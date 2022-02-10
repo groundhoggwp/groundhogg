@@ -575,11 +575,11 @@
 
                 $('#select-step').select2({
                   placeholder: __( 'Select a step...', 'groundhogg' ),
-                  data: funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
+                  data: funnel ? funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
                     id: s.ID,
                     text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`,
                     selected: s.ID == step.ID,
-                  }))
+                  })) : [],
                   // templateSelection: template,
                   // templateResult: template
                 }).on('change', ({ target }) => {
@@ -633,7 +633,8 @@
               }
 
               const { setContent, close: closeFunnelModal } = modal({
-                content: addToFunnel()
+                content: addToFunnel(),
+                width: 400,
               })
 
               mounted()

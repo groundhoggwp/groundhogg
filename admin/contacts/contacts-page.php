@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Classes\Note;
+use Groundhogg\Contact_Properties;
 use Groundhogg\Saved_Searches;
 use Groundhogg\Scripts;
 use Groundhogg\Step;
@@ -140,6 +141,14 @@ class Contacts_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			default:
 			case 'bulk_edit':
+
+				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
+
+				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts' , 'BulkEdit', [
+					'meta_exclusions'              => $this->get_meta_key_exclusions(),
+					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all(),
+				] );
+
 				break;
 			case 'edit':
 				wp_enqueue_editor();
@@ -147,10 +156,10 @@ class Contacts_Page extends Admin_Page {
 
 				$contact = get_contactdata( get_url_var( 'contact' ) );
 
-				if ( ! $contact ){
-					$this->add_notice( new \WP_Error( 'error', sprintf( __('Contact with ID %d does not exist'), get_url_var( 'contact' ) ) ) );
+				if ( ! $contact ) {
+					$this->add_notice( new \WP_Error( 'error', sprintf( __( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
 					?>
-					<script>window.open( '<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
+					<script>window.open('<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
 					<?php
 					die();
 				}
@@ -164,16 +173,11 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 					'contact_id'                   => $contact->get_id(),
-					'delete_note_text'             => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
 					'contact'                      => $contact,
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
-					'gh_contact_custom_properties' => get_option( 'gh_contact_custom_properties', [
-						'tabs'   => [],
-						'groups' => [],
-						'fields' => []
-					] ),
-					'marketable' => $contact->is_marketable(),
-					'i18n' => [
+					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all(),
+					'marketable'                   => $contact->is_marketable(),
+					'i18n'                         => [
 						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
 					],
 				] );
@@ -289,13 +293,9 @@ class Contacts_Page extends Admin_Page {
 				} else {
 					return _ex( 'Submit Form', 'page_title', 'groundhogg' );
 				}
-
-			case 'search':
-				return _ex( 'Search Contacts', 'page_title', 'groundhogg' );
-
-			case 'view':
 			case 'bulk_edit':
 				return __( 'Bulk Edit Contacts', 'groundhogg' );
+			case 'view':
 			default:
 				return _ex( 'Contacts', 'page_title', 'groundhogg' );
 		}
@@ -638,7 +638,7 @@ class Contacts_Page extends Admin_Page {
 
 		do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
 
-		if ( ! wp_doing_ajax() ){
+		if ( ! wp_doing_ajax() ) {
 			$this->add_notice( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
 		}
 
@@ -874,7 +874,8 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/parts/bulk-edit.php';
+		?>
+		<div id="bulk-edit"></div><?php
 	}
 
 	function process___export() {

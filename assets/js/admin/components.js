@@ -177,11 +177,11 @@
 
     const onMount = () => {
 
-      tooltip('.add-tag', {
+      tooltip($el.find('.add-tag'), {
         content: __('Add a tag', 'groundhogg')
       })
 
-      $('.gh-tag .remove-tag').on('click', (e) => {
+      $el.find('.gh-tag .remove-tag').on('click', (e) => {
         let tagId = parseInt(e.currentTarget.dataset.id)
 
         if (removeTags.includes(tagId)) {
@@ -195,7 +195,7 @@
         mount()
       })
 
-      $('.gh-tag .remove-adding-tag').on('click', (e) => {
+      $el.find('.gh-tag .remove-adding-tag').on('click', (e) => {
         let tagId = parseInt(e.currentTarget.dataset.id)
 
         if (addTags.includes(tagId)) {
@@ -207,7 +207,7 @@
         mount()
       })
 
-      $('.add-tag').on('click', (e) => {
+      $el.find('.add-tag').on('click', (e) => {
         searchOptionsWidget({
           target: e.currentTarget,
           position: 'fixed',
@@ -223,7 +223,7 @@
               {
                 ID: search,
                 data: {
-                  tag_name: `Add "${search}"`,
+                  tag_name: sprintf( __( 'Add "%s"', 'groundhogg' ), search ),
                 }
               },
               ...opts

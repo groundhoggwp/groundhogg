@@ -6248,3 +6248,14 @@ function is_free_email_provider( $email ) {
 
 	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), $providers ) );
 }
+
+/**
+ * Filter object array based on exists
+ *
+ * @param $array
+ *
+ * @return array
+ */
+function filter_object_exists( $array ){
+	return array_filter( $array, function ( $obj ){ return method_exists( $obj, 'exists' ) && $obj->exists(); } );
+}

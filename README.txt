@@ -333,6 +333,7 @@ You can purchase a premium plan for access to support and our premium extensions
   * Edits are saved via the API, no page reloading!
   * Custom tabs are backwards compatible.
  * ADDED Contact merging!
+ * ADDED Support for multilingual sites by saving the contact locale and switching to their locale when necessary.
  * ADDED When adding a contact via the admin you can opt them into GDPR requirements.
  * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
  * TWEAKED all jQuery removed from the form ajax submission script.

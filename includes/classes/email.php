@@ -554,11 +554,11 @@ class Email extends Base_Object_With_Meta {
 		add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 
 		// If click tracking is disabled, do not convert to tracking links.
-		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ){
+		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ) {
 			add_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 		}
 
-		add_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
+//		add_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
 		add_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 	}
 
@@ -578,7 +578,7 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'groundhogg/email_template/preferences_link', [ $this, 'get_preferences_link' ] );
 		remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
-		remove_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
+//		remove_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
 	}
 
 	/**
@@ -590,7 +590,7 @@ class Email extends Base_Object_With_Meta {
 
 		$e = $this->get_meta( 'edited' );
 
-		if ( ! $e ){
+		if ( ! $e ) {
 			return false;
 		}
 
@@ -1108,12 +1108,23 @@ class Email extends Base_Object_With_Meta {
 
 	public function get_as_array() {
 
-		if ( ! get_contactdata() ) {
+		$contact = get_contactdata();
+
+		if ( ! $contact && is_user_logged_in() ) {
+			$user = wp_get_current_user();
+
+			$contact             = new Contact();
+			$contact->email      = $user->user_email;
+			$contact->first_name = $user->first_name;
+			$contact->last_name  = $user->last_name;
+		}
+
+		if ( ! $contact ){
 			return parent::get_as_array();
 		}
 
 		$this->set_event( new Event() );
-		$this->set_contact( get_contactdata() );
+		$this->set_contact( $contact );
 
 		$live_preview   = $this->build();
 		$edited_preview = $this->get_edited_preview();

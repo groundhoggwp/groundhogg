@@ -47,6 +47,7 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width',
 			...props,
 			type: 'text'
 		})}`
@@ -68,6 +69,7 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${textarea({
+			className: 'full-width',
 			...props,
 		})}`
       },
@@ -88,6 +90,7 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width',
 			...props,
 			type: 'number',
 		})}`
@@ -109,6 +112,7 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width',
 			...props,
 			type: 'date',
 		})}`
@@ -130,9 +134,10 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
-          ...props,
-          type: 'time',
-        })}`
+			className: 'full-width',
+			...props,
+			type: 'time',
+		})}`
       },
       onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -249,6 +254,7 @@
 
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${select({
+			className: 'full-width',
 			...props,
 		}, options, value)}`
       },

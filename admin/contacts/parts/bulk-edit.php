@@ -44,19 +44,21 @@ $count = get_db( 'contacts' )->count( $query );
 			<th>
 				<label for="primary_phone"><?php echo _x( 'Primary Phone', 'contact_record', 'groundhogg' ) ?></label>
 			</th>
-			<td><?php
+			<td class="gh-input-group"><?php
 				echo html()->input( [
-					'type'  => 'tel',
-					'class' => 'input',
-					'id'    => 'primary_phone',
-					'name'  => 'primary_phone',
+					'type'        => 'tel',
+					'class'       => 'input',
+					'id'          => 'primary_phone',
+					'name'        => 'primary_phone',
+					'placeholder' => __( '+1 (555) 555-555', 'groundhogg' )
 				] ); ?>
-				<?php _e( 'ext.', 'groundhogg' ) ?>
 				<?php
 				echo html()->input( [
-					'id'    => 'primary_phone_extension',
-					'name'  => 'primary_phone_extension',
-					'class' => 'phone-ext',
+					'id'          => 'primary_phone_extension',
+					'name'        => 'primary_phone_extension',
+					'class'       => 'phone-ext',
+					'placeholder' => __( '1234', 'groundhogg' ),
+					'title'       => __( 'Extension', 'groundhogg' )
 				] ); ?>
 			</td>
 		</tr>
@@ -163,61 +165,6 @@ $count = get_db( 'contacts' )->count( $query );
 				?></td>
 		</tr>
 		</tbody>
-	</table>
-	<!-- Company info -->
-	<h2><?php _ex( 'Company Info', 'contact_record', 'groundhogg' ); ?></h2>
-	<table class="form-table">
-		<tr>
-			<th><label for="company_name"><?php echo _x( 'Company Name', 'contact_record', 'groundhogg' ) ?></label>
-			</th>
-			<td><?php
-				echo html()->input( [
-					'id'   => 'company_name',
-					'name' => 'company_name',
-				] ); ?>
-			</td>
-		</tr>
-		<tr>
-			<th><label for="job_title"><?php echo _x( 'Job Title', 'contact_record', 'groundhogg' ) ?></label></th>
-			<td><?php
-				echo html()->input( [
-					'id'   => 'job_title',
-					'name' => 'job_title',
-				] ); ?>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label
-					for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label>
-			</th>
-			<td><?php
-				echo html()->input( [
-					'id'   => 'company_address',
-					'name' => 'company_address',
-				] ); ?>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label for="company_phone"><?php echo _x( 'Company Phone', 'contact_record', 'groundhogg' ) ?></label>
-			</th>
-			<td><?php
-				echo html()->input( [
-					'type'  => 'tel',
-					'class' => 'input',
-					'id'    => 'company_phone',
-					'name'  => 'company_phone',
-				] ); ?>
-				<?php _e( 'ext.', 'groundhogg' ) ?>
-				<?php
-				echo html()->input( [
-					'id'    => 'company_phone_extension',
-					'name'  => 'company_phone_extension',
-					'class' => 'phone-ext',
-				] ); ?>
-			</td>
-		</tr>
 	</table>
 	<h3><?php _ex( 'Location', 'bulk_edit', 'groundhogg' ); ?></h3>
 	<table class="form-table">

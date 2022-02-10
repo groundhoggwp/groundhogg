@@ -10,12 +10,9 @@
  * @var $contact \Groundhogg\Contact
  */
 
-use function Groundhogg\time_ago;
-
 if ( $contact->get_user_id() ):
 
 	?>
-	<p><?php \Groundhogg\dashicon_e( 'admin-users' ); ?> <b><?php _e( 'Details', 'groundhogg' ) ?></b></p>
 	<ul class="info-list">
 		<li>
 			<span class="label"><?php _e( 'User ID', 'groundhogg' ) ?></span>

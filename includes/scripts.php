@@ -213,6 +213,26 @@ class Scripts {
 			'groundhogg-admin-components'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-bulk-edit-contacts', GROUNDHOGG_ASSETS_URL . 'js/admin/bulk-edit-contacts' . $dot_min . '.js', [
+			'groundhogg-admin-search-filters',
+			'groundhogg-admin-components',
+			'groundhogg-admin-properties',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
+			'jquery',
+			'jquery-ui-sortable',
+			'groundhogg-admin-notes',
+			'groundhogg-admin-components',
+			'groundhogg-admin-properties',
+			'groundhogg-admin',
+			'groundhogg-admin-data'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [
+			'jquery',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
@@ -241,24 +261,7 @@ class Scripts {
 			'wp-color-picker'
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
-			'jquery',
-			'jquery-ui-sortable',
-			'groundhogg-admin-notes',
-			'groundhogg-admin-components',
-			'groundhogg-admin-properties',
-			'groundhogg-admin',
-			'groundhogg-admin-data'
-		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [
-			'jquery',
-		], GROUNDHOGG_VERSION, true );
-
-		wp_register_script( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $dot_min . '.js', [
-			'jquery',
-			'groundhogg-admin'
-		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/dashboard' . $dot_min . '.js', [
 			'jquery',
 			'papaparse'

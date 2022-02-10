@@ -109,7 +109,7 @@ h3.no-margin-top {
 .property-groups {
   min-width: 360px;
 }
-.property-groups .property-group {
+.property-groups .property-group:not(:first-child) {
   margin-top: 20px;
 }
 .property-groups .property-group .property-group-header {
@@ -448,6 +448,14 @@ span.gh-text.lg {
   height: 14px;
   width: 14px;
   margin-right: 10px;
+}
+.gh-panel .gh-panel-header .toggle-indicator {
+  background: transparent;
+  border: none;
+  border-top-right-radius: 5px;
+}
+.gh-panel .gh-panel-header .toggle-indicator:hover {
+  background: rgba(16, 38, 64, 0.05);
 }
 .gh-panel .gh-panel-header .toggle-indicator::before {
   content: "";
@@ -1565,6 +1573,13 @@ ul.gh-form-errors {
 
 .text-align.right {
   text-align: right;
+}
+
+#bulk-edit {
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .spinning {
