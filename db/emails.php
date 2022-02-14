@@ -75,6 +75,26 @@ class Emails extends DB {
 		return 'email';
 	}
 
+	protected function add_additional_actions() {
+		parent::add_additional_actions();
+		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
+	}
+
+	public function owner_deleted( $prev, $new ){
+		$this->update([
+			'author' => $prev,
+		], [
+			'author' => $new,
+		]);
+
+		$this->update([
+			'from_user' => $prev,
+		], [
+			'from_user' => $new,
+		]);
+	}
+
+
 	/**
 	 * Get columns and formats
 	 *
