@@ -184,6 +184,10 @@ body.groundhogg-admin-page {
 .groundhogg-admin-page h2.nav-tab-wrapper {
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
   padding-top: 0;
+  margin-top: 20px;
+}
+.groundhogg-admin-page h2.nav-tab-wrapper.no-margin {
+  margin-top: 0;
 }
 .groundhogg-admin-page h2.nav-tab-wrapper .nav-tab {
   border-radius: 3px 3px 0 0;
@@ -465,6 +469,9 @@ span.gh-text.lg {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-decoration: none;
+}
+.gh-panel.closed .gh-panel-header {
+  border-bottom: none;
 }
 .gh-panel.closed .gh-panel-header .toggle-indicator::before {
   content: "";
@@ -1167,9 +1174,11 @@ p.error,
 .gh-tags span.gh-tag {
   background: #f2f2f2;
   padding: 3px 9px;
+  gap: 5px;
   border-radius: 3px;
   font-size: 12px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 .gh-tags span.gh-tag.remove {
   background: rgba(233, 31, 79, 0.5);
@@ -1225,14 +1234,16 @@ p.error,
 
 .gh-progress-bar {
   min-width: 300px;
-  border: 1px solid #0075ff;
-  background-color: rgba(0, 117, 255, 0.02);
+  background-color: rgba(0, 117, 255, 0.1);
   border-radius: 5px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .gh-progress-bar .gh-progress-bar-fill {
+  box-sizing: border-box;
   width: 1px;
   background-color: #0075ff;
-  height: 25px;
+  padding: 8px;
   display: flex;
   align-items: center;
 }
@@ -1576,6 +1587,9 @@ ul.gh-form-errors {
 }
 
 #bulk-edit {
+  margin-top: 40px;
+}
+#bulk-edit #edit-fields {
   width: 600px;
   display: flex;
   flex-direction: column;

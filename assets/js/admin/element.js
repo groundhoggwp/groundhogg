@@ -312,6 +312,7 @@
     const html = `
 		<div class="gh-progress-bar">
 			<div class="gh-progress-bar-fill">
+          <span class="fill-amount">0%</span>
 			</div>
 		</div>`
 
@@ -325,6 +326,11 @@
 
       if (progress <= 1) {
         progress = progress * 100
+      }
+
+      // cap at 100
+      if ( progress >= 100 ){
+        progress = 100
       }
 
       if (progress === 100) {
@@ -731,7 +737,7 @@
     onOpen = () => {},
     ...rest
   }) => {
-    
+
     return modal({
       canClose: false,
       width: 500,
@@ -747,7 +753,7 @@ ${afterProgress()}`,
     })
 
   }
-  
+
   /**
    *
    * @param text
@@ -1034,7 +1040,7 @@ ${afterProgress()}`,
       setContent
     }
   }
-  
+
   const wpErrorDialog = ( error, props ) => {
 
     let message

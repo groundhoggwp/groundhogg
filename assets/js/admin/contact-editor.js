@@ -1045,7 +1045,7 @@
     const template = () => {
       // language=HTML
       return `
-		  <div id="secondary-tabs"><h2 class="nav-tab-wrapper secondary gh">
+		  <div id="secondary-tabs"><h2 class="no-margin nav-tab-wrapper secondary gh">
 			  ${tabs.map(({
 				  id,
 				  name
@@ -1612,6 +1612,10 @@
       $('#send-email').on('click', e => {
         e.preventDefault()
         sendEmail()
+      })
+
+      $('#primary-contact-stuff .toggle-indicator').on('click', e => {
+        $(e.target).closest('.gh-panel').toggleClass('closed')
       })
 
       if (window.location.href.match(/send_email=true/)) {
