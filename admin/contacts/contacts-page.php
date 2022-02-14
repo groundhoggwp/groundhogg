@@ -36,6 +36,7 @@ use Groundhogg\Preferences;
 use function Groundhogg\sanitize_email_header;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
+use function Groundhogg\utils;
 use function Groundhogg\validate_tags;
 use function Groundhogg\Ymd;
 use function Groundhogg\Ymd_His;
@@ -134,6 +135,42 @@ class Contacts_Page extends Admin_Page {
 	 */
 	public function scripts() {
 
+		$filter_query = [
+			'filters'         => [],
+			'exclude_filters' => []
+		];
+
+		if ( $filters = get_url_var( 'filters' ) ) {
+			$filter_query['filters'] = is_string( $filters ) ? base64_json_decode( $filters ) : $filters;
+		}
+
+		if ( $exclude_filters = get_url_var( 'exclude_filters' ) ) {
+			$filter_query['exclude_filters'] = is_string( $exclude_filters ) ? base64_json_decode( $exclude_filters ) : $exclude_filters;
+		}
+
+		if ( $saved_search = get_url_var( 'saved_search' ) ) {
+			$saved_search = Saved_Searches::instance()->get( $saved_search );
+
+			// If the search does not have filters we need to migrate it
+			if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
+				$saved_search['query'] = [
+					'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+				];
+			}
+
+			if ( isset( $saved_search['query']['filters'] ) ) {
+				$filter_query['filters'] = $saved_search['query']['filters'];
+			}
+
+			if ( isset( $saved_search['query']['exclude_filters'] ) ) {
+				$filter_query['exclude_filters'] = $saved_search['query']['exclude_filters'];
+			}
+		}
+
+		if ( empty( $filter_query['filters'] ) && empty( $filter_query['exclude_filters'] ) ) {
+			$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
+		}
+
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
 		wp_enqueue_script( 'groundhogg-admin-components' );
@@ -144,9 +181,23 @@ class Contacts_Page extends Admin_Page {
 
 				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
 
-				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts' , 'BulkEdit', [
+				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts', 'BulkEdit', [
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all(),
+					'query'                        => get_request_query(),
+					'filter_query'                 => $filter_query,
+					'countries'                    => utils()->location->get_countries_list(),
+					'time_zones'                   => utils()->location->get_time_zones(),
+					'language_dropdown'           => wp_dropdown_languages([
+						'id'                          => 'locale',
+						'name'                        => 'locale',
+						'selected'                    => '',
+						'echo'                        => false,
+						'show_available_translations' => true,
+						'show_option_site_default'    => false,
+						'show_option_en_us'           => true,
+						'explicit_option_en_us'       => true,
+                    ])
 				] );
 
 				break;
@@ -159,7 +210,7 @@ class Contacts_Page extends Admin_Page {
 				if ( ! $contact ) {
 					$this->add_notice( new \WP_Error( 'error', sprintf( __( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
 					?>
-					<script>window.open('<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
+                    <script>window.open('<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
 					<?php
 					die();
 				}
@@ -188,45 +239,6 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'select2' );
 				wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 				enqueue_filter_assets();
-
-				$filter_query = [
-					'filters'         => [],
-					'exclude_filters' => []
-				];
-
-				if ( $filters = get_url_var( 'filters' ) ) {
-
-					$filter_query['filters'] = $filters;
-
-					if ( is_string( $filters ) ) {
-						$filter_query['filters'] = base64_json_decode( $filters );
-					}
-
-				}
-
-				if ( $exclude_filters = get_url_var( 'exclude_filters' ) ) {
-
-					$filter_query['exclude_filters'] = $exclude_filters;
-
-					if ( is_string( $exclude_filters ) ) {
-						$filter_query['exclude_filters'] = base64_json_decode( $exclude_filters );
-					}
-				}
-
-				if ( $saved_search = get_url_var( 'saved_search' ) ) {
-					$saved_search = Saved_Searches::instance()->get( $saved_search );
-
-					// If the search does not have filters we need to migrate it
-					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
-						$saved_search['query'] = [
-							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
-						];
-					}
-				}
-
-				if ( empty( $filter_query['filters'] ) && empty( $filter_query['exclude_filters'] ) ) {
-					$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
-				}
 
 				// Advanced Search
 				wp_enqueue_script( 'groundhogg-admin-contact-search' );
@@ -762,12 +774,12 @@ class Contacts_Page extends Admin_Page {
 		$contacts_table = new Tables\Contacts_Table();
 
 		?>
-		<form method="post" id="contacts-table-form">
+        <form method="post" id="contacts-table-form">
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
 			?>
-		</form>
+        </form>
 		<?php
 
 		$table = ob_get_clean();
@@ -860,12 +872,12 @@ class Contacts_Page extends Admin_Page {
 		include __DIR__ . '/parts/quick-search.php';
 
 		?>
-		<form method="post" id="contacts-table-form">
+        <form method="post" id="contacts-table-form">
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
 			?>
-		</form>
+        </form>
 		<?php
 	}
 
@@ -875,7 +887,7 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		?>
-		<div id="bulk-edit"></div><?php
+        <div id="bulk-edit"></div><?php
 	}
 
 	function process___export() {
@@ -898,10 +910,8 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		return admin_page_url( 'gh_contacts', [
-			'action' => 'bulk_edit',
-			'query'  => [
-				'include' => implode( ',', $this->get_items() )
-			]
+			'action'  => 'bulk_edit',
+			'include' => implode( ',', $this->get_items() )
 		] );
 	}
 
