@@ -156,8 +156,6 @@ abstract class Extension {
 			}
 
 			if ( ! is_plugin_active( $plugin_file_path ) ) {
-				add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
-
 				return false;
 			}
 		}
@@ -183,6 +181,12 @@ abstract class Extension {
 	public function init() {
 
 		if ( ! $this->dependent_plugins_are_installed() ) {
+
+			// hide if white-labelled
+			if ( ! is_white_labeled() ){
+				add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
+			}
+
 			return;
 		}
 
