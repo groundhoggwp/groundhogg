@@ -498,6 +498,10 @@ abstract class Base_Object_Api extends Base_Api {
 			$items = $request->get_json_params();
 		}
 
+		if ( empty( $items ) ){
+			return self::ERROR_403( 'error', 'No items defined.' );
+		}
+
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
 		$deleted_item_ids = [];

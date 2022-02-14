@@ -279,32 +279,31 @@ class Contacts_Api extends Base_Object_Api {
 		$contact_query = new Contact_Query();
 
 		$count    = $contact_query->count( $query );
-		$contacts = $contact_query->query( $query );
-
-		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
+		$contacts = $contact_query->query( $query, true );
 
 		/**
 		 * @var $contact Contact
 		 */
 		foreach ( $contacts as $contact ) {
 
+			$_data = $data;
+
 			if ( ! current_user_can( 'edit_contact', $contact ) ) {
 				return self::ERROR_401();
 			}
 
-			// get the email address
+			// get the email address if part of the request
 			$email_address = get_array_var( $data, 'email' );
 
-			// skip if the email address is not being used
-			if ( is_email_address_in_use( $email_address, $contact ) ) {
-				continue;
+			// remove email from update request if in use by another contact
+			if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
+				unset( $_data['email']);
 			}
 
-			$contact->update( $data );
+			$contact->update( $_data );
 			$contact->update_meta( $meta );
 			$contact->apply_tag( $add_tags );
 			$contact->remove_tag( $remove_tags );
-
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -388,12 +387,19 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact->update( $data );
 
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+		if ( $meta ){
+			foreach ( $meta as $key => $value ) {
+				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+			}
 		}
 
-		$contact->apply_tag( $add_tags );
-		$contact->remove_tag( $remove_tags );
+		if ( $add_tags ){
+			$contact->apply_tag( $add_tags );
+		}
+
+		if ( $remove_tags ){
+			$contact->remove_tag( $remove_tags );
+		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
 	}
