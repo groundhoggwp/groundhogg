@@ -335,6 +335,8 @@ You can purchase a premium plan for access to support and our premium extensions
  * ADDED Contact merging!
  * ADDED Support for multilingual sites by saving the contact locale and switching to their locale when necessary.
  * ADDED When adding a contact via the admin you can opt them into GDPR requirements.
+ * ADDED CRM data reassignment when deleting users that are CRM users.
+ * ADDED Option to delete associated contact records when deleting users from the admin.
  * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
  * TWEAKED all jQuery removed from the form ajax submission script.
  * TWEAKED all jQuery removed from the fullframe script.
@@ -342,6 +344,7 @@ You can purchase a premium plan for access to support and our premium extensions
  * FIXED fullframe.js conflicting with the forms iframe script causing console errors.
  * FIXED fullframe.js made to be compatible with plugins which optimize iframes.
  * FIXED Replacement code regex will not span multiple lines.
+ * FIXED Search issues with custom checkbox fields.
  * REMOVED Company/Business details in favour of adding them to the Companies addon since these fields are usually unused unless the companies addon is installed.
 
 = 2.5.7.9 (2022-01-05) =
