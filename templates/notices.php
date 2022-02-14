@@ -105,3 +105,10 @@ function notice_preferences_updated(){
 	<?php
 }
 
+function notice_unsubscribed(){
+	?>
+    <div class="notice notice-success">
+        <p><?php _e( "You have been unsubscribed.", 'groundhogg' ); ?></p>
+    </div>
+	<?php
+}
