@@ -18,7 +18,7 @@ class Location {
 	 *
 	 * @param string $country_code
 	 *
-	 * @param bool $existing_data whether to only include countries which we have existing contacts for
+	 * @param bool   $existing_data whether to only include countries which we have existing contacts for
 	 *
 	 * @return array|string
 	 */
@@ -414,9 +414,9 @@ class Location {
 	/**
 	 * Get a list of all the time zones
 	 *
+	 * @throws \Exception
 	 * @return array
-	 * //     * @throws \Exception
-	 */
+	 * //     */
 	public function get_time_zones() {
 
 		static $regions = array(
@@ -471,7 +471,7 @@ class Location {
 		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) )   //check ip from share internet
 		{
 			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )   //to check ip is pass from proxy
+		} else if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )   //to check ip is pass from proxy
 		{
 			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		} else {
@@ -506,35 +506,40 @@ class Location {
 	/**
 	 * Get Geolocated information about an IP address
 	 *
-	 * @param null $ip
+	 * @param null   $ip
 	 * @param string $purpose
-	 * @param bool $deep_detect
+	 * @param bool   $deep_detect
 	 *
 	 * @return array|string|object
 	 */
 	public function ip_info( $ip = null, $purpose = "location", $deep_detect = true ) {
+
 		$output = null;
-		if ( filter_var( $ip, FILTER_VALIDATE_IP ) === false ) {
-			$ip = $_SERVER["REMOTE_ADDR"];
-			if ( $deep_detect ) {
 
-				$IP_Alias = [
-					'HTTP_X_FORWARDED_FOR',
-					'HTTP_CLIENT_IP',
-					'HTTP_CF_CONNECTING_IP'
-				];
-
-				foreach ( $IP_Alias as $alias ) {
-					$alias_ip = get_array_var( $_SERVER, $alias );
-					if ( $alias_ip && filter_var( $alias_ip, FILTER_VALIDATE_IP ) ) {
-						$ip = $alias_ip;
-					}
-				}
-			}
+		if ( $ip === null ) {
+			$ip = $this->get_real_ip();
 		}
-		$purpose    = str_replace( array( "name", "\n", "\t", " ", "-", "_" ), null, strtolower( trim( $purpose ) ) );
-		$support    = array( "country", "countrycode", "state", "region", "city", "location", "address" );
-		$continents = array(
+
+		if ( filter_var( $ip, FILTER_VALIDATE_IP ) === false ) {
+			return false;
+		}
+
+		$purpose    = str_replace( [ "name", "\n", "\t", " ", "-", "_" ], null, strtolower( trim( $purpose ) ) );
+		$support    = [
+			'raw',
+			'cc',
+			'country_code',
+			'province',
+			"country",
+			"countrycode",
+			"state",
+			"region",
+			"city",
+			"location",
+			"address"
+		];
+
+		$continents = [
 			"AF" => "Africa",
 			"AN" => "Antarctica",
 			"AS" => "Asia",
@@ -542,65 +547,69 @@ class Location {
 			"OC" => "Australia (Oceania)",
 			"NA" => "North America",
 			"SA" => "South America"
-		);
-		if ( filter_var( $ip, FILTER_VALIDATE_IP ) && in_array( $purpose, $support ) ) {
+		];
 
+		if ( in_array( $purpose, $support ) ) {
 
-			$ipdat = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip, [
+			$ip_data = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip, [
 				'headers' => [
 					'Referer' => home_url()
 				]
 			] );
 
-			if ( is_wp_error( $ipdat ) || ! $ipdat || wp_remote_retrieve_response_code( $ipdat ) !== 200 ) {
+			if ( is_wp_error( $ip_data ) || ! $ip_data || wp_remote_retrieve_response_code( $ip_data ) !== 200 ) {
 				return false;
 			}
 
-			$ipdat = wp_remote_retrieve_body( $ipdat );
-			$ipdat = @json_decode( $ipdat );
+			$ip_data = wp_remote_retrieve_body( $ip_data );
+			$ip_data = @json_decode( $ip_data );
 
-			if ( ! $ipdat ) {
+			if ( ! $ip_data ) {
 				return false;
 			}
 
-			if ( @strlen( trim( $ipdat->geoplugin_countryCode ) ) == 2 ) {
+			if ( @strlen( trim( $ip_data->geoplugin_countryCode ) ) == 2 ) {
 				switch ( $purpose ) {
-					case "location":
+					case 'raw':
+						$output = $ip_data;
+						break;
+					case 'location':
 						$output = array(
-							"city"           => @$ipdat->geoplugin_city,
-							"region"         => @$ipdat->geoplugin_regionName,
-							"region_code"    => @$ipdat->geoplugin_regionCode,
-							"country"        => @$ipdat->geoplugin_countryName,
-							"country_code"   => @$ipdat->geoplugin_countryCode,
-							"continent"      => @$continents[ strtoupper( $ipdat->geoplugin_continentCode ) ],
-							"continent_code" => @$ipdat->geoplugin_continentCode,
-							"time_zone"      => @$ipdat->geoplugin_timezone
+							"city"           => @$ip_data->geoplugin_city,
+							"region"         => @$ip_data->geoplugin_regionName,
+							"region_code"    => @$ip_data->geoplugin_regionCode,
+							"country"        => @$ip_data->geoplugin_countryName,
+							"country_code"   => @$ip_data->geoplugin_countryCode,
+							"continent"      => @$continents[ strtoupper( $ip_data->geoplugin_continentCode ) ],
+							"continent_code" => @$ip_data->geoplugin_continentCode,
+							"time_zone"      => @$ip_data->geoplugin_timezone
 						);
 						break;
-					case "address":
-						$address = array( $ipdat->geoplugin_countryName );
-						if ( @strlen( $ipdat->geoplugin_regionName ) >= 1 ) {
-							$address[] = $ipdat->geoplugin_regionName;
+					case 'address':
+						$address = array( $ip_data->geoplugin_countryName );
+						if ( @strlen( $ip_data->geoplugin_regionName ) >= 1 ) {
+							$address[] = $ip_data->geoplugin_regionName;
 						}
-						if ( @strlen( $ipdat->geoplugin_city ) >= 1 ) {
-							$address[] = $ipdat->geoplugin_city;
+						if ( @strlen( $ip_data->geoplugin_city ) >= 1 ) {
+							$address[] = $ip_data->geoplugin_city;
 						}
 						$output = implode( ", ", array_reverse( $address ) );
 						break;
-					case "city":
-						$output = @$ipdat->geoplugin_city;
+					case 'city':
+						$output = @$ip_data->geoplugin_city;
 						break;
-					case "state":
-						$output = @$ipdat->geoplugin_regionName;
+					case 'region':
+					case 'province':
+					case 'state':
+						$output = @$ip_data->geoplugin_regionName;
 						break;
-					case "region":
-						$output = @$ipdat->geoplugin_regionName;
+					case 'country':
+						$output = @$ip_data->geoplugin_countryName;
 						break;
-					case "country":
-						$output = @$ipdat->geoplugin_countryName;
-						break;
-					case "countrycode":
-						$output = @$ipdat->geoplugin_countryCode;
+					case 'countrycode':
+					case 'country_code':
+					case 'cc':
+						$output = @$ip_data->geoplugin_countryCode;
 						break;
 				}
 			}

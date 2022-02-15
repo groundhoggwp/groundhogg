@@ -1,4 +1,4 @@
-(($, editor) => {
+( ($, editor) => {
 
   const { contact, meta_exclusions } = editor
 
@@ -25,9 +25,14 @@
     moreMenu,
     loadingDots,
     spinner,
-    dialog
+    dialog,
   } = Groundhogg.element
-  const { currentUser, filters, propertiesEditor, isWPFusionActive } = Groundhogg
+  const {
+    currentUser,
+    filters,
+    propertiesEditor,
+    isWPFusionActive,
+  } = Groundhogg
   const { userHasCap } = Groundhogg.user
   const {
     events: EventsStore,
@@ -76,7 +81,9 @@
     }
 
     if (contact.data.owner_id && currentUser.ID != contact.data.owner_id) {
-      email.cc = [filters.owners.find(u => u.ID == contact.data.owner_id).data.user_email]
+      email.cc = [
+        filters.owners.find(u => u.ID == contact.data.owner_id).data.user_email,
+      ]
     }
 
     Groundhogg.components.emailModal(email)
@@ -86,32 +93,36 @@
 
     // language = HTML
     let actions = `
-    <button id="action-send-email" class="gh-button secondary text icon">${icons.email}</button>
-				${getContact().meta.primary_phone ? `<a id="call-primary" class="gh-button secondary text icon" href="tel:${getContact().meta.primary_phone}">${icons.phone}</a>` : ''}
-				${getContact().meta.mobile_phone ? `<a id="call-mobile" class="gh-button secondary text icon" href="tel:${getContact().meta.mobile_phone}">${icons.smartphone}</a>` : ''}
-				<button id="add-to-funnel" class="gh-button secondary text icon">${icons.funnel}</button>
-				<button id="internal-form" class="gh-button secondary text icon">${icons.form}</button>
-				<button id="contact-more" class="gh-button secondary text icon">${icons.verticalDots}</button>`
+    <button id="action-send-email" class="gh-button secondary text icon">${ icons.email }</button>
+				${ getContact().meta.primary_phone
+      ? `<a id="call-primary" class="gh-button secondary text icon" href="tel:${ getContact().meta.primary_phone }">${ icons.phone }</a>`
+      : '' }
+				${ getContact().meta.mobile_phone
+      ? `<a id="call-mobile" class="gh-button secondary text icon" href="tel:${ getContact().meta.mobile_phone }">${ icons.smartphone }</a>`
+      : '' }
+				<button id="add-to-funnel" class="gh-button secondary text icon">${ icons.funnel }</button>
+				<button id="internal-form" class="gh-button secondary text icon">${ icons.form }</button>
+				<button id="contact-more" class="gh-button secondary text icon">${ icons.verticalDots }</button>`
 
     $('#contact-more-actions').html(actions)
 
     tooltip('#action-send-email', {
-      content: __('Send Email', 'groundhogg')
+      content: __('Send Email', 'groundhogg'),
     })
     tooltip('#call-primary', {
-      content: __('Call', 'groundhogg')
+      content: __('Call', 'groundhogg'),
     })
     tooltip('#call-mobile', {
-      content: __('Call Mobile', 'groundhogg')
+      content: __('Call Mobile', 'groundhogg'),
     })
     tooltip('#internal-form', {
-      content: __('Submit Internal Form', 'groundhogg')
+      content: __('Submit Internal Form', 'groundhogg'),
     })
     tooltip('#contact-more', {
-      content: __('More Actions', 'groundhogg')
+      content: __('More Actions', 'groundhogg'),
     })
     tooltip('#add-to-funnel', {
-      content: __('Add to Funnel', 'groundhogg')
+      content: __('Add to Funnel', 'groundhogg'),
     })
 
     $('#internal-form').on('click', e => {
@@ -119,7 +130,7 @@
         contact: getContact(),
         onSubmit: () => {
           activityUpdated()
-        }
+        },
       })
     })
 
@@ -134,26 +145,30 @@
           const addToFunnelUi = () => {
             // language=HTML
             return `
-				<div>
-					<h2>${sprintf(__('Add %s to a funnel', 'groundhogg'), getContact().data.full_name)}</h2>
-					<div class="gh-rows-and-columns">
-						<div class="gh-row">
-							<div class="gh-col">
-								${select({ id: 'select-funnel' })}
-							</div>
-						</div>
-						<div class="gh-row">
-							<div class="gh-col">
-								${funnel ? select({ id: 'select-step' }) : ''}
-							</div>
-						</div>
-						<div class="gh-row">
-							<div class="gh-col">
-								${funnel && step ? `<button id="confirm-add-to-funnel" class="gh-button primary">${__('Add to funnel')}</button>` : ''}
-							</div>
-						</div>
-					</div>
-				</div>`
+                <div>
+                    <h2>${ sprintf(__('Add %s to a funnel', 'groundhogg'),
+                            getContact().data.full_name) }</h2>
+                    <div class="gh-rows-and-columns">
+                        <div class="gh-row">
+                            <div class="gh-col">
+                                ${ select({ id: 'select-funnel' }) }
+                            </div>
+                        </div>
+                        <div class="gh-row">
+                            <div class="gh-col">
+                                ${ funnel ? select({ id: 'select-step' }) : '' }
+                            </div>
+                        </div>
+                        <div class="gh-row">
+                            <div class="gh-col">
+                                ${ funnel && step
+                                        ? `<button id="confirm-add-to-funnel" class="gh-button primary">${ __(
+                                                'Add to funnel') }</button>`
+                                        : '' }
+                            </div>
+                        </div>
+                    </div>
+                </div>`
           }
 
           setContent(addToFunnelUi())
@@ -165,19 +180,19 @@
               getParams: (q) => {
                 return {
                   ...q,
-                  status: 'active'
+                  status: 'active',
                 }
               },
-              data: FunnelsStore.getItems().map(f => ({
+              data: FunnelsStore.getItems().map(f => ( {
                 id: f.ID,
                 text: f.data.title,
-                selected: funnel && f.ID === funnel.ID
-              })),
+                selected: funnel && f.ID === funnel.ID,
+              } )),
               getResults: ({ items }) => {
                 FunnelsStore.itemsFetched(items)
-                return items.map(f => ({ id: f.ID, text: f.data.title }))
+                return items.map(f => ( { id: f.ID, text: f.data.title } ))
               },
-              placeholder: __('Select a funnel...', 'groundhogg')
+              placeholder: __('Select a funnel...', 'groundhogg'),
             }).on('change', ({ target }) => {
               funnel = FunnelsStore.get(parseInt($(target).val()))
 
@@ -190,15 +205,17 @@
             if (funnel) {
               $('#select-step').select2({
                 placeholder: __('Select a step...', 'groundhogg'),
-                data: funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
+                data: funnel.steps.sort(
+                  (a, b) => a.data.step_order - b.data.step_order).map(s => ( {
                   id: s.ID,
-                  text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`,
+                  text: `${ s.data.step_title } (${ Groundhogg.rawStepTypes[s.data.step_type].name })`,
                   selected: s.ID == step.ID,
-                }))
+                } )),
                 // templateSelection: template,
                 // templateResult: template
               }).on('change', ({ target }) => {
-                step = funnel.steps.find(s => s.ID === parseInt($(target).val()))
+                step = funnel.steps.find(
+                  s => s.ID === parseInt($(target).val()))
                 setContent(addToFunnelUi())
                 onMount()
               })
@@ -211,12 +228,13 @@
                   funnel_id: funnel.ID,
                   step_id: step.ID,
                   query: {
-                    include: [getContact().ID]
-                  }
+                    include: [getContact().ID],
+                  },
                 }).then(() => {
 
                   dialog({
-                    message: sprintf(__('%s added to funnel!', 'groundhogg'), getContact().data.full_name)
+                    message: sprintf(__('%s added to funnel!', 'groundhogg'),
+                      getContact().data.full_name),
                   })
 
                   close()
@@ -230,7 +248,7 @@
 
           onMount()
 
-        }
+        },
       })
 
     })
@@ -239,13 +257,13 @@
         {
           key: 'merge',
           cap: 'delete_contacts',
-          text: __('Merge')
+          text: __('Merge'),
         },
         {
           key: 'delete',
           cap: 'delete_contacts',
-          text: `<span class="gh-text danger">${__('Delete')}</span>`
-        }
+          text: `<span class="gh-text danger">${ __('Delete') }</span>`,
+        },
       ],
       onSelect: k => {
         switch (k) {
@@ -260,40 +278,50 @@
                   width: 500,
                   // language=HTML
                   alert: `<p>
-					  ${sprintf(__('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.', 'groundhogg'), bold(_contact.data.full_name), bold(getContact().data.full_name))}</p>
-				  <p><a href="https://help.groundhogg.io/article/540-merging-contacts"
-				        target="_blank">${__('What happens when contacts are merged?', 'groundhogg')}</a></p>`,
+                      ${ sprintf(
+                              __('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.',
+                                      'groundhogg'),
+                              bold(_contact.data.full_name),
+                              bold(getContact().data.full_name)) }</p>
+                  <p>
+                      <a href="https://help.groundhogg.io/article/540-merging-contacts"
+                         target="_blank">${ __(
+                              'What happens when contacts are merged?',
+                              'groundhogg') }</a></p>`,
                   onConfirm: () => {
 
                     loadingModal()
 
-                    post(`${ContactsStore.route}/${contact.ID}/merge`, [
-                      _contact.ID
+                    post(`${ ContactsStore.route }/${ contact.ID }/merge`, [
+                      _contact.ID,
                     ]).then(() => {
                       location.reload()
                     })
-                  }
+                  },
                 })
 
-              }
+              },
             })
 
             break
           case 'delete':
             dangerConfirmationModal({
               confirmText: __('Delete'),
-              alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(getContact().data.full_name))}</p>`,
+              alert: `<p>${ sprintf(
+                __('Are you sure you want to delete %s?', 'groundhogg'),
+                bold(getContact().data.full_name)) }</p>`,
               onConfirm: () => {
                 ContactsStore.delete(contact.ID).then(() => {
                   dialog({
-                    message: sprintf(__('%s was deleted!', 'groundhogg'), contact.data.full_name)
+                    message: sprintf(__('%s was deleted!', 'groundhogg'),
+                      contact.data.full_name),
                   })
                   window.open(adminPageURL('gh_contacts'), '_self')
                 })
-              }
+              },
             })
         }
-      }
+      },
     }))
 
     $('#action-send-email').on('click', sendEmail)
@@ -307,7 +335,7 @@
         icon: '',
         render: () => '',
         preload: () => {},
-        ...opts
+        ...opts,
       }
     },
 
@@ -316,23 +344,23 @@
         icon: icons.wp_fusion,
         render: ({ data, meta }) => {
           const { event_name, event_value } = meta
-          return `${event_name}: <code>${event_value}</code>`
+          return `${ event_name }: <code>${ event_value }</code>`
         },
-        preload: () => {}
+        preload: () => {},
       },
       wp_login: {
         icon: icons.login,
         render: ({ email }) => {
           return __('Logged in', 'groundhogg')
         },
-        preload: () => {}
+        preload: () => {},
       },
       wp_logout: {
         icon: icons.logout,
         render: ({ email }) => {
           return __('Logged out', 'groundhogg')
         },
-        preload: () => {}
+        preload: () => {},
       },
       email_opened: {
         icon: icons.open_email,
@@ -341,14 +369,14 @@
         },
         preload: ({ email }) => {
           EmailsStore.itemsFetched([email])
-        }
+        },
       },
       email_link_click: {
         icon: icons.link_click,
         render: ({ email, data }) => {
 
           const maybeTruncateLink = (link) => {
-            return link.length > 50 ? `${link.substring(0, 47)}...` : link
+            return link.length > 50 ? `${ link.substring(0, 47) }...` : link
           }
 
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
@@ -358,8 +386,8 @@
         },
         preload: ({ email }) => {
           EmailsStore.itemsFetched([email])
-        }
-      }
+        },
+      },
     },
 
     renderActivity (activity) {
@@ -369,43 +397,50 @@
         let funnel = FunnelsStore.get(activity.form.data.funnel_id)
         // language=HTML
         return `
-			<li class="activity-item">
-				<div class="activity-icon submission">${icons.form}</div>
-				<div class="activity-rendered gh-panel">
-					<div class="activity-info">
-						${sprintf(__('Submitted form %s in funnel %s', 'groundhogg'), bold(activity.form.data.step_title), el('a', {
-							href: funnel.admin,
-							target: '_blank'
-						}, bold(funnel.data.title)))}
-						<p>
-							${textarea({
-								className: 'full-width code',
-								value: JSON.stringify(activity.meta, null, 2),
-								readonly: true
-							})}
-						</p>
-					</div>
-					<div class="diff-time">
-						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
-					</div>
-				</div>
-			</li>`
+            <li class="activity-item">
+                <div class="activity-icon submission">${ icons.form }</div>
+                <div class="activity-rendered gh-panel">
+                    <div class="activity-info">
+                        ${ sprintf(__('Submitted form %s in funnel %s',
+                                        'groundhogg'),
+                                bold(activity.form.data.step_title), el('a', {
+                                    href: funnel.admin,
+                                    target: '_blank',
+                                }, bold(funnel.data.title))) }
+                        <p>
+                            ${ textarea({
+                                className: 'full-width code',
+                                value: JSON.stringify(activity.meta, null, 2),
+                                readonly: true,
+                            }) }
+                        </p>
+                    </div>
+                    <div class="diff-time">
+                        ${ sprintf(__('%s ago', 'groundhogg'),
+                                activity.locale.diff_time) }
+                    </div>
+                </div>
+            </li>`
       }
 
       if (activity.type === 'page_visit') {
         // language=HTML
         return `
-			<li class="activity-item">
-				<div class="activity-icon page-visit">${icons.link_click}</div>
-				<div class="activity-rendered gh-panel">
-					<div class="activity-info">
-						${sprintf(__('Visited %s', 'groundhogg'), `<a href="${activity.data.path}" target="_blank">${bold(activity.data.path)}</a>`)}
-					</div>
-					<div class="diff-time">
-						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
-					</div>
-				</div>
-			</li>`
+            <li class="activity-item">
+                <div class="activity-icon page-visit">${ icons.link_click }
+                </div>
+                <div class="activity-rendered gh-panel">
+                    <div class="activity-info">
+                        ${ sprintf(__('Visited %s', 'groundhogg'),
+                                `<a href="${ activity.data.path }" target="_blank">${ bold(
+                                        activity.data.path) }</a>`) }
+                    </div>
+                    <div class="diff-time">
+                        ${ sprintf(__('%s ago', 'groundhogg'),
+                                activity.locale.diff_time) }
+                    </div>
+                </div>
+            </li>`
       }
 
       if (activity.type === 'event') {
@@ -419,48 +454,83 @@
 
             // language=HTML
             return `
-				<li class="activity-item">
-					<div class="activity-icon ${step.data.step_group}">${icons.funnel}</div>
-					<div class="activity-rendered gh-panel space-between">
-						<div>
-							<div class="activity-info">
-								<span>${sprintf(step.data.step_group === 'action' ? (pending ? __('Pending action: %s | %s', 'groundhogg') : __('Completed action: %s | %s', 'groundhogg')) : (pending ? __('Pending benchmark: %s | %s', 'groundhogg') : __('Completed benchmark: %s | %s', 'groundhogg')), bold(step.data.step_title), Groundhogg.rawStepTypes[step.data.step_type].name)}</span>
-							</div>
-							<div class="event-extra">
-								${sprintf(__('in funnel %s', 'groundhogg'), el('a', {
-									href: funnel.admin
-								}, funnel.data.title))}
-							</div>
-							<div class="diff-time">
-								${sprintf(pending ? (Math.floor(Date.now() / 1000) > activity.time ? __('Running now...', 'groundhogg') : (__('Runs in %s', 'groundhogg'))) : __('%s ago', 'groundhogg'), activity.locale.diff_time)}
-							</div>
-						</div>
-						<button class="gh-button secondary icon text event-${pending ? 'queue-' : ''}more"
-						        data-event="${activity.ID}">
-							${icons.verticalDots}
-						</button>
-					</div>
-				</li>`
+                <li class="activity-item">
+                    <div class="activity-icon ${ step.data.step_group }">
+                        ${ icons.funnel }
+                    </div>
+                    <div class="activity-rendered gh-panel space-between">
+                        <div>
+                            <div class="activity-info">
+                                <span>${ sprintf(
+                                        step.data.step_group === 'action'
+                                                ? ( pending ? __(
+                                                        'Pending action: %s | %s',
+                                                        'groundhogg') : __(
+                                                        'Completed action: %s | %s',
+                                                        'groundhogg') )
+                                                : ( pending ? __(
+                                                        'Pending benchmark: %s | %s',
+                                                        'groundhogg') : __(
+                                                        'Completed benchmark: %s | %s',
+                                                        'groundhogg') ),
+                                        bold(step.data.step_title),
+                                        Groundhogg.rawStepTypes[step.data.step_type].name) }</span>
+                            </div>
+                            <div class="event-extra">
+                                ${ sprintf(__('in funnel %s', 'groundhogg'),
+                                        el('a', {
+                                            href: funnel.admin,
+                                        }, funnel.data.title)) }
+                            </div>
+                            <div class="diff-time">
+                                ${ sprintf(pending ? ( Math.floor(
+                                                Date.now() / 1000) > activity.time ? __(
+                                                'Running now...', 'groundhogg') : ( __(
+                                                'Runs in %s', 'groundhogg') ) ) : __(
+                                                '%s ago', 'groundhogg'),
+                                        activity.locale.diff_time) }
+                            </div>
+                        </div>
+                        <button class="gh-button secondary icon text event-${ pending
+                                ? 'queue-'
+                                : '' }more"
+                                data-event="${ activity.ID }">
+                            ${ icons.verticalDots }
+                        </button>
+                    </div>
+                </li>`
           case 2:
             // language=HTML
             return `
-				<li class="activity-item">
-					<div class="activity-icon broadcast">${icons.megaphone}</div>
-					<div class="activity-rendered gh-panel space-between">
-						<div>
-							<div class="activity-info">
-								<span>${sprintf(pending ? __('Will receive broadcast: %s', 'groundhogg') : __('Received broadcast: %s', 'groundhogg'), bold(activity.broadcast.object.data.title))}</span>
-							</div>
-							<div class="diff-time">
-								${sprintf(pending ? (Math.floor(Date.now() / 1000) > activity.time ? __('Running now...', 'groundhogg') : (__('Runs in %s', 'groundhogg'))) : __('%s ago', 'groundhogg'), activity.locale.diff_time)}
-							</div>
-						</div>
-						<button class="gh-button secondary icon text event-${pending ? 'queue-' : ''}more"
-						        data-event="${activity.ID}">
-							${icons.verticalDots}
-						</button>
-					</div>
-				</li>`
+                <li class="activity-item">
+                    <div class="activity-icon broadcast">${ icons.megaphone }
+                    </div>
+                    <div class="activity-rendered gh-panel space-between">
+                        <div>
+                            <div class="activity-info">
+                                <span>${ sprintf(pending ? __(
+                                                'Will receive broadcast: %s',
+                                                'groundhogg') : __(
+                                                'Received broadcast: %s', 'groundhogg'),
+                                        bold(activity.broadcast.object.data.title)) }</span>
+                            </div>
+                            <div class="diff-time">
+                                ${ sprintf(pending ? ( Math.floor(
+                                                Date.now() / 1000) > activity.time ? __(
+                                                'Running now...', 'groundhogg') : ( __(
+                                                'Runs in %s', 'groundhogg') ) ) : __(
+                                                '%s ago', 'groundhogg'),
+                                        activity.locale.diff_time) }
+                            </div>
+                        </div>
+                        <button class="gh-button secondary icon text event-${ pending
+                                ? 'queue-'
+                                : '' }more"
+                                data-event="${ activity.ID }">
+                            ${ icons.verticalDots }
+                        </button>
+                    </div>
+                </li>`
         }
 
         return ''
@@ -470,32 +540,37 @@
 
       // language=HTML
       return `
-		  <li class="activity-item ${activity.data.activity_type} activity" tabindex="0">
-			  <div class="activity-icon ${activity.data.activity_type}">${type.icon}</div>
-			  <div class="activity-rendered gh-panel">
-				  <div class="activity-info">
-					  ${type.render(activity)}
-				  </div>
-				  <div class="diff-time">
-					  ${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
-				  </div>
-			  </div>
-		  </li>`
+          <li class="activity-item ${ activity.data.activity_type } activity"
+              tabindex="0">
+              <div class="activity-icon ${ activity.data.activity_type }">
+                  ${ type.icon }
+              </div>
+              <div class="activity-rendered gh-panel">
+                  <div class="activity-info">
+                      ${ type.render(activity) }
+                  </div>
+                  <div class="diff-time">
+                      ${ sprintf(__('%s ago', 'groundhogg'),
+                              activity.locale.diff_time) }
+                  </div>
+              </div>
+          </li>`
     },
 
     render (activities) {
 
       // language=HTML
       return `
-		  <ul id="activity-timeline">
-			  ${activities.map(a => {
-				  try {
-					  return this.renderActivity(a)
-				  } catch (e) {
-					  return ''
-				  }
-			  }).join('')}
-		  </ul>`
+          <ul id="activity-timeline">
+              ${ activities.map(a => {
+                  try {
+                      return this.renderActivity(a)
+                  }
+                  catch (e) {
+                      return ''
+                  }
+              }).join('') }
+          </ul>`
 
     },
 
@@ -510,21 +585,22 @@
           items: [
             {
               key: 'execute',
-              text: __('Run Now')
+              text: __('Run Now'),
             },
             {
               key: 'cancel',
-              text: `<span class="gh-text danger">${__('Cancel')}</span>`
-            }
+              text: `<span class="gh-text danger">${ __('Cancel') }</span>`,
+            },
           ],
           onSelect: (key) => {
             switch (key) {
               case 'cancel':
 
-                patch(`${EventQueue.route}/${event.ID}/cancel`).then(() => {
-                  EventQueue.items.splice(EventQueue.items.findIndex(e => e.ID === event.ID), 1)
+                patch(`${ EventQueue.route }/${ event.ID }/cancel`).then(() => {
+                  EventQueue.items.splice(
+                    EventQueue.items.findIndex(e => e.ID === event.ID), 1)
                   dialog({
-                    message: __('Event cancelled', 'groundhogg')
+                    message: __('Event cancelled', 'groundhogg'),
                   })
                   this.needsRefresh()
                 })
@@ -533,16 +609,17 @@
 
               case 'execute':
 
-                patch(`${EventQueue.route}/${event.ID}/execute`).then(() => {
-                  dialog({
-                    message: __('Event rescheduled', 'groundhogg')
+                patch(`${ EventQueue.route }/${ event.ID }/execute`).
+                  then(() => {
+                    dialog({
+                      message: __('Event rescheduled', 'groundhogg'),
+                    })
+                    this.needsRefresh()
                   })
-                  this.needsRefresh()
-                })
 
                 break
             }
-          }
+          },
         })
       })
 
@@ -555,29 +632,30 @@
           items: [
             {
               key: 'execute',
-              text: __('Run Again')
-            }
+              text: __('Run Again'),
+            },
           ],
           onSelect: (key) => {
             switch (key) {
               case 'execute':
 
-                patch(`${EventsStore.route}/${event.ID}/execute`).then(() => {
-                  dialog({
-                    message: __('Event rescheduled', 'groundhogg')
+                patch(`${ EventsStore.route }/${ event.ID }/execute`).
+                  then(() => {
+                    dialog({
+                      message: __('Event rescheduled', 'groundhogg'),
+                    })
+                    this.needsRefresh()
                   })
-                  this.needsRefresh()
-                })
 
                 break
             }
-          }
+          },
         })
       })
     },
 
     mount (selector, activities, {
-      needsRefresh = () => {}
+      needsRefresh = () => {},
     }) {
 
       this.needsRefresh = needsRefresh
@@ -585,45 +663,45 @@
       const $el = $(selector)
 
       // Only show supported activities
-      activities = activities.filter(a => ['event', 'page_visit', 'submission'].includes(a.type) || a.data.activity_type in this.types)
+      activities = activities.filter(
+        a => ['event', 'page_visit', 'submission'].includes(a.type) ||
+          a.data.activity_type in this.types)
 
       if (!activities.length) {
-        $el.html(`<div class="align-center-space-between" style="margin: 20px"><span class="pill orange">${__('No activity found.', 'groundhogg')}</span></div>`)
+        $el.html(
+          `<div class="align-center-space-between" style="margin: 20px"><span class="pill orange">${ __(
+            'No activity found.', 'groundhogg') }</span></div>`)
         return
       }
 
-      let funnelIds = activities
-        .filter(a => a.type === 'event' && a.data.event_type == 1)
-        .reduce((arr, e) => {
+      let funnelIds = activities.filter(
+        a => a.type === 'event' && a.data.event_type == 1).reduce((arr, e) => {
 
-          if (!arr.includes(e.data.funnel_id)) {
-            arr.push(e.data.funnel_id)
-          }
+        if (!arr.includes(e.data.funnel_id)) {
+          arr.push(e.data.funnel_id)
+        }
 
-          return arr
-        }, [])
+        return arr
+      }, [])
 
       let promises = [
-        ...activities
-          .filter(a => a.type === 'activity')
-          .map(a => this.types[a.data.activity_type].preload(a)),
+        ...activities.filter(a => a.type === 'activity').
+          map(a => this.types[a.data.activity_type].preload(a)),
         // Funnel Events
         // ...activities
         // .filter(a => a.type === 'event' && a.data.event_type == 1)
         // .map(a => StepTypes.getType(a.step.step_type).preload(a.step)),
         // Funnels
         !FunnelsStore.hasItems(funnelIds) ? FunnelsStore.fetchItems({
-          ID: funnelIds
+          ID: funnelIds,
         }) : null,
         // Broadcast Events
-        ...activities
-          .filter(a => a.type === 'event' && a.data.event_type == 2)
-          .map(a => BroadcastsStore.itemsFetched([a.broadcast])),
+        ...activities.filter(a => a.type === 'event' && a.data.event_type == 2).
+          map(a => BroadcastsStore.itemsFetched([a.broadcast])),
         // Submission Events
         FunnelsStore.fetchItems({
-          include: activities
-            .filter(a => a.type === 'submission')
-            .map(a => a.form.data.funnel_id)
+          include: activities.filter(a => a.type === 'submission').
+            map(a => a.form.data.funnel_id),
         }),
       ]
 
@@ -632,7 +710,7 @@
         this.onMount()
       })
 
-    }
+    },
 
   }
 
@@ -647,40 +725,46 @@
         render: () => {
           // language=HTML
           return `
-			  <div class="gh-panel top-left-square">
-				  <div class="inside">
-					  <div class="display-flex gap-10 align-bottom">
-						  <div class="order-by">
-							  <label for="activity-order"><b>${__('Order by')}</b></label><br/>
-							  ${select({
-								  id: 'activity-order',
-								  name: 'order',
-							  }, {
-								  desc: __('Newest first'),
-								  asc: __('Oldest first'),
-							  }, 'desc')}
-						  </div>
-						  <div class="filter-by">
-							  <label for="filter-by"><b>${__('Filter by')}</b></label><br/>
-							  ${select({
-								  id: 'filter-by',
-								  name: 'filter',
-							  }, {
-								  all: __('All Activity', 'groundhogg'),
-								  funnel: __('Funnel Activity', 'groundhogg'),
-								  email: __('Email Activity', 'groundhogg'),
-								  web: __('Web Activity', 'groundhogg'),
-								  ...isWPFusionActive ? { wp_fusion: __('WPFusion Activity', 'groundhogg') } : {},
-							  }, '')}
-						  </div>
-						  <button id="refresh-timeline" class="gh-button secondary text icon"><span
-							  class="dashicons dashicons-update-alt"></span></button>
-					  </div>
-				  </div>
-			  </div>
-			  <div id="activity-here">
-				  ${spinner()}
-			  </div>`
+              <div class="gh-panel top-left-square">
+                  <div class="inside">
+                      <div class="display-flex gap-10 align-bottom">
+                          <div class="order-by">
+                              <label for="activity-order"><b>${ __(
+                                      'Order by') }</b></label><br/>
+                              ${ select({
+                                  id: 'activity-order',
+                                  name: 'order',
+                              }, {
+                                  desc: __('Newest first'),
+                                  asc: __('Oldest first'),
+                              }, 'desc') }
+                          </div>
+                          <div class="filter-by">
+                              <label for="filter-by"><b>${ __('Filter by') }</b></label><br/>
+                              ${ select({
+                                  id: 'filter-by',
+                                  name: 'filter',
+                              }, {
+                                  all: __('All Activity', 'groundhogg'),
+                                  funnel: __('Funnel Activity', 'groundhogg'),
+                                  email: __('Email Activity', 'groundhogg'),
+                                  web: __('Web Activity', 'groundhogg'),
+                                  ...isWPFusionActive ? {
+                                      wp_fusion: __('WPFusion Activity',
+                                              'groundhogg'),
+                                  } : {},
+                              }, '') }
+                          </div>
+                          <button id="refresh-timeline"
+                                  class="gh-button secondary text icon"><span
+                                  class="dashicons dashicons-update-alt"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+              <div id="activity-here">
+                  ${ spinner() }
+              </div>`
         },
         onMount: () => {
 
@@ -698,7 +782,7 @@
 
           tooltip('#refresh-timeline', {
             content: __('Refresh'),
-            position: 'right'
+            position: 'right',
           })
 
           $('#activity-order').on('change', (e) => {
@@ -717,34 +801,34 @@
                 contact_id: contact.ID,
                 limit: 50,
                 order,
-                orderby: 'date_created'
+                orderby: 'date_created',
               }),
               ActivityStore.fetchItems({
                 contact_id: contact.ID,
                 limit: 50,
                 order,
-                orderby: 'timestamp'
+                orderby: 'timestamp',
               }),
               EventsStore.fetchItems({
                 contact_id: contact.ID,
                 status: 'complete',
                 limit: 50,
                 orderby: 'time',
-                order
+                order,
               }),
               EventQueue.fetchItems({
                 contact_id: contact.ID,
                 status: 'waiting',
                 limit: 50,
                 orderby: 'time',
-                order
+                order,
               }),
               PageVisitsStore.fetchItems({
                 contact_id: contact.ID,
                 limit: 50,
                 orderby: 'timestamp',
-                order
-              })
+                order,
+              }),
             ]).then(() => {
               loadTimeline()
             })
@@ -752,58 +836,65 @@
 
           const loadTimeline = () => {
             let allActivities = [
-              ...SubmissionsStore.getItems().map(a => ({
+              ...SubmissionsStore.getItems().map(a => ( {
                 ...a,
                 type: 'submission',
-                time: parseInt(a.data.time)
-              })), ...ActivityStore.getItems().map(a => ({
+                time: parseInt(a.data.time),
+              } )), ...ActivityStore.getItems().map(a => ( {
                 ...a,
                 type: 'activity',
-                time: parseInt(a.data.timestamp)
-              })),
-              ...EventsStore.getItems().map(e => ({
+                time: parseInt(a.data.timestamp),
+              } )),
+              ...EventsStore.getItems().map(e => ( {
                 ...e,
                 type: 'event',
-                time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
-              })),
-              ...EventQueue.getItems().map(e => ({
+                time: parseInt(e.data.time) + parseFloat(e.data.micro_time),
+              } )),
+              ...EventQueue.getItems().map(e => ( {
                 ...e,
                 type: 'event',
                 pending: true,
-                time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
-              })),
-              ...PageVisitsStore.getItems().map(v => ({
+                time: parseInt(e.data.time) + parseFloat(e.data.micro_time),
+              } )),
+              ...PageVisitsStore.getItems().map(v => ( {
                 ...v,
                 type: 'page_visit',
-                time: parseInt(v.data.timestamp)
-              }))
-            ].sort((a, b) => order === 'desc' ? b.time - a.time : a.time - b.time)
+                time: parseInt(v.data.timestamp),
+              } )),
+            ].sort(
+              (a, b) => order === 'desc' ? b.time - a.time : a.time - b.time)
 
             switch (filter) {
               case 'submissions':
-                allActivities = allActivities.filter(a => a.type === 'submission')
+                allActivities = allActivities.filter(
+                  a => a.type === 'submission')
                 break
               case 'funnel':
-                allActivities = allActivities.filter(a => a.type === 'event' && a.data.event_type == 1)
+                allActivities = allActivities.filter(
+                  a => a.type === 'event' && a.data.event_type == 1)
                 break
               case 'email':
                 allActivities = allActivities.filter(a => a.data.email_id > 0)
                 break
               case 'web':
-                allActivities = allActivities.filter(a => a.type === 'page_visit')
+                allActivities = allActivities.filter(
+                  a => a.type === 'page_visit')
                 break
               case 'wp_fusion':
-                allActivities = allActivities.filter(a => a.type === 'activity' && a.data.activity_type === 'wp_fusion')
+                allActivities = allActivities.filter(
+                  a => a.type === 'activity' && a.data.activity_type ===
+                    'wp_fusion')
                 break
             }
 
             ActivityTimeline.mount('#activity-here', allActivities, {
               needsRefresh: () => {
                 fetchActivity()
-              }
+              },
             })
 
-            $('#activity-here').css({ maxHeight: $('#primary-contact-stuff').height() })
+            $('#activity-here').
+              css({ maxHeight: $('#primary-contact-stuff').height() })
           }
 
           if (ActivityStore.hasItems()
@@ -817,7 +908,7 @@
           }
 
           fetchActivity()
-        }
+        },
       },
       {
         id: 'notes',
@@ -825,9 +916,9 @@
         render: () => {
           // language=HTML
           return `
-			  <div class="gh-panel top-left-square">
-				  <div class="inside" id="notes-here"></div>
-			  </div>`
+              <div class="gh-panel top-left-square">
+                  <div class="inside" id="notes-here"></div>
+              </div>`
         },
         onMount: () => {
           Groundhogg.noteEditor('#notes-here', {
@@ -835,7 +926,7 @@
             object_type: 'contact',
             title: '',
           })
-        }
+        },
       },
       {
         id: 'files',
@@ -843,25 +934,30 @@
         render: () => {
           // language=HTML
           return `
-			  <div class="gh-panel top-left-square">
-				  <div id="file-actions" class="inside space-between">
-					  ${input({
-						  placeholder: __('Search files...'),
-						  type: 'search',
-						  id: 'search-files'
-					  })}
-					  <button id="upload-file" class="gh-button secondary">${__('Upload Files')}</button>
-				  </div>
-				  <div id="bulk-actions" class="hidden inside" style="padding-top: 0">
-					  <button id="bulk-delete-files" class="gh-button danger icon"><span
-						  class="dashicons dashicons-trash"></span></button>
-				  </div>
-				  <table class="wp-list-table widefat striped" style="border: none">
-					  <thead></thead>
-					  <tbody id="files-here">
-					  </tbody>
-				  </table>
-			  </div>`
+              <div class="gh-panel top-left-square">
+                  <div id="file-actions" class="inside space-between">
+                      ${ input({
+                          placeholder: __('Search files...'),
+                          type: 'search',
+                          id: 'search-files',
+                      }) }
+                      <button id="upload-file" class="gh-button secondary">
+                          ${ __('Upload Files') }
+                      </button>
+                  </div>
+                  <div id="bulk-actions" class="hidden inside"
+                       style="padding-top: 0">
+                      <button id="bulk-delete-files"
+                              class="gh-button danger icon"><span
+                              class="dashicons dashicons-trash"></span></button>
+                  </div>
+                  <table class="wp-list-table widefat striped"
+                         style="border: none">
+                      <thead></thead>
+                      <tbody id="files-here">
+                      </tbody>
+                  </table>
+              </div>`
         },
         onMount: () => {
 
@@ -872,14 +968,19 @@
           $('#bulk-delete-files').on('click', () => {
             dangerConfirmationModal({
               confirmText: __('Delete'),
-              alert: `<p>${sprintf(_n('Are you sure you want to delete %d file?', 'Are you sure you want to delete %d files?', selectedFiles.length, 'groundhogg'), selectedFiles.length)}</p>`,
+              alert: `<p>${ sprintf(
+                _n('Are you sure you want to delete %d file?',
+                  'Are you sure you want to delete %d files?',
+                  selectedFiles.length, 'groundhogg'),
+                selectedFiles.length) }</p>`,
               onConfirm: () => {
-                _delete(`${routes.v4.contacts}/${contact.ID}/files`, selectedFiles).then(({ items }) => {
+                _delete(`${ routes.v4.contacts }/${ contact.ID }/files`,
+                  selectedFiles).then(({ items }) => {
                   selectedFiles = []
                   files = items
                   mount()
                 })
-              }
+              },
             })
           })
 
@@ -890,36 +991,43 @@
 
           tooltip('#bulk-delete-files', {
             content: __('Bulk delete files'),
-            position: 'right'
+            position: 'right',
           })
 
           const renderFile = (file) => {
             //language=HTML
             return `
-				<tr class="file">
-					<th scope="row" class="check-column">${input({
-						type: 'checkbox',
-						name: 'select[]',
-						className: 'file-toggle',
-						value: file.name
-					})}
-					</th>
-					<td class="column-primary"><a class="row-title" href="${file.url}"
-					                              target="_blank">${file.name}</a></td>
-					<td>${file.date_modified}</td>
-					<td>
-						<div class="space-between align-right">
-							<button data-file="${file.name}" class="file-more gh-button secondary text icon">
-								${icons.verticalDots}
-							</button>
-						</div>
-					</td>
-				</tr>`
+                <tr class="file">
+                    <th scope="row" class="check-column">${ input({
+                        type: 'checkbox',
+                        name: 'select[]',
+                        className: 'file-toggle',
+                        value: file.name,
+                    }) }
+                    </th>
+                    <td class="column-primary"><a class="row-title"
+                                                  href="${ file.url }"
+                                                  target="_blank">${ file.name }</a>
+                    </td>
+                    <td>${ file.date_modified }</td>
+                    <td>
+                        <div class="space-between align-right">
+                            <button data-file="${ file.name }"
+                                    class="file-more gh-button secondary text icon">
+                                ${ icons.verticalDots }
+                            </button>
+                        </div>
+                    </td>
+                </tr>`
           }
 
           const mount = () => {
 
-            $('#files-here').html(files.filter(f => !fileSearch || f.name.match(regexp(fileSearch))).map(f => renderFile(f)).join(''))
+            $('#files-here').
+              html(files.filter(
+                f => !fileSearch || f.name.match(regexp(fileSearch))).
+                map(f => renderFile(f)).
+                join(''))
             onMount()
           }
 
@@ -928,7 +1036,8 @@
             const maybeShowBulkActions = () => {
               if (selectedFiles.length) {
                 $('#bulk-actions').removeClass('hidden')
-              } else {
+              }
+              else {
                 $('#bulk-actions').addClass('hidden')
               }
             }
@@ -946,40 +1055,46 @@
                   },
                   {
                     key: 'delete',
-                    text: `<span class="gh-text danger">${__('Delete')}</span>`,
-                  }
+                    text: `<span class="gh-text danger">${ __(
+                      'Delete') }</span>`,
+                  },
                 ],
                 onSelect: k => {
                   switch (k) {
                     case 'download':
-                      window.open(files.find(f => f.name === _file).url, '_blank').focus()
+                      window.open(files.find(f => f.name === _file).url,
+                        '_blank').focus()
                       break
                     case 'delete':
 
                       dangerConfirmationModal({
                         confirmText: __('Delete'),
-                        alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), _file)}</p>`,
+                        alert: `<p>${ sprintf(
+                          __('Are you sure you want to delete %s?',
+                            'groundhogg'), _file) }</p>`,
                         onConfirm: () => {
-                          _delete(`${routes.v4.contacts}/${contact.ID}/files`, [
-                            _file
-                          ]).then(({ items }) => {
+                          _delete(
+                            `${ routes.v4.contacts }/${ contact.ID }/files`, [
+                              _file,
+                            ]).then(({ items }) => {
                             selectedFiles = []
                             files = items
                             mount()
                           })
-                        }
+                        },
                       })
 
                       break
                   }
-                }
+                },
               })
             })
 
             $('.file-toggle').on('change', e => {
               if (e.target.checked) {
                 selectedFiles.push(e.target.value)
-              } else {
+              }
+              else {
                 selectedFiles.splice(selectedFiles.indexOf(e.target.value), 1)
               }
               maybeShowBulkActions()
@@ -998,7 +1113,7 @@
                 // console.log( json )
                 files = json.data.files
                 mount()
-              }
+              },
             })
           })
 
@@ -1011,7 +1126,7 @@
 
           mount()
 
-        }
+        },
       },
       {
         id: 'inbox',
@@ -1019,14 +1134,17 @@
         render: () => {
           // language=HTML
           return `
-			  <div class="gh-panel top-left-square">
-				  <div class="inside" id="inbox-here">
-					  <p>
-						  ${sprintf(__('Hi %s, we\'re still working on the inbox feature! We know how important this is for you, so our team is working around the clock to make it a reality!', 'groundhogg'), Groundhogg.currentUser.data.display_name)}</p>
-					  <p>
-						  ${__('You can help us get there faster by giving us a <a target="_blank" href="https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5">⭐⭐⭐⭐⭐ review!</a>')}</p>
-				  </div>
-			  </div>`
+              <div class="gh-panel top-left-square">
+                  <div class="inside" id="inbox-here">
+                      <p>
+                          ${ sprintf(
+                                  __('Hi %s, we\'re still working on the inbox feature! We know how important this is for you, so our team is working around the clock to make it a reality!',
+                                          'groundhogg'),
+                                  Groundhogg.currentUser.data.display_name) }</p>
+                      <p>
+                          ${ __('You can help us get there faster by giving us a <a target="_blank" href="https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5">⭐⭐⭐⭐⭐ review!</a>') }</p>
+                  </div>
+              </div>`
         },
         onMount: () => {
 
@@ -1034,8 +1152,8 @@
           //   console.log(r)
           // } )
 
-        }
-      }
+        },
+      },
     ]
 
     // if (Groundhogg.isWhiteLabeled) {
@@ -1045,14 +1163,16 @@
     const template = () => {
       // language=HTML
       return `
-		  <div id="secondary-tabs"><h2 class="no-margin nav-tab-wrapper secondary gh">
-			  ${tabs.map(({
-				  id,
-				  name
-			  }) => `<a href="#" data-tab="${id}" class="nav-tab ${activeTab === id ? 'nav-tab-active' : ''}">${name}</a>`).join('')}
-		  </h2>
-			  ${tabs.find(t => t.id === activeTab).render()}
-		  </div>`
+          <div id="secondary-tabs"><h2
+                  class="no-margin nav-tab-wrapper secondary gh">
+              ${ tabs.map(({
+                  id,
+                  name,
+              }) => `<a href="#" data-tab="${ id }" class="nav-tab ${ activeTab ===
+              id ? 'nav-tab-active' : '' }">${ name }</a>`).join('') }
+          </h2>
+              ${ tabs.find(t => t.id === activeTab).render() }
+          </div>`
     }
 
     const mount = () => {
@@ -1099,7 +1219,7 @@
         stop()
 
         dialog({
-          message: __('Changes saved!')
+          message: __('Changes saved!'),
         })
 
       })
@@ -1115,7 +1235,7 @@
     let customTabState = gh_contact_custom_properties || {
       tabs: [],
       groups: [],
-      fields: []
+      fields: [],
     }
 
     let timeout
@@ -1127,9 +1247,11 @@
       let { stop } = loadingDots('#save-meta')
       $('#save-meta').prop('disabled', true)
 
+
+
       Promise.all([
         ContactsStore.patchMeta(getContact().ID, metaChanges),
-        ContactsStore.deleteMeta(getContact().ID, deleteKeys)
+        deleteKeys.length ? ContactsStore.deleteMeta(getContact().ID, deleteKeys) : null,
       ]).then(() => {
 
         metaChanges = {}
@@ -1138,7 +1260,7 @@
         stop()
         mount()
         dialog({
-          message: __('Changes saved!')
+          message: __('Changes saved!'),
         })
       })
     }
@@ -1158,10 +1280,10 @@
 
       timeout = setTimeout(() => {
         patch(routes.v4.options, {
-          gh_contact_custom_properties: customTabState
+          gh_contact_custom_properties: customTabState,
         }).then(() => {
           dialog({
-            message: __('Changes saved!', 'groundhogg')
+            message: __('Changes saved!', 'groundhogg'),
           })
         })
       }, 1500)
@@ -1187,37 +1309,48 @@
       $('#primary-contact-stuff .edit-meta').remove()
       $('#primary-contact-stuff .custom-tab').remove()
       $('#primary-contact-stuff .tab-more').remove()
-      $(`<a href="#" id="edit-meta" class="nav-tab edit-meta ${'edit-meta' === activeTab ? ' nav-tab-active' : ''}">${__('More', 'groundhogg')}</a>`).insertAfter('#general')
+      $(`<a href="#" id="edit-meta" class="nav-tab edit-meta ${ 'edit-meta' ===
+      activeTab ? ' nav-tab-active' : '' }">${ __('More', 'groundhogg') }</a>`).
+        insertAfter('#general')
       $(customTabState.tabs.map(({
         id,
-        name
-      }) => `<a href="#" id="${id}" class="nav-tab custom-tab${id === activeTab ? ' nav-tab-active' : ''}">${name}</a>`).join('')).insertBefore('#tab-actions')
+        name,
+      }) => `<a href="#" id="${ id }" class="nav-tab custom-tab${ id ===
+      activeTab ? ' nav-tab-active' : '' }">${ name }</a>`).join('')).
+        insertBefore('#tab-actions')
       onMount()
     }
 
     const onMount = () => {
 
       $('#primary-contact-stuff .tab-content-wrapper').removeClass('active')
-      $(`#primary-contact-stuff [data-tab-content="${activeTab}"]`).addClass('active')
+      $(`#primary-contact-stuff [data-tab-content="${ activeTab }"]`).
+        addClass('active')
 
       // If the current tab is a custom tab
       if (customTabState.tabs.find(t => t.id === activeTab)) {
 
         // language=HTML
         let customTabUi = `
-			<div class="tab-content-wrapper custom-tab gh-panel top-left-square active" data-tab-content="${activeTab}">
-				<div class="inside">
-					<div id="custom-fields-here">
-					</div>
-					<p>
-						<button id="save-meta" class="gh-button primary">${__('Save Changes')}</button>
-						<button id="cancel-meta-changes" class="gh-button danger text">${__('Cancel')}</button>
-					</p>
-				</div>
-			</div>`
+            <div class="tab-content-wrapper custom-tab gh-panel top-left-square active"
+                 data-tab-content="${ activeTab }">
+                <div class="inside">
+                    <div id="custom-fields-here">
+                    </div>
+                    <p>
+                        <button id="save-meta" class="gh-button primary">
+                            ${ __('Save Changes') }
+                        </button>
+                        <button id="cancel-meta-changes"
+                                class="gh-button danger text">${ __('Cancel') }
+                        </button>
+                    </p>
+                </div>
+            </div>`
 
         $(customTabUi).insertAfter('#primary-contact-stuff form')
-        $(`<button class="gh-button tab-more secondary text icon">${icons.verticalDots}</button>`).insertAfter('#add-tab')
+        $(`<button class="gh-button tab-more secondary text icon">${ icons.verticalDots }</button>`).
+          insertAfter('#add-tab')
 
         $('#save-meta').on('click', commitMetaChanges)
         $('#cancel-meta-changes').on('click', cancelMetaChanges)
@@ -1230,13 +1363,13 @@
               {
                 key: 'rename',
                 cap: 'manage_options',
-                text: __('Rename')
+                text: __('Rename'),
               },
               {
                 key: 'delete',
                 cap: 'manage_options',
-                text: `<span class="gh-text danger">${__('Delete')}</span>`
-              }
+                text: `<span class="gh-text danger">${ __('Delete') }</span>`,
+              },
             ],
             onSelect: k => {
 
@@ -1246,21 +1379,29 @@
 
                   dangerConfirmationModal({
                     confirmText: __('Delete'),
-                    alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(customTabState.tabs.find(t => t.id === activeTab).name))}</p>`,
+                    alert: `<p>${ sprintf(
+                      __('Are you sure you want to delete %s?', 'groundhogg'),
+                      bold(customTabState.tabs.find(
+                        t => t.id === activeTab).name)) }</p>`,
                     onConfirm: () => {
                       // Groups belonging to this tab
-                      let groups = customTabState.groups.filter(g => g.tab === activeTab)
+                      let groups = customTabState.groups.filter(
+                        g => g.tab === activeTab)
                       // Fields belonging to the groups of this tab
-                      let fields = customTabState.fields.filter(f => groups.find(g => g.id === f.group)).map(f => f.id)
+                      let fields = customTabState.fields.filter(
+                        f => groups.find(g => g.id === f.group)).map(f => f.id)
 
-                      customTabState.tabs = customTabState.tabs.filter(t => t.id !== activeTab)
-                      customTabState.groups = customTabState.groups.filter(g => g.tab !== activeTab)
-                      customTabState.fields = customTabState.fields.filter(f => !fields.includes(f.id))
+                      customTabState.tabs = customTabState.tabs.filter(
+                        t => t.id !== activeTab)
+                      customTabState.groups = customTabState.groups.filter(
+                        g => g.tab !== activeTab)
+                      customTabState.fields = customTabState.fields.filter(
+                        f => !fields.includes(f.id))
 
                       updateTabState()
                       activeTab = 'general'
                       mount()
-                    }
+                    },
                   })
 
                   break
@@ -1269,19 +1410,21 @@
                   modal({
                     // language=HTML
                     content: `
-						<div>
-							<h2>${__('Rename tab', 'groundhogg')}</h2>
-							<div class="align-left-space-between">
-								${input({
-									id: 'tab-name',
-									value: customTabState.tabs.find(t => t.id === activeTab).name,
-									placeholder: __('Tab name', 'groundhogg')
-								})}
-								<button id="update-tab" class="gh-button primary">
-									${__('Save')}
-								</button>
-							</div>
-						</div>`,
+                        <div>
+                            <h2>${ __('Rename tab', 'groundhogg') }</h2>
+                            <div class="align-left-space-between">
+                                ${ input({
+                                    id: 'tab-name',
+                                    value: customTabState.tabs.find(
+                                            t => t.id === activeTab).name,
+                                    placeholder: __('Tab name', 'groundhogg'),
+                                }) }
+                                <button id="update-tab"
+                                        class="gh-button primary">
+                                    ${ __('Save') }
+                                </button>
+                            </div>
+                        </div>`,
                     onOpen: ({ close }) => {
 
                       let tabName
@@ -1292,7 +1435,8 @@
 
                       $('#update-tab').on('click', () => {
 
-                        customTabState.tabs.find(t => t.id === activeTab).name = tabName
+                        customTabState.tabs.find(
+                          t => t.id === activeTab).name = tabName
 
                         updateTabState()
 
@@ -1301,40 +1445,39 @@
 
                       })
 
-                    }
+                    },
                   })
                   break
 
               }
 
-            }
+            },
           })
         })
 
         // Groups belonging to this tab
         let groups = customTabState.groups.filter(g => g.tab === activeTab)
         // Fields belonging to the groups of this tab
-        let fields = customTabState.fields.filter(f => groups.find(g => g.id === f.group))
+        let fields = customTabState.fields.filter(
+          f => groups.find(g => g.id === f.group))
 
         propertiesEditor('#custom-fields-here', {
           values: {
             ...getContact().meta,
-            ...metaChanges
+            ...metaChanges,
           },
           properties: {
             groups,
-            fields
+            fields,
           },
           onPropertiesUpdated: ({ groups = [], fields = [] }) => {
 
             customTabState.groups = [
-              ...groups.map(g => ({ ...g, tab: activeTab })), // new items
-              ...customTabState.groups.filter(group => !groups.find(_group => _group.id == group.id))
+              ...groups.map(g => ( { ...g, tab: activeTab } )), // new items
             ]
 
             customTabState.fields = [
               ...fields, // new items
-              ...customTabState.fields.filter(field => !fields.find(_field => _field.id == field.id))
             ]
 
             updateTabState()
@@ -1343,40 +1486,46 @@
           onChange: (meta) => {
             metaChanges = {
               ...metaChanges,
-              ...meta
+              ...meta,
             }
           },
           canEdit: () => {
             return userHasCap('edit_contacts')
-          }
+          },
 
         })
 
-      } else if (activeTab === 'edit-meta') {
+      }
+      else if (activeTab === 'edit-meta') {
 
         let combinedMeta = {
           ...getContact().meta,
-          ...metaChanges
+          ...metaChanges,
         }
 
         // language=HTML
         let metaUi = `
-			<div class="tab-content-wrapper edit-meta gh-panel top-left-square active" data-tab-content="${activeTab}">
-				<div class="inside">
-					<h2>${__('Additional Contact Methods', 'groundhogg')}</h2>
-					<p><b>${__('Email Addresses', 'groundhogg')}</b></p>
-					<div id="contact-emails-here"></div>
-					<p><b>${__('Phone Numbers', 'groundhogg')}</b></p>
-					<div id="contact-phones-here"></div>
-					<h2>${__('Meta')}</h2>
-					<div id="meta-here">
-					</div>
-					<p>
-						<button id="save-meta" class="gh-button primary">${__('Save Changes')}</button>
-						<button id="cancel-meta-changes" class="gh-button danger text">${__('Cancel')}</button>
-					</p>
-				</div>
-			</div>`
+            <div class="tab-content-wrapper edit-meta gh-panel top-left-square active"
+                 data-tab-content="${ activeTab }">
+                <div class="inside">
+                    <h2>${ __('Additional Contact Methods', 'groundhogg') }</h2>
+                    <p><b>${ __('Email Addresses', 'groundhogg') }</b></p>
+                    <div id="contact-emails-here"></div>
+                    <p><b>${ __('Phone Numbers', 'groundhogg') }</b></p>
+                    <div id="contact-phones-here"></div>
+                    <h2>${ __('Meta') }</h2>
+                    <div id="meta-here">
+                    </div>
+                    <p>
+                        <button id="save-meta" class="gh-button primary">
+                            ${ __('Save Changes') }
+                        </button>
+                        <button id="cancel-meta-changes"
+                                class="gh-button danger text">${ __('Cancel') }
+                        </button>
+                    </p>
+                </div>
+            </div>`
 
         $(metaUi).insertAfter('#primary-contact-stuff form')
         $('#cancel-meta-changes').on('click', cancelMetaChanges)
@@ -1386,17 +1535,19 @@
         inputRepeaterWidget({
           selector: '#contact-phones-here',
           rows: alternate_phones,
-          cellProps: [{
-            type: 'email',
-            options: {
-              mobile: __('Mobile'),
-              home: __('Home'),
-              work: __('Work'),
-            }
-          }, {
-            type: 'tel',
-            placeholder: __('(123) 456-7890')
-          }],
+          cellProps: [
+            {
+              type: 'email',
+              options: {
+                mobile: __('Mobile'),
+                home: __('Home'),
+                work: __('Work'),
+              },
+            }, {
+              type: 'tel',
+              placeholder: __('(123) 456-7890'),
+            },
+          ],
           cellCallbacks: [select, input],
           onMount: () => {
           },
@@ -1408,11 +1559,13 @@
         inputRepeaterWidget({
           selector: '#contact-emails-here',
           rows: alternate_emails.map(e => [e]),
-          cellProps: [{
-            type: 'email',
-            className: 'alternate-email-address',
-            placeholder: __('john.doe@example.com', 'groundhogg')
-          }],
+          cellProps: [
+            {
+              type: 'email',
+              className: 'alternate-email-address',
+              placeholder: __('john.doe@example.com', 'groundhogg'),
+            },
+          ],
           cellCallbacks: [input],
           onMount: () => {
           },
@@ -1423,11 +1576,19 @@
 
         inputRepeaterWidget({
           selector: '#meta-here',
-          rows: Object.keys(combinedMeta).filter(k => !meta_exclusions.includes(k)).map(k => ([k, combinedMeta[k]])).map(([k, v]) => ([k, ['array', 'object'].includes(typeof v) ? 'SERIALIZED DATA' : v])),
-          cellProps: [{
-            className: 'meta-key',
-            readonly: true
-          }, {}],
+          rows: Object.keys(combinedMeta).
+            filter(k => !meta_exclusions.includes(k)).
+            map(k => ( [k, combinedMeta[k]] )).
+            map(([k, v]) => ( [
+              k,
+              ['array', 'object'].includes(typeof v) ? 'SERIALIZED DATA' : v,
+            ] )),
+          cellProps: [
+            {
+              className: 'meta-key',
+              readonly: true,
+            }, {},
+          ],
           cellCallbacks: [input, input],
           onMount: () => {
 
@@ -1461,7 +1622,7 @@
 
             deleteKeys.push(key)
             delete metaChanges[key]
-          }
+          },
         }).mount()
 
         $('#save-meta').on('click', commitMetaChanges)
@@ -1469,25 +1630,27 @@
 
     }
 
-    $('.nav-tab-wrapper.primary').append(`<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
+    $('.nav-tab-wrapper.primary').
+      append(
+        `<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
     $('#add-tab').on('click', (e) => {
       e.preventDefault()
 
       modal({
         // language=HTML
         content: `
-			<div>
-				<h2>${__('Add a new tab', 'groundhogg')}</h2>
-				<div class="align-left-space-between">
-					${input({
-						id: 'tab-name',
-						placeholder: __('Tab name', 'groundhogg')
-					})}
-					<button id="create-tab" class="gh-button primary">
-						${__('Create')}
-					</button>
-				</div>
-			</div>`,
+            <div>
+                <h2>${ __('Add a new tab', 'groundhogg') }</h2>
+                <div class="align-left-space-between">
+                    ${ input({
+                        id: 'tab-name',
+                        placeholder: __('Tab name', 'groundhogg'),
+                    }) }
+                    <button id="create-tab" class="gh-button primary">
+                        ${ __('Create') }
+                    </button>
+                </div>
+            </div>`,
         onOpen: ({ close }) => {
 
           let tabName
@@ -1502,7 +1665,7 @@
 
             customTabState.tabs.push({
               id,
-              name: tabName
+              name: tabName,
             })
 
             activeTab = id
@@ -1513,14 +1676,14 @@
 
           })
 
-        }
+        },
       })
 
     })
 
     tooltip('#add-tab', {
       content: __('Add tab', 'groundhogg'),
-      position: 'right'
+      position: 'right',
     })
 
     mount()
@@ -1538,18 +1701,23 @@
     const template = () => {
       // language=HTML
       return `
-		  <div id="gh-better-tag-picker">
-		  </div>
-		  <div class="tag-change-actions hidden" style="margin-top: 10px">
-			  <button id="cancel-tag-changes" class="gh-button danger text">${__('Cancel')}</button>
-			  <button id="save-tag-changes" class="gh-button primary">${__('Save')}</button>
-		  </div>`
+          <div id="gh-better-tag-picker">
+          </div>
+          <div class="tag-change-actions hidden" style="margin-top: 10px">
+              <button id="cancel-tag-changes" class="gh-button danger text">
+                  ${ __('Cancel') }
+              </button>
+              <button id="save-tag-changes" class="gh-button primary">
+                  ${ __('Save') }
+              </button>
+          </div>`
     }
 
     const maybeShowTagChangeActions = () => {
       if (removeTags.length || addTags.length) {
         $('.tag-change-actions').addClass('align-right-space-between')
-      } else {
+      }
+      else {
         $('.tag-change-actions').removeClass('align-right-space-between')
       }
     }
@@ -1567,16 +1735,16 @@
           removeTags = _removeTags
           addTags = _addTags
           maybeShowTagChangeActions()
-        }
+        },
       })
 
       $('#save-tag-changes').on('click', () => {
         ContactsStore.patch(getContact().ID, {
           remove_tags: removeTags,
-          add_tags: addTags
+          add_tags: addTags,
         }).then(() => {
           dialog({
-            message: __('Changes saved!')
+            message: __('Changes saved!'),
           })
           addTags = []
           removeTags = []
@@ -1621,7 +1789,7 @@
       if (window.location.href.match(/send_email=true/)) {
         sendEmail()
       }
-    }
+    },
   })
 
   $(function () {
@@ -1630,4 +1798,4 @@
 
   Groundhogg.ActivityTimeline = ActivityTimeline
 
-})(jQuery, ContactEditor)
+} )(jQuery, ContactEditor)
