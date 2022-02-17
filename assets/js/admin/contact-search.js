@@ -212,7 +212,7 @@
                         ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${ __(
                                 'Exclude') }</div><div id="exclude-filters"></div></div>`
                         : '' }
-                <div class="space-between">
+                <div id="below-filters" class="space-between">
                     <div class="align-left-space-between">
                         <span>${ __('Show exclude filters',
                                 'groundhogg') }</span>
@@ -224,14 +224,14 @@
                     </div>
                     <div class="align-right-space-between">
                         <button id="search-contacts"
-                                class="button button-primary">
+                                class="gh-button primary">
                             ${ __('Search', 'groundhogg') }
                         </button>
                         ${ !this.currentSearch
-                                ? `<button id="save-search" class="button button-secondary">${ __(
+                                ? `<button id="save-search" class="gh-button secondary">${ __(
                                         'Save this search',
                                         'groundhogg') }</button>`
-                                : `<button id="update-search" class="button button-secondary" ${ objectEquals(
+                                : `<button id="update-search" class="gh-button secondary" ${ objectEquals(
                                         this.query.filters,
                                         this.currentSearch.query.filters) &&
                                 ( !this.excludeEnabled ||

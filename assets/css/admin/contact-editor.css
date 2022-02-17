@@ -320,4 +320,20 @@ code.meta-replacement-code {
   flex-grow: 0;
 }
 
+@media only screen and (max-width: 1300px) {
+  .contact-record {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+@media only screen and (max-width: 830px) {
+  .contact-editor-wrap {
+    padding-right: 0;
+  }
+  .contact-editor-wrap .two-columns {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
 /*# sourceMappingURL=contact-editor.css.map */

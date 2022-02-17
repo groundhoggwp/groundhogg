@@ -29,6 +29,7 @@
   /*align-items: center;*/
   width: 100%;
   gap: 5px;
+  align-items: stretch;
 }
 
 #search-panel .contact-quick-search {
@@ -97,29 +98,6 @@ span#search-name {
 
 .start-search {
   padding-left: 15px;
-}
-
-.wp-list-table th#email,
-.wp-list-table th#tags_col {
-  width: 400px;
-}
-
-.wp-list-table th,
-.wp-list-table #first_name,
-.wp-list-table #user_id,
-.wp-list-table #owner_id,
-.wp-list-table #tel_numbers,
-.wp-list-table #last_name {
-  width: 125px;
-}
-
-.wp-list-table #birthday,
-.wp-list-table #date_created {
-  width: 200px;
-}
-
-.wp-list-table #address {
-  width: 300px;
 }
 
 li#option-delete a,
@@ -224,64 +202,6 @@ td.tel_numbers .dashicons {
   width: 100px;
 }
 
-.table-scroll {
-  position: relative;
-  width: 100%;
-  z-index: 1;
-  margin: auto;
-  overflow-y: auto;
-}
-
-.table-scroll table {
-  width: 100%;
-  min-width: 1280px;
-  margin: auto;
-}
-
-.table-wrap {
-  position: relative;
-}
-
-.table-scroll thead th {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-}
-
-/* safari and ios need the tfoot itself to be position:sticky also */
-.table-scroll tfoot,
-.table-scroll tfoot th,
-.table-scroll tfoot td {
-  position: -webkit-sticky;
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-}
-
-tbody th.check-column,
-tfoot td.check-column,
-thead td.check-column {
-  position: -webkit-sticky;
-  position: sticky;
-  left: 0;
-  z-index: 4;
-}
-
-thead th.column-email,
-tfoot th.column-email,
-tbody td.column-email {
-  position: -webkit-sticky;
-  position: sticky;
-  left: 33px;
-  z-index: 4;
-}
-
-td.check-column,
-thead th.column-email,
-tfoot th.column-email {
-  background: #ffffff;
-}
-
 .alternate, .striped > tbody > :nth-child(odd) td,
 .alternate, .striped > tbody > :nth-child(odd) th {
   background-color: #f9f9f9;
@@ -290,6 +210,113 @@ tfoot th.column-email {
 .alternate, .striped > tbody > :nth-child(even) td,
 .alternate, .striped > tbody > :nth-child(even) th {
   background-color: #ffffff;
+}
+
+@media only screen and (min-width: 782px) {
+  .wp-list-table th#email,
+.wp-list-table th#tags_col {
+    width: 400px;
+  }
+
+  .wp-list-table th,
+.wp-list-table #first_name,
+.wp-list-table #user_id,
+.wp-list-table #owner_id,
+.wp-list-table #tel_numbers,
+.wp-list-table #last_name {
+    width: 125px;
+  }
+
+  .wp-list-table #birthday,
+.wp-list-table #date_created {
+    width: 200px;
+  }
+
+  .wp-list-table #address {
+    width: 300px;
+  }
+
+  .table-scroll {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    margin: auto;
+    overflow-y: auto;
+  }
+
+  .table-scroll table {
+    width: 100%;
+    min-width: 1280px;
+    margin: auto;
+  }
+
+  .table-wrap {
+    position: relative;
+  }
+
+  .table-scroll thead th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+  }
+
+  /* safari and ios need the tfoot itself to be position:sticky also */
+  .table-scroll tfoot,
+.table-scroll tfoot th,
+.table-scroll tfoot td {
+    position: -webkit-sticky;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+  }
+
+  tbody th.check-column,
+tfoot td.check-column,
+thead td.check-column {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+    z-index: 4;
+  }
+
+  thead th.column-email,
+tfoot th.column-email,
+tbody td.column-email {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 33px;
+    z-index: 4;
+  }
+
+  td.check-column,
+thead th.column-email,
+tfoot th.column-email {
+    background: #ffffff;
+  }
+}
+@media only screen and (max-width: 782px) {
+  #below-filters {
+    margin-top: 20px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #load-saved-search {
+    margin-bottom: 0;
+  }
+
+  .tablenav.top .gh-actions {
+    display: none;
+  }
+
+  #search-panel {
+    flex-direction: column;
+    gap: 20px;
+  }
+  #search-panel .contact-quick-search {
+    justify-content: flex-start;
+  }
 }
 
 /*# sourceMappingURL=contacts.css.map */
