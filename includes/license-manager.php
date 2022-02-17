@@ -542,7 +542,7 @@ class License_Manager {
 		$key = md5( serialize( $args ) );
 
 		if ( get_transient( "gh_store_products_{$key}" ) ) {
-			return get_transient( "gh_store_products_{$key}" );
+//			return get_transient( "gh_store_products_{$key}" );
 		}
 
 		$args = wp_parse_args( $args, array(
