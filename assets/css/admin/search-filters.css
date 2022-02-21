@@ -131,13 +131,23 @@
   border: 1px solid #8c8f94;
   border-radius: 5px;
   cursor: pointer;
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 #search-filters-editor .filter.filter-view:hover, #search-filters-editor .filter.filter-view:focus {
   background: #f9f9f9;
 }
 #search-filters-editor .filter.filter-view.filter-broken {
-  border-color: #E91F4F;
+  border-color: #e91f4f;
   background: rgba(233, 31, 79, 0.1);
+}
+#search-filters-editor .filter.filter-view .delete-filter {
+  margin-right: -3px;
+}
+#search-filters-editor .filter.filter-view .delete-filter:hover {
+  background: rgba(16, 38, 64, 0.05);
+  border-radius: 3px;
 }
 #search-filters-editor .filter.filter-edit-wrap {
   position: relative;

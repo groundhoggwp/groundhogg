@@ -384,3 +384,35 @@ code.meta-replacement-code {
 #secondary-tabs {
   flex-grow: 0;
 }
+
+@media only screen and ( max-width: 1300px ){
+
+  .contact-record{
+    flex-direction: column;
+    gap: 20px;
+  }
+
+}
+
+
+@media only screen and ( max-width: 830px ){
+
+  .contact-details{
+    .inside {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  }
+
+  .contact-editor-wrap {
+
+    padding-right: 0;
+
+    .two-columns{
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+}

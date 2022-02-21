@@ -53,18 +53,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 			</div>
 		</div>
-		<div class="postbox gh-panel tags-panel">
-			<div class="postbox-header gh-panel-header">
+		<div class="gh-panel tags-panel">
+			<div class="gh-panel-header">
 				<h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php _e( 'Tags' ); ?></h2>
-				<div class="handle-actions hide-if-no-js">
-					<button type="button" class="handlediv" aria-expanded="true">
-                                <span class="screen-reader-text">
-	                                <?php _e( 'Toggle tags box', 'groundhogg' ) ?>
-                                </span>
-						<span class="toggle-indicator" aria-hidden="true"></span>
-					</button>
-				</div>
-			</div>
+                <button type="button" class="toggle-indicator" aria-expanded="true"></button>
+            </div>
 			<div class="inside"
 			     title="<?php esc_attr_e( 'Tags' ); ?>">
 				<div id="tags-here"></div>
@@ -77,7 +70,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				<?php do_action( 'groundhogg/contact/record/nav/before', $contact ); ?>
 
 				<!-- BEGIN TABS -->
-				<h2 class="nav-tab-wrapper primary gh">
+				<h2 class="nav-tab-wrapper primary gh no-margin">
 					<?php foreach ( $tabs as $id => $tab ): ?>
 						<a href="javascript:void(0)"
 						   class="nav-tab <?php echo $active_tab == $id ? 'nav-tab-active' : ''; ?>"

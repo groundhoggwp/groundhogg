@@ -1,4 +1,4 @@
-(function ($) {
+( function ($) {
 
   const { createFilters } = Groundhogg.filters.functions
   const {
@@ -20,17 +20,27 @@
     dialog,
     bold,
     tooltip,
-    adminPageURL
+    adminPageURL,
   } = Groundhogg.element
   const {
     quickEditContactModal,
     addContactModal,
   } = Groundhogg.components
   const { post, get, patch, routes, ajax } = Groundhogg.api
-  const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
+  const {
+    searches: SearchesStore,
+    contacts: ContactsStore,
+    tags: TagsStore,
+    funnels: FunnelsStore,
+  } = Groundhogg.stores
   const { tagPicker, funnelPicker } = Groundhogg.pickers
   const { userHasCap } = Groundhogg.user
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
   const { sprintf, __, _x, _n } = wp.i18n
 
   // const { StepTypes } = Groundhogg
@@ -86,11 +96,15 @@
 
       ContactsStore.count({
         filters: base64_json_encode(this.query.filters),
-        exclude_filters: base64_json_encode(this.excludeEnabled ? this.query.exclude_filters : [])
+        exclude_filters: base64_json_encode(
+          this.excludeEnabled ? this.query.exclude_filters : []),
       }, {
-        signal
+        signal,
       }).then(total => {
-        $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
+        $('#search-contacts').
+          html(sprintf(
+            _n('Show %s contact', 'Show %s contacts', total, 'groundhogg'),
+            formatNumber(total)))
       })
     },
 
@@ -102,7 +116,8 @@
         if (this.currentSearch) {
           if (objectEquals(this.query, this.currentSearch.query)) {
             $('#update-search').prop('disabled', true)
-          } else {
+          }
+          else {
             $('#update-search').prop('disabled', false)
           }
         }
@@ -133,21 +148,26 @@
 
         $('.contact-quick-search').hide()
 
-      } else if (ContactSearch.currentSearch) {
+      }
+
+      if (ContactSearch.currentSearch) {
 
         this.currentSearch = copyObject(ContactSearch.currentSearch)
 
         if (this.currentSearch.query) {
           this.query = copyObject(this.currentSearch.query, {})
 
-          if ( 'exclude_filters' in this.query && this.query.exclude_filters.length) {
+          if ('exclude_filters' in this.query &&
+            this.query.exclude_filters.length) {
             this.excludeEnabled = true
           }
         }
       }
 
-      this.filtersApp = createFilters('#search-filters', this.query.filters, handleUpdateFilters)
-      this.excludeFiltersApp = createFilters('#exclude-filters', this.query.exclude_filters, handleUpdateExcludeFilters)
+      this.filtersApp = createFilters('#search-filters', this.query.filters,
+        handleUpdateFilters)
+      this.excludeFiltersApp = createFilters('#exclude-filters',
+        this.query.exclude_filters, handleUpdateExcludeFilters)
       this.mount()
     },
 
@@ -168,7 +188,7 @@
           this.loadingSearch = true
           loadSearch(option.id)
         },
-        noOptions: __('No matching searches...', 'groundhogg')
+        noOptions: __('No matching searches...', 'groundhogg'),
       }).mount()
 
     },
@@ -178,47 +198,73 @@
       if (this.filtersEnabled) {
         //language=HTML
         return `
-			<div class="enable-filters-wrap">
-				<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
-			</div>
-			<div class="search-filters-wrap">
-				${this.excludeEnabled ? `<div class="include-filters-wrap"><div class="include-block">${__('Include')}</div>` : ''}
-				<div id="search-filters"></div>
-				${this.excludeEnabled ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${__('Exclude')}</div><div id="exclude-filters"></div></div>` : ''}
-				<div class="space-between">
-					<div class="align-left-space-between">
-						<span>${__('Show exclude filters', 'groundhogg')}</span>
-						${toggle({
-							id: 'enable-exclude',
-							name: 'enable_exclude',
-							checked: this.excludeEnabled
-						})}
-					</div>
-					<div class="align-right-space-between">
-						<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}
-						</button>
-						${!this.currentSearch
-							? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
-							: `<button id="update-search" class="button button-secondary" ${objectEquals(this.query.filters, this.currentSearch.query.filters) && (!this.excludeEnabled || objectEquals(this.query.exclude_filters, this.currentSearch.query.exclude_filters)) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
-					</div>
+            <div class="enable-filters-wrap">
+                <button class="enable-filters white"><span
+                        class="dashicons dashicons-filter"></button>
+            </div>
+            <div class="search-filters-wrap">
+                ${ this.excludeEnabled
+                        ? `<div class="include-filters-wrap"><div class="include-block">${ __(
+                                'Include') }</div>`
+                        : '' }
+                <div id="search-filters"></div>
+                ${ this.excludeEnabled
+                        ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${ __(
+                                'Exclude') }</div><div id="exclude-filters"></div></div>`
+                        : '' }
+                <div id="below-filters" class="space-between">
+                    <div class="align-left-space-between">
+                        <span>${ __('Show exclude filters',
+                                'groundhogg') }</span>
+                        ${ toggle({
+                            id: 'enable-exclude',
+                            name: 'enable_exclude',
+                            checked: this.excludeEnabled,
+                        }) }
+                    </div>
+                    <div class="align-right-space-between">
+                        <button id="search-contacts"
+                                class="gh-button primary">
+                            ${ __('Search', 'groundhogg') }
+                        </button>
+                        ${ !this.currentSearch
+                                ? `<button id="save-search" class="gh-button secondary">${ __(
+                                        'Save this search',
+                                        'groundhogg') }</button>`
+                                : `<button id="update-search" class="gh-button secondary" ${ objectEquals(
+                                        this.query.filters,
+                                        this.currentSearch.query.filters) &&
+                                ( !this.excludeEnabled ||
+                                        objectEquals(this.query.exclude_filters,
+                                                this.currentSearch.query.exclude_filters) )
+                                        ? 'disabled'
+                                        : '' }>${ sprintf(
+                                        __('Update "%s"', 'groundhogg'),
+                                        this.currentSearch.name) }</button><a class="gh-text danger delete-search">${ __(
+                                        'Delete') }</a>` }
+                    </div>
 
-				</div>
-			</div>
+                </div>
+            </div>
         `
       }
 
       //language=HTML
       return `
-		  <button class="enable-filters white" style="padding-right: 10px"><span
-			  class="dashicons dashicons-filter"></span>
-			  ${this.currentSearch ? __('Edit Filters', 'groundhogg') : __('Filter Contacts', 'groundhogg')}
-		  </button>
-		  ${this.savedSearchEnabled
-			  ? `<div id="searches-picker"></div>`
-			  : (ContactSearch.searches.length
-					  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search"></span> <span class="text">${this.loadingSearch ? __('Loading search', 'groundhogg') : __('Load saved search', 'groundhogg')}</span></button>`
-					  : ''
-			  )}`
+          <button class="enable-filters white" style="padding-right: 10px"><span
+                  class="dashicons dashicons-filter"></span>
+              ${ this.currentSearch ? __('Edit Filters', 'groundhogg') : __(
+                      'Filter Contacts', 'groundhogg') }
+          </button>
+          ${ this.savedSearchEnabled
+                  ? `<div id="searches-picker"></div>`
+                  : ( ContactSearch.searches.length
+                                  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search"></span> <span class="text">${ this.loadingSearch
+                                          ? __('Loading search', 'groundhogg')
+                                          : __('Load saved search',
+                                                  'groundhogg') }</span></button>`
+                                  : ''
+                  ) }`
     },
 
     mount () {
@@ -238,7 +284,8 @@
         this.filtersEnabled = !this.filtersEnabled
         if (this.filtersEnabled) {
           $('.contact-quick-search').hide()
-        } else {
+        }
+        else {
           $('.contact-quick-search').show()
         }
         remount()
@@ -255,7 +302,7 @@
 
         tooltip('.enable-filters', {
           content: __('Turn off filters', 'groundhogg'),
-          position: 'top'
+          position: 'top',
         })
 
         if (this.excludeEnabled) {
@@ -291,14 +338,17 @@
         loadingDots('#search-contacts')
         if (this.currentSearch
           && objectEquals(this.query.filters, this.currentSearch.query.filters)
-          && objectEquals(this.currentSearch.query.exclude_filters, this.excludeEnabled ? this.query.exclude_filters : [])) {
+          && objectEquals(this.currentSearch.query.exclude_filters,
+            this.excludeEnabled ? this.query.exclude_filters : [])) {
           loadSearch(this.currentSearch.id)
-        } else {
+        }
+        else {
 
-          let query = `filters=${base64_json_encode(this.query.filters)}`
+          let query = `filters=${ base64_json_encode(this.query.filters) }`
 
           if (this.excludeEnabled) {
-            query += `&exclude_filters=${base64_json_encode(this.query.exclude_filters)}`
+            query += `&exclude_filters=${ base64_json_encode(
+              this.query.exclude_filters) }`
           }
 
           loadFilters(query)
@@ -310,14 +360,15 @@
         e.preventDefault()
 
         dangerConfirmationModal({
-          alert: `<p>${__('Are you sure you want to delete this search')}</p>`,
+          alert: `<p>${ __(
+            'Are you sure you want to delete this search') }</p>`,
           onConfirm: () => {
             SearchesStore.delete(this.currentSearch.id).then(() => {
               this.currentSearch = null
               $('#current-search').remove()
               this.mount()
             })
-          }
+          },
         })
       })
 
@@ -331,13 +382,18 @@
         SearchesStore.patch(this.currentSearch.id, {
           query: {
             filters: this.query.filters,
-            exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
-          }
+            exclude_filters: this.excludeEnabled
+              ? this.query.exclude_filters
+              : [],
+          },
         }).then(search => {
 
           stop()
           this.currentSearch = search
           $button.html(__('Updated!', 'groundhogg'))
+          dialog({
+            message: __('Search updated!', 'groundhogg'),
+          })
 
           setTimeout(() => {
             this.mount()
@@ -352,7 +408,7 @@
         $span.html(input({
           name: 'search_name',
           id: 'saved-search-name-edit',
-          value: this.currentSearch.name
+          value: this.currentSearch.name,
         }))
 
         $('#saved-search-name-edit').focus().on('change blur keydown', (e) => {
@@ -367,8 +423,10 @@
 
           if (newName !== this.currentSearch.name) {
             SearchesStore.patch(this.currentSearch.id, {
-              name: newName
-            }).then(s => this.currentSearch = s).then(() => $span.html(specialChars(this.currentSearch.name)))
+              name: newName,
+            }).
+              then(s => this.currentSearch = s).
+              then(() => $span.html(specialChars(this.currentSearch.name)))
           }
         })
       })
@@ -376,23 +434,26 @@
       $('#save-search').on('click', () => {
         const {
           $modal,
-          close
+          close,
         } = modal({
           //language=html
           content: `
-			  <h2>${__('Name your search...', 'groundhogg')}</h2>
-			  <p>${input({
-				  id: 'search-name',
-				  placeholder: __('My saved search...', 'groundhogg')
-			  })}</p>
-			  <button id="save" disabled class="gh-button primary">${__('Save', 'groundhogg')}</button>`
+              <h2>${ __('Name your search...', 'groundhogg') }</h2>
+              <p>${ input({
+                  id: 'search-name',
+                  placeholder: __('My saved search...', 'groundhogg'),
+              }) }</p>
+              <button id="save" disabled class="gh-button primary">
+                  ${ __('Save', 'groundhogg') }
+              </button>`,
         })
 
         $('input#search-name').on('change input', (e) => {
           this.newSearchName = e.target.value
           if (!this.newSearchName) {
             $('#save').prop('disabled', true)
-          } else {
+          }
+          else {
             $('#save').prop('disabled', false)
           }
 
@@ -413,8 +474,10 @@
             name: this.newSearchName,
             query: {
               filters: this.query.filters,
-              exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
-            }
+              exclude_filters: this.excludeEnabled
+                ? this.query.exclude_filters
+                : [],
+            },
           }).then(search => {
 
             stop()
@@ -427,7 +490,7 @@
           })
         })
       })
-    }
+    },
   }
 
   $(function () {
@@ -437,13 +500,16 @@
   // More Actions
   $(() => {
 
-    $('.gh-actions').append(`<button type="button" class="more-actions button button-secondary">${__('More Actions', 'groundhogg')}</button>`)
+    $('.gh-actions').
+      append(
+        `<button type="button" class="more-actions button button-secondary">${ __(
+          'More Actions', 'groundhogg') }</button>`)
     $('.more-actions').on('click', (e) => {
 
       const {
         total_items: totalContacts,
         total_items_formatted: totalContactsFormatted,
-        query: ContactQuery
+        query: ContactQuery,
       } = ContactsTable
 
       // console.log(e.currentTarget)
@@ -452,28 +518,34 @@
         {
           key: 'edit',
           cap: 'edit_contacts',
-          text: sprintf(__('Edit %s contacts', 'groundhogg'), totalContactsFormatted)
+          text: sprintf(__('Edit %s contacts', 'groundhogg'),
+            totalContactsFormatted),
         },
         {
           key: 'export',
           cap: 'export_contacts',
-          text: sprintf(__('Export %s contacts', 'groundhogg'), totalContactsFormatted)
+          text: sprintf(__('Export %s contacts', 'groundhogg'),
+            totalContactsFormatted),
         },
         {
           key: 'broadcast',
           cap: 'schedule_broadcasts',
-          text: sprintf(__('Send a broadcast to %s contacts', 'groundhogg'), totalContactsFormatted)
+          text: sprintf(__('Send a broadcast to %s contacts', 'groundhogg'),
+            totalContactsFormatted),
         },
         {
           key: 'funnel',
           cap: 'view_funnels',
-          text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'), totalContactsFormatted)
+          text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'),
+            totalContactsFormatted),
         },
         {
           key: 'delete',
           cap: 'delete_contacts',
-          text: `<span class="gh-text danger">${sprintf(__('Delete %s contacts', 'groundhogg'), totalContactsFormatted)}</span>`
-        }
+          text: `<span class="gh-text danger">${ sprintf(
+            __('Delete %s contacts', 'groundhogg'),
+            totalContactsFormatted) }</span>`,
+        },
       ]
 
       moreMenu(e.currentTarget, {
@@ -482,13 +554,13 @@
           switch (key) {
             case 'edit':
               window.location.href = adminPageURL('gh_contacts', {
+                ...ContactQuery,
                 action: 'bulk_edit',
-                query: {
-                  ...ContactQuery,
-                  number: -1,
-                  offset: 0,
-                  filters: base64_json_encode(ContactQuery.filters) // base64 json encode it to preserve the filters
-                }
+                number: -1,
+                offset: 0,
+                filters: base64_json_encode(ContactQuery.filters),
+                exclude_filters: base64_json_encode(
+                  ContactQuery.exclude_filters),
               })
               break
             case 'export':
@@ -499,8 +571,10 @@
                   ...ContactQuery,
                   number: -1,
                   offset: 0,
-                  filters: base64_json_encode(ContactQuery.filters) // base64 json encode it to preserve the filters
-                }
+                  filters: base64_json_encode(ContactQuery.filters),
+                  exclude_filters: base64_json_encode(
+                    ContactQuery.exclude_filters),
+                },
               })
               break
             case 'funnel':
@@ -513,77 +587,85 @@
                 const steps = () => {
                   // language=HTML
                   return `
-					  <div class="gh-row">
-						  <div class="gh-col">
-							  <label class="block">${__('Select a step', 'groundhogg')}</label>
-							  ${select({
-								  id: 'select-step',
-								  name: 'step'
-							  })}
-						  </div>
-					  </div>`
+                      <div class="gh-row">
+                          <div class="gh-col">
+                              <label class="block">${ __('Select a step',
+                                      'groundhogg') }</label>
+                              ${ select({
+                                  id: 'select-step',
+                                  name: 'step',
+                              }) }
+                          </div>
+                      </div>`
                 }
 
                 const submit = () => {
                   //language=HTML
                   return `
-					  <div class="gh-row">
-						  <div class="gh-col">
-							  <button id="add-to-funnel" class="gh-button primary">
-								  ${sprintf(__('Add %1$s contacts to %2$s', 'groundhogg'), totalContactsFormatted, bold(funnel.data.title))}
-							  </button>
-						  </div>
-					  </div>`
+                      <div class="gh-row">
+                          <div class="gh-col">
+                              <button id="add-to-funnel"
+                                      class="gh-button primary">
+                                  ${ sprintf(__('Add %1$s contacts to %2$s',
+                                                  'groundhogg'), totalContactsFormatted,
+                                          bold(funnel.data.title)) }
+                              </button>
+                          </div>
+                      </div>`
                 }
 
                 // language=HTML
                 return `
-					<h2>${__('Add contacts to a funnel', 'groundhogg')}</h2>
-					<div class="gh-rows-and-columns">
-						<div class="gh-row">
-							<div class="gh-col">
-								<label class="block">${__('Select a funnel', 'groundhogg')}</label>
-								${select({
-									id: 'select-funnel',
-									name: 'funnel'
-								}, FunnelsStore.getItems().map(f => ({
-									value: f.ID,
-									text: f.data.title
-								})), funnel && funnel.ID)}
-							</div>
-						</div>
-						${funnel ? steps() : ''}
-						${funnel && step ? submit() : ''}
-					</div>`
+                    <h2>${ __('Add contacts to a funnel', 'groundhogg') }</h2>
+                    <div class="gh-rows-and-columns">
+                        <div class="gh-row">
+                            <div class="gh-col">
+                                <label class="block">${ __('Select a funnel',
+                                        'groundhogg') }</label>
+                                ${ select({
+                                    id: 'select-funnel',
+                                    name: 'funnel',
+                                }, FunnelsStore.getItems().map(f => ( {
+                                    value: f.ID,
+                                    text: f.data.title,
+                                } )), funnel && funnel.ID) }
+                            </div>
+                        </div>
+                        ${ funnel ? steps() : '' }
+                        ${ funnel && step ? submit() : '' }
+                    </div>`
               }
 
               const mounted = () => {
                 funnelPicker('#select-funnel', false, (items) => {
                   FunnelsStore.itemsFetched(items)
                 }, {
-                  status: 'active'
+                  status: 'active',
                 }, {
-                  placeholder: __( 'Select a funnel...', 'groundhogg' ),
+                  placeholder: __('Select a funnel...', 'groundhogg'),
                 }).on('change', ({ target }) => {
                   funnel = FunnelsStore.get(parseInt($(target).val()))
 
-                  step = funnel.steps.find( s => s.data.step_order == 1)
+                  step = funnel.steps.find(s => s.data.step_order == 1)
                   setContent(addToFunnel())
                   mounted()
 
                 })
 
                 $('#select-step').select2({
-                  placeholder: __( 'Select a step...', 'groundhogg' ),
-                  data: funnel ? funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
-                    id: s.ID,
-                    text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`,
-                    selected: s.ID == step.ID,
-                  })) : [],
+                  placeholder: __('Select a step...', 'groundhogg'),
+                  data: funnel ? funnel.steps.sort(
+                    (a, b) => a.data.step_order - b.data.step_order).
+                    map(s => ( {
+                      id: s.ID,
+                      text: `${ s.data.step_title } (${ Groundhogg.rawStepTypes[s.data.step_type].name })`,
+                      selected: s.ID == step.ID,
+                    } )) : [],
                   // templateSelection: template,
                   // templateResult: template
                 }).on('change', ({ target }) => {
-                  step = funnel.steps.find(s => s.ID === parseInt($(target).val()))
+                  step = funnel.steps.find(
+                    s => s.ID === parseInt($(target).val()))
                   setContent(addToFunnel())
                   mounted()
                 })
@@ -593,7 +675,8 @@
                   let limit = 500
                   let offset = 0
 
-                  setContent(`<h2 id="has-dots">${__('Adding contacts to funnel')}</h2><div id="funnel-progress"></div>`)
+                  setContent(`<h2 id="has-dots">${ __(
+                    'Adding contacts to funnel') }</h2><div id="funnel-progress"></div>`)
 
                   const { stop: stopDots } = loadingDots('#has-dots')
                   const { setProgress } = progressBar('#funnel-progress')
@@ -605,8 +688,8 @@
                       query: {
                         ...ContactQuery,
                         limit,
-                        offset
-                      }
+                        offset,
+                      },
                     }).then(() => {
 
                       limit = Math.min(totalContacts - offset, limit)
@@ -618,7 +701,8 @@
                         closeFunnelModal()
                         stopDots()
                         dialog({
-                          message: sprintf(__('%s contacts added to "%s"'), totalContactsFormatted, funnel.data.title)
+                          message: sprintf(__('%s contacts added to "%s"'),
+                            totalContactsFormatted, funnel.data.title),
                         })
                         return
                       }
@@ -643,7 +727,8 @@
             case 'broadcast':
 
               const { close: closeModal } = modal({
-                content: `<h2>${__('Send a broadcast', 'groundhogg')}</h2><div id="gh-broadcast-form" style="width: 400px"></div>`
+                content: `<h2>${ __('Send a broadcast',
+                  'groundhogg') }</h2><div id="gh-broadcast-form" style="width: 400px"></div>`,
               })
 
               Groundhogg.SendBroadcast('#gh-broadcast-form', {
@@ -653,12 +738,12 @@
                   offset: 0,
                 },
                 total_contacts: totalContacts,
-                which: 'from_table'
+                which: 'from_table',
 
               }, {
                 onScheduled: () => {
                   closeModal()
-                }
+                },
               })
 
               break
@@ -687,7 +772,9 @@
               }
 
               dangerConfirmationModal({
-                alert: `<p>${sprintf(__('Are you sure you want to delete %s contacts? This cannot be undone. Consider <i>exporting</i> first!', 'groundhogg'), `<b>${totalContactsFormatted}</b>`)}</p>`,
+                alert: `<p>${ sprintf(__(
+                  'Are you sure you want to delete %s contacts? This cannot be undone. Consider <i>exporting</i> first!',
+                  'groundhogg'), `<b>${ totalContactsFormatted }</b>`) }</p>`,
                 onConfirm: () => {
 
                   modal({
@@ -705,18 +792,19 @@
                   // Go back to the root contacts page
                   const onComplete = () => {
                     dialog({
-                      message: sprintf(__('%s contacts deleted', 'groundhogg'), `<b>${deleted}</b>`)
+                      message: sprintf(__('%s contacts deleted', 'groundhogg'),
+                        `<b>${ deleted }</b>`),
                     })
 
                     window.location.href = adminPageURL('gh_contacts')
                   }
 
                   deleteContacts(onDelete, onComplete)
-                }
+                },
               })
               break
           }
-        }
+        },
       })
     })
   })
@@ -736,15 +824,18 @@
 
       dangerConfirmationModal({
         confirmText: __('Delete'),
-        alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(`${contact.data.first_name} ${contact.data.last_name}`))}</p>`,
+        alert: `<p>${ sprintf(
+          __('Are you sure you want to delete %s?', 'groundhogg'), bold(
+            `${ contact.data.first_name } ${ contact.data.last_name }`)) }</p>`,
         onConfirm: () => {
           ContactsStore.delete(contact.ID).then(() => {
-            $(`#contact-${contact.ID}`).remove()
+            $(`#contact-${ contact.ID }`).remove()
             dialog({
-              message: sprintf(__('%s was deleted!', 'groundhogg'), `${contact.data.first_name} ${contact.data.last_name}`)
+              message: sprintf(__('%s was deleted!', 'groundhogg'),
+                `${ contact.data.first_name } ${ contact.data.last_name }`),
             })
           })
-        }
+        },
       })
     })
 
@@ -761,14 +852,14 @@
           onCreate: (c) => {
             ajax({
               action: 'groundhogg_contact_table_row',
-              contact: c.ID
+              contact: c.ID,
             }).then((r) => {
               dialog({
-                message: __('Contact created!', 'groundhogg')
+                message: __('Contact created!', 'groundhogg'),
               })
               $('.wp-list-table.contacts tbody').prepend(r.data.row)
             })
-          }
+          },
         })
       })
     }
@@ -791,15 +882,15 @@
 
             ajax({
               action: 'groundhogg_contact_table_row',
-              contact: contact.ID
+              contact: contact.ID,
             }).then((r) => {
               dialog({
-                message: __('Contact updated!', 'groundhogg')
+                message: __('Contact updated!', 'groundhogg'),
               })
-              $(`#contact-${contact.ID}`).replaceWith(r.data.row)
+              $(`#contact-${ contact.ID }`).replaceWith(r.data.row)
             })
 
-          }
+          },
         })
 
       })
@@ -810,15 +901,15 @@
   const marketableTooltips = () => {
     tooltip('.pill.marketable', {
       content: __('Will receive marketing', 'groundhogg'),
-      position: 'right'
+      position: 'right',
     })
 
     tooltip('.pill.unmarketable', {
       content: __('Will <b>not</b> receive marketing', 'groundhogg'),
-      position: 'right'
+      position: 'right',
     })
   }
 
   $(marketableTooltips)
 
-})(jQuery)
+} )(jQuery)

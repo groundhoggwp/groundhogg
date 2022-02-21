@@ -86,8 +86,41 @@ class Contacts extends DB {
 	 * Update contact record when user profile updated.
 	 */
 	protected function add_additional_actions() {
-		add_action( 'profile_update', array( $this, 'update_contact_on_user_update' ), 10, 2 );
+		add_action( 'profile_update', [ $this, 'update_contact_on_user_update' ], 10, 2 );
+		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
+		add_action( 'delete_user', [ $this, 'user_deleted' ], 10, 1 );
 		parent::add_additional_actions();
+	}
+
+	/**
+	 * When an owner is deleted, reassign their contacts
+	 *
+	 * @param $prev
+	 * @param $new
+	 *
+	 * @return void
+	 */
+	public function owner_deleted( $prev, $new ) {
+		$this->update( [
+			'owner_id' => $prev,
+		], [
+			'owner_id' => $new,
+		] );
+	}
+
+	/**
+	 * When a user is deleted, also remove the relationship in the contacts table
+	 *
+	 * @param $id
+	 *
+	 * @return void
+	 */
+	public function user_deleted( $id ) {
+		$this->update( [
+			'user_id' => $id,
+		], [
+			'user_id' => 0,
+		] );
 	}
 
 	public function create_object( $object ) {
@@ -175,8 +208,8 @@ class Contacts extends DB {
 	 * Update a contact
 	 *
 	 * @access  public
-	 * @return  bool
 	 * @since   2.1
+	 * @return  bool
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -257,12 +290,13 @@ class Contacts extends DB {
 	 *
 	 * @access public
 	 *
-	 * @param string $field id or email
-	 * @param mixed  $value The Customer ID or email to search
-	 *
-	 * @return mixed          Upon success, an object of the contact. Upon failure, NULL
 	 * @since  2.3
 	 *
+	 * @param mixed  $value The Customer ID or email to search
+	 *
+	 * @param string $field id or email
+	 *
+	 * @return mixed          Upon success, an object of the contact. Upon failure, NULL
 	 */
 	public function get_contact_by( $field = 'ID', $value = 0 ) {
 		if ( empty( $field ) || empty( $value ) ) {
@@ -329,11 +363,11 @@ class Contacts extends DB {
 	 *
 	 * @access protected
 	 *
+	 * @since  2.8
+	 *
 	 * @param array $args Arguments for `WPGH_Contact_Query`.
 	 *
 	 * @return array Prepared arguments.
-	 * @since  2.8
-	 *
 	 */
 	protected function prepare_contact_query_args( $args ) {
 		if ( ! empty( $args['ID'] ) ) {

@@ -10,7 +10,7 @@
  * @var $contact \Groundhogg\Contact
  */
 
-if ( $contact->get_user_id() ):
+if ( $contact->get_userdata() ):
 
 	?>
 	<ul class="info-list">

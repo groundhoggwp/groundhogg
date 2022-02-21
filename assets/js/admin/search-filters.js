@@ -49,7 +49,7 @@
 
     //language=HTML
     return `
-		<div class="filter filter-view filter-broken space-between" data-key="${filterIndex}"
+		<div class="filter filter-view filter-broken" data-key="${filterIndex}"
 		     data-group="${filterGroupIndex}" tabindex="0">
 			<span class="text">${sprintf(__('This %s filter is corrupted', 'groundhogg'), bold( Filters.types[filter.type].name ))}</span>
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
@@ -64,7 +64,7 @@
 
     //language=HTML
     return `
-		<div class="filter filter-view space-between" data-key="${filterIndex}" data-group="${filterGroupIndex}"
+		<div class="filter filter-view" data-key="${filterIndex}" data-group="${filterGroupIndex}"
 		     tabindex="0">
 			<span class="text">${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}</span>
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
@@ -192,7 +192,7 @@
 
   const createFilters = (el = '', filters = [], onChange = (f) => {console.log(f)}) => ({
     onChange,
-    filters,
+    filters: Array.isArray( filters ) ? filters : [],
     el,
     initFlag: false,
     currentGroup: false,
@@ -212,7 +212,6 @@
           try {
             filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
           } catch (e) {
-            console.log(e)
             filters.push( renderFilterBroken(filter, j, k) );
           }
         })
@@ -344,11 +343,6 @@
       }
 
       const getFilterSettings = (group, key) => {
-
-        console.log({
-          group, key
-        })
-
         return {
           ...this.filters[group][key]
         }
@@ -520,7 +514,7 @@
         }
       })
 
-      tooltip('.add-filter', {
+      tooltip(`${el} .add-filter`, {
         content: __('Add a filter', 'groundhogg'),
         position: 'right'
       })

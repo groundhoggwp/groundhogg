@@ -36,6 +36,8 @@ class Notes extends DB {
 	 * Option to add additional actions following construct.
 	 */
 	protected function add_additional_actions() {
+		parent::add_additional_actions();
+		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 		add_action( "groundhogg/contact/merged", [ $this, 'objects_merged' ], 10, 2 );
 	}
 
@@ -53,6 +55,15 @@ class Notes extends DB {
 		], [
 			'object_id' => $orig->get_id()
 		] );
+	}
+
+
+	public function owner_deleted( $prev, $new ){
+		$this->update([
+			'user_id' => $prev,
+		], [
+			'user_id' => $new,
+		]);
 	}
 
 	/**

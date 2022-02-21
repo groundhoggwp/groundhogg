@@ -262,6 +262,11 @@ body.groundhogg-admin-page {
   h2.nav-tab-wrapper{
     border-bottom: 1px solid $primary-dark-15;
     padding-top: 0;
+    margin-top: 20px;
+
+    &.no-margin{
+      margin-top: 0;
+    }
 
     .nav-tab {
       border-radius: 3px 3px 0 0;
@@ -615,6 +620,9 @@ span.gh-text {
 
   &.closed {
     .gh-panel-header {
+
+      border-bottom: none;
+
       .toggle-indicator::before {
         content: "\f140";
       }
@@ -1424,9 +1432,11 @@ p.error,
   span.gh-tag {
     background: #f2f2f2;
     padding: 3px 9px;
+    gap: 5px;
     border-radius: 3px;
     font-size: 12px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
 
     &.remove {
       background: $error-red-50;
@@ -1500,21 +1510,24 @@ p.error,
 
 .gh-progress-bar {
   min-width: 300px;
-  border: 1px solid $primary-blue;
-  background-color: $primary-blue-2;
+  //border: 1px solid $primary-blue;
+  background-color: $primary-blue-10;
   border-radius: 5px;
+  overflow: hidden;
+  box-sizing: border-box;
   //position: relative;
   //height: 25px;
   //box-sizing: content-box;
 
   .gh-progress-bar-fill {
+    box-sizing: border-box;
     //position: absolute;
     //top: 0;
     //left: 0;
     //border-radius: 5px;
     width: 1px;
     background-color: $primary-blue;
-    height: 25px;
+    padding: 8px;
     display: flex;
     align-items: center;
 
@@ -1904,11 +1917,16 @@ ul.gh-form-errors {
 }
 
 #bulk-edit{
-  width: 600px;
-  //margin: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  margin-top: 40px;
+
+  #edit-fields{
+    width: 600px;
+    //margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
 }
 
 .spinning {
