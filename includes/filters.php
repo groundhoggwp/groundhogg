@@ -191,8 +191,6 @@ function _responsive_tag_compat_callback( $matches ) {
 
 	$default_email_width = get_default_email_width();
 
-//	wp_send_json( $default_email_width );
-
 	$classes = explode( ' ', get_array_var( $atts, 'class' ) );
 	$style   = get_array_var( $atts, 'style', [] );
 

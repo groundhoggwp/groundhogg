@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
-use Groundhogg\Contact_Properties;
+use Groundhogg\Properties;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
 use Groundhogg\Queue\Event_Queue;
@@ -665,7 +665,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$count = get_db( 'contacts' )->count( $query_args );
 
 		$default_exportable_fields = get_exportable_fields();
-		$custom_properties         = array_map( function ($f) { return $f['name']; }, Contact_Properties::instance()->get_fields() );
+		$custom_properties         = array_map( function ($f) { return $f['name']; }, Properties::instance()->get_fields() );
 		$meta_keys                 = array_diff( array_values( get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ), $custom_properties );
 
 		?>
@@ -702,13 +702,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 				];
 			} ) );
 
-			$tabs = Contact_Properties::instance()->get_tabs();
+			$tabs = Properties::instance()->get_tabs();
 
 			foreach ( $tabs as $tab ):
 
 				?><h2><?php esc_html_e( $tab['name'] ); ?></h2><?php
 
-				$groups = Contact_Properties::instance()->get_groups( $tab['id'] );
+				$groups = Properties::instance()->get_groups( $tab['id'] );
 
 				foreach ( $groups as $group ):
 					?><h4><?php esc_html_e( $group['name'] ); ?></h4><?php
@@ -737,7 +737,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 							esc_html( $field['label'] ),
 							'<code>' . esc_html( $field['name'] ) . '</code>'
 						];
-					}, Contact_Properties::instance()->get_fields( $group['id'] ) ) );
+					}, Properties::instance()->get_fields( $group['id'] ) ) );
 				endforeach;
 
 			endforeach;

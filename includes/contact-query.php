@@ -1252,7 +1252,7 @@ class Contact_Query {
 
 	protected function setup_custom_field_filters() {
 
-		$fields = Contact_Properties::instance()->get_fields();
+		$fields = Properties::instance()->get_fields();
 
 		foreach ( $fields as $field ) {
 			self::register_filter( $field['id'], [ $this, 'handler_filter' ] );
@@ -1270,7 +1270,7 @@ class Contact_Query {
 
 		$field_id = $filter_vars['type'];
 
-		$field = Contact_Properties::instance()->get_field( $field_id );
+		$field = Properties::instance()->get_field( $field_id );
 
 		// Use most recent available key?
 		$filter_vars['meta'] = $field['name'];

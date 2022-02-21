@@ -1355,6 +1355,11 @@
         $('#save-meta').on('click', commitMetaChanges)
         $('#cancel-meta-changes').on('click', cancelMetaChanges)
 
+        tooltip('.tab-more', {
+          content: __('Tab Options', 'groundhogg'),
+          position: 'right'
+        })
+
         $('.tab-more').on('click', e => {
           e.preventDefault()
 

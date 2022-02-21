@@ -18,7 +18,7 @@ function sanitize_custom_field( $value, $field_id ) {
 	if ( is_array( $field_id ) && isset( $field_id['type'] ) ) {
 		$field = $field_id;
 	} else {
-		$field = Contact_Properties::instance()->get_field( $field_id );
+		$field = Properties::instance()->get_field( $field_id );
 	}
 
 	if ( ! $field || empty( $value ) ) {
@@ -63,7 +63,7 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	if ( is_array( $id_or_name ) && isset( $field_id['type'] ) ) {
 		$field = $field_id;
 	} else {
-		$field = Contact_Properties::instance()->get_field( $id_or_name );
+		$field = Properties::instance()->get_field( $id_or_name );
 	}
 
 	// Change from int to Contact
@@ -110,7 +110,7 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
  * @return bool|mixed
  */
 function get_field_meta_key( $field_id ) {
-	$field = Contact_Properties::instance()->get_field( $field_id );
+	$field = Properties::instance()->get_field( $field_id );
 
 	if ( ! $field ) {
 		return false;
@@ -128,7 +128,7 @@ function get_field_meta_key( $field_id ) {
  */
 function add_custom_fields_to_mappable_fields( $fields = [] ) {
 
-	$groups = Contact_Properties::instance()->get_groups();
+	$groups = Properties::instance()->get_groups();
 
 	if ( empty( $groups ) ) {
 		return $fields;
@@ -138,11 +138,11 @@ function add_custom_fields_to_mappable_fields( $fields = [] ) {
 
 		$_group = [];
 
-		$tab = Contact_Properties::instance()->get_group_tab( $group['id'] );
+		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
-	    $group_name = sprintf( '%s: %s', $tab['name'], $group['name'] );
+		$group_name = sprintf( '%s: %s', $tab['name'], $group['name'] );
 
-		$custom_fields = Contact_Properties::instance()->get_fields( $group['id'] );
+		$custom_fields = Properties::instance()->get_fields( $group['id'] );
 
 		foreach ( $custom_fields as $custom_field ) {
 			$_group[ $custom_field['id'] ] = $custom_field['label'];
@@ -167,7 +167,7 @@ add_filter( 'groundhogg/mappable_fields', __NAMESPACE__ . '\add_custom_fields_to
  */
 function add_custom_fields_to_meta_key_picker( $response = [], $search = '' ) {
 
-	$custom_fields = Contact_Properties::instance()->get_fields();
+	$custom_fields = Properties::instance()->get_fields();
 
 	if ( empty( $custom_fields ) ) {
 		return $response;
@@ -202,7 +202,7 @@ add_filter( 'groundhogg/handle_ajax_meta_picker', __NAMESPACE__ . '\add_custom_f
  */
 function map_custom_fields_to_meta( $field_id, $value, &$args, &$meta, &$tags, &$notes, &$files ) {
 
-	$field = Contact_Properties::instance()->get_field( $field_id );
+	$field = Properties::instance()->get_field( $field_id );
 
 	// if we don't know about it forget about it
 	if ( ! $field || ! $field['name'] ) {
@@ -226,7 +226,7 @@ add_action( 'groundhogg/update_contact_with_map/default', __NAMESPACE__ . '\map_
  */
 function export_custom_property_header( $header, $id, $type ) {
 
-	$field = Contact_Properties::instance()->get_field( $id );
+	$field = Properties::instance()->get_field( $id );
 
 	if ( ! $field ) {
 		return $header;
@@ -250,7 +250,7 @@ add_filter( 'groundhogg/export_header_name', __NAMESPACE__ . '\export_custom_pro
  */
 function export_custom_property( $return, $contact, $field_id ) {
 
-	$field = Contact_Properties::instance()->get_field( $field_id );
+	$field = Properties::instance()->get_field( $field_id );
 
 	// if we don't know about it forget about it
 	if ( ! empty( $return ) || ! $field || ! $field['name'] ) {
@@ -268,7 +268,7 @@ add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property'
  */
 function add_custom_property_replacements( $replacements ) {
 
-	$groups = Contact_Properties::instance()->get_groups();
+	$groups = Properties::instance()->get_groups();
 
 	if ( empty( $groups ) ) {
 		return;
@@ -276,11 +276,11 @@ function add_custom_property_replacements( $replacements ) {
 
 	foreach ( $groups as $group ) {
 
-		$tab = Contact_Properties::instance()->get_group_tab( $group['id'] );
+		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
 		$replacements->add_group( $group['id'], sprintf( '%s: %s', $tab['name'], $group['name'] ) );
 
-		$custom_fields = Contact_Properties::instance()->get_fields( $group['id'] );
+		$custom_fields = Properties::instance()->get_fields( $group['id'] );
 
 		foreach ( $custom_fields as $custom_field ) {
 			$replacements->add(
@@ -302,7 +302,7 @@ function add_custom_property_replacements( $replacements ) {
 			);
 
 			// Hide ugly replacement codes from the UI
-			$replacements->make_hidden($custom_field['id']);
+			$replacements->make_hidden( $custom_field['id'] );
 		}
 	}
 }
@@ -316,7 +316,7 @@ add_action( 'groundhogg/replacements/init', __NAMESPACE__ . '\add_custom_propert
  */
 function register_contact_property_table_columns( $columns ) {
 
-	$custom_fields = Contact_Properties::instance()->get_fields();
+	$custom_fields = Properties::instance()->get_fields();
 
 	foreach ( $custom_fields as $i => $custom_field ) {
 
@@ -330,3 +330,78 @@ function register_contact_property_table_columns( $columns ) {
 
 add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
 
+/**
+ * Migrate existing custom fields and tabs to the new format
+ */
+function migrate_custom_fields_groundhogg_2_6() {
+
+	$new_tab_state = [
+		'tabs'   => [],
+		'groups' => [],
+		'fields' => [],
+	];
+
+	// Get the fields & tabs from the Custom Field Management Extension
+	$tabs     = get_option( 'gh_custom_tabs', [] ) ?: [];
+	$sections = get_option( 'gh_custom_tab_sections', [] ) ?: [];
+	$fields   = get_option( 'gh_custom_tab_section_fields', [] ) ?: [];
+
+	// No tabs? Nevermind
+	if ( empty( $tabs ) ) {
+		return;
+	}
+
+	// Sort sections into correct order
+	uasort( $sections, function ( $a, $b ) {
+		return $a['order'] - $b['order'];
+	} );
+
+	// Sort Fields into correct order
+	uasort( $fields, function ( $a, $b ) {
+		return $a['order'] - $b['order'];
+	} );
+
+	foreach ( $tabs as $tab ) {
+		$new_tab_state['tabs'][] = [
+			'id'   => $tab['id'],
+			'name' => $tab['name'],
+		];
+	}
+
+	foreach ( $sections as $section ) {
+		$new_tab_state['groups'][] = [
+			'id'   => $section['id'],
+			'name' => $section['name'],
+			'tab'  => $section['tab'],
+		];
+	}
+
+	foreach ( $fields as $field ) {
+		$new_field = [
+			'id'    => $field['id'],
+			'group' => $field['section'],
+			'name'  => $field['meta'],
+			'label' => $field['name'],
+			'type'  => $field['type'],
+			'order' => absint( $field['order'] ),
+		];
+
+		switch ( $field['type'] ):
+			case 'text':
+			case 'textarea':
+			case 'number':
+			case 'date':
+				break;
+			case 'dropdown':
+				$new_field['multiple'] = boolval( $field['settings']['multiple'] );
+			case 'checkboxes':
+			case 'radio':
+				$new_field['options'] = array_map( 'trim', explode( PHP_EOL, $field['settings']['options'] ) );
+				break;
+		endswitch;
+
+		$new_tab_state['fields'][] = $new_field;
+	}
+
+	update_option( 'gh_contact_custom_properties', $new_tab_state );
+}

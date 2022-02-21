@@ -826,7 +826,7 @@ function array_to_atts( $atts ) {
 			case 'href':
 			case 'action':
 			case 'src':
-				$value = esc_url( $value );
+				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : $value;
 				break;
 			default:
 				if ( is_array( $value ) ) {

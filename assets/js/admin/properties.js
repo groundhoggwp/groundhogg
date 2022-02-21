@@ -33,6 +33,7 @@
       rows: options.map(o => ([o])),
       cellCallbacks: [input],
       cellProps: [{ placeholder: __('Option') }],
+      sortable: true,
       onChange: (r) => {
         onChange(r.map(r => r[0]))
       }
@@ -154,6 +155,11 @@
     checkboxes: {
       name: __('Checkboxes', 'groundhogg'),
       view: ({ label, id, name, options, value, ...props }) => {
+
+        if ( ! Array.isArray( value ) ){
+          value = [value]
+        }
+
         //language=HTML
         return `<label class="property-label">${label}</label>
 		${options.map(opt => `<label class="checkbox-label">${input({
@@ -199,7 +205,7 @@
         optionsRepeater({
           selector: '#property-dropdown-options',
           options: field.options || [''],
-          onChange: (options) => updateField({ options })
+          onChange: (options) => updateField({ options }),
         })
       }
     },
@@ -300,7 +306,8 @@
         optionsRepeater({
           selector: '#property-dropdown-options',
           options: field.options || [''],
-          onChange: (options) => updateField({ options })
+          onChange: (options) => updateField({ options }),
+          sortable: true,
         })
 
         $('#allow-multiple').on('change', (e) => {
@@ -331,6 +338,8 @@
     },
 
     group: (group, fields = [], editable) => {
+
+      fields.sort( ({order: a},{order:b}) => a-b )
 
       //language=HTML
       return `
@@ -387,7 +396,7 @@
 
     addField: (field) => {
 
-      const { type, label, name, id } = field
+      const { type, label, name, id, order = 10 } = field
 
       //language=HTML
       return `
@@ -429,6 +438,18 @@
 						  ${fieldTypes[type].edit(field)}
 					  </div>
 				  </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label class="">${__('Order', 'groundhogg')}</label>
+                    ${input({
+                        id: 'property-field-order',
+                        name: 'property_field_order',
+                        placeholder: __('10', 'groundhogg'),
+                        value: order,
+                        type: 'number'
+                    })}
+                </div>
+            </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
 						  <button class="gh-button primary" id="create-property-field">
@@ -643,6 +664,10 @@
           updateField({ name: e.target.value })
         })
 
+        $('#property-field-order').on('input change', (e) => {
+          updateField({ order: parseInt( e.target.value ) })
+        })
+
         $('#property-field-type').on('change', (e) => {
           newField.type = e.target.value
           setContent(Templates.addField(newField))
@@ -790,6 +815,10 @@
             {
               key: 'edit-fields',
               text: __('Edit Fields', 'groundhogg')
+            },
+            {
+              key: 'reorder-fields',
+              text: __('Re-order Fields', 'groundhogg')
             },
             {
               key: 'rename',

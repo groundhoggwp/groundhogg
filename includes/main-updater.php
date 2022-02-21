@@ -519,8 +519,17 @@ class Main_Updater extends Updater {
 	/**
 	 * Install the logs table
 	 */
-	public function version_2_5_7_5(){
+	public function version_2_5_7_5() {
 		get_db( 'logs' )->create_table();
+	}
+
+	/**
+	 * Migrate custom fields
+	 *
+	 * @return void
+	 */
+	public function version_2_6() {
+		migrate_custom_fields_groundhogg_2_6();
 	}
 
 	/**
@@ -581,6 +590,7 @@ class Main_Updater extends Updater {
 			'2.5.7',
 			'2.5.7.4',
 			'2.5.7.5',
+			'2.6',
 		];
 	}
 
@@ -613,6 +623,7 @@ class Main_Updater extends Updater {
 			'2.5.5',
 			'2.5.7',
 			'2.5.7.5',
+			'2.6',
 		];
 	}
 
@@ -664,6 +675,7 @@ class Main_Updater extends Updater {
 			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
 			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates 1970-01-01 and 1999-11-30 because of import bug.', 'groundhogg' ),
 			'2.5.7.5'       => __( 'Install the debug logs table.', 'groundhogg' ),
+			'2.6'           => __( 'Refactor custom fields to new format.', 'groundhogg' ),
 		];
 	}
 }

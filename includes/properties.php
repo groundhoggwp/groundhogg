@@ -2,12 +2,10 @@
 
 namespace Groundhogg;
 
-class Contact_Properties {
-
-	protected $option_name = 'gh_contact_custom_properties';
+class Properties {
 
 	/**
-	 * @var Contact_Properties
+	 * @var Properties
 	 */
 	public static $instance = null;
 
@@ -19,16 +17,16 @@ class Contact_Properties {
 	protected $groups;
 	protected $all;
 
-	public function __construct() {
-		$all_data     = get_option( $this->option_name );
-		$this->all    = $all_data ?: [
+	public function __construct( $option = 'gh_contact_custom_properties' ) {
+		$all_data     = get_option( $option );
+		$this->all    = wp_parse_args( $all_data ?: [], [
 			'fields' => [],
 			'tabs'   => [],
 			'groups' => [],
-		];
-		$this->fields = $this->all['fields'] ?: [];
-		$this->tabs   = $this->all['tabs'] ?: [];
-		$this->groups = $this->all['groups'] ?: [];
+		] );
+		$this->fields = $this->all['fields'];
+		$this->tabs   = $this->all['tabs'];
+		$this->groups = $this->all['groups'];
 	}
 
 	/**
@@ -40,7 +38,7 @@ class Contact_Properties {
 	 * @access public
 	 * @static
 	 *
-	 * @return Contact_Properties
+	 * @return Properties
 	 */
 	public static function instance() {
 
@@ -52,6 +50,10 @@ class Contact_Properties {
 		}
 
 		return $class::$instance;
+	}
+
+	public function get_option(){
+		return self::$option_name;
 	}
 
 	public function get_all() {
@@ -183,14 +185,4 @@ class Contact_Properties {
 
 		return $tab;
 	}
-
-
-	final public function __clone() {
-		trigger_error( "Singleton. No cloning allowed!", E_USER_ERROR );
-	}
-
-	final public function __wakeup() {
-		trigger_error( "Singleton. No serialization allowed!", E_USER_ERROR );
-	}
-
 }

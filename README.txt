@@ -340,6 +340,7 @@ You can purchase a premium plan for access to support and our premium extensions
  * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
  * TWEAKED all jQuery removed from the form ajax submission script.
  * TWEAKED all jQuery removed from the fullframe script.
+ * TWEAKED contacts table and record is now mobile responsive for better mobile usability.
  * FIXED Search filters which may have been saved, and then settings get corrupted will show a "corrupted filter" notice instead of crashing, which you'll be able to delete.
  * FIXED fullframe.js conflicting with the forms iframe script causing console errors.
  * FIXED fullframe.js made to be compatible with plugins which optimize iframes.

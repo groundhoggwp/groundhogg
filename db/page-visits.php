@@ -18,12 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Stores information about a contact's site activity.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Page_Visits extends DB {
 
@@ -36,9 +36,9 @@ class Page_Visits extends DB {
 	/**
 	 * Setup any cron stuffs
 	 */
-	public function init(){
+	public function init() {
 
-		if ( ! is_option_enabled( 'gh_purge_page_visits' ) ){
+		if ( ! is_option_enabled( 'gh_purge_page_visits' ) ) {
 			return;
 		}
 
@@ -60,7 +60,7 @@ class Page_Visits extends DB {
 	 */
 	public function purge() {
 
-		if ( ! is_option_enabled( 'gh_purge_page_visits' ) ){
+		if ( ! is_option_enabled( 'gh_purge_page_visits' ) ) {
 			return;
 		}
 
@@ -139,6 +139,7 @@ class Page_Visits extends DB {
 			'contact_id' => '%d',
 			'timestamp'  => '%d',
 			'path'       => '%s',
+			'hostname'   => '%s',
 			'query'      => '%s',
 			'fragment'   => '%s',
 			'ip_address' => '%s',
@@ -157,6 +158,7 @@ class Page_Visits extends DB {
 			'ID'         => 0,
 			'contact_id' => 0,
 			'timestamp'  => time(),
+			'hostname'   => '',
 			'path'       => '',
 			'query'      => '',
 			'fragment'   => '',
@@ -225,6 +227,7 @@ class Page_Visits extends DB {
         timestamp bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         ip_address varchar(15) NOT NULL,
+        hostname varchar({$this->get_max_index_length()}) NOT NULL,
         path varchar({$this->get_max_index_length()}) NOT NULL,
         query text NOT NULL,
         fragment text NOT NULL,
