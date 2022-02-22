@@ -1238,6 +1238,12 @@
       fields: [],
     }
 
+    const __groups = () =>
+      customTabState.groups.filter(g => g.tab === activeTab)
+
+    const __fields = () => customTabState.fields.filter(
+      f => __groups().find(g => g.id === f.group))
+
     let timeout
     let metaChanges = {}
     let deleteKeys = []
@@ -1247,11 +1253,10 @@
       let { stop } = loadingDots('#save-meta')
       $('#save-meta').prop('disabled', true)
 
-
-
       Promise.all([
         ContactsStore.patchMeta(getContact().ID, metaChanges),
-        deleteKeys.length ? ContactsStore.deleteMeta(getContact().ID, deleteKeys) : null,
+        deleteKeys.length ? ContactsStore.deleteMeta(getContact().ID,
+          deleteKeys) : null,
       ]).then(() => {
 
         metaChanges = {}
@@ -1286,7 +1291,7 @@
             message: __('Changes saved!', 'groundhogg'),
           })
         })
-      }, 1500)
+      }, 3000)
 
     }
 
@@ -1357,7 +1362,7 @@
 
         tooltip('.tab-more', {
           content: __('Tab Options', 'groundhogg'),
-          position: 'right'
+          position: 'right',
         })
 
         $('.tab-more').on('click', e => {
@@ -1389,19 +1394,15 @@
                       bold(customTabState.tabs.find(
                         t => t.id === activeTab).name)) }</p>`,
                     onConfirm: () => {
-                      // Groups belonging to this tab
-                      let groups = customTabState.groups.filter(
-                        g => g.tab === activeTab)
-                      // Fields belonging to the groups of this tab
-                      let fields = customTabState.fields.filter(
-                        f => groups.find(g => g.id === f.group)).map(f => f.id)
 
-                      customTabState.tabs = customTabState.tabs.filter(
-                        t => t.id !== activeTab)
-                      customTabState.groups = customTabState.groups.filter(
-                        g => g.tab !== activeTab)
+                      let fields = __fields().map( f => f.id )
+
                       customTabState.fields = customTabState.fields.filter(
                         f => !fields.includes(f.id))
+                      customTabState.groups = customTabState.groups.filter(
+                        g => g.tab !== activeTab)
+                      customTabState.tabs = customTabState.tabs.filter(
+                        t => t.id !== activeTab)
 
                       updateTabState()
                       activeTab = 'general'
@@ -1460,29 +1461,32 @@
           })
         })
 
-        // Groups belonging to this tab
-        let groups = customTabState.groups.filter(g => g.tab === activeTab)
-        // Fields belonging to the groups of this tab
-        let fields = customTabState.fields.filter(
-          f => groups.find(g => g.id === f.group))
-
         propertiesEditor('#custom-fields-here', {
           values: {
             ...getContact().meta,
             ...metaChanges,
           },
           properties: {
-            groups,
-            fields,
+            groups: __groups(),
+            fields: __fields(),
           },
           onPropertiesUpdated: ({ groups = [], fields = [] }) => {
 
-            customTabState.groups = [
-              ...groups.map(g => ( { ...g, tab: activeTab } )), // new items
+            customTabState.fields = [
+              // Filter out any fields that are part of any group belonging to
+              // the current tab
+              ...customTabState.fields.filter(
+                field => !__fields().find(f => f.id === field.id)),
+              // Any new fields
+              ...fields,
             ]
 
-            customTabState.fields = [
-              ...fields, // new items
+            customTabState.groups = [
+              // Filter out groups that are part of the current tab
+              ...customTabState.groups.filter(
+                group => !__groups().find(g => g.id === group.id)),
+              // The groups that were edited and any new groups
+              ...groups.map(g => ( { ...g, tab: activeTab } )),
             ]
 
             updateTabState()
