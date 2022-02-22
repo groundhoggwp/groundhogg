@@ -596,7 +596,7 @@ span.gh-text {
       margin: 0;
     }
 
-    .toggle-indicator{
+    button.toggle-indicator{
       background: transparent;
       border: none;
       border-top-right-radius: 5px;
@@ -606,7 +606,7 @@ span.gh-text {
       }
     }
 
-    .toggle-indicator::before {
+    button.toggle-indicator::before {
       content: "\f142";
       display: inline-block;
       font: normal 20px/1 dashicons;
@@ -623,7 +623,7 @@ span.gh-text {
 
       border-bottom: none;
 
-      .toggle-indicator::before {
+      button.toggle-indicator::before {
         content: "\f140";
       }
     }

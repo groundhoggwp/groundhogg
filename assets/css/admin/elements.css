@@ -453,15 +453,15 @@ span.gh-text.lg {
   width: 14px;
   margin-right: 10px;
 }
-.gh-panel .gh-panel-header .toggle-indicator {
+.gh-panel .gh-panel-header button.toggle-indicator {
   background: transparent;
   border: none;
   border-top-right-radius: 5px;
 }
-.gh-panel .gh-panel-header .toggle-indicator:hover {
+.gh-panel .gh-panel-header button.toggle-indicator:hover {
   background: rgba(16, 38, 64, 0.05);
 }
-.gh-panel .gh-panel-header .toggle-indicator::before {
+.gh-panel .gh-panel-header button.toggle-indicator::before {
   content: "";
   display: inline-block;
   font: normal 20px/1 dashicons;
@@ -473,7 +473,7 @@ span.gh-text.lg {
 .gh-panel.closed .gh-panel-header {
   border-bottom: none;
 }
-.gh-panel.closed .gh-panel-header .toggle-indicator::before {
+.gh-panel.closed .gh-panel-header button.toggle-indicator::before {
   content: "";
 }
 .gh-panel .inside {

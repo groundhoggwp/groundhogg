@@ -88,7 +88,7 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 		case 'dropdown':
 		case 'checkboxes':
 			if ( is_array( $data ) ) {
-				$data = implode( ', ', $data );
+				$data = esc_html( implode( ', ', $data ) );
 			} else {
 				$data = esc_html( $data );
 			}
@@ -319,13 +319,20 @@ function register_contact_property_table_columns( $columns ) {
 	$custom_fields = Properties::instance()->get_fields();
 
 	foreach ( $custom_fields as $i => $custom_field ) {
-
-		$callback = function ( $contact ) use ( $custom_field ) {
-			display_custom_field( $custom_field, $contact );
-		};
-
-		$columns::register( $custom_field['id'], $custom_field['label'], $callback, false, 100 + $i );
+		$columns::register( $custom_field['id'], $custom_field['label'], __NAMESPACE__ . '\display_custom_field_column_callback', false, 100 + absint( get_array_var( $custom_field, 'order', $i ) ) );
 	}
+}
+
+/**
+ * Display the custom field columns
+ *
+ * @param $contact   Contact
+ * @param $column_id string
+ *
+ * @return void
+ */
+function display_custom_field_column_callback( $contact, $column_id ) {
+	display_custom_field( $column_id, $contact );
 }
 
 add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
@@ -351,15 +358,15 @@ function migrate_custom_fields_groundhogg_2_6() {
 		return;
 	}
 
-	// Sort sections into correct order
-	uasort( $sections, function ( $a, $b ) {
-		return $a['order'] - $b['order'];
-	} );
-
-	// Sort Fields into correct order
-	uasort( $fields, function ( $a, $b ) {
-		return $a['order'] - $b['order'];
-	} );
+//	// Sort sections into correct order
+//	uasort( $sections, function ( $a, $b ) {
+//		return $a['order'] - $b['order'];
+//	} );
+//
+//	// Sort Fields into correct order
+//	uasort( $fields, function ( $a, $b ) {
+//		return $a['order'] - $b['order'];
+//	} );
 
 	foreach ( $tabs as $tab ) {
 		$new_tab_state['tabs'][] = [
@@ -383,7 +390,7 @@ function migrate_custom_fields_groundhogg_2_6() {
 			'name'  => $field['meta'],
 			'label' => $field['name'],
 			'type'  => $field['type'],
-			'order' => absint( $field['order'] ),
+			'order' => absint( get_array_var( $field, 'order', 10 ) ),
 		];
 
 		switch ( $field['type'] ):
@@ -394,6 +401,8 @@ function migrate_custom_fields_groundhogg_2_6() {
 				break;
 			case 'dropdown':
 				$new_field['multiple'] = boolval( $field['settings']['multiple'] );
+				$new_field['options']  = array_map( 'trim', explode( PHP_EOL, $field['settings']['options'] ) );
+				break;
 			case 'checkboxes':
 			case 'radio':
 				$new_field['options'] = array_map( 'trim', explode( PHP_EOL, $field['settings']['options'] ) );

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6
+Stable tag: 2.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,7 +321,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.6 =
+= 2.6.1 (2022-02-22) =
+* FIXED Display issue for custom fields in the contact table.
+
+= 2.6 (2022-02-22) =
 * NEW UI for the contact record
   * Condensed design to fit more on the screen, less scrolling.
   * Custom field management is now FREE and part of Groundhogg core! _If you have created custom fields previously with the Custom Field Management addon you will have to update the addon and the custom fields will be refactored._
