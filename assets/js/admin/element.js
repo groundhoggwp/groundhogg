@@ -1570,6 +1570,7 @@ ${afterProgress()}`,
 
             this.rows.splice(oldIndex, 1)
             this.rows.splice(curIndex, 0, row)
+            onChange(this.rows)
 
             this.mount()
           }

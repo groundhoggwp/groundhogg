@@ -1330,7 +1330,7 @@ class Contact_Query {
 		$key_clause = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
 		$opt_clause = implode( ' AND ', array_map( function ( $opt ) use ( $meta_table_name, $filter_vars ) {
 			$opt = esc_sql( $opt );
-			return "$meta_table_name.meta_value = '{$opt}'";
+			return "$meta_table_name.meta_value LIKE '%{$opt}%'";
 		}, $filter_vars['options'] ) );
 
 		switch ( $filter_vars['compare'] ) {

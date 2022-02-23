@@ -366,7 +366,6 @@ function groundhogg_get_host() {
 	return $host;
 }
 
-
 /**
  * Generates a System Info download file
  *

@@ -339,7 +339,7 @@
 
     group: (group, fields = [], editable) => {
 
-      fields.sort( ({order: a},{order:b}) => a-b )
+      fields.sort( ({order: a = 10},{order:b = 10}) => a-b )
 
       //language=HTML
       return `
@@ -815,10 +815,6 @@
             {
               key: 'edit-fields',
               text: __('Edit Fields', 'groundhogg')
-            },
-            {
-              key: 'reorder-fields',
-              text: __('Re-order Fields', 'groundhogg')
             },
             {
               key: 'rename',

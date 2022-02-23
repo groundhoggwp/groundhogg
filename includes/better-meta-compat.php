@@ -298,7 +298,7 @@ function add_custom_property_replacements( $replacements ) {
 				$custom_field['id'],
 				function ( $contact_id, $name ) {
 					return display_custom_field( $name, $contact_id, false );
-				},
+				}
 			);
 
 			// Hide ugly replacement codes from the UI
