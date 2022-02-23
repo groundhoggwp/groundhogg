@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.1.1
+Stable tag: 2.6.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.1.2 (2022-02-23) =
+* FIXED Options not saving after sorting in custom fields
+* FIXED Fatal error caused by trailing comma in PHP < 7.3
 
 = 2.6.1.1 (2022-02-22) =
 * FIXED Custom field saving issue, missing fields and mapping. If your custom fields disappeared after editing them in 2.6, follow [this guide](https://help.groundhogg.io/article/541-custom-fields-disappeared-afgter-updating-to-2-6) to fix it!
