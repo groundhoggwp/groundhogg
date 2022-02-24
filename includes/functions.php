@@ -4033,6 +4033,15 @@ function is_pro_features_active() {
 }
 
 /**
+ * Checks if the Groundhogg helper plugin is installed
+ *
+ * @return bool
+ */
+function is_helper_plugin_installed() {
+	return defined( 'GROUNDHOGG_HELPER_VERSION' );
+}
+
+/**
  * If the current customer has access to premium features...
  *
  * Will return true if the `Groundhogg - Helper` is installed (has a plan license)
@@ -6290,7 +6299,7 @@ function is_free_email_provider( $email ) {
 	static $providers = [];
 
 	// initialize providers
-	if ( $providers ) {
+	if ( empty( $providers ) ) {
 		$providers = json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
 	}
 
