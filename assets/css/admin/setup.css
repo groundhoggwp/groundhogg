@@ -1,7 +1,3 @@
-#wpcontent {
-  padding: 0;
-}
-
 #wpfooter {
   display: none;
 }
@@ -28,46 +24,70 @@
   max-width: 100%;
 }
 
+#troubleshooter .gh-panel.outlined .inside p:first-child {
+  margin-top: 0;
+}
+
+.wp-list-table pre {
+  margin: 0;
+}
+
+#troubleshooter,
 #guided-setup {
   width: 600px;
   margin: auto;
   padding: 60px 0;
 }
+#troubleshooter h1,
 #guided-setup h1 {
   margin-top: 0;
 }
-#guided-setup p, #guided-setup label, #guided-setup ul {
+#troubleshooter p, #troubleshooter label, #troubleshooter ul, #troubleshooter ol, #troubleshooter li,
+#guided-setup p,
+#guided-setup label,
+#guided-setup ul,
+#guided-setup ol,
+#guided-setup li {
   font-size: 16px;
 }
-#guided-setup ul {
+#troubleshooter ul:not(.select2-selection__rendered),
+#guided-setup ul:not(.select2-selection__rendered) {
   list-style: disc;
   padding-left: 20px;
 }
+#troubleshooter .step .logo,
 #guided-setup .step .logo {
   width: 400px;
   margin: auto;
   margin-bottom: 40px;
 }
+#troubleshooter .step > .gh-panel > .inside,
 #guided-setup .step > .gh-panel > .inside {
   padding: 40px;
 }
-#guided-setup .step input.input {
+#troubleshooter .step input.input, #troubleshooter .step select,
+#guided-setup .step input.input,
+#guided-setup .step select {
   font-size: 16px;
   padding: 4px 12px;
 }
+#troubleshooter #services .download.gh-panel,
 #guided-setup #services .download.gh-panel {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
+#troubleshooter #services .download.gh-panel img,
 #guided-setup #services .download.gh-panel img {
   width: 180px;
   border-radius: 4px;
 }
+#troubleshooter #services .download.gh-panel .plugin-actions,
 #guided-setup #services .download.gh-panel .plugin-actions {
   border-top: 1px solid rgba(16, 38, 64, 0.1);
   padding: 20px;
 }
+#troubleshooter #services .download.gh-panel h2,
 #guided-setup #services .download.gh-panel h2 {
   margin-top: 0;
 }

@@ -403,7 +403,7 @@ add_action( 'admin_init', 'groundhogg_tools_sysinfo_download' );
  * @return bool
  */
 function groundhogg_enable_safe_mode() {
-	if ( ! current_user_can( 'deactivate_plugins' ) ) {
+	if ( ! current_user_can( 'deactivate_plugins' ) || is_option_enabled( 'gh_safe_mode_enabled' ) ) {
 		return false;
 	}
 
@@ -437,7 +437,7 @@ function groundhogg_enable_safe_mode() {
  * @return bool
  */
 function groundhogg_disable_safe_mode() {
-	if ( ! current_user_can( 'activate_plugins' ) ) {
+	if ( ! current_user_can( 'activate_plugins' ) || ! is_option_enabled( 'gh_safe_mode_enabled' ) ) {
 		return false;
 	}
 

@@ -137,9 +137,8 @@ class Admin_Menu {
 		$this->bulk_jobs = new Bulk_Job_Page();
 
 		$this->reporting = new Reports_Page();
-//        $this->dashboard = new Dashboard_Widgets();
 
-		if ( ! is_white_labeled() ) {
+		if ( ! is_white_labeled() || current_user_can( 'manage_gh_white_label' ) ) {
 			$this->guided_setup = new Guided_Setup();
 			$this->help         = new Help_Page();
 

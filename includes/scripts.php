@@ -321,6 +321,11 @@ class Scripts {
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-troubleshooter', GROUNDHOGG_ASSETS_URL . 'js/admin/troubleshooter' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+		], GROUNDHOGG_VERSION, true );
+
 		// Funnel Elements
 		wp_register_script( 'groundhogg-funnel-email', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/email' . $dot_min . '.js', [
 			'jquery',
