@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.1.2
+Stable tag: 2.6.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -25,13 +25,9 @@ WordPress CRM, Email & Marketing Automation
 
 ## Join 3,000+ Small Businesses in 35+ Countries!
 
-### All new Search Filters enable you to find more business, faster! [August 11th, 2021](https://www.groundhogg.io/updates/groundhoggs-all-new-search-filters-enable-you-to-find-more-business-faster/)
+### Groundhogg 2.6 brings major innovation including a the new Contact Activity Timeline and Free custom field management! [February 22nd, 2021](https://www.groundhogg.io/updates/new-contact-record-user-interface-in-groundhogg-2-6/)
 
-[youtube https://youtu.be/shJLAbL-Zxo]
-
-### Groundhogg 2.5 is a preview of what's to come! [August 11th, 2021](https://www.groundhogg.io/updates/groundhogg-2-5-shows-a-glimpse-of-whats-coming-down-the-pipeline/)
-
-[youtube https://youtu.be/25joq7uCfsE]
+[youtube https://youtu.be/OzZD0_OSNVM]
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
@@ -133,6 +129,10 @@ From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-pro
 
 There are over [90 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
+### Why Kris Britton of the KAYBE marketing agency moved all of his clients from HubSpot to Groundhogg!
+
+[youtube https://youtu.be/EzQW0oexYFs]
+
 ## Features
 
 Here are the tools you can use to launch your funnel, grow your list, and scale your business faster with Groundhogg CRM & Marketing Automation!
@@ -177,7 +177,11 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Detailed results from your funnels and broadcast emails.
 * Integrate with Ecommerce to see revenue from your marketing.
 * Learn more about your audience with demographic reporting.
-* See which funnels/emails are underperforming.
+* See which funnels/emails are under-performing.
+
+### Track how your contacts navigate your site!
+
+[youtube https://youtu.be/fHW3NpFehc4]
 
 ### 🇪🇺 GDPR Ready
 
@@ -320,6 +324,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.2 (2022-03-02) =
+* ADDED the new Groundhogg troubleshooter! A guided support tool to help users identify and resolve issues quickly.
+* ADDED column width option for custom fields for more control over the layout.
+* FIXED rare fatal error caused by missing contact resource from when processing event-queue.
+* FIXED remote_install not working for some plugins.
+* FIXED Conflict between BuddyPress activity meta table and Groundhogg activity meta table.
 
 = 2.6.1.2 (2022-02-23) =
 * FIXED Options not saving after sorting in custom fields
