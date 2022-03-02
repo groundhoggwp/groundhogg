@@ -396,7 +396,7 @@
 
     addField: (field) => {
 
-      const { type, label, name, id, order = 10 } = field
+      const { type, label, name, id, order = 10, width = 2 } = field
 
       //language=HTML
       return `
@@ -449,6 +449,16 @@
                         type: 'number'
                     })}
                 </div>
+                <div class="gh-col">
+                    <label class="">${__('Width', 'groundhogg')}</label>
+                    ${select({
+                        id: 'property-field-width',
+                        name: 'property_field_width'
+                    }, {
+                      1: __('Full'),
+                      2: __('Half'),
+                    }, width)}
+                </div>
             </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
@@ -462,9 +472,11 @@
     },
 
     field: ({ group, ...field }) => {
+
+      let { width = 2 } = field
       //language=HTML
       return `
-		  <div class="property-field" data-group="${group}" data-id="${field.id}">
+		  <div class="property-field col-width-${width}" data-group="${group}" data-id="${field.id}">
 			  ${fieldTypes[field.type].view(field)}
 		  </div>`
     }
@@ -666,6 +678,10 @@
 
         $('#property-field-order').on('input change', (e) => {
           updateField({ order: parseInt( e.target.value ) })
+        })
+
+        $('#property-field-width').on('change', (e) => {
+          updateField({ width: parseInt( e.target.value ) })
         })
 
         $('#property-field-type').on('change', (e) => {

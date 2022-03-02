@@ -1125,6 +1125,14 @@ ${afterProgress()}`,
     // Options is an array format
     if (Array.isArray(options)) {
       options.forEach(option => {
+
+        if ( typeof option !== 'object' ){
+          option = {
+            value: option,
+            text: option
+          }
+        }
+
         optionsString.push(Elements.option(
           option.value, option.text,
           Array.isArray(selected)

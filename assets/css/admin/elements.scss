@@ -197,6 +197,11 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
     .property-field {
+
+      &.col-width-1{
+        grid-column: 1 / 3;
+      }
+
       max-width: 100%;
 
       .property-label {

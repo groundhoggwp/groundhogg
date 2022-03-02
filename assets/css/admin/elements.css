@@ -135,6 +135,9 @@ h3.no-margin-top {
 .property-groups .property-group-fields .property-field {
   max-width: 100%;
 }
+.property-groups .property-group-fields .property-field.col-width-1 {
+  grid-column: 1/3;
+}
 .property-groups .property-group-fields .property-field .property-label {
   font-weight: 500;
   display: block;
