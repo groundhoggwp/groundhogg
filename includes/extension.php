@@ -28,8 +28,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Extension {
 
 	/**
-	 * TODO Override this static var in child class.
-	 *
 	 * @var Extension
 	 */
 	public static $instance = null;

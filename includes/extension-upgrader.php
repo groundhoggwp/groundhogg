@@ -173,6 +173,10 @@ class Extension_Upgrader {
 
 		$is_installed = false;
 
+		if ( ! function_exists( 'get_plugins' ) ){
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
 		foreach ( get_plugins() as $path => $details ) {
 			if ( false === strpos( $path, $plugin ) ) {
 				continue;

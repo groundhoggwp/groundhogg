@@ -2666,8 +2666,6 @@ class Contact_Query {
 	/**
 	 * Filter by the phone number
 	 *
-	 * todo replace the phone number
-	 *
 	 * @param $filter_vars
 	 * @param $query Contact_Query
 	 *
