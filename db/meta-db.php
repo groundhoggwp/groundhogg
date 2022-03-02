@@ -14,12 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Allows for the use of metadata api usage
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 abstract class Meta_DB extends DB {
 
@@ -95,7 +95,43 @@ abstract class Meta_DB extends DB {
 
 		if ( $wpdb ) {
 			$wpdb->__set( $this->get_object_type() . 'meta', $this->get_table_name() );
-			$wpdb->tables[] = $this->get_db_suffix();
+
+			if ( ! in_array( $this->get_db_suffix(), $wpdb->tables ) ) {
+				$wpdb->tables[] = $this->get_db_suffix();
+			}
+		}
+	}
+
+	/**
+	 * Temp storage for conflicting table names
+	 *
+	 * @var string
+	 */
+	protected $conflicting_table_name = '';
+
+	/**
+	 * Resolve meta table conflicts just in time by caching the conflicting table and replacing it temporarily with our own
+	 * Does nothing if there is no table conflict
+	 *
+	 * Made for BuddyPress compatibility
+	 *
+	 * @return void
+	 */
+	public function maybe_resolve_table_conflict() {
+		global $wpdb;
+		$registered_table = _get_meta_table( $this->get_object_type() );
+
+		// If the current table meta table is not equal to ours, set it to ours
+		if ( $registered_table !== $this->get_table_name() ) {
+			$wpdb->__set( $this->get_object_type() . 'meta', $this->get_table_name() );
+			$this->conflicting_table_name = $registered_table;
+		}
+
+		// If a conflict table was removed, restore it
+		else if ( $this->conflicting_table_name){
+			$wpdb->__set( $this->get_object_type() . 'meta', $this->conflicting_table_name );
+			// Reset the conflicting table flag
+			$this->conflicting_table_name = '';
 		}
 	}
 
@@ -111,7 +147,7 @@ abstract class Meta_DB extends DB {
 	public function delete_associated_meta( $where, $formats, $object_table ) {
 		global $wpdb;
 
-		if ( is_numeric( $where ) ){
+		if ( is_numeric( $where ) ) {
 
 			$result = $wpdb->delete( $this->table_name, [ $this->get_object_id_col() => $where ], [ '%d' ] );
 
@@ -146,22 +182,30 @@ abstract class Meta_DB extends DB {
 	 *
 	 * For internal use only. Use EDD_Contact->get_meta() for public usage.
 	 *
-	 * @param int    $object_id Object ID.
+	 * @since   2.6
+	 *
 	 * @param string $meta_key  The meta key to retrieve.
 	 * @param bool   $single    Whether to return a single value.
+	 *
+	 * @param int    $object_id Object ID.
 	 *
 	 * @return  mixed                 Will be an array if $single is false. Will be value of meta data field if $single is true.
 	 *
 	 * @access  private
-	 * @since   2.6
 	 */
 	public function get_meta( $object_id = 0, $meta_key = '', $single = false ) {
+
 		$object_id = $this->sanitize_id( $object_id );
 
 		if ( false === $object_id ) {
 			return false;
 		}
+
+		$this->maybe_resolve_table_conflict();
+
 		$getted = get_metadata( $this->get_object_type(), $object_id, $meta_key, $single );
+
+		$this->maybe_resolve_table_conflict();
 
 		if ( $getted ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/get", $object_id, $meta_key, $single, $getted );
@@ -175,15 +219,17 @@ abstract class Meta_DB extends DB {
 	 *
 	 * For internal use only. Use EDD_Contact->add_meta() for public usage.
 	 *
-	 * @param int    $object_id  Contact ID.
+	 * @since   2.6
+	 *
 	 * @param string $meta_key   Metadata name.
 	 * @param mixed  $meta_value Metadata value.
 	 * @param bool   $unique     Optional, default is false. Whether the same key should not be added.
 	 *
+	 * @param int    $object_id  Contact ID.
+	 *
 	 * @return  bool                  False for failure. True for success.
 	 *
 	 * @access  private
-	 * @since   2.6
 	 */
 	public function add_meta( $object_id = 0, $meta_key = '', $meta_value = '', $unique = false ) {
 		$object_id = $this->sanitize_id( $object_id );
@@ -192,7 +238,11 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
+		$this->maybe_resolve_table_conflict();
+
 		$added = add_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
+
+		$this->maybe_resolve_table_conflict();
 
 		if ( $added ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/add", $object_id, $meta_key, $meta_value, $unique );
@@ -211,15 +261,17 @@ abstract class Meta_DB extends DB {
 	 *
 	 * If the meta field for the object does not exist, it will be added.
 	 *
-	 * @param int    $object_id  Contact ID.
+	 * @since   2.6
+	 *
 	 * @param string $meta_key   Metadata key.
 	 * @param mixed  $meta_value Metadata value.
 	 * @param mixed  $prev_value Optional. Previous value to check before removing.
 	 *
+	 * @param int    $object_id  Contact ID.
+	 *
 	 * @return  bool                  False on failure, true if success.
 	 *
 	 * @access  private
-	 * @since   2.6
 	 */
 	public function update_meta( $object_id = 0, $meta_key = '', $meta_value = '', $prev_value = '' ) {
 		$object_id = $this->sanitize_id( $object_id );
@@ -228,7 +280,11 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
+		$this->maybe_resolve_table_conflict();
+
 		$updated = update_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
+
+		$this->maybe_resolve_table_conflict();
 
 		if ( $updated ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/update", $object_id, $meta_key, $meta_value, $prev_value );
@@ -246,14 +302,16 @@ abstract class Meta_DB extends DB {
 	 * value, will keep from removing duplicate metadata with the same key. It also
 	 * allows removing all metadata matching key, if needed.
 	 *
-	 * @param int    $object_id  Contact ID.
+	 * @since   2.6
+	 *
 	 * @param string $meta_key   Metadata name.
 	 * @param mixed  $meta_value Optional. Metadata value.
+	 *
+	 * @param int    $object_id  Contact ID.
 	 *
 	 * @return  bool                  False for failure. True for success.
 	 *
 	 * @access  private
-	 * @since   2.6
 	 */
 	public function delete_meta( $object_id = 0, $meta_key = '', $meta_value = '' ) {
 
@@ -263,7 +321,11 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
+		$this->maybe_resolve_table_conflict();
+
 		$deleted = delete_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value );
+
+		$this->maybe_resolve_table_conflict();
 
 		if ( $deleted ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/delete", $object_id, $meta_key, $meta_value );
@@ -317,10 +379,11 @@ abstract class Meta_DB extends DB {
 	/**
 	 * Given a object ID, make sure it's a positive number, greater than zero before inserting or adding.
 	 *
+	 * @since  2.6
+	 *
 	 * @param int|string $object_id A passed object ID.
 	 *
 	 * @return int|bool                The normalized object ID or false if it's found to not be valid.
-	 * @since  2.6
 	 */
 	private function sanitize_id( $object_id ) {
 		if ( ! is_numeric( $object_id ) ) {
@@ -347,7 +410,7 @@ abstract class Meta_DB extends DB {
 	 *
 	 * @param $object_table DB;
 	 */
-	public function _delete_orphaned_meta( $object_table ){
+	public function _delete_orphaned_meta( $object_table ) {
 
 		global $wpdb;
 
