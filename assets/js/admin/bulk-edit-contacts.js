@@ -67,7 +67,10 @@
                       ${ select({
                           id: `optin-status`,
                           name: 'optin_status',
-                      }, Groundhogg.filters.optin_status) }
+                      }, {
+                        0 : __('No change', 'groundhogg'),
+                        ...Groundhogg.filters.optin_status 
+                      }) }
                   </div>
                   <div class="gh-col">
                       <label for="owner">${ __('Owner',
@@ -75,10 +78,12 @@
                       ${ select({
                           id: `owner`,
                           name: 'owner_id',
-                      }, Groundhogg.filters.owners.map(u => ( {
+                      }, [
+                          { value: 0, text: __('No change', 'groundhogg')},
+                      ...Groundhogg.filters.owners.map(u => ( {
                           text: `${ u.data.display_name } (${ u.data.user_email })`,
                           value: u.ID,
-                      } ))) }
+                      } )) ]) }
                   </div>
               </div>
           </div>`,
