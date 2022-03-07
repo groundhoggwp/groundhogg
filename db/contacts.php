@@ -160,7 +160,7 @@ class Contacts extends DB {
 			'first_name'                => '',
 			'last_name'                 => '',
 			'user_id'                   => 0,
-			'owner_id'                  => get_primary_owner() ? get_primary_owner()->ID : false,
+			'owner_id'                  => current_user_can( 'edit_contacts' ) ? get_current_user_id() : get_primary_owner(),
 			'optin_status'              => Preferences::UNCONFIRMED,
 			'date_created'              => current_time( 'mysql' ),
 			'date_optin_status_changed' => current_time( 'mysql' ),
