@@ -94,7 +94,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$object = $this->get_from_db( $field, $identifier_or_args );
 
-			if ( ! $object || empty( $object ) || ! is_object( $object ) ) {
+			if ( empty( $object ) || ! is_object( $object ) ) {
 				return false;
 			}
 
