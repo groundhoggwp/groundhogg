@@ -326,10 +326,12 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Get the contact's time_zone
 	 *
-	 * @return mixed
+	 * If one is not saved it will return the timezone of the site and not false
+	 *
+	 * @return string
 	 */
 	public function get_time_zone() {
-		return $this->get_meta( 'time_zone' );
+		return $this->get_meta( 'time_zone' ) ?: wp_timezone_string();
 	}
 
 	/**
