@@ -2641,14 +2641,14 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'user_id':
 			case 'owner_id':
 
-				// Email Passed
 				if ( is_email( $value ) ) {
+					// Email Passed
 					$by = 'email';
-					// Username passed
 				} else if ( is_string( $value ) && ! is_numeric( $value ) ) {
+					// Username passed
 					$by = 'login';
-					// ID Passed
 				} else {
+					// ID Passed
 					$by    = 'id';
 					$value = absint( $value );
 				}
@@ -2825,11 +2825,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	if ( ! $contact ) {
 		return false;
-	}
-
-	// If the current user can add a contact and a contact owner has not been explicitly defined.
-	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
-		$args['owner_id'] = get_current_user_id();
 	}
 
 	if ( $gdpr_consent ) {
@@ -4228,8 +4223,8 @@ function get_primary_owner() {
 	$user = get_userdata( $primary_user_id );
 
 	/**
-     * Filter the primary owner
-     *
+	 * Filter the primary owner
+	 *
 	 * @param $user \WP_User
 	 */
 	return apply_filters( 'groundhogg/primary_owner', $user );
