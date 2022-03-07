@@ -58,11 +58,11 @@ class Admin_Menu {
 
 		$current_page = get_url_var( 'page' );
 
-		if ( ! $current_page ){
+		if ( ! $current_page ) {
 			return $class;
 		}
 
-		if ( preg_match( '/^gh_/', $current_page ) || $current_page === 'groundhogg' ){
+		if ( preg_match( '/^gh_/', $current_page ) || $current_page === 'groundhogg' ) {
 			$class .= ' groundhogg-admin-page';
 		}
 
@@ -74,7 +74,7 @@ class Admin_Menu {
 	 */
 	public function admin_bar( $admin_bar ) {
 
-		if ( is_admin_bar_widget_disabled() ) {
+		if ( is_admin_bar_widget_disabled() || ! current_user_can( 'view_contacts' ) ) {
 			return;
 		}
 
@@ -96,15 +96,15 @@ class Admin_Menu {
 			]
 		] );
 
-		if ( get_contactdata() ) {
+		$admin_contact = get_contactdata();
+
+		if ( $admin_contact->exists() ) {
 			$admin_bar->add_node(
 				array(
 					'parent' => 'user-actions',
 					'id'     => 'contact-info',
 					'title'  => __( 'Contact Record' ),
-					'href'   => admin_page_url( 'gh_contacts', [ 'action'  => 'edit',
-					                                             'contact' => get_contactdata()->ID
-					] ),
+					'href'   => $admin_contact->admin_link(),
 					'meta'   => array(
 						'tabindex' => - 1,
 					),
