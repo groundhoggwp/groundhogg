@@ -396,4 +396,20 @@ div.info-card.postbox {
   display: inline-block;
 }
 
+.info-card-views {
+  margin-bottom: 10px;
+}
+
+.info-cards-sortables {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.info-cards-sortables .info-card > .gh-panel-header {
+  align-items: stretch;
+}
+.info-cards-sortables .info-card > .gh-panel-header .actions {
+  display: flex;
+}
+
 /*# sourceMappingURL=info-cards.css.map */

@@ -601,7 +601,9 @@ span.gh-text {
       margin: 0;
     }
 
-    button.toggle-indicator{
+    button.panel-handle-order-higher,
+    button.panel-handle-order-lower,
+    button.toggle-indicator,{
       background: transparent;
       border: none;
       border-top-right-radius: 5px;
@@ -609,16 +611,29 @@ span.gh-text {
       &:hover{
         background: $primary-dark-5;
       }
+
+      &::before {
+        display: inline-block;
+        font: normal 20px/1 dashicons;
+        speak: never;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-decoration: none;
+      }
     }
 
-    button.toggle-indicator::before {
-      content: "\f142";
-      display: inline-block;
-      font: normal 20px/1 dashicons;
-      speak: never;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-decoration: none;
+    button {
+
+      &.toggle-indicator::before {
+        content: "\f142";
+      }
+
+      &.panel-handle-order-lower::before {
+        content: "\f347";
+      }
+      &.panel-handle-order-higher::before {
+        content: "\f343";
+      }
     }
 
   }
