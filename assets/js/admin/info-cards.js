@@ -4,7 +4,7 @@
     $('.info-cards-wrap .info-cards-sortables').sortable({
       placeholder: 'sortable-placeholder',
       // connectWith: '.ui-sortable',
-      handle: '.hndle',
+      handle: '.gh-panel-header > h2',
       // axis: 'y',
       start: function (e, ui) {
         ui.helper.css('left',

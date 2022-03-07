@@ -461,12 +461,17 @@ span.gh-text.lg {
 .gh-panel .gh-panel-header button.toggle-indicator {
   background: transparent;
   border: none;
-  border-top-right-radius: 5px;
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher:hover,
 .gh-panel .gh-panel-header button.panel-handle-order-lower:hover,
 .gh-panel .gh-panel-header button.toggle-indicator:hover {
   background: rgba(16, 38, 64, 0.05);
+}
+.gh-panel .gh-panel-header button.panel-handle-order-higher:focus,
+.gh-panel .gh-panel-header button.panel-handle-order-lower:focus,
+.gh-panel .gh-panel-header button.toggle-indicator:focus {
+  box-shadow: 0 0 0 1px #0075ff, 0 0 2px 1px rgba(0, 117, 255, 0.6);
+  outline: 1px solid transparent;
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher::before,
 .gh-panel .gh-panel-header button.panel-handle-order-lower::before,
@@ -477,6 +482,9 @@ span.gh-text.lg {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-decoration: none;
+}
+.gh-panel .gh-panel-header button.toggle-indicator {
+  border-top-right-radius: 5px;
 }
 .gh-panel .gh-panel-header button.toggle-indicator::before {
   content: "";

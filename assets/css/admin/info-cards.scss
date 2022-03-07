@@ -1,3 +1,6 @@
+
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+
 .info-card-actions .inside {
   display: flex;
   justify-content: space-between;
@@ -29,6 +32,10 @@ ul.regular-list {
 
 ul.regular-list li {
   margin: 0;
+}
+
+.gh-panel-header > h2{
+  cursor: move;
 }
 
 div.info-card.postbox {
@@ -403,9 +410,17 @@ div.info-card.postbox {
 }
 
 .info-cards-sortables {
+
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  .sortable-placeholder {
+    border: none;
+    background: $primary-dark-15;
+    border-radius: 5px;
+    margin-bottom: 0;
+  }
 
   .info-card {
     > .gh-panel-header {

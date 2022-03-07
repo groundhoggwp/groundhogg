@@ -32,6 +32,10 @@ ul.regular-list li {
   margin: 0;
 }
 
+.gh-panel-header > h2 {
+  cursor: move;
+}
+
 div.info-card.postbox {
   /*max-width: 300px;*/
 }
@@ -404,6 +408,12 @@ div.info-card.postbox {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+.info-cards-sortables .sortable-placeholder {
+  border: none;
+  background: rgba(16, 38, 64, 0.15);
+  border-radius: 5px;
+  margin-bottom: 0;
 }
 .info-cards-sortables .info-card > .gh-panel-header {
   align-items: stretch;

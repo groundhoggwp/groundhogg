@@ -603,13 +603,17 @@ span.gh-text {
 
     button.panel-handle-order-higher,
     button.panel-handle-order-lower,
-    button.toggle-indicator,{
+    button.toggle-indicator{
       background: transparent;
       border: none;
-      border-top-right-radius: 5px;
 
       &:hover{
         background: $primary-dark-5;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 1px $primary-blue, 0 0 2px 1px $primary-blue-60;
+        outline: 1px solid transparent;
       }
 
       &::before {
@@ -623,6 +627,10 @@ span.gh-text {
     }
 
     button {
+
+      &.toggle-indicator {
+        border-top-right-radius: 5px;
+      }
 
       &.toggle-indicator::before {
         content: "\f142";
