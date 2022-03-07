@@ -221,6 +221,15 @@ class Help_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+     * Now title actions
+     *
+	 * @return array|array[]
+	 */
+    protected function get_title_actions() {
+	    return [];
+    }
+
+	/**
 	 * Adds additional actions.
 	 *
 	 * @return mixed
@@ -496,103 +505,13 @@ class Help_Page extends Tabbed_Admin_Page {
         <div id="troubleshooter"></div><?php
 	}
 
-
-	public function support_view() {
-
-		if ( ! is_pro_features_active() ):
-
-			$pricing_url = add_query_arg( [
-				'utm_source'   => 'wp-dash',
-				'utm_medium'   => 'support',
-				'utm_campaign' => 'go-pro',
-				'utm_content'  => 'button',
-			], 'https://www.groundhogg.io/pricing/' );
-
-			$discount = get_user_meta( wp_get_current_user()->ID, 'gh_free_extension_discount', true );
-
-			if ( $discount ) {
-				$pricing_url = add_query_arg( [ 'discount' => $discount ], $pricing_url );
-			}
-
-			?>
-            <style>
-                .support-ad {
-                    display: block;
-                    max-width: 500px;
-                    margin: 60px auto;
-                    background: #FFF;
-                    padding: 30px;
-                    box-sizing: border-box;
-                    border: 1px solid #e5e5e5;
-                }
-
-                .support-ad h1 {
-                    text-align: center;
-                    font-size: 32px;
-                }
-
-                .support-ad p {
-                    font-size: 16px;
-                }
-
-            </style>
-            <div class="support-ad">
-
-                <h1><b>Need Support?</b></h1>
-                <p>Unlock <b>premium technical support</b> when you upgrade to any premium plan.</p>
-                <p>There are many benefits to upgrading, like advanced integrations with your favorite tools, more
-                    features, and of course premium support.</p>
-                <p style="text-align: center">
-                    <a id="pricing-button" class="button-primary big-button"
-                       href="<?php echo esc_url( $pricing_url ); ?>"
-                       target="_blank"><?php dashicon_e( 'star-filled' );
-						_e( 'Yes, I Want To Upgrade!' ); ?></a>
-                </p>
-                <p style="text-align: center">
-                    <a href="https://www.groundhogg.io/fb/"
-                       target="_blank"><?php _e( 'Ask my question on Facebook.', 'groundhogg' ); ?></a>
-                </p>
-            </div>
-		<?php
-
-		endif;
-
-		do_action( 'groundhogg/support_ticket_form' );
-	}
-
-	/**
-	 * @var int
-	 */
-	protected $ticket_id = 0;
-
-	/**
-	 * Create a support ticket
-	 */
-	public function process_support_submit_ticket() {
-		add_action( 'groundhogg/create_support_ticket/failed', [ $this, 'listen_for_support_error' ] );
-
-		do_action( 'groundhogg/create_support_ticket' );
-
-		if ( $this->has_errors() ) {
-			return $this->get_last_error();
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param $error \WP_Error
-	 */
-	public function listen_for_support_error( $error ) {
-		$this->add_error( $error );
-	}
-
 	/**
 	 * Output the basic view.
 	 *
 	 * @return mixed
 	 */
 	public function view() {
-		// TODO: Implement view() method.
+		?>
+        <div id="troubleshooter"></div><?php
 	}
 }
