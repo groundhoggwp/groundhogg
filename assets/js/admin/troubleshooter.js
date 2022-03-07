@@ -122,7 +122,7 @@
           showBack: false, inside: () => {
             // language=HTML
             return `
-                <h1>${ __('This is the Groundhogg trouble shooter', 'groundhogg') }</h1>
+                <h1>${ __('This is the Groundhogg Troubleshooter', 'groundhogg') }</h1>
                 <p>
                     ${ __('The troubleshooter can identify common problems that Groundhogg users run into frequently and attempt to solve them.',
                             'groundhogg') }</p>
