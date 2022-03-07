@@ -69,10 +69,10 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 	if ( ! $contact_id_or_email ) {
 
 		if ( Event_Queue::is_processing() ) {
-			return Plugin::instance()->event_queue->get_current_contact();
+			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
-		return Plugin::$instance->tracking->get_current_contact();
+		return tracking()->get_current_contact();
 	} else if ( in_array( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
@@ -2658,7 +2658,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				// Make sure User exists
 				if ( $user ) {
 					// Check the mapped owner can actually own contacts.
-					if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
+					if ( $field !== 'owner_id' || user_can( $user, 'edit_contacts' ) ) {
 						$args[ $field ] = $user->ID;
 					}
 				}
@@ -2792,11 +2792,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	$contact = false;
 
-	// If the current user can add a contact and a contact owner has not been explicitly defined.
-	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
-		$args['owner_id'] = get_current_user_id();
-	}
-
 	// No point in trying if there is no email field
 	if ( isset( $args['email'] ) ) {
 
@@ -2830,6 +2825,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	if ( ! $contact ) {
 		return false;
+	}
+
+	// If the current user can add a contact and a contact owner has not been explicitly defined.
+	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
+		$args['owner_id'] = get_current_user_id();
 	}
 
 	if ( $gdpr_consent ) {
@@ -3150,7 +3150,7 @@ function get_email_templates() {
 function blacklist_check( $data = '' ) {
 
 	if ( ! is_array( $data ) && ! is_object( $data ) ) {
-		$mod_keys = trim( get_option( 'blacklist_keys' ) );
+		$mod_keys = trim( get_option( 'disallowed_keys' ) );
 		if ( '' == $mod_keys ) {
 			return false; // If moderation keys are empty
 		}
@@ -4227,7 +4227,12 @@ function get_primary_owner() {
 
 	$user = get_userdata( $primary_user_id );
 
-	return $user;
+	/**
+     * Filter the primary owner
+     *
+	 * @param $user \WP_User
+	 */
+	return apply_filters( 'groundhogg/primary_owner', $user );
 }
 
 /**
