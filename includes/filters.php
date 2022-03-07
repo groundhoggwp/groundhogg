@@ -10,15 +10,46 @@ namespace Groundhogg;
  */
 
 /**
+ * Handle the skip if confirmed logic for the email confirmation step
+ *
+ * @param $enqueue bool
+ * @param $contact Contact
+ * @param $step    Step
+ *
+ * @return bool true if the step should be enqueued, otherwise false
+ */
+function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
+
+	// If the enqueue was already set to false ofr the step is not the send_email step
+	if ( ! $enqueue || $step->get_type() !== 'send_email' ) {
+		return $enqueue;
+	}
+
+	$email = new Email( $step->get_meta( 'email_id' ) );
+
+	if ( $email->exists() && $email->is_confirmation_email() ){
+		// Contact is confirmed and thus the step should be skipped
+		if ( $step->get_meta( 'skip_if_confirmed' ) && $contact->is_confirmed() ){
+			do_action( 'groundhogg/step/email/confirmed', $contact->get_id(), Preferences::CONFIRMED, Preferences::CONFIRMED, $step->get_funnel_id() );
+			return false;
+		}
+	}
+
+	return true;
+}
+
+add_filter( 'groundhogg/steps/enqueue', __NAMESPACE__ . '\handle_skip_if_confirmed', 9, 3 );
+
+/**
  * Swap out the sanitization callback
  *
  * @param $callback callable
- * @param $option string
- * @param $value mixed
+ * @param $option   string
+ * @param $value    mixed
  */
-function filter_option_sanitize_callback( $callback, $option, $value ){
+function filter_option_sanitize_callback( $callback, $option, $value ) {
 
-	switch ( $option ){
+	switch ( $option ) {
 		case 'gh_contact_custom_properties':
 			// todo implement proper sanitization here
 			return function ( $props ) {
@@ -196,14 +227,14 @@ function _responsive_tag_compat_callback( $matches ) {
 
 	$given_width = absint( get_array_var( $atts, 'width', $default_email_width ) );
 
-	if ( $given_width <= 0 ){
+	if ( $given_width <= 0 ) {
 		$given_width = $default_email_width;
 	}
 
 	$img_width = min( $given_width, $default_email_width );
 
-	$style   = array_merge( $style, [
-		'width'     => $img_width . 'px' ,
+	$style = array_merge( $style, [
+		'width'     => $img_width . 'px',
 		'height'    => 'auto',
 		'max-width' => '100%',
 	] );
@@ -272,7 +303,7 @@ add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\
  *
  * @return string
  */
-function kses_wrapper( $content ){
+function kses_wrapper( $content ) {
 	return email_kses( $content );
 }
 
@@ -283,10 +314,10 @@ function kses_wrapper( $content ){
  *
  * @return string
  */
-function email_kses( $content ){
+function email_kses( $content ) {
 
 	// Basic protocols
-	$basic_protocols = [ 'http', 'https', 'mailto','mms', 'sms', 'svn', 'tel', 'fax' ];
+	$basic_protocols = [ 'http', 'https', 'mailto', 'mms', 'sms', 'svn', 'tel', 'fax' ];
 
 	// Weird protocols for replacements compatibility
 	$wacky_protocols = [

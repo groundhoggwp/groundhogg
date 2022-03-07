@@ -409,6 +409,15 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Return whether the contact is confirmed or not.
+	 *
+	 * @return bool
+	 */
+	public function is_confirmed() {
+		return $this->get_optin_status() === Preferences::CONFIRMED;
+	}
+
+	/**
 	 * get the contact's notes
 	 *
 	 * @return Note[]
