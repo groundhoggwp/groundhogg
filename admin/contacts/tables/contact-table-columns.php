@@ -146,7 +146,11 @@ class Contact_Table_Columns {
 			return;
 		}
 
-		call_user_func( $column['callback'], $contact, $column_id, $column );
+		$result = call_user_func( $column['callback'], $contact, $column_id, $column );
+
+        if ( $result ){
+            echo $result;
+        }
 	}
 
 	/**
