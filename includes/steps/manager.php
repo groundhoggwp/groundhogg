@@ -58,11 +58,6 @@ class Manager {
 	 */
 	public function init_steps() {
 
-//		if ( ! empty( $this->elements ) ){
-//			return;
-//		}
-
-
 		/* actions */
 		$this->add_step( new Send_Email() );
 		$this->add_step( new Admin_Notification() );

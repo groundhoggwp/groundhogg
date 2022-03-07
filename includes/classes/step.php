@@ -38,6 +38,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public $enqueued_contact;
 
 	/**
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	public function type_is( string $type ) {
+		return $this->get_type() === $type;
+	}
+
+	/**
 	 * Return the DB instance that is associated with items of this type.
 	 *
 	 * @return Steps
@@ -182,6 +191,29 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function is_action() {
 		return $this->get_group() === self::ACTION;
+	}
+
+	/**
+	 * Get the next step in the funnel of a specific type
+	 *
+	 * @param $type
+	 *
+	 * @return Step
+	 */
+	public function get_next_of_type( $type = '' ) {
+
+		$items = $this->get_funnel()->get_steps();
+
+		// Order = index + 1, so accessing array at order is actually getting the next step
+		for ( $i = $this->get_order(); $i < count( $items ); $i ++ ) {
+			$next = $items[$i];
+
+			if ( $next->get_type() === $type ){
+				return $next;
+			}
+		}
+
+		return $this->get_next_action();
 	}
 
 	/**
@@ -450,11 +482,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

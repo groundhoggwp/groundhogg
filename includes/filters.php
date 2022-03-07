@@ -21,7 +21,7 @@ namespace Groundhogg;
 function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
 
 	// If the enqueue was already set to false ofr the step is not the send_email step
-	if ( ! $enqueue || $step->get_type() !== 'send_email' ) {
+	if ( ! $enqueue || ! $step->type_is( 'send_email' ) ) {
 		return $enqueue;
 	}
 
@@ -30,7 +30,13 @@ function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
 	if ( $email->exists() && $email->is_confirmation_email() ){
 		// Contact is confirmed and thus the step should be skipped
 		if ( $step->get_meta( 'skip_if_confirmed' ) && $contact->is_confirmed() ){
-			do_action( 'groundhogg/step/email/confirmed', $contact->get_id(), Preferences::CONFIRMED, Preferences::CONFIRMED, $step->get_funnel_id() );
+
+			$next = $step->get_next_of_type( 'email_confirmed' );
+
+			if ( $next ){
+				$next->enqueue( $contact );
+			}
+
 			return false;
 		}
 	}
