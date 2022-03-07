@@ -1066,11 +1066,11 @@ class Replacements implements \JsonSerializable {
 	 * Return a raw confirmation link for the contact that can be placed in a button.
 	 * This just gets the Optin Page link for now.
 	 *
-	 * @param $redirect_to
+	 * @param string $redirect_to
 	 *
 	 * @return string the optin link
 	 */
-	function replacement_confirmation_link_raw( $redirect_to ) {
+	function replacement_confirmation_link_raw( $redirect_to = '' ) {
 
 		$link_url = managed_page_url( 'preferences/confirm/' );
 
