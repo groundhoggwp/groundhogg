@@ -325,6 +325,17 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.6.2.1 (2022-03-07) =
+* TWEAKED The "skip if confirmed" logic for confirmation emails to handle logic outside of the run process.
+* TWEAKED Contact::get_time_zone() will return wp_timezone_string() if no timezone is set.
+* TWEAKED When creating a contact, if an owner is logged in the default owner will be be the logged in user instead of the primary owner from the settings.
+* TWEAKED When importing a list, do not set the owner to the current user and allow the default fallback to take effect.
+* FIXED Changed `blacklist_keys` to `disallowed_keys`.
+* FIXED Custom contact table columns will echo a return value if not void.
+* FIXED Check for the view_contacts cap before display the Groundhogg admin bar widget.
+* FIXED Removed title actions from the help page.
+* FIXED Typos in the new troubleshooter.
+
 = 2.6.2 (2022-03-02) =
 * ADDED the new Groundhogg troubleshooter! A guided support tool to help users identify and resolve issues quickly.
 * ADDED column width option for custom fields for more control over the layout.
