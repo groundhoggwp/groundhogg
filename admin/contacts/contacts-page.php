@@ -717,10 +717,10 @@ class Contacts_Page extends Admin_Page {
 				$ip_address = $contact->get_meta( 'ip_address' );
 
 				if ( $ip_address ) {
-					$blacklist = get_option( 'blacklist_keys' );
+					$blacklist = get_option( 'disallowed_keys' );
 					$blacklist .= "\n" . $ip_address;
 					$blacklist = sanitize_textarea_field( $blacklist );
-					update_option( 'blacklist_keys', $blacklist );
+					update_option( 'disallowed_keys', $blacklist );
 				}
 			}
 
