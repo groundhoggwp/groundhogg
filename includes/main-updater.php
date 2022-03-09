@@ -533,6 +533,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Add hostname column for page visits table
+	 *
+	 * @return void
+	 */
+	public function version_2_6_2_2() {
+		get_db( 'page_visits' )->create_table();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -591,6 +600,7 @@ class Main_Updater extends Updater {
 			'2.5.7.4',
 			'2.5.7.5',
 			'2.6',
+			'2.6.2.2',
 		];
 	}
 
@@ -624,6 +634,7 @@ class Main_Updater extends Updater {
 			'2.5.7',
 			'2.5.7.5',
 			'2.6',
+			'2.6.2.2',
 		];
 	}
 
@@ -676,6 +687,7 @@ class Main_Updater extends Updater {
 			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates 1970-01-01 and 1999-11-30 because of import bug.', 'groundhogg' ),
 			'2.5.7.5'       => __( 'Install the debug logs table.', 'groundhogg' ),
 			'2.6'           => __( 'Refactor custom fields to new format.', 'groundhogg' ),
+			'2.6.2.2'       => __( 'Add hostname field to page-visits table.', 'groundhogg' ),
 		];
 	}
 }

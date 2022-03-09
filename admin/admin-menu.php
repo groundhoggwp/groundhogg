@@ -98,7 +98,7 @@ class Admin_Menu {
 
 		$admin_contact = get_contactdata();
 
-		if ( $admin_contact->exists() ) {
+		if ( $admin_contact && $admin_contact->exists() ) {
 			$admin_bar->add_node(
 				array(
 					'parent' => 'user-actions',

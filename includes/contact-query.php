@@ -805,7 +805,7 @@ class Contact_Query {
 			$where['optin_status_exclude'] = "$this->table_name.optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
 
-		if ( $this->query_vars['owner'] ) {
+		if ( isset_not_empty( $this->query_vars, 'owner' ) ) {
 			$owner_clause   = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
 			$where['owner'] = "$this->table_name.owner_id IN ( {$owner_clause} )";
 		}

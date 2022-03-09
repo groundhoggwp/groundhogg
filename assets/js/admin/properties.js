@@ -398,6 +398,14 @@
 
       const { type, label, name, id, order = 10, width = 2 } = field
 
+      let editUI = ''
+
+      try {
+        editUI = fieldTypes[type].edit(field)
+      }catch (e) {
+        console.log(e)
+      }
+
       //language=HTML
       return `
 		  <div class="property-field">
@@ -435,7 +443,7 @@
 				  </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
-						  ${fieldTypes[type].edit(field)}
+						  ${editUI}
 					  </div>
 				  </div>
             <div class="gh-row">
@@ -473,11 +481,20 @@
 
     field: ({ group, ...field }) => {
 
+      let fieldUI
+
+      try {
+        fieldUI = fieldTypes[field.type].view(field)
+      } catch (e) {
+        console.log(e)
+        fieldUI = `<span class="gh-text danger">${__('This field is corrupted', 'groundhogg')}</span>`
+      }
+
       let { width = 2 } = field
       //language=HTML
       return `
 		  <div class="property-field col-width-${width}" data-group="${group}" data-id="${field.id}">
-			  ${fieldTypes[field.type].view(field)}
+			  ${fieldUI}
 		  </div>`
     }
 
@@ -696,7 +713,11 @@
           close()
         })
 
-        fieldTypes[newField.type].onEditMount(newField, updateField)
+        try {
+          fieldTypes[newField.type].onEditMount(newField, updateField)
+        } catch (e) {
+          console.log(e)
+        }
       }
 
       const { close, setContent } = modal({
@@ -739,15 +760,19 @@
       const { fields = [] } = properties
 
       fields.forEach(f => {
-        fieldTypes[f.type].onMount(f, (props) => {
+        try {
+          fieldTypes[f.type].onMount(f, (props) => {
 
-          values = {
-            ...values,
-            ...props
-          }
+            values = {
+              ...values,
+              ...props
+            }
 
-          onChange(props)
-        })
+            onChange(props)
+          })
+        } catch (e) {
+          console.log(e)
+        }
       })
 
       $('.property-field').on('dblclick', (e) => {

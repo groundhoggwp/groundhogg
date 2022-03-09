@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.1
+Stable tag: 2.6.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.2.2 (2022-03-09) =
+* FIXED Fatal error if not contact record linked to the logged in admin.
+* FIXED Ghost custom fields causing custom field editor to not load
+* FIXED DB error caused by missing field name in the page-visits table.
+* FIXED PHP notice caused by missing array index.
 
 = 2.6.2.1 (2022-03-07) =
 * TWEAKED The "skip if confirmed" logic for confirmation emails to handle logic outside of the run process.
