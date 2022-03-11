@@ -324,10 +324,10 @@ class Preferences {
 	/**
 	 * Check if GDPR is enabled throughout the plugin.
 	 *
-	 * @return bool, whether it's enable or not.
+	 * @return bool whether it's enable or not.
 	 */
 	public function is_gdpr_enabled() {
-		return Plugin::$instance->settings->is_option_enabled( 'enable_gdpr' );
+		return is_option_enabled( 'gh_enable_gdpr' );
 	}
 
 	/**
@@ -336,7 +336,7 @@ class Preferences {
 	 * @return bool
 	 */
 	public function is_gdpr_strict() {
-		return Plugin::$instance->settings->is_option_enabled( 'strict_gdpr' );
+		return is_option_enabled( 'gh_enable_gdpr' ) && is_option_enabled( 'gh_strict_gdpr' );
 	}
 
 	/**
