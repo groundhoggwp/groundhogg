@@ -487,7 +487,7 @@ class Help_Page extends Tabbed_Admin_Page {
 
 					echo html()->e( 'a', [
 						'class' => 'button big-button',
-						'href'  => admin_page_url( 'gh_help', [ 'tab' => 'support' ] )
+						'href'  => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
 					], __( 'Open a ticket!', 'groundhogg' ) ); ?>
                 </div>
             </div>
