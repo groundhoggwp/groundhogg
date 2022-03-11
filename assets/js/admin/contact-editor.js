@@ -23,6 +23,7 @@
     confirmationModal,
     adminPageURL,
     moreMenu,
+    setFrameContent,
     loadingDots,
     spinner,
     dialog,
@@ -46,6 +47,8 @@
     page_visits: PageVisitsStore,
     submissions: SubmissionsStore,
   } = Groundhogg.stores
+
+  const { emailPicker } = Groundhogg.pickers
 
   const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
   const {
@@ -324,7 +327,124 @@
       },
     }))
 
-    $('#action-send-email').on('click', sendEmail)
+    $('#action-send-email').on('click', e => {
+
+      moreMenu(e.currentTarget, {
+        items: [
+          {
+            key: 'compose',
+            text: __('Compose', 'groundhogg'),
+          },
+          {
+            key: 'template',
+            text: __('Use template', 'groundhogg'),
+          },
+        ],
+        onSelect: k => {
+          switch (k) {
+
+            case 'compose':
+              sendEmail()
+              break
+            case 'template':
+
+              let emailId
+
+              const preview = () => {
+
+                // language=HTML
+                return `
+                    <div class="gh-row">
+                        <div class="gh-col">
+                            <iframe id="select-email-preview" class="hidden"></iframe>
+                        </div>
+                    </div>`
+              }
+
+              const showFrame = () => {
+                if (emailId) {
+                  let $frm = $('#select-email-preview')
+                  setFrameContent($frm[0], EmailsStore.get(emailId).context.built)
+                  $frm.removeClass('hidden')
+                }
+              }
+
+              modal({
+                width: 500,
+                // language=HTML
+                content:
+                  `
+                      <h2>${ __('Select an email template to send', 'groundhogg') }</h2>
+                      <div class="gh-rows-and-columns">
+                          <div class="gh-row">
+                              <div class="gh-col">
+                                  ${ select({
+                                              name: 'email',
+                                              id: `select-email`,
+                                          }, EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
+                                          emailId) }
+                              </div>
+                          </div>
+                          ${ preview() }
+                          <div class="gh-row">
+                              <div class="gh-col">
+                                  <button id="send-email-template" class="gh-button primary" disabled>
+                                      ${ __('Send Email', 'groundhogg') }
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  `,
+                onOpen: ({ close }) => {
+
+                  let $btn = $('#send-email-template')
+
+                  emailPicker(`#select-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
+                    status: 'ready',
+                  }, {
+                    placeholder: __('Select an email to send...', 'groundhogg'),
+                  }).on('change', ({ target }) => {
+
+                    emailId = parseInt(target.value)
+                    showFrame()
+
+                    $btn.prop('disabled', false)
+
+                  })
+
+                  $btn.on('click', e => {
+
+                    $btn.prop('disabled', true)
+                    let { stop } = loadingDots(e.currentTarget)
+
+                    post(`${ EmailsStore.route }/${ emailId }/send`, {
+                      to: getContact().ID,
+                    }).then(r => {
+                      dialog({
+                        message: __('Email sent!'),
+                      })
+                      stop()
+                      close()
+                    }).catch(e => {
+                      stop()
+                      $btn.prop( 'disabled', false )
+                      dialog({
+                        type: 'error',
+                        message: e.message
+                      })
+                    })
+
+                  })
+                },
+              })
+
+              break
+
+          }
+        },
+      })
+
+    })
 
   }
 
@@ -1395,7 +1515,7 @@
                         t => t.id === activeTab).name)) }</p>`,
                     onConfirm: () => {
 
-                      let fields = __fields().map( f => f.id )
+                      let fields = __fields().map(f => f.id)
 
                       customTabState.fields = customTabState.fields.filter(
                         f => !fields.includes(f.id))
