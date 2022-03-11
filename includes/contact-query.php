@@ -770,7 +770,7 @@ class Contact_Query {
 
 		if ( $this->query_vars['marketable'] !== 'any' ) {
 			$where['marketable'] = self::filter_marketability( [
-				'marketable' => $this->query_vars['marketable'] ? 'yes' : 'no'
+				'marketable' => filter_var( $this->query_vars['marketable'], FILTER_VALIDATE_BOOLEAN ) ? 'yes' : 'no'
 			], $this );
 		}
 
