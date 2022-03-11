@@ -37,7 +37,7 @@ h3 {
   padding: 30px;
 
   object.gh-spinner {
-    max-width: 100px;
+    max-width: 150px;
   }
 }
 
@@ -1519,6 +1519,13 @@ p.error,
       //gap: 10px;
     }
   }
+}
+
+#select-email-preview{
+  width: 100%;
+  height: 300px;
+  border-radius: 5px;
+  border: 1px solid $primary-dark-50;
 }
 
 #gh-send-broadcast-form {

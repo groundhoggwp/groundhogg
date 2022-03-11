@@ -9,7 +9,7 @@ h3.no-margin-top {
   padding: 30px;
 }
 .gh-spinner-wrap object.gh-spinner {
-  max-width: 100px;
+  max-width: 150px;
 }
 
 .align-center-space-between {
@@ -1244,6 +1244,13 @@ p.error,
 }
 .gh-rows-and-columns .gh-row .gh-col, .gh-rows-and-columns .gh-row .gh-column {
   width: 100%;
+}
+
+#select-email-preview {
+  width: 100%;
+  height: 300px;
+  border-radius: 5px;
+  border: 1px solid rgba(16, 38, 64, 0.5);
 }
 
 #gh-send-broadcast-form #gh-broadcast-email-preview {

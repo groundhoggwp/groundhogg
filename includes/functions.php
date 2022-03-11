@@ -3068,10 +3068,10 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 	switch ( $color ) {
 		default:
 		case 'black':
-			$link = 'logo-black-1000x182.png';
+			$link = 'groundhogg-logo-black.svg';
 			break;
 		case 'white':
-			$link = 'logo-white-1000x182.png';
+			$link = 'groundhogg-logo-white.svg';
 			break;
 	}
 
@@ -5722,7 +5722,7 @@ function create_object_from_type( $object, $object_type ) {
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
  */
 function is_template_site() {
-	return apply_filters( 'groundhogg/is_template_site', false );
+	return apply_filters( 'groundhogg/is_template_site', defined( 'IS_GROUNDHOGG_TEMPLATE_SITE' ) && IS_GROUNDHOGG_TEMPLATE_SITE );
 }
 
 /**
