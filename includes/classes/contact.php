@@ -991,9 +991,9 @@ class Contact extends Base_Object_With_Meta {
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
 				'tags'  => array_values( $this->get_tags( true ) ),
-				'files' => $this->get_files(),
+//				'files' => $this->get_files(),
 				'user'  => $this->user,
-				'notes' => $this->get_notes(),
+//				'notes' => $this->get_notes(),
 				'admin' => $this->admin_link()
 			]
 		);
