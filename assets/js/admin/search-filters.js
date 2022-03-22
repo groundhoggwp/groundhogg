@@ -213,6 +213,7 @@
             filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
           } catch (e) {
             filters.push( renderFilterBroken(filter, j, k) );
+            console.log(e)
           }
         })
         filters.push(self.isAddingFilterToGroup === j ? `<div class="add-filter-wrap"></div>` : `<button data-group="${j}" class="add-filter">
@@ -1905,10 +1906,14 @@
 
   const { tabs, fields, groups } = Groundhogg.filters.gh_contact_custom_properties
 
+  const getField = ( id ) => {
+    return fields.find( f => f.id == id )
+  }
+
   const filterFactory = {
     text: (f) => ({
       view ({ field, compare, value }) {
-        return ComparisonsTitleGenerators[compare](`<b>${fields[field].label}</b>`, `<b>"${value}"</b>`)
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`, `<b>"${value}"</b>`)
       },
       edit ({ compare, value }) {
         // language=html
@@ -1943,7 +1948,7 @@
     }),
     number: (f) => ({
       view ({ field, compare, value }) {
-        return ComparisonsTitleGenerators[compare](`<b>${fields[field].label}</b>`, `<b>"${value}"</b>`)
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`, `<b>"${value}"</b>`)
       },
       edit ({ compare, value }) {
         // language=html
@@ -1976,7 +1981,7 @@
     date: (f) => ({
       view ({ field, ...rest }) {
         //language=HTMl
-        return standardActivityDateTitle(`<b>${fields[field].label}</b>`, rest)
+        return standardActivityDateTitle(`<b>${f.label}</b>`, rest)
       },
       edit (filter) {
         // language=html
