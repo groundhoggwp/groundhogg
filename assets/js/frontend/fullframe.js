@@ -7,6 +7,14 @@
     return origin.protocol === destination.protocol && origin.host === destination.host
   }
 
+  function addEvent (event, callback) {
+    if (!window.addEventListener) { // This listener will not be valid in < IE9
+      window.attachEvent('on' + event, callback)
+    } else { // For all other browsers other than < IE9
+      window.addEventListener(event, callback, false)
+    }
+  }
+
   function initAllFrames () {
 
     document.querySelectorAll('iframe:not(.gh-from-iframe)').forEach((frame, i) => {
@@ -19,22 +27,19 @@
         frame.classList.add('gh')
         frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
         frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
+        postFrameMessage( frame )
       }
     })
   }
 
-  function addEvent (event, callback) {
-    if (!window.addEventListener) { // This listener will not be valid in < IE9
-      window.attachEvent('on' + event, callback)
-    } else { // For all other browsers other than < IE9
-      window.addEventListener(event, callback, false)
-    }
+  function postFrameMessage ( frame ) {
+    frame.contentWindow.postMessage({ action: 'getFrameSize', id: frame.id }, '*')
   }
 
   function resizeAllFrames () {
     // inited frames will have the gh class
     document.querySelectorAll('iframe.gh').forEach((frame, i) => {
-      frame.contentWindow.postMessage({ action: 'getFrameSize', id: frame.id }, '*')
+      postFrameMessage( frame )
     })
   }
 
