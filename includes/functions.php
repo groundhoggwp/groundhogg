@@ -6404,7 +6404,7 @@ function do_reassignments_when_user_deleted( $id, $reassign ) {
 	if ( $delete_contact_records ) {
 		$contact = get_contactdata( $id, true );
 
-		if ( $contact->exists() ) {
+		if ( $contact && $contact->exists() ) {
 			$contact->delete();
 		}
 	}
@@ -6420,4 +6420,29 @@ function do_reassignments_when_user_deleted( $id, $reassign ) {
 		 */
 		do_action( 'groundhogg/owner_deleted', $id, $new_owner );
 	}
+}
+
+/**
+ * Minify html content
+ *
+ * @param $content
+ *
+ * @return string
+ */
+function minify_html( $content ) {
+	$search = array(
+		'/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+		'/[^\S ]+\</s',     // strip whitespaces before tags, except space
+		'/(\s)+/s',         // shorten multiple whitespace sequences
+		'/<!--(.|\s)*?-->/' // Remove HTML comments
+	);
+
+	$replace = array(
+		'>',
+		'<',
+		'\\1',
+		''
+	);
+
+	return preg_replace( $search, $replace, $content );
 }
