@@ -506,6 +506,9 @@ span.gh-text.lg {
   margin-top: 0;
   margin-bottom: 0;
 }
+.gh-panel .inside.no-padding {
+  padding: 0;
+}
 
 .wp-core-ui select {
   vertical-align: initial;

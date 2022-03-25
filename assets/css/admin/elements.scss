@@ -661,6 +661,10 @@ span.gh-text {
     padding: 20px;
     margin-top: 0;
     margin-bottom: 0;
+
+    &.no-padding{
+      padding: 0;
+    }
   }
 }
 
