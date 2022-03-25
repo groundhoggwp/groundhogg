@@ -3597,7 +3597,7 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
-	$url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
+	$url = managed_page_url( 'files/' . ltrim( $path, '/' ) );
 
 	// WP Engine file download links do not work if forward slash is not present.
 	$url = trailingslashit( $url );

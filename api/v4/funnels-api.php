@@ -95,13 +95,13 @@ class Funnels_Api extends Base_Object_Api {
 		$query    = new Contact_Query();
 		$contacts = $query->query( $query_vars, true );
 
-		foreach ( $contacts as $contact ){
+		foreach ( $contacts as $contact ) {
 			$step->enqueue( $contact );
 		}
 
-		return self::SUCCESS_RESPONSE([
+		return self::SUCCESS_RESPONSE( [
 			'added' => count( $contacts )
-		]);
+		] );
 	}
 
 	/**
@@ -231,7 +231,7 @@ class Funnels_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return is_template_site() || current_user_can( 'export_funnels' );
+		return is_template_site() || current_user_can( 'export_funnels' ) || current_user_can( 'view_funnels' );
 	}
 
 	/**

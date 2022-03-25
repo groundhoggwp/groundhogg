@@ -217,7 +217,7 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return is_template_site() || current_user_can( 'edit_emails' );
+		return is_template_site() || current_user_can( 'view_emails' );
 	}
 
 	public function update_permissions_callback() {

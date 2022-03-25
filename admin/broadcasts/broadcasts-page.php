@@ -79,7 +79,7 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	public function get_cap() {
-		return 'view_broadcasts';
+		return 'schedule_broadcasts';
 	}
 
 	public function get_item_type() {
@@ -99,7 +99,6 @@ class Broadcasts_Page extends Admin_Page {
 				break;
 		}
 	}
-
 
 	public function process_cancel() {
 		if ( ! current_user_can( 'cancel_broadcasts' ) ) {

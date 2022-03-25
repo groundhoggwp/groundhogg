@@ -142,8 +142,6 @@ class Main_Roles extends Roles {
 				];
 
 				break;
-
-				break;
 			case 'edit_contact':
 			case 'view_contact':
 			case 'delete_contact':
@@ -184,6 +182,55 @@ class Main_Roles extends Roles {
 				}
 
 				break;
+			case 'download_file':
+
+				$caps = [];
+
+				$file_path = wp_normalize_path( $args[0] );
+
+				$path = explode( '/', $file_path );
+
+				switch ( $path[0] ) {
+					case 'uploads':
+						$caps[] = 'download_contact_files';
+
+						$request        = $args[1];
+						$contact        = get_array_var( $request, 'contact' );
+						$contact_folder = $path[1];
+
+						$contact = new Contact( $contact );
+
+						if ( ! $contact->exists() ) {
+							$caps[] = 'do_not_allow';
+							break;
+						}
+
+						// Trying to cheat the system
+						if ( $contact_folder !== $contact->get_upload_folder_basename() ) {
+							$caps[] = 'do_not_allow';
+							break;
+						}
+
+						// Trying to download files of contacts that don't belong to them
+						if ( ! $contact->owner_is( $user_id ) ){
+							$caps[] = 'view_others_contacts';
+						}
+
+						break;
+					case 'exports':
+						$caps[] = 'export_contacts';
+						break;
+					case 'imports':
+						$caps[] = 'import_contacts';
+						$caps[] = 'download_files';
+						break;
+					default:
+						$caps[] = 'do_not_allow';
+						break;
+				}
+
+				break;
+
 		}
 
 		return $caps;
@@ -231,7 +278,11 @@ class Main_Roles extends Roles {
 			'delete_others_notes',
 			'delete_notes',
 			'edit_notes',
-			'view_notes'
+			'view_notes',
+			'view_funnels',
+			'view_emails',
+			'view_broadcasts',
+			'perform_bulk_actions'
 		];
 	}
 
@@ -254,7 +305,11 @@ class Main_Roles extends Roles {
 			'add_notes',
 			'delete_notes',
 			'edit_notes',
-			'view_notes'
+			'view_notes',
+			'view_funnels',
+			'view_emails',
+			'view_broadcasts',
+			'perform_bulk_actions',
 		];
 	}
 
