@@ -84,10 +84,6 @@ class HTML {
 		}
 	}
 
-	public function contact_query_form() {
-
-	}
-
 	/**
 	 * Turn the GET into inputs for a nav form
 	 *
