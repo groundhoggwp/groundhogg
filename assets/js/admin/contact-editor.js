@@ -267,7 +267,7 @@
           cap: 'delete_contacts',
           text: `<span class="gh-text danger">${ __('Delete') }</span>`,
         },
-      ],
+      ].filter( i => userHasCap( i.cap ) ),
       onSelect: k => {
         switch (k) {
           case 'merge':
@@ -491,6 +491,13 @@
           EmailsStore.itemsFetched([email])
         },
       },
+      composed_email_sent: {
+        icon: icons.open_email,
+        render: ({ meta, sent_by }) => {
+          return sprintf(__('%s sent an email with subject %s', 'groundhogg'), bold(sent_by), bold(meta.subject))
+        },
+        preload: () => {}
+      },
       email_link_click: {
         icon: icons.link_click,
         render: ({ email, data }) => {
@@ -651,6 +658,38 @@
                         </button>
                     </div>
                 </li>`
+          case 3:
+            // language=HTML
+            return `
+                <li class="activity-item">
+                    <div class="activity-icon broadcast">${ icons.email }
+                    </div>
+                    <div class="activity-rendered gh-panel space-between">
+                        <div>
+                            <div class="activity-info">
+                                <span>${ sprintf(pending ? __(
+                'Will receive email: %s',
+                'groundhogg') : __(
+                'Received email: %s', 'groundhogg'),
+              bold(activity.email.email.data.title)) }</span>
+                            </div>
+                            <div class="diff-time">
+                                ${ sprintf(pending ? ( Math.floor(
+                Date.now() / 1000) > activity.time ? __(
+                'Running now...', 'groundhogg') : ( __(
+                'Runs in %s', 'groundhogg') ) ) : __(
+                '%s ago', 'groundhogg'),
+              activity.locale.diff_time) }
+                            </div>
+                        </div>
+                        <button class="gh-button secondary icon text event-${ pending
+              ? 'queue-'
+              : '' }more"
+                                data-event="${ activity.ID }">
+                            ${ icons.verticalDots }
+                        </button>
+                    </div>
+                </li>`
         }
 
         return ''
@@ -794,40 +833,41 @@
         return
       }
 
-      let funnelIds = activities.filter(
-        a => a.type === 'event' && a.data.event_type == 1).reduce((arr, e) => {
+      let funnelIds = activities.reduce((arr, e) => {
 
-        if (!arr.includes(e.data.funnel_id)) {
-          arr.push(e.data.funnel_id)
+        let funnelId = parseInt( e.data?.funnel_id || e.form?.data?.funnel_id )
+
+        if ( funnelId > 1 ){
+          if (!arr.includes(funnelId)) {
+            arr.push(funnelId)
+          }
         }
 
         return arr
       }, [])
 
+
       let promises = [
+        // Preload activities
         ...activities.filter(a => a.type === 'activity').
           map(a => this.types[a.data.activity_type].preload(a)),
-        // Funnel Events
-        // ...activities
-        // .filter(a => a.type === 'event' && a.data.event_type == 1)
-        // .map(a => StepTypes.getType(a.step.step_type).preload(a.step)),
-        // Funnels
-        !FunnelsStore.hasItems(funnelIds) ? FunnelsStore.fetchItems({
+
+        // events with funnel IDs
+        funnelIds.length && !FunnelsStore.hasItems(funnelIds) ? FunnelsStore.fetchItems({
           ID: funnelIds,
         }) : null,
+
         // Broadcast Events
         ...activities.filter(a => a.type === 'event' && a.data.event_type == 2).
           map(a => BroadcastsStore.itemsFetched([a.broadcast])),
-        // Submission Events
-        FunnelsStore.fetchItems({
-          include: activities.filter(a => a.type === 'submission').
-            map(a => a.form.data.funnel_id),
-        }),
       ]
 
       Promise.all(promises).then(() => {
         $el.html(this.render(activities))
         this.onMount()
+      }).catch( e => {
+        // Something went wrong
+        console.log(e)
       })
 
     },
@@ -950,6 +990,8 @@
                 order,
               }),
             ]).then(() => {
+              loadTimeline()
+            }).catch( e => {
               loadTimeline()
             })
           }
@@ -1173,11 +1215,11 @@
                     key: 'download',
                     text: __('Download'),
                   },
-                  {
+                  userHasCap('delete_files' ) ? {
                     key: 'delete',
                     text: `<span class="gh-text danger">${ __(
                       'Delete') }</span>`,
-                  },
+                  } : false,
                 ],
                 onSelect: k => {
                   switch (k) {
@@ -1442,7 +1484,7 @@
         name,
       }) => `<a href="#" id="${ id }" class="nav-tab custom-tab${ id ===
       activeTab ? ' nav-tab-active' : '' }">${ name }</a>`).join('')).
-        insertBefore('#tab-actions')
+        insertAfter( '#edit-meta' )
       onMount()
     }
 
@@ -1619,7 +1661,7 @@
             }
           },
           canEdit: () => {
-            return userHasCap('edit_contacts')
+            return userHasCap('manage_options')
           },
 
         })
@@ -1759,61 +1801,65 @@
 
     }
 
-    $('.nav-tab-wrapper.primary').
-      append(
-        `<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
-    $('#add-tab').on('click', (e) => {
-      e.preventDefault()
+    if ( userHasCap( 'manage_options' ) ){
+      $('.nav-tab-wrapper.primary').
+        append(
+          `<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
+      $('#add-tab').on('click', (e) => {
+        e.preventDefault()
 
-      modal({
-        // language=HTML
-        content: `
+        modal({
+          // language=HTML
+          content: `
             <div>
                 <h2>${ __('Add a new tab', 'groundhogg') }</h2>
                 <div class="align-left-space-between">
                     ${ input({
-                        id: 'tab-name',
-                        placeholder: __('Tab name', 'groundhogg'),
-                    }) }
+            id: 'tab-name',
+            placeholder: __('Tab name', 'groundhogg'),
+          }) }
                     <button id="create-tab" class="gh-button primary">
                         ${ __('Create') }
                     </button>
                 </div>
             </div>`,
-        onOpen: ({ close }) => {
+          onOpen: ({ close }) => {
 
-          let tabName
+            let tabName
 
-          $('#tab-name').on('change input', (e) => {
-            tabName = e.target.value
-          }).focus()
+            $('#tab-name').on('change input', (e) => {
+              tabName = e.target.value
+            }).focus()
 
-          $('#create-tab').on('click', () => {
+            $('#create-tab').on('click', () => {
 
-            let id = uuid()
+              let id = uuid()
 
-            customTabState.tabs.push({
-              id,
-              name: tabName,
+              customTabState.tabs.push({
+                id,
+                name: tabName,
+              })
+
+              activeTab = id
+              updateTabState()
+
+              mount()
+              close()
+
             })
 
-            activeTab = id
-            updateTabState()
+          },
+        })
 
-            mount()
-            close()
-
-          })
-
-        },
       })
 
-    })
+      tooltip('#add-tab', {
+        content: __('Add tab', 'groundhogg'),
+        position: 'right',
+      })
 
-    tooltip('#add-tab', {
-      content: __('Add tab', 'groundhogg'),
-      position: 'right',
-    })
+    }
+
 
     mount()
   }
