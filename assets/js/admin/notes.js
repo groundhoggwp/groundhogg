@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const { notes: NotesStore } = Groundhogg.stores
   const {
@@ -8,7 +8,7 @@
     addMediaToBasicTinyMCE,
     moreMenu,
     tooltip,
-    dangerConfirmationModal
+    dangerConfirmationModal,
   } = Groundhogg.element
   const { post, get, patch, routes, ajax } = Groundhogg.api
   const { userHasCap } = Groundhogg.user
@@ -35,53 +35,55 @@
 
       // language=HTML
       return `
-		  <div class="notes-widget">
-			  <div class="notes-header">
-				  <h3>${title}</h3>
-				  <button class="gh-button text icon secondary note-add">
-					  <span class="dashicons dashicons-plus-alt2"></span>
-				  </button>
-			  </div>
-			  <div class="notes">
-				  ${adding ? templates.addNote() : ``}
-				  ${notes.sort((a, b) => b.data.timestamp - a.data.timestamp).map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).join('')}
-			  </div>
-		  </div>`
+          <div class="notes-widget">
+              <div class="notes-header">
+                  <h3>${ title }</h3>
+                  <button class="gh-button text icon secondary note-add">
+                      <span class="dashicons dashicons-plus-alt2"></span>
+                  </button>
+              </div>
+              <div class="notes">
+                  ${ adding ? templates.addNote() : `` }
+                  ${ notes.sort((a, b) => b.data.timestamp - a.data.timestamp).
+                          map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).
+                          join('') }
+              </div>
+          </div>`
     },
 
     editNote: (note) => {
       // language=HTML
       return `
-		  <div class="add-note">
-			  <textarea id="edit-note-editor">${note.data.content}</textarea>
-			  <div class="actions">
-				  <div>
-					  <label>${__('Note type', 'groundhogg')}
-						  ${select({ id: 'note-type' }, noteTypes, note.data.type)}</label>
-				  </div>
-				  <div style="display: flex">
-					  <button class="gh-button danger text cancel">${__('Cancel')}</button>
-					  <button class="gh-button primary save">${__('Save')}</button>
-				  </div>
-			  </div>
-		  </div>`
+          <div class="add-note">
+              <textarea id="edit-note-editor">${ note.data.content }</textarea>
+              <div class="actions">
+                  <div>
+                      <label>${ __('Note type', 'groundhogg') }
+                          ${ select({ id: 'note-type' }, noteTypes, note.data.type) }</label>
+                  </div>
+                  <div style="display: flex">
+                      <button class="gh-button danger text cancel">${ __('Cancel') }</button>
+                      <button class="gh-button primary save">${ __('Save') }</button>
+                  </div>
+              </div>
+          </div>`
     },
     addNote: () => {
       // language=HTML
       return `
-		  <div class="add-note">
-			  <textarea id="add-note-editor"></textarea>
-			  <div class="actions">
-				  <div>
-					  <label>${__('Note type', 'groundhogg')}
-						  ${select({ id: 'note-type' }, noteTypes)}</label>
-				  </div>
-				  <div style="display: flex">
-					  <button class="gh-button danger text cancel">${__('Cancel')}</button>
-					  <button class="gh-button primary create">${__('Create')}</button>
-				  </div>
-			  </div>
-		  </div>`
+          <div class="add-note">
+              <textarea id="add-note-editor"></textarea>
+              <div class="actions">
+                  <div>
+                      <label>${ __('Note type', 'groundhogg') }
+                          ${ select({ id: 'note-type' }, noteTypes) }</label>
+                  </div>
+                  <div style="display: flex">
+                      <button class="gh-button danger text cancel">${ __('Cancel') }</button>
+                      <button class="gh-button primary create">${ __('Create') }</button>
+                  </div>
+              </div>
+          </div>`
     },
 
     note: (note) => {
@@ -97,7 +99,8 @@
 
             if (!user) {
               username = __('Unknown')
-            } else {
+            }
+            else {
               username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
             }
 
@@ -113,26 +116,26 @@
 
       // language=HTML
       return `
-		  <div class="note">
-			  <div class="icon">
-				  ${typeToIcon[type]}
-			  </div>
-			  <div style="width: 100%">
-				  <div class="note-header">
-					  ${addedBy()}
-					  <div class="actions">
-						  <button class="gh-button text icon secondary note-more" data-id="${note.ID}">
-							  ${icons.verticalDots}
-						  </button>
-					  </div>
-				  </div>
-				  <div class="note-content">
-					  ${content}
-				  </div>
-			  </div>
+          <div class="note">
+              <div class="icon">
+                  ${ typeToIcon[type] }
+              </div>
+              <div style="width: 100%">
+                  <div class="note-header">
+                      ${ addedBy() }
+                      <div class="actions">
+                          <button class="gh-button text icon secondary note-more" data-id="${ note.ID }">
+                              ${ icons.verticalDots }
+                          </button>
+                      </div>
+                  </div>
+                  <div class="note-content">
+                      ${ content }
+                  </div>
+              </div>
 
-		  </div>`
-    }
+          </div>`
+    },
 
   }
 
@@ -154,9 +157,8 @@
       wp.editor.remove('edit-note-editor')
       wp.editor.remove('add-note-editor')
 
-      const notes = NotesStore
-        .filter(({ data }) => data.object_type == object_type && data.object_id == object_id)
-        .sort((a, b) => b.data.timestamp - a.data.timestamp)
+      const notes = NotesStore.filter(({ data }) => data.object_type == object_type && data.object_id == object_id).
+        sort((a, b) => b.data.timestamp - a.data.timestamp)
 
       $el.html(templates.notes(notes, state.adding, state.editing, title))
       onMount()
@@ -191,7 +193,7 @@
         render()
       }
 
-      $(`${selector} .note-add`).on('click', () => {
+      $(`${ selector } .note-add`).on('click', () => {
 
         if (this.adding) {
           return
@@ -204,9 +206,9 @@
         $('.note-add').remove()
       }
 
-      tooltip(`${selector} .note-add`, {
+      tooltip(`${ selector } .note-add`, {
         content: __('Add Note', 'groundhogg'),
-        position: 'left'
+        position: 'left',
       })
 
       if (state.adding) {
@@ -226,27 +228,30 @@
           newNote.content = content
         })
 
-        $(`${selector} #note-type`).on('change', (e) => {
+        $(`${ selector } #note-type`).on('change', (e) => {
           newNote.type = e.target.value
         })
 
-        $(`${selector} .cancel`).on('click', () => {
+        $(`${ selector } .cancel`).on('click', () => {
           state.adding = false
           render()
         })
 
-        $(`${selector} .create`).on('click', () => {
+        $(`${ selector } .create`).on('click', () => {
           state.adding = false
           state.editing = false
 
-          NotesStore.post({ data: {
-            ...newNote,
-              content: editor.getContent({ format: 'raw' })
-            } }).then(() => {
+          NotesStore.post({
+            data: {
+              ...newNote,
+              content: editor.getContent({ format: 'raw' }),
+            },
+          }).then(() => {
             render()
           })
         })
-      } else if (state.editing) {
+      }
+      else if (state.editing) {
 
         const editedNote = NotesStore.get(state.editing)
 
@@ -261,23 +266,23 @@
           updateNote.content = content
         })
 
-        $(`${selector} #note-type`).on('change', (e) => {
+        $(`${ selector } #note-type`).on('change', (e) => {
           updateNote.type = e.target.value
         })
 
-        $(`${selector} .cancel`).on('click', () => {
+        $(`${ selector } .cancel`).on('click', () => {
           state.editing = false
           render()
         })
 
-        $(`${selector} .save`).on('click', () => {
+        $(`${ selector } .save`).on('click', () => {
           state.adding = false
 
           NotesStore.patch(state.editing, {
             data: {
               ...updateNote,
-              content: editor.getContent({ format: 'raw' })
-            }
+              content: editor.getContent({ format: 'raw' }),
+            },
           }).then(() => {
             state.editing = false
             render()
@@ -285,7 +290,7 @@
         })
       }
 
-      $(`${selector} .note-more`).on('click', (e) => {
+      $(`${ selector } .note-more`).on('click', (e) => {
 
         const curNote = parseInt(e.currentTarget.dataset.id)
         const note = () => NotesStore.get(curNote)
@@ -296,13 +301,13 @@
             {
               key: 'edit',
               cap: belongsToMe() ? 'edit_notes' : 'edit_others_notes',
-              text: __('Edit')
+              text: __('Edit'),
             },
             {
               key: 'delete',
               cap: belongsToMe() ? 'delete_notes' : 'delete_others_notes',
-              text: `<span class="gh-text danger">${__('Delete')}</span>`
-            }
+              text: `<span class="gh-text danger">${ __('Delete') }</span>`,
+            },
           ].filter(i => userHasCap(i.cap)),
           onSelect: (k) => {
             switch (k) {
@@ -312,36 +317,33 @@
               case 'delete':
 
                 dangerConfirmationModal({
-                  alert: `<p>${__('Are you sure you want to delete this note?', 'groundhogg')}</p>`,
+                  alert: `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
                   onConfirm: () => {
                     NotesStore.delete(curNote).then(() => render())
-                  }
+                  },
                 })
 
                 break
             }
-          }
+          },
         })
       })
     }
 
     if (!NotesStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
       NotesStore.fetchItems({
-        query: {
-          object_id,
-          object_type,
-        },
-        limit: 9999
+        object_id,
+        object_type,
+        limit: 9999,
       }).then(() => {
         render()
       })
-    } else {
+    }
+    else {
       render()
     }
   }
 
-  console.log('here')
-
   Groundhogg.noteEditor = Notes
 
-})(jQuery)
+} )(jQuery)

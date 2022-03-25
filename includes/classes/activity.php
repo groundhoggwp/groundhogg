@@ -64,6 +64,17 @@ class Activity extends Base_Object_With_Meta {
 		];
 
 		switch ( $this->activity_type ) {
+			case 'composed_email_sent':
+
+				$sent_by = get_userdata( $this->get_meta( 'sent_by' ) );
+
+				if ( ! $sent_by ){
+					return $this->get_meta( 'from' );
+				}
+
+				return array_merge( $array, [
+					'sent_by' => $sent_by->display_name
+				] );
 			case 'email_opened':
 			case 'email_link_click':
 				return array_merge( $array, [
