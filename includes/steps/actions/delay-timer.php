@@ -192,7 +192,7 @@ class Delay_Timer extends Action {
 		$date = new \DateTime( 'now', wp_timezone() );
 
 		if ( $send_in_timezone && Event_Queue::is_processing() ) {
-			$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone() );
+			$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
 		}
 
 		$amount           = absint( $this->get_setting( 'delay_amount' ) );
