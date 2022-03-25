@@ -2416,6 +2416,7 @@ class Contact_Query {
 				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
 				break;
 			case 'between':
+			case 'today':
 				$clause = $as_int
 					? sprintf( "BETWEEN %d AND %d", $after, $before )
 					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
@@ -2491,11 +2492,18 @@ class Contact_Query {
 		$after  = date_as_int( $filter_vars['after'] );
 		$before = date_as_int( $filter_vars['before'] );
 
+		$today = new \DateTime( 'today', wp_timezone() );
+
 		switch ( $filter_vars['date_range'] ) {
 			default:
 			case 'any':
 				$after  = 1;
 				$before = time();
+				break;
+			case 'today':
+				$after = $today->getTimestamp();
+				$today->modify( '+1 day' );
+				$before = $today->getTimestamp();
 				break;
 			case '24_hours':
 				$after  = time() - DAY_IN_SECONDS;
@@ -2561,11 +2569,18 @@ class Contact_Query {
 		$after  = date_as_int( $filter_vars['after'] );
 		$before = date_as_int( $filter_vars['before'] );
 
+		$today = new \DateTime( 'today', wp_timezone() );
+
 		switch ( $filter_vars['date_range'] ) {
 			default:
 			case 'any':
 				$after  = 1;
 				$before = time() * 2;
+				break;
+			case 'today':
+				$after = $today->getTimestamp();
+				$today->modify( '+1 day' );
+				$before = $today->getTimestamp();
 				break;
 			case '24_hours':
 				$after  = time();
@@ -2638,8 +2653,9 @@ class Contact_Query {
 		$meta_table_name = get_db( 'contactmeta' )->table_name;
 
 		$year = date( 'Y' );
+		$time = date( 'H:i:s' );
 
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ) ) {$clause} ) ";
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ), '$time' ) {$clause} ) ";
 	}
 
 	/**
