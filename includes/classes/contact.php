@@ -278,6 +278,17 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Whether the given is the owner of this contact
+	 *
+	 * @param $owner WP_User|int
+	 *
+	 * @return bool
+	 */
+	public function owner_is( $owner ){
+		return $owner instanceof WP_User ? $this->get_owner_id() === $owner->ID : $this->get_owner_id() === $owner;
+	}
+
+	/**
 	 * Get the user data
 	 *
 	 * @return WP_User|false
@@ -930,6 +941,10 @@ class Contact extends Base_Object_With_Meta {
 					'url'           => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
+
+				if ( current_user_can( 'view_contact', $this ) ){
+					$file['url'] .= '?contact=' . $this->ID;
+				}
 
 				$data[] = $file;
 
