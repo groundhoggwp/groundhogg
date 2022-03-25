@@ -961,6 +961,8 @@ abstract class DB {
 		return $this->advanced_query( $query_vars, $from_cache );
 	}
 
+	public $last_query = '';
+
 	/**
 	 * New and improved query function to access DB in more complex and interesting ways.
 	 *
@@ -999,6 +1001,8 @@ abstract class DB {
 				$results = $wpdb->get_results( $sql );
 				break;
 		}
+
+		$this->last_query = $wpdb->last_query;
 
 		$results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
 
