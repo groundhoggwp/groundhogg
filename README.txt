@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.3
+Stable tag: 2.6.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -17,7 +17,7 @@ WordPress CRM, Email & Marketing Automation
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
-🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
+🌎 [Facebook Group](https://www.fa   cebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
 
 🚀 [Free Quickstart Course — Launch your first funnel!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
 
@@ -324,6 +324,18 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.2.4 (2022-03-23) =
+* ADDED Composed & 1-off emails now show in the activity timeline
+* ADDED "Today" date filter for search filters
+* TWEAKED Gave the welcome screen a visual refresh and updated remaining img assets with new logo
+* TWEAKED Changed file rewrite path from `/uploads/` to `/files/`
+* TWEAKED Add view permissions for funnels, emails, events, and activity to Sales Reps and Managers so they can view the activity timeline
+* FIXED Contact file uploads & downloads for Sales Reps and Sales Managers
+* FIXED Some custom field search filters showing corrupted when they are actually fine
+* FIXED Multiple UI issues for Sales Managers and Sales Reps
+* FIXED Notes widget loading in ALL notes instead of object notes
+* FIXED Mapping array values from form integrations to comma seperated strings
 
 = 2.6.2.3 (2022-03-11) =
 * ADDED New logos and brand assets!
