@@ -540,6 +540,7 @@ class Main_Updater extends Updater {
 	public function version_2_6_2_2() {
 		get_db( 'page_visits' )->create_table();
 	}
+
 	/**
 	 * Add caps to sales rep and manager
 	 *
@@ -548,6 +549,15 @@ class Main_Updater extends Updater {
 	public function version_2_6_2_4() {
 		Plugin::instance()->roles->add_caps();
 		install_custom_rewrites();
+	}
+
+	/**
+	 * Add caps to sales rep and manager
+	 *
+	 * @return void
+	 */
+	public function version_2_6_2_5() {
+		Plugin::instance()->roles->add_caps();
 	}
 
 	/**
@@ -646,6 +656,7 @@ class Main_Updater extends Updater {
 			'2.6',
 			'2.6.2.2',
 			'2.6.2.4',
+			'2.6.2.5',
 		];
 	}
 
@@ -700,6 +711,7 @@ class Main_Updater extends Updater {
 			'2.6'           => __( 'Refactor custom fields to new format.', 'groundhogg' ),
 			'2.6.2.2'       => __( 'Add hostname field to page-visits table.', 'groundhogg' ),
 			'2.6.2.4'       => __( 'Add view caps to Sales Rep & Manager.', 'groundhogg' ),
+			'2.6.2.5'       => __( 'Fix missing caps for emails endpoint.', 'groundhogg' ),
 		];
 	}
 }

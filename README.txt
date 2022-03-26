@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.4
+Stable tag: 2.6.2.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.6.2.4 (2022-03-23) =
+= 2.6.2.5 (2022-03-26) =
+* FIXED Missing view_emails cap for admins
+
+= 2.6.2.4 (2022-03-25) =
 * ADDED Composed & 1-off emails now show in the activity timeline
 * ADDED "Today" date filter for search filters
 * TWEAKED Gave the welcome screen a visual refresh and updated remaining img assets with new logo
