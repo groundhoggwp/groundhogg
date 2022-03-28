@@ -1,0 +1,51 @@
+.three-column-layout {
+  display: flex;
+  width: calc(100% - 160px);
+  gap: 20px;
+}
+.three-column-layout .column-left {
+  flex-grow: 1;
+  background: #FFFFFF;
+  border-right: solid 1px rgba(16, 38, 64, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-width: 400px;
+}
+.three-column-layout .column-left input {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.three-column-layout .column-middle {
+  flex-grow: 2;
+}
+.three-column-layout .column-right {
+  flex-grow: 1;
+}
+
+.image-to-left {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+.image-to-left img {
+  width: 90px;
+  border-radius: 5px;
+  flex-grow: 0;
+}
+.image-to-left .right-of-image {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0;
+}
+.image-to-left .right-of-image h1, .image-to-left .right-of-image h2, .image-to-left .right-of-image h3, .image-to-left .right-of-image p {
+  font-weight: normal;
+  margin: 0;
+}
+.image-to-left .right-of-image p {
+  font-size: 16px;
+}
+
+/*# sourceMappingURL=layout.css.map */

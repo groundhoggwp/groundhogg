@@ -458,11 +458,6 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
 			),
-//			'api_settings'      => array(
-//				'id'    => 'api_settings',
-//				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
-//				'tab'   => 'api_tab'
-//			),
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
@@ -1192,30 +1187,6 @@ class Settings_Page extends Admin_Page {
 				'atts'    => array(
 					'name'  => 'gh_complained_tag',
 					'id'    => 'gh_complained_tag',
-					'class' => 'gh-single-tag-picker'
-				),
-			],
-			'gh_monthly_tag'                         => [
-				'id'      => 'gh_monthly_tag',
-				'section' => 'optin_status_tags',
-				'label'   => _x( 'Subscribed Monthly Tag', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'All contacts which have requested monthly emails will have this tag.', 'settings', 'groundhogg' ),
-				'type'    => 'tag_picker',
-				'atts'    => array(
-					'name'  => 'gh_monthly_tag',
-					'id'    => 'gh_monthly_tag',
-					'class' => 'gh-single-tag-picker'
-				),
-			],
-			'gh_weekly_tag'                          => [
-				'id'      => 'gh_weekly_tag',
-				'section' => 'optin_status_tags',
-				'label'   => _x( 'Subscribed Weekly Tag', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'All contacts which have requested weekly emails will have this tag.', 'settings', 'groundhogg' ),
-				'type'    => 'tag_picker',
-				'atts'    => array(
-					'name'  => 'gh_weekly_tag',
-					'id'    => 'gh_weekly_tag',
 					'class' => 'gh-single-tag-picker'
 				),
 			],

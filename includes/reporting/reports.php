@@ -10,6 +10,7 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Donut_Chart_Contact_Engagement;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
@@ -62,13 +63,15 @@ class Reports {
 	 */
 	protected $reports = [];
 
+	protected $params = [];
+
 	/**
 	 * Reports constructor.
 	 *
 	 * @param $start int unix timestamps
 	 * @param $end   int unix timestamps
 	 */
-	public function __construct( $start, $end ) {
+	public function __construct( $start, $end, $params = [] ) {
 
 		if ( is_string( $start ) ) {
 			$start = strtotime( $start );
@@ -77,6 +80,8 @@ class Reports {
 		if ( is_string( $end ) ) {
 			$end = strtotime( $end );
 		}
+
+		$this->params = $params;
 
 		$this->start = absint( $start );
 		$this->end   = absint( $end );
@@ -249,6 +254,10 @@ class Reports {
 			[
 				'id'       => 'table_list_engagement',
 				'callback' => [ $this, 'table_list_engagement' ]
+			],
+			[
+				'id'       => 'donut_chart_contact_engagement',
+				'callback' => [ $this, 'donut_chart_contact_engagement' ]
 			]
 		];
 
@@ -297,96 +306,98 @@ class Reports {
 			return false;
 		}
 
-		$results = call_user_func( $this->reports[ $report_id ]['callback'] );
+		$report = call_user_func( $this->reports[ $report_id ]['callback'] );
 
-		return $results;
+		if ( is_array( $report ) ) {
+			return $report;
+		}
+
+		return $report->get_data();
+	}
+
+	public function get_data_3_0( $report_id ) {
+		if ( ! isset_not_empty( $this->reports, $report_id ) ) {
+			return false;
+		}
+
+		$report = call_user_func( $this->reports[ $report_id ]['callback'] );
+
+		if ( is_array( $report ) ) {
+			return $report;
+		}
+
+		return $report->get_data_3_0();
 	}
 
 	/**
 	 * Return the total new contacts
 	 *
-	 * @return array
+	 * @return Total_New_Contacts
 	 */
 	public function total_new_contacts() {
-		$report = new Total_New_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Total_New_Contacts( $this->start, $this->end );
 	}
 
 	/**
 	 * Total amount of new confirmed contacts
 	 *
-	 * @return array
+	 * @return Total_Confirmed_Contacts
 	 */
 	public function total_confirmed_contacts() {
-		$report = new Total_Confirmed_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Total_Confirmed_Contacts( $this->start, $this->end );
 	}
 
 	/**
 	 * Total Number of Active Contacts
 	 *
-	 * @return array
+	 * @return Total_Active_Contacts
 	 */
 	public function total_engaged_contacts() {
-		$report = new Total_Active_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Total_Active_Contacts( $this->start, $this->end );
 	}
 
 	/**
 	 * Total Number of Unsubscribes
 	 *
-	 * @return array
+	 * @return Total_Unsubscribed_Contacts
 	 */
 	public function total_unsubscribed_contacts() {
-		$report = new Total_Unsubscribed_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Total_Unsubscribed_Contacts( $this->start, $this->end );
 	}
 
 	/**
 	 * Return the total emails sent
 	 *
-	 * @return array
+	 * @return Total_Emails_Sent
 	 */
 	public function total_emails_sent() {
-		$report = new Total_Emails_Sent( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Total_Emails_Sent( $this->start, $this->end );
 	}
 
 	/**
 	 * The email open rate
 	 *
-	 * @return array
+	 * @return Email_Open_Rate
 	 */
 	public function email_open_rate() {
-		$report = new Email_Open_Rate( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Email_Open_Rate( $this->start, $this->end );
 	}
 
 
 	/**
 	 * The email open rate
 	 *
-	 * @return array
+	 * @return Email_Click_Rate
 	 */
 	public function email_click_rate() {
-		$report = new Email_Click_Rate( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Email_Click_Rate( $this->start, $this->end );
 	}
 
 	/**
-	 * @return mixed
+	 * @return Chart_New_Contacts
 	 */
 	public function chart_new_contacts() {
-		$report = new Chart_New_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Chart_New_Contacts( $this->start, $this->end );
 	}
 
 
@@ -414,11 +425,13 @@ class Reports {
 	 * @return mixed
 	 */
 	public function chart_contacts_by_optin_status() {
-
-		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
-
-		return $report->get_data();
-
+		return new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
+	}
+	/**
+	 * @return mixed
+	 */
+	public function donut_chart_contact_engagement() {
+		return new Donut_Chart_Contact_Engagement( $this->start, $this->end );
 	}
 
 	/**
@@ -509,14 +522,10 @@ class Reports {
 	}
 
 	/**
-	 * @return mixed
+	 * @return Table_Top_Performing_Emails
 	 */
 	public function table_top_performing_emails() {
-
-		$report = new Table_Top_Performing_Emails( $this->start, $this->end );
-
-		return $report->get_data();
-
+		return new Table_Top_Performing_Emails( $this->start, $this->end );
 	}
 
 	/**
@@ -655,15 +664,11 @@ class Reports {
 	 * @return mixed
 	 */
 	public function table_top_converting_funnels() {
-		$report = new Table_Top_Converting_Funnels( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Table_Top_Converting_Funnels( $this->start, $this->end );
 	}
 
 	public function table_form_activity() {
-		$report = new Table_Form_Activity( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Table_Form_Activity( $this->start, $this->end );
 	}
 
 	public function table_email_stats() {

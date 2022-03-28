@@ -50,7 +50,7 @@ abstract class Base_Table_Report extends Base_Report {
 	 * @return int
 	 */
 	function get_num_results() {
-		return 10;
+		return 999;
 	}
 
 	/**

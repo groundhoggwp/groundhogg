@@ -2,10 +2,17 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Api\V4\Base_Api;
+
 class Library extends Supports_Errors {
 
-	const PROXY_URL = 'https://library.groundhogg.io/wp-json/gh/v3/';
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' library-manager';
+
+	public function get_libraries() {
+		return apply_filters( 'groundhogg/template_libraries', [
+			'https://app-60b684a2c1ac185aa47ce22e.closte.com', //  todo replace with actual library url
+		] );
+	}
 
 	/**
 	 * Flush cache templates
@@ -19,23 +26,68 @@ class Library extends Supports_Errors {
 	 * Send a request to the library
 	 *
 	 * @param string $endpoint
-	 * @param array $body
+	 * @param array  $body
 	 * @param string $method
-	 * @param array $headers
+	 * @param array  $headers
 	 *
 	 * @return array|bool|\WP_Error
 	 */
-	public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] ) {
+	public function request( $endpoint = '', $body = [] ) {
 
-		$url = self::PROXY_URL . $endpoint;
+		$libraries = $this->get_libraries();
+		$requests  = [];
 
-		$result = remote_post_json( $url, $body, $method, $headers );
-
-		if ( is_wp_error( $result ) ) {
-			$this->add_error( $result );
+		foreach ( $libraries as $library ) {
+			$requests[] = [
+				'type'    => 'GET',
+				'url'     => $library . '/wp-json/gh/v4/' . $endpoint,
+				'data'    => wp_json_encode( $body ),
+				'headers' => [
+					'content-type' => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
+				],
+				'options' => [
+					'data_format' => 'body',
+				]
+			];
 		}
 
-		return $result;
+		$requests_hooks = new \Requests_Hooks();
+
+		$requests_hooks->register( 'curl.before_request', function ( $handle ) {
+			curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, 0 );
+			curl_setopt( $handle, CURLOPT_SSL_VERIFYHOST, 0 );
+		} );
+
+		$responses = \Requests::request_multiple( $requests, [
+			'hooks' => $requests_hooks
+		] );
+
+		$templates = [];
+
+		foreach ( $responses as $response ) {
+
+			if ( ! $response || is_wp_error( $response ) || is_a( $response, '\Requests_Exception' ) ) {
+				continue;
+			}
+
+			if ( is_a( $response, '\Requests_Response' ) ) {
+				$body = $response->body;
+				$code = $response->status_code;
+			} else {
+				$body = wp_remote_retrieve_body( $response );
+				$code = wp_remote_retrieve_response_code( $response );
+			}
+
+			if ( $code !== 200 ) {
+				continue;
+			}
+
+			$json = json_decode( $body, true );
+
+			$templates = array_merge( $templates, get_array_var( $json, 'items', [] ) );
+		}
+
+		return $templates;
 	}
 
 	/**
@@ -44,33 +96,17 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_templates() {
-		$funnels = get_transient( 'groundhogg_funnel_templates' );
+//		$funnels = get_transient( 'groundhogg_funnel_templates' );
+//
+//		if ( ! empty( $funnels ) ) {
+//			return $funnels;
+//		}
 
-		if ( ! empty( $funnels ) ) {
-			return $funnels;
-		}
+		$templates = $this->request( 'funnels', [ 'limit' => 999, 'status' => 'active' ] );
 
-		$response = $this->request( 'funnels/', [
-			'installed' => Extension::$extension_ids
-		], 'GET' );
+		set_transient( 'groundhogg_funnel_templates', $templates, DAY_IN_SECONDS );
 
-		$funnels = get_array_var( $response, 'funnels', [] );
-
-		set_transient( 'groundhogg_funnel_templates', $funnels, DAY_IN_SECONDS );
-
-		return $funnels;
-	}
-
-	/**
-	 * Get a specific funnel template
-	 *
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get_funnel_template( $id ) {
-		$response = $this->request( 'funnels/get', [ 'id' => $id ], 'GET' );
-		return get_array_var( $response, 'funnel', [] );
+		return $templates;
 	}
 
 	/**
@@ -79,33 +115,29 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_email_templates() {
-		$emails = get_transient( 'groundhogg_email_templates' );
 
-		if ( ! empty( $emails ) ) {
-			return $emails;
-		}
+		$templates = $this->request( 'emails', [ 'limit' => 999, 'status' => 'ready' ] );
 
-		$response = $this->request( 'email/templates', [
-			'installed' => Extension::$extension_ids
-		], 'GET' );
+		$templates = array_map( function ( $e ) {
 
-		$emails = get_array_var( $response, 'emails', [] );
+			$data = get_array_var( $e, 'data' );
+			$meta = get_array_var( $e, 'meta' );
 
-		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
+			unset( $data['ID'] );
+			$data['from_user'] = get_current_user_id();
+			$data['author']    = get_current_user_id();
 
-		return $emails;
-	}
+			$email       = new Email();
+			$email->data = $data;
+			$email->meta = $meta;
+			$email->ID   = uniqid( 'email-' );
 
-	/**
-	 * Get a specific email template
-	 *
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get_email_template( $id ) {
-		$response = $this->request( 'email/templates/get', [ 'id' => $id ], 'GET' );
+			return $email;
 
-		return get_array_var( $response, 'email', [] );
+		}, $templates );
+
+		set_transient( 'groundhogg_email_templates', $templates, DAY_IN_SECONDS );
+
+		return $templates;
 	}
 }

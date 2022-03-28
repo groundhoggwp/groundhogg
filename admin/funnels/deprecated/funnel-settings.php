@@ -36,7 +36,7 @@ $funnel    = new Funnel( $funnel_id );
 					'name'        => 'conversion_step_id',
 					'id'          => 'conversion-step',
 					'options'     => $options,
-					'selected'    => $funnel->get_conversion_step_id(),
+					'selected'    => $funnel->get_conversion_step_ids(),
 					'option_none' => false,
 				];
 

@@ -205,13 +205,19 @@ class Rewrites {
 				status_header( 200 );
 				nocache_headers();
 
-				$funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
+				$funnel_id = absint( decrypt( get_query_var( 'enc_funnel_id' ) ) );
 				$funnel    = new Funnel( $funnel_id );
+
 				if ( ! $funnel->exists() ) {
 					wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
 				}
 
-				$export_string = wp_json_encode( $funnel->legacy_export() );
+				// Non privileged users can export funnels if sharing is enabled.
+				if ( ! $funnel->is_sharing_enabled() && ! current_user_can( 'export_funnels' ) ) {
+					wp_die( 'Sharing is not enabled for this funnel.', 'Sharing disabled.', [ 'status' => 403 ] );
+				}
+
+				$export_string = wp_json_encode( $funnel->get_as_array() );
 
 				$funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
 
@@ -219,6 +225,36 @@ class Rewrites {
 
 				header( "Content-type: text/plain" );
 				header( "Content-disposition: attachment; filename=" . $filename . ".funnel" );
+				$file = fopen( 'php://output', 'w' );
+				fputs( $file, $export_string );
+				fclose( $file );
+				exit();
+				break;
+
+			case 'emails_export':
+				// Export the funnel from special rewrite link...
+				status_header( 200 );
+				nocache_headers();
+
+				$email_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_email_id' ), 'd' ) );
+				$email    = new Email( $email_id );
+
+				if ( ! $email->exists() ) {
+					wp_die( 'The requested email was not found.', 'Email not found.', [ 'status' => 404 ] );
+				}
+
+				if ( ! $email->is_sharing_enabled() && ! current_user_can( 'export_emails' ) ) {
+					wp_die( 'Sharing is not enabled for this email.', 'Sharing disabled.', [ 'status' => 403 ] );
+				}
+
+				$export_string = wp_json_encode( $email->get_as_array() );
+
+				$email_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $email->get_title() ) );
+
+				$filename = 'email-' . $email_export_name . '-' . date( "Y-m-d_H-i", time() );
+
+				header( "Content-type: text/plain" );
+				header( "Content-disposition: attachment; filename=" . $filename . ".json" );
 				$file = fopen( 'php://output', 'w' );
 				fputs( $file, $export_string );
 				fclose( $file );

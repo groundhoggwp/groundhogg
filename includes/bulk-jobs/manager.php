@@ -40,6 +40,7 @@ class Manager {
 		$this->update_marketing_consent = new Update_Marketing_Consent();
 		$this->bulk_edit_contacts       = new Edit_Contacts();
 		$this->fix_birthdays            = new Fix_Birthdays();
+		$this->upgrade_3_0              = new Upgrade_3_0_Contacts();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}

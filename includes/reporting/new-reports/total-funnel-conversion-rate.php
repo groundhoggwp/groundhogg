@@ -26,11 +26,11 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 
 		$funnel = new Funnel( $this->get_funnel_id() );
 
-		$conversion_step = $funnel->get_conversion_step_id();
+		$conversion_step = $funnel->get_conversion_step_ids();
 
 		$where = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
+			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],

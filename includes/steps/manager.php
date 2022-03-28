@@ -15,9 +15,11 @@ use Groundhogg\Steps\Actions\Edit_Meta;
 use Groundhogg\Steps\Actions\Field_Timer;
 use Groundhogg\Steps\Actions\HTTP_Post;
 use Groundhogg\Steps\Actions\Remove_Tag;
+use Groundhogg\Steps\Actions\Restart_Funnel;
 use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Steps\Actions\Sleep;
 use Groundhogg\Steps\Benchmarks\Account_Created;
+use Groundhogg\Steps\Benchmarks\New_Contact;
 use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
@@ -51,12 +53,17 @@ class Manager {
 	public function __construct() {
 		// RIGHT AFTER THE DBS.
 		add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
+		add_action( 'groundhogg/api/v4/pre_init', [ $this, 'init_steps' ], 2 );
 	}
 
 	/**
 	 * Initialize all the steps
 	 */
 	public function init_steps() {
+
+//		if ( ! empty( $this->elements ) ){
+//			return;
+//		}
 
 		/* actions */
 		$this->add_step( new Send_Email() );
@@ -65,9 +72,11 @@ class Manager {
 		$this->add_step( new Remove_Tag() );
 		$this->add_step( new Apply_Note() );
 		$this->add_step( new Delay_Timer() );
+		$this->add_step( new Restart_Funnel() );
 
 		/* Benchmarks */
 
+		$this->add_step( new New_Contact() );
 		$this->add_step( new Form_Filled() );
 		$this->add_step( new Account_Created() );
 		$this->add_step( new Email_Confirmed() );

@@ -25,7 +25,7 @@ class Error extends Funnel_Step {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/no-icon.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 
 	}
 

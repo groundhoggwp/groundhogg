@@ -123,7 +123,7 @@ class Contacts_Table extends WP_List_Table {
 		$optin_status = get_request_var( 'optin_status' );
 
 		if ( is_array( $optin_status ) ) {
-			$query['optin_status'] = map_deep( $optin_status, 'absint' );
+			$query['optin_status'] = Preferences::sanitize( $optin_status );
 		}
 
 		$date_query = [
@@ -434,7 +434,7 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	protected function get_view() {
-		return ( isset( $_GET['optin_status'] ) ) ? absint( $_GET['optin_status'] ) : 0;
+		return get_url_var( 'optin_status' ) ? Preferences::sanitize( get_url_var( 'optin_status' ) ) : false;
 	}
 
 	protected function get_views() {
@@ -454,16 +454,6 @@ class Contacts_Table extends WP_List_Table {
 				'id'    => 'confirmed',
 				'name'  => __( 'Confirmed', 'groundhogg' ),
 				'query' => [ 'optin_status' => Preferences::CONFIRMED ],
-			],
-			'weekly'       => [
-				'id'    => 'weekly',
-				'name'  => __( 'Weekly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::WEEKLY ],
-			],
-			'monthly'      => [
-				'id'    => 'monthly',
-				'name'  => __( 'Monthly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::MONTHLY ],
 			],
 			'unsubscribed' => [
 				'id'    => 'unsubscribed',

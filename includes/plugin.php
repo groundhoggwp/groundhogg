@@ -351,6 +351,8 @@ class Plugin {
 		\Groundhogg_Email_Services::init();
 
 		new Plugin_Compatibility();
+
+		Contact_Query::setup_default_filters();
 	}
 
 	/**

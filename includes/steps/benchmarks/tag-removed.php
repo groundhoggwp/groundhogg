@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use Groundhogg\Steps\Benchmarks\Base\Tags;
 use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
 use function Groundhogg\get_db;
@@ -29,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-class Tag_Removed extends Benchmark {
+class Tag_Removed extends Tags {
 
 	public function get_help_article() {
 		return 'https://docs.groundhogg.io/docs/builder/benchmarks/tag-removed/';
@@ -68,7 +69,7 @@ class Tag_Removed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-removed.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-removed.png';
 	}
 
 	/**
@@ -101,58 +102,6 @@ class Tag_Removed extends Benchmark {
 		] );
 
 		$this->end_controls_section();
-	}
-
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
-		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step $step
-	 */
-	public function import( $args, $step ) {
-		if ( empty( $args['tags'] ) ) {
-			return;
-		}
-
-		$tags = get_db( 'tags' )->validate( $args['tags'] );
-
-		$this->save_setting( 'tags', $tags );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step $step
-	 *
-	 * @return array
-	 */
-	public function export( $args, $step ) {
-		$args['tags'] = array();
-
-		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
-
-		if ( empty( $tags ) ) {
-			return $args;
-		}
-
-		foreach ( $tags as $tag_id ) {
-
-			$tag = new Tag( $tag_id );
-
-			if ( $tag ) {
-				$args['tags'][] = $tag->get_name();
-			}
-
-		}
-
-		return $args;
 	}
 
 	/**

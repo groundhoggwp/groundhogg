@@ -1,0 +1,159 @@
+body {
+  background: rgba(0, 117, 255, 0.02);
+}
+body #wpcontent {
+  padding: 0;
+}
+
+#app * {
+  box-sizing: border-box;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+#app .gh-reporting-dashboard {
+  position: relative;
+}
+#app .gh-reporting-dashboard .gh-logo {
+  padding: 5px 10px;
+  width: 300px;
+}
+#app .gh-reporting-dashboard-header {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  position: sticky;
+  top: 32px;
+  z-index: 999;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+#app .gh-reporting-dashboard-header .gh-reporting-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+#app .gh-reporting-dashboard-header .gh-reporting-nav-item {
+  color: #102640;
+  font-size: 18px;
+  text-decoration: none;
+  padding: 25px 0;
+  transition: none;
+}
+#app .gh-reporting-dashboard-header .gh-reporting-nav-item.active, #app .gh-reporting-dashboard-header .gh-reporting-nav-item:hover {
+  padding-bottom: 22px;
+  color: #0075ff;
+  border-bottom: 3px solid #0075ff;
+}
+#app .gh-reporting-dashboard-header .gh-reporting-nav-item:focus {
+  outline: none;
+  box-shadow: none;
+}
+#app .gh-reporting-dashboard-header .gh-reporting-nav-item.active {
+  font-weight: 700;
+}
+#app .gh-reporting-dashboard-reports-container {
+  padding: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row {
+  display: flex;
+  gap: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-line-chart-report canvas {
+  min-height: 400px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-quickstat-report[data-url] {
+  cursor: pointer;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-quickstat-report:hover {
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
+  transform: translate3d(0, -1px, 0);
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-header h2.gh-report-name {
+  margin: 0;
+  font-weight: 700;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .big-number {
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .compare-and-range .gh-report-range {
+  color: rgba(16, 38, 64, 0.5);
+  text-align: right;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .compare-and-range .gh-report-prev {
+  display: flex;
+  font-size: 20px;
+  gap: 10px;
+  justify-content: flex-end;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .compare-and-range .gh-report-prev.gh-report-prev-green {
+  color: #9ece38;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .compare-and-range .gh-report-prev.gh-report-prev-red {
+  color: #e91f4f;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report .gh-report-details .compare-and-range .gh-report-prev-arrow {
+  width: 20px;
+  height: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report {
+  padding: 0 0 12px 0;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report .gh-report-header {
+  padding: 20px 20px 0 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table td, #app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th {
+  padding: 8px;
+  font-size: 16px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table td:first-child, #app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th:first-child {
+  padding-left: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table td:last-child, #app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th:last-child {
+  text-align: right;
+  padding-right: 20px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table td a, #app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th a {
+  text-decoration: none;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table td span.row-count, #app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th span.row-count {
+  margin-right: 10px;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table th {
+  font-weight: 700;
+  font-size: 16px;
+  text-align: left;
+}
+#app .gh-reporting-dashboard-reports-container .gh-report-column .gh-report-row .gh-report.gh-table-report table.gh-report-table tr:nth-child(even) {
+  background: rgba(0, 117, 255, 0.02);
+}
+
+/*# sourceMappingURL=reporting-v3.css.map */

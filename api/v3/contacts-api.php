@@ -246,7 +246,6 @@ class Contacts_Api extends Base {
 			]
 		] );
 
-
 	}
 
 	/**
@@ -445,8 +444,8 @@ class Contacts_Api extends Base {
 			return self::ERROR_400( 'email_in_use', _x( 'This email address already belongs to another contact.', 'api', 'groundhogg' ) );
 		}
 
-		if ( isset( $args['optin_status'] ) && absint( $args['optin_status'] ) !== $contact->get_optin_status() ) {
-			$contact->change_marketing_preference( absint( $args['optin_status'] ) );
+		if ( isset( $args['optin_status'] ) && $args['optin_status'] !== $contact->get_optin_status() ) {
+			$contact->change_marketing_preference( $args['optin_status'] );
 			unset( $args['optin_status'] );
 		}
 
@@ -607,10 +606,10 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$notes = $contact->get_all_notes();
+		$notes    = $contact->get_all_notes();
 		$response = [];
 
-		foreach ( $notes as $note ){
+		foreach ( $notes as $note ) {
 			$response[] = $note->get_as_array();
 		}
 

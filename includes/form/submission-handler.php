@@ -324,7 +324,7 @@ class Submission_Handler extends Supports_Errors {
 		}
 
 		if ( get_post_var( 'gdpr_consent' ) ) {
-			$contact->set_gdpr_consent();
+			$contact->set_data_processing_consent();
 		}
 
 		if ( get_post_var( 'terms_agreement' ) ) {
@@ -544,7 +544,7 @@ class Submission_Handler extends Supports_Errors {
 			$this->check_first_and_last()
 		];
 
-		return apply_filters( 'groundhogg/form/submission_handler/is_spam', in_array( true, $checks ) );
+		return apply_filters( 'groundhogg/form/submission_handler/is_spam', in_array( true, $checks ), $this );
 	}
 
 	/**

@@ -98,9 +98,9 @@ class Email extends Base_Object_With_Meta {
 	}
 
 //	public function get_id() {
+
 //		return absint( $this->ID );
 //	}
-
 	public function get_subject_line() {
 		return $this->subject;
 	}
@@ -248,6 +248,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Whether sharing is enabled
+	 *
+	 * @return bool
+	 */
+	public function is_sharing_enabled() {
+		return $this->get_meta( 'sharing' ) === 'enabled';
+	}
+
+	/**
 	 * Whether browser view is enabled
 	 *
 	 * @param $bool
@@ -392,6 +401,10 @@ class Email extends Base_Object_With_Meta {
 		return apply_filters( 'groundhogg/email/pre_header', $pre_header );
 	}
 
+	public function get_blocks() {
+		return $this->get_meta( 'blocks' ) ?: [];
+	}
+
 	/**
 	 * Return email content
 	 * This is called by a filter rather than directly
@@ -401,10 +414,9 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_content( $content = '' ) {
-		$content = do_replacements(
-			$this->get_content(),
-			$this->get_contact()->get_id()
-		);
+
+		$content = Dynamic_Block_Handler::instance()->replace_content( $this->get_content(), $this->get_blocks() );
+		$content = do_replacements( $content, $this->get_contact() );
 
 		// Autop non blocked emails.
 		if ( strpos( $content, 'data-block' ) === false && apply_filters( 'groundhogg/email/should_autop', true ) ) {
@@ -1104,6 +1116,18 @@ class Email extends Base_Object_With_Meta {
 		];
 	}
 
+	/**
+	 * The export URL
+	 *
+	 * @return string
+	 */
+	public function export_url() {
+		return managed_page_url( sprintf( 'emails/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
+	}
+
+	/**
+	 * @return array
+	 */
 	public function get_as_array() {
 
 		$contact = get_contactdata();
@@ -1127,8 +1151,19 @@ class Email extends Base_Object_With_Meta {
 		$live_preview   = $this->build();
 		$edited_preview = $this->get_edited_preview();
 
+		// Convert non block emails to blocks
+		if ( ! $this->get_meta( 'blocks' ) ) {
+			$this->meta['blocks'] = [
+				[
+					'id'      => wp_generate_uuid4(),
+					'type'    => 'text',
+					'content' => wpautop( $this->content ),
+				]
+			];
+		}
+
 		return array_merge( parent::get_as_array(), [
-			'context' => [
+			'context'   => [
 				'from_name'      => $this->get_from_name(),
 				'from_email'     => $this->get_from_email(),
 				'from_user'      => $this->get_from_user(),
@@ -1137,6 +1172,15 @@ class Email extends Base_Object_With_Meta {
 				'avatar'         => get_avatar_url( $this->get_from_user_id(), [
 					'size' => 30
 				] )
+			],
+			'campaigns' => $this->get_related_objects( 'campaign' ),
+			'links'     => [
+				'export' => $this->export_url(),
+				'report' => admin_page_url( 'gh_reporting', [
+					'tab'         => 'v3',
+					'currentPage' => 'emails',
+					'params'      => [ 'email' => $this->get_id() ],
+				] ),
 			]
 		] );
 	}

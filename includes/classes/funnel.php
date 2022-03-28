@@ -62,6 +62,10 @@ class Funnel extends Base_Object_With_Meta {
 		return $this->get_status() === 'active';
 	}
 
+	public function is_sharing_enabled() {
+		return $this->get_meta( 'sharing' ) === 'enabled';
+	}
+
 	/**
 	 * Pause any events in the queue
 	 */
@@ -89,6 +93,30 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Cancel events
+	 */
+	public function cancel_events() {
+		get_db( 'event_queue' )->update( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
+		], [
+			'status' => Event::CANCELLED
+		] );
+	}
+
+	/**
+	 * Delete events outright
+	 */
+	public function delete_waiting_events() {
+		get_db( 'event_queue' )->delete( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
+		] );
+	}
+
+	/**
 	 * Commit all the changes from the previous update.
 	 *
 	 * - Pause all active events for this funnel
@@ -112,6 +140,7 @@ class Funnel extends Base_Object_With_Meta {
 			return false;
 		}
 
+		// Create temp step objects from all the steps based as a big ol' array
 		$edited_steps = array_map( function ( $edited_step ) {
 			return new Temp_Step( $edited_step );
 		}, $edited['steps'] );
@@ -119,19 +148,13 @@ class Funnel extends Base_Object_With_Meta {
 		// Create a copy of the "previous" steps pre-commit
 		$previous_steps = $this->get_steps();
 
-		$loop = [];
-
 		// Loop thru all the edited steps
 		foreach ( $edited_steps as $edited_step ) {
-
-			$loop[] = $edited_step;
 
 			// validate the step settings through the use of the save method from the Funnel_Step()
 			$edited_step->validate();
 
 			if ( $edited_step->has_errors() ) {
-
-				$loop[] = $edited_step->get_errors();
 
 				foreach ( $edited_step->get_errors() as $error ) {
 					$error->add_data( [ 'step' => $edited_step ] );
@@ -154,9 +177,19 @@ class Funnel extends Base_Object_With_Meta {
 			return false;
 		}
 
+		// Old ID => New ID
+		$id_map = [];
+
 		// There were no errors, so we can commit the changes to the funnel
 		foreach ( $edited_steps as $edited_step ) {
+
+			// The temp ID will be overwritten so store it temporarily
+			$temp_id = $edited_step->get_id();
+
 			$edited_step->commit();
+
+			// After committing the ID will be changed from the temp ID to the new real ID
+			$id_map[ $temp_id ] = $edited_step->get_id();
 		}
 
 		// Create and ID list of all the now current steps of this funnel
@@ -176,19 +209,39 @@ class Funnel extends Base_Object_With_Meta {
 			$step_to_delete->delete();
 		}
 
-		// Unpause any active events which haven't been+ deleted as a result of the associated step being deleted
-		$this->unpause_events();
+		// Update temp step Ids in other step settings to real step ids
+		foreach ( $id_map as $old_id => $new_id ) {
+
+			// This will handle only the trivial case of the step being saved in the meta value not in an array.
+			get_db( 'stepmeta' )->update( [
+				'meta_value' => $old_id
+			], [
+				'meta_value' => $new_id
+			] );
+		}
+
+		/**
+		 * Do any clean up actions that extensions can hook into that may need to happen after a funnel is commited
+		 *
+		 * @param $funnel Funnel
+		 * @param $id_map int[]
+		 */
+		do_action( 'groundhogg/funnel/commit/after', $this, $id_map );
 
 		// Update the status of the funnel to active
 		$this->update( [
 			'status' => 'active'
 		] );
 
+		// Update tghe edited state to the current state
 		$this->update_meta( [
 			'edited' => [
 				'steps' => $this->get_steps()
 			]
 		] );
+
+		// Unpause any active events which haven't been+ deleted as a result of the associated step being deleted
+		$this->unpause_events();
 
 		return true;
 	}
@@ -213,9 +266,16 @@ class Funnel extends Base_Object_With_Meta {
 			$this->unpause_events();
 		} // Went from active to inactive
 		else if ( $was_active && ! $this->is_active() ) {
-
-			// Pause any waiting events
-			$this->pause_events();
+			switch ( $this->get_status() ) {
+				case 'archived':
+					// Cancel events outright
+					$this->cancel_events();
+					break;
+				case 'inactive':
+					// Pause any waiting events
+					$this->pause_events();
+					break;
+			}
 		}
 
 		return $updated;
@@ -225,28 +285,12 @@ class Funnel extends Base_Object_With_Meta {
 	 * Get the ID of the conversion step...
 	 * This can be defined, or is assumed the last benchmark in the funnel...
 	 *
-	 * @return int
+	 * @return int[]
 	 */
-	public function get_conversion_step_id() {
-		$conversion_step_id = absint( $this->conversion_step );
-
-		if ( ! $conversion_step_id ) {
-			$steps = $this->get_steps( [
-				'step_group' => Step::BENCHMARK,
-			] );
-
-			$last = array_pop( $steps );
-
-			if ( $last ) {
-
-				return $last->get_id();
-			}
-
-			return 0;
-
-		}
-
-		return $conversion_step_id;
+	public function get_conversion_step_ids() {
+		return array_map( function ( $step ) {
+			return $step->get_id();
+		}, $this->get_steps( [ 'is_conversion' => true ] ) );
 	}
 
 	public function get_first_action_id() {

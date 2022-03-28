@@ -82,17 +82,10 @@ class Send_Email extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/send-email.png';
 	}
 
-	public function admin_scripts() {
-		wp_enqueue_script( 'groundhogg-funnel-email' );
-		wp_localize_script( 'groundhogg-funnel-email', 'EmailStep', array(
-			'edit_email_path'     => admin_url( 'admin.php?page=gh_emails&action=edit' ),
-			'add_email_path'      => admin_url( 'admin.php?page=gh_emails&action=add' ),
-			'save_changes_prompt' => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
-		) );
-	}
+	public function admin_scripts() {}
 
 	/**
 	 * Display the settings
@@ -168,19 +161,9 @@ class Send_Email extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$email_id = absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) );
+		$email_id = absint( $this->get_posted_data( 'email_id' ) );
 
 		$this->save_setting( 'email_id', $email_id );
-
-		$email = new Email( $this->get_setting( 'email_id' ) );
-
-		if ( ! $email->exists() ) {
-			$this->add_error( 'email_dne', __( 'You have not selected an email to send in one of your steps.', 'groundhogg' ) );
-		}
-
-		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
-			$this->add_error( 'email_in_draft_mode', __( 'You still have emails in draft mode! These emails will not be sent and will cause automation to stop.' ) );
-		}
 
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
 	}
@@ -189,7 +172,7 @@ class Send_Email extends Action {
 	 * Process the apply note step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error
 	 */
@@ -198,8 +181,24 @@ class Send_Email extends Action {
 		$email_id = absint( $this->get_setting( 'email_id' ) );
 		$email    = new Email( $email_id );
 
-		if ( ! $email->exists() ) {
-			return new \WP_Error( 'email_dne', 'Invalid email ID provided.' );
+		// No email defined, skip over this step...
+		if ( ! $email ) {
+			return false;
+		}
+
+		if ( $email->is_confirmation_email() ) {
+
+			if ( $this->get_setting( 'skip_if_confirmed' ) && $contact->get_optin_status() === Preferences::CONFIRMED ) {
+
+				/* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
+				do_action( 'groundhogg/step/email/confirmed', $contact->get_id(), Preferences::CONFIRMED, Preferences::CONFIRMED, $event->get_funnel_id() );
+
+				/* Return false to avoid enqueueing the next step. */
+
+				return false;
+
+			}
+
 		}
 
 		return $email->send( $contact, $event );
@@ -213,25 +212,43 @@ class Send_Email extends Action {
 	 */
 	public function import( $args, $step ) {
 
-		if ( ! isset_not_empty( $args, 'content' ) || ! isset_not_empty( $args, 'subject' ) ) {
+		// legacy import
+		if ( isset_not_empty( $args, 'content' ) ) {
+
+			$args = wp_parse_args( $args, [
+				'content'    => '',
+				'subject'    => '',
+				'pre_header' => '',
+				'title'      => '',
+				'from_user'  => get_current_user_id(),
+				'author'     => get_current_user_id()
+			] );
+
+			$email_id = get_db( 'emails' )->add( $args );
+
+			if ( $email_id ) {
+				$step->update_meta( 'email_id', $email_id );
+			}
+
 			return;
 		}
 
-		if ( ! isset_not_empty( $args, 'content' ) ) {
-			$args['pre_header'] = '';
-		}
+		// New import
+		if ( isset_not_empty( $args, 'email' ) ) {
 
-		$email_id = Plugin::$instance->dbs->get_db( 'emails' )->add( [
-			'content'    => search_and_replace_domain( $args['content'] ),
-			'subject'    => $args['subject'],
-			'pre_header' => $args['pre_header'],
-			'title'      => get_array_var( $args, 'title', $args['subject'] ),
-			'from_user'  => get_current_user_id(),
-			'author'     => get_current_user_id()
-		] );
+			$email = new Email();
 
-		if ( $email_id ) {
-			$step->update_meta( 'email_id', $email_id );
+			// override the from user and author as if the is coming
+			// from a different site we don't want to use those values
+			$data = array_merge( $args['email']['data'], [
+				'from_user' => get_current_user_id(),
+				'author'    => get_current_user_id()
+			] );
+
+			$email->create( $data );
+			$email->update_meta( $args['email']['meta'] );
+
+			$step->update_meta( 'email_id', $email->get_id() );
 		}
 	}
 
@@ -253,10 +270,7 @@ class Send_Email extends Action {
 			return $args;
 		}
 
-		$args['subject']    = $email->get_subject_line();
-		$args['title']      = $email->get_title();
-		$args['pre_header'] = $email->get_pre_header();
-		$args['content']    = $email->get_content();
+		$args['email'] = $email;
 
 		return $args;
 	}

@@ -3,7 +3,6 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Contact;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;

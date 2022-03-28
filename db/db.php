@@ -152,9 +152,6 @@ abstract class DB {
 		return $this->table_name;
 	}
 
-	protected function add_additional_actions() {
-	}
-
 	/**
 	 * Check if the site is global multisite enabled
 	 *
@@ -211,6 +208,36 @@ abstract class DB {
 		global $wpdb;
 
 		return $wpdb->collate;
+	}
+
+	/**
+	 * Option to add additional actions following construct.
+	 */
+	protected function add_additional_actions() {
+
+		// If contact_id is supported here, we must update it when contacts are merged.
+		if ( array_key_exists( 'contact_id', $this->get_columns() ) ){
+			add_action( 'groundhogg/contact/merge', [ $this, 'contact_merged' ], 10, 2 );
+		}
+	}
+
+	/**
+	 * Change other's contact_id to primary's contact_id
+	 *
+	 * @param $primary Contact
+	 * @param $other Contact
+	 */
+	public function contact_merged( $primary, $other ){
+
+		if ( ! array_key_exists( 'contact_id', $this->get_columns() ) ){
+			return;
+		}
+
+		$this->update([
+			'contact_id' => $other->get_id()
+		], [
+			'contact_id' => $primary->get_id()
+		]);
 	}
 
 	/**

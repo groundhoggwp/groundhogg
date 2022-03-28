@@ -3751,7 +3751,7 @@ function parse_inline_styles( $style ) {
 
 		$rule              = explode( ':', $bit );
 		$attribute         = sanitize_key( $rule[0] );
-		$value             = trim( $rule[1] );
+		$value             = trim( get_array_var( $rule, 1 ) );
 		$css[ $attribute ] = $value;
 	}
 
@@ -4883,10 +4883,10 @@ function track_live_activity( $type, $details = [] ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string  $type    string, an activity identifier
- * @param array   $args    the details for the activity
- * @param array   $details details about that activity
- * @param Contact $contact the contact to track
+ * @param string             $type    string, an activity identifier
+ * @param array              $args    the details for the activity
+ * @param array              $details details about that activity
+ * @param Contact|string|int $contact the contact to track
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
@@ -5513,6 +5513,12 @@ function array_map_to_class( &$array, $class ) {
 	return $array;
 }
 
+function class_list_to_ids( $array ) {
+	return array_map( function ( $c ) {
+		return $c->get_id();
+	}, $array );
+}
+
 /**
  * Get objects as ID list
  *
@@ -5729,6 +5735,9 @@ function is_template_site() {
  * Enqueue any step type registration assets
  */
 function enqueue_step_type_assets() {
+
+	wp_enqueue_script( 'groundhogg-funnel-step-types' );
+
 	do_action( 'groundhogg_enqueue_step_type_assets' );
 }
 
@@ -6047,6 +6056,15 @@ function get_filters_from_old_query_vars( $query = [] ) {
  */
 function is_admin_bar_widget_disabled() {
 	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
+}
+
+/**
+ * Whether the mobile phone number should be treated as unique
+ *
+ * @return bool
+ */
+function is_mobile_phone_unique() {
+	return apply_filters( 'groundhogg/is_mobile_phone_unique', is_option_enabled( 'gh_mobile_is_unique' ) );
 }
 
 /**

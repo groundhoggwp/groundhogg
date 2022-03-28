@@ -9,7 +9,9 @@ use Groundhogg\Reports;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -30,6 +32,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Adds additional actions.
 	 */
 	protected function add_additional_actions() {
+		add_filter( 'screen_options_show_screen', '__return_false' );
 	}
 
 	/**
@@ -73,6 +76,15 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
+
+		if ( $this->get_current_tab() === 'v3' ) {
+			wp_enqueue_script( 'groundhogg-admin-reporting-v3' );
+			wp_enqueue_style( 'groundhogg-admin-reporting-v3' );
+			wp_localize_script('groundhogg-admin-reporting-v3', 'GroundhoggReporting', get_request_query() );
+
+			return;
+		}
+
 		wp_enqueue_style( 'groundhogg-admin-reporting' );
 		wp_enqueue_style( 'groundhogg-admin-loader' );
 		wp_enqueue_style( 'baremetrics-calendar' );
@@ -98,6 +110,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			'reports' => $this->get_reports_per_tab(),
 			'dates'   => $dates
 		] );
+
 	}
 
 	protected function get_reports_per_tab() {
@@ -261,6 +274,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'name' => __( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
 			],
+			[
+				'name' => __( 'Version 3.0', 'groundhogg' ),
+				'slug' => 'v3'
+			],
 		];
 
 		// Add the custom registered tabs...
@@ -279,6 +296,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 	}
 
 	public function page() {
+
+		if ( $this->get_current_tab() === 'v3' ) {
+			include __DIR__ . '/views/v3.php';
+
+			return;
+		}
+
 
 		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );

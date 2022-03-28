@@ -449,6 +449,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Whether this step is an entry point in the funnel
+	 *
+	 * @return bool
+	 */
+	public function is_entry(){
+		return (bool) $this->is_entry;
+	}
+
+	/**
 	 * Whether the step starts a funnel
 	 *
 	 * @return bool
@@ -458,7 +467,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_order() === 1 ) {
+		if ( $this->get_order() === 1 || $this->is_entry() ) {
 			return true;
 		}
 
@@ -526,29 +535,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$result = apply_filters( 'groundhogg/steps/run/result', $result, $this, $contact, $event );
 
 		return $result;
-	}
-
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function sortable_item() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
-		} else {
-			do_action( "groundhogg/steps/error/sortable", $this );
-		}
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function html() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html", $this );
-		}
 	}
 
 	/**
@@ -636,30 +622,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return false;
 	}
 
-	/**
-	 * Get the HTML of the step and return it.
-	 *
-	 * @return false|string
-	 */
-	public function __toString() {
-		ob_start();
-
-		$this->html();
-
-		$html = ob_get_clean();
-
-		return $html;
-	}
-
-	/**
-	 * Return whether or not the current action can run.
-	 * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
-	 *
-	 * Always return true if not a multisite or multisite global is not enabled
-	 * otherwise compare the current blog ID to the blg ID associated with the step.
-	 *
-	 * @deprecated
-	 */
 	public function can_run() {
 		return true;
 	}

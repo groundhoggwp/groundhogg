@@ -1,0 +1,172 @@
+body {
+  background: rgba(0, 117, 255, 0.02);
+}
+body #wpcontent {
+  padding: 0;
+}
+body .test-email-address-wrap {
+  display: flex;
+  gap: 10px;
+}
+body .test-email-address-wrap #initiate-test {
+  gap: 0;
+  display: flex;
+}
+body iframe#preview.mobile {
+  height: 600px;
+  width: 350px;
+}
+body iframe#preview.desktop {
+  height: 600px;
+  width: 800px;
+}
+
+#wpfooter {
+  display: none;
+}
+
+#email-editor {
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+}
+#email-editor input[type=text],
+#email-editor select {
+  max-width: 100%;
+}
+#email-editor .email-editor-p {
+  line-height: 1.5;
+  margin: 1em 0;
+}
+#email-editor-header {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  padding: 8px 12px;
+  min-height: 50px;
+  border-radius: 0;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+#email-editor-header .title-wrap h1 {
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 1.6em;
+  white-space: nowrap;
+}
+#email-editor-header .title-wrap h1 .sep,
+#email-editor-header .title-wrap h1 #email-title {
+  font-weight: 400;
+  cursor: pointer;
+}
+#email-editor-header .title-wrap h1 .dashicons {
+  color: rgba(16, 38, 64, 0.3);
+}
+#email-editor-header .title-wrap h1 #email-title-edit {
+  width: 400px;
+  font-size: 18px;
+}
+#email-editor-header .actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+#email-editor-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+#email-editor-sidebar {
+  flex-basis: 300px;
+  flex-shrink: 0;
+}
+#email-editor-content {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  flex: 1;
+}
+#email-editor-controls {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+}
+#email-editor-sidebar label {
+  display: block;
+  padding-bottom: 0.382rem;
+}
+#email-editor-sidebar-controls button {
+  flex-basis: 40px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+}
+#email-editor-sidebar-controls button:first-child {
+  flex-grow: 1;
+}
+#email-editor-sidebar-options {
+  display: flex;
+  gap: 20px;
+}
+#email-editor-sidebar-message_type {
+  flex-grow: 1;
+}
+#email-editor-advanced {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  margin-top: 20px;
+}
+#email-editor .inline-label {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  align-items: center;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+#email-editor .inline-label:focus-within {
+  border-color: #0075ff;
+}
+#email-editor .inline-label label {
+  font-weight: 500;
+  font-size: 18px;
+}
+#email-editor .inline-label .input-wrap {
+  width: 100%;
+}
+#email-editor .inline-label .input-wrap button {
+  background: none;
+  border: none;
+  opacity: 0.5;
+}
+#email-editor .inline-label .input-wrap button:hover, #email-editor .inline-label .input-wrap button:focus {
+  opacity: 1;
+}
+#email-editor .inline-label .input-wrap input {
+  width: 100%;
+  box-shadow: none;
+  border: none;
+  font-size: 18px;
+  outline: 0;
+  padding: 0;
+}
+
+/*# sourceMappingURL=email-editor.css.map */

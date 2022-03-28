@@ -39,6 +39,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 		}
 
 		$list = [];
+
 		foreach ( $funnels as $funnel ) {
 			$list [] = [
 				'label' => $funnel->title,
@@ -46,7 +47,6 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 				'url'   => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->ID ] ),
 			];
 		}
-
 
 		$list = $this->normalize_data( $list );
 
@@ -77,23 +77,18 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-
-		return [
-			'label' => $item_data ['label'],
-			'data'  => $item_data ['data'],
-			'url'   => $item_data ['url'],
-		];
+		return $item_data;
 	}
 
 
 	protected function get_conversion_rate( $funnel_id ) {
 
 		$funnel          = new Funnel( $funnel_id );
-		$conversion_step = $funnel->get_conversion_step_id();
+		$conversion_step = $funnel->get_conversion_step_ids();
 
 		$where = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
+			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
@@ -119,6 +114,32 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		return percentage( $num_events_completed, $num_of_conversions );
 
+	}
+
+	public function get_data_3_0() {
+
+		// Get list of funnels and plot it conversion rate
+		// Only include active funnels
+		$funnels = get_db( 'funnels' )->query( [
+			'status' => 'active'
+		] );
+
+		if ( empty( $funnels ) ) {
+			return [];
+		}
+
+		$rows = [];
+
+		foreach ( $funnels as $funnel ) {
+			$rows[] = [
+				'funnel' => $funnel,
+				'cvr'    => $this->get_conversion_rate( $funnel->ID ),
+			];
+		}
+
+		return [
+			'rows' => $rows
+		];
 	}
 
 

@@ -7,6 +7,8 @@ use Groundhogg\Base_Object;
 use Groundhogg\Classes\Note;
 use function Groundhogg\create_object_from_type;
 
+use Groundhogg\Contact;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
