@@ -2377,6 +2377,10 @@ ${ afterProgress() }`,
     return `<b>${ text }</b>`
   }
 
+  const sanitizeKey = (label) => {
+    return label.toLowerCase().replace(/[^a-z0-9]/g, '_')
+  }
+
   Groundhogg.element = {
     icons,
     ...Elements,
@@ -2430,6 +2434,7 @@ ${ afterProgress() }`,
     spinner,
     el,
     isNumeric,
+    sanitizeKey
   }
 
 } )(jQuery)

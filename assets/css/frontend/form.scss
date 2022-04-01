@@ -1,0 +1,34 @@
+.gh-form-wrapper * {
+    box-sizing: border-box;
+}
+
+.gh-message-wrapper{
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+
+.gh-form-errors-wrapper{
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.gh-form-success-wrapper{
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.gh-form-warning-wrapper{
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+ul.gh-form-errors{
+    padding-left: 20px;
+    margin: 0;
+}
+

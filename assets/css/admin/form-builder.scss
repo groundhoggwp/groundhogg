@@ -63,11 +63,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         background: #FFFFFF;
         border-radius: 3px;
         border: 1px solid rgba(16, 38, 64, 0.15);
-        //overflow: hidden;
+        overflow: hidden;
 
         .settings {
           box-sizing: border-box;
           padding: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
 
           .row {
             display: flex;
@@ -181,7 +184,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   position: relative;
   border: 1px solid #8c8f94;
-  border-right-width: 0;
+  //border-right-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -190,19 +193,16 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   cursor: pointer;
 
-  .show-on-hover {
+  .gh-panel {
     display: none;
   }
 
-  &:hover {
-
-    background-color: $primary-dark-15;
-
-    .show-on-hover {
-      display: flex;
+  &.show {
+    .gh-panel {
+      display: block;
       position: absolute;
       top: 0;
-      left: 0;
+      right: 0;
       background-color: #FFFFFF;
       padding: 5px;
     }

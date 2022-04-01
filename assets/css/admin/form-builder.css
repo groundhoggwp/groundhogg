@@ -31,10 +31,14 @@
   background: #FFFFFF;
   border-radius: 3px;
   border: 1px solid rgba(16, 38, 64, 0.15);
+  overflow: hidden;
 }
 #form-builder #fields-editor #form-fields .form-field .settings, #form-builder #fields-editor #button-settings .form-field .settings {
   box-sizing: border-box;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 #form-builder #fields-editor #form-fields .form-field .settings .row, #form-builder #fields-editor #button-settings .form-field .settings .row {
   display: flex;
@@ -126,24 +130,20 @@
 .inline-tag-picker {
   position: relative;
   border: 1px solid #8c8f94;
-  border-right-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 5px;
   cursor: pointer;
 }
-.inline-tag-picker .show-on-hover {
+.inline-tag-picker .gh-panel {
   display: none;
 }
-.inline-tag-picker:hover {
-  background-color: rgba(16, 38, 64, 0.15);
-}
-.inline-tag-picker:hover .show-on-hover {
-  display: flex;
+.inline-tag-picker.show .gh-panel {
+  display: block;
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   background-color: #FFFFFF;
   padding: 5px;
 }
