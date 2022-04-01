@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.5
+Stable tag: 2.6.2.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.2.6 (2022-04-01) =
+* FIXED Passing an empty string to the add_tag method would apply the most recently created tag
+* FIXED download_file capability conflict with woocommerce
 
 = 2.6.2.5 (2022-03-26) =
 * FIXED Missing view_emails cap for admins

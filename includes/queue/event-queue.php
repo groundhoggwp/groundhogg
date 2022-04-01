@@ -191,9 +191,9 @@ class Event_Queue extends Supports_Errors {
 	public function run_queue() {
 
 		// Don't run during wp-cron.php if gh-cron.php is working
-		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
-			return 0;
-		}
+//		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
+//			return 0;
+//		}
 
 		// Let's make sure we are not over doing it.
 		if ( ! $this->is_enabled() ) {

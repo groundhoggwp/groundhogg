@@ -6176,9 +6176,18 @@ function array_map_to_method( $array, $method ) {
  */
 function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 
+	// Some falsy value? Return false
+	if ( empty( $maybe_tags ) ) {
+		return [];
+	}
+
 	if ( is_array( $maybe_tags ) ) {
 
 		$tags = array_map( function ( $maybe_tag ) use ( $create ) {
+
+            if ( empty( $maybe_tag) ) {
+                return false;
+            }
 
 			if ( is_a( $maybe_tag, Tag::class ) ) {
 				return $maybe_tag;
@@ -6225,7 +6234,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 	}
 
 	$tags = array_filter( $tags, function ( $tag ) {
-		return $tag->exists();
+		return is_a( $tag, Tag::class ) && $tag->exists();
 	} );
 
 	switch ( $as ) {

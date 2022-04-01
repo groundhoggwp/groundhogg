@@ -7,6 +7,8 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\get_db;
+use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -94,7 +96,7 @@ class Remove_Tag extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
+		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
 	}
 
 	/**
@@ -120,7 +122,7 @@ class Remove_Tag extends Action {
 			return;
 		}
 
-		$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $args['tags'] );
+		$tags = validate_tags( $args['tags'] );
 
 		$this->save_setting( 'tags', $tags );
 	}
@@ -142,7 +144,7 @@ class Remove_Tag extends Action {
 
 		foreach ( $tags as $tag_id ) {
 
-			$tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $tag_id );
+			$tag = get_db( 'tags' )->get( $tag_id );
 
 			if ( $tag ) {
 				$args['tags'][] = $tag->tag_name;

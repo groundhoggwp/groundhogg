@@ -184,9 +184,16 @@ class Main_Roles extends Roles {
 				break;
 			case 'download_file':
 
+				$file_path = $args[0];
+
+				// Compat for WooCommerce usage of download file
+				if ( ! is_string( $file_path ) ){
+					return $caps;
+				}
+
 				$caps = [];
 
-				$file_path = wp_normalize_path( $args[0] );
+				$file_path = wp_normalize_path( $file_path );
 
 				$path = explode( '/', $file_path );
 
