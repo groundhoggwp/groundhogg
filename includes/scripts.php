@@ -378,6 +378,7 @@ class Scripts {
 				],
 				'api'              => [
 					'routes' => [
+						'posts' => rest_url( 'wp/v2/posts' ),
 						'v3' => [
 							'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
 							'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),

@@ -636,6 +636,9 @@
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'
     }),
+    posts: ObjectStore(Groundhogg.api.routes.posts, {
+      primaryKey: 'id'
+    }),
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {
