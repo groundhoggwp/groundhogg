@@ -232,6 +232,9 @@ class Contacts_Page extends Admin_Page {
 						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
 					],
 				] );
+
+                do_action( 'groundhogg/admin/contacts/edit/scripts' );
+
 				break;
 			case 'view':
 

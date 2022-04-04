@@ -450,7 +450,7 @@
 
   const ActivityTimeline = {
 
-    addType: (type, opts) => {
+    addType (type, opts) {
       this.types[type] = {
         icon: '',
         render: () => '',
@@ -462,6 +462,7 @@
     types: {
       wp_fusion: {
         icon: icons.wp_fusion,
+        iconFramed: false,
         render: ({ data, meta }) => {
           const { event_name, event_value } = meta
           return `${ event_name }: <code>${ event_value }</code>`
@@ -701,7 +702,7 @@
       return `
           <li class="activity-item ${ activity.data.activity_type } activity"
               tabindex="0">
-              <div class="activity-icon ${ activity.data.activity_type }">
+              <div class="activity-icon ${ activity.data.activity_type } ${type.iconFramed === false ? 'no-frame' : ''}">
                   ${ type.icon }
               </div>
               <div class="activity-rendered gh-panel">
