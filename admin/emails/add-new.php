@@ -11,7 +11,7 @@ use function Groundhogg\managed_page_url;
 
 add_action( 'admin_print_footer_scripts', function () {
 	?>
-	<style>
+    <style>
         .email-container ul {
             list-style-type: disc;
             margin-left: 2em;
@@ -32,7 +32,7 @@ add_action( 'admin_print_footer_scripts', function () {
             padding: 0;
             margin: 0.83em 0 0.83em 0;
         }
-	</style><?php
+    </style><?php
 } );
 
 $tabs = [
@@ -59,30 +59,33 @@ switch ( $tab ):
 
 	case 'my-templates':
 		?>
-		<form method="post" id="poststuff">
+    <p></p>
+        <form method="post" id="">
 			<?php wp_nonce_field( 'add' ); ?>
-			<div class="post-box-grid">
+            <div class="post-box-grid">
 				<?php
 				foreach ( $custom_templates as $id => $email ):
 					$email = new Email( absint( $email->ID ) ); ?>
-					<div class="postbox">
-						<h2 class="hndle"><?php esc_html_e( $email->get_title() ); ?></h2>
-						<div class="inside">
-							<p><?php echo __( 'Subject: ', 'groundhogg-pro' ) . $email->get_subject_line(); ?></p>
-							<p><?php echo __( 'Pre-Header: ', 'groundhogg-pro' ) . $email->get_pre_header(); ?></p>
-							<iframe class="email-container" style="margin-bottom: 10px;border: 1px solid #e5e5e5;"
-							        width="100%" height="500"
-							        src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-							<button class="choose-template button-primary" name="email_id"
-							        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg-pro' ); ?></button>
-							<a class="button-secondary"
-							   href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email->get_id() ); ?>"><?php _e( 'Edit Template', 'groundhogg-pro' ); ?></a>
-						</div>
-					</div>
+                    <div class="gh-panel">
+                        <div class="gh-panel-header">
+                            <h2 class="hndle"><?php esc_html_e( $email->get_title() ); ?></h2>
+                        </div>
+                        <div class="inside">
+                            <p><?php echo __( 'Subject: ', 'groundhogg-pro' ) . $email->get_subject_line(); ?></p>
+                            <p><?php echo __( 'Pre-Header: ', 'groundhogg-pro' ) . $email->get_pre_header(); ?></p>
+                            <iframe class="email-container" style="margin-bottom: 10px;border: 1px solid #e5e5e5;"
+                                    width="100%" height="500"
+                                    src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+                            <button class="choose-template gh-button primary" name="email_id"
+                                    value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg-pro' ); ?></button>
+                            <a class="gh-button secondary"
+                               href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email->get_id() ); ?>"><?php _e( 'Edit Template', 'groundhogg-pro' ); ?></a>
+                        </div>
+                    </div>
 				<?php endforeach;
 				?>
-			</div>
-		</form>
+            </div>
+        </form>
 		<?php
 
 		break;
@@ -90,88 +93,96 @@ switch ( $tab ):
 	case 'my-emails':
 
 		?>
-		<style>
+        <style>
             .wp-filter-search {
                 box-sizing: border-box;
                 width: 100%;
                 font-size: 16px;
                 padding: 6px;
             }
-		</style>
-		<p></p>
-		<div class="postbox">
-			<div class="inside">
-				<p style="float: left"><?php _e( 'Search your previous emails and use them as a starting point.', 'groundhogg-pro' ); ?></p>
-				<input type="text" id="search_emails"
-				       placeholder="<?php esc_attr_e( 'Type in a search term like "Special"...', 'groundhogg-pro' ); ?>"
-				       class="wp-filter-search"/>
-			</div>
-		</div>
-		<div style="text-align: center;" id="spinner">
-			<span class="spinner" style="visibility: visible;float: none;"></span>
-		</div>
-		<form method="post" id="poststuff">
+        </style>
+        <p></p>
+        <div class="gh-panel">
+            <div class="inside">
+                <p style="float: left"><?php _e( 'Search your previous emails and use them as a starting point.', 'groundhogg-pro' ); ?></p>
+                <input type="text" id="search_emails"
+                       placeholder="<?php esc_attr_e( 'Type in a search term like "Special"...', 'groundhogg-pro' ); ?>"
+                       class="wp-filter-search"/>
+            </div>
+        </div>
+        <div style="text-align: center;" id="spinner">
+            <?php ?>
+        </div>
+        <p></p>
+        <form method="post" id="">
 			<?php wp_nonce_field( 'add' ); ?>
-			<div id="emails" class="post-box-grid">
-				<!-- Only retrieve previous 20 emails.. -->
+            <div id="emails" class="post-box-grid">
+                <!-- Only retrieve previous 20 emails.. -->
 				<?php
 				$emails = get_db( 'emails' )->query( [ 'limit' => 10 ] );
 				foreach ( $emails as $email ):
 					$email = new Email( absint( $email->ID ) ); ?>
-					<div class="postbox">
-						<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
-						<div class="inside">
-							<p><?php echo __( 'Subject: ', 'groundhogg-pro' ) . $email->get_subject_line(); ?></p>
-							<p><?php echo __( 'Pre-Header: ', 'groundhogg-pro' ) . $email->get_pre_header(); ?></p>
-							<iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;"
-							        width="100%"
-							        height="500"
-							        src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-							<button class="choose-template button-primary" name="email_id"
-							        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg-pro' ); ?></button>
-						</div>
-					</div>
+                    <div class="gh-panel">
+                        <div class="gh-panel-header">
+                            <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+                        </div>
+                        <div class="inside">
+                            <p><?php echo __( 'Subject: ', 'groundhogg-pro' ) . $email->get_subject_line(); ?></p>
+                            <p><?php echo __( 'Pre-Header: ', 'groundhogg-pro' ) . $email->get_pre_header(); ?></p>
+                            <iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;"
+                                    width="100%"
+                                    height="500"
+                                    src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+                            <button class="choose-template gh-button primary" name="email_id"
+                                    value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg-pro' ); ?></button>
+                        </div>
+                    </div>
 				<?php endforeach; ?>
-			</div>
-		</form>
-		<script type="text/javascript">
-          (function ($) {
+            </div>
+        </form>
+        <script type="text/javascript">
+          (  ($) => {
 
-            //setup before functions
-            var typingTimer                //timer identifier
-            var doneTypingInterval = 500  //time in ms, 5 second for example
-            var $search = $('#search_emails')
-            var $downloads = $('#emails')
-            var $spinner = $('#spinner')
+            $(() => {
+              //setup before functions
+              var typingTimer                //timer identifier
+              var doneTypingInterval = 500  //time in ms, 5 second for example
+              var $search = $('#search_emails')
+              var $downloads = $('#emails')
+              var $spinner = $('#spinner')
 
-            $spinner.hide()
+              $spinner.html(Groundhogg.element.spinner())
 
-            $search.keyup(function () {
-              clearTimeout(typingTimer)
-              typingTimer = setTimeout(ajaxCall, doneTypingInterval)
-            })
+              $spinner.hide()
 
-            $search.keydown(function () {
-              clearTimeout(typingTimer)
-            })
-
-            function ajaxCall () {
-              $downloads.hide()
-              $spinner.show()
-              var ajaxCall = $.ajax({
-                type: 'post',
-                url: ajaxurl,
-                dataType: 'json',
-                data: { action: 'get_my_emails_search_results', s: $('#search_emails').val() },
-                success: function (response) {
-                  $spinner.hide()
-                  $downloads.show()
-                  $downloads.html(response.html)
-                }
+              $search.keyup(function () {
+                clearTimeout(typingTimer)
+                typingTimer = setTimeout(ajaxCall, doneTypingInterval)
               })
-            }
-          })(jQuery)
-		</script>
+
+              $search.keydown(function () {
+                clearTimeout(typingTimer)
+              })
+
+              function ajaxCall () {
+                $downloads.hide()
+                $spinner.show()
+                var ajaxCall = $.ajax({
+                  type: 'post',
+                  url: ajaxurl,
+                  dataType: 'json',
+                  data: { action: 'get_my_emails_search_results', s: $('#search_emails').val() },
+                  success: function (response) {
+                    $spinner.hide()
+                    $downloads.show()
+                    $downloads.html(response.html)
+                  },
+                })
+              }
+            })
+
+          } )(jQuery)
+        </script>
 		<?php
 		break;
 
