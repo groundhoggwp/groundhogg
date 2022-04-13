@@ -23,6 +23,7 @@
     confirmationModal,
     adminPageURL,
     moreMenu,
+    setFrameContent,
     loadingDots,
     spinner,
     dialog,
@@ -46,6 +47,8 @@
     page_visits: PageVisitsStore,
     submissions: SubmissionsStore,
   } = Groundhogg.stores
+
+  const { emailPicker } = Groundhogg.pickers
 
   const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
   const {
@@ -264,7 +267,7 @@
           cap: 'delete_contacts',
           text: `<span class="gh-text danger">${ __('Delete') }</span>`,
         },
-      ],
+      ].filter( i => userHasCap( i.cap ) ),
       onSelect: k => {
         switch (k) {
           case 'merge':
@@ -324,13 +327,130 @@
       },
     }))
 
-    $('#action-send-email').on('click', sendEmail)
+    $('#action-send-email').on('click', e => {
+
+      moreMenu(e.currentTarget, {
+        items: [
+          {
+            key: 'compose',
+            text: __('Compose', 'groundhogg'),
+          },
+          {
+            key: 'template',
+            text: __('Use template', 'groundhogg'),
+          },
+        ],
+        onSelect: k => {
+          switch (k) {
+
+            case 'compose':
+              sendEmail()
+              break
+            case 'template':
+
+              let emailId
+
+              const preview = () => {
+
+                // language=HTML
+                return `
+                    <div class="gh-row">
+                        <div class="gh-col">
+                            <iframe id="select-email-preview" class="hidden"></iframe>
+                        </div>
+                    </div>`
+              }
+
+              const showFrame = () => {
+                if (emailId) {
+                  let $frm = $('#select-email-preview')
+                  setFrameContent($frm[0], EmailsStore.get(emailId).context.built)
+                  $frm.removeClass('hidden')
+                }
+              }
+
+              modal({
+                width: 500,
+                // language=HTML
+                content:
+                  `
+                      <h2>${ __('Select an email template to send', 'groundhogg') }</h2>
+                      <div class="gh-rows-and-columns">
+                          <div class="gh-row">
+                              <div class="gh-col">
+                                  ${ select({
+                                              name: 'email',
+                                              id: `select-email`,
+                                          }, EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
+                                          emailId) }
+                              </div>
+                          </div>
+                          ${ preview() }
+                          <div class="gh-row">
+                              <div class="gh-col">
+                                  <button id="send-email-template" class="gh-button primary" disabled>
+                                      ${ __('Send Email', 'groundhogg') }
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  `,
+                onOpen: ({ close }) => {
+
+                  let $btn = $('#send-email-template')
+
+                  emailPicker(`#select-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
+                    status: 'ready',
+                  }, {
+                    placeholder: __('Select an email to send...', 'groundhogg'),
+                  }).on('change', ({ target }) => {
+
+                    emailId = parseInt(target.value)
+                    showFrame()
+
+                    $btn.prop('disabled', false)
+
+                  })
+
+                  $btn.on('click', e => {
+
+                    $btn.prop('disabled', true)
+                    let { stop } = loadingDots(e.currentTarget)
+
+                    post(`${ EmailsStore.route }/${ emailId }/send`, {
+                      to: getContact().ID,
+                    }).then(r => {
+                      dialog({
+                        message: __('Email sent!'),
+                      })
+                      stop()
+                      close()
+                    }).catch(e => {
+                      stop()
+                      $btn.prop( 'disabled', false )
+                      dialog({
+                        type: 'error',
+                        message: e.message
+                      })
+                    })
+
+                  })
+                },
+              })
+
+              break
+
+          }
+        },
+      })
+
+    })
 
   }
 
   const ActivityTimeline = {
 
-    addType: (type, opts) => {
+    addType (type, opts) {
       this.types[type] = {
         icon: '',
         render: () => '',
@@ -342,6 +462,7 @@
     types: {
       wp_fusion: {
         icon: icons.wp_fusion,
+        iconFramed: false,
         render: ({ data, meta }) => {
           const { event_name, event_value } = meta
           return `${ event_name }: <code>${ event_value }</code>`
@@ -370,6 +491,13 @@
         preload: ({ email }) => {
           EmailsStore.itemsFetched([email])
         },
+      },
+      composed_email_sent: {
+        icon: icons.open_email,
+        render: ({ meta, sent_by }) => {
+          return sprintf(__('%s sent an email with subject %s', 'groundhogg'), bold(sent_by), bold(meta.subject))
+        },
+        preload: () => {}
       },
       email_link_click: {
         icon: icons.link_click,
@@ -531,6 +659,38 @@
                         </button>
                     </div>
                 </li>`
+          case 3:
+            // language=HTML
+            return `
+                <li class="activity-item">
+                    <div class="activity-icon broadcast">${ icons.email }
+                    </div>
+                    <div class="activity-rendered gh-panel space-between">
+                        <div>
+                            <div class="activity-info">
+                                <span>${ sprintf(pending ? __(
+                'Will receive email: %s',
+                'groundhogg') : __(
+                'Received email: %s', 'groundhogg'),
+              bold(activity.email.email.data.title)) }</span>
+                            </div>
+                            <div class="diff-time">
+                                ${ sprintf(pending ? ( Math.floor(
+                Date.now() / 1000) > activity.time ? __(
+                'Running now...', 'groundhogg') : ( __(
+                'Runs in %s', 'groundhogg') ) ) : __(
+                '%s ago', 'groundhogg'),
+              activity.locale.diff_time) }
+                            </div>
+                        </div>
+                        <button class="gh-button secondary icon text event-${ pending
+              ? 'queue-'
+              : '' }more"
+                                data-event="${ activity.ID }">
+                            ${ icons.verticalDots }
+                        </button>
+                    </div>
+                </li>`
         }
 
         return ''
@@ -542,7 +702,7 @@
       return `
           <li class="activity-item ${ activity.data.activity_type } activity"
               tabindex="0">
-              <div class="activity-icon ${ activity.data.activity_type }">
+              <div class="activity-icon ${ activity.data.activity_type } ${type.iconFramed === false ? 'no-frame' : ''}">
                   ${ type.icon }
               </div>
               <div class="activity-rendered gh-panel">
@@ -674,40 +834,41 @@
         return
       }
 
-      let funnelIds = activities.filter(
-        a => a.type === 'event' && a.data.event_type == 1).reduce((arr, e) => {
+      let funnelIds = activities.reduce((arr, e) => {
 
-        if (!arr.includes(e.data.funnel_id)) {
-          arr.push(e.data.funnel_id)
+        let funnelId = parseInt( e.data?.funnel_id || e.form?.data?.funnel_id )
+
+        if ( funnelId > 1 ){
+          if (!arr.includes(funnelId)) {
+            arr.push(funnelId)
+          }
         }
 
         return arr
       }, [])
 
+
       let promises = [
+        // Preload activities
         ...activities.filter(a => a.type === 'activity').
           map(a => this.types[a.data.activity_type].preload(a)),
-        // Funnel Events
-        // ...activities
-        // .filter(a => a.type === 'event' && a.data.event_type == 1)
-        // .map(a => StepTypes.getType(a.step.step_type).preload(a.step)),
-        // Funnels
-        !FunnelsStore.hasItems(funnelIds) ? FunnelsStore.fetchItems({
+
+        // events with funnel IDs
+        funnelIds.length && !FunnelsStore.hasItems(funnelIds) ? FunnelsStore.fetchItems({
           ID: funnelIds,
         }) : null,
+
         // Broadcast Events
         ...activities.filter(a => a.type === 'event' && a.data.event_type == 2).
           map(a => BroadcastsStore.itemsFetched([a.broadcast])),
-        // Submission Events
-        FunnelsStore.fetchItems({
-          include: activities.filter(a => a.type === 'submission').
-            map(a => a.form.data.funnel_id),
-        }),
       ]
 
       Promise.all(promises).then(() => {
         $el.html(this.render(activities))
         this.onMount()
+      }).catch( e => {
+        // Something went wrong
+        console.log(e)
       })
 
     },
@@ -830,6 +991,8 @@
                 order,
               }),
             ]).then(() => {
+              loadTimeline()
+            }).catch( e => {
               loadTimeline()
             })
           }
@@ -1053,11 +1216,11 @@
                     key: 'download',
                     text: __('Download'),
                   },
-                  {
+                  userHasCap('delete_files' ) ? {
                     key: 'delete',
                     text: `<span class="gh-text danger">${ __(
                       'Delete') }</span>`,
-                  },
+                  } : false,
                 ],
                 onSelect: k => {
                   switch (k) {
@@ -1238,6 +1401,12 @@
       fields: [],
     }
 
+    const __groups = () =>
+      customTabState.groups.filter(g => g.tab === activeTab)
+
+    const __fields = () => customTabState.fields.filter(
+      f => __groups().find(g => g.id === f.group))
+
     let timeout
     let metaChanges = {}
     let deleteKeys = []
@@ -1247,11 +1416,10 @@
       let { stop } = loadingDots('#save-meta')
       $('#save-meta').prop('disabled', true)
 
-
-
       Promise.all([
         ContactsStore.patchMeta(getContact().ID, metaChanges),
-        deleteKeys.length ? ContactsStore.deleteMeta(getContact().ID, deleteKeys) : null,
+        deleteKeys.length ? ContactsStore.deleteMeta(getContact().ID,
+          deleteKeys) : null,
       ]).then(() => {
 
         metaChanges = {}
@@ -1286,7 +1454,7 @@
             message: __('Changes saved!', 'groundhogg'),
           })
         })
-      }, 1500)
+      }, 3000)
 
     }
 
@@ -1317,7 +1485,7 @@
         name,
       }) => `<a href="#" id="${ id }" class="nav-tab custom-tab${ id ===
       activeTab ? ' nav-tab-active' : '' }">${ name }</a>`).join('')).
-        insertBefore('#tab-actions')
+        insertAfter( '#edit-meta' )
       onMount()
     }
 
@@ -1355,6 +1523,11 @@
         $('#save-meta').on('click', commitMetaChanges)
         $('#cancel-meta-changes').on('click', cancelMetaChanges)
 
+        tooltip('.tab-more', {
+          content: __('Tab Options', 'groundhogg'),
+          position: 'right',
+        })
+
         $('.tab-more').on('click', e => {
           e.preventDefault()
 
@@ -1384,19 +1557,15 @@
                       bold(customTabState.tabs.find(
                         t => t.id === activeTab).name)) }</p>`,
                     onConfirm: () => {
-                      // Groups belonging to this tab
-                      let groups = customTabState.groups.filter(
-                        g => g.tab === activeTab)
-                      // Fields belonging to the groups of this tab
-                      let fields = customTabState.fields.filter(
-                        f => groups.find(g => g.id === f.group)).map(f => f.id)
 
-                      customTabState.tabs = customTabState.tabs.filter(
-                        t => t.id !== activeTab)
-                      customTabState.groups = customTabState.groups.filter(
-                        g => g.tab !== activeTab)
+                      let fields = __fields().map(f => f.id)
+
                       customTabState.fields = customTabState.fields.filter(
                         f => !fields.includes(f.id))
+                      customTabState.groups = customTabState.groups.filter(
+                        g => g.tab !== activeTab)
+                      customTabState.tabs = customTabState.tabs.filter(
+                        t => t.id !== activeTab)
 
                       updateTabState()
                       activeTab = 'general'
@@ -1455,29 +1624,32 @@
           })
         })
 
-        // Groups belonging to this tab
-        let groups = customTabState.groups.filter(g => g.tab === activeTab)
-        // Fields belonging to the groups of this tab
-        let fields = customTabState.fields.filter(
-          f => groups.find(g => g.id === f.group))
-
         propertiesEditor('#custom-fields-here', {
           values: {
             ...getContact().meta,
             ...metaChanges,
           },
           properties: {
-            groups,
-            fields,
+            groups: __groups(),
+            fields: __fields(),
           },
           onPropertiesUpdated: ({ groups = [], fields = [] }) => {
 
-            customTabState.groups = [
-              ...groups.map(g => ( { ...g, tab: activeTab } )), // new items
+            customTabState.fields = [
+              // Filter out any fields that are part of any group belonging to
+              // the current tab
+              ...customTabState.fields.filter(
+                field => !__fields().find(f => f.id === field.id)),
+              // Any new fields
+              ...fields,
             ]
 
-            customTabState.fields = [
-              ...fields, // new items
+            customTabState.groups = [
+              // Filter out groups that are part of the current tab
+              ...customTabState.groups.filter(
+                group => !__groups().find(g => g.id === group.id)),
+              // The groups that were edited and any new groups
+              ...groups.map(g => ( { ...g, tab: activeTab } )),
             ]
 
             updateTabState()
@@ -1490,7 +1662,7 @@
             }
           },
           canEdit: () => {
-            return userHasCap('edit_contacts')
+            return userHasCap('manage_options')
           },
 
         })
@@ -1630,61 +1802,65 @@
 
     }
 
-    $('.nav-tab-wrapper.primary').
-      append(
-        `<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
-    $('#add-tab').on('click', (e) => {
-      e.preventDefault()
+    if ( userHasCap( 'manage_options' ) ){
+      $('.nav-tab-wrapper.primary').
+        append(
+          `<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
+      $('#add-tab').on('click', (e) => {
+        e.preventDefault()
 
-      modal({
-        // language=HTML
-        content: `
+        modal({
+          // language=HTML
+          content: `
             <div>
                 <h2>${ __('Add a new tab', 'groundhogg') }</h2>
                 <div class="align-left-space-between">
                     ${ input({
-                        id: 'tab-name',
-                        placeholder: __('Tab name', 'groundhogg'),
-                    }) }
+            id: 'tab-name',
+            placeholder: __('Tab name', 'groundhogg'),
+          }) }
                     <button id="create-tab" class="gh-button primary">
                         ${ __('Create') }
                     </button>
                 </div>
             </div>`,
-        onOpen: ({ close }) => {
+          onOpen: ({ close }) => {
 
-          let tabName
+            let tabName
 
-          $('#tab-name').on('change input', (e) => {
-            tabName = e.target.value
-          }).focus()
+            $('#tab-name').on('change input', (e) => {
+              tabName = e.target.value
+            }).focus()
 
-          $('#create-tab').on('click', () => {
+            $('#create-tab').on('click', () => {
 
-            let id = uuid()
+              let id = uuid()
 
-            customTabState.tabs.push({
-              id,
-              name: tabName,
+              customTabState.tabs.push({
+                id,
+                name: tabName,
+              })
+
+              activeTab = id
+              updateTabState()
+
+              mount()
+              close()
+
             })
 
-            activeTab = id
-            updateTabState()
+          },
+        })
 
-            mount()
-            close()
-
-          })
-
-        },
       })
 
-    })
+      tooltip('#add-tab', {
+        content: __('Add tab', 'groundhogg'),
+        position: 'right',
+      })
 
-    tooltip('#add-tab', {
-      content: __('Add tab', 'groundhogg'),
-      position: 'right',
-    })
+    }
+
 
     mount()
   }

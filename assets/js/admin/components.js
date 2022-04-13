@@ -24,6 +24,7 @@
   const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore } = Groundhogg.stores
   const { post, routes } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
+  const { userHasCap } = Groundhogg.user
   const { sprintf, __, _x, _n } = wp.i18n
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
   const { currentUser } = Groundhogg
@@ -215,19 +216,20 @@
           options: TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
           filterOptions: (opts, search) => {
-            if (!search) {
+            if ( ! search ) {
               return opts
             }
 
-            return [
-              {
+            if ( userHasCap('add_tags') ){
+              opts.unshift({
                 ID: search,
                 data: {
                   tag_name: sprintf( __( 'Add "%s"', 'groundhogg' ), search ),
                 }
-              },
-              ...opts
-            ]
+              })
+            }
+
+            return opts
           },
           renderOption: ({ data }) => data.tag_name,
           onClose: () => {

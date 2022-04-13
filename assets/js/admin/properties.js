@@ -33,6 +33,7 @@
       rows: options.map(o => ([o])),
       cellCallbacks: [input],
       cellProps: [{ placeholder: __('Option') }],
+      sortable: true,
       onChange: (r) => {
         onChange(r.map(r => r[0]))
       }
@@ -154,6 +155,11 @@
     checkboxes: {
       name: __('Checkboxes', 'groundhogg'),
       view: ({ label, id, name, options, value, ...props }) => {
+
+        if ( ! Array.isArray( value ) ){
+          value = [value]
+        }
+
         //language=HTML
         return `<label class="property-label">${label}</label>
 		${options.map(opt => `<label class="checkbox-label">${input({
@@ -199,7 +205,7 @@
         optionsRepeater({
           selector: '#property-dropdown-options',
           options: field.options || [''],
-          onChange: (options) => updateField({ options })
+          onChange: (options) => updateField({ options }),
         })
       }
     },
@@ -300,7 +306,8 @@
         optionsRepeater({
           selector: '#property-dropdown-options',
           options: field.options || [''],
-          onChange: (options) => updateField({ options })
+          onChange: (options) => updateField({ options }),
+          sortable: true,
         })
 
         $('#allow-multiple').on('change', (e) => {
@@ -331,6 +338,8 @@
     },
 
     group: (group, fields = [], editable) => {
+
+      fields.sort( ({order: a = 10},{order:b = 10}) => a-b )
 
       //language=HTML
       return `
@@ -387,7 +396,15 @@
 
     addField: (field) => {
 
-      const { type, label, name, id } = field
+      const { type, label, name, id, order = 10, width = 2 } = field
+
+      let editUI = ''
+
+      try {
+        editUI = fieldTypes[type].edit(field)
+      }catch (e) {
+        console.log(e)
+      }
 
       //language=HTML
       return `
@@ -426,9 +443,31 @@
 				  </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
-						  ${fieldTypes[type].edit(field)}
+						  ${editUI}
 					  </div>
 				  </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label class="">${__('Order', 'groundhogg')}</label>
+                    ${input({
+                        id: 'property-field-order',
+                        name: 'property_field_order',
+                        placeholder: __('10', 'groundhogg'),
+                        value: order,
+                        type: 'number'
+                    })}
+                </div>
+                <div class="gh-col">
+                    <label class="">${__('Width', 'groundhogg')}</label>
+                    ${select({
+                        id: 'property-field-width',
+                        name: 'property_field_width'
+                    }, {
+                      1: __('Full'),
+                      2: __('Half'),
+                    }, width)}
+                </div>
+            </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
 						  <button class="gh-button primary" id="create-property-field">
@@ -441,10 +480,21 @@
     },
 
     field: ({ group, ...field }) => {
+
+      let fieldUI
+
+      try {
+        fieldUI = fieldTypes[field.type].view(field)
+      } catch (e) {
+        console.log(e)
+        fieldUI = `<span class="gh-text danger">${__('This field is corrupted', 'groundhogg')}</span>`
+      }
+
+      let { width = 2 } = field
       //language=HTML
       return `
-		  <div class="property-field" data-group="${group}" data-id="${field.id}">
-			  ${fieldTypes[field.type].view(field)}
+		  <div class="property-field col-width-${width}" data-group="${group}" data-id="${field.id}">
+			  ${fieldUI}
 		  </div>`
     }
 
@@ -643,6 +693,14 @@
           updateField({ name: e.target.value })
         })
 
+        $('#property-field-order').on('input change', (e) => {
+          updateField({ order: parseInt( e.target.value ) })
+        })
+
+        $('#property-field-width').on('change', (e) => {
+          updateField({ width: parseInt( e.target.value ) })
+        })
+
         $('#property-field-type').on('change', (e) => {
           newField.type = e.target.value
           setContent(Templates.addField(newField))
@@ -655,7 +713,11 @@
           close()
         })
 
-        fieldTypes[newField.type].onEditMount(newField, updateField)
+        try {
+          fieldTypes[newField.type].onEditMount(newField, updateField)
+        } catch (e) {
+          console.log(e)
+        }
       }
 
       const { close, setContent } = modal({
@@ -698,15 +760,19 @@
       const { fields = [] } = properties
 
       fields.forEach(f => {
-        fieldTypes[f.type].onMount(f, (props) => {
+        try {
+          fieldTypes[f.type].onMount(f, (props) => {
 
-          values = {
-            ...values,
-            ...props
-          }
+            values = {
+              ...values,
+              ...props
+            }
 
-          onChange(props)
-        })
+            onChange(props)
+          })
+        } catch (e) {
+          console.log(e)
+        }
       })
 
       $('.property-field').on('dblclick', (e) => {

@@ -205,22 +205,7 @@ abstract class Form_Integration extends Benchmark {
 		$posted_data = $this->get_data( 'posted_data' );
 		$field_map   = $this->get_setting( 'field_map' );
 
-		if ( is_array( $posted_data ) ) {
-			$sanitized_array = [];
-			foreach ( $posted_data as $key => $value ) {
-				$sanitized_array[ $key ] = is_array( $value ) ? implode( ',', $value ) : $value;
-			}
-		} else {
-			$sanitized_array = $posted_data;
-		}
-		/**
-		 * Did not work need to test
-		 */
-//		$sanitized_array = map_deep( $posted_data, function ( $item ){
-//			return is_array( $item ) ? implode( ',', array_flatten( $item ) ) : $item;
-//		} );
-
-		$contact = generate_contact_with_map( $sanitized_array, $field_map );
+		$contact = generate_contact_with_map( $posted_data, $field_map );
 
 		if ( ! $contact || is_wp_error( $contact ) ) {
 			return false;

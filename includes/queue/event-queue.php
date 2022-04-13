@@ -13,6 +13,7 @@ use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\gh_doing_cron;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\track_wp_cron_ping;
 
@@ -190,9 +191,9 @@ class Event_Queue extends Supports_Errors {
 	public function run_queue() {
 
 		// Don't run during wp-cron.php if gh-cron.php is working
-		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
-			return 0;
-		}
+//		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
+//			return 0;
+//		}
 
 		// Let's make sure we are not over doing it.
 		if ( ! $this->is_enabled() ) {
@@ -293,6 +294,10 @@ class Event_Queue extends Supports_Errors {
 			$this->set_current_event( $event );
 
 			$contact = $event->get_contact();
+
+			if ( ! is_a_contact( $contact ) ){
+				continue;
+			}
 
 			$this->set_current_contact( $contact );
 

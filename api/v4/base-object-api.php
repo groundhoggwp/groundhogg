@@ -78,7 +78,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return bool
 	 */
-	public function read_permissions_callback(){
+	public function read_permissions_callback() {
 		return current_user_can( sprintf( 'view_%ss', $this->get_object_type() ) );
 	}
 
@@ -87,7 +87,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return bool
 	 */
-	public function read_single_permissions_callback( WP_REST_Request $request ){
+	public function read_single_permissions_callback( WP_REST_Request $request ) {
 		return $this->read_permissions_callback();
 	}
 
@@ -96,7 +96,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return mixed
 	 */
-	public function update_permissions_callback(){
+	public function update_permissions_callback() {
 		return current_user_can( sprintf( 'edit_%ss', $this->get_object_type() ) );
 	}
 
@@ -105,7 +105,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return bool
 	 */
-	public function update_single_permissions_callback( WP_REST_Request $request ){
+	public function update_single_permissions_callback( WP_REST_Request $request ) {
 		return $this->update_permissions_callback();
 	}
 
@@ -114,7 +114,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return mixed
 	 */
-	public function create_permissions_callback(){
+	public function create_permissions_callback() {
 		return current_user_can( sprintf( 'add_%ss', $this->get_object_type() ) );
 	}
 
@@ -123,7 +123,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return mixed
 	 */
-	public function delete_permissions_callback(){
+	public function delete_permissions_callback() {
 		return current_user_can( sprintf( 'delete_%ss', $this->get_object_type() ) );
 	}
 
@@ -132,7 +132,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return bool
 	 */
-	public function delete_single_permissions_callback( WP_REST_Request $request ){
+	public function delete_single_permissions_callback( WP_REST_Request $request ) {
 		return $this->delete_permissions_callback();
 	}
 
@@ -498,7 +498,7 @@ abstract class Base_Object_Api extends Base_Api {
 			$items = $request->get_json_params();
 		}
 
-		if ( empty( $items ) ){
+		if ( empty( $items ) ) {
 			return self::ERROR_403( 'error', 'No items defined.' );
 		}
 
@@ -559,8 +559,9 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return Base_Object|Base_Object_With_Meta
 	 */
-	public function get_object_from_request( WP_REST_Request $request ){
+	public function get_object_from_request( WP_REST_Request $request ) {
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
 		return $this->create_new_object( $primary_key );
 	}
 
@@ -655,8 +656,7 @@ abstract class Base_Object_Api extends Base_Api {
 		// If the current object supports meta data...
 		if ( method_exists( $object, 'update_meta' ) ) {
 			$newObject = $object->duplicate( $data, $meta );
-		}
-		// Otherwise
+		} // Otherwise
 		else {
 			$newObject = $object->duplicate( $data );
 		}
@@ -774,7 +774,7 @@ abstract class Base_Object_Api extends Base_Api {
 			$other_id   = get_array_var( $relationship, 'other_id' );
 			$other_type = get_array_var( $relationship, 'other_type' );
 
-			if ( ! $other_id || ! $other_type ){
+			if ( ! $other_id || ! $other_type ) {
 				continue;
 			}
 
@@ -871,7 +871,7 @@ abstract class Base_Object_Api extends Base_Api {
 			$other_id   = get_array_var( $relationship, 'other_id' );
 			$other_type = get_array_var( $relationship, 'other_type' );
 
-			if ( ! $other_id || ! $other_type ){
+			if ( ! $other_id || ! $other_type ) {
 				continue;
 			}
 

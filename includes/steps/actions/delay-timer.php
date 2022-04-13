@@ -186,38 +186,31 @@ class Delay_Timer extends Action {
 	 */
 	public function enqueue( $step ) {
 
+
+		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
+
+		$date = new \DateTime( 'now', wp_timezone() );
+
+		if ( $send_in_timezone && Event_Queue::is_processing() ) {
+			$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
+		}
+
 		$amount           = absint( $this->get_setting( 'delay_amount' ) );
 		$type             = $this->get_setting( 'delay_type' );
 		$run_time         = $this->get_setting( 'run_time', '09:00:00' );
 		$run_when         = $this->get_setting( 'run_when', 'now' );
-		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
 
-		if ( $run_when == 'now' ) {
-			$time_string = '+ ' . $amount . ' ' . $type;
-			$final_time  = strtotime( $time_string );
-		} else {
-			$time_string    = '+ ' . $amount . ' ' . $type;
-			$base_time      = strtotime( $time_string );
-			$formatted_date = date( 'Y-m-d', $base_time );
-			$time_string    = $formatted_date . ' ' . $run_time;
-			if ( strtotime( $time_string ) < Plugin::$instance->utils->date_time->convert_to_local_time( time() ) ) {
-				$formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
-				$time_string    = $formatted_date . ' ' . $run_time;
-			}
+		$date->modify( sprintf('+%d %s', $amount, $type) );
 
-			/* convert to utc */
-			$final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
+		if ( $run_when !== 'now' ){
+			$date->modify( $run_time );
 
-			/* Modify according to the contacts timezone */
-			if ( $send_in_timezone && Event_Queue::is_processing() ) {
-				$final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
-				if ( $final_time < time() ) {
-					$final_time += DAY_IN_SECONDS;
-				}
+			if ( $date->getTimestamp() < time() ){
+				$date->modify('+1 day');
 			}
 		}
 
-		return $final_time;
+		return $date->getTimestamp();
 	}
 
 	/**

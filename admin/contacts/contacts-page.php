@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Classes\Note;
-use Groundhogg\Contact_Properties;
+use Groundhogg\Properties;
 use Groundhogg\Saved_Searches;
 use Groundhogg\Scripts;
 use Groundhogg\Step;
@@ -183,7 +183,7 @@ class Contacts_Page extends Admin_Page {
 
 				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts', 'BulkEdit', [
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
-					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all(),
+					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'query'                        => get_request_query(),
 					'filter_query'                 => $filter_query,
 					'countries'                    => utils()->location->get_countries_list(),
@@ -226,12 +226,15 @@ class Contacts_Page extends Admin_Page {
 					'contact_id'                   => $contact->get_id(),
 					'contact'                      => $contact,
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
-					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all(),
+					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'marketable'                   => $contact->is_marketable(),
 					'i18n'                         => [
 						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
 					],
 				] );
+
+                do_action( 'groundhogg/admin/contacts/edit/scripts' );
+
 				break;
 			case 'view':
 
@@ -717,10 +720,10 @@ class Contacts_Page extends Admin_Page {
 				$ip_address = $contact->get_meta( 'ip_address' );
 
 				if ( $ip_address ) {
-					$blacklist = get_option( 'blacklist_keys' );
+					$blacklist = get_option( 'disallowed_keys' );
 					$blacklist .= "\n" . $ip_address;
 					$blacklist = sanitize_textarea_field( $blacklist );
-					update_option( 'blacklist_keys', $blacklist );
+					update_option( 'disallowed_keys', $blacklist );
 				}
 			}
 

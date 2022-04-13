@@ -34,6 +34,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @param $identifier_or_args int|string the identifier to look for
 	 * @param $field              string the file to query
+	 *
+	 * @return void
 	 */
 	public function __construct( $identifier_or_args = 0, $field = null ) {
 
@@ -62,7 +64,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 					$object = $this->get_from_db( $this->get_identifier_key(), $primary );
 
 					if ( ! $object || empty( $object ) || ! is_object( $object ) ) {
-						return false;
+						return;
 					}
 				}
 
@@ -94,8 +96,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$object = $this->get_from_db( $field, $identifier_or_args );
 
-			if ( ! $object || empty( $object ) || ! is_object( $object ) ) {
-				return false;
+			if ( empty( $object ) || ! is_object( $object ) ) {
+				return;
 			}
 
 			$this->setup_object( $object );

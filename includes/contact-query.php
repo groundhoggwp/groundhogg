@@ -770,7 +770,7 @@ class Contact_Query {
 
 		if ( $this->query_vars['marketable'] !== 'any' ) {
 			$where['marketable'] = self::filter_marketability( [
-				'marketable' => $this->query_vars['marketable'] ? 'yes' : 'no'
+				'marketable' => filter_var( $this->query_vars['marketable'], FILTER_VALIDATE_BOOLEAN ) ? 'yes' : 'no'
 			], $this );
 		}
 
@@ -805,7 +805,7 @@ class Contact_Query {
 			$where['optin_status_exclude'] = "$this->table_name.optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
 
-		if ( $this->query_vars['owner'] ) {
+		if ( isset_not_empty( $this->query_vars, 'owner' ) ) {
 			$owner_clause   = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
 			$where['owner'] = "$this->table_name.owner_id IN ( {$owner_clause} )";
 		}
@@ -1252,7 +1252,7 @@ class Contact_Query {
 
 	protected function setup_custom_field_filters() {
 
-		$fields = Contact_Properties::instance()->get_fields();
+		$fields = Properties::instance()->get_fields();
 
 		foreach ( $fields as $field ) {
 			self::register_filter( $field['id'], [ $this, 'handler_filter' ] );
@@ -1270,7 +1270,7 @@ class Contact_Query {
 
 		$field_id = $filter_vars['type'];
 
-		$field = Contact_Properties::instance()->get_field( $field_id );
+		$field = Properties::instance()->get_field( $field_id );
 
 		// Use most recent available key?
 		$filter_vars['meta'] = $field['name'];
@@ -1330,7 +1330,7 @@ class Contact_Query {
 		$key_clause = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
 		$opt_clause = implode( ' AND ', array_map( function ( $opt ) use ( $meta_table_name, $filter_vars ) {
 			$opt = esc_sql( $opt );
-			return "$meta_table_name.meta_value = '{$opt}'";
+			return "$meta_table_name.meta_value LIKE '%{$opt}%'";
 		}, $filter_vars['options'] ) );
 
 		switch ( $filter_vars['compare'] ) {
@@ -2416,6 +2416,7 @@ class Contact_Query {
 				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
 				break;
 			case 'between':
+			case 'today':
 				$clause = $as_int
 					? sprintf( "BETWEEN %d AND %d", $after, $before )
 					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
@@ -2491,11 +2492,18 @@ class Contact_Query {
 		$after  = date_as_int( $filter_vars['after'] );
 		$before = date_as_int( $filter_vars['before'] );
 
+		$today = new \DateTime( 'today', wp_timezone() );
+
 		switch ( $filter_vars['date_range'] ) {
 			default:
 			case 'any':
 				$after  = 1;
 				$before = time();
+				break;
+			case 'today':
+				$after = $today->getTimestamp();
+				$today->modify( '+1 day' );
+				$before = $today->getTimestamp();
 				break;
 			case '24_hours':
 				$after  = time() - DAY_IN_SECONDS;
@@ -2561,11 +2569,18 @@ class Contact_Query {
 		$after  = date_as_int( $filter_vars['after'] );
 		$before = date_as_int( $filter_vars['before'] );
 
+		$today = new \DateTime( 'today', wp_timezone() );
+
 		switch ( $filter_vars['date_range'] ) {
 			default:
 			case 'any':
 				$after  = 1;
 				$before = time() * 2;
+				break;
+			case 'today':
+				$after = $today->getTimestamp();
+				$today->modify( '+1 day' );
+				$before = $today->getTimestamp();
 				break;
 			case '24_hours':
 				$after  = time();
@@ -2638,8 +2653,9 @@ class Contact_Query {
 		$meta_table_name = get_db( 'contactmeta' )->table_name;
 
 		$year = date( 'Y' );
+		$time = date( 'H:i:s' );
 
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ) ) {$clause} ) ";
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ), '$time' ) {$clause} ) ";
 	}
 
 	/**
@@ -2665,8 +2681,6 @@ class Contact_Query {
 
 	/**
 	 * Filter by the phone number
-	 *
-	 * todo replace the phone number
 	 *
 	 * @param $filter_vars
 	 * @param $query Contact_Query

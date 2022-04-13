@@ -321,6 +321,11 @@ class Scripts {
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-troubleshooter', GROUNDHOGG_ASSETS_URL . 'js/admin/troubleshooter' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+		], GROUNDHOGG_VERSION, true );
+
 		// Funnel Elements
 		wp_register_script( 'groundhogg-funnel-email', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/email' . $dot_min . '.js', [
 			'jquery',
@@ -373,6 +378,7 @@ class Scripts {
 				],
 				'api'              => [
 					'routes' => [
+						'posts' => rest_url( 'wp/v2/posts' ),
 						'v3' => [
 							'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
 							'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
@@ -414,7 +420,7 @@ class Scripts {
 					'current'                      => get_request_var( 'filters', [] ),
 					'roles'                        => get_editable_roles(),
 					'countries'                    => utils()->location->get_countries_list(),
-					'gh_contact_custom_properties' => Contact_Properties::instance()->get_all()
+					'gh_contact_custom_properties' => Properties::instance()->get_all()
 				],
 				'managed_page'     => [
 					'root' => managed_page_url()

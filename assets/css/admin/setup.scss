@@ -25,7 +25,7 @@ $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 #wpcontent {
-  padding: 0;
+  //padding: 0;
 }
 
 #wpfooter {
@@ -60,6 +60,25 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   max-width: 100%;
 }
 
+#troubleshooter{
+
+  .gh-panel.outlined{
+    .inside{
+      p:first-child{
+        margin-top: 0;
+      }
+    }
+  }
+
+}
+
+.wp-list-table{
+  pre{
+    margin: 0;
+  }
+}
+
+#troubleshooter,
 #guided-setup {
   width: 600px;
   margin: auto;
@@ -69,11 +88,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     margin-top: 0;
   }
 
-  p, label, ul {
+  p, label, ul, ol, li{
     font-size: 16px;
   }
 
-  ul {
+  ul:not(.select2-selection__rendered) {
     list-style: disc;
     padding-left: 20px;
   }
@@ -96,7 +115,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       //font-weight: 500;
     }
 
-    input.input {
+    input.input, select {
       font-size: 16px;
       padding: 4px 12px;
     }

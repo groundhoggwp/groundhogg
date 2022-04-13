@@ -64,15 +64,16 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		$time_string = $date . ' ' . $time;
 
+		$date = new \DateTime( $time_string, wp_timezone() );
+
 		/* convert to UTC */
-		$send_time = utils()->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
 		if ( $request->get_param( 'send_now' ) ) {
 			$meta['send_now'] = true;
-			$send_time        = time() + 10;
+			$date->setTimestamp( time() + 10 );
 		}
 
-		if ( $send_time < time() ) {
+		if ( $date->getTimestamp() < time() ) {
 			return self::ERROR_401( 'invalid_date', __( 'Please select a time in the future', 'groundhogg' ) );
 		}
 
@@ -94,7 +95,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		$broadcast_id = new Broadcast( [
 			'object_id'    => $object_id,
 			'object_type'  => $object_type,
-			'send_time'    => $send_time,
+			'send_time'    => $date->getTimestamp(),
 			'scheduled_by' => get_current_user_id(),
 			'status'       => 'pending',
 			'query'        => $query,

@@ -278,6 +278,17 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Whether the given is the owner of this contact
+	 *
+	 * @param $owner WP_User|int
+	 *
+	 * @return bool
+	 */
+	public function owner_is( $owner ){
+		return $owner instanceof WP_User ? $this->get_owner_id() === $owner->ID : $this->get_owner_id() === $owner;
+	}
+
+	/**
 	 * Get the user data
 	 *
 	 * @return WP_User|false
@@ -326,10 +337,13 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Get the contact's time_zone
 	 *
-	 * @return mixed
+	 * If one is not saved it will return the timezone of the site and not false
+	 *
+	 * @return string|\DateTimeZone
 	 */
-	public function get_time_zone() {
-		return $this->get_meta( 'time_zone' );
+	public function get_time_zone( $as_string = true ) {
+		$tz = $this->get_meta( 'time_zone' ) ?: wp_timezone_string();
+		return $as_string ? $tz : new \DateTimeZone( $tz );
 	}
 
 	/**
@@ -404,6 +418,15 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function is_marketable() {
 		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this->ID ), $this );
+	}
+
+	/**
+	 * Return whether the contact is confirmed or not.
+	 *
+	 * @return bool
+	 */
+	public function is_confirmed() {
+		return $this->get_optin_status() === Preferences::CONFIRMED;
 	}
 
 	/**
@@ -919,6 +942,10 @@ class Contact extends Base_Object_With_Meta {
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
+				if ( current_user_can( 'view_contact', $this ) ){
+					$file['url'] .= '?contact=' . $this->ID;
+				}
+
 				$data[] = $file;
 
 			}
@@ -980,9 +1007,9 @@ class Contact extends Base_Object_With_Meta {
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
 				'tags'  => array_values( $this->get_tags( true ) ),
-				'files' => $this->get_files(),
+//				'files' => $this->get_files(),
 				'user'  => $this->user,
-				'notes' => $this->get_notes(),
+//				'notes' => $this->get_notes(),
 				'admin' => $this->admin_link()
 			]
 		);

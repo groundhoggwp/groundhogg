@@ -69,10 +69,10 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 	if ( ! $contact_id_or_email ) {
 
 		if ( Event_Queue::is_processing() ) {
-			return Plugin::instance()->event_queue->get_current_contact();
+			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
-		return Plugin::$instance->tracking->get_current_contact();
+		return tracking()->get_current_contact();
 	} else if ( in_array( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
@@ -826,7 +826,7 @@ function array_to_atts( $atts ) {
 			case 'href':
 			case 'action':
 			case 'src':
-				$value = esc_url( $value );
+				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : $value;
 				break;
 			default:
 				if ( is_array( $value ) ) {
@@ -2641,14 +2641,14 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'user_id':
 			case 'owner_id':
 
-				// Email Passed
 				if ( is_email( $value ) ) {
+					// Email Passed
 					$by = 'email';
-					// Username passed
 				} else if ( is_string( $value ) && ! is_numeric( $value ) ) {
+					// Username passed
 					$by = 'login';
-					// ID Passed
 				} else {
+					// ID Passed
 					$by    = 'id';
 					$value = absint( $value );
 				}
@@ -2658,7 +2658,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				// Make sure User exists
 				if ( $user ) {
 					// Check the mapped owner can actually own contacts.
-					if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
+					if ( $field !== 'owner_id' || user_can( $user, 'edit_contacts' ) ) {
 						$args[ $field ] = $user->ID;
 					}
 				}
@@ -2791,11 +2791,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	$contact = false;
-
-	// If the current user can add a contact and a contact owner has not been explicitly defined.
-	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
-		$args['owner_id'] = get_current_user_id();
-	}
 
 	// No point in trying if there is no email field
 	if ( isset( $args['email'] ) ) {
@@ -3073,10 +3068,10 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 	switch ( $color ) {
 		default:
 		case 'black':
-			$link = 'logo-black-1000x182.png';
+			$link = 'groundhogg-logo-black.svg';
 			break;
 		case 'white':
-			$link = 'logo-white-1000x182.png';
+			$link = 'groundhogg-logo-white.svg';
 			break;
 	}
 
@@ -3150,7 +3145,7 @@ function get_email_templates() {
 function blacklist_check( $data = '' ) {
 
 	if ( ! is_array( $data ) && ! is_object( $data ) ) {
-		$mod_keys = trim( get_option( 'blacklist_keys' ) );
+		$mod_keys = trim( get_option( 'disallowed_keys' ) );
 		if ( '' == $mod_keys ) {
 			return false; // If moderation keys are empty
 		}
@@ -3602,7 +3597,7 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
-	$url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
+	$url = managed_page_url( 'files/' . ltrim( $path, '/' ) );
 
 	// WP Engine file download links do not work if forward slash is not present.
 	$url = trailingslashit( $url );
@@ -4033,6 +4028,15 @@ function is_pro_features_active() {
 }
 
 /**
+ * Checks if the Groundhogg helper plugin is installed
+ *
+ * @return bool
+ */
+function is_helper_plugin_installed() {
+	return defined( 'GROUNDHOGG_HELPER_VERSION' );
+}
+
+/**
  * If the current customer has access to premium features...
  *
  * Will return true if the `Groundhogg - Helper` is installed (has a plan license)
@@ -4218,7 +4222,12 @@ function get_primary_owner() {
 
 	$user = get_userdata( $primary_user_id );
 
-	return $user;
+	/**
+	 * Filter the primary owner
+	 *
+	 * @param $user \WP_User
+	 */
+	return apply_filters( 'groundhogg/primary_owner', $user );
 }
 
 /**
@@ -5713,7 +5722,7 @@ function create_object_from_type( $object, $object_type ) {
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
  */
 function is_template_site() {
-	return apply_filters( 'groundhogg/is_template_site', false );
+	return apply_filters( 'groundhogg/is_template_site', defined( 'IS_GROUNDHOGG_TEMPLATE_SITE' ) && IS_GROUNDHOGG_TEMPLATE_SITE );
 }
 
 /**
@@ -6167,9 +6176,18 @@ function array_map_to_method( $array, $method ) {
  */
 function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 
+	// Some falsy value? Return false
+	if ( empty( $maybe_tags ) ) {
+		return [];
+	}
+
 	if ( is_array( $maybe_tags ) ) {
 
 		$tags = array_map( function ( $maybe_tag ) use ( $create ) {
+
+            if ( empty( $maybe_tag) ) {
+                return false;
+            }
 
 			if ( is_a( $maybe_tag, Tag::class ) ) {
 				return $maybe_tag;
@@ -6216,7 +6234,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 	}
 
 	$tags = array_filter( $tags, function ( $tag ) {
-		return $tag->exists();
+		return is_a( $tag, Tag::class ) && $tag->exists();
 	} );
 
 	switch ( $as ) {
@@ -6290,7 +6308,7 @@ function is_free_email_provider( $email ) {
 	static $providers = [];
 
 	// initialize providers
-	if ( $providers ) {
+	if ( empty( $providers ) ) {
 		$providers = json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
 	}
 
@@ -6395,7 +6413,7 @@ function do_reassignments_when_user_deleted( $id, $reassign ) {
 	if ( $delete_contact_records ) {
 		$contact = get_contactdata( $id, true );
 
-		if ( $contact->exists() ) {
+		if ( $contact && $contact->exists() ) {
 			$contact->delete();
 		}
 	}
@@ -6411,4 +6429,29 @@ function do_reassignments_when_user_deleted( $id, $reassign ) {
 		 */
 		do_action( 'groundhogg/owner_deleted', $id, $new_owner );
 	}
+}
+
+/**
+ * Minify html content
+ *
+ * @param $content
+ *
+ * @return string
+ */
+function minify_html( $content ) {
+	$search = array(
+		'/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+		'/[^\S ]+\</s',     // strip whitespaces before tags, except space
+		'/(\s)+/s',         // shorten multiple whitespace sequences
+		'/<!--(.|\s)*?-->/' // Remove HTML comments
+	);
+
+	$replace = array(
+		'>',
+		'<',
+		'\\1',
+		''
+	);
+
+	return preg_replace( $search, $replace, $content );
 }

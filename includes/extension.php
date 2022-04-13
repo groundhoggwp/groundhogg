@@ -28,8 +28,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Extension {
 
 	/**
-	 * TODO Override this static var in child class.
-	 *
 	 * @var Extension
 	 */
 	public static $instance = null;
@@ -567,8 +565,10 @@ abstract class Extension {
 	 * @return string
 	 */
 	public function __toString() {
-		$content = "<div class='postbox '>";
+		$content = "<div class='gh-panel'>";
+		$content .= "<div class='gh-panel-header'>";
 		$content .= "<h2 class='hndle'>{$this->get_display_name()}</h2>";
+		$content .= "</div>";
 		$content .= "<div class=\"inside\">";
 		$content .= "<p>" . $this->get_display_description() . "</p>";
 
@@ -585,27 +585,26 @@ abstract class Extension {
 			$content .= "</p>";
 
 			$content .= html()->wrap( [
+				html()->wrap( __( 'Check', 'groundhogg' ), 'a', [
+					'class' => 'gh-button secondary',
+					'href'  => admin_url( wp_nonce_url( add_query_arg( [
+						'action'    => 'check_license',
+						'extension' => $this->get_download_id()
+					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
+				] ),
 				html()->wrap( __( 'Deactivate', 'groundhogg' ), 'a', [
-					'class' => 'button button-secondary',
+					'class' => 'gh-button danger text',
 					'href'  => admin_url( wp_nonce_url( add_query_arg( [
 						'action'    => 'deactivate_license',
 						'extension' => $this->get_download_id()
 					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
 				] ),
-				'&nbsp;',
-				html()->wrap( __( 'Check', 'groundhogg' ), 'a', [
-					'class' => 'button button-secondary',
-					'href'  => admin_url( wp_nonce_url( add_query_arg( [
-						'action'    => 'check_license',
-						'extension' => $this->get_download_id()
-					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
-				] )
-			], 'p' );
+			], 'div',  [ 'class' => 'display-flex gap-10' ]);
 		} else {
 			$content .= html()->wrap( html()->input( [
 				'type'  => 'submit',
 				'name'  => 'activate_license',
-				'class' => 'button button-primary',
+				'class' => 'gh-button primary',
 				'value' => __( 'Activate', 'groundhogg' ),
 			] ), 'p' );
 		}

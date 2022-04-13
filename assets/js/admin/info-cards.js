@@ -1,10 +1,10 @@
 (function ($) {
 
   function init () {
-    $('.info-cards-wrap .meta-box-sortables').sortable({
+    $('.info-cards-wrap .info-cards-sortables').sortable({
       placeholder: 'sortable-placeholder',
       // connectWith: '.ui-sortable',
-      handle: '.hndle',
+      handle: '.gh-panel-header > h2',
       // axis: 'y',
       start: function (e, ui) {
         ui.helper.css('left',
@@ -15,17 +15,17 @@
       stop: saveInfoCardOrder
     })
 
-    $(document).on('click', '.info-cards-wrap .info-card > .postbox-header  button.handlediv', function (e) {
+    $(document).on('click', '.info-cards-wrap .info-card > .gh-panel-header button.toggle-indicator', function (e) {
       $(this).closest('.info-card').toggleClass('closed')
       saveInfoCardOrder()
     })
 
-    $(document).on('click', '.info-cards-wrap .info-card > .postbox-header button.handle-order-higher', function (e) {
+    $(document).on('click', '.info-cards-wrap .info-card > .gh-panel-header button.panel-handle-order-higher', function (e) {
       $(this).closest('.info-card').insertBefore($(this).closest('.info-card').prev())
       saveInfoCardOrder()
     })
 
-    $(document).on('click', '.info-cards-wrap .info-card > .postbox-header button.handle-order-lower', function (e) {
+    $(document).on('click', '.info-cards-wrap .info-card > .gh-panel-header button.panel-handle-order-lower', function (e) {
       $(this).closest('.info-card').insertAfter($(this).closest('.info-card').next())
       saveInfoCardOrder()
     })

@@ -142,8 +142,6 @@ class Main_Roles extends Roles {
 				];
 
 				break;
-
-				break;
 			case 'edit_contact':
 			case 'view_contact':
 			case 'delete_contact':
@@ -184,6 +182,62 @@ class Main_Roles extends Roles {
 				}
 
 				break;
+			case 'download_file':
+
+				$file_path = $args[0];
+
+				// Compat for WooCommerce usage of download file
+				if ( ! is_string( $file_path ) ){
+					return $caps;
+				}
+
+				$caps = [];
+
+				$file_path = wp_normalize_path( $file_path );
+
+				$path = explode( '/', $file_path );
+
+				switch ( $path[0] ) {
+					case 'uploads':
+						$caps[] = 'download_contact_files';
+
+						$request        = $args[1];
+						$contact        = get_array_var( $request, 'contact' );
+						$contact_folder = $path[1];
+
+						$contact = new Contact( $contact );
+
+						if ( ! $contact->exists() ) {
+							$caps[] = 'do_not_allow';
+							break;
+						}
+
+						// Trying to cheat the system
+						if ( $contact_folder !== $contact->get_upload_folder_basename() ) {
+							$caps[] = 'do_not_allow';
+							break;
+						}
+
+						// Trying to download files of contacts that don't belong to them
+						if ( ! $contact->owner_is( $user_id ) ){
+							$caps[] = 'view_others_contacts';
+						}
+
+						break;
+					case 'exports':
+						$caps[] = 'export_contacts';
+						break;
+					case 'imports':
+						$caps[] = 'import_contacts';
+						$caps[] = 'download_files';
+						break;
+					default:
+						$caps[] = 'do_not_allow';
+						break;
+				}
+
+				break;
+
 		}
 
 		return $caps;
@@ -231,7 +285,11 @@ class Main_Roles extends Roles {
 			'delete_others_notes',
 			'delete_notes',
 			'edit_notes',
-			'view_notes'
+			'view_notes',
+			'view_funnels',
+			'view_emails',
+			'view_broadcasts',
+			'perform_bulk_actions'
 		];
 	}
 
@@ -254,7 +312,11 @@ class Main_Roles extends Roles {
 			'add_notes',
 			'delete_notes',
 			'edit_notes',
-			'view_notes'
+			'view_notes',
+			'view_funnels',
+			'view_emails',
+			'view_broadcasts',
+			'perform_bulk_actions',
 		];
 	}
 
@@ -308,6 +370,7 @@ class Main_Roles extends Roles {
 			'delete_tags',
 			'edit_tags',
 			'manage_tags',
+			'view_tags',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/tags', $caps );
@@ -349,6 +412,7 @@ class Main_Roles extends Roles {
 	public function get_email_caps() {
 		$caps = array(
 			'add_emails',
+			'view_emails',
 			'delete_emails',
 			'edit_emails',
 			'send_emails',
@@ -373,6 +437,7 @@ class Main_Roles extends Roles {
 	public function get_funnel_caps() {
 		$caps = array(
 			'add_funnels',
+			'view_funnels',
 			'delete_funnels',
 			'edit_funnels',
 			'export_funnels',

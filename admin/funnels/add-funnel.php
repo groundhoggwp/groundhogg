@@ -47,15 +47,18 @@ if ( get_url_var( 'flush' ) ) {
 		<?php wp_nonce_field( 'add' ); ?>
 		<!-- GET FUNNEL TEMPLATES FROM HERE -->
 		<?php $funnel_templates = Plugin::$instance->library->get_funnel_templates(); ?>
-		<div id="poststuff">
+		<div id="">
+            <p></p>
 			<div class="post-box-grid">
 				<?php
 				foreach ( $funnel_templates as $funnel_args ): ?>
-					<div class="postbox">
-						<h2 class="hndle"><?php echo $funnel_args->name; ?></h2>
+					<div class="gh-panel">
+                        <div class="gh-panel-header">
+                            <h2 class="hndle"><?php echo $funnel_args->name; ?></h2>
+                        </div>
 						<div class="inside">
 							<p><?php echo $funnel_args->description; ?></p>
-							<button class="button-primary" name="funnel_template"
+							<button class="gh-button primary" name="funnel_template"
 							        value="<?php echo $funnel_args->id ?>"><?php _ex( 'Start Building', 'action', 'groundhogg' ); ?></button>
 						</div>
 					</div>
@@ -139,22 +142,22 @@ if ( get_url_var( 'flush' ) ) {
 <?php else: ?>
 	<div class="gh-tools-wrap">
 		<p class="tools-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
-		<form method="post" enctype="multipart/form-data" class="gh-tools-box">
+		<form method="post" enctype="multipart/form-data" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
 			<p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
 			<hr/>
 			<input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
-			<button style="float: right" class="button-primary" name="funnel_import"
+			<button style="float: right" class="gh-button primary" name="funnel_import"
 			        value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
 			<div class="wp-clearfix"></div>
 		</form>
-		<form method="post" class="gh-tools-box">
+		<form method="post" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
 			<p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
 			<hr/>
 			<textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json"
 			          placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ); ?>"></textarea>
-			<button style="float: right" class="button-primary" name="funnel_import"
+			<button style="float: right" class="gh-button primary" name="funnel_import"
 			        value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
 			<div class="wp-clearfix"></div>
 		</form>

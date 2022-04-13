@@ -11,6 +11,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
 use function Groundhogg\parse_tag_list;
+use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -111,7 +112,7 @@ class Tag_Applied extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
+		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
 		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
 	}
 
@@ -197,7 +198,7 @@ class Tag_Applied extends Benchmark {
 
 		$applied_tag = $this->get_data( 'tag_id' );
 
-		$tags      = parse_tag_list( $this->get_setting( 'tags' ) );
+		$tags      = parse_tag_list( $this->get_setting( 'tags' ), 'ID', false );
 		$condition = $this->get_setting( 'condition', 'any' );
 
 		switch ( $condition ) {

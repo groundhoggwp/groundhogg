@@ -12,9 +12,9 @@
   } = gh
 
   const { tracking, ajax } = routes
-  const { _wprest } = nonces
   const { consent_cookie_name = 'viewed_cookie_policy', consent_cookie_value = 'yes' } = settings
   const { tracking: tracking_cookie, lead_source, form_impressions, page_visits } = cookies
+  const { _wprest } = nonces
 
   /**
    * Post data
@@ -271,7 +271,7 @@
   window.addEventListener('load', () => {
     gh.init()
   })
-  
+
   Groundhogg.adminAjax = adminAjax
   Groundhogg.apiPost = apiPost
 

@@ -96,56 +96,54 @@ $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 	return $carry && $item['completed'];
 }, true );
 
-$hidden = get_user_option( 'gh_hide_groundhogg_quickstart' ) !== false;
+$hidden = \Groundhogg\is_option_enabled( 'gh_hide_groundhogg_quickstart' );
 
 ?>
-<div class="col">
-	<div id="checklist" class="postbox onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : 'open' ); ?>">
-		<div class="postbox-header">
+	<div id="checklist" class="gh-panel onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : '' ); ?>">
+		<div class="gh-panel-header">
 			<h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
-			<div class="handle-actions">
-				<?php html()->e( 'a', [ 'href' => action_url( $hidden ? 'show_checklist' : 'hide_checklist' ) ], $hidden ? __( 'Show', 'groundhogg' ) : __( 'Hide', 'groundhogg' ), false, true ); ?>
-			</div>
-		</div>
-		<?php
+            <button type="button" class="toggle-indicator" aria-expanded="true"></button>
+        </div>
+        <div class="inside no-padding">
+	        <?php
 
-		if ( $all_completed ):
-			?>
-			<div class="inside checklist-complete">
-				<?php
-				html()->e( 'img', [
-					'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
-				], false, true, true )
-				?>
-				<p>
-					🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
-			</div>
-		<?php
-		else :
+	        if ( $all_completed ):
+		        ?>
+                <div class="inside checklist-complete">
+			        <?php
+			        html()->e( 'img', [
+				        'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
+			        ], false, true, true )
+			        ?>
+                    <p>
+                        🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
+                </div>
+	        <?php
+	        else :
 
-			foreach ( $checklist_items as $item ):
+		        foreach ( $checklist_items as $item ):
 
-				if ( ! current_user_can( $item['cap'] ) ) {
-					continue;
-				} ?>
-				<div class="checklist-row">
-					<div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
-						<?php if ( $item['completed'] ): ?>
-							✅
-						<?php else: ?>
-							❌
-						<?php endif; ?>
-					</div>
-					<div class="details">
-						<h3 class="item-title"><?php echo $item['title']; ?></h3>
-						<p class="description"><?php echo $item['description']; ?></p>
-					</div>
-					<?php if ( ! $item['completed'] ): ?>
-						<span
-							class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'] ], __( 'Fix', 'groundhogg' ) ); ?></span>
-					<?php endif; ?>
-				</div>
-			<?php endforeach;
-		endif; ?>
+			        if ( ! current_user_can( $item['cap'] ) ) {
+				        continue;
+			        } ?>
+                    <div class="checklist-row">
+                        <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
+					        <?php if ( $item['completed'] ): ?>
+                                ✅
+					        <?php else: ?>
+                                ❌
+					        <?php endif; ?>
+                        </div>
+                        <div class="details">
+                            <h3 class="item-title"><?php echo $item['title']; ?></h3>
+                            <p class="description"><?php echo $item['description']; ?></p>
+                        </div>
+				        <?php if ( ! $item['completed'] ): ?>
+                            <span
+                                    class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'], 'class' => 'gh-button primary' ], __( 'Fix', 'groundhogg' ) ); ?></span>
+				        <?php endif; ?>
+                    </div>
+		        <?php endforeach;
+	        endif; ?>
+        </div>
 	</div>
-</div>

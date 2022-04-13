@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6
+Stable tag: 2.6.2.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -17,7 +17,7 @@ WordPress CRM, Email & Marketing Automation
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
-🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
+🌎 [Facebook Group](https://www.fa   cebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
 
 🚀 [Free Quickstart Course — Launch your first funnel!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
 
@@ -25,13 +25,9 @@ WordPress CRM, Email & Marketing Automation
 
 ## Join 3,000+ Small Businesses in 35+ Countries!
 
-### All new Search Filters enable you to find more business, faster! [August 11th, 2021](https://www.groundhogg.io/updates/groundhoggs-all-new-search-filters-enable-you-to-find-more-business-faster/)
+### Groundhogg 2.6 brings major innovation including a the new Contact Activity Timeline and Free custom field management! [February 22nd, 2021](https://www.groundhogg.io/updates/new-contact-record-user-interface-in-groundhogg-2-6/)
 
-[youtube https://youtu.be/shJLAbL-Zxo]
-
-### Groundhogg 2.5 is a preview of what's to come! [August 11th, 2021](https://www.groundhogg.io/updates/groundhogg-2-5-shows-a-glimpse-of-whats-coming-down-the-pipeline/)
-
-[youtube https://youtu.be/25joq7uCfsE]
+[youtube https://youtu.be/OzZD0_OSNVM]
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
@@ -133,6 +129,10 @@ From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-pro
 
 There are over [90 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
+### Why Kris Britton of the KAYBE marketing agency moved all of his clients from HubSpot to Groundhogg!
+
+[youtube https://youtu.be/EzQW0oexYFs]
+
 ## Features
 
 Here are the tools you can use to launch your funnel, grow your list, and scale your business faster with Groundhogg CRM & Marketing Automation!
@@ -177,7 +177,11 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Detailed results from your funnels and broadcast emails.
 * Integrate with Ecommerce to see revenue from your marketing.
 * Learn more about your audience with demographic reporting.
-* See which funnels/emails are underperforming.
+* See which funnels/emails are under-performing.
+
+### Track how your contacts navigate your site!
+
+[youtube https://youtu.be/fHW3NpFehc4]
 
 ### 🇪🇺 GDPR Ready
 
@@ -321,7 +325,70 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.6 =
+= 2.6.2.7 (2022-04-04) =
+* TWEAKED Added some CSS polish to some of the admin areas, such as the licenses settings page and the templates pages for funnels and emails
+* TWEAKED Made it possible to enqueue scripts on the contact edit page to enable integrations to add items to the activity timeline
+
+= 2.6.2.6 (2022-04-01) =
+* FIXED Passing an empty string to the add_tag method would apply the most recently created tag
+* FIXED download_file capability conflict with woocommerce
+
+= 2.6.2.5 (2022-03-26) =
+* FIXED Missing view_emails cap for admins
+
+= 2.6.2.4 (2022-03-25) =
+* ADDED Composed & 1-off emails now show in the activity timeline
+* ADDED "Today" date filter for search filters
+* TWEAKED Gave the welcome screen a visual refresh and updated remaining img assets with new logo
+* TWEAKED Changed file rewrite path from `/uploads/` to `/files/`
+* TWEAKED Add view permissions for funnels, emails, events, and activity to Sales Reps and Managers so they can view the activity timeline
+* FIXED Contact file uploads & downloads for Sales Reps and Sales Managers
+* FIXED Some custom field search filters showing corrupted when they are actually fine
+* FIXED Multiple UI issues for Sales Managers and Sales Reps
+* FIXED Notes widget loading in ALL notes instead of object notes
+* FIXED Mapping array values from form integrations to comma seperated strings
+
+= 2.6.2.3 (2022-03-11) =
+* ADDED New logos and brand assets!
+* ADDED (Again) Send an email template from the contact record.
+* TWEAKED track activity when composed email is sent. Will show in activity timeline in a future update.
+* FIXED Ticket link in help page links to the ticket portion of the troubleshooter.
+
+= 2.6.2.2 (2022-03-09) =
+* FIXED Fatal error if not contact record linked to the logged in admin.
+* FIXED Ghost custom fields causing custom field editor to not load
+* FIXED DB error caused by missing field name in the page-visits table.
+* FIXED PHP notice caused by missing array index.
+
+= 2.6.2.1 (2022-03-07) =
+* TWEAKED The "skip if confirmed" logic for confirmation emails to handle logic outside of the run process.
+* TWEAKED Contact::get_time_zone() will return wp_timezone_string() if no timezone is set.
+* TWEAKED When creating a contact, if an owner is logged in the default owner will be be the logged in user instead of the primary owner from the settings.
+* TWEAKED When importing a list, do not set the owner to the current user and allow the default fallback to take effect.
+* FIXED Changed `blacklist_keys` to `disallowed_keys`.
+* FIXED Custom contact table columns will echo a return value if not void.
+* FIXED Check for the view_contacts cap before display the Groundhogg admin bar widget.
+* FIXED Removed title actions from the help page.
+* FIXED Typos in the new troubleshooter.
+
+= 2.6.2 (2022-03-02) =
+* ADDED the new Groundhogg troubleshooter! A guided support tool to help users identify and resolve issues quickly.
+* ADDED column width option for custom fields for more control over the layout.
+* FIXED rare fatal error caused by missing contact resource from when processing event-queue.
+* FIXED remote_install not working for some plugins.
+* FIXED Conflict between BuddyPress activity meta table and Groundhogg activity meta table.
+
+= 2.6.1.2 (2022-02-23) =
+* FIXED Options not saving after sorting in custom fields
+* FIXED Fatal error caused by trailing comma in PHP < 7.3
+
+= 2.6.1.1 (2022-02-22) =
+* FIXED Custom field saving issue, missing fields and mapping. If your custom fields disappeared after editing them in 2.6, follow [this guide](https://help.groundhogg.io/article/541-custom-fields-disappeared-afgter-updating-to-2-6) to fix it!
+
+= 2.6.1 (2022-02-22) =
+* FIXED Display issue for custom fields in the contact table.
+
+= 2.6 (2022-02-22) =
 * NEW UI for the contact record
   * Condensed design to fit more on the screen, less scrolling.
   * Custom field management is now FREE and part of Groundhogg core! _If you have created custom fields previously with the Custom Field Management addon you will have to update the addon and the custom fields will be refactored._
@@ -340,6 +407,7 @@ You can purchase a premium plan for access to support and our premium extensions
  * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
  * TWEAKED all jQuery removed from the form ajax submission script.
  * TWEAKED all jQuery removed from the fullframe script.
+ * TWEAKED contacts table and record is now mobile responsive for better mobile usability.
  * FIXED Search filters which may have been saved, and then settings get corrupted will show a "corrupted filter" notice instead of crashing, which you'll be able to delete.
  * FIXED fullframe.js conflicting with the forms iframe script causing console errors.
  * FIXED fullframe.js made to be compatible with plugins which optimize iframes.

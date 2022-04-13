@@ -37,7 +37,7 @@ h3 {
   padding: 30px;
 
   object.gh-spinner {
-    max-width: 100px;
+    max-width: 150px;
   }
 }
 
@@ -197,6 +197,11 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
     .property-field {
+
+      &.col-width-1{
+        grid-column: 1 / 3;
+      }
+
       max-width: 100%;
 
       .property-label {
@@ -596,24 +601,47 @@ span.gh-text {
       margin: 0;
     }
 
-    .toggle-indicator{
+    button.panel-handle-order-higher,
+    button.panel-handle-order-lower,
+    button.toggle-indicator{
       background: transparent;
       border: none;
-      border-top-right-radius: 5px;
 
       &:hover{
         background: $primary-dark-5;
       }
+
+      &:focus {
+        box-shadow: 0 0 0 1px $primary-blue, 0 0 2px 1px $primary-blue-60;
+        outline: 1px solid transparent;
+      }
+
+      &::before {
+        display: inline-block;
+        font: normal 20px/1 dashicons;
+        speak: never;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-decoration: none;
+      }
     }
 
-    .toggle-indicator::before {
-      content: "\f142";
-      display: inline-block;
-      font: normal 20px/1 dashicons;
-      speak: never;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-decoration: none;
+    button {
+
+      &.toggle-indicator {
+        border-top-right-radius: 5px;
+      }
+
+      &.toggle-indicator::before {
+        content: "\f142";
+      }
+
+      &.panel-handle-order-lower::before {
+        content: "\f347";
+      }
+      &.panel-handle-order-higher::before {
+        content: "\f343";
+      }
     }
 
   }
@@ -623,7 +651,7 @@ span.gh-text {
 
       border-bottom: none;
 
-      .toggle-indicator::before {
+      button.toggle-indicator::before {
         content: "\f140";
       }
     }
@@ -633,6 +661,10 @@ span.gh-text {
     padding: 20px;
     margin-top: 0;
     margin-bottom: 0;
+
+    &.no-padding{
+      padding: 0;
+    }
   }
 }
 
@@ -655,6 +687,8 @@ span.gh-text {
 }
 
 a,
+input[type='button'],
+input[type='submit'],
 button {
   cursor: pointer;
 
@@ -678,6 +712,10 @@ button {
 
     text-decoration: none;
     white-space: nowrap;
+
+    &:hover {
+      text-decoration: none;
+    }
 
     border: none;
     color: #FFFFFF;
@@ -1491,6 +1529,13 @@ p.error,
       //gap: 10px;
     }
   }
+}
+
+#select-email-preview{
+  width: 100%;
+  height: 300px;
+  border-radius: 5px;
+  border: 1px solid $primary-dark-50;
 }
 
 #gh-send-broadcast-form {

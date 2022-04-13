@@ -15,6 +15,7 @@ use function Groundhogg\get_default_from_name;
 use function Groundhogg\is_template_site;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_user_test_email;
+use function Groundhogg\track_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -149,6 +150,22 @@ class Emails_Api extends Base_Object_Api {
 			return self::ERROR_500();
 		}
 
+		$all_recipients = array_unique( array_merge( $to, $bcc, $cc ) );
+
+		foreach ( $all_recipients as $recipient ) {
+			$contact = get_contactdata( $recipient );
+
+			if ( ! $contact ) {
+				continue;
+			}
+
+			track_activity( $contact, 'composed_email_sent', [], [
+				'subject' => $subject,
+				'from'    => $from_email,
+				'sent_by' => get_current_user_id()
+			] );
+		}
+
 		return self::SUCCESS_RESPONSE();
 	}
 
@@ -200,7 +217,7 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return is_template_site() || current_user_can( 'edit_emails' );
+		return is_template_site() || current_user_can( 'view_emails' ) || current_user_can( 'edit_emails' );
 	}
 
 	public function update_permissions_callback() {

@@ -24,6 +24,8 @@ class Api_Loader {
 	 */
 	public $v4;
 
+	protected static $request;
+
 	/**
 	 * WPGH_API_LOADER constructor.
 	 */
@@ -31,6 +33,27 @@ class Api_Loader {
 
 		add_action( 'rest_api_init', [ $this, 'load_api' ] );
 		add_action( 'rest_api_init', [ $this, 'handle_api_key_usage' ] );
+		add_filter( 'rest_request_before_callbacks', [ $this, 'make_request_accessible' ], 10, 3 );
+	}
+
+	/**
+	 * @return \WP_REST_Request
+	 */
+	public static function get_request(){
+		return self::$request;
+	}
+
+	/**
+	 * @param $response
+	 * @param $handler
+	 * @param $request
+	 *
+	 * @return mixed
+	 */
+	public function make_request_accessible( $response, $handler, $request ) {
+		self::$request = $request;
+
+		return $response;
 	}
 
 	public function load_api() {

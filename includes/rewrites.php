@@ -48,13 +48,13 @@ class Rewrites {
 
 		// File download
 		add_managed_rewrite_rule(
-			'uploads/([^/]*)/?$',
+			'files/([^/]*)/?$',
 			'subpage=files&action=download&file_path=$matches[1]'
 		);
 
 		// File view with basename.
 		add_managed_rewrite_rule(
-			'uploads/(.*)',
+			'files/(.*)',
 			'subpage=files&action=download&file_path=$matches[1]'
 		);
 
@@ -226,27 +226,31 @@ class Rewrites {
 				break;
 
 			case 'files':
-				$file_path       = get_query_var( 'file_path' );
+
+				$short_path       = get_query_var( 'file_path' );
 				$groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
-				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
+				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 
 				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
 					wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
 				}
 
-				$subfolder = basename( dirname( $file_path ) );
-				$contact   = get_contactdata();
-
-				$admin_read_access = current_user_can( 'download_files' );
-
-				$nonce             = get_url_var( 'key' );
-				$nonce_read_access = $nonce && wp_verify_nonce( $nonce );
-
-				$contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
-
 				$unrestricted = is_option_enabled( 'gh_allow_unrestricted_file_access' );
 
 				if ( ! $unrestricted ) {
+
+					$request = get_request_query();
+
+					// General admin access
+					$admin_read_access = current_user_can( 'download_file', $short_path, $request, $file_path );
+
+					// Contact read access
+					$contact             = get_contactdata();
+					$subfolder           = basename( dirname( $file_path ) );
+					$nonce               = get_url_var( 'key' );
+					$nonce_read_access   = $nonce && wp_verify_nonce( $nonce );
+					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
+
 					if ( ! $admin_read_access && ! $contact_read_access ) {
 						wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
 					}
@@ -285,23 +289,23 @@ class Rewrites {
 				break;
 			case 'auto_login':
 
-				$contact = get_contactdata( get_url_var( 'cid' ) );
+				$contact         = get_contactdata( get_url_var( 'cid' ) );
 				$permissions_key = get_permissions_key();
 
 				$target_fallback_page = get_option( 'gh_auto_login_fallback_page', home_url() );
-				$redirect_to = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
+				$redirect_to          = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
 
-				if ( ! is_user_logged_in() ){
+				if ( ! is_user_logged_in() ) {
 
 					// If the contact or permissions key is not available, checkout now.
-					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ){
+					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ) {
 						exit( wp_redirect( $redirect_to ) );
 					}
 
 					$user = $contact->get_userdata();
 
 					// If there is no user account, send to the home page
-					if ( ! $user ){
+					if ( ! $user ) {
 						exit( wp_redirect( $redirect_to ) );
 					}
 

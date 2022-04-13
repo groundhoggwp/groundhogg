@@ -5,6 +5,7 @@ namespace Groundhogg\Steps;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Temp_Step;
+use function Groundhogg\array_map_to_class;
 use function Groundhogg\dashicon;
 use function Groundhogg\doing_rest;
 use function Groundhogg\ensure_array;
@@ -623,19 +624,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$args  = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
 		$query = array_merge( $query, $args );
 
-		$raw_steps = get_db( 'steps' )->query( $query );
+		$steps = get_db( 'steps' )->query( $query );
 
-		$steps = [];
-
-		if ( $raw_steps ) {
-			foreach ( $raw_steps as $raw_step ) {
-				$step = new Step( absint( $raw_step->ID ) );
-
-				if ( $step ) {
-					$steps[] = $step;
-				}
-			}
-		}
+        array_map_to_class( $steps, Step::class );
 
 		return $steps;
 

@@ -731,7 +731,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function delete_files_permissions_callback() {
-		return current_user_can( 'download_contact_files' );
+		return current_user_can( 'delete_files' );
 	}
 
 	/**

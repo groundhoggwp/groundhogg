@@ -497,14 +497,16 @@ class Emails_Page extends Admin_Page {
 			<?php foreach ( $emails as $email ):
 			$email = new Email( $email->ID );
 			?>
-			<div class="postbox">
-				<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+			<div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+                </div>
 				<div class="inside">
 					<p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
 					<p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
 					<iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
 					        height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-					<button class="choose-template button-primary" name="email_id"
+					<button class="choose-template gh-button primary" name="email_id"
 					        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
 				</div>
 			</div>
