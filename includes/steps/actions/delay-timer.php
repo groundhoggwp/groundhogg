@@ -186,7 +186,6 @@ class Delay_Timer extends Action {
 	 */
 	public function enqueue( $step ) {
 
-
 		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
 
 		$date = new \DateTime( 'now', wp_timezone() );
@@ -196,7 +195,7 @@ class Delay_Timer extends Action {
 		}
 
 		$amount           = absint( $this->get_setting( 'delay_amount' ) );
-		$type             = $this->get_setting( 'delay_type' );
+		$type             = $this->get_setting( 'delay_type', 'days' );
 		$run_time         = $this->get_setting( 'run_time', '09:00:00' );
 		$run_when         = $this->get_setting( 'run_when', 'now' );
 

@@ -68,8 +68,8 @@ class Event extends Base_Object {
 	/**
 	 * Event constructor.
 	 *
-	 * @param int $identifier_or_args
-	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
+	 * @param int    $identifier_or_args
+	 * @param string $db    allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
 	 * @param string $field the field to identify when querying the DB
 	 */
 	public function __construct( $identifier_or_args = 0, $db = 'events', $field = 'ID' ) {
@@ -182,6 +182,7 @@ class Event extends Base_Object {
 
 	/**
 	 * returns the email id of the
+	 *
 	 * @return int
 	 */
 	public function get_email_id() {
@@ -359,9 +360,14 @@ class Event extends Base_Object {
 	 * Wrapper function for the step call in WPGH_Step
 	 */
 	public function run() {
+
 		// If the claim has not been set by the queue we should quit now
-		if ( ! $this->get_claim() || ! $this->is_waiting() ) {
-			return false;
+		if ( ! $this->get_claim() ) {
+			return new WP_Error( 'invalid_claim', 'This event has not be claimed' );
+		}
+
+		if ( ! $this->is_waiting() ){
+			return new WP_Error( 'not_waiting', 'This event\'s status is not waiting' );
 		}
 
 		do_action( 'groundhogg/event/run/before', $this );
@@ -371,20 +377,30 @@ class Event extends Base_Object {
 		// No step or not contact?
 		if ( ! $this->get_step() || ! $this->get_contact() || ! $this->get_contact()->exists() ) {
 
-			$this->add_error( new \WP_Error( 'missing', 'Could not locate contact or step record.' ) );
+			$error = new \WP_Error( 'missing', 'Could not locate contact or step record.' );
+
+			$this->add_error( $error );
 
 			$this->fail();
 
-			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
+			return apply_filters( 'groundhogg/event/run/failed_result', $error, $this );
 		}
 
 		$result = $this->get_step()->run( $this->get_contact(), $this );
 
-		// Soft fail when return false
+		// Falsy value from the run() method
 		if ( ! $result ) {
 
-			$this->skip();
+			// Update the error code details with the reason this event was skipped
+			$this->skip( [
+				'error_code'    => 'soft_fail',
+				'error_message' => 'Falsy value returned from Step::run() method'
+			] );
 
+			/**
+			 * We have decided that a "Soft Fail" (Falsy value from the run() method) will allow funnel events to proceed to the next step
+			 * instead of stopping the funnel.
+			 */
 			return apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
 		}
 
@@ -449,12 +465,10 @@ class Event extends Base_Object {
 	public function cancel() {
 		do_action( 'groundhogg/event/cancelled', $this );
 
-		$cancel = $this->update( [
+		return $this->update( [
 			'status' => self::CANCELLED,
 			'time'   => time(),
 		] );
-
-		return $cancel;
 
 	}
 
@@ -486,15 +500,13 @@ class Event extends Base_Object {
 	/**
 	 * Mark the event as skipped
 	 */
-	public function skip() {
+	public function skip( $args = [] ) {
 		do_action( 'groundhogg/event/skipped', $this );
 
-		$skip = $this->update( [
+		return $this->update( wp_parse_args( $args, [
 			'status' => self::SKIPPED,
 			'time'   => time(),
-		] );
-
-		return $skip;
+		] ) );
 	}
 
 	/**
