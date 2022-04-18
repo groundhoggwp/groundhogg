@@ -2715,8 +2715,12 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'tags':
 
-				if ( ! is_array( $value ) ) {
+				if ( is_string( $value ) ) {
 					$maybe_tags = explode( ',', $value );
+				}
+
+				if ( ! is_array( $value ) ){
+					$maybe_tags = [ $value ];
 				}
 
 				$tags = array_merge( $tags, $maybe_tags );

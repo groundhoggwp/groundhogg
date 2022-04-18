@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.8
+Stable tag: 2.6.2.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.2.9 (2022-04-18) =
+* FIXED Values in array format not mapping to tags during field mapping
 
 = 2.6.2.8 (2022-04-14) =
 * TWEAKED Return WP_Error from Event::run() if event is not waiting or has no claim as a failsafe instead of returning false which might allow proceeding funnel events to run out of turn.
