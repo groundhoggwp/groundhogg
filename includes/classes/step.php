@@ -311,13 +311,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// Update any events to skipped...
 		$this->get_event_queue_db()->mass_update(
 			[
-				'status' => Event::SKIPPED
+				'status'        => Event::SKIPPED,
+				'error_code'    => 'skipped_by_step',
+				'error_message' => sprintf( 'Step %d [%s] enqueued', $this->get_id(), $this->get_step_title() )
 			],
 			[
 				'funnel_id'  => $this->get_funnel_id(),
 				'contact_id' => $contact->get_id(),
 				'event_type' => Event::FUNNEL,
-				'status'     => Event::WAITING
+				'status'     => Event::WAITING,
 			]
 		);
 
@@ -493,11 +495,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
-	 * @deprecated since 2.0
-	 *
 	 * @param $name
 	 *
 	 * @return string
+	 * @deprecated since 2.0
+	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

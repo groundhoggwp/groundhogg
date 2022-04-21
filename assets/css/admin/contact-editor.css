@@ -280,7 +280,7 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-rendered.gh-panel {
   padding: 5px 10px;
 }
-#activity-timeline li.activity-item .activity-icon.wp_fusion {
+#activity-timeline li.activity-item .activity-icon.no-frame {
   position: absolute;
   left: -34px;
   height: 25px;
@@ -289,7 +289,7 @@ code.meta-replacement-code {
   align-items: center;
   justify-content: center;
 }
-#activity-timeline li.activity-item .activity-icon:not(.wp_fusion) {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame) {
   position: absolute;
   left: -34px;
   height: 25px;
@@ -301,17 +301,17 @@ code.meta-replacement-code {
   background: #0075ff;
   color: #FFFFFF;
 }
-#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).page-visit {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
 }
-#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).benchmark {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
   background: #f58115;
   border-radius: 4px;
 }
-#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).broadcast, #activity-timeline li.activity-item .activity-icon:not(.wp_fusion).action {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).broadcast, #activity-timeline li.activity-item .activity-icon:not(.no-frame).action {
   background: #9ece38;
 }
-#activity-timeline li.activity-item .activity-icon:not(.wp_fusion) svg {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   width: 15px;
   height: 15px;
 }

@@ -48,7 +48,7 @@ class Settings_Page extends Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_style( 'groundhogg-admin-extensions' );
+//		wp_enqueue_style( 'groundhogg-admin-extensions' );
 	}
 
 	/**
@@ -173,7 +173,7 @@ class Settings_Page extends Admin_Page {
 		$extensions = Extension::get_extensions();
 
 		?>
-		<div id="poststuff">
+		<div>
 			<?php wp_nonce_field(); ?>
 			<?php
 
@@ -199,29 +199,6 @@ class Settings_Page extends Admin_Page {
 				?></div><?php
 			else:
 				?>
-				<style>
-                    .masonry {
-                        columns: 1;
-                        column-gap: 1.5em;
-                    }
-
-                    .postbox {
-                        display: inline-block;
-                        vertical-align: top;
-                    }
-
-                    @media only screen and (max-width: 1023px) and (min-width: 768px) {
-                        .masonry {
-                            columns: 2;
-                        }
-                    }
-
-                    @media only screen and (min-width: 1024px) {
-                        .masonry {
-                            columns: 5;
-                        }
-                    }
-				</style>
 				<p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
 						href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
 				</p>

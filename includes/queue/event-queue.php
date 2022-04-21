@@ -191,9 +191,9 @@ class Event_Queue extends Supports_Errors {
 	public function run_queue() {
 
 		// Don't run during wp-cron.php if gh-cron.php is working
-		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
-			return 0;
-		}
+//		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
+//			return 0;
+//		}
 
 		// Let's make sure we are not over doing it.
 		if ( ! $this->is_enabled() ) {
@@ -260,9 +260,7 @@ class Event_Queue extends Supports_Errors {
 			return $completed_events;
 		}
 
-
-		$event_ids           = $this->store->get_events_by_claim( $claim );
-		$processed_event_ids = [];
+		$event_ids = $this->store->get_events_by_claim( $claim );
 
 		// If this happens it means we are in a parallel queue processing situation,
 		// so let's just try and make another claim.
@@ -284,6 +282,8 @@ class Event_Queue extends Supports_Errors {
 			return $completed_events;
 		}
 
+		$processed_event_ids = [];
+
 		self::set_is_processing( true );
 
 		do {
@@ -295,7 +295,7 @@ class Event_Queue extends Supports_Errors {
 
 			$contact = $event->get_contact();
 
-			if ( ! is_a_contact( $contact ) ){
+			if ( ! is_a_contact( $contact ) ) {
 				continue;
 			}
 
@@ -306,7 +306,9 @@ class Event_Queue extends Supports_Errors {
 				switch_to_locale( $contact->get_locale() );
 			}
 
-			if ( ! is_wp_error( $event->run() ) ) {
+			$result = $event->run();
+
+			if ( ! is_wp_error( $result ) ) {
 
 				if ( $event->is_funnel_event() ) {
 

@@ -70,6 +70,12 @@ class Contact extends Base_Object_With_Meta {
 			}
 		}
 
+		// Support fetching contact by user id
+		if ( is_a( $_id_or_email_or_args, '\WP_User' ) ) {
+			$_id_or_email_or_args = $_id_or_email_or_args->ID;
+			$field                = 'user_id';
+		}
+
 		parent::__construct( $_id_or_email_or_args, $field );
 	}
 
@@ -284,7 +290,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function owner_is( $owner ){
+	public function owner_is( $owner ) {
 		return $owner instanceof WP_User ? $this->get_owner_id() === $owner->ID : $this->get_owner_id() === $owner;
 	}
 
@@ -343,6 +349,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function get_time_zone( $as_string = true ) {
 		$tz = $this->get_meta( 'time_zone' ) ?: wp_timezone_string();
+
 		return $as_string ? $tz : new \DateTimeZone( $tz );
 	}
 
@@ -359,7 +366,7 @@ class Contact extends Base_Object_With_Meta {
 	 * Get the contact's locale
 	 *
 	 * @return string en_US if undefined
- 	 */
+	 */
 	public function get_locale() {
 		return $this->get_meta( 'locale' ) ?: 'en_US';
 	}
@@ -942,7 +949,7 @@ class Contact extends Base_Object_With_Meta {
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
-				if ( current_user_can( 'view_contact', $this ) ){
+				if ( current_user_can( 'view_contact', $this ) ) {
 					$file['url'] .= '?contact=' . $this->ID;
 				}
 

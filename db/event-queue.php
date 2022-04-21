@@ -151,7 +151,7 @@ class Event_Queue extends DB {
 			'event_type'     => Event::FUNNEL,
 			'error_code'     => '',
 			'error_message'  => '',
-			'status'         => 'waiting',
+			'status'         => Event::WAITING,
 			'priority'       => 10,
 			'claim'          => '',
 		);

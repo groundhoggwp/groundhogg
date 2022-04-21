@@ -691,6 +691,8 @@ span.gh-text {
 }
 
 a,
+input[type='button'],
+input[type='submit'],
 button {
   cursor: pointer;
 
@@ -714,6 +716,10 @@ button {
 
     text-decoration: none;
     white-space: nowrap;
+
+    &:hover {
+      text-decoration: none;
+    }
 
     border: none;
     color: #FFFFFF;

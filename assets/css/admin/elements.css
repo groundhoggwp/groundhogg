@@ -523,25 +523,37 @@ span.gh-text.lg {
 }
 
 a,
+input[type=button],
+input[type=submit],
 button {
   cursor: pointer;
 }
 a.dashicon-button,
+input[type=button].dashicon-button,
+input[type=submit].dashicon-button,
 button.dashicon-button {
   border: none;
   background: none;
   opacity: 0.8;
 }
 a.dashicon-button:hover,
+input[type=button].dashicon-button:hover,
+input[type=submit].dashicon-button:hover,
 button.dashicon-button:hover {
   opacity: 1;
 }
 a.dashicon-button:disabled,
+input[type=button].dashicon-button:disabled,
+input[type=submit].dashicon-button:disabled,
 button.dashicon-button:disabled {
   opacity: 0.5;
   cursor: initial;
 }
 a.gh-button, a.gh-submit,
+input[type=button].gh-button,
+input[type=button].gh-submit,
+input[type=submit].gh-button,
+input[type=submit].gh-submit,
 button.gh-button,
 button.gh-submit {
   text-decoration: none;
@@ -553,13 +565,30 @@ button.gh-submit {
   font-size: 16px;
   font-weight: 400;
 }
+a.gh-button:hover, a.gh-submit:hover,
+input[type=button].gh-button:hover,
+input[type=button].gh-submit:hover,
+input[type=submit].gh-button:hover,
+input[type=submit].gh-submit:hover,
+button.gh-button:hover,
+button.gh-submit:hover {
+  text-decoration: none;
+}
 a.gh-button:disabled, a.gh-submit:disabled,
+input[type=button].gh-button:disabled,
+input[type=button].gh-submit:disabled,
+input[type=submit].gh-button:disabled,
+input[type=submit].gh-submit:disabled,
 button.gh-button:disabled,
 button.gh-submit:disabled {
   opacity: 0.5;
   cursor: initial;
 }
 a.gh-button.dropdown, a.gh-submit.dropdown,
+input[type=button].gh-button.dropdown,
+input[type=button].gh-submit.dropdown,
+input[type=submit].gh-button.dropdown,
+input[type=submit].gh-submit.dropdown,
 button.gh-button.dropdown,
 button.gh-submit.dropdown {
   display: flex;
@@ -571,6 +600,10 @@ button.gh-submit.dropdown {
   padding: 5px 10px;
 }
 a.gh-button.dropdown::after, a.gh-submit.dropdown::after,
+input[type=button].gh-button.dropdown::after,
+input[type=button].gh-submit.dropdown::after,
+input[type=submit].gh-button.dropdown::after,
+input[type=submit].gh-submit.dropdown::after,
 button.gh-button.dropdown::after,
 button.gh-submit.dropdown::after {
   content: "";
@@ -582,21 +615,41 @@ button.gh-submit.dropdown::after {
   text-decoration: none;
 }
 a.gh-button.no-border, a.gh-submit.no-border,
+input[type=button].gh-button.no-border,
+input[type=button].gh-submit.no-border,
+input[type=submit].gh-button.no-border,
+input[type=submit].gh-submit.no-border,
 button.gh-button.no-border,
 button.gh-submit.no-border {
   border: none !important;
 }
 a.gh-button.action, a.gh-submit.action,
+input[type=button].gh-button.action,
+input[type=button].gh-submit.action,
+input[type=submit].gh-button.action,
+input[type=submit].gh-submit.action,
 button.gh-button.action,
 button.gh-submit.action {
   background: #9ece38;
 }
 a.gh-button.action:hover:not(:disabled), a.gh-submit.action:hover:not(:disabled),
+input[type=button].gh-button.action:hover:not(:disabled),
+input[type=button].gh-submit.action:hover:not(:disabled),
+input[type=submit].gh-button.action:hover:not(:disabled),
+input[type=submit].gh-submit.action:hover:not(:disabled),
 button.gh-button.action:hover:not(:disabled),
 button.gh-submit.action:hover:not(:disabled) {
   background: #80a92a;
 }
 a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit#gh-submit, a.gh-submit.primary,
+input[type=button].gh-button#gh-submit,
+input[type=button].gh-button.primary,
+input[type=button].gh-submit#gh-submit,
+input[type=button].gh-submit.primary,
+input[type=submit].gh-button#gh-submit,
+input[type=submit].gh-button.primary,
+input[type=submit].gh-submit#gh-submit,
+input[type=submit].gh-submit.primary,
 button.gh-button#gh-submit,
 button.gh-button.primary,
 button.gh-submit#gh-submit,
@@ -604,6 +657,14 @@ button.gh-submit.primary {
   background: #0075ff;
 }
 a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
+input[type=button].gh-button#gh-submit.text,
+input[type=button].gh-button.primary.text,
+input[type=button].gh-submit#gh-submit.text,
+input[type=button].gh-submit.primary.text,
+input[type=submit].gh-button#gh-submit.text,
+input[type=submit].gh-button.primary.text,
+input[type=submit].gh-submit#gh-submit.text,
+input[type=submit].gh-submit.primary.text,
 button.gh-button#gh-submit.text,
 button.gh-button.primary.text,
 button.gh-submit#gh-submit.text,
@@ -612,6 +673,14 @@ button.gh-submit.primary.text {
   color: #0075ff;
 }
 a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
+input[type=button].gh-button#gh-submit:hover:not(:disabled),
+input[type=button].gh-button.primary:hover:not(:disabled),
+input[type=button].gh-submit#gh-submit:hover:not(:disabled),
+input[type=button].gh-submit.primary:hover:not(:disabled),
+input[type=submit].gh-button#gh-submit:hover:not(:disabled),
+input[type=submit].gh-button.primary:hover:not(:disabled),
+input[type=submit].gh-submit#gh-submit:hover:not(:disabled),
+input[type=submit].gh-submit.primary:hover:not(:disabled),
 button.gh-button#gh-submit:hover:not(:disabled),
 button.gh-button.primary:hover:not(:disabled),
 button.gh-submit#gh-submit:hover:not(:disabled),
@@ -619,6 +688,14 @@ button.gh-submit.primary:hover:not(:disabled) {
   background: #005ecc;
 }
 a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
+input[type=button].gh-button#gh-submit:hover:not(:disabled).text,
+input[type=button].gh-button.primary:hover:not(:disabled).text,
+input[type=button].gh-submit#gh-submit:hover:not(:disabled).text,
+input[type=button].gh-submit.primary:hover:not(:disabled).text,
+input[type=submit].gh-button#gh-submit:hover:not(:disabled).text,
+input[type=submit].gh-button.primary:hover:not(:disabled).text,
+input[type=submit].gh-submit#gh-submit:hover:not(:disabled).text,
+input[type=submit].gh-submit.primary:hover:not(:disabled).text,
 button.gh-button#gh-submit:hover:not(:disabled).text,
 button.gh-button.primary:hover:not(:disabled).text,
 button.gh-submit#gh-submit:hover:not(:disabled).text,
@@ -627,6 +704,10 @@ button.gh-submit.primary:hover:not(:disabled).text {
   color: #0075ff;
 }
 a.gh-button.secondary, a.gh-submit.secondary,
+input[type=button].gh-button.secondary,
+input[type=button].gh-submit.secondary,
+input[type=submit].gh-button.secondary,
+input[type=submit].gh-submit.secondary,
 button.gh-button.secondary,
 button.gh-submit.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
@@ -635,6 +716,10 @@ button.gh-submit.secondary {
   padding: 5px 10px;
 }
 a.gh-button.secondary.text, a.gh-submit.secondary.text,
+input[type=button].gh-button.secondary.text,
+input[type=button].gh-submit.secondary.text,
+input[type=submit].gh-button.secondary.text,
+input[type=submit].gh-submit.secondary.text,
 button.gh-button.secondary.text,
 button.gh-submit.secondary.text {
   border: none;
@@ -642,6 +727,10 @@ button.gh-submit.secondary.text {
   color: #102640;
 }
 a.gh-button.secondary:hover:not(:disabled), a.gh-submit.secondary:hover:not(:disabled),
+input[type=button].gh-button.secondary:hover:not(:disabled),
+input[type=button].gh-submit.secondary:hover:not(:disabled),
+input[type=submit].gh-button.secondary:hover:not(:disabled),
+input[type=submit].gh-submit.secondary:hover:not(:disabled),
 button.gh-button.secondary:hover:not(:disabled),
 button.gh-submit.secondary:hover:not(:disabled) {
   color: #005ecc;
@@ -649,6 +738,10 @@ button.gh-submit.secondary:hover:not(:disabled) {
   background-color: rgba(0, 117, 255, 0.02);
 }
 a.gh-button.secondary:hover:not(:disabled).text, a.gh-submit.secondary:hover:not(:disabled).text,
+input[type=button].gh-button.secondary:hover:not(:disabled).text,
+input[type=button].gh-submit.secondary:hover:not(:disabled).text,
+input[type=submit].gh-button.secondary:hover:not(:disabled).text,
+input[type=submit].gh-submit.secondary:hover:not(:disabled).text,
 button.gh-button.secondary:hover:not(:disabled).text,
 button.gh-submit.secondary:hover:not(:disabled).text {
   border: none;
@@ -656,28 +749,48 @@ button.gh-submit.secondary:hover:not(:disabled).text {
   color: #102640;
 }
 a.gh-button.danger, a.gh-submit.danger,
+input[type=button].gh-button.danger,
+input[type=button].gh-submit.danger,
+input[type=submit].gh-button.danger,
+input[type=submit].gh-submit.danger,
 button.gh-button.danger,
 button.gh-submit.danger {
   background: #e91f4f;
 }
 a.gh-button.danger.text, a.gh-submit.danger.text,
+input[type=button].gh-button.danger.text,
+input[type=button].gh-submit.danger.text,
+input[type=submit].gh-button.danger.text,
+input[type=submit].gh-submit.danger.text,
 button.gh-button.danger.text,
 button.gh-submit.danger.text {
   color: #e91f4f;
   background-color: transparent;
 }
 a.gh-button.danger:hover:not(:disabled), a.gh-submit.danger:hover:not(:disabled),
+input[type=button].gh-button.danger:hover:not(:disabled),
+input[type=button].gh-submit.danger:hover:not(:disabled),
+input[type=submit].gh-button.danger:hover:not(:disabled),
+input[type=submit].gh-submit.danger:hover:not(:disabled),
 button.gh-button.danger:hover:not(:disabled),
 button.gh-submit.danger:hover:not(:disabled) {
   background: #c2133d;
 }
 a.gh-button.danger:hover:not(:disabled).text, a.gh-submit.danger:hover:not(:disabled).text,
+input[type=button].gh-button.danger:hover:not(:disabled).text,
+input[type=button].gh-submit.danger:hover:not(:disabled).text,
+input[type=submit].gh-button.danger:hover:not(:disabled).text,
+input[type=submit].gh-submit.danger:hover:not(:disabled).text,
 button.gh-button.danger:hover:not(:disabled).text,
 button.gh-submit.danger:hover:not(:disabled).text {
   color: #e91f4f;
   background-color: rgba(233, 31, 79, 0.1);
 }
 a.gh-button.dashicon, a.gh-submit.dashicon,
+input[type=button].gh-button.dashicon,
+input[type=button].gh-submit.dashicon,
+input[type=submit].gh-button.dashicon,
+input[type=submit].gh-submit.dashicon,
 button.gh-button.dashicon,
 button.gh-submit.dashicon {
   border: 1px solid rgba(16, 38, 64, 0.5);
@@ -686,16 +799,28 @@ button.gh-submit.dashicon {
   padding: 4px 5px;
 }
 a.gh-button.dashicon.filled, a.gh-submit.dashicon.filled,
+input[type=button].gh-button.dashicon.filled,
+input[type=button].gh-submit.dashicon.filled,
+input[type=submit].gh-button.dashicon.filled,
+input[type=submit].gh-submit.dashicon.filled,
 button.gh-button.dashicon.filled,
 button.gh-submit.dashicon.filled {
   background: rgba(16, 38, 64, 0.1);
 }
 a.gh-button.dashicon:hover, a.gh-submit.dashicon:hover,
+input[type=button].gh-button.dashicon:hover,
+input[type=button].gh-submit.dashicon:hover,
+input[type=submit].gh-button.dashicon:hover,
+input[type=submit].gh-submit.dashicon:hover,
 button.gh-button.dashicon:hover,
 button.gh-submit.dashicon:hover {
   background-color: rgba(16, 38, 64, 0.1);
 }
 a.gh-button.icon, a.gh-submit.icon,
+input[type=button].gh-button.icon,
+input[type=button].gh-submit.icon,
+input[type=submit].gh-button.icon,
+input[type=submit].gh-submit.icon,
 button.gh-button.icon,
 button.gh-submit.icon {
   padding: 7px;
@@ -703,41 +828,69 @@ button.gh-submit.icon {
   align-items: center;
 }
 a.gh-button.icon svg, a.gh-submit.icon svg,
+input[type=button].gh-button.icon svg,
+input[type=button].gh-submit.icon svg,
+input[type=submit].gh-button.icon svg,
+input[type=submit].gh-submit.icon svg,
 button.gh-button.icon svg,
 button.gh-submit.icon svg {
   width: 20px;
   height: 20px;
 }
 a.gh-button.icon.small svg, a.gh-submit.icon.small svg,
+input[type=button].gh-button.icon.small svg,
+input[type=button].gh-submit.icon.small svg,
+input[type=submit].gh-button.icon.small svg,
+input[type=submit].gh-submit.icon.small svg,
 button.gh-button.icon.small svg,
 button.gh-submit.icon.small svg {
   width: 14px;
   height: 14px;
 }
 a.gh-button.big, a.gh-submit.big,
+input[type=button].gh-button.big,
+input[type=button].gh-submit.big,
+input[type=submit].gh-button.big,
+input[type=submit].gh-submit.big,
 button.gh-button.big,
 button.gh-submit.big {
   font-size: 24px;
   padding: 15px 32px;
 }
 a.gh-button.medium, a.gh-submit.medium,
+input[type=button].gh-button.medium,
+input[type=button].gh-submit.medium,
+input[type=submit].gh-button.medium,
+input[type=submit].gh-submit.medium,
 button.gh-button.medium,
 button.gh-submit.medium {
   font-size: 18px;
   padding: 11px 22px;
 }
 a.gh-button.small, a.gh-submit.small,
+input[type=button].gh-button.small,
+input[type=button].gh-submit.small,
+input[type=submit].gh-button.small,
+input[type=submit].gh-submit.small,
 button.gh-button.small,
 button.gh-submit.small {
   font-size: 14px;
   padding: 4px 6px;
 }
 a.gh-button.bold, a.gh-submit.bold,
+input[type=button].gh-button.bold,
+input[type=button].gh-submit.bold,
+input[type=submit].gh-button.bold,
+input[type=submit].gh-submit.bold,
 button.gh-button.bold,
 button.gh-submit.bold {
   font-weight: 700;
 }
 a.gh-button.loud, a.gh-submit.loud,
+input[type=button].gh-button.loud,
+input[type=button].gh-submit.loud,
+input[type=submit].gh-button.loud,
+input[type=submit].gh-submit.loud,
 button.gh-button.loud,
 button.gh-submit.loud {
   text-transform: uppercase;

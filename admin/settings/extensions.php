@@ -27,6 +27,11 @@ usort( $downloads, function ( $a, $b ) {
 } );
 
 ?>
+<style>
+    .gh-panel .display-flex p:first-child {
+        margin-top: 0;
+    }
+</style>
 <div class="post-box-grid">
 	<?php
 
@@ -40,56 +45,62 @@ usort( $downloads, function ( $a, $b ) {
 		}
 
 		?>
-		<div class="postbox">
-			<div class="card-top">
-				<h3 class="extension-title">
-					<?php esc_html_e( $download->info->title ); ?>
-					<img class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
-					     alt="<?php esc_attr_e( $extension->info->title ); ?>">
-				</h3>
-				<p class="extension-description">
-					<?php esc_html_e( $extension->info->excerpt ); ?>
-				</p>
-			</div>
-			<div class="install-actions">
+		<div class="gh-panel">
+            <div class="gh-panel-header">
+                <h2>
+                    <?php esc_html_e( $download->info->title ); ?>
+                </h2>
+            </div>
+            <div class="inside">
+                <div class="display-flex gap-20">
+                    <div style="width: 100%">
+                        <img width="100%" height="auto" style="border-radius: 5px" class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
+                             alt="<?php esc_attr_e( $extension->info->title ); ?>">
+                    </div>
+                    <div style="width: 100%">
+                        <?php echo wpautop( $extension->info->excerpt ); ?>
+                    </div>
+                </div>
+                <p></p>
+                <div class="display-flex space-between">
+	                <?php if ( $extension->info->link ): ?>
+		                <?php
+		                $pricing = (array) $extension->pricing;
 
-				<?php if ( $extension->info->link ): ?>
-					<?php
-					$pricing = (array) $extension->pricing;
+		                if ( count( $pricing ) > 1 ) {
 
-					if ( count( $pricing ) > 1 ) {
+			                $price1 = min( $pricing );
+			                $price2 = max( $pricing );
 
-						$price1 = min( $pricing );
-						$price2 = max( $pricing );
+			                ?>
+                            <a class="gh-button secondary" target="_blank"
+                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+			                <?php
+		                } else {
 
-						?>
-						<a class="button-secondary" target="_blank"
-						   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
-						<?php
-					} else {
+			                $price = array_pop( $pricing );
 
-						$price = array_pop( $pricing );
+			                if ( $price > 0.00 ) {
+				                ?>
+                                <a class="gh-button secondary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+				                <?php
+			                } else {
+				                ?>
+                                <a class="gh-button secondary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+				                <?php
+			                }
+		                }
+	                endif; ?>
 
-						if ( $price > 0.00 ) {
-							?>
-							<a class="button-secondary" target="_blank"
-							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
-							<?php
-						} else {
-							?>
-							<a class="button-secondary" target="_blank"
-							   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
-							<?php
-						}
-					}
-				endif; ?>
-
-				<?php echo html()->e( 'a', [
-					'href'   => $extension->info->link,
-					'target' => '_blank',
-					'class'  => 'more-details',
-				], __( 'More details' ) ); ?>
-			</div>
+	                <?php echo html()->e( 'a', [
+		                'href'   => $extension->info->link,
+		                'target' => '_blank',
+		                'class'  => 'more-details',
+	                ], __( 'More details' ) ); ?>
+                </div>
+            </div>
 		</div>
 
 	<?php

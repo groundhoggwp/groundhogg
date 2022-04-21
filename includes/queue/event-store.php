@@ -3,6 +3,7 @@
 namespace Groundhogg\Queue;
 
 use Groundhogg\DB\Events;
+use Groundhogg\Event;
 use function Groundhogg\get_db;
 
 /**
@@ -21,6 +22,11 @@ class Event_Store {
 	 * @return int[]
 	 */
 	public function get_events_by_claim( $claim ) {
+
+		if ( empty( $claim ) ){
+			return [];
+		}
+
 		$queued_events = $this->db()->advanced_query( [
 			'where'   => [
 				'relationship' => 'AND',
@@ -30,9 +36,7 @@ class Event_Store {
 			'select'  => 'ID'
 		], false );
 
-		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
-
-		return $ids;
+		return wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 	}
 
 	/**
@@ -80,7 +84,6 @@ class Event_Store {
 	 */
 	public function get_queued_event_ids( $count = 100 ) {
 
-
 		global $wpdb;
 
 		$count = absint( $count );
@@ -89,12 +92,10 @@ class Event_Store {
 			return [];
 		}
 
-		$now = time();
-
-		$SQL = "SELECT ID FROM {$this->db()->get_table_name()}
-		WHERE `status` = 'waiting' AND `time` <= {$now} AND `claim` = ''
+		$SQL = sprintf( "SELECT ID FROM {$this->db()->get_table_name()}
+		WHERE `status` = '%s' AND `time` <= %d AND `claim` = ''
 		ORDER BY `priority` ASC, `time` ASC
-		LIMIT {$count}";
+		LIMIT %d", Event::WAITING, time(), $count );
 
 		$queued_events = $wpdb->get_results( $SQL );
 
@@ -102,24 +103,25 @@ class Event_Store {
 	}
 
 	/**
+	 * Update the claim in the events queue
 	 *
-	 *
-	 * @param $event_ids
-	 * @param $claim
+	 * @param $event_ids int[]
+	 * @param $claim string
 	 *
 	 * @return bool
 	 */
 	public function claim_events( $event_ids, $claim ) {
 		global $wpdb;
 
-		$ids = implode( ',', $event_ids );
-
-		if ( empty( $ids ) ) {
+		if ( empty( $event_ids ) || empty( $claim ) ) {
 			return false;
 		}
 
-		// Double check claim is empty, because it it's not, bail.
-		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET `claim` = %s WHERE `ID` IN ( $ids ) AND `claim` = ''", $claim ) );
+		$ids = implode( ',', $event_ids );
+
+		// Double check claim is empty, because if it's not, bail.
+		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET `claim` = %s 
+WHERE `ID` IN ( $ids ) AND `claim` = '' AND `time` <= %d", $claim, time() ) );
 	}
 
 	/**
