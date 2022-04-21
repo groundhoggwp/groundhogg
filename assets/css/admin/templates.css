@@ -106,66 +106,61 @@ body {
   min-height: 500px;
 }
 .templates-picker #templates {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas: ". . ." ". . ." ". . .";
   gap: 20px;
   padding: 20px;
 }
-.templates-picker #templates .row {
-  display: flex;
-  gap: 20px;
-}
-.templates-picker #templates .row > * {
-  width: 100%;
-}
-.templates-picker #templates .row .template p.actions button:not(:focus) {
+.templates-picker #templates .template p.actions button:not(:focus) {
   visibility: hidden;
 }
-.templates-picker #templates .row .template.enabled:focus, .templates-picker #templates .row .template.enabled:hover {
+.templates-picker #templates .template.enabled:focus, .templates-picker #templates .template.enabled:hover {
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
 }
-.templates-picker #templates .row .template.enabled:focus p.actions button, .templates-picker #templates .row .template.enabled:hover p.actions button {
+.templates-picker #templates .template.enabled:focus p.actions button, .templates-picker #templates .template.enabled:hover p.actions button {
   visibility: visible;
 }
-.templates-picker #templates .row .template.disabled {
+.templates-picker #templates .template.disabled {
   opacity: 0.8;
 }
-.templates-picker #templates .row .template .inside {
+.templates-picker #templates .template .inside {
   padding-top: 0;
 }
-.templates-picker #templates .row .template .template-header {
+.templates-picker #templates .template .template-header {
   padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.templates-picker #templates .row .template .subject-and-preview {
+.templates-picker #templates .template .subject-and-preview {
   margin-bottom: 10px;
 }
-.templates-picker #templates .row .template .subject-and-preview .subject-wrap, .templates-picker #templates .row .template .subject-and-preview .preview-wrap {
+.templates-picker #templates .template .subject-and-preview .subject-wrap, .templates-picker #templates .template .subject-and-preview .preview-wrap {
   font-size: 14px;
   padding: 8px 10px 0 10px;
   font-weight: 300;
 }
-.templates-picker #templates .row .template .subject-and-preview .subject-wrap {
+.templates-picker #templates .template .subject-and-preview .subject-wrap {
   font-size: 16px;
 }
-.templates-picker #templates .row .template .subject-and-preview .subject,
-.templates-picker #templates .row .template .subject-and-preview .preview-text {
+.templates-picker #templates .template .subject-and-preview .subject,
+.templates-picker #templates .template .subject-and-preview .preview-text {
   font-weight: 500;
 }
-.templates-picker #templates .row .template .template-preview {
+.templates-picker #templates .template .template-preview {
   position: relative;
 }
-.templates-picker #templates .row .template .template-preview .template-content {
+.templates-picker #templates .template .template-preview .template-content {
   border-top: 1px solid rgba(16, 38, 64, 0.15);
 }
-.templates-picker #templates .row .template .template-preview .template-content iframe {
+.templates-picker #templates .template .template-preview .template-content iframe {
   height: 400px;
   width: 100%;
   zoom: 80%;
 }
-.templates-picker #templates .row .template .template-preview .template-actions {
+.templates-picker #templates .template .template-preview .template-actions {
   display: none;
   position: absolute;
   bottom: 0;
@@ -174,10 +169,10 @@ body {
   border-radius: 0 0 5px 5px;
   padding: 10px;
 }
-.templates-picker #templates .row .template .template-preview .template-actions button {
+.templates-picker #templates .template .template-preview .template-actions button {
   width: 100%;
 }
-.templates-picker #templates .row .template .template-preview:hover .template-actions {
+.templates-picker #templates .template .template-preview:hover .template-actions {
   display: block;
   left: 0;
   right: 0;

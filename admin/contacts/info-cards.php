@@ -14,7 +14,7 @@ class Info_Cards {
 
 	public function __construct() {
 		add_action( 'admin_init', [ $this, 'register_core_cards' ] );
-//		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'wp_ajax_groundhogg_save_card_order', [ $this, 'save_card_atts' ] );
 	}
 

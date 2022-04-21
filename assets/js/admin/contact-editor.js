@@ -33,6 +33,7 @@
     filters,
     propertiesEditor,
     isWPFusionActive,
+    StepTypes
   } = Groundhogg
   const { userHasCap } = Groundhogg.user
   const {
@@ -582,9 +583,7 @@
             // language=HTML
             return `
                 <li class="activity-item">
-                    <div class="activity-icon ${ step.data.step_group }">
-                        ${ icons.funnel }
-                    </div>
+                    <div class="activity-icon ${step.data.step_group}">${StepTypes.getType(step.data.step_type).svg}</div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
                             <div class="activity-info">
@@ -600,7 +599,7 @@
                                                         'groundhogg') : __(
                                                         'Completed benchmark: %s | %s',
                                                         'groundhogg') ),
-                                        bold(step.data.step_title),
+                                        StepTypes.getType(step.data.step_type).title(step),
                                         Groundhogg.rawStepTypes[step.data.step_type].name) }</span>
                             </div>
                             <div class="event-extra">
@@ -726,6 +725,7 @@
                       return this.renderActivity(a)
                   }
                   catch (e) {
+                    console.log(e)
                       return ''
                   }
               }).join('') }

@@ -94,7 +94,7 @@
       const numBenchmarks = steps.filter(({ data }) => data.step_group === 'benchmark').length
       const pills = [
         `<span class="pill orange">${sprintf(_n('%d benchmark', '%d benchmarks', numBenchmarks, 'groundhogg'), numBenchmarks)}</span>`,
-        `<span class="pill green">${sprintf(_n('%d action', '%d actions', numBenchmarks, 'groundhogg'), numActions)}</span>`,
+        `<span class="pill green">${sprintf(_n('%d action', '%d actions', numActions, 'groundhogg'), numActions)}</span>`,
         `<span class="pill">${sprintf(__('Added %s', 'groundhogg'), formatDate(data.date_created))}</span>`
       ]
 
@@ -110,13 +110,13 @@
 				  <p>
 					  <b>${__('Details', 'groundhogg')}</b>
 				  </p>
-				  <p>
+				  <p class="display-flex gap-10">
 					  ${pills.join('')}
 				  </p>
 				  <p>
 					  <b>${__('Campaigns', 'groundhogg')}</b>
 				  </p>
-				  <p>
+				  <p class="display-flex gap-10 flex-wrap">
 					  ${campaigns.map(c => `<span class="pill">${c.data.name}</span>`).join('')}
 				  </p>
 				  <p class="actions">
@@ -169,10 +169,8 @@
     },
 
     renderTemplates () {
-      return `<div id="templates">${rowsOf(3, this.getTemplates()
-        .map(t => this.renderTemplate(t)))
-        .map(r => `<div class="row">${fillRow(3, '<div class="fill"></div>', r)
-          .join('')}</div>`).join('')}</div>`
+      return `<div id="templates">${ this.getTemplates()
+      .map(t => this.renderTemplate(t)).join('')}</div>`
     },
 
     getTemplates () {

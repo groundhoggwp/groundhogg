@@ -88,8 +88,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->step_order = absint( $this->step_order );
-		$this->funnel_id  = absint( $this->funnel_id );
+		$this->is_entry      = boolval( $this->is_entry );
+		$this->is_conversion = boolval( $this->is_conversion );
+		$this->step_order    = absint( $this->step_order );
+		$this->funnel_id     = absint( $this->funnel_id );
 	}
 
 	/**
@@ -206,9 +208,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Order = index + 1, so accessing array at order is actually getting the next step
 		for ( $i = $this->get_order(); $i < count( $items ); $i ++ ) {
-			$next = $items[$i];
+			$next = $items[ $i ];
 
-			if ( $next->get_type() === $type ){
+			if ( $next->get_type() === $type ) {
 				return $next;
 			}
 		}
@@ -453,7 +455,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool
 	 */
-	public function is_entry(){
+	public function is_entry() {
 		return (bool) $this->is_entry;
 	}
 

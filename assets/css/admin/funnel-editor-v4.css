@@ -22,8 +22,8 @@
   /* Control panel */
   /* context menu */
 }
-#funnel-editor input {
-  width: auto;
+#funnel-editor p.description {
+  opacity: 0.7;
 }
 #funnel-editor .editor {
   display: flex;
@@ -63,7 +63,7 @@
   line-height: 1;
   margin: 0;
   display: flex;
-  gap: 10px;
+  gap: 5px;
   align-items: center;
   font-size: 1.6em;
   white-space: nowrap;
@@ -117,35 +117,22 @@
   justify-content: flex-start;
   align-items: center;
   align-content: center;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 #funnel-editor .step-flow .steps .action {
   margin: 0 15px;
 }
 #funnel-editor .step-flow .steps .step:last-child {
-  margin-bottom: 100px;
+  margin-bottom: 40px;
 }
 #funnel-editor .step-flow .add-new-step-wrapper {
   background: #F6F9FB;
-  position: absolute;
+  position: sticky;
   bottom: 0;
-  right: 0;
-  left: 0;
-  margin-top: auto;
   padding: 10px 0;
   text-align: center;
   z-index: 100;
-}
-#funnel-editor .step-flow .add-new-step-wrapper:before {
-  background: linear-gradient(0deg, #F6F9FB 0%, #F6F9FB00 100%);
-  bottom: 100%;
-  content: "";
-  display: block;
-  height: 2rem;
-  left: 0;
-  pointer-events: none;
-  position: absolute;
-  width: 100%;
 }
 #funnel-editor .flow-label {
   margin: 30px auto 0;

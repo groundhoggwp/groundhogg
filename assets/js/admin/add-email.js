@@ -123,10 +123,8 @@
     },
 
     renderTemplates () {
-      return `<div id="templates">${rowsOf(3, this.getTemplates()
-        .map(t => this.renderTemplate(t)))
-        .map(r => `<div class="row">${fillRow(3, '<div class="fill"></div>', r)
-          .join('')}</div>`).join('')}</div>`
+      return `<div id="templates">${this.getTemplates()
+        .map(t => this.renderTemplate(t)).join('')}</div>`
     },
 
     getTemplates () {

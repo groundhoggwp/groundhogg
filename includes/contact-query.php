@@ -291,8 +291,7 @@ class Contact_Query {
 			'count'                  => false,
 			'no_found_rows'          => true,
 			'filters'                => [],
-			'exclude_filters'        => [],
-			'is_marketable'          => null,
+			'exclude_filters'        => []
 		);
 
 		/**
@@ -786,22 +785,22 @@ class Contact_Query {
 
 		if ( $this->query_vars['optin_status'] !== 'any' ) {
 
-			if ( ! is_array( $this->query_vars['optin_status'] ) ) {
-				$this->query_vars['optin_status'] = [ $this->query_vars['optin_status'] ];
+			if ( is_array( $this->query_vars['optin_status'] ) ) {
+				$this->query_vars['optin_status'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status'] ) );
+			} else {
+				$this->query_vars['optin_status'] = absint( $this->query_vars['optin_status'] );
 			}
-
-			$this->query_vars['optin_status'] = implode_in_quotes( Preferences::sanitize( $this->query_vars['optin_status'] ) );
 
 			$where['optin_status'] = "$this->table_name.optin_status IN ( {$this->query_vars['optin_status']} )";
 		}
 
 		if ( $this->query_vars['optin_status_exclude'] !== false ) {
 
-			if ( ! is_array( $this->query_vars['optin_status_exclude'] ) ) {
-				$this->query_vars['optin_status_exclude'] = [ $this->query_vars['optin_status_exclude'] ];
+			if ( is_array( $this->query_vars['optin_status_exclude'] ) ) {
+				$this->query_vars['optin_status_exclude'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status_exclude'] ) );
+			} else {
+				$this->query_vars['optin_status_exclude'] = absint( $this->query_vars['optin_status_exclude'] );
 			}
-
-			$this->query_vars['optin_status_exclude'] = implode_in_quotes( Preferences::sanitize( $this->query_vars['optin_status_exclude'] ) );
 
 			$where['optin_status_exclude'] = "$this->table_name.optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
@@ -990,61 +989,6 @@ class Contact_Query {
 		if ( ! empty( $this->query_vars['date_optin_status_changed'] ) && is_array( $this->query_vars['date_optin_status_changed'] ) ) {
 			$date_optin_status_changed_query    = new \WP_Date_Query( $this->query_vars['date_optin_status_changed'], $this->table_name . '.date_optin_status_changed' );
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
-		}
-
-		if ( $this->query_vars['is_marketable'] === true ) {
-
-			$clause = [];
-
-			// If GDPR strict is enabled check for both forms of GDPR compliance
-			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
-				$clause[] = "({$this->table_name}.marketing_consent_date != '' AND {$this->table_name}.data_processing_consent_date != '')";
-			}
-
-			// If confirmation is required check the last optin date against the grace period term
-			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
-				$clause[] = sprintf( '(( %4$s.optin_status = \'%1$s\' AND %4$s.date_last_optin >= \'%2$s\' ) OR ( %4$s.optin_status = \'%3$s\' ))',
-					Preferences::UNCONFIRMED,
-					Preferences::get_min_grace_period_date(),
-					Preferences::CONFIRMED,
-					$this->table_name
-				);
-			} // Otherwise all unconfirmed and confirmed are marketable
-			else {
-				$clause[] = sprintf( "{$this->table_name}.optin_status IN (%s)", implode_in_quotes( [
-					Preferences::UNCONFIRMED,
-					Preferences::CONFIRMED
-				] ) );
-			}
-
-			$where['is_marketable'] = implode( ' AND ', $clause );
-
-		} else if ( $this->query_vars['is_marketable'] === false ) {
-
-			$clause = [];
-
-			// Any statuses that are not confirmed or unconfirmed...
-			$clause[] = sprintf( "{$this->table_name}.optin_status NOT IN (%s)", implode_in_quotes( [
-				Preferences::UNCONFIRMED,
-				Preferences::CONFIRMED
-			] ) );
-
-			// If GDPR strict is enabled check for both forms of GDPR compliance
-			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
-				$clause[] = "({$this->table_name}.marketing_consent_date = '' OR {$this->table_name}.data_processing_consent_date = '')";
-			}
-
-			// If confirmation is required check the last optin date against the grace period term
-			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
-				$clause[] = sprintf( '( %3$s.optin_status = \'%1$s\' AND %3$s.date_last_optin < \'%2$s\')',
-					Preferences::UNCONFIRMED,
-					Preferences::get_min_grace_period_date(),
-					$this->table_name
-				);
-			}
-
-			$where['is_not_marketable'] = implode( ' OR ', $clause );
-
 		}
 
 		/**
@@ -1676,82 +1620,6 @@ class Contact_Query {
 			[ self::class, 'filter_page_visited' ]
 		);
 
-		self::register_filter(
-			'is_marketable',
-			[ self::class, 'filter_is_marketable' ]
-		);
-
-	}
-
-	/**
-	 * Filter based on whether the contact is marketable or not.
-	 *
-	 * @param $filter_vars
-	 * @param $query
-	 *
-	 * @return false|string
-	 */
-	public static function filter_is_marketable( $filter_vars, $query ) {
-
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'value' => 'yes'
-		] );
-
-		if ( $filter_vars['value'] == 'yes' ) {
-
-			$clause = [];
-
-			// If GDPR strict is enabled check for both forms of GDPR compliance
-			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
-				$clause[] = "({$query->table_name}.marketing_consent_date != '' AND {$query->table_name}.data_processing_consent_date != '')";
-			}
-
-			// If confirmation is required check the last optin date against the grace period term
-			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
-				$clause[] = sprintf( '(( %4$s.optin_status = \'%1$s\' AND %4$s.date_last_optin >= \'%2$s\' ) OR ( %4$s.optin_status = \'%3$s\' ))',
-					Preferences::UNCONFIRMED,
-					Preferences::get_min_grace_period_date(),
-					Preferences::CONFIRMED,
-					$query->table_name
-				);
-			} // Otherwise all unconfirmed and confirmed are marketable
-			else {
-				$clause[] = sprintf( "{$query->table_name}.optin_status IN (%s)", implode_in_quotes( [
-					Preferences::UNCONFIRMED,
-					Preferences::CONFIRMED
-				] ) );
-			}
-
-			return implode( ' AND ', $clause );
-
-		} else if ( $filter_vars['value'] == 'no' ) {
-
-			$clause = [];
-
-			// Any statuses that are not confirmed or unconfirmed...
-			$clause[] = sprintf( "{$query->table_name}.optin_status NOT IN (%s)", implode_in_quotes( [
-				Preferences::UNCONFIRMED,
-				Preferences::CONFIRMED
-			] ) );
-
-			// If GDPR strict is enabled check for both forms of GDPR compliance
-			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
-				$clause[] = "({$query->table_name}.marketing_consent_date = '' OR {$query->table_name}.data_processing_consent_date = '')";
-			}
-
-			// If confirmation is required check the last optin date against the grace period term
-			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
-				$clause[] = sprintf( '( %3$s.optin_status = \'%1$s\' AND %3$s.date_last_optin < \'%2$s\')',
-					Preferences::UNCONFIRMED,
-					Preferences::get_min_grace_period_date(),
-					$query->table_name
-				);
-			}
-
-			return implode( ' OR ', $clause );
-		}
-
-		return false;
 	}
 
 	/**

@@ -63,7 +63,7 @@
     // language=HTML
     return `
 		<button id="close-email-editor" class="gh-button secondary text icon">
-			${icons.close}
+        <span class="dashicons dashicons-no-alt"></span>
 		</button>`
   }
 
@@ -1238,7 +1238,7 @@
                 step_group: group,
                 step_order: $(ui.helper).prevAll('.step').length,
               },
-              meta: StepTypes.getType(type).defaults,
+              meta: copyObject( StepTypes.getType(type).defaults ),
             })
           },
           update: function (e, ui) {
@@ -1516,7 +1516,7 @@
       self.renderStepFlow()
 
       const mountSteps = () => {
-        const sr = regexp(self.stepSearch)
+        const sr = regexp(self.stepSearch ? self.stepSearch: '')
 
         $('#types').html(
           Object.values(StepTypes)
@@ -1545,7 +1545,7 @@
               step_group: group,
               step_order: order,
             },
-            meta: StepTypes.getType(type).defaults,
+            meta: copyObject( StepTypes.getType(type).defaults ),
           })
         }
 

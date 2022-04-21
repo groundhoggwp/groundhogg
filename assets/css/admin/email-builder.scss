@@ -32,6 +32,8 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 #email-block-editor {
   display: flex;
+  gap: 20px;
+  padding: 0 20px;
   max-height: calc(100vh - 132px);
 
   *{
@@ -39,7 +41,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   }
 
   #blocks-panel {
-    padding: 0 20px;
+    //padding: 0 20px;
   }
 
   .block-wrap{
@@ -199,7 +201,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   #controls-panel {
     width: 400px;
-    padding: 0 10px;
+    //padding: 0 10px;
 
     h3{
       padding-left: 10px;

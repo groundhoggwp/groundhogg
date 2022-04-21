@@ -48,11 +48,12 @@
 
   let MAX_EMAIL_WITH = 600
 
-  const createBlock = (type, props) => {
+  const createBlock = (type, props = {}) => {
+
     return {
       id: uuid(),
       type,
-      ...BlockRegistry.blocks[type].defaults,
+      ...copyObject( BlockRegistry.blocks[type].defaults ),
       ...props
     }
   }
@@ -169,11 +170,7 @@
        */
       const addBlock = (type, index = 0, parent = false, column = 0) => {
 
-        let newBlock = {
-          id: uuid(),
-          type,
-          ...BlockRegistry.blocks[type].defaults
-        }
+        let newBlock = createBlock( type )
 
         __insertBlock(newBlock, index, this.blocks, parent, column)
 

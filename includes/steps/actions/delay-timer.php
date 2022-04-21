@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Form\Fields\Date;
 use Groundhogg\Plugin;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Step;
@@ -248,12 +249,13 @@ class Delay_Timer extends Action {
 	/**
 	 * Get the enqueue time
 	 *
-	 * @param array $settings
+	 * @param array   $settings
 	 * @param Contact $contact
 	 *
 	 * @return int
 	 */
-	protected static function get_enqueue_time( $settings, $contact=false ) {
+	protected static function get_enqueue_time( $settings, $contact = false ) {
+
 		$settings = wp_parse_args( $settings, [
 			'delay_amount'      => 3,
 			'delay_type'        => 'days',
@@ -270,14 +272,14 @@ class Delay_Timer extends Action {
 		] );
 
 
-		$date = new DelayDateTime();
-		$tz = $settings['send_in_timezone'] && $contact ? new \DateTimeZone( $contact->get_time_zone() ) : wp_timezone();
-		$date->setTimezone( $tz );
+		$tz   = $settings['send_in_timezone'] && $contact ? $contact->get_time_zone( false ) : wp_timezone();
+		$date = new DelayDateTime( 'now', $tz );
+
 		$date->setMin();
 
 		// The base amount of time which we need to wait for
 		if ( $settings['delay_type'] !== 'none' ) {
-			$date->dontMakeSmaller( sprintf( '+%d %s', $settings['delay_amount'], $settings['delay_type'] ) );
+			$date->modify( sprintf( '+%d %s', $settings['delay_amount'], $settings['delay_type'] ) );
 		}
 
 		// The date to run on
@@ -394,7 +396,7 @@ class Delay_Timer extends Action {
 				break;
 			case 'later':
 
-				$date->modify( $date->format( 'Y-m-d' ) . ' ' . $settings['run_time'] );
+				$date->modify( $settings['run_time'] );
 
 				// If the date for some reason ends up being later than the current time, modify it to the next day
 				if ( $date->getTimestamp() < time() ) {
@@ -406,22 +408,18 @@ class Delay_Timer extends Action {
 
 				// Is today
 				if ( date( 'Y-m-d', $date->getTimestamp() ) === date( 'Y-m-d' ) ) {
-					$from = strtotime( $date->format( 'Y-m-d' ) . ' ' . $settings['run_time'] ) - $tz->getOffset( $date );
-					$to   = strtotime( $date->format( 'Y-m-d' ) . ' ' . $settings['run_time_to'] ) - $tz->getOffset( $date );
+
+					$from = clone $date;
+					$from->modify( $settings['run_time'] );
+
+					$to = clone $date;
+					$to->modify( $settings['run_time_to'] );
 
 					// If the time does not fall within the given from/to modify it to the next day run time.
-					if ( $date->getTimestamp() < $from || $date->getTimestamp() > $to ) {
-						$date->modify( '+1 day' )->modify( $date->format( 'Y-m-d' ) . ' ' . $settings['run_time'] );
+					if ( $date < $from || $date > $to ) {
+						$date->modify( '+1 day' );
+						$date->modify( $settings['run_time'] );
 					}
-
-					break;
-				}
-
-				$date->modify( $date->format( 'Y-m-d' ) . ' ' . $settings['run_time'] );
-
-				// If the date for some reason ends up being later than the current time, modify it to the next day
-				if ( $date->getTimestamp() < time() ) {
-					$date->modify( '+1 day' );
 				}
 
 				break;
@@ -437,47 +435,18 @@ class Delay_Timer extends Action {
 	 * @return int|void
 	 */
 	public function enqueue( $step ) {
-		return self::get_enqueue_time( $step->get_meta() );
+
+		$contact = false;
+
+		if ( Event_Queue::is_processing() ){
+			$contact = \Groundhogg\event_queue()->get_current_contact();
+		}
+
+		return self::get_enqueue_time( $step->get_meta(), $contact );
 	}
 
 	/**
-	 * Override the parent and set the run time of this function to the settings
-	 *
-	 * @param Step $step
-	 *
-	 * @return int
-	 */
-	public function old_enqueue( $step ) {
-
-
-		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
-
-		$date = new \DateTime( 'now', wp_timezone() );
-
-		if ( $send_in_timezone && Event_Queue::is_processing() ) {
-			$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
-		}
-
-		$amount           = absint( $this->get_setting( 'delay_amount' ) );
-		$type             = $this->get_setting( 'delay_type' );
-		$run_time         = $this->get_setting( 'run_time', '09:00:00' );
-		$run_when         = $this->get_setting( 'run_when', 'now' );
-
-		$date->modify( sprintf('+%d %s', $amount, $type) );
-
-		if ( $run_when !== 'now' ){
-			$date->modify( $run_time );
-
-			if ( $date->getTimestamp() < time() ){
-				$date->modify('+1 day');
-			}
-		}
-
-		return $date->getTimestamp();
-	}
-
-	/**
-	 * Process the apply tag step...
+	 * Nothing happens during event timer run
 	 *
 	 * @param $contact Contact
 	 * @param $event   Event

@@ -60,6 +60,9 @@ h3.no-margin-top {
 .display-flex.stretch {
   align-items: stretch;
 }
+.display-flex.flex-wrap {
+  flex-wrap: wrap;
+}
 .display-flex.gap-10 {
   gap: 10px;
 }
@@ -324,7 +327,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   line-height: 1;
   margin: 0;
   display: flex;
-  gap: 10px;
+  gap: 5px;
   align-items: center;
   font-size: 1.6em;
   white-space: nowrap;

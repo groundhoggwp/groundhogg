@@ -9,7 +9,6 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\track_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,4 +45,11 @@ if ( ! current_user_can( 'view_contact', $contact ) ) {
 }
 
 ?>
-<div id="app"></div>
+<div class="contact-record">
+	<div class="contact-editor-wrap">
+		<?php include __DIR__ . '/contact-editor.php'; ?>
+	</div>
+	<div class="contact-info-cards">
+		<?php Info_Cards::display( $contact ); ?>
+	</div>
+</div>

@@ -70,20 +70,22 @@ class Tag_Relationships extends DB {
 	}
 
 	/**
+	 * A contact was merged
 	 *
+	 * Update the relationship to the new contact only where the contact does
+	 * not already have that relationship to avoid collisions
 	 *
-	 * @param \Groundhogg\Contact $primary
-	 * @param \Groundhogg\Contact $other
+	 * @param $contact Contact
+	 * @param $other Contact
 	 */
-	public function contact_merged( $primary, $other ) {
+	public function contact_merged( $contact, $other ) {
 
-		$diff = array_diff( $other->get_tag_ids());//todo
+		global $wpdb;
 
-		$this->update([
-			'contact_id' => $other->get_id()
-		], [
-			'contact_id' => $primary->get_id()
-		]);
+		$tag_ids = implode( ',', $contact->get_tag_ids() );
+
+		$wpdb->query( "UPDATE $this->table_name SET contact_id = $contact->ID WHERE contact_id = $other->ID AND tag_id NOT IN ($tag_ids)" );
+
 	}
 
 	/**
@@ -150,25 +152,6 @@ class Tag_Relationships extends DB {
 		}
 
 		return false;
-	}
-
-	/**
-	 * A contact was merged
-	 *
-	 * Update the relationship to the new contact only where the contact does
-	 * not already have that relationship to avoid collisions
-	 *
-	 * @param $contact Contact
-	 * @param $other Contact
-	 */
-	public function contact_merged( $contact, $other ) {
-
-		global $wpdb;
-
-		$tag_ids = implode( ',', $contact->get_tag_ids() );
-
-		$wpdb->query( "UPDATE $this->table_name SET contact_id = $contact->ID WHERE contact_id = $other->ID AND tag_id NOT IN ($tag_ids)" );
-
 	}
 
 	/**

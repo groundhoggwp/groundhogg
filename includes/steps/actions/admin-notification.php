@@ -5,6 +5,7 @@ namespace Groundhogg\Steps\Actions;
 use Groundhogg\Contact;
 use function Groundhogg\do_replacements;
 use Groundhogg\Event;
+use function Groundhogg\email_kses;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use Groundhogg\HTML;
@@ -92,82 +93,6 @@ class Admin_Notification extends Action {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		$this->start_controls_section();
-
-		if ( is_sms_plugin_active() ) {
-			$this->add_control( 'is_sms', [
-				'label'       => __( 'Send as SMS', 'groundhogg' ),
-				'type'        => HTML::CHECKBOX,
-				'default'     => false,
-				'field'       => [
-					'label' => Plugin::$instance->utils->html->wrap( __( 'Send as a text message instead of as an email.', 'groundhogg' ), 'span', [ 'class' => 'description' ] ),
-					'class' => 'auto-save'
-				],
-				'description' => false
-			] );
-		}
-
-		if ( ! $this->is_sms() || ! is_sms_plugin_active() ) {
-			$this->add_control( 'send_to', [
-				'label'       => __( 'Send To:', 'groundhogg' ),
-				'type'        => HTML::INPUT,
-				'default'     => get_bloginfo( 'admin_email' ),
-				'description' => __( 'Use any email address or the {owner_email} replacement code.', 'groundhogg' )
-			] );
-
-			$this->add_control( 'from', [
-				'label'       => __( 'From:', 'groundhogg' ),
-				'type'        => HTML::INPUT,
-				'default'     => get_bloginfo( 'admin_email' ),
-				'description' => __( 'The email address which you want to send email from. Accepts one email address.', 'groundhogg' )
-			] );
-
-			$this->add_control( 'reply_to', [
-				'label'       => __( 'Reply To:', 'groundhogg' ),
-				'type'        => HTML::INPUT,
-				'default'     => "{email}",
-				'description' => __( 'The email address which you can reply to. Use any address or the {email} code.', 'groundhogg' )
-			] );
-
-			$this->add_control( 'subject', [
-				'label'       => __( 'Subject:', 'groundhogg' ),
-				'type'        => HTML::INPUT,
-				'default'     => "Admin notification for {full_name} ({email})",
-				'description' => __( 'Use any valid replacement codes.', 'groundhogg' )
-			] );
-		} else {
-			$this->add_control( 'send_to_sms', [
-				'label'       => __( 'Send To:', 'groundhogg' ),
-				'type'        => HTML::INPUT,
-				'default'     => get_option( 'gh_business_phone' ),
-				'description' => __( 'Use any mobile phone number. Include country code and <code>+</code>! Also accepts {owner_phone}', 'groundhogg' )
-			] );
-		}
-
-		$this->add_control( 'note_text', [
-			'label'       => __( 'Content:', 'groundhogg' ),
-			'type'        => HTML::TEXTAREA,
-			'default'     => "Please follow up with {full_name} soon.\nEmail: {email}\nPhone: {phone}",
-			'description' => __( 'Use any valid replacement codes.', 'groundhogg' ),
-			'field'       => [
-				'cols' => 64,
-				'rows' => 4
-			],
-		] );
-
-		if ( ! $this->is_sms() ) {
-			$this->add_control( 'hide_admin_links', [
-				'label'       => __( 'Hide admin links', 'groundhogg' ),
-				'type'        => HTML::CHECKBOX,
-				'default'     => false,
-				'field'       => [
-					'label' => Plugin::$instance->utils->html->wrap( __( 'Will hide the admin links to the contact record in the footer of the email.', 'groundhogg' ), 'span', [ 'class' => 'description' ] ),
-				],
-				'description' => false
-			] );
-		}
-
-		$this->end_controls_section();
 	}
 
 	/**
@@ -179,31 +104,14 @@ class Admin_Notification extends Action {
 		$send_to = $this->get_posted_data( 'send_to' );
 
 		if ( $send_to ) {
-			$send_to          = sanitize_text_field( $send_to );
-			$emails           = array_map( 'trim', explode( ',', $send_to ) );
-			$emails = array_filter( $emails, function ( $email ){
+			$send_to = sanitize_text_field( $send_to );
+			$emails  = array_map( 'trim', explode( ',', $send_to ) );
+			$emails  = array_filter( $emails, function ( $email ) {
 				return is_email( $email ) || is_replacement_code_format( $email );
 			} );
 
 			$send_to = implode( ',', $emails );
 			$this->save_setting( 'send_to', $send_to );
-		}
-
-		if ( is_sms_plugin_active() ) {
-			$send_to_sms = $this->get_posted_data( 'send_to_sms' );
-
-			if ( $send_to_sms ) {
-				$send_to_sms       = sanitize_text_field( $send_to_sms );
-				$numbers           = array_map( 'trim', explode( ',', $send_to_sms ) );
-				$sanitized_numbers = array();
-
-				foreach ( $numbers as $number ) {
-					$sanitized_numbers[] = ( $number === '{owner_phone}' ) ? '{owner_phone}' : preg_replace( '/[^+0-9]/', '', $number );
-				}
-
-				$send_to = implode( ', ', $sanitized_numbers );
-				$this->save_setting( 'send_to_sms', $send_to );
-			}
 		}
 
 		$reply_to = $this->get_posted_data( 'reply_to' );
@@ -220,13 +128,10 @@ class Admin_Notification extends Action {
 		$from = sanitize_email( $this->get_posted_data( 'from' ) );
 		$this->save_setting( 'from', $from );
 
-		if ( is_sms_plugin_active() ) {
-			$this->save_setting( 'is_sms', boolval( $this->get_posted_data( 'is_sms' ) ) );
-		}
 
 		$this->save_setting( 'hide_admin_links', boolval( $this->get_posted_data( 'hide_admin_links' ) ) );
 		$this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
-		$this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text' ) ) );
+		$this->save_setting( 'note_text', email_kses( $this->get_posted_data( 'note_text' ) ) );
 	}
 
 	/**
@@ -246,63 +151,44 @@ class Admin_Notification extends Action {
 		$is_sms           = $this->get_setting( 'is_sms', false );
 		$hide_admin_links = $this->get_setting( 'hide_admin_links', false );
 
-		// Email
-		if ( ! $is_sms ) {
-
-			if ( ! $hide_admin_links ) {
-				$finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
-					admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
-					$contact->get_email()
-				);
-			}
-
-			$subject = $this->get_setting( 'subject' );
-			$subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );
-
-			$send_to  = $this->get_setting( 'send_to' );
-			$reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
-			$from     = do_replacements( $this->get_setting( 'from', get_default_from_name() ), $contact->get_id() );
-
-
-			if ( ! is_email( $send_to ) ) {
-				$send_to = do_replacements( $send_to, $contact->get_id() );
-			}
-
-			if ( ! $send_to ) {
-				return false;
-			}
-
-			add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
-
-			$from_email = is_email( $from ) ? $from : get_default_from_name();
-
-			$headers = [
-				sprintf( 'From: %s <%s>', get_default_from_name(), $from_email ),
-				"Content-Type: text/plain"
-			];
-
-			if ( is_email( $reply_to ) ) {
-				$headers[] = sprintf( 'Reply-To: %s', $reply_to );
-			}
-
-			$sent = \Groundhogg_Email_Services::send_transactional( $send_to, wp_specialchars_decode( $subject ), $finished_note, $headers );
-
-			remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
-		} else {
-
-			if ( ! is_sms_plugin_active() ) {
-				return new \WP_Error( 'sms_inactive', 'The SMS extension was not found.' );
-			}
-
-			$to   = do_replacements( $this->get_setting( 'send_to_sms' ), $contact );
-			$sent = false;
-
-			if ( class_exists( '\GroundhoggSMS\SMS_Services' ) ) {
-				$sent = \GroundhoggSMS\SMS_Services::send_transactional( $to, $finished_note );
-			}
-
-			return $sent;
+		if ( ! $hide_admin_links ) {
+			$finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
+				admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
+				$contact->get_email()
+			);
 		}
+
+		$subject = $this->get_setting( 'subject' );
+		$subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );
+
+		$send_to  = $this->get_setting( 'send_to' );
+		$reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
+		$from     = do_replacements( $this->get_setting( 'from', get_default_from_name() ), $contact->get_id() );
+
+		if ( ! is_email( $send_to ) ) {
+			$send_to = do_replacements( $send_to, $contact->get_id() );
+		}
+
+		if ( ! $send_to ) {
+			return false;
+		}
+
+		add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
+
+		$from_email = is_email( $from ) ? $from : get_default_from_name();
+
+		$headers = [
+			sprintf( 'From: %s <%s>', get_default_from_name(), $from_email ),
+			"Content-Type: text/html"
+		];
+
+		if ( is_email( $reply_to ) ) {
+			$headers[] = sprintf( 'Reply-To: %s', $reply_to );
+		}
+
+		$sent = \Groundhogg_Email_Services::send_transactional( $send_to, wp_specialchars_decode( $subject ), $finished_note, $headers );
+
+		remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
 		if ( $this->has_errors() ) {
 			return $this->get_last_error();

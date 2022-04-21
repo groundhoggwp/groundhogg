@@ -8,13 +8,12 @@
 
 #email-block-editor {
   display: flex;
+  gap: 20px;
+  padding: 0 20px;
   max-height: calc(100vh - 132px);
 }
 #email-block-editor * {
   box-sizing: border-box;
-}
-#email-block-editor #blocks-panel {
-  padding: 0 20px;
 }
 #email-block-editor .block-wrap .block-name {
   text-align: center;
@@ -136,7 +135,6 @@
 }
 #email-block-editor #controls-panel {
   width: 400px;
-  padding: 0 10px;
 }
 #email-block-editor #controls-panel h3 {
   padding-left: 10px;

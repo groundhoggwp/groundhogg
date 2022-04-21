@@ -99,6 +99,10 @@ h3 {
     align-items: stretch;
   }
 
+  &.flex-wrap{
+    flex-wrap: wrap;
+  }
+
   &.gap-10 {
     gap: 10px;
   }
@@ -448,7 +452,7 @@ body {
       line-height: 1;
       margin: 0;
       display: flex;
-      gap: 10px;
+      gap: 5px;
       align-items: center;
       font-size: 1.6em;
       white-space: nowrap;
