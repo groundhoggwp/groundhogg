@@ -17,7 +17,7 @@ WordPress CRM, Email & Marketing Automation
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
-🌎 [Facebook Group](https://www.fa   cebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
+🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
 
 🚀 [Free Quickstart Course — Launch your first funnel!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
 

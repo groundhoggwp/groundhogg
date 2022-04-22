@@ -55,7 +55,7 @@ class Address extends Input {
 			'name'        => 'address[street_address_1]',
 			'class'       => 'gh-input',
 			'placeholder' => __( 'Street Address 1', 'groundhogg' ),
-			'required'    => $this->is_required()
+			'required'    => $this->is_required(),
 		];
 
 		$street_address_2 = [
@@ -94,7 +94,7 @@ class Address extends Input {
 			'name'        => 'address[country]',
 			'class'       => 'gh-input gh-form-field',
 			'options'     => Plugin::$instance->utils->location->get_countries_list(),
-			'placeholder' => __( 'Country', 'groundhogg' ),
+			'option_none' => __( 'Country', 'groundhogg' ),
 			'required'    => $this->is_required(),
 		];
 
