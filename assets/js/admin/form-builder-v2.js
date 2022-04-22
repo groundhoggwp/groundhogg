@@ -150,6 +150,43 @@
         })
       },
     },
+    tags: {
+      type: 'tags',
+      edit () {
+        //language=HTML
+        return `<label for="type">${ __('Apply Tags') }</label>
+        <div class="setting">
+            ${ select({
+                id: 'apply-tags',
+                name: 'apply-tags',
+            }) }
+        </div>`
+      },
+      onMount ({ tags = []}, updateField) {
+
+        const renderTagPicker = () => {
+          tagPicker('#apply-tags', true, (items) => TagsStore.itemsFetched(items), {
+            data: tags.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+          }).on('change', e => {
+            let tags = $(e.target).val().map(id => parseInt(id))
+            updateField({
+              tags,
+            })
+          })
+        }
+
+        if ( tags && ! TagsStore.hasItems( tags ) ){
+          TagsStore.fetchItems({
+            id: tags
+          }).then( () => {
+            renderTagPicker()
+          })
+        } else {
+          renderTagPicker()
+        }
+
+      },
+    },
 
     name: {
       type: 'name',
@@ -192,6 +229,29 @@
         $('#required').on('change', (e) => {
           updateField({
             required: e.target.checked,
+          })
+        })
+      },
+    },
+    checked: {
+      type: 'checked',
+      edit ({ checked = false }) {
+        //language=HTML
+        return `<label for="required">${ __('Checked by default', 'groundhogg') }</label>
+        <div class="setting">${ toggle({
+            id: 'checked',
+            name: 'checked',
+            className: 'checked',
+            onLabel: 'Yes',
+            offLabel: 'No',
+            checked,
+        }) }
+        </div>`
+      },
+      onMount (field, updateField) {
+        $('#checked').on('change', (e) => {
+          updateField({
+            checked: e.target.checked,
           })
         })
       },
@@ -450,7 +510,7 @@
       },
       onMount ({ options = [['', []]] }, updateField, currentField) {
 
-        let allTags = options.map( opt => opt[1] ).reduce((a, i) => [...a, i], [])
+        let allTags = options.map(opt => opt[1]).reduce((a, i) => [...a, i], [])
 
         console.log(allTags)
 
@@ -494,7 +554,7 @@
                 onOpen: () => {
 
                   let $input = $($(el).find('input'))
-                  let selected = $input.val().split(',').map(t => parseInt(t)).filter( id => TagsStore.has( id ) )
+                  let selected = $input.val().split(',').map(t => parseInt(t)).filter(id => TagsStore.has(id))
 
                   tagPicker('#tags', true, (items) => TagsStore.itemsFetched(items), {
                     data: selected.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
@@ -776,7 +836,10 @@
         Settings.options.type,
         Settings.columnWidth.type,
       ],
-      advanced: standardAdvancedSettings,
+      advanced: [
+        Settings.id.type,
+        Settings.className.type,
+      ],
       preview: ({
         id = uuid(),
         name = 'name',
@@ -828,7 +891,10 @@
         Settings.options.type,
         Settings.columnWidth.type,
       ],
-      advanced: standardAdvancedSettings,
+      advanced: [
+        Settings.id.type,
+        Settings.className.type,
+      ],
       preview: ({
         id = uuid(),
         name = 'name',
@@ -847,7 +913,6 @@
                       ${ input({
                           type: 'radio',
                           id,
-                          required,
                           className,
                           name,
                           value: opt[0],
@@ -856,10 +921,104 @@
               </div>`
         }).join('')
 
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
         return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
       },
     },
-    checkbox: {},
+    checkbox_list: {
+      name: __('Checkbox List'),
+      content: [
+        Settings.type.type,
+        Settings.label.type,
+        Settings.name.type,
+        // Settings.hideLabel.type,
+        Settings.required.type,
+        Settings.options.type,
+        Settings.columnWidth.type,
+      ],
+      advanced: [
+        Settings.id.type,
+        Settings.className.type,
+      ],
+      preview: ({
+        id = uuid(),
+        name = 'name',
+        options = [],
+        label = '',
+        // hide_label = false,
+        required = false,
+        className = '',
+      }) => {
+
+        const inputField = options.map(opt => {
+          // language=HTML
+          return `
+              <div class="gh-radio-wrapper">
+                  <label class="gh-radio-label">
+                      ${ input({
+            type: 'checkbox',
+            id,
+            required,
+            className,
+            name: name + '[]',
+            value: opt[0],
+          }) } ${ opt[0] }
+                  </label>
+              </div>`
+        }).join('')
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+      },
+    },
+    checkbox: {
+      name: __('Checkbox', 'groundhogg'),
+      content: [
+        Settings.type.type,
+        Settings.label.type,
+        Settings.name.type,
+        Settings.tags.type,
+        Settings.required.type,
+        Settings.checked.type,
+        Settings.columnWidth.type,
+      ],
+      advanced: standardAdvancedSettings,
+      preview: ({
+        id = uuid(),
+        name = 'name',
+        value = '1',
+        label = '',
+        required = false,
+        className = '',
+        checked = false,
+      }) => {
+
+        if (!value) {
+          value = '1'
+        }
+
+        const inputField = input({
+          id: id,
+          type: 'checkbox',
+          className: `gh-checkbox-input ${ className }`,
+          name,
+          value,
+          checked,
+        })
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label">${ inputField } ${ label }</label>`
+      },
+    },
     address: {},
     birthday: {},
     date: {

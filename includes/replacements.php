@@ -1267,6 +1267,7 @@ class Replacements implements \JsonSerializable {
 		return $quotes[ $quote ];
 	}
 
+
 	public function jsonSerialize() {
 		return false;
 	}
