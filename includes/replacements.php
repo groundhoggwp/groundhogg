@@ -300,7 +300,15 @@ class Replacements implements \JsonSerializable {
 				'default_args' => 'Y-m-d|now',
 				'callback'     => [ $this, 'replacement_date' ],
 				'name'         => __( 'Date', 'groundhogg' ),
-				'description'  => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+				'description'  => _x( 'Insert a dynamic date based on the site\'s timezone. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'local_date',
+				'group'        => 'site',
+				'default_args' => 'Y-m-d|now',
+				'callback'     => [ $this, 'replacement_local_date' ],
+				'name'         => __( 'Local Date', 'groundhogg' ),
+				'description'  => _x( 'Same as {date} but will display in local time of the contact instead of the site.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'files',
@@ -1133,6 +1141,14 @@ class Replacements implements \JsonSerializable {
 		return home_url();
 	}
 
+
+	/**
+	 * Flag to modify the date replacement to output in the local time of the contact
+	 *
+	 * @var bool
+	 */
+	protected $date_display_in_contacts_local_time = false;
+
 	/**
 	 * Return a formatted date in local time.
 	 *
@@ -1152,11 +1168,43 @@ class Replacements implements \JsonSerializable {
 			$when   = $parts[1];
 		}
 
-		/* convert to local time */
-		$time = strtotime( $when );
+		try {
+			$dateTime = new \DateTime( $when, wp_timezone() );
+		} catch ( \Exception $e ){
 
-		return date_i18n( $format, $time );
+			// Swap the variables
+			$temp = $when;
+			$when = $format;
+			$format = $temp;
+
+			try {
+				$dateTime = new \DateTime( $when, wp_timezone() );
+			} catch ( \Exception $e ){
+				return '';
+			}
+		}
+
+		if ( $this->date_display_in_contacts_local_time ){
+			$dateTime->setTimezone( $this->get_current_contact()->get_time_zone( false ) );
+		}
+
+		return $dateTime->format( $format );
 	}
+
+	/**
+	 * Return a formatted date in contact's local time.
+	 *
+	 * @param $time_string
+	 *
+	 * @return string
+	 */
+	function replacement_local_date( $time_string ) {
+		$this->date_display_in_contacts_local_time = true;
+		$date = $this->replacement_date( $time_string );
+		$this->date_display_in_contacts_local_time = false;
+		return $date;
+	}
+
 
 	/**
 	 * Return the business name
