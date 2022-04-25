@@ -20,6 +20,7 @@
     tinymceElement,
     addMediaToBasicTinyMCE,
     mappableFields,
+    dialog,
     bold,
     uuid,
     orList,
@@ -28,6 +29,7 @@
     select,
     input,
     textarea,
+    icons,
     toggle,
     textAreaWithReplacements,
     setFrameContent,
@@ -1630,7 +1632,7 @@
 
       defaults: {
         redirect_to: '',
-        uuid: uuid(),
+        uuid: '',
       },
 
       //language=HTML
@@ -1664,17 +1666,23 @@
             <div class="panel">
                 <div class="row">
                     <label class="row-label" for="copy-this">${ __('Copy this link', 'groundhogg') }</label>
-                    ${ input({
-                        type: 'url',
-                        id: 'copy-this',
-                        className: 'code input regular-text',
-                        value: `${ Groundhogg.managed_page.root }link/click/${ meta.uuid }`,
-                        readonly: true,
-                        onfocus: 'this.select()',
-                        style: {
-                            width: '100%',
-                        },
-                    }) }
+                    <div class="gh-input-group">
+	                    ${ input({
+		                    type: 'url',
+		                    id: 'copy-this',
+		                    className: 'code input regular-text',
+		                    value: `${ Groundhogg.managed_page.root }link/click/${ meta.uuid }`,
+		                    readonly: true,
+		                    onfocus: 'this.select()',
+		                    style: {
+			                    width: '100%',
+		                    },
+	                    }) }
+	                    <button class="gh-button secondary icon copy-value">
+		                    ${icons.copy}
+	                    </button>
+                    </div>
+                   
                     <p class="description">
                         ${ __('Paste this link in any email or page. Once a contact clicks it the benchmark will be completed and the contact will be redirected to the page set below.',
                                 'groundhogg') }</p>
@@ -1698,12 +1706,34 @@
             </div>`
       },
       onMount ({ meta }, updateStepMeta) {
+
+        $('.copy-value').on('click', e => {
+
+          let input = $(e.currentTarget).siblings('input')[0]
+          input.focus()
+          input.select()
+          document.execCommand('copy')
+          dialog({
+            message: __('Copied!', 'groundhogg')
+          })
+
+        })
+
+        if ( ! meta.uuid ){
+          updateStepMeta({
+            uuid: uuid()
+          }, true )
+        }
+
         linkPicker('#redirect-to').on('change', function (e) {
           updateStepMeta({
             redirect_to: $(this).val(),
           })
         })
       },
+      onDuplicate: ( step ) => {
+        step.meta.uuid = uuid()
+      }
     },
 
     email_confirmed: {
@@ -1801,6 +1831,13 @@
             </div>`
       },
       onMount ({ meta }, updateStepMeta) {
+
+        if ( ! meta.uuid ){
+          updateStepMeta({
+            uuid: uuid()
+          }, true )
+        }
+
         linkPicker('#success-page').on('change', (e) => {
           updateStepMeta({
             success_page: e.target.value,
@@ -1840,6 +1877,9 @@
 
         editor.init()
       },
+      onDuplicate: ( step ) => {
+        step.meta.uuid = uuid()
+      }
     },
 
     restart_funnel: {

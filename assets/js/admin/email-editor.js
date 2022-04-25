@@ -847,7 +847,6 @@
         })
 
         $('#edit-plain-text').on('click', (e) => {
-
           const altBodyEditor = () => {
             // language=HTML
             return `
@@ -865,7 +864,6 @@
                     },
                 }) }`
           }
-
           modal({
             // language=HTML
             content: altBodyEditor(),
@@ -894,47 +892,55 @@
           })
         })
 
-        const getHeadersArray = () => {
-          const { custom_headers = {} } = this.edited.meta
+        $('#edit-custom-headers').on('click', e => {
+          modal({
+            // language=HTML
+            content: `
+                <h2>${__('Custom Email Headers', 'groundhogg')}</h2>
+                <div id="email-editor-advanced-headers"></div>`,
+            onOpen: ({ setContent }) => {
+              const getHeadersArray = () => {
+                const { custom_headers = {} } = this.edited.meta
 
-          const rows = []
+                const rows = []
 
-          Object.keys(custom_headers).forEach((key) => {
-            rows.push([key, custom_headers[key]])
+                Object.keys(custom_headers).forEach((key) => {
+                  rows.push([key, custom_headers[key]])
+                })
+
+                if (!rows.length) {
+                  rows.push(['', ''])
+                }
+
+                return rows
+              }
+
+              const headersEditor = inputRepeaterWidget({
+                selector: '#email-editor-advanced-headers',
+                rows: getHeadersArray(),
+                cellProps: [
+                  { placeholder: 'Header...' },
+                  { placeholder: 'Value...' },
+                ],
+                cellCallbacks: [input, inputWithReplacements],
+                onChange: (rows) => {
+                  const headers = {}
+
+                  rows.forEach(([key, value]) => {
+                    headers[key] = value
+                  })
+
+                  this.updateEmailMeta({
+                    custom_headers: headers,
+                  })
+                  mountHeader()
+                },
+              })
+
+              headersEditor.mount()
+            },
           })
-
-          if (!rows.length) {
-            rows.push(['', ''])
-          }
-
-          return rows
-        }
-
-        const headersEditor = inputRepeaterWidget({
-          selector: '#email-editor-advanced-headers',
-          rows: getHeadersArray(),
-          cellProps: [
-            { placeholder: 'Header...' },
-            { placeholder: 'Value...' },
-          ],
-          cellCallbacks: [input, inputWithReplacements],
-          onChange: (rows) => {
-            const headers = {}
-
-            rows.forEach(([key, value]) => {
-              headers[key] = value
-            })
-
-            // console.log( headers )
-
-            this.updateEmailMeta({
-              custom_headers: headers,
-            })
-            mountHeader()
-          },
         })
-
-        headersEditor.mount()
 
         const {
           from_user = 0,

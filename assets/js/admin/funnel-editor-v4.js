@@ -63,7 +63,7 @@
     // language=HTML
     return `
 		<button id="close-email-editor" class="gh-button secondary text icon">
-        <span class="dashicons dashicons-no-alt"></span>
+			<span class="dashicons dashicons-no-alt"></span>
 		</button>`
   }
 
@@ -170,7 +170,7 @@
   const Editor = {
     activeAddType: 'actions',
     view: 'addingStep',
-    activeStep: {},
+    activeStep: false,
     htmlModules: {},
     isEditingTitle: false,
     stepFlowContextMenu: null,
@@ -268,10 +268,7 @@
 				  ${_x('Deactivate', 'when deactivating a funnel', 'groundhogg')}
 			  </button>
 			  <button class="update gh-button primary"
-			          ${objectEquals(
-				          Editor.funnel.steps,
-				          Editor.origFunnel.steps
-			          ) || Object.keys(Editor.stepErrors).length > 0
+			          ${!Editor.hasChanges() || Editor.hasErrors()
 				          ? 'disabled'
 				          : ''
 			          }>
@@ -646,6 +643,13 @@
                 case 'duplicate':
                   const newStep = copyObject(step)
                   newStep.ID = uniqid()
+
+                  let type = StepTypes.getType( step.data.step_type )
+
+                  if ( type.onDuplicate ){
+                    type.onDuplicate( newStep )
+                  }
+
                   self.addStep(newStep)
                   break
                 case 'delete':
@@ -688,7 +692,7 @@
       $doc.on('blur change keydown', '#funnel-title-edit', function (e) {
         // If the event is key down do nothing if the key wasn't enter
         if (e.type === 'keydown' && e.key !== 'Enter') {
-          $('#funnel-title-edit').width(((e.target.value.length + 1) * 0.8)  + 'ch')
+          $('#funnel-title-edit').width(((e.target.value.length + 1) * 0.8) + 'ch')
           return
         }
 
@@ -852,7 +856,8 @@
 					<p>
 						<b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
 					</p>
-					<p>${__('Any active contacts will be removed from the funnel permanently. The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
+					<p>
+						${__('Any active contacts will be removed from the funnel permanently. The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
                 confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
                 onConfirm: () => {
                   this.update({
@@ -861,10 +866,10 @@
                     }
                   }).then(() => {
                     dialog({
-                      message: __( 'Funnel Archived', 'groundhogg' )
+                      message: __('Funnel Archived', 'groundhogg')
                     })
 
-                    window.location.href = adminPageURL( 'gh_funnels' )
+                    window.location.href = adminPageURL('gh_funnels')
                   })
                 }
               })
@@ -1157,6 +1162,33 @@
         }
       )
 
+      if (window.location.hash) {
+        let hash = window.location.hash.substring(1)
+        if (hash !== 'add') {
+          this.activeStep = parseInt(hash)
+          this.view = 'editingStep'
+        }
+      }
+
+      window.addEventListener('popstate', (e) => {
+
+        let state = e.state
+
+        console.log( state )
+
+        if (state && state.id) {
+
+          if (state.id !== 'add') {
+            this.activeStep = parseInt(state.id)
+            this.view = 'editingStep'
+          } else {
+            this.view = 'addingStep'
+          }
+
+          this.render( false )
+        }
+      })
+
       StepTypes.setup()
       // self.initStepFlowContextMenu()
       this.preloadFunnel()
@@ -1170,13 +1202,13 @@
     /**
      * Re-render the whole editor
      */
-    render () {
+    render ( pushState = true ) {
       this.renderContainer()
       this.renderTitle()
       this.renderPublishActions()
       this.renderStepFlow()
-      this.renderStepAdd()
-      this.renderStepEdit()
+      this.renderStepAdd( pushState )
+      this.renderStepEdit( pushState )
 
       this.loadingClose()
       $(window).trigger('resize')
@@ -1238,7 +1270,7 @@
                 step_group: group,
                 step_order: $(ui.helper).prevAll('.step').length,
               },
-              meta: copyObject( StepTypes.getType(type).defaults ),
+              meta: copyObject(StepTypes.getType(type).defaults),
             })
           },
           update: function (e, ui) {
@@ -1252,44 +1284,6 @@
           },
         })
         .disableSelection()
-    },
-
-    /**
-     * Setup the context menu for editing duplicating and deleting steps
-     */
-    initStepFlowContextMenu () {
-      const self = this
-
-      this.stepFlowContextMenu = createContextMenu({
-        menuClassName: 'step-context-menu',
-        targetSelector: '.step-flow .steps .step',
-        items: [
-          { key: 'duplicate', text: 'Duplicate' },
-          { key: 'delete', text: 'Delete' },
-        ],
-        onOpen (e, el) {
-          self.stepOpenInContextMenu = parseInt(el.dataset.id)
-        },
-        onSelect (key) {
-          switch (key) {
-            case 'delete':
-              self.deleteStep(self.stepOpenInContextMenu)
-              break
-            case 'duplicate':
-              const stepToCopy = self.funnel.steps.find(
-                (step) => step.ID === self.stepOpenInContextMenu
-              )
-
-              const newStep = copyObject(stepToCopy)
-              newStep.ID = uniqid()
-              self.addStep(newStep)
-
-              break
-          }
-        },
-      })
-
-      this.stepFlowContextMenu.init()
     },
 
     /**
@@ -1336,6 +1330,17 @@
       }
 
       this.stepWarnings[id].push(error)
+    },
+
+    hasChanges () {
+      return !objectEquals(
+        this.funnel.steps,
+        this.origFunnel.steps
+      )
+    },
+
+    hasErrors () {
+      return Object.values(this.stepErrors).length > 0
     },
 
     /**
@@ -1455,11 +1460,10 @@
     /**
      * Renders the edit step panel for the current step in the controls panel
      */
-    renderStepEdit () {
+    renderStepEdit ( pushState = true ) {
       if (this.view !== 'editingStep') {
         return
       }
-
       // const activeElementId = document.activeElement.id
 
       const step = this.funnel.steps.find(
@@ -1473,7 +1477,7 @@
         this.activeStep = false
         this.previousActiveStep = false
         this.view = 'addingStep'
-        this.renderStepAdd()
+        this.renderStepAdd( pushState )
         return
       }
 
@@ -1491,12 +1495,16 @@
       this.mountStep(step)
 
       slotsMounted()
+
+      if ( pushState ){
+        history.pushState({ id: step.ID }, step.data.step_title, `#${step.ID}`)
+      }
     },
 
     /**
      * Renders the add step panel for the current step in the controls panel
      */
-    renderStepAdd () {
+    renderStepAdd ( pushState = true ) {
       if (this.view !== 'addingStep') {
         return
       }
@@ -1516,7 +1524,7 @@
       self.renderStepFlow()
 
       const mountSteps = () => {
-        const sr = regexp(self.stepSearch ? self.stepSearch: '')
+        const sr = regexp(self.stepSearch ? self.stepSearch : '')
 
         $('#types').html(
           Object.values(StepTypes)
@@ -1545,7 +1553,7 @@
               step_group: group,
               step_order: order,
             },
-            meta: copyObject( StepTypes.getType(type).defaults ),
+            meta: copyObject(StepTypes.getType(type).defaults),
           })
         }
 
@@ -1583,6 +1591,10 @@
         this.packFilter = e.target.value
         mountSteps()
       })
+
+      if ( pushState ){
+        history.pushState({ id: 'add' }, 'add', `#add`)
+      }
     },
 
     renderEmailTemplatePicker (updateStepMeta) {
@@ -1669,7 +1681,7 @@
     },
 
     resizeTitleEdit () {
-      $('#funnel-title-edit').width(((this.funnel.data.title.length + 1) * 0.8)  + 'ch')
+      $('#funnel-title-edit').width(((this.funnel.data.title.length + 1) * 0.8) + 'ch')
     },
 
     /**
@@ -1690,6 +1702,12 @@
       tooltip('.redo', {
         content: __('Redo')
       })
+
+      if (this.hasErrors()) {
+        tooltip('.publish-actions .update', {
+          content: __('You must resolve any errors<br/>before you can update', 'groundhogg')
+        })
+      }
 
     },
 
@@ -2253,12 +2271,18 @@
       }
 
       const copyValue = (toCopy) => {
-        return input({
-          className: 'code',
-          value: toCopy,
-          onfocus: 'this.select()',
-          readonly: true,
-        })
+        //language=HTML
+        return `
+			<div class="gh-input-group">${input({
+				className: 'code',
+				value: toCopy,
+				onfocus: 'this.select()',
+				readonly: true,
+			})}
+				<button class="gh-button secondary icon copy-value">
+					${icons.copy}
+				</button>
+			</div>`
       }
 
       //language=HTML
@@ -2271,11 +2295,37 @@
 			  </div>
 			  <div class="row">
 				  <label class="row-label">${__('Embed via iFrame', 'groundhogg')}</label>
-				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
+				  <div class="embed-option">
+					  ${copyValue(`<script id="groundhogg_form_${ID}" type="text/javascript" src="${Groundhogg.url.home}/gh/forms/iframe/${meta.uuid}/"></script>`)}
+				  </div>
+			  </div>
+			  <div class="row">
+				  <label class="row-label">${__('Embed via HTML', 'groundhogg')}</label>
+				  <div class="embed-option">
+					  ${copyValue(`<div>Todo</div>`)}
+				  </div>
+			  </div>
+			  <div class="row">
+				  <label class="row-label">${__('Direct URL', 'groundhogg')}</label>
+				  <div class="embed-option">
+					  ${copyValue(`${Groundhogg.url.home}/gh/forms/${meta.uuid}/submit/`)}
 				  </div>
 			  </div>
 		  </div>`
     },
+    onMount: () => {
+      $('.copy-value').on('click', e => {
+
+        let input = $(e.currentTarget).siblings('input')[0]
+        input.focus()
+        input.select()
+        document.execCommand('copy')
+        dialog({
+          message: __('Copied!', 'groundhogg')
+        })
+
+      })
+    }
   })
 
   const isStartingStep = (stepId) => {

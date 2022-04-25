@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Base_Object;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use Groundhogg\Properties;
 use function Groundhogg\dashicon;
 use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\get_array_var;
@@ -171,6 +172,7 @@ class Funnels_Page extends Admin_Page {
 
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
 					'funnel'    => $funnel,
+					'contact_custom_fields' => Properties::instance()->get_fields()
 				] );
 
 				do_action( 'groundhogg_funnel_scripts', $funnel );

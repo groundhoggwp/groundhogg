@@ -53,7 +53,7 @@
     return {
       id: uuid(),
       type,
-      ...copyObject( BlockRegistry.blocks[type].defaults ),
+      ...copyObject(BlockRegistry.blocks[type].defaults),
       ...props
     }
   }
@@ -170,7 +170,7 @@
        */
       const addBlock = (type, index = 0, parent = false, column = 0) => {
 
-        let newBlock = createBlock( type )
+        let newBlock = createBlock(type)
 
         __insertBlock(newBlock, index, this.blocks, parent, column)
 
@@ -1017,11 +1017,11 @@
     controls: ({ p, h1, h2, h3 }) => {
       // language=HTML
 
-      const textControlGroup = (name, tag, style) => {
+      const textControlGroup = (name, tag, style, open = false) => {
 
         //language=HTML
         return `
-			<div class="control-group closed">
+			<div class="control-group ${ open ? 'gh-panel' : 'closed'}">
 				<div class="control-group-header space-between">
 					<h4 class="control-group-name">${name}</h4>
 					<span class="dashicons dashicons-arrow-down-alt2"></span>
@@ -1060,7 +1060,7 @@
 			</div>`
       }
 
-      return `${textControlGroup(__('Paragraphs'), 'p', p)}
+      return `${textControlGroup(__('Paragraphs'), 'p', p, true)}
       ${textControlGroup(__('Heading 1'), 'h1', h1)}
       ${textControlGroup(__('Heading 2'), 'h2', h2)}
       ${textControlGroup(__('Heading 3'), 'h3', h3)}`
@@ -1156,22 +1156,22 @@
     defaults: {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
       p: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 'normal',
         fontFamily: 'Arial, sans-serif'
       },
       h1: {
-        fontSize: 32,
+        fontSize: 52,
         fontWeight: '500',
         fontFamily: 'Arial, sans-serif'
       },
       h2: {
-        fontSize: 24,
+        fontSize: 36,
         fontWeight: '500',
         fontFamily: 'Arial, sans-serif'
       },
       h3: {
-        fontSize: 18,
+        fontSize: 24,
         fontWeight: '500',
         fontFamily: 'Arial, sans-serif'
       }
@@ -1374,6 +1374,68 @@
       align: 'center',
     }
 
+  })
+
+  registerBlock('spacer', __('Spacer'), {
+    //language=HTML
+    svg: `
+		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
+  <path color="currentColor"
+        d="M352 384h-48V128h48a16 16 0 0 0 11-27L267 5c-6-7-16-7-22 0l-96 96c-5 4-6 11-4 17 3 6 9 10 15 10h48v256h-48a16 16 0 0 0-11 27l96 96c6 7 16 7 22 0l96-96a16 16 0 0 0-11-27z"/>
+</svg>`,
+    controls: ({ height }) => {
+      //language=HTML
+      return `
+		  <div class="control-group">
+			  <div class="control-group-header space-between">
+				  <h4 class="control-group-name">${__('Settings')}</h4>
+				  <span class="dashicons dashicons-arrow-down-alt2"></span>
+			  </div>
+			  <div class="controls">
+				  <div class="space-between">
+					  <label for="font-size" class="control-label">${__('Height', 'groundhogg')}</label>
+					  ${input({
+						  type: 'number',
+						  id: 'height',
+						  name: 'height',
+						  className: 'control-input',
+						  value: height
+					  })}
+				  </div>
+			  </div>
+		  </div>`
+    },
+    controlsOnMount: ({ updateBlock, curBlock }) => {
+
+      $('#height').on('change', ({ target }) => {
+        updateBlock({
+          height: target.value
+        })
+      })
+
+    },
+    edit: ({ id, height }) => {
+
+      // language=HTML
+      return `
+		  <div class="spacer-block" style="height: ${height}px">
+		  </div>`
+    },
+    editOnMount: ({ id, height, updateBlock, curBlock }) => {
+
+    },
+    css: ({ height }) => {
+      return ''
+    },
+    html: ({ height }) => {
+      // language=HTML
+      return `
+	      <div style="height: ${height}px">
+	      </div>`
+    },
+    defaults: {
+      height: 100
+    }
   })
 
   registerBlock('button', __('Button'), {

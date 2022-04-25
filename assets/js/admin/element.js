@@ -1838,6 +1838,11 @@ ${ afterProgress() }`,
   }
 
   const icons = {
+    // language=html
+    copy: `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 488.3 488.3">
+  <path fill="currentColor" d="M314 85H87c-21 0-38 18-38 39v326c0 21 17 38 38 38h227c22 0 39-17 39-38V124c0-21-18-39-39-39zm12 365c0 6-5 11-12 11H87c-6 0-11-5-11-11V124c0-6 5-12 11-12h227c7 0 12 6 12 12v326z"/>
+  <path fill="currentColor" d="M401 0H174c-21 0-39 17-39 39 0 7 6 13 14 13s13-6 13-13 6-12 12-12h227c6 0 12 5 12 12v325c0 7-6 12-12 12-7 0-13 6-13 13s6 14 13 14c21 0 39-17 39-39V39c0-22-18-39-39-39z"/>
+</svg>`,
     drag: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle fill="currentColor" cx="8" cy="4" r="2"/><circle fill="currentColor" cx="8" cy="12" r="2"/><circle fill="currentColor" cx="8" cy="20" r="2"/><circle fill="currentColor" cx="16" cy="4" r="2"/><circle fill="currentColor" cx="16" cy="12" r="2"/><circle fill="currentColor" cx="16" cy="20" r="2"/></svg>`,
     // language=html
     image: `

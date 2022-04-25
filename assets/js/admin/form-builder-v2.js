@@ -1,4 +1,4 @@
-( function ($) {
+(function ($) {
 
   const {
     toggle,
@@ -11,6 +11,7 @@
     icons,
     miniModal,
     tooltip,
+    copyObject,
     sanitizeKey,
   } = Groundhogg.element
   const { sprintf, __, _x } = wp.i18n
@@ -20,15 +21,6 @@
     tagPicker,
   } = Groundhogg.pickers
 
-  const columnWidths = {
-    '1/1': 1,
-    '1/2': 0.5,
-    '1/3': 0.33333,
-    '1/4': 0.25,
-    '2/3': 0.66666,
-    '3/4': 0.75,
-  }
-
   const columnClasses = {
     '1/1': 'col-1-of-1',
     '1/2': 'col-1-of-2',
@@ -36,41 +28,6 @@
     '1/4': 'col-1-of-4',
     '2/3': 'col-2-of-3',
     '3/4': 'col-3-of-4',
-  }
-
-  const fieldWidth = ({ column_width }) => {
-    return columnWidths[column_width]
-  }
-
-  /**
-   * Group into rows based on their field width
-   *
-   * @param fields
-   * @param button
-   * @returns {*}
-   */
-  const groupFieldsInRows = ({ fields, button }) => {
-
-    fields = [
-      ...fields,
-      button,
-    ]
-
-    return fields.reduce((rows, field) => {
-
-      const rowWidth = rows[rows.length - 1].reduce((width, field) => {
-        return width + fieldWidth(field)
-      }, 0)
-
-      if (rowWidth + fieldWidth(field) > 1) {
-        rows.push([])
-      }
-
-      rows[rows.length - 1].push(field)
-
-      return rows
-    }, [[]])
-
   }
 
   const defaultField = {
@@ -122,12 +79,12 @@
     basic (label, atts) {
       const { id } = atts
       // language=html
-      return `<label for="${ id }">${ label }</label>
-      <div class="setting">${ input(atts) }</div>`
+      return `<label for="${id}">${label}</label>
+	  <div class="setting">${input(atts)}</div>`
     },
     basicWithReplacements (label, atts) {
       const { id } = atts
-      return `<label for="${ id }">${ label }</label> ${ inputWithReplacements(atts) }`
+      return `<label for="${id}">${label}</label> ${inputWithReplacements(atts)}`
     },
 
     type: {
@@ -135,12 +92,12 @@
       edit ({ type = 'text' }) {
         //language=HTML
         return `<label for="type">Type</label>
-        <div class="setting">
-            ${ select({
-                id: 'type',
-                name: 'type',
-            }, getFieldTypeOptions(), type) }
-        </div>`
+		<div class="setting">
+			${select({
+				id: 'type',
+				name: 'type',
+			}, getFieldTypeOptions(), type)}
+		</div>`
       },
       onMount (field, updateField) {
         $('#type').on('change', (e) => {
@@ -150,23 +107,48 @@
         })
       },
     },
+    property: {
+      type: 'property',
+      edit ({ property = false }) {
+        //language=HTML
+        return `<label for="type">${__('Custom Field')}</label>
+		<div class="setting">
+			${select({
+				id: 'property',
+				name: 'property',
+			}, Funnel.contact_custom_fields.map(field => ({ value: field.id, text: field.label })), property)}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#property').on('change', (e) => {
+
+          let property = e.target.value
+          let label = Funnel.contact_custom_fields.find( f => f.id === property ).label
+
+          updateField({
+            property,
+            label,
+          }, true)
+        })
+      },
+    },
     tags: {
       type: 'tags',
       edit () {
         //language=HTML
-        return `<label for="type">${ __('Apply Tags') }</label>
-        <div class="setting">
-            ${ select({
-                id: 'apply-tags',
-                name: 'apply-tags',
-            }) }
-        </div>`
+        return `<label for="type">${__('Apply Tags')}</label>
+		<div class="setting">
+			${select({
+				id: 'apply-tags',
+				name: 'apply-tags',
+			})}
+		</div>`
       },
-      onMount ({ tags = []}, updateField) {
+      onMount ({ tags = [] }, updateField) {
 
         const renderTagPicker = () => {
           tagPicker('#apply-tags', true, (items) => TagsStore.itemsFetched(items), {
-            data: tags.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+            data: tags.map(id => ({ id, text: TagsStore.get(id).data.tag_name, selected: true })),
           }).on('change', e => {
             let tags = $(e.target).val().map(id => parseInt(id))
             updateField({
@@ -175,10 +157,10 @@
           })
         }
 
-        if ( tags && ! TagsStore.hasItems( tags ) ){
+        if (tags && !TagsStore.hasItems(tags)) {
           TagsStore.fetchItems({
             id: tags
-          }).then( () => {
+          }).then(() => {
             renderTagPicker()
           })
         } else {
@@ -192,14 +174,14 @@
       type: 'name',
       edit ({ name = '' }) {
         //language=HTML
-        return `<label for="type">${ __('Internal Name', 'groundhogg') }</label>
-        <div class="setting">
-            ${ input({
-                id: 'name',
-                name: 'name',
-                value: name,
-            }) }
-        </div>`
+        return `<label for="type">${__('Internal Name', 'groundhogg')}</label>
+		<div class="setting">
+			${input({
+				id: 'name',
+				name: 'name',
+				value: name,
+			})}
+		</div>`
       },
       onMount (field, updateField) {
         metaPicker('#name').on('change', (e) => {
@@ -214,16 +196,16 @@
       type: 'required',
       edit ({ required = false }) {
         //language=HTML
-        return `<label for="required">${ __('Required', 'groundhogg') }</label>
-        <div class="setting">${ toggle({
-            id: 'required',
-            name: 'required',
-            className: 'required',
-            onLabel: 'Yes',
-            offLabel: 'No',
-            checked: required,
-        }) }
-        </div>`
+        return `<label for="required">${__('Required', 'groundhogg')}</label>
+		<div class="setting">${toggle({
+			id: 'required',
+			name: 'required',
+			className: 'required',
+			onLabel: 'Yes',
+			offLabel: 'No',
+			checked: required,
+		})}
+		</div>`
       },
       onMount (field, updateField) {
         $('#required').on('change', (e) => {
@@ -237,16 +219,16 @@
       type: 'checked',
       edit ({ checked = false }) {
         //language=HTML
-        return `<label for="required">${ __('Checked by default', 'groundhogg') }</label>
-        <div class="setting">${ toggle({
-            id: 'checked',
-            name: 'checked',
-            className: 'checked',
-            onLabel: 'Yes',
-            offLabel: 'No',
-            checked,
-        }) }
-        </div>`
+        return `<label for="required">${__('Checked by default', 'groundhogg')}</label>
+		<div class="setting">${toggle({
+			id: 'checked',
+			name: 'checked',
+			className: 'checked',
+			onLabel: 'Yes',
+			offLabel: 'No',
+			checked,
+		})}
+		</div>`
       },
       onMount (field, updateField) {
         $('#checked').on('change', (e) => {
@@ -269,8 +251,6 @@
       },
       onMount (field, updateField) {
 
-        console.log(field)
-
         $('#label').on('change input', (e) => {
 
           let label = e.target.value
@@ -290,15 +270,15 @@
       edit ({ hide_label = false }) {
         //language=HTML
         return `<label for="hide-label">Hide label</label>
-        <div class="setting">${ toggle({
-            id: 'hide-label',
-            name: 'hide_label',
-            className: 'hide-label',
-            onLabel: 'Yes',
-            offLabel: 'No',
-            checked: hide_label,
-        }) }
-        </div>`
+		<div class="setting">${toggle({
+			id: 'hide-label',
+			name: 'hide_label',
+			className: 'hide-label',
+			onLabel: 'Yes',
+			offLabel: 'No',
+			checked: hide_label,
+		})}
+		</div>`
       },
       onMount (field, updateField) {
         $('#hide-label').on('change', (e) => {
@@ -407,17 +387,17 @@
       type: 'phoneType',
       edit ({ phone_type = 'primary' }) {
         //language=HTML
-        return `<label for="phone-type">${ _x('Phone Type', 'form field setting', 'groundhogg') }</label>
-        <div class="setting">${ select({
-            id: 'phone-type',
-            name: 'phone_type',
-            className: 'phone-type',
-        }, {
-            primary: 'Primary Phone',
-            mobile: 'Mobile Phone',
-            company: 'Company Phone',
-        }, phone_type) }
-        </div>`
+        return `<label for="phone-type">${_x('Phone Type', 'form field setting', 'groundhogg')}</label>
+		<div class="setting">${select({
+			id: 'phone-type',
+			name: 'phone_type',
+			className: 'phone-type',
+		}, {
+			primary: 'Primary Phone',
+			mobile: 'Mobile Phone',
+			company: 'Company Phone',
+		}, phone_type)}
+		</div>`
       },
       onMount (field, updateField) {
         $('#phone-type').on('change', (e) => {
@@ -432,19 +412,19 @@
       edit ({ column_width }) {
         //language=HTML
         return `<label for="column-width">Column Width</label>
-        <div class="setting">${ select({
-            id: 'column-width',
-            name: 'column_width',
-            className: 'column-width',
-        }, {
-            '1/1': '1/1',
-            '1/2': '1/2',
-            '1/3': '1/3',
-            '1/4': '1/4',
-            '2/3': '2/3',
-            '3/4': '3/4',
-        }, column_width) }
-        </div>`
+		<div class="setting">${select({
+			id: 'column-width',
+			name: 'column_width',
+			className: 'column-width',
+		}, {
+			'1/1': '1/1',
+			'1/2': '1/2',
+			'1/3': '1/3',
+			'1/4': '1/4',
+			'2/3': '2/3',
+			'3/4': '3/4',
+		}, column_width)}
+		</div>`
       },
       onMount (field, updateField) {
         $('#column-width').on('change', (e) => {
@@ -459,20 +439,20 @@
       edit: ({ file_types }) => {
         // language=HTML
         return `
-            <div class="setting">
-                <label>${ _x('Restrict file types', 'groundhogg') }</label>
-                ${ select({
-                    name: 'file-types',
-                    id: 'file-types',
-                    multiple: true,
-                }, [
-                    { text: 'jpeg', value: 'jpeg' },
-                    { text: 'png', value: 'png' },
-                    { text: 'pdf', value: 'pdf' },
-                    { text: 'doc', value: 'doc' },
-                    { text: 'docx', value: 'docx' },
-                ], file_types) }
-            </div>`
+			<div class="setting">
+				<label>${_x('Restrict file types', 'groundhogg')}</label>
+				${select({
+					name: 'file-types',
+					id: 'file-types',
+					multiple: true,
+				}, [
+					{ text: 'jpeg', value: 'jpeg' },
+					{ text: 'png', value: 'png' },
+					{ text: 'pdf', value: 'pdf' },
+					{ text: 'doc', value: 'doc' },
+					{ text: 'docx', value: 'docx' },
+				], file_types)}
+			</div>`
       },
       onMount: (field, updateField) => {
         $('#file-types').select2().on('change', (e) => {
@@ -489,30 +469,28 @@
         const selectOption = (option, i) => {
           // language=HTML
           return `
-              <div class="select-option-wrap">
-                  ${ input({
-                      id: `select-option-${ i }`,
-                      className: 'select-option',
-                      value: option,
-                      dataKey: i,
-                  }) }
-                  <button class="dashicon-button remove-option" data-key="${ i }"><span
-                          class="dashicons dashicons-no-alt"></span></button>
-              </div>`
+			  <div class="select-option-wrap">
+				  ${input({
+					  id: `select-option-${i}`,
+					  className: 'select-option',
+					  value: option,
+					  dataKey: i,
+				  })}
+				  <button class="dashicon-button remove-option" data-key="${i}"><span
+					  class="dashicons dashicons-no-alt"></span></button>
+			  </div>`
         }
 
         // language=HTML
         return `
-            <div class="options full-width">
-                <label>${ _x('Options', 'label for dropdown options', 'groundhogg') }</label>
-                <div class="select-options"></div>
-            </div>`
+			<div class="options full-width">
+				<label>${_x('Options', 'label for dropdown options', 'groundhogg')}</label>
+				<div class="select-options"></div>
+			</div>`
       },
       onMount ({ options = [['', []]] }, updateField, currentField) {
 
         let allTags = options.map(opt => opt[1]).reduce((a, i) => [...a, i], [])
-
-        console.log(allTags)
 
         if (!TagsStore.hasItems(allTags)) {
           TagsStore.fetchItems({
@@ -528,13 +506,13 @@
             input, (field) => {
               // language=HTML
               return `
-                  <div class="inline-tag-picker">
-                      ${ icons.tag }
-                      ${ input({
-                          className: 'input hidden tags-input',
-                          ...field,
-                      }) }
-                  </div>`
+				  <div class="inline-tag-picker">
+					  ${icons.tag}
+					  ${input({
+						  className: 'input hidden tags-input',
+						  ...field,
+					  })}
+				  </div>`
             },
           ],
           onMount: () => {
@@ -557,7 +535,7 @@
                   let selected = $input.val().split(',').map(t => parseInt(t)).filter(id => TagsStore.has(id))
 
                   tagPicker('#tags', true, (items) => TagsStore.itemsFetched(items), {
-                    data: selected.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+                    data: selected.map(id => ({ id, text: TagsStore.get(id).data.tag_name, selected: true })),
                   }).on('change', e => {
                     let tagIds = $(e.target).val().map(id => parseInt(id))
                     $input.val(tagIds.join(',')).trigger('change')
@@ -682,7 +660,7 @@
       name: name,
       placeholder: placeholder,
       value: value,
-      className: `gh-input ${ className }`,
+      className: `gh-input ${className}`,
     })
 
     if (hide_label) {
@@ -693,7 +671,7 @@
       label += ' <span class="required">*</span>'
     }
 
-    return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+    return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
   }
 
   const FieldTypes = {
@@ -719,7 +697,7 @@
         Settings.className.type,
       ],
       preview ({ text = 'Submit', id = '', className = '' }) {
-        return `<button id="${ id }" class="gh-button primary ${ className } full-width">${ text }</button>`
+        return `<button id="${id}" class="gh-button primary ${className} full-width">${text}</button>`
       },
     },
     first: {
@@ -770,7 +748,44 @@
         name: field.phone_type + '_phone',
       }),
     },
-    gdpr: {},
+    gdpr: {
+      name: __('GDPR', 'groundhogg'),
+      content: [
+        Settings.type.type,
+        Settings.label.type,
+        Settings.columnWidth.type,
+      ],
+      advanced: standardAdvancedSettings,
+      preview: ({
+        id = uuid(),
+        name = 'name',
+        value = '1',
+        label = '',
+        required = false,
+        className = '',
+        checked = false,
+      }) => {
+
+        if (!value) {
+          value = '1'
+        }
+
+        const inputField = input({
+          id: id,
+          type: 'checkbox',
+          className: `gh-checkbox-input ${className}`,
+          name,
+          value,
+          checked,
+        })
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label">${inputField} ${label}</label>`
+      },
+    },
     terms: {},
     recaptcha: {},
     text: {
@@ -778,6 +793,15 @@
       content: standardMetaContentSettings,
       advanced: standardAdvancedSettings,
       preview: (field) => fieldPreview(field),
+    },
+    url: {
+      name: 'URL',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'url',
+      }),
     },
     textarea: {
       name: 'Textarea',
@@ -801,7 +825,7 @@
           name: name,
           placeholder: placeholder,
           value: value,
-          className: `gh-input ${ className }`,
+          className: `gh-input ${className}`,
         })
 
         if (hide_label) {
@@ -812,7 +836,7 @@
           label += ' <span class="required">*</span>'
         }
 
-        return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
       },
     },
     number: {
@@ -851,10 +875,10 @@
         className = '',
       }) => {
 
-        options = options.map(opt => ( {
-          text: opt[0],
-          value: opt[0],
-        } ))
+        options = options.map(opt => ({
+          text: Array.isArray(opt) ? opt[0] : opt,
+          value: Array.isArray(opt) ? opt[0] : opt,
+        }))
 
         if (placeholder) {
           options.unshift({
@@ -866,7 +890,7 @@
         const inputField = select({
           id: id,
           name: name,
-          className: `gh-input ${ className }`,
+          className: `gh-input ${className}`,
         }, options)
 
         if (hide_label) {
@@ -877,7 +901,7 @@
           label += ' <span class="required">*</span>'
         }
 
-        return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
       },
     },
     radio: {
@@ -908,27 +932,27 @@
         const inputField = options.map(opt => {
           // language=HTML
           return `
-              <div class="gh-radio-wrapper">
-                  <label class="gh-radio-label">
-                      ${ input({
-                          type: 'radio',
-                          id,
-                          className,
-                          name,
-                          value: opt[0],
-                      }) } ${ opt[0] }
-                  </label>
-              </div>`
+			  <div class="gh-radio-wrapper">
+				  <label class="gh-radio-label">
+					  ${input({
+						  type: 'radio',
+						  id,
+						  className,
+						  name,
+						  value: Array.isArray(opt) ? opt[0] : opt,
+					  })} ${Array.isArray(opt) ? opt[0] : opt}
+				  </label>
+			  </div>`
         }).join('')
 
         if (required) {
           label += ' <span class="required">*</span>'
         }
 
-        return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
       },
     },
-    checkbox_list: {
+    checkboxes: {
       name: __('Checkbox List'),
       content: [
         Settings.type.type,
@@ -948,7 +972,6 @@
         name = 'name',
         options = [],
         label = '',
-        // hide_label = false,
         required = false,
         className = '',
       }) => {
@@ -956,25 +979,25 @@
         const inputField = options.map(opt => {
           // language=HTML
           return `
-              <div class="gh-radio-wrapper">
-                  <label class="gh-radio-label">
-                      ${ input({
-            type: 'checkbox',
-            id,
-            required,
-            className,
-            name: name + '[]',
-            value: opt[0],
-          }) } ${ opt[0] }
-                  </label>
-              </div>`
+			  <div class="gh-radio-wrapper">
+				  <label class="gh-radio-label">
+					  ${input({
+						  type: 'checkbox',
+						  id,
+						  // required,
+						  className,
+						  name: name + '[]',
+						  value: Array.isArray(opt) ? opt[0] : opt,
+					  })} ${Array.isArray(opt) ? opt[0] : opt}
+				  </label>
+			  </div>`
         }).join('')
 
         if (required) {
           label += ' <span class="required">*</span>'
         }
 
-        return `<label class="gh-input-label" for="${ id }">${ label }</label><div class="gh-form-field-input">${ inputField }</div>`
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
       },
     },
     checkbox: {
@@ -1006,7 +1029,7 @@
         const inputField = input({
           id: id,
           type: 'checkbox',
-          className: `gh-checkbox-input ${ className }`,
+          className: `gh-checkbox-input ${className}`,
           name,
           value,
           checked,
@@ -1016,7 +1039,7 @@
           label += ' <span class="required">*</span>'
         }
 
-        return `<label class="gh-input-label">${ inputField } ${ label }</label>`
+        return `<label class="gh-input-label">${inputField} ${label}</label>`
       },
     },
     address: {},
@@ -1073,6 +1096,43 @@
         type: 'file',
       }),
     },
+    custom_field: {
+      name: _x('Custom Field', 'form field', 'groundhogg'),
+      content: [
+        Settings.type.type,
+        Settings.property.type,
+        Settings.required.type,
+        Settings.columnWidth.type,
+      ],
+      advanced: [
+        Settings.value.type,
+        Settings.id.type,
+        Settings.className.type,
+      ],
+      preview: ({
+        id = uuid(),
+        property = false,
+        value = '',
+        required = false,
+        className = '',
+      }) => {
+
+        property = Funnel.contact_custom_fields.find(f => f.id === property)
+
+        if (!property) {
+          return ''
+        }
+
+        property = copyObject(property)
+
+        return FieldTypes[property.type].preview({
+          ...property,
+          value,
+          required,
+          className,
+        })
+      },
+    },
   }
 
   const Templates = {
@@ -1085,13 +1145,13 @@
 
       // language=HTML
       return `
-          <div class="settings-tabs">
-              <a class="settings-tab ${ settingsTab === 'content' ? 'active' : '' }" data-tab="content">Content</a>
-              <a class="settings-tab ${ settingsTab === 'advanced' ? 'active' : '' }" data-tab="advanced">Advanced</a>
-          </div>
-          <div class="settings">
-              ${ settings.map(setting => `<div class="row">${ Settings[setting].edit(field) }</div>`).join('') }
-          </div>`
+		  <div class="settings-tabs">
+			  <a class="settings-tab ${settingsTab === 'content' ? 'active' : ''}" data-tab="content">Content</a>
+			  <a class="settings-tab ${settingsTab === 'advanced' ? 'active' : ''}" data-tab="advanced">Advanced</a>
+		  </div>
+		  <div class="settings">
+			  ${settings.map(setting => `<div class="row">${Settings[setting].edit(field)}</div>`).join('')}
+		  </div>`
     },
 
     field (key, field, isEditing, settingsTab, isSpecial = false) {
@@ -1102,53 +1162,52 @@
 
       //language=HTML
       return `
-          <div class="form-field" data-key="${ key }">
-              <div class="field-header">
-                  <div class="details">
-                      <div class="field-label">${ label }</div>
-                      <div class="field-type">${ fieldType.name }</div>
-                  </div>
-                  <div class="actions">
-                      ${ !isSpecial ? `
+		  <div class="form-field" data-key="${key}">
+			  <div class="field-header">
+				  <div class="details">
+					  <div class="field-label">${label}</div>
+					  <div class="field-type">${fieldType.name}</div>
+				  </div>
+				  <div class="actions">
+					  ${!isSpecial ? `
 					  <!-- Duplicate/Delete -->
-					  <button class="duplicate" data-key="${ key }"><span class="dashicons dashicons-admin-page"></span>
+					  <button class="duplicate" data-key="${key}"><span class="dashicons dashicons-admin-page"></span>
 					  </button>
-					  <button class="delete" data-key="${ key }"><span class="dashicons dashicons-no"></span></button>`
-                              // language=html
-                              : `<button class="open" data-key="${ key }"><span class="dashicons ${ isEditing
-                                      ? 'dashicons-arrow-up'
-                                      : 'dashicons-arrow-down' }"></span></button>` }
-                  </div>
-              </div>
-              ${ isEditing ?
-                      //language=HTML
-                      Templates.settings(field, settingsTab) : '' }
-          </div>`
+					  <button class="delete" data-key="${key}"><span class="dashicons dashicons-no"></span></button>`
+						  // language=html
+						  : `<button class="open" data-key="${key}"><span class="dashicons ${isEditing
+							  ? 'dashicons-arrow-up'
+							  : 'dashicons-arrow-down'}"></span></button>`}
+				  </div>
+			  </div>
+			  ${isEditing ?
+				  //language=HTML
+				  Templates.settings(field, settingsTab) : ''}
+		  </div>`
     },
 
     builder (form, activeField, settingsTab) {
 
       //language=HTML
       return `
-          <div id="form-builder" data-id="${ form.id }">
-              <div id="fields-editor" class="fields-editor">
-                  <div id="form-fields">
-                      ${ form.fields.map(
-                              (field, index) => Templates.field(index, field, activeField === index, settingsTab)).
-                              join('') }
-                  </div>
-                  <button class="add-field gh-button secondary">Add Field</button>
-                  <div id="button-settings">
-                      ${ this.field('button', form.button, activeField === 'button', settingsTab, true) }
-                  </div>
-              </div>
-              <div id="form-preview-wrap" class="panel">
-                  <label class="row-label">Preview...</label>
-                  <div id="form-preview">
-                      ${ this.preview(form) }
-                  </div>
-              </div>
-          </div>`
+		  <div id="form-builder" data-id="${form.id}">
+			  <div id="fields-editor" class="fields-editor">
+				  <div id="form-fields">
+					  ${form.fields.map(
+						  (field, index) => Templates.field(index, field, activeField === index, settingsTab)).join('')}
+				  </div>
+				  <button class="add-field gh-button secondary">Add Field</button>
+				  <div id="button-settings">
+					  ${this.field('button', form.button, activeField === 'button', settingsTab, true)}
+				  </div>
+			  </div>
+			  <div id="form-preview-wrap" class="panel">
+				  <label class="row-label">Preview...</label>
+				  <div id="form-preview">
+					  ${this.preview(form)}
+				  </div>
+			  </div>
+		  </div>`
     },
 
     /**
@@ -1166,17 +1225,17 @@
 
         // language=HTML
         return `
-            <div class="gh-form-column ${ columnClasses[column_width] }">
-                ${ previewField(field) }
-            </div>`
+			<div class="gh-form-column ${columnClasses[column_width]}">
+				${previewField(field)}
+			</div>`
 
       }).join('')
 
       //language=HTML
       return `
-          <div class="gh-form-wrapper">
-              ${ formHTML }
-          </div>`
+		  <div class="gh-form-wrapper">
+			  ${formHTML}
+		  </div>`
     },
 
   }
@@ -1186,7 +1245,7 @@
     form = defaultForm,
     onChange = (form) => {
       console.log(form)
-    }) => ( {
+    }) => ({
 
     form: {
       ...defaultForm,
@@ -1281,8 +1340,7 @@
         if (reRenderSettings) {
 
           render()
-        }
-        else if (reRenderPreview) {
+        } else if (reRenderPreview) {
           renderPreview()
         }
 
@@ -1306,15 +1364,12 @@
 
         if ($target.is('button.delete, button.delete .dashicons')) {
           deleteField(fieldKey)
-        }
-        else if ($target.is('button.duplicate, button.duplicate .dashicons')) {
+        } else if ($target.is('button.duplicate, button.duplicate .dashicons')) {
           duplicateField(fieldKey)
-        }
-        else {
+        } else {
           if (fieldKey !== self.activeField) {
             setActiveField(fieldKey)
-          }
-          else if (e.target.classList.contains('settings-tab')) {
+          } else if (e.target.classList.contains('settings-tab')) {
             self.activeFieldTab = e.target.dataset.tab
             render()
           }
@@ -1326,8 +1381,7 @@
           getFieldType(currentField().type).content.forEach(setting => {
             Settings[setting].onMount(currentField(), updateField, currentField)
           })
-        }
-        else {
+        } else {
           getFieldType(currentField().type).advanced.forEach(setting => {
             Settings[setting].onMount(currentField(), updateField, currentField)
           })
@@ -1365,9 +1419,9 @@
       this.el.html(Templates.builder(this.form, this.activeField, this.activeFieldTab))
     },
 
-  } )
+  })
 
   Groundhogg.formBuilder = FormBuilder
 
-} )
+})
 (jQuery)

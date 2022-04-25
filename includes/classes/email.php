@@ -550,6 +550,12 @@ class Email extends Base_Object_With_Meta {
 		return $url;
 	}
 
+	public function css() {
+		if ( $this->get_meta( 'css' ) ) {
+			echo $this->get_meta( 'css' );
+		}
+	}
+
 	/**
 	 * Add all the filters relevant to the email content
 	 */
@@ -564,6 +570,7 @@ class Email extends Base_Object_With_Meta {
 		add_filter( 'groundhogg/email_template/unsubscribe_link', [ $this, 'get_unsubscribe_link' ] );
 		add_filter( 'groundhogg/email_template/preferences_link', [ $this, 'get_preferences_link' ] );
 		add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
+		add_action( 'groundhogg/templates/email/head/style', [ $this, 'css' ] );
 
 		// If click tracking is disabled, do not convert to tracking links.
 		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ) {
@@ -589,6 +596,8 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'groundhogg/email_template/preferences_link', [ $this, 'get_preferences_link' ] );
 		remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
+		remove_action( 'groundhogg/templates/email/head/style', [ $this, 'css' ] );
+
 	}
 
 	/**
@@ -1141,7 +1150,7 @@ class Email extends Base_Object_With_Meta {
 			$contact->last_name  = $user->last_name;
 		}
 
-		if ( ! $contact ){
+		if ( ! $contact ) {
 			return parent::get_as_array();
 		}
 

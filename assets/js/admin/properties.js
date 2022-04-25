@@ -481,7 +481,6 @@
       try {
         fieldUI = fieldTypes[field.type].view(field)
       } catch (e) {
-        console.log(e)
         fieldUI = `<span class="gh-text danger">${__('This field is corrupted', 'groundhogg')}</span>`
       }
 
@@ -924,5 +923,10 @@
   }
 
   Groundhogg.propertiesEditor = Properties
+  Groundhogg.customProperties = {
+    renderProperty: ( property ) => {
+      return fieldTypes[property.type].view( property )
+    }
+  }
 
 })(jQuery)
