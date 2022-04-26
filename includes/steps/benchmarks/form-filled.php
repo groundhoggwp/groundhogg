@@ -26,12 +26,12 @@ use function Groundhogg\percentage;
  *
  * This will run whenever a form is completed
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Benchmarks
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -124,7 +124,7 @@ class Form_Filled extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'form', map_deep( $this->get_posted_data( 'form' ), 'sanitize_text_field' ) );
+		$this->save_setting( $this->get_posted_data( 'form' ) );
 		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
 		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
 		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );

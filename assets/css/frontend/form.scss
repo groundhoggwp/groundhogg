@@ -32,3 +32,77 @@ ul.gh-form-errors{
     margin: 0;
 }
 
+.gh-form-fields {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    gap: 10px 10px;
+    align-items: stretch;
+
+    label {
+        cursor: pointer;
+        vertical-align: baseline;
+
+        .required{
+            color: #b32d2e;
+        }
+    }
+
+    .gh-input {
+        outline: none;
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+    }
+
+    input[type=file].gh-file-uploader {
+        width: 100%;
+        margin: auto;
+        padding: 30px;
+        box-sizing: border-box;
+        background: #f1f1f1;
+        border: 2px dashed #e5e5e5;
+        text-align: center;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .gh-form-column {
+        &.col-1-of-1 {
+            grid-column: span 12;
+        }
+
+        &.col-1-of-2 {
+            grid-column: span 6;
+        }
+
+        &.col-1-of-3 {
+            grid-column: span 4;
+        }
+
+        &.col-1-of-4 {
+            grid-column: span 3;
+        }
+
+        &.col-2-of-3 {
+            grid-column: span 8;
+        }
+
+        &.col-3-of-4 {
+            grid-column: span 9;
+        }
+    }
+}
+
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+    .gh-form-fields {
+        display: flex;
+        flex-direction: column;
+    }
+
+}
+

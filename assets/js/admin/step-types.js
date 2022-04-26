@@ -1879,7 +1879,14 @@
       },
       onDuplicate: ( step ) => {
         step.meta.uuid = uuid()
-      }
+      },
+      validate ({ meta }, addError, addWarning) {
+
+        if ( ! meta.form.fields.find( f => f.type === 'gdpr') ){
+          addWarning( __( 'You are not collecting GDPR consent in this form but have GDPR enabled in the settings. Add the <b>GDPR Consent</b> field to remain compliant.' ) )
+        }
+
+      },
     },
 
     restart_funnel: {

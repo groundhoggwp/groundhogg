@@ -697,8 +697,8 @@
 
       if (e.type == 'keyup' && e.ctrlKey && e.shiftKey && e.which == 219) {
 
-        if ( GlobalReplacementsWidget && GlobalReplacementsWidget.isOpen() ){
-          return;
+        if (GlobalReplacementsWidget && GlobalReplacementsWidget.isOpen()) {
+          return
         }
 
         editor.execCommand('mceInsertContent', false, '<span id="rep-here">{</span>')
@@ -708,7 +708,7 @@
           offset: editor.iframeElement.getBoundingClientRect(),
           onClose: () => {
             editor.dom.remove('rep-here')
-          }
+          },
         })
 
         GlobalReplacementsWidget.mount()
@@ -1153,21 +1153,61 @@ ${ afterProgress() }`,
 
     // Options is an array format
     if (Array.isArray(options)) {
-      options.forEach(option => {
 
-        if (typeof option !== 'object') {
-          option = {
-            value: option,
-            text: option,
+      if (options.some(opt => typeof opt === 'object' && opt.group)) {
+        options = options.reduce((groups, opt) => {
+          if (groups[opt.group]) {
+            groups[opt.group].push(opt)
           }
-        }
+          else {
+            groups[opt.group] = [opt]
+          }
+          return groups
+        }, {})
 
-        optionsString.push(Elements.option(
-          option.value, option.text,
-          Array.isArray(selected)
-            ? selected.indexOf(option.value) !== -1
-            : option.value == selected))
-      })
+        Object.keys(options).forEach(g => {
+
+          let optGroup = []
+
+          options[g].forEach(option => {
+
+            if (typeof option !== 'object') {
+              option = {
+                value: option,
+                text: option,
+              }
+            }
+
+            optGroup.push(Elements.option(
+              option.value, option.text,
+              Array.isArray(selected)
+                ? selected.indexOf(option.value) !== -1
+                : option.value == selected))
+          })
+
+          optionsString.push(`<optgroup label="${g}">${optGroup.join('')}</optgroup>`)
+
+        })
+
+      }
+      else {
+        options.forEach(option => {
+
+          if (typeof option !== 'object') {
+            option = {
+              value: option,
+              text: option,
+            }
+          }
+
+          optionsString.push(Elements.option(
+            option.value, option.text,
+            Array.isArray(selected)
+              ? selected.indexOf(option.value) !== -1
+              : option.value == selected))
+        })
+      }
+
     }
     // Assume object
     else {
@@ -1354,7 +1394,7 @@ ${ afterProgress() }`,
       return this._open
     },
     isClosed () {
-      return ! this._open
+      return !this._open
     },
     selectOption (optionId, groupId) {
       if (!this.hasGroups()) {
@@ -1421,7 +1461,7 @@ ${ afterProgress() }`,
         left, top, right, bottom,
       } = target.getBoundingClientRect()
 
-      if ( offset ){
+      if (offset) {
         left += offset.left
         top += offset.top
       }
@@ -1579,7 +1619,7 @@ ${ afterProgress() }`,
     })
 
     $doc.on('click', (e) => {
-      if ( GlobalReplacementsWidget && GlobalReplacementsWidget.isOpen() && !clickedIn(e, '.search-options-widget')) {
+      if (GlobalReplacementsWidget && GlobalReplacementsWidget.isOpen() && !clickedIn(e, '.search-options-widget')) {
         GlobalReplacementsWidget.close()
       }
 
@@ -1839,9 +1879,12 @@ ${ afterProgress() }`,
 
   const icons = {
     // language=html
-    copy: `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 488.3 488.3">
-  <path fill="currentColor" d="M314 85H87c-21 0-38 18-38 39v326c0 21 17 38 38 38h227c22 0 39-17 39-38V124c0-21-18-39-39-39zm12 365c0 6-5 11-12 11H87c-6 0-11-5-11-11V124c0-6 5-12 11-12h227c7 0 12 6 12 12v326z"/>
-  <path fill="currentColor" d="M401 0H174c-21 0-39 17-39 39 0 7 6 13 14 13s13-6 13-13 6-12 12-12h227c6 0 12 5 12 12v325c0 7-6 12-12 12-7 0-13 6-13 13s6 14 13 14c21 0 39-17 39-39V39c0-22-18-39-39-39z"/>
+    copy: `
+        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 488.3 488.3">
+  <path fill="currentColor"
+        d="M314 85H87c-21 0-38 18-38 39v326c0 21 17 38 38 38h227c22 0 39-17 39-38V124c0-21-18-39-39-39zm12 365c0 6-5 11-12 11H87c-6 0-11-5-11-11V124c0-6 5-12 11-12h227c7 0 12 6 12 12v326z"/>
+            <path fill="currentColor"
+                  d="M401 0H174c-21 0-39 17-39 39 0 7 6 13 14 13s13-6 13-13 6-12 12-12h227c6 0 12 5 12 12v325c0 7-6 12-12 12-7 0-13 6-13 13s6 14 13 14c21 0 39-17 39-39V39c0-22-18-39-39-39z"/>
 </svg>`,
     drag: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle fill="currentColor" cx="8" cy="4" r="2"/><circle fill="currentColor" cx="8" cy="12" r="2"/><circle fill="currentColor" cx="8" cy="20" r="2"/><circle fill="currentColor" cx="16" cy="4" r="2"/><circle fill="currentColor" cx="16" cy="12" r="2"/><circle fill="currentColor" cx="16" cy="20" r="2"/></svg>`,
     // language=html
@@ -2439,7 +2482,7 @@ ${ afterProgress() }`,
     spinner,
     el,
     isNumeric,
-    sanitizeKey
+    sanitizeKey,
   }
 
 } )(jQuery)

@@ -451,6 +451,7 @@ class Scripts {
 		] );
 
 		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = ' . wp_json_encode( [
+				'name'             => get_option( 'gh_business_name', get_bloginfo( 'name' ) ),
 				'locale'           => str_replace( '_', '-', get_locale() ),
 				'user_test_email'  => get_user_test_email(),
 				'assets'           => [
@@ -459,13 +460,13 @@ class Scripts {
 				'api'              => [
 					'routes' => [
 						'posts' => rest_url( 'wp/v2/posts' ),
-						'v3' => [
+						'v3'    => [
 							'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
 							'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
 							'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
 							'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
 						],
-						'v4' => [
+						'v4'    => [
 							'root'        => rest_url( Base_Api::NAME_SPACE ),
 							'tags'        => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 							'activity'    => rest_url( Base_Api::NAME_SPACE . '/activity' ),

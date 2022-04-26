@@ -562,13 +562,16 @@ class HTML {
 			'type'    => 'checkbox',
 			'name'    => '',
 			'id'      => '',
-			'class'   => '',
+			'class'   => 'gh-checkbox-input',
 			'value'   => '1',
 			'checked' => false,
 			'title'   => '',
 		) );
 
-		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a['label'] ) ? '&nbsp;' . $a['label'] : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
+		$label = $a['label'];
+		unset( $a['label'] );
+
+		$html = $this->wrap( $this->input( $a ) . ( ! empty( $label ) ? ' ' . $label : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
 
 		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}
@@ -800,7 +803,7 @@ class HTML {
 			'exclude'           => []
 		) );
 
-        $exclude = wp_parse_id_list( $a['exclude'] );
+		$exclude = wp_parse_id_list( $a['exclude'] );
 
 		if ( empty( $a['options'] ) ) {
 			$owners = get_owners();
