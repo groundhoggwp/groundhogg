@@ -124,7 +124,6 @@
 
       },
     },
-
     type: {
       type: 'type',
       edit ({ type = 'text' }) {
@@ -208,7 +207,6 @@
 
       },
     },
-
     name: {
       type: 'name',
       edit ({ name = '' }) {
@@ -223,14 +221,13 @@
         </div>`
       },
       onMount (field, updateField) {
-        metaPicker('#name').on('change', (e) => {
+        metaPicker('#name').on('change input', (e) => {
           updateField({
             name: e.target.value,
           })
         })
       },
     },
-
     required: {
       type: 'required',
       edit ({ required = false }) {
@@ -362,7 +359,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#text').on('change', (e) => {
+        $('#text').on('change input', (e) => {
           updateField({
             text: e.target.value,
           })
@@ -381,7 +378,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#value').on('change', (e) => {
+        $('#value').on('change input', (e) => {
           updateField({
             value: e.target.value,
           })
@@ -400,7 +397,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#placeholder').on('change', (e) => {
+        $('#placeholder').on('change input', (e) => {
           updateField({
             placeholder: e.target.value,
           })
@@ -419,7 +416,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#css-id').on('change', (e) => {
+        $('#css-id').on('change input', (e) => {
           updateField({
             id: e.target.value,
           })
@@ -438,7 +435,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#className').on('change', (e) => {
+        $('#className').on('change input', (e) => {
           updateField({
             className: e.target.value,
           })
@@ -624,13 +621,6 @@
             })
           },
         }).mount()
-      },
-    },
-
-    optionNone: {
-      type: 'optionNone',
-      edit ({ option_none }) {
-
       },
     },
 

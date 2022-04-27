@@ -11,6 +11,7 @@ use function Groundhogg\encrypt;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\html;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\utils;
 
@@ -88,6 +89,18 @@ function basic_text_field( $field ) {
 }
 
 /**
+ * Sanitize a regular basic text field
+ *
+ * @param $field
+ * @param $posted_data
+ *
+ * @return string
+ */
+function sanitize_text( $field, $posted_data ) {
+	return sanitize_text_field( $posted_data[ $field['name'] ] );
+}
+
+/**
  * Created by PhpStorm.
  * User: adria
  * Date: 2019-05-10
@@ -117,8 +130,27 @@ class Form_v2 extends Step {
 						'name' => 'first_name',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$first_name = get_array_var( $posted_data, 'first_name' );
+					$last_name  = get_array_var( $posted_data, 'last_name' );
+
+					if ( $first_name && $last_name && $first_name === $last_name ) {
+						return new \WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
+					}
+
+					if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/u', $first_name ) ) {
+
+						if ( current_user_can( 'edit_funnels' ) ) {
+							return new \WP_Error( 'invalid_first_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+						}
+
+						return new \WP_Error( 'invalid_first_name', __( 'Please provide a valid first name.', 'groundhogg' ) );
+
+					}
+
+					return true;
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'last'         => [
 				'render'   => function ( $field ) {
@@ -127,8 +159,27 @@ class Form_v2 extends Step {
 						'name' => 'last_name',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$first_name = get_array_var( $posted_data, 'first_name' );
+					$last_name  = get_array_var( $posted_data, 'last_name' );
+
+					if ( $first_name && $last_name && $first_name === $last_name ) {
+						return new \WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
+					}
+
+					if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/u', $last_name ) ) {
+
+						if ( current_user_can( 'edit_funnels' ) ) {
+							return new \WP_Error( 'invalid_last_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+						}
+
+						return new \WP_Error( 'invalid_last_name', __( 'Please provide a valid last name.', 'groundhogg' ) );
+
+					}
+
+					return true;
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'email'        => [
 				'render'   => function ( $field ) {
@@ -137,8 +188,12 @@ class Form_v2 extends Step {
 						'name' => 'email',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					return is_email( $posted_data[ $field['name'] ] ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
+				},
+				'sanitize' => function ( $field, $posted_data ) {
+					return sanitize_email( $posted_data[ $field['name'] ] );
+				},
 			],
 			'phone'        => [
 				'render'   => function ( $field ) {
@@ -151,8 +206,8 @@ class Form_v2 extends Step {
 						'name' => $field['phone_type'] . '_phone',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'line1'        => [
 				'render'   => function ( $field ) {
@@ -161,8 +216,8 @@ class Form_v2 extends Step {
 						'name' => 'line1',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'line2'        => [
 				'render'   => function ( $field ) {
@@ -171,8 +226,8 @@ class Form_v2 extends Step {
 						'name' => 'line2',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'city'         => [
 				'render'   => function ( $field ) {
@@ -181,8 +236,8 @@ class Form_v2 extends Step {
 						'name' => 'city',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'state'        => [
 				'render'   => function ( $field ) {
@@ -191,8 +246,8 @@ class Form_v2 extends Step {
 						'name' => 'state',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'zip_code'     => [
 				'render'   => function ( $field ) {
@@ -201,8 +256,8 @@ class Form_v2 extends Step {
 						'name' => 'zip_code',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'country'      => [
 				'render'   => function ( $field ) {
@@ -231,8 +286,10 @@ class Form_v2 extends Step {
 						'options'     => utils()->location->get_countries_list()
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					return key_exists( $posted_data['country'], utils()->location->get_countries_list() ) ? true : new \WP_Error( 'invalid_country', __( 'Invalid country selected', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'gdpr'         => [
 				'render'   => function ( $field ) {
@@ -272,7 +329,8 @@ class Form_v2 extends Step {
 					}
 
 					return true;
-				}
+				},
+				'sanitize' => '__return_true'
 			],
 			'terms'        => [
 				'render'   => function ( $field ) {
@@ -301,7 +359,8 @@ class Form_v2 extends Step {
 					}
 
 					return true;
-				}
+				},
+				'sanitize' => '__return_true'
 			],
 			'text'         => [
 				'render'   => function ( $field ) {
@@ -309,8 +368,8 @@ class Form_v2 extends Step {
 						'type' => 'text',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'url'          => [
 				'render'   => function ( $field ) {
@@ -318,8 +377,10 @@ class Form_v2 extends Step {
 						'type' => 'url',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					return filter_var( $posted_data[ $field['name'] ], FILTER_VALIDATE_URL ) ? true : new \WP_Error( 'invalid_url', __( 'Invalid URL', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'date'         => [
 				'render'   => function ( $field ) {
@@ -327,8 +388,10 @@ class Form_v2 extends Step {
 						'type' => 'date',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new \WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'time'         => [
 				'render'   => function ( $field ) {
@@ -336,8 +399,12 @@ class Form_v2 extends Step {
 						'type' => 'time',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$d = \DateTime::createFromFormat( "Y-m-d H:i:s", "2017-12-01 {$posted_data[ $field['name'] ]}" );
+
+					return $d && $d->format( 'H:i:s' ) == $posted_data[ $field['name'] ] ? true : new \WP_Error( 'invalid_time', __( 'Invalid Time', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'number'       => [
 				'render'   => function ( $field ) {
@@ -345,8 +412,14 @@ class Form_v2 extends Step {
 						'type' => 'number',
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					return is_numeric( $posted_data[ $field['name'] ] ) ? true : new \WP_Error( 'invalid_number', __( 'Invalid number.', 'groundhogg' ) );
+				},
+				'sanitize' => function ( $field, $posted_data ) {
+					$num = $posted_data[ $field['name'] ];
+
+					return strpos( $num, '.' ) !== false ? floatval( $num ) : intval( $num );
+				},
 			],
 			'textarea'     => [
 				'render'   => function ( $field ) {
@@ -375,8 +448,10 @@ class Form_v2 extends Step {
 						'value'       => $field['value'],
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true',
+				'sanitize' => function ( $field, $posted_data ) {
+					return sanitize_textarea_field( $posted_data[ $field['name'] ] );
+				},
 			],
 			'dropdown'     => [
 				'render'   => function ( $field ) {
@@ -409,8 +484,14 @@ class Form_v2 extends Step {
 						}, $field['options'] )
 					] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$options = array_map( function ( $opt ) {
+						return is_array( $opt ) ? $opt[0] : $opt;
+					}, $field['options'] );
+
+					return in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'radio'        => [
 				'render'   => function ( $field ) {
@@ -444,8 +525,15 @@ class Form_v2 extends Step {
 
 						}, $field['options'] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$options = array_map( function ( $opt ) {
+						return is_array( $opt ) ? $opt[0] : $opt;
+					}, $field['options'] );
+
+					return in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+				},
+				'sanitize' => __NAMESPACE__ . '\sanitize_text',
+
 			],
 			'checkboxes'   => [
 				'render'   => function ( $field ) {
@@ -479,8 +567,18 @@ class Form_v2 extends Step {
 
 						}, $field['options'] ) );
 				},
-				'validate' => function () {
-				}
+				'validate' => function ( $field, $posted_data ) {
+					$options = array_map( function ( $opt ) {
+						return is_array( $opt ) ? $opt[0] : $opt;
+					}, $field['options'] );
+
+					$selections = $posted_data[ $field['name'] ];
+
+					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new \WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
+				},
+				'sanitize' => function ( $field, $posted_data ) {
+					return map_deep( $posted_data[ $field['name'] ], 'sanitize_text_field' );
+				},
 			],
 			'checkbox'     => [
 				'render'   => function ( $field ) {
@@ -502,13 +600,12 @@ class Form_v2 extends Step {
 						'label'    => $field['label'],
 						'id'       => $field['id'],
 						'name'     => $field['name'],
-						'class'    => trim( 'gh-input ' . $field['className'] ),
+						'class'    => trim( 'gh-checkbox-input ' . $field['className'] ),
 						'required' => $field['required'],
 						'value'    => $field['value'] ?: '1',
 					] );
 				},
-				'validate' => function () {
-				}
+				'validate' => '__return_true'
 			],
 			'file'         => [],
 			'custom_field' => [
@@ -526,7 +623,20 @@ class Form_v2 extends Step {
 						'required'  => $field['required'],
 					] ) );
 				},
-				'validate' => '__return_true'
+				'validate' => function ( $field, $posted_data ) {
+					$property = $field['property'];
+					$property = Properties::instance()->get_field( $property );
+					if ( ! $property ) {
+						return new \WP_Error( 'invalid_property', 'somethign went wrong' );
+					}
+
+					return Form_v2::validate_input( array_merge( $property, [
+						'value'     => $field['value'],
+						'id'        => $field['id'],
+						'className' => $field['className'],
+						'required'  => $field['required'],
+					] ), $posted_data );
+				}
 			],
 			'html'         => [
 				'render'   => function ( $field ) {
@@ -686,6 +796,26 @@ class Form_v2 extends Step {
 	}
 
 	/**
+	 * Validate a field
+	 *
+	 * @param $field
+	 * @param $posted_data array
+	 *
+	 * @return false|mixed|string
+	 */
+	public static function validate_input( $field, $posted_data ) {
+		$type = $field['type'];
+
+		$field_type = get_array_var( self::$fields, $type );
+
+		if ( ! $field_type ) {
+			return '';
+		}
+
+		return call_user_func( $field_type['validate'], $field, $posted_data );
+	}
+
+	/**
 	 * @param $field
 	 *
 	 * @return false|mixed|string
@@ -746,10 +876,10 @@ class Form_v2 extends Step {
 
 		$html = implode( '', array_map( [ $this, 'render_field' ], $fields ) );
 
-		$recaptcha = $config['recaptcha'];
-		$button    = $config['button'];
+		$recaptcha = get_array_var( $config, 'recaptcha' );
+		$button    = get_array_var( $config, 'button' );
 
-		if ( $recaptcha['enabled'] ) {
+		if ( isset_not_empty( $recaptcha, 'enabled' ) ) {
 			$html .= $this->render_field( $recaptcha );
 		}
 
