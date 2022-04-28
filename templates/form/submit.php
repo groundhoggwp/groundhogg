@@ -1,40 +1,29 @@
 <?php
+
 namespace Groundhogg;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 include GROUNDHOGG_PATH . 'templates/managed-page.php';
 
-use Groundhogg\Form\Form;
-
+use Groundhogg\Form\Form_v2;
 
 $form_id = get_query_var( 'form_id' );
-$form = new Form( [ 'id' => $form_id ] );
-$step = new Step( $form_id );
 
-add_action( 'wp_head', function (){
-	wp_dequeue_script('fullframe');
-}, 99 ) ;
+if ( ! $form_id ) {
+	$form_id = get_query_var( 'form_uuid' );
+}
 
-add_action( 'wp_head', function(){
-    ?>
-    <style>
-        #main {max-width: 650px;}
-    </style>
-    <?php
-} );
+$form = new Form_v2( [ 'id' => $form_id ] );
 
-managed_page_head( $step->get_title(), 'view' );
+add_action( 'wp_head', function () {
+	wp_dequeue_script( 'fullframe' );
+}, 99 );
 
-?>
-    <div class="box">
-        <?php
+managed_page_head( wp_strip_all_tags( $form->get_title() ), 'submit-form' );
 
-        form_errors( false );
-
-        ?>
-        <?php echo $form->get_iframe_embed_code(); ?>
-    </div>
-    <?php
+echo do_shortcode( $form->get_shortcode() );
 
 managed_page_footer();

@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Form\Form;
+use Groundhogg\Form\Form_v2;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_REST_Server;
@@ -20,26 +21,6 @@ class Forms_Api extends Base_Api {
 	 */
 	public function register_routes() {
 
-		register_rest_route( self::NAME_SPACE, '/forms/submit', [
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return wp_verify_nonce( $request->get_param( '_ghnonce' ), 'groundhogg_frontend' );
-				},
-				'callback'            => [ $this, 'ajax_submit' ],
-				'args'                => [
-					'_ghnonce'  => [
-						'description' => 'Need this!',
-						'required'    => true
-					],
-					'form_data' => [
-						'description' => 'Data from the form.',
-						'required'    => true,
-					]
-				]
-			]
-		] );
-
 		register_rest_route( self::NAME_SPACE, '/forms', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -50,9 +31,9 @@ class Forms_Api extends Base_Api {
 
 		register_rest_route( self::NAME_SPACE, '/forms/(?P<form>\d+)', [
 			[
-				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => [ $this, 'read_permissions_callback' ],
-				'callback'            => [ $this, 'read_single' ],
+				'methods'             => WP_REST_Server::CREATABLE,
+				'permission_callback' => '__return_true',
+				'callback'            => [ $this, 'submit' ],
 			]
 		] );
 	}
@@ -99,8 +80,8 @@ class Forms_Api extends Base_Api {
 			return new Form( [ 'id' => $form->ID ] );
 		}, $items );
 
-		if ( $request->get_param('active') ){
-			$items = array_filter( $items, function ( $form ){
+		if ( $request->get_param( 'active' ) ) {
+			$items = array_filter( $items, function ( $form ) {
 				return $form->is_active();
 			} );
 		}
@@ -112,15 +93,33 @@ class Forms_Api extends Base_Api {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Handler to submit a specific form
 	 *
-	 * @return WP_Error
+	 * @return WP_Error|WP_REST_Response
 	 */
-	public function ajax_submit( WP_REST_Request $request ) {
-		do_action( 'groundhogg/api/v3/forms/submit', $request );
+	public function submit( WP_REST_Request $request ) {
+		$form_uuid = $request->get_param( 'form' );
+		$form      = new Form_v2( [ 'id' => $form_uuid ] );
 
-		$errors = Plugin::$instance->submission_handler->get_errors();
+		if ( ! $form->exists() ) {
+			return self::ERROR_404();
+		}
 
-		return self::ERROR_401( 'invalid_request', 'Invalid request.', [ 'errors' => $errors ] );
+		$form->submit();
+
+		if ( $form->has_errors() ) {
+
+			$error = new WP_Error( 'failed_to_submit', __( 'Your submission has errors.', 'groundhogg' ), [
+				'status' => 400
+			] );
+
+			foreach ( $form->get_errors() as $_error ) {
+				$error->add( $_error->get_error_code(), $_error->get_error_message() );
+			}
+
+			return $error;
+		}
+
+		return self::SUCCESS_RESPONSE();
 	}
 }

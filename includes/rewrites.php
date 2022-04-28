@@ -107,7 +107,7 @@ class Rewrites {
 	/**
 	 * Maps a function to a specific query var.
 	 *
-	 * @param $query
+	 * @param $query \WP_Query
 	 *
 	 * @return mixed
 	 */
@@ -116,6 +116,8 @@ class Rewrites {
 		$this->map_query_var( $query, 'email_id', 'absint' );
 
 		// form
+		$query['form_uuid'] = $query['form_id'];
+
 		$this->map_query_var( $query, 'form_id', 'urldecode' );
 		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
 		$this->map_query_var( $query, 'form_id', 'absint' );
@@ -263,7 +265,7 @@ class Rewrites {
 
 			case 'files':
 
-				$short_path       = get_query_var( 'file_path' );
+				$short_path      = get_query_var( 'file_path' );
 				$groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
 				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 

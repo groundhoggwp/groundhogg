@@ -3,13 +3,18 @@
 namespace Groundhogg\Form;
 
 
+use Groundhogg\Contact;
 use Groundhogg\Properties;
 use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_to_atts;
+use function Groundhogg\do_replacements;
 use function Groundhogg\encrypt;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
+use function Groundhogg\get_db;
+use function Groundhogg\get_request_query;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
@@ -148,9 +153,10 @@ class Form_v2 extends Step {
 
 					}
 
+					$posted_data->first_name = sanitize_text_field( $first_name );
+
 					return true;
 				},
-				'sanitize' => __NAMESPACE__ . '\sanitize_text',
 			],
 			'last'         => [
 				'render'   => function ( $field ) {
@@ -177,6 +183,8 @@ class Form_v2 extends Step {
 
 					}
 
+					$posted_data->last_name = sanitize_text_field( $last_name );
+
 					return true;
 				},
 				'sanitize' => __NAMESPACE__ . '\sanitize_text',
@@ -189,10 +197,16 @@ class Form_v2 extends Step {
 					] ) );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return is_email( $posted_data[ $field['name'] ] ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
+					$email = get_array_var( $posted_data, 'email' );
+
+					wp_send_json( $email );
+
+					return is_email( $email ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
 				},
 				'sanitize' => function ( $field, $posted_data ) {
-					return sanitize_email( $posted_data[ $field['name'] ] );
+					$email = get_array_var( $posted_data, 'email' );
+
+					return sanitize_email( $email );
 				},
 			],
 			'phone'        => [
@@ -703,7 +717,6 @@ class Form_v2 extends Step {
 			return;
 		}
 
-
 		self::$fields[ $type ] = [
 			'type'     => $type,
 			'render'   => $render,
@@ -726,8 +739,14 @@ class Form_v2 extends Step {
 			self::register_fields();
 		}
 
+		$id = $atts['id'];
+
+		if ( is_string( $id ) && ! is_numeric( $id ) ) {
+			$id = absint( get_db( 'stepmeta' )->get_column_by( 'step_id', 'meta_value', $id ) );
+		}
+
 		// Init step as normal
-		parent::__construct( $atts['id'] );
+		parent::__construct( $id );
 	}
 
 	public function get_uuid() {
@@ -900,27 +919,19 @@ class Form_v2 extends Step {
 
 		$form = '<div class="gh-form-wrapper">';
 
-		/* Errors from a previous submission */
-		$form .= form_errors( true );
-
 		if ( ! $this->exists() ) {
 			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
 		}
 
-		$submit_via_ajax = $this->get_meta( 'enable_ajax' );
-
-		if ( $submit_via_ajax ) {
-			wp_enqueue_script( 'groundhogg-ajax-form' );
-			wp_enqueue_style( 'groundhogg-loader' );
-		}
+		wp_enqueue_script( 'groundhogg-ajax-form' );
 
 		$atts = [
 			'method'  => 'post',
-			'class'   => 'gh-form ' . ( $submit_via_ajax ? ' ajax-submit' : '' ),
+			'class'   => 'gh-form ajax-submit',
 			'target'  => '_parent',
 			'enctype' => 'multipart/form-data',
 			'name'    => wp_strip_all_tags( $this->get_step_title() ),
-			'id'      => $this->get_uuid()
+			'id'      => $this->get_id()
 		];
 
 		if ( get_query_var( 'doing_iframe' ) ) {
@@ -929,22 +940,12 @@ class Form_v2 extends Step {
 
 		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
-		$form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
-		$form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
-
 		$form .= '<div class="gh-form-fields">';
 
 		$form .= $this->get_field_html();
 
 		$form .= '</div>';
 		$form .= '</form>';
-
-		if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ) {
-			$form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_page_url( 'gh_funnels', [
-				'action' => 'edit',
-				'funnel' => $this->get_funnel_id()
-			], $this->get_id() ), __( '(Edit Form)' ) );
-		}
 
 		$form .= '</div>';
 
@@ -976,5 +977,117 @@ class Form_v2 extends Step {
 				'url'    => $this->get_submission_url()
 			]
 		];
+	}
+
+	/**
+	 * Validates a field
+	 *
+	 * @param $field
+	 * @param $posted_data
+	 *
+	 * @return false|mixed|string
+	 */
+	public static function validate_field( $field, $posted_data ) {
+		$type = $field['type'];
+
+		$field_type = get_array_var( self::$fields, $type );
+
+		if ( ! $field_type ) {
+			return '';
+		}
+
+		return call_user_func( $field_type['validate'], $field, $posted_data );
+	}
+
+	/**
+	 * Whether to submit this form via ajax
+	 *
+	 * @return bool
+	 */
+	public function is_ajax_submit() {
+		return (bool) $this->get_meta( 'enable_ajax' );
+	}
+
+	public function get_success_url() {
+		$message = $this->get_meta( 'success_page' );
+
+		return do_replacements( $message, get_contactdata() );
+	}
+
+	public function get_success_message() {
+		$message = $this->get_meta( 'success_message' );
+
+		return do_replacements( $message, get_contactdata() );
+	}
+
+	/**
+	 * Submit the form
+	 *
+	 * @return false|true true if successful, false otherwise
+	 */
+	public function submit() {
+
+		$posted_data = new Posted_Data( wp_unslash( $_POST ) );
+
+		$config    = $this->get_meta( 'form' );
+		$fields    = $config['fields'];
+		$recaptcha = $config['recaptcha'];
+
+		if ( $recaptcha['enabled'] ) {
+			$fields[] = $recaptcha;
+		}
+
+		foreach ( $fields as $field ) {
+			$result = self::validate_field( $field, $posted_data );
+			if ( is_wp_error( $result ) ) {
+				$this->add_error( $result );
+			}
+		}
+
+		if ( $this->has_errors() ) {
+			return false;
+		}
+
+		$contact = new Contact();
+		$contact->create();
+
+		return true;
+	}
+
+}
+
+class Posted_Data implements \ArrayAccess {
+
+	/**
+	 * @var array
+	 */
+	protected $posted = [];
+
+	public function __construct( $posted = [] ) {
+		$this->posted = $posted;
+	}
+
+	public function __set( $name, $value ) {
+		$this->posted[$name] = $value;
+	}
+
+	public function __get( $name ) {
+		return $this->posted[$name];
+	}
+
+	public function offsetExists( $offset ) {
+		return isset( $this->posted[ $offset ] );
+	}
+
+	public function offsetGet( $offset ) {
+		return $this->posted[ $offset ];
+	}
+
+	public function offsetSet( $offset, $value ) {
+		$this->posted[ $offset ] = $value;
+	}
+
+	public function offsetUnset( $offset ) {
+		unset( $this->posted[ $offset ] );
 	}
 }

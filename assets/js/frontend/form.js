@@ -1,12 +1,12 @@
-(function (gh) {
+( function (gh) {
 
   const {
     nonces,
-    i18n
+    i18n,
+    routes,
   } = gh
 
-  const { _ghnonce } = nonces
-  const { adminAjax } = gh
+  const { _wprest } = nonces
 
   const loadingDots = (el) => {
 
@@ -23,17 +23,33 @@
     const interval = setInterval(() => {
       if (dotsHolder.innerText.length >= 3) {
         dotsHolder.innerText = '.'
-      } else {
+      }
+      else {
         dotsHolder.innerText = dotsHolder.innerText + '.'
       }
     }, 500)
 
     return {
-      stop
+      stop,
     }
   }
 
-  let ajaxFinEvt = new CustomEvent( 'ajaxfinished' )
+  let ajaxFinEvt = new CustomEvent('ajaxfinished')
+  let formSubmitted = new CustomEvent('ghformsubmitted')
+
+  const apiPostFormData = async (url, data, opts = {}) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'X-WP-Nonce': _wprest,
+      },
+      body: data,
+      ...opts,
+    })
+
+    return response.json()
+  }
 
   const handleAjaxForms = () => {
 
@@ -53,11 +69,9 @@
         btn.innerHTML = i18n.submitting
         let { stop } = loadingDots(btn)
 
-        form.parentNode.querySelectorAll('.gh-message-wrapper').forEach( el => el.remove() )
+        form.parentNode.querySelectorAll('.gh-message-wrapper, .gh-errors').forEach(el => el.remove())
 
         let fd = new FormData(form)
-        fd.append('_ghnonce', _ghnonce)
-        fd.append('action', 'groundhogg_ajax_form_submit')
 
         //check if google is active
         let captchaValidated = true
@@ -73,13 +87,26 @@
         }
 
         if (captchaValidated) {
-          adminAjax(fd).then(r => {
+
+          let uuid = __form.id
+
+          apiPostFormData(`${ routes.forms }/${ uuid }/`, fd).then(r => {
 
             stop()
             btn.innerHTML = submitText
             btn.disabled = false
 
-            if (r.success === undefined) {
+            if (r.code && r.code === 'failed_to_submit') {
+
+              let msg = document.createElement('div')
+              //language=HTML
+              msg.innerHTML = `
+                  <p>${r.message}</p>
+                  <ul>${ r.additional_errors.map(err => `<li>${ err.message }</li>`).join('') }</ul>`
+              msg.classList.add(...['gh-errors'])
+
+              form.parentNode.appendChild(msg)
+
               return
             }
 
@@ -87,22 +114,24 @@
 
               let msg = document.createElement('div')
               msg.innerHTML = r.data.message
-              msg.classList.add( ...['gh-message-wrapper', 'gh-form-success-wrapper'])
+              msg.classList.add(...['gh-message-wrapper', 'gh-form-success-wrapper'])
 
               form.parentNode.appendChild(msg)
 
               form.reset()
 
-            } else {
+            }
+            else {
 
               let msg = document.createElement('div')
               msg.innerHTML = r.data.html
 
-              form.parentNode.insertBefore( msg.firstChild, form)
+              form.parentNode.insertBefore(msg.firstChild, form)
 
             }
 
-            form.dispatchEvent( ajaxFinEvt )
+            form.dispatchEvent(ajaxFinEvt)
+            form.dispatchEvent(formSubmitted)
 
           }).catch(e => {
             alert(e.message)
@@ -116,4 +145,4 @@
 
   window.addEventListener('load', handleAjaxForms)
 
-})(Groundhogg)
+} )(Groundhogg)
