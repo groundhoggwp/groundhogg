@@ -1,4 +1,4 @@
-(function ($) {
+( function ($) {
 
   const {
     modal,
@@ -14,7 +14,7 @@
     adminPageURL,
     bold,
     toggle,
-    dialog
+    dialog,
   } = Groundhogg.element
   const { emailPicker, searchesPicker } = Groundhogg.pickers
   const { emails: EmailsStore, searches: SearchesStore, contacts: ContactsStore } = Groundhogg.stores
@@ -27,7 +27,7 @@
     email = false,
     ...rest
   } = {}, {
-    onScheduled = () => {}
+    onScheduled = () => {},
   }) => {
 
     let state = {
@@ -38,13 +38,13 @@
       time: '09:00:00',
       query: {},
       total_contacts: 0,
-      ...rest
+      ...rest,
     }
 
     const setState = (newState) => {
       state = {
         ...state,
-        ...newState
+        ...newState,
       }
 
       console.log(state)
@@ -60,16 +60,16 @@
 
       // language=HTML
       return `
-		  <div class="gh-row">
-			  <div class="gh-col">
-				  <iframe id="${elPrefix}-email-preview"></iframe>
-			  </div>
-		  </div>`
+          <div class="gh-row">
+              <div class="gh-col">
+                  <iframe id="${ elPrefix }-email-preview"></iframe>
+              </div>
+          </div>`
     }
 
     const showFrame = () => {
       if (state.email_id) {
-        setFrameContent($(`#${elPrefix}-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
+        setFrameContent($(`#${ elPrefix }-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
       }
     }
 
@@ -77,26 +77,26 @@
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-email"><b>${__('Which email do you want to send?', 'groundhogg')}</b></label>
-					  ${select({
-						  name: 'email',
-						  id: `${elPrefix}-email`
-					  }, EmailsStore.getItems().map(e => ({ text: e.data.title, value: e.ID })), state.email_id)}
-				  </div>
-			  </div>
-			  ${state.email_id ? preview() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>
-						  ${__('Next', 'groundhogg')} &rarr;
-					  </button>
-				  </div>
-			  </div>
-		  </div>
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-email"><b>${ __('Which email do you want to send?', 'groundhogg') }</b></label>
+                      ${ select({
+                          name: 'email',
+                          id: `${ elPrefix }-email`,
+                      }, EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )), state.email_id) }
+                  </div>
+              </div>
+              ${ state.email_id ? preview() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button class="gh-next-step gh-button primary" ${ state.email_id ? '' : 'disabled' }>
+                          ${ __('Next', 'groundhogg') } &rarr;
+                      </button>
+                  </div>
+              </div>
+          </div>
       `
     }
 
@@ -105,74 +105,75 @@
       const laterSettings = () => {
         // language=HTML
         return `
-			<div class="gh-row">
-				<div class="gh-col">
-					<label for="${elPrefix}-date"><b>${__('Set the date and time...', 'groundhogg')}</b></label>
-					<div class="gh-input-group">
-						${input({
-							id: `${elPrefix}-date`,
-							type: 'date',
-							name: 'date',
-							value: state.date,
-							min: moment().format('YYYY-MM-DD')
-						})}
-						${input({
-							id: `${elPrefix}-time`,
-							type: 'time',
-							name: 'time',
-							value: state.time,
-						})}
-					</div>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
-					<label>${__('Send in the contact\'s local time?', 'groundhogg')} ${toggle({
-						onLabel: __('Yes'),
-						offLabel: __('No'),
-						id: `${elPrefix}-local-time`,
-						name: 'send_in_local_time',
-						checked: state.send_in_local_time
-					})}</label>
-				</div>
-			</div>`
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label for="${ elPrefix }-date"><b>${ __('Set the date and time...', 'groundhogg') }</b></label>
+                    <div class="gh-input-group">
+                        ${ input({
+                            id: `${ elPrefix }-date`,
+                            type: 'date',
+                            name: 'date',
+                            value: state.date,
+                            min: moment().format('YYYY-MM-DD'),
+                        }) }
+                        ${ input({
+                            id: `${ elPrefix }-time`,
+                            type: 'time',
+                            name: 'time',
+                            value: state.time,
+                        }) }
+                    </div>
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label>${ __('Send in the contact\'s local time?', 'groundhogg') } ${ toggle({
+                        onLabel: __('Yes'),
+                        offLabel: __('No'),
+                        id: `${ elPrefix }-local-time`,
+                        name: 'send_in_local_time',
+                        checked: state.send_in_local_time,
+                    }) }</label>
+                </div>
+            </div>`
       }
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-when"><b>${__('When should this email be sent?', 'groundhogg')}</b></label>
-					  <div class="gh-radio-group">
-						  <label>${input({
-							  type: 'radio',
-							  className: 'change-when',
-							  name: 'gh_send_when',
-							  value: 'now',
-							  checked: state.when === 'now',
-						  })} ${__('Now', 'groundhogg')}</label>
-						  <label>${input({
-							  type: 'radio',
-							  name: 'gh_send_when',
-							  className: 'change-when',
-							  value: 'later',
-							  checked: state.when === 'later',
-						  })} ${__('Later', 'groundhogg')}</label>
-					  </div>
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-when"><b>${ __('When should this email be sent?',
+                              'groundhogg') }</b></label>
+                      <div class="gh-radio-group">
+                          <label>${ input({
+                              type: 'radio',
+                              className: 'change-when',
+                              name: 'gh_send_when',
+                              value: 'now',
+                              checked: state.when === 'now',
+                          }) } ${ __('Now', 'groundhogg') }</label>
+                          <label>${ input({
+                              type: 'radio',
+                              name: 'gh_send_when',
+                              className: 'change-when',
+                              value: 'later',
+                              checked: state.when === 'later',
+                          }) } ${ __('Later', 'groundhogg') }</label>
+                      </div>
 
-				  </div>
-			  </div>
-			  ${state.when === 'later' ? laterSettings() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary"
-					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>
-						  ${__('Next', 'groundhogg')} &rarr;
-					  </button>
-				  </div>
-			  </div>`
+                  </div>
+              </div>
+              ${ state.when === 'later' ? laterSettings() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button class="gh-next-step gh-button primary"
+                              ${ state.when === 'later' && ( !state.date || !state.time ) ? 'disabled' : '' }>
+                          ${ __('Next', 'groundhogg') } &rarr;
+                      </button>
+                  </div>
+              </div>`
     }
 
     const step3 = () => {
@@ -182,71 +183,69 @@
       const totalAndNext = () => {
         //language=HTML
         return `
-			<div class="gh-row">
-				<div class="gh-col">
-					<div id="${elPrefix}-total-contacts">
-						<p>
-							${sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'), bold(formatNumber(total_contacts)))}
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
-					<button class="gh-next-step gh-button primary" ${total_contacts ? '' : 'disabled'}>
-						${__('Next', 'groundhogg')}
-						&rarr;
-					</button>
-				</div>
-			</div>`
+            <div class="gh-row">
+                <div class="gh-col">
+                    <div id="${ elPrefix }-total-contacts">
+                        <p>
+                            ${ sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'),
+                                    bold(formatNumber(total_contacts))) }
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <button class="gh-next-step gh-button primary" ${ total_contacts ? '' : 'disabled' }>
+                        ${ __('Next', 'groundhogg') }
+                        &rarr;
+                    </button>
+                </div>
+            </div>`
         // language=HTML
       }
 
       if (state.which === 'from_table') {
-        return `<div class="gh-rows-and-columns">${totalAndNext()}</div>`
+        return `<div class="gh-rows-and-columns">${ totalAndNext() }</div>`
       }
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-search-which"><b>${__('Select contacts to receive this email...', 'groundhogg')}</b></label>
-					  <div class="gh-radio-group">
-						  <label>${input({
-							  type: 'radio',
-							  className: 'change-search-which',
-							  name: 'gh_send_search_which',
-							  value: 'filters',
-							  checked: state.which === 'filters',
-						  })} ${__('Search for Contacts', 'groundhogg')}</label>
-						  <label>${input({
-							  type: 'radio',
-							  name: 'gh_send_search_which',
-							  className: 'change-search-which',
-							  value: 'searches',
-							  checked: state.which === 'searches',
-						  })} ${__('Use a Saved Search', 'groundhogg')}</label>
-					  </div>
-				  </div>
-			  </div>
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <div id="${elPrefix}-search-method">
-						  ${state.which === 'searches' ? select({
-							  id: `${elPrefix}-search-method-searches`,
-							  name: 'searches',
-							  dataPlaceholder: __('Please select a saved search...', 'groundhogg')
-						  }, SearchesStore.getItems().map(s => ({
-							  text: s.name,
-							  value: s.id
-						  })), state.query.saved_search) : ''}
-					  </div>
-				  </div>
-			  </div>
-			  ${totalAndNext()}
-		  </div>`
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-search-which"><b>${ __('Select contacts to receive this email...',
+                              'groundhogg') }</b></label>
+                      <div class="gh-radio-group">
+                          <label>${ input({
+                              type: 'radio',
+                              className: 'change-search-which',
+                              name: 'gh_send_search_which',
+                              value: 'filters',
+                              checked: state.which === 'filters',
+                          }) } ${ __('Search for Contacts', 'groundhogg') }</label>
+                          <label>${ input({
+                              type: 'radio',
+                              name: 'gh_send_search_which',
+                              className: 'change-search-which',
+                              value: 'searches',
+                              checked: state.which === 'searches',
+                          }) } ${ __('Use a Saved Search', 'groundhogg') }</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <div id="${ elPrefix }-search-method">
+                          ${ state.which === 'searches' ? select({
+                              id: `${ elPrefix }-search-method-searches`,
+                              name: 'searches',
+                          }) : '' }
+                      </div>
+                  </div>
+              </div>
+              ${ totalAndNext() }
+          </div>`
     }
 
     const step4 = () => {
@@ -256,32 +255,35 @@
       const {
         total_contacts,
         date,
-        time
+        time,
       } = state
 
       let review = state.when === 'later'
         ? _n('Send %1$s to %2$s contact on %3$s', 'Send %1$s to %2$s contacts on %3$s', total_contacts, 'groundhogg')
-        : _n('Send %1$s to %2$s contact <b>immediately</b>.', 'Send %1$s to %2$s contacts <b>immediately</b>', total_contacts, 'groundhogg')
+        : _n('Send %1$s to %2$s contact <b>immediately</b>.', 'Send %1$s to %2$s contacts <b>immediately</b>',
+          total_contacts, 'groundhogg')
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
               <span class="gh-text md">
-                  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)), state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '')}
+                  ${ sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)),
+                          state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '') }
               </span>
-				  </div>
-			  </div>
-			  ${state.email_id ? preview() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button id="${elPrefix}-confirm" class="gh-button primary">
-						  ${state.when === 'later' ? __('Confirm and Schedule', 'groundhogg') : __('Confirm and Send', 'groundhogg')}
-					  </button>
-				  </div>
-			  </div>
-		  </div>`
+                  </div>
+              </div>
+              ${ state.email_id ? preview() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button id="${ elPrefix }-confirm" class="gh-button primary">
+                          ${ state.when === 'later' ? __('Confirm and Schedule', 'groundhogg') : __('Confirm and Send',
+                                  'groundhogg') }
+                      </button>
+                  </div>
+              </div>
+          </div>`
     }
 
     $(selector).html(`<div id="gh-send-broadcast-form"></div>`)
@@ -290,38 +292,38 @@
       $el,
       nextStep,
       lastStep,
-      setStep
+      setStep,
     } = stepNavHandler('#gh-send-broadcast-form', {
       currentStep: 0,
       steps: [
         step1,
         step2,
         step3,
-        step4
+        step4,
       ],
       showNav: true,
       labels: [
         __('Email', 'groundhogg'),
         __('Schedule', 'groundhogg'),
         __('Contacts', 'groundhogg'),
-        __('Review', 'groundhogg')
+        __('Review', 'groundhogg'),
       ],
       onStepChange: (step, {
         nextStep,
         lastStep,
-        setStep
+        setStep,
       }) => {
 
         switch (step) {
           case 0:
 
-            emailPicker(`#${elPrefix}-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
-              status: 'ready'
+            emailPicker(`#${ elPrefix }-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
+              status: 'ready',
             }, {
-              placeholder: 'Select an email to send...'
+              placeholder: 'Select an email to send...',
             }).on('change', ({ target }) => {
               setState({
-                email_id: parseInt(target.value)
+                email_id: parseInt(target.value),
               })
               setStep(0)
 
@@ -336,29 +338,29 @@
           case 1:
             $('.change-when').on('change', ({ target }) => {
               setState({
-                when: $(target).val()
+                when: $(target).val(),
               })
               setStep(1)
             })
 
             const updateButton = () => {
 
-              const isValid = state.when === 'now' || moment().isBefore(`${state.date} ${state.time}`)
+              const isValid = state.when === 'now' || moment().isBefore(`${ state.date } ${ state.time }`)
 
               $('.gh-next-step').prop('disabled', !isValid)
             }
 
-            $(`#${elPrefix}-date`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-date`).on('change', ({ target }) => {
               setState({ date: target.value })
               updateButton()
             })
 
-            $(`#${elPrefix}-time`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-time`).on('change', ({ target }) => {
               setState({ time: target.value })
               updateButton()
             })
 
-            $(`#${elPrefix}-local-time`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-local-time`).on('change', ({ target }) => {
               setState({ send_in_local_time: target.checked })
             })
 
@@ -369,14 +371,16 @@
 
               const query = {
                 ...state.query,
-                marketable: true
+                marketable: true,
               }
 
               ContactsStore.count(query).then(total => {
-                $(`#${elPrefix}-total-contacts`).html(`<p>${sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'), bold(formatNumber(total)))}</p>`)
+                $(`#${ elPrefix }-total-contacts`).
+                  html(`<p>${ sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'),
+                    bold(formatNumber(total))) }</p>`)
                 $('.gh-next-step').prop('disabled', total === 0)
                 setState({
-                  total_contacts: total
+                  total_contacts: total,
                 })
               })
             }
@@ -384,30 +388,38 @@
             $('.change-search-which').on('change', ({ target }) => {
               setState({
                 which: $(target).val(),
-                query: {}
+                query: {},
               })
               setStep(2)
             })
 
             if (state.which === 'filters') {
-              createFilters(`#${elPrefix}-search-method`, state.query.filters, (filters) => {
+              createFilters(`#${ elPrefix }-search-method`, state.query.filters, (filters) => {
                 setState({
                   query: {
                     filters,
-                  }
+                  },
                 })
                 updateTotal()
               }).mount()
-            } else {
-              searchesPicker(`#${elPrefix}-search-method-searches`, (items) => { SearchesStore.itemsFetched(items)}, {}, {
-                placeholder: 'Select a saved search...'
-              }).on('select2:select', ({ target }) => {
-                setState({
-                  query: {
-                    saved_search: $(target).val(),
-                  }
+            }
+            else {
+
+              SearchesStore.fetchItems().then(() => {
+
+                $(`#${ elPrefix }-search-method-searches`).select2({
+                  placeholder: __('Select a saved search...', 'groundhogg'),
+
+                  data: SearchesStore.getItems().map(s => ( { id: s.id, text: s.name } )),
+                }).on('select2:select', ({ target }) => {
+                  setState({
+                    query: {
+                      saved_search: $(target).val(),
+                    },
+                  })
+                  updateTotal()
                 })
-                updateTotal()
+
               })
             }
 
@@ -419,7 +431,7 @@
 
             showFrame()
 
-            $(`#${elPrefix}-confirm`).on('click', ({ currentTarget }) => {
+            $(`#${ elPrefix }-confirm`).on('click', ({ currentTarget }) => {
 
               $(currentTarget).prop('disabled', true)
 
@@ -429,7 +441,7 @@
                 when = 'now',
                 date = '',
                 time = '',
-                send_in_local_time = false
+                send_in_local_time = false,
               } = state
 
               post(routes.v4.broadcasts, {
@@ -439,15 +451,16 @@
                 date,
                 time,
                 send_now: when === 'now',
-                send_in_local_time
+                send_in_local_time,
               }).then(r => r.item).then(b => {
 
                 const scheduling = () => {
                   // language=HTML
                   return `
-					  <h2 id="broadcast-progress-header">${__('Scheduling', 'groundhogg')}</h2>
-            <p class="pill orange"><b>${ __( 'Do not close this window while the broadcast is scheduling!', 'groundhogg' ) }</b></p>
-					  <div id="broadcast-progress"></div>`
+                      <h2 id="broadcast-progress-header">${ __('Scheduling', 'groundhogg') }</h2>
+                      <p class="pill orange"><b>${ __('Do not close this window while the broadcast is scheduling!',
+                              'groundhogg') }</b></p>
+                      <div id="broadcast-progress"></div>`
                 }
 
                 $('#gh-send-broadcast-form').html(scheduling())
@@ -456,25 +469,25 @@
                 const { setProgress } = progressBar('#broadcast-progress')
 
                 const schedule = () => {
-                  post(`${routes.v4.broadcasts}/${b.ID}/schedule`)
-                    .then(({ finished, scheduled }) => {
-                      setProgress(scheduled / total_contacts)
-                      if (!finished) {
-                        schedule()
-                      } else {
-                        setTimeout(() => {
-                          stopDots()
-                          dialog({
-                            message: __('Broadcast scheduled!', 'groundhogg')
-                          })
+                  post(`${ routes.v4.broadcasts }/${ b.ID }/schedule`).then(({ finished, scheduled }) => {
+                    setProgress(scheduled / total_contacts)
+                    if (!finished) {
+                      schedule()
+                    }
+                    else {
+                      setTimeout(() => {
+                        stopDots()
+                        dialog({
+                          message: __('Broadcast scheduled!', 'groundhogg'),
+                        })
 
-                          onScheduled()
+                        onScheduled()
 
-                        }, 500)
-                      }
-                    }).catch(() => {
+                      }, 500)
+                    }
+                  }).catch(() => {
                     errorDialog({
-                      message: __('Something went wrong...', 'groundhogg')
+                      message: __('Something went wrong...', 'groundhogg'),
                     })
                   })
                 }
@@ -482,7 +495,7 @@
                 schedule()
               }).catch(() => {
                 errorDialog({
-                  message: __('Something went wrong...', 'groundhogg')
+                  message: __('Something went wrong...', 'groundhogg'),
                 })
                 setStep(3)
               })
@@ -493,7 +506,7 @@
         }
 
         $('.gh-next-step').on('click', nextStep)
-      }
+      },
     })
 
   }
@@ -507,26 +520,26 @@
 
       const { close } = modal({
         dialogClasses: 'overflow-visible',
-        content: `<div id="gh-broadcast-form" style="width: 400px"></div>`
+        content: `<div id="gh-broadcast-form" style="width: 400px"></div>`,
       })
 
       SendBroadcast('#gh-broadcast-form', {}, {
         onScheduled: () => {
           window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
-        }
+        },
       })
     })
 
     if (typeof GroundhoggNewBroadcast !== 'undefined') {
 
       SendBroadcast('#gh-broadcast-form-inline', {
-        email: GroundhoggNewBroadcast.email
+        email: GroundhoggNewBroadcast.email,
       }, {
         onScheduled: () => {
           window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
-        }
+        },
       })
     }
   })
 
-})(jQuery)
+} )(jQuery)

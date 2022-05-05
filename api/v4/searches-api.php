@@ -55,9 +55,17 @@ class Searches_Api extends Base_Api {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function read() {
+	public function read( \WP_REST_Request $request ) {
 
 		$searches = array_values( Saved_Searches::instance()->get_all() );
+
+		$term = $request->get_param( 'term' ) ?: $request->get_param( 'search' );
+
+		if ( $term ) {
+			$searches = array_filter( $searches, function ( $search ) use ( $term ) {
+				return preg_match( "/{$term}/i", $search['name'] );
+			} );
+		}
 
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $searches,
