@@ -121,7 +121,10 @@ class Emails_Api extends Base_Object_Api {
 		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
 
 		$content = $request->get_param( 'content' );
-		$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
+
+		if ( apply_filters( 'groundhogg/add_custom_footer_text_to_personal_emails', true ) ){
+			$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
+		}
 
 		$content = email_kses( $content );
 		$subject = sanitize_text_field( $request->get_param( 'subject' ) );
