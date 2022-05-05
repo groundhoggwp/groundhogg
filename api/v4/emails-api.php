@@ -120,7 +120,10 @@ class Emails_Api extends Base_Object_Api {
 		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
 		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
 
-		$content = email_kses( $request->get_param( 'content' ) );
+		$content = $request->get_param( 'content' );
+		$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
+
+		$content = email_kses( $content );
 		$subject = sanitize_text_field( $request->get_param( 'subject' ) );
 
 		$type = sanitize_text_field( $request->get_param( 'type' ) ?: 'wordpress' );
