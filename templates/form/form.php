@@ -30,6 +30,11 @@ status_header( 200 );
 header( 'Content-Type: text/html; charset=utf-8' );
 nocache_headers();
 
+add_action( 'wp_enqueue_scripts', function () {
+	wp_enqueue_style( 'groundhogg-form' );
+	wp_enqueue_style( 'groundhogg-loader' );
+} );
+
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -78,7 +83,9 @@ nocache_headers();
 	<?php echo do_shortcode( $shortcode ); ?>
 </div>
 <?php
-wp_footer();
+ wp_print_scripts([
+         'groundhogg-ajax-form'
+ ])
 ?>
 <div class="clear"></div>
 </body>
