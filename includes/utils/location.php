@@ -271,8 +271,8 @@ class Location {
 			'ZW' => 'Zimbabwe',
 		);
 
-		if ( $country_code && key_exists( $country_code, $countries ) ) {
-			return $countries[ $country_code ];
+		if ( $country_code ) {
+			return key_exists( $country_code, $countries ) ? $countries[ $country_code ] : false;
 		}
 
 		if ( $existing_data ) {

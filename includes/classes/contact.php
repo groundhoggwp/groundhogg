@@ -385,27 +385,29 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return array
 	 */
-	public function get_address( $exclude = [ 'region', 'country_name' ] ) {
+	public function get_address( $exclude = [] ) {
 
 		$address_keys = array_diff( [
 			'street_address_1',
 			'street_address_2',
-			'postal_zip',
 			'city',
 			'region',
-			'region_code',
 			'country',
-			'country_name',
+			'postal_zip',
 		], $exclude );
 
 		$address = [];
 
 		foreach ( $address_keys as $key ) {
-
 			$val = $this->get_meta( $key );
 			if ( ! empty( $val ) ) {
 				$address[ $key ] = $val;
 			}
+		}
+
+		if ( isset_not_empty( $address, 'country' ) ){
+			// Map to the proper name
+			$address['country'] = utils()->location->get_countries_list( $address['country'] );
 		}
 
 		return $address;
@@ -736,24 +738,23 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$info = Plugin::instance()->utils->location->ip_info( $ip_address );
+		$info = utils()->location->ip_info( $ip_address );
 
-		if ( ! $info || empty( $info ) ) {
+		if ( empty( $info ) ) {
 			return false;
 		}
 
 		$location_meta = [
 			'city'         => 'city',
 			'region'       => 'region',
-			'region_code'  => 'region_code',
-			'country_name' => 'country',
 			'country'      => 'country_code',
 			'time_zone'    => 'time_zone',
 		];
 
 		foreach ( $location_meta as $meta_key => $ip_info_key ) {
-			$has_meta = $this->get_meta( $meta_key );
-			if ( key_exists( $ip_info_key, $info ) && ( ! $has_meta || $override ) ) {
+			$meta_value = $this->get_meta( $meta_key );
+
+			if ( key_exists( $ip_info_key, $info ) && ( empty( $meta_value ) || $override ) ) {
 				$this->update_meta( $meta_key, $info[ $ip_info_key ] );
 			}
 		}
