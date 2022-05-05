@@ -48,13 +48,13 @@ class Rewrites {
 
 		// File download
 		add_managed_rewrite_rule(
-			'files/([^/]*)/?$',
+			'file-download/([^/]*)/?$',
 			'subpage=files&action=download&file_path=$matches[1]'
 		);
 
 		// File view with basename.
 		add_managed_rewrite_rule(
-			'files/(.*)',
+			'file-download/(.*)',
 			'subpage=files&action=download&file_path=$matches[1]'
 		);
 
