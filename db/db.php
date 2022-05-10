@@ -897,6 +897,7 @@ abstract class DB {
 			switch ( $key ) {
 				case 's':
 				case 'search':
+				case 'term':
 					$query_vars['search'] = $val;
 					break;
 				case 'include':
