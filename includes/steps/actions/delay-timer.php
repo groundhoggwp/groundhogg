@@ -187,25 +187,29 @@ class Delay_Timer extends Action {
 	public function enqueue( $step ) {
 
 		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
+		$run_when         = $this->get_setting( 'run_when', 'now' );
+		$date             = new \DateTime( 'now', wp_timezone() );
 
-		$date = new \DateTime( 'now', wp_timezone() );
-
-		if ( $send_in_timezone && Event_Queue::is_processing() ) {
-			$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
+		// Timezone change is only important when time of day is specified
+		if ( $send_in_timezone && $run_when === 'later' && Event_Queue::is_processing() ) {
+			try {
+				$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
+			} catch ( \Exception $e ) {
+				// Ignore.
+			}
 		}
 
-		$amount           = absint( $this->get_setting( 'delay_amount' ) );
-		$type             = $this->get_setting( 'delay_type', 'days' );
-		$run_time         = $this->get_setting( 'run_time', '09:00:00' );
-		$run_when         = $this->get_setting( 'run_when', 'now' );
+		$amount   = absint( $this->get_setting( 'delay_amount' ) );
+		$type     = $this->get_setting( 'delay_type', 'days' );
+		$run_time = $this->get_setting( 'run_time', '09:00:00' );
 
-		$date->modify( sprintf('+%d %s', $amount, $type) );
+		$date->modify( sprintf( '+%d %s', $amount, $type ) );
 
-		if ( $run_when !== 'now' ){
+		if ( $run_when !== 'now' ) {
 			$date->modify( $run_time );
 
-			if ( $date->getTimestamp() < time() ){
-				$date->modify('+1 day');
+			if ( $date->getTimestamp() < time() ) {
+				$date->modify( '+1 day' );
 			}
 		}
 

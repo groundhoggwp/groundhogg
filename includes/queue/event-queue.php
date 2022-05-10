@@ -383,7 +383,7 @@ class Event_Queue extends Supports_Errors {
 	/**
 	 * @param $contact Contact
 	 */
-	protected function set_current_contact( &$contact ) {
+	protected function set_current_contact( $contact ) {
 		$this->current_contact = $contact;
 	}
 

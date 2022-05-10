@@ -350,7 +350,17 @@ class Contact extends Base_Object_With_Meta {
 	public function get_time_zone( $as_string = true ) {
 		$tz = $this->get_meta( 'time_zone' ) ?: wp_timezone_string();
 
-		return $as_string ? $tz : new \DateTimeZone( $tz );
+		if ( $as_string ) {
+			return $tz;
+		}
+
+		try {
+			$tz = new \DateTimeZone( $tz );
+		} catch ( \Exception $exception ) {
+			$tz = wp_timezone();
+		}
+
+		return $tz;
 	}
 
 	/**
@@ -368,7 +378,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string en_US if undefined
 	 */
 	public function get_locale() {
-		return $this->get_meta( 'locale' ) ?: 'en_US';
+		return $this->get_meta( 'locale' ) ?: get_locale();
 	}
 
 	/**
@@ -405,7 +415,7 @@ class Contact extends Base_Object_With_Meta {
 			}
 		}
 
-		if ( isset_not_empty( $address, 'country' ) ){
+		if ( isset_not_empty( $address, 'country' ) ) {
 			// Map to the proper name
 			$address['country'] = utils()->location->get_countries_list( $address['country'] );
 		}
@@ -745,10 +755,10 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		$location_meta = [
-			'city'         => 'city',
-			'region'       => 'region',
-			'country'      => 'country_code',
-			'time_zone'    => 'time_zone',
+			'city'      => 'city',
+			'region'    => 'region',
+			'country'   => 'country_code',
+			'time_zone' => 'time_zone',
 		];
 
 		foreach ( $location_meta as $meta_key => $ip_info_key ) {
