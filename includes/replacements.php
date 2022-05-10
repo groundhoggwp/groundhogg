@@ -167,12 +167,6 @@ class Replacements implements \JsonSerializable {
 				'name'        => __( 'Birthday', 'groundhogg' ),
 				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
 			],
-//			[
-//				'code'        => 'notes',
-//				'callback'    => [ $this, 'replacement_notes' ],
-//				'name'        => __( '', 'groundhogg' ),
-//				'description' => _x( 'The contact\'s notes.', 'replacement', 'groundhogg' ),
-//			],
 			[
 				'code'        => 'tag_names',
 				'group'       => 'contact',
@@ -187,6 +181,14 @@ class Replacements implements \JsonSerializable {
 				'callback'     => [ $this, 'replacement_meta' ],
 				'name'         => __( 'Meta Data', 'groundhogg' ),
 				'description'  => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'profile_picture',
+				'group'        => 'contact',
+				'default_args' => '300',
+				'callback'     => [ $this, 'replacement_profile_picture' ],
+				'name'         => __( 'Profile Picture', 'groundhogg' ),
+				'description'  => _x( 'The contact\'s profile picture.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'user',
@@ -725,6 +727,30 @@ class Replacements implements \JsonSerializable {
 
 		return print_r( $this->get_current_contact()->get_meta( $arg ), true );
 	}
+
+
+	/**
+	 * Return the profile_picture
+	 *
+	 * @param $contact_id int
+	 * @param $arg        string the meta key
+	 *
+	 * @return mixed|string
+	 */
+	function replacement_profile_picture( $arg, $contact_id ) {
+
+		$size = absint( $arg );
+
+		if ( empty( $contact_id ) ){
+			$size = 300;
+		}
+
+		$size = min( $size, 1000 );
+		$size = max( $size, 20 );
+
+		return $this->get_current_contact()->get_profile_picture( $size );
+	}
+
 
 
 	/**

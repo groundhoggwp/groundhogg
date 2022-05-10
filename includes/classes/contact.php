@@ -84,12 +84,12 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return false|string
 	 */
-	public function get_profile_picture() {
+	public function get_profile_picture( $size = 300 ) {
 
 		if ( $this->profile_picture ) {
 			$profile_pic = $this->profile_picture;
 		} else {
-			$profile_pic           = get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
+			$profile_pic           = get_avatar_url( $this->get_email(), [ 'size' => $size ] );
 			$this->profile_picture = $profile_pic;
 		}
 

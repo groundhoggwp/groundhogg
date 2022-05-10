@@ -2719,7 +2719,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 					$maybe_tags = explode( ',', $value );
 				}
 
-				if ( ! is_array( $value ) ){
+				if ( ! is_array( $value ) ) {
 					$maybe_tags = [ $value ];
 				}
 
@@ -5790,18 +5790,6 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		'email',
 	];
 
-	// Search
-//	if ( isset_not_empty( $query, 'search' ) ) {
-//		// First Name | Last Name | Email
-//		foreach ( $common_query_filters as $i => $common_query_filter ) {
-//			$filters[ $i ][] = [
-//				'type'    => $common_query_filter,
-//				'compare' => 'contains',
-//				'value'   => $query['search']
-//			];
-//		}
-//	}
-
 	// First Name | Last Name | Email
 	foreach ( $common_query_filters as $common_query_filter ) {
 		if ( isset_not_empty( $query, $common_query_filter ) ) {
@@ -5905,7 +5893,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 	if ( isset_not_empty( $query, 'report' ) ) {
 
 		$events_query = wp_parse_args( $query['report'], [
-			'event_type' => Event::FUNNEL
+			'event_type' => Event::FUNNEL,
+			'status'     => 'complete',
 		] );
 
 		$map = [
@@ -5938,11 +5927,17 @@ function get_filters_from_old_query_vars( $query = [] ) {
 				break;
 
 			case Event::BROADCAST:
-				$filters[0][] = [
-					'type'         => 'broadcast_received',
-					'status'       => $events_query['status'],
-					'broadcast_id' => absint( get_array_var( $events_query, 'step_id' ) ),
-				];
+
+				$broadcast_id = absint( get_array_var( $events_query, 'step_id' ) );
+				$broadcast = new Broadcast( $broadcast_id );
+
+				if ( $broadcast->exists() ){
+					$filters[0][] = [
+						'type'         => 'broadcast_received',
+						'status'       => $broadcast->is_sent() ? 'waiting' : 'complete',
+						'broadcast_id' => $broadcast_id,
+					];
+				}
 
 				break;
 			case Event::EMAIL_NOTIFICATION:
