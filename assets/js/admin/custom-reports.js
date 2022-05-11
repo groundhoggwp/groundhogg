@@ -205,8 +205,8 @@
 						id: 'value'
 					}, {
 						contacts: __('Total number of contacts', 'groundhogg'),
-						sum: __('Sum of a custom field', 'groundhogg'),
-						average: __('Average of a custom field', 'groundhogg'),
+						// sum: __('Sum of a custom field', 'groundhogg'),
+						// average: __('Average of a custom field', 'groundhogg'),
 					}, value)}
 				</div>
 			</div>
