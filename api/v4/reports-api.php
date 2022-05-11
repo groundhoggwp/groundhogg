@@ -66,6 +66,7 @@ class Reports_Api extends Base_Api {
 
 				$where = [
 					[ 'meta_key', '=', $report['field'] ],
+					[ 'meta_value', '!=', '' ],
 				];
 
 				if ( ! empty( $report['filters'] ) ) {
@@ -82,7 +83,18 @@ class Reports_Api extends Base_Api {
 				return $records;
 
 			case 'number':
-				return $query->count();
+
+				switch ( $report['value'] ) {
+					case 'sum':
+					case 'average':
+
+						// todo
+
+					default:
+					case 'contacts':
+						return $query->count();
+
+				}
 		}
 
 		return false;

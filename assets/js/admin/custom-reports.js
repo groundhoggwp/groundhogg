@@ -289,25 +289,6 @@
     onMount()
   }
 
-  $('#custom-reports').sortable({
-    handle: 'h2',
-    tolerance: 'pointer',
-    placeholder: 'report-placeholder',
-    start: (e, ui) => {
-      ui.placeholder.addClass(reports.find(r => r.id === ui.item.data('id')).type)
-    },
-    update: () => {
-
-      $('.report').each((i, el) => {
-        let $report = $(el)
-        reports.find(r => r.id == $report.data('id')).order = $report.index()
-      })
-
-      commitReports()
-
-    }
-  })
-
   const renderReportEdit = (report) => {
 
     // language=HTML
@@ -349,24 +330,41 @@
 
   let commitTimeout
 
+  $('#custom-reports').sortable({
+    handle: 'h2',
+    tolerance: 'pointer',
+    placeholder: 'report-placeholder',
+    start: (e, ui) => {
+      ui.placeholder.addClass(reports.find(r => r.id === ui.item.data('id')).type)
+    },
+    update: () => {
+
+      $('.report').each((i, el) => {
+        let $report = $(el)
+        reports.find(r => r.id == $report.data('id')).order = $report.index()
+      })
+
+      if (commitTimeout) {
+        clearTimeout(commitTimeout)
+      }
+
+      commitTimeout = setTimeout(() => {
+        commitReports()
+      })
+
+    }
+  })
+
   /**
    * Save the reports based on the current state
    *
    * @return {Promise<*>}
    */
   const commitReports = () => {
-
-    if (commitTimeout) {
-      clearTimeout(commitTimeout)
-    }
-
-    commitTimeout = setTimeout(() => {
-      return OptionsStore.patch({
-        // filter out data
-        gh_custom_reports: reports.map(({ data, ...report }) => report)
-      })
-    }, 1000)
-
+    return OptionsStore.patch({
+      // filter out data
+      gh_custom_reports: reports.map(({ data, ...report }) => report)
+    })
   }
 
   const editReport = (report) => {

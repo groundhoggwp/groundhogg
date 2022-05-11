@@ -106,16 +106,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 				break;
 
 			case 'custom':
+				enqueue_filter_assets();
 				wp_enqueue_style( 'groundhogg-admin-reporting' );
 				wp_enqueue_script( 'groundhogg-admin-custom-reports' );
-				enqueue_filter_assets();
-
-				$request = new \WP_REST_Request('GET', '/gh/v4/custom-reports' );
-				$response = rest_do_request( $request );
-				$server = rest_get_server();
-				$data = $server->response_to_data( $response, false );
-//				var_dump( $data );
-
 
 				break;
 		}
