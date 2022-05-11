@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.2.11
+Stable tag: 2.6.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.3 (2022-05-10) =
+* ADDED New custom reports feature! Build a custom dashboard that gives you the stats you need.
+* FIXED Mapping to tags not working for Ninja Forms.
 
 = 2.6.2.11 (2022-05-10) =
 * FIXED Email duplication not carrying over meta data
