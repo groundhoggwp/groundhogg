@@ -57,6 +57,7 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 
 	switch ( $option ) {
 		case 'gh_contact_custom_properties':
+		case 'gh_custom_reports':
 			// todo implement proper sanitization here
 			return function ( $props ) {
 				return $props;

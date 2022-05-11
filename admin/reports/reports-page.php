@@ -6,6 +6,7 @@ use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
+use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
@@ -73,31 +74,51 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
-		wp_enqueue_style( 'groundhogg-admin-reporting' );
-		wp_enqueue_style( 'groundhogg-admin-loader' );
-		wp_enqueue_style( 'baremetrics-calendar' );
-		wp_enqueue_script( 'groundhogg-admin-reporting' );
 
-		$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
+		switch ( $this->get_current_tab() ) {
+			default:
+				wp_enqueue_style( 'groundhogg-admin-reporting' );
+				wp_enqueue_style( 'groundhogg-admin-loader' );
+				wp_enqueue_style( 'baremetrics-calendar' );
+				wp_enqueue_script( 'groundhogg-admin-reporting' );
 
-		if ( ! $dates ) {
-			$dates = [
-				'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
-				'end_date'   => date( 'Y-m-d', time() ),
-			];
-		} else {
-			$dates = explode( '|', $dates );
+				$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
 
-			$dates = [
-				'start_date' => $dates[0],
-				'end_date'   => $dates[1],
-			];
+				if ( ! $dates ) {
+					$dates = [
+						'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
+						'end_date'   => date( 'Y-m-d', time() ),
+					];
+				} else {
+					$dates = explode( '|', $dates );
+
+					$dates = [
+						'start_date' => $dates[0],
+						'end_date'   => $dates[1],
+					];
+				}
+
+				wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
+					'reports' => $this->get_reports_per_tab(),
+					'dates'   => $dates
+				] );
+
+				break;
+
+			case 'custom':
+				wp_enqueue_style( 'groundhogg-admin-reporting' );
+				wp_enqueue_script( 'groundhogg-admin-custom-reports' );
+				enqueue_filter_assets();
+
+				$request = new \WP_REST_Request('GET', '/gh/v4/custom-reports' );
+				$response = rest_do_request( $request );
+				$server = rest_get_server();
+				$data = $server->response_to_data( $response, false );
+//				var_dump( $data );
+
+
+				break;
 		}
-
-		wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
-			'reports' => $this->get_reports_per_tab(),
-			'dates'   => $dates
-		] );
 	}
 
 	protected function get_reports_per_tab() {
@@ -261,6 +282,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'name' => __( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
 			],
+			[
+				'name' => __( 'Custom', 'groundhogg' ),
+				'slug' => 'custom'
+			],
 		];
 
 		// Add the custom registered tabs...
@@ -358,6 +383,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	public function contacts_view() {
 		include __DIR__ . '/views/contacts.php';
+	}
+
+	/**
+	 * Contacts
+	 */
+	public function custom_view() {
+		include __DIR__ . '/views/custom.php';
 	}
 
 

@@ -2716,14 +2716,14 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'tags':
 
 				if ( is_string( $value ) ) {
-					$maybe_tags = explode( ',', $value );
+					$value = explode( ',', $value );
 				}
 
 				if ( ! is_array( $value ) ) {
-					$maybe_tags = [ $value ];
+					$value = [ $value ];
 				}
 
-				$tags = array_merge( $tags, $maybe_tags );
+				$tags = array_merge( $tags, $value );
 				break;
 			case 'meta':
 				$meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );

@@ -1041,7 +1041,10 @@ abstract class DB {
 
 			foreach ( $this->get_columns() as $column => $type ) {
 				if ( $type === '%s' ) {
-					$search[] = [ 'col' => $column, 'val' => '%' . esc_sql( $query_vars['search'] ) . '%', 'compare' => 'LIKE' ];
+					$search[] = [ 'col'     => $column,
+					              'val'     => '%' . esc_sql( $query_vars['search'] ) . '%',
+					              'compare' => 'LIKE'
+					];
 				}
 			}
 
@@ -1069,8 +1072,8 @@ abstract class DB {
 
 		$limit   = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
 		$offset  = $query_vars['offset'] ? sprintf( 'OFFSET %d', absint( $query_vars['offset'] ) ) : '';
-		$orderby = $query_vars['orderby'] && in_array( $query_vars['orderby'], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
-		$groupby = $query_vars['groupby'] && in_array( $query_vars['groupby'], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
+		$orderby = $query_vars['orderby'] && ( in_array( $query_vars['orderby'], $this->get_allowed_columns() ) || strpos( $query_vars['select'], $query_vars['orderby'] ) !== false ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
+		$groupby = $query_vars['groupby'] && ( in_array( $query_vars['groupby'], $this->get_allowed_columns() ) || strpos( $query_vars['select'], $query_vars['groupby'] ) !== false ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
 
 		$order = '';
 
@@ -1194,7 +1197,7 @@ abstract class DB {
 							if ( is_numeric( $value ) ) {
 								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
 							} else {
-								$value = preg_quote( $value );
+								$value    = preg_quote( $value );
 								$clause[] = "{$condition[ 'col' ]} {$condition[ 'compare' ]} '$value'";
 							}
 
