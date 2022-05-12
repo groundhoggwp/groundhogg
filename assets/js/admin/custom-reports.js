@@ -82,19 +82,77 @@
       },
       onMount: ({ id, field, data }) => {
 
+        let cuttoff = 11
+
         let ctx = $(`.pie-chart[data-id=${id}]`)[0].getContext('2d')
+
+        let _data = data
+
+        if (_data.length > cuttoff) {
+          _data = data.slice(0, cuttoff)
+
+          let _rest = data.slice(cuttoff).reduce((carr, i) => {
+            return carr + parseInt(i.count)
+          }, 0)
+
+          _data.push({ count: _rest, value: __('Other') })
+        }
 
         let chart = new Chart(ctx, {
           type: 'doughnut',
           data: {
             datasets: [{
-              data: data.map(({ count }) => count),
-              backgroundColor: data.map((d, i) => adjust('#0074ff', -(i * 50)))
+              data: _data.map(({ count }) => count),
+              backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30)))
             }],
-            labels: data.map(({ value }) => value),
+            labels: _data.map(({ value }) => value),
           },
           options: {
             onClick: (e, arr) => {
+
+              if (arr.length && arr[0]._index === cuttoff && arr[0]._view.label === __('Other')) {
+
+                let _data = data.slice( cuttoff )
+
+                modal({
+                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${id}"></canvas>`,
+                  onOpen: () => {
+
+                    let ctx = $(`.pie-chart-large[data-id=${id}]`)[0].getContext('2d')
+
+                    let chart = new Chart(ctx, {
+                      type: 'doughnut',
+                      data: {
+                        datasets: [{
+                          data: _data.map(({ count }) => count),
+                          backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30)))
+                        }],
+                        labels: _data.map(({ value }) => value),
+                      },
+                      options: {
+
+                        maintainAspectRatio : false,
+                        aspectRatio: 1,
+                        onClick: (e, arr) => {
+
+                          if (arr.length && arr[0]._view) {
+                            window.open(adminPageURL('gh_contacts', {
+                              meta_key: field,
+                              meta_value: arr[0]._view.label
+                            }), '_blank')
+                          }
+
+                        },
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    })
+                  }
+                })
+
+                return
+              }
 
               if (arr.length && arr[0]._view) {
                 window.open(adminPageURL('gh_contacts', {
@@ -136,7 +194,42 @@
         })
       },
 
-      render: ({ id, data }) => {
+      render: ({ id, data, num = 10 }) => {
+
+        // language=HTML
+        return `
+			<table class="groundhogg-report-table">
+				<tbody>
+				</tbody>
+			</table>
+			<div class="inside">
+				<div class="display-flex flex-end gap-10 align-center">
+					<label>${__('Number of records')}</label>
+					<div class="gh-input-group">
+					</div>
+				</div>
+			</div>`
+      },
+      onMount: ({ id, data, field }) => {
+
+        let num = 10
+
+        const setData = () => {
+          $(`#${id} tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
+          $(`#${id} .gh-input-group`).html([10, 25, 50].map(_num => `<button class="gh-button ${num === _num ? 'primary' : 'secondary'} num-records" data-num="${_num}">${_num}</button>`))
+
+          $(`#${id} .num-records`).on('click', e => {
+            num = parseInt(e.target.dataset.num)
+            setData()
+          })
+
+          $(`.number-total[data-id=${id}]`).on('click', e => {
+            window.open(adminPageURL('gh_contacts', {
+              meta_key: field,
+              meta_value: e.target.dataset.value
+            }), '_blank')
+          })
+        }
 
         const dataRow = ({ value, count }) => {
           // language=HTML
@@ -147,22 +240,7 @@
 			  </tr>`
         }
 
-        // language=HTML
-        return `
-			<table class="groundhogg-report-table">
-				<tbody>
-				${data.map(row => dataRow(row)).join('')}
-				</tbody>
-			</table>`
-      },
-      onMount: ({ id, field }) => {
-
-        $(`.number-total[data-id=${id}]`).on('click', e => {
-          window.open(adminPageURL('gh_contacts', {
-            meta_key: field,
-            meta_value: e.target.dataset.value
-          }), '_blank')
-        })
+        setData()
 
       }
     },
@@ -254,7 +332,7 @@
 
     // language=HTML
     return `
-		<div class="gh-panel report ${report.type}" data-id="${report.id}">
+		<div id="${report.id}" class="gh-panel report ${report.type}" data-id="${report.id}">
 			<div class="gh-panel-header">
 				<h2>${report.name}</h2>
 				<button class="report-more gh-button secondary text icon" data-id="${report.id}">${icons.verticalDots}
@@ -440,6 +518,7 @@
   }
 
   const onMount = () => {
+
     reports.forEach(report => reportTypes[report.type].onMount(report))
 
     $('.report-more').on('click', e => {
