@@ -52,6 +52,10 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		];
 	}
 
+	public function get_data_3_0() {
+		return $this->get_datasets();
+	}
+
 
 	/**
 	 * Used to find date field form the list of array.

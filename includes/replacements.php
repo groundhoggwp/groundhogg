@@ -167,12 +167,6 @@ class Replacements implements \JsonSerializable {
 				'name'        => __( 'Birthday', 'groundhogg' ),
 				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
 			],
-//			[
-//				'code'        => 'notes',
-//				'callback'    => [ $this, 'replacement_notes' ],
-//				'name'        => __( '', 'groundhogg' ),
-//				'description' => _x( 'The contact\'s notes.', 'replacement', 'groundhogg' ),
-//			],
 			[
 				'code'        => 'tag_names',
 				'group'       => 'contact',
@@ -187,6 +181,14 @@ class Replacements implements \JsonSerializable {
 				'callback'     => [ $this, 'replacement_meta' ],
 				'name'         => __( 'Meta Data', 'groundhogg' ),
 				'description'  => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'profile_picture',
+				'group'        => 'contact',
+				'default_args' => '300',
+				'callback'     => [ $this, 'replacement_profile_picture' ],
+				'name'         => __( 'Profile Picture', 'groundhogg' ),
+				'description'  => _x( 'The contact\'s profile picture.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'user',
@@ -300,7 +302,15 @@ class Replacements implements \JsonSerializable {
 				'default_args' => 'Y-m-d|now',
 				'callback'     => [ $this, 'replacement_date' ],
 				'name'         => __( 'Date', 'groundhogg' ),
-				'description'  => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+				'description'  => _x( 'Insert a dynamic date based on the site\'s timezone. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'local_date',
+				'group'        => 'site',
+				'default_args' => 'Y-m-d|now',
+				'callback'     => [ $this, 'replacement_local_date' ],
+				'name'         => __( 'Local Date', 'groundhogg' ),
+				'description'  => _x( 'Same as {date} but will display in local time of the contact instead of the site.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'files',
@@ -720,6 +730,30 @@ class Replacements implements \JsonSerializable {
 
 
 	/**
+	 * Return the profile_picture
+	 *
+	 * @param $contact_id int
+	 * @param $arg        string the meta key
+	 *
+	 * @return mixed|string
+	 */
+	function replacement_profile_picture( $arg, $contact_id ) {
+
+		$size = absint( $arg );
+
+		if ( empty( $contact_id ) ){
+			$size = 300;
+		}
+
+		$size = min( $size, 1000 );
+		$size = max( $size, 20 );
+
+		return $this->get_current_contact()->get_profile_picture( $size );
+	}
+
+
+
+	/**
 	 * Returns comma separated tags
 	 *
 	 * @param $contact_id
@@ -1133,6 +1167,14 @@ class Replacements implements \JsonSerializable {
 		return home_url();
 	}
 
+
+	/**
+	 * Flag to modify the date replacement to output in the local time of the contact
+	 *
+	 * @var bool
+	 */
+	protected $date_display_in_contacts_local_time = false;
+
 	/**
 	 * Return a formatted date in local time.
 	 *
@@ -1152,11 +1194,43 @@ class Replacements implements \JsonSerializable {
 			$when   = $parts[1];
 		}
 
-		/* convert to local time */
-		$time = strtotime( $when );
+		try {
+			$dateTime = new \DateTime( $when, wp_timezone() );
+		} catch ( \Exception $e ){
 
-		return date_i18n( $format, $time );
+			// Swap the variables
+			$temp = $when;
+			$when = $format;
+			$format = $temp;
+
+			try {
+				$dateTime = new \DateTime( $when, wp_timezone() );
+			} catch ( \Exception $e ){
+				return '';
+			}
+		}
+
+		if ( $this->date_display_in_contacts_local_time ){
+			$dateTime->setTimezone( $this->get_current_contact()->get_time_zone( false ) );
+		}
+
+		return $dateTime->format( $format );
 	}
+
+	/**
+	 * Return a formatted date in contact's local time.
+	 *
+	 * @param $time_string
+	 *
+	 * @return string
+	 */
+	function replacement_local_date( $time_string ) {
+		$this->date_display_in_contacts_local_time = true;
+		$date = $this->replacement_date( $time_string );
+		$this->date_display_in_contacts_local_time = false;
+		return $date;
+	}
+
 
 	/**
 	 * Return the business name

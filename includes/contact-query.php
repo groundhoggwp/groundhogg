@@ -192,8 +192,6 @@ class Contact_Query {
 	 *
 	 * @access public
 	 *
-	 * @since  2.8
-	 *
 	 * @param string|array $query          {
 	 *                                     Optional. Array or query string of contact query parameters. Default empty.
 	 *
@@ -237,13 +235,12 @@ class Contact_Query {
 	 * @type bool          $no_found_rows  Whether to disable the `SQL_CALC_FOUND_ROWS` query.
 	 *                                        Default true.
 	 * }
+	 * @since  2.8
+	 *
 	 */
 	public function __construct( $query = '', $gh_db_contacts = null ) {
-		if ( $gh_db_contacts ) {
-			$this->gh_db_contacts = $gh_db_contacts;
-		} else {
-			$this->gh_db_contacts = Plugin::$instance->dbs->get_db( 'contacts' );
-		}
+
+		$this->gh_db_contacts = get_db( 'contacts' );
 
 		$this->table_name  = $this->gh_db_contacts->get_table_name();
 		$this->meta_type   = $this->gh_db_contacts->get_object_type();
@@ -288,6 +285,8 @@ class Contact_Query {
 			'meta_compare'           => '=',
 			'meta_query'             => '',
 			'date_query'             => null,
+			'before'                 => false,
+			'after'                  => false,
 			'count'                  => false,
 			'no_found_rows'          => true,
 			'filters'                => [],
@@ -302,7 +301,7 @@ class Contact_Query {
 		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
 		if ( ! empty( $query ) ) {
-			$this->query( $query );
+			$this->query_vars = $query;
 		}
 	}
 
@@ -315,17 +314,21 @@ class Contact_Query {
 	 *
 	 * @access public
 	 *
+	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
+	 *
+	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
 	 * @see    WPGH_Contact_Query::__construct()
 	 *
-	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
-	 *
-	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 */
-	public function query( $query, $as_contact_object = false ) {
-		$this->query_vars = wp_parse_args( $query );
-		$items            = $this->get_items();
+	public function query( $query = [], $as_contact_object = false ) {
+
+		if ( ! empty( $query ) ) {
+			$this->query_vars = wp_parse_args( $query );
+		}
+
+		$items = $this->get_items();
 
 		if ( $as_contact_object ) {
 			$items = array_map( function ( $contact ) {
@@ -337,14 +340,18 @@ class Contact_Query {
 	}
 
 	/**
-	 * Retreive the SQL statement instead of the actual items
+	 * Retrieve the SQL statement instead of the actual items
 	 *
 	 * @param $query
 	 *
 	 * @return string
 	 */
-	public function get_sql( $query ) {
-		$this->query_vars = wp_parse_args( $query );
+	public function get_sql( $query = [] ) {
+
+		if ( ! empty( $query ) ) {
+			$this->query_vars = wp_parse_args( $query );
+		}
+
 		$this->parse_query();
 		$this->generate_request();
 
@@ -358,13 +365,23 @@ class Contact_Query {
 	 *
 	 * @return array|int
 	 */
-	public function count( $query ) {
+	public function count( $query = [] ) {
 
-		$query['count']  = true;
-		$query['offset'] = 0;
-		$query['number'] = - 1;
+		if ( ! empty( $query ) ) {
+			$this->query_vars = wp_parse_args( $query );
+		}
 
-		return $this->query( $query );
+		$orig_query = $this->query_vars;
+
+		$this->query_vars['count']  = true;
+		$this->query_vars['offset'] = 0;
+		$this->query_vars['number'] = - 1;
+
+		$count = $this->query();
+
+		$this->query_vars = $orig_query;
+
+		return $count;
 	}
 
 	/**
@@ -516,9 +533,9 @@ class Contact_Query {
 		/**
 		 * Fires after the contact query vars have been parsed.
 		 *
-		 * @since 2.8
-		 *
 		 * @param Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
+		 *
+		 * @since 2.8
 		 *
 		 */
 		do_action_ref_array( 'gh_parse_contact_query', [ &$this ] );
@@ -532,9 +549,9 @@ class Contact_Query {
 	 * Tries to use a cached value and otherwise uses `WPGH_Contact_Query::query_items()`.
 	 *
 	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 */
 	protected function get_items() {
 		$this->parse_query();
@@ -542,9 +559,9 @@ class Contact_Query {
 		/**
 		 * Fires before contacts are retrieved.
 		 *
-		 * @deprecated
-		 *
 		 * @param Contact_Query &$this Current instance of Contact_Query, passed by reference.
+		 *
+		 * @deprecated
 		 *
 		 */
 		do_action_ref_array( 'gh_pre_get_contacts', [ &$this ] );
@@ -652,9 +669,9 @@ class Contact_Query {
 	 * Runs a database query to retrieve contacts.
 	 *
 	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @global \wpdb $wpdb WordPress database abstraction object.
 	 *
 	 */
@@ -682,11 +699,12 @@ class Contact_Query {
 			/**
 			 * Filters the query used to retrieve the count of found contacts.
 			 *
-			 * @since 2.8
-			 *
 			 * @param string        $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
 			 *
 			 * @param Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
+			 *
+			 * @since 2.8
+			 *
 			 */
 			$found_items_query = apply_filters( 'gh_found_contacts_query', 'SELECT FOUND_ROWS()', $this );
 
@@ -698,9 +716,9 @@ class Contact_Query {
 	 * Constructs the fields segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL fields segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL fields segment.
 	 */
 	protected function construct_request_fields() {
 		if ( $this->query_vars['count'] ) {
@@ -714,9 +732,9 @@ class Contact_Query {
 	 * Constructs the join segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL join segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL join segment.
 	 */
 	protected function construct_request_join() {
 		$join = '';
@@ -744,9 +762,9 @@ class Contact_Query {
 	 * Constructs the where segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return array SQL where segment.
 	 * @since  2.8
 	 *
-	 * @return array SQL where segment.
 	 */
 	protected function construct_request_where() {
 		global $wpdb;
@@ -991,6 +1009,26 @@ class Contact_Query {
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
 		}
 
+		if ( ! empty( $this->query_vars['before'] ) ) {
+			if ( is_numeric( $this->query_vars['before'] ) ) {
+				$this->query_vars['before'] = Ymd_His( $this->query_vars['before'] );
+			}
+			if ( is_a( $this->query_vars['before'], \DateTime::class ) ){
+				$this->query_vars['before'] = $this->query_vars['before']->format('Y-m-d H:i:s');
+			}
+			$where['before'] = "{$this->table_name}.date_created <= {$this->query_vars['before']}";
+		}
+
+		if ( ! empty( $this->query_vars['after'] ) ) {
+			if ( is_numeric( $this->query_vars['after'] ) ) {
+				$this->query_vars['after'] = Ymd_His( $this->query_vars['after'] );
+			}
+			if ( is_a( $this->query_vars['after'], \DateTime::class ) ){
+				$this->query_vars['after'] = $this->query_vars['after']->format('Y-m-d H:i:s');
+			}
+			$where['after'] = "{$this->table_name}.date_created >= {$this->query_vars['after']}";
+		}
+
 		/**
 		 * Filter the where clauses
 		 *
@@ -1004,9 +1042,9 @@ class Contact_Query {
 	 * Constructs the orderby segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL orderby segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL orderby segment.
 	 */
 	protected function construct_request_orderby() {
 		if ( in_array( $this->query_vars['orderby'], array( 'none', array(), false ), true ) ) {
@@ -1047,9 +1085,9 @@ class Contact_Query {
 	 * Constructs the limits segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL limits segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL limits segment.
 	 */
 	protected function construct_request_limits() {
 		if ( $this->query_vars['number'] ) {
@@ -1067,9 +1105,9 @@ class Contact_Query {
 	 * Constructs the groupby segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL groupby segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL groupby segment.
 	 */
 	protected function construct_request_groupby() {
 		if ( ! empty( $this->meta_query_clauses['join'] )
@@ -1089,13 +1127,13 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param string $string  Search string.
 	 *
 	 * @param array  $columns Columns to search.
 	 *
 	 * @return string Search SQL.
+	 * @since  2.8
+	 *
 	 * @global \wpdb $wpdb    WordPress database abstraction object.
 	 *
 	 */
@@ -1118,6 +1156,16 @@ class Contact_Query {
 		}
 
 		return '(' . implode( ' OR ', $searches ) . ')';
+	}
+
+	/**
+	 * Set a query var
+	 *
+	 * @param string $var
+	 * @param        $value
+	 */
+	public function set_query_var( string $var, $value ) {
+		$this->query_vars[ $var ] = $value;
 	}
 
 	/**
@@ -1150,11 +1198,11 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param string $orderby Orderby string.
 	 *
 	 * @return string Parsed orderby string to use in the SQL request, or an empty string.
+	 * @since  2.8
+	 *
 	 */
 	protected function parse_orderby_string( $orderby ) {
 		if ( 'include' === $orderby ) {
@@ -1201,11 +1249,11 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param string $orderby Order string.
 	 *
 	 * @return string Parsed order string to use in the SQL request, or an empty string.
+	 * @since  2.8
+	 *
 	 */
 	protected function parse_order_string( $order, $orderby ) {
 		if ( 'include' === $orderby ) {
@@ -1227,9 +1275,9 @@ class Contact_Query {
 	 * Returns the basic allowed keys to use for the orderby clause.
 	 *
 	 * @access protected
+	 * @return array Allowed keys.
 	 * @since  2.8
 	 *
-	 * @return array Allowed keys.
 	 */
 	protected function get_allowed_orderby_keys() {
 		return apply_filters( 'groundhogg/contact_query/allowed_orderby_keys', array_keys( $this->gh_db_contacts->get_columns() ) );
@@ -1330,6 +1378,7 @@ class Contact_Query {
 		$key_clause = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
 		$opt_clause = implode( ' AND ', array_map( function ( $opt ) use ( $meta_table_name, $filter_vars ) {
 			$opt = esc_sql( $opt );
+
 			return "$meta_table_name.meta_value LIKE '%{$opt}%'";
 		}, $filter_vars['options'] ) );
 

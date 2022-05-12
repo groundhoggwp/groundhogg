@@ -587,13 +587,6 @@ class Contacts_Page extends Admin_Page {
 			'ip_address',
 			'time_zone',
 			'locale',
-
-			// Moved to companies addon
-//			'company_phone',
-//			'company_phone_extension',
-//			'company_name',
-//			'job_title',
-//			'company_address',
 		];
 
 		$basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
@@ -603,12 +596,6 @@ class Contacts_Page extends Admin_Page {
 				$contact->update_meta( $field, sanitize_text_field( get_request_var( $field, false, true ) ) );
 			} else {
 				$contact->delete_meta( $field );
-			}
-		}
-
-		if ( get_request_var( 'extrapolate_location' ) ) {
-			if ( $contact->extrapolate_location( true ) ) {
-				$this->add_notice( 'location_updated', _x( 'Location updated.', 'notice', 'groundhogg' ), 'info' );
 			}
 		}
 

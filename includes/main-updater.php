@@ -561,6 +561,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Flush rewrites
+	 *
+	 * @return void
+	 */
+	public function version_2_6_2_10() {
+		install_custom_rewrites();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -621,6 +630,7 @@ class Main_Updater extends Updater {
 			'2.6',
 			'2.6.2.2',
 			'2.6.2.4',
+			'2.6.2.10',
 		];
 	}
 
@@ -657,6 +667,7 @@ class Main_Updater extends Updater {
 			'2.6.2.2',
 			'2.6.2.4',
 			'2.6.2.5',
+			'2.6.2.10',
 		];
 	}
 
@@ -712,6 +723,7 @@ class Main_Updater extends Updater {
 			'2.6.2.2'       => __( 'Add hostname field to page-visits table.', 'groundhogg' ),
 			'2.6.2.4'       => __( 'Add view caps to Sales Rep & Manager.', 'groundhogg' ),
 			'2.6.2.5'       => __( 'Fix missing caps for emails endpoint.', 'groundhogg' ),
+			'2.6.2.10'      => __( 'Change files download pathname to /file-download/ from /files/.', 'groundhogg' ),
 		];
 	}
 }

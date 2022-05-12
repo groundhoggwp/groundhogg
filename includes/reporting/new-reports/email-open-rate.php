@@ -18,7 +18,7 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 	 *
 	 * @return mixed
 	 */
-	protected function query( $start, $end ) {
+	public function query( $start, $end ) {
 
 		$db = get_db( 'activity' );
 
@@ -27,10 +27,6 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 			'before'        => $end,
 			'after'         => $start
 		];
-
-		if ( $this->get_email_id() ) {
-			$query['email_id'] = $this->get_email_id();
-		}
 
 		return $db->count( $query );
 	}
