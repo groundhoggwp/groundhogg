@@ -168,8 +168,8 @@ class Reports_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
-		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start = $request->get_param( 'start' );
+		$end   = $request->get_param( 'end' );
 
 		$params  = $request->get_param( 'params' );
 		$reports = map_deep( $request->get_param( 'reports' ), 'sanitize_key' );
@@ -184,13 +184,13 @@ class Reports_Api extends Base_Api {
 
 		foreach ( $reports as $report_id ) {
 			$data                  = $reporting->get_data_3_0( $report_id );
-			$results[ $report_id ] = array_merge( [ 'id' => $report_id ], $data );
+			$results[ $report_id ] = $data;
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'start'   => $start,
-			'end'     => $end,
-			'reports' => $results
+			'start'       => $start,
+			'end'         => $end,
+			'report_data' => $results
 		] );
 	}
 

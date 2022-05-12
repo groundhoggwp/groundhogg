@@ -81,15 +81,11 @@ class Reports_Page extends Tabbed_Admin_Page {
 		if ( $this->get_current_tab() === 'v3' ) {
 			wp_enqueue_script( 'groundhogg-admin-reporting-v3' );
 			wp_enqueue_style( 'groundhogg-admin-reporting-v3' );
-			wp_localize_script('groundhogg-admin-reporting-v3', 'GroundhoggReporting', get_request_query() );
+			wp_enqueue_style( 'groundhogg-admin-reporting' );
+			wp_localize_script( 'groundhogg-admin-reporting-v3', 'GroundhoggReporting', get_request_query() );
 
 			return;
 		}
-
-		wp_enqueue_style( 'groundhogg-admin-reporting' );
-		wp_enqueue_style( 'groundhogg-admin-loader' );
-		wp_enqueue_style( 'baremetrics-calendar' );
-		wp_enqueue_script( 'groundhogg-admin-reporting' );
 
 		switch ( $this->get_current_tab() ) {
 			default:
@@ -98,21 +94,21 @@ class Reports_Page extends Tabbed_Admin_Page {
 				wp_enqueue_style( 'baremetrics-calendar' );
 				wp_enqueue_script( 'groundhogg-admin-reporting' );
 
-		$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
+				$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
 
-		if ( ! $dates ) {
-			$dates = [
-				'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
-				'end_date'   => date( 'Y-m-d', time() ),
-			];
-		} else {
-			$dates = explode( '|', $dates );
+				if ( ! $dates ) {
+					$dates = [
+						'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
+						'end_date'   => date( 'Y-m-d', time() ),
+					];
+				} else {
+					$dates = explode( '|', $dates );
 
-			$dates = [
-				'start_date' => $dates[0],
-				'end_date'   => $dates[1],
-			];
-		}
+					$dates = [
+						'start_date' => $dates[0],
+						'end_date'   => $dates[1],
+					];
+				}
 
 				wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
 					'reports' => $this->get_reports_per_tab(),
@@ -317,6 +313,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 	}
 
 	public function page() {
+
+		if ( $this->get_current_tab() === 'v3' ) {
+			include __DIR__ . '/views/v3.php';
+
+			return;
+		}
+
 
 		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );

@@ -85,22 +85,9 @@ abstract class Base_Quick_Stat extends Base_Report {
 		$current_data = $this->query( $this->start, $this->end );
 		$compare_data = $this->query( $this->compare_start, $this->compare_end );
 
-		$compare_diff = $current_data - $compare_data;
-		$percentage   = percentage( $current_data, $compare_diff, 0 );
-		$arrow        = $this->get_arrow_properties( $current_data, $compare_data );
-
 		return [
-			'url'            => esc_url( $this->get_url( $this->start, $this->end ) ),
-			'total'          => _nf( $current_data ),
-			'arrowDirection' => $arrow['direction'],
-			'arrowColor'     => $arrow['color'],
-			'prev'           => $percentage,
-			'prevRange'      => $this->num_days,
-			'isPercentage'   => false,
-			'data'           => [
-				'current' => _nf( $current_data ),
-				'compare' => _nf( $compare_data )
-			]
+			'curr' => $current_data,
+			'prev' => $compare_data
 		];
 	}
 

@@ -44,7 +44,7 @@ abstract class Base_Report {
 	 * @param $start int unix timestamps
 	 * @param $end   int unix timestamps
 	 */
-	public function __construct( $start, $end ) {
+	public function __construct( $start = 0, $end = 0 ) {
 
 		if ( is_string( $start ) ) {
 			$start = strtotime( $start );

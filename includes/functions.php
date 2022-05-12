@@ -5938,9 +5938,9 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			case Event::BROADCAST:
 
 				$broadcast_id = absint( get_array_var( $events_query, 'step_id' ) );
-				$broadcast = new Broadcast( $broadcast_id );
+				$broadcast    = new Broadcast( $broadcast_id );
 
-				if ( $broadcast->exists() ){
+				if ( $broadcast->exists() ) {
 					$filters[0][] = [
 						'type'         => 'broadcast_received',
 						'status'       => $broadcast->is_sent() ? 'waiting' : 'complete',
@@ -6475,4 +6475,48 @@ function minify_html( $content ) {
 	);
 
 	return preg_replace( $search, $replace, $content );
+}
+
+/**
+ * Setup the search_engines array from the yaml file in lib
+ *
+ * return array
+ */
+function yaml_load_search_engines() {
+
+	static $search_engines = [];
+
+	if ( ! empty( $search_engines ) ) {
+		return $search_engines;
+	}
+
+	if ( ! class_exists( 'Spyc' ) ) {
+		include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
+	}
+
+	$search_engines = \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/SearchEngines.yml' );
+
+	return $search_engines;
+}
+
+/**
+ * Setup the search_engines array from the yaml file in lib
+ *
+ * return array
+ */
+function yaml_load_socials() {
+
+	static $socials = [];
+
+	if ( ! empty( $socials ) ) {
+		return $socials;
+	}
+
+	if ( ! class_exists( 'Spyc' ) ) {
+		include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
+	}
+
+	$socials = \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/Socials.yml' );
+
+	return $socials;
 }

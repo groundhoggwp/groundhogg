@@ -686,6 +686,11 @@ label.block {
 
 
   .report {
+
+    &.line_chart{
+      grid-column: span 4;
+    }
+
     &.table,
     &.pie_chart {
       grid-column: span 2;

@@ -43,6 +43,7 @@ use Groundhogg\Reporting\New_Reports\Total_Funnel_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Total_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Spam_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Unsubscribed_Contacts;
+use MongoDB\Driver\Query;
 
 class Reports {
 
@@ -71,20 +72,19 @@ class Reports {
 	 * @param $start int unix timestamps
 	 * @param $end   int unix timestamps
 	 */
-	public function __construct( $start, $end, $params = [] ) {
-
-		if ( is_string( $start ) ) {
-			$start = strtotime( $start );
-		}
-
-		if ( is_string( $end ) ) {
-			$end = strtotime( $end );
-		}
+	public function __construct( $start = '', $end = '', $params = [] ) {
 
 		$this->params = $params;
 
-		$this->start = absint( $start );
-		$this->end   = absint( $end );
+		$this->start = new \DateTime( ! empty( $start ) ? $start : '30 days ago 00:00:00', wp_timezone() );
+		$this->end   = new \DateTime( ! empty( $end ) ? $end : 'now', wp_timezone() );
+		$this->end->modify( '23:59:59' );
+
+		$time_diff = $this->start->diff( $this->end );
+
+		$this->prev_end   = new \DateTime( $this->start->format( 'Y-m-d H:i:s' ), wp_timezone() );
+		$this->prev_start = clone $this->prev_end;
+		$this->prev_start->sub( $time_diff );
 
 		$this->setup_default_reports();
 
@@ -188,8 +188,8 @@ class Reports {
 				'callback' => [ $this, 'total_spam_contacts' ]
 			],
 			[
-				'id'       => 'total_bounces_contacts',
-				'callback' => [ $this, 'total_bounces_contacts' ]
+				'id'       => 'total_bounces',
+				'callback' => [ $this, 'total_bounces' ]
 			],
 			[
 				'id'       => 'total_complaints_contacts',
@@ -322,7 +322,7 @@ class Reports {
 
 		$report = call_user_func( $this->reports[ $report_id ]['callback'] );
 
-		if ( is_array( $report ) ) {
+		if ( ! is_object( $report ) || ! method_exists( $report, 'get_data_3_0' ) ) {
 			return $report;
 		}
 
@@ -332,66 +332,185 @@ class Reports {
 	/**
 	 * Return the total new contacts
 	 *
-	 * @return Total_New_Contacts
+	 * @return array
 	 */
 	public function total_new_contacts() {
-		return new Total_New_Contacts( $this->start, $this->end );
+
+		$query = new Contact_Query();
+
+		return [
+			'curr' => $query->count( [
+				'date_query' => [
+					'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->end->format( 'Y-m-d H:i:s' )
+				]
+			] ),
+			'prev' => $query->count( [
+				'date_query' => [
+					'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
+				]
+			] ),
+		];
 	}
 
 	/**
 	 * Total amount of new confirmed contacts
 	 *
-	 * @return Total_Confirmed_Contacts
+	 * @return array
 	 */
 	public function total_confirmed_contacts() {
-		return new Total_Confirmed_Contacts( $this->start, $this->end );
+		$query = new Contact_Query();
+
+		$query->set_date_key( 'date_optin_status_changed' );
+
+		return [
+			'curr' => $query->count( [
+				'optin_status' => Preferences::CONFIRMED,
+				'date_query'   => [
+					'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->end->format( 'Y-m-d H:i:s' )
+				]
+			] ),
+			'prev' => $query->count( [
+				'optin_status' => Preferences::CONFIRMED,
+				'date_query'   => [
+					'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
+				]
+			] ),
+		];
 	}
 
 	/**
 	 * Total Number of Active Contacts
 	 *
-	 * @return Total_Active_Contacts
+	 * @return array
 	 */
 	public function total_engaged_contacts() {
-		return new Total_Active_Contacts( $this->start, $this->end );
+
+		return [
+			'curr' => get_db( 'activity' )->count( [
+				'select'   => 'contact_id',
+				'distinct' => true,
+				'before'   => $this->end->getTimestamp(),
+				'after'    => $this->start->getTimestamp(),
+			] ),
+			'prev' => get_db( 'activity' )->count( [
+				'select'   => 'contact_id',
+				'distinct' => true,
+				'before'   => $this->prev_end->getTimestamp(),
+				'after'    => $this->prev_start->getTimestamp(),
+			] ),
+		];
+
 	}
 
 	/**
 	 * Total Number of Unsubscribes
 	 *
-	 * @return Total_Unsubscribed_Contacts
+	 * @return array
 	 */
 	public function total_unsubscribed_contacts() {
-		return new Total_Unsubscribed_Contacts( $this->start, $this->end );
+		$query = new Contact_Query();
+
+		$query->set_date_key( 'date_optin_status_changed' );
+
+		return [
+			'curr' => $query->count( [
+				'optin_status' => Preferences::UNSUBSCRIBED,
+				'date_query'   => [
+					'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->end->format( 'Y-m-d H:i:s' )
+				]
+			] ),
+			'prev' => $query->count( [
+				'optin_status' => Preferences::UNSUBSCRIBED,
+				'date_query'   => [
+					'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
+				]
+			] ),
+		];
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_bounces() {
+
+		$query = new Contact_Query();
+
+		$query->set_date_key( 'date_optin_status_changed' );
+
+		return [
+			'curr' => $query->count( [
+				'optin_status' => Preferences::HARD_BOUNCE,
+				'date_query'   => [
+					'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->end->format( 'Y-m-d H:i:s' )
+				]
+			] ),
+			'prev' => $query->count( [
+				'optin_status' => Preferences::HARD_BOUNCE,
+				'date_query'   => [
+					'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
+					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
+				]
+			] ),
+		];
+
 	}
 
 	/**
 	 * Return the total emails sent
 	 *
-	 * @return Total_Emails_Sent
+	 * @return array
 	 */
 	public function total_emails_sent() {
-		return new Total_Emails_Sent( $this->start, $this->end );
+
+		$report = new Total_Emails_Sent();
+
+		return [
+			'curr' => $report->query( $this->start->getTimestamp(), $this->end->getTimestamp() ),
+			'prev' => $report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() )
+		];
 	}
+
 
 	/**
 	 * The email open rate
 	 *
-	 * @return Email_Open_Rate
+	 * @return array
 	 */
 	public function email_open_rate() {
-		return new Email_Open_Rate( $this->start, $this->end );
-	}
 
+		$sent = $this->total_emails_sent();
+
+		$report = new Email_Open_Rate();
+
+		return [
+			'curr' => percentage( $sent['curr'], $report->query( $this->start->getTimestamp(), $this->end->getTimestamp() ) ),
+			'prev' => percentage( $sent['prev'], $report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() ) ),
+		];
+	}
 
 	/**
 	 * The email open rate
 	 *
-	 * @return Email_Click_Rate
+	 * @return array
 	 */
 	public function email_click_rate() {
-		return new Email_Click_Rate( $this->start, $this->end );
+
+		$report       = new Email_Click_Rate();
+		$other_report = new Email_Open_Rate();
+
+		return [
+			'curr' => percentage( $other_report->query( $this->start->getTimestamp(), $this->end->getTimestamp() ), $report->query( $this->start->getTimestamp(), $this->end->getTimestamp() ) ),
+			'prev' => percentage( $other_report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() ), $report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() ) ),
+		];
 	}
+
 
 	/**
 	 * @return Chart_New_Contacts
@@ -420,13 +539,13 @@ class Reports {
 		return $report->get_data();
 	}
 
-
 	/**
 	 * @return mixed
 	 */
 	public function chart_contacts_by_optin_status() {
 		return new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
 	}
+
 	/**
 	 * @return mixed
 	 */
@@ -472,10 +591,100 @@ class Reports {
 	 */
 	public function table_contacts_by_lead_source() {
 
-		$report = new Table_Contacts_By_Lead_Source( $this->start, $this->end );
+		$query = new Contact_Query( [
+			'select'     => 'ID',
+			'date_query' => [
+				'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+				'before' => $this->end->format( 'Y-m-d H:i:s' )
+			]
+		] );
 
-		return $report->get_data();
+		$sql = $query->get_sql();
 
+		$where = [
+			[ 'meta_key', '=', 'lead_source' ],
+			[ 'meta_value', '!=', '' ],
+			[ 'contact_id', 'IN', $sql ],
+		];
+
+		$records = get_db( 'contactmeta' )->query( [
+			'select'  => 'meta_value as value, COUNT(*) as count',
+			'where'   => $where,
+			'groupby' => 'value',
+			'orderby' => 'count'
+		] );
+
+		$parsed = [];
+
+		foreach ( $records as $record ) {
+
+			if ( filter_var( $record->value, FILTER_VALIDATE_URL ) ) {
+
+				$test_lead_source = wp_parse_url( $record->value, PHP_URL_HOST );
+				$test_lead_source = str_replace( 'www.', '', $test_lead_source );
+
+				foreach ( yaml_load_socials() as $network => $urls ) {
+					if ( in_array( $test_lead_source, $urls ) ) {
+						if ( isset( $parsed[ $network ] ) ) {
+							$parsed[ $network ] += $record->count;
+						} else {
+							$parsed[ $network ] = $record->count;
+						}
+						continue 2;
+					}
+				}
+
+				foreach ( yaml_load_search_engines() as $engine_name => $atts ) {
+					$urls = $atts[0]['urls'];
+					if ( $this->in_urls( $test_lead_source, $urls ) ) {
+						if ( isset( $parsed[ $engine_name ] ) ) {
+							$parsed[ $engine_name ] += $record->count;
+						} else {
+							$parsed[ $engine_name ] = $record->count;
+						}
+						continue 2;
+					}
+				}
+
+				if ( isset( $parsed[ $test_lead_source ] ) ) {
+					$parsed[ $test_lead_source ] += $record->count;
+				} else {
+					$parsed[ $test_lead_source ] = $record->count;
+				}
+
+				continue;
+			}
+
+			$parsed[ $record->value ] = $record->count;
+
+		}
+
+		return $records;
+
+	}
+
+	/**
+	 * Special search function for comparing lead sources to potential search engine matches.
+	 *
+	 * @param $search string the URL in question
+	 * @param $urls   array list of string potential matches...
+	 *
+	 * @return bool
+	 */
+	private function in_urls( $search, $urls ) {
+
+		foreach ( $urls as $url ) {
+
+			/* Given YAML dataset uses .{} as sequence for match all expression, convert into regex friendly */
+			$url     = str_replace( '.{}', '\.{1,3}', $url );
+			$url     = str_replace( '{}.', '.{1,}?\.?', $url );
+			$pattern = '#' . $url . '#';
+			if ( preg_match( $pattern, $search ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -539,6 +748,7 @@ class Reports {
 
 	}
 
+
 	/**
 	 * @return mixed
 	 */
@@ -557,18 +767,6 @@ class Reports {
 	public function total_complaints_contacts() {
 
 		$report = new Total_Complaints_Contacts( $this->start, $this->end );
-
-		return $report->get_data();
-
-	}
-
-
-	/**
-	 * @return mixed
-	 */
-	public function total_bounces_contacts() {
-
-		$report = new Total_Bounces_Contacts( $this->start, $this->end );
 
 		return $report->get_data();
 

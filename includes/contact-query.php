@@ -285,6 +285,8 @@ class Contact_Query {
 			'meta_compare'           => '=',
 			'meta_query'             => '',
 			'date_query'             => null,
+			'before'                 => false,
+			'after'                  => false,
 			'count'                  => false,
 			'no_found_rows'          => true,
 			'filters'                => [],
@@ -1005,6 +1007,26 @@ class Contact_Query {
 		if ( ! empty( $this->query_vars['date_optin_status_changed'] ) && is_array( $this->query_vars['date_optin_status_changed'] ) ) {
 			$date_optin_status_changed_query    = new \WP_Date_Query( $this->query_vars['date_optin_status_changed'], $this->table_name . '.date_optin_status_changed' );
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
+		}
+
+		if ( ! empty( $this->query_vars['before'] ) ) {
+			if ( is_numeric( $this->query_vars['before'] ) ) {
+				$this->query_vars['before'] = Ymd_His( $this->query_vars['before'] );
+			}
+			if ( is_a( $this->query_vars['before'], \DateTime::class ) ){
+				$this->query_vars['before'] = $this->query_vars['before']->format('Y-m-d H:i:s');
+			}
+			$where['before'] = "{$this->table_name}.date_created <= {$this->query_vars['before']}";
+		}
+
+		if ( ! empty( $this->query_vars['after'] ) ) {
+			if ( is_numeric( $this->query_vars['after'] ) ) {
+				$this->query_vars['after'] = Ymd_His( $this->query_vars['after'] );
+			}
+			if ( is_a( $this->query_vars['after'], \DateTime::class ) ){
+				$this->query_vars['after'] = $this->query_vars['after']->format('Y-m-d H:i:s');
+			}
+			$where['after'] = "{$this->table_name}.date_created >= {$this->query_vars['after']}";
 		}
 
 		/**

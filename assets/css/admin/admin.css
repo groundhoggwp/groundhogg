@@ -644,6 +644,9 @@ label.block {
   grid-column: span 2;
   grid-row: span 2;
 }
+.report-grid .report.line_chart {
+  grid-column: span 4;
+}
 .report-grid .report.table, .report-grid .report.pie_chart {
   grid-column: span 2;
   grid-row: span 2;
