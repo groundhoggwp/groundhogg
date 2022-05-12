@@ -261,15 +261,10 @@ class Emails_Page extends Admin_Page {
 					return new \WP_Error( 'error', 'Invalid email ID!' );
 				}
 
-				$args['content']    = $from_email->get_content();
-				$args['subject']    = $from_email->get_subject_line();
-				$args['title']      = sprintf( "%s - (copy)", $from_email->get_title() );
-				$args['pre_header'] = $from_email->get_pre_header();
-
-				$args['author']    = get_current_user_id();
-				$args['from_user'] = $from_email->get_from_user_id();
-
-				$email = new Email( $args );
+				$email = $from_email->duplicate( [
+					'title'  => sprintf( "%s - (copy)", $from_email->get_title() ),
+					'author' => get_current_user_id()
+				] );
 
 				if ( ! $email->exists() ) {
 					return new \WP_Error( 'error', 'Could not create email.' );
@@ -468,9 +463,9 @@ class Emails_Page extends Admin_Page {
 			$email = new Email( $email->ID );
 			?>
 			<div class="gh-panel">
-                <div class="gh-panel-header">
-                    <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
-                </div>
+				<div class="gh-panel-header">
+					<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+				</div>
 				<div class="inside">
 					<p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
 					<p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>

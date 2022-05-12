@@ -429,6 +429,16 @@ class Scripts {
 			'groundhogg-admin-element'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-custom-reports', GROUNDHOGG_ASSETS_URL . 'js/admin/custom-reports' . $dot_min . '.js', [
+			'jquery',
+			'jquery-ui-sortable',
+			'chart-js',
+			'moment',
+			'groundhogg-admin',
+			'groundhogg-admin-element',
+			'groundhogg-admin-data'
+		], GROUNDHOGG_VERSION, true );
+
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [

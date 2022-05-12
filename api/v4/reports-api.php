@@ -7,11 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use function Groundhogg\array_find;
+use function Groundhogg\get_db;
 
 class Reports_Api extends Base_Api {
 
@@ -24,13 +27,120 @@ class Reports_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>\w+)', [
+		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>[-\w]+)', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_single' ],
 				'permission_callback' => [ $this, 'read_permissions_callback' ],
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, '/custom-reports', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_custom_reports' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/custom-reports/(?P<id>[-\w]+)', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_single_custom_report' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
+			],
+		] );
+	}
+
+	function get_report_data( $report ) {
+
+		$query = new Contact_Query( [
+			'filters' => $report['filters']
+		] );
+
+		switch ( $report['type'] ) {
+			case 'pie_chart':
+			case 'table':
+				$query->set_query_var( 'select', 'ID' );
+				$sql = $query->get_sql();
+
+				$where = [
+					[ 'meta_key', '=', $report['field'] ],
+					[ 'meta_value', '!=', '' ],
+				];
+
+				if ( ! empty( $report['filters'] ) ) {
+					$where[] = [ 'contact_id', 'IN', $sql ];
+				}
+
+				$records = get_db( 'contactmeta' )->query( [
+					'select'  => 'meta_value as value, COUNT(*) as count',
+					'where'   => $where,
+					'groupby' => 'value',
+					'orderby' => 'count'
+				] );
+
+				return $records;
+
+			case 'number':
+
+				switch ( $report['value'] ) {
+					case 'sum':
+					case 'average':
+
+						// todo
+
+					default:
+					case 'contacts':
+						return $query->count();
+
+				}
+		}
+
+		return false;
+	}
+
+	/**
+	 *
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function read_custom_reports( WP_REST_Request $request ) {
+
+		$reports = get_option( 'gh_custom_reports', [] );
+
+		foreach ( $reports as &$report ) {
+			$report['data'] = $this->get_report_data( $report );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items' => $reports
+		] );
+
+	}
+
+	/**
+	 *
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function read_single_custom_report( WP_REST_Request $request ) {
+
+		$reports = get_option( 'gh_custom_reports', [] );
+		$report  = array_find( $reports, function ( $report ) use ( $request ) {
+			return $report['id'] == $request->get_param( 'id' );
+		} );
+
+		$report['data'] = $this->get_report_data( $report );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $report
+		] );
+
 	}
 
 	public function read_permissions_callback() {
