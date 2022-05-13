@@ -25,6 +25,23 @@
   margin: 0;
 }
 
+.gh-success {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(158, 206, 56, 0.1);
+  color: #040601;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gh-success p:first-child {
+  margin-top: 0;
+}
+.gh-success p:last-child {
+  margin-bottom: 0;
+}
+
 .gh-form-wrapper * {
   box-sizing: border-box;
 }

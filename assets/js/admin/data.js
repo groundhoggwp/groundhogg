@@ -61,6 +61,20 @@
     return json
   }
 
+  const apiPostFormData = async (url = '', data = {}, opts = {}) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: data,
+      ...opts,
+    })
+
+    return response.json()
+  }
+
   /**
    * Post data
    *
@@ -422,6 +436,7 @@
   })
 
   Groundhogg.api.post = apiPost
+  Groundhogg.api.postFormData = apiPostFormData
   Groundhogg.api.get = apiGet
   Groundhogg.api.patch = apiPatch
   Groundhogg.api.delete = apiDelete
@@ -434,6 +449,9 @@
       items: {},
       route: Groundhogg.api.routes.v4.options,
 
+      set (opt, value){
+        this.items[opt] = value
+      },
       get (opt, _default = false) {
 
         if ( Array.isArray( opt ) ){

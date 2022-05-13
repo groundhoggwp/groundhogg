@@ -115,8 +115,10 @@ class Rewrites {
 		$this->map_query_var( $query, 'link_id', 'absint' );
 		$this->map_query_var( $query, 'email_id', 'absint' );
 
-		// form
-		$query['form_uuid'] = $query['form_id'];
+		if ( isset( $query['form_id'] ) ){
+			// form
+			$query['form_uuid'] = $query['form_id'];
+		}
 
 		$this->map_query_var( $query, 'form_id', 'urldecode' );
 		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );

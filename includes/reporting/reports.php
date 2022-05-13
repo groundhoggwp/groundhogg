@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Form\Form_v2;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_country;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Optin_Status;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Region;
@@ -224,6 +225,14 @@ class Reports {
 				'callback' => [ $this, 'table_benchmark_conversion_rate' ]
 			],
 			[
+				'id'       => 'table_funnel_performance',
+				'callback' => [ $this, 'table_funnel_performance' ]
+			],
+			[
+				'id'       => 'table_broadcast_performance',
+				'callback' => [ $this, 'table_broadcast_performance' ]
+			],
+			[
 				'id'       => 'table_top_converting_funnels',
 				'callback' => [ $this, 'table_top_converting_funnels' ]
 			],
@@ -258,6 +267,14 @@ class Reports {
 			[
 				'id'       => 'donut_chart_contact_engagement',
 				'callback' => [ $this, 'donut_chart_contact_engagement' ]
+			],
+			[
+				'id'       => 'all_form_submissions',
+				'callback' => [ $this, 'all_form_submissions' ]
+			],
+			[
+				'id'       => 'form_engagement_rate',
+				'callback' => [ $this, 'form_engagement_rate' ]
 			]
 		];
 
@@ -351,6 +368,73 @@ class Reports {
 					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
 				]
 			] ),
+		];
+	}
+
+	/**
+	 * Total amount of new confirmed contacts
+	 *
+	 * @return array
+	 */
+	public function all_form_submissions() {
+
+		return [
+			'curr' => get_db( 'submissions' )->count( [
+				'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+				'before' => $this->end->format( 'Y-m-d H:i:s' )
+			] ),
+			'prev' => get_db( 'submissions' )->count( [
+				'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
+				'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
+			] ),
+		];
+	}
+
+	/**
+	 * Total amount of new confirmed contacts
+	 *
+	 * @return array
+	 */
+	public function form_engagement_rate() {
+
+		/**
+		 * @param $start \DateTime
+		 * @param $end   \DateTime
+		 *
+		 * @return int
+		 */
+		$helper = function ( $start, $end ) {
+
+			$submissions = get_db( 'submissions' )->count( [
+				'select' => 'DISTINCT(contact_id)',
+				'after'  => $start->format( 'Y-m-d H:i:s' ),
+				'before' => $end->format( 'Y-m-d H:i:s' ),
+			] );
+
+			$activities = get_db( 'activity' )->count( [
+				'select' => 'DISTINCT(contact_id)',
+				'where'  => [
+					[ 'activity_type', '=', 'email_opened' ],
+					[
+						'contact_id',
+						'IN',
+						get_db( 'submissions' )->get_sql( [
+							'select' => 'DISTINCT(contact_id)',
+							'where'  => [
+								[ 'date_created', '<=', $end->format( 'Y-m-d H:i:s' ) ],
+								[ 'date_created', '>=', $start->format( 'Y-m-d H:i:s' ) ]
+							]
+						] )
+					]
+				]
+			] );
+
+			return percentage( $submissions, $activities );
+		};
+
+		return [
+			'curr' => $helper( $this->start, $this->end ),
+			'prev' => $helper( $this->prev_start, $this->prev_end ),
 		];
 	}
 
@@ -659,7 +743,15 @@ class Reports {
 
 		}
 
-		return $records;
+		$parsed = array_values( array_map_with_keys( $parsed, function ( $v, $k ) {
+			return [ 'count' => $v, 'value' => $k ];
+		} ) );
+
+		usort( $parsed, function ( $a, $b ) {
+			return $b['count'] - $a['count'];
+		} );
+
+		return $parsed;
 
 	}
 
@@ -713,9 +805,53 @@ class Reports {
 	 */
 	public function table_contacts_by_source_page() {
 
-		$report = new Table_Contacts_By_Source_Pages( $this->start, $this->end );
+		$query = new Contact_Query( [
+			'select'     => 'ID',
+			'date_query' => [
+				'after'  => $this->start->format( 'Y-m-d H:i:s' ),
+				'before' => $this->end->format( 'Y-m-d H:i:s' )
+			]
+		] );
 
-		return $report->get_data();
+		$sql = $query->get_sql();
+
+		$where = [
+			[ 'meta_key', '=', 'source_page' ],
+			[ 'meta_value', '!=', '' ],
+			[ 'contact_id', 'IN', $sql ],
+		];
+
+		$records = get_db( 'contactmeta' )->query( [
+			'select'  => 'meta_value as value, COUNT(*) as count',
+			'where'   => $where,
+			'groupby' => 'value',
+			'orderby' => 'count'
+		] );
+
+		$parsed = [];
+
+		foreach ( $records as $record ) {
+			if ( $record->value && filter_var( $record->value, FILTER_VALIDATE_URL ) ) {
+				$page = wp_parse_url( $record->value, PHP_URL_PATH );
+
+				if ( isset( $parsed[ $page ] ) ) {
+					$parsed[ $page ] += $record->count;
+				} else {
+					$parsed[ $page ] = $record->count;
+				}
+			}
+
+		}
+
+		$parsed = array_values( array_map_with_keys( $parsed, function ( $v, $k ) {
+			return [ 'count' => $v, 'value' => $k ];
+		} ) );
+
+		usort( $parsed, function ( $a, $b ) {
+			return $b['count'] - $a['count'];
+		} );
+
+		return $parsed;
 
 	}
 
@@ -858,6 +994,61 @@ class Reports {
 		return $report->get_data();
 	}
 
+	public function table_funnel_performance() {
+
+		$funnels = get_db( 'funnels' )->query( [
+			'status' => 'active'
+		] );
+
+		$data = [];
+
+		foreach ( $funnels as $funnel ) {
+			$funnel = new Funnel( $funnel );
+
+			$conversion_rate = $funnel->get_conversion_rate( $this->start->getTimestamp(), $this->end->getTimestamp() );
+
+			if ( $conversion_rate === false ) {
+				continue;
+			}
+
+			$data[] = [
+				'id'         => $funnel->get_id(),
+				'title'      => $funnel->get_title(),
+				'conversion' => $conversion_rate
+			];
+		}
+
+		usort( $data, function ( $a, $b ) {
+			return $b['conversion'] - $a['conversion'];
+		} );
+
+		return $data;
+	}
+
+	public function table_broadcast_performance() {
+
+		$broadcasts = get_db( 'broadcasts' )->query( [
+			'status'      => 'sent',
+			'object_type' => 'email',
+			'orderby'     => 'send_time',
+			'order'       => 'DESC'
+		] );
+
+		$data = [];
+
+		foreach ( $broadcasts as $broadcast ) {
+			$broadcast = new Broadcast( $broadcast );
+
+			$data[] = [
+				'id'     => $broadcast->get_id(),
+				'title'  => $broadcast->get_title(),
+				'report' => $broadcast->get_report_data()
+			];
+		}
+
+		return $data;
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -866,6 +1057,21 @@ class Reports {
 	}
 
 	public function table_form_activity() {
+
+		$form_ids = array_keys( get_form_list() );
+
+		$forms = array_map_to_class( $form_ids, Form_v2::class );
+
+		return array_map( function ( $form ) {
+			return [
+				'id'          => $form->get_id(),
+				'funnel_id'   => $form->get_funnel_id(),
+				'name'        => $form->get_name(),
+				'submissions' => $form->get_submissions_count( $this->start->format( 'Y-m-d H:i:s' ), $this->end->format( 'Y-m-d H:i:s' ) ),
+				'impressions' => $form->get_impressions_count( $this->start->getTimestamp(), $this->end->getTimestamp() ),
+			];
+		}, $forms );
+
 		return new Table_Form_Activity( $this->start, $this->end );
 	}
 
@@ -888,9 +1094,24 @@ class Reports {
 	}
 
 	public function table_funnel_stats() {
-		$report = new Table_Funnel_Stats( $this->start, $this->end );
 
-		return $report->get_data();
+		$funnel_id = $this->params[1];
+
+		$funnel = new Funnel( $funnel_id );
+
+		$steps = $funnel->get_steps();
+
+		return array_map( function ( $step ) {
+			return [
+				'id'       => $step->get_id(),
+				'funnel'   => $step->get_funnel_id(),
+				'group'    => $step->get_group(),
+				'type'     => $step->get_type(),
+				'name'     => $step->get_title(),
+				'waiting'  => $step->count_waiting(),
+				'complete' => $step->count_complete( $this->start->getTimestamp(), $this->end->getTimestamp() ),
+			];
+		}, $steps );
 	}
 
 	public function table_email_funnels_used_in() {

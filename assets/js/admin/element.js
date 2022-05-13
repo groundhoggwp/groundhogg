@@ -1867,14 +1867,24 @@ ${ afterProgress() }`,
     return Date.now()
   }
 
-  const adminPageURL = (page, params) => {
+  const adminPageURL = (page, params = {}, fragment = false) => {
 
     params = $.param({
       page,
       ...params,
     })
 
-    return `${ Groundhogg.url.admin.replace(/(\/|\\)$/, '') }/admin.php?${ params }`
+    let url = `${ Groundhogg.url.admin.replace(/(\/|\\)$/, '') }/admin.php`
+
+    if ( params ){
+      url += '?' + params
+    }
+
+    if ( fragment ){
+      url += '#' + fragment
+    }
+
+    return url
   }
 
   const icons = {

@@ -288,10 +288,71 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return int[]
 	 */
 	public function get_conversion_step_ids() {
-		return array_map( function ( $step ) {
+		$step_ids = array_map( function ( $step ) {
 			return $step->get_id();
 		}, $this->get_steps( [ 'is_conversion' => true ] ) );
+
+		if ( ! empty( $step_ids ) ) {
+			return $step_ids;
+		}
+
+		// use the last benchmark
+		$benchmarks = $this->get_steps( [
+			'step_group' => Step::BENCHMARK,
+			'orderby'    => 'step_order',
+			'order'      => 'desc',
+			'limit'      => 1
+		] );
+
+		if ( empty( $benchmarks ) ) {
+			return [];
+		}
+
+		return [ $benchmarks[0]->get_id() ];
 	}
+
+	/**
+	 * Get the conversion rate of the funnel
+	 *
+	 * @param $start
+	 * @param $end
+	 *
+	 * @return false|float|int
+	 */
+	public function get_conversion_rate( $start, $end ) {
+
+		$conversion_steps = $this->get_conversion_step_ids();
+
+		if ( empty( $conversion_steps ) ) {
+			return false;
+		}
+
+		$num_of_conversions = get_db( 'events' )->count( [
+			'where'  => [
+				'relationship' => "AND",
+				[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
+				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
+				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
+			],
+			'select' => 'DISTINCT contact_id'
+		] );
+
+		$query = new Contact_Query( [
+			'report' => [
+				'funnel_id' => $this->get_id(),
+				'step_id'   => $this->get_first_step_id(),
+				'start'     => $start,
+				'end'       => $end,
+				'status'    => Event::COMPLETE
+			]
+		] );
+
+		$num_events_completed = $query->count();
+
+		return percentage( $num_events_completed, $num_of_conversions );
+	}
+
 
 	public function get_first_action_id() {
 		$actions = $this->get_step_ids( [
@@ -315,8 +376,8 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * @return array
 	 */
-	public function get_starting_step_ids(){
-		return get_object_ids( array_filter( $this->get_steps(), function ( $step ){
+	public function get_starting_step_ids() {
+		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_starting();
 		} ) );
 	}
@@ -329,7 +390,7 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_step_ids( $query = [] ) {
-		$query = array_merge( $query, [
+		$query = wp_parse_args( $query, [
 			'funnel_id' => $this->get_id(),
 			'orderby'   => 'step_order',
 			'order'     => 'ASC',

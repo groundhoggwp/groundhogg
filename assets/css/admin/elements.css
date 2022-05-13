@@ -641,63 +641,87 @@ button.gh-button.action:hover:not(:disabled),
 button.gh-submit.action:hover:not(:disabled) {
   background: #80a92a;
 }
-a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit#gh-submit, a.gh-submit.primary,
+a.gh-button[type=submit], a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit[type=submit], a.gh-submit#gh-submit, a.gh-submit.primary,
+input[type=button].gh-button[type=submit],
 input[type=button].gh-button#gh-submit,
 input[type=button].gh-button.primary,
+input[type=button].gh-submit[type=submit],
 input[type=button].gh-submit#gh-submit,
 input[type=button].gh-submit.primary,
+input[type=submit].gh-button[type=submit],
 input[type=submit].gh-button#gh-submit,
 input[type=submit].gh-button.primary,
+input[type=submit].gh-submit[type=submit],
 input[type=submit].gh-submit#gh-submit,
 input[type=submit].gh-submit.primary,
+button.gh-button[type=submit],
 button.gh-button#gh-submit,
 button.gh-button.primary,
+button.gh-submit[type=submit],
 button.gh-submit#gh-submit,
 button.gh-submit.primary {
   background: #0075ff;
 }
-a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
+a.gh-button[type=submit].text, a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit[type=submit].text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
+input[type=button].gh-button[type=submit].text,
 input[type=button].gh-button#gh-submit.text,
 input[type=button].gh-button.primary.text,
+input[type=button].gh-submit[type=submit].text,
 input[type=button].gh-submit#gh-submit.text,
 input[type=button].gh-submit.primary.text,
+input[type=submit].gh-button[type=submit].text,
 input[type=submit].gh-button#gh-submit.text,
 input[type=submit].gh-button.primary.text,
+input[type=submit].gh-submit[type=submit].text,
 input[type=submit].gh-submit#gh-submit.text,
 input[type=submit].gh-submit.primary.text,
+button.gh-button[type=submit].text,
 button.gh-button#gh-submit.text,
 button.gh-button.primary.text,
+button.gh-submit[type=submit].text,
 button.gh-submit#gh-submit.text,
 button.gh-submit.primary.text {
   background-color: transparent;
   color: #0075ff;
 }
-a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
+a.gh-button[type=submit]:hover:not(:disabled), a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit[type=submit]:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
+input[type=button].gh-button[type=submit]:hover:not(:disabled),
 input[type=button].gh-button#gh-submit:hover:not(:disabled),
 input[type=button].gh-button.primary:hover:not(:disabled),
+input[type=button].gh-submit[type=submit]:hover:not(:disabled),
 input[type=button].gh-submit#gh-submit:hover:not(:disabled),
 input[type=button].gh-submit.primary:hover:not(:disabled),
+input[type=submit].gh-button[type=submit]:hover:not(:disabled),
 input[type=submit].gh-button#gh-submit:hover:not(:disabled),
 input[type=submit].gh-button.primary:hover:not(:disabled),
+input[type=submit].gh-submit[type=submit]:hover:not(:disabled),
 input[type=submit].gh-submit#gh-submit:hover:not(:disabled),
 input[type=submit].gh-submit.primary:hover:not(:disabled),
+button.gh-button[type=submit]:hover:not(:disabled),
 button.gh-button#gh-submit:hover:not(:disabled),
 button.gh-button.primary:hover:not(:disabled),
+button.gh-submit[type=submit]:hover:not(:disabled),
 button.gh-submit#gh-submit:hover:not(:disabled),
 button.gh-submit.primary:hover:not(:disabled) {
   background: #005ecc;
 }
-a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
+a.gh-button[type=submit]:hover:not(:disabled).text, a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit[type=submit]:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
+input[type=button].gh-button[type=submit]:hover:not(:disabled).text,
 input[type=button].gh-button#gh-submit:hover:not(:disabled).text,
 input[type=button].gh-button.primary:hover:not(:disabled).text,
+input[type=button].gh-submit[type=submit]:hover:not(:disabled).text,
 input[type=button].gh-submit#gh-submit:hover:not(:disabled).text,
 input[type=button].gh-submit.primary:hover:not(:disabled).text,
+input[type=submit].gh-button[type=submit]:hover:not(:disabled).text,
 input[type=submit].gh-button#gh-submit:hover:not(:disabled).text,
 input[type=submit].gh-button.primary:hover:not(:disabled).text,
+input[type=submit].gh-submit[type=submit]:hover:not(:disabled).text,
 input[type=submit].gh-submit#gh-submit:hover:not(:disabled).text,
 input[type=submit].gh-submit.primary:hover:not(:disabled).text,
+button.gh-button[type=submit]:hover:not(:disabled).text,
 button.gh-button#gh-submit:hover:not(:disabled).text,
 button.gh-button.primary:hover:not(:disabled).text,
+button.gh-submit[type=submit]:hover:not(:disabled).text,
 button.gh-submit#gh-submit:hover:not(:disabled).text,
 button.gh-submit.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
@@ -1459,6 +1483,7 @@ p.error,
 }
 .gh-has-tooltip .gh-tooltip {
   width: max-content;
+  max-width: 300px;
   display: none;
   position: absolute;
   background-color: #102640;
@@ -1640,24 +1665,24 @@ ul.gh-form-errors {
   display: block;
 }
 
-.gh-form-wrapper {
+.gh-form-fields {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 10px 10px;
   align-items: stretch;
 }
-.gh-form-wrapper label {
+.gh-form-fields label {
   cursor: pointer;
   vertical-align: baseline;
 }
-.gh-form-wrapper .gh-input {
+.gh-form-fields .gh-input {
   outline: none;
   width: 100%;
   max-width: 100%;
   height: 100%;
 }
-.gh-form-wrapper input[type=file].gh-file-uploader {
+.gh-form-fields input[type=file].gh-file-uploader {
   width: 100%;
   margin: auto;
   padding: 30px;
@@ -1666,25 +1691,25 @@ ul.gh-form-errors {
   border: 2px dashed #e5e5e5;
   text-align: center;
 }
-.gh-form-wrapper * {
+.gh-form-fields * {
   box-sizing: border-box;
 }
-.gh-form-wrapper .gh-form-column.col-1-of-1 {
+.gh-form-fields .gh-form-column.col-1-of-1 {
   grid-column: span 12;
 }
-.gh-form-wrapper .gh-form-column.col-1-of-2 {
+.gh-form-fields .gh-form-column.col-1-of-2 {
   grid-column: span 6;
 }
-.gh-form-wrapper .gh-form-column.col-1-of-3 {
+.gh-form-fields .gh-form-column.col-1-of-3 {
   grid-column: span 4;
 }
-.gh-form-wrapper .gh-form-column.col-1-of-4 {
+.gh-form-fields .gh-form-column.col-1-of-4 {
   grid-column: span 3;
 }
-.gh-form-wrapper .gh-form-column.col-2-of-3 {
+.gh-form-fields .gh-form-column.col-2-of-3 {
   grid-column: span 8;
 }
-.gh-form-wrapper .gh-form-column.col-3-of-4 {
+.gh-form-fields .gh-form-column.col-3-of-4 {
   grid-column: span 9;
 }
 

@@ -124,10 +124,20 @@ class Form_Filled extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( $this->get_posted_data( 'form' ) );
+
+		$form = $this->get_posted_data( 'form' );
+
+		$sanitized = [
+			'fields'    => $form['fields'],
+			'recaptcha' => $form['recaptcha'],
+			'button'    => $form['button'],
+		];
+
+		$this->save_setting( 'form', $sanitized );
+		$this->save_setting( 'form_name', sanitize_text_field( $this->get_posted_data('form_name')));
 		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
 		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
-		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
+		$this->save_setting( 'enable_ajax', boolval( $this->get_posted_data( 'enable_ajax' ) ) );
 	}
 
 	public function settings( $step ) {

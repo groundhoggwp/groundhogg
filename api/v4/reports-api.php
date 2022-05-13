@@ -52,7 +52,7 @@ class Reports_Api extends Base_Api {
 		] );
 	}
 
-	function get_report_data( $report ) {
+	function get_custom_report_data( $report ) {
 
 		$query = new Contact_Query( [
 			'filters' => $report['filters']
@@ -112,7 +112,7 @@ class Reports_Api extends Base_Api {
 		$reports = get_option( 'gh_custom_reports', [] );
 
 		foreach ( $reports as &$report ) {
-			$report['data'] = $this->get_report_data( $report );
+			$report['data'] = $this->get_custom_report_data( $report );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -135,7 +135,7 @@ class Reports_Api extends Base_Api {
 			return $report['id'] == $request->get_param( 'id' );
 		} );
 
-		$report['data'] = $this->get_report_data( $report );
+		$report['data'] = $this->get_custom_report_data( $report );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $report
@@ -176,14 +176,25 @@ class Reports_Api extends Base_Api {
 
 		$reporting = new Reports( $start, $end, $params );
 
-		if ( empty( $reports ) ) {
-			return self::ERROR_404( 'error', 'report not found' );
-		}
+//		if ( empty( $reports ) ) {
+//			return self::ERROR_404( 'error', 'report not found' );
+//		}
 
-		$results = [];
+		$custom_reports = get_option( 'gh_custom_reports', [] );
+
 
 		foreach ( $reports as $report_id ) {
-			$data                  = $reporting->get_data_3_0( $report_id );
+
+			if ( wp_is_uuid( $report_id ) ) {
+				$report  = array_find( $custom_reports, function ( $report ) use ( $report_id ) {
+					return $report['id'] == $report_id;
+				} );
+
+				$data = $this->get_custom_report_data( $report );
+			} else {
+				$data = $reporting->get_data_3_0( $report_id );
+			}
+
 			$results[ $report_id ] = $data;
 		}
 

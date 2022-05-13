@@ -27,9 +27,108 @@ body {
   }
 }
 
+
+.big-number {
+  font-size: 52px;
+  line-height: 1;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    color: $primary-blue;
+    //text-decoration: underline;
+  }
+}
+
+.report-grid.ui-sortable {
+  h2 {
+    cursor: move;
+  }
+}
+
+.report-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+
+  .report-placeholder {
+
+    &.table,
+    &.pie_chart {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    background-color: $primary-dark-15;
+    border-radius: 5px;
+  }
+
+
+  .report {
+
+    &.line_chart {
+      grid-column: span 4;
+    }
+
+    &.table,
+    &.pie_chart {
+      grid-column: span 2;
+      grid-row: span 2;
+
+      td.number-total {
+        font-weight: bold;
+        cursor: pointer;
+
+        &:not(:last-child){
+          text-align: center;
+        }
+
+        &:hover {
+          color: $primary-blue;
+        }
+      }
+    }
+
+    .report-more {
+      visibility: hidden;
+    }
+
+    &:hover {
+      .report-more {
+        visibility: visible;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 800px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media only screen and (min-width: 800px) and (max-width: 1000px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+
 #app {
 
-  * {
+  *:not(.dashicons) {
     box-sizing: border-box;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   }
@@ -38,8 +137,15 @@ body {
 
     position: relative;
 
+    h1{
+      font-size: 42px;
+      line-height: 1;
+      padding: 40px 0 0 20px;
+      margin: 0;
+    }
+
     .gh-logo {
-      padding: 5px 10px;
+      padding: 20px;
       width: 300px;
     }
 
@@ -136,51 +242,73 @@ body {
           }
         }
 
-        &.gh-table-report {
-          padding: 0 0 12px 0;
 
-          .gh-report-header {
-            padding: 20px 20px 0 20px;
+        table.gh-report-table {
+          border-collapse: collapse;
+          width: 100%;
+
+          td, th {
+            padding: 16px;
+            font-size: 16px;
+
+            &.large {
+              width: 100%;
+            }
+
+            &:first-child {
+              padding-left: 20px;
+            }
+
+            &:last-child {
+              text-align: right;
+              padding-right: 20px;
+            }
+
+            a {
+              text-decoration: none;
+            }
+
+            span.row-count {
+              margin-right: 10px;
+            }
+
+            &.link {
+              cursor: pointer;
+              &:hover {
+                color: $primary-blue;
+                font-weight: 500;
+              }
+            }
+
+            &.step {
+              svg {
+                height: 30px;
+                width: 30px;
+              }
+
+              &.action {
+                color: $action-green;
+              }
+
+              &.benchmark {
+                color: $benchmark-orange;
+              }
+            }
           }
 
-          table.gh-report-table {
-            border-collapse: collapse;
-            width: 100%;
+          th {
+            font-weight: 700;
+            font-size: 16px;
+            text-align: left;
+            white-space: nowrap;
+          }
 
-            td, th {
-              padding: 8px;
-              font-size: 16px;
-
-              &:first-child {
-                padding-left: 20px;
-              }
-
-              &:last-child {
-                text-align: right;
-                padding-right: 20px;
-              }
-
-              a {
-                text-decoration: none;
-              }
-
-              span.row-count {
-                margin-right: 10px;
-              }
-            }
-
-            th {
-              font-weight: 700;
-              font-size: 16px;
-              text-align: left;
-            }
-
-            tr:nth-child(even) {
-              background: $primary-blue-2;
-            }
+          tr:nth-child(even) {
+            background: $primary-blue-2;
           }
         }
       }
     }
   }
 }
+

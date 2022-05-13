@@ -22,7 +22,7 @@
 
   } = Groundhogg.element
   const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore } = Groundhogg.stores
-  const { post, routes } = Groundhogg.api
+  const { post, routes, postFormData } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
   const { userHasCap } = Groundhogg.user
   const { sprintf, __, _x, _n } = wp.i18n
@@ -822,62 +822,47 @@
 
               var $form = $(e.currentTarget)
 
-              let $btn = $form.find('#gh-submit')
+              let $btn = $form.find('.gh-submit')
               let origTxt = $btn.text()
 
               $btn.prop('disabled', true)
               $btn.text(__('Submitting', 'groundhogg'))
-              const { stop } = loadingDots('.quick-add-wrap form.gh-form #gh-submit')
+              const { stop } = loadingDots('.quick-add-wrap form.gh-form .gh-submit')
+
               var data = new FormData($form[0])
 
-              data.append('action', 'groundhogg_ajax_form_submit')
+              postFormData( `${FormsStore.route}/${selectedForm.ID}/admin${ contact ? `?contact=${contact.ID}` : ''}`, data ).then( (r) => {
+                stop()
+                $btn.prop('disabled', false)
+                $btn.text(origTxt)
 
-              $.ajax({
-                method: 'POST',
-                // dataType: 'json',
-                url: ajaxurl,
-                data: data,
-                processData: false,
-                contentType: false,
-                cache: false,
-                timeout: 600000,
-                enctype: 'multipart/form-data',
-                success: (r) => {
+                if ( r.status !== 'success' ) {
 
-                  stop()
-                  $btn.prop('disabled', false)
-                  $btn.text(origTxt)
-
-                  if (!r.success) {
-
-                    dialog({
-                      message: r.data[0].message,
-                      type: 'error'
-                    })
-
-                  } else {
-                    dialog({
-                      message: __('Form submitted!'),
-                    })
-
-                    close()
-
-                    ContactsStore.itemsFetched([
-                      r.data.contact
-                    ])
-
-                    onSubmit(r.data.contact)
-                  }
-
-                },
-                error: (e) => {
                   dialog({
-                    message: __('Something went wrong...', 'groundhogg'),
+                    message: r.additional_errors[0].message,
                     type: 'error'
                   })
-                }
-              })
 
+                } else {
+
+                  dialog({
+                    message: __('Form submitted!'),
+                  })
+
+                  close()
+
+                  ContactsStore.itemsFetched([
+                    r.contact
+                  ])
+
+                  onSubmit(r.contact)
+                }
+              }).catch( err => {
+                dialog({
+                  message: __('Something went wrong...', 'groundhogg'),
+                  type: 'error'
+                })
+              })
             })
           }
         }

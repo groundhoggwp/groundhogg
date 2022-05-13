@@ -8,19 +8,21 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.0.20
  */
-use Groundhogg\Step;
+use Groundhogg\Form\Form_v2;
 
 $form_id = get_query_var( 'form_id' );
 
-$step = new Step( $form_id );
+if ( ! $form_id ) {
+	$form_id = get_query_var( 'form_uuid' );
+}
 
-if ( ! $step ) {
+$form = new Form_v2( [ 'id' => $form_id, 'fill' => true ] );
+
+if ( ! $form->exists() ) {
 	wp_die( 'No form found...' );
 }
 
-$title = $step->get_title();
-
-$shortcode = sprintf( '[gh_form id="%d"]', $step->get_id() );
+$title = wp_strip_all_tags( $form->get_title() );
 
 add_filter( 'show_admin_bar', '__return_false' );
 
@@ -80,7 +82,7 @@ add_action( 'wp_enqueue_scripts', function () {
 </head>
 <body class="groundhogg-form-body" style="padding: 20px">
 <div id="main">
-	<?php echo do_shortcode( $shortcode ); ?>
+	<?php echo $form->shortcode() ?>
 </div>
 <?php
  wp_print_scripts([

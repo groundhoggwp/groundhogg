@@ -767,6 +767,7 @@ button {
       }
     }
 
+    &[type='submit'],
     &#gh-submit,
     &.primary {
       background: $primary-blue;
@@ -1609,6 +1610,7 @@ p.error,
 
   .gh-tooltip {
     width: max-content;
+    max-width: 300px;
     display: none;
     position: absolute;
     background-color: $primary-dark;
@@ -1825,7 +1827,7 @@ ul.gh-form-errors {
   display: block;
 }
 
-.gh-form-wrapper {
+.gh-form-fields {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;

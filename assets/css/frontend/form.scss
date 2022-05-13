@@ -22,6 +22,7 @@ $benchmark-orange-50: rgba(245, 129, 21, 0.50);
 $benchmark-orange-25: rgba(245, 129, 21, 0.25);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
+$action-green-10: rgba(158, 206, 56, 0.1);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
@@ -54,6 +55,28 @@ $background-color: #F6F9FB;
         }
     }
 }
+
+.gh-success {
+    margin-top: 20px;
+    padding: 20px;
+    background: $action-green-10;
+    color: darken( $action-green, 50 );
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    p {
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
 
 .gh-form-wrapper * {
     box-sizing: border-box;

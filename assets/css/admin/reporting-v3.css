@@ -5,15 +5,92 @@ body #wpcontent {
   padding: 0;
 }
 
-#app * {
+.big-number {
+  font-size: 52px;
+  line-height: 1;
+  font-weight: 500;
+  cursor: pointer;
+}
+.big-number:hover {
+  color: #0075ff;
+}
+
+.report-grid.ui-sortable h2 {
+  cursor: move;
+}
+
+.report-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+.report-grid .report-placeholder {
+  background-color: rgba(16, 38, 64, 0.15);
+  border-radius: 5px;
+}
+.report-grid .report-placeholder.table, .report-grid .report-placeholder.pie_chart {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.report-grid .report.line_chart {
+  grid-column: span 4;
+}
+.report-grid .report.table, .report-grid .report.pie_chart {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.report-grid .report.table td.number-total, .report-grid .report.pie_chart td.number-total {
+  font-weight: bold;
+  cursor: pointer;
+}
+.report-grid .report.table td.number-total:not(:last-child), .report-grid .report.pie_chart td.number-total:not(:last-child) {
+  text-align: center;
+}
+.report-grid .report.table td.number-total:hover, .report-grid .report.pie_chart td.number-total:hover {
+  color: #0075ff;
+}
+.report-grid .report .report-more {
+  visibility: hidden;
+}
+.report-grid .report:hover .report-more {
+  visibility: visible;
+}
+
+@media only screen and (max-width: 600px) {
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media only screen and (min-width: 600px) and (max-width: 800px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media only screen and (min-width: 800px) and (max-width: 1000px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+@media only screen and (min-width: 1000px) {
+  .report-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+#app *:not(.dashicons) {
   box-sizing: border-box;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 #app .gh-reporting-dashboard {
   position: relative;
 }
+#app .gh-reporting-dashboard h1 {
+  font-size: 42px;
+  line-height: 1;
+  padding: 40px 0 0 20px;
+  margin: 0;
+}
 #app .gh-reporting-dashboard .gh-logo {
-  padding: 5px 10px;
+  padding: 20px;
   width: 300px;
 }
 #app .gh-reporting-dashboard-header {
@@ -80,39 +157,54 @@ body #wpcontent {
   width: 20px;
   height: 20px;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report {
-  padding: 0 0 12px 0;
-}
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report .gh-report-header {
-  padding: 20px 20px 0 20px;
-}
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table {
   border-collapse: collapse;
   width: 100%;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table td, #app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th {
-  padding: 8px;
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th {
+  padding: 16px;
   font-size: 16px;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table td:first-child, #app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th:first-child {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.large, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.large {
+  width: 100%;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td:first-child, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th:first-child {
   padding-left: 20px;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table td:last-child, #app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th:last-child {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td:last-child, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th:last-child {
   text-align: right;
   padding-right: 20px;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table td a, #app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th a {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td a, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th a {
   text-decoration: none;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table td span.row-count, #app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th span.row-count {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td span.row-count, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th span.row-count {
   margin-right: 10px;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table th {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.link, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.link {
+  cursor: pointer;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.link:hover, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.link:hover {
+  color: #0075ff;
+  font-weight: 500;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.step svg, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.step svg {
+  height: 30px;
+  width: 30px;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.step.action, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.step.action {
+  color: #9ece38;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table td.step.benchmark, #app .gh-reporting-dashboard #reports-container .report table.gh-report-table th.step.benchmark {
+  color: #f58115;
+}
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table th {
   font-weight: 700;
   font-size: 16px;
   text-align: left;
+  white-space: nowrap;
 }
-#app .gh-reporting-dashboard #reports-container .report.gh-table-report table.gh-report-table tr:nth-child(even) {
+#app .gh-reporting-dashboard #reports-container .report table.gh-report-table tr:nth-child(even) {
   background: rgba(0, 117, 255, 0.02);
 }
 

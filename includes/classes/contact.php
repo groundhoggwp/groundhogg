@@ -1202,12 +1202,21 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * ahve the contact agree to the terms and conditions
+	 * Have the contact agree to the terms and conditions
 	 */
 	public function set_terms_agreement() {
 		$this->set_compliance_and_date_meta( 'terms_agreement' );
 
 		do_action( "groundhogg/contact/agreed_to_terms", $this );
+	}
+
+	/**
+	 * Whether the contact agreed to terms and conditions
+	 *
+	 * @return bool
+	 */
+	public function agreed_to_terms() {
+		return $this->has_compliance_and_date_meta( 'terms_agreement' );
 	}
 
 	/**

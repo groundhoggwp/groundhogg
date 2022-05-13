@@ -69,7 +69,7 @@
         btn.innerHTML = i18n.submitting
         let { stop } = loadingDots(btn)
 
-        form.parentNode.querySelectorAll('.gh-message-wrapper, .gh-errors').forEach(el => el.remove())
+        form.parentNode.querySelectorAll('.gh-success, .gh-errors').forEach(el => el.remove())
 
         let fd = new FormData(form)
 
@@ -96,42 +96,50 @@
             btn.innerHTML = submitText
             btn.disabled = false
 
-            if (r.code && r.code === 'failed_to_submit') {
+            form.dispatchEvent(ajaxFinEvt)
+            form.dispatchEvent(formSubmitted)
+
+            if (r.code) {
+
+              let message
+
+              switch (r.code) {
+                case 'failed_to_submit':
+                  message = `
+                  <p>${ r.message }</p>
+                  <ul>${ r.additional_errors.map(err => `<li><b>${err.data}:</b> ${ err.message }</li>`).join('') }</ul>`
+                  break
+                default:
+                  message = `<p>${ r.message }</p>`
+              }
 
               let msg = document.createElement('div')
               //language=HTML
-              msg.innerHTML = `
-                  <p>${r.message}</p>
-                  <ul>${ r.additional_errors.map(err => `<li>${ err.message }</li>`).join('') }</ul>`
+              msg.innerHTML = message
               msg.classList.add(...['gh-errors'])
 
               form.parentNode.appendChild(msg)
 
               return
+
             }
 
-            if (r.success) {
+            if (r.url) {
+              setTimeout(() => {
+                window.open(r.url, '_self')
+              }, 500)
+            }
 
+            if (r.message) {
               let msg = document.createElement('div')
-              msg.innerHTML = r.data.message
-              msg.classList.add(...['gh-message-wrapper', 'gh-form-success-wrapper'])
-
+              //language=HTML
+              msg.innerHTML = r.message
+              msg.classList.add(...['gh-success'])
               form.parentNode.appendChild(msg)
 
               form.reset()
 
             }
-            else {
-
-              let msg = document.createElement('div')
-              msg.innerHTML = r.data.html
-
-              form.parentNode.insertBefore(msg.firstChild, form)
-
-            }
-
-            form.dispatchEvent(ajaxFinEvt)
-            form.dispatchEvent(formSubmitted)
 
           }).catch(e => {
             alert(e.message)

@@ -1455,7 +1455,7 @@
 
       //language=HTML
       return `
-          <div class="gh-form-wrapper">
+          <div class="gh-form-fields">
               ${ formHTML }
           </div>`
     },

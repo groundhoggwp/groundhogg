@@ -16,7 +16,7 @@ if ( ! $form_id ) {
 	$form_id = get_query_var( 'form_uuid' );
 }
 
-$form = new Form_v2( [ 'id' => $form_id ] );
+$form = new Form_v2( [ 'id' => $form_id, 'fill' => true ] );
 
 add_action( 'wp_head', function () {
 	wp_dequeue_script( 'fullframe' );
@@ -24,6 +24,6 @@ add_action( 'wp_head', function () {
 
 managed_page_head( wp_strip_all_tags( $form->get_title() ), 'submit-form' );
 
-echo do_shortcode( $form->get_shortcode() );
+echo $form->shortcode();
 
 managed_page_footer();

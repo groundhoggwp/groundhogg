@@ -7,6 +7,7 @@ use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
 use function Groundhogg\enqueue_filter_assets;
+use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
@@ -78,52 +79,18 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	public function scripts() {
 
-		if ( $this->get_current_tab() === 'v3' ) {
-			wp_enqueue_script( 'groundhogg-admin-reporting-v3' );
-			wp_enqueue_style( 'groundhogg-admin-reporting-v3' );
-			wp_enqueue_style( 'groundhogg-admin-reporting' );
-			wp_localize_script( 'groundhogg-admin-reporting-v3', 'GroundhoggReporting', get_request_query() );
+		wp_enqueue_style( 'groundhogg-admin-reporting-v3' );
+		wp_enqueue_style( 'groundhogg-admin-reporting' );
+		wp_enqueue_script( 'groundhogg-admin-custom-reports' );
+		wp_enqueue_script( 'groundhogg-admin-reporting-v3' );
+		wp_localize_script( 'groundhogg-admin-reporting-v3', 'GroundhoggReporting', array_merge( get_request_query(), [
+                'custom_reports' => []
+        ] ) );
 
-			return;
-		}
-
-		switch ( $this->get_current_tab() ) {
-			default:
-				wp_enqueue_style( 'groundhogg-admin-reporting' );
-				wp_enqueue_style( 'groundhogg-admin-loader' );
-				wp_enqueue_style( 'baremetrics-calendar' );
-				wp_enqueue_script( 'groundhogg-admin-reporting' );
-
-				$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
-
-				if ( ! $dates ) {
-					$dates = [
-						'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
-						'end_date'   => date( 'Y-m-d', time() ),
-					];
-				} else {
-					$dates = explode( '|', $dates );
-
-					$dates = [
-						'start_date' => $dates[0],
-						'end_date'   => $dates[1],
-					];
-				}
-
-				wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
-					'reports' => $this->get_reports_per_tab(),
-					'dates'   => $dates
-				] );
-
-				break;
-
-			case 'custom':
-				enqueue_filter_assets();
-				wp_enqueue_style( 'groundhogg-admin-reporting' );
-				wp_enqueue_script( 'groundhogg-admin-custom-reports' );
-
-				break;
-		}
+        enqueue_step_type_assets();
+		enqueue_filter_assets();
+		wp_enqueue_style( 'groundhogg-admin-reporting' );
+//		wp_enqueue_script( 'groundhogg-admin-custom-reports' );
 	}
 
 	protected function get_reports_per_tab() {
@@ -314,61 +281,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	public function page() {
 
-		if ( $this->get_current_tab() === 'v3' ) {
-			include __DIR__ . '/views/v3.php';
-
-			return;
-		}
-
-
-		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
-		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
-
-		include __DIR__ . '/views/functions.php';
-
-		?>
-		<div class="loader-wrap">
-			<div class="gh-loader-overlay" style="display:none;"></div>
-			<div class="gh-loader" style="display: none"></div>
-		</div>
-		<div class="wrap blurred">
-			<?php if ( ! is_white_labeled() ): ?>
-				<h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
-			<?php else: ?>
-				<h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
-			<?php endif; ?>
-			<?php $this->do_title_actions(); ?>
-			<?php $this->range_picker(); ?>
-			<?php $this->notices(); ?>
-			<hr class="wp-header-end">
-			<?php $this->do_page_tabs(); ?>
-			<?php
-
-			$method        = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
-			$backup_method = sprintf( '%s_%s', $this->get_current_tab(), 'view' );
-
-			if ( isset_not_empty( $this->custom_tabs, $this->get_current_tab() ) ) {
-				// Callback for custom tabs
-				$tab_args = get_array_var( $this->custom_tabs, $this->get_current_tab() );
-				call_user_func( $tab_args['callback'] );
-
-			} else if ( method_exists( $this, $method ) ) {
-				// Standard method
-				call_user_func( [ $this, $method ] );
-
-			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {
-				// Action
-				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
-
-			} else if ( method_exists( $this, $backup_method ) ) {
-				// Backup method
-				call_user_func( [ $this, $backup_method ] );
-
-			}
-
-			?>
-		</div>
-		<?php
+		include __DIR__ . '/views/v3.php';
 
 	}
 
@@ -377,12 +290,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function range_picker() {
 		?>
-		<div id="groundhogg-datepicker-wrap">
-			<div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
-		</div>
-		<!--        <div id="groundhogg-datepicker-wrap">-->
-		<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-		<!--        </div>-->
+        <div id="groundhogg-datepicker-wrap">
+            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+        </div>
+        <!--        <div id="groundhogg-datepicker-wrap">-->
+        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+        <!--        </div>-->
 		<?php
 	}
 

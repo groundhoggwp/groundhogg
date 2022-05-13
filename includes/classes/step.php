@@ -154,6 +154,33 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $contacts;
 	}
 
+	/**
+	 * @param $start
+	 * @param $end
+	 *
+	 * @return array|array[]|bool|int|object|object[]|null
+	 */
+	public function count_complete( $start, $end ) {
+		return get_db( 'events' )->count( [
+			'status'    => Event::COMPLETE,
+			'step_id'   => $this->get_id(),
+			'funnel_id' => $this->get_funnel_id(),
+			'after'     => $start,
+			'before'    => $end
+		] );
+	}
+
+	/**
+	 * @return array|array[]|bool|int|object|object[]|null
+	 */
+	public function count_waiting() {
+		return get_db( 'event_queue' )->count( [
+			'status'    => Event::WAITING,
+			'step_id'   => $this->get_id(),
+			'funnel_id' => $this->get_funnel_id(),
+		] );
+	}
+
 
 	/**
 	 * Get an array of waiting events
@@ -495,11 +522,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

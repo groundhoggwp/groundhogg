@@ -1440,7 +1440,7 @@
                         ${ toggle({
                             id: 'send_in_timezone',
                             name: 'send_in_timezone',
-                            checked: send_in_timezone,
+                            checked: Boolean( send_in_timezone ),
                         }) }</p>
                 </div>
             </div>`
@@ -1820,7 +1820,7 @@
                     <p>${ __('Stay on page after submitting?', 'groundhogg') } ${ toggle({
                         name: 'enable_ajax',
                         id: 'enable-ajax',
-                        checked: meta.enable_ajax,
+                        checked: Boolean( meta.enable_ajax ),
                         onLabel: _x('YES', 'toggle switch', 'groundhogg'),
                         offLabel: _x('NO', 'toggle switch', 'groundhogg'),
                     }) }</p>
