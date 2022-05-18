@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.6.3
+Stable tag: 2.6.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,19 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.6.3 (2022-05-10) =
+= 2.6.3.1 (2022-05-18) ==
+* TWEAKED Combined several tools pages into one to make the interface less confusing.
+ * Moved user sync to the Misc tab
+ * Removed the create users tool (can be done via a funnel)
+ * Removed the delete users tool (can be done from the contact's tab)
+ * Combined install and updates and system info tabs
+ * Visually updated the tools screen
+* TWEAKED Updated the profile audit email with better formatting.
+* TWEAKED Special link sent from the preferences screen will not require the tracking cookie to be set for changes to be made.
+* FIXED Default contact owner not being used.
+* FIXED Un-serialize values in custom reports.
+
+= 2.6.3 (2022-05-11) =
 * ADDED New custom reports feature! Build a custom dashboard that gives you the stats you need.
 * FIXED Mapping to tags not working for Ninja Forms.
 

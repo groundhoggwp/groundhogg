@@ -14,6 +14,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\array_find;
+use function Groundhogg\array_map_with_keys;
 use function Groundhogg\get_db;
 
 class Reports_Api extends Base_Api {
@@ -79,6 +80,10 @@ class Reports_Api extends Base_Api {
 					'groupby' => 'value',
 					'orderby' => 'count'
 				] );
+
+				foreach ( $records as &$record ) {
+					$record->value = maybe_unserialize( $record->value );
+				}
 
 				return $records;
 

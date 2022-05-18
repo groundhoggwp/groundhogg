@@ -55,21 +55,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public $exporter;
 
 	/**
-	 * @var Delete_Contacts
-	 */
-	public $deleter;
-
-	/**
-	 * @var \Groundhogg\Bulk_Jobs\Sync_Contacts
-	 */
-	public $syncer;
-
-	/**
 	 * @var Create_Users;
 	 */
 	public $create_users;
 
+	/**
+	 * Get the menu order between 1 - 99
+	 *
+	 * @return int
+	 */
+	public function get_priority() {
+		return 98;
+	}
+
 	// Unused functions.
+
 	public function view() {
 	}
 
@@ -84,16 +84,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-		add_action( "groundhogg/admin/{$this->get_slug()}", [ $this, 'delete_warning' ] );
-
 		$this->init_bulk_jobs();
 	}
 
 	public function init_bulk_jobs() {
 		$this->importer     = Plugin::$instance->bulk_jobs->import_contacts;
 		$this->exporter     = Plugin::$instance->bulk_jobs->export_contacts;
-		$this->deleter      = Plugin::$instance->bulk_jobs->delete_contacts;
-		$this->syncer       = Plugin::$instance->bulk_jobs->sync_contacts;
 		$this->create_users = Plugin::$instance->bulk_jobs->create_users;
 	}
 
@@ -179,21 +175,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'export_contacts'
 			],
 			[
-				'name' => __( 'Sync or Create Users' ),
-				'slug' => 'sync_create_users',
-				'cap'  => 'create_users'
-			],
-			[
-				'name' => __( 'Bulk Delete', 'groundhogg' ),
-				'slug' => 'delete',
-				'cap'  => 'delete_contacts'
-			],
-			[
-				'name' => __( 'Install & Updates', 'groundhogg' ),
-				'slug' => 'install_updates',
-				'cap'  => 'manage_options'
-			],
-			[
 				'name' => __( 'Cron Setup', 'groundhogg' ),
 				'slug' => 'cron',
 				'cap'  => 'manage_options'
@@ -224,54 +205,180 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Regular system view.
 	 */
 	public function system_view() {
+
 		?>
-        <div id="poststuff">
+        <p></p>
+		<?php if ( get_url_var( 'show_sys_info' ) ): ?>
+            <pre class="code" style="width: 100%;height:max-content;"
+                 id="system-info-textarea"><?php echo groundhogg_tools_sysinfo_get(); ?></pre>
+			<?php
+			return;
+		endif; ?>
+		<?php if ( get_url_var( 'action' ) === 'view_updates' && ! get_request_var( 'confirm' ) ):
+			do_action( 'groundhogg/admin/tools/updates', get_request_var( 'updater' ) );
 
+			return;
+		endif; ?>
+		<?php if ( get_url_var( 'action' ) === 'view_updates' && get_request_var( 'confirm' ) === 'yes' ):
+
+			?>
+            <p><?php _e( '<b>WARNING:</b> Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
+			<?php
+
+			echo html()->e( 'a', [
+				'class' => 'big-button button-primary',
+				'href'  => add_query_arg( [
+					'updater'             => sanitize_text_field( get_request_var( 'updater' ) ),
+					'manual_update'       => sanitize_text_field( get_request_var( 'manual_update' ) ),
+					'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
+				], $_SERVER['REQUEST_URI'] )
+			], sprintf( __( 'Yes, perform update %s', 'groundhogg' ), sanitize_text_field( get_request_var( 'manual_update' ) ) ) );
+
+			return;
+		endif; ?>
+        <div class="post-box-grid">
 			<?php do_action( 'groundhogg/admin/tools/system_status/before' ); ?>
-
-            <div class="postbox">
-                <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
+            <div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
+                </div>
                 <div class="inside">
-                    <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
-                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly"
-                              onclick="this.focus(); this.select()" id="system-info-textarea"
-                              name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
-                    <p class="submit">
-                        <a class="button button-secondary"
-                           href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
-                    </p>
+                    <p><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
+                    <a class="gh-button primary"
+                       href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
+                    <a class="gh-button secondary"
+                       href="<?php echo admin_page_url( 'gh_tools', [
+						   'tab'           => 'system',
+						   'show_sys_info' => 1
+					   ] ) ?>"><?php _e( 'View System Info', 'groundhogg' ); ?></a>
                 </div>
             </div>
-            <div class="postbox">
-                <h2 class="hndle"><?php _e( 'Safe Mode', 'groundhogg' ); ?></h2>
+            <div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><?php _e( 'Safe Mode', 'groundhogg' ); ?></h2>
+                </div>
                 <div class="inside">
-                    <p class="description"><?php printf( __( 'Safe mode will disable any non %s related plugins for debugging purposes.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                    <p class="submit">
+                    <p><?php printf( __( 'Safe mode will disable any non %s related plugins for debugging purposes.', 'groundhogg' ), white_labeled_name() ); ?></p>
+					<?php
+
+					if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) ):
+
+						echo html()->e( 'a', [
+							'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'enable_safe_mode' ] ), 'enable_safe_mode' ),
+							'class' => [ 'gh-button secondary' ]
+						], __( 'Enable Safe Mode' ) );
+
+					else:
+
+						echo html()->e( 'a', [
+							'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' ),
+							'class' => [ 'gh-button primary' ]
+						], __( 'Disable Safe Mode' ) );
+
+					endif;
+
+					?>
+                </div>
+            </div>
+            <div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><?php _e( 'Install Help', 'groundhogg' ); ?></h2>
+                </div>
+                <div class="inside">
+                    <p><?php _e( 'In the event there were installation issues you can run the install process from here.', 'groundhogg' ); ?></p>
+                    <form method="get">
+						<?php html()->hidden_GET_inputs() ?>
+						<?php wp_nonce_field( 'gh_manual_install', 'manual_install_nonce' ) ?>
+                        <div class="gh-input-group">
+							<?php echo html()->dropdown( [
+								'name'        => 'manual_install',
+								'options'     => apply_filters( 'groundhogg/admin/tools/install', [] ),
+								'required'    => true,
+								'option_none' => __( 'Select plugin to run install', 'groundhogg' )
+							] );
+
+							echo html()->submit( [
+								'class' => 'gh-button primary',
+								'text'  => __( 'Run installation', 'groundhogg' )
+							] )
+							?>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
+                </div>
+                <div class="inside">
+                    <p><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
+                    <form method="get">
+						<?php html()->hidden_GET_inputs() ?>
+						<?php action_input( 'view_updates' ) ?>
+                        <div class="gh-input-group">
+							<?php echo html()->dropdown( [
+								'name'        => 'updater',
+								'required'    => true,
+								'options'     => apply_filters( 'groundhogg/admin/tools/updaters', [] ),
+								'option_none' => __( 'Select plugin to view updates', 'groundhogg' )
+							] );
+
+							echo html()->submit( [
+								'class' => 'gh-button primary',
+								'text'  => __( 'View Updates' )
+							] )
+
+							?>
+                        </div>
+                    </form>
+                </div>
+            </div>
+			<?php
+			if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) : ?>
+                <div class="gh-panel">
+                    <div class="gh-panel-header">
+                        <h2 class="hndle"><?php _e( 'Network Upgrades', 'groundhogg' ); ?></h2>
+                    </div>
+                    <div class="inside">
+                        <p><?php _e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
 						<?php
 
-						if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) ):
-
-							echo html()->e( 'a', [
-								'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'enable_safe_mode' ] ), 'enable_safe_mode' ),
-								'class' => [ 'button button-primary' ]
-							], __( 'Enable Safe Mode' ) );
-
-						else:
-
-							echo html()->e( 'a', [
-								'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' ),
-								'class' => [ 'button button-secondary' ]
-							], __( 'Disable Safe Mode' ) );
-
-						endif;
+						do_action( 'groundhogg/admin/tools/network_updates' );
 
 						?>
-                    </p>
+                    </div>
+                </div>
+			<?php endif; ?>
+            <div class="gh-panel">
+                <div class="gh-panel-header">
+                    <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
+                </div>
+                <div class="inside">
+                    <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
+                    <form method="post">
+						<?php wp_nonce_field( 'reset' ) ?>
+						<?php action_input( 'reset' ) ?>
+                        <div class="gh-input-group">
+							<?php echo html()->input( [
+								'class'       => 'input',
+								'name'        => 'reset_confirmation',
+								'placeholder' => 'reset',
+								'required'    => true,
+							] );
+
+
+							echo html()->submit( [
+								'class' => 'gh-button primary',
+								'text'  => __( '⚠️ Reset', 'groundhogg' )
+							] )
+							?>
+                        </div>
+                    </form>
+                    <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
                 </div>
             </div>
-
 			<?php do_action( 'groundhogg/admin/tools/system_status/after' ); ?>
-
         </div>
 		<?php
 	}
@@ -289,138 +396,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 		if ( groundhogg_disable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' ) );
 		}
-	}
-
-	####### SYNC TAB FUNCTIONS #########
-
-	public function sync_create_users_view() {
-
-		?>
-        <div class="tools-left">
-            <div class="gh-tools-wrap">
-                <p class="tools-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
-                <form method="post" class="gh-tools-box">
-					<?php wp_nonce_field(); ?>
-					<?php echo html()->input( [
-						'type'  => 'hidden',
-						'name'  => 'action',
-						'value' => 'bulk_sync',
-					] ); ?>
-                    <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
-                    <p>
-						<?php echo html()->checkbox( [
-							'label' => __( 'Sync all user meta.', 'groundhogg' ),
-							'value' => 1,
-							'name'  => 'sync_user_meta'
-						] ); ?>
-                    </p>
-                    <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                        <button style="width: 100%" class="button-primary" name="sync_users"
-                                value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
-                    </p>
-                </form>
-            </div>
-        </div>
-        <div class="tools-right">
-            <div class="gh-tools-wrap">
-                <p class="tools-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
-                <form method="post" class="gh-tools-box">
-					<?php wp_nonce_field(); ?>
-					<?php echo html()->input( [
-						'type'  => 'hidden',
-						'name'  => 'action',
-						'value' => 'start',
-					] );
-
-					echo html()->e( 'p', [], [
-						__( 'Select contacts to create accounts for.', 'groundhogg' ),
-						html()->tag_picker( [
-							'name' => 'tags_include[]',
-							'id'   => 'tags_include',
-						] ),
-					] );
-
-					echo html()->e( 'p', [], [
-						__( 'Exclude these contacts.', 'groundhogg' ),
-						html()->tag_picker( [
-							'name' => 'tags_exclude[]',
-							'id'   => 'tags_exclude',
-						] ),
-					] );
-
-					echo html()->e( 'p', [], [
-						__( 'Choose role.', 'groundhogg' ),
-						html()->dropdown( [
-							'name'     => 'role',
-							'id'       => 'role',
-							'options'  => Plugin::$instance->roles->get_roles_for_select(),
-							'selected' => 'subscriber',
-							'style'    => [ 'width' => '100%' ]
-						] ),
-					] );
-
-					echo html()->e( 'p', [], [
-						html()->checkbox( [
-							'label'   => __( 'Send email notification to user.', 'groundhogg' ),
-							'name'    => 'send_email_notification',
-							'value'   => '1',
-							'checked' => false,
-						] ),
-						'<br/>',
-						html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
-					] );
-
-					?>
-                    <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                        <button style="width: 100%" class="button-primary" name="start"
-                                value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
-                    </p>
-                </form>
-            </div>
-        </div>
-        <div class="wp-clearfix"></div>
-
-		<?php
-	}
-
-	/**
-	 * Sync all the users and contacts
-	 */
-	public function process_sync_create_users_bulk_sync() {
-
-		if ( ! current_user_can( 'edit_users' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		if ( get_request_var( 'sync_user_meta' ) ) {
-			set_transient( 'gh_sync_user_meta', true, HOUR_IN_SECONDS );
-		}
-
-		$this->syncer->start();
-	}
-
-	/**
-	 * Create users for contact records
-	 */
-	public function process_sync_create_users_start() {
-
-		if ( ! current_user_can( 'add_users' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		delete_transient( 'gh_create_user_job_config' );
-
-		$config = [
-			'send_email' => boolval( get_request_var( 'send_email_notification' ) ),
-			'role'       => sanitize_text_field( get_request_var( 'role', 'subscriber' ) ),
-		];
-
-		set_transient( 'gh_create_user_job_config', $config, HOUR_IN_SECONDS );
-
-		$this->create_users->start( [
-			'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
-			'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) ),
-		] );
 	}
 
 	####### IMPORT TAB FUNCTIONS #########
@@ -875,137 +850,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	####### UPDATES TAB FUNCTIONS #########
 
-	public function install_updates_view() {
-
-		?>
-        <div id="poststuff">
-            <div class="postbox">
-                <div class="postbox-header">
-                    <h2 class="hndle"><?php _e( 'Install Help', 'groundhogg' ); ?></h2>
-                </div>
-                <div class="inside">
-                    <p><?php _e( 'In the event there were installation issues you can run the install process from here.', 'groundhogg' ); ?></p>
-                    <form method="get">
-						<?php html()->hidden_GET_inputs() ?>
-						<?php wp_nonce_field( 'gh_manual_install', 'manual_install_nonce' ) ?>
-						<?php echo html()->dropdown( [
-							'name'        => 'manual_install',
-							'options'     => apply_filters( 'groundhogg/admin/tools/install', [] ),
-							'required'    => true,
-							'option_none' => __( 'Select plugin to run install', 'groundhogg' )
-						] );
-
-
-						echo html()->submit( [
-							'text' => __( 'Run installation', 'groundhogg' )
-						] )
-						?>
-                    </form>
-                </div>
-            </div>
-            <div class="postbox">
-                <div class="postbox-header">
-                    <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
-                </div>
-                <div class="inside">
-					<?php
-
-					if ( get_request_var( 'confirm' ) === 'yes' ):
-
-						?>
-                        <p><?php _e( '<b>WARNING:</b> Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
-						<?php
-
-
-						echo html()->e( 'a', [
-							'class' => 'big-button button-primary',
-							'href'  => add_query_arg( [
-								'updater'             => sanitize_text_field( get_request_var( 'updater' ) ),
-								'manual_update'       => sanitize_text_field( get_request_var( 'manual_update' ) ),
-								'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
-							], $_SERVER['REQUEST_URI'] )
-						], sprintf( __( 'Yes, perform update %s', 'groundhogg' ), sanitize_text_field( get_request_var( 'manual_update' ) ) ) );
-
-                    elseif ( get_request_var( 'action' ) === 'view_updates' ):
-
-						do_action( 'groundhogg/admin/tools/updates', get_request_var( 'updater' ) );
-
-					else:
-
-						?>
-                        <p><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
-                        <form method="get">
-							<?php html()->hidden_GET_inputs() ?>
-							<?php action_input( 'view_updates' ) ?>
-							<?php echo html()->dropdown( [
-								'name'        => 'updater',
-								'required'    => true,
-								'options'     => apply_filters( 'groundhogg/admin/tools/updaters', [] ),
-								'option_none' => __( 'Select plugin to view updates', 'groundhogg' )
-							] );
-
-							echo html()->submit( [
-								'text' => __( 'View Updates' )
-							] )
-
-							?>
-                        </form>
-					<?php
-
-					endif;
-
-					?>
-                </div>
-            </div>
-			<?php
-			if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) : ?>
-                <div class="postbox">
-                    <h2 class="hndle"><?php _e( 'Network Upgrades', 'groundhogg' ); ?></h2>
-                    <div class="inside">
-                        <p><?php _e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
-						<?php
-
-						do_action( 'groundhogg/admin/tools/network_updates' );
-
-						?>
-                    </div>
-                </div>
-			<?php endif; ?>
-            <div class="postbox">
-                <div class="postbox-header">
-                    <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
-                </div>
-                <div class="inside">
-                    <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                    <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
-                    <form method="post">
-						<?php wp_nonce_field( 'reset' ) ?>
-						<?php action_input( 'reset' ) ?>
-						<?php echo html()->input( [
-							'class'       => 'input',
-							'name'        => 'reset_confirmation',
-							'placeholder' => 'reset',
-							'required'    => true,
-						] );
-
-
-						echo html()->submit( [
-							'text' => __( '⚠️ Reset', 'groundhogg' )
-						] )
-						?>
-                    </form>
-                    <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
-                </div>
-            </div>
-
-        </div>
-		<?php
-	}
-
 	/**
 	 * Reset Groundhogg to when first installed.
 	 */
-	public function process_install_updates_reset() {
+	public function process_system_reset() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
 		} else if ( get_post_var( 'reset_confirmation' ) !== 'reset' ) {
@@ -1021,84 +869,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 		do_action( 'groundhogg/reset' );
 
 		return admin_page_url( 'gh_guided_setup' );
-	}
-
-	####### DELETE TAB FUNCTIONS #########
-
-	/**
-	 * show a deletion warning.
-	 */
-	public function delete_warning() {
-		if ( $this->get_current_tab() === 'delete' ) {
-			$this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groundhogg' ), 'warning' );
-		}
-	}
-
-	/**
-	 * Show the delete view to delete contacts
-	 */
-	public function delete_view() {
-
-		$query = get_url_var( 'query' );
-
-		if ( $query ) {
-			$count = get_db( 'contacts' )->count( $query );
-		}
-
-		?>
-        <div class="gh-tools-wrap">
-            <p class="tools-help"><?php _e( 'Delete Contacts in Bulk', 'groundhogg' ); ?></p>
-            <form method="post" class="gh-tools-box">
-				<?php wp_nonce_field(); ?>
-				<?php action_input( 'bulk_delete' ) ?>
-				<?php if ( ! $query ): ?>
-					<?php echo html()->tag_picker( [] ); ?>
-				<?php else: ?>
-					<?php html()->hidden_inputs( $query, 'query' ); ?>
-				<?php endif; ?>
-                <p>
-                    &#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b>
-                </p>
-                <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                    <button style="width: 100%" class="button-primary" name="delete_contacts"
-                            value="delete">
-						<?php if ( $query && $count ): ?>
-							<?php printf( _nx( 'Delete %s contact', 'Delete %s contacts', $count, 'action', 'groundhogg' ), $count ); ?>
-						<?php else: ?>
-							<?php _ex( 'Delete contacts', 'action', 'groundhogg' ); ?>
-						<?php endif; ?>
-                    </button>
-                </p>
-            </form>
-        </div>
-		<?php
-	}
-
-	/**
-	 * Delete all them contacts.
-	 */
-	public function process_delete_bulk_delete() {
-
-//		wp_send_json( $_POST );
-
-		if ( $query = get_post_var( 'query' ) ) {
-			$this->deleter->start( $query );
-
-			return;
-		}
-
-		$tags = get_db( 'tags' )->validate( get_post_var( 'tags' ) );
-		$this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
-	}
-
-
-	/**
-	 * Get the menu order between 1 - 99
-	 *
-	 * @return int
-	 */
-	public function get_priority() {
-		return 98;
 	}
 
 	########### ADVANCED SETUP ###########
@@ -1146,7 +916,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		return false;
 	}
-
 
 	/**
 	 * Download the gh-cron.txt file.

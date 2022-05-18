@@ -87,7 +87,7 @@ switch ( $step ):
 
 				html()->e( 'a', [
 					'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'install_gh_cron' ] ),
-					'class' => 'button button-primary'
+					'class' => 'gh-button primary'
 				], __( 'Get Started', 'groundhogg' ), false, true );
 
 				?>
@@ -104,14 +104,14 @@ switch ( $step ):
 				<p><?php _e( 'This file can be installed automatically.', 'groundhogg' ); ?></p>
 				<p>
 					<?php if ( ! gh_cron_installed() ): ?>
-						<a class="button button-primary"
+						<a class="gh-button primary"
 						   href="<?php echo esc_url( action_url( 'install_gh_cron' ) ); ?>">
 							<?php _e( 'Install Automatically!', 'groundhogg' ); ?>
 						</a>
 					<?php else: ?>
 						<span
 							style="color: green"><?php _e( "<code>gh-cron.php</code> is installed!", 'groundhogg' ); ?></span>
-						<a class="button button-secondary"
+						<a class="gh-button secondary"
 						   href="<?php echo esc_url( action_url( 'uninstall_gh_cron' ) ); ?>">
 							<?php _e( 'Uninstall', 'groundhogg' ); ?>
 						</a>
@@ -132,7 +132,7 @@ switch ( $step ):
 
 				html()->e( 'a', [
 					'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'create_external_jobs' ] ),
-					'class' => 'button button-' . ( gh_cron_installed() ? 'primary' : 'secondary' )
+					'class' => 'gh-button ' . ( gh_cron_installed() ? 'primary' : 'secondary' )
 				], __( 'Next &rarr;', 'groundhogg' ), false, true );
 
 				?>
@@ -159,7 +159,7 @@ switch ( $step ):
 
 				html()->e( 'a', [
 					'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'verify' ] ),
-					'class' => 'button button-primary'
+					'class' => 'gh-button primary'
 				], __( 'Verify setup &rarr;', 'groundhogg' ), false, true );
 
 				?>
@@ -206,7 +206,7 @@ switch ( $step ):
 					<?php if ( ! is_white_labeled() ){
 						html()->e( 'a', [
 							'href'  => admin_page_url( 'groundhogg' ),
-							'class' => 'button button-primary'
+							'class' => 'gh-button primary'
 						], __( 'Finish', 'groundhogg' ), false, true );
 					} ?>
 				<?php else: ?>
@@ -217,7 +217,7 @@ switch ( $step ):
 
 					html()->e( 'a', [
 						'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'verify' ] ),
-						'class' => 'button button-primary'
+						'class' => 'gh-button primary'
 					], __( 'Try again! &olarr;', 'groundhogg' ), false, true ); ?>
 				<?php endif; ?>
 			</div>

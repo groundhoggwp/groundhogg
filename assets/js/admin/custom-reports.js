@@ -45,28 +45,28 @@
     return utf8_to_b64(JSON.stringify(stuff))
   }
 
-  const reportTypes = {
+  const ReportTypes = {
 
     pie_chart: {
       name: __('Pie Chart', 'groundhogg'),
       settings: ({ field = '' }) => {
         // language=HTML
         return `
-			<div class="row">
-				<div class="col">
-					<label for="value">${__('Custom Field')}</label>
-					${input({
-						id: 'field',
-						value: field,
-					})}
-				</div>
-			</div>`
+            <div class="row">
+                <div class="col">
+                    <label for="value">${ __('Custom Field') }</label>
+                    ${ input({
+          id: 'field',
+          value: field,
+        }) }
+                </div>
+            </div>`
       },
 
       settingsOnMount: (filter, updateReport) => {
         metaPicker('#field').on('change', e => {
           updateReport({
-            field: e.target.value
+            field: e.target.value,
           })
         })
       },
@@ -75,16 +75,16 @@
 
         // language=HTML
         return `
-			<div class="inside">
-				<canvas class="pie-chart" data-id="${id}"></canvas>
-			</div>
+            <div class="inside">
+                <canvas class="pie-chart" data-id="${ id }"></canvas>
+            </div>
         `
       },
       onMount: ({ id, field, data }) => {
 
         let cuttoff = 11
 
-        let ctx = $(`.pie-chart[data-id=${id}]`)[0].getContext('2d')
+        let ctx = $(`.pie-chart[data-id=${ id }]`)[0].getContext('2d')
 
         let _data = data
 
@@ -101,10 +101,12 @@
         let chart = new Chart(ctx, {
           type: 'doughnut',
           data: {
-            datasets: [{
-              data: _data.map(({ count }) => count),
-              backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30)))
-            }],
+            datasets: [
+              {
+                data: _data.map(({ count }) => count),
+                backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
+              },
+            ],
             labels: _data.map(({ value }) => value),
           },
           options: {
@@ -112,43 +114,45 @@
 
               if (arr.length && arr[0]._index === cuttoff && arr[0]._view.label === __('Other')) {
 
-                let _data = data.slice( cuttoff )
+                let _data = data.slice(cuttoff)
 
                 modal({
-                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${id}"></canvas>`,
+                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${ id }"></canvas>`,
                   onOpen: () => {
 
-                    let ctx = $(`.pie-chart-large[data-id=${id}]`)[0].getContext('2d')
+                    let ctx = $(`.pie-chart-large[data-id=${ id }]`)[0].getContext('2d')
 
                     let chart = new Chart(ctx, {
                       type: 'doughnut',
                       data: {
-                        datasets: [{
-                          data: _data.map(({ count }) => count),
-                          backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30)))
-                        }],
+                        datasets: [
+                          {
+                            data: _data.map(({ count }) => count),
+                            backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
+                          },
+                        ],
                         labels: _data.map(({ value }) => value),
                       },
                       options: {
 
-                        maintainAspectRatio : false,
+                        maintainAspectRatio: false,
                         aspectRatio: 1,
                         onClick: (e, arr) => {
 
                           if (arr.length && arr[0]._view) {
                             window.open(adminPageURL('gh_contacts', {
                               meta_key: field,
-                              meta_value: arr[0]._view.label
+                              meta_value: arr[0]._view.label,
                             }), '_blank')
                           }
 
                         },
                         legend: {
-                          position: 'bottom'
-                        }
-                      }
+                          position: 'bottom',
+                        },
+                      },
                     })
-                  }
+                  },
                 })
 
                 return
@@ -157,39 +161,39 @@
               if (arr.length && arr[0]._view) {
                 window.open(adminPageURL('gh_contacts', {
                   meta_key: field,
-                  meta_value: arr[0]._view.label
+                  meta_value: arr[0]._view.label,
                 }), '_blank')
               }
 
             },
             legend: {
-              position: 'right'
-            }
-          }
+              position: 'right',
+            },
+          },
         })
 
-      }
+      },
     },
     table: {
       name: __('Table', 'groundhogg'),
       settings: ({ field = '' }) => {
         // language=HTML
         return `
-			<div class="row">
-				<div class="col">
-					<label for="value">${__('Custom Field')}</label>
-					${input({
-						id: 'field',
-						value: field,
-					})}
-				</div>
-			</div>`
+            <div class="row">
+                <div class="col">
+                    <label for="value">${ __('Custom Field') }</label>
+                    ${ input({
+          id: 'field',
+          value: field,
+        }) }
+                </div>
+            </div>`
       },
 
       settingsOnMount: (filter, updateReport) => {
         metaPicker('#field').on('change', e => {
           updateReport({
-            field: e.target.value
+            field: e.target.value,
           })
         })
       },
@@ -198,35 +202,39 @@
 
         // language=HTML
         return `
-			<table class="groundhogg-report-table">
-				<tbody>
-				</tbody>
-			</table>
-			<div class="inside">
-				<div class="display-flex flex-end gap-10 align-center">
-					<label>${__('Number of records')}</label>
-					<div class="gh-input-group">
-					</div>
-				</div>
-			</div>`
+            <table class="groundhogg-report-table">
+                <tbody>
+                </tbody>
+            </table>
+            ${ data.length > 10 ?
+          `<div class="inside">
+                <div class="display-flex flex-end gap-10 align-center">
+                    <label>${ __('Number of records') }</label>
+                    <div class="gh-input-group">
+                    </div>
+                </div>
+            </div>` : '' }`
       },
       onMount: ({ id, data, field }) => {
 
         let num = 10
 
         const setData = () => {
-          $(`#${id} tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
-          $(`#${id} .gh-input-group`).html([10, 25, 50].map(_num => `<button class="gh-button ${num === _num ? 'primary' : 'secondary'} num-records" data-num="${_num}">${_num}</button>`))
+          $(`#${ id } tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
+          $(`#${ id } .gh-input-group`).
+            html([10, 25, 50].filter(i => i < data.length).map(_num => `<button class="gh-button ${ num === _num
+              ? 'primary'
+              : 'secondary' } num-records" data-num="${ _num }">${ _num }</button>`))
 
-          $(`#${id} .num-records`).on('click', e => {
+          $(`#${ id } .num-records`).on('click', e => {
             num = parseInt(e.target.dataset.num)
             setData()
           })
 
-          $(`.number-total[data-id=${id}]`).on('click', e => {
+          $(`.number-total[data-id=${ id }]`).on('click', e => {
             window.open(adminPageURL('gh_contacts', {
               meta_key: field,
-              meta_value: e.target.dataset.value
+              meta_value: e.target.dataset.value,
             }), '_blank')
           })
         }
@@ -234,15 +242,15 @@
         const dataRow = ({ value, count }) => {
           // language=HTML
           return `
-			  <tr>
-				  <td>${value}</td>
-				  <td class="number-total" data-id="${id}" data-value="${value}">${count}</td>
-			  </tr>`
+              <tr>
+                  <td>${ value }</td>
+                  <td class="number-total" data-id="${ id }" data-value="${ value }">${ count }</td>
+              </tr>`
         }
 
         setData()
 
-      }
+      },
     },
     number: {
       name: __('Number', 'groundhogg'),
@@ -261,47 +269,47 @@
             case 'average':
               // language=HTML
               return `
-				  <div class="row">
-					  <div class="col">
-						  <label for="value">${__('Custom Field')}</label>
-						  ${input({
-							  id: 'field',
-							  value: field,
-						  })}
-					  </div>
-				  </div>`
+                  <div class="row">
+                      <div class="col">
+                          <label for="value">${ __('Custom Field') }</label>
+                          ${ input({
+                id: 'field',
+                value: field,
+              }) }
+                      </div>
+                  </div>`
           }
 
         }
 
         // language=HTML
         return `
-			<div class="row">
-				<div class="col">
-					<label for="value">${__('Report Value')}</label>
-					${select({
-						id: 'value'
-					}, {
-						contacts: __('Total number of contacts', 'groundhogg'),
-						// sum: __('Sum of a custom field', 'groundhogg'),
-						// average: __('Average of a custom field', 'groundhogg'),
-					}, value)}
-				</div>
-			</div>
-			${maybeExtra()}`
+            <div class="row">
+                <div class="col">
+                    <label for="value">${ __('Report Value') }</label>
+                    ${ select({
+          id: 'value',
+        }, {
+          contacts: __('Total number of contacts', 'groundhogg'),
+          // sum: __('Sum of a custom field', 'groundhogg'),
+          // average: __('Average of a custom field', 'groundhogg'),
+        }, value) }
+                </div>
+            </div>
+            ${ maybeExtra() }`
       },
 
       settingsOnMount: (filter, updateReport) => {
         $('#value').on('change', e => {
           updateReport({
-            value: e.target.value
+            value: e.target.value,
           }, true)
           $('#value').focus()
         })
 
         metaPicker('#field').on('change', e => {
           updateReport({
-            field: e.target.value
+            field: e.target.value,
           })
         })
       },
@@ -310,22 +318,22 @@
 
         // language=HTML
         return `
-			<div class="inside">
-				<div data-id="${id}" class="big-number display-flex center">
-					${data}
-				</div>
-			</div>`
+            <div class="inside">
+                <div data-id="${ id }" class="big-number display-flex center">
+                    ${ data }
+                </div>
+            </div>`
       },
 
       onMount: ({ id, filters }) => {
-        $(`.big-number[data-id=${id}]`).on('click', e => {
+        $(`.big-number[data-id=${ id }]`).on('click', e => {
           window.open(adminPageURL('gh_contacts', {
-            filters: base64_json_encode(filters)
+            filters: base64_json_encode(filters),
           }), '_blank')
         })
-      }
+      },
 
-    }
+    },
   }
 
   const renderReport = (report) => {
@@ -338,7 +346,7 @@
 				<button class="report-more gh-button secondary text icon" data-id="${report.id}">${icons.verticalDots}
 				</button>
 			</div>
-			${reportTypes[report.type].render(report)}
+			${ReportTypes[report.type].render(report)}
 		</div>`
   }
 
@@ -387,13 +395,13 @@
 					<label for="report-type">${__('Report Type', 'groundhogg')}</label>
 					${select({
 						id: 'report-type'
-					}, Object.keys(reportTypes).map(type => ({
+					}, Object.keys(ReportTypes).map(type => ({
 						value: type,
-						text: reportTypes[type].name
+						text: ReportTypes[type].name
 					})), report.type)}
 				</div>
 			</div>
-			${reportTypes[report.type].settings(report)}
+			${ReportTypes[report.type].settings(report)}
 			<div class="row">
 				<div class="col">
 					<label>${__('Filter Contacts', 'groundhogg')}</label>
@@ -414,6 +422,7 @@
     placeholder: 'report-placeholder',
     start: (e, ui) => {
       ui.placeholder.addClass(reports.find(r => r.id === ui.item.data('id')).type)
+      ui.placeholder.height(ui.item.height())
     },
     update: () => {
 
@@ -469,7 +478,7 @@
 
         const onMount = () => {
 
-          reportTypes[report.type].settingsOnMount(report, updateReport)
+          ReportTypes[report.type].settingsOnMount(report, updateReport)
 
           $('#name').on('change input', e => {
             updateReport({
@@ -519,7 +528,7 @@
 
   const onMount = () => {
 
-    reports.forEach(report => reportTypes[report.type].onMount(report))
+    reports.forEach(report => ReportTypes[report.type].onMount(report))
 
     $('.report-more').on('click', e => {
 

@@ -227,8 +227,8 @@ class Rewrites {
 
 			case 'files':
 
-				$short_path       = get_query_var( 'file_path' );
-				$groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
+				$short_path      = get_query_var( 'file_path' );
+				$groundhogg_path = utils()->files->get_base_uploads_dir();
 				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 
 				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
@@ -246,10 +246,8 @@ class Rewrites {
 
 					// Contact read access
 					$contact             = get_contactdata();
-					$subfolder           = basename( dirname( $file_path ) );
-					$nonce               = get_url_var( 'key' );
-					$nonce_read_access   = $nonce && wp_verify_nonce( $nonce );
-					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
+					$basename            = basename( dirname( $file_path ) );
+					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $basename && check_permissions_key( get_permissions_key(), $contact, 'download_files' );
 
 					if ( ! $admin_read_access && ! $contact_read_access ) {
 						wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
