@@ -145,13 +145,17 @@ class HTML {
 	 * @param array $cols
 	 * @param array $rows
 	 * @param bool  $footer
+     *
+     * @return string
 	 */
-	public function list_table( $args = [], $cols = [], $rows = [], $footer = true ) {
+	public function list_table( $args = [], $cols = [], $rows = [], $footer = true, $echo=true ) {
 		$args = wp_parse_args( $args, [
 			'class' => ''
 		] );
 
 		$args['class'] .= ' wp-list-table widefat fixed striped';
+
+        ob_start();
 
 		?>
         <table <?php echo array_to_atts( $args ); ?> >
@@ -184,6 +188,14 @@ class HTML {
 			<?php endif; ?>
         </table>
 		<?php
+
+        $content = ob_get_clean();
+
+        if ( $echo ){
+            echo $content;
+        }
+
+		return $content;
 	}
 
 	public function tabs( $tabs = [], $active_tab = false, $class = "nav-tab-wrapper" ) {

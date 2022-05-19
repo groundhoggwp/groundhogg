@@ -187,7 +187,7 @@ class Main_Roles extends Roles {
 				$file_path = $args[0];
 
 				// Compat for WooCommerce usage of download file
-				if ( ! is_string( $file_path ) ){
+				if ( ! is_string( $file_path ) ) {
 					return $caps;
 				}
 
@@ -219,7 +219,7 @@ class Main_Roles extends Roles {
 						}
 
 						// Trying to download files of contacts that don't belong to them
-						if ( ! $contact->owner_is( $user_id ) ){
+						if ( ! $contact->owner_is( $user_id ) ) {
 							$caps[] = 'view_others_contacts';
 						}
 
@@ -621,4 +621,34 @@ class Main_Roles extends Roles {
 	protected function get_admin_cap_check() {
 		return 'view_contacts';
 	}
+
+	public function output_cap_table() {
+
+		$admin    = get_role( 'administrator' );
+		$marketer = get_role( 'marketer' );
+		$manager  = get_role( 'sales_manager' );
+		$rep      = get_role( 'sales_rep' );
+
+
+		$caps = $this->get_all_caps();
+
+		return html()->list_table( [], [
+			'Capability',
+			translate_user_role( $admin->name ),
+			translate_user_role(  $marketer->name ),
+			translate_user_role(  $manager->name ),
+			translate_user_role(  $rep->name )
+		], array_map( function ( $cap ) use ( $admin, $marketer, $manager, $rep ) {
+			return [
+				$cap,
+				$admin->has_cap( $cap ) ? "✅" : "❌",
+				$marketer->has_cap( $cap ) ? "✅" : "❌",
+				$manager->has_cap( $cap ) ? "✅" : "❌",
+				$rep->has_cap( $cap ) ? "✅" : "❌",
+			];
+		}, $caps ), false, false );
+
+	}
+
+
 }

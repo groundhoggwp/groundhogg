@@ -200,5 +200,4 @@ abstract class Roles {
 		// There are no missing roles and the admin capo is there.
 		return empty( $missing_roles ) && get_role( 'administrator' )->has_cap( $this->get_admin_cap_check() );
 	}
-
 }

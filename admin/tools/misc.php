@@ -32,6 +32,14 @@ use function Groundhogg\html;
 					], __( 'Process', 'groundhogg' ) ) ?></p>
 			</div>
 		</div>
+        <div class="postbox tool">
+            <div class="postbox-header">
+                <h2 class="hndle"><?php _e( 'Output Cap Table', 'groundhogg' ); ?></h2>
+            </div>
+            <div class="inside">
+                <textarea readonly class="code"><?php esc_html_e( Plugin::instance()->roles->output_cap_table()  ); ?></textarea>
+            </div>
+        </div>
 		<?php do_action( 'groundhogg/tools/misc' ); ?>
 	</div>
 </div>

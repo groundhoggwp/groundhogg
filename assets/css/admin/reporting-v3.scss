@@ -79,7 +79,7 @@ body {
         font-weight: bold;
         cursor: pointer;
 
-        &:not(:last-child){
+        &:not(:last-child) {
           text-align: center;
         }
 
@@ -87,6 +87,36 @@ body {
           color: $primary-blue;
         }
       }
+    }
+
+    &.grid-rows {
+      &-2 {
+        grid-row: span 2;
+      }
+      &-3 {
+        grid-row: span 3;
+      }
+      &-4 {
+        grid-row: span 4;
+      }
+      &-5 {
+        grid-row: span 5;
+      }
+
+    }
+
+    &.grid-columns {
+
+      &-2 {
+        grid-column: span 2;
+      }
+      &-3 {
+        grid-column: span 3;
+      }
+      &-4 {
+        grid-column: span 4;
+      }
+
     }
 
     .report-more {
@@ -137,7 +167,7 @@ body {
 
     position: relative;
 
-    h1{
+    h1 {
       font-size: 42px;
       line-height: 1;
       padding: 40px 0 0 20px;
@@ -274,6 +304,7 @@ body {
 
             &.link {
               cursor: pointer;
+
               &:hover {
                 color: $primary-blue;
                 font-weight: 500;

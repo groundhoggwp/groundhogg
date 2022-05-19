@@ -7,10 +7,23 @@
     options: OptionsStore,
     funnels: FunnelsStore,
     broadcasts: BroadcastsStore,
+    emails: EmailsStore,
   } = Groundhogg.stores
   const { loadingModal, icons, modal, input, select, tooltip, adminPageURL } = Groundhogg.element
 
   const { __ } = wp.i18n
+
+  function utf8_to_b64 (str) {
+    return window.btoa(unescape(encodeURIComponent(str)))
+  }
+
+  function b64_to_utf8 (str) {
+    return decodeURIComponent(escape(window.atob(str)))
+  }
+
+  const base64_json_encode = (stuff) => {
+    return utf8_to_b64(JSON.stringify(stuff))
+  }
 
   function isValidHostname (value) {
     if (typeof value !== 'string') {
@@ -67,7 +80,9 @@
 
     // language=HTML
     return `
-        <div id="${ report.id }" class="gh-panel report ${ report.type }" data-id="${ report.id }">
+        <div id="${ report.id }" class="gh-panel report ${ report.type } ${ report.rows
+                ? `grid-rows-${ report.rows }`
+                : '' } ${ report.columns ? `grid-columns-${ report.columns }` : '' }" data-id="${ report.id }">
             <div class="gh-panel-header">
                 <h2>${ report.name }
                     ${ report.description ? `<span class="dashicons dashicons-info-outline"></span>` : '' }
@@ -184,6 +199,7 @@
 
         if (state && state.page) {
           this.currentPage = state.page
+          this.params = this.currentPage.split('/')
           this.mount()
         }
       })
@@ -462,8 +478,35 @@
     },
 
     bar_chart: {
-      render: () => {},
-      onMount: () => {},
+      render: ({ id }) => {
+        // language=HTML
+        return `
+            <div class="inside">
+                <canvas class="bar-chart" data-id="${ id }"></canvas>
+            </div>`
+      },
+      onMount: ({ id, data }) => {
+
+        let ctx = $(`.bar-chart[data-id=${ id }]`)[0].getContext('2d')
+
+        let chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.map(({ name }) => name),
+            datasets: [
+              {
+                backgroundColor: 'rgb(245, 129, 21)',
+                data: data.map(({ complete }) => complete),
+              },
+            ],
+          },
+          options: {
+            legend: {
+              display: false,
+            },
+          },
+        })
+      },
     },
 
     pie_chart: {
@@ -558,10 +601,6 @@
             num = parseInt(e.target.dataset.num)
             setData()
           })
-
-          $(`.number-total[data-id=${ id }]`).on('click', e => {
-
-          })
         }
 
         setData()
@@ -571,20 +610,52 @@
   }
 
   const CommonReports = {
+
+    forms: {
+      name: __('Forms'),
+      type: 'table',
+      headers: [
+        __('ID'),
+        __('Name'),
+        __('Impressions'),
+        __('Submissions'),
+        __('Conversion Rate'),
+      ],
+      renderRow: ({ id, name, impressions, submissions }) => {
+        // language=HTML
+        return `
+            <tr>
+                <td>${ id }.</td>
+                <td class="large">${ name }</td>
+                <td class="number-total">${ impressions }</td>
+                <td class="number-total">${ submissions }</td>
+                <td class="number-total">${ Math.floor(submissions / Math.max(impressions, 1)) * 100 }%</td>
+            </tr>`
+      },
+    },
     funnel_performance: {
       id: 'table_funnel_performance',
       name: __('Funnel Performance'),
       type: 'table',
       headers: [
         __('Name'),
+        __('Active Contacts'),
         __('Conversion Rate'),
       ],
-      renderRow: ({ id, title, conversion }) => {
-        return `<tr><td class="link" data-funnel="${ id }">${ title }</td><td class="number-total">${ conversion }%</td></tr>`
+      renderRow: ({ id, title, active, conversion, query }) => {
+        //language=HTML
+        return `
+            <tr>
+                <td class="link large" data-funnel="${ id }">${ title }</td>
+                <td class="number-total contacts" data-query="${ query }">${ active }</td>
+                <td class="number-total">${ conversion }%</td>
+            </tr>`
       },
       onMount: ({ id, title }, setPage) => {
         $(`#${ id }`).on('click', '.link', e => {
           setPage(`funnels/${ e.target.dataset.funnel }`)
+        }).on('click', '.contacts', e => {
+          showContacts( e.target.dataset.query )
         })
       },
     },
@@ -617,26 +688,36 @@
 
   }
 
+  const onMountHasQuery = ({id, data}) => {
+    $(`#${ id }`).on('click', '.big-number', e => {
+      showContacts( data.query )
+    })
+  }
+
   registerReportPage('overview', __('Overview', 'groundhogg'), [
     {
       id: 'total_new_contacts',
       name: __('New Contacts'),
       type: 'number',
+      onMount: onMountHasQuery
     },
     {
       id: 'total_confirmed_contacts',
       name: __('Confirmed Contacts'),
       type: 'number',
+      onMount: onMountHasQuery
     },
     {
       id: 'total_engaged_contacts',
       name: __('Engaged Contacts'),
       type: 'number',
+      onMount: onMountHasQuery
     },
     {
       id: 'total_unsubscribed_contacts',
       name: __('Unsubscribed Contacts'),
       type: 'bad_number',
+      onMount: onMountHasQuery
     },
     {
       id: 'total_emails_sent',
@@ -662,22 +743,34 @@
       id: 'table_contacts_by_lead_source',
       name: __('Top Lead Sources'),
       type: 'table',
-      renderRow: ({ value, count }) => {
+      renderRow: ({ value, count, query }) => {
 
-        if (isValidHostname(value)) {
-          try {
-            let url = new URL(`https://${ value }`)
-            return `<tr><td class="link" data-link="${ url }">${ url.hostname }</td><td class="number-total" data-value="${ value }">${ count }</td></tr>`
+        const leadSource = () => {
+          if (isValidHostname(value)) {
+            try {
+              let url = new URL(`https://${ value }`)
+              return `<td class="link" data-link="${ url }">${ url.hostname }</td>`
+            }
+            catch (e) {
+            }
           }
-          catch (e) {}
+
+          return ` <td>${ value }</td>`
         }
 
-        return `<tr><td>${ value }</td><td class="number-total" data-value="${ value }">${ count }</td></tr>`
+        // language=HTML
+        return `
+            <tr>
+                ${leadSource()}
+                <td class="number-total contacts" data-value="${ value }" data-query="${query}">${ count }</td>
+            </tr>`
 
       },
       onMount: ({ id }) => {
         $(`#${ id }`).on('click', '.link', e => {
           window.open(e.currentTarget.dataset.link, '_blank')
+        }).on('click', '.contacts', e => {
+          showContacts( e.target.dataset.query )
         })
       },
     },
@@ -703,7 +796,7 @@
     CommonReports.broadcast_performance,
   ])
 
-  registerReportPage(/funnels\/email\/[0-9]+/, 'Email', [
+  registerReportPage(/funnels\/[0-9]+\/email\/[0-9]+/, 'Email', [
     {
       id: 'emails_sent',
       name: __('Sent'),
@@ -731,29 +824,83 @@
     },
   ], 'funnels', {
     priority: 1,
-    preload: ([route, id]) => {
-      return FunnelsStore.fetchItem(id)
+    preload: ([a, funnelId, b, emailId]) => {
+      return EmailsStore.fetchItem(emailId)
     },
-    beforeReports: ([route, id]) => {
-      return `<h1>${ FunnelsStore.get(id).data.title }</h1>`
+    beforeReports: ([route, funnelId, route1, emailId]) => {
+      return `<h1>${ EmailsStore.get(emailId).data.title }</h1>`
     },
   })
 
   registerReportPage(/funnels\/[0-9]+/, 'Funnel', [
     {
-      id: 'active_contacts_in_funnels',
+      id: 'active_contacts_in_funnel',
       name: __('Active Contacts'),
       type: 'number',
     },
     {
-      id: 'funnel_conversion_rate',
+      id: 'total_funnel_conversion_rate',
       name: __('Conversion Rate'),
       type: 'percentage',
+    },
+    {
+      id: 'chart_funnel_breakdown',
+      name: __('Progress'),
+      type: 'bar_chart',
+      columns: 2,
+      rows: 3,
+    },
+    {
+      id: 'funnel_emails_sent',
+      name: __('Emails Sent'),
+      type: 'number',
+    },
+    {
+      id: 'funnel_open_rate',
+      name: __('Open Rate'),
+      type: 'percentage',
+    },
+    {
+      id: 'funnel_click_rate',
+      name: __('Click Thru Rate'),
+      type: 'percentage',
+    },
+    {
+      id: 'funnel_unsubscribes',
+      name: __('Unsubscribes'),
+      type: 'bad_number',
+    },
+    {
+      id: 'funnel_email_performance',
+      name: __('Email Performance'),
+      type: 'table',
+      headers: [
+        __('Name'),
+        __('Sent'),
+        __('Open Rate'),
+        __('CTR'),
+      ],
+      renderRow: ({ sent, opened, clicked, title, id }) => {
+        // language=html
+        return `
+            <tr>
+                <td class="link large" data-email="${ id }">${ title }</td>
+                <td class="number-total">${ sent }</td>
+                <td class="number-total">${ Math.floor(( opened / Math.max(sent, 1) ) * 100) }%</td>
+                <td class="number-total">${ Math.floor(( clicked / Math.max(opened, 1) ) * 100) }%</td>
+            </tr>`
+      },
+      onMount: ({ id }, setPage) => {
+        $(`#${ id }`).on('click', '.link', e => {
+          setPage(`funnels/${ Dashboard.params[1] }/email/${ e.target.dataset.email }`)
+        })
+      },
     },
     {
       id: 'table_funnel_stats',
       name: __('Steps'),
       type: 'table',
+      rows: 5,
       headers: [
         '',
         __('Name'),
@@ -765,7 +912,7 @@
         return `
             <tr>
                 <td class="step ${ group }">${ StepTypes.getType(type).svg }</td>
-                <td class="link" data-funnel="${ funnel }" data-step="${ id }">${ name }</td>
+                <td class="link large" data-funnel="${ funnel }" data-step="${ id }">${ name }</td>
                 <td class="number-total">${ waiting }</td>
                 <td class="number-total">${ complete }</td>
             </tr>`
@@ -778,6 +925,12 @@
           }, e.currentTarget.dataset.step), '_blank')
         })
       },
+    },
+    {
+      id: 'funnel_forms',
+      name: __('Forms'),
+      ...CommonReports.forms,
+      columns: 4,
     },
   ], 'funnels', {
     priority: 1,
@@ -833,37 +986,8 @@
   registerReportPage('contacts', 'Contacts', [])
   registerReportPage('funnels', 'Funnels', [
     {
-      id: 'active_contacts_in_all_funnels',
-      name: __('Active Contacts in All Funnels'),
-      type: 'number',
-    },
-    {
-      id: 'funnel_emails_sent',
-      name: __('Funnel Emails Sent'),
-      type: 'number',
-    },
-    {
-      id: 'funnel_emails_opened',
-      name: __('Open Rate'),
-      type: 'number',
-    },
-    {
-      id: 'funnel_emails_clicked',
-      name: __('Click Thru Rate'),
-      type: 'number',
-    },
-    CommonReports.funnel_performance,
-    {
-      id: 'funnel_most_activity',
-      name: __('Most Active Contacts'),
-      type: 'table',
-      headers: [
-        __('Name'),
-        __('Contacts'),
-      ],
-      renderRow: ({ id, title, conversion }) => {
-        return `<tr><td class="link" data-funnel="${ id }">${ title }</td><td class="number-total">${ conversion }%</td></tr>`
-      },
+      ...CommonReports.funnel_performance,
+      columns: 4,
     },
   ])
   registerReportPage('broadcasts', __('Broadcasts', 'groundhogg'), [
@@ -892,26 +1016,9 @@
   registerReportPage('forms', __('Forms', 'groundhogg'), [
     {
       id: 'table_form_activity',
-      name: __('Forms'),
-      type: 'table',
-      headers: [
-        __('ID'),
-        __('Name'),
-        __('Impressions'),
-        __('Submissions'),
-        __('Conversion Rate'),
-      ],
-      renderRow: ({ id, name, impressions, submissions }) => {
-        // language=HTML
-        return `
-            <tr>
-                <td>${ id }.</td>
-                <td class="large">${ name }</td>
-                <td class="number-total">${ impressions }</td>
-                <td class="number-total">${ submissions }</td>
-                <td class="number-total">${ Math.floor(submissions / Math.max(impressions, 1)) * 100 }%</td>
-            </tr>`
-      },
+      columns: 3,
+      rows: 3,
+      ...CommonReports.forms,
     },
     {
       id: 'all_form_submissions',
@@ -930,7 +1037,13 @@
     },
   })
 
-  registerReportPage('custom', __('Custom'), [], true, {
+  const showContacts = ( query ) => {
+    window.open(adminPageURL('gh_contacts', {
+      filters: query,
+    }), '_blank')
+  }
+
+  registerReportPage('custom', __('Custom'), [], false, {
     onMount: () => {
       Groundhogg.loadCustomReportsPage()
     },

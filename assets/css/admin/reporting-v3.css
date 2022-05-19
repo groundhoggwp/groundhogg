@@ -49,6 +49,27 @@ body #wpcontent {
 .report-grid .report.table td.number-total:hover, .report-grid .report.pie_chart td.number-total:hover {
   color: #0075ff;
 }
+.report-grid .report.grid-rows-2 {
+  grid-row: span 2;
+}
+.report-grid .report.grid-rows-3 {
+  grid-row: span 3;
+}
+.report-grid .report.grid-rows-4 {
+  grid-row: span 4;
+}
+.report-grid .report.grid-rows-5 {
+  grid-row: span 5;
+}
+.report-grid .report.grid-columns-2 {
+  grid-column: span 2;
+}
+.report-grid .report.grid-columns-3 {
+  grid-column: span 3;
+}
+.report-grid .report.grid-columns-4 {
+  grid-column: span 4;
+}
 .report-grid .report .report-more {
   visibility: hidden;
 }
