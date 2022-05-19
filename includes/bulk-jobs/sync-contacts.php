@@ -2,8 +2,11 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
+use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_encode;
 use function Groundhogg\create_contact_from_user;
 use Groundhogg\Plugin;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,7 +65,7 @@ class Sync_Contacts extends Bulk_Job {
 			return;
 		}
 
-		create_contact_from_user( absint( $item ), get_transient( 'gh_sync_user_meta' ) );
+		create_contact_from_user( absint( $item ), is_option_enabled( 'gh_sync_user_meta' ) );
 	}
 
 	/**
@@ -79,7 +82,6 @@ class Sync_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function post_loop() {
-		delete_transient( 'gh_sync_user_meta' );
 	}
 
 	/**
@@ -97,6 +99,8 @@ class Sync_Contacts extends Bulk_Job {
 	 * @return string
 	 */
 	protected function get_return_url() {
-		return admin_url( 'admin.php?page=gh_contacts' );
+		return admin_page_url( 'gh_contacts', [
+			'filters' => base64_json_encode( [[['type' => 'is_user']]])
+		] );
 	}
 }

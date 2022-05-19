@@ -343,11 +343,15 @@ a.danger:hover {
 }
 
 .gh-tools-box {
-  background: #fff;
-  border: 1px solid #ccd0d4;
   padding: 30px;
   margin: 30px auto;
   max-width: 380px;
+
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  /*margin: 20px;*/
+  border-radius: 5px;
+  border: none;
 }
 
 .tools-left {

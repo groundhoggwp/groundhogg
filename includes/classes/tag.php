@@ -80,4 +80,11 @@ class Tag extends Base_Object {
 
 		return $contact_ids;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->get_name();
+	}
 }

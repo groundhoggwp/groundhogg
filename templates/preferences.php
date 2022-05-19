@@ -49,62 +49,103 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 
 		$contact = get_contactdata( $contact_id );
 
-		$message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.", 'groundhogg' );
-		$message .= "\r\n";
+		ob_start();
 
-		$contact_data = apply_filters( 'groundhogg/preferences/contact_data', $contact->get_as_array() );
+		do_action( 'groundhogg/preferences/gdpr_audit_message/before', $contact );
 
-		// Basic Information
-		$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Basic Information', 'groundhogg' ) );
+		?>
+        <p><?php _e( 'You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.', 'groundhogg' ) ?></p>
+        <h3><?php _e( 'Basic Information', 'groundhogg' ) ?></h3>
+		<?php
 
-		foreach ( $contact_data['data'] as $key => $contact_datum ) {
-			$message .= sprintf( "%s: %s\n", key_to_words( $key ), $contact_datum );
-		}
+		html()->list_table( [
+			'style' => [
+				'border-spacing' => '10px'
+			]
+		], [], [
+			[ __( 'Name' ), $contact->get_full_name() ],
+			[ __( 'Email' ), $contact->get_email() ],
+			[ __( 'Phone' ), $contact->get_phone_number() ],
+			[ __( 'Mobile' ), $contact->get_mobile_number() ],
+			[ __( 'Address' ), implode( ', ', $contact->get_address() ) ],
+			[ __( 'IP Address' ), $contact->get_ip_address() ],
+			[ __( 'Subscribed' ), date_i18n( get_date_time_format(), date_as_int( $contact->get_date_created() ) ) ],
+			[ __( 'Tags' ), implode( ', ', $contact->get_tags( true ) ) ],
+		] );
 
-		// Custom Information
-		if ( isset_not_empty( $contact_data, 'meta' ) ) {
-			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Other Information', 'groundhogg' ) );
-			foreach ( $contact_data['meta'] as $key => $contact_datum ) {
-				$message .= sprintf( "%s: %s\n", key_to_words( $key ), $contact_datum );
+		do_action( 'groundhogg/preferences/gdpr_audit_message/after_basic', $contact );
+
+		?>
+        <h3><?php _e( 'Other Information', 'groundhogg' ) ?></h3>
+		<?php
+
+		$properties = Properties::instance()->get_fields();
+
+		html()->list_table( [
+			'style' => [
+				'border-spacing' => '10px'
+			]
+		], [], array_map( function ( $p ) use ( $contact ) {
+
+			return [
+				$p['label'],
+				display_custom_field( $p['name'], $contact, false )
+			];
+
+		}, $properties ) );
+
+		do_action( 'groundhogg/preferences/gdpr_audit_message/after_other', $contact );
+
+		$files = $contact->get_files();
+
+		if ( ! empty( $files ) ):
+
+			?>
+            <h3><?php _e( 'Files', 'groundhogg' ) ?></h3>
+            <ul>
+			<?php
+
+			foreach ( $files as $i => $file ) {
+				printf( '<li><a href="%s">%s</a></li>', esc_url( permissions_key_url( $file['url'], $contact, 'download_files' ) . '&identity=' . encrypt( $contact->get_email() ) ), esc_html( $file['name'] ) );
 			}
+
+			?></ul><?php
+
+		endif;
+
+		$contact_methods = [
+			html()->e( 'a', [ 'href' => 'mailto: ' . get_default_from_email() ], get_default_from_email() ),
+		];
+
+		$phone = get_option( 'gh_business_phone' );
+
+		if ( $phone ) {
+			$contact_methods[] = html()->e( 'a', [ 'href' => 'tel: ' . $phone ], $phone );
 		}
 
-		// Custom Information
-		if ( isset_not_empty( $contact_data, 'tags' ) ) {
-			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Profile Tags', 'groundhogg' ) );
+		?>
+        <p style="margin-top: 30px"><?php echo get_option( 'gh_business_name' ) ?></p>
+        <p><?php echo implode( ' | ', $contact_methods ) ?></p>
+        <p>
+            <i><?php _e( 'This information is provided without any guarantee of being accurate, and is exhaustive to the best of our knowledge, with the exception of potentially sensitive information.', 'groundhogg' ) ?></i>
+        </p>
+        <p>
+            <i><?php _e( 'If there is information that you wish to obtain that is not included in this audit, please contact us.', 'groundhogg' ) ?></i>
+        </p>
+		<?php
 
-			$tag_names = [];
+		$message = ob_get_clean();
 
-			foreach ( $contact->get_tag_ids() as $tag_id ) {
-				$tag_names[] = Plugin::$instance->dbs->get_db( 'tags' )->get_column_by( 'tag_name', 'tag_id', $tag_id );
-			}
-
-			$message .= sprintf( "%s\n", implode( ', ', $tag_names ) );
-		}
-
-		// Files
-		if ( isset_not_empty( $contact_data, 'files' ) ) {
-			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Files', 'groundhogg' ) );
-
-			foreach ( $contact_data['files'] as $file_data ) {
-				$message .= sprintf( "%s: %s\n", $file_data['file_name'], $file_data['file_url'] );
-			}
-		}
-
-		$subject_line = sprintf( __( '[%s] Your personal profile audit', 'groundhogg' ), get_bloginfo( 'title' ) );
-
-		/**
-		 * Filters the GDPR audit subject line
-		 */
-		$subject_line = apply_filters( 'groundhogg/preferences/gdpr_audit_subject_line', $subject_line );
-
-		/**
-		 * Filters the message
-		 */
+		// Filters the message
 		$message = apply_filters( 'groundhogg/preferences/gdpr_audit_message', $message );
 
+		$subject_line = sprintf( __( '[%s] Your personal profile audit', 'groundhogg' ), get_option( 'gh_business_name' ) );
+
+		// Filters the GDPR audit subject line
+		$subject_line = apply_filters( 'groundhogg/preferences/gdpr_audit_subject_line', $subject_line );
+
 		return \Groundhogg_Email_Services::send_transactional( $contact->get_email(), wp_specialchars_decode( $subject_line ), $message, [
-			'Content-Type: text/plain'
+			'Content-Type: text/html'
 		] );
 	}
 }
@@ -150,16 +191,26 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		$subject = apply_filters( 'groundhogg/preferences/send_preferences_link_subject_line', $subject, $contact );
 
 		/**
-		 * Filters the emssage
+		 * Filters the message
 		 */
 		$message = apply_filters( 'groundhogg/preferences/send_preferences_link_message', $message, $contact );
 
-		return \Groundhogg_Email_Services::send_transactional( $contact->get_email(), wp_specialchars_decode( $subject ), $message, [
-			'Content-Type: text/plain'
-		] );
+		add_action( 'phpmailer_init', function ( $mailer ) use ( $message ) {
+			// set AltBody
+			$mailer->AltBody = $message;
+		} );
+
+		return \Groundhogg_Email_Services::send_transactional(
+			$contact->get_email(),
+			wp_specialchars_decode( $subject ),
+			make_clickable( wpautop( $message ) ),
+			[
+				'Content-Type: text/html'
+			] );
 	}
 }
 
+$contact         = get_contactdata();
 $permissions_key = get_permissions_key();
 
 if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
@@ -172,8 +223,7 @@ if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
 	}
 }
 
-$contact = get_contactdata();
-$action  = get_query_var( 'action', 'profile' );
+$action = get_query_var( 'action', 'profile' );
 
 if ( ! is_ignore_user_tracking_precedence_enabled() ) {
 	// If the user takes precedence of the tracking cookie
@@ -438,6 +488,11 @@ switch ( $action ):
 
 		$preferences = apply_filters( 'manage_email_preferences_options', $preferences );
 
+		$params = [
+			'pk'       => $permissions_key,
+			'identity' => get_url_var( 'identity' ),
+		];
+
 		do_action( 'groundhogg/preferences/manage/form/before' );
 
 		?>
@@ -448,8 +503,14 @@ switch ( $action ):
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
 			<?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
             <div class="preference-options">
-				<?php foreach ( $preferences as $preference => $text ): ?>
-                    <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=' . $preference, 'manage_email_preferences' ); ?>"
+				<?php foreach ( $preferences as $preference => $text ):
+
+					$url = add_query_arg( wp_parse_args( [
+						'preference' => $preference
+					], $params ), managed_page_url( 'preferences/manage/' ) )
+
+					?>
+                    <a href="<?php echo wp_nonce_url( $url, 'manage_email_preferences' ); ?>"
                        class="preference-<?php esc_attr_e( $preference ); ?>"
                     ><?php echo $text; ?></a>
 				<?php endforeach; ?>

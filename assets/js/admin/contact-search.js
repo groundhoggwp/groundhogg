@@ -762,12 +762,14 @@
                   deleted += items.length
                   onDelete()
 
-                  if (items.length === 0) {
+                  if (items.length === 0 || deleted === totalContacts) {
                     onComplete()
                     return
                   }
 
                   deleteContacts(onDelete, onComplete)
+                }).catch(() => {
+                  onComplete()
                 })
               }
 

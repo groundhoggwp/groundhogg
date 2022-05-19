@@ -1304,7 +1304,7 @@ class Replacements implements \JsonSerializable {
 		$html = '';
 
 		foreach ( $files as $i => $file ) {
-			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file['url'] ), esc_html( $file['name'] ) );
+			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) ), esc_html( $file['name'] ) );
 		}
 
 		return sprintf( '<ul>%s</ul>', $html );
