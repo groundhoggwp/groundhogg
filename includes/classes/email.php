@@ -418,11 +418,6 @@ class Email extends Base_Object_With_Meta {
 		$content = Dynamic_Block_Handler::instance()->replace_content( $this->get_content(), $this->get_blocks() );
 		$content = do_replacements( $content, $this->get_contact() );
 
-		// Autop non blocked emails.
-		if ( strpos( $content, 'data-block' ) === false && apply_filters( 'groundhogg/email/should_autop', true ) ) {
-			$content = wpautop( $content );
-		}
-
 		/* filter out double http based on bug where links have http:// prepended */
 		$schema  = is_ssl() ? 'https://' : 'http://';
 		$content = str_replace( 'http://https://', $schema, $content );

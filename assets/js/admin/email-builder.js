@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const {
     el, objectToStyle, icons, inputWithReplacements, uuid, tinymceElement,
@@ -46,15 +46,13 @@
     'Verdana, Geneva, sans-serif': 'Verdana',
   }
 
-  let MAX_EMAIL_WITH = 600
-
   const createBlock = (type, props = {}) => {
 
     return {
       id: uuid(),
       type,
       ...copyObject(BlockRegistry.blocks[type].defaults),
-      ...props
+      ...props,
     }
   }
 
@@ -65,8 +63,9 @@
     emailControlsOnMount,
     scrollDepth,
     onScroll,
-    onMount
-  }) => ({
+    template,
+    onMount,
+  }) => ( {
 
     $el: $(el),
     email,
@@ -74,9 +73,11 @@
     init () {
 
       $('head').append(`<style id="builder-style" type="text/css"></style>`)
-      this.blocks = email.meta.blocks ? email.meta.blocks : [createBlock('text', {
-        content: email.data.content
-      })]
+      this.blocks = email.meta.blocks ? email.meta.blocks : [
+        createBlock('text', {
+          content: email.data.content,
+        }),
+      ]
       this.scrollDepth = scrollDepth
       this.render()
     },
@@ -91,65 +92,153 @@
 
       blockControls: (block) => {
 
+        const { design = {} } = block
+        const {
+          padding = {},
+          margin = {},
+          borderStyle = 'none',
+          borderWidth = {},
+          borderRadius = {},
+        } = design
+
+        const boxInputGroup = ({
+          values = {},
+          prefix,
+        }) => {
+          // language=HTML
+          return `
+              <div class="gh-input-group">
+                  ${ input({
+                      type: 'number',
+                      name: 'top',
+                      value: values.top,
+                      attr: prefix,
+                      className: `${ prefix } design-attr full-width`,
+                  }) }
+                  ${ input({
+                      type: 'number',
+                      name: 'right',
+                      value: values.right,
+                      attr: prefix,
+                      className: `${ prefix } design-attr full-width`,
+                  }) }
+                  ${ input({
+                      type: 'number',
+                      name: 'bottom',
+                      value: values.bottom,
+                      attr: prefix,
+                      className: `${ prefix } design-attr full-width`,
+                  }) }
+                  ${ input({
+                      type: 'number',
+                      name: 'left',
+                      value: values.left,
+                      attr: prefix,
+                      className: `${ prefix } design-attr full-width`,
+                  }) }
+              </div>`
+        }
+
+        const designControls = () => {
+          //language=HTML
+          return `
+                  <div class="control">
+                      <label>${ __('Padding') }</label>
+                      ${ boxInputGroup({ prefix: 'padding', values: padding }) }
+                  </div>
+                  <div class="control">
+                      <label>${ __('Margin') }</label>
+                      ${ boxInputGroup({ prefix: 'margin', values: margin }) }
+                  </div>
+                  <hr>
+                  <div class="control space-between">
+                      <label>${ __('Border Style') }</label>
+                      ${ select({
+                          id: 'border-style',
+                      }, {
+                          none: __('None'),
+                          solid: __('Solid'),
+                          dashed: __('Dashed'),
+                          dotted: __('Dotted'),
+                      }) }
+                  </div>
+                  <div class="control">
+                      <label>${ __('Border Width') }</label>
+                      ${ boxInputGroup({ prefix: 'border-width', values: borderWidth }) }
+                  </div>
+                  <div class="control">
+                      <label>${ __('Border Radius') }</label>
+                      ${ boxInputGroup({ prefix: 'border-radius', values: borderRadius }) }
+                  </div>
+          `
+        }
+
         //language=HTML
         return `
-			<div class="block-controls">
-				<h3>${BlockRegistry.get(block.type).name}</h3>
-				${BlockRegistry.controls(block)}
-			</div>`
+            <div class="block-controls">
+                <h3>${ BlockRegistry.get(block.type).name }</h3>
+                ${ BlockRegistry.controls(block) }
+                ${ controlGroup({
+                    name: 'Design',
+                    //language=HTML
+                    controls: designControls()
+                }) }
+            </div>`
       },
 
       block: ({ type, name, svg }) => {
         // language=HTML
         return `
-			<div class="block-wrap">
-				<div class="block new-block gh-panel" data-type="${type}">
-					<div class="icon">
-						${svg}
-					</div>
-				</div>
-				<div class="block-name">${name}</div>
-			</div>
+            <div class="block-wrap">
+                <div class="block new-block gh-panel" data-type="${ type }">
+                    <div class="icon">
+                        ${ svg }
+                    </div>
+                </div>
+                <div class="block-name">${ name }</div>
+            </div>
         `
       },
 
       editor: () => {
         // language=HTML
         return `
-			<div id="email-block-editor">
-				<!-- BLOCKS -->
-				<div id="blocks-panel"></div>
-				<!-- CONTENT -->
-				<div id="content" class="gh-panel">
-					<div class="inside">
-						<div class="inline-label">
-							<label for="subject">${__('Subject:', 'groundhogg')}</label>
-							${inputWithReplacements({
-								id: 'subject',
-								name: 'subject',
-								placeholder: 'Subject line...',
-								value: email.data.subject || '',
-							})}
-						</div>
-						<div class="inline-label">
-							<label for="preview-text">${__('Preview:', 'groundhogg')}</label>
-							${inputWithReplacements({
-								id: 'preview-text',
-								name: 'pre_header',
-								placeholder: 'Preview text...',
-								value: email.data.pre_header || '',
-							})}
-						</div>
-					</div>
-					<div id="builder-content-wrap">
-						<div id="builder-content"
-						     class="inside sortable-blocks ${email.meta.alignment === 'center' ? 'center' : ''}"></div>
-					</div>
-				</div>
-				<!-- CONTROLS -->
-				<div id="controls-panel"></div>
-			</div>`
-      }
+            <div id="email-block-editor">
+                <!-- BLOCKS -->
+                <div id="blocks-panel"></div>
+                <!-- CONTENT -->
+                <div id="content" class="gh-panel">
+                    <div class="inside">
+                        <div class="inline-label">
+                            <label for="subject">${ __('Subject:', 'groundhogg') }</label>
+                            ${ inputWithReplacements({
+                                id: 'subject',
+                                name: 'subject',
+                                placeholder: 'Subject line...',
+                                value: email.data.subject || '',
+                            }) }
+                        </div>
+                        <div class="inline-label">
+                            <label for="preview-text">${ __('Preview:', 'groundhogg') }</label>
+                            ${ inputWithReplacements({
+                                id: 'preview-text',
+                                name: 'pre_header',
+                                placeholder: 'Preview text...',
+                                value: email.data.pre_header || '',
+                            }) }
+                        </div>
+                    </div>
+                    <div id="builder-content-wrap">
+                        ${ template({
+                            settings: email.meta,
+                            content: `<div id="builder-content" class="sortable-blocks"></div>`,
+                        }) }
+                    </div>
+                </div>
+                <!-- CONTROLS -->
+                <div id="controls-panel"></div>
+            </div>`
+      },
     },
 
     render () {
@@ -224,7 +313,7 @@
         onChange({
           css: renderBlocksCSS(this.blocks),
           html: renderBlocks(this.blocks, false),
-          blocks: this.blocks
+          blocks: this.blocks,
         })
 
       }
@@ -264,7 +353,7 @@
 
         block = {
           ...block,
-          ...props
+          ...props,
         }
 
         this.blocks = __updateBlocks(this.blocks, block)
@@ -282,7 +371,7 @@
       const updateBlock = (props, reRenderBlocks = true, reRenderEditor = false) => {
         this.editingBlock = {
           ...this.editingBlock,
-          ...props
+          ...props,
         }
 
         this.blocks = __updateBlocks(this.blocks, this.editingBlock)
@@ -394,7 +483,7 @@
 
         return {
           ...block,
-          id: uuid()
+          id: uuid(),
         }
 
       }
@@ -498,7 +587,8 @@
        * Get a block from the main structure given and ID
        *
        * @param id
-       * @return {(*&{id: *, type: string}) | (*&{id: *, type: string}) | (*&{id: *, type: string}) | (*&{id: *, type: string})}
+       * @return {(*&{id: *, type: string}) | (*&{id: *, type: string}) | (*&{id: *, type: string}) | (*&{id: *, type:
+       *   string})}
        */
       const getBlock = (id) => {
         return __findBlock(id, this.blocks)
@@ -520,9 +610,9 @@
           let block = getBlock(blockId, columnBlockId, column)
 
           return `
-			<div class="block gh-panel" data-id="${blockId}">
+			<div class="block gh-panel" data-id="${ blockId }">
 				<div class="icon">
-					${BlockRegistry.blocks[block.type].svg}
+					${ BlockRegistry.blocks[block.type].svg }
 				</div>
 			</div>`
         }
@@ -549,7 +639,7 @@
           },
           cursorAt: {
             left: 70,
-            top: 5
+            top: 5,
           },
           receive: (e, ui) => {
 
@@ -595,7 +685,8 @@
             return
           }
 
-          if (clickedIn(e, 'td.column .builder-block') && $(e.currentTarget).data('type') === 'columns') {
+          if (clickedIn(e, '.email-columns-cell .column .builder-block') && $(e.currentTarget).data('type') ===
+            'columns') {
             return
           }
 
@@ -608,11 +699,13 @@
         })
 
         if (this.editingBlock) {
+
           BlockRegistry.blocks[this.editingBlock.type].editOnMount({
             ...this.editingBlock,
             updateBlock,
-            curBlock
+            curBlock,
           })
+
         }
       }
 
@@ -623,7 +716,7 @@
         revertDuration: 0,
         start: (e, ui) => {
           ui.helper.addClass('dragging')
-        }
+        },
       })
 
       renderBlockEditorBlocks()
@@ -643,16 +736,33 @@
         BlockRegistry.controlsOnMount({
           ...this.editingBlock,
           updateBlock,
-          curBlock
+          curBlock,
         })
-      } else {
+
+        $('input.design-attr').on('change input', e => {
+
+          let attribute = e.target.dataset.attr
+
+          updateBlock({
+            design: {
+              ...curBlock().design,
+              [attribute]: {
+                ...curBlock().design[attribute],
+                [e.target.name]: e.target.value,
+              },
+            },
+          })
+        })
+
+      }
+      else {
         this.$el.find('#controls-panel').html(emailControls())
         emailControlsOnMount()
       }
 
-      $('.control-group > .control-group-header').on('click', e => {
-        $('.control-group:not(.closed)').toggleClass('closed').toggleClass('gh-panel')
-        $(e.currentTarget).parent().toggleClass('closed').toggleClass('gh-panel')
+      $('.control-group > .gh-panel-header').on('click', e => {
+        $('.control-group:not(.closed)').toggleClass('closed')
+        $(e.currentTarget).parent().toggleClass('closed')
       })
 
       this.$el.find('#content').on('scroll', e => {
@@ -668,7 +778,7 @@
 
     },
 
-  })
+  } )
 
   const BlockRegistry = {
 
@@ -683,7 +793,7 @@
     css (block) {
       return this.get(block.type).css({
         ...this.defaults(block),
-        ...block
+        ...block,
       })
     },
 
@@ -695,7 +805,7 @@
 
       return this.get(block.type).edit({
         ...this.defaults(block),
-        ...block
+        ...block,
       }, editing)
     },
 
@@ -708,8 +818,8 @@
     },
 
     __fetchDynamicContent (block) {
-      return api.post(`${api.routes.v4.emails}/blocks/${block.type}`, {
-        props: block
+      return api.post(`${ api.routes.v4.emails }/blocks/${ block.type }`, {
+        props: block,
       })
     },
 
@@ -723,7 +833,7 @@
         block.html = html
         block.css = css
 
-        $(`[data-id="${block.id}"]`).html(html)
+        $(`[data-id="${ block.id }"]`).html(html)
       })
     },
 
@@ -735,14 +845,14 @@
 
       return this.get(block.type).html({
         ...this.defaults(block),
-        ...block
+        ...block,
       }, editing)
     },
 
     controls (block) {
       return this.get(block.type).controls({
         ...this.defaults(block),
-        ...block
+        ...block,
       })
     },
 
@@ -750,12 +860,12 @@
       return this.get(type).controlsOnMount({
         type,
         ...this.defaults({ type }),
-        ...props
+        ...props,
       })
     },
 
     collections: {
-      core: 'Groundhogg'
+      core: 'Groundhogg',
     },
 
     blocks: {},
@@ -766,30 +876,44 @@
     // language=HTML
 
     return `
-		<div class="block-toolbar">
-			<button class="gh-button secondary small text icon move-block" style="color: #fff">${icons.move}</button>
-			<button class="gh-button secondary small text icon duplicate-block" style="color: #fff">${icons.duplicate}
-			</button>
-			<button class="gh-button secondary small text icon delete-block" style="color: #fff">${icons.close}</button>
-		</div>`
+        <div class="block-toolbar">
+            <button class="gh-button secondary small text icon move-block" style="color: #fff">${ icons.move }</button>
+            <button class="gh-button secondary small text icon duplicate-block" style="color: #fff">${ icons.duplicate }
+            </button>
+            <button class="gh-button secondary small text icon delete-block" style="color: #fff">${ icons.close }
+            </button>
+        </div>`
   }
 
   const blockWrapper = (block, editing) => {
     // language=HTML
     return `
-		<div class="builder-block" data-id="${block.id}" data-type="${block.type}">
-			${BlockRegistry.html(block, editing)}
-			${editing === false ? '' : blockToolbar()}
-		</div>`
+        <div class="builder-block" data-id="${ block.id }" data-type="${ block.type }">
+            ${ BlockRegistry.html(block, editing) }
+            ${ editing === false ? '' : blockToolbar() }
+        </div>`
   }
 
   const editBlockWrapper = (block, editing) => {
     // language=HTML
     return `
-		<div class="builder-block is-editing" data-id="${block.id}" data-type="${block.type}">
-			${BlockRegistry.edit(block, editing)}
-			${blockToolbar()}
-		</div>`
+        <div class="builder-block is-editing" data-id="${ block.id }" data-type="${ block.type }">
+            ${ BlockRegistry.edit(block, editing) }
+            ${ blockToolbar() }
+        </div>`
+  }
+
+  const renderBlocksDesignCSS = (blocks) => {
+    return blocks.filter(b => b.type).map((id, design) => {
+
+      //language=CSS
+      return `
+        [data-id=${id}] {
+            
+        }
+      `
+
+    }).join('')
   }
 
   const renderBlocksCSS = (blocks) => {
@@ -797,7 +921,9 @@
   }
 
   const renderBlocks = (blocks, editing) => {
-    return blocks.filter(b => b.type).map(b => editing && editing.id === b.id ? editBlockWrapper(b, editing) : blockWrapper(b, editing)).join('')
+    return blocks.filter(b => b.type).
+      map(b => editing && editing.id === b.id ? editBlockWrapper(b, editing) : blockWrapper(b, editing)).
+      join('')
   }
 
   /**
@@ -814,7 +940,7 @@
       type,
       name,
       collection,
-      ...block
+      ...block,
     }
 
   }
@@ -847,15 +973,15 @@
 
             BlockRegistry.__fetchDynamicContent({
               ...curBlock(),
-              ...props
+              ...props,
             }).then(({ html, css = '' }) => {
               updateBlock({
                 html,
                 css,
-                ...props
+                ...props,
               }, a, b)
             })
-          }
+          },
         })
       },
       css: () => '',
@@ -868,11 +994,11 @@
        * @param editing will be false when rendering the final version
        * @return {string|*}
        */
-      html: ({ id, html }, editing) => editing === false ? `<!-- ${type}:${id} -->` : html,
+      html: ({ id, html }, editing) => editing === false ? `<!-- ${ type }:${ id } -->` : html,
       defaults: {
         html: '',
         css: '',
-        ...defaults
+        ...defaults,
       },
 
     }
@@ -888,49 +1014,51 @@
     BlockRegistry.collections[collection] = name
   }
 
-  const Column = ({ blocks, editing, width, col, padding }) => {
+  const Column = ({ blocks, editing, col, className }) => {
     //language=HTML
     return `
-		<td align="center" valign="top" width="${width}%">
-			<div class="column sortable-blocks ${blocks.length ? '' : 'empty'}"
-			     data-col="${col}">
-				${renderBlocks(blocks, editing)}
-			</div>
-		</td>`
+        ${ col > 0 ? `<div class="email-columns-cell gap"></div>` : '' }
+        <div class="email-columns-cell ${ className }">
+            <div class="column sortable-blocks ${ blocks.length ? '' : 'empty' }"
+                 data-col="${ col }">
+                ${ renderBlocks(blocks, editing) }
+            </div>
+        </div>`
   }
 
   const columnLayouts = {
     three_columns: (columns, editing) => {
       //language=HTML
-      return [0, 1, 2].map(i => Column({
+      return ['one-third', 'one-third', 'one-third'].map((className, i) => Column({
         blocks: columns[i],
         editing,
-        width: 33.3333,
-        col: i
+        className,
+        col: i,
+
       })).join('')
     },
     two_columns: (columns, editing) => {
-      return [0, 1].map(i => Column({
+      return ['one-half', 'one-half'].map((className, i) => Column({
         blocks: columns[i],
         editing,
-        width: 50,
-        col: i
+        className,
+        col: i,
       })).join('')
     },
     two_columns_right: (columns, editing) => {
-      return [66.666, 33.333].map((w, i) => Column({
+      return ['two-thirds', 'one-third'].map((className, i) => Column({
         blocks: columns[i],
         editing,
-        width: w,
-        col: i
+        className,
+        col: i,
       })).join('')
     },
     two_columns_left: (columns, editing) => {
-      return [33.333, 66.666].map((w, i) => Column({
+      return ['one-third', 'two-thirds'].map((className, i) => Column({
         blocks: columns[i],
         editing,
-        width: w,
-        col: i
+        className,
+        col: i,
       })).join('')
     },
   }
@@ -938,9 +1066,9 @@
   registerBlock('columns', __('Columns'), {
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
-		     style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
-    controls: ({ layout = 'two_columns' }) => {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
+             style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
+    controls: ({ layout = 'two_columns', gap = 0 }) => {
 
       const layoutChoices = {
         three_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="23.085 13.971 499.999 150"><path d="M28.085 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H28.085a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM201.418 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H201.418a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM374.751 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H374.751a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 5.588)"/></svg>`,
@@ -950,25 +1078,40 @@
       }
 
       //language=HTML
-      return `
-		  <div class="control-group gh-panel">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Layout')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="control layouts">
-					  ${Object.keys(layoutChoices).map(k => `<button class="layout-choice ${layout === k ? 'selected' : ''}" data-layout="${k}">${layoutChoices[k]}</button>`).join('')}
-				  </div>
-			  </div>
-		  </div>
-      `
+      return controlGroup({
+        name: 'Layout',
+        open: true,
+        controls: `
+            <div class="control layouts">
+                ${ Object.keys(layoutChoices).
+                        map(k => `<button class="layout-choice ${ layout === k
+                                ? 'selected'
+                                : '' }" data-layout="${ k }">${ layoutChoices[k] }</button>`).
+                        join('') }
+            </div>
+            <div class="control space-between">
+                <label for="column-gap" class="control-label">${ __('Column Gap', 'groundhogg') }</label>
+                ${ input({
+                    type: 'number',
+                    id: 'column-gap',
+                    className: 'control',
+                    name: 'gap',
+                    value: gap,
+                }) }
+            </div>`,
+      })
     },
     controlsOnMount: ({ updateBlock }) => {
 
       $('.layout-choice').on('click', (e) => {
         updateBlock({
-          layout: e.currentTarget.dataset.layout
+          layout: e.currentTarget.dataset.layout,
+        }, false, true)
+      })
+
+      $('#column-gap').on('change', e => {
+        updateBlock({
+          gap: e.target.value,
         }, false, true)
       })
 
@@ -976,27 +1119,38 @@
     edit: ({ id, columns, style, layout = 'two_columns' }, editing) => {
       //language=HTML
       return `
-		  <table class="email-columns" border="0" cellpadding="0" cellspacing="0" width="100%">
-			  <tr>
-				  ${columnLayouts[layout](columns, editing)}
-			  </tr>
-		  </table>
+          <div class="email-columns">
+              <div class="email-columns-row">
+                  ${ columnLayouts[layout](columns, editing) }
+              </div>
+          </div>
       `
     },
-    css: ({ columns }) => {
+    css: ({ id, columns, gap = 0 }) => {
       //language=CSS
-      return `${columns.map(col => col.length ? renderBlocksCSS(col) : '').join('')}`
+      return `
+
+          [data-id="${ id }"] .email-columns .email-columns-cell.gap {
+              width: ${ gap }px;
+          }
+
+          [data-id="${ id }"] .email-columns .email-columns-cell.one-third {
+              width: ${ ( 1 / 3 ) * 100 }%;
+          }
+
+          ${ columns.map(col => col.length ? renderBlocksCSS(col) : '').join('') }
+      `
     },
     editOnMount: () => {},
     html: ({ id, columns, style, layout = 'two_columns' }, editing) => {
 
       //language=HTML
       return `
-		  <table class="email-columns" border="0" cellpadding="0" cellspacing="0" width="100%">
-			  <tr>
-				  ${columnLayouts[layout](columns, editing)}
-			  </tr>
-		  </table>
+          <div class="email-columns">
+              <div class="email-columns-row">
+                  ${ columnLayouts[layout](columns, editing) }
+              </div>
+          </div>
       `
     },
     defaults: {
@@ -1004,66 +1158,64 @@
       columns: [
         [],
         [],
-        []
-      ]
-    }
+        [],
+      ],
+    },
   })
 
   registerBlock('text', __('Text'), {
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
-		     viewBox="0 0 977.7 977.7"><path d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
+        <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
+             viewBox="0 0 977.7 977.7"><path d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
     controls: ({ p, h1, h2, h3 }) => {
       // language=HTML
 
       const textControlGroup = (name, tag, style, open = false) => {
 
-        //language=HTML
-        return `
-			<div class="control-group ${ open ? 'gh-panel' : 'closed'}">
-				<div class="control-group-header space-between">
-					<h4 class="control-group-name">${name}</h4>
-					<span class="dashicons dashicons-arrow-down-alt2"></span>
-				</div>
-				<div class="controls">
-					<div class="space-between">
-						<label for="font-size" class="control-label">${__('Font Size', 'groundhogg')}</label>
-						${input({
-							type: 'number',
-							id: 'font-size',
-							name: 'fontSize',
-							className: 'font-control control-input',
-							dataTag: tag,
-							value: style.fontSize
-						})}
-					</div>
-					<div class="space-between">
-						<label for="font-weight" class="control-label">${__('Font Weight', 'groundhogg')}</label>
-						${select({
-							id: 'font-weight',
-							name: 'fontWeight',
-							className: 'font-control control-input',
-							dataTag: tag,
-						}, fontWeights.map(i => ({ value: i, text: i })), style.fontWeight)}
-					</div>
-					<div class="space-between">
-						<label id="font-family" class="control-label">${__('Font Family', 'groundhogg')}</label>
-						${select({
-							id: 'font-family',
-							name: 'fontFamily',
-							className: 'font-control control-input',
-							dataTag: tag,
-						}, fontFamilies, style.fontFamily)}
-					</div>
-				</div>
-			</div>`
+        return controlGroup({
+          open,
+          name,
+          //language=HTML
+          controls: `
+              <div class="space-between">
+                  <label for="font-size" class="control-label">${ __('Font Size', 'groundhogg') }</label>
+                  ${ input({
+                      type: 'number',
+                      id: 'font-size',
+                      name: 'fontSize',
+                      className: 'font-control control-input',
+                      dataTag: tag,
+                      value: style.fontSize,
+                  }) }
+              </div>
+              <div class="space-between">
+                  <label for="font-weight" class="control-label">${ __('Font Weight', 'groundhogg') }</label>
+                  ${ select({
+                      id: 'font-weight',
+                      name: 'fontWeight',
+                      className: 'font-control control-input',
+                      dataTag: tag,
+                  }, fontWeights.map(i => ( { value: i, text: i } )), style.fontWeight) }
+              </div>
+              <div class="space-between">
+                  <label id="font-family" class="control-label">${ __('Font Family', 'groundhogg') }</label>
+                  ${ select({
+                      id: 'font-family',
+                      name: 'fontFamily',
+                      className: 'font-control control-input',
+                      dataTag: tag,
+                  }, fontFamilies, style.fontFamily) }
+              </div>`,
+        })
       }
 
-      return `${textControlGroup(__('Paragraphs'), 'p', p, true)}
-      ${textControlGroup(__('Heading 1'), 'h1', h1)}
-      ${textControlGroup(__('Heading 2'), 'h2', h2)}
-      ${textControlGroup(__('Heading 3'), 'h3', h3)}`
+      return [
+        textControlGroup(__('Paragraphs'), 'p', p, true),
+        textControlGroup(__('Heading 1'), 'h1', h1),
+        textControlGroup(__('Heading 2'), 'h2', h2),
+        textControlGroup(__('Heading 3'), 'h3', h3),
+      ].join('')
     },
     controlsOnMount: ({ updateBlock, curBlock }) => {
 
@@ -1074,8 +1226,8 @@
         updateBlock({
           [tag]: {
             ...curBlock()[tag],
-            [target.name]: target.value
-          }
+            [target.name]: target.value,
+          },
         })
       })
 
@@ -1084,22 +1236,22 @@
 
       // language=HTML
       return `
-		  <div class="maybe-edit-text" style="text-align: left">
-			  ${content}
-			  <button class="gh-button primary edit-text-content">${__('Edit Content', 'groundhogg')}</button>
-		  </div>`
+          <div class="maybe-edit-text" style="text-align: left">
+              ${ content }
+              <button class="gh-button primary edit-text-content">${ __('Edit Content', 'groundhogg') }</button>
+          </div>`
     },
     editOnMount: ({ id, content, updateBlock, curBlock }) => {
 
-      $(`[data-id=${id}] .edit-text-content`).on('click', (e) => {
+      $(`[data-id=${ id }] .edit-text-content`).on('click', (e) => {
         modal({
           content: textarea({
             value: curBlock().content,
-            id: `text-${id}`
+            id: `text-${ id }`,
           }),
           width: 600,
           onOpen: () => {
-            tinymceElement(`text-${id}`, {
+            tinymceElement(`text-${ id }`, {
               tinymce: true,
               quicktags: true,
               settings: {
@@ -1107,16 +1259,16 @@
               },
             }, (content) => {
               updateBlock({
-                content
+                content,
               })
             })
           },
           beforeClose: () => {
 
-            wp.editor.remove(`text-${id}`)
+            wp.editor.remove(`text-${ id }`)
 
             return true
-          }
+          },
         })
       })
     },
@@ -1124,58 +1276,58 @@
 
       //language=CSS
       return `
-          [data-id="${id}"] * {
-              ${objectToStyle(p)}
+          [data-id="${ id }"] * {
+              ${ objectToStyle(p) }
           }
 
-          [data-id="${id}"] ul {
+          [data-id="${ id }"] ul {
               list-style: disc;
               padding-left: 20px;
           }
 
-          [data-id="${id}"] h1 {
-              ${objectToStyle(h1)}
+          [data-id="${ id }"] h1 {
+              ${ objectToStyle(h1) }
           }
 
-          [data-id="${id}"] h2 {
-              ${objectToStyle(h2)}
+          [data-id="${ id }"] h2 {
+              ${ objectToStyle(h2) }
           }
 
-          [data-id="${id}"] h3 {
-              ${objectToStyle(h3)}
+          [data-id="${ id }"] h3 {
+              ${ objectToStyle(h3) }
           }
       `
     },
     html: ({ content }) => {
       // language=HTML
       return `
-		  <div style="text-align: left">
-			  ${content}
-		  </div>`
+          <div style="text-align: left">
+              ${ content }
+          </div>`
     },
     defaults: {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
       p: {
         fontSize: 16,
         fontWeight: 'normal',
-        fontFamily: 'Arial, sans-serif'
+        fontFamily: 'Arial, sans-serif',
       },
       h1: {
         fontSize: 52,
         fontWeight: '500',
-        fontFamily: 'Arial, sans-serif'
+        fontFamily: 'Arial, sans-serif',
       },
       h2: {
         fontSize: 36,
         fontWeight: '500',
-        fontFamily: 'Arial, sans-serif'
+        fontFamily: 'Arial, sans-serif',
       },
       h3: {
         fontSize: 24,
         fontWeight: '500',
-        fontFamily: 'Arial, sans-serif'
-      }
-    }
+        fontFamily: 'Arial, sans-serif',
+      },
+    },
   })
 
   registerBlock('image', __('Image'), {
@@ -1183,100 +1335,106 @@
     svg: icons.image,
     controls: ({ src, width, alt, title, align = 'center' }) => {
       //language=HTML
-      return `
-		  <div class="control-group gh-panel">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Content')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="control">
-					  <label for="image-src" class="control-label">${__('Image SRC', 'groundhogg')}</label>
-					  <div class="gh-input-group">
-						  ${input({
-							  type: 'text',
-							  id: 'image-src',
-							  value: src,
-							  className: 'control full-width',
-							  name: 'src'
-						  })}
-						  <button class="gh-button secondary icon" id="select-image">
-							  ${icons.image}
-						  </button>
-					  </div>
-				  </div>
-				  <div class="control">
-					  <label for="image-alt" class="control-label">${__('Alt Text', 'groundhogg')}</label>
-					  ${input({
-						  type: 'text',
-						  id: 'image-alt',
-						  className: 'control full-width',
-						  name: 'alt',
-						  value: alt
-					  })}
-				  </div>
-				  <div class="control">
-					  <label for="image-title" class="control-label">${__('Title', 'groundhogg')}</label>
-					  ${input({
-						  type: 'text',
-						  id: 'image-title',
-						  className: 'control full-width',
-						  name: 'title',
-						  value: title
-					  })}
-				  </div>
-				  <div class="control space-between">
-					  <label class="">${__('Alignment', 'groundhogg')}</label>
-					  <div class="gh-input-group">
-						  <button id="align-left" data-alignment="left"
-						          class="change-alignment gh-button ${
-							          align === 'left' ? 'primary' : 'secondary'
-						          }">
-							  ${icons.alignLeft}
-						  </button>
-						  <button id="align-center" data-alignment="center"
-						          class="change-alignment gh-button ${
-							          align === 'center' ? 'primary' : 'secondary'
-						          }">
-							  ${icons.alignCenter}
-							  <button id="align-right" data-alignment="center"
-							          class="change-alignment gh-button ${
-								          align === 'right' ? 'primary' : 'secondary'
-							          }">
-								  ${icons.alignRight}
-							  </button>
-					  </div>
-				  </div>
-			  </div>
-		  </div>
-      `
+      return controlGroup({
+        name: __('Content'),
+        open: true,
+        controls: `
+            <div class="control">
+                <label for="image-src" class="control-label">${ __('Image SRC', 'groundhogg') }</label>
+                <div class="gh-input-group">
+                    ${ input({
+                        type: 'text',
+                        id: 'image-src',
+                        value: src,
+                        className: 'control full-width',
+                        name: 'src',
+                    }) }
+                    <button class="gh-button secondary icon" id="select-image">
+                        ${ icons.image }
+                    </button>
+                </div>
+            </div>
+            <div class="control">
+                <label for="image-width" class="control-label">${ __('Width', 'groundhogg') }</label>
+                ${ input({
+                    type: 'number',
+                    id: 'image-width',
+                    className: 'control full-width',
+                    name: 'width',
+                    value: width,
+                }) }
+            </div>
+            <div class="control">
+                <label for="image-alt" class="control-label">${ __('Alt Text', 'groundhogg') }</label>
+                ${ input({
+                    type: 'text',
+                    id: 'image-alt',
+                    className: 'control full-width',
+                    name: 'alt',
+                    value: alt,
+                }) }
+            </div>
+            <div class="control">
+                <label for="image-title" class="control-label">${ __('Title', 'groundhogg') }</label>
+                ${ input({
+                    type: 'text',
+                    id: 'image-title',
+                    className: 'control full-width',
+                    name: 'title',
+                    value: title,
+                }) }
+            </div>
+            <div class="control space-between">
+                <label class="">${ __('Alignment', 'groundhogg') }</label>
+                <div class="gh-input-group">
+                    <button id="align-left" data-alignment="left"
+                            class="change-alignment gh-button ${
+                                    align === 'left' ? 'primary' : 'secondary'
+                            }">
+                        ${ icons.alignLeft }
+                    </button>
+                    <button id="align-center" data-alignment="center"
+                            class="change-alignment gh-button ${
+                                    align === 'center' ? 'primary' : 'secondary'
+                            }">
+                        ${ icons.alignCenter }
+                        <button id="align-right" data-alignment="center"
+                                class="change-alignment gh-button ${
+                                        align === 'right' ? 'primary' : 'secondary'
+                                }">
+                            ${ icons.alignRight }
+                        </button>
+                </div>
+            </div>
+        `,
+      })
     },
     css: () => '',
     controlsOnMount: ({
-      updateBlock
+      updateBlock,
     }) => {
 
       $('#align-left').on('click', () => {
         updateBlock({
-          align: 'left'
+          align: 'left',
         }, false, true)
       })
 
       $('#align-center').on('click', () => {
         updateBlock({
-          align: 'center'
+          align: 'center',
         }, false, true)
       })
 
       $('#align-right').on('click', () => {
         updateBlock({
-          align: 'right'
+          align: 'right',
         }, false, true)
       })
 
-      $('#image-src,#image-alt,#image-title').on('change', e => {
+      $('#image-src,#image-alt,#image-title,#image-width').on('change', e => {
         updateBlock({
-          [e.target.name]: e.target.value
+          [e.target.name]: e.target.value,
         })
       })
 
@@ -1300,7 +1458,7 @@
           button: {
             text: __('Use this image'),
           },
-          multiple: false	// Set to true to allow multiple files to be selected
+          multiple: false,	// Set to true to allow multiple files to be selected
 
         })
         // When an image is selected, run a callback.
@@ -1311,12 +1469,6 @@
           console.log(attachment)
 
           let { height, width } = attachment
-
-          if (width > MAX_EMAIL_WITH) {
-            let ratio = height / width
-            width = MAX_EMAIL_WITH
-            height = width * ratio
-          }
 
           updateBlock({
             src: attachment.url,
@@ -1334,25 +1486,29 @@
     edit: ({ src, width, height, alt = '', title = '', align = 'center' }) => {
       // language=HTML
       return `
-		  <div class="img-container" style="width: 100%;text-align: ${align}">
-			  <img alt="${specialChars(alt)}" title="${specialChars(title)}" width="${width}" height="auto"
-			       src="${src}" style="vertical-align: bottom"/>
-		  </div>`
+          <div class="img-container" style="width: 100%;text-align: ${ align }">
+              <img alt="${ specialChars(alt) }" title="${ specialChars(title) }" width="${ width }" height="auto"
+                   src="${ src }" style="vertical-align: bottom"/>
+          </div>`
     },
     editOnMount: ({ id, updateBlock }) => {
-      let $img = $(`[data-id=${id}] img`)
+      let $img = $(`[data-id=${ id }] img`)
 
       // Delay because of weird height 0 thing
       setTimeout(() => {
         $img.resizable({
           aspectRatio: true,
-          maxWidth: 600,
+          maxWidth: $img.parent().width(),
+          resize: (e, ui) => {
+            $('#image-width').val(Math.ceil(ui.size.width))
+          },
           stop: (e, ui) => {
             updateBlock({
-              width: ui.size.width,
+              width: Math.ceil(ui.size.width),
               // height: ui.size.height
             })
-          }
+            $('#image-width').val(Math.ceil(ui.size.width))
+          },
         })
       }, 100)
 
@@ -1360,56 +1516,56 @@
     html: ({ src, width, height, alt = '', title = '', align = 'center' }) => {
       // language=HTML
       return `
-		  <div class="img-container" style="text-align: ${align}">
-			  <img alt="${specialChars(alt)}" title="${specialChars(title)}" width="${width}" height="auto"
-			       src="${src}" style="vertical-align: bottom"/>
-		  </div>`
+          <div class="img-container" style="text-align: ${ align }">
+              <img alt="${ specialChars(alt) }" title="${ specialChars(title) }" width="${ width }" height="auto"
+                   src="${ src }" style="vertical-align: bottom"/>
+          </div>`
     },
     defaults: {
       src: 'http://via.placeholder.com/600x338',
       alt: 'placeholder image',
       title: 'placeholder image',
-      width: MAX_EMAIL_WITH,
+      width: 600,
       height: 338,
       align: 'center',
-    }
+    },
 
   })
 
   registerBlock('spacer', __('Spacer'), {
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
+        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
   <path color="currentColor"
         d="M352 384h-48V128h48a16 16 0 0 0 11-27L267 5c-6-7-16-7-22 0l-96 96c-5 4-6 11-4 17 3 6 9 10 15 10h48v256h-48a16 16 0 0 0-11 27l96 96c6 7 16 7 22 0l96-96a16 16 0 0 0-11-27z"/>
 </svg>`,
     controls: ({ height }) => {
       //language=HTML
       return `
-		  <div class="control-group">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Settings')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="space-between">
-					  <label for="font-size" class="control-label">${__('Height', 'groundhogg')}</label>
-					  ${input({
-						  type: 'number',
-						  id: 'height',
-						  name: 'height',
-						  className: 'control-input',
-						  value: height
-					  })}
-				  </div>
-			  </div>
-		  </div>`
+          <div class="control-group">
+              <div class="control-group-header space-between">
+                  <h4 class="control-group-name">${ __('Settings') }</h4>
+                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              </div>
+              <div class="controls">
+                  <div class="space-between">
+                      <label for="font-size" class="control-label">${ __('Height', 'groundhogg') }</label>
+                      ${ input({
+                          type: 'number',
+                          id: 'height',
+                          name: 'height',
+                          className: 'control-input',
+                          value: height,
+                      }) }
+                  </div>
+              </div>
+          </div>`
     },
     controlsOnMount: ({ updateBlock, curBlock }) => {
 
       $('#height').on('change', ({ target }) => {
         updateBlock({
-          height: target.value
+          height: target.value,
         })
       })
 
@@ -1418,8 +1574,8 @@
 
       // language=HTML
       return `
-		  <div class="spacer-block" style="height: ${height}px">
-		  </div>`
+          <div class="spacer-block" style="height: ${ height }px">
+          </div>`
     },
     editOnMount: ({ id, height, updateBlock, curBlock }) => {
 
@@ -1430,163 +1586,163 @@
     html: ({ height }) => {
       // language=HTML
       return `
-	      <div style="height: ${height}px">
-	      </div>`
+          <div style="height: ${ height }px">
+          </div>`
     },
     defaults: {
-      height: 100
-    }
+      height: 20,
+    },
   })
 
   registerBlock('button', __('Button'), {
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-			<path fill="#444"
-			      d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
-		</svg>`,
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path fill="#444"
+                  d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
+        </svg>`,
     controls: ({ text, link, style, align, size }) => {
       //language=HTML
       return `
-		  <div class="control-group gh-panel">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Content')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="control">
-					  <label class="control-label">${__('Button Text', 'groundhogg')}</label>
-					  ${inputWithReplacements({
-						  type: 'text',
-						  id: 'button-text',
-						  className: 'full-width',
-						  value: text
-					  })}
-				  </div>
-				  <div class="control">
-					  <label class="control-label">${__('Button Link', 'groundhogg')}</label>
-					  ${inputWithReplacements({
-						  type: 'text',
-						  id: 'button-link',
-						  className: 'full-width',
-						  value: link
-					  })}
-				  </div>
-				  <div class="space-between">
-					  <label class="control-label">${__('Button Size', 'groundhogg')}</label>
-					  ${select({
-						  name: 'size',
-						  id: 'button-size',
-					  }, {
-						  sm: __('Small'),
-						  md: __('Medium'),
-						  lg: __('Large'),
-					  }, size)}
-				  </div>
-				  <div class="control space-between">
-					  <label class="">${__('Alignment', 'groundhogg')}</label>
-					  <div class="gh-input-group">
-						  <button id="align-left" data-alignment="left"
-						          class="change-alignment gh-button ${
-							          align === 'left' ? 'primary' : 'secondary'
-						          }">
-							  ${icons.alignLeft}
-						  </button>
-						  <button id="align-center" data-alignment="center"
-						          class="change-alignment gh-button ${
-							          align === 'center' ? 'primary' : 'secondary'
-						          }">
-							  ${icons.alignCenter}
-							  <button id="align-right" data-alignment="right"
-							          class="change-alignment gh-button ${
-								          align === 'right' ? 'primary' : 'secondary'
-							          }">
-								  ${icons.alignRight}
-							  </button>
-					  </div>
-				  </div>
-			  </div>
-		  </div>
-		  <div class="control-group closed">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Button Style')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="space-between">
-					  <label class="control-label">${__('Button Color', 'groundhogg')}</label>
-					  ${input({
-						  type: 'text',
-						  id: 'button-color',
-						  value: style.backgroundColor,
-					  })}
-				  </div>
-				  <div class="space-between">
-					  <label class="control-label">${__('Text Color', 'groundhogg')}</label>
-					  ${input({
-						  type: 'text',
-						  id: 'text-color',
-						  value: style.color,
-					  })}
-				  </div>
-			  </div>
-		  </div>
-		  <div class="control-group closed">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Font Style')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="space-between">
-					  <label for="font-size" class="control-label">${__('Font Size', 'groundhogg')}</label>
-					  ${input({
-						  type: 'number',
-						  id: 'font-size',
-						  name: 'fontSize',
-						  className: 'font-control control-input',
-						  value: style.fontSize
-					  })}
-				  </div>
-				  <div class="space-between">
-					  <label for="font-weight" class="control-label">${__('Font Weight', 'groundhogg')}</label>
-					  ${select({
-						  id: 'font-weight',
-						  name: 'fontWeight',
-						  className: 'font-control control-input',
-					  }, fontWeights.map(i => ({ value: i, text: i })), style.fontWeight)}
-				  </div>
-				  <div class="space-between">
-					  <label for="font-family" class="control-label">${__('Font Family', 'groundhogg')}</label>
-					  ${select({
-						  id: 'font-family',
-						  name: 'fontFamily',
-						  className: 'font-control control-input',
-					  }, fontFamilies, style.fontFamily)}
-				  </div>
-			  </div>
-		  </div>`
+          <div class="control-group gh-panel">
+              <div class="control-group-header space-between">
+                  <h4 class="control-group-name">${ __('Content') }</h4>
+                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              </div>
+              <div class="controls">
+                  <div class="control">
+                      <label class="control-label">${ __('Button Text', 'groundhogg') }</label>
+                      ${ inputWithReplacements({
+                          type: 'text',
+                          id: 'button-text',
+                          className: 'full-width',
+                          value: text,
+                      }) }
+                  </div>
+                  <div class="control">
+                      <label class="control-label">${ __('Button Link', 'groundhogg') }</label>
+                      ${ inputWithReplacements({
+                          type: 'text',
+                          id: 'button-link',
+                          className: 'full-width',
+                          value: link,
+                      }) }
+                  </div>
+                  <div class="space-between">
+                      <label class="control-label">${ __('Button Size', 'groundhogg') }</label>
+                      ${ select({
+                          name: 'size',
+                          id: 'button-size',
+                      }, {
+                          sm: __('Small'),
+                          md: __('Medium'),
+                          lg: __('Large'),
+                      }, size) }
+                  </div>
+                  <div class="control space-between">
+                      <label class="">${ __('Alignment', 'groundhogg') }</label>
+                      <div class="gh-input-group">
+                          <button id="align-left" data-alignment="left"
+                                  class="change-alignment gh-button ${
+                                          align === 'left' ? 'primary' : 'secondary'
+                                  }">
+                              ${ icons.alignLeft }
+                          </button>
+                          <button id="align-center" data-alignment="center"
+                                  class="change-alignment gh-button ${
+                                          align === 'center' ? 'primary' : 'secondary'
+                                  }">
+                              ${ icons.alignCenter }
+                              <button id="align-right" data-alignment="right"
+                                      class="change-alignment gh-button ${
+                                              align === 'right' ? 'primary' : 'secondary'
+                                      }">
+                                  ${ icons.alignRight }
+                              </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="control-group closed">
+              <div class="control-group-header space-between">
+                  <h4 class="control-group-name">${ __('Button Style') }</h4>
+                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              </div>
+              <div class="controls">
+                  <div class="space-between">
+                      <label class="control-label">${ __('Button Color', 'groundhogg') }</label>
+                      ${ input({
+                          type: 'text',
+                          id: 'button-color',
+                          value: style.backgroundColor,
+                      }) }
+                  </div>
+                  <div class="space-between">
+                      <label class="control-label">${ __('Text Color', 'groundhogg') }</label>
+                      ${ input({
+                          type: 'text',
+                          id: 'text-color',
+                          value: style.color,
+                      }) }
+                  </div>
+              </div>
+          </div>
+          <div class="control-group closed">
+              <div class="control-group-header space-between">
+                  <h4 class="control-group-name">${ __('Font Style') }</h4>
+                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              </div>
+              <div class="controls">
+                  <div class="space-between">
+                      <label for="font-size" class="control-label">${ __('Font Size', 'groundhogg') }</label>
+                      ${ input({
+                          type: 'number',
+                          id: 'font-size',
+                          name: 'fontSize',
+                          className: 'font-control control-input',
+                          value: style.fontSize,
+                      }) }
+                  </div>
+                  <div class="space-between">
+                      <label for="font-weight" class="control-label">${ __('Font Weight', 'groundhogg') }</label>
+                      ${ select({
+                          id: 'font-weight',
+                          name: 'fontWeight',
+                          className: 'font-control control-input',
+                      }, fontWeights.map(i => ( { value: i, text: i } )), style.fontWeight) }
+                  </div>
+                  <div class="space-between">
+                      <label for="font-family" class="control-label">${ __('Font Family', 'groundhogg') }</label>
+                      ${ select({
+                          id: 'font-family',
+                          name: 'fontFamily',
+                          className: 'font-control control-input',
+                      }, fontFamilies, style.fontFamily) }
+                  </div>
+              </div>
+          </div>`
     },
 
     controlsOnMount: ({
       updateBlock,
-      curBlock
+      curBlock,
     }) => {
 
       $('#align-left').on('click', () => {
         updateBlock({
-          align: 'left'
+          align: 'left',
         }, false, true)
       })
 
       $('#align-center').on('click', () => {
         updateBlock({
-          align: 'center'
+          align: 'center',
         }, false, true)
       })
 
       $('#align-right').on('click', () => {
         updateBlock({
-          align: 'right'
+          align: 'right',
         }, false, true)
       })
 
@@ -1596,10 +1752,10 @@
           updateBlock({
             style: {
               ...curBlock().style,
-              backgroundColor: ui.color.toString()
-            }
+              backgroundColor: ui.color.toString(),
+            },
           })
-        }
+        },
       })
 
       $('#text-color').wpColorPicker({
@@ -1608,27 +1764,27 @@
           updateBlock({
             style: {
               ...curBlock().style,
-              color: ui.color.toString()
-            }
+              color: ui.color.toString(),
+            },
           })
-        }
+        },
       })
 
       $('#button-text').on('change', e => {
         updateBlock({
-          text: e.target.value
+          text: e.target.value,
         })
       })
 
       linkPicker('#button-link').on('change', e => {
         updateBlock({
-          link: e.target.value
+          link: e.target.value,
         })
       })
 
       $('#button-size').on('change', e => {
         updateBlock({
-          size: e.target.value
+          size: e.target.value,
         })
       })
 
@@ -1636,8 +1792,8 @@
         updateBlock({
           style: {
             ...curBlock().style,
-            [target.name]: target.value
-          }
+            [target.name]: target.value,
+          },
         })
       })
 
@@ -1659,31 +1815,31 @@
 
       //language=HTML
       return `
-		  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-			  <tbody>
-			  <tr>
-				  <td align="${align}">
-					  <table border="0" cellspacing="0" cellpadding="0">
-						  <tbody>
-						  <tr>
-							  <td class="email-button" bgcolor="${style.backgroundColor}"
-							      style="padding: ${padding}; border-radius:3px" align="center">
-								  <a contenteditable="true" target="_blank"
-								     style="font-size: ${style.fontSize}px; font-family: ${style.fontFamily}; font-weight: ${style.fontWeight}; color: ${style.color}; text-decoration: none !important; display: inline-block;">${text}</a>
-							  </td>
-						  </tr>
-						  </tbody>
-					  </table>
-				  </td>
-			  </tr>
-			  </tbody>
-		  </table>`
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+              <tr>
+                  <td align="${ align }" style="padding: 20px 0">
+                      <table border="0" cellspacing="0" cellpadding="0">
+                          <tbody>
+                          <tr>
+                              <td class="email-button" bgcolor="${ style.backgroundColor } "
+                                  style="padding: ${ padding }; border-radius:3px" align="center">
+                                  <a contenteditable="true" target="_blank"
+                                     style="font-size: ${ style.fontSize }px; font-family: ${ style.fontFamily }; font-weight: ${ style.fontWeight }; color: ${ style.color }; text-decoration: none !important; display: inline-block;">${ text }</a>
+                              </td>
+                          </tr>
+                          </tbody>
+                      </table>
+                  </td>
+              </tr>
+              </tbody>
+          </table>`
     },
     editOnMount: ({ id, updateStyle, updateBlock }) => {
 
-      $(`[data-id=${id}] .email-button a`).on('keyup keydown', (e) => {
+      $(`[data-id=${ id }] .email-button a`).on('keyup keydown', (e) => {
         updateBlock({
-          text: e.currentTarget.textContent
+          text: e.currentTarget.textContent,
         }, false)
       })
 
@@ -1691,19 +1847,19 @@
     css: ({ id, style }) => {
 
       let {
-        color, backgroundColor
+        color, backgroundColor,
       } = style
 
       // language=CSS
       return `
 
-          [data-id="${id}"] a {
-              ${objectToStyle({
+          [data-id="${ id }"] a {
+              ${ objectToStyle({
                   display: 'inline-block',
                   color,
                   backgroundColor,
-                  padding: '8px 12px'
-              })}
+                  padding: '8px 12px',
+              }) }
           }
 
       `
@@ -1725,25 +1881,25 @@
 
       //language=HTML
       return `
-		  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-			  <tbody>
-			  <tr>
-				  <td align="${align}">
-					  <table border="0" cellspacing="0" cellpadding="0">
-						  <tbody>
-						  <tr>
-							  <td class="email-button" bgcolor="${style.backgroundColor}"
-							      style="padding: ${padding}; border-radius:3px" align="center"><a href="${link}"
-							                                                                       target="_blank"
-							                                                                       style="font-size: ${style.fontSize}px; font-family: ${style.fontFamily}; font-weight: ${style.fontWeight}; color: ${style.color}; text-decoration: none !important; display: inline-block;">${text}</a>
-							  </td>
-						  </tr>
-						  </tbody>
-					  </table>
-				  </td>
-			  </tr>
-			  </tbody>
-		  </table>`
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+              <tr>
+                  <td align="${ align }" style="padding: 20px 0">
+                      <table border="0" cellspacing="0" cellpadding="0">
+                          <tbody>
+                          <tr>
+                              <td class="email-button" bgcolor="${ style.backgroundColor }"
+                                  style="padding: ${ padding }; border-radius:3px" align="center"><a href="${ link }"
+                                                                                                     target="_blank"
+                                                                                                     style="font-size: ${ style.fontSize }px; font-family: ${ style.fontFamily }; font-weight: ${ style.fontWeight }; color: ${ style.color }; text-decoration: none !important; display: inline-block;">${ text }</a>
+                              </td>
+                          </tr>
+                          </tbody>
+                      </table>
+                  </td>
+              </tr>
+              </tbody>
+          </table>`
     },
     defaults: {
       link: Groundhogg.url.home,
@@ -1755,42 +1911,43 @@
         color: '#ffffff',
         fontSize: 20,
         fontWeight: '600',
-        fontFamily: 'Arial, sans-serif'
-      }
+        fontFamily: 'Arial, sans-serif',
+      },
     },
   })
 
   registerDynamicBlock('posts', __('Posts'), {
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
-		     style="enable-background:new 0 0 193.826 193.826" xml:space="preserve"><path d="M191.495 55.511 137.449 1.465a4.998 4.998 0 0 0-7.07 0l-.229.229a17.43 17.43 0 0 0-5.14 12.406c0 3.019.767 5.916 2.192 8.485l-56.55 48.533c-4.328-3.868-9.852-5.985-15.703-5.985a23.444 23.444 0 0 0-16.689 6.913l-.339.339a4.998 4.998 0 0 0 0 7.07l32.378 32.378-31.534 31.533c-.631.649-15.557 16.03-25.37 28.27-9.345 11.653-11.193 13.788-11.289 13.898a4.995 4.995 0 0 0 .218 6.822 4.987 4.987 0 0 0 3.543 1.471c1.173 0 2.349-.41 3.295-1.237.083-.072 2.169-1.885 13.898-11.289 12.238-9.813 27.619-24.74 28.318-25.421l31.483-31.483 30.644 30.644c.976.977 2.256 1.465 3.535 1.465s2.56-.488 3.535-1.465l.339-.339a23.446 23.446 0 0 0 6.913-16.689 23.43 23.43 0 0 0-5.985-15.703l48.533-56.55a17.434 17.434 0 0 0 8.485 2.192c4.687 0 9.093-1.825 12.406-5.14l.229-.229a5 5 0 0 0 0-7.072z"/></svg>`,
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
+             style="enable-background:new 0 0 193.826 193.826" xml:space="preserve"><path d="M191.495 55.511 137.449 1.465a4.998 4.998 0 0 0-7.07 0l-.229.229a17.43 17.43 0 0 0-5.14 12.406c0 3.019.767 5.916 2.192 8.485l-56.55 48.533c-4.328-3.868-9.852-5.985-15.703-5.985a23.444 23.444 0 0 0-16.689 6.913l-.339.339a4.998 4.998 0 0 0 0 7.07l32.378 32.378-31.534 31.533c-.631.649-15.557 16.03-25.37 28.27-9.345 11.653-11.193 13.788-11.289 13.898a4.995 4.995 0 0 0 .218 6.822 4.987 4.987 0 0 0 3.543 1.471c1.173 0 2.349-.41 3.295-1.237.083-.072 2.169-1.885 13.898-11.289 12.238-9.813 27.619-24.74 28.318-25.421l31.483-31.483 30.644 30.644c.976.977 2.256 1.465 3.535 1.465s2.56-.488 3.535-1.465l.339-.339a23.446 23.446 0 0 0 6.913-16.689 23.43 23.43 0 0 0-5.985-15.703l48.533-56.55a17.434 17.434 0 0 0 8.485 2.192c4.687 0 9.093-1.825 12.406-5.14l.229-.229a5 5 0 0 0 0-7.072z"/></svg>`,
     controls: ({ query = {} }) => {
 
       const { numberposts = 5 } = query
 
       //language=HTML
       return `
-		  <div class="control-group gh-panel">
-			  <div class="control-group-header space-between">
-				  <h4 class="control-group-name">${__('Query')}</h4>
-				  <span class="dashicons dashicons-arrow-down-alt2"></span>
-			  </div>
-			  <div class="controls">
-				  <div class="control">
-					  <div class="space-between">
-						  <label for="number-posts" class="control-label">${__('Number of posts', 'groundhogg')}</label>
-						  ${input({
-							  type: 'number',
-							  id: 'number-posts',
-							  value: numberposts,
-							  className: 'control-input query-control',
-							  name: 'numberposts'
-						  })}
-					  </div>
-				  </div>
-			  </div>
-		  </div>
+          <div class="control-group gh-panel">
+              <div class="control-group-header space-between">
+                  <h4 class="control-group-name">${ __('Query') }</h4>
+                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              </div>
+              <div class="controls">
+                  <div class="control">
+                      <div class="space-between">
+                          <label for="number-posts" class="control-label">${ __('Number of posts',
+                                  'groundhogg') }</label>
+                          ${ input({
+                              type: 'number',
+                              id: 'number-posts',
+                              value: numberposts,
+                              className: 'control-input query-control',
+                              name: 'numberposts',
+                          }) }
+                      </div>
+                  </div>
+              </div>
+          </div>
       `
     },
     controlsOnMount: ({ updateBlock, curBlock }) => {
@@ -1798,18 +1955,36 @@
         updateBlock({
           query: {
             ...curBlock().query,
-            [e.target.name]: e.target.value
-          }
+            [e.target.name]: e.target.value,
+          },
         })
       })
     },
     defaults: {
       query: {
-        numberposts: 5
-      }
+        numberposts: 5,
+      },
     },
   })
 
+  const controlGroup = ({
+    name = '',
+    controls = '',
+    open = false,
+  }) => {
+    // language=HTML
+    return `
+        <div class="gh-panel control-group ${ open ? 'open' : 'closed' }">
+            <div class="gh-panel-header">
+                <h2>${ name }</h2>
+                <button class="toggle-indicator"></button>
+            </div>
+            <div class="inside controls">
+                ${ controls }
+            </div>
+        </div>`
+  }
+
   Groundhogg.EmailBlockEditor = BlockEditor
 
-})(jQuery)
+} )(jQuery)

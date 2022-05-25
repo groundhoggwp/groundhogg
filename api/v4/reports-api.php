@@ -187,11 +187,12 @@ class Reports_Api extends Base_Api {
 
 		$custom_reports = get_option( 'gh_custom_reports', [] );
 
+		$results = [];
 
 		foreach ( $reports as $report_id ) {
 
 			if ( wp_is_uuid( $report_id ) ) {
-				$report  = array_find( $custom_reports, function ( $report ) use ( $report_id ) {
+				$report = array_find( $custom_reports, function ( $report ) use ( $report_id ) {
 					return $report['id'] == $report_id;
 				} );
 
@@ -206,7 +207,8 @@ class Reports_Api extends Base_Api {
 		return self::SUCCESS_RESPONSE( [
 			'start'       => $start,
 			'end'         => $end,
-			'report_data' => $results
+			'report_data' => $results,
+			'diff'        => human_time_diff( $reporting->start->getTimestamp(), $reporting->end->getTimestamp() )
 		] );
 	}
 

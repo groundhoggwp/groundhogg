@@ -82,30 +82,30 @@ h3.no-margin-top {
   flex-direction: column;
 }
 
-.space-between {
+.space-between:not(.display-flex) {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
 }
-.space-between.align-right {
+.space-between:not(.display-flex).align-right {
   justify-content: flex-end;
 }
-.space-between.align-left {
+.space-between:not(.display-flex).align-left {
   justify-content: flex-start;
 }
-.space-between.align-center {
+.space-between:not(.display-flex).align-center {
   justify-content: center;
 }
-.space-between.gap-20 {
+.space-between:not(.display-flex).gap-20 {
   gap: 20px;
 }
-.space-between.gap-10 {
+.space-between:not(.display-flex).gap-10 {
   gap: 10px;
 }
-.space-between.no-gap {
+.space-between:not(.display-flex).no-gap {
   gap: 0;
 }
-.space-between.align-top {
+.space-between:not(.display-flex).align-top {
   align-items: flex-start;
 }
 
@@ -503,6 +503,9 @@ span.gh-text.lg {
 }
 .gh-panel.closed .gh-panel-header button.toggle-indicator::before {
   content: "";
+}
+.gh-panel.closed .inside {
+  display: none;
 }
 .gh-panel .inside {
   padding: 20px;
@@ -1428,12 +1431,16 @@ p.error,
 .gh-rows-and-columns input:not([type=checkbox], [type=radio]), .gh-rows-and-columns select {
   width: 100%;
 }
+.gh-rows-and-columns .row,
 .gh-rows-and-columns .gh-row {
   display: flex;
   gap: 10px;
   justify-content: space-between;
 }
-.gh-rows-and-columns .gh-row .gh-col, .gh-rows-and-columns .gh-row .gh-column {
+.gh-rows-and-columns .row .col, .gh-rows-and-columns .row .gh-col, .gh-rows-and-columns .row .gh-column,
+.gh-rows-and-columns .gh-row .col,
+.gh-rows-and-columns .gh-row .gh-col,
+.gh-rows-and-columns .gh-row .gh-column {
   width: 100%;
 }
 

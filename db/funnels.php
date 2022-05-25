@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Funnel;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -55,6 +57,10 @@ class Funnels extends DB {
 	 */
 	public function get_object_type() {
 		return 'funnel';
+	}
+
+	public function create_object( $object ) {
+		return new Funnel( $object );
 	}
 
 	protected function add_additional_actions() {

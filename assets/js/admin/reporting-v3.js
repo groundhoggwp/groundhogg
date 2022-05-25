@@ -8,10 +8,12 @@
     funnels: FunnelsStore,
     broadcasts: BroadcastsStore,
     emails: EmailsStore,
+    campaigns: CampaignsStore,
   } = Groundhogg.stores
   const { loadingModal, icons, modal, input, select, tooltip, adminPageURL } = Groundhogg.element
+  const { formatNumber } = Groundhogg.formatting
 
-  const { __ } = wp.i18n
+  const { __, sprintf } = wp.i18n
 
   function utf8_to_b64 (str) {
     return window.btoa(unescape(encodeURIComponent(str)))
@@ -139,6 +141,7 @@
         params: this.params,
       }).then(r => {
 
+        this.diff = r.diff
         this.reportData = r.report_data
         this.mountReports().then(() => {
           close()
@@ -178,6 +181,7 @@
                       <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
                   </div>
               </div>
+              <div id="before-reports"></div>
               <div id="reports-container" class="report-grid">
               </div>
           </div>`
@@ -229,7 +233,7 @@
       catch (e) {}
 
       try {
-        $(getPage(this.currentPage).beforeReports(this.params)).insertBefore('#reports-container')
+        $('#before-reports').html(getPage(this.currentPage).beforeReports(this.params))
       }
       catch (e) {}
 
@@ -345,7 +349,7 @@
           // language=HTML
           return `
               <div class="inside">
-                  <div class="big-number">${ curr }%</div>
+                  <div class="big-number">${ formatNumber(curr) }%</div>
               </div>`
         }
 
@@ -355,13 +359,13 @@
         // language=HTML
         return `
             <div class="inside display-flex space-between gap-20">
-                <div class="big-number">${ curr }%</div>
+                <div class="big-number">${ formatNumber(curr) }%</div>
                 <div class="compare-and-range">
                     <div class="gh-report-prev gh-report-prev-${ curr >= prev ? 'green' : 'red' }">
                         <div class="gh-report-prev-arrow">${ curr >= prev ? arrows.up : arrows.down }</div>
                         <div class="gh-report-prev-number">${ diff }%</div>
                     </div>
-                    <div class="gh-report-range">vs. previous ${ '' } days.</div>
+                    <div class="gh-report-range">${ sprintf(__('vs. previous %s', 'groundhogg'), Dashboard.diff) }</div>
                 </div>
             </div>
         `
@@ -379,7 +383,7 @@
           // language=HTML
           return `
               <div class="inside">
-                  <div class="big-number">${ curr }</div>
+                  <div class="big-number">${ formatNumber(curr) }</div>
               </div>`
         }
 
@@ -389,13 +393,13 @@
         // language=HTML
         return `
             <div class="inside display-flex space-between gap-20">
-                <div class="big-number">${ curr }</div>
+                <div class="big-number">${ formatNumber(curr) }</div>
                 <div class="compare-and-range">
                     <div class="gh-report-prev gh-report-prev-${ curr >= prev ? 'green' : 'red' }">
                         <div class="gh-report-prev-arrow">${ curr >= prev ? arrows.up : arrows.down }</div>
                         <div class="gh-report-prev-number">${ diff }%</div>
                     </div>
-                    <div class="gh-report-range">vs. previous ${ '' } days.</div>
+                    <div class="gh-report-range">${ sprintf(__('vs. previous %s', 'groundhogg'), Dashboard.diff) }</div>
                 </div>
             </div>
         `
@@ -413,7 +417,7 @@
           // language=HTML
           return `
               <div class="inside">
-                  <div class="big-number"><span class="gh-text danger">${ curr }</span></div>
+                  <div class="big-number"><span class="gh-text danger">${ formatNumber(curr) }</span></div>
               </div>`
         }
 
@@ -423,13 +427,13 @@
         // language=HTML
         return `
             <div class="inside display-flex space-between gap-20">
-                <div class="big-number">${ curr }</div>
+                <div class="big-number">${ formatNumber(curr) }</div>
                 <div class="compare-and-range">
                     <div class="gh-report-prev gh-report-prev-${ curr <= prev ? 'green' : 'red' }">
                         <div class="gh-report-prev-arrow">${ curr <= prev ? arrows.up : arrows.down }</div>
                         <div class="gh-report-prev-number">${ diff }%</div>
                     </div>
-                    <div class="gh-report-range">vs. previous ${ '' } days.</div>
+                    <div class="gh-report-range">${ sprintf(__('vs. previous %s', 'groundhogg'), Dashboard.diff) }</div>
                 </div>
             </div>
         `
@@ -501,6 +505,9 @@
             ],
           },
           options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
             legend: {
               display: false,
             },
@@ -609,8 +616,38 @@
 
   }
 
+  const onMountHasQuery = ({ id, data }) => {
+    $(`#${ id }`).on('click', '.big-number', e => {
+      showContacts(data.query)
+    })
+  }
+
   const CommonReports = {
 
+    new_contacts: {
+      id: 'total_new_contacts',
+      name: __('New Contacts'),
+      type: 'number',
+      onMount: onMountHasQuery,
+    },
+    confirmed_contacts: {
+      id: 'total_confirmed_contacts',
+      name: __('Confirmed Contacts'),
+      type: 'number',
+      onMount: onMountHasQuery,
+    },
+    engaged_contacts: {
+      id: 'total_engaged_contacts',
+      name: __('Engaged Contacts'),
+      type: 'number',
+      onMount: onMountHasQuery,
+    },
+    unsubscribed_contacts: {
+      id: 'total_unsubscribed_contacts',
+      name: __('Unsubscribed Contacts'),
+      type: 'bad_number',
+      onMount: onMountHasQuery,
+    },
     forms: {
       name: __('Forms'),
       type: 'table',
@@ -655,7 +692,7 @@
         $(`#${ id }`).on('click', '.link', e => {
           setPage(`funnels/${ e.target.dataset.funnel }`)
         }).on('click', '.contacts', e => {
-          showContacts( e.target.dataset.query )
+          showContacts(e.target.dataset.query)
         })
       },
     },
@@ -685,61 +722,7 @@
         })
       },
     },
-
-  }
-
-  const onMountHasQuery = ({id, data}) => {
-    $(`#${ id }`).on('click', '.big-number', e => {
-      showContacts( data.query )
-    })
-  }
-
-  registerReportPage('overview', __('Overview', 'groundhogg'), [
-    {
-      id: 'total_new_contacts',
-      name: __('New Contacts'),
-      type: 'number',
-      onMount: onMountHasQuery
-    },
-    {
-      id: 'total_confirmed_contacts',
-      name: __('Confirmed Contacts'),
-      type: 'number',
-      onMount: onMountHasQuery
-    },
-    {
-      id: 'total_engaged_contacts',
-      name: __('Engaged Contacts'),
-      type: 'number',
-      onMount: onMountHasQuery
-    },
-    {
-      id: 'total_unsubscribed_contacts',
-      name: __('Unsubscribed Contacts'),
-      type: 'bad_number',
-      onMount: onMountHasQuery
-    },
-    {
-      id: 'total_emails_sent',
-      name: __('Emails Sent'),
-      type: 'number',
-    },
-    {
-      id: 'email_open_rate',
-      name: __('Open Rate'),
-      type: 'percentage',
-    },
-    {
-      id: 'email_click_rate',
-      name: __('Click Thru Rate'),
-      type: 'percentage',
-    },
-    {
-      id: 'total_bounces',
-      name: __('Bounces'),
-      type: 'number',
-    },
-    {
+    lead_sources: {
       id: 'table_contacts_by_lead_source',
       name: __('Top Lead Sources'),
       type: 'table',
@@ -761,8 +744,8 @@
         // language=HTML
         return `
             <tr>
-                ${leadSource()}
-                <td class="number-total contacts" data-value="${ value }" data-query="${query}">${ count }</td>
+                ${ leadSource() }
+                <td class="number-total contacts" data-value="${ value }" data-query="${ query }">${ count }</td>
             </tr>`
 
       },
@@ -770,11 +753,11 @@
         $(`#${ id }`).on('click', '.link', e => {
           window.open(e.currentTarget.dataset.link, '_blank')
         }).on('click', '.contacts', e => {
-          showContacts( e.target.dataset.query )
+          showContacts(e.target.dataset.query)
         })
       },
     },
-    {
+    source_pages: {
       id: 'table_contacts_by_source_page',
       name: __('Top Source Pages'),
       type: 'table',
@@ -792,43 +775,99 @@
         })
       },
     },
+    link_clicks: {
+      id: 'link_clicks',
+      name: __('Link Clicks'),
+      type: 'table',
+      renderRow: ({ value, count }) => {
+        //language=HTML
+        return `
+            <tr>
+                <td class="link large" data-link="${ value }">${ value }</td>
+                <td class="number-total" data-value="${ value }">${ count }</td>
+            </tr>`
+      },
+      onMount: ({ id }) => {
+        $(`#${ id }`).on('click', '.link', e => {
+          window.open(e.currentTarget.dataset.link, '_blank')
+        })
+      },
+    },
+  }
+
+  registerReportPage('overview', __('Overview', 'groundhogg'), [
+    CommonReports.new_contacts,
+    CommonReports.confirmed_contacts,
+    CommonReports.engaged_contacts,
+    CommonReports.unsubscribed_contacts,
+    {
+      id: 'total_emails_sent',
+      name: __('Emails Sent'),
+      type: 'number',
+    },
+    {
+      id: 'email_open_rate',
+      name: __('Open Rate'),
+      type: 'percentage',
+    },
+    {
+      id: 'email_click_rate',
+      name: __('Click Thru Rate'),
+      type: 'percentage',
+    },
+    {
+      id: 'total_bounces',
+      name: __('Bounces'),
+      type: 'number',
+    },
+    CommonReports.lead_sources,
+    CommonReports.source_pages,
     CommonReports.funnel_performance,
     CommonReports.broadcast_performance,
   ])
 
   registerReportPage(/funnels\/[0-9]+\/email\/[0-9]+/, 'Email', [
     {
-      id: 'emails_sent',
-      name: __('Sent'),
+      id: 'funnel_emails_sent',
+      name: __('Emails Sent'),
       type: 'number',
     },
     {
-      id: 'emails_opened',
+      id: 'funnel_opens',
+      name: __('Opens'),
+      type: 'number',
+    },
+    {
+      ...CommonReports.link_clicks,
+      rows: 3,
+    },
+    {
+      id: 'funnel_open_rate',
       name: __('Open Rate'),
       type: 'percentage',
     },
     {
-      id: 'emails_clicked',
+      id: 'funnel_clicks',
+      name: __('Clicks'),
+      type: 'number',
+    },
+    {
+      id: 'funnel_click_rate',
       name: __('Click Thru Rate'),
       type: 'percentage',
     },
     {
-      id: 'unsubscribes',
+      id: 'funnel_unsubscribes',
       name: __('Unsubscribes'),
       type: 'bad_number',
-    },
-    {
-      id: 'link_clicks',
-      name: __('Clicks'),
-      type: 'table',
     },
   ], 'funnels', {
     priority: 1,
     preload: ([a, funnelId, b, emailId]) => {
-      return EmailsStore.fetchItem(emailId)
+      return FunnelsStore.fetchItem(funnelId)
     },
     beforeReports: ([route, funnelId, route1, emailId]) => {
-      return `<h1>${ EmailsStore.get(emailId).data.title }</h1>`
+      return `<h1>${ FunnelsStore.get(funnelId).steps.find(s => s.ID == emailId).export.email.data.title }</h1>`
     },
   })
 
@@ -837,6 +876,7 @@
       id: 'active_contacts_in_funnel',
       name: __('Active Contacts'),
       type: 'number',
+      onMount: onMountHasQuery,
     },
     {
       id: 'total_funnel_conversion_rate',
@@ -938,7 +978,20 @@
       return FunnelsStore.fetchItem(id)
     },
     beforeReports: ([route, id]) => {
-      return `<h1>${ FunnelsStore.get(id).data.title }</h1>`
+      //language=HTML
+      return `
+          <div class="display-flex gap-20 align-bottom">
+              <h1>${ FunnelsStore.get(id).data.title }</h1>
+              <button class="gh-button secondary edit-funnel" data-funnel="${ id }">${ __('Edit Funnel') }</button>
+          </div>`
+    },
+    onMount: () => {
+      $('.edit-funnel').on('click', e => {
+        window.open(adminPageURL('gh_funnels', {
+          action: 'edit',
+          funnel: e.currentTarget.dataset.funnel,
+        }), '_blank')
+      })
     },
   })
 
@@ -969,9 +1022,8 @@
       type: 'pie_chart',
     },
     {
-      id: 'broadcast_link_clicks',
-      name: __('Clicks'),
-      type: 'table',
+      ...CommonReports.link_clicks,
+      columns: 4,
     },
   ], 'broadcasts', {
     priority: 1,
@@ -983,7 +1035,56 @@
     },
   })
 
-  registerReportPage('contacts', 'Contacts', [])
+  registerReportPage('contacts', 'Contacts', [
+    CommonReports.new_contacts,
+    CommonReports.confirmed_contacts,
+    CommonReports.engaged_contacts,
+    CommonReports.unsubscribed_contacts,
+    CommonReports.lead_sources,
+    CommonReports.source_pages,
+  ])
+
+  registerReportPage(/campaigns\/[0-9]+/, 'Campaigns', [
+    CommonReports.funnel_performance,
+    CommonReports.broadcast_performance,
+  ], 'campaigns', {
+    priority: 1,
+    preload: ([route, id]) => {
+      return CampaignsStore.fetchItem(id)
+    },
+    beforeReports: ([route, id]) => {
+      return `<h1>${ CampaignsStore.get(id).data.name }</h1>`
+    },
+  })
+
+  registerReportPage('campaigns', 'Campaigns', [
+    {
+      id: 'campaigns_table',
+      name: __('Campaigns'),
+      type: 'table',
+      columns: 4,
+      headers: [
+        __('Campaign'),
+        __('Funnels'),
+        __('Broadcasts'),
+      ],
+      renderRow: ({ id, name, funnels, broadcasts }) => {
+        //language=HTML
+        return `
+            <tr>
+                <td class="link large" data-campaign="${ id }">${ name }</td>
+                <td class="number-total">${ funnels }</td>
+                <td class="number-total">${ broadcasts }</td>
+            </tr>`
+      },
+      onMount: ({ id }, setPage) => {
+        $(`#${ id }`).on('click', '.link', e => {
+          setPage(`campaigns/${ e.target.dataset.campaign }`)
+        })
+      },
+    },
+  ])
+
   registerReportPage('funnels', 'Funnels', [
     {
       ...CommonReports.funnel_performance,
@@ -1037,7 +1138,7 @@
     },
   })
 
-  const showContacts = ( query ) => {
+  const showContacts = (query) => {
     window.open(adminPageURL('gh_contacts', {
       filters: query,
     }), '_blank')

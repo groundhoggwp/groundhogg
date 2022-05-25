@@ -90,6 +90,15 @@ body {
     justify-content: space-between;
     align-items: center;
 
+    .show-preview{
+      width: 35px;
+    }
+
+    #send-test{
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
     .title-wrap {
 
       h1 {

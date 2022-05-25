@@ -54,6 +54,13 @@ body iframe#preview.desktop {
   justify-content: space-between;
   align-items: center;
 }
+#email-editor-header .show-preview {
+  width: 35px;
+}
+#email-editor-header #send-test {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 #email-editor-header .title-wrap h1 {
   line-height: 1;
   margin: 0;

@@ -72,7 +72,7 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
-        // support for identity
+		// support for identity
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
 			$contact  = get_contactdata( $identity );
@@ -6544,4 +6544,15 @@ function yaml_load_socials() {
 	$socials = \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/Socials.yml' );
 
 	return $socials;
+}
+
+/**
+ * Whether the URL belongs to this site
+ *
+ * @param $url
+ *
+ * @return bool
+ */
+function is_this_site( $url ) {
+	return wp_parse_url( $url, PHP_URL_HOST ) === wp_parse_url( home_url(), PHP_URL_HOST );
 }

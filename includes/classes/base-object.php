@@ -245,10 +245,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	/**
 	 * is triggered by calling isset() or empty() on inaccessible members.
 	 *
+	 * @link https://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.members
+	 *
 	 * @param $name string
 	 *
 	 * @return bool
-	 * @link https://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.members
 	 */
 	public function __isset( $name ) {
 		return isset( $this->$name );
@@ -639,10 +640,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @param false $secondary_type
 	 * @param bool  $is_primary
-	 *
+	 * @param string $class a Class
 	 * @return array|DB_Object[]|DB_Object_With_Meta[]
 	 */
-	public function get_related_objects( $secondary_type = false, $is_primary = true ) {
+	public function get_related_objects( $secondary_type = false, $is_primary = true, $class = false ) {
 
 		$relationships = $this->get_rel_db()->query( array_filter( [
 			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
@@ -650,13 +651,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $secondary_type
 		] ) );
 
-		return array_map( function ( $rel ) use ( $is_primary ) {
+		return array_map( function ( $rel ) use ( $is_primary, $class ) {
 
-			if ( $is_primary ) {
-				return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
-			} else {
-				return create_object_from_type( $rel->primary_object_id, $rel->primary_object_type );
-			}
+			$id   = $is_primary ? $rel->secondary_object_id : $rel->primary_object_id;
+			$type = $is_primary ? $rel->secondary_object_type : $rel->primary_object_type;
+
+			return $class ? new $class( $id ) : create_object_from_type( $id, $type );
 
 		}, $relationships );
 	}

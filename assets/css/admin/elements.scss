@@ -129,7 +129,7 @@ h3 {
 
 }
 
-.space-between {
+.space-between:not(.display-flex) {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
@@ -658,6 +658,10 @@ span.gh-text {
       button.toggle-indicator::before {
         content: "\f140";
       }
+    }
+
+    .inside {
+      display: none;
     }
   }
 
@@ -1530,12 +1534,13 @@ p.error,
     width: 100%;
   }
 
+  .row,
   .gh-row {
     display: flex;
     gap: 10px;
     justify-content: space-between;
 
-    .gh-col, .gh-column {
+    .col, .gh-col, .gh-column {
       width: 100%;
       //display: flex;
       //flex-direction: column;

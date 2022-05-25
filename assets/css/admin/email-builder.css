@@ -1,9 +1,44 @@
+.template-full-width {
+  padding: 0 20px 20px 20px;
+}
+
+.template-boxed {
+  margin: 0 20px 20px 20px;
+}
+.template-boxed.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.template-framed {
+  background: rgba(0, 117, 255, 0.07);
+  padding: 60px 0;
+}
+.template-framed .template-logo {
+  margin: 0 auto 30px auto;
+  display: block;
+  width: 100%;
+}
+.template-framed > .inner-content {
+  margin: 0 auto;
+  padding: 30px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  border-radius: 20px;
+  background: #ffffff;
+}
+
 .alignleft {
   margin-right: 10px;
 }
 
 .alignright {
   margin-left: 10px;
+}
+
+.block-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 #email-block-editor {
@@ -48,11 +83,8 @@
   background: #FFFFFF;
   overflow: auto;
 }
-#email-block-editor #content #builder-content {
-  max-width: 640px;
-}
-#email-block-editor #content #builder-content.center {
-  margin: auto;
+#email-block-editor #content #builder-content p:first-child {
+  margin-top: 0;
 }
 #email-block-editor #content #builder-content img {
   max-width: 100%;
@@ -67,7 +99,6 @@
 }
 #email-block-editor #content #builder-content .builder-block {
   position: relative;
-  padding: 5px;
 }
 #email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
   display: inline-block;
@@ -88,14 +119,17 @@
 #email-block-editor #content #builder-content .builder-block .email-button {
   display: inline-block;
 }
-#email-block-editor #content #builder-content .builder-block .email-columns td {
-  padding: 0 5px;
+#email-block-editor #content #builder-content .builder-block .email-columns {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
 }
-#email-block-editor #content #builder-content .builder-block .email-columns td:first-child {
-  padding-left: 0;
+#email-block-editor #content #builder-content .builder-block .email-columns-row {
+  display: table-row;
 }
-#email-block-editor #content #builder-content .builder-block .email-columns td:last-child {
-  padding-right: 0;
+#email-block-editor #content #builder-content .builder-block .email-columns-cell {
+  display: table-cell;
+  vertical-align: top;
 }
 #email-block-editor #content #builder-content .builder-block img {
   display: inline-block;
@@ -104,6 +138,7 @@
   background-color: rgba(16, 38, 64, 0.05);
   border-radius: 5px;
   padding: 20px;
+  margin: 5px;
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar {
   display: none;
@@ -132,6 +167,7 @@
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
   display: flex;
   background-color: #0075ff;
+  z-index: 999;
 }
 #email-block-editor #controls-panel {
   width: 400px;
@@ -139,33 +175,15 @@
 #email-block-editor #controls-panel h3 {
   padding-left: 10px;
 }
-#email-block-editor #controls-panel .control-group:not(:last-child) {
-  margin-bottom: 20px;
-}
-#email-block-editor #controls-panel .control-group .control-group-header {
-  padding: 10px;
-  cursor: pointer;
-}
-#email-block-editor #controls-panel .control-group .control-group-header h4.control-group-name {
-  margin: 0;
-  font-size: 16px;
-}
-#email-block-editor #controls-panel .control-group.closed .controls {
-  display: none;
-}
-#email-block-editor #controls-panel .control-group.closed .control-group-header span {
-  transform: rotate(180deg);
-}
-#email-block-editor #controls-panel .control-group .controls {
-  padding: 10px;
+#email-block-editor #controls-panel .control-group:not(.closed) .controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-#email-block-editor #controls-panel .control-group .controls label {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls label {
   font-weight: 500;
 }
-#email-block-editor #controls-panel .control-group .controls .layouts {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls .layouts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -174,18 +192,18 @@
   grid-auto-flow: row;
   grid-template-areas: ". ." ". .";
 }
-#email-block-editor #controls-panel .control-group .controls .layout-choice {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice {
   border: none;
   padding: 10px;
   border-radius: 5px;
 }
-#email-block-editor #controls-panel .control-group .controls .layout-choice:hover {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
   background-color: rgba(0, 117, 255, 0.2);
 }
-#email-block-editor #controls-panel .control-group .controls .layout-choice.selected {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
   background-color: rgba(0, 117, 255, 0.5);
 }
-#email-block-editor #controls-panel .control-group .controls .layout-choice svg {
+#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice svg {
   width: 100%;
 }
 #email-block-editor #controls-panel .control-input {

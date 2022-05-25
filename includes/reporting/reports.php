@@ -222,24 +222,8 @@ class Reports {
 				'callback' => [ $this, 'total_funnel_conversion_rate' ]
 			],
 			[
-				'id'       => 'total_benchmark_conversion_rate',
-				'callback' => [ $this, 'total_benchmark_conversion_rate' ]
-			],
-			[
-				'id'       => 'total_abandonment_rate',
-				'callback' => [ $this, 'total_abandonment_rate' ]
-			],
-			[
-				'id'       => 'table_broadcast_stats',
-				'callback' => [ $this, 'table_broadcast_stats' ]
-			],
-			[
-				'id'       => 'table_broadcast_link_clicked',
-				'callback' => [ $this, 'table_broadcast_link_clicked' ]
-			],
-			[
-				'id'       => 'table_benchmark_conversion_rate',
-				'callback' => [ $this, 'table_benchmark_conversion_rate' ]
+				'id'       => 'link_clicks',
+				'callback' => [ $this, 'link_clicks' ]
 			],
 			[
 				'id'       => 'table_funnel_performance',
@@ -250,24 +234,8 @@ class Reports {
 				'callback' => [ $this, 'table_broadcast_performance' ]
 			],
 			[
-				'id'       => 'table_top_converting_funnels',
-				'callback' => [ $this, 'table_top_converting_funnels' ]
-			],
-			[
 				'id'       => 'table_form_activity',
 				'callback' => [ $this, 'table_form_activity' ]
-			],
-			[
-				'id'       => 'table_email_stats',
-				'callback' => [ $this, 'table_email_stats' ]
-			],
-			[
-				'id'       => 'table_email_links_clicked',
-				'callback' => [ $this, 'table_email_links_clicked' ]
-			],
-			[
-				'id'       => 'chart_donut_email_stats',
-				'callback' => [ $this, 'chart_donut_email_stats' ]
 			],
 			[
 				'id'       => 'table_funnel_stats',
@@ -278,8 +246,16 @@ class Reports {
 				'callback' => [ $this, 'funnel_emails_sent' ]
 			],
 			[
+				'id'       => 'funnel_opens',
+				'callback' => [ $this, 'funnel_opens' ]
+			],
+			[
 				'id'       => 'funnel_open_rate',
 				'callback' => [ $this, 'funnel_open_rate' ]
+			],
+			[
+				'id'       => 'funnel_clicks',
+				'callback' => [ $this, 'funnel_clicks' ]
 			],
 			[
 				'id'       => 'funnel_click_rate',
@@ -294,14 +270,6 @@ class Reports {
 				'callback' => [ $this, 'funnel_forms' ]
 			],
 			[
-				'id'       => 'table_email_funnels_used_in',
-				'callback' => [ $this, 'table_email_funnels_used_in' ]
-			],
-			[
-				'id'       => 'table_list_engagement',
-				'callback' => [ $this, 'table_list_engagement' ]
-			],
-			[
 				'id'       => 'donut_chart_contact_engagement',
 				'callback' => [ $this, 'donut_chart_contact_engagement' ]
 			],
@@ -312,6 +280,10 @@ class Reports {
 			[
 				'id'       => 'form_engagement_rate',
 				'callback' => [ $this, 'form_engagement_rate' ]
+			],
+			[
+				'id'       => 'campaigns_table',
+				'callback' => [ $this, 'campaigns_table' ]
 			]
 		];
 
@@ -535,13 +507,13 @@ class Reports {
 					'before'     => $this->end->format( 'Y-m-d' )
 				]
 			] ),
-			'curr' => get_db( 'activity' )->count( [
+			'curr'  => get_db( 'activity' )->count( [
 				'select'   => 'contact_id',
 				'distinct' => true,
 				'before'   => $this->end->getTimestamp(),
 				'after'    => $this->start->getTimestamp(),
 			] ),
-			'prev' => get_db( 'activity' )->count( [
+			'prev'  => get_db( 'activity' )->count( [
 				'select'   => 'contact_id',
 				'distinct' => true,
 				'before'   => $this->prev_end->getTimestamp(),
@@ -570,51 +542,18 @@ class Reports {
 					'before'     => $this->end->format( 'Y-m-d' )
 				]
 			] ),
-			'curr' => $query->count( [
+			'curr'  => $query->count( [
 				'optin_status' => Preferences::UNSUBSCRIBED,
 				'date_query'   => [
 					'after'  => $this->start->format( 'Y-m-d H:i:s' ),
 					'before' => $this->end->format( 'Y-m-d H:i:s' )
 				]
 			] ),
-			'prev' => $query->count( [
+			'prev'  => $query->count( [
 				'optin_status' => Preferences::UNSUBSCRIBED,
 				'date_query'   => [
 					'after'  => $this->prev_start->format( 'Y-m-d H:i:s' ),
 					'before' => $this->prev_end->format( 'Y-m-d H:i:s' ),
-				]
-			] ),
-		];
-	}
-
-	/**
-	 * Total Number of Unsubscribes
-	 *
-	 * @return array
-	 */
-	public function funnel_unsubscribes() {
-		$query = new Contact_Query();
-
-		$funnel = new Funnel( $this->params[1] );
-		if ( ! $funnel->exists() ) {
-			return 0;
-		}
-
-		return [
-			'curr' => $query->count( [
-				'activity' => [
-					'activity_type' => Activity::UNSUBSCRIBED,
-					'funnel_id'     => $funnel->get_id(),
-					'before'        => $this->end->getTimestamp(),
-					'after'         => $this->start->getTimestamp(),
-				]
-			] ),
-			'prev' => $query->count( [
-				'activity' => [
-					'activity_type' => Activity::UNSUBSCRIBED,
-					'funnel_id'     => $funnel->get_id(),
-					'before'        => $this->prev_end->getTimestamp(),
-					'after'         => $this->prev_start->getTimestamp(),
 				]
 			] ),
 		];
@@ -663,7 +602,6 @@ class Reports {
 		];
 	}
 
-
 	/**
 	 * The email open rate
 	 *
@@ -681,6 +619,7 @@ class Reports {
 		];
 	}
 
+
 	/**
 	 * The email open rate
 	 *
@@ -696,7 +635,6 @@ class Reports {
 			'prev' => percentage( $other_report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() ), $report->query( $this->prev_start->getTimestamp(), $this->prev_end->getTimestamp() ) ),
 		];
 	}
-
 
 	/**
 	 * @return Chart_New_Contacts
@@ -722,6 +660,7 @@ class Reports {
 	public function chart_contacts_by_optin_status() {
 		return new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
 	}
+
 
 	/**
 	 * @return mixed
@@ -1007,7 +946,6 @@ class Reports {
 
 	}
 
-
 	/**
 	 * @return mixed
 	 */
@@ -1056,10 +994,23 @@ class Reports {
 		};
 
 		return [
-			'curr' => $func( $this->start, $this->end ),
-			'prev' => $func( $this->prev_start, $this->prev_end ),
+			'curr'  => $func( $this->start, $this->end ),
+			'prev'  => $func( $this->prev_start, $this->prev_end ),
+			'query' => base64_json_encode( [
+				[
+					[
+						'type'       => 'funnel_history',
+						'date_range' => 'between',
+						'after'      => $this->start->format( 'Y-m-d' ),
+						'before'     => $this->end->format( 'Y-m-d' ),
+						'funnel_id'  => $funnel->get_id(),
+						'status'     => Event::COMPLETE
+					]
+				]
+			] ),
 		];
 	}
+
 
 	/**
 	 * @return mixed
@@ -1077,75 +1028,89 @@ class Reports {
 		];
 	}
 
-
 	/**
 	 * @return mixed
 	 */
-	public function total_contacts_in_funnel() {
+	public function link_clicks() {
 
-		$report = new Total_Contacts_In_Funnel( $this->start, $this->end );
+		$query = [
+			'select'        => 'COUNT(DISTINCT(contact_id)) as count, referer',
+			'activity_type' => Activity::EMAIL_CLICKED,
+			'groupby'       => 'referer'
+		];
 
-		return $report->get_data();
+		switch ( $this->params[0] ) {
+			case 'funnels':
 
-	}
+				$funnel             = new Funnel( $this->params[1] );
+				$query['funnel_id'] = $funnel->get_id();
+				$query['step_id']   = absint( $this->params[3] );
+				$query['after']     = $this->start->getTimestamp();
+				$query['before']    = $this->end->getTimestamp();
 
-	/**
-	 * @return mixed
-	 */
-	public function total_benchmark_conversion_rate() {
+				break;
 
-		$report = new Total_Benchmark_Conversion_Rate( $this->start, $this->end );
+			case 'broadcasts':
 
-		return $report->get_data();
+				$broadcast          = new Broadcast( $this->params[1] );
+				$query['funnel_id'] = $broadcast->get_funnel_id();
+				$query['step_id']   = $broadcast->get_id();
 
-	}
+				break;
 
-	/**
-	 * @return mixed
-	 */
-	public function total_abandonment_rate() {
+		}
 
-		$report = new Total_Abandonment_Rate( $this->start, $this->end );
+		$clicks = get_db( 'activity' )->query( $query );
 
-		return $report->get_data();
+		$data = [];
 
-	}
+		foreach ( $clicks as $click ) {
 
-	/**
-	 * @return mixed
-	 */
-	public function table_broadcast_stats() {
+			if ( ! is_this_site( $click->referer ) ) {
+				$data[ $click->referer ] = $click->count;
+				continue;
+			}
 
-		$report = new Table_Broadcast_Stats( $this->start, $this->end );
+			$path = wp_parse_url( $click->referer, PHP_URL_PATH );
 
-		return $report->get_data();
+			if ( empty( $path ) ) {
+				continue;
+			}
 
-	}
+			if ( isset( $data[ $path ] ) ) {
+				$data[ $path ] += $click->count;
+			} else {
+				$data[ $path ] = $click->count;
+			}
 
+		}
 
-	/**
-	 * @return mixed
-	 */
-	public function table_broadcast_link_clicked() {
-		$report = new Table_Broadcast_Link_Clicked( $this->start, $this->end );
+		$parsed = array_values( array_map_with_keys( $data, function ( $v, $k ) {
+			return [ 'count' => $v, 'value' => $k ];
+		} ) );
 
-		return $report->get_data();
-	}
+		usort( $parsed, function ( $a, $b ) {
+			return $b['count'] - $a['count'];
+		} );
 
-	/**
-	 * @return mixed
-	 */
-	public function table_benchmark_conversion_rate() {
-		$report = new Table_Benchmark_Conversion_Rate( $this->start, $this->end );
-
-		return $report->get_data();
+		return $parsed;
 	}
 
 	public function table_funnel_performance() {
 
-		$funnels = get_db( 'funnels' )->query( [
+		$query = [
 			'status' => 'active'
-		] );
+		];
+
+		if ( $this->params[0] === 'campaigns' ) {
+			$campaign    = new Campaign( $this->params[1] );
+			$query['ID'] = get_object_ids( $campaign->get_related_objects( 'funnel', false ) );
+			if ( empty( $query['ID'] ) ) {
+				return [];
+			}
+		}
+
+		$funnels = get_db( 'funnels' )->query( $query );
 
 		$data = [];
 
@@ -1192,14 +1157,29 @@ class Reports {
 		return $data;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function table_broadcast_performance() {
 
-		$broadcasts = get_db( 'broadcasts' )->query( [
+		$query = [
 			'status'      => 'sent',
 			'object_type' => 'email',
+			'before'      => $this->end->getTimestamp(),
+			'after'       => $this->start->getTimestamp(),
 			'orderby'     => 'send_time',
 			'order'       => 'DESC'
-		] );
+		];
+
+		if ( $this->params[0] === 'campaigns' ) {
+			$campaign    = new Campaign( $this->params[1] );
+			$query['ID'] = get_object_ids( $campaign->get_related_objects( 'broadcast', false ) );
+			if ( empty( $query['ID'] ) ) {
+				return [];
+			}
+		}
+
+		$broadcasts = get_db( 'broadcasts' )->query( $query );
 
 		$data = [];
 
@@ -1216,13 +1196,6 @@ class Reports {
 		return $data;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	public function table_top_converting_funnels() {
-		return new Table_Top_Converting_Funnels( $this->start, $this->end );
-	}
-
 	public function table_form_activity() {
 
 		$form_ids = array_keys( get_form_list() );
@@ -1234,28 +1207,10 @@ class Reports {
 				'id'          => $form->get_id(),
 				'funnel_id'   => $form->get_funnel_id(),
 				'name'        => $form->get_name(),
-				'submissions' => $form->get_submissions_count( $this->start->format( 'Y-m-d H:i:s' ), $this->end->format( 'Y-m-d H:i:s' ) ),
+				'submissions' => $form->get_submissions_count( $this->start->format( 'Y - m - d H:i:s' ), $this->end->format( 'Y - m - d H:i:s' ) ),
 				'impressions' => $form->get_impressions_count( $this->start->getTimestamp(), $this->end->getTimestamp() ),
 			];
 		}, $forms );
-	}
-
-	public function table_email_stats() {
-		$report = new Table_Email_Stats( $this->start, $this->end );
-
-		return $report->get_data();
-	}
-
-	public function table_email_links_clicked() {
-		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
-
-		return $report->get_data();
-	}
-
-	public function chart_donut_email_stats() {
-		$report = new Chart_Donut_Email_Stats( $this->start, $this->end );
-
-		return $report->get_data();
 	}
 
 	/**
@@ -1311,16 +1266,21 @@ class Reports {
 		$funnel = new Funnel( $funnel_id );
 
 		if ( ! $funnel->exists() ) {
-			return 0;
+			return [];
 		}
 
-		$steps = $funnel->get_steps();
+		// If doing a specific email step
+		if ( isset( $this->params[2] ) && $this->params[2] === 'email' ) {
+			$step_ids = wp_parse_id_list( $this->params[3] );
+		} else {
+			$steps = $funnel->get_steps();
 
-		$steps = array_values( array_filter( $steps, function ( $step ) {
-			return $step->type_is( Send_Email::TYPE );
-		} ) );
+			$steps = array_values( array_filter( $steps, function ( $step ) {
+				return $step->type_is( Send_Email::TYPE );
+			} ) );
 
-		$step_ids = get_object_ids( $steps );
+			$step_ids = get_object_ids( $steps );
+		}
 
 		$func = function ( $start, $end ) use ( $funnel, $step_ids ) {
 			return get_db( 'events' )->count( [
@@ -1343,6 +1303,44 @@ class Reports {
 	 *
 	 * @return array
 	 */
+	public function funnel_opens() {
+
+		$funnel_id = $this->params[1];
+
+		$funnel = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ) {
+			return [];
+		}
+
+		$opened = function ( $start, $end ) use ( $funnel ) {
+
+			$query = [
+				'funnel_id'     => $funnel->get_id(),
+				'activity_type' => Activity::EMAIL_OPENED,
+				'after'         => $start->getTimestamp(),
+				'before'        => $end->getTimestamp(),
+			];
+
+			// If doing a specific email step
+			if ( isset( $this->params[2] ) && $this->params[2] === 'email' ) {
+				$query['step_id'] = absint( $this->params[3] );
+			}
+
+			return get_db( 'activity' )->count( $query );
+		};
+
+		return [
+			'curr' => $opened( $this->start, $this->end ),
+			'prev' => $opened( $this->prev_start, $this->prev_end ),
+		];
+	}
+
+	/**
+	 * The email open rate
+	 *
+	 * @return array
+	 */
 	public function funnel_open_rate() {
 
 		$sent = $this->funnel_emails_sent();
@@ -1352,21 +1350,68 @@ class Reports {
 		$funnel = new Funnel( $funnel_id );
 
 		if ( ! $funnel->exists() ) {
-			return 0;
+			return [];
 		}
 
 		$opened = function ( $start, $end ) use ( $funnel ) {
-			return get_db( 'activity' )->count( [
+
+			$query = [
 				'funnel_id'     => $funnel->get_id(),
 				'activity_type' => Activity::EMAIL_OPENED,
 				'after'         => $start->getTimestamp(),
 				'before'        => $end->getTimestamp(),
-			] );
+			];
+
+			// If doing a specific email step
+			if ( isset( $this->params[2] ) && $this->params[2] === 'email' ) {
+				$query['step_id'] = absint( $this->params[3] );
+			}
+
+			return get_db( 'activity' )->count( $query );
 		};
 
 		return [
 			'curr' => percentage( $sent['curr'], $opened( $this->start, $this->end ) ),
 			'prev' => percentage( $sent['prev'], $opened( $this->prev_start, $this->prev_end ) ),
+		];
+	}
+
+	/**
+	 * The email open rate
+	 *
+	 * @return array
+	 */
+	public function funnel_clicks() {
+
+		$funnel_id = $this->params[1];
+
+		$funnel = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ) {
+			return [];
+		}
+
+		$func = function ( $start, $end ) use ( $funnel ) {
+
+			$query = [
+				'select'        => 'DISTINCT(contact_id)',
+				'funnel_id'     => $funnel->get_id(),
+				'activity_type' => Activity::EMAIL_CLICKED,
+				'after'         => $start->getTimestamp(),
+				'before'        => $end->getTimestamp(),
+			];
+
+			// If doing a specific email step
+			if ( isset( $this->params[3] ) ) {
+				$query['step_id'] = absint( $this->params[3] );
+			}
+
+			return get_db( 'activity' )->count( $query );
+		};
+
+		return [
+			'curr' => $func( $this->start, $this->end ),
+			'prev' => $func( $this->prev_start, $this->prev_end ),
 		];
 	}
 
@@ -1382,21 +1427,70 @@ class Reports {
 		$funnel = new Funnel( $funnel_id );
 
 		if ( ! $funnel->exists() ) {
-			return 0;
+			return [];
 		}
 
 		$func = function ( $type, $start, $end ) use ( $funnel ) {
-			return get_db( 'activity' )->count( [
+
+			$query = [
+				'select'        => 'DISTINCT(contact_id)',
 				'funnel_id'     => $funnel->get_id(),
 				'activity_type' => $type,
 				'after'         => $start->getTimestamp(),
 				'before'        => $end->getTimestamp(),
-			] );
+			];
+
+			// If doing a specific email step
+			if ( isset( $this->params[2] ) && $this->params[2] === 'email' ) {
+				$query['step_id'] = absint( $this->params[3] );
+			}
+
+			return get_db( 'activity' )->count( $query );
 		};
 
 		return [
 			'curr' => percentage( $func( Activity::EMAIL_OPENED, $this->start, $this->end ), $func( Activity::EMAIL_CLICKED, $this->start, $this->end ) ),
 			'prev' => percentage( $func( Activity::EMAIL_OPENED, $this->prev_start, $this->prev_end ), $func( Activity::EMAIL_CLICKED, $this->prev_start, $this->prev_end ) ),
+		];
+	}
+
+	/**
+	 * Total Number of Unsubscribes
+	 *
+	 * @return array
+	 */
+	public function funnel_unsubscribes() {
+		$funnel = new Funnel( $this->params[1] );
+
+		if ( ! $funnel->exists() ) {
+			return [];
+		}
+
+		$func = function ( $start, $end ) use ( $funnel ) {
+
+			$query = new Contact_Query();
+
+			$_query = [
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'funnel_id'     => $funnel->get_id(),
+				'before'        => $this->end->getTimestamp(),
+				'after'         => $this->start->getTimestamp(),
+			];
+
+			// If doing a specific email step
+			if ( isset( $this->params[2] ) && $this->params[2] === 'email' ) {
+				$_query['step_id'] = absint( $this->params[3] );
+			}
+
+			return $query->count( [
+				'activity' => $_query
+			] );
+
+		};
+
+		return [
+			'curr' => $func( $this->start, $this->end ),
+			'prev' => $func( $this->prev_start, $this->prev_end ),
 		];
 	}
 
@@ -1409,7 +1503,7 @@ class Reports {
 
 		$funnel = new Funnel( $funnel_id );
 		if ( ! $funnel->exists() ) {
-			return 0;
+			return [];
 		}
 
 		$steps = $funnel->get_steps();
@@ -1423,7 +1517,7 @@ class Reports {
 			$email          = new Email( $email_id );
 			$stats          = $email->get_email_stats( $this->start->getTimestamp(), $this->end->getTimestamp(), [ $step->get_id() ] );
 			$stats['title'] = $email->get_title();
-			$stats['id']    = $email->get_id();
+			$stats['id']    = $step->get_id();
 
 			return $stats;
 		}, $steps );
@@ -1449,22 +1543,38 @@ class Reports {
 				'id'          => $form->get_id(),
 				'funnel_id'   => $form->get_funnel_id(),
 				'name'        => $form->get_name(),
-				'submissions' => $form->get_submissions_count( $this->start->format( 'Y-m-d H:i:s' ), $this->end->format( 'Y-m-d H:i:s' ) ),
+				'submissions' => $form->get_submissions_count( $this->start->format( 'Y - m - d H:i:s' ), $this->end->format( 'Y - m - d H:i:s' ) ),
 				'impressions' => $form->get_impressions_count( $this->start->getTimestamp(), $this->end->getTimestamp() ),
 			];
 		}, $forms );
 	}
 
-	public function table_email_funnels_used_in() {
-		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
+	public function campaigns_table() {
 
-		return $report->get_data();
-	}
+		$campaigns = get_db( 'campaigns' )->query();
+		$campaigns = array_map_to_class( $campaigns, Campaign::class );
 
-	public function table_list_engagement() {
-		$report = new Table_List_Engagement( $this->start, $this->end );
+		$data = [];
 
-		return $report->get_data();
+		/**
+		 * @var $campaign Campaign
+		 */
+		foreach ( $campaigns as $campaign ) {
+
+			$data[] = [
+				'id'         => $campaign->get_id(),
+				'name'       => $campaign->get_name(),
+				'funnels'    => count( array_filter( $campaign->get_related_objects( 'funnel', false ), function ( $funnel ) {
+					return $funnel->is_active();
+				} ) ),
+				// todo this can be optimized probably
+				'broadcasts' => count( array_filter( $campaign->get_related_objects( 'broadcast', false ), function ( $broadcast ) {
+					return $broadcast->is_sent() && $broadcast->sent_within( $this->start->getTimestamp(), $this->end->getTimestamp() );
+				} ) ),
+			];
+		}
+
+		return $data;
 	}
 
 

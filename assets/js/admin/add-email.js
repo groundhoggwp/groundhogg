@@ -78,8 +78,7 @@
       return `
 		  <div class="gh-panel template" tabindex="0">
 			  <div class="subject-and-preview">
-				  <div class="subject-wrap">${__('Subject', 'groundhogg')}: <span class="subject">${data.subject}</span></div>
-				  <div class="preview-wrap">${__('Preview', 'groundhogg')}: <span class="preview-text">${data.pre_header}</span></div>
+				  <div class="subject-wrap">${data.title}</div>
 			  </div>
 			  <div class="template-preview">
 				  <div class="template-content">

@@ -22,12 +22,54 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
-.alignleft{
+
+
+.template-full-width {
+  padding: 0 20px 20px 20px;
+}
+
+.template-boxed {
+
+  margin: 0 20px 20px 20px;
+
+  &.center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.template-framed {
+
+  .template-logo {
+    margin: 0 auto 30px auto;
+    display: block;
+    width: 100%;
+  }
+
+  > .inner-content {
+    margin: 0 auto;
+    padding: 30px;
+    box-shadow: $box-shadow;
+    border-radius: 20px;
+    background: #ffffff;
+  }
+
+  background: $primary-blue-7;
+  padding: 60px 0;
+}
+
+.alignleft {
   margin-right: 10px;
 }
 
-.alignright{
+.alignright {
   margin-left: 10px;
+}
+
+.block-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 #email-block-editor {
@@ -36,7 +78,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   padding: 0 20px;
   max-height: calc(100vh - 132px);
 
-  *{
+  * {
     box-sizing: border-box;
   }
 
@@ -44,11 +86,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     //padding: 0 20px;
   }
 
-  .block-wrap{
+  .block-wrap {
     .block-name {
       text-align: center;
       font-weight: 300;
     }
+
     &:not(:last-child) {
       margin-bottom: 10px;
     }
@@ -63,7 +106,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     cursor: grab;
     margin-bottom: 5px;
 
-    &.dragging{
+    &.dragging {
       cursor: grabbing;
     }
 
@@ -86,13 +129,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
     #builder-content {
 
-      &.center{
-        margin: auto;
+      p:first-child{
+        margin-top: 0;
       }
 
-      max-width: 640px;
-
-      img{
+      img {
         max-width: 100%;
       }
 
@@ -107,18 +148,19 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
       .builder-block {
         position: relative;
-        padding: 5px;
 
         &[data-type="image"] .ui-wrapper {
           display: inline-block;
         }
 
-        .maybe-edit-text{
+        .maybe-edit-text {
           position: relative;
-          button.edit-text-content{
+
+          button.edit-text-content {
             display: none;
           }
-          &:hover button.edit-text-content{
+
+          &:hover button.edit-text-content {
             display: inline-block;
             position: absolute;
             left: 50%;
@@ -133,21 +175,20 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         .email-columns {
 
-          td {
-            padding: 0 5px;
-            //text-align: left;
+          display: table;
+          table-layout:fixed;
+          width: 100%;
 
-            &:first-child{
-              padding-left: 0;
-            }
+          &-row {
+            display: table-row;
+          }
 
-            &:last-child{
-              padding-right: 0;
-            }
+          &-cell {
+            display: table-cell;
+            vertical-align: top;
           }
 
         }
-
 
 
         img {
@@ -158,6 +199,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           background-color: $primary-dark-5;
           border-radius: 5px;
           padding: 20px;
+          margin: 5px;
         }
 
         .block-toolbar {
@@ -167,22 +209,22 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           transform: translateX(50%);
           left: auto;
           top: -22px;
-          background-color: rgb(200,200,200);
+          background-color: rgb(200, 200, 200);
           border-radius: 5px 5px 0 0;
           z-index: 99;
 
-          .move-block{
+          .move-block {
             cursor: grab;
           }
         }
 
         &:hover {
           //transition: 0.4s;
-          outline: 2px solid rgb(200,200,200);
+          outline: 2px solid rgb(200, 200, 200);
 
           > .block-toolbar {
             display: flex;
-            background-color: rgb(200,200,200);
+            background-color: rgb(200, 200, 200);
           }
         }
 
@@ -193,6 +235,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           > .block-toolbar {
             display: flex;
             background-color: $primary-blue;
+            z-index: 999;
           }
         }
       }
@@ -203,47 +246,22 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     width: 400px;
     //padding: 0 10px;
 
-    h3{
+    h3 {
       padding-left: 10px;
     }
 
-    .control-group {
-
-      &:not(:last-child) {
-        margin-bottom: 20px;
-      }
-
-      .control-group-header {
-        padding: 10px;
-        cursor: pointer;
-
-        h4.control-group-name {
-          margin: 0;
-          font-size: 16px;
-        }
-      }
-
-      &.closed {
-        .controls {
-          display: none;
-        }
-
-        .control-group-header span {
-          transform: rotate(180deg);
-        }
-      }
-
+    .control-group:not(.closed){
       .controls {
-        padding: 10px;
         display: flex;
         flex-direction: column;
         gap: 10px;
 
-        label{
+        label {
           font-weight: 500;
         }
 
-        .layouts {  display: grid;
+        .layouts {
+          display: grid;
           grid-template-columns: 1fr 1fr;
           grid-template-rows: 1fr 1fr;
           grid-auto-rows: 1fr;
@@ -255,13 +273,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         }
 
 
-        .layout-choice{
+        .layout-choice {
 
-          &:hover{
+          &:hover {
             background-color: $primary-blue-20;
           }
 
-          &.selected{
+          &.selected {
             background-color: $primary-blue-50;
           }
 
@@ -269,12 +287,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           padding: 10px;
           border-radius: 5px;
 
-          svg{
+          svg {
             width: 100%;
           }
         }
       }
     }
+
 
     .control-input {
       max-width: 75px;
@@ -291,7 +310,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         top: 30px;
       }
 
-      .wp-picker-input-wrap{
+      .wp-picker-input-wrap {
         display: flex;
         box-sizing: border-box;
         width: 202px;
@@ -304,7 +323,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       .wp-picker-holder {
         top: 65px;
 
-        .iris-picker{
+        .iris-picker {
           border-top: none;
         }
       }

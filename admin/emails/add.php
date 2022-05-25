@@ -6,6 +6,7 @@
       Groundhogg.EmailTemplatePicker({
         selector: '#app',
         onSelect: (email) => {
+          Groundhogg.element.loadingModal()
           window.location.href = email.admin
         }
       }).mount()

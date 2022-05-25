@@ -161,6 +161,7 @@ body #wpcontent {
 #app .gh-reporting-dashboard #reports-container .report.number .compare-and-range .gh-report-range, #app .gh-reporting-dashboard #reports-container .report.bad_number .compare-and-range .gh-report-range, #app .gh-reporting-dashboard #reports-container .report.percentage .compare-and-range .gh-report-range {
   color: rgba(16, 38, 64, 0.5);
   text-align: right;
+  font-size: 14px;
 }
 #app .gh-reporting-dashboard #reports-container .report.number .compare-and-range .gh-report-prev, #app .gh-reporting-dashboard #reports-container .report.bad_number .compare-and-range .gh-report-prev, #app .gh-reporting-dashboard #reports-container .report.percentage .compare-and-range .gh-report-prev {
   display: flex;

@@ -194,6 +194,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_status() === 'sent';
 	}
 
+	/**
+	 * @param $start
+	 * @param $end
+	 *
+	 * @return bool
+	 */
+	public function sent_within( $start, $end ){
+		return $start <= $this->get_send_time() && $this->get_send_time() <= $end;
+	}
+
 	public function get_date_scheduled() {
 		return $this->date_scheduled;
 	}

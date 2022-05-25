@@ -37,6 +37,221 @@
     frame.src = URL.createObjectURL(blob)
   }
 
+  const DesignTemplates = [
+    {
+      id: 'boxed',
+      name: __('Boxed'),
+      settings: ({ width = 640, alignment = 'left' }) => {
+        // language=HTML
+        return `
+            <div class="gh-rows-and-columns">
+                <div class="row">
+                    <div class="col">
+                        <label class="full-width">${ __('Email Width') }</label>
+                    </div>
+                    <div class="col">
+                        ${ input({
+                            type: 'number',
+                            value: width,
+                            id: 'template-width',
+
+                        }) }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="">${ __('Alignment:', 'groundhogg') }</label>
+                    </div>
+                    <div class="col">
+                        <div class="gh-input-group">
+                            <button id="align-left" data-alignment="left"
+                                    class="change-alignment gh-button ${
+                                            alignment === 'left' ? 'primary' : 'secondary'
+                                    }">
+                                ${ icons.alignLeft }
+                            </button>
+                            <button id="align-center" data-alignment="center"
+                                    class="change-alignment gh-button ${
+                                            alignment === 'center' ? 'primary' : 'secondary'
+                                    }">
+                                ${ icons.alignCenter }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+      },
+      onMount: (settings, updateSetting) => {
+
+        $('#template-width').on('change input', e => {
+          updateSetting({
+            width: e.currentTarget.value,
+          })
+        })
+
+        $('.change-alignment').on('click', (e) => {
+          updateSetting({
+            alignment: e.currentTarget.dataset.alignment,
+          }, true)
+          $('#' + e.currentTarget.id).focus()
+        })
+
+      },
+      template: ({ settings, content }) => {
+
+        const {
+          width = 640,
+          alignment = 'left',
+        } = settings
+
+        return `<div class="template-boxed ${ alignment }" style="max-width: ${ width }px">${ content }</div>`
+      },
+    },
+    {
+      id: 'full_width',
+      name: __('Full-Width'),
+      settings: () => {
+        // no settings
+        return ''
+      },
+      template: ({ content }) => {
+        return `<div class="template-full-width">${ content }</div>`
+      },
+    },
+    {
+      id: 'framed',
+      name: __('Framed'),
+      settings: ({ width = 640, logo = '', logo_width = 360 }) => {
+
+        // background color
+        // border radius
+        // logo above?
+        // content padding
+
+        // language=HTML
+        return `
+            <div class="gh-rows-and-columns">
+                <div class="row">
+                    <div class="col">
+                        <label class="full-width">${ __('Email Width') }</label>
+                    </div>
+                    <div class="col">
+                        ${ input({
+                            type: 'number',
+                            value: width,
+                            id: 'template-width',
+                        }) }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="image-src" class="control-label">${ __('Logo', 'groundhogg') }</label>
+                        <div class="gh-input-group">
+                            ${ input({
+                                type: 'text',
+                                id: 'template-logo',
+                                value: logo,
+                                className: 'full-width',
+                                name: 'logo',
+                            }) }
+                            <button class="gh-button secondary icon" id="select-image">
+                                ${ icons.image }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="full-width">${ __('Logo Width') }</label>
+                    </div>
+                    <div class="col">
+                        ${ input({
+                            type: 'number',
+                            value: logo_width,
+                            id: 'logo-width',
+                        }) }
+                    </div>
+                </div>
+            </div>`
+      },
+      onMount: (settings, updateSetting) => {
+        $('#template-width').on('change', e => {
+          updateSetting({
+            width: e.target.value,
+          }, true)
+        })
+
+        $('#logo-width').on('change', e => {
+          updateSetting({
+            logo_width: e.target.value,
+          }, true)
+        })
+
+        $('#template-logo').on('change', e => {
+          updateSetting({
+            logo: e.target.value,
+          }, true)
+        })
+
+        // Uploading files
+        var file_frame
+
+        $('#select-image').on('click', (event) => {
+
+          var picker = $(this)
+
+          event.preventDefault()
+          // If the media frame already exists, reopen it.
+          if (file_frame) {
+            // Open frame
+            file_frame.open()
+            return
+          }
+          // Create the media frame.
+          file_frame = wp.media.frames.file_frame = wp.media({
+            title: __('Select a image to upload'),
+            button: {
+              text: __('Use this image'),
+            },
+            multiple: false,	// Set to true to allow multiple files to be selected
+
+          })
+          // When an image is selected, run a callback.
+          file_frame.on('select', function () {
+            // We set multiple to false so only get one image from the uploader
+            var attachment = file_frame.state().get('selection').first().toJSON()
+
+            updateSetting({
+              logo: attachment.url,
+              // height: height,
+            }, true)
+          })
+          // Finally, open the modal
+          file_frame.open()
+        })
+      },
+      template: ({ settings, content }) => {
+
+        const {
+          width = 640,
+          logo,
+          logo_width = 360,
+        } = settings
+
+        // language=HTML
+        return `
+            <div class="template-framed">
+                ${ logo
+                        ? `<img class="template-logo" src="${ logo }" alt="logo" title="logo" style="max-width: ${ logo_width }px"/>`
+                        : '' }
+                <div class="inner-content" style="max-width: ${ width }px">
+                    ${ content }
+                </div>
+            </div>`
+      },
+    },
+  ]
+
   const EmailEditor = ({
     selector,
     email,
@@ -98,6 +313,16 @@
                 ]) }</h1>
             </div>
             <div class="actions">
+                <div id="email-editor-sidebar-controls" class="gh-button-group">
+                    <button id="send-test" class="gh-button secondary">${ __('Send test email', 'groundhogg') }
+                    </button>
+                    <button data-device="mobile" class="show-preview gh-button secondary">
+                        ${ icons.smartphone }
+                    </button>
+                    <button data-device="desktop" class="show-preview gh-button secondary">
+                        ${ icons.desktop }
+                    </button>
+                </div>
                 <div class="undo-and-redo">
                     <button class="redo dashicon-button" ${ this.redoStates.length ? '' : 'disabled' }><span
                             class="dashicons dashicons-redo"></span></button>
@@ -627,6 +852,75 @@
           })
         })
 
+        $('.show-preview').on('click', (e) => {
+
+          const device = e.currentTarget.dataset.device
+
+          modal({
+            dialogClasses: 'no-padding',
+            content: `<iframe id="preview" class="${ device }"></div>`,
+          })
+
+          const {
+            built, edited_preview,
+          } = this.email.context
+
+          setFrameContent($('#preview')[0], edited_preview || built)
+
+        })
+
+        $('#send-test').on('click', (e) => {
+          if (!this.testEmailAddress) {
+            this.testEmailAddress = user_test_email
+          }
+
+          const modalContent = (isSending = false) => {
+            //language=HTML
+            return `<h2>Send a test email to the following address...</h2>
+            <div class="test-email-address-wrap">
+                ${ input({
+              type: 'email',
+              id: 'email-address',
+              name: 'email-address',
+              placeholder: 'Your email...',
+              disabled: isSending,
+              value: this.testEmailAddress,
+            }) }
+                <button id="initiate-test" class="gh-button primary" ${
+              isSending ? 'disabled' : ''
+            }>
+                    <span>${ isSending ? 'Sending' : 'Send' }</span>
+                </button>
+            </div>`
+          }
+
+          const { $modal, close: closeModal, setContent } = modal({
+            content: modalContent(),
+          })
+
+          $('#email-address').autocomplete({
+            source: Groundhogg.filters.owners.map((u) => u.data.user_email),
+            change: (e) => {
+              this.testEmailAddress = e.target.value
+              mountHeader()
+            },
+          })
+
+          $('#initiate-test').on('click', () => {
+            setContent(modalContent(true))
+            const { stop: stopDots } = loadingDots('#initiate-test')
+
+            post(`${ routes.v4.emails }/${ this.email.ID }/test`, {
+              to: this.testEmailAddress,
+              edited: this.edited,
+            }).then((r) => {
+              stopDots()
+              setContent(`<p>Test sent to <b>${ this.testEmailAddress }</b></p>`)
+              setTimeout(closeModal, 2000)
+            })
+          })
+        })
+
         $('#commit').on('click', () => {
           this.commitChanges()
         })
@@ -703,6 +997,7 @@
 
         onHeaderMount()
       }
+
       const emailControls = () => {
         const message_typeOptions = {
           marketing: __('Marketing', 'groundhogg'),
@@ -715,6 +1010,7 @@
           message_type = 'marketing',
           alt_body = '',
           use_custom_alt_body = false,
+          template = 'boxed',
         } = this.edited.meta
 
         // language=HTML
@@ -722,16 +1018,6 @@
             <div class="display-flex column gap-20">
                 <div class="gh-panel">
                     <div class="inside">
-                        <div id="email-editor-sidebar-controls" class="gh-button-group">
-                            <button id="send-test" class="gh-button secondary">${ __('Send test email', 'groundhogg') }
-                            </button>
-                            <button data-device="mobile" class="show-preview gh-button secondary">
-                                ${ icons.smartphone }
-                            </button>
-                            <button data-device="desktop" class="show-preview gh-button secondary">
-                                ${ icons.desktop }
-                            </button>
-                        </div>
                         <p>
                             <label class="">${ __('Send this email from:', 'groundhogg') }</label>
                             ${ select({
@@ -749,23 +1035,6 @@
                             }) }
                         </p>
                         <div id="email-editor-sidebar-options">
-                            <div>
-                                <label class="">${ __('Alignment:', 'groundhogg') }</label>
-                                <div class="gh-input-group">
-                                    <button id="align-left" data-alignment="left"
-                                            class="change-alignment gh-button ${
-                                                    alignment === 'left' ? 'primary' : 'secondary'
-                                            }">
-                                        ${ icons.alignLeft }
-                                    </button>
-                                    <button id="align-center" data-alignment="center"
-                                            class="change-alignment gh-button ${
-                                                    alignment === 'center' ? 'primary' : 'secondary'
-                                            }">
-                                        ${ icons.alignCenter }
-                                    </button>
-                                </div>
-                            </div>
                             <div id="email-editor-sidebar-message_type">
                                 <label class="">${ __('Message type:') }</label>
                                 <div class="gh-input-group">
@@ -778,7 +1047,28 @@
                                             message_type,
                                     ) }
                                 </div>
-                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gh-panel">
+                    <div class="gh-panel-header">
+                        <h2>${ __('Template', 'groundhogg') }</h2>
+                        <button class="toggle-indicator"></button>
+                    </div>
+                    <div class="inside">
+                        <div class="gh-rows-and-columns">
+                            <div class="row">
+                                <div class="col">
+                                    <label>${ __('Select Template Design') }</label>
+                                    ${ select({ id: 'template' },
+                                            DesignTemplates.map(t => ( { value: t.id, text: t.name } )), template) }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    ${ DesignTemplates.find(t => t.id === template).settings(this.edited.meta) }
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -805,14 +1095,17 @@
                             </div>
                             <div class="gh-row">
                                 <div class="gh-col">
-                                    ${ use_custom_alt_body ? `<button class="gh-button secondary" id="edit-plain-text">${ __(
-                                            'Edit plain text version', 'groundhogg' ) }</button>` : '' }
+                                    ${ use_custom_alt_body
+                                            ? `<button class="gh-button secondary" id="edit-plain-text">${ __(
+                                                    'Edit plain text version', 'groundhogg') }</button>`
+                                            : '' }
                                 </div>
                             </div>
                             <div class="gh-row">
                                 <div class="gh-col">
                                     <button class="gh-button secondary" id="edit-custom-headers">${ __(
-                                            'Edit custom email headers', 'groundhogg') }</button>
+                                            'Edit custom email headers', 'groundhogg') }
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -821,23 +1114,12 @@
             </div>
         `
       }
+
       const emailControlsOnMount = () => {
-        $('.show-preview').on('click', (e) => {
 
-          const device = e.currentTarget.dataset.device
-
-          modal({
-            dialogClasses: 'no-padding',
-            content: `<iframe id="preview" class="${ device }"></div>`,
-          })
-
-          const {
-            built, edited_preview,
-          } = this.email.context
-
-          setFrameContent($('#preview')[0], edited_preview || built)
-
-        })
+        const {
+          template = 'boxed',
+        } = this.edited.meta
 
         $('#toggle-plain-text').on('change', (e) => {
           this.updateEmailMeta({
@@ -864,6 +1146,7 @@
                     },
                 }) }`
           }
+
           modal({
             // language=HTML
             content: altBodyEditor(),
@@ -896,7 +1179,7 @@
           modal({
             // language=HTML
             content: `
-                <h2>${__('Custom Email Headers', 'groundhogg')}</h2>
+                <h2>${ __('Custom Email Headers', 'groundhogg') }</h2>
                 <div id="email-editor-advanced-headers"></div>`,
             onOpen: ({ setContent }) => {
               const getHeadersArray = () => {
@@ -979,71 +1262,35 @@
           ],
         })
 
-        $('.change-alignment').on('click', (e) => {
+        $('#template').on('change', (e) => {
           this.updateEmailMeta({
-            alignment: e.currentTarget.dataset.alignment,
+            template: e.target.value,
           })
           this.remount()
-          $('#' + e.currentTarget.id).focus()
         })
 
-        $('#send-test').on('click', (e) => {
-          if (!this.testEmailAddress) {
-            this.testEmailAddress = user_test_email
-          }
-
-          const modalContent = (isSending = false) => {
-            //language=HTML
-            return `<h2>Send a test email to the following address...</h2>
-            <div class="test-email-address-wrap">
-                ${ input({
-                    type: 'email',
-                    id: 'email-address',
-                    name: 'email-address',
-                    placeholder: 'Your email...',
-                    disabled: isSending,
-                    value: this.testEmailAddress,
-                }) }
-                <button id="initiate-test" class="gh-button primary" ${
-                        isSending ? 'disabled' : ''
-                }>
-                    <span>${ isSending ? 'Sending' : 'Send' }</span>
-                </button>
-            </div>`
-          }
-
-          const { $modal, close: closeModal, setContent } = modal({
-            content: modalContent(),
+        try {
+          DesignTemplates.find(t => t.id === template).onMount(this.edited.meta, (newMeta, reRender) => {
+            this.updateEmailMeta(newMeta)
+            if (reRender) {
+              this.remount()
+            }
           })
+        }
+        catch (e) {
 
-          $('#email-address').autocomplete({
-            source: Groundhogg.filters.owners.map((u) => u.data.user_email),
-            change: (e) => {
-              this.testEmailAddress = e.target.value
-              mountHeader()
-            },
-          })
-
-          $('#initiate-test').on('click', () => {
-            setContent(modalContent(true))
-            const { stop: stopDots } = loadingDots('#initiate-test')
-
-            post(`${ routes.v4.emails }/${ this.email.ID }/test`, {
-              to: this.testEmailAddress,
-              edited: this.edited,
-            }).then((r) => {
-              stopDots()
-              setContent(`<p>Test sent to <b>${ this.testEmailAddress }</b></p>`)
-              setTimeout(closeModal, 2000)
-            })
-          })
-        })
+        }
       }
 
       if (email.meta.type !== 'html') {
 
+        const {
+          template = 'boxed',
+        } = this.edited.meta
+
         Groundhogg.EmailBlockEditor('#email-editor-body', {
           email: this.edited,
+          template: DesignTemplates.find(t => t.id === template).template,
           scrollDepth: this.scrollDepth,
           onScroll: (y) => { this.scrollDepth = y },
           onMount: () => {
