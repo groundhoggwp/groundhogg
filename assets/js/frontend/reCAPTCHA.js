@@ -1,31 +1,48 @@
-(function ($, reCAPTCHA ) {
+( function (reCAPTCHA) {
 
-    var mem = {
-        token: false
-    };
+  let token
 
-    function protectForms(){
-        $( '.gh-recaptcha-v3' ).closest( 'form' ).on( 'submit', function (e) {
+  function protectForms () {
 
-            if ( mem.token ){
-                return true;
-            }
+    document.querySelectorAll('form.gh-form').forEach(form => {
 
-            e.preventDefault();
+      // only if the form has recaptcha
+      if (!form.querySelector('.gh-recaptcha-v3')) {
+        return
+      }
 
-            var $form = $(this);
+      form.addEventListener('submit', e => {
 
-            grecaptcha.ready(function() {
-                grecaptcha.execute(reCAPTCHA.site_key, {action: 'submit'}).then(function(token) {
-                    // Add your logic to submit to your backend server here.
-                    mem.token = token;
-                    $form.append( '<input type="hidden" name="g-recaptcha-response" value="' + token + '">' );
-                    $form.submit();
-                });
-            });
-        } );
-    }
+        if (token) {
+          return true
+        }
 
-    $(protectForms);
+        e.preventDefault()
 
-})(jQuery, ghReCAPTCHA);
+        grecaptcha.ready(function () {
+          grecaptcha.execute(reCAPTCHA.site_key, { action: 'submit' }).then((_token) => {
+            // Add your logic to submit to your backend server here.
+            token = _token
+
+            const input = document.createElement('input')
+            input.type = 'hidden'
+            input.name = 'g-recaptcha-response'
+            input.value = token
+
+            form.appendChild(input)
+
+            // dont use
+            form.dispatchEvent(new Event('submit'))
+          })
+        })
+
+        return false;
+
+      })
+
+    })
+  }
+
+  window.addEventListener( 'load', protectForms )
+
+} )(ghReCAPTCHA)

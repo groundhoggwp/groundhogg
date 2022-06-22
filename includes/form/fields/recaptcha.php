@@ -5,6 +5,7 @@ namespace Groundhogg\Form\Fields;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
+use function Groundhogg\is_recaptcha_enabled;
 
 class Recaptcha extends Input {
 
@@ -58,6 +59,10 @@ class Recaptcha extends Input {
 	 */
 	public function render() {
 
+		if ( ! is_recaptcha_enabled() ){
+			return '';
+		}
+
 		$version = self::get_version();
 
 		if ( $version === 'v2' ) {
@@ -95,6 +100,11 @@ class Recaptcha extends Input {
 
 		// unnecessary for admin submissions.
 		if ( Plugin::instance()->submission_handler->is_admin_submission() ) {
+			return true;
+		}
+
+		// recaptcha is not enabled
+		if ( ! is_recaptcha_enabled() ){
 			return true;
 		}
 

@@ -48,27 +48,36 @@ class Scripts {
 		$dot_min = $this->is_script_debug_enabled() ? '' : '.min';
 
 		wp_register_script( 'groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', [
-			'groundhogg-frontend'
-		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
+		$form_dependencies = [
+			'groundhogg-frontend',
+		];
 
-		$google_recaptcha_api_url = 'https://www.google.com/recaptcha/api.js';
-		$site_key                 = get_option( 'gh_recaptcha_site_key' );
+		// If recaptcha is enabled
+		if ( is_recaptcha_enabled() ){
+			$google_recaptcha_api_url = 'https://www.google.com/recaptcha/api.js';
+			$site_key                 = get_option( 'gh_recaptcha_site_key' );
 
-		if ( get_option( 'gh_recaptcha_version' ) === 'v3' ) {
-			$google_recaptcha_api_url = add_query_arg( [ 'render' => $site_key ], $google_recaptcha_api_url );
+			if ( get_option( 'gh_recaptcha_version' ) === 'v3' ) {
+				$google_recaptcha_api_url = add_query_arg( [ 'render' => $site_key ], $google_recaptcha_api_url );
+			}
+
+			wp_register_script( 'google-recaptcha', $google_recaptcha_api_url );
+
+			wp_register_script( 'groundhogg-google-recaptcha', GROUNDHOGG_ASSETS_URL . 'js/frontend/reCAPTCHA' . $dot_min . '.js', [
+				'google-recaptcha'
+			], GROUNDHOGG_VERSION, true );
+
+			wp_localize_script( 'groundhogg-google-recaptcha', 'ghReCAPTCHA', [
+				'site_key' => $site_key
+			] );
+
+			$form_dependencies[] = 'groundhogg-google-recaptcha';
 		}
 
-		wp_register_script( 'google-recaptcha', $google_recaptcha_api_url );
-		wp_register_script( 'groundhogg-google-recaptcha', GROUNDHOGG_ASSETS_URL . 'js/frontend/reCAPTCHA' . $dot_min . '.js', [
-			'jquery',
-			'google-recaptcha'
-		], GROUNDHOGG_VERSION, true );
-		wp_localize_script( 'groundhogg-google-recaptcha', 'ghReCAPTCHA', [
-			'site_key' => $site_key
-		] );
+		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', $form_dependencies, GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 
 		wp_localize_script( 'groundhogg-frontend', 'Groundhogg', array(
 			'base_url'                     => untrailingslashit( home_url() ),

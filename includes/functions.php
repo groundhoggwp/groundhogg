@@ -6483,3 +6483,12 @@ function minify_html( $content ) {
 
 	return preg_replace( $search, $replace, $content );
 }
+
+/**
+ * Whether Google Recaptcha is enabled
+ *
+ * @return bool
+ */
+function is_recaptcha_enabled(){
+    return is_option_enabled( 'gh_recaptcha_site_key' ) && is_option_enabled( 'gh_recaptcha_secret_key' );
+}
