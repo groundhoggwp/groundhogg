@@ -325,6 +325,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.6.3.2 (2022-06-22) ==
+* FIXED recaptcha v3 causing forms to submit to success page when they are set to ajax.
+
 = 2.6.3.1 (2022-05-18) ==
 * TWEAKED Combined several tools pages into one to make the interface less confusing.
  * Moved user sync to the Misc tab
