@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.2
+Stable tag: 2.6.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.3.3 (2022-06-23) ==
+* ADDED "Unsubscribed" activity filter
+* FIXED Autocomplete not working on Safari
+* FIXED "Email Confirmed" filter not working
+* FIXED "Greater than or Equal to" comparator not working
 
 = 2.6.3.2 (2022-06-22) ==
 * FIXED recaptcha v3 causing forms to submit to success page when they are set to ajax.

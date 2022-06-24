@@ -1,4 +1,4 @@
-(function ($, nonces, endpoints, gh) {
+( function ($, nonces, endpoints, gh) {
 
   const { currentUser, isSuperAdmin } = Groundhogg
 
@@ -6,9 +6,9 @@
     getCurrentUser: () => {
       return currentUser
     },
-    userHasCap: ( cap ) => {
+    userHasCap: (cap) => {
       return currentUser.allcaps[cap] || currentUser.caps[cap] || isSuperAdmin
-    }
+    },
   }
 
   // Serialize better
@@ -22,7 +22,8 @@
           o[this.name] = [o[this.name]]
         }
         o[this.name].push(this.value || '')
-      } else {
+      }
+      else {
         o[this.name] = this.value || ''
       }
     })
@@ -36,10 +37,10 @@
   $.fn.ghPicker = function ({
     endpoint,
     getResults = (r) => r.items,
-    getParams = (q) => ({
+    getParams = (q) => ( {
       ...q,
-      search: q.term
-    }),
+      search: q.term,
+    } ),
     ...rest
   }) {
 
@@ -56,11 +57,11 @@
         },
         processResults: function (data, page) {
           return {
-            results: getResults(data, page)
+            results: getResults(data, page),
           }
         },
       },
-      ...rest
+      ...rest,
     })
 
     return this
@@ -84,11 +85,11 @@
     multiple = false,
     tags = false,
     getResults = (d) => d.results,
-    getParams = (q) => ({
+    getParams = (q) => ( {
       ...q,
-      search: q.term
-    }),
-    select2opts = {}
+      search: q.term,
+    } ),
+    select2opts = {},
   ) {
 
     return $(selector).select2({
@@ -106,16 +107,18 @@
         },
         processResults: function (data, page) {
           return {
-            results: getResults(data, page)
+            results: getResults(data, page),
           }
         },
       },
-      ...select2opts
+      ...select2opts,
     })
   }
 
   function linkPicker (selector) {
-    return $(selector).autocomplete({
+    let $input = $(selector)
+
+    return $input.autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -139,6 +142,10 @@
             }
             response($return)
           },
+          select: (e, ui) => {
+            $input.value(ui.item.value).trigger('change')
+          },
+
         })
       },
       minLength: 0,
@@ -146,7 +153,9 @@
   }
 
   function userMetaPicker (selector) {
-    return $(selector).autocomplete({
+    let $input = $(selector)
+
+    return $input.autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -161,14 +170,19 @@
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
           },
+          select: (e, ui) => {
+            $input.value(ui.item.value).trigger('change')
+          },
         })
       },
       minLength: 0,
     })
   }
 
-  function metaPicker (selector,) {
-    return $(selector).autocomplete({
+  function metaPicker (selector) {
+    let $input = $(selector)
+
+    return $input.autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -183,6 +197,9 @@
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
           },
+          select: (e, ui) => {
+            $input.value(ui.item.value).trigger('change')
+          },
         })
       },
       minLength: 0,
@@ -190,7 +207,10 @@
   }
 
   function metaValuePicker (selector, meta_key) {
-    return $(selector).autocomplete({
+
+    let $input = $(selector)
+
+    return $input.autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -205,6 +225,9 @@
           success: function (data) {
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
+          },
+          select: (e, ui) => {
+            $input.value(ui.item.value).trigger('change')
           },
         })
       },
@@ -221,15 +244,15 @@
    * @param opts
    */
   function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
-    return apiPicker(selector, gh.api.routes.v4.tags, multiple, Groundhogg.user.userHasCap( 'add_tags' ),
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, Groundhogg.user.userHasCap('add_tags'),
       (data) => {
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.data.tag_name}`
-        }))
+          text: `${ item.data.tag_name }`,
+        } ))
       },
       (query) => {
         return {
@@ -252,10 +275,10 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.data.first_name} ${item.data.last_name} (${item.data.email})`
-        }))
+          text: `${ item.data.first_name } ${ item.data.last_name } (${ item.data.email })`,
+        } ))
       },
       (query) => {
         return {
@@ -279,14 +302,14 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.data.name}`
-        }))
+          text: `${ item.data.name }`,
+        } ))
       },
       (query) => {
         return {
-          search: query.term
+          search: query.term,
         }
       }, ...opts)
   }
@@ -305,15 +328,15 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.data.title} (${item.data.status})`
-        }))
+          text: `${ item.data.title } (${ item.data.status })`,
+        } ))
       },
       (query) => {
         return {
           search: query.term,
-          ...queryOpts
+          ...queryOpts,
         }
       }, ...opts)
   }
@@ -332,15 +355,15 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.data.title}`
-        }))
+          text: `${ item.data.title }`,
+        } ))
       },
       (query) => {
         return {
           search: query.term,
-          ...queryOpts
+          ...queryOpts,
         }
       }, ...opts)
   }
@@ -359,15 +382,15 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.ID,
-          text: `${item.object.data.title} (${item.date_sent_pretty})`
-        }))
+          text: `${ item.object.data.title } (${ item.date_sent_pretty })`,
+        } ))
       },
       (query) => {
         return {
           search: query.term,
-          ...queryOpts
+          ...queryOpts,
         }
       }, ...opts)
   }
@@ -385,15 +408,15 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => ({
+        return data.items.map(item => ( {
           id: item.id,
-          text: item.name
-        }))
+          text: item.name,
+        } ))
       },
       (query) => {
         return {
           search: query.term,
-          ...queryOpts
+          ...queryOpts,
         }
       }, ...opts)
   }
@@ -407,7 +430,7 @@
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
     contactPicker('.gh-contact-picker')
     contactPicker('.gh-contact-picker-multiple', (items) => {}, {
-      multiple: true
+      multiple: true,
     })
     apiPicker('.gh-benchmark-picker', endpoints.benchmarks, false, false)
     apiPicker('.gh-metakey-picker', endpoints.metakeys, false, false)
@@ -455,8 +478,7 @@
   gh.nonces = nonces
   gh.endpoints = endpoints
 
-
-  if ( ! gh.functions ){
+  if (!gh.functions) {
     gh.functions = {}
   }
 
@@ -469,7 +491,7 @@
    */
   gh.functions.setCookie = (cname, cvalue, duration) => {
     var d = new Date()
-    d.setTime(d.getTime() + (duration * 1000))
+    d.setTime(d.getTime() + ( duration * 1000 ))
     var expires = 'expires=' + d.toUTCString()
     document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
   }
@@ -496,5 +518,4 @@
     return none
   }
 
-
-})(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
+} )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

@@ -1169,7 +1169,7 @@
 
       metaPicker('#filter-meta')
 
-      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+      $('#filter-compare, #filter-value, #filter-meta').on('change blur', function (e) {
         const $el = $(this)
         const { compare } = updateFilter({
           [$el.prop('name')]: $el.val(),
@@ -1255,7 +1255,7 @@
 
       userMetaPicker('#filter-meta')
 
-      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+      $('#filter-compare, #filter-value, #filter-meta').on('change blur', function (e) {
         const $el = $(this)
         const { compare } = updateFilter({
           [$el.prop('name')]: $el.val(),
@@ -1312,7 +1312,7 @@
     },
     onMount (filter, updateFilter) {
 
-      metaValuePicker('#filter-region', 'region').on('change', function (e) {
+      metaValuePicker('#filter-region', 'region').on('change blur', function (e) {
         updateFilter({
           region: $(e.target).val(),
         })
@@ -1340,7 +1340,7 @@
     },
     onMount (filter, updateFilter) {
 
-      metaValuePicker('#filter-city', 'city').on('change', function (e) {
+      metaValuePicker('#filter-city', 'city').on('change blur', function (e) {
         updateFilter({
           city: $(e.target).val(),
         })
@@ -1552,6 +1552,21 @@
   registerFilter('confirmed_email', 'activity', __('Confirmed Email Address', 'groundhogg'), {
     view (filter) {
       return standardActivityDateTitle(`<b>${ __('Confirmed Email Address', 'groundhogg') }</b>`, filter)
+    },
+    edit (filter) {
+      return standardActivityDateOptions(filter)
+    },
+    onMount (filter, updateFilter) {
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults,
+    },
+  })
+
+  registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
+    view (filter) {
+      return standardActivityDateTitle(`<b>${ __('Unsubscribed', 'groundhogg') }</b>`, filter)
     },
     edit (filter) {
       return standardActivityDateOptions(filter)

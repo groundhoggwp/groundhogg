@@ -1503,6 +1503,17 @@ class Contact_Query {
 		);
 
 		self::register_filter(
+			'confirmed_email',
+			[ self::class, 'filter_email_confirmed' ]
+		);
+
+		self::register_filter(
+			'unsubscribed',
+			[ self::class, 'filter_unsubscribed' ]
+		);
+
+
+		self::register_filter(
 			'birthday',
 			[ self::class, 'filter_birthday' ]
 		);
@@ -2673,6 +2684,33 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
+	public static function filter_email_confirmed( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		return "{$query->table_name}.date_optin_status_changed $clause AND {$query->table_name}.optin_status = " . Preferences::CONFIRMED;
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_unsubscribed( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		return "{$query->table_name}.date_optin_status_changed $clause AND {$query->table_name}.optin_status = " . Preferences::UNSUBSCRIBED;
+	}
+
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
 	public static function filter_birthday( $filter_vars, $query ) {
 
 		$clause = self::standard_activity_filter_clause( $filter_vars );
@@ -2933,6 +2971,10 @@ class Contact_Query {
 				return sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
 			case 'greater_than':
 				return sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+			case 'greater_than_or_equal_to':
+				return sprintf( "%s >= %s", $column, $value );
+			case 'less_than_or_equal_to':
+				return sprintf( "%s <= %s", $column, $value );
 		}
 	}
 
@@ -2949,21 +2991,17 @@ class Contact_Query {
 		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "%s = %d", $column, $value );
+				return sprintf( "%d = %d", $column, $value );
 			case 'not_equals':
-				return sprintf( "%s != %d", $column, $value );
+				return sprintf( "%d != %d", $column, $value );
 			case 'greater_than':
-				return sprintf( "%s > %d", $column, $value );
+				return sprintf( "%d > %d", $column, $value );
 			case 'less_than':
-				return sprintf( "%s < %d", $column, $value );
+				return sprintf( "%d < %d", $column, $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "%s >= %d", $column, $value );
+				return sprintf( "%d >= %d", $column, $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "%s <= %d", $column, $value );
-			case 'between_inclusive':
-				return sprintf( "%s <> %d", $column, $value );
-			case 'between_exclusive':
-				return sprintf( "%s <= %d", $column, $value );
+				return sprintf( "%d <= %d", $column, $value );
 		}
 	}
 
@@ -2981,16 +3019,5 @@ class Contact_Query {
 		}
 
 		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
-	}
-
-	/**
-	 * Handle the first name filter args
-	 *
-	 * @param $filter_vars array
-	 *
-	 * @return string
-	 */
-	public static function contact_generic_number_filter_compare( array $filter_vars ): string {
-		return self::generic_number_filter_compare( $filter_vars, $filter_vars['type'] );
 	}
 }
