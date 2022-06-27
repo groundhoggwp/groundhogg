@@ -325,6 +325,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.6.3.4 (2022-06-23) ==
+* FIXED Funnel history contact search filter not working
+* FIXED Zip Code filter not working
+
 = 2.6.3.3 (2022-06-23) ==
 * ADDED "Unsubscribed" activity filter
 * FIXED Autocomplete not working on Safari

@@ -5718,23 +5718,19 @@ function get_object_relationships( $object, $is_primary = true ) {
 }
 
 /**
- * Compare two dates
+ * Before should always be greater than the after
  *
  * @param $before
  * @param $after
+ *
+ * @return void
  */
-function compare_dates( &$before, &$after ) {
-
-	if ( strtotime( $before ) < strtotime( $after ) ) {
-		return true;
-	} else if ( strtotime( $after ) < strtotime( $before ) ) {
+function maybe_swap_dates( &$before, &$after ) {
+    // If after is > than before, swap them
+    if ( strtotime( $after ) > strtotime( $before ) ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
-
-		return true;
-	} else {
-		return false;
 	}
 }
 

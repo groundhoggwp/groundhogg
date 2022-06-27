@@ -1574,7 +1574,7 @@ class Contact_Query {
 		);
 
 		self::register_filter(
-			'postal_zip',
+			'zip_code',
 			[ self::class, 'filter_postal_zip' ]
 		);
 
@@ -2576,7 +2576,7 @@ class Contact_Query {
 				$after  = date_as_int( $after );
 				break;
 			case 'between':
-				compare_dates( $before, $after );
+				maybe_swap_dates( $before, $after );
 				$after  = date_as_int( $after );
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
 				break;
@@ -2653,7 +2653,7 @@ class Contact_Query {
 				$after  = date_as_int( $after );
 				break;
 			case 'between':
-				compare_dates( $before, $after );
+				maybe_swap_dates( $before, $after );
 				$after  = date_as_int( $after );
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
 				break;
@@ -2991,17 +2991,17 @@ class Contact_Query {
 		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "%d = %d", $column, $value );
+				return sprintf( "%s = %s", $column, $value );
 			case 'not_equals':
-				return sprintf( "%d != %d", $column, $value );
+				return sprintf( "%s != %s", $column, $value );
 			case 'greater_than':
-				return sprintf( "%d > %d", $column, $value );
+				return sprintf( "%s > %s", $column, $value );
 			case 'less_than':
-				return sprintf( "%d < %d", $column, $value );
+				return sprintf( "%s < %s", $column, $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "%d >= %d", $column, $value );
+				return sprintf( "%s >= %s", $column, $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "%d <= %d", $column, $value );
+				return sprintf( "%s <= %s", $column, $value );
 		}
 	}
 
