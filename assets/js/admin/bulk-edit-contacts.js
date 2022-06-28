@@ -68,8 +68,8 @@
                           id: `optin-status`,
                           name: 'optin_status',
                       }, {
-                        0 : __('No change', 'groundhogg'),
-                        ...Groundhogg.filters.optin_status 
+                          0: __('No change', 'groundhogg'),
+                          ...Groundhogg.filters.optin_status,
                       }) }
                   </div>
                   <div class="gh-col">
@@ -79,11 +79,12 @@
                           id: `owner`,
                           name: 'owner_id',
                       }, [
-                          { value: 0, text: __('No change', 'groundhogg')},
-                      ...Groundhogg.filters.owners.map(u => ( {
-                          text: `${ u.data.display_name } (${ u.data.user_email })`,
-                          value: u.ID,
-                      } )) ]) }
+                          { value: 0, text: __('No change', 'groundhogg') },
+                          ...Groundhogg.filters.owners.map(u => ( {
+                              text: `${ u.data.display_name } (${ u.data.user_email })`,
+                              value: u.ID,
+                          } )),
+                      ]) }
                   </div>
               </div>
           </div>`,
@@ -108,6 +109,8 @@
                       ${ input({
                           id: 'line1',
                           name: 'street_address_1',
+                          className: 'location-setting',
+
                       }) }
                   </div>
                   <div class="gh-col">
@@ -115,6 +118,8 @@
                       ${ input({
                           id: 'line2',
                           name: 'street_address_2',
+                          className: 'location-setting',
+
                       }) }
                   </div>
               </div>
@@ -124,6 +129,7 @@
                       ${ input({
                           id: 'city',
                           name: 'city',
+                          className: 'location-setting',
                       }) }
                   </div>
                   <div class="gh-col">
@@ -132,6 +138,7 @@
                       ${ input({
                           id: 'postal_zip',
                           name: 'postal_zip',
+                          className: 'location-setting',
                       }) }
                   </div>
               </div>
@@ -141,6 +148,7 @@
                       ${ input({
                           id: 'region',
                           name: 'region',
+                          className: 'location-setting',
                       }) }
                   </div>
                   <div class="gh-col">
@@ -149,6 +157,7 @@
                       ${ select({
                           id: 'country',
                           name: 'country',
+                          className: 'location-setting',
                       }, {
                           0: __('Select a country', 'groundhogg'),
                           ...BulkEdit.countries,
@@ -162,6 +171,7 @@
                       ${ select({
                           id: 'time-zone',
                           name: 'time_zone',
+                          className: 'location-setting',
                       }, {
                           0: __('Select a time zone', 'groundhogg'),
                           ...BulkEdit.time_zones,
@@ -174,10 +184,10 @@
                   </div>
               </div>
           </div>`,
-      onMount: ({ updateData }) => {
+      onMount: ({ updateData, updateMeta }) => {
 
-        $('').on('change', e => {
-          updateData({
+        $('#locale,.location-setting').on('change', e => {
+          updateMeta({
             [e.target.name]: e.target.value,
           })
         })
@@ -389,6 +399,7 @@
       query.filters = filters
       fetchContactCount().then(setCommitText)
     }).init()
+
     createFilters('#exclude-filters', query.exclude_filters,
       (filters) => {
         query.exclude_filters = filters
@@ -408,12 +419,6 @@
     })
 
     $('#commit').on('click', () => {
-
-      console.log({
-        meta,
-        data,
-        ...payload,
-      })
 
       confirmationModal({
         alert: `<p>${ sprintf(__(
@@ -457,8 +462,15 @@
                     message: __('Contacts updated!', 'groundhogg'),
                   })
 
-                  window.open(adminPageURL('gh_contacts'), '_self')
-                  // close()
+                  let url = new URL( window.location.href )
+
+                  url.searchParams.delete('action')
+                  url.searchParams.delete('number')
+                  url.searchParams.delete('offset')
+                  url.searchParams.delete('search')
+
+                  window.open( url, '_self')
+
                 })
 
               }

@@ -27,6 +27,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Event_Queue extends DB {
 
+	public function __construct() {
+		parent::__construct();
+		wp_cache_add_non_persistent_groups( $this->get_cache_group() );
+	}
+
 	/**
 	 * Get the DB suffix
 	 *

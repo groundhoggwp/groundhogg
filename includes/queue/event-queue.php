@@ -200,8 +200,6 @@ class Event_Queue extends Supports_Errors {
 			return 0;
 		}
 
-		$this->cleanup_unprocessed_events();
-
 		Limits::start();
 
 		Limits::raise_memory_limit();

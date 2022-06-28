@@ -26,6 +26,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Events extends DB {
 
+	public function __construct() {
+		parent::__construct();
+		wp_cache_add_non_persistent_groups( $this->get_cache_group() );
+	}
+
 	/**
 	 * Get the DB suffix
 	 *
@@ -54,7 +59,7 @@ class Events extends DB {
 	}
 
 	/**
-	 * Get the object type we're inserting/updateing/deleting.
+	 * Get the object type we're inserting/updating/deleting.
 	 *
 	 * @return string
 	 */

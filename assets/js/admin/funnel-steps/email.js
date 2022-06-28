@@ -53,14 +53,15 @@
                 }
 
                 if ( self.addingEmail ){
-                    console.log( self.newEmailId );
                     self.step.find( '.add-email-override' ).val( self.newEmailId )
                 }
 
-                e.addingEmail = false;
-                e.editingEmail = false;
+                self.addingEmail = false;
+                self.editingEmail = false;
 
-                $(document).trigger( 'auto-save' );
+                setTimeout( () => {
+                    $(document).trigger( 'auto-save' );
+                }, 50 )
 
             } );
 

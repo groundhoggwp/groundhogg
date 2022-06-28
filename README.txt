@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.3
+Stable tag: 2.6.3.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.3.5 (2022-06-28) ==
+* TWEAKED Added 'event' and 'event_queue_item' as non persistent cache groups
+* TWEAKED Return to list of edited contacts after completed bulk edit
+* FIXED Webhook mapping not saving after exiting the email edit modal without saving
+* FIXED Location fields in bulk edit not saving
 
 = 2.6.3.4 (2022-06-23) ==
 * FIXED Funnel history contact search filter not working

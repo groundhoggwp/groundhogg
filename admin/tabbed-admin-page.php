@@ -12,12 +12,12 @@ use function Groundhogg\isset_not_empty;
  *
  * This is a base class for all admin pages
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 
 // Exit if accessed directly
@@ -73,13 +73,23 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	 */
 	public function get_current_tab_cap() {
 
+		$cap = false;
+
 		foreach ( $this->parsed_tabs() as $tab ) {
 			if ( $tab['slug'] === $this->get_current_tab() ) {
-				return $tab['cap'];
+				$cap = $tab['cap'];
+				break;
 			}
 		}
 
-		return false;
+		/**
+         * Filter the capability for the current tab
+         *
+		 * @param $cap    string the cap
+		 * @param $tab    string the current tab
+		 * @param $action string the current action
+		 */
+		return apply_filters( 'groundhogg/admin/get_current_tab_cap', $cap, $this->get_current_tab(), $this->get_current_action() );
 	}
 
 	/**
@@ -88,16 +98,16 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	protected function do_page_tabs() {
 
 		?>
-		<!-- BEGIN TABS -->
-		<h2 class="nav-tab-wrapper">
+        <!-- BEGIN TABS -->
+        <h2 class="nav-tab-wrapper">
 			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
 				<?php if ( ! current_user_can( $tab['cap'] ) ) {
 					continue;
 				} ?>
-				<a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
-				   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
+                <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
+                   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
 			<?php endforeach; ?>
-		</h2>
+        </h2>
 		<?php
 	}
 
@@ -170,11 +180,11 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
 
 		?>
-		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->notices(); ?>
-			<hr class="wp-header-end">
+            <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
@@ -203,7 +213,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 			}
 
 			?>
-		</div>
+        </div>
 		<?php
 	}
 
