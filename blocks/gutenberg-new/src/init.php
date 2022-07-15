@@ -45,7 +45,7 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 
 
 	$i18n = array(
-		'title'            => esc_html__( 'Groundhogg', 'groundhogg' ),
+		'title'            => \Groundhogg\white_labeled_name(),
 		'description'      => esc_html__( 'Select and display one of your forms.', 'groundhogg' ),
 		'form_select'      => esc_html__( 'Select a Form', 'groundhogg' ),
 		'form_settings'    => esc_html__( 'Form Settings', 'groundhogg' ),

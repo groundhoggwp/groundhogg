@@ -4,6 +4,7 @@ namespace Groundhogg\Blocks;
 
 use Groundhogg\Blocks\Elementor\Form_Widget;
 use function Groundhogg\get_form_list;
+use function Groundhogg\white_labeled_name;
 
 class Blocks {
 
@@ -38,7 +39,7 @@ class Blocks {
 					'title'    => __( 'Select a form', 'groundhogg' ),
 					'sections' => array(
 						'groundhogg-forms' => array(
-							'title'  => __( 'Groundhogg Forms', 'groundhogg' ),
+							'title'  => sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() ),
 							'fields' => array(
 								'groundhogg_form_id' => array(
 									'type'    => 'select',

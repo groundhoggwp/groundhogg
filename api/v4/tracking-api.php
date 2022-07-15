@@ -85,6 +85,18 @@ class Tracking_Api extends Base_Api {
 
 		$visit = track_page_visit( $ref, $contact );
 
+		if ( ! $visit || ! $visit->exists() ){
+
+			global $wpdb;
+
+			if ( $wpdb->last_error ){
+				return self::ERROR_500( 'db_error', $wpdb->last_error );
+			}
+
+			return self::ERROR_500();
+
+		}
+
 		return self::SUCCESS_RESPONSE( $visit );
 
 	}

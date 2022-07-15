@@ -125,7 +125,7 @@ h3 {
 
 }
 
-.space-between {
+.space-between:not(.display-flex) {
   display: flex !important;
   justify-content: space-between;
   align-items: center;

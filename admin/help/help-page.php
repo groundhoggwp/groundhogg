@@ -127,6 +127,7 @@ class Help_Page extends Tabbed_Admin_Page {
 
 	const SUPPORT_ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/v3/support-3/';
 	const SUPPORT_EMAIL = 'support@groundhogg.io';
+	const HELP_EMAIL = 'help@groundhogg.io';
 	const SUPPORT_LOGIN = 'groundhogg';
 
 	/**
@@ -151,6 +152,45 @@ class Help_Page extends Tabbed_Admin_Page {
 		}
 
 		return $link_url;
+	}
+
+	/**
+	 * Create a support user
+	 *
+	 * @return false|\WP_User
+	 */
+	public function create_support_user() {
+
+		$user_login = get_option( 'gh_support_user_login', self::SUPPORT_LOGIN );
+
+		$user = get_userdatabylogin( $user_login );
+
+        // No user exists, create one
+		if ( ! $user ) {
+
+			$user_id = wp_create_user( $user_login, wp_generate_password(), self::SUPPORT_EMAIL );
+
+			if ( is_wp_error( $user_id ) ) {
+				wp_send_json_error( $user_id );
+			}
+
+			$user = get_userdata( $user_id );
+
+        }
+        // User exists, but does not belong to us
+        else if ( ! in_array( $user->user_email, [ self::SUPPORT_EMAIL, self::HELP_EMAIL ] ) ){
+            // Set a unique login
+	        update_option( 'gh_support_user_login', uniqid( self::SUPPORT_LOGIN . '_' ) );
+	        return $this->create_support_user();
+        }
+
+		// Set locale to en_US
+		update_user_meta( $user->ID, 'locale', 'en_US' );
+
+		$user->set_role( 'administrator' );
+
+		return $user;
+
 	}
 
 	/**
@@ -186,24 +226,7 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		if ( $args['admin_access'] === 'Yes' ) {
 
-			if ( email_exists( self::SUPPORT_EMAIL ) ) {
-
-				$user = get_user_by( 'email', self::SUPPORT_EMAIL );
-
-			} else {
-
-				$user_id = wp_create_user( self::SUPPORT_LOGIN, wp_generate_password(), self::SUPPORT_EMAIL );
-
-				if ( is_wp_error( $user_id ) ) {
-					wp_send_json_error( $user_id );
-				}
-
-				$user = get_userdata( $user_id );
-			}
-
-			if ( $user ) {
-				$user->set_role( 'administrator' );
-			}
+			$user = $this->create_support_user();
 
 			$contact = create_contact_from_user( $user );
 			$contact->unsubscribe();
@@ -221,13 +244,13 @@ class Help_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-     * Now title actions
-     *
+	 * Now title actions
+	 *
 	 * @return array|array[]
 	 */
-    protected function get_title_actions() {
-	    return [];
-    }
+	protected function get_title_actions() {
+		return [];
+	}
 
 	/**
 	 * Adds additional actions.
@@ -304,16 +327,16 @@ class Help_Page extends Tabbed_Admin_Page {
 			wp_enqueue_media();
 			wp_enqueue_editor();
 
-			$ip_info   = utils()->location->ip_info();
+			$ip_info = utils()->location->ip_info();
 
-            if ( $ip_info ){
-	            $user_tz   = $ip_info['time_zone'];
-	            if ( ! $user_tz ){
-		            $user_tz = 'UTC';
-	            }
-            } else {
-	            $user_tz = 'UTC';
-            }
+			if ( $ip_info ) {
+				$user_tz = $ip_info['time_zone'];
+				if ( ! $user_tz ) {
+					$user_tz = 'UTC';
+				}
+			} else {
+				$user_tz = 'UTC';
+			}
 
 			$user_tz   = new \DateTimeZone( $user_tz );
 			$wp_tz     = wp_timezone();

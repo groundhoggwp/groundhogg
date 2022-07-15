@@ -3,6 +3,7 @@
 namespace Groundhogg\Blocks\Elementor;
 
 use function Groundhogg\get_form_list;
+use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,7 +16,7 @@ class Form_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return __( 'Groundhogg Forms', 'groundhogg' );
+		return sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() );
 	}
 
 	public function get_icon() {

@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\User;
 
 use function Groundhogg\get_post_var;
+use function Groundhogg\white_labeled_name;
 
 class Admin_User {
 
@@ -27,7 +28,7 @@ class Admin_User {
 		}
 
 		?>
-		<h2><?php _e( 'Groundhogg', 'groundhogg' ); ?></h2>
+		<h2><?php _e( white_labeled_name() ); ?></h2>
 		<table class="form-table">
 			<tr>
 				<th><?php _e( 'Signature', 'groundhogg' ); ?></th>

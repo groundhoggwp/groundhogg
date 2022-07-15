@@ -4874,6 +4874,10 @@ function track_page_visit( $ref, $contact, $override = [] ) {
 
 	$visit = new Page_Visit( $visit );
 
+    if ( ! $visit->exists() ){
+        return false;
+    }
+
 	/**
 	 * Runs when a page visit is tracked
 	 *

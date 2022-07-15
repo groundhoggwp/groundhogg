@@ -79,30 +79,30 @@ h3.no-margin-top {
   flex-direction: column;
 }
 
-.space-between {
+.space-between:not(.display-flex) {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
 }
-.space-between.align-right {
+.space-between:not(.display-flex).align-right {
   justify-content: flex-end;
 }
-.space-between.align-left {
+.space-between:not(.display-flex).align-left {
   justify-content: flex-start;
 }
-.space-between.align-center {
+.space-between:not(.display-flex).align-center {
   justify-content: center;
 }
-.space-between.gap-20 {
+.space-between:not(.display-flex).gap-20 {
   gap: 20px;
 }
-.space-between.gap-10 {
+.space-between:not(.display-flex).gap-10 {
   gap: 10px;
 }
-.space-between.no-gap {
+.space-between:not(.display-flex).no-gap {
   gap: 0;
 }
-.space-between.align-top {
+.space-between:not(.display-flex).align-top {
   align-items: flex-start;
 }
 
