@@ -130,6 +130,8 @@ class Email_Logger {
 			'status'          => 'sent'
 		];
 
+		$log_data = apply_filters( 'groundhogg/email_logger/before_create_log/log_data', $log_data, $this );
+
 		if ( self::$log_item_id && self::$log_item->exists() ){
 			self::$log_item->update( $log_data );
 		} else {
@@ -137,6 +139,7 @@ class Email_Logger {
 			self::$log_item    = new Email_Log_Item( self::$log_item_id );
 		}
 
+		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );
 	}
 
 	/**
