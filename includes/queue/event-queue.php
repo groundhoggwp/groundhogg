@@ -98,7 +98,7 @@ class Event_Queue extends Supports_Errors {
 	}
 
 	/**
-	 * If the cron job fil is not installed also execute events during the heartbeat.
+	 * If the cron job file is not installed also execute events during the heartbeat.
 	 */
 	public function heartbeat() {
 
@@ -179,8 +179,12 @@ class Event_Queue extends Supports_Errors {
 		// 5 minute window.
 		$time = time() - ( MINUTE_IN_SECONDS * 5 );
 
-		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE `claim` <> '' AND `time` < {$time}" );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE `claim` != '' AND `time` < {$time}" );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'waiting' WHERE status = 'in_progress' AND `time` < {$time}" );
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => [ Event::CANCELLED, Event::SKIPPED ] ] );
+
+		$events->cache_set_last_changed();
+
 	}
 
 	/**
@@ -190,12 +194,7 @@ class Event_Queue extends Supports_Errors {
 	 */
 	public function run_queue() {
 
-		// Don't run during wp-cron.php if gh-cron.php is working
-//		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
-//			return 0;
-//		}
-
-		// Let's make sure we are not over doing it.
+		// If for some reason the queue is not enabled
 		if ( ! $this->is_enabled() ) {
 			return 0;
 		}
@@ -214,13 +213,14 @@ class Event_Queue extends Supports_Errors {
 
 		$this->log( sprintf( '%s - Starting queue!', $thread_id ) );
 
-		$result = $this->process();
+		$this->process();
 
 		$process_time = round( Limits::time_elapsed(), 2 );
+
 		Limits::stop();
 
-		if ( $result > 0 ) {
-			$this->log( sprintf( "%s - %d events have been completed in %s seconds.", $thread_id, $result, $process_time ) );
+		if ( Limits::get_actions_processed() > 0 ) {
+			$this->log( sprintf( "%s - %d events have been completed in %s seconds.", $thread_id, Limits::get_actions_processed(), $process_time ) );
 		} else {
 			$this->log( sprintf( '%s - No events completed.', $thread_id ) );
 		}
@@ -237,7 +237,7 @@ class Event_Queue extends Supports_Errors {
 		$settings->update_option( 'queue_times_executed', $times_executed );
 		$settings->update_option( 'average_execution_time', $average_execution_time );
 
-		return $result;
+		return Limits::get_actions_processed();
 	}
 
 	/**
@@ -245,17 +245,15 @@ class Event_Queue extends Supports_Errors {
 	 * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
 	 * the amount of traffic.
 	 *
-	 * @param int $completed_events
-	 *
-	 * @return int the number of events process, 0 if no events.
+	 * @return void
 	 */
-	protected function process( $completed_events = 0 ) {
+	protected function process() {
 
 		$claim = $this->store->stake_claim( $this->max_events );
 
 		// no events to complete
 		if ( ! $claim ) {
-			return $completed_events;
+			return;
 		}
 
 		$event_ids = $this->store->get_events_by_claim( $claim );
@@ -268,7 +266,7 @@ class Event_Queue extends Supports_Errors {
 
 			// no events to complete
 			if ( ! $claim ) {
-				return $completed_events;
+				return;
 			}
 
 			$event_ids = $this->store->get_events_by_claim( $claim );
@@ -277,7 +275,7 @@ class Event_Queue extends Supports_Errors {
 
 		// Definitely no events, let's bail.
 		if ( empty( $event_ids ) ) {
-			return $completed_events;
+			return;
 		}
 
 		$processed_event_ids = [];
@@ -294,6 +292,10 @@ class Event_Queue extends Supports_Errors {
 			$contact = $event->get_contact();
 
 			if ( ! is_a_contact( $contact ) ) {
+
+				// Delete the event
+				$event->delete();
+
 				continue;
 			}
 
@@ -328,22 +330,21 @@ class Event_Queue extends Supports_Errors {
 			}
 
 			$processed_event_ids[] = $event_id;
-			$completed_events      += 1;
 			Limits::processed_action();
 
 		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
 
 		$this->store->release_events( $claim );
-		get_db( 'event_queue' )->move_events_to_history( [ 'ID' => $processed_event_ids ] );
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => 'skipped' ] );
+
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::SKIPPED,  'ID' => $processed_event_ids ] );
 
 		self::set_is_processing( false );
 
-		if ( Limits::limits_exceeded( $completed_events ) ) {
-			return $completed_events;
+		if ( Limits::limits_exceeded() ) {
+			return;
 		}
 
-		return $this->process( $completed_events );
+		$this->process();
 	}
 
 	/**

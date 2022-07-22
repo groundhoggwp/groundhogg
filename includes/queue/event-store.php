@@ -23,15 +23,13 @@ class Event_Store {
 	 */
 	public function get_events_by_claim( $claim ) {
 
-		if ( empty( $claim ) ){
+		if ( empty( $claim ) ) {
 			return [];
 		}
 
-		$queued_events = $this->db()->advanced_query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'col' => 'claim', 'val' => $claim, 'compare' => '=' ],
-			],
+		$queued_events = $this->db()->query( [
+			'claim'   => $claim,
+			'status'  => Event::WAITING,
 			'orderby' => 'time',
 			'select'  => 'ID'
 		], false );
@@ -92,12 +90,10 @@ class Event_Store {
 			return [];
 		}
 
-		$SQL = sprintf( "SELECT ID FROM {$this->db()->get_table_name()}
-		WHERE `status` = '%s' AND `time` <= %d AND `claim` = ''
+		$queued_events = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM {$this->db()->get_table_name()}
+		WHERE `status` = %s AND `time` <= %d AND `claim` = ''
 		ORDER BY `priority` ASC, `time` ASC
-		LIMIT %d", Event::WAITING, time(), $count );
-
-		$queued_events = $wpdb->get_results( $SQL );
+		LIMIT %d", Event::WAITING, time(), $count ) );
 
 		return wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 	}
@@ -106,7 +102,7 @@ class Event_Store {
 	 * Update the claim in the events queue
 	 *
 	 * @param $event_ids int[]
-	 * @param $claim string
+	 * @param $claim     string
 	 *
 	 * @return bool
 	 */
@@ -120,12 +116,16 @@ class Event_Store {
 		$ids = implode( ',', $event_ids );
 
 		// Double check claim is empty, because if it's not, bail.
-		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET `claim` = %s 
-WHERE `ID` IN ( $ids ) AND `claim` = '' AND `time` <= %d", $claim, time() ) );
+		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET `claim` = %s 
+WHERE `ID` IN ( $ids ) AND `claim` = '' AND `time` <= %d AND `status` = %s", $claim, time(), Event::WAITING ) );
+
+		$this->db()->cache_set_last_changed();
+
+		return $result;
 	}
 
 	/**
-	 * Remove the claim from the event store.
+	 * Release waiting events that have a claim from the event store.
 	 *
 	 * @param $claim
 	 *
@@ -137,7 +137,8 @@ WHERE `ID` IN ( $ids ) AND `claim` = '' AND `time` <= %d", $claim, time() ) );
 				'claim' => ''
 			],
 			[
-				'claim' => $claim
+				'claim'  => $claim,
+				'status' => Event::WAITING
 			]
 		);
 	}

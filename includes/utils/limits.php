@@ -15,6 +15,10 @@ class Limits {
 	protected static $total_time_elapsed = 0;
 	protected static $limits_exceeded = false;
 
+	public static function get_actions_processed(){
+		return self::$total_processed_actions;
+	}
+
 
 	/**
 	 * Start the function to prevent limits exceeding.
@@ -275,18 +279,14 @@ class Limits {
 	 *
 	 * Based on WC_Background_Process::batch_limits_exceeded()
 	 *
-	 * @param int $processed_actions The number of actions processed so far - used to determine the likelihood of exceeding the time limit if processing another action
+	 * @param int $unused no longer used
 	 *
 	 * @return bool
 	 */
-	public static function limits_exceeded( $processed_actions = 0 ) {
+	public static function limits_exceeded( $unused = 0 ) {
 
 		if ( self::$limits_exceeded ) {
 			return true;
-		}
-
-		if ( $processed_actions ) {
-			self::$processed_actions = $processed_actions;
 		}
 
 		// check if doing unit tests.

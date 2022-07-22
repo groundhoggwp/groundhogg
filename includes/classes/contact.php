@@ -873,6 +873,10 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function upload_file( &$file ) {
 
+		if ( ! isset_not_empty( $file, 'name' ) ){
+			return new \WP_Error( 'invalid_file_name', __( 'Invalid file name.', 'groundhogg' ) );
+		}
+
 		$file['name'] = sanitize_file_name( $file['name'] );
 
 		$upload_overrides = array( 'test_form' => false );

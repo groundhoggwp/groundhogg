@@ -234,24 +234,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$i = $this->get_order();
 
 		if ( $i >= count( $items ) ) {
-
 			/* This is the last step. */
 			return false;
 		}
 
-		if ( $items[ $i ]->get_group() === self::ACTION ) {
+		// Since order is index+1, accessing the index with the given order should return the next step
+		$next = $items[ $i ];
 
-			/* regardless of whether the current step is an action
-			or a benchmark we can run the next step if it's an action */
-			return $items[ $i ];
-
+		// regardless of whether the current step is an action or a benchmark we can run the next step if it's an action
+		if ( $next->is_action() && $next->get_order() > $i ) {
+			return $next;
 		}
 
 		if ( $this->is_benchmark() ) {
 
 			while ( $i < count( $items ) ) {
 
-				if ( $items[ $i ]->get_group() === self::ACTION ) {
+				if ( $items[ $i ]->is_action() ) {
 
 					return $items[ $i ];
 
@@ -484,11 +483,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

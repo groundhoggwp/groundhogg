@@ -935,7 +935,8 @@ class Contact_Query {
 			$where['activity'] = "$this->table_name.$this->primary_key $in ( $sql )";
 		}
 
-		if ( strlen( $this->query_vars['search'] ) ) {
+		// Search maybe unset if searching for a full name
+		if ( isset_not_empty( $this->query_vars, 'search' ) && strlen( $this->query_vars['search'] ) ) {
 
 			if ( ! empty( $this->query_vars['search_columns'] ) ) {
 				$search_columns = array_map( 'sanitize_key', (array) $this->query_vars['search_columns'] );
@@ -947,12 +948,10 @@ class Contact_Query {
 		}
 
 		if ( strlen( $this->query_vars['first_name'] ) || strlen( $this->query_vars['first_name_compare'] ) ) {
-
 			$where['first_name'] = self::generic_text_compare( "{$this->table_name}.first_name", $this->query_vars['first_name_compare'], $this->query_vars['first_name'] );
 		}
 
 		if ( strlen( $this->query_vars['last_name'] ) || strlen( $this->query_vars['last_name_compare'] ) ) {
-
 			$where['last_name'] = self::generic_text_compare( "{$this->table_name}.last_name", $this->query_vars['last_name_compare'], $this->query_vars['last_name'] );
 		}
 

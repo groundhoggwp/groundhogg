@@ -330,11 +330,11 @@ abstract class DB {
 	 * Create a where clause given an array
 	 *
 	 * @param array  $args
-	 * @param string $operator
+	 * @param string $relationship
 	 *
 	 * @return string
 	 */
-	public function generate_where( $args = array(), $operator = "AND" ) {
+	public function generate_where( $args = array(), $relationship = "AND" ) {
 
 		$where = array();
 		if ( ! empty( $args ) && is_array( $args ) ) {
@@ -374,7 +374,7 @@ abstract class DB {
 			}
 		}
 
-		return implode( " {$operator} ", $where );
+		return implode( " {$relationship} ", $where );
 
 	}
 
@@ -944,8 +944,10 @@ abstract class DB {
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
 						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
 							$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
+						} else if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false  ) {
+							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
 						} else {
-							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
+							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => is_array( $val ) ? 'IN' : '=' ];
 						}
 					}
 

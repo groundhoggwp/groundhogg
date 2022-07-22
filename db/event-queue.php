@@ -97,7 +97,7 @@ class Event_Queue extends DB {
 		$history_columns = implode( ',', array_keys( $history_columns ) );
 		$queue_columns   = implode( ',', array_keys( $queue_columns ) ) . ',ID'; // Tack on ID at the end to update `queued_id`
 
-		$where = $this->generate_where( $where );
+		$where = $this->generate_where( $where, 'OR' );
 
 		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
 		// Move the events to the event queue
@@ -106,7 +106,7 @@ class Event_Queue extends DB {
 			FROM $event_queue
 			WHERE $where" );
 
-		$wpdb->query( "DELETE FROM $event_queue WHERE $where;" );
+		$wpdb->query( "DELETE FROM $event_queue WHERE $where ORDER BY ID;" );
 
 		$this->cache_set_last_changed();
 	}
