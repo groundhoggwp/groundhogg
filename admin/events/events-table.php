@@ -415,7 +415,7 @@ class Events_Table extends WP_List_Table {
 		$paged    = $this->get_pagenum();
 		$offset   = $per_page * ( $paged - 1 );
 //        $search  = get_url_var( 's' );
-		$order   = get_url_var( 'order', 'DESC' );
+		$order   = get_url_var( 'order', $this->get_view() === Event::WAITING ? 'ASC' : 'DESC' );
 		$orderby = get_url_var( 'orderby', 'time' );
 
 		$where = [

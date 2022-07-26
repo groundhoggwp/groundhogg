@@ -170,18 +170,18 @@ class Email_Log_Table extends Table {
 
 			echo html()->input( [
 				'type'  => 'date',
-				'id'    => 'before',
-				'name'  => 'before',
-				'value' => get_url_var( 'before' ),
-				'class' => 'input' . ( get_url_var( 'before' ) ? '' : ' hidden' )
-			] );
-
-			echo html()->input( [
-				'type'  => 'date',
 				'id'    => 'after',
 				'name'  => 'after',
 				'value' => get_url_var( 'after' ),
 				'class' => 'input' . ( get_url_var( 'after' ) ? '' : ' hidden' )
+			] );
+
+			echo html()->input( [
+				'type'  => 'date',
+				'id'    => 'before',
+				'name'  => 'before',
+				'value' => get_url_var( 'before' ),
+				'class' => 'input' . ( get_url_var( 'before' ) ? '' : ' hidden' )
 			] );
 
 			echo html()->button( [
@@ -365,16 +365,20 @@ class Email_Log_Table extends Table {
 	protected function column_sent( $email ) {
 
 		$lu_time   = mysql2date( 'U', $email->date_sent );
-		$cur_time  = (int) current_time( 'timestamp' );
+		$cur_time  = time();
 		$time_diff = $lu_time - $cur_time;
 
+		$date = new \DateTime();
+		$date->setTimestamp( $lu_time );
+		$date->setTimezone( wp_timezone() );
+
 		if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ) {
-			$time = date_i18n( get_date_time_format(), intval( $lu_time ) );
+			$time = $date->format( get_date_time_format() );
 		} else {
 			$time = sprintf( "%s ago", human_time_diff( $lu_time, $cur_time ) );
 		}
 
-		return '<abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
+		return '<abbr title="' . $date->format( DATE_RFC3339 ) . '">' . $time . '</abbr>';
 	}
 
 	/**
