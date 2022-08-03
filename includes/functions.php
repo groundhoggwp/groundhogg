@@ -72,13 +72,19 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
-        // support for identity
+		// support for identity
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
-			$contact  = get_contactdata( $identity );
-			if ( $contact ) {
-				return $contact;
+
+            // A valid Identity was found.
+			if ( $identity ) {
+				$contact = get_contactdata( $identity );
+
+				if ( $contact ) {
+					return $contact;
+				}
 			}
+
 		}
 
 		return tracking()->get_current_contact();
@@ -934,6 +940,20 @@ function get_default_from_name() {
 }
 
 /**
+ * The hostname with no www.
+ *
+ * @return string
+ */
+function get_hostname() {
+	$hostname = wp_parse_url( home_url(), PHP_URL_HOST );
+	if ( substr( $hostname, 0, 4 ) == 'www.' ) {
+		$hostname = substr( $hostname, 4 );
+	}
+
+	return $hostname;
+}
+
+/**
  * Get the default from email
  *
  * @return string
@@ -943,6 +963,10 @@ function get_default_from_email() {
 
 	if ( empty( $from ) ) {
 		$from = get_bloginfo( 'admin_email' );
+	}
+
+	if ( empty( $from ) ) {
+		$from = 'wordpress@' . get_hostname();
 	}
 
 	return apply_filters( 'groundhogg/get_default_from_email', $from );
@@ -4874,9 +4898,9 @@ function track_page_visit( $ref, $contact, $override = [] ) {
 
 	$visit = new Page_Visit( $visit );
 
-    if ( ! $visit->exists() ){
-        return false;
-    }
+	if ( ! $visit->exists() ) {
+		return false;
+	}
 
 	/**
 	 * Runs when a page visit is tracked
@@ -5730,8 +5754,8 @@ function get_object_relationships( $object, $is_primary = true ) {
  * @return void
  */
 function maybe_swap_dates( &$before, &$after ) {
-    // If after is > than before, swap them
-    if ( strtotime( $after ) > strtotime( $before ) ) {
+	// If after is > than before, swap them
+	if ( strtotime( $after ) > strtotime( $before ) ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
@@ -6489,6 +6513,6 @@ function minify_html( $content ) {
  *
  * @return bool
  */
-function is_recaptcha_enabled(){
-    return is_option_enabled( 'gh_recaptcha_site_key' ) && is_option_enabled( 'gh_recaptcha_secret_key' );
+function is_recaptcha_enabled() {
+	return is_option_enabled( 'gh_recaptcha_site_key' ) && is_option_enabled( 'gh_recaptcha_secret_key' );
 }

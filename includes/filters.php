@@ -27,13 +27,13 @@ function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
 
 	$email = new Email( $step->get_meta( 'email_id' ) );
 
-	if ( $email->exists() && $email->is_confirmation_email() ){
+	if ( $email->exists() && $email->is_confirmation_email() ) {
 		// Contact is confirmed and thus the step should be skipped
-		if ( $step->get_meta( 'skip_if_confirmed' ) && $contact->is_confirmed() ){
+		if ( $step->get_meta( 'skip_if_confirmed' ) && $contact->is_confirmed() ) {
 
 			$next = $step->get_next_of_type( 'email_confirmed' );
 
-			if ( $next ){
+			if ( $next ) {
 				$next->enqueue( $contact );
 			}
 
@@ -91,55 +91,38 @@ add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_lin
 /**
  * Override the default from email
  *
- * @param $original_email_address
+ * @param $from_email
  *
  * @return mixed
  */
-function sender_email( $original_email_address ) {
+function sender_email( $from_email ) {
 
-	// Might not be set.
-	if ( ! isset_not_empty( $_SERVER, 'SERVER_NAME' ) && ! empty( $original_email_address ) ) {
-		return $original_email_address;
+	$wp_from_email = 'wordpress@' . get_hostname();
+
+	// if from email starts with WP, or not a valid email address
+	if ( ! is_email( $from_email ) || $from_email === $wp_from_email ){
+		return get_default_from_email();
 	}
 
-	// Get the site domain and get rid of www.
-	$sitename = strtolower( $_SERVER['SERVER_NAME'] );
-
-	if ( substr( $sitename, 0, 4 ) == 'www.' ) {
-		$sitename = substr( $sitename, 4 );
-	}
-
-	$from_email = 'wordpress@' . $sitename;
-
-	if ( $original_email_address === $from_email ) {
-		$new_email_address = get_option( 'gh_override_from_email', $original_email_address );
-
-		if ( ! empty( $new_email_address ) ) {
-			$original_email_address = $new_email_address;
-		}
-	}
-
-	return $original_email_address;
+	return $from_email;
 }
 
 /**
  * Override the default from name
  *
- * @param $original_email_from
+ * @param $from_name
  *
  * @return mixed
  */
-function sender_name( $original_email_from ) {
+function sender_name( $from_name ) {
 
-	if ( $original_email_from === 'WordPress' ) {
-		$new_email_from = get_option( 'gh_override_from_name', $original_email_from );
+	$wp_from_name = 'WordPress';
 
-		if ( ! empty( $new_email_from ) ) {
-			$original_email_from = $new_email_from;
-		}
+	if ( empty( $from_name ) || $from_name === $wp_from_name ) {
+		return get_default_from_name();
 	}
 
-	return $original_email_from;
+	return $from_name;
 }
 
 // Hooking up our functions to WordPress filters
