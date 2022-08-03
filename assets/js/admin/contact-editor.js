@@ -1459,7 +1459,25 @@
 
       e.preventDefault()
 
-      let $tab = $(e.target)
+      if ( e.currentTarget.id === 'custom-tabs-menu' ){
+
+        moreMenu( e.currentTarget, {
+          items: customTabState.tabs.map( t => ({
+            key: t.id,
+            text: t.name
+          })),
+          onSelect: k => {
+            activeTab = k
+            $('.nav-tab-wrapper.primary .nav-tab').removeClass('nav-tab-active')
+            mount()
+          }
+        } )
+
+        return
+      }
+
+
+      let $tab = $(e.currentTarget)
 
       $('.nav-tab-wrapper.primary .nav-tab').removeClass('nav-tab-active')
       $tab.addClass('nav-tab-active')
@@ -1474,13 +1492,30 @@
       $('#primary-contact-stuff .edit-meta').remove()
       $('#primary-contact-stuff .custom-tab').remove()
       $('#primary-contact-stuff .tab-more').remove()
+
       $(`<a href="#" id="edit-meta" class="nav-tab edit-meta ${'edit-meta' ===
       activeTab ? ' nav-tab-active' : ''}">${__('More', 'groundhogg')}</a>`).insertAfter('#general')
-      $(customTabState.tabs.map(({
-        id,
-        name,
-      }) => `<a href="#" id="${id}" class="nav-tab custom-tab${id ===
-      activeTab ? ' nav-tab-active' : ''}">${name}</a>`).join('')).insertAfter('#edit-meta')
+
+      if ( customTabState.tabs.length <= 3 ){
+        $(customTabState.tabs.map(({
+          id,
+          name,
+        }) => `<a href="#" id="${id}" class="nav-tab custom-tab${id ===
+        activeTab ? ' nav-tab-active' : ''}">${name}</a>`).join('')).insertAfter('#edit-meta')
+      } else {
+        $('#primary-contact-stuff #custom-tabs-menu').remove()
+        $(`<a href="#" id="custom-tabs-menu" class="nav-tab"></a>`).insertAfter('#edit-meta')
+        $(customTabState.tabs.filter( t => t.id === activeTab ).map(({
+          id,
+          name,
+        }) => `<a href="#" id="${id}" class="nav-tab custom-tab${id ===
+        activeTab ? ' nav-tab-active' : ''} custom-tabs-menu">${name}</a>`).join('')).insertAfter('#edit-meta')
+        tooltip( '#custom-tabs-menu', {
+          content: __('Custom tabs'),
+          position: 'top'
+        } )
+      }
+
       onMount()
     }
 

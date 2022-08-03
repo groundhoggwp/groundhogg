@@ -381,6 +381,25 @@ code.meta-replacement-code {
   }
 }
 
+#primary-tabs-wrap {
+
+  #custom-tabs-menu {
+    //display: flex;
+    //align-items: center;
+    //gap: 5px;
+  }
+
+  #custom-tabs-menu::after {
+    content: "\f347";
+    display: inline-block;
+    font: normal 16px/1 dashicons;
+    speak: never;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-decoration: none;
+  }
+}
+
 #secondary-tabs {
   flex-grow: 0;
 }

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .wp-heading-inline, .page-title-action, #screen-meta-links {
   display: none !important;
 }
@@ -314,6 +315,16 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   width: 15px;
   height: 15px;
+}
+
+#primary-tabs-wrap #custom-tabs-menu::after {
+  content: "";
+  display: inline-block;
+  font: normal 16px/1 dashicons;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
 }
 
 #secondary-tabs {
