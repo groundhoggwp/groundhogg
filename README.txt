@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.7
+Stable tag: 2.6.3.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.3.8 (2022-08-03) ==
+* TWEAKED If there are more than 3 custom tabs in the contact record, tabs can be shown via a dropdown dialog to clean up the UI.
+* UPDATED Translation files with new strings.
+* FIXED Fatal error in AWS integration when pulling up identity verification details
+* FIXED From email address filter will replace invalid from email addresses with the default
 
 = 2.6.3.7 (2022-07-26) ==
 * ADDED Data filters for the email logger
