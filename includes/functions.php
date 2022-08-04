@@ -6556,3 +6556,11 @@ function yaml_load_socials() {
 function is_this_site( $url ) {
 	return wp_parse_url( $url, PHP_URL_HOST ) === wp_parse_url( home_url(), PHP_URL_HOST );
 }
+
+/**
+ * @return Email
+ */
+function the_email(){
+    global $email;
+    return $email;
+}

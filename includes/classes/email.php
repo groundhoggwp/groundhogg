@@ -30,6 +30,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Email extends Base_Object_With_Meta {
+
+	public function __construct( $identifier_or_args = 0, $field = null ) {
+		parent::__construct( $identifier_or_args, $field );
+		$this->maybe_do_3_0_upgrade();
+	}
+
+	/**
+	 * Do upgrades for 3.0
+	 *
+	 * @return void
+	 */
+	protected function maybe_do_3_0_upgrade() {
+		$template = $this->get_meta( 'template' );
+		if ( empty( $template ) ) {
+			$this->update_meta( 'template', 'boxed' );
+		}
+	}
+
 	/**
 	 * Whether the email is a test or not.
 	 *
@@ -220,7 +238,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_template() {
-		return apply_filters( 'groundhogg/email/template', 'default' );
+		return apply_filters( 'groundhogg/email/template', $this->get_meta( 'template' ) ?: 'boxed' );
 	}
 
 	/**
@@ -629,47 +647,19 @@ class Email extends Base_Object_With_Meta {
 
 		do_action( 'groundhogg/email/build/before', $this );
 
-		$this->add_filters();
-
 		ob_start();
+
+		global $email;
+
+		$email = $this;
 
 		$template = $this->get_template();
 
-		if ( has_action( "groundhogg/email/header/{$template}" ) ) {
-			/**
-			 *  Rather than loading the email from the default template, load whatever the custom template is.
-			 */
-			do_action( "groundhogg/email/header/{$template}", $this );
-
-		} else {
-			$templates->get_template_part( 'emails/header', $this->get_template() );
-		}
-
-		if ( has_action( "groundhogg/email/body/{$template}" ) ) {
-			/**
-			 *  Rather than loading the email from the default template, load whatever the custom template is.
-			 */
-			do_action( "groundhogg/email/body/{$template}", $this );
-		} else {
-			$templates->get_template_part( 'emails/body', $this->get_template() );
-		}
-
-		if ( has_action( "groundhogg/email/footer/{$template}" ) ) {
-			/**
-			 *  Rather than loading the email from the default template, load whatever the custom template is.
-			 */
-			do_action( "groundhogg/email/footer/{$template}", $this );
-
-		} else {
-			$templates->get_template_part( 'emails/footer', $this->get_template() );
-
-		}
+		$templates->get_template_part( 'email/' . $template );
 
 		$content = ob_get_clean();
 
 		$content = apply_filters( 'groundhogg/email/the_content', $content );
-
-		$this->remove_filters();
 
 		do_action( 'groundhogg/email/build/after', $this );
 

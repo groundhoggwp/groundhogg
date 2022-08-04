@@ -35,6 +35,11 @@
   margin-left: 10px;
 }
 
+#email-controls {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
 .block-controls {
   display: flex;
   flex-direction: column;
@@ -83,6 +88,9 @@
   background: #FFFFFF;
   overflow: auto;
 }
+#email-block-editor #content #builder-content {
+  min-height: 40px;
+}
 #email-block-editor #content #builder-content p:first-child {
   margin-top: 0;
 }
@@ -103,18 +111,39 @@
 #email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
   display: inline-block;
 }
-#email-block-editor #content #builder-content .builder-block .maybe-edit-text {
-  position: relative;
-}
-#email-block-editor #content #builder-content .builder-block .maybe-edit-text button.edit-text-content {
+#email-block-editor #content #builder-content .builder-block[data-type=text] button.edit-text-content {
   display: none;
 }
-#email-block-editor #content #builder-content .builder-block .maybe-edit-text:hover button.edit-text-content {
+#email-block-editor #content #builder-content .builder-block[data-type=text]:hover button.edit-text-content {
   display: inline-block;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .maybe-edit-text > *:last-child,
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .text-content-wrap > *:last-child {
+  margin-bottom: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .maybe-edit-text > *:first-child,
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .text-content-wrap > *:first-child {
+  margin-top: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] {
+  min-height: 30px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] button.edit-html-content {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html]:hover button.edit-html-content {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] .maybe-edit-html {
+  min-height: 30px;
 }
 #email-block-editor #content #builder-content .builder-block .email-button {
   display: inline-block;
@@ -169,21 +198,22 @@
   background-color: #0075ff;
   z-index: 999;
 }
-#email-block-editor #controls-panel {
+
+#controls-panel {
   width: 400px;
 }
-#email-block-editor #controls-panel h3 {
+#controls-panel h3 {
   padding-left: 10px;
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls {
+#controls-panel .control-group:not(.closed) .controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls label {
+#controls-panel .control-group:not(.closed) .controls label {
   font-weight: 500;
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls .layouts {
+#controls-panel .control-group:not(.closed) .controls .layouts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -192,34 +222,38 @@
   grid-auto-flow: row;
   grid-template-areas: ". ." ". .";
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice {
+#controls-panel .control-group:not(.closed) .controls .layout-choice {
   border: none;
   padding: 10px;
   border-radius: 5px;
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
+#controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
   background-color: rgba(0, 117, 255, 0.2);
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
+#controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
   background-color: rgba(0, 117, 255, 0.5);
 }
-#email-block-editor #controls-panel .control-group:not(.closed) .controls .layout-choice svg {
+#controls-panel .control-group:not(.closed) .controls .layout-choice svg {
   width: 100%;
 }
-#email-block-editor #controls-panel .control-input {
+#controls-panel .control-input {
   max-width: 75px;
 }
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active {
+#controls-panel .wp-picker-container.wp-picker-active {
   position: relative;
 }
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder,
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder,
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
   position: absolute;
   z-index: 99;
   right: 0;
   top: 30px;
 }
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder *,
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap * {
+  box-sizing: content-box;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
   display: flex;
   box-sizing: border-box;
   width: 202px;
@@ -228,10 +262,10 @@
   border-bottom: none;
   padding: 6px;
 }
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder {
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder {
   top: 65px;
 }
-#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder .iris-picker {
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder .iris-picker {
   border-top: none;
 }
 

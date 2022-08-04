@@ -67,38 +67,46 @@ class Dynamic_Block_Handler {
 	 */
 	public function posts( $props ) {
 
+		global $post;
+
 		$props = wp_parse_args( $props, [
-			'query' => [
-				'numberposts' => '5'
-			]
+			'query'          => [],
+			'hide_excerpt'   => false,
+			'hide_meta_data' => false,
 		] );
 
-		$posts = get_posts( $props['query'] );
+		$query = wp_parse_args( [
+			'numberposts' => 5
+		], $props['query'] );
+
+		$posts = get_posts( $query );
 
 		ob_start();
 
-		foreach ( $posts as $post ):
-			?>
-			<div class="post">
-				<table>
-					<tr>
-						<td width="33.333%">
-							<a href="<?php echo esc_url( get_permalink( $post ) ) ?>"><?php echo get_the_post_thumbnail( $post ); ?></a>
-						</td>
-						<td width="66.666%" style="padding-left: 20px">
-							<h3 class="post-title" style="margin-top: 0">
-								<a href="<?php echo esc_url( get_permalink( $post ) ) ?>"><?php esc_html_e( $post->post_title ); ?></a>
-							</h3>
-							<div class="post-excerpt">
-								<?php echo wpautop( get_the_excerpt( $post ) ) ?>
-							</div>
-						</td>
-					</tr>
-				</table>
-			</div>
-		<?php
-		endforeach;
+		?>
+        <div class="email-columns">
+			<?php
 
+			foreach ( $posts as $post ):
+
+				setup_postdata( $post )
+
+				?>
+                <div class="email-columns-row">
+                    <div class="email-columns-cell one-third">
+                        <img src="<?php echo get_the_post_thumbnail_url( $post ) ?>">
+                    </div>
+                    <div class="email-columns-cell" style="width: 20px;"></div>
+                    <div class="email-columns-cell two-thirds">
+                        <h2><?php the_title() ?></h2>
+                        <p><?php the_excerpt(); ?></p>
+                    </div>
+                </div>
+			<?php
+			endforeach;
+			?>
+        </div>
+		<?php
 		return ob_get_clean();
 	}
 
@@ -113,7 +121,8 @@ class Dynamic_Block_Handler {
 	public function replace_content( $content, $blocks ) {
 
 		$blocks = array_filter( $blocks, function ( $block ) {
-			return key_exists( 'type', $block ); } );
+			return key_exists( 'type', $block );
+		} );
 
 		foreach ( $blocks as $block ) {
 

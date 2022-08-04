@@ -83,10 +83,10 @@
       },
       onMount: (settings, updateSetting) => {
 
-        $('#template-width').on('change input', e => {
+        $('#template-width').on('change', e => {
           updateSetting({
             width: e.currentTarget.value,
-          })
+          }, true )
         })
 
         $('.change-alignment').on('click', (e) => {
@@ -429,7 +429,7 @@
 
     hasChanges () {
 
-      const ignoreProps = ['status']
+      const ignoreProps = ['status', 'edited', 'blocks']
 
       for (let prop in this.edited.data) {
 
@@ -439,6 +439,18 @@
         }
 
         if (this.email.data[prop] !== this.edited.data[prop]) {
+          return true
+        }
+      }
+
+      for (let prop in this.edited.meta) {
+
+        // ignore these keys
+        if (ignoreProps.includes(prop)) {
+          continue
+        }
+
+        if (this.email.meta[prop] !== this.edited.meta[prop]) {
           return true
         }
       }
@@ -915,8 +927,10 @@
               edited: this.edited,
             }).then((r) => {
               stopDots()
-              setContent(`<p>Test sent to <b>${ this.testEmailAddress }</b></p>`)
-              setTimeout(closeModal, 2000)
+              closeModal()
+              dialog({
+                message: sprintf( __( 'Test sent to %s' ), this.testEmailAddress )
+              })
             })
           })
         })
@@ -1004,7 +1018,7 @@
           transactional: __('Transactional', 'groundhogg'),
         }
 
-        const {
+        let {
           reply_to_override = '',
           alignment = 'left',
           message_type = 'marketing',
@@ -1012,6 +1026,10 @@
           use_custom_alt_body = false,
           template = 'boxed',
         } = this.edited.meta
+
+        if ( ! template ){
+          template = 'boxed'
+        }
 
         // language=HTML
         return `
@@ -1284,13 +1302,17 @@
 
       if (email.meta.type !== 'html') {
 
-        const {
+        let {
           template = 'boxed',
         } = this.edited.meta
 
+        if ( ! template ){
+          template = 'boxed'
+        }
+
         Groundhogg.EmailBlockEditor('#email-editor-body', {
           email: this.edited,
-          template: DesignTemplates.find(t => t.id === template).template,
+          template: DesignTemplates.find(t => t.id === template )?.template,
           scrollDepth: this.scrollDepth,
           onScroll: (y) => { this.scrollDepth = y },
           onMount: () => {
@@ -1301,8 +1323,8 @@
               mountHeader()
             })
           },
-          emailControls: () => emailControls(),
-          emailControlsOnMount: () => emailControlsOnMount(),
+          emailControls: emailControls,
+          emailControlsOnMount: emailControlsOnMount,
           onChange: ({ css, html, blocks }) => {
 
             this.updateEmail({

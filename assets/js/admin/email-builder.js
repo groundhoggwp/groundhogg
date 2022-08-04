@@ -10,6 +10,7 @@
     clickedIn,
     select,
     copyObject,
+    codeEditor,
   } = Groundhogg.element
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
   const { __, _x, _n, _nx, sprintf } = wp.i18n
@@ -56,6 +57,204 @@
     }
   }
 
+  const topRightBottomLeft = (selector, {
+    values = { top: 0, right: 0, bottom: 0, left: 0 },
+    onChange = (values) => {},
+  }) => {
+
+    let linked = Object.values(values).every(v => v === values.top)
+
+    let $el = $(selector)
+
+    const mount = () => {
+      $el.html(
+        // language=HTML
+        `
+            <div class="gh-input-group">
+                ${ input({
+                    type: 'number',
+                    name: 'top',
+                    value: values.top,
+                    className: `design-attr full-width`,
+                }) }
+                ${ input({
+                    type: 'number',
+                    name: 'right',
+                    value: values.right,
+                    className: `design-attr full-width`,
+                }) }
+                ${ input({
+                    type: 'number',
+                    name: 'bottom',
+                    value: values.bottom,
+                    className: `design-attr full-width`,
+                }) }
+                ${ input({
+                    type: 'number',
+                    name: 'left',
+                    value: values.left,
+                    className: `design-attr full-width`,
+                }) }
+                <button class="gh-button ${ linked ? 'primary' : 'secondary' } icon">${ icons.link }</button>
+            </div>`)
+
+      $el.find('.design-attr').on('change', e => {
+
+        let val = e.target.value
+
+        if (linked) {
+          values.top = e.target.value
+          values.right = e.target.value
+          values.bottom = e.target.value
+          values.left = e.target.value
+          $el.find('input').val(val)
+        }
+        else {
+          values[e.target.name] = e.target.value
+        }
+
+        onChange(values)
+      })
+
+      $el.find('.gh-button').on('click', e => {
+        linked = !linked
+        mount()
+      })
+    }
+
+    mount()
+
+  }
+
+  const AdvancedStyleControls = {
+    css: (block) => {
+      const { advancedStyle = {}, id } = block
+      const {
+        padding = {},
+        margin = {},
+        borderStyle = 'none',
+        borderWidth = {},
+        borderRadius = {},
+      } = advancedStyle
+
+      //language=CSS
+      return `
+          [data-id="${ id }"] {
+              padding-top: ${ padding.top }px;
+              padding-bottom: ${ padding.bottom }px;
+              padding-left: ${ padding.left }px;
+              padding-right: ${ padding.right }px;
+
+              border-style: ${ borderStyle };
+
+              border-top-width: ${ borderWidth.top }px;
+              border-bottom-width: ${ borderWidth.bottom }px;
+              border-left-width: ${ borderWidth.left }px;
+              border-right-width: ${ borderWidth.right }px;
+
+              border-top-right-radius: ${ borderRadius.top }px;
+              border-bottom-right-radius: ${ borderRadius.right }px;
+              border-bottom-left-radius: ${ borderRadius.bottom }px;
+              border-top-left-radius: ${ borderRadius.left }px;
+          }
+      `
+    },
+    render: (block) => {
+
+      const { advancedStyle = {} } = block
+      const {
+        borderStyle = 'none',
+      } = advancedStyle
+      //language=HTML
+      return `
+          <div class="gh-panel control-group closed">
+              <div class="gh-panel-header">
+                  <h2>${ __('Advanced Style') }</h2>
+                  <button class="toggle-indicator"></button>
+              </div>
+              <div class="inside controls">
+                  <div class="control">
+                      <label>${ __('Padding', 'groundhogg') }</label>
+                      <div id="block-padding"></div>
+                  </div>
+                  <div class="control">
+                      <label>${ __('Margin', 'groundhogg') }</label>
+                      <div id="block-margin"></div>
+                  </div>
+                  <hr>
+                  <div class="control space-between">
+                      <label>${ __('Border Style', 'groundhogg') }</label>
+                      ${ select({
+                          id: 'border-style',
+                      }, {
+                          none: __('None', 'groundhogg'),
+                          solid: __('Solid', 'groundhogg'),
+                          dashed: __('Dashed', 'groundhogg'),
+                          dotted: __('Dotted', 'groundhogg'),
+                      }, borderStyle) }
+                  </div>
+                  <div class="control">
+                      <label>${ __('Border Width', 'groundhogg') }</label>
+                      <div id="block-border-width"></div>
+                  </div>
+                  <div class="control">
+                      <label>${ __('Border Radius', 'groundhogg') }</label>
+                      <div id="block-border-radius"></div>
+                  </div>
+              </div>
+          </div>
+      `
+    },
+    onMount: ({ updateBlock, curBlock }) => {
+
+      $('#border-style').on('change', e => {
+        updateBlock({
+          advancedStyle: {
+            ...curBlock().advancedStyle,
+            borderStyle: e.target.value,
+          },
+        })
+      })
+
+      topRightBottomLeft('#block-padding', {
+        values: curBlock().advancedStyle?.padding,
+        onChange: padding => {
+          updateBlock({
+            advancedStyle: {
+              ...curBlock().advancedStyle,
+              padding,
+            },
+          })
+        },
+      })
+
+      topRightBottomLeft('#block-border-radius', {
+        values: curBlock().advancedStyle?.borderRadius,
+        onChange: borderRadius => {
+          updateBlock({
+            advancedStyle: {
+              ...curBlock().advancedStyle,
+              borderRadius,
+            },
+          })
+        },
+      })
+
+      topRightBottomLeft('#block-border-width', {
+        values: curBlock().advancedStyle?.borderWidth,
+        onChange: borderWidth => {
+          updateBlock({
+            advancedStyle: {
+              ...curBlock().advancedStyle,
+              borderWidth,
+            },
+          })
+        },
+      })
+
+    },
+  }
+
   const BlockEditor = (el, {
     email,
     onChange,
@@ -92,97 +291,13 @@
 
       blockControls: (block) => {
 
-        const { design = {} } = block
-        const {
-          padding = {},
-          margin = {},
-          borderStyle = 'none',
-          borderWidth = {},
-          borderRadius = {},
-        } = design
-
-        const boxInputGroup = ({
-          values = {},
-          prefix,
-        }) => {
-          // language=HTML
-          return `
-              <div class="gh-input-group">
-                  ${ input({
-                      type: 'number',
-                      name: 'top',
-                      value: values.top,
-                      attr: prefix,
-                      className: `${ prefix } design-attr full-width`,
-                  }) }
-                  ${ input({
-                      type: 'number',
-                      name: 'right',
-                      value: values.right,
-                      attr: prefix,
-                      className: `${ prefix } design-attr full-width`,
-                  }) }
-                  ${ input({
-                      type: 'number',
-                      name: 'bottom',
-                      value: values.bottom,
-                      attr: prefix,
-                      className: `${ prefix } design-attr full-width`,
-                  }) }
-                  ${ input({
-                      type: 'number',
-                      name: 'left',
-                      value: values.left,
-                      attr: prefix,
-                      className: `${ prefix } design-attr full-width`,
-                  }) }
-              </div>`
-        }
-
-        const designControls = () => {
-          //language=HTML
-          return `
-                  <div class="control">
-                      <label>${ __('Padding') }</label>
-                      ${ boxInputGroup({ prefix: 'padding', values: padding }) }
-                  </div>
-                  <div class="control">
-                      <label>${ __('Margin') }</label>
-                      ${ boxInputGroup({ prefix: 'margin', values: margin }) }
-                  </div>
-                  <hr>
-                  <div class="control space-between">
-                      <label>${ __('Border Style') }</label>
-                      ${ select({
-                          id: 'border-style',
-                      }, {
-                          none: __('None'),
-                          solid: __('Solid'),
-                          dashed: __('Dashed'),
-                          dotted: __('Dotted'),
-                      }) }
-                  </div>
-                  <div class="control">
-                      <label>${ __('Border Width') }</label>
-                      ${ boxInputGroup({ prefix: 'border-width', values: borderWidth }) }
-                  </div>
-                  <div class="control">
-                      <label>${ __('Border Radius') }</label>
-                      ${ boxInputGroup({ prefix: 'border-radius', values: borderRadius }) }
-                  </div>
-          `
-        }
-
         //language=HTML
         return `
+            <h3><span id="email-controls">${ __('Email', 'groundhogg') }</span> /
+                ${ BlockRegistry.get(block.type).name }</h3>
             <div class="block-controls">
-                <h3>${ BlockRegistry.get(block.type).name }</h3>
                 ${ BlockRegistry.controls(block) }
-                ${ controlGroup({
-                    name: 'Design',
-                    //language=HTML
-                    controls: designControls()
-                }) }
+                ${ AdvancedStyleControls.render(block) }
             </div>`
       },
 
@@ -619,12 +734,6 @@
 
         this.$el.find('#builder-content').html(renderBlocks(this.blocks, this.editingBlock ? this.editingBlock : null))
 
-        this.$el.find('#builder-content-wrap').on('click', (e) => {
-          if (!clickedIn(e, '.builder-block')) {
-            editBlock(false)
-          }
-        })
-
         $('.sortable-blocks').sortable({
 
           placeholder: 'block-placeholder',
@@ -679,23 +788,19 @@
          */
         this.$el.find('#builder-content .builder-block').on('click', (e) => {
 
+          e.preventDefault()
+
           let blockId = getBlockId(e)
 
           if (this.editingBlock && blockId === this.editingBlock.id) {
-            return
-          }
-
-          if (clickedIn(e, '.email-columns-cell .column .builder-block') && $(e.currentTarget).data('type') ===
-            'columns') {
+            e.stopPropagation()
             return
           }
 
           editBlock(blockId)
 
-        })
+          e.stopPropagation()
 
-        $(document).on('click', '#builder-content a', e => {
-          e.preventDefault()
         })
 
         if (this.editingBlock) {
@@ -733,7 +838,17 @@
 
         this.$el.find('#controls-panel').html(this.templates.blockControls(this.editingBlock))
 
+        $('#email-controls').on('click', e => {
+          editBlock(false)
+        })
+
         BlockRegistry.controlsOnMount({
+          ...this.editingBlock,
+          updateBlock,
+          curBlock,
+        })
+
+        AdvancedStyleControls.onMount({
           ...this.editingBlock,
           updateBlock,
           curBlock,
@@ -756,7 +871,9 @@
 
       }
       else {
-        this.$el.find('#controls-panel').html(emailControls())
+        this.$el.find('#controls-panel').html(`
+        <h3>${ __('Email', 'groundhogg') }</h3>
+        ${ emailControls() }`)
         emailControlsOnMount()
       }
 
@@ -791,10 +908,19 @@
     },
 
     css (block) {
-      return this.get(block.type).css({
-        ...this.defaults(block),
-        ...block,
-      })
+      try {
+        return this.get(block.type).css({
+          ...this.defaults(block),
+          ...block,
+        }) + '\n\n' + AdvancedStyleControls.css({
+          ...this.defaults(block),
+          ...block,
+        })
+      }
+      catch (e) {
+        return ''
+      }
+
     },
 
     edit (block, editing) {
@@ -906,11 +1032,16 @@
   const renderBlocksDesignCSS = (blocks) => {
     return blocks.filter(b => b.type).map((id, design) => {
 
+      const {
+        padding = {},
+        margin = {},
+      } = design
+
       //language=CSS
       return `
-        [data-id=${id}] {
-            
-        }
+          [data-id=${ id }] {
+
+          }
       `
 
     }).join('')
@@ -1132,6 +1263,7 @@
 
           [data-id="${ id }"] .email-columns .email-columns-cell.gap {
               width: ${ gap }px;
+              height: ${ gap }px;
           }
 
           [data-id="${ id }"] .email-columns .email-columns-cell.one-third {
@@ -1238,8 +1370,8 @@
       return `
           <div class="maybe-edit-text" style="text-align: left">
               ${ content }
-              <button class="gh-button primary edit-text-content">${ __('Edit Content', 'groundhogg') }</button>
-          </div>`
+          </div>
+          <button class="gh-button primary edit-text-content">${ __('Edit Content', 'groundhogg') }</button>`
     },
     editOnMount: ({ id, content, updateBlock, curBlock }) => {
 
@@ -1280,6 +1412,10 @@
               ${ objectToStyle(p) }
           }
 
+          [data-id="${ id }"] b, [data-id="${ id }"] strong {
+              font-weight: bold;
+          }
+
           [data-id="${ id }"] ul {
               list-style: disc;
               padding-left: 20px;
@@ -1301,7 +1437,7 @@
     html: ({ content }) => {
       // language=HTML
       return `
-          <div style="text-align: left">
+          <div class="text-content-wrap" style="text-align: left">
               ${ content }
           </div>`
     },
@@ -1540,26 +1676,22 @@
         d="M352 384h-48V128h48a16 16 0 0 0 11-27L267 5c-6-7-16-7-22 0l-96 96c-5 4-6 11-4 17 3 6 9 10 15 10h48v256h-48a16 16 0 0 0-11 27l96 96c6 7 16 7 22 0l96-96a16 16 0 0 0-11-27z"/>
 </svg>`,
     controls: ({ height }) => {
-      //language=HTML
-      return `
-          <div class="control-group">
-              <div class="control-group-header space-between">
-                  <h4 class="control-group-name">${ __('Settings') }</h4>
-                  <span class="dashicons dashicons-arrow-down-alt2"></span>
-              </div>
-              <div class="controls">
-                  <div class="space-between">
-                      <label for="font-size" class="control-label">${ __('Height', 'groundhogg') }</label>
-                      ${ input({
-                          type: 'number',
-                          id: 'height',
-                          name: 'height',
-                          className: 'control-input',
-                          value: height,
-                      }) }
-                  </div>
-              </div>
-          </div>`
+      return controlGroup({
+        name: 'Content',
+        //language=HTML
+        open: true,
+        controls: `
+            <div class="space-between">
+                <label for="font-size" class="control-label">${ __('Height', 'groundhogg') }</label>
+                ${ input({
+                    type: 'number',
+                    id: 'height',
+                    name: 'height',
+                    className: 'control-input',
+                    value: height,
+                }) }
+            </div>`,
+      })
     },
     controlsOnMount: ({ updateBlock, curBlock }) => {
 
@@ -1602,125 +1734,120 @@
                   d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
         </svg>`,
     controls: ({ text, link, style, align, size }) => {
-      //language=HTML
-      return `
-          <div class="control-group gh-panel">
-              <div class="control-group-header space-between">
-                  <h4 class="control-group-name">${ __('Content') }</h4>
-                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+
+      return [
+        controlGroup({
+          name: 'Content',
+          //language=HTML
+          controls: `
+              <div class="control">
+                  <label class="control-label">${ __('Button Text', 'groundhogg') }</label>
+                  ${ inputWithReplacements({
+                      type: 'text',
+                      id: 'button-text',
+                      className: 'full-width',
+                      value: text,
+                  }) }
               </div>
-              <div class="controls">
-                  <div class="control">
-                      <label class="control-label">${ __('Button Text', 'groundhogg') }</label>
-                      ${ inputWithReplacements({
-                          type: 'text',
-                          id: 'button-text',
-                          className: 'full-width',
-                          value: text,
-                      }) }
-                  </div>
-                  <div class="control">
-                      <label class="control-label">${ __('Button Link', 'groundhogg') }</label>
-                      ${ inputWithReplacements({
-                          type: 'text',
-                          id: 'button-link',
-                          className: 'full-width',
-                          value: link,
-                      }) }
-                  </div>
-                  <div class="space-between">
-                      <label class="control-label">${ __('Button Size', 'groundhogg') }</label>
-                      ${ select({
-                          name: 'size',
-                          id: 'button-size',
-                      }, {
-                          sm: __('Small'),
-                          md: __('Medium'),
-                          lg: __('Large'),
-                      }, size) }
-                  </div>
-                  <div class="control space-between">
-                      <label class="">${ __('Alignment', 'groundhogg') }</label>
-                      <div class="gh-input-group">
-                          <button id="align-left" data-alignment="left"
+              <div class="control">
+                  <label class="control-label">${ __('Button Link', 'groundhogg') }</label>
+                  ${ inputWithReplacements({
+                      type: 'text',
+                      id: 'button-link',
+                      className: 'full-width',
+                      value: link,
+                  }) }
+              </div>
+              <div class="space-between">
+                  <label class="control-label">${ __('Button Size', 'groundhogg') }</label>
+                  ${ select({
+                      name: 'size',
+                      id: 'button-size',
+                  }, {
+                      sm: __('Small'),
+                      md: __('Medium'),
+                      lg: __('Large'),
+                  }, size) }
+              </div>
+              <div class="control space-between">
+                  <label class="">${ __('Alignment', 'groundhogg') }</label>
+                  <div class="gh-input-group">
+                      <button id="align-left" data-alignment="left"
+                              class="change-alignment gh-button ${
+                                      align === 'left' ? 'primary' : 'secondary'
+                              }">
+                          ${ icons.alignLeft }
+                      </button>
+                      <button id="align-center" data-alignment="center"
+                              class="change-alignment gh-button ${
+                                      align === 'center' ? 'primary' : 'secondary'
+                              }">
+                          ${ icons.alignCenter }
+                          <button id="align-right" data-alignment="right"
                                   class="change-alignment gh-button ${
-                                          align === 'left' ? 'primary' : 'secondary'
+                                          align === 'right' ? 'primary' : 'secondary'
                                   }">
-                              ${ icons.alignLeft }
+                              ${ icons.alignRight }
                           </button>
-                          <button id="align-center" data-alignment="center"
-                                  class="change-alignment gh-button ${
-                                          align === 'center' ? 'primary' : 'secondary'
-                                  }">
-                              ${ icons.alignCenter }
-                              <button id="align-right" data-alignment="right"
-                                      class="change-alignment gh-button ${
-                                              align === 'right' ? 'primary' : 'secondary'
-                                      }">
-                                  ${ icons.alignRight }
-                              </button>
-                      </div>
                   </div>
+              </div>`,
+          open: true,
+        }),
+        controlGroup({
+          name: 'Button Style',
+          //language=HTML
+          controls: `
+              <div class="space-between">
+                  <label class="control-label">${ __('Button Color', 'groundhogg') }</label>
+                  ${ input({
+                      type: 'text',
+                      id: 'button-color',
+                      value: style.backgroundColor,
+                  }) }
               </div>
-          </div>
-          <div class="control-group closed">
-              <div class="control-group-header space-between">
-                  <h4 class="control-group-name">${ __('Button Style') }</h4>
-                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              <div class="space-between">
+                  <label class="control-label">${ __('Text Color', 'groundhogg') }</label>
+                  ${ input({
+                      type: 'text',
+                      id: 'text-color',
+                      value: style.color,
+                  }) }
               </div>
-              <div class="controls">
-                  <div class="space-between">
-                      <label class="control-label">${ __('Button Color', 'groundhogg') }</label>
-                      ${ input({
-                          type: 'text',
-                          id: 'button-color',
-                          value: style.backgroundColor,
-                      }) }
-                  </div>
-                  <div class="space-between">
-                      <label class="control-label">${ __('Text Color', 'groundhogg') }</label>
-                      ${ input({
-                          type: 'text',
-                          id: 'text-color',
-                          value: style.color,
-                      }) }
-                  </div>
+          `,
+        }),
+        controlGroup({
+          name: 'Font Style',
+          //language=HTML
+          controls: `
+              <div class="space-between">
+                  <label for="font-size" class="control-label">${ __('Font Size', 'groundhogg') }</label>
+                  ${ input({
+                      type: 'number',
+                      id: 'font-size',
+                      name: 'fontSize',
+                      className: 'font-control control-input',
+                      value: style.fontSize,
+                  }) }
               </div>
-          </div>
-          <div class="control-group closed">
-              <div class="control-group-header space-between">
-                  <h4 class="control-group-name">${ __('Font Style') }</h4>
-                  <span class="dashicons dashicons-arrow-down-alt2"></span>
+              <div class="space-between">
+                  <label for="font-weight" class="control-label">${ __('Font Weight', 'groundhogg') }</label>
+                  ${ select({
+                      id: 'font-weight',
+                      name: 'fontWeight',
+                      className: 'font-control control-input',
+                  }, fontWeights.map(i => ( { value: i, text: i } )), style.fontWeight) }
               </div>
-              <div class="controls">
-                  <div class="space-between">
-                      <label for="font-size" class="control-label">${ __('Font Size', 'groundhogg') }</label>
-                      ${ input({
-                          type: 'number',
-                          id: 'font-size',
-                          name: 'fontSize',
-                          className: 'font-control control-input',
-                          value: style.fontSize,
-                      }) }
-                  </div>
-                  <div class="space-between">
-                      <label for="font-weight" class="control-label">${ __('Font Weight', 'groundhogg') }</label>
-                      ${ select({
-                          id: 'font-weight',
-                          name: 'fontWeight',
-                          className: 'font-control control-input',
-                      }, fontWeights.map(i => ( { value: i, text: i } )), style.fontWeight) }
-                  </div>
-                  <div class="space-between">
-                      <label for="font-family" class="control-label">${ __('Font Family', 'groundhogg') }</label>
-                      ${ select({
-                          id: 'font-family',
-                          name: 'fontFamily',
-                          className: 'font-control control-input',
-                      }, fontFamilies, style.fontFamily) }
-                  </div>
+              <div class="space-between">
+                  <label for="font-family" class="control-label">${ __('Font Family', 'groundhogg') }</label>
+                  ${ select({
+                      id: 'font-family',
+                      name: 'fontFamily',
+                      className: 'font-control control-input',
+                  }, fontFamilies, style.fontFamily) }
               </div>
-          </div>`
+          `,
+        }),
+      ].join('')
     },
 
     controlsOnMount: ({
@@ -1888,7 +2015,7 @@
                       <table border="0" cellspacing="0" cellpadding="0">
                           <tbody>
                           <tr>
-                              <td class="email-button" bgcolor="${ style.backgroundColor }"
+                              <td class="email-button" bgcolor="${ style.backgroundColor }" f
                                   style="padding: ${ padding }; border-radius:3px" align="center"><a href="${ link }"
                                                                                                      target="_blank"
                                                                                                      style="font-size: ${ style.fontSize }px; font-family: ${ style.fontFamily }; font-weight: ${ style.fontWeight }; color: ${ style.color }; text-decoration: none !important; display: inline-block;">${ text }</a>
@@ -1925,6 +2052,35 @@
 
       const { numberposts = 5 } = query
 
+      return [
+
+        controlGroup({
+          name: 'Query',
+          //language=HTML
+          controls: `
+              <div class="control">
+                  <div class="space-between">
+                      <label for="number-posts" class="control-label">${ __('Number of posts',
+                              'groundhogg') }</label>
+                      ${ input({
+                          type: 'number',
+                          id: 'number-posts',
+                          value: numberposts,
+                          className: 'control-input query-control',
+                          name: 'numberposts',
+                      }) }
+                  </div>
+              </div>`,
+        }),
+        controlGroup({
+          name: 'Layout',
+        }),
+        controlGroup({
+          name: 'Style',
+        }),
+
+      ].join('')
+
       //language=HTML
       return `
           <div class="control-group gh-panel">
@@ -1933,19 +2089,7 @@
                   <span class="dashicons dashicons-arrow-down-alt2"></span>
               </div>
               <div class="controls">
-                  <div class="control">
-                      <div class="space-between">
-                          <label for="number-posts" class="control-label">${ __('Number of posts',
-                                  'groundhogg') }</label>
-                          ${ input({
-                              type: 'number',
-                              id: 'number-posts',
-                              value: numberposts,
-                              className: 'control-input query-control',
-                              name: 'numberposts',
-                          }) }
-                      </div>
-                  </div>
+
               </div>
           </div>
       `
@@ -1964,6 +2108,54 @@
       query: {
         numberposts: 5,
       },
+    },
+  })
+
+  registerBlock('html', 'HTML', {
+    //language=HTML
+    svg: icons.copy,
+    controls: ({ content = {} }) => {
+      return ''
+    },
+    controlsOnMount: ({ updateBlock, curBlock }) => {
+
+    },
+    edit: ({ id, content }) => {
+
+      // language=HTML
+      return `
+          <div class="maybe-edit-html" style="text-align: left">
+              ${ content }
+              <button class="gh-button primary edit-html-content">${ __('Edit HTML', 'groundhogg') }</button>
+          </div>`
+    },
+    editOnMount: ({ id, content, updateBlock, curBlock }) => {
+
+      $(`[data-id=${ id }] .edit-html-content`).on('click', (e) => {
+        modal({
+          content: `<textarea id="code-here"></textarea>`,
+          dialogClasses: 'no-padding',
+          width: 600,
+          onOpen: () => {
+            codeEditor({
+              selector: '#code-here',
+              onChange: (content) => {
+                updateBlock({
+                  content,
+                })
+              },
+              initialContent: curBlock().content,
+              height: 500,
+            })
+          },
+        })
+      })
+    },
+    html: ({ content }) => {
+      return content
+    },
+    defaults: {
+      content: '<p>HTML CODE</p>',
     },
   })
 
