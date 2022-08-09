@@ -873,7 +873,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function upload_file( &$file ) {
 
-		if ( ! isset_not_empty( $file, 'name' ) ){
+		if ( ! isset_not_empty( $file, 'name' ) ) {
 			return new \WP_Error( 'invalid_file_name', __( 'Invalid file name.', 'groundhogg' ) );
 		}
 
@@ -897,25 +897,61 @@ class Contact extends Base_Object_With_Meta {
 		return $mfile;
 	}
 
-	public function copy_file( $url ) {
+	/**
+	 * Copy a file given an uploaded URL
+	 *
+	 * @param string $url        url of the file to copy
+	 * @param bool   $delete_tmp whether to delete the tgemp file after
+	 *
+	 * @return bool
+	 */
+	public function copy_file( $url_or_path, $delete_tmp = true ) {
 
 		if ( ! function_exists( 'download_url' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+			require_once ABSPATH . '/wp-admin/includes/file.php';
 		}
 
-		$tmp_file = download_url( $url );
+		// File cannot be copied
+		if ( ! is_copyable_file( $url_or_path ) ){
+			return false;
+		}
+
+		// path given
+		if ( file_exists( $url_or_path ) ) {
+			$tmp_file   = $url_or_path;
+			// if using path, force false
+			$delete_tmp = false;
+		} else {
+
+			// We should only be doing this for files which are already uploaded to the server,
+			// We should reject urls for sites that aren't this one
+			if ( get_hostname( $url_or_path ) !== get_hostname() ){
+				return false;
+			}
+
+			add_filter( 'https_local_ssl_verify', '__return_false' );
+			add_filter( 'https_ssl_verify', '__return_false' );
+
+			$tmp_file = download_url( $url_or_path, 300, false );
+
+			if ( is_wp_error( $tmp_file ) ) {
+				return false;
+			}
+		}
 
 		if ( ! is_dir( $this->get_uploads_folder() ['path'] ) ) {
 			mkdir( $this->get_uploads_folder() ['path'] );
 		}
 		try {
-			$result = copy( $tmp_file, $this->get_uploads_folder()['path'] . '/' . basename( $url ) );
-			@unlink( $tmp_file );
+			copy( $tmp_file, $this->get_uploads_folder()['path'] . '/' . basename( $url_or_path ) );
 		} catch ( \Exception $e ) {
-//			var_dump( $e );
 		}
 
-		return $result;
+		if ( $delete_tmp ){
+			@unlink( $tmp_file );
+		}
+
+		return true;
 	}
 
 

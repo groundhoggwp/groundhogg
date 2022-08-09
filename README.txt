@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.8
+Stable tag: 2.6.3.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,43 +325,48 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.6.3.8 (2022-08-03) ==
+= 2.6.3.9 (2022-08-09) =
+* TWEAKED Add as file mapping for form integrations now supports array of multiple files
+* TWEAKED Add as file mapping will support absolute path to file or url of file
+* TWEAKED Add as file mapping will only allow copying of files from the same server
+
+= 2.6.3.8 (2022-08-03) =
 * TWEAKED If there are more than 3 custom tabs in the contact record, tabs can be shown via a dropdown dialog to clean up the UI.
 * UPDATED Translation files with new strings.
 * FIXED Fatal error in AWS integration when pulling up identity verification details
 * FIXED From email address filter will replace invalid from email addresses with the default
 
-= 2.6.3.7 (2022-07-26) ==
+= 2.6.3.7 (2022-07-26) =
 * ADDED Data filters for the email logger
 * TWEAKED Events log table will now default ASC order for waiting events, and DESC for completed and otherwise.
 * TWEAKED Simplified some event queue login and queries
 * FIXED Multiple PHP Warnings
 * FIXED Email log date filter fields in wrong order for BETWEEN clause.
 
-= 2.6.3.6 (2022-07-15) ==
+= 2.6.3.6 (2022-07-15) =
 * TWEAKED Use white labeled name for form Blocks
 * TWEAKED Use white labeled name for user profile settings
 
-= 2.6.3.5 (2022-06-28) ==
+= 2.6.3.5 (2022-06-28) =
 * TWEAKED Added 'event' and 'event_queue_item' as non persistent cache groups
 * TWEAKED Return to list of edited contacts after completed bulk edit
 * FIXED Webhook mapping not saving after exiting the email edit modal without saving
 * FIXED Location fields in bulk edit not saving
 
-= 2.6.3.4 (2022-06-23) ==
+= 2.6.3.4 (2022-06-23) =
 * FIXED Funnel history contact search filter not working
 * FIXED Zip Code filter not working
 
-= 2.6.3.3 (2022-06-23) ==
+= 2.6.3.3 (2022-06-23) =
 * ADDED "Unsubscribed" activity filter
 * FIXED Autocomplete not working on Safari
 * FIXED "Email Confirmed" filter not working
 * FIXED "Greater than or Equal to" comparator not working
 
-= 2.6.3.2 (2022-06-22) ==
+= 2.6.3.2 (2022-06-22) =
 * FIXED recaptcha v3 causing forms to submit to success page when they are set to ajax.
 
-= 2.6.3.1 (2022-05-18) ==
+= 2.6.3.1 (2022-05-18) =
 * TWEAKED Combined several tools pages into one to make the interface less confusing.
  * Moved user sync to the Misc tab
  * Removed the create users tool (can be done via a funnel)

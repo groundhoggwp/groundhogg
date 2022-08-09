@@ -76,7 +76,7 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
 
-            // A valid Identity was found.
+			// A valid Identity was found.
 			if ( $identity ) {
 				$contact = get_contactdata( $identity );
 
@@ -944,8 +944,13 @@ function get_default_from_name() {
  *
  * @return string
  */
-function get_hostname() {
-	$hostname = wp_parse_url( home_url(), PHP_URL_HOST );
+function get_hostname( $url = '' ) {
+	$hostname = wp_parse_url( $url ?: home_url(), PHP_URL_HOST );
+
+    if ( ! $hostname ){
+        return false;
+    }
+
 	if ( substr( $hostname, 0, 4 ) == 'www.' ) {
 		$hostname = substr( $hostname, 4 );
 	}
@@ -2451,16 +2456,19 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
 				}
 				break;
-
 			case 'copy_file':
-				// used to copy file uploaded using form builder
-				if ( ! function_exists( 'download_url' ) ) {
-					require_once( ABSPATH . '/wp-admin/includes/file.php' );
+				if ( is_string( $value ) && is_copyable_file( $value ) ) {
+					$copy[] = $value;
+                    break;
 				}
-				if ( download_url( $value ) ) {
-					$copy [] = $value;
-				}
-
+                // Maybe multiple files?
+                if ( is_array( $value ) ){
+                    foreach ( $value as $string ){
+                        if ( is_string( $string ) && is_copyable_file( $string ) ){
+	                        $copy[] = $string;
+                        }
+                    }
+                }
 				break;
 			case 'notes':
 				if ( $json = json_decode( $value, true ) ) {
@@ -2762,20 +2770,29 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
 				break;
 			case 'files':
-				if ( isset_not_empty( $_FILES, $column ) ) {
+
+				// passed path as the value
+				if ( file_exists( $value ) ) {
+					$files[ $column ] = $value;
+				} // ZGet from $_FILES
+				else if ( isset_not_empty( $_FILES, $column ) ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
 				}
 				break;
 
 			case 'copy_file':
-				// used to copy file uploaded using form builder
-				if ( ! function_exists( 'download_url' ) ) {
-					require_once( ABSPATH . '/wp-admin/includes/file.php' );
+				if ( is_string( $value ) && is_copyable_file( $value ) ) {
+					$copy[] = $value;
+					break;
 				}
-				if ( download_url( $value ) ) {
-					$copy [] = $value;
+				// Maybe multiple files?
+				if ( is_array( $value ) ){
+					foreach ( $value as $string ){
+						if ( is_string( $string ) && is_copyable_file( $string ) ){
+							$copy[] = $string;
+						}
+					}
 				}
-
 				break;
 			case 'notes':
 
@@ -6515,4 +6532,15 @@ function minify_html( $content ) {
  */
 function is_recaptcha_enabled() {
 	return is_option_enabled( 'gh_recaptcha_site_key' ) && is_option_enabled( 'gh_recaptcha_secret_key' );
+}
+
+/**
+ * Whether a file can be copied because the file exists or it's a downloadable URL of the same hostname
+ *
+ * @param $file string
+ *
+ * @return bool
+ */
+function is_copyable_file( $file ){
+    return file_exists( $file ) || get_hostname( $file ) === get_hostname();
 }
