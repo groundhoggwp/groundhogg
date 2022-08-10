@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.9
+Stable tag: 2.6.3.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.6.3.10 (2022-08-10) =
+* FIXED "Does not start with/Does not end with" comparisons not working in search filters
+* FIXED Future date range comparison not setting minimum date bound in search filters
 
 = 2.6.3.9 (2022-08-09) =
 * TWEAKED Add as file mapping for form integrations now supports array of multiple files

@@ -195,7 +195,6 @@ class Contacts_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $count,
 			'items'       => $contacts,
-			'query'       => $contact_query->request
 		] );
 	}
 
