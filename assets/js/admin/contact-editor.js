@@ -61,6 +61,18 @@
 
   let files = []
 
+
+  const maybeCall = (maybeFunc, ...args) => {
+    if (typeof maybeFunc === 'string') {
+      return maybeFunc
+    }
+    if (typeof maybeFunc === 'function') {
+      return maybeFunc( ...args )
+    }
+
+    return maybeFunc
+  }
+
   const activityUpdated = () => {
     window.dispatchEvent(new Event('activityupdated'))
   }
@@ -723,7 +735,7 @@
               <div class="activity-icon ${ activity.data.activity_type } ${ type.iconFramed === false
                       ? 'no-frame'
                       : '' }">
-                  ${ type.icon }
+                  ${ maybeCall( type.icon, activity ) }
               </div>
               <div class="activity-rendered gh-panel">
                   <div class="activity-info">

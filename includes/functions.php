@@ -4954,6 +4954,8 @@ function track_live_activity( $type, $details = [] ) {
 		'referer'   => tracking()->get_leadsource(),
 	];
 
+	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
+
 	track_activity( $contact, $type, $args, $details );
 }
 
@@ -4984,7 +4986,8 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
 	// Merge overrides with args
 	$args = wp_parse_args( $args, $defaults );
-	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
+
+	$args = apply_filters( 'groundhogg/track_activity/args', $args, $contact );
 
 	// Add the activity to the DB
 	$id = get_db( 'activity' )->add( $args );
@@ -5007,6 +5010,7 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	 * @param $contact  Contact
 	 */
 	do_action( 'groundhogg/track_activity', $activity, $contact );
+	do_action( "groundhogg/track_activity/{$activity->activity_type}", $activity, $contact );
 }
 
 

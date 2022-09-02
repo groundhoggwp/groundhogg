@@ -36,7 +36,7 @@ abstract class Activity_Benchmark extends Benchmark {
 
 	protected function get_complete_hooks() {
 		return [
-			'groundhogg/track_activity' => 2
+			"groundhogg/track_activity/{$this->type}" => 2
 		];
 	}
 

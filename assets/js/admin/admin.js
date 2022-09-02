@@ -9,6 +9,12 @@
     userHasCap: (cap) => {
       return currentUser.allcaps[cap] || currentUser.caps[cap] || isSuperAdmin
     },
+    getOwner: (id) => {
+      return Groundhogg.filters.owners.find( u => u.ID == id )
+    },
+    getOwnerDisplayName: (id) => {
+      return Groundhogg.filters.owners.find( u => u.ID == id ).data.display_name
+    }
   }
 
   // Serialize better
