@@ -285,14 +285,13 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin-functions',
-			'sticky-sidebar'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v3' . $dot_min . '.js', [
 			'jquery',
-			'groundhogg-admin-functions',
 			'groundhogg-admin',
-			'sticky-sidebar'
+			'groundhogg-admin-element',
+			'groundhogg-admin-functions',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/form-builder' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

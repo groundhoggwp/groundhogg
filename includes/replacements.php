@@ -1341,6 +1341,12 @@ class Replacements implements \JsonSerializable {
 		return $quotes[ $quote ];
 	}
 
+	/**
+     * We don't want this to be serialized
+     *
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return false;
 	}

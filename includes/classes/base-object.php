@@ -489,9 +489,20 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @link  https://php.net/manual/en/serializable.serialize.php
 	 * @return string the string representation of the object or null
 	 * @since 5.1.0
+	 *
+	 * @return string
 	 */
 	public function serialize() {
 		return serialize( $this->get_as_array() );
+	}
+
+	/**
+	 * For PHP 8.0
+	 *
+	 * @return string
+	 */
+	public function __serialize(): string {
+		return $this->serialize();
 	}
 
 	/**
@@ -505,6 +516,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		$data = $data['data'];
 
 		$this->setup_object( $data );
+	}
+
+	/**
+	 * For PHP 8.0
+	 *
+	 * @return string
+	 */
+	public function __unserialize( array $data ): void {
+		$this->unserialize( $data );
 	}
 
 	/**
@@ -522,6 +542,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * The return value will be casted to boolean if non-boolean was returned.
 	 * @since 5.0.0
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists( $offset ) {
 		if ( property_exists( $this, $offset ) ) {
 			return $this->$offset !== null;
@@ -542,6 +563,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return mixed Can return all value types.
 	 * @since 5.0.0
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		if ( property_exists( $this, $offset ) ) {
 			return $this->$offset;
@@ -565,6 +587,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return void
 	 * @since 5.0.0
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
 		if ( is_null( $offset ) ) {
 			$this->data[] = $value;
@@ -585,6 +608,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return void
 	 * @since 5.0.0
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {
 		if ( property_exists( $this, $offset ) ) {
 			$this->$offset = null;
@@ -619,6 +643,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		] );
 	}
 
+	/**
+	 * Serialize to json
+	 *
+	 * @return array
+	 */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->get_as_array();
 	}

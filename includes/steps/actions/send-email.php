@@ -162,6 +162,18 @@ class Send_Email extends Action {
 		$html->end_form_table();
 	}
 
+	public function validate_settings( Step $step ) {
+		$email = new Email( $this->get_setting( 'email_id' ) );
+
+		if ( ! $email->exists() ) {
+			$step->add_error( 'email_dne', __( 'You have not selected an email!', 'groundhogg' ) );
+		}
+
+		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
+			$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop.' ) );
+		}
+	}
+
 	/**
 	 * Save the settings
 	 *

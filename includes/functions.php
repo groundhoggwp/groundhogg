@@ -947,9 +947,9 @@ function get_default_from_name() {
 function get_hostname( $url = '' ) {
 	$hostname = wp_parse_url( $url ?: home_url(), PHP_URL_HOST );
 
-    if ( ! $hostname ){
-        return false;
-    }
+	if ( ! $hostname ) {
+		return false;
+	}
 
 	if ( substr( $hostname, 0, 4 ) == 'www.' ) {
 		$hostname = substr( $hostname, 4 );
@@ -2459,16 +2459,16 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'copy_file':
 				if ( is_string( $value ) && is_copyable_file( $value ) ) {
 					$copy[] = $value;
-                    break;
+					break;
 				}
-                // Maybe multiple files?
-                if ( is_array( $value ) ){
-                    foreach ( $value as $string ){
-                        if ( is_string( $string ) && is_copyable_file( $string ) ){
-	                        $copy[] = $string;
-                        }
-                    }
-                }
+				// Maybe multiple files?
+				if ( is_array( $value ) ) {
+					foreach ( $value as $string ) {
+						if ( is_string( $string ) && is_copyable_file( $string ) ) {
+							$copy[] = $string;
+						}
+					}
+				}
 				break;
 			case 'notes':
 				if ( $json = json_decode( $value, true ) ) {
@@ -2786,9 +2786,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 					break;
 				}
 				// Maybe multiple files?
-				if ( is_array( $value ) ){
-					foreach ( $value as $string ){
-						if ( is_string( $string ) && is_copyable_file( $string ) ){
+				if ( is_array( $value ) ) {
+					foreach ( $value as $string ) {
+						if ( is_string( $string ) && is_copyable_file( $string ) ) {
 							$copy[] = $string;
 						}
 					}
@@ -3926,7 +3926,7 @@ function mobile_validator() {
  *
  * @return bool|string
  */
-function validate_mobile_number( $number, $country_code = '', $with_plus = false ) {
+function validate_mobile_number( $number, $country_code = '', $with_plus = true ) {
 	if ( ! $country_code ) {
 		$country_code = get_default_country_code();
 	}
@@ -5592,6 +5592,24 @@ function array_map_to_class( &$array, $class ) {
 }
 
 /**
+ * @param $array
+ *
+ * @return Contact[]
+ */
+function array_map_to_contacts( &$array ) {
+	return array_map_to_class( $array, Contact::class );
+}
+
+/**
+ * @param $array
+ *
+ * @return Step[]
+ */
+function array_map_to_step( &$array ) {
+	return array_map_to_class( $array, Step::class );
+}
+
+/**
  * Get objects as ID list
  *
  * @param $array
@@ -6541,6 +6559,39 @@ function is_recaptcha_enabled() {
  *
  * @return bool
  */
-function is_copyable_file( $file ){
-    return file_exists( $file ) || get_hostname( $file ) === get_hostname();
+function is_copyable_file( $file ) {
+	return file_exists( $file ) || get_hostname( $file ) === get_hostname();
+}
+
+/**
+ * Process events in the event queue
+ * Pass a contact to only process events for a specific contact
+ *
+ * @param $contacts Contact|Contact[]
+ *
+ * @return void
+ */
+function process_events( $contacts = [] ) {
+
+	if ( ! empty( $contacts ) ) {
+
+		if ( ! is_array( $contacts ) ) {
+			$contacts = [ get_contactdata( $contacts ) ];
+		}
+
+		$contacts    = array_filter( $contacts, __NAMESPACE__ . '\is_a_contact' );
+		$contact_ids = array_unique( get_object_ids( $contacts ) );
+
+		if ( ! empty( $contact_ids ) ) {
+
+			// only process the events for this contact
+			add_filter( 'groundhogg/queue/event_store/get_queued_event_ids/clauses', function ( $clauses ) use ( $contact_ids ) {
+				$clauses[] = sprintf( '`contact_id` IN (%s)', implode( ',', $contact_ids ) );
+
+				return $clauses;
+			} );
+		}
+	}
+
+	do_action( Event_Queue::WP_CRON_HOOK );
 }

@@ -125,10 +125,8 @@ abstract class Meta_DB extends DB {
 		if ( $registered_table !== $this->get_table_name() ) {
 			$wpdb->__set( $this->get_object_type() . 'meta', $this->get_table_name() );
 			$this->conflicting_table_name = $registered_table;
-		}
-
-		// If a conflict table was removed, restore it
-		else if ( $this->conflicting_table_name){
+		} // If a conflict table was removed, restore it
+		else if ( $this->conflicting_table_name ) {
 			$wpdb->__set( $this->get_object_type() . 'meta', $this->conflicting_table_name );
 			// Reset the conflicting table flag
 			$this->conflicting_table_name = '';
@@ -240,6 +238,16 @@ abstract class Meta_DB extends DB {
 
 		$this->maybe_resolve_table_conflict();
 
+		/**
+		 * Filter the meta value
+		 *
+		 * @param $meta_value mixed
+		 * @param $meta_key   string
+		 * @param $object_id  int
+		 * @param $prev_value mixed
+		 */
+		$meta_value = apply_filters( "groundhogg/meta/{$this->get_object_type()}/add/filter_value", $meta_value, $meta_key, $object_id );
+
 		$added = add_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
 
 		$this->maybe_resolve_table_conflict();
@@ -281,6 +289,16 @@ abstract class Meta_DB extends DB {
 		}
 
 		$this->maybe_resolve_table_conflict();
+
+		/**
+		 * Filter the meta value
+		 *
+		 * @param $meta_value mixed
+		 * @param $meta_key   string
+		 * @param $object_id  int
+		 * @param $prev_value mixed
+		 */
+		$meta_value = apply_filters( "groundhogg/meta/{$this->get_object_type()}/update/filter_value", $meta_value, $meta_key, $object_id, $prev_value );
 
 		$updated = update_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
 

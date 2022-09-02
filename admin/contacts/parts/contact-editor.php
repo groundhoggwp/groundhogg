@@ -258,7 +258,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								?>
 							</div>
 						</div>
-					</div>
+						<?php do_action( 'groundhogg/contact/record/general_info', $contact ); ?>
+                    </div>
 
 					<?php do_action( 'groundhogg/contact/record/contact_info/after', $contact ); ?>
 					<?php do_action( 'groundhogg/contact/record/email_status/after', $contact ); ?>

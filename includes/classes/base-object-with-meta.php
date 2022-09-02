@@ -142,6 +142,35 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	}
 
 	/**
+	 * Same as update_meta, but only sets the value if one does not already exist
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public function update_meta_if_empty( $key, $value = false ) {
+
+		if ( is_array( $key ) && ! $value ) {
+
+			$updated = true;
+
+			foreach ( $key as $meta_key => $meta_value ) {
+				$updated = $this->update_meta( $meta_key, $meta_value ) && $updated;
+			}
+
+			return $updated;
+
+		} else if ( ! $this->get_meta( $key ) && $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
+			$this->meta[ $key ] = $value;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Update some meta data
 	 *
 	 * @param $key

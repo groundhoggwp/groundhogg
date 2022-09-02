@@ -1,9 +1,12 @@
-(function ($, funnel, modal) {
+( function ($, funnel, modal) {
+
+  const { uuid } = Groundhogg.element
 
   $.extend(funnel, {
 
     sortables: null,
     insertAfterStep: false,
+    currentlyActive: false,
 
     getSteps: function () {
       return $('#step-sortable')
@@ -30,28 +33,27 @@
       })
 
       $document.on('click', '#postbox-container-1 .step', function (e) {
+
+        if ($(e.target).is('.dashicons, button')) {
+          return
+        }
+
         self.makeActive(this.id, e)
       })
 
-      $document.on('click', '.add-step', (e) => {
-        this.insertAfterStep = e.currentTarget.dataset.step;
+      $document.on('click', '.add-step-bottom-wrap button', e => {
+        this.showAddStep()
       })
 
-      $document.on('click', 'td.step-icon', function (e) {
+      $document.on('click', '#step-toggle button', e => {
 
-        var $icon = $(this)
-        var $type = $icon.find('.wpgh-element')
-        var type = $type.attr('id')
+        let group = e.currentTarget.dataset.group
 
-        var data = {
-          action: 'wpgh_get_step_html',
-          step_type: type,
-          after_step: self.insertAfterStep,
-          funnel_id: self.id,
-          version: 2,
-        }
+        $(`.steps-grid`).addClass('hidden')
+        $(`#${ group }`).removeClass('hidden')
 
-        self.getStepHtml(data)
+        $('#step-toggle button').removeClass('active')
+        $(e.currentTarget).addClass('active')
 
       })
 
@@ -173,6 +175,7 @@
         $(document).trigger('new-step')
 
         $('body').removeClass('saving')
+        self.makeActive(self.currentlyActive)
       })
     },
 
@@ -180,16 +183,79 @@
       this.sortables = $('.ui-sortable').sortable({
         placeholder: 'sortable-placeholder',
         connectWith: '.ui-sortable',
-        axis: 'y',
+        // axis: 'y',
         start: function (e, ui) {
-          ui.helper.css('left',
-            (ui.item.parent().width() - ui.item.width()) / 2)
-          ui.placeholder.height(ui.item.height())
-          ui.placeholder.width(ui.item.width())
+          // ui.helper.css('left',
+          //   (ui.item.parent().width() - ui.item.width()) / 2)
+          // ui.placeholder.height(ui.item.height())
+          // ui.placeholder.width(ui.item.width())
+        },
+        receive: (e, ui) => {
+          console.log({ e, ui })
+
+          let after_step = ui.helper.prev().prop('id');
+
+
+          if ( ! after_step ){
+
+          }
+
+          var data = {
+            action: 'wpgh_get_step_html',
+            step_type: ui.item.prop('id'),
+            after_step: ui.helper.prev().prop('id'),
+            funnel_id: this.id,
+            version: 2,
+          }
+
+          this.insertAfterStep = data.after_step
+
+          console.log({ data })
+
+          let id = uuid()
+          // language=HTML
+          ui.helper.replaceWith(`
+              <div class="step step-placeholder" id="${ id }">
+                  Loading...
+              </div>`)
+
+          var self = this
+          var $steps = self.getSteps()
+          var $settings = self.getSettings()
+
+          showSpinner()
+          adminAjaxRequest(data, function (response) {
+
+            if (self.insertAfterStep) {
+              $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
+            }
+            else {
+              $steps.prepend(response.data.data.sortable)
+            }
+
+            $settings.append(response.data.data.settings)
+            $(`#${ id }`).remove()
+
+            hideSpinner()
+            $(document).trigger('new-step')
+          })
         },
       })
 
       this.sortables.disableSelection()
+
+      $('.wpgh-element.ui-draggable').draggable({
+        connectToSortable: '#step-sortable.ui-sortable',
+        helper: 'clone',
+      })
+    },
+
+    showAddStep () {
+      $('#add-steps').removeClass('hidden')
+      $('.step-settings').addClass('hidden')
+      $('#step-sortable .step').removeClass('active')
+
+      this.currentlyActive = false
     },
 
     /**
@@ -204,16 +270,6 @@
       showSpinner()
 
       var $step = $('#' + id)
-      var $prev_step = $step.prev()
-
-      if (!$prev_step.attr('id')) {
-        $prev_step = $step.next()
-
-        if (!$prev_step.attr('id')) {
-          $prev_step = false
-        }
-      }
-
       var result = confirm(
         'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.')
 
@@ -227,14 +283,11 @@
             var $step_settings = $(sid)
             $step_settings.remove()
             $('html').removeClass('active-step')
-
-            if ($prev_step !== false) {
-              self.makeActive($prev_step.attr('id'))
-            }
-
             self.save()
+            self.showAddStep()
           })
-      } else {
+      }
+      else {
         hideSpinner()
       }
     },
@@ -267,14 +320,14 @@
       showSpinner()
       adminAjaxRequest(obj, function (response) {
 
-        if ( self.insertAfterStep ) {
-          $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
-        } else {
+        if (self.insertAfterStep) {
+          $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
+        }
+        else {
           $steps.append(response.data.data.sortable)
         }
 
         $settings.append(response.data.data.settings)
-        self.makeActive(response.data.data.id)
         modal.close()
         hideSpinner()
         $(document).trigger('new-step')
@@ -287,12 +340,19 @@
      * @param id string
      * @param e object
      */
-    makeActive: function (id, e) {
+    makeActive: function (id) {
       var self = this
 
       if (typeof e == 'undefined') {
         e = false
       }
+
+      if (!id) {
+        this.showAddStep()
+        return
+      }
+
+      this.currentlyActive = id
 
       var $steps = self.getSteps()
       var $settings = self.getSettings()
@@ -304,48 +364,31 @@
       var was_active = $step.hasClass('active')
 
       // In some cases we do not want to allow deselecting a step...
-      if (self.disable_deselect_step) {
-        was_active = false
+      if (was_active) {
+        return
       }
 
-      // Remove active from the active step
-      var make_inactive = true
+      $('#add-steps').addClass('hidden')
+      $('.step-settings').removeClass('hidden')
 
-      if (e) {
-        var $target = $(e.target)
-
-        // console.log( e.target );
-
-        if (was_active &&
-          ($target.hasClass('dashicons') ||
-            $target.hasClass('add-step'))) {
-          // console.log( e )
-          make_inactive = false
-        }
-      }
-
-      if (make_inactive) {
-        $settings.find('.step').addClass('hidden')
-        $settings.find('.step').removeClass('active')
-        $steps.find('.step').removeClass('active')
-        $steps.find('.is_active').val(null)
-        $html.removeClass('active-step')
-      }
+      $settings.find('.step').addClass('hidden')
+      $settings.find('.step').removeClass('active')
+      $steps.find('.step').removeClass('active')
+      $html.removeClass('active-step')
 
       // Make the clicked step active
-      if (!was_active) {
-        $step.addClass('active')
-        $step.find('.is_active').val(1)
+      $step.addClass('active')
+      $step.find('.is_active').val(1)
 
-        var sid = '#settings-' + $step.attr('id')
-        var $step_settings = $(sid)
+      var sid = '#settings-' + $step.attr('id')
+      var $step_settings = $(sid)
 
-        $step_settings.removeClass('hidden')
-        $step_settings.addClass('active')
-        $html.addClass('active-step')
+      $step_settings.removeClass('hidden')
+      $step_settings.addClass('active')
+      $html.addClass('active-step')
 
-        $(document).trigger('step-active')
-      }
+      $(document).trigger('step-active')
+
     },
   })
 
@@ -353,4 +396,4 @@
     funnel.init()
   })
 
-})(jQuery, Funnel, GroundhoggModal)
+} )(jQuery, Funnel, GroundhoggModal)

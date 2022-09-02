@@ -872,6 +872,15 @@ button.gh-submit.medium {
   font-size: 18px;
   padding: 11px 22px;
 }
+a.gh-button.medium.icon, a.gh-submit.medium.icon,
+input[type=button].gh-button.medium.icon,
+input[type=button].gh-submit.medium.icon,
+input[type=submit].gh-button.medium.icon,
+input[type=submit].gh-submit.medium.icon,
+button.gh-button.medium.icon,
+button.gh-submit.medium.icon {
+  gap: 10px;
+}
 a.gh-button.small, a.gh-submit.small,
 input[type=button].gh-button.small,
 input[type=button].gh-submit.small,

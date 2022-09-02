@@ -1654,9 +1654,9 @@
         }
 
         Options.fetch([
-          'gh_master_license',
+          'gh_support_license',
         ]).then(r => {
-          if (!Options.get('gh_master_license')) {
+          if (!Options.get('gh_support_license')) {
             next('need-license')
           }
         })
@@ -1948,7 +1948,7 @@
                     ${ input({
                         placeholder: __('Your license key'),
                         id: 'license',
-                        value: Options.get('gh_master_license'),
+                        value: Options.get('gh_support_license'),
                     }) }
                     <button id="activate" class="gh-button primary medium">
                         ${ __('Activate', 'groundhogg') }
@@ -1989,7 +1989,7 @@
           window.open(e.target.dataset.link, '_blank')
         })
 
-        let license = Options.get('gh_master_license')
+        let license = Options.get('gh_support_license')
 
         $('#license').on('change input', e => {
           license = e.target.value
@@ -2004,7 +2004,7 @@
           $btn.prop('disabled', true)
 
           ajax({
-            action: 'gh_guided_setup_license',
+            action: 'groundhogg_check_support_license',
             license,
           }).then((r) => {
 

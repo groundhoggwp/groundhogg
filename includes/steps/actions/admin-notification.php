@@ -12,7 +12,6 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\is_replacement_code_format;
 use function Groundhogg\is_sms_plugin_active;
-use function Groundhogg\validate_mobile_number;
 
 /**
  * Admin Notification

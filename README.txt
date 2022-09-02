@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.6.3.10
+Stable tag: 2.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,18 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7 (2022-09-02) =
+* IMPROVED Funnel UI receives a new coat of paint!
+ * Updated colors to match new contact UI
+ * More visually appealing layout
+ * Textual helpers in the step flow to make the functionality clearer
+ * Drag and drop steps into the flow
+ * Warnings and errors are shown more clearly
+ * Think of this as a sort of 3.0 preview
+* ADDED New developer class, the `Activity_Benchmark` class gives a simple way to hook into the contact activity tracking system.
+* TWEAKED Benchmark that are completed and sequential actions will processed synchronously for the current contact.
+* FIXED Individually purchased support licenses not being accepted in the troubleshooter license verification.
 
 = 2.6.3.10 (2022-08-10) =
 * FIXED "Does not start with/Does not end with" comparisons not working in search filters

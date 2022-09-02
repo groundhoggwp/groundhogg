@@ -185,11 +185,11 @@
          *
          * @param e string class name
          */
-        insertDummyStep: function (e) {
+        insertDummyStep: function (selector) {
             /* Check if we actually dropped it in */
-            if ( this.editor.find(e).length > 0 ){
+            if ( this.editor.find(selector).length > 0 ){
 
-                this.editor.find(e).replaceWith(
+                this.editor.find(selector).replaceWith(
                     '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
                 );
 

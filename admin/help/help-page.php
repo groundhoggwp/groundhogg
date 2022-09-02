@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Help;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact;
+use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\create_contact_from_user;
@@ -35,7 +36,27 @@ class Help_Page extends Tabbed_Admin_Page {
 		add_action( 'wp_ajax_groundhogg_disable_safe_mode', [ $this, 'disable_safe_mode' ] );
 		add_action( 'wp_ajax_groundhogg_submit_support_ticket', [ $this, 'submit_ticket' ] );
 		add_action( 'wp_ajax_groundhogg_resave_permalinks', [ $this, 'resave_permalinks' ] );
+		add_action( 'wp_ajax_groundhogg_check_support_license', [ $this, 'check_license' ] );
 	}
+
+	/**
+	 * Checks the provided license to see if it's valid
+	 */
+	public function check_license() {
+
+		$license = sanitize_text_field( get_post_var( 'license' ) );
+
+		$result = License_Manager::activate_license_quietly( $license, 12344 );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result );
+		}
+
+		update_option( 'gh_support_license', $license );
+
+		wp_send_json_success();
+	}
+
 
 	public function resave_permalinks() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -165,7 +186,7 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$user = get_userdatabylogin( $user_login );
 
-        // No user exists, create one
+		// No user exists, create one
 		if ( ! $user ) {
 
 			$user_id = wp_create_user( $user_login, wp_generate_password(), self::SUPPORT_EMAIL );
@@ -176,13 +197,13 @@ class Help_Page extends Tabbed_Admin_Page {
 
 			$user = get_userdata( $user_id );
 
-        }
-        // User exists, but does not belong to us
-        else if ( ! in_array( $user->user_email, [ self::SUPPORT_EMAIL, self::HELP_EMAIL ] ) ){
-            // Set a unique login
-	        update_option( 'gh_support_user_login', uniqid( self::SUPPORT_LOGIN . '_' ) );
-	        return $this->create_support_user();
-        }
+		} // User exists, but does not belong to us
+		else if ( ! in_array( $user->user_email, [ self::SUPPORT_EMAIL, self::HELP_EMAIL ] ) ) {
+			// Set a unique login
+			update_option( 'gh_support_user_login', uniqid( self::SUPPORT_LOGIN . '_' ) );
+
+			return $this->create_support_user();
+		}
 
 		// Set locale to en_US
 		update_user_meta( $user->ID, 'locale', 'en_US' );
@@ -203,7 +224,7 @@ class Help_Page extends Tabbed_Admin_Page {
 		$args = [
 			'name'          => sanitize_text_field( get_post_var( 'name' ) ),
 			'email'         => sanitize_email( get_post_var( 'email' ) ),
-			'license'       => get_option( 'gh_master_license' ),
+			'license'       => get_option( 'gh_support_license' ),
 			'host'          => sanitize_text_field( get_post_var( 'host' ) ),
 			'mood'          => sanitize_text_field( get_post_var( 'mood' ) ),
 			'gh_experience' => sanitize_text_field( get_post_var( 'gh_experience' ) ),
@@ -323,6 +344,11 @@ class Help_Page extends Tabbed_Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin-help' );
 
 		if ( $this->get_current_tab() === 'troubleshooting' ) {
+
+			$master_license = get_option( 'gh_master_license' );
+			if ( ! empty( $master_license ) ) {
+				update_option( 'gh_support_license', $master_license );
+			}
 
 			wp_enqueue_media();
 			wp_enqueue_editor();

@@ -90,10 +90,17 @@ class Event_Store {
 			return [];
 		}
 
+		$clauses = apply_filters( 'groundhogg/queue/event_store/get_queued_event_ids/clauses', [
+			$wpdb->prepare( '`status` = %s', Event::WAITING ),
+			$wpdb->prepare( '`time` <= %d',  time() ),
+		] );
+
+		$clauses = implode( ' AND ', $clauses );
+
 		$queued_events = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM {$this->db()->get_table_name()}
-		WHERE `status` = %s AND `time` <= %d AND `claim` = ''
+		WHERE $clauses
 		ORDER BY `priority` ASC, `time` ASC
-		LIMIT %d", Event::WAITING, time(), $count ) );
+		LIMIT %d", $count ) );
 
 		return wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 	}

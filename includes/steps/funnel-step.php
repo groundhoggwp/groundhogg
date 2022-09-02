@@ -38,14 +38,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * complete()
  *
+ * @since       File available since Release 0.9
  * @see         WPGH_Form_Filled for an example.
  *
- * @package     Elements
  * @subpackage  Elements/Benchmarks
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable {
 	protected static $step_properties = [];
@@ -209,6 +209,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 	}
 
+	private function get_error_icon() {
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/warning.png';
+	}
 
 	/**
 	 * Register the this action/benchmark with the globals...
@@ -440,20 +443,21 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Get the reporting view for the STEP
 	 * Most steps will use the default step reporting given here...
 	 *
+	 * @deprecated  Version 2.2 use Dashboard APi to add graphs
+	 *
 	 * @param $step Step
 	 *
-	 * @deprecated  Version 2.2 use Dashboard APi to add graphs
 	 */
 	public function reporting_v2( $step ) {
 
 		?>
-		<div class="step-title-wrap">
-			<div class="step-title-view">
+        <div class="step-title-wrap">
+            <div class="step-title-view">
 				<?php printf( __( 'Reporting %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ) ); ?>
-			</div>
-		</div>
-		<div class="reporting-results">
-			<h3><?php _e( 'History', 'groundhogg' ); ?></h3>
+            </div>
+        </div>
+        <div class="reporting-results">
+            <h3><?php _e( 'History', 'groundhogg' ); ?></h3>
 			<?php
 
 			$stats = $this->quick_stats( $step );
@@ -464,7 +468,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			html()->list_table( [ 'style' => [ 'margin-bottom' => '10px' ] ], $cols, [ $stats ], false );
 
 			?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -495,19 +499,19 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			] );
 
 			?>
-			<p class="report">
+            <p class="report">
 				<?php _e( 'Waiting:', 'groundhogg' ) ?>
-				<a target="_blank" href="<?php echo add_query_arg( [
+                <a target="_blank" href="<?php echo add_query_arg( [
 					'report' => [
 						'step'   => $step->get_id(),
 						'funnel' => $step->get_funnel_id(),
 						'status' => 'waiting'
 					]
 				], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-					<b><?php echo $num_events_waiting; ?></b>
-				</a>
-			</p>
-			<hr>
+                    <b><?php echo $num_events_waiting; ?></b>
+                </a>
+            </p>
+            <hr>
 		<?php
 		endif;
 
@@ -523,9 +527,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		] );
 
 		?>
-		<p class="report">
+        <p class="report">
 			<?php _e( 'Completed:', 'groundhogg' ) ?>
-			<a target="_blank" href="<?php echo add_query_arg( [
+            <a target="_blank" href="<?php echo add_query_arg( [
 				'report' => [
 					'step'   => $step->get_id(),
 					'funnel' => $step->get_funnel_id(),
@@ -534,9 +538,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					'end'    => $end_time,
 				]
 			], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-				<b><?php echo $num_events_completed; ?></b>
-			</a>
-		</p>
+                <b><?php echo $num_events_completed; ?></b>
+            </a>
+        </p>
 		<?php
 	}
 
@@ -626,7 +630,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$steps = get_db( 'steps' )->query( $query );
 
-        array_map_to_class( $steps, Step::class );
+		array_map_to_class( $steps, Step::class );
 
 		return $steps;
 
@@ -637,6 +641,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function pre_html( Step $step ) {
 		$this->set_current_step( $step );
+
+		$this->validate_settings( $step );
+	}
+
+	public function validate_settings( Step $step ) {
+
 	}
 
 	/**
@@ -657,72 +667,58 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function sortable_item( $step ) {
 
-		?>
-		<div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-		     title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>"
-		     class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php if ( $step->get_meta( 'is_active' ) ) {
-			     echo 'active';
-		     } ?>">
-			<input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
-			<?php echo html()->input( [
-				'type'  => 'hidden',
-				'name'  => $this->setting_name_prefix( 'is_active' ),
-				'id'    => $this->setting_id_prefix( 'is_active' ),
-				'value' => $this->get_setting( 'is_active' ),
-				'class' => 'is_active'
-			] ); ?>
+		$classes = [
+			$step->get_group(),
+			$step->get_type()
+		];
 
-			<span class="actions">
+		if ( $step->has_errors() ) {
+			$classes[] = 'has-errors';
+		}
+
+		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
+
+		?>
+        <div
+                id="<?php echo $step->get_id(); ?>"
+                data-id="<?php echo $step->get_id(); ?>"
+                data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+                title="<?php echo $step->get_title() ?>"
+                class="step <?php echo implode( ' ', $classes ) ?>">
+            <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+			<?php do_action( 'groundhogg/steps/sortable/inside', $step, $this ); ?>
+			<?php do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step ); ?>
+            <span class="actions">
             <!-- DELETE -->
             <button title="Delete" type="button" class="handlediv delete-step">
                 <span class="dashicons dashicons-trash"></span>
             </button>
-				<!-- DUPLICATE -->
+                <!-- DUPLICATE -->
             <button title="Duplicate" type="button" class="handlediv duplicate-step">
                 <span class="dashicons dashicons-admin-page"></span>
             </button>
-            <?php
-            echo html()->modal_link( [
-	            'title'              => __( 'Add Step' ),
-	            'text'               => dashicon( 'plus' ),
-	            'footer_button_text' => __( 'Cancel' ),
-	            'class'              => 'add-step button button-secondary no-padding',
-	            'source'             => 'steps',
-	            'height'             => 700,
-	            'width'              => 600,
-	            'footer'             => 'true',
-	            'preventSave'        => 'true',
-	            'data-step'          => $step->get_id(),
-            ] );
-            ?>
             </span>
-			<h2 class="hndle ui-sortable-handle">
-				<img class="hndle-icon" width="50"
-				     src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-				<span>
-	                <?php
+            <div class="hndle ui-sortable-handle">
+				<?php if ( $step->has_errors() ): ?>
+                    <img class="hndle-icon"
+                         src="<?php echo $this->get_error_icon(); ?>">
+				<?php else: ?>
+                    <img class="hndle-icon"
+                         src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+				<?php endif; ?>
+                <div>
+					<?php
+					echo html()->e( 'span', [
+						'class' => 'step-title',
+					], $step->get_title() );
 
-	                $title = $step->get_title();
-
-	                if ( $step->get_meta( 'has_errors' ) ) {
-		                $title = "<span class='step-error'>&#x26A0</span> " . $title;
-	                }
-
-	                echo html()->e( 'span', [
-		                'class' => 'step-title',
-	                ], $title );
-
-	                echo "<br/>";
-
-	                ?>
-                </span>
-				<?php echo html()->e( 'span', [
-					'class' => 'step-name',
-				], $this->get_name() );
-				?>
-				<div class="wp-clearfix"></div>
-			</h2>
-		</div>
+					echo html()->e( 'span', [
+						'class' => 'step-name',
+					], $this->get_name() );
+					?>
+                </div>
+            </div>
+        </div>
 		<?php
 
 	}
@@ -732,57 +728,58 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function html_v2( $step ) {
 		?>
-		<div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-		     title="<?php echo $step->get_title() ?>" id="settings-<?php echo $step->get_id(); ?>"
-		     class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo ( $step->get_meta( 'is_active' ) ) ? 'active' : 'hidden'; ?>">
+        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+             title="<?php echo $step->get_title() ?>" id="settings-<?php echo $step->get_id(); ?>"
+             class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
 
-			<div class="step-background">
-				<div class="inside">
-					<!-- SETTINGS -->
-					<div class="step-edit">
-						<div class="step-title-wrap">
-							<img class="step-icon"
-							     src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-							<div class="step-title-edit hidden">
+            <!-- WARNINGS -->
+			<?php if ( $step->has_errors() ): ?>
+                <div class="step-warnings">
+					<?php foreach ( $step->get_errors() as $error ): ?>
+
+                        <div id="<?php $error->get_error_code() ?>"
+                             class="notice notice-warning is-dismissible">
+							<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
+                        </div>
+					<?php endforeach; ?>
+                </div>
+			<?php endif; ?>
+            <!-- SETTINGS -->
+            <div class="step-flex">
+                <div class="step-edit panels">
+                    <div class="gh-panel">
+                        <div class="step-title-wrap">
+                            <img class="step-icon"
+                                 src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+                            <div class="step-title-edit hidden">
 								<?php
 								$args = array(
 									'id'      => $this->setting_id_prefix( 'title' ),
 									'name'    => $this->setting_name_prefix( 'title' ),
 									'value'   => __( $step->get_title(), 'groundhogg' ),
 									'title'   => __( 'Step Title', 'groundhogg' ),
-									'class'   => 'step-title-large edit-title',
+									'class'   => 'step-title-large edit-title full-width',
 									'data-id' => $step->get_id(),
 								);
 
-								echo Plugin::$instance->utils->html->input( $args );
+								echo html()->input( $args );
 								?>
-							</div>
-							<div class="step-title-view">
+                            </div>
+                            <div class="step-title-view">
 								<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
-							</div>
-						</div>
-						<div class="custom-settings">
-							<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-							<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
+                            </div>
+                        </div>
+                        <div class="custom-settings">
 							<?php $this->settings( $step ); ?>
-							<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-							<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
-						</div>
-					</div>
-					<!-- REPORTING  -->
-					<!--                <div class="step-reporting">-->
-					<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-					<!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-					<!--					--><?php //$this->reporting_v2( $step ); ?>
-					<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-					<!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
-					<!--                </div>-->
+                        </div>
+                    </div>
 
-
-				</div>
-			</div>
-			<div class="step-notes">
-				<div class="step-notes" style="margin-top: 10px;padding-bottom: 30px">
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
+					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
+					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+                </div>
+                <div class="step-notes">
 					<?php
 					echo html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
@@ -792,47 +789,48 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 						'class'       => 'step-notes-textarea'
 					] );
 					?>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 		<?php
 	}
 
 	/**
+	 * @deprecated since 2.1
+	 *
 	 * @param $step Step
 	 *
-	 * @deprecated since 2.1
 	 */
 	public function html( $step ) {
 
 		$closed = $step->get_meta( 'is_closed' ) ? 'closed' : '';
 
 		?>
-		<div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>"
-		     id="<?php echo $step->get_id(); ?>"
-		     class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
-			<button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span>
-			</button>
-			<input type="hidden" class="collapse-input" name="<?php echo $this->setting_name_prefix( 'closed' ); ?>"
-			       value="<?php echo $this->get_setting( 'is_closed' ); ?>">
-			<input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>"
+             id="<?php echo $step->get_id(); ?>"
+             class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
+            <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span>
+            </button>
+            <input type="hidden" class="collapse-input" name="<?php echo $this->setting_name_prefix( 'closed' ); ?>"
+                   value="<?php echo $this->get_setting( 'is_closed' ); ?>">
+            <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
 
-			<!-- DELETE -->
-			<button title="Delete" type="button" class="handlediv delete-step">
-				<span class="dashicons dashicons-trash"></span>
-			</button>
-			<!-- DUPLICATE -->
-			<button title="Duplicate" type="button" class="handlediv duplicate-step">
-				<span class="dashicons dashicons-admin-page"></span>
-			</button>
-			<!-- HELP -->
-			<button title="Help" type="button" class="handlediv help">
+            <!-- DELETE -->
+            <button title="Delete" type="button" class="handlediv delete-step">
+                <span class="dashicons dashicons-trash"></span>
+            </button>
+            <!-- DUPLICATE -->
+            <button title="Duplicate" type="button" class="handlediv duplicate-step">
+                <span class="dashicons dashicons-admin-page"></span>
+            </button>
+            <!-- HELP -->
+            <button title="Help" type="button" class="handlediv help">
 				<?php echo html()->help_icon( $this->get_help_article() ); ?>
-			</button>
-			<!-- HNDLE -->
-			<h2 class="hndle ui-sortable-handle">
-				<img class="hndle-icon" width="50"
-				     src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+            </button>
+            <!-- HNDLE -->
+            <h2 class="hndle ui-sortable-handle">
+                <img class="hndle-icon" width="50"
+                     src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
 
 				<?php $args = array(
 					'id'    => $this->setting_id_prefix( 'title' ),
@@ -844,9 +842,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				echo Plugin::$instance->utils->html->input( $args ); ?>
 
 				<?php if ( Plugin::$instance->settings->is_global_multisite() ): ?>
-					<!-- MULTISITE BLOG OPTION -->
-					<div class="wpmu-options">
-						<label style="padding-left: 30px">
+                    <!-- MULTISITE BLOG OPTION -->
+                    <div class="wpmu-options">
+                        <label style="padding-left: 30px">
 							<?php _e( 'Run on which blog?', 'groundhogg' ); ?>
 							<?php
 
@@ -866,36 +864,34 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 							) );
 
 							?>
-						</label>
-					</div>
-					<!-- END MULTISITE BLOG OPTION -->
+                        </label>
+                    </div>
+                    <!-- END MULTISITE BLOG OPTION -->
 				<?php endif; ?>
-			</h2>
-			<!-- INSIDE -->
-			<div class="inside">
-				<!-- SETTINGS -->
-				<div class="step-edit">
-					<div class="custom-settings">
-						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-						<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
-						<?php $this->settings( $step ); ?>
-						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-						<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
-					</div>
-				</div>
-				<!-- REPORTING  -->
-				<?php //TODO Reporting enabled?
-				?>
-				<!--                <div class="step-reporting -->
-				<?php //echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?><!--">-->
-				<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-				<!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-				<!--					--><?php //$this->reporting( $step ); ?>
-				<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-				<!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
-				<!--                </div>-->
-			</div>
-		</div>
+            </h2>
+            <!-- INSIDE -->
+            <!-- SETTINGS -->
+            <div class="step-edit">
+                <div class="custom-settings">
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
+					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
+					<?php $this->settings( $step ); ?>
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
+					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+                </div>
+            </div>
+            <!-- REPORTING  -->
+			<?php //TODO Reporting enabled?
+			?>
+            <!--                <div class="step-reporting -->
+			<?php //echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?><!--">-->
+            <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+            <!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+            <!--					--><?php //$this->reporting( $step ); ?>
+            <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+            <!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+            <!--                </div>-->
+        </div>
 		<?php
 	}
 
@@ -922,12 +918,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$step->update_meta( 'blog_id', absint( $this->get_posted_data( 'blog_id', false ) ) );
 		} else {
 			$step->delete_meta( 'blog_id' );
-		}
-
-		if ( $this->get_posted_data( 'is_active', false ) ) {
-			$step->update_meta( 'is_active', 1 );
-		} else {
-			$step->delete_meta( 'is_active' );
 		}
 
 		if ( $this->get_posted_data( 'is_closed', false ) ) {
@@ -963,6 +953,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				notices()->add( $error );
 			}
 		}
+
+		$this->clear_errors();
 	}
 
 	/**
@@ -1049,6 +1041,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return null;
 	}
 
+	/**
+	 * Serialize the step for JS
+	 *
+	 * @return array
+	 */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
 			'icon'    => $this->get_icon(),

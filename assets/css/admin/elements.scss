@@ -881,6 +881,10 @@ button {
     &.medium {
       font-size: 18px;
       padding: 11px 22px;
+
+      &.icon {
+        gap: 10px;
+      }
     }
 
     &.small {

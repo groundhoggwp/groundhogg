@@ -760,7 +760,7 @@ class Funnels_Page extends Admin_Page {
 				wp_send_json_error();
 			}
 
-			$step_order = count( $funnel->get_steps() ) + 1;
+			$step_order = 1;
 		}
 
 		$elements = Plugin::$instance->step_manager->get_elements();

@@ -1,0 +1,929 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow-50: rgba(255, 238, 88, 0.50);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$benchmark-orange-25: rgba(245, 129, 21, 0.25);
+$benchmark-orange-5: rgba(245, 129, 21, 0.05);
+$action-green-dark: rgb(90, 131, 3);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$action-green-5: rgba(158, 206, 56, 0.05);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+$background-color: #F6F9FB;
+
+#post-body {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+}
+
+#poststuff #post-body.columns-2 {
+  margin-left: 400px;
+  margin-right: 0 !important;
+  border-left: 1px solid #ccd0d4;
+}
+
+/* Full Screen */
+#adminmenumain,
+#wpfooter,
+#wpadminbar {
+  display: none !important;
+}
+
+html {
+  padding: 0 !important;
+}
+
+/* END Full Screen */
+
+#screen-meta-links {
+  display: none;
+}
+
+/* NEW STUFF */
+#wpbody-content {
+  /*height: 100vh;*/
+  padding-bottom: 0;
+}
+
+.trigger-popup {
+  font-weight: normal;
+}
+
+.button.button-secondary.submit.trigger-popup {
+  background: #f7f7f7 !important;
+  border-color: #ccc !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  float: none !important;
+  padding: 0 10px 1px !important;
+  margin: 2px !important;
+}
+
+#wpcontent {
+  padding-left: 0 !important;
+  box-sizing: border-box;
+}
+
+#poststuff {
+  padding-top: 0px;
+  margin-top: 107px;
+}
+
+.replacements-button,
+.add-contacts-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.header-wrap {
+  width: 100%;
+}
+
+#change_reporting {
+  margin: 1px 2px;
+}
+
+#postbox-container-2-inner {
+  .step:not(.hidden) {
+
+    .step-warnings {
+
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      margin-bottom: 20px;
+
+      .notice {
+        margin: 0;
+        border-radius: 5px;
+        /*border-width: 2px;*/
+        border-width: 0 0 0 5px;
+      }
+    }
+
+    .step-flex {
+      display: flex;
+      gap: 30px;
+
+      .step-notes {
+
+        width: 200px;
+        flex-shrink: 0;
+
+        .step-notes-textarea {
+          width: 100%;
+          background: $primary-dark-5;
+          border-radius: 5px;
+          font-weight: 400;
+          border: none;
+          padding: 12px;
+        }
+      }
+
+
+      .step-edit {
+        width: 100%;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+
+        .custom-settings {
+          padding: 0 20px 10px 20px;
+        }
+      }
+    }
+
+  }
+}
+
+.step {
+  margin: 0;
+  position: relative;
+}
+
+#wpcontent {
+  margin-left: 0 !important;
+}
+
+.funnel-editor-header {
+  z-index: 999;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  position: fixed;
+  height: 60px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #ccd0d4;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  //width: inherit;
+
+  svg {
+    height: 60px;
+    padding: 10px;
+    box-sizing: border-box;
+    //border-right: 1px solid #ccd0d4;
+    flex-shrink: 0;
+    background-color: $primary-dark;
+  }
+
+  #title {
+    font-size: 20px;
+    font-weight: 600;
+    width: 100%;
+  }
+
+  .status-options {
+    //margin-left: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .save-button {
+      gap: 7px;
+      align-items: center;
+      padding: 9px 18px;
+      font-weight: 500;
+    }
+  }
+
+  .title-section {
+    width: 100%;
+    margin-right: auto;
+  }
+
+  #close {
+    .exit {
+      background-color: #fff;
+      color: #909090;
+      border-left: 1px solid #d3d3d3;
+      text-decoration: none;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .dashicons {
+        width: 30px;
+        height: 30px;
+        font-size: 30px;
+      }
+    }
+  }
+}
+
+.step-title-view,
+.title-view {
+  line-height: 44px;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.step-title-view .title,
+.title-view .title {
+  font-weight: 600;
+  padding: 8px;
+  line-height: 1em;
+  cursor: pointer;
+}
+
+.funnel-editor-header.sub-header {
+  top: 60px;
+  height: 47px;
+  background: white;
+  border-bottom: 0;
+  box-shadow: $box-shadow;
+  left: 340px;
+
+  .toolbar-buttons {
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 10px;
+
+    .gh-button {
+      gap: 5px;
+    }
+
+    .dashicons {
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
+    }
+  }
+}
+
+.funnel-editor-header div {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.funnel-editor-header div.hidden {
+  display: none;
+}
+
+.funnel-editor-header .status-options {
+  //position: absolute;
+  //top: 0;
+  //padding: 8px;
+  //right: 65px;
+}
+
+button.button.save-button {
+  font-size: 18px;
+  margin-left: 10px;
+  font-weight: 600;
+  position: relative;
+  height: auto;
+  padding: 2px 14px 2px 32px;
+}
+
+@-moz-keyframes spin {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.save-button.spin .dashicons {
+  animation: spin;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+/* END NEW STUFF */
+.form-buttons .button {
+  margin: 2px;
+}
+
+.form-buttons {
+  margin: 0 0 5px 0;
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 100px solid transparent;
+  border-right: 100px solid transparent;
+  border-top: 30px solid #ffffff;
+  position: absolute;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.wpgh-element {
+  /*height: 112px;*/
+  text-align: center;
+}
+
+.step-icon img {
+  margin: 0 auto 0 auto;
+  width: 80%;
+}
+
+.hndle label {
+  margin: 0 10px 0 0;
+}
+
+.step-reporting .chart {
+  background: #FFF;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+}
+
+.step-reporting .chart .inside {
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ui-front.ui-autocomplete {
+  z-index: 100100;
+}
+
+#actions table,
+#benchmarks table {
+  box-sizing: border-box;
+  width: 100%;
+  border-spacing: 7px;
+}
+
+#actions table td,
+#benchmarks table td {
+  text-align: center;
+}
+.sortable-placeholder {
+  box-sizing: border-box;
+  border-radius: 5px;
+  background-color: $primary-dark-15;
+  border: none;
+  margin: 0;
+  height: 60px;
+}
+
+
+@mixin above-text {
+  position: absolute;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+}
+
+
+#postbox-container-1 {
+
+  width: 340px;
+  flex-shrink: 0;
+  position: relative;
+
+  .fixed-inside {
+    bottom: 0;
+    top: 60px;
+    padding: 0 20px;
+    width: 340px;
+    box-sizing: border-box;
+    position: fixed;
+    overflow-y: scroll;
+  }
+
+  .wpgh-element {
+    /*height: 112px;*/
+    text-align: center;
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 5px;
+
+    p {
+      display: none;
+    }
+  }
+
+  .step.action + .step.benchmark {
+
+    margin-top: 40px;
+
+    &::before {
+      content: "Until...";
+      @include above-text;
+      background-color: $benchmark-orange;
+    }
+  }
+
+  .step.benchmark + .step.benchmark {
+
+    margin-top: 40px;
+
+    &::before {
+      content: "Or...";
+      @include above-text;
+      background-color: $secondary-purple;
+    }
+  }
+
+  .step.benchmark + .step.action {
+
+    margin-top: 40px;
+
+    &::before {
+      content: "Then...";
+      @include above-text;
+      background-color: $action-green;
+    }
+  }
+
+  .step {
+    border-radius: 5px;
+    box-shadow: $box-shadow;
+    margin: 10px 0;
+    background: white;
+    border: 2px solid transparent;
+    cursor: pointer;
+
+    &.step-placeholder {
+      justify-content: center;
+      padding: 20px;
+    }
+
+    &.has-errors {
+      border-left-color: $alert-yellow !important;
+
+      &.active {
+        border-color: $alert-yellow !important;
+      }
+    }
+
+    > .hndle {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .hndle-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+
+        span.step-title {
+          font-size: 14px;
+        }
+
+        span.step-name {
+          /*margin-left:6px;*/
+          font-size: 8px;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
+
+      }
+    }
+
+    &.benchmark {
+      border-left-color: $benchmark-orange;
+
+      span.step-name {
+        color: $benchmark-orange;
+      }
+
+      &.active {
+        border-color: $benchmark-orange;
+      }
+
+      &:first-child {
+
+        margin-top: 40px;
+
+        &::before {
+          content: "Start the funnel when...";
+          @include above-text;
+          background-color: $benchmark-orange;
+        }
+      }
+    }
+
+    &.action {
+      border-left-color: $action-green;
+
+      span.step-name {
+        color: $action-green;
+      }
+
+      &.active {
+        border-color: $action-green;
+      }
+    }
+  }
+}
+
+
+#postbox-container-1 .step.step h2 {
+  cursor: pointer !important;
+}
+
+.step .inside select {
+  vertical-align: top;
+}
+
+.step span.actions,
+.reporting-enabled .step:hover span.actions {
+  visibility: hidden;
+}
+
+.step:hover span.actions {
+  visibility: visible;
+}
+
+#benchmarks .help-icon,
+#actions .help-icon {
+  float: right;
+}
+
+#postbox-container-1 .step .add-step {
+  display: none;
+  padding: 0 5px 1px;
+}
+
+#postbox-container-1 .step:hover .add-step {
+  display: inline-block;
+  position: absolute;
+  left: 45%;
+  bottom: -10px;
+  z-index: 9999999999999;
+}
+
+#postbox-container-1 .step .add-step .dashicons {
+  vertical-align: middle;
+}
+
+#postbox-container-2 {
+  /*padding: 10px 20px;*/
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+/*.saving #poststuff{*/
+/*    opacity: 0.5;*/
+/*}*/
+
+.step-settings {
+  padding: 30px;
+}
+
+#funnel-chart {
+  background: #FFF;
+  padding: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  box-sizing: border-box;
+}
+
+#add-steps {
+
+  padding: 30px;
+
+  h2 {
+    font-size: 24px;
+    margin: 30px 0 0 0;
+    border-top: 3px solid;
+    padding: 20px 0 20px 0;
+
+    &.benchmarks-header {
+      border-color: $benchmark-orange;
+      margin-top: 0;
+    }
+
+    &.actions-header {
+      border-color: $action-green;
+    }
+  }
+
+  #step-toggle {
+    [data-group=benchmarks] {
+      color: $benchmark-orange;
+      border-color: $benchmark-orange;
+
+      &.active {
+        background-color: $benchmark-orange;
+        color: white;
+      }
+    }
+
+    [data-group=actions] {
+      color: $action-green-dark;
+      border-color: $action-green;
+
+      &.active {
+        background-color: $action-green;
+        color: white;
+      }
+    }
+  }
+
+  #actions {
+    .step-icon {
+      //border-color: $action-green;
+      //background-color: $action-green-5;
+    }
+
+    .select-step:hover {
+      .step-icon {
+        background-color: $action-green-50;
+      }
+    }
+  }
+
+  #benchmarks {
+    .step-icon {
+      //border-color: $benchmark-orange;
+      //background-color: $benchmark-orange-5;
+    }
+
+    .select-step:hover {
+      .step-icon {
+        background-color: $benchmark-orange-25;
+      }
+    }
+  }
+
+  .steps-select .steps-grid:not(.hidden) {
+    //padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .steps-select .description {
+    padding: 10px;
+  }
+
+  .steps-select .nav-tab-wrapper {
+    text-align: center;
+    margin-top: 0 !important;
+    padding: 20px 0 0 0 !important;
+  }
+
+  .steps-select .nav-tab {
+    float: none;
+    display: inline-block;
+  }
+
+  .steps-select .nav-tab-wrapper .nav-tab {
+    font-size: 20px;
+    padding: 5px 15px;
+    /*font-weight: bold;*/
+  }
+
+  .steps-select .steps-grid > .select-step {
+    width: 80px;
+    border-radius: 5px;
+    //padding: 5px;
+    cursor: pointer;
+
+    > .ui-draggable-dragging {
+      width: 80px;
+      height: 80px;
+
+      p {
+        display: none;
+      }
+    }
+  }
+
+  .steps-select .steps-grid > .select-step p {
+    font-size: 14px;
+    margin: 10px 0 0 0;
+    //color: white;
+  }
+
+  .steps-select .steps-grid > .select-step .step-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    border-radius: 5px;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    background: #FFFFFF;
+  }
+}
+
+.add-step-bottom-wrap {
+  margin-top: 20px;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  bottom: 10px;
+
+  button {
+    box-shadow: $box-shadow;
+  }
+}
+
+.hndle input {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(85, 93, 102, 0.23);
+  vertical-align: top;
+}
+
+table.embed-options td {
+  padding: 0 !important;
+}
+
+.step-title-wrap {
+  background: #FFF;
+  border-bottom: 1px solid #ccd0d4;
+  padding: 8px 10px 8px 70px;
+  height: 60px;
+  position: relative;
+  border-radius: 5px 5px 0 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  //justify-content: stretch;
+
+  .step-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 60px;
+    background: #ffffff;
+    vertical-align: middle;
+    border-right: 1px solid #ccd0d4;
+  }
+
+  .step-title-edit {
+    width: 100%;
+  }
+
+  .step-title-large {
+    //height: 100%;
+    font-size: 20px;
+    box-shadow: none;
+    font-weight: 600;
+  }
+}
+
+.back-to-admin {
+  position: fixed;
+  display: inline-block;
+  left: 5px;
+  bottom: 5px;
+}
+
+
+.step .handlediv {
+  float: right;
+  background: none;
+  color: #5c5c5c;
+  opacity: 0.6;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.step .handlediv:hover {
+  opacity: 0.9;
+}
+
+.row-actions {
+  margin: 3px 0 0 3px;
+}
+
+.row-actions a {
+  text-decoration: none;
+}
+
+.add-contact-form {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.add-contact-form td {
+  padding-bottom: 30px;
+}
+
+.form-table th {
+  width: 160px;
+}
+
+input, select, textarea {
+  max-width: 100% !important;
+}
+
+#add-step-bottom {
+  font-size: 16px;
+  height: auto;
+  margin: 0 0 6px;
+  padding: 8px 14px;
+}
+
+#add-step-bottom .dashicons {
+  /*vertical-align: middle;*/
+  font-size: 22px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+#groundhogg-notices {
+  position: fixed;
+  width: 400px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 99999999;
+}
+
+#groundhogg-notices .notice {
+  border-radius: 5px;
+  /*border-width: 2px;*/
+  border-width: 0 0 0 5px;
+}
+
+.step-error {
+  font-size: 24px;
+}
+
+.demo-video {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  margin: 40px auto;
+  /*margin-top: 250px;*/
+  max-width: 722px;
+  display: block;
+}
+
+.demo-video img {
+  vertical-align: middle;
+}
+
+.actions-links-arrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.select-a-step-arrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

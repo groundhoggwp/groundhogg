@@ -23,7 +23,7 @@ class Activity extends Base_Object_With_Meta {
 	 * @return void
 	 */
 	protected function post_setup() {
-		// TODO: Implement post_setup() method.
+		$this->type = $this->activity_type;
 	}
 
 	public function get_timestamp() {

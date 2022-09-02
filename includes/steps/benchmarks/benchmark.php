@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Steps\Funnel_Step;
+use function Groundhogg\process_events;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -98,6 +99,8 @@ abstract class Benchmark extends Funnel_Step {
 	public function complete() {
 		$steps = $this->get_like_steps();
 
+		$contacts_to_process = [];
+
 		foreach ( $steps as $step ) {
 
 			// Skip inactive steps
@@ -114,6 +117,7 @@ abstract class Benchmark extends Funnel_Step {
 			}
 
 			foreach ( $contacts as $contact ) {
+
 				if ( is_wp_error( $contact ) || ! is_a_contact( $contact ) ) {
 					continue;
 				}
@@ -123,12 +127,13 @@ abstract class Benchmark extends Funnel_Step {
 				if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
 
 					$step->enqueue( $this->get_current_contact() );
-
+					$contacts_to_process[] = $this->get_current_contact();
 				}
 			}
 
 		}
 
+		process_events( $contacts_to_process );
 	}
 
 	/**
