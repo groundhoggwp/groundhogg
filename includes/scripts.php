@@ -485,7 +485,10 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-email-wysiwyg', GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css', [], GROUNDHOGG_VERSION ); //todo I think un used
 		wp_register_style( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'css/admin/email-preview.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor.css', [], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v3.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v3.css', [
+			'groundhogg-admin',
+			'groundhogg-admin-element',
+		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'css/admin/modal.css', [ 'wp-color-picker' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-extensions', GROUNDHOGG_ASSETS_URL . 'css/admin/extensions.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );

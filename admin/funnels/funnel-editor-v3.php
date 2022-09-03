@@ -149,7 +149,7 @@ $funnel = new Funnel( $funnel_id );
                             title="<?php esc_attr_e( 'Export', 'groundhogg' ) ?>"
                             class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
 
-                <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?>"
+                <a target="_blank" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?>"
                    class="gh-button secondary text icon"><span
                             title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
                             class="dashicons dashicons-chart-area"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
@@ -227,15 +227,8 @@ $funnel = new Funnel( $funnel_id );
                     <div class="step-settings hidden">
 						<?php
 
-						$step_active = false;
-
 						foreach ( $funnel->get_steps() as $step ):
 							$step->html_v2();
-
-							if ( $step->get_meta( 'is_active' ) ) {
-								$step_active = true;
-							}
-
 						endforeach; ?>
                     </div>
                 </div>

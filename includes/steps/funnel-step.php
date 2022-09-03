@@ -642,6 +642,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function pre_html( Step $step ) {
 		$this->set_current_step( $step );
 
+        if ( $step->is_action() && $step->get_order() === 1 ){
+            $step->add_error( new \WP_Error( 'cant_start', __( 'A benchmark must be used to start the funnel.' )  ) );
+        }
+
 		$this->validate_settings( $step );
 	}
 
