@@ -218,6 +218,6 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	}
 
 	public function view() {
-		return false;
+		return $this->get_cap();
 	}
 }

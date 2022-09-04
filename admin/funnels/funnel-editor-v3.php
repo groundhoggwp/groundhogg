@@ -193,6 +193,7 @@ $funnel = new Funnel( $funnel_id );
                                     <div class="select-step">
                                     <div id='<?php echo $benchmark->get_type(); ?>'
                                          title="<?php esc_attr_e( $benchmark->get_description() ); ?>"
+                                         data-group="benchmark"
                                          class="wpgh-element ui-draggable">
                                         <div class="step-icon">
                                             <img width="60" src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
@@ -212,6 +213,7 @@ $funnel = new Funnel( $funnel_id );
 									?>
                                     <div class="select-step">
                                     <div id='<?php echo $action->get_type(); ?>'
+                                         data-group="action"
                                          title="<?php esc_attr_e( $action->get_description() ); ?>"
                                          class="wpgh-element ui-draggable">
                                         <div class="step-icon"><img width="60"

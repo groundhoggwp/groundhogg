@@ -118,6 +118,15 @@ html {
 #postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:first-child {
   margin-top: 20px;
 }
+#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions th:last-child {
+  width: 70px;
+}
+#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions td:last-child > div {
+  display: none;
+}
+#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions tbody tr:hover td:last-child > div {
+  display: flex;
+}
 
 .step {
   margin: 0;

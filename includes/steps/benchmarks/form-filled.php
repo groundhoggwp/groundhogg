@@ -5,8 +5,10 @@ namespace Groundhogg\Steps\Benchmarks;
 use Groundhogg\Contact;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Utils\Graph;
+use function Groundhogg\add_custom_fields_to_mappable_fields;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_custom_fields_dropdown_options;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -50,6 +52,7 @@ class Form_Filled extends Benchmark {
 
 	/**
 	 * Get element name
+	 *
 	 * @return string
 	 */
 	public function get_name() {
@@ -97,7 +100,7 @@ class Form_Filled extends Benchmark {
 	 * Setup the completion process
 	 *
 	 * @param $submission Submission
-	 * @param $contact Contact
+	 * @param $contact    Contact
 	 * @param $submission_handler
 	 */
 	public function setup( $submission, $contact, $submission_handler ) {
@@ -325,6 +328,10 @@ class Form_Filled extends Benchmark {
 									'class' => 'button button-secondary terms'
 								),
 								array(
+									'text'  => __( 'Custom Field', 'groundhogg' ),
+									'class' => 'button button-secondary custom'
+								),
+								array(
 									'text'  => __( 'Text', 'groundhogg' ),
 									'class' => 'button button-secondary text'
 								),
@@ -528,6 +535,18 @@ class Form_Filled extends Benchmark {
 							) );
 							?>
 							<p class="description"><?php _e( 'This will be the custom field name. I.E. {meta.name}', 'groundhogg' ) ?></p>
+						</td>
+					</tr>
+					<tr id="gh-field-custom_field">
+						<th><?php _e( 'Custom Field', 'groundhogg' ) ?></th>
+						<td><?php
+							echo html()->dropdown( [
+								'id'      => 'field-custom_field',
+								'name'    => 'custom_field',
+								'options' => get_custom_fields_dropdown_options()
+							] );
+							?>
+							<p class="description"><?php _e( 'Select a custom field to show.', 'groundhogg' ) ?></p>
 						</td>
 					</tr>
 

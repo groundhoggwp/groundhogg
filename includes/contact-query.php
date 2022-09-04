@@ -2069,7 +2069,7 @@ class Contact_Query {
 						], $query );
 				}
 
-				return $clause;
+				return apply_filters( 'groundhogg/query/is_marketable_clause',  $clause );
 
 			case 'no':
 
@@ -2098,7 +2098,7 @@ class Contact_Query {
 						], $query ) );
 				}
 
-				return $clause;
+				return apply_filters( 'groundhogg/query/is_not_marketable_clause',  $clause );
 		}
 	}
 

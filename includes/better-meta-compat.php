@@ -122,6 +122,38 @@ function get_field_meta_key( $field_id ) {
 /**
  * Add the custom fields to the mappable fields API
  *
+ * @return array
+ */
+function get_custom_fields_dropdown_options() {
+
+	$fields = [];
+
+	$groups = Properties::instance()->get_groups();
+
+	foreach ( $groups as $group ) {
+
+		$_group = [];
+
+		$tab = Properties::instance()->get_group_tab( $group['id'] );
+
+		$group_name = sprintf( '%s: %s', $tab['name'], $group['name'] );
+
+		$custom_fields = Properties::instance()->get_fields( $group['id'] );
+
+		foreach ( $custom_fields as $custom_field ) {
+			$_group[ $custom_field['name'] ] = $custom_field['label'];
+		}
+
+		$fields[ $group_name ] = $_group;
+	}
+
+	return $fields;
+
+}
+
+/**
+ * Add the custom fields to the mappable fields API
+ *
  * @param array $fields
  *
  * @return array

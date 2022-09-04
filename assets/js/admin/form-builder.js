@@ -103,6 +103,7 @@ var FormBuilder = {};
             this.types.terms        = ['label','tag','id','class'];
             this.types.recaptcha    = ['captcha-theme','captcha-size','id','class'];
             this.types.submit       = ['text','id','class'];
+            this.types.custom       = ['required','label','custom_field','id','class'];
             this.types.text         = ['required','label','placeholder','name','id','class'];
             this.types.textarea     = ['required','label','placeholder','name','id','class'];
             this.types.number       = ['required','label','name','min','max','id','class'];
@@ -201,6 +202,8 @@ var FormBuilder = {};
         },
 
         insert: function ( myValue ){
+
+            let sel
 
             var myField = this.activeEditor;
             // console.log( myField );

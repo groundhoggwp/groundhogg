@@ -59,6 +59,7 @@ abstract class Form_Integration extends Benchmark {
 		html()->start_row();
 		html()->th( __( 'Run when this form is submitted', 'groundhogg' ) );
 		html()->td( [
+			'<div class="display-flex gap-10">',
 			html()->select2( [
 				'id'       => $this->setting_id_prefix( 'form_id' ),
 				'name'     => $this->setting_name_prefix( 'form_id' ),
@@ -87,7 +88,8 @@ abstract class Form_Integration extends Benchmark {
 			html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
 				'class' => 'hidden field-map-wrapper',
 				'id'    => $this->setting_id_prefix( 'field_map' )
-			] )
+			] ),
+			'</div>'
 		] );
 		html()->end_row();
 		html()->end_form_table();
@@ -172,6 +174,20 @@ abstract class Form_Integration extends Benchmark {
 		);
 
 		return ob_get_clean();
+	}
+
+	public function validate_settings( Step $step ) {
+
+		$field_map = $step->get_meta( 'field_map' );
+
+		if ( empty( $field_map ) ){
+			$step->add_error( 'invalid_field_map', __( 'Map your form fields to capture submissions.', 'groundhogg' ) );
+		}
+
+		if ( $field_map && ! in_array( 'email', $field_map ) ){
+			$step->add_error( 'missing_email_field', __( 'There is no email address field mapped, submissions may not be captured correctly.', 'groundhogg' ) );
+		}
+
 	}
 
 	/**

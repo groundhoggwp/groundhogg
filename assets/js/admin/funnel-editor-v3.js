@@ -183,26 +183,12 @@
       this.sortables = $('.ui-sortable').sortable({
         placeholder: 'sortable-placeholder',
         connectWith: '.ui-sortable',
-        // axis: 'y',
-        start: function (e, ui) {
-          // ui.helper.css('left',
-          //   (ui.item.parent().width() - ui.item.width()) / 2)
-          // ui.placeholder.height(ui.item.height())
-          // ui.placeholder.width(ui.item.width())
-        },
         receive: (e, ui) => {
-          console.log({ e, ui })
-
-          let after_step = ui.helper.prev().prop('id');
-
-
-          if ( ! after_step ){
-
-          }
 
           var data = {
             action: 'wpgh_get_step_html',
             step_type: ui.item.prop('id'),
+            step_group: ui.item.data('group'),
             after_step: ui.helper.prev().prop('id'),
             funnel_id: this.id,
             version: 2,
@@ -210,12 +196,10 @@
 
           this.insertAfterStep = data.after_step
 
-          console.log({ data })
-
           let id = uuid()
           // language=HTML
           ui.helper.replaceWith(`
-              <div class="step step-placeholder" id="${ id }">
+              <div class="step step-placeholder ${data.step_group}" id="${ id }">
                   Loading...
               </div>`)
 

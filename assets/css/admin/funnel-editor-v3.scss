@@ -165,6 +165,27 @@ html {
           &:first-child{
             margin-top: 20px;
           }
+
+          &.has-actions{
+
+            th:last-child {
+              width: 70px;
+            }
+
+            td:last-child {
+              > div {
+                display: none;
+              }
+            }
+
+            tbody tr:hover {
+              td:last-child {
+                > div {
+                  display: flex;
+                }
+              }
+            }
+          }
         }
       }
     }

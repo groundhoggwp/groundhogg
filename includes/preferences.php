@@ -156,7 +156,7 @@ class Preferences {
 					}
 				}
 
-				return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
+				return apply_filters( 'groundhogg/preferences/optin_status_text', _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' ), $contact );
 				break;
 			case self::CONFIRMED:
 				return _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );

@@ -3,6 +3,7 @@
 namespace Groundhogg\Form;
 
 use Groundhogg\Form\Fields\Birthday;
+use Groundhogg\Form\Fields\Custom_Field;
 use Groundhogg\Step;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\do_replacements;
@@ -95,6 +96,7 @@ class Form implements \JsonSerializable {
 		$this->recaptcha = new Recaptcha( $this->get_id() );
 		$this->submit    = new Submit( $this->get_id() );
 		$this->birthday  = new Birthday( $this->get_id() );
+		$this->custom    = new Custom_Field( $this->get_id() );
 
 		do_action( 'groundhogg/form/fields/init', $this );
 	}
