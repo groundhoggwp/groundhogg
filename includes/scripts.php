@@ -270,7 +270,6 @@ class Scripts {
 			'wp-color-picker'
 		], GROUNDHOGG_VERSION, true );
 
-
 		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/dashboard' . $dot_min . '.js', [
 			'jquery',
 			'papaparse'
@@ -303,8 +302,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-link-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/link-picker' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-media-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/media-picker' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'js/admin/modal' . $dot_min . '.js', [
-			'jquery',
-			'wp-color-picker'
+			'groundhogg-admin-element',
 		], GROUNDHOGG_VERSION, true );
 		wp_localize_script( 'groundhogg-admin-modal', 'GroundhoggModalDefaults', [
 			'title'      => 'Modal',
@@ -487,7 +485,6 @@ class Scripts {
 			'groundhogg-admin-element',
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'css/admin/modal.css', [ 'wp-color-picker' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-extensions', GROUNDHOGG_ASSETS_URL . 'css/admin/extensions.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'css/admin/iframe.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-email-log', GROUNDHOGG_ASSETS_URL . 'css/admin/email-log.css', [], GROUNDHOGG_VERSION );

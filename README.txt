@@ -334,6 +334,8 @@ You can purchase a premium plan for access to support and our premium extensions
  * Warnings and errors are shown more clearly
  * Think of this as a sort of 3.0 preview
 * ADDED New developer class, the `Activity_Benchmark` class gives a simple way to hook into the contact activity tracking system.
+* ADDED New `Custom Field` button to the form builder that enabled the easy embedding of custom fields from contact records in forms.
+* TWEAKED Admin styles for several components to improve the user experience.
 * TWEAKED Benchmark that are completed and sequential actions will processed synchronously for the current contact.
 * FIXED Individually purchased support licenses not being accepted in the troubleshooter license verification.
 

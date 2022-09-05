@@ -30,7 +30,7 @@ class Modal {
 	}
 
 	public function scripts() {
-		wp_enqueue_style( 'groundhogg-admin-modal' );
+		wp_enqueue_style( 'groundhogg-admin-element' );
 		wp_enqueue_script( 'groundhogg-admin-modal' );
 	}
 

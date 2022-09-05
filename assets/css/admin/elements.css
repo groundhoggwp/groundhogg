@@ -1013,6 +1013,12 @@ button.gh-submit.loud {
   background-color: #102640;
 }
 
+.gh-legacy-modal h3.replacements-group {
+  padding-left: 20px;
+}
+.gh-legacy-modal table.replacements-table tr > *:first-child {
+  padding-left: 20px;
+}
 .gh-legacy-modal table.form-table {
   width: 600px;
 }
