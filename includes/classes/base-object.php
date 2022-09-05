@@ -519,7 +519,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * For PHP 8.0
 	 */
-	public function __unserialize( array $data ) {
+	public function __unserialize( $data ) {
+
+		if ( ! is_array( $data ) ){
+			return;
+		}
+
 		$this->setup_object( $data['data'] );
 	}
 
