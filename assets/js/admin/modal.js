@@ -190,11 +190,6 @@ var GroundhoggModal = {};
 
   $(function () {
     modal.reload()
-    $('.wpgh-color').wpColorPicker()
-  })
-
-  $(document).on('new-step', function () {
-    $('.wpgh-color').wpColorPicker()
   })
 
 } )(jQuery, GroundhoggModal, GroundhoggModalDefaults)
