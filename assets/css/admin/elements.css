@@ -1013,6 +1013,17 @@ button.gh-submit.loud {
   background-color: #102640;
 }
 
+.gh-legacy-modal table.form-table {
+  width: 600px;
+}
+.gh-legacy-modal table.form-table tr > *:first-child {
+  padding-left: 20px;
+}
+.gh-legacy-modal .gh-modal-dialog-content > table.wp-list-table {
+  border: none;
+  max-width: 800px;
+}
+
 .gh-modal {
   align-items: center;
   display: flex;
@@ -1025,6 +1036,24 @@ button.gh-submit.loud {
   right: 0;
   top: 0;
   box-sizing: border-box;
+}
+.gh-modal.hidden {
+  display: none;
+}
+.gh-modal .gh-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  align-items: center;
+  background: #FFFFFF;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  position: sticky;
+  bottom: 0;
+}
+.gh-modal .gh-modal-footer.hidden {
+  display: none;
 }
 .gh-modal.send-email {
   bottom: 0;
@@ -1081,12 +1110,13 @@ button.gh-submit.loud {
   border-radius: 5px;
   position: relative;
   padding: 30px;
-  max-width: 80vw;
+  max-width: calc(100vw - 100px);
   max-height: calc(92vh - 64px);
   overflow: auto;
+  overflow-x: hidden;
 }
 .gh-modal-dialog .gh-header {
-  position: absolute;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;

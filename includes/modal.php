@@ -37,23 +37,21 @@ class Modal {
 	public function popup() {
 
 		?>
-        <div class="popup-overlay hidden"></div>
-        <div class="popup-window hidden">
-            <div class="popup-title-container">
-                <h2 class="popup-title"></h2>
-                <div class="popup-close">
-                    <button id="popup-close" type="button">
+        <div class="gh-legacy-modal gh-modal hidden">
+            <div class="gh-modal-overlay"></div>
+            <div class="gh-modal-dialog no-padding has-header">
+                <div class="gh-header">
+                    <h3 class="gh-modal-dialog-title"></h3>
+                    <button type="button" class="gh-button secondary text icon legacy-modal-close">
                         <span class="dashicons dashicons-no"></span>
                     </button>
                 </div>
-            </div>
-            <div class="iframe-loader-wrapper hidden" style="text-align: center;">
-                <div class="iframe-loader"></div>
-            </div>
-            <div class="popup-content"></div>
-            <div class="popup-footer">
-                <button id="popup-close-footer" class="popup-close button button-secondary"
-                        type="button"><?php _e( 'Close' ); ?></button>
+                <div class="gh-modal-dialog-content">
+
+                </div>
+                <div class="gh-modal-footer">
+                    <button class="legacy-modal-close gh-button secondary" type="button"><?php _e( 'Close' ); ?></button>
+                </div>
             </div>
         </div>
 		<?php

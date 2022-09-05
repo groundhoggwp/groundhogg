@@ -87,7 +87,10 @@ html {
   gap: 30px;
 }
 #postbox-container-2-inner .step:not(.hidden) .step-flex .step-notes {
-  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 240px;
   flex-shrink: 0;
 }
 #postbox-container-2-inner .step:not(.hidden) .step-flex .step-notes .step-notes-textarea {
@@ -283,8 +286,10 @@ button.button.save-button {
 }
 
 /* END NEW STUFF */
-.form-buttons .button {
-  margin: 2px;
+.form-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .form-buttons {

@@ -26,7 +26,6 @@
         frame.id = `gh-frame-${i}`
         frame.classList.add('gh')
         frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
-        frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
         postFrameMessage( frame )
       }
     })

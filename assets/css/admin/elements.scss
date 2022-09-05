@@ -1036,6 +1036,24 @@ button {
   }
 }
 
+.gh-legacy-modal {
+  table.form-table {
+    width: 600px;
+
+    tr > *:first-child {
+      padding-left: 20px;
+    }
+  }
+
+  .gh-modal-dialog-content {
+    > table.wp-list-table{
+      border: none;
+      max-width: 800px;
+    }
+  }
+
+}
+
 .gh-modal {
   align-items: center;
   display: flex;
@@ -1048,6 +1066,27 @@ button {
   right: 0;
   top: 0;
   box-sizing: border-box;
+
+  &.hidden {
+    display: none;
+  }
+
+  .gh-modal-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    box-shadow: 5px 5px 30px 0 rgb(24 45 70 / 5%);
+    align-items: center;
+    background: #FFFFFF;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    position: sticky;
+    bottom: 0;
+
+    &.hidden {
+      display: none;
+    }
+  }
 
   &.send-email {
     bottom: 0;
@@ -1117,12 +1156,13 @@ button {
     position: relative;
     //height: 70vh;
     padding: 30px;
-    max-width: 80vw;
+    max-width: calc(100vw - 100px);
     max-height: calc(92vh - 64px);
     overflow: auto;
+    overflow-x: hidden;
 
     .gh-header {
-      position: absolute;
+      position: sticky;
       top: 0;
       left: 0;
       right: 0;

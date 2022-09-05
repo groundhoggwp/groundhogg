@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Form;
 
+use Groundhogg\Properties;
 use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\blacklist_check;
 use Groundhogg\Contact;
@@ -281,9 +282,7 @@ class Submission_Handler extends Supports_Errors {
 				} else {
 					$tags[] = $this->get_tag_from_map( $field, $value );
 				}
-
 			}
-
 		}
 
 		do_action( 'groundhogg/form/submission_handler/before_create_contact', $args, $meta, $tags, $files, $this );
@@ -312,7 +311,6 @@ class Submission_Handler extends Supports_Errors {
 			if ( ! $contact->exists() ) {
 				return $this->add_error( 'db_error', __( 'Unable to create contact record.', 'groundhogg' ) );
 			}
-
 		}
 
 		if ( ! $contact || ! $contact->exists() ) {
@@ -445,7 +443,7 @@ class Submission_Handler extends Supports_Errors {
 	}
 
 	public function is_admin_submission() {
-		// _ghnonce is not present in the event of a backend sumission
+		// _ghnonce is not present in the event of a backend submission
 		return is_admin() && current_user_can( 'add_contacts' ) && ! get_post_var( '_ghnonce' );
 	}
 

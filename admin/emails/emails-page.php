@@ -94,8 +94,6 @@ class Emails_Page extends Admin_Page {
 				'email_id'         => absint( Groundhogg\get_request_var( 'email' ) ),
 			] );
 
-			remove_editor_styles();
-
 			add_filter( 'mce_css', function ( $mce_css ) {
 				return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
 			} );
@@ -103,12 +101,10 @@ class Emails_Page extends Admin_Page {
 			wp_enqueue_script( 'groundhogg-admin-iframe' );
 			wp_enqueue_style( 'groundhogg-admin-iframe' );
 
-			wp_enqueue_style( 'groundhogg-admin-email-preview' );
 			wp_enqueue_script( 'groundhogg-admin-email-preview' );
+			wp_enqueue_style( 'groundhogg-admin-email-preview' );
 
 		}
-
-//		enqueue_broadcast_assets();
 
 		remove_editor_styles();
 

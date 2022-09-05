@@ -784,6 +784,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
                 </div>
                 <div class="step-notes">
+                    <?php $this->before_step_notes( $step ); ?>
 					<?php
 					echo html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
@@ -1059,5 +1060,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'group'   => $this->get_group(),
 			'context' => $this->get_context()
 		];
+	}
+
+	protected function before_step_notes( Step $step ) {
 	}
 }

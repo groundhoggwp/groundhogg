@@ -6,7 +6,9 @@ close the thickbox and put the content back where it came from.
 
 var GroundhoggModal = {};
 
-(function ($, modal, defaults) {
+( function ($, modal, defaults) {
+
+  const { loadingModal } = Groundhogg.element
 
   $.extend(modal, {
 
@@ -20,6 +22,7 @@ var GroundhoggModal = {};
     args: {},
     defaults: {},
     showFooter: true,
+    closeLoader: () => {},
 
     init: function (title, href) {
 
@@ -31,42 +34,53 @@ var GroundhoggModal = {};
 
       Object.assign(this.args, defaults)
 
-      // console.log( href );
-
       if (typeof href == 'string') {
         this.parseArgs(href)
-      } else {
+      }
+      else {
         this.args = $.extend(defaults, href)
       }
 
-      this.overlay = $('.popup-overlay')
-      this.window = $('.popup-window')
-      this.content = $('.popup-content')
-      this.title = $('.popup-title')
+      this.wrapper = $('.gh-legacy-modal')
+      this.overlay = $('.gh-legacy-modal .gh-modal-overlay')
+      this.window = $('.gh-legacy-modal .gh-modal-dialog')
+      this.content = $('.gh-legacy-modal .gh-modal-dialog-content')
+      this.title = $('.gh-legacy-modal .gh-modal-dialog-title')
+      this.footer = $('.gh-legacy-modal .gh-modal-footer')
       this.loader = $('.iframe-loader-wrapper')
+      this.footerClose = $('.gh-legacy-modal .gh-modal-footer .legacy-modal-close')
 
       if (typeof this.args.footer !== 'undefined' && this.args.footer === 'false') {
-        this.showFooter = false;
-        $('.popup-footer').addClass('hidden')
-      } else {
-        $('.popup-footer').removeClass('hidden')
+        this.showFooter = false
+        this.footer.addClass('hidden')
+      }
+      else {
+        this.footer.removeClass('hidden')
       }
 
-      this.sizeup()
-
       if (this.matchUrl(this.args.source)) {
-        this.loader.removeClass('hidden')
-        this.source = $(
-          '<div><iframe class=\'hidden\' src=\'' + this.args.source + '\' width=\'' + this.args.width + '\' height=\'' + (this.args.height - 100) + '\' style=\'margin-bottom: -5px;\' onload=\'GroundhoggModal.prepareFrame( this )\'></iframe></div>'
-        )
-      } else {
+
+        //language=HTML
+        this.source = $(`
+            <div>
+                <iframe
+                        src="${ this.args.source }"
+                        onload="GroundhoggModal.prepareFrame( this )"
+                        width="${ this.args.width ?? 1200 }"
+                ></iframe>
+            </div>`)
+
+        this.closeLoader = loadingModal().close
+
+      }
+      else {
         this.source = $('#' + this.args.source)
       }
 
       this.title.text(title)
 
       if (typeof this.args.footertext !== 'undefined') {
-        $('#popup-close-footer').text(this.args.footertext)
+        this.footerClose.text(this.args.footertext)
       }
 
       self.open()
@@ -87,28 +101,6 @@ var GroundhoggModal = {};
         this.args[args[0]] = decodeURIComponent(args[1].replace('+', ' '))
       }
       return this.args
-    },
-
-    sizeup: function () {
-      /*top: calc(50% - 250px);*/
-      /*left: calc(50% - 250px);*/
-      var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-      var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
-
-      if (this.args.height > h) {
-        this.args.height = h - 50
-      }
-
-      if (this.args.width > w) {
-        this.args.width = w - 50
-      }
-
-      this.window.css('height', this.args.height + 'px')
-      this.window.css('width', this.args.width + 'px')
-      this.window.css('top', 'calc( 50% - ' + (this.args.height / 2) + 'px )')
-      this.window.css('left', 'calc( 50% - ' + (this.args.width / 2) + 'px )')
-      this.content.css('height', (this.args.height - ( this.showFooter ? 100 : 50 ) ) + 'px')
-      this.loader.css('height', (this.args.height - ( this.showFooter ? 100 : 50 ) ) + 'px')
     },
 
     open: function () {
@@ -134,20 +126,11 @@ var GroundhoggModal = {};
       this.reset()
     },
 
-    pullFrame: function (iframe) {
-      var $iframe = $(iframe)
-      var $content = $('#wpbody-content', $iframe.contents())
-      this.content.append($content)
-    },
-
     prepareFrame: function (iframe) {
-      var self = this
-      var $iframe = $(iframe)
-      $iframe.removeClass('hidden')
+      let height = Math.max( iframe.contentWindow.document.body.scrollHeight, iframe.contentWindow.document.body.offsetHeight )
 
-      this.content.removeClass('hidden')
-      this.content.css('padding', 0)
-      this.loader.addClass('hidden')
+      iframe.style.height = height + 100 + 'px'
+      this.closeLoader()
     },
 
     frameReload: function () {
@@ -168,16 +151,12 @@ var GroundhoggModal = {};
 
     /* Load the PopUp onto the screen */
     showPopUp: function () {
-      this.overlay.removeClass('hidden')
-      this.window.removeClass('hidden')
-      this.overlay.fadeIn()
-      this.window.fadeIn()
+      this.wrapper.removeClass('hidden')
     },
 
     /* Close the PopUp */
     hidePopUp: function () {
-      this.window.addClass('hidden')
-      this.overlay.addClass('hidden')
+      this.wrapper.addClass('hidden')
     },
 
     getDefaults: function () {
@@ -187,7 +166,6 @@ var GroundhoggModal = {};
     reset: function () {
       this.is_open = false
       this.args = this.getDefaults()
-      this.content.css('padding', '0 20px')
     },
 
     reload: function () {
@@ -198,20 +176,16 @@ var GroundhoggModal = {};
           e.preventDefault()
           //console.log(this.href);
           self.init(this.title, this.href)
-
-          if ($(this).hasClass('no-padding')) {
-            $('.popup-content').css('padding', '0')
-          }
-        }
+        },
       )
 
-      $(document).on('click', '.popup-close',
+      $(document).on('click', '.gh-legacy-modal .legacy-modal-close',
         function () {
           $(document).trigger('modal-closed')
           self.close()
-        }
+        },
       )
-    }
+    },
   })
 
   $(function () {
@@ -223,4 +197,4 @@ var GroundhoggModal = {};
     $('.wpgh-color').wpColorPicker()
   })
 
-})(jQuery, GroundhoggModal, GroundhoggModalDefaults)
+} )(jQuery, GroundhoggModal, GroundhoggModalDefaults)

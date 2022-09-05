@@ -20,8 +20,8 @@ var FormBuilder = {};
 
             });
 
-            $( '#popup-close-footer' ).click( function (e) {
-                if ( self.active ){ 
+            $( '.gh-legacy-modal .gh-modal-footer .legacy-modal-close' ).click( function (e) {
+                if ( self.active ){
                     self.makeField();
                 }
             });
@@ -74,18 +74,17 @@ var FormBuilder = {};
         },
 
         addOptionsHTML: function() {
-            var $newOption = "<div class='option-wrapper' style='margin-bottom:10px;'>" +
-                "<div style='display: inline-block;width: 170px;vertical-align: top;'>" +
-                "<input type='text' class='input' style='float: left' name='option[]' placeholder='Option Text'>" +
-                "</div>" +
-                "<div style='display: inline-block;width: 220px;vertical-align: top;'>" +
-                "<select class='gh-single-tag-picker' name='tags[]' style='max-width: 140px;'></select>"+
-                "</div>" +
-                "<div style='display: inline-block;width: 20px;vertical-align: top;'>" +
-                " <span  class=\"row-actions\"><span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deleteOption\"><span class=\"dashicons dashicons-trash\"></span></a></span></span>\n" +
-                "</div>" +
-                "</div>";
-            $('#gh-option-table').append( $newOption );
+
+            // language=HTML
+            let newOption = `<div class="option-wrapper display-flex gap-10">
+                <input type="text" class="input" style="float: left" name="option[]" placeholder="Option Text">
+                <select class="gh-single-tag-picker" name='tags[]' style="max-width: 140px;"></select>
+                <a style="text-decoration: none" href="javascript:void(0)" class="deleteOption gh-button danger text small">
+                    <span class="dashicons dashicons-trash"></span>
+                </a>
+            </div>`
+
+            $('#gh-option-table').append( newOption );
             $(document).trigger( 'gh-init-pickers' );
         },
 
@@ -132,7 +131,7 @@ var FormBuilder = {};
             GroundhoggModal.args.preventSave = true;
             this.active = true;
 
-            this.currentType = button.className.split(' ')[2];
+            this.currentType = button.dataset.type;
 
             var fields = this.types[ this.currentType ];
             this.hideFields();

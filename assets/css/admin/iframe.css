@@ -6,16 +6,13 @@ html.iframed {
     margin: 0;
 }
 
-.iframed #wpbody-content{
-    padding-bottom: 0;
-    min-height: 100vh;
-}
-
-.iframed #wpadminbar,
-.iframed #adminmenuwrap,
-.iframed #adminmenuback,
-.iframed #wpfooter,
-.iframed #screen-meta-links,
-.iframed #screen-meta {
+html.iframed body.wp-admin .page-title-action,
+html.iframed body.wp-admin .wp-heading-inline,
+html.iframed body.wp-admin #wpadminbar,
+html.iframed body.wp-admin #adminmenuwrap,
+html.iframed body.wp-admin #adminmenuback,
+html.iframed body.wp-admin #wpfooter,
+html.iframed body.wp-admin #screen-meta-links,
+html.iframed body.wp-admin #screen-meta {
     display: none;
 }

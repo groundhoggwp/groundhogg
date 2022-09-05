@@ -4,10 +4,18 @@ namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Properties;
 use function Groundhogg\display_custom_field;
+use function Groundhogg\ensure_array;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\sanitize_custom_field;
 
 class Custom_Field extends Input {
+
+	public function get_default_args() {
+		return array_merge( [
+			'custom_field' => false
+		], parent::get_default_args() );
+	}
 
 	public function get_shortcode_name() {
 		return 'custom';
@@ -17,11 +25,33 @@ class Custom_Field extends Input {
 		return Properties::instance()->get_field( $this->get_att( 'custom_field' ) );
 	}
 
+	/**
+	 * Return the value that will be the final value.
+	 *
+	 * @param $input
+	 * @param $config
+	 *
+	 * @return string|\WP_Error
+	 */
+	public static function validate( $input, $config ) {
+		return sanitize_custom_field( $input, $config['name'] );
+	}
+
 	public function get_name() {
 		$field = $this->get_field();
 
 		if ( $field ) {
 			return $field['name'];
+		}
+
+		return false;
+	}
+
+	public function get_id() {
+		$field = $this->get_field();
+
+		if ( $field ) {
+			return $field['id'];
 		}
 
 		return false;
@@ -45,8 +75,8 @@ class Custom_Field extends Input {
 			return $this->render_field();
 		}
 
-		return html()->e('div', [], [
-			html()->e('label', [ 'for' => $this->get_id() ], $this->get_label() ),
+		return html()->e( 'div', [], [
+			html()->e( 'label', [ 'for' => $this->get_id() ], $this->get_label() ),
 			$this->render_field()
 		] );
 
@@ -55,12 +85,13 @@ class Custom_Field extends Input {
 	public function render_field() {
 
 		$field = $this->get_field();
+		$name  = $this->get_name();
 
 		$type = $field['type'];
 
 		$args = [
-			'name'  => $field['name'],
-			'id'    => $this->get_att( 'id' ),
+			'name'  => $name,
+			'id'    => $this->get_id(),
 			'class' => $this->get_att( 'class' )
 		];
 
@@ -99,74 +130,66 @@ class Custom_Field extends Input {
 
 			case 'radio':
 
-				$options = explode( PHP_EOL, $field['settings']['options'] );
+				$options = array_map( 'trim', $field['options'] );
+
+				$html = [];
 
 				foreach ( $options as $option ) {
 
-					echo html()->e( 'label', [
+					$html[] = html()->e( 'label', [
 						'style' => [ 'display' => 'block' ]
 					], html()->input( [
 							'type'    => 'radio',
 							'class'   => 'radio',
 							'value'   => $option,
 							'name'    => $name,
-							'checked' => trim( $option ) === trim( $value )
+							'checked' => $this->get_value() === $option
 						] ) . ' ' . esc_html( $option ) );
-
 				}
 
-				break;
+				return html()->e( 'div', [ 'class' => 'radio-group' ], $html );
 
 			case 'checkboxes':
 
-				$options = explode( PHP_EOL, $field['settings']['options'] );
-				$options = array_map( 'trim', $options );
+				$options = array_map( 'trim', $field['options'] );
+				$checked = ensure_array( $this->get_value() );
 
-				if ( is_string( $value ) ) {
-					$value = array_map( 'trim', explode( ',', $value ) );
-				}
+				$html = [];
 
 				foreach ( $options as $option ) {
 
-					echo html()->e( 'label', [
+					$html[] = html()->e( 'label', [
 						'style' => [ 'display' => 'block' ]
 					], html()->input( [
 							'type'    => 'checkbox',
 							'class'   => 'checkbox',
 							'value'   => $option,
 							'name'    => $name . '[]',
-							'checked' => in_array( trim( $option ), $value )
+							'checked' => in_array( trim( $option ), $checked )
 						] ) . ' ' . esc_html( $option ) );
 				}
 
-				break;
+				return html()->e( 'div', [ 'class' => 'checkbox-group' ], $html );
 
 			case 'dropdown':
 
-				$options             = explode( PHP_EOL, $field['settings']['options'] );
-				$options             = array_map( 'trim', $options );
-				$options             = array_combine( $options, $options );
-				$is_multiple         = isset_not_empty( $field['settings'], 'multiple' );
-				$insert_blank_option = isset_not_empty( $field['settings'], 'blank_option' );
+				$options     = array_map( 'trim', $field['options'] );
+				$options     = array_combine( $options, $options );
+				$is_multiple = isset_not_empty( $field, 'multiple' );
 
 				if ( $is_multiple ) {
 					$name .= '[]';
 				}
 
-				// Handles the comma speprated value if values are stored as a sting using the Form Builders
-				if ( is_string( $value ) ) {
-					$value = explode( ',', $value );
-				}
-
-				echo html()->dropdown( [
+				return html()->dropdown( [
 					'name'        => $name,
+					'id'          => $this->get_id(),
+					'class'       => 'gh-input ' . $this->get_att( 'class' ),
 					'multiple'    => $is_multiple,
 					'options'     => $options,
-					'selected'    => $value,
-					'option_none' => $insert_blank_option ? __( '-----' ) : false,
+					'selected'    => $this->get_value(),
+					'option_none' => $is_multiple ? false : __( 'Please select one' ),
 				] );
-
-				break;
 
 		endswitch;
 

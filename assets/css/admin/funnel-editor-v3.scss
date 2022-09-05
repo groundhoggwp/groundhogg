@@ -124,8 +124,11 @@ html {
       gap: 30px;
 
       .step-notes {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
 
-        width: 200px;
+        width: 240px;
         flex-shrink: 0;
 
         .step-notes-textarea {
@@ -135,6 +138,7 @@ html {
           font-weight: 400;
           border: none;
           padding: 12px;
+
         }
       }
 
@@ -373,8 +377,10 @@ button.button.save-button {
 }
 
 /* END NEW STUFF */
-.form-buttons .button {
-  margin: 2px;
+.form-buttons  {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .form-buttons {

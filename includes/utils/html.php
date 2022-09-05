@@ -876,7 +876,7 @@ class HTML {
 			'multiple'    => false,
 			'placeholder' => 'Please Select One',
 			'tags'        => false,
-			'style'       => [ 'min-width' => '400px' ]
+			'style'       => []
 		) );
 
 		if ( isset_not_empty( $a, 'data' ) ) {

@@ -309,9 +309,6 @@ class Scripts {
 		wp_localize_script( 'groundhogg-admin-modal', 'GroundhoggModalDefaults', [
 			'title'      => 'Modal',
 			'footertext' => __( 'Close' ),
-			'height'     => 500,
-			'width'      => 500,
-			'footer'     => 'true',
 		] );
 		wp_register_script( 'groundhogg-admin-replacements', GROUNDHOGG_ASSETS_URL . 'js/admin/replacements' . $dot_min . '.js', [
 			'jquery',
