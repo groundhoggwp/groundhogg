@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7
+Stable tag: 2.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7 (2022-09-02) =
+= 2.7.1 (2022-09-05) =
+* FIXED Missing dependency causing JS issue in modal
+
+= 2.7 (2022-09-05) =
 * IMPROVED Funnel UI receives a new coat of paint!
  * Updated colors to match new contact UI
  * More visually appealing layout
