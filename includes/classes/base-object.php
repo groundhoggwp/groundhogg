@@ -493,38 +493,34 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return string
 	 */
 	public function serialize() {
-		return serialize( $this->get_as_array() );
+		return serialize( $this->__serialize() );
 	}
 
 	/**
 	 * For PHP 8.0
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function __serialize(): string {
-		return $this->serialize();
+	public function __serialize() {
+		return $this->get_as_array();
 	}
 
 	/**
+	 * Unserialize stuff
+	 *
 	 * @param string $serialized
 	 */
 	public function unserialize( $serialized ) {
-		/**
-		 * @var $data array
-		 */
-		$data = unserialize( $serialized );
-		$data = $data['data'];
-
-		$this->setup_object( $data );
+		$this->__unserialize( unserialize( $serialized ) );
 	}
 
 	/**
-	 * For PHP 8.0
+	 * Unserialize stuff
 	 *
-	 * @return string
+	 * For PHP 8.0
 	 */
-	public function __unserialize( array $data ): void {
-		$this->unserialize( $data );
+	public function __unserialize( array $data ) {
+		$this->setup_object( $data['data'] );
 	}
 
 	/**
