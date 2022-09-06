@@ -318,6 +318,17 @@
       })
     },
 
+    getActiveStep(){
+      return this.steps.find( s => s.ID == this.currentlyActive )
+    },
+
+    updateStepMeta( _meta ){
+      this.getActiveStep().meta = {
+        ...this.getActiveStep().meta,
+        ..._meta
+      }
+    },
+
     /**
      * Make the given step active.
      *

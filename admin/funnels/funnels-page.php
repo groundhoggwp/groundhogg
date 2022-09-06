@@ -14,6 +14,7 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_upload_wp_error;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
@@ -175,10 +176,12 @@ class Funnels_Page extends Admin_Page {
 //           wp_enqueue_script( 'groundhogg-admin-link-picker' );
 			wp_enqueue_script( 'sticky-sidebar' );
 
+			$funnel = new Funnel( get_url_var( 'funnel' ) );
 
 			wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
 			wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
 			wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
+				'steps'                 => $funnel->get_steps(),
 				'id'                    => absint( get_request_var( 'funnel' ) ),
 				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
 				'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
@@ -237,148 +240,18 @@ class Funnels_Page extends Admin_Page {
 			)
 		);
 
-//		$screen->add_help_tab(
-//			array(
-//				'id'      => 'gh_reporting',
-//				'title'   => __( 'Reporting' ),
-//				'content' => '<p>' . __( 'To view funnel reporting, simply go to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg' ) . '</p>'
-//			)
-//		);
-
 	}
 
 	public function get_pointers_add() {
 		return [
-			[
-				'id'        => 'default_funnel_templates',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#funnel-templates',
-				'title'     => 'Default Templates',
-				'show_next' => true,
-				'content'   => "These are templates that we've created for you to get you started. The content contains instructions for what we've learned converts and turns leads into contacts.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-//            [
-//                'id' => 'funnel_marketplace',
-//                'screen' => $this->get_screen_id(),
-//                'target' => '#funnel-marketplace',
-//                'title' => 'Funnel Marketplace',
-//                'show_next' => true,
-//                'content' => 'Browse the Groundhogg Marketplace for templates that fit your business niche.',
-//                'position' => [
-//                    'edge' => 'left',
-//                    'align' => 'middle'
-//                ]
-//            ],
-			[
-				'id'        => 'import_funnel_template',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#funnel-import',
-				'title'     => 'Import Funnels',
-				'show_next' => true,
-				'content'   => 'Downloaded a funnel from somewhere? Import it here.',
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'start_building_funnel',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#poststuff .postbox:first-child .button-primary',
-				'title'     => 'Start Building',
-				'show_next' => false,
-				'content'   => "When you're ready to start building click this button to copy and edit the funnel template.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
 		];
 	}
 
 	public function get_pointers_edit() {
 		return [
-			[
-				'id'        => 'funnel_benchmarks',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#benchmarks',
-				'title'     => 'Benchmarks',
-				'show_next' => true,
-				'content'   => "Benchmarks are used to trigger automation. Simply drag them into the funnel flow.",
-				'position'  => [
-					'edge'  => 'right', //top, bottom, left, right
-					'align' => 'top' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'funnel_actions',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#actions',
-				'title'     => 'Actions',
-				'show_next' => true,
-				'content'   => "Actions perform automation, like sending emails or text messages. Drag them into the funnel flow anywhere.",
-				'position'  => [
-					'edge'  => 'right', //top, bottom, left, right
-					'align' => 'top' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'funnel_reporting',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#reporting',
-				'title'     => 'Reporting',
-				'show_next' => true,
-				'content'   => "Enable reporting view to see how contacts are responding to your funnel.",
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'funnel_export',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#export',
-				'title'     => 'Sharing',
-				'show_next' => true,
-				'content'   => "Share your funnel with clients and colleagues by sharing the download link.",
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'funnel_status',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#status-toggle-switch',
-				'title'     => 'Status',
-				'show_next' => true,
-				'content'   => "Turn your funnel on and off at the flick of a switch.",
-				'position'  => [
-					'edge'  => 'right', //top, bottom, left, right
-					'align' => 'top' //top, bottom, left, right, middle
-				]
-			],
+
 		];
 	}
-//	public function get_reporting_start_time() {
-//		return Plugin::$instance->reporting->get_start_time();
-//	}
-//
-//	public function get_reporting_end_time() {
-//		return Plugin::$instance->reporting->get_end_time();
-//	}
-//
-//	private function setup_reporting() {
-//
-//		if ( get_request_var( 'reporting_on' ) ) {
-//			$this->reporting_enabled = true;
-//		}
-
-//	}
 
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_funnels' ) ) {
@@ -481,7 +354,6 @@ class Funnels_Page extends Admin_Page {
 
 		return false;
 	}
-
 
 	/**
 	 * Process add action for the funnel.
@@ -597,7 +469,6 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
-
 		if ( is_wp_error( $result ) ) {
 			$this->add_notice( $result );
 		}
@@ -606,13 +477,14 @@ class Funnels_Page extends Admin_Page {
 
 		$result['settings'] = $this->get_step_html();
 		$result['sortable'] = $this->get_step_sortable();
+		$result['steps']    = $this->get_current_funnel()->get_steps();
 
 		$this->send_ajax_response( $result );
 
 	}
 
 	public function get_step_html() {
-		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+		$funnel = $this->get_current_funnel();
 		$steps  = $funnel->get_steps();
 
 		$html = "";
@@ -628,8 +500,15 @@ class Funnels_Page extends Admin_Page {
 		return $html;
 	}
 
+	/**
+	 * @return Funnel
+	 */
+	public function get_current_funnel() {
+		return new Funnel( absint( get_request_var( 'funnel' ) ) );
+	}
+
 	public function get_step_sortable() {
-		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+		$funnel = $this->get_current_funnel();
 		$steps  = $funnel->get_steps();
 
 		$html = "";
@@ -749,14 +628,14 @@ class Funnels_Page extends Admin_Page {
 
 		$after_step = new Step( absint( get_request_var( 'after_step' ) ) );
 
-		if ( $after_step->exists() ){
+		if ( $after_step->exists() ) {
 			$step_order = $after_step->get_order() + 1;
 			$funnel_id  = $after_step->get_funnel_id();
 		} else {
-			$funnel_id  = absint( get_post_var( 'funnel_id' ) );
-			$funnel = new Funnel( $funnel_id );
+			$funnel_id = absint( get_post_var( 'funnel_id' ) );
+			$funnel    = new Funnel( $funnel_id );
 
-			if ( ! $funnel->exists() ){
+			if ( ! $funnel->exists() ) {
 				wp_send_json_error();
 			}
 
@@ -792,7 +671,8 @@ class Funnels_Page extends Admin_Page {
 			'sortable'   => $sortable,
 			'settings'   => $settings,
 			'id'         => $step->get_id(),
-			'after_step' => $after_step
+			'after_step' => $after_step,
+			'json'       => $step
 		] );
 
 		wp_send_json_error();
@@ -852,6 +732,7 @@ class Funnels_Page extends Admin_Page {
 			'sortable' => $sortable,
 			'settings' => $settings,
 			'id'       => $new_step->get_id(),
+			'json'     => $step
 		] );
 
 		wp_send_json_error();
@@ -953,10 +834,10 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table->views();
 		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
 		?>
-		<form method="post" class="wp-clearfix">
+        <form method="post" class="wp-clearfix">
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>
-		</form>
+        </form>
 		<?php
 	}
 
@@ -1071,13 +952,13 @@ class Funnels_Page extends Admin_Page {
 
 			foreach ( $products->products as $product ):
 				?>
-				<div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-					<div class="">
-						<img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
-					</div>
-					<h2 class="hndle"><?php echo $product->info->title; ?></h2>
-					<div class="inside">
-						<p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
+                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
+                    <div class="">
+                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
+                    </div>
+                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
+                    <div class="inside">
+                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
 
 						<?php $pricing = (array) $product->pricing;
 						if ( count( $pricing ) > 1 ) {
@@ -1086,8 +967,8 @@ class Funnels_Page extends Admin_Page {
 							$price2 = max( $pricing );
 
 							?>
-							<a class="button-primary" target="_blank"
-							   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+                            <a class="button-primary" target="_blank"
+                               href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -1095,24 +976,24 @@ class Funnels_Page extends Admin_Page {
 
 							if ( $price > 0.00 ) {
 								?>
-								<a class="button-primary" target="_blank"
-								   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-								<a class="button-primary" target="_blank"
-								   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-					</div>
-				</div>
+                    </div>
+                </div>
 			<?php endforeach;
 		} else {
 			?>
-			<p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
+            <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		}
 	}
 
