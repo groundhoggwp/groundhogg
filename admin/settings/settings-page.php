@@ -321,67 +321,82 @@ class Settings_Page extends Admin_Page {
 	 */
 	private function get_default_sections() {
 
-		$sections = array(
-			'business_info'         => array(
+		$sections = [
+			'business_info'         => [
 				'id'    => 'business_info',
 				'title' => _x( 'Business Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'general'
-			),
-			'general_other'         => array(
+			],
+			'general_other'         => [
 				'id'    => 'general_other',
 				'title' => _x( 'Other', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'general'
-			),
-			'misc_info'             => array(
+			],
+			'misc_info'             => [
 				'id'    => 'misc_info',
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
-			),
-			'experimental'          => array(
-				'id'    => 'experimental',
-				'title' => _x( 'Experimental', 'settings_sections', 'groundhogg' ),
+			],
+			'interface'             => [
+				'id'    => 'interface',
+				'title' => _x( 'Interface', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
-			),
-			'page_tracking'         => array(
+			],
+			'performance'           => [
+				'id'    => 'performance',
+				'title' => _x( 'Performance', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			],
+			'developer'             => [
+				'id'    => 'developer',
+				'title' => _x( 'Developers', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			],
+			'page_tracking'         => [
 				'id'    => 'page_tracking',
 				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
-			),
+			],
 			'wp_cron'               => [
 				'id'    => 'wp_cron',
 				'title' => _x( 'WP Cron', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc',
 			],
-			'affiliate'             => array(
+			'affiliate'             => [
 				'id'    => 'affiliate',
 				'title' => _x( 'Affiliate Section', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
-			),
-			'captcha'               => array(
+			],
+			'captcha'               => [
 				'id'    => 'captcha',
 				'title' => _x( 'Google reCAPTCHA', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
-			),
+			],
 			'event_notices'         => [
 				'id'    => 'event_notices',
 				'title' => _x( 'Event Notices', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
-			'compliance'            => array(
+			'danger_zone'           => [
+				'id'    => 'danger_zone',
+				'title' => _x( 'Danger Zone', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			],
+			'compliance'            => [
 				'id'    => 'compliance',
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
-			),
-			'cookies'               => array(
+			],
+			'cookies'               => [
 				'id'    => 'cookies',
 				'title' => _x( 'Cookies', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
-			),
-			'unsubscribe'           => array(
+			],
+			'unsubscribe'           => [
 				'id'    => 'unsubscribe',
 				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
-			),
+			],
 //			'sendwp'            => [
 //				'id'       => 'sendwp',
 //				'title'    => _x( 'SendWP', 'settings_sections', 'groundhogg' ),
@@ -409,12 +424,12 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Footer', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'tracking'              => array(
+			'tracking'              => [
 				'id'    => 'tracking',
 				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
-			),
-			'email_logging'         => array(
+			],
+			'email_logging'         => [
 				'id'       => 'email_logging',
 				'title'    => _x( 'Email Logging', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
@@ -422,19 +437,19 @@ class Settings_Page extends Admin_Page {
 					?>
 					<div id="email-logging"></div><?php
 				}
-			),
+			],
 //			'imap'               => array(
 //				'id'       => 'imap',
 //				'title'    => _x( 'Email Imap', 'settings_sections', 'groundhogg' ),
 //				'tab'      => 'email',
 //				'callback' => [ Plugin::$instance->imap_inbox, 'test_connection_ui' ],
 //			),
-			'bounces'               => array(
+			'bounces'               => [
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
 				'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
-			),
+			],
 //			'api_settings'      => array(
 //				'id'    => 'api_settings',
 //				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
@@ -447,7 +462,7 @@ class Settings_Page extends Admin_Page {
 				'callback' => [ Plugin::$instance->tag_mapping, 'reset_tags_ui' ],
 
 			],
-		);
+		];
 
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
 	}
@@ -579,7 +594,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_uninstall_on_delete'                 => array(
 				'id'      => 'gh_uninstall_on_delete',
-				'section' => 'misc_info',
+				'section' => 'danger_zone',
 				'label'   => sprintf( _x( 'Delete %s data', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'desc'    => _x( 'Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -607,7 +622,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_allow_unrestricted_file_access'      => array(
 				'id'      => 'gh_allow_unrestricted_file_access',
-				'section' => 'misc_info',
+				'section' => 'danger_zone',
 				'label'   => _x( 'Allow unrestricted access to contact file uploads.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will allow anyone with a file access link to view uploads regardless of whether they are logged in.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -621,7 +636,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_enable_experimental_features'        => array(
 				'id'      => 'gh_enable_experimental_features',
-				'section' => 'experimental',
+				'section' => 'developer',
 				'label'   => _x( 'Enable experimental features.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will enabled experimental features in Groundhogg and various extensions.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -635,7 +650,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_get_beta_versions'                   => array(
 				'id'      => 'gh_get_beta_versions',
-				'section' => 'experimental',
+				'section' => 'developer',
 				'label'   => _x( 'Get updates for beta versions of extensions!', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will show automatic updates or extensions which may have experimental features.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -700,7 +715,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_script_debug'                        => array(
 				'id'      => 'gh_script_debug',
-				'section' => 'misc_info',
+				'section' => 'developer',
 				'label'   => _x( 'Enable script debug mode', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will attempt to load full JS files instead of minified JS files for debugging.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -713,7 +728,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_use_object_cache'                    => array(
 				'id'      => 'gh_use_object_cache',
-				'section' => 'misc_info',
+				'section' => 'performance',
 				'label'   => _x( 'Enable Object Caching', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Use the WordPress core object caching system to improve performance. This may cause strange behaviour on some hosts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -739,7 +754,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_hide_tooltips'                       => array(
 				'id'      => 'gh_hide_tooltips',
-				'section' => 'misc_info',
+				'section' => 'interface',
 				'label'   => _x( 'Hide Tooltips', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will hides the tooltips user see in new installations.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -753,7 +768,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_is_admin_bar_widget_disabled'        => array(
 				'id'      => 'gh_is_admin_bar_widget_disabled',
-				'section' => 'misc_info',
+				'section' => 'interface',
 				'label'   => _x( 'Hide Admin Toolbar Widget', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Hide the Admin Toolbar Widget.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -935,7 +950,7 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => '0.5'
 				),
 			),
-			'gh_imap_inbox_address'                        => array(
+			'gh_imap_inbox_address'                  => array(
 				'id'      => 'gh_imap_inbox_address',
 				'section' => 'imap',
 				'label'   => _x( 'IMAP Inbox', 'settings', 'groundhogg' ),
@@ -948,7 +963,7 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => 'replies@' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
 				),
 			),
-			'gh_imap_inbox_password'               => array(
+			'gh_imap_inbox_password'                 => array(
 				'id'      => 'gh_imap_inbox_password',
 				'section' => 'imap',
 				'type'    => 'input',
@@ -960,7 +975,7 @@ class Settings_Page extends Admin_Page {
 					'id'   => 'gh_imap_inbox_password',
 				),
 			),
-			'gh_imap_inbox_host'                   => array(
+			'gh_imap_inbox_host'                     => array(
 				'id'      => 'gh_imap_inbox_host',
 				'section' => 'imap',
 				'label'   => _x( 'Mail Server', 'settings', 'groundhogg' ),
@@ -973,7 +988,7 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => 'mail.' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
 				),
 			),
-			'gh_imap_inbox_port'                   => array(
+			'gh_imap_inbox_port'                     => array(
 				'id'      => 'gh_imap_inbox_port',
 				'section' => 'imap',
 				'label'   => _x( 'IMAP Port', 'settings', 'groundhogg' ),
@@ -1234,7 +1249,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				],
 			],
-			'gh_disable_open_tracking'              => [
+			'gh_disable_open_tracking'               => [
 				'id'      => 'gh_disable_open_tracking',
 				'section' => 'tracking',
 				'label'   => _x( 'Disable Email Open Tracking', 'settings', 'groundhogg' ),

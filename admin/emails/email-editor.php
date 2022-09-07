@@ -66,22 +66,43 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 			echo 'align-email-center';
 		} ?>" style="clear: both">
 			<div id="postbox-container-1" class="postbox-container sidebar">
-				<div id="save" class="postbox">
-					<span class="spinner"></span>
-					<h2><?php _e( 'Save & Preview', 'groundhogg' ); ?></h2>
+				<div id="save" class="gh-panel">
+					<div class="gh-panel-header">
+						<h2><?php _e( 'Save & Preview', 'groundhogg' ); ?></h2>
+						<span class="spinner"></span>
+					</div>
 					<div class="inside">
-						<?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
-						<?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
-						<?php echo html()->button( [
-							'title' => __( 'Mobile Preview' ),
-							'text'  => '<span class="dashicons dashicons-smartphone"></span>',
-							'class' => 'button button-secondary dash-button show-email-preview',
-						] ); ?>
-						<?php echo html()->button( [
-							'title' => __( 'Desktop Preview' ),
-							'text'  => '<span class="dashicons dashicons-desktop"></span>',
-							'class' => 'button button-secondary dash-button show-email-preview',
-						] ); ?>
+						<div class="display-flex space-between">
+							<div class="gh-button-group">
+								<?php echo html()->button( [
+									'type'  => 'submit',
+									'text'  => 'Update',
+									'name'  => 'update',
+									'id'    => 'update',
+									'class' => 'gh-button primary',
+								] );
+
+								echo html()->button( [
+									'type'  => 'submit',
+									'text'  => 'Test',
+									'name'  => 'update_and_test',
+									'id'    => 'update_and_test',
+									'class' => 'gh-button secondary',
+								] ); ?>
+							</div>
+							<div class="gh-button-group">
+								<?php echo html()->button( [
+									'title' => __( 'Mobile Preview' ),
+									'text'  => '<span class="dashicons dashicons-smartphone"></span>',
+									'class' => 'gh-button secondary dash-button show-email-preview',
+								] ); ?>
+								<?php echo html()->button( [
+									'title' => __( 'Desktop Preview' ),
+									'text'  => '<span class="dashicons dashicons-desktop"></span>',
+									'class' => 'gh-button secondary dash-button show-email-preview',
+								] ); ?>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -97,14 +118,13 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					] ); ?>
 				</p>
 				<h3><?php _e( 'From', 'groundhogg' ); ?></h3>
-				<?php $args = array(
-					'option_none' => __( 'The Contact\'s Owner' ),
-					'id'          => 'from_user',
-					'name'        => 'from_user',
-					'selected'    => $email->from_user,
-					'style'       => [ 'max-width' => '100%' ]
-				); ?>
-				<p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
+				<p><?php echo html()->select_from_address( [
+						'option_none' => __( 'The Contact\'s Owner' ),
+						'id'          => 'from_user',
+						'name'        => 'from_user',
+						'selected'    => $email->from_select,
+						'style'       => [ 'max-width' => '100%' ]
+					] ); ?></p>
 				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
 				<h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>

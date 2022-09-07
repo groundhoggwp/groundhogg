@@ -112,6 +112,8 @@ class Delay_Timer extends Action {
 				'selected'    => $this->get_setting( 'delay_type', 'minutes' ),
 				'option_none' => false,
 			] ),
+		], [
+			'class' => 'gh-input-group'
 		] );
 
 		$html->end_row();

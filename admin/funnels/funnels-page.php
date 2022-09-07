@@ -161,7 +161,7 @@ class Funnels_Page extends Admin_Page {
 	public function scripts() {
 		if ( $this->get_current_action() === 'edit' ) {
 
-			wp_enqueue_script( 'chart-js' );
+			wp_enqueue_editor();
 
 			wp_enqueue_style( 'editor-buttons' );
 			wp_enqueue_style( 'jquery-ui' );
@@ -171,16 +171,11 @@ class Funnels_Page extends Admin_Page {
 
 			wp_enqueue_script( 'jquery-ui-sortable' );
 			wp_enqueue_script( 'jquery-ui-draggable' );
-			wp_enqueue_script( 'jquery-ui-datepicker' );
-
-//           wp_enqueue_script( 'groundhogg-admin-link-picker' );
-			wp_enqueue_script( 'sticky-sidebar' );
-
 			$funnel = new Funnel( get_url_var( 'funnel' ) );
 
-			wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
-			wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
-			wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
+			wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
+			wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+			wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
 				'steps'                 => $funnel->get_steps(),
 				'id'                    => absint( get_request_var( 'funnel' ) ),
 				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
@@ -200,6 +195,7 @@ class Funnels_Page extends Admin_Page {
 			] );
 
 			wp_enqueue_script( 'groundhogg-admin-replacements' );
+			wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
 
 		} else if ( $this->get_current_action() === 'funnel_settings' ) {
 			wp_enqueue_script( 'groundhogg-admin-iframe' );
@@ -807,7 +803,7 @@ class Funnels_Page extends Admin_Page {
 		}
 
 //		if ( $this->is_v2() ) {
-		include __DIR__ . '/funnel-editor-v3.php';
+		include __DIR__ . '/funnel-editor.php';
 
 //			return;
 //		}

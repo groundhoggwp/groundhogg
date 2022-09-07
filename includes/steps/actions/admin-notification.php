@@ -3,13 +3,17 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\do_replacements;
 use Groundhogg\Event;
+use function Groundhogg\email_kses;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\get_owners;
+use function Groundhogg\html;
 use function Groundhogg\is_replacement_code_format;
 use function Groundhogg\is_sms_plugin_active;
 
@@ -83,66 +87,140 @@ class Admin_Notification extends Action {
 		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.png';
 	}
 
-	protected function is_sms() {
-		return (bool) $this->get_setting( 'is_sms' );
-	}
-
 	/**
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		$this->start_controls_section();
 
-		$this->add_control( 'send_to', [
-			'label'       => __( 'Send To:', 'groundhogg' ),
-			'type'        => HTML::INPUT,
-			'default'     => get_bloginfo( 'admin_email' ),
-			'description' => __( 'Use any email address or the {owner_email} replacement code.', 'groundhogg' )
-		] );
+		?>
+		<p></p>
+		<div class="gh-rows-and-columns">
+			<div class="gh-row">
+				<div class="gh-col">
+					<label><?php _e( 'Send to...' ); ?></label>
+					<div class="">
+						<?php
 
-		$this->add_control( 'from', [
-			'label'       => __( 'From:', 'groundhogg' ),
-			'type'        => HTML::INPUT,
-			'default'     => get_bloginfo( 'admin_email' ),
-			'description' => __( 'The email address which you want to send email from. Accepts one email address.', 'groundhogg' )
-		] );
+						$selected = $this->get_setting( 'send_to' );
 
-		$this->add_control( 'reply_to', [
-			'label'       => __( 'Reply To:', 'groundhogg' ),
-			'type'        => HTML::INPUT,
-			'default'     => "{email}",
-			'description' => __( 'The email address which you can reply to. Use any address or the {email} code.', 'groundhogg' )
-		] );
+						$options = [
+							'{owner_email}' => __( 'Contact Owner' ),
+							'{email}'       => __( 'Contact' ),
+						];
 
-		$this->add_control( 'subject', [
-			'label'       => __( 'Subject:', 'groundhogg' ),
-			'type'        => HTML::INPUT,
-			'default'     => "Admin notification for {full_name} ({email})",
-			'description' => __( 'Use any valid replacement codes.', 'groundhogg' )
-		] );
+						foreach ( get_owners() as $owner ) {
+							$options[ $owner->user_email ] = $owner->user_email;
+						}
 
-		$this->add_control( 'note_text', [
-			'label'       => __( 'Content:', 'groundhogg' ),
-			'type'        => HTML::TEXTAREA,
-			'default'     => "Please follow up with {full_name} soon.\nEmail: {email}\nPhone: {phone}",
-			'description' => __( 'Use any valid replacement codes.', 'groundhogg' ),
-			'field'       => [
-				'cols' => 64,
-				'rows' => 4
-			],
-		] );
+						$other_emails = array_diff( $selected, array_keys( $options ) );
 
-		$this->add_control( 'hide_admin_links', [
-			'label'       => __( 'Hide admin links', 'groundhogg' ),
-			'type'        => HTML::CHECKBOX,
-			'default'     => false,
-			'field'       => [
-				'label' => Plugin::$instance->utils->html->wrap( __( 'Will hide the admin links to the contact record in the footer of the email.', 'groundhogg' ), 'span', [ 'class' => 'description' ] ),
-			],
-			'description' => false
-		] );
+						foreach ( $other_emails as $email ) {
+							$options[ $email ] = $email;
+						}
 
-		$this->end_controls_section();
+						echo html()->select2( [
+							'id'       => $this->setting_id_prefix( 'send_to' ),
+							'name'     => $this->setting_name_prefix( 'send_to' ) . '[]',
+							'options'  => $options,
+							'selected' => $selected,
+							'multiple' => true,
+							'tags'     => true,
+						] );
+
+						?>
+					</div>
+				</div>
+				<div class="gh-col">
+					<label><?php _e( 'Reply to...' ) ?></label>
+					<div class="gh-input-group">
+						<?php
+
+						$reply_to_type = $this->get_setting( 'reply_to_type', $this->get_setting( 'reply_to' ) ? 'custom' : 'owner' );
+
+						echo html()->dropdown( [
+							'name'        => $this->setting_name_prefix( 'reply_to_type' ),
+							'options'     => [
+								'contact' => __( 'Contact\'s email' ),
+								'owner'   => __( 'Contact owner\'s email' ),
+								'custom'  => __( 'Custom email' ),
+							],
+							'selected'    => $reply_to_type,
+							'option_none' => false,
+							'class'       => 'reply-to-type full-width',
+						] );
+
+						$classes = [
+							'custom-email',
+							'full-width'
+						];
+
+						if ( $reply_to_type !== 'custom' ) {
+							$classes[] = 'hidden';
+						}
+
+						echo html()->input( [
+							'name'  => $this->setting_name_prefix( 'reply_to' ),
+							'value' => $this->get_setting( 'reply_to' ),
+							'class' => implode( ' ', $classes )
+						] )
+
+						?>
+					</div>
+				</div>
+			</div>
+			<div class="gh-row">
+				<div class="gh-col">
+					<label><?php _e( 'Subject line' ) ?></label>
+					<?php
+
+					echo html()->input( [
+						'name'  => $this->setting_name_prefix( 'subject' ),
+						'value' => $this->get_setting( 'subject' ),
+						'class' => 'full-width'
+					] );
+
+					?>
+				</div>
+			</div>
+			<div class="gh-row">
+				<div class="gh-col">
+					<?php
+
+					echo html()->textarea( [
+						'id'    => $this->setting_id_prefix( 'note_text' ),
+						'name'  => 'note_text',
+						'value' => wpautop( $this->get_setting( 'note_text' ) )
+					] );
+
+					?>
+				</div>
+			</div>
+			<div class="gh-row">
+				<div class="gh-col">
+					<?php
+
+					echo html()->checkbox( [
+						'label'   => __( 'Don\'t show admin links to the contact record in the notification.' ),
+						'name'    => $this->setting_name_prefix( 'hide_admin_links' ),
+						'checked' => $this->get_setting( 'hide_admin_links' )
+					] );
+
+					?>
+				</div>
+			</div>
+		</div>
+		<?php
+
+	}
+
+	public function validate_settings( Step $step ) {
+		$send_to = $this->get_setting( 'send_to' );
+
+		if ( ! is_array( $send_to ) ) {
+			$send_to = explode( ',', $send_to );
+			$send_to = array_map( 'trim', $send_to );
+			$this->save_setting( 'send_to', $send_to );
+		}
 	}
 
 	/**
@@ -151,36 +229,36 @@ class Admin_Notification extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$send_to = $this->get_posted_data( 'send_to' );
+
+		$send_to = $this->get_posted_data( 'send_to', [] );
 
 		if ( $send_to ) {
-			$send_to = sanitize_text_field( $send_to );
-			$emails  = array_map( 'trim', explode( ',', $send_to ) );
-			$emails  = array_filter( $emails, function ( $email ) {
-				return is_email( $email ) || is_replacement_code_format( $email );
-			} );
 
-			$send_to = implode( ',', $emails );
-			$this->save_setting( 'send_to', $send_to );
+			$send_to = array_map( function ( $email ) {
+				if ( is_replacement_code_format( $email ) ) {
+					return $email;
+				}
+
+				return sanitize_email( $email );
+			}, $send_to );
+
+			$this->save_setting( 'send_to', array_filter( $send_to ) );
 		}
 
-		$reply_to = $this->get_posted_data( 'reply_to' );
+		$reply_to_type = $this->get_posted_data( 'reply_to_type' );
+		$reply_to      = $this->get_posted_data( 'reply_to' );
 
 		if ( $reply_to ) {
-			$reply_to = sanitize_text_field( $reply_to );
-
-			$emails   = array_map( 'trim', explode( ',', $reply_to ) );
-			$email    = array_shift( $emails );
-			$reply_to = ( $email === '{email}' ) ? '{email}' : sanitize_email( $email );
-			$this->save_setting( 'reply_to', $reply_to );
+			if ( is_replacement_code_format( $reply_to ) || is_email( $reply_to ) ) {
+				$this->save_setting( 'reply_to_type', $reply_to );
+			} else {
+				$this->save_setting( 'reply_to_type', '' );
+			}
 		}
 
-		$from = sanitize_email( $this->get_posted_data( 'from' ) );
-		$this->save_setting( 'from', $from );
-
+		$this->save_setting( 'reply_to_type', sanitize_text_field( $reply_to_type ) );
 		$this->save_setting( 'hide_admin_links', boolval( $this->get_posted_data( 'hide_admin_links' ) ) );
 		$this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
-		$this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text' ) ) );
 	}
 
 	/**
@@ -194,40 +272,53 @@ class Admin_Notification extends Action {
 	public function run( $contact, $event ) {
 
 		$note = $this->get_setting( 'note_text' );
-
-		$finished_note = sanitize_textarea_field( do_replacements( $note, $contact->get_id() ) );
+		$body = email_kses( make_clickable( wpautop( do_replacements( $note, $contact ) ) ) );
 
 		$hide_admin_links = $this->get_setting( 'hide_admin_links', false );
 
 		if ( ! $hide_admin_links ) {
-			$finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
-				admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
-				$contact->get_email()
+			$body .= sprintf( "<p><a href='%s'>%s</a></p>",
+				$contact->admin_link(),
+				__( 'Manage Contact', 'groundhogg' )
 			);
 		}
 
 		$subject = $this->get_setting( 'subject' );
-		$subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );
+		$subject = sanitize_text_field( do_replacements( $subject, $contact ) );
 
-		$send_to  = $this->get_setting( 'send_to' );
-		$reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
-		$from     = do_replacements( $this->get_setting( 'from', get_default_from_name() ), $contact->get_id() );
+		$send_to = $this->get_setting( 'send_to' );
 
-
-		if ( ! is_email( $send_to ) ) {
-			$send_to = do_replacements( $send_to, $contact->get_id() );
+		if ( ! is_array( $send_to ) ) {
+			$send_to = do_replacements( $send_to, $contact );
+			$send_to = explode( ',', $send_to );
+		} else {
+			$send_to = array_map( function ( $email ) use ( $contact ) {
+				return sanitize_email( do_replacements( $email, $contact ) );
+			}, $send_to );
 		}
 
-		if ( ! $send_to ) {
+		$send_to       = array_filter( array_map( 'trim', $send_to ), 'is_email' );
+		$reply_to_type = $this->get_setting( 'reply_to_type', 'custom' );
+		$reply_to      = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact );
+
+		// No recipients defined, skip
+		if ( empty( $send_to ) ) {
 			return false;
+		}
+
+		switch ( $reply_to_type ) {
+			case 'contact':
+				$reply_to = $contact->get_email();
+				break;
+			case 'owner':
+				$reply_to = $contact->get_ownerdata()->user_email;
+				break;
 		}
 
 		add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-		$from_email = is_email( $from ) ? $from : get_default_from_name();
-
 		$headers = [
-			sprintf( 'From: %s <%s>', get_default_from_name(), $from_email ),
+			sprintf( 'From: %s <%s>', get_default_from_name(), get_default_from_email() ),
 			"Content-Type: text/html"
 		];
 
@@ -238,7 +329,7 @@ class Admin_Notification extends Action {
 		$sent = \Groundhogg_Email_Services::send_transactional(
 			$send_to,
 			wp_specialchars_decode( $subject ),
-			wpautop( make_clickable( $finished_note ) ),
+			$body,
 			$headers
 		);
 

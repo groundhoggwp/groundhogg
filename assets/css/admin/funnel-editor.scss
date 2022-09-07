@@ -104,6 +104,25 @@ html {
 #postbox-container-2-inner {
   .step:not(.hidden) {
 
+    .custom-settings {
+      .gh-rows-and-columns {
+        label {
+          font-weight: 500;
+        }
+      }
+    }
+
+    &.action.apply_note {
+      .step-flex .step-edit .custom-settings{
+        padding: 0;
+
+        .mce-panel {
+          box-shadow: none;
+          border-top: none;
+        }
+      }
+    }
+
     .step-warnings {
 
       display: flex;
@@ -154,23 +173,23 @@ html {
           padding: 0 20px 10px 20px;
         }
 
-        table.wp-list-table{
+        table.wp-list-table {
           border-radius: 5px;
           overflow: hidden;
 
-          &.striped>tbody>:nth-child(odd){
+          &.striped > tbody > :nth-child(odd) {
             //background-color: $primary-dark-5;
           }
 
-          &:not(:last-child){
+          &:not(:last-child) {
             margin-bottom: 10px;
           }
 
-          &:first-child{
+          &:first-child {
             margin-top: 20px;
           }
 
-          &.has-actions{
+          &.has-actions {
 
             th:last-child {
               width: 70px;
@@ -377,7 +396,7 @@ button.button.save-button {
 }
 
 /* END NEW STUFF */
-.form-buttons  {
+.form-buttons {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
@@ -443,14 +462,16 @@ button.button.save-button {
 #benchmarks table td {
   text-align: center;
 }
+
 .sortable-placeholder {
   box-sizing: border-box;
   border-radius: 5px;
   background-color: $primary-dark-15;
   border: none;
-  margin: 0;
+  margin: 10px 0;
   height: 60px;
 }
+
 @mixin above-text {
   position: absolute;
   padding: 3px 8px;
@@ -462,6 +483,20 @@ button.button.save-button {
   width: max-content;
 }
 
+#step-sortable {
+  &:empty {
+    &::after {
+      margin: 10px 0;
+      height: 60px;
+      background-color: $primary-dark-15;
+      content: 'Drag a step into the flow';
+      display: flex;
+      border-radius: 5px;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
 
 #postbox-container-1 {
 
@@ -536,6 +571,7 @@ button.button.save-button {
     &.step-placeholder {
       justify-content: center;
       padding: 20px;
+      margin: 10px 0;
     }
 
     &.has-errors {

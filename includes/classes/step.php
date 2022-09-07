@@ -90,6 +90,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	protected function post_setup() {
 		$this->step_order = absint( $this->step_order );
 		$this->funnel_id  = absint( $this->funnel_id );
+
+		do_action( 'groundhogg/step/post_setup', $this );
 	}
 
 	/**
@@ -217,53 +219,73 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Returns all the actions that come before this one
+	 *
+	 * @return Step[]
+	 */
+	public function get_preceeding_actions() {
+		$steps = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_group', '=', self::ACTION ],
+				[ 'step_order', '<', $this->get_order() ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ]
+			],
+			'orderby' => 'step_order',
+			'order'   => 'asc',
+		] );
+
+		return array_map_to_step( $steps );
+	}
+
+	/**
+	 * Returns all the actions that come after this one
+	 *
+	 * @return Step[]
+	 */
+	public function get_proceeding_actions() {
+
+		$steps = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_group', '=', self::ACTION ],
+				[ 'step_order', '>', $this->get_order() ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ]
+			],
+			'orderby' => 'step_order',
+			'order'   => 'asc',
+		] );
+
+		return array_map_to_step( $steps );
+	}
+
+	/**
 	 * Get the next step in the order
 	 *
 	 * @return Step|false
 	 */
 	public function get_next_action() {
 
-		/* this will give an array of objects ordered by appearance in the funnel builder */
-		$items = $this->get_funnel()->get_steps();
+		$actions = $this->get_proceeding_actions();
+		$next    = array_shift( $actions );
 
-		if ( empty( $items ) ) {
-			/* something went wrong or there are no more steps*/
-			return false;
-		}
+		// It's not null, so there is a step
+		if ( $next ){
 
-		$i = $this->get_order();
-
-		if ( $i >= count( $items ) ) {
-			/* This is the last step. */
-			return false;
-		}
-
-		// Since order is index+1, accessing the index with the given order should return the next step
-		$next = $items[ $i ];
-
-		// regardless of whether the current step is an action or a benchmark we can run the next step if it's an action
-		if ( $next->is_action() && $next->get_order() > $i ) {
-			return $next;
-		}
-
-		if ( $this->is_benchmark() ) {
-
-			while ( $i < count( $items ) ) {
-
-				if ( $items[ $i ]->is_action() ) {
-
-					return $items[ $i ];
-
-				}
-
-				$i ++;
-
+			// Only adjacent actions can process
+			if ( $this->is_action() && $next->get_order() !== ( $this->get_order() + 1 ) ){
+				$next = false;
 			}
 
 		}
 
-		return false;
-
+		/**
+		 * Filters the next action
+		 *
+		 * @param $next    Step|null
+		 * @param $current Step
+		 */
+		return apply_filters( 'groundhogg/step/next_action', $next, $this );
 	}
 
 	/**
@@ -384,6 +406,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
 			$event = new Event( absint( $event->ID ), 'event_queue' );
+
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
 				return $event->get_step()->get_order();
@@ -483,11 +506,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
-	 * @deprecated since 2.0
-	 *
 	 * @param $name
 	 *
 	 * @return string
+	 * @deprecated since 2.0
+	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

@@ -68,11 +68,21 @@ function get_dummy_text() {
 	<div id='poststuff'>
 		<div id="post-body" class="metabox-holder columns-2  align-email-center" style="clear: both">
 			<div id="postbox-container-1" class="postbox-container sidebar">
-				<div id="save" class="postbox">
-					<span class="spinner"></span>
-					<h2><?php _e( 'Save', 'groundhogg' ); ?></h2>
+				<div id="save" class="gh-panel">
+					<div class="gh-panel-header">
+						<h2><?php _e( 'Save', 'groundhogg' ); ?></h2>
+						<span class="spinner"></span>
+					</div>
 					<div class="inside">
-						<?php submit_button( __( 'Create', 'groundhogg' ), 'primary', 'update', false ); ?>
+						<?php
+						echo html()->button( [
+							'type'  => 'submit',
+							'text'  => __( 'Create' ),
+							'name'  => 'create',
+							'id'    => 'create',
+							'class' => 'gh-button primary',
+						] );
+						?>
 					</div>
 				</div>
 
@@ -88,14 +98,13 @@ function get_dummy_text() {
 					] ); ?>
 				</p>
 				<h3><?php _e( 'From', 'groundhogg' ); ?></h3>
-				<?php $args = array(
-					'option_none' => __( 'The Contact\'s Owner' ),
-					'id'          => 'from_user',
-					'name'        => 'from_user',
-					'selected'    => get_current_user_id(),
-					'style'       => [ 'max-width' => '100%' ]
-				); ?>
-				<p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
+				<p><?php echo html()->select_from_address( [
+						'option_none' => __( 'The Contact\'s Owner' ),
+						'id'          => 'from_user',
+						'name'        => 'from_user',
+						'selected'    => get_current_user_id(),
+						'style'       => [ 'max-width' => '100%' ]
+					] ); ?></p>
 				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
 				<h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>

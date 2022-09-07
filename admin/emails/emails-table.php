@@ -6,11 +6,14 @@ use Groundhogg\Email;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
+use function Groundhogg\get_default_from_email;
+use function Groundhogg\get_default_from_name;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use Groundhogg\Plugin;
 use WP_List_Table;
+use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
 /**
@@ -114,9 +117,9 @@ class Emails_Table extends WP_List_Table {
 	protected function get_views() {
 		$views = array();
 
-		$count_ready = Plugin::$instance->dbs->get_db( 'emails' )->count( array( 'status' => 'ready' ) );
-		$count_draft = Plugin::$instance->dbs->get_db( 'emails' )->count( array( 'status' => 'draft' ) );
-		$count_trash = Plugin::$instance->dbs->get_db( 'emails' )->count( array( 'status' => 'trash' ) );
+		$count_ready = get_db( 'emails' )->count( array( 'status' => 'ready' ) );
+		$count_draft = get_db( 'emails' )->count( array( 'status' => 'draft' ) );
+		$count_trash = get_db( 'emails' )->count( array( 'status' => 'trash' ) );
 		$count_all   = $count_ready + $count_draft;
 
 		$views['all']   = "<a class='" . print_r( ( $this->get_view() === 'all' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails' ) . "'>" . __( 'All' ) . " <span class='count'>(" . _nf( $count_all ) . ")</span>" . "</a>";
@@ -149,7 +152,7 @@ class Emails_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @param  $email Email
+	 * @param        $email Email
 	 * @param string $column_name
 	 * @param string $primary
 	 *
@@ -222,17 +225,20 @@ class Emails_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_from_user( $email ) {
-		if ( $email->get_from_user() ) {
-			$from_user = esc_html( $email->get_from_user()->display_name . ' <' . $email->get_from_user()->user_email . '>' );
-			$queryUrl  = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $email->get_from_user_id() );
 
-			return "<a href='$queryUrl'>$from_user</a>";
-		} else {
-			return sprintf( "<a href='%s'>%s</a>",
-				admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=0' ),
-				__( 'The Contact\'s Owner', 'groundhogg' )
-			);
+		if ( $email->get_from_user_id() == 0 && ! $email->get_meta( 'use_default_from' ) ) {
+			return __( 'The contact\'s owner', 'groundhogg' );
 		}
+
+		if ( $email->get_from_user() ) {
+			return html()->e( 'a', [
+				'href' => admin_page_url( 'gh_emails', [
+					'from_user' => $email->get_from_user_id()
+				] )
+			], esc_html( sprintf( '%s <%s>', $email->get_from_name(), $email->get_from_email() ) ) );
+		}
+
+		return esc_html( sprintf( '%s <%s>', get_default_from_name(), get_default_from_email() ) );
 	}
 
 	/**
@@ -277,7 +283,7 @@ class Emails_Table extends WP_List_Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $email A singular item (one full row's worth of data).
+	 * @param object $email       A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.

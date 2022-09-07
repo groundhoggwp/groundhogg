@@ -1,370 +1,424 @@
-( function( $, funnel ) {
+(function ($, funnel) {
 
-    $.extend( funnel, {
+  const { uuid } = Groundhogg.element
+  const { patch, routes } = Groundhogg.api
 
-        editorID: '#normal-sortables',
-        editor: null,
-        sortables: null,
-        draggables: null,
-        curStep: null,
-        curHTML: null,
-        curOrder: 0,
-        reportData: null,
-        sidebar: null,
+  $.extend(funnel, {
 
-        init: function () {
+    sortables: null,
+    insertAfterStep: false,
+    currentlyActive: false,
 
-            var self = this;
+    getSteps: function () {
+      return $('#step-sortable')
+    },
 
-            /* Create Editor */
-            this.editor = $( this.editorID );
+    getSettings: function () {
+      return $('.step-settings')
+    },
 
-            /* Bind Delete */
-            this.editor.on( 'click', 'button.delete-step', function ( e ) {
-                self.deleteStep( this );
-            } );
+    init: function () {
 
-            /* Bind Duplicate */
-            this.editor.on( 'click', 'button.duplicate-step', function ( e ) {
-                self.duplicateStep( this );
-            } );
+      var self = this
 
-            /* Activate Spinner */
-            $('#funnel-form').on('submit', function( e ){
-                e.preventDefault();
-                self.save( $(this) );
-            });
+      var $document = $(document)
+      var $form = $('#funnel-form')
+      var $steps = self.getSteps()
+      var $settings = self.getSettings()
 
-            $( document ).on( 'change', '.auto-save', function( e ){
-                e.preventDefault();
-                self.save( $('#funnel-form') );
-            });
+      $document.on('change input', '.step-title-large', function () {
+        var $title = $(this)
+        var id = $title.attr('data-id')
+        var $step = $('#' + id)
+        $step.find('.step-title').text($title.val())
+      })
 
-            $( document ).on('GroundhoggModalClosed', function( e ){
-                e.preventDefault();
-                self.save( $('#funnel-form') );
-            });
+      $document.on('click', '#postbox-container-1 .step', function (e) {
 
-            $( document ).on('GroundhoggModalClosed', function( e ){
-                e.preventDefault();
-                self.save( $('#funnel-form') );
-            });
-
-            $(document).on( 'click', '#enter-full-screen', function(e){
-                $( 'html' ).toggleClass( 'full-screen' );
-                self.editorSizing();
-            } );
-
-            if ( window.innerWidth > 600 ){
-                this.makeSortable();
-                this.makeDraggable();
-            }
-
-            this.initReporting();
-
-            this.editorSizing();
-
-            $( window ).resize(function() {
-                self.editorSizing();
-            });
-
-            $( '#add-contacts-button' ).click( function(){
-                self.addContacts();
-            });
-
-            $( '#copy-share-link' ).click( function ( e ) {
-                e.preventDefault();
-                prompt( "Copy this link.", $('#share-link').val() );
-            });
-
-            $( document ).on( 'click', '.postbox .collapse', function ( e ) {
-                var $step = $( this.parentNode );
-                if ( $step.hasClass( 'closed' ) ){
-                    self.expandStep( $step );
-                } else {
-                    self.collapseStep( $step );
-                }
-            } );
-
-            $( '#postbox-container-1 .hndle' ).click( function ( e ) {
-                var $metabox = $( this.parentNode );
-                $metabox.toggleClass( 'closed' );
-                self.sidebar.updateSticky();
-            })
-
-        },
-
-        editorSizing: function (){
-            $( '.funnel-editor-header').width( $('#poststuff').width() );
-            $( '#postbox-container-2').height( $('#wpbody').height() - 80 );
-            // $( '#postbox-container-1' ).height( $(window).height() - (32 - 56));
-
-            this.sidebar = new StickySidebar( '#postbox-container-1' , {
-                topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
-                bottomSpacing: 0
-            });
-
-            $( '#normal-sortables' ).css( 'visibility', 'visible' );
-        },
-
-        initReporting: function(){
-
-            var $reporting = $("#reporting-toggle");
-
-            $reporting.on( 'input', function(){
-                if ( $(this).is(':checked')){
-                    $('.step-reporting').removeClass('hidden');
-                    $('.step-edit').addClass('hidden');
-                    $( 'html' ).addClass( 'reporting-enabled' );
-                } else {
-                    $('.step-reporting').addClass('hidden');
-                    $('.step-edit').removeClass('hidden');
-                    $( 'html' ).removeClass( 'reporting-enabled' );
-                }
-            });
-
-            if($reporting.is( ':checked')){
-                $('.step-reporting').removeClass('hidden');
-                $('.step-reporting').removeClass('hidden');
-                $('.step-edit').addClass('hidden');
-            }
-
-            $('#custom_date_range_start').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                maxDate:0,
-                dateFormat:'d-m-yy'
-            });
-
-            $('#custom_date_range_end').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                maxDate:0,
-                dateFormat:'d-m-yy'
-            });
-
-            $('#date_range').change(function(){
-                if($(this).val() === 'custom'){
-                    $('#custom_date_range_end').removeClass('hidden');
-                    $('#custom_date_range_start').removeClass('hidden');
-                } else {
-                    $('#custom_date_range_end').addClass('hidden');
-                    $('#custom_date_range_start').addClass('hidden');
-                }});
-        },
-
-        save: function ( $form ) {
-
-            var self = this;
-
-            showSpinner();
-
-            var fd = $form.serialize();
-            fd = fd +  '&action=gh_save_funnel_via_ajax';
-
-            adminAjaxRequest( fd, function ( response ) {
-
-                handleNotices( response.data.notices );
-                // console.log( response.data.notices );
-
-                hideSpinner();
-
-                $( '#normal-sortables' ).html( response.data.data.steps );
-
-                FunnelChart.data = response.data.data.chartData;
-                if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
-                    FunnelChart.draw();
-                }
-
-                $( document ).trigger( 'new-step' );
-            } );
-        },
-
-        /**
-         * Inserts a dummy step wherever the given class is
-         *
-         * @param e string class name
-         */
-        insertDummyStep: function (selector) {
-            /* Check if we actually dropped it in */
-            if ( this.editor.find(selector).length > 0 ){
-
-                this.editor.find(selector).replaceWith(
-                    '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
-                );
-
-                return true;
-            }
-
-            return false
-        },
-
-        /**
-         * Replaces the dummy step with the given html
-         *
-         * @param html
-         */
-        replaceDummyStep: function (html) {
-            this.editor.find('.replace-me').replaceWith(html);
-            $(document).trigger('new-step');
-        },
-
-        /**
-         * The callback when the draggable event is finished. Dragging in a new step
-         *
-         * @param e
-         */
-        convertDraggableToStep: function ( e ) {
-
-            var step_type = e.id;
-
-            if ( this.insertDummyStep('.ui-draggable') ){
-
-                var order = $('.step').index($('#temp-step')) + 1;
-                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id, version:1};
-                this.getStepHtml( data );
-            }
-        },
-
-        /**
-         * Initializes the draggable state of the steps
-         */
-        makeDraggable: function () {
-            var self=this;
-
-            this.draggables = $(".ui-draggable").draggable({
-                connectToSortable: ".ui-sortable",
-                helper: "clone",
-                stop: function ( e, ui ) {
-                    /* double check we dropped in a step... */
-                    if ( ui.helper.closest( '#normal-sortables' ).length > 0 ){
-                        console.log( ui.helper.parent() );
-                        self.convertDraggableToStep( this )
-                    }
-
-                }
-            });
-        },
-
-        makeSortable: function () {
-            this.sortables = $(".ui-sortable").sortable({
-                placeholder: "sortable-placeholder",
-                connectWith: ".ui-sortable",
-                axis: 'y',
-                start: function (e, ui) {
-                    ui.helper.css('left', (ui.item.parent().width() - ui.item.width()) / 2);
-                    ui.placeholder.height(ui.item.height());
-                    ui.placeholder.width(ui.item.width());
-                }
-            });
-
-            this.sortables.disableSelection();
-        },
-
-        /**
-         * Given an element delete it
-         *
-         * @param e node
-         */
-        deleteStep: function (e) {
-
-            showSpinner();
-
-            var step = $(e).closest('.step');
-
-            var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
-
-            if (result) {
-
-                adminAjaxRequest(
-                    {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
-                    function ( result ) {
-                        hideSpinner();
-                        step.remove();
-                    }
-                );
-            } else {
-                hideSpinner();
-            }
-        },
-
-        /**
-         * Given an element, duplicate the step and
-         * Add it to the funnel
-         *
-         * @param e node
-         */
-        duplicateStep: function ( e ) {
-            var step = $(e).closest('.step');
-
-            $('<div class="replace-me"></div>').insertAfter( step );
-            this.insertDummyStep( '.replace-me' );
-
-            var data = {action: "wpgh_duplicate_funnel_step", step_id: step.attr( 'id' ), version: 1 };
-            this.getStepHtml( data );
-
-        },
-
-        /**
-         * Performs an ajax call and replaces
-         *
-         * @param obj
-         */
-        getStepHtml: function (obj) {
-
-            var self = this;
-            adminAjaxRequest( obj, function ( response ) {
-                self.curHTML = response.data.data.html;
-                self.replaceDummyStep(self.curHTML);
-            } );
-        },
-
-        addContacts: function () {
-
-            var tags    = $( '#add_contacts_to_funnel_tag_picker' ).val();
-
-            if ( ! tags ){
-                alert( 'Please select at least 1 tag.' );
-                return;
-            }
-
-            var stepId = $( '#add_contacts_to_funnel_step_picker' ).val();
-
-            if ( ! stepId ){
-                alert( 'Please select at funnel step.' );
-                return;
-            }
-
-            showSpinner();
-            adminAjaxRequest( { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId }, function ( response ) {
-                hideSpinner();
-            } );
-        },
-
-        /**
-         * Collapse a step
-         *
-         * @param $step jQuery object
-         */
-        collapseStep: function( $step ) {
-            console.log( $step );
-            $step.addClass( 'closed' );
-            $step.find( '.collapse-input' ).val( '1' )
-        },
-
-        /**
-         * Expand a step
-         *
-         * @param $step jQuery object
-         */
-        expandStep: function( $step ) {
-            $step.removeClass( 'closed' );
-            $step.find( '.collapse-input' ).val( '' )
+        if ($(e.target).is('.dashicons, button')) {
+          return
         }
-    } );
 
-    $(function(){
-        funnel.init();
-    });
+        self.makeActive(this.id, e)
+      })
 
-})( jQuery, Funnel );
+      $document.on('click', '.add-step-bottom-wrap button', e => {
+        this.showAddStep()
+      })
+
+      $document.on('click', '#step-toggle button', e => {
+
+        let group = e.currentTarget.dataset.group
+
+        $(`.steps-grid`).addClass('hidden')
+        $(`#${group}`).removeClass('hidden')
+
+        $('#step-toggle button').removeClass('active')
+        $(e.currentTarget).addClass('active')
+
+      })
+
+      /* Bind Delete */
+      $document.on('click', 'button.delete-step', function (e) {
+        self.deleteStep(this.parentNode.parentNode.id)
+      })
+
+      /* Bind Duplicate */
+      $document.on('click', 'button.duplicate-step', function (e) {
+        self.duplicateStep(this.parentNode.parentNode.id)
+      })
+
+      /* Activate Spinner */
+      $form.on('submit', function (e) {
+        e.preventDefault()
+        self.save($form)
+      })
+
+      /* Auto save */
+      $document.on('change', '.auto-save', function (e) {
+        e.preventDefault()
+        self.save($form)
+      })
+
+      /* Auto save */
+      $document.on('auto-save', function (e) {
+        e.preventDefault()
+        self.save($form)
+      })
+
+      // Funnel Title
+      $document.on('click', '.title-view .title', function (e) {
+        $('.title-view').hide()
+        $('.title-edit').show().removeClass('hidden')
+        $('#title').focus()
+      })
+
+      $document.on('blur change', '#title', function (e) {
+
+        var title = $(this).val()
+
+        $('.title-view').find('.title').text(title)
+        $('.title-view').show()
+        $('.title-edit').hide()
+      })
+
+      // Step Title
+      $document.on('click', '.step-title-view .title', function (e) {
+
+        var $step = $(this).closest('.step')
+
+        $step.find('.step-title-view').hide()
+        $step.find('.step-title-edit').show().removeClass('hidden')
+        $step.find('.step-title-edit .edit-title').focus()
+      })
+
+      $document.on('blur change', '.edit-title', function (e) {
+
+        var $step = $(this).closest('.step')
+
+        var title = $(this).val()
+
+        $step.find('.step-title-view').find('.title').text(title)
+        $step.find('.step-title-view').show()
+        $step.find('.step-title-edit').hide()
+      })
+
+      $document.on('click', '#enter-full-screen', function (e) {
+        $('html').toggleClass('full-screen')
+      })
+
+      if (window.innerWidth > 600) {
+        this.makeSortable()
+      }
+
+      $('#add-contacts-button').click(function () {
+        self.addContacts()
+      })
+
+      $('#copy-share-link').click(function (e) {
+        e.preventDefault()
+        prompt('Copy this link.', $('#share-link').val())
+      })
+
+    },
+
+    async save ($form) {
+
+      if (typeof $form === 'undefined') {
+        $form = $('#funnel-form')
+      }
+
+      var self = this
+
+      var $saveButton = $('.save-button')
+
+      $('body').addClass('saving')
+
+      $saveButton.html(self.saving_text)
+      $saveButton.addClass('spin')
+
+      var fd = $form.serialize()
+      fd = fd + '&action=gh_save_funnel_via_ajax&version=2'
+
+      // Update the JS meta changes first
+      if (Object.keys(this.metaUpdates).length) {
+
+        let changes = Object.keys(this.metaUpdates).map( ID => ({
+          ID,
+          meta: {
+            ...this.metaUpdates[ID]
+          }
+        }) )
+
+        let response = await patch( routes.v4.steps, changes )
+        // reset
+        this.metaUpdates = {}
+      }
+
+      // Do regular form update
+      adminAjaxRequest(fd,  (response) => {
+        handleNotices(response.data.notices)
+        this.steps = response.data.data.steps
+
+        setTimeout(function () {
+          $('.notice-success').fadeOut()
+        }, 3000)
+
+        $saveButton.removeClass('spin')
+        $saveButton.html(self.save_text)
+
+        self.getSettings().html(response.data.data.settings)
+        self.getSteps().html(response.data.data.sortable)
+
+        $(document).trigger('new-step')
+
+        $('body').removeClass('saving')
+        self.makeActive(self.currentlyActive)
+      })
+    },
+
+    makeSortable () {
+      this.sortables = $('.ui-sortable').sortable({
+        placeholder: 'sortable-placeholder',
+        connectWith: '.ui-sortable',
+        receive: (e, ui) => {
+
+          var data = {
+            action: 'wpgh_get_step_html',
+            step_type: ui.item.prop('id'),
+            step_group: ui.item.data('group'),
+            after_step: ui.helper.prev().prop('id'),
+            funnel_id: this.id,
+            version: 2,
+          }
+
+          this.insertAfterStep = data.after_step
+
+          let id = uuid()
+          // language=HTML
+          ui.helper.replaceWith(`
+			  <div class="step step-placeholder ${data.step_group}" id="${id}">
+				  Loading...
+			  </div>`)
+
+          var self = this
+          var $steps = self.getSteps()
+          var $settings = self.getSettings()
+
+          showSpinner()
+          adminAjaxRequest(data,  (response) => {
+
+            this.steps.push( response.data.data.json )
+
+            if (self.insertAfterStep) {
+              $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
+            } else {
+              $steps.prepend(response.data.data.sortable)
+            }
+
+            $settings.append(response.data.data.settings)
+            $(`#${id}`).remove()
+
+            hideSpinner()
+            $(document).trigger('new-step')
+          })
+        },
+      })
+
+      this.sortables.disableSelection()
+
+      $('.wpgh-element.ui-draggable').draggable({
+        connectToSortable: '#step-sortable.ui-sortable',
+        helper: 'clone',
+      })
+    },
+
+    showAddStep () {
+      $('#add-steps').removeClass('hidden')
+      $('.step-settings').addClass('hidden')
+      $('#step-sortable .step').removeClass('active')
+
+      this.currentlyActive = false
+    },
+
+    /**
+     * Given an element delete it
+     *
+     * @param id int
+     */
+    deleteStep: function (id) {
+
+      var self = this
+
+      showSpinner()
+
+      var $step = $('#' + id)
+      var result = confirm(
+        'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.')
+
+      if (result) {
+        adminAjaxRequest(
+          { action: 'wpgh_delete_funnel_step', step_id: id },
+          function (result) {
+            hideSpinner()
+            $step.remove()
+            var sid = '#settings-' + id
+            var $step_settings = $(sid)
+            $step_settings.remove()
+            $('html').removeClass('active-step')
+            self.save()
+            self.showAddStep()
+          })
+      } else {
+        hideSpinner()
+      }
+    },
+
+    /**
+     * Given an element, duplicate the step and
+     * Add it to the funnel
+     *
+     * @param id int
+     */
+    duplicateStep: function (id) {
+      this.insertAfterStep = id
+      var data = {
+        action: 'wpgh_duplicate_funnel_step',
+        step_id: id,
+        version: 2,
+      }
+      this.getStepHtml(data)
+    },
+
+    /**
+     * Performs an ajax call and replaces
+     *
+     * @param obj
+     */
+    getStepHtml: function (obj) {
+      var self = this
+      var $steps = self.getSteps()
+      var $settings = self.getSettings()
+
+      adminAjaxRequest(obj, (response) => {
+
+        this.steps.push( response.data.data.json )
+
+        if (self.insertAfterStep) {
+          $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
+        } else {
+          $steps.append(response.data.data.sortable)
+        }
+
+        $settings.append(response.data.data.settings)
+
+        $(document).trigger('new-step')
+      })
+    },
+
+    getActiveStep () {
+      return this.steps.find(s => s.ID == this.currentlyActive)
+    },
+
+    metaUpdates: {},
+
+    updateStepMeta (_meta) {
+
+      let step = this.getActiveStep()
+
+      step.meta = {
+        ...step.meta,
+        ..._meta
+      }
+
+      this.metaUpdates[step.ID] = {
+        ...this.metaUpdates[step.ID],
+        ..._meta
+      }
+
+      return step
+    },
+
+    /**
+     * Make the given step active.
+     *
+     * @param id string
+     * @param e object
+     */
+    makeActive: function (id) {
+      var self = this
+
+      if (typeof e == 'undefined') {
+        e = false
+      }
+
+      if (!id) {
+        this.showAddStep()
+        return
+      }
+
+      this.currentlyActive = id
+
+      var $steps = self.getSteps()
+      var $settings = self.getSettings()
+      var $html = $('html')
+
+      var $step = $('#' + id)
+
+      // If the click step was already active...
+      var was_active = $step.hasClass('active')
+
+      // In some cases we do not want to allow deselecting a step...
+      if (was_active) {
+        return
+      }
+
+      $('#add-steps').addClass('hidden')
+      $('.step-settings').removeClass('hidden')
+
+      $settings.find('.step').addClass('hidden')
+      $settings.find('.step').removeClass('active')
+      $steps.find('.step').removeClass('active')
+      $html.removeClass('active-step')
+
+      // Make the clicked step active
+      $step.addClass('active')
+      $step.find('.is_active').val(1)
+
+      var sid = '#settings-' + $step.attr('id')
+      var $step_settings = $(sid)
+
+      $step_settings.removeClass('hidden')
+      $step_settings.addClass('active')
+      $html.addClass('active-step')
+
+      $(document).trigger('step-active')
+
+    },
+  })
+
+  $(function () {
+    funnel.init()
+  })
+
+})(jQuery, Funnel)

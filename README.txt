@@ -325,6 +325,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.2 (2022-09-05) =
+* ADDED The **default FROM address** is now an option when selecting email FROM address in the email editor.
+* IMPROVED The **Apply Note** action now has a rich text editor in the funnel
+* IMPROVED **Admin Notification** action now has a rich text editor, emails are sent in HTML format.
+* TWEAKED Cleaned up the Admin Notification action UI, removed the FROM address setting in favor of always using the default.
+
 = 2.7.1.1 (2022-09-05) =
 * HOT FIX `__serialize` & `__unserialize` functions in `Base_Object` acting up with typed params
 

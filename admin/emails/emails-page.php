@@ -344,7 +344,15 @@ class Emails_Page extends Admin_Page {
 			$this->add_notice( 'email-in-draft-mode', __( 'Emails cannot be sent while in DRAFT mode.', 'groundhogg' ), 'warning' );
 		}
 
-		$from_user = absint( Groundhogg\get_request_var( 'from_user' ) );
+		$from_user = Groundhogg\get_request_var( 'from_user' );
+
+		if ( $from_user === 'default' ){
+			$email->update_meta( 'use_default_from', true );
+			$from_user = 0;
+		} else {
+			$email->delete_meta( 'use_default_from' );
+			$from_user = absint( $from_user );
+		}
 
 		$subject    = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );

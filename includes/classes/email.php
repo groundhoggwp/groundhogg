@@ -81,9 +81,12 @@ class Email extends Base_Object_With_Meta {
 	 */
 	protected function post_setup() {
 
-		$this->ID = absint( $this->ID );
+		$this->ID          = absint( $this->ID );
+		$this->from_user   = absint( $this->from_user );
+		$this->from_select = $this->from_user > 0 ? $this->from_user : ( $this->get_meta( 'use_default_from' ) ? 'default' : 0 );
+		$this->from_type   = $this->from_user > 0 ? 'user' : ( $this->get_meta( 'use_default_from' ) ? 'default' : 'owner' );
 
-		if ( $this->get_from_user_id() ) {
+		if ( $this->from_user > 0 ) {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
 	}
@@ -97,16 +100,12 @@ class Email extends Base_Object_With_Meta {
 		return 'email';
 	}
 
-//	public function get_id() {
-//		return absint( $this->ID );
-//	}
-
 	public function get_subject_line() {
 		return $this->subject;
 	}
 
 	public function get_title() {
-		return $this->title ? $this->title : $this->get_subject_line();
+		return $this->title ?: $this->get_subject_line();
 	}
 
 	public function get_pre_header() {
@@ -122,7 +121,7 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	public function get_from_user_id() {
-		return absint( $this->from_user );
+		return $this->from_user;
 	}
 
 	public function get_from_user() {
@@ -666,12 +665,23 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_from_name() {
-		if ( $this->get_from_user() ) {
-			return $this->get_from_user()->display_name;
-		} else if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
-			return $this->get_contact()->get_ownerdata()->display_name;
-		} else if ( get_primary_owner() ) {
-			return get_primary_owner()->display_name;
+
+		switch ( $this->from_type ) {
+
+			case 'owner':
+
+				if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
+					return $this->get_contact()->get_ownerdata()->display_name;
+				}
+
+				break;
+			case 'user':
+
+				if ( $this->get_from_user() ) {
+					return $this->get_from_user()->display_name;
+				}
+
+				break;
 		}
 
 		return get_default_from_name();
@@ -684,14 +694,24 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_from_email() {
-		if ( $this->get_from_user() ) {
-			return $this->get_from_user()->user_email;
-		} else if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
-			return $this->get_contact()->get_ownerdata()->user_email;
-		} else if ( get_primary_owner() ) {
-			return get_primary_owner()->user_email;
-		}
 
+		switch ( $this->from_type ) {
+
+			case 'owner':
+
+				if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
+					return $this->get_contact()->get_ownerdata()->user_email;
+				}
+
+				break;
+			case 'user':
+
+				if ( $this->get_from_user() ) {
+					return $this->get_from_user()->user_email;
+				}
+
+				break;
+		}
 
 		return get_default_from_email();
 	}
@@ -702,7 +722,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_reply_to_address() {
-		return ( is_email( $this->get_meta( 'reply_to_override' ) ) ? do_replacements( $this->get_meta( 'reply_to_override' ), $this->get_contact()->get_id() ) : $this->get_from_email() );
+		return $this->get_meta( 'reply_to_override' ) ? do_replacements( $this->get_meta( 'reply_to_override' ), $this->get_contact() ) : $this->get_from_email();
 	}
 
 	/**
@@ -1117,7 +1137,7 @@ class Email extends Base_Object_With_Meta {
 			$contact->last_name  = $user->last_name;
 		}
 
-		if ( ! $contact ){
+		if ( ! $contact ) {
 			return parent::get_as_array();
 		}
 

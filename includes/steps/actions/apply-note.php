@@ -7,6 +7,8 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\do_replacements;
+use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -72,20 +74,13 @@ class Apply_Note extends Action {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		$this->start_controls_section();
 
-		$this->add_control( 'note_text', [
-			'label'       => __( 'Content:', 'groundhogg' ),
-			'type'        => HTML::TEXTAREA,
-			'default'     => "This contact is super awesome!",
-			'description' => __( 'Use any valid replacement codes.', 'groundhogg' ),
-			'field'       => [
-				'cols' => 64,
-				'rows' => 4
-			],
+		echo html()->textarea( [
+			'id'    => $this->setting_id_prefix( 'note_text' ),
+			'name'  => 'note_text',
+			'value' => $this->get_setting( 'note_text' )
 		] );
 
-		$this->end_controls_section();
 	}
 
 	/**
@@ -94,15 +89,14 @@ class Apply_Note extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text', "" ) ) );
+//		$this->save_setting( 'note_text', wp_kses_post( $this->get_posted_data( 'note_text', "" ) ) );
 	}
-
 
 	/**
 	 * Process the apply note step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true;
 	 */
@@ -110,7 +104,7 @@ class Apply_Note extends Action {
 
 		$note = $this->get_setting( 'note_text' );
 
-		$finished_note = sanitize_textarea_field( Plugin::$instance->replacements->process( $note, $contact->get_id() ) );
+		$finished_note = do_replacements( $note, $contact );
 
 		// Add funnel context
 		$contact->add_note( $finished_note, 'funnel', $event->get_funnel_id() );
