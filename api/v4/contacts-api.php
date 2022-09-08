@@ -199,6 +199,26 @@ class Contacts_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Unable to edit
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return WP_Error
+	 */
+	public static function ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact ) {
+
+		if ( ! is_a_contact( $contact ) || ! $contact->exists() ){
+			return self::ERROR_401( 'error', 'The requested contact does not exist.', [
+				'given' => $contact
+			] );
+		}
+
+		return self::ERROR_401( 'error', 'You do not have sufficient permissions to edit this contact.', [
+			'id' => $contact->get_id()
+		] );
+	}
+
+	/**
 	 * Updates a contact given a contact array
 	 *
 	 * @param WP_REST_Request $request
@@ -239,7 +259,7 @@ class Contacts_Api extends Base_Object_Api {
 				}
 
 				if ( ! current_user_can( 'edit_contact', $contact ) ) {
-					return self::ERROR_401();
+					continue;
 				}
 
 				$data        = get_array_var( $item, 'data', [] );
@@ -288,7 +308,7 @@ class Contacts_Api extends Base_Object_Api {
 			$_data = $data;
 
 			if ( ! current_user_can( 'edit_contact', $contact ) ) {
-				return self::ERROR_401();
+				continue;
 			}
 
 			// get the email address if part of the request
@@ -296,7 +316,7 @@ class Contacts_Api extends Base_Object_Api {
 
 			// remove email from update request if in use by another contact
 			if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
-				unset( $_data['email']);
+				unset( $_data['email'] );
 			}
 
 			$contact->update( $_data );
@@ -368,7 +388,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
 		$data        = $request->get_param( 'data' );
@@ -386,17 +406,17 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact->update( $data );
 
-		if ( $meta ){
+		if ( $meta ) {
 			foreach ( $meta as $key => $value ) {
 				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
 		}
 
-		if ( $add_tags ){
+		if ( $add_tags ) {
 			$contact->apply_tag( $add_tags );
 		}
 
-		if ( $remove_tags ){
+		if ( $remove_tags ) {
 			$contact->remove_tag( $remove_tags );
 		}
 
@@ -419,7 +439,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
 		$tags = $request->get_json_params();
@@ -480,7 +500,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
 		$tags = $request->get_json_params();
@@ -603,7 +623,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
 		$others = $request->get_json_params();

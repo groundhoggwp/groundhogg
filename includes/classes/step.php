@@ -223,7 +223,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return Step[]
 	 */
-	public function get_preceeding_actions() {
+	public function get_preceding_actions() {
 		$steps = $this->get_db()->query( [
 			'where'   => [
 				'relationship' => 'AND',
@@ -266,15 +266,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_next_action() {
 
-		$actions = $this->get_proceeding_actions();
-		$next    = array_shift( $actions );
+		$next = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_group', '=', self::ACTION ],
+				[ 'step_order', $this->is_action() ? '=' : '>=', $this->get_order() + 1 ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ]
+			],
+			'orderby' => 'step_order',
+			'order'   => 'asc',
+			'limit'   => 1,
+		] );
 
-		// It's not null, so there is a step
-		if ( $next ){
+		if ( is_array( $next ) ) {
 
-			// Only adjacent actions can process
-			if ( $this->is_action() && $next->get_order() !== ( $this->get_order() + 1 ) ){
-				$next = false;
+			$next = array_shift( $next );
+
+			if ( ! empty( $next ) ){
+				$next = new Step( $next );
 			}
 
 		}
@@ -506,11 +515,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

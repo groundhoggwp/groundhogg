@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.1.1
+Stable tag: 2.7.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -330,6 +330,10 @@ You can purchase a premium plan for access to support and our premium extensions
 * IMPROVED The **Apply Note** action now has a rich text editor in the funnel
 * IMPROVED **Admin Notification** action now has a rich text editor, emails are sent in HTML format.
 * TWEAKED Cleaned up the Admin Notification action UI, removed the FROM address setting in favor of always using the default.
+* TWEAKED Clarified settings sections in the MISC tab
+* FIXED Potential 401 error while bulk editing contacts
+* FIXED Potential DB error when scheduling a new broadcast
+* FIXED CSS issues with modals and modal headers
 
 = 2.7.1.1 (2022-09-05) =
 * HOT FIX `__serialize` & `__unserialize` functions in `Base_Object` acting up with typed params

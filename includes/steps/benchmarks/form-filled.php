@@ -215,7 +215,7 @@ class Form_Filled extends Benchmark {
 		}
 
 		?>
-            <p></p>
+        <p></p>
         <div class="form-editor">
             <div class="form-buttons">
 				<?php
@@ -223,112 +223,90 @@ class Form_Filled extends Benchmark {
 				$buttons = [
 					[
 						'text'      => __( 'Row', 'groundhogg' ),
-						'class'     => 'gh-button secondary small',
 						'data-type' => 'row',
 					],
 					[
 						'text'      => __( 'Col', 'groundhogg' ),
-						'class'     => 'gh-button secondary small',
 						'data-type' => 'col',
 					],
 					[
 						'text'      => __( 'First', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'first',
 					],
 					[
 						'text'      => __( 'Last', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'last',
 					],
 					[
 						'text'      => __( 'Email', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'email',
 					],
 					[
 						'text'      => __( 'Phone', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'phone',
 					],
 					[
 						'text'      => __( 'Address', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'address',
 					],
 					[
 						'text'      => __( 'Birthday', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'birthday',
 					],
 					[
 						'text'      => __( 'GDPR', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'gdpr',
 					],
 					[
 						'text'      => __( 'Terms', 'groundhogg' ),
-						'class'     => 'gh-button secondary small terms',
-						'data-type' => 'col',
+						'data-type' => 'terms',
 					],
 					[
 						'text'      => __( 'Custom Field', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'custom',
 					],
 					[
 						'text'      => __( 'Text', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'text',
 					],
 					[
 						'text'      => __( 'Textarea', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'textarea',
 					],
 					[
 						'text'      => __( 'Number', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'number',
 					],
 					[
 						'text'      => __( 'Dropdown', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'dropdown',
 					],
 					[
 						'text'      => __( 'Radio', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'radio',
 					],
 					[
 						'text'      => __( 'Checkbox', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'checkbox',
 					],
 					[
 						'text'      => __( 'Date', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'date',
 					],
 					[
 						'text'      => __( 'Time', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'time',
 					],
 					[
 						'text'      => __( 'File', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'file',
 					],
 					[
 						'text'      => __( 'ReCAPTCHA', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'recaptcha',
 					],
 					[
 						'text'      => __( 'Submit', 'groundhogg' ),
-						'class'     => 'gh-button secondary small ',
 						'data-type' => 'submit',
 					],
 				];
@@ -340,7 +318,7 @@ class Form_Filled extends Benchmark {
 					$args = wp_parse_args( $button, array(
 						'text'               => __( 'Field', 'groundhogg' ),
 						'title'              => sprintf( __( 'Insert Field: %s', 'groundhogg' ), $button['text'] ),
-						'class'              => 'gh-button secondary small column',
+						'class'              => 'gh-button grey text small',
 						'source'             => 'form-field-editor',
 						'footer_button_text' => __( 'Insert Field', 'groundhogg' ),
 						'width'              => 600,

@@ -123,6 +123,7 @@ class Delay_Timer extends Action {
 
 		$html->td( [
 			// RUN WHEN
+			'<div class="gh-input-group">',
 			$html->dropdown( [
 				'name'        => $this->setting_name_prefix( 'run_when' ),
 				'id'          => $this->setting_id_prefix( 'run_when' ),
@@ -142,6 +143,7 @@ class Delay_Timer extends Action {
 				'id'    => $this->setting_id_prefix( 'run_time' ),
 				'value' => $this->get_setting( 'run_time', "09:00:00" ),
 			] ),
+			'</div>',
 			// LOCAL TIME
 			$html->wrap(
 				$html->checkbox( [

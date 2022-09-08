@@ -329,9 +329,7 @@ class Contact_Query {
 		$items = $this->get_items();
 
 		if ( $as_contact_object ) {
-			$items = array_map( function ( $contact ) {
-				return new Contact( $contact );
-			}, $items );
+			$items = array_map_to_contacts( $items );
 		}
 
 		return $items;

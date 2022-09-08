@@ -790,6 +790,17 @@ button {
       }
     }
 
+    &.grey {
+      border: none;
+      background: $primary-dark-5;
+      color: $primary-dark;
+      padding: 5px 10px;
+
+      &:hover:not(:disabled) {
+        background: $primary-dark-15;
+      }
+    }
+
     &.secondary {
       border: 1px solid $primary-blue-60;
       background: #FFFFFF;
@@ -1057,9 +1068,27 @@ button {
   }
 
   .gh-modal-dialog-content {
+
     > table.wp-list-table{
       border: none;
       max-width: 800px;
+    }
+  }
+
+  .gh-modal-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    box-shadow: 5px 5px 30px 0 rgb(24 45 70 / 5%);
+    align-items: center;
+    background: #FFFFFF;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    position: sticky;
+    bottom: 0;
+
+    &.hidden {
+      display: none;
     }
   }
 
@@ -1080,23 +1109,6 @@ button {
 
   &.hidden {
     display: none;
-  }
-
-  .gh-modal-footer{
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    box-shadow: 5px 5px 30px 0 rgb(24 45 70 / 5%);
-    align-items: center;
-    background: #FFFFFF;
-    padding: 8px 12px;
-    box-sizing: border-box;
-    position: sticky;
-    bottom: 0;
-
-    &.hidden {
-      display: none;
-    }
   }
 
   &.send-email {
@@ -1161,12 +1173,11 @@ button {
   }
 
   &-dialog {
+
     box-sizing: border-box;
     background: white;
     border-radius: 5px;
     position: relative;
-    //height: 70vh;
-    padding: 30px;
     max-width: calc(100vw - 100px);
     max-height: calc(92vh - 64px);
     overflow: auto;
@@ -1184,12 +1195,18 @@ button {
       }
     }
 
+    &-content{
+      padding: 30px;
+    }
+
     &.overflow-visible {
       overflow: visible;
     }
 
     &.no-padding {
-      padding: 0;
+      .gh-modal-dialog-content {
+        padding: 0;
+      }
     }
 
     &-alert {
@@ -1853,10 +1870,6 @@ p.error,
     img {
       border-radius: 5px;
     }
-  }
-
-  &-fields {
-    margin-top: 50px;
   }
 }
 

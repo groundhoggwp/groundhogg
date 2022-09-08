@@ -70,6 +70,12 @@ html {
   margin: 1px 2px;
 }
 
+#postbox-container-2-inner .notice {
+  margin: 0;
+  border-radius: 5px;
+  /*border-width: 2px;*/
+  border-width: 0 0 0 5px;
+}
 #postbox-container-2-inner .step:not(.hidden) .custom-settings .gh-rows-and-columns label {
   font-weight: 500;
 }
@@ -85,12 +91,6 @@ html {
   gap: 10px;
   flex-direction: column;
   margin-bottom: 20px;
-}
-#postbox-container-2-inner .step:not(.hidden) .step-warnings .notice {
-  margin: 0;
-  border-radius: 5px;
-  /*border-width: 2px;*/
-  border-width: 0 0 0 5px;
 }
 #postbox-container-2-inner .step:not(.hidden) .step-flex {
   display: flex;
@@ -404,6 +404,13 @@ button.button.save-button {
   height: 60px;
   background-color: white;
   border-radius: 5px;
+  cursor: grabbing;
+}
+#postbox-container-1 .wpgh-element[data-group=action] {
+  background-color: rgba(158, 206, 56, 0.5);
+}
+#postbox-container-1 .wpgh-element[data-group=benchmark] {
+  background-color: rgba(245, 129, 21, 0.25);
 }
 #postbox-container-1 .wpgh-element p {
   display: none;
@@ -626,6 +633,9 @@ button.button.save-button {
 #add-steps #benchmarks .select-step:hover .step-icon {
   background-color: rgba(245, 129, 21, 0.25);
 }
+#add-steps .steps-select {
+  margin-top: 20px;
+}
 #add-steps .steps-select .steps-grid:not(.hidden) {
   display: flex;
   flex-wrap: wrap;
@@ -640,23 +650,15 @@ button.button.save-button {
   margin-top: 0 !important;
   padding: 20px 0 0 0 !important;
 }
-#add-steps .steps-select .nav-tab {
-  float: none;
-  display: inline-block;
-}
-#add-steps .steps-select .nav-tab-wrapper .nav-tab {
-  font-size: 20px;
-  padding: 5px 15px;
-  /*font-weight: bold;*/
-}
 #add-steps .steps-select .steps-grid > .select-step {
   width: 80px;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: grab;
 }
 #add-steps .steps-select .steps-grid > .select-step > .ui-draggable-dragging {
   width: 80px;
   height: 80px;
+  cursor: grabbing;
 }
 #add-steps .steps-select .steps-grid > .select-step > .ui-draggable-dragging p {
   display: none;

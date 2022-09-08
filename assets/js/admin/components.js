@@ -773,7 +773,7 @@
               <button id="cancel" class="gh-button secondary text icon"><span class="dashicons dashicons-no-alt"></span></button>
           </div>
       </div>
-			<div style="margin-top: 50px">
+			<div class="form-wrap" >
 				${selectedForm ? selectedForm.rendered : `<p>${__('Select a form using the dropdown', 'groundhogg')}</p>`}
 			</div>`
     }
@@ -903,13 +903,13 @@
       const quickAddForm = () => {
         //language=HTML
         return `
-			<div id="${prefix}-quick-add-form" style="margin-top: 50px"></div>`
+			<div id="${prefix}-quick-add-form"></div>`
       }
 
       const useForm = () => {
         //language=HTML
         return `
-			<div class="gh-rows-and-columns" style="margin-top: 50px">
+			<div class="gh-rows-and-columns">
 				<div class="gh-row">
 					<div class="gh-col">
 						<label for="${prefix}-select-form">${__('Select a form', 'groundhogg')}</label>

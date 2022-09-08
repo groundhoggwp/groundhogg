@@ -93,15 +93,19 @@ class Admin_Notification extends Action {
 	public function settings( $step ) {
 
 		?>
-		<p></p>
-		<div class="gh-rows-and-columns">
-			<div class="gh-row">
-				<div class="gh-col">
-					<label><?php _e( 'Send to...' ); ?></label>
-					<div class="">
+        <p></p>
+        <div class="gh-rows-and-columns">
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label><?php _e( 'Send to...' ); ?></label>
+                    <div class="">
 						<?php
 
 						$selected = $this->get_setting( 'send_to' );
+
+						if ( empty( $selected ) ) {
+							$selected = [ '{owner_email}' ];
+						}
 
 						$options = [
 							'{owner_email}' => __( 'Contact Owner' ),
@@ -128,11 +132,11 @@ class Admin_Notification extends Action {
 						] );
 
 						?>
-					</div>
-				</div>
-				<div class="gh-col">
-					<label><?php _e( 'Reply to...' ) ?></label>
-					<div class="gh-input-group">
+                    </div>
+                </div>
+                <div class="gh-col">
+                    <label><?php _e( 'Reply to...' ) ?></label>
+                    <div class="gh-input-group">
 						<?php
 
 						$reply_to_type = $this->get_setting( 'reply_to_type', $this->get_setting( 'reply_to' ) ? 'custom' : 'owner' );
@@ -165,12 +169,12 @@ class Admin_Notification extends Action {
 						] )
 
 						?>
-					</div>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
-					<label><?php _e( 'Subject line' ) ?></label>
+                    </div>
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label><?php _e( 'Subject line' ) ?></label>
 					<?php
 
 					echo html()->input( [
@@ -180,10 +184,10 @@ class Admin_Notification extends Action {
 					] );
 
 					?>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
 					<?php
 
 					echo html()->textarea( [
@@ -193,10 +197,10 @@ class Admin_Notification extends Action {
 					] );
 
 					?>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
 					<?php
 
 					echo html()->checkbox( [
@@ -206,9 +210,9 @@ class Admin_Notification extends Action {
 					] );
 
 					?>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 		<?php
 
 	}
@@ -216,7 +220,7 @@ class Admin_Notification extends Action {
 	public function validate_settings( Step $step ) {
 		$send_to = $this->get_setting( 'send_to' );
 
-		if ( ! is_array( $send_to ) ) {
+		if ( is_string( $send_to ) ) {
 			$send_to = explode( ',', $send_to );
 			$send_to = array_map( 'trim', $send_to );
 			$this->save_setting( 'send_to', $send_to );

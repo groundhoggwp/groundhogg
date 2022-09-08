@@ -92,7 +92,8 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_401( 'error', __( 'No contacts match the given filters.', 'groundhogg' ) );
 		}
 
-		$broadcast_id = new Broadcast( [
+		$broadcast = new Broadcast();
+		$broadcast->create( [
 			'object_id'    => $object_id,
 			'object_type'  => $object_type,
 			'send_time'    => $date->getTimestamp(),
@@ -105,8 +106,6 @@ class Broadcasts_Api extends Base_Object_Api {
 			$meta['send_in_local_time'] = true;
 		}
 
-		$broadcast = new Broadcast( $broadcast_id );
-
 		$broadcast->update_meta( $meta );
 
 		/**
@@ -115,7 +114,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		 * @param int   $broadcast_id the ID of the broadcast
 		 * @param array $meta         the config object which is passed to the scheduler
 		 */
-		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta, $broadcast );
+		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $broadcast
@@ -137,7 +136,7 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		if ( $broadcast->get_status() === 'pending' ){
+		if ( $broadcast->get_status() === 'pending' ) {
 			$broadcast->update( [
 				'status' => 'scheduled'
 			] );

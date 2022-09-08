@@ -174,6 +174,9 @@ $funnel = new Funnel( $funnel_id );
                 <div id="postbox-container-2-inner">
 					<?php Plugin::$instance->notices->print_notices(); ?>
                     <div id="add-steps">
+                        <div class="notice notice-info">
+                            <p><?php _e( 'Adding steps is now <b>Drag and Drop</b>! Drag the desired step icon into the flow.' ) ?></p>
+                        </div>
                         <div class="steps-select">
                             <div id="step-toggle" class="gh-button-group">
                                 <button class="gh-button secondary change-step-type" type="button"

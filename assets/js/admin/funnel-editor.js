@@ -140,6 +140,10 @@
         prompt('Copy this link.', $('#share-link').val())
       })
 
+      if ( window.location.hash ){
+        this.makeActive( parseInt( window.location.hash.substring(1) ) )
+      }
+
     },
 
     async save ($form) {

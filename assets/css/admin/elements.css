@@ -708,6 +708,27 @@ button.gh-submit.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
   color: #0075ff;
 }
+a.gh-button.grey, a.gh-submit.grey,
+input[type=button].gh-button.grey,
+input[type=button].gh-submit.grey,
+input[type=submit].gh-button.grey,
+input[type=submit].gh-submit.grey,
+button.gh-button.grey,
+button.gh-submit.grey {
+  border: none;
+  background: rgba(16, 38, 64, 0.05);
+  color: #102640;
+  padding: 5px 10px;
+}
+a.gh-button.grey:hover:not(:disabled), a.gh-submit.grey:hover:not(:disabled),
+input[type=button].gh-button.grey:hover:not(:disabled),
+input[type=button].gh-submit.grey:hover:not(:disabled),
+input[type=submit].gh-button.grey:hover:not(:disabled),
+input[type=submit].gh-submit.grey:hover:not(:disabled),
+button.gh-button.grey:hover:not(:disabled),
+button.gh-submit.grey:hover:not(:disabled) {
+  background: rgba(16, 38, 64, 0.15);
+}
 a.gh-button.secondary, a.gh-submit.secondary,
 input[type=button].gh-button.secondary,
 input[type=button].gh-submit.secondary,
@@ -1029,6 +1050,21 @@ button.gh-submit.loud {
   border: none;
   max-width: 800px;
 }
+.gh-legacy-modal .gh-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  align-items: center;
+  background: #FFFFFF;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  position: sticky;
+  bottom: 0;
+}
+.gh-legacy-modal .gh-modal-footer.hidden {
+  display: none;
+}
 
 .gh-modal {
   align-items: center;
@@ -1044,21 +1080,6 @@ button.gh-submit.loud {
   box-sizing: border-box;
 }
 .gh-modal.hidden {
-  display: none;
-}
-.gh-modal .gh-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-  align-items: center;
-  background: #FFFFFF;
-  padding: 8px 12px;
-  box-sizing: border-box;
-  position: sticky;
-  bottom: 0;
-}
-.gh-modal .gh-modal-footer.hidden {
   display: none;
 }
 .gh-modal.send-email {
@@ -1115,7 +1136,6 @@ button.gh-submit.loud {
   background: white;
   border-radius: 5px;
   position: relative;
-  padding: 30px;
   max-width: calc(100vw - 100px);
   max-height: calc(92vh - 64px);
   overflow: auto;
@@ -1131,10 +1151,13 @@ button.gh-submit.loud {
 .gh-modal-dialog .gh-header h3 {
   margin: 0;
 }
+.gh-modal-dialog-content {
+  padding: 30px;
+}
 .gh-modal-dialog.overflow-visible {
   overflow: visible;
 }
-.gh-modal-dialog.no-padding {
+.gh-modal-dialog.no-padding .gh-modal-dialog-content {
   padding: 0;
 }
 .gh-modal-dialog-alert p {
@@ -1661,9 +1684,6 @@ p.error,
 }
 .contact-quick-edit .gh-header img {
   border-radius: 5px;
-}
-.contact-quick-edit-fields {
-  margin-top: 50px;
 }
 
 .gh-form-wrapper * {

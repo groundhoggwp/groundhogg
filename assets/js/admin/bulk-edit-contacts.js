@@ -9,28 +9,22 @@
     confirmationModal,
     dialog,
     bold,
-    adminPageURL,
     loadingModal,
     inputRepeaterWidget,
   } = Groundhogg.element
+
   const {
     betterTagPicker,
   } = Groundhogg.components
-  const { post, get, patch, routes, ajax } = Groundhogg.api
+
   const {
-    searches: SearchesStore,
     contacts: ContactsStore,
-    tags: TagsStore,
-    funnels: FunnelsStore,
   } = Groundhogg.stores
-  const { tagPicker, funnelPicker } = Groundhogg.pickers
-  const { userHasCap } = Groundhogg.user
+
   const {
     formatNumber,
-    formatTime,
-    formatDate,
-    formatDateTime,
   } = Groundhogg.formatting
+
   const { sprintf, __, _x, _n } = wp.i18n
 
   const fieldSection = ({
@@ -462,15 +456,20 @@
                     message: __('Contacts updated!', 'groundhogg'),
                   })
 
-                  let url = new URL( window.location.href )
+                  let url = new URL(window.location.href)
 
                   url.searchParams.delete('action')
                   url.searchParams.delete('number')
                   url.searchParams.delete('offset')
                   url.searchParams.delete('search')
 
-                  window.open( url, '_self')
+                  window.open(url, '_self')
 
+                }).catch(err => {
+                  dialog({
+                    message: err.message,
+                    type: 'error',
+                  })
                 })
 
               }

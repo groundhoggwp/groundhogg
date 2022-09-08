@@ -427,7 +427,7 @@ class Contact extends Base_Object_With_Meta {
 	 * Return whether the contact actually exists
 	 */
 	public function exists() {
-		return (bool) is_email( $this->email );
+		return $this->ID > 0 || (bool) is_email( $this->email );
 	}
 
 	/**

@@ -320,7 +320,7 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function legacy_export() {
 		$export          = [];
-		$export['title'] = sprintf( "%s - Copy", $this->get_title() );
+		$export['title'] = $this->get_title();
 		$export['steps'] = [];
 
 		$steps = $this->get_steps();
