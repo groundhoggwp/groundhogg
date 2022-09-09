@@ -80,7 +80,6 @@ class Phone extends Input {
 			'placeholder' => $this->get_placeholder(),
 			'title'       => $this->get_title(),
 			'required'    => $this->is_required(),
-			'pattern'     => $this->get_att( 'pattern' )
 		];
 
 		$ext = [
@@ -91,9 +90,11 @@ class Phone extends Input {
 			'value'       => '',
 			'placeholder' => '',
 			'title'       => '',
-			'required'    => $this->is_required(),
-			'pattern'     => $this->get_att( 'pattern' )
+			'required'    => false,
 		];
+
+		$phone_input = html()->input( $phone );
+		$ext_input   = html()->input( $ext );
 
 		// Show ext for none mobile numbers if being collected
 		if ( $this->get_att( 'show_ext' ) && $this->get_att( 'phone_type' ) !== 'mobile' ) {
@@ -106,41 +107,41 @@ class Phone extends Input {
 			}
 
 			return html()->e( 'div', [ 'class' => 'gh-form-row' ], [
-				html()->e( 'div', [ 'class' => 'gh-form-column col-2-of-3' ], html()->wrap( [
-					$this->get_label(),
-					html()->input( $phone )
-				],
-					'label',
-					[
-						'class' => 'gh-input-label'
-					]
-				) ),
-				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], html()->wrap( [
-					__( 'Ext.', 'groundhogg' ),
-					html()->input( $ext )
-				],
-					'label',
-					[
-						'class' => 'gh-input-label'
-					]
-				) ),
+				html()->e( 'div', [ 'class' => 'gh-form-column col-2-of-3' ], [
+					html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+						html()->e( 'label', [
+							'class' => 'gh-input-label',
+							'for'   => $this->get_id(),
+						], $this->get_label() ),
+						$phone_input
+					] )
+				] ),
+				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], [
+					html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+						html()->e( 'label', [
+							'class' => 'gh-input-label',
+							'for'   => $this->get_id(),
+						], __( 'Ext.' ) ),
+						$ext_input
+					] )
+				] ),
 			] );
 		}
 
 		// No label, do not wrap in label element.
 		if ( ! $this->has_label() ) {
-			return html()->input( $phone );
+			return $phone_input;
 		}
 
-		return html()->wrap( [
-			$this->get_label(),
-			html()->input( $phone )
-		],
-			'label',
-			[
-				'class' => 'gh-input-label'
-			]
-		);
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$phone_input
+		] );
 	}
 
 	/**

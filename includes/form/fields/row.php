@@ -44,7 +44,7 @@ class Row extends Field {
 	public function render() {
 		return html()->wrap( do_shortcode( $this->get_content() ), 'div', [
 			'id'    => $this->get_id(),
-			'class' => sprintf( 'gh-form-row clearfix %s', $this->get_classes() )
+			'class' => sprintf( 'gh-form-row %s', $this->get_classes() )
 		] );
 	}
 

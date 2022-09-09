@@ -2067,7 +2067,7 @@ class Contact_Query {
 						], $query );
 				}
 
-				return apply_filters( 'groundhogg/query/is_marketable_clause',  $clause );
+				return apply_filters( 'groundhogg/query/is_marketable_clause', $clause );
 
 			case 'no':
 
@@ -2096,7 +2096,7 @@ class Contact_Query {
 						], $query ) );
 				}
 
-				return apply_filters( 'groundhogg/query/is_not_marketable_clause',  $clause );
+				return apply_filters( 'groundhogg/query/is_not_marketable_clause', $clause );
 		}
 	}
 
@@ -2703,17 +2703,71 @@ class Contact_Query {
 	 */
 	public static function filter_meta( $filter_vars, $query ) {
 
+		global $wpdb;
+
 		$filter_vars = wp_parse_args( $filter_vars, [
 			'meta'    => '',
-			'compare' => '',
+			'compare' => 'equals',
 			'value'   => ''
 		] );
 
 		$meta_table_name = get_db( 'contactmeta' )->table_name;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
-		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
+		$clause1         = self::generic_text_compare( 'meta.meta_key', '=', $filter_vars['meta'] );
+		$value           = sanitize_text_field( $filter_vars['value'] );
+		$column          = 'meta.meta_value';
+		$compare         = $filter_vars['compare'];
 
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'equals':
+			case '=':
+			case '!=':
+			case 'not_equals':
+				$clause2 = sprintf( "%s = '%s'", $column, $value );
+				break;
+			case 'contains':
+			case 'not_contains':
+				$clause2 = sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				break;
+			case 'starts_with':
+			case 'begins_with':
+			case 'does_not_start_with':
+				$clause2 = sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
+				break;
+			case 'ends_with':
+			case 'does_not_end_with':
+				$clause2 = sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
+				break;
+			case 'empty':
+			case 'not_empty':
+				$clause2 = sprintf( "%s != ''", $column );
+				break;
+			case 'regex':
+				$clause2 = sprintf( "%s REGEXP BINARY '%s'", $column, $value );
+				break;
+			case 'less_than':
+				$clause2 = sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+				break;
+			case 'greater_than':
+				$clause2 = sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+				break;
+			case 'greater_than_or_equal_to':
+				$clause2 = sprintf( "%s >= %s", $column, $value );
+				break;
+			case 'less_than_or_equal_to':
+				$clause2 = sprintf( "%s <= %s", $column, $value );
+				break;
+		}
+
+		$IN_OR_NOT = in_array( $compare, [
+			'not_equals',
+			'not_contains',
+			'does_not_start_with',
+			'does_not_end_with',
+			'empty',
+		] ) ? 'NOT IN' : 'IN';
+
+		return "{$query->table_name}.ID $IN_OR_NOT ( select meta.contact_id FROM {$meta_table_name} as meta WHERE {$clause1} AND {$clause2} ) ";
 	}
 
 	/**

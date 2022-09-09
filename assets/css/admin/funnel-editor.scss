@@ -259,7 +259,7 @@ html {
     //margin-left: auto;
     display: flex;
     gap: 10px;
-    align-items: center;
+    align-items: stretch;
 
     .save-button {
       gap: 7px;
@@ -700,7 +700,6 @@ button.button.save-button {
 #postbox-container-2 {
   /*padding: 10px 20px;*/
   box-sizing: border-box;
-  overflow: auto;
 }
 
 /*.saving #poststuff{*/

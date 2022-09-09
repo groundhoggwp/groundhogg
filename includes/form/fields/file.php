@@ -3,6 +3,7 @@
 namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Plugin;
+use function Groundhogg\html;
 
 /**
  * Created by PhpStorm.
@@ -68,19 +69,34 @@ class File extends Input {
 	}
 
 	public function render() {
-		return sprintf(
-			'<label class="gh-input-label">%1$s <input type="%2$s" name="%3$s" id="%4$s" class="gh-input %5$s" value="%6$s" placeholder="%7$s" title="%8$s" accept="%9$s" %10$s %11$s></label>',
-			$this->get_label(),
-			$this->get_type(),
-			$this->get_name(),
-			$this->get_id(),
-			$this->get_classes(),
-			$this->get_value(),
-			$this->get_placeholder(),
-			$this->get_title(),
-			$this->get_file_types(),
-			$this->get_attributes(),
-			$this->is_required() ? 'required' : ''
-		);
+
+		$atts = [
+			'type'        => 'file',
+			'name'        => $this->get_name(),
+			'id'          => $this->get_id(),
+			'class'       => $this->get_classes() . ' gh-input',
+			'value'       => $this->get_value(),
+			'placeholder' => $this->get_placeholder(),
+			'title'       => $this->get_title(),
+			'required'    => $this->is_required(),
+			'accept'      => $this->get_file_types()
+		];
+
+		$input = html()->input( $atts );
+
+		// No label, do not wrap in label element.
+		if ( ! $this->has_label() ) {
+			return $input;
+		}
+
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input
+		] );
 	}
 }

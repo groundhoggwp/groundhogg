@@ -32,7 +32,7 @@ abstract class Input extends Field {
 	public static function save_config( $html, $form ) {
 		$config = self::$configurations[ $form->get_id() ];
 
-		if ( $config ){
+		if ( $config ) {
 			$form->step->update_meta( 'config', $config );
 		}
 
@@ -114,7 +114,7 @@ abstract class Input extends Field {
 	/**
 	 * Return the value that will be the final value.
 	 *
-	 * @param $input string|array
+	 * @param $input  string|array
 	 * @param $config array
 	 *
 	 * @return string
@@ -161,7 +161,7 @@ abstract class Input extends Field {
 	}
 
 	/**
-	 * @param $atts array the shortcode atts
+	 * @param        $atts array the shortcode atts
 	 * @param string $content
 	 *
 	 * @return string
@@ -230,20 +230,22 @@ abstract class Input extends Field {
 			'pattern'     => $this->get_att( 'pattern' )
 		];
 
+		$input = html()->input( $atts );
+
 		// No label, do not wrap in label element.
 		if ( ! $this->has_label() ) {
-			return html()->input( $atts );
+			return $input;
 		}
 
-		return html()->wrap( [
-			$this->get_label(),
-			html()->input( $atts )
-		],
-			'label',
-			[
-				'class' => 'gh-input-label'
-			]
-		);
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input
+		] );
 
 	}
 }

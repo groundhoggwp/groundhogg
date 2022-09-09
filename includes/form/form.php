@@ -5,6 +5,7 @@ namespace Groundhogg\Form;
 use Groundhogg\Form\Fields\Birthday;
 use Groundhogg\Form\Fields\Custom_Field;
 use Groundhogg\Step;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\do_replacements;
 use function Groundhogg\encrypt;
@@ -152,9 +153,8 @@ class Form implements \JsonSerializable {
 
 	public function get_iframe_embed_code() {
 		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
-		$script          = sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
 
-		return $script;
+		return sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
 	}
 
 	public function get_submission_url() {
@@ -169,28 +169,12 @@ class Form implements \JsonSerializable {
 		return $this->step->is_active();
 	}
 
-	protected function get_honey_pot_code() {
-		// Honey Pot validation.
-		$honeypot = html()->input( [
-			'type'         => 'password',
-			'name'         => 'your_password',
-			'id'           => 'your_password',
-			'title'        => 'Password',
-			'class'        => '',
-			'value'        => '',
-			'autocomplete' => 'off',
-			'tabindex'     => '-1'
-		] );
-
-		$honeypot = html()->wrap( $honeypot, 'div', [
-			'class' => 'your-password h0n3yp0t',
-			'style' => [ 'display' => 'none' ]
-		] );
-
-		return $honeypot;
-	}
-
 	public function get_html_embed_code() {
+
+		if ( ! $this->step->exists() ) {
+			return '';
+		}
+
 		$form = html()->e( 'link', [
 			'rel'  => 'stylesheet',
 			'href' => GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css'
@@ -216,37 +200,18 @@ class Form implements \JsonSerializable {
 
 		$step = new Step( $this->get_id() );
 
-		if ( ! $step ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
-		}
-
-//        do_action( 'groundhogg/form/embed/before', $this );
-
-		$content = do_shortcode( $step->get_meta( 'form' ) );
-
-//        do_action( 'groundhogg/form/embed/after', $this );
-
-		if ( empty( $content ) ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
-		}
-
-		$form .= $content;
+		$form .= do_shortcode( $step->get_meta( 'form' ) );
 
 		$form .= '</form>';
 
 		$form .= '</div>';
 
-		$form = apply_filters( 'groundhogg/form/embed', $form, $this );
-
-		return $form;
+		return apply_filters( 'groundhogg/form/embed', $form, $this );
 	}
 
 
 	/**
 	 * Do the shortcode
-	 *
-	 * @param $atts
-	 * @param $content
 	 *
 	 * @return string
 	 */
@@ -290,33 +255,22 @@ class Form implements \JsonSerializable {
 			$form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
 		}
 
-		if ( ! $this->step ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
-		}
-
-//        do_action( 'groundhogg/form/shortcode/before', $this );
-
-		$content = do_shortcode( do_replacements( $this->step->get_meta( 'form' ) ) );
-
-//        do_action( 'groundhogg/form/shortcode/after', $this );
-
-		if ( empty( $content ) ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
-		}
-
-		$form .= $content;
+		$form .= '<div class="form-fields">';
+		$form .= do_shortcode( do_replacements( $this->step->get_meta( 'form' ) ) );
+		$form .= '</div>';
 
 		$form .= '</form>';
 
 		if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ) {
-			$form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $this->step->get_funnel_id() ), __( '(Edit Form)' ) );
+			$form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_page_url( 'gh_funnels', [
+				'action' => 'edit',
+				'funnel' => $this->step->get_funnel_id(),
+			], $this->step->get_id() ), __( 'Edit Form' ) );
 		}
 
 		$form .= '</div>';
 
-		$form = apply_filters( 'groundhogg/form/shortcode', $form, $this );
-
-		return $form;
+		return apply_filters( 'groundhogg/form/shortcode', $form, $this );
 	}
 
 	/**

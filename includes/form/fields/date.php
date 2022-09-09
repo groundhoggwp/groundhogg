@@ -91,18 +91,30 @@ class Date extends Input {
 
 		$script = ob_get_clean();
 
-		return html()->e( 'label', [], [
-			$this->get_label(),
-			html()->input( [
-				'type'        => $this->get_type(),
-				'id'          => $this->get_id(),
-				'name'        => $this->get_name(),
-				'class'       => 'gh-input ' . $this->get_classes() . ' ' . $uniq_id,
-				'placeholder' => $this->get_placeholder(),
-				'title'       => $this->get_title(),
-				'required'    => $this->is_required(),
-			] ),
-			$script,
+		$input = html()->input( [
+			'type'        => $this->get_type(),
+			'id'          => $this->get_id(),
+			'name'        => $this->get_name(),
+			'class'       => 'gh-input ' . $this->get_classes() . ' ' . $uniq_id,
+			'placeholder' => $this->get_placeholder(),
+			'title'       => $this->get_title(),
+			'required'    => $this->is_required(),
+		] );
+
+		// No label, do not wrap in label element.
+		if ( ! $this->has_label() ) {
+			return $input;
+		}
+
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input,
+            $script
 		] );
 	}
 }

@@ -70,14 +70,21 @@ class Custom_Field extends Input {
 			return '';
 		}
 
+		$input = $this->render_field();
+
 		// No label, do not wrap in label element.
 		if ( ! $this->has_label() ) {
-			return $this->render_field();
+			return $input;
 		}
 
-		return html()->e( 'div', [], [
-			html()->e( 'label', [ 'for' => $this->get_id() ], $this->get_label() ),
-			$this->render_field()
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input
 		] );
 
 	}

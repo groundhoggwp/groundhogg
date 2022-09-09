@@ -29,7 +29,7 @@ class Address extends Input {
 	/**
 	 * Return the value that will be the final value.
 	 *
-	 * @param $input string|array
+	 * @param $input  string|array
 	 * @param $config array
 	 *
 	 * @return string
@@ -98,11 +98,14 @@ class Address extends Input {
 			'required'    => $this->is_required(),
 		];
 
-		return html()->e( 'div', [ 'class' => 'gh-address clearfix' ], [
+		return html()->e( 'div', [ 'class' => 'form-fields address-fields' ], [
 			html()->e( 'div', [ 'class' => 'gh-form-row' ], [
-				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ],
-					html()->e( 'div', [ 'class' => 'gh-form-field' ],
-						html()->e( 'label', [ 'class' => 'gh-input-label' ], $this->get_label() . ' ' . html()->input( $street_address_1 ) ) ) )
+				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ], [
+					html()->e('div', ['class' => 'form-field-with-label'], [
+						html()->e('label', [], $this->get_label() ),
+						html()->input( $street_address_1 )
+					] )
+				] )
 			] ),
 			html()->e( 'div', [ 'class' => 'gh-form-row' ], [
 				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ], html()->input( $street_address_2 ) ),

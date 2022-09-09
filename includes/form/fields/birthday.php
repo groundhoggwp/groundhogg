@@ -91,7 +91,7 @@ class Birthday extends Input {
 
 		$html = html()->e( 'div', [ 'class' => $this->get_classes(), 'id' => $this->get_id() ], [
 			html()->e( 'label', [ 'class' => 'gh-input-label' ], $this->get_label() ),
-			html()->e( 'div', [ 'class' => 'gh-form-row clearfix' ], [
+			html()->e( 'div', [ 'class' => 'gh-form-row' ], [
 				// Year
 				html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], [
 					html()->dropdown( [

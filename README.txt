@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.2
+Stable tag: 2.7.2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.2 (2022-09-05) =
+= 2.7.2.1 (2022-09-09) =
+* TWEAKED Some CSS issues in the funnel builder
+* TWEAKED Form CSS uses grid and flexbox for improved mobile responsiveness
+* TWEAKED Custom meta filter has better handling for missing or empty meta keys when the compares selection is a negative
+
+= 2.7.2 (2022-09-08) =
 * ADDED The **default FROM address** is now an option when selecting email FROM address in the email editor.
 * IMPROVED The **Apply Note** action now has a rich text editor in the funnel
 * IMPROVED **Admin Notification** action now has a rich text editor, emails are sent in HTML format.

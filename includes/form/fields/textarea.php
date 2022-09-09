@@ -69,15 +69,21 @@ class Textarea extends Input {
 			'cols'        => $this->get_att( 'cols', false )
 		];
 
-		return html()->wrap( [
-			$this->get_label(),
-			"&nbsp;",
-			html()->textarea( $atts )
-		],
-			'label',
-			[
-				'class' => 'gh-input-label'
-			]
-		);
+		$input = html()->textarea( $atts );
+
+		// No label, do not wrap in label element.
+		if ( ! $this->has_label() ) {
+			return $input;
+		}
+
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input
+		] );
 	}
 }

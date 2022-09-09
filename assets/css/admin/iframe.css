@@ -6,8 +6,8 @@ html.iframed {
     margin: 0;
 }
 
-html.iframed body.wp-admin .page-title-action,
-html.iframed body.wp-admin .wp-heading-inline,
+html.iframed body.wp-admin #wpwrap #wpbody #wpbody-content .page-title-action,
+html.iframed body.wp-admin #wpwrap #wpbody #wpbody-content .wp-heading-inline,
 html.iframed body.wp-admin #wpadminbar,
 html.iframed body.wp-admin #adminmenuwrap,
 html.iframed body.wp-admin #adminmenuback,

@@ -157,7 +157,7 @@ $funnel = new Funnel( $funnel_id );
             </div>
         </div>
     </div>
-    <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+    <div id='poststuff' class="wpgh-funnel-builder">
         <div id="post-body">
             <div id="postbox-container-1" class="sidebar">
                 <div class="fixed-inside">

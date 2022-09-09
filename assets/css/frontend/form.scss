@@ -1,0 +1,177 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow-50: rgba(255, 238, 88, 0.50);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$benchmark-orange-25: rgba(245, 129, 21, 0.25);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+$background-color: #F6F9FB;
+
+.gh-form-wrapper {
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gh-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas:
+    ". . . . . . . . . . . .";
+    gap: 10px;
+
+    > .gh-form-column {
+
+      &.col-1-of-1 {
+        grid-column: span 12;
+      }
+
+      &.col-1-of-2 {
+        grid-column: span 6;
+      }
+
+      &.col-1-of-3 {
+        grid-column: span 4;
+      }
+
+      &.col-1-of-4 {
+        grid-column: span 3;
+      }
+
+      &.col-2-of-3 {
+        grid-column: span 8;
+      }
+
+      &.col-3-of-4 {
+        grid-column: span 9;
+      }
+    }
+  }
+
+  label {
+    display: block;
+  }
+
+  .gh-input {
+    width: 100%;
+    display: block;
+  }
+
+  input[type=file].gh-file-uploader {
+    width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+    background: $primary-dark-5;
+    border: 3px dashed $primary-dark-50;
+    text-align: center;
+    border-radius: 5px;
+  }
+
+  .gh-message-wrapper {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 4px;
+
+    &.gh-form-errors-wrapper {
+      color: darken( $error-red, 20 );
+      background-color: $error-red-10;
+      border-color: $error-red-50;
+      margin-bottom: 20px;
+
+      ul.gh-form-errors {
+        padding-left: 20px;
+        margin: 0;
+      }
+    }
+
+    &.gh-form-success-wrapper {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      margin-top: 20px;
+    }
+
+    &.gh-form-warning-wrapper {
+      color: #8a6d3b;
+      background-color: #fcf8e3;
+      border-color: #faebcc;
+    }
+
+  }
+
+  .gh-form-edit-link {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    transition: 0.4s;
+  }
+
+  &:hover {
+    .gh-form-edit-link {
+      visibility: visible;
+      background: #FFFFFF;
+      opacity: 1;
+      padding: 5px;
+      transition: 0.4s;
+    }
+  }
+
+  #gdpr-checkboxes-wrap label {
+    display: block;
+  }
+
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+
+  .gh-form-wrapper {
+    > form.gh-form {
+      > .form-fields {
+        > .gh-form-row {
+          @include flex-column();
+
+          .address-fields {
+            .gh-form-row {
+              @include flex-column();
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+
+}

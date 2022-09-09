@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
@@ -148,35 +149,34 @@ class Dropdown extends Input {
 
 	public function render() {
 
-		$optionHTML = sprintf( "<option value=''>%s</option>", $this->get_default() );
+		$atts = [
+			'name'        => $this->get_name(),
+			'id'          => $this->get_id(),
+			'class'       => $this->get_classes() . ' gh-input',
+			'placeholder' => $this->get_placeholder(),
+			'title'       => $this->get_title(),
+			'required'    => $this->is_required(),
+			'multiple'    => $this->is_multiple(),
+			'options'     => array_combine( $this->get_options(), $this->get_options() ),
+			'option_none' => $this->get_default(),
+			'selected'    => $this->get_value(),
+		];
 
-		$options = $this->get_options();
+		$input = html()->dropdown( $atts );
 
-		foreach ( $options as $i => $value ) {
-
-			$selected = '';
-
-			if ( ! $this->is_multiple() && $this->get_value() ) {
-				$selected = $this->get_default() === $value ? 'selected' : '';
-				$selected = $this->get_value() === $value ? 'selected' : $selected;
-			} else if ( is_array( $this->get_value() ) ) {
-				$selected = in_array( $value, $this->get_value() ) ? 'selected' : '';
-			}
-
-			$optionHTML .= sprintf( '<option value="%1$s" %2$s>%3$s</option>', esc_attr( $value ), $selected, $value );
+		// No label, do not wrap in label element.
+		if ( ! $this->has_label() ) {
+			return $input;
 		}
 
-		return sprintf(
-			"<label class='gh-input-label'>%s <select name='%s' id='%s' class='gh-input %s' title='%s' %s %s %s>%s</select></label>",
-			$this->get_label(),
-			$this->get_name() . ( $this->is_multiple() ? '[]' : '' ),
-			$this->get_id(),
-			$this->get_classes(),
-			$this->get_title(),
-			$this->get_attributes(),
-			$this->is_required() ? 'required' : '',
-			$this->is_multiple() ? 'multiple' : '',
-			$optionHTML
-		);
+		$label = html()->e( 'label', [
+			'class' => 'gh-input-label',
+			'for'   => $this->get_id(),
+		], $this->get_label() );
+
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			$label,
+			$input
+		] );
 	}
 }

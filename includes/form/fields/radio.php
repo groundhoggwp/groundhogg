@@ -3,6 +3,7 @@
 namespace Groundhogg\Form\Fields;
 
 use function Groundhogg\get_array_var;
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
@@ -98,25 +99,25 @@ class Radio extends Dropdown {
 	 * @return string
 	 */
 	public function render() {
-		$options = $this->get_options();
 
-		$optionHTML = sprintf( "<label class='gh-input-label'>%s</label>", esc_html( $this->get_label() ) );
+		$inputs = [];
 
-		foreach ( $options as $i => $value ) {
-
-			$checked = $this->get_value() === $value ? 'checked' : '';
-
-			$optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s %s> %s</label></div>",
-				$this->get_classes(),
-				$this->get_name(),
-				$this->get_id() . '-' . $i,
-				esc_attr( $value ),
-				$this->is_required() ? 'required' : '',
-				$checked,
-				$value
-			);
+		foreach ( $this->get_options() as $i => $option ) {
+			$inputs[] = html()->checkbox( [
+				'label'    => $option,
+				'type'     => 'radio',
+				'name'     => $this->get_name(),
+				'id'       => $this->get_id() . '-' . $i,
+				'class'    => 'gh-radio-button',
+				'value'    => $option,
+				'checked'  => $option == $this->get_value(),
+				'required' => $this->is_required()
+			] );
 		}
 
-		return $optionHTML;
+		return html()->e( 'div', [ 'class' => 'form-field-with-label' ], [
+			html()->e( 'label', [ 'class' => 'gh-radio-label' ], $this->get_label() ),
+			html()->e( 'div', [ 'class' => 'radio-group' ], $inputs )
+		] );
 	}
 }

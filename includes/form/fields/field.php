@@ -135,7 +135,7 @@ abstract class Field {
 	 * @return string
 	 */
 	protected function field_wrap( $content ) {
-		return sprintf( "<div class='gh-form-field'>%s</div>", $content );
+		return $content;
 	}
 
 	/**
