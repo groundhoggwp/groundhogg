@@ -8,6 +8,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -64,6 +65,41 @@ class Funnels_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+	}
+
+	public function read( WP_REST_Request $request ) {
+
+		$query = $request->get_params();
+
+		$query = wp_parse_args( $query, [
+			'select'  => '*',
+			'orderby' => $this->get_primary_key(),
+			'order'   => 'DESC',
+			'limit'   => 25,
+		] );
+
+		if ( $request->has_param( 'step_types' ) ) {
+			$step_types = array_map( 'sanitize_key', $request->get_param( 'step_types' ) );
+
+			$query['ID'] = get_db( 'steps' )->get_sql( [
+				'select' => 'DISTINCT(funnel_id)',
+				'where'  => [
+					[ 'step_type', 'IN', $step_types ]
+				]
+			] );
+		}
+
+		$total = $this->get_db_table()->count( $query );
+		$items = $this->get_db_table()->query( $query );
+
+		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
+
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $total,
+			'items'       => $items
+		] );
+
+
 	}
 
 	/**

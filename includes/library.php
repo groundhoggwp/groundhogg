@@ -2,10 +2,11 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Steps\Manager;
+
 class Library extends Supports_Errors {
 
-	const PROXY_URL = 'https://library.groundhogg.io/wp-json/gh/v3/';
-	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' library-manager';
+	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
 
 	/**
 	 * Flush cache templates
@@ -27,12 +28,12 @@ class Library extends Supports_Errors {
 	 */
 	public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] ) {
 
-		$url = self::PROXY_URL . $endpoint;
+		$url = self::LIBRARY_URL . $endpoint;
 
 		$result = remote_post_json( $url, $body, $method, $headers );
 
 		if ( is_wp_error( $result ) ) {
-			$this->add_error( $result );
+			notices()->add( $result );
 		}
 
 		return $result;
@@ -44,17 +45,19 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_templates() {
-		$funnels = get_transient( 'groundhogg_funnel_templates' );
+//		$funnels = get_transient( 'groundhogg_funnel_templates' );
+//
+//		if ( ! empty( $funnels ) ) {
+//			return $funnels;
+//		}
 
-		if ( ! empty( $funnels ) ) {
-			return $funnels;
-		}
+		$step_steps = array_keys( Plugin::instance()->step_manager->elements );
 
 		$response = $this->request( 'funnels/', [
-			'installed' => Extension::$extension_ids
+			'step_types' => $step_steps
 		], 'GET' );
 
-		$funnels = get_array_var( $response, 'funnels', [] );
+		$funnels = get_array_var( $response, 'item', [] );
 
 		set_transient( 'groundhogg_funnel_templates', $funnels, DAY_IN_SECONDS );
 
@@ -69,8 +72,8 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_template( $id ) {
-		$response = $this->request( 'funnels/get', [ 'id' => $id ], 'GET' );
-		return get_array_var( $response, 'funnel', [] );
+		$response = $this->request( 'funnels/' . $id, [], 'GET' );
+		return get_array_var( $response, 'item', [] );
 	}
 
 	/**

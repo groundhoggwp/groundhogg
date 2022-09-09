@@ -3606,7 +3606,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		$data['url']     = $url;
 		$data['method']  = $method;
 		$data['headers'] = $headers;
-		$data['body']    = json_decode( $body );
+		$data['body']    = $body;
 
 		$error->add_data( $data );
 
