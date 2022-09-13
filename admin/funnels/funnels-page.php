@@ -18,6 +18,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\iframe_compat;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
@@ -202,7 +203,7 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
 				break;
 			case 'funnel_settings':
-				wp_enqueue_style( 'groundhogg-admin-iframe' );
+				iframe_compat();
 				break;
 			case 'add':
 				break;

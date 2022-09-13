@@ -69,26 +69,30 @@ $log_item = new Email_Log_Item( $log_item_id );
 				</tr>
 				</tbody>
 			</table>
+            <h2><?php _e( 'Content', 'groundhogg' ); ?></h2>
 			<div id="content">
-				<h2><?php _e( 'Content', 'groundhogg' ); ?></h2>
 
 				<iframe id="body-iframe"
 				        src="<?php echo \Groundhogg\admin_page_url( 'gh_events', [
 					        'action' => 'view_log_content',
 					        'log'    => $log_item_id
-				        ] ); ?>"></iframe>
+				        ] ); ?>"
+                onload="window.setFrameHeightToContentHeight( this )"></iframe>
 			</div>
-			<div id="headers">
-				<h2><?php _e( 'Headers', 'groundhogg' ); ?></h2>
+            <h2><?php _e( 'Headers', 'groundhogg' ); ?></h2>
+            <div id="headers">
+                <table>
+                    <tbody>
+                    <?php
+                    foreach ( $log_item->headers as $header ):
+                        ?><tr>
+                        <td><pre><?php esc_html_e( $header[0] )?></pre></td>
+                        <td><pre><?php esc_html_e( $header[1] ); ?></pre></td>
+                    </tr><?php
 
-				<?php
-				$headers = "";
-				foreach ( $log_item->headers as $header ):
-					$headers .= sprintf( "%s: %s\n", $header[0], $header[1] );
-				endforeach; ?>
-
-				<textarea class="code" readonly rows="4"><?php esc_html_e( $headers ); ?></textarea>
-
+                    endforeach; ?>
+                    </tbody>
+                </table>
 			</div>
 
 		<?php endif; ?>

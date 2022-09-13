@@ -72,11 +72,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			wp_die( 'Invalid log item ID.' );
 		}
 
-		if ( preg_match( '/<html[^>]*>/', $log_item->content ) ) {
-			echo $log_item->content;
-		} else {
-			echo wpautop( esc_html( $log_item->content ) );
-		}
+        echo $log_item->content;
 
 		die();
 	}
@@ -105,10 +101,8 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_style( 'groundhogg-admin-email-log' );
 		wp_enqueue_script( 'groundhogg-admin-fullframe' );
 		wp_enqueue_script( 'groundhogg-admin-email-log' );
-
 	}
 
 	public function get_slug() {

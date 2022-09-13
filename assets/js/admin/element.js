@@ -1581,6 +1581,11 @@ ${ afterProgress() }`,
 
     window.addEventListener('keyup', e => {
       if (e.ctrlKey && e.shiftKey && e.which == 219) {
+
+        if ( Insert.to_mce ){
+          return
+        }
+
         let $el = $('<div id="rep-here"></div>')
         $el.insertAfter(e.target)
         openWidget({
@@ -2444,6 +2449,7 @@ ${ afterProgress() }`,
     spinner,
     el,
     isNumeric,
+    replacementsWidget
   }
 
 } )(jQuery)

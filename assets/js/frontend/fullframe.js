@@ -17,7 +17,7 @@
 
   function initAllFrames () {
 
-    document.querySelectorAll('iframe:not(.gh-from-iframe)').forEach((frame, i) => {
+    document.querySelectorAll('iframe:not(.gh-form-iframe)').forEach((frame, i) => {
 
       let src = frame.src || frame.dataset.src
 
@@ -25,10 +25,14 @@
       if (src && src.match(/\/gh\//) && isSameOrigin(src)) {
         frame.id = `gh-frame-${i}`
         frame.classList.add('gh')
-        frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
+        setHeightToContent( frame )
         postFrameMessage( frame )
       }
     })
+  }
+
+  function setHeightToContent ( iframe ){
+    iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px'
   }
 
   function postFrameMessage ( frame ) {
@@ -62,5 +66,6 @@
   addEvent('resize', resizeAllFrames)
 
   window.fullFrame = initAllFrames
+  window.setFrameHeightToContentHeight = setHeightToContent
 
 })()

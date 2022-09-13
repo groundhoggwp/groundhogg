@@ -1,9 +1,9 @@
-(function ($, frame, email) {
+(function ($, email) {
 
     $('#email-form').on('submit', function () {
         $('.spinner').css('visibility', 'visible');
 
-        if (IsFrame.inFrame() && typeof parent.EmailStep != "undefined") {
+        if ( window.self !== window.top ) {
             parent.EmailStep.changesSaved = true;
             parent.EmailStep.newEmailId = email.email_id;
         }
@@ -37,4 +37,4 @@
     operation(header_table);
 
 
-})(jQuery, IsFrame, Email);
+})(jQuery, Email);

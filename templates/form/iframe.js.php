@@ -69,7 +69,7 @@ $form = new \Groundhogg\Form\Form( [
         } = form
 
         let id = `gh-form-${i}`
-        let iframeHTML = `<iframe id="${id}" class="gh-from-iframe" name="${name}" src="${src}" allowtransparency="" frameborder="0" scrolling="no" style="overflow:hidden; border:none; width:100%;">`
+        let iframeHTML = `<iframe id="${id}" class="gh-form-iframe" name="${name}" src="${src}" allowtransparency="" frameborder="0" scrolling="no" style="overflow:hidden; border:none; width:100%;">`
         let container = document.createElement('div')
         container.classList.add('gh-form-iframe-container')
         container.innerHTML = iframeHTML

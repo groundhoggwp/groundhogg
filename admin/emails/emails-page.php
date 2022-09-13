@@ -99,8 +99,7 @@ class Emails_Page extends Admin_Page {
 				return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
 			} );
 
-			wp_enqueue_script( 'groundhogg-admin-iframe' );
-			wp_enqueue_style( 'groundhogg-admin-iframe' );
+			Groundhogg\iframe_compat();
 
 			wp_enqueue_script( 'groundhogg-admin-email-preview' );
 			wp_enqueue_style( 'groundhogg-admin-email-preview' );

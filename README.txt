@@ -327,6 +327,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 2.7.3 (2022-09-12) =
 * ADDED There is now a *Start From Scratch* button on the add funnel screen
+* ADDED Insert replacement code shortcut `CTRL + Shift + {`
 * IMPROVED When importing funnel templates...
  * Steps with *skip to* functionally will correctly import their desired behaviour relative to other steps.
   * Loop action
@@ -340,6 +341,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED show 404 errors on the managed page for non-existent resources
 * TWEAKED When sending an email template to a contact manually, process the event right away and report event failures
 * TWEAKED Disable the WordPress emoji to image conversion feature while sending/editing emails
+* FIXED Email log preview UI is now readable
+* FIXED Email editor toolbar fixed to low when scrolling in the modal
 
 = 2.7.2.1 (2022-09-09) =
 * TWEAKED Some CSS issues in the funnel builder

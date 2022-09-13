@@ -1,4 +1,7 @@
 (function ($){
+
+  const { loadingModal } = Groundhogg.element
+
   var $doc = $(document);
 
   var $portal = $('#modal-log-details-view');
@@ -6,6 +9,8 @@
   $doc.on('click', 'a.view-email-log', function (e) {
 
     e.preventDefault();
+
+    let { close } = loadingModal()
 
     var $e = $(e.target);
 
@@ -18,7 +23,7 @@
 
         $portal.html( response.data.content );
 
-        fullFrame();
+        close()
       },
     });
 

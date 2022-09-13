@@ -272,7 +272,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					</div>
 				<?php endif; ?>
 				<div id="header-wrap">
-					<h3><?php _e( 'Custom Headers', 'groundhogg-pro' ); ?></h3>
+					<h3><?php _e( 'Custom Headers', 'groundhogg' ); ?></h3>
 					<p><?php printf( __( 'You can define custom email headers and override existing ones. For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>', 'groundhogg' ), white_labeled_name() ); ?></p>
 					<?php
 					$headers        = [];
@@ -288,16 +288,18 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 							html()->input( [
 								'name'  => 'header_key[]',
 								'class' => 'input',
-								'value' => $key
+								'value' => $key,
+                                'placeholder' => 'X-Custom-Header'
 							] ),
 							html()->input( [
 								'name'  => 'header_value[]',
 								'class' => 'input',
-								'value' => $value
+								'value' => $value,
+                                'placeholder' => 'Custom Value'
 							] ),
-							"<span class=\"row-actions\">
-                        <span class=\"add\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"addmeta\"><span class=\"dashicons dashicons-plus\"></span></a></span> |
-                        <span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span>
+							"<span class=\"display-flex\">
+                        <a href=\"javascript:void(0)\" class=\"gh-button secondary text icon addmeta\"><span class=\"dashicons dashicons-plus\"></span></a>
+                        <a href=\"javascript:void(0)\" class=\"gh-button danger text icon deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a>
                     </span>"
 						];
 					endforeach;

@@ -1034,6 +1034,38 @@ button.gh-submit.loud {
   background-color: #102640;
 }
 
+.gh-legacy-modal #modal-log-details-view {
+  width: 500px;
+  padding: 30px;
+}
+.gh-legacy-modal #modal-log-details-view iframe {
+  width: 100%;
+}
+.gh-legacy-modal #modal-log-details-view .notice {
+  margin: 0;
+}
+.gh-legacy-modal #modal-log-details-view h2 {
+  margin: 0;
+}
+.gh-legacy-modal #modal-log-details-view .groundhogg-content-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table {
+  width: 100%;
+}
+.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table th {
+  text-align: left;
+  width: 100px;
+}
+.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table pre {
+  margin: 0;
+}
+.gh-legacy-modal #modal-log-details-view .groundhogg-content-box #headers {
+  width: 100%;
+  overflow: auto;
+}
 .gh-legacy-modal h3.replacements-group {
   padding-left: 20px;
 }

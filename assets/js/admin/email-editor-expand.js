@@ -3,7 +3,14 @@
  */
 
 ( function( window, $, undefined ) {
+
     'use strict';
+
+    const {
+        replacementsWidget
+    } = Groundhogg.element
+
+    let MceReplacementsWidget
 
     var $window = $( window ),
         $document = $( document ),
@@ -143,7 +150,7 @@
             heights = {
                 windowHeight: $window.height(),
                 windowWidth: windowWidth,
-                adminBarHeight: ( windowWidth > 600 ? $adminBar.outerHeight() : 0 ),
+                adminBarHeight: document.querySelector( 'html' ).classList.contains('iframed') ? 0 : ( windowWidth > 600 ? $adminBar.outerHeight() : 0 ) ,
                 toolsHeight: $tools.outerHeight() || 0,
                 menuBarHeight: $menuBar.outerHeight() || 0,
                 visualTopHeight: $visualTop.outerHeight() || 0,
@@ -245,6 +252,27 @@
              */
             function mceKeyup( event ) {
                 var key = event.keyCode;
+
+
+                if (event.type == 'keyup' && event.ctrlKey && event.shiftKey && event.which == 219) {
+
+                    if (MceReplacementsWidget && MceReplacementsWidget.isOpen()) {
+                        return
+                    }
+
+                    editor.execCommand('mceInsertContent', false, '<span id="rep-here">{</span>')
+
+                    MceReplacementsWidget = replacementsWidget({
+                        target: editor.iframeElement.contentWindow.document.getElementById('rep-here'),
+                        offset: editor.iframeElement.getBoundingClientRect(),
+                        onClose: () => {
+                            editor.dom.remove('rep-here')
+                        },
+                    })
+
+                    MceReplacementsWidget.mount()
+                    return
+                }
 
                 // Bail on special keys. Key code 47 is a /
                 if ( key <= 47 && ! ( key === VK.SPACEBAR || key === VK.ENTER || key === VK.DELETE || key === VK.BACKSPACE || key === VK.UP || key === VK.LEFT || key === VK.DOWN || key === VK.UP ) ) {

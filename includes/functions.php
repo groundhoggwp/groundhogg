@@ -786,7 +786,6 @@ function dequeue_wc_css_compat() {
  * Enqueue any iframe compat scripts
  */
 function iframe_compat() {
-	wp_enqueue_script( 'groundhogg-admin-iframe' );
 	wp_enqueue_style( 'groundhogg-admin-iframe' );
 }
 
@@ -6594,7 +6593,7 @@ function is_copyable_file( $file ) {
 
 /**
  * Process events in the event queue
- * Pass a contact to only process events for a specific contact
+ * Pass a contact to only process evenAts for a specific contact
  *
  * @param $contacts Contact|Contact[]
  *
