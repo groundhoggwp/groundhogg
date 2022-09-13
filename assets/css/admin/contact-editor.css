@@ -273,6 +273,7 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-info {
   font-size: 15px;
   margin-bottom: 4px;
+  word-break: break-word;
 }
 #activity-timeline li.activity-item .event-extra,
 #activity-timeline li.activity-item .diff-time {
@@ -335,6 +336,9 @@ code.meta-replacement-code {
   .contact-record {
     flex-direction: column;
     gap: 20px;
+  }
+  .contact-record .contact-editor-wrap {
+    padding-right: 0;
   }
 }
 @media only screen and (max-width: 830px) {

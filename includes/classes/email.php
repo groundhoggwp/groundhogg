@@ -839,6 +839,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool|WP_Error
 	 */
 	public function send( $contact_id_or_email, $event = 0 ) {
+
 		// Clear any old previous errors.
 		$this->clear_errors();
 

@@ -492,7 +492,7 @@ class Event extends Base_Object {
 
 		$updated = $this->update( $args );
 
-		do_action( 'groundhogg/event/failed', $this );
+		do_action( 'groundhogg/event/failed', $this, $this->get_last_error() );
 
 		return $updated;
 	}

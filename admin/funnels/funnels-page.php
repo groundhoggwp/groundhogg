@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
@@ -115,7 +116,8 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-//		$this->setup_reporting();
+
+        add_disable_emojis_action();
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'view' ) {
 			add_action( 'admin_init', [ $this, 'redirect_to_add' ] );

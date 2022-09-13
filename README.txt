@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.2.1
+Stable tag: 2.7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -338,6 +338,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED The funnel library will now only show templates for which the necessary step types are actively registered
 * TWEAKED Forms & Link Click benchmarks will now show use a pretty slug when embedding. Old URLs will still work fine!
 * TWEAKED show 404 errors on the managed page for non-existent resources
+* TWEAKED When sending an email template to a contact manually, process the event right away and report event failures
+* TWEAKED Disable the WordPress emoji to image conversion feature while sending/editing emails
 
 = 2.7.2.1 (2022-09-09) =
 * TWEAKED Some CSS issues in the funnel builder

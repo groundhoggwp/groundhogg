@@ -20,6 +20,8 @@ status_header( 200 );
 header( 'Content-Type: text/html; charset=utf-8' );
 nocache_headers();
 
+disable_emojis();
+
 add_action( 'groundhogg/templates/email/head/after', function(){
 	?>
 <style>

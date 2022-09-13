@@ -40,6 +40,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
+        Groundhogg\add_disable_emojis_action();
 	}
 
 	public function admin_title( $admin_title, $title ) {
