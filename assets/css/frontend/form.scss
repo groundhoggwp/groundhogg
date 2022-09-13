@@ -107,6 +107,11 @@ $background-color: #F6F9FB;
       ul.gh-form-errors {
         padding-left: 20px;
         margin: 0;
+        list-style: disc;
+
+        li:last-child {
+          margin-bottom: 0;
+        }
       }
     }
 

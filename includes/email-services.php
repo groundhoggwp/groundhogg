@@ -1,5 +1,6 @@
 <?php
 
+use function Groundhogg\disable_emojis;
 use function Groundhogg\get_array_var;
 
 class Groundhogg_Email_Services {
@@ -227,6 +228,9 @@ class Groundhogg_Email_Services {
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send( $service, $to, $subject, $message, $headers = '', $attachments = array() ) {
+
+		disable_emojis();
+
 		$callback                    = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
 		self::$current_email_service = $service;
 

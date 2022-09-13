@@ -1,20 +1,17 @@
-var IsFrame = {};
+let IsFrame = {};
 
-(function ($,framer) {
+(() => {
 
-    $.extend( framer, {
+    try {
+        if ( window.self !== window.top ){
 
-        inFrame: function () {
-            try {
-                return window.self !== window.top;
-            } catch (e) {
-                return true;
-            }
-        },
-    } );
+            isFrame.framed = true
 
-    if ( framer.inFrame() ){
-        $( 'html' ).addClass( 'iframed' );
+            document.body.classList.add( 'iframed' )
+
+        }
+    } catch (e) {
+
     }
 
-})(jQuery,IsFrame);
+})();

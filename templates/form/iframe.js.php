@@ -14,8 +14,14 @@ nocache_headers();
 
 header( "Content-Type: application/javascript" );
 
+$step = new \Groundhogg\Step( get_query_var( 'slug' ) );
+
+if ( ! $step->exists() ){
+  wp_die();
+}
+
 $form = new \Groundhogg\Form\Form( [
-	'id' => absint( get_query_var( 'form_id' ) ),
+	'id' => $step->get_id(),
 ] );
 
 ?>

@@ -8,6 +8,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -140,49 +141,21 @@ class Funnels_Api extends Base_Object_Api {
 
 		// Is this a legacy funnel template or a new template?
 
-		// New template, old templates does not have the 'data' prop
-		if ( isset_not_empty( $template, 'data' ) ) {
+		$funnel = new Funnel();
+		$result = $funnel->import( $template );
 
-			// Create the funnel
-			$funnel = new Funnel();
+		if ( is_wp_error( $result ) ){
+			return $result;
+		}
 
-			$funnel->create( [
-				'title' => $template['data']['title']
-			] );
-
-			// Import the steps with their settings
-			$steps = $template['steps'];
-
-			// Import the steps
-			foreach ( $steps as $_step ) {
-
-				// Override the funnel ID to the newly created one
-				$_step['data'] = array_merge( $_step['data'], [
-					'funnel_id' => $funnel->get_id()
-				] );
-
-				$step = new Step();
-
-				$step->create( $_step['data'] ); // use create method to ensure uniqueness
-				$step->update_meta( $_step['meta'] ); // save all that meta data!
-				$step->import( $_step['export'] ); // import any relevant exported information
-			}
-
-			// Etc...
-
-		} // Old template from pre 2.5
-		else {
-			$funnel = new Funnel();
-			$result = $funnel->legacy_import( $template );
-
-			if ( is_wp_error( $result ) ) {
-				return $result;
-			}
+		if ( ! $funnel->exists() ) {
+			return self::ERROR_400();
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
+			'item' => $funnel,
 		] );
+
 	}
 
 	/**

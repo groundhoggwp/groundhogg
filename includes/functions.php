@@ -3606,7 +3606,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		$data['url']     = $url;
 		$data['method']  = $method;
 		$data['headers'] = $headers;
-		$data['body']    = json_decode( $body );
+		$data['body']    = $body;
 
 		$error->add_data( $data );
 
@@ -4725,6 +4725,27 @@ function permissions_key_url( $url, $contact, $usage = 'preferences', $expiratio
 }
 
 /**
+ * Generate an unsubscribe URL
+ *
+ * @param $contact
+ *
+ * @return mixed|void
+ */
+function unsubscribe_url( $contact ) {
+	$url = managed_page_url( is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ? 'preferences/unsubscribe' : 'preferences/manage' );
+
+	// create permissions url
+	$url = permissions_key_url( $url, $contact, 'preferences' );
+
+	// add identity as tracking failsafe
+	$url = add_query_arg( [
+		'identity' => encrypt( $contact->get_email() )
+	], $url );
+
+	return apply_filters( 'groundhogg/unsubscribe_url', $url, $contact );
+}
+
+/**
  * Get the permissions key
  * if one is not available return false
  * Will set the permissions key cookie if the key is found in the URL
@@ -5626,67 +5647,73 @@ function get_object_ids( $array ) {
 	}, $array );
 }
 
-
-function disable_emoji_feature() {
-
-	// Prevent Emoji from loading on the front-end
-	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-	remove_action( 'wp_print_styles', 'print_emoji_styles' );
-
-	// Remove from admin area also
-	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
-	remove_action( 'admin_print_styles', 'print_emoji_styles' );
-
-	// Remove from RSS feeds also
-	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
-	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
-
-	// Remove from Embeds
-	remove_filter( 'embed_head', 'print_emoji_detection_script' );
-
-	// Remove from emails
-	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
-
-	// Disable from TinyMCE editor. Currently disabled in block editor by default
-	add_filter( 'tiny_mce_plugins', __NAMESPACE__ . '\disable_emojis_tinymce' );
-
-	/** Finally, prevent character conversion too
-	 ** without this, emojis still work
-	 ** if it is available on the user's device
-	 */
-	add_filter( 'option_use_smilies', '__return_false' );
-
+/**
+ * Adds actions to disable emojis
+ *
+ * @return void
+ */
+function add_disable_emojis_action(){
+	add_action( 'init', __NAMESPACE__ . '\disable_emojis' );
+	add_action( 'admin_init', __NAMESPACE__ . '\disable_emojis' );
 }
-
-function disable_emojis_tinymce( $plugins ) {
-	if ( is_array( $plugins ) ) {
-		$plugins = array_diff( $plugins, array( 'wpemoji' ) );
-	}
-
-	return $plugins;
-}
-
-//add_action('init', __NAMESPACE__ . '\disable_emoji_feature');
 
 /**
- * @param $plugins
+ * Disables emojis
+ *
+ * @credit Ryan Hellyer https://en-ca.wordpress.org/plugins/disable-emojis/
+ *
+ * @return void
  */
-function add_tiny_mce_plugin( $plugins ) {
-	$plugins['groundhogg'] = GROUNDHOGG_ASSETS_URL . 'js/admin/tiny-mce-plugin.js';
-//	var_dump( $plugins );
-//	die();
-	return $plugins;
+function disable_emojis() {
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+	add_filter( 'tiny_mce_plugins',  __NAMESPACE__ . '\disable_emojis_tinymce' );
+	add_filter( 'wp_resource_hints', __NAMESPACE__ . '\disable_emojis_remove_dns_prefetch', 10, 2 );
 }
 
-//add_filter( 'mce_external_plugins', __NAMESPACE__ . '\add_tiny_mce_plugin' );
+/**
+ * Filter function used to remove the tinymce emoji plugin.
+ *
+ * @credit Ryan Hellyer https://en-ca.wordpress.org/plugins/disable-emojis/
+ *
+ * @param    array  $plugins
+ * @return   array             Difference betwen the two arrays
+ */
+function disable_emojis_tinymce( $plugins ) {
+	if ( is_array( $plugins ) ) {
+		return array_diff( $plugins, array( 'wpemoji' ) );
+	}
 
-// register new button in the editor
-function register_mce_button( $buttons ) {
-	array_push( $buttons, 'groundhoggreplacementbtn', 'groundhoggemojibtn' );
+	return array();
+}
 
-//	var_dump( $buttons );
+/**
+ * Remove emoji CDN hostname from DNS prefetching hints.
+ *
+ * @credit Ryan Hellyer https://en-ca.wordpress.org/plugins/disable-emojis/
+ *
+ * @param  array  $urls          URLs to print for resource hints.
+ * @param  string $relation_type The relation type the URLs are printed for.
+ * @return array                 Difference betwen the two arrays.
+ */
+function disable_emojis_remove_dns_prefetch( $urls, $relation_type ) {
 
-	return $buttons;
+	if ( 'dns-prefetch' == $relation_type ) {
+
+		// Strip out any URLs referencing the WordPress.org emoji location
+		$emoji_svg_url_bit = 'https://s.w.org/images/core/emoji/';
+		foreach ( $urls as $key => $url ) {
+			if ( strpos( $url, $emoji_svg_url_bit ) !== false ) {
+				unset( $urls[$key] );
+			}
+		}
+
+	}
+
+	return $urls;
 }
 
 /**
@@ -5706,8 +5733,6 @@ function get_keys() {
 
 	return $key_array;
 }
-
-add_filter( 'mce_buttons', __NAMESPACE__ . '\register_mce_button' );
 
 function get_pages_list() {
 	$pages      = get_pages();
@@ -6573,9 +6598,11 @@ function is_copyable_file( $file ) {
  *
  * @param $contacts Contact|Contact[]
  *
- * @return void
+ * @return true|WP_Error[]
  */
 function process_events( $contacts = [] ) {
+
+	$errors = [];
 
 	if ( ! empty( $contacts ) ) {
 
@@ -6595,7 +6622,36 @@ function process_events( $contacts = [] ) {
 				return $clauses;
 			} );
 		}
+
+		add_action( 'groundhogg/event/failed', function ( $event, $error ) use ( &$errors ) {
+			$errors[] = $error;
+		}, 10, 2 );
 	}
 
 	do_action( Event_Queue::WP_CRON_HOOK );
+
+    return empty( $errors ) ?: $errors;
 }
+
+/**
+ * Backwards compat for encrypted ID vs slug
+ *
+ * @param $data
+ *
+ * @return int|mixed
+ */
+function maybe_url_decrypt_id( $data ) {
+	return absint( decrypt( urldecode( $data ) ) ) ?: $data;
+}
+
+function iframe_js(){
+    ?>
+<script>
+  if ( window.self !== window.top ){
+    document.querySelector('html').classList.add( 'iframed' )
+  }
+</script>
+<?php
+}
+
+add_action( 'admin_head', __NAMESPACE__ . '\iframe_js', 9 );

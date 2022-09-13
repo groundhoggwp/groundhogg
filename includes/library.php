@@ -2,10 +2,12 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Steps\Manager;
+
 class Library extends Supports_Errors {
 
-	const PROXY_URL = 'https://library.groundhogg.io/wp-json/gh/v3/';
-	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' library-manager';
+	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
+//	const LIBRARY_URL = 'https://library.local/wp-json/gh/v4/';
 
 	/**
 	 * Flush cache templates
@@ -19,20 +21,22 @@ class Library extends Supports_Errors {
 	 * Send a request to the library
 	 *
 	 * @param string $endpoint
-	 * @param array $body
+	 * @param array  $body
 	 * @param string $method
-	 * @param array $headers
+	 * @param array  $headers
 	 *
 	 * @return array|bool|\WP_Error
 	 */
 	public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] ) {
 
-		$url = self::PROXY_URL . $endpoint;
+		$url = self::LIBRARY_URL . $endpoint;
+
+//		add_filter( 'https_ssl_verify', '__return_false' );
 
 		$result = remote_post_json( $url, $body, $method, $headers );
 
 		if ( is_wp_error( $result ) ) {
-			$this->add_error( $result );
+			notices()->add( $result );
 		}
 
 		return $result;
@@ -50,11 +54,16 @@ class Library extends Supports_Errors {
 			return $funnels;
 		}
 
+		$step_steps = array_keys( Plugin::instance()->step_manager->elements );
+
 		$response = $this->request( 'funnels/', [
-			'installed' => Extension::$extension_ids
+			'step_types' => $step_steps,
+			'status'     => 'active',
+			'orderby'    => 'title',
+			'order'      => 'asc',
 		], 'GET' );
 
-		$funnels = get_array_var( $response, 'funnels', [] );
+		$funnels = get_array_var( $response, 'items', [] );
 
 		set_transient( 'groundhogg_funnel_templates', $funnels, DAY_IN_SECONDS );
 
@@ -69,8 +78,9 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_template( $id ) {
-		$response = $this->request( 'funnels/get', [ 'id' => $id ], 'GET' );
-		return get_array_var( $response, 'funnel', [] );
+		$response = $this->request( 'funnels/' . $id, [], 'GET' );
+
+		return get_array_var( $response, 'item', [] );
 	}
 
 	/**
@@ -85,11 +95,11 @@ class Library extends Supports_Errors {
 			return $emails;
 		}
 
-		$response = $this->request( 'email/templates', [
-			'installed' => Extension::$extension_ids
-		], 'GET' );
+		$response = $this->request( 'emails', [
+			'status'           => 'ready',
+		] );
 
-		$emails = get_array_var( $response, 'emails', [] );
+		$emails = get_array_var( $response, 'items', [] );
 
 		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
 
@@ -104,8 +114,8 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_email_template( $id ) {
-		$response = $this->request( 'email/templates/get', [ 'id' => $id ], 'GET' );
+		$response = $this->request( 'emails/' . $id );
 
-		return get_array_var( $response, 'email', [] );
+		return get_array_var( $response, 'item', [] );
 	}
 }

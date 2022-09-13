@@ -514,11 +514,11 @@ class Email extends Base_Object_With_Meta {
 	 * @return false|string
 	 */
 	public function get_unsubscribe_link( $url = '' ) {
-		$url = is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ? managed_page_url( 'preferences/unsubscribe' ) : managed_page_url( 'preferences/manage' );
+		$url = managed_page_url( 'preferences/manage' );
 
 		// only add permissions key if this is a real email being sent.
 		if ( ! $this->is_testing() ) {
-			$url = permissions_key_url( $url, $this->get_contact(), 'preferences' );
+			$url = unsubscribe_url( $this->get_contact() );
 		}
 
 		return $url;
@@ -839,6 +839,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool|WP_Error
 	 */
 	public function send( $contact_id_or_email, $event = 0 ) {
+
 		// Clear any old previous errors.
 		$this->clear_errors();
 

@@ -323,6 +323,7 @@ code.meta-replacement-code {
     .activity-info {
       font-size: 15px;
       margin-bottom: 4px;
+      word-break: break-word;
     }
 
     .event-extra,
@@ -409,6 +410,10 @@ code.meta-replacement-code {
   .contact-record{
     flex-direction: column;
     gap: 20px;
+
+    .contact-editor-wrap{
+      padding-right: 0;
+    }
   }
 
 }

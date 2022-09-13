@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * store steps that belong to funnels
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Steps extends DB {
 
@@ -86,6 +86,7 @@ class Steps extends DB {
 			'step_type'     => '%s',
 			'step_group'    => '%s',
 			'step_order'    => '%d',
+			'step_slug'     => '%s',
 			'is_entry'      => '%d',
 			'is_conversion' => '%d',
 		);
@@ -105,6 +106,7 @@ class Steps extends DB {
 			'step_status'   => 'ready',
 			'step_type'     => 'send_email',
 			'step_group'    => 'action',
+			'step_slug'     => '',
 			'step_order'    => 0,
 			'is_entry'      => 0,
 			'is_conversion' => 0,
@@ -172,11 +174,13 @@ class Steps extends DB {
 	 *
 	 * @access public
 	 *
-	 * @param string $field id or email
+	 * @since  2.3
+	 *
 	 * @param mixed  $value The Customer ID or email to search
 	 *
+	 * @param string $field id or email
+	 *
 	 * @return mixed          Upon success, an object of the step. Upon failure, NULL
-	 * @since  2.3
 	 */
 	public function get_step_by( $field = 'ID', $value = 0 ) {
 
@@ -229,9 +233,7 @@ class Steps extends DB {
 
 		}
 
-		$results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
-
-		return $results;
+		return $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
 	}
 
 	/**
@@ -263,6 +265,7 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
+		step_slug varchar({$this->get_max_index_length()}) NOT NULL,
 		step_order int unsigned NOT NULL,
 		is_entry TINYINT(1) NOT NULL,
 		is_conversion TINYINT(1) NOT NULL,

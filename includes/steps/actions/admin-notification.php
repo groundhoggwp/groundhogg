@@ -3,19 +3,15 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
-use function Groundhogg\admin_page_url;
 use function Groundhogg\do_replacements;
 use Groundhogg\Event;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
-use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\get_owners;
 use function Groundhogg\html;
 use function Groundhogg\is_replacement_code_format;
-use function Groundhogg\is_sms_plugin_active;
 
 /**
  * Admin Notification

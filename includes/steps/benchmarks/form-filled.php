@@ -318,7 +318,7 @@ class Form_Filled extends Benchmark {
 					$args = wp_parse_args( $button, array(
 						'text'               => __( 'Field', 'groundhogg' ),
 						'title'              => sprintf( __( 'Insert Field: %s', 'groundhogg' ), $button['text'] ),
-						'class'              => 'gh-button grey text small',
+						'class'              => 'gh-button grey text small code',
 						'source'             => 'form-field-editor',
 						'footer_button_text' => __( 'Insert Field', 'groundhogg' ),
 						'width'              => 600,

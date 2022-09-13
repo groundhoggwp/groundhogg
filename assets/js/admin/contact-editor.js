@@ -1134,11 +1134,12 @@
           // language=HTML
           return `
               <div class="gh-panel top-left-square">
-                  <div id="file-actions" class="inside space-between">
+                  <div id="file-actions" class="inside display-flex gap-10">
                       ${ input({
                           placeholder: __('Search files...'),
                           type: 'search',
                           id: 'search-files',
+                          className: 'full-width'
                       }) }
                       <button id="upload-file" class="gh-button secondary">
                           ${ __('Upload Files') }

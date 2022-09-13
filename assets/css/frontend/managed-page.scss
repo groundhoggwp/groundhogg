@@ -1,0 +1,223 @@
+html, body.managed-page, #main {
+    background-color: #F6F9FB;
+    position: initial !important;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#main * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    line-height: 1.6em;
+}
+
+#main {
+    max-width: 500px;
+    padding: 3% 0 20px 0;
+    margin: auto;
+}
+
+#main form:not(.gdpr-consent), #main .box {
+    margin-top: 20px;
+    margin-left: 0;
+    padding: 30px;
+    font-weight: 400;
+    overflow: hidden;
+    background: #FFFFFF;
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    /*margin: 20px;*/
+    border-radius: 5px;
+    border: none;
+}
+
+#main h1 a {
+    background-size: 84px;
+    background-position: center top;
+    background-repeat: no-repeat;
+    color: #444;
+    height: 84px;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.3em;
+    margin: 0 auto 25px;
+    padding: 0;
+    text-decoration: none;
+    width: 84px;
+    text-indent: -9999px;
+    outline: 0;
+    overflow: hidden;
+    display: block;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#main .notice {
+    margin: 0 0 10px 0;
+}
+
+#main .notice:last-child {
+    margin-bottom: 0;
+}
+
+.right {
+    float: right;
+}
+
+.align-center {
+    text-align: center;
+}
+
+@media screen and (max-width: 360px ) {
+    .right {
+        float: none;
+    }
+}
+
+body p {
+    margin: 1.1em 0;
+}
+
+a {
+    outline: 0;
+}
+
+a {
+    color: #0073aa;
+    transition-property: border, background, color;
+    transition-duration: .05s;
+    transition-timing-function: ease-in-out;
+    text-decoration: none;
+}
+
+.notice a {
+    text-decoration: underline;
+}
+
+a:active, a:hover {
+    color: #00a0d2;
+}
+
+label {
+    font-weight: normal;
+    cursor: pointer;
+}
+
+p#credit,
+#extralinks {
+    color: #555d66;
+    text-align: center;
+}
+
+p#credit img {
+    vertical-align: middle;
+}
+
+#main .preference-options a {
+    margin: 10px 0 0 0;
+    padding: 8px 20px;
+    display: inline-block;
+    width: 100%;
+    border-radius: 5px;
+}
+
+#main .preference-options a:hover{
+    background-color: rgba(16, 38, 64, 0.05);
+}
+
+#main .preference-options a.preference-unsubscribe,
+#main .preference-options a.preference-gdpr_delete {
+    color: #e91f4f;
+
+}
+
+#main .preference-options a.preference-unsubscribe:hover,
+#main .preference-options a.preference-gdpr_delete:hover {
+    color: rgb(194, 19, 61);
+    background-color: rgba(194, 19, 61, 0.05);
+}
+
+#main p label {
+    color: #72777c;
+    font-size: 14px;
+}
+
+#main input[type="email"],
+#main input[type="tel"],
+#main input[type="text"] {
+    background: #fbfbfb;
+    border-radius: 4px;
+    font-size: 18px;
+    width: 100%;
+    padding: 4px 8px;
+    margin: 2px 6px 16px 0;
+    border: 1px solid #7e8993;
+    box-shadow: 0 0 0 transparent;
+    color: #32373c;
+    outline: 0;
+    transition: 50ms border-color ease-in-out;
+}
+
+#main{
+    input[type="email"],
+    input[type="tel"],
+    input[type="text"] {
+        background: #fbfbfb;
+        border-radius: 4px;
+        font-size: 18px;
+        width: 100%;
+        padding: 4px 8px;
+        margin: 2px 6px 16px 0;
+        border: 1px solid #7e8993;
+        box-shadow: 0 0 0 transparent;
+        color: #32373c;
+        outline: 0;
+        transition: 50ms border-color ease-in-out;
+    }
+
+    #gh-submit,
+    button[type=submit],
+    .button {
+        display: inline-block;
+        text-decoration: none;
+        white-space: nowrap;
+
+        border: none;
+        color: #FFFFFF;
+        border-radius: 5px;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: 400;
+        background: rgb(0, 117, 255);
+        cursor: pointer;
+
+        * {
+            font-size: 16px;
+        }
+
+        &:hover {
+            background: #005ecc;
+        }
+
+        &.danger {
+            background: #e91f4f;
+
+            &:hover {
+                background: #c2133d;
+            }
+        }
+    }
+
+    .contact-name {
+        border-bottom: 1px dotted;
+    }
+}
+
+.erase #main ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}

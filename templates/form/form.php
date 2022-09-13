@@ -2,15 +2,16 @@
 /**
  * Responsive Form Iframe Template
  *
- * @package     Templates
+ * @since       File available since Release 1.0.20
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 1.0.20
+ * @package     Templates
  */
+
 use Groundhogg\Step;
 
-$form_id = get_query_var( 'form_id' );
+$form_id = get_query_var( 'slug' );
 
 $step = new Step( $form_id );
 
@@ -38,13 +39,13 @@ add_action( 'wp_enqueue_scripts', function () {
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
-	<base target="_parent">
-	<meta charset="<?php bloginfo( 'charset' ); ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="profile" href="http://gmpg.org/xfn/11">
-	<title><?php echo $title; ?></title>
+    <base target="_parent">
+    <meta charset="<?php bloginfo( 'charset' ); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <title><?php echo $title; ?></title>
 	<?php wp_head(); ?>
-	<script>
+    <script>
 
       let source = ''
       let formId = 0
@@ -69,23 +70,23 @@ add_action( 'wp_enqueue_scripts', function () {
       })
 
       window.addEventListener('load', () => {
-        ['submit', 'reset', 'ajaxfinished'].forEach( evt => {
+        ['submit', 'reset', 'ajaxfinished'].forEach(evt => {
           document.querySelector('form.gh-form').addEventListener(evt, () => {
             console.log('this worked')
             postResizeData()
           })
         })
       })
-	</script>
+    </script>
 </head>
 <body class="groundhogg-form-body" style="padding: 20px">
 <div id="main">
 	<?php echo do_shortcode( $shortcode ); ?>
 </div>
 <?php
- wp_print_scripts([
-         'groundhogg-ajax-form'
- ])
+wp_print_scripts( [
+	'groundhogg-ajax-form'
+] )
 ?>
 <div class="clear"></div>
 </body>

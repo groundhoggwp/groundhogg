@@ -152,17 +152,17 @@ class Form implements \JsonSerializable {
 	}
 
 	public function get_iframe_embed_code() {
-		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', $this->step->get_slug() ) );
 
 		return sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
 	}
 
 	public function get_submission_url() {
-		return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
+		return managed_page_url( sprintf( 'forms/%s/submit/', $this->step->get_slug() ) );
 	}
 
 	public function get_hosted_url() {
-		return managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+		return managed_page_url( sprintf( 'forms/%s/', $this->step->get_slug() ) );
 	}
 
 	public function is_active() {
@@ -200,7 +200,9 @@ class Form implements \JsonSerializable {
 
 		$step = new Step( $this->get_id() );
 
+		$form .= '<div class="form-fields">';
 		$form .= do_shortcode( $step->get_meta( 'form' ) );
+		$form .= '</div>';
 
 		$form .= '</form>';
 

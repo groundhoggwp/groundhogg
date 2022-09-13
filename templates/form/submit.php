@@ -8,9 +8,14 @@ include GROUNDHOGG_PATH . 'templates/managed-page.php';
 use Groundhogg\Form\Form;
 
 
-$form_id = get_query_var( 'form_id' );
-$form = new Form( [ 'id' => $form_id ] );
-$step = new Step( $form_id );
+$slug = get_query_var( 'slug' );
+$step = new Step( $slug );
+
+if ( ! $step->exists() || ! $step->type_is( 'form_fill' ) ){
+    wp_die('Form does not exist.' );
+}
+
+$form = new Form( [ 'id' => $step->get_id() ] );
 
 add_action( 'wp_head', function (){
 	wp_dequeue_script('fullframe');

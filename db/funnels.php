@@ -107,26 +107,6 @@ class Funnels extends DB {
 	}
 
 	/**
-	 * Add a funnel
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function add( $data = array() ) {
-
-		$args = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
-		if ( empty( $args['title'] ) ) {
-			return false;
-		}
-
-		return $this->insert( $args );
-	}
-
-	/**
 	 * Create the table
 	 *
 	 * @access  public

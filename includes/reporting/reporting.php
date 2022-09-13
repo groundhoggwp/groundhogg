@@ -25,7 +25,6 @@ use Groundhogg\Reporting\Reports\New_Contacts;
 use Groundhogg\Reporting\Reports\Report;
 use Groundhogg\Reporting\Reports\Waiting_Funnel_Activity;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\search_and_replace_domain;
 
 /**
  * Created by PhpStorm.

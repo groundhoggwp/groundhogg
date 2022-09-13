@@ -2,23 +2,13 @@
 
 namespace Groundhogg\Steps\Actions;
 
-use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
-use Groundhogg\Reporting\New_Reports\Chart_Draw;
-use Groundhogg\Reporting\Reporting;
-use Groundhogg\Utils\Graph;
 use function Groundhogg\get_array_var;
-use Groundhogg\Preferences;
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
-use function Groundhogg\html;
 use Groundhogg\Plugin;
-use function Groundhogg\percentage;
-use function Groundhogg\search_and_replace_domain;
 use Groundhogg\Step;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,13 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * This will send an email to the contact using WP_MAIL
  *
- * @package     Elements
- * @subpackage  Elements/Actions
+ * @since       File available since Release 0.9
+ * @see         WPGH_Email::send()
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @see         WPGH_Email::send()
- * @since       File available since Release 0.9
+ * @package     Elements
+ * @subpackage  Elements/Actions
  */
 class Send_Email extends Action {
 
@@ -119,19 +109,18 @@ class Send_Email extends Action {
 				'selected' => $this->get_setting( 'email_id' ),
 			] ),
 			// ROW ACTIONS
-			"<div style='margin-top: 10px'>",
+			"<div class='display-flex gap-10' style='margin-top: 10px'>",
 			// EDIT EMAIL
 			$html->button( [
 				'title' => 'Edit Email',
 				'text'  => _x( 'Edit Email', 'action', 'groundhogg' ),
-				'class' => 'button button-primary edit-email',
+				'class' => 'gh-button primary edit-email',
 			] ),
-			'&nbsp;',
 			// ADD NEW EMAIL
 			$html->button( [
 				'title' => 'Create New Email',
 				'text'  => _x( 'Create New Email', 'action', 'groundhogg' ),
-				'class' => 'button button-secondary add-email',
+				'class' => 'gh-button secondary add-email',
 			] ),
 			"</div>",
 			// ADD EMAIL OVERRIDE
@@ -201,7 +190,7 @@ class Send_Email extends Action {
 	 * Process the apply note step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error
 	 */
@@ -234,7 +223,7 @@ class Send_Email extends Action {
 		}
 
 		$email_id = Plugin::$instance->dbs->get_db( 'emails' )->add( [
-			'content'    => search_and_replace_domain( $args['content'] ),
+			'content'    => $args['content'],
 			'subject'    => $args['subject'],
 			'pre_header' => $args['pre_header'],
 			'title'      => get_array_var( $args, 'title', $args['subject'] ),

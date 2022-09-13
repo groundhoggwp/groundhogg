@@ -140,4 +140,16 @@ class Manager {
 	public function get_elements() {
 		return array_merge( $this->get_actions(), $this->get_benchmarks() );
 	}
+
+	/**
+	 * Whether a specific step type is registered
+	 *
+	 *
+	 * @param $step_type
+	 *
+	 * @return bool
+	 */
+	public function type_is_registered( $step_type ) {
+		return in_array( $step_type, array_keys( $this->elements ) );
+	}
 }

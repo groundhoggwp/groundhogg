@@ -25,6 +25,28 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
+
+	public function __construct( $identifier_or_args = 0, $field = null ) {
+
+		if ( is_string( $identifier_or_args ) && ! is_numeric( $identifier_or_args ) ) {
+
+			$slug_or_id = maybe_url_decrypt_id( $identifier_or_args );
+
+			// We got an ID
+			if ( is_numeric( $slug_or_id ) ) {
+				return parent::__construct( $slug_or_id, 'ID' );
+			}
+
+			// We got a slug
+			$parts = explode( '-', $slug_or_id );
+			$ID    = absint( $parts[0] );
+
+			return parent::__construct( $ID, 'ID' );
+		}
+
+		parent::__construct( $identifier_or_args, $field );
+	}
+
 	const BENCHMARK = 'benchmark';
 	const ACTION = 'action';
 
@@ -127,11 +149,30 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return absint( $this->funnel_id );
 	}
 
+	public function get_slug() {
+		return $this->step_slug;
+	}
+
 	/**
 	 * @return Funnel
 	 */
 	public function get_funnel() {
 		return new Funnel( $this->get_funnel_id() );
+	}
+
+	public function set_slug() {
+		$this->update( [
+			'step_slug' => $this->get_id() . '-' . sanitize_title( $this->get_step_title() )
+		] );
+	}
+
+	public function create( $data = [] ) {
+		$step = parent::create( $data );
+
+		// to set the slug
+		$this->set_slug();
+
+		return $step;
 	}
 
 	/**
@@ -282,7 +323,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 			$next = array_shift( $next );
 
-			if ( ! empty( $next ) ){
+			if ( ! empty( $next ) ) {
 				$next = new Step( $next );
 			}
 
@@ -295,6 +336,44 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 * @param $current Step
 		 */
 		return apply_filters( 'groundhogg/step/next_action', $next, $this );
+	}
+
+	/**
+	 * Get the next step in the order
+	 *
+	 * @return Step|false
+	 */
+	public function get_prev_action() {
+
+		$next = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_group', '=', self::ACTION ],
+				[ 'step_order', $this->is_action() ? '=' : '<=', $this->get_order() - 1 ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ]
+			],
+			'orderby' => 'step_order',
+			'order'   => 'desc',
+			'limit'   => 1,
+		] );
+
+		if ( is_array( $next ) ) {
+
+			$next = array_shift( $next );
+
+			if ( ! empty( $next ) ) {
+				$next = new Step( $next );
+			}
+
+		}
+
+		/**
+		 * Filters the next action
+		 *
+		 * @param $next    Step|null
+		 * @param $current Step
+		 */
+		return apply_filters( 'groundhogg/step/prev_action', $next, $this );
 	}
 
 	/**
@@ -645,6 +724,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function import( $import_args = [] ) {
 		do_action( "groundhogg/steps/{$this->get_type()}/import", $import_args, $this );
+	}
+
+	/**
+	 * Post import cleanup actions any contextual args from the given template
+	 */
+	public function post_import() {
+		do_action( "groundhogg/steps/{$this->get_type()}/post_import", $this );
+		do_action( "groundhogg/steps/post_import", $this );
 	}
 
 	/**

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.2.1
+Stable tag: 2.7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,22 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.3 (2022-09-12) =
+* ADDED There is now a *Start From Scratch* button on the add funnel screen
+* IMPROVED When importing funnel templates...
+ * Steps with *skip to* functionally will correctly import their desired behaviour relative to other steps.
+  * Loop action
+  * Field Timer, Date Timer, & Advanced Timer
+  * Any step with Conditional Logic enabled
+ * *Link Click* benchmark links in email content will be correctly updated to the new step's link
+ * JSON data is now based on the v4 API response
+ * Legacy funnel templates will still be supported for importing
+* TWEAKED The funnel library will now only show templates for which the necessary step types are actively registered
+* TWEAKED Forms & Link Click benchmarks will now show use a pretty slug when embedding. Old URLs will still work fine!
+* TWEAKED show 404 errors on the managed page for non-existent resources
+* TWEAKED When sending an email template to a contact manually, process the event right away and report event failures
+* TWEAKED Disable the WordPress emoji to image conversion feature while sending/editing emails
 
 = 2.7.2.1 (2022-09-09) =
 * TWEAKED Some CSS issues in the funnel builder

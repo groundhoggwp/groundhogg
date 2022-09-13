@@ -46,6 +46,7 @@ var GroundhoggModal = {};
       this.window = $('.gh-legacy-modal .gh-modal-dialog')
       this.content = $('.gh-legacy-modal .gh-modal-dialog-content')
       this.title = $('.gh-legacy-modal .gh-modal-dialog-title')
+      this.header = $('.gh-legacy-modal .gh-header')
       this.footer = $('.gh-legacy-modal .gh-modal-footer')
       this.loader = $('.iframe-loader-wrapper')
       this.footerClose = $('.gh-legacy-modal .gh-modal-footer .legacy-modal-close')
@@ -64,6 +65,7 @@ var GroundhoggModal = {};
         this.source = $(`
             <div>
                 <iframe
+                        style="display: block"
                         src="${ this.args.source }"
                         onload="GroundhoggModal.prepareFrame( this )"
                         width="${ this.args.width ?? 1200 }"
@@ -82,6 +84,8 @@ var GroundhoggModal = {};
       if (typeof this.args.footertext !== 'undefined') {
         this.footerClose.text(this.args.footertext)
       }
+
+      this.content.css('height', 'auto')
 
       self.open()
     },
@@ -127,9 +131,16 @@ var GroundhoggModal = {};
     },
 
     prepareFrame: function (iframe) {
-      let height = Math.max( iframe.contentWindow.document.body.scrollHeight, iframe.contentWindow.document.body.offsetHeight )
+      let frameHeight = Math.max(iframe.contentWindow.document.body.scrollHeight,
+        iframe.contentWindow.document.body.offsetHeight) + 100
 
-      iframe.style.height = height + 100 + 'px'
+      iframe.style.height = '100%'
+      this.content.css('height', '100vh')
+
+      let dialogHeight = this.window.height() - this.header.outerHeight()
+
+      this.content.css('height', Math.min( frameHeight, dialogHeight ) )
+
       this.closeLoader()
     },
 

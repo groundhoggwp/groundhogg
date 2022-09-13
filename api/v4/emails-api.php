@@ -13,6 +13,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\is_template_site;
+use function Groundhogg\process_events;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_user_test_email;
 use function Groundhogg\track_activity;
@@ -83,8 +84,20 @@ class Emails_Api extends Base_Object_Api {
 		//send emails
 		$status = send_email_notification( $email, $contact, $request->get_param( 'when' ) );
 
+		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] ) ;
+
+		$result = process_events( $contact );
+
+		if ( $result !== true ){
+			return $result[0];
+		}
+
 		if ( ! $status ) {
 			return self::ERROR_UNKNOWN();
+		}
+
+		if ( $this->has_errors() ){
+			return $this->get_last_error();
 		}
 
 		return self::SUCCESS_RESPONSE();

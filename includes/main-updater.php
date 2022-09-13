@@ -569,6 +569,11 @@ class Main_Updater extends Updater {
 		install_custom_rewrites();
 	}
 
+	public function version_2_7_2() {
+		get_db( 'steps' )->create_table();
+		install_custom_rewrites();
+	}
+
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -631,6 +636,7 @@ class Main_Updater extends Updater {
 			'2.6.2.2',
 			'2.6.2.4',
 			'2.6.2.10',
+			'2.7.2',
 		];
 	}
 
@@ -668,6 +674,7 @@ class Main_Updater extends Updater {
 			'2.6.2.4',
 			'2.6.2.5',
 			'2.6.2.10',
+			'2.7.2',
 		];
 	}
 
@@ -724,6 +731,7 @@ class Main_Updater extends Updater {
 			'2.6.2.4'       => __( 'Add view caps to Sales Rep & Manager.', 'groundhogg' ),
 			'2.6.2.5'       => __( 'Fix missing caps for emails endpoint.', 'groundhogg' ),
 			'2.6.2.10'      => __( 'Change files download pathname to /file-download/ from /files/.', 'groundhogg' ),
+			'2.7.2'         => __( 'Add <code>step_slug</code> column. Add new rewrites for prettier URLs.', 'groundhogg' ),
 		];
 	}
 }
