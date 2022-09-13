@@ -97,7 +97,7 @@ class Link_Clicked extends Benchmark {
 		$slug_in_use = $this->get_setting( 'slug_in_use' );
 
 		if ( $slug_in_use !== $step->get_slug() ) {
-			$this->replace_links_in_email_content( $slug_in_use, $step );
+//			$this->replace_links_in_email_content( $slug_in_use, $step );
 			$this->save_setting( 'slug_in_use', $step->get_slug() );
 		}
 	}
@@ -154,7 +154,7 @@ class Link_Clicked extends Benchmark {
 	protected function replace_links_in_email_content( $old_slug, $step ) {
 
 		$new_url       = sprintf( managed_page_url( "click/%s/" ), $step->get_slug() );
-		$old_url_regex = "@https?://.*/$old_slug/@";
+		$old_url_regex = "@https?://[A-z0-9/\-.]+/gh/click/$old_slug/@";
 
 		$send_email_steps = $step->get_funnel()->get_steps( [
 			'step_type' => 'send_email'

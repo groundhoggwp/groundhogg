@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.3
+Stable tag: 2.7.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.3 (2022-09-12) =
+= 2.7.3.1 (2022-09-13) =
+* HOT FIX Disable auto slug search and replace for link click benchmark.
+
+= 2.7.3 (2022-09-13) =
 * ADDED There is now a *Start From Scratch* button on the add funnel screen
 * ADDED Insert replacement code shortcut `CTRL + Shift + {`
 * IMPROVED When importing funnel templates...

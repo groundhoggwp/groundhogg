@@ -150,6 +150,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function get_slug() {
+
+		if ( ! $this->step_slug ){
+			$this->set_slug();
+		}
+
 		return $this->step_slug;
 	}
 
