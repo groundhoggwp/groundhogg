@@ -105,6 +105,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		 */
 		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'pre_import' ], 1, 2 );
 		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'import' ], 10, 2 );
+		add_action( "groundhogg/steps/{$this->get_type()}/post_import", [ $this, '__post_import' ], 10, 1 );
 
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
@@ -906,30 +907,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @param $step Step
 	 */
 	public function pre_save( Step $step ) {
+
 		$this->set_current_step( $step );
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
-		$args = array(
+		$step->update( [
 			'step_title'  => sanitize_text_field( $this->get_posted_data( 'title' ) ),
 			'step_order'  => $this->get_posted_order(),
 			'step_status' => 'ready',
-		);
-
-		$step->update( $args );
+		] );
 
 		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
-
-		if ( $this->get_posted_data( 'blog_id', false ) ) {
-			$step->update_meta( 'blog_id', absint( $this->get_posted_data( 'blog_id', false ) ) );
-		} else {
-			$step->delete_meta( 'blog_id' );
-		}
-
-		if ( $this->get_posted_data( 'is_closed', false ) ) {
-			$step->update_meta( 'is_closed', 1 );
-		} else {
-			$step->delete_meta( 'is_closed' );
-		}
 
 		$step->delete_meta( 'has_errors' );
 	}
@@ -958,6 +946,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				notices()->add( $error );
 			}
 		}
+
+        $step->set_slug();
 
 		$this->clear_errors();
 	}
@@ -1014,6 +1004,29 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function import( $args, $step ) {
 		//silence is golden
 	}
+
+	/**
+	 * Cleanup actions after the import of a step
+	 *
+	 * @param $step
+	 *
+	 * @return void
+	 */
+	public function __post_import( $step ){
+        $this->set_current_step( $step );
+        $this->post_import( $step );
+	}
+
+	/**
+     * Cleanup actions after the import of a step
+     *
+	 * @param $step
+	 *
+	 * @return void
+	 */
+    public function post_import( $step ){
+
+    }
 
 	/**
 	 * @param $args

@@ -62,6 +62,10 @@
 .gh-form-wrapper .gh-message-wrapper.gh-form-errors-wrapper ul.gh-form-errors {
   padding-left: 20px;
   margin: 0;
+  list-style: disc;
+}
+.gh-form-wrapper .gh-message-wrapper.gh-form-errors-wrapper ul.gh-form-errors li:last-child {
+  margin-bottom: 0;
 }
 .gh-form-wrapper .gh-message-wrapper.gh-form-success-wrapper {
   color: #155724;

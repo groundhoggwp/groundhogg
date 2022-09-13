@@ -40,6 +40,11 @@ class Rewrites {
 			'subpage=benchmark_link&link_id=$matches[1]'
 		);
 
+		add_managed_rewrite_rule(
+			'click/([^/]*)/?$',
+			'subpage=benchmark_link&slug=$matches[1]'
+		);
+
 		// Funnel Download/Export
 		add_managed_rewrite_rule(
 			'funnels/export/([^/]*)/?$',
@@ -60,19 +65,19 @@ class Rewrites {
 
 		add_managed_rewrite_rule(
 			'forms/([^/]*)/submit/?$',
-			'subpage=form_submit&form_id=$matches[1]'
+			'subpage=form_submit&slug=$matches[1]'
 		);
 
 		// Forms Iframe Script
 		add_managed_rewrite_rule(
 			'forms/iframe/([^/]*)/?$',
-			'subpage=forms_iframe&form_id=$matches[1]'
+			'subpage=forms_iframe&slug=$matches[1]'
 		);
 
 		// Forms Iframe Template
 		add_managed_rewrite_rule(
 			'forms/([^/]*)/?$',
-			'subpage=forms&form_id=$matches[1]'
+			'subpage=forms&slug=$matches[1]'
 		);
 
 		// Forms Iframe Template
@@ -93,6 +98,7 @@ class Rewrites {
 	public function add_query_vars( $vars ) {
 		$vars[] = 'subpage';
 		$vars[] = 'action';
+		$vars[] = 'slug';
 		$vars[] = 'file_path';
 		$vars[] = 'funnel_id';
 		$vars[] = 'enc_funnel_id';
@@ -116,9 +122,9 @@ class Rewrites {
 		$this->map_query_var( $query, 'email_id', 'absint' );
 
 		// form
-		$this->map_query_var( $query, 'form_id', 'urldecode' );
-		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
-		$this->map_query_var( $query, 'form_id', 'absint' );
+//		$this->map_query_var( $query, 'form_id', 'urldecode' );
+//		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
+//		$this->map_query_var( $query, 'form_id', 'absint' );
 
 		return $query;
 	}
@@ -128,6 +134,13 @@ class Rewrites {
 	 */
 	public function get_template_loader() {
 		return new Template_Loader();
+	}
+
+	public function get_404(){
+		global $wp_query;
+		$wp_query->set_404();
+		status_header( 404 );
+		return get_404_template();
 	}
 
 	/**
@@ -146,6 +159,9 @@ class Rewrites {
 		$template_loader = $this->get_template_loader();
 
 		switch ( $subpage ) {
+			case 'benchmark_link':
+			case 'funnels':
+				return $this->get_404();
 			case 'browser_view':
 				$template = $template_loader->get_template_part( 'emails/browser-view', '', false );
 				break;
@@ -153,10 +169,20 @@ class Rewrites {
 				$template = $template_loader->get_template_part( 'emails/email', '', false );
 				break;
 			case 'forms':
-				$template = $template_loader->get_template_part( 'form/form', '', false );
+				if ( get_query_var( 'form_step' ) ) {
+					$template = $template_loader->get_template_part( 'form/form', '', false );
+				} else {
+					return $this->get_404();
+				}
+
 				break;
 			case 'form_submit':
-				$template = $template_loader->get_template_part( 'form/submit', '', false );
+				if ( get_query_var( 'form_step' ) ) {
+					$template = $template_loader->get_template_part( 'form/submit', '', false );
+				} else {
+					return $this->get_404();
+				}
+
 				break;
 		}
 
@@ -168,7 +194,7 @@ class Rewrites {
 	 *
 	 * @param string $template
 	 */
-	public function template_redirect( $template = '' ) {
+	public function template_redirect() {
 
 		if ( ! is_managed_page() ) {
 			return;
@@ -178,18 +204,37 @@ class Rewrites {
 		$template_loader = $this->get_template_loader();
 
 		switch ( $subpage ) {
+			case 'forms':
+			case 'form_submit':
+
+				$step = new Step( get_query_var( 'slug' ) );
+
+				if ( $step->exists() && $step->type_is( 'form_fill' ) ) {
+					set_query_var( 'form_step', $step );
+				}
+
+				break;
 			case 'benchmark_link':
 
 				$link_id = absint( get_query_var( 'link_id' ) );
+
+				if ( ! $link_id ) {
+					$link_id = get_query_var( 'slug' );
+				}
+
 				$contact = get_contactdata();
 
 				$step = new Step( $link_id );
 
-				if ( ! $step ) {
+				if ( ! $step->exists() || ! $step->type_is( 'link_click' ) ) {
 					return;
 				}
 
 				$target_url = $step->get_meta( 'redirect_to' );
+
+				if ( empty( $target_url ) ){
+					$target_url = home_url();
+				}
 
 				if ( $contact ) {
 					do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
@@ -207,15 +252,16 @@ class Rewrites {
 
 				$funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
 				$funnel    = new Funnel( $funnel_id );
+
 				if ( ! $funnel->exists() ) {
-					wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
+					return;
 				}
 
-				$export_string = wp_json_encode( $funnel->legacy_export() );
+				$export_string = wp_json_encode( $funnel->export() );
 
 				$funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
 
-				$filename = 'funnel-' . $funnel_export_name . '-' . date( "Y-m-d_H-i", time() );
+				$filename = 'funnel-' . $funnel_export_name;
 
 				header( "Content-type: text/plain" );
 				header( "Content-disposition: attachment; filename=" . $filename . ".funnel" );

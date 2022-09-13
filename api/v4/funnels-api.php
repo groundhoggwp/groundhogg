@@ -67,41 +67,6 @@ class Funnels_Api extends Base_Object_Api {
 		] );
 	}
 
-	public function read( WP_REST_Request $request ) {
-
-		$query = $request->get_params();
-
-		$query = wp_parse_args( $query, [
-			'select'  => '*',
-			'orderby' => $this->get_primary_key(),
-			'order'   => 'DESC',
-			'limit'   => 25,
-		] );
-
-		if ( $request->has_param( 'step_types' ) ) {
-			$step_types = array_map( 'sanitize_key', $request->get_param( 'step_types' ) );
-
-			$query['ID'] = get_db( 'steps' )->get_sql( [
-				'select' => 'DISTINCT(funnel_id)',
-				'where'  => [
-					[ 'step_type', 'IN', $step_types ]
-				]
-			] );
-		}
-
-		$total = $this->get_db_table()->count( $query );
-		$items = $this->get_db_table()->query( $query );
-
-		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
-
-		return self::SUCCESS_RESPONSE( [
-			'total_items' => $total,
-			'items'       => $items
-		] );
-
-
-	}
-
 	/**
 	 * Add contacts to a funnel
 	 *
@@ -176,49 +141,21 @@ class Funnels_Api extends Base_Object_Api {
 
 		// Is this a legacy funnel template or a new template?
 
-		// New template, old templates does not have the 'data' prop
-		if ( isset_not_empty( $template, 'data' ) ) {
+		$funnel = new Funnel();
+		$result = $funnel->import( $template );
 
-			// Create the funnel
-			$funnel = new Funnel();
+		if ( is_wp_error( $result ) ){
+			return $result;
+		}
 
-			$funnel->create( [
-				'title' => $template['data']['title']
-			] );
-
-			// Import the steps with their settings
-			$steps = $template['steps'];
-
-			// Import the steps
-			foreach ( $steps as $_step ) {
-
-				// Override the funnel ID to the newly created one
-				$_step['data'] = array_merge( $_step['data'], [
-					'funnel_id' => $funnel->get_id()
-				] );
-
-				$step = new Step();
-
-				$step->create( $_step['data'] ); // use create method to ensure uniqueness
-				$step->update_meta( $_step['meta'] ); // save all that meta data!
-				$step->import( $_step['export'] ); // import any relevant exported information
-			}
-
-			// Etc...
-
-		} // Old template from pre 2.5
-		else {
-			$funnel = new Funnel();
-			$result = $funnel->legacy_import( $template );
-
-			if ( is_wp_error( $result ) ) {
-				return $result;
-			}
+		if ( ! $funnel->exists() ) {
+			return self::ERROR_400();
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
+			'item' => $funnel,
 		] );
+
 	}
 
 	/**

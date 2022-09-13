@@ -1154,10 +1154,7 @@ class Replacements implements \JsonSerializable {
 	 * @return string|void
 	 */
 	function replacement_unsubscribe_link() {
-		$link_url = managed_page_url( 'preferences/unsubscribe/' );
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences', MONTH_IN_SECONDS );
-
-		return $link_url;
+		return unsubscribe_url( $this->get_current_contact() );
 	}
 
 	/**

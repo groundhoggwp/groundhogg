@@ -4725,6 +4725,27 @@ function permissions_key_url( $url, $contact, $usage = 'preferences', $expiratio
 }
 
 /**
+ * Generate an unsubscribe URL
+ *
+ * @param $contact
+ *
+ * @return mixed|void
+ */
+function unsubscribe_url( $contact ) {
+	$url = managed_page_url( is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ? 'preferences/unsubscribe' : 'preferences/manage' );
+
+	// create permissions url
+	$url = permissions_key_url( $url, $contact, 'preferences' );
+
+	// add identity as tracking failsafe
+	$url = add_query_arg( [
+		'identity' => encrypt( $contact->get_email() )
+	], $url );
+
+	return apply_filters( 'groundhogg/unsubscribe_url', $url, $contact );
+}
+
+/**
  * Get the permissions key
  * if one is not available return false
  * Will set the permissions key cookie if the key is found in the URL
@@ -6599,3 +6620,26 @@ function process_events( $contacts = [] ) {
 
 	do_action( Event_Queue::WP_CRON_HOOK );
 }
+
+/**
+ * Backwards compat for encrypted ID vs slug
+ *
+ * @param $data
+ *
+ * @return int|mixed
+ */
+function maybe_url_decrypt_id( $data ) {
+	return absint( decrypt( urldecode( $data ) ) ) ?: $data;
+}
+
+function iframe_js(){
+    ?>
+<script>
+  if ( window.self !== window.top ){
+    document.querySelector('html').classList.add( 'iframed' )
+  }
+</script>
+<?php
+}
+
+add_action( 'admin_head', __NAMESPACE__ . '\iframe_js', 9 );

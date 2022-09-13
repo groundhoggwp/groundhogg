@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -159,47 +160,50 @@ class Funnels_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
-		if ( $this->get_current_action() === 'edit' ) {
 
-			wp_enqueue_editor();
+		switch ( $this->get_current_action() ) {
+			case 'edit':
+				wp_enqueue_editor();
 
-			wp_enqueue_style( 'editor-buttons' );
-			wp_enqueue_style( 'jquery-ui' );
+				wp_enqueue_style( 'editor-buttons' );
+				wp_enqueue_style( 'jquery-ui' );
 
-			wp_enqueue_editor();
-			wp_enqueue_script( 'wplink' );
+				wp_enqueue_editor();
+				wp_enqueue_script( 'wplink' );
 
-			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script( 'jquery-ui-draggable' );
-			$funnel = new Funnel( get_url_var( 'funnel' ) );
+				wp_enqueue_script( 'jquery-ui-sortable' );
+				wp_enqueue_script( 'jquery-ui-draggable' );
+				$funnel = new Funnel( get_url_var( 'funnel' ) );
 
-			wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
-			wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
-			wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-				'steps'                 => $funnel->get_steps(),
-				'id'                    => absint( get_request_var( 'funnel' ) ),
-				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
-				'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
-				'disable_deselect_step' => is_white_labeled(),
-				'add_step_button'       => html()->modal_link( [
-					'title'              => __( 'Add Step' ),
-					'text'               => dashicon( 'plus' ),
-					'footer_button_text' => __( 'Cancel' ),
-					'class'              => 'add-step button button-secondary no-padding',
-					'source'             => 'steps',
-					'height'             => 700,
-					'width'              => 500,
-					'footer'             => 'true',
-					'preventSave'        => 'true',
-				] )
-			] );
+				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
+				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
+					'steps'                 => $funnel->get_steps(),
+					'id'                    => absint( get_request_var( 'funnel' ) ),
+					'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
+					'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
+					'disable_deselect_step' => is_white_labeled(),
+					'add_step_button'       => html()->modal_link( [
+						'title'              => __( 'Add Step' ),
+						'text'               => dashicon( 'plus' ),
+						'footer_button_text' => __( 'Cancel' ),
+						'class'              => 'add-step button button-secondary no-padding',
+						'source'             => 'steps',
+						'height'             => 700,
+						'width'              => 500,
+						'footer'             => 'true',
+						'preventSave'        => 'true',
+					] )
+				] );
 
-			wp_enqueue_script( 'groundhogg-admin-replacements' );
-			wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
-
-		} else if ( $this->get_current_action() === 'funnel_settings' ) {
-			wp_enqueue_script( 'groundhogg-admin-iframe' );
-			wp_enqueue_style( 'groundhogg-admin-iframe' );
+				wp_enqueue_script( 'groundhogg-admin-replacements' );
+				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
+				break;
+			case 'funnel_settings':
+				wp_enqueue_style( 'groundhogg-admin-iframe' );
+				break;
+			case 'add':
+				break;
 		}
 
 		wp_enqueue_style( 'groundhogg-admin' );
@@ -310,13 +314,7 @@ class Funnels_Page extends Admin_Page {
 				'success'
 			);
 
-			$edit_url = $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
-
-//			if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
-//				$edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
-//			}
-
-			return $edit_url;
+			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
 		}
 
 		return false;
@@ -351,6 +349,21 @@ class Funnels_Page extends Admin_Page {
 		return false;
 	}
 
+	public function process_start_from_scratch() {
+		if ( ! current_user_can( 'add_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$funnel = new Funnel();
+		$funnel->create( [
+			'title'  => 'My new funnel',
+			'author' => get_current_user_id(),
+			'status' => 'inactive',
+		] );
+
+        return $funnel->admin_link();
+	}
+
 	/**
 	 * Process add action for the funnel.
 	 *
@@ -369,15 +382,14 @@ class Funnels_Page extends Admin_Page {
 			$template_id = get_request_var( 'funnel_template' );
 			$library     = new Library();
 			$template    = $library->get_funnel_template( $template_id );
-			$json        = json_encode( $template->import_json );
-			$funnel_id   = $this->import_funnel( $json );
+			$funnel_id   = $this->import_funnel( $template );
 
 		} else if ( isset( $_POST['funnel_id'] ) ) {
 
 			$from_funnel = absint( get_request_var( 'funnel_id' ) );
 			$from_funnel = new Funnel( $from_funnel );
 
-			$json      = $from_funnel->legacy_export();
+			$json      = $from_funnel->export();
 			$funnel_id = $this->import_funnel( $json );
 
 		} else if ( isset( $_FILES['funnel_template'] ) ) {
@@ -393,12 +405,12 @@ class Funnels_Page extends Admin_Page {
 
 			$validate = wp_check_filetype( $file['name'], [ 'funnel' => 'text/plain' ] );
 
-			if ( $validate['ext'] !== 'funnel' || $validate['text/plain'] ) {
+			if ( $validate['ext'] !== 'funnel' || isset_not_empty( $validate, 'text/plain' ) ) {
 				return new \WP_Error( 'invalid_template', sprintf( 'Please upload a valid funnel template. Expected mime type of <i>text/plain</i> but got <i>%s</i>', esc_html( $file['type'] ) ) );
 			}
 
 			$json = file_get_contents( $file['tmp_name'] );
-			$json = json_decode( $json, true );
+			$json = json_decode( $json );
 
 			if ( ! $json ) {
 				return new \WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
@@ -408,7 +420,7 @@ class Funnels_Page extends Admin_Page {
 
 		} else if ( $json = get_request_var( 'funnel_json' ) ) {
 
-			$json = json_decode( $json, true );
+			$json = json_decode( $json );
 
 			if ( ! $json ) {
 				return new \WP_Error( 'invalid_json', 'Invalid JSON provided.' );
@@ -425,11 +437,10 @@ class Funnels_Page extends Admin_Page {
 			return new \WP_Error( 'error', __( 'Could not create funnel.', 'groundhogg' ) );
 		}
 
-		$this->add_notice( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );
-
-		$edit_url = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id );
-
-		return $edit_url;
+		return admin_page_url( 'gh_funnels', [
+			'action' => 'edit',
+			'funnel' => $funnel_id
+		] );
 
 	}
 
@@ -448,7 +459,7 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel = new Funnel();
 
-		return $funnel->legacy_import( $import );
+		return $funnel->import( $import );
 	}
 
 	/**
@@ -802,14 +813,7 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-//		if ( $this->is_v2() ) {
 		include __DIR__ . '/funnel-editor.php';
-
-//			return;
-//		}
-//
-//		include __DIR__ . '/funnel-editor.php';
-
 	}
 
 	public function add() {
@@ -884,6 +888,7 @@ class Funnels_Page extends Admin_Page {
 			'conversion_step' => $conversion_step_id
 		] );
 
+		$funnel->update_meta( 'description', sanitize_textarea_field( get_post_var( 'description' ) ) );
 
 		$this->add_notice( 'success', __( 'Settings saved!', 'groundhogg' ) );
 

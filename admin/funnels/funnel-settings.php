@@ -14,11 +14,11 @@ $funnel    = new Funnel( $funnel_id );
 
 	<?php wp_nonce_field( 'funnel_settings' ); ?>
 
-	<table class="form-table">
-		<tbody>
-		<tr>
-			<th><?php _e( 'Conversion Benchmark', 'groundhogg' ); ?></th>
-			<td><?php
+    <table class="form-table">
+        <tbody>
+        <tr>
+            <th><?php _e( 'Conversion Benchmark', 'groundhogg' ); ?></th>
+            <td><?php
 
 				$steps = $funnel->get_steps( [
 					'step_group' => 'benchmark',
@@ -45,9 +45,20 @@ $funnel    = new Funnel( $funnel_id );
 				echo html()->description( __( 'This is used to calculate the conversion rate of a funnel in a report. By default it is assumed the last benchmark should be used.', 'groundhogg' ) )
 
 				?></td>
-		</tr>
-		</tbody>
-	</table>
+        </tr>
+        <tr>
+            <th><?php _e( 'Description', 'groundhogg' ); ?></th>
+            <td><?php
+
+				echo html()->textarea( [
+					'name'  => 'description',
+					'value' => $funnel->get_meta( 'description' ),
+				] );
+
+				?></td>
+        </tr>
+        </tbody>
+    </table>
 
 	<?php submit_button(); ?>
 </form>

@@ -7,6 +7,32 @@ use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
 class Funnel extends Base_Object_With_Meta {
+
+	protected $is_template = false;
+	protected $steps = [];
+
+	public function __construct( $identifier_or_args = 0, $is_template_data = false ) {
+
+		if ( $is_template_data ) {
+			$this->setup_template_data( $identifier_or_args );
+
+			return;
+		}
+
+		parent::__construct( $identifier_or_args );
+	}
+
+	protected function setup_template_data( $data ) {
+
+		$data = (object) $data;
+
+		$this->is_template = true;
+		$this->ID          = $data->ID;
+		$this->data        = (array) $data->data;
+		$this->meta        = (array) $data->meta;
+		$this->steps       = (array) $data->steps;
+	}
+
 	/**
 	 * Do any post setup actions.
 	 *
@@ -271,8 +297,8 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * @return array
 	 */
-	public function get_starting_step_ids(){
-		return get_object_ids( array_filter( $this->get_steps(), function ( $step ){
+	public function get_starting_step_ids() {
+		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_starting();
 		} ) );
 	}
@@ -285,13 +311,7 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_step_ids( $query = [] ) {
-		$query = array_merge( $query, [
-			'funnel_id' => $this->get_id(),
-			'orderby'   => 'step_order',
-			'order'     => 'ASC',
-		] );
-
-		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->query( $query ), 'ID' ) );
+		return get_object_ids( $this->get_steps( $query ) );
 	}
 
 	/**
@@ -302,15 +322,16 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return Step[]
 	 */
 	public function get_steps( $query = [] ) {
-		$raw_step_ids = $this->get_step_ids( $query );
 
-		$steps = [];
+		$query = wp_parse_args( $query, [
+			'funnel_id' => $this->get_id(),
+			'orderby'   => 'step_order',
+			'order'     => 'ASC',
+		] );
 
-		foreach ( $raw_step_ids as $raw_step_id ) {
-			$steps[] = new Step( $raw_step_id );
-		}
+		$steps = $this->get_steps_db()->query( $query );
 
-		return $steps;
+		return array_map_to_step( $steps );
 	}
 
 	/**
@@ -341,9 +362,7 @@ class Funnel extends Base_Object_With_Meta {
 
 		}
 
-		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );
-
-		return $export;
+		return apply_filters( 'groundhogg/funnel/export', $export, $this );
 	}
 
 	/**
@@ -382,6 +401,66 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function export_url() {
 		return managed_page_url( sprintf( 'funnels/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
+	}
+
+	/**
+	 * Import a funnel
+	 *
+	 * @return bool|int|\WP_Error
+	 */
+	public function import( $data ) {
+
+		// legacy import
+		if ( isset_not_empty( $data, 'title' ) ) {
+			return $this->legacy_import( json_decode( json_encode( $data ), true ) );
+		}
+
+		$this->setup_template_data( $data );
+
+		$this->create( [
+			'title'  => $this->get_title(),
+			'author' => get_current_user_id(),
+			'status' => 'inactive'
+		] );
+
+		if ( ! $this->exists() ) {
+			return new \WP_Error( 'error', 'Unable to create funnel.' );
+		}
+
+		/**
+		 * @var $steps Step[]
+		 */
+		$steps = [];
+
+		foreach ( $this->steps as $i => $_step ) {
+
+			$_step = (object) $_step;
+
+			$data              = (array) $_step->data;
+			$data['funnel_id'] = $this->get_id();
+			$step              = new Step();
+
+			$step->create( $data );
+			$step->update_meta( (array) $_step->meta );
+			$step->import( (array) $_step->export );
+
+			// Save the original ID from the donor site
+			$step->update_meta( 'imported_step_id', $_step->ID );
+
+			$steps[ $i ] = $step;
+		}
+
+		// Re-run through the steps and perform cleanup actions...
+		foreach ( $steps as $step ) {
+			$step->post_import();
+		}
+
+		// don't need imported_step_id forever, just get rid of it
+		get_db( 'stepmeta' )->delete( [
+			'meta_key' => 'imported_step_id'
+		] );
+
+		return $this->get_id();
 	}
 
 	/**
@@ -447,11 +526,6 @@ class Funnel extends Base_Object_With_Meta {
 			$import_args = $step_args['args'];
 
 			$step->import( $import_args );
-
-			// The screen will be blank, so set the first step to active
-			if ( $i === 0 && is_white_labeled() ) {
-				$step->update_meta( 'is_active', true );
-			}
 
 		}
 

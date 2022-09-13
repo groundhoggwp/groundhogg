@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Funnel;
+use function Groundhogg\action_url;
 use function Groundhogg\get_url_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
@@ -12,12 +14,12 @@ use Groundhogg\Plugin;
  * Similar to the Email add page, this allows one to select a funnel from some pre-installed defaults.
  * Or upload their own funnel if they purchased one from us or another provider
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Funnels
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 
 // Exit if accessed directly
@@ -33,137 +35,83 @@ if ( get_url_var( 'flush' ) ) {
 
 ?>
 	<?php $active_tab = sanitize_key( get_request_var( 'tab', 'templates' ) ); ?>
-	<h2 class="nav-tab-wrapper">
-		<a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates"
-		   class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Funnel Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
-		<a id="funnel-import" href="?page=gh_funnels&action=add&tab=import"
-		   class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Funnel', 'add_funnel_tab', 'groundhogg' ); ?></a>
-	</h2>
-	<!-- search form -->
-	<?php do_action( 'wpgh_add_new_funnel_form_before' ); ?>
+    <h2 class="nav-tab-wrapper">
+        <a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates"
+           class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Funnel Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
+        <a id="funnel-import" href="?page=gh_funnels&action=add&tab=import"
+           class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Funnel', 'add_funnel_tab', 'groundhogg' ); ?></a>
+        <a class="gh-button secondary small alignright" href="<?php echo action_url( 'start_from_scratch' ) ?>"><?php _e( 'Start from scratch' ) ?></a>
+    </h2>
 
 	<?php if ( 'templates' === $active_tab ): ?>
-	<form method="post">
-		<?php wp_nonce_field( 'add' ); ?>
-		<!-- GET FUNNEL TEMPLATES FROM HERE -->
-		<?php $funnel_templates = Plugin::$instance->library->get_funnel_templates(); ?>
-		<div id="">
-            <p></p>
-			<div class="post-box-grid">
-				<?php
-				foreach ( $funnel_templates as $funnel_args ): ?>
-					<div class="gh-panel">
-                        <div class="gh-panel-header">
-                            <h2 class="hndle"><?php echo $funnel_args->name; ?></h2>
-                        </div>
-						<div class="inside">
-							<p><?php echo $funnel_args->description; ?></p>
-							<button class="gh-button primary" name="funnel_template"
-							        value="<?php echo $funnel_args->id ?>"><?php _ex( 'Start Building', 'action', 'groundhogg' ); ?></button>
-						</div>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</form>
-<?php elseif ( 'marketplace' === $active_tab ):
-	?>
-	<style>
-        .wp-filter-search {
-            box-sizing: border-box;
-            width: 100%;
-            font-size: 16px;
-            padding: 6px;
-        }
-	</style>
-	<div id="poststuff">
-		<div class="postbox">
-			<div class="inside">
-				<p style="float: left"><?php _e( 'Search for templates from our marketplace.', 'groundhogg' ); ?></p>
-				<p style="float: right"
-				   class="description"><?php _e( 'Want to share your funnel with the world? <a target="_blank" href="https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/">Get Started Now!</a>', 'groundhogg' ); ?></p>
-				<form class="search-form" method="get">
-					<input type="text" id="search_funnel"
-					       placeholder="<?php esc_attr_e( 'Type in a search term like Webinar...', 'groundhogg' ); ?>"
-					       class="wp-filter-search"/>
-				</form>
-			</div>
-		</div>
-		<div style="text-align: center;" id="spinner">
-			<span class="spinner" style="float: none; visibility: visible"></span>
-		</div>
-		<div id="downloads" class="post-box-grid">
-			<?php Plugin::$instance->admin->get_page( 'funnels' )->display_funnel_templates(); ?>
-		</div>
-	</div>
 
-	<script type="text/javascript">
-      (function ($) {
+	<?php
 
-        //setup before functions
-        var typingTimer                //timer identifier
-        var doneTypingInterval = 500  //time in ms, 5 second for example
-        var $search = $('#search_funnel')
-        var $downloads = $('#downloads')
-        var $spinner = $('#spinner')
+	$funnel_templates = Plugin::$instance->library->get_funnel_templates();
 
-        $spinner.hide()
+    $funnel_templates = array_map( function ( $template ) {
+		return new Funnel( $template, true );
+	}, $funnel_templates );
 
-        $search.keyup(function () {
-          clearTimeout(typingTimer)
-          typingTimer = setTimeout(ajaxCall, doneTypingInterval)
-        })
+    // Filter out templates that have steps that are not registered on this site
+    $funnel_templates = array_filter( $funnel_templates, function ( $funnel ){
 
-        $search.keydown(function () {
-          clearTimeout(typingTimer)
-        })
-
-        function ajaxCall () {
-          $downloads.hide()
-          $spinner.show()
-          // $(".spinner").css( 'visibility', 'visible' );
-          var ajaxCall = $.ajax({
-            type: 'post',
-            url: ajaxurl,
-            dataType: 'json',
-            data: { action: 'gh_get_templates', s: $('#search_funnel').val() },
-            success: function (response) {
-              // $(".spinner").css( 'visibility', 'hidden' );
-              $spinner.hide()
-              $downloads.show()
-              $downloads.html(response.html)
-
+        foreach ( $funnel->steps as $step ){
+            $step = (object) $step;
+            if ( ! Plugin::instance()->step_manager->type_is_registered( $step->data->step_type ) ){
+                return false;
             }
-          })
         }
-      })(jQuery)
-	</script>
+
+        return true;
+    } )
+
+	?>
+
+    <form method="post">
+		<?php wp_nonce_field( 'add' ); ?>
+        <div id="">
+            <p></p>
+            <div class="post-box-grid">
+				<?php
+				foreach ( $funnel_templates as $funnel ): ?>
+                    <div class="gh-panel">
+                        <div class="gh-panel-header">
+                            <h2 ><?php echo $funnel->get_title(); ?></h2>
+                        </div>
+                        <div class="inside">
+                            <p><?php echo $funnel->get_meta( 'description' ); ?></p>
+                            <button class="gh-button primary" name="funnel_template"
+                                    value="<?php echo $funnel->ID ?>"><?php _ex( 'Use Template', 'action', 'groundhogg' ); ?></button>
+                        </div>
+                    </div>
+				<?php endforeach; ?>
+            </div>
+        </div>
+    </form>
 
 <?php else: ?>
-	<div class="gh-tools-wrap">
-		<p class="tools-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
-		<form method="post" enctype="multipart/form-data" class="gh-tools-box gh-panel">
+    <div class="gh-tools-wrap">
+        <p class="tools-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
+        <form method="post" enctype="multipart/form-data" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
-			<p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
-			<hr/>
-			<input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
-			<button style="float: right" class="gh-button primary" name="funnel_import"
-			        value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
-			<div class="wp-clearfix"></div>
-		</form>
-		<form method="post" class="gh-tools-box gh-panel">
+            <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
+            <hr/>
+            <input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
+            <button style="float: right" class="gh-button primary" name="funnel_import"
+                    value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
+            <div class="wp-clearfix"></div>
+        </form>
+        <form method="post" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
-			<p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
-			<hr/>
-			<textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json"
-			          placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ); ?>"></textarea>
-			<button style="float: right" class="gh-button primary" name="funnel_import"
-			        value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
-			<div class="wp-clearfix"></div>
-		</form>
-	</div>
-<?php endif; ?>
-	<?php do_action( 'groundhogg_add_new_funnel_form_after' ); ?>
-<?php
-
+            <p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
+            <hr/>
+            <textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json"
+                      placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ); ?>"></textarea>
+            <button style="float: right" class="gh-button primary" name="funnel_import"
+                    value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
+            <div class="wp-clearfix"></div>
+        </form>
+    </div>
+<?php endif;
 
