@@ -329,6 +329,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Setting to explicitly select 1 or more benchmarks to track as a conversion.
 * ADDED Setting to enable entering a funnel at an inner benchmark.
 * TWEAKED CSS for funnel step duplicate & delete actions
+* FIXED Transactional emails being sent to undeliverable addresses
 
 = 2.7.3.1 (2022-09-13) =
 * HOT FIX Disable auto slug search and replace for link click benchmark.

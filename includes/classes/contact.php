@@ -228,7 +228,6 @@ class Contact extends Base_Object_With_Meta {
 		return strtolower( $this->email );
 	}
 
-
 	/**
 	 * Gets the contact's optin status
 	 *
@@ -237,6 +236,7 @@ class Contact extends Base_Object_With_Meta {
 	public function get_optin_status() {
 		return absint( $this->optin_status );
 	}
+
 
 	/**
 	 * Get the contact's first name
@@ -437,6 +437,19 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function is_marketable() {
 		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this->ID ), $this );
+	}
+
+	/**
+	 * Whether the email address is deliverable
+	 *
+	 * @return bool
+	 */
+	public function is_deliverable() {
+		return ! in_array( $this->get_optin_status(), [
+			Preferences::HARD_BOUNCE,
+			Preferences::COMPLAINED,
+			Preferences::SPAM
+		]);
 	}
 
 	/**

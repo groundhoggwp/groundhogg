@@ -860,14 +860,13 @@ class Email extends Base_Object_With_Meta {
 			$this->set_event( $event );
 		}
 
-		$do_not_send = [
-			Preferences::COMPLAINED,
-			Preferences::HARD_BOUNCE,
-			Preferences::SPAM
-		];
+		// Contact is undeliverable
+		if ( ! $contact->is_deliverable() ) {
+			return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.' ) );
+		}
 
 		// Ignore if testing or the message is transactional
-		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() && ! in_array( $contact->get_optin_status(), $do_not_send ) ) {
+		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() ) {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
 		}
 
