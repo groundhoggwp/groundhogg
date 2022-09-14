@@ -48,11 +48,11 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_templates() {
-		$funnels = get_transient( 'groundhogg_funnel_templates' );
+//		$funnels = get_transient( 'groundhogg_funnel_templates' );
 
-		if ( ! empty( $funnels ) ) {
-			return $funnels;
-		}
+//		if ( ! empty( $funnels ) ) {
+//			return $funnels;
+//		}
 
 		$step_steps = array_keys( Plugin::instance()->step_manager->elements );
 

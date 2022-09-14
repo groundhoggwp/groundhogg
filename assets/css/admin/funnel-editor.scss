@@ -103,6 +103,13 @@ html {
 
 #postbox-container-2-inner {
 
+  .benchmark-settings {
+    //.gh-checkbox-label {
+    //  display: flex;
+    //  gap: 5px;
+    //}
+  }
+
   .notice {
     margin: 0;
     border-radius: 5px;
@@ -477,10 +484,10 @@ button.button.save-button {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
+  width: max-content;
   top: -34px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
 }
 
 #step-sortable {
@@ -577,6 +584,47 @@ button.button.save-button {
     border: 2px solid transparent;
     cursor: pointer;
 
+    &:hover {
+      .actions {
+        visibility: visible;
+      }
+    }
+
+    .actions {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      display: flex;
+      visibility: hidden;
+
+      button.gh-button {
+        padding: 5px;
+        font-size: 16px;
+        .dashicons {
+          font-size: 16px;
+          height: 16px;
+          width: 16px;
+        }
+      }
+    }
+
+    .step-labels{
+
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      gap: 3px;
+
+      .step-label {
+        font-size: 10px;
+        padding: 1px 6px;
+        color: white;
+        border-radius: 3px;
+        width: max-content;
+        background-color: $primary-dark;
+      }
+    }
+
     &.step-placeholder {
       justify-content: center;
       padding: 20px;
@@ -592,7 +640,7 @@ button.button.save-button {
     }
 
     > .hndle {
-      padding: 10px;
+      padding: 10px 55px 10px 10px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -631,6 +679,10 @@ button.button.save-button {
         border-color: $benchmark-orange;
       }
 
+      .step-labels .step-label{
+        background-color: $benchmark-orange;
+      }
+
       &:first-child {
 
         margin-top: 40px;
@@ -664,15 +716,6 @@ button.button.save-button {
 
 .step .inside select {
   vertical-align: top;
-}
-
-.step span.actions,
-.reporting-enabled .step:hover span.actions {
-  visibility: hidden;
-}
-
-.step:hover span.actions {
-  visibility: visible;
 }
 
 #benchmarks .help-icon,

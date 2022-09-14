@@ -306,10 +306,10 @@ class Funnels_Page extends Admin_Page {
 				continue;
 			}
 
-			$json = $funnel->legacy_export();
+			$json = $funnel->export();
 
 			$new_funnel = new Funnel();
-			$id         = $new_funnel->legacy_import( $json );
+			$id         = $new_funnel->import( $json );
 
 			$this->add_notice(
 				esc_attr( 'duplicated' ),
@@ -762,15 +762,15 @@ class Funnels_Page extends Admin_Page {
 			return;
 		}
 
-		$stepid = absint( get_request_var( 'step_id' ) );
-		$step   = new Step( $stepid );
+		$step_id = absint( get_request_var( 'step_id' ) );
+		$step    = new Step( $step_id );
 
 		if ( ! $step->exists() ) {
 			wp_send_json_error();
 		}
 
 		if ( $step->delete() ) {
-			wp_send_json_success( [ 'id' => $stepid ] );
+			wp_send_json_success( [ 'id' => $step_id ] );
 		}
 
 		wp_send_json_error();

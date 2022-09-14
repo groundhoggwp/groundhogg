@@ -88,12 +88,12 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 	protected function get_conversion_rate( $funnel_id ) {
 
-		$funnel          = new Funnel( $funnel_id );
-		$conversion_step = $funnel->get_conversion_step_id();
+		$funnel           = new Funnel( $funnel_id );
+		$conversion_steps = $funnel->get_conversion_step_ids();
 
 		$where = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
+			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],

@@ -25,18 +25,15 @@ class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 
 		$where_events = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $funnel->get_first_step_id(), 'compare' => '=' ],
+			[ 'col' => 'step_id', 'val' => $funnel->get_entry_step_ids(), 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 		];
 
-		$num_of_contacts = get_db( 'events' )->count( [
+		return get_db( 'events' )->count( [
 			'where'  => $where_events,
 			'select' => 'DISTINCT contact_id'
 		] );
-
-
-		return $num_of_contacts;
 	}
 }

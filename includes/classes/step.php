@@ -151,11 +151,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function get_slug() {
 
-		if ( ! $this->step_slug ){
+		if ( ! $this->step_slug ) {
 			$this->set_slug();
 		}
 
 		return $this->step_slug;
+	}
+
+	public function is_conversion() {
+		return (bool) $this->is_conversion;
+	}
+
+	public function is_entry() {
+		return (bool) $this->is_entry;
 	}
 
 	/**
@@ -200,7 +208,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $contacts;
 	}
 
-
 	/**
 	 * Get an array of waiting events
 	 *
@@ -226,6 +233,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return $prepped;
 	}
+
 
 	/**
 	 * @return bool whether the step is a benchmark
@@ -445,7 +453,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'priority'   => 10,
 		];
 
-		return (bool) $this->get_event_queue_db()->add( $event );
+		return $this->get_event_queue_db()->add( $event );
 	}
 
 	/**
@@ -462,7 +470,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// Check if starting
-		if ( $this->is_starting() ) {
+		if ( $this->is_starting() || $this->is_entry() ) {
 			return true;
 		} // If inner step, check if contact is at a step before this one.
 		else if ( $this->is_inner() ) {
@@ -579,21 +587,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return true;
 		}
 
-		$step_order = $this->get_order() - 1;
-		$steps      = $this->get_funnel()->get_steps();
+		// if has preceding actions, than also not starting
+		$preceding = $this->get_preceding_actions();
 
-		while ( $step_order > 0 ) {
-
-			$step = $steps[ $step_order ];
-
-			if ( $step->is_action() ) {
-				return false;
-			}
-
-			$step_order -= 1;
+		if ( empty( $preceding ) ) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -641,6 +642,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Modify the result
 		$result = apply_filters( 'groundhogg/steps/run/result', $result, $this, $contact, $event );
+
+		if ( $result && ! is_wp_error( $result ) ) {
+
+			// track conversion if a benchmark
+			if ( $this->is_benchmark() && $this->is_conversion() ) {
+				track_activity( $contact, 'funnel_conversion', [
+					'funnel_id' => $this->get_funnel_id(),
+					'step_id'   => $this->get_id(),
+					'event_id'  => $event->get_id()
+				] );
+			}
+		}
 
 		return $result;
 	}
@@ -771,9 +784,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$this->html();
 
-		$html = ob_get_clean();
-
-		return $html;
+		return ob_get_clean();
 	}
 
 	/**

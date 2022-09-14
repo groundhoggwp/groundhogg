@@ -17,36 +17,6 @@ $funnel    = new Funnel( $funnel_id );
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php _e( 'Conversion Benchmark', 'groundhogg' ); ?></th>
-            <td><?php
-
-				$steps = $funnel->get_steps( [
-					'step_group' => 'benchmark',
-					'funnel_id'  => $funnel_id
-				] );
-
-				$options = [];
-
-				foreach ( $steps as $step ) {
-					$step                       = new Step( absint( $step->ID ) );
-					$options[ $step->get_id() ] = $step->get_title();
-				}
-
-				$args = [
-					'name'        => 'conversion_step_id',
-					'id'          => 'conversion-step',
-					'options'     => $options,
-					'selected'    => $funnel->get_conversion_step_id(),
-					'option_none' => false,
-				];
-
-				echo Plugin::$instance->utils->html->dropdown( $args );
-
-				echo html()->description( __( 'This is used to calculate the conversion rate of a funnel in a report. By default it is assumed the last benchmark should be used.', 'groundhogg' ) )
-
-				?></td>
-        </tr>
-        <tr>
             <th><?php _e( 'Description', 'groundhogg' ); ?></th>
             <td><?php
 

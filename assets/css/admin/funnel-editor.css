@@ -424,10 +424,10 @@ button.button.save-button {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
+  width: max-content;
   top: -34px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
   background-color: #f58115;
 }
 #postbox-container-1 .step.benchmark + .step.benchmark {
@@ -439,10 +439,10 @@ button.button.save-button {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
+  width: max-content;
   top: -34px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
   background-color: #6c19ad;
 }
 #postbox-container-1 .step.benchmark + .step.action {
@@ -454,10 +454,10 @@ button.button.save-button {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
+  width: max-content;
   top: -34px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
   background-color: #9ece38;
 }
 #postbox-container-1 .step {
@@ -467,6 +467,39 @@ button.button.save-button {
   background: white;
   border: 2px solid transparent;
   cursor: pointer;
+}
+#postbox-container-1 .step:hover .actions {
+  visibility: visible;
+}
+#postbox-container-1 .step .actions {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  visibility: hidden;
+}
+#postbox-container-1 .step .actions button.gh-button {
+  padding: 5px;
+  font-size: 16px;
+}
+#postbox-container-1 .step .actions button.gh-button .dashicons {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+#postbox-container-1 .step .step-labels {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  gap: 3px;
+}
+#postbox-container-1 .step .step-labels .step-label {
+  font-size: 10px;
+  padding: 1px 6px;
+  color: white;
+  border-radius: 3px;
+  width: max-content;
+  background-color: #102640;
 }
 #postbox-container-1 .step.step-placeholder {
   justify-content: center;
@@ -480,7 +513,7 @@ button.button.save-button {
   border-color: #ffee58 !important;
 }
 #postbox-container-1 .step > .hndle {
-  padding: 10px;
+  padding: 10px 55px 10px 10px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -511,6 +544,9 @@ button.button.save-button {
 #postbox-container-1 .step.benchmark.active {
   border-color: #f58115;
 }
+#postbox-container-1 .step.benchmark .step-labels .step-label {
+  background-color: #f58115;
+}
 #postbox-container-1 .step.benchmark:first-child {
   margin-top: 40px;
 }
@@ -520,10 +556,10 @@ button.button.save-button {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
+  width: max-content;
   top: -34px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
   background-color: #f58115;
 }
 #postbox-container-1 .step.action {
@@ -542,15 +578,6 @@ button.button.save-button {
 
 .step .inside select {
   vertical-align: top;
-}
-
-.step span.actions,
-.reporting-enabled .step:hover span.actions {
-  visibility: hidden;
-}
-
-.step:hover span.actions {
-  visibility: visible;
 }
 
 #benchmarks .help-icon,

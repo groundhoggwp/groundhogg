@@ -27,7 +27,7 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 		return get_db( 'events' )->count( [
 			'where'  => [
 				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $step_id, 'compare' => '=' ],
+				[ 'col' => 'step_id', 'val' => $step_id, 'compare' => is_array( $step_id ) ? 'IN' : '=' ],
 				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],

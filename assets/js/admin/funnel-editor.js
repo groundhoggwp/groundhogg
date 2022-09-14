@@ -278,7 +278,7 @@
 
       var $step = $('#' + id)
       var result = confirm(
-        'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.')
+        'Are you sure you want to delete this step? Any pending events for this step will be removed.')
 
       if (result) {
         adminAjaxRequest(

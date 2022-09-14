@@ -251,9 +251,21 @@ class Funnel extends Base_Object_With_Meta {
 	 * Get the ID of the conversion step...
 	 * This can be defined, or is assumed the last benchmark in the funnel...
 	 *
+	 * @return int[]
+	 */
+	public function get_conversion_step_ids() {
+		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
+			return $step->is_conversion();
+		} ) );
+	}
+
+	/**
+	 * Get the ID of the conversion step...
+	 * This can be defined, or is assumed the last benchmark in the funnel...
+	 *
 	 * @return int
 	 */
-	public function get_conversion_step_id() {
+	public function legacy_conversion_step_id() {
 		$conversion_step_id = absint( $this->conversion_step );
 
 		if ( ! $conversion_step_id ) {
@@ -264,7 +276,6 @@ class Funnel extends Base_Object_With_Meta {
 			$last = array_pop( $steps );
 
 			if ( $last ) {
-
 				return $last->get_id();
 			}
 
@@ -274,6 +285,7 @@ class Funnel extends Base_Object_With_Meta {
 
 		return $conversion_step_id;
 	}
+
 
 	public function get_first_action_id() {
 		$actions = $this->get_step_ids( [
@@ -297,9 +309,9 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * @return array
 	 */
-	public function get_starting_step_ids() {
+	public function get_entry_step_ids() {
 		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
-			return $step->is_starting();
+			return $step->is_starting() || $step->is_entry();
 		} ) );
 	}
 

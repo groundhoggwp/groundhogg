@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.3.1
+Stable tag: 2.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.4 (2022-09-14) =
+* ADDED Setting to explicitly select 1 or more benchmarks to track as a conversion.
+* ADDED Setting to enable entering a funnel at an inner benchmark.
+* TWEAKED CSS for funnel step duplicate & delete actions
 
 = 2.7.3.1 (2022-09-13) =
 * HOT FIX Disable auto slug search and replace for link click benchmark.

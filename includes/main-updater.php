@@ -575,6 +575,38 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Set conversion step IDs to preserve legacy behaviour
+	 *
+	 * @return void
+	 */
+	public function version_2_7_4() {
+
+		$funnels = get_db( 'funnels' )->query();
+
+		foreach ( $funnels as $funnel ) {
+			$funnel = new Funnel( $funnel );
+
+			$step_id = $funnel->legacy_conversion_step_id();
+
+			if ( ! $step_id ) {
+				continue;
+			}
+
+			$step = new Step( $step_id );
+
+			if ( ! $step->exists() ) {
+				continue;
+			}
+
+			$step->update( [
+				'is_conversion' => true
+			] );
+
+		}
+
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -637,6 +669,7 @@ class Main_Updater extends Updater {
 			'2.6.2.4',
 			'2.6.2.10',
 			'2.7.2',
+			'2.7.4',
 		];
 	}
 
@@ -732,6 +765,7 @@ class Main_Updater extends Updater {
 			'2.6.2.5'       => __( 'Fix missing caps for emails endpoint.', 'groundhogg' ),
 			'2.6.2.10'      => __( 'Change files download pathname to /file-download/ from /files/.', 'groundhogg' ),
 			'2.7.2'         => __( 'Add <code>step_slug</code> column. Add new rewrites for prettier URLs.', 'groundhogg' ),
+			'2.7.4'         => __( 'Set the <code>is_conversion</code> for benchmarks based on legacy funnel conversion step.', 'groundhogg' ),
 		];
 	}
 }

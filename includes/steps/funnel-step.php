@@ -643,9 +643,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function pre_html( Step $step ) {
 		$this->set_current_step( $step );
 
-        if ( $step->is_action() && $step->get_order() === 1 ){
-            $step->add_error( new \WP_Error( 'cant_start', __( 'A benchmark must be used to start the funnel.' )  ) );
-        }
+		if ( $step->is_action() && $step->get_order() === 1 ) {
+			$step->add_error( new \WP_Error( 'cant_start', __( 'A benchmark must be used to start the funnel.' ) ) );
+		}
 
 		$this->validate_settings( $step );
 	}
@@ -691,18 +691,27 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                 title="<?php echo $step->get_title() ?>"
                 class="step <?php echo implode( ' ', $classes ) ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+            <div class="step-labels display-flex gap-10">
+				<?php if ( $step->is_benchmark() && $step->is_entry() ): ?>
+                    <div class="step-label">Entry</div>
+				<?php endif; ?>
+				<?php if ( $step->is_benchmark() && $step->is_conversion() ): ?>
+                    <div class="step-label">Conversion</div>
+				<?php endif; ?>
+				<?php do_action( 'groundhogg/steps/sortable/labels', $step, $this ); ?>
+            </div>
 			<?php do_action( 'groundhogg/steps/sortable/inside', $step, $this ); ?>
 			<?php do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step ); ?>
-            <span class="actions">
-            <!-- DELETE -->
-            <button title="Delete" type="button" class="handlediv delete-step">
-                <span class="dashicons dashicons-trash"></span>
-            </button>
+            <div class="actions">
                 <!-- DUPLICATE -->
-            <button title="Duplicate" type="button" class="handlediv duplicate-step">
-                <span class="dashicons dashicons-admin-page"></span>
-            </button>
-            </span>
+                <button title="Duplicate" type="button" class="gh-button secondary text icon duplicate-step">
+                    <span class="dashicons dashicons-admin-page"></span>
+                </button>
+                <!-- DELETE -->
+                <button title="Delete" type="button" class="gh-button danger text icon delete-step">
+                    <span class="dashicons dashicons-trash"></span>
+                </button>
+            </div>
             <div class="hndle ui-sortable-handle">
 				<?php if ( $step->has_errors() ): ?>
                     <img class="hndle-icon"
@@ -785,7 +794,33 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
                 </div>
                 <div class="step-notes">
-                    <?php $this->before_step_notes( $step ); ?>
+					<?php $this->before_step_notes( $step ); ?>
+					<?php if ( $step->is_benchmark() ): ?>
+                        <div class="gh-panel benchmark-settings">
+                            <div class="gh-panel-header">
+                                <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
+                            </div>
+                            <div class="inside display-flex gap-20 column">
+								<?php if ( ! $step->is_starting() ):
+
+									echo html()->checkbox( [
+										'label'   => 'Allow contacts to enter the funnel at this step',
+										'name'    => $this->setting_name_prefix( 'is_entry' ),
+										'checked' => $step->is_entry()
+									] );
+
+								endif;
+
+								echo html()->checkbox( [
+									'label'   => 'Track conversion when completed',
+									'name'    => $this->setting_name_prefix( 'is_conversion' ),
+									'checked' => $step->is_conversion()
+								] );
+
+								?>
+                            </div>
+                        </div>
+					<?php endif; ?>
 					<?php
 					echo html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
@@ -912,9 +947,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
 		$step->update( [
-			'step_title'  => sanitize_text_field( $this->get_posted_data( 'title' ) ),
-			'step_order'  => $this->get_posted_order(),
-			'step_status' => 'ready',
+			'step_title'    => sanitize_text_field( $this->get_posted_data( 'title' ) ),
+			'step_order'    => $this->get_posted_order(),
+			'step_status'   => 'ready',
+			'is_conversion' => (bool) $this->get_posted_data( 'is_conversion', false ),
+			'is_entry'      => (bool) $this->get_posted_data( 'is_entry', false ),
 		] );
 
 		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
@@ -947,7 +984,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			}
 		}
 
-        $step->set_slug();
+		$step->set_slug();
 
 		$this->clear_errors();
 	}
@@ -1012,21 +1049,21 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @return void
 	 */
-	public function __post_import( $step ){
-        $this->set_current_step( $step );
-        $this->post_import( $step );
+	public function __post_import( $step ) {
+		$this->set_current_step( $step );
+		$this->post_import( $step );
 	}
 
 	/**
-     * Cleanup actions after the import of a step
-     *
+	 * Cleanup actions after the import of a step
+	 *
 	 * @param $step
 	 *
 	 * @return void
 	 */
-    public function post_import( $step ){
+	public function post_import( $step ) {
 
-    }
+	}
 
 	/**
 	 * @param $args
