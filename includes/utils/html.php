@@ -135,7 +135,7 @@ class HTML {
 				echo sprintf( '<%1$s %2$s>%3$s</%1$s>', $tag, array_to_atts( $atts ), $name );
 
 			else: ?>
-				<th><?php echo $name; ?></th>
+                <th><?php echo $name; ?></th>
 			<?php endif;
 		endforeach;
 	}
@@ -154,21 +154,21 @@ class HTML {
 		$args['class'] .= ' wp-list-table widefat fixed striped';
 
 		?>
-		<table <?php echo array_to_atts( $args ); ?> >
-			<thead>
-			<tr>
+        <table <?php echo array_to_atts( $args ); ?> >
+            <thead>
+            <tr>
 				<?php $this->list_table_column_headers( $cols ); ?>
-			</tr>
-			</thead>
-			<tbody>
+            </tr>
+            </thead>
+            <tbody>
 			<?php if ( ! empty( $rows ) ): ?>
 
 				<?php foreach ( $rows as $row => $cells ): ?>
-					<tr>
+                    <tr>
 						<?php foreach ( $cells as $cell => $content ): ?>
-							<td><?php echo $content; ?></td>
+                            <td><?php echo $content; ?></td>
 						<?php endforeach; ?>
-					</tr>
+                    </tr>
 				<?php endforeach; ?>
 			<?php else:
 
@@ -176,13 +176,13 @@ class HTML {
 				echo $this->wrap( __( 'No items found.', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] );
 
 			endif; ?>
-			</tbody>
+            </tbody>
 			<?php if ( $footer ): ?>
-				<tfoot>
+                <tfoot>
 				<?php $this->list_table_column_headers( $cols ); ?>
-				</tfoot>
+                </tfoot>
 			<?php endif; ?>
-		</table>
+        </table>
 		<?php
 	}
 
@@ -202,7 +202,7 @@ class HTML {
 		}
 
 		?>
-		<h2 class="<?php esc_attr_e( $class ); ?>">
+        <h2 class="<?php esc_attr_e( $class ); ?>">
 			<?php foreach ( $tabs as $id => $tab ):
 
 				echo html()->e( 'a', [
@@ -212,7 +212,7 @@ class HTML {
 				], $tab );
 
 			endforeach; ?>
-		</h2>
+        </h2>
 		<?php
 	}
 
@@ -231,8 +231,8 @@ class HTML {
 			?><h3><?php echo $args['title']; ?></h3><?php
 		}
 		?>
-		<table class="form-table <?php esc_attr_e( $args['class'] ) ?>">
-		<tbody>
+        <table class="form-table <?php esc_attr_e( $args['class'] ) ?>">
+        <tbody>
 		<?php
 	}
 
@@ -311,25 +311,25 @@ class HTML {
 		if ( $tr_wrap ):
 
 			?>
-			<tr class="form-row">
-				<th><?php echo $args['label']; ?></th>
-				<td><?php echo call_user_func( [ $this, $args['type'] ], $args['field'] );
+            <tr class="form-row">
+                <th><?php echo $args['label']; ?></th>
+                <td><?php echo call_user_func( [ $this, $args['type'] ], $args['field'] );
 					if ( ! empty( $args['description'] ) ) {
 						?><p class="description"><?php echo $args['description']; ?></p><?php
 					} ?></td>
-			</tr>
+            </tr>
 		<?php
 		else:
 			?>
-			<div class="form-row">
-				<label><?php echo $args['label']; ?><?php echo call_user_func( [
+            <div class="form-row">
+                <label><?php echo $args['label']; ?><?php echo call_user_func( [
 						$this,
 						$args['type']
 					], $args['field'] ); ?></label>
 				<?php if ( ! empty( $args['description'] ) ) {
 					?><p class="description"><?php echo $args['description']; ?></p><?php
 				} ?>
-			</div>
+            </div>
 		<?php
 		endif;
 	}
@@ -707,15 +707,16 @@ class HTML {
 			'option_none_value' => '',
 		) );
 
-		$a['selected'] = ensure_array( $a['selected'] );
+		$selected = wp_parse_list( $a['selected'] );
 
-		$optionHTML = '';
+		$optionHTML = [];
+
 
 		if ( ! empty( $a['option_none'] ) ) {
-			$optionHTML .= sprintf( "<option value='%s'>%s</option>",
-				esc_attr( $a['option_none_value'] ),
-				sanitize_text_field( $a['option_none'] )
-			);
+			$optionHTML[] = html()->e( 'option', [
+				'value'    => $a['option_none_value'],
+				'selected' => in_array( $a['option_none_value'], $selected )
+			], esc_html( $a['option_none'] ) );
 		}
 
 		if ( is_array( get_array_var( $a, 'options' ) ) ) {
@@ -731,31 +732,23 @@ class HTML {
 					$inner_options = $name;
 					$label         = $value;
 
-					$optionHTML .= sprintf( "<optgroup label='%s'>", $label );
+					$optionHTML[] = sprintf( "<optgroup label='%s'>", $label );
 
 					foreach ( $inner_options as $inner_value => $inner_name ) {
 
-						$selected = ( in_array( $inner_value, $a['selected'] ) ) ? 'selected' : '';
-
-						$optionHTML .= sprintf(
-							"<option value='%s' %s>%s</option>",
-							esc_attr( $inner_value ),
-							$selected,
-							esc_html( $inner_name )
-						);
+						$optionHTML[] = html()->e( 'option', [
+							'value'    => $inner_value,
+							'selected' => in_array( $inner_value, $selected ),
+						], esc_html( $inner_name ) );
 					}
 
-					$optionHTML .= "</optgroup>";
+					$optionHTML[] = "</optgroup>";
 
 				} else {
-					$selected = ( in_array( $value, $a['selected'] ) ) ? 'selected' : '';
-
-					$optionHTML .= sprintf(
-						"<option value='%s' %s>%s</option>",
-						esc_attr( $value ),
-						$selected,
-						esc_html( $name )
-					);
+					$optionHTML[] = html()->e( 'option', [
+						'value'    => $value,
+						'selected' => in_array( $value, $selected ),
+					], esc_html( $name ) );
 				}
 
 			}
@@ -772,9 +765,7 @@ class HTML {
 		unset( $a['selected'] );
 		unset( $a['options'] );
 
-		$html = $this->wrap( $optionHTML, 'select', $a );
-
-		return apply_filters( 'groundhogg/html/select', $html, $a );
+		return apply_filters( 'groundhogg/html/select', $this->e( 'select', $a, $optionHTML ), $a );
 
 	}
 
@@ -787,7 +778,7 @@ class HTML {
 			'options'           => [],
 			'selected'          => '',
 			'multiple'          => false,
-			'option_none'       => __( 'Please select a from address', 'groundhogg' ),
+			'option_none'       => __( 'The Contact\'s Owner', 'groundhogg' ),
 			'option_none_value' => 0,
 			'exclude'           => []
 		) );
@@ -796,7 +787,7 @@ class HTML {
 
 		if ( empty( $a['options'] ) ) {
 
-			$a['options'][ 'default' ] = sprintf( '%s (%s)', get_default_from_name(), get_default_from_email() );
+			$a['options']['default'] = sprintf( '%s (%s)', get_default_from_name(), get_default_from_email() );
 
 			$owners = get_owners();
 
@@ -1196,11 +1187,11 @@ class HTML {
 	/**
 	 * Get a meta key picker. useful for searching.
 	 *
+	 * @deprecated use meta_picker() instead
+	 *
 	 * @param array $args
 	 *
 	 * @return string
-	 * @deprecated use meta_picker() instead
-	 *
 	 */
 	public function meta_key_picker( $args = [] ) {
 		$a = wp_parse_args( $args, array(

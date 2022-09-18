@@ -118,8 +118,9 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					] ); ?>
 				</p>
 				<h3><?php _e( 'From', 'groundhogg' ); ?></h3>
-				<p><?php echo html()->select_from_address( [
-						'option_none' => __( 'The Contact\'s Owner' ),
+				<p><?php
+
+                    echo html()->select_from_address( [
 						'id'          => 'from_user',
 						'name'        => 'from_user',
 						'selected'    => $email->from_select,

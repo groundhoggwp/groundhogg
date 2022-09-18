@@ -30,8 +30,17 @@ foreach ( $funnels as $funnel ) {
 
 ?>
 	<div class="actions" style="margin-bottom: 25px; float: right">
-		<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+		<form method="get" target="_blank" class="gh-input-group" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
 			<?php
+
+			echo html()->dropdown( [
+				'name'        => 'funnel',
+				'id'          => 'funnel-id',
+				'class'       => 'post-data',
+				'options'     => $options,
+				'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
+				'option_none' => false,
+			] );
 
 			echo html()->input( [
 				'type'  => 'hidden',
@@ -45,20 +54,9 @@ foreach ( $funnels as $funnel ) {
 				'value' => 'edit'
 			] );
 
-			$args = array(
-				'name'        => 'funnel',
-				'id'          => 'funnel-id',
-				'class'       => 'post-data',
-				'options'     => $options,
-				'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
-				'option_none' => false,
-			);
-
-			echo html()->dropdown( $args );
-
 			echo html()->e( 'button', [
 				'type'  => 'submit',
-				'class' => 'button'
+				'class' => 'gh-button secondary'
 			], __( 'View Funnel', 'groundhogg' ) );
 
 			?>

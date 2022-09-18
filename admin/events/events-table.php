@@ -61,8 +61,8 @@ class Events_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -167,6 +167,7 @@ class Events_Table extends WP_List_Table {
 
 		switch ( $status ) {
 			default:
+			case 'paused':
 			case 'waiting':
 				$time_prefix = _x( 'Will run', 'status', 'groundhogg' );
 				break;
@@ -213,7 +214,7 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param Event $event A singular item (one full row's worth of data).
+	 * @param Event  $event       A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -279,6 +280,7 @@ class Events_Table extends WP_List_Table {
 
 		$count = array(
 			'waiting'   => get_db( 'event_queue' )->count( array( 'status' => 'waiting' ) ),
+			'paused'    => get_db( 'event_queue' )->count( array( 'status' => 'paused' ) ),
 			'skipped'   => get_db( 'events' )->count( array( 'status' => 'skipped' ) ),
 			'cancelled' => get_db( 'events' )->count( array( 'status' => 'cancelled' ) ),
 			'completed' => get_db( 'events' )->count( array( 'status' => 'complete' ) ),
@@ -287,6 +289,7 @@ class Events_Table extends WP_List_Table {
 
 		return apply_filters( 'gh_event_views', array(
 			'waiting'   => "<a class='" . ( $view === 'waiting' ? 'current' : '' ) . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['waiting'] ) . ')</span>' . "</a>",
+			'paused'    => "<a class='" . ( $view === 'paused' ? 'current' : '' ) . "' href='" . $base_url . "paused" . "'>" . _x( 'Paused', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['paused'] ) . ')</span>' . "</a>",
 			'completed' => "<a class='" . ( $view === 'complete' ? 'current' : '' ) . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['completed'] ) . ')</span>' . "</a>",
 			'skipped'   => "<a class='" . ( $view === 'skipped' ? 'current' : '' ) . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['skipped'] ) . ')</span>' . "</a>",
 			'cancelled' => "<a class='" . ( $view === 'cancelled' ? 'current' : '' ) . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['cancelled'] ) . ')</span>' . "</a>",
@@ -297,9 +300,9 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Generates and displays row actions.
 	 *
-	 * @param Event $event Event being acted upon.
+	 * @param Event  $event       Event being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -374,23 +377,23 @@ class Events_Table extends WP_List_Table {
 	protected function extra_tablenav( $which ) {
 
 		?>
-		<div class="alignleft gh-actions">
-			<a class="button action"
-			   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
-			<a class="button action"
-			   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
+        <div class="alignleft gh-actions">
+            <a class="button action"
+               href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+            <a class="button action"
+               href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
 			<?php if ( $this->get_view() === Event::WAITING ): ?>
-				<a class="button action danger"
-				   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
+                <a class="button action danger"
+                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
-				<a class="button action"
-				   href="<?php echo wp_nonce_url( add_query_arg( [
+                <a class="button action"
+                   href="<?php echo wp_nonce_url( add_query_arg( [
 					   'action' => 'purge',
 					   'status' => $this->get_view()
 				   ], $_SERVER['REQUEST_URI'] ), 'purge' ); ?>"><?php _ex( 'Purge events', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -441,7 +444,7 @@ class Events_Table extends WP_List_Table {
 			'orderby' => $orderby,
 		);
 
-		$this->table = $this->get_view() === Event::WAITING ? 'event_queue' : 'events';
+		$this->table = in_array( $this->get_view(), [ Event::PAUSED, Event::WAITING ] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
 		$total  = get_db( $this->table )->count( $args );

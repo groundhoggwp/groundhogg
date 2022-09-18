@@ -69,6 +69,7 @@ class Extension_Upgrader {
 		93174  => 'groundhogg-helpscout/groundhogg-helpscout.php',
 		98242  => 'groundhogg-givewp/groundhogg-givewp.php',
 		101745 => 'groundhogg-memberpress/groundhogg-memberpress.php',
+		134192 => 'groundhogg-presto-player/groundhogg-presto-player.php',
 	];
 
 	/**

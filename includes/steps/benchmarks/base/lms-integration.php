@@ -5,6 +5,7 @@ namespace Groundhogg\Steps\Benchmarks\Base;
 use Groundhogg\Contact;
 use Groundhogg\Step;
 use Groundhogg\Steps\Benchmarks\Benchmark;
+use function Groundhogg\ensure_array;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\html;
 
@@ -14,10 +15,10 @@ abstract class LMS_Integration extends Benchmark {
 	 * Do the lifterLMS benchmark
 	 *
 	 * @param $contact int|string
-	 * @param $course int
-	 * @param $lesson int
-	 * @param $action string
-	 * @param $type string
+	 * @param $course  int
+	 * @param $lesson  int
+	 * @param $action  string
+	 * @param $type    string
 	 */
 	static function do_it( $contact, $course, $lesson, $action, $type = 'lms_action' ) {
 		do_action( "groundhogg/lms/{$type}", $contact, $course, $lesson, $action );
@@ -54,9 +55,9 @@ abstract class LMS_Integration extends Benchmark {
 
 	/**
 	 * @param $contact_id_or_email int|string
-	 * @param $course_id int
-	 * @param $lesson_id int
-	 * @param $action string
+	 * @param $course_id           int
+	 * @param $lesson_id           int
+	 * @param $action              string
 	 */
 	public function setup( $contact_id_or_email, $course_id, $lesson_id, $action ) {
 		$this->add_data( 'contact', $contact_id_or_email );
@@ -72,31 +73,24 @@ abstract class LMS_Integration extends Benchmark {
 	 */
 	protected function can_complete_step() {
 
-		$given_action = $this->get_data( 'action' );
+		$actions    = wp_parse_list( $this->get_setting( 'action' ) );
+		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
+		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
 
-		$saved_action = $this->get_setting( 'action' );
-
-		if ( $saved_action !== $given_action ) {
+		if ( ! in_array( $this->get_data( 'action' ), $actions ) ){
 			return false;
 		}
 
-		$saved_course_id = absint( $this->get_setting( 'course' ) );
-		$given_course_id = absint( $this->get_data( 'course' ) );
-
-		switch ( $saved_action ) {
-			case 'course_enrolled':
-			case 'course_completed':
-				return $saved_course_id === $given_course_id;
-				break;
-			case 'lesson_completed':
-				$saved_lesson_id = absint( $this->get_setting( 'lesson' ) );
-				$given_lesson_id = absint( $this->get_data( 'lesson' ) );
-
-				return ( $saved_course_id === $given_course_id ) && ( $saved_lesson_id == $given_lesson_id );
-				break;
+		if ( ! empty( $course_ids ) && ! in_array( $this->get_data( 'course' ), $course_ids ) ){
+			return false;
 		}
 
-		return false;
+		if ( ! empty( $course_ids ) && ! empty( $lesson_ids ) && ! in_array( $this->get_data( 'lesson' ), $lesson_ids ) ){
+			return false;
+		}
+
+		return true;
+
 	}
 
 	/**
@@ -138,22 +132,25 @@ abstract class LMS_Integration extends Benchmark {
 		html()->start_row();
 
 		html()->th( [
-			__( 'Action', 'groundhogg' )
+			__( 'Events', 'groundhogg' )
 		] );
 
+		$actions    = wp_parse_list( $this->get_setting( 'action' ) );
+		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
+		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
+
 		html()->td( [
-			html()->dropdown( [
-				'name'        => $this->setting_name_prefix( 'action' ),
-				'id'          => $this->setting_id_prefix( 'action' ),
-				'class'       => 'auto-save',
-				'options'     => [
-					'course_enrolled'  => __( 'Course Enrolled', 'groundhogg' ),
-					'course_completed' => __( 'Course Completed', 'groundhogg' ),
-					'lesson_completed' => __( 'Lesson Completed', 'groundhogg' ),
+			html()->select2( [
+				'id'       => $this->setting_id_prefix( 'action' ),
+				'name'     => $this->setting_name_prefix( 'action' ) . '[]',
+				'class'    => 'gh-select2',
+				'options'  => [
+					'course_enrolled'  => __( 'Enrolled in a course', 'groundhogg' ),
+					'course_completed' => __( 'Completed a course', 'groundhogg' ),
+					'lesson_completed' => __( 'Completed a lesson', 'groundhogg' ),
 				],
-				'selected'    => $this->get_setting( 'action' ),
-				'multiple'    => false,
-				'option_none' => false,
+				'selected' => $actions,
+				'multiple' => true,
 			] )
 		] );
 
@@ -163,44 +160,49 @@ abstract class LMS_Integration extends Benchmark {
 		html()->start_row();
 
 		html()->th( [
-			__( 'Course', 'groundhogg' )
+			__( 'Filter by course', 'groundhogg' )
 		] );
-
-		$course_id = absint( $this->get_setting( 'course' ) );
 
 		html()->td( [
 			html()->select2( [
 				'id'       => $this->setting_id_prefix( 'course' ),
-				'name'     => $this->setting_name_prefix( 'course' ),
+				'name'     => $this->setting_name_prefix( 'course' ) . '[]',
 				'data'     => $this->get_courses_for_select(),
-				'selected' => [ $course_id ],
-				'class'    => 'gh-select2 auto-save'
-			] )
+				'selected' => $course_ids,
+				'class'    => 'gh-select2',
+				'multiple' => true,
+			] ),
+			html()->description( 'Leave empty for any course.' )
 		] );
 
 		html()->end_row();
 
-		if ( $this->get_setting( 'action' ) === 'lesson_completed' ):
+		if ( empty( $course_ids ) ) {
+			html()->end_form_table();
 
-			// COURSE
-			html()->start_row();
+			return;
+		}
 
-			html()->th( [
-				__( 'Lesson', 'groundhogg' )
-			] );
 
-			html()->td( [
-				html()->select2( [
-					'id'       => $this->setting_id_prefix( 'lesson' ),
-					'name'     => $this->setting_name_prefix( 'lesson' ),
-					'data'     => $this->get_lessons_for_select( $course_id ),
-					'selected' => $this->get_setting( 'lesson' ),
-				] )
-			] );
+		// COURSE
+		html()->start_row();
 
-			html()->end_row();
+		html()->th( [
+			__( 'Filter by lesson', 'groundhogg' )
+		] );
 
-		endif;
+		html()->td( [
+			html()->select2( [
+				'id'       => $this->setting_id_prefix( 'lesson' ),
+				'name'     => $this->setting_name_prefix( 'lesson' ) . '[]',
+				'data'     => $this->get_lessons_for_select( $course_ids ),
+				'selected' => $this->get_setting( 'lesson' ),
+				'multiple' => true,
+			] ),
+			html()->description( 'Leave empty for any lesson. Update the funnel to see updated choices.' )
+		] );
+
+		html()->end_row();
 
 		html()->end_form_table();
 	}
@@ -215,11 +217,11 @@ abstract class LMS_Integration extends Benchmark {
 	/**
 	 * Get the lessons for a select 2 container
 	 *
-	 * @param $course_id int the ID of the course
+	 * @param $course_ids [] int the ID of the course
 	 *
 	 * @return mixed
 	 */
-	abstract protected function get_lessons_for_select( $course_id );
+	abstract protected function get_lessons_for_select( $course_ids );
 
 	/**
 	 * Save the step based on the given ID
@@ -227,8 +229,8 @@ abstract class LMS_Integration extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'action', sanitize_key( $this->get_posted_data( 'action' ) ) );
-		$this->save_setting( 'course', absint( $this->get_posted_data( 'course' ) ) );
-		$this->save_setting( 'lesson', absint( $this->get_posted_data( 'lesson' ) ) );
+		$this->save_setting( 'action', array_map( 'sanitize_text_field', $this->get_posted_data( 'action', [] ) ) );
+		$this->save_setting( 'course', wp_parse_id_list( $this->get_posted_data( 'course' ) ) );
+		$this->save_setting( 'lesson', wp_parse_id_list( $this->get_posted_data( 'lesson' ) ) );
 	}
 }
