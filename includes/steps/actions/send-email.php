@@ -254,10 +254,11 @@ class Send_Email extends Action {
 			return $args;
 		}
 
-		$args['subject']    = $email->get_subject_line();
-		$args['title']      = $email->get_title();
-		$args['pre_header'] = $email->get_pre_header();
-		$args['content']    = $email->get_content();
+		$args['subject']     = $email->get_subject_line();
+		$args['title']       = $email->get_title();
+		$args['pre_header']  = $email->get_pre_header();
+		$args['content']     = $email->get_content();
+		$args['from_select'] = $email->from_select;
 
 		return $args;
 	}

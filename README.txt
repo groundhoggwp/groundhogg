@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.4.1
+Stable tag: 2.7.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.4.2 (2022-09-19) =
+* FIXED Unable to add form fields to form builder.
+* FIXED Insert at cursor replacements widget moving cursor to end of content in input fields.
 
 = 2.7.4.1 (2022-09-18) =
 * ADDED Presto Player integration download ID for supporting remote download and install

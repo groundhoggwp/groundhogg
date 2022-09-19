@@ -31,7 +31,7 @@
     },
 
     adminNotification (step) {
-      
+
       let $customEmail = $('.active .custom-settings input.custom-email')
       let $replyType = $('.active .custom-settings select.reply-to-type')
 

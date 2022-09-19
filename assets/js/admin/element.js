@@ -18,13 +18,15 @@
       myField.value = myField.value.substring(0, startPos)
         + myValue
         + myField.value.substring(endPos, myField.value.length)
+
+      myField.selectionStart = startPos + myValue.length
+      myField.selectionEnd = startPos + myValue.length
     }
     else {
-
       myField.value += myValue
     }
 
-    $(myField).trigger('change')
+    // $(myField).trigger('change')
   }
 
   const Insert = {
