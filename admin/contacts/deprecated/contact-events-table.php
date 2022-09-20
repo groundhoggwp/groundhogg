@@ -72,10 +72,10 @@ class Contact_Events_Table extends Events\Events_Table {
 	 */
 	public function get_columns() {
 		$columns = array(
-			'funnel'  => _x( 'Funnel', 'Column label', 'wp-funnels' ),
-			'step'    => _x( 'Step', 'Column label', 'wp-funnels' ),
-			'time'    => _x( 'Time', 'Column label', 'wp-funnels' ),
-			'actions' => _x( 'Actions', 'Column label', 'wp-funnels' ),
+			'funnel'  => _x( 'Funnel', 'Column label', 'groundhogg' ),
+			'step'    => _x( 'Step', 'Column label', 'groundhogg' ),
+			'time'    => _x( 'Time', 'Column label', 'groundhogg' ),
+			'actions' => _x( 'Actions', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'wpgh_event_columns', $columns );

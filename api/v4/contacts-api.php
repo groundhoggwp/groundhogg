@@ -207,7 +207,7 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public static function ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact ) {
 
-		if ( ! is_a_contact( $contact ) || ! $contact->exists() ){
+		if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 			return self::ERROR_401( 'error', 'The requested contact does not exist.', [
 				'given' => $contact
 			] );
@@ -297,8 +297,9 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact_query = new Contact_Query();
 
-		$count    = $contact_query->count( $query );
 		$contacts = $contact_query->query( $query, true );
+
+		$updated = 0;
 
 		/**
 		 * @var $contact Contact
@@ -323,10 +324,12 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->update_meta( $meta );
 			$contact->apply_tag( $add_tags );
 			$contact->remove_tag( $remove_tags );
+
+			$updated ++;
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'total_items' => $count,
+			'total_items' => $updated,
 			'items'       => $contacts,
 		] );
 	}

@@ -4,6 +4,7 @@ namespace Groundhogg\Queue;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Event_Queue_Item;
 use Groundhogg\Utils\Limits;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -66,7 +67,7 @@ class Event_Queue extends Supports_Errors {
 	protected static $is_processing;
 
 	/**
-	 * @var Event_Store
+	 * @var Event_Store_V2
 	 */
 	protected $store;
 
@@ -75,7 +76,7 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected $event_ids = [];
 
-	protected $max_events = 50;
+	protected $max_events = 100;
 	protected $logging_enabled = false;
 
 	/**
@@ -107,10 +108,8 @@ class Event_Queue extends Supports_Errors {
 			return;
 		}
 
-		// set max time limit to 15 seconds
-		add_filter( 'groundhogg/event_queue/max_time_limit', function () {
-			return 15;
-		} );
+		// 10 second cap on heartbeat
+		Limits::set_max_execution_time( 10 );
 
 		do_action( self::WP_CRON_HOOK );
 	}
@@ -176,12 +175,23 @@ class Event_Queue extends Supports_Errors {
 
 		$events = get_db( 'event_queue' );
 
-		// 5 minute window.
+		get_db( 'event_queue' )->move_events_to_history( [
+			'status' => [
+				Event::CANCELLED,
+				Event::SKIPPED,
+				Event::COMPLETE,
+				Event::FAILED
+			]
+		] );
+
+		// 5-minute window.
 		$time = time() - ( MINUTE_IN_SECONDS * 5 );
 
-		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE `claim` != '' AND `time` < {$time}" );
-		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'waiting' WHERE status = 'in_progress' AND `time` < {$time}" );
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => [ Event::CANCELLED, Event::SKIPPED ] ] );
+		$wpdb->query( "
+UPDATE {$events->get_table_name()} 
+SET status = 'waiting', claim = '' 
+WHERE status IN ( 'in_progress', 'waiting' ) AND claim != '' AND `time` < {$time}
+ORDER BY ID" );
 
 		$events->cache_set_last_changed();
 
@@ -204,14 +214,11 @@ class Event_Queue extends Supports_Errors {
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit( apply_filters( 'groundhogg/event_queue/max_time_limit', MINUTE_IN_SECONDS ) );
 
-		$this->cleanup_unprocessed_events();
+//		$this->cleanup_unprocessed_events();
 
-		$this->store = new Event_Store();
-		$settings    = Plugin::$instance->settings;
+		$this->store = new Event_Store_V2();
 
-		$thread_id = uniqid();
-
-		$this->log( sprintf( '%s - Starting queue!', $thread_id ) );
+		do_action( 'groundhogg/event_queue/before_process' );
 
 		$this->process();
 
@@ -219,23 +226,17 @@ class Event_Queue extends Supports_Errors {
 
 		Limits::stop();
 
-		if ( Limits::get_actions_processed() > 0 ) {
-			$this->log( sprintf( "%s - %d events have been completed in %s seconds.", $thread_id, Limits::get_actions_processed(), $process_time ) );
-		} else {
-			$this->log( sprintf( '%s - No events completed.', $thread_id ) );
-		}
-
-		$times_executed         = intval( $settings->get_option( 'queue_times_executed', 0 ) );
-		$average_execution_time = floatval( $settings->get_option( 'average_execution_time', 0.0 ) );
+		$times_executed         = intval( get_option( 'gh_queue_times_executed', 0 ) );
+		$average_execution_time = floatval( get_option( 'gh_average_execution_time', 0.0 ) );
 
 		$average = $times_executed * $average_execution_time;
 		$average += $process_time;
 		$times_executed ++;
 		$average_execution_time = $average / $times_executed;
 
-		$settings->update_option( 'queue_last_execution_time', $process_time );
-		$settings->update_option( 'queue_times_executed', $times_executed );
-		$settings->update_option( 'average_execution_time', $average_execution_time );
+		update_option( 'gh_queue_last_execution_time', $process_time );
+		update_option( 'gh_queue_times_executed', $times_executed );
+		update_option( 'gh_average_execution_time', $average_execution_time );
 
 		return Limits::get_actions_processed();
 	}
@@ -249,32 +250,9 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected function process() {
 
-		$claim = $this->store->stake_claim( $this->max_events );
+		$events = $this->store->get_events( $this->max_events );
 
-		// no events to complete
-		if ( ! $claim ) {
-			return;
-		}
-
-		$event_ids = $this->store->get_events_by_claim( $claim );
-
-		// If this happens it means we are in a parallel queue processing situation,
-		// so let's just try and make another claim.
-		if ( empty( $event_ids ) ) {
-
-			$claim = $this->store->stake_claim( $this->max_events );
-
-			// no events to complete
-			if ( ! $claim ) {
-				return;
-			}
-
-			$event_ids = $this->store->get_events_by_claim( $claim );
-
-		}
-
-		// Definitely no events, let's bail.
-		if ( empty( $event_ids ) ) {
+		if ( empty( $events ) ) {
 			return;
 		}
 
@@ -284,9 +262,13 @@ class Event_Queue extends Supports_Errors {
 
 		do {
 
-			$event_id = array_pop( $event_ids );
+			/**
+			 * Get first event from selected
+			 *
+			 * @var $event Event_Queue_Item
+			 */
+			$event = array_shift( $events );
 
-			$event = new Event( $event_id, 'event_queue' );
 			$this->set_current_event( $event );
 
 			$contact = $event->get_contact();
@@ -329,14 +311,14 @@ class Event_Queue extends Supports_Errors {
 				restore_current_locale();
 			}
 
-			$processed_event_ids[] = $event_id;
+			$processed_event_ids[] = $event->get_id();
 			Limits::processed_action();
 
-		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
+		} while ( ! empty( $events ) && ! Limits::limits_exceeded() );
 
-		$this->store->release_events( $claim );
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::SKIPPED, 'ID' => $processed_event_ids ] );
 
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::SKIPPED,  'ID' => $processed_event_ids ] );
+		$this->store->release_events();
 
 		self::set_is_processing( false );
 

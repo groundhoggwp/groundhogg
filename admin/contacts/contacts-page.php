@@ -141,11 +141,11 @@ class Contacts_Page extends Admin_Page {
 		];
 
 		if ( $filters = get_url_var( 'filters' ) ) {
-			$filter_query['filters'] = is_string( $filters ) ? base64_json_decode( $filters ) : $filters;
+			$filter_query['filters'] = is_string( $filters ) ? ( base64_json_decode( $filters ) ?: [] ) : $filters;
 		}
 
-		if ( $exclude_filters = get_url_var( 'exclude_filters' ) ) {
-			$filter_query['exclude_filters'] = is_string( $exclude_filters ) ? base64_json_decode( $exclude_filters ) : $exclude_filters;
+		if ( $exclude_filters = get_url_var( 'exclude_filters', [] ) ) {
+			$filter_query['exclude_filters'] = is_string( $exclude_filters ) ? ( base64_json_decode( $exclude_filters ) ?: [] ) : $exclude_filters;
 		}
 
 		if ( $saved_search = get_url_var( 'saved_search' ) ) {
@@ -181,14 +181,17 @@ class Contacts_Page extends Admin_Page {
 
 				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
 
+				$search_query = get_request_query();
+				unset( $search_query['number'] );
+
 				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts', 'BulkEdit', [
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Properties::instance()->get_all(),
-					'query'                        => get_request_query(),
+					'query'                        => $search_query,
 					'filter_query'                 => $filter_query,
 					'countries'                    => utils()->location->get_countries_list(),
 					'time_zones'                   => utils()->location->get_time_zones(),
-					'language_dropdown'           => wp_dropdown_languages([
+					'language_dropdown'            => wp_dropdown_languages( [
 						'id'                          => 'locale',
 						'name'                        => 'locale',
 						'selected'                    => '',
@@ -197,7 +200,7 @@ class Contacts_Page extends Admin_Page {
 						'show_option_site_default'    => false,
 						'show_option_en_us'           => true,
 						'explicit_option_en_us'       => true,
-                    ])
+					] )
 				] );
 
 				break;
@@ -233,7 +236,7 @@ class Contacts_Page extends Admin_Page {
 					],
 				] );
 
-                do_action( 'groundhogg/admin/contacts/edit/scripts' );
+				do_action( 'groundhogg/admin/contacts/edit/scripts' );
 
 				break;
 			case 'view':

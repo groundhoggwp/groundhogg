@@ -884,8 +884,8 @@ class Settings_Page extends Admin_Page {
 					'id'          => 'gh_consent_cookie_name',
 				],
 			],
-			'gh_cookie_consent_cookie_value'         => [
-				'id'      => 'gh_cookie_consent_cookie_value',
+			'gh_consent_cookie_value'         => [
+				'id'      => 'gh_consent_cookie_value',
 				'section' => 'cookies',
 				'label'   => _x( 'Consent cookie value', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),

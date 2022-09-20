@@ -3,6 +3,8 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Plugin;
+use Groundhogg\Utils\Limits;
+use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -89,7 +91,7 @@ class Process_Events extends Bulk_Job {
 	 */
 	public function process() {
 
-		$start = microtime( true );
+		$time = new Micro_Time_Tracker();
 
 		if ( ! key_exists( 'the_end', $_POST ) ) {
 
@@ -101,14 +103,12 @@ class Process_Events extends Bulk_Job {
 			wp_send_json_error( $error );
 		}
 
-		// Set the time limit to 10 so it seams like its' going faster.
-		set_time_limit( 10 );
+		Limits::set_max_execution_time( 10 );
 
 		$completed = Plugin::instance()->event_queue->run_queue();
 		$failed    = count( Plugin::instance()->event_queue->get_errors() );
 
-		$end  = microtime( true );
-		$diff = round( $end - $start, 2 );
+		$diff = $time->time_elapsed_rounded(3);
 
 		if ( $failed === 0 ) {
 			$msg = sprintf( __( 'Processed %d events in %s seconds.', 'groundhogg' ), $completed, $diff );

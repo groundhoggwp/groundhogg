@@ -427,8 +427,8 @@
             },
             onOpen: ({ setProgress, close }) => {
 
-              let offset = 0
-              let limit = 500
+              const limit = 500
+              let offset = Math.max(totalContacts - limit, 0)
 
               const patchContacts = () => {
 
@@ -443,11 +443,17 @@
                   ...payload,
                 }).then(r => {
 
-                  offset += limit
+                  setProgress(( ( totalContacts - offset ) / totalContacts ) * 100)
 
-                  setProgress(( offset / totalContacts ) * 100)
+                  if (offset > 0) {
 
-                  if (offset < totalContacts) {
+                    offset -= limit
+
+                    // limit can't be less than 0
+                    if (offset < 0) {
+                      offset = 0
+                    }
+
                     patchContacts()
                     return
                   }

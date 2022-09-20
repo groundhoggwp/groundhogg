@@ -158,9 +158,9 @@ abstract class DB {
 	/**
 	 * Check if the site is global multisite enabled
 	 *
+	 * @deprecated
 	 * @return bool
 	 *
-	 * @deprecated
 	 */
 	private function is_global_multisite() {
 		return false;
@@ -319,8 +319,8 @@ abstract class DB {
 	 * Whitelist of columns
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_columns() {
 		return [];
@@ -382,8 +382,8 @@ abstract class DB {
 	 * Retrieve a row by the primary key
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get( $row_id ) {
 		return $this->get_by( $this->primary_key, $row_id );
@@ -393,8 +393,8 @@ abstract class DB {
 	 * Retrieve a row by a specific column / value
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
@@ -418,8 +418,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column( $column, $row_id ) {
 		return $this->get_column_by( $column, $this->primary_key, $row_id );
@@ -429,8 +429,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the the specified column / value
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column_by( $column, $column_where, $column_value ) {
 		global $wpdb;
@@ -471,8 +471,8 @@ abstract class DB {
 	 * Default column values
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_column_defaults() {
 		return [];
@@ -482,8 +482,8 @@ abstract class DB {
 	 * Insert a new row
 	 *
 	 * @access  public
-	 * @return  int
 	 * @since   2.1
+	 * @return  int
 	 */
 	public function insert( $data ) {
 		global $wpdb;
@@ -673,8 +673,8 @@ abstract class DB {
 	 * Update a row
 	 *
 	 * @access  public
-	 * @return  bool
 	 * @since   2.1
+	 * @return  bool
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -787,10 +787,11 @@ abstract class DB {
 	 *
 	 * @access  public
 	 *
+	 * @since   2.1
+	 *
 	 * @param mixed $id
 	 *
 	 * @return  bool
-	 * @since   2.1
 	 */
 	public function delete( $id = null ) {
 
@@ -841,25 +842,27 @@ abstract class DB {
 	 */
 	public function exists( $value = 0, $field = false ) {
 
-		$columns = $this->get_columns();
-
 		if ( is_array( $value ) ) {
 
-			$exists = $this->query( $value );
-
-			return ! empty( $exists );
+			$query = $value;
 
 		} else {
 			if ( ! $field ) {
 				$field = $this->get_primary_key();
 			}
 
-			if ( ! array_key_exists( $field, $columns ) ) {
+			if ( ! array_key_exists( $field, $this->get_columns() ) ) {
 				return false;
 			}
 
-			return (bool) $this->get_column_by( $this->get_primary_key(), $field, $value );
+			$query = [
+				$field => $value
+			];
 		}
+
+		$exists = $this->query( $query );
+
+		return ! empty( $exists );
 	}
 
 	/**
@@ -944,7 +947,7 @@ abstract class DB {
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
 						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
 							$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
-						} else if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false  ) {
+						} else if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
 							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
 						} else {
 							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => is_array( $val ) ? 'IN' : '=' ];
@@ -1043,9 +1046,10 @@ abstract class DB {
 
 			foreach ( $this->get_columns() as $column => $type ) {
 				if ( $type === '%s' ) {
-					$search[] = [ 'col'     => $column,
-					              'val'     => '%' . esc_sql( $query_vars['search'] ) . '%',
-					              'compare' => 'LIKE'
+					$search[] = [
+						'col'     => $column,
+						'val'     => '%' . esc_sql( $query_vars['search'] ) . '%',
+						'compare' => 'LIKE'
 					];
 				}
 			}
@@ -1325,6 +1329,11 @@ abstract class DB {
 
 	}
 
+	public function drop_column( $column ){
+		global $wpdb;
+		$wpdb->query( "ALTER TABLE {$this->table_name} DROP COLUMN $column" );
+	}
+
 	/**
 	 * Empty the table
 	 */
@@ -1346,8 +1355,8 @@ abstract class DB {
 	/**
 	 * Check if the table was ever installed
 	 *
-	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 * @since  2.4
+	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 */
 	public function installed() {
 		return $this->table_exists( $this->table_name );
@@ -1356,11 +1365,11 @@ abstract class DB {
 	/**
 	 * Check if the given table exists
 	 *
+	 * @since  2.4
+	 *
 	 * @param string $table The table name
 	 *
 	 * @return bool          If the table name exists
-	 * @since  2.4
-	 *
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;

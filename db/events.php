@@ -95,7 +95,6 @@ class Events extends DB {
 			'error_message'  => '%s',
 			'status'         => '%s',
 			'priority'       => '%d',
-			'claim'          => '%s',
 			'queued_id'      => '%d',
 		);
 	}
@@ -121,7 +120,6 @@ class Events extends DB {
 			'error_message'  => '',
 			'status'         => 'waiting',
 			'priority'       => 10,
-			'claim'          => '',
 			'queued_id'      => 0,
 		);
 	}
@@ -150,7 +148,7 @@ class Events extends DB {
 	 * Move events from this table to the event queue
 	 *
 	 * @param array $where
-	 * @param bool $delete_from_history whether to delete the records from the history table
+	 * @param bool  $delete_from_history whether to delete the records from the history table
 	 */
 	public function move_events_to_queue( $where = [], $delete_from_history = false ) {
 
@@ -160,15 +158,21 @@ class Events extends DB {
 		$event_queue = get_db( 'event_queue' )->get_table_name();
 		$events      = $this->get_table_name();
 
-		$queue_columns   = get_db( 'event_queue' )->get_columns();
-		$history_columns = $this->get_columns(); // queue_id will be last
+		$column_map = [
+			'time'           => 'time',
+			'micro_time'     => 'micro_time',
+			'time_scheduled' => 'time_scheduled',
+			'contact_id'     => 'contact_id',
+			'funnel_id'      => 'funnel_id',
+			'step_id'        => 'step_id',
+			'email_id'       => 'email_id',
+			'event_type'     => 'event_type',
+			'priority'       => 'priority',
+			'status'         => 'status',
+		];
 
-		unset( $history_columns['ID'] );
-		unset( $history_columns['queued_id'] );
-		unset( $queue_columns['ID'] );
-
-		$history_columns = implode( ',', array_keys( $history_columns ) );
-		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
+		$history_columns = implode( ',', array_keys( $column_map ) );
+		$queue_columns   = implode( ',', array_values( $column_map ) );
 
 		$where = $this->generate_where( $where );
 
@@ -205,15 +209,17 @@ class Events extends DB {
 	 *
 	 * @access  public
 	 *
-	 * @param $column
+	 * @since   2.1
+	 *
 	 * @param $row_id
 	 *
+	 * @param $column
+	 *
 	 * @return  object
-	 * @since   2.1
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
-		$column  = esc_sql( $column );
+		$column = esc_sql( $column );
 
 		$cache_key   = "get_by:$column:$row_id";
 		$cache_value = $this->cache_get( $cache_key );
@@ -309,7 +315,6 @@ class Events extends DB {
         error_message tinytext NOT NULL, 
         priority int unsigned NOT NULL,
         status varchar(20) NOT NULL,
-        claim varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY time (time),
         KEY time_scheduled (time_scheduled),
@@ -318,7 +323,6 @@ class Events extends DB {
         KEY queued_id (queued_id),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
-        KEY claim (claim),
         KEY priority (priority)
 		) {$this->get_charset_collate()};";
 

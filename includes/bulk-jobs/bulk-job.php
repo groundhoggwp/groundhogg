@@ -155,6 +155,8 @@ abstract class Bulk_Job {
 
 		$completed = 0;
 
+		ob_start();
+
 		$this->pre_loop();
 
 		foreach ( $items as $item ) {

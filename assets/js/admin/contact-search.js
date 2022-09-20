@@ -551,16 +551,17 @@
       moreMenu(e.currentTarget, {
         items: items.filter(i => userHasCap(i.cap)),
         onSelect: (key) => {
+
+          let { number, offset, paged, ...query } = ContactQuery
+
           switch (key) {
             case 'edit':
               window.location.href = adminPageURL('gh_contacts', {
-                ...ContactQuery,
+                ...query,
                 action: 'bulk_edit',
-                number: -1,
-                offset: 0,
-                filters: base64_json_encode(ContactQuery.filters),
+                filters: base64_json_encode(query.filters),
                 exclude_filters: base64_json_encode(
-                  ContactQuery.exclude_filters),
+                  query.exclude_filters),
               })
               break
             case 'export':
@@ -568,12 +569,10 @@
                 tab: 'export',
                 action: 'choose_columns',
                 query: {
-                  ...ContactQuery,
-                  number: -1,
-                  offset: 0,
-                  filters: base64_json_encode(ContactQuery.filters),
+                  ...query,
+                  filters: base64_json_encode(query.filters),
                   exclude_filters: base64_json_encode(
-                    ContactQuery.exclude_filters),
+                    query.exclude_filters),
                 },
               })
               break
@@ -686,7 +685,7 @@
                       funnel_id: funnel.ID,
                       step_id: step.ID,
                       query: {
-                        ...ContactQuery,
+                        ...query,
                         limit,
                         offset,
                       },
@@ -733,9 +732,7 @@
 
               Groundhogg.SendBroadcast('#gh-broadcast-form', {
                 query: {
-                  ...ContactQuery,
-                  number: -1,
-                  offset: 0,
+                  ...query
                 },
                 total_contacts: totalContacts,
                 which: 'from_table',
@@ -754,9 +751,7 @@
 
               const deleteContacts = (onDelete, onComplete) => {
                 ContactsStore.deleteMany({
-                  ...ContactQuery,
-                  number,
-                  offset: 0,
+                  ...query
                 }).then(items => {
 
                   deleted += items.length

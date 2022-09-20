@@ -4,9 +4,9 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
-use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
+use Groundhogg\Utils\Limits;
 use WP_Error;
 
 
@@ -1988,6 +1988,20 @@ function get_csv_delimiter( $file_path ) {
 }
 
 /**
+ * Return the number of rows in a CSV file
+ *
+ * @param $file_path
+ *
+ * @return int
+ */
+function count_csv_rows( $file_path ) {
+	$file = new \SplFileObject( $file_path, 'r' );
+	$file->seek( PHP_INT_MAX );
+
+	return $file->key() + 1;
+}
+
+/**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
  * @param string $file_path   path to the CSV file
@@ -2856,15 +2870,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			return false;
 		}
 
-		$contact = get_contactdata( $args['email'] );
+		$contact = new Contact( [
+			'email' => $args['email']
+		] );
 
-		// update existing
-		if ( $contact !== false && $contact->exists() ) {
-			$contact->update( $args );
-			// create new
-		} else {
-			$contact = new Contact( $args );
-		}
+        $contact->update( $args );
 
 		// We do NOT want to process this in the event the user is logged is as
 		// a GH user
@@ -2908,7 +2918,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		}
 	}
 
-	// update meta data
+    //	 update meta data
 	if ( ! empty( $meta ) ) {
 		foreach ( $meta as $key => $value ) {
 			$contact->update_meta( $key, $value );
@@ -2927,8 +2937,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			$contact->copy_file( $url );
 		}
 	}
-
-	$contact->update_meta( 'last_optin', time() );
 
 	/**
 	 * @param $contact Contact the contact record
@@ -3866,6 +3874,13 @@ function action_url( $action, $args = [] ) {
  * @return string the cc code of the site. US is default
  */
 function get_default_country_code() {
+
+    static $cc;
+
+    if ( $cc ){
+        return $cc;
+    }
+
 	// Is the CC already set?
 	$cc = get_option( 'gh_default_country_code' );
 
@@ -3900,7 +3915,9 @@ function get_default_country_code() {
 		}
 	}
 
-	return 'US';
+	$cc = 'US';
+
+    return $cc;
 }
 
 /**
@@ -5651,7 +5668,7 @@ function get_object_ids( $array ) {
  *
  * @return void
  */
-function add_disable_emojis_action(){
+function add_disable_emojis_action() {
 	add_action( 'init', __NAMESPACE__ . '\disable_emojis' );
 	add_action( 'admin_init', __NAMESPACE__ . '\disable_emojis' );
 }
@@ -5669,7 +5686,7 @@ function disable_emojis() {
 	remove_action( 'wp_print_styles', 'print_emoji_styles' );
 	remove_action( 'admin_print_styles', 'print_emoji_styles' );
 	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
-	add_filter( 'tiny_mce_plugins',  __NAMESPACE__ . '\disable_emojis_tinymce' );
+	add_filter( 'tiny_mce_plugins', __NAMESPACE__ . '\disable_emojis_tinymce' );
 	add_filter( 'wp_resource_hints', __NAMESPACE__ . '\disable_emojis_remove_dns_prefetch', 10, 2 );
 }
 
@@ -5678,7 +5695,8 @@ function disable_emojis() {
  *
  * @credit Ryan Hellyer https://en-ca.wordpress.org/plugins/disable-emojis/
  *
- * @param    array  $plugins
+ * @param array $plugins
+ *
  * @return   array             Difference betwen the two arrays
  */
 function disable_emojis_tinymce( $plugins ) {
@@ -5694,8 +5712,9 @@ function disable_emojis_tinymce( $plugins ) {
  *
  * @credit Ryan Hellyer https://en-ca.wordpress.org/plugins/disable-emojis/
  *
- * @param  array  $urls          URLs to print for resource hints.
- * @param  string $relation_type The relation type the URLs are printed for.
+ * @param array  $urls          URLs to print for resource hints.
+ * @param string $relation_type The relation type the URLs are printed for.
+ *
  * @return array                 Difference betwen the two arrays.
  */
 function disable_emojis_remove_dns_prefetch( $urls, $relation_type ) {
@@ -5706,7 +5725,7 @@ function disable_emojis_remove_dns_prefetch( $urls, $relation_type ) {
 		$emoji_svg_url_bit = 'https://s.w.org/images/core/emoji/';
 		foreach ( $urls as $key => $url ) {
 			if ( strpos( $url, $emoji_svg_url_bit ) !== false ) {
-				unset( $urls[$key] );
+				unset( $urls[ $key ] );
 			}
 		}
 
@@ -6627,9 +6646,11 @@ function process_events( $contacts = [] ) {
 		}, 10, 2 );
 	}
 
+    Limits::set_max_execution_time( 5 );
+
 	do_action( Event_Queue::WP_CRON_HOOK );
 
-    return empty( $errors ) ?: $errors;
+	return empty( $errors ) ?: $errors;
 }
 
 /**
@@ -6643,14 +6664,14 @@ function maybe_url_decrypt_id( $data ) {
 	return absint( decrypt( urldecode( $data ) ) ) ?: $data;
 }
 
-function iframe_js(){
-    ?>
-<script>
-  if ( window.self !== window.top ){
-    document.querySelector('html').classList.add( 'iframed' )
-  }
-</script>
-<?php
+function iframe_js() {
+	?>
+    <script>
+      if (window.self !== window.top) {
+        document.querySelector('html').classList.add('iframed')
+      }
+    </script>
+	<?php
 }
 
 add_action( 'admin_head', __NAMESPACE__ . '\iframe_js', 9 );

@@ -88,14 +88,24 @@ class Event_Queue extends DB {
 		$event_queue = $this->get_table_name();
 		$events      = get_db( 'events' )->get_table_name();
 
-		$queue_columns   = $this->get_columns();
-		$history_columns = get_db( 'events' )->get_columns(); // queue_id will be last
+		$column_map = [
+			'queued_id'      => 'ID',
+			'time'           => 'time',
+			'micro_time'     => 'micro_time',
+			'time_scheduled' => 'time_scheduled',
+			'contact_id'     => 'contact_id',
+			'funnel_id'      => 'funnel_id',
+			'step_id'        => 'step_id',
+			'email_id'       => 'email_id',
+			'event_type'     => 'event_type',
+			'error_code'     => 'error_code',
+			'error_message'  => 'error_message',
+			'priority'       => 'priority',
+			'status'         => 'status',
+		];
 
-		unset( $history_columns['ID'] );
-		unset( $queue_columns['ID'] );
-
-		$history_columns = implode( ',', array_keys( $history_columns ) );
-		$queue_columns   = implode( ',', array_keys( $queue_columns ) ) . ',ID'; // Tack on ID at the end to update `queued_id`
+		$history_columns = implode( ',', array_keys( $column_map ) );
+		$queue_columns   = implode( ',', array_values( $column_map ) );
 
 		$where = $this->generate_where( $where, 'OR' );
 
@@ -240,6 +250,7 @@ class Event_Queue extends DB {
 	public function step_deleted( $id ) {
 		return $this->bulk_delete( array( 'step_id' => $id ) );
 	}
+
 	/**
 	 * Create the table
 	 *

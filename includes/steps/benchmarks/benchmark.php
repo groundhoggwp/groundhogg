@@ -133,7 +133,9 @@ abstract class Benchmark extends Funnel_Step {
 
 		}
 
-		process_events( $contacts_to_process );
+		if ( ! empty( $contacts_to_process ) ){
+			process_events( $contacts_to_process );
+		}
 	}
 
 	/**

@@ -607,6 +607,16 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Drop the claim columns from the history table
+	 * Unneeded data
+	 *
+	 * @return void
+	 */
+	public function version_2_7_4_3() {
+		get_db( 'events' )->drop_column( 'claim' );
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -670,6 +680,7 @@ class Main_Updater extends Updater {
 			'2.6.2.10',
 			'2.7.2',
 			'2.7.4',
+			'2.7.4.3',
 		];
 	}
 
@@ -708,6 +719,7 @@ class Main_Updater extends Updater {
 			'2.6.2.5',
 			'2.6.2.10',
 			'2.7.2',
+			'2.7.4.3',
 		];
 	}
 
@@ -766,6 +778,7 @@ class Main_Updater extends Updater {
 			'2.6.2.10'      => __( 'Change files download pathname to /file-download/ from /files/.', 'groundhogg' ),
 			'2.7.2'         => __( 'Add <code>step_slug</code> column. Add new rewrites for prettier URLs.', 'groundhogg' ),
 			'2.7.4'         => __( 'Set the <code>is_conversion</code> for benchmarks based on legacy funnel conversion step.', 'groundhogg' ),
+			'2.7.4.3'       => __( 'Drop un-needed <code>claim</code> column from <code>wp_gh_events</code> table.', 'groundhogg' ),
 		];
 	}
 }

@@ -14,6 +14,7 @@ class Limits {
 	protected static $total_processed_actions = 0;
 	protected static $total_time_elapsed = 0;
 	protected static $limits_exceeded = false;
+	protected static $max_execution_time = 0;
 
 	public static function get_actions_processed(){
 		return self::$total_processed_actions;
@@ -224,6 +225,10 @@ class Limits {
 	 */
 	public static function get_time_limit() {
 
+		if ( self::$max_execution_time ){
+			return self::$max_execution_time;
+		}
+
 		$real_limit = absint( ini_get( 'max_execution_time' ) );
 
 		// If the real limit is 0 assume 60 seconds
@@ -297,6 +302,17 @@ class Limits {
 		self::$limits_exceeded = self::memory_exceeded() || self::time_likely_to_be_exceeded();
 
 		return self::$limits_exceeded;
+	}
+
+	/**
+	 * Acts as an internal limit independent of PHP.ini max execution time
+	 *
+	 * @param $time_in_seconds
+	 *
+	 * @return void
+	 */
+	public static function set_max_execution_time( $time_in_seconds ) {
+		self::$max_execution_time = absint( $time_in_seconds );
 	}
 
 }

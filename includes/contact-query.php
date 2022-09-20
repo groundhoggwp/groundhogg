@@ -1065,15 +1065,10 @@ class Contact_Query {
 	 * @return string SQL limits segment.
 	 */
 	protected function construct_request_limits() {
-		if ( $this->query_vars['number'] ) {
-			if ( $this->query_vars['offset'] ) {
-				return "LIMIT {$this->query_vars['offset']},{$this->query_vars['number']}";
-			}
-
-			return "LIMIT {$this->query_vars['number']}";
-		}
-
-		return '';
+		return implode( ' ', [
+			$this->query_vars['number'] ? 'LIMIT ' . $this->query_vars['number'] : '',
+			$this->query_vars['offset'] ? 'OFFSET ' . $this->query_vars['offset'] : ''
+		] );
 	}
 
 	/**

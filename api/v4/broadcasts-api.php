@@ -160,6 +160,10 @@ class Broadcasts_Api extends Base_Object_Api {
 
 			$offset ++;
 
+			if ( ! $contact->is_deliverable() ) {
+				continue;
+			}
+
 			// No point in scheduling an email to a contact that is not marketable.
 			if ( ! $broadcast->is_transactional() && ! $contact->is_marketable() ) {
 				continue;
@@ -182,7 +186,7 @@ class Broadcasts_Api extends Base_Object_Api {
 				'funnel_id'  => Broadcast::FUNNEL_ID,
 				'step_id'    => $broadcast->get_id(),
 				'event_type' => Event::BROADCAST,
-				'status'     => Event::WAITING,
+				'status'     => Event::PAUSED,
 				'priority'   => 100,
 			];
 
@@ -195,6 +199,17 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		$broadcast->update_meta( 'num_scheduled', $offset );
+
+		// Finished scheduling, unpause broadcast events
+		if ( $offset >= $total ) {
+			get_db( 'event_queue' )->update( [
+				'status'     => Event::PAUSED,
+				'step_id'    => $broadcast->get_id(),
+				'event_type' => Event::BROADCAST,
+			], [
+				'status' => Event::WAITING
+			] );
+		}
 
 		return self::SUCCESS_RESPONSE( [
 			'finished'  => $offset >= $total,

@@ -72,7 +72,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			wp_die( 'Invalid log item ID.' );
 		}
 
-        echo $log_item->content;
+		echo $log_item->content;
 
 		die();
 	}
@@ -84,7 +84,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		add_action( 'admin_init', [ $this, 'raw_email_content' ] );
 		add_action( 'admin_head', function () {
 			?>
-			<style>
+            <style>
                 .email-sent {
                     color: green;
                 }
@@ -92,7 +92,7 @@ class Events_Page extends Tabbed_Admin_Page {
                 .email-failed {
                     color: red;
                 }
-			</style>
+            </style>
 			<?php
 		} );
 
@@ -157,7 +157,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-	 * Cancels scheduled broadcast
+	 * Cancel some events
 	 *
 	 * @return bool
 	 */
@@ -190,7 +190,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-	 * Cancels scheduled broadcast
+	 * Cancel all waiting events
 	 *
 	 * @return bool
 	 */
@@ -200,15 +200,11 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
-
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-//		$event_ids   = implode( ',', $this->get_items() );
-		$cancelled = Event::CANCELLED;
-		$waiting   = Event::WAITING;
-
-		// Update the time
-		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `status` = '$waiting'" );
+		get_db( 'event_queue' )->update( [
+			'status' => Event::WAITING
+		], [
+			'status' => Event::CANCELLED
+		] );
 
 		// Move the items over...
 		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
@@ -216,6 +212,80 @@ class Events_Page extends Tabbed_Admin_Page {
 		$this->add_notice( 'cancelled', __( 'Cancelled all waiting events.', 'groundhogg' ) );
 
 		//false return users to the main page
+		return false;
+	}
+
+	/**
+	 * Unpause some events
+	 *
+	 * @return bool
+	 */
+	public function process_unpause() {
+
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$event_ids   = implode( ',', $this->get_items() );
+		$waiting     = Event::WAITING;
+
+		// Update the time
+		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$waiting' WHERE `ID` in ({$event_ids})" );
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events unpaused', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		//false return users to the main page
+		return false;
+	}
+
+
+	/**
+	 * Unpause all paused events
+	 *
+	 * @return bool
+	 */
+	public function process_unpause_all() {
+
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		get_db( 'event_queue' )->update( [
+			'status' => Event::PAUSED
+		], [
+			'status' => Event::WAITING
+		] );
+
+		$this->add_notice( 'cancelled', __( 'All events unpaused.', 'groundhogg' ) );
+
+		//false return users to the main page
+		return false;
+	}
+
+	/**
+	 * Cancel all paused events
+	 *
+	 * @return bool
+	 */
+	public function process_cancel_all_paused() {
+
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		get_db( 'event_queue' )->update( [
+			'status' => Event::PAUSED
+		], [
+			'status' => Event::CANCELLED
+		] );
+
+		// Move the items over...
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
+
+		$this->add_notice( 'cancelled', __( 'Cancelled all paused events.', 'groundhogg' ) );
+
 		return false;
 	}
 
@@ -233,8 +303,9 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events = get_db( 'event_queue' );
 
-		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim <> ''" );
-		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress'" );
+        $time = time() - ( 5 * MINUTE_IN_SECONDS );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim != '' AND time < $time" );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress' AND time < $time" );
 
 		return false;
 	}
@@ -402,11 +473,11 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events_table->views();
 		?>
-		<form method="post" class="search-form wp-clearfix">
-			<!-- search form -->
+        <form method="post" class="search-form wp-clearfix">
+            <!-- search form -->
 			<?php $events_table->prepare_items(); ?>
 			<?php $events_table->display(); ?>
-		</form>
+        </form>
 
 		<?php
 	}
@@ -442,14 +513,14 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table->views();
 		?>
-		<form method="post" class="search-form wp-clearfix">
-			<!-- search form -->
+        <form method="post" class="search-form wp-clearfix">
+            <!-- search form -->
 			<?php $log_table->prepare_items(); ?>
 			<?php $log_table->display(); ?>
-		</form>
-		<div id="modal-log-details">
-			<div id="modal-log-details-view"></div>
-		</div>
+        </form>
+        <div id="modal-log-details">
+            <div id="modal-log-details-view"></div>
+        </div>
 		<?php
 	}
 

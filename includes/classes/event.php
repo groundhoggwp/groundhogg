@@ -281,7 +281,7 @@ class Event extends Base_Object {
 	 */
 	protected function post_setup() {
 
-		$this->contact = get_contactdata( $this->get_contact_id() );
+		$this->contact = new Contact( $this->get_contact_id() );
 
 		switch ( $this->get_event_type() ) {
 			case self::FUNNEL:

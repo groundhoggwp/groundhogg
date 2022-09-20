@@ -551,13 +551,13 @@ class Email extends Base_Object_With_Meta {
 		add_filter( 'groundhogg/email_template/unsubscribe_link', [ $this, 'get_unsubscribe_link' ] );
 		add_filter( 'groundhogg/email_template/preferences_link', [ $this, 'get_preferences_link' ] );
 		add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
+		add_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 
 		// If click tracking is disabled, do not convert to tracking links.
 		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ) {
 			add_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 		}
 
-		add_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 	}
 
 
@@ -575,6 +575,7 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'groundhogg/email_template/unsubscribe_link', [ $this, 'get_unsubscribe_link' ] );
 		remove_filter( 'groundhogg/email_template/preferences_link', [ $this, 'get_preferences_link' ] );
 		remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
+		remove_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 	}
 

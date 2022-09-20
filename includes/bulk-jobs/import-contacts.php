@@ -4,13 +4,13 @@ namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\count_csv_rows;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_db;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\get_url_var;
-use function Groundhogg\guided_setup_finished;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\recount_tag_contacts_count;
@@ -24,6 +24,8 @@ class Import_Contacts extends Bulk_Job {
 	protected $field_map = [];
 	protected $import_tags = [];
 	protected $compliance = [];
+	protected $file_path = '';
+	const LIMIT = 250;
 
 	/**
 	 * Get the action reference.
@@ -49,67 +51,72 @@ class Import_Contacts extends Bulk_Job {
 		$file_name = sanitize_file_name( get_url_var( 'import' ) );
 		$file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
-		return get_items_from_csv( $file_path );
+		set_transient( 'gh_import_file_path', $file_path );
+
+		// -1 because headers
+		$num_rows = count_csv_rows( $file_path ) - 1;
+
+		$num_requests = ceil( $num_rows / self::LIMIT );
+
+		return range( 0, $num_requests );
 	}
 
 	/**
 	 * Get the maximum number of items which can be processed at a time.
 	 *
-	 * @param $max int
+	 * @param $max   int
 	 * @param $items array
 	 *
 	 * @return int
 	 */
 	public function max_items( $max, $items ) {
-		$item   = array_shift( $items );
-		$fields = count( array_keys( $item ) );
-
-		$max       = intval( ini_get( 'max_input_vars' ) );
-		$max_items = floor( $max / $fields );
-
-		$max_override = absint( get_url_var( 'max_items' ) );
-
-		if ( $max_override > 0 ) {
-			return $max_override;
-		}
-
-		return min( $max_items, 100 );
+		return 1;
 	}
 
 	/**
 	 * Process an item
 	 *
+	 * @throws \Exception
+	 *
 	 * @param $item mixed
 	 *
 	 * @return void
-	 * @throws \Exception
 	 */
 	protected function process_item( $item ) {
 
-		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ) {
-			$item['optin_status'] = Preferences::CONFIRMED;
+		$offset = absint( $item ) * self::LIMIT;
+
+		$items = get_items_from_csv( $this->file_path );
+		$items = array_slice( $items, $offset, self::LIMIT );
+
+		foreach ( $items as $item ) {
+
+			if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ) {
+				$item['optin_status'] = Preferences::CONFIRMED;
+			}
+
+			if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ) {
+				$item['gdpr_consent'] = 'yes';
+			}
+
+			if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ) {
+				$item['marketing_consent'] = 'yes';
+			}
+
+			$contact = generate_contact_with_map( $item, $this->field_map );
+
+			if ( is_a_contact( $contact ) ) {
+				$contact->apply_tag( $this->import_tags );
+			}
+
+
+			/**
+			 * Whenever a contact is imported
+			 *
+			 * @param $contact Contact
+			 */
+			do_action( 'groundhogg/contact/imported', $contact );
 		}
-
-		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ) {
-			$item['gdpr_consent'] = 'yes';
-		}
-
-		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ) {
-			$item['marketing_consent'] = 'yes';
-		}
-
-		$contact = generate_contact_with_map( $item, $this->field_map );
-
-		if ( is_a_contact( $contact ) ) {
-			$contact->apply_tag( $this->import_tags );
-		}
-
-		/**
-		 * Whenever a contact is imported
-		 *
-		 * @param $contact Contact
-		 */
-		do_action( 'groundhogg/contact/imported', $contact );
 	}
 
 	/**
@@ -121,6 +128,7 @@ class Import_Contacts extends Bulk_Job {
 		$this->field_map   = get_transient( 'gh_import_map' );
 		$this->import_tags = get_transient( 'gh_import_tags' );
 		$this->compliance  = get_transient( 'gh_import_compliance' );
+		$this->file_path   = get_transient( 'gh_import_file_path' );
 
 		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ) {
 			$this->field_map['optin_status'] = 'optin_status';
@@ -152,14 +160,16 @@ class Import_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function clean_up() {
-		Plugin::$instance->settings->delete_transient( 'gh_import_map' );
-		Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
-		Plugin::$instance->settings->delete_transient( 'gh_import_compliance' );
+		delete_transient( 'gh_import_map' );
+		delete_transient( 'gh_import_tags' );
+		delete_transient( 'gh_import_compliance' );
+		delete_transient( 'gh_import_file_path' );
 
 		recount_tag_contacts_count();
 
 		do_action( 'groundhogg/import_contacts/clean_up' );
 	}
+
 
 	/**
 	 * Display the total import count.

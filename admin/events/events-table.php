@@ -67,12 +67,12 @@ class Events_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'            => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'contact'       => _x( 'Contact', 'Column label', 'wp-funnels' ),
-			'funnel'        => _x( 'Funnel', 'Column label', 'wp-funnels' ),
-			'step'          => _x( 'Step', 'Column label', 'wp-funnels' ),
-			'time'          => _x( 'Time', 'Column label', 'wp-funnels' ),
-			'error_code'    => _x( 'Error Code', 'Column label', 'wp-funnels' ),
-			'error_message' => _x( 'Error Message', 'Column label', 'wp-funnels' ),
+			'contact'       => _x( 'Contact', 'Column label', 'groundhogg' ),
+			'funnel'        => _x( 'Funnel', 'Column label', 'groundhogg' ),
+			'step'          => _x( 'Step', 'Column label', 'groundhogg' ),
+			'time'          => _x( 'Time', 'Column label', 'groundhogg' ),
+			'error_code'    => _x( 'Error Code', 'Column label', 'groundhogg' ),
+			'error_message' => _x( 'Error Message', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg_event_columns', $columns );
@@ -251,18 +251,21 @@ class Events_Table extends WP_List_Table {
 		$actions = [];
 
 		switch ( $this->get_view() ) {
+			case 'paused':
+				$actions['unpause'] = _x( 'Unpause', 'List table bulk action', 'groundhogg' );
+				break;
 			default:
 			case 'waiting':
-				$actions['execute_now'] = _x( 'Run Now', 'List table bulk action', 'wp-funnels' );
-				$actions['cancel']      = _x( 'Cancel', 'List table bulk action', 'wp-funnels' );
+				$actions['execute_now'] = _x( 'Run Now', 'List table bulk action', 'groundhogg' );
+				$actions['cancel']      = _x( 'Cancel', 'List table bulk action', 'groundhogg' );
 				break;
 			case 'complete':
 			case 'skipped':
 			case 'cancelled':
-				$actions['uncancel'] = _x( 'Uncancel', 'List table bulk action', 'wp-funnels' );
+				$actions['uncancel'] = _x( 'Uncancel', 'List table bulk action', 'groundhogg' );
 				break;
 			case 'failed':
-				$actions['execute_again'] = _x( 'Run Again', 'List table bulk action', 'wp-funnels' );
+				$actions['execute_again'] = _x( 'Run Again', 'List table bulk action', 'groundhogg' );
 				break;
 		}
 
@@ -386,6 +389,12 @@ class Events_Table extends WP_List_Table {
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
+	        <?php if ( $this->get_view() === Event::PAUSED ): ?>
+                <a class="button action danger"
+                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'unpause_all' ], $_SERVER['REQUEST_URI'] ), 'unpause_all' ); ?>"><?php _ex( 'Unpause All', 'action', 'groundhogg' ); ?></a>
+                <a class="button action danger"
+                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all_paused' ], $_SERVER['REQUEST_URI'] ), 'cancel_all_paused' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
+	        <?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
                 <a class="button action"
                    href="<?php echo wp_nonce_url( add_query_arg( [

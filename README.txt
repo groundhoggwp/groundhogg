@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.4.2
+Stable tag: 2.7.4.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.4.3 (2022-09-19) =
+* TWEAKED Optimized the contact import tool to import more contacts at a time.
+* TWEAKED Optimized the event queue by removing excessive queries on the queue table.
+* FIXED Potential event queue bug causing events to be executed twice, and executed events to left out of reports during parallel queue processing.
+* FIXED Contact import process taking a long time when importing mobile phone number with the twilio addon installed.
+* FIXED Consent cookie value not saving in settings.
+* FIXED Bulk edit not updating all contacts when updating only optin_status or owner_id
+* FIXED Filters not showing after returning from bulk edit tool and no exclude filters defined
 
 = 2.7.4.2 (2022-09-19) =
 * FIXED Unable to add form fields to form builder.
