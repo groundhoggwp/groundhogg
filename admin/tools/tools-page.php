@@ -187,16 +187,14 @@ class Tools_Page extends Tabbed_Admin_Page {
 		];
 
 		// If old customer updating to new version.
-		if ( get_option( 'gh_updating_to_2_1' ) ) {
-			$tabs[] = [
-				'name' => __( 'Re-install Features' ),
-				'slug' => 'remote_install'
-			];
-		}
+//		if ( get_option( 'gh_updating_to_2_1' ) ) {
+//			$tabs[] = [
+//				'name' => __( 'Re-install Features' ),
+//				'slug' => 'remote_install'
+//			];
+//		}
 
-		$tabs = apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
-
-		return $tabs;
+		return apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
 	}
 
 	####### SYSTEM TAB FUNCTIONS #########

@@ -1106,9 +1106,7 @@ class Replacements implements \JsonSerializable {
 	 */
 	function replacement_confirmation_link_raw( $redirect_to = '' ) {
 
-		$link_url = managed_page_url( 'preferences/confirm/' );
-
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
+		$link_url = confirmation_url( $this->get_current_contact() );
 
 		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( no_and_amp( $redirect_to ) ) : false;
 

@@ -13,7 +13,7 @@ function tool_tip_title () {
 }
 
 ( function (reporting, $, nonces) {
-  
+
   const { loadingModal } = Groundhogg.element
 
   $.extend(reporting, {
@@ -176,6 +176,11 @@ function tool_tip_title () {
     renderReport: function (report_id, report_data) {
 
       var $report = $('#' + report_id)
+
+      if ( ! $report.length ){
+        return
+      }
+
       var type = report_data.type
 
       switch (type) {

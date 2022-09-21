@@ -3,6 +3,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
+use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\_nf;
 use function Groundhogg\get_post_var;
 use Groundhogg\Plugin;
@@ -32,6 +33,15 @@ abstract class Bulk_Job {
 	 * @var int
 	 */
 	protected $skipped = 0;
+	protected $completed = 0;
+
+	protected function _skipped() {
+		$this->skipped ++;
+	}
+
+	protected function _completed() {
+		$this->completed ++;
+	}
 
 	/**
 	 * WPGH_Bulk_Jon constructor.
@@ -91,7 +101,7 @@ abstract class Bulk_Job {
 	/**
 	 * Get the maximum number of items which can be processed at a time.
 	 *
-	 * @param $max int
+	 * @param $max   int
 	 * @param $items array
 	 *
 	 * @return int
@@ -131,7 +141,7 @@ abstract class Bulk_Job {
 	 * @param $item
 	 */
 	protected function skip_item( $item ) {
-		$this->skipped ++;
+		$this->_skipped();
 	}
 
 	/**
@@ -139,7 +149,7 @@ abstract class Bulk_Job {
 	 */
 	public function process() {
 
-		$start = microtime( true );
+		$start = new Micro_Time_Tracker();
 
 		if ( ! key_exists( 'the_end', $_POST ) ) {
 
@@ -151,9 +161,8 @@ abstract class Bulk_Job {
 			wp_send_json_error( $error );
 		}
 
-		$items = $this->get_items();
-
-		$completed = 0;
+		$items      = $this->get_items();
+		$item_count = count( $items );
 
 		ob_start();
 
@@ -161,7 +170,10 @@ abstract class Bulk_Job {
 
 		foreach ( $items as $item ) {
 			$this->process_item( $item );
-			$completed ++;
+
+			if ( $item_count > 1 ){
+				$this->_completed();
+			}
 		}
 
 		$this->post_loop();
@@ -169,21 +181,14 @@ abstract class Bulk_Job {
 		// Clean up any output like DB errors.
 		$output = ob_get_clean();
 
-		$end  = microtime( true );
-		$diff = round( $end - $start, 2 );
-
-		if ( $this->skipped > 0 ) {
-			$msg = sprintf( __( 'Processed %s items in %s seconds. Skipped %s items.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ), _nf( $this->skipped ) );
-		} else {
-			$msg = sprintf( __( 'Processed %s items in %s seconds.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ) );
-		}
+		$time = $start->time_elapsed_rounded( 3 );
 
 		$response = [
-			'complete'    => $completed - $this->skipped,
+			'complete'    => $item_count,
 			'skipped'     => $this->skipped,
-			'complete_nf' => _nf( $completed - $this->skipped ),
+			'complete_nf' => _nf( $this->completed - $this->skipped ),
 			'skipped_nf'  => _nf( $this->skipped ),
-			'message'     => esc_html( $msg ),
+			'message'     => esc_html( $this->get_log_message( $this->completed, $time, $this->skipped ) ),
 			'output'      => $output,
 		];
 
@@ -199,6 +204,23 @@ abstract class Bulk_Job {
 		}
 
 		$this->send_response( $response );
+	}
+
+	/**
+	 * Get the message to show in the log.
+	 *
+	 * @param $completed
+	 * @param $skipped
+	 * @param $time
+	 *
+	 * @return string
+	 */
+	protected function get_log_message( $completed, $time, $skipped = 0 ){
+		if ( $skipped > 0 ) {
+			return sprintf( __( 'Processed %s items in %s seconds. Skipped %s items.', 'groundhogg' ), _nf( $completed ), $time, _nf( $skipped ) );
+		} else {
+			return sprintf( __( 'Processed %s items in %s seconds.', 'groundhogg' ), $completed, $time );
+		}
 	}
 
 	/**

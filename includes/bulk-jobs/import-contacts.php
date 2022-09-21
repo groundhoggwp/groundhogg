@@ -25,7 +25,7 @@ class Import_Contacts extends Bulk_Job {
 	protected $import_tags = [];
 	protected $compliance = [];
 	protected $file_path = '';
-	const LIMIT = 250;
+	const LIMIT = 500;
 
 	/**
 	 * Get the action reference.
@@ -56,7 +56,7 @@ class Import_Contacts extends Bulk_Job {
 		// -1 because headers
 		$num_rows = count_csv_rows( $file_path ) - 1;
 
-		$num_requests = ceil( $num_rows / self::LIMIT );
+		$num_requests = floor( $num_rows / self::LIMIT );
 
 		return range( 0, $num_requests );
 	}
@@ -109,14 +109,20 @@ class Import_Contacts extends Bulk_Job {
 				$contact->apply_tag( $this->import_tags );
 			}
 
-
 			/**
 			 * Whenever a contact is imported
 			 *
 			 * @param $contact Contact
 			 */
 			do_action( 'groundhogg/contact/imported', $contact );
+
+			$this->_completed();
 		}
+	}
+
+
+	protected function get_log_message( $completed, $time, $skipped = 0 ) {
+		return sprintf( 'Imported %s contacts in %s seconds.', $completed, $time );
 	}
 
 	/**

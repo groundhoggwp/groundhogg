@@ -1282,9 +1282,7 @@ class Contact_Query {
 				return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 
 			case 'radio':
-
 				return self::meta_in( $filter_vars, $query );
-
 			case 'checkboxes':
 
 				return self::meta_all_in( $filter_vars, $query );
@@ -1665,20 +1663,13 @@ class Contact_Query {
 	 * @return string
 	 */
 	public static function filter_user_meta( $filter_vars, $query ) {
-
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'meta'    => '',
-			'compare' => '',
-			'value'   => ''
-		] );
-
 		global $wpdb;
 
-		$meta_table_name = $wpdb->usermeta;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
-		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
-
-		return "{$query->table_name}.user_id IN ( select {$meta_table_name}.user_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+		return self::_filter_meta( $filter_vars, $query, [
+			'column'     => 'user_id',
+			'select'     => 'user_id',
+			'meta_table' => $wpdb->usermeta
+		] );
 	}
 
 	/**
@@ -2691,14 +2682,23 @@ class Contact_Query {
 	}
 
 	/**
+	 * Select on any meta table
+	 *
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query
+	 * @param $table_info
 	 *
 	 * @return string
 	 */
-	public static function filter_meta( $filter_vars, $query ) {
+	public static function _filter_meta( $filter_vars, $query, $table_info = [] ) {
 
 		global $wpdb;
+
+		$table_info = wp_parse_args( $table_info, [
+			'column'     => 'ID',
+			'select'     => 'contact_id',
+			'meta_table' => get_db( 'contactmeta' )->table_name
+		] );
 
 		$filter_vars = wp_parse_args( $filter_vars, [
 			'meta'    => '',
@@ -2706,7 +2706,6 @@ class Contact_Query {
 			'value'   => ''
 		] );
 
-		$meta_table_name = get_db( 'contactmeta' )->table_name;
 		$clause1         = self::generic_text_compare( 'meta.meta_key', '=', $filter_vars['meta'] );
 		$value           = sanitize_text_field( $filter_vars['value'] );
 		$column          = 'meta.meta_value';
@@ -2762,7 +2761,22 @@ class Contact_Query {
 			'empty',
 		] ) ? 'NOT IN' : 'IN';
 
-		return "{$query->table_name}.ID $IN_OR_NOT ( select meta.contact_id FROM {$meta_table_name} as meta WHERE {$clause1} AND {$clause2} ) ";
+		return "{$query->table_name}.{$table_info['column']} $IN_OR_NOT ( select meta.{$table_info['select']} FROM {$table_info['meta_table']} as meta WHERE {$clause1} AND {$clause2} ) ";
+
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_meta( $filter_vars, $query ) {
+		return self::_filter_meta( $filter_vars, $query, [
+			'column'     => 'ID',
+			'select'     => 'contact_id',
+			'meta_table' => get_db( 'contactmeta' )->table_name
+		] );
 	}
 
 	/**

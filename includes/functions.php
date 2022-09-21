@@ -4741,6 +4741,27 @@ function permissions_key_url( $url, $contact, $usage = 'preferences', $expiratio
 }
 
 /**
+ * Generate a confirmation URL
+ *
+ * @param $contact
+ *
+ * @return mixed|void
+ */
+function confirmation_url( $contact ) {
+	$url = managed_page_url( 'preferences/confirm/' );
+
+	// create permissions url
+	$url = permissions_key_url( $url, $contact, 'preferences' );
+
+	// add identity as tracking failsafe
+	$url = add_query_arg( [
+		'identity' => encrypt( $contact->get_email() )
+	], $url );
+
+	return apply_filters( 'groundhogg/confirmation_url', $url, $contact );
+}
+
+/**
  * Generate an unsubscribe URL
  *
  * @param $contact
@@ -6616,9 +6637,14 @@ function is_copyable_file( $file ) {
  *
  * @param $contacts Contact|Contact[]
  *
- * @return true|WP_Error[]
+ * @return bool|WP_Error[]
  */
 function process_events( $contacts = [] ) {
+
+    // Event queue is already in progress
+    if ( Event_Queue::is_processing() ){
+        return true;
+    }
 
 	$errors = [];
 

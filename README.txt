@@ -325,7 +325,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.4.3 (2022-09-19) =
+= 2.7.4.4 (2022-09-20) =
+*
+
+= 2.7.4.3 (2022-09-20) =
 * TWEAKED Optimized the contact import tool to import more contacts at a time.
 * TWEAKED Optimized the event queue by removing excessive queries on the queue table.
 * FIXED Potential event queue bug causing events to be executed twice, and executed events to left out of reports during parallel queue processing.

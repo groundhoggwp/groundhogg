@@ -765,7 +765,7 @@ class HTML {
 		unset( $a['selected'] );
 		unset( $a['options'] );
 
-		return apply_filters( 'groundhogg/html/select', $this->e( 'select', $a, $optionHTML ), $a );
+		return apply_filters( 'groundhogg/html/select', $this->e( 'select', $a, $optionHTML, false ), $a );
 
 	}
 

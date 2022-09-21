@@ -13,7 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Sync_Contacts extends Bulk_Job {
+class Sync_Users extends Bulk_Job {
+
+	const LIMIT = 500;
 
 	/**
 	 * Get the action reference.
@@ -22,6 +24,10 @@ class Sync_Contacts extends Bulk_Job {
 	 */
 	function get_action() {
 		return 'gh_sync_users';
+	}
+
+	public function max_items( $max, $items ) {
+		return 1;
 	}
 
 	/**
@@ -36,36 +42,44 @@ class Sync_Contacts extends Bulk_Job {
 			return $items;
 		}
 
-		/* convert users to contacts */
-		$args = array(
-			'fields' => 'all_with_meta'
-		);
+		$user_count = count_users();
+		$num_users  = $user_count['total_users'];
 
-		$users = get_users( $args );
+		$num_requests = floor( $num_users / self::LIMIT );
 
-		$uids = [];
-
-		/* @var $wp_user \WP_User */
-		foreach ( $users as $wp_user ) {
-			$uids[] = $wp_user->ID;
-		}
-
-		return $uids;
+		return range( 0, $num_requests );
 	}
 
 	/**
 	 * Process an item
 	 *
-	 * @param $item mixed
+	 * @param $batch int
 	 *
 	 * @return void
 	 */
-	protected function process_item( $item ) {
+	protected function process_item( $batch ) {
+
 		if ( ! current_user_can( 'add_contacts' ) ) {
 			return;
 		}
 
-		create_contact_from_user( absint( $item ), is_option_enabled( 'gh_sync_user_meta' ) );
+		$user_query = new \WP_User_Query( [
+			'number' => self::LIMIT,
+			'offset' => $batch * self::LIMIT
+		] );
+
+		$users = $user_query->get_results();
+
+		foreach ( $users as $user ){
+			create_contact_from_user( $user, is_option_enabled( 'gh_sync_user_meta' ) );
+
+			$this->_completed();
+		}
+
+	}
+
+	protected function get_log_message( $completed, $time, $skipped = 0 ) {
+		return sprintf( 'Synced %s users in %s seconds.', $completed, $time );
 	}
 
 	/**
@@ -100,7 +114,7 @@ class Sync_Contacts extends Bulk_Job {
 	 */
 	protected function get_return_url() {
 		return admin_page_url( 'gh_contacts', [
-			'filters' => base64_json_encode( [[['type' => 'is_user']]])
+			'filters' => base64_json_encode( [ [ [ 'type' => 'is_user' ] ] ] )
 		] );
 	}
 }

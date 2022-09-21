@@ -28,7 +28,7 @@ class Manager {
 		$this->delete_contacts          = new Delete_Contacts();
 		$this->export_contacts          = new Export_Contacts();
 		$this->import_contacts          = new Import_Contacts();
-		$this->sync_contacts            = new Sync_Contacts();
+		$this->sync_contacts            = new Sync_Users();
 		$this->migrate_form_impressions = new Migrate_Form_Impressions();
 		$this->migrate_waiting_events   = new Migrate_Waiting_Events();
 		$this->add_contacts_to_funnel   = new Add_Contacts_To_Funnel();
