@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use Groundhogg\Step;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_request_var;
@@ -42,7 +43,7 @@ abstract class Base_Report {
 	 * Reports constructor.
 	 *
 	 * @param $start int unix timestamps
-	 * @param $end int unix timestamps
+	 * @param $end   int unix timestamps
 	 */
 	public function __construct( $start, $end ) {
 
@@ -176,7 +177,7 @@ abstract class Base_Report {
 	protected function get_funnel_id() {
 		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
 
-		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id && ! $this->funnel_cookie_set ){
+		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id && ! $this->funnel_cookie_set ) {
 			set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
 			$this->funnel_cookie_set = true;
 		}
@@ -195,6 +196,14 @@ abstract class Base_Report {
 	 * @return mixed
 	 */
 	protected function get_email_id() {
+
+		if ( $this->get_step_id() ) {
+			$step = new Step( $this->get_step_id() );
+			if ( $step->exists() && $step->type_is( 'send_email' ) ) {
+				return $step->get_meta( 'email_id' );
+			}
+		}
+
 		return absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
 	}
 

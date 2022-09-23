@@ -4,9 +4,9 @@ namespace Groundhogg\Admin\Reports\Views;
 
 ?>
 
-<div class="groundhogg-chart-wrapper">
-	<div class="groundhogg-chart-no-padding full-width">
+<div class="gh-panel">
+	<div class="gh-panel-header">
 		<h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
-		<div id="table_form_activity"></div>
 	</div>
+    <div id="table_form_activity"></div>
 </div

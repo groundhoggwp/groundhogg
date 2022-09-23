@@ -143,15 +143,6 @@ class Emails_Page extends Admin_Page {
 	protected function get_title_actions() {
 
 		$broadcast_args = [ 'action' => 'add', 'type' => 'email' ];
-		$reporting_args = [ 'tab' => 'email' ];
-
-		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
-			$broadcast_args['email'] = absint( $email );
-			$reporting_args          = [
-				'tab'   => 'email_step',
-				'email' => $email,
-			];
-		}
 
 		return [
 			[
@@ -162,11 +153,6 @@ class Emails_Page extends Admin_Page {
 			[
 				'link'   => Groundhogg\admin_page_url( 'gh_broadcasts', $broadcast_args ),
 				'action' => __( 'Broadcast', 'groundhogg' ),
-				'target' => '_self',
-			],
-			[
-				'link'   => Groundhogg\admin_page_url( 'gh_reporting', $reporting_args ),
-				'action' => __( 'Reporting', 'groundhogg' ),
 				'target' => '_self',
 			],
 		];

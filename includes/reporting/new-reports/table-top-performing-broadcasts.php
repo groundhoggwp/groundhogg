@@ -15,7 +15,7 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	 *
 	 * @return array
 	 */
-	protected function get_email_ids_of_sent_emails() {
+	protected function get_send_email_steps() {
 
 		$broadcasts = get_db( 'broadcasts' )->query( [
 			'where' => [
@@ -36,7 +36,7 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	}
 
 	protected function get_table_data() {
-		$emails = $this->get_email_ids_of_sent_emails();
+		$emails = $this->get_send_email_steps();
 
 		$list = [];
 

@@ -2,31 +2,40 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
+use function Groundhogg\percentage;
 use function Groundhogg\Ymd_His;
 
-class Total_Contacts_In_Funnel extends Base_Quick_Stat {
+class Total_Funnel_Conversions extends Base_Quick_Stat {
+
 
 	public function get_link() {
+
+		$funnel = $this->get_funnel();
+
 		return admin_page_url( 'gh_contacts', [
-			'filters' => base64_json_encode( [
-				[
+			'filters' => base64_json_encode( array_values( array_map( function ( $step_id ) use ( $funnel ) {
+				return [
 					[
 						'type'       => 'funnel_history',
-						'funnel_id'  => $this->get_funnel()->ID,
+						'funnel_id'  => $funnel->ID,
+						'step_id'    => $step_id,
 						'status'     => 'complete',
 						'date_range' => 'between',
 						'before'     => Ymd_His( $this->end ),
 						'after'      => Ymd_His( $this->start )
 					]
-				]
-			] )
+				];
+			}, $funnel->get_conversion_step_ids() ) ) )
 		] );
 	}
 
@@ -40,18 +49,25 @@ class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 	 */
 	protected function query( $start, $end ) {
 
+		$conversion_steps = $this->get_funnel()->get_conversion_step_ids();
 
-		$where_events = [
+		$where = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $this->get_funnel()->get_entry_step_ids(), 'compare' => 'IN' ],
+			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 		];
 
-		return get_db( 'events' )->count( [
-			'where'  => $where_events,
+		$num_of_conversions = get_db( 'events' )->count( [
+			'where'  => $where,
 			'select' => 'DISTINCT contact_id'
 		] );
+
+		return $num_of_conversions;
+
 	}
+
+
+
 }

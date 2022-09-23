@@ -66,22 +66,27 @@ function quick_stat_report( $args = [] ) {
 	$args = wp_parse_args( $args, [
 		'id'    => uniqid( 'groundhogg_' ),
 		'title' => 'Report',
+        'class' => 'span-3',
 		'info'  => 'Some interesting data...',
 		'style' => [],
 	] );
 
 	?>
 
-	<div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args['id'] ); ?>"
-	     style="<?php echo array_to_css( $args['style'] ); ?>">
-		<div class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></div>
-		<div class="groundhogg-quick-stat-info"></div>
-		<div class="groundhogg-quick-stat-number">1234</div>
-		<div class="groundhogg-quick-stat-previous green">
-			<span class="groundhogg-quick-stat-arrow up"></span>
-			<span class="groundhogg-quick-stat-prev-percent">25%</span>
-		</div>
-		<div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
+	<div class="groundhogg-quick-stat gh-panel <?php esc_attr_e( $args[ 'class' ] ); ?>" id="<?php esc_attr_e( $args['id'] ); ?>">
+        <div class="gh-panel-header">
+            <h2 class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></h2>
+        </div>
+        <div class="inside">
+            <div class="groundhogg-quick-stat-info"></div>
+            <div class="groundhogg-quick-stat-number">1234</div>
+            <div class="groundhogg-quick-stat-previous green">
+                <span class="groundhogg-quick-stat-arrow up"></span>
+                <span class="groundhogg-quick-stat-prev-percent">25%</span>
+            </div>
+            <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
+            <div class="clearfix"></div>
+        </div>
 	</div>
 	<?php
 }

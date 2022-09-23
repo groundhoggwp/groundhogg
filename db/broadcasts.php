@@ -14,12 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Stores information about broadcasts
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Broadcasts extends DB {
 
@@ -57,6 +57,10 @@ class Broadcasts extends DB {
 	 */
 	public function get_object_type() {
 		return 'broadcast';
+	}
+
+	public function get_date_key() {
+		return 'send_time';
 	}
 
 	/**

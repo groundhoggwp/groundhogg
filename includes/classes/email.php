@@ -1067,7 +1067,7 @@ class Email extends Base_Object_With_Meta {
 
 			$where_events = [
 				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
+				[ 'col' => 'step_id', 'val' => wp_parse_id_list( $steps_ids ), 'compare' => 'IN' ],
 				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
@@ -1116,12 +1116,14 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		return [
-			'steps'        => $steps_ids,
-			'sent'         => $count,
-			'opened'       => $opened,
-			'clicked'      => $clicked,
-			'all_clicks'   => $all_clicked,
-			'unsubscribed' => $unsubscribed,
+			'steps'              => $steps_ids,
+			'sent'               => $count,
+			'opened'             => $opened,
+			'open_rate'          => percentage( $count, $opened ),
+			'clicked'            => $clicked,
+			'all_clicks'         => $all_clicked,
+			'unsubscribed'       => $unsubscribed,
+			'click_through_rate' => percentage( $opened, $clicked ),
 		];
 	}
 

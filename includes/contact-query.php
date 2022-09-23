@@ -1477,6 +1477,10 @@ class Contact_Query {
 			[ self::class, 'filter_unsubscribed' ]
 		);
 
+		self::register_filter(
+			'optin_status_changed',
+			[ self::class, 'filter_optin_status_changed' ]
+		);
 
 		self::register_filter(
 			'birthday',
@@ -1546,6 +1550,11 @@ class Contact_Query {
 		self::register_filter(
 			'funnel_history',
 			[ self::class, 'filter_funnel' ]
+		);
+
+		self::register_filter(
+			'custom_activity',
+			[ self::class, 'filter_custom_activity' ]
 		);
 
 		self::register_filter(
@@ -1959,6 +1968,31 @@ class Contact_Query {
 		] );
 
 		return self::filter_by_events( $event_query, $query );
+	}
+
+	/**
+	 * Filter Activity
+	 *
+	 * Generic filter for activity type
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_custom_activity( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'activity' => '',
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => $filter_vars['activity'],
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
 	}
 
 	/**
@@ -2662,6 +2696,24 @@ class Contact_Query {
 		return "{$query->table_name}.date_optin_status_changed $clause AND {$query->table_name}.optin_status = " . Preferences::UNSUBSCRIBED;
 	}
 
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_optin_status_changed( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value' => []
+		] );
+
+		$optin_status = maybe_implode_in_quotes( $filter_vars['value'] );
+
+		return "{$query->table_name}.date_optin_status_changed $clause AND {$query->table_name}.optin_status IN ( $optin_status )";
+	}
 
 	/**
 	 * @param $filter_vars
@@ -2706,10 +2758,10 @@ class Contact_Query {
 			'value'   => ''
 		] );
 
-		$clause1         = self::generic_text_compare( 'meta.meta_key', '=', $filter_vars['meta'] );
-		$value           = sanitize_text_field( $filter_vars['value'] );
-		$column          = 'meta.meta_value';
-		$compare         = $filter_vars['compare'];
+		$clause1 = self::generic_text_compare( 'meta.meta_key', '=', $filter_vars['meta'] );
+		$value   = sanitize_text_field( $filter_vars['value'] );
+		$column  = 'meta.meta_value';
+		$compare = $filter_vars['compare'];
 
 		switch ( $filter_vars['compare'] ) {
 			default:

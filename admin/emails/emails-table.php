@@ -21,12 +21,12 @@ use function Groundhogg\scheduled_time_column;
  *
  * This class shows the data table for accessing information about an email.
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Emails
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 
 // Exit if accessed directly
@@ -62,8 +62,8 @@ class Emails_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -102,10 +102,10 @@ class Emails_Table extends WP_List_Table {
 			return;
 		}
 		?>
-		<div class="alignleft gh-actions">
-			<a class="button"
-			   href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
-		</div>
+        <div class="alignleft gh-actions">
+            <a class="button"
+               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+        </div>
 		<?php
 	}
 
@@ -137,9 +137,9 @@ class Emails_Table extends WP_List_Table {
 	/**
 	 * Generates content for a single row of the table
 	 *
-	 * @param object $item The current item
-	 *
 	 * @since 3.1.0
+	 *
+	 * @param object $item The current item
 	 *
 	 */
 	public function single_row( $item ) {
@@ -170,15 +170,7 @@ class Emails_Table extends WP_List_Table {
 			$actions['restore'] = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email=' . $id ), 'restore' ) . "'>" . __( 'Restore' ) . "</a>";
 			$actions['delete']  = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email=' . $id ), 'delete' ) . "'>" . __( 'Delete Permanently' ) . "</a>";
 		} else {
-			$actions['edit'] = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
-
-			if ( $email->is_ready() ) {
-				$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
-						'tab'   => 'email_step',
-						'email' => $id,
-					] ) ) . "'>" . __( 'Report', 'groundhogg' ) . "</a>";
-			}
-
+			$actions['edit']   = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
 			$actions['delete'] = "<a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email=' . $id ), 'trash' ) . "'>" . __( 'Trash' ) . "</a>";
 		}
 

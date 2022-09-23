@@ -3,6 +3,7 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use function Groundhogg\_nf;
+use function Groundhogg\html;
 use function Groundhogg\percentage;
 use function Sodium\compare;
 
@@ -12,7 +13,7 @@ abstract class Base_Quick_Stat extends Base_Report {
 	 * Query the results
 	 *
 	 * @param $start int
-	 * @param $end int
+	 * @param $end   int
 	 *
 	 * @return mixed
 	 */
@@ -45,6 +46,10 @@ abstract class Base_Quick_Stat extends Base_Report {
 		];
 	}
 
+	public function get_link() {
+		return false;
+	}
+
 	/**
 	 * Get the report data
 	 *
@@ -61,7 +66,10 @@ abstract class Base_Quick_Stat extends Base_Report {
 
 		return [
 			'type'    => 'quick_stat',
-			'number'  => _nf( $current_data ),
+			'number'  => $this->get_link() ? html()->e( 'a', [
+				'href'   => $this->get_link(),
+				'target' => '_blank'
+			], _nf( $current_data ), false ) : _nf( $current_data ),
 			'compare' => [
 				'arrow'   => [
 					'direction' => $arrow['direction'],

@@ -293,7 +293,7 @@ function is_option_enabled( $option = '' ) {
  * @return HTML
  */
 function html() {
-	return Plugin::$instance->utils->html;
+	return Plugin::instance()->utils->html;
 }
 
 /**
@@ -302,21 +302,21 @@ function html() {
  * @return Notices
  */
 function notices() {
-	return Plugin::$instance->notices;
+	return Plugin::instance()->notices;
 }
 
 /**
  * @return Tracking
  */
 function tracking() {
-	return Plugin::$instance->tracking;
+	return Plugin::instance()->tracking;
 }
 
 /**
  * @return Utils
  */
 function utils() {
-	return Plugin::$instance->utils;
+	return Plugin::instance()->utils;
 }
 
 function bulk_jobs() {
@@ -2874,7 +2874,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			'email' => $args['email']
 		] );
 
-        $contact->update( $args );
+		$contact->update( $args );
 
 		// We do NOT want to process this in the event the user is logged is as
 		// a GH user
@@ -2918,7 +2918,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		}
 	}
 
-    //	 update meta data
+	//	 update meta data
 	if ( ! empty( $meta ) ) {
 		foreach ( $meta as $key => $value ) {
 			$contact->update_meta( $key, $value );
@@ -3875,11 +3875,11 @@ function action_url( $action, $args = [] ) {
  */
 function get_default_country_code() {
 
-    static $cc;
+	static $cc;
 
-    if ( $cc ){
-        return $cc;
-    }
+	if ( $cc ) {
+		return $cc;
+	}
 
 	// Is the CC already set?
 	$cc = get_option( 'gh_default_country_code' );
@@ -3917,7 +3917,7 @@ function get_default_country_code() {
 
 	$cc = 'US';
 
-    return $cc;
+	return $cc;
 }
 
 /**
@@ -6129,6 +6129,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 				} else {
 					$filters[0][] = [
 						'type'       => 'email_link_clicked',
+						'count_compare' => 'greater_than_or_equal_to',
+						'count'         => 1,
 						'email_id'   => absint( $activity_query['email_id'] ),
 						'link'       => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
 						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
@@ -6148,11 +6150,13 @@ function get_filters_from_old_query_vars( $query = [] ) {
 
 				} else {
 					$filters[0][] = [
-						'type'       => 'email_opened',
-						'email_id'   => absint( $activity_query['email_id'] ),
-						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
-						'before'     => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
-						'date_range' => 'between',
+						'type'          => 'email_opened',
+						'count_compare' => 'greater_than_or_equal_to',
+						'count'         => 1,
+						'email_id'      => absint( $activity_query['email_id'] ),
+						'after'         => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'        => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
+						'date_range'    => 'between',
 					];
 				}
 
@@ -6641,10 +6645,10 @@ function is_copyable_file( $file ) {
  */
 function process_events( $contacts = [] ) {
 
-    // Event queue is already in progress
-    if ( Event_Queue::is_processing() ){
-        return true;
-    }
+	// Event queue is already in progress
+	if ( Event_Queue::is_processing() ) {
+		return true;
+	}
 
 	$errors = [];
 
@@ -6672,7 +6676,7 @@ function process_events( $contacts = [] ) {
 		}, 10, 2 );
 	}
 
-    Limits::set_max_execution_time( 5 );
+	Limits::set_max_execution_time( 5 );
 
 	do_action( Event_Queue::WP_CRON_HOOK );
 

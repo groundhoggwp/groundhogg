@@ -141,6 +141,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->step_type;
 	}
 
+	public function get_type_name() {
+		return Plugin::instance()->step_manager->get_element( $this->get_type() )->get_name();
+	}
+
 	public function get_group() {
 		return $this->step_group;
 	}

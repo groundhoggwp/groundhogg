@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.4.3
+Stable tag: 2.7.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,8 +325,16 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.4.4 (2022-09-20) =
-*
+= 2.7.5 (2022-09-23) =
+* IMPROVED Reports dashboard gets a facelift
+ * New styles make viewing your reports more enjoyable.
+ * Quick stat numbers are clickable and show relevant contacts with correct search filters.
+ * Funnels tab shows list of all active funnels and their results. Click into each individual report to see expanded results.
+ * Show number of conversions instead of abandonment rate in the funnel report.
+ * Broadcasts page shows list of broadcasts sent within the given time range, and their results, ordered by date sent. Click into each individual report to see expanded results.
+* TWEAKED Optimized the Sync Users bulk job to handle larger datasets of 100K plus users.
+* TWEAKED Show a prompt to schedule a broadcast in the reports and there are no sent broadcasts.
+* TWEAKED Show a prompt to launch a funnel in the reports and there are no active funnels.
 
 = 2.7.4.3 (2022-09-20) =
 * TWEAKED Optimized the contact import tool to import more contacts at a time.

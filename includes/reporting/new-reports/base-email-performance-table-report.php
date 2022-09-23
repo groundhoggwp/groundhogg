@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_map_to_step;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
@@ -29,8 +30,10 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 
 	/**
 	 * Get the email IDs of emails sent within the time period...
+	 *
+	 * @return Step[]
 	 */
-	protected function get_email_ids_of_sent_emails() {
+	protected function get_send_email_steps() {
 
 
 		global $wpdb;
@@ -60,15 +63,7 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 
 		$step_ids = wp_list_pluck( $data, 'step_id' );
 
-		$emails = [];
-
-		foreach ( $step_ids as $step_id ) {
-			$step = new Step( $step_id );
-
-			$emails[] = absint( $step->get_meta( 'email_id' ) );
-		}
-
-		return array_unique( $emails );
+		return array_map_to_step( $step_ids );
 
 	}
 
@@ -90,30 +85,28 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 
-		$emails = $this->get_email_ids_of_sent_emails();
+		$steps = $this->get_send_email_steps();
 
 		$list = [];
 
-		foreach ( $emails as $email ) {
+		foreach ( $steps as $step ) {
 
-			$email_id = is_object( $email ) ? $email->ID : $email;
-
-			$email = new Email( $email_id );
+			$email = new Email( $step->get_meta( 'email_id' ) );
 
 			if ( ! $email->exists() ) {
 				continue;
 			}
 
-			$report = $email->get_email_stats( $this->start, $this->end );
+			$report = $email->get_email_stats( $this->start, $this->end, $step->ID );
 
 			$title = $email->get_title();
 
-			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
+			if ( $this->should_include( $report['sent'], $report['opened'], $report['clicked'] ) ) {
 				$list[] = [
 					'label'   => $title,
 					'url'     => admin_page_url( 'gh_reporting', [
-						'tab'   => 'email_step',
-						'email' => $email->get_id()
+						'tab'  => 'funnels',
+						'step' => $step->get_id()
 					] ),
 					'sent'    => _nf( $report['sent'] ),
 					'opened'  => percentage( $report['sent'], $report['opened'] ),
@@ -155,13 +148,7 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-		return [
-			'label'   => $item_data['label'],
-			'url'     => $item_data['url'],
-			'sent'    => $item_data['sent'],
-			'opened'  => $item_data['opened'],
-			'clicked' => $item_data['clicked'],
-		];
+		return $item_data;
 	}
 
 

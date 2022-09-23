@@ -11,6 +11,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -100,7 +101,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 				wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
 					'reports' => $this->get_reports_per_tab(),
-					'dates'   => $dates
+					'dates'   => $dates,
+					'other'   => [
+						'funnel_id'    => get_url_var( 'funnel' ),
+						'broadcast_id' => get_url_var( 'broadcast' ),
+						'email_id'     => get_url_var( 'email' ),
+						'step_id'      => get_url_var( 'step' ),
+					]
 				] );
 
 				break;
@@ -112,6 +119,39 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 				break;
 		}
+	}
+
+	protected function get_funnel_reports() {
+
+		if ( get_url_var( 'funnel' ) ) {
+			return [
+				'chart_funnel_breakdown',
+				'table_top_performing_emails',
+				'table_worst_performing_emails',
+				'total_funnel_conversion_rate',
+				'total_funnel_conversions',
+				'total_contacts_in_funnel',
+				'table_form_activity',
+				'table_funnel_stats',
+				'table_all_funnel_emails_performance'
+			];
+		}
+
+		if ( get_url_var( 'step' ) ) {
+			return [
+				'table_email_stats',
+				'table_email_links_clicked',
+				'total_emails_sent',
+				'email_open_rate',
+				'email_click_rate',
+				'chart_donut_email_stats',
+			];
+		}
+
+		return [
+			'table_all_funnels_performance'
+		];
+
 	}
 
 	protected function get_reports_per_tab() {
@@ -162,31 +202,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'table_top_performing_broadcasts',
 				'table_broadcast_stats'
 			],
-			'funnels'    => [
-				'chart_funnel_breakdown',
-				'table_top_performing_emails',
-				'table_worst_performing_emails',
-				'total_funnel_conversion_rate',
-				'total_benchmark_conversion_rate',
-				'total_abandonment_rate',
-				'total_contacts_in_funnel',
-				'table_benchmark_conversion_rate',
-				'table_form_activity',
-				'table_funnel_stats',
-			],
-			'broadcasts' => [
+			'funnels'    => $this->get_funnel_reports(),
+			'broadcasts' => get_url_var( 'broadcast' ) ? [
 				'chart_last_broadcast',
 				'table_broadcast_stats',
 				'table_broadcast_link_clicked',
-			],
-			'email_step' => [
-				'table_email_stats',
-				'table_email_links_clicked',
-				'total_emails_sent',
-				'email_open_rate',
-				'email_click_rate',
-				'chart_donut_email_stats',
-				'table_email_funnels_used_in'
+			] : [
+				'table_all_broadcasts_performance'
 			],
 			'forms'      => [
 				'table_form_activity',
@@ -304,20 +326,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include __DIR__ . '/views/functions.php';
 
 		?>
-		<div class="loader-wrap">
-			<div class="gh-loader-overlay" style="display:none;"></div>
-			<div class="gh-loader" style="display: none"></div>
-		</div>
-		<div class="wrap blurred">
+        <div class="loader-wrap">
+            <div class="gh-loader-overlay" style="display:none;"></div>
+            <div class="gh-loader" style="display: none"></div>
+        </div>
+        <div class="wrap blurred">
 			<?php if ( ! is_white_labeled() ): ?>
-				<h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
+                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
-				<h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
+                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
 			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
-			<hr class="wp-header-end">
+            <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
@@ -344,7 +366,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			}
 
 			?>
-		</div>
+        </div>
 		<?php
 
 	}
@@ -354,12 +376,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function range_picker() {
 		?>
-		<div id="groundhogg-datepicker-wrap">
-			<div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
-		</div>
-		<!--        <div id="groundhogg-datepicker-wrap">-->
-		<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-		<!--        </div>-->
+        <div id="groundhogg-datepicker-wrap">
+            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+        </div>
+        <!--        <div id="groundhogg-datepicker-wrap">-->
+        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+        <!--        </div>-->
 		<?php
 	}
 

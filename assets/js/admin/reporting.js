@@ -122,7 +122,9 @@ function tool_tip_title () {
           reports: self.reports,
           start: start,
           end: end,
-          data: self.get_other_data(),
+          data: {
+            ...reporting.other
+          },
         },
         success: function (json) {
 
@@ -282,21 +284,6 @@ function tool_tip_title () {
           }
         },
       })
-      //
-      // legend on the side in the pie chart
-      $('#' + report_id + '_legend').html(chart.generateLegend())
-
-      // var chart_pi = this.myChart[$report.selector];
-      $('#' + report_id + '_legend' + ' > ul > li').
-        on('click', chart, function (e) {
-          var index = $(this).index()
-          $(this).toggleClass('strike')
-          var ci = e.data.chart
-          var meta = Object.values(ci.data.datasets[0]._meta) [0]
-          var curr = meta.data[index]
-          curr.hidden = !curr.hidden
-          ci.update()
-        })
 
     },
 

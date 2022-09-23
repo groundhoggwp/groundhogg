@@ -46,21 +46,26 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 	protected function get_table_data() {
 
 		$broadcast = new Broadcast( $this->get_broadcast_id() );
-		$stats     = $broadcast->get_report_data();
 
-		$title = $broadcast->is_email() ? $broadcast->get_object()->get_subject_line() : $broadcast->get_title();
+		if ( ! $broadcast->exists() ) {
+			return [];
+		}
+
+		$stats = $broadcast->get_report_data();
+
+		$title  = $broadcast->is_email() ? $broadcast->get_object()->get_subject_line() : $broadcast->get_title();
+		$object = $broadcast->get_object();
 
 		return [
 			[
 				'label' => __( 'Subject', 'groundhogg' ),
-				'data'  => html()->wrap( $title, 'a', [
-					'href'  => admin_page_url( 'gh_reporting', [
-						'tab'       => 'broadcasts',
-						'broadcast' => $broadcast->get_id()
+				'data'  => $broadcast->is_email() ? html()->wrap( $title, 'a', [
+					'href'  => admin_page_url( 'gh_emails', [
+						'action' => 'edit',
+						'email'  => $object->get_id()
 					] ),
 					'title' => $title,
-//					'class' => 'number-total'
-				] )
+				] ) : $title
 			],
 			[
 				'label' => __( 'Sent', 'groundhogg' ),

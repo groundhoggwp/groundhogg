@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
@@ -24,6 +25,10 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 	protected function get_datasets() {
 
 		$data = $this->get_last_broadcast_details();
+
+		if ( empty( $data ) ){
+			return $data;
+		}
 
 		return [
 			'labels'   => $data['label'],
@@ -41,11 +46,10 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 	}
 
 	protected function get_broadcast_id() {
-		return get_request_var( 'data' )['broadcast_id'];
+		return get_array_var( get_request_var( 'data' ), 'broadcast_id' );
 	}
 
 	protected function get_last_broadcast_details() {
-
 
 		$broadcast = $this->get_broadcast();
 

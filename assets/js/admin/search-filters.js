@@ -1579,6 +1579,40 @@
     },
   })
 
+  registerFilter('optin_status_changed', 'activity', __('Optin Status Changed', 'groundhogg'), {
+    view ({ value, ...filter }) {
+      return standardActivityDateTitle(
+        sprintf('<b>Optin status</b> changed to %s', orList(value.map(v => `<b>${ optin_status[v] }</b>`))), filter)
+    },
+    edit ({ value, ...filter }) {
+      return [
+        select({
+            id: 'filter-value',
+            name: 'value',
+            class: 'gh-select2',
+            multiple: true,
+          }, Object.keys(optin_status).map(k => ( { value: k, text: optin_status[k] } )),
+          value),
+        standardActivityDateOptions(filter),
+      ].join('')
+    },
+    onMount (filter, updateFilter) {
+      $('#filter-value').select2()
+      $('#filter-value').on('change', function (e) {
+        const $el = $(this)
+        // console.log($el.val())
+        updateFilter({
+          [$el.prop('name')]: $el.val(),
+        })
+      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      value: [],
+      ...standardActivityDateDefaults,
+    },
+  })
+
   //filter by Email Opened
   registerFilter('page_visited', 'activity', __('Page Visited', 'groundhogg'), {
     view ({ link, ...rest }) {
@@ -1817,7 +1851,7 @@
   registerFilterGroup('broadcast', _x('Broadcast', 'noun meaning email blast', 'groundhogg'))
 
   registerFilter('broadcast_received', 'broadcast', __('Received Broadcast', 'groundhogg'), {
-    view ({ broadcast_id, status }) {
+    view ({ broadcast_id, status = 'complete' }) {
 
       if (!broadcast_id) {
         return __('Received any broadcast', 'groundhogg')
@@ -1973,6 +2007,35 @@
       if (broadcast_id) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
+    },
+  })
+
+  registerFilter('custom_activity', 'activity', __('Custom Activity', 'groundhogg'), {
+    view ({ activity, ...filter }) {
+      return standardActivityDateTitle(`<b>${ activity }</b>`, filter)
+    },
+    edit ({ activity, ...filter }) {
+      return [
+        input({
+          id: 'filter-activity-type',
+          name: 'activity',
+          value: activity,
+          placeholder: 'custom_activity',
+        }),
+        standardActivityDateOptions(filter),
+      ].join('')
+    },
+    onMount (filter, updateFilter) {
+      $('#filter-activity-type').on('input', e => {
+        updateFilter({
+          activity: e.target.value,
+        })
+      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      activity: '',
+      ...standardActivityDateDefaults,
     },
   })
 

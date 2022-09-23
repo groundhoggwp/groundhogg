@@ -42,6 +42,42 @@ h3.no-margin-top {
   align-items: flex-start;
 }
 
+.display-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-rows: auto;
+}
+.display-grid.gap-10 {
+  gap: 10px;
+}
+.display-grid.gap-20 {
+  gap: 20px;
+}
+.display-grid > .span-12 {
+  grid-column: span 12;
+}
+.display-grid > .span-9 {
+  grid-column: span 9;
+}
+.display-grid > .span-8 {
+  grid-column: span 8;
+}
+.display-grid > .span-6 {
+  grid-column: span 6;
+}
+.display-grid > .span-4 {
+  grid-column: span 4;
+}
+.display-grid > .span-3 {
+  grid-column: span 3;
+}
+
+@media only screen and (max-width: 480px) {
+  .display-grid {
+    display: flex;
+    flex-direction: column;
+  }
+}
 .display-flex {
   display: flex;
 }

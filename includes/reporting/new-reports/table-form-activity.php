@@ -49,7 +49,7 @@ class Table_Form_Activity extends Base_Table_Report {
 					'href' => admin_page_url( 'gh_funnels', [
 						'action' => 'edit',
 						'funnel' => $form_step->get_funnel_id()
-					] )
+					], $form_id )
 				], $form_name ),
 			];
 

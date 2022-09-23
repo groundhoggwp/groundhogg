@@ -28,6 +28,7 @@ use Groundhogg\Steps\Benchmarks\Page_Visited;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
+use function Groundhogg\get_array_var;
 use function Groundhogg\is_option_enabled;
 
 /**
@@ -151,5 +152,20 @@ class Manager {
 	 */
 	public function type_is_registered( $step_type ) {
 		return in_array( $step_type, array_keys( $this->elements ) );
+	}
+
+	/**
+	 * @param $get_type
+	 *
+	 * @return Funnel_Step
+	 */
+	public function get_element( $get_type ) {
+
+		if ( ! $this->type_is_registered( $get_type ) ){
+			return $this->get_element( 'error' );
+		}
+
+		return get_array_var( $this->elements, $get_type );
+
 	}
 }

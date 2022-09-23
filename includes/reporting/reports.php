@@ -12,6 +12,9 @@ use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
+use Groundhogg\Reporting\New_Reports\Table_All_Broadcasts_Performance;
+use Groundhogg\Reporting\New_Reports\Table_All_Funnel_Emails_Performance;
+use Groundhogg\Reporting\New_Reports\Table_All_Funnels_Performance;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Link_Clicked;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Stats;
@@ -39,6 +42,7 @@ use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Contacts_In_Funnel;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
 use Groundhogg\Reporting\New_Reports\Total_Funnel_Conversion_Rate;
+use Groundhogg\Reporting\New_Reports\Total_Funnel_Conversions;
 use Groundhogg\Reporting\New_Reports\Total_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Spam_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Unsubscribed_Contacts;
@@ -177,6 +181,9 @@ class Reports {
 			[
 				'id'       => 'table_top_performing_broadcasts',
 				'callback' => [ $this, 'table_top_performing_broadcasts' ]
+			],[
+				'id'       => 'table_all_broadcasts_performance',
+				'callback' => [ $this, 'table_all_broadcasts_performance' ]
 			],
 			[
 				'id'       => 'total_spam_contacts',
@@ -197,6 +204,10 @@ class Reports {
 			[
 				'id'       => 'total_funnel_conversion_rate',
 				'callback' => [ $this, 'total_funnel_conversion_rate' ]
+			],
+			[
+				'id'       => 'total_funnel_conversions',
+				'callback' => [ $this, 'total_funnel_conversions' ]
 			],
 			[
 				'id'       => 'total_benchmark_conversion_rate',
@@ -221,6 +232,10 @@ class Reports {
 			[
 				'id'       => 'table_top_converting_funnels',
 				'callback' => [ $this, 'table_top_converting_funnels' ]
+			],
+			[
+				'id'       => 'table_all_funnels_performance',
+				'callback' => [ $this, 'table_all_funnels_performance' ]
 			],
 			[
 				'id'       => 'table_form_activity',
@@ -249,6 +264,10 @@ class Reports {
 			[
 				'id'       => 'table_list_engagement',
 				'callback' => [ $this, 'table_list_engagement' ]
+			],
+			[
+				'id'       => 'table_all_funnel_emails_performance',
+				'callback' => [ $this, 'table_all_funnel_emails_performance' ]
 			]
 		];
 
@@ -541,6 +560,17 @@ class Reports {
 
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function table_all_broadcasts_performance() {
+
+		$report = new Table_All_Broadcasts_Performance( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
 
 	/**
 	 * @return mixed
@@ -583,6 +613,17 @@ class Reports {
 	public function total_funnel_conversion_rate() {
 
 		$report = new Total_Funnel_Conversion_Rate( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_funnel_conversions() {
+
+		$report = new Total_Funnel_Conversions( $this->start, $this->end );
 
 		return $report->get_data();
 
@@ -660,6 +701,12 @@ class Reports {
 		return $report->get_data();
 	}
 
+	public function table_all_funnels_performance() {
+		$report = new Table_All_Funnels_Performance( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
 	public function table_form_activity() {
 		$report = new Table_Form_Activity( $this->start, $this->end );
 
@@ -686,6 +733,12 @@ class Reports {
 
 	public function table_funnel_stats() {
 		$report = new Table_Funnel_Stats( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_all_funnel_emails_performance() {
+		$report = new Table_All_Funnel_Emails_Performance( $this->start, $this->end );
 
 		return $report->get_data();
 	}

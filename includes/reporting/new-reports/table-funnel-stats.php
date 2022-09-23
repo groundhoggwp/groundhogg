@@ -34,7 +34,8 @@ class Table_Funnel_Stats extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 		//get list of benchmark
-		$funnel = new Funnel( absint( $this->get_funnel_id() ) );
+		$funnel = $this->get_funnel();
+
 		$steps  = $funnel->get_steps();
 
 		$data = [];
@@ -57,19 +58,36 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$url_completed = admin_page_url( 'gh_contacts', $args );
 
-			$args = array(
-				'report' => array(
+			$args = [
+				'report' => [
 					'funnel' => $funnel->get_id(),
 					'step'   => $step->get_id(),
 					'status' => Event::WAITING,
-				)
-			);
+				]
+			];
 
 			$count_waiting = count( $query->query( $args ) );
 
 			$url_waiting = admin_page_url( 'gh_contacts', $args );
 
-			$title = sprintf( '<img src="%s" class="step-icon"> <b>%s</b> (%s)', $step->icon(), $step->get_title(), key_to_words( $step->get_type() ) );
+			$img = html()->e( 'img', [
+				'src'   => $step->icon(),
+				'class' => implode( ' ', [
+					'step-icon',
+					$step->get_group()
+				] )
+			] );
+
+			$edit = html()->e( 'a', [
+				'class'  => 'step-title',
+				'href'   => admin_page_url( 'gh_funnels', [
+					'action' => 'edit',
+					'funnel' => $step->get_funnel_id()
+ 				], $step->ID ),
+				'target' => '_blank'
+			], $step->get_title() );
+
+			$title = sprintf( '%s%s<br/><span class="step-type pill %s">%s</span>', $img, $edit, $step->get_group(), $step->get_type_name() );
 
 			$data[] = [
 				'step'      => $title,
@@ -87,7 +105,6 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 
 		return $data;
-
 
 	}
 

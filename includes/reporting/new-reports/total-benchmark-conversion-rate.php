@@ -36,10 +36,7 @@ class Total_Benchmark_Conversion_Rate extends Base_Quick_Stat {
 
 			$per = [];
 
-//			$per [] = percentage( $this->get_total( $steps[ 0 ], $start, $end ), $this->get_total( $steps[ 0 ], $start - WEEK_IN_SECONDS, $end ) );
-
 			for ( $i = 1; $i < count( $steps ); $i ++ ) {
-
 				$per [] = percentage( $this->get_total( $steps[ $i ], $start, $end ), $this->get_total( $steps[ $i - 1 ], $start - WEEK_IN_SECONDS, $end ) );
 			}
 
