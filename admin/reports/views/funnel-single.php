@@ -79,19 +79,17 @@ if ( ! $funnel->exists() ) {
         </div>
         <div id="table_form_activity"></div>
     </div>
-
+    <div class="gh-panel span-12">
+        <div class="gh-panel-header">
+            <h2 class="title"><?php _e( 'All Email Activity', 'groundhogg' ); ?></h2>
+        </div>
+        <div id="table_all_funnel_emails_performance"></div>
+    </div>
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
             <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_funnel_stats"></div>
-    </div>
-
-    <div class="gh-panel span-12">
-        <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
-        </div>
-        <div id="table_all_funnel_emails_performance"></div>
     </div>
 </div>
 

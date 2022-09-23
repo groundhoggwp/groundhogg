@@ -6086,7 +6086,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 				if ( $broadcast->exists() ) {
 					$filters[0][] = [
 						'type'         => 'broadcast_received',
-						'status'       => $broadcast->is_sent() ? 'waiting' : 'complete',
+						'status'       => $broadcast->is_sent() ? 'complete' : 'waiting',
 						'broadcast_id' => $broadcast_id,
 					];
 				}
@@ -6124,7 +6124,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					$filters[0][] = [
 						'type'         => 'broadcast_link_clicked',
 						'broadcast_id' => absint( $activity_query['step_id'] ),
-						'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) )
+						'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
 					];
 				} else {
 					$filters[0][] = [
@@ -6132,7 +6132,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'count_compare' => 'greater_than_or_equal_to',
 						'count'         => 1,
 						'email_id'   => absint( $activity_query['email_id'] ),
-						'link'       => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
+						'link'       => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
 						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
 						'before'     => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
 						'date_range' => 'between',
@@ -6153,7 +6153,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'type'          => 'email_opened',
 						'count_compare' => 'greater_than_or_equal_to',
 						'count'         => 1,
-						'email_id'      => absint( $activity_query['email_id'] ),
+						'email_id'      => absint( get_array_var( $activity_query, 'email_id' ) ),
 						'after'         => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
 						'before'        => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
 						'date_range'    => 'between',

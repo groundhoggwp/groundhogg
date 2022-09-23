@@ -110,7 +110,7 @@ class Table_List_Engagement extends Base_Table_Report {
 		] );
 
 		$rows[] = [
-			__( 'Marketable' ),
+			__( 'Un-Marketable' ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $unmarketable_filters )

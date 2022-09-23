@@ -355,7 +355,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::UNSUBSCRIBED
 				] );
-				$data['click_through_rate'] = percentage( $data['clicked'], $data['opened'] );
+				$data['click_through_rate'] = percentage( $data['opened'], $data['clicked'] );
 				$data['unopened']           = $data['sent'] - $data['opened'];
 				$data['opened_not_clicked'] = $data['opened'] - $data['clicked'];
 

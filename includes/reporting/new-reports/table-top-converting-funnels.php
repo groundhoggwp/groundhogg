@@ -110,7 +110,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 			'count'  => true,
 			'report' => [
 				'funnel_id' => $funnel->get_id(),
-				'step_id'   => $funnel->get_first_step_id(),
+				'step_id'   => $funnel->get_entry_step_ids(),
 				'start'     => $this->start,
 				'end'       => $this->end,
 				'status'    => Event::COMPLETE

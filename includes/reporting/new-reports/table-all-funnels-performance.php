@@ -52,7 +52,6 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		foreach ( $funnels as $funnel ) {
 
-			$active      = $this->count_active_contacts( $funnel );
 			$conversions = $this->count_conversions( $funnel );
 
 			$sent   = $this->count_emails_sent( $funnel );
@@ -60,9 +59,11 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 			$clicks = $this->count_email_clicks( $funnel );
 
 			$conversion_ids = $funnel->get_conversion_step_ids();
+			$active         = $this->count_active_contacts( $funnel );
 
 			$data[] = [
-				'title' => html()->e( 'a', [
+				'active' => $active,
+				'title'  => html()->e( 'a', [
 					'href' => admin_page_url( 'gh_reporting', [
 						'tab'    => 'funnels',
 						'funnel' => $funnel->ID,
@@ -85,7 +86,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						] )
 					] ),
 					'target' => '_blank'
-				], $this->count_active_contacts( $funnel ), false ),
+				], $active, false ),
 				'conversions' => count( $conversion_ids ) ? html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( array_values( array_map( function ( $step_id ) use ( $funnel ) {
@@ -109,6 +110,14 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 				'open'        => percentage( $sent, $opens ) . '%',
 				'ctr'         => percentage( $opens, $clicks ) . '%',
 			];
+		}
+
+		usort( $data, function ( $a, $b ) {
+			return absint( $b['active'] ) - absint( $a['active'] );
+		} );
+
+		foreach ( $data as &$datum ) {
+			unset( $datum['active'] );
 		}
 
 		return $data;
@@ -140,7 +149,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		return get_db( 'events' )->count( [
 			'where'  => $where_events,
-			'select' => 'DISTINCT contact_id'
+			'select' => 'contact_id'
 		] );
 	}
 
@@ -157,13 +166,13 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 			'relationship' => "AND",
 			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
 			[ 'col' => 'activity_type', 'val' => Activity::EMAIL_OPENED, 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
+			[ 'col' => 'timestamp', 'val' => $this->start, 'compare' => '>=' ],
+			[ 'col' => 'timestamp', 'val' => $this->end, 'compare' => '<=' ],
 		];
 
 		return get_db( 'activity' )->count( [
 			'where'  => $where,
-			'select' => 'DISTINCT contact_id'
+			'select' => 'contact_id'
 		] );
 	}
 
@@ -180,13 +189,13 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 			'relationship' => "AND",
 			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
 			[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
+			[ 'col' => 'timestamp', 'val' => $this->start, 'compare' => '>=' ],
+			[ 'col' => 'timestamp', 'val' => $this->end, 'compare' => '<=' ],
 		];
 
 		return get_db( 'activity' )->count( [
 			'where'  => $where,
-			'select' => 'DISTINCT contact_id'
+			'select' => 'contact_id'
 		] );
 	}
 
