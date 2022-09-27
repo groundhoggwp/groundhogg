@@ -9,11 +9,11 @@ Stable tag: 2.7.5.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-The best WordPress CRM & Marketing Automation plugin. Create funnels, email campaigns, newsletters, marketing automation, and have a CRM all within your WordPress website.
+Groundhogg is the best WordPress CRM & Marketing Automation plugin. Create funnels, email campaigns, newsletters, marketing automation, and have a CRM all within your WordPress website.
 
 == Description ==
 
-WordPress CRM, Email & Marketing Automation
+Groundhogg WordPress CRM, Email & Marketing Automation
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
@@ -247,18 +247,15 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
-1. Meet the Groundhogg CRM and Marketing Automation team!
-2. Advanced searching and filtering to segment your contacts.
-3. Admin toolbar widget to search or add contact's anywhere in the admin.
-2. Drag and drop steps in any order to create your sales funnel.
-3. View funnel reports to help optimize your CRM sales process.
-4. Choose from a variety of actions to to communicate with your customers.
-5. Choose from a variety of benchmarks to start and move customers through your funnels.
-6. Write personalized emails and send them right from your WordPress CRM.
-7. Send out mass emails to your list whenever you want.
-8. Keep customer info up to date, pull reports and more with your CRM.
-9. Know your KPIs with your executive CRM dashboard reports.
-10. Choose from easy to use funnel templates to get started faster.
+1. Create funnels in the CRM quickly using our drag & drop builder with dozens of triggers and actions.
+2. Start with pre-written templates base don real CRM use cases.
+3. Quickly write, preview, test and send personalized emails from the CRM.
+4. Upgrade to the drag and drop email editor to create emails with HTML and blocks.
+5. Groundhogg's CRM reports give you the most data visibility of any small business CRM and Marketing Automation suite.
+6. Create your personalized CRM report dashboard to monitor your most important metrics.
+7. The Groundhogg CRM pulls data from all your integrations to show all activity and data on a single screen.
+8. Filter contacts in the CRM using dozens of search filters to segment based on tags, custom fields, activity, purchase history, and more!
+9. Send out mass emails to your list and view details reports of your subscribers' engagement.
 
 == Installation ==
 = Plugin Repo =
