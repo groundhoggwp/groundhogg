@@ -1070,6 +1070,10 @@ button.gh-submit.loud {
   background-color: #102640;
 }
 
+#modal-log-details {
+  display: none;
+}
+
 .gh-legacy-modal #modal-log-details-view {
   width: 500px;
   padding: 30px;

@@ -150,7 +150,7 @@ class Events extends DB {
 	 * @param array $where
 	 * @param bool  $delete_from_history whether to delete the records from the history table
 	 */
-	public function move_events_to_queue( $where = [], $delete_from_history = false ) {
+	public function move_events_to_queue( $where = [], $delete_from_history = false, $column_map = [] ) {
 
 		global $wpdb;
 
@@ -158,7 +158,7 @@ class Events extends DB {
 		$event_queue = get_db( 'event_queue' )->get_table_name();
 		$events      = $this->get_table_name();
 
-		$column_map = [
+		$column_map = wp_parse_args( $column_map, [
 			'time'           => 'time',
 			'micro_time'     => 'micro_time',
 			'time_scheduled' => 'time_scheduled',
@@ -169,19 +169,32 @@ class Events extends DB {
 			'event_type'     => 'event_type',
 			'priority'       => 'priority',
 			'status'         => 'status',
-		];
+		] );
 
-		$history_columns = implode( ',', array_keys( $column_map ) );
-		$queue_columns   = implode( ',', array_values( $column_map ) );
+		$history_columns = array_values( $column_map );
+
+		foreach ( $history_columns as &$column ) {
+			if ( ! $this->has_column( $column ) ) {
+				$column = is_numeric( $column ) ? $column : "'$column'";
+			}
+		}
+
+		$history_columns = implode( ',', $history_columns );
+		$queue_columns   = implode( ',', array_keys( $column_map ) );
 
 		$where = $this->generate_where( $where );
 
 		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
 		// Move the events to the event queue
-		$wpdb->query( "INSERT INTO $event_queue ($queue_columns)
+		$inserted = $wpdb->query( "INSERT INTO $event_queue ($queue_columns)
 			SELECT $history_columns
 			FROM $events
 			WHERE $where" );
+
+		// Only moved one event
+		if ( $inserted === 1 ) {
+			$inserted = $wpdb->insert_id;
+		}
 
 		// Optionally delete these events for backwards compatibility...
 		// this way we can retain a record of retires as well...
@@ -190,6 +203,8 @@ class Events extends DB {
 		}
 
 		$this->cache_set_last_changed();
+
+		return $inserted;
 	}
 
 	/**

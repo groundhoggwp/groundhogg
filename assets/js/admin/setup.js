@@ -1078,7 +1078,7 @@
                 <p>
                     ${ __('Ways you can participate with, learn from, and support other like-minded business owners and entrepreneurs.',
                             'groundhogg') }</p>
-                <div class="display-flex gap-20 space-between">
+                <div class="display-flex gap-20 space-between align-center">
                     <div>
                         <h2>${ __('Follow us on Twitter', 'groundhogg') }</h2>
                         <p>${ __('For fast updates and notifications.',
@@ -1090,7 +1090,7 @@
                             'Follow', 'groundhogg') }
                     </button>
                 </div>
-                <div class="display-flex gap-20 space-between">
+                <div class="display-flex gap-20 space-between align-center">
                     <div>
                         <h2>${ __('Join the Facebook Support Group',
                                 'groundhogg') }</h2>
@@ -1104,7 +1104,7 @@
                             'Join', 'groundhogg') }
                     </button>
                 </div>
-                <div class="display-flex gap-20 space-between">
+                <div class="display-flex gap-20 space-between align-center">
                     <div>
                         <h2>${ __('Subscribe to our YouTube channel',
                                 'groundhogg') }</h2>
@@ -1153,7 +1153,7 @@
                             __('Congrats %s, you\'re all set to use Groundhogg. Here are some next steps for you so you can start leveraging Groundhogg.',
                                     'groundhogg'),
                             currentUser.data.display_name) }</p>
-                ${ installedMailhawk ? `<div class="display-flex gap-20 space-between">
+                ${ installedMailhawk ? `<div class="display-flex gap-20 space-between align-center">
 					<div>
 						<h2>${ __('Configure Mailhawk', 'groundhogg') }</h2>
 						<p>
@@ -1164,7 +1164,7 @@
                         'Go to MailHawk') }
 					</button>
 				</div>` : '' }
-                <div class="display-flex gap-20 space-between">
+                <div class="display-flex gap-20 space-between align-center">
                     <div>
                         <h2>${ __('Register for Groundhogg Academy',
                                 'groundhogg') }</h2>
@@ -1180,7 +1180,7 @@
                     </button>
                 </div>
                 ${ isLicensed ? `
-				<div class="display-flex gap-20 space-between">
+				<div class="display-flex gap-20 space-between align-center">
 					<div>
 						<h2>${ __('Install your Premium Features', 'groundhogg') }</h2>
 						<p>
@@ -1195,7 +1195,7 @@
                         'Use code <b>IFOUND15OFF</b> to save 15% off your first year!',
                         'groundhogg') }</p>` : '' }
 				</div>` : `
-				<div class="display-flex gap-20 space-between">
+				<div class="display-flex gap-20 space-between align-center">
 					<div>
 						<h2>${ __('Sign up for PRO', 'groundhogg') }</h2>
 						<p>

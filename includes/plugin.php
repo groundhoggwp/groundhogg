@@ -135,7 +135,7 @@ class Plugin {
 	public $proxy_service;
 
 	/**
-	 * @var Stats_Collection
+	 * @var Telemetry
 	 */
 	public $stats_collection;
 
@@ -315,7 +315,7 @@ class Plugin {
 //		$this->imap_inbox     = new Imap_Inbox();
 //		$this->sending_service  = new Sending_Service();
 		$this->proxy_service    = new Proxy_Service();
-		$this->stats_collection = new Stats_Collection();
+		$this->stats_collection = new Telemetry();
 //
 		$this->event_queue = new Event_Queue();
 

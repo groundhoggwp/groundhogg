@@ -51,6 +51,10 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 
 		$conversion_steps = $this->get_funnel()->get_conversion_step_ids();
 
+		if ( empty( $conversion_steps ) ){
+			return 0;
+		}
+
 		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
@@ -59,12 +63,10 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 		];
 
-		$num_of_conversions = get_db( 'events' )->count( [
+		return get_db( 'events' )->count( [
 			'where'  => $where,
 			'select' => 'DISTINCT contact_id'
 		] );
-
-		return $num_of_conversions;
 
 	}
 

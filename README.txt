@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.5.1
+Stable tag: 2.7.5.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,6 +324,16 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.5.2 (2022-09-26) =
+* TWEAKED `process_events()` function will call the `Event_Queue::run_queue()` function directly instead of using `do_action()`
+* TWEAKED The `Event_Store` will now only select necessary columns from the `wp_gh_event_queue` table.
+* TWEAKED Switched to new telemetry method.
+* TWEAKED Updated cron action names to `groundhogg/<action>` for easier identification.
+* FIXED The run again/uncancel actions for events were not working.
+* FIXED Email log modal content showing under table when should be hidden.
+* FIXED MySQL errors related to funnel reports with no set conversion benchmark.
+* FIXED Tag Pickers in Funnel Editor show `Please select one` placeholder as a selected tag.
 
 = 2.7.5.1 (2022-09-23) =
 * FIXED Funnels report showing incorrect open/click rates

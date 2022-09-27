@@ -179,6 +179,8 @@ class Contacts_Page extends Admin_Page {
 			default:
 			case 'bulk_edit':
 
+                enqueue_filter_assets();
+
 				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
 
 				$search_query = get_request_query();

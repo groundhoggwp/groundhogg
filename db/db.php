@@ -1390,4 +1390,8 @@ abstract class DB {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
 	}
 
+	public function has_column( $column ){
+		return in_array( $column, array_keys( $this->get_columns() ) );
+	}
+
 }

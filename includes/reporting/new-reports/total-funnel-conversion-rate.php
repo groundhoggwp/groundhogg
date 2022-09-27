@@ -28,6 +28,10 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 
 		$conversion_steps = $funnel->get_conversion_step_ids();
 
+		if ( ! $conversion_steps ){
+			return 0;
+		}
+
 		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],

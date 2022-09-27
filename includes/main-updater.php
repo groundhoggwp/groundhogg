@@ -616,6 +616,13 @@ class Main_Updater extends Updater {
 		get_db( 'events' )->drop_column( 'claim' );
 	}
 
+	public function version_2_7_5_2(){
+		wp_clear_scheduled_hook( 'gh_do_stats_collection' );
+		wp_clear_scheduled_hook( 'gh_purge_page_visits' );
+		wp_clear_scheduled_hook( 'gh_purge_expired_permissions_keys' );
+		wp_clear_scheduled_hook( 'gh_check_bounces' );
+	}
+
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -681,6 +688,7 @@ class Main_Updater extends Updater {
 			'2.7.2',
 			'2.7.4',
 			'2.7.4.3',
+			'2.7.5.2',
 		];
 	}
 
@@ -720,6 +728,7 @@ class Main_Updater extends Updater {
 			'2.6.2.10',
 			'2.7.2',
 			'2.7.4.3',
+			'2.7.5.2',
 		];
 	}
 
@@ -779,6 +788,7 @@ class Main_Updater extends Updater {
 			'2.7.2'         => __( 'Add <code>step_slug</code> column. Add new rewrites for prettier URLs.', 'groundhogg' ),
 			'2.7.4'         => __( 'Set the <code>is_conversion</code> for benchmarks based on legacy funnel conversion step.', 'groundhogg' ),
 			'2.7.4.3'       => __( 'Drop un-needed <code>claim</code> column from <code>wp_gh_events</code> table.', 'groundhogg' ),
+			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
 		];
 	}
 }

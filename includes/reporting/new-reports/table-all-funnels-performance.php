@@ -231,9 +231,14 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	 */
 	protected function count_conversions( $funnel ) {
 
+		$ids = $funnel->get_conversion_step_ids();
+		if ( empty( $ids ) ) {
+			return 0;
+		}
+
 		$where_events = [
 			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $funnel->get_conversion_step_ids(), 'compare' => 'IN' ],
+			[ 'col' => 'step_id', 'val' => $ids, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],

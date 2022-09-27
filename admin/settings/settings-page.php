@@ -332,11 +332,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Other', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'general'
 			],
-			'misc_info'             => [
-				'id'    => 'misc_info',
-				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'misc'
-			],
+//			'misc_info'             => [
+//				'id'    => 'misc_info',
+//				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
+//				'tab'   => 'misc'
+//			],
 			'interface'             => [
 				'id'    => 'interface',
 				'title' => _x( 'Interface', 'settings_sections', 'groundhogg' ),
@@ -354,7 +354,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'page_tracking'         => [
 				'id'    => 'page_tracking',
-				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
+				'title' => _x( 'Site Activity Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
 			'wp_cron'               => [
@@ -608,7 +608,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_opted_in_stats_collection'           => array(
 				'id'      => 'gh_opted_in_stats_collection',
-				'section' => 'misc_info',
+				'section' => 'danger_zone',
 				'label'   => _x( 'Optin to anonymous usage tracking.', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
@@ -741,7 +741,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_ignore_user_precedence'              => array(
 				'id'      => 'gh_ignore_user_precedence',
-				'section' => 'misc_info',
+				'section' => 'page_tracking',
 				'label'   => _x( 'Disable logged in user tracking precedence.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'By default, Groundhogg will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',

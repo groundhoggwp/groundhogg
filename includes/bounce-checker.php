@@ -43,7 +43,7 @@ class Bounce_Checker {
 	 */
 	protected $bounce_handler;
 
-	const ACTION = 'gh_check_bounces';
+	const ACTION = 'groundhogg/check_bounces';
 
 	public function __construct() {
 		/* run whenever these jobs are run */

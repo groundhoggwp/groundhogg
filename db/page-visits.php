@@ -43,15 +43,15 @@ class Page_Visits extends DB {
 		}
 
 		$this->setup_cron();
-		add_action( 'gh_purge_page_visits', [ $this, 'purge' ] );
+		add_action( 'groundhogg/purge_page_visits', [ $this, 'purge' ] );
 	}
 
 	/**
 	 * Setup the CRON listener to purge old events
 	 */
 	public function setup_cron() {
-		if ( ! wp_next_scheduled( 'gh_purge_page_visits' ) ) {
-			wp_schedule_event( time(), 'daily', 'gh_purge_page_visits' );
+		if ( ! wp_next_scheduled( 'groundhogg/purge_page_visits' ) ) {
+			wp_schedule_event( time(), 'daily', 'groundhogg/purge_page_visits' );
 		}
 	}
 

@@ -91,6 +91,10 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 		$funnel           = new Funnel( $funnel_id );
 		$conversion_steps = $funnel->get_conversion_step_ids();
 
+		if ( empty( $conversion_steps ) ){
+			return 0;
+		}
+
 		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],

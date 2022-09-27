@@ -896,16 +896,18 @@ class HTML {
 	 */
 	public function select2( $args = [] ) {
 		$a = wp_parse_args( $args, array(
-			'name'        => '',
-			'id'          => '',
-			'class'       => 'gh-select2',
-			'data'        => [],
-			'options'     => [],
-			'selected'    => [],
-			'multiple'    => false,
-			'placeholder' => 'Please Select One',
-			'tags'        => false,
-			'style'       => []
+			'name'              => '',
+			'id'                => '',
+			'class'             => 'gh-select2',
+			'data'              => [],
+			'options'           => [],
+			'selected'          => [],
+			'multiple'          => false,
+			'placeholder'       => 'Please Select One',
+			'option_none'       => false,
+			'option_none_value' => false,
+			'tags'              => false,
+			'style'             => []
 		) );
 
 		if ( isset_not_empty( $a, 'data' ) ) {
@@ -962,9 +964,9 @@ class HTML {
 
 			foreach ( $a['selected'] as $tag_id ) {
 
-				if ( Plugin::$instance->dbs->get_db( 'tags' )->exists( $tag_id ) ) {
+				if ( $tag_id && get_db( 'tags' )->exists( $tag_id ) ) {
 
-					$tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $tag_id );
+					$tag = get_db( 'tags' )->get( $tag_id );
 
 					$a['data'][ $tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
 

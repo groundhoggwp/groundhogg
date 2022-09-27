@@ -5563,10 +5563,15 @@ function uninstall_groundhogg() {
 	/** Cleanup Cron Events */
 	wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
-	wp_clear_scheduled_hook( Stats_Collection::ACTION );
+	wp_clear_scheduled_hook( Telemetry::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
 	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
 	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
+	wp_clear_scheduled_hook( 'groundhogg/aws/remove_old_logs' );
+	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
+	wp_clear_scheduled_hook( 'groundhogg/purge_page_visits' );
+	wp_clear_scheduled_hook( 'groundhogg/check_bounces' );
+	wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 
 	//delete api keys from user_meta
 	delete_metadata( 'user', 0, 'wpgh_user_public_key', '', true );
@@ -6678,7 +6683,7 @@ function process_events( $contacts = [] ) {
 
 	Limits::set_max_execution_time( 5 );
 
-	do_action( Event_Queue::WP_CRON_HOOK );
+	\Groundhogg\event_queue()->run_queue();
 
 	return empty( $errors ) ?: $errors;
 }

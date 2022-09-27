@@ -33,8 +33,21 @@ class Event_Store_V2 {
 	public function get_events_by_claim() {
 
 		$events = $this->db()->query( [
+			'select'  => [
+				'ID',
+				'time',
+				'micro_time',
+				'time_scheduled',
+				'funnel_id',
+				'step_id',
+				'email_id',
+				'contact_id',
+				'event_type',
+				'status',
+				'claim'
+			],
 			'claim'   => $this->claim,
-			'orderby' => 'time',
+			'orderby' => 'ID',
 			'order'   => 'asc'
 		], false );
 
@@ -91,7 +104,7 @@ class Event_Store_V2 {
 	UPDATE {$this->db()->get_table_name()}
 	SET claim = '{$this->claim}', time = $current_time
 	WHERE $clauses
-	ORDER BY ID
+	ORDER BY priority ASC, ID ASC
 	LIMIT $count" );
 
 		// Deadlock maybe?

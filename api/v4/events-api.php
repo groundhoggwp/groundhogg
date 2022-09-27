@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\Event;
+use Groundhogg\Event_Queue_Item;
 use function Groundhogg\get_db;
 
 class Events_Api extends Base_Object_Api {
@@ -40,20 +41,10 @@ class Events_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$claim = substr( md5( wp_json_encode( $event ) ), 0, 20 );
-
-		$event->update( [
-			'claim' => $claim
-		] );
-
 		// Move the events over... only delete if the status is not complete
-		get_db( 'events' )->move_events_to_queue( [ 'claim' => $claim ], $event->is_complete() ? false : true );
-		get_db( 'event_queue' )->update( [
-			'claim' => $claim
-		], [
+		$event_id = get_db( 'events' )->move_events_to_queue( [ 'ID' => $event->get_id() ], $event->is_complete() ? false : true, [
 			'status' => Event::WAITING,
-			'claim'  => '',
-			'time'   => time(),
+			'time'   => time()
 		] );
 
 		return self::SUCCESS_RESPONSE();
@@ -85,7 +76,7 @@ class Events_Api extends Base_Object_Api {
 		// from contact screen
 		$contact_id = $request->get_param( 'contact_id' );
 
-		if ( $contact_id && current_user_can('view_contact', $contact_id ) ){
+		if ( $contact_id && current_user_can( 'view_contact', $contact_id ) ) {
 			return true;
 		}
 

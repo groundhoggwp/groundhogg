@@ -505,12 +505,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$events = $this->get_event_queue_db()->query( [
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
-			'status'     => Event::WAITING
-		], null, false );
+			'status'     => Event::WAITING,
+			'limit'      => 1,
+		] );
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
-			$event = new Event( absint( $event->ID ), 'event_queue' );
+			$event = new Event( $event, 'event_queue' );
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
@@ -526,12 +527,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'order'      => 'DESC',
 			'orderby'    => 'time',
 			'limit'      => 1,
-		], null, false );
+		] );
 
 		if ( ! empty( $events ) ) {
 			// get top element.
 			$event = array_shift( $events );
-			$event = new Event( absint( $event->ID ) );
+			$event = new Event( $event );
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {

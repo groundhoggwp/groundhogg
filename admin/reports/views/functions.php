@@ -67,7 +67,6 @@ function quick_stat_report( $args = [] ) {
 		'id'    => uniqid( 'groundhogg_' ),
 		'title' => 'Report',
         'class' => 'span-3',
-		'info'  => 'Some interesting data...',
 		'style' => [],
 	] );
 
@@ -78,14 +77,13 @@ function quick_stat_report( $args = [] ) {
             <h2 class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></h2>
         </div>
         <div class="inside">
-            <div class="groundhogg-quick-stat-info"></div>
-            <div class="groundhogg-quick-stat-number">1234</div>
+            <div class="groundhogg-quick-stat-number">...</div>
             <div class="groundhogg-quick-stat-previous green">
                 <span class="groundhogg-quick-stat-arrow up"></span>
-                <span class="groundhogg-quick-stat-prev-percent">25%</span>
+                <span class="groundhogg-quick-stat-prev-percent">0%</span>
             </div>
             <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
-            <div class="clearfix"></div>
+            <div class="wp-clearfix"></div>
         </div>
 	</div>
 	<?php

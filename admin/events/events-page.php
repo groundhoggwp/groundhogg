@@ -303,7 +303,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events = get_db( 'event_queue' );
 
-        $time = time() - ( 5 * MINUTE_IN_SECONDS );
+		$time = time() - ( 5 * MINUTE_IN_SECONDS );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim != '' AND time < $time" );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress' AND time < $time" );
 
@@ -349,10 +349,6 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
-		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
-		}
-
 		return false;
 	}
 
@@ -366,30 +362,13 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
-
-		$events      = get_db( 'events' )->get_table_name();
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$event_ids   = implode( ',', $this->get_items() );
-		$time        = time();
-		$waiting     = Event::WAITING;
-
-		$claim = substr( md5( wp_json_encode( $this->get_items() ) ), 0, 20 );
-
-		// Update the claim column
-		$wpdb->query( "UPDATE {$events} SET `claim` = '$claim' WHERE `ID` in ({$event_ids});" );
-
 		// Move the events over... only delete if the status is not complete
-		get_db( 'events' )->move_events_to_queue( [ 'claim' => $claim ], get_request_var( 'status' ) === Event::COMPLETE ? false : true );
-
-		// Update claim, status, and time...
-		$wpdb->query( "UPDATE {$event_queue} SET `claim` = '', `status` = '$waiting', `time` = $time WHERE `claim` = '$claim';" );
+		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items() ], get_request_var( 'status' ) === Event::COMPLETE ? false : true, [
+			'time'   => time(),
+			'status' => Event::WAITING
+		] );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
-
-		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
-		}
 
 		return false;
 	}
@@ -404,24 +383,12 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
-
-		$events    = get_db( 'events' )->get_table_name();
-		$event_ids = implode( ',', $this->get_items() );
-		$cancelled = Event::CANCELLED;
-		$waiting   = Event::WAITING;
-
-		// Update the status back to waiting...
-		$wpdb->query( "UPDATE {$events} SET `status` = '$waiting' WHERE `ID` in ({$event_ids}) AND `status` = '$cancelled';" );
-
 		// Move the events over...
-		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items(), 'status' => $waiting ], true );
+		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items() ], true, [
+			'status' => Event::WAITING
+		] );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event uncancelled', '%d events uncancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
-
-		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
-		}
 
 		return false;
 	}
@@ -446,10 +413,6 @@ class Events_Page extends Tabbed_Admin_Page {
 			foreach ( $queue->get_errors() as $error ) {
 				Plugin::instance()->notices->add( $error );
 			}
-		}
-
-		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
 		}
 
 		return false;

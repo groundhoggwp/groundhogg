@@ -194,12 +194,12 @@ class Contact_Query {
 	 *
 	 * @since  2.8
 	 *
-	 * @param string|array $query          {
-	 *                                     Optional. Array or query string of contact query parameters. Default empty.
+	 * @param string|array $query             {
+	 *                                        Optional. Array or query string of contact query parameters. Default empty.
 	 *
-	 * @type int           $number         Maximum number of contacts to retrieve. Default 20.
-	 * @type int           $offset         Number of contacts to offset the query. Default 0.
-	 * @type string|array  $orderby        Customer status or array of statuses. To use 'meta_value'
+	 * @type int           $number            Maximum number of contacts to retrieve. Default 20.
+	 * @type int           $offset            Number of contacts to offset the query. Default 0.
+	 * @type string|array  $orderby           Customer status or array of statuses. To use 'meta_value'
 	 *                                        or 'meta_value_num', `$meta_key` must also be provided.
 	 *                                        To sort by a specific `$meta_query` clause, use that
 	 *                                        clause's array key. Accepts 'ID', 'user_id', 'first_name',
@@ -208,35 +208,35 @@ class Contact_Query {
 	 *                                        the value of `$meta_key`, and the array keys of `$meta_query`.
 	 *                                        Also accepts false, an empty array, or 'none' to disable the
 	 *                                        `ORDER BY` clause. Default 'ID'.
-	 * @type string        $order          How to order retrieved contacts. Accepts 'ASC', 'DESC'.
+	 * @type string        $order             How to order retrieved contacts. Accepts 'ASC', 'DESC'.
 	 *                                        Default 'DESC'.
-	 * @type string|array  $include        String or array of contact IDs to include. Default empty.
-	 * @type string|array  $exclude        String or array of contact IDs to exclude. Default empty.
-	 * @type string|array  $users_include  String or array of contact user IDs to include. Default
+	 * @type string|array  $include           String or array of contact IDs to include. Default empty.
+	 * @type string|array  $exclude           String or array of contact IDs to exclude. Default empty.
+	 * @type string|array  $users_include     String or array of contact user IDs to include. Default
 	 *                                        empty.
-	 * @type string|array  $users_exclude  String or array of contact user IDs to exclude. Default
+	 * @type string|array  $users_exclude     String or array of contact user IDs to exclude. Default
 	 *                                        empty.
-	 * @type string|array  $tags_include   String or array of tags the contact should have
-	 * @type string|array  $tags_exclude   String or array of tags the contact should not have
-	 * @type string|array  $email          Limit results to those contacts affiliated with one of
+	 * @type string|array  $tags_include      String or array of tags the contact should have
+	 * @type string|array  $tags_exclude      String or array of tags the contact should not have
+	 * @type string|array  $email             Limit results to those contacts affiliated with one of
 	 *                                        the given emails. Default empty.
-	 * @type string|array  $report         array of args for an activity report.
-	 * @type string        $search         Search term(s) to retrieve matching contacts for. Searches
+	 * @type string|array  $report            array of args for an activity report.
+	 * @type string        $search            Search term(s) to retrieve matching contacts for. Searches
 	 *                                        through contact names. Default empty.
-	 * @type string|array  $search_columns Columns to search using the value of `$search`. Default 'first_name'.
-	 * @type string        $meta_key       Include contacts with a matching contact meta key.
+	 * @type string|array  $search_columns    Columns to search using the value of `$search`. Default 'first_name'.
+	 * @type string        $meta_key          Include contacts with a matching contact meta key.
 	 *                                        Default empty.
-	 * @type string        $meta_value     Include contacts with a matching contact meta value.
+	 * @type string        $meta_value        Include contacts with a matching contact meta value.
 	 *                                        Requires `$meta_key` to be set. Default empty.
-	 * @type array         $meta_query     Meta query clauses to limit retrieved contacts by.
+	 * @type array         $meta_query        Meta query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Meta_Query`. Default empty.
-	 * @type array         $date_query     Date query clauses to limit retrieved contacts by.
+	 * @type array         $date_query        Date query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Date_Query`. Default empty.
-	 * @type bool          $count          Whether to return a count (true) instead of an array of
+	 * @type bool          $count             Whether to return a count (true) instead of an array of
 	 *                                        contact objects. Default false.
-	 * @type bool          $no_found_rows  Whether to disable the `SQL_CALC_FOUND_ROWS` query.
+	 * @type bool          $no_found_rows     Whether to disable the `SQL_CALC_FOUND_ROWS` query.
 	 *                                        Default true.
-	 * }
+	 *                                        }
 	 */
 	public function __construct( $query = '', $gh_db_contacts = null ) {
 
@@ -285,6 +285,8 @@ class Contact_Query {
 			'meta_compare'           => '=',
 			'meta_query'             => '',
 			'date_query'             => null,
+			'before'                 => false,
+			'after'                  => false,
 			'count'                  => false,
 			'no_found_rows'          => true,
 			'filters'                => [],
@@ -962,6 +964,14 @@ class Contact_Query {
 
 		if ( $this->date_query ) {
 			$where['date_query'] = preg_replace( '/^\s*AND\s*/', '', $this->date_query->get_sql() );
+		}
+
+		if ( $this->query_vars['after'] ) {
+			$where['after'] = "$this->table_name.$this->date_key >= {$this->query_vars['after']}";
+		}
+
+		if ( $this->query_vars['before'] ) {
+			$where['before'] = "$this->table_name.$this->date_key <= {$this->query_vars['before']}";
 		}
 
 		if ( ! empty( $this->meta_query_clauses['where'] ) ) {

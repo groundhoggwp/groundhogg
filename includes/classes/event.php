@@ -32,6 +32,7 @@ class Event extends Base_Object {
 	const CANCELLED = 'cancelled';
 	const SKIPPED = 'skipped';
 	const WAITING = 'waiting';
+	const EXECUTE = 'execute';
 	const FAILED = 'failed';
 	const IN_PROGRESS = 'in_progress';
 	const PAUSED = 'paused';

@@ -237,8 +237,7 @@ abstract class Form_Integration extends Benchmark {
 	 *
 	 * @return bool
 	 */
-	public
-	function can_complete_step() {
+	public function can_complete_step() {
 		return absint( $this->get_data( 'form_id' ) ) === absint( $this->get_setting( 'form_id' ) );
 	}
 }

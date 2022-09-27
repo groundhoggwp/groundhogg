@@ -35,8 +35,7 @@ class Total_Emails_Sent extends Base_Quick_Stat {
 				"SELECT COUNT(*) FROM $events_table e 
                         LEFT JOIN $steps_table s ON e.step_id = s.ID 
                         WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %d OR e.event_type = %d)
-                        AND e.time >= %d AND e.time <= %d
-                        ORDER BY time DESC"
+                        AND e.time >= %d AND e.time <= %d"
 				, 'complete', 'send_email', Event::BROADCAST, Event::EMAIL_NOTIFICATION,
 				$start, $end )
 			);

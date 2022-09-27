@@ -14,15 +14,15 @@ class Permissions_Keys extends DB {
 		parent::__construct();
 
 		add_action( 'init', [ $this, 'setup_cron' ] );
-		add_action( 'gh_purge_expired_permissions_keys', [ $this, 'purge_old_permission_keys' ] );
+		add_action( 'groundhogg/purge_expired_permissions_keys', [ $this, 'purge_old_permission_keys' ] );
 	}
 
 	/**
 	 * Setup the cron job to remove old permissions keys
 	 */
 	public function setup_cron() {
-		if ( ! wp_next_scheduled( 'gh_purge_expired_permissions_keys' ) ) {
-			wp_schedule_event( time(), 'daily', 'gh_purge_expired_permissions_keys' );
+		if ( ! wp_next_scheduled( 'groundhogg/purge_expired_permissions_keys' ) ) {
+			wp_schedule_event( time(), 'daily', 'groundhogg/purge_expired_permissions_keys' );
 		}
 	}
 
