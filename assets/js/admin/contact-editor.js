@@ -61,13 +61,12 @@
 
   let files = []
 
-
   const maybeCall = (maybeFunc, ...args) => {
     if (typeof maybeFunc === 'string') {
       return maybeFunc
     }
     if (typeof maybeFunc === 'function') {
-      return maybeFunc( ...args )
+      return maybeFunc(...args)
     }
 
     return maybeFunc
@@ -574,8 +573,7 @@
                         </p>
                     </div>
                     <div class="diff-time">
-                        ${ sprintf(__('%s ago', 'groundhogg'),
-                                activity.locale.diff_time) }
+                        ${ activity.locale.diff_time }
                     </div>
                 </div>
             </li>`
@@ -594,8 +592,7 @@
                                         activity.data.path) }</a>`) }
                     </div>
                     <div class="diff-time">
-                        ${ sprintf(__('%s ago', 'groundhogg'),
-                                activity.locale.diff_time) }
+                        ${ activity.locale.diff_time }
                     </div>
                 </div>
             </li>`
@@ -614,39 +611,27 @@
             return `
                 <li class="activity-item">
                     <div class="activity-icon ${ step.data.step_group }">
-                        ${ icons.funnel }
+                        ${ pending ? icons.hourglass : icons.funnel }
                     </div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
                             <div class="activity-info">
-                                <span>${ sprintf(
-                                        step.data.step_group === 'action'
-                                                ? ( pending ? __(
-                                                        'Pending action: %s | %s',
-                                                        'groundhogg') : __(
-                                                        'Completed action: %s | %s',
-                                                        'groundhogg') )
-                                                : ( pending ? __(
-                                                        'Pending benchmark: %s | %s',
-                                                        'groundhogg') : __(
-                                                        'Completed benchmark: %s | %s',
-                                                        'groundhogg') ),
-                                        bold(step.data.step_title),
-                                        Groundhogg.rawStepTypes[step.data.step_type].name) }</span>
+                                <span>${ sprintf(pending ? __(
+                                                'Pending %s',
+                                                'groundhogg') : __(
+                                                'Completed %s',
+                                                'groundhogg'),
+                                        bold(step.data.step_title)) }</span>
                             </div>
                             <div class="event-extra">
-                                ${ sprintf(__('in funnel %s', 'groundhogg'),
+                                ${ sprintf(__('%s in funnel %s', 'groundhogg'),
+                                        el( 'span',  { className: [ 'step-type', step.data.step_group ].join(' ') }, Groundhogg.rawStepTypes[step.data.step_type].name ),
                                         el('a', {
                                             href: funnel.admin,
                                         }, funnel.data.title)) }
                             </div>
                             <div class="diff-time">
-                                ${ sprintf(pending ? ( Math.floor(
-                                                Date.now() / 1000) > activity.time ? __(
-                                                'Running now...', 'groundhogg') : ( __(
-                                                'Runs in %s', 'groundhogg') ) ) : __(
-                                                '%s ago', 'groundhogg'),
-                                        activity.locale.diff_time) }
+                                ${ activity.locale.diff_time }
                             </div>
                         </div>
                         <button class="gh-button secondary icon text event-${ pending
@@ -673,12 +658,7 @@
                                         bold(activity.broadcast.object.data.title)) }</span>
                             </div>
                             <div class="diff-time">
-                                ${ sprintf(pending ? ( Math.floor(
-                                                Date.now() / 1000) > activity.time ? __(
-                                                'Running now...', 'groundhogg') : ( __(
-                                                'Runs in %s', 'groundhogg') ) ) : __(
-                                                '%s ago', 'groundhogg'),
-                                        activity.locale.diff_time) }
+                                ${ activity.locale.diff_time }
                             </div>
                         </div>
                         <button class="gh-button secondary icon text event-${ pending
@@ -705,12 +685,7 @@
                                         bold(activity.email.email.data.title)) }</span>
                             </div>
                             <div class="diff-time">
-                                ${ sprintf(pending ? ( Math.floor(
-                                                Date.now() / 1000) > activity.time ? __(
-                                                'Running now...', 'groundhogg') : ( __(
-                                                'Runs in %s', 'groundhogg') ) ) : __(
-                                                '%s ago', 'groundhogg'),
-                                        activity.locale.diff_time) }
+                                ${ activity.locale.diff_time }
                             </div>
                         </div>
                         <button class="gh-button secondary icon text event-${ pending
@@ -735,15 +710,14 @@
               <div class="activity-icon ${ activity.data.activity_type } ${ type.iconFramed === false
                       ? 'no-frame'
                       : '' }">
-                  ${ maybeCall( type.icon, activity ) }
+                  ${ maybeCall(type.icon, activity) }
               </div>
               <div class="activity-rendered gh-panel">
                   <div class="activity-info">
                       ${ type.render(activity) }
                   </div>
                   <div class="diff-time">
-                      ${ sprintf(__('%s ago', 'groundhogg'),
-                              activity.locale.diff_time) }
+                      ${ activity.locale.diff_time }
                   </div>
               </div>
           </li>`
@@ -1139,7 +1113,7 @@
                           placeholder: __('Search files...'),
                           type: 'search',
                           id: 'search-files',
-                          className: 'full-width'
+                          className: 'full-width',
                       }) }
                       <button id="upload-file" class="gh-button secondary">
                           ${ __('Upload Files') }

@@ -7,7 +7,11 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\andList;
+use function Groundhogg\array_bold;
+use function Groundhogg\site_locale_is_english;
 use function Groundhogg\get_db;
+use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,12 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * This will remove any specified tags from the contact
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Remove_Tag extends Action {
 
@@ -96,14 +100,46 @@ class Remove_Tag extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
+		$tags = validate_tags( $this->get_posted_data( 'tags', [] ) );
+		$this->save_setting( 'tags', $tags );
+		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
+
+		if ( site_locale_is_english() ) {
+
+			if ( empty( $tags ) ) {
+				$name = __( 'Remove tags', 'groundhogg' );
+			} else if ( count( $tags ) >= 4 ) {
+				$name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+			} else {
+				$name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
+			}
+
+			$step->update( [
+				'step_title' => $name
+			] );
+		}
+	}
+
+	public function step_title_edit( $step ) {
+
+		if ( ! site_locale_is_english() ) {
+			parent::step_title_edit( $step );
+
+			return;
+		}
+
+		?>
+        <div class="gh-panel-header">
+            <h2><?php _e( 'Remove Tag Settings' ) ?></h2>
+        </div>
+		<?php
 	}
 
 	/**
 	 * Process the apply tag step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true
 	 */
@@ -115,7 +151,7 @@ class Remove_Tag extends Action {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 */
 	public function import( $args, $step ) {
 		if ( empty( $args['tags'] ) ) {
@@ -129,7 +165,7 @@ class Remove_Tag extends Action {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 *
 	 * @return array
 	 */

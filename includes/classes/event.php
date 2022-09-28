@@ -8,6 +8,7 @@ use Groundhogg\Queue\Email_Notification;
 
 use Groundhogg\Queue\Test_Event_Failure;
 use Groundhogg\Queue\Test_Event_Success;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -553,8 +554,16 @@ class Event extends Base_Object {
 	public function get_as_array() {
 		$array = parent::get_as_array();
 
+		$date = new DateTimeHelper( $this->get_time() );
+
+		if ( $this->is_waiting() && $this->get_time() <= time() ){
+			$diff_time = __( 'Running now...', 'groundhogg' );
+		} else {
+			$diff_time = sprintf( $this->is_waiting() ? __( 'Runs %s', 'groundhogg' ) : __( 'Ran %s', 'groundhogg' ),  $date->i18n() );
+		}
+
 		$array['locale'] = [
-			'diff_time' => human_time_diff( $this->get_time(), time() )
+			'diff_time' => $diff_time
 		];
 
 		switch ( $this->get_event_type() ) {

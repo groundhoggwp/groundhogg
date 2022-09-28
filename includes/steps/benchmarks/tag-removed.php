@@ -3,6 +3,9 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use function Groundhogg\andList;
+use function Groundhogg\array_bold;
+use function Groundhogg\site_locale_is_english;
 use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
 use function Groundhogg\get_db;
@@ -10,7 +13,9 @@ use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
+use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -109,8 +114,61 @@ class Tag_Removed extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
-		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
+		$tags      = validate_tags( $this->get_posted_data( 'tags', [] ) );
+		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
+		$this->save_setting( 'tags', $tags );
+		$this->save_setting( 'condition', $condition );
+
+		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
+
+		if ( site_locale_is_english() ) {
+
+			if ( empty( $tags ) ) {
+				$name = __( 'A tag is removed', 'groundhogg' );
+			} else if ( count( $tags ) === 1 ) {
+				$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+			} else if ( count( $tags ) >= 4 ) {
+				switch ( $condition ){
+					default:
+					case 'any':
+						$name = sprintf( __( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+						break;
+					case 'all':
+						$name = sprintf( __( '%s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+						break;
+				}
+			} else {
+
+				switch ( $condition ){
+					default:
+					case 'any':
+						$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+						break;
+					case 'all':
+						$name = sprintf( __( '%s are removed', 'groundhogg' ), andList( $tags ) );
+						break;
+				}
+			}
+
+			$step->update( [
+				'step_title' => $name
+			] );
+		}
+	}
+
+	public function step_title_edit( $step ) {
+
+		if ( ! site_locale_is_english() ) {
+			parent::step_title_edit( $step );
+
+			return;
+		}
+
+		?>
+		<div class="gh-panel-header">
+			<h2><?php _e( 'Tag Removed Settings' ) ?></h2>
+		</div>
+		<?php
 	}
 
 	/**

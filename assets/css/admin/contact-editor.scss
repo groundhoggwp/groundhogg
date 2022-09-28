@@ -329,6 +329,19 @@ code.meta-replacement-code {
     .event-extra,
     .diff-time {
       color: $primary-dark-50;
+
+      .step-type {
+        &.action {
+          color: $action-green;
+        }
+        &.benchmark {
+          color: $benchmark-orange;
+        }
+      }
+    }
+
+    .diff-time:first-letter {
+      text-transform: capitalize;
     }
 
     .activity-rendered.gh-panel {

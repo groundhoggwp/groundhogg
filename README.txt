@@ -322,6 +322,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.6 (2022-09-28) =
+* IMPROVED Delay Timer has more advanced settings enabling delays based on day of week, day of month, and waiting for specific months.
+* TWEAKED Some step types will have their step titles generated from the settings (e.g. the delay timer) if the site language is english.
+* TWEAKED Time diff in activity timeline shows site date format
+
 = 2.7.5.2 (2022-09-26) =
 * TWEAKED `process_events()` function will call the `Event_Queue::run_queue()` function directly instead of using `do_action()`
 * TWEAKED The `Event_Store` will now only select necessary columns from the `wp_gh_event_queue` table.

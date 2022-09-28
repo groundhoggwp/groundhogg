@@ -6,6 +6,7 @@ use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_db;
 
 class Page_Visit extends Base_Object {
@@ -75,8 +76,10 @@ class Page_Visit extends Base_Object {
 	public function get_as_array() {
 		$array = parent::get_as_array();
 
+		$date = new DateTimeHelper( $this->get_timestamp() );
+
 		$array['locale'] = [
-			'diff_time' => human_time_diff( $this->get_timestamp(), time() )
+			'diff_time' => $date->i18n()
 		];
 
 		return $array;

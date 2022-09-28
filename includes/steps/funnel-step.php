@@ -737,6 +737,32 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	}
 
+	public function step_title_edit( $step ) {
+		?>
+        <div class="step-title-wrap">
+            <img class="step-icon"
+                 src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+            <div class="step-title-edit hidden">
+				<?php
+				$args = array(
+					'id'      => $this->setting_id_prefix( 'title' ),
+					'name'    => $this->setting_name_prefix( 'title' ),
+					'value'   => __( $step->get_title(), 'groundhogg' ),
+					'title'   => __( 'Step Title', 'groundhogg' ),
+					'class'   => 'step-title-large edit-title full-width',
+					'data-id' => $step->get_id(),
+				);
+
+				echo html()->input( $args );
+				?>
+            </div>
+            <div class="step-title-view">
+				<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
+            </div>
+        </div>
+		<?php
+	}
+
 	/**
 	 * @param $step Step
 	 */
@@ -762,27 +788,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <div class="step-flex">
                 <div class="step-edit panels">
                     <div class="gh-panel">
-                        <div class="step-title-wrap">
-                            <img class="step-icon"
-                                 src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-                            <div class="step-title-edit hidden">
-								<?php
-								$args = array(
-									'id'      => $this->setting_id_prefix( 'title' ),
-									'name'    => $this->setting_name_prefix( 'title' ),
-									'value'   => __( $step->get_title(), 'groundhogg' ),
-									'title'   => __( 'Step Title', 'groundhogg' ),
-									'class'   => 'step-title-large edit-title full-width',
-									'data-id' => $step->get_id(),
-								);
-
-								echo html()->input( $args );
-								?>
-                            </div>
-                            <div class="step-title-view">
-								<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
-                            </div>
-                        </div>
+						<?php $this->step_title_edit( $step ); ?>
                         <div class="custom-settings">
 							<?php $this->settings( $step ); ?>
                         </div>

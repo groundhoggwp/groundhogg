@@ -3633,6 +3633,15 @@ function get_date_time_format() {
 }
 
 /**
+ * Returns the full format of dat time based on WP settings.
+ *
+ * @return string
+ */
+function get_time_format() {
+	return get_option( 'time_format' );
+}
+
+/**
  * @param $time
  *
  * @return string
@@ -6133,14 +6142,14 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					];
 				} else {
 					$filters[0][] = [
-						'type'       => 'email_link_clicked',
+						'type'          => 'email_link_clicked',
 						'count_compare' => 'greater_than_or_equal_to',
 						'count'         => 1,
-						'email_id'   => absint( $activity_query['email_id'] ),
-						'link'       => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
-						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
-						'before'     => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
-						'date_range' => 'between',
+						'email_id'      => absint( $activity_query['email_id'] ),
+						'link'          => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
+						'after'         => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'        => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
+						'date_range'    => 'between',
 					];
 				}
 				break;
@@ -6710,3 +6719,50 @@ function iframe_js() {
 }
 
 add_action( 'admin_head', __NAMESPACE__ . '\iframe_js', 9 );
+
+/**
+ * Whether the current locale is english or not
+ *
+ * @return bool
+ */
+function site_locale_is_english() {
+	return in_array( get_locale(), [
+		'en',
+		'en-us',
+		'en_US',
+		'en-au',
+		'en_AU',
+		'en-ca',
+		'en_CA',
+		'en-gb',
+		'en_GB',
+	] );
+}
+
+function array_bold( $array ){
+    return array_map( function ( $item ) {
+        return html()->e( 'b', [], $item );
+    }, $array );
+}
+
+function andList ($array) {
+	if (empty($array)) {
+		return '';
+    }
+	if (count($array) === 1) {
+		return $array[0];
+    }
+	return sprintf(_x('%s and %s', 'and preceding the last item in a list', 'groundhogg'),
+		implode( ', ', array_slice($array, 0, -1)), $array[count($array) - 1] );
+  }
+
+function orList ($array) {
+	if (empty($array)) {
+		return '';
+	}
+	if (count($array) === 1) {
+		return $array[0];
+	}
+	return sprintf(_x('%s or %s', 'or preceding the last item in a list', 'groundhogg'),
+		implode( ', ', array_slice($array, 0, -1)), $array[count($array) - 1] );
+  }

@@ -279,6 +279,17 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .diff-time {
   color: rgba(16, 38, 64, 0.5);
 }
+#activity-timeline li.activity-item .event-extra .step-type.action,
+#activity-timeline li.activity-item .diff-time .step-type.action {
+  color: #9ece38;
+}
+#activity-timeline li.activity-item .event-extra .step-type.benchmark,
+#activity-timeline li.activity-item .diff-time .step-type.benchmark {
+  color: #f58115;
+}
+#activity-timeline li.activity-item .diff-time:first-letter {
+  text-transform: capitalize;
+}
 #activity-timeline li.activity-item .activity-rendered.gh-panel {
   padding: 5px 10px;
 }

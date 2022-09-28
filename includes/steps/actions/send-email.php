@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Email;
+use function Groundhogg\site_locale_is_english;
 use function Groundhogg\get_array_var;
 use Groundhogg\Contact;
 use Groundhogg\Event;
@@ -82,6 +83,20 @@ class Send_Email extends Action {
 			'add_email_path'      => admin_url( 'admin.php?page=gh_emails&action=add' ),
 			'save_changes_prompt' => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
 		) );
+	}
+
+	public function step_title_edit( $step ) {
+
+        if ( ! site_locale_is_english() ){
+            parent::step_title_edit( $step );
+            return;
+        }
+
+		?>
+		<div class="gh-panel-header">
+			<h2><?php _e( 'Email Settings' ) ?></h2>
+		</div>
+		<?php
 	}
 
 	/**
@@ -184,6 +199,12 @@ class Send_Email extends Action {
 		}
 
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
+
+        if ( site_locale_is_english() && $email->exists() ){
+	        $step->update([
+		        'step_title' => sprintf( __( 'Send %s', 'groundhogg' ), '<b>' . $email->get_title() . '</b>' )
+	        ]);
+        }
 	}
 
 	/**
