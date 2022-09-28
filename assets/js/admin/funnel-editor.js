@@ -407,7 +407,6 @@
 
       // Make the clicked step active
       $step.addClass('active')
-      $step.find('.is_active').val(1)
 
       var sid = '#settings-' + $step.attr('id')
       var $step_settings = $(sid)

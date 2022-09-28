@@ -256,8 +256,6 @@ ORDER BY ID" );
 			return;
 		}
 
-		$processed_event_ids = [];
-
 		self::set_is_processing( true );
 
 		do {
@@ -311,12 +309,15 @@ ORDER BY ID" );
 				restore_current_locale();
 			}
 
-			$processed_event_ids[] = $event->get_id();
 			Limits::processed_action();
 
 		} while ( ! empty( $events ) && ! Limits::limits_exceeded() );
 
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::SKIPPED, 'ID' => $processed_event_ids ] );
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => [
+			Event::SKIPPED,
+			Event::COMPLETE,
+			Event::FAILED,
+		] ] );
 
 		$this->store->release_events();
 

@@ -307,6 +307,10 @@ class Events_Page extends Tabbed_Admin_Page {
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim != '' AND time < $time" );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress' AND time < $time" );
 
+		get_db( 'events' )->move_events_to_queue( [
+			'status' => Event::WAITING
+		], true );
+
 		return false;
 	}
 

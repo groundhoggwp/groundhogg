@@ -341,25 +341,7 @@ abstract class DB {
 			foreach ( $args as $key => $value ) {
 
 				if ( is_array( $value ) ) {
-
-					$ORS = [];
-
-					foreach ( $value as $item ) {
-
-						if ( is_numeric( $item ) ) {
-							$ORS[] = $item;
-						} else if ( is_string( $item ) ) {
-							$ORS[] = "'" . $item . "'";
-						}
-
-					}
-
-					if ( empty( $ORS ) ) {
-						$ORS[] = 0;
-					}
-
-					$where[] = "$key IN (" . implode( ',', $ORS ) . ")";
-
+					$where[] = "$key IN (" . maybe_implode_in_quotes( $value ) . ")";
 				} else {
 					if ( is_string( $value ) ) {
 						$value = "'" . $value . "'";

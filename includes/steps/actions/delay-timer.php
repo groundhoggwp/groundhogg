@@ -181,11 +181,13 @@ class Delay_Timer extends Action {
 	 */
 	public function save( $step ) {
 
-        if ( site_locale_is_english() ){
-	        $step->update( [
-		        'step_title' => $step->get_meta( 'delay_preview' )
-	        ] );
-        }
+        $preview = $step->get_meta( 'delay_preview' );
+
+		if ( site_locale_is_english() && ! empty( $preview ) ) {
+			$step->update( [
+				'step_title' => $preview
+			] );
+		}
 
 	}
 
@@ -427,10 +429,11 @@ class Delay_Timer extends Action {
 
 	public function step_title_edit( $step ) {
 
-        if ( ! site_locale_is_english() ){
-            parent::step_title_edit( $step );
-            return;
-        }
+		if ( ! site_locale_is_english() ) {
+			parent::step_title_edit( $step );
+
+			return;
+		}
 
 		?>
         <div class="gh-panel-header">

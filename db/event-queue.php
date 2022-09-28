@@ -89,7 +89,7 @@ class Event_Queue extends DB {
 		$events      = get_db( 'events' )->get_table_name();
 
 		$column_map = [
-			'queued_id'      => 'ID',
+			'ID'             => 'queued_id',
 			'time'           => 'time',
 			'micro_time'     => 'micro_time',
 			'time_scheduled' => 'time_scheduled',
@@ -104,8 +104,8 @@ class Event_Queue extends DB {
 			'status'         => 'status',
 		];
 
-		$history_columns = implode( ',', array_keys( $column_map ) );
-		$queue_columns   = implode( ',', array_values( $column_map ) );
+		$history_columns = implode( ',', array_values( $column_map ) );
+		$queue_columns   = implode( ',', array_keys( $column_map ) );
 
 		$where = $this->generate_where( $where, 'OR' );
 

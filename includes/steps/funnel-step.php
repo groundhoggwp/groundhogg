@@ -953,7 +953,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
 		$step->update( [
-			'step_title'    => sanitize_text_field( $this->get_posted_data( 'title' ) ),
+			'step_title'    => sanitize_text_field( $this->get_posted_data( 'title', $step->get_title() ) ),
 			'step_order'    => $this->get_posted_order(),
 			'step_status'   => 'ready',
 			'is_conversion' => (bool) $this->get_posted_data( 'is_conversion', false ),

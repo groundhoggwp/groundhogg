@@ -498,6 +498,6 @@
     },
   }
 
-  $(() => FunnelSteps.init())
+  FunnelSteps.init()
 
 } )(jQuery)
