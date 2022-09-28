@@ -732,9 +732,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function get_as_array() {
+
+		$data = $this->data;
+		// remove HTML formatting
+		$data[ 'step_title' ] = sanitize_text_field( $this->step_title );
+
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
 			'ID'     => $this->get_id(),
-			'data'   => $this->data,
+			'data'   => $data,
 			'meta'   => $this->meta,
 			'export' => $this->export(),
 		] );

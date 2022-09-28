@@ -578,8 +578,8 @@
               break
             case 'funnel':
 
-              let funnel
-              let step
+              let funnel = FunnelsStore.hasItems() ? FunnelsStore.getItems()[0] : null
+              let step = funnel ? funnel.steps[0] : null
 
               const addToFunnel = () => {
 
