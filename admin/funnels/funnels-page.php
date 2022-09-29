@@ -718,7 +718,6 @@ class Funnels_Page extends Admin_Page {
 			'step_title'  => sprintf( __( '%s - (copy)', 'groundhogg' ), $step->get_title() ),
 			'step_type'   => $step->get_type(),
 			'step_group'  => $step->get_group(),
-			'step_status' => 'ready',
 			'step_order'  => $step->get_order() + 1,
 		] );
 

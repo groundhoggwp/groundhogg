@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.6
+Stable tag: 2.7.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.6.1 (2022-09-29) =
+* ADDED LocalDateTime custom field type
+* TWEAKED Use while loop for event queue processing instead of recursive function to avoid memory issues.
+* TWEAKED Store local active/inactive stats at step level to avoid having to look at the parent funnel status.
+* FIXED HTML in funnel step names showing in breakdown chart columns.
+* FIXED `process_events()` function removes contact ID filter after processing.
 
 = 2.7.6 (2022-09-28) =
 * IMPROVED Delay Timer has more advanced settings enabling delays based on day of week, day of month, and waiting for specific months.

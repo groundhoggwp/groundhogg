@@ -65,7 +65,7 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 			);
 
 			$count     = count( $query->query( $args ) );
-			$label[]   = $step->get_title();
+			$label[]   = sanitize_text_field( $step->get_title() );
 			$dataset[] = $count;
 
 		}

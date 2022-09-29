@@ -171,10 +171,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * @var Funnel
+	 */
+	protected $funnel;
+
+	/**
 	 * @return Funnel
 	 */
 	public function get_funnel() {
-		return new Funnel( $this->get_funnel_id() );
+
+		if ( $this->funnel ){
+			return $this->funnel;
+		}
+
+		$this->funnel = new Funnel( $this->get_funnel_id() );
+
+		return $this->funnel;
 	}
 
 	public function set_slug() {
@@ -566,7 +578,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_active() {
-		return $this->get_funnel() && $this->get_funnel()->is_active();
+		return $this->step_status === 'active';
 	}
 
 	/**

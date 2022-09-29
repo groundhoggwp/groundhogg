@@ -38,6 +38,8 @@ define( 'DOING_CRON', true );
  */
 define( 'DOING_GH_CRON', true );
 
+define( 'QM_DISABLED', true );
+
 /**
  * How many concurrent requests you can make, too many might DDOS your server so be careful
  */

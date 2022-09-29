@@ -76,7 +76,7 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected $event_ids = [];
 
-	protected $max_events = 100;
+	protected $max_events = 50;
 	protected $logging_enabled = false;
 
 	/**
@@ -250,86 +250,77 @@ ORDER BY ID" );
 	 */
 	protected function process() {
 
-		$events = $this->store->get_events( $this->max_events );
-
-		if ( empty( $events ) ) {
-			return;
-		}
-
 		self::set_is_processing( true );
 
-		do {
+		while ( ! Limits::limits_exceeded() ){
 
-			/**
-			 * Get first event from selected
-			 *
-			 * @var $event Event_Queue_Item
-			 */
-			$event = array_shift( $events );
+			$events = $this->store->get_events( $this->max_events );
 
-			$this->set_current_event( $event );
-
-			$contact = $event->get_contact();
-
-			if ( ! is_a_contact( $contact ) ) {
-
-				// Delete the event
-				$event->delete();
-
-				continue;
+			if ( empty( $events ) ){
+				break;
 			}
 
-			$this->set_current_contact( $contact );
+			foreach ( $events as $event ){
 
-			// maybe switch the locale if multilingual?
-			if ( $contact->get_locale() !== get_locale() ) {
-				switch_to_locale( $contact->get_locale() );
-			}
+				$this->set_current_event( $event );
 
-			$result = $event->run();
+				$contact = $event->get_contact();
 
-			if ( ! is_wp_error( $result ) ) {
+				if ( ! is_a_contact( $contact ) ) {
 
-				if ( $event->is_funnel_event() ) {
+					// Delete the event
+//					$event->delete();
 
-					$next_step = $event->get_step()->get_next_action();
+					continue;
+				}
 
-					if ( $next_step instanceof Step && $next_step->is_active() ) {
-						$next_step->enqueue( $event->get_contact() );
+				$this->set_current_contact( $contact );
+
+				// maybe switch the locale if multilingual?
+				if ( $contact->get_locale() !== get_locale() ) {
+					switch_to_locale( $contact->get_locale() );
+				}
+
+				$result = $event->run();
+
+				if ( ! is_wp_error( $result ) ) {
+
+					if ( $event->is_funnel_event() ) {
+
+						$next_step = $event->get_step()->get_next_action();
+
+						if ( $next_step instanceof Step && $next_step->is_active() ) {
+							$next_step->enqueue( $event->get_contact() );
+						}
+					}
+
+				} else {
+					if ( $event->has_errors() ) {
+						$this->add_error( $event->get_last_error() );
 					}
 				}
 
-			} else {
-				if ( $event->has_errors() ) {
-					$this->add_error( $event->get_last_error() );
+				if ( is_locale_switched() ) {
+					restore_current_locale();
 				}
+
+				Limits::processed_action();
+
 			}
 
-			if ( is_locale_switched() ) {
-				restore_current_locale();
-			}
+			get_db( 'event_queue' )->move_events_to_history( [
+				'status' => [
+					Event::SKIPPED,
+					Event::COMPLETE,
+					Event::FAILED,
+				]
+			] );
 
-			Limits::processed_action();
+			$this->store->release_events();
 
-		} while ( ! empty( $events ) && ! Limits::limits_exceeded() );
-
-		get_db( 'event_queue' )->move_events_to_history( [
-			'status' => [
-				Event::SKIPPED,
-				Event::COMPLETE,
-				Event::FAILED,
-			]
-		] );
-
-		$this->store->release_events();
-
-		self::set_is_processing( false );
-
-		if ( Limits::limits_exceeded() ) {
-			return;
 		}
 
-		$this->process();
+		self::set_is_processing( false );
 	}
 
 	/**

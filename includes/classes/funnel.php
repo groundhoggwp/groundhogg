@@ -115,6 +115,21 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Mass update sattus of steps related to this funnel
+	 *
+	 * @param $status
+	 *
+	 * @return bool
+	 */
+	public function update_step_status( $status ){
+		return get_db( 'steps' )->update([
+			'funnel_id' => $this->get_id()
+		], [
+			'step_status' => $status
+		]);
+	}
+
+	/**
 	 * Commit all the changes from the previous update.
 	 *
 	 * - Pause all active events for this funnel
@@ -243,6 +258,8 @@ class Funnel extends Base_Object_With_Meta {
 			// Pause any waiting events
 			$this->pause_events();
 		}
+
+		$this->update_step_status( $this->is_active() ? 'active' : 'inactive' );
 
 		return $updated;
 	}
@@ -517,7 +534,6 @@ class Funnel extends Base_Object_With_Meta {
 			$args = array(
 				'funnel_id'   => $funnel_id,
 				'step_title'  => $step_title,
-				'step_status' => 'ready',
 				'step_group'  => $step_group,
 				'step_type'   => $step_type,
 				'step_order'  => $i + 1,
@@ -562,7 +578,6 @@ class Funnel extends Base_Object_With_Meta {
 
 		$args = wp_parse_args( $args, [
 			'funnel_id'   => $this->get_id(),
-			'step_status' => 'ready',
 			'step_order'  => count( $this->get_step_ids() ) + 1,
 			'meta'        => [],
 		] );

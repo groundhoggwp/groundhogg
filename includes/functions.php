@@ -6,6 +6,7 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
+use Groundhogg\Queue\Process_Contact_Events;
 use Groundhogg\Utils\Limits;
 use WP_Error;
 
@@ -6664,37 +6665,9 @@ function process_events( $contacts = [] ) {
 		return true;
 	}
 
-	$errors = [];
+    $process = new Process_Contact_Events( $contacts );
 
-	if ( ! empty( $contacts ) ) {
-
-		if ( ! is_array( $contacts ) ) {
-			$contacts = [ get_contactdata( $contacts ) ];
-		}
-
-		$contacts    = array_filter( $contacts, __NAMESPACE__ . '\is_a_contact' );
-		$contact_ids = array_unique( get_object_ids( $contacts ) );
-
-		if ( ! empty( $contact_ids ) ) {
-
-			// only process the events for this contact
-			add_filter( 'groundhogg/queue/event_store/get_queued_event_ids/clauses', function ( $clauses ) use ( $contact_ids ) {
-				$clauses[] = sprintf( '`contact_id` IN (%s)', implode( ',', $contact_ids ) );
-
-				return $clauses;
-			} );
-		}
-
-		add_action( 'groundhogg/event/failed', function ( $event, $error ) use ( &$errors ) {
-			$errors[] = $error;
-		}, 10, 2 );
-	}
-
-	Limits::set_max_execution_time( 5 );
-
-	\Groundhogg\event_queue()->run_queue();
-
-	return empty( $errors ) ?: $errors;
+	return $process->has_errors() ? $process->get_errors() : true;
 }
 
 /**

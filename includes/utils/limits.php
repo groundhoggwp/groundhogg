@@ -20,7 +20,6 @@ class Limits {
 		return self::$total_processed_actions;
 	}
 
-
 	/**
 	 * Start the function to prevent limits exceeding.
 	 */

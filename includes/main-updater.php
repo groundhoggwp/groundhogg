@@ -623,6 +623,17 @@ class Main_Updater extends Updater {
 		wp_clear_scheduled_hook( 'gh_check_bounces' );
 	}
 
+	public function version_2_7_6_1(){
+
+		$funnels = get_db( 'funnels' )->query();
+
+		foreach ( $funnels as $funnel ) {
+			$funnel = new Funnel( $funnel );
+			$funnel->update_step_status( $funnel->is_active() ? 'active' : 'inactive' );
+		}
+
+	}
+
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -689,6 +700,7 @@ class Main_Updater extends Updater {
 			'2.7.4',
 			'2.7.4.3',
 			'2.7.5.2',
+			'2.7.6.1',
 		];
 	}
 
@@ -729,6 +741,7 @@ class Main_Updater extends Updater {
 			'2.7.2',
 			'2.7.4.3',
 			'2.7.5.2',
+			'2.7.6.1',
 		];
 	}
 
@@ -789,6 +802,7 @@ class Main_Updater extends Updater {
 			'2.7.4'         => __( 'Set the <code>is_conversion</code> for benchmarks based on legacy funnel conversion step.', 'groundhogg' ),
 			'2.7.4.3'       => __( 'Drop un-needed <code>claim</code> column from <code>wp_gh_events</code> table.', 'groundhogg' ),
 			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
+			'2.7.6.1'       => __( 'Update `step_status` column with `active` or `inactive`', 'groundhogg' ),
 		];
 	}
 }

@@ -103,7 +103,7 @@ class Steps extends DB {
 			'ID'            => 0,
 			'funnel_id'     => 0,
 			'step_title'    => __( 'New Step' ),
-			'step_status'   => 'ready',
+			'step_status'   => 'inactive',
 			'step_type'     => 'send_email',
 			'step_group'    => 'action',
 			'step_slug'     => '',
