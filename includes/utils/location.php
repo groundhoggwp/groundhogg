@@ -530,13 +530,14 @@ class Location {
 			'cc',
 			'country_code',
 			'province',
-			"country",
-			"countrycode",
-			"state",
-			"region",
-			"city",
-			"location",
-			"address"
+			'country',
+			'countrycode',
+			'state',
+			'region',
+			'city',
+			'location',
+			'address',
+			'time_zone'
 		];
 
 		$continents = [
@@ -610,6 +611,9 @@ class Location {
 					case 'country_code':
 					case 'cc':
 						$output = @$ip_data->geoplugin_countryCode;
+						break;
+					case 'time_zone':
+						$output = @$ip_data->geoplugin_timezone;
 						break;
 				}
 			}

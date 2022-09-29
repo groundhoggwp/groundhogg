@@ -313,11 +313,13 @@ ORDER BY ID" );
 
 		} while ( ! empty( $events ) && ! Limits::limits_exceeded() );
 
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => [
-			Event::SKIPPED,
-			Event::COMPLETE,
-			Event::FAILED,
-		] ] );
+		get_db( 'event_queue' )->move_events_to_history( [
+			'status' => [
+				Event::SKIPPED,
+				Event::COMPLETE,
+				Event::FAILED,
+			]
+		] );
 
 		$this->store->release_events();
 

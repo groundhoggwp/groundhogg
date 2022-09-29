@@ -49,7 +49,7 @@ class Event_Store_V2 {
 			'claim'   => $this->claim,
 			'orderby' => 'ID',
 			'order'   => 'asc'
-		], false );
+		] );
 
 		return array_map_to_class( $events, Event_Queue_Item::class );
 	}
@@ -98,11 +98,10 @@ class Event_Store_V2 {
 		] );
 
 		$clauses      = implode( ' AND ', $clauses );
-		$current_time = time();
 
 		$result = $wpdb->query( "
 	UPDATE {$this->db()->get_table_name()}
-	SET claim = '{$this->claim}', time = $current_time
+	SET claim = '{$this->claim}'
 	WHERE $clauses
 	ORDER BY priority ASC, ID ASC
 	LIMIT $count" );

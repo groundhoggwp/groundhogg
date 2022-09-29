@@ -152,6 +152,28 @@
       },
       onEditMount: () => {}
     },
+    datetime: {
+      name: __('Date & Time', 'groundhogg'),
+      view: ({ label, ...props }) => {
+        //language=HTML
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+          className: 'full-width',
+          ...props,
+          type: 'datetime-local',
+        })}`
+      },
+      onMount: ({ id, name }, onChange) => {
+        $(`#${id}`).on('change', (e) => {
+          onChange({
+            [name]: e.target.value
+          })
+        })
+      },
+      edit: () => {
+        return ''
+      },
+      onEditMount: () => {}
+    },
     checkboxes: {
       name: __('Checkboxes', 'groundhogg'),
       view: ({ label, id, name, options, value, ...props }) => {

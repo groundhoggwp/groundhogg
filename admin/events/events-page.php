@@ -177,7 +177,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `ID` in ({$event_ids})" );
 
 		// Move the items over...
-		get_db( 'event_queue' )->move_events_to_history( [ 'ID' => $this->get_items() ] );
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
 
 		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 

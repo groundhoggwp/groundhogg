@@ -24,20 +24,22 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
+use function Groundhogg\get_user_timezone;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\show_groundhogg_branding;
+use function Groundhogg\utils;
 
 /**
  * Guided Setup
  *
  * An automated and simple experience that allows users to setup Groundhogg in a few steps.
  *
- * @package     Admin
+ * @since       File available since Release 0.9
  * @subpackage  Admin/Guided Setup
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Admin
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,8 +103,9 @@ class Guided_Setup extends Admin_Page {
 
 		// Add to list
 		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v3/webhook-listener?auth_token=NCM39k3&step_id=1641', [
-			'email' => $email,
-			'name'  => $name
+			'email'     => $email,
+			'name'      => $name,
+			'time_zone' => get_user_timezone()->getName()
 		] );
 
 		wp_send_json_success( [
@@ -199,9 +202,9 @@ class Guided_Setup extends Admin_Page {
 	 */
 	public function page() {
 		?>
-		<div id="guided-setup">
+        <div id="guided-setup">
 
-		</div><?php
+        </div><?php
 	}
 
 	/**

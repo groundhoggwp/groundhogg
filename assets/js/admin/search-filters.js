@@ -2133,6 +2133,57 @@
         meta: f.name,
       },
     } ),
+    datetime: (f) => ( {
+      view ({ field, ...rest }) {
+        //language=HTMl
+        return standardActivityDateTitle(`<b>${ f.label }</b>`, rest)
+      },
+      edit (filter) {
+        // language=html
+        return standardActivityDateOptions(filter)
+      },
+      onMount (filter, updateFilter) {
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+        field: f.id,
+        meta: f.name,
+      },
+    } ),
+    time: (f) => ( {
+      view ({ field, compare, value }) {
+        return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, `<b>${ value }</b>`)
+      },
+      edit ({ compare, value }) {
+        // language=html
+        return `
+            ${ select({
+          id: 'filter-compare',
+          name: 'compare',
+        }, NumericComparisons, compare) } ${ input({
+          id: 'filter-value',
+          name: 'value',
+          type: 'time',
+          value,
+        }) }`
+      },
+      onMount (filter, updateFilter) {
+
+        $('#filter-compare, #filter-value').on('change', function (e) {
+          const $el = $(this)
+          updateFilter({
+            [$el.prop('name')]: $el.val(),
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: 'equals',
+        value: '',
+      },
+    } ),
     radio: (f) => ( {
       view: ({ options, compare }) => {
         return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, orList(options.map(o => bold(o))))

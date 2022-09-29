@@ -59,11 +59,13 @@ class Telemetry {
 			'email'       => $telemetry_email,
 			'date'        => Ymd_His(),
 			'subscribed'  => $subscribed ? 'yes' : 'no',
+			'time_zone'   => get_user_timezone()->getName(),
 			'system_info' => [
 				'php_version' => PHP_VERSION,
 				'wp_version'  => get_bloginfo( 'version' ),
 				'gh_version'  => GROUNDHOGG_VERSION,
 				'site_lang'   => get_bloginfo( 'language' ),
+				'time_zone'   => wp_timezone()->getName()
 			]
 		];
 

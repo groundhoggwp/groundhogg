@@ -114,7 +114,7 @@ class Event_Queue extends DB {
 		$wpdb->query( "INSERT INTO $events ($history_columns)
 			SELECT $queue_columns
 			FROM $event_queue
-			WHERE $where" );
+			WHERE ( $where ) AND status != 'waiting'" );
 
 		$wpdb->query( "DELETE FROM $event_queue WHERE $where ORDER BY ID;" );
 

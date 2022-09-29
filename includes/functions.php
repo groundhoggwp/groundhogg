@@ -6739,30 +6739,48 @@ function site_locale_is_english() {
 	] );
 }
 
-function array_bold( $array ){
-    return array_map( function ( $item ) {
-        return html()->e( 'b', [], $item );
-    }, $array );
+function array_bold( $array ) {
+	return array_map( function ( $item ) {
+		return html()->e( 'b', [], $item );
+	}, $array );
 }
 
-function andList ($array) {
-	if (empty($array)) {
+function andList( $array ) {
+	if ( empty( $array ) ) {
 		return '';
-    }
-	if (count($array) === 1) {
+	}
+	if ( count( $array ) === 1 ) {
 		return $array[0];
-    }
-	return sprintf(_x('%s and %s', 'and preceding the last item in a list', 'groundhogg'),
-		implode( ', ', array_slice($array, 0, -1)), $array[count($array) - 1] );
-  }
+	}
 
-function orList ($array) {
-	if (empty($array)) {
+	return sprintf( _x( '%s and %s', 'and preceding the last item in a list', 'groundhogg' ),
+		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
+}
+
+function orList( $array ) {
+	if ( empty( $array ) ) {
 		return '';
 	}
-	if (count($array) === 1) {
+	if ( count( $array ) === 1 ) {
 		return $array[0];
 	}
-	return sprintf(_x('%s or %s', 'or preceding the last item in a list', 'groundhogg'),
-		implode( ', ', array_slice($array, 0, -1)), $array[count($array) - 1] );
-  }
+
+	return sprintf( _x( '%s or %s', 'or preceding the last item in a list', 'groundhogg' ),
+		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
+}
+
+/**
+ * Returns the current user's timezone
+ *
+ * @return \DateTimeZone
+ */
+function get_user_timezone() {
+
+    $tz = utils()->location->ip_info( null, 'time_zone' );
+
+    if ( $tz ){
+        return new \DateTimeZone( $tz );
+    }
+
+    return wp_timezone();
+}
