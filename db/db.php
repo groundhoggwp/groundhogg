@@ -491,6 +491,7 @@ abstract class DB {
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
 		$wpdb->insert( $this->table_name, $data, $column_formats );
+
 		$wpdb_insert_id = $wpdb->insert_id;
 
 		$this->cache_set_last_changed();

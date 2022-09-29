@@ -117,6 +117,19 @@ class Tag_Relationships extends DB {
 		return $result;
 	}
 
+	public function insert( $data ) {
+
+		add_filter( 'query', [ $this, '_insert_ignore' ] );
+		$result = parent::insert( $data );
+		remove_filter( 'query', [ $this, '_insert_ignore' ] );
+
+		return $result;
+	}
+
+	public function _insert_ignore( $query ) {
+		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
+	}
+
 	/**
 	 * A tag was delete, delete all tag relationships
 	 *

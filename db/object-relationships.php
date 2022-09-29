@@ -11,12 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Store the relationships between arbitrary objects in Groundhogg
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Object_Relationships extends DB {
 
@@ -102,6 +102,19 @@ secondary_object_type = 'contact' AND secondary_object_id = $other->ID AND (prim
     SELECT primary_object_id,primary_object_type FROM $this->table WHERE secondary_object_id = $contact->ID AND secondary_object_type = 'contact'
 ) " );
 
+	}
+
+	public function insert( $data ) {
+
+		add_filter( 'query', [ $this, '_insert_ignore' ] );
+		$result = parent::insert( $data );
+		remove_filter( 'query', [ $this, '_insert_ignore' ] );
+
+		return $result;
+	}
+
+	public function _insert_ignore( $query ) {
+		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
 	}
 
 	/**

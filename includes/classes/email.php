@@ -771,6 +771,11 @@ class Email extends Base_Object_With_Meta {
 			$defaults['list-unsubscribe-post'] = 'List-Unsubscribe=One-Click';
 		}
 
+		// Add list-id header to marketing emails
+		if ( ! $this->is_transactional() ){
+			$defaults['list-id'] = wp_parse_url( home_url(), PHP_URL_HOST );
+		}
+
 		// Merge the custom headers with the defaults...
 		$headers = wp_parse_args( $headers, $defaults );
 
