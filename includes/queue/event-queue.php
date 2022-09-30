@@ -262,6 +262,10 @@ ORDER BY ID" );
 
 			foreach ( $events as $event ){
 
+				if ( Limits::limits_exceeded() ){
+					break;
+				}
+
 				$this->set_current_event( $event );
 
 				$contact = $event->get_contact();
@@ -281,23 +285,10 @@ ORDER BY ID" );
 					switch_to_locale( $contact->get_locale() );
 				}
 
-				$result = $event->run();
+				$event->run();
 
-				if ( ! is_wp_error( $result ) ) {
-
-					if ( $event->is_funnel_event() ) {
-
-						$next_step = $event->get_step()->get_next_action();
-
-						if ( $next_step instanceof Step && $next_step->is_active() ) {
-							$next_step->enqueue( $event->get_contact() );
-						}
-					}
-
-				} else {
-					if ( $event->has_errors() ) {
-						$this->add_error( $event->get_last_error() );
-					}
+				if ( $event->has_errors() ) {
+					$this->add_error( $event->get_last_error() );
 				}
 
 				if ( is_locale_switched() ) {

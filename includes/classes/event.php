@@ -418,6 +418,10 @@ class Event extends Base_Object {
 
 		$this->complete();
 
+		if ( method_exists( $this->get_step(), 'run_after' ) ){
+			call_user_func( [ $this->get_step(), 'run_after' ], $this->get_contact(), $this );
+		}
+
 		do_action( 'groundhogg/event/run/after', $this );
 
 		return true;

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.6.2
+Stable tag: 2.7.6.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.6.3 (2022-09-29) =
+* TWEAKED Moved enqueue next action logic from `Event_Queue::process()` to `Step::run_after()`
+* TWEAKED Do not do an UPDATE query to skip enqueued steps if the `Step::enqueue()` method from `Step::run_after()`
+* TWEAKED Add a check for `Limits::limits_exceeded()` in inner foreach loop in the event queue.
 
 = 2.7.6.2 (2022-09-29) =
 * FIXED Use `INSERT IGNORE` for object/tag relationships to avoid duplicate key errors.

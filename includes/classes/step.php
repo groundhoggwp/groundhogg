@@ -180,7 +180,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_funnel() {
 
-		if ( $this->funnel ){
+		if ( $this->funnel ) {
 			return $this->funnel;
 		}
 
@@ -423,11 +423,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Create an event and add it to the queue
 	 *
-	 * @param $contact Contact
+	 * @param Contact $contact
+	 * @param bool    $skip_enqueued whether to skip any other enqueued steps
 	 *
 	 * @return bool
 	 */
-	public function enqueue( $contact ) {
+	public function enqueue( $contact, $skip_enqueued = true ) {
 
 		$this->enqueued_contact = $contact;
 
@@ -444,20 +445,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		// Update any events to skipped...
-		$this->get_event_queue_db()->mass_update(
-			[
-				'status'        => Event::SKIPPED,
-				'error_code'    => 'skipped_by_step',
-				'error_message' => sprintf( 'Step %d [%s] enqueued', $this->get_id(), $this->get_step_title() )
-			],
-			[
-				'funnel_id'  => $this->get_funnel_id(),
-				'contact_id' => $contact->get_id(),
-				'event_type' => Event::FUNNEL,
-				'status'     => Event::WAITING,
-			]
-		);
+		if ( $skip_enqueued ) {
+
+			// Update any events to skipped...
+			$this->get_event_queue_db()->mass_update(
+				[
+					'status'        => Event::SKIPPED,
+					'error_code'    => 'skipped_by_step',
+					'error_message' => sprintf( 'Step %d [%s] enqueued', $this->get_id(), sanitize_text_field( $this->get_step_title() ) )
+				],
+				[
+					'funnel_id'  => $this->get_funnel_id(),
+					'contact_id' => $contact->get_id(),
+					'event_type' => Event::FUNNEL,
+					'status'     => Event::WAITING,
+				]
+			);
+
+		}
 
 		// Setup the new event args
 		$event = [
@@ -636,6 +641,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool|\WP_Error whether it was successful or not
 	 */
 	public function run( $contact, $event = null ) {
+
 		if ( ! $this->is_active() ) {
 			return false;
 		}
@@ -675,6 +681,25 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $result;
 	}
 
+	/**
+	 * Enqueue the next action if one exists
+	 *
+	 * @param $contact
+	 * @param $event
+	 *
+	 * @return void
+	 */
+	public function run_after( $contact, $event ) {
+
+		$next = $this->get_next_action();
+
+		if ( $next && is_a( $next, Step::class ) ) {
+
+			// No need to do update to skip previous at this point
+			$next->enqueue( $contact, false );
+		}
+
+	}
 
 	/**
 	 * Output the HTML of a step.
@@ -747,7 +772,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$data = $this->data;
 		// remove HTML formatting
-		$data[ 'step_title' ] = sanitize_text_field( $this->step_title );
+		$data['step_title'] = sanitize_text_field( $this->step_title );
 
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
 			'ID'     => $this->get_id(),
