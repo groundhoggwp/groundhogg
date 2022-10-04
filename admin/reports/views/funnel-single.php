@@ -24,9 +24,10 @@ if ( ! $funnel->exists() ) {
     <h1 class="report-title"><?php _e( $funnel->get_title() ) ?></h1>
 	<?php echo html()->e( 'a', [
 		'target' => '_blank',
-        'href' => $funnel->admin_link(),
-        'class' => 'gh-button secondary'
-	], __('Edit Funnel') ) ?>
+		'id'     => 'edit-funnel',
+		'href'   => $funnel->admin_link(),
+		'class'  => 'gh-button secondary'
+	], __( 'Edit Funnel' ) ) ?>
 </div>
 <div class="display-grid gap-20">
 

@@ -310,8 +310,11 @@ function tool_tip_title () {
         for (var i = 0; i < length; i++) {
 
           html += '<tr >'
-          for (var key in report_data.data[i]) {
-            html = html + '<td>' + report_data.data[i][key] + '</td>'
+
+          let data = Object.values(report_data.data[i])
+
+          for (var k in data ) {
+            html = html + `<td data-colname="${report_data.label[k]}">${data[k]}</td>`
           }
           html += '</tr>'
 
