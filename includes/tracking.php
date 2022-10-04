@@ -228,14 +228,6 @@ class Tracking {
 		$contact_id = absint( get_query_var( 'contact_id' ) );
 		$email_id   = absint( get_query_var( 'email_id' ) );
 		$event_id   = absint( get_query_var( 'event_id' ) );
-		$target_url = get_query_var( 'target_url' );
-
-		// Clean the URL, wonky encoding sometimes...
-		$target_url = str_replace( '&#038;', '&', $target_url );
-
-		if ( empty( $target_url ) ) {
-			$target_url = home_url();
-		}
 
 		// Add the tracking cookie params.
 		$this->add_tracking_cookie_param( 'contact_id', $contact_id );
@@ -244,7 +236,6 @@ class Tracking {
 		$this->add_tracking_cookie_param( 'source', $tracking_via );
 		$this->add_tracking_cookie_param( 'action', $tracking_action );
 
-		$target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		switch ( $tracking_via ) {
 			case 'email':
@@ -257,6 +248,18 @@ class Tracking {
 						$this->doing_click = true;
 
 						$this->build_tracking_cookie();
+
+						$target_url = get_query_var( 'target_url' );
+
+						// Clean the URL, wonky encoding sometimes...
+						$target_url = str_replace( '&#038;', '&', $target_url );
+
+						if ( empty( $target_url ) ) {
+							$target_url = '/';
+						}
+
+						$target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
+
 
 						$this->email_link_clicked( $target_url );
 						break;
@@ -603,13 +606,10 @@ class Tracking {
 	 */
 	protected function output_tracking_image() {
 		/* thanks for coming! */
-		$file = GROUNDHOGG_ASSETS_PATH . 'images/email-open.png';
-		$type = 'image/png';
 
-		header( 'Content-Type:' . $type );
-		header( 'Content-Length:' . filesize( $file ) );
 		status_header( 200 );
-		readfile( $file );
+		header( 'Content-Type: image/png' );
+		echo base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=' );
 
 		die();
 	}
@@ -662,7 +662,16 @@ class Tracking {
 		/* track every click as an open */
 		$this->email_opened();
 
+		$orig_target = $target;
+
 		$event = $this->get_current_event();
+
+		// We removed the hostname from the url to shorten it
+		if ( preg_match( '@^/@', $target ) ){
+			$scheme = is_ssl() ? 'https' : 'http';
+			$hostname = wp_parse_url( home_url(), PHP_URL_HOST );
+			$target = "$scheme://$hostname$target";
+		}
 
 		/**
 		 * @since 2.1
@@ -687,8 +696,8 @@ class Tracking {
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'event_id'      => $event->get_id(),
-			'referer'       => $target,
-			'referer_hash'  => generate_referer_hash( $target )
+			'referer'       => $orig_target,
+			'referer_hash'  => generate_referer_hash( $orig_target )
 		);
 
 		if ( get_db( 'activity' )->add( $args ) ) {

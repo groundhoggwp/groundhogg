@@ -17,6 +17,7 @@ use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
 use Groundhogg\Admin\Guided_Setup\Steps\Tracking;
 use Groundhogg\Extension;
+use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
 use function Groundhogg\dashicon;
 use function Groundhogg\floating_phil;
@@ -57,6 +58,22 @@ class Guided_Setup extends Admin_Page {
 		add_action( 'wp_ajax_gh_guided_setup_subscribe', [ $this, 'subscribe_to_newsletter' ] );
 		add_action( 'wp_ajax_gh_guided_setup_telemetry', [ $this, 'optin_to_telemetry' ] );
 		add_action( 'wp_ajax_gh_guided_setup_license', [ $this, 'check_license' ] );
+		add_action( 'wp_ajax_groundhogg_remote_install_hollerbox', [ $this, 'install_hollerbox' ] );
+	}
+
+	public function install_hollerbox() {
+
+		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'install_plugins' ) || ! current_user_can( 'install_plugins' ) ) {
+			wp_send_json_error();
+		}
+
+		$res = Extension_Upgrader::install_repo_plugin( 'holler-box' );
+
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( $res );
+		}
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -250,9 +267,18 @@ class Guided_Setup extends Admin_Page {
 			'integrations'           => $integrations,
 			'mailhawkInstalled'      => defined( 'MAILHAWK_VERSION' ),
 			'install_mailhawk_nonce' => wp_create_nonce( 'install_mailhawk' ),
+			'install_plugins_nonce'  => wp_create_nonce( 'install_plugins' ),
+			'installed'              => [
+				'mailhawk'  => defined( 'MAILHAWK_VERSION' ),
+				'hollerbox' => defined( 'HOLLERBOX_VERSION' ),
+			],
+			'assets'                 => [
+				'mailhawk'  => GROUNDHOGG_ASSETS_URL . 'images/recommended/mailhawk.png',
+				'hollerbox' => GROUNDHOGG_ASSETS_URL . 'images/recommended/hollerbox.png',
+			]
 		];
 
-		wp_add_inline_script( 'groundhogg-admin-guided-setup', 'var GroundhoggGuidedSetup = ' . wp_json_encode( $setup ) );
+		wp_add_inline_script( 'groundhogg-admin-guided-setup', 'var GroundhoggGuidedSetup = ' . wp_json_encode( $setup ), 'before' );
 	}
 
 	/**

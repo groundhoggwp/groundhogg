@@ -42,9 +42,10 @@ class Manager {
 	/**
 	 * Storage for the instances of the elements
 	 *
-	 * @var array
+	 * @var Funnel_Step[]
 	 */
-	public $elements = array();
+	public $elements = [];
+	protected $sub_groups = [];
 
 	/**
 	 * Manager constructor.
@@ -54,10 +55,30 @@ class Manager {
 		add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
 	}
 
+
+	/**
+	 * Register a new group
+	 *
+	 * @param $group
+	 * @param $name
+	 */
+	public function register_sub_group( $group, $name ) {
+		$this->sub_groups[ $group ] = $name;
+	}
+
 	/**
 	 * Initialize all the steps
 	 */
 	public function init_steps() {
+
+		$this->register_sub_group( 'activity', __( 'Activity' ) );
+		$this->register_sub_group( 'crm', __( 'CRM' ) );
+		$this->register_sub_group( 'admin', __( 'Admin' ) );
+		$this->register_sub_group( 'email', __( 'Email' ) );
+		$this->register_sub_group( 'user', __( 'User' ) );
+		$this->register_sub_group( 'delay', __( 'Delay' ) );
+		$this->register_sub_group( 'developer', __( 'Developer' ) );
+		$this->register_sub_group( 'other', __( 'Other' ) );
 
 		/* actions */
 		$this->add_step( new Send_Email() );
@@ -95,7 +116,9 @@ class Manager {
 	 * @return Benchmark[]
 	 */
 	public function get_benchmarks() {
-		return apply_filters( "groundhogg/steps/benchmarks", array() );
+		return array_filter( $this->elements, function ( $element ){
+			return $element->get_group() === Funnel_Step::BENCHMARK;
+		} );
 	}
 
 	/**
@@ -104,7 +127,9 @@ class Manager {
 	 * @return Action[]
 	 */
 	public function get_actions() {
-		return apply_filters( 'groundhogg/steps/actions', array() );
+		return array_filter( $this->elements, function ( $element ){
+			return $element->get_group() === Funnel_Step::ACTION;
+		} );
 	}
 
 	/**

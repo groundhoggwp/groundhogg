@@ -243,5 +243,64 @@ class Extension_Upgrader {
 
 	}
 
+	/**
+	 * Pre-process the post content
+	 *
+	 * @param $slug string
+	 *
+	 * @return \WP_Error|bool
+	 */
+	public static function install_repo_plugin( $slug ) {
+
+		include_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		foreach ( get_plugins() as $path => $details ) {
+
+			if ( false === strpos( $path, sprintf( '/%s.php', $slug ) ) ) {
+				continue;
+			}
+
+			$activate = activate_plugin( $path );
+
+			if ( is_wp_error( $activate ) ) {
+				return $activate;
+			}
+
+			return true;
+		}
+
+		include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		include_once ABSPATH . 'wp-admin/includes/file.php';
+		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		// Use the WordPress Plugins API to get the plugin download link.
+		$api = plugins_api(
+			'plugin_information',
+			array(
+				'slug' => $slug,
+			)
+		);
+
+		if ( is_wp_error( $api ) ) {
+			return $api;
+		}
+
+		// Use the AJAX upgrader skin to quietly install the plugin.
+		$upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin() );
+		$install  = $upgrader->install( $api->download_link );
+
+		if ( is_wp_error( $install ) ) {
+			return $install;
+		}
+
+		$activate = activate_plugin( $upgrader->plugin_info() );
+
+		if ( is_wp_error( $activate ) ) {
+			return $activate;
+		}
+
+		return true;
+	}
+
 
 }

@@ -391,7 +391,7 @@ class Event extends Base_Object {
 		$result = $this->get_step()->run( $this->get_contact(), $this );
 
 		// Falsy value from the run() method
-		if ( ! $result ) {
+		if ( $result === false ) {
 
 			// Update the error code details with the reason this event was skipped
 			$this->skip( [

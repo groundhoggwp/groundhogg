@@ -1,4 +1,4 @@
-( ($) => {
+( ($, Setup) => {
 
   const {
     input,
@@ -72,13 +72,14 @@
               <div class="gh-panel outlined">
                   <div class="inside display-flex gap-10">
                       <a style="display: inline-block" class="gh-button primary"
-                    href="https://groundhogg.io/secure/checkout/?edd_action=add_to_cart&download_id=${ download.info.id }">${ __('Buy Now!',
-        'groundhogg') }</a>
-                  <a style="display: inline-block" class="gh-button secondary"
-                     href="${ download.info.link }">${ __('View on Groundhogg.io',
-        'groundhogg') }</a></div>
+                         href="https://groundhogg.io/secure/checkout/?edd_action=add_to_cart&download_id=${ download.info.id }">${ __(
+                              'Buy Now!',
+                              'groundhogg') }</a>
+                      <a style="display: inline-block" class="gh-button secondary"
+                         href="${ download.info.link }">${ __('View on Groundhogg.io',
+                              'groundhogg') }</a></div>
               </div>
-              
+
               ${ download.info.content }
           </div>`,
       width: 500,
@@ -110,6 +111,10 @@
         </div>`
 
   }
+
+  const maybeGoToSubscribe = () => acceptedMarketing ? 'community' : 'subscribe'
+  const maybeGoToHollerBox = () => ! Setup.installed.hollerbox ? 'hollerbox' : maybeGoToSubscribe()
+  const maybeGoToMailHawk = () => ! Setup.installed.mailhawk ? 'mailhawk' : maybeGoToHollerBox()
 
   const steps = [
     {
@@ -746,9 +751,7 @@
         })
         $('#skip').on('click', () => next())
       },
-      next: () => isLicensed ? ( !GroundhoggGuidedSetup.mailhawkInstalled
-        ? 'mailhawk'
-        : 'community' ) : 'integrations',
+      next: () => isLicensed ? maybeGoToMailHawk() : 'integrations',
     },
     {
       id: 'integrations',
@@ -763,7 +766,7 @@
                     ${ __('We noticed you\'re using some plugins which we integrate with! Integrations can unlock powerful marketing and segmentation features you can use to increase leads & sales.',
                             'groundhogg') }</p>
                 <div id="services">
-                    ${ GroundhoggGuidedSetup.integrations.map(
+                    ${ Setup.integrations.map(
                             d => downloadTemplate(d)).join('') }
                 </div>
                 <p>
@@ -819,7 +822,7 @@
           const $link = $(e.currentTarget)
 
           let downloadId = $link.data('id')
-          let download = GroundhoggGuidedSetup.integrations.find(
+          let download = Setup.integrations.find(
             d => d.info.id == downloadId)
 
           downloadMoreDetails(download)
@@ -834,9 +837,7 @@
 
         $('#skip').on('click', () => next())
       },
-      next: () => !GroundhoggGuidedSetup.mailhawkInstalled
-        ? 'mailhawk'
-        : 'subscribe',
+      next: () => maybeGoToMailHawk()
     },
     {
       id: 'mailhawk',
@@ -847,6 +848,7 @@
           inside: () => {
             // language=HTML
             return `
+                <img src="${ Setup.assets.mailhawk }" class="plugin-header-image">
                 <h1>${ __('Install MailHawk', 'groundhogg') }</h1>
                 <h2>${ __('A better WordPress SMTP plugin.',
                         'groundhogg') }</h2>
@@ -859,7 +861,7 @@
                             'Install MailHawk!') }</b>
                     </button>
                 </div>
-                <p><b>${ __('Why use an MailHawk?', 'groundhogg') }</b></p>
+                <p><b>${ __('Why use MailHawk?', 'groundhogg') }</b></p>
                 <ul>
                     <li>${ __('Simple & transparent pricing!', 'groundhogg') }
                     </li>
@@ -893,7 +895,7 @@
 
           var data = {
             'action': 'groundhogg_mailhawk_remote_install',
-            'nonce': GroundhoggGuidedSetup.install_mailhawk_nonce,
+            'nonce': Setup.install_mailhawk_nonce,
           }
 
           ajax(data).then(r => {
@@ -906,15 +908,12 @@
                 'groundhogg'),
             })
 
-            next()
+            next( maybeGoToHollerBox() )
           })
 
         })
-        $('#skip').on('click', () => next())
+        $('#skip').on('click', () => next( 'smtp' ))
       },
-      next: () => installedMailhawk ? 'subscribe' : ( isLicensed
-        ? 'community'
-        : 'smtp' ),
     },
     {
       id: 'smtp',
@@ -929,7 +928,7 @@
                     ${ __('We\'ve detected you\'re not using an official Groundhogg SMTP service. For best results we recommend using one of the options listed below.',
                             'groundhogg') }</p>
                 <div id="services">
-                    ${ GroundhoggGuidedSetup.smtpProducts.filter(
+                    ${ Setup.smtpProducts.filter(
                             d => d.info.id !== 90048).
                             map(d => downloadTemplate(d)).
                             join('') }
@@ -975,7 +974,7 @@
           const $link = $(e.currentTarget)
 
           let downloadId = $link.data('id')
-          let download = GroundhoggGuidedSetup.smtpProducts.find(
+          let download = Setup.smtpProducts.find(
             d => d.info.id == downloadId)
 
           downloadMoreDetails(download)
@@ -990,7 +989,78 @@
 
         $('#skip').on('click', () => next())
       },
-      next: () => 'subscribe',
+      next: () => maybeGoToHollerBox(),
+    },
+    {
+      id: 'hollerbox',
+      render: () => {
+
+        return stepTemplate({
+          logo: icons.hollerbox,
+          inside: () => {
+            // language=HTML
+            return `
+                <img src="${ Setup.assets.hollerbox }" class="plugin-header-image">
+                <h1>${ __('Install HollerBox', 'groundhogg') }</h1>
+                <h2>${ __('Popups and Lead Generation for WordPress.', 'groundhogg') }</h2>
+                <p>
+                    ${ __('Use HollerBox to quickly create effective lead generation popups and deploy them on your WordPress site!',
+                            'groundhogg') }</p>
+                <div class="display-flex column gap-20 inside align-center">
+                    <button id="install-hollerbox"
+                            class="gh-button primary medium"><b>${ __(
+                            'Install HollerBox!') }</b>
+                    </button>
+                </div>
+                <p><b>${ __('Why use HollerBox?', 'groundhogg') }</b></p>
+                <ul>
+                    <li>${ __('It\'s free!', 'groundhogg') }</li>
+                    <li>${ __('It integrates with Groundhogg!', 'groundhogg') }</li>
+                    <li>${ __('Works with any WordPress theme.', 'groundhogg') }</li>
+                    <li>${ __('It\'s super lightweight. No jQuery!', 'groundhogg') }</li>
+                    <li>${ __('Requires no design skills!', 'groundhogg') }</li>
+                </ul>
+                <p><i>${ __('HollerBox is a service owned and operated by Groundhogg Inc.', 'groundhogg') }</i></p>
+                <div class="space-between align-center"
+                     style="margin-top: 40px">
+                    <button id="skip" class="gh-button secondary text">
+                        ${ __('I don\'t need more leads.', 'groundhogg') }
+                    </button>
+                </div>`
+          },
+        })
+      },
+      onMount: ({ next, prev }) => {
+
+        $('#install-hollerbox').on('click', (e) => {
+
+          let $btn = $(e.currentTarget)
+          $btn.prop('disabled', true)
+          let { stop } = loadingDots(e.currentTarget)
+
+          var data = {
+            action: 'groundhogg_remote_install_hollerbox',
+            nonce: Setup.install_plugins_nonce,
+            slug: 'holler-box',
+          }
+
+          ajax(data).then(r => {
+
+            stop()
+
+            dialog({
+              message: __(
+                'HollerBox was installed. You will be able to complete the setup at the end.',
+                'groundhogg'),
+            })
+
+            next()
+          })
+
+        })
+        $('#skip').on('click', () => next())
+      },
+      next: () => maybeGoToSubscribe(),
     },
     {
       id: 'subscribe',
@@ -1344,4 +1414,4 @@
 
   })
 
-} )(jQuery)
+} )(jQuery, GroundhoggGuidedSetup)

@@ -643,7 +643,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function run( $contact, $event = null ) {
 
 		if ( ! $this->is_active() ) {
-			return false;
+			return new \WP_Error( 'funnel_inactive', 'The funnel is not active.' );
 		}
 
 		$result = false;

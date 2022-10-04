@@ -105,6 +105,21 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
 
     > .gh-panel {
+
+      &:has(img.plugin-header-image){
+        position: relative;
+        padding-top: 195px;
+        overflow: hidden;
+      }
+
+      img.plugin-header-image{
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+      }
+
       > .inside {
         padding: 40px;
       }

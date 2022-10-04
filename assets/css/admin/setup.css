@@ -61,6 +61,20 @@
   margin: auto;
   margin-bottom: 40px;
 }
+#troubleshooter .step > .gh-panel:has(img.plugin-header-image),
+#guided-setup .step > .gh-panel:has(img.plugin-header-image) {
+  position: relative;
+  padding-top: 195px;
+  overflow: hidden;
+}
+#troubleshooter .step > .gh-panel img.plugin-header-image,
+#guided-setup .step > .gh-panel img.plugin-header-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
 #troubleshooter .step > .gh-panel > .inside,
 #guided-setup .step > .gh-panel > .inside {
   padding: 40px;

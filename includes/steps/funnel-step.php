@@ -154,6 +154,15 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	abstract public function get_group();
 
 	/**
+	 * Get the element group
+	 *
+	 * @return string
+	 */
+	public function get_sub_group() {
+		return 'other';
+	}
+
+	/**
 	 * Get the description
 	 *
 	 * @return string

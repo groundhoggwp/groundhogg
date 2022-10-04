@@ -12,6 +12,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
@@ -51,13 +52,26 @@ class Funnels_Page extends Admin_Page {
 	public $reporting_enabled = false;
 
 	protected function add_ajax_actions() {
-		add_action( 'wp_ajax_gh_get_templates', array( $this, 'get_funnel_templates_ajax' ) );
-		add_action( 'wp_ajax_gh_save_funnel_via_ajax', array( $this, 'ajax_save_funnel' ) );
-		add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
-		add_action( 'wp_ajax_wpgh_delete_funnel_step', array( $this, 'delete_step' ) );
-		add_action( 'wp_ajax_wpgh_duplicate_funnel_step', array( $this, 'duplicate_step' ) );
-		add_action( 'wp_ajax_gh_add_contacts_to_funnel', array( $this, 'add_contacts_to_funnel' ) );
+		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
+
+        add_action( 'wp_ajax_wpgh_get_step_html', [ $this, 'add_step' ] );
+		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
+		add_action( 'wp_ajax_wpgh_duplicate_funnel_step', [ $this, 'duplicate_step' ] );
+
+		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [ $this, 'update_user_full_screen_preference' ] );
 	}
+
+	/**
+     * Whether the editor should appear full screen or not
+     *
+	 * @return void
+	 */
+    function update_user_full_screen_preference(){
+        $is_full_screen = filter_var( get_post_var( 'full_screen', false ), FILTER_VALIDATE_BOOLEAN );
+        update_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', $is_full_screen );
+
+        wp_send_json( $is_full_screen );
+    }
 
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
@@ -201,6 +215,18 @@ class Funnels_Page extends Admin_Page {
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
+
+                add_filter( 'admin_body_class', function ( $class ) {
+
+                    $is_full_screen = get_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', true );
+
+                    if ( $is_full_screen ){
+                        $class .= ' funnel-full-screen';
+                    }
+
+                    return $class;
+                } );
+
 				break;
 			case 'funnel_settings':
 				iframe_compat();
@@ -542,6 +568,18 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+        if ( get_request_var( '_delete_step' ) ){
+
+	        $step_id = absint( get_request_var( '_delete_step' ) );
+	        $step    = new Step( $step_id );
+
+	        if ( ! $step->exists() ) {
+		        wp_send_json_error();
+	        }
+
+	        $step->delete();
+        }
+
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
 
@@ -605,7 +643,7 @@ class Funnels_Page extends Admin_Page {
 
 		$first_step = array_shift( $completed_steps );
 
-		/* if it's not a bench mark then the funnel cant actually ever run */
+		/* if it's not a benchmark then the funnel cant actually ever run */
 		if ( ! $first_step->is_benchmark() ) {
 			return new \WP_Error( 'invalid_config', _x( 'Funnels must start with 1 or more benchmarks', 'warning', 'groundhogg' ) );
 		}

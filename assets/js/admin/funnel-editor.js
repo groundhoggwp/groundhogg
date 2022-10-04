@@ -1,7 +1,7 @@
-(function ($, funnel) {
+( function ($, funnel) {
 
   const { uuid } = Groundhogg.element
-  const { patch, routes } = Groundhogg.api
+  const { patch, routes, ajax } = Groundhogg.api
 
   $.extend(funnel, {
 
@@ -33,7 +33,17 @@
         $step.find('.step-title').text($title.val())
       })
 
-      $document.on('click', '#postbox-container-1 .step', function (e) {
+      $document.on('click', '#full-screen', () => {
+        $(document.body).toggleClass('funnel-full-screen')
+
+        ajax({
+          action: 'gh_funnel_editor_full_screen_preference',
+          full_screen: $(document.body).hasClass('funnel-full-screen') ? 1 : 0
+        })
+
+      })
+
+      $document.on('click', '#step-flow .step:not(.step-placeholder)', function (e) {
 
         if ($(e.target).is('.dashicons, button')) {
           return
@@ -51,7 +61,7 @@
         let group = e.currentTarget.dataset.group
 
         $(`.steps-grid`).addClass('hidden')
-        $(`#${group}`).removeClass('hidden')
+        $(`#${ group }`).removeClass('hidden')
 
         $('#step-toggle button').removeClass('active')
         $(e.currentTarget).addClass('active')
@@ -140,8 +150,8 @@
         prompt('Copy this link.', $('#share-link').val())
       })
 
-      if ( window.location.hash ){
-        this.makeActive( parseInt( window.location.hash.substring(1) ) )
+      if (window.location.hash) {
+        this.makeActive(parseInt(window.location.hash.substring(1)))
       }
 
     },
@@ -162,25 +172,29 @@
       $saveButton.addClass('spin')
 
       var fd = $form.serialize()
-      fd = fd + '&action=gh_save_funnel_via_ajax&version=2'
+      fd += '&action=gh_save_funnel_via_ajax&version=2'
+
+      if (this._delete_step) {
+        fd += '&_delete_step=' + this._delete_step
+      }
 
       // Update the JS meta changes first
       if (Object.keys(this.metaUpdates).length) {
 
-        let changes = Object.keys(this.metaUpdates).map( ID => ({
+        let changes = Object.keys(this.metaUpdates).map(ID => ( {
           ID,
           meta: {
-            ...this.metaUpdates[ID]
-          }
-        }) )
+            ...this.metaUpdates[ID],
+          },
+        } ))
 
-        let response = await patch( routes.v4.steps, changes )
+        let response = await patch(routes.v4.steps, changes)
         // reset
         this.metaUpdates = {}
       }
 
       // Do regular form update
-      adminAjaxRequest(fd,  (response) => {
+      adminAjaxRequest(fd, (response) => {
         handleNotices(response.data.notices)
         this.steps = response.data.data.steps
 
@@ -221,27 +235,28 @@
           let id = uuid()
           // language=HTML
           ui.helper.replaceWith(`
-			  <div class="step step-placeholder ${data.step_group}" id="${id}">
-				  Loading...
-			  </div>`)
+              <div class="step step-placeholder ${ data.step_group }" id="${ id }">
+                  Loading...
+              </div>`)
 
           var self = this
           var $steps = self.getSteps()
           var $settings = self.getSettings()
 
           showSpinner()
-          adminAjaxRequest(data,  (response) => {
+          adminAjaxRequest(data, (response) => {
 
-            this.steps.push( response.data.data.json )
+            this.steps.push(response.data.data.json)
 
             if (self.insertAfterStep) {
-              $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
-            } else {
+              $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
+            }
+            else {
               $steps.prepend(response.data.data.sortable)
             }
 
             $settings.append(response.data.data.settings)
-            $(`#${id}`).remove()
+            $(`#${ id }`).remove()
 
             hideSpinner()
             $(document).trigger('new-step')
@@ -274,27 +289,30 @@
 
       var self = this
 
-      showSpinner()
-
       var $step = $('#' + id)
       var result = confirm(
         'Are you sure you want to delete this step? Any pending events for this step will be removed.')
 
       if (result) {
-        adminAjaxRequest(
-          { action: 'wpgh_delete_funnel_step', step_id: id },
-          function (result) {
-            hideSpinner()
-            $step.remove()
-            var sid = '#settings-' + id
-            var $step_settings = $(sid)
-            $step_settings.remove()
-            $('html').removeClass('active-step')
-            self.save()
+
+        self._delete_step = id
+
+        $step.fadeOut( 400, () => {
+          $step.remove()
+
+          let sid = '#settings-' + id
+          let $step_settings = $(sid)
+
+          $step_settings.remove()
+
+          self.save()
+
+          if (this.currentlyActive === id) {
             self.showAddStep()
-          })
-      } else {
-        hideSpinner()
+          }
+
+          self._delete_step = false
+        })
       }
     },
 
@@ -326,11 +344,12 @@
 
       adminAjaxRequest(obj, (response) => {
 
-        this.steps.push( response.data.data.json )
+        this.steps.push(response.data.data.json)
 
         if (self.insertAfterStep) {
-          $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
-        } else {
+          $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
+        }
+        else {
           $steps.append(response.data.data.sortable)
         }
 
@@ -352,12 +371,12 @@
 
       step.meta = {
         ...step.meta,
-        ..._meta
+        ..._meta,
       }
 
       this.metaUpdates[step.ID] = {
         ...this.metaUpdates[step.ID],
-        ..._meta
+        ..._meta,
       }
 
       return step
@@ -424,4 +443,4 @@
     funnel.init()
   })
 
-})(jQuery, Funnel)
+} )(jQuery, Funnel)

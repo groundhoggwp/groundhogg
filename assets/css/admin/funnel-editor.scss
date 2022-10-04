@@ -28,10 +28,57 @@ $action-green-5: rgba(158, 206, 56, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
-#post-body {
+body {
+  &.folded {
+    #funnel-form {
+      left: 36px;
+    }
+  }
+
+  &.funnel-full-screen {
+    #funnel-form {
+      top: 0;
+      left: 0;
+
+      #full-screen {
+        .dashicons::before {
+          content: "\f189";
+        }
+      }
+    }
+
+    /* Full Screen */
+    #adminmenumain,
+    #wpfooter,
+    #wpadminbar {
+      display: none !important;
+    }
+
+  }
+
+  &:not(.funnel-full-screen) {
+    #close {
+      display: none;
+    }
+  }
+}
+
+#funnel-form {
+  position: fixed;
+  top: 32px;
+  left: 160px;
+  bottom: 0;
+  right: 0;
+
   display: flex;
-  align-items: stretch;
-  margin: 0;
+  flex-direction: column;
+
+  #funnel-builder {
+    display: flex;
+    align-items: stretch;
+    margin: 0;
+    flex-grow: 1;
+  }
 }
 
 #poststuff #post-body.columns-2 {
@@ -44,11 +91,16 @@ $background-color: #F6F9FB;
 #adminmenumain,
 #wpfooter,
 #wpadminbar {
+  //display: none !important;
+}
+
+#wpfooter {
   display: none !important;
 }
 
+
 html {
-  padding: 0 !important;
+  //padding: 0 !important;
 }
 
 /* END Full Screen */
@@ -101,7 +153,58 @@ html {
   margin: 1px 2px;
 }
 
-#postbox-container-2-inner {
+#step-settings-container {
+  /*padding: 10px 20px;*/
+  box-sizing: border-box;
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+
+  .sub-header {
+    background: white;
+    border-bottom: 0;
+    box-shadow: $box-shadow;
+    left: 340px;
+    display: flex;
+    padding: 5px;
+    position: static;
+    z-index: 99;
+
+    .toolbar-buttons {
+      margin-left: auto;
+      display: flex;
+      justify-content: flex-end;
+      margin-right: 10px;
+
+      .gh-button {
+        gap: 5px;
+      }
+
+      .dashicons {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+      }
+    }
+  }
+}
+
+/*.saving #poststuff{*/
+/*    opacity: 0.5;*/
+/*}*/
+
+.step-settings {
+  padding: 30px;
+}
+
+#step-settings-inner {
+
+  position: absolute;
+  top: 45px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
 
   .benchmark-settings {
     //.gh-checkbox-label {
@@ -234,17 +337,14 @@ html {
 
 .funnel-editor-header {
   z-index: 999;
-  top: 0;
-  left: 0;
-  right: 0;
   box-sizing: border-box;
-  position: fixed;
   height: 60px;
   background: #FFFFFF;
   border-bottom: 1px solid #ccd0d4;
   display: flex;
   gap: 10px;
   align-items: center;
+  padding-right: 10px;
   //width: inherit;
 
   svg {
@@ -282,21 +382,14 @@ html {
   }
 
   #close {
-    .exit {
-      background-color: #fff;
-      color: #909090;
-      border-left: 1px solid #d3d3d3;
-      text-decoration: none;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    #close-button {
+
+      padding: 12px;
 
       .dashicons {
-        width: 30px;
-        height: 30px;
-        font-size: 30px;
+        //width: 20px;
+        //height: 20px;
+        //font-size: 20px;
       }
     }
   }
@@ -315,32 +408,6 @@ html {
   padding: 8px;
   line-height: 1em;
   cursor: pointer;
-}
-
-.funnel-editor-header.sub-header {
-  top: 60px;
-  height: 47px;
-  background: white;
-  border-bottom: 0;
-  box-shadow: $box-shadow;
-  left: 340px;
-
-  .toolbar-buttons {
-    margin-left: auto;
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 10px;
-
-    .gh-button {
-      gap: 5px;
-    }
-
-    .dashicons {
-      font-size: 16px;
-      height: 16px;
-      width: 16px;
-    }
-  }
 }
 
 .funnel-editor-header div {
@@ -505,7 +572,7 @@ button.button.save-button {
   }
 }
 
-#postbox-container-1 {
+#step-flow {
 
   width: 340px;
   flex-shrink: 0;
@@ -513,12 +580,16 @@ button.button.save-button {
 
   .fixed-inside {
     bottom: 0;
-    top: 60px;
+    top: 0;
+    right: 0;
+    left: 0;
     padding: 0 20px;
-    width: 340px;
     box-sizing: border-box;
-    position: fixed;
+    position: absolute;
     overflow-y: scroll;
+
+    background-image: radial-gradient(circle at 1px 1px, $primary-dark-10 1px, transparent 0);
+    background-size: 20px 20px;
   }
 
   .wpgh-element {
@@ -565,6 +636,19 @@ button.button.save-button {
     }
   }
 
+  //.step.action + .step.action {
+  //
+  //  &::before {
+  //    content: '';
+  //    height: 10px;
+  //    position: absolute;
+  //    left: calc( 50% - 1px );
+  //    top: -12px;
+  //    width: 2px;
+  //    background: $primary-dark;
+  //  }
+  //}
+
   .step.benchmark + .step.action {
 
     margin-top: 40px;
@@ -600,6 +684,7 @@ button.button.save-button {
       button.gh-button {
         padding: 5px;
         font-size: 16px;
+
         .dashicons {
           font-size: 16px;
           height: 16px;
@@ -608,7 +693,7 @@ button.button.save-button {
       }
     }
 
-    .step-labels{
+    .step-labels {
 
       position: absolute;
       right: 3px;
@@ -622,6 +707,10 @@ button.button.save-button {
         border-radius: 3px;
         width: max-content;
         background-color: $primary-dark;
+
+        &.logic-tag{
+          background-color: $secondary-purple !important;
+        }
       }
     }
 
@@ -679,7 +768,7 @@ button.button.save-button {
         border-color: $benchmark-orange;
       }
 
-      .step-labels .step-label{
+      .step-labels .step-label {
         background-color: $benchmark-orange;
       }
 
@@ -710,7 +799,7 @@ button.button.save-button {
 }
 
 
-#postbox-container-1 .step.step h2 {
+#step-flow .step.step h2 {
   cursor: pointer !important;
 }
 
@@ -723,12 +812,12 @@ button.button.save-button {
   float: right;
 }
 
-#postbox-container-1 .step .add-step {
+#step-flow .step .add-step {
   display: none;
   padding: 0 5px 1px;
 }
 
-#postbox-container-1 .step:hover .add-step {
+#step-flow .step:hover .add-step {
   display: inline-block;
   position: absolute;
   left: 45%;
@@ -736,21 +825,8 @@ button.button.save-button {
   z-index: 9999999999999;
 }
 
-#postbox-container-1 .step .add-step .dashicons {
+#step-flow .step .add-step .dashicons {
   vertical-align: middle;
-}
-
-#postbox-container-2 {
-  /*padding: 10px 20px;*/
-  box-sizing: border-box;
-}
-
-/*.saving #poststuff{*/
-/*    opacity: 0.5;*/
-/*}*/
-
-.step-settings {
-  padding: 30px;
 }
 
 #funnel-chart {
@@ -1017,6 +1093,9 @@ input, select, textarea {
   right: 20px;
   bottom: 20px;
   z-index: 99999999;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 #groundhogg-notices .notice {

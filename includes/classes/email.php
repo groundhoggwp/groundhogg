@@ -461,6 +461,15 @@ class Email extends Base_Object_With_Meta {
 			return $matches[1] . $clean_url . $matches[3];
 		}
 
+		$local_hostname = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		// target hostname and local hostname are the same
+		// in that case just use the path as the hostname is not needed.
+		if ( wp_parse_url( $clean_url, PHP_URL_HOST ) === $local_hostname ) {
+			$regex     = preg_quote( $local_hostname );
+			$clean_url = preg_replace( "@https?://$regex@", '', $clean_url );
+		}
+
 		return $matches[1] . trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) ) . $matches[3];
 	}
 
@@ -772,7 +781,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// Add list-id header to marketing emails
-		if ( ! $this->is_transactional() ){
+		if ( ! $this->is_transactional() ) {
 			$defaults['list-id'] = wp_parse_url( home_url(), PHP_URL_HOST );
 		}
 

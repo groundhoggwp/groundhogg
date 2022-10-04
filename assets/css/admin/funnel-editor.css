@@ -1,7 +1,40 @@
-#post-body {
+@charset "UTF-8";
+body.folded #funnel-form {
+  left: 36px;
+}
+body.funnel-full-screen {
+  /* Full Screen */
+}
+body.funnel-full-screen #funnel-form {
+  top: 0;
+  left: 0;
+}
+body.funnel-full-screen #funnel-form #full-screen .dashicons::before {
+  content: "";
+}
+body.funnel-full-screen #adminmenumain,
+body.funnel-full-screen #wpfooter,
+body.funnel-full-screen #wpadminbar {
+  display: none !important;
+}
+body:not(.funnel-full-screen) #close {
+  display: none;
+}
+
+#funnel-form {
+  position: fixed;
+  top: 32px;
+  left: 160px;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+#funnel-form #funnel-builder {
   display: flex;
   align-items: stretch;
   margin: 0;
+  flex-grow: 1;
 }
 
 #poststuff #post-body.columns-2 {
@@ -11,14 +44,8 @@
 }
 
 /* Full Screen */
-#adminmenumain,
-#wpfooter,
-#wpadminbar {
+#wpfooter {
   display: none !important;
-}
-
-html {
-  padding: 0 !important;
 }
 
 /* END Full Screen */
@@ -70,40 +97,87 @@ html {
   margin: 1px 2px;
 }
 
-#postbox-container-2-inner .notice {
+#step-settings-container {
+  /*padding: 10px 20px;*/
+  box-sizing: border-box;
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+}
+#step-settings-container .sub-header {
+  background: white;
+  border-bottom: 0;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  left: 340px;
+  display: flex;
+  padding: 5px;
+  position: static;
+  z-index: 99;
+}
+#step-settings-container .sub-header .toolbar-buttons {
+  margin-left: auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 10px;
+}
+#step-settings-container .sub-header .toolbar-buttons .gh-button {
+  gap: 5px;
+}
+#step-settings-container .sub-header .toolbar-buttons .dashicons {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+
+/*.saving #poststuff{*/
+/*    opacity: 0.5;*/
+/*}*/
+.step-settings {
+  padding: 30px;
+}
+
+#step-settings-inner {
+  position: absolute;
+  top: 45px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+#step-settings-inner .notice {
   margin: 0;
   border-radius: 5px;
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
 }
-#postbox-container-2-inner .step:not(.hidden) .custom-settings .gh-rows-and-columns label {
+#step-settings-inner .step:not(.hidden) .custom-settings .gh-rows-and-columns label {
   font-weight: 500;
 }
-#postbox-container-2-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings {
+#step-settings-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings {
   padding: 0;
 }
-#postbox-container-2-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings .mce-panel {
+#step-settings-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings .mce-panel {
   box-shadow: none;
   border-top: none;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-warnings {
+#step-settings-inner .step:not(.hidden) .step-warnings {
   display: flex;
   gap: 10px;
   flex-direction: column;
   margin-bottom: 20px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex {
+#step-settings-inner .step:not(.hidden) .step-flex {
   display: flex;
   gap: 30px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-notes {
+#step-settings-inner .step:not(.hidden) .step-flex .step-notes {
   display: flex;
   flex-direction: column;
   gap: 30px;
   width: 240px;
   flex-shrink: 0;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-notes .step-notes-textarea {
+#step-settings-inner .step:not(.hidden) .step-flex .step-notes .step-notes-textarea {
   width: 100%;
   background: rgba(16, 38, 64, 0.05);
   border-radius: 5px;
@@ -111,33 +185,33 @@ html {
   border: none;
   padding: 12px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit {
   width: 100%;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit .custom-settings {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit .custom-settings {
   padding: 0 20px 10px 20px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table {
   border-radius: 5px;
   overflow: hidden;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:not(:last-child) {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:not(:last-child) {
   margin-bottom: 10px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:first-child {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:first-child {
   margin-top: 20px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions th:last-child {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions th:last-child {
   width: 70px;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions td:last-child > div {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions td:last-child > div {
   display: none;
 }
-#postbox-container-2-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions tbody tr:hover td:last-child > div {
+#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions tbody tr:hover td:last-child > div {
   display: flex;
 }
 
@@ -152,17 +226,14 @@ html {
 
 .funnel-editor-header {
   z-index: 999;
-  top: 0;
-  left: 0;
-  right: 0;
   box-sizing: border-box;
-  position: fixed;
   height: 60px;
   background: #FFFFFF;
   border-bottom: 1px solid #ccd0d4;
   display: flex;
   gap: 10px;
   align-items: center;
+  padding-right: 10px;
 }
 .funnel-editor-header svg {
   height: 60px;
@@ -191,23 +262,9 @@ html {
   width: 100%;
   margin-right: auto;
 }
-.funnel-editor-header #close .exit {
-  background-color: #fff;
-  color: #909090;
-  border-left: 1px solid #d3d3d3;
-  text-decoration: none;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.funnel-editor-header #close #close-button {
+  padding: 12px;
 }
-.funnel-editor-header #close .exit .dashicons {
-  width: 30px;
-  height: 30px;
-  font-size: 30px;
-}
-
 .step-title-view,
 .title-view {
   line-height: 44px;
@@ -221,29 +278,6 @@ html {
   padding: 8px;
   line-height: 1em;
   cursor: pointer;
-}
-
-.funnel-editor-header.sub-header {
-  top: 60px;
-  height: 47px;
-  background: white;
-  border-bottom: 0;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-  left: 340px;
-}
-.funnel-editor-header.sub-header .toolbar-buttons {
-  margin-left: auto;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 10px;
-}
-.funnel-editor-header.sub-header .toolbar-buttons .gh-button {
-  gap: 5px;
-}
-.funnel-editor-header.sub-header .toolbar-buttons .dashicons {
-  font-size: 16px;
-  height: 16px;
-  width: 16px;
 }
 
 .funnel-editor-header div {
@@ -383,21 +417,24 @@ button.button.save-button {
   align-items: center;
 }
 
-#postbox-container-1 {
+#step-flow {
   width: 340px;
   flex-shrink: 0;
   position: relative;
 }
-#postbox-container-1 .fixed-inside {
+#step-flow .fixed-inside {
   bottom: 0;
-  top: 60px;
+  top: 0;
+  right: 0;
+  left: 0;
   padding: 0 20px;
-  width: 340px;
   box-sizing: border-box;
-  position: fixed;
+  position: absolute;
   overflow-y: scroll;
+  background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
+  background-size: 20px 20px;
 }
-#postbox-container-1 .wpgh-element {
+#step-flow .wpgh-element {
   /*height: 112px;*/
   text-align: center;
   width: 60px;
@@ -406,19 +443,19 @@ button.button.save-button {
   border-radius: 5px;
   cursor: grabbing;
 }
-#postbox-container-1 .wpgh-element[data-group=action] {
+#step-flow .wpgh-element[data-group=action] {
   background-color: rgba(158, 206, 56, 0.5);
 }
-#postbox-container-1 .wpgh-element[data-group=benchmark] {
+#step-flow .wpgh-element[data-group=benchmark] {
   background-color: rgba(245, 129, 21, 0.25);
 }
-#postbox-container-1 .wpgh-element p {
+#step-flow .wpgh-element p {
   display: none;
 }
-#postbox-container-1 .step.action + .step.benchmark {
+#step-flow .step.action + .step.benchmark {
   margin-top: 40px;
 }
-#postbox-container-1 .step.action + .step.benchmark::before {
+#step-flow .step.action + .step.benchmark::before {
   content: "Until...";
   position: absolute;
   padding: 3px 8px;
@@ -430,10 +467,10 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #f58115;
 }
-#postbox-container-1 .step.benchmark + .step.benchmark {
+#step-flow .step.benchmark + .step.benchmark {
   margin-top: 40px;
 }
-#postbox-container-1 .step.benchmark + .step.benchmark::before {
+#step-flow .step.benchmark + .step.benchmark::before {
   content: "Or...";
   position: absolute;
   padding: 3px 8px;
@@ -445,10 +482,10 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #6c19ad;
 }
-#postbox-container-1 .step.benchmark + .step.action {
+#step-flow .step.benchmark + .step.action {
   margin-top: 40px;
 }
-#postbox-container-1 .step.benchmark + .step.action::before {
+#step-flow .step.benchmark + .step.action::before {
   content: "Then...";
   position: absolute;
   padding: 3px 8px;
@@ -460,7 +497,7 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #9ece38;
 }
-#postbox-container-1 .step {
+#step-flow .step {
   border-radius: 5px;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   margin: 10px 0;
@@ -468,32 +505,32 @@ button.button.save-button {
   border: 2px solid transparent;
   cursor: pointer;
 }
-#postbox-container-1 .step:hover .actions {
+#step-flow .step:hover .actions {
   visibility: visible;
 }
-#postbox-container-1 .step .actions {
+#step-flow .step .actions {
   position: absolute;
   top: 3px;
   right: 3px;
   display: flex;
   visibility: hidden;
 }
-#postbox-container-1 .step .actions button.gh-button {
+#step-flow .step .actions button.gh-button {
   padding: 5px;
   font-size: 16px;
 }
-#postbox-container-1 .step .actions button.gh-button .dashicons {
+#step-flow .step .actions button.gh-button .dashicons {
   font-size: 16px;
   height: 16px;
   width: 16px;
 }
-#postbox-container-1 .step .step-labels {
+#step-flow .step .step-labels {
   position: absolute;
   right: 3px;
   bottom: 3px;
   gap: 3px;
 }
-#postbox-container-1 .step .step-labels .step-label {
+#step-flow .step .step-labels .step-label {
   font-size: 10px;
   padding: 1px 6px;
   color: white;
@@ -501,56 +538,59 @@ button.button.save-button {
   width: max-content;
   background-color: #102640;
 }
-#postbox-container-1 .step.step-placeholder {
+#step-flow .step .step-labels .step-label.logic-tag {
+  background-color: #6c19ad !important;
+}
+#step-flow .step.step-placeholder {
   justify-content: center;
   padding: 20px;
   margin: 10px 0;
 }
-#postbox-container-1 .step.has-errors {
+#step-flow .step.has-errors {
   border-left-color: #ffee58 !important;
 }
-#postbox-container-1 .step.has-errors.active {
+#step-flow .step.has-errors.active {
   border-color: #ffee58 !important;
 }
-#postbox-container-1 .step > .hndle {
+#step-flow .step > .hndle {
   padding: 10px 55px 10px 10px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
-#postbox-container-1 .step > .hndle .hndle-icon {
+#step-flow .step > .hndle .hndle-icon {
   width: 40px;
   height: 40px;
 }
-#postbox-container-1 .step > .hndle > div {
+#step-flow .step > .hndle > div {
   display: flex;
   flex-direction: column;
 }
-#postbox-container-1 .step > .hndle > div span.step-title {
+#step-flow .step > .hndle > div span.step-title {
   font-size: 14px;
 }
-#postbox-container-1 .step > .hndle > div span.step-name {
+#step-flow .step > .hndle > div span.step-name {
   /*margin-left:6px;*/
   font-size: 8px;
   font-weight: 500;
   text-transform: uppercase;
 }
-#postbox-container-1 .step.benchmark {
+#step-flow .step.benchmark {
   border-left-color: #f58115;
 }
-#postbox-container-1 .step.benchmark span.step-name {
+#step-flow .step.benchmark span.step-name {
   color: #f58115;
 }
-#postbox-container-1 .step.benchmark.active {
+#step-flow .step.benchmark.active {
   border-color: #f58115;
 }
-#postbox-container-1 .step.benchmark .step-labels .step-label {
+#step-flow .step.benchmark .step-labels .step-label {
   background-color: #f58115;
 }
-#postbox-container-1 .step.benchmark:first-child {
+#step-flow .step.benchmark:first-child {
   margin-top: 40px;
 }
-#postbox-container-1 .step.benchmark:first-child::before {
+#step-flow .step.benchmark:first-child::before {
   content: "Start the funnel when...";
   position: absolute;
   padding: 3px 8px;
@@ -562,17 +602,17 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #f58115;
 }
-#postbox-container-1 .step.action {
+#step-flow .step.action {
   border-left-color: #9ece38;
 }
-#postbox-container-1 .step.action span.step-name {
+#step-flow .step.action span.step-name {
   color: #9ece38;
 }
-#postbox-container-1 .step.action.active {
+#step-flow .step.action.active {
   border-color: #9ece38;
 }
 
-#postbox-container-1 .step.step h2 {
+#step-flow .step.step h2 {
   cursor: pointer !important;
 }
 
@@ -585,12 +625,12 @@ button.button.save-button {
   float: right;
 }
 
-#postbox-container-1 .step .add-step {
+#step-flow .step .add-step {
   display: none;
   padding: 0 5px 1px;
 }
 
-#postbox-container-1 .step:hover .add-step {
+#step-flow .step:hover .add-step {
   display: inline-block;
   position: absolute;
   left: 45%;
@@ -598,20 +638,8 @@ button.button.save-button {
   z-index: 9999999999999;
 }
 
-#postbox-container-1 .step .add-step .dashicons {
+#step-flow .step .add-step .dashicons {
   vertical-align: middle;
-}
-
-#postbox-container-2 {
-  /*padding: 10px 20px;*/
-  box-sizing: border-box;
-}
-
-/*.saving #poststuff{*/
-/*    opacity: 0.5;*/
-/*}*/
-.step-settings {
-  padding: 30px;
 }
 
 #funnel-chart {
@@ -827,6 +855,9 @@ input, select, textarea {
   right: 20px;
   bottom: 20px;
   z-index: 99999999;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 #groundhogg-notices .notice {

@@ -6660,6 +6660,10 @@ function is_copyable_file( $file ) {
  */
 function process_events( $contacts = [] ) {
 
+    if ( empty( $contacts ) ){
+        return false;
+    }
+
 	// Event queue is already in progress
 	if ( Event_Queue::is_processing() ) {
 		return true;
