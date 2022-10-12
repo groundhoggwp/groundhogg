@@ -421,6 +421,55 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Whether this step can actually be completed
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return bool
+	 */
+	public function can_complete( $contact = null ) {
+		// Actions cannot be completed.
+		if ( $this->is_action() || ! $this->is_active() ) {
+			return false;
+		}
+
+		// Check if starting
+		if ( $this->is_starting() || $this->is_entry() ) {
+			return true;
+		} // If inner step, check if contact is at a step before this one.
+		else if ( $this->is_inner() ) {
+
+			// get the current funnel step
+			$current_order = $this->get_current_funnel_step_order( $contact );
+
+			// If the step order is < than this one, return true.
+			if ( $current_order && $current_order < $this->get_order() ) {
+				return true;
+			}
+		}
+
+		return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
+	}
+
+	/**
+	 * Enqueue if and only if the step can complete
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return bool
+	 */
+	public function benchmark_enqueue( $contact ){
+
+		if ( ! $this->can_complete($contact) ){
+			return false;
+		}
+
+		$this->enqueue( $contact );
+
+		return true;
+	}
+
+	/**
 	 * Create an event and add it to the queue
 	 *
 	 * @param Contact $contact
@@ -475,37 +524,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		];
 
 		return $this->get_event_queue_db()->add( $event );
-	}
-
-	/**
-	 * Whether this step can actually be completed
-	 *
-	 * @param $contact Contact
-	 *
-	 * @return bool
-	 */
-	public function can_complete( $contact = null ) {
-		// Actions cannot be completed.
-		if ( $this->is_action() || ! $this->is_active() ) {
-			return false;
-		}
-
-		// Check if starting
-		if ( $this->is_starting() || $this->is_entry() ) {
-			return true;
-		} // If inner step, check if contact is at a step before this one.
-		else if ( $this->is_inner() ) {
-
-			// get the current funnel step
-			$current_order = $this->get_current_funnel_step_order( $contact );
-
-			// If the step order is < than this one, return true.
-			if ( $current_order && $current_order < $this->get_order() ) {
-				return true;
-			}
-		}
-
-		return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
 	}
 
 	/**

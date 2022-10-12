@@ -150,34 +150,40 @@ body:not(.funnel-full-screen) #close {
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
 }
-#step-settings-inner .step:not(.hidden) .custom-settings .gh-rows-and-columns label {
+#step-settings-inner .step:not(.active) {
+  display: none;
+}
+#step-settings-inner .step.active .custom-settings {
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+#step-settings-inner .step.active .custom-settings .gh-rows-and-columns label {
   font-weight: 500;
 }
-#step-settings-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings {
+#step-settings-inner .step.active.action.apply_note .step-flex .step-edit .custom-settings {
   padding: 0;
 }
-#step-settings-inner .step:not(.hidden).action.apply_note .step-flex .step-edit .custom-settings .mce-panel {
+#step-settings-inner .step.active.action.apply_note .step-flex .step-edit .custom-settings .mce-panel {
   box-shadow: none;
   border-top: none;
 }
-#step-settings-inner .step:not(.hidden) .step-warnings {
+#step-settings-inner .step.active .step-warnings {
   display: flex;
   gap: 10px;
   flex-direction: column;
   margin-bottom: 20px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex {
+#step-settings-inner .step.active .step-flex {
   display: flex;
   gap: 30px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-notes {
+#step-settings-inner .step.active .step-flex .step-notes {
   display: flex;
   flex-direction: column;
   gap: 30px;
   width: 240px;
   flex-shrink: 0;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-notes .step-notes-textarea {
+#step-settings-inner .step.active .step-flex .step-notes .step-notes-textarea {
   width: 100%;
   background: rgba(16, 38, 64, 0.05);
   border-radius: 5px;
@@ -185,33 +191,33 @@ body:not(.funnel-full-screen) #close {
   border: none;
   padding: 12px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit {
+#step-settings-inner .step.active .step-flex .step-edit {
   width: 100%;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit .custom-settings {
+#step-settings-inner .step.active .step-flex .step-edit .custom-settings {
   padding: 0 20px 10px 20px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table {
   border-radius: 5px;
   overflow: hidden;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:not(:last-child) {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table:not(:last-child) {
   margin-bottom: 10px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table:first-child {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table:first-child {
   margin-top: 20px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions th:last-child {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table.has-actions th:last-child {
   width: 70px;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions td:last-child > div {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table.has-actions td:last-child > div {
   display: none;
 }
-#step-settings-inner .step:not(.hidden) .step-flex .step-edit table.wp-list-table.has-actions tbody tr:hover td:last-child > div {
+#step-settings-inner .step.active .step-flex .step-edit table.wp-list-table.has-actions tbody tr:hover td:last-child > div {
   display: flex;
 }
 
@@ -361,6 +367,9 @@ button.button.save-button {
 .step-icon img {
   margin: 0 auto 0 auto;
   width: 80%;
+}
+.step-icon img[src*=svg] {
+  width: 60%;
 }
 
 .hndle label {
@@ -578,6 +587,7 @@ button.button.save-button {
 #step-flow .step.benchmark {
   border-left-color: #f58115;
 }
+#step-flow .step.benchmark .hndle-icon,
 #step-flow .step.benchmark span.step-name {
   color: #f58115;
 }
@@ -759,12 +769,9 @@ table.embed-options td {
 }
 
 .step-title-wrap {
-  background: #FFF;
-  border-bottom: 1px solid #ccd0d4;
   padding: 8px 10px 8px 70px;
   height: 60px;
   position: relative;
-  border-radius: 5px 5px 0 0;
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
@@ -776,9 +783,12 @@ table.embed-options td {
   top: 0;
   left: 0;
   height: 60px;
-  background: #ffffff;
   vertical-align: middle;
-  border-right: 1px solid #ccd0d4;
+  border-right: 1px solid rgba(16, 38, 64, 0.15);
+  box-sizing: border-box;
+}
+.step-title-wrap .step-icon.is-svg {
+  padding: 8px;
 }
 .step-title-wrap .step-title-edit {
   width: 100%;
@@ -892,6 +902,180 @@ input, select, textarea {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.benchmark.web_form .after-submit .success-message {
+  display: none;
+}
+.benchmark.web_form .after-submit .success-redirect {
+  display: block;
+}
+.benchmark.web_form .after-submit.ajax-enabled .success-message {
+  display: block;
+}
+.benchmark.web_form .after-submit.ajax-enabled .success-redirect {
+  display: none;
+}
+
+.form-builder-main {
+  margin-bottom: 30px;
+  display: flex;
+  gap: 20px;
+}
+.form-builder-main .fields-editor,
+.form-builder-main .form-preview-wrap {
+  margin-top: 0 !important;
+  width: 100%;
+}
+.form-builder-main .fields-editor *,
+.form-builder-main .form-preview-wrap * {
+  box-sizing: border-box;
+}
+.form-builder-main .fields-editor {
+  max-width: 400px;
+  width: 50%;
+  flex-shrink: 0;
+}
+.form-builder-main .fields-editor .add-field {
+  width: 100%;
+  margin-top: 10px;
+}
+.form-builder-main .fields-editor .special-fields {
+  margin-top: 20px;
+}
+.form-builder-main .fields-editor .form-fields, .form-builder-main .fields-editor .special-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-builder-main .fields-editor .form-fields .field-placeholder, .form-builder-main .fields-editor .special-fields .field-placeholder {
+  background: #0001;
+  border-radius: 5px;
+}
+.form-builder-main .fields-editor .form-fields .form-field, .form-builder-main .fields-editor .special-fields .form-field {
+  background: #FFFFFF;
+  border-radius: 3px;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  overflow: hidden;
+  cursor: pointer;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings, .form-builder-main .fields-editor .special-fields .form-field .settings {
+  box-sizing: border-box;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row, .form-builder-main .fields-editor .special-fields .form-field .settings .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row > label, .form-builder-main .fields-editor .special-fields .form-field .settings .row > label {
+  flex-basis: 150px;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row > .setting, .form-builder-main .fields-editor .special-fields .form-field .settings .row > .setting {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row > .setting input, .form-builder-main .fields-editor .special-fields .form-field .settings .row > .setting input {
+  width: 100%;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row .input-wrap, .form-builder-main .fields-editor .special-fields .form-field .settings .row .input-wrap {
+  width: 100%;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings .row:not(:last-child), .form-builder-main .fields-editor .special-fields .form-field .settings .row:not(:last-child) {
+  margin-bottom: 5px;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings-tabs, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs {
+  /*display: flex;*/
+  /*justify-content: center;*/
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 10px 10px 0 10px;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings-tabs a.settings-tab, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs a.settings-tab {
+  color: #2c3338;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab {
+  border-width: 1px 1px 0 1px;
+  border-color: rgba(16, 38, 64, 0.15);
+  border-style: solid;
+  display: inline-block;
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+  border-radius: 3px 3px 0 0;
+  margin: 0 2px;
+  font-size: 13px;
+  padding: 4px 8px 2px 8px;
+  /*height: ?22px;*/
+  text-align: center;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+.form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab.active, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab.active {
+  font-weight: 500;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+  background: #FFFFFF;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header, .form-builder-main .fields-editor .special-fields .form-field .field-header {
+  padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header .field-type, .form-builder-main .fields-editor .special-fields .form-field .field-header .field-type {
+  font-size: 8px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header .field-label, .form-builder-main .fields-editor .special-fields .form-field .field-header .field-label {
+  font-size: 13px;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header .actions, .form-builder-main .fields-editor .special-fields .form-field .field-header .actions {
+  display: flex;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header .actions button, .form-builder-main .fields-editor .special-fields .form-field .field-header .actions button {
+  background: #FFFFFF;
+  width: 40px;
+  height: 40px;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  border-left: 1px solid rgba(16, 38, 64, 0.15);
+  cursor: pointer;
+}
+.form-builder-main .fields-editor .form-fields .form-field .field-header .actions button:hover, .form-builder-main .fields-editor .special-fields .form-field .field-header .actions button:hover {
+  background: #f1f1f1;
+}
+
+.inline-tag-picker {
+  position: relative;
+  border: 1px solid #8c8f94;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.inline-tag-picker .gh-panel {
+  display: none;
+}
+.inline-tag-picker.show .gh-panel {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #FFFFFF;
+  padding: 5px;
+}
+.inline-tag-picker svg {
+  height: 20px;
+  width: 20px;
 }
 
 /*# sourceMappingURL=funnel-editor.css.map */

@@ -568,7 +568,7 @@ class HTML {
 			'title'   => '',
 		) );
 
-		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a['label'] ) ? '&nbsp;' . $a['label'] : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
+		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a['label'] ) ? '<span class="checkbox-label">' . $a['label'] . '</span>' : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
 
 		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}

@@ -1,11 +1,5 @@
 <?php
 
-
-//namespace Groundhogg\Blocks\Gutenberg_New;
-
-use function Groundhogg\get_db;
-
-
 /**
  * Get form HTML to display in a Groundhogg Gutenberg block.
  *
@@ -30,7 +24,7 @@ function get_gutenberg_form_html( $attr ) {
 
 	ob_start();
 
-	echo "<div class='" . $attr['className'] . "'>";
+	echo "<div class='" . \Groundhogg\get_array_var( $attr, 'className', '' ) . "'>";
 
 	echo do_shortcode( ' [gh_form id="' . $id . '" title="' . $title . '"] ' );
 
@@ -39,8 +33,8 @@ function get_gutenberg_form_html( $attr ) {
 	return ob_get_clean();
 }
 
-
 add_action( 'init', 'groundhogg_gutenberg_form_selector_init' );
+
 function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 
 
@@ -54,14 +48,6 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 		'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
 	);
 
-	// Register block styles for both frontend + backend.
-	wp_register_style(
-		'groundhogg-form-style-css', // Handle.
-		plugins_url( 'dist/blocks.style.build.css', dirname( __FILE__ ) ), // Block style CSS.
-		is_admin() ? array( 'wp-editor' ) : null, // Dependency to include the CSS after it.
-		null // filemtime( plugin_dir_path( __DIR__ ) . 'dist/blocks.style.build.css' ) // Version: File modification time.
-	);
-
 	// Register block editor script for backend.
 	wp_register_script(
 		'groundhogg-form-block-js', // Handle.
@@ -71,15 +57,7 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 		true // Enqueue the script in the footer.
 	);
 
-	// Register block editor styles for backend.
-	wp_register_style(
-		'groundhogg-form-block-editor-css', // Handle.
-		plugins_url( 'dist/blocks.editor.build.css', dirname( __FILE__ ) ), // Block editor CSS.
-		array( 'wp-edit-blocks' ), // Dependency to include the CSS after it.
-		null // filemtime( plugin_dir_path( __DIR__ ) . 'dist/blocks.editor.build.css' ) // Version: File modification time.
-	);
-
-	$forms = get_db( 'steps' )->query( [ 'step_type' => 'form_fill' ] );
+	$forms = \Groundhogg\get_form_list();
 
 	wp_localize_script(
 		'groundhogg-form-block-js',
@@ -107,11 +85,8 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 		),
 
 		'render_callback' => 'get_gutenberg_form_html',
-		'style'           => 'groundhogg-form-style-css',
-		// Enqueue blocks.build.js in the editor only.
+		'style'           => 'groundhogg-form',
 		'editor_script'   => 'groundhogg-form-block-js',
-		// Enqueue blocks.editor.build.css in the editor only.
-		'editor_style'    => 'groundhogg-form-block-editor-css',
 
 	) );
 

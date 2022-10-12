@@ -407,7 +407,7 @@ class Contact_Query {
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
 		if ( strlen( $this->query_vars['search'] ) ) {
-			$full_name = split_name( $this->query_vars['search'] );
+			$full_name = split_name( trim( $this->query_vars['search'] ) );
 
 			if ( $full_name[0] && $full_name[1] ) {
 				$this->query_vars['first_name']         = $full_name[0];
@@ -944,7 +944,7 @@ class Contact_Query {
 				$search_columns = array( 'first_name', 'last_name', 'email' );
 			}
 
-			$where['search'] = $this->get_search_sql( $this->query_vars['search'], $search_columns );
+			$where['search'] = $this->get_search_sql( trim( $this->query_vars['search'] ), $search_columns );
 		}
 
 		if ( strlen( $this->query_vars['first_name'] ) || strlen( $this->query_vars['first_name_compare'] ) ) {

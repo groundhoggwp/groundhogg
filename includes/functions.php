@@ -835,6 +835,9 @@ function array_to_atts( $atts ) {
 		$key = strtolower( $key );
 
 		switch ( $key ) {
+			case 'class':
+                $value = is_array( $value ) ? trim( implode( ' ', $value ) ) : $value;
+                break;
 			case 'style':
 				$value = array_to_css( $value );
 				break;
@@ -1665,7 +1668,7 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 function get_form_list() {
 
 	$forms = get_db( 'steps' )->query( [
-		'step_type' => 'form_fill'
+		'step_type' => [ 'form_fill', 'web_form' ]
 	] );
 
 	$form_options = array();
@@ -5573,7 +5576,6 @@ function uninstall_groundhogg() {
 	/** Cleanup Cron Events */
 	wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
-	wp_clear_scheduled_hook( Telemetry::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
 	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
 	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );

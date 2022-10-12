@@ -6,16 +6,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 include GROUNDHOGG_PATH . 'templates/managed-page.php';
 
 use Groundhogg\Form\Form;
+use Groundhogg\Form\Form_v2;
 
 
 $slug = get_query_var( 'slug' );
 $step = new Step( $slug );
 
-if ( ! $step->exists() || ! $step->type_is( 'form_fill' ) ){
+if ( ! $step->exists() || ! ( $step->type_is( 'form_fill' ) || $step->type_is( 'web_form' ) ) ){
     wp_die('Form does not exist.' );
 }
 
-$form = new Form( [ 'id' => $step->get_id() ] );
+if ( $step->type_is( 'form_fill') ){
+	$form = new Form( [ 'id' => $step->get_id() ] );
+} else if ( $step->type_is( 'web_form' )){
+	$form = new Form_v2( [ 'id' => $step->get_id() ] );
+}
+
 
 add_action( 'wp_head', function (){
 	wp_dequeue_script('fullframe');

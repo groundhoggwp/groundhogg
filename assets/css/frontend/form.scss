@@ -22,6 +22,7 @@ $benchmark-orange-50: rgba(245, 129, 21, 0.50);
 $benchmark-orange-25: rgba(245, 129, 21, 0.25);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
+$action-green-10: rgba(158, 206, 56, 0.1);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
@@ -35,18 +36,76 @@ $background-color: #F6F9FB;
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    .gh-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas:
+    ". . . . . . . . . . . .";
+      gap: 10px;
+
+      > .gh-form-column {
+
+        &.col-1-of-1 {
+          grid-column: span 12;
+        }
+
+        &.col-1-of-2 {
+          grid-column: span 6;
+        }
+
+        &.col-1-of-3 {
+          grid-column: span 4;
+        }
+
+        &.col-1-of-4 {
+          grid-column: span 3;
+        }
+
+        &.col-2-of-3 {
+          grid-column: span 8;
+        }
+
+        &.col-3-of-4 {
+          grid-column: span 9;
+        }
+      }
+    }
   }
 
-  .gh-form-row {
+  .gh-form-fields {
     display: grid;
+    grid-auto-rows: auto;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr;
-    grid-template-areas:
-    ". . . . . . . . . . . .";
-    gap: 10px;
+    gap: 10px 10px;
+    align-items: stretch;
 
-    > .gh-form-column {
+    label {
+      cursor: pointer;
+      vertical-align: baseline;
 
+      .required{
+        color: #b32d2e;
+      }
+    }
+
+    .gh-input {
+      outline: none;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+    }
+
+    button.gh-submit{
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .gh-form-column {
       &.col-1-of-1 {
         grid-column: span 12;
       }
@@ -71,10 +130,18 @@ $background-color: #F6F9FB;
         grid-column: span 9;
       }
     }
+
   }
+
 
   label {
     display: block;
+  }
+
+  label.gh-checkbox-label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 
   .gh-input {
@@ -90,6 +157,11 @@ $background-color: #F6F9FB;
     border: 3px dashed $primary-dark-50;
     text-align: center;
     border-radius: 5px;
+  }
+
+  .gh-birthday{
+    display: flex;
+    gap: 5px;
   }
 
   .gh-message-wrapper {
@@ -151,6 +223,58 @@ $background-color: #F6F9FB;
     display: block;
   }
 
+
+  > .gh-errors {
+    margin-top: 20px;
+    padding: 20px;
+    background: $error-red-10;
+    color: darken( $error-red, 50 );
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    ul {
+      list-style: disc;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      li {
+        font-size: 16px;
+        margin: 0;
+      }
+    }
+  }
+
+  > .gh-success {
+    margin-top: 20px;
+    padding: 20px;
+    background: $action-green-10;
+    color: darken( $action-green, 50 );
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    p {
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
 }
 
 @mixin flex-column {
@@ -160,6 +284,11 @@ $background-color: #F6F9FB;
 
 /*  GO FULL WIDTH BELOW 480 PIXELS */
 @media only screen and (max-width: 480px) {
+
+  .gh-form-fields {
+    display: flex;
+    flex-direction: column;
+  }
 
   .gh-form-wrapper {
     > form.gh-form {

@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Form\Form;
+use Groundhogg\Form\Form_v2;
 use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -48,7 +49,21 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function custom_form_shortcode( $atts ) {
-		$form = new Form( $atts );
+
+		$atts = shortcode_atts( [
+			'class' => '',
+			'id'    => 0
+		], $atts );
+
+		$step   = new Step( $atts['id'] );
+
+		if ( $step->type_is( 'form_fill' )){
+			$form = new Form( $atts );
+		} else if ( $step->type_is( 'web_form' )){
+			$form = new Form_v2( $atts );
+		} else {
+			return '';
+		}
 
 		return $form->shortcode();
 	}

@@ -19,6 +19,7 @@ package.json
 package-lock.json
 phpunit.xml.dist
 webpack.config.js
+babel.config.js
 wp-cli.phar
 wp-cli.yml
 

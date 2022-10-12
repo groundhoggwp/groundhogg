@@ -70,6 +70,7 @@ class Extension_Upgrader {
 		98242  => 'groundhogg-givewp/groundhogg-givewp.php',
 		101745 => 'groundhogg-memberpress/groundhogg-memberpress.php',
 		134192 => 'groundhogg-presto-player/groundhogg-presto-player.php',
+		135217 => 'groundhogg-traffic-filter/groundhogg-traffic-filter.php',
 	];
 
 	/**
@@ -174,7 +175,7 @@ class Extension_Upgrader {
 
 		$is_installed = false;
 
-		if ( ! function_exists( 'get_plugins' ) ){
+		if ( ! function_exists( 'get_plugins' ) ) {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 

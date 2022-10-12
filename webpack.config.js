@@ -1,41 +1,62 @@
-const path = require('path');
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+var ExtractText = require('extract-text-webpack-plugin');
+var debug = process.env.NODE_ENV !== 'production';
+var webpack = require('webpack');
+
+var extractEditorSCSS = new ExtractText({
+    filename: './blocks.editor.build.css'
+});
+
+var extractBlockSCSS = new ExtractText({
+    filename: './blocks.style.build.css'
+});
+
+var plugins = [extractEditorSCSS, extractBlockSCSS];
+
+var scssConfig = {
+    use: [
+        {
+            loader: 'css-loader'
+        },
+        {
+            loader: 'sass-loader',
+            options: {
+                outputStyle: 'compressed'
+            }
+        }
+    ]
+};
 
 module.exports = {
-    mode: 'development',
-    entry: {
-        // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
-        './react/build': './react/index.js',
-    },
+    context: __dirname,
+    devtool: debug ? 'inline-sourcemap' : null,
+    mode: debug ? 'development' : 'production',
+    entry: './blocks/gutenberg/src/blocks.js',
     output: {
-        path: path.resolve(__dirname),
-        filename: './react/build/[hash].js',
+        path: __dirname + '/blocks/gutenberg/dist/',
+        filename: 'blocks.build.js'
     },
-    watch: true,
-    devtool: 'cheap-eval-source-map',
     module: {
         rules: [
             {
                 test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                },
-            },
-            {
-                test: /\.s?css$/,
+                exclude: /node_modules/,
                 use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    'sass-loader',
+                    {
+                        loader: 'babel-loader'
+                    }
                 ]
             },
-        ],
+            {
+                test: /editor\.scss$/,
+                exclude: /node_modules/,
+                use: extractEditorSCSS.extract(scssConfig)
+            },
+            {
+                test: /style\.scss$/,
+                exclude: /node_modules/,
+                use: extractBlockSCSS.extract(scssConfig)
+            }
+        ]
     },
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: './react/build/build.css'
-        })
-    ]
+    plugins: plugins
 };

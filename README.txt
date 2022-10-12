@@ -322,6 +322,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.7 (2022-09-29) =
+* ADDED New form visual drag and drop builder!
+* ADDED Upgrade path from the old form builder to the new one.
+* TWEAKED update the Gutenberg block to also be compatible with the new form builder.
+
 = 2.7.6.3 (2022-09-29) =
 * TWEAKED Moved enqueue next action logic from `Event_Queue::process()` to `Step::run_after()`
 * TWEAKED Do not do an UPDATE query to skip enqueued steps if the `Step::enqueue()` method from `Step::run_after()`

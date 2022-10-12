@@ -220,9 +220,16 @@ html {
     border-width: 0 0 0 5px;
   }
 
-  .step:not(.hidden) {
+  .step:not(.active){
+    display: none;
+  }
+
+  .step.active {
 
     .custom-settings {
+
+      border-top: 1px solid $primary-dark-15;
+
       .gh-rows-and-columns {
         label {
           font-weight: 500;
@@ -501,6 +508,10 @@ button.button.save-button {
 .step-icon img {
   margin: 0 auto 0 auto;
   width: 80%;
+
+  &[src*="svg"]{
+    width: 60%;
+  }
 }
 
 .hndle label {
@@ -760,6 +771,7 @@ button.button.save-button {
     &.benchmark {
       border-left-color: $benchmark-orange;
 
+      .hndle-icon,
       span.step-name {
         color: $benchmark-orange;
       }
@@ -991,12 +1003,9 @@ table.embed-options td {
 }
 
 .step-title-wrap {
-  background: #FFF;
-  border-bottom: 1px solid #ccd0d4;
   padding: 8px 10px 8px 70px;
   height: 60px;
   position: relative;
-  border-radius: 5px 5px 0 0;
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
@@ -1009,9 +1018,13 @@ table.embed-options td {
     top: 0;
     left: 0;
     height: 60px;
-    background: #ffffff;
     vertical-align: middle;
-    border-right: 1px solid #ccd0d4;
+    border-right: 1px solid $primary-dark-15;
+    box-sizing: border-box;
+
+    &.is-svg {
+      padding: 8px;
+    }
   }
 
   .step-title-edit {
@@ -1130,4 +1143,226 @@ input, select, textarea {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.benchmark.web_form {
+  .after-submit{
+
+    .success-message {
+      display: none;
+    }
+
+    .success-redirect {
+      display: block;
+    }
+
+    &.ajax-enabled {
+      .success-message {
+        display: block;
+      }
+
+      .success-redirect {
+        display: none;
+      }
+    }
+  }
+}
+
+.form-builder-main {
+  margin-bottom: 30px;
+
+  display: flex;
+  gap: 20px;
+
+  .fields-editor,
+  .form-preview-wrap {
+    margin-top: 0 !important;
+    width: 100%;
+    * {
+      box-sizing: border-box;
+    }
+  }
+
+  .fields-editor {
+
+    max-width: 400px;
+    width: 50%;
+    flex-shrink: 0;
+
+    .add-field {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .special-fields {
+      margin-top: 20px;
+    }
+
+    .form-fields, .special-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      .field-placeholder {
+        //border-style: none;
+        background: #0001;
+        border-radius: 5px;
+        //flex-direction: column;
+        //margin: auto;
+      }
+
+      .form-field {
+        background: #FFFFFF;
+        border-radius: 3px;
+        border: 1px solid rgba(16, 38, 64, 0.15);
+        overflow: hidden;
+        cursor: pointer;
+
+        .settings {
+          box-sizing: border-box;
+          padding: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            > label {
+              flex-basis: 150px;
+            }
+
+            > .setting {
+              width: 100%;
+
+              display: flex;
+              justify-content: flex-end;
+
+              input {
+                width: 100%;
+              }
+            }
+
+            .input-wrap {
+              width: 100%;
+            }
+
+            &:not(:last-child) {
+              margin-bottom: 5px;
+            }
+          }
+        }
+
+        .settings-tabs {
+          /*display: flex;*/
+          /*justify-content: center;*/
+          border-top: 1px solid rgba(16, 38, 64, 0.15);
+          border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+          padding: 10px 10px 0 10px;
+
+          a.settings-tab {
+            color: #2c3338;
+          }
+
+          .settings-tab {
+            border-width: 1px 1px 0 1px;
+            border-color: rgba(16, 38, 64, 0.15);
+            border-style: solid;
+            display: inline-block;
+            /*display: flex;*/
+            /*align-items: center;*/
+            /*justify-content: center;*/
+            border-radius: 3px 3px 0 0;
+            margin: 0 2px;
+            font-size: 13px;
+            padding: 4px 8px 2px 8px;
+            /*height: ?22px;*/
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+
+            &.active {
+              font-weight: 500;
+              border-bottom: 1px solid #fff;
+              margin-bottom: -1px;
+              background: #FFFFFF;
+            }
+          }
+        }
+
+        .field-header {
+          padding-left: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .field-type {
+            font-size: 8px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            font-weight: 500;
+          }
+
+          .field-label {
+            font-size: 13px;
+          }
+
+          .actions {
+            display: flex;
+
+            button {
+              background: #FFFFFF;
+              width: 40px;
+              height: 40px;
+              border-top: none;
+              border-right: none;
+              border-bottom: none;
+              border-left: 1px solid rgba(16, 38, 64, 0.15);
+              cursor: pointer;
+
+              &:hover {
+                background: #f1f1f1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.inline-tag-picker {
+
+  position: relative;
+  border: 1px solid #8c8f94;
+  //border-right-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 5px;
+
+  cursor: pointer;
+
+  .gh-panel {
+    display: none;
+  }
+
+  &.show {
+    .gh-panel {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #FFFFFF;
+      padding: 5px;
+    }
+  }
+
+  svg {
+    height: 20px;
+    width: 20px;
+  }
 }

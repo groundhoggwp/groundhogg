@@ -8,7 +8,14 @@
     andList,
     orList,
     input,
+    inputWithReplacements,
+    textAreaWithReplacements,
+    confirmationModal,
   } = Groundhogg.element
+
+  const {
+    linkPicker,
+  } = Groundhogg.pickers
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -358,7 +365,7 @@
                   ${ toggle({
                       onLabel: 'Yes',
                       offLabel: 'No',
-                      id: `${ID}_send_in_timezone`,
+                      id: `${ ID }_send_in_timezone`,
                       name: 'send_in_timezone',
                       checked: Boolean(send_in_timezone),
                   }) }
@@ -375,19 +382,19 @@
         })
 
         updateStepMeta({
-          delay_preview: preview
+          delay_preview: preview,
         })
 
-        $(`#settings-${ID} .delay-preview`).html( preview )
+        $(`#settings-${ ID } .delay-preview`).html(preview)
       }
 
-      $(`#${ID}_send_in_timezone`).on('change', (e) => {
+      $(`#${ ID }_send_in_timezone`).on('change', (e) => {
         updateStepMeta({
           send_in_timezone: e.target.checked,
         })
       })
 
-      $(`#settings-${ID} .select2__picker`).select2({
+      $(`#settings-${ ID } .select2__picker`).select2({
         width: 'auto',
       }).on('change', function (e) {
         // console.log(e)
@@ -397,7 +404,7 @@
         updatePreview()
       })
 
-      $(`#settings-${ID} .delay-input`).on('change', ({ target }) => {
+      $(`#settings-${ ID } .delay-input`).on('change', ({ target }) => {
 
         const reRender = target.classList.contains('re-render')
 
@@ -406,7 +413,7 @@
         }, reRender)
 
         if (reRender) {
-          $(`#settings-${ID} [name=${ target.name }]`).focus()
+          $(`#settings-${ ID } [name=${ target.name }]`).focus()
         }
         else {
           updatePreview()
@@ -416,6 +423,88 @@
       })
 
       updatePreview()
+    },
+  }
+
+  const WebForm = {
+    edit ({ meta }) {
+      // language=html
+      const redirectToURL = `<label class="row-label">${ __('Redirect to this URL...', 'groundhogg') }</label>
+      ${ inputWithReplacements({
+          name: 'success_page',
+          className: 'full-width',
+          value: meta.success_page || '',
+      }) }`
+
+      // language=html
+      const stayOnPage = `<label class="row-label">${ __('Show this message...', 'groundhogg') }</label>
+      ${ textAreaWithReplacements({
+          name: 'success_message',
+          className: 'full-width',
+          value: meta.success_message || '',
+      }) }`
+
+      //language=HTML
+      return `
+          <div class="edit-form"></div>
+          <div class="after-submit gh-panel ${ meta.enable_ajax ? 'ajax-enabled' : '' }">
+              <div class="gh-panel-header">
+                  <h2>After submit...</h2>
+              </div>
+              <div class="inside display-flex column gap-10">
+                  <p>${ __('Stay on page after submitting?', 'groundhogg') } ${ toggle({
+                      name: 'enable_ajax',
+                      checked: Boolean(meta.enable_ajax),
+                      onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+                      offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+                  }) }</p>
+                  <div class="success-message">
+                      ${ stayOnPage }
+                  </div>
+                  <div class="success-redirect">
+                      ${ redirectToURL }
+                  </div>
+              </div>
+          </div>`
+    },
+    onMount ({ ID, meta }, updateStepMeta) {
+
+      const parent = `#settings-${ ID }`
+
+      linkPicker(`${ parent } input[name=success_page]`).on('change', (e) => {
+        updateStepMeta({
+          success_page: e.target.value,
+        })
+      })
+
+      $(`${ parent } textarea[name=success_message]`).on('change', (e) => {
+        updateStepMeta({
+          success_message: e.target.value,
+        })
+      })
+
+      const $panel = $(`${ parent } .after-submit`)
+
+      $(`${ parent } input[name=enable_ajax]`).on('change', (e) => {
+
+        updateStepMeta({
+          enable_ajax: e.target.checked,
+        })
+
+        if (e.target.checked) {
+          $panel.addClass('ajax-enabled')
+        }
+        else {
+          $panel.removeClass('ajax-enabled')
+        }
+      })
+
+      Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form ?? {}, (form) => {
+        updateStepMeta({
+          form,
+        })
+      }).mount()
+
     },
   }
 
@@ -437,8 +526,65 @@
           case 'delay_timer':
             this.delayTimer(active)
             break
+          case 'web_form':
+            this.webForm(active)
+            break
+          case 'form_fill':
+            this.formFill(active)
+            break
         }
       })
+    },
+
+    formFill ({ ID }) {
+
+      let id = `step_${ ID }_upgrade_form`
+      const $btn = $(`#${ id }`)
+
+      if ($btn.data('flag')) {
+        return
+      }
+
+      $btn.data('flag', true)
+
+      $btn.on('click', e => {
+
+        confirmationModal({
+          alert: `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.',
+            'groundhogg') }</p>`,
+          confirmText: __('Upgrade Form', 'groundhogg'),
+          onConfirm: () => {
+
+            $(`#step_${ ID }_upgrade_form_confirm`).val( 'confirm' )
+            Funnel.save()
+
+          }
+        })
+
+      })
+
+    },
+
+    webForm (step) {
+
+      let id = `step_${ step.ID }_web_form_builder`
+
+      const mount = (step) => {
+        $(`#${ id }`).html(WebForm.edit(step))
+
+        WebForm.onMount(step, (meta, reRender) => {
+
+          let step = Funnel.updateStepMeta(meta)
+
+          if (reRender) {
+            mount(step)
+          }
+
+        }, () => {}, () => Funnel.getActiveStep())
+      }
+
+      mount(step)
+
     },
 
     adminNotification (step) {

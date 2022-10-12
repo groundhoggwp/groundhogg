@@ -590,7 +590,7 @@
               ${ Elements.input(inputProps) }
               ${ emojis ? `<button class="emoji-picker-start gh-button dashicon" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : '' }
-              ${ replacements ? `<button class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
+              ${ replacements ? `<button type="button" class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : '' }
           </div>`
     },
@@ -613,7 +613,7 @@
           <div class="${ classList.filter(c => c).join(' ') }" xmlns="http://www.w3.org/1999/html">
               ${ Elements.textarea(props) }
               <div class="buttons">
-                  ${ replacements ? `<button class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
+                  ${ replacements ? `<button type="button" class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : '' }
                   ${ emojis ? `<button class="emoji-picker-start gh-button dashicon" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : '' }
@@ -929,9 +929,7 @@ ${ afterProgress() }`,
                 <button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
                     <span class="dashicons dashicons-no-alt"></span>
                 </button>
-                <div class="gh-modal-dialog-content">
-                    ${ content }
-                </div>
+                ${ content }
             </div>
         </div>`
 
@@ -2416,10 +2414,15 @@ ${ afterProgress() }`,
     return `<b>${ text }</b>`
   }
 
+  const sanitizeKey = (label) => {
+    return label.toLowerCase().replace(/[^a-z0-9]/g, '_')
+  }
+
   Groundhogg.element = {
     icons,
     ...Elements,
     adminPageURL,
+    sanitizeKey,
     specialChars,
     uniqid,
     moreMenu,

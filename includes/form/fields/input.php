@@ -4,6 +4,7 @@ namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Form\Form;
 use Groundhogg\Step;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -30,7 +31,7 @@ abstract class Input extends Field {
 	 * @return string
 	 */
 	public static function save_config( $html, $form ) {
-		$config = self::$configurations[ $form->get_id() ];
+		$config = get_array_var( self::$configurations, $form->get_id() );
 
 		if ( $config ) {
 			$form->step->update_meta( 'config', $config );

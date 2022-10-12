@@ -23,8 +23,6 @@ class Rewrites {
 	 */
 	public function add_rewrite_rules() {
 
-		add_rewrite_rule( 'gh/tracking/email', 'gh/index.php' );
-
 		// View Emails
 		add_managed_rewrite_rule(
 			'browser-view/emails/([^/]*)/?$',
@@ -139,10 +137,11 @@ class Rewrites {
 		return new Template_Loader();
 	}
 
-	public function get_404(){
+	public function get_404() {
 		global $wp_query;
 		$wp_query->set_404();
 		status_header( 404 );
+
 		return get_404_template();
 	}
 
@@ -212,7 +211,7 @@ class Rewrites {
 
 				$step = new Step( get_query_var( 'slug' ) );
 
-				if ( $step->exists() && $step->type_is( 'form_fill' ) ) {
+				if ( $step->exists() && ( $step->type_is( 'form_fill' ) || $step->type_is( 'web_form' ) ) ) {
 					set_query_var( 'form_step', $step );
 				}
 
@@ -235,13 +234,16 @@ class Rewrites {
 
 				$target_url = $step->get_meta( 'redirect_to' );
 
-				if ( empty( $target_url ) ){
+				if ( empty( $target_url ) ) {
 					$target_url = home_url();
 				}
 
 				if ( $contact ) {
-					do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
 					$target_url = do_replacements( $target_url, $contact->get_id() );
+
+					if ( $step->benchmark_enqueue( $contact ) ) {
+						process_events( $contact );
+					}
 				}
 
 				wp_redirect( $target_url );

@@ -28,6 +28,7 @@ use Groundhogg\Steps\Benchmarks\Page_Visited;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
+use Groundhogg\Steps\Benchmarks\Web_Form;
 use function Groundhogg\get_array_var;
 use function Groundhogg\is_option_enabled;
 
@@ -90,6 +91,7 @@ class Manager {
 
 		/* Benchmarks */
 
+		$this->add_step( new Web_Form() );
 		$this->add_step( new Form_Filled() );
 		$this->add_step( new Account_Created() );
 		$this->add_step( new Email_Confirmed() );

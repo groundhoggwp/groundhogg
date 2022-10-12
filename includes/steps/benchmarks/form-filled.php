@@ -3,10 +3,12 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use Groundhogg\Properties;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Utils\Graph;
 use function Groundhogg\add_custom_fields_to_mappable_fields;
 use function Groundhogg\encrypt;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_custom_fields_dropdown_options;
 use function Groundhogg\get_db;
@@ -56,7 +58,7 @@ class Form_Filled extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Web Form', 'step_name', 'groundhogg' );
+		return _x( 'Web Form (Legacy)', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -91,9 +93,7 @@ class Form_Filled extends Benchmark {
 	 * @return int[]
 	 */
 	protected function get_complete_hooks() {
-		return [
-			'groundhogg/form/submission_handler/after' => 3
-		];
+		return [];
 	}
 
 	/**
@@ -135,11 +135,329 @@ class Form_Filled extends Benchmark {
 		return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
 	}
 
+	/**
+	 * Save the step settings
+	 *
+	 * @param $step Step
+	 */
+	public function save( $step ) {
+		$this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
+		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
+		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
+		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
+
+		// Render the config quietly
+		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
+
+		// upgrade the form
+		if ( $this->get_posted_data( 'upgrade_form_confirm' ) === 'confirm' ) {
+			$this->upgrade_form( $step );
+		}
+	}
+
+	/**
+	 * @param $step Step
+	 *
+	 * @return void
+	 */
+	protected function upgrade_form( $step ) {
+
+		$config     = $step->get_meta( 'config' );
+		$shortcodes = $step->get_meta( 'form' );
+
+		$fields = [];
+
+		$form = [
+			'recaptcha' => [
+				'type'         => 'recaptcha',
+				'label'        => 'reCAPTCHA',
+				'enabled'      => false,
+				'column_width' => '1/1'
+			],
+		];
+
+		if ( ! empty( $config ) ) {
+
+			foreach ( $config as $field ) {
+
+				$field['atts'] = wp_parse_args( $field['atts'], [
+					'id'          => '',
+					'class'       => '',
+					'placeholder' => '',
+					'value'       => '',
+				] );
+
+				switch ( $field['type'] ) {
+					case 'first':
+					case 'last':
+					case 'email':
+						$fields[] = [
+							'type'         => $field['type'],
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => $field['atts']['placeholder'],
+							'value'        => $field['atts']['value'],
+							'column_width' => '1/1'
+						];
+						break;
+					case 'phone':
+						$fields[] = [
+							'type'         => 'phone',
+							'phone_type'   => $field['atts']['phone_type'],
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => $field['atts']['placeholder'],
+							'value'        => $field['atts']['value'],
+							'column_width' => '1/1'
+						];
+						break;
+					case 'address':
+
+						$fields[] = [
+							'type'         => 'line1',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'Line 1', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '2/3'
+						];
+
+						$fields[] = [
+							'type'         => 'line2',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'Line 2', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '1/3'
+						];
+
+						$fields[] = [
+							'type'         => 'city',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'City', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '1/1'
+						];
+
+						$fields[] = [
+							'type'         => 'state',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'State', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '1/3'
+						];
+
+						$fields[] = [
+							'type'         => 'zip_code',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'Zip Code', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '1/3'
+						];
+
+						$fields[] = [
+							'type'         => 'country',
+							'required'     => $field['required'],
+							'hide_label'   => false,
+							'label'        => __( 'Country', 'groundhogg' ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => '',
+							'value'        => '',
+							'column_width' => '1/3'
+						];
+
+						break;
+					case 'birthday':
+						$fields[] = [
+							'type'         => 'birthday',
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'value'        => '',
+							'column_width' => '1/1'
+						];
+
+						break;
+					case 'gdpr':
+					case 'terms':
+						$fields[] = [
+							'type'         => $field['type'],
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'column_width' => '1/1'
+						];
+
+						break;
+					case 'text':
+					case 'textarea':
+						$fields[] = [
+							'type'         => $field['type'],
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => $field['atts']['placeholder'],
+							'value'        => $field['atts']['value'],
+							'column_width' => '1/1'
+						];
+						break;
+					case 'number':
+					case 'date':
+					case 'time':
+						$fields[] = [
+							'type'         => $field['type'],
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'placeholder'  => $field['atts']['placeholder'],
+							'value'        => $field['atts']['value'],
+							'min'          => get_array_var( $field['atts'], 'min' ),
+							'max'          => get_array_var( $field['atts'], 'max' ),
+							'column_width' => '1/1'
+						];
+						break;
+					case 'file':
+						$fields[] = [
+							'type'         => 'file',
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'hide_label'   => empty( $field['label'] ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'file_types'   => explode( ',', str_replace( '.', '', $field['atts']['file_types'] ) ),
+							'column_width' => '1/1'
+						];
+						break;
+					case 'checkbox':
+						$fields[] = [
+							'type'         => 'checkbox',
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'value'        => $field['atts']['value'],
+							'tags'         => [ absint( $field['atts']['tag'] ) ],
+							'column_width' => '1/1'
+						];
+						break;
+					case 'radio':
+					case 'dropdown':
+						$fields[] = [
+							'type'         => $field['type'],
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'options'      => array_map( function ( $option ) {
+								return explode( '|', $option );
+							}, explode( ',', $field['atts']['options'] ) ),
+							'column_width' => '1/1'
+						];
+						break;
+					case 'custom':
+						$fields[] = [
+							'type'         => 'custom_field',
+							'name'         => $field['name'],
+							'required'     => $field['required'],
+							'property'     => get_array_var( Properties::instance()->get_field( $field['atts']['custom_field'] ), 'id' ),
+							'label'        => str_replace( '*', '', $field['label'] ),
+							'id'           => $field['atts']['id'],
+							'className'    => $field['atts']['class'],
+							'column_width' => '1/1'
+						];
+
+						break;
+					case 'recaptcha':
+
+						$form['recaptcha']['enabled'] = true;
+
+						break;
+				}
+
+			}
+		}
+
+		preg_match( '/\[submit ([^\]]+)\]/', $shortcodes, $matches );
+
+		$atts = $matches[1];
+		$atts = wp_parse_args( shortcode_parse_atts( $atts ), [
+			'id'    => '',
+			'class' => '',
+			'text'  => ''
+		] );
+
+		$button = [
+			'type'         => 'button',
+			'column_width' => '1/1',
+			'text'         => $atts['text'],
+			'className'    => $atts['class'],
+			'id'           => $atts['id'],
+		];
+
+		$form['fields'] = $fields;
+		$form['button'] = $button;
+
+		$step->update_meta( 'form', $form );
+
+		$step->update( [
+			'step_type' => 'web_form'
+		] );
+	}
+
 	protected function before_step_notes( Step $step ) {
 
 		$form            = new Form\Form( [ 'id' => $step->get_id() ] );
 		$form_embed_code = esc_html( $form->get_html_embed_code() );
 		$form_url        = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
+
+		echo html()->button( [
+			'type'  => 'button',
+			'id'    => $this->setting_id_prefix( 'upgrade_form' ),
+			'text'  => __( 'Upgrade Form' ),
+			'class' => 'gh-button secondary full-width'
+		] );
+
+		echo html()->input( [
+			'type' => 'hidden',
+			'name' => $this->setting_name_prefix( 'upgrade_form_confirm' ),
+			'id'   => $this->setting_id_prefix( 'upgrade_form_confirm' ),
+		] )
 
 		?>
         <div class="gh-panel">
@@ -193,9 +511,7 @@ class Form_Filled extends Benchmark {
 					?>
                 </p>
             </div>
-
         </div>
-
 		<?php
 	}
 
@@ -849,171 +1165,5 @@ class Form_Filled extends Benchmark {
             </form>
         </div>
 		<?php
-	}
-
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
-		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
-		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
-		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
-
-		// Render the config quietly
-		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
-
-	}
-
-	/**
-	 * Extend the Form reporting VIEW with impressions vs. submissions...
-	 *
-	 * @param $step Step
-	 */
-	public function reporting( $step ) {
-		$start_time = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_start_time();
-		$end_time   = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_end_time();
-
-		$cquery = new Contact_Query();
-
-		$num_events_completed = $cquery->query( array(
-			'count'  => true,
-			'report' => array(
-				'start'  => $start_time,
-				'end'    => $end_time,
-				'step'   => $step->get_id(),
-				'funnel' => $step->get_funnel_id(),
-				'status' => 'complete'
-			)
-		) );
-
-		$records = get_db( 'form_impressions' )->query( [
-			'after'   => $start_time,
-			'before'  => $end_time,
-			'form_id' => $step->get_id(),
-		] );
-
-		$num_impressions = array_sum( map_deep( wp_list_pluck( $records, 'count' ), 'absint' ) );
-
-		?>
-        <p class="report">
-            <span class="impressions"><?php _e( 'Views: ' ); ?>
-                <strong>
-                    <?php echo $num_impressions; ?>
-                </strong>
-            </span> |
-            <!-- TODO -->
-            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong>
-                    <a target="_blank" href="<?php echo add_query_arg( [
-	                    'report' => [
-		                    'step'   => $step->get_id(),
-		                    'funnel' => $step->get_funnel_id(),
-		                    'status' => 'complete',
-		                    'start'  => $start_time,
-		                    'end'    => $end_time,
-	                    ]
-                    ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-                <b><?php echo $num_events_completed; ?></b>
-            </a>
-                </strong></span> |
-            <span class="cvr"
-                  title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: ' ); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 ) ? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
-        </p>
-		<?php
-	}
-
-	public function reporting_v2( $step ) {
-		parent::reporting_v2( $step );
-
-		?>
-        <div class="reporting-results"><?php
-
-		$times = $this->get_reporting_interval();
-
-		$start_time = $times['start_time'];
-		$end_time   = $times['end_time'];
-
-		$db = get_db( 'form_impressions' );
-
-		$data = $db->query( [
-			'before' => $end_time,
-			'after'  => $start_time
-		] );
-
-		$impressions = [];
-
-		// Normalize data so reports don't have to change...
-		foreach ( $data as $datum ) {
-			$count = absint( $datum->count );
-			for ( $i = 0; $i < $count; $i ++ ) {
-				$impressions[] = [ 'timestamp' => absint( $datum->timestamp ) ];
-			}
-		}
-
-		$submissions = get_db( 'events' )->query( [
-			'step_id' => $step->get_id(),
-			'status'  => Event::COMPLETE,
-			'before'  => $end_time,
-			'after'   => $start_time
-		] );
-
-		$total_impressions = count( $impressions );
-		$total_submissions = count( $submissions );
-
-		$impressions = Reporting::group_by_time( $impressions, 'timestamp', 'absint' );
-		$submissions = Reporting::group_by_time( $submissions, 'time', 'absint' );
-
-		$data = [
-			[
-				'label' => __( 'Impressions', 'groundhogg' ),
-				'data'  => $impressions
-			],
-			[
-				'label' => __( 'Submissions', 'groundhogg' ),
-				'data'  => $submissions
-			],
-		];
-
-		$graph = new Graph( $step->get_id(), [
-			'mode' => 'time'
-		], $data );
-
-		if ( $graph->has_data() ):
-
-			?>
-            <div class="chart">
-                <div class="inside">
-					<?php $graph->render(); ?>
-                </div>
-            </div>
-		<?php
-
-		endif;
-
-		?>
-        <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
-		<?php
-
-		html()->list_table(
-			[ 'class' => 'form_activity' ],
-			[
-				__( 'Impressions', 'groundhogg' ),
-				__( 'Submissions', 'groundhogg' ),
-				__( 'Conversion Rate (%)', 'groundhogg' ),
-			],
-			[
-				[
-					html()->wrap( $total_impressions, 'span', [ 'class' => 'number-total' ] ),
-					html()->wrap( $total_submissions, 'span', [ 'class' => 'number-total' ] ),
-					html()->wrap( percentage( $total_impressions, $total_submissions ) . '%', 'span', [ 'class' => 'number-total' ] ),
-				]
-			],
-			false
-		);
-
-		?></div><?php
-
 	}
 }

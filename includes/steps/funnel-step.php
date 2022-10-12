@@ -690,6 +690,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'has-errors';
 		}
 
+//		$icon = $this->get_icon() ? $this->get_icon() : $this->get_default_icon();
+//		$is_svg = preg_match( '/\.svg$/', $icon );
+
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
@@ -723,7 +726,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             </div>
             <div class="hndle ui-sortable-handle">
 				<?php if ( $step->has_errors() ): ?>
-                    <img class="hndle-icon"
+                    <img class="hndle-icon error"
                          src="<?php echo $this->get_error_icon(); ?>">
 				<?php else: ?>
                     <img class="hndle-icon"
@@ -747,10 +750,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	public function step_title_edit( $step ) {
+
+        $icon = $this->get_icon() ? $this->get_icon() : $this->get_default_icon();
+        $is_svg = preg_match( '/\.svg$/', $icon );
+
 		?>
         <div class="step-title-wrap">
-            <img class="step-icon"
-                 src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+            <img class="step-icon <?php echo $is_svg ? 'is-svg' : '' ?>"
+                 src="<?php echo $icon ?>">
             <div class="step-title-edit hidden">
 				<?php
 				$args = array(

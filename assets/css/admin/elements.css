@@ -1757,6 +1757,54 @@ p.error,
   border-radius: 5px;
 }
 
+.gh-form-fields {
+  display: grid;
+  grid-auto-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 10px 10px;
+  align-items: stretch;
+}
+.gh-form-fields label {
+  cursor: pointer;
+  vertical-align: baseline;
+}
+.gh-form-fields .gh-input {
+  outline: none;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+.gh-form-fields input[type=file].gh-file-uploader {
+  width: 100%;
+  margin: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+  border: 2px dashed #e5e5e5;
+  text-align: center;
+}
+.gh-form-fields * {
+  box-sizing: border-box;
+}
+.gh-form-fields .gh-form-column.col-1-of-1 {
+  grid-column: span 12;
+}
+.gh-form-fields .gh-form-column.col-1-of-2 {
+  grid-column: span 6;
+}
+.gh-form-fields .gh-form-column.col-1-of-3 {
+  grid-column: span 4;
+}
+.gh-form-fields .gh-form-column.col-1-of-4 {
+  grid-column: span 3;
+}
+.gh-form-fields .gh-form-column.col-2-of-3 {
+  grid-column: span 8;
+}
+.gh-form-fields .gh-form-column.col-3-of-4 {
+  grid-column: span 9;
+}
+
 .gh-form-wrapper * {
   box-sizing: border-box;
 }

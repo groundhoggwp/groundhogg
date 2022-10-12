@@ -81,6 +81,10 @@
       /* Activate Spinner */
       $form.on('submit', function (e) {
         e.preventDefault()
+        return false
+      })
+
+      $document.on('click', '#update', function (e) {
         self.save($form)
       })
 

@@ -70,7 +70,7 @@ add_action( 'wp_enqueue_scripts', function () {
       })
 
       window.addEventListener('load', () => {
-        ['submit', 'reset', 'ajaxfinished'].forEach(evt => {
+        ['submit', 'reset', 'ajaxfinished', 'ghformsubmitted'].forEach(evt => {
           document.querySelector('form.gh-form').addEventListener(evt, () => {
             console.log('this worked')
             postResizeData()
@@ -85,7 +85,8 @@ add_action( 'wp_enqueue_scripts', function () {
 </div>
 <?php
 wp_print_scripts( [
-	'groundhogg-ajax-form'
+	'groundhogg-ajax-form',
+	'groundhogg-form-v2'
 ] )
 ?>
 <div class="clear"></div>

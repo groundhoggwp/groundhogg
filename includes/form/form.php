@@ -296,4 +296,10 @@ class Form implements \JsonSerializable {
 			]
 		];
 	}
+
+	public function upgrade(){
+
+
+
+	}
 }
