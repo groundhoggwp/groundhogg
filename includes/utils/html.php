@@ -846,6 +846,9 @@ class HTML {
 				$a['options'][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
 			}
 		}
+        if ( $a['multiple'] ){
+            $a['option_none'] = false;
+        }
 
 		return apply_filters( 'groundhogg/html/dropdown_owners', $this->dropdown( $a ), $a );
 	}

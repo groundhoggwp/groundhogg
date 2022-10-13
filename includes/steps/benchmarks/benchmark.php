@@ -94,10 +94,20 @@ abstract class Benchmark extends Funnel_Step {
 	abstract protected function can_complete_step();
 
 	/**
+	 * Whether events should be process after this benchmark is complete
+	 *
+	 * @var bool
+	 */
+	protected $process_events_after_complete = false;
+
+	/**
 	 * Start completing the thing....
 	 */
 	public function complete() {
-		$steps = $this->get_like_steps();
+
+		$steps = $this->get_like_steps( [
+			'step_status' => 'active'
+		] );
 
 		$contacts_to_process = [];
 
@@ -125,15 +135,15 @@ abstract class Benchmark extends Funnel_Step {
 				$this->set_current_contact( $contact );
 
 				if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
-
 					$step->enqueue( $this->get_current_contact() );
-					$contacts_to_process[] = $this->get_current_contact();
+
 				}
 			}
 
 		}
 
-		if ( ! empty( $contacts_to_process ) ){
+		// Only process events if flag to complete is true
+		if ( $this->process_events_after_complete && ! empty( $contacts_to_process ) ){
 			process_events( $contacts_to_process );
 		}
 	}

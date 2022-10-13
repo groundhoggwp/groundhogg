@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.6.3
+Stable tag: 2.7.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,7 +325,8 @@ You can purchase a premium plan for access to support and our premium extensions
 = 2.7.7 (2022-09-29) =
 * ADDED New form visual drag and drop builder!
 * ADDED Upgrade path from the old form builder to the new one.
-* TWEAKED update the Gutenberg block to also be compatible with the new form builder.
+* TWEAKED Update the Gutenberg block to also be compatible with the new form builder.
+* TWEAKED Benchmarks will no longer process instantly when they are completed unless explicitly defined that they should.
 
 = 2.7.6.3 (2022-09-29) =
 * TWEAKED Moved enqueue next action logic from `Event_Queue::process()` to `Step::run_after()`

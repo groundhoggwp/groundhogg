@@ -168,7 +168,6 @@ class Web_Form extends Benchmark {
 	protected function before_step_notes( Step $step ) {
 
 		$form            = new Form\Form_v2( [ 'id' => $step->get_id() ] );
-		$form_embed_code = esc_html( $form->get_html_embed_code() );
 		$form_url        = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
 
 		?>
@@ -191,13 +190,6 @@ class Web_Form extends Benchmark {
                             onfocus="this.select()"
                             class="regular-text code"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
-                            readonly>
-                    <label><?php printf( '%s:', __( 'HTML' ) ); ?></label>
-                    <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="regular-text code"
-                            value="<?php echo esc_attr( $form_embed_code ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
                     <input

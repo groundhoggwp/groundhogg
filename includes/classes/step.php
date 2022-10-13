@@ -458,9 +458,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool
 	 */
-	public function benchmark_enqueue( $contact ){
+	public function benchmark_enqueue( $contact ) {
 
-		if ( ! $this->can_complete($contact) ){
+		if ( ! $this->can_complete( $contact ) ) {
 			return false;
 		}
 

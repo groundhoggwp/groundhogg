@@ -226,9 +226,11 @@ html {
 
   .step.active {
 
-    .custom-settings {
-
+    .step-title-wrap ~ .custom-settings{
       border-top: 1px solid $primary-dark-15;
+    }
+
+    .custom-settings {
 
       .gh-rows-and-columns {
         label {

@@ -48,6 +48,7 @@ class Settings_Page extends Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-element' );
 //		wp_enqueue_style( 'groundhogg-admin-extensions' );
 	}
 

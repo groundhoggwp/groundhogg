@@ -1114,9 +1114,9 @@ class Form_v2 extends Step {
 			'recaptcha'    => [
 				'render'   => function ( $field ) {
 
-					if ( current_user_can( 'edit_contacts' ) ) {
-						return '';
-					}
+//					if ( current_user_can( 'edit_contacts' ) ) {
+//						return '';
+//					}
 
 					$version = get_option( 'gh_recaptcha_version', 'v2' ) ?: 'v2';
 

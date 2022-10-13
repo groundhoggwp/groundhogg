@@ -635,7 +635,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function get_like_steps( $query = [] ) {
 
-		$args  = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
+		$args  = [
+			'step_type'  => $this->get_type(),
+			'step_group' => $this->get_group()
+		];
+
 		$query = array_merge( $query, $args );
 
 		$steps = get_db( 'steps' )->query( $query );
@@ -751,8 +755,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	public function step_title_edit( $step ) {
 
-        $icon = $this->get_icon() ? $this->get_icon() : $this->get_default_icon();
-        $is_svg = preg_match( '/\.svg$/', $icon );
+		$icon   = $this->get_icon() ? $this->get_icon() : $this->get_default_icon();
+		$is_svg = preg_match( '/\.svg$/', $icon );
 
 		?>
         <div class="step-title-wrap">

@@ -153,7 +153,7 @@ body:not(.funnel-full-screen) #close {
 #step-settings-inner .step:not(.active) {
   display: none;
 }
-#step-settings-inner .step.active .custom-settings {
+#step-settings-inner .step.active .step-title-wrap ~ .custom-settings {
   border-top: 1px solid rgba(16, 38, 64, 0.15);
 }
 #step-settings-inner .step.active .custom-settings .gh-rows-and-columns label {
