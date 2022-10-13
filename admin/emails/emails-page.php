@@ -144,6 +144,10 @@ class Emails_Page extends Admin_Page {
 
 		$broadcast_args = [ 'action' => 'add', 'type' => 'email' ];
 
+		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
+			$broadcast_args[ 'email' ] = absint( $email );
+		}
+
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
