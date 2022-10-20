@@ -512,7 +512,7 @@ button.button.save-button {
   width: 80%;
 
   &[src*="svg"]{
-    width: 60%;
+    width: 100%;
   }
 }
 
@@ -747,9 +747,20 @@ button.button.save-button {
       align-items: center;
       gap: 10px;
 
+      &:has([src*="svg"]){
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+      }
+
       .hndle-icon {
         width: 40px;
         height: 40px;
+
+        &[src*="svg"]{
+          width: 50px;
+          height: 50px;
+        }
       }
 
       > div {
@@ -1023,10 +1034,6 @@ table.embed-options td {
     vertical-align: middle;
     border-right: 1px solid $primary-dark-15;
     box-sizing: border-box;
-
-    &.is-svg {
-      padding: 8px;
-    }
   }
 
   .step-title-edit {

@@ -325,8 +325,12 @@ You can purchase a premium plan for access to support and our premium extensions
 = 2.7.7 (2022-09-29) =
 * ADDED New form visual drag and drop builder!
 * ADDED Upgrade path from the old form builder to the new one.
+* ADDED HollerBox installer to guided setup.
+* ADDED Full screen toggle for the funnel editor
+* UPDATED New icons for funnel steps!
 * TWEAKED Update the Gutenberg block to also be compatible with the new form builder.
 * TWEAKED Benchmarks will no longer process instantly when they are completed unless explicitly defined that they should.
+* FIXED Select2 defaulting to first option instead of showing placeholder text.
 
 = 2.7.6.3 (2022-09-29) =
 * TWEAKED Moved enqueue next action logic from `Event_Queue::process()` to `Step::run_after()`

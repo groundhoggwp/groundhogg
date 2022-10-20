@@ -1709,7 +1709,7 @@ class Contact_Query {
 
 		$role = sanitize_text_field( $filter_vars['role'] );
 
-		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'wp_capabilities' AND meta_value RLIKE '\"$role\"' )";
+		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$wpdb->prefix}capabilities' AND meta_value RLIKE '\"$role\"' )";
 	}
 
 	/**

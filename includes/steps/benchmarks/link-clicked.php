@@ -51,7 +51,8 @@ class Link_Clicked extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/link-clicked.png';
+//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/link-clicked.png';
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/link-clicked.svg';
 	}
 
 	/**

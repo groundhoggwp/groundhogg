@@ -76,7 +76,8 @@ class Web_Form extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/contact-form.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/contact-form.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/web-form.svg';
 	}
 
     public function complete() {

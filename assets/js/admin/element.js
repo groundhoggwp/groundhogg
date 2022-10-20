@@ -552,7 +552,7 @@
 
       return `<input ${ objectToProps(props) }/>`
     },
-    select (_props, _options, _selected) {
+    select (_props, _options = {}, _selected = false ) {
 
       let { options = _options, selected = _selected, value, ...props } = _props
 
@@ -1610,6 +1610,101 @@ ${ afterProgress() }`,
     })
   })
 
+  const inputRepeater = (selector, {
+    rows = [],
+    sortable = false,
+    cells = [],
+    onMount = () => {},
+    addRow = () => Array(cells.length).fill(''),
+    onChange = (rows) => {},
+    onRemove = (row) => {},
+  }) => ( {
+
+    rows,
+
+    mount () {
+      $(selector).html(this.render())
+      this.onMount()
+    },
+
+    onMount () {
+
+      $(`${ selector } .remove-row`).on('click', (e) => {
+        const row = parseInt(e.currentTarget.dataset.row)
+        onRemove(this.rows[row])
+        this.rows.splice(row, 1)
+        onChange(this.rows)
+        this.mount()
+      })
+
+      $(`${ selector } .add-row`).on('click', (e) => {
+        this.rows.push( addRow() )
+        onChange(this.rows)
+        this.mount()
+        $(`${ selector } .add-row`).focus()
+      })
+
+      $(`${ selector } [data-cell][data-row]`).on('change', (e) => {
+        const row = parseInt(e.target.dataset.row)
+        const cell = parseInt(e.target.dataset.cell)
+        this.rows[row][cell] = $(e.target).val()
+        onChange(this.rows)
+      })
+
+      if (sortable) {
+        $(`${ selector } .gh-input-repeater`).sortable({
+          handle: '.handle',
+          update: (e, ui) => {
+
+            let $row = $(ui.item)
+            let oldIndex = parseInt($row.data('row'))
+            let curIndex = $row.index()
+
+            let row = this.rows[oldIndex]
+
+            this.rows.splice(oldIndex, 1)
+            this.rows.splice(curIndex, 0, row)
+            onChange(this.rows)
+
+            this.mount()
+          },
+        })
+      }
+
+      onMount()
+    },
+
+    render () {
+
+      const renderRow = (row, rowIndex) => {
+        //language=HTML
+        return `
+            <div class="gh-input-repeater-row" data-row="${ rowIndex }">
+                ${ row.map((cell, cellIndex) => cells[cellIndex]({
+                    value: cell,
+                    dataRow: rowIndex,
+                    dataCell: cellIndex,
+                })).join('') }
+                ${ sortable ? `<span class="handle" data-row="${ rowIndex }"><span
+					class="dashicons dashicons-move"></span></span>` : '' }
+                <button class="gh-button dashicon remove-row" data-row="${ rowIndex }"><span
+                        class="dashicons dashicons-no-alt"></span></button>
+            </div>`
+      }
+
+      //language=HTML
+      return `
+          <div class="gh-input-repeater">
+              ${ this.rows.map((row, i) => renderRow(row, i)).join('') }
+              <div class="gh-input-repeater-row-add">
+                  <div class="spacer"></div>
+                  <button class="add-row gh-button dashicon">
+                      <span class="dashicons dashicons-plus-alt2"></span></button>
+              </div>
+          </div>`
+    },
+  } )
+
   const inputRepeaterWidget = ({
     selector = '',
     rows = [],
@@ -2436,6 +2531,7 @@ ${ afterProgress() }`,
     createSlotFillProvider,
     clickInsideElement,
     searchOptionsWidget,
+    improveTinyMCE,
     tinymceElement,
     addMediaToBasicTinyMCE,
     isValidEmail,
@@ -2451,8 +2547,8 @@ ${ afterProgress() }`,
     loadingDots,
     flattenObject,
     objectEquals,
+    inputRepeater,
     inputRepeaterWidget,
-    improveTinyMCE,
     primaryButton,
     dangerButton,
     secondaryButton,

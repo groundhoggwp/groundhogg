@@ -207,7 +207,7 @@ $funnel = new Funnel( $funnel_id );
                                      data-group="benchmark"
                                      class="wpgh-element ui-draggable">
                                     <div class="step-icon">
-                                        <img width="60" src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
+                                        <img src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
                                     </div>
                                     <p><?php echo $benchmark->get_name() ?></p>
                                 </div>
@@ -227,8 +227,8 @@ $funnel = new Funnel( $funnel_id );
                                      data-group="action"
                                      title="<?php esc_attr_e( $action->get_description() ); ?>"
                                      class="wpgh-element ui-draggable">
-                                    <div class="step-icon"><img width="60"
-                                                                src="<?php echo esc_url( $action->get_icon() ); ?>">
+                                    <div class="step-icon">
+                                        <img src="<?php echo esc_url( $action->get_icon() ); ?>">
                                     </div>
                                     <p><?php echo $action->get_name() ?></p></div>
                                 </div><?php

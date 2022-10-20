@@ -74,7 +74,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	public function scripts() {
-		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-element' );
 	}
 
 	public function help() {

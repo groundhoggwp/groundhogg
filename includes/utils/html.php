@@ -711,6 +711,9 @@ class HTML {
 
 		$optionHTML = [];
 
+		if ( isset_not_empty( $a, 'data-placeholder' ) ) {
+			$optionHTML[] = html()->e( 'option', [], '', false );
+		}
 
 		if ( ! empty( $a['option_none'] ) ) {
 			$optionHTML[] = html()->e( 'option', [
@@ -739,7 +742,7 @@ class HTML {
 						$optionHTML[] = html()->e( 'option', [
 							'value'    => $inner_value,
 							'selected' => in_array( $inner_value, $selected ),
-						], esc_html( $inner_name ) );
+						], esc_html( $inner_name ), false );
 					}
 
 					$optionHTML[] = "</optgroup>";
@@ -748,7 +751,7 @@ class HTML {
 					$optionHTML[] = html()->e( 'option', [
 						'value'    => $value,
 						'selected' => in_array( $value, $selected ),
-					], esc_html( $name ) );
+					], esc_html( $name ), false );
 				}
 
 			}
@@ -846,9 +849,9 @@ class HTML {
 				$a['options'][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
 			}
 		}
-        if ( $a['multiple'] ){
-            $a['option_none'] = false;
-        }
+		if ( $a['multiple'] ) {
+			$a['option_none'] = false;
+		}
 
 		return apply_filters( 'groundhogg/html/dropdown_owners', $this->dropdown( $a ), $a );
 	}
@@ -906,7 +909,7 @@ class HTML {
 			'options'           => [],
 			'selected'          => [],
 			'multiple'          => false,
-			'placeholder'       => 'Please Select One',
+			'placeholder'       => __( 'Please select one', 'groundhogg' ),
 			'option_none'       => false,
 			'option_none_value' => false,
 			'tags'              => false,

@@ -62,7 +62,8 @@ class Email_Confirmed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/email-confirmed.png';
+//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/email-confirmed.png';
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/email-confirmed.svg';
 	}
 
 	/**

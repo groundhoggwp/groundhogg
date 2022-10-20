@@ -130,6 +130,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function get_title() {
+		return sanitize_text_field( $this->step_title );
+	}
+
+	public function get_title_formatted() {
 		return $this->step_title;
 	}
 

@@ -325,39 +325,34 @@
                           'groundhogg') }</label>
                   <div class="gh-input-group">
                       ${ select({
-                                  className: 'delay-input re-render',
-                                  name: 'run_when',
-                              },
-                              runWhenTypes,
-                              run_when,
-                      ) }
-                      ${
-                              run_when === 'later'
-                                      ? input({
-                                          className: 'delay-input',
-                                          type: 'time',
-                                          name: 'run_time',
-                                          value: run_time,
-                                      }) : ''
-                      }
-                      ${
-                              run_when === 'between'
-                                      ? [
-                                          input({
-                                              className: 'delay-input',
-                                              type: 'time',
-                                              name: 'run_time',
-                                              value: run_time,
-                                          }),
-                                          input({
-                                              className: 'delay-input',
-                                              type: 'time',
-                                              name: 'run_time_to',
-                                              value: run_time_to,
-                                          }),
-                                      ].join('')
-                                      : ''
-                      }
+                          className: 'delay-input re-render',
+                          name: 'run_when',
+                          options: runWhenTypes,
+                          selected: run_when,
+                      }) }
+                      ${ run_when === 'later'
+                              ? input({
+                                  className: 'delay-input',
+                                  type: 'time',
+                                  name: 'run_time',
+                                  value: run_time,
+                              }) : '' }
+                      ${ run_when === 'between'
+                              ? [
+                                  input({
+                                      className: 'delay-input',
+                                      type: 'time',
+                                      name: 'run_time',
+                                      value: run_time,
+                                  }),
+                                  input({
+                                      className: 'delay-input',
+                                      type: 'time',
+                                      name: 'run_time_to',
+                                      value: run_time_to,
+                                  }),
+                              ].join('')
+                              : '' }
                   </div>
               </div>
               <div class="display-flex align-center gap-10">
@@ -499,7 +494,7 @@
         }
       })
 
-      Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form ?? {}, (form) => {
+      Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form, (form) => {
         updateStepMeta({
           form,
         })
@@ -555,10 +550,10 @@
           confirmText: __('Upgrade Form', 'groundhogg'),
           onConfirm: () => {
 
-            $(`#step_${ ID }_upgrade_form_confirm`).val( 'confirm' )
+            $(`#step_${ ID }_upgrade_form_confirm`).val('confirm')
             Funnel.save()
 
-          }
+          },
         })
 
       })

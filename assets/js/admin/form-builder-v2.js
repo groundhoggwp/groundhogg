@@ -1584,7 +1584,7 @@
 
       //language=HTML
       return `
-          <div class="form-builder-main" data-id="${ form.id }">
+          <div class="form-builder-main">
               <div class="fields-editor">
                   <div class="form-fields">
                       ${ form.fields.map(
@@ -1653,20 +1653,26 @@
 
   const FormBuilder = (
     selector,
-    form = defaultForm,
+    form,
     onChange = (form) => {
       console.log(form)
     }) => ( {
 
-    form: {
-      ...defaultForm,
-      ...form,
-    },
+    form,
     el: $(selector),
     activeField: false,
     activeFieldTab: 'content',
 
     mount () {
+
+      // form does not exist yet, adding new
+      if ( ! this.form ){
+        this.form = defaultForm
+        onChange( this.form )
+      }
+
+      console.log( this.form )
+
       this.render()
       this.onMount()
     },

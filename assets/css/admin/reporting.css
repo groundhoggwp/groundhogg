@@ -255,19 +255,11 @@ h1.report-title {
   background-color: #9ece38;
 }
 .gh-panel table.groundhogg-report-table tr th .step-icon, .gh-panel table.groundhogg-report-table tr td .step-icon {
-  background-color: #FFFFFF;
+  position: absolute;
   width: 46px;
-  border-radius: 5px;
   top: 6px;
   left: 6px;
 }
-.gh-panel table.groundhogg-report-table tr th .step-icon.benchmark, .gh-panel table.groundhogg-report-table tr td .step-icon.benchmark {
-  border: 2px solid #f58115;
-}
-.gh-panel table.groundhogg-report-table tr th .step-icon.action, .gh-panel table.groundhogg-report-table tr td .step-icon.action {
-  border: 2px solid #9ece38;
-}
-
 /* NEW CSS FOR TABLE */
 table.groundhogg-report-table tr:nth-child(odd) {
   background-color: rgba(0, 117, 255, 0.02);
@@ -400,15 +392,6 @@ table.groundhogg-report-table td:last-child {
   top: 40%;
   left: 0;
   right: 0;
-}
-
-.step-icon {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 47px;
-  border: solid #f2f2f2;
-  border-width: 0 1px 0 0;
 }
 
 #table_funnel_stats table td:first-child {

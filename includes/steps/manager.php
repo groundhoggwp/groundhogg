@@ -105,6 +105,12 @@ class Manager {
 		do_action( 'groundhogg/steps/init', $this );
 	}
 
+	public function __set( $name, $value ) {
+		if ( method_exists( $value, 'get_type' ) ){
+			$this->add_step( $value );
+		}
+	}
+
 	/**
 	 * @param $step Funnel_Step
 	 */

@@ -20,5 +20,6 @@
 /package-lock.json export-ignore
 /phpunit.xml.dist export-ignore
 /webpack.config.js export-ignore
+/babel.config.js export-ignore
 /wp-cli.phar export-ignore
 /wp-cli.yml export-ignore

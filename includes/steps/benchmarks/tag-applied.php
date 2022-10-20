@@ -75,7 +75,8 @@ class Tag_Applied extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.png';
+//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.png';
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.svg';
 	}
 
 	/**

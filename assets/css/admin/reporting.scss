@@ -309,18 +309,17 @@ h1.report-title {
         }
 
         .step-icon {
-          background-color: #FFFFFF;
+          position: absolute;
           width: 46px;
-          border-radius: 5px;
           top: 6px;
           left: 6px;
 
           &.benchmark {
-            border: 2px solid $benchmark-orange;
+            //border: 2px solid $benchmark-orange;
           }
 
           &.action {
-            border: 2px solid $action-green;
+            //border: 2px solid $action-green;
           }
         }
       }
@@ -463,15 +462,6 @@ table.groundhogg-report-table td:last-child {
   top: 40%;
   left: 0;
   right: 0;
-}
-
-.step-icon {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 47px;
-  border: solid #f2f2f2;
-  border-width: 0 1px 0 0;
 }
 
 #table_funnel_stats table td:first-child {

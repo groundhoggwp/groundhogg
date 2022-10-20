@@ -74,7 +74,7 @@ class Send_Email extends Action {
 	 */
 	public function get_icon() {
 //		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send.svg';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.png';
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.svg';
 	}
 
 	public function admin_scripts() {

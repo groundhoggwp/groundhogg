@@ -232,6 +232,7 @@ class Funnels_Page extends Admin_Page {
 				iframe_compat();
 				break;
 			case 'add':
+				wp_enqueue_style( 'groundhogg-admin-element' );
 				break;
 		}
 
@@ -753,7 +754,7 @@ class Funnels_Page extends Admin_Page {
 
 		$new_step_id = $new_step->create( [
 			'funnel_id'   => $step->get_funnel_id(),
-			'step_title'  => sprintf( __( '%s - (copy)', 'groundhogg' ), $step->get_title() ),
+			'step_title'  => $step->get_title(),
 			'step_type'   => $step->get_type(),
 			'step_group'  => $step->get_group(),
 			'step_order'  => $step->get_order() + 1,
