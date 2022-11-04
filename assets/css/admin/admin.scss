@@ -572,86 +572,96 @@ label.block {
   display: inline-block;
   width: 50px;
   height: 20px;
-}
 
-.gh-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: none;
+  }
 
-.gh-switch .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
 
-.gh-switch .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    &:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-.gh-switch input:checked + .slider {
-  background-color: #2196F3;
-}
+    &.round {
+      border-radius: 34px;
 
-.gh-switch input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+      &:before {
+        border-radius: 50%;
+      }
+    }
+  }
 
-.gh-switch input:checked + .slider:before {
-  -webkit-transform: translateX(30px);
-  -ms-transform: translateX(30px);
-  transform: translateX(30px);
-}
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
 
-/* Rounded sliders */
-.gh-switch .slider.round {
-  border-radius: 34px;
-}
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
 
-.gh-switch .slider.round:before {
-  border-radius: 50%;
-}
+  input:disabled + .slider {
+    opacity: 0.5;
+  }
 
-.gh-switch span.on {
-  display: none;
-  left: 7px
-}
+  input:checked + .slider:before {
+    -webkit-transform: translateX(30px);
+    -ms-transform: translateX(30px);
+    transform: translateX(30px);
+  }
 
-.gh-switch span.off {
-  right: 7px;
-}
+  span  {
 
-.gh-switch span.on, .gh-switch span.off {
-  font-weight: 500;
-  color: white;
-  position: absolute;
-  transform: translateY(-50%);
-  top: 50%;
-  font-size: 10px;
-  font-family: Verdana, sans-serif;
-}
+    &.on,
+    &.off {
+      font-weight: 500;
+      color: white;
+      position: absolute;
+      transform: translateY(-50%);
+      top: 50%;
+      font-size: 10px;
+      font-family: Verdana, sans-serif;
+    }
 
-.gh-switch input:checked ~ span.on {
-  display: block;
-}
+    &.on {
+      display: none;
+      left: 7px
+    }
 
-.gh-switch input:checked ~ span.off {
-  display: none;
+    &.off {
+      right: 7px;
+    }
+
+  }
+
+  input:checked ~ span.on {
+    display: block;
+  }
+
+  input:checked ~ span.off {
+    display: none;
+  }
+
 }
 
 

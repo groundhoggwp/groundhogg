@@ -4,8 +4,13 @@
         $('.spinner').css('visibility', 'visible');
 
         if ( window.self !== window.top ) {
-            parent.EmailStep.changesSaved = true;
-            parent.EmailStep.newEmailId = email.email_id;
+
+            try {
+                parent.EmailStep.changesSaved = true;
+                parent.EmailStep.newEmailId = email.email_id;
+            } catch (e) {
+                console.debug(e)
+            }
         }
     });
 

@@ -67,15 +67,12 @@ class Recaptcha extends Input {
 
 		if ( $version === 'v2' ) {
 
-			wp_enqueue_script( 'google-recaptcha' );
-
 			return sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>',
 				get_option( 'gh_recaptcha_site_key', '' ),
 				$this->get_theme(),
 				$this->get_size()
 			);
 		} else {
-			wp_enqueue_script( 'groundhogg-google-recaptcha' );
 
 			return "<div class='gh-recaptcha-v3' style='display: none;'></div>";
 		}

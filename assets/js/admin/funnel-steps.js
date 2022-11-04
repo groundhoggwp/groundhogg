@@ -447,12 +447,15 @@
                   <h2>After submit...</h2>
               </div>
               <div class="inside display-flex column gap-10">
-                  <p>${ __('Stay on page after submitting?', 'groundhogg') } ${ toggle({
-                      name: 'enable_ajax',
-                      checked: Boolean(meta.enable_ajax),
-                      onLabel: _x('YES', 'toggle switch', 'groundhogg'),
-                      offLabel: _x('NO', 'toggle switch', 'groundhogg'),
-                  }) }</p>
+                  <div class="display-flex gap-10">
+                      <p>${ __('Stay on page after submitting?', 'groundhogg') }</p>
+                      ${ toggle({
+                          name: 'enable_ajax',
+                          checked: Boolean(meta.enable_ajax),
+                          onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+                          offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+                      }) }
+                  </div>
                   <div class="success-message">
                       ${ stayOnPage }
                   </div>

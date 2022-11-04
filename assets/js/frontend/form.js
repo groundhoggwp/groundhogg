@@ -4,6 +4,7 @@
     nonces,
     i18n,
     routes,
+    reCAPTCHA
   } = gh
 
   const { _wprest } = nonces
@@ -53,10 +54,88 @@
 
   function inIframe () {
     try {
-      return window.self !== window.top;
-    } catch (e) {
-      return true;
+      return window.self !== window.top
     }
+    catch (e) {
+      return true
+    }
+  }
+
+  const submitForm = ( form ) => {
+
+    let submitText = ''
+
+    let btn = form.querySelector('button[type="submit"]')
+
+    btn.disabled = true
+    submitText = btn.innerHTML
+    btn.innerHTML = i18n.submitting
+    let { stop } = loadingDots(btn)
+
+    form.parentNode.querySelectorAll('.gh-success, .gh-errors').forEach(el => el.remove())
+
+    let fd = new FormData(form)
+
+    let uuid = form.id
+
+    apiPostFormData(`${ routes.forms }/${ uuid }/`, fd).then(r => {
+
+      stop()
+      btn.innerHTML = submitText
+      btn.disabled = false
+
+      if (r.code) {
+
+        let message
+
+        switch (r.code) {
+          case 'failed_to_submit':
+            message = `
+                  <p>${ r.message }</p>
+                  <ul>${ r.additional_errors.map(err => `<li><b>${ err.data }:</b> ${ err.message }</li>`).
+              join('') }</ul>`
+            break
+          default:
+            message = `<p>${ r.message }</p>`
+        }
+
+        let msg = document.createElement('div')
+        //language=HTML
+        msg.innerHTML = message
+        msg.classList.add(...['gh-errors'])
+
+        form.parentNode.appendChild(msg)
+
+        return
+
+      }
+
+      if (r.url) {
+        setTimeout(() => {
+          window.open(r.url, inIframe() ? '_parent' : '_self')
+        }, 500)
+      }
+
+      if (r.message) {
+        let msg = document.createElement('div')
+        //language=HTML
+        msg.innerHTML = r.message
+        msg.classList.add(...['gh-success'])
+        form.parentNode.appendChild(msg)
+
+        form.reset()
+
+      }
+
+    }).then(() => {
+
+      form.dispatchEvent(ajaxFinEvt)
+      form.dispatchEvent(formSubmitted)
+
+    }).catch(e => {
+      alert(e.message)
+    })
+
   }
 
   const handleAjaxForms = () => {
@@ -68,95 +147,32 @@
         e.preventDefault()
 
         let form = e.currentTarget
-        let submitText = ''
 
-        let btn = form.querySelector('button[type="submit"]')
+        let hasRecaptcha = form.querySelectorAll('.gh-recaptcha-v3').length > 0
+        let hasRecaptchaResponse = form.querySelectorAll('input[name="g-recaptcha-response"]').length > 0
 
-        btn.disabled = true
-        submitText = btn.innerHTML
-        btn.innerHTML = i18n.submitting
-        let { stop } = loadingDots(btn)
+        if ( hasRecaptcha && ! hasRecaptchaResponse ) {
 
-        form.parentNode.querySelectorAll('.gh-success, .gh-errors').forEach(el => el.remove())
+          grecaptcha.ready(() => {
+            grecaptcha.execute(reCAPTCHA.site_key, { action: 'submit' }).then((_token) => {
 
-        let fd = new FormData(form)
+              // Add your logic to submit to your backend server here.
+              const input = document.createElement('input')
+              input.type = 'hidden'
+              input.name = 'g-recaptcha-response'
+              input.value = _token
 
-        //check if google is active
-        let captchaValidated = true
+              form.appendChild(input)
 
-        // If this element is present in the form then captcha has not been verified
-        if (form.querySelectorAll('.gh-recaptcha-v3').length > 0) {
-          captchaValidated = false
-        }
-
-        // Captcha has been verified
-        if (fd.has('g-recaptcha-response')) {
-          captchaValidated = true
-        }
-
-        if (captchaValidated) {
-
-          let uuid = __form.id
-
-          apiPostFormData(`${ routes.forms }/${ uuid }/`, fd).then(r => {
-
-            stop()
-            btn.innerHTML = submitText
-            btn.disabled = false
-
-            if (r.code) {
-
-              let message
-
-              switch (r.code) {
-                case 'failed_to_submit':
-                  message = `
-                  <p>${ r.message }</p>
-                  <ul>${ r.additional_errors.map(err => `<li><b>${err.data}:</b> ${ err.message }</li>`).join('') }</ul>`
-                  break
-                default:
-                  message = `<p>${ r.message }</p>`
-              }
-
-              let msg = document.createElement('div')
-              //language=HTML
-              msg.innerHTML = message
-              msg.classList.add(...['gh-errors'])
-
-              form.parentNode.appendChild(msg)
-
-              return
-
-            }
-
-            if (r.url) {
-              setTimeout(() => {
-
-                window.open(r.url, inIframe() ? '_parent' : '_self')
-
-              }, 500)
-            }
-
-            if (r.message) {
-              let msg = document.createElement('div')
-              //language=HTML
-              msg.innerHTML = r.message
-              msg.classList.add(...['gh-success'])
-              form.parentNode.appendChild(msg)
-
-              form.reset()
-
-            }
-
-          }).then( () => {
-
-            form.dispatchEvent(ajaxFinEvt)
-            form.dispatchEvent(formSubmitted)
-
-          } ).catch(e => {
-            alert(e.message)
+              // dont use
+              submitForm( form )
+            })
           })
+
+          return;
         }
+
+        submitForm( form )
 
       })
 

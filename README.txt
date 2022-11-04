@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7
+Stable tag: 2.7.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.7.1 (2022-011-04) =
+* TWEAKED combined frontend JS files.
+* FIXED Recaptcha v3 issues with new form builder.
+* FIXED Fatal error when previewing emails while not being logged in.
 
 = 2.7.7 (2022-09-29) =
 * ADDED New form visual drag and drop builder!

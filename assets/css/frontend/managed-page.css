@@ -160,6 +160,13 @@ p#credit img {
   transition: 50ms border-color ease-in-out;
 }
 
+#main label.gh-checkbox-label {
+  display: flex;
+  gap: 5px;
+}
+#main p .gh-checkbox-label + br {
+  display: none;
+}
 #main input[type=email],
 #main input[type=tel],
 #main input[type=text] {

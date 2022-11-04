@@ -1122,8 +1122,6 @@ class Form_v2 extends Step {
 
 					if ( $version === 'v2' ) {
 
-						wp_enqueue_script( 'google-recaptcha' );
-
 						return html()->e( 'div', [
 							'class'        => 'g-recaptcha',
 							'data-sitekey' => get_option( 'gh_recaptcha_site_key', '' ),
@@ -1132,10 +1130,9 @@ class Form_v2 extends Step {
 						], '', false );
 
 					} else {
-						wp_enqueue_script( 'groundhogg-google-recaptcha' );
 
 						return html()->e( 'div', [
-							'class' => 'g-recaptcha-v3',
+							'class' => 'gh-recaptcha-v3',
 							'style' => [
 								'display' => 'none'
 							]

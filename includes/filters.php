@@ -81,9 +81,7 @@ add_filter( 'groundhogg/api/v4/options_sanitize_callback', __NAMESPACE__ . '\fil
  * @return string
  */
 function fix_html_pw_reset_link( $message, $key, $user_login, $user_data ) {
-	$message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
-
-	return $message;
+	return preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
 }
 
 add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_link', 10, 4 );

@@ -84,11 +84,11 @@ class Emails_Api extends Base_Object_Api {
 		//send emails
 		$status = send_email_notification( $email, $contact, $request->get_param( 'when' ) );
 
-		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] ) ;
+		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
 		$result = process_events( $contact );
 
-		if ( $result !== true ){
+		if ( $result !== true ) {
 			return $result[0];
 		}
 
@@ -96,7 +96,7 @@ class Emails_Api extends Base_Object_Api {
 			return self::ERROR_UNKNOWN();
 		}
 
-		if ( $this->has_errors() ){
+		if ( $this->has_errors() ) {
 			return $this->get_last_error();
 		}
 
@@ -135,14 +135,13 @@ class Emails_Api extends Base_Object_Api {
 
 		$content = $request->get_param( 'content' );
 
-		if ( apply_filters( 'groundhogg/add_custom_footer_text_to_personal_emails', true ) ){
+		if ( apply_filters( 'groundhogg/add_custom_footer_text_to_personal_emails', true ) ) {
 			$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
 		}
 
 		$content = email_kses( $content );
 		$subject = sanitize_text_field( $request->get_param( 'subject' ) );
-
-		$type = sanitize_text_field( $request->get_param( 'type' ) ?: 'wordpress' );
+		$type    = sanitize_text_field( $request->get_param( 'type' ) ?: 'wordpress' );
 
 		$headers = [
 			'Content-Type: text/html',

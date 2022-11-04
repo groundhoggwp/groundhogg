@@ -47,11 +47,8 @@ class Scripts {
 		$dot_min = $this->is_script_debug_enabled() ? '' : '.min';
 
 		wp_register_script( 'groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'groundhogg-form-v2', GROUNDHOGG_ASSETS_URL . 'js/frontend/form' . $dot_min . '.js', [
-			'groundhogg-frontend'
-		], GROUNDHOGG_VERSION, true );
 
-		$form_dependencies = [
+		$form_dependencies = $form_v2_dependencies = [
 			'groundhogg-frontend',
 		];
 
@@ -74,10 +71,12 @@ class Scripts {
 				'site_key' => $site_key
 			] );
 
+			$form_v2_dependencies[] = 'google-recaptcha';
 			$form_dependencies[] = 'groundhogg-google-recaptcha';
 		}
 
 		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', $form_dependencies, GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-form-v2', GROUNDHOGG_ASSETS_URL . 'js/frontend/form' . $dot_min . '.js', $form_v2_dependencies, GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 
@@ -101,6 +100,9 @@ class Scripts {
 				'lead_source'      => Tracking::LEAD_SOURCE_COOKIE,
 				'form_impressions' => Tracking::FORM_IMPRESSIONS_COOKIE,
 				'page_visits'      => Tracking::PAGE_VISITS_COOKIE,
+			],
+			'reCAPTCHA'                    => [
+				'site_key' => get_option( 'gh_recaptcha_site_key' )
 			],
 			'settings'                     => [
 				'consent_cookie_name'  => get_option( 'gh_consent_cookie_name', 'viewed_cookie_policy' ),

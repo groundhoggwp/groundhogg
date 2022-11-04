@@ -165,6 +165,12 @@ class Rewrites {
 			case 'funnels':
 				return $this->get_404();
 			case 'browser_view':
+
+				// No tracked contact
+				if ( ! get_contactdata() ){
+					break;
+				}
+
 				$template = $template_loader->get_template_part( 'emails/browser-view', '', false );
 				break;
 			case 'emails':

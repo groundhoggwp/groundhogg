@@ -208,7 +208,7 @@ class HTML {
 				echo html()->e( 'a', [
 					'href'  => esc_url( add_query_arg( [ 'tab' => $id ], $_SERVER['REQUEST_URI'] ) ),
 					'class' => 'nav-tab' . ( $active_tab == $id ? ' nav-tab-active' : '' ),
-					'id'    => $id,
+//					'id'    => $id,
 				], $tab );
 
 			endforeach; ?>
@@ -568,7 +568,10 @@ class HTML {
 			'title'   => '',
 		) );
 
-		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a['label'] ) ? '<span class="checkbox-label">' . $a['label'] . '</span>' : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
+		$label = $a['label'];
+		unset( $a['label'] );
+
+		$html = $this->wrap( $this->input( $a ) . ( ! empty( $label ) ? '<span class="checkbox-label">' . $label . '</span>' : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
 
 		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}

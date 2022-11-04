@@ -319,6 +319,30 @@
         })
       },
     },
+
+    multiple: {
+      type: 'multiple',
+      edit ({ multiple = false }) {
+        //language=HTML
+        return `<label for="multiple">${ __('Allow multiple selections', 'groundhogg') }</label>
+        <div class="setting">${ toggle({
+          id: 'allow-multiple',
+          name: 'multiple',
+          className: 'multiple',
+          onLabel: 'Yes',
+          offLabel: 'No',
+          checked: multiple,
+        }) }
+        </div>`
+      },
+      onMount (field, updateField) {
+        $('#allow-multiple').on('change', (e) => {
+          updateField({
+            multiple: e.target.checked,
+          })
+        })
+      },
+    },
     label: {
       type: 'label',
       edit ({ label = '' }) {
@@ -1140,6 +1164,7 @@
         Settings.hideLabel.type,
         Settings.required.type,
         Settings.options.type,
+        Settings.multiple.type,
         Settings.columnWidth.type,
       ],
       advanced: [

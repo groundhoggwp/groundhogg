@@ -163,6 +163,16 @@ p#credit img {
 }
 
 #main{
+
+    label.gh-checkbox-label {
+        display: flex;
+        gap: 5px;
+    }
+
+    p .gh-checkbox-label + br {
+        display: none;
+    }
+
     input[type="email"],
     input[type="tel"],
     input[type="text"] {

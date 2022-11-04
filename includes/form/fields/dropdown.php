@@ -149,8 +149,14 @@ class Dropdown extends Input {
 
 	public function render() {
 
+		$name = $this->get_name();
+
+		if ( $this->is_multiple() ){
+			$name .= '[]';
+		}
+
 		$atts = [
-			'name'        => $this->get_name(),
+			'name'        => $name,
 			'id'          => $this->get_id(),
 			'class'       => $this->get_classes() . ' gh-input',
 			'placeholder' => $this->get_placeholder(),
