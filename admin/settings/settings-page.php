@@ -180,13 +180,17 @@ class Settings_Page extends Admin_Page {
 
 			if ( ! empty( $extensions ) ) :
 
-				if ( ! is_white_labeled() ):
+				if ( ! is_white_labeled() && License_Manager::has_expired_licenses() ):
 
 					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 					?>
-					<p><?php printf( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
+					<p><?php printf( __( 'If your license key has expired, <a href="https://groundhogg.io/account/licenses/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
+
+                else:
+
+                    ?><p></p><?php
 
 				endif;
 

@@ -81,9 +81,11 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 		case 'text':
 		case 'radio':
 		case 'textarea':
-		case 'number':
 		case 'date':
 			$data = esc_html( $data );
+			break;
+		case 'number':
+			$data = number_format_i18n( floatval( $data ), floor( $data ) != $data ? 2 : 0 );
 			break;
 		case 'dropdown':
 		case 'checkboxes':

@@ -13,26 +13,17 @@ class License_Notice {
 	}
 
 	/**
-	 * Get the expired license from the license manager
-	 *
-	 * @return mixed
-	 */
-	public function get_expired_licenses() {
-		$extensions = License_Manager::get_expired_licenses();
-
-		return array_pop( $extensions );
-	}
-
-	/**
 	 * Show an admin notice to nag users into renewing or updating their license.
 	 */
 	public function show_expired_license_nag() {
 
-		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ){
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ) {
 			return;
 		}
 
-		$license_key = $this->get_expired_licenses();
+		$licenses = License_Manager::get_expired_licenses();
+
+		$license_key = array_pop( $licenses );
 
 		if ( ! $license_key ) {
 			return;
@@ -43,8 +34,8 @@ class License_Notice {
 		], self::CHECKOUT_URL );
 
 		$deactivate_url = admin_url( wp_nonce_url( add_query_arg( [
-			'action'    => 'deactivate_license',
-			'license'   => $license_key,
+			'action'  => 'deactivate_license',
+			'license' => $license_key,
 		], 'admin.php?page=gh_settings&tab=extensions' ) ) );
 
 		$check_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
@@ -74,7 +65,7 @@ class License_Notice {
 	 */
 	public function show_non_licensed_extensions_nag() {
 
-		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ){
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ) {
 			return;
 		}
 

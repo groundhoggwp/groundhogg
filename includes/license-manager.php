@@ -67,6 +67,15 @@ class License_Manager {
 	}
 
 	/**
+     * Whether there are expired licences
+     *
+	 * @return bool
+	 */
+    public static function has_expired_licenses(){
+        return count( self::get_expired_licenses() ) > 0;
+    }
+
+	/**
 	 * Get a list of the expired licenses
 	 *
 	 * @return array
@@ -74,9 +83,20 @@ class License_Manager {
 	public static function get_expired_licenses() {
 		self::init_licenses();
 
-		return array_unique( wp_list_pluck( array_filter( self::$extensions, function ( $license ) {
-			return $license['status'] === 'invalid' || ( $license['expiry'] !== 'lifetime' && strtotime( $license['expiry'] < time() ) );
-		} ), 'license' ) );
+		return array_unique( wp_list_pluck( self::get_expired_items(), 'license' ) );
+	}
+
+	/**
+	 * Get the expired items
+	 *
+	 * @return array
+	 */
+	public static function get_expired_items() {
+		self::init_licenses();
+
+		return array_filter( self::$extensions, function ( $license ) {
+			return $license['status'] === 'invalid' || ( $license['expiry'] !== 'lifetime' && strtotime( $license['expiry'] ) < time() );
+		} );
 	}
 
 	/**
@@ -440,7 +460,7 @@ class License_Manager {
 	 */
 	public static function verify_license( $item_id, $license = '' ) {
 
-		if ( ! $item_id ){
+		if ( ! $item_id ) {
 			return false;
 		}
 
@@ -486,8 +506,6 @@ class License_Manager {
 			return false;
 		}
 
-//		wp_send_json( $license_data );
-
 		return true;
 	}
 
@@ -519,11 +537,7 @@ class License_Manager {
 			return true;
 		}
 
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-		// Todo parse license data?
-
-		return $license_data;
+		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 
 	/**
@@ -542,7 +556,7 @@ class License_Manager {
 		$key = md5( serialize( $args ) );
 
 		if ( get_transient( "gh_store_products_{$key}" ) ) {
-//			return get_transient( "gh_store_products_{$key}" );
+			return get_transient( "gh_store_products_{$key}" );
 		}
 
 		$args = wp_parse_args( $args, array(
@@ -617,9 +631,7 @@ class License_Manager {
 			$extensions[] = $products[ $rand ];
 		}
 
-		$extensions = apply_filters( 'groundhogg/license_manager/get_extensions', $extensions );
-
-		return $extensions;
+		return apply_filters( 'groundhogg/license_manager/get_extensions', $extensions );
 	}
 
 	/**
@@ -639,27 +651,27 @@ class License_Manager {
 		], $extension->info->link );
 
 		?>
-		<div class="postbox">
+        <div class="postbox">
 			<?php if ( $extension->info->title ): ?>
-				<h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
+                <h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
 			<?php endif; ?>
-			<div class="inside" style="padding: 0;margin: 0">
+            <div class="inside" style="padding: 0;margin: 0">
 				<?php if ( $extension->info->thumbnail ): ?>
-					<div class="img-container">
-						<a href="<?php echo $extension->info->link; ?>" target="_blank">
-							<img src="<?php echo $extension->info->thumbnail; ?>"
-							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
-						</a>
-					</div>
+                    <div class="img-container">
+                        <a href="<?php echo $extension->info->link; ?>" target="_blank">
+                            <img src="<?php echo $extension->info->thumbnail; ?>"
+                                 style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
+                        </a>
+                    </div>
 				<?php endif; ?>
 				<?php if ( $extension->info->excerpt ): ?>
-					<div class="article-description" style="padding: 10px;">
+                    <div class="article-description" style="padding: 10px;">
 						<?php echo $extension->info->excerpt; ?>
-					</div>
-					<hr/>
+                    </div>
+                    <hr/>
 				<?php endif; ?>
 				<?php if ( $extension->info->link ): ?>
-					<div class="buy" style="padding: 10px">
+                    <div class="buy" style="padding: 10px">
 						<?php $pricing = (array) $extension->pricing;
 						if ( count( $pricing ) > 1 ) {
 
@@ -667,8 +679,8 @@ class License_Manager {
 							$price2 = max( $pricing );
 
 							?>
-							<a class="button-secondary" target="_blank"
-							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+                            <a class="button-secondary" target="_blank"
+                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -676,22 +688,22 @@ class License_Manager {
 
 							if ( $price > 0.00 ) {
 								?>
-								<a class="button-secondary" target="_blank"
-								   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+                                <a class="button-secondary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-								<a class="button-secondary" target="_blank"
-								   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+                                <a class="button-secondary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-					</div>
+                    </div>
 				<?php endif; ?>
-			</div>
-		</div>
+            </div>
+        </div>
 
 		<?php
 

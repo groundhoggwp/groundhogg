@@ -24,11 +24,13 @@ class Check_Licenses extends Bulk_Job {
 	 */
 	public function query( $items ) {
 
-		$licenses = License_Manager::get_extension_licenses();
+		$licenses = License_Manager::get_expired_items();
 
-		return array_map( function ( $license_details, $item_id ) {
-			$license_details['item_id'] = $item_id;
-		}, $licenses, array_keys( $licenses ) );
+		foreach ( $licenses as $item_id => &$license ){
+			$license['item_id'] = $item_id;
+		}
+
+		return array_values( $licenses );
 	}
 
 	public function max_items( $max, $items ) {
