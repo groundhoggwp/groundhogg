@@ -226,7 +226,12 @@ class Event_Queue extends DB {
 	 * @return false|int
 	 */
 	public function contact_deleted( $id ) {
-		return $this->bulk_delete( array( 'contact_id' => $id ) );
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
+		return $this->bulk_delete( [ 'contact_id' => $id ] );
 	}
 
 	/**
@@ -237,7 +242,12 @@ class Event_Queue extends DB {
 	 * @return false|int
 	 */
 	public function funnel_deleted( $id ) {
-		return $this->bulk_delete( array( 'funnel_id' => $id ) );
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
+		return $this->bulk_delete( [ 'funnel_id' => $id ] );
 	}
 
 	/**
@@ -248,7 +258,12 @@ class Event_Queue extends DB {
 	 * @return false|int
 	 */
 	public function step_deleted( $id ) {
-		return $this->bulk_delete( array( 'step_id' => $id ) );
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
+		return $this->bulk_delete( [ 'step_id' => $id ] );
 	}
 
 	/**

@@ -468,17 +468,26 @@ class Location {
 	 * @return string
 	 */
 	public function get_real_ip() {
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) )   //check ip from share internet
-		{
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} else if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )   //to check ip is pass from proxy
-		{
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
+
+		// Check for IP
+		$places = [
+			'REMOTE_ADDR',
+			'HTTP_X_FORWARDED_FOR',
+			'HTTP_CLIENT_IP',
+		];
+
+		$found = '';
+
+		foreach ( $places as $place ) {
+			if ( ! empty( $_SERVER[ $place ] ) ) {
+				$found = $_SERVER[ $place ];
+				break;
+			}
 		}
 
-		return $ip;
+		$ips = array_map( 'trim', explode( ',', $found ) );
+
+		return array_pop( $ips );
 	}
 
 
@@ -524,8 +533,8 @@ class Location {
 			return false;
 		}
 
-		$purpose    = str_replace( [ "name", "\n", "\t", " ", "-", "_" ], null, strtolower( trim( $purpose ) ) );
-		$support    = [
+		$purpose = str_replace( [ "name", "\n", "\t", " ", "-", "_" ], null, strtolower( trim( $purpose ) ) );
+		$support = [
 			'raw',
 			'cc',
 			'country_code',

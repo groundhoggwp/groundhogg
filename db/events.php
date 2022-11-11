@@ -208,17 +208,6 @@ class Events extends DB {
 	}
 
 	/**
-	 * Delete events for a contact that was just deleted...
-	 *
-	 * @param $id
-	 *
-	 * @return false|int
-	 */
-	public function contact_deleted( $id ) {
-		return $this->bulk_delete( [ 'contact_id' => $id ] );
-	}
-
-	/**
 	 * For some reason, queued_id is getting duplicated on large installs
 	 * So let's order the table by ID DESC so we get the most recent event...
 	 *
@@ -261,6 +250,22 @@ class Events extends DB {
 	}
 
 	/**
+	 * Delete events for a contact that was just deleted...
+	 *
+	 * @param $id
+	 *
+	 * @return false|int
+	 */
+	public function contact_deleted( $id ) {
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
+		return $this->bulk_delete( [ 'contact_id' => $id ] );
+	}
+
+	/**
 	 * Delete events for a funnel that was just deleted...
 	 *
 	 * @param $id
@@ -268,6 +273,11 @@ class Events extends DB {
 	 * @return false|int
 	 */
 	public function funnel_deleted( $id ) {
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
 		return $this->bulk_delete( [ 'funnel_id' => $id ] );
 	}
 
@@ -279,6 +289,11 @@ class Events extends DB {
 	 * @return false|int
 	 */
 	public function step_deleted( $id ) {
+
+		if ( ! is_numeric( $id ) ){
+			return false;
+		}
+
 		// This is only used when funnel steps are deleted...
 		return $this->bulk_delete( [ 'step_id' => $id, 'event_type' => Event::FUNNEL ] );
 	}

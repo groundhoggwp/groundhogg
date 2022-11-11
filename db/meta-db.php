@@ -143,6 +143,12 @@ abstract class Meta_DB extends DB {
 	 * @return false|int
 	 */
 	public function delete_associated_meta( $where, $formats, $object_table ) {
+
+		// Same table problem for meta tables with same object type
+		if ( $object_table->table_name === $this->table_name ){
+			return false;
+		}
+
 		global $wpdb;
 
 		if ( is_numeric( $where ) ) {
