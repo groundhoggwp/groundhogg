@@ -27,11 +27,17 @@ class License_Manager {
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
 	/**
-	 * Maybe setup the licenses unless the haven't been already
+	 * Maybe setup the licenses unless they haven't been already
 	 */
 	public static function init_licenses() {
+
 		if ( empty( static::$extensions ) ) {
-			static::$extensions = get_option( "gh_extensions", [] );
+			$extensions         = get_option( "gh_extensions", [] );
+
+            // Ignore inactive addons
+			static::$extensions = array_filter( $extensions, function ( $item_id ) {
+				return array_key_exists( $item_id, Extension::$extension_ids );
+			}, ARRAY_FILTER_USE_KEY );
 		}
 	}
 
@@ -67,13 +73,13 @@ class License_Manager {
 	}
 
 	/**
-     * Whether there are expired licences
-     *
+	 * Whether there are expired licences
+	 *
 	 * @return bool
 	 */
-    public static function has_expired_licenses(){
-        return count( self::get_expired_licenses() ) > 0;
-    }
+	public static function has_expired_licenses() {
+		return count( self::get_expired_licenses() ) > 0;
+	}
 
 	/**
 	 * Get a list of the expired licenses

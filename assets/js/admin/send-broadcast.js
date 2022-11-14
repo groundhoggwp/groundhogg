@@ -85,7 +85,12 @@
                       ${ select({
                           name: 'email',
                           id: `${ elPrefix }-email`,
-                      }, EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )), state.email_id) }
+                          options: [
+                              { text: '', value: '' },
+                              ...EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
+                          ],
+                          selected: state.email_id,
+                      }) }
                   </div>
               </div>
               ${ state.email_id ? preview() : '' }
@@ -409,8 +414,10 @@
 
                 $(`#${ elPrefix }-search-method-searches`).select2({
                   placeholder: __('Select a saved search...', 'groundhogg'),
-
-                  data: SearchesStore.getItems().map(s => ( { id: s.id, text: s.name } )),
+                  data: [
+                    { id: '', text: '' },
+                    ...SearchesStore.getItems().map(s => ( { id: s.id, text: s.name } )),
+                  ],
                 }).on('select2:select', ({ target }) => {
                   setState({
                     query: {

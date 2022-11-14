@@ -22,6 +22,20 @@ class Plugin_Compatibility {
 		// Cookie Law Info
 		add_filter( 'groundhogg/has_accepted_cookies', [ $this, 'cookie_law_info_plugin' ] );
 
+		// Dokan
+		add_action( 'dokan_enqueue_admin_dashboard_script', [ $this, 'dokan_lite' ] );
+		add_action( 'dokan_enqueue_admin_scripts', [ $this, 'dokan_lite' ] );
+
+	}
+
+	public function dokan_lite(){
+
+		if ( get_current_screen()->id !== 'groundhogg_page_gh_reporting' ){
+			return;
+		}
+
+		wp_dequeue_script( 'dokan-vue-vendor' );
+		wp_dequeue_script( 'dokan-promo-notice-js' );
 	}
 
 	/**

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.2
+Stable tag: 2.7.7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.7.3 (2022-011-04) =
+* ADDED compatibility check for dokan lite to dequeue conflict scripts on the reports dashboard.
+* TWEAKED Ignore license checks and notices for inactive addons.
+* TWEAKED Improved select2 usability
+* FIXED Fatal error caused by invalid numeric value when displaying number custom fields.
+* FIXED Fatal error using stdClass instead of array in new form builder when rendering.
 
 = 2.7.7.2 (2022-011-04) =
 * TWEAKED Change js file handles to avoid ChartJS conflict.

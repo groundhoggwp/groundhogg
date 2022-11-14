@@ -160,10 +160,14 @@
                             <div class="gh-row">
                                 <div class="gh-col">
                                     ${ select({
-                                                name: 'email',
-                                                id: `select-email`,
-                                            }, EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
-                                            emailId) }
+                                        name: 'email',
+                                        id: `select-email`,
+                                        options: [
+                                            { text: '', value: '' },
+                                            ...EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
+                                        ],
+                                        selected: emailId,
+                                    }) }
                                 </div>
                             </div>
                             ${ preview() }
@@ -626,7 +630,8 @@
                             </div>
                             <div class="event-extra">
                                 ${ sprintf(__('%s in funnel %s', 'groundhogg'),
-                                        el( 'span',  { className: [ 'step-type', step.data.step_group ].join(' ') }, Groundhogg.rawStepTypes[step.data.step_type].name ),
+                                        el('span', { className: ['step-type', step.data.step_group].join(' ') },
+                                                Groundhogg.rawStepTypes[step.data.step_type].name),
                                         el('a', {
                                             href: funnel.admin,
                                         }, funnel.data.title)) }

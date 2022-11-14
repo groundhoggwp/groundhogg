@@ -1461,6 +1461,9 @@ class Form_v2 extends Step {
 	function get_field_html() {
 
 		$config = $this->get_meta( 'form' );
+
+		$config = json_decode( wp_json_encode( $config ), true );
+
 		$fields = get_array_var( $config, 'fields', [] );
 
 		$html = implode( '', array_map( [ $this, 'render_field' ], $fields ) );
