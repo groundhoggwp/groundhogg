@@ -725,7 +725,24 @@ class Replacements implements \JsonSerializable {
 			return '';
 		}
 
-		return print_r( $this->get_current_contact()->get_meta( $arg ), true );
+		$parts    = explode( '|', $arg );
+		$meta_key = get_array_var( $parts, 0 );
+		$format   = get_array_var( $parts, 1 );
+
+		$value = $this->get_current_contact()->get_meta( $meta_key );
+
+		switch ($format){
+			default:
+				return print_r( $value, true );
+			case 'csv':
+				return is_array( $value ) ? implode( ', ', $value ) : print_r( $value, true );
+			case 'ol':
+			case 'ul':
+				return html()->e( $format, [], array_map( function ( $item ){
+					return html()->e('li', [], $item );
+				}, is_array( $value ) ? $value : array_map( 'trim', explode(',', $value ) ) ) );
+
+		}
 	}
 
 
@@ -741,7 +758,7 @@ class Replacements implements \JsonSerializable {
 
 		$size = absint( $arg );
 
-		if ( empty( $contact_id ) ){
+		if ( empty( $contact_id ) ) {
 			$size = 300;
 		}
 
@@ -750,7 +767,6 @@ class Replacements implements \JsonSerializable {
 
 		return $this->get_current_contact()->get_profile_picture( $size );
 	}
-
 
 
 	/**
@@ -1191,21 +1207,21 @@ class Replacements implements \JsonSerializable {
 
 		try {
 			$dateTime = new \DateTime( $when, wp_timezone() );
-		} catch ( \Exception $e ){
+		} catch ( \Exception $e ) {
 
 			// Swap the variables
-			$temp = $when;
-			$when = $format;
+			$temp   = $when;
+			$when   = $format;
 			$format = $temp;
 
 			try {
 				$dateTime = new \DateTime( $when, wp_timezone() );
-			} catch ( \Exception $e ){
+			} catch ( \Exception $e ) {
 				return '';
 			}
 		}
 
-		if ( $this->date_display_in_contacts_local_time ){
+		if ( $this->date_display_in_contacts_local_time ) {
 			$dateTime->setTimezone( $this->get_current_contact()->get_time_zone( false ) );
 		}
 
@@ -1221,8 +1237,9 @@ class Replacements implements \JsonSerializable {
 	 */
 	function replacement_local_date( $time_string ) {
 		$this->date_display_in_contacts_local_time = true;
-		$date = $this->replacement_date( $time_string );
+		$date                                      = $this->replacement_date( $time_string );
 		$this->date_display_in_contacts_local_time = false;
+
 		return $date;
 	}
 
@@ -1337,8 +1354,8 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * We don't want this to be serialized
-     *
+	 * We don't want this to be serialized
+	 *
 	 * @return mixed
 	 */
 	#[\ReturnTypeWillChange]

@@ -1947,6 +1947,11 @@ add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_noti
  * @return array
  */
 function split_name( $name ) {
+
+	if ( is_array( $name ) ){
+		$name = implode( ' ', $name );
+	}
+
 	$name       = trim( $name );
 	$last_name  = ( strpos( $name, ' ' ) === false ) ? '' : preg_replace( '#.*\s([\w-]*)$#', '$1', $name );
 	$first_name = trim( preg_replace( '#' . $last_name . '#', '', $name ) );
