@@ -328,6 +328,12 @@ class Contacts_Api extends Base_Object_Api {
 			$updated ++;
 		}
 
+		if ( $request->has_param( 'total_only' ) ){
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => $updated,
+			] );
+		}
+
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $updated,
 			'items'       => $contacts,

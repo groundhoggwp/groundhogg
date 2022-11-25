@@ -433,6 +433,7 @@
               const patchContacts = () => {
 
                 ContactsStore.patchMany({
+                  total_only: true,
                   query: {
                     ...query,
                     offset,
