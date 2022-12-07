@@ -836,8 +836,8 @@ function array_to_atts( $atts ) {
 
 		switch ( $key ) {
 			case 'class':
-                $value = is_array( $value ) ? trim( implode( ' ', $value ) ) : $value;
-                break;
+				$value = is_array( $value ) ? trim( implode( ' ', $value ) ) : $value;
+				break;
 			case 'style':
 				$value = array_to_css( $value );
 				break;
@@ -1948,7 +1948,7 @@ add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_noti
  */
 function split_name( $name ) {
 
-	if ( is_array( $name ) ){
+	if ( is_array( $name ) ) {
 		$name = implode( ' ', $name );
 	}
 
@@ -4959,7 +4959,7 @@ function fix_nested_p( $content ) {
 
 	$patterns = [
 		'@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
-		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m' // closing tags
+		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m', // closing tags
 	];
 
 	$replacements = [
@@ -6624,14 +6624,16 @@ function minify_html( $content ) {
 		'/\>[^\S ]+/s',     // strip whitespaces after tags, except space
 		'/[^\S ]+\</s',     // strip whitespaces before tags, except space
 		'/(\s)+/s',         // shorten multiple whitespace sequences
-		'/<!--(.|\s)*?-->/' // Remove HTML comments
+		'/<!--(.|\s)*?-->/', // Remove HTML comments,
+		'/\>\s+\</m' // Remove HTML comments,
 	);
 
 	$replace = array(
 		'>',
 		'<',
 		'\\1',
-		''
+		'',
+		'><',
 	);
 
 	return preg_replace( $search, $replace, $content );
@@ -6667,16 +6669,16 @@ function is_copyable_file( $file ) {
  */
 function process_events( $contacts = [] ) {
 
-    if ( empty( $contacts ) ){
-        return false;
-    }
+	if ( empty( $contacts ) ) {
+		return false;
+	}
 
 	// Event queue is already in progress
 	if ( Event_Queue::is_processing() ) {
 		return true;
 	}
 
-    $process = new Process_Contact_Events( $contacts );
+	$process = new Process_Contact_Events( $contacts );
 
 	return $process->has_errors() ? $process->get_errors() : true;
 }
@@ -6760,11 +6762,35 @@ function orList( $array ) {
  */
 function get_user_timezone() {
 
-    $tz = utils()->location->ip_info( null, 'time_zone' );
+	$tz = utils()->location->ip_info( null, 'time_zone' );
 
-    if ( $tz ){
-        return new \DateTimeZone( $tz );
-    }
+	if ( $tz ) {
+		return new \DateTimeZone( $tz );
+	}
 
-    return wp_timezone();
+	return wp_timezone();
+}
+
+/**
+ * Add the ordinal suffix to a number;
+ *
+ * @param $num
+ *
+ * @return string
+ */
+function ordinal_suffix( $num ) {
+	$num = intval( $num );
+	$num = $num % 100; // protect against large numbers
+	if ( $num < 11 || $num > 13 ) {
+		switch ( $num % 10 ) {
+			case 1:
+				return $num . 'st';
+			case 2:
+				return $num . 'nd';
+			case 3:
+				return $num . 'rd';
+		}
+	}
+
+	return $num . 'th';
 }
