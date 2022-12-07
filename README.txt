@@ -322,7 +322,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.7.4 (2022-11-14) =
+= 2.7.7.4 (2022-12-07) =
 * ADDED Format support for `{meta}` replacements.
 * ADDED Posts related replacement codes to show lists or grids of posts, post titles, and more in emails.
 * TWEAKED Make `split_name` function compatible with arrays.
