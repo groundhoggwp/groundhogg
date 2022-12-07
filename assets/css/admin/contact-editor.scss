@@ -54,7 +54,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 }
 
 .contact-details div .dashicons {
-  margin-right: 10px;
+  //margin-right: 10px;
 }
 
 .contact-details div a {
@@ -115,10 +115,10 @@ a.change-status.complained:hover {
 
   .email {
     p.marketable-reason{
-      padding-left: 30px;
+      //padding-left: 30px;
       font-size: 12px;
       color: $error-red;
-      margin-top: 0;
+      margin-top: 5px;
     }
   }
 

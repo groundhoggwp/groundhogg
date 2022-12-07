@@ -30,10 +30,6 @@
   margin-bottom: 8px;
 }
 
-.contact-details div .dashicons {
-  margin-right: 10px;
-}
-
 .contact-details div a {
   text-decoration: none;
 }
@@ -87,10 +83,9 @@ a.change-status.complained:hover {
 }
 
 .basic-details .email p.marketable-reason {
-  padding-left: 30px;
   font-size: 12px;
   color: #e91f4f;
-  margin-top: 0;
+  margin-top: 5px;
 }
 .basic-details .details {
   margin: 0 0 10px 2px;
