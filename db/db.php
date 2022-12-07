@@ -951,6 +951,7 @@ abstract class DB {
 	}
 
 	public $last_query = '';
+	public $last_error = '';
 
 	/**
 	 * New and improved query function to access DB in more complex and interesting ways.

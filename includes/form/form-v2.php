@@ -94,6 +94,7 @@ function basic_text_field( $field, $contact = false ) {
 
 	$input = html()->input( [
 		'id'          => $field['id'],
+		'type'        => $field['type'],
 		'name'        => $field['name'],
 		'class'       => trim( 'gh-input ' . $field['className'] ),
 		'placeholder' => $field['placeholder'],
@@ -1701,7 +1702,8 @@ class Form_v2 extends Step {
 
 		$posted_data = new Posted_Data();
 
-		$config    = $this->get_meta( 'form' );
+		// Ensure array and not stdClass
+		$config    = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
 		$fields    = $config['fields'];
 		$recaptcha = $config['recaptcha'];
 

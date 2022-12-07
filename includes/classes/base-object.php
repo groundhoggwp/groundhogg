@@ -784,7 +784,6 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$note = new Note( $note_data );
 
-			do_action( "groundhogg/{$this->get_object_type()}/note/added", $this->ID, $note, $this );
 		} else if ( is_array( $note ) ) {
 			// imported note
 			$note_data = array_merge( $note, [
@@ -794,6 +793,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$note = new Note( $note_data );
 		}
+
+		/**
+		 * Triggered when a new note is added and related to an object
+		 *
+		 * @param $id int the ID of the current object
+		 * @param $note Note the object of the note that was just created
+		 * @param $object Base_Object the primary object
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/note/added", $this->ID, $note, $this );
 
 		return $note;
 	}

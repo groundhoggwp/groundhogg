@@ -706,9 +706,6 @@ button.button.save-button {
 #add-steps #benchmarks .select-step:hover .step-icon {
   background-color: rgba(245, 129, 21, 0.25);
 }
-#add-steps .steps-select {
-  margin-top: 20px;
-}
 #add-steps .steps-select .steps-grid:not(.hidden) {
   display: flex;
   flex-wrap: wrap;

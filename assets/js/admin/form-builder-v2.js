@@ -174,7 +174,12 @@
             ${ select({
                 id: 'property',
                 name: 'property',
-            }, getCustomProperties().map(field => ( { value: field.id, text: field.label } )), property) }
+                options: [
+                    { value: '', text: __( 'Please select one' ) },
+                    ...getCustomProperties().map(field => ( { value: field.id, text: field.label } )),
+                ],
+                selected: property,
+            }) }
         </div>`
       },
       onMount (field, updateField) {
@@ -326,12 +331,12 @@
         //language=HTML
         return `<label for="multiple">${ __('Allow multiple selections', 'groundhogg') }</label>
         <div class="setting">${ toggle({
-          id: 'allow-multiple',
-          name: 'multiple',
-          className: 'multiple',
-          onLabel: 'Yes',
-          offLabel: 'No',
-          checked: multiple,
+            id: 'allow-multiple',
+            name: 'multiple',
+            className: 'multiple',
+            onLabel: 'Yes',
+            offLabel: 'No',
+            checked: multiple,
         }) }
         </div>`
       },
@@ -1648,7 +1653,7 @@
       let tmpFields = [...fields]
 
       // only show if enabled and is version 2
-      if (recaptcha.enabled && Groundhogg.recaptcha.version === 'v2' && Groundhogg.recaptcha.enabled ) {
+      if (recaptcha.enabled && Groundhogg.recaptcha.version === 'v2' && Groundhogg.recaptcha.enabled) {
         tmpFields.push(recaptcha)
       }
 
@@ -1691,12 +1696,12 @@
     mount () {
 
       // form does not exist yet, adding new
-      if ( ! this.form ){
+      if (!this.form) {
         this.form = defaultForm
-        onChange( this.form )
+        onChange(this.form)
       }
 
-      console.log( this.form )
+      console.log(this.form)
 
       this.render()
       this.onMount()

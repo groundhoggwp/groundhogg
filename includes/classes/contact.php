@@ -449,7 +449,7 @@ class Contact extends Base_Object_With_Meta {
 			Preferences::HARD_BOUNCE,
 			Preferences::COMPLAINED,
 			Preferences::SPAM
-		]);
+		] );
 	}
 
 	/**
@@ -665,7 +665,45 @@ class Contact extends Base_Object_With_Meta {
 			unset( $data['optin_status'] );
 		}
 
+		// Email might be changing
+		if ( isset_not_empty( $data, 'email' ) ) {
+			$new_email = $data['email'];
+
+			// Email is different
+			if ( $new_email !== $this->email ) {
+
+				// Invalid email, or in use by another contact record
+				if ( ! is_email( $new_email ) || is_email_address_in_use( $new_email ) ) {
+					unset( $data['email'] );
+				}
+			}
+		}
+
+		$folders       = $this->get_uploads_folder();
+		$orig_owner    = $this->owner;
+		$orig_owner_id = $this->owner_id;
+
 		$updated = parent::update( $data );
+
+		$maybe_changed_folders = $this->get_uploads_folder();
+
+		// Uploads directory has been changed, rename the folder to preserve field uploads
+		if ( $updated && $folders['path'] !== $maybe_changed_folders['path'] ) {
+			@rename( $folders['path'], $maybe_changed_folders['path'] );
+		}
+
+		// The contact owner was changed
+		if ( $orig_owner_id !== $this->owner_id ) {
+
+			/**
+			 * When the owner is changed
+			 *
+			 * @param $owner      \WP_User
+			 * @param $contact    Contact
+			 * @param $prev_owner \WP_User
+			 */
+			do_action( 'groundhogg/contact/owner_changed', $this->owner, $this, $orig_owner );
+		}
 
 		if ( $updated && $preference_updated ) {
 
@@ -925,20 +963,20 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		// File cannot be copied
-		if ( ! is_copyable_file( $url_or_path ) ){
+		if ( ! is_copyable_file( $url_or_path ) ) {
 			return false;
 		}
 
 		// path given
 		if ( file_exists( $url_or_path ) ) {
-			$tmp_file   = $url_or_path;
+			$tmp_file = $url_or_path;
 			// if using path, force false
 			$delete_tmp = false;
 		} else {
 
 			// We should only be doing this for files which are already uploaded to the server,
 			// We should reject urls for sites that aren't this one
-			if ( get_hostname( $url_or_path ) !== get_hostname() ){
+			if ( get_hostname( $url_or_path ) !== get_hostname() ) {
 				return false;
 			}
 
@@ -960,7 +998,7 @@ class Contact extends Base_Object_With_Meta {
 		} catch ( \Exception $e ) {
 		}
 
-		if ( $delete_tmp ){
+		if ( $delete_tmp ) {
 			@unlink( $tmp_file );
 		}
 

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.3
+Stable tag: 2.7.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,20 +322,28 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.7.3 (2022-011-04) =
+= 2.7.7.4 (2022-12-07) =
+* ADDED Format support for `{meta}` replacements.
+* ADDED Posts related replacement codes to show lists or grids of posts, post titles, and more in emails.
+* TWEAKED Make `split_name` function compatible with arrays.
+* FIXED Inserting replacement code into text field not triggering input/change event.
+* FIXED If the email address of a contact is changed then the uploads folder of that contact will be renamed accordingly.
+* FIXED Targeting specific day of next month in delay timer actually scheduling for the same day of month next year.
+
+= 2.7.7.3 (2022-11-14) =
 * ADDED compatibility check for dokan lite to dequeue conflict scripts on the reports dashboard.
 * TWEAKED Ignore license checks and notices for inactive addons.
 * TWEAKED Improved select2 usability
 * FIXED Fatal error caused by invalid numeric value when displaying number custom fields.
 * FIXED Fatal error using stdClass instead of array in new form builder when rendering.
 
-= 2.7.7.2 (2022-011-04) =
+= 2.7.7.2 (2022-11-11) =
 * TWEAKED Change js file handles to avoid ChartJS conflict.
 * TWEAKED Number custom fields will show as a formatted number when used as a replacement.
 * FIXED DB errors when importing funnels.
 * FIXED License checker script not updating license status correctly.
 
-= 2.7.7.1 (2022-011-04) =
+= 2.7.7.1 (2022-11-04) =
 * TWEAKED combined frontend JS files.
 * FIXED Recaptcha v3 issues with new form builder.
 * FIXED Fatal error when previewing emails while not being logged in.

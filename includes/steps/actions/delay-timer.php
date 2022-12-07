@@ -11,6 +11,7 @@ use Groundhogg\Step;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\convert_to_utc_0;
+use function Groundhogg\ordinal_suffix;
 use function Groundhogg\site_locale_is_english;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -182,7 +183,7 @@ class Delay_Timer extends Action {
 	 */
 	public function save( $step ) {
 
-        $preview = $step->get_meta( 'delay_preview' );
+		$preview = $step->get_meta( 'delay_preview' );
 
 		if ( site_locale_is_english() && ! empty( $preview ) ) {
 			$step->update( [
@@ -258,7 +259,8 @@ class Delay_Timer extends Action {
 
 		$date->setMin();
 
-		$next_year = date( 'Y', strtotime( '+1 year' ) );
+		$next_year  = date( 'Y', strtotime( '+1 year' ) );
+		$next_month = date( 'F', strtotime( '+1 month' ) );
 
 		// The date to run on
 		switch ( $settings['run_on_type'] ) {
@@ -333,7 +335,6 @@ class Delay_Timer extends Action {
 						foreach ( $settings['run_on_months'] as $month ) {
 
 							if ( $day_of_month === 'last' ) {
-
 								$date->minMax( "last day of $month this year" );
 								$date->minMax( "last day of $month $next_year" );
 							} else {
@@ -354,7 +355,12 @@ class Delay_Timer extends Action {
 							$thisMonth = $date->format( 'F' );
 
 							$date->minMax( "$thisMonth $day_of_month" );
-							$date->minMax( "$thisMonth $day_of_month $next_year" );
+
+                            $nextMonthDate = clone $date;
+                            $nextMonthDate->modify( '+1 month' );
+
+                            $date->minMax( $nextMonthDate->format( "Y-m-$day_of_month" ) );
+
 						}
 					}
 				}
