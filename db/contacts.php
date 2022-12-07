@@ -181,6 +181,9 @@ class Contacts extends DB {
 		);
 
 		if ( empty( $args['email'] ) ) {
+
+			$this->last_error = 'No email field provided.';
+
 			return false;
 		}
 
