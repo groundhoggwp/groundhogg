@@ -69,6 +69,7 @@ class Replacements implements \JsonSerializable {
 			'user'       => __( 'WP User', 'groundhogg' ),
 			'owner'      => __( 'Contact Owner', 'groundhogg' ),
 			'site'       => __( 'Site', 'groundhogg' ),
+			'post'       => __( 'Post', 'groundhogg' ),
 			'compliance' => __( 'Compliance', 'groundhogg' ),
 			'other'      => __( 'Other', 'groundhogg' ),
 		];
@@ -332,8 +333,44 @@ class Replacements implements \JsonSerializable {
 				'group'       => 'other',
 				'name'        => __( 'Groundhog Day Quote', 'groundhogg' ),
 				'callback'    => [ $this, 'get_random_groundhogday_quote' ],
-				'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
-			]
+				'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray!', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'posts',
+				'default_args' => 'layout=grid number=5 featured excerpt',
+				'group'        => 'post',
+				'callback'     => [ $this, 'posts' ],
+				'name'         => __( 'Recent Posts', 'groundhogg' ),
+				'description'  => _x( 'Show links posts in your email.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'post_title',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_title' ],
+				'name'        => __( 'Post Title', 'groundhogg' ),
+				'description' => _x( 'Return the title of a single recent post.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'post_excerpt',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_excerpt' ],
+				'name'        => __( 'Post Excerpt', 'groundhogg' ),
+				'description' => _x( 'Return the excerpt of a single recent post.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'post_content',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_content' ],
+				'name'        => __( 'Post Content', 'groundhogg' ),
+				'description' => _x( 'Return the content of a single recent post.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'post_featured_image',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_featured_image' ],
+				'name'        => __( 'Post Featured Image', 'groundhogg' ),
+				'description' => _x( 'Return the featured image of a single recent post.', 'replacement', 'groundhogg' ),
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -410,9 +447,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @param string $code to remove
-	 *
 	 * @since 1.9
+	 *
+	 * @param string $code to remove
 	 *
 	 */
 	public function remove( $code ) {
@@ -442,9 +479,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Returns a list of all replacement codes
 	 *
-	 * @return array
 	 * @since 1.9
 	 *
+	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -596,9 +633,9 @@ class Replacements implements \JsonSerializable {
 
 	public function replacements_in_footer() {
 		?>
-		<div id="footer-replacement-codes" class="hidden">
+        <div id="footer-replacement-codes" class="hidden">
 			<?php $this->get_table(); ?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -611,16 +648,16 @@ class Replacements implements \JsonSerializable {
 			} );
 
 			?>
-			<h3 class="replacements-group"><?php _e( $name ) ?></h3>
-			<table class="wp-list-table widefat fixed striped replacements-table">
-				<thead>
-				<tr>
-					<th><?php _e( 'Name' ); ?></th>
-					<th><?php _e( 'Code' ); ?></th>
-					<th><?php _e( 'Description' ); ?></th>
-				</tr>
-				</thead>
-				<tbody>
+            <h3 class="replacements-group"><?php _e( $name ) ?></h3>
+            <table class="wp-list-table widefat fixed striped replacements-table">
+                <thead>
+                <tr>
+                    <th><?php _e( 'Name' ); ?></th>
+                    <th><?php _e( 'Code' ); ?></th>
+                    <th><?php _e( 'Description' ); ?></th>
+                </tr>
+                </thead>
+                <tbody>
 
 				<?php foreach ( $codes as $code => $replacement ):
 
@@ -629,23 +666,23 @@ class Replacements implements \JsonSerializable {
 					}
 
 					?>
-					<tr>
-						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
-						<td>
-							<input class="replacement-selector code"
-							       type="text"
-							       style="border: none;outline: none;background: transparent;width: 100%;"
-							       onfocus="this.select();"
-							       value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
-							       readonly>
-						</td>
-						<td>
-							<span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
-						</td>
-					</tr>
+                    <tr>
+                        <td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+                        <td>
+                            <input class="replacement-selector code"
+                                   type="text"
+                                   style="border: none;outline: none;background: transparent;width: 100%;"
+                                   onfocus="this.select();"
+                                   value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+                                   readonly>
+                        </td>
+                        <td>
+                            <span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+                        </td>
+                    </tr>
 				<?php endforeach; ?>
-				</tbody>
-			</table>
+                </tbody>
+            </table>
 		<?php
 		endforeach;
 	}
@@ -731,16 +768,16 @@ class Replacements implements \JsonSerializable {
 
 		$value = $this->get_current_contact()->get_meta( $meta_key );
 
-		switch ($format){
+		switch ( $format ) {
 			default:
 				return print_r( $value, true );
 			case 'csv':
 				return is_array( $value ) ? implode( ', ', $value ) : print_r( $value, true );
 			case 'ol':
 			case 'ul':
-				return html()->e( $format, [], array_map( function ( $item ){
-					return html()->e('li', [], $item );
-				}, is_array( $value ) ? $value : array_map( 'trim', explode(',', $value ) ) ) );
+				return html()->e( $format, [], array_map( function ( $item ) {
+					return html()->e( 'li', [], $item );
+				}, is_array( $value ) ? $value : array_map( 'trim', explode( ',', $value ) ) ) );
 
 		}
 	}
@@ -1351,6 +1388,414 @@ class Replacements implements \JsonSerializable {
 		$quote = rand( 0, count( $quotes ) - 1 );
 
 		return $quotes[ $quote ];
+	}
+
+	/**
+	 * Parse atts for replacement codes
+	 *
+	 * @param $text
+	 *
+	 * @return array
+	 */
+	function parse_atts( $text ) {
+		$_atts = shortcode_parse_atts( $text );
+
+		if ( empty( $_atts ) ) {
+			return [];
+		}
+
+		$atts = [];
+
+		foreach ( $_atts as $key => $value ) {
+
+			// fix flags
+			if ( is_numeric( $key ) ) {
+				$atts[ $value ] = true;
+				continue;
+			}
+
+			$atts[ $key ] = $value;
+		}
+
+		return $atts;
+	}
+
+	/**
+	 * Output a part about a post
+	 *
+	 * @param string $args
+	 * @param string $which
+	 *
+	 * @return string
+	 */
+	function single_post( $args, $which = '' ) {
+
+		$props = $this->parse_atts( $args );
+
+		$props = wp_parse_args( $props, [
+			'id'         => '',
+			'offset'     => 0,
+			'post_type'  => 'post',
+			'category'   => '',
+			'tag'        => '',
+			'orderby'    => 'date',
+			'order'      => 'DESC',
+			'meta_key'   => '',
+			'meta_value' => '',
+		] );
+
+		$post_query = [
+			'post_status' => 'publish',
+			'numberposts' => 1,
+			'offset'      => $props['offset'],
+			'post_type'   => $props['post_type'],
+			'category'    => $props['category'],
+			'tag'         => $props['tag'],
+			'orderby'     => $props['orderby'],
+			'order'       => $props['order'],
+			'meta_key'    => $props['meta_key'],
+			'meta_value'  => $props['meta_value'],
+		];
+
+		if ( isset_not_empty( $props, 'id' ) ) {
+			/**
+			 * Filter post query variables
+			 *
+			 * @param $query   array the query vars
+			 * @param $contact Contact the current contact
+			 */
+			$post_query = apply_filters( "groundhogg/posts/query/{$props['id']}", $post_query, $this->current_contact );
+		}
+
+		$cache_key = md5( wp_json_encode( $post_query ) );
+
+		// Check posts cache
+		if ( isset_not_empty( self::$posts_cache, $cache_key ) ) {
+			$posts = self::$posts_cache[ $cache_key ];
+		} else {
+			$posts                           = get_posts( $post_query );
+			self::$posts_cache[ $cache_key ] = $posts;
+		}
+
+		if ( empty( $posts ) ) {
+			return '';
+		}
+
+		if ( isset_not_empty( $props, 'id' ) ) {
+			/**
+			 * Filter posts
+			 *
+			 * @param $posts   \WP_Post[] the query vars
+			 * @param $contact Contact the current contact
+			 */
+			$posts = apply_filters( "groundhogg/posts/{$props['id']}", $posts, $this->current_contact );
+		}
+
+		$post = array_shift( $posts );
+
+		switch ( $which ) {
+			default:
+			case 'title':
+				$content = html_entity_decode( get_the_title( $post ), ENT_QUOTES );
+				break;
+			case 'content':
+				$content = get_the_content( null, false, $post );
+
+				/**
+				 * Filters the post content.
+				 *
+				 * @since 0.71
+				 *
+				 * @param string $content Content of the current post.
+				 */
+				$content = apply_filters( 'the_content', $content );
+				$content = str_replace( ']]>', ']]&gt;', $content );
+				break;
+			case 'excerpt':
+				$content = get_the_excerpt( $post );
+				break;
+			case 'thumbnail':
+			case 'featured_image':
+
+                if ( ! has_post_thumbnail( $post ) ){
+                    return '';
+                }
+
+				return html()->e( 'a', [
+					'href' => get_permalink( $post )
+				], html()->e( 'img', [
+					'class'  => 'featured-image',
+					'src'    => get_the_post_thumbnail_url( $post ),
+					'width'  => get_array_var( $props, 'width' ),
+					'height' => get_array_var( $props, 'height' ),
+				] ) );
+			case 'featured_image_url':
+			case 'thumbnail_url':
+
+				if ( ! has_post_thumbnail( $post ) ){
+					return '';
+				}
+
+				$content = get_the_post_thumbnail_url( $post );
+				break;
+			case 'url':
+				$content = get_permalink( $post );
+				break;
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Output a title from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_title( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'title' );
+	}
+
+	/**
+	 * Output the excerpt from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_excerpt( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'excerpt' );
+	}
+
+	/**
+	 * Output a title from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_featured_image( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'featured_image' );
+	}
+
+	/**
+	 * Output the content from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_content( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'content' );
+	}
+
+	/**
+	 * Output a url for a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_url( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'url' );
+	}
+
+	static $posts_cache = [];
+
+	/**
+	 * Display posts!
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function posts( $args, $contact_id = null ) {
+
+		$props = $this->parse_atts( $args );
+
+		$props = wp_parse_args( $props, [
+			'id'         => '',
+			'number'     => 5,
+			'offset'     => 0,
+			'layout'     => 'ul',
+			'featured'   => false,
+			'excerpt'    => false,
+			'post_type'  => 'post',
+			'category'   => '',
+			'tag'        => '',
+			'orderby'    => 'date',
+			'order'      => 'DESC',
+			'meta_key'   => '',
+			'meta_value' => '',
+		] );
+
+		$post_query = [
+			'post_status' => 'publish',
+			'numberposts' => $props['number'],
+			'offset'      => $props['offset'],
+			'post_type'   => $props['post_type'],
+			'category'    => $props['category'],
+			'tag'         => $props['tag'],
+			'orderby'     => $props['orderby'],
+			'order'       => $props['order'],
+			'meta_key'    => $props['meta_key'],
+			'meta_value'  => $props['meta_value'],
+		];
+
+		if ( isset_not_empty( $props, 'id' ) ) {
+			/**
+			 * Filter post query variables
+			 *
+			 * @param $query   array the query vars
+			 * @param $contact Contact the current contact
+			 */
+			$post_query = apply_filters( "groundhogg/posts/query/{$props['id']}", $post_query, $this->current_contact );
+		}
+
+		$cache_key = md5( wp_json_encode( $post_query ) );
+
+		// Check posts cache
+		if ( isset_not_empty( self::$posts_cache, $cache_key ) ) {
+			$posts = self::$posts_cache[ $cache_key ];
+		} else {
+			$posts                           = get_posts( $post_query );
+			self::$posts_cache[ $cache_key ] = $posts;
+		}
+
+		if ( empty( $posts ) ) {
+			return '';
+		}
+
+		if ( isset_not_empty( $props, 'id' ) ) {
+			/**
+			 * Filter posts
+			 *
+			 * @param $posts   \WP_Post[] the query vars
+			 * @param $contact Contact the current contact
+			 */
+			$posts = apply_filters( "groundhogg/posts/{$props['id']}", $posts, $this->current_contact );
+		}
+
+		switch ( $props['layout'] ) {
+			default:
+			case 'ul':
+			case 'ol':
+
+				$content = html()->e( $props['layout'] ?? 'ul', [], array_map( function ( $post ) {
+					return html()->e( 'li', [], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
+				}, $posts ) );
+
+				break;
+			case 'grid':
+			case 'cards':
+
+				$rows = [];
+
+				$render_post = function ( $post ) use ( $props ) {
+					return html()->e( 'div', [
+						'class' => [
+							$props['layout'] === 'grid' ? 'post' : 'post-card',
+							has_post_thumbnail( $post ) ? 'has-thumbnail' : ''
+						]
+					], [
+						has_post_thumbnail( $post ) ? html()->e( 'div', [
+							'class' => 'featured-image-wrap'
+						], html()->e( 'a', [
+							'href' => get_permalink( $post )
+						], html()->e( 'img', [
+							'class' => 'featured-image',
+							'src'   => get_the_post_thumbnail_url( $post ),
+						] ) ) ) : '',
+						html()->e( 'div', [ 'class' => 'card-content' ], [
+							html()->e( 'h2', [], html()->e( 'a', [
+								'href' => get_permalink( $post )
+							], get_the_title( $post ) ) ),
+							$props['excerpt'] ? html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt( $post ) ) : ''
+						] ),
+					] );
+				};
+
+				if ( $props['featured'] ) {
+					$post   = array_shift( $posts );
+					$rows[] = $render_post( $post );
+				}
+
+				$rows[] = '<div class="email-columns">';
+
+
+				while ( ! empty( $posts ) ):
+
+					$post = array_shift( $posts );
+
+					$render_column = function ( $content = '' ) {
+						return html()->e( 'div', [
+							'class' => 'email-columns-cell one-half'
+						], [
+							$content
+						] );
+					};
+
+					$columns = [
+						$render_column( $render_post( $post ) ),
+						'<div class="email-columns-cell gap" style="width: 20px;"></div>',
+					];
+
+					$post = array_shift( $posts );
+
+					if ( ! empty( $post ) ) {
+						$columns[] = $render_column( $render_post( $post ) );
+					} else {
+						$columns[] = $render_column();
+					}
+
+
+					$rows[] = html()->e( 'div', [
+						'class' => 'email-columns-row'
+					], $columns );
+
+				endwhile;
+
+				$content = html()->e( 'div', [
+					'class' => $props['layout']
+				], $rows );
+
+				break;
+
+//			case 'list':
+//				break;
+			case 'h1':
+			case 'h2':
+			case 'h3':
+			case 'h4':
+			case 'h5':
+
+				$tag = $props['layout'];
+
+				$content = implode( '', array_map( function ( $post ) use ( $props, $tag ) {
+
+					$_html = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
+
+					if ( $props['excerpt'] ) {
+						$_html .= html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt( $post ) );
+					}
+
+					return $_html;
+				}, $posts ) );
+
+
+				break;
+
+
+		}
+
+		return $content;
 	}
 
 	/**

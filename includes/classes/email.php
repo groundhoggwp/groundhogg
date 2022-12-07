@@ -175,7 +175,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_alt_body() {
-		return do_replacements( $this->get_alt_body(), $this->get_contact()->get_id() );
+		return $this->strip_html_tags( do_replacements( $this->get_alt_body(), $this->get_contact()->get_id() ) );
 	}
 
 	/**
@@ -541,9 +541,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return false|string
 	 */
 	public function get_preferences_link( $url = '' ) {
-		$url = managed_page_url( 'preferences/profile' );
-
-		return $url;
+		return managed_page_url( 'preferences/profile' );
 	}
 
 	/**
@@ -567,6 +565,10 @@ class Email extends Base_Object_With_Meta {
 			add_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 		}
 
+		// Has posts replacement code
+		if ( strpos( $this->content, '{posts.' ) !== false ){
+			add_filter( 'groundhogg/templates/email/has_posts', '__return_true' );
+		}
 	}
 
 
@@ -586,6 +588,7 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 		remove_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
+		remove_filter( 'groundhogg/templates/email/has_posts', '__return_true' );
 	}
 
 	/**
@@ -671,6 +674,7 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 * Return the from name for the email
+	 *
 	 *
 	 * @return string
 	 */

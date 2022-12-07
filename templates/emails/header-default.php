@@ -154,9 +154,11 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
             }
 
         }
-
 		<?php do_action( 'groundhogg/templates/email/head/style' ); ?>
-	</style>
+        <?php if ( apply_filters( 'groundhogg/templates/email/has_posts', false ) ): ?>
+            <?php echo file_get_contents( __DIR__ . '/posts.css' ) ?>
+        <?php endif; ?>
+    </style>
 	<?php do_action( 'groundhogg/templates/email/head/after' ); ?>
 </head>
 <!-- /HEAD -->
