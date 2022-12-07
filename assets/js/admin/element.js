@@ -4,29 +4,34 @@
 
   const { sprintf, __, _x, _n } = wp.i18n
 
-  function insertAtCursor (myField, myValue) {
+  function insertAtCursor (field, value) {
     //IE support
     if (document.selection) {
-      myField.focus()
+      field.focus()
       var sel = document.selection.createRange()
-      sel.text = myValue
+      sel.text = value
     }
     //MOZILLA and others
-    else if (myField.selectionStart || myField.selectionStart == '0') {
-      var startPos = myField.selectionStart
-      var endPos = myField.selectionEnd
-      myField.value = myField.value.substring(0, startPos)
-        + myValue
-        + myField.value.substring(endPos, myField.value.length)
+    else if (field.selectionStart || field.selectionStart == '0') {
+      var startPos = field.selectionStart
+      var endPos = field.selectionEnd
+      field.value = field.value.substring(0, startPos)
+        + value
+        + field.value.substring(endPos, field.value.length)
 
-      myField.selectionStart = startPos + myValue.length
-      myField.selectionEnd = startPos + myValue.length
+      field.selectionStart = startPos + value.length
+      field.selectionEnd = startPos + value.length
     }
     else {
-      myField.value += myValue
+      field.value += value
     }
 
-    // $(myField).trigger('change')
+    let input = new Event( 'input' );
+    let change = new Event( 'change' );
+
+    // Trigger input & change event
+    field.dispatchEvent( input )
+    field.dispatchEvent( change )
   }
 
   const Insert = {
