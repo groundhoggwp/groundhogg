@@ -4958,13 +4958,17 @@ function current_contact_and_logged_in_user_match() {
 function fix_nested_p( $content ) {
 
 	$patterns = [
-		'@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
-		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m', // closing tags
+		'@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // double opening P tags
+		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m', // double closing P tags
+		'@(<p[^>]*>)(<div[^>]*>)@m', // opening p with opening div
+		'@(<\/div[^>]*>)(<\/p[^>]*>)@m', // closing div with closing p
 	];
 
 	$replacements = [
 		'$1$2',
 		'$2$3',
+		'$2',
+		'$1',
 	];
 
 	return preg_replace( $patterns, $replacements, $content );
