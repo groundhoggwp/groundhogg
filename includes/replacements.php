@@ -447,9 +447,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @since 1.9
-	 *
 	 * @param string $code to remove
+	 *
+	 * @since 1.9
 	 *
 	 */
 	public function remove( $code ) {
@@ -479,9 +479,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Returns a list of all replacement codes
 	 *
+	 * @return array
 	 * @since 1.9
 	 *
-	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -633,9 +633,9 @@ class Replacements implements \JsonSerializable {
 
 	public function replacements_in_footer() {
 		?>
-        <div id="footer-replacement-codes" class="hidden">
+		<div id="footer-replacement-codes" class="hidden">
 			<?php $this->get_table(); ?>
-        </div>
+		</div>
 		<?php
 	}
 
@@ -648,16 +648,16 @@ class Replacements implements \JsonSerializable {
 			} );
 
 			?>
-            <h3 class="replacements-group"><?php _e( $name ) ?></h3>
-            <table class="wp-list-table widefat fixed striped replacements-table">
-                <thead>
-                <tr>
-                    <th><?php _e( 'Name' ); ?></th>
-                    <th><?php _e( 'Code' ); ?></th>
-                    <th><?php _e( 'Description' ); ?></th>
-                </tr>
-                </thead>
-                <tbody>
+			<h3 class="replacements-group"><?php _e( $name ) ?></h3>
+			<table class="wp-list-table widefat fixed striped replacements-table">
+				<thead>
+				<tr>
+					<th><?php _e( 'Name' ); ?></th>
+					<th><?php _e( 'Code' ); ?></th>
+					<th><?php _e( 'Description' ); ?></th>
+				</tr>
+				</thead>
+				<tbody>
 
 				<?php foreach ( $codes as $code => $replacement ):
 
@@ -666,23 +666,23 @@ class Replacements implements \JsonSerializable {
 					}
 
 					?>
-                    <tr>
-                        <td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
-                        <td>
-                            <input class="replacement-selector code"
-                                   type="text"
-                                   style="border: none;outline: none;background: transparent;width: 100%;"
-                                   onfocus="this.select();"
-                                   value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
-                                   readonly>
-                        </td>
-                        <td>
-                            <span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
-                        </td>
-                    </tr>
+					<tr>
+						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+						<td>
+							<input class="replacement-selector code"
+							       type="text"
+							       style="border: none;outline: none;background: transparent;width: 100%;"
+							       onfocus="this.select();"
+							       value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+							       readonly>
+						</td>
+						<td>
+							<span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+						</td>
+					</tr>
 				<?php endforeach; ?>
-                </tbody>
-            </table>
+				</tbody>
+			</table>
 		<?php
 		endforeach;
 	}
@@ -1442,6 +1442,7 @@ class Replacements implements \JsonSerializable {
 			'order'      => 'DESC',
 			'meta_key'   => '',
 			'meta_value' => '',
+			'within'     => '',
 		] );
 
 		$post_query = [
@@ -1456,6 +1457,15 @@ class Replacements implements \JsonSerializable {
 			'meta_key'    => $props['meta_key'],
 			'meta_value'  => $props['meta_value'],
 		];
+
+		if ( isset_not_empty( $props, 'within' ) ) {
+			$days = absint( $props['within'] );
+			if ( $days ) {
+				$post_query['date_query'] = [
+					'after' => $days . ' days ago'
+				];
+			}
+		}
 
 		if ( isset_not_empty( $props, 'id' ) ) {
 			/**
@@ -1504,9 +1514,10 @@ class Replacements implements \JsonSerializable {
 				/**
 				 * Filters the post content.
 				 *
+				 * @param string $content Content of the current post.
+				 *
 				 * @since 0.71
 				 *
-				 * @param string $content Content of the current post.
 				 */
 				$content = apply_filters( 'the_content', $content );
 				$content = str_replace( ']]>', ']]&gt;', $content );
@@ -1517,9 +1528,9 @@ class Replacements implements \JsonSerializable {
 			case 'thumbnail':
 			case 'featured_image':
 
-                if ( ! has_post_thumbnail( $post ) ){
-                    return '';
-                }
+				if ( ! has_post_thumbnail( $post ) ) {
+					return '';
+				}
 
 				return html()->e( 'a', [
 					'href' => get_permalink( $post )
@@ -1532,7 +1543,7 @@ class Replacements implements \JsonSerializable {
 			case 'featured_image_url':
 			case 'thumbnail_url':
 
-				if ( ! has_post_thumbnail( $post ) ){
+				if ( ! has_post_thumbnail( $post ) ) {
 					return '';
 				}
 
@@ -1634,6 +1645,7 @@ class Replacements implements \JsonSerializable {
 			'order'      => 'DESC',
 			'meta_key'   => '',
 			'meta_value' => '',
+			'within'     => '',
 		] );
 
 		$post_query = [
@@ -1648,6 +1660,15 @@ class Replacements implements \JsonSerializable {
 			'meta_key'    => $props['meta_key'],
 			'meta_value'  => $props['meta_value'],
 		];
+
+		if ( isset_not_empty( $props, 'within' ) ) {
+			$days = absint( $props['within'] );
+			if ( $days ) {
+				$post_query['date_query'] = [
+					'after' => $days . ' days ago'
+				];
+			}
+		}
 
 		if ( isset_not_empty( $props, 'id' ) ) {
 			/**

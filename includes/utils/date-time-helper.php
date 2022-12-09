@@ -9,28 +9,31 @@ class DateTimeHelper extends \DateTime {
 
 	public function __construct( $datetime = 'now', \DateTimeZone $timezone = null ) {
 
-		if ( ! $timezone ){
+		if ( ! $timezone ) {
 			$timezone = wp_timezone();
 		}
 
 		$timestamp = false;
 
-		if ( is_int( $datetime ) ){
+		if ( is_int( $datetime ) ) {
 			$timestamp = $datetime;
-			$datetime = 'now';
+			$datetime  = 'now';
 		}
 
 		parent::__construct( $datetime, $timezone );
 
-		if ( $timestamp ){
+		if ( $timestamp ) {
 			$this->setTimestamp( $timestamp );
 		}
 	}
 
 	public function whenIs() {
 
-		$compare  = new \DateTime( 'now', $this->getTimezone() );
-		$interval = $compare->diff( $this );
+		$compare   = new \DateTime( 'today', $this->getTimezone() );
+		$timestamp = $this->getTimestamp();
+		$this->setTime( 0, 0, 0 );
+		$interval  = $compare->diff( $this );
+		$this->setTimestamp( $timestamp );
 
 		if ( $interval->days == 0 ) {
 			return 'today';

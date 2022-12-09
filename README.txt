@@ -322,6 +322,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.7.5 (2022-12-08) =
+* ADDED The `within` parameter to the posts replacement to limit posts to a given date range.
+* FIXED Events not displaying correct "today/yesterday/tomorrow" in contact activity timeline.
+
 = 2.7.7.4 (2022-12-07) =
 * ADDED Format support for `{meta}` replacements.
 * ADDED Posts related replacement codes to show lists or grids of posts, post titles, and more in emails.
