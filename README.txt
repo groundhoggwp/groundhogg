@@ -326,7 +326,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED The `within` parameter to the posts replacement to limit posts to a given date range.
 * ADDED Setting to select default middle tab in the contact record in MISC Interface settings.
 * TWEAKED Optimized broadcast scheduling by batch inserting events with a single query rather than doing multiple insert queries.
-* TWEAKED Legacy form benchmark will no longer be registered unless it's in active use by the site.
+* TWEAKED Legacy steps are now hidden from the funnel editor (when adding) unless enabled in the interface settings.
 * FIXED Events not displaying correct "today/yesterday/tomorrow" in contact activity timeline.
 * FIXED Translations for some form fields in the v2 form not available.
 * FIXED Restore, Archive, and Delete actions for funnels not using correct class methods.
