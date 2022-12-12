@@ -192,7 +192,7 @@ abstract class Extension {
 
 		$this->init_components();
 
-		add_action( 'groundhogg_funnel_scripts', [ $this, 'funnel_editor_scripts' ] );
+		add_action( 'groundhogg/admin/funnels/editor_scripts', [ $this, 'funnel_editor_scripts' ] );
 		add_action( 'groundhogg_enqueue_step_type_assets', [ $this, 'enqueue_step_type_assets' ] );
 		add_action( 'groundhogg_enqueue_filter_assets', [ $this, 'enqueue_filter_assets' ] );
 		add_action( 'groundhogg/scripts/after_register_admin_scripts', [ $this, 'register_admin_scripts' ], 10, 2 );

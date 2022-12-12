@@ -339,6 +339,13 @@ function event_queue() {
 }
 
 /**
+ * @return \Groundhogg\DB\Event_Queue
+ */
+function event_queue_db() {
+	return get_db( 'event_queue' );
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array

@@ -616,20 +616,42 @@ class Main_Updater extends Updater {
 		get_db( 'events' )->drop_column( 'claim' );
 	}
 
-	public function version_2_7_5_2(){
+	public function version_2_7_5_2() {
 		wp_clear_scheduled_hook( 'gh_do_stats_collection' );
 		wp_clear_scheduled_hook( 'gh_purge_page_visits' );
 		wp_clear_scheduled_hook( 'gh_purge_expired_permissions_keys' );
 		wp_clear_scheduled_hook( 'gh_check_bounces' );
 	}
 
-	public function version_2_7_6_1(){
+	/**
+	 * Fix funnel step statuses
+	 *
+	 * @return void
+	 */
+	public function version_2_7_6_1() {
 
 		$funnels = get_db( 'funnels' )->query();
 
 		foreach ( $funnels as $funnel ) {
 			$funnel = new Funnel( $funnel );
-			$funnel->update_step_status( $funnel->is_active() ? 'active' : 'inactive' );
+			$funnel->update_step_status();
+		}
+
+	}
+
+	/**
+	 * Fix funnel events and step statuses
+	 *
+	 * @return void
+	 */
+	public function version_2_7_7_5() {
+
+		$funnels = get_db( 'funnels' )->query();
+
+		foreach ( $funnels as $funnel ) {
+			$funnel = new Funnel( $funnel );
+			$funnel->update_step_status();
+			$funnel->update_events_from_status();
 		}
 
 	}
@@ -701,6 +723,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3',
 			'2.7.5.2',
 			'2.7.6.1',
+			'2.7.7.5',
 		];
 	}
 
@@ -742,6 +765,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3',
 			'2.7.5.2',
 			'2.7.6.1',
+			'2.7.7.5',
 		];
 	}
 
@@ -803,6 +827,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3'       => __( 'Drop un-needed <code>claim</code> column from <code>wp_gh_events</code> table.', 'groundhogg' ),
 			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
 			'2.7.6.1'       => __( 'Update `step_status` column with `active` or `inactive`', 'groundhogg' ),
+			'2.7.7.5'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
 		];
 	}
 }
