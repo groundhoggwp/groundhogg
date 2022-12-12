@@ -179,7 +179,7 @@ class Contacts_Page extends Admin_Page {
 			default:
 			case 'bulk_edit':
 
-                enqueue_filter_assets();
+				enqueue_filter_assets();
 
 				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
 
@@ -230,6 +230,7 @@ class Contacts_Page extends Admin_Page {
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 					'contact_id'                   => $contact->get_id(),
 					'contact'                      => $contact,
+					'default_tab'                  => get_option( 'gh_default_contact_tab' ) ?: 'activity',
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'marketable'                   => $contact->is_marketable(),

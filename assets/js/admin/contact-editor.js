@@ -885,7 +885,7 @@
 
   const otherContactStuff = () => {
 
-    let activeTab = 'activity'
+    let activeTab = editor.default_tab ?? 'activity'
 
     const tabs = [
       {
