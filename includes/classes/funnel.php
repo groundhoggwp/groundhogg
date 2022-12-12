@@ -142,7 +142,7 @@ class Funnel extends Base_Object_With_Meta {
 			'funnel_id'  => $this->get_id(),
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::CANCELLED,
-		] );
+		], 'AND' );
 	}
 
 	/**

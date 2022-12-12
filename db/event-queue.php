@@ -80,7 +80,7 @@ class Event_Queue extends DB {
 	 *
 	 * @param array $where
 	 */
-	public function move_events_to_history( $where = [] ) {
+	public function move_events_to_history( $where = [], $relationship = 'OR' ) {
 
 		global $wpdb;
 
@@ -107,7 +107,7 @@ class Event_Queue extends DB {
 		$history_columns = implode( ',', array_values( $column_map ) );
 		$queue_columns   = implode( ',', array_keys( $column_map ) );
 
-		$where = $this->generate_where( $where, 'OR' );
+		$where = $this->generate_where( $where, $relationship );
 
 		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
 		// Move the events to the event queue
@@ -116,7 +116,7 @@ class Event_Queue extends DB {
 			FROM $event_queue
 			WHERE ( $where ) AND status != 'waiting'" );
 
-		$wpdb->query( "DELETE FROM $event_queue WHERE $where ORDER BY ID;" );
+		$wpdb->query( "DELETE FROM $event_queue WHERE ( $where ) AND status != 'waiting' ORDER BY ID;" );
 
 		$this->cache_set_last_changed();
 	}

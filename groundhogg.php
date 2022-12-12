@@ -3,7 +3,7 @@
  * Plugin Name: Groundhogg
  * Plugin URI:  https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description: CRM and marketing automation for WordPress
- * Version: 2.7.7.6
+ * Version: 2.7.7.7
  * Author: Groundhogg Inc.
  * Author URI: https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: groundhogg
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GROUNDHOGG_VERSION', '2.7.7.6' );
+define( 'GROUNDHOGG_VERSION', '2.7.7.7' );
 define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '2.7.7.5' );
 
 define( 'GROUNDHOGG__FILE__', __FILE__ );

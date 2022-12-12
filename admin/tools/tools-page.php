@@ -28,6 +28,7 @@ use function Groundhogg\isset_not_empty;
 use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
+use function Groundhogg\restore_missing_funnel_events;
 use function Groundhogg\uninstall_gh_cron_file;
 use function Groundhogg\uninstall_groundhogg;
 use function Groundhogg\validate_tags;
@@ -1094,6 +1095,23 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		return false;
 	}
+
+	/**
+     * Restore missing funnel events
+     *
+	 * @return string
+	 */
+    public function process_restore_funnel_events(){
+	    if ( ! current_user_can( 'cancel_events' ) ) {
+		    $this->wp_die_no_access();
+	    }
+
+        restore_missing_funnel_events();
+
+	    $this->add_notice( 'restored', 'Events restored!' );
+
+        return admin_page_url( 'gh_events' );
+    }
 
 	/**
 	 * Misc view

@@ -650,6 +650,11 @@ class Main_Updater extends Updater {
 
 		foreach ( $funnels as $funnel ) {
 			$funnel = new Funnel( $funnel );
+
+			if ( ! $funnel->exists() ){
+				continue;
+			}
+
 			$funnel->update_step_status();
 			$funnel->update_events_from_status();
 		}

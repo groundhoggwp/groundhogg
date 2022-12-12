@@ -6805,3 +6805,59 @@ function ordinal_suffix( $num ) {
 
 	return $num . 'th';
 }
+
+/**
+ * If funnel events go missing, this will restore them
+ *
+ * @return void
+ */
+function restore_missing_funnel_events() {
+	global $wpdb;
+
+	$events_table = \Groundhogg\get_db( 'events' );
+	$last_30_days = strtotime( '30 days ago' );
+
+	$SQL = "SELECT contact_id,funnel_id FROM $events_table->table_name 
+WHERE event_type = 1 AND time > $last_30_days AND status = 'complete' GROUP BY contact_id, funnel_id";
+
+	$results = $wpdb->get_results( $SQL );
+
+	foreach ( $results as $record ) {
+
+		// Get most recent event for the given funnel
+		$_event = $events_table->query( [
+			'contact_id' => $record->contact_id,
+			'funnel_id'  => $record->funnel_id,
+			'event_type' => \Groundhogg\Event::FUNNEL,
+			'limit'      => 1,
+			'orderby'    => 'time',
+			'order'      => 'DESC'
+		] );
+
+		$event = new \Groundhogg\Event( $_event[0]->ID );
+
+		// if the event does not exist
+		// If the event did not complete
+		// If the event does not have an associated step
+		// If the step does not exist
+		if ( ! $event->exists()
+		     || ! $event->is_complete()
+		     || ! $event->get_step()
+		     || ! $event->get_step()->exists()
+		) {
+			continue;
+		}
+
+		// Do nothing if there is a pending waiting event
+		if ( event_queue_db()->exists( [
+			'contact_id' => $event->get_contact_id(),
+			'funnel_id'  => $event->get_funnel_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING
+		] ) ) {
+			continue;
+		}
+
+		$event->get_step()->run_after( $event->get_contact(), $event );
+	}
+}
