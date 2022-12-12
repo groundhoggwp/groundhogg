@@ -11,6 +11,8 @@ use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\enqueue_event;
+use function Groundhogg\event_queue;
+use function Groundhogg\event_queue_db;
 use function Groundhogg\get_db;
 use Groundhogg\Tag;
 use WP_REST_Server;
@@ -41,6 +43,15 @@ class Broadcasts_Api extends Base_Object_Api {
 
 	}
 
+	/**
+	 * Create a broadcast
+	 *
+	 * @throws \Exception
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
 	public function create( WP_REST_Request $request ) {
 
 		$meta = [];
@@ -194,8 +205,13 @@ class Broadcasts_Api extends Base_Object_Api {
 				$args['email_id'] = $broadcast->get_object_id();
 			}
 
-			enqueue_event( $args );
+			event_queue_db()->batch_insert( $args );
+		}
 
+		$inserted = event_queue_db()->commit_batch_insert();
+
+		if ( $total > 0 && ! $inserted ){
+			return self::ERROR_500( 'error', 'Something went wrong: ' . event_queue_db()->last_error );
 		}
 
 		$broadcast->update_meta( 'num_scheduled', $offset );

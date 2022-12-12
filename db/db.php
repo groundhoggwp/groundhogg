@@ -461,6 +461,90 @@ abstract class DB {
 	}
 
 	/**
+	 * Storage for when batch inserting
+	 *
+	 * @var array
+	 */
+	protected $batch_inserts = [];
+	protected $batch_formats = [];
+	protected $batch_columns = [];
+
+
+	/**
+	 * Add an insert statment for a batch insert
+	 *
+	 * @param $data mixed
+	 *
+	 * @return void
+	 */
+	public function batch_insert( $data ) {
+
+		// Set default values
+		$data = wp_parse_args( $data, $this->get_column_defaults() );
+
+		do_action( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data );
+
+		// Initialise column format array
+		$column_formats = $this->get_columns();
+
+		// Force fields to lower case
+		$data = array_change_key_case( $data );
+
+		// White list columns
+		$data = array_intersect_key( $data, $column_formats );
+		$column_formats = array_intersect_key( $column_formats, $data );
+
+		// Reorder $column_formats to match the order of columns given in $data
+		$data_keys      = array_keys( $data );
+		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
+		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
+
+		if ( empty( $this->batch_columns ) ) {
+			$this->batch_columns = array_keys( $data );
+		}
+		if ( empty( $this->batch_formats ) ) {
+			$this->batch_formats = array_values( $column_formats );
+		}
+		$this->batch_inserts[] = array_values( $data );
+	}
+
+	/**
+	 * Perform a batch insert
+	 *
+	 * @return false|int
+	 */
+	public function commit_batch_insert() {
+
+		global $wpdb;
+
+		$INSERTS = [];
+		$FORMATS = implode( ', ', $this->batch_formats );
+
+		foreach ( $this->batch_inserts as $_insert ) {
+			$INSERTS[] = $wpdb->prepare( '(' . $FORMATS . ')', $_insert );
+		}
+
+		$INSERTS = implode( ', ', $INSERTS );
+		$COLUMNS = implode( ', ', $this->batch_columns );
+
+		$wpdb->query( "INSERT INTO $this->table_name ( $COLUMNS ) VALUES $INSERTS" );
+
+		$this->cache_set_last_changed();
+
+		// Clear batch stuff
+		$this->batch_columns = [];
+		$this->batch_formats = [];
+		$this->batch_inserts = [];
+
+		if ( ! $wpdb->rows_affected ){
+			return false;
+		}
+
+		return $wpdb->rows_affected;
+	}
+
+	/**
 	 * Insert a new row
 	 *
 	 * @access  public
@@ -1313,7 +1397,7 @@ abstract class DB {
 
 	}
 
-	public function drop_column( $column ){
+	public function drop_column( $column ) {
 		global $wpdb;
 		$wpdb->query( "ALTER TABLE {$this->table_name} DROP COLUMN $column" );
 	}
@@ -1374,7 +1458,7 @@ abstract class DB {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
 	}
 
-	public function has_column( $column ){
+	public function has_column( $column ) {
 		return in_array( $column, array_keys( $this->get_columns() ) );
 	}
 
