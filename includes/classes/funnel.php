@@ -92,7 +92,7 @@ class Funnel extends Base_Object_With_Meta {
 	 * Pause any events in the queue
 	 */
 	public function pause_events() {
-		get_db( 'event_queue' )->update( [
+		event_queue_db()->update( [
 			'funnel_id'  => $this->get_id(),
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::WAITING,
@@ -105,7 +105,7 @@ class Funnel extends Base_Object_With_Meta {
 	 * Unpause any waiting events in the event queue
 	 */
 	public function unpause_events() {
-		get_db( 'event_queue' )->update( [
+		event_queue_db()->update( [
 			'funnel_id'  => $this->get_id(),
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::PAUSED,
@@ -115,18 +115,66 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Mass update sattus of steps related to this funnel
-	 *
-	 * @param $status
+	 * Cancel paused or waiting events
+	 */
+	public function cancel_events() {
+
+		// Cancel waiting events
+		event_queue_db()->update( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
+		], [
+			'status' => Event::CANCELLED
+		] );
+
+		// Cancel paused events
+		event_queue_db()->update( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::PAUSED,
+		], [
+			'status' => Event::CANCELLED
+		] );
+
+		// Move to history
+		event_queue_db()->move_events_to_history( [
+			'status'     => Event::CANCELLED,
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+		] );
+	}
+
+	/**
+	 * Mass update status of steps related to this funnel
 	 *
 	 * @return bool
 	 */
-	public function update_step_status( $status ){
-		return get_db( 'steps' )->update([
+	public function update_step_status() {
+		return get_db( 'steps' )->update( [
 			'funnel_id' => $this->get_id()
 		], [
-			'step_status' => $status
-		]);
+			'step_status' => $this->is_active() ? 'active' : 'inactive'
+		] );
+	}
+
+	/**
+	 * Pause, unpause, or cancel events based on the current status of the funnel
+	 *
+	 * @return void
+	 */
+	public function update_events_from_status(){
+		switch ( $this->get_status() ) {
+			case 'active':
+				$this->unpause_events();
+				break;
+			case 'inactive':
+				$this->pause_events();
+				break;
+			case 'archived':
+				$this->cancel_events();
+				break;
+		}
 	}
 
 	/**
@@ -243,23 +291,16 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function update( $data = [] ) {
 
-		$was_active = $this->is_active();
+		$status         = $this->get_status();
+		$updated        = parent::update( $data );
+		$current_status = $this->get_status();
 
-		$updated = parent::update( $data );
+		$this->update_step_status();
 
-		// Went from inactive to active
-		if ( $this->is_active() && ! $was_active ) {
-
-			// Unpause the events active events
-			$this->unpause_events();
-		} // Went from active to inactive
-		else if ( $was_active && ! $this->is_active() ) {
-
-			// Pause any waiting events
-			$this->pause_events();
+		// When the status of the funnel changes
+		if ( $current_status !== $status ) {
+			$this->update_events_from_status();
 		}
-
-		$this->update_step_status( $this->is_active() ? 'active' : 'inactive' );
 
 		return $updated;
 	}
@@ -532,11 +573,11 @@ class Funnel extends Base_Object_With_Meta {
 			$step_type  = $step_args['type'];
 
 			$args = array(
-				'funnel_id'   => $funnel_id,
-				'step_title'  => $step_title,
-				'step_group'  => $step_group,
-				'step_type'   => $step_type,
-				'step_order'  => $i + 1,
+				'funnel_id'  => $funnel_id,
+				'step_title' => $step_title,
+				'step_group' => $step_group,
+				'step_type'  => $step_type,
+				'step_order' => $i + 1,
 			);
 
 			$step = new Step( $args );
@@ -577,9 +618,9 @@ class Funnel extends Base_Object_With_Meta {
 	public function add_step( $args ) {
 
 		$args = wp_parse_args( $args, [
-			'funnel_id'   => $this->get_id(),
-			'step_order'  => count( $this->get_step_ids() ) + 1,
-			'meta'        => [],
+			'funnel_id'  => $this->get_id(),
+			'step_order' => count( $this->get_step_ids() ) + 1,
+			'meta'       => [],
 		] );
 
 		$step = new Step( $args );

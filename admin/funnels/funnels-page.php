@@ -54,24 +54,27 @@ class Funnels_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
 
-        add_action( 'wp_ajax_wpgh_get_step_html', [ $this, 'add_step' ] );
+		add_action( 'wp_ajax_wpgh_get_step_html', [ $this, 'add_step' ] );
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
 		add_action( 'wp_ajax_wpgh_duplicate_funnel_step', [ $this, 'duplicate_step' ] );
 
-		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [ $this, 'update_user_full_screen_preference' ] );
+		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
+			$this,
+			'update_user_full_screen_preference'
+		] );
 	}
 
 	/**
-     * Whether the editor should appear full screen or not
-     *
+	 * Whether the editor should appear full screen or not
+	 *
 	 * @return void
 	 */
-    function update_user_full_screen_preference(){
-        $is_full_screen = filter_var( get_post_var( 'full_screen', false ), FILTER_VALIDATE_BOOLEAN );
-        update_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', $is_full_screen );
+	function update_user_full_screen_preference() {
+		$is_full_screen = filter_var( get_post_var( 'full_screen', false ), FILTER_VALIDATE_BOOLEAN );
+		update_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', $is_full_screen );
 
-        wp_send_json( $is_full_screen );
-    }
+		wp_send_json( $is_full_screen );
+	}
 
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
@@ -132,7 +135,7 @@ class Funnels_Page extends Admin_Page {
 
 	protected function add_additional_actions() {
 
-        add_disable_emojis_action();
+		add_disable_emojis_action();
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'view' ) {
 			add_action( 'admin_init', [ $this, 'redirect_to_add' ] );
@@ -216,16 +219,18 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
 
-                add_filter( 'admin_body_class', function ( $class ) {
+				add_filter( 'admin_body_class', function ( $class ) {
 
-                    $is_full_screen = get_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', true );
+					$is_full_screen = get_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', true );
 
-                    if ( $is_full_screen ){
-                        $class .= ' funnel-full-screen';
-                    }
+					if ( $is_full_screen ) {
+						$class .= ' funnel-full-screen';
+					}
 
-                    return $class;
-                } );
+					return $class;
+				} );
+
+				do_action( 'groundhogg/admin/funnels/editor_scripts' );
 
 				break;
 			case 'funnel_settings':
@@ -272,24 +277,19 @@ class Funnels_Page extends Admin_Page {
 
 	}
 
-	public function get_pointers_add() {
-		return [
-		];
-	}
-
-	public function get_pointers_edit() {
-		return [
-
-		];
-	}
-
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_funnels' ) ) {
 			$this->wp_die_no_access();
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			Plugin::$instance->dbs->get_db( 'funnels' )->delete( $id );
+			$funnel = new Funnel( $id );
+
+			if ( ! $funnel->exists() ) {
+				continue;
+			}
+
+			$funnel->delete();
 		}
 
 		$this->add_notice(
@@ -307,8 +307,15 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			$args = array( 'status' => 'inactive' );
-			Plugin::$instance->dbs->get_db( 'funnels' )->update( $id, $args );
+			$funnel = new Funnel( $id );
+
+			if ( ! $funnel->exists() ) {
+				continue;
+			}
+
+			$funnel->update( [
+				'status' => 'archived'
+			] );
 		}
 
 		$this->add_notice(
@@ -361,8 +368,16 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			$args = array( 'status' => 'archived' );
-			Plugin::$instance->dbs->get_db( 'funnels' )->update( $id, $args );
+
+			$funnel = new Funnel( $id );
+
+			if ( ! $funnel->exists() ) {
+				continue;
+			}
+
+			$funnel->update( [
+				'status' => 'archived'
+			] );
 		}
 
 		$this->add_notice(
@@ -391,7 +406,7 @@ class Funnels_Page extends Admin_Page {
 			'status' => 'inactive',
 		] );
 
-        return $funnel->admin_link();
+		return $funnel->admin_link();
 	}
 
 	/**
@@ -569,17 +584,17 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-        if ( get_request_var( '_delete_step' ) ){
+		if ( get_request_var( '_delete_step' ) ) {
 
-	        $step_id = absint( get_request_var( '_delete_step' ) );
-	        $step    = new Step( $step_id );
+			$step_id = absint( get_request_var( '_delete_step' ) );
+			$step    = new Step( $step_id );
 
-	        if ( ! $step->exists() ) {
-		        wp_send_json_error();
-	        }
+			if ( ! $step->exists() ) {
+				wp_send_json_error();
+			}
 
-	        $step->delete();
-        }
+			$step->delete();
+		}
 
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
@@ -753,11 +768,11 @@ class Funnels_Page extends Admin_Page {
 		$new_step = new Step();
 
 		$new_step_id = $new_step->create( [
-			'funnel_id'   => $step->get_funnel_id(),
-			'step_title'  => $step->get_title(),
-			'step_type'   => $step->get_type(),
-			'step_group'  => $step->get_group(),
-			'step_order'  => $step->get_order() + 1,
+			'funnel_id'  => $step->get_funnel_id(),
+			'step_title' => $step->get_title(),
+			'step_type'  => $step->get_type(),
+			'step_group' => $step->get_group(),
+			'step_order' => $step->get_order() + 1,
 		] );
 
 		if ( ! $new_step_id || ! $new_step->exists() ) {
