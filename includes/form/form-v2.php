@@ -19,6 +19,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
+use function Groundhogg\get_default_field_label;
 use function Groundhogg\get_request_query;
 use function Groundhogg\html;
 use function Groundhogg\is_recaptcha_enabled;
@@ -464,7 +465,7 @@ class Form_v2 extends Step {
 					], [
 						html()->wrap(
 							html()->checkbox( [
-								'label'    => sprintf( __( 'I agree to %s\'s storage and processing of my personal data.', 'groundhogg' ), $business_name ) . ' <span class="required">*</span>',
+								'label'    => get_default_field_label( 'gdpr_consent' ) . ' <span class="required">*</span>',
 								'id'       => 'data-processing-consent',
 								'name'     => 'data_processing_consent',
 								'required' => true,
@@ -473,7 +474,7 @@ class Form_v2 extends Step {
 							] ), 'div' ),
 						html()->wrap(
 							html()->checkbox( [
-								'label'    => sprintf( __( 'I agree to receive marketing offers and updates from %s.', 'groundhogg' ), $business_name ),
+								'label'    => get_default_field_label( 'marketing_consent' ),
 								'id'       => 'marketing-consent',
 								'name'     => 'marketing_consent',
 								'required' => false,
@@ -511,7 +512,7 @@ class Form_v2 extends Step {
 						'id'    => $field['id']
 					], [
 						html()->checkbox( [
-							'label'    => __( 'I agree to the terms & conditions.', 'groundhogg' ) . ' <span class="required">*</span>',
+							'label'    => get_default_field_label( 'terms_agreement' ) . ' <span class="required">*</span>',
 							'id'       => 'terms-and-conditions',
 							'name'     => 'terms_and_conditions',
 							'required' => true,
