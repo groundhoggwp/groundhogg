@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.4
+Stable tag: 2.7.7.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,7 +324,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 2.7.7.5 (2022-12-08) =
 * ADDED The `within` parameter to the posts replacement to limit posts to a given date range.
+* ADDED Setting to select default middle tab in the contact record in MISC Interface settings.
+* TWEAKED Optimized broadcast scheduling by batch inserting events with a single query rather than doing multiple insert queries.
+* TWEAKED Legacy form benchmark will no longer be registered unless it's in active use by the site.
 * FIXED Events not displaying correct "today/yesterday/tomorrow" in contact activity timeline.
+* FIXED Translations for some form fields in the v2 form not available.
+* FIXED Restore, Archive, and Delete actions for funnels not using correct class methods.
 
 = 2.7.7.4 (2022-12-07) =
 * ADDED Format support for `{meta}` replacements.
