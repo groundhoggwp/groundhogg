@@ -322,7 +322,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.7.5 (2022-12-08) =
+= 2.7.7.5 (2022-12-12) =
 * ADDED The `within` parameter to the posts replacement to limit posts to a given date range.
 * ADDED Setting to select default middle tab in the contact record in MISC Interface settings.
 * TWEAKED Optimized broadcast scheduling by batch inserting events with a single query rather than doing multiple insert queries.
