@@ -139,9 +139,9 @@ class Funnel extends Base_Object_With_Meta {
 
 		// Move to history
 		event_queue_db()->move_events_to_history( [
-			'status'     => Event::CANCELLED,
 			'funnel_id'  => $this->get_id(),
 			'event_type' => Event::FUNNEL,
+			'status'     => Event::CANCELLED,
 		] );
 	}
 
