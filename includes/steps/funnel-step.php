@@ -66,6 +66,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	const ACTION = 'action';
 	const BENCHMARK = 'benchmark';
 
+	public function is_legacy() {
+        return false;
+	}
+
 	/**
 	 * Setup all of the filters and actions to register this step and save it.
 	 *
@@ -751,6 +755,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		<?php
 	}
 
+    public function after_step_warnings(){}
+
 	/**
 	 * @param $step Step
 	 */
@@ -772,6 +778,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php endforeach; ?>
                 </div>
 			<?php endif; ?>
+	        <?php $this->after_step_warnings() ?>
             <!-- SETTINGS -->
             <div class="step-flex">
                 <div class="step-edit panels">

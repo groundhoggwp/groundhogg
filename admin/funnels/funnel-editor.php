@@ -9,6 +9,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
@@ -197,6 +198,11 @@ $funnel = new Funnel( $funnel_id );
 							<?php
 							$benchmarks = Plugin::$instance->step_manager->get_benchmarks();
 							foreach ( $benchmarks as $benchmark ):
+
+                                if ( $benchmark->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ){
+                                    continue;
+                                }
+
 								?>
                                 <div class="select-step">
                                 <div id='<?php echo $benchmark->get_type(); ?>'
@@ -218,6 +224,11 @@ $funnel = new Funnel( $funnel_id );
 							<?php
 							$actions = Plugin::$instance->step_manager->get_actions();
 							foreach ( $actions as $action ):
+
+								if ( $action->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ){
+									continue;
+								}
+
 								?>
                                 <div class="select-step">
                                 <div id='<?php echo $action->get_type(); ?>'

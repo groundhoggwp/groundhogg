@@ -52,6 +52,10 @@ class Form_Filled extends Benchmark {
 		add_action( 'admin_footer', [ $this, 'modal_form' ] );
 	}
 
+    public function is_legacy() {
+	    return true;
+    }
+
 	/**
 	 * Get element name
 	 *

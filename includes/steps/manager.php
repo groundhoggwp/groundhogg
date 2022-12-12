@@ -92,12 +92,12 @@ class Manager {
 		/* Benchmarks */
 
 		$this->add_step( new Web_Form() );
-		$this->add_step( new Form_Filled() );
 		$this->add_step( new Account_Created() );
 		$this->add_step( new Email_Confirmed() );
 		$this->add_step( new Link_Clicked() );
 		$this->add_step( new Tag_Applied() );
 		$this->add_step( new Tag_Removed() );
+		$this->add_step( new Form_Filled() );
 
 		/* Other */
 		$this->add_step( new Error() );
@@ -106,7 +106,7 @@ class Manager {
 	}
 
 	public function __set( $name, $value ) {
-		if ( method_exists( $value, 'get_type' ) ){
+		if ( method_exists( $value, 'get_type' ) ) {
 			$this->add_step( $value );
 		}
 	}
@@ -124,7 +124,7 @@ class Manager {
 	 * @return Benchmark[]
 	 */
 	public function get_benchmarks() {
-		return array_filter( $this->elements, function ( $element ){
+		return array_filter( $this->elements, function ( $element ) {
 			return $element->get_group() === Funnel_Step::BENCHMARK;
 		} );
 	}
@@ -135,7 +135,7 @@ class Manager {
 	 * @return Action[]
 	 */
 	public function get_actions() {
-		return array_filter( $this->elements, function ( $element ){
+		return array_filter( $this->elements, function ( $element ) {
 			return $element->get_group() === Funnel_Step::ACTION;
 		} );
 	}
@@ -194,7 +194,7 @@ class Manager {
 	 */
 	public function get_element( $get_type ) {
 
-		if ( ! $this->type_is_registered( $get_type ) ){
+		if ( ! $this->type_is_registered( $get_type ) ) {
 			return $this->get_element( 'error' );
 		}
 
