@@ -11,6 +11,7 @@ use Groundhogg\Step;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\convert_to_utc_0;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\ordinal_suffix;
 use function Groundhogg\site_locale_is_english;
 use function Groundhogg\get_date_time_format;
@@ -259,8 +260,8 @@ class Delay_Timer extends Action {
 
 		$date->setMin();
 
-		$next_year  = date( 'Y', strtotime( '+1 year' ) );
-		$next_month = date( 'F', strtotime( '+1 month' ) );
+		$next_year = date( 'Y', strtotime( '+1 year' ) );
+		$time      = isset_not_empty( $settings, 'run_time' ) ? $settings['run_time'] : $date->format( 'H:i:s' );
 
 		// The date to run on
 		switch ( $settings['run_on_type'] ) {
@@ -271,13 +272,13 @@ class Delay_Timer extends Action {
 			case 'weekday':
 				// If it is not a weekday modify to the next Monday
 				if ( ! in_array( $date->format( 'l' ), [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ] ) ) {
-					$date->modify( 'next Monday' );
+					$date->modify( "next Monday {$time}" );
 				}
 				break;
 			case 'weekend':
 				// If is a weekday modify to the following saturday
 				if ( ! in_array( $date->format( 'l' ), [ 'Saturday', 'Sunday' ] ) ) {
-					$date->modify( 'next Saturday' );
+					$date->modify( "next Saturday {$time}" );
 				}
 				break;
 			case 'day_of_week':
@@ -285,7 +286,6 @@ class Delay_Timer extends Action {
 				$run_on_dow_type       = $settings['run_on_dow_type'];
 				$run_on_month_type     = $settings['run_on_month_type'];
 				$selected_days_of_week = $settings['run_on_dow'];
-				$time                  = $date->format( 'H:i:s' );
 
 				// Generate a list of all possible combinations of days and months
 				// TODO There is probably a more efficient way to do this other than brute forcing it.
@@ -356,10 +356,10 @@ class Delay_Timer extends Action {
 
 							$date->minMax( "$thisMonth $day_of_month" );
 
-                            $nextMonthDate = clone $date;
-                            $nextMonthDate->modify( '+1 month' );
+							$nextMonthDate = clone $date;
+							$nextMonthDate->modify( '+1 month' );
 
-                            $date->minMax( $nextMonthDate->format( "Y-m-$day_of_month" ) );
+							$date->minMax( $nextMonthDate->format( "Y-m-$day_of_month" ) );
 
 						}
 					}
