@@ -251,9 +251,13 @@ class Delay_Timer extends Action {
 				$to->modify( $settings['run_time_to'] );
 
 				// If the time does not fall within the given from/to modify it to the next day run time.
-				if ( $date < $from || $date > $to ) {
-					$date->modify( '+1 day ' . $settings['run_time'] );
+				if ( $date < $from ) {
+					$date->modify( $settings['run_time'] );
 				}
+
+                if ( $date > $to ){
+	                $date->modify( '+1 day ' . $settings['run_time'] );
+                }
 
 				break;
 		}
@@ -261,7 +265,7 @@ class Delay_Timer extends Action {
 		$date->setMin();
 
 		$next_year = date( 'Y', strtotime( '+1 year' ) );
-		$time      = isset_not_empty( $settings, 'run_time' ) ? $settings['run_time'] : $date->format( 'H:i:s' );
+		$time      = $date->format( 'H:i:s' );
 
 		// The date to run on
 		switch ( $settings['run_on_type'] ) {
@@ -310,7 +314,6 @@ class Delay_Timer extends Action {
 					} else {
 
 						if ( $run_on_dow_type === 'any' ) {
-//							$date->minMax( "$day_of_week $time" );
 							$date->minMax( "next $day_of_week $time" );
 						} else {
 							$date->minMax( "$run_on_dow_type $day_of_week of this month $time" );
