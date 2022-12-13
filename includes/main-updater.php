@@ -644,7 +644,7 @@ class Main_Updater extends Updater {
 	 *
 	 * @return void
 	 */
-	public function version_2_7_7_5() {
+	public function version_2_7_7_8() {
 
 		$funnels = get_db( 'funnels' )->query();
 
@@ -728,7 +728,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3',
 			'2.7.5.2',
 			'2.7.6.1',
-//			'2.7.7.5',
+			'2.7.7.8',
 		];
 	}
 
@@ -770,7 +770,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3',
 			'2.7.5.2',
 			'2.7.6.1',
-//			'2.7.7.5',
+			'2.7.7.8',
 		];
 	}
 
@@ -832,7 +832,7 @@ class Main_Updater extends Updater {
 			'2.7.4.3'       => __( 'Drop un-needed <code>claim</code> column from <code>wp_gh_events</code> table.', 'groundhogg' ),
 			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
 			'2.7.6.1'       => __( 'Update `step_status` column with `active` or `inactive`', 'groundhogg' ),
-			'2.7.7.5'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
+			'2.7.7.8'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
 		];
 	}
 }
