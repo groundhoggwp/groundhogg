@@ -3,9 +3,6 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\create_contact_from_user;
-use Groundhogg\DB\Steps;
-use function Groundhogg\get_contactdata;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;

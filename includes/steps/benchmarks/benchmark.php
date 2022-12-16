@@ -4,9 +4,9 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\process_events;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -114,7 +114,7 @@ abstract class Benchmark extends Funnel_Step {
 		foreach ( $steps as $step ) {
 
 			// Skip inactive steps
-			if ( ! $step->is_active() ){
+			if ( ! $step->is_active() ) {
 				continue;
 			}
 
@@ -143,7 +143,7 @@ abstract class Benchmark extends Funnel_Step {
 		}
 
 		// Only process events if flag to complete is true
-		if ( $this->process_events_after_complete && ! empty( $contacts_to_process ) ){
+		if ( $this->process_events_after_complete && ! empty( $contacts_to_process ) ) {
 			process_events( $contacts_to_process );
 		}
 	}

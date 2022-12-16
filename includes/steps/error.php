@@ -2,9 +2,9 @@
 
 namespace Groundhogg\Steps;
 
+use Groundhogg\Step;
 use function Groundhogg\html;
 use function Groundhogg\key_to_words;
-use Groundhogg\Step;
 
 class Error extends Funnel_Step {
 
@@ -31,7 +31,7 @@ class Error extends Funnel_Step {
 
 	/**
 	 * @param \Groundhogg\Contact $contact
-	 * @param \Groundhogg\Event $event
+	 * @param \Groundhogg\Event   $event
 	 *
 	 * @return bool|\WP_Error
 	 */

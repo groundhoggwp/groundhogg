@@ -3,26 +3,18 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use Groundhogg\Form;
+use Groundhogg\Plugin;
 use Groundhogg\Properties;
-use Groundhogg\Reporting\Reporting;
-use Groundhogg\Utils\Graph;
-use function Groundhogg\add_custom_fields_to_mappable_fields;
+use Groundhogg\Step;
+use Groundhogg\Submission;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_custom_fields_dropdown_options;
-use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use Groundhogg\HTML;
-use Groundhogg\Plugin;
-use Groundhogg\Step;
-use Groundhogg\Contact_Query;
-use Groundhogg\Event;
-use Groundhogg\Form;
-use Groundhogg\Submission;
 use function Groundhogg\managed_page_url;
-use function Groundhogg\percentage;
 
 
 /**
@@ -52,9 +44,9 @@ class Form_Filled extends Benchmark {
 		add_action( 'admin_footer', [ $this, 'modal_form' ] );
 	}
 
-    public function is_legacy() {
-	    return true;
-    }
+	public function is_legacy() {
+		return true;
+	}
 
 	/**
 	 * Get element name

@@ -4,18 +4,10 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\Form\Fields\Date;
-use Groundhogg\Plugin;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Step;
-use Groundhogg\Utils\Micro_Time_Tracker;
-use function Groundhogg\convert_to_local_time;
-use function Groundhogg\convert_to_utc_0;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\ordinal_suffix;
-use function Groundhogg\site_locale_is_english;
+use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_date_time_format;
-use function Groundhogg\get_db;
 use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -186,7 +178,7 @@ class Delay_Timer extends Action {
 
 		$preview = $step->get_meta( 'delay_preview' );
 
-		if ( site_locale_is_english() && ! empty( $preview ) ) {
+		if ( ! force_custom_step_names() && ! empty( $preview ) ) {
 			$step->update( [
 				'step_title' => $preview
 			] );
@@ -255,9 +247,9 @@ class Delay_Timer extends Action {
 					$date->modify( $settings['run_time'] );
 				}
 
-                if ( $date > $to ){
-	                $date->modify( '+1 day ' . $settings['run_time'] );
-                }
+				if ( $date > $to ) {
+					$date->modify( '+1 day ' . $settings['run_time'] );
+				}
 
 				break;
 		}
@@ -439,7 +431,7 @@ class Delay_Timer extends Action {
 
 	public function step_title_edit( $step ) {
 
-		if ( ! site_locale_is_english() ) {
+		if ( force_custom_step_names() ) {
 			parent::step_title_edit( $step );
 
 			return;

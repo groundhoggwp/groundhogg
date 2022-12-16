@@ -49,6 +49,10 @@ if ( get_url_var( 'flush' ) ) {
 
 	$funnel_templates = Plugin::$instance->library->get_funnel_templates();
 
+    if ( ! is_array( $funnel_templates ) ){
+        $funnel_templates = [];
+    }
+
     $funnel_templates = array_map( function ( $template ) {
 		return new Funnel( $template, true );
 	}, $funnel_templates );

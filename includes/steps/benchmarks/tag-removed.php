@@ -3,16 +3,14 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\andList;
-use function Groundhogg\array_bold;
-use function Groundhogg\site_locale_is_english;
-use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
-use function Groundhogg\get_db;
-use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+use function Groundhogg\andList;
+use function Groundhogg\array_bold;
+use function Groundhogg\force_custom_step_names;
+use function Groundhogg\get_db;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
@@ -27,12 +25,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * This will run whenever a tag is removed
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Benchmarks
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Tag_Removed extends Benchmark {
 
@@ -122,14 +120,14 @@ class Tag_Removed extends Benchmark {
 
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
 
-		if ( site_locale_is_english() ) {
+		if ( ! force_custom_step_names() ) {
 
 			if ( empty( $tags ) ) {
 				$name = __( 'A tag is removed', 'groundhogg' );
 			} else if ( count( $tags ) === 1 ) {
 				$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
 			} else if ( count( $tags ) >= 4 ) {
-				switch ( $condition ){
+				switch ( $condition ) {
 					default:
 					case 'any':
 						$name = sprintf( __( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
@@ -140,7 +138,7 @@ class Tag_Removed extends Benchmark {
 				}
 			} else {
 
-				switch ( $condition ){
+				switch ( $condition ) {
 					default:
 					case 'any':
 						$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
@@ -159,22 +157,22 @@ class Tag_Removed extends Benchmark {
 
 	public function step_title_edit( $step ) {
 
-		if ( ! site_locale_is_english() ) {
+		if ( force_custom_step_names() ) {
 			parent::step_title_edit( $step );
 
 			return;
 		}
 
 		?>
-		<div class="gh-panel-header">
-			<h2><?php _e( 'Tag Removed Settings' ) ?></h2>
-		</div>
+        <div class="gh-panel-header">
+            <h2><?php _e( 'Tag Removed Settings' ) ?></h2>
+        </div>
 		<?php
 	}
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 */
 	public function import( $args, $step ) {
 		if ( empty( $args['tags'] ) ) {
@@ -188,7 +186,7 @@ class Tag_Removed extends Benchmark {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 *
 	 * @return array
 	 */

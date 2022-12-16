@@ -244,8 +244,6 @@ class Contacts_Page extends Admin_Page {
 				break;
 			case 'view':
 
-				wp_enqueue_style( 'select2' );
-				wp_enqueue_script( 'select2' );
 				wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 				enqueue_filter_assets();
 

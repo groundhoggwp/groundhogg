@@ -138,7 +138,7 @@ abstract class LMS_Enroll extends Action {
 
 	/**
 	 * @param \Groundhogg\Contact $contact
-	 * @param \Groundhogg\Event $event
+	 * @param \Groundhogg\Event   $event
 	 *
 	 * @return bool|void
 	 */

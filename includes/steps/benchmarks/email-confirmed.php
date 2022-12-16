@@ -3,9 +3,9 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\get_contactdata;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
+use function Groundhogg\get_contactdata;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * This will run whenever an email is confirmed
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Benchmarks
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Email_Confirmed extends Benchmark {
 
@@ -71,15 +71,15 @@ class Email_Confirmed extends Benchmark {
 	 */
 	public function settings( $step ) {
 		?>
-		<table class="form-table">
-			<tbody>
-			<tr>
-				<td>
-					<p class="description"><?php _e( 'Runs whenever an email is confirmed while in this funnel', 'groundhogg' ); ?></p>
-				</td>
-			</tr>
-			</tbody>
-		</table>
+        <table class="form-table">
+            <tbody>
+            <tr>
+                <td>
+                    <p class="description"><?php _e( 'Runs whenever an email is confirmed while in this funnel', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
 		<?php
 	}
@@ -106,8 +106,8 @@ class Email_Confirmed extends Benchmark {
 	}
 
 	/**
-	 * @param $contact_id int
-	 * @param $preference int
+	 * @param $contact_id     int
+	 * @param $preference     int
 	 * @param $old_preference int
 	 */
 	public function setup( $contact_id, $preference, $old_preference ) {

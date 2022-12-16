@@ -3,16 +3,14 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\andList;
-use function Groundhogg\array_bold;
-use function Groundhogg\site_locale_is_english;
-use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
-use function Groundhogg\get_db;
-use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+use function Groundhogg\andList;
+use function Groundhogg\array_bold;
+use function Groundhogg\force_custom_step_names;
+use function Groundhogg\get_db;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
@@ -124,34 +122,34 @@ class Tag_Applied extends Benchmark {
 
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
 
-		if ( site_locale_is_english() ) {
+		if ( ! force_custom_step_names() ) {
 
 			if ( empty( $tags ) ) {
 				$name = __( 'A tag is applied', 'groundhogg' );
 			} else if ( count( $tags ) === 1 ) {
 				$name = sprintf( __( '%s is applied', 'groundhogg' ), orList( $tags ) );
 			} else if ( count( $tags ) >= 4 ) {
-				switch ( $condition ){
-                    default:
-                    case 'any':
-	                    $name = sprintf( __( 'Any of %s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-	                    break;
-                    case 'all':
-	                    $name = sprintf( __( '%s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-	                    break;
-                }
-			} else {
-
-				switch ( $condition ){
+				switch ( $condition ) {
 					default:
 					case 'any':
-					    $name = sprintf( __( '%s is applied', 'groundhogg' ), orList( $tags ) );
+						$name = sprintf( __( 'Any of %s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+						break;
+					case 'all':
+						$name = sprintf( __( '%s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+						break;
+				}
+			} else {
+
+				switch ( $condition ) {
+					default:
+					case 'any':
+						$name = sprintf( __( '%s is applied', 'groundhogg' ), orList( $tags ) );
 						break;
 					case 'all':
 						$name = sprintf( __( '%s are applied', 'groundhogg' ), andList( $tags ) );
 						break;
 				}
-            }
+			}
 
 			$step->update( [
 				'step_title' => $name
@@ -161,7 +159,7 @@ class Tag_Applied extends Benchmark {
 
 	public function step_title_edit( $step ) {
 
-		if ( ! site_locale_is_english() ) {
+		if ( force_custom_step_names() ) {
 			parent::step_title_edit( $step );
 
 			return;

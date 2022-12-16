@@ -5913,6 +5913,8 @@ function create_object_from_type( $object, $object_type ) {
 
 /**
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
+ *
+ * @return bool
  */
 function is_template_site() {
 	return apply_filters( 'groundhogg/is_template_site', defined( 'IS_GROUNDHOGG_TEMPLATE_SITE' ) && IS_GROUNDHOGG_TEMPLATE_SITE );
@@ -6734,6 +6736,15 @@ function site_locale_is_english() {
 		'en-gb',
 		'en_GB',
 	] );
+}
+
+/**
+ * Whether custom step names should be forced instead of created based on settings
+ *
+ * @return bool
+ */
+function force_custom_step_names(){
+    return is_option_enabled( 'gh_force_custom_step_names' ) || ! site_locale_is_english();
 }
 
 function array_bold( $array ) {

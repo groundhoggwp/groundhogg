@@ -4,7 +4,7 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
-use Groundhogg\Step;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -73,7 +73,7 @@ abstract class Activity_Benchmark extends Benchmark {
 	 *
 	 * @return Activity
 	 */
-	protected function get_current_activity(){
+	protected function get_current_activity() {
 		return $this->get_data( 'activity' );
 	}
 

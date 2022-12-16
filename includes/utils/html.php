@@ -939,8 +939,6 @@ class HTML {
 
 		$html = $this->dropdown( $a );
 
-		wp_enqueue_style( 'select2' );
-		wp_enqueue_script( 'select2' );
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_script( 'groundhogg-admin' );
 

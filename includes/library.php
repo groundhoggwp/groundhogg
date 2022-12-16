@@ -2,12 +2,9 @@
 
 namespace Groundhogg;
 
-use Groundhogg\Steps\Manager;
-
 class Library extends Supports_Errors {
 
 	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
-//	const LIBRARY_URL = 'https://library.local/wp-json/gh/v4/';
 
 	/**
 	 * Flush cache templates
@@ -15,6 +12,20 @@ class Library extends Supports_Errors {
 	public function flush() {
 		delete_transient( 'groundhogg_funnel_templates' );
 		delete_transient( 'groundhogg_email_templates' );
+	}
+
+	/**
+	 * Get the library url
+	 *
+	 * @return mixed|null
+	 */
+	function get_library_url() {
+		/**
+		 * Filter the library url
+		 *
+		 * @param $url string the library url
+		 */
+		return apply_filters( 'groundhogg/library/get_library_url', self::LIBRARY_URL );
 	}
 
 	/**
@@ -29,9 +40,7 @@ class Library extends Supports_Errors {
 	 */
 	public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] ) {
 
-		$url = self::LIBRARY_URL . $endpoint;
-
-//		add_filter( 'https_ssl_verify', '__return_false' );
+		$url = $this->get_library_url() . $endpoint;
 
 		$result = remote_post_json( $url, $body, $method, $headers );
 
@@ -96,7 +105,7 @@ class Library extends Supports_Errors {
 		}
 
 		$response = $this->request( 'emails', [
-			'status'           => 'ready',
+			'is_template' => 1,
 		] );
 
 		$emails = get_array_var( $response, 'items', [] );

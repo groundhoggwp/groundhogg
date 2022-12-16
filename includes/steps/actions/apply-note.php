@@ -4,8 +4,6 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
@@ -19,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Apply a note to a contact through the funnel builder.
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Apply_Note extends Action {
 	/**

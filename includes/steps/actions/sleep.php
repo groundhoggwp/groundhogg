@@ -5,7 +5,6 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
@@ -18,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Creates a WordPress user account for the contact, or assigns one to the contact if one exists.
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Sleep extends Action {
 
@@ -90,7 +89,7 @@ class Sleep extends Action {
 	 * Process the apply tag step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true
 	 */

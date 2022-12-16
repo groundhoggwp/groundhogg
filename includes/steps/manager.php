@@ -16,21 +16,19 @@ use Groundhogg\Steps\Actions\Field_Timer;
 use Groundhogg\Steps\Actions\HTTP_Post;
 use Groundhogg\Steps\Actions\Remove_Tag;
 use Groundhogg\Steps\Actions\Send_Email;
-use Groundhogg\Steps\Actions\Sleep;
 use Groundhogg\Steps\Benchmarks\Account_Created;
-use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
 use Groundhogg\Steps\Benchmarks\Form_Filled;
 use Groundhogg\Steps\Benchmarks\Link_Clicked;
 use Groundhogg\Steps\Benchmarks\Login_Status;
 use Groundhogg\Steps\Benchmarks\Page_Visited;
+use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
 use Groundhogg\Steps\Benchmarks\Web_Form;
 use function Groundhogg\get_array_var;
-use function Groundhogg\is_option_enabled;
 
 /**
  * Created by PhpStorm.

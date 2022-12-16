@@ -3,12 +3,12 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
-use function Groundhogg\do_replacements;
 use Groundhogg\Event;
+use Groundhogg\Step;
+use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
-use Groundhogg\Step;
 use function Groundhogg\get_owners;
 use function Groundhogg\html;
 use function Groundhogg\is_replacement_code_format;

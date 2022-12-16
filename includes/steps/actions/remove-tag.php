@@ -5,11 +5,10 @@ namespace Groundhogg\Steps\Actions;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
-use function Groundhogg\site_locale_is_english;
+use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_db;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
@@ -105,7 +104,7 @@ class Remove_Tag extends Action {
 		$this->save_setting( 'tags', $tags );
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
 
-		if ( site_locale_is_english() ) {
+		if ( ! force_custom_step_names() ) {
 
 			if ( empty( $tags ) ) {
 				$name = __( 'Remove tags', 'groundhogg' );
@@ -123,7 +122,7 @@ class Remove_Tag extends Action {
 
 	public function step_title_edit( $step ) {
 
-		if ( ! site_locale_is_english() ) {
+		if ( force_custom_step_names() ) {
 			parent::step_title_edit( $step );
 
 			return;

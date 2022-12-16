@@ -2,25 +2,12 @@
 
 namespace Groundhogg\Steps\Benchmarks;
 
-use Groundhogg\Contact;
-use Groundhogg\Reporting\Reporting;
-use Groundhogg\Utils\Graph;
-use function Groundhogg\add_custom_fields_to_mappable_fields;
-use function Groundhogg\encrypt;
-use function Groundhogg\get_contactdata;
-use function Groundhogg\get_custom_fields_dropdown_options;
-use function Groundhogg\get_db;
-use function Groundhogg\get_url_var;
-use function Groundhogg\html;
-use Groundhogg\HTML;
+use Groundhogg\Form;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
-use Groundhogg\Contact_Query;
-use Groundhogg\Event;
-use Groundhogg\Form;
-use Groundhogg\Submission;
+use function Groundhogg\encrypt;
+use function Groundhogg\html;
 use function Groundhogg\managed_page_url;
-use function Groundhogg\percentage;
 
 
 /**
@@ -80,9 +67,9 @@ class Web_Form extends Benchmark {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/web-form.svg';
 	}
 
-    public function complete() {
-	    return;
-    }
+	public function complete() {
+		return;
+	}
 
 	/**
 	 * @return int[]
@@ -168,8 +155,8 @@ class Web_Form extends Benchmark {
 
 	protected function before_step_notes( Step $step ) {
 
-		$form            = new Form\Form_v2( [ 'id' => $step->get_id() ] );
-		$form_url        = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
+		$form     = new Form\Form_v2( [ 'id' => $step->get_id() ] );
+		$form_url = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
 
 		?>
         <div class="gh-panel">

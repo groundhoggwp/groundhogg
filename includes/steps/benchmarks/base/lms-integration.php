@@ -5,7 +5,6 @@ namespace Groundhogg\Steps\Benchmarks\Base;
 use Groundhogg\Contact;
 use Groundhogg\Step;
 use Groundhogg\Steps\Benchmarks\Benchmark;
-use function Groundhogg\ensure_array;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\html;
 
@@ -77,15 +76,15 @@ abstract class LMS_Integration extends Benchmark {
 		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
 		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
 
-		if ( ! in_array( $this->get_data( 'action' ), $actions ) ){
+		if ( ! in_array( $this->get_data( 'action' ), $actions ) ) {
 			return false;
 		}
 
-		if ( ! empty( $course_ids ) && ! in_array( $this->get_data( 'course' ), $course_ids ) ){
+		if ( ! empty( $course_ids ) && ! in_array( $this->get_data( 'course' ), $course_ids ) ) {
 			return false;
 		}
 
-		if ( ! empty( $course_ids ) && ! empty( $lesson_ids ) && ! in_array( $this->get_data( 'lesson' ), $lesson_ids ) ){
+		if ( ! empty( $course_ids ) && ! empty( $lesson_ids ) && ! in_array( $this->get_data( 'lesson' ), $lesson_ids ) ) {
 			return false;
 		}
 

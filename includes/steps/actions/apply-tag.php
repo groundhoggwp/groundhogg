@@ -5,11 +5,10 @@ namespace Groundhogg\Steps\Actions;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
-use function Groundhogg\site_locale_is_english;
+use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_db;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
@@ -107,7 +106,7 @@ class Apply_Tag extends Action {
 
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
 
-		if ( site_locale_is_english() ) {
+		if ( ! force_custom_step_names() ) {
 
 			if ( empty( $tags ) ) {
 				$name = __( 'Apply tags', 'groundhogg' );
@@ -120,12 +119,12 @@ class Apply_Tag extends Action {
 			$step->update( [
 				'step_title' => $name
 			] );
-        }
+		}
 	}
 
 	public function step_title_edit( $step ) {
 
-		if ( ! site_locale_is_english() ) {
+		if ( force_custom_step_names() ) {
 			parent::step_title_edit( $step );
 
 			return;

@@ -4,21 +4,18 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
-use Groundhogg\Temp_Step;
-use function Groundhogg\array_map_to_class;
-use function Groundhogg\dashicon;
-use function Groundhogg\doing_rest;
-use function Groundhogg\ensure_array;
-use function Groundhogg\get_db;
-use function Groundhogg\html;
 use Groundhogg\Event;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\array_map_to_class;
+use function Groundhogg\ensure_array;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
+use function Groundhogg\html;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,7 +64,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	const BENCHMARK = 'benchmark';
 
 	public function is_legacy() {
-        return false;
+		return false;
 	}
 
 	/**
@@ -606,7 +603,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function get_like_steps( $query = [] ) {
 
-		$args  = [
+		$args = [
 			'step_type'  => $this->get_type(),
 			'step_group' => $this->get_group()
 		];
@@ -755,7 +752,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		<?php
 	}
 
-    public function after_step_warnings(){}
+	public function after_step_warnings() {
+	}
 
 	/**
 	 * @param $step Step
@@ -778,7 +776,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php endforeach; ?>
                 </div>
 			<?php endif; ?>
-	        <?php $this->after_step_warnings() ?>
+			<?php $this->after_step_warnings() ?>
             <!-- SETTINGS -->
             <div class="step-flex">
                 <div class="step-edit panels">

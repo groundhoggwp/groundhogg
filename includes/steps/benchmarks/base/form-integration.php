@@ -2,15 +2,14 @@
 
 namespace Groundhogg\Steps\Benchmarks;
 
-use function Groundhogg\after_form_submit_handler;
 use Groundhogg\Contact;
-use function Groundhogg\array_flatten;
+use Groundhogg\Step;
+use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use Groundhogg\Step;
 
 /**
  * Created by PhpStorm.
@@ -55,11 +54,12 @@ abstract class Form_Integration extends Benchmark {
 	 */
 	public function settings( $step ) {
 
-		html()->start_form_table();
-		html()->start_row();
-		html()->th( __( 'Run when this form is submitted', 'groundhogg' ) );
-		html()->td( [
-			'<div class="display-flex gap-10">',
+
+		echo html()->e( 'p', [], html()->e( 'b', [], __( 'Run when this form is submitted', 'groundhogg' ) ) );
+
+		echo html()->e( 'div', [
+			'class' => 'display-flex gap-10 stretch'
+		], [
 			html()->select2( [
 				'id'       => $this->setting_id_prefix( 'form_id' ),
 				'name'     => $this->setting_name_prefix( 'form_id' ),
@@ -67,32 +67,26 @@ abstract class Form_Integration extends Benchmark {
 				'selected' => $this->get_setting( 'form_id' ),
 				'class'    => 'gh-select2 form-integration-picker'
 			] ),
-			html()->wrap( [
-				html()->modal_link( [
-					'title'              => __( 'Map Fields', 'groundhogg' ),
-					'text'               => __( 'Map Fields', 'groundhogg' ),
-					'footer_button_text' => __( 'Save Changes' ),
-					'id'                 => '',
-					'class'              => 'button button-primary no-padding',
-					'source'             => $this->setting_id_prefix( 'field_map' ),
-					'height'             => 600,
-					'width'              => 600,
-					'footer'             => 'true',
-					'preventSave'        => 'true',
-				] ),
-				html()->e( 'span', [ 'class' => 'spinner' ], '', false )
-			],
-				'div',
-				[ 'class' => '' ]
-			),
+			html()->modal_link( [
+				'title'              => __( 'Map Fields', 'groundhogg' ),
+				'text'               => __( 'Map Fields', 'groundhogg' ),
+				'footer_button_text' => __( 'Save Changes' ),
+				'id'                 => '',
+				'class'              => 'gh-button primary no-padding',
+				'source'             => $this->setting_id_prefix( 'field_map' ),
+				'height'             => 600,
+				'width'              => 600,
+				'footer'             => 'true',
+				'preventSave'        => 'true',
+			] ),
+			html()->e( 'span', [ 'class' => 'spinner' ], '', false ),
 			html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
 				'class' => 'hidden field-map-wrapper',
 				'id'    => $this->setting_id_prefix( 'field_map' )
 			] ),
-			'</div>'
 		] );
-		html()->end_row();
-		html()->end_form_table();
+
+		echo '<p></p>';
 	}
 
 	/**
@@ -114,7 +108,7 @@ abstract class Form_Integration extends Benchmark {
 	/**
 	 * Parse the filed into a normalize array.
 	 *
-	 * @param $key int|string
+	 * @param $key   int|string
 	 * @param $field array|string
 	 *
 	 * @return array
@@ -180,11 +174,11 @@ abstract class Form_Integration extends Benchmark {
 
 		$field_map = $step->get_meta( 'field_map' );
 
-		if ( empty( $field_map ) ){
+		if ( empty( $field_map ) ) {
 			$step->add_error( 'invalid_field_map', __( 'Map your form fields to capture submissions.', 'groundhogg' ) );
 		}
 
-		if ( $field_map && ! in_array( 'email', $field_map ) ){
+		if ( $field_map && ! in_array( 'email', $field_map ) ) {
 			$step->add_error( 'missing_email_field', __( 'There is no email address field mapped, submissions may not be captured correctly.', 'groundhogg' ) );
 		}
 

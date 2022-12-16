@@ -322,8 +322,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.7.8 (2022-12-16) =
+* ADDED Misc interface setting to enable custom step titles for all step types.
+* ADDED Developer hook to filter the template library URL.
+* FIXED Recent Thrive Suite update dequeuing and unregistering select2 scripts. Very naughty of them.
+
 = 2.7.7.8 (2022-12-12) =
-* FIX Delay Timer setting time to 12:00 AM if weekday or weekend is selected and timer is enqueue on the opposite.
+* FIXED Delay Timer setting time to 12:00 AM if weekday or weekend is selected and timer is enqueue on the opposite.
 
 = 2.7.7.7 (2022-12-12) =
 * ADDED Tool to restore pending events if events were deleted.

@@ -816,6 +816,20 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
+            'gh_force_custom_step_names'                       => array(
+				'id'      => 'gh_force_custom_step_names',
+				'section' => 'interface',
+				'label'   => _x( 'Enable Custom Step Titles', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will ensure all step titles can be customized.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable', 'groundhogg' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_force_custom_step_names',
+					'id'    => 'gh_force_custom_step_names',
+					'value' => 'on',
+				),
+			),
 			'gh_privacy_policy'                      => array(
 				'id'      => 'gh_privacy_policy',
 				'section' => 'compliance',
