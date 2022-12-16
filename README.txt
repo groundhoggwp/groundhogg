@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.8
+Stable tag: 2.7.7.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,7 +322,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.7.8 (2022-12-16) =
+= 2.7.7.9 (2022-12-16) =
 * ADDED Misc interface setting to enable custom step titles for all step types.
 * ADDED Developer hook to filter the template library URL.
 * FIXED Recent Thrive Suite update dequeuing and unregistering select2 scripts. Very naughty of them.
