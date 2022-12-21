@@ -1051,8 +1051,9 @@ class Contact extends Base_Object_With_Meta {
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
+				// For capabilities
 				if ( current_user_can( 'view_contact', $this ) ) {
-					$file['url'] .= '?contact=' . $this->ID;
+					$file['url'] = add_query_arg( 'contact', $this->ID, $file['url'] );
 				}
 
 				$data[] = $file;

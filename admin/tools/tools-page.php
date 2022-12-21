@@ -11,11 +11,15 @@ use Groundhogg\License_Manager;
 use Groundhogg\Queue\Event_Queue;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\check_permissions_key;
 use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
+use function Groundhogg\get_permissions_key;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -31,6 +35,7 @@ use function Groundhogg\notices;
 use function Groundhogg\restore_missing_funnel_events;
 use function Groundhogg\uninstall_gh_cron_file;
 use function Groundhogg\uninstall_groundhogg;
+use function Groundhogg\utils;
 use function Groundhogg\validate_tags;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
@@ -1111,6 +1116,56 @@ class Tools_Page extends Tabbed_Admin_Page {
 	    $this->add_notice( 'restored', 'Events restored!' );
 
         return admin_page_url( 'gh_events' );
+    }
+
+	/**
+     * Download a file from the admin
+     *
+	 * @return void
+	 */
+    public function process_download_file(){
+
+	    $short_path      = get_url_var( 'file_path' );
+	    $groundhogg_path = utils()->files->get_base_uploads_dir();
+	    $file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
+
+	    if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
+		    wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
+	    }
+
+        $request = get_request_query();
+
+        if ( ! current_user_can( 'download_file', $short_path, $request, $file_path ) ) {
+            wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+        }
+
+	    $mime = wp_check_filetype( $file_path );
+	    $mime = $mime['type'];
+
+	    if ( ! $mime ) {
+		    wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+	    }
+
+	    $content_type = sprintf( "Content-Type: %s", $mime );
+	    $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
+
+	    header( $content_type );
+	    header( $content_size );
+
+	    if ( get_request_var( 'download' ) ) {
+		    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+	    } else {
+		    $content_disposition = sprintf( "Content-disposition: inline; filename=%s", basename( $file_path ) );
+	    }
+
+	    header( $content_disposition );
+
+	    status_header( 200 );
+	    nocache_headers();
+
+	    readfile( $file_path );
+	    exit();
+
     }
 
 	/**

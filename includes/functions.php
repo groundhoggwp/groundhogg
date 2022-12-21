@@ -3687,6 +3687,10 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
+	if ( is_user_logged_in() && current_user_can( 'download_files' ) ){
+		return action_url( 'download_file', [ 'page' => 'gh_tools', 'file_path' => ltrim( $path, '/' ), 'download' => $download ] );
+	}
+
 	$url = managed_page_url( 'file-download/' . ltrim( $path, '/' ) );
 
 	// WP Engine file download links do not work if forward slash is not present.
