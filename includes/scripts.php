@@ -280,7 +280,7 @@ class Scripts {
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor-plain' . $dot_min . '.js', [
-			'jquery',
+			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 		], GROUNDHOGG_VERSION, true );
 
@@ -320,7 +320,9 @@ class Scripts {
 			'jquery',
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/simple-editor' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/simple-editor' . $dot_min . '.js', [
+			'groundhogg-admin-element'
+		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'js/admin/email-preview' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-email-log', GROUNDHOGG_ASSETS_URL . 'js/admin/email-log' . $dot_min . '.js', [

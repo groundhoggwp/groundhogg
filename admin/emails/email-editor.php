@@ -275,42 +275,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 				<div id="header-wrap">
 					<h3><?php _e( 'Custom Headers', 'groundhogg' ); ?></h3>
 					<p><?php printf( __( 'You can define custom email headers and override existing ones. For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>', 'groundhogg' ), white_labeled_name() ); ?></p>
-					<?php
-					$headers        = [];
-					$custom_headers = $email->get_meta( 'custom_headers', true );
-
-					if ( ! $custom_headers ) {
-						$custom_headers = [ '' ];
-					}
-
-					foreach ( $custom_headers as $key => $value ):
-
-						$headers[] = [
-							html()->input( [
-								'name'  => 'header_key[]',
-								'class' => 'input',
-								'value' => $key,
-                                'placeholder' => 'X-Custom-Header'
-							] ),
-							html()->input( [
-								'name'  => 'header_value[]',
-								'class' => 'input',
-								'value' => $value,
-                                'placeholder' => 'Custom Value'
-							] ),
-							"<span class=\"display-flex\">
-                        <a href=\"javascript:void(0)\" class=\"gh-button secondary text icon addmeta\"><span class=\"dashicons dashicons-plus\"></span></a>
-                        <a href=\"javascript:void(0)\" class=\"gh-button danger text icon deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a>
-                    </span>"
-						];
-					endforeach;
-
-					html()->list_table( [ 'id' => 'headers-table' ], [
-						__( 'Key' ),
-						__( 'Value' ),
-						__( 'Actions' )
-					], $headers, false );
-					?>
+					<div id="custom-headers"></div>
 				</div>
 			</div>
 		</div>
