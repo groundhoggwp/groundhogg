@@ -1714,6 +1714,8 @@ class Form_v2 extends Step {
 
 		foreach ( $fields as $field ) {
 
+			$isset = false;
+
 			if ( isset_not_empty( $field, 'required' ) ) {
 
 				$isset = self::check_field_isset( $field, $posted_data );
@@ -1724,7 +1726,11 @@ class Form_v2 extends Step {
 				}
 			}
 
-			$result = self::validate_field( $field, $posted_data );
+			$result = null;
+
+			if ( $isset ){
+				$result = self::validate_field( $field, $posted_data );
+			}
 
 			if ( is_wp_error( $result ) ) {
 				$result->add_data( $field['label'] );
