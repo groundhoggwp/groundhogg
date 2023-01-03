@@ -99,7 +99,8 @@ class Telemetry {
 				'funnels'    => get_db( 'funnels' )->count( [ 'status' => 'active' ] ),
 				'contacts'   => get_db( 'contacts' )->count( [ 'after' => $_7daysago->format( 'Y-m-d H:i:s' ) ] ),
 				'broadcasts' => get_db( 'broadcasts' )->count( [ 'after' => $_7daysago->getTimestamp() ] )
-			]
+			],
+			'extensions' => implode(',', Extension::$extension_ids )
 		];
 
 		remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1727-receive-telemetry?token=JVq8f3u', $request );
