@@ -306,6 +306,7 @@ class Delay_Timer extends Action {
 					} else {
 
 						if ( $run_on_dow_type === 'any' ) {
+							$date->minMax( "$day_of_week $time" );
 							$date->minMax( "next $day_of_week $time" );
 						} else {
 							$date->minMax( "$run_on_dow_type $day_of_week of this month $time" );
