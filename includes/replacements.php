@@ -1308,9 +1308,9 @@ class Replacements implements \JsonSerializable {
 		$address_keys = [
 			'street_address_1',
 			'street_address_2',
-			'zip_or_postal',
 			'city',
 			'region',
+			'zip_or_postal',
 			'country',
 		];
 
@@ -1324,9 +1324,7 @@ class Replacements implements \JsonSerializable {
 			}
 		}
 
-		$address = implode( ', ', $address );
-
-		return $address;
+		return implode( ', ', $address );
 	}
 
 	/**
