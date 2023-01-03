@@ -481,9 +481,8 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_footer_text( $content ) {
-		$footer = "";
 
-		$footer .= "&copy; {business_name}<br/>";
+		$footer = "&copy; {business_name}<br/>";
 		$footer .= "{business_address}<br/>";
 
 		$sub = array();
