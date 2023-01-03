@@ -441,10 +441,12 @@ switch ( $action ):
 
 			switch ( $preference ) {
 				case 'unsubscribe':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
-					$notice   = 'notice_unsubscribed';
+					$contact->unsubscribe();
+                    $redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
+                    $notice   = 'notice_unsubscribed';
 					break;
 				case 'confirm':
+					$contact->change_marketing_preference( Preferences::CONFIRMED );
 					$redirect = managed_page_url( 'preferences/confirm/' );
 					break;
 				case 'weekly':

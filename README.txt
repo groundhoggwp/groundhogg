@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.9
+Stable tag: 2.7.7.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.7.10 (2023-01-03) =
+* ADDED More developer hooks in the event queue.
+* TWEAKED Events moved from queue table to history in one big batch instead of many smaller batches.
+* TWEAKED When downloading files from admin pages use /wp-admin/ link instead of /gh/
+* FIXED Non-required fields giving invalid data error when empty value provided
 
 = 2.7.7.9 (2022-12-16) =
 * ADDED Misc interface setting to enable custom step titles for all step types.

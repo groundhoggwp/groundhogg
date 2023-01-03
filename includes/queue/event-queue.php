@@ -175,15 +175,6 @@ class Event_Queue extends Supports_Errors {
 
 		$events = get_db( 'event_queue' );
 
-		get_db( 'event_queue' )->move_events_to_history( [
-			'status' => [
-				Event::CANCELLED,
-				Event::SKIPPED,
-				Event::COMPLETE,
-				Event::FAILED
-			]
-		] );
-
 		// 5-minute window.
 		$time = time() - ( MINUTE_IN_SECONDS * 5 );
 
@@ -194,7 +185,6 @@ WHERE status IN ( 'in_progress', 'waiting' ) AND claim != '' AND `time` < {$time
 ORDER BY ID" );
 
 		$events->cache_set_last_changed();
-
 	}
 
 	/**
@@ -213,8 +203,6 @@ ORDER BY ID" );
 
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit( apply_filters( 'groundhogg/event_queue/max_time_limit', MINUTE_IN_SECONDS ) );
-
-//		$this->cleanup_unprocessed_events();
 
 		$this->store = new Event_Store_V2();
 
@@ -242,9 +230,7 @@ ORDER BY ID" );
 	}
 
 	/**
-	 * Recursive, Iterate through the list of events and process them via the EVENTS api
-	 * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
-	 * the amount of traffic.
+	 * Iterate through the list of events and process them via the EVENTS api
 	 *
 	 * @return void
 	 */
@@ -299,17 +285,22 @@ ORDER BY ID" );
 
 			}
 
-			get_db( 'event_queue' )->move_events_to_history( [
-				'status' => [
-					Event::SKIPPED,
-					Event::COMPLETE,
-					Event::FAILED,
-				]
-			] );
-
 			$this->store->release_events();
-
 		}
+
+		/**
+		 * When the queue is finished processing events, but before processed events are moved to the history table
+		 */
+		do_action( 'groundhogg/queue/processed_events' );
+
+		// Move all processed events to the history table
+		get_db( 'event_queue' )->move_events_to_history( [
+			'status' => [
+				Event::SKIPPED,
+				Event::COMPLETE,
+				Event::FAILED,
+			]
+		] );
 
 		self::set_is_processing( false );
 	}
