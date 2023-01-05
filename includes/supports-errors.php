@@ -59,4 +59,19 @@ abstract class Supports_Errors {
 	public function get_errors() {
 		return $this->errors;
 	}
+
+	/**
+	 * Whether a specific error is present
+	 *
+	 * @param $code
+	 *
+	 * @return false|\WP_Error
+	 */
+	public function has_error( $code = '' ){
+		return array_find( $this->errors, function ( $error ) use ( $code ){
+			return $error->get_error_code() === $code;
+		} );
+	}
+
+
 }
