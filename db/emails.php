@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Email;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -73,6 +75,10 @@ class Emails extends DB {
 	 */
 	public function get_object_type() {
 		return 'email';
+	}
+
+	public function create_object( $object ) {
+		return new Email( $object );
 	}
 
 	protected function add_additional_actions() {

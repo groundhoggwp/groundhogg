@@ -376,7 +376,10 @@
 
               const query = {
                 ...state.query,
-                marketable: true,
+              }
+
+              if ( EmailsStore.get(state.email_id).meta.message_type === 'marketing' ){
+                query.marketable=true
               }
 
               ContactsStore.count(query).then(total => {
