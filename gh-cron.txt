@@ -81,7 +81,7 @@ if ( is_multisite() && is_main_site() && ! \Groundhogg\get_url_var( 'process_que
 
 } // Single site do the cron
 else {
-	do_action( 'groundhogg_process_queue' );
+	\Groundhogg\event_queue()->run_queue();
 }
 
 die();

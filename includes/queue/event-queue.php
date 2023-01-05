@@ -87,7 +87,7 @@ class Event_Queue extends Supports_Errors {
 	public function __construct() {
 
 		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
-		add_action( self::WP_CRON_HOOK, [ $this, 'run_queue' ] );
+		add_action( self::WP_CRON_HOOK, [ $this, 'wp_cron' ] );
 
 		// no need if gh-cron.php is installed.
 		add_action( 'init', [ $this, 'setup_cron_jobs' ] );
@@ -111,7 +111,22 @@ class Event_Queue extends Supports_Errors {
 		// 10 second cap on heartbeat
 		Limits::set_max_execution_time( 10 );
 
-		do_action( self::WP_CRON_HOOK );
+		$this->run_queue();
+	}
+
+	/**
+	 * Processed from WP-cron
+	 *
+	 * @return void
+	 */
+	public function wp_cron() {
+
+		// If the cron file is installed and the queue is processing do not do wp-cron action
+		if ( is_event_queue_processing() && gh_cron_installed() ) {
+			return;
+		}
+
+		$this->run_queue();
 	}
 
 	public function init() {
@@ -127,7 +142,6 @@ class Event_Queue extends Supports_Errors {
 	public function is_enabled() {
 		return apply_filters( 'groundhogg/event_queue/is_enabled', true, $this );
 	}
-
 
 	/**
 	 * Add the schedules
