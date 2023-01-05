@@ -1642,6 +1642,45 @@ class Contact_Query {
 			[ self::class, 'filter_page_visited' ]
 		);
 
+		self::register_filter(
+			'contact_id',
+			[ self::class, 'filter_contact_id' ]
+		);
+
+		self::register_filter(
+			'user_id',
+			[ self::class, 'filter_user_id' ]
+		);
+	}
+
+	/**
+	 * @param $filter
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_contact_id($filter, $query ) {
+		$filter_vars = wp_parse_args( $filter, [
+			'compare' => 'equals',
+			'value'   => ''
+		] );
+
+		return self::generic_number_compare( $query->table_name . '.ID', $filter_vars['compare'], $filter_vars['value'] );
+	}
+
+	/**
+	 * @param $filter
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_user_id($filter, $query ) {
+		$filter_vars = wp_parse_args( $filter, [
+			'compare' => 'equals',
+			'value'   => ''
+		] );
+
+		return self::generic_number_compare( $query->table_name . '.user_id', $filter_vars['compare'], $filter_vars['value'] );
 	}
 
 	/**
@@ -2126,7 +2165,7 @@ class Contact_Query {
 						], $query ) );
 				}
 
-				return apply_filters( 'groundhogg/query/is_not_marketable_clause', $clause );
+				return apply_filters( 'groundhogg/query/is_not_marketable_clause', '(' . $clause . ')' );
 		}
 	}
 

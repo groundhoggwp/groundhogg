@@ -1183,6 +1183,39 @@
     },
   })
 
+  registerFilter('contact_id', 'contact', __('Contact ID', 'groundhogg'), {
+    view ({ compare, value }) {
+      return ComparisonsTitleGenerators[compare](`<b>${ __('Contact ID') }</b>`, `<b>${ value }</b>`)
+    },
+    edit ({ compare, value }) {
+      // language=html
+      return `
+          ${ select({
+        id: 'filter-compare',
+        name: 'compare',
+      }, NumericComparisons, compare) } ${ input({
+        id: 'filter-value',
+        name: 'value',
+        type: 'number',
+        step: '0.01',
+        value,
+      }) }`
+    },
+    onMount (filter, updateFilter) {
+
+      $('#filter-compare, #filter-value').on('change', function (e) {
+        const $el = $(this)
+        updateFilter({
+          [$el.prop('name')]: $el.val(),
+        })
+      })
+    },
+    defaults: {
+      compare: 'equals',
+      value: '',
+    },
+  })
+
   registerFilter('is_user', 'user', __('Has User Account', 'groundhogg'), {
     view () {
       return __('Has a user account', 'groundhogg')
@@ -1264,6 +1297,39 @@
     },
     defaults: {
       meta: '',
+      compare: 'equals',
+      value: '',
+    },
+  })
+
+  registerFilter('user_id', 'user', __('User ID', 'groundhogg'), {
+    view ({ compare, value }) {
+      return ComparisonsTitleGenerators[compare](`<b>${ __('User ID') }</b>`, `<b>${ value }</b>`)
+    },
+    edit ({ compare, value }) {
+      // language=html
+      return `
+          ${ select({
+              id: 'filter-compare',
+              name: 'compare',
+          }, NumericComparisons, compare) } ${ input({
+              id: 'filter-value',
+              name: 'value',
+              type: 'number',
+              step: '0.01',
+              value,
+          }) }`
+    },
+    onMount (filter, updateFilter) {
+
+      $('#filter-compare, #filter-value').on('change', function (e) {
+        const $el = $(this)
+        updateFilter({
+          [$el.prop('name')]: $el.val(),
+        })
+      })
+    },
+    defaults: {
       compare: 'equals',
       value: '',
     },
@@ -2159,14 +2225,14 @@
         // language=html
         return `
             ${ select({
-          id: 'filter-compare',
-          name: 'compare',
-        }, NumericComparisons, compare) } ${ input({
-          id: 'filter-value',
-          name: 'value',
-          type: 'time',
-          value,
-        }) }`
+                id: 'filter-compare',
+                name: 'compare',
+            }, NumericComparisons, compare) } ${ input({
+                id: 'filter-value',
+                name: 'value',
+                type: 'time',
+                value,
+            }) }`
       },
       onMount (filter, updateFilter) {
 
