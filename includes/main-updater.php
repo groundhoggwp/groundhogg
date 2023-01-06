@@ -463,15 +463,6 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Update the gh-cron file to support subsites.
-	 */
-	public function version_2_5_3() {
-		if ( gh_cron_installed() ) {
-			install_gh_cron_file();
-		}
-	}
-
-	/**
 	 * New page tracking stuff!
 	 */
 	public function version_2_5_4() {
@@ -671,6 +662,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Update the gh-cron file to use direct function instead of do_action
+	 */
+	public function version_2_7_7_10() {
+		if ( gh_cron_installed() ) {
+			install_gh_cron_file();
+		}
+	}
+
+	/**
 	 * Get a list of updates which are available.
 	 *
 	 * @return string[]
@@ -713,7 +713,6 @@ class Main_Updater extends Updater {
 			'2.4.7.3',
 			'2.5',
 			'2.5.1.3',
-			'2.5.3',
 			'2.5.4',
 			'2.5.5',
 			'2.5.7',
@@ -729,6 +728,7 @@ class Main_Updater extends Updater {
 			'2.7.5.2',
 			'2.7.6.1',
 			'2.7.7.8',
+			'2.7.7.10',
 		];
 	}
 
@@ -756,7 +756,6 @@ class Main_Updater extends Updater {
 			'2.4.7.1',
 			'2.5',
 			'2.5.1.3',
-			'2.5.3',
 			'2.5.4',
 			'2.5.5',
 			'2.5.7',
@@ -771,6 +770,7 @@ class Main_Updater extends Updater {
 			'2.7.5.2',
 			'2.7.6.1',
 			'2.7.7.8',
+			'2.7.7.10',
 		];
 	}
 
@@ -816,7 +816,6 @@ class Main_Updater extends Updater {
 			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 			'2.5'           => __( 'Add additional capabilities for admins and marketers. Update database tables and replace wp_login activity names in the activity table.', 'groundhogg' ),
 			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
-			'2.5.3'         => __( 'Update the gh-cron.php file to support subsites on multisite networks.', 'groundhogg' ),
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
 			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
 			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
@@ -833,6 +832,7 @@ class Main_Updater extends Updater {
 			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
 			'2.7.6.1'       => __( 'Update `step_status` column with `active` or `inactive`', 'groundhogg' ),
 			'2.7.7.8'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
+			'2.7.7.10'       => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
 		];
 	}
 }
