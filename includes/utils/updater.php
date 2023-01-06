@@ -361,7 +361,7 @@ abstract class Updater {
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
 			'class' => 'button button-secondary'
-		], __( 'Upgrade Database Now!', 'groundhogg' ) );
+		], __( 'Update Now!', 'groundhogg' ) );
 
 		$update_descriptions = "";
 
@@ -377,7 +377,7 @@ abstract class Updater {
 			$update_descriptions = sprintf( __( "Required Upgrades:<span style='font-weight: normal'><ul>%s</ul></span>", 'groundhogg' ), $update_descriptions );
 		}
 
-		$notice = sprintf( __( "%s requires a database upgrade. Consider backing up your site before upgrading. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
+		$notice = sprintf( __( "%s requires an update. Consider backing up your site before updating. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
 		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
 	}
 
@@ -395,7 +395,7 @@ abstract class Updater {
 		$this->unlock_updates();
 
 		if ( $this->do_updates() ) {
-			notices()->add( 'updated', sprintf( __( "%s upgraded successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
+			notices()->add( 'updated', sprintf( __( "%s updated successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
 		}
 
 		wp_safe_redirect( wp_get_referer() );
