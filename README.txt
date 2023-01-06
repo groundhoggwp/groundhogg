@@ -324,9 +324,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 2.7.7.10 (2023-01-03) =
 * ADDED More developer hooks in the event queue.
+* ADDED **Contact ID** and **User ID** filters.
 * TWEAKED Events moved from queue table to history in one big batch instead of many smaller batches.
-* TWEAKED When downloading files from admin pages use /wp-admin/ link instead of /gh/
-* FIXED Non-required fields giving invalid data error when empty value provided
+* TWEAKED When downloading files from admin pages use `/wp-admin/` link instead of `/gh/`.
+* TWEAKED Built-in wp-cron will only process the event queue as a fail safe, and will not execute if the event queue has already run.
+* FIXED Non-required fields giving invalid data error when empty value provided.
+* FIXED Transactional broadcasts not being sent to all deliverable contacts.
 
 = 2.7.7.9 (2022-12-16) =
 * ADDED Misc interface setting to enable custom step titles for all step types.
