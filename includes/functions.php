@@ -5328,7 +5328,7 @@ function track_gh_cron_ping() {
 	update_option( 'gh_cron_last_ping', time() );
 }
 
-add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
+add_action( 'groundhogg/event_queue/before_process', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
 
 /**
  * Whether the queue is processing every single minute
