@@ -1,6 +1,6 @@
 <?php
 
-use Groundhogg\Utils\Limits;
+use Groundhogg\Queue\Event_Queue;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\get_default_from_name;
@@ -13,9 +13,9 @@ use function Groundhogg\white_labeled_name;
 /**
  * Get system info
  *
+ * @since       2.0
  * @return      string $return A string containing the info to output
  * @global      object $wpdb Used to query the database using the WordPress Database API
- * @since       2.0
  */
 function groundhogg_tools_sysinfo_get() {
 
@@ -151,7 +151,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= 'DISABLE_WP_CRON:          ' . ( defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 	$return .= 'wp-cron.php last ping:    ' . ( get_option( 'wp_cron_last_ping' ) ? human_time_diff( get_option( 'wp_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n\n";
 	$return .= 'gh-cron.php installed:    ' . ( gh_cron_installed() ? 'Yes' : 'No' ) . "\n";
-	$return .= 'Event Queue Unhooked:     ' . ( ! wp_next_scheduled( 'groundhogg_process_queue' ) ? 'Yes' : 'No' ) . "\n";
+	$return .= 'Event Queue Unhooked:     ' . ( ! wp_next_scheduled( Event_Queue::WP_CRON_HOOK ) ? 'Yes' : 'No' ) . "\n";
 	$return .= 'gh-cron.php last ping:    ' . ( get_option( 'gh_cron_last_ping' ) ? human_time_diff( get_option( 'gh_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n";
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_cron_config', $return );
@@ -327,36 +327,36 @@ function groundhogg_get_ns_records() {
  *
  * Returns the webhost this site is using if possible
  *
- * @return mixed string $host if detected, false otherwise
  * @since 1.0.9
+ * @return mixed string $host if detected, false otherwise
  */
 function groundhogg_get_host() {
 
 	if ( defined( 'WPE_APIKEY' ) ) {
 		$host = 'WP Engine';
-	} elseif ( defined( 'PAGELYBIN' ) ) {
+	} else if ( defined( 'PAGELYBIN' ) ) {
 		$host = 'Pagely';
-	} elseif ( DB_HOST == 'localhost:/tmp/mysql5.sock' ) {
+	} else if ( DB_HOST == 'localhost:/tmp/mysql5.sock' ) {
 		$host = 'ICDSoft';
-	} elseif ( DB_HOST == 'mysqlv5' ) {
+	} else if ( DB_HOST == 'mysqlv5' ) {
 		$host = 'NetworkSolutions';
-	} elseif ( strpos( DB_HOST, 'ipagemysql.com' ) !== false ) {
+	} else if ( strpos( DB_HOST, 'ipagemysql.com' ) !== false ) {
 		$host = 'iPage';
-	} elseif ( strpos( DB_HOST, 'ipowermysql.com' ) !== false ) {
+	} else if ( strpos( DB_HOST, 'ipowermysql.com' ) !== false ) {
 		$host = 'IPower';
-	} elseif ( strpos( DB_HOST, '.gridserver.com' ) !== false ) {
+	} else if ( strpos( DB_HOST, '.gridserver.com' ) !== false ) {
 		$host = 'MediaTemple Grid';
-	} elseif ( strpos( DB_HOST, '.pair.com' ) !== false ) {
+	} else if ( strpos( DB_HOST, '.pair.com' ) !== false ) {
 		$host = 'pair Networks';
-	} elseif ( strpos( DB_HOST, '.stabletransit.com' ) !== false ) {
+	} else if ( strpos( DB_HOST, '.stabletransit.com' ) !== false ) {
 		$host = 'Rackspace Cloud';
-	} elseif ( strpos( DB_HOST, '.sysfix.eu' ) !== false ) {
+	} else if ( strpos( DB_HOST, '.sysfix.eu' ) !== false ) {
 		$host = 'SysFix.eu Power Hosting';
-	} elseif ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
+	} else if ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
 		$host = 'Flywheel';
-	} elseif ( defined( 'SiteGround_Optimizer\VERSION' ) ) {
+	} else if ( defined( 'SiteGround_Optimizer\VERSION' ) ) {
 		$host = 'SiteGround';
-	} elseif ( defined( 'CLOSTE_DIR' ) ) {
+	} else if ( defined( 'CLOSTE_DIR' ) ) {
 		$host = 'Closte';
 	} else {
 		// Adding a general fallback for data gathering
@@ -369,8 +369,8 @@ function groundhogg_get_host() {
 /**
  * Generates a System Info download file
  *
- * @return      void
  * @since       2.0
+ * @return      void
  */
 function groundhogg_tools_sysinfo_download() {
 
@@ -459,9 +459,9 @@ function groundhogg_disable_safe_mode() {
  *
  * Warning when the site doesn't have the minimum required WordPress version.
  *
- * @return void
  * @since 2.0
  *
+ * @return void
  */
 function groundhogg_safe_mode_enabled_notice() {
 
