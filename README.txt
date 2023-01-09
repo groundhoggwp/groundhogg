@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.7.10
+Stable tag: 2.7.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,7 +322,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.7.10 (2023-01-03) =
+= 2.7.8 (2023-01-09) =
 * ADDED More developer hooks in the event queue.
 * ADDED **Contact ID** and **User ID** filters.
 * TWEAKED Events moved from queue table to history in one big batch instead of many smaller batches.
