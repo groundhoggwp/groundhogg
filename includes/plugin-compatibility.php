@@ -30,7 +30,7 @@ class Plugin_Compatibility {
 
 	public function dokan_lite(){
 
-		if ( get_current_screen()->id !== 'groundhogg_page_gh_reporting' ){
+		if ( ! current_screen_is_gh_page( 'gh_reporting' ) ){
 			return;
 		}
 
@@ -136,11 +136,11 @@ class Plugin_Compatibility {
 
 		$action = get_request_var( 'action', 'view' );
 
-		if ( $screen->id === 'groundhogg_page_gh_funnels' && $action === 'edit' ) {
+		if ( current_screen_is_gh_page( 'gh_funnels' ) && $action === 'edit' ) {
 			return true;
 		}
 
-		if ( $screen->id === 'groundhogg_page_gh_emails' && $action === 'edit' && is_option_enabled( 'gh_use_advanced_email_editor' ) ) {
+		if ( current_screen_is_gh_page( 'gh_emails' ) && $action === 'edit' && is_option_enabled( 'gh_use_advanced_email_editor' ) ) {
 			return true;
 		}
 

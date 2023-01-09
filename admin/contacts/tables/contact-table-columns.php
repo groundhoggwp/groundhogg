@@ -9,9 +9,11 @@ use Groundhogg\Tag;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
+use function Groundhogg\white_labeled_name;
 
 class Contact_Table_Columns {
 
@@ -21,7 +23,10 @@ class Contact_Table_Columns {
 
 		add_filter( 'groundhogg_contact_columns', [ $this, 'add_columns_to_table' ] );
 		add_filter( 'groundhogg_contact_sortable_columns', [ $this, 'add_sortable_columns_to_table' ] );
-		add_filter( 'manage_groundhogg_page_gh_contacts_columns', [ $this, 'add_columns_to_screen_options' ] );
+
+        $screen = get_gh_page_screen_id( 'gh_contacts' );
+
+		add_filter( "manage_{$screen}_columns", [ $this, 'add_columns_to_screen_options' ] );
 	}
 
 	public function sort_columns() {

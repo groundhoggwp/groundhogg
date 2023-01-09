@@ -7,7 +7,6 @@ use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
-use Groundhogg\Utils\Limits;
 use WP_Error;
 
 
@@ -3687,8 +3686,11 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
-	if ( is_user_logged_in() && current_user_can( 'download_files' ) ){
-		return action_url( 'download_file', [ 'page' => 'gh_tools', 'file_path' => ltrim( $path, '/' ), 'download' => $download ] );
+	if ( is_user_logged_in() && current_user_can( 'download_files' ) ) {
+		return action_url( 'download_file', [ 'page'      => 'gh_tools',
+		                                      'file_path' => ltrim( $path, '/' ),
+		                                      'download'  => $download
+		] );
 	}
 
 	$url = managed_page_url( 'file-download/' . ltrim( $path, '/' ) );
@@ -6747,8 +6749,8 @@ function site_locale_is_english() {
  *
  * @return bool
  */
-function force_custom_step_names(){
-    return is_option_enabled( 'gh_force_custom_step_names' ) || ! site_locale_is_english();
+function force_custom_step_names() {
+	return is_option_enabled( 'gh_force_custom_step_names' ) || ! site_locale_is_english();
 }
 
 function array_bold( $array ) {
@@ -6875,4 +6877,30 @@ WHERE event_type = 1 AND time > $last_30_days AND status = 'complete' GROUP BY c
 
 		$event->get_step()->run_after( $event->get_contact(), $event );
 	}
+}
+
+
+/**
+ * Get the scree Id of a given gh page
+ *
+ * @param $page
+ *
+ * @return string
+ */
+function get_gh_page_screen_id( $page = '' ) {
+	$pagename = sanitize_title( white_labeled_name() );
+
+	return "{$pagename}_page_{$page}";
+
+}
+
+/**
+ * Is the current screen a specific Groundhogg page
+ *
+ * @param $page
+ *
+ * @return bool
+ */
+function current_screen_is_gh_page( $page = '' ) {
+	return get_gh_page_screen_id( $page ) === get_current_screen()->id;
 }

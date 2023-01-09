@@ -3,10 +3,6 @@
 namespace Groundhogg\Admin\Reports\Views;
 
 // Overview
-
-use function Groundhogg\html;
-use function Groundhogg\is_white_labeled;
-
 ?>
 <div class="display-grid gap-20">
     <div class="gh-panel span-12">

@@ -4,9 +4,7 @@ namespace Groundhogg\Admin\Reports\Views;
 
 // Overview
 
-use Groundhogg\Plugin;
 use function Groundhogg\html;
-use function Groundhogg\is_white_labeled;
 use function Groundhogg\utils;
 
 ?>

@@ -11,6 +11,7 @@ use function Groundhogg\current_user_is;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
+use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -69,11 +70,11 @@ class Contacts_Table extends WP_List_Table {
 			'singular' => 'contact',     // Singular name of the listed records.
 			'plural'   => 'contacts',    // Plural name of the listed records.
 			'ajax'     => true,       // Does this table support ajax?
-			'screen'   => 'groundhogg_page_gh_contacts'
+			'screen'   => get_gh_page_screen_id( 'gh_contacts' )
 		) );
 
 		$columns  = $this->get_columns();
-		$hidden   = get_hidden_columns( 'groundhogg_page_gh_contacts' );
+		$hidden   = get_hidden_columns( get_gh_page_screen_id( 'gh_contacts' ) );
 		$sortable = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}

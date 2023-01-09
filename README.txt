@@ -330,6 +330,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED Built-in wp-cron will only process the event queue as a fail safe, and will not execute if the event queue has already run.
 * FIXED Non-required fields giving invalid data error when empty value provided.
 * FIXED Transactional broadcasts not being sent to all deliverable contacts.
+* FIXED Contact column screen options missing when white labeled.
 
 = 2.7.7.9 (2022-12-16) =
 * ADDED Misc interface setting to enable custom step titles for all step types.
