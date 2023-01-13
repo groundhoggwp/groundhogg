@@ -4,31 +4,24 @@ namespace Groundhogg\Form;
 
 
 use Groundhogg\Contact;
-use Groundhogg\Plugin;
 use Groundhogg\Properties;
 use Groundhogg\Step;
 use Groundhogg\Submission;
-use function Groundhogg\admin_page_url;
+use function Groundhogg\array_find;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\current_contact_and_logged_in_user_match;
 use function Groundhogg\do_replacements;
-use function Groundhogg\encrypt;
-use function Groundhogg\file_access_url;
-use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_field_label;
-use function Groundhogg\get_request_query;
 use function Groundhogg\html;
 use function Groundhogg\is_recaptcha_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\process_events;
-use function Groundhogg\track_activity;
 use function Groundhogg\utils;
-use function Groundhogg\validate_mobile_number;
 use function Groundhogg\Ymd;
 
 /**
@@ -130,19 +123,28 @@ function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
  * @return void
  */
 function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tags ) {
-	$selected               = sanitize_text_field( $posted_data[ $field['name'] ] );
-	$meta[ $field['name'] ] = $selected;
 
-	$options = $field['options'];
+	if ( isset_not_empty( $field, 'multiple' ) ) {
+		standard_multiselect_callback( $field, $posted_data, $data, $meta, $tags );
 
-	foreach ( $options as $opt ) {
-		if ( is_array( $opt ) ) {
-			if ( $opt[0] === $selected ) {
-				$tags[] = $opt[1];
-			}
-		}
+		return;
 	}
 
+	$selected               = $posted_data[ $field['name'] ];
+	$meta[ $field['name'] ] = $selected;
+
+	// Maybe add tags based on selection
+	$options = $field['options'];
+
+	// Find the associated selected option
+	$_selected = array_find( $options, function ( $option ) use ( $selected ) {
+		return is_array( $option ) && $option[0] === $selected;
+	} );
+
+	// if found and is array with tag, add the tag
+	if ( $_selected && ! empty( $_selected[1] ) ) {
+		$tags[] = $_selected[1];
+	}
 }
 
 /**
@@ -157,45 +159,22 @@ function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tag
  * @return void
  */
 function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$tags ) {
-	$selected               = map_deep( $posted_data[ $field['name'] ], 'sanitize_text_field' );
-	$meta[ $field['name'] ] = $selected;
+	$selections             = map_deep( $posted_data[ $field['name'] ], 'sanitize_text_field' );
+	$meta[ $field['name'] ] = $selections;
 
 	$options = $field['options'];
 
-	foreach ( $options as $opt ) {
-		if ( is_array( $opt ) ) {
-			if ( in_array( $opt[0], $selected ) ) {
-				$tags[] = $opt[1];
-			}
+	// Find associated tags and apply
+	foreach ( $selections as $selection ) {
+
+		$_selected = array_find( $options, function ( $option ) use ( $selection ) {
+			return is_array( $option ) && $option[0] === $selection;
+		} );
+
+		if ( $_selected && ! empty( $_selected[1] ) ) {
+			$tags[] = $_selected[1];
 		}
 	}
-}
-
-/**
- * Apply tags from options if defined.
- *
- * @param $field       array
- * @param $posted_data Posted_Data
- * @param $contact     Contact
- *
- * @return void
- */
-function apply_option_tags( $field, $posted_data, $contact ) {
-
-	$options  = $field['options'];
-	$selected = wp_parse_list( $posted_data[ $field['name'] ] );
-
-	$tags = [];
-
-	foreach ( $options as $pair ) {
-
-		if ( in_array( $pair[0], $selected ) ) {
-			$tags = array_merge( $tags, wp_parse_list( $pair[1] ) );
-		}
-
-	}
-
-	$contact->apply_tag( $tags );
 }
 
 /**
@@ -656,14 +635,22 @@ class Form_v2 extends Step {
 						return is_array( $opt ) ? $opt[0] : $opt;
 					}, $field['options'] );
 
+					$multiple = isset_not_empty( $field, 'multiple' );
+					$name     = $field['name'];
+
+					if ( $multiple ) {
+						$name .= '[]';
+					}
+
 					return basic_field( $field, html()->dropdown( [
 						'id'          => $field['id'],
-						'name'        => $field['name'],
+						'name'        => $name,
 						'class'       => trim( 'gh-input ' . $field['className'] ),
 						'option_none' => $field['placeholder'],
 						'required'    => $field['required'],
 						'selected'    => $contact ? $contact->get_meta( $field['name'] ) : $field['value'],
-						'options'     => array_combine( $options, $options )
+						'options'     => array_combine( $options, $options ),
+						'multiple'    => $multiple,
 					] ) );
 				},
 				'validate' => function ( $field, $posted_data ) {
@@ -671,10 +658,21 @@ class Form_v2 extends Step {
 						return is_array( $opt ) ? $opt[0] : $opt;
 					}, $field['options'] );
 
-					return in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+					$value = $posted_data[ $field['name'] ];
+
+					// multiple options
+					if ( $field['multiple'] ) {
+						if ( ! is_array( $value ) ) {
+							return new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+						}
+
+						// All given values are in the options
+						return count( $value ) === count( array_intersect( $options, $value ) ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+					}
+
+					return in_array( $value, $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
-				'after'    => __NAMESPACE__ . '\apply_option_tags',
 			],
 			'radio'        => [
 				'render'   => function ( $field, $contact ) {
@@ -728,7 +726,6 @@ class Form_v2 extends Step {
 					return empty( $posted_data[ $field['name'] ] ) || in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
-				'after'    => __NAMESPACE__ . '\apply_option_tags',
 			],
 			'checkboxes'   => [
 				'render'   => function ( $field, $contact ) {
@@ -789,7 +786,6 @@ class Form_v2 extends Step {
 					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new \WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_multiselect_callback',
-				'after'    => __NAMESPACE__ . '\apply_option_tags',
 			],
 			'checkbox'     => [
 				'render'   => function ( $field, $contact ) {
@@ -1671,9 +1667,18 @@ class Form_v2 extends Step {
 	 * @return string
 	 */
 	public function get_success_url() {
-		$message = $this->get_meta( 'success_page' );
+		$url = $this->get_meta( 'success_page' );
+		$url = do_replacements( $url, get_contactdata() );
 
-		return do_replacements( $message, get_contactdata() );
+		if ( preg_match( 'https?://', $url ) ){
+			$url = home_url( $url );
+		}
+
+		/**
+		 * @param $url string
+		 * @param $form Form_v2
+		 */
+		return apply_filters( 'groundhogg/form/v2/success_url', $url, $this );
 	}
 
 	/**
@@ -1728,7 +1733,7 @@ class Form_v2 extends Step {
 
 			$result = null;
 
-			if ( $isset ){
+			if ( $isset ) {
 				$result = self::validate_field( $field, $posted_data );
 			}
 

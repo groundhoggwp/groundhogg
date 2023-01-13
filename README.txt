@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.8
+Stable tag: 2.7.8.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.8.1 (2023-01-12) =
+* IMPROVED SMS Broadcast reports now provide meaningful information.
+* HOT FIX Multiselect dropdowns not working in new form builder.
+* FIXED If page tracking nonce is invalid request a new nonce via API.
+* FIXED Not redirect to thank you page when only url path is provided.
 
 = 2.7.8 (2023-01-09) =
 * ADDED More developer hooks in the event queue.

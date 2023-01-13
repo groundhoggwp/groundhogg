@@ -444,19 +444,19 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	public function refresh_report_data() {
 
-		$start = strtotime( sanitize_text_field( get_post_var( 'start' ) ) );
-		$end   = strtotime( sanitize_text_field( get_post_var( 'end' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start = new \DateTime( get_post_var( 'start' ) . ' 00:00:00', wp_timezone() );
+		$end   = new \DateTime( get_post_var( 'end' ) . ' 23:59:59', wp_timezone() );
 
 		$saved = [
-			'start_date' => date_i18n( 'Y-m-d', $start ),
-			'end_date'   => date_i18n( 'Y-m-d', $end ),
+			'start_date' => $start->format( 'Y-m-d' ),
+			'end_date'   => $end->format( 'Y-m-d' ),
 		];
 
 		set_cookie( 'groundhogg_reporting_dates', implode( '|', $saved ) );
 
 		$reports = map_deep( get_post_var( 'reports' ), 'sanitize_key' );
 
-		$reporting = new Reports( $start, $end );
+		$reporting = new Reports( $start->getTimestamp(), $end->getTimestamp() );
 
 		$results = [];
 

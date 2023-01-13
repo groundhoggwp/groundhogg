@@ -82,12 +82,12 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 								'status' => Event::COMPLETE
 							]
 						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+						admin_page_url( 'gh_contacts' )
 					),
 					'class' => 'number-total'
 				] )
 			],
-			[
+			$broadcast->is_sms() ? false : [
 				'label' => __( 'Opens', 'groundhogg' ),
 				'data'  => html()->wrap( _nf( $stats['opened'] ) . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
@@ -115,7 +115,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 					'href'  => add_query_arg(
 						[
 							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
+								'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
 								'step_id'       => $broadcast->get_id(),
 								'funnel_id'     => $broadcast->get_funnel_id()
 							]
@@ -127,9 +127,9 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Click Thru Rate', 'groundhogg' ),
-				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
+				'data'  => percentage( $stats[ $broadcast->is_sms() ? 'sent' : 'opened'], $stats['clicked'] ) . '%'
 			],
-			[
+			$broadcast->is_sms() ? false : [
 				'label' => __( 'Unopened', 'groundhogg' ),
 				'data'  => _nf( $stats['unopened'] ) . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
 			],

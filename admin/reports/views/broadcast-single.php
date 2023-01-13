@@ -3,14 +3,10 @@
 namespace Groundhogg\Admin\Reports\Views;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
-use function Groundhogg\html;
 
 $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
+
 
 ?>
 <div class="display-flex gap-20 align-center">

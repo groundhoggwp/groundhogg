@@ -3,25 +3,18 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
+use Groundhogg\Plugin;
+use WP_List_Table;
 use function Groundhogg\_nf;
-use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
-use function Groundhogg\groundhogg_url;
-use Groundhogg\Plugin;
 use function Groundhogg\html;
 use function Groundhogg\is_sms_plugin_active;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\scheduled_time;
-use \WP_List_Table;
 use function Groundhogg\scheduled_time_column;
-use function Groundhogg\use_experimental_features;
 
 /**
  * The table for Broadcasts
@@ -75,8 +68,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 
@@ -269,17 +262,10 @@ class Broadcasts_Table extends WP_List_Table {
 
 			case 'sent':
 
-				if ( $broadcast->is_email() ) {
-					$edit_url = admin_page_url( 'gh_reporting', [
-						'tab'       => 'broadcasts',
-						'broadcast' => $broadcast->get_id()
-					] );
-				} else {
-					$edit_url = groundhogg_url( 'broadcasts', [
-						'action'    => 'report',
-						'broadcast' => $broadcast->get_id()
-					] );
-				}
+				$edit_url = admin_page_url( 'gh_reporting', [
+					'tab'       => 'broadcasts',
+					'broadcast' => $broadcast->get_id()
+				] );
 
 				$html = sprintf( "<strong><a class='row-title' href='%s'>%s</a></strong>", $edit_url, $broadcast->get_title() );
 
@@ -380,7 +366,7 @@ class Broadcasts_Table extends WP_List_Table {
 			_nf( $stats['sent'] )
 		);
 
-		if ( ! $broadcast->is_sms() ) {
+		if ( $broadcast->is_email() ) {
 
 			$html .= sprintf(
 				"%s: <strong><a href='%s'>%s</a></strong><br/>",
@@ -413,6 +399,24 @@ class Broadcasts_Table extends WP_List_Table {
 				),
 				_nf( $stats['clicked'] )
 			);
+		} else if ( $broadcast->is_sms() ) {
+
+			$html .= sprintf(
+				"%s: <strong><a href='%s'>%s</a></strong><br/>",
+				_x( "Clicked", 'stats', 'groundhogg' ),
+				add_query_arg(
+					[
+						'activity' => [
+							'activity_type' => Activity::SMS_CLICKED,
+							'step'          => $broadcast->get_id(),
+							'funnel'        => $broadcast->get_funnel_id()
+						]
+					],
+					admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+				),
+				_nf( $stats['clicked'] )
+			);
+
 		}
 
 		return $html;
@@ -462,7 +466,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $broadcast A singular item (one full row's worth of data).
+	 * @param object $broadcast   A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.

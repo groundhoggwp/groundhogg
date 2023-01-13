@@ -14,7 +14,30 @@
   const { tracking, ajax } = routes
   const { consent_cookie_name = 'viewed_cookie_policy', consent_cookie_value = 'yes' } = settings
   const { tracking: tracking_cookie, lead_source, form_impressions, page_visits } = cookies
-  const { _wprest } = nonces
+  let { _wprest } = nonces
+
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  function unauthenticatedApiPost (url = '', data = {}, opts = {}) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      ...opts,
+    })
+    .then(r => r.json())
+    .catch( err => {
+      console.log(err)
+    })
+  }
 
   /**
    * Post data
@@ -33,7 +56,17 @@
       },
       body: JSON.stringify(data),
       ...opts,
-    }).then(r => r.json())
+    })
+    .then(r => {
+      if ( r.ok ){
+        return r
+      }
+      return unauthenticatedApiPost( url, data, opts )
+    })
+    .then(r => r.json())
+    .catch( err => {
+      console.log(err)
+    })
   }
 
   /**
@@ -161,13 +194,16 @@
 
         // Don't run if we recently tracked this page visit
         if (getVisitedPages().pages.includes(url.pathname)) {
-          return
+          // return
         }
 
       }
 
       if (this.isLoggedIn || this.hasContactTrackingCookie) {
-        apiPost(tracking + '/pages/', {
+
+        let func = this.isLoggedIn ? apiPost : unauthenticatedApiPost
+
+        func(tracking + '/pages/', {
           ref: url.href
         })
 
@@ -194,7 +230,9 @@
         return
       }
 
-      apiPost(tracking + '/forms/', {
+      let func = this.isLoggedIn ? apiPost : unauthenticatedApiPost
+
+      func(tracking + '/forms/', {
         ref: window.location.href,
         form_id: id
       }).then(() => {
@@ -274,6 +312,7 @@
 
   Groundhogg.adminAjax = adminAjax
   Groundhogg.apiPost = apiPost
+  Groundhogg.unauthenticatedApiPost = unauthenticatedApiPost
 
 })(Groundhogg)
 

@@ -5,8 +5,6 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
-use Groundhogg\DB\DB;
-use Groundhogg\DB\Meta_DB;
 use GroundhoggSMS\Classes\SMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,11 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * This is a simple class that inits a broadcast like object for easy use and manipulation.
  * Also contains some api methods for the event queue
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
@@ -306,21 +304,15 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return $this->report_data;
 		}
 
-		if ( ! $email_id ) {
-			$email_id = $this->get_object_id();
-		}
-
 		$data = [];
 
 		$data['waiting'] = get_db( 'event_queue' )->count( [
 			'step_id'    => $this->get_id(),
 			'event_type' => Event::BROADCAST,
 			'status'     => Event::WAITING,
-//			'email_id'   => $email_id
 		] );
 
-		$data['id']       = $this->get_id();
-		$data['email_id'] = $email_id;
+		$data['id'] = $this->get_id();
 
 		if ( $this->is_sent() ) {
 
@@ -328,10 +320,26 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				'step_id'    => $this->get_id(),
 				'event_type' => Event::BROADCAST,
 				'status'     => Event::COMPLETE,
-//				'email_id'   => $email_id
 			] );
 
-			if ( ! $this->is_sms() ) {
+			if ( $this->is_sms() ) {
+				$data['sms_id']     = $this->get_object_id();
+				$data['clicked']    = get_db( 'activity' )->count( [
+					'select'        => 'DISTINCT contact_id',
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::SMS_CLICKED
+				] );
+				$data['all_clicks'] = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::SMS_CLICKED
+				] );
+
+				$data['click_through_rate'] = percentage( $data['sent'], $data['clicked'] );
+
+			} else {
+				$data['email_id'] = $this->get_object_id();
 				$data['opened']             = get_db( 'activity' )->count( [
 					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
@@ -350,16 +358,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_CLICKED
 				] );
-				$data['unsubscribed']       = get_db( 'activity' )->count( [
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::UNSUBSCRIBED
-				] );
 				$data['click_through_rate'] = percentage( $data['opened'], $data['clicked'] );
 				$data['unopened']           = $data['sent'] - $data['opened'];
 				$data['opened_not_clicked'] = $data['opened'] - $data['clicked'];
-
 			}
+
+			$data['unsubscribed'] = get_db( 'activity' )->count( [
+				'funnel_id'     => $this->get_funnel_id(),
+				'step_id'       => $this->get_id(),
+				'activity_type' => Activity::UNSUBSCRIBED
+			] );
 
 			// only if broadcast was actually sent and experimental is enabled.
 			if ( use_experimental_features() && $data['sent'] > 0 ) {
@@ -392,8 +400,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	public function get_as_array() {
 		return array_merge( parent::get_as_array(), [
-			'object' => $this->get_object(),
+			'object'           => $this->get_object(),
 			'date_sent_pretty' => format_date( convert_to_local_time( $this->get_send_time() ) )
-		]);
+		] );
 	}
 }

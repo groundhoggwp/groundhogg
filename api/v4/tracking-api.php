@@ -85,6 +85,10 @@ class Tracking_Api extends Base_Api {
 
 		$visit = track_page_visit( $ref, $contact );
 
+		if ( ! current_user_can( 'view_activity' ) ){
+			return self::SUCCESS_RESPONSE();
+		}
+
 		if ( ! $visit || ! $visit->exists() ){
 
 			global $wpdb;

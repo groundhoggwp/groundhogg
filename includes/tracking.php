@@ -523,10 +523,11 @@ class Tracking {
 	 * If we want to start tracking a new contact we can overwrite any current cookie
 	 * or just start with a new cookie by calling this function.
 	 *
-	 * @param $contact Contact
-	 * @param $source  string
+	 * @param       $contact Contact
+	 * @param null  $deprecated
+	 * @param array $more
 	 */
-	public function start_tracking( $contact, $source = 'manual' ) {
+	public function start_tracking( $contact, $deprecated = null, $more = [] ) {
 		if ( ! $contact ) {
 			return;
 		}
@@ -535,7 +536,10 @@ class Tracking {
 		$this->cookie = [];
 
 		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
-		$this->add_tracking_cookie_param( 'source', $source );
+
+		foreach ( $more as $key => $value ){
+			$this->add_tracking_cookie_param( $key, $value );
+		}
 
 		// Rebuild the cookie.
 		$this->build_tracking_cookie();

@@ -13,6 +13,7 @@ use function Groundhogg\get_db;
 class Activity extends Base_Object_With_Meta {
 	const EMAIL_OPENED = 'email_opened';
 	const EMAIL_CLICKED = 'email_link_click';
+	const SMS_CLICKED = 'sms_link_click';
 	const FORM_IMPRESSION = 'form_impression';
 	const FORM_SUBMISSION = 'form_submission';
 	const UNSUBSCRIBED = 'unsubscribed';

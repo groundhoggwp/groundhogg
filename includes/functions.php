@@ -3687,9 +3687,10 @@ function file_access_url( $path, $download = false ) {
 	}
 
 	if ( is_user_logged_in() && current_user_can( 'download_files' ) ) {
-		return action_url( 'download_file', [ 'page'      => 'gh_tools',
-		                                      'file_path' => ltrim( $path, '/' ),
-		                                      'download'  => $download
+		return action_url( 'download_file', [
+			'page'      => 'gh_tools',
+			'file_path' => ltrim( $path, '/' ),
+			'download'  => $download
 		] );
 	}
 
@@ -6160,7 +6161,14 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		switch ( $activity_query['activity_type'] ) {
 			default:
 				break;
-			case 'email_link_click':
+			case Activity::SMS_CLICKED:
+				$filters[0][] = [
+					'type'         => 'broadcast_link_clicked',
+					'broadcast_id' => absint( $activity_query['step_id'] ),
+					'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
+				];
+				break;
+			case Activity::EMAIL_CLICKED:
 				if ( get_array_var( $activity_query, 'funnel_id' ) == Broadcast::FUNNEL_ID ) {
 					$filters[0][] = [
 						'type'         => 'broadcast_link_clicked',
@@ -6180,7 +6188,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					];
 				}
 				break;
-			case 'email_opened':
+			case Activity::EMAIL_OPENED:
 
 				if ( get_array_var( $activity_query, 'funnel_id' ) == Broadcast::FUNNEL_ID ) {
 

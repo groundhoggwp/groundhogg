@@ -6,6 +6,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\generate_referer_hash;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -36,7 +37,7 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 		$activity = get_db( 'activity' )->query( [
 			'funnel_id'     => $broadcast->get_funnel_id(),
 			'step_id'       => $broadcast->get_id(),
-			'activity_type' => Activity::EMAIL_CLICKED,
+			'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
 		] );
 
 		$links = [];
@@ -82,13 +83,13 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 					'href'  => add_query_arg(
 						[
 							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
+								'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
 								'step_id'       => $broadcast->get_id(),
 								'funnel_id'     => $broadcast->get_funnel_id(),
 								'referer_hash'  => $hash,
 							]
 						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+						admin_page_url( 'gh_contacts' )
 					),
 					'class' => 'number-total'
 				] ),
@@ -98,31 +99,9 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 
 		return $data;
 
-
 	}
 
-
-	/**
-	 * Normalize a datum
-	 *
-	 * @param $item_key
-	 * @param $item_data
-	 *
-	 * @return array
-	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-
-		$label = ! empty( $item_key ) ? Plugin::$instance->utils->location->get_countries_list( $item_key ) : __( 'Unknown' );
-		$data  = $item_data;
-		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $item_key ) ) : '#';
-
-
-		return [
-			'label' => $label,
-			'data'  => $data,
-			'url'   => $url
-		];
+		// TODO: Implement normalize_datum() method.
 	}
-
-
 }

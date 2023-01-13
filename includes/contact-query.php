@@ -1954,8 +1954,10 @@ class Contact_Query {
 			'link'         => ''
 		] );
 
+		$broadcast = new Broadcast( $filter_vars[ 'broadcast_id' ] );
+
 		$event_query = array_filter( [
-			'activity_type' => Activity::EMAIL_CLICKED,
+			'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
 			'funnel_id'     => Broadcast::FUNNEL_ID,
 			'step_id'       => $filter_vars['broadcast_id'],
 			'referer'       => $filter_vars['link'],

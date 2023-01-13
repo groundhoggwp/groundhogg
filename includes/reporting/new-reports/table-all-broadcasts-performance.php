@@ -9,6 +9,7 @@ use function Groundhogg\array_map_to_class;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\is_sms_plugin_active;
 
 class Table_All_Broadcasts_Performance extends Base_Table_Report {
 
@@ -51,14 +52,23 @@ class Table_All_Broadcasts_Performance extends Base_Table_Report {
 
 			$stats = $broadcast->get_report_data();
 
-			$data[] = [
-				'title' => html()->e( 'a', [
-					'href' => admin_page_url( 'gh_reporting', [
-						'tab'       => 'broadcasts',
-						'broadcast' => $broadcast->ID,
-					] )
-				], $broadcast->get_title() ),
+			$title = html()->e( 'a', [
+				'href' => admin_page_url( 'gh_reporting', [
+					'tab'       => 'broadcasts',
+					'broadcast' => $broadcast->ID,
+				] )
+			], $broadcast->get_title() );
 
+			if ( is_sms_plugin_active() ){
+				$title = html()->e( 'span', [ 'class' => 'broadcast-type' ], $broadcast->is_sms() ? 'SMS' : 'EMAIL' ) . $title;
+			}
+
+			$data[] = [
+
+				// Title
+				'title' => $title,
+
+				// Sent
 				'sent'      => html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( [
@@ -73,7 +83,9 @@ class Table_All_Broadcasts_Performance extends Base_Table_Report {
 					] ),
 					'target' => '_blank'
 				], $stats['sent'], false ),
-				'opened'    => html()->e( 'a', [
+
+				// Opened
+				'opened'    => $broadcast->is_sms() ? 'N/A' : html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( [
 							[
@@ -86,7 +98,11 @@ class Table_All_Broadcasts_Performance extends Base_Table_Report {
 					] ),
 					'target' => '_blank'
 				], $stats['opened'], false ),
-				'open_rate' => $stats['open_rate'] . '%',
+
+				// Open rate
+				'open_rate' => $broadcast->is_sms() ? 'N/A' : $stats['open_rate'] . '%',
+
+				// Clicked
 				'clicked'   => html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( [
@@ -100,6 +116,8 @@ class Table_All_Broadcasts_Performance extends Base_Table_Report {
 					] ),
 					'target' => '_blank'
 				], $stats['clicked'], false ),
+
+				// Click Thru Rate
 				'ctr'       => $stats['click_through_rate'] . '%',
 			];
 		}

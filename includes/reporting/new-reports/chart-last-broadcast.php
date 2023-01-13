@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
@@ -56,7 +57,6 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 		if ( $broadcast && $broadcast->exists() ) {
 
 			$counts = $this->normalize_data( $broadcast->get_report_data() );
-
 
 			$data  = [];
 			$label = [];
@@ -120,9 +120,48 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 		/*
 		* create array  of data ..
 		*/
-		$dataset = array();
+		$dataset = [];
 
-		$dataset[] = array(
+		if ( isset_not_empty( $stats, 'sms_id') ){
+
+			$dataset[] = [
+				'label' => _x( 'Sent', 'stats', 'groundhogg' ),
+				'data'  => $stats['sent'] - $stats['clicked'],
+				'url'   => add_query_arg(
+					[
+						'activity' => [
+							'step_id'       => $stats['id'],
+							'activity_type' => Activity::SMS_CLICKED,
+							'funnel_id'     => Broadcast::FUNNEL_ID
+						]
+					],
+					admin_page_url( 'gh_contacts' )
+				),
+				'color' => $this->get_random_color()
+			];
+
+			$dataset[] = [
+				'label' => _x( 'Clicked', 'stats', 'groundhogg' ),
+				'data'  => $stats['clicked'],
+				'url'   => add_query_arg(
+					[
+						'report' => [
+							'type'   => Event::BROADCAST,
+							'step'   => $stats['id'],
+							'status' => Event::COMPLETE
+						]
+					],
+					admin_page_url( 'gh_contacts' )
+				),
+				'color' => $this->get_random_color()
+			];
+
+
+			return $dataset;
+		}
+
+
+		$dataset[] = [
 			'label' => _x( 'Opened', 'stats', 'groundhogg' ),
 			'data'  => $stats['opened'] - $stats['clicked'],
 			'url'   => add_query_arg(
@@ -136,9 +175,9 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 			),
 			'color' => $this->get_random_color()
-		);
+		];
 
-		$dataset[] = array(
+		$dataset[] = [
 			'label' => _x( 'Clicked', 'stats', 'groundhogg' ),
 			'data'  => $stats['clicked'],
 			'url'   => add_query_arg(
@@ -152,14 +191,14 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 			),
 			'color' => $this->get_random_color()
-		);
+		];
 
-		$dataset[] = array(
+		$dataset[] = [
 			'label' => _x( 'Unopened', 'stats', 'groundhogg' ),
 			'data'  => $stats['unopened'],
 			'url'   => '#',
 			'color' => $this->get_random_color()
-		);
+		];
 
 		return $dataset;
 	}

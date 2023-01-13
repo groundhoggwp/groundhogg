@@ -1185,6 +1185,7 @@
         hide_label = false,
         required = false,
         className = '',
+        multiple = false,
       }) => {
 
         options = options.map(opt => ( {
@@ -1199,11 +1200,18 @@
           })
         }
 
-        const inputField = select({
+        let props = {
           id: id,
           name: name,
+          multiple,
           className: `gh-input ${ className }`,
-        }, options)
+        }
+
+        if ( multiple ){
+          props.multiple = true
+        }
+
+        const inputField = select(props, options)
 
         if (hide_label) {
           return inputField
