@@ -11,8 +11,8 @@ class Blocks {
 	public function __construct() {
 		$this->init_gutenberg();
 
-		add_action( 'elementor/widgets/widgets_registered', array( $this, 'init_elementor_blocks' ) );
-		add_action( 'init', array( $this, 'init_beaver_builder_blocks' ) );
+		add_action( 'elementor/widgets/register', [ $this, 'init_elementor_blocks' ] );
+		add_action( 'init', [ $this, 'init_beaver_builder_blocks' ] );
 
 	}
 
@@ -23,7 +23,7 @@ class Blocks {
 
 	public function init_elementor_blocks() {
 		try {
-			\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Form_Widget() );
+			\Elementor\Plugin::instance()->widgets_manager->register( new Form_Widget() );
 		} catch ( \Exception $e ) {
 		}
 	}
@@ -34,23 +34,23 @@ class Blocks {
 			/**
 			 * Register the module and its form settings.
 			 */
-			\FLBuilder::register_module( \Groundhogg\Blocks\Beaver_Builder\Form_Widget::class, array(
-				'select-form' => array(
+			\FLBuilder::register_module( \Groundhogg\Blocks\Beaver_Builder\Form_Widget::class, [
+				'select-form' => [
 					'title'    => __( 'Select a form', 'groundhogg' ),
-					'sections' => array(
-						'groundhogg-forms' => array(
+					'sections' => [
+						'groundhogg-forms' => [
 							'title'  => sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() ),
-							'fields' => array(
-								'groundhogg_form_id' => array(
+							'fields' => [
+								'groundhogg_form_id' => [
 									'type'    => 'select',
 									'label'   => __( 'Select a form', 'groundhogg' ),
 									'options' => get_form_list()
-								),
-							)
-						)
-					)
-				)
-			) );
+								],
+							]
+						]
+					]
+				]
+			] );
 		}
 	}
 
