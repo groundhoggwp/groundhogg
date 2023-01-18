@@ -229,9 +229,9 @@
         })
       }, onMount: ({ next, prev }) => {
 
-        if ( ! $('.gh-panel.faq').length ){
+        if (!$('.gh-panel.faq').length) {
           next('other-issue')
-          return;
+          return
         }
 
         $('#other').on('click', () => next('other-issue'))
@@ -1557,20 +1557,35 @@
       }, onMount: ({ next, prev }) => {
         $('#enable-safe-mode').on('click', e => {
 
-          let release = holdButton( e.currentTarget )
+          let release = holdButton(e.currentTarget)
 
           $(e.target).text(__('Enabling safe mode'))
 
+          const safeModeErr = () => {
+            dialog({
+              message: __('Safe mode could not be enabled.'),
+              type: 'error',
+            })
+            release()
+            ticket.safe_mode = true
+            next('ticket')
+          }
+
           ajax({
             action: 'groundhogg_enable_safe_mode',
-          }).then(() => {
+          }).then(r => {
+
+            if (!r.success) {
+              return safeModeErr()
+            }
+
             dialog({
               message: __('Safe mode enabled'),
             })
             release()
             ticket.safe_mode = true
             next('safe-mode-2')
-          })
+          }).catch(err => safeModeErr())
         })
 
         $('#ticket').on('click', () => {

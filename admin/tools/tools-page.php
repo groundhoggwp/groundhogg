@@ -393,6 +393,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public function process_enable_safe_mode() {
 		if ( groundhogg_enable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_enabled', __( 'Safe mode has been enabled.' ) );
+		} else {
+			$this->add_notice( new WP_Error( 'error', 'Could not enable safe mode due to a possible fatal error.' ) );
 		}
 	}
 

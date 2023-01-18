@@ -8,18 +8,14 @@ use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\create_contact_from_user;
-use function Groundhogg\dashicon;
-use function Groundhogg\dashicon_e;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
-use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_pro_features_active;
 use function Groundhogg\managed_page_url;
-use function Groundhogg\notices;
 use function Groundhogg\permissions_key_url;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\utils;
@@ -73,9 +69,11 @@ class Help_Page extends Tabbed_Admin_Page {
 			return;
 		}
 
-		groundhogg_enable_safe_mode();
+		if ( groundhogg_enable_safe_mode() ) {
+			wp_send_json_success();
+		}
 
-		wp_send_json_success();
+		wp_send_json_error();
 	}
 
 	public function disable_safe_mode() {

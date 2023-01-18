@@ -428,6 +428,16 @@ function groundhogg_enable_safe_mode() {
 
 	do_action( 'groundhogg/safe_mode_enabled' );
 
+	// Do a test to see if safe mode could be enabled
+	$response = wp_remote_get( home_url() );
+
+	// Some kind of 500 level error
+	if ( wp_remote_retrieve_response_code( $response )  >= 500 ){
+		groundhogg_disable_safe_mode();
+
+		return false;
+	}
+
 	return true;
 }
 
