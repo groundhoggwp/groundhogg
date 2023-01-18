@@ -14,11 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Maintain information about the contact, events, funnels, etc...
  * Uses cookies.
  *
- * @package     Includes
+ * @since       File available since Release 0.9
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Includes
  */
 class Tracking {
 
@@ -334,23 +334,31 @@ class Tracking {
 	}
 
 	/**
+	 * Get the appropriate variable for get_contactdata
+	 *
+	 * @return int|string|null
+	 */
+	protected function _get_current_contact_id_or_email() {
+		$logged_in_email = function_exists( 'is_user_logged_in' ) && is_user_logged_in() ? wp_get_current_user()->user_email : null;
+		$tracked_id      = $this->get_tracking_cookie_param( 'contact_id', null );
+
+		// If both are well-defined, use based on precedence setting
+		if ( $logged_in_email && $tracked_id ) {
+			return is_ignore_user_tracking_precedence_enabled() ? $tracked_id : $logged_in_email;
+		}
+
+		// Use whichever is defined
+		return $logged_in_email ?? $tracked_id;
+	}
+
+	/**
 	 * Get the contact which is currently being tracked.
 	 *
 	 * @return Contact|false
 	 */
 	public function get_current_contact() {
-		$id_or_email = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
 
-		// Override if the user is logged in.
-		if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
-
-			$ignore_user_precedence = is_ignore_user_tracking_precedence_enabled();
-
-			// You can have user precedence if the id_or_email is false and the user is logged in or if the disable option is not enabled.
-			if ( ! $ignore_user_precedence || ! $id_or_email ) {
-				$id_or_email = wp_get_current_user()->user_email;
-			}
-		}
+		$id_or_email = $this->_get_current_contact_id_or_email();
 
 		if ( ! $id_or_email ) {
 			return false;
@@ -537,7 +545,7 @@ class Tracking {
 
 		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
 
-		foreach ( $more as $key => $value ){
+		foreach ( $more as $key => $value ) {
 			$this->add_tracking_cookie_param( $key, $value );
 		}
 
@@ -671,10 +679,10 @@ class Tracking {
 		$event = $this->get_current_event();
 
 		// We removed the hostname from the url to shorten it
-		if ( preg_match( '@^/@', $target ) ){
-			$scheme = is_ssl() ? 'https' : 'http';
+		if ( preg_match( '@^/@', $target ) ) {
+			$scheme   = is_ssl() ? 'https' : 'http';
 			$hostname = wp_parse_url( home_url(), PHP_URL_HOST );
-			$target = "$scheme://$hostname$target";
+			$target   = "$scheme://$hostname$target";
 		}
 
 		/**
@@ -722,14 +730,8 @@ class Tracking {
 	 * @param $contact Contact
 	 */
 	public function form_filled( $contact ) {
-		if ( is_user_logged_in() || headers_sent() ) {
-			return;
-		}
-
-		if ( ! isset_not_empty( $_COOKIE, self::TRACKING_COOKIE ) ) {
-			$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
-			$this->build_tracking_cookie();
-		}
+		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
+		$this->build_tracking_cookie();
 	}
 
 	/**

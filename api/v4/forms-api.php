@@ -86,7 +86,7 @@ class Forms_Api extends Base_Api {
 			return self::ERROR_404();
 		}
 
-		$form->submit();
+		$contact = $form->submit();
 
 		if ( $form->has_errors() ) {
 

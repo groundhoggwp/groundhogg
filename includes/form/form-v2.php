@@ -214,6 +214,7 @@ class Form_v2 extends Step {
 	public static function register_fields() {
 
 		$fields = [
+			// First Name
 			'first'        => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -248,6 +249,8 @@ class Form_v2 extends Step {
 					return isset( $posted_data['first_name'] ) && ! empty( $posted_data['first_name'] );
 				},
 			],
+
+			// Last Name
 			'last'         => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -283,6 +286,8 @@ class Form_v2 extends Step {
 					return isset( $posted_data['last_name'] ) && ! empty( $posted_data['last_name'] );
 				},
 			],
+
+			// Email
 			'email'        => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -300,6 +305,8 @@ class Form_v2 extends Step {
 					$args['email'] = sanitize_email( $posted_data->email );
 				}
 			],
+
+			// Phone Number
 			'phone'        => [
 				'render'   => function ( $field, $contact ) {
 					$field = wp_parse_args( $field, [
@@ -329,6 +336,8 @@ class Form_v2 extends Step {
 					$meta[ '__' . $type ] = preg_replace( "/[^0-9]/", "", $posted_data->$type );
 				}
 			],
+
+			// Address Line 1
 			'line1'        => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -342,6 +351,8 @@ class Form_v2 extends Step {
 					$meta['street_address_1'] = sanitize_text_field( $posted_data->line1 );
 				}
 			],
+
+			// Address Line 2
 			'line2'        => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -355,6 +366,8 @@ class Form_v2 extends Step {
 					$meta['street_address_2'] = sanitize_text_field( $posted_data->line2 );
 				}
 			],
+
+			// Address City
 			'city'         => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -368,6 +381,8 @@ class Form_v2 extends Step {
 					$meta['city'] = sanitize_text_field( $posted_data->city );
 				}
 			],
+
+			// Address State
 			'state'        => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -381,6 +396,8 @@ class Form_v2 extends Step {
 					$meta['region'] = sanitize_text_field( $posted_data->state );
 				}
 			],
+
+			// Address Zip
 			'zip_code'     => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -394,6 +411,8 @@ class Form_v2 extends Step {
 					$meta['postal_zip'] = sanitize_text_field( $posted_data->zip_code );
 				}
 			],
+
+			// Address Country
 			'country'      => [
 				'render'   => function ( $field, $contact ) {
 
@@ -428,6 +447,8 @@ class Form_v2 extends Step {
 					$meta['country'] = sanitize_text_field( $posted_data->country );
 				}
 			],
+
+			// GDPR Checkboxes
 			'gdpr'         => [
 				'render'   => function ( $field, $contact ) {
 
@@ -478,6 +499,8 @@ class Form_v2 extends Step {
 				},
 				'required' => '__return_true'
 			],
+
+			// Terms & Conditions checkbox
 			'terms'        => [
 				'render'   => function ( $field, $contact ) {
 
@@ -512,6 +535,8 @@ class Form_v2 extends Step {
 				},
 				'required' => '__return_true'
 			],
+
+			// Generic Text
 			'text'         => [
 				'render' => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -520,6 +545,8 @@ class Form_v2 extends Step {
 				},
 				'before' => __NAMESPACE__ . '\standard_meta_callback',
 			],
+
+			// Generic URL
 			'url'          => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -531,6 +558,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 			],
+
+			// Generic Date
 			'date'         => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -542,6 +571,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 			],
+
+			// Generic Date & Time
 			'datetime'     => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -553,6 +584,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 			],
+
+			// Generic Time
 			'time'         => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -566,6 +599,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 			],
+
+			// Generic Number
 			'number'       => [
 				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
@@ -580,6 +615,8 @@ class Form_v2 extends Step {
 					$meta[ $field['name'] ] = strpos( $num, '.' ) !== false ? floatval( $num ) : intval( $num );
 				},
 			],
+
+			// Generic Textarea
 			'textarea'     => [
 				'render'   => function ( $field, $contact ) {
 
@@ -612,6 +649,8 @@ class Form_v2 extends Step {
 					$meta[ $field['name'] ] = sanitize_textarea_field( $posted_data[ $field['name'] ] );
 				}
 			],
+
+			// Generic Dropdown
 			'dropdown'     => [
 				'render'   => function ( $field, $contact ) {
 
@@ -674,6 +713,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
 			],
+
+			// Generic Radio
 			'radio'        => [
 				'render'   => function ( $field, $contact ) {
 
@@ -727,6 +768,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
 			],
+
+			// Generic Checkboxes
 			'checkboxes'   => [
 				'render'   => function ( $field, $contact ) {
 
@@ -787,6 +830,8 @@ class Form_v2 extends Step {
 				},
 				'before'   => __NAMESPACE__ . '\standard_multiselect_callback',
 			],
+
+			// Generic Checkbox
 			'checkbox'     => [
 				'render'   => function ( $field, $contact ) {
 
@@ -821,6 +866,8 @@ class Form_v2 extends Step {
 					}
 				}
 			],
+
+			// File Upload
 			'file'         => [
 				'render'   => function ( $field, $contact ) {
 
@@ -879,6 +926,8 @@ class Form_v2 extends Step {
 					return isset_not_empty( $_FILES, $field['name'] );
 				},
 			],
+
+			// Birthday
 			'birthday'     => [
 
 				'render'   => function ( $field, $contact ) {
@@ -1016,6 +1065,8 @@ class Form_v2 extends Step {
 					return ! empty( $input );
 				},
 			],
+
+			// Custom Fields
 			'custom_field' => [
 				'render'   => function ( $field, $contact ) {
 					$property = $field['property'];
@@ -1075,6 +1126,8 @@ class Form_v2 extends Step {
 					] ), $posted_data );
 				},
 			],
+
+			// HTML & Text
 			'html'         => [
 				'render'   => function ( $field ) {
 
@@ -1091,6 +1144,8 @@ class Form_v2 extends Step {
 				},
 				'validate' => '__return_true'
 			],
+
+			// Button (1 per form)
 			'button'       => [
 				'render'   => function ( $field ) {
 
@@ -1109,12 +1164,10 @@ class Form_v2 extends Step {
 				},
 				'validate' => '__return_true'
 			],
+
+			// Google Recaptcha
 			'recaptcha'    => [
 				'render'   => function ( $field ) {
-
-//					if ( current_user_can( 'edit_contacts' ) ) {
-//						return '';
-//					}
 
 					$version = get_option( 'gh_recaptcha_version', 'v2' ) ?: 'v2';
 
@@ -1670,7 +1723,7 @@ class Form_v2 extends Step {
 		$url = $this->get_meta( 'success_page' );
 		$url = do_replacements( $url, get_contactdata() );
 
-		if ( preg_match( 'https?://', $url ) ){
+		if ( preg_match( '@https?://@', $url ) ){
 			$url = home_url( $url );
 		}
 

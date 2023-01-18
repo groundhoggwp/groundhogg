@@ -4,7 +4,7 @@
     nonces,
     i18n,
     routes,
-    reCAPTCHA
+    reCAPTCHA,
   } = gh
 
   const { _wprest } = nonces
@@ -61,7 +61,7 @@
     }
   }
 
-  const submitForm = ( form ) => {
+  const submitForm = (form) => {
 
     let submitText = ''
 
@@ -138,47 +138,69 @@
 
   }
 
-  const handleAjaxForms = () => {
+  const formEventListener = e => {
 
-    document.querySelectorAll('form.gh-form.gh-form-v2').forEach(__form => {
+    e.preventDefault()
 
-      __form.addEventListener('submit', e => {
+    let form = e.currentTarget
 
-        e.preventDefault()
+    let hasRecaptcha = form.querySelectorAll('.gh-recaptcha-v3').length > 0
+    let hasRecaptchaResponse = form.querySelectorAll('input[name="g-recaptcha-response"]').length > 0
 
-        let form = e.currentTarget
+    if (hasRecaptcha && !hasRecaptchaResponse) {
 
-        let hasRecaptcha = form.querySelectorAll('.gh-recaptcha-v3').length > 0
-        let hasRecaptchaResponse = form.querySelectorAll('input[name="g-recaptcha-response"]').length > 0
+      grecaptcha.ready(() => {
+        grecaptcha.execute(reCAPTCHA.site_key, { action: 'submit' }).then((_token) => {
 
-        if ( hasRecaptcha && ! hasRecaptchaResponse ) {
+          // Add your logic to submit to your backend server here.
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = 'g-recaptcha-response'
+          input.value = _token
 
-          grecaptcha.ready(() => {
-            grecaptcha.execute(reCAPTCHA.site_key, { action: 'submit' }).then((_token) => {
+          form.appendChild(input)
 
-              // Add your logic to submit to your backend server here.
-              const input = document.createElement('input')
-              input.type = 'hidden'
-              input.name = 'g-recaptcha-response'
-              input.value = _token
-
-              form.appendChild(input)
-
-              // dont use
-              submitForm( form )
-            })
-          })
-
-          return;
-        }
-
-        submitForm( form )
-
+          submitForm(form)
+        })
       })
+
+      // quit here, submit handled in callback
+      return
+    }
+
+    submitForm(form)
+
+  }
+
+  /**
+   * Adds Groundhogg form event listener based on given selector
+   *
+   * @param selector
+   */
+  const addFormEventListeners = (selector = '') => {
+
+    document.querySelectorAll(`${ selector } form.gh-form.gh-form-v2`.trim()).forEach(__form => {
+
+      // Don't add the event listener twice
+      if (__form.hasAttribute('ghformhandler')) {
+        return
+      }
+
+      __form.addEventListener('submit', formEventListener)
+
+      __form.setAttribute('ghformhandler', 'true')
 
     })
   }
 
-  window.addEventListener('load', handleAjaxForms)
+  // Which events to add form event listeners to, and the relevant selector
+  const events = {
+    'load': '',
+    'elementor/popup/show': '.elementor-location-popup',
+  }
+
+  Object.keys(events).forEach(event => {
+    window.addEventListener(event, e => addFormEventListeners(events[event]))
+  })
 
 } )(Groundhogg)

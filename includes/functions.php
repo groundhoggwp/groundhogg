@@ -1778,7 +1778,7 @@ function sanitize_from_name( $name ) {
  */
 function after_form_submit_handler( &$contact ) {
 
-	if ( ! $contact instanceof Contact ) {
+	if ( ! is_a_contact( $contact ) ) {
 		return;
 	}
 
