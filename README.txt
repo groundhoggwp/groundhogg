@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.8.1
+Stable tag: 2.7.8.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.8.2 (2023-01-18) =
+* TWEAKED Enabling safe mode will check for a 200 OK, otherwise will revert.
+* FIXED Fatal error when previewing email and no contact record available.
+* FIXED Logged in user tracking not used if user precedence is disabled and no contact tracking is available.
+* FIXED New forms not working in Elementor popups.
+* FIXED New forms not setting tracking cookie after submission.
+* FIXED Deprecation notices when registering elementor widgets.
 
 = 2.7.8.1 (2023-01-12) =
 * IMPROVED SMS Broadcast reports now provide meaningful information.
