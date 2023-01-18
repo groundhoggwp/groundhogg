@@ -390,6 +390,17 @@ class Event extends Base_Object {
 
 		$result = $this->get_step()->run( $this->get_contact(), $this );
 
+
+		// Hard fail when WP Error
+		if ( is_wp_error( $result ) ) {
+			/* handle event failure */
+			$this->add_error( $result );
+
+			$this->fail();
+
+			return apply_filters( 'groundhogg/event/run/failed_result', $result, $this );
+		}
+
 		// Falsy value from the run() method
 		if ( $result === false ) {
 
@@ -403,17 +414,7 @@ class Event extends Base_Object {
 			 * We have decided that a "Soft Fail" (Falsy value from the run() method) will allow funnel events to proceed to the next step
 			 * instead of stopping the funnel.
 			 */
-			return apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
-		}
-
-		// Hard fail when WP Error
-		if ( is_wp_error( $result ) ) {
-			/* handle event failure */
-			$this->add_error( $result );
-
-			$this->fail();
-
-			return apply_filters( 'groundhogg/event/run/failed_result', $result, $this );
+			$result = apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
 		}
 
 		$this->complete();
@@ -424,11 +425,11 @@ class Event extends Base_Object {
 
 		do_action( 'groundhogg/event/run/after', $this );
 
-		return true;
+		return $result;
 	}
 
 	/**
-	 * Due to the nature of WP and cron, let's DOUBLE check that at the time of running this event has not been run by another instance of the queue.
+	 * Due to the nature of WP and cron, let's DOUBLE-check that at the time of running this event has not been run by another instance of the queue.
 	 *
 	 * @return bool whether the event has run or not
 	 */
@@ -544,15 +545,13 @@ class Event extends Base_Object {
 
 		do_action( 'groundhogg/event/complete', $this );
 
-		$update = $this->update( [
+		return $this->update( [
 			'status'        => self::COMPLETE,
 			'time'          => time(),
 			'micro_time'    => micro_seconds(),
 			'error_code'    => '',
 			'error_message' => '',
 		] );
-
-		return $update;
 	}
 
 	public function get_as_array() {
