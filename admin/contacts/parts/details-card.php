@@ -63,7 +63,7 @@ use function Groundhogg\html;
             </div>
 		<?php endif; ?>
 		<?php if ( count( $contact->get_address() ) > 0 ): ?>
-            <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
+            <div class="location align-left-space-between" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 				<?php dashicon_e( 'admin-site' ); ?>
                 <div class="address">
 					<?php echo html()->e( 'a', [
