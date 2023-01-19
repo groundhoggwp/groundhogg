@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.8.2
+Stable tag: 2.7.8.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.8.3 (2023-01-19) =
+* HOT FIX Absolute URLs not working in form redirect.
 
 = 2.7.8.2 (2023-01-18) =
 * TWEAKED Enabling safe mode will check for a 200 OK, otherwise will revert.

@@ -1723,7 +1723,8 @@ class Form_v2 extends Step {
 		$url = $this->get_meta( 'success_page' );
 		$url = do_replacements( $url, get_contactdata() );
 
-		if ( preg_match( '@https?://@', $url ) ){
+		// No https? must be a relative URL
+		if ( ! preg_match( '@https?://@', $url ) ){
 			$url = home_url( $url );
 		}
 
