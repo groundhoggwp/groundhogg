@@ -34,6 +34,11 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 	protected function get_table_data() {
 
 		$ids  = $this->get_new_contact_ids_in_time_period();
+
+		if ( empty( $ids ) ){
+			return [];
+		}
+
 		$rows = get_db( 'contactmeta' )->query( [
 			'relationship' => 'AND',
 			'where'        => [

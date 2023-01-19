@@ -324,6 +324,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 2.7.8.3 (2023-01-19) =
 * HOT FIX Absolute URLs not working in form redirect.
+* FIXED Form submission dates not showing correctly in activity feed.
 
 = 2.7.8.2 (2023-01-18) =
 * TWEAKED Enabling safe mode will check for a 200 OK, otherwise will revert.

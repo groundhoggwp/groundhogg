@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\Utils\DateTimeHelper;
 
 /**
  * Created by PhpStorm.
@@ -64,7 +65,17 @@ class Submission extends Base_Object_With_Meta {
 	}
 
 	public function get_date_created() {
-		return date_i18n( get_date_time_format(), strtotime( $this->date_created ) );
+		return $this->date_created;
+	}
+
+	/**
+	 * Get a datetime object representative of the date the submission was created
+	 *
+	 * @throws \Exception
+	 * @return \DateTime
+	 */
+	public function get_date(){
+		return new \DateTime( $this->get_date_created(), wp_timezone() );
 	}
 
 	public function get_contact_id() {
@@ -97,10 +108,12 @@ class Submission extends Base_Object_With_Meta {
 	public function get_as_array() {
 		$array = parent::get_as_array();
 
-		$array['data']['time'] = convert_to_utc_0( date_as_int( $this->get_date_created() ) );
+		$date = new DateTimeHelper( $this->get_date_created(), wp_timezone() );
+
+		$array['data']['time'] =$date->getTimestamp();
 		$array['form']         = new Step( $this->get_form_id() );
 		$array['locale']       = [
-			'diff_time' => human_time_diff( $array['data']['time'], time() )
+			'diff_time' => ucfirst( $date->i18n() )
 		];
 
 		return $array;
