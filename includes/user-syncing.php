@@ -8,10 +8,34 @@ class User_Syncing {
 		add_action( 'user_register', [ $this, 'sync_new_user' ], 10, 1 );
 		add_action( 'profile_update', [ $this, 'sync_existing_user' ], 10, 2 );
 
+		add_action( 'set_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 3 );
+		add_action( 'add_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 2 );
+		add_action( 'remove_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 2 );
+
 		if ( is_option_enabled( 'gh_sync_user_meta' ) ) {
 			add_action( 'added_user_meta', [ $this, 'user_meta_added' ], 10, 4 );
 			add_action( 'updated_user_meta', [ $this, 'user_meta_updated' ], 10, 4 );
 			add_action( 'deleted_user_meta', [ $this, 'user_meta_deleted' ], 10, 4 );
+		}
+	}
+
+	/**
+	 * Deletes the owners cache option if the role of a user is changed from or to an owner
+	 *
+	 * @param       $user_id int
+	 * @param       $role    string
+	 * @param array $old_roles string[]
+	 *
+	 * @return void
+	 */
+	public function maybe_clear_owners_cache( $user_id, $role, $old_roles = [] ) {
+
+		if ( in_array( $role, get_owner_roles() ) ) {
+			delete_option( 'gh_owners' );
+		}
+
+		if ( count( array_intersect( $old_roles, get_owner_roles() ) ) > 0 ){
+			delete_option( 'gh_owners' );
 		}
 	}
 
@@ -85,9 +109,9 @@ class User_Syncing {
 	/**
 	 * Add meta to the contact record when it is added to the user
 	 *
-	 * @param $meta_id int
-	 * @param $object_id int
-	 * @param $meta_key string
+	 * @param $meta_id     int
+	 * @param $object_id   int
+	 * @param $meta_key    string
 	 * @param $_meta_value mixed
 	 */
 	public function user_meta_added( $meta_id, $object_id, $meta_key, $_meta_value ) {
@@ -109,9 +133,9 @@ class User_Syncing {
 	/**
 	 * When user meta is updated, update it in the contact record.
 	 *
-	 * @param $meta_id int
-	 * @param $object_id int
-	 * @param $meta_key string
+	 * @param $meta_id     int
+	 * @param $object_id   int
+	 * @param $meta_key    string
 	 * @param $_meta_value mixed
 	 */
 	public function user_meta_updated( $meta_id, $object_id, $meta_key, $_meta_value ) {
@@ -122,7 +146,7 @@ class User_Syncing {
 			return;
 		}
 
-		if ( self::is_primary_meta_key( $meta_key ) ){
+		if ( self::is_primary_meta_key( $meta_key ) ) {
 			$contact->update( [
 				$meta_key => $_meta_value
 			] );
@@ -134,9 +158,9 @@ class User_Syncing {
 	/**
 	 * Delete meta from the contact record when it is deleted from the user
 	 *
-	 * @param $meta_id int
-	 * @param $object_id int
-	 * @param $meta_key string
+	 * @param $meta_id     int
+	 * @param $object_id   int
+	 * @param $meta_key    string
 	 * @param $_meta_value mixed
 	 */
 	public function user_meta_deleted( $meta_id, $object_id, $meta_key, $_meta_value ) {

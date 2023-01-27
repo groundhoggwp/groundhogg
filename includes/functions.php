@@ -4551,6 +4551,34 @@ function convert_to_utc_0( $time ) {
 }
 
 /**
+ * Retrieve an array of roles that have the view_contacts cap
+ *
+ * @return array|mixed
+ */
+function get_owner_roles(){
+
+    static $roles;
+
+    if ( ! empty( $roles ) ){
+        return $roles;
+    }
+
+	$roles = [];
+
+	foreach ( wp_roles()->roles as $role_slug => $role ) {
+		if ( isset_not_empty( $role['capabilities'], 'view_contacts' ) ) {
+			$roles[] = $role_slug;
+		}
+	}
+
+    if ( empty( $roles ) ){
+        return Main_Roles::get_owner_roles();
+    }
+
+    return $roles;
+}
+
+/**
  * Get an array of all the valid owners on the site
  *
  * @return \WP_User[]
@@ -4563,15 +4591,19 @@ function get_owners() {
 		return $users;
 	}
 
-	$roles__in = [];
+	// Check option cache first
+	$cached_users = get_option( 'gh_owners' );
 
-	foreach ( wp_roles()->roles as $role_slug => $role ) {
-		if ( isset_not_empty( $role['capabilities'], 'view_contacts' ) ) {
-			$roles__in[] = $role_slug;
-		}
+	if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
+		return array_map( 'get_userdata', wp_parse_id_list( $cached_users ) );
 	}
 
-	$users = get_users( [ 'role__in' => ! empty( $roles__in ) ? $roles__in : Main_Roles::$owner_roles ] );
+	$users    = get_users( [ 'role__in' => get_owner_roles() ] );
+	$user_ids = array_map( function ( $user ) {
+		return $user->ID;
+	}, $users );
+
+	update_option( 'gh_owners', $user_ids );
 
 	return apply_filters( 'groundhogg/owners', $users );
 }
