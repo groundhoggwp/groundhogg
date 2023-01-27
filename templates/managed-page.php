@@ -155,7 +155,7 @@ function managed_page_footer() {
 	$privacy_policy_url = function_exists( 'get_privacy_policy_url' ) && get_privacy_policy_url() ? get_privacy_policy_url() : get_option( 'gh_privacy_policy' );
 
 	$html = implode( ' | ', [
-		html()->e( 'a', [ 'href' => home_url( '/' ) ], sprintf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) ) ),
+		html()->e( 'a', [ 'href' => home_url( '/' ) ], sprintf( __( '&larr; Back to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ) ),
 		html()->e( 'a', [ 'href' => managed_page_url( 'preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) ),
 		html()->e( 'a', [ 'href' => $privacy_policy_url ], __( 'Privacy Policy', 'groundhogg' ) ),
 	] );

@@ -519,7 +519,7 @@ switch ( $action ):
             </div>
             <p class="align-center" style="margin-top: 40px">
                 <a id="gotoprofile" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php _e( 'Nevermind, I don\'t want to change anything.' ) ?></a>
+                   href="<?php echo esc_url( home_url() ); ?>"><?php _e( 'Never mind, I don\'t want to change anything.', 'groundhogg' ) ?></a>
             </p>
         </div>
 		<?php
