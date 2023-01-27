@@ -6,17 +6,14 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Api\V3\Base;
 use Groundhogg\Api\V4\Base_Api;
 use Groundhogg\Extension;
+use Groundhogg\License_Manager;
 use Groundhogg\Mailhawk;
-use Groundhogg\SendWp;
+use Groundhogg\Plugin;
 use Groundhogg_Email_Services;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
-use function Groundhogg\get_url_exclusions_regex;
 use function Groundhogg\html;
-use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
-use Groundhogg\License_Manager;
-use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\white_labeled_name;
 
@@ -282,27 +279,31 @@ class Settings_Page extends Admin_Page {
 	 */
 	private function get_default_tabs() {
 		$tabs = [
-			'general'   => array(
+			'general'      => array(
 				'id'    => 'general',
 				'title' => _x( 'General', 'settings_tabs', 'groundhogg' )
 			),
-			'marketing' => array(
+			'marketing'    => array(
 				'id'    => 'marketing',
 				'title' => _x( 'Compliance', 'settings_tabs', 'groundhogg' )
 			),
-			'email'     => array(
+			'email'        => array(
 				'id'    => 'email',
 				'title' => _x( 'Email', 'settings_tabs', 'groundhogg' )
 			),
-			'tags'      => [
+			'tags'         => [
 				'id'    => 'tags',
 				'title' => _x( 'Tags', 'settings_tabs', 'groundhogg' )
 			],
-			'api_tab'   => array(
+			'api_tab'      => array(
 				'id'    => 'api_tab',
 				'title' => _x( 'API', 'settings_tabs', 'groundhogg' )
 			),
-			'misc'      => array(
+			'integrations' => array(
+				'id'    => 'integrations',
+				'title' => _x( 'Integrations', 'settings_tabs', 'groundhogg' )
+			),
+			'misc'         => array(
 				'id'    => 'misc',
 				'title' => _x( 'Misc', 'settings_tabs', 'groundhogg' )
 			),
@@ -802,7 +803,7 @@ class Settings_Page extends Admin_Page {
 					'option_none' => false
 				),
 			),
-			'gh_show_legacy_steps'                       => array(
+			'gh_show_legacy_steps'                   => array(
 				'id'      => 'gh_show_legacy_steps',
 				'section' => 'interface',
 				'label'   => _x( 'Enable Legacy Funnel Steps', 'settings', 'groundhogg' ),
@@ -816,7 +817,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-            'gh_force_custom_step_names'                       => array(
+			'gh_force_custom_step_names'             => array(
 				'id'      => 'gh_force_custom_step_names',
 				'section' => 'interface',
 				'label'   => _x( 'Enable Custom Step Titles', 'settings', 'groundhogg' ),
@@ -1623,6 +1624,17 @@ class Settings_Page extends Admin_Page {
 	}
 
 	/**
+	 * @param $tab
+	 *
+	 * @return bool
+	 */
+	protected function tab_has_sections( $tab ) {
+		return count( array_filter( $this->sections, function ( $section ) use ( $tab ) {
+				return $section['tab'] == $tab;
+			} ) ) >= 1;
+	}
+
+	/**
 	 * Output the settings content
 	 */
 //    public function settings_content()
@@ -1642,6 +1654,10 @@ class Settings_Page extends Admin_Page {
                 <!-- BEGIN TABS -->
                 <h2 class="nav-tab-wrapper">
 					<?php foreach ( $this->tabs as $id => $tab ):
+
+                        if ( ! $this->tab_has_settings( $tab['id'] ) ){
+                            continue;
+                        }
 
 						// Check for cap restriction on the tab...
 						$cap = get_array_var( $tab, 'cap' );
