@@ -323,6 +323,7 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 2.7.8.4 (2023-01-27) =
+* ADDED `plain` posts layout option for plain text version compatibility.
 * ADDED Integrations tab in settings area for more obvious place to put integration settings.
 * TWEAKED Exporting contacts is now faster and more resource efficient.
 * TWEAKED Cache contact owner IDs in an option so that users are not queried every page load.

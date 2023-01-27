@@ -1813,7 +1813,7 @@ class Replacements implements \JsonSerializable {
 			case 'plain':
 
 				$content = implode( "\n\n", array_map( function ( $post ) use ( $props ) {
-					return sprintf( '%s 🔗 %s', html_entity_decode( get_the_title( $post ) ), get_permalink( $post ) );
+					return sprintf( '- %s 🔗 %s', html_entity_decode( get_the_title( $post ) ), get_permalink( $post ) );
 				}, $posts ) );
 
 				break;
