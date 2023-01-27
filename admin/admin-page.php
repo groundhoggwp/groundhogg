@@ -367,7 +367,7 @@ abstract class Admin_Page extends Supports_Errors {
                 <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>
                 <input type="search" id="post-search-input" name="<?php echo $name ?>"
                        value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( $title ); ?>">
+                <input type="submit" id="search-submit" class="button button-primary" value="<?php esc_attr_e( $title ); ?>">
             </p>
         </form>
 		<?php

@@ -821,6 +821,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$header_type = sanitize_text_field( get_post_var( 'header_type', 'basic' ) );
 
+		set_transient( 'gh_export_query', $query, DAY_IN_SECONDS );
 		set_transient( 'gh_export_headers', $headers, DAY_IN_SECONDS );
 		set_transient( 'gh_export_header_type', $header_type, DAY_IN_SECONDS );
 
