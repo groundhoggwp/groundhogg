@@ -752,6 +752,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		<?php
 	}
 
+	public function before_step_warnings() {
+	}
+
 	public function after_step_warnings() {
 	}
 
@@ -765,7 +768,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
              class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
 
             <!-- WARNINGS -->
-			<?php if ( $step->has_errors() ): ?>
+	        <?php $this->before_step_warnings() ?>
+            <?php if ( $step->has_errors() || $this->has_errors() ): ?>
                 <div class="step-warnings">
 					<?php foreach ( $step->get_errors() as $error ): ?>
 
@@ -774,6 +778,13 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 							<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
                         </div>
 					<?php endforeach; ?>
+	                <?php foreach ( $this->get_errors() as $error ): ?>
+
+                        <div id="<?php $error->get_error_code() ?>"
+                             class="notice notice-warning is-dismissible">
+			                <?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
+                        </div>
+	                <?php endforeach; ?>
                 </div>
 			<?php endif; ?>
 			<?php $this->after_step_warnings() ?>
