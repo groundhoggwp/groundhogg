@@ -155,27 +155,58 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * If a custom alt body is currently enabled
+	 *
+	 * @return bool
+	 */
+	public function using_custom_alt_body() {
+		return boolval( $this->get_meta( 'use_custom_alt_body' ) );
+	}
+
+	/**
+	 *
+	 * @deprecated
+	 * @return bool
+	 */
+	public function has_custom_alt_body() {
+		return $this->using_custom_alt_body();
+	}
+
+	/**
+	 * fetch the custom alt body
+	 *
+	 * @return array|mixed
+	 */
+	public function get_custom_alt_body(){
+		return $this->get_meta( 'alt_body' );
+	}
+
+	/**
+	 * Fetch the alt body based on the email settings
+	 *
 	 * @return string
 	 */
 	public function get_alt_body() {
 		$body = "";
 
-		if ( $this->has_custom_alt_body() ) {
-			$body = wp_strip_all_tags( $this->get_meta( 'alt_body' ), false );
+		if ( $this->using_custom_alt_body() ) {
+			$body = $this->get_custom_alt_body();
 		}
 
+		// Default to content
 		if ( empty( $body ) ) {
-			$body = $this->strip_html_tags( $this->get_content() );
+			$body = $this->get_content();
 		}
 
-		return $body;
+		// Strip HTML we don't like
+		return $this->strip_html_tags( $body );
 	}
 
 	/**
 	 * @return string
 	 */
 	public function get_merged_alt_body() {
-		return $this->strip_html_tags( do_replacements( $this->get_alt_body(), $this->get_contact()->get_id() ) );
+		return $this->strip_html_tags( do_replacements( $this->get_alt_body(), $this->get_contact() ) );
 	}
 
 	/**
@@ -190,13 +221,6 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function is_ready() {
 		return $this->get_status() === 'ready';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function has_custom_alt_body() {
-		return boolval( $this->get_meta( 'use_custom_alt_body' ) );
 	}
 
 	/**
@@ -997,8 +1021,8 @@ class Email extends Base_Object_With_Meta {
 				'@<embed[^>]*?.*?</embed>@siu',
 				'@<noscript[^>]*?.*?</noscript>@siu',
 				'@<noembed[^>]*?.*?</noembed>@siu',
-				'@\t+@siu',
-				'@\n+@siu'
+//				'@\t+@siu',
+//				'@\n+@siu'
 			),
 			'',
 			$text );

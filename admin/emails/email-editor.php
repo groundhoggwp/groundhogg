@@ -189,12 +189,12 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 				</p>
 				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
-						'label'   => __( 'Enable custom plain text version', 'groundhogg' ),
+						'label'   => __( 'Set custom plain text version', 'groundhogg' ),
 						'name'    => 'use_custom_alt_body',
 						'id'      => 'use_custom_alt_body',
 						'class'   => '',
 						'value'   => '1',
-						'checked' => $email->has_custom_alt_body(),
+						'checked' => $email->using_custom_alt_body(),
 					] ); ?>
 				</p>
 			</div>
@@ -262,13 +262,12 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					</div>
 				</div>
 
-				<?php if ( $email->has_custom_alt_body() ) : ?>
+				<?php if ( $email->using_custom_alt_body() ) : ?>
 					<div id="alt-wrap">
 						<h3><?php _e( 'Alternate Plain Text Version', 'groundhogg' ); ?></h3>
 						<p><?php printf( __( 'Having a custom plain text version will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
 						<textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="8"><?php
-							$alt_body = $email->get_alt_body();
-							esc_html_e( $alt_body );
+							esc_html_e( $email->get_custom_alt_body() );
 							?></textarea>
 					</div>
 				<?php endif; ?>
