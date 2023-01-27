@@ -2,20 +2,15 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
-use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
 use function Groundhogg\encrypt;
 use function Groundhogg\export_field;
 use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\file_access_url;
-use function Groundhogg\get_contactdata;
-use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_a_contact;
-use function Groundhogg\key_to_words;
-use function Groundhogg\multi_implode;
-use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,6 +22,9 @@ class Export_Contacts extends Bulk_Job {
 	protected $file_name;
 	protected $file_path;
 	protected $headers;
+	protected $query;
+
+	const LIMIT = 500;
 
 	/**
 	 * Get the action reference.
@@ -57,10 +55,11 @@ class Export_Contacts extends Bulk_Job {
 			$args = get_request_query();
 		}
 
-		$contacts = $query->query( $args );
-		$ids      = wp_list_pluck( $contacts, 'ID' );
+		$num_contacts = $query->count( $args );
 
-		return $ids;
+		$num_requests = floor( $num_contacts / self::LIMIT );
+
+		return range( 0, $num_requests );
 	}
 
 	/**
@@ -72,35 +71,45 @@ class Export_Contacts extends Bulk_Job {
 	 * @return int
 	 */
 	public function max_items( $max, $items ) {
-		return min( 500, intval( ini_get( 'max_input_vars' ) ) );
+		return 1;
 	}
 
 	/**
 	 * Process an item
 	 *
-	 * @param $item mixed
+	 * @param $batch int
 	 *
 	 * @return void
 	 */
-	protected function process_item( $item ) {
+	protected function process_item( $batch ) {
 
 		if ( ! current_user_can( 'export_contacts' ) ) {
 			return;
 		}
 
-		$line = [];
+		$query_args = array_merge( [
+			'limit'  => self::LIMIT,
+			'offset' => $batch * self::LIMIT,
+		], $this->query );
 
-		$contact = get_contactdata( absint( $item ) );
+		$query    = new Contact_Query( $query_args );
+		$contacts = $query->query( null, true );
 
-		if ( ! is_a_contact( $contact ) ) {
-			return;
+		foreach ( $contacts as $contact ) {
+			$line = [];
+
+			if ( ! is_a_contact( $contact ) ) {
+				return;
+			}
+
+			foreach ( $this->headers as $header ) {
+				$line[] = export_field( $contact, $header );
+			}
+
+			fputcsv( $this->fp, $line );
+
+			$this->_completed();
 		}
-
-		foreach ( $this->headers as $header ) {
-			$line[] = export_field( $contact, $header );
-		}
-
-		fputcsv( $this->fp, $line );
 	}
 
 	/**
@@ -111,9 +120,9 @@ class Export_Contacts extends Bulk_Job {
 	protected function pre_loop() {
 
 		$headers     = get_transient( 'gh_export_headers' );
+		$query       = get_transient( 'gh_export_query' ) ?: [];
 		$header_type = get_transient( 'gh_export_header_type' );
-
-		$file_name = get_transient( 'gh_export_file' );
+		$file_name   = get_transient( 'gh_export_file' );
 
 		$fp = false;
 
@@ -145,6 +154,7 @@ class Export_Contacts extends Bulk_Job {
 		$this->fp        = $fp;
 		$this->file_name = $file_name;
 		$this->headers   = $headers;
+		$this->query     = $query;
 	}
 
 	/**
