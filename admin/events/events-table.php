@@ -3,19 +3,18 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
+use Groundhogg\Plugin;
+use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\array_map_with_keys;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
-use function Groundhogg\get_request_var;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use function Groundhogg\isset_not_empty;
-use Groundhogg\Plugin;
-use function Groundhogg\scheduled_time;
-use \WP_List_Table;
 use function Groundhogg\scheduled_time_column;
 
 /**
@@ -277,27 +276,52 @@ class Events_Table extends WP_List_Table {
 	}
 
 	protected function get_views() {
-		$base_url = admin_url( 'admin.php?page=gh_events&status=' );
 
 		$view = $this->get_view();
 
-		$count = array(
-			'waiting'   => get_db( 'event_queue' )->count( array( 'status' => 'waiting' ) ),
-			'paused'    => get_db( 'event_queue' )->count( array( 'status' => 'paused' ) ),
-			'skipped'   => get_db( 'events' )->count( array( 'status' => 'skipped' ) ),
-			'cancelled' => get_db( 'events' )->count( array( 'status' => 'cancelled' ) ),
-			'completed' => get_db( 'events' )->count( array( 'status' => 'complete' ) ),
-			'failed'    => get_db( 'events' )->count( array( 'status' => 'failed' ) )
-		);
+		$views = [
+			Event::WAITING     => __( 'Waiting', 'groundhogg' ),
+			Event::PAUSED      => __( 'Paused', 'groundhogg' ),
+			Event::IN_PROGRESS => __( 'In Progress', 'groundhogg' ),
+		];
 
-		return apply_filters( 'gh_event_views', array(
-			'waiting'   => "<a class='" . ( $view === 'waiting' ? 'current' : '' ) . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['waiting'] ) . ')</span>' . "</a>",
-			'paused'    => "<a class='" . ( $view === 'paused' ? 'current' : '' ) . "' href='" . $base_url . "paused" . "'>" . _x( 'Paused', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['paused'] ) . ')</span>' . "</a>",
-			'completed' => "<a class='" . ( $view === 'complete' ? 'current' : '' ) . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['completed'] ) . ')</span>' . "</a>",
-			'skipped'   => "<a class='" . ( $view === 'skipped' ? 'current' : '' ) . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['skipped'] ) . ')</span>' . "</a>",
-			'cancelled' => "<a class='" . ( $view === 'cancelled' ? 'current' : '' ) . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['cancelled'] ) . ')</span>' . "</a>",
-			'failed'    => "<a class='" . ( $view === 'failed' ? 'current' : '' ) . "' href='" . $base_url . "failed" . "'>" . _x( 'Failed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['failed'] ) . ')</span>' . "</a>"
-		) );
+		$views = array_map_with_keys( $views, function ( $text, $status ) use ( $view ) {
+			$count = get_db( 'event_queue' )->count( [ 'status' => $status ] );
+
+			return html()->e( 'a', [
+				'class' => [ $status, $view == $status ? 'current' : '' ],
+				'href'  => admin_page_url( 'gh_events', [
+					'status' => $status
+				] )
+			], [
+				$text . ' ',
+				html()->e( 'span', [ 'class' => 'count' ],  '(' . $count . ')' )
+			] );
+		} );
+
+		$more_views = [
+			Event::COMPLETE  => __( 'Complete', 'groundhogg' ),
+			Event::SKIPPED   => __( 'Skipped', 'groundhogg' ),
+			Event::CANCELLED => __( 'Cancelled', 'groundhogg' ),
+			Event::FAILED    => __( 'Failed', 'groundhogg' ),
+		];
+
+		$more_views = array_map_with_keys( $more_views, function ( $text, $status ) use ( $view ) {
+			$count = get_db( 'events' )->count( [ 'status' => $status ] );
+
+			return html()->e( 'a', [
+				'class' => [ $status, $view == $status ? 'current' : '' ],
+				'href'  => admin_page_url( 'gh_events', [
+					'status' => $status
+				] )
+			], [
+				$text . ' ',
+				html()->e( 'span', [ 'class' => 'count' ],  '(' . $count . ')' )
+			] );
+		} );
+
+
+		return apply_filters( 'gh_event_views', array_merge( $views, $more_views ) );
 	}
 
 	/**
@@ -389,12 +413,12 @@ class Events_Table extends WP_List_Table {
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
-	        <?php if ( $this->get_view() === Event::PAUSED ): ?>
+			<?php if ( $this->get_view() === Event::PAUSED ): ?>
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'unpause_all' ], $_SERVER['REQUEST_URI'] ), 'unpause_all' ); ?>"><?php _ex( 'Unpause All', 'action', 'groundhogg' ); ?></a>
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all_paused' ], $_SERVER['REQUEST_URI'] ), 'cancel_all_paused' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
-	        <?php endif; ?>
+			<?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
                 <a class="button action"
                    href="<?php echo wp_nonce_url( add_query_arg( [

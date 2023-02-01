@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.8.4
+Stable tag: 2.7.8.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.8.5 (2023-02-01) =
+* TWEAKED Moved recaptcha settings to the integrations tab.
+* FIXED API and Licenses tab not showing after last update.
 
 = 2.7.8.4 (2023-01-27) =
 * ADDED `plain` posts layout option for plain text version compatibility.

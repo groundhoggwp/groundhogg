@@ -376,7 +376,7 @@ class Settings_Page extends Admin_Page {
 			'captcha'               => [
 				'id'    => 'captcha',
 				'title' => _x( 'Google reCAPTCHA', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'misc'
+				'tab'   => 'integrations'
 			],
 			'event_notices'         => [
 				'id'    => 'event_notices',
@@ -951,7 +951,7 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_site_key'                  => array(
 				'id'      => 'gh_recaptcha_site_key',
 				'section' => 'captcha',
-				'label'   => _x( 'reCAPTCHA Site Key', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Site Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This is the key which faces the users on the front-end', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
@@ -962,7 +962,7 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_secret_key'                => array(
 				'id'      => 'gh_recaptcha_secret_key',
 				'section' => 'captcha',
-				'label'   => _x( 'reCAPTCHA Secret Key', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Secret Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Never ever ever share this with anyone!', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
@@ -973,7 +973,7 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_version'                   => array(
 				'id'      => 'gh_recaptcha_version',
 				'section' => 'captcha',
-				'label'   => _x( 'reCAPTCHA Version', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Version', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Which version of reCAPTCHA you want to use.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => array(
@@ -989,7 +989,7 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_v3_score_threshold'        => array(
 				'id'      => 'gh_recaptcha_v3_score_threshold',
 				'section' => 'captcha',
-				'label'   => _x( 'reCAPTCHA v3 Score Threshold', 'settings', 'groundhogg' ),
+				'label'   => _x( 'v3 Score Threshold', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The score threshold to block form submissions. <code>0.5</code> by default.', 'settings', 'groundhogg' ),
 				'type'    => 'number',
 				'atts'    => array(
@@ -1655,14 +1655,15 @@ class Settings_Page extends Admin_Page {
                 <h2 class="nav-tab-wrapper">
 					<?php foreach ( $this->tabs as $id => $tab ):
 
-                        if ( ! $this->tab_has_settings( $tab['id'] ) ){
-                            continue;
-                        }
+                        // Force API Tab & Licenses Tab
+						if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab[ 'id' ], [ 'extensions', 'api_tab' ] ) ) {
+							continue;
+						}
 
 						// Check for cap restriction on the tab...
 						$cap = get_array_var( $tab, 'cap' );
 
-						// ignore if there is no cap, but if there is one check if the user has require privileges...
+						// ignore if there is no cap, but if there is one check if the user has required privileges...
 						if ( $cap && ! current_user_can( $cap ) ) {
 							continue;
 						}

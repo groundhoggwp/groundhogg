@@ -2,20 +2,16 @@
 
 namespace Groundhogg\Admin\Events;
 
-use cli\Table;
-use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
+use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
-use Groundhogg\Plugin;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
-use function Groundhogg\is_option_enabled;
-use function Groundhogg\Ymd_His;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -306,6 +302,10 @@ class Events_Page extends Tabbed_Admin_Page {
 		$time = time() - ( 5 * MINUTE_IN_SECONDS );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim != '' AND time < $time" );
 		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress' AND time < $time" );
+
+		$events->move_events_to_history( [
+			'status' => [ Event::COMPLETE, Event::SKIPPED, Event::FAILED ]
+		] );
 
 		get_db( 'events' )->move_events_to_queue( [
 			'status' => Event::WAITING
