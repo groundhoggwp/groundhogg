@@ -323,6 +323,7 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 2.7.8.5 (2023-02-01) =
+* ADDED Logs management screen and tools for debugging and cleaning up logs.
 * TWEAKED Moved recaptcha settings to the integrations tab.
 * FIXED API and Licenses tab not showing after last update.
 

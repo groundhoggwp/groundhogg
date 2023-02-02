@@ -3,10 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
-use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -73,6 +71,18 @@ class Event_Queue extends DB {
 	 */
 	public function get_date_key() {
 		return 'time';
+	}
+
+	public function count_unprocessed() {
+		return $this->count( [
+			'where'  => [
+				'relationship' => 'AND',
+				// Event should have processed over a minute ago
+				[ 'time', '<', time() - MINUTE_IN_SECONDS ],
+				// Event is still waiting or in progress
+				[ 'status', 'IN', [ Event::WAITING, Event::IN_PROGRESS ] ],
+			]
+		] );
 	}
 
 	/**
@@ -227,7 +237,7 @@ class Event_Queue extends DB {
 	 */
 	public function contact_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 
@@ -243,7 +253,7 @@ class Event_Queue extends DB {
 	 */
 	public function funnel_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 
@@ -259,7 +269,7 @@ class Event_Queue extends DB {
 	 */
 	public function step_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 

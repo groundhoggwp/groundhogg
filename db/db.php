@@ -1140,8 +1140,11 @@ abstract class DB {
 
 		$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
 
+		$func = false;
+
 		if ( $query_vars['func'] ) {
-			$select = sprintf( '%s( %s %s)', strtoupper( $query_vars['func'] ), $distinct, $select );
+			$func = strtoupper( $query_vars['func'] );
+			$select = sprintf( '%s( %s %s)', $func, $distinct, $select );
 		}
 
 		$limit   = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
@@ -1164,6 +1167,12 @@ abstract class DB {
 			'limit'   => $limit,
 			'offset'  => $offset,
 		];
+
+		if ( $func ){
+			unset( $clauses['limit'] );
+			unset( $clauses['orderby'] );
+			unset( $clauses['order'] );
+		}
 
 		$clauses = apply_filters( 'groundhogg/db/sql_query_clauses', $clauses, $query_vars );
 

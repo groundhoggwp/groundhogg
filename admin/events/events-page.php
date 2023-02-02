@@ -8,10 +8,12 @@ use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\event_queue_db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\implode_in_quotes;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -326,10 +328,23 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events = get_db( 'events' );
 
-		$result = $wpdb->query( $wpdb->prepare( "DELETE FROM {$events->get_table_name()} WHERE `status` = %s", get_url_var( 'status' ) ) );
+		$status           = get_url_var( 'status' );
+		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
+
+		if ( ! empty( $status ) ) {
+
+			// don't accidentally delete important data
+			if ( ! in_array( $status, $purgeable_events ) ) {
+				return false;
+			}
+
+			$result = $wpdb->query( $wpdb->prepare( "DELETE FROM {$events->get_table_name()} WHERE `status` = %s", get_url_var( 'status' ) ) );
+		} else {
+			$result = $wpdb->query( sprintf( "DELETE FROM {$events->get_table_name()} WHERE `status` IN ( %s )", implode_in_quotes( $purgeable_events ) ) );
+		}
 
 		if ( $result !== false ) {
-			$this->add_notice( 'events_purged', __( 'Purged events!' ) );
+			$this->add_notice( 'events_purged', sprintf( __( 'Purged %s events!' ), number_format_i18n( $result ) ) );
 		}
 	}
 
@@ -445,7 +460,6 @@ class Events_Page extends Tabbed_Admin_Page {
 			<?php $events_table->prepare_items(); ?>
 			<?php $events_table->display(); ?>
         </form>
-
 		<?php
 	}
 
@@ -464,6 +478,11 @@ class Events_Page extends Tabbed_Admin_Page {
 				'slug' => 'emails',
 				'cap'  => 'view_logs'
 
+			],
+			[
+				'name' => __( 'Manage', 'groundhogg' ),
+				'slug' => 'manage',
+				'cap'  => 'view_events'
 			],
 		];
 	}
@@ -490,6 +509,205 @@ class Events_Page extends Tabbed_Admin_Page {
         </div>
 		<?php
 	}
+
+	public function view_manage() {
+
+		if ( ! current_user_can( 'view_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/manage.php';
+	}
+
+	/**
+	 * Delete any failed or cancelled events.
+	 */
+	public function process_purge_completed_tool() {
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$time_range = absint( get_post_var( 'time_range' ) );
+		$time_unit  = sanitize_text_field( get_post_var( 'time_unit' ) );
+		$confirm    = get_post_var( 'confirm' );
+		$events     = get_db( 'events' );
+
+		if ( $confirm !== 'confirm' ) {
+			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+		}
+
+		$time = strtotime( "$time_range $time_unit ago" );
+
+		if ( ! $time ) {
+			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+		}
+
+		$results = $wpdb->query( "
+DELETE FROM {$events->get_table_name()} 
+WHERE status = 'complete' AND `time` < {$time}
+ORDER BY ID" );
+
+		$this->add_notice( 'success', $results ?
+			sprintf( '%s logs have been purged!', number_format_i18n( $results ) ) :
+			'The query ran successfully but there were no unprocessed logs for the given time range.' );
+
+		return false;
+	}
+
+	/**
+	 * Admin tool to cancel waiting events
+	 *
+	 * @return false|\WP_Error
+	 */
+	public function process_cancel_events_tool() {
+
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+		$events = event_queue_db();
+
+		$what_to_cancel = sanitize_text_field( get_post_var( 'what_to_cancel' ) );
+		$confirm        = get_post_var( 'confirm' );
+
+		if ( $confirm !== 'confirm' ) {
+			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+		}
+
+		switch ( $what_to_cancel ) {
+			case 'all':
+
+				$results = $wpdb->query( "
+UPDATE {$events->get_table_name()} 
+SET status = 'cancelled'
+ORDER BY ID" );
+
+				break;
+			case 'waiting':
+				event_queue_db()->update( [
+					'status' => Event::WAITING
+				], [
+					'status' => Event::CANCELLED
+				] );
+				break;
+			case 'paused':
+
+				event_queue_db()->update( [
+					'status' => Event::PAUSED
+				], [
+					'status' => Event::CANCELLED
+				] );
+
+				break;
+			case 'funnel':
+				event_queue_db()->update( [
+					'event_type' => Event::FUNNEL
+				], [
+					'status' => Event::CANCELLED
+				] );
+
+				break;
+			case 'broadcast':
+				event_queue_db()->update( [
+					'event_type' => Event::BROADCAST
+				], [
+					'status' => Event::CANCELLED
+				] );
+
+				break;
+		}
+
+		$results = $wpdb->rows_affected;
+
+		if ( $results ) {
+			event_queue_db()->move_events_to_history( [
+				'status' => Event::CANCELLED
+			] );
+		}
+
+		$this->add_notice( 'success', $results ?
+			sprintf( '%s events have been cancelled!', number_format_i18n( $results ) ) :
+			'The query ran successfully but there were no events found matching the given parameters.' );
+
+		return false;
+	}
+
+
+	/**
+	 * Tool to fix unprocessed events by rescheduling them or cancelling them
+	 *
+	 * @return false|\WP_Error
+	 */
+	public function process_fix_unprocessed() {
+
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$events = event_queue_db();
+
+		$fix_or_cancel    = sanitize_text_field( get_post_var( 'fix_or_cancel' ) );
+		$older_or_younger = sanitize_text_field( get_post_var( 'older_or_younger' ) );
+		$time_range       = absint( get_post_var( 'time_range' ) );
+		$time_unit        = sanitize_text_field( get_post_var( 'time_unit' ) );
+		$confirm          = get_post_var( 'confirm' );
+
+		if ( $confirm !== 'confirm' ) {
+			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+		}
+
+		$time = strtotime( "$time_range $time_unit ago" );
+
+		if ( ! $time ) {
+			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+		}
+
+		$compare = $older_or_younger == 'older' ? '<' : '>';
+
+		switch ( $fix_or_cancel ) {
+			case 'fix':
+
+				$results = $wpdb->query( "
+UPDATE {$events->get_table_name()} 
+SET status = 'waiting', claim = '' 
+WHERE status IN ( 'in_progress', 'waiting' ) AND `time` $compare {$time}
+ORDER BY ID" );
+
+				$this->add_notice( 'success', $results ?
+					sprintf( '%s events have been rescheduled to run immediately!', number_format_i18n( $results ) ) :
+					'The query ran successfully but there were no unprocessed events for the given time range.' );
+
+				break;
+			case 'cancel':
+
+				$results = $wpdb->query( "
+UPDATE {$events->get_table_name()} 
+SET status = 'cancelled'
+WHERE status IN ( 'in_progress', 'waiting' ) AND `time` $compare {$time}
+ORDER BY ID" );
+
+				if ( $results ) {
+					event_queue_db()->move_events_to_history( [
+						'status' => Event::CANCELLED
+					] );
+				}
+
+				$this->add_notice( 'success', $results ?
+					sprintf( '%s events have been cancelled!', number_format_i18n( $results ) ) :
+					'The query ran successfully but there were no unprocessed events for the given time range.' );
+
+				break;
+		}
+
+		return false;
+
+	}
+
 
 	public function process_filter_logs() {
 		return admin_page_url( 'gh_events', [

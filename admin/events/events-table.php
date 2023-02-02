@@ -5,7 +5,6 @@ namespace Groundhogg\Admin\Events;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_List_Table;
-use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
@@ -162,6 +161,11 @@ class Events_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_time( $event ) {
+
+		if ( $this->get_view() === 'unprocessed' ){
+			return __( 'Should have run', 'groundhogg' ) . '&nbsp;' . scheduled_time_column( $event->get_time() );
+		}
+
 		$status = $event->get_status();
 
 		switch ( $status ) {
@@ -184,7 +188,7 @@ class Events_Table extends WP_List_Table {
 				break;
 		}
 
-		if ( $event->get_time() < time() && $event->is_waiting() ) {
+		if ( $event->get_time() < time() && $event->is_waiting() && $this->get_view() !== 'unprocessed' ) {
 			return '<abbr title="' . date_i18n( get_date_time_format(), $event->get_time() ) . '">' . __( 'Running now...', 'groundhogg' ) . '</abbr>';
 		}
 
@@ -295,7 +299,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ],  '(' . $count . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . $count . ')' )
 			] );
 		} );
 
@@ -316,7 +320,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ],  '(' . $count . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . $count . ')' )
 			] );
 		} );
 
@@ -407,13 +411,7 @@ class Events_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
             <a class="button action"
                href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
-            <a class="button action"
-               href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
-			<?php if ( $this->get_view() === Event::WAITING ): ?>
-                <a class="button action danger"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
-			<?php endif; ?>
-			<?php if ( $this->get_view() === Event::PAUSED ): ?>
+          	<?php if ( $this->get_view() === Event::PAUSED ): ?>
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'unpause_all' ], $_SERVER['REQUEST_URI'] ), 'unpause_all' ); ?>"><?php _ex( 'Unpause All', 'action', 'groundhogg' ); ?></a>
                 <a class="button action danger"
@@ -450,14 +448,25 @@ class Events_Table extends WP_List_Table {
 		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
 		$paged    = $this->get_pagenum();
 		$offset   = $per_page * ( $paged - 1 );
-//        $search  = get_url_var( 's' );
-		$order   = get_url_var( 'order', $this->get_view() === Event::WAITING ? 'ASC' : 'DESC' );
-		$orderby = get_url_var( 'orderby', 'time' );
+		$order    = get_url_var( 'order', $this->get_view() === Event::WAITING ? 'ASC' : 'DESC' );
+		$orderby  = get_url_var( 'orderby', 'time' );
 
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-		];
+		$view = $this->get_view();
+
+        // Special handling of the unprocessed status
+		if ( $view === 'unprocessed' ) {
+			$where = [
+				'relationship' => "AND",
+				[ 'col' => 'status', 'val' => [ Event::WAITING, Event::IN_PROGRESS ], 'compare' => 'IN' ],
+				[ 'col' => 'time', 'val' => time() - MINUTE_IN_SECONDS, 'compare' => '<' ],
+			];
+		} else {
+			$where = [
+				'relationship' => "AND",
+				[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
+			];
+		}
+
 
 		$request_query = get_request_query( [], [], array_keys( get_db( 'events' )->get_columns() ) );
 
@@ -477,7 +486,7 @@ class Events_Table extends WP_List_Table {
 			'orderby' => $orderby,
 		);
 
-		$this->table = in_array( $this->get_view(), [ Event::PAUSED, Event::WAITING ] ) ? 'event_queue' : 'events';
+		$this->table = in_array( $this->get_view(), [ Event::PAUSED, Event::WAITING, 'unprocessed' ] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
 		$total  = get_db( $this->table )->count( $args );
