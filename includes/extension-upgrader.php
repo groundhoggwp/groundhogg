@@ -72,6 +72,7 @@ class Extension_Upgrader {
 		134192 => 'groundhogg-presto-player/groundhogg-presto-player.php',
 		135217 => 'groundhogg-traffic-filter/groundhogg-traffic-filter.php',
 		135350 => 'groundhogg-postmark/groundhogg-postmark.php',
+		143328 => 'groundhogg-facebook-conversions-api/groundhogg-facebook-conversions-api.php',
 	];
 
 	/**
