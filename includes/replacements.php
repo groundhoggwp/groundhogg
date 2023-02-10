@@ -599,11 +599,7 @@ class Replacements implements \JsonSerializable {
 			return $default;
 		}
 
-//		else if ( ! $this->contact_id || ! $this->current_contact ){
-//			return $default;
-//        }
-
-		$cache_key   = 'key:' . ( $this->contact_id ?: 'anon' ) . ':' . md5( serialize( $parts ) );
+		$cache_key   = 'key:' . ( $this->contact_id ?: 'anon' ) . ':' . md5( serialize( $parts ) ) . ':' . cache_get_last_changed( 'replacements' );
 		$cache_value = wp_cache_get( $cache_key, 'replacements' );
 
 		if ( $cache_value ) {

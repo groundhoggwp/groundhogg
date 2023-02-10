@@ -6944,3 +6944,36 @@ function get_gh_page_screen_id( $page = '' ) {
 function current_screen_is_gh_page( $page = '' ) {
 	return get_gh_page_screen_id( $page ) === get_current_screen()->id;
 }
+
+/**
+ * generic function for fetching last changed in cache group
+ *
+ * @param $group
+ *
+ * @return false|mixed|string
+ */
+function cache_get_last_changed( $group ){
+	if ( function_exists( 'wp_cache_get_last_changed' ) ) {
+		return wp_cache_get_last_changed( $group );
+	}
+
+	$last_changed = wp_cache_get( 'last_changed', $group );
+
+	if ( ! $last_changed ) {
+		$last_changed = microtime();
+		wp_cache_set( 'last_changed', $last_changed, $group );
+	}
+
+	return $last_changed;
+}
+
+/**
+ * Allows expiring of cache results
+ *
+ * @param $group
+ *
+ * @return void
+ */
+function cache_set_last_changed( $group ){
+	wp_cache_set( 'last_changed', microtime(), $group );
+}
