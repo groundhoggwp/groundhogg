@@ -29,6 +29,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Web_Form extends Benchmark {
 
+    public function get_sub_group() {
+	    return 'forms';
+    }
 
 	/**
 	 * Get element name

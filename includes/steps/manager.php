@@ -44,7 +44,7 @@ class Manager {
 	 * @var Funnel_Step[]
 	 */
 	public $elements = [];
-	protected $sub_groups = [];
+	public $sub_groups = [];
 
 	/**
 	 * Manager constructor.
@@ -61,7 +61,7 @@ class Manager {
 	 * @param $group
 	 * @param $name
 	 */
-	public function register_sub_group( $group, $name ) {
+	public function register_sub_group( $group, $name, $priority = 10 ) {
 		$this->sub_groups[ $group ] = $name;
 	}
 
@@ -70,14 +70,18 @@ class Manager {
 	 */
 	public function init_steps() {
 
+		$this->register_sub_group( 'delay', __( 'Delay' ) );
+		$this->register_sub_group( 'comms', __( 'Communications' ) );
+		$this->register_sub_group( 'notifications', __( 'Notifications' ) );
+		$this->register_sub_group( 'forms', __( 'Forms' ) );
 		$this->register_sub_group( 'activity', __( 'Activity' ) );
 		$this->register_sub_group( 'crm', __( 'CRM' ) );
-		$this->register_sub_group( 'admin', __( 'Admin' ) );
-		$this->register_sub_group( 'email', __( 'Email' ) );
+		$this->register_sub_group( 'wordpress', __( 'WordPress' ) );
+		$this->register_sub_group( 'sms', __( 'SMS' ) );
 		$this->register_sub_group( 'user', __( 'User' ) );
-		$this->register_sub_group( 'delay', __( 'Delay' ) );
-		$this->register_sub_group( 'developer', __( 'Developer' ) );
+		$this->register_sub_group( 'lms', __( 'LMS' ) );
 		$this->register_sub_group( 'other', __( 'Other' ) );
+		$this->register_sub_group( 'developer', __( 'Developer' ) );
 
 		/* actions */
 		$this->add_step( new Send_Email() );
@@ -101,6 +105,8 @@ class Manager {
 		$this->add_step( new Error() );
 
 		do_action( 'groundhogg/steps/init', $this );
+
+		// Order by subgroup
 	}
 
 	public function __set( $name, $value ) {
@@ -114,6 +120,18 @@ class Manager {
 	 */
 	public function add_step( $step ) {
 		$this->elements[ $step->get_type() ] = $step;
+	}
+
+	function filter_by_group( $group ){
+		return array_filter( $this->elements, function ( $element ) use ( $group ) {
+			return $element->get_group() === $group;
+		} );
+	}
+
+	function filter_by_sub_group( $group ){
+		return array_filter( $this->elements, function ( $element ) use ( $group ) {
+			return $element->get_sub_group() === $group;
+		} );
 	}
 
 	/**

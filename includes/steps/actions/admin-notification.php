@@ -56,6 +56,10 @@ class Admin_Notification extends Action {
 		return _x( 'Admin Notification', 'step_name', 'groundhogg' );
 	}
 
+	public function get_sub_group() {
+		return 'comms';
+	}
+
 	/**
 	 * Get the element type
 	 *

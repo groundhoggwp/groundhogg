@@ -44,7 +44,10 @@ class Account_Created extends Benchmark {
 	 */
 	public function get_name() {
 		return _x( 'User Created', 'step_name', 'groundhogg' );
+	}
 
+	public function get_sub_group() {
+		return 'wordpress';
 	}
 
 	/**

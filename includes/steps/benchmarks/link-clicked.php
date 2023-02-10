@@ -36,6 +36,10 @@ class Link_Clicked extends Benchmark {
 		return 'link_click';
 	}
 
+	public function get_sub_group() {
+		return 'activity';
+	}
+
 	/**
 	 * Get the description
 	 *

@@ -19,6 +19,10 @@ use function Groundhogg\html;
  */
 abstract class Form_Integration extends Benchmark {
 
+	public function get_sub_group() {
+		return 'forms';
+	}
+
 	public function add_additional_actions() {
 		add_action( "wp_ajax_get_form_integration_map_{$this->get_type()}", [ $this, 'get_map_ajax' ] );
 	}

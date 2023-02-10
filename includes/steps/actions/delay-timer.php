@@ -104,6 +104,10 @@ class Delay_Timer extends Action {
 		return 'delay_timer';
 	}
 
+    public function get_sub_group() {
+	    return 'delay';
+    }
+
 	/**
 	 * Get the description
 	 *

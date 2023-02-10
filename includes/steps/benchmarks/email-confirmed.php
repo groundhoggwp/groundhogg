@@ -47,6 +47,10 @@ class Email_Confirmed extends Benchmark {
 		return 'email_confirmed';
 	}
 
+    public function get_sub_group() {
+	    return 'crm';
+    }
+
 	/**
 	 * Get the description
 	 *

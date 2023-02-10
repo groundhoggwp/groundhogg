@@ -27,6 +27,10 @@ abstract class LMS_Enroll extends Action {
 		return 'lms_enroll';
 	}
 
+	public function get_sub_group() {
+		return 'lms';
+	}
+
 	/**
 	 * The icon
 	 *

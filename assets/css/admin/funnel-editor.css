@@ -107,7 +107,7 @@ body:not(.funnel-full-screen) #close {
 #step-settings-container .sub-header {
   background: white;
   border-bottom: 0;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
   left: 340px;
   display: flex;
   padding: 5px;
@@ -200,6 +200,12 @@ body:not(.funnel-full-screen) #close {
 }
 #step-settings-inner .step.active .step-flex .step-edit .custom-settings {
   padding: 0 20px 10px 20px;
+}
+#step-settings-inner .step.active .step-flex .step-edit .custom-settings hr {
+  border: 0;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-bottom: none;
+  margin: 0 -20px;
 }
 #step-settings-inner .step.active .step-flex .step-edit table.wp-list-table {
   border-radius: 5px;
@@ -508,7 +514,7 @@ button.button.save-button {
 }
 #step-flow .step {
   border-radius: 5px;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
   margin: 10px 0;
   background: white;
   border: 2px solid transparent;
@@ -549,6 +555,9 @@ button.button.save-button {
 }
 #step-flow .step .step-labels .step-label.logic-tag {
   background-color: #6c19ad !important;
+}
+#step-flow .step .step-labels .step-label.danger {
+  background-color: #e91f4f !important;
 }
 #step-flow .step.step-placeholder {
   justify-content: center;
@@ -708,8 +717,8 @@ button.button.save-button {
 }
 #add-steps .steps-select .steps-grid:not(.hidden) {
   display: flex;
-  flex-wrap: wrap;
   gap: 20px;
+  flex-wrap: wrap;
   margin-top: 20px;
 }
 #add-steps .steps-select .description {
@@ -720,24 +729,42 @@ button.button.save-button {
   margin-top: 0 !important;
   padding: 20px 0 0 0 !important;
 }
-#add-steps .steps-select .steps-grid > .select-step {
+#add-steps .steps-select .steps-grid .sub-group {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  border-radius: 5px;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 20px;
+}
+#add-steps .steps-select .steps-grid .sub-group > .sub-group-label {
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: #F6F9FB;
+  border-radius: 5px;
+  padding: 3px 8px;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+}
+#add-steps .steps-select .steps-grid .sub-group > .select-step {
   width: 80px;
   border-radius: 5px;
   cursor: grab;
 }
-#add-steps .steps-select .steps-grid > .select-step > .ui-draggable-dragging {
+#add-steps .steps-select .steps-grid .sub-group > .select-step > .ui-draggable-dragging {
   width: 80px;
   height: 80px;
   cursor: grabbing;
 }
-#add-steps .steps-select .steps-grid > .select-step > .ui-draggable-dragging p {
+#add-steps .steps-select .steps-grid .sub-group > .select-step > .ui-draggable-dragging p {
   display: none;
 }
-#add-steps .steps-select .steps-grid > .select-step p {
+#add-steps .steps-select .steps-grid .sub-group > .select-step p {
   font-size: 14px;
   margin: 10px 0 0 0;
 }
-#add-steps .steps-select .steps-grid > .select-step .step-icon {
+#add-steps .steps-select .steps-grid .sub-group > .select-step .step-icon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -759,7 +786,7 @@ button.button.save-button {
   bottom: 10px;
 }
 .add-step-bottom-wrap button {
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
 }
 
 .hndle input {

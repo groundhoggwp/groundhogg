@@ -40,6 +40,10 @@ abstract class Activity_Benchmark extends Benchmark {
 		];
 	}
 
+	public function get_sub_group() {
+		return 'activity';
+	}
+
 	/**
 	 * Handle the activity
 	 *

@@ -26,7 +26,6 @@ class Error extends Funnel_Step {
 
 	public function get_icon() {
 		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/no-icon.png';
-
 	}
 
 	/**
@@ -36,31 +35,17 @@ class Error extends Funnel_Step {
 	 * @return bool|\WP_Error
 	 */
 	public function run( $contact, $event ) {
-		return new \WP_Error( 'invalid_step_type', $this->get_error_message( $event->get_step() ) );
+		return new \WP_Error( 'invalid_step_type', 'This step type is not active.' );
 	}
 
-	/**
-	 * @param $step Step
-	 *
-	 * @return string
-	 */
-	protected function get_error_message( $step ) {
-		return sprintf(
-			__( '<b>%s</b> settings were not found. This may be because you disabled an add-on which utilized this step type.', 'groundhogg' ),
-			key_to_words( $step->get_type() )
-		);
-
+	public function before_step_warnings() {
+		$this->add_error( 'error', __( 'No settings were found for this step type. This may be because you disabled an add-on which utilized this step type. You should either enable the addon that registers this step type, or delete this step from the funnel.', 'groundhogg' ) );
 	}
 
 	/**
 	 * @param Step $step
 	 */
 	public function settings( $step ) {
-		echo html()->e( 'p', [
-			'class' => 'description'
-		],
-			$this->get_error_message( $step )
-		);
 	}
 
 	/**
@@ -69,8 +54,5 @@ class Error extends Funnel_Step {
 	 * @return bool
 	 */
 	public function save( $step ) {
-		$this->add_error( new \WP_Error( 'invalid_step_type', $this->get_error_message( $step ) ) );
-
-		return false;
 	}
 }

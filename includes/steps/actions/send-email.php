@@ -49,6 +49,10 @@ class Send_Email extends Action {
 		return _x( 'Send Email', 'step_name', 'groundhogg' );
 	}
 
+    public function get_sub_group() {
+	    return 'comms';
+    }
+
 	/**
 	 * Get the element type
 	 *

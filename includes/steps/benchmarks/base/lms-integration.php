@@ -10,6 +10,10 @@ use function Groundhogg\html;
 
 abstract class LMS_Integration extends Benchmark {
 
+	public function get_sub_group() {
+		return 'lms';
+	}
+
 	/**
 	 * Do the lifterLMS benchmark
 	 *

@@ -50,6 +50,10 @@ class Apply_Note extends Action {
 		return 'apply_note';
 	}
 
+	public function get_sub_group() {
+		return 'crm';
+	}
+
 	/**
 	 * Get the description
 	 *

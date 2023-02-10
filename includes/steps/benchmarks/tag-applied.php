@@ -58,6 +58,10 @@ class Tag_Applied extends Benchmark {
 		return 'tag_applied';
 	}
 
+    public function get_sub_group() {
+	    return 'crm';
+    }
+
 	/**
 	 * Get the description
 	 *

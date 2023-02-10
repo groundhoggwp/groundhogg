@@ -274,7 +274,8 @@ input[type=range].slider:focus::-ms-fill-upper {
 .select2-container .select2-search--inline .select2-search__field {
   min-height: 0;
   line-height: 1;
-  padding-left: 10px;
+  width:initial !important;
+  //padding-left: 10px;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__rendered li {

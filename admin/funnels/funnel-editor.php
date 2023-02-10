@@ -3,18 +3,15 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
-use Groundhogg\Step;
-use function Groundhogg\Admin\Reports\Views\get_funnel_id;
+use Groundhogg\Plugin;
+use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
-use function Groundhogg\groundhogg_logo;
-use function Groundhogg\is_option_enabled;
-use function Groundhogg\is_white_labeled;
-use function Groundhogg\key_to_words;
-use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_white_labeled;
 
 /**
  * Edit Funnel
@@ -36,6 +33,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 $funnel_id = absint( get_request_var( 'funnel' ) );
 
 $funnel = new Funnel( $funnel_id );
+
+/**
+ * @param $steps Funnel_Step[]
+ *
+ * @return void
+ */
+function render_draggable_step_grid( $steps ) {
+
+    $sub_groups = Plugin::instance()->step_manager->sub_groups;
+
+    foreach ( $sub_groups as $sub_group_id => $name ){
+
+        $_steps = array_filter( $steps, function ( $step ) use ( $sub_group_id ){
+            return $step->get_sub_group() === $sub_group_id;
+        } );
+
+        if ( empty( $_steps ) ){
+            continue;
+        }
+
+        ?><div class="sub-group">
+        <span class="sub-group-label">
+            <?php _e( $name ) ?>
+        </span><?php
+
+	    foreach ( $_steps as $step ):
+
+		    if ( $step->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ) {
+			    continue;
+		    }
+
+		    ?>
+            <div class="select-step">
+            <div id='<?php echo $step->get_type(); ?>'
+                 data-group="<?php echo $step->get_group(); ?>"
+                 title="<?php esc_attr_e( $step->get_description() ); ?>"
+                 class="wpgh-element ui-draggable">
+                <div class="step-icon">
+                    <img src="<?php echo esc_url( $step->get_icon() ); ?>">
+                </div>
+                <p><?php echo $step->get_name() ?></p></div>
+            </div><?php
+	    endforeach;
+
+        ?></div><?php
+
+    }
+
+}
 
 ?>
 <form method="post" id="funnel-form">
@@ -195,52 +241,13 @@ $funnel = new Funnel( $funnel_id );
                                     data-group="actions"><?php _e( 'Actions' ) ?></button>
                         </div>
                         <div id='benchmarks' class="hidden steps-grid">
-							<?php
-							$benchmarks = Plugin::$instance->step_manager->get_benchmarks();
-							foreach ( $benchmarks as $benchmark ):
-
-                                if ( $benchmark->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ){
-                                    continue;
-                                }
-
-								?>
-                                <div class="select-step">
-                                <div id='<?php echo $benchmark->get_type(); ?>'
-                                     title="<?php esc_attr_e( $benchmark->get_description() ); ?>"
-                                     data-group="benchmark"
-                                     class="wpgh-element ui-draggable">
-                                    <div class="step-icon">
-                                        <img src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
-                                    </div>
-                                    <p><?php echo $benchmark->get_name() ?></p>
-                                </div>
-                                </div><?php
-
-							endforeach;
-
-							?>
+	                        <?php
+	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
+	                        ?>
                         </div>
                         <div id='actions' class="steps-grid">
 							<?php
-							$actions = Plugin::$instance->step_manager->get_actions();
-							foreach ( $actions as $action ):
-
-								if ( $action->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ){
-									continue;
-								}
-
-								?>
-                                <div class="select-step">
-                                <div id='<?php echo $action->get_type(); ?>'
-                                     data-group="action"
-                                     title="<?php esc_attr_e( $action->get_description() ); ?>"
-                                     class="wpgh-element ui-draggable">
-                                    <div class="step-icon">
-                                        <img src="<?php echo esc_url( $action->get_icon() ); ?>">
-                                    </div>
-                                    <p><?php echo $action->get_name() ?></p></div>
-                                </div><?php
-							endforeach;
+							render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
 							?>
                         </div>
                     </div>

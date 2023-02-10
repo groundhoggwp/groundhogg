@@ -262,11 +262,11 @@ class Events_Table extends WP_List_Table {
 				$actions['execute_now'] = _x( 'Run Now', 'List table bulk action', 'groundhogg' );
 				$actions['cancel']      = _x( 'Cancel', 'List table bulk action', 'groundhogg' );
 				break;
-			case 'complete':
-			case 'skipped':
 			case 'cancelled':
 				$actions['uncancel'] = _x( 'Uncancel', 'List table bulk action', 'groundhogg' );
 				break;
+			case 'skipped':
+			case 'complete':
 			case 'failed':
 				$actions['execute_again'] = _x( 'Run Again', 'List table bulk action', 'groundhogg' );
 				break;

@@ -56,6 +56,10 @@ class Remove_Tag extends Action {
 		return 'remove_tag';
 	}
 
+	public function get_sub_group() {
+		return 'crm';
+	}
+
 	/**
 	 * Get the description
 	 *
