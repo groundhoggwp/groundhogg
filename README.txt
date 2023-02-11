@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.8.5
+Stable tag: 2.7.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -323,7 +323,8 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 2.7.9 (2023-02-10) =
-* ADDED New categrories UI optimization for funnel steps for easier funnel builfing
+* ADDED New categories UI optimization for funnel steps for easier funnel building.
+* ADDED Ability to expire replacements cache results.
 
 = 2.7.8.5 (2023-02-01) =
 * ADDED Logs management screen and tools for debugging and cleaning up logs.
