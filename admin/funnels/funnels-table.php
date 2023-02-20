@@ -2,22 +2,16 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
+use Groundhogg\Manager;
+use Groundhogg\Plugin;
+use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
-use function Groundhogg\is_option_enabled;
-use function Groundhogg\isset_not_empty;
-use Groundhogg\Plugin;
-use \WP_List_Table;
-use Groundhogg\Contact_Query;
-use Groundhogg\Admin\Funnels\Funnels_Page;
-use Groundhogg\Manager;
-
-use function Groundhogg\get_request_var;
 use function Groundhogg\scheduled_time_column;
 
 
@@ -26,11 +20,11 @@ use function Groundhogg\scheduled_time_column;
  *
  * This class shows the data table for accessing information about an email.
  *
- * @package     groundhogg
+ * @since       0.1
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     groundhogg
  */
 
 // Exit if accessed directly
@@ -68,8 +62,8 @@ class Funnels_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 
@@ -263,7 +257,7 @@ class Funnels_Table extends WP_List_Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $funnel A singular item (one full row's worth of data).
+	 * @param object $funnel      A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -299,16 +293,35 @@ class Funnels_Table extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 
-		if ( $this->get_view() === 'archived' ) {
-			$actions = array(
-				'delete'  => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
-				'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
-			);
 
-		} else {
-			$actions = array(
-				'archive' => _x( 'Archive', 'List table bulk action', 'groundhogg' )
-			);
+		switch ( $this->get_view() ) {
+			case 'active':
+
+				$actions = [
+					'deactivate' => _x( 'Deactivate', 'List table bulk action', 'groundhogg' ),
+					'archive'    => _x( 'Archive', 'List table bulk action', 'groundhogg' )
+				];
+
+				break;
+
+			case 'inactive':
+
+				$actions = [
+					'activate' => _x( 'Activate', 'List table bulk action', 'groundhogg' ),
+					'archive'  => _x( 'Archive', 'List table bulk action', 'groundhogg' )
+				];
+
+				break;
+
+			case 'archived':
+
+				$actions = [
+					'delete'  => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
+					'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
+				];
+
+				break;
+
 		}
 
 		return apply_filters( 'groundhogg_email_bulk_actions', $actions );

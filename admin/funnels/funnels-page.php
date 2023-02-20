@@ -46,10 +46,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     groundhogg
  */
 class Funnels_Page extends Admin_Page {
-	/**
-	 * @var
-	 */
-	public $reporting_enabled = false;
 
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
@@ -301,34 +297,74 @@ class Funnels_Page extends Admin_Page {
 		return false;
 	}
 
+    public function update_funnels_status( $status ){
+
+        if ( ! current_user_can( 'edit_funnels' ) ) {
+		    $this->wp_die_no_access();
+	    }
+
+        $updated = 0;
+
+	    foreach ( $this->get_items() as $id ) {
+		    $funnel = new Funnel( $id );
+
+		    if ( ! $funnel->exists() ) {
+			    continue;
+		    }
+
+		    if ( $funnel->update( [
+			    'status' => $status
+		    ] ) ){
+                $updated++;
+            }
+	    }
+
+	    return $updated;
+    }
+
 	public function process_restore() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		foreach ( $this->get_items() as $id ) {
-			$funnel = new Funnel( $id );
-
-			if ( ! $funnel->exists() ) {
-				continue;
-			}
-
-			$funnel->update( [
-				'status' => 'archived'
-			] );
-		}
+		$updated = $this->update_funnels_status( 'inactive' );
 
 		$this->add_notice(
 			esc_attr( 'restored' ),
-			sprintf( _nx( 'Restored %d funnel', 'Deleted %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			sprintf( _nx( 'Restored %d funnel', 'Restored %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
 			'success'
 		);
+	}
 
-		return false;
+	public function process_archive() {
+		$updated = $this->update_funnels_status( 'archived' );
+
+		$this->add_notice(
+			esc_attr( 'archived' ),
+			sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			'success'
+		);
+	}
+
+	public function process_deactivate() {
+		$updated = $this->update_funnels_status( 'deactivate' );
+
+		$this->add_notice(
+			esc_attr( 'deactivated' ),
+			sprintf( _nx( 'Deactivated %d funnel', 'Deactivated %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			'success'
+		);
+	}
+
+	public function process_activate() {
+		$updated = $this->update_funnels_status( 'active' );
+
+		$this->add_notice(
+			esc_attr( 'activated' ),
+			sprintf( _nx( 'Activated %d funnel', 'Activated %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			'success'
+		);
 	}
 
 	public function process_duplicate() {
-		if ( ! current_user_can( 'add_funnels' ) ) {
+
+        if ( ! current_user_can( 'add_funnels' ) ) {
 			$this->wp_die_no_access();
 		}
 
@@ -353,43 +389,6 @@ class Funnels_Page extends Admin_Page {
 
 			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
 		}
-
-		return false;
-	}
-
-	/**
-	 * Archive a funnel
-	 *
-	 * @return bool
-	 */
-	public function process_archive() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		foreach ( $this->get_items() as $id ) {
-
-			$funnel = new Funnel( $id );
-
-			if ( ! $funnel->exists() ) {
-				continue;
-			}
-
-			$funnel->update( [
-				'status' => 'archived'
-			] );
-		}
-
-		$this->add_notice(
-			esc_attr( 'archived' ),
-			sprintf( _nx(
-				'Archived %d funnel',
-				'Archived %d funnels',
-				count( $this->get_items() ),
-				'notice', 'groundhogg' ),
-				count( $this->get_items() ) ),
-			'success'
-		);
 
 		return false;
 	}
