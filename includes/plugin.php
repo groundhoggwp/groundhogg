@@ -351,6 +351,7 @@ class Plugin {
 		\Groundhogg_Email_Services::init();
 
 		new Plugin_Compatibility();
+		new License_Manager();
 	}
 
 	/**
