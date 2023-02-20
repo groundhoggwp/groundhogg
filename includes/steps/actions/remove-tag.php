@@ -10,6 +10,7 @@ use function Groundhogg\andList;
 use function Groundhogg\array_bold;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
 
@@ -84,18 +85,15 @@ class Remove_Tag extends Action {
 	 */
 	public function settings( $step ) {
 
-		$this->start_controls_section();
+		echo html()->e( 'p', [], __( 'Remove all of the following tags...', 'groundhogg' ) );
 
-		$this->add_control( 'tags', [
-			'label'       => __( 'Remove These Tags:', 'groundhogg' ),
-			'type'        => HTML::TAG_PICKER,
-			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
-			'field'       => [
-				'multiple' => true,
-			]
+		echo html()->tag_picker( [
+			'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
+			'multiple' => true,
+			'selected' => $this->get_setting( 'tags' )
 		] );
 
-		$this->end_controls_section();
+		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
 	}
 
 	/**
@@ -106,38 +104,22 @@ class Remove_Tag extends Action {
 	public function save( $step ) {
 		$tags = validate_tags( $this->get_posted_data( 'tags', [] ) );
 		$this->save_setting( 'tags', $tags );
-		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
-
-		if ( ! force_custom_step_names() ) {
-
-			if ( empty( $tags ) ) {
-				$name = __( 'Remove tags', 'groundhogg' );
-			} else if ( count( $tags ) >= 4 ) {
-				$name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-			} else {
-				$name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
-			}
-
-			$step->update( [
-				'step_title' => $name
-			] );
-		}
 	}
 
-	public function step_title_edit( $step ) {
+    public function generate_step_title( $step ) {
 
-		if ( force_custom_step_names() ) {
-			parent::step_title_edit( $step );
+	    $tags = array_bold( parse_tag_list( $this->get_setting( 'tags' ), 'name', false ) );
 
-			return;
-		}
+        if ( empty( $tags ) ) {
+		    $name = __( 'Remove tags', 'groundhogg' );
+	    } else if ( count( $tags ) >= 4 ) {
+		    $name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+	    } else {
+		    $name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
+	    }
 
-		?>
-        <div class="gh-panel-header">
-            <h2><?php _e( 'Remove Tag Settings' ) ?></h2>
-        </div>
-		<?php
-	}
+	    return $name;
+    }
 
 	/**
 	 * Process the apply tag step...

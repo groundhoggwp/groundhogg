@@ -2,11 +2,15 @@
 
 namespace Groundhogg\Steps\Benchmarks\Base;
 
+use Groundhogg\Api\V4\Properties_Api;
 use Groundhogg\Contact;
 use Groundhogg\Step;
 use Groundhogg\Steps\Benchmarks\Benchmark;
+use function Groundhogg\array_bold;
+use function Groundhogg\bold_it;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\html;
+use function Groundhogg\orList;
 
 abstract class LMS_Integration extends Benchmark {
 
@@ -88,8 +92,13 @@ abstract class LMS_Integration extends Benchmark {
 			return false;
 		}
 
-		if ( ! empty( $course_ids ) && ! empty( $lesson_ids ) && ! in_array( $this->get_data( 'lesson' ), $lesson_ids ) ) {
-			return false;
+		// Don't check lessons when not relevant
+		if ( $this->get_data( 'action' ) === 'lesson_completed' ) {
+
+			if ( ! empty( $course_ids ) && ! empty( $lesson_ids ) && ! in_array( $this->get_data( 'lesson' ), $lesson_ids ) ) {
+				return false;
+			}
+
 		}
 
 		return true;
@@ -129,85 +138,107 @@ abstract class LMS_Integration extends Benchmark {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		html()->start_form_table();
-
-		// ACTION
-		html()->start_row();
-
-		html()->th( [
-			__( 'Events', 'groundhogg' )
-		] );
-
 		$actions    = wp_parse_list( $this->get_setting( 'action' ) );
 		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
 		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
 
-		html()->td( [
-			html()->select2( [
-				'id'       => $this->setting_id_prefix( 'action' ),
-				'name'     => $this->setting_name_prefix( 'action' ) . '[]',
-				'class'    => 'gh-select2',
-				'options'  => [
-					'course_enrolled'  => __( 'Enrolled in a course', 'groundhogg' ),
-					'course_completed' => __( 'Completed a course', 'groundhogg' ),
-					'lesson_completed' => __( 'Completed a lesson', 'groundhogg' ),
-				],
-				'selected' => $actions,
-				'multiple' => true,
-			] )
+		echo html()->e( 'p', [], __( 'When a contact...', 'groundhogg' ) );
+
+		echo html()->select2( [
+			'id'       => $this->setting_id_prefix( 'action' ),
+			'name'     => $this->setting_name_prefix( 'action' ) . '[]',
+			'class'    => 'gh-select2',
+			'options'  => [
+				'course_enrolled'  => __( 'Enrolls in a course', 'groundhogg' ),
+				'course_completed' => __( 'Completes a course', 'groundhogg' ),
+				'lesson_completed' => __( 'Completes a lesson', 'groundhogg' ),
+			],
+			'selected' => $actions,
+			'multiple' => true,
 		] );
 
-		html()->end_row();
+		echo html()->e( 'p', [], __( 'For any of the following courses...', 'groundhogg' ) );
 
-		// COURSE
-		html()->start_row();
-
-		html()->th( [
-			__( 'Filter by course', 'groundhogg' )
+		echo html()->select2( [
+			'id'          => $this->setting_id_prefix( 'course' ),
+			'name'        => $this->setting_name_prefix( 'course' ) . '[]',
+			'data'        => $this->get_courses_for_select(),
+			'selected'    => $course_ids,
+			'class'       => 'gh-select2',
+			'multiple'    => true,
+			'placeholder' => 'Any course'
 		] );
 
-		html()->td( [
-			html()->select2( [
-				'id'       => $this->setting_id_prefix( 'course' ),
-				'name'     => $this->setting_name_prefix( 'course' ) . '[]',
-				'data'     => $this->get_courses_for_select(),
-				'selected' => $course_ids,
-				'class'    => 'gh-select2',
-				'multiple' => true,
-			] ),
-			html()->description( 'Leave empty for any course.' )
+		echo html()->e( 'p', [], __( 'And for any of the following lessons... <i>Only relevant for lesson events.</i>', 'groundhogg' ) );
+
+		echo html()->select2( [
+			'id'          => $this->setting_id_prefix( 'lesson' ),
+			'name'        => $this->setting_name_prefix( 'lesson' ) . '[]',
+			'data'        => $this->get_lessons_for_select( $course_ids ),
+			'selected'    => $lesson_ids,
+			'multiple'    => true,
+			'placeholder' => 'Any lesson'
 		] );
 
-		html()->end_row();
 
-		if ( empty( $course_ids ) ) {
-			html()->end_form_table();
+		?><p></p><?php
 
-			return;
+	}
+
+	public function generate_step_title( $step ) {
+
+		$actions    = wp_parse_list( $this->get_setting( 'action' ) );
+
+        if ( empty( $actions ) ){
+            return 'LMS event';
+        }
+
+		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
+		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
+
+		$courses = array_map( 'get_the_title', $course_ids );
+		$lessons = array_map( 'get_the_title', $lesson_ids );
+
+		$courses = orList( array_bold( $courses ) );
+
+		if ( empty( $courses ) ) {
+			$courses = bold_it( 'any course' );
 		}
 
+		$lessons = orList( array_bold( $lessons ) );
 
-		// COURSE
-		html()->start_row();
+		if ( empty( $lessons ) ) {
+			$lessons = bold_it( 'any lesson' );
+		}
 
-		html()->th( [
-			__( 'Filter by lesson', 'groundhogg' )
-		] );
+		if ( count( $actions ) === 1 ) {
+			switch ( $actions[0] ) {
+				default:
+				case 'course_enrolled':
+					return sprintf( 'Enrolls in %s', $courses );
+				case 'course_completed':
+					return sprintf( 'Completes %s', $courses );
+				case 'lesson_completed':
+					return sprintf( 'Completes %s in %s', $lessons, $courses );
+			}
+		}
 
-		html()->td( [
-			html()->select2( [
-				'id'       => $this->setting_id_prefix( 'lesson' ),
-				'name'     => $this->setting_name_prefix( 'lesson' ) . '[]',
-				'data'     => $this->get_lessons_for_select( $course_ids ),
-				'selected' => $this->get_setting( 'lesson' ),
-				'multiple' => true,
-			] ),
-			html()->description( 'Leave empty for any lesson. Update the funnel to see updated choices.' )
-		] );
+        if ( in_array( 'lesson_completed', $actions ) ){
 
-		html()->end_row();
+            $events = [
+	            'course_enrolled'  => __( 'Enrolls in a course', 'groundhogg' ),
+	            'course_completed' => __( 'Completes a course', 'groundhogg' ),
+	            'lesson_completed' => __( 'Completes a lesson', 'groundhogg' )
+            ];
 
-		html()->end_form_table();
+            $actions = array_intersect_key( $events, array_combine( $actions, $actions ) );
+
+	        return orList( array_bold( array_values( $actions ) ) );
+        }
+
+        $actions = orList( array_bold( [ 'Completes', 'Enrolls in' ] ) );
+
+        return sprintf( '%s %s', $actions, $courses );
 	}
 
 	/**

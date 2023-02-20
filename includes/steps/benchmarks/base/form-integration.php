@@ -5,6 +5,7 @@ namespace Groundhogg\Steps\Benchmarks;
 use Groundhogg\Contact;
 use Groundhogg\Step;
 use function Groundhogg\after_form_submit_handler;
+use function Groundhogg\bold_it;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
@@ -59,7 +60,7 @@ abstract class Form_Integration extends Benchmark {
 	public function settings( $step ) {
 
 
-		echo html()->e( 'p', [], html()->e( 'b', [], __( 'Run when this form is submitted', 'groundhogg' ) ) );
+		echo html()->e( 'p', [], __( 'Run when this form is submitted...', 'groundhogg' ) );
 
 		echo html()->e( 'div', [
 			'class' => 'display-flex gap-10 stretch'
@@ -203,6 +204,23 @@ abstract class Form_Integration extends Benchmark {
 		}
 
 		$this->save_setting( 'field_map', $field_map );
+	}
+
+	public function generate_step_title( $step ) {
+		$form_id = $this->get_setting( 'form_id' );
+
+		if ( ! $form_id ) {
+			return 'Submits a form';
+		}
+
+		// Gets the title for the form
+		$title = get_the_title( $form_id );
+
+		if ( ! $title ) {
+			return null;
+		}
+
+		return sprintf( 'Submits %s', bold_it( $title ) );
 	}
 
 	/**

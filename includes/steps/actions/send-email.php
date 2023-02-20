@@ -8,8 +8,8 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
-use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_array_var;
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,9 +49,9 @@ class Send_Email extends Action {
 		return _x( 'Send Email', 'step_name', 'groundhogg' );
 	}
 
-    public function get_sub_group() {
-	    return 'comms';
-    }
+	public function get_sub_group() {
+		return 'comms';
+	}
 
 	/**
 	 * Get the element type
@@ -90,21 +90,6 @@ class Send_Email extends Action {
 		) );
 	}
 
-	public function step_title_edit( $step ) {
-
-		if ( force_custom_step_names() ) {
-			parent::step_title_edit( $step );
-
-			return;
-		}
-
-		?>
-        <div class="gh-panel-header">
-            <h2><?php _e( 'Email Settings' ) ?></h2>
-        </div>
-		<?php
-	}
-
 	/**
 	 * Display the settings
 	 *
@@ -112,64 +97,60 @@ class Send_Email extends Action {
 	 */
 	public function settings( $step ) {
 
-		$html = Plugin::$instance->utils->html;
-
 		$email_id = $this->get_setting( 'email_id' );
 		$email    = new Email( $email_id );
 
-		$html->start_form_table();
+		echo html()->e( 'p', [], __( 'Select an email template to send...', 'groundhogg' ) );
 
-		$html->start_row();
+		echo html()->dropdown_emails( [
+			'name'     => $this->setting_name_prefix( 'email_id' ),
+			'id'       => $this->setting_id_prefix( 'email_id' ),
+			'selected' => $this->get_setting( 'email_id' ),
+		] );
 
-		$html->th( __( 'Select an email to send:', 'groundhogg' ) );
-		$html->td( [
-			// EMAIL ID DROPDOWN
-			$html->dropdown_emails( [
-				'name'     => $this->setting_name_prefix( 'email_id' ),
-				'id'       => $this->setting_id_prefix( 'email_id' ),
-				'selected' => $this->get_setting( 'email_id' ),
-			] ),
-			// ROW ACTIONS
-			"<div class='display-flex gap-10' style='margin-top: 10px'>",
-			// EDIT EMAIL
-			$html->button( [
+		?><p></p><?php
+
+		echo html()->e( 'div', [
+			'class' => 'display-flex gap-10'
+		], [
+			html()->button( [
 				'title' => 'Edit Email',
 				'text'  => _x( 'Edit Email', 'action', 'groundhogg' ),
 				'class' => 'gh-button primary edit-email',
 			] ),
 			// ADD NEW EMAIL
-			$html->button( [
+			html()->button( [
 				'title' => 'Create New Email',
 				'text'  => _x( 'Create New Email', 'action', 'groundhogg' ),
 				'class' => 'gh-button secondary add-email',
 			] ),
-			"</div>",
-			// ADD EMAIL OVERRIDE
-			$html->input( [
-				'type'  => 'hidden',
-				'name'  => $this->setting_name_prefix( 'add_email_override' ),
-				'id'    => $this->setting_id_prefix( 'add_email_override' ),
-				'class' => 'add-email-override',
-			] )
 		] );
 
-		$html->end_row();
+        echo html()->input( [
+	        'type'  => 'hidden',
+	        'name'  => $this->setting_name_prefix( 'add_email_override' ),
+	        'id'    => $this->setting_id_prefix( 'add_email_override' ),
+	        'class' => 'add-email-override',
+        ] );
 
-		if ( $email && $email->is_confirmation_email() ) {
-			$html->add_form_control( [
-				'label'       => __( 'Skip if confirmed?', 'groundhogg' ),
-				'type'        => HTML::CHECKBOX,
-				'field'       => [
+		if ( $email->is_confirmation_email() ) {
+
+			echo html()->e( 'div', [
+				'class' => 'display-flex gap-10 align-center'
+			], [
+				html()->e( 'p', [], __( "Skip this email if the contact's email address is already confirmed?", 'groundhogg' ) ),
+				html()->checkbox( [
+					'label'    => __( 'Yes' ),
 					'name'    => $this->setting_name_prefix( 'skip_if_confirmed' ),
 					'id'      => $this->setting_id_prefix( 'skip_if_confirmed' ),
-					'label'   => __( 'Enable', 'groundhogg' ),
 					'checked' => (bool) $this->get_setting( 'skip_if_confirmed' )
-				],
-				'description' => __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' ),
+				] )
 			] );
 		}
 
-		$html->end_form_table();
+		html()->end_form_table();
+
+        ?><p></p><?php
 	}
 
 	public function validate_settings( Step $step ) {
@@ -205,12 +186,17 @@ class Send_Email extends Action {
 		}
 
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
+	}
 
-		if ( ! force_custom_step_names() && $email->exists() ) {
-			$step->update( [
-				'step_title' => sprintf( __( 'Send %s', 'groundhogg' ), '<b>' . $email->get_title() . '</b>' )
-			] );
+	public function generate_step_title( $step ) {
+
+		$email = new Email( $this->get_setting( 'email_id' ) );
+
+		if ( ! $email->exists() ) {
+			return 'Send an email';
 		}
+
+		return sprintf( __( 'Send %s', 'groundhogg' ), '<b>' . $email->get_title() . '</b>' );
 	}
 
 	/**
