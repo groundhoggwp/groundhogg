@@ -785,6 +785,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$note = new Note( $note_data );
 
 		} else if ( is_array( $note ) ) {
+
+			// Undefined content
+			if ( empty( $note['content'] ) ){
+				return false;
+			}
+
 			// imported note
 			$note_data = array_merge( $note, [
 				'object_id'   => $this->get_id(),
