@@ -6,8 +6,9 @@ namespace Groundhogg\Api\V4;
 use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Event;
-use Groundhogg\Plugin;
 use WP_REST_Server;
+use function Groundhogg\array_map_to_contacts;
+use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
@@ -130,10 +131,20 @@ class Emails_Api extends Base_Object_Api {
 			return self::ERROR_401( 'no_recipients', 'No recipients were defined.' );
 		}
 
+		// Get relevant contact records
+		$contactRecords = $to;
+		$contactRecords = array_map_to_contacts( $contactRecords );
+		$contact        = array_shift( $contactRecords );
+
 		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
 		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
 
-		$content = $request->get_param( 'content' );
+		$content = $request->get_param( 'content' ) ;
+
+		// Replacements will be based on the first email address provided
+		if ( $contact && $contact->exists() ){
+			$content = do_replacements( $content, $contact );
+		}
 
 		if ( apply_filters( 'groundhogg/add_custom_footer_text_to_personal_emails', true ) ) {
 			$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
