@@ -363,12 +363,13 @@ abstract class Admin_Page extends Supports_Errors {
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
             <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>
-                <input type="search" id="post-search-input" name="<?php echo $name ?>"
+            <label class="screen-reader-text" for="gh-post-search-input"><?php echo $title; ?>:</label>
+
+            <div style="float: right" class="gh-input-group">
+                <input type="search" id="gh-post-search-input" name="<?php echo $name ?>"
                        value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
-                <input type="submit" id="search-submit" class="button button-primary" value="<?php esc_attr_e( $title ); ?>">
-            </p>
+                <button type="submit" id="search-submit" class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+            </div>
         </form>
 		<?php
 	}
@@ -457,7 +458,7 @@ abstract class Admin_Page extends Supports_Errors {
 			] );
 
 			echo html()->e( 'a', [
-				'class'  => 'page-title-action aria-button-if-js ' . $action['classes'],
+				'class'  => 'page-title-action aria-button-if-js gh-button secondary' . $action['classes'],
 				'target' => $action['target'],
 				'href'   => $action['link'],
 				'id'     => $action['id'],

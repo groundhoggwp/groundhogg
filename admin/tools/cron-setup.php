@@ -80,7 +80,7 @@ switch ( $step ):
 		?>
 		<div class="gh-tools-wrap">
 			<p class="tools-help"><?php _e( 'Cron Job Setup', 'groundhogg' ); ?></p>
-			<div class="gh-tools-box">
+			<div class="gh-tools-box gh-panel">
 				<p><?php printf( __( 'Follow these steps to optimize your WordPress & %s installation!', 'groundhogg' ), white_labeled_name() ); ?></p>
 				<p><?php _e( 'It should only take a few minutes to complete.', 'groundhogg' ); ?></p>
 				<?php
@@ -99,7 +99,7 @@ switch ( $step ):
 		?>
 		<div class="gh-tools-wrap">
 			<p class="tools-help"><?php _e( 'Install Cron Files', 'groundhogg' ); ?></p>
-			<div class="gh-tools-box">
+			<div class="gh-tools-box gh-panel">
 				<h3><?php printf( __( '%s Cron File' ), white_labeled_name() ) ?></h3>
 				<p><?php _e( 'This file can be installed automatically.', 'groundhogg' ); ?></p>
 				<p>
@@ -144,7 +144,7 @@ switch ( $step ):
 		?>
 		<div class="gh-tools-wrap">
 			<p class="tools-help"><?php _e( 'Create External Cron Jobs', 'groundhogg' ); ?></p>
-			<div class="gh-tools-box">
+			<div class="gh-tools-box gh-panel">
 				<p><?php _e( 'You must create <b>external cron jobs</b> which will ping your site on regular intervals and make sure that scheduled events, like emails, run on time.', 'groundhogg' ); ?></p>
 				<hr/>
 				<?php foreach ( $cron_jobs as $cron_job_id => $cron_job ): ?>
@@ -171,7 +171,7 @@ switch ( $step ):
 		?>
 		<div class="gh-tools-wrap">
 			<p class="tools-help"><?php _e( 'Verify Setup', 'groundhogg' ); ?></p>
-			<div class="gh-tools-box">
+			<div class="gh-tools-box gh-panel">
 				<p><?php _e( "Let's check to make sure you set up everything up correctly.", 'groundhogg' ); ?></p>
 				<hr/>
 				<?php if ( ! gh_cron_installed() ): ?>

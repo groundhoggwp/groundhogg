@@ -58,8 +58,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				<h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php _e( 'Tags' ); ?></h2>
                 <button type="button" class="toggle-indicator" aria-expanded="true"></button>
             </div>
-			<div class="inside"
-			     title="<?php esc_attr_e( 'Tags' ); ?>">
+			<div class="inside">
 				<div id="tags-here"></div>
 			</div>
 		</div>
@@ -199,7 +198,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									_e( 'Birthday', 'groundhogg' );
 
 									if ( $contact->get_age() ) :
-										?><span
+										?><span style="margin-left: 10px"
 										class="pill green"><?php printf( __( '%d years old', 'groundhogg' ), $contact->get_age() ); ?></span>
 									<?php
 									endif; ?>
