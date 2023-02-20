@@ -1689,7 +1689,7 @@ ${ afterProgress() }`,
                     value: cell,
                     dataRow: rowIndex,
                     dataCell: cellIndex,
-                })).join('') }
+                }, row )).join('') }
                 ${ sortable ? `<span class="handle" data-row="${ rowIndex }"><span
 					class="dashicons dashicons-move"></span></span>` : '' }
                 <button class="gh-button dashicon remove-row" data-row="${ rowIndex }"><span
