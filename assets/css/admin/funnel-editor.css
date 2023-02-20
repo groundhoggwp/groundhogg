@@ -596,6 +596,10 @@ button.button.save-button {
 #step-flow .step > .hndle > div span.step-title {
   font-size: 14px;
 }
+#step-flow .step > .hndle > div span.step-title code {
+  border-radius: 4px;
+  padding: 1px 3px;
+}
 #step-flow .step > .hndle > div span.step-name {
   /*margin-left:6px;*/
   font-size: 8px;
