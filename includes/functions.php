@@ -2824,6 +2824,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'notes':
 
+				if ( is_array( $notes ) ) {
+					$notes = array_merge( $notes, $notes );
+					break;
+				}
+
 				if ( $json = json_decode( $value, true ) ) {
 					$notes = array_merge( $notes, $json );
 				} else {
@@ -3975,18 +3980,36 @@ function mobile_validator() {
  * @return bool|string
  */
 function validate_mobile_number( $number, $country_code = '', $with_plus = true ) {
+
+    // Remove non-digits
+	$number = preg_replace( "/[^0-9]/", "", $number );
+
+	// Keep initial number
+    $initial = $number;
+
 	if ( ! $country_code ) {
 		$country_code = get_default_country_code();
 	}
 
-	$number = preg_replace( "/[^0-9]/", "", $number );
-
 	if ( ! number_has_country_code( $number ) ) {
 		$number = \Groundhogg\mobile_validator()->normalize( $number, $country_code );
+
+        // Try neighboring country
+        if ( empty( $number ) ){
+            switch ( $country_code ){
+                case 'US':
+	                $number = \Groundhogg\mobile_validator()->normalize( $number, 'CA' );
+	                break;
+                case 'CA':
+	                $number = \Groundhogg\mobile_validator()->normalize( $number, 'US' );
+                    break;
+            }
+        }
 	}
 
+    // Unable to validate number, could be because of a mismatch of country code to number
 	if ( empty( $number ) ) {
-		return false;
+		return $initial;
 	}
 
 	// Number may come from validator meaning it will be in array
@@ -4555,13 +4578,13 @@ function convert_to_utc_0( $time ) {
  *
  * @return array|mixed
  */
-function get_owner_roles(){
+function get_owner_roles() {
 
-    static $roles;
+	static $roles;
 
-    if ( ! empty( $roles ) ){
-        return $roles;
-    }
+	if ( ! empty( $roles ) ) {
+		return $roles;
+	}
 
 	$roles = [];
 
@@ -4571,11 +4594,11 @@ function get_owner_roles(){
 		}
 	}
 
-    if ( empty( $roles ) ){
-        return Main_Roles::get_owner_roles();
-    }
+	if ( empty( $roles ) ) {
+		return Main_Roles::get_owner_roles();
+	}
 
-    return $roles;
+	return $roles;
 }
 
 /**
@@ -4595,11 +4618,12 @@ function get_owners() {
 	$cached_users = get_option( 'gh_owners' );
 
 	if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
-		return array_map( 'get_userdata', wp_parse_id_list( $cached_users ) );
+		return array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
 	}
 
 	$users    = get_users( [ 'role__in' => get_owner_roles() ] );
-	$user_ids = array_map( function ( $user ) {
+
+    $user_ids = array_map( function ( $user ) {
 		return $user->ID;
 	}, $users );
 
@@ -5558,6 +5582,36 @@ function array_unique_cb( $array, $callback ) {
 }
 
 /**
+ * Filters out elements from that match the predicate from the original array
+ * Does not preserve keys
+ *
+ * @param $array     array
+ * @param $predicate callable
+ *
+ * @return array the filtered array
+ */
+function array_filter_splice( &$array, $predicate ) {
+	$new_array = [];
+
+	$filtered = array_filter( $array, function ( $item ) use ( $predicate, &$new_array ) {
+
+		// Item matched predicate, remove from original
+		if ( call_user_func( $predicate, $item ) ) {
+			return true;
+		}
+
+		$new_array[] = $item;
+
+		return false;
+	} );
+
+	// Set the original array to the array with elements filtered out
+	$array = $new_array;
+
+	return $filtered;
+}
+
+/**
  * Sanitize any type email header
  *
  * @param $header_value
@@ -5741,6 +5795,24 @@ function array_map_to_contacts( &$array ) {
  */
 function array_map_to_step( &$array ) {
 	return array_map_to_class( $array, Step::class );
+}
+
+/**
+ * Get a list of active steps
+ *
+ * @param $type
+ *
+ * @return Step[]
+ */
+function get_active_steps( $type ) {
+	$steps = get_db( 'steps' )->query( [
+		'step_type'   => $type,
+		'step_status' => 'active'
+	] );
+
+    array_map_to_step( $steps );
+
+    return $steps;
 }
 
 /**
@@ -6793,9 +6865,23 @@ function force_custom_step_names() {
 	return is_option_enabled( 'gh_force_custom_step_names' ) || ! site_locale_is_english();
 }
 
+function bold_it( $content ) {
+	return html()->e( 'b', [], $content, false );
+}
+
+function code_it( $content ) {
+	return html()->e( 'code', [], $content, false );
+}
+
 function array_bold( $array ) {
 	return array_map( function ( $item ) {
-		return html()->e( 'b', [], $item );
+		return bold_it( $item );
+	}, $array );
+}
+
+function array_code( $array ) {
+	return array_map( function ( $item ) {
+		return code_it( $item );
 	}, $array );
 }
 
@@ -6952,7 +7038,7 @@ function current_screen_is_gh_page( $page = '' ) {
  *
  * @return false|mixed|string
  */
-function cache_get_last_changed( $group ){
+function cache_get_last_changed( $group ) {
 	if ( function_exists( 'wp_cache_get_last_changed' ) ) {
 		return wp_cache_get_last_changed( $group );
 	}
@@ -6974,6 +7060,6 @@ function cache_get_last_changed( $group ){
  *
  * @return void
  */
-function cache_set_last_changed( $group ){
+function cache_set_last_changed( $group ) {
 	wp_cache_set( 'last_changed', microtime(), $group );
 }
