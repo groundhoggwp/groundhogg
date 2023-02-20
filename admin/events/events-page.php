@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\Classes\Activity;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
@@ -529,10 +530,11 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		global $wpdb;
 
-		$time_range = absint( get_post_var( 'time_range' ) );
-		$time_unit  = sanitize_text_field( get_post_var( 'time_unit' ) );
-		$confirm    = get_post_var( 'confirm' );
-		$events     = get_db( 'events' );
+		$time_range     = absint( get_post_var( 'time_range' ) );
+		$time_unit      = sanitize_text_field( get_post_var( 'time_unit' ) );
+		$what_to_delete = get_post_var( 'what_to_delete' );
+		$confirm        = get_post_var( 'confirm' );
+		$events         = get_db( 'events' );
 
 		if ( $confirm !== 'confirm' ) {
 			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
@@ -544,9 +546,83 @@ class Events_Page extends Tabbed_Admin_Page {
 			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
 		}
 
+		switch ( $what_to_delete ) {
+			default:
+			case 'all':
+				$type_clause = "1=1";
+				break;
+			case 'funnel':
+				$type_clause = "event_type = " . Event::FUNNEL;
+				break;
+			case 'broadcast':
+				$type_clause = "event_type = " . Event::BROADCAST;
+				break;
+			case 'other':
+				$type_clause = sprintf( "event_type NOT IN ( %s )", implode( ',', [
+					Event::BROADCAST,
+					Event::FUNNEL
+				] ) );
+				break;
+		}
+
 		$results = $wpdb->query( "
 DELETE FROM {$events->get_table_name()} 
-WHERE status = 'complete' AND `time` < {$time}
+WHERE status = 'complete' AND `time` < {$time} AND $type_clause
+ORDER BY ID" );
+
+		$this->add_notice( 'success', $results ?
+			sprintf( '%s logs have been purged!', number_format_i18n( $results ) ) :
+			'The query ran successfully but there were no unprocessed logs for the given time range.' );
+
+		return false;
+	}
+
+	/**
+	 * Delete any failed or cancelled events.
+	 */
+	public function process_purge_activity_tool() {
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$time_range     = absint( get_post_var( 'time_range' ) );
+		$time_unit      = sanitize_text_field( get_post_var( 'time_unit' ) );
+		$what_to_delete = get_post_var( 'what_to_delete' );
+		$confirm        = get_post_var( 'confirm' );
+		$activity       = get_db( 'activity' );
+
+		if ( $confirm !== 'confirm' ) {
+			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+		}
+
+		$time = strtotime( "$time_range $time_unit ago" );
+
+		if ( ! $time ) {
+			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+		}
+
+		switch ( $what_to_delete ) {
+			default:
+			case 'all':
+				$type_clause = "1=1";
+				break;
+			case 'opens':
+				$type_clause = $wpdb->prepare( "activity_type = %s", Activity::EMAIL_OPENED );
+				break;
+			case 'clicks':
+				$type_clause = $wpdb->prepare("activity_type = %s", Activity::EMAIL_CLICKED );
+				break;
+			case 'login':
+				$type_clause = $wpdb->prepare("activity_type = %s", Activity::LOGIN );
+
+				break;
+		}
+
+		$results = $wpdb->query( "
+DELETE FROM {$activity->get_table_name()} 
+WHERE `timestamp` < {$time} AND $type_clause
 ORDER BY ID" );
 
 		$this->add_notice( 'success', $results ?
