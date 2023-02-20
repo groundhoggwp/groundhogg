@@ -26,15 +26,25 @@ function sanitize_custom_field( $value, $field_id ) {
 	}
 
 	switch ( $field['type'] ):
+		default:
 		case 'text':
+		case 'url':
 		case 'radio':
+		case 'tel':
 			return sanitize_text_field( $value );
+		case 'email':
+		case 'custom_email':
+			return sanitize_email( $value );
 		case 'textarea':
 			return sanitize_textarea_field( $value );
 		case 'number':
 			return intval( $value );
+		case 'time':
+			return date( 'H:i:s', strtotime( $value ) );
 		case 'date':
 			return date( 'Y-m-d', strtotime( $value ) );
+		case 'datetime':
+			return date( 'Y-m-d H:i:s', strtotime( $value ) );
 		case 'dropdown':
 		case 'checkboxes':
 			if ( is_array( $value ) ) {
@@ -43,9 +53,6 @@ function sanitize_custom_field( $value, $field_id ) {
 				return sanitize_text_field( $value );
 			}
 	endswitch;
-
-	return '';
-
 }
 
 /**
@@ -78,11 +85,24 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	$data = $contact->get_meta( $field['name'] );
 
 	switch ( $field['type'] ):
+		default:
 		case 'text':
+		case 'custom_email':
+		case 'email':
+		case 'url':
+		case 'tel':
 		case 'radio':
 		case 'textarea':
-		case 'date':
 			$data = esc_html( $data );
+			break;
+		case 'datetime':
+			$data = date_i18n( get_date_time_format(), strtotime( $data ) );
+			break;
+		case 'time':
+			$data = date_i18n( get_time_format(), strtotime( $data ) );
+			break;
+		case 'date':
+			$data = date_i18n( get_option( 'date_format' ), strtotime( $data ) );
 			break;
 		case 'number':
 			$data = floatval( $data );
@@ -358,6 +378,8 @@ function register_contact_property_table_columns( $columns ) {
 	}
 }
 
+add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
+
 /**
  * Display the custom field columns
  *
@@ -369,8 +391,6 @@ function register_contact_property_table_columns( $columns ) {
 function display_custom_field_column_callback( $contact, $column_id ) {
 	display_custom_field( $column_id, $contact );
 }
-
-add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
 
 /**
  * Migrate existing custom fields and tabs to the new format
