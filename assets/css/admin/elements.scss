@@ -1383,6 +1383,14 @@ input.ui-autocomplete-input {
 
   > *:not(:first-child) {
 
+    &.input-with-replacements{
+      input {
+        border-left: 0 !important;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
     .select2-selection {
       border-left: 0 !important;
       border-top-left-radius: 0;

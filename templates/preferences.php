@@ -176,7 +176,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		$preferences_link = permissions_key_url( $preferences_link, $contact, 'preferences' );
 		$preferences_link = add_query_arg( 'identity', encrypt( $email ), $preferences_link );
 
-		$message = __( 'Someone has requested to manage your email preferences:' ) . "\r\n\r\n";
+		$message = __( 'Someone has requested to manage your email preferences:', 'groundhogg' ) . "\r\n\r\n";
 		/* translators: %s: Site name. */
 		$message .= sprintf( __( 'Site Name: %s', 'groundhogg' ), get_bloginfo( 'name' ) ) . "\r\n\r\n";
 		$message .= __( 'If this was a mistake, just ignore this email and nothing will happen.', 'groundhogg' ) . "\r\n\r\n";

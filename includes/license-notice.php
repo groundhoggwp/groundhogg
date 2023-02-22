@@ -70,13 +70,15 @@ class License_Notice {
 		}
 
 		// Only check against official extensions
-		$licensed  = array_intersect( Extension::$extension_ids, array_keys( License_Manager::get_extension_licenses() ) );
-		$installed = array_intersect( Extension::$extension_ids, Extension_Upgrader::get_extension_ids() );
+		$licensed  = array_intersect( array_keys( License_Manager::get_extension_licenses() ), Extension_Upgrader::get_extension_ids() );
+		$installed = array_intersect( array_values( Extension::$extension_ids ), Extension_Upgrader::get_extension_ids() );
 
 		// Licensed may be greater than installed if an extension was licensed then deactivated.
 		if ( count( $installed ) <= count( $licensed ) ) {
 			return;
 		}
+
+        // todo, show diff to see which extensions are missing licenses.
 
 //		$license_page_url = in_array( self::HELPER_PLUGIN_ID, $installed ) ? admin_page_url( 'gh_extensions' ) : admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
 		$license_page_url = admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
