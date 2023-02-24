@@ -6,6 +6,9 @@ use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\HTML;
 use Groundhogg\Step;
+use function Groundhogg\dashicon;
+use function Groundhogg\get_hostname;
+use function Groundhogg\html;
 use function Groundhogg\managed_page_url;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,29 +69,64 @@ class Link_Clicked extends Benchmark {
 
 		$redirect_url = $step->get_meta( 'redirect_to' );
 
-		$this->start_controls_section();
+		echo html()->e( 'p', [], __( 'Copy this link to use in emails or on your website...', 'groundhogg' ) );
 
-		$this->add_control( 'tracking_link', [
-			'label'       => __( 'Copy This Link:', 'groundhogg' ),
-			'type'        => HTML::INPUT,
-			'default'     => sprintf( managed_page_url( "click/%s/" ), $step->get_slug() ),
-			'description' => __( 'Paste this link in any email or page. Once a contact clicks it the benchmark will be completed and the contact will be redirected to the page set below.', 'groundhogg' ),
-			'field'       => [
-				'class'    => 'regular-text code',
-				'value'    => sprintf( managed_page_url( "click/%s/" ), $step->get_slug() ),
-				'onfocus'  => "this.select()",
-				'readonly' => true,
-			],
+		echo html()->input( [
+			'class'    => 'regular-text code',
+			'value'    => sprintf( managed_page_url( "click/%s/" ), $step->get_slug() ),
+			'onfocus'  => "this.select()",
+			'readonly' => true,
 		] );
 
-		$this->add_control( 'redirect_to', [
-			'label'       => __( 'Redirect To:', 'groundhogg' ),
-			'type'        => HTML::LINK_PICKER,
-			'default'     => home_url(),
-			'description' => __( 'Contacts will be redirected to this link.', 'groundhogg' ),
+		echo html()->e( 'p', [], __( 'When the link is clicked, redirect to...', 'groundhogg' ) );
+
+		echo html()->e( 'div', [
+			'class' => 'gh-input-group'
+		], [
+			html()->link_picker( [
+				'placeholder' => 'https://example.com',
+				'name'        => $this->setting_name_prefix( 'redirect_to' ),
+				'value'       => $this->get_setting( 'redirect_to' )
+			] ),
+			html()->e( 'a', [
+				'href' => $redirect_url,
+				'target' => '_blank',
+				'class' => 'gh-button secondary icon'
+			], dashicon( 'external' ) )
 		] );
 
-		$this->end_controls_section();
+		?><p></p><?php
+	}
+
+	/**
+     * added __ to disable
+     *
+	 * @param $step
+	 *
+	 * @return string
+	 */
+	public function __generate_step_title( $step ) {
+
+		$redirect_url = $step->get_meta( 'redirect_to' );
+
+		$basename = basename( $redirect_url );
+
+		$file = wp_check_filetype( $basename );
+
+		if ( $file && $file['type'] ){
+			return 'Downloads <b>' . $basename . '</b>';
+		}
+
+		$hostname = get_hostname( $redirect_url );
+		$path = wp_parse_url( $redirect_url, PHP_URL_PATH );
+
+		if ( $hostname === get_hostname() && ! empty( $path ) ){
+			$path = '<code>' . $path . '</code>';
+		} else {
+			$path = '<b>' . $hostname . '</b>';
+		}
+
+		return 'Clicks to ' . $path;
 	}
 
 	/**

@@ -37,7 +37,7 @@
     type: 'text',
     name: '',
     value: '',
-    label: 'New field',
+    label: '',
     hide_label: false,
     required: false,
     column_width: '1/1',
@@ -1088,11 +1088,31 @@
           checked,
         })
 
-        label = __('I agree to the terms & conditions.', 'groundhogg')
+        let label = __('I agree to the terms & conditions.', 'groundhogg')
 
         //language=HTML
         return `<label class="gh-input-label">${ field } ${ label } <span class="required">*</span></label>`
       },
+    },
+    hidden: {
+      group: 'custom',
+      name: 'Hidden',
+      content: [
+        Settings.type.type,
+        // Settings.label.type,
+        Settings.name.type,
+        // Settings.placeholder.type,
+        // Settings.hideLabel.type,
+        // Settings.required.type,
+        // Settings.columnWidth.type,
+      ],
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'hidden',
+        hide_label: true,
+        required: false,
+      }),
     },
     text: {
       group: 'custom',
@@ -1109,6 +1129,26 @@
       preview: (field) => fieldPreview({
         ...field,
         type: 'url',
+      }),
+    },
+    custom_email: {
+      group: 'custom',
+      name: 'Email',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'email'
+      }),
+    },
+    tel: {
+      group: 'custom',
+      name: 'Phone Number',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'tel'
       }),
     },
     textarea: {
@@ -1588,16 +1628,21 @@
 
     field (key, field, isEditing, settingsTab, isSpecial = false) {
 
-      const { type, label, text } = field
-
+      const { type, label = '', text } = field
       const fieldType = getFieldType(type)
+
+      let fieldName = label
+
+      if ( ! fieldName || ! fieldName.length ){
+        fieldName = fieldType.name + ' Field'
+      }
 
       //language=HTML
       return `
           <div class="form-field" data-key="${ key }">
               <div class="field-header">
                   <div class="details">
-                      <div class="field-label">${ label ?? text }</div>
+                      <div class="field-label">${fieldName}</div>
                       <div class="field-type">${ fieldType.name }</div>
                   </div>
                   <div class="actions">
@@ -1658,7 +1703,7 @@
 
       let { button, recaptcha, fields } = form
 
-      let tmpFields = [...fields]
+      let tmpFields = [...fields].filter( ({type}) => ! [ 'hidden' ].includes( type ) )
 
       // only show if enabled and is version 2
       if (recaptcha.enabled && Groundhogg.recaptcha.version === 'v2' && Groundhogg.recaptcha.enabled) {
@@ -1708,8 +1753,6 @@
         this.form = defaultForm
         onChange(this.form)
       }
-
-      console.log(this.form)
 
       this.render()
       this.onMount()

@@ -2,8 +2,6 @@
 
 namespace Groundhogg\Api\V4;
 
-use Groundhogg\DB\Activity;
-
 /**
  * Created by PhpStorm.
  * User: atty
@@ -38,6 +36,7 @@ class API_V4_HANDLER {
 		$this->notes_api       = new Notes_Api();
 		$this->tags            = new Tags_Api();
 		$this->fields          = new Fields_Api();
+		$this->properties      = new Properties_Api();
 		$this->emails          = new Emails_Api();
 		$this->broadcasts      = new Broadcasts_Api();
 		$this->funnels_api     = new Funnels_Api();

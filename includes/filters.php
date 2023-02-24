@@ -457,3 +457,7 @@ function add_phone_contact_method( $methods, $user ) {
 
 	return $methods;
 }
+
+add_filter( 'user_phone_label', function ( $label ){
+	return 'Mobile Number </label> <div style="font-weight: 400">Include <code>+</code> and country code.</div><label>';
+} );

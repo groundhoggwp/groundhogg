@@ -3,14 +3,13 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\validate_tags;
@@ -83,32 +82,66 @@ class Tag_Removed extends Benchmark {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		$this->start_controls_section();
 
-		$html = Plugin::$instance->utils->html;
+		echo html()->e( 'p', [], __( 'Run when the following tags are removed from the contact...', 'groundhogg' ) );
 
-		$condition_picker = $html->dropdown( [
-			'name'        => $this->setting_name_prefix( 'condition' ),
-			'selected'    => $this->get_setting( 'condition', 'any' ),
-			'option_none' => false,
-			'style'       => [ 'vertical-align' => 'middle' ],
-			'options'     =>
-				[
-					'any' => __( 'any' ),
-					'all' => __( 'all' ),
-				]
-		] );
-
-		$this->add_control( 'tags', [
-			'label'       => sprintf( __( 'Run when %s of these tags are removed:', 'groundhogg' ), $condition_picker ),
-			'type'        => HTML::TAG_PICKER,
-			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
-			'field'       => [
+		echo html()->e( 'div', [
+			'class' => 'gh-input-group'
+		], [
+			html()->dropdown( [
+				'name'        => $this->setting_name_prefix( 'condition' ),
+				'selected'    => $this->get_setting( 'condition', 'any' ),
+				'option_none' => false,
+				'style'       => [ 'vertical-align' => 'middle' ],
+				'options'     =>
+					[
+						'any' => __( 'Any' ),
+						'all' => __( 'All' ),
+					]
+			] ),
+			html()->tag_picker( [
+				'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
 				'multiple' => true,
-			]
+				'selected' => $this->get_setting( 'tags' )
+			] )
 		] );
 
-		$this->end_controls_section();
+		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
+	}
+
+	public function generate_step_title( $step ) {
+
+		$condition = $this->get_setting( 'condition' );
+		$tags      = array_bold( parse_tag_list( $this->get_setting( 'tags' ), 'name', false ) );
+
+		if ( empty( $tags ) ) {
+			$name = __( 'A tag is removed', 'groundhogg' );
+		} else if ( count( $tags ) === 1 ) {
+			$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+		} else if ( count( $tags ) >= 4 ) {
+			switch ( $condition ) {
+				default:
+				case 'any':
+					$name = sprintf( __( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					break;
+				case 'all':
+					$name = sprintf( __( '%s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					break;
+			}
+		} else {
+
+			switch ( $condition ) {
+				default:
+				case 'any':
+					$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+					break;
+				case 'all':
+					$name = sprintf( __( '%s are removed', 'groundhogg' ), andList( $tags ) );
+					break;
+			}
+		}
+
+		return $name;
 	}
 
 	/**
@@ -123,55 +156,6 @@ class Tag_Removed extends Benchmark {
 		$this->save_setting( 'condition', $condition );
 
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
-
-		if ( ! force_custom_step_names() ) {
-
-			if ( empty( $tags ) ) {
-				$name = __( 'A tag is removed', 'groundhogg' );
-			} else if ( count( $tags ) === 1 ) {
-				$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
-			} else if ( count( $tags ) >= 4 ) {
-				switch ( $condition ) {
-					default:
-					case 'any':
-						$name = sprintf( __( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-						break;
-					case 'all':
-						$name = sprintf( __( '%s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-						break;
-				}
-			} else {
-
-				switch ( $condition ) {
-					default:
-					case 'any':
-						$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
-						break;
-					case 'all':
-						$name = sprintf( __( '%s are removed', 'groundhogg' ), andList( $tags ) );
-						break;
-				}
-			}
-
-			$step->update( [
-				'step_title' => $name
-			] );
-		}
-	}
-
-	public function step_title_edit( $step ) {
-
-		if ( force_custom_step_names() ) {
-			parent::step_title_edit( $step );
-
-			return;
-		}
-
-		?>
-        <div class="gh-panel-header">
-            <h2><?php _e( 'Tag Removed Settings' ) ?></h2>
-        </div>
-		<?php
 	}
 
 	/**

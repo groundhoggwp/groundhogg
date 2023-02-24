@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.9
+Stable tag: 2.7.9.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,9 +322,22 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.9 (2023-02-10) =
+= 2.7.9.1 (2023-02-22) =
+* ADDED `maybeFetchItem` method for JS object stores.
+* TWEAKED License notice
+* TWEAKED Some admin CSS
+* UPDATED language POT file
+
+= 2.7.9 (2023-02-20) =
 * ADDED New categories UI optimization for funnel steps for easier funnel building.
-* ADDED Ability to expire replacements cache results.
+* ADDED Standardized method for generating step names.
+* ADDED Tool in logs management to purge old activity logs.
+* ADDED Event type filter in delete event logs management tool.
+* ADDED Custom Email, Phone Number, and Hidden field types to new form builder.
+* ADDED URL, Email, and Phone Number custom field types.
+* TWEAKED Most standard funnel steps now have generated step names.
+* TWEAKED Will double check CA and US origin when validating mobile numbers before giving up.
+* FIXED Field mapping to date & time custom fields not working.
 
 = 2.7.8.5 (2023-02-01) =
 * ADDED Logs management screen and tools for debugging and cleaning up logs.

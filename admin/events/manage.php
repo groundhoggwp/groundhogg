@@ -26,29 +26,44 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
             <p><?php _e( 'Purging completed event logs will free up space, but will adversely affect reporting and may impact funnel automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
             <p><?php _e( 'Delete completed event logs older than...', 'groundhogg' ) ?></p>
             <form class="display-flex column gap-10" method="post">
-	            <?php
+				<?php
 
-	            html()->hidden_GET_inputs();
-	            action_input( 'purge_completed_tool', true, true );
+				html()->hidden_GET_inputs();
+				action_input( 'purge_completed_tool', true, true );
 
-	            ?>
+				?>
                 <div class="gh-input-group">
 					<?php
 
 					echo html()->input( [
-                            'name' => 'time_range',
+						'name'        => 'time_range',
 						'type'        => 'number',
 						'class'       => 'input',
 						'placeholder' => 3
 					] );
 
 					echo html()->dropdown( [
-						'name' => 'time_unit',
+						'name'        => 'time_unit',
 						'options'     => [
 							'years'  => __( 'Years' ),
 							'months' => __( 'Months' ),
 							'weeks'  => __( 'Weeks' ),
 							'days'   => __( 'Days' ),
+						],
+						'option_none' => false,
+					] ) ?>
+                </div>
+                <span><?php _e( 'What type of logs should be deleted?' ) ?></span>
+                <div class="gh-input-group">
+					<?php
+
+					echo html()->dropdown( [
+						'name'        => 'what_to_delete',
+						'options'     => [
+							'all'       => __( 'Everything' ),
+							'funnel'    => __( 'Broadcast events' ),
+							'broadcast' => __( 'Funnel events' ),
+							'other'     => __( 'Other events' ),
 						],
 						'option_none' => false,
 					] ) ?>
@@ -211,6 +226,77 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 			<?php else: ?>
                 <p>✅ <?php _e( 'We have not detected any unprocessed events!', 'groundhogg' ) ?></p>
 			<?php endif; ?>
+        </div>
+    </div>
+    <div class="gh-panel">
+        <div class="gh-panel-header">
+            <h2><?php _e( 'Purge historical activity logs', 'groundhogg' ) ?></h2>
+        </div>
+        <div class="inside">
+            <p><?php _e( 'Purging activity logs will free up space, but will adversely affect reporting and may impact funnel automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
+            <p><?php _e( 'Delete activity event logs older than...', 'groundhogg' ) ?></p>
+            <form class="display-flex column gap-10" method="post">
+				<?php
+
+				html()->hidden_GET_inputs();
+				action_input( 'purge_activity_tool', true, true );
+
+				?>
+                <div class="gh-input-group">
+					<?php
+
+					echo html()->input( [
+						'name'        => 'time_range',
+						'type'        => 'number',
+						'class'       => 'input',
+						'placeholder' => 3
+					] );
+
+					echo html()->dropdown( [
+						'name'        => 'time_unit',
+						'options'     => [
+							'years'  => __( 'Years' ),
+							'months' => __( 'Months' ),
+							'weeks'  => __( 'Weeks' ),
+							'days'   => __( 'Days' ),
+						],
+						'option_none' => false,
+					] ) ?>
+                </div>
+                <span><?php _e( 'What type of activity should be deleted?' ) ?></span>
+                <div class="gh-input-group">
+					<?php
+
+					echo html()->dropdown( [
+						'name'        => 'what_to_delete',
+						'options'     => [
+							'all'    => __( 'Everything' ),
+							'opens'  => __( 'Email Opens' ),
+							'clicks' => __( 'Email Clicks' ),
+							'login'  => __( 'Login history' ),
+						],
+						'option_none' => false,
+					] ) ?>
+                </div>
+                <div class="gh-input-group">
+					<?php
+
+					echo html()->input( [
+						'name'        => 'confirm',
+						'type'        => 'text',
+						'placeholder' => 'Type "confirm" to delete logs.',
+						'required'    => true,
+					] );
+
+					echo html()->button( [
+						'type'  => 'submit',
+						'text'  => __( 'Delete', 'groundhogg' ),
+						'class' => 'gh-button danger small'
+					] )
+
+					?>
+                </div>
+            </form>
         </div>
     </div>
 

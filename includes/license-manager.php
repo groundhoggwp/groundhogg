@@ -26,6 +26,47 @@ class License_Manager {
 	static $storeUrl = "https://www.groundhogg.io";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
+    public function __construct() {
+        add_action( 'activated_plugin', [ self::class, 'maybe_activate_using_master_license' ], 99, 2 );
+    }
+
+	/**
+     * Activate the a
+     *
+	 * @param $plugin string
+	 * @param $network_wide bool
+	 *
+	 * @return void
+	 */
+    public static function maybe_activate_using_master_license( $plugin, $network_wide ){
+
+        if ( $network_wide ){
+            return;
+        }
+
+        $item_id = Extension_Upgrader::get_extension_id_by_path( $plugin );
+
+
+        // The plugin that's being activated is a registered extension
+        if ( ! $item_id ){
+            return;
+        }
+
+	    $master_license = get_option( 'gh_master_license' );
+
+        if ( empty( $master_license ) ){
+            return;
+        }
+
+        $license = self::get_license( $item_id );
+
+        if ( $license ){
+            return;
+        }
+
+        self::activate_license_quietly( $master_license, $item_id );
+    }
+
 	/**
 	 * Maybe setup the licenses unless they haven't been already
 	 */

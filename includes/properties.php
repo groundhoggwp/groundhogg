@@ -16,8 +16,11 @@ class Properties {
 	protected $tabs;
 	protected $groups;
 	protected $all;
+	protected $option;
 
 	public function __construct( $option = 'gh_contact_custom_properties' ) {
+
+		$this->option = $option;
 		$all_data     = get_option( $option );
 		$this->all    = wp_parse_args( $all_data ?: [], [
 			'fields' => [],
@@ -52,7 +55,7 @@ class Properties {
 		return $class::$instance;
 	}
 
-	public function get_option(){
+	public function get_option() {
 		return self::$option_name;
 	}
 

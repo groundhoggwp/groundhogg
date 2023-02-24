@@ -1294,6 +1294,12 @@ input.ui-autocomplete-input.focus-visible {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+.gh-input-group > *:not(:first-child).input-with-replacements input,
+.input-wrap > *:not(:first-child).input-with-replacements input {
+  border-left: 0 !important;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
 .gh-input-group > *:not(:first-child) .select2-selection,
 .input-wrap > *:not(:first-child) .select2-selection {
   border-left: 0 !important;

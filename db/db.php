@@ -491,7 +491,7 @@ abstract class DB {
 		$data = array_change_key_case( $data );
 
 		// White list columns
-		$data = array_intersect_key( $data, $column_formats );
+		$data           = array_intersect_key( $data, $column_formats );
 		$column_formats = array_intersect_key( $column_formats, $data );
 
 		// Reorder $column_formats to match the order of columns given in $data
@@ -537,7 +537,7 @@ abstract class DB {
 		$this->batch_formats = [];
 		$this->batch_inserts = [];
 
-		if ( ! $wpdb->rows_affected ){
+		if ( ! $wpdb->rows_affected ) {
 			return false;
 		}
 
@@ -945,14 +945,15 @@ abstract class DB {
 		}
 
 		$query_vars = wp_parse_args( $data, [
-			'where'   => [],
-			'limit'   => false,
-			'offset'  => false,
-			'orderby' => $this->get_primary_key(),
-			'order'   => 'desc',
-			'select'  => '*',
-			'search'  => false,
-			'func'    => false,
+			'operation' => 'SELECT',
+			'where'     => [],
+			'limit'     => false,
+			'offset'    => false,
+			'orderby'   => $this->get_primary_key(),
+			'order'     => 'desc',
+			'select'    => '*',
+			'search'    => false,
+			'func'      => false,
 		] );
 
 		$where = [ 'relationship' => 'AND' ];
@@ -1047,40 +1048,63 @@ abstract class DB {
 	 */
 	public function advanced_query( $query_vars = [], $from_cache = true ) {
 
+		$query_vars = wp_parse_args( $query_vars, [
+			'operation' => 'SELECT',
+		] );
+
 		ksort( $query_vars );
 
+		$operation = $query_vars['operation'];
 		$cache_key = "query:" . md5( serialize( $query_vars ) );
 
-		$cache_value = $this->cache_get( $cache_key, $found );
+		// Only fetch cached results for SELECT queries
+		if ( $operation === 'SELECT' ) {
 
-		if ( $found && $from_cache !== false ) {
-			return $cache_value;
+			$cache_value = $this->cache_get( $cache_key, $found );
+
+			if ( $found && $from_cache !== false ) {
+				return $cache_value;
+			}
 		}
 
 		$sql = $this->get_sql( $query_vars );
 
 		global $wpdb;
 
-		$func = strtolower( get_array_var( $query_vars, 'func' ) );
-
-		switch ( $func ) {
-			case 'count':
-				$results = absint( $wpdb->get_var( $sql ) );
-				break;
-			case 'sum':
-			case 'avg':
-				$results = $wpdb->get_var( $sql );
-				break;
+		switch ( $query_vars['operation'] ) {
 			default:
-				$results = $wpdb->get_results( $sql );
+			case 'SELECT':
+
+				$func = strtolower( get_array_var( $query_vars, 'func' ) );
+
+				switch ( $func ) {
+					case 'count':
+					case 'sum':
+					case 'avg':
+						$method = 'get_var';
+						break;
+					default:
+						$method = 'get_results';
+						break;
+				}
+
+				break;
+			case 'UPDATE':
+			case 'DELETE':
+				$method = 'query';
 				break;
 		}
 
+		$results          = call_user_func( [ $wpdb, $method ], $sql );
 		$this->last_query = $wpdb->last_query;
-
-		$results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
+		$results          = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
 
 		$this->cache_set( $cache_key, $results );
+
+		// Clear cache after changing table results
+		if ( in_array( $query_vars['operation'], [ 'UPDATE', 'DELETE' ] ) ) {
+			$this->cache_set_last_changed();
+		}
 
 		return $results;
 	}
@@ -1095,15 +1119,17 @@ abstract class DB {
 	public function get_sql( $query_vars = [] ) {
 		// Actual start
 		$query_vars = wp_parse_args( $query_vars, [
-			'where'   => [],
-			'limit'   => false,
-			'offset'  => false,
-			'orderby' => $this->get_primary_key(),
-			'order'   => 'desc', // ASC || DESC
-			'select'  => '*',
-			'search'  => false,
-			'func'    => false, // COUNT | AVG | SUM
-			'groupby' => false,
+			'operation' => 'SELECT',
+			'data'      => [],
+			'where'     => [],
+			'limit'     => false,
+			'offset'    => false,
+			'orderby'   => $this->get_primary_key(),
+			'order'     => 'desc', // ASC || DESC
+			'select'    => '*',
+			'search'    => false,
+			'func'      => false, // COUNT | AVG | SUM
+			'groupby'   => false,
 		] );
 
 		// Build Where Statement
@@ -1130,21 +1156,66 @@ abstract class DB {
 			$where = '1=1';
 		}
 
-		// Build SELECT statement
-		$select = get_array_var( $query_vars, 'select', '*' );
+		switch ( $query_vars['operation'] ) {
+			default:
+			case 'SELECT':
 
-		if ( is_array( $select ) ) {
-			$select = array_intersect( $select, $this->get_allowed_columns() );
-			$select = implode( ',', $select );
-		}
+				$select = get_array_var( $query_vars, 'select', '*' );
 
-		$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
+				if ( is_array( $select ) ) {
+					$select = array_intersect( $select, $this->get_allowed_columns() );
+					$select = implode( ',', $select );
+				}
 
-		$func = false;
+				$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
 
-		if ( $query_vars['func'] ) {
-			$func = strtoupper( $query_vars['func'] );
-			$select = sprintf( '%s( %s %s)', $func, $distinct, $select );
+				$func = false;
+
+				if ( $query_vars['func'] ) {
+					$func   = strtoupper( $query_vars['func'] );
+					$select = sprintf( '%s( %s %s)', $func, $distinct, $select );
+				}
+
+				$operation = "SELECT $select FROM {$this->get_table_name()}";
+
+				break;
+
+			case 'DELETE':
+
+				$operation = "DELETE FROM {$this->get_table_name()}";
+
+				break;
+
+			case 'UPDATE':
+
+				global $wpdb;
+
+				$data = $query_vars['data'];
+
+				// Initialise column format array
+				$column_formats = $this->get_columns();
+
+				// Force fields to lower case
+				$data = array_change_key_case( $data );
+
+				// White list columns
+				$data = array_intersect_key( $data, $column_formats );
+
+				// Reorder $column_formats to match the order of columns given in $data
+				$data_keys      = array_keys( $data );
+				$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
+				$fields = [];
+
+				foreach ( $data as $column => $value ) {
+					$fields[] = "`$column` = {$column_formats[$column]}";
+				}
+
+				$fields = $wpdb->prepare( implode( ', ', $fields ), array_values( $data ) );
+
+				$operation = "UPDATE {$this->get_table_name()} SET $fields";
+
+				break;
 		}
 
 		$limit   = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
@@ -1168,7 +1239,7 @@ abstract class DB {
 			'offset'  => $offset,
 		];
 
-		if ( $func ){
+		if ( $func ) {
 			unset( $clauses['limit'] );
 			unset( $clauses['orderby'] );
 			unset( $clauses['order'] );
@@ -1178,7 +1249,7 @@ abstract class DB {
 
 		$clauses = implode( ' ', array_filter( $clauses ) );
 
-		$sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
+		$sql = "$operation WHERE $clauses";
 
 		return apply_filters( 'groundhogg/db/sql_query', $sql, $query_vars );
 	}

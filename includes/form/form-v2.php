@@ -7,6 +7,7 @@ use Groundhogg\Contact;
 use Groundhogg\Properties;
 use Groundhogg\Step;
 use Groundhogg\Submission;
+use function Groundhogg\array_filter_splice;
 use function Groundhogg\array_find;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\current_contact_and_logged_in_user_match;
@@ -108,7 +109,9 @@ function basic_text_field( $field, $contact = false ) {
  * @param $meta array
  */
 function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
-	$meta[ $field['name'] ] = sanitize_text_field( $posted_data[ $field['name'] ] );
+	if ( isset( $posted_data[ $field['name'] ] ) ){
+		$meta[ $field['name'] ] = sanitize_text_field( $posted_data[ $field['name'] ] );
+	}
 }
 
 /**
@@ -546,6 +549,45 @@ class Form_v2 extends Step {
 				'before' => __NAMESPACE__ . '\standard_meta_callback',
 			],
 
+			// Generic Hidden
+			'hidden'       => [
+				'render' => function ( $field, $contact ) {
+					return html()->input( [
+						'id'    => $field['id'],
+						'type'  => 'hidden',
+						'name'  => $field['name'],
+						'class' => $field['className'],
+						'value' => $contact ? ( $contact->get_meta( $field['name'] ) ?: '' ) : $field['value'],
+					] );
+				},
+				'before' => __NAMESPACE__ . '\standard_meta_callback',
+			],
+
+			// Generic Email
+			'custom_email' => [
+				'render'   => function ( $field, $contact ) {
+					return basic_text_field( array_merge( $field, [
+						'type' => 'email',
+					] ), $contact );
+				},
+				'validate' => function ( $field, $posted_data ) {
+					$email = $posted_data[ $field['name'] ];
+
+					return is_email( $email ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
+				},
+				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
+					$meta[ $field['name'] ] = sanitize_email( $posted_data[ $field['name'] ] );
+				},
+			],
+			// Generic Tel
+			'tel'          => [
+				'render' => function ( $field, $contact ) {
+					return basic_text_field( array_merge( $field, [
+						'type' => 'tel',
+					] ), $contact );
+				},
+				'before' => __NAMESPACE__ . '\standard_meta_callback',
+			],
 			// Generic URL
 			'url'          => [
 				'render'   => function ( $field, $contact ) {
@@ -1504,6 +1546,8 @@ class Form_v2 extends Step {
 		], $inner_html, false );
 	}
 
+	protected $hidden_fields = [];
+
 	/**
 	 * Get the HTML For the fields
 	 *
@@ -1517,6 +1561,11 @@ class Form_v2 extends Step {
 
 		$fields = get_array_var( $config, 'fields', [] );
 
+		// Filter out hidden fields
+		$this->hidden_fields = array_filter_splice( $fields, function ( $field ) {
+			return $field['type'] === 'hidden';
+		} );
+
 		$html = implode( '', array_map( [ $this, 'render_field' ], $fields ) );
 
 		$recaptcha = get_array_var( $config, 'recaptcha', [] );
@@ -1529,6 +1578,21 @@ class Form_v2 extends Step {
 		$html .= $this->render_field( $button );
 
 		return $html;
+	}
+
+	function get_hidden_fields(){
+		if ( empty( $this->hidden_fields ) ){
+			return '';
+		}
+
+		$html = '';
+
+		foreach ( $this->hidden_fields as $hidden_field ){
+			$html .= self::render_input( $hidden_field, $this->contact ?: get_contactdata() );
+		}
+
+		return $html;
+
 	}
 
 
@@ -1569,6 +1633,10 @@ class Form_v2 extends Step {
 		$form .= do_replacements( $this->get_field_html(), $this->contact ?: get_contactdata() );
 
 		$form .= '</div>';
+
+		if ( ! empty( $this->hidden_fields ) ){
+			$form .= do_replacements( $this->get_hidden_fields(), $this->contact ?: get_contactdata() );
+		}
 
 		$config    = $this->get_meta( 'form' );
 		$recaptcha = get_array_var( $config, 'recaptcha', [] );
@@ -1724,12 +1792,12 @@ class Form_v2 extends Step {
 		$url = do_replacements( $url, get_contactdata() );
 
 		// No https? must be a relative URL
-		if ( ! preg_match( '@https?://@', $url ) ){
+		if ( ! preg_match( '@https?://@', $url ) ) {
 			$url = home_url( $url );
 		}
 
 		/**
-		 * @param $url string
+		 * @param $url  string
 		 * @param $form Form_v2
 		 */
 		return apply_filters( 'groundhogg/form/v2/success_url', $url, $this );

@@ -18,6 +18,7 @@ class Activity extends Base_Object_With_Meta {
 	const FORM_SUBMISSION = 'form_submission';
 	const UNSUBSCRIBED = 'unsubscribed';
 	const PAGE_VIEW = 'page_view';
+	const LOGIN = 'wp_login';
 
 	/**
 	 * Do any post setup actions.

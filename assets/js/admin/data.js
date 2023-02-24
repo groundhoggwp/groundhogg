@@ -270,6 +270,23 @@
         })
     },
 
+    async maybeFetchItem (id, opts = {}) {
+
+      if ( this.hasItem( id ) ){
+        return Promise.resolve( this.get( id ) )
+      }
+
+      return apiGet(`${this.route}/${id}`, opts)
+      .then(r => this.getItemFromResponse(r))
+      .then(item => {
+        this.item = item
+        this.itemsFetched([
+          item
+        ])
+        return item
+      })
+    },
+
     async create (...args) {
       return this.post(...args)
     },

@@ -5,6 +5,9 @@ namespace Groundhogg\Steps\Actions;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
+use function Groundhogg\andList;
+use function Groundhogg\bold_it;
+use function Groundhogg\code_it;
 use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_default_from_email;
@@ -111,7 +114,7 @@ class Admin_Notification extends Action {
 
 						$options = [
 							'{owner_email}' => __( 'Contact Owner' ),
-							'{email}'       => __( 'Contact' ),
+							'{email}'       => __( 'The Contact' ),
 						];
 
 						foreach ( get_owners() as $owner ) {
@@ -265,6 +268,25 @@ class Admin_Notification extends Action {
 		$this->save_setting( 'reply_to_type', sanitize_text_field( $reply_to_type ) );
 		$this->save_setting( 'hide_admin_links', boolval( $this->get_posted_data( 'hide_admin_links' ) ) );
 		$this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
+	}
+
+
+	public function generate_step_title( $step ) {
+		$send_to = $this->get_setting( 'send_to' );
+		$send_to = array_map( function ( $email ) {
+
+			switch ( $email ) {
+				case '{email}':
+					return bold_it( 'the contact' );
+				case '{owner_email}':
+					return bold_it( 'the contact owner' );
+				default:
+					return code_it( $email );
+			}
+
+		}, $send_to );
+
+		return 'Notify ' . andList( $send_to );
 	}
 
 	/**

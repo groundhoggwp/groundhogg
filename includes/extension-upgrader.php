@@ -85,6 +85,24 @@ class Extension_Upgrader {
 	}
 
 	/**
+	 * The ids of official Groundhogg extensions
+	 *
+	 * @return int[]
+	 */
+	public static function get_extension_paths() {
+		return array_values( static::$file_map );
+	}
+
+	/**
+	 * The ids of official Groundhogg extensions
+	 *
+	 * @return int
+	 */
+	public static function get_extension_id_by_path( $path ) {
+		return array_search( $path, static::$file_map );
+	}
+
+	/**
 	 * @param $id
 	 * @param $file
 	 */
@@ -164,6 +182,10 @@ class Extension_Upgrader {
 	 * @return bool|\WP_Error
 	 */
 	public static function remote_install( $item_id, $license = '' ) {
+
+		// We set the license here, so ignore the fallback action...
+		remove_action( 'activated_plugin', [ License_Manager::class, 'maybe_activate_using_master_license' ], 99 );
+
 		if ( empty( $license ) ) {
 			// Get the first available license
 			$license = License_Manager::get_license();

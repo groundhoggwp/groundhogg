@@ -780,6 +780,11 @@ button.button.save-button {
 
         span.step-title {
           font-size: 14px;
+
+          code {
+            border-radius: 4px;
+            padding: 1px 3px;
+          }
         }
 
         span.step-name {

@@ -996,7 +996,7 @@
   })
 
   const userDisplay = (user) => {
-    return `${ user.data.user_login } (${ user.data.user_email })`
+    return `${ user.data.display_name } (${ user.data.user_email })`
   }
 
   registerFilter('owner', 'contact', __('Owner', 'groundhogg'), {
@@ -2143,6 +2143,15 @@
         compare: 'equals',
         value: '',
       },
+    } ),
+    url: (f) => ( {
+      ...filterFactory.text(f),
+    } ),
+    custom_email: (f) => ( {
+      ...filterFactory.text(f),
+    } ),
+    tel: (f) => ( {
+      ...filterFactory.text(f),
     } ),
     textarea: (f) => ( {
       ...filterFactory.text(f),
