@@ -1156,6 +1156,8 @@ abstract class DB {
 			$where = '1=1';
 		}
 
+		$func = false;
+
 		switch ( $query_vars['operation'] ) {
 			default:
 			case 'SELECT':
@@ -1168,8 +1170,6 @@ abstract class DB {
 				}
 
 				$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
-
-				$func = false;
 
 				if ( $query_vars['func'] ) {
 					$func   = strtoupper( $query_vars['func'] );

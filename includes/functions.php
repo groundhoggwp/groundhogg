@@ -7063,3 +7063,35 @@ function cache_get_last_changed( $group ) {
 function cache_set_last_changed( $group ) {
 	wp_cache_set( 'last_changed', microtime(), $group );
 }
+
+/**
+ * Deletes any pending events for a given step type for the current contact
+ *
+ * @return false|int
+ */
+function clear_pending_events_by_step_type( $type, $contact = false ){
+
+    $contact = get_contactdata( $contact );
+
+    if ( ! is_a_contact( $contact ) ){
+        return false;
+    }
+
+	$steps = get_db( 'steps' )->query( [
+		'step_type' => $type
+	] );
+
+	if ( empty( $steps ) ) {
+		return false;
+	}
+
+	return event_queue_db()->query( [
+		'operation' => 'DELETE',
+		'where'     => [
+			[ 'step_id', 'IN', wp_parse_id_list( wp_list_pluck( $steps, 'ID' ) ) ],
+			[ 'event_type', '=', Event::FUNNEL ],
+			[ 'status', '=', Event::WAITING ],
+			[ 'contact_id', '=', $contact->get_id() ]
+		]
+	] );
+}
