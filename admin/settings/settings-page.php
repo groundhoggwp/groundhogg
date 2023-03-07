@@ -463,7 +463,7 @@ class Settings_Page extends Admin_Page {
 //			),
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
-				'title'    => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
+				'title'    => _x( 'Opt-in Status Tags', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'tags',
 				'callback' => [ Plugin::$instance->tag_mapping, 'reset_tags_ui' ],
 
@@ -615,7 +615,7 @@ class Settings_Page extends Admin_Page {
 			'gh_opted_in_stats_collection'           => array(
 				'id'      => 'gh_opted_in_stats_collection',
 				'section' => 'danger_zone',
-				'label'   => _x( 'Optin to anonymous usage tracking.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Opt-in to anonymous usage tracking.', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => array(
