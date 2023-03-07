@@ -3,7 +3,6 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Base_Object;
 use function Groundhogg\generate_referer_hash;
 use function Groundhogg\isset_not_empty;
 
@@ -16,12 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Stores information about a contact's site activity.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Activity extends DB {
 
@@ -89,6 +88,7 @@ class Activity extends DB {
 			'activity_type' => '%s',
 			'referer'       => '%s',
 			'referer_hash'  => '%s',
+			'value'         => '%f',
 		];
 	}
 
@@ -110,6 +110,7 @@ class Activity extends DB {
 			'activity_type' => '',
 			'referer'       => '',
 			'referer_hash'  => '',
+			'value'         => 0,
 		);
 	}
 
@@ -219,6 +220,7 @@ class Activity extends DB {
         activity_type VARCHAR({$this->get_max_index_length()}) NOT NULL,
         referer text NOT NULL,
         referer_hash varchar(20) NOT NULL,
+        value decimal(10,2) unsigned NOT NULL DEFAULT 0,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY funnel_id (funnel_id),
