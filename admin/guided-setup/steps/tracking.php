@@ -62,7 +62,7 @@ class Tracking extends Step
         </style>
         <div id="enable-tracking">
             <h3><?php _e( 'Want 15% off any premium plan?', 'groundhogg' ); ?></h3>
-            <p><?php printf( __( "When you enable anonymous statistics collection, you help us make Groundhogg better. As a thank you we'll send you a 15%% discount code which you can use for any <a href='%s' target='_blank'>Groundhogg premium plan.</a>", 'groundhogg' ), $pricing_url ); ?></p>
+            <p><?php printf( __( "When you enable anonymous statistics collection, you help us make Groundhogg better. As a thank-you we'll send you a 15%% discount code which you can use for any <a href='%s' target='_blank'>Groundhogg premium plan.</a>", 'groundhogg' ), $pricing_url ); ?></p>
             <button id="enabled-tracking-button" type="submit" class="button-primary big-button" name="enable_tracking" value="enable"><?php dashicon_e( 'yes' );_e( 'Yes! I Want <b>15% Off!</b>', 'groundhogg' ); ?></button>
             <p class="description"><?php echo sprintf(__('A discount code will be emailed to <b>%s</b> upon completion. By opting in you consent to receive marketing, transactional information and updates from Groundhogg Inc. For more information, please see our <a target="_blank" href="https://www.groundhogg.io/privacy-policy/#usage-tracking">privacy policy</a>.', 'groundhogg'), wp_get_current_user()->user_email ); ?></p>
         </div>
