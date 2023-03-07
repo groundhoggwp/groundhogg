@@ -14,6 +14,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 use function Groundhogg\implode_in_quotes;
 
 // Exit if accessed directly
@@ -496,8 +497,40 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table = new Email_Log_Table();
 
-		$this->search_form( __( 'Search Logs', 'groundhogg' ) );
+		if ( method_exists( $this, 'get_current_tab' ) ) {
+			?>
+            <div style="margin-top: 10px"></div><?php
+		}
 
+		?>
+        <form method="get" class="search-form">
+			<?php html()->hidden_GET_inputs( true ); ?>
+            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
+
+            <div style="float: right" class="gh-input-group">
+                <input type="search" id="gh-post-search-input" name="s"
+                       value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
+				<?php
+
+				echo html()->dropdown( [
+					'options'     => [
+						'subject'    => __( 'Subject', 'groundhogg' ),
+						'content'    => __( 'Body', 'groundhogg' ),
+						'recipients' => __( 'Recipients', 'groundhogg' ),
+						'headers'    => __( 'Headers', 'groundhogg' )
+					],
+					'option_none' => 'Everywhere',
+					'name'        => 'search_columns',
+					'selected'    => get_request_var( 'search_columns' )
+				] );
+
+				?>
+                <button type="submit" id="search-submit"
+                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+            </div>
+        </form>
+		<?php
 		$log_table->views();
 		?>
         <form method="post" class="search-form wp-clearfix">
@@ -612,10 +645,10 @@ ORDER BY ID" );
 				$type_clause = $wpdb->prepare( "activity_type = %s", Activity::EMAIL_OPENED );
 				break;
 			case 'clicks':
-				$type_clause = $wpdb->prepare("activity_type = %s", Activity::EMAIL_CLICKED );
+				$type_clause = $wpdb->prepare( "activity_type = %s", Activity::EMAIL_CLICKED );
 				break;
 			case 'login':
-				$type_clause = $wpdb->prepare("activity_type = %s", Activity::LOGIN );
+				$type_clause = $wpdb->prepare( "activity_type = %s", Activity::LOGIN );
 
 				break;
 		}
