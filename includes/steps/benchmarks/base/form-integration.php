@@ -206,6 +206,24 @@ abstract class Form_Integration extends Benchmark {
 		$this->save_setting( 'field_map', $field_map );
 	}
 
+	/**
+	 * Assumes a CPT
+	 *
+	 * @param $form_id
+	 *
+	 * @return string
+	 */
+	protected function get_form_name( $form_id ) {
+		return get_the_title( $form_id );
+	}
+
+	/**
+	 * Genertae a step title based on the name of the form
+	 *
+	 * @param $step
+	 *
+	 * @return false|string|null
+	 */
 	public function generate_step_title( $step ) {
 		$form_id = $this->get_setting( 'form_id' );
 
@@ -214,7 +232,7 @@ abstract class Form_Integration extends Benchmark {
 		}
 
 		// Gets the title for the form
-		$title = get_the_title( $form_id );
+		$title = $this->get_form_name( $form_id );
 
 		if ( ! $title ) {
 			return null;
