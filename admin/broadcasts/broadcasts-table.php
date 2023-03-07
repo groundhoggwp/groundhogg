@@ -554,12 +554,13 @@ class Broadcasts_Table extends WP_List_Table {
 		}
 
 		$args = array(
-			'where'   => $where,
+			'where'      => $where,
 //			'search'  => $search,
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'orderby' => $orderby,
+			'limit'      => $per_page,
+			'offset'     => $offset,
+			'order'      => $order,
+			'orderby'    => $orderby,
+			'found_rows' => true,
 		);
 
 		$anonymous = function ( $clauses ) use ( $search ) {
@@ -577,7 +578,7 @@ class Broadcasts_Table extends WP_List_Table {
 		add_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
 
 		$events = get_db( 'broadcasts' )->query( $args );
-		$total  = get_db( 'broadcasts' )->count( $args );
+		$total  = get_db( 'broadcasts' )->found_rows();
 
 		remove_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
 

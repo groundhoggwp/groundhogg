@@ -20,16 +20,15 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use Groundhogg\Tag;
-
-//use Groundhogg\Webhook;
-use function Groundhogg\create_object_from_type;
-use function Groundhogg\get_array_var;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
+use function Groundhogg\create_object_from_type;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
-use function Groundhogg\last_db_query;
+
+//use Groundhogg\Webhook;
 
 abstract class Base_Object_Api extends Base_Api {
 
@@ -390,14 +389,15 @@ abstract class Base_Object_Api extends Base_Api {
 		$query = $request->get_params();
 
 		$query = wp_parse_args( $query, [
-			'select'  => '*',
-			'orderby' => $this->get_primary_key(),
-			'order'   => 'DESC',
-			'limit'   => 25,
+			'select'     => '*',
+			'orderby'    => $this->get_primary_key(),
+			'order'      => 'DESC',
+			'limit'      => 25,
+			'found_rows' => true,
 		] );
 
-		$total = $this->get_db_table()->count( $query );
 		$items = $this->get_db_table()->query( $query );
+		$total = $this->get_db_table()->found_rows();
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 

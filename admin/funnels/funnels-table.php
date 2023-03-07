@@ -361,16 +361,17 @@ class Funnels_Table extends WP_List_Table {
 		];
 
 		$args = array(
-			'where'   => $where,
-			'search'  => $search,
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'orderby' => $orderby,
+			'where'      => $where,
+			'search'     => $search,
+			'limit'      => $per_page,
+			'offset'     => $offset,
+			'order'      => $order,
+			'orderby'    => $orderby,
+			'found_rows' => true,
 		);
 
 		$events = get_db( 'funnels' )->query( $args );
-		$total  = get_db( 'funnels' )->count( $args );
+		$total  = get_db( 'funnels' )->found_rows();
 
 		$this->items = $events;
 

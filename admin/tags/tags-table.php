@@ -2,14 +2,12 @@
 
 namespace Groundhogg\Admin\Tags;
 
+use Groundhogg\Tag;
+use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
-use Groundhogg\Tag;
-use Groundhogg\Plugin;
-use WP_List_Table;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -50,8 +48,8 @@ class Tags_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -79,21 +77,21 @@ class Tags_Table extends WP_List_Table {
 
 	protected function extra_tablenav( $which ) {
 		?>
-		<div class="alignleft gh-actions">
-			<a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [
+        <div class="alignleft gh-actions">
+            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [
 				'page'   => 'gh_tags',
 				'action' => 'recount'
 			], admin_url( 'admin.php' ) ) ) ?>"><?php _ex( 'Recount Contacts', 'action', 'groundhogg' ); ?></a>
-		</div>
+        </div>
 		<?php
 	}
 
 	/**
 	 * Generates content for a single row of the table
 	 *
-	 * @param object $item The current item
-	 *
 	 * @since 3.1.0
+	 *
+	 * @param object $item The current item
 	 *
 	 */
 	public function single_row( $item ) {
@@ -137,7 +135,7 @@ class Tags_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $tag A singular item (one full row's worth of data).
+	 * @param object $tag         A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -199,15 +197,16 @@ class Tags_Table extends WP_List_Table {
 		$orderby  = get_url_var( 'orderby', 'tag_id' );
 
 		$args = [
-			'search'  => $search,
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'orderby' => $orderby,
+			'search'     => $search,
+			'limit'      => $per_page,
+			'offset'     => $offset,
+			'order'      => $order,
+			'orderby'    => $orderby,
+			'found_rows' => true,
 		];
 
 		$items = get_db( 'tags' )->query( $args );
-		$total = get_db( 'tags' )->count( $args );
+		$total = get_db( 'tags' )->found_rows();
 
 		$this->items = $items;
 
@@ -227,7 +226,7 @@ class Tags_Table extends WP_List_Table {
 	 *
 	 * @param        $tag         Tag      Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
