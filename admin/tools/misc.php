@@ -23,10 +23,10 @@ use function Groundhogg\html;
     </div>
     <div class="gh-panel">
         <div class="gh-panel-header">
-            <h2><?php _e( 'Refresh optin status tags', 'groundhogg' ); ?></h2>
+            <h2><?php _e( 'Refresh opt-in status tags', 'groundhogg' ); ?></h2>
         </div>
         <div class="inside">
-            <p><?php _e( 'In the event the optin status tags of your contacts become out of sync, you can re-sync them using this tool.', 'groundhogg' ); ?></p>
+            <p><?php _e( 'In the event the opt-in status tags of your contacts become out of sync, you can re-sync them using this tool.', 'groundhogg' ); ?></p>
             <p><?php echo html()->e( 'a', [
 					'class' => 'gh-button secondary',
 					'href'  => Plugin::instance()->tag_mapping->get_start_url(),

@@ -1130,7 +1130,7 @@ class Replacements implements \JsonSerializable {
 
 	/**
 	 * Return a confirmation link for the contact
-	 * This just gets the Optin Page link for now.
+	 * This just gets the Opt-in Page link for now.
 	 *
 	 * @param $redirect_to string
 	 *
@@ -1147,7 +1147,7 @@ class Replacements implements \JsonSerializable {
 
 	/**
 	 * Return a raw confirmation link for the contact that can be placed in a button.
-	 * This just gets the Optin Page link for now.
+	 * This just gets the Opt-in Page link for now.
 	 *
 	 * @param string $redirect_to
 	 *

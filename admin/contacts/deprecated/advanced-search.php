@@ -114,7 +114,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 
 			<?php
 
-			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Optin Status', 'groundhogg' ) );
+			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Opt-in Status', 'groundhogg' ) );
 			echo "&nbsp;";
 
 			echo html()->wrap( html()->select2( [

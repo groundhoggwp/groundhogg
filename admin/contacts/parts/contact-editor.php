@@ -135,11 +135,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								] ); ?>
 							</div>
 							<div class="gh-col">
-								<label for="optin_status"><?php _e( 'Optin Status', 'groundhogg' ) ?></label>
+								<label for="optin_status"><?php _e( 'Opt-in Status', 'groundhogg' ) ?></label>
 								<?php
 								echo html()->dropdown( [
 									'name'     => 'optin_status',
-									'title'    => __( 'Ooptin Status', 'groundhogg' ),
+									'title'    => __( 'Opt-in Status', 'groundhogg' ),
 									'selected' => $contact->get_optin_status(),
 									'options'  => Preferences::get_preference_names()
 								] );

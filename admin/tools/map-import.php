@@ -139,7 +139,7 @@ $sample_item = $items[ $selected ];
 					'title'   => 'I have confirmed.',
 				] );
 
-				echo html()->description( __( "If you are importing the <b>optin status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+				echo html()->description( __( "If you are importing the <b>opt-in status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
 
 				?></td>
 		</tr>
