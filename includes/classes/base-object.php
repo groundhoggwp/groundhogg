@@ -73,6 +73,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 				return;
 			}
 
+			// Only get 1 record
+			$identifier_or_args['limit'] = 1;
+
 			$query = $this->get_db()->query( $identifier_or_args );
 
 			$object = array_shift( $query );
