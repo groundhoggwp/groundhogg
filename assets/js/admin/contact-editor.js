@@ -8,6 +8,7 @@
     tooltip,
     regexp,
     inputRepeaterWidget,
+    inputRepeater,
     el,
     searchOptionsWidget,
     input,
@@ -1792,32 +1793,24 @@
           },
         }).mount()
 
-        inputRepeaterWidget({
-          selector: '#meta-here',
+        inputRepeater('#meta-here', {
           rows: Object.keys(combinedMeta).
             filter(k => !meta_exclusions.includes(k)).
-            map(k => ( [k, combinedMeta[k]] )).
-            map(([k, v]) => ( [
-              k,
-              ['array', 'object'].includes(typeof v) ? 'SERIALIZED DATA' : v,
-            ] )),
-          cellProps: [
-            {
+            map(k => ( [k, combinedMeta[k]] )),
+          cells: [
+            (props) => input({
+              ...props,
+              readonly: !!props.value,
               className: 'meta-key',
-              readonly: true,
-            }, {},
+            }),
+            ({ value, ...props }) => input({
+              value: ['array', 'object'].includes(typeof value) ? 'SERIALIZED DATA' : value,
+              readonly: ['array', 'object'].includes(typeof value),
+              ...props
+            }),
           ],
-          cellCallbacks: [input, input],
           onMount: () => {
-
-            $(`[value="SERIALIZED DATA"]`).prop('readonly', true)
-
-            $('.meta-key').each((i, el) => {
-              let $el = $(el)
-              if (!$el.val()) {
-                $el.prop('readonly', false)
-              }
-            }).on('input', (e) => {
+            $('.meta-key').on('change', (e) => {
               let key = sanitizeKey(e.target.value)
               $(e.target).val(key)
             })
