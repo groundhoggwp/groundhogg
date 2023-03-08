@@ -109,7 +109,7 @@ function basic_text_field( $field, $contact = false ) {
  * @param $meta array
  */
 function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
-	if ( isset( $posted_data[ $field['name'] ] ) ){
+	if ( isset( $posted_data[ $field['name'] ] ) ) {
 		$meta[ $field['name'] ] = sanitize_text_field( $posted_data[ $field['name'] ] );
 	}
 }
@@ -1010,44 +1010,69 @@ class Form_v2 extends Step {
 						$months[ $i ] = date_i18n( "F", $timestamp );
 					}
 
+					$year = html()->dropdown( [
+						'name'        => 'birthday[year]',
+						'id'          => 'birthday_year',
+						'options'     => $years,
+						'multiple'    => false,
+						'option_none' => __( 'Year', 'groundhogg' ),
+						'required'    => $field['required'],
+						'class'       => 'gh-input',
+						'selected'    => $selected_year
+					] );
+					$month = html()->dropdown( [
+						'name'        => 'birthday[month]',
+						'id'          => 'birthday_month',
+						'options'     => $months,
+						'multiple'    => false,
+						'option_none' => __( 'Month', 'groundhogg' ),
+						'required'    => $field['required'],
+						'class'       => 'gh-input',
+						'selected'    => $selected_month
+					] );
+					$day = html()->dropdown( [
+						'id'          => 'birthday_day',
+						'name'        => 'birthday[day]',
+						'options'     => $days,
+						'multiple'    => false,
+						'option_none' => __( 'Day', 'groundhogg' ),
+						'required'    => $field['required'],
+						'class'       => 'gh-input',
+						'selected'    => $selected_day
+					] );
+
+					$date_format = get_option( 'date_format' );
+
+					switch ( $date_format ) {
+						case 'F j, Y':
+						case 'm/d/Y':
+							$inputs = [
+								$month,
+								$day,
+								$year
+							];
+							break;
+						case 'd/m/Y':
+							$inputs = [
+								$day,
+								$month,
+								$year
+							];
+							break;
+						default:
+							$inputs = [
+								$year,
+								$month,
+								$day,
+							];
+							break;
+
+					}
+
 					$input = html()->e( 'div', [
 						'id'    => $field['id'],
 						'class' => [ 'gh-birthday gh-input-group', $field['className'] ]
-					], [
-						// Year
-						html()->dropdown( [
-							'name'        => 'birthday[year]',
-							'id'          => 'birthday_year',
-							'options'     => $years,
-							'multiple'    => false,
-							'option_none' => __( 'Year', 'groundhogg' ),
-							'required'    => $field['required'],
-							'class'       => 'gh-input',
-							'selected'    => $selected_year
-						] ),
-						html()->dropdown( [
-							'name'        => 'birthday[month]',
-							'id'          => 'birthday_month',
-							'options'     => $months,
-							'multiple'    => false,
-							'option_none' => __( 'Month', 'groundhogg' ),
-							'required'    => $field['required'],
-							'class'       => 'gh-input',
-							'selected'    => $selected_month
-						] ),
-						html()->dropdown( [
-							'id'          => 'birthday_day',
-							'name'        => 'birthday[day]',
-							'options'     => $days,
-							'multiple'    => false,
-							'option_none' => __( 'Day', 'groundhogg' ),
-							'required'    => $field['required'],
-							'class'       => 'gh-input',
-							'selected'    => $selected_day
-
-						] ),
-					] );
-
+					], $inputs );
 
 					if ( $field['hide_label'] ) {
 						return $input;
@@ -1580,14 +1605,14 @@ class Form_v2 extends Step {
 		return $html;
 	}
 
-	function get_hidden_fields(){
-		if ( empty( $this->hidden_fields ) ){
+	function get_hidden_fields() {
+		if ( empty( $this->hidden_fields ) ) {
 			return '';
 		}
 
 		$html = '';
 
-		foreach ( $this->hidden_fields as $hidden_field ){
+		foreach ( $this->hidden_fields as $hidden_field ) {
 			$html .= self::render_input( $hidden_field, $this->contact ?: get_contactdata() );
 		}
 
@@ -1634,7 +1659,7 @@ class Form_v2 extends Step {
 
 		$form .= '</div>';
 
-		if ( ! empty( $this->hidden_fields ) ){
+		if ( ! empty( $this->hidden_fields ) ) {
 			$form .= do_replacements( $this->get_hidden_fields(), $this->contact ?: get_contactdata() );
 		}
 
