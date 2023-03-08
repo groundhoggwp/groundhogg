@@ -214,35 +214,31 @@ class Preferences {
 		}
 
 		$string_map = [
-			_x( 'Unconfirmed', 'optin_status', 'groundhogg' )        => self::UNCONFIRMED,
-			'pending'                                                => self::UNCONFIRMED,
-			'unconfirm'                                              => self::UNCONFIRMED,
-			'unconfirmed'                                            => self::UNCONFIRMED,
-			_x( 'Confirmed', 'optin_status', 'groundhogg' )          => self::CONFIRMED,
-			'confirm'                                                => self::CONFIRMED,
-			'confirmed'                                              => self::CONFIRMED,
-			_x( 'Unsubscribed', 'optin_status', 'groundhogg' )       => self::UNSUBSCRIBED,
-			'unsubscribe'                                            => self::UNSUBSCRIBED,
-			'unsubscribed'                                           => self::UNSUBSCRIBED,
-			_x( 'Subscribed Weekly', 'optin_status', 'groundhogg' )  => self::WEEKLY,
-			'weekly'                                                 => self::WEEKLY,
-			_x( 'Subscribed Monthly', 'optin_status', 'groundhogg' ) => self::MONTHLY,
-			'monthly'                                                => self::MONTHLY,
-			_x( 'Bounced', 'optin_status', 'groundhogg' )            => self::HARD_BOUNCE,
-			'hard_bounce'                                            => self::HARD_BOUNCE,
-			'bounce'                                                 => self::HARD_BOUNCE,
-			'bounced'                                                => self::HARD_BOUNCE,
-			_x( 'Complained', 'optin_status', 'groundhogg' )         => self::COMPLAINED,
-			'complain'                                               => self::COMPLAINED,
-			'complaint'                                              => self::COMPLAINED,
-			'complained'                                             => self::COMPLAINED,
-			'spam'                                                   => self::SPAM,
-			'spammed'                                                => self::SPAM,
-			'fake'                                                   => self::SPAM,
-			_x( 'Spam', 'optin_status', 'groundhogg' )               => self::SPAM,
+			'pending'      => self::UNCONFIRMED,
+			'unconfirm'    => self::UNCONFIRMED,
+			'unconfirmed'  => self::UNCONFIRMED,
+			'confirm'      => self::CONFIRMED,
+			'confirmed'    => self::CONFIRMED,
+			'unsubscribe'  => self::UNSUBSCRIBED,
+			'unsubscribed' => self::UNSUBSCRIBED,
+			'weekly'       => self::WEEKLY,
+			'monthly'      => self::MONTHLY,
+			'hard_bounce'  => self::HARD_BOUNCE,
+			'bounce'       => self::HARD_BOUNCE,
+			'bounced'      => self::HARD_BOUNCE,
+			'complain'     => self::COMPLAINED,
+			'complaint'    => self::COMPLAINED,
+			'complained'   => self::COMPLAINED,
+			'spam'         => self::SPAM,
+			'spammed'      => self::SPAM,
+			'fake'         => self::SPAM,
 		];
 
-		return get_array_var( $string_map, $string, self::UNCONFIRMED );
+		// Add translated names as well!
+		$pretty_names = array_map( 'strtolower', self::get_preference_names() );
+		$string_map   = array_merge( $string_map, array_flip( $pretty_names ) );
+
+		return get_array_var( $string_map, strtolower( $string ), self::UNCONFIRMED );
 	}
 
 	/**
