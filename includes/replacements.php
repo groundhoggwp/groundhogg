@@ -192,6 +192,13 @@ class Replacements implements \JsonSerializable {
 				'description'  => _x( 'The contact\'s profile picture.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'        => 'optin_status',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_optin_status' ],
+				'name'        => __( 'Opt-in Status', 'groundhogg' ),
+				'description' => _x( 'The contact\'s opt-in status.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'         => 'user',
 				'group'        => 'user',
 				'default_args' => 'attribute',
@@ -801,6 +808,16 @@ class Replacements implements \JsonSerializable {
 		return $this->get_current_contact()->get_profile_picture( $size );
 	}
 
+	/**
+     * The pretty name of the optin status
+     *
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+    function replacement_optin_status( $contact_id ){
+        return Preferences::get_preference_pretty_name( $this->get_current_contact()->get_optin_status() );
+    }
 
 	/**
 	 * Returns comma separated tags
