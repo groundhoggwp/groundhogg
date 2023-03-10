@@ -1797,6 +1797,9 @@ function after_form_submit_handler( &$contact ) {
 
 add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\extrapolate_location_after_signup', 9 );
 
+// If we are able to extrapolate the location, we can fix the mobile number if provided
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 9 );
+
 /**
  * Get the location of a contact record when they signup
  *
@@ -4091,6 +4094,30 @@ function number_has_country_code( $number = '' ) {
 }
 
 /**
+ * Runs a contact's mobile number though the validation function and updates it if it's different from the original
+ *
+ * @param $contact Contact
+ *
+ * @return void
+ */
+function maybe_validate_and_update_mobile_number( $contact ) {
+	$to           = $contact->get_mobile_number();
+	$country_code = $contact->get_meta( 'country' );
+
+	if ( ! $to || ! $country_code ) {
+		return;
+	}
+
+	$validated = validate_mobile_number( $to, $country_code );
+
+    if ( $validated !== $to ) {
+		$contact->update_meta( 'mobile_number', $validated );
+	}
+}
+
+add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 10, 1 );
+
+/**
  * Get an error from an uploaded file.
  *
  * @param $file
@@ -4216,7 +4243,7 @@ function is_helper_plugin_installed() {
  * @return bool
  */
 function has_premium_features() {
-	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false;
+	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false || is_white_labeled();
 }
 
 add_action( 'admin_menu', function () {
