@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.7.9.2
+Stable tag: 2.7.9.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,17 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.9.3 (2023-03-03) =
+* ADDED `value` column to the activity table.
+* ADDED Opt-in Status replacement code.
+* TWEAKED Birthday field will have inputs reordered based on the `date_format` setting.
+* TWEAKED Refactored occurrences of "Optin" to "Opt-in."
+* TWEAKED Field mapping API is now better visually organized.
+* TWEAKED Optimized table queries to utilize the `FOUND_ROWS()` MySQL function instead of `COUNT()`.
+* TWEAKED Optimized `DB::get_sql()` method to parse queries.
+* TWEAKED `DB` class support for `WP_Meta_Query`.
+* TWEAKED Use `?by_user_id=1` to any `gh/v4/contacts/<ID>/` request to fetch contact by the user ID.
 
 = 2.7.9.2 (2023-03-02) =
 * ADDED Developer method to clear pending funnel events by step type
