@@ -10,10 +10,8 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_gh_page_screen_id;
-use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
-use function Groundhogg\white_labeled_name;
 
 class Contact_Table_Columns {
 
@@ -24,11 +22,31 @@ class Contact_Table_Columns {
 		add_filter( 'groundhogg_contact_columns', [ $this, 'add_columns_to_table' ] );
 		add_filter( 'groundhogg_contact_sortable_columns', [ $this, 'add_sortable_columns_to_table' ] );
 
-        $screen = get_gh_page_screen_id( 'gh_contacts' );
+		$screen = get_gh_page_screen_id( 'gh_contacts' );
 
 		add_filter( "manage_{$screen}_columns", [ $this, 'add_columns_to_screen_options' ] );
+		add_filter( 'groundhogg/contact_query/allowed_orderby_keys', [ $this, 'add_orderby_keys' ] );
 	}
 
+	/**
+     * Add defined orderby keys as allowed keys in Contact_Query
+     *
+	 * @param $keys
+	 *
+	 * @return array
+	 */
+    public function add_orderby_keys( $keys ){
+
+        $orderby_keys = array_filter( wp_list_pluck( self::$columns, 'orderby' ) );
+
+        return array_unique( array_merge( $keys, $orderby_keys ) );
+    }
+
+	/**
+     * Sort the columns based on priority
+     *
+	 * @return void
+	 */
 	public function sort_columns() {
 		// Sort the meta boxes by priority
 		uasort( self::$columns, function ( $a, $b ) {
@@ -114,12 +132,12 @@ class Contact_Table_Columns {
 	/**
 	 * Register a new contact table column
 	 *
-	 * @param string $id the ID of the info card
-	 * @param string $title the title of the info card
-	 * @param callable $callback callback to display the data
-	 * @param string $orderby if the column will be sortable
-	 * @param int $priority how high in the cards it should be displayed
-	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
+	 * @param string   $id         the ID of the info card
+	 * @param string   $title      the title of the info card
+	 * @param callable $callback   callback to display the data
+	 * @param string   $orderby    if the column will be sortable
+	 * @param int      $priority   how high in the cards it should be displayed
+	 * @param string   $capability the minimum capability for the viewing user to see the data in this card.
 	 */
 	public static function register( string $id, string $title, callable $callback, $orderby = false, $priority = 100, $capability = 'view_contacts' ) {
 
@@ -135,6 +153,15 @@ class Contact_Table_Columns {
 			'priority'   => $priority,
 			'capability' => $capability,
 		];
+
+        // If order by is defined, make sure that it's a registered key for the contact query
+		if ( $orderby ) {
+			add_filter( 'groundhogg/contact_query/allowed_orderby_keys', function ( $keys ) use ( $orderby ) {
+				$keys[] = $orderby;
+
+				return $keys;
+			} );
+		}
 	}
 
 	/**
@@ -153,9 +180,9 @@ class Contact_Table_Columns {
 
 		$result = call_user_func( $column['callback'], $contact, $column_id, $column );
 
-        if ( $result ){
-            echo $result;
-        }
+		if ( $result ) {
+			echo $result;
+		}
 	}
 
 	/**
@@ -187,7 +214,7 @@ class Contact_Table_Columns {
 
 		// Other Columns
 		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], false, 11 );
-		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false,11 );
+		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false, 11 );
 		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], false, 11 );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
@@ -202,7 +229,7 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_optin_status( $contact ) {
 		?>
-		<span class="pill sm <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() )?></span>
+        <span class="pill sm <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?></span>
 		<?php
 	}
 
@@ -262,17 +289,17 @@ class Contact_Table_Columns {
 	protected static function column_tags( Contact $contact ) {
 
 		?>
-		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
+        <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
 			<?php
 			$tags = $contact->get_tags();
 
 			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
 				$tag = new Tag( $tag ) ?><span
-				class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
-			<?php if ( count( $tags ) > 0 ):  ?>
+                    class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+			<?php if ( count( $tags ) > 0 ): ?>
 				<?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
 			<?php endif; ?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -300,18 +327,18 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_tel_numbers( Contact $contact ) {
 		if ( $contact->get_phone_number() ): ?>
-			<div class="phone"
-			     title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+            <div class="phone"
+                 title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
 				<?php if ( $contact->get_phone_extension() ): ?>
-					<span
-						class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+                    <span
+                            class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
 				<?php endif; ?>
-			</div>
+            </div>
 		<?php endif;
 		if ( $contact->get_mobile_number() ): ?>
-			<div class="phone"
-			     title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
-			</div>
+            <div class="phone"
+                 title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+            </div>
 		<?php endif;
 	}
 
@@ -324,19 +351,19 @@ class Contact_Table_Columns {
 
 		if ( count( $contact->get_address() ) > 0 ):
 			?>
-			<div class="address">
+            <div class="address">
 				<?php echo html()->e( 'a', [
 					'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
 					'target' => '_blank'
 				], implode( ', ', $contact->get_address() ) ) ?>
-			</div>
+            </div>
 		<?php
 		endif;
 		?><span class="sub"><?php
 
 		if ( $contact->get_ip_address() ) {
 			?>
-			<span class="ip-address"><?php echo $contact->get_ip_address(); ?></span>
+            <span class="ip-address"><?php echo $contact->get_ip_address(); ?></span>
 			<?php
 		}
 
@@ -347,8 +374,8 @@ class Contact_Table_Columns {
 			}
 
 			?>
-			<span
-				class="time-zone"><?php echo $contact->get_time_zone(); ?> (<?php printf( __( "UTC %s%s", 'groundhogg' ), intval( $contact->get_time_zone_offset() ) < 0 ? '-' : '+', absint( $contact->get_time_zone_offset() / HOUR_IN_SECONDS ) ) ?>)</span>
+            <span
+                    class="time-zone"><?php echo $contact->get_time_zone(); ?> (<?php printf( __( "UTC %s%s", 'groundhogg' ), intval( $contact->get_time_zone_offset() ) < 0 ? '-' : '+', absint( $contact->get_time_zone_offset() / HOUR_IN_SECONDS ) ) ?>)</span>
 			<?php
 		}
 		?></span><?php
