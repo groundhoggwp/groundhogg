@@ -3,9 +3,9 @@ Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 2.7.9.3
+Stable tag: 2.7.9.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.9.4 (2023-03-17) =
+* ADDED New address line replacement codes
+* TWEAKED Add CSS to remove underline in posts grid article headlines in emails.
+* FIXED Admin notification step title causing fatal error
+* FIXED Potential low risk (admin authentication required) vulnerability, credit to WPScan.com for disclosing safely.
+* FIXED Track activity actions now fired from API
+* FIXED Mapping to notes not working
 
 = 2.7.9.3 (2023-03-03) =
 * ADDED `value` column to the activity table.
