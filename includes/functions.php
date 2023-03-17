@@ -2268,8 +2268,8 @@ function get_mappable_fields( $extra = [] ) {
 			'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
 		],
 		__( 'Address' )       => [
-			'street_address_1' => __( 'Street Address 1', 'groundhogg' ),
-			'street_address_2' => __( 'Street Address 2', 'groundhogg' ),
+			'street_address_1' => __( 'Line 1', 'groundhogg' ),
+			'street_address_2' => __( 'Line 2', 'groundhogg' ),
 			'city'             => __( 'City', 'groundhogg' ),
 			'postal_zip'       => __( 'Postal/Zip', 'groundhogg' ),
 			'region'           => __( 'Province/State/Region', 'groundhogg' ),
@@ -2865,8 +2865,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'notes':
 
-				if ( is_array( $notes ) ) {
-					$notes = array_merge( $notes, $notes );
+				if ( is_array( $value ) ) {
+					$notes = array_merge( $notes, $value );
 					break;
 				}
 
@@ -4111,7 +4111,7 @@ function maybe_validate_and_update_mobile_number( $contact ) {
 	$validated = validate_mobile_number( $to, $country_code );
 
     if ( $validated !== $to ) {
-		$contact->update_meta( 'mobile_number', $validated );
+		$contact->update_meta( 'mobile_phone', $validated );
 	}
 }
 
@@ -5223,14 +5223,26 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 		$activity->update_meta( $detail_key, $value );
 	}
 
-	/**
+	track_activity_actions( $activity );
+}
+
+/**
+ * do actions when activity is tracked
+ *
+ * @param Activity $activity
+ *
+ * @return void
+ */
+function track_activity_actions( $activity ){
+
+    /**
 	 * Fires after some activity is tracked
 	 *
 	 * @param $activity Activity
 	 * @param $contact  Contact
 	 */
-	do_action( 'groundhogg/track_activity', $activity, $contact );
-	do_action( "groundhogg/track_activity/{$activity->activity_type}", $activity, $contact );
+	do_action( 'groundhogg/track_activity', $activity, $activity->get_contact() );
+	do_action( "groundhogg/track_activity/{$activity->activity_type}", $activity, $activity->get_contact() );
 }
 
 
