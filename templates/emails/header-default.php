@@ -154,6 +154,12 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
             }
 
         }
+
+        .card-content h2 a{
+            /*font-size: 18px;*/
+            text-decoration: none;
+        }
+
 		<?php do_action( 'groundhogg/templates/email/head/style' ); ?>
         <?php if ( apply_filters( 'groundhogg/templates/email/has_posts', false ) ): ?>
             <?php echo file_get_contents( __DIR__ . '/posts.css' ) ?>
