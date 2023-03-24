@@ -285,12 +285,12 @@ $background-color: #F6F9FB;
 /*  GO FULL WIDTH BELOW 480 PIXELS */
 @media only screen and (max-width: 480px) {
 
-  .gh-form-fields {
-    display: flex;
-    flex-direction: column;
-  }
-
   .gh-form-wrapper {
+
+    .gh-form-fields {
+      @include flex-column();
+    }
+
     > form.gh-form {
       > .form-fields {
         > .gh-form-row {
