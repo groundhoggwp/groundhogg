@@ -1328,7 +1328,7 @@ class Settings_Page extends Admin_Page {
 			'gh_wordpress_email_service'             => [
 				'id'      => 'gh_wordpress_email_service',
 				'section' => 'outgoing_email_config',
-				'label'   => _x( 'WordPress Default Email Service', 'settings', 'groundhogg' ),
+				'label'   => _x( 'WordPress Email', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Choose which installed service should handle core WordPress email. This service will apply to <b>all WordPress email</b> and email from third party plugins like <b>LifterLMS</b> or <b>BuddyBoss</b>.</p><p class="description"><code>WordPress Default</code> is whichever email service WordPress is using at the moment. This could be your server\'s email or a third party SMTP plugin.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => array(
@@ -1341,7 +1341,7 @@ class Settings_Page extends Admin_Page {
 			'gh_transactional_email_service'         => [
 				'id'      => 'gh_transactional_email_service',
 				'section' => 'outgoing_email_config',
-				'label'   => _x( 'Transactional Email Service', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Transactional Email', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Choose which installed service should handle transactional email from Groundhogg. This service will apply to Groundhogg emails which have their <code>message type</code> set to <b>Transactional</b>, admin notifications and other Groundhogg notifications.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => array(
@@ -1354,7 +1354,7 @@ class Settings_Page extends Admin_Page {
 			'gh_marketing_email_service'             => [
 				'id'      => 'gh_marketing_email_service',
 				'section' => 'outgoing_email_config',
-				'label'   => _x( 'Marketing Email Service', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Marketing Email', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Choose which installed service should handle marketing email from Groundhogg. This service will only apply to Groundhogg emails which have their <code>message type</code> set to <b>Marketing</b>.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => array(
