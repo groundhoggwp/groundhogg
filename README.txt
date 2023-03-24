@@ -2,10 +2,10 @@
 Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
-Requires at least: 5.0
+Requires at least: 5.9
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 2.7.9.4
+Stable tag: 2.7.9.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.9.5 (2023-03-24) =
+* ADDED New **Log Only** email service which will not send email but just log them.
+* TWEAKED Bumped minimum required WordPress version to 5.9.
+* FIXED Forms columns CSS not responsive.
+* FIXED Translation issues.
 
 = 2.7.9.4 (2023-03-17) =
 * ADDED New address line replacement codes

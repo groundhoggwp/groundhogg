@@ -13192,7 +13192,7 @@ msgid "Legal documents associated with your profile."
 msgstr ""
 
 #: templates/preferences.php:614
-msgid "Nevermind! Don't erase my profile."
+msgid "Never mind! Don't erase my profile."
 msgstr ""
 
 #: templates/preferences.php:634
