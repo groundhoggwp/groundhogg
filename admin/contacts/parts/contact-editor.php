@@ -384,7 +384,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <div class="gh-rows-and-columns">
                         <div class="gh-row">
                             <div class="gh-col">
-                                <label for="source_page"><?php _e( 'Source Page', 'groundhogg' ); ?></label>
+                                <label for="source_page"><?php _e( 'Signup Page', 'groundhogg' ); ?></label>
 								<?php echo html()->input( [
 									'id'    => 'source_page',
 									'name'  => 'source_page',

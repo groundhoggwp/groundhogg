@@ -1434,7 +1434,7 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  * @return string
  */
 function wpgh_get_referer() {
-	if ( ! isset( $_POST['_wp_http_referer'] ) ) {
+	if ( ! isset( $_REQUEST['_wp_http_referer'] ) ) {
 		return wp_get_referer();
 	}
 
@@ -2158,7 +2158,7 @@ function get_exportable_fields( $extra = [] ) {
 		'time_zone'              => __( 'Time Zone', 'groundhogg' ),
 		'ip_address'             => __( 'IP Address', 'groundhogg' ),
 		'lead_source'            => __( 'Lead Source', 'groundhogg' ),
-		'source_page'            => __( 'Source Page', 'groundhogg' ),
+		'source_page'            => __( 'Signup Page', 'groundhogg' ),
 		'terms_agreement'        => __( 'Terms Agreement', 'groundhogg' ),
 		'gdpr_consent'           => __( 'Data Processing Consent', 'groundhogg' ),
 		'gdpr_consent_date'      => __( 'Data Processing Consent Data', 'groundhogg' ),
@@ -2284,7 +2284,7 @@ function get_mappable_fields( $extra = [] ) {
 			'utm_term'     => __( 'UTM Term', 'groundhogg' ),
 			'utm_source'   => __( 'UTM Source', 'groundhogg' ),
 			'lead_source'  => __( 'Lead Source', 'groundhogg' ),
-			'source_page'  => __( 'Source Page', 'groundhogg' ),
+			'source_page'  => __( 'Signup Page', 'groundhogg' ),
 		],
 	];
 
@@ -6609,8 +6609,8 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 		$tags = [ new Tag( $maybe_tags ) ];
 	} else if ( is_string( $maybe_tags ) ) {
 		// it's a comma separated list
-		if ( strpos( $maybe_tags, ',' ) !== false ) {
-			$tags = parse_tag_list( wp_parse_list( $maybe_tags ) );
+		if ( str_contains( $maybe_tags, ',' ) ) {
+			$tags = parse_tag_list( wp_parse_list( $maybe_tags ), 'tags' );
 		} else {
 
 			// if create is true, use the query and create method, otherwise use the slug

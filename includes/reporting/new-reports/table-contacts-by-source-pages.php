@@ -16,7 +16,7 @@ class Table_Contacts_By_Source_Pages extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Source Page', 'groundhogg' ),
+			__( 'Signup Page', 'groundhogg' ),
 			__( 'Contacts', 'groundhogg' ),
 		];
 	}

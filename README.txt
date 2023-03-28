@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 2.7.9.5
+Stable tag: 2.7.9.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,6 +322,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.9.6 (2023-03-28) =
+* TWEAKED Changed "Source Page" to "Signup Page" to make it more obvious.
+* TWEAKED Edit Form link shows to admins when looking at a form on the hosted page.
+* FIXED Tag picker in form options sometimes not working.
+* FIXED Tags not being applied during form submission when more than one tag is selected for a single option.
+
 = 2.7.9.5 (2023-03-24) =
 * ADDED New **Log Only** email service which will not send email but just log them.
 * TWEAKED Bumped minimum required WordPress version to 5.9.
@@ -330,7 +336,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 2.7.9.4 (2023-03-17) =
 * ADDED New address line replacement codes
-* TWEAKED Add CSS to remove underline in posts grid article headlines in emails.
+* TWEAKED Added CSS to remove underline in posts grid article headlines in emails.
 * FIXED Admin notification step title causing fatal error
 * FIXED Potential low risk (admin authentication required) vulnerability, credit to WPScan.com for disclosing safely.
 * FIXED Track activity actions now fired from API
@@ -345,7 +351,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED Optimized table queries to utilize the `FOUND_ROWS()` MySQL function instead of `COUNT()`.
 * TWEAKED Optimized `DB::get_sql()` method to parse queries.
 * TWEAKED `DB` class support for `WP_Meta_Query`.
-* TWEAKED Use `?by_user_id=1` to any `gh/v4/contacts/<ID>/` request to fetch contact by the user ID.
+* TWEAKED Add `?by_user_id=1` to any `gh/v4/contacts/<ID>/` request to fetch contact by the user ID.
 
 = 2.7.9.2 (2023-03-02) =
 * ADDED Developer method to clear pending funnel events by step type

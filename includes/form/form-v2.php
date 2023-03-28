@@ -21,6 +21,7 @@ use function Groundhogg\html;
 use function Groundhogg\is_recaptcha_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
+use function Groundhogg\parse_tag_list;
 use function Groundhogg\process_events;
 use function Groundhogg\utils;
 use function Groundhogg\Ymd;
@@ -115,6 +116,18 @@ function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
 }
 
 /**
+ * Helper to push tags to the big tags array
+ *
+ * @param $tags array
+ * @param $add mixed
+ *
+ * @return void
+ */
+function push_tags( &$tags, $add ){
+	$tags = array_merge( $tags, parse_tag_list( $add ) );
+}
+
+/**
  * Callback for dropdowns & radio buttons
  *
  * @param $field       array
@@ -146,7 +159,7 @@ function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tag
 
 	// if found and is array with tag, add the tag
 	if ( $_selected && ! empty( $_selected[1] ) ) {
-		$tags[] = $_selected[1];
+		push_tags( $tags, $_selected[1] );
 	}
 }
 
@@ -175,7 +188,7 @@ function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$
 		} );
 
 		if ( $_selected && ! empty( $_selected[1] ) ) {
-			$tags[] = $_selected[1];
+			push_tags( $tags, $_selected[1] );
 		}
 	}
 }
@@ -1010,7 +1023,7 @@ class Form_v2 extends Step {
 						$months[ $i ] = date_i18n( "F", $timestamp );
 					}
 
-					$year = html()->dropdown( [
+					$year  = html()->dropdown( [
 						'name'        => 'birthday[year]',
 						'id'          => 'birthday_year',
 						'options'     => $years,
@@ -1030,7 +1043,7 @@ class Form_v2 extends Step {
 						'class'       => 'gh-input',
 						'selected'    => $selected_month
 					] );
-					$day = html()->dropdown( [
+					$day   = html()->dropdown( [
 						'id'          => 'birthday_day',
 						'name'        => 'birthday[day]',
 						'options'     => $days,

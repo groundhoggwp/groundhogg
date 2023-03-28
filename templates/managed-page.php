@@ -58,7 +58,7 @@ function ensure_logo_is_there() {
 		}
 
 		?>
-		<style type="text/css">
+        <style type="text/css">
             #main h1 a {
                 background-image: url(<?php echo esc_url( $image[0] ); ?>);
                 -webkit-background-size: <?php echo absint( $image[1] )?>px;
@@ -66,7 +66,7 @@ function ensure_logo_is_there() {
                 height: <?php echo absint( $image[2] ) ?>px;
                 width: <?php echo absint( $image[1] ) ?>px;
             }
-		</style>
+        </style>
 	<?php
 	endif;
 }
@@ -119,21 +119,21 @@ function managed_page_head( $title = '', $action = '' ) {
 	}
 
 	?><!DOCTYPE html>
-	<html <?php language_attributes(); ?>>
-	<head>
-		<meta charset="<?php bloginfo( 'charset' ); ?>">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+    <html <?php language_attributes(); ?>>
+    <head>
+        <meta charset="<?php bloginfo( 'charset' ); ?>">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php no_index_tag(); ?>
-		<link rel="profile" href="http://gmpg.org/xfn/11">
-		<title><?php echo $mp_title; ?></title>
+        <link rel="profile" href="http://gmpg.org/xfn/11">
+        <title><?php echo $mp_title; ?></title>
 		<?php wp_head(); ?>
-	</head>
-	<body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+    </head>
+    <body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 	<?php wp_body_open(); ?>
-	<div id="main">
+    <div id="main">
 	<?php if ( has_custom_logo() ): ?>
-		<h1><a href="<?php echo esc_url( $header_url ); ?>"
-		       title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
+        <h1><a href="<?php echo esc_url( $header_url ); ?>"
+               title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
 	<?php endif;
 
 	if ( $notice = get_url_var( 'notice' ) ) {
@@ -143,7 +143,7 @@ function managed_page_head( $title = '', $action = '' ) {
 	print_notices();
 
 	?>
-	<div id="content">
+    <div id="content">
 	<?php
 }
 
@@ -154,17 +154,30 @@ function managed_page_footer() {
 
 	$privacy_policy_url = function_exists( 'get_privacy_policy_url' ) && get_privacy_policy_url() ? get_privacy_policy_url() : get_option( 'gh_privacy_policy' );
 
-	$html = implode( ' | ', [
+	$footer_links = [
 		html()->e( 'a', [ 'href' => home_url( '/' ) ], sprintf( __( '&larr; Back to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ) ),
-		html()->e( 'a', [ 'href' => managed_page_url( 'preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) ),
 		html()->e( 'a', [ 'href' => $privacy_policy_url ], __( 'Privacy Policy', 'groundhogg' ) ),
-	] );
+	];
+
+    // A contact is being tracked...
+	if ( get_contactdata() ) {
+		$footer_links[] = html()->e( 'a', [ 'href' => managed_page_url( 'preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) );
+    }
+
+	/**
+	 * Filter the footer links for the managed page
+	 *
+	 * @param $footer_links array
+	 */
+	$footer_links = apply_filters( 'groundhogg/managed_page/footer_links', $footer_links );
+
+	$html = implode( ' | ', $footer_links );
 
 	?>
-	</div>
-	<p id="extralinks"><?php echo $html; ?></p>
+    </div>
+    <p id="extralinks"><?php echo $html; ?></p>
 	<?php if ( is_option_enabled( 'gh_affiliate_link_in_email' ) ): ?>
-		<p id="credit">
+        <p id="credit">
 			<?php printf( __( "Powered by %s", 'groundhogg' ), html()->e( 'a', [
 				'target' => '_blank',
 				'href'   => add_query_arg( [
@@ -177,14 +190,14 @@ function managed_page_footer() {
 				'width' => 85,
 				'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png'
 			], null, true ) ) ); ?>
-		</p>
+        </p>
 	<?php endif; ?>
-	</div>
+    </div>
 	<?php
 	wp_footer();
 	?>
-	<div class="clear"></div>
-	</body>
-	</html>
+    <div class="clear"></div>
+    </body>
+    </html>
 	<?php
 }
