@@ -31,6 +31,7 @@ class Email_Log extends DB {
 	 * Maybe serialize the args...
 	 *
 	 * @param $args
+	 *
 	 * @return array
 	 */
 	protected function maybe_serialize( $args ) {
@@ -180,6 +181,16 @@ class Email_Log extends DB {
 			'retries'         => 0,
 			'date_sent'       => Ymd_His(),
 		);
+	}
+
+	public function get_searchable_columns() {
+		return [
+			'recipients',
+			'from_address',
+			'subject',
+			'content',
+			'headers'
+		];
 	}
 
 	public function create_table() {

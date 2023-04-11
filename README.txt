@@ -2,10 +2,10 @@
 Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
-Requires at least: 5.0
-Tested up to: 6.0
+Requires at least: 5.9
+Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 2.7.9.1
+Stable tag: 2.7.9.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,41 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.9.6 (2023-03-28) =
+* TWEAKED Changed "Source Page" to "Signup Page" to make it more obvious.
+* TWEAKED Edit Form link shows to admins when looking at a form on the hosted page.
+* FIXED Tag picker in form options sometimes not working.
+* FIXED Tags not being applied during form submission when more than one tag is selected for a single option.
+
+= 2.7.9.5 (2023-03-24) =
+* ADDED New **Log Only** email service which will not send email but just log them.
+* TWEAKED Bumped minimum required WordPress version to 5.9.
+* FIXED Forms columns CSS not responsive.
+* FIXED Translation issues.
+
+= 2.7.9.4 (2023-03-17) =
+* ADDED New address line replacement codes
+* TWEAKED Added CSS to remove underline in posts grid article headlines in emails.
+* FIXED Admin notification step title causing fatal error
+* FIXED Potential low risk (admin authentication required) vulnerability, credit to WPScan.com for disclosing safely.
+* FIXED Track activity actions now fired from API
+* FIXED Mapping to notes not working
+
+= 2.7.9.3 (2023-03-03) =
+* ADDED `value` column to the activity table.
+* ADDED Opt-in Status replacement code.
+* TWEAKED Birthday field will have inputs reordered based on the `date_format` setting.
+* TWEAKED Refactored occurrences of "Optin" to "Opt-in."
+* TWEAKED Field mapping API is now better visually organized.
+* TWEAKED Optimized table queries to utilize the `FOUND_ROWS()` MySQL function instead of `COUNT()`.
+* TWEAKED Optimized `DB::get_sql()` method to parse queries.
+* TWEAKED `DB` class support for `WP_Meta_Query`.
+* TWEAKED Add `?by_user_id=1` to any `gh/v4/contacts/<ID>/` request to fetch contact by the user ID.
+
+= 2.7.9.2 (2023-03-02) =
+* ADDED Developer method to clear pending funnel events by step type
+* FIXED Potential undefined variable when performing DELETE operations with \Groundhogg\DB::query() method
 
 = 2.7.9.1 (2023-02-22) =
 * ADDED `maybeFetchItem` method for JS object stores.

@@ -13,7 +13,7 @@ class Table_Contacts_By_Social_Media extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Search Engines', 'groundhogg' ),
+			__( 'Social Network', 'groundhogg' ),
 			__( 'Contacts', 'groundhogg' ),
 		];
 	}

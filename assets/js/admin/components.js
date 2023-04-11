@@ -384,7 +384,7 @@
                   </div>
                   <div class="gh-row">
                       <div class="gh-col">
-                          <label for="${ prefix }-email">${ __('Optin Status', 'groundhogg') }</label>
+                          <label for="${ prefix }-email">${ __('Opt-in Status', 'groundhogg') }</label>
                           ${ select({
                               id: `${ prefix }-optin-status`,
                               name: 'optin_status',
@@ -602,7 +602,7 @@
               </div>
               <div class="gh-row">
                   <div class="gh-col">
-                      <label for="${ prefix }-email">${ __('Optin Status', 'groundhogg') }</label>
+                      <label for="${ prefix }-email">${ __('Opt-in Status', 'groundhogg') }</label>
                       ${ select({
                           id: `${ prefix }-optin-status`,
                           name: 'optin_status',

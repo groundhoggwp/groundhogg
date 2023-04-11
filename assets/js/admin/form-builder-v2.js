@@ -8,12 +8,14 @@
     inputWithReplacements,
     uuid,
     inputRepeaterWidget,
+    inputRepeater,
     icons,
     miniModal,
     tooltip,
     copyObject,
     tinymceElement,
     sanitizeKey,
+    isString,
   } = Groundhogg.element
   const { sprintf, __, _x } = wp.i18n
   const { tags: TagsStore } = Groundhogg.stores
@@ -175,7 +177,7 @@
                 id: 'property',
                 name: 'property',
                 options: [
-                    { value: '', text: __( 'Please select one' ) },
+                    { value: '', text: __('Please select one') },
                     ...getCustomProperties().map(field => ( { value: field.id, text: field.label } )),
                 ],
                 selected: property,
@@ -659,29 +661,38 @@
                 <div class="select-options"></div>
             </div>`
       },
-      onMount ({ options = [['', []]] }, updateField, currentField) {
+      onMount ({ options = [['', '']] }, updateField, currentField) {
 
-        let allTags = options.map(opt => opt[1]).reduce((a, i) => [...a, i], [])
-
-        if (!TagsStore.hasItems(allTags)) {
-          TagsStore.fetchItems({
-            id: allTags,
-          })
+        try {
+          let allTags = options.map(opt => opt[1]).reduce((carry, current) => [...carry, ...current.split(',')], [])
+          if (!TagsStore.hasItems(allTags)) {
+            TagsStore.fetchItems({
+              tag_id: allTags,
+            })
+          }
+        }
+        catch (e) {
+          // Just preload some options
+          TagsStore.fetchItems()
         }
 
-        inputRepeaterWidget({
-          selector: '.select-options',
+        inputRepeater('.select-options', {
           rows: options,
           sortable: true,
-          cellCallbacks: [
-            input, (field) => {
+          cells: [
+            (props) => input({
+              placeholder: _x('Value...', 'input placeholder', 'groundhogg'),
+              ...props,
+            }),
+            ({ value, ...props }) => {
               // language=HTML
               return `
                   <div class="inline-tag-picker">
                       ${ icons.tag }
                       ${ input({
                           className: 'input hidden tags-input',
-                          ...field,
+                          value: isString(value) ? value : '',
+                          ...props,
                       }) }
                   </div>`
             },
@@ -698,15 +709,16 @@
 
               modal = miniModal(el, {
                 content: select({
-                  id: 'tags',
+                  id: 'gh-option-tags',
                 }),
                 onOpen: () => {
 
                   let $input = $($(el).find('input'))
                   let selected = $input.val().split(',').map(t => parseInt(t)).filter(id => TagsStore.has(id))
 
-                  tagPicker('#tags', true, (items) => TagsStore.itemsFetched(items), {
+                  tagPicker('#gh-option-tags', true, (items) => TagsStore.itemsFetched(items), {
                     data: selected.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+                    placeholder: __( 'Select tags...', 'groundhogg' )
                   }).on('change', e => {
                     let tagIds = $(e.target).val().map(id => parseInt(id))
                     $input.val(tagIds.join(',')).trigger('change')
@@ -726,7 +738,6 @@
               content: __('Apply a tag'),
             })
           },
-          cellProps: [{ placeholder: _x('Value...', 'input placeholder', 'groundhogg') }, {}],
           onChange: (rows) => {
             updateField({
               options: rows,
@@ -1138,7 +1149,7 @@
       advanced: standardAdvancedSettings,
       preview: (field) => fieldPreview({
         ...field,
-        type: 'email'
+        type: 'email',
       }),
     },
     tel: {
@@ -1148,7 +1159,7 @@
       advanced: standardAdvancedSettings,
       preview: (field) => fieldPreview({
         ...field,
-        type: 'tel'
+        type: 'tel',
       }),
     },
     textarea: {
@@ -1247,7 +1258,7 @@
           className: `gh-input ${ className }`,
         }
 
-        if ( multiple ){
+        if (multiple) {
           props.multiple = true
         }
 
@@ -1633,7 +1644,7 @@
 
       let fieldName = label
 
-      if ( ! fieldName || ! fieldName.length ){
+      if (!fieldName || !fieldName.length) {
         fieldName = fieldType.name + ' Field'
       }
 
@@ -1642,7 +1653,7 @@
           <div class="form-field" data-key="${ key }">
               <div class="field-header">
                   <div class="details">
-                      <div class="field-label">${fieldName}</div>
+                      <div class="field-label">${ fieldName }</div>
                       <div class="field-type">${ fieldType.name }</div>
                   </div>
                   <div class="actions">
@@ -1703,7 +1714,7 @@
 
       let { button, recaptcha, fields } = form
 
-      let tmpFields = [...fields].filter( ({type}) => ! [ 'hidden' ].includes( type ) )
+      let tmpFields = [...fields].filter(({ type }) => !['hidden'].includes(type))
 
       // only show if enabled and is version 2
       if (recaptcha.enabled && Groundhogg.recaptcha.version === 'v2' && Groundhogg.recaptcha.enabled) {

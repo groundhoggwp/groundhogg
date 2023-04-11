@@ -9,7 +9,7 @@
  * @since 1.4.8
  *
  */
-function get_gutenberg_form_html( $attr ) {
+function groundhogg_get_gutenberg_form_html( $attr ) {
 
 	$id = ! empty( $attr['formId'] ) ? absint( $attr['formId'] ) : 0;
 
@@ -35,6 +35,11 @@ function get_gutenberg_form_html( $attr ) {
 
 add_action( 'init', 'groundhogg_gutenberg_form_selector_init' );
 
+/**
+ * Register the block type
+ *
+ * @return void
+ */
 function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 
 
@@ -84,7 +89,7 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 			),
 		),
 
-		'render_callback' => 'get_gutenberg_form_html',
+		'render_callback' => 'groundhogg_get_gutenberg_form_html',
 		'style'           => 'groundhogg-form',
 		'editor_script'   => 'groundhogg-form-block-js',
 

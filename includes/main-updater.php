@@ -2,10 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\Bulk_Jobs\Manager;
-use Groundhogg\Bulk_Jobs\Migrate_Notes;
-use Groundhogg\DB\Activity;
-
 /**
  * Upgrade
  *
@@ -642,7 +638,7 @@ class Main_Updater extends Updater {
 		foreach ( $funnels as $funnel ) {
 			$funnel = new Funnel( $funnel );
 
-			if ( ! $funnel->exists() ){
+			if ( ! $funnel->exists() ) {
 				continue;
 			}
 
@@ -650,6 +646,15 @@ class Main_Updater extends Updater {
 			$funnel->update_events_from_status();
 		}
 
+	}
+
+	/**
+	 * Add the value column for activity
+	 *
+	 * @return void
+	 */
+	public function version_2_7_9_3() {
+		get_db( 'activity' )->create_table();
 	}
 
 	/**
@@ -729,6 +734,7 @@ class Main_Updater extends Updater {
 			'2.7.6.1',
 			'2.7.7.8',
 			'2.7.7.10',
+			'2.7.9.3',
 		];
 	}
 
@@ -771,6 +777,7 @@ class Main_Updater extends Updater {
 			'2.7.6.1',
 			'2.7.7.8',
 			'2.7.7.10',
+			'2.7.9.3',
 		];
 	}
 
@@ -832,7 +839,8 @@ class Main_Updater extends Updater {
 			'2.7.5.2'       => __( 'Clear telemetry cron job.', 'groundhogg' ),
 			'2.7.6.1'       => __( 'Update `step_status` column with `active` or `inactive`', 'groundhogg' ),
 			'2.7.7.8'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
-			'2.7.7.10'       => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
+			'2.7.7.10'      => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
+			'2.7.9.3'       => __( 'Add a value column to the the activity table!', 'groundhogg' ),
 		];
 	}
 }

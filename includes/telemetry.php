@@ -28,7 +28,7 @@ class Telemetry {
 	}
 
 	/**
-	 * Optin to the stats tracker system
+	 * Opt-in to the stats tracker system
 	 *
 	 * @deprecated
 	 */

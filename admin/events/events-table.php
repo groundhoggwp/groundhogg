@@ -162,7 +162,7 @@ class Events_Table extends WP_List_Table {
 	 */
 	protected function column_time( $event ) {
 
-		if ( $this->get_view() === 'unprocessed' ){
+		if ( $this->get_view() === 'unprocessed' ) {
 			return __( 'Should have run', 'groundhogg' ) . '&nbsp;' . scheduled_time_column( $event->get_time() );
 		}
 
@@ -411,7 +411,7 @@ class Events_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
             <a class="button action"
                href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
-          	<?php if ( $this->get_view() === Event::PAUSED ): ?>
+			<?php if ( $this->get_view() === Event::PAUSED ): ?>
                 <a class="button action danger"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'unpause_all' ], $_SERVER['REQUEST_URI'] ), 'unpause_all' ); ?>"><?php _ex( 'Unpause All', 'action', 'groundhogg' ); ?></a>
                 <a class="button action danger"
@@ -453,7 +453,7 @@ class Events_Table extends WP_List_Table {
 
 		$view = $this->get_view();
 
-        // Special handling of the unprocessed status
+		// Special handling of the unprocessed status
 		if ( $view === 'unprocessed' ) {
 			$where = [
 				'relationship' => "AND",
@@ -478,18 +478,23 @@ class Events_Table extends WP_List_Table {
 			}
 		}
 
-		$args = array(
-			'where'   => $where,
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'orderby' => $orderby,
-		);
+		$args = [
+			'where'      => $where,
+			'limit'      => $per_page,
+			'offset'     => $offset,
+			'order'      => $order,
+			'orderby'    => $orderby,
+			'found_rows' => true
+		];
 
-		$this->table = in_array( $this->get_view(), [ Event::PAUSED, Event::WAITING, 'unprocessed' ] ) ? 'event_queue' : 'events';
+		$this->table = in_array( $this->get_view(), [
+			Event::PAUSED,
+			Event::WAITING,
+			'unprocessed'
+		] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
-		$total  = get_db( $this->table )->count( $args );
+		$total  = get_db( $this->table )->found_rows();
 
 		$this->items = $events;
 

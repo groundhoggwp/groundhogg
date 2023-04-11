@@ -921,10 +921,10 @@
 
   const { optin_status, owners, countries, roles } = Groundhogg.filters
 
-  registerFilter('optin_status', 'contact', __('Optin Status', 'groundhogg'), {
+  registerFilter('optin_status', 'contact', __('Opt-in Status', 'groundhogg'), {
     view ({ compare, value }) {
       const func = compare === 'in' ? orList : andList
-      return ComparisonsTitleGenerators[compare](`<b>${ __('Optin Status', 'groundhogg') }</b>`,
+      return ComparisonsTitleGenerators[compare](`<b>${ __('Opt-in Status', 'groundhogg') }</b>`,
         func(value.map(v => `<b>${ optin_status[v] }</b>`)))
     },
     edit ({ compare, value }) {
@@ -1645,10 +1645,10 @@
     },
   })
 
-  registerFilter('optin_status_changed', 'activity', __('Optin Status Changed', 'groundhogg'), {
+  registerFilter('optin_status_changed', 'activity', __('Opt-in Status Changed', 'groundhogg'), {
     view ({ value, ...filter }) {
       return standardActivityDateTitle(
-        sprintf('<b>Optin status</b> changed to %s', orList(value.map(v => `<b>${ optin_status[v] }</b>`))), filter)
+        sprintf('<b>Opt-in status</b> changed to %s', orList(value.map(v => `<b>${ optin_status[v] }</b>`))), filter)
     },
     edit ({ value, ...filter }) {
       return [
@@ -2422,6 +2422,39 @@
 
   })
 
+  const registerActivityFilter = ( id, group, label, {
+    view = () => {},
+    edit = () => {},
+    onMount = () => {},
+    defaults = {}
+  } ) => {
+
+
+    registerFilter(id, group, label, {
+      view (filter) {
+        return standardActivityDateTitle(filterCountTitle(view(filter), filter), filter)
+      },
+      edit (filter) {
+        return [
+          edit(filter),
+          filterCount(filter),
+          standardActivityDateOptions(filter),
+        ].join('')
+      },
+      onMount (filter, updateFilter) {
+        onMount(filter, updateFilter)
+        filterCountOnMount(updateFilter)
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...defaults,
+        ...standardActivityDateDefaults,
+        ...filterCountDefaults,
+      },
+    })
+
+  }
+
   Groundhogg.filters.functions = {
     createFilters,
     registerFilter,
@@ -2435,6 +2468,7 @@
     standardActivityDateDefaults,
     standardActivityDateFilterOnMount,
     BasicTextFilter,
+    registerActivityFilter
   }
 
 } )

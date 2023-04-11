@@ -65,7 +65,9 @@ class Replacements implements \JsonSerializable {
 	public function setup_defaults() {
 
 		$groups = [
-			'contact'    => __( 'Contact', 'groundhogg' ),
+			'contact'    => __( 'Contact Info', 'groundhogg' ),
+			'crm'        => __( 'CRM', 'groundhogg' ),
+			'address'    => __( 'Address', 'groundhogg' ),
 			'user'       => __( 'WP User', 'groundhogg' ),
 			'owner'      => __( 'Contact Owner', 'groundhogg' ),
 			'site'       => __( 'Site', 'groundhogg' ),
@@ -155,11 +157,76 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'The contact\'s mobile phone number.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'     => 'line1',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_line1' ],
+				'name'     => __( 'Line 1', 'groundhogg' ),
+				'description' => _x( 'The contact\'s street address.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'line2',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_line2' ],
+				'name'     => __( 'Line 2', 'groundhogg' ),
+				'description' => _x( 'The contact\'s street address.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'city',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_city' ],
+				'name'     => __( 'City', 'groundhogg' ),
+				'description' => _x( 'The contact\'s city.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'state',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_state' ],
+				'name'     => __( 'State', 'groundhogg' ),
+				'description' => _x( 'The contact\'s state.', 'replacement', 'groundhogg' ),
+
+			],
+			[
+				'code'     => 'zip_code',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_zip' ],
+				'name'     => __( 'Zip Code', 'groundhogg' ),
+				'description' => _x( 'The contact\'s zip code.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'country',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_country' ],
+				'name'     => __( 'Country', 'groundhogg' ),
+				'description' => _x( 'The contact\'s country.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'country_code',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_country_code' ],
+				'name'     => __( 'Country Code', 'groundhogg' ),
+				'description' => _x( 'The contact\'s country code.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'address',
-				'group'       => 'contact',
+				'group'       => 'address',
 				'callback'    => [ $this, 'replacement_address' ],
 				'name'        => __( 'Full Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'ip_address',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_ip_address' ],
+				'name'     => __( 'IP Address', 'groundhogg' ),
+				'description' => _x( 'The contact\'s IP address.', 'replacement', 'groundhogg' ),
+
+			],
+			[
+				'code'     => 'time_zone',
+				'group'    => 'address',
+				'callback' => [ $this, 'replacement_time_zone' ],
+				'name'     => __( 'Time Zone', 'groundhogg' ),
+				'description' => _x( 'The contact\'s time zone.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'birthday',
@@ -170,14 +237,14 @@ class Replacements implements \JsonSerializable {
 			],
 			[
 				'code'        => 'tag_names',
-				'group'       => 'contact',
+				'group'       => 'crm',
 				'callback'    => [ $this, 'tag_names' ],
 				'name'        => __( 'Tag Names', 'groundhogg' ),
 				'description' => _x( 'List of tags applied to the contact.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'meta',
-				'group'        => 'contact',
+				'group'        => 'crm',
 				'default_args' => 'meta_key',
 				'callback'     => [ $this, 'replacement_meta' ],
 				'name'         => __( 'Meta Data', 'groundhogg' ),
@@ -185,11 +252,18 @@ class Replacements implements \JsonSerializable {
 			],
 			[
 				'code'         => 'profile_picture',
-				'group'        => 'contact',
+				'group'        => 'crm',
 				'default_args' => '300',
 				'callback'     => [ $this, 'replacement_profile_picture' ],
 				'name'         => __( 'Profile Picture', 'groundhogg' ),
 				'description'  => _x( 'The contact\'s profile picture.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'optin_status',
+				'group'       => 'crm',
+				'callback'    => [ $this, 'replacement_optin_status' ],
+				'name'        => __( 'Opt-in Status', 'groundhogg' ),
+				'description' => _x( 'The contact\'s opt-in status.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'user',
@@ -315,7 +389,7 @@ class Replacements implements \JsonSerializable {
 			],
 			[
 				'code'        => 'files',
-				'group'       => 'contact',
+				'group'       => 'crm',
 				'callback'    => [ $this, 'replacement_files' ],
 				'name'        => __( 'Files List', 'groundhogg' ),
 				'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
@@ -801,6 +875,16 @@ class Replacements implements \JsonSerializable {
 		return $this->get_current_contact()->get_profile_picture( $size );
 	}
 
+	/**
+	 * The pretty name of the optin status
+	 *
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function replacement_optin_status( $contact_id ) {
+		return Preferences::get_preference_pretty_name( $this->get_current_contact()->get_optin_status() );
+	}
 
 	/**
 	 * Returns comma separated tags
@@ -971,6 +1055,42 @@ class Replacements implements \JsonSerializable {
 		}
 	}
 
+	function replacement_line1() {
+		return $this->get_current_contact()->get_meta( 'street_address_1' );
+	}
+
+	function replacement_line2() {
+		return $this->get_current_contact()->get_meta( 'street_address_2' );
+	}
+
+	function replacement_city() {
+		return $this->get_current_contact()->get_meta( 'city' );
+	}
+
+	function replacement_state() {
+		return $this->get_current_contact()->get_meta( 'region' );
+	}
+
+	function replacement_zip() {
+		return $this->get_current_contact()->get_meta( 'postal_zip' );
+	}
+
+	function replacement_country_code() {
+		return $this->get_current_contact()->get_meta( 'country' );
+	}
+
+	function replacement_country() {
+		return utils()->location->get_countries_list( $this->get_current_contact()->get_meta( 'country' ) );
+	}
+
+	function replacement_ip_address() {
+		return $this->get_current_contact()->get_meta( 'ip_address' );
+	}
+
+	function replacement_time_zone() {
+		return $this->get_current_contact()->get_meta( 'time_zone' );
+	}
+
 	/**
 	 * Return back the address of the contact.
 	 *
@@ -1130,7 +1250,7 @@ class Replacements implements \JsonSerializable {
 
 	/**
 	 * Return a confirmation link for the contact
-	 * This just gets the Optin Page link for now.
+	 * This just gets the Opt-in Page link for now.
 	 *
 	 * @param $redirect_to string
 	 *
@@ -1147,7 +1267,7 @@ class Replacements implements \JsonSerializable {
 
 	/**
 	 * Return a raw confirmation link for the contact that can be placed in a button.
-	 * This just gets the Optin Page link for now.
+	 * This just gets the Opt-in Page link for now.
 	 *
 	 * @param string $redirect_to
 	 *
@@ -1713,7 +1833,7 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
-				$render_post = function ( $post ) use ( $props ) {
+				$render_post = function ( $post, $thumbnail_size = 'thumbnail' ) use ( $props ) {
 					return html()->e( 'div', [
 						'class' => [
 							$props['layout'] === 'grid' ? 'post' : 'post-card',
@@ -1726,7 +1846,7 @@ class Replacements implements \JsonSerializable {
 							'href' => get_permalink( $post )
 						], html()->e( 'img', [
 							'class' => 'featured-image',
-							'src'   => get_the_post_thumbnail_url( $post ),
+							'src'   => get_the_post_thumbnail_url( $post, $thumbnail_size ),
 						] ) ) ) : '',
 						html()->e( 'div', [ 'class' => 'card-content' ], [
 							html()->e( 'h2', [], html()->e( 'a', [
@@ -1739,7 +1859,7 @@ class Replacements implements \JsonSerializable {
 
 				if ( $props['featured'] ) {
 					$post   = array_shift( $posts );
-					$rows[] = $render_post( $post );
+					$rows[] = $render_post( $post, 'large' );
 				}
 
 				$rows[] = '<div class="email-columns">';

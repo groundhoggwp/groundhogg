@@ -145,6 +145,15 @@ class Emails extends DB {
 		];
 	}
 
+	public function get_searchable_columns() {
+		return [
+			'title',
+			'subject',
+			'pre_header',
+			'content',
+		];
+	}
+
 	/**
 	 * Create the table
 	 *

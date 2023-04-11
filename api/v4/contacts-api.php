@@ -11,13 +11,12 @@ use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
-use function Groundhogg\array_map_keys;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_contactdata;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\sanitize_object_meta;
@@ -177,19 +176,23 @@ class Contacts_Api extends Base_Object_Api {
 		$default_offset      = absint( $request->get_param( 'offset' ) ) ?: 0;
 
 		$query = wp_parse_args( $query, [
-			'number' => $default_query_limit,
-			'offset' => $default_offset,
+			'number'        => $default_query_limit,
+			'offset'        => $default_offset,
+			'no_found_rows' => false
 		] );
 
-		$count = $contact_query->count( $query );
-
 		if ( $request->get_param( 'count' ) ) {
+
+			$count = $contact_query->count( $query );
+
 			return self::SUCCESS_RESPONSE( [
 				'total_items' => $count,
 			] );
 		}
 
 		$contacts = $contact_query->query( $query );
+		$count    = $contact_query->found_items;
+
 		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		return self::SUCCESS_RESPONSE( [
@@ -328,7 +331,7 @@ class Contacts_Api extends Base_Object_Api {
 			$updated ++;
 		}
 
-		if ( $request->has_param( 'total_only' ) ){
+		if ( $request->has_param( 'total_only' ) ) {
 			return self::SUCCESS_RESPONSE( [
 				'total_items' => $updated,
 			] );
@@ -341,8 +344,38 @@ class Contacts_Api extends Base_Object_Api {
 	}
 
 	/**
-	 * Create a contact or multiple contacts
-	 * Should handle both cases
+	 * Fetch a contact given the user ID
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return bool
+	 */
+	protected function by_user_id( WP_REST_Request $request ){
+		return $request->has_param( 'by_user_id' ) && $request->get_param( 'by_user_id' );
+	}
+
+	/**
+	 * Fetch a contact record
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
+	public function read_single( WP_REST_Request $request ) {
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = new Contact( $primary_key, $this->by_user_id( $request ) );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
+	}
+
+	/**
+	 * Create a contact
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -390,7 +423,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function update_single( WP_REST_Request $request ) {
 		$ID = absint( $request->get_param( 'ID' ) );
 
-		$contact = get_contactdata( $ID );
+		$contact = get_contactdata( $ID, $this->by_user_id( $request ) );
 
 		if ( ! is_a_contact( $contact ) ) {
 			return self::ERROR_CONTACT_NOT_FOUND();
@@ -430,6 +463,27 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
+	}
+
+	/**
+	 * Delete a contact record
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_single( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = new Contact( $primary_key, $this->by_user_id( $request ) );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$object->delete();
+
+		return self::SUCCESS_RESPONSE();
 	}
 
 	/**

@@ -4,10 +4,12 @@ namespace Groundhogg\Classes;
 
 use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
+use Groundhogg\Contact;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\Email;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 
 class Activity extends Base_Object_With_Meta {
@@ -19,6 +21,22 @@ class Activity extends Base_Object_With_Meta {
 	const UNSUBSCRIBED = 'unsubscribed';
 	const PAGE_VIEW = 'page_view';
 	const LOGIN = 'wp_login';
+
+	public $contact;
+
+	/**
+	 * Retrieve associated the contact
+	 *
+	 * @return false|\Groundhogg\Contact
+	 */
+	public function get_contact() {
+		if ( $this->contact ){
+			return $this->contact;
+		}
+
+		$this->contact = new Contact( $this->contact_id );
+		return $this->contact;
+	}
 
 	/**
 	 * Do any post setup actions.

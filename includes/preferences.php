@@ -27,11 +27,11 @@ class Preferences {
 	 *
 	 * @return bool
 	 */
-	public function current_contact_can_modify_preferences(){
+	public function current_contact_can_modify_preferences() {
 
 		$permissions_hash = get_cookie( 'gh-preferences-permission' );
 
-		if ( ! $permissions_hash ){
+		if ( ! $permissions_hash ) {
 			return false;
 		}
 
@@ -47,7 +47,7 @@ class Preferences {
 
 		$value = wp_hash( encrypt( implode( '|', $parts ) ) );
 
-		if ( $value !== $permissions_hash ){
+		if ( $value !== $permissions_hash ) {
 			return false;
 		}
 
@@ -142,7 +142,7 @@ class Preferences {
 
 		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() ) {
 
-			if ( ! $contact->has_gdpr_consent() || ! $contact->has_gdpr_consent( 'marketing' )  ) {
+			if ( ! $contact->has_gdpr_consent() || ! $contact->has_gdpr_consent( 'marketing' ) ) {
 				return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
 			}
 		}
@@ -209,11 +209,12 @@ class Preferences {
 	 */
 	public static function string_to_preference( $string ) {
 
-		if ( ! is_string( $string ) ){
+		if ( ! is_string( $string ) ) {
 			return self::UNCONFIRMED;
 		}
 
 		$string_map = [
+			'pending'      => self::UNCONFIRMED,
 			'unconfirm'    => self::UNCONFIRMED,
 			'unconfirmed'  => self::UNCONFIRMED,
 			'confirm'      => self::CONFIRMED,
@@ -228,9 +229,16 @@ class Preferences {
 			'complain'     => self::COMPLAINED,
 			'complaint'    => self::COMPLAINED,
 			'complained'   => self::COMPLAINED,
+			'spam'         => self::SPAM,
+			'spammed'      => self::SPAM,
+			'fake'         => self::SPAM,
 		];
 
-		return get_array_var( $string_map, $string, self::UNCONFIRMED );
+		// Add translated names as well!
+		$pretty_names = array_map( 'strtolower', self::get_preference_names() );
+		$string_map   = array_merge( $string_map, array_flip( $pretty_names ) );
+
+		return get_array_var( $string_map, strtolower( $string ), self::UNCONFIRMED );
 	}
 
 	/**
@@ -247,12 +255,12 @@ class Preferences {
 	/**
 	 * ensure that the provided preference is valid
 	 *
-	 * @param $preference
+	 * @param       $preference
 	 * @param false $old_preference
 	 *
 	 * @return false|int|mixed
 	 */
-	public static function sanitize( $preference, $old_preference = false ){
+	public static function sanitize( $preference, $old_preference = false ) {
 		return self::is_valid( absint( $preference ) ) ? absint( $preference ) : ( $old_preference ?: self::UNCONFIRMED );
 	}
 
@@ -263,7 +271,7 @@ class Preferences {
 	 *
 	 * @return bool
 	 */
-	public static function is_valid( $preference ){
+	public static function is_valid( $preference ) {
 		return in_array( $preference, array_keys( self::get_preference_names() ) );
 	}
 

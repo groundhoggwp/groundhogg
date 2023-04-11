@@ -3,16 +3,15 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email;
+use Groundhogg\Plugin;
+use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
-use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
-use Groundhogg\Plugin;
-use WP_List_Table;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
@@ -362,16 +361,17 @@ class Emails_Table extends WP_List_Table {
 		];
 
 		$args = array(
-			'where'   => $where,
-			'search'  => $search,
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'orderby' => $orderby,
+			'where'      => $where,
+			'search'     => $search,
+			'limit'      => $per_page,
+			'offset'     => $offset,
+			'order'      => $order,
+			'orderby'    => $orderby,
+			'found_rows' => true,
 		);
 
 		$events = get_db( 'emails' )->query( $args );
-		$total  = get_db( 'emails' )->count( $args );
+		$total  = get_db( 'emails' )->found_rows();
 
 		$this->items = $events;
 

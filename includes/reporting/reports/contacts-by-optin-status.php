@@ -21,7 +21,7 @@ class Contacts_By_Optin_Status extends Contacts_By_Data {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Contacts By Optin Status', 'groundhogg' );
+		return __( 'Contacts By Opt-in Status', 'groundhogg' );
 	}
 
 	/**

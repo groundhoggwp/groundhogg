@@ -56,7 +56,7 @@
           <div class="gh-rows-and-columns">
               <div class="gh-row">
                   <div class="gh-col">
-                      <label for="email">${ __('Optin Status',
+                      <label for="email">${ __('Opt-in Status',
                               'groundhogg') }</label>
                       ${ select({
                           id: `optin-status`,

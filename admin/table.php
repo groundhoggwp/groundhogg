@@ -66,7 +66,7 @@ abstract class Table extends \WP_List_Table {
 		return html()->e( 'a',
 			[
 				'class' => $is_active ? 'current' : '',
-				'href'  => add_query_arg( is_array( $param ) ? $param: [
+				'href'  => add_query_arg( is_array( $param ) ? $param : [
 					$param => $view,
 				], $this->get_page_url() ),
 			],
@@ -103,7 +103,7 @@ abstract class Table extends \WP_List_Table {
 	abstract protected function get_row_actions( $item, $column_name, $primary );
 
 	/**
-	 * @param mixed $item
+	 * @param mixed  $item
 	 * @param string $column_name
 	 * @param string $primary
 	 *
@@ -205,23 +205,26 @@ abstract class Table extends \WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$per_page = absint( get_url_var( 'limit', 30 ) );
-		$paged    = $this->get_pagenum();
-		$offset   = $per_page * ( $paged - 1 );
-		$search   = trim( sanitize_text_field( get_url_var( 's' ) ) );
-		$order    = get_url_var( 'order', 'DESC' );
-		$orderby  = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
+		$per_page       = absint( get_url_var( 'limit', 30 ) );
+		$paged          = $this->get_pagenum();
+		$offset         = $per_page * ( $paged - 1 );
+		$search         = trim( sanitize_text_field( get_url_var( 's' ) ) );
+		$order          = get_url_var( 'order', 'DESC' );
+		$orderby        = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
+		$search_columns = get_url_var( 'search_columns', '' );
 
 		$query = array_merge( $this->get_default_query(), get_request_query(), [
-			'limit'   => $per_page,
-			'offset'  => $offset,
-			'order'   => $order,
-			'search'  => $search,
-			'orderby' => $orderby,
+			'limit'          => $per_page,
+			'offset'         => $offset,
+			'order'          => $order,
+			'search'         => $search,
+			'search_columns' => $search_columns,
+			'orderby'        => $orderby,
+			'found_rows'     => true,
 		] );
 
 		$items = $this->get_db()->query( $query );
-		$total = $this->get_db()->count( $query );
+		$total = $this->get_db()->found_rows();
 
 		foreach ( $items as $i => $item ) {
 			$items[ $i ] = $this->parse_item( $item );

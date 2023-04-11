@@ -611,7 +611,7 @@ switch ( $action ):
                 </ul>
                 <p>
                     <a id="gotoprofile" class="button"
-                       href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( "Nevermind! Don't erase my profile.", 'groundhogg' ) ?></a>
+                       href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( "Never mind! Don't erase my profile.", 'groundhogg' ) ?></a>
                     <a id="eraseprofile" class="button danger right"
                        href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
                 </p>

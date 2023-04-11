@@ -27,18 +27,26 @@ class Admin_User {
 			return;
 		}
 
+		add_filter( 'mce_css', function ( $mce_css ) {
+			return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
+		} );
+
 		?>
-		<h2><?php _e( white_labeled_name() ); ?></h2>
-		<table class="form-table">
-			<tr>
-				<th><?php _e( 'Signature', 'groundhogg' ); ?></th>
-				<td>
-					<textarea name="signature" rows="4"
-					          cols="20"><?php esc_html_e( $profile_user->signature ); ?></textarea>
-					<p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
-				</td>
-			</tr>
-		</table>
+        <h2><?php _e( white_labeled_name() ); ?></h2>
+        <table class="form-table">
+            <tr>
+                <th><?php _e( 'Signature', 'groundhogg' ); ?></th>
+                <td>
+                    <div style="max-width: 800px">
+						<?php wp_editor( $profile_user->signature, 'signature', [
+							'teeny'         => false,
+							'textarea_rows' => 10
+						] ); ?>
+                    </div>
+                    <p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+        </table>
 		<?php
 	}
 

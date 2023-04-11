@@ -2578,6 +2578,7 @@ ${ afterProgress() }`,
     spinner,
     el,
     isNumeric,
+    isString,
     replacementsWidget,
   }
 

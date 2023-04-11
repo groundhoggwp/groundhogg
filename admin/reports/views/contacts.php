@@ -96,7 +96,7 @@ use function Groundhogg\utils;
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php _e( 'Top Signup Pages', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_contacts_by_source_page"></div>
     </div>

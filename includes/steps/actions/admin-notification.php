@@ -272,7 +272,7 @@ class Admin_Notification extends Action {
 
 
 	public function generate_step_title( $step ) {
-		$send_to = $this->get_setting( 'send_to' );
+		$send_to = wp_parse_list( $this->get_setting( 'send_to', [] ) );
 		$send_to = array_map( function ( $email ) {
 
 			switch ( $email ) {

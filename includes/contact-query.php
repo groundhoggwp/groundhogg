@@ -1193,10 +1193,15 @@ class Contact_Query {
 		if ( in_array( $orderby, $allowed_keys, true ) ) {
 			/* This column needs special handling here. */
 
+			// table defined
+			if ( str_contains( $orderby, '.' ) ){
+				return $orderby;
+			}
+
 			return "$this->table_name.$orderby";
 		}
 
-		return empty( $orderby ) ? '' : $orderby;
+		return '';
 	}
 
 	/**

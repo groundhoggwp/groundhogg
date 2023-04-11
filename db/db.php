@@ -248,7 +248,7 @@ abstract class DB {
 	/**
 	 * Get the associated meta table
 	 *
-	 * @return mixed|null
+	 * @return Meta_DB
 	 */
 	public function get_meta_table() {
 		return Plugin::instance()->dbs->get_meta_db_by_object_type( $this->get_object_type() );
@@ -304,10 +304,8 @@ abstract class DB {
 
 		$where_args = array();
 
-		foreach ( $this->get_columns() as $column => $type ) {
-			if ( $type === '%s' ) {
-				$where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
-			}
+		foreach ( $this->get_searchable_columns() as $column ) {
+			$where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
 		}
 
 		$where = $this->generate_where( $where_args, "OR" );
@@ -324,6 +322,23 @@ abstract class DB {
 	 */
 	public function get_columns() {
 		return [];
+	}
+
+	public function has_column( $column ) {
+		return array_key_exists( $column, $this->get_columns() );
+	}
+
+	public function column_is_searchable( $column ) {
+		return in_array( $column, $this->get_searchable_columns() );
+	}
+
+	/**
+	 * @return int[]|string[]
+	 */
+	public function get_searchable_columns() {
+		return array_keys( array_filter( $this->get_columns(), function ( $f ) {
+			return $f === '%s';
+		} ) );
 	}
 
 	/**
@@ -933,15 +948,17 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array        $data
-	 * @param string|false $ORDER_BY
-	 * @param bool         $from_cache
+	 * Parses query vars when as they can be passed in a variety of formats
 	 *
-	 * @return array|bool|null|object
+	 * @param $data array
+	 *
+	 * @return array
 	 */
-	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
-		if ( isset_not_empty( $data, 'where' ) ) {
-			return $this->advanced_query( $data, $from_cache );
+	public function parse_query_vars( $data = [] ) {
+
+		// parsed allready
+		if ( isset_not_empty( $data, '_was_parsed' ) ) {
+			return $data;
 		}
 
 		$query_vars = wp_parse_args( $data, [
@@ -966,6 +983,9 @@ abstract class DB {
 			}
 
 			switch ( $key ) {
+				case 'where':
+					$where = array_merge( $where, $val );
+					break;
 				case 's':
 				case 'search':
 				case 'term':
@@ -1013,26 +1033,60 @@ abstract class DB {
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
-						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
-							$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
-						} else if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
-							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
-						} else {
-							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => is_array( $val ) ? 'IN' : '=' ];
+
+						if ( is_array( $val ) ) {
+
+							// Compare and val defined explicitly
+							if ( array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
+								$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
+								break;
+							}
+
+							// Compare is provided as first item in array of 2
+							if ( count( $val ) === 2 && in_array( $val[0], $this->get_allowed_comparisons() ) ) {
+								$where[] = [ 'col' => $key, 'val' => $val[1], 'compare' => $val[0] ];
+								break;
+							}
 						}
+
+						// Select Clause
+						if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
+							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
+							break;
+						}
+
+						// Basic column clause
+						$where[] = [ 'col' => $key, 'val' => $val, 'compare' => is_array( $val ) ? 'IN' : '=' ];
+
+					} else {
+						// Pass along
+						$query_vars[ $key ] = $val;
 					}
 
 					break;
 			}
 		}
 
+		$query_vars['where']       = $where;
+		$query_vars['_was_parsed'] = true;
+
+		return $query_vars;
+	}
+
+	/**
+	 * @param array        $data
+	 * @param string|false $ORDER_BY
+	 * @param bool         $from_cache
+	 *
+	 * @return array|bool|null|object
+	 */
+	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
+
 		if ( $ORDER_BY ) {
-			$query_vars['orderby'] = $ORDER_BY;
+			$data['orderby'] = $ORDER_BY;
 		}
 
-		$query_vars['where'] = $where;
-
-		return $this->advanced_query( $query_vars, $from_cache );
+		return $this->advanced_query( $data, $from_cache );
 	}
 
 	public $last_query = '';
@@ -1048,9 +1102,7 @@ abstract class DB {
 	 */
 	public function advanced_query( $query_vars = [], $from_cache = true ) {
 
-		$query_vars = wp_parse_args( $query_vars, [
-			'operation' => 'SELECT',
-		] );
+		$query_vars = $this->parse_query_vars( $query_vars );
 
 		ksort( $query_vars );
 
@@ -1095,7 +1147,8 @@ abstract class DB {
 				break;
 		}
 
-		$results          = call_user_func( [ $wpdb, $method ], $sql );
+		$results = call_user_func( [ $wpdb, $method ], $sql );
+
 		$this->last_query = $wpdb->last_query;
 		$results          = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
 
@@ -1109,6 +1162,12 @@ abstract class DB {
 		return $results;
 	}
 
+	public function found_rows() {
+		global $wpdb;
+
+		return (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
+	}
+
 	/**
 	 * Generate the SQL Statement
 	 *
@@ -1117,20 +1176,38 @@ abstract class DB {
 	 * @return string
 	 */
 	public function get_sql( $query_vars = [] ) {
+
+		$query_vars = $this->parse_query_vars( $query_vars );
+
 		// Actual start
 		$query_vars = wp_parse_args( $query_vars, [
-			'operation' => 'SELECT',
-			'data'      => [],
-			'where'     => [],
-			'limit'     => false,
-			'offset'    => false,
-			'orderby'   => $this->get_primary_key(),
-			'order'     => 'desc', // ASC || DESC
-			'select'    => '*',
-			'search'    => false,
-			'func'      => false, // COUNT | AVG | SUM
-			'groupby'   => false,
+			'operation'      => 'SELECT',
+			'data'           => [],
+			'where'          => [],
+			'limit'          => false,
+			'offset'         => false,
+			'orderby'        => $this->get_primary_key(),
+			'order'          => 'desc', // ASC || DESC
+			'select'         => '*',
+			'search'         => false,
+			'search_columns' => [],
+			'func'           => false, // COUNT | AVG | SUM
+			'groupby'        => false,
+			'meta_query'     => [],
+			'found_rows'     => false,
 		] );
+
+		if ( ! empty( $query_vars['meta_query'] ) ) {
+
+			$meta_query = new \WP_Meta_Query( $query_vars['meta_query'] );
+
+			$meta_table = $this->get_meta_table();
+			$meta_table->maybe_resolve_table_conflict();
+
+			$meta_query_sql = $meta_query->get_sql( $this->get_object_type(), $this->table_name, 'ID' );
+
+			$meta_table->maybe_resolve_table_conflict();
+		}
 
 		// Build Where Statement
 		$where = get_array_var( $query_vars, 'where', [] );
@@ -1138,14 +1215,19 @@ abstract class DB {
 		if ( $query_vars['search'] ) {
 			$search = [ 'relationship' => 'OR' ];
 
-			foreach ( $this->get_columns() as $column => $type ) {
-				if ( $type === '%s' ) {
-					$search[] = [
-						'col'     => $column,
-						'val'     => '%' . esc_sql( $query_vars['search'] ) . '%',
-						'compare' => 'LIKE'
-					];
+			$search_columns = ! empty( $query_vars['search_columns'] ) ? wp_parse_list( $query_vars['search_columns'] ) : $this->get_searchable_columns();
+
+			foreach ( $search_columns as $column ) {
+
+				if ( ! $this->column_is_searchable( $column ) ) {
+					continue;
 				}
+
+				$search[] = [
+					'col'     => $column,
+					'val'     => '%' . esc_sql( $query_vars['search'] ) . '%',
+					'compare' => 'LIKE'
+				];
 			}
 
 			$where[] = $search;
@@ -1155,6 +1237,12 @@ abstract class DB {
 		if ( empty( $where ) ) {
 			$where = '1=1';
 		}
+
+		if ( isset( $meta_query_sql ) && $meta_query_sql ) {
+			$where .= ' ' . $meta_query_sql['where'];
+		}
+
+		$func = false;
 
 		switch ( $query_vars['operation'] ) {
 			default:
@@ -1169,14 +1257,18 @@ abstract class DB {
 
 				$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
 
-				$func = false;
-
 				if ( $query_vars['func'] ) {
 					$func   = strtoupper( $query_vars['func'] );
 					$select = sprintf( '%s( %s %s)', $func, $distinct, $select );
 				}
 
-				$operation = "SELECT $select FROM {$this->get_table_name()}";
+				$found_rows = $query_vars['found_rows'] && $query_vars['limit'] ? 'SQL_CALC_FOUND_ROWS' : '';
+
+				$operation = "SELECT $found_rows $select FROM {$this->get_table_name()}";
+
+				if ( isset( $meta_query_sql ) && $meta_query_sql ) {
+					$operation .= ' ' . $meta_query_sql['join'];
+				}
 
 				break;
 
@@ -1536,10 +1628,6 @@ abstract class DB {
 	 */
 	public function delete_orphaned_meta() {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
-	}
-
-	public function has_column( $column ) {
-		return in_array( $column, array_keys( $this->get_columns() ) );
 	}
 
 }

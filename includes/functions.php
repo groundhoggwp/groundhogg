@@ -1434,7 +1434,7 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  * @return string
  */
 function wpgh_get_referer() {
-	if ( ! isset( $_POST['_wp_http_referer'] ) ) {
+	if ( ! isset( $_REQUEST['_wp_http_referer'] ) ) {
 		return wp_get_referer();
 	}
 
@@ -1797,6 +1797,9 @@ function after_form_submit_handler( &$contact ) {
 
 add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\extrapolate_location_after_signup', 9 );
 
+// If we are able to extrapolate the location, we can fix the mobile number if provided
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 9 );
+
 /**
  * Get the location of a contact record when they signup
  *
@@ -2130,11 +2133,11 @@ function get_exportable_fields( $extra = [] ) {
 		'first_name'                => __( 'First Name', 'groundhogg' ),
 		'last_name'                 => __( 'Last Name', 'groundhogg' ),
 		'email'                     => __( 'Email Address', 'groundhogg' ),
-		'optin_status'              => __( 'Optin Status', 'groundhogg' ),
+		'optin_status'              => __( 'Opt-in Status', 'groundhogg' ),
 		'user_id'                   => __( 'User Id', 'groundhogg' ),
 		'owner_id'                  => __( 'Owner Id', 'groundhogg' ),
 		'date_created'              => __( 'Date Created', 'groundhogg' ),
-		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
+		'date_optin_status_changed' => __( 'Date Opt-in Status Changed', 'groundhogg' ),
 		'birthday'                  => __( 'Birthday', 'groundhogg' ),
 		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
 		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
@@ -2155,7 +2158,7 @@ function get_exportable_fields( $extra = [] ) {
 		'time_zone'              => __( 'Time Zone', 'groundhogg' ),
 		'ip_address'             => __( 'IP Address', 'groundhogg' ),
 		'lead_source'            => __( 'Lead Source', 'groundhogg' ),
-		'source_page'            => __( 'Source Page', 'groundhogg' ),
+		'source_page'            => __( 'Signup Page', 'groundhogg' ),
 		'terms_agreement'        => __( 'Terms Agreement', 'groundhogg' ),
 		'gdpr_consent'           => __( 'Data Processing Consent', 'groundhogg' ),
 		'gdpr_consent_date'      => __( 'Data Processing Consent Data', 'groundhogg' ),
@@ -2231,48 +2234,58 @@ function export_field( $contact, $field = '' ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		'full_name'                 => __( 'Full Name', 'groundhogg' ),
-		'first_name'                => __( 'First Name', 'groundhogg' ),
-		'last_name'                 => __( 'Last Name', 'groundhogg' ),
-		'email'                     => __( 'Email Address', 'groundhogg' ),
-		'optin_status'              => __( 'Optin Status', 'groundhogg' ),
-		'user_id'                   => __( 'User Id', 'groundhogg' ),
-		'owner_id'                  => __( 'Owner Id', 'groundhogg' ),
-		'date_created'              => __( 'Date Created', 'groundhogg' ),
-		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
-		'birthday'                  => __( 'Birthday', 'groundhogg' ),
-		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
-		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
-		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
-		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
-		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
-		'city'                      => __( 'City', 'groundhogg' ),
-		'postal_zip'                => __( 'Postal/Zip', 'groundhogg' ),
-		'region'                    => __( 'Province/State/Region', 'groundhogg' ),
-		'country'                   => __( 'Country', 'groundhogg' ),
-
-//		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
-//		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
-//		'company_name'              => __( 'Company Name', 'groundhogg' ),
-//		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
-//		'job_title'                 => __( 'Job Title', 'groundhogg' ),
-
-		'time_zone'         => __( 'Time Zone', 'groundhogg' ),
-		'ip_address'        => __( 'IP Address', 'groundhogg' ),
-		'lead_source'       => __( 'Lead Source', 'groundhogg' ),
-		'source_page'       => __( 'Source Page', 'groundhogg' ),
-		'terms_agreement'   => __( 'Terms Agreement', 'groundhogg' ),
-		'gdpr_consent'      => __( 'Data Processing Consent', 'groundhogg' ),
-		'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
-		'notes'             => __( 'Add To Notes', 'groundhogg' ),
-		'tags'              => __( 'Apply Value as Tag', 'groundhogg' ),
-		'meta'              => __( 'Add as Custom Meta', 'groundhogg' ),
-		'copy_file'         => __( 'Add as File', 'groundhogg' ),
-		'utm_campaign'      => __( 'UTM Campaign', 'groundhogg' ),
-		'utm_content'       => __( 'UTM Content', 'groundhogg' ),
-		'utm_medium'        => __( 'UTM Medium', 'groundhogg' ),
-		'utm_term'          => __( 'UTM Term', 'groundhogg' ),
-		'utm_source'        => __( 'UTM Source', 'groundhogg' ),
+		__( 'Contact Info' )  => [
+			'full_name'                 => __( 'Full Name', 'groundhogg' ),
+			'first_name'                => __( 'First Name', 'groundhogg' ),
+			'last_name'                 => __( 'Last Name', 'groundhogg' ),
+			'email'                     => __( 'Email Address', 'groundhogg' ),
+			'optin_status'              => __( 'Opt-in Status', 'groundhogg' ),
+			'date_created'              => __( 'Date Created', 'groundhogg' ),
+			'date_optin_status_changed' => __( 'Date Opt-in Status Changed', 'groundhogg' ),
+			'birthday'                  => __( 'Birthday', 'groundhogg' ),
+			'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
+			'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
+			'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
+			'contact_id'                => __( 'Contact ID', 'groundhogg' ),
+		],
+		__( 'User' )          => [
+			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
+			'user_email' => __( 'User Email', 'groundhogg' ),
+		],
+		__( 'Contact Owner' ) => [
+			'owner_id'    => __( 'Owner Id/Login', 'groundhogg' ),
+			'owner_email' => __( 'Owner Email', 'groundhogg' ),
+		],
+		__( 'CRM' )           => [
+			'notes'     => __( 'Add To Notes', 'groundhogg' ),
+			'tags'      => __( 'Apply Value as Tag', 'groundhogg' ),
+			'meta'      => __( 'Add as Custom Meta', 'groundhogg' ),
+			'copy_file' => __( 'Add as File', 'groundhogg' ),
+		],
+		__( 'Compliance' )    => [
+			'terms_agreement'   => __( 'Terms Agreement', 'groundhogg' ),
+			'gdpr_consent'      => __( 'Data Processing Consent', 'groundhogg' ),
+			'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
+		],
+		__( 'Address' )       => [
+			'street_address_1' => __( 'Line 1', 'groundhogg' ),
+			'street_address_2' => __( 'Line 2', 'groundhogg' ),
+			'city'             => __( 'City', 'groundhogg' ),
+			'postal_zip'       => __( 'Postal/Zip', 'groundhogg' ),
+			'region'           => __( 'Province/State/Region', 'groundhogg' ),
+			'country'          => __( 'Country', 'groundhogg' ),
+			'time_zone'        => __( 'Time Zone', 'groundhogg' ),
+			'ip_address'       => __( 'IP Address', 'groundhogg' ),
+		],
+		__( 'Tracking' )      => [
+			'utm_campaign' => __( 'UTM Campaign', 'groundhogg' ),
+			'utm_content'  => __( 'UTM Content', 'groundhogg' ),
+			'utm_medium'   => __( 'UTM Medium', 'groundhogg' ),
+			'utm_term'     => __( 'UTM Term', 'groundhogg' ),
+			'utm_source'   => __( 'UTM Source', 'groundhogg' ),
+			'lead_source'  => __( 'Lead Source', 'groundhogg' ),
+			'source_page'  => __( 'Signup Page', 'groundhogg' ),
+		],
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -2682,6 +2695,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				] );
 
 				break;
+			case 'contact_id':
+				$args[ $field ] = absint( $value );
+				break;
 			case 'full_name':
 				$parts              = split_name( $value );
 				$args['first_name'] = sanitize_text_field( $parts[0] );
@@ -2706,6 +2722,31 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 
 				$args[ $field ] = absint( $value );
+				break;
+			case 'user_email':
+			case 'owner_email':
+
+				if ( ! is_email( $value ) ) {
+					break;
+				}
+
+				$user = get_user_by( 'email', $value );
+
+				// Make sure User exists
+				if ( ! $user ) {
+					break;
+				}
+
+				$swap = [
+					'user_email'  => 'user_id',
+					'owner_email' => 'owner_id'
+				];
+
+				// Check the mapped owner can actually own contacts.
+				if ( $field !== 'owner_email' || user_can( $user, 'edit_contacts' ) ) {
+					$args[ $swap[ $field ] ] = $user->ID;
+				}
+
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2824,8 +2865,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'notes':
 
-				if ( is_array( $notes ) ) {
-					$notes = array_merge( $notes, $notes );
+				if ( is_array( $value ) ) {
+					$notes = array_merge( $notes, $value );
 					break;
 				}
 
@@ -2883,9 +2924,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	$contact = false;
 
-	// No point in trying if there is no email field
-	if ( isset( $args['email'] ) ) {
+	if ( isset_not_empty( $args, 'email' ) ) {
 
+		// Get given email
 		if ( ! is_email( $args['email'] ) ) {
 			return false;
 		}
@@ -2894,25 +2935,29 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			'email' => $args['email']
 		] );
 
-		$contact->update( $args );
+	} else if ( isset_not_empty( $args, 'user_id' ) ) {
 
-		// We do NOT want to process this in the event the user is logged is as
-		// a GH user
-		// There is no email field in this case!
+		// Get by given user id
+		$contact = get_contactdata( $args['user_id'], true );
+
+	} else if ( isset_not_empty( $args, 'contact_id' ) ) {
+
+		// Get by given contact id
+		$contact = get_contactdata( $args['contact_id'] );
+		unset( $args['contact_id'] );
+
 	} else if ( ! current_user_can( 'view_contacts' ) ) {
 
 		// Is there an active contact record?
 		$contact = get_contactdata();
-
-		// Update based on the current args...
-		if ( $contact !== false && $contact->exists() ) {
-			$contact->update( $args );
-		}
 	}
 
-	if ( ! $contact ) {
+	if ( ! $contact || ! $contact->exists() ) {
 		return false;
 	}
+
+	// Update contact info
+	$contact->update( $args );
 
 	if ( $gdpr_consent ) {
 		$contact->set_gdpr_consent();
@@ -3981,11 +4026,11 @@ function mobile_validator() {
  */
 function validate_mobile_number( $number, $country_code = '', $with_plus = true ) {
 
-    // Remove non-digits
+	// Remove non-digits
 	$number = preg_replace( "/[^0-9]/", "", $number );
 
 	// Keep initial number
-    $initial = $number;
+	$initial = $number;
 
 	if ( ! $country_code ) {
 		$country_code = get_default_country_code();
@@ -3994,20 +4039,20 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = true 
 	if ( ! number_has_country_code( $number ) ) {
 		$number = \Groundhogg\mobile_validator()->normalize( $number, $country_code );
 
-        // Try neighboring country
-        if ( empty( $number ) ){
-            switch ( $country_code ){
-                case 'US':
-	                $number = \Groundhogg\mobile_validator()->normalize( $number, 'CA' );
-	                break;
-                case 'CA':
-	                $number = \Groundhogg\mobile_validator()->normalize( $number, 'US' );
-                    break;
-            }
-        }
+		// Try neighboring country
+		if ( empty( $number ) ) {
+			switch ( $country_code ) {
+				case 'US':
+					$number = \Groundhogg\mobile_validator()->normalize( $number, 'CA' );
+					break;
+				case 'CA':
+					$number = \Groundhogg\mobile_validator()->normalize( $number, 'US' );
+					break;
+			}
+		}
 	}
 
-    // Unable to validate number, could be because of a mismatch of country code to number
+	// Unable to validate number, could be because of a mismatch of country code to number
 	if ( empty( $number ) ) {
 		return $initial;
 	}
@@ -4047,6 +4092,30 @@ function number_has_country_code( $number = '' ) {
 	// If found ISO than number has country code.
 	return ! empty( $iso3166 );
 }
+
+/**
+ * Runs a contact's mobile number though the validation function and updates it if it's different from the original
+ *
+ * @param $contact Contact
+ *
+ * @return void
+ */
+function maybe_validate_and_update_mobile_number( $contact ) {
+	$to           = $contact->get_mobile_number();
+	$country_code = $contact->get_meta( 'country' );
+
+	if ( ! $to || ! $country_code ) {
+		return;
+	}
+
+	$validated = validate_mobile_number( $to, $country_code );
+
+    if ( $validated !== $to ) {
+		$contact->update_meta( 'mobile_phone', $validated );
+	}
+}
+
+add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 10, 1 );
 
 /**
  * Get an error from an uploaded file.
@@ -4174,7 +4243,7 @@ function is_helper_plugin_installed() {
  * @return bool
  */
 function has_premium_features() {
-	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false;
+	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false || is_white_labeled();
 }
 
 add_action( 'admin_menu', function () {
@@ -4621,9 +4690,9 @@ function get_owners() {
 		return array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
 	}
 
-	$users    = get_users( [ 'role__in' => get_owner_roles() ] );
+	$users = get_users( [ 'role__in' => get_owner_roles() ] );
 
-    $user_ids = array_map( function ( $user ) {
+	$user_ids = array_map( function ( $user ) {
 		return $user->ID;
 	}, $users );
 
@@ -5087,7 +5156,7 @@ function track_page_visit( $ref, $contact, $override = [] ) {
  * @param $type
  * @param $details
  */
-function track_live_activity( $type, $details = [] ) {
+function track_live_activity( $type, $details = [], $value = 0 ) {
 
 	// Use tracked contact
 	$contact = get_contactdata();
@@ -5102,6 +5171,7 @@ function track_live_activity( $type, $details = [] ) {
 		'email_id'  => tracking()->get_current_email_id(),
 		'event_id'  => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
 		'referer'   => tracking()->get_leadsource(),
+		'value'     => $value
 	];
 
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
@@ -5153,14 +5223,26 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 		$activity->update_meta( $detail_key, $value );
 	}
 
-	/**
+	track_activity_actions( $activity );
+}
+
+/**
+ * do actions when activity is tracked
+ *
+ * @param Activity $activity
+ *
+ * @return void
+ */
+function track_activity_actions( $activity ){
+
+    /**
 	 * Fires after some activity is tracked
 	 *
 	 * @param $activity Activity
 	 * @param $contact  Contact
 	 */
-	do_action( 'groundhogg/track_activity', $activity, $contact );
-	do_action( "groundhogg/track_activity/{$activity->activity_type}", $activity, $contact );
+	do_action( 'groundhogg/track_activity', $activity, $activity->get_contact() );
+	do_action( "groundhogg/track_activity/{$activity->activity_type}", $activity, $activity->get_contact() );
 }
 
 
@@ -5810,9 +5892,9 @@ function get_active_steps( $type ) {
 		'step_status' => 'active'
 	] );
 
-    array_map_to_step( $steps );
+	array_map_to_step( $steps );
 
-    return $steps;
+	return $steps;
 }
 
 /**
@@ -6527,8 +6609,8 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 		$tags = [ new Tag( $maybe_tags ) ];
 	} else if ( is_string( $maybe_tags ) ) {
 		// it's a comma separated list
-		if ( strpos( $maybe_tags, ',' ) !== false ) {
-			$tags = parse_tag_list( wp_parse_list( $maybe_tags ) );
+		if ( str_contains( $maybe_tags, ',' ) ) {
+			$tags = parse_tag_list( wp_parse_list( $maybe_tags ), 'tags' );
 		} else {
 
 			// if create is true, use the query and create method, otherwise use the slug
@@ -7062,4 +7144,36 @@ function cache_get_last_changed( $group ) {
  */
 function cache_set_last_changed( $group ) {
 	wp_cache_set( 'last_changed', microtime(), $group );
+}
+
+/**
+ * Deletes any pending events for a given step type for the current contact
+ *
+ * @return false|int
+ */
+function clear_pending_events_by_step_type( $type, $contact = false ) {
+
+	$contact = get_contactdata( $contact );
+
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+	}
+
+	$steps = get_db( 'steps' )->query( [
+		'step_type' => $type
+	] );
+
+	if ( empty( $steps ) ) {
+		return false;
+	}
+
+	return event_queue_db()->query( [
+		'operation' => 'DELETE',
+		'where'     => [
+			[ 'step_id', 'IN', wp_parse_id_list( wp_list_pluck( $steps, 'ID' ) ) ],
+			[ 'event_type', '=', Event::FUNNEL ],
+			[ 'status', '=', Event::WAITING ],
+			[ 'contact_id', '=', $contact->get_id() ]
+		]
+	] );
 }
