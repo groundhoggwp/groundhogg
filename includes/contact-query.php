@@ -1194,7 +1194,7 @@ class Contact_Query {
 			/* This column needs special handling here. */
 
 			// table defined
-			if ( str_contains( $orderby, '.' ) ){
+			if ( str_contains( $orderby, '.' ) ) {
 				return $orderby;
 			}
 
@@ -1664,7 +1664,7 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function filter_contact_id($filter, $query ) {
+	public static function filter_contact_id( $filter, $query ) {
 		$filter_vars = wp_parse_args( $filter, [
 			'compare' => 'equals',
 			'value'   => ''
@@ -1679,7 +1679,7 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function filter_user_id($filter, $query ) {
+	public static function filter_user_id( $filter, $query ) {
 		$filter_vars = wp_parse_args( $filter, [
 			'compare' => 'equals',
 			'value'   => ''
@@ -1959,7 +1959,7 @@ class Contact_Query {
 			'link'         => ''
 		] );
 
-		$broadcast = new Broadcast( $filter_vars[ 'broadcast_id' ] );
+		$broadcast = new Broadcast( $filter_vars['broadcast_id'] );
 
 		$event_query = array_filter( [
 			'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
@@ -2044,11 +2044,11 @@ class Contact_Query {
 
 		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
 
-		$event_query = array_filter( array_merge( [
-			'activity_type' => $filter_vars['activity'],
-		], $before_and_after ) );
+		$args = array_merge( $filter_vars, [
+			'activity_type' => $filter_vars['activity']
+		], $before_and_after );
 
-		return self::filter_by_activity( $event_query, $query );
+		return self::filter_by_activity( $args, $query );
 	}
 
 	/**
@@ -2331,7 +2331,6 @@ class Contact_Query {
 
 				$subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
 			}
-
 		}
 
 		$table = get_array_var( $event_query, 'status' ) === Event::WAITING ? 'event_queue' : 'events';
@@ -2362,40 +2361,48 @@ class Contact_Query {
 	 */
 	public static function filter_by_activity( $activity_query, $query ) {
 
-		$subwhere = [ 'relationship' => 'AND' ];
+		$where = [ 'relationship' => 'AND' ];
 
 		$activity_query = wp_parse_args( $activity_query, [
 			'activity_type' => '',
 			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
+			'count_compare' => 'greater_than_or_equal_to',
+			'value'         => 0,
+			'value_compare' => 'greater_than_or_equal_to',
 		] );
 
 		foreach ( $activity_query as $col => $val ) {
+			if ( empty( $val ) ) {
+				continue;
+			}
 
-			if ( ! empty( $val ) ) {
-				switch ( $col ) {
-					default:
-						$subwhere[] = [ 'col' => $col, 'compare' => '=', 'val' => $val ];
-						break;
-					case 'before':
-						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '<=', 'val' => $val ];
-						break;
-					case 'after':
-						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '>=', 'val' => $val ];
-						break;
-					case 'referer':
-						$subwhere[] = [ 'col' => 'referer', 'compare' => 'RLIKE', 'val' => $val ];
-						break;
-					case 'exclude':
-					case 'count_compare':
-					case 'count':
-						break;
-				}
+			switch ( $col ) {
+
+				default:
+					$where[] = [ 'col' => $col, 'compare' => '=', 'val' => $val ];
+					break;
+				case 'before':
+					$where[] = [ 'col' => 'timestamp', 'compare' => '<=', 'val' => $val ];
+					break;
+				case 'after':
+					$where[] = [ 'col' => 'timestamp', 'compare' => '>=', 'val' => $val ];
+					break;
+				case 'referer':
+					$where[] = [ 'col' => 'referer', 'compare' => 'RLIKE', 'val' => $val ];
+					break;
+				case 'value':
+					$where[] = [ 'col' => 'value', 'compare' => $activity_query['value_compare'], 'val' => $val ];
+					break;
+				case 'exclude':
+				case 'count_compare':
+				case 'value_compare':
+				case 'count':
+					break;
 			}
 		}
 
 		$sql = get_db( 'activity' )->get_sql( [
-			'where'   => $subwhere,
+			'where'   => $where,
 			'select'  => 'contact_id, COUNT(*) as total_events',
 			'groupby' => 'contact_id',
 			'orderby' => false,
