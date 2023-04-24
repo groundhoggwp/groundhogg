@@ -67,8 +67,8 @@ function sanitize_custom_field( $value, $field_id ) {
 function display_custom_field( $id_or_name, $contact, $echo = true ) {
 
 	// Field object was passed...
-	if ( is_array( $id_or_name ) && isset( $field_id['type'] ) ) {
-		$field = $field_id;
+	if ( is_array( $id_or_name ) && isset( $id_or_name['type'] ) ) {
+		$field = $id_or_name;
 	} else {
 		$field = Properties::instance()->get_field( $id_or_name );
 	}
@@ -312,7 +312,7 @@ function export_custom_property( $return, $contact, $field_id ) {
 		return $return;
 	}
 
-	return $contact->get_meta( $field['name'] );
+	return display_custom_field( $field, $contact, false );
 }
 
 add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property', 10, 3 );
