@@ -55,32 +55,14 @@ $checklist_items = [
 		'title'       => __( 'Send A Broadcast Email To Your List', 'groundhogg' ),
 		'description' => __( "Let's make sure your subscribers can hear you. Send them a broadcast email and say hello!", 'groundhogg' ),
 		'completed'   => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ) > 0,
-		'fix'         => modal_link_url( [
-			'title'              => __( 'Send your first broadcast!', 'groundhogg' ),
-			'footer_button_text' => __( 'Close' ),
-			'source'             => 'send-your-first-broadcast-video',
-			'class'              => 'img-link no-padding',
-			'height'             => 555,
-			'width'              => 800,
-			'footer'             => 'true',
-			'preventSave'        => 'true',
-		] ),
+		'fix'         => admin_page_url( 'gh_broadcasts', [ 'action' => 'add' ] ),
 		'cap'         => 'edit_emails'
 	],
 	[
 		'title'       => __( 'Launch A Funnel', 'groundhogg' ),
 		'description' => __( "We're going to launch a funnel that will welcome new subscribers to the list. It will only take a few minutes.", 'groundhogg' ),
 		'completed'   => get_db( 'funnels' )->count( [ 'status' => 'active' ] ) > 0,
-		'fix'         => modal_link_url( [
-			'title'              => __( 'Create your first funnel!', 'groundhogg' ),
-			'footer_button_text' => __( 'Close' ),
-			'source'             => 'create-your-first-funnel-video',
-			'class'              => 'img-link no-padding',
-			'height'             => 555,
-			'width'              => 800,
-			'footer'             => 'true',
-			'preventSave'        => 'true',
-		] ),
+		'fix'         => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
 		'cap'         => 'edit_funnels'
 	],
 	[
