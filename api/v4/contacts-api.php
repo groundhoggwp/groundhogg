@@ -145,6 +145,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->apply_tag( $tags );
 
 			$added[] = $contact;
+
+			$this->do_object_created_action( $contact );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -290,6 +292,8 @@ class Contacts_Api extends Base_Object_Api {
 				$contact->remove_tag( $remove_tags );
 
 				$contacts[] = $contact;
+
+				$this->do_object_updated_action( $contact );
 			}
 
 			return self::SUCCESS_RESPONSE( [
@@ -329,6 +333,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->remove_tag( $remove_tags );
 
 			$updated ++;
+
+			$this->do_object_updated_action( $contact );
 		}
 
 		if ( $request->has_param( 'total_only' ) ) {
@@ -407,6 +413,8 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact->apply_tag( $tags );
 
+		$this->do_object_created_action( $contact );
+
 		return self::SUCCESS_RESPONSE( [
 			'item' => $contact
 		] );
@@ -462,6 +470,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->remove_tag( $remove_tags );
 		}
 
+		$this->do_object_updated_action( $contact );
+
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
 	}
 
@@ -482,6 +492,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		$object->delete();
+
+		$this->do_object_deleted_action( $object );
 
 		return self::SUCCESS_RESPONSE();
 	}
@@ -508,6 +520,8 @@ class Contacts_Api extends Base_Object_Api {
 		$tags = $request->get_json_params();
 
 		$contact->apply_tag( $tags );
+
+		$this->do_object_created_action( $contact );
 
 		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}

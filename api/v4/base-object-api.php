@@ -66,6 +66,39 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * Action when object is created via the API
+	 *
+	 * @param $object
+	 *
+	 * @return void
+	 */
+	protected function do_object_created_action( $object ){
+		do_action( "groundhogg/api/{$this->get_object_type()}/created", $object );
+	}
+
+	/**
+	 * Action when object is updated via the API
+	 *
+	 * @param $object
+	 *
+	 * @return void
+	 */
+	protected function do_object_updated_action( $object ){
+		do_action( "groundhogg/api/{$this->get_object_type()}/updated", $object );
+	}
+
+	/**
+	 * Action when object is deleted via the API
+	 *
+	 * @param $object
+	 *
+	 * @return void
+	 */
+	protected function do_object_deleted_action( $object ){
+		do_action( "groundhogg/api/{$this->get_object_type()}/deleted", $object );
+	}
+
+	/**
 	 * The name of the table resource to use
 	 *
 	 * @return string
@@ -369,6 +402,8 @@ abstract class Base_Object_Api extends Base_Api {
 			}
 
 			$added[] = $object;
+
+			$this->do_object_created_action( $object );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -451,6 +486,8 @@ abstract class Base_Object_Api extends Base_Api {
 				}
 
 				$updated[] = $object;
+
+				$this->do_object_updated_action( $object );
 			}
 
 			return self::SUCCESS_RESPONSE( [
@@ -473,6 +510,8 @@ abstract class Base_Object_Api extends Base_Api {
 			if ( method_exists( $object, 'update_meta' ) ) {
 				$object->update_meta( $meta );
 			}
+
+			$this->do_object_updated_action( $object );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -512,6 +551,8 @@ abstract class Base_Object_Api extends Base_Api {
 		foreach ( $items as $object ) {
 			$deleted_item_ids[] = $object->get_id();
 			$object->delete();
+
+			$this->do_object_deleted_action( $object );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -545,6 +586,8 @@ abstract class Base_Object_Api extends Base_Api {
 				'wpdb' => $wpdb->last_error
 			] );
 		}
+
+		$this->do_object_created_action( $object );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object
@@ -610,6 +653,8 @@ abstract class Base_Object_Api extends Base_Api {
 			$object->update_meta( $meta );
 		}
 
+		$this->do_object_updated_action( $object );
+
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
 	}
 
@@ -630,6 +675,8 @@ abstract class Base_Object_Api extends Base_Api {
 		}
 
 		$object->delete();
+
+		$this->do_object_deleted_action( $object );
 
 		return self::SUCCESS_RESPONSE();
 	}
