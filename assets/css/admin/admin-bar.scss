@@ -24,6 +24,24 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .groundhogg-toolbar-quick-search {
 
+  #gh-notifications{
+    .gh-button.dismiss{
+      background: transparent;
+      color: $primary-dark;
+      margin: 3px;
+      padding: 4px 4px;
+
+      &:hover{
+        background: $primary-dark-10;
+      }
+    }
+
+    p.all-dismissed {
+      font-size: 16px;
+      text-align: center;
+    }
+  }
+
   #quick-search-input {
     width: 100%;
   }

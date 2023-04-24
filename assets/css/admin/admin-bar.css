@@ -1,3 +1,16 @@
+.groundhogg-toolbar-quick-search #gh-notifications .gh-button.dismiss {
+  background: transparent;
+  color: #102640;
+  margin: 3px;
+  padding: 4px 4px;
+}
+.groundhogg-toolbar-quick-search #gh-notifications .gh-button.dismiss:hover {
+  background: rgba(16, 38, 64, 0.1);
+}
+.groundhogg-toolbar-quick-search #gh-notifications p.all-dismissed {
+  font-size: 16px;
+  text-align: center;
+}
 .groundhogg-toolbar-quick-search #quick-search-input {
   width: 100%;
 }

@@ -752,3 +752,37 @@ label.block {
   }
 }
 
+.gh-header.admin-header{
+  padding: 0 10px 0 0;
+  border-bottom: 1px solid $primary-dark;
+  margin-left: -20px;
+
+   .logo {
+     box-sizing: border-box;
+     width: 60px;
+     background: $primary-dark;
+     padding: 5px 10px;
+   }
+}
+
+.gh-has-notifications{
+
+  position: relative;
+
+  &::after{
+    content: '0';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: $benchmark-orange;
+    color: white;
+    border-radius: 50%;
+    //padding: 5px;
+    width: 15px;
+    height: 15px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

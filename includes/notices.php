@@ -8,11 +8,11 @@ namespace Groundhogg;
  * Easy implementation for notices on admin pages in Groundhogg.
  * This class is used by all admin page classes, thus all notices will appear on any admin page.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,8 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Notices {
 	const TRANSIENT = 'groundhogg_notices';
 	const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';
+	const READ_NOTICES_OPTION = 'gh_read_notices';
+    const REMOTE_NOTICES_URL = 'https://groundho.gg/wp-json/wp/v2/plugin-notification/';
 
 	public static $dismissed_notices = [];
+	public static $read_notices = [];
 
 	public function __construct() {
 		add_action( 'after_setup_theme', [ $this, 'init' ] );
@@ -32,6 +35,9 @@ class Notices {
 		add_action( 'admin_notices', [ $this, 'notices' ] );
 
 		add_action( 'admin_init', [ $this, 'dismiss_notices' ] );
+		add_action( 'wp_ajax_gh_dismiss_notice', [ $this, 'ajax_dismiss_notice' ] );
+		add_action( 'wp_ajax_gh_read_notice', [ $this, 'ajax_read_notice' ] );
+		add_action( 'wp_ajax_gh_remote_notifications', [ $this, 'ajax_fetch_remote_notices' ] );
 	}
 
 	public function init() {
@@ -40,6 +46,58 @@ class Notices {
 		if ( ! is_array( self::$dismissed_notices ) ) {
 			self::$dismissed_notices = [];
 		}
+
+		self::$read_notices = get_user_meta( get_current_user_id(), self::READ_NOTICES_OPTION, true );
+
+		if ( ! is_array( self::$read_notices ) ) {
+			self::$read_notices = [];
+		}
+	}
+
+	/**
+     * Fetch remote notices for ajax
+     *
+	 * @return void
+	 */
+    function ajax_fetch_remote_notices(){
+        wp_send_json( $this->fetch_remote_notices() );
+    }
+
+	/**
+     * Fetch the remote notices
+     *
+	 * @return array|mixed
+	 */
+    function fetch_remote_notices(){
+	    $response = wp_remote_get( self::REMOTE_NOTICES_URL );
+
+	    if ( is_wp_error( $response ) ) {
+		    return [];
+	    }
+
+	    $json = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        if ( ! $json ){
+            return [];
+        }
+
+        return $json;
+    }
+
+	/**
+	 * Retrieve the number of unread notices...
+	 *
+	 * @return int
+	 */
+	function count_unread() {
+		$ids = get_transient( 'gh_notification_ids' );
+
+		if ( empty( $ids ) || ! is_array( $ids ) ) {
+			$ids  = wp_parse_id_list( wp_list_pluck( $this->fetch_remote_notices(), 'id' ) );
+			set_transient( 'gh_notification_ids', $ids, DAY_IN_SECONDS );
+		}
+
+		return count( array_diff( $ids, array_values( Notices::$read_notices ) ) );
 	}
 
 	/**
@@ -96,10 +154,32 @@ class Notices {
 	}
 
 	/**
-	 * @param $id
+	 * Mark a notice as read
+	 *
+	 * @param $ids
 	 */
-	public function dismiss_notice( $id ) {
-		self::$dismissed_notices[ $id ] = $id;
+	public function read_notice( $ids ) {
+
+		$notices = parse_maybe_numeric_list( $ids );
+
+		foreach ( $notices as $notice ) {
+			self::$read_notices[ $notice ] = $notice;
+		}
+
+		update_user_meta( get_current_user_id(), self::READ_NOTICES_OPTION, self::$read_notices );
+	}
+
+	/**
+	 * Mark a notice as dismissed
+	 *
+	 * @param $ids
+	 */
+	public function dismiss_notice( $ids ) {
+
+		$notices = parse_maybe_numeric_list( $ids );
+		foreach ( $notices as $notice ) {
+			self::$dismissed_notices[ $notice ] = $notice;
+		}
 
 		update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
 	}
@@ -116,6 +196,38 @@ class Notices {
 	}
 
 	/**
+	 * Mark a notice as read with Ajax
+	 *
+	 * @return void
+	 */
+	public function ajax_read_notice() {
+
+		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+			wp_send_json_error();
+		}
+
+		$this->read_notice( get_post_var( 'notice' ) );
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Dismiss a notice with Ajax
+	 *
+	 * @return void
+	 */
+	public function ajax_dismiss_notice() {
+
+		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+			wp_send_json_error();
+		}
+
+		$this->dismiss_notice( get_post_var( 'notice' ) );
+
+		wp_send_json_success();
+	}
+
+	/**
 	 * Dismiss a notice via the URL permanently.
 	 */
 	public function dismiss_notices() {
@@ -124,7 +236,7 @@ class Notices {
 			return;
 		}
 
-		$notice_id = get_request_var( 'notice' );
+		$notice_id = sanitize_text_field( get_request_var( 'notice' ) );
 
 		$this->dismiss_notice( $notice_id );
 
@@ -174,11 +286,11 @@ class Notices {
 	/**
 	 * Add a notice
 	 *
-	 * @param $code string|\WP_Error|array ID of the notice
-	 * @param $message string message
-	 * @param string $type
+	 * @param             $code      string|\WP_Error|array ID of the notice
+	 * @param             $message   string message
+	 * @param string      $type
 	 * @param string|bool $cap
-	 * @param bool $site_wide whether the notice should be displayed site_wide
+	 * @param bool        $site_wide whether the notice should be displayed site_wide
 	 *
 	 * @return true|false
 	 */
@@ -211,7 +323,7 @@ class Notices {
 
 			$type = 'error';
 		} // Passed as array
-        elseif ( is_array( $code ) ) {
+        else if ( is_array( $code ) ) {
 
 			$args = wp_parse_args( $code, [
 				'code'      => '',
@@ -260,25 +372,25 @@ class Notices {
 	}
 
 	/**
-     * Print a notice
-     *
+	 * Print a notice
+	 *
 	 * @param $notice
 	 *
 	 * @return void
 	 */
-    public function print_notice( $notice ){
-	    ?>
+	public function print_notice( $notice ) {
+		?>
         <div id="<?php esc_attr_e( $notice['code'] ); ?>"
              class="notice notice-<?php esc_attr_e( $notice['type'] ); ?> is-dismissible"><p>
                 <strong><?php echo wp_kses_post( $notice['message'] ); ?></strong></p>
-		    <?php if ( $notice['type'] === 'error' && ! empty( $notice['data'] ) ): ?>
+			<?php if ( $notice['type'] === 'error' && ! empty( $notice['data'] ) ): ?>
                 <p><textarea class="code" style="width: 100%;"
                              readonly><?php echo wp_json_encode( $notice['data'], JSON_PRETTY_PRINT ); ?></textarea>
                 </p>
-		    <?php endif; ?>
+			<?php endif; ?>
         </div>
-	    <?php
-    }
+		<?php
+	}
 
 	/**
 	 * Get the notices

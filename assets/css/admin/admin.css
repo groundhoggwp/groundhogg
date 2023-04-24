@@ -674,5 +674,35 @@ label.block {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }
+.gh-header.admin-header {
+  padding: 0 10px 0 0;
+  border-bottom: 1px solid #102640;
+  margin-left: -20px;
+}
+.gh-header.admin-header .logo {
+  box-sizing: border-box;
+  width: 60px;
+  background: #102640;
+  padding: 5px 10px;
+}
+
+.gh-has-notifications {
+  position: relative;
+}
+.gh-has-notifications::after {
+  content: "0";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: #f58115;
+  color: white;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /*# sourceMappingURL=admin.css.map */
