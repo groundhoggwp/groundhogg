@@ -8,6 +8,7 @@ use Groundhogg\Contact;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
@@ -1347,6 +1348,37 @@ abstract class DB {
 	}
 
 	/**
+	 * Maybe symbolized the comparison
+	 *
+	 * @param $str
+	 *
+	 * @return bool|mixed
+	 */
+	public function symbolize_comparison( $str ) {
+
+		$symbols = [
+			'equals'                   => '=',
+			'not_equals'               => '!=',
+			'less_than'                => '<',
+			'greater_than'             => '>',
+			'more_than'                => '>',
+			'less_than_or_equal_to'    => '<=',
+			'greater_than_or_equal_to' => '>=',
+			'in'                       => 'IN',
+			'not_in'                   => 'NOT IN',
+			'like'                     => 'LIKE',
+			'not_like'                 => 'NOT LIKE',
+			'rlike'                    => 'RLIKE',
+		];
+
+		if ( in_array( $str, $symbols ) ) {
+			return $str;
+		}
+
+		return get_array_var( $symbols, $str );
+	}
+
+	/**
 	 * Build the where clause statement using the new structure. Recursive
 	 *
 	 * @param $where array
@@ -1370,14 +1402,14 @@ abstract class DB {
 
 		unset( $where['relationship'] );
 
-		$clause = [];
+		$clauses = [];
 
-		foreach ( $where as $i => $condition ) {
+		foreach ( $where as $i => $clause ) {
 
-			if ( ! is_array( $condition ) ) {
+			if ( ! is_array( $clause ) ) {
 				// Assume first order ==
 
-				$value = $condition;
+				$value = $clause;
 				$col   = $i;
 
 				if ( is_numeric( $value ) ) {
@@ -1386,13 +1418,13 @@ abstract class DB {
 					$clause[] = $wpdb->prepare( "$col = %s", $value );
 				}
 
-			} else if ( isset_not_empty( $condition, 'relationship' ) ) {
+			} else if ( isset_not_empty( $clause, 'relationship' ) ) {
 
-				$clause[] = '(' . $this->build_advanced_where_statement( $condition ) . ')';
+				$clause[] = '(' . $this->build_advanced_where_statement( $clause ) . ')';
 
 			} else {
 
-				$condition = wp_parse_args( $condition, [
+				$clause = wp_parse_args( $clause, [
 					'col'     => '',
 					'val'     => '',
 					'compare' => '='
@@ -1409,20 +1441,28 @@ abstract class DB {
 				];
 
 				foreach ( $normalize_keys as $from => $to ) {
-					if ( isset_not_empty( $condition, $from ) ) {
-						$condition[ $to ] = $condition[ $from ];
+					if ( isset_not_empty( $clause, $from ) ) {
+						$clause[ $to ] = $clause[ $from ];
 					}
 				}
 
-				if ( in_array( $condition['col'], $this->get_allowed_columns() ) && in_array( $condition['compare'], $this->get_allowed_comparisons() ) ) {
+				if ( ! in_array( $clause['compare'], $this->get_allowed_comparisons() ) ) {
+					$clause['compare'] = $this->symbolize_comparison( $clause['compare'] );
 
-					$value = $condition['val'];
+					if ( ! $clause['compare'] ) {
+						continue;
+					}
+				}
 
-					if ( is_array( $value ) && ! in_array( $condition['compare'], [ 'IN', 'NOT IN' ] ) ) {
-						$condition['compare'] = 'IN';
+				if ( in_array( $clause['col'], $this->get_allowed_columns() ) ) {
+
+					$value = $clause['val'];
+
+					if ( is_array( $value ) && ! in_array( $clause['compare'], [ 'IN', 'NOT IN' ] ) ) {
+						$clause['compare'] = 'IN';
 					}
 
-					switch ( $condition['compare'] ) {
+					switch ( $clause['compare'] ) {
 						default:
 						case '=':
 						case '!=':
@@ -1433,18 +1473,18 @@ abstract class DB {
 						case '<>':
 						case 'LIKE':
 							if ( is_numeric( $value ) ) {
-								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
+								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %d", $value );
 							} else {
-								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
+								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %s", $value );
 							}
 							break;
 						case 'RLIKE':
 
 							if ( is_numeric( $value ) ) {
-								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
+								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %d", $value );
 							} else {
-								$value    = preg_quote( $value );
-								$clause[] = "{$condition[ 'col' ]} {$condition[ 'compare' ]} '$value'";
+								$value     = preg_quote( $value );
+								$clauses[] = "{$clause[ 'col' ]} {$clause[ 'compare' ]} '$value'";
 							}
 
 							break;
@@ -1459,7 +1499,7 @@ abstract class DB {
 								$value = maybe_implode_in_quotes( $value );
 							}
 
-							$clause[] = "{$condition[ 'col' ]} {$condition['compare']} ({$value})";
+							$clauses[] = "{$clause[ 'col' ]} {$clause['compare']} ({$value})";
 
 
 							break;
@@ -1471,7 +1511,7 @@ abstract class DB {
 
 		}
 
-		return implode( " {$relationship} ", $clause );
+		return implode( " {$relationship} ", $clauses );
 	}
 
 	/**
@@ -1569,6 +1609,30 @@ abstract class DB {
 
 	}
 
+	/**
+	 * Retrieve the date created via an SQL query
+	 *
+	 * @throws \Exception
+	 *
+	 * @return \DateTimeInterface
+	 */
+	public function get_date_created() {
+
+		global $wpdb;
+
+		$results = $wpdb->get_results( "SELECT create_time FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '{$wpdb->dbname}' AND table_name = '{$this->table_name}';" );
+		$date    = $results[0]->create_time;
+
+		return new DateTimeHelper( $date );
+	}
+
+	/**
+	 * Drop a column
+	 *
+	 * @param $column
+	 *
+	 * @return void
+	 */
 	public function drop_column( $column ) {
 		global $wpdb;
 		$wpdb->query( "ALTER TABLE {$this->table_name} DROP COLUMN $column" );
