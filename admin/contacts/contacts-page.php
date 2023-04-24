@@ -889,6 +889,10 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+        if ( empty( $this->get_items() ) ){
+            return new \WP_Error( 'none-selected', 'You must select at least one contact to export.' );
+        }
+
 		return admin_page_url( 'gh_tools', [
 			'tab'    => 'export',
 			'action' => 'choose_columns',
