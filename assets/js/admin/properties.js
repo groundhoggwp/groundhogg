@@ -1,6 +1,5 @@
 ( ($) => {
 
-  const { notes: NotesStore } = Groundhogg.stores
   const {
     uuid,
     specialChars,
@@ -18,8 +17,7 @@
     dangerConfirmationModal,
     toggle,
   } = Groundhogg.element
-  const { post, get, patch, routes, ajax } = Groundhogg.api
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+
   const { sprintf, __, _x, _n } = wp.i18n
 
   const optionsRepeater = ({
@@ -228,7 +226,8 @@
           onChange: (options) => updateField({ options }),
         })
       },
-    }, dropdown: {
+    },
+    dropdown: {
       name: __('Dropdown', 'groundhogg'), view: ({ label, value, options = [], ...props }) => {
 
         options = options.map(o => ( { text: o, value: o } ))
@@ -294,6 +293,26 @@
         })
       },
     },
+    html: {
+      name: __('HTML', 'groundhogg'),
+      view: ({ label, ...props }) => {
+        //language=HTML
+        return `<label class="property-label" for="${ props.id }">${ label }</label>${ textarea({
+          className: 'full-width', ...props,
+        }) }`
+      },
+      onMount: ({ id, name, ...props }, onChange) => {
+
+        wp.editor.remove(id)
+        let editor = tinymceElement(id, {
+          quicktags: false,
+        }, content => {
+          onChange({
+            [name]:content
+          })
+        })
+      }
+    }
   }
 
   const Templates = {

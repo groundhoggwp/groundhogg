@@ -52,6 +52,8 @@ function sanitize_custom_field( $value, $field_id ) {
 			} else {
 				return sanitize_text_field( $value );
 			}
+		case 'html':
+			return wp_kses_post( $value );
 	endswitch;
 }
 
@@ -115,6 +117,9 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 			} else {
 				$data = esc_html( $data );
 			}
+			break;
+		case 'html':
+			// output with no change as already HTML
 			break;
 	endswitch;
 
