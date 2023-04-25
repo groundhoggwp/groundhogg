@@ -8,10 +8,13 @@ use function Groundhogg\dashicon;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\has_premium_features;
 use function Groundhogg\html;
+use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
+use function Groundhogg\qualifies_for_review_your_funnel;
 use function Groundhogg\white_labeled_name;
 
 
@@ -169,6 +172,27 @@ class Welcome_Page extends Admin_Page {
 		do_action( "groundhogg/admin/{$this->get_slug()}/after" );
 	}
 
+	/**
+     * Shows the add for review your funnel
+     * Only shows if the conditions for viewing are met
+     *
+	 * @return void
+	 */
+    public function promote_review_your_funnel(){
+
+        if ( ! qualifies_for_review_your_funnel() ){
+            return;
+        }
+
+        ?>
+        <a href="<?php echo admin_page_url( 'gh_guided_setup', [], 'funnel-review' ) ?>">
+            <img style="border-radius: 5px" alt="review your funnel offer" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/review-your-funnel.png' ?>">
+        </a>
+        <?php
+
+
+    }
+
 
 	/**
 	 * The main output
@@ -251,7 +275,8 @@ class Welcome_Page extends Admin_Page {
                             </ul>
                         </div>
                     </div>
-					<?php include __DIR__ . '/checklist.php' ?>
+	                <?php include __DIR__ . '/checklist.php' ?>
+                    <?php $this->promote_review_your_funnel() ?>
                     <div class="gh-panel">
 						<?php
 

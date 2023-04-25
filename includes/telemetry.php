@@ -6,7 +6,7 @@ class Telemetry {
 
 	public function __construct() {
 		add_action( 'admin_init', [ $this, 'init_cron' ] );
-		add_action( 'groundhogg/telemetry', [ $this, 'send_telemetry' ] );
+		add_action( 'groundhogg/telemetry', [ $this, 'maybe_send_telemetry' ] );
 	}
 
 	/**
@@ -73,14 +73,21 @@ class Telemetry {
 	}
 
 	/**
-	 * Continue continuous tracking of the site.
-	 * Include anonymous site key
+	 * @return void
 	 */
-	public function send_telemetry() {
-
+	public function maybe_send_telemetry(){
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
+
+		self::send_telemetry();
+	}
+
+	/**
+	 * Continue continuous tracking of the site.
+	 * Include anonymous site key
+	 */
+	public static function send_telemetry() {
 
 		$date      = new \DateTime( 'now', wp_timezone() );
 		$_7daysago = clone $date;

@@ -7,6 +7,7 @@ use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 
 
@@ -2202,14 +2203,9 @@ function export_field( $contact, $field = '' ) {
 			$return = wp_json_encode( $contact->get_notes() );
 			break;
 		case 'tags':
-			$tags = $contact->get_tags( true );
-
-			if ( $tags ) {
-				$names  = array_map( function ( $tag ) {
-					return $tag->get_name();
-				}, $tags );
-				$return = implode( ',', $names );
-			}
+			$tags   = $contact->get_tags( true );
+			$names  = array_map_to_method( $tags, 'get_name' );
+			$return = implode( ',', $names );
 
 			break;
 	}
@@ -4095,12 +4091,20 @@ function number_has_country_code( $number = '' ) {
 
 /**
  * Runs a contact's mobile number though the validation function and updates it if it's different from the original
+ * Run this after most contact creation opportunities
  *
  * @param $contact Contact
  *
  * @return void
  */
 function maybe_validate_and_update_mobile_number( $contact ) {
+
+    $contact = get_contactdata( $contact );
+
+    if ( ! is_a_contact( $contact ) ){
+        return;
+    }
+
 	$to           = $contact->get_mobile_number();
 	$country_code = $contact->get_meta( 'country' );
 
@@ -4108,14 +4112,25 @@ function maybe_validate_and_update_mobile_number( $contact ) {
 		return;
 	}
 
+    // Is e164 format already
+    if ( preg_match( '/^\+[1-9]\d{1,14}$/', $to ) ){
+        return;
+    }
+
 	$validated = validate_mobile_number( $to, $country_code );
 
-    if ( $validated !== $to ) {
+	if ( $validated !== $to && $validated ) {
 		$contact->update_meta( 'mobile_phone', $validated );
 	}
 }
 
-add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 10, 1 );
+// Webhooks, integrations
+add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+// Admin
+add_action( 'groundhogg/admin/contact/save', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+// API
+add_action( 'groundhogg/api/contact/created', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+add_action( 'groundhogg/api/contact/updated', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
 
 /**
  * Get an error from an uploaded file.
@@ -4268,8 +4283,12 @@ add_action( 'admin_menu', function () {
 
 }, 99999999 );
 
-
-add_action( 'admin_print_styles', function () {
+/**
+ * Menu styles when plugin is not white labelled
+ *
+ * @return void
+ */
+function maybe_print_menu_styles() {
 
 	if ( is_white_labeled() ) {
 		return;
@@ -4277,6 +4296,13 @@ add_action( 'admin_print_styles', function () {
 
 	?>
     <style>
+
+        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
+        .unread-notices::after {
+            content: '<?php echo $unread ?>' !important;
+        }
+
+        <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
@@ -4312,8 +4338,8 @@ add_action( 'admin_print_styles', function () {
             content: "";
             display: block;
             height: 1px;
-            margin: 5px auto 0;
-            width: calc(100% - 24px);
+            margin: 5px 0;
+            width: 100%;
             opacity: .4;
         }
 
@@ -4322,7 +4348,9 @@ add_action( 'admin_print_styles', function () {
         }
     </style>
 	<?php
-} );
+}
+
+add_action( 'admin_print_styles', __NAMESPACE__ . '\maybe_print_menu_styles' );
 
 /**
  * Allow funnel files to be uploaded
@@ -5183,10 +5211,10 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string  $type    string, an activity identifier
- * @param array   $args    the details for the activity
- * @param array   $details details about that activity
- * @param Contact $contact the contact to track
+ * @param string             $type    string, an activity identifier
+ * @param array              $args    the details for the activity
+ * @param array              $details details about that activity
+ * @param Contact|string|int $contact the contact to track
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
@@ -5233,9 +5261,9 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
  *
  * @return void
  */
-function track_activity_actions( $activity ){
+function track_activity_actions( $activity ) {
 
-    /**
+	/**
 	 * Fires after some activity is tracked
 	 *
 	 * @param $activity Activity
@@ -5383,8 +5411,16 @@ function get_time( $time ) {
  *
  * @return false|string
  */
-function Ymd_His( $time = false ) {
-	return date( 'Y-m-d H:i:s', get_time( $time ) );
+function Ymd_His( $time = false, $local = false ) {
+	$date = new \DateTime();
+
+	if ( $local ) {
+		$date->setTimezone( wp_timezone() );
+	}
+
+	$date->setTimestamp( get_time( $time ) );
+
+	return $date->format( 'Y-m-d H:i:s' );
 }
 
 /**
@@ -5405,8 +5441,16 @@ function His( $time = false ) {
  *
  * @return false|string
  */
-function Ymd( $time = false ) {
-	return date( 'Y-m-d', get_time( $time ) );
+function Ymd( $time = false, $local = false ) {
+	$date = new \DateTime();
+
+	if ( $local ) {
+		$date->setTimezone( wp_timezone() );
+	}
+
+	$date->setTimestamp( get_time( $time ) );
+
+	return $date->format( 'Y-m-d' );
 }
 
 /**
@@ -7176,4 +7220,106 @@ function clear_pending_events_by_step_type( $type, $contact = false ) {
 			[ 'contact_id', '=', $contact->get_id() ]
 		]
 	] );
+}
+
+/**
+ * Whether the given data is base64 encoded or not
+ *
+ * @param $data
+ *
+ * @return bool
+ */
+function is_base64_encoded( $data ) {
+	return base64_decode( $data, true ) !== false;
+}
+
+/**
+ * The best approximate date this site started using Groundhogg
+ *
+ * @return \DateTimeInterface
+ */
+function date_started_using_groundhogg() {
+	return get_db( 'contacts' )->get_date_created();
+}
+
+/**
+ * The number of emails sent between a specific time frame
+ *
+ * @param \DateTimeInterface $from
+ * @param \DateTimeInterface $to
+ *
+ * @return void
+ */
+function num_emails_sent( \DateTimeInterface $from, \DateTimeInterface $to ) {
+
+	global $wpdb;
+
+	$events_table = get_db( 'events' )->get_table_name();
+	$steps_table  = get_db( 'steps' )->get_table_name();
+
+	return $wpdb->get_var( $wpdb->prepare(
+		"SELECT COUNT(*) FROM $events_table e 
+                LEFT JOIN $steps_table s ON e.step_id = s.ID 
+                WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %d OR e.event_type = %d)
+                AND e.time >= %d AND e.time <= %d"
+		, 'complete', 'send_email', Event::BROADCAST, Event::EMAIL_NOTIFICATION,
+		$from->getTimestamp(), $to->getTimestamp() )
+	);
+}
+
+/**
+ * Tells us whether this site qualifies for review your funnel
+ *
+ * @return bool
+ */
+function qualifies_for_review_your_funnel() {
+
+	$one_month_ago = new DateTimeHelper( '1 month ago' );
+
+	$conditions = [
+		// has at least 3 active funnels
+		get_db( 'funnels' )->count( [ 'status' => 'active' ] ) >= 3,
+
+		// using for at least 30 days
+		date_started_using_groundhogg() < $one_month_ago,
+
+		// has sent at least 1000 emails in the last month
+		num_emails_sent( $one_month_ago, new DateTimeHelper( 'now' ) ) >= 1000,
+
+		// Is a paid customer
+		has_premium_features()
+	];
+
+	return ! in_array( false, $conditions );
+}
+
+/**
+ * Enqueue the admin header
+ *
+ * @return void
+ */
+function enqueue_admin_header() {
+	if ( is_white_labeled() ) {
+		return;
+	}
+
+	wp_enqueue_script( 'groundhogg-admin-header' );
+
+	do_action( 'groundhogg/enqueue_admin_header' );
+}
+
+/**
+ * Parses a list into number and non-numeric items
+ *
+ * @param $list     array|string
+ * @param $sanitize callable
+ *
+ * @return array|int[]
+ */
+function parse_maybe_numeric_list( $list, $sanitize = 'sanitize_text_field' ) {
+	$list = wp_parse_list( $list );
+
+	return array_map( function ( $item ) use ( $sanitize ) {
+		return is_numeric( $item ) ? absint( $item ) : call_user_func( $sanitize, $item );
+	}, $list );
 }

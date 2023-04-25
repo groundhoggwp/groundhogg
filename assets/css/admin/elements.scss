@@ -719,6 +719,10 @@ span.gh-text {
       padding: 0;
     }
   }
+
+  &.gh-error {
+    background: $error-red-10;
+  }
 }
 
 .wp-core-ui {

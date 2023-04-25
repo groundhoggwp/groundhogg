@@ -548,6 +548,9 @@ span.gh-text.lg {
 .gh-panel .inside.no-padding {
   padding: 0;
 }
+.gh-panel.gh-error {
+  background: rgba(233, 31, 79, 0.1);
+}
 
 .wp-core-ui select {
   vertical-align: initial;

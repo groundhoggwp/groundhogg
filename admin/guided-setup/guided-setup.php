@@ -3,32 +3,18 @@
 namespace Groundhogg\Admin\Guided_Setup;
 
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\Admin\Guided_Setup\Steps\Business_Info;
-use Groundhogg\Admin\Guided_Setup\Steps\Community;
-use Groundhogg\Admin\Guided_Setup\Steps\Compliance;
-use Groundhogg\Admin\Guided_Setup\Steps\Email;
-use Groundhogg\Admin\Guided_Setup\Steps\Extensions;
-use Groundhogg\Admin\Guided_Setup\Steps\Finished;
-use Groundhogg\Admin\Guided_Setup\Steps\Import_Contacts;
-use Groundhogg\Admin\Guided_Setup\Steps\Partners;
-use Groundhogg\Admin\Guided_Setup\Steps\Premium;
-use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
-use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
-use Groundhogg\Admin\Guided_Setup\Steps\Tracking;
 use Groundhogg\Extension;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
-use function Groundhogg\dashicon;
-use function Groundhogg\floating_phil;
+use Groundhogg\Plugin;
+use Groundhogg\Telemetry;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
-use Groundhogg\Plugin;
 use function Groundhogg\get_user_timezone;
+use function Groundhogg\qualifies_for_review_your_funnel;
 use function Groundhogg\remote_post_json;
-use function Groundhogg\show_groundhogg_branding;
-use function Groundhogg\utils;
 
 /**
  * Guided Setup
@@ -59,8 +45,51 @@ class Guided_Setup extends Admin_Page {
 		add_action( 'wp_ajax_gh_guided_setup_telemetry', [ $this, 'optin_to_telemetry' ] );
 		add_action( 'wp_ajax_gh_guided_setup_license', [ $this, 'check_license' ] );
 		add_action( 'wp_ajax_groundhogg_remote_install_hollerbox', [ $this, 'install_hollerbox' ] );
+		add_action( 'wp_ajax_gh_apply_for_review_your_funnel', [ $this, 'review_your_funnel_application' ] );
 	}
 
+	/**
+	 * Send data for review funnel application
+	 *
+	 * @return void
+	 */
+	public function review_your_funnel_application() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+
+		$email     = sanitize_text_field( get_post_var( 'email' ) );
+		$name      = sanitize_text_field( get_post_var( 'name' ) );
+		$business  = sanitize_text_field( get_post_var( 'business' ) );
+		$more_info = wp_kses_post( get_post_var( 'more' ) );
+
+		// Update the telemetry email
+		update_option( 'gh_telemetry_email', $email );
+
+		// Send the telemetry
+		Telemetry::send_telemetry();
+
+		// Submit the application
+		$request = [
+			'email'    => $email,
+			'name'     => $name,
+			'business' => $business,
+			'more'     => $more_info,
+			'license'  => get_option( 'gh_master_license' ),
+			'url'      => home_url(),
+		];
+
+		remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1998-review-your-funnel?token=l2d4PaK', $request );
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Installed HollerBox remotely
+	 *
+	 * @return void
+	 */
 	public function install_hollerbox() {
 
 		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'install_plugins' ) || ! current_user_can( 'install_plugins' ) ) {
@@ -261,21 +290,23 @@ class Guided_Setup extends Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-guided-setup' );
 		wp_enqueue_script( 'groundhogg-admin-guided-setup' );
+		wp_enqueue_editor();
 
 		$setup = [
-			'smtpProducts'           => $smtp_services,
-			'integrations'           => $integrations,
-			'mailhawkInstalled'      => defined( 'MAILHAWK_VERSION' ),
-			'install_mailhawk_nonce' => wp_create_nonce( 'install_mailhawk' ),
-			'install_plugins_nonce'  => wp_create_nonce( 'install_plugins' ),
-			'installed'              => [
+			'smtpProducts'                 => $smtp_services,
+			'integrations'                 => $integrations,
+			'mailhawkInstalled'            => defined( 'MAILHAWK_VERSION' ),
+			'install_mailhawk_nonce'       => wp_create_nonce( 'install_mailhawk' ),
+			'install_plugins_nonce'        => wp_create_nonce( 'install_plugins' ),
+			'installed'                    => [
 				'mailhawk'  => defined( 'MAILHAWK_VERSION' ),
 				'hollerbox' => defined( 'HOLLERBOX_VERSION' ),
 			],
-			'assets'                 => [
+			'assets'                       => [
 				'mailhawk'  => GROUNDHOGG_ASSETS_URL . 'images/recommended/mailhawk.png',
 				'hollerbox' => GROUNDHOGG_ASSETS_URL . 'images/recommended/hollerbox.png',
-			]
+			],
+			'qualifiesForReviewYourFunnel' => qualifies_for_review_your_funnel(),
 		];
 
 		wp_add_inline_script( 'groundhogg-admin-guided-setup', 'var GroundhoggGuidedSetup = ' . wp_json_encode( $setup ), 'before' );

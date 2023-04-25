@@ -11,7 +11,7 @@
     max-width: 100%;
 }
 
-.gh-panel {
+.gh-panel:not(.outlined) {
     overflow: hidden;
 }
 
