@@ -795,7 +795,7 @@ class HTML {
 
 			$a['options']['default'] = sprintf( '%s (%s)', get_default_from_name(), get_default_from_email() );
 
-			$owners = get_owners();
+			$owners = apply_filters( 'groundhogg/select_from_users', get_owners() );
 
 			/**
 			 * @var $owner \WP_User
@@ -838,7 +838,8 @@ class HTML {
 		$exclude = wp_parse_id_list( $a['exclude'] );
 
 		if ( empty( $a['options'] ) ) {
-			$owners = get_owners();
+
+			$owners = apply_filters( 'groundhogg/select_owners', get_owners() );
 
 			/**
 			 * @var $owner \WP_User
