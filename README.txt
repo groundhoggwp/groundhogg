@@ -327,6 +327,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED More search filter registration helper functions.
 * ADDED Remote Notifications system to the Toolbar Widget.
 * TWEAKED Convert mobile number to e164 format after most contact creation/update opportunities.
+* TWEAKED Cached owners also passed through `groundhogg/owners` filter
+* FIXED Web Form URLs search and replaced when importing funnels.
 * FIXED Phone field not saving in web forms when phone type is not changed at least once.
 * FIXED PHP Warnings when submitting web form with a phone field.
 
