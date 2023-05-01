@@ -1542,7 +1542,7 @@
 
 //filter by Email Opened
   registerFilter('email_link_clicked', 'activity', __('Email Link Clicked', 'groundhogg'), {
-    view ({ email_id, link, ...rest }) {
+    view ({ email_id, link = '', ...rest }) {
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 

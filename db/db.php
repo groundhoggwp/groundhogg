@@ -309,9 +309,7 @@ abstract class DB {
 			$where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
 		}
 
-		$where = $this->generate_where( $where_args, "OR" );
-
-		return $where;
+		return $this->generate_where( $where_args, "OR" );
 	}
 
 	/**
@@ -1235,6 +1233,7 @@ abstract class DB {
 		}
 
 		$where = empty( $where ) ? '1=1' : $this->build_advanced_where_statement( $where );
+
 		if ( empty( $where ) ) {
 			$where = '1=1';
 		}
@@ -1402,29 +1401,29 @@ abstract class DB {
 
 		unset( $where['relationship'] );
 
-		$clauses = [];
+		$parsed_clauses = [];
 
-		foreach ( $where as $i => $clause ) {
+		foreach ( $where as $i => $unparsed_clause ) {
 
-			if ( ! is_array( $clause ) ) {
+			if ( ! is_array( $unparsed_clause ) ) {
 				// Assume first order ==
 
-				$value = $clause;
+				$value = $unparsed_clause;
 				$col   = $i;
 
 				if ( is_numeric( $value ) ) {
-					$clause[] = $wpdb->prepare( "$col = %d", $value );
+					$parsed_clauses[] = $wpdb->prepare( "$col = %d", $value );
 				} else {
-					$clause[] = $wpdb->prepare( "$col = %s", $value );
+					$parsed_clauses[] = $wpdb->prepare( "$col = %s", $value );
 				}
 
-			} else if ( isset_not_empty( $clause, 'relationship' ) ) {
+			} else if ( isset_not_empty( $unparsed_clause, 'relationship' ) ) {
 
-				$clause[] = '(' . $this->build_advanced_where_statement( $clause ) . ')';
+				$parsed_clauses[] = '(' . $this->build_advanced_where_statement( $unparsed_clause ) . ')';
 
 			} else {
 
-				$clause = wp_parse_args( $clause, [
+				$unparsed_clause = wp_parse_args( $unparsed_clause, [
 					'col'     => '',
 					'val'     => '',
 					'compare' => '='
@@ -1441,28 +1440,28 @@ abstract class DB {
 				];
 
 				foreach ( $normalize_keys as $from => $to ) {
-					if ( isset_not_empty( $clause, $from ) ) {
-						$clause[ $to ] = $clause[ $from ];
+					if ( isset_not_empty( $unparsed_clause, $from ) ) {
+						$unparsed_clause[ $to ] = $unparsed_clause[ $from ];
 					}
 				}
 
-				if ( ! in_array( $clause['compare'], $this->get_allowed_comparisons() ) ) {
-					$clause['compare'] = $this->symbolize_comparison( $clause['compare'] );
+				if ( ! in_array( $unparsed_clause['compare'], $this->get_allowed_comparisons() ) ) {
+					$unparsed_clause['compare'] = $this->symbolize_comparison( $unparsed_clause['compare'] );
 
-					if ( ! $clause['compare'] ) {
+					if ( ! $unparsed_clause['compare'] ) {
 						continue;
 					}
 				}
 
-				if ( in_array( $clause['col'], $this->get_allowed_columns() ) ) {
+				if ( in_array( $unparsed_clause['col'], $this->get_allowed_columns() ) ) {
 
-					$value = $clause['val'];
+					$value = $unparsed_clause['val'];
 
-					if ( is_array( $value ) && ! in_array( $clause['compare'], [ 'IN', 'NOT IN' ] ) ) {
-						$clause['compare'] = 'IN';
+					if ( is_array( $value ) && ! in_array( $unparsed_clause['compare'], [ 'IN', 'NOT IN' ] ) ) {
+						$unparsed_clause['compare'] = 'IN';
 					}
 
-					switch ( $clause['compare'] ) {
+					switch ( $unparsed_clause['compare'] ) {
 						default:
 						case '=':
 						case '!=':
@@ -1473,18 +1472,18 @@ abstract class DB {
 						case '<>':
 						case 'LIKE':
 							if ( is_numeric( $value ) ) {
-								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %d", $value );
+								$parsed_clauses[] = $wpdb->prepare( "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} %d", $value );
 							} else {
-								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %s", $value );
+								$parsed_clauses[] = $wpdb->prepare( "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} %s", $value );
 							}
 							break;
 						case 'RLIKE':
 
 							if ( is_numeric( $value ) ) {
-								$clauses[] = $wpdb->prepare( "{$clause[ 'col' ]} {$clause[ 'compare' ]} %d", $value );
+								$parsed_clauses[] = $wpdb->prepare( "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} %d", $value );
 							} else {
 								$value     = preg_quote( $value );
-								$clauses[] = "{$clause[ 'col' ]} {$clause[ 'compare' ]} '$value'";
+								$parsed_clauses[] = "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} '$value'";
 							}
 
 							break;
@@ -1499,7 +1498,7 @@ abstract class DB {
 								$value = maybe_implode_in_quotes( $value );
 							}
 
-							$clauses[] = "{$clause[ 'col' ]} {$clause['compare']} ({$value})";
+							$parsed_clauses[] = "{$unparsed_clause[ 'col' ]} {$unparsed_clause['compare']} ({$value})";
 
 
 							break;
@@ -1511,7 +1510,7 @@ abstract class DB {
 
 		}
 
-		return implode( " {$relationship} ", $clauses );
+		return implode( " {$relationship} ", $parsed_clauses );
 	}
 
 	/**

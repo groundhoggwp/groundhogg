@@ -4707,24 +4707,22 @@ function get_owners() {
 
 	static $users;
 
-	if ( ! empty( $users ) ) {
-		return $users;
+	if ( empty( $users ) ) {
+		// Check option cache first
+		$cached_users = get_option( 'gh_owners' );
+
+		if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
+			$users = array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
+		} else {
+			$users = get_users( [ 'role__in' => get_owner_roles() ] );
+
+			$user_ids = array_map( function ( $user ) {
+				return $user->ID;
+			}, $users );
+
+			update_option( 'gh_owners', $user_ids );
+		}
 	}
-
-	// Check option cache first
-	$cached_users = get_option( 'gh_owners' );
-
-	if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
-		$users = array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
-	} else {
-		$users = get_users( [ 'role__in' => get_owner_roles() ] );
-
-		$user_ids = array_map( function ( $user ) {
-			return $user->ID;
-		}, $users );
-
-		update_option( 'gh_owners', $user_ids );
-    }
 
 	return apply_filters( 'groundhogg/owners', $users );
 }

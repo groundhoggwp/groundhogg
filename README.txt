@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.9.7
+Stable tag: 2.7.9.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,7 +322,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.9.7 (2023-04-25) =
+= 2.7.9.8 (2023-05-01) =
+* HOT FIX Table/API searching for some endpoints not working.
+* TWEAKED `get_owners` is now always passed through the `groundhogg/owners` filter.
+
+= 2.7.9.7 (2023-04-28) =
 * ADDED Application flow for *Review Your Funnel* series.
 * ADDED More search filter registration helper functions.
 * ADDED Remote Notifications system to the Toolbar Widget.
