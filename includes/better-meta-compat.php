@@ -86,42 +86,52 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 
 	$data = $contact->get_meta( $field['name'] );
 
-	switch ( $field['type'] ):
-		default:
-		case 'text':
-		case 'custom_email':
-		case 'email':
-		case 'url':
-		case 'tel':
-		case 'radio':
-		case 'textarea':
-			$data = esc_html( $data );
-			break;
-		case 'datetime':
-			$data = date_i18n( get_date_time_format(), strtotime( $data ) );
-			break;
-		case 'time':
-			$data = date_i18n( get_time_format(), strtotime( $data ) );
-			break;
-		case 'date':
-			$data = date_i18n( get_option( 'date_format' ), strtotime( $data ) );
-			break;
-		case 'number':
-			$data = floatval( $data );
-			$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
-			break;
-		case 'dropdown':
-		case 'checkboxes':
-			if ( is_array( $data ) ) {
-				$data = esc_html( implode( ', ', $data ) );
-			} else {
+	if ( ! empty( $data ) ){
+		switch ( $field['type'] ):
+			default:
+			case 'text':
+			case 'custom_email':
+			case 'email':
+			case 'url':
+			case 'tel':
+			case 'radio':
+			case 'textarea':
 				$data = esc_html( $data );
-			}
-			break;
-		case 'html':
-			// output with no change as already HTML
-			break;
-	endswitch;
+				break;
+			case 'datetime':
+				$data = date_i18n( get_date_time_format(), strtotime( $data ) );
+				break;
+			case 'time':
+				$data = date_i18n( get_time_format(), strtotime( $data ) );
+				break;
+			case 'date':
+				$data = date_i18n( get_option( 'date_format' ), strtotime( $data ) );
+				break;
+			case 'number':
+				$data = floatval( $data );
+				$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
+				break;
+			case 'dropdown':
+			case 'checkboxes':
+				if ( is_array( $data ) ) {
+					$data = esc_html( implode( ', ', $data ) );
+				} else {
+					$data = esc_html( $data );
+				}
+				break;
+			case 'html':
+				// output with no change as already HTML
+				break;
+		endswitch;
+	}
+
+	/**
+	 * Filter the display value of a custom field
+	 *
+	 * @param $data mixed the custom field display value
+	 * @param $contact Contact
+	 */
+	$data = apply_filters( 'groundhogg/display_custom_field', $data, $contact );
 
 	if ( $echo ) {
 		echo $data;

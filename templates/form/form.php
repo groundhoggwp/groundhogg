@@ -37,7 +37,7 @@ add_action( 'wp_enqueue_scripts', function () {
 } );
 
 ?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> style="margin-top: 0 !important;">
 <head>
     <base target="_parent">
     <meta charset="<?php bloginfo( 'charset' ); ?>">
@@ -47,10 +47,15 @@ add_action( 'wp_enqueue_scripts', function () {
 	<?php wp_head(); ?>
     <script>
 
-      let source = ''
+      let source = null
       let formId = 0
 
       const postResizeData = () => {
+
+        if ( source === null ){
+          return
+        }
+
         let body = document.body, html = document.documentElement
         let height = Math.max(body.scrollHeight, body.offsetHeight,
           html.clientHeight, html.scrollHeight, html.offsetHeight)
@@ -72,7 +77,6 @@ add_action( 'wp_enqueue_scripts', function () {
       window.addEventListener('load', () => {
         ['submit', 'reset', 'ajaxfinished', 'ghformsubmitted'].forEach(evt => {
           document.querySelector('form.gh-form').addEventListener(evt, () => {
-            console.log('this worked')
             postResizeData()
           })
         })
