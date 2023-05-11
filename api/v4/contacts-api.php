@@ -400,6 +400,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
+		if ( ! is_email( $email_address ) ){
+			return self::ERROR_400( 'invalid_email', 'The provided email address is not valid.' );
+		}
+
 		// If the email address is in use, treat as an update
 		if ( is_email_address_in_use( $email_address ) ) {
 			$contact = new Contact( $email_address );
