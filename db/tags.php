@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\swap_array_keys;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -103,6 +104,25 @@ class Tags extends DB {
 			'contact_count'      => 0,
 			'show_as_preference' => 0,
 		);
+	}
+
+	/**
+	 * Fix some queries that aren't working
+	 *
+	 * @param $data
+	 * @param $ORDER_BY
+	 * @param $from_cache
+	 *
+	 * @return array|array[]|bool|int|object|object[]|null
+	 */
+	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
+
+		$data = swap_array_keys( $data, [
+			'id' => 'tag_id',
+			'ID' => 'tag_id',
+		] );
+
+		return parent::query( $data, $ORDER_BY, $from_cache );
 	}
 
 	/**

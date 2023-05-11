@@ -213,7 +213,7 @@
 
         const renderTagPicker = () => {
           tagPicker('#apply-tags', true, (items) => TagsStore.itemsFetched(items), {
-            data: tags.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+            data: tags.filter( t => TagsStore.has(t) ).map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
           }).on('change', e => {
             let tags = $(e.target).val().map(id => parseInt(id))
             updateField({
@@ -717,7 +717,7 @@
                   let selected = $input.val().split(',').map(t => parseInt(t)).filter(id => TagsStore.has(id))
 
                   tagPicker('#gh-option-tags', true, (items) => TagsStore.itemsFetched(items), {
-                    data: selected.map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
+                    data: selected.filter( t => TagsStore.has(t) ).map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
                     placeholder: __( 'Select tags...', 'groundhogg' )
                   }).on('change', e => {
                     let tagIds = $(e.target).val().map(id => parseInt(id))
