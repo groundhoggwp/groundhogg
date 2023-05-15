@@ -177,7 +177,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return array|mixed
 	 */
-	public function get_custom_alt_body(){
+	public function get_custom_alt_body() {
 		return $this->get_meta( 'alt_body' );
 	}
 
@@ -470,6 +470,14 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Temp array to store a map if the original link to the tracking link
+	 * For sanitization later
+	 *
+	 * @var array
+	 */
+	protected $tracking_link_map = [];
+
+	/**
 	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
 	 *
 	 * @param $matches
@@ -478,7 +486,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function tracking_link_callback( $matches ) {
 
-		$clean_url = no_and_amp( $matches[2] );
+		$clean_url = no_and_amp( html_entity_decode( $matches[2] ) );
 
 		// If the url is not to be tracked leave it alone.
 		if ( is_url_excluded_from_tracking( $clean_url ) ) {
@@ -494,7 +502,11 @@ class Email extends Base_Object_With_Meta {
 			$clean_url = preg_replace( "@https?://$regex@", '', $clean_url );
 		}
 
-		return $matches[1] . trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) ) . $matches[3];
+		// Save to link map...
+		$tracking_link                         = trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) );
+		$this->tracking_link_map[ $clean_url ] = $tracking_link;
+
+		return $matches[1] . $tracking_link . $matches[3];
 	}
 
 	/**
@@ -589,7 +601,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// Has posts replacement code
-		if ( strpos( $this->content, '{posts.' ) !== false ){
+		if ( strpos( $this->content, '{posts.' ) !== false ) {
 			add_filter( 'groundhogg/templates/email/has_posts', '__return_true' );
 		}
 	}
@@ -882,6 +894,8 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function send( $contact_id_or_email, $event = 0 ) {
 
+		is_sending( true );
+
 		// Clear any old previous errors.
 		$this->clear_errors();
 
@@ -926,6 +940,8 @@ class Email extends Base_Object_With_Meta {
 
 		$headers = $this->get_headers();
 
+//		add_filter( 'groundhogg/email_logger/before_create_log/log_data', [ $this, 'set_log_safe_version' ] );
+
 		if ( $this->is_transactional() ) {
 			// If the email is transactional, use the installed transactional system
 			$sent = \Groundhogg_Email_Services::send_transactional( $to, $subject, $content, $headers );
@@ -933,6 +949,8 @@ class Email extends Base_Object_With_Meta {
 			// If the email is marketing, send using the installed marketing system, in most cases also wp_mail.
 			$sent = \Groundhogg_Email_Services::send_marketing( $to, $subject, $content, $headers );
 		}
+
+		is_sending( false );
 
 		remove_action( 'phpmailer_init', [ $this, 'set_bounce_return_path' ] );
 		remove_action( 'phpmailer_init', [ $this, 'set_plaintext_body' ] );
@@ -1204,6 +1222,4 @@ class Email extends Base_Object_With_Meta {
 			]
 		] );
 	}
-
-
 }

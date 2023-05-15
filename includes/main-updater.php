@@ -649,15 +649,6 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Add the value column for activity
-	 *
-	 * @return void
-	 */
-	public function version_2_7_9_3() {
-		get_db( 'activity' )->create_table();
-	}
-
-	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -674,6 +665,23 @@ class Main_Updater extends Updater {
 			install_gh_cron_file();
 		}
 	}
+
+	/**
+	 * Add the value column for activity
+	 *
+	 * @return void
+	 */
+	public function version_2_7_9_3() {
+		get_db( 'activity' )->create_table();
+	}
+
+	/**
+	 * Update the gh-cron file to use direct function instead of do_action
+	 */
+	public function version_2_7_10() {
+		get_db( 'email_log' )->create_table();
+	}
+
 
 	/**
 	 * Get a list of updates which are available.
@@ -735,6 +743,7 @@ class Main_Updater extends Updater {
 			'2.7.7.8',
 			'2.7.7.10',
 			'2.7.9.3',
+			'2.7.10',
 		];
 	}
 
@@ -778,6 +787,7 @@ class Main_Updater extends Updater {
 			'2.7.7.8',
 			'2.7.7.10',
 			'2.7.9.3',
+			'2.7.10',
 		];
 	}
 
@@ -841,6 +851,7 @@ class Main_Updater extends Updater {
 			'2.7.7.8'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
 			'2.7.7.10'      => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
 			'2.7.9.3'       => __( 'Add a value column to the the activity table!', 'groundhogg' ),
+			'2.7.10'        => __( 'Add an <code>is_sensitive</code> flag to email logs for enhanced security.', 'groundhogg' ),
 		];
 	}
 }

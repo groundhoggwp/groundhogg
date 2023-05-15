@@ -677,9 +677,8 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param     $a
- * @param     $b
- *
+ * @param $a int denominator
+ * @param $b int numerator
  * @param int $precision
  *
  * @return float
@@ -4099,11 +4098,11 @@ function number_has_country_code( $number = '' ) {
  */
 function maybe_validate_and_update_mobile_number( $contact ) {
 
-    $contact = get_contactdata( $contact );
+	$contact = get_contactdata( $contact );
 
-    if ( ! is_a_contact( $contact ) ){
-        return;
-    }
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
 
 	$to           = $contact->get_mobile_number();
 	$country_code = $contact->get_meta( 'country' );
@@ -4112,10 +4111,10 @@ function maybe_validate_and_update_mobile_number( $contact ) {
 		return;
 	}
 
-    // Is e164 format already
-    if ( preg_match( '/^\+[1-9]\d{1,14}$/', $to ) ){
-        return;
-    }
+	// Is e164 format already
+	if ( preg_match( '/^\+[1-9]\d{1,14}$/', $to ) ) {
+		return;
+	}
 
 	$validated = validate_mobile_number( $to, $country_code );
 
@@ -4907,6 +4906,31 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 }
 
 /**
+ * Wrapper for `permissions_key_url()` which will give a permissions key link
+ * if an email is sending or the current logged-in user and the tracking cookie of the contact match up
+ *
+ *
+ * @param $url
+ * @param $contact
+ * @param $usage
+ * @param $expiration
+ * @param $delete_after_use
+ *
+ * @return mixed|string
+ */
+function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false  ){
+
+    if ( is_sending() || current_contact_and_logged_in_user_match() ){
+
+        Email_Logger::email_is_sensitive();
+
+	    return permissions_key_url( $url, $contact, $usage, $expiration, $delete_after_use );
+    }
+
+    return $url;
+}
+
+/**
  * Generate a url with the permissions key on it.
  *
  * @param string    $url              the url to append the key to
@@ -5076,11 +5100,7 @@ function is_ignore_user_tracking_precedence_enabled() {
  */
 function contact_and_user_match( $contact = false, $user = false ) {
 
-	if ( is_int( $contact ) ) {
-		$contact = get_contactdata( $contact );
-	} else if ( ! $contact ) {
-		$contact = get_contactdata();
-	}
+	$contact = get_contactdata( $contact );
 
 	if ( ! is_a_contact( $contact ) ) {
 		return false;
@@ -5089,7 +5109,7 @@ function contact_and_user_match( $contact = false, $user = false ) {
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
 	} else if ( ! $user ) {
-		$$user = wp_get_current_user();
+		$user = wp_get_current_user();
 	}
 
 	if ( ! is_a_user( $user ) ) {
@@ -7320,4 +7340,65 @@ function parse_maybe_numeric_list( $list, $sanitize = 'sanitize_text_field' ) {
 	return array_map( function ( $item ) use ( $sanitize ) {
 		return is_numeric( $item ) ? absint( $item ) : call_user_func( $sanitize, $item );
 	}, $list );
+}
+
+/**
+ * Programmatically create a task and associate it with the relevant object
+ *
+ * @param $args array
+ * @param $object Base_Object|Contact
+ *
+ * @return void
+ */
+function create_task( $args, $object ){
+
+}
+
+/**
+ * If the contact is viewing the email in the browser
+ *
+ * @return bool
+ */
+function is_browser_view(){
+    return defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) && GROUNDHOGG_IS_BROWSER_VIEW;
+}
+
+/**
+ * If an email is actually sending to the contact
+ * This is used as a flag for generating replacements which may contain sensitive information
+ *
+ * @param bool|null $sending
+ *
+ * @return bool
+ */
+function is_sending( $sending = null ){
+
+    static $_sending;
+
+    if ( $sending === null ){
+        return $_sending;
+    }
+
+    $_sending = $sending;
+
+    return $_sending;
+}
+
+/**
+ * Makes swapping array keys easy...
+ *
+ * @param array $array
+ * @param array $key_map
+ *
+ * @return array
+ */
+function swap_array_keys( array $array = [], array $key_map = [] ){
+
+    foreach ( $key_map as $old => $new ){
+        if ( isset( $array[$old] ) ){
+	        $array[$new] = $array[$old];
+        }
+    }
+
+    return $array;
 }

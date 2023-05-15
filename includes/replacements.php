@@ -157,53 +157,53 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'The contact\'s mobile phone number.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'line1',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_line1' ],
-				'name'     => __( 'Line 1', 'groundhogg' ),
+				'code'        => 'line1',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_line1' ],
+				'name'        => __( 'Line 1', 'groundhogg' ),
 				'description' => _x( 'The contact\'s street address.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'line2',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_line2' ],
-				'name'     => __( 'Line 2', 'groundhogg' ),
+				'code'        => 'line2',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_line2' ],
+				'name'        => __( 'Line 2', 'groundhogg' ),
 				'description' => _x( 'The contact\'s street address.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'city',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_city' ],
-				'name'     => __( 'City', 'groundhogg' ),
+				'code'        => 'city',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_city' ],
+				'name'        => __( 'City', 'groundhogg' ),
 				'description' => _x( 'The contact\'s city.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'state',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_state' ],
-				'name'     => __( 'State', 'groundhogg' ),
+				'code'        => 'state',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_state' ],
+				'name'        => __( 'State', 'groundhogg' ),
 				'description' => _x( 'The contact\'s state.', 'replacement', 'groundhogg' ),
 
 			],
 			[
-				'code'     => 'zip_code',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_zip' ],
-				'name'     => __( 'Zip Code', 'groundhogg' ),
+				'code'        => 'zip_code',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_zip' ],
+				'name'        => __( 'Zip Code', 'groundhogg' ),
 				'description' => _x( 'The contact\'s zip code.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'country',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_country' ],
-				'name'     => __( 'Country', 'groundhogg' ),
+				'code'        => 'country',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_country' ],
+				'name'        => __( 'Country', 'groundhogg' ),
 				'description' => _x( 'The contact\'s country.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'country_code',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_country_code' ],
-				'name'     => __( 'Country Code', 'groundhogg' ),
+				'code'        => 'country_code',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_country_code' ],
+				'name'        => __( 'Country Code', 'groundhogg' ),
 				'description' => _x( 'The contact\'s country code.', 'replacement', 'groundhogg' ),
 			],
 			[
@@ -214,18 +214,18 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'ip_address',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_ip_address' ],
-				'name'     => __( 'IP Address', 'groundhogg' ),
+				'code'        => 'ip_address',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_ip_address' ],
+				'name'        => __( 'IP Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s IP address.', 'replacement', 'groundhogg' ),
 
 			],
 			[
-				'code'     => 'time_zone',
-				'group'    => 'address',
-				'callback' => [ $this, 'replacement_time_zone' ],
-				'name'     => __( 'Time Zone', 'groundhogg' ),
+				'code'        => 'time_zone',
+				'group'       => 'address',
+				'callback'    => [ $this, 'replacement_time_zone' ],
+				'name'        => __( 'Time Zone', 'groundhogg' ),
 				'description' => _x( 'The contact\'s time zone.', 'replacement', 'groundhogg' ),
 			],
 			[
@@ -1289,7 +1289,7 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-	 * Autologin the user
+	 * Auto login the user
 	 *
 	 * @param $redirect_to
 	 *
@@ -1304,7 +1304,7 @@ class Replacements implements \JsonSerializable {
 			return $redirect_to;
 		}
 
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
+		maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
@@ -1467,7 +1467,7 @@ class Replacements implements \JsonSerializable {
 		$html = '';
 
 		foreach ( $files as $i => $file ) {
-			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) ), esc_html( $file['name'] ) );
+			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( maybe_permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) ), esc_html( $file['name'] ) );
 		}
 
 		return sprintf( '<ul>%s</ul>', $html );
@@ -1559,71 +1559,68 @@ class Replacements implements \JsonSerializable {
 			'within'     => '',
 		] );
 
-		$post_query = [
-			'post_status' => 'publish',
-			'numberposts' => 1,
-			'offset'      => $props['offset'],
-			'post_type'   => $props['post_type'],
-			'category'    => $props['category'],
-			'tag'         => $props['tag'],
-			'orderby'     => $props['orderby'],
-			'order'       => $props['order'],
-			'meta_key'    => $props['meta_key'],
-			'meta_value'  => $props['meta_value'],
+		$query_vars = [
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'offset'         => $props['offset'],
+			'post_type'      => $props['post_type'],
+			'category'       => $props['category'],
+			'tag'            => $props['tag'],
+			'orderby'        => $props['orderby'],
+			'order'          => $props['order'],
+			'meta_key'       => $props['meta_key'],
+			'meta_value'     => $props['meta_value'],
 		];
 
 		if ( isset_not_empty( $props, 'within' ) ) {
 			$days = absint( $props['within'] );
 			if ( $days ) {
-				$post_query['date_query'] = [
+				$query_vars['date_query'] = [
 					'after' => $days . ' days ago'
 				];
 			}
 		}
 
 		if ( isset_not_empty( $props, 'id' ) ) {
+
 			/**
 			 * Filter post query variables
 			 *
-			 * @param $query   array the query vars
+			 * @param $query   array the query args
 			 * @param $contact Contact the current contact
 			 */
-			$post_query = apply_filters( "groundhogg/posts/query/{$props['id']}", $post_query, $this->current_contact );
+			$query_vars = apply_filters( "groundhogg/posts/query/{$props['id']}", $query_vars, $this->current_contact );
 		}
 
-		$cache_key = md5( wp_json_encode( $post_query ) );
+		$query = new \WP_Query( $query_vars );
 
-		// Check posts cache
-		if ( isset_not_empty( self::$posts_cache, $cache_key ) ) {
-			$posts = self::$posts_cache[ $cache_key ];
-		} else {
-			$posts                           = get_posts( $post_query );
-			self::$posts_cache[ $cache_key ] = $posts;
+		if ( isset_not_empty( $props, 'id' ) ) {
+
+			/**
+			 * Filter post query
+			 *
+			 * @param $query   \WP_Query the query
+			 * @param $contact Contact the current contact
+			 */
+			$query = apply_filters_ref_array( "groundhogg/posts/wp_query/{$props['id']}", [
+				&$query,
+				$this->current_contact
+			] );
 		}
 
-		if ( empty( $posts ) ) {
+		if ( ! $query->have_posts() ) {
 			return '';
 		}
 
-		if ( isset_not_empty( $props, 'id' ) ) {
-			/**
-			 * Filter posts
-			 *
-			 * @param $posts   \WP_Post[] the query vars
-			 * @param $contact Contact the current contact
-			 */
-			$posts = apply_filters( "groundhogg/posts/{$props['id']}", $posts, $this->current_contact );
-		}
-
-		$post = array_shift( $posts );
+		$query->the_post();
 
 		switch ( $which ) {
 			default:
 			case 'title':
-				$content = html_entity_decode( get_the_title( $post ), ENT_QUOTES );
+				$content = html_entity_decode( get_the_title(), ENT_QUOTES );
 				break;
 			case 'content':
-				$content = get_the_content( null, false, $post );
+				$content = get_the_content();
 
 				/**
 				 * Filters the post content.
@@ -1637,34 +1634,34 @@ class Replacements implements \JsonSerializable {
 				$content = str_replace( ']]>', ']]&gt;', $content );
 				break;
 			case 'excerpt':
-				$content = get_the_excerpt( $post );
+				$content = get_the_excerpt();
 				break;
 			case 'thumbnail':
 			case 'featured_image':
 
-				if ( ! has_post_thumbnail( $post ) ) {
+				if ( ! has_post_thumbnail() ) {
 					return '';
 				}
 
 				return html()->e( 'a', [
-					'href' => get_permalink( $post )
+					'href' => get_the_permalink()
 				], html()->e( 'img', [
 					'class'  => 'featured-image',
-					'src'    => get_the_post_thumbnail_url( $post ),
+					'src'    => get_the_post_thumbnail_url(),
 					'width'  => get_array_var( $props, 'width' ),
 					'height' => get_array_var( $props, 'height' ),
 				] ) );
 			case 'featured_image_url':
 			case 'thumbnail_url':
 
-				if ( ! has_post_thumbnail( $post ) ) {
+				if ( ! has_post_thumbnail() ) {
 					return '';
 				}
 
-				$content = get_the_post_thumbnail_url( $post );
+				$content = get_the_post_thumbnail_url();
 				break;
 			case 'url':
-				$content = get_permalink( $post );
+				$content = get_the_permalink();
 				break;
 		}
 
@@ -1731,8 +1728,6 @@ class Replacements implements \JsonSerializable {
 		return $this->single_post( $args, 'url' );
 	}
 
-	static $posts_cache = [];
-
 	/**
 	 * Display posts!
 	 *
@@ -1762,66 +1757,72 @@ class Replacements implements \JsonSerializable {
 			'within'     => '',
 		] );
 
-		$post_query = [
-			'post_status' => 'publish',
-			'numberposts' => $props['number'],
-			'offset'      => $props['offset'],
-			'post_type'   => $props['post_type'],
-			'category'    => $props['category'],
-			'tag'         => $props['tag'],
-			'orderby'     => $props['orderby'],
-			'order'       => $props['order'],
-			'meta_key'    => $props['meta_key'],
-			'meta_value'  => $props['meta_value'],
+		$query_vars = [
+			'post_status'    => 'publish',
+			'posts_per_page' => $props['number'],
+			'offset'         => $props['offset'],
+			'post_type'      => $props['post_type'],
+			'category'       => $props['category'],
+			'tag'            => $props['tag'],
+			'orderby'        => $props['orderby'],
+			'order'          => $props['order'],
+			'meta_key'       => $props['meta_key'],
+			'meta_value'     => $props['meta_value'],
 		];
 
 		if ( isset_not_empty( $props, 'within' ) ) {
 			$days = absint( $props['within'] );
 			if ( $days ) {
-				$post_query['date_query'] = [
+				$query_vars['date_query'] = [
 					'after' => $days . ' days ago'
 				];
 			}
 		}
 
 		if ( isset_not_empty( $props, 'id' ) ) {
+
 			/**
 			 * Filter post query variables
 			 *
-			 * @param $query   array the query vars
+			 * @param $query   array the query args
 			 * @param $contact Contact the current contact
 			 */
-			$post_query = apply_filters( "groundhogg/posts/query/{$props['id']}", $post_query, $this->current_contact );
+			$query_vars = apply_filters( "groundhogg/posts/query/{$props['id']}", $query_vars, $this->current_contact );
 		}
 
-		$cache_key = md5( wp_json_encode( $post_query ) );
+		$query = new \WP_Query( $query_vars );
 
-		// Check posts cache
-		if ( isset_not_empty( self::$posts_cache, $cache_key ) ) {
-			$posts = self::$posts_cache[ $cache_key ];
-		} else {
-			$posts                           = get_posts( $post_query );
-			self::$posts_cache[ $cache_key ] = $posts;
+		if ( isset_not_empty( $props, 'id' ) ) {
+
+			/**
+			 * Filter post query
+			 *
+			 * @param $query   \WP_Query the query
+			 * @param $contact Contact the current contact
+			 */
+			$query = apply_filters_ref_array( "groundhogg/posts/wp_query/{$props['id']}", [
+				&$query,
+				$this->current_contact
+			] );
 		}
 
-		if ( empty( $posts ) ) {
+		if ( ! $query->have_posts() ) {
 			return '';
 		}
 
-		if ( isset_not_empty( $props, 'id' ) ) {
-			/**
-			 * Filter posts
-			 *
-			 * @param $posts   \WP_Post[] the query vars
-			 * @param $contact Contact the current contact
-			 */
-			$posts = apply_filters( "groundhogg/posts/{$props['id']}", $posts, $this->current_contact );
-		}
+		/**
+		 * Hook to maybe add some filters for the output of the core WP functions
+		 *
+		 * @param array $props
+		 */
+		do_action( 'groundhogg/posts/before_render', $props );
 
 		switch ( $props['layout'] ) {
 			default:
 			case 'ul':
 			case 'ol':
+
+				$posts = $query->get_posts();
 
 				$content = html()->e( $props['layout'] ?? 'ul', [], array_map( function ( $post ) {
 					return html()->e( 'li', [], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
@@ -1833,41 +1834,40 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
-				$render_post = function ( $post, $thumbnail_size = 'thumbnail' ) use ( $props ) {
+				$render_post = function ( $thumbnail_size = 'thumbnail' ) use ( $props ) {
+
 					return html()->e( 'div', [
 						'class' => [
 							$props['layout'] === 'grid' ? 'post' : 'post-card',
-							has_post_thumbnail( $post ) ? 'has-thumbnail' : ''
+							has_post_thumbnail() ? 'has-thumbnail' : ''
 						]
 					], [
-						has_post_thumbnail( $post ) ? html()->e( 'div', [
+						has_post_thumbnail() ? html()->e( 'div', [
 							'class' => 'featured-image-wrap'
 						], html()->e( 'a', [
-							'href' => get_permalink( $post )
+							'href' => get_the_permalink()
 						], html()->e( 'img', [
 							'class' => 'featured-image',
-							'src'   => get_the_post_thumbnail_url( $post, $thumbnail_size ),
+							'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
 						] ) ) ) : '',
 						html()->e( 'div', [ 'class' => 'card-content' ], [
 							html()->e( 'h2', [], html()->e( 'a', [
-								'href' => get_permalink( $post )
-							], get_the_title( $post ) ) ),
-							$props['excerpt'] ? html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt( $post ) ) : ''
+								'href' => get_the_permalink()
+							], get_the_title() ) ),
+							$props['excerpt'] ? html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt() ) : ''
 						] ),
 					] );
 				};
 
 				if ( $props['featured'] ) {
-					$post   = array_shift( $posts );
-					$rows[] = $render_post( $post, 'large' );
+					$query->the_post();
+					$rows[] = $render_post( 'large' );
 				}
 
 				$rows[] = '<div class="email-columns">';
 
 
-				while ( ! empty( $posts ) ):
-
-					$post = array_shift( $posts );
+				while ( $query->have_posts() ):
 
 					$render_column = function ( $content = '' ) {
 						return html()->e( 'div', [
@@ -1877,19 +1877,21 @@ class Replacements implements \JsonSerializable {
 						] );
 					};
 
+					$query->the_post();
+
 					$columns = [
-						$render_column( $render_post( $post ) ),
+						$render_column( $render_post() ),
 						'<div class="email-columns-cell gap" style="width: 20px;"></div>',
 					];
 
-					$post = array_shift( $posts );
+					if ( $query->have_posts() ) {
 
-					if ( ! empty( $post ) ) {
-						$columns[] = $render_column( $render_post( $post ) );
+						$query->the_post();
+
+						$columns[] = $render_column( $render_post() );
 					} else {
 						$columns[] = $render_column();
 					}
-
 
 					$rows[] = html()->e( 'div', [
 						'class' => 'email-columns-row'
@@ -1901,39 +1903,49 @@ class Replacements implements \JsonSerializable {
 					'class' => $props['layout']
 				], $rows );
 
+                $query->reset_postdata();
+
 				break;
 
-//			case 'list':
-//				break;
 			case 'h1':
 			case 'h2':
 			case 'h3':
 			case 'h4':
 			case 'h5':
 
-				$tag = $props['layout'];
+				$tag  = $props['layout'];
+				$html = [];
 
-				$content = implode( '', array_map( function ( $post ) use ( $props, $tag ) {
+				while ( $query->have_posts() ) {
+					$query->the_post();
 
-					$_html = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
+					$html[] = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );
 
 					if ( $props['excerpt'] ) {
-						$_html .= html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt( $post ) );
+						$html[] = html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt() );
 					}
+				}
 
-					return $_html;
-				}, $posts ) );
+				$content = implode( '', $html );
 
+                $query->reset_postdata();
 
 				break;
 			case 'plain':
-
+				$posts   = $query->get_posts();
 				$content = implode( "\n\n", array_map( function ( $post ) use ( $props ) {
 					return sprintf( '- %s 🔗 %s', html_entity_decode( get_the_title( $post ) ), get_permalink( $post ) );
 				}, $posts ) );
 
 				break;
 		}
+
+		/**
+		 * Hook to remove filters for the output of the core WP functions
+		 *
+		 * @param array $props
+		 */
+		do_action( 'groundhogg/posts/after_render', $props );
 
 		return $content;
 	}

@@ -322,6 +322,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.7.10 (2023-05-15) =
+* TWEAKED Enhanced security around email logs and potentially sensitive information.
+
 = 2.7.9.8 (2023-05-01) =
 * HOT FIX Table/API searching for some endpoints not working.
 * TWEAKED `get_owners` is now always passed through the `groundhogg/owners` filter.

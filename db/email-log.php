@@ -113,6 +113,16 @@ class Email_Log extends DB {
 		return $this->maybe_unserialize( $obj );
 	}
 
+	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
+
+		// Don't allow low level people to see sensitive email logs
+		if ( ! is_super_admin() ){
+			$data['is_sensitive'] = 0;
+		}
+
+		return self::query( $data, $ORDER_BY, $from_cache );
+	}
+
 	/**
 	 * Wrapper to add maybe unserialize
 	 *
@@ -153,6 +163,7 @@ class Email_Log extends DB {
 			'status'          => '%s',
 			'retries'         => '%d',
 			'queued_event_id' => '%d',
+			'is_sensitive'    => '%d',
 			'date_sent'       => '%s',
 		);
 	}
@@ -179,6 +190,7 @@ class Email_Log extends DB {
 			'error_message'   => '',
 			'status'          => 'sent',
 			'retries'         => 0,
+			'is_sensitive'    => 0,
 			'date_sent'       => Ymd_His(),
 		);
 	}
@@ -213,6 +225,7 @@ class Email_Log extends DB {
 		error_code varchar(30) NOT NULL,
 		error_message text NOT NULL,
 		retries bigint(20) unsigned NOT NULL,
+		is_sensitive tinyint(1) NOT NULL,
 		queued_event_id bigint(20) unsigned NOT NULL,
 		date_sent datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
