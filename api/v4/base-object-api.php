@@ -51,7 +51,6 @@ abstract class Base_Object_Api extends Base_Api {
 			'funnel'    => Funnel::class,
 			'broadcast' => Broadcast::class,
 			'event'     => Event::class,
-//			'webhook'   => Webhook::class,
 			'activity'  => Activity::class,
 			'campaign'  => Campaign::class
 		] );
