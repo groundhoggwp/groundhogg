@@ -87,6 +87,7 @@ class Rewrites {
 			'subpage=auto_login'
 		);
 
+
 	}
 
 	/**
@@ -352,16 +353,16 @@ class Rewrites {
 
 				if ( ! is_user_logged_in() ) {
 
-					// If the contact or permissions key is not available, checkout now.
+					// If the contact or permissions key is not available, exit now.
 					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ) {
-						exit( wp_redirect( $redirect_to ) );
+						wp_die( __( 'Unable to login. This link may have expired.', 'groundhogg' ) );
 					}
 
 					$user = $contact->get_userdata();
 
 					// If there is no user account, send to the home page
 					if ( ! $user ) {
-						exit( wp_redirect( $redirect_to ) );
+						wp_die( __( 'Unable to login. There is no user account associated with your email address.', 'groundhogg' ) );
 					}
 
 					wp_set_current_user( $user->ID );

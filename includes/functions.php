@@ -842,7 +842,7 @@ function array_to_atts( $atts ) {
 
 		switch ( $key ) {
 			case 'class':
-				$value = is_array( $value ) ? trim( implode( ' ', $value ) ) : $value;
+				$value = esc_attr( trim( is_array( $value ) ? implode( ' ', $value ) : $value ) );
 				break;
 			case 'style':
 				$value = array_to_css( $value );
@@ -850,7 +850,7 @@ function array_to_atts( $atts ) {
 			case 'href':
 			case 'action':
 			case 'src':
-				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : $value;
+				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : esc_attr( $value );
 				break;
 			default:
 				if ( is_array( $value ) ) {
@@ -7401,4 +7401,33 @@ function swap_array_keys( array $array = [], array $key_map = [] ){
     }
 
     return $array;
+}
+
+/**
+ * The default tab to show in the contact record
+ *
+ * @return false|mixed|string
+ */
+function get_default_contact_tab(){
+
+    if ( get_url_var( '_tab' ) ){
+        return get_url_var( '_tab' );
+    }
+
+    $profile_setting = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
+
+    if ( $profile_setting ){
+        return $profile_setting;
+    }
+
+	return get_option( 'gh_default_contact_tab' ) ?: 'activity';
+}
+
+/**
+ * Standard admin ajax nonce function
+ *
+ * @return false|int
+ */
+function verify_admin_ajax_nonce(){
+    return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
 }

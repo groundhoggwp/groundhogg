@@ -15,6 +15,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_user_timezone;
 use function Groundhogg\qualifies_for_review_your_funnel;
 use function Groundhogg\remote_post_json;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 /**
  * Guided Setup
@@ -55,7 +56,7 @@ class Guided_Setup extends Admin_Page {
 	 */
 	public function review_your_funnel_application() {
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
 			wp_send_json_error();
 		}
 
@@ -110,6 +111,10 @@ class Guided_Setup extends Admin_Page {
 	 */
 	public function check_license() {
 
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
 		$license = sanitize_text_field( get_post_var( 'license' ) );
 
 		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/edd/all-access/', [
@@ -129,6 +134,11 @@ class Guided_Setup extends Admin_Page {
 	 * Optin the contact to telemetry
 	 */
 	public function optin_to_telemetry() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
 		// Add to telemetry
 		$response = Plugin::$instance->stats_collection->optin( get_post_var( 'marketing', false ) );
 
@@ -143,6 +153,10 @@ class Guided_Setup extends Admin_Page {
 	 * Subscribe the contact to the newsletter
 	 */
 	public function subscribe_to_newsletter() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
 
 		$email = get_post_var( 'email' );
 		$name  = wp_get_current_user()->display_name;

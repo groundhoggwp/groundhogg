@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\User;
 
 use function Groundhogg\get_post_var;
+use function Groundhogg\html;
 use function Groundhogg\white_labeled_name;
 
 class Admin_User {
@@ -22,7 +23,7 @@ class Admin_User {
 	 */
 	public function show_fields( $profile_user ) {
 
-		// Do nto show for non relevant users...
+		// Do not show for non-relevant users...
 		if ( ! user_can( $profile_user, 'view_contacts' ) ) {
 			return;
 		}
@@ -35,7 +36,23 @@ class Admin_User {
         <h2><?php _e( white_labeled_name() ); ?></h2>
         <table class="form-table">
             <tr>
-                <th><?php _e( 'Signature', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Default Contact Tab', 'groundhogg' ); ?></th>
+                <td>
+			        <?php echo html()->dropdown( [
+				        'name'     => 'gh_default_contact_tab',
+				        'options'  => [
+					        'activity' => 'Activity Timeline',
+					        'notes'    => 'Notes',
+					        'tasks'    => 'Tasks',
+					        'files'    => 'Files'
+				        ],
+				        'selected' => $profile_user->gh_default_contact_tab
+			        ] ); ?>
+                    <p class="description"><?php _ex( 'Which tab should be selected by default when opening a contact record.', 'settings', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><?php _e( 'Email Signature', 'groundhogg' ); ?></th>
                 <td>
                     <div style="max-width: 800px">
 						<?php wp_editor( $profile_user->signature, 'signature', [
@@ -57,8 +74,8 @@ class Admin_User {
 	 */
 	public function save_fields( $user_id ) {
 
-		$signature = wp_kses_post( get_post_var( 'signature' ) );
-		update_user_meta( $user_id, 'signature', $signature );
+		update_user_meta( $user_id, 'signature', wp_kses_post( get_post_var( 'signature' ) ) );
+		update_user_meta( $user_id, 'gh_default_contact_tab', sanitize_text_field( get_post_var( 'gh_default_contact_tab' ) ) );
 
 	}
 

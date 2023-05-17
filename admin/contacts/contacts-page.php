@@ -17,6 +17,7 @@ use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_default_contact_tab;
 use function Groundhogg\get_filters_from_old_query_vars;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
@@ -38,6 +39,7 @@ use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\utils;
 use function Groundhogg\validate_tags;
+use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\Ymd;
 use function Groundhogg\Ymd_His;
 
@@ -230,7 +232,7 @@ class Contacts_Page extends Admin_Page {
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 					'contact_id'                   => $contact->get_id(),
 					'contact'                      => $contact,
-					'default_tab'                  => get_option( 'gh_default_contact_tab' ) ?: 'activity',
+					'default_tab'                  => get_default_contact_tab(),
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'marketable'                   => $contact->is_marketable(),
@@ -407,6 +409,11 @@ class Contacts_Page extends Admin_Page {
 		return $this->admin_url( [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
 	}
 
+	/**
+     * Excludes these contact meta fields from the meta field editor
+     *
+	 * @return mixed|null
+	 */
 	public function get_meta_key_exclusions() {
 		return apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
 			'alternate_emails',
@@ -455,10 +462,23 @@ class Contacts_Page extends Admin_Page {
 		] );
 	}
 
+	/**
+     * Uploads a file to the contact record
+     *
+	 * @return void
+	 */
 	public function ajax_upload_file() {
+
+        if ( ! current_user_can( 'edit_contacts' )  || ! verify_admin_ajax_nonce() ){
+            return;
+        }
 
 		$id      = absint( get_post_var( 'contact' ) );
 		$contact = get_contactdata( $id );
+
+		if ( ! current_user_can( 'edit_contact', $contact ) ){
+			return;
+		}
 
 		$file = $_FILES['file-upload'];
 
@@ -514,9 +534,9 @@ class Contacts_Page extends Admin_Page {
 	 */
 	public function ajax_edit_contact() {
 
-		if ( ! doing_action() ) {
-			return;
-		}
+        if ( ! current_user_can( 'edit_contacts' ) || ! verify_admin_ajax_nonce() ){
+            $this->wp_die_no_access();
+        }
 
 		$id = absint( get_request_var( 'contact' ) );
 

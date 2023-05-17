@@ -19,6 +19,7 @@ use function Groundhogg\managed_page_url;
 use function Groundhogg\permissions_key_url;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\utils;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 class Help_Page extends Tabbed_Admin_Page {
 
@@ -40,6 +41,10 @@ class Help_Page extends Tabbed_Admin_Page {
 	 */
 	public function check_license() {
 
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			return;
+		}
+
 		$license = sanitize_text_field( get_post_var( 'license' ) );
 
 		$result = License_Manager::activate_license_quietly( $license, 12344 );
@@ -53,9 +58,14 @@ class Help_Page extends Tabbed_Admin_Page {
 		wp_send_json_success();
 	}
 
-
+	/**
+	 * Resave permalinks
+	 *
+	 * @return void
+	 */
 	public function resave_permalinks() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -64,8 +74,13 @@ class Help_Page extends Tabbed_Admin_Page {
 		wp_send_json_success();
 	}
 
+	/**
+	 * Enables safe mode
+	 *
+	 * @return void
+	 */
 	public function enable_safe_mode() {
-		if ( ! current_user_can( 'deactivate_plugins' ) ) {
+		if ( ! current_user_can( 'deactivate_plugins' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -76,8 +91,13 @@ class Help_Page extends Tabbed_Admin_Page {
 		wp_send_json_error();
 	}
 
+	/**
+	 * Disables safe mode
+	 *
+	 * @return void
+	 */
 	public function disable_safe_mode() {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
+		if ( ! current_user_can( 'activate_plugins' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -93,7 +113,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	 */
 	public function get_docs_ajax() {
 
-		if ( ! current_user_can( 'view_contacts' ) ) {
+		if ( ! current_user_can( 'view_contacts' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -109,7 +129,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	 */
 	public function fix_missing_tables() {
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -218,6 +238,10 @@ class Help_Page extends Tabbed_Admin_Page {
 	 * @return void
 	 */
 	public function submit_ticket() {
+
+		if ( ! current_user_can( 'create_users' ) || ! verify_admin_ajax_nonce() ) {
+			return;
+		}
 
 		$args = [
 			'name'          => sanitize_text_field( get_post_var( 'name' ) ),
