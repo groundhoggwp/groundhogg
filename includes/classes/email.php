@@ -1124,10 +1124,13 @@ class Email extends Base_Object_With_Meta {
 
 		if ( ! empty( $steps_ids ) ) {
 
+			$steps_ids = wp_parse_id_list( $steps_ids );
+
 			$where_events = [
 				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => wp_parse_id_list( $steps_ids ), 'compare' => 'IN' ],
-				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
+				[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
+				[ 'col' => 'status', 'val' => Event::COMPLETE, 'compare' => '=' ],
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 			];
@@ -1138,6 +1141,7 @@ class Email extends Base_Object_With_Meta {
 
 			$where_opened = [
 				'relationship' => "AND",
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
 				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
 				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_OPENED, 'compare' => '=' ],
 				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
@@ -1150,6 +1154,7 @@ class Email extends Base_Object_With_Meta {
 
 			$where_clicked = [
 				'relationship' => "AND",
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
 				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
 				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
 				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
@@ -1167,11 +1172,11 @@ class Email extends Base_Object_With_Meta {
 
 			$unsubscribed = get_db( 'activity' )->count( [
 				'email_id'      => $this->get_id(),
+				'step_id'       => $steps_ids,
 				'activity_type' => Activity::UNSUBSCRIBED,
 				'before'        => $end,
 				'after'         => $start,
 			] );
-
 		}
 
 		return [

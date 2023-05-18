@@ -323,7 +323,14 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 2.7.10 (2023-05-15) =
+* ADDED Task management
+ * NEW Tasks tab in contact record.
+ * NEW **My Tasks** panel in the Groundhogg admin bar widget
+ * NEW Task automation. Create tasks and do automation when tasks are completed in funnels.
+* ADDED Default contact tab profile option so the default tab can be set per user.
+* IMPROVED Contact quick search in admin bar widget shows more useful information.
 * TWEAKED Enhanced security around email logs and potentially sensitive information.
+* FIXED Added missing capability/nonce checks. Thanks to WordFence for practicing responsible disclosure.
 
 = 2.7.9.8 (2023-05-01) =
 * HOT FIX Table/API searching for some endpoints not working.

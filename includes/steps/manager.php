@@ -8,6 +8,7 @@ use Groundhogg\Steps\Actions\Advanced_Timer;
 use Groundhogg\Steps\Actions\Apply_Note;
 use Groundhogg\Steps\Actions\Apply_Owner;
 use Groundhogg\Steps\Actions\Apply_Tag;
+use Groundhogg\Steps\Actions\Create_Task;
 use Groundhogg\Steps\Actions\Create_User;
 use Groundhogg\Steps\Actions\Date_Timer;
 use Groundhogg\Steps\Actions\Delay_Timer;
@@ -27,6 +28,7 @@ use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
+use Groundhogg\Steps\Benchmarks\Task_Completed;
 use Groundhogg\Steps\Benchmarks\Web_Form;
 use function Groundhogg\get_array_var;
 
@@ -89,6 +91,7 @@ class Manager {
 		$this->add_step( new Apply_Tag() );
 		$this->add_step( new Remove_Tag() );
 		$this->add_step( new Apply_Note() );
+		$this->add_step( new Create_Task() );
 		$this->add_step( new Delay_Timer() );
 
 		/* Benchmarks */
@@ -100,6 +103,7 @@ class Manager {
 		$this->add_step( new Tag_Applied() );
 		$this->add_step( new Tag_Removed() );
 		$this->add_step( new Form_Filled() );
+		$this->add_step( new Task_Completed() );
 
 		/* Other */
 		$this->add_step( new Error() );

@@ -310,30 +310,64 @@
 
         const renderSearchResult = (item) => {
 
+          let phones = []
+          let actions = [
+            // language=html
+            `
+                <button class="gh-button secondary text icon edit-profile">
+                    ${ icons.contact }
+                </button>`,
+            // language=html
+            `<a class="email-contact gh-button secondary text icon send-email"
+                href="mailto:${ item.data.email }" data-id=${ item.ID } target="_blank">
+                ${ icons.email }
+            </a>`,
+          ]
+
+          if (item.meta.primary_phone) {
+            phones.push(`<span title="primary phone">${item.meta.primary_phone}</span>`)
+
+            // language=html
+            actions.push(`<a class="gh-button secondary text icon call-primary" href="tel:${ item.meta.primary_phone }">
+                ${ icons.phone }
+            </a>`)
+          }
+
+          if (item.meta.mobile_phone) {
+            phones.push(`<span title="mobile phone">${item.meta.mobile_phone}</span>`)
+            // language=html
+            actions.push(`<a class="gh-button secondary text icon call-mobile" href="tel:${ item.meta.mobile_phone }">
+                ${ icons.mobile }
+            </a>`)
+          }
+
+          let allTags = item.tags
+          let showTags = allTags.splice(0, 10)
+
           //language=HTML
           return `
               <div id="search-result-${ item.ID }" data-contact="${ item.ID }" class="${ classPrefix }-result">
-                  <img class="avatar" src="${ item.data.gravatar }" alt="avatar"/>
-                  <div class="details">
-                      <div class="name">${ item.data.first_name } ${ item.data.last_name }</div>
-                      <div class="email">${ item.data.email }</div>
+                  <div class="above">
+                      <img class="avatar" src="${ item.data.gravatar }" alt="avatar"/>
+                      <div class="details">
+                          <div class="name">${ item.data.first_name } ${ item.data.last_name } <span class="subscribed">— ${ sprintf(
+                                  __('Subscribed %s'),
+                                  `<abbr title="${ formatDateTime(item.data.date_created) }">${ sprintf(__('%s ago '),
+                                          item.locale.created) }</abbr>`) }</span></div>
+                          <div class="email">${ item.data.email } — <span class="gh-text ${ item.is_marketable
+                                  ? 'green'
+                                  : 'red' }"><b>${ Groundhogg.filters.optin_status[item.data.optin_status] }</b></span>
+                          </div>
+                          ${ ! phones.length ? '' : `<div class="phones">${phones.join('')}</div>` }
+                      </div>
+                      <div class="actions">
+                          ${ actions.join('') }
+                      </div>
                   </div>
-                  <div class="actions">
-                      <button class="gh-button secondary text icon edit-profile">
-                          ${ icons.contact }
-                      </button>
-                      <a class="email-contact gh-button secondary text icon send-email"
-                         href="mailto:${ item.data.email }" data-id=${ item.ID } target="_blank">
-                          ${ icons.email }
-                      </a>
-                      ${ item.meta.primary_phone ? `
-					  <a class="gh-button secondary text icon call-primary" href="tel:${ item.meta.primary_phone }">
-						  ${ icons.phone }
-					  </a>` : '' }
-                      ${ item.meta.mobile_phone ? `
-					  <a class="gh-button secondary text icon call-mobile" href="tel:${ item.meta.mobile_phone }">
-						  ${ icons.mobile }
-					  </a>` : '' }
+                  <div class="gh-tags">
+                      ${ showTags.map(t => `<span class="gh-tag">${ t.data.tag_name }</span>`).join('') }
+                      ${ allTags.length ? `<span class="gh-tag">${ sprintf(__('%d more...', 'groundhogg'),
+                              allTags.length) }</span>` : '' }
                   </div>
               </div>`
         }
@@ -418,18 +452,6 @@
 
       },
     },
-    // send_email: {
-    //   tooltip: `Send an email`,
-    //   //language=HTML
-    //   svg: `
-    //   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-    // 	  <path fill="currentColor"
-    // 	        d="M467 61H45a45 45 0 00-45 45v300a45 45 0 0045 45h422a45 45 0 0045-45V106a45 45 0 00-45-45zm-6.2
-    // 30L257 294.8 51.4 91h409.4zM30 399.8V112l144.5 143.2L30 399.8zM51.2 421l144.6-144.6 50.6 50.3a15 15 0 0021.2
-    // 0l49.4-49.5L460.8 421H51.2zM482 399.8L338.2 256 482 112.2v287.6z"/> </svg>`, view: () => { // language=html
-    // return ` <div class="gh-rows-and-columns"> <div class="gh-row"> <div class="gh-col"> <div
-    // class="gh-input-inline-label"> <label for="subject-line">Subject:</label> ${inputWithReplacements({ id:
-    // 'subject-line' })} </div> </div> </div> <div class="gh-row"></div> </div>` }, onMount: () => {}, },
     broadcast: {
       cap: 'schedule_broadcasts',
       //language=HTML
@@ -446,6 +468,20 @@
             setTab('broadcast')
           },
         })
+      },
+    },
+    tasks: {
+      cap: 'schedule_broadcasts',
+      //language=HTML
+      tooltip: 'My tasks',
+      svg: icons.tasks,
+      view: () => {
+        // language=HTML
+        return `
+            <div id="admin-tasks"></div>`
+      },
+      onMount: ({ setTab }) => {
+        Groundhogg.myTasks('#admin-tasks', {})
       },
     },
   }

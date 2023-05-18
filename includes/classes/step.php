@@ -410,6 +410,39 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Check if the funnel of this step is the same as the given one
+	 *
+	 * @param Step $step
+	 *
+	 * @return bool
+	 */
+	public function is_same_funnel( Step $step ){
+		return $step->get_funnel_id() === $this->get_funnel_id();
+	}
+
+	/**
+	 * Check to see if this step is before the given one
+	 *
+	 * @param Step $step
+	 *
+	 * @return bool
+	 */
+	public function is_before( Step $step ){
+		return $this->is_same_funnel( $step ) && $this->get_order() < $step->get_order();
+	}
+
+	/**
+	 * Check to see if this step is after the given one
+	 *
+	 * @param Step $step
+	 *
+	 * @return bool
+	 */
+	public function is_after( Step $step ){
+		return $this->is_same_funnel( $step ) && $this->get_order() > $step->get_order();
+	}
+
+	/**
 	 * Get the delay time for enqueueing the next action
 	 *
 	 * @return int

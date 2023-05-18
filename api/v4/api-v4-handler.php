@@ -55,6 +55,7 @@ class API_V4_HANDLER {
 		$this->forms           = new Forms_Api();
 		$this->options         = new Options_Api();
 		$this->page_visits     = new Page_Visits_Api();
+		$this->tasks           = new Tasks_Api();
 	}
 
 	/**

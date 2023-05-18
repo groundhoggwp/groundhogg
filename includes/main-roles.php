@@ -148,6 +148,9 @@ class Main_Roles extends Roles {
 			case 'edit_note':
 			case 'view_note':
 			case 'delete_note':
+			case 'edit_task':
+			case 'view_task':
+			case 'delete_task':
 
 				$caps = [];
 
@@ -172,6 +175,7 @@ class Main_Roles extends Roles {
 
 				switch ( $object_type ) {
 					case 'note':
+					case 'task':
 					case 'contact':
 					default:
 						// Most common methods for comparing
@@ -279,6 +283,8 @@ class Main_Roles extends Roles {
 			'view_events',
 			'manage_tags',
 			'download_contact_files',
+
+			// notes
 			'add_notes',
 			'view_others_notes',
 			'edit_others_notes',
@@ -286,6 +292,16 @@ class Main_Roles extends Roles {
 			'delete_notes',
 			'edit_notes',
 			'view_notes',
+
+			// tasks
+			'add_tasks',
+			'view_others_tasks',
+			'edit_others_tasks',
+			'delete_others_tasks',
+			'delete_tasks',
+			'edit_tasks',
+			'view_tasks',
+
 			'view_funnels',
 			'view_emails',
 			'view_broadcasts',
@@ -300,19 +316,31 @@ class Main_Roles extends Roles {
 	 */
 	public function get_sales_rep_caps() {
 		return [
+			// contacts
 			'edit_contacts',
 			'add_contacts',
 			'view_contacts',
 			'import_contacts',
 			'export_contacts',
+			// email
 			'send_emails',
+			// tags
 			'manage_tags',
+			// files
 			'download_contact_files',
+			// notes
 			'view_others_notes',
 			'add_notes',
 			'delete_notes',
 			'edit_notes',
 			'view_notes',
+			// tasks
+			'view_others_tasks',
+			'add_tasks',
+			'delete_tasks',
+			'edit_tasks',
+			'view_tasks',
+
 			'view_funnels',
 			'view_emails',
 			'view_broadcasts',
@@ -448,6 +476,11 @@ class Main_Roles extends Roles {
 	}
 
 
+	/**
+	 * caps for notes
+	 *
+	 * @return mixed|null
+	 */
 	public function get_note_caps() {
 		$caps = array(
 			'add_notes',
@@ -460,6 +493,25 @@ class Main_Roles extends Roles {
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/notes', $caps );
+	}
+
+	/**
+	 * Caps for tasks
+	 *
+	 * @return mixed|null
+	 */
+	public function get_task_caps() {
+		$caps = array(
+			'add_tasks',
+			'delete_tasks',
+			'edit_tasks',
+			'view_tasks',
+			'delete_others_tasks',
+			'edit_others_tasks',
+			'view_others_tasks'
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/tasks', $caps );
 	}
 
 	/**
@@ -586,6 +638,7 @@ class Main_Roles extends Roles {
 			$this->get_file_caps(),
 			$this->get_log_caps(),
 			$this->get_note_caps(),
+			$this->get_task_caps(),
 			$this->get_activity_caps()
 		);
 

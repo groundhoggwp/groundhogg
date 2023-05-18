@@ -1109,6 +1109,24 @@
         },
       },
       {
+        id: 'tasks',
+        name: __('Tasks'),
+        render: () => {
+          // language=HTML
+          return `
+              <div class="gh-panel top-left-square">
+                  <div class="inside" id="tasks-here"></div>
+              </div>`
+        },
+        onMount: () => {
+          Groundhogg.taskEditor('#tasks-here', {
+            object_id: contact.ID,
+            object_type: 'contact',
+            title: '',
+          })
+        },
+      },
+      {
         id: 'files',
         name: __('Files'),
         render: () => {
@@ -1974,7 +1992,6 @@
     }
 
     TagsStore.itemsFetched(getContact().tags)
-    TagsStore.fetchItems()
 
     mount()
 

@@ -8,6 +8,7 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Tag_Relationships;
 use Groundhogg\DB\Tags;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_User;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -382,9 +383,18 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * @throws \Exception
+	 *
+	 * @param bool $as_date
+	 *
 	 * @return bool|mixed
 	 */
-	public function get_date_created() {
+	public function get_date_created( $as_date = false ) {
+
+		if ( $as_date ) {
+			return new DateTimeHelper( $this->date_created );
+		}
+
 		return $this->date_created;
 	}
 
@@ -1113,14 +1123,19 @@ class Contact extends Base_Object_With_Meta {
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",
 			[
-				'ID'    => $this->get_id(),
-				'data'  => $contact,
-				'meta'  => $this->get_meta(),
-				'tags'  => array_values( $this->get_tags( true ) ),
+				'ID'             => $this->get_id(),
+				'data'           => $contact,
+				'meta'           => $this->get_meta(),
+				'tags'           => array_values( $this->get_tags( true ) ),
 //				'files' => $this->get_files(),
-				'user'  => $this->user,
+				'user'           => $this->user,
 //				'notes' => $this->get_notes(),
-				'admin' => $this->admin_link()
+				'admin'          => $this->admin_link(),
+				'is_marketable'  => $this->is_marketable(),
+				'is_deliverable' => $this->is_deliverable(),
+				'locale'         => [
+					'created' => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() )
+				]
 			]
 		);
 	}

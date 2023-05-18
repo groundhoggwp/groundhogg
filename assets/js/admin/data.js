@@ -154,6 +154,8 @@
       data = fData
     }
 
+    data.append( 'gh_admin_ajax_nonce', Groundhogg.nonces._adminajax )
+
     const response = await fetch(ajaxurl, {
       method: 'POST',
       credentials: 'same-origin',
@@ -665,6 +667,32 @@
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
     notes: ObjectStore(Groundhogg.api.routes.v4.notes),
+    tasks: ObjectStore(Groundhogg.api.routes.v4.tasks, {
+      complete( id ) {
+        return apiPatch(`${this.route}/${id}/complete`)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+      },
+      incomplete( id ) {
+        return apiPatch(`${this.route}/${id}/incomplete`)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+      }
+    }),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'
     }),

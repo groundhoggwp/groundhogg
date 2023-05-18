@@ -5,7 +5,6 @@ namespace Groundhogg\DB;
 
 use Groundhogg\Base_Object;
 use Groundhogg\Classes\Note;
-use function Groundhogg\create_object_from_type;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,12 +57,12 @@ class Notes extends DB {
 	}
 
 
-	public function owner_deleted( $prev, $new ){
-		$this->update([
+	public function owner_deleted( $prev, $new ) {
+		$this->update( [
 			'user_id' => $prev,
 		], [
 			'user_id' => $new,
-		]);
+		] );
 	}
 
 	/**
@@ -94,15 +93,15 @@ class Notes extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'           => '%d',
-			'object_id'    => '%d',
-			'object_type'  => '%s',
-			'context'      => '%s',
-			'user_id'      => '%d',
-			'content'      => '%s',
-			'date_created' => '%s',
-			'timestamp'    => '%d',
-			'type'         => '%s',
+			'ID'             => '%d',
+			'object_id'      => '%d',
+			'object_type'    => '%s',
+			'timestamp'      => '%d',
+			'context'        => '%s',
+			'user_id'        => '%d',
+			'content'        => '%s',
+			'date_created'   => '%s',
+			'type'           => '%s',
 		);
 	}
 
@@ -115,15 +114,15 @@ class Notes extends DB {
 	public function get_column_defaults() {
 
 		return array(
-			'ID'           => 0,
-			'object_id'    => 0,
-			'object_type'  => '',
-			'context'      => 'user',
-			'user_id'      => get_current_user_id(),
-			'content'      => '',
-			'type'         => 'note',
-			'date_created' => current_time( 'mysql', true ),
-			'timestamp'    => time(),
+			'ID'             => 0,
+			'object_id'      => 0,
+			'timestamp'      => time(),
+			'object_type'    => '',
+			'context'        => 'user',
+			'user_id'        => get_current_user_id(),
+			'content'        => '',
+			'type'           => 'note',
+			'date_created'   => current_time( 'mysql', true ),
 		);
 	}
 
@@ -178,7 +177,7 @@ class Notes extends DB {
 	/**
 	 * Update the note type to the default
 	 */
-	public function update_2_5_5(){
+	public function update_2_5_5() {
 		global $wpdb;
 
 		$wpdb->query( "UPDATE $this->table_name SET type = 'note' WHERE type = ''" );

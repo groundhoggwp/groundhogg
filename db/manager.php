@@ -69,6 +69,7 @@ class Manager {
 		$this->submissionmeta       = new Submission_Meta();
 		$this->form_impressions     = new Form_Impressions();
 		$this->notes                = new Notes();
+		$this->tasks                = new Tasks();
 		$this->permissions_keys     = new Permissions_Keys();
 		$this->email_log            = new Email_Log();
 		$this->event_queue          = new Event_Queue();

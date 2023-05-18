@@ -4,6 +4,7 @@ namespace Groundhogg\Classes;
 
 use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
+use function Groundhogg\create_object_from_type;
 use function Groundhogg\get_db;
 
 class Note extends Base_Object {
@@ -30,6 +31,15 @@ class Note extends Base_Object {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Gets the related object
+	 *
+	 * @return \Groundhogg\DB_Object|\Groundhogg\DB_Object_With_Meta
+	 */
+	public function get_associated_object(){
+		return create_object_from_type( $this->object_id, $this->object_type );
 	}
 
 	public function get_as_array() {

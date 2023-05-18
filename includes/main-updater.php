@@ -676,9 +676,11 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Update the gh-cron file to use direct function instead of do_action
+	 * Update email_logs table to have the is_sensitive flag
+	 * Create the new tasks table
 	 */
 	public function version_2_7_10() {
+		get_db( 'tasks' )->create_table();
 		get_db( 'email_log' )->create_table();
 	}
 
@@ -851,7 +853,7 @@ class Main_Updater extends Updater {
 			'2.7.7.8'       => __( 'Fix step statuses for inactive or archived funnels.', 'groundhogg' ),
 			'2.7.7.10'      => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
 			'2.7.9.3'       => __( 'Add a value column to the the activity table!', 'groundhogg' ),
-			'2.7.10'        => __( 'Add an <code>is_sensitive</code> flag to email logs for enhanced security.', 'groundhogg' ),
+			'2.7.10'        => __( 'Add an <code>is_sensitive</code> flag to email logs for enhanced security. Create tasks table.', 'groundhogg' ),
 		];
 	}
 }
