@@ -915,7 +915,7 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'after'    => function ( $field, $posted_data, $contact ) {
-					if ( isset( $posted_data[ $field['name'] ] ) && $posted_data[ $field['name'] ] === $field['value'] ) {
+					if ( $posted_data->isset_not_empty( $field['name'] ) ) {
 						$contact->apply_tag( $field['tags'] );
 					}
 				}
@@ -1804,7 +1804,7 @@ class Form_v2 extends Step {
 
 		$field_type = get_array_var( self::$fields, $type );
 
-		if ( ! $field_type ) {
+		if ( ! $field_type || ! is_callable( $field_type['after_create_contact'] ) ) {
 			return false;
 		}
 
@@ -2028,5 +2028,16 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 
 	public function jsonSerialize() {
 		return $this->posted;
+	}
+
+	/**
+	 * Wrapper for isset_not_empty
+	 *
+	 * @param $key
+	 *
+	 * @return bool
+	 */
+	public function isset_not_empty( $key ){
+		return isset_not_empty( $this->posted, $key );
 	}
 }
