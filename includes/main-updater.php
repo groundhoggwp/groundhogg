@@ -678,10 +678,12 @@ class Main_Updater extends Updater {
 	/**
 	 * Update email_logs table to have the is_sensitive flag
 	 * Create the new tasks table
+	 * Add task related capabilities
 	 */
 	public function version_2_7_10() {
-		get_db( 'tasks' )->create_table();
 		get_db( 'email_log' )->create_table();
+		get_db( 'tasks' )->create_table();
+		Plugin::instance()->roles->add_caps();
 	}
 
 

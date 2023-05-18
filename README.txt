@@ -330,6 +330,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Default contact tab profile option so the default tab can be set per user.
 * IMPROVED Contact quick search in admin bar widget shows more useful information.
 * TWEAKED Enhanced security around email logs and potentially sensitive information.
+* TWEAKED `{posts}` replacement code now uses the proper `WP_Query` loop syntax.
 * FIXED Added missing capability/nonce checks. Thanks to WordFence for practicing responsible disclosure.
 
 = 2.7.9.8 (2023-05-01) =
