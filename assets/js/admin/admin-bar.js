@@ -342,7 +342,7 @@
           }
 
           let allTags = item.tags
-          let showTags = allTags.splice(0, 10)
+          let showTags = allTags.splice(0, 10 )
 
           //language=HTML
           return `

@@ -267,7 +267,7 @@
     },
     myTasks: (tasks) => {
 
-      tasks = tasks.sort((a, b) => a.due_timestamp - b.due_timestamp)
+      tasks = tasks.sort((a, b) => a.due_timestamp - b.due_timestamp).slice(0, 10)
 
       // language=HTML
       return `
@@ -620,7 +620,7 @@
 
     const mount = () => {
 
-      let tasks = TasksStore.getItems().filter(t => !t.is_complete).splice(0, 10)
+      let tasks = TasksStore.getItems().filter(t => !t.is_complete)
 
       $el.html(templates.myTasks(tasks))
 

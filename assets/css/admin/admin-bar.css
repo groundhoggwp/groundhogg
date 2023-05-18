@@ -72,10 +72,11 @@
 .groundhogg-toolbar-quick-search-results {
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
-  margin-top: 10px;
-  margin-left: -20px;
-  margin-right: -20px;
+  max-height: 70vh;
+  margin: 10px -20px 0 -20px;
+}
+.groundhogg-toolbar-quick-search-results:not(:empty) {
+  margin-bottom: -20px;
 }
 .groundhogg-toolbar-quick-search-results p:last-child {
   text-align: center;
@@ -93,6 +94,7 @@
 }
 .groundhogg-toolbar-quick-search-result .gh-tags {
   gap: 5px;
+  display: none;
 }
 .groundhogg-toolbar-quick-search-result .gh-tags .gh-tag {
   font-size: 11px;
@@ -125,6 +127,9 @@
   justify-content: flex-end;
   visibility: hidden;
   margin-left: auto;
+}
+.groundhogg-toolbar-quick-search-result:hover .gh-tags {
+  display: flex;
 }
 .groundhogg-toolbar-quick-search-result:hover .actions {
   visibility: visible;

@@ -118,12 +118,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   &-results {
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
-    //overflow: auto;
-    margin-top: 10px;
-    margin-left: -20px;
-    margin-right: -20px;
-
+    max-height: 70vh;
+    //overflow-y: auto;
+    margin: 10px -20px 0 -20px;
+    &:not(:empty){
+      margin-bottom: -20px;
+    }
     p:last-child {
       text-align: center;
     }
@@ -145,6 +145,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
     .gh-tags {
       gap: 5px;
+      display: none;
 
       .gh-tag {
         font-size: 11px;
@@ -190,6 +191,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
 
     &:hover {
+
+      .gh-tags{
+        display: flex;
+      }
 
       .actions{
         visibility: visible;
