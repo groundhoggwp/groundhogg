@@ -158,12 +158,12 @@ class Email_Logger {
 			self::$log_item    = new Email_Log_Item( self::$log_item_id );
 		}
 
+		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );
+
 		// Reset $is_sensitive for the next email log
 		if ( self::$is_sensitive ){
 			self::$is_sensitive = false;
 		}
-
-		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );
 	}
 
 	/**
