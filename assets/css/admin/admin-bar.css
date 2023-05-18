@@ -72,7 +72,7 @@
 .groundhogg-toolbar-quick-search-results {
   display: flex;
   flex-direction: column;
-  max-height: 500px;
+  max-height: 80vh;
   margin-top: 10px;
   margin-left: -20px;
   margin-right: -20px;
