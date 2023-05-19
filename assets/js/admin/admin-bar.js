@@ -25,6 +25,7 @@
 
   const { tagPicker } = Groundhogg.pickers
   const { ajax } = Groundhogg.api
+  const { isWhiteLabeled } = Groundhogg
 
   const {
     contacts: ContactsStore,
@@ -47,195 +48,6 @@
     })
 
     return content
-  }
-
-  const Notifications = {
-    state: 'showActive',
-    $el: false,
-
-    showAll () {
-
-      let html = this.getAll().map(n => this.renderNotification(n, {
-        showDismiss: false,
-      }))
-
-      html.push(`<p class="all-dismissed"><a href="#" id="show-active">${ __('See active...') }</a></p>`)
-
-      this.$el.html(html.join(''))
-
-      $('#show-active').on('click', e => {
-        e.preventDefault()
-        this.setState('showActive')
-      })
-
-    },
-    showActive () {
-
-      // set to all dismissedd
-      if (!this.getActive().length) {
-        return this.setState('allDismissed')
-      }
-
-      let html = this.getActive().map(n => this.renderNotification(n))
-
-      html.push(`<p class="all-dismissed"><a href="#" id="show-all">${ __('See all...') }</a></p>`)
-
-      this.$el.html(html.join(''))
-
-      this.mountNotifications(() => {
-        if (!this.getActive().length) {
-          this.setState('allDismissed')
-        }
-      })
-
-      $('#show-all').on('click', e => {
-        e.preventDefault()
-        this.setState('showAll')
-      })
-
-      setTimeout(() => {
-        this.readAll().then(() => {
-          // Remove unread notice
-          $('.unread-notices.gh-has-notifications').removeClass('unread-notices gh-has-notifications')
-        })
-      }, 3000)
-    },
-    allDismissed () {
-
-      let html = []
-
-      html.push(`<p class="all-dismissed">${ __('🙌 There are no new notifications.') }</p>`)
-
-      // but there are some to be seen
-      if (Notifications.getAll().length) {
-        html.push(
-          `<p class="all-dismissed"><a href="#" id="show-all" ">${ __('See dismissed...') }</a></p>`)
-      }
-
-      this.$el.html(html.join(''))
-
-      $('#show-all').on('click', e => {
-        e.preventDefault()
-        this.setState('showAll')
-      })
-
-    },
-
-    setState (state) {
-      this.state = state
-      this.mount()
-    },
-
-    async mount ($el = false) {
-
-      if ($el !== false) {
-        this.$el = $el
-      }
-
-      await this.fetch()
-
-      this[this.state]()
-    },
-
-    notifications: [],
-    dismissed: GroundhoggToolbar.dismissed_notices,
-    read: GroundhoggToolbar.read_notices,
-
-    readAll () {
-      return ajax({
-        action: 'gh_read_notice',
-        notice: this.notifications.map(n => n.id),
-        _wpnonce: groundhogg_nonces._wpnonce,
-      })
-    },
-
-    dismiss (id) {
-      this.dismissed.push(id)
-
-      return ajax({
-        action: 'gh_dismiss_notice',
-        notice: id,
-        _wpnonce: groundhogg_nonces._wpnonce,
-      })
-    },
-
-    fetch () {
-
-      if (this.notifications.length) {
-        return Promise.resolve(this.notifications)
-      }
-
-      return ajax({
-        action: 'gh_remote_notifications',
-      }).
-        then(notifications => {
-          this.notifications = notifications
-          return notifications
-        })
-    },
-
-    getAll () {
-      return this.notifications
-    },
-
-    getUnread () {
-      return this.notifications.filter(n => !this.read.includes(n.id))
-    },
-
-    getActive () {
-      return this.notifications.filter(n => !this.dismissed.includes(n.id))
-    },
-
-    renderNotification: (n, {
-      showDismiss = true,
-    } = {}) => {
-
-      const {
-        id,
-        title,
-        content,
-        acf,
-      } = n
-
-      // language=HTML
-      return `
-          <div id="n-${ id }" class="gh-panel outlined overflow-visible">
-              <div class="gh-panel-header">
-                  <h2>${ doReplacements(title.rendered) }</h2>
-                  ${ !showDismiss ? '' : `<button class="gh-button dismiss small" data-id="${ id }">
-                      <span class="dashicons dashicons-no-alt"></span>
-                  </button>` }
-              </div>
-              <div class="inside">
-                  <div class="content">${ doReplacements(content.rendered) }</div>
-                  ${ !acf.cta_text ? '' : `<div class="actions">
-                      <a href="${ doReplacements(acf.cta_url) }" target="_blank"
-                         class="gh-button primary small">${ doReplacements(acf.cta_text) }</a>
-                  </div>` }
-              </div>
-          </div>`
-    },
-
-    mountNotifications: (dismissed = () => {}) => {
-      tooltip('.gh-button.dismiss', {
-        content: 'Dismiss',
-        position: 'right',
-      })
-
-      $('.gh-button.dismiss').click(e => {
-
-        let nId = parseInt(e.currentTarget.dataset.id)
-
-        const n = $(`#n-${ nId }`)
-        Notifications.dismiss(nId)
-        n.fadeOut({
-          complete: () => {
-            n.remove()
-            dismissed()
-          },
-        })
-      })
-    },
   }
 
   const Tabs = {
@@ -486,7 +298,196 @@
     },
   }
 
-  if (!Groundhogg.isWhiteLabeled) {
+  if (!isWhiteLabeled) {
+
+    const Notifications = {
+      state: 'showActive',
+      $el: false,
+
+      showAll () {
+
+        let html = this.getAll().map(n => this.renderNotification(n, {
+          showDismiss: false,
+        }))
+
+        html.push(`<p class="all-dismissed"><a href="#" id="show-active">${ __('See active...') }</a></p>`)
+
+        this.$el.html(html.join(''))
+
+        $('#show-active').on('click', e => {
+          e.preventDefault()
+          this.setState('showActive')
+        })
+
+      },
+      showActive () {
+
+        // set to all dismissedd
+        if (!this.getActive().length) {
+          return this.setState('allDismissed')
+        }
+
+        let html = this.getActive().map(n => this.renderNotification(n))
+
+        html.push(`<p class="all-dismissed"><a href="#" id="show-all">${ __('See all...') }</a></p>`)
+
+        this.$el.html(html.join(''))
+
+        this.mountNotifications(() => {
+          if (!this.getActive().length) {
+            this.setState('allDismissed')
+          }
+        })
+
+        $('#show-all').on('click', e => {
+          e.preventDefault()
+          this.setState('showAll')
+        })
+
+        setTimeout(() => {
+          this.readAll().then(() => {
+            // Remove unread notice
+            $('.unread-notices.gh-has-notifications').removeClass('unread-notices gh-has-notifications')
+          })
+        }, 3000)
+      },
+      allDismissed () {
+
+        let html = []
+
+        html.push(`<p class="all-dismissed">${ __('🙌 There are no new notifications.') }</p>`)
+
+        // but there are some to be seen
+        if (Notifications.getAll().length) {
+          html.push(
+            `<p class="all-dismissed"><a href="#" id="show-all" ">${ __('See dismissed...') }</a></p>`)
+        }
+
+        this.$el.html(html.join(''))
+
+        $('#show-all').on('click', e => {
+          e.preventDefault()
+          this.setState('showAll')
+        })
+
+      },
+
+      setState (state) {
+        this.state = state
+        this.mount()
+      },
+
+      async mount ($el = false) {
+
+        if ($el !== false) {
+          this.$el = $el
+        }
+
+        await this.fetch()
+
+        this[this.state]()
+      },
+
+      notifications: [],
+      dismissed: GroundhoggToolbar.dismissed_notices,
+      read: GroundhoggToolbar.read_notices,
+
+      readAll () {
+        return ajax({
+          action: 'gh_read_notice',
+          notice: this.notifications.map(n => n.id),
+          _wpnonce: groundhogg_nonces._wpnonce,
+        })
+      },
+
+      dismiss (id) {
+        this.dismissed.push(id)
+
+        return ajax({
+          action: 'gh_dismiss_notice',
+          notice: id,
+          _wpnonce: groundhogg_nonces._wpnonce,
+        })
+      },
+
+      fetch () {
+
+        if (this.notifications.length) {
+          return Promise.resolve(this.notifications)
+        }
+
+        return ajax({
+          action: 'gh_remote_notifications',
+        }).
+        then(notifications => {
+          this.notifications = notifications
+          return notifications
+        })
+      },
+
+      getAll () {
+        return this.notifications
+      },
+
+      getUnread () {
+        return this.notifications.filter(n => !this.read.includes(n.id))
+      },
+
+      getActive () {
+        return this.notifications.filter(n => !this.dismissed.includes(n.id))
+      },
+
+      renderNotification: (n, {
+        showDismiss = true,
+      } = {}) => {
+
+        const {
+          id,
+          title,
+          content,
+          acf,
+        } = n
+
+        // language=HTML
+        return `
+          <div id="n-${ id }" class="gh-panel outlined overflow-visible">
+              <div class="gh-panel-header">
+                  <h2>${ doReplacements(title.rendered) }</h2>
+                  ${ !showDismiss ? '' : `<button class="gh-button dismiss small" data-id="${ id }">
+                      <span class="dashicons dashicons-no-alt"></span>
+                  </button>` }
+              </div>
+              <div class="inside">
+                  <div class="content">${ doReplacements(content.rendered) }</div>
+                  ${ !acf.cta_text ? '' : `<div class="actions">
+                      <a href="${ doReplacements(acf.cta_url) }" target="_blank"
+                         class="gh-button primary small">${ doReplacements(acf.cta_text) }</a>
+                  </div>` }
+              </div>
+          </div>`
+      },
+
+      mountNotifications: (dismissed = () => {}) => {
+        tooltip('.gh-button.dismiss', {
+          content: 'Dismiss',
+          position: 'right',
+        })
+
+        $('.gh-button.dismiss').click(e => {
+
+          let nId = parseInt(e.currentTarget.dataset.id)
+
+          const n = $(`#n-${ nId }`)
+          Notifications.dismiss(nId)
+          n.fadeOut({
+            complete: () => {
+              n.remove()
+              dismissed()
+            },
+          })
+        })
+      },
+    }
 
     Tabs.notifications = {
       cap: 'manage_options',
@@ -504,6 +505,8 @@
         Notifications.mount($('#gh-notifications'))
       },
     }
+
+
   }
 
   $(() => {
@@ -513,7 +516,7 @@
     let openFlag = false
     let tab = 'search_contacts'
 
-    if (Tabs.hasOwnProperty('notifications') && GroundhoggToolbar.unread > 0) {
+    if (!isWhiteLabeled && Tabs.hasOwnProperty('notifications') && GroundhoggToolbar.unread > 0) {
       tab = 'notifications'
     }
 
@@ -599,7 +602,7 @@
           close()
         })
 
-        if (GroundhoggToolbar.unread > 0) {
+        if (!isWhiteLabeled && GroundhoggToolbar.unread > 0) {
           $('#gh-tab-notifications').addClass('unread-notices gh-has-notifications')
         }
       }
@@ -622,7 +625,7 @@
     })
 
     // Notices
-    if (GroundhoggToolbar.unread > 0) {
+    if (!isWhiteLabeled && GroundhoggToolbar.unread > 0) {
       $menuItem.addClass('unread-notices gh-has-notifications')
     }
   })
