@@ -42,10 +42,10 @@ class Tasks extends Notes {
 			'user_id'        => '%d',
 			'content'        => '%s',
 			'summary'        => '%s',
-			'date_created'   => '%s',
-			'date_completed' => '%s',
-			'due_date'       => '%s',
 			'type'           => '%s',
+			'due_date'       => '%s', // local time
+			'date_completed' => '%s', // UTC-0
+			'date_created'   => '%s', // UTC-0
 		);
 	}
 
@@ -69,9 +69,9 @@ class Tasks extends Notes {
 			'content'        => '',
 			'summary'        => '',
 			'type'           => 'task',
-			'date_created'   => current_time( 'mysql', true ),
-			'date_completed' => '',
-			'due_date'       => '',
+			'due_date'       => '', // local time
+			'date_created'   => current_time( 'mysql', true ), // UTC-0
+			'date_completed' => '', // UTC-0
 		);
 	}
 

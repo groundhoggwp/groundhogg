@@ -73,7 +73,7 @@ class Task extends Note {
 	 * @return DateTimeHelper
 	 */
 	public function get_due_date() {
-		return new DateTimeHelper( strtotime( $this->due_date ) );
+		return new DateTimeHelper( $this->due_date );
 	}
 
 	/**

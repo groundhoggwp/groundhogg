@@ -805,11 +805,17 @@ ${ afterProgress() }`,
     })
   }
 
-  const spinner = () => {
+  const spinner = ( color = 'white' ) => {
+
+    // No color when not white labelled
+    if ( ! Groundhogg.isWhiteLabeled ){
+      color = ''
+    }
+
     // language=HTML
     return `
         <div class="gh-spinner-wrap">
-            <object class="gh-spinner" data="${ Groundhogg.assets.spinner }" type="image/svg+xml" width="150"
+            <object class="gh-spinner ${color}" data="${ Groundhogg.assets.spinner }" type="image/svg+xml" width="150"
                     height="150"/>
         </div>`
   }
@@ -1551,7 +1557,7 @@ ${ afterProgress() }`,
 
       this._open = true
 
-      onOpen()
+      onOpen(this)
     },
   } )
 

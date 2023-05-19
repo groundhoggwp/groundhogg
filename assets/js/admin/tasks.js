@@ -584,7 +584,7 @@
     }
 
     if (!TasksStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
-      $el.html(spinner())
+      $el.html(spinner('gray'))
       TasksStore.fetchItems({
         object_id,
         object_type,
@@ -664,7 +664,7 @@
       mount()
     }
     else {
-      $el.html(spinner())
+      $el.html(spinner('gray'))
       fetchMyTasks().then(mount)
     }
   }

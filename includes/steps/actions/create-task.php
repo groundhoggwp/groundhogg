@@ -197,7 +197,7 @@ class Create_Task extends Action {
 		$dueDate->modify( "$time" );
 
 		$task = new Task( [
-			'due_date'    => Ymd_His( $dueDate->getTimestamp() ),
+			'due_date'    => $dueDate->format( 'Y-m-d H:i:s' ),
 			'summary'     => $summary,
 			'content'     => wp_kses_post( $content ),
 			'step_id'     => $event->get_step_id(),

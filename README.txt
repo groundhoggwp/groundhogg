@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.10
+Stable tag: 2.7.10.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -322,7 +322,14 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.7.10 (2023-05-15) =
+= 2.7.10.1 (2023-05-19) =
+* FIXED Tag picker will only make necessary GET requests
+* FIXED Display issues in funnel reports showing incorrect numbers.
+* FIXED Admin bar widget not working when white labelled.
+* FIXED Task due dates showing relative to GMT instead of local time zone.
+* FIXED Files not uploading to contact record from admin screen.
+
+= 2.7.10 (2023-05-18) =
 * ADDED Task management
  * NEW Tasks tab in contact record.
  * NEW **My Tasks** panel in the Groundhogg admin bar widget

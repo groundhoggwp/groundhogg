@@ -11,6 +11,12 @@ h3.no-margin-top {
 .gh-spinner-wrap object.gh-spinner {
   max-width: 150px;
 }
+.gh-spinner-wrap object.gh-spinner.white {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(108deg) brightness(104%) contrast(104%);
+}
+.gh-spinner-wrap object.gh-spinner.gray {
+  filter: invert(100%) sepia(3%) saturate(1259%) hue-rotate(196deg) brightness(118%) contrast(87%);
+}
 
 .align-center-space-between {
   display: flex !important;
@@ -173,6 +179,10 @@ h3.no-margin-top {
 }
 .space-below-20 {
   margin-bottom: 10px;
+}
+
+.border-radius-5 {
+  border-radius: 5px;
 }
 
 .property-groups {

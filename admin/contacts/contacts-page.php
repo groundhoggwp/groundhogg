@@ -812,7 +812,7 @@ class Contacts_Page extends Admin_Page {
 			return;
 		}
 
-		if ( ! current_user_can( 'edit_contacts' ) ) {
+		if ( ! current_user_can( 'view_contacts' ) || ! verify_admin_ajax_nonce() ) {
 			$this->wp_die_no_access();
 		}
 

@@ -221,7 +221,7 @@
             clearTimeout(timeout)
           }
           else {
-            $(`.${ classPrefix }-results`).html(spinner())
+            $(`.${ classPrefix }-results`).html(spinner('gray'))
           }
 
           timeout = setTimeout(() => {
@@ -498,7 +498,7 @@
         // language=HTML
         return `
             <div id="gh-notifications">
-                ${ spinner() }
+                ${ spinner('gray') }
             </div>`
       },
       onMount: ({ setTab, remMount }) => {

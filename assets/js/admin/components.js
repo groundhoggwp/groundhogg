@@ -217,11 +217,16 @@
       })
 
       $el.find('.add-tag').on('click', (e) => {
+
+        const filterTags = ( tags ) => tags.filter( t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID) ).sort( (a,b) => b.ID - a.ID )
+
+        let initialOptions = filterTags( TagsStore.getItems() )
+
         searchOptionsWidget({
           target: e.currentTarget,
           position: 'fixed',
           noOptions: __('No tags found...', 'groundhogg'),
-          options: TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
+          options: initialOptions,
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
           filterOptions: (opts, search) => {
             if (!search) {
@@ -253,7 +258,7 @@
               TagsStore.fetchItems({
                 search,
               }).then(() => {
-                widget.options = TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID))
+                widget.options = filterTags( TagsStore.getItems() )
                 widget.mountOptions()
               })
             }, 1500)
@@ -280,18 +285,23 @@
             addTags.push(ID)
             informChanges()
           },
-          onOpen: () => {
+          onOpen: (widget) => {
+
+            if ( ! initialOptions.length ){
+              TagsStore.fetchItems().then(() => {
+                widget.options = filterTags( TagsStore.getItems() )
+                widget.mountOptions()
+              })
+            }
+
           },
         }).mount()
       })
-
     }
 
-    TagsStore.fetchItems()
     TagsStore.itemsFetched(selected)
 
     mount()
-
   }
 
   const quickEditContactModal = ({
@@ -317,7 +327,7 @@
           <div class="contact-quick-edit" tabindex="0">
               <div class="gh-header space-between">
                   <div class="align-left-space-between">
-                      <img height="40" width="40" src="${ contact.data.gravatar }" alt="avatar"/>
+                      <img class="border-radius-5" height="40" width="40" src="${ contact.data.gravatar }" alt="avatar"/>
                       <h3 class="contact-name">
                           ${ specialChars(`${ contact.data.first_name } ${ contact.data.last_name }`) }</h3>
                   </div>
@@ -1410,7 +1420,7 @@
           let fd = new FormData()
 
           fd.append(fileName, file, file.name)
-          fd.append('_wpnonce', nonce)
+          fd.append( 'gh_admin_ajax_nonce', Groundhogg.nonces._adminajax )
           fd.append('action', action)
 
           beforeUpload(fd)

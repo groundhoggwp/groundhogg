@@ -1,3 +1,6 @@
+.groundhogg-toolbar-quick-search .gh-spinner-wrap {
+  color: rgba(16, 38, 64, 0.1);
+}
 .groundhogg-toolbar-quick-search #gh-notifications .gh-button.dismiss {
   background: transparent;
   color: #102640;
