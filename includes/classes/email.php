@@ -1105,7 +1105,6 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_email_stats( $start, $end, $steps_ids = [] ) {
 
-
 		if ( empty( $steps_ids ) ) {
 
 			$steps = get_db( 'stepmeta' )->query( [

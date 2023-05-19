@@ -72,27 +72,30 @@ class Table_Form_Activity extends Base_Table_Report {
 			$form_stats['total_impressions'] = _nf( absint( $total_impressions ) );
 
 			$submissions = absint( get_db( 'events' )->count( [
-				'step_id' => $form_id,
-				'status'  => Event::COMPLETE,
-				'before'  => $this->end,
-				'after'   => $this->start
+				'funnel_id'  => $form_step->get_funnel(),
+				'step_id'    => $form_id,
+				'event_type' => Event::FUNNEL,
+				'status'     => Event::COMPLETE,
+				'before'     => $this->end,
+				'after'      => $this->start
 			] ) );
 
 			if ( $submissions > 0 ) {
 				$form_stats['submissions'] = html()->e( 'a', [
 					'href' => admin_page_url( 'gh_contacts', [
 						'report' => [
-							'step_id' => $form_id,
-							'status'  => Event::COMPLETE,
-							'before'  => $this->end,
-							'after'   => $this->start,
+							'funnel_id'  => $form_step->get_funnel_id(),
+							'step_id'    => $form_id,
+							'event_type' => Event::FUNNEL,
+							'status'     => Event::COMPLETE,
+							'before'     => $this->end,
+							'after'      => $this->start,
 						]
 					] ),
 				], _nf( $submissions ) ?: '0', false );
 			} else {
 				$form_stats['submissions'] = 0;
 			}
-
 
 			$conversion_rate = percentage( $unique_impressions, $submissions, 2 );
 

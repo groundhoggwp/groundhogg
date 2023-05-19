@@ -43,7 +43,9 @@ class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 
 		$where_events = [
 			'relationship' => "AND",
+			[ 'col' => 'funnel_id', 'val' => $this->get_funnel()->get_id(), 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $this->get_funnel()->get_entry_step_ids(), 'compare' => 'IN' ],
+			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],

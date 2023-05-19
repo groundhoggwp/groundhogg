@@ -51,13 +51,15 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 
 		$conversion_steps = $this->get_funnel()->get_conversion_step_ids();
 
-		if ( empty( $conversion_steps ) ){
+		if ( empty( $conversion_steps ) ) {
 			return 0;
 		}
 
 		$where = [
 			'relationship' => "AND",
+			[ 'col' => 'funnel_id', 'val' => $this->get_funnel()->get_id(), 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
+			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
@@ -69,7 +71,6 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 		] );
 
 	}
-
 
 
 }

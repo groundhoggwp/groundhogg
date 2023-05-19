@@ -11,6 +11,7 @@ class User_Syncing {
 		add_action( 'set_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 3 );
 		add_action( 'add_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 2 );
 		add_action( 'remove_user_role', [ $this, 'maybe_clear_owners_cache' ], 10, 2 );
+		add_action( 'delete_user', [ $this, 'maybe_clear_owners_cache' ], 10, 1 );
 
 		if ( is_option_enabled( 'gh_sync_user_meta' ) ) {
 			add_action( 'added_user_meta', [ $this, 'user_meta_added' ], 10, 4 );
@@ -28,13 +29,17 @@ class User_Syncing {
 	 *
 	 * @return void
 	 */
-	public function maybe_clear_owners_cache( $user_id, $role, $old_roles = [] ) {
+	public function maybe_clear_owners_cache( $user_id, $role = '', $old_roles = [] ) {
 
 		if ( in_array( $role, get_owner_roles() ) ) {
 			delete_option( 'gh_owners' );
 		}
 
 		if ( count( array_intersect( $old_roles, get_owner_roles() ) ) > 0 ){
+			delete_option( 'gh_owners' );
+		}
+
+		if ( empty( $role ) && empty( $old_roles ) && user_can( $user_id, 'view_contacts' ) ){
 			delete_option( 'gh_owners' );
 		}
 	}
