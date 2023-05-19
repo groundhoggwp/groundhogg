@@ -16,6 +16,12 @@ class Email_Logger {
 	 */
 	private static $log_item;
 
+
+	/**
+	 * @var bool
+	 */
+	private static $is_sensitive = false;
+
 	/**
 	 * Email_Logger constructor.
 	 */
@@ -27,6 +33,9 @@ class Email_Logger {
 		add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
 
 		add_action( 'init', [ $this, 'init' ] );
+
+		// Whenever retrieve_password happens, then following email should be sensitive
+		add_action( 'retrieve_password', [ self::class, 'email_is_sensitive' ] );
 	}
 
 	public static function is_enabled() {
@@ -88,6 +97,15 @@ class Email_Logger {
 	}
 
 	/**
+	 * Set the current log to be marked as sensitive information
+	 *
+	 * @return void
+	 */
+	public static function email_is_sensitive(){
+		self::$is_sensitive = true;
+	}
+
+	/**
 	 * Log any emails sent through calls to PHPMailer
 	 * Most Groundhogg plugins use this method, as do many other SMTP plugins.
 	 *
@@ -127,7 +145,8 @@ class Email_Logger {
 			'queued_event_id' => Event_Queue::is_processing() ? event_queue()->get_current_event()->get_id() : false,
 			'error_code'      => '',
 			'error_message'   => '',
-			'status'          => 'sent'
+			'status'          => 'sent',
+			'is_sensitive'    => self::$is_sensitive,
 		];
 
 		$log_data = apply_filters( 'groundhogg/email_logger/before_create_log/log_data', $log_data, $this );
@@ -140,6 +159,11 @@ class Email_Logger {
 		}
 
 		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );
+
+		// Reset $is_sensitive for the next email log
+		if ( self::$is_sensitive ){
+			self::$is_sensitive = false;
+		}
 	}
 
 	/**

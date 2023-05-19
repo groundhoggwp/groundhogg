@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Steps\Benchmarks;
 
+use Groundhogg\Email;
 use Groundhogg\Form;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -237,5 +238,67 @@ class Web_Form extends Benchmark {
 
 	protected function can_complete_step() {
 		return false;
+	}
+
+	/**
+	 * Update email content when slug changes
+	 *
+	 * @param $old_slug string
+	 * @param $new_slug string
+	 * @param $step     Step
+	 *
+	 * @return void
+	 */
+	protected function replace_links_in_other_steps( $old_slug, $step ) {
+
+		$new_url       = sprintf( managed_page_url( "forms/%s/" ), $step->get_slug() );
+		$old_url_regex = "@https?://[A-z0-9/\-.]+/gh/forms/$old_slug/@";
+
+        $steps = $step->get_funnel()->get_steps();
+
+		foreach ( $steps as $_step ) {
+
+            switch ( $_step->get_type() ){
+                case 'send_email':
+
+	                $email = new Email( $_step->get_meta( 'email_id' ) );
+
+	                if ( ! $email->exists() ) {
+		                break;
+	                }
+
+	                $content = preg_replace( $old_url_regex, $new_url, $email->get_content() );
+	                $email->update( [
+		                'content' => $content
+	                ] );
+
+                    break;
+                case 'link_click':
+
+                    $to_link = $_step->get_meta( 'redirect_to' ) ?: '';
+	                $to_link = preg_replace( $old_url_regex, $new_url, $to_link );
+                    $_step->update_meta( 'redirect_to', $to_link );
+
+	                break;
+            }
+		}
+	}
+
+	/**
+	 * Search and replace emails for the link click url
+	 *
+	 * @param $step Step
+	 *
+	 * @return void
+	 */
+	public function post_import( $step ) {
+
+
+		// get all send-email steps in the funnel
+		// loop through all the emails
+		// search and replace for the old URL and the new URL
+
+		$old_slug = $step->get_meta( 'imported_step_id' ) . '-' . sanitize_title( $step->get_step_title() );
+		$this->replace_links_in_other_steps( $old_slug, $step );
 	}
 }

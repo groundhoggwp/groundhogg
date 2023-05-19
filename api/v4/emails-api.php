@@ -13,6 +13,7 @@ use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\is_sending;
 use function Groundhogg\is_template_site;
 use function Groundhogg\process_events;
 use function Groundhogg\send_email_notification;
@@ -122,6 +123,8 @@ class Emails_Api extends Base_Object_Api {
 	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function send_email( \WP_REST_Request $request ) {
+
+		is_sending( true );
 
 		$to  = array_map( 'sanitize_email', $request->get_param( 'to' ) ?: [] );
 		$cc  = array_map( 'sanitize_email', $request->get_param( 'cc' ) ?: [] );

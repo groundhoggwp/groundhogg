@@ -34,7 +34,7 @@ use function Groundhogg\Ymd;
  *
  * @return mixed|string
  */
-function basic_field( $field, $input ) {
+function basic_field_with_label( $field, $input ) {
 
 	$field = wp_parse_args( $field, [
 		'id'          => '',
@@ -63,6 +63,29 @@ function basic_field( $field, $input ) {
 }
 
 /**
+ * Returns a basic input field
+ *
+ * @param $field
+ * @param $contact
+ *
+ * @return string
+ */
+function basic_input( $field, $contact, $tag = 'input' ) {
+
+	$property = $field['name'];
+
+	return call_user_func( [ html(), $tag ], [
+		'id'          => $field['id'],
+		'type'        => $field['type'],
+		'name'        => $field['name'],
+		'class'       => trim( 'gh-input ' . $field['className'] ),
+		'placeholder' => $field['placeholder'],
+		'required'    => $field['required'],
+		'value'       => $contact ? ( $contact->$property ?: $field['value'] ) : $field['value'],
+	] );
+}
+
+/**
  * Wrapper for basic text fields
  *
  * @param              $field
@@ -70,7 +93,7 @@ function basic_field( $field, $input ) {
  *
  * @return mixed|string
  */
-function basic_text_field( $field, $contact = false ) {
+function basic_text_field( $field, $contact = false, $tag = 'input' ) {
 
 	$field = wp_parse_args( $field, [
 		'id'          => '',
@@ -88,17 +111,7 @@ function basic_text_field( $field, $contact = false ) {
 		$field['id'] = $field['name'];
 	}
 
-	$input = html()->input( [
-		'id'          => $field['id'],
-		'type'        => $field['type'],
-		'name'        => $field['name'],
-		'class'       => trim( 'gh-input ' . $field['className'] ),
-		'placeholder' => $field['placeholder'],
-		'required'    => $field['required'],
-		'value'       => $contact ? ( $contact->get_meta( $field['name'] ) ?: '' ) : $field['value'],
-	] );
-
-	return basic_field( $field, $input );
+	return basic_field_with_label( $field, basic_input( $field, $contact, $tag ) );
 }
 
 /**
@@ -119,11 +132,11 @@ function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
  * Helper to push tags to the big tags array
  *
  * @param $tags array
- * @param $add mixed
+ * @param $add  mixed
  *
  * @return void
  */
-function push_tags( &$tags, $add ){
+function push_tags( &$tags, $add ) {
 	$tags = array_merge( $tags, parse_tag_list( $add ) );
 }
 
@@ -202,7 +215,7 @@ function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$
  * @return bool
  */
 function basic_required_check( $field, Posted_Data $posted_data ) {
-	$name = $field['name'] ?: $field['type'];
+	$name = isset_not_empty( $field, 'name' ) ? $field['name'] : $field['type'];
 
 	return isset( $posted_data[ $name ] ) && ! empty( $posted_data[ $name ] );
 }
@@ -339,17 +352,22 @@ class Form_v2 extends Step {
 				},
 				'validate' => '__return_true',
 				'required' => function ( $field, $posted_data ) {
+
+					$field = wp_parse_args( $field, [
+						'phone_type' => 'primary'
+					] );
+
 					$type = $field['phone_type'] . '_phone';
 
 					return isset( $posted_data[ $type ] ) && ! empty( $posted_data[ $type ] );
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
+					$field = wp_parse_args( $field, [
+						'phone_type' => 'primary'
+					] );
 
 					$type          = $field['phone_type'] . '_phone';
 					$meta[ $type ] = sanitize_text_field( $posted_data->$type );
-
-					// unformatted version
-					$meta[ '__' . $type ] = preg_replace( "/[^0-9]/", "", $posted_data->$type );
 				}
 			],
 
@@ -446,7 +464,7 @@ class Form_v2 extends Step {
 						$field['id'] = 'country';
 					}
 
-					return basic_field( $field, html()->dropdown( [
+					return basic_field_with_label( $field, html()->dropdown( [
 						'id'          => $field['id'],
 						'name'        => 'country',
 						'class'       => trim( 'gh-input ' . $field['className'] ),
@@ -565,13 +583,14 @@ class Form_v2 extends Step {
 			// Generic Hidden
 			'hidden'       => [
 				'render' => function ( $field, $contact ) {
-					return html()->input( [
-						'id'    => $field['id'],
-						'type'  => 'hidden',
-						'name'  => $field['name'],
-						'class' => $field['className'],
-						'value' => $contact ? ( $contact->get_meta( $field['name'] ) ?: '' ) : $field['value'],
-					] );
+
+					if ( empty( $field['id'] ) ) {
+						$field['id'] = $field['name'];
+					}
+
+					$field['type'] = 'hidden';
+
+					return basic_input( $field, $contact );
 				},
 				'before' => __NAMESPACE__ . '\standard_meta_callback',
 			],
@@ -675,29 +694,9 @@ class Form_v2 extends Step {
 			'textarea'     => [
 				'render'   => function ( $field, $contact ) {
 
-					$field = wp_parse_args( $field, [
-						'id'          => '',
-						'name'        => '',
-						'placeholder' => '',
-						'className'   => '',
-						'required'    => false,
-						'value'       => '',
-						'hide_label'  => false,
-						'label'       => '',
-					] );
+					unset( $field['type'] );
 
-					if ( empty( $field['id'] ) ) {
-						$field['id'] = $field['name'];
-					}
-
-					return basic_field( $field, html()->textarea( [
-						'id'          => $field['id'],
-						'name'        => $field['name'],
-						'class'       => trim( 'gh-input ' . $field['className'] ),
-						'placeholder' => $field['placeholder'],
-						'required'    => $field['required'],
-						'value'       => $contact ? $contact->get_meta( $field['name'] ) : $field['value'],
-					] ) );
+					return basic_text_field( $field, $contact, 'textarea' );
 				},
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$data, &$meta ) {
@@ -736,7 +735,7 @@ class Form_v2 extends Step {
 						$name .= '[]';
 					}
 
-					return basic_field( $field, html()->dropdown( [
+					return basic_field_with_label( $field, html()->dropdown( [
 						'id'          => $field['id'],
 						'name'        => $name,
 						'class'       => trim( 'gh-input ' . $field['className'] ),
@@ -916,7 +915,7 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'after'    => function ( $field, $posted_data, $contact ) {
-					if ( isset( $posted_data[ $field['name'] ] ) && $posted_data[ $field['name'] ] === $field['value'] ) {
+					if ( $posted_data->isset_not_empty( $field['name'] ) ) {
 						$contact->apply_tag( $field['tags'] );
 					}
 				}
@@ -1618,6 +1617,11 @@ class Form_v2 extends Step {
 		return $html;
 	}
 
+	/**
+	 * Fetch any hidden fields for the form.
+	 *
+	 * @return string
+	 */
 	function get_hidden_fields() {
 		if ( empty( $this->hidden_fields ) ) {
 			return '';
@@ -1800,7 +1804,7 @@ class Form_v2 extends Step {
 
 		$field_type = get_array_var( self::$fields, $type );
 
-		if ( ! $field_type ) {
+		if ( ! $field_type || ! is_callable( $field_type['after_create_contact'] ) ) {
 			return false;
 		}
 
@@ -2024,5 +2028,16 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 
 	public function jsonSerialize() {
 		return $this->posted;
+	}
+
+	/**
+	 * Wrapper for isset_not_empty
+	 *
+	 * @param $key
+	 *
+	 * @return bool
+	 */
+	public function isset_not_empty( $key ){
+		return isset_not_empty( $this->posted, $key );
 	}
 }

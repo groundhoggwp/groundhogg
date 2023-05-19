@@ -3,9 +3,9 @@ Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 6.1
+Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.9.6
+Stable tag: 2.7.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,31 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.10 (2023-05-15) =
+* ADDED Task management
+ * NEW Tasks tab in contact record.
+ * NEW **My Tasks** panel in the Groundhogg admin bar widget
+ * NEW Task automation. Create tasks and do automation when tasks are completed in funnels.
+* ADDED Default contact tab profile option so the default tab can be set per user.
+* IMPROVED Contact quick search in admin bar widget shows more useful information.
+* TWEAKED Enhanced security around email logs and potentially sensitive information.
+* TWEAKED `{posts}` replacement code now uses the proper `WP_Query` loop syntax.
+* FIXED Added missing capability/nonce checks. Thanks to WordFence for practicing responsible disclosure.
+
+= 2.7.9.8 (2023-05-01) =
+* HOT FIX Table/API searching for some endpoints not working.
+* TWEAKED `get_owners` is now always passed through the `groundhogg/owners` filter.
+
+= 2.7.9.7 (2023-04-28) =
+* ADDED Application flow for *Review Your Funnel* series.
+* ADDED More search filter registration helper functions.
+* ADDED Remote Notifications system to the Toolbar Widget.
+* TWEAKED Convert mobile number to e164 format after most contact creation/update opportunities.
+* TWEAKED Cached owners also passed through `groundhogg/owners` filter
+* FIXED Web Form URLs search and replaced when importing funnels.
+* FIXED Phone field not saving in web forms when phone type is not changed at least once.
+* FIXED PHP Warnings when submitting web form with a phone field.
 
 = 2.7.9.6 (2023-03-28) =
 * TWEAKED Changed "Source Page" to "Signup Page" to make it more obvious.

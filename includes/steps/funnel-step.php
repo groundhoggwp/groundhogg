@@ -893,6 +893,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function pre_save( Step $step ) {
 
 		$this->set_current_step( $step );
+
+        // Something happened
+        if ( ! $step->get_id() ){
+            return;
+        }
+
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
 		$step->update( [

@@ -24,6 +24,24 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .groundhogg-toolbar-quick-search {
 
+  #gh-notifications{
+    .gh-button.dismiss{
+      background: transparent;
+      color: $primary-dark;
+      margin: 3px;
+      padding: 4px 4px;
+
+      &:hover{
+        background: $primary-dark-10;
+      }
+    }
+
+    p.all-dismissed {
+      font-size: 16px;
+      text-align: center;
+    }
+  }
+
   #quick-search-input {
     width: 100%;
   }
@@ -81,7 +99,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     width: 500px;
     position: fixed;
     background: #FFFFFF;
-    padding: 20px;
+    padding: 20px 20px 20px 20px;
     box-shadow: $box-shadow;
     border-radius: 0 0 5px 5px;
     z-index: 99999;
@@ -100,22 +118,61 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   &-results {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-height: 500px;
-    //overflow: auto;
-    margin-top: 10px;
+    max-height: 70vh;
+    //overflow-y: auto;
+    margin: 10px -20px 0 -20px;
+    &:not(:empty){
+      margin-bottom: -20px;
+    }
+    p:last-child {
+      text-align: center;
+    }
   }
 
   &-result {
-    display: flex;
-    gap: 10px;
-    border-radius: 5px;
-    padding: 10px;
+
     cursor: pointer;
-    align-items: center;
+    padding: 10px 10px 10px 20px;
+    border-top: 1px solid $primary-dark-10;
+
+    .above {
+      display: flex;
+      gap: 10px;
+      //border-radius: 5px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .gh-tags {
+      gap: 5px;
+      display: none;
+
+      .gh-tag {
+        font-size: 11px;
+        padding: 2px 7px;
+      }
+    }
+
+    &:last-of-type{
+      border-bottom: 1px solid $primary-dark-10;
+    }
+
+    .subscribed {
+      color: $primary-dark-30;
+    }
 
     .name {
       font-weight: 500;
+    }
+
+    .phones {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 2px 5px;
     }
 
     img.avatar {
@@ -125,21 +182,25 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
 
     .actions{
-      width: 100%;
+      //width: 100%;
       display: flex;
-      gap: 5px;
+      //gap: 5px;
       justify-content: flex-end;
       visibility: hidden;
-      flex-wrap: wrap;
+      margin-left: auto;
     }
 
     &:hover {
+
+      .gh-tags{
+        display: flex;
+      }
 
       .actions{
         visibility: visible;
       }
 
-      background-color: $primary-dark-5
+      //background-color: $primary-dark-5
     }
   }
 

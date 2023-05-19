@@ -151,8 +151,8 @@ class Tag_Removed extends Benchmark {
 	 */
 	public function save( $step ) {
 		$tags      = validate_tags( $this->get_posted_data( 'tags', [] ) );
-		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
 		$this->save_setting( 'tags', $tags );
+		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
 		$this->save_setting( 'condition', $condition );
 
 		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );

@@ -519,6 +519,9 @@
           case 'apply_note':
             this.applyNote(active)
             break
+          case 'create_task':
+            this.createTask(active)
+            break
           case 'admin_notification':
             this.adminNotification(active)
             break
@@ -617,6 +620,21 @@
       }, (content) => {
         Funnel.updateStepMeta({
           note_text: content,
+        })
+      })
+    },
+
+    createTask (step) {
+      let id = `step_${ step.ID }_task_content`
+
+      console.log('here')
+
+      wp.editor.remove(id)
+      tinymceElement(id, {
+        quicktags: false,
+      }, (content) => {
+        Funnel.updateStepMeta({
+          content
         })
       })
     },

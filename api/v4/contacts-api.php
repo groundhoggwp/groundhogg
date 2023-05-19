@@ -145,6 +145,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->apply_tag( $tags );
 
 			$added[] = $contact;
+
+			$this->do_object_created_action( $contact );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -290,6 +292,8 @@ class Contacts_Api extends Base_Object_Api {
 				$contact->remove_tag( $remove_tags );
 
 				$contacts[] = $contact;
+
+				$this->do_object_updated_action( $contact );
 			}
 
 			return self::SUCCESS_RESPONSE( [
@@ -329,6 +333,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->remove_tag( $remove_tags );
 
 			$updated ++;
+
+			$this->do_object_updated_action( $contact );
 		}
 
 		if ( $request->has_param( 'total_only' ) ) {
@@ -394,6 +400,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
+		if ( ! is_email( $email_address ) ){
+			return self::ERROR_400( 'invalid_email', 'The provided email address is not valid.' );
+		}
+
 		// If the email address is in use, treat as an update
 		if ( is_email_address_in_use( $email_address ) ) {
 			$contact = new Contact( $email_address );
@@ -406,6 +416,8 @@ class Contacts_Api extends Base_Object_Api {
 		$contact->update_meta( $meta );
 
 		$contact->apply_tag( $tags );
+
+		$this->do_object_created_action( $contact );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $contact
@@ -462,6 +474,8 @@ class Contacts_Api extends Base_Object_Api {
 			$contact->remove_tag( $remove_tags );
 		}
 
+		$this->do_object_updated_action( $contact );
+
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
 	}
 
@@ -482,6 +496,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		$object->delete();
+
+		$this->do_object_deleted_action( $object );
 
 		return self::SUCCESS_RESPONSE();
 	}
@@ -508,6 +524,8 @@ class Contacts_Api extends Base_Object_Api {
 		$tags = $request->get_json_params();
 
 		$contact->apply_tag( $tags );
+
+		$this->do_object_created_action( $contact );
 
 		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}

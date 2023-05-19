@@ -798,6 +798,7 @@ class Settings_Page extends Admin_Page {
 					'options'     => [
 						'activity' => 'Activity Timeline',
 						'notes'    => 'Notes',
+						'tasks'    => 'Tasks',
 						'files'    => 'Files'
 					],
 					'option_none' => false

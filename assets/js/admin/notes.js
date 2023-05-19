@@ -7,6 +7,7 @@
     tinymceElement,
     addMediaToBasicTinyMCE,
     moreMenu,
+    spinner,
     tooltip,
     dangerConfirmationModal,
   } = Groundhogg.element
@@ -92,6 +93,8 @@
 
       const addedBy = () => {
 
+        let date_created = `<abbr title="${ formatDateTime( note.data.date_created ) }">${ note.locale.time_diff }</abbr>`
+
         switch (context) {
           case 'user':
             let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
@@ -104,13 +107,13 @@
               username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
             }
 
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, note.locale.time_diff)
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, date_created)
 
           default:
           case 'system':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), note.locale.time_diff)
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), date_created)
           case 'funnel':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), note.locale.time_diff)
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), date_created)
         }
       }
 
@@ -122,7 +125,7 @@
               </div>
               <div style="width: 100%">
                   <div class="note-header">
-                      ${ addedBy() }
+                      <span class="added-by">${ addedBy() }</span>
                       <div class="actions">
                           <button class="gh-button text icon secondary note-more" data-id="${ note.ID }">
                               ${ icons.verticalDots }
@@ -331,6 +334,7 @@
     }
 
     if (!NotesStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
+      $el.html(spinner())
       NotesStore.fetchItems({
         object_id,
         object_type,

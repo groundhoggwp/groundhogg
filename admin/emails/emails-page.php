@@ -34,8 +34,8 @@ class Emails_Page extends Admin_Page {
 
 
 	protected function add_ajax_actions() {
-		add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
-		add_action( 'wp_ajax_get_my_emails_search_results', array( $this, 'get_my_emails_search_results' ) );
+//		add_action( 'wp_ajax_gh_update_email', [ $this, 'update_email_ajax' ] );
+		add_action( 'wp_ajax_get_my_emails_search_results', [ $this, 'get_my_emails_search_results' ] );
 	}
 
 	protected function add_additional_actions() {

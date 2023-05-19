@@ -733,6 +733,15 @@
     count_compare: 'greater_than_or_equal_to',
   }
 
+  const activityFilterComparisons = {
+    equals: _x('Exactly', 'comparison', 'groundhogg'),
+    less_than: _x('Less than', 'comparison', 'groundhogg'),
+    greater_than: _x('More than', 'comparison', 'groundhogg'),
+    less_than_or_equal_to: _x('At most', 'comparison', 'groundhogg'),
+    greater_than_or_equal_to: _x('At least', 'comparison', 'groundhogg'),
+  }
+
+
   const filterCount = ({ count, count_compare }) => {
     //language=HTML
     return `
@@ -741,14 +750,7 @@
                 ${ select({
                     id: 'filter-count-compare',
                     name: 'count_compare',
-                }, {
-                    equals: _x('Exactly', 'comparison', 'groundhogg'),
-                    less_than: _x('Less than', 'comparison', 'groundhogg'),
-                    greater_than: _x('More than', 'comparison', 'groundhogg'),
-                    less_than_or_equal_to: _x('At most', 'comparison', 'groundhogg'),
-                    greater_than_or_equal_to: _x('At least', 'comparison', 'groundhogg'),
-
-                }, count_compare) }
+                }, activityFilterComparisons, count_compare) }
                 ${ input({
                     type: 'number',
                     id: 'filter-count',
@@ -1191,15 +1193,15 @@
       // language=html
       return `
           ${ select({
-        id: 'filter-compare',
-        name: 'compare',
-      }, NumericComparisons, compare) } ${ input({
-        id: 'filter-value',
-        name: 'value',
-        type: 'number',
-        step: '0.01',
-        value,
-      }) }`
+              id: 'filter-compare',
+              name: 'compare',
+          }, NumericComparisons, compare) } ${ input({
+              id: 'filter-value',
+              name: 'value',
+              type: 'number',
+              step: '0.01',
+              value,
+          }) }`
     },
     onMount (filter, updateFilter) {
 
@@ -1540,7 +1542,7 @@
 
 //filter by Email Opened
   registerFilter('email_link_clicked', 'activity', __('Email Link Clicked', 'groundhogg'), {
-    view ({ email_id, link, ...rest }) {
+    view ({ email_id, link = '', ...rest }) {
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
@@ -2076,35 +2078,6 @@
     },
   })
 
-  registerFilter('custom_activity', 'activity', __('Custom Activity', 'groundhogg'), {
-    view ({ activity, ...filter }) {
-      return standardActivityDateTitle(`<b>${ activity }</b>`, filter)
-    },
-    edit ({ activity, ...filter }) {
-      return [
-        input({
-          id: 'filter-activity-type',
-          name: 'activity',
-          value: activity,
-          placeholder: 'custom_activity',
-        }),
-        standardActivityDateOptions(filter),
-      ].join('')
-    },
-    onMount (filter, updateFilter) {
-      $('#filter-activity-type').on('input', e => {
-        updateFilter({
-          activity: e.target.value,
-        })
-      })
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      activity: '',
-      ...standardActivityDateDefaults,
-    },
-  })
-
   const { tabs, fields, groups } = Groundhogg.filters.gh_contact_custom_properties
 
   const getField = (id) => {
@@ -2422,13 +2395,12 @@
 
   })
 
-  const registerActivityFilter = ( id, group, label, {
+  const registerActivityFilter = (id, group, label, {
     view = () => {},
     edit = () => {},
     onMount = () => {},
-    defaults = {}
-  } ) => {
-
+    defaults = {},
+  }) => {
 
     registerFilter(id, group, label, {
       view (filter) {
@@ -2455,6 +2427,108 @@
 
   }
 
+  const registerActivityFilterWithValue = (id, group, label, {
+    view = () => {},
+    edit = () => {},
+    onMount = () => {},
+    defaults = {},
+  }) => {
+    registerFilter(id, group, label, {
+      view (filter) {
+
+        let {
+          value, value_compare,
+        } = filter
+
+        let content = view(filter)
+
+        if ( value && value_compare ){
+          content += ` worth ${activityFilterComparisons[value_compare].toLowerCase()} ${value}`;
+        }
+
+        return standardActivityDateTitle(filterCountTitle(content, filter), filter)
+      },
+      edit (filter) {
+
+        let {
+          value, value_compare,
+        } = filter
+
+        return [
+          edit(filter),
+          //language=HTML
+          `
+              <div class="space-between" style="gap: 10px">
+                  <span class="gh-text">Value</span>
+                  <div class="gh-input-group">
+                      ${ select({
+                          id: 'filter-value-compare',
+                          name: 'value_compare',
+                          options: activityFilterComparisons,
+                          selected: value_compare,
+                      }) }
+                      ${ input({
+                          type: 'number',
+                          id: 'filter-value',
+                          name: 'value',
+                          autocomplete: 'off',
+                          value: value,
+                          placeholder: 'any value',
+                          style: {
+                              width: '100px',
+                          },
+                      }) }
+                  </div>
+              </div>`,
+          filterCount(filter),
+          standardActivityDateOptions(filter),
+        ].join('')
+      },
+      onMount (filter, updateFilter) {
+        onMount(filter, updateFilter)
+
+        $('#filter-value,#filter-value-compare').on('change', (e) => {
+          updateFilter({
+            [e.target.name]: e.target.value,
+          })
+        })
+
+        filterCountOnMount(updateFilter)
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...defaults,
+        ...standardActivityDateDefaults,
+        ...filterCountDefaults,
+        value: 0,
+        value_compare: 'greater_than_or_equal_to',
+      },
+    })
+
+  }
+
+  registerActivityFilterWithValue( 'custom_activity', 'activity', __('Custom Activity', 'groundhogg'), {
+    view: ( { activity } ) => `<b>${activity}</b>`,
+    edit: ({ activity, ...filter }) => {
+      return input({
+        id: 'filter-activity-type',
+        name: 'activity',
+        value: activity,
+        placeholder: 'custom_activity',
+      })
+    },
+    onMount (filter, updateFilter) {
+      $('#filter-activity-type').on('input', e => {
+        updateFilter({
+          activity: e.target.value,
+        })
+      })
+    },
+    defaults: {
+      activity: '',
+    },
+  } )
+
   Groundhogg.filters.functions = {
     createFilters,
     registerFilter,
@@ -2468,7 +2542,8 @@
     standardActivityDateDefaults,
     standardActivityDateFilterOnMount,
     BasicTextFilter,
-    registerActivityFilter
+    registerActivityFilter,
+    registerActivityFilterWithValue
   }
 
 } )

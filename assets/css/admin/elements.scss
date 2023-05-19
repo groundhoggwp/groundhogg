@@ -22,6 +22,7 @@ $benchmark-orange-50: rgba(245, 129, 21, 0.50);
 $benchmark-orange-25: rgba(245, 129, 21, 0.25);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
+$action-green-5: rgba(158, 206, 56, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
@@ -115,14 +116,15 @@ h3 {
 }
 
 @media only screen and (max-width: 480px) {
-
   .display-grid {
     display: flex;
     flex-direction: column;
   }
 
+  .display-flex.stack-on-mobile {
+    flex-direction: column;
+  }
 }
-
 
 .display-flex{
 
@@ -172,6 +174,10 @@ h3 {
     flex-direction: column;
   }
 
+  &.wrap {
+    flex-wrap: wrap;
+  }
+
 }
 
 .space-between:not(.display-flex) {
@@ -207,6 +213,41 @@ h3 {
     align-items: flex-start;
   }
 }
+
+.label-with-input{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.space-above {
+  &-5{
+    margin-top: 10px;
+  }
+
+  &-10 {
+    margin-top: 10px;
+  }
+
+  &-20 {
+    margin-top: 10px;
+  }
+}
+
+.space-below {
+  &-5{
+    margin-bottom: 10px;
+  }
+
+  &-10 {
+    margin-bottom: 10px;
+  }
+
+  &-20 {
+    margin-bottom: 10px;
+  }
+}
+
 
 .property-groups {
 
@@ -383,8 +424,50 @@ h2.nav-tab-wrapper.gh {
   }
 }
 
+#notes-here,
+#tasks-here {
+  .notes-widget,
+  .tasks-widget {
+    margin: auto -20px;
+
+    .notes-header,
+    .tasks-header {
+      padding-right: 10px;
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    .note,
+    .task {
+      padding-left: 20px;
+      padding-right: 10px;
+      box-sizing: border-box;
+    }
+
+    .add-note,
+    .add-task {
+      padding: 20px;
+    }
+  }
+}
+
+@keyframes task-completing {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: $action-green-5;
+  }
+}
+
+.tasks-widget,
 .notes-widget {
 
+  .task-settings {
+    margin-top: 10px;
+  }
+
+  .tasks-header,
   .notes-header {
     display: flex;
     justify-content: space-between;
@@ -394,26 +477,51 @@ h2.nav-tab-wrapper.gh {
       font-size: 14px;
       margin: 0;
     }
+
+    .pill {
+      font-weight: 500;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   }
 
+  #task-type,
   #note-type {
     width: fit-content;
   }
 
+  .task,
   .note {
     border-top: 1px solid $primary-dark-10;
     padding-top: 10px;
-    margin-top: 10px;
+    //margin-top: 10px;
     display: flex;
     width: 100%;
     gap: 20px;
     //align-items: center;
+
+    &.complete {
+      background: $action-green-5;
+    }
+
+    &.completing {
+      animation-name: task-completing;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+
+      .mark-complete {
+        visibility: hidden;
+      }
+    }
 
     > .icon {
       width: 25px;
       padding-top: 10px;
     }
 
+    .task-header,
     .note-header {
       width: 100%;
       display: flex;
@@ -421,8 +529,13 @@ h2.nav-tab-wrapper.gh {
       color: $primary-dark-30;
       align-items: center;
       justify-content: space-between;
+
+      .summary {
+        color: $primary-dark;
+      }
     }
 
+    .task-content,
     .note-content {
 
       img {
@@ -441,6 +554,8 @@ h2.nav-tab-wrapper.gh {
     }
   }
 
+  .edit-task,
+  .add-task,
   .edit-note,
   .add-note {
     .actions {
@@ -450,6 +565,86 @@ h2.nav-tab-wrapper.gh {
     }
   }
 }
+
+#groundhogg-toolbar-quick-search{
+  .my-tasks{
+    margin: 0 -20px -20px -20px;
+    max-height: 80vh;
+    overflow: auto;
+
+    .task {
+      padding-left: 20px;
+      padding-right: 10px;
+      box-sizing: border-box;
+
+      &.completing {
+        animation-name: task-completing;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+
+        .mark-complete {
+          visibility: hidden;
+        }
+      }
+    }
+  }
+}
+
+.my-tasks{
+
+  .task {
+    border-top: 1px solid $primary-dark-10;
+    padding-top: 10px;
+    //margin-top: 10px;
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    //align-items: center;
+
+    &.complete {
+      background: $action-green-5;
+    }
+
+    > .icon {
+      width: 25px;
+      padding-top: 10px;
+    }
+
+    .task-header {
+      width: 100%;
+      display: flex;
+      font-weight: 500;
+      color: $primary-dark-30;
+      align-items: center;
+      justify-content: space-between;
+
+      .summary,
+      .name {
+        color: $primary-dark;
+      }
+    }
+
+    .task-content {
+
+      img {
+        max-width: 100%;
+        height: auto !important;
+      }
+
+      p {
+        margin-top: 0;
+      }
+
+      ul {
+        list-style: disc;
+        margin-left: 2em;
+      }
+    }
+  }
+
+}
+
+
 
 input {
   &:invalid {
@@ -532,25 +727,29 @@ a.action-link {
   padding: 3px 8px;
   color: $primary-dark;
 
+  &.attention,
   &.yellow {
     background: $alert-yellow-50;
     color: darken($alert-yellow, 55);
   }
 
+  &.warning,
   &.orange {
     background: $benchmark-orange-25;
     color: darken($benchmark-orange, 35);
   }
 
+  &.notice,
   &.blue {
     background: $primary-blue-50;
   }
 
+  &.success,
   &.green {
     background: $action-green-50;
     color: darken($action-green, 35);
   }
-
+  &.danger,
   &.red {
     background: $error-red-50;
     color: darken($error-red, 35)
@@ -564,14 +763,15 @@ a.action-link {
 svg,
 p.gh-text,
 span.gh-text {
+  &.red,
   &.danger {
     color: $error-red;
   }
 
+  &.orange,
   &.warning {
     color: $benchmark-orange;
   }
-
 
   &.green {
     color: $action-green;
@@ -718,6 +918,10 @@ span.gh-text {
     &.no-padding{
       padding: 0;
     }
+  }
+
+  &.gh-error {
+    background: $error-red-10;
   }
 }
 

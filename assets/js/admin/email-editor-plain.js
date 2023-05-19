@@ -29,7 +29,7 @@
     }
   })
 
-  const { custom_headers } = Email.email.meta
+  const { custom_headers = [] } = Email.email.meta
 
   inputRepeater('#custom-headers', {
     rows: Object.keys(custom_headers).map((k) => [k, custom_headers[k]]),

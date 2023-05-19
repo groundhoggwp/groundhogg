@@ -74,4 +74,8 @@ class DateTimeHelper extends \DateTime {
 		}
 
 	}
+
+	public function isPast() {
+		return $this->getTimestamp() < time();
+	}
 }

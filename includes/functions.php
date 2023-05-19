@@ -7,6 +7,7 @@ use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 
 
@@ -676,9 +677,8 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param     $a
- * @param     $b
- *
+ * @param $a int denominator
+ * @param $b int numerator
  * @param int $precision
  *
  * @return float
@@ -842,7 +842,7 @@ function array_to_atts( $atts ) {
 
 		switch ( $key ) {
 			case 'class':
-				$value = is_array( $value ) ? trim( implode( ' ', $value ) ) : $value;
+				$value = esc_attr( trim( is_array( $value ) ? implode( ' ', $value ) : $value ) );
 				break;
 			case 'style':
 				$value = array_to_css( $value );
@@ -850,7 +850,7 @@ function array_to_atts( $atts ) {
 			case 'href':
 			case 'action':
 			case 'src':
-				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : $value;
+				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : esc_attr( $value );
 				break;
 			default:
 				if ( is_array( $value ) ) {
@@ -2202,14 +2202,9 @@ function export_field( $contact, $field = '' ) {
 			$return = wp_json_encode( $contact->get_notes() );
 			break;
 		case 'tags':
-			$tags = $contact->get_tags( true );
-
-			if ( $tags ) {
-				$names  = array_map( function ( $tag ) {
-					return $tag->get_name();
-				}, $tags );
-				$return = implode( ',', $names );
-			}
+			$tags   = $contact->get_tags( true );
+			$names  = array_map_to_method( $tags, 'get_name' );
+			$return = implode( ',', $names );
 
 			break;
 	}
@@ -4095,12 +4090,20 @@ function number_has_country_code( $number = '' ) {
 
 /**
  * Runs a contact's mobile number though the validation function and updates it if it's different from the original
+ * Run this after most contact creation opportunities
  *
  * @param $contact Contact
  *
  * @return void
  */
 function maybe_validate_and_update_mobile_number( $contact ) {
+
+	$contact = get_contactdata( $contact );
+
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
 	$to           = $contact->get_mobile_number();
 	$country_code = $contact->get_meta( 'country' );
 
@@ -4108,14 +4111,25 @@ function maybe_validate_and_update_mobile_number( $contact ) {
 		return;
 	}
 
+	// Is e164 format already
+	if ( preg_match( '/^\+[1-9]\d{1,14}$/', $to ) ) {
+		return;
+	}
+
 	$validated = validate_mobile_number( $to, $country_code );
 
-    if ( $validated !== $to ) {
+	if ( $validated !== $to && $validated ) {
 		$contact->update_meta( 'mobile_phone', $validated );
 	}
 }
 
-add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 10, 1 );
+// Webhooks, integrations
+add_action( 'groundhogg/generate_contact_with_map/after', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+// Admin
+add_action( 'groundhogg/admin/contact/save', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+// API
+add_action( 'groundhogg/api/contact/created', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
+add_action( 'groundhogg/api/contact/updated', __NAMESPACE__ . '\maybe_validate_and_update_mobile_number', 99, 1 );
 
 /**
  * Get an error from an uploaded file.
@@ -4268,8 +4282,12 @@ add_action( 'admin_menu', function () {
 
 }, 99999999 );
 
-
-add_action( 'admin_print_styles', function () {
+/**
+ * Menu styles when plugin is not white labelled
+ *
+ * @return void
+ */
+function maybe_print_menu_styles() {
 
 	if ( is_white_labeled() ) {
 		return;
@@ -4277,6 +4295,13 @@ add_action( 'admin_print_styles', function () {
 
 	?>
     <style>
+
+        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
+        .unread-notices::after {
+            content: '<?php echo $unread ?>' !important;
+        }
+
+        <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
@@ -4312,8 +4337,8 @@ add_action( 'admin_print_styles', function () {
             content: "";
             display: block;
             height: 1px;
-            margin: 5px auto 0;
-            width: calc(100% - 24px);
+            margin: 5px 0;
+            width: 100%;
             opacity: .4;
         }
 
@@ -4322,7 +4347,9 @@ add_action( 'admin_print_styles', function () {
         }
     </style>
 	<?php
-} );
+}
+
+add_action( 'admin_print_styles', __NAMESPACE__ . '\maybe_print_menu_styles' );
 
 /**
  * Allow funnel files to be uploaded
@@ -4679,24 +4706,22 @@ function get_owners() {
 
 	static $users;
 
-	if ( ! empty( $users ) ) {
-		return $users;
+	if ( empty( $users ) ) {
+		// Check option cache first
+		$cached_users = get_option( 'gh_owners' );
+
+		if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
+			$users = array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
+		} else {
+			$users = get_users( [ 'role__in' => get_owner_roles() ] );
+
+			$user_ids = array_map( function ( $user ) {
+				return $user->ID;
+			}, $users );
+
+			update_option( 'gh_owners', $user_ids );
+		}
 	}
-
-	// Check option cache first
-	$cached_users = get_option( 'gh_owners' );
-
-	if ( is_array( $cached_users ) && ! empty( $cached_users ) ) {
-		return array_filter( array_map( 'get_userdata', wp_parse_id_list( $cached_users ) ) );
-	}
-
-	$users = get_users( [ 'role__in' => get_owner_roles() ] );
-
-	$user_ids = array_map( function ( $user ) {
-		return $user->ID;
-	}, $users );
-
-	update_option( 'gh_owners', $user_ids );
 
 	return apply_filters( 'groundhogg/owners', $users );
 }
@@ -4881,6 +4906,31 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 }
 
 /**
+ * Wrapper for `permissions_key_url()` which will give a permissions key link
+ * if an email is sending or the current logged-in user and the tracking cookie of the contact match up
+ *
+ *
+ * @param $url
+ * @param $contact
+ * @param $usage
+ * @param $expiration
+ * @param $delete_after_use
+ *
+ * @return mixed|string
+ */
+function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false  ){
+
+    if ( is_sending() || current_contact_and_logged_in_user_match() ){
+
+        Email_Logger::email_is_sensitive();
+
+	    return permissions_key_url( $url, $contact, $usage, $expiration, $delete_after_use );
+    }
+
+    return $url;
+}
+
+/**
  * Generate a url with the permissions key on it.
  *
  * @param string    $url              the url to append the key to
@@ -5050,11 +5100,7 @@ function is_ignore_user_tracking_precedence_enabled() {
  */
 function contact_and_user_match( $contact = false, $user = false ) {
 
-	if ( is_int( $contact ) ) {
-		$contact = get_contactdata( $contact );
-	} else if ( ! $contact ) {
-		$contact = get_contactdata();
-	}
+	$contact = get_contactdata( $contact );
 
 	if ( ! is_a_contact( $contact ) ) {
 		return false;
@@ -5063,7 +5109,7 @@ function contact_and_user_match( $contact = false, $user = false ) {
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
 	} else if ( ! $user ) {
-		$$user = wp_get_current_user();
+		$user = wp_get_current_user();
 	}
 
 	if ( ! is_a_user( $user ) ) {
@@ -5183,10 +5229,10 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string  $type    string, an activity identifier
- * @param array   $args    the details for the activity
- * @param array   $details details about that activity
- * @param Contact $contact the contact to track
+ * @param string             $type    string, an activity identifier
+ * @param array              $args    the details for the activity
+ * @param array              $details details about that activity
+ * @param Contact|string|int $contact the contact to track
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
@@ -5233,9 +5279,9 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
  *
  * @return void
  */
-function track_activity_actions( $activity ){
+function track_activity_actions( $activity ) {
 
-    /**
+	/**
 	 * Fires after some activity is tracked
 	 *
 	 * @param $activity Activity
@@ -5383,8 +5429,16 @@ function get_time( $time ) {
  *
  * @return false|string
  */
-function Ymd_His( $time = false ) {
-	return date( 'Y-m-d H:i:s', get_time( $time ) );
+function Ymd_His( $time = false, $local = false ) {
+	$date = new \DateTime();
+
+	if ( $local ) {
+		$date->setTimezone( wp_timezone() );
+	}
+
+	$date->setTimestamp( get_time( $time ) );
+
+	return $date->format( 'Y-m-d H:i:s' );
 }
 
 /**
@@ -5405,8 +5459,16 @@ function His( $time = false ) {
  *
  * @return false|string
  */
-function Ymd( $time = false ) {
-	return date( 'Y-m-d', get_time( $time ) );
+function Ymd( $time = false, $local = false ) {
+	$date = new \DateTime();
+
+	if ( $local ) {
+		$date->setTimezone( wp_timezone() );
+	}
+
+	$date->setTimestamp( get_time( $time ) );
+
+	return $date->format( 'Y-m-d' );
 }
 
 /**
@@ -7176,4 +7238,196 @@ function clear_pending_events_by_step_type( $type, $contact = false ) {
 			[ 'contact_id', '=', $contact->get_id() ]
 		]
 	] );
+}
+
+/**
+ * Whether the given data is base64 encoded or not
+ *
+ * @param $data
+ *
+ * @return bool
+ */
+function is_base64_encoded( $data ) {
+	return base64_decode( $data, true ) !== false;
+}
+
+/**
+ * The best approximate date this site started using Groundhogg
+ *
+ * @return \DateTimeInterface
+ */
+function date_started_using_groundhogg() {
+	return get_db( 'contacts' )->get_date_created();
+}
+
+/**
+ * The number of emails sent between a specific time frame
+ *
+ * @param \DateTimeInterface $from
+ * @param \DateTimeInterface $to
+ *
+ * @return void
+ */
+function num_emails_sent( \DateTimeInterface $from, \DateTimeInterface $to ) {
+
+	global $wpdb;
+
+	$events_table = get_db( 'events' )->get_table_name();
+	$steps_table  = get_db( 'steps' )->get_table_name();
+
+	return $wpdb->get_var( $wpdb->prepare(
+		"SELECT COUNT(*) FROM $events_table e 
+                LEFT JOIN $steps_table s ON e.step_id = s.ID 
+                WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %d OR e.event_type = %d)
+                AND e.time >= %d AND e.time <= %d"
+		, 'complete', 'send_email', Event::BROADCAST, Event::EMAIL_NOTIFICATION,
+		$from->getTimestamp(), $to->getTimestamp() )
+	);
+}
+
+/**
+ * Tells us whether this site qualifies for review your funnel
+ *
+ * @return bool
+ */
+function qualifies_for_review_your_funnel() {
+
+	$one_month_ago = new DateTimeHelper( '1 month ago' );
+
+	$conditions = [
+		// has at least 3 active funnels
+		get_db( 'funnels' )->count( [ 'status' => 'active' ] ) >= 3,
+
+		// using for at least 30 days
+		date_started_using_groundhogg() < $one_month_ago,
+
+		// has sent at least 1000 emails in the last month
+		num_emails_sent( $one_month_ago, new DateTimeHelper( 'now' ) ) >= 1000,
+
+		// Is a paid customer
+		has_premium_features()
+	];
+
+	return ! in_array( false, $conditions );
+}
+
+/**
+ * Enqueue the admin header
+ *
+ * @return void
+ */
+function enqueue_admin_header() {
+	if ( is_white_labeled() ) {
+		return;
+	}
+
+	wp_enqueue_script( 'groundhogg-admin-header' );
+
+	do_action( 'groundhogg/enqueue_admin_header' );
+}
+
+/**
+ * Parses a list into number and non-numeric items
+ *
+ * @param $list     array|string
+ * @param $sanitize callable
+ *
+ * @return array|int[]
+ */
+function parse_maybe_numeric_list( $list, $sanitize = 'sanitize_text_field' ) {
+	$list = wp_parse_list( $list );
+
+	return array_map( function ( $item ) use ( $sanitize ) {
+		return is_numeric( $item ) ? absint( $item ) : call_user_func( $sanitize, $item );
+	}, $list );
+}
+
+/**
+ * Programmatically create a task and associate it with the relevant object
+ *
+ * @param $args array
+ * @param $object Base_Object|Contact
+ *
+ * @return void
+ */
+function create_task( $args, $object ){
+
+}
+
+/**
+ * If the contact is viewing the email in the browser
+ *
+ * @return bool
+ */
+function is_browser_view(){
+    return defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) && GROUNDHOGG_IS_BROWSER_VIEW;
+}
+
+/**
+ * If an email is actually sending to the contact
+ * This is used as a flag for generating replacements which may contain sensitive information
+ *
+ * @param bool|null $sending
+ *
+ * @return bool
+ */
+function is_sending( $sending = null ){
+
+    static $_sending;
+
+    if ( $sending === null ){
+        return $_sending;
+    }
+
+    $_sending = $sending;
+
+    return $_sending;
+}
+
+/**
+ * Makes swapping array keys easy...
+ *
+ * @param array $array
+ * @param array $key_map
+ *
+ * @return array
+ */
+function swap_array_keys( array $array = [], array $key_map = [] ){
+
+    foreach ( $key_map as $old => $new ){
+        if ( isset( $array[$old] ) ){
+	        $array[$new] = $array[$old];
+        }
+    }
+
+    return $array;
+}
+
+/**
+ * The default tab to show in the contact record
+ *
+ * @return false|mixed|string
+ */
+function get_default_contact_tab(){
+
+    if ( get_url_var( '_tab' ) ){
+        return get_url_var( '_tab' );
+    }
+
+    $profile_setting = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
+
+    if ( $profile_setting ){
+        return $profile_setting;
+    }
+
+	return get_option( 'gh_default_contact_tab' ) ?: 'activity';
+}
+
+/**
+ * Standard admin ajax nonce function
+ *
+ * @return false|int
+ */
+function verify_admin_ajax_nonce(){
+    return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
 }
