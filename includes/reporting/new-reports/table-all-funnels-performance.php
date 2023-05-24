@@ -52,13 +52,13 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		foreach ( $funnels as $funnel ) {
 
-			$conversions = $this->count_conversions( $funnel );
 
 			$sent   = $this->count_emails_sent( $funnel );
 			$opens  = $this->count_email_opens( $funnel );
 			$clicks = $this->count_email_clicks( $funnel );
 
 			$conversion_ids = $funnel->get_conversion_step_ids();
+			$conversions    = $this->count_conversions( $funnel );
 			$active         = $this->count_active_contacts( $funnel );
 
 			$data[] = [
@@ -87,7 +87,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 					] ),
 					'target' => '_blank'
 				], $active, false ),
-				'conversions' => count( $conversion_ids ) ? html()->e( 'a', [
+				'conversions' => ! empty( $conversion_ids ) ? html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( array_values( array_map( function ( $step_id ) use ( $funnel ) {
 							return [
@@ -104,8 +104,8 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						}, $conversion_ids ) ) )
 					] ),
 					'target' => '_blank'
-				], $this->count_conversions( $funnel ), false ) : 'N/A',
-				'cvr'         => count( $conversion_ids ) ? percentage( $active, $conversions ) . '%' : 'N/A',
+				], $conversions, false ) : 'N/A',
+				'cvr'         => ! empty( $conversion_ids ) ? percentage( $active, $conversions ) . '%' : 'N/A',
 				'sent'        => $sent,
 				'open'        => percentage( $sent, $opens ) . '%',
 				'ctr'         => percentage( $opens, $clicks ) . '%',
@@ -141,6 +141,8 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		$where_events = [
 			'relationship' => "AND",
+			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
+			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $email_steps, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
@@ -210,6 +212,8 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		$where_events = [
 			'relationship' => "AND",
+			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
+			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $funnel->get_entry_step_ids(), 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
@@ -232,12 +236,15 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	protected function count_conversions( $funnel ) {
 
 		$ids = $funnel->get_conversion_step_ids();
+
 		if ( empty( $ids ) ) {
 			return 0;
 		}
 
 		$where_events = [
 			'relationship' => "AND",
+			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
+			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $ids, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],

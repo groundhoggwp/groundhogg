@@ -120,7 +120,7 @@ class Email_Log extends DB {
 			$data['is_sensitive'] = 0;
 		}
 
-		return self::query( $data, $ORDER_BY, $from_cache );
+		return parent::query( $data, $ORDER_BY, $from_cache );
 	}
 
 	/**
