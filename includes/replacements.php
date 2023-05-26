@@ -1304,7 +1304,7 @@ class Replacements implements \JsonSerializable {
 			return $redirect_to;
 		}
 
-		maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
+		$link_url = maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
