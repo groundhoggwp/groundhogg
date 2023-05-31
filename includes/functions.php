@@ -677,8 +677,8 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param $a int denominator
- * @param $b int numerator
+ * @param     $a int denominator
+ * @param     $b int numerator
  * @param int $precision
  *
  * @return float
@@ -799,9 +799,9 @@ function iframe_compat() {
 /**
  * Enqueues the modal scripts
  *
- * @since 1.0.5
  * @return Modal
  *
+ * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -1002,11 +1002,6 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
- * @throws \Exception
- *
- * @since      1.2.10
- * @deprecated 2.1.11
- *
  * @param string       $subject     Email subject
  *
  * @param string       $message     Message contents
@@ -1018,6 +1013,11 @@ function get_return_path_email() {
  * @param string|array $to          Array or comma-separated list of email addresses to send message.
  *
  * @return bool Whether the email contents were sent successfully.
+ * @throws \Exception
+ *
+ * @since      1.2.10
+ * @deprecated 2.1.11
+ *
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -1025,10 +1025,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
-	 * @since 2.2.0
-	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -1197,9 +1197,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @since 2.2.0
-	 *
 	 * @param string $from_email Email address to send from.
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -1207,9 +1207,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $from_name Name associated with the "from" email address.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -1277,9 +1277,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $content_type Default wp_mail() content type.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1306,9 +1306,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $charset Default email charset.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1337,9 +1337,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @since 2.2.0
-	 *
 	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1373,10 +1373,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
-		 * @since 4.4.0
-		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
+		 *
+		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -2622,13 +2622,13 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @throws \Exception
- *
  * @param $map    array map of field_ids to contact keys
  *
  * @param $fields array the raw data from the source
  *
  * @return Contact|false
+ * @throws \Exception
+ *
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -3177,7 +3177,7 @@ function show_groundhogg_branding() {
  */
 function floating_phil() {
 	?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil"
-           src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+	       src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
 }
 
 /**
@@ -3367,20 +3367,20 @@ function preferences_center_shortcode() {
 	ob_start();
 
 	?>
-    <p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
-    <p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
-    <p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
-    <ul>
-        <li>
-            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
-        </li>
-        <li>
-            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
-        </li>
-        <li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
-        <li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
-    </ul>
-    <p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
+	<p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
+	<p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
+	<p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
+	<ul>
+		<li>
+			<a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
+		</li>
+		<li>
+			<a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
+		</li>
+		<li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
+		<li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
+	</ul>
+	<p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
 	<?php
 
 	return ob_get_clean();
@@ -3410,11 +3410,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
- * @deprecated since 2.0.9.2
- *
  * @param string $string
  *
  * @return string
+ * @deprecated since 2.0.9.2
+ *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -3432,7 +3432,7 @@ function is_managed_page() {
  */
 function no_index_tag() {
 	?>
-    <meta name="robots" content="noindex">
+	<meta name="robots" content="noindex">
 	<?php
 }
 
@@ -3467,8 +3467,6 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @since 2.0.4
- *
  * @param int|string $action    Optional. Nonce action name. Default -1.
  *
  * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
@@ -3476,6 +3474,8 @@ function install_custom_rewrites() {
  * @param string     $actionurl URL to add nonce action.
  *
  * @return string
+ * @since 2.0.4
+ *
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -4294,14 +4294,14 @@ function maybe_print_menu_styles() {
 	}
 
 	?>
-    <style>
+	<style>
 
-        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
+		<?php if ( $unread = notices()->count_unread() > 0 ): ?>
         .unread-notices::after {
             content: '<?php echo $unread ?>' !important;
         }
 
-        <?php endif; ?>
+		<?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
@@ -4345,7 +4345,7 @@ function maybe_print_menu_styles() {
         #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before {
             margin-bottom: 8px;
         }
-    </style>
+	</style>
 	<?php
 }
 
@@ -4918,16 +4918,16 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
  *
  * @return mixed|string
  */
-function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false  ){
+function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false ) {
 
-    if ( is_sending() || current_contact_and_logged_in_user_match() ){
+	if ( is_sending() || current_contact_and_logged_in_user_match() ) {
 
-        Email_Logger::email_is_sensitive();
+		Email_Logger::email_is_sensitive();
 
-	    return permissions_key_url( $url, $contact, $usage, $expiration, $delete_after_use );
-    }
+		return permissions_key_url( $url, $contact, $usage, $expiration, $delete_after_use );
+	}
 
-    return $url;
+	return $url;
 }
 
 /**
@@ -5756,6 +5756,84 @@ function array_filter_splice( &$array, $predicate ) {
 }
 
 /**
+ * Checks if at least one of the elements in the array matches some predicate
+ *
+ * @param array $array
+ * @param callable $predicate
+ *
+ * @return bool
+ */
+function array_any( $array, $predicate ){
+	foreach ( $array as $element ){
+		if ( call_user_func( $predicate, $element ) ){
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Checks if all the elements in the array match some predicate
+ *
+ * @param array $array
+ * @param callable $predicate
+ *
+ * @return bool
+ */
+function array_all( $array, $predicate ){
+	foreach ( $array as $element ){
+		if ( ! call_user_func( $predicate, $element ) ){
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Is something empty
+ *
+ * @param $something
+ *
+ * @return bool
+ */
+function is_empty( $something ){
+	return empty( $something );
+}
+
+/**
+ * Is something not empty
+ *
+ * @param $something
+ *
+ * @return bool
+ */
+function is_not_empty( $something ){
+	return ! is_empty( $something );
+}
+
+/**
+ * Check if all the elements in an array are empty
+ *
+ * @param $array
+ *
+ * @return bool
+ */
+function array_all_empty( $array ){
+	return array_all( $array, __NAMESPACE__ . '\is_empty' );
+}
+
+/**
+ * Check if all of the elements in the array are not empty
+ *
+ * @param $array
+ *
+ * @return bool
+ */
+function array_all_not_empty( $array ){
+	return array_all( $array, __NAMESPACE__ . '\is_not_empty' );
+}
+
+/**
  * Sanitize any type email header
  *
  * @param $header_value
@@ -6413,7 +6491,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 				$filters[0][] = [
 					'type'         => 'broadcast_link_clicked',
 					'broadcast_id' => absint( $activity_query['step_id'] ),
-					'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
+					'link'         => get_array_var( $activity_query, 'referer', get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ),
 				];
 				break;
 			case Activity::EMAIL_CLICKED:
@@ -6421,7 +6499,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					$filters[0][] = [
 						'type'         => 'broadcast_link_clicked',
 						'broadcast_id' => absint( $activity_query['step_id'] ),
-						'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
+						'link'         => get_array_var( $activity_query, 'referer', get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ),
 					];
 				} else {
 					$filters[0][] = [
@@ -6429,7 +6507,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'count_compare' => 'greater_than_or_equal_to',
 						'count'         => 1,
 						'email_id'      => absint( $activity_query['email_id'] ),
-						'link'          => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ?? '',
+						'link'         => get_array_var( $activity_query, 'referer', get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ),
 						'after'         => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
 						'before'        => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
 						'date_range'    => 'between',
@@ -6803,15 +6881,15 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $num_related_contacts > 0 ):
 
 		?>
-        <fieldset>
-            <p>
-                <legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
-            </p>
-            <p><?php echo html()->checkbox( [
+		<fieldset>
+			<p>
+				<legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
+			</p>
+			<p><?php echo html()->checkbox( [
 					'label' => sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ),
 					'name'  => 'delete_related_contact_records'
 				] ) ?></p>
-        </fieldset>
+		</fieldset>
 	<?php
 	endif;
 
@@ -6829,16 +6907,16 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $has_owned_content ):
 
 		?>
-        <fieldset>
-            <p>
-                <legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
-            </p>
-            <p><?php echo html()->dropdown_owners( [
+		<fieldset>
+			<p>
+				<legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
+			</p>
+			<p><?php echo html()->dropdown_owners( [
 					'name'        => 'reassign_groundhogg_owner',
 					'option_none' => false,
 					'exclude'     => $all_ids
 				] ) ?></p>
-        </fieldset>
+		</fieldset>
 	<?php
 
 	endif;
@@ -6971,11 +7049,11 @@ function maybe_url_decrypt_id( $data ) {
 
 function iframe_js() {
 	?>
-    <script>
+	<script>
       if (window.self !== window.top) {
         document.querySelector('html').classList.add('iframed')
       }
-    </script>
+	</script>
 	<?php
 }
 
@@ -7345,12 +7423,12 @@ function parse_maybe_numeric_list( $list, $sanitize = 'sanitize_text_field' ) {
 /**
  * Programmatically create a task and associate it with the relevant object
  *
- * @param $args array
+ * @param $args   array
  * @param $object Base_Object|Contact
  *
  * @return void
  */
-function create_task( $args, $object ){
+function create_task( $args, $object ) {
 
 }
 
@@ -7359,8 +7437,8 @@ function create_task( $args, $object ){
  *
  * @return bool
  */
-function is_browser_view(){
-    return defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) && GROUNDHOGG_IS_BROWSER_VIEW;
+function is_browser_view() {
+	return defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) && GROUNDHOGG_IS_BROWSER_VIEW;
 }
 
 /**
@@ -7371,17 +7449,17 @@ function is_browser_view(){
  *
  * @return bool
  */
-function is_sending( $sending = null ){
+function is_sending( $sending = null ) {
 
-    static $_sending;
+	static $_sending;
 
-    if ( $sending === null ){
-        return $_sending;
-    }
+	if ( $sending === null ) {
+		return $_sending;
+	}
 
-    $_sending = $sending;
+	$_sending = $sending;
 
-    return $_sending;
+	return $_sending;
 }
 
 /**
@@ -7392,15 +7470,15 @@ function is_sending( $sending = null ){
  *
  * @return array
  */
-function swap_array_keys( array $array = [], array $key_map = [] ){
+function swap_array_keys( array $array = [], array $key_map = [] ) {
 
-    foreach ( $key_map as $old => $new ){
-        if ( isset( $array[$old] ) ){
-	        $array[$new] = $array[$old];
-        }
-    }
+	foreach ( $key_map as $old => $new ) {
+		if ( isset( $array[ $old ] ) ) {
+			$array[ $new ] = $array[ $old ];
+		}
+	}
 
-    return $array;
+	return $array;
 }
 
 /**
@@ -7408,17 +7486,17 @@ function swap_array_keys( array $array = [], array $key_map = [] ){
  *
  * @return false|mixed|string
  */
-function get_default_contact_tab(){
+function get_default_contact_tab() {
 
-    if ( get_url_var( '_tab' ) ){
-        return get_url_var( '_tab' );
-    }
+	if ( get_url_var( '_tab' ) ) {
+		return get_url_var( '_tab' );
+	}
 
-    $profile_setting = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
+	$profile_setting = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
 
-    if ( $profile_setting ){
-        return $profile_setting;
-    }
+	if ( $profile_setting ) {
+		return $profile_setting;
+	}
 
 	return get_option( 'gh_default_contact_tab' ) ?: 'activity';
 }
@@ -7428,6 +7506,6 @@ function get_default_contact_tab(){
  *
  * @return false|int
  */
-function verify_admin_ajax_nonce(){
-    return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
+function verify_admin_ajax_nonce() {
+	return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
 }
