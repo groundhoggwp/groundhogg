@@ -46,6 +46,10 @@
   display: inline-block;
 }
 
+#tags-here .tag-change-actions:not(.align-right-space-between) {
+  display: none;
+}
+
 div.email-status {
   margin: 20px;
 }

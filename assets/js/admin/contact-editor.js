@@ -1934,7 +1934,7 @@
       return `
           <div id="gh-better-tag-picker">
           </div>
-          <div class="tag-change-actions hidden" style="margin-top: 10px">
+          <div class="tag-change-actions" style="margin-top: 10px">
               <button id="cancel-tag-changes" class="gh-button danger text">
                   ${ __('Cancel') }
               </button>

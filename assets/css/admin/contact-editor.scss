@@ -73,6 +73,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   display: inline-block;
 }
 
+#tags-here{
+  .tag-change-actions:not(.align-right-space-between) {
+    display: none;
+  }
+}
+
 div.email-status {
   margin: 20px;
 }
@@ -418,6 +424,8 @@ code.meta-replacement-code {
   flex-grow: 0;
 }
 
+
+
 @media only screen and ( max-width: 1300px ){
 
   .contact-record{
@@ -430,7 +438,6 @@ code.meta-replacement-code {
   }
 
 }
-
 
 @media only screen and ( max-width: 830px ){
 
