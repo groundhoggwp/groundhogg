@@ -750,6 +750,12 @@ class Contact extends Base_Object_With_Meta {
 	 * @param $preference
 	 */
 	public function change_marketing_preference( $preference ) {
+
+		// No change
+		if ( $this->get_optin_status() === $preference ){
+			return;
+		}
+
 		$this->update( [
 			'optin_status' => $preference
 		] );
@@ -761,6 +767,12 @@ class Contact extends Base_Object_With_Meta {
 	 * @param $owner_id
 	 */
 	public function change_owner( $owner_id ) {
+
+		// No change
+		if ( $this->owner_is( $owner_id ) ){
+			return;
+		}
+
 		$this->update( [
 			'owner_id' => $owner_id
 		] );
