@@ -62,7 +62,6 @@ class Funnel extends Base_Object_With_Meta {
 		return Plugin::instance()->dbs->get_db( 'funnelmeta' );
 	}
 
-
 	/**
 	 * A string to represent the object type
 	 *
@@ -343,7 +342,6 @@ class Funnel extends Base_Object_With_Meta {
 
 		return $conversion_step_id;
 	}
-
 
 	public function get_first_action_id() {
 		$actions = $this->get_step_ids( [
