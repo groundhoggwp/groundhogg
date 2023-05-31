@@ -1492,12 +1492,17 @@ class Form_v2 extends Step {
 			'target'  => '_parent',
 			'action'  => $this->get_submission_url(),
 			'enctype' => 'multipart/form-data',
-			'name'    => $this->get_name()
+			'name'    => $this->get_name(),
+			'data-id' => $this->get_id(),
 		];
 
 		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
 		$form .= $this->get_field_html();
+
+		if ( ! empty( $this->hidden_fields ) ) {
+			$form .= $this->get_hidden_fields();
+		}
 
 		$form .= '</form>';
 
@@ -1661,7 +1666,8 @@ class Form_v2 extends Step {
 			'target'  => '_parent',
 			'enctype' => 'multipart/form-data',
 			'name'    => $this->get_name(),
-			'id'      => $this->get_id()
+			'id'      => $this->get_id(),
+			'data-id' => $this->get_id(),
 		];
 
 		if ( get_query_var( 'doing_iframe' ) ) {
@@ -2037,7 +2043,7 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 	 *
 	 * @return bool
 	 */
-	public function isset_not_empty( $key ){
+	public function isset_not_empty( $key ) {
 		return isset_not_empty( $this->posted, $key );
 	}
 }
