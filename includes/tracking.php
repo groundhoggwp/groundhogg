@@ -741,25 +741,12 @@ class Tracking {
 	 */
 	public function contact_unsubscribed( $contact_id ) {
 
-		// Check if we have an email ID/step ID that we can attribute it too...
-
-		$event = $this->get_current_event();
-
-		if ( ! $event || ! $event->exists() ) {
+		// Check if the current contact is also the tracked contact
+		if ( $this->get_current_contact_id() !== $contact_id ){
 			return;
 		}
 
-		$args = array(
-			'timestamp'     => time(),
-			'contact_id'    => $contact_id,
-			'funnel_id'     => $event->get_funnel_id(),
-			'step_id'       => $event->get_step_id(),
-			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
-			'activity_type' => Activity::UNSUBSCRIBED,
-			'event_id'      => $event->get_id(),
-		);
-
-		get_db( 'activity' )->add( $args );
+		track_live_activity( Activity::UNSUBSCRIBED );
 	}
 
 }

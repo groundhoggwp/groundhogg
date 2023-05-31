@@ -531,7 +531,7 @@ switch ( $action ):
 		break;
 	case 'unsubscribe':
 
-		// Don't require the nonce check if one click unsub is require because it will go directly to this page.
+		// Don't require the nonce check if one click unsub is required because it will go directly to this page.
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) && ! is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ) {
 			wp_redirect( managed_page_url( 'preferences/manage/' ) );
 			die();
