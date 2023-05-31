@@ -214,10 +214,18 @@
     },
 
     logFormImpressions () {
-      var self = this
-      var forms = document.querySelectorAll('.gh-form')
+      let self = this
+      let forms = document.querySelectorAll('.gh-form')
       forms.forEach(function (form, i) {
-        var field = form.querySelector('input[name="gh_submit_form"]')
+        let formId = form.dataset.id
+
+        if ( formId ){
+          self.formImpression(formId)
+          return
+        }
+
+        let field = form.querySelector('input[name="gh_submit_form"]')
+
         if (field){
           self.formImpression(field.value)
         }
