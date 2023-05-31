@@ -51,7 +51,7 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report {
 
 		return [
 //			"fill"                      => false,
-			'lineTension'               => 0,
+			'lineTension'               => 0.1,
 			'fillOpacity'               => 0.2,
 			'pointRadius'               => 4,
 			'pointBackgroundColor'      => '#FFF',

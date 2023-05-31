@@ -73,7 +73,6 @@ if ( ! $funnel->exists() ) {
         </div>
         <div id="table_worst_performing_emails" class="emails-list"></div>
     </div>
-
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
             <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>

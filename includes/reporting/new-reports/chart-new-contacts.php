@@ -3,36 +3,22 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
-use Groundhogg\Plugin;
+use function Groundhogg\get_db;
 
 class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 	protected function get_datasets() {
 
-		$new      = $this->normalize_data( $this->group_by_time( $this->get_new_contacts_in_time_period() ) );
-		$previous = $this->get_previous_new_contact();
-
-		$n = [];
-		$p = [];
-
-		/**
-		 * adds labels in the data set to display during the hover action
-		 */
-		for ( $i = 0; $i < count( $new ); $i ++ ) {
-
-			$n[] = [
-				't'     => $new[ $i ]['t'],
-				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $new[ $i ]['t'] ) ), $new[ $i ]['y'] ),
-				'y'     => $new[ $i ]['y']
-			];
-
-			$p[] = [
-				't'     => $new[ $i ]['t'],
-				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $previous[ $i ]['t'] ) ), $previous[ $i ]['y'] ),
-				'y'     => $previous[ $i ]['y'],
-			];
-
-		}
+		$new = get_db( 'contacts' )->advanced_query( [
+			'where'   => [
+				[ 'date_created', '>=', $this->startDate->format( 'Y-m-d H:i:s' ) ],
+				[ 'date_created', '<', $this->endDate->format( 'Y-m-d H:i:s' ) ]
+			],
+			'orderby' => 'date_created',
+			'order'   => 'ASC',
+			'select'  => "count(ID) y, DATE(date_created) t, CONCAT( DATE_FORMAT(date_created, '%b %e, %Y'), ': ', count(ID) ) label",
+			'groupby' => 't'
+		] );
 
 		/**
 		 * Create a valid data set to plot in chart
@@ -41,13 +27,9 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		return [
 			'datasets' => [
 				array_merge( [
-					'label' => __( sprintf( "%s - %s", date( get_option( 'date_format' ), $this->start ), date( get_option( 'date_format' ), $this->end ) ), 'groundhogg' ),
-					'data'  => $n,
+					'label' => __('New contacts'),
+					'data'  => $new,
 				], $this->get_line_style() ),
-				array_merge( [
-					'label' => __( sprintf( "%s - %s", date( get_option( 'date_format' ), $this->compare_start ), date( get_option( 'date_format' ), $this->compare_end ) ), 'groundhogg' ),
-					'data'  => $p,
-				], $this->get_line_style() )
 			]
 		];
 	}

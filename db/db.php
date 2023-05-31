@@ -14,6 +14,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\maybe_implode_in_quotes;
+use function Groundhogg\preg_quote_except;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -1482,7 +1483,7 @@ abstract class DB {
 							if ( is_numeric( $value ) ) {
 								$parsed_clauses[] = $wpdb->prepare( "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} %d", $value );
 							} else {
-								$value     = preg_quote( $value );
+								$value     = str_replace( '\\', '\\\\', preg_quote_except( $value, [ '=', ':' ], '@' ) );
 								$parsed_clauses[] = "{$unparsed_clause[ 'col' ]} {$unparsed_clause[ 'compare' ]} '$value'";
 							}
 

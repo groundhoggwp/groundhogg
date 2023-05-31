@@ -6,6 +6,7 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
 use function Groundhogg\_nf;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\generate_referer_hash;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -25,16 +26,32 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 		];
 	}
 
-	protected function get_table_data() {
-
+	protected function get_activities(){
 		$email = new Email( $this->get_email_id() );
 
-		$activity = get_db( 'activity' )->query( [
+		return get_db( 'activity' )->query( [
 			'email_id'      => $email->get_id(),
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'before'        => $this->end,
 			'after'         => $this->start,
 		] );
+	}
+
+	protected function get_contact_query_link( $link ){
+		return admin_page_url( 'gh_contacts', [
+			'activity' => [
+				'activity_type' => Activity::EMAIL_CLICKED,
+				'email_id'      => $this->get_email_id(),
+				'referer'       => $link['referer'],
+				'before'        => $this->end,
+				'after'         => $this->start
+			]
+		] );
+	}
+
+	protected function get_table_data() {
+
+		$activity = $this->get_activities();
 
 		$links = [];
 
@@ -65,8 +82,8 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 			return [];
 		}
 
-
 		$data = [];
+
 		foreach ( $links as $hash => $link ) {
 			$data[] = [
 				'label'   => html()->wrap( $link['referer'], 'a', [
@@ -76,18 +93,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 					'target' => '_blank',
 				] ),
 				'uniques' => html()->wrap( _nf( $link['uniques'] ), 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'email_id'      => $email->get_id(),
-								'referer_hash'  => $hash,
-								'before'        => $this->end,
-								'after'         => $this->start
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
+					'href'  => $this->get_contact_query_link( $link ),
 					'class' => 'number-total'
 				] ),
 				'clicks'  => html()->wrap( _nf( $link['clicks'] ), 'span', [ 'class' => 'number-total' ] ),

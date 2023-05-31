@@ -908,6 +908,9 @@ class Contact_Query {
 						default:
 							$compare = '=';
 							break;
+						case 'referer':
+							$compare = 'RLIKE';
+							break;
 						case 'before':
 							$compare = '<=';
 							$col     = 'timestamp';

@@ -6,10 +6,10 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_request_var;
-use function Groundhogg\percentage;
 use function Groundhogg\set_cookie;
 
 abstract class Base_Report {
@@ -40,6 +40,14 @@ abstract class Base_Report {
 	protected $num_days;
 
 	/**
+	 * @var DateTimeHelper
+	 */
+	protected $startDate;
+	protected $endDate;
+	protected $startDateCompare;
+	protected $endDateCompare;
+
+	/**
 	 * Reports constructor.
 	 *
 	 * @param $start int unix timestamps
@@ -57,6 +65,9 @@ abstract class Base_Report {
 
 		$this->start = absint( $start );
 		$this->end   = absint( $end );
+
+		$this->startDate = new DateTimeHelper( $this->start );
+		$this->endDate   = new DateTimeHelper( $this->end );
 
 		$this->set_compare_dates();
 	}
@@ -82,6 +93,9 @@ abstract class Base_Report {
 		// previous period
 		$this->compare_start = absint( $previous_start->format( 'U' ) );
 		$this->compare_end   = absint( $previous_end->format( 'U' ) );
+
+		$this->startDateCompare = new DateTimeHelper( $this->compare_start );
+		$this->endDateCompare   = new DateTimeHelper( $this->compare_end );
 	}
 
 

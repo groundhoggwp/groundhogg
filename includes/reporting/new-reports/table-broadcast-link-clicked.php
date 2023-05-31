@@ -15,93 +15,33 @@ use function Groundhogg\html;
 use function Groundhogg\percentage;
 use function Groundhogg\remove_query_string_from_url;
 
-class Table_Broadcast_Link_Clicked extends Base_Table_Report {
-
-
-	public function get_label() {
-		return [
-			__( 'Link', 'groundhogg' ),
-			__( 'Uniques', 'groundhogg' ),
-			__( 'Clicks', 'groundhogg' ),
-		];
-	}
+class Table_Broadcast_Link_Clicked extends Table_Email_Links_Clicked {
 
 	protected function get_broadcast_id() {
 		return get_array_var( get_request_var( 'data', [] ), 'broadcast_id' );
 	}
 
-	protected function get_table_data() {
-
+	protected function get_activities() {
 		$broadcast = new Broadcast( $this->get_broadcast_id() );
 
-		$activity = get_db( 'activity' )->query( [
+		return get_db( 'activity' )->query( [
 			'funnel_id'     => $broadcast->get_funnel_id(),
 			'step_id'       => $broadcast->get_id(),
 			'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
 		] );
-
-		$links = [];
-
-		foreach ( $activity as $event ) {
-
-			// Links with permissions keys
-			if ( strpos( $event->referer, '?pk=' ) !== false ) {
-				$event->referer      = remove_query_string_from_url( $event->referer );
-				$event->referer_hash = generate_referer_hash( $event->referer );
-			}
-
-			if ( ! isset( $links[ $event->referer_hash ] ) ) {
-				$links[ $event->referer_hash ] = [
-					'referer'  => $event->referer,
-					'hash'     => $event->referer_hash,
-					'contacts' => [],
-					'uniques'  => 0,
-					'clicks'   => 0,
-				];
-			}
-
-			$links[ $event->referer_hash ]['clicks'] ++;
-			$links[ $event->referer_hash ]['contacts'][] = $event->contact_id;
-			$links[ $event->referer_hash ]['uniques']    = count( array_unique( $links[ $event->referer_hash ]['contacts'] ) );
-		}
-
-		if ( empty( $links ) ) {
-			return [];
-		}
-
-
-		$data = [];
-		foreach ( $links as $hash => $link ) {
-			$data[] = [
-				'label'   => html()->wrap( $link['referer'], 'a', [
-					'href'   => $link['referer'],
-					'class'  => 'number-total',
-					'title'  => $link['referer'],
-					'target' => '_blank',
-				] ),
-				'uniques' => html()->wrap( $link['uniques'], 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id(),
-								'referer_hash'  => $hash,
-							]
-						],
-						admin_page_url( 'gh_contacts' )
-					),
-					'class' => 'number-total'
-				] ),
-				'clicks'  => html()->wrap( $link['clicks'], 'span', [ 'class' => 'number-total' ] ),
-			];
-		}
-
-		return $data;
-
 	}
 
-	protected function normalize_datum( $item_key, $item_data ) {
-		// TODO: Implement normalize_datum() method.
+	protected function get_contact_query_link( $link ) {
+
+		$broadcast = new Broadcast( $this->get_broadcast_id() );
+
+		return admin_page_url( 'gh_contacts', [
+			'activity' => [
+				'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
+				'step_id'       => $broadcast->get_id(),
+				'funnel_id'     => $broadcast->get_funnel_id(),
+				'referer'       => $link['referer'],
+			]
+		] );
 	}
 }

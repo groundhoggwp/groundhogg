@@ -38,7 +38,8 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 						'type'       => 'time',
 						'time'       => [
 							'parser'        => "YYY-MM-DD HH:mm:ss",
-							'tooltipFormat' => "l HH:mm"
+							'tooltipFormat' => "l HH:mm",
+							'unit'          => 'day',
 						],
 						'scaleLabel' => [
 							'display'     => false,
