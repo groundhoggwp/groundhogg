@@ -794,7 +794,7 @@ class Funnels_Page extends Admin_Page {
 			'sortable' => $sortable,
 			'settings' => $settings,
 			'id'       => $new_step->get_id(),
-			'json'     => $step
+			'json'     => $new_step
 		] );
 
 		wp_send_json_error();
