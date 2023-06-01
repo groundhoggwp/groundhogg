@@ -650,12 +650,17 @@ class Tracking {
 			'event_id'      => $event->get_id(),
 		);
 
+		// Check if exists first
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
 
+			// Does not exist, add the timestamp
 			$args['timestamp'] = time();
 
-			if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ) {
+			if ( $id = get_db( 'activity' )->add( $args ) ) {
 				do_action( 'groundhogg/tracking/email/opened', $this );
+
+				// Add compat for new tracking actions for activity
+				track_activity_actions( new Activity( $id ) );
 			}
 		}
 
@@ -663,6 +668,16 @@ class Tracking {
 		if ( $this->doing_open ) {
 			$this->output_tracking_image();
 		}
+	}
+
+	/**
+	 * The redirect http status code to use
+	 * 301, 302, 307, 308
+	 *
+	 * @return int
+	 */
+	protected function redirect_http_status_code(){
+		return apply_filters( 'groundhogg/tracking/redirect_http_status_code', 307 );
 	}
 
 	/**
@@ -695,7 +710,7 @@ class Tracking {
 		 * always.
 		 */
 		if ( ! $event || ! $event->exists() ) {
-			wp_redirect( $target, 301 );
+			wp_redirect( $target, $this->redirect_http_status_code() );
 
 			return;
 		}
@@ -712,10 +727,13 @@ class Tracking {
 			'referer_hash'  => generate_referer_hash( $orig_target )
 		);
 
-		if ( get_db( 'activity' )->add( $args ) ) {
+		if ( $id = get_db( 'activity' )->add( $args ) ) {
 			do_action( 'groundhogg/tracking/email/click', $this );
 
-			wp_redirect( $target, 301 );
+			// Add compat for new tracking actions for activity
+			track_activity_actions( new Activity( $id ) );
+
+			wp_redirect( $target, $this->redirect_http_status_code() );
 
 			return;
 		}
@@ -741,8 +759,8 @@ class Tracking {
 	 */
 	public function contact_unsubscribed( $contact_id ) {
 
-		// Check if the current contact is also the tracked contact
-		if ( $this->get_current_contact_id() !== $contact_id ){
+		// Check if the current tracked contact is also that is being unsubscribed
+		if ( get_current_contact()->get_id() !== $contact_id ){
 			return;
 		}
 
