@@ -5201,6 +5201,8 @@ function track_page_visit( $ref, $contact, $override = [] ) {
  *
  * @param $type
  * @param $details
+ *
+ * @return Activity|False
  */
 function track_live_activity( $type, $details = [], $value = 0 ) {
 
@@ -5209,7 +5211,7 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {
-		return;
+		return false;
 	}
 
 	$args = [
@@ -5222,7 +5224,7 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 
-	track_activity( $contact, $type, $args, $details );
+	return track_activity( $contact, $type, $args, $details );
 }
 
 /**
@@ -5233,6 +5235,8 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
  * @param array              $args    the details for the activity
  * @param array              $details details about that activity
  * @param Contact|string|int $contact the contact to track
+ *
+ * @return Activity|False
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
@@ -5240,7 +5244,7 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {
-		return;
+		return false;
 	}
 
 	// use tracking cookies to generate information for the activity log
@@ -5259,7 +5263,7 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	$id = get_db( 'activity' )->add( $args );
 
 	if ( ! $id ) {
-		return;
+		return false;
 	}
 
 	$activity = new Activity( $id );
@@ -5270,6 +5274,8 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	}
 
 	track_activity_actions( $activity );
+
+	return $activity;
 }
 
 /**
