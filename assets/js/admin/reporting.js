@@ -64,6 +64,10 @@ function tool_tip_title () {
             end: moment().endOf('year'),
           },
         ],
+        format: {
+          preset: GroundhoggReporting.date_format
+          // preset: 'MMM D, YYYY'
+        },
         earliest_date: 'January 1, 2017',
         latest_date: moment(),
         start_date: self.dates.start_date,

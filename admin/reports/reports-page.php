@@ -2,22 +2,18 @@
 
 namespace Groundhogg\Admin\Reports;
 
-use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
-use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
-use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\set_cookie;
 use function Groundhogg\white_labeled_name;
-use Groundhogg\Plugin;
 
 class Reports_Page extends Tabbed_Admin_Page {
 
@@ -72,6 +68,63 @@ class Reports_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * Converts php DateTime format to Javascript Moment format.
+	 *
+	 * @param string $phpFormat
+	 *
+	 * @return string
+	 */
+	public function convertPhpToJsMomentFormat( string $phpFormat ): string {
+		$replacements = [
+			'A' => 'A',      // for the sake of escaping below
+			'a' => 'a',      // for the sake of escaping below
+			'B' => '',       // Swatch internet time (.beats), no equivalent
+			'c' => 'YYYY-MM-DD[T]HH:mm:ssZ', // ISO 8601
+			'D' => 'ddd',
+			'd' => 'DD',
+			'e' => 'zz',     // deprecated since version 1.6.0 of moment.js
+			'F' => 'MMMM',
+			'G' => 'H',
+			'g' => 'h',
+			'H' => 'HH',
+			'h' => 'hh',
+			'I' => '',       // Daylight Saving Time? => moment().isDST();
+			'i' => 'mm',
+			'j' => 'D',
+			'L' => '',       // Leap year? => moment().isLeapYear();
+			'l' => 'dddd',
+			'M' => 'MMM',
+			'm' => 'MM',
+			'N' => 'E',
+			'n' => 'M',
+			'O' => 'ZZ',
+			'o' => 'YYYY',
+			'P' => 'Z',
+			'r' => 'ddd, DD MMM YYYY HH:mm:ss ZZ', // RFC 2822
+			'S' => 'o',
+			's' => 'ss',
+			'T' => 'z',      // deprecated since version 1.6.0 of moment.js
+			't' => '',       // days in the month => moment().daysInMonth();
+			'U' => 'X',
+			'u' => 'SSSSSS', // microseconds
+			'v' => 'SSS',    // milliseconds (from PHP 7.0.0)
+			'W' => 'W',      // for the sake of escaping below
+			'w' => 'e',
+			'Y' => 'YYYY',
+			'y' => 'YY',
+			'Z' => '',       // time zone offset in minutes => moment().zone();
+			'z' => 'DDD',
+		];
+
+		// Converts escaped characters.
+		foreach ( $replacements as $from => $to ) {
+			$replacements[ '\\' . $from ] = '[' . $from . ']';
+		}
+
+		return strtr( $phpFormat, $replacements );
+	}
+
+	/**
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
@@ -100,9 +153,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 				}
 
 				wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
-					'reports' => $this->get_reports_per_tab(),
-					'dates'   => $dates,
-					'other'   => [
+					'reports'     => $this->get_reports_per_tab(),
+					'dates'       => $dates,
+					'date_format' => self::convertPhpToJsMomentFormat( get_option( 'date_format' ) ),
+					'other'       => [
 						'funnel_id'    => get_url_var( 'funnel' ),
 						'broadcast_id' => get_url_var( 'broadcast' ),
 						'email_id'     => get_url_var( 'email' ),
@@ -326,20 +380,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include __DIR__ . '/views/functions.php';
 
 		?>
-        <div class="loader-wrap">
-            <div class="gh-loader-overlay" style="display:none;"></div>
-            <div class="gh-loader" style="display: none"></div>
-        </div>
-        <div class="wrap blurred">
+		<div class="loader-wrap">
+			<div class="gh-loader-overlay" style="display:none;"></div>
+			<div class="gh-loader" style="display: none"></div>
+		</div>
+		<div class="wrap blurred">
 			<?php if ( ! is_white_labeled() ): ?>
-                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
+				<h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
-                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
+				<h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
 			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
-            <hr class="wp-header-end">
+			<hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
@@ -366,7 +420,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			}
 
 			?>
-        </div>
+		</div>
 		<?php
 
 	}
@@ -376,12 +430,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function range_picker() {
 		?>
-        <div id="groundhogg-datepicker-wrap">
-            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
-        </div>
-        <!--        <div id="groundhogg-datepicker-wrap">-->
-        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-        <!--        </div>-->
+		<div id="groundhogg-datepicker-wrap">
+			<div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+		</div>
+		<!--        <div id="groundhogg-datepicker-wrap">-->
+		<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+		<!--        </div>-->
 		<?php
 	}
 
