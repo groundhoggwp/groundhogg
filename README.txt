@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.10.3
+Stable tag: 2.7.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.11 (2023-06-01) =
+* ADDED Custom activity is now shown in the contact activity timeline.
+* IMPROVED Optimized some reports for better performance.
+* TWEAKED Changed redirect HTTP method for tracking links from `301` to `307`.
+* FIXED Contacts not shown when clicking the report of who click a specific link.
+* FIXED Impressions not recording for forms built with the new Form Builder.
+* FIXED Duplicating a step in the funnel returning original step JSON instead of the new step, causing rendering issues.
+* FIXED Date format in reporting date picker showing placeholder instead of actual date.
 
 = 2.7.10.3 (2023-05-26) =
 * HOT FIX Replacement code for `{auto_login_link}` not working.
