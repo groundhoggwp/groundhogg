@@ -7515,3 +7515,22 @@ function get_default_contact_tab() {
 function verify_admin_ajax_nonce() {
 	return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
 }
+
+/**
+ * Returns the name for the day of the week given an int
+ *
+ * @param $number int
+ *
+ * @return bool|mixed
+ */
+function day_of_week( $number = 0 ){
+	return get_array_var( [
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	], absint( $number ) );
+}

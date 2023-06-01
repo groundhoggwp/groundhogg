@@ -192,8 +192,6 @@ class Contact_Query {
 	 *
 	 * @access public
 	 *
-	 * @since  2.8
-	 *
 	 * @param string|array $query             {
 	 *                                        Optional. Array or query string of contact query parameters. Default empty.
 	 *
@@ -237,6 +235,8 @@ class Contact_Query {
 	 * @type bool          $no_found_rows     Whether to disable the `SQL_CALC_FOUND_ROWS` query.
 	 *                                        Default true.
 	 *                                        }
+	 * @since  2.8
+	 *
 	 */
 	public function __construct( $query = '', $gh_db_contacts = null ) {
 
@@ -314,13 +314,13 @@ class Contact_Query {
 	 *
 	 * @access public
 	 *
+	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
+	 *
+	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
 	 * @see    WPGH_Contact_Query::__construct()
 	 *
-	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
-	 *
-	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 */
 	public function query( $query = [], $as_contact_object = false ) {
 
@@ -531,9 +531,9 @@ class Contact_Query {
 		/**
 		 * Fires after the contact query vars have been parsed.
 		 *
-		 * @since 2.8
-		 *
 		 * @param Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
+		 *
+		 * @since 2.8
 		 *
 		 */
 		do_action_ref_array( 'gh_parse_contact_query', [ &$this ] );
@@ -547,9 +547,9 @@ class Contact_Query {
 	 * Tries to use a cached value and otherwise uses `WPGH_Contact_Query::query_items()`.
 	 *
 	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 */
 	protected function get_items() {
 		$this->parse_query();
@@ -557,9 +557,9 @@ class Contact_Query {
 		/**
 		 * Fires before contacts are retrieved.
 		 *
-		 * @deprecated
-		 *
 		 * @param Contact_Query &$this Current instance of Contact_Query, passed by reference.
+		 *
+		 * @deprecated
 		 *
 		 */
 		do_action_ref_array( 'gh_pre_get_contacts', [ &$this ] );
@@ -667,9 +667,9 @@ class Contact_Query {
 	 * Runs a database query to retrieve contacts.
 	 *
 	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @global \wpdb $wpdb WordPress database abstraction object.
 	 *
 	 */
@@ -697,11 +697,11 @@ class Contact_Query {
 			/**
 			 * Filters the query used to retrieve the count of found contacts.
 			 *
-			 * @since 2.8
-			 *
 			 * @param Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
 			 *
 			 * @param string        $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
+			 *
+			 * @since 2.8
 			 *
 			 */
 			$found_items_query = apply_filters( 'gh_found_contacts_query', 'SELECT FOUND_ROWS()', $this );
@@ -714,9 +714,9 @@ class Contact_Query {
 	 * Constructs the fields segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL fields segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL fields segment.
 	 */
 	protected function construct_request_fields() {
 		if ( $this->query_vars['count'] ) {
@@ -730,9 +730,9 @@ class Contact_Query {
 	 * Constructs the join segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL join segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL join segment.
 	 */
 	protected function construct_request_join() {
 		$join = '';
@@ -760,9 +760,9 @@ class Contact_Query {
 	 * Constructs the where segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return array SQL where segment.
 	 * @since  2.8
 	 *
-	 * @return array SQL where segment.
 	 */
 	protected function construct_request_where() {
 		global $wpdb;
@@ -1030,9 +1030,9 @@ class Contact_Query {
 	 * Constructs the orderby segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL orderby segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL orderby segment.
 	 */
 	protected function construct_request_orderby() {
 		if ( in_array( $this->query_vars['orderby'], array( 'none', array(), false ), true ) ) {
@@ -1073,9 +1073,9 @@ class Contact_Query {
 	 * Constructs the limits segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL limits segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL limits segment.
 	 */
 	protected function construct_request_limits() {
 		return implode( ' ', [
@@ -1088,9 +1088,9 @@ class Contact_Query {
 	 * Constructs the groupby segment of the SQL request.
 	 *
 	 * @access protected
+	 * @return string SQL groupby segment.
 	 * @since  2.8
 	 *
-	 * @return string SQL groupby segment.
 	 */
 	protected function construct_request_groupby() {
 		if ( ! empty( $this->meta_query_clauses['join'] )
@@ -1110,13 +1110,13 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param array  $columns Columns to search.
 	 *
 	 * @param string $string  Search string.
 	 *
 	 * @return string Search SQL.
+	 * @since  2.8
+	 *
 	 * @global \wpdb $wpdb    WordPress database abstraction object.
 	 *
 	 */
@@ -1156,11 +1156,11 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param string $orderby Orderby string.
 	 *
 	 * @return string Parsed orderby string to use in the SQL request, or an empty string.
+	 * @since  2.8
+	 *
 	 */
 	protected function parse_orderby_string( $orderby ) {
 		if ( 'include' === $orderby ) {
@@ -1212,11 +1212,11 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @since  2.8
-	 *
 	 * @param string $orderby Order string.
 	 *
 	 * @return string Parsed order string to use in the SQL request, or an empty string.
+	 * @since  2.8
+	 *
 	 */
 	protected function parse_order_string( $order, $orderby ) {
 		if ( 'include' === $orderby ) {
@@ -1238,9 +1238,9 @@ class Contact_Query {
 	 * Returns the basic allowed keys to use for the orderby clause.
 	 *
 	 * @access protected
+	 * @return array Allowed keys.
 	 * @since  2.8
 	 *
-	 * @return array Allowed keys.
 	 */
 	protected function get_allowed_orderby_keys() {
 		return apply_filters( 'groundhogg/contact_query/allowed_orderby_keys', array_keys( $this->gh_db_contacts->get_columns() ) );
@@ -2542,13 +2542,13 @@ class Contact_Query {
 		$after  = $before_and_after['after'];
 
 		switch ( $filter_vars['date_range'] ) {
-			default:
 			case 'after':
 				$clause = $as_int ? sprintf( "> %d", $after ) : sprintf( "> '%s'", Ymd_His( $after ) );
 				break;
 			case 'before':
 				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
 				break;
+			default:
 			case '24_hours':
 			case '7_days':
 			case '30_days':
@@ -2597,9 +2597,28 @@ class Contact_Query {
 				$before = time();
 				break;
 			case 'today':
-				$after = $today->getTimestamp();
-				$today->modify( '+1 day' );
-				$before = $today->getTimestamp();
+				$after  = $today->getTimestamp();
+				$before = time();
+				break;
+			case 'this_week':
+				$start_of_week = day_of_week( get_option( 'start_of_week' ) );
+
+				if ( $today->format( 'l' ) !== $start_of_week ) {
+					$today->modify( sprintf( 'last %s', $start_of_week ) );
+				}
+
+				$after  = $today->getTimestamp();
+				$before = time();
+				break;
+			case 'this_month':
+				$today->modify( 'first day of this month' );
+				$after  = $today->getTimestamp();
+				$before = time();
+				break;
+			case 'this_year':
+				$today->modify( 'first day of January this year' );
+				$after  = $today->getTimestamp();
+				$before = time();
 				break;
 			case '24_hours':
 				$after  = time() - DAY_IN_SECONDS;
@@ -2674,9 +2693,31 @@ class Contact_Query {
 				$before = time() * 2;
 				break;
 			case 'today':
-				$after = $today->getTimestamp();
-				$today->modify( '+1 day' );
+				$after = time();
+				$today->modify( '23:59:59' );
 				$before = $today->getTimestamp();
+				break;
+			case 'this_week':
+				$end_of_week = day_of_week( get_option( 'start_of_week' ) - 6 );
+
+				$today->modify( '23:59:59' );
+
+				if ( $today->format( 'l' ) !== $end_of_week ) {
+					$today->modify( sprintf( 'next %s 23:59:59', $end_of_week ) );
+				}
+
+				$before = $today->getTimestamp();
+				$after  = time();
+				break;
+			case 'this_month':
+				$today->modify( 'last day of this month 23:59:59' );
+				$before = $today->getTimestamp();
+				$after  = time();
+				break;
+			case 'this_year':
+				$today->modify( 'last day of December this year 23:59:59' );
+				$before = $today->getTimestamp();
+				$after  = time();
 				break;
 			case '24_hours':
 				$after  = time();

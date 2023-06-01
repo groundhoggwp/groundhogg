@@ -1,4 +1,4 @@
-( function ($) {
+(function ($) {
 
   const {
     input,
@@ -25,7 +25,12 @@
     userMetaPicker,
   } = Groundhogg.pickers
 
-  const { broadcasts: BroadcastsStore, emails: EmailsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
+  const {
+    broadcasts: BroadcastsStore,
+    emails: EmailsStore,
+    tags: TagsStore,
+    funnels: FunnelsStore,
+  } = Groundhogg.stores
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -39,7 +44,12 @@
     groups: {},
   }
 
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
 
   const renderFilterBroken = (filter, filterGroupIndex, filterIndex) => {
 
@@ -49,12 +59,14 @@
 
     //language=HTML
     return `
-        <div class="filter filter-view filter-broken" data-key="${ filterIndex }"
-             data-group="${ filterGroupIndex }" tabindex="0">
-            <span class="text">${ sprintf(__('This %s filter is corrupted', 'groundhogg'),
-                    bold(Filters.types[filter.type].name)) }</span>
-            <button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
-        </div>`
+		<div class="filter filter-view filter-broken" data-key="${filterIndex}"
+		     data-group="${filterGroupIndex}" tabindex="0">
+			<span class="text">${sprintf(
+				__('This %s filter is corrupted', 'groundhogg'),
+				bold(Filters.types[filter.type].name))}</span>
+			<button class="delete-filter"><span
+				class="dashicons dashicons-no-alt"></span></button>
+		</div>`
   }
 
   const renderFilterView = (filter, filterGroupIndex, filterIndex) => {
@@ -65,11 +77,14 @@
 
     //language=HTML
     return `
-        <div class="filter filter-view" data-key="${ filterIndex }" data-group="${ filterGroupIndex }"
-             tabindex="0">
-            <span class="text">${ Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex) }</span>
-            <button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
-        </div>`
+		<div class="filter filter-view" data-key="${filterIndex}"
+		     data-group="${filterGroupIndex}"
+		     tabindex="0">
+			<span class="text">${Filters.types[filter.type].view(filter,
+				filterGroupIndex, filterIndex)}</span>
+			<button class="delete-filter"><span
+				class="dashicons dashicons-no-alt"></span></button>
+		</div>`
   }
 
   const renderFilterEdit = (filter, filterGroupIndex, filterIndex) => {
@@ -80,21 +95,26 @@
 
     //language=HTML
     return `
-        <div class="filter filter-edit-wrap" data-key="${ filterIndex }" data-group="${ filterGroupIndex }">
-            <div class="filter-edit" tabindex="0">
-                <div class="header">
-                    <b>${ Filters.types[filter.type].name }</b>
-                    <button class="close-edit"><span class="dashicons dashicons-no-alt"></span></button>
-                </div>
-                <div class="settings">
-                    ${ Filters.types[filter.type].edit(filter, filterGroupIndex, filterIndex) }
-                </div>
-                <div class="actions">
-                    <button class="delete"><span class="dashicons dashicons-trash"></span></button>
-                    <button class="commit"><span class="dashicons dashicons-yes"></span></button>
-                </div>
-            </div>
-        </div>`
+		<div class="filter filter-edit-wrap" data-key="${filterIndex}"
+		     data-group="${filterGroupIndex}">
+			<div class="filter-edit" tabindex="0">
+				<div class="header">
+					<b>${Filters.types[filter.type].name}</b>
+					<button class="close-edit"><span
+						class="dashicons dashicons-no-alt"></span></button>
+				</div>
+				<div class="settings">
+					${Filters.types[filter.type].edit(filter, filterGroupIndex,
+						filterIndex)}
+				</div>
+				<div class="actions">
+					<button class="delete"><span
+						class="dashicons dashicons-trash"></span></button>
+					<button class="commit"><span
+						class="dashicons dashicons-yes"></span></button>
+				</div>
+			</div>
+		</div>`
   }
 
   const registerFilterGroup = (group, name) => {
@@ -141,9 +161,11 @@
     does_not_start_with: _x('Does not start with', 'comparison', 'groundhogg'),
     does_not_end_with: _x('Does not end with', 'comparison', 'groundhogg'),
     less_than: _x('Less than', 'comparison', 'groundhogg'),
-    less_than_or_equal_to: _x('Less than or equal to', 'comparison', 'groundhogg'),
+    less_than_or_equal_to: _x('Less than or equal to', 'comparison',
+      'groundhogg'),
     greater_than: _x('Greater than', 'comparison', 'groundhogg'),
-    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison', 'groundhogg'),
+    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison',
+      'groundhogg'),
     empty: _x('Is empty', 'comparison', 'groundhogg'),
     not_empty: _x('Is not empty', 'comparison', 'groundhogg'),
   }
@@ -165,47 +187,78 @@
     equals: _x('Equals', 'comparison', 'groundhogg'),
     not_equals: _x('Not equals', 'comparison', 'groundhogg'),
     less_than: _x('Less than', 'comparison', 'groundhogg'),
-    less_than_or_equal_to: _x('Less than or equal to', 'comparison', 'groundhogg'),
+    less_than_or_equal_to: _x('Less than or equal to', 'comparison',
+      'groundhogg'),
     greater_than: _x('Greater than', 'comparison', 'groundhogg'),
-    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison', 'groundhogg'),
+    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison',
+      'groundhogg'),
   }
 
   const ComparisonsTitleGenerators = {
-    equals: (k, v) => sprintf(_x('%1$s equals %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+    equals: (k, v) => sprintf(
+      _x('%1$s equals %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     not_equals: (k, v) => sprintf(
-      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    contains: (k, v) => sprintf(_x('%1$s contains %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k,
+      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    contains: (k, v) => sprintf(
+      _x('%1$s contains %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k,
       v),
     not_contains: (k, v) => sprintf(
-      _x('%1$s does not contain %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not contain %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     starts_with: (k, v) => sprintf(
-      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    ends_with: (k, v) => sprintf(_x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k,
+      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    ends_with: (k, v) => sprintf(
+      _x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k,
       v),
     does_not_start_with: (k, v) => sprintf(
-      _x('%1$s does not start with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not start with %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     does_not_end_with: (k, v) => sprintf(
-      _x('%1$s does not end with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    less_than: (k, v) => sprintf(_x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'),
+      _x('%1$s does not end with %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+    less_than: (k, v) => sprintf(
+      _x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'),
       k, v),
     less_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is less than or equal to %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is less than or equal to %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     greater_than: (k, v) => sprintf(
-      _x('%1$s is greater than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is greater than %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     greater_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is greater than or equal to %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    in: (k, v) => sprintf(_x('%1$s is %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    not_in: (k, v) => sprintf(_x('%1$s is not %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    empty: (k, v) => sprintf(_x('%1$s is empty', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    not_empty: (k, v) => sprintf(_x('%1$s is not empty', '%1 is a key and %2 is user defined value', 'groundhogg'), k,
+      _x('%1$s is greater than or equal to %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+    in: (k, v) => sprintf(
+      _x('%1$s is %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    not_in: (k, v) => sprintf(
+      _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    empty: (k, v) => sprintf(
+      _x('%1$s is empty', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    not_empty: (k, v) => sprintf(
+      _x('%1$s is not empty', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k,
       v),
-    includes: (k, v) => sprintf(_x('%1$s includes %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k,
+    includes: (k, v) => sprintf(
+      _x('%1$s includes %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k,
       v),
-    excludes: (k, v) => sprintf(_x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k,
+    excludes: (k, v) => sprintf(
+      _x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k,
       v),
   }
 
-  const createFilters = (el = '', filters = [], onChange = (f) => {console.log(f)}) => ( {
+  const createFilters = (
+    el = '', filters = [], onChange = (f) => {console.log(f)}) => ({
     onChange,
     filters: Array.isArray(filters) ? filters : [],
     el,
@@ -225,45 +278,51 @@
         const filters = []
         filterGroup.forEach((filter, k) => {
           try {
-            filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(
-              this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
-          }
-          catch (e) {
+            filters.push(self.currentGroup === j && self.currentFilter === k
+              ? renderFilterEdit(
+                this.usingTempFilters ? this.tempFilterSettings : filter, j, k)
+              : renderFilterView(filter, j, k))
+          } catch (e) {
             filters.push(renderFilterBroken(filter, j, k))
             console.log(e)
           }
         })
         filters.push(
-          self.isAddingFilterToGroup === j ? `<div class="add-filter-wrap"></div>` : `<button data-group="${ j }" class="add-filter">
+          self.isAddingFilterToGroup === j
+            ? `<div class="add-filter-wrap"></div>`
+            : `<button data-group="${j}" class="add-filter">
 				  <span class="dashicons dashicons-plus-alt2"></span>
 			  </button>`)
         groups.push(filters.join(''))
       })
 
-      const separator = `<div class="or-separator"><span class="or-circle">${ _x('Or...', 'search filters separator',
-        'groundhogg') }</span></div>`
+      const separator = `<div class="or-separator"><span class="or-circle">${_x(
+        'Or...', 'search filters separator',
+        'groundhogg')}</span></div>`
 
       //language=HTML
       return `
-          <div id="search-filters-editor">
-              ${ groups.length > 0 ? `${ groups.map(
-                      (group, i) => `<div class="group" data-key="${ i }">${ group }</div>`).join(separator) }
-			  ${ separator }` : '' }
-              <div class="group" data-group="${ groups.length }">
-                  ${ self.isAddingFilterToGroup === groups.length
-                          ? `<div class="add-filter-wrap"></div>`
-                          : `<button data-group="${ groups.length }" class="add-filter">
+		  <div id="search-filters-editor">
+			  ${groups.length > 0 ? `${groups.map(
+				  (
+					  group,
+					  i) => `<div class="group" data-key="${i}">${group}</div>`).
+			  join(separator)}
+			  ${separator}` : ''}
+			  <div class="group" data-group="${groups.length}">
+				  ${self.isAddingFilterToGroup === groups.length
+					  ? `<div class="add-filter-wrap"></div>`
+					  : `<button data-group="${groups.length}" class="add-filter">
 				  <span class="dashicons dashicons-plus-alt2"></span>
-			  </button>` }
-              </div>
-          </div>`
+			  </button>`}
+			  </div>
+		  </div>`
     },
 
     init () {
       if (this.initFlag) {
         this.mount()
-      }
-      else {
+      } else {
         this.initFlag = true
         this.preload()
       }
@@ -334,8 +393,9 @@
       }
 
       $(el).
-        html(`<p><span id="search-loading-dots-pill">${ _x('Loading', 'as in waiting for the page to load',
-          'groundhogg') }<span id="search-loading-dots"></span></span></p>`)
+      html(`<p><span id="search-loading-dots-pill">${_x('Loading',
+        'as in waiting for the page to load',
+        'groundhogg')}<span id="search-loading-dots"></span></span></p>`)
 
       const { stop: stopDots } = loadingDots('#search-loading-dots')
 
@@ -388,8 +448,7 @@
         if (self.filters.length === 0) {
           group = 0
           self.filters.push([])
-        }
-        else if (!self.filters[group]) {
+        } else if (!self.filters[group]) {
           self.filters.push([])
           group = self.filters.length - 1
         }
@@ -514,11 +573,9 @@
 
           if (clickedOnEditClose) {
             setActiveFilter(false, false)
-          }
-          else if (clickedOnCommitChanges) {
+          } else if (clickedOnCommitChanges) {
             commitFilter()
-          }
-          else if (clickedOnDeleteFilter) {
+          } else if (clickedOnDeleteFilter) {
             deleteFilter()
           }
         })
@@ -527,13 +584,14 @@
       if (this.currentGroup !== false && this.currentFilter !== false) {
 
         if (!this.usingTempFilters) {
-          this.tempFilterSettings = getFilterSettings(this.currentGroup, this.currentFilter)
+          this.tempFilterSettings = getFilterSettings(this.currentGroup,
+            this.currentFilter)
         }
 
         mountFilterEdit()
       }
 
-      $(`${ el } .filter-view`).on('keydown', function (e) {
+      $(`${el} .filter-view`).on('keydown', function (e) {
 
         switch (e.key) {
           case 'Enter':
@@ -543,26 +601,27 @@
         }
       })
 
-      tooltip(`${ el } .add-filter`, {
+      tooltip(`${el} .add-filter`, {
         content: __('Add a filter', 'groundhogg'),
         position: 'right',
       })
 
-      $(`${ el } #search-filters-editor`).on('click', function (e) {
+      $(`${el} #search-filters-editor`).on('click', function (e) {
 
         // console.log(e)
 
         const clickedOnAddFilter = clickInsideElement(e, 'button.add-filter')
-        const clickedOnAddFilterSearch = clickInsideElement(e, 'div.add-filter-wrap')
+        const clickedOnAddFilterSearch = clickInsideElement(e,
+          'div.add-filter-wrap')
         const clickedOnFilterView = clickInsideElement(e, '.filter.filter-view')
         const clickedOnFilterEdit = clickInsideElement(e, '.filter-edit')
 
         if (clickedOnAddFilter) {
 
-          setActiveFilter(false, false, parseInt(clickedOnAddFilter.dataset.group))
+          setActiveFilter(false, false,
+            parseInt(clickedOnAddFilter.dataset.group))
 
-        }
-        else if (clickedOnFilterView) {
+        } else if (clickedOnFilterView) {
 
           const clickedOnFilterDelete = clickInsideElement(e, '.delete-filter')
 
@@ -571,26 +630,22 @@
 
           if (clickedOnFilterDelete) {
             deleteFilter(group, filter)
-          }
-          else {
+          } else {
             setActiveFilter(group, filter)
           }
 
-        }
-        else if (clickedOnFilterEdit) {
+        } else if (clickedOnFilterEdit) {
 
-        }
-        else if (clickedOnAddFilterSearch) {
+        } else if (clickedOnAddFilterSearch) {
 
-        }
-        else {
+        } else {
           // setActiveFilter(false, false)
         }
 
       })
 
-      $(`${ el } .group`).sortable({
-        connectWith: `${ el } .group`,
+      $(`${el} .group`).sortable({
+        connectWith: `${el} .group`,
         placeholder: 'filter-placeholder',
         cancel: '.add-filter, .add-filter-wrap, .filter-edit-wrap',
         start: (e, ui) => {
@@ -614,11 +669,14 @@
         update: (e, ui) => {},
       }).disableSelection()
     },
-  } )
+  })
 
   const pastDateRanges = {
     'any': __('At any time', 'groundhogg'),
     'today': __('Today', 'groundhogg'),
+    'this_week': __('This week', 'groundhogg'),
+    'this_month': __('This month', 'groundhogg'),
+    'this_year': __('This year', 'groundhogg'),
     '24_hours': __('In the last 24 hours', 'groundhogg'),
     '7_days': __('In the last 7 days', 'groundhogg'),
     '30_days': __('In the last 30 days', 'groundhogg'),
@@ -633,6 +691,9 @@
   const futureDateRanges = {
     'any': __('At any time', 'groundhogg'),
     'today': __('Today', 'groundhogg'),
+    'this_week': __('This week', 'groundhogg'),
+    'this_month': __('This month', 'groundhogg'),
+    'this_year': __('This year', 'groundhogg'),
     '24_hours': __('In the next 24 hours', 'groundhogg'),
     '7_days': __('In the next 7 days', 'groundhogg'),
     '30_days': __('In the next 30 days', 'groundhogg'),
@@ -645,7 +706,8 @@
   }
 
   const standardActivityDateFilterOnMount = (filter, updateFilter) => {
-    $('#filter-date-range, #filter-before, #filter-after').on('change', function (e) {
+    $('#filter-date-range, #filter-before, #filter-after').
+    on('change', function (e) {
       const $el = $(this)
       updateFilter({
         [$el.prop('name')]: $el.val(),
@@ -678,47 +740,63 @@
     })
   }
 
-  const standardActivityDateTitle = (prepend, { date_range, before, after, future = false }) => {
+  const standardActivityDateTitle = (
+    prepend, { date_range, before, after, future = false }) => {
 
     let ranges = future ? futureDateRanges : pastDateRanges
 
     switch (date_range) {
       default:
-        return `${ prepend } ${ ranges[date_range] ? ranges[date_range].toLowerCase() : '' }`
+        return `${prepend} ${ranges[date_range]
+          ? ranges[date_range].toLowerCase()
+          : ''}`
       case 'between':
-        return `${ prepend } ${ sprintf(_x('between %1$s and %2$s', 'where %1 and %2 are dates', 'groundhogg'),
-          `<b>${ formatDate(after) }</b>`, `<b>${ formatDate(before) }</b>`) }`
+        return `${prepend} ${sprintf(
+          _x('between %1$s and %2$s', 'where %1 and %2 are dates',
+            'groundhogg'),
+          `<b>${formatDate(after)}</b>`, `<b>${formatDate(before)}</b>`)}`
       case 'before':
-        return `${ prepend } ${ sprintf(_x('before %s', '%s is a date', 'groundhogg'),
-          `<b>${ formatDate(before) }</b>`) }`
+        return `${prepend} ${sprintf(
+          _x('before %s', '%s is a date', 'groundhogg'),
+          `<b>${formatDate(before)}</b>`)}`
       case 'after':
-        return `${ prepend } ${ sprintf(_x('after %s', '%s is a date', 'groundhogg'),
-          `<b>${ formatDate(after) }</b>`) }`
+        return `${prepend} ${sprintf(
+          _x('after %s', '%s is a date', 'groundhogg'),
+          `<b>${formatDate(after)}</b>`)}`
     }
   }
 
-  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future = false }) => {
+  const standardActivityDateOptions = ({
+    date_range = '24_hours',
+    after = '',
+    before = '',
+    future = false,
+  }) => {
 
-    return ` ${ select({
+    return ` ${select({
       id: 'filter-date-range',
       name: 'date_range',
-    }, future ? futureDateRanges : pastDateRanges, date_range) }
+    }, future ? futureDateRanges : pastDateRanges, date_range)}
 
-		  ${ input({
+		  ${input({
       type: 'date',
       value: after.split(' ')[0],
       id: 'filter-after',
-      className: `date ${ ['between', 'after'].includes(date_range) ? '' : 'hidden' }`,
+      className: `date ${['between', 'after'].includes(date_range)
+        ? ''
+        : 'hidden'}`,
       name: 'after',
-    }) }
+    })}
 
-		  ${ input({
+		  ${input({
       type: 'date',
       value: before.split(' ')[0],
       id: 'filter-before',
-      className: `value ${ ['between', 'before'].includes(date_range) ? '' : 'hidden' }`,
+      className: `value ${['between', 'before'].includes(date_range)
+        ? ''
+        : 'hidden'}`,
       name: 'before',
-    }) }`
+    })}`
   }
 
   const standardActivityDateDefaults = {
@@ -741,32 +819,31 @@
     greater_than_or_equal_to: _x('At least', 'comparison', 'groundhogg'),
   }
 
-
   const filterCount = ({ count, count_compare }) => {
     //language=HTML
     return `
-        <div class="space-between" style="gap: 10px">
-            <div class="gh-input-group">
-                ${ select({
-                    id: 'filter-count-compare',
-                    name: 'count_compare',
-                }, activityFilterComparisons, count_compare) }
-                ${ input({
-                    type: 'number',
-                    id: 'filter-count',
-                    name: 'count',
-                    autocomplete: 'off',
-                    value: count,
-                    placeholder: 1,
-                    style: {
-                        width: '100px',
-                    },
-                }) }
-            </div>
-            <span class="gh-text">
-			  ${ __('Times') }
+		<div class="space-between" style="gap: 10px">
+			<div class="gh-input-group">
+				${select({
+					id: 'filter-count-compare',
+					name: 'count_compare',
+				}, activityFilterComparisons, count_compare)}
+				${input({
+					type: 'number',
+					id: 'filter-count',
+					name: 'count',
+					autocomplete: 'off',
+					value: count,
+					placeholder: 1,
+					style: {
+						width: '100px',
+					},
+				})}
+			</div>
+			<span class="gh-text">
+			  ${__('Times')}
           </span>
-        </div>`
+		</div>`
   }
 
   const filterCountOnMount = (updateFilter) => {
@@ -778,11 +855,19 @@
   }
 
   const filterCountComparisons = {
-    equals: (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'), v),
-    less_than: (v) => sprintf(_n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'), v),
-    less_than_or_equal_to: (v) => sprintf(_n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
-    greater_than: (v) => sprintf(_n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'), v),
-    greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'), v),
+    equals: (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'),
+      v),
+    less_than: (v) => sprintf(
+      _n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'),
+      v),
+    less_than_or_equal_to: (v) => sprintf(
+      _n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
+    greater_than: (v) => sprintf(
+      _n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'),
+      v),
+    greater_than_or_equal_to: (v) => sprintf(
+      _n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'),
+      v),
   }
 
   const filterCountTitle = (title, { count = 1, count_compare = 'equals' }) => {
@@ -790,21 +875,22 @@
   }
 
 //  REGISTER ALL FILTERS HERE
-  const BasicTextFilter = (name) => ( {
+  const BasicTextFilter = (name) => ({
     name,
     view ({ compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ name }</b>`, `<b>"${ value }"</b>`)
+      return ComparisonsTitleGenerators[compare](`<b>${name}</b>`,
+        `<b>"${value}"</b>`)
     },
     edit ({ compare, value }) {
       // language=html
-      return `${ select({
-          id: 'filter-compare',
-          name: 'compare',
-      }, StringComparisons, compare) } ${ input({
-          id: 'filter-value',
-          name: 'value',
-          value,
-      }) }`
+      return `${select({
+		  id: 'filter-compare',
+		  name: 'compare',
+	  }, StringComparisons, compare)} ${input({
+		  id: 'filter-value',
+		  name: 'value',
+		  value,
+	  })}`
     },
     onMount (filter, updateFilter) {
       // console.log(filter)
@@ -821,12 +907,16 @@
       compare: 'equals',
       value: '',
     },
-  } )
+  })
 
-  registerFilterGroup('contact', _x('Contact', 'noun referring to a person in the crm', 'groundhogg'))
-  registerFilterGroup('location', _x('Contact Location', 'contact is a noun referring to a person', 'groundhogg'))
+  registerFilterGroup('contact',
+    _x('Contact', 'noun referring to a person in the crm', 'groundhogg'))
+  registerFilterGroup('location',
+    _x('Contact Location', 'contact is a noun referring to a person',
+      'groundhogg'))
   registerFilterGroup('user', __('User'))
-  registerFilterGroup('activity', _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
+  registerFilterGroup('activity',
+    _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
 
   registerFilter('first_name', 'contact', {
     ...BasicTextFilter(__('First Name', 'groundhogg')),
@@ -849,27 +939,29 @@
   registerFilter('phone', 'contact', {
     name: __('Phone Number', 'groundhogg'),
     view ({ phone_type = 'primary', compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ phoneTypes[phone_type] }</b>`, `<b>"${ value }"</b>`)
+      return ComparisonsTitleGenerators[compare](
+        `<b>${phoneTypes[phone_type]}</b>`, `<b>"${value}"</b>`)
     },
     edit ({ phone_type, compare, value }) {
       // language=html
-      return `${ select({
-          id: 'filter-phone-type',
-          name: 'phone_type',
-      }, phoneTypes, phone_type) }
-      ${ select({
-          id: 'filter-compare',
-          name: 'compare',
-      }, StringComparisons, compare) } ${ input({
-          id: 'filter-value',
-          name: 'value',
-          value,
-      }) }`
+      return `${select({
+		  id: 'filter-phone-type',
+		  name: 'phone_type',
+	  }, phoneTypes, phone_type)}
+	  ${select({
+		  id: 'filter-compare',
+		  name: 'compare',
+	  }, StringComparisons, compare)} ${input({
+		  id: 'filter-value',
+		  name: 'value',
+		  value,
+	  })}`
     },
     onMount (filter, updateFilter) {
       // console.log(filter)
 
-      $('#filter-phone-type, #filter-compare, #filter-value').on('change', function (e) {
+      $('#filter-phone-type, #filter-compare, #filter-value').
+      on('change', function (e) {
         // console.log(e)
         const $el = $(this)
         updateFilter({
@@ -926,30 +1018,32 @@
   registerFilter('optin_status', 'contact', __('Opt-in Status', 'groundhogg'), {
     view ({ compare, value }) {
       const func = compare === 'in' ? orList : andList
-      return ComparisonsTitleGenerators[compare](`<b>${ __('Opt-in Status', 'groundhogg') }</b>`,
-        func(value.map(v => `<b>${ optin_status[v] }</b>`)))
+      return ComparisonsTitleGenerators[compare](
+        `<b>${__('Opt-in Status', 'groundhogg')}</b>`,
+        func(value.map(v => `<b>${optin_status[v]}</b>`)))
     },
     edit ({ compare, value }) {
 
       // language=html
       return `
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-              class: '',
-          }, {
-              in: _x('Is one of', 'comparison, groundhogg'),
-              not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-          }, compare) }
-          ${ select({
-                      id: 'filter-value',
-                      name: 'value',
-                      class: 'gh-select2',
-                      multiple: true,
-                  },
-                  Object.keys(optin_status).map(k => ( { value: k, text: optin_status[k] } )),
-                  value,
-          ) } `
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  class: '',
+		  }, {
+			  in: _x('Is one of', 'comparison, groundhogg'),
+			  not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+		  }, compare)}
+		  ${select({
+				  id: 'filter-value',
+				  name: 'value',
+				  class: 'gh-select2',
+				  multiple: true,
+			  },
+			  Object.keys(optin_status).
+			  map(k => ({ value: k, text: optin_status[k] })),
+			  value,
+		  )} `
     },
     onMount (filter, updateFilter) {
       $('#filter-value').select2()
@@ -969,19 +1063,20 @@
 
   registerFilter('is_marketable', 'contact', __('Marketable', 'groundhogg'), {
     view ({ marketable }) {
-      return marketable === 'yes' ? __('Is marketable', 'groundhogg') : __('Is not marketable', 'groundhogg')
+      return marketable === 'yes' ? __('Is marketable', 'groundhogg') : __(
+        'Is not marketable', 'groundhogg')
     },
     edit ({ marketable }) {
 
       // language=html
       return `
-          ${ select({
-              id: 'filter-marketable',
-              name: 'marketable',
-          }, {
-              yes: _x('Yes', 'comparison, groundhogg'),
-              no: _x('No', 'comparison', 'groundhogg'),
-          }, marketable) }`
+		  ${select({
+			  id: 'filter-marketable',
+			  name: 'marketable',
+		  }, {
+			  yes: _x('Yes', 'comparison, groundhogg'),
+			  no: _x('No', 'comparison', 'groundhogg'),
+		  }, marketable)}`
     },
     onMount (filter, updateFilter) {
       $('#filter-marketable').on('change', function (e) {
@@ -998,7 +1093,7 @@
   })
 
   const userDisplay = (user) => {
-    return `${ user.data.display_name } (${ user.data.user_email })`
+    return `${user.data.display_name} (${user.data.user_email})`
   }
 
   registerFilter('owner', 'contact', __('Owner', 'groundhogg'), {
@@ -1010,30 +1105,31 @@
       }
 
       const func = compare === 'in' ? orList : andList
-      return ComparisonsTitleGenerators[compare](`<b>${ __('Contact Owner', 'groundhogg') }</b>`,
-        func(value.map(v => `<b>${ ownerName(v) }</b>`)))
+      return ComparisonsTitleGenerators[compare](
+        `<b>${__('Contact Owner', 'groundhogg')}</b>`,
+        func(value.map(v => `<b>${ownerName(v)}</b>`)))
 
     },
     edit ({ compare, value }) {
 
       // language=html
       return `
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-          }, {
-              in: _x('Is one of', 'comparison, groundhogg'),
-              not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-          }, compare) }
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+		  }, {
+			  in: _x('Is one of', 'comparison, groundhogg'),
+			  not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+		  }, compare)}
 
-          ${ select({
-                      id: 'filter-value',
-                      name: 'value',
-                      multiple: true,
-                  },
-                  owners.map(u => ( { value: u.ID, text: userDisplay(u) } )),
-                  value.map(id => parseInt(id)),
-          ) } `
+		  ${select({
+				  id: 'filter-value',
+				  name: 'value',
+				  multiple: true,
+			  },
+			  owners.map(u => ({ value: u.ID, text: userDisplay(u) })),
+			  value.map(id => parseInt(id)),
+		  )} `
 
     },
     onMount (filter, updateFilter) {
@@ -1054,124 +1150,128 @@
     },
   })
 
-  registerFilter('tags', 'contact', _x('Tags', 'noun referring to contact segments', 'groundhogg'), {
-    view ({ tags = [], compare, compare2 }) {
+  registerFilter('tags', 'contact',
+    _x('Tags', 'noun referring to contact segments', 'groundhogg'), {
+      view ({ tags = [], compare, compare2 }) {
 
-      if (!tags) {
-        return 'tags'
-      }
+        if (!tags) {
+          return 'tags'
+        }
 
-      tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
+        tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
 
-      const tagNames = tags.map(t =>
-        `<b>${ t.data.tag_name }</b>`)
-      const func = compare2 === 'any' ? orList : andList
+        const tagNames = tags.map(t =>
+          `<b>${t.data.tag_name}</b>`)
+        const func = compare2 === 'any' ? orList : andList
 
-      return ComparisonsTitleGenerators[compare](
-        `<b>${ _x('Tags', 'noun referring to contact segments', 'groundhogg') }</b>`, func(tagNames))
-    },
-    edit ({ tags, compare, compare2 }) {
+        return ComparisonsTitleGenerators[compare](
+          `<b>${_x('Tags', 'noun referring to contact segments',
+            'groundhogg')}</b>`, func(tagNames))
+      },
+      edit ({ tags, compare, compare2 }) {
 
-      tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
+        tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
 
-      // language=html
-      return `${ select({
-          id: 'filter-compare',
-          name: 'compare',
-      }, {
-          includes: _x('Includes', 'comparison', 'groundhogg'),
-          excludes: _x('Excludes', 'comparison', 'groundhogg'),
-      }, compare) }
+        // language=html
+        return `${select({
+			id: 'filter-compare',
+			name: 'compare',
+		}, {
+			includes: _x('Includes', 'comparison', 'groundhogg'),
+			excludes: _x('Excludes', 'comparison', 'groundhogg'),
+		}, compare)}
 
-      ${ select({
-          id: 'filter-compare2',
-          name: 'compare2',
-      }, {
-          any: __('Any', 'groundhogg'),
-          all: __('All', 'groundhogg'),
-      }, compare2)
-      }
+		${select({
+			id: 'filter-compare2',
+			name: 'compare2',
+		}, {
+			any: __('Any', 'groundhogg'),
+			all: __('All', 'groundhogg'),
+		}, compare2)
+		}
 
-      ${ select({
-                  id: 'filter-tags',
-                  name: 'tags',
-                  className: 'tag-picker',
-                  multiple: true,
-              }
-              ,
-              tags.map(t => ( {
-                  value: t.ID,
-                  text: t.data.tag_name,
-              } )), tags.map(t => t.ID),
-      ) }`
-    },
-    onMount (filter, updateFilter) {
+		${select({
+				id: 'filter-tags',
+				name: 'tags',
+				className: 'tag-picker',
+				multiple: true,
+			}
+			,
+			tags.map(t => ({
+				value: t.ID,
+				text: t.data.tag_name,
+			})), tags.map(t => t.ID),
+		)}`
+      },
+      onMount (filter, updateFilter) {
 
-      tagPicker('#filter-tags', true, (items) => {
-        TagsStore.itemsFetched(items)
-      }, {
-        tags: false,
-      }).on('change', (e) => {
-        updateFilter({
-          tags: $(e.target).val(),
+        tagPicker('#filter-tags', true, (items) => {
+          TagsStore.itemsFetched(items)
+        }, {
+          tags: false,
+        }).on('change', (e) => {
+          updateFilter({
+            tags: $(e.target).val(),
+          })
         })
-      })
 
-      $('#filter-compare, #filter-compare2').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val(),
+        $('#filter-compare, #filter-compare2').on('change', function (e) {
+          const $el = $(this)
+          updateFilter({
+            [$el.prop('name')]: $el.val(),
+          })
         })
-      })
-    },
-    defaults: {
-      compare: 'includes',
-      compare2: 'any',
-      tags: [],
-    },
-    preload: ({ tags }) => {
+      },
+      defaults: {
+        compare: 'includes',
+        compare2: 'any',
+        tags: [],
+      },
+      preload: ({ tags }) => {
 
-      if (!TagsStore.hasItems(tags)) {
-        return TagsStore.fetchItems({
-          tag_id: tags,
-        })
-      }
-    },
-  })
+        if (!TagsStore.hasItems(tags)) {
+          return TagsStore.fetchItems({
+            tag_id: tags,
+          })
+        }
+      },
+    })
 
   registerFilter('meta', 'contact', __('Custom meta', 'groundhogg'), {
     view ({ meta, compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`, `<b>"${ value }"</b>`)
+      return ComparisonsTitleGenerators[compare](`<b>${meta}</b>`,
+        `<b>"${value}"</b>`)
     },
     edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
       // language=html
       return `
-          ${ input({
-              id: 'filter-meta',
-              name: 'meta',
-              className: 'meta-picker',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value: meta,
-          }) }
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-          }, AllComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value,
-          }) }`
+		  ${input({
+			  id: 'filter-meta',
+			  name: 'meta',
+			  className: 'meta-picker',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value: meta,
+		  })}
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+		  }, AllComparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value,
+		  })}`
     },
     onMount (filter, updateFilter) {
 
       metaPicker('#filter-meta')
 
-      $('#filter-compare, #filter-value, #filter-meta').on('change blur', function (e) {
+      $('#filter-compare, #filter-value, #filter-meta').
+      on('change blur', function (e) {
         const $el = $(this)
         const { compare } = updateFilter({
           [$el.prop('name')]: $el.val(),
@@ -1187,21 +1287,22 @@
 
   registerFilter('contact_id', 'contact', __('Contact ID', 'groundhogg'), {
     view ({ compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ __('Contact ID') }</b>`, `<b>${ value }</b>`)
+      return ComparisonsTitleGenerators[compare](`<b>${__('Contact ID')}</b>`,
+        `<b>${value}</b>`)
     },
     edit ({ compare, value }) {
       // language=html
       return `
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-          }, NumericComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              type: 'number',
-              step: '0.01',
-              value,
-          }) }`
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+		  }, NumericComparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  type: 'number',
+			  step: '0.01',
+			  value,
+		  })}`
     },
     onMount (filter, updateFilter) {
 
@@ -1232,15 +1333,17 @@
 
   registerFilter('user_role_is', 'user', __('User Role', 'groundhogg'), {
     view ({ role = 'subscriber' }) {
-      return sprintf(__('User role is %s', 'groundhogg'), bold(role ? roles[role].name : ''))
+      return sprintf(__('User role is %s', 'groundhogg'),
+        bold(role ? roles[role].name : ''))
     },
     edit ({ role }) {
 
       // language=html
-      return `${ select({
-        id: 'filter-role',
-        name: 'role',
-      }, Object.keys(roles).map(r => ( { text: roles[r].name, value: r } )), role) }`
+      return `${select({
+          id: 'filter-role',
+          name: 'role',
+        }, Object.keys(roles).map(r => ({ text: roles[r].name, value: r })),
+        role)}`
     },
     onMount (filter, updateFilter) {
 
@@ -1260,37 +1363,39 @@
 
   registerFilter('user_meta', 'user', __('User Meta', 'groundhogg'), {
     view ({ meta, compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`, `<b>"${ value }"</b>`)
+      return ComparisonsTitleGenerators[compare](`<b>${meta}</b>`,
+        `<b>"${value}"</b>`)
     },
     edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
       // language=html
       return `
-          ${ input({
-              id: 'filter-meta',
-              name: 'meta',
-              className: 'meta-picker',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value: meta,
-          }) }
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-          }, AllComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value,
-          }) }`
+		  ${input({
+			  id: 'filter-meta',
+			  name: 'meta',
+			  className: 'meta-picker',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value: meta,
+		  })}
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+		  }, AllComparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value,
+		  })}`
     },
     onMount (filter, updateFilter) {
 
       userMetaPicker('#filter-meta')
 
-      $('#filter-compare, #filter-value, #filter-meta').on('change blur', function (e) {
+      $('#filter-compare, #filter-value, #filter-meta').
+      on('change blur', function (e) {
         const $el = $(this)
         const { compare } = updateFilter({
           [$el.prop('name')]: $el.val(),
@@ -1306,21 +1411,22 @@
 
   registerFilter('user_id', 'user', __('User ID', 'groundhogg'), {
     view ({ compare, value }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ __('User ID') }</b>`, `<b>${ value }</b>`)
+      return ComparisonsTitleGenerators[compare](`<b>${__('User ID')}</b>`,
+        `<b>${value}</b>`)
     },
     edit ({ compare, value }) {
       // language=html
       return `
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-          }, NumericComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              type: 'number',
-              step: '0.01',
-              value,
-          }) }`
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+		  }, NumericComparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  type: 'number',
+			  step: '0.01',
+			  value,
+		  })}`
     },
     onMount (filter, updateFilter) {
 
@@ -1339,15 +1445,16 @@
 
   registerFilter('country', 'location', __('Country', 'groundhogg'), {
     view ({ country }) {
-      return sprintf(__('Country is %s', 'groundhogg'), bold(countries[country]))
+      return sprintf(__('Country is %s', 'groundhogg'),
+        bold(countries[country]))
     },
     edit ({ country }) {
       // language=html
       return `
-          ${ select({
-              id: 'filter-country',
-              name: 'country',
-          }, countries, country) }`
+		  ${select({
+			  id: 'filter-country',
+			  name: 'country',
+		  }, countries, country)}`
     },
     onMount (filter, updateFilter) {
 
@@ -1370,17 +1477,18 @@
     edit ({ region }) {
       // language=html
       return `
-          ${ input({
-              id: 'filter-region',
-              name: 'region',
-              value: region,
-              autocomplete: 'off',
-              placeholder: __('Start typing to select a region', 'groundhogg'),
-          }) }`
+		  ${input({
+			  id: 'filter-region',
+			  name: 'region',
+			  value: region,
+			  autocomplete: 'off',
+			  placeholder: __('Start typing to select a region', 'groundhogg'),
+		  })}`
     },
     onMount (filter, updateFilter) {
 
-      metaValuePicker('#filter-region', 'region').on('change blur', function (e) {
+      metaValuePicker('#filter-region', 'region').
+      on('change blur', function (e) {
         updateFilter({
           region: $(e.target).val(),
         })
@@ -1398,13 +1506,13 @@
     edit ({ city }) {
       // language=html
       return `
-          ${ input({
-              id: 'filter-city',
-              name: 'city',
-              value: city,
-              autocomplete: 'off',
-              placeholder: __('Start typing to select a city', 'groundhogg'),
-          }) }`
+		  ${input({
+			  id: 'filter-city',
+			  name: 'city',
+			  value: city,
+			  autocomplete: 'off',
+			  placeholder: __('Start typing to select a city', 'groundhogg'),
+		  })}`
     },
     onMount (filter, updateFilter) {
 
@@ -1419,78 +1527,88 @@
     },
   })
 
-  registerFilter('street_address_1', 'location', __('Street Address 1', 'groundhogg'), {
-    ...BasicTextFilter(__('Street Address 1', 'groundhogg')),
-  })
+  registerFilter('street_address_1', 'location',
+    __('Street Address 1', 'groundhogg'), {
+      ...BasicTextFilter(__('Street Address 1', 'groundhogg')),
+    })
 
-  registerFilter('street_address_2', 'location', __('Street Address 2', 'groundhogg'), {
-    ...BasicTextFilter(__('Street Address 2', 'groundhogg')),
-  })
+  registerFilter('street_address_2', 'location',
+    __('Street Address 2', 'groundhogg'), {
+      ...BasicTextFilter(__('Street Address 2', 'groundhogg')),
+    })
 
   registerFilter('zip_code', 'location', __('Zip/Postal Code', 'groundhogg'), {
     ...BasicTextFilter(__('Zip/Postal Code', 'groundhogg')),
   })
 
   //filter by Email Opened
-  registerFilter('email_received', 'activity', __('Email Received', 'groundhogg'), {
-    view ({ email_id, ...rest }) {
-      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
+  registerFilter('email_received', 'activity',
+    __('Email Received', 'groundhogg'), {
+      view ({ email_id, ...rest }) {
+        const emailName = email_id
+          ? EmailsStore.get(email_id).data.title
+          : 'any email'
 
-      let prefix = sprintf(_x('Received %s', '%s is an email', 'groundhogg'), `<b>${ emailName }</b>`)
-      prefix = filterCountTitle(prefix, rest)
+        let prefix = sprintf(_x('Received %s', '%s is an email', 'groundhogg'),
+          `<b>${emailName}</b>`)
+        prefix = filterCountTitle(prefix, rest)
 
-      return standardActivityDateTitle(prefix, rest)
-    },
-    edit ({ email_id, ...rest }) {
+        return standardActivityDateTitle(prefix, rest)
+      },
+      edit ({ email_id, ...rest }) {
 
-      const pickerOptions = email_id ? {
-        [email_id]: EmailsStore.get(email_id).data.title,
-      } : {}
+        const pickerOptions = email_id ? {
+          [email_id]: EmailsStore.get(email_id).data.title,
+        } : {}
 
-      // language=html
-      return `
-          ${ select({
-              id: 'filter-email',
-              name: 'email_id',
-          }, pickerOptions, email_id) }
+        // language=html
+        return `
+			${select({
+				id: 'filter-email',
+				name: 'email_id',
+			}, pickerOptions, email_id)}
 
-          ${ filterCount(rest) }
+			${filterCount(rest)}
 
-          ${ standardActivityDateOptions(rest) }`
-    },
-    onMount (filter, updateFilter) {
-      emailPicker('#filter-email', false, (items) => {
-        EmailsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Please select an email or leave blank for any email', 'groundhogg'),
-      }).on('change', (e) => {
-        updateFilter({
-          email_id: parseInt(e.target.value),
+			${standardActivityDateOptions(rest)}`
+      },
+      onMount (filter, updateFilter) {
+        emailPicker('#filter-email', false, (items) => {
+          EmailsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __('Please select an email or leave blank for any email',
+            'groundhogg'),
+        }).on('change', (e) => {
+          updateFilter({
+            email_id: parseInt(e.target.value),
+          })
         })
-      })
 
-      filterCountOnMount(updateFilter)
+        filterCountOnMount(updateFilter)
 
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      ...standardActivityDateDefaults,
-      ...filterCountDefaults,
-      email_id: 0,
-    },
-    preload: ({ email_id }) => {
-      if (email_id) {
-        return EmailsStore.fetchItem(email_id)
-      }
-    },
-  })
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+        ...filterCountDefaults,
+        email_id: 0,
+      },
+      preload: ({ email_id }) => {
+        if (email_id) {
+          return EmailsStore.fetchItem(email_id)
+        }
+      },
+    })
 
   //filter by Email Opened
   registerFilter('email_opened', 'activity', __('Email Opened', 'groundhogg'), {
     view ({ email_id, ...rest }) {
-      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
+      const emailName = email_id
+        ? EmailsStore.get(email_id).data.title
+        : 'any email'
 
-      let prefix = sprintf(_x('Opened %s', '%s is an email', 'groundhogg'), `<b>${ emailName }</b>`)
+      let prefix = sprintf(_x('Opened %s', '%s is an email', 'groundhogg'),
+        `<b>${emailName}</b>`)
 
       prefix = filterCountTitle(prefix, rest)
 
@@ -1504,20 +1622,21 @@
 
       // language=html
       return `
-          ${ select({
-              id: 'filter-email',
-              name: 'email_id',
-          }, pickerOptions, email_id) }
+		  ${select({
+			  id: 'filter-email',
+			  name: 'email_id',
+		  }, pickerOptions, email_id)}
 
-          ${ filterCount(rest) }
+		  ${filterCount(rest)}
 
-          ${ standardActivityDateOptions(rest) }`
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
       emailPicker('#filter-email', false, (items) => {
         EmailsStore.itemsFetched(items)
       }, {}, {
-        placeholder: __('Please select an email or leave blank for any email', 'groundhogg'),
+        placeholder: __('Please select an email or leave blank for any email',
+          'groundhogg'),
       }).on('change', (e) => {
         updateFilter({
           email_id: parseInt(e.target.value),
@@ -1541,100 +1660,111 @@
   })
 
 //filter by Email Opened
-  registerFilter('email_link_clicked', 'activity', __('Email Link Clicked', 'groundhogg'), {
-    view ({ email_id, link = '', ...rest }) {
+  registerFilter('email_link_clicked', 'activity',
+    __('Email Link Clicked', 'groundhogg'), {
+      view ({ email_id, link = '', ...rest }) {
 
-      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
+        const emailName = email_id
+          ? EmailsStore.get(email_id).data.title
+          : 'any email'
 
-      const maybeTruncateLink = (link) => {
-        return link.length > 50 ? `${ link.substring(0, 47) }...` : link
-      }
+        const maybeTruncateLink = (link) => {
+          return link.length > 50 ? `${link.substring(0, 47)}...` : link
+        }
 
-      let prepend = sprintf(
-        link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'),
-        `<b class="link" title="${ link }">${ maybeTruncateLink(link) }</b>`, `<b>${ emailName }</b>`)
+        let prepend = sprintf(
+          link ? __('Clicked %1$s in %2$s', 'groundhogg') : __(
+            'Clicked any link in %2$s', 'groundhogg'),
+          `<b class="link" title="${link}">${maybeTruncateLink(link)}</b>`,
+          `<b>${emailName}</b>`)
 
-      prepend = filterCountTitle(prepend, rest)
+        prepend = filterCountTitle(prepend, rest)
 
-      return standardActivityDateTitle(prepend, rest)
-    },
-    edit ({ email_id, link, ...rest }) {
+        return standardActivityDateTitle(prepend, rest)
+      },
+      edit ({ email_id, link, ...rest }) {
 
-      const pickerOptions = email_id ? {
-        [email_id]: EmailsStore.get(email_id).data.title,
-      } : {}
+        const pickerOptions = email_id ? {
+          [email_id]: EmailsStore.get(email_id).data.title,
+        } : {}
 
-      // language=html
-      return `
-          ${ select({
-              id: 'filter-email',
-              name: 'email_id',
-          }, pickerOptions, email_id) }
+        // language=html
+        return `
+			${select({
+				id: 'filter-email',
+				name: 'email_id',
+			}, pickerOptions, email_id)}
 
-          ${ input({
-              id: 'filter-link',
-              name: 'link',
-              autocomplete: 'off',
-              value: link,
-              placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg'),
-          }) }
+			${input({
+				id: 'filter-link',
+				name: 'link',
+				autocomplete: 'off',
+				value: link,
+				placeholder: __(
+					'Start typing to select a link or leave blank for any link',
+					'groundhogg'),
+			})}
 
-          ${ filterCount(rest) }
+			${filterCount(rest)}
 
-          ${ standardActivityDateOptions(rest) }`
-    },
-    onMount (filter, updateFilter) {
-      emailPicker('#filter-email', false, (items) => {
-        EmailsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Please select an email or leave blank for any email', 'groundhogg'),
-      }).on('change', (e) => {
-        updateFilter({
-          email_id: parseInt(e.target.value),
+			${standardActivityDateOptions(rest)}`
+      },
+      onMount (filter, updateFilter) {
+        emailPicker('#filter-email', false, (items) => {
+          EmailsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __('Please select an email or leave blank for any email',
+            'groundhogg'),
+        }).on('change', (e) => {
+          updateFilter({
+            email_id: parseInt(e.target.value),
+          })
         })
-      })
 
-      linkPicker('#filter-link').on('change input blur', ({ target }) => {
-        updateFilter({
-          link: target.value,
+        linkPicker('#filter-link').on('change input blur', ({ target }) => {
+          updateFilter({
+            link: target.value,
+          })
         })
-      })
 
-      filterCountOnMount(updateFilter)
+        filterCountOnMount(updateFilter)
 
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      ...standardActivityDateDefaults,
-      ...filterCountDefaults,
-      link: '',
-      email_id: 0,
-    },
-    preload: ({ email_id }) => {
-      if (email_id) {
-        return EmailsStore.fetchItem(email_id)
-      }
-    },
-  })
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+        ...filterCountDefaults,
+        link: '',
+        email_id: 0,
+      },
+      preload: ({ email_id }) => {
+        if (email_id) {
+          return EmailsStore.fetchItem(email_id)
+        }
+      },
+    })
 
-  registerFilter('confirmed_email', 'activity', __('Confirmed Email Address', 'groundhogg'), {
-    view (filter) {
-      return standardActivityDateTitle(`<b>${ __('Confirmed Email Address', 'groundhogg') }</b>`, filter)
-    },
-    edit (filter) {
-      return standardActivityDateOptions(filter)
-    },
-    onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      ...standardActivityDateDefaults,
-    },
-  })
+  registerFilter('confirmed_email', 'activity',
+    __('Confirmed Email Address', 'groundhogg'), {
+      view (filter) {
+        return standardActivityDateTitle(
+          `<b>${__('Confirmed Email Address', 'groundhogg')}</b>`, filter)
+      },
+      edit (filter) {
+        return standardActivityDateOptions(filter)
+      },
+      onMount (filter, updateFilter) {
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+      },
+    })
 
   registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
     view (filter) {
-      return standardActivityDateTitle(`<b>${ __('Unsubscribed', 'groundhogg') }</b>`, filter)
+      return standardActivityDateTitle(
+        `<b>${__('Unsubscribed', 'groundhogg')}</b>`, filter)
     },
     edit (filter) {
       return standardActivityDateOptions(filter)
@@ -1647,39 +1777,42 @@
     },
   })
 
-  registerFilter('optin_status_changed', 'activity', __('Opt-in Status Changed', 'groundhogg'), {
-    view ({ value, ...filter }) {
-      return standardActivityDateTitle(
-        sprintf('<b>Opt-in status</b> changed to %s', orList(value.map(v => `<b>${ optin_status[v] }</b>`))), filter)
-    },
-    edit ({ value, ...filter }) {
-      return [
-        select({
-            id: 'filter-value',
-            name: 'value',
-            class: 'gh-select2',
-            multiple: true,
-          }, Object.keys(optin_status).map(k => ( { value: k, text: optin_status[k] } )),
-          value),
-        standardActivityDateOptions(filter),
-      ].join('')
-    },
-    onMount (filter, updateFilter) {
-      $('#filter-value').select2()
-      $('#filter-value').on('change', function (e) {
-        const $el = $(this)
-        // console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val(),
+  registerFilter('optin_status_changed', 'activity',
+    __('Opt-in Status Changed', 'groundhogg'), {
+      view ({ value, ...filter }) {
+        return standardActivityDateTitle(
+          sprintf('<b>Opt-in status</b> changed to %s',
+            orList(value.map(v => `<b>${optin_status[v]}</b>`))), filter)
+      },
+      edit ({ value, ...filter }) {
+        return [
+          select({
+              id: 'filter-value',
+              name: 'value',
+              class: 'gh-select2',
+              multiple: true,
+            }, Object.keys(optin_status).
+            map(k => ({ value: k, text: optin_status[k] })),
+            value),
+          standardActivityDateOptions(filter),
+        ].join('')
+      },
+      onMount (filter, updateFilter) {
+        $('#filter-value').select2()
+        $('#filter-value').on('change', function (e) {
+          const $el = $(this)
+          // console.log($el.val())
+          updateFilter({
+            [$el.prop('name')]: $el.val(),
+          })
         })
-      })
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      value: [],
-      ...standardActivityDateDefaults,
-    },
-  })
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        value: [],
+        ...standardActivityDateDefaults,
+      },
+    })
 
   //filter by Email Opened
   registerFilter('page_visited', 'activity', __('Page Visited', 'groundhogg'), {
@@ -1691,8 +1824,7 @@
         const url = new URL(link)
 
         prefix = sprintf(__('Visited %s', 'groundhogg'), bold(url.pathname))
-      }
-      else {
+      } else {
         prefix = __('Visited <b>any page</b>', 'groundhogg')
       }
 
@@ -1705,17 +1837,19 @@
       // language=html
       return `
 
-          ${ input({
-              id: 'filter-link',
-              name: 'link',
-              autocomplete: 'off',
-              value: link,
-              placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg'),
-          }) }
+		  ${input({
+			  id: 'filter-link',
+			  name: 'link',
+			  autocomplete: 'off',
+			  value: link,
+			  placeholder: __(
+				  'Start typing to select a link or leave blank for any link',
+				  'groundhogg'),
+		  })}
 
-          ${ filterCount(rest) }
+		  ${filterCount(rest)}
 
-          ${ standardActivityDateOptions(rest) }`
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
 
@@ -1740,7 +1874,8 @@
   registerFilter('logged_in', 'activity', __('Logged In', 'groundhogg'), {
     view (filter) {
 
-      let prefix = filterCountTitle(`<b>${ __('Logged in', 'groundhogg') }</b>`, filter)
+      let prefix = filterCountTitle(`<b>${__('Logged in', 'groundhogg')}</b>`,
+        filter)
 
       return standardActivityDateTitle(prefix, filter)
     },
@@ -1759,25 +1894,8 @@
 
   registerFilter('logged_out', 'activity', __('Logged Out', 'groundhogg'), {
     view (filter) {
-      return standardActivityDateTitle(filterCountTitle(`<b>${ __('Logged out', 'groundhogg') }</b>`, filter), filter)
-    },
-    edit (filter) {
-      return filterCount(filter) + standardActivityDateOptions(filter)
-    },
-    onMount (filter, updateFilter) {
-      filterCountOnMount(updateFilter)
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      ...filterCountDefaults,
-      ...standardActivityDateDefaults,
-    },
-  })
-
-//filter by User Not Logged In
-  registerFilter('not_logged_in', 'activity', __('Has Not Logged In', 'groundhogg'), {
-    view (filter) {
-      return standardActivityDateTitle(filterCountTitle(`<b>${ __('Has not logged in', 'groundhogg') }</b>`, filter),
+      return standardActivityDateTitle(
+        filterCountTitle(`<b>${__('Logged out', 'groundhogg')}</b>`, filter),
         filter)
     },
     edit (filter) {
@@ -1793,10 +1911,33 @@
     },
   })
 
+//filter by User Not Logged In
+  registerFilter('not_logged_in', 'activity',
+    __('Has Not Logged In', 'groundhogg'), {
+      view (filter) {
+        return standardActivityDateTitle(
+          filterCountTitle(`<b>${__('Has not logged in', 'groundhogg')}</b>`,
+            filter),
+          filter)
+      },
+      edit (filter) {
+        return filterCount(filter) + standardActivityDateOptions(filter)
+      },
+      onMount (filter, updateFilter) {
+        filterCountOnMount(updateFilter)
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...filterCountDefaults,
+        ...standardActivityDateDefaults,
+      },
+    })
+
 //filter by User Was Active
   registerFilter('was_active', 'activity', __('Was Active', 'groundhogg'), {
     view (filter) {
-      return standardActivityDateTitle(`<b>${ __('Was active', 'groundhogg') }</b>`, filter)
+      return standardActivityDateTitle(
+        `<b>${__('Was active', 'groundhogg')}</b>`, filter)
     },
     edit (filter) {
       return standardActivityDateOptions(filter)
@@ -1810,296 +1951,335 @@
   })
 
 //filter By User Was Not Active
-  registerFilter('was_not_active', 'activity', __('Was Inactive', 'groundhogg'), {
-    view (filter) {
-      return standardActivityDateTitle(`<b>${ __('Was inactive', 'groundhogg') }</b>`, filter)
-    },
-    edit (filter) {
-      return standardActivityDateOptions(filter)
-    },
-    onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      ...standardActivityDateDefaults,
-    },
-  })
+  registerFilter('was_not_active', 'activity', __('Was Inactive', 'groundhogg'),
+    {
+      view (filter) {
+        return standardActivityDateTitle(
+          `<b>${__('Was inactive', 'groundhogg')}</b>`, filter)
+      },
+      edit (filter) {
+        return standardActivityDateOptions(filter)
+      },
+      onMount (filter, updateFilter) {
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+      },
+    })
 
 // Other Filters to Add
 // Location (Country,Province)
 // Phones (Primary,Mobile)
 // Tags
 
-  registerFilterGroup('funnels', _x('Funnel', 'noun meaning automation', 'groundhogg'))
+  registerFilterGroup('funnels',
+    _x('Funnel', 'noun meaning automation', 'groundhogg'))
 
-  registerFilter('funnel_history', 'funnels', __('Funnel History', 'groundhogg'), {
-    view ({ status, funnel_id, step_id, date_range, before, after }) {
+  registerFilter('funnel_history', 'funnels',
+    __('Funnel History', 'groundhogg'), {
+      view ({ status, funnel_id, step_id, date_range, before, after }) {
 
-      let prepend
+        let prepend
 
-      if (funnel_id) {
+        if (funnel_id) {
 
-        const funnel = FunnelsStore.get(funnel_id)
-        const step = funnel.steps.find(s => s.ID === step_id)
+          const funnel = FunnelsStore.get(funnel_id)
+          const step = funnel.steps.find(s => s.ID === step_id)
 
-        prepend = status === 'complete' ?
-          sprintf(step ? __('Completed %2$s in %1$s', 'groundhogg') : __('Completed any step in %1$s', 'groundhogg'),
-            `<b>${ funnel.data.title }</b>`, step ? `<b>${ step.data.step_title }</b>` : '')
-          : sprintf(
-            step ? __('Will complete %2$s in %1$s', 'groundhogg') : __('Will complete any step in %1$s', 'groundhogg'),
-            `<b>${ funnel.data.title }</b>`, step ? `<b>${ step.data.step_title }</b>` : '')
+          prepend = status === 'complete' ?
+            sprintf(step ? __('Completed %2$s in %1$s', 'groundhogg') : __(
+                'Completed any step in %1$s', 'groundhogg'),
+              `<b>${funnel.data.title}</b>`,
+              step ? `<b>${step.data.step_title}</b>` : '')
+            : sprintf(
+              step ? __('Will complete %2$s in %1$s', 'groundhogg') : __(
+                'Will complete any step in %1$s', 'groundhogg'),
+              `<b>${funnel.data.title}</b>`,
+              step ? `<b>${step.data.step_title}</b>` : '')
 
-        if (status === 'waiting') {
-          return prepend
+          if (status === 'waiting') {
+            return prepend
+          }
+
+        } else {
+          prepend = __('Completed any step in any funnel', 'groundhogg')
         }
 
-      }
-      else {
-        prepend = __('Completed any step in any funnel', 'groundhogg')
-      }
-
-      return standardActivityDateTitle(prepend, {
-        date_range,
-        before,
-        after,
-      })
-    },
-    edit ({ funnel_id, step_id, date_range, before, after }) {
-
-      return `
-      ${ select({
-          id: 'filter-funnel',
-          name: 'funnel_id',
-        }, FunnelsStore.getItems().map(f => ( { value: f.ID, text: f.data.title } )),
-        funnel_id) }
-      ${ select({
-        id: 'filter-step',
-        name: 'step_id',
-      }, funnel_id ? FunnelsStore.get(funnel_id).steps.map(s => ( {
-        value: s.ID,
-        text: s.data.step_title,
-      } )) : [], step_id) }
-      ${ standardActivityDateOptions({ date_range, before, after }) }`
-    },
-    onMount (filter, updateFilter) {
-      funnelPicker('#filter-funnel', false, (items) => {
-        FunnelsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Select a funnel', 'groundhogg'),
-      }).on('select2:select', ({ target }) => {
-        updateFilter({
-          funnel_id: parseInt($(target).val()),
-          step_id: 0,
-        }, true)
-      })
-
-      $('#filter-step').select2({
-        placeholder: __('Select a step or leave empty for any step', 'groundhogg'),
-      }).on('select2:select', ({ target }) => {
-        updateFilter({
-          step_id: parseInt($(target).val()),
+        return standardActivityDateTitle(prepend, {
+          date_range,
+          before,
+          after,
         })
-      })
+      },
+      edit ({ funnel_id, step_id, date_range, before, after }) {
 
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      funnel_id: 0,
-      step_id: 0,
-      status: 'complete',
-      ...standardActivityDateDefaults,
-    },
-    preload: ({ funnel_id }) => {
-      if (funnel_id) {
-        return FunnelsStore.fetchItem(funnel_id)
-      }
-    },
-  })
-
-  registerFilterGroup('broadcast', _x('Broadcast', 'noun meaning email blast', 'groundhogg'))
-
-  registerFilter('broadcast_received', 'broadcast', __('Received Broadcast', 'groundhogg'), {
-    view ({ broadcast_id, status = 'complete' }) {
-
-      if (!broadcast_id) {
-        return __('Received any broadcast', 'groundhogg')
-      }
-
-      const broadcast = BroadcastsStore.get(broadcast_id)
-
-      return status === 'complete' ?
-        sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'),
-          `<b>${ broadcast.object.data.title }</b>`, `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
-        : sprintf(broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __('Received a broadcast', 'groundhogg'),
-          `<b>${ broadcast.object.data.title }</b>`, `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
-    },
-    edit ({ broadcast_id }) {
-
-      return select({
-          id: 'filter-broadcast',
-          name: 'broadcast_id',
-        }, BroadcastsStore.getItems().
-          map(b => ( { value: b.ID, text: `${ b.object.data.title } (${ b.date_sent_pretty })` } )),
-        broadcast_id)
-    },
-    onMount (filter, updateFilter) {
-      broadcastPicker('#filter-broadcast', false, (items) => {
-        BroadcastsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Select a broadcast', 'groundhogg'),
-      }).on('select2:select', ({ target }) => {
-        updateFilter({
-          broadcast_id: parseInt($(target).val()),
+        return `
+      ${select({
+            id: 'filter-funnel',
+            name: 'funnel_id',
+          }, FunnelsStore.getItems().
+          map(f => ({ value: f.ID, text: f.data.title })),
+          funnel_id)}
+      ${select({
+          id: 'filter-step',
+          name: 'step_id',
+        }, funnel_id ? FunnelsStore.get(funnel_id).steps.map(s => ({
+          value: s.ID,
+          text: s.data.step_title,
+        })) : [], step_id)}
+      ${standardActivityDateOptions({ date_range, before, after })}`
+      },
+      onMount (filter, updateFilter) {
+        funnelPicker('#filter-funnel', false, (items) => {
+          FunnelsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __('Select a funnel', 'groundhogg'),
+        }).on('select2:select', ({ target }) => {
+          updateFilter({
+            funnel_id: parseInt($(target).val()),
+            step_id: 0,
+          }, true)
         })
-      })
-    },
-    defaults: {
-      broadcast_id: 0,
-      status: 'complete',
-    },
-    preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
-        return BroadcastsStore.fetchItem(broadcast_id)
-      }
-    },
-  })
 
-  registerFilter('broadcast_opened', 'broadcast', __('Opened Broadcast', 'groundhogg'), {
-    view ({ broadcast_id }) {
-
-      if (!broadcast_id) {
-        return __('Opened any broadcast', 'groundhogg')
-      }
-
-      const broadcast = BroadcastsStore.get(broadcast_id)
-
-      return sprintf(
-        broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'),
-        `<b>${ broadcast.object.data.title }</b>`, `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
-
-    },
-    edit ({ broadcast_id }) {
-
-      return select({
-          id: 'filter-broadcast',
-          name: 'broadcast_id',
-        }, BroadcastsStore.getItems().
-          map(b => ( { value: b.ID, text: `${ b.object.data.title } (${ b.date_sent_pretty })` } )),
-        broadcast_id)
-    },
-    onMount (filter, updateFilter) {
-      broadcastPicker('#filter-broadcast', false, (items) => {
-        BroadcastsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Select a broadcast', 'groundhogg'),
-      }).on('select2:select', ({ target }) => {
-        updateFilter({
-          broadcast_id: parseInt($(target).val()),
+        $('#filter-step').select2({
+          placeholder: __('Select a step or leave empty for any step',
+            'groundhogg'),
+        }).on('select2:select', ({ target }) => {
+          updateFilter({
+            step_id: parseInt($(target).val()),
+          })
         })
-      })
-    },
-    defaults: {
-      broadcast_id: 0,
-    },
-    preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
-        return BroadcastsStore.fetchItem(broadcast_id)
-      }
-    },
-  })
 
-  registerFilter('broadcast_link_clicked', 'broadcast', __('Broadcast Link Clicked', 'groundhogg'), {
-    view ({ broadcast_id, link }) {
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        funnel_id: 0,
+        step_id: 0,
+        status: 'complete',
+        ...standardActivityDateDefaults,
+      },
+      preload: ({ funnel_id }) => {
+        if (funnel_id) {
+          return FunnelsStore.fetchItem(funnel_id)
+        }
+      },
+    })
 
-      if (!broadcast_id && !link) {
-        return __('Clicked any link in any broadcast', 'groundhogg')
-      }
+  registerFilterGroup('broadcast',
+    _x('Broadcast', 'noun meaning email blast', 'groundhogg'))
 
-      if (!broadcast_id && link) {
-        return sprintf(__('Clicked %s in any broadcast', 'groundhogg'), bold(link))
-      }
+  registerFilter('broadcast_received', 'broadcast',
+    __('Received Broadcast', 'groundhogg'), {
+      view ({ broadcast_id, status = 'complete' }) {
 
-      const broadcast = BroadcastsStore.get(broadcast_id)
+        if (!broadcast_id) {
+          return __('Received any broadcast', 'groundhogg')
+        }
 
-      if (broadcast_id && !link) {
-        return sprintf(__('Clicked any link in %1$s after %2$s', 'groundhogg'), bold(broadcast.object.data.title),
+        const broadcast = BroadcastsStore.get(broadcast_id)
+
+        return status === 'complete' ?
+          sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __(
+              'Will receive a broadcast', 'groundhogg'),
+            `<b>${broadcast.object.data.title}</b>`,
+            `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+          : sprintf(
+            broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __(
+              'Received a broadcast', 'groundhogg'),
+            `<b>${broadcast.object.data.title}</b>`,
+            `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+      },
+      edit ({ broadcast_id }) {
+
+        return select({
+            id: 'filter-broadcast',
+            name: 'broadcast_id',
+          }, BroadcastsStore.getItems().
+          map(b => ({
+            value: b.ID,
+            text: `${b.object.data.title} (${b.date_sent_pretty})`,
+          })),
+          broadcast_id)
+      },
+      onMount (filter, updateFilter) {
+        broadcastPicker('#filter-broadcast', false, (items) => {
+          BroadcastsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __('Select a broadcast', 'groundhogg'),
+        }).on('select2:select', ({ target }) => {
+          updateFilter({
+            broadcast_id: parseInt($(target).val()),
+          })
+        })
+      },
+      defaults: {
+        broadcast_id: 0,
+        status: 'complete',
+      },
+      preload: ({ broadcast_id }) => {
+        if (broadcast_id) {
+          return BroadcastsStore.fetchItem(broadcast_id)
+        }
+      },
+    })
+
+  registerFilter('broadcast_opened', 'broadcast',
+    __('Opened Broadcast', 'groundhogg'), {
+      view ({ broadcast_id }) {
+
+        if (!broadcast_id) {
+          return __('Opened any broadcast', 'groundhogg')
+        }
+
+        const broadcast = BroadcastsStore.get(broadcast_id)
+
+        return sprintf(
+          broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __(
+            'Will receive a broadcast', 'groundhogg'),
+          `<b>${broadcast.object.data.title}</b>`,
+          `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+
+      },
+      edit ({ broadcast_id }) {
+
+        return select({
+            id: 'filter-broadcast',
+            name: 'broadcast_id',
+          }, BroadcastsStore.getItems().
+          map(b => ({
+            value: b.ID,
+            text: `${b.object.data.title} (${b.date_sent_pretty})`,
+          })),
+          broadcast_id)
+      },
+      onMount (filter, updateFilter) {
+        broadcastPicker('#filter-broadcast', false, (items) => {
+          BroadcastsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __('Select a broadcast', 'groundhogg'),
+        }).on('select2:select', ({ target }) => {
+          updateFilter({
+            broadcast_id: parseInt($(target).val()),
+          })
+        })
+      },
+      defaults: {
+        broadcast_id: 0,
+      },
+      preload: ({ broadcast_id }) => {
+        if (broadcast_id) {
+          return BroadcastsStore.fetchItem(broadcast_id)
+        }
+      },
+    })
+
+  registerFilter('broadcast_link_clicked', 'broadcast',
+    __('Broadcast Link Clicked', 'groundhogg'), {
+      view ({ broadcast_id, link }) {
+
+        if (!broadcast_id && !link) {
+          return __('Clicked any link in any broadcast', 'groundhogg')
+        }
+
+        if (!broadcast_id && link) {
+          return sprintf(__('Clicked %s in any broadcast', 'groundhogg'),
+            bold(link))
+        }
+
+        const broadcast = BroadcastsStore.get(broadcast_id)
+
+        if (broadcast_id && !link) {
+          return sprintf(
+            __('Clicked any link in %1$s after %2$s', 'groundhogg'),
+            bold(broadcast.object.data.title),
+            bold(formatDateTime(broadcast.data.send_time * 1000)))
+        }
+
+        return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'),
+          bold(link), bold(broadcast.object.data.title),
           bold(formatDateTime(broadcast.data.send_time * 1000)))
-      }
+      },
+      edit ({ broadcast_id, link }) {
 
-      return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'), bold(link), bold(broadcast.object.data.title),
-        bold(formatDateTime(broadcast.data.send_time * 1000)))
-    },
-    edit ({ broadcast_id, link }) {
+        // language=html
+        return `
+			${select({
+					id: 'filter-broadcast',
+					name: 'broadcast_id',
+				}, BroadcastsStore.getItems().map(b => ({
+					value: b.ID,
+					text: `${b.object.data.title} (${b.date_sent_pretty})`,
+				})),
+				broadcast_id)}
 
-      // language=html
-      return `
-          ${ select({
-                      id: 'filter-broadcast',
-                      name: 'broadcast_id',
-                  }, BroadcastsStore.getItems().map(b => ( {
-                      value: b.ID,
-                      text: `${ b.object.data.title } (${ b.date_sent_pretty })`,
-                  } )),
-                  broadcast_id) }
-
-          ${ input({
-              id: 'filter-link',
-              name: 'link',
-              value: link,
-              autocomplete: 'off',
-              placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg'),
-          }) }`
-    },
-    onMount (filter, updateFilter) {
-      broadcastPicker('#filter-broadcast', false, (items) => {
-        BroadcastsStore.itemsFetched(items)
-      }, {}, {
-        placeholder: __('Please select a broadcast or leave blank for any broadcast', 'groundhogg'),
-      }).on('change', (e) => {
-        updateFilter({
-          broadcast_id: parseInt(e.target.value),
+			${input({
+				id: 'filter-link',
+				name: 'link',
+				value: link,
+				autocomplete: 'off',
+				placeholder: __(
+					'Start typing to select a link or leave blank for any link',
+					'groundhogg'),
+			})}`
+      },
+      onMount (filter, updateFilter) {
+        broadcastPicker('#filter-broadcast', false, (items) => {
+          BroadcastsStore.itemsFetched(items)
+        }, {}, {
+          placeholder: __(
+            'Please select a broadcast or leave blank for any broadcast',
+            'groundhogg'),
+        }).on('change', (e) => {
+          updateFilter({
+            broadcast_id: parseInt(e.target.value),
+          })
         })
-      })
 
-      linkPicker('#filter-link').on('change input blur', ({ target }) => {
-        updateFilter({
-          link: target.value,
+        linkPicker('#filter-link').on('change input blur', ({ target }) => {
+          updateFilter({
+            link: target.value,
+          })
         })
-      })
-    },
-    defaults: {
-      link: '',
-      broadcast_id: 0,
-    },
-    preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
-        return BroadcastsStore.fetchItem(broadcast_id)
-      }
-    },
-  })
+      },
+      defaults: {
+        link: '',
+        broadcast_id: 0,
+      },
+      preload: ({ broadcast_id }) => {
+        if (broadcast_id) {
+          return BroadcastsStore.fetchItem(broadcast_id)
+        }
+      },
+    })
 
-  const { tabs, fields, groups } = Groundhogg.filters.gh_contact_custom_properties
+  const {
+    tabs,
+    fields,
+    groups,
+  } = Groundhogg.filters.gh_contact_custom_properties
 
   const getField = (id) => {
     return fields.find(f => f.id == id)
   }
 
   const filterFactory = {
-    text: (f) => ( {
+    text: (f) => ({
       view ({ field, compare, value }) {
-        return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, `<b>"${ value }"</b>`)
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`,
+          `<b>"${value}"</b>`)
       },
       edit ({ compare, value }) {
         // language=html
         return `
-            ${ select({
-                id: 'filter-compare',
-                name: 'compare',
-            }, StringComparisons, compare) } ${ input({
-                id: 'filter-value',
-                name: 'value',
-                value,
-            }) }`
+			${select({
+				id: 'filter-compare',
+				name: 'compare',
+			}, StringComparisons, compare)} ${input({
+				id: 'filter-value',
+				name: 'value',
+				value,
+			})}`
       },
       onMount (filter, updateFilter) {
 
@@ -2116,36 +2296,37 @@
         compare: 'equals',
         value: '',
       },
-    } ),
-    url: (f) => ( {
+    }),
+    url: (f) => ({
       ...filterFactory.text(f),
-    } ),
-    custom_email: (f) => ( {
+    }),
+    custom_email: (f) => ({
       ...filterFactory.text(f),
-    } ),
-    tel: (f) => ( {
+    }),
+    tel: (f) => ({
       ...filterFactory.text(f),
-    } ),
-    textarea: (f) => ( {
+    }),
+    textarea: (f) => ({
       ...filterFactory.text(f),
-    } ),
-    number: (f) => ( {
+    }),
+    number: (f) => ({
       view ({ field, compare, value }) {
-        return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, `<b>${ value }</b>`)
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`,
+          `<b>${value}</b>`)
       },
       edit ({ compare, value }) {
         // language=html
         return `
-            ${ select({
-                id: 'filter-compare',
-                name: 'compare',
-            }, NumericComparisons, compare) } ${ input({
-                id: 'filter-value',
-                name: 'value',
-                type: 'number',
-                step: '0.01',
-                value,
-            }) }`
+			${select({
+				id: 'filter-compare',
+				name: 'compare',
+			}, NumericComparisons, compare)} ${input({
+				id: 'filter-value',
+				name: 'value',
+				type: 'number',
+				step: '0.01',
+				value,
+			})}`
       },
       onMount (filter, updateFilter) {
 
@@ -2162,11 +2343,11 @@
         compare: 'equals',
         value: '',
       },
-    } ),
-    date: (f) => ( {
+    }),
+    date: (f) => ({
       view ({ field, ...rest }) {
         //language=HTMl
-        return standardActivityDateTitle(`<b>${ f.label }</b>`, rest)
+        return standardActivityDateTitle(`<b>${f.label}</b>`, rest)
       },
       edit (filter) {
         // language=html
@@ -2180,11 +2361,11 @@
         field: f.id,
         meta: f.name,
       },
-    } ),
-    datetime: (f) => ( {
+    }),
+    datetime: (f) => ({
       view ({ field, ...rest }) {
         //language=HTMl
-        return standardActivityDateTitle(`<b>${ f.label }</b>`, rest)
+        return standardActivityDateTitle(`<b>${f.label}</b>`, rest)
       },
       edit (filter) {
         // language=html
@@ -2198,23 +2379,24 @@
         field: f.id,
         meta: f.name,
       },
-    } ),
-    time: (f) => ( {
+    }),
+    time: (f) => ({
       view ({ field, compare, value }) {
-        return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, `<b>${ value }</b>`)
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`,
+          `<b>${value}</b>`)
       },
       edit ({ compare, value }) {
         // language=html
         return `
-            ${ select({
-                id: 'filter-compare',
-                name: 'compare',
-            }, NumericComparisons, compare) } ${ input({
-                id: 'filter-value',
-                name: 'value',
-                type: 'time',
-                value,
-            }) }`
+			${select({
+				id: 'filter-compare',
+				name: 'compare',
+			}, NumericComparisons, compare)} ${input({
+				id: 'filter-value',
+				name: 'value',
+				type: 'time',
+				value,
+			})}`
       },
       onMount (filter, updateFilter) {
 
@@ -2231,24 +2413,25 @@
         compare: 'equals',
         value: '',
       },
-    } ),
-    radio: (f) => ( {
+    }),
+    radio: (f) => ({
       view: ({ options, compare }) => {
-        return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, orList(options.map(o => bold(o))))
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`,
+          orList(options.map(o => bold(o))))
       },
       edit: ({ field, options, compare }) => {
         // language=HTML
-        return `${ select({
-            id: 'filter-compare',
-            name: 'compare',
-        }, {
-            in: _x('Is one of', 'comparison, groundhogg'),
-            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-        }, compare) } ${ select({
-            id: 'filter-options',
-            name: 'options',
-            multiple: true,
-        }, f.options.map(o => ( { value: o, text: o } )), options) }`
+        return `${select({
+			id: 'filter-compare',
+			name: 'compare',
+		}, {
+			in: _x('Is one of', 'comparison, groundhogg'),
+			not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2272,31 +2455,32 @@
         compare: 'in',
         options: [],
       },
-    } ),
-    dropdown: (f) => ( {
+    }),
+    dropdown: (f) => ({
       view: ({ options, compare }) => {
         if (ComparisonsTitleGenerators[compare]) {
-          return ComparisonsTitleGenerators[compare](`<b>${ f.label }</b>`, orList(options.map(o => bold(o))))
+          return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`,
+            orList(options.map(o => bold(o))))
         }
 
-        return moreComparisonTitles[compare](`<b>${ f.label }</b>`, options)
+        return moreComparisonTitles[compare](`<b>${f.label}</b>`, options)
       },
       edit: ({ field, options, compare }) => {
         // language=HTML
-        return `${ select({
-            id: 'filter-compare',
-            name: 'compare',
-        }, !f.multiple ? {
-            in: _x('Is one of', 'comparison, groundhogg'),
-            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-        } : {
-            all_in: __('Has all selected'),
-            all_not_in: __('Does not have all selected'),
-        }, compare) } ${ select({
-            id: 'filter-options',
-            name: 'options',
-            multiple: true,
-        }, f.options.map(o => ( { value: o, text: o } )), options) }`
+        return `${select({
+			id: 'filter-compare',
+			name: 'compare',
+		}, !f.multiple ? {
+			in: _x('Is one of', 'comparison, groundhogg'),
+			not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+		} : {
+			all_in: __('Has all selected'),
+			all_not_in: __('Does not have all selected'),
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2320,24 +2504,24 @@
         compare: f.multiple ? 'all_in' : 'in',
         options: [],
       },
-    } ),
-    checkboxes: (f) => ( {
+    }),
+    checkboxes: (f) => ({
       view: ({ options, compare }) => {
         return moreComparisonTitles[compare](bold(f.label), options)
       },
       edit: ({ field, options, compare }) => {
         // language=HTML
-        return `${ select({
-            id: 'filter-compare',
-            name: 'compare',
-        }, {
-            all_checked: __('Is Checked', 'groundhogg-better-meta'),
-            not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
-        }, compare) } ${ select({
-            id: 'filter-options',
-            name: 'options',
-            multiple: true,
-        }, f.options.map(o => ( { value: o, text: o } )), options) }`
+        return `${select({
+			id: 'filter-compare',
+			name: 'compare',
+		}, {
+			all_checked: __('Is Checked', 'groundhogg-better-meta'),
+			not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2361,17 +2545,21 @@
         compare: 'all_checked',
         options: [],
       },
-    } ),
+    }),
   }
 
   const moreComparisonTitles = {
-    all_checked: (prefix, options) => sprintf(__('%2$s is checked for %1$s', 'groundhogg-better-meta'), prefix,
+    all_checked: (prefix, options) => sprintf(
+      __('%2$s is checked for %1$s', 'groundhogg-better-meta'), prefix,
       andList(options.map(b => bold(b)))),
-    not_checked: (prefix, options) => sprintf(__('%2$s is not checked for %1$s', 'groundhogg-better-meta'), prefix,
+    not_checked: (prefix, options) => sprintf(
+      __('%2$s is not checked for %1$s', 'groundhogg-better-meta'), prefix,
       andList(options.map(b => bold(b)))),
-    all_in: (prefix, options) => sprintf(__('%2$s is selected for %1$s', 'groundhogg-better-meta'), prefix,
+    all_in: (prefix, options) => sprintf(
+      __('%2$s is selected for %1$s', 'groundhogg-better-meta'), prefix,
       andList(options.map(b => bold(b)))),
-    all_not_in: (prefix, options) => sprintf(__('%2$s is not selected for %1$s', 'groundhogg-better-meta'), prefix,
+    all_not_in: (prefix, options) => sprintf(
+      __('%2$s is not selected for %1$s', 'groundhogg-better-meta'), prefix,
       andList(options.map(b => bold(b)))),
   }
 
@@ -2379,9 +2567,9 @@
 
     Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
 
-      let groupId = `${ t.id }-${ s.id }`
+      let groupId = `${t.id}-${s.id}`
 
-      registerFilterGroup(groupId, `${ t.name }: ${ s.name }`)
+      registerFilterGroup(groupId, `${t.name}: ${s.name}`)
 
       Object.values(fields).filter(f => f.group === s.id).forEach(f => {
 
@@ -2404,7 +2592,8 @@
 
     registerFilter(id, group, label, {
       view (filter) {
-        return standardActivityDateTitle(filterCountTitle(view(filter), filter), filter)
+        return standardActivityDateTitle(filterCountTitle(view(filter), filter),
+          filter)
       },
       edit (filter) {
         return [
@@ -2442,11 +2631,12 @@
 
         let content = view(filter)
 
-        if ( value && value_compare ){
-          content += ` worth ${activityFilterComparisons[value_compare].toLowerCase()} ${value}`;
+        if (value && value_compare) {
+          content += ` worth ${activityFilterComparisons[value_compare].toLowerCase()} ${value}`
         }
 
-        return standardActivityDateTitle(filterCountTitle(content, filter), filter)
+        return standardActivityDateTitle(filterCountTitle(content, filter),
+          filter)
       },
       edit (filter) {
 
@@ -2458,28 +2648,28 @@
           edit(filter),
           //language=HTML
           `
-              <div class="space-between" style="gap: 10px">
-                  <span class="gh-text">Value</span>
-                  <div class="gh-input-group">
-                      ${ select({
-                          id: 'filter-value-compare',
-                          name: 'value_compare',
-                          options: activityFilterComparisons,
-                          selected: value_compare,
-                      }) }
-                      ${ input({
-                          type: 'number',
-                          id: 'filter-value',
-                          name: 'value',
-                          autocomplete: 'off',
-                          value: value,
-                          placeholder: 'any value',
-                          style: {
-                              width: '100px',
-                          },
-                      }) }
-                  </div>
-              </div>`,
+			  <div class="space-between" style="gap: 10px">
+				  <span class="gh-text">Value</span>
+				  <div class="gh-input-group">
+					  ${select({
+						  id: 'filter-value-compare',
+						  name: 'value_compare',
+						  options: activityFilterComparisons,
+						  selected: value_compare,
+					  })}
+					  ${input({
+						  type: 'number',
+						  id: 'filter-value',
+						  name: 'value',
+						  autocomplete: 'off',
+						  value: value,
+						  placeholder: 'any value',
+						  style: {
+							  width: '100px',
+						  },
+					  })}
+				  </div>
+			  </div>`,
           filterCount(filter),
           standardActivityDateOptions(filter),
         ].join('')
@@ -2507,27 +2697,28 @@
 
   }
 
-  registerActivityFilterWithValue( 'custom_activity', 'activity', __('Custom Activity', 'groundhogg'), {
-    view: ( { activity } ) => `<b>${activity}</b>`,
-    edit: ({ activity, ...filter }) => {
-      return input({
-        id: 'filter-activity-type',
-        name: 'activity',
-        value: activity,
-        placeholder: 'custom_activity',
-      })
-    },
-    onMount (filter, updateFilter) {
-      $('#filter-activity-type').on('input', e => {
-        updateFilter({
-          activity: e.target.value,
+  registerActivityFilterWithValue('custom_activity', 'activity',
+    __('Custom Activity', 'groundhogg'), {
+      view: ({ activity }) => `<b>${activity}</b>`,
+      edit: ({ activity, ...filter }) => {
+        return input({
+          id: 'filter-activity-type',
+          name: 'activity',
+          value: activity,
+          placeholder: 'custom_activity',
         })
-      })
-    },
-    defaults: {
-      activity: '',
-    },
-  } )
+      },
+      onMount (filter, updateFilter) {
+        $('#filter-activity-type').on('input', e => {
+          updateFilter({
+            activity: e.target.value,
+          })
+        })
+      },
+      defaults: {
+        activity: '',
+      },
+    })
 
   Groundhogg.filters.functions = {
     createFilters,
@@ -2543,8 +2734,8 @@
     standardActivityDateFilterOnMount,
     BasicTextFilter,
     registerActivityFilter,
-    registerActivityFilterWithValue
+    registerActivityFilterWithValue,
   }
 
-} )
+})
 (jQuery)
