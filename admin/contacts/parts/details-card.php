@@ -6,6 +6,9 @@ use function Groundhogg\dashicon_e;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\html;
 
+/**
+ * @var $contact \Groundhogg\Contact
+ */
 ?>
 <div class="inside align-left-space-between align-top">
     <!-- Photo -->
@@ -20,10 +23,12 @@ use function Groundhogg\html;
     </div>
     <div class="basic-details">
         <!-- FIRST -->
+	    <?php if ( trim( $contact->get_full_name() ) ): ?>
         <div class="full-name align-left-space-between">
 			<?php dashicon_e( 'admin-users' ); ?>
-            <span><?php echo $contact->get_full_name(); ?></span>
+            <span><?php esc_html_e( $contact->get_full_name() ); ?></span>
         </div>
+	    <?php endif; ?>
         <div class="email align-left-space-between">
 			<?php dashicon_e( 'email' ); ?>
             <div>
