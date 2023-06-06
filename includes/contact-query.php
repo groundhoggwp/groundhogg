@@ -3142,37 +3142,41 @@ class Contact_Query {
 			default:
 			case 'equals':
 			case '=':
-				return sprintf( "%s = '%s'", $column, $value );
+				return $wpdb->prepare( "$column = %s", $value );
 			case '!=':
 			case 'not_equals':
-				return sprintf( "%s != '%s'", $column, $value );
+				return $wpdb->prepare( "$column != %s", $column, $value );
 			case 'contains':
-				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				return $wpdb->prepare( "$column LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'not_contains':
-				return sprintf( "%s NOT LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				return $wpdb->prepare( "$column NOT LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'starts_with':
 			case 'begins_with':
-				return sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
+				return $wpdb->prepare( "$column LIKE %s", $wpdb->esc_like( $value ) . '%' );
 			case 'does_not_start_with':
-				return sprintf( "%s NOT LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
+				return $wpdb->prepare( "$column NOT LIKE %s", $wpdb->esc_like( $value ) . '%' );
 			case 'ends_with':
-				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
+				return $wpdb->prepare( "$column LIKE %s", '%' . $wpdb->esc_like( $value ) );
 			case 'does_not_end_with':
-				return sprintf( "%s NOT LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
+				return $wpdb->prepare( "$column NOT LIKE %s", '%' . $wpdb->esc_like( $value ) );
 			case 'empty':
-				return sprintf( "%s = ''", $column );
+				return "$column = ''";
 			case 'not_empty':
-				return sprintf( "%s != ''", $column );
+				return "$column != ''";
 			case 'regex':
-				return sprintf( "%s REGEXP BINARY '%s'", $column, $value );
+				return $wpdb->prepare( "$column REGEXP BINARY %s", $value );
 			case 'less_than':
-				return sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+				$rep = is_numeric( $value ) ? '%d' : '%s';
+				return $wpdb->prepare( "$column < $rep", $value );
 			case 'greater_than':
-				return sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+				$rep = is_numeric( $value ) ? '%d' : '%s';
+				return $wpdb->prepare( "$column > $rep", $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "%s >= %s", $column, $value );
+				$rep = is_numeric( $value ) ? '%d' : '%s';
+				return $wpdb->prepare( "$column >= $rep", $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "%s <= %s", $column, $value );
+				$rep = is_numeric( $value ) ? '%d' : '%s';
+				return $wpdb->prepare( "$column <= $rep", $value );
 		}
 	}
 
@@ -3185,21 +3189,22 @@ class Contact_Query {
 	 * @return string
 	 */
 	public static function generic_number_compare( $column, $compare, $value ) {
+		global $wpdb;
 
 		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "%s = %s", $column, $value );
+				return $wpdb->prepare( "$column = %d", $column, $value );
 			case 'not_equals':
-				return sprintf( "%s != %s", $column, $value );
+				return $wpdb->prepare( "$column != %d", $column, $value );
 			case 'greater_than':
-				return sprintf( "%s > %s", $column, $value );
+				return $wpdb->prepare( "$column > %d", $column, $value );
 			case 'less_than':
-				return sprintf( "%s < %s", $column, $value );
+				return $wpdb->prepare( "$column < %d", $column, $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "%s >= %s", $column, $value );
+				return $wpdb->prepare( "$column >= %d", $column, $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "%s <= %s", $column, $value );
+				return $wpdb->prepare( "$column <= %d", $column, $value );
 		}
 	}
 

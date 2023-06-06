@@ -305,15 +305,24 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Get the ID of the conversion step...
+	 * Get all the conversion steps in this funnel
+	 *
+	 * @return Step[]
+	 */
+	public function get_conversion_steps(){
+		return array_filter( $this->get_steps(), function ( $step ) {
+			return $step->is_conversion();
+		} );
+	}
+
+	/**
+	 * Get the ID of the conversion steps...
 	 * This can be defined, or is assumed the last benchmark in the funnel...
 	 *
 	 * @return int[]
 	 */
 	public function get_conversion_step_ids() {
-		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
-			return $step->is_conversion();
-		} ) );
+		return get_object_ids( $this->get_conversion_steps() );
 	}
 
 	/**

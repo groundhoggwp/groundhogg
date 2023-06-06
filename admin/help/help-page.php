@@ -118,7 +118,7 @@ class Help_Page extends Tabbed_Admin_Page {
 		}
 
 		$query = sanitize_text_field( get_post_var( 'query' ) );
-		$json  = remote_post_json( 'https://help.groundhogg.io/search/typeahead?query=' . $query, false, 'GET' );
+		$json  = remote_post_json( 'https://help.groundhogg.io/search/typeahead?query=' . $query, '', 'GET' );
 		wp_send_json( $json );
 	}
 

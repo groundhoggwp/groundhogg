@@ -26,46 +26,46 @@ class License_Manager {
 	static $storeUrl = "https://www.groundhogg.io";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
-    public function __construct() {
-        add_action( 'activated_plugin', [ self::class, 'maybe_activate_using_master_license' ], 99, 2 );
-    }
+	public function __construct() {
+		add_action( 'activated_plugin', [ self::class, 'maybe_activate_using_master_license' ], 99, 2 );
+	}
 
 	/**
-     * Activate the a
-     *
-	 * @param $plugin string
+	 * Activate the a
+	 *
+	 * @param $plugin       string
 	 * @param $network_wide bool
 	 *
 	 * @return void
 	 */
-    public static function maybe_activate_using_master_license( $plugin, $network_wide ){
+	public static function maybe_activate_using_master_license( $plugin, $network_wide ) {
 
-        if ( $network_wide ){
-            return;
-        }
+		if ( $network_wide ) {
+			return;
+		}
 
-        $item_id = Extension_Upgrader::get_extension_id_by_path( $plugin );
+		$item_id = Extension_Upgrader::get_extension_id_by_path( $plugin );
 
 
-        // The plugin that's being activated is a registered extension
-        if ( ! $item_id ){
-            return;
-        }
+		// The plugin that's being activated is a registered extension
+		if ( ! $item_id ) {
+			return;
+		}
 
-	    $master_license = get_option( 'gh_master_license' );
+		$master_license = get_option( 'gh_master_license' );
 
-        if ( empty( $master_license ) ){
-            return;
-        }
+		if ( empty( $master_license ) ) {
+			return;
+		}
 
-        $license = self::get_license( $item_id );
+		$license = self::get_license( $item_id );
 
-        if ( $license ){
-            return;
-        }
+		if ( $license ) {
+			return;
+		}
 
-        self::activate_license_quietly( $master_license, $item_id );
-    }
+		self::activate_license_quietly( $master_license, $item_id );
+	}
 
 	/**
 	 * Maybe setup the licenses unless they haven't been already
@@ -73,9 +73,9 @@ class License_Manager {
 	public static function init_licenses() {
 
 		if ( empty( static::$extensions ) ) {
-			$extensions         = get_option( "gh_extensions", [] );
+			$extensions = get_option( "gh_extensions", [] );
 
-            // Ignore inactive addons
+			// Ignore inactive addons
 			static::$extensions = array_filter( $extensions, function ( $item_id ) {
 				return array_key_exists( $item_id, Extension::$extension_ids );
 			}, ARRAY_FILTER_USE_KEY );
@@ -391,6 +391,8 @@ class License_Manager {
 			'user-agent' => self::$user_agent,
 		];
 
+		$license_data = null;
+
 		// Call the custom api.
 		$response = wp_remote_post( static::$storeUrl, $request );
 		// make sure the response came back okay
@@ -399,14 +401,11 @@ class License_Manager {
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( false === $license_data->success ) {
-
 				$message = self::get_license_error_message( $license_data->error, $license_data->expires );
-
 			}
 		}
 
 		// Check if anything passed on a message constituting a failure
-
 		if ( ! empty( $message ) ) {
 			return new \WP_Error( 'license_failed', __( $message ), $license_data );
 		}
@@ -698,27 +697,27 @@ class License_Manager {
 		], $extension->info->link );
 
 		?>
-        <div class="postbox">
+		<div class="postbox">
 			<?php if ( $extension->info->title ): ?>
-                <h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
+				<h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
 			<?php endif; ?>
-            <div class="inside" style="padding: 0;margin: 0">
+			<div class="inside" style="padding: 0;margin: 0">
 				<?php if ( $extension->info->thumbnail ): ?>
-                    <div class="img-container">
-                        <a href="<?php echo $extension->info->link; ?>" target="_blank">
-                            <img src="<?php echo $extension->info->thumbnail; ?>"
-                                 style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
-                        </a>
-                    </div>
+					<div class="img-container">
+						<a href="<?php echo $extension->info->link; ?>" target="_blank">
+							<img src="<?php echo $extension->info->thumbnail; ?>"
+							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
+						</a>
+					</div>
 				<?php endif; ?>
 				<?php if ( $extension->info->excerpt ): ?>
-                    <div class="article-description" style="padding: 10px;">
+					<div class="article-description" style="padding: 10px;">
 						<?php echo $extension->info->excerpt; ?>
-                    </div>
-                    <hr/>
+					</div>
+					<hr/>
 				<?php endif; ?>
 				<?php if ( $extension->info->link ): ?>
-                    <div class="buy" style="padding: 10px">
+					<div class="buy" style="padding: 10px">
 						<?php $pricing = (array) $extension->pricing;
 						if ( count( $pricing ) > 1 ) {
 
@@ -726,8 +725,8 @@ class License_Manager {
 							$price2 = max( $pricing );
 
 							?>
-                            <a class="button-secondary" target="_blank"
-                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+							<a class="button-secondary" target="_blank"
+							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -735,23 +734,22 @@ class License_Manager {
 
 							if ( $price > 0.00 ) {
 								?>
-                                <a class="button-secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+								<a class="button-secondary" target="_blank"
+								   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-                                <a class="button-secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+								<a class="button-secondary" target="_blank"
+								   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-                    </div>
+					</div>
 				<?php endif; ?>
-            </div>
-        </div>
-
+			</div>
+		</div>
 		<?php
 
 	}
