@@ -1884,17 +1884,39 @@ function track_page_visits_after_signup( $contact ) {
 	// Track any non logged page visits for the new contact
 	$pages_visited = get_cookie( Tracking::PAGE_VISITS_COOKIE );
 
-	if ( ! empty( $pages_visited ) ) {
-		$pages_visited = json_decode( stripslashes( $pages_visited ), true );
+	if ( empty( $pages_visited ) ) {
+		return;
+	}
 
-		foreach ( $pages_visited['pagesAndTimes'] as $visit ) {
-			if ( ! $visit['tracked'] ) {
-				track_page_visit( $visit['page'], $contact, [
-					'timestamp' => absint( $visit['time'] )
-				] );
+	$pages_visited = json_decode( stripslashes( $pages_visited ), true );
+
+	if ( empty( $pages_visited ) ) {
+		return;
+	}
+
+	foreach ( $pages_visited as $visit ) {
+
+		$url = get_array_var( $visit, 'page' );
+
+		if ( $url === false ) {
+			continue;
+		}
+
+		$times = get_array_var( $visit, 'times' );
+
+		foreach ( $times as $time ) {
+
+			// was already tracked
+			if ( $time[1] ) {
+				continue;
 			}
+
+			track_page_visit( $url, $contact, [
+				'timestamp' => absint( $time[0] )
+			] );
 		}
 	}
+
 
 	// Delete the cookie and clear the results.
 	delete_cookie( Tracking::PAGE_VISITS_COOKIE );
@@ -5764,34 +5786,36 @@ function array_filter_splice( &$array, $predicate ) {
 /**
  * Checks if at least one of the elements in the array matches some predicate
  *
- * @param array $array
+ * @param array    $array
  * @param callable $predicate
  *
  * @return bool
  */
-function array_any( $array, $predicate ){
-	foreach ( $array as $element ){
-		if ( call_user_func( $predicate, $element ) ){
+function array_any( $array, $predicate ) {
+	foreach ( $array as $element ) {
+		if ( call_user_func( $predicate, $element ) ) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
 /**
  * Checks if all the elements in the array match some predicate
  *
- * @param array $array
+ * @param array    $array
  * @param callable $predicate
  *
  * @return bool
  */
-function array_all( $array, $predicate ){
-	foreach ( $array as $element ){
-		if ( ! call_user_func( $predicate, $element ) ){
+function array_all( $array, $predicate ) {
+	foreach ( $array as $element ) {
+		if ( ! call_user_func( $predicate, $element ) ) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -5802,7 +5826,7 @@ function array_all( $array, $predicate ){
  *
  * @return bool
  */
-function is_empty( $something ){
+function is_empty( $something ) {
 	return empty( $something );
 }
 
@@ -5813,7 +5837,7 @@ function is_empty( $something ){
  *
  * @return bool
  */
-function is_not_empty( $something ){
+function is_not_empty( $something ) {
 	return ! is_empty( $something );
 }
 
@@ -5824,7 +5848,7 @@ function is_not_empty( $something ){
  *
  * @return bool
  */
-function array_all_empty( $array ){
+function array_all_empty( $array ) {
 	return array_all( $array, __NAMESPACE__ . '\is_empty' );
 }
 
@@ -5835,7 +5859,7 @@ function array_all_empty( $array ){
  *
  * @return bool
  */
-function array_all_not_empty( $array ){
+function array_all_not_empty( $array ) {
 	return array_all( $array, __NAMESPACE__ . '\is_not_empty' );
 }
 
@@ -6513,7 +6537,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'count_compare' => 'greater_than_or_equal_to',
 						'count'         => 1,
 						'email_id'      => absint( $activity_query['email_id'] ),
-						'link'         => get_array_var( $activity_query, 'referer', get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ),
+						'link'          => get_array_var( $activity_query, 'referer', get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ) ),
 						'after'         => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
 						'before'        => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
 						'date_range'    => 'between',
@@ -7488,6 +7512,20 @@ function swap_array_keys( array $array = [], array $key_map = [] ) {
 }
 
 /**
+ * Main tabs in the contact profile that can be selected to open by default
+ *
+ * @return mixed|void
+ */
+function get_valid_contact_tabs() {
+	return apply_filters( 'groundhogg/get_valid_contact_tabs', [
+		'activity' => __( 'Activity Timeline', 'groundhogg' ),
+		'notes'    => __( 'Notes', 'groundhogg' ),
+		'tasks'    => __( 'Tasks', 'groundhogg' ),
+		'files'    => __( 'Files', 'groundhogg' ),
+	] );
+}
+
+/**
  * The default tab to show in the contact record
  *
  * @return false|mixed|string
@@ -7495,16 +7533,16 @@ function swap_array_keys( array $array = [], array $key_map = [] ) {
 function get_default_contact_tab() {
 
 	if ( get_url_var( '_tab' ) ) {
-		return get_url_var( '_tab' );
+		$tab = get_url_var( '_tab' );
+	} else {
+		$tab = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
+
+		if ( empty( $tab ) ) {
+			$tab = get_option( 'gh_default_contact_tab' ) ?: 'activity';
+		}
 	}
 
-	$profile_setting = get_user_meta( get_current_user_id(), 'gh_default_contact_tab', true );
-
-	if ( $profile_setting ) {
-		return $profile_setting;
-	}
-
-	return get_option( 'gh_default_contact_tab' ) ?: 'activity';
+	return key_exists( $tab, get_valid_contact_tabs() ) ? $tab : 'activity';
 }
 
 /**
@@ -7523,7 +7561,7 @@ function verify_admin_ajax_nonce() {
  *
  * @return bool|mixed
  */
-function day_of_week( $number = 0 ){
+function day_of_week( $number = 0 ) {
 	return get_array_var( [
 		'Sunday',
 		'Monday',

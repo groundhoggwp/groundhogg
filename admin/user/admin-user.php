@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\User;
 
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\html;
 use function Groundhogg\white_labeled_name;
 
@@ -33,37 +34,33 @@ class Admin_User {
 		} );
 
 		?>
-        <h2><?php _e( white_labeled_name() ); ?></h2>
-        <table class="form-table">
-            <tr>
-                <th><?php _e( 'Default Contact Tab', 'groundhogg' ); ?></th>
-                <td>
-			        <?php echo html()->dropdown( [
-				        'name'     => 'gh_default_contact_tab',
-				        'options'  => [
-					        'activity' => 'Activity Timeline',
-					        'notes'    => 'Notes',
-					        'tasks'    => 'Tasks',
-					        'files'    => 'Files'
-				        ],
-				        'selected' => $profile_user->gh_default_contact_tab
-			        ] ); ?>
-                    <p class="description"><?php _ex( 'Which tab should be selected by default when opening a contact record.', 'settings', 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-            <tr>
-                <th><?php _e( 'Email Signature', 'groundhogg' ); ?></th>
-                <td>
-                    <div style="max-width: 800px">
+		<h2><?php _e( white_labeled_name() ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php _e( 'Default Contact Tab', 'groundhogg' ); ?></th>
+				<td>
+					<?php echo html()->dropdown( [
+						'name'        => 'gh_default_contact_tab',
+						'options'     => get_valid_contact_tabs(),
+						'option_none' => false,
+						'selected'    => $profile_user->gh_default_contact_tab
+					] ); ?>
+					<p class="description"><?php _ex( 'Which tab should be selected by default when opening a contact record.', 'settings', 'groundhogg' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php _e( 'Email Signature', 'groundhogg' ); ?></th>
+				<td>
+					<div style="max-width: 800px">
 						<?php wp_editor( $profile_user->signature, 'signature', [
 							'teeny'         => false,
 							'textarea_rows' => 10
 						] ); ?>
-                    </div>
-                    <p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-        </table>
+					</div>
+					<p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 

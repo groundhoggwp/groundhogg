@@ -1,3 +1,5 @@
+import ca from '../../lib/calendar/js/locale/ca'
+
 (function (gh) {
 
   const {
@@ -12,8 +14,16 @@
   } = gh
 
   const { tracking, ajax } = routes
-  const { consent_cookie_name = 'viewed_cookie_policy', consent_cookie_value = 'yes' } = settings
-  const { tracking: tracking_cookie, lead_source, form_impressions, page_visits } = cookies
+  const {
+    consent_cookie_name = 'viewed_cookie_policy',
+    consent_cookie_value = 'yes',
+  } = settings
+  const {
+    tracking: tracking_cookie,
+    lead_source,
+    form_impressions,
+    page_visits,
+  } = cookies
   let { _wprest } = nonces
 
   /**
@@ -32,9 +42,7 @@
       },
       body: JSON.stringify(data),
       ...opts,
-    })
-    .then(r => r.json())
-    .catch( err => {
+    }).then(r => r.json()).catch(err => {
       console.log(err)
     })
   }
@@ -56,15 +64,12 @@
       },
       body: JSON.stringify(data),
       ...opts,
-    })
-    .then(r => {
-      if ( r.ok ){
+    }).then(r => {
+      if (r.ok) {
         return r
       }
-      return unauthenticatedApiPost( url, data, opts )
-    })
-    .then(r => r.json())
-    .catch( err => {
+      return unauthenticatedApiPost(url, data, opts)
+    }).then(r => r.json()).catch(err => {
       console.log(err)
     })
   }
@@ -78,7 +83,7 @@
    */
   async function adminAjax (data = {}, opts = {}) {
 
-    if (! ( data instanceof FormData )) {
+    if (!(data instanceof FormData)) {
       const fData = new FormData()
 
       for (const key in data) {
@@ -103,7 +108,7 @@
   const DURATION = {
     HOUR: 60 * 60 * 1000,
     MINUTE: 60 * 1000,
-    DAY: 24 * 60 * 60 * 1000
+    DAY: 24 * 60 * 60 * 1000,
   }
 
   /**
@@ -142,17 +147,14 @@
     return none
   }
 
-  const defaultPageTracking = {
-    pages: [],
-    pagesAndTimes: [],
-  }
-
+  const defaultPageTracking = []
   /**
    * Fetch recently visited pages
    * @return {any}
    */
   const getVisitedPages = () => {
-    return JSON.parse(getCookie(page_visits, JSON.stringify(defaultPageTracking)))
+    return JSON.parse(
+      getCookie(page_visits, JSON.stringify(defaultPageTracking)))
   }
 
   /**
@@ -162,20 +164,43 @@
   const rememberPageVisit = (wasTracked = false) => {
 
     // Don't set cookie if cookies are disabled
-    if ( unnecessary_cookies_disabled ){
-      return;
+    if (unnecessary_cookies_disabled) {
+      return
     }
 
     const url = new URL(window.location.href)
 
-    const pagesVisited = getVisitedPages()
+    let pagesVisited = getVisitedPages()
 
-    pagesVisited.pages.push(url.pathname)
-    pagesVisited.pagesAndTimes.push({
-      page: url.href,
-      time: Date.now() / 1000,
-      tracked: wasTracked
-    })
+    if ( ! Array.isArray( pagesVisited ) ){
+      pagesVisited = []
+    }
+
+    // don't let the cookie get too big
+    if (pagesVisited.length >= 50) {
+      pagesVisited.shift()
+    }
+
+    let unix = Date.now() / 1000
+
+    let visited = pagesVisited.find( p => p[0] === url.pathname )
+
+    if ( visited ){
+
+      if ( visited[1].length >= 5 ){
+        visited[1].shift()
+      }
+
+      visited[1].push( [unix, wasTracked ? 1 : 0] )
+
+    } else {
+
+      pagesVisited.push([
+        url.pathname,
+        [[unix, wasTracked ? 1 : 0]],
+      ])
+
+    }
 
     setCookie(page_visits, JSON.stringify(pagesVisited), DURATION.HOUR)
   }
@@ -188,24 +213,17 @@
 
     pageView () {
 
-      const url = new URL(window.location.href)
+      const apiPageView = (ref) => {
+        let func = this.isLoggedIn ? apiPost : unauthenticatedApiPost
 
-      if ( ! unnecessary_cookies_disabled ) {
-
-        // Don't run if we recently tracked this page visit
-        if (getVisitedPages().pages.includes(url.pathname)) {
-          // return
-        }
-
+        func(tracking + '/pages/', {
+          ref,
+        })
       }
 
       if (this.isLoggedIn || this.hasContactTrackingCookie) {
 
-        let func = this.isLoggedIn ? apiPost : unauthenticatedApiPost
-
-        func(tracking + '/pages/', {
-          ref: url.href
-        })
+        apiPageView(url.href)
 
         rememberPageVisit(true)
       } else {
@@ -219,14 +237,14 @@
       forms.forEach(function (form, i) {
         let formId = form.dataset.id
 
-        if ( formId ){
+        if (formId) {
           self.formImpression(formId)
           return
         }
 
         let field = form.querySelector('input[name="gh_submit_form"]')
 
-        if (field){
+        if (field) {
           self.formImpression(field.value)
         }
       })
@@ -242,10 +260,11 @@
 
       func(tracking + '/forms/', {
         ref: window.location.href,
-        form_id: id
+        form_id: id,
       }).then(() => {
         this.previousFormImpressions.push(id)
-        setCookie(form_impressions, this.previousFormImpressions.join(), 3 * DURATION.DAY)
+        setCookie(form_impressions, this.previousFormImpressions.join(),
+          3 * DURATION.DAY)
       })
     },
 
@@ -256,14 +275,14 @@
       this.has_accepted_cookies = has_accepted_cookies
 
       // Cookies have not been accepted yet, quit out
-      if ( ! has_accepted_cookies && ! this.checkCookieConsent() ) {
+      if (!has_accepted_cookies && !this.checkCookieConsent()) {
 
         // Listen for cookie acceptance
-        document.addEventListener( 'click', () => {
-          setTimeout( () => {
-            this.onCookiesAccept();
-          }, 100 )
-        } );
+        document.addEventListener('click', () => {
+          setTimeout(() => {
+            this.onCookiesAccept()
+          }, 100)
+        })
 
         return
       }
@@ -273,11 +292,11 @@
 
     doTracking () {
 
-      if ( this.initFlag ){
-        return;
+      if (this.initFlag) {
+        return
       }
 
-      this.initFlag = true;
+      this.initFlag = true
 
       // Set "unnecessary" cookies
       if (!unnecessary_cookies_disabled) {
@@ -288,30 +307,36 @@
           setCookie(lead_source, document.referrer, 3 * DURATION.DAY)
         }
 
-        this.previousFormImpressions = getCookie(form_impressions, '').split(',')
+        this.previousFormImpressions = getCookie(form_impressions, '').
+        split(',')
 
         this.logFormImpressions()
       }
 
-      this.pageView()
+      try {
+        this.pageView()
+      } catch ( e ){
+        // do nothing
+      }
     },
 
     onCookiesAccept () {
 
-      if ( this.initFlag ){
-        return;
+      if (this.initFlag) {
+        return
       }
 
-      this.has_accepted_cookies = this.checkCookieConsent();
+      this.has_accepted_cookies = this.checkCookieConsent()
 
-      if ( this.has_accepted_cookies ){
+      if (this.has_accepted_cookies) {
         this.doTracking()
       }
     },
 
-    checkCookieConsent(){
-      return getCookie( consent_cookie_name || 'viewed_cookie_policy' ) === ( consent_cookie_value || 'yes' )
-    }
+    checkCookieConsent () {
+      return getCookie(consent_cookie_name || 'viewed_cookie_policy') ===
+        (consent_cookie_value || 'yes')
+    },
   }
 
   window.addEventListener('load', () => {
