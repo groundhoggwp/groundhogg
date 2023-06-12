@@ -284,8 +284,8 @@ class API_Keys_Table extends \WP_List_Table {
 		if ( ! $user ) {
 			return false;
 		}
-		//genrate new keys
 
+		//generate new keys
 		$new_public_key = self::generate_public_key( $user->user_email );
 		$new_secret_key = self::generate_private_key( $user->ID );
 
@@ -309,9 +309,8 @@ class API_Keys_Table extends \WP_List_Table {
 	public static function generate_public_key( $user_email = '' ) {
 
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
-		$public   = hash( 'md5', $user_email . $auth_key . date( 'U' ) );
 
-		return $public;
+		return hash( 'md5', $user_email . $auth_key . date( 'U' ) );
 	}
 
 	/**
@@ -326,9 +325,8 @@ class API_Keys_Table extends \WP_List_Table {
 	 */
 	public static function generate_private_key( $user_id = 0 ) {
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
-		$secret   = hash( 'md5', $user_id . $auth_key . date( 'U' ) );
 
-		return $secret;
+		return hash( 'md5', $user_id . $auth_key . date( 'U' ) );
 	}
 
 	/**
