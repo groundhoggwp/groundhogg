@@ -10,8 +10,11 @@ use Groundhogg\License_Manager;
 use Groundhogg\Mailhawk;
 use Groundhogg\Plugin;
 use Groundhogg_Email_Services;
+use function Groundhogg\action_input;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -136,8 +139,29 @@ class Settings_Page extends Admin_Page {
 		$api_keys_table = new API_Keys_Table();
 		$api_keys_table->prepare_items();
 		?>
-        <h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
-        <div style="max-width: 900px;"><?php
+		<h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
+
+		<form id="api-key-generate-form" method="post"
+		      action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
+			<?php action_input( 'create_api_key', true, true ); ?>
+			<div class="gh-input-group">
+				<?php echo html()->dropdown_owners( [
+					'option_none' => __( 'Select a user', 'groundhogg' ),
+					'name'        => 'user_id',
+					'id'          => 'user_id'
+				] );
+
+				echo html()->button( [
+					'class' => 'gh-button primary',
+					'text'  => __( 'Generate new API key' ),
+					'type'  => 'submit',
+				] )
+
+				?>
+			</div>
+		</form>
+
+		<div style="max-width: 900px;"><?php
 		$api_keys_table->display();
 		?></div><?php
 
@@ -162,7 +186,6 @@ class Settings_Page extends Admin_Page {
 			]
 		) );
 		html()->end_row();
-
 		html()->end_form_table();
 	}
 
@@ -171,7 +194,7 @@ class Settings_Page extends Admin_Page {
 		$extensions = Extension::get_extensions();
 
 		?>
-        <div>
+		<div>
 			<?php wp_nonce_field(); ?>
 			<?php
 
@@ -182,7 +205,7 @@ class Settings_Page extends Admin_Page {
 					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 					?>
-                    <p><?php printf( __( 'If your license key has expired, <a href="https://groundhogg.io/account/licenses/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
+					<p><?php printf( __( 'If your license key has expired, <a href="https://groundhogg.io/account/licenses/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
 
 				else:
@@ -192,7 +215,7 @@ class Settings_Page extends Admin_Page {
 				endif;
 
 				?>
-                <div class="post-box-grid"><?php
+				<div class="post-box-grid"><?php
 
 				foreach ( $extensions as $extension ):
 					echo $extension;
@@ -201,14 +224,14 @@ class Settings_Page extends Admin_Page {
 				?></div><?php
 			else:
 				?>
-                <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
-                            href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
-                </p>
-                <div class="extensions">
+				<p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
+						href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
+				</p>
+				<div class="extensions">
 					<?php include __DIR__ . '/extensions.php'; ?>
-                </div>
+				</div>
 			<?php endif; ?>
-        </div>
+		</div>
 		<?php
 	}
 
@@ -227,6 +250,73 @@ class Settings_Page extends Admin_Page {
 
 			}
 		}
+	}
+
+	/**
+	 * Generate a new api key
+	 */
+	public function process_create_api_key() {
+
+		// No access
+		if ( ! is_super_admin() ) {
+			$this->wp_die_no_access();
+		}
+
+		$user_id = absint( get_post_var( 'user_id' ) );
+
+		$has_key = get_user_meta( $user_id, 'wpgh_user_secret_key', true );
+
+		if ( ! empty( $has_key ) ){
+			return new \WP_Error( 'error', 'An API key has already been issued for this user.' );
+		}
+
+		if ( API_Keys_Table::generate_api_key( $user_id ) ) {
+			$this->add_notice( 'success', 'API key created!' );
+
+			return true;
+		}
+
+		return new \WP_Error( 'error', 'Unable to generate API key.' );
+	}
+
+	/**
+	 * Generate a new api key
+	 */
+	public function process_reissue_api_key() {
+
+		// No access
+		if ( ! is_super_admin() ) {
+			$this->wp_die_no_access();
+		}
+
+		$user_id = absint( get_request_var( 'user_id' ) );
+
+		if ( API_Keys_Table::generate_api_key( $user_id ) ) {
+			$this->add_notice( 'success', 'New API key created!' );
+
+			return true;
+		}
+
+		return new \WP_Error( 'error', 'Unable to generate new API key.' );
+	}
+
+	/**
+	 * Revoke an existing api key
+	 */
+	public function process_revoke_api_key() {
+
+		if ( ! is_super_admin() ) {
+			$this->wp_die_no_access();
+		}
+
+		$user_id = absint( get_request_var( 'user_id' ) );
+
+		delete_user_meta( $user_id, 'wpgh_user_public_key' );
+		delete_user_meta( $user_id, 'wpgh_user_secret_key' );
+
+		$this->add_notice( 'success', 'API key revoked!' );
+
+		return true;
 	}
 
 	/**
@@ -441,7 +531,7 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => function () {
 					?>
-                    <div id="email-logging"></div><?php
+					<div id="email-logging"></div><?php
 				}
 			],
 //			'imap'               => array(
@@ -795,12 +885,7 @@ class Settings_Page extends Admin_Page {
 				'atts'    => array(
 					'name'        => 'gh_default_contact_tab',
 					'id'          => 'gh_default_contact_tab',
-					'options'     => [
-						'activity' => 'Activity Timeline',
-						'notes'    => 'Notes',
-						'tasks'    => 'Tasks',
-						'files'    => 'Files'
-					],
+					'options'     => get_valid_contact_tabs(),
 					'option_none' => false
 				),
 			),
@@ -1641,23 +1726,26 @@ class Settings_Page extends Admin_Page {
 //    public function settings_content()
 	public function view() {
 		?>
-        <style>
+		<style>
             td .select2 {
                 max-width: 300px;
             }
-        </style>
-        <div class="wrap">
+		</style>
+		<div class="wrap">
 			<?php
 			settings_errors();
 			$action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
-            <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
+			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
 
-                <!-- BEGIN TABS -->
-                <h2 class="nav-tab-wrapper">
+				<!-- BEGIN TABS -->
+				<h2 class="nav-tab-wrapper">
 					<?php foreach ( $this->tabs as $id => $tab ):
 
-                        // Force API Tab & Licenses Tab
-						if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab[ 'id' ], [ 'extensions', 'api_tab' ] ) ) {
+						// Force API Tab & Licenses Tab
+						if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab['id'], [
+								'extensions',
+								'api_tab'
+							] ) ) {
 							continue;
 						}
 
@@ -1671,13 +1759,13 @@ class Settings_Page extends Admin_Page {
 
 						?>
 
-                        <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
-                           class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
+						<a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
+						   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
 					<?php endforeach; ?>
-                </h2>
-                <!-- END TABS -->
+				</h2>
+				<!-- END TABS -->
 
-                <!-- BEGIN SETTINGS -->
+				<!-- BEGIN SETTINGS -->
 				<?php
 				if ( $this->tab_has_settings() && $this->user_can_access_tab() ) {
 
@@ -1690,10 +1778,10 @@ class Settings_Page extends Admin_Page {
 
 				do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_submit" );
 				?>
-                <!-- END SETTINGS -->
-            </form>
+				<!-- END SETTINGS -->
+			</form>
 			<?php do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_form" ); ?>
-        </div> <?php
+		</div> <?php
 	}
 
 	public function settings_callback( $field ) {

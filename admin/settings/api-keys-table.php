@@ -2,8 +2,13 @@
 
 namespace Groundhogg\Admin\Settings;
 
+use function Groundhogg\action_input;
+use function Groundhogg\action_url;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
+use function Groundhogg\html;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 /**
  * API Key Table Class
@@ -50,7 +55,7 @@ class API_Keys_Table extends \WP_List_Table {
 	 * Get things started
 	 *
 	 * @since 1.5
-	 * @see WP_List_Table::__construct()
+	 * @see   WP_List_Table::__construct()
 	 */
 	public function __construct() {
 		global $status, $page;
@@ -69,7 +74,7 @@ class API_Keys_Table extends \WP_List_Table {
 	 * Gets the name of the primary column.
 	 *
 	 * @return string Name of the primary column.
-	 * @since 2.5
+	 * @since  2.5
 	 * @access protected
 	 *
 	 */
@@ -80,7 +85,7 @@ class API_Keys_Table extends \WP_List_Table {
 	/**
 	 * This function renders most of the columns in the list table.
 	 *
-	 * @param array $item Contains all the data of the keys
+	 * @param array  $item        Contains all the data of the keys
 	 * @param string $column_name The name of the column
 	 *
 	 * @return string Column Name
@@ -94,7 +99,7 @@ class API_Keys_Table extends \WP_List_Table {
 	/**
 	 * Displays the public key rows
 	 *
-	 * @param array $item Contains all the data of the keys
+	 * @param array  $item        Contains all the data of the keys
 	 * @param string $column_name The name of the column
 	 *
 	 * @return string Column Name
@@ -108,7 +113,7 @@ class API_Keys_Table extends \WP_List_Table {
 	/**
 	 * Displays the token rows
 	 *
-	 * @param array $item Contains all the data of the keys
+	 * @param array  $item        Contains all the data of the keys
 	 * @param string $column_name The name of the column
 	 *
 	 * @return string Column Name
@@ -122,7 +127,7 @@ class API_Keys_Table extends \WP_List_Table {
 	/**
 	 * Displays the secret key rows
 	 *
-	 * @param array $item Contains all the data of the keys
+	 * @param array  $item        Contains all the data of the keys
 	 * @param string $column_name The name of the column
 	 *
 	 * @return string Column Name
@@ -145,20 +150,12 @@ class API_Keys_Table extends \WP_List_Table {
 
 		$actions['reissue'] = sprintf(
 			'<a href="%s" class="wpgh-regenerate-api-key">%s</a>',
-			esc_url( wp_nonce_url( add_query_arg( array(
-				'user_id'          => $item['id'],
-				'wpgh_action'      => 'process_api_key',
-				'wpgh_api_process' => 'regenerate'
-			) ), 'wpgh-api-nonce' ) ),
+			esc_url( action_url( 'reissue_api_key', [ 'user_id' => $item['id'] ] ) ),
 			_x( 'Reissue', 'action', 'groundhogg' )
 		);
 		$actions['revoke']  = sprintf(
 			'<a href="%s" class="wpgh-revoke-api-key wpgh-delete">%s</a>',
-			esc_url( wp_nonce_url( add_query_arg( array(
-				'user_id'          => $item['id'],
-				'wpgh_action'      => 'process_api_key',
-				'wpgh_api_process' => 'revoke'
-			) ), 'wpgh-api-nonce' ) ),
+			esc_url( action_url( 'revoke_api_key', [ 'user_id' => $item['id'] ] ) ),
 			_x( 'Revoke', 'action', 'groundhogg' )
 		);
 
@@ -183,62 +180,6 @@ class API_Keys_Table extends \WP_List_Table {
 
 		return $columns;
 	}
-
-	/**
-	 * Display the key generation form
-	 *
-	 * @return void
-	 * @since 1.5
-	 */
-	public function bulk_actions( $which = '' ) {
-		// These aren't really bulk actions but this outputs the markup in the right place
-		static $wpgh_api_is_bottom;
-
-		if ( $wpgh_api_is_bottom ) {
-			return;
-		}
-		?>
-
-		<form id="api-key-generate-form" method="post"
-		      action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
-			<input type="hidden" name="wpgh_action" value="process_api_key"/>
-			<input type="hidden" name="wpgh_api_process" value="generate"/>
-			<?php wp_nonce_field( 'wpgh-api-nonce' ); ?>
-			<?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'option_none' => __( 'Please Select a User', 'groundhogg' ) ) ); ?>
-			<?php submit_button( _x( 'Generate New API Keys', 'action', 'groundhogg' ), 'secondary', 'submit', false ); ?>
-		</form>
-		<?php
-		$wpgh_api_is_bottom = true;
-	}
-
-	/**
-	 * Generate the table navigation above or below the table
-	 *
-	 * @param string $which
-	 *
-	 * @since 3.1.0
-	 * @access protected
-	 */
-	protected function display_tablenav( $which ) {
-		if ( 'top' === $which ) {
-			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
-		}
-		?>
-		<div class="tablenav <?php echo esc_attr( $which ); ?>">
-
-			<div class="alignleft actions bulkactions">
-				<?php $this->bulk_actions( $which ); ?>
-			</div>
-			<?php
-			$this->extra_tablenav( $which );
-			$this->pagination( $which );
-			?>
-
-			<br class="clear"/>
-		</div>
-		<?php
-	}
-
 
 	/**
 	 * Retrieve the current page number
@@ -304,24 +245,6 @@ class API_Keys_Table extends \WP_List_Table {
 	 */
 	public function prepare_items() {
 
-		$uid      = absint( get_request_var( 'user_id' ) );
-		$owner_id = absint( get_request_var( 'owner_id' ) );
-		$process  = sanitize_text_field( get_request_var( 'wpgh_api_process' ) );
-
-		// check for form submit to create
-		if ( $owner_id && $owner_id != 0 && $process === 'generate' ) {
-			$this->generate_api_key( $owner_id );
-		}
-
-		if ( $process && $process === 'revoke' && $uid ) {
-			delete_user_meta( $uid, 'wpgh_user_public_key' );
-			delete_user_meta( $uid, 'wpgh_user_secret_key' );
-		}
-
-		if ( $process && $process === 'regenerate' && $uid ) {
-			$this->generate_api_key( $uid );
-		}
-
 		$columns = $this->get_columns();
 
 		$hidden   = array(); // No hidden columns
@@ -343,8 +266,14 @@ class API_Keys_Table extends \WP_List_Table {
 		);
 	}
 
-
-	public function generate_api_key( $user_id = 0 ) {
+	/**
+	 * Generate an api key and store it in user meta
+	 *
+	 * @param int $user_id
+	 *
+	 * @return bool
+	 */
+	public static function generate_api_key( $user_id = 0 ) {
 
 		if ( empty( $user_id ) ) {
 			return false;
@@ -357,8 +286,8 @@ class API_Keys_Table extends \WP_List_Table {
 		}
 		//genrate new keys
 
-		$new_public_key = $this->generate_public_key( $user->user_email );
-		$new_secret_key = $this->generate_private_key( $user->ID );
+		$new_public_key = self::generate_public_key( $user->user_email );
+		$new_secret_key = self::generate_private_key( $user->ID );
 
 		//update meta
 		update_user_meta( $user_id, 'wpgh_user_public_key', $new_public_key );
@@ -375,9 +304,9 @@ class API_Keys_Table extends \WP_List_Table {
 	 * @param string $user_email
 	 *
 	 * @return string
-	 * @since 1.9.9
+	 * @since  1.9.9
 	 */
-	public function generate_public_key( $user_email = '' ) {
+	public static function generate_public_key( $user_email = '' ) {
 
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
 		$public   = hash( 'md5', $user_email . $auth_key . date( 'U' ) );
@@ -393,9 +322,9 @@ class API_Keys_Table extends \WP_List_Table {
 	 * @param int $user_id
 	 *
 	 * @return string
-	 * @since 1.9.9
+	 * @since  1.9.9
 	 */
-	public function generate_private_key( $user_id = 0 ) {
+	public static function generate_private_key( $user_id = 0 ) {
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
 		$secret   = hash( 'md5', $user_id . $auth_key . date( 'U' ) );
 
@@ -410,9 +339,9 @@ class API_Keys_Table extends \WP_List_Table {
 	 * @param int $user_id
 	 *
 	 * @return string
-	 * @since 1.9.9
+	 * @since  1.9.9
 	 */
-	public function get_token( $user_id = 0 ) {
+	public static function get_token( $user_id = 0 ) {
 		return hash( 'md5', get_user_meta( $user_id, 'wpgh_user_secret_key', true ) . get_user_meta( $user_id, 'wpgh_user_public_key', true ) );
 	}
 }
