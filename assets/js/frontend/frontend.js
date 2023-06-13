@@ -1,5 +1,3 @@
-import ca from '../../lib/calendar/js/locale/ca'
-
 (function (gh) {
 
   const {
