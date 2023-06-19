@@ -2,7 +2,8 @@ const { __ } = wp.i18n
 const { createElement } = wp.element
 const { registerBlockType } = wp.blocks
 const { InspectorControls } = wp.editor
-const { SelectControl, ToggleControl, PanelBody, ServerSideRender, Placeholder } = wp.components
+const { SelectControl, ToggleControl, PanelBody, Placeholder } = wp.components
+const { serverSideRender: ServerSideRender } = wp
 
 const ghIcon = <svg viewBox="38.053 7.279 310.877 351.102" xmlns="http://www.w3.org/2000/svg">
 	<g>

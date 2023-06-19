@@ -28,7 +28,7 @@ var scssConfig = {
 
 module.exports = {
     context: __dirname,
-    devtool: debug ? 'inline-sourcemap' : null,
+    // devtool: debug ? 'inline-sourcemap' : null,
     mode: debug ? 'development' : 'production',
     entry: './blocks/gutenberg/src/blocks.js',
     output: {
