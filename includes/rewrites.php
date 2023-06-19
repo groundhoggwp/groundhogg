@@ -25,8 +25,14 @@ class Rewrites {
 
 		// View Emails
 		add_managed_rewrite_rule(
-			'browser-view/emails/([^/]*)/?$',
-			'subpage=browser_view&email_id=$matches[1]'
+			'archive/([^/]*)/?$',
+			'subpage=browser_view&event_id=$matches[1]'
+		);
+
+		// Email Archive
+		add_managed_rewrite_rule(
+			'archive/?$',
+			'subpage=archive'
 		);
 
 		// View Emails
@@ -107,6 +113,7 @@ class Rewrites {
 		$vars[] = 'enc_form_id';
 		$vars[] = 'form_id';
 		$vars[] = 'email_id';
+		$vars[] = 'event_id';
 		$vars[] = 'link_id';
 
 		return $vars;
@@ -122,6 +129,10 @@ class Rewrites {
 	public function parse_query( $query ) {
 		$this->map_query_var( $query, 'link_id', 'absint' );
 		$this->map_query_var( $query, 'email_id', 'absint' );
+
+		// Event ID
+		$this->map_query_var( $query, 'event_id', 'hexdec' );
+		$this->map_query_var( $query, 'event_id', 'absint' );
 
 		// form
 //		$this->map_query_var( $query, 'form_id', 'urldecode' );
@@ -172,7 +183,16 @@ class Rewrites {
 					break;
 				}
 
-				$template = $template_loader->get_template_part( 'emails/browser-view', '', false );
+				$template = $template_loader->get_template_part( 'archive/single', '', false );
+				break;
+			case 'archive':
+
+				// No tracked contact
+				if ( ! get_contactdata() ){
+					break;
+				}
+
+				$template = $template_loader->get_template_part( 'archive/list', '', false );
 				break;
 			case 'emails':
 				$template = $template_loader->get_template_part( 'emails/email', '', false );
@@ -305,7 +325,7 @@ class Rewrites {
 					// Contact read access
 					$contact             = get_contactdata();
 					$basename            = basename( dirname( $file_path ) );
-					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $basename && check_permissions_key( get_permissions_key(), $contact, 'download_files' );
+					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $basename && check_permissions_key( get_permissions_key( 'download_files' ), $contact, 'download_files' );
 
 					if ( ! $admin_read_access && ! $contact_read_access ) {
 						wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
@@ -346,7 +366,7 @@ class Rewrites {
 			case 'auto_login':
 
 				$contact         = get_contactdata( get_url_var( 'cid' ) );
-				$permissions_key = get_permissions_key();
+				$permissions_key = get_permissions_key( 'auto-login' );
 
 				$target_fallback_page = get_option( 'gh_auto_login_fallback_page', home_url() );
 				$redirect_to          = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
@@ -386,7 +406,7 @@ class Rewrites {
 	/**
 	 * @param $array
 	 * @param $key
-	 * @param $func
+	 * @param $func callable
 	 */
 	public function map_query_var( &$array, $key, $func ) {
 		if ( ! function_exists( $func ) ) {

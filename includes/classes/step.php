@@ -8,6 +8,7 @@ use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
+use Groundhogg\Steps\Actions\Send_Email;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -416,7 +417,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool
 	 */
-	public function is_same_funnel( Step $step ){
+	public function is_same_funnel( Step $step ) {
 		return $step->get_funnel_id() === $this->get_funnel_id();
 	}
 
@@ -427,7 +428,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool
 	 */
-	public function is_before( Step $step ){
+	public function is_before( Step $step ) {
 		return $this->is_same_funnel( $step ) && $this->get_order() < $step->get_order();
 	}
 
@@ -438,7 +439,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool
 	 */
-	public function is_after( Step $step ){
+	public function is_after( Step $step ) {
 		return $this->is_same_funnel( $step ) && $this->get_order() > $step->get_order();
 	}
 
@@ -550,7 +551,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		}
 
-		// Setup the new event args
+		// Set up the new event args
 		$event = [
 			'time'       => $this->get_delay_time(),
 			'funnel_id'  => $this->get_funnel_id(),
@@ -559,6 +560,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'contact_id' => $contact->get_id(),
 			'priority'   => 10,
 		];
+
+		// Special handling for email events
+		if ( $this->get_type() === Send_Email::TYPE ) {
+			$event['email_id'] = absint( $this->get_meta( 'email_id' ) );
+		}
 
 		return $this->get_event_queue_db()->add( $event );
 	}
@@ -677,11 +683,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
-	 * @deprecated since 2.0
-	 *
 	 * @param $name
 	 *
 	 * @return string
+	 * @deprecated since 2.0
+	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

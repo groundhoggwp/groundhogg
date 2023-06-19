@@ -59,7 +59,7 @@ class Groundhogg_Email_Services {
 			}
 		}
 
-		if ( self::service_in_use( 'log_only' ) && ! Email_Logger::is_enabled() && current_user_can( 'manage_options' ) ){
+		if ( self::service_in_use( 'log_only' ) && ! Email_Logger::is_enabled() && current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_notices', __NAMESPACE__ . '\log_only_logs_not_enabled_notice' );
 		}
 	}
@@ -87,7 +87,7 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool
 	 */
-	public static function service_in_use( $service ){
+	public static function service_in_use( $service ) {
 		return in_array( $service, [
 			self::get_wordpress_service(),
 			self::get_transactional_service(),
@@ -255,11 +255,49 @@ class Groundhogg_Email_Services {
 		$callback                    = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
 		self::$current_email_service = $service;
 
+		add_action( 'wp_mail_failed', [ self::class, 'catch_wp_mail_failed' ] );
+
 		$sent = call_user_func( $callback, $to, $subject, $message, $headers, $attachments );
 
 		self::clear();
 
+		remove_action( 'wp_mail_failed', [ self::class, 'catch_wp_mail_failed' ] );
+
 		return $sent;
+	}
+
+	/**
+	 * Last WP_Error error from most recently sent email
+	 *
+	 * @var WP_Error
+	 */
+	protected static $last_error;
+
+	/**
+	 * Catch the WP_Error from a failed email
+	 *
+	 * @param $error WP_Error
+	 */
+	public static function catch_wp_mail_failed( $error ) {
+		self::$last_error = $error;
+	}
+
+	/**
+	 * Returns the most recent error
+	 *
+	 * @return WP_Error
+	 */
+	public static function get_last_error(){
+		return self::$last_error;
+	}
+
+	/**
+	 * Whether the last_error isset and is a wp_error
+	 *
+	 * @return bool
+	 */
+	public static function has_error(){
+		return is_wp_error( self::$last_error );
 	}
 
 	/**
@@ -340,7 +378,7 @@ class Groundhogg_Email_Services {
  *
  * @return void
  */
-function log_only_logs_not_enabled_notice(){
+function log_only_logs_not_enabled_notice() {
 
 	?>
 	<div class="notice notice-warning is-dismissible">
@@ -363,17 +401,17 @@ function log_only_logs_not_enabled_notice(){
  * The default charset is based on the charset used on the blog. The charset can
  * be set using the {@see 'wp_mail_charset'} filter.
  *
+ * @param string|string[]                $to          Array or comma-separated list of email addresses to send message.
+ * @param string                         $subject     Email subject.
+ * @param string                         $message     Message contents.
+ * @param string|string[]                $headers     Optional. Additional headers.
+ * @param string|string[]                $attachments Optional. Paths to files to attach.
+ *
+ * @return bool Whether the email was sent successfully.
  * @since 1.2.1
  * @since 5.5.0 is_email() is used for email validation,
  *              instead of PHPMailer's default validator.
  *
- * @param string|string[] $to          Array or comma-separated list of email addresses to send message.
- * @param string          $subject     Email subject.
- * @param string          $message     Message contents.
- * @param string|string[] $headers     Optional. Additional headers.
- * @param string|string[] $attachments Optional. Paths to files to attach.
- *
- * @return bool Whether the email was sent successfully.
  * @global PHPMailer\PHPMailer\PHPMailer $phpmailer
  *
  */
@@ -383,17 +421,17 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @param array          $args        {
+	 *                                    Array of the `wp_mail()` arguments.
+	 *
+	 * @type string|string[] $to          Array or comma-separated list of email addresses to send message.
+	 * @type string          $subject     Email subject.
+	 * @type string          $message     Message contents.
+	 * @type string|string[] $headers     Additional headers.
+	 * @type string|string[] $attachments Paths to files to attach.
+	 * }
 	 * @since 2.2.0
 	 *
-	 * @param array $args {
-	 *     Array of the `wp_mail()` arguments.
-	 *
-	 *     @type string|string[] $to          Array or comma-separated list of email addresses to send message.
-	 *     @type string          $subject     Email subject.
-	 *     @type string          $message     Message contents.
-	 *     @type string|string[] $headers     Additional headers.
-	 *     @type string|string[] $attachments Paths to files to attach.
-	 * }
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
 
@@ -497,11 +535,15 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 					case 'content-type':
 						if ( strpos( $content, ';' ) !== false ) {
 							list( $type, $charset_content ) = explode( ';', $content );
-							$content_type                   = trim( $type );
+							$content_type = trim( $type );
 							if ( false !== stripos( $charset_content, 'charset=' ) ) {
 								$charset = trim( str_replace( array( 'charset=', '"' ), '', $charset_content ) );
 							} elseif ( false !== stripos( $charset_content, 'boundary=' ) ) {
-								$boundary = trim( str_replace( array( 'BOUNDARY=', 'boundary=', '"' ), '', $charset_content ) );
+								$boundary = trim( str_replace( array(
+									'BOUNDARY=',
+									'boundary=',
+									'"'
+								), '', $charset_content ) );
 								$charset  = '';
 							}
 
@@ -561,18 +603,20 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 	/**
 	 * Filters the email address to send from.
 	 *
+	 * @param string $from_email Email address to send from.
+	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $from_email Email address to send from.
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
 
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
+	 * @param string $from_name Name associated with the "from" email address.
+	 *
 	 * @since 2.3.0
 	 *
-	 * @param string $from_name Name associated with the "from" email address.
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
 
@@ -645,9 +689,10 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 	/**
 	 * Filters the wp_mail() content type.
 	 *
+	 * @param string $content_type Default wp_mail() content type.
+	 *
 	 * @since 2.3.0
 	 *
-	 * @param string $content_type Default wp_mail() content type.
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
 
@@ -666,9 +711,10 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
+	 * @param string $charset Default email charset.
+	 *
 	 * @since 2.3.0
 	 *
-	 * @param string $charset Default email charset.
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
 
@@ -703,9 +749,10 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
+	 * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
+	 *
 	 * @since 2.2.0
 	 *
-	 * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
@@ -725,9 +772,10 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 		 * email successfully. It only means that the `send` method above was able to
 		 * process the request without any errors.
 		 *
+		 * @param array $mail_data An array containing the mail recipient, subject, message, headers, and attachments.
+		 *
 		 * @since 5.9.0
 		 *
-		 * @param array $mail_data An array containing the mail recipient, subject, message, headers, and attachments.
 		 */
 		do_action( 'wp_mail_succeeded', $mail_data );
 
@@ -738,10 +786,11 @@ function log_only( $to, $subject, $message, $headers = '', $attachments = array(
 		/**
 		 * Fires after a PHPMailer\PHPMailer\Exception is caught.
 		 *
-		 * @since 4.4.0
-		 *
 		 * @param WP_Error $error A WP_Error object with the PHPMailer\PHPMailer\Exception message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
+		 *
+		 * @since 4.4.0
+		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_data ) );
 

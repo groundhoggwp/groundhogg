@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Steps\Actions\Send_Email;
+
 /**
  * Upgrade
  *
@@ -748,6 +750,32 @@ class Main_Updater extends Updater {
 			'2.7.7.10',
 			'2.7.9.3',
 			'2.7.10',
+			// New format
+			'2.7.11.3' => [
+				'automatic'   => true,
+				'description' => __( 'Refresh permalinks so that the new email archive feature works.', 'groundhogg' ),
+				'callback'    => function () {
+					install_custom_rewrites();
+
+					$steps = get_db( 'steps' )->query( [
+						'step_type'   => Send_Email::TYPE,
+						'step_status' => 'active'
+					] );
+
+					array_map_to_step( $steps );
+
+					foreach ( $steps as $step ) {
+						$email_id = absint( $step->get_meta( 'email_id' ) );
+
+						get_db( 'events' )->update( [
+							'funnel_id'  => $step->get_funnel_id(),
+							'step_id'    => $step->get_id(),
+							'event_type' => Event::FUNNEL,
+							'status'     => Event::COMPLETE,
+						], [ 'email_id' => $email_id ] );
+					}
+				}
+			],
 		];
 	}
 
@@ -792,17 +820,6 @@ class Main_Updater extends Updater {
 			'2.7.7.10',
 			'2.7.9.3',
 			'2.7.10',
-		];
-	}
-
-	/**
-	 * Updates that will allow you to revert.
-	 *
-	 * @return array|string[]
-	 */
-	protected function get_optional_updates() {
-		return [
-			'2.1.13.revert'
 		];
 	}
 
@@ -856,6 +873,17 @@ class Main_Updater extends Updater {
 			'2.7.7.10'      => __( 'Update <code>gh-cron.php</code> to use direction function call instead of <code>do_action()</code>', 'groundhogg' ),
 			'2.7.9.3'       => __( 'Add a value column to the the activity table!', 'groundhogg' ),
 			'2.7.10'        => __( 'Add an <code>is_sensitive</code> flag to email logs for enhanced security. Create tasks table.', 'groundhogg' ),
+		];
+	}
+
+	/**
+	 * Updates that will allow you to revert.
+	 *
+	 * @return array|string[]
+	 */
+	protected function get_optional_updates() {
+		return [
+			'2.1.13.revert'
 		];
 	}
 }

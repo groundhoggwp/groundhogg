@@ -19,6 +19,35 @@ html, body.managed-page, #main {
   margin: auto;
 }
 
+body.managed-page.view #main, body.managed-page.archive #main {
+  max-width: 700px;
+}
+body.managed-page.view #main h2.subject-line, body.managed-page.archive #main h2.subject-line {
+  font-size: 24px;
+  line-height: 1.2;
+  margin-top: -10px;
+  padding: 0 30px 20px;
+  border-bottom: 1px solid #cccccc;
+  margin-left: -30px;
+  margin-right: -30px;
+}
+body.managed-page.view #main .list-wrap, body.managed-page.archive #main .list-wrap {
+  margin: auto -30px;
+}
+body.managed-page.view #main .list-wrap .wp-list-table.archive-list, body.managed-page.archive #main .list-wrap .wp-list-table.archive-list {
+  border-width: 1px 0;
+  width: 100%;
+}
+body.managed-page.view #main .pagination, body.managed-page.archive #main .pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+body.managed-page.view #main .pagination .active, body.managed-page.archive #main .pagination .active {
+  font-weight: bold;
+}
+
 #main form:not(.gdpr-consent), #main .box {
   margin-top: 20px;
   margin-left: 0;
@@ -30,6 +59,9 @@ html, body.managed-page, #main {
   /*margin: 20px;*/
   border-radius: 5px;
   border: none;
+}
+#main form:not(.gdpr-consent) > p:first-child, #main .box > p:first-child {
+  margin-top: 0;
 }
 
 #main h1 a {
@@ -163,6 +195,10 @@ p#credit img {
 #main label.gh-checkbox-label {
   display: flex;
   gap: 5px;
+  align-items: start;
+}
+#main label.gh-checkbox-label input {
+  margin-top: 6px;
 }
 #main p .gh-checkbox-label + br {
   display: none;

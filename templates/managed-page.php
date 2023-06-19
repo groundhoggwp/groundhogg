@@ -62,9 +62,10 @@ function ensure_logo_is_there() {
             #main h1 a {
                 background-image: url(<?php echo esc_url( $image[0] ); ?>);
                 -webkit-background-size: <?php echo absint( $image[1] )?>px;
-                background-size: <?php echo absint( $image[1] ) ?>px;
+                background-size: contain;
                 height: <?php echo absint( $image[2] ) ?>px;
                 width: <?php echo absint( $image[1] ) ?>px;
+	            max-width: 100%;
             }
         </style>
 	<?php

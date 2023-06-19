@@ -186,7 +186,7 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 							<!-- /PREHEADER -->
 
 							<!-- BROWSER VIEW -->
-							<?php if ( apply_filters( 'groundhogg/email_template/show_browser_view', false ) ): ?>
+							<?php if ( apply_filters( 'groundhogg/email_template/show_browser_view', false ) && \Groundhogg\is_sending() ): ?>
 								<div class="header" style="text-align: center;margin-bottom: 25px;">
                                     <span class="apple-link" style="<?php echo $apple_link; ?>">
                                         <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/browser_view_link', home_url() ) ); ?>">

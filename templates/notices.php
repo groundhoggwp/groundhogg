@@ -57,6 +57,14 @@ function notice_general_issue_message(){
 	<?php
 }
 
+function notice_email_issue(){
+	?>
+	<div class="notice notice-error">
+		<p><?php _e( "Email failed to send due to an error!", 'groundhogg' ); ?></p>
+	</div>
+	<?php
+}
+
 function notice_general_success_message(){
 	?>
 	<div class="notice notice-success">

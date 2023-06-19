@@ -19,6 +19,48 @@ html, body.managed-page, #main {
     margin: auto;
 }
 
+body.managed-page {
+
+    &.view,
+    &.archive {
+
+        #main {
+            max-width: 700px;
+
+            h2.subject-line {
+                font-size: 24px;
+                line-height: 1.2;
+                margin-top: -10px;
+                padding: 0 30px 20px;
+                border-bottom: 1px solid #cccccc;
+                margin-left: -30px;
+                margin-right: -30px;
+            }
+
+            .list-wrap {
+                margin: auto -30px;
+                //width: 100%;
+
+                .wp-list-table.archive-list {
+                    border-width: 1px 0;
+                    width: 100%;
+                }
+            }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 20px;
+
+                .active {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
 #main form:not(.gdpr-consent), #main .box {
     margin-top: 20px;
     margin-left: 0;
@@ -30,6 +72,10 @@ html, body.managed-page, #main {
     /*margin: 20px;*/
     border-radius: 5px;
     border: none;
+
+    > p:first-child{
+        margin-top: 0;
+    }
 }
 
 #main h1 a {
@@ -167,6 +213,11 @@ p#credit img {
     label.gh-checkbox-label {
         display: flex;
         gap: 5px;
+        align-items: start;
+
+        input {
+            margin-top: 6px;
+        }
     }
 
     p .gh-checkbox-label + br {

@@ -304,6 +304,11 @@ class Tracking {
 		// Get from the user if logged in and the ID is not available.
 		if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
 			$contact            = $this->get_current_contact();
+
+			if ( ! $contact ){
+				return false;
+			}
+
 			$logged_in_id_value = $contact->get_id();
 		}
 
