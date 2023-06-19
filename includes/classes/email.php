@@ -289,7 +289,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function browser_view_link( $link ) {
-		return managed_page_url( sprintf( "browser-view/emails/%d", $this->get_id() ) );
+		return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
 	}
 
 	/**
@@ -518,13 +518,12 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_footer_text( $content ) {
 
-		$footer = "&copy; {business_name}<br/>";
-		$footer .= "{business_address}<br/>";
+		$footer = sprintf( "&copy; %s<br/>%s<br/>", replacements()->replacement_business_name(), replacements()->replacement_business_address() );
 
 		$sub = array();
 
 		if ( Plugin::$instance->settings->get_option( 'phone', 0 ) ) {
-			$sub[] = "<a href=\"tel:{business_phone}\">{business_phone}</a>";
+			$sub[] = sprintf( '<a href="tel:%1$s">%1$s</a>', replacements()->replacement_business_phone() );
 		}
 
 		if ( Plugin::$instance->settings->get_option( 'privacy_policy' ) ) {
@@ -545,7 +544,7 @@ class Email extends Base_Object_With_Meta {
 
 		$footer .= implode( ' | ', $sub );
 
-		$footer = do_replacements( $footer, $this->get_contact()->get_id() );
+//		$footer = do_replacements( $footer, $this->get_contact() );
 
 		return apply_filters( 'groundhogg/email/footer', $footer );
 	}

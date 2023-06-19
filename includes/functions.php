@@ -82,6 +82,10 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 				$contact = get_contactdata( $identity );
 
 				if ( $contact ) {
+
+					// Start tracking if from the identity parameter
+					tracking()->start_tracking( $contact );
+
 					return $contact;
 				}
 			}
@@ -304,6 +308,13 @@ function html() {
  */
 function notices() {
 	return Plugin::instance()->notices;
+}
+
+/**
+ * @return Replacements
+ */
+function replacements(){
+	return Plugin::instance()->replacements;
 }
 
 /**
@@ -915,7 +926,7 @@ function get_cookie( $cookie = '', $default = false ) {
  *
  * @return bool
  */
-function set_cookie( $cookie = '', $value = '', $expiration = 3600 ) {
+function set_cookie( $cookie = '', $value = '', $expiration = HOUR_IN_SECONDS ) {
 	return setcookie( $cookie, $value, time() + $expiration, COOKIEPATH, COOKIE_DOMAIN );
 }
 
@@ -5018,15 +5029,29 @@ function unsubscribe_url( $contact ) {
  *
  * @return string|false
  */
-function get_permissions_key() {
-	// check for the permissions_key and set it as a cookie
-	if ( $permissions_key = get_url_var( 'pk' ) ) {
-		set_cookie( 'gh-permissions-key', $permissions_key, HOUR_IN_SECONDS );
-	} else {
-		$permissions_key = get_cookie( 'gh-permissions-key' );
+function get_permissions_key( $usage = '', $set_cookie = false ) {
+
+	$cookie = 'gh-permissions-key';
+
+	if ( $usage ){
+		$cookie .= '-' . $usage;
 	}
 
-	return $permissions_key;
+	// Try to get from URL
+	$permissions_key = get_url_var( 'pk' );
+
+	if ( $permissions_key ) {
+
+		// if we also want to set it as the cookie
+		if ( $set_cookie ){
+			set_cookie( $cookie, $permissions_key, HOUR_IN_SECONDS );
+		}
+
+		return $permissions_key;
+	}
+
+	// Try to get from cookies
+	return get_cookie( $cookie );
 }
 
 /**
@@ -5995,6 +6020,12 @@ function get_default_field_label( $field = '' ) {
 			break;
 		case 'email':
 			$label = _x( 'Email Address', 'field_label', 'groundhogg' );
+			break;
+		case 'primary_phone':
+			$label = _x( 'Phone Number', 'field_label', 'groundhogg' );
+			break;
+		case 'mobile_phone':
+			$label = _x( 'Mobile Phone Number', 'field_label', 'groundhogg' );
 			break;
 		case 'gdpr_consent':
 			$label = sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'field_label', 'groundhogg' ), get_bloginfo() );
