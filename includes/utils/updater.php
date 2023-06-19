@@ -74,63 +74,64 @@ abstract class Updater {
 	 *
 	 * @return mixed
 	 */
-	public function show_updates_in_dropdown( $plugins ){
-	    $plugins[ $this->get_updater_name() ] = $this->get_display_name();
-	    return $plugins;
-    }
+	public function show_updates_in_dropdown( $plugins ) {
+		$plugins[ $this->get_updater_name() ] = $this->get_display_name();
+
+		return $plugins;
+	}
 
 	/**
 	 * Show the manual updates in the tools area
 	 */
 	public function show_manual_updates( $updater ) {
 
-	    if ( $updater !== $this->get_updater_name() ){
-	        return;
-        }
+		if ( $updater !== $this->get_updater_name() ) {
+			return;
+		}
 
 		?>
-        <h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3>
-        <p><?php _e( 'Click on a version to run the update process for that version.', 'groundhogg' ); ?></p>
-        <?php
+		<h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3>
+		<p><?php _e( 'Click on a version to run the update process for that version.', 'groundhogg' ); ?></p>
+		<?php
 
-		$updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+		$updates = array_merge( $this->_get_available_updates(), $this->get_optional_updates() );
 
 		usort( $updates, 'version_compare' );
 
 		$_this = $this;
 
 		html()->list_table( [
-            'id' => 'updates-list'
-        ], [
-            __( 'Completed', 'groundhogg' ),
-            __( 'Version', 'groundhogg' ),
-            __( 'Description', 'groundhogg' ),
-        ],
-            array_map_with_keys( array_reverse( $updates ), function ( $update ) use ( $_this ){
-                return [
-                    $this->did_update( $update ) ? "<span style=\"color: green\">&#x2705;</span>" : '-',
-	                html()->e( 'a', [
-		                'href' => add_query_arg( [
-			                'updater'       => $this->get_updater_name(),
-			                'manual_update' => $update,
-			                'confirm'       => 'yes',
-		                ], $_SERVER['REQUEST_URI'] )
-	                ], $update ),
-                    esc_html( $_this->get_update_description( $update ) )
-                ];
-            } )
-        );
+			'id' => 'updates-list'
+		], [
+			__( 'Completed', 'groundhogg' ),
+			__( 'Version', 'groundhogg' ),
+			__( 'Description', 'groundhogg' ),
+		],
+			array_map_with_keys( array_reverse( $updates ), function ( $update ) use ( $_this ) {
+				return [
+					$this->did_update( $update ) ? "<span style=\"color: green\">&#x2705;</span>" : '-',
+					html()->e( 'a', [
+						'href' => add_query_arg( [
+							'updater'       => $this->get_updater_name(),
+							'manual_update' => $update,
+							'confirm'       => 'yes',
+						], $_SERVER['REQUEST_URI'] )
+					], $update ),
+					esc_html( $_this->get_update_description( $update ) )
+				];
+			} )
+		);
 	}
 
 	/**
 	 * Show all the network updates
 	 */
-	public function show_network_updates(){
+	public function show_network_updates() {
 		$action_url = Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
 
 		?>
-        <h3><?php echo $this->get_display_name(); ?></h3>
-        <p><?php
+		<h3><?php echo $this->get_display_name(); ?></h3>
+		<p><?php
 
 		echo html()->e( 'a', [
 			'class' => 'button',
@@ -147,6 +148,26 @@ abstract class Updater {
 	 */
 	public function get_display_name() {
 		return key_to_words( $this->get_updater_name() );
+	}
+
+	/**
+	 * Handler for new update callback format
+	 *
+	 * @return array
+	 */
+	public function _get_available_updates() {
+
+		$versions = [];
+
+		foreach ( $this->get_available_updates() as $i => $version ) {
+			if ( is_array( $version ) ) {
+				$versions[] = $i;
+			} else {
+				$versions[] = $version;
+			}
+		}
+
+		return $versions;
 	}
 
 	/**
@@ -170,6 +191,20 @@ abstract class Updater {
 	 *
 	 * @return string[]
 	 */
+	protected function _get_automatic_updates() {
+
+		$versions = array_keys( array_filter( $this->get_available_updates(), function ( $v ) {
+			return is_array( $v ) && get_array_var( $v, 'automatic' ) === true;
+		} ) );
+
+		return array_merge( $versions, $this->get_automatic_updates() );
+	}
+
+	/**
+	 * List of updates which will run automatically
+	 *
+	 * @return string[]
+	 */
 	protected function get_automatic_updates() {
 		return [];
 	}
@@ -182,6 +217,12 @@ abstract class Updater {
 	 * @return string
 	 */
 	private function get_update_description( $update ) {
+
+		// Handler for new format
+		if ( key_exists( $update, $this->get_available_updates() ) ) {
+			return get_array_var( get_array_var( $this->get_available_updates(), $update ), 'description' );
+		}
+
 		return get_array_var( $this->get_update_descriptions(), $update );
 	}
 
@@ -205,7 +246,7 @@ abstract class Updater {
 
 		$update = get_url_var( 'manual_update' );
 
-		$updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+		$updates = array_merge( $this->_get_available_updates(), $this->get_optional_updates() );
 
 		if ( ! in_array( $update, $updates ) ) {
 			return;
@@ -230,8 +271,26 @@ abstract class Updater {
 	 */
 	private function update_to_version( $version ) {
 
-		// Check if the version we want to update to is greater than that of the db_version
 		$func = $this->convert_version_to_function( $version );
+
+		// Handler for new format
+		if ( array_key_exists( $version, $this->get_available_updates() ) ){
+
+			$update = get_array_var( $this->get_available_updates(), $version );
+			$callback = get_array_var( $update, 'callback' );
+
+			if ( ! is_callable( $callback ) ){
+				return false;
+			}
+
+			call_user_func( $callback );
+
+			$this->remember_version_update( $version );
+
+			do_action( "groundhogg/updater/{$this->get_updater_name()}/{$func}" );
+
+			return true;
+		}
 
 		if ( $func && method_exists( $this, $func ) ) {
 
@@ -344,7 +403,7 @@ abstract class Updater {
 			return;
 		}
 
-		$available_updates = $this->get_available_updates();
+		$available_updates = $this->_get_available_updates();
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
 		if ( empty( $missing_updates ) ) {
@@ -366,11 +425,11 @@ abstract class Updater {
 		$update_descriptions = "";
 
 		foreach ( $missing_updates as $missing_update ) {
-		    if ( $this->get_update_description( $missing_update ) ){
-			    $update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
-		    } else {
-			    $update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b></li>', $missing_update );
-		    }
+			if ( $this->get_update_description( $missing_update ) ) {
+				$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
+			} else {
+				$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b></li>', $missing_update );
+			}
 		}
 
 		if ( ! empty( $update_descriptions ) ) {
@@ -403,17 +462,17 @@ abstract class Updater {
 	}
 
 	/**
-     * Remove the update lock before running the upgrade path...
-     *
+	 * Remove the update lock before running the upgrade path...
+	 *
 	 * @return bool
 	 */
-	public function force_updates(){
+	public function force_updates() {
 
-	    // Remove the update lock...
+		// Remove the update lock...
 		$this->unlock_updates();
 
-	    return $this->do_updates();
-    }
+		return $this->do_updates();
+	}
 
 	/**
 	 * Check whether upgrades should happen or not.
@@ -435,7 +494,7 @@ abstract class Updater {
 			return false;
 		}
 
-		$available_updates = array_merge( $this->get_available_updates(), $this->get_automatic_updates() );
+		$available_updates = array_merge( $this->_get_available_updates(), $this->_get_automatic_updates() );
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
 		if ( empty( $missing_updates ) ) {
@@ -467,7 +526,7 @@ abstract class Updater {
 			return false;
 		}
 
-		$available_updates = $this->get_automatic_updates();
+		$available_updates = $this->_get_automatic_updates();
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
 		if ( empty( $missing_updates ) ) {
@@ -513,19 +572,19 @@ abstract class Updater {
 		return GROUNDHOGG__FILE__;
 	}
 
-	protected function get_update_lock_name(){
+	protected function get_update_lock_name() {
 		return 'gh_' . $this->get_updater_name() . '_doing_updates';
 	}
 
-	protected function lock_updates(){
+	protected function lock_updates() {
 		return set_transient( $this->get_update_lock_name(), time(), MINUTE_IN_SECONDS );
 	}
 
-	protected function unlock_updates(){
+	protected function unlock_updates() {
 		return delete_transient( $this->get_update_lock_name() );
 	}
 
-	protected function are_updates_locked(){
+	protected function are_updates_locked() {
 		return time() - get_transient( $this->get_update_lock_name() ) < MINUTE_IN_SECONDS;
 	}
 }
