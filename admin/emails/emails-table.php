@@ -10,6 +10,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -61,8 +62,8 @@ class Emails_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -101,10 +102,10 @@ class Emails_Table extends WP_List_Table {
 			return;
 		}
 		?>
-        <div class="alignleft gh-actions">
-            <a class="button"
-               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
-        </div>
+		<div class="alignleft gh-actions">
+			<a class="button"
+			   href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+		</div>
 		<?php
 	}
 
@@ -136,9 +137,9 @@ class Emails_Table extends WP_List_Table {
 	/**
 	 * Generates content for a single row of the table
 	 *
-	 * @since 3.1.0
-	 *
 	 * @param object $item The current item
+	 *
+	 * @since 3.1.0
 	 *
 	 */
 	public function single_row( $item ) {
@@ -355,25 +356,22 @@ class Emails_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-		];
-
-		$args = array(
-			'where'      => $where,
+		$args = array_filter( [
+			'status'     => $this->get_view(),
+			'from_user'  => absint( get_url_var( 'from_user' ) ),
+			'author'     => absint( get_url_var( 'author' ) ),
 			'search'     => $search,
 			'limit'      => $per_page,
 			'offset'     => $offset,
 			'order'      => $order,
 			'orderby'    => $orderby,
 			'found_rows' => true,
-		);
+		] );
 
-		$events = get_db( 'emails' )->query( $args );
+		$emails = get_db( 'emails' )->query( $args );
 		$total  = get_db( 'emails' )->found_rows();
 
-		$this->items = $events;
+		$this->items = $emails;
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
