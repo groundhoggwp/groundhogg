@@ -52,8 +52,12 @@ class Admin_User {
 				<th><?php _e( 'Email Signature', 'groundhogg' ); ?></th>
 				<td>
 					<div style="max-width: 800px">
-						<?php wp_editor( $profile_user->signature, 'signature', [
-							'teeny'         => false,
+
+						<?php
+
+						$signature = get_user_meta( $profile_user->ID, 'signature', true );
+
+						wp_editor( $signature, 'signature', [
 							'textarea_rows' => 10
 						] ); ?>
 					</div>
