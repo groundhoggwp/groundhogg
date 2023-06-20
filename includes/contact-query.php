@@ -3194,17 +3194,17 @@ class Contact_Query {
 		switch ( $compare ) {
 			default:
 			case 'equals':
-				return $wpdb->prepare( "$column = %d", $column, $value );
+				return $wpdb->prepare( "$column = %d", $value );
 			case 'not_equals':
-				return $wpdb->prepare( "$column != %d", $column, $value );
+				return $wpdb->prepare( "$column != %d", $value );
 			case 'greater_than':
-				return $wpdb->prepare( "$column > %d", $column, $value );
+				return $wpdb->prepare( "$column > %d", $value );
 			case 'less_than':
-				return $wpdb->prepare( "$column < %d", $column, $value );
+				return $wpdb->prepare( "$column < %d", $value );
 			case 'greater_than_or_equal_to':
-				return $wpdb->prepare( "$column >= %d", $column, $value );
+				return $wpdb->prepare( "$column >= %d", $value );
 			case 'less_than_or_equal_to':
-				return $wpdb->prepare( "$column <= %d", $column, $value );
+				return $wpdb->prepare( "$column <= %d", $value );
 		}
 	}
 

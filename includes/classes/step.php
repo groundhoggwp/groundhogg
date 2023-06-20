@@ -237,9 +237,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function get_waiting_events() {
 
 		$events = $this->get_event_queue_db()->query( [
-			'status'    => Event::WAITING,
-			'step_id'   => $this->get_id(),
-			'funnel_id' => $this->get_funnel_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
+			'step_id'    => $this->get_id(),
+			'funnel_id'  => $this->get_funnel_id(),
 		] );
 
 		$prepped = [];
@@ -556,8 +557,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'time'       => $this->get_delay_time(),
 			'funnel_id'  => $this->get_funnel_id(),
 			'step_id'    => $this->get_id(),
-			'event_type' => Event::FUNNEL,
 			'contact_id' => $contact->get_id(),
+			'event_type' => Event::FUNNEL,
 			'priority'   => 10,
 		];
 
@@ -583,6 +584,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$events = $this->get_event_queue_db()->query( [
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
+			'event_type' => Event::FUNNEL,
 			'status'     => Event::WAITING,
 			'limit'      => 1,
 		] );
@@ -601,6 +603,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$events = $this->get_events_db()->query( [
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
+			'event_type' => Event::FUNNEL,
 			'status'     => Event::COMPLETE,
 			'order'      => 'DESC',
 			'orderby'    => 'time',
@@ -629,12 +632,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function contact_in_funnel( $contact ) {
-		return $this->get_events_db()->count( [
+		return $this->get_events_db()->exists( [
 				'funnel_id'  => $this->get_funnel_id(),
-				'contact_id' => $contact->get_id()
-			] ) > 0 || $this->get_event_queue_db()->count( [
+				'contact_id' => $contact->get_id(),
+				'event_type' => Event::FUNNEL,
+			] ) || $this->get_event_queue_db()->exists( [
 				'funnel_id'  => $this->get_funnel_id(),
-				'contact_id' => $contact->get_id()
+				'contact_id' => $contact->get_id(),
+				'event_type' => Event::FUNNEL,
 			] );
 	}
 
