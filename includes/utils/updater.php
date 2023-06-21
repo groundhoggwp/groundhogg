@@ -307,7 +307,7 @@ abstract class Updater {
 	}
 
 	/**
-	 * Takes the current version number and converts it to a function which can be clled to perform the upgrade requirements.
+	 * Takes the current version number and converts it to a function which can be called to perform the upgrade requirements.
 	 *
 	 * @param $version string
 	 *
@@ -382,7 +382,7 @@ abstract class Updater {
 			return false;
 		}
 
-		return update_option( $this->get_version_option_name(), $this->get_available_updates() );
+		return update_option( $this->get_version_option_name(), $this->_get_available_updates() );
 	}
 
 	/**

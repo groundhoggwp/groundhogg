@@ -183,6 +183,7 @@ class Create_Task extends Action {
 	public function run( $contact, $event ) {
 
 		$summary = $this->get_setting( 'summary' );
+		$summary = sanitize_text_field( do_replacements( $summary, $contact ) );
 		$content = $this->get_setting( 'content' );
 		$content = do_replacements( $content, $contact );
 
