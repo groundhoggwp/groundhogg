@@ -284,7 +284,7 @@ class Rewrites {
 				status_header( 200 );
 				nocache_headers();
 
-				$funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
+				$funnel_id = absint( decrypt( get_query_var( 'enc_funnel_id' ) ) );
 				$funnel    = new Funnel( $funnel_id );
 
 				if ( ! $funnel->exists() ) {
