@@ -127,17 +127,19 @@ class Rewrites {
 	 * @return mixed
 	 */
 	public function parse_query( $query ) {
-		$this->map_query_var( $query, 'link_id', 'absint' );
-		$this->map_query_var( $query, 'email_id', 'absint' );
 
-		// Event ID
-		$this->map_query_var( $query, 'event_id', 'hexdec' );
-		$this->map_query_var( $query, 'event_id', 'absint' );
-
-		// form
-//		$this->map_query_var( $query, 'form_id', 'urldecode' );
-//		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
-//		$this->map_query_var( $query, 'form_id', 'absint' );
+		switch ( get_array_var( $query, 'subpage' ) ){
+			case 'emails':
+				$this->map_query_var( $query, 'email_id', 'absint' );
+				break;
+			case 'benchmark_link':
+				$this->map_query_var( $query, 'link_id', 'absint' );
+				break;
+			case 'browser_view':
+				$this->map_query_var( $query, 'event_id', 'hexdec' );
+				$this->map_query_var( $query, 'event_id', 'absint' );
+				break;
+		}
 
 		return $query;
 	}

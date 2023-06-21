@@ -173,21 +173,6 @@ class Tracking {
 	}
 
 	/**
-	 * @param $array
-	 * @param $key
-	 * @param $func
-	 */
-	public function map_query_var( &$array, $key, $func ) {
-		if ( ! function_exists( $func ) ) {
-			return;
-		}
-
-		if ( isset_not_empty( $array, $key ) ) {
-			$array[ $key ] = call_user_func( $func, $array[ $key ] );
-		}
-	}
-
-	/**
 	 * Parse the Ids from hex to int.
 	 *
 	 * @param $vars array
@@ -206,6 +191,21 @@ class Tracking {
 		}
 
 		return $vars;
+	}
+
+	/**
+	 * @param $array
+	 * @param $key
+	 * @param $func
+	 */
+	public function map_query_var( &$array, $key, $func ) {
+		if ( ! function_exists( $func ) ) {
+			return;
+		}
+
+		if ( isset_not_empty( $array, $key ) ) {
+			$array[ $key ] = call_user_func( $func, $array[ $key ] );
+		}
 	}
 
 	/**
@@ -764,8 +764,10 @@ class Tracking {
 	 */
 	public function contact_unsubscribed( $contact_id ) {
 
+		$contact = get_current_contact();
+
 		// Check if the current tracked contact is also that is being unsubscribed
-		if ( get_current_contact()->get_id() !== $contact_id ){
+		if ( ! is_a_contact( $contact ) || $contact !== $contact_id ){
 			return;
 		}
 

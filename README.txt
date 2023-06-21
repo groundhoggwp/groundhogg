@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.11.5
+Stable tag: 2.7.11.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.11.6 (2023-06-21) =
+* HOT FIX Permalinks conflict with new email archive feature preventing open/click tracing from working.
 
 = 2.7.11.5 (2023-06-21) =
 * TWEAKED Task Summary now supports replacements in the Create Task action.
