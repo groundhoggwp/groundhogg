@@ -941,7 +941,7 @@ function delete_cookie( $cookie = '' ) {
 	unset( $_COOKIE[ $cookie ] );
 
 	// empty value and expiration one hour before
-	return setcookie( $cookie, '', time() - 3600 );
+	return set_cookie( $cookie, '', -3600 );
 }
 
 /**
@@ -1908,13 +1908,13 @@ function track_page_visits_after_signup( $contact ) {
 
 	foreach ( $pages_visited as $visit ) {
 
-		$url = get_array_var( $visit, 'page' );
+		$url = get_array_var( $visit, 0 );
 
-		if ( $url === false ) {
+		if ( empty( $url ) ) {
 			continue;
 		}
 
-		$times = get_array_var( $visit, 'times' );
+		$times = get_array_var( $visit, 1 );
 
 		foreach ( $times as $time ) {
 
@@ -5263,13 +5263,18 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 	}
 
 	$args = [
-		'funnel_id' => tracking()->get_current_funnel_id(),
-		'email_id'  => tracking()->get_current_email_id(),
-		'step_id'   => tracking()->get_current_step_id(),
-		'event_id'  => tracking()->get_current_event()->get_id(),
-		'referer'   => tracking()->get_leadsource(),
-		'value'     => $value
+		'value' => $value
 	];
+
+	if ( tracking()->get_current_event() ) {
+		$args = array_merge( $args, [
+			'funnel_id' => tracking()->get_current_funnel_id(),
+			'email_id'  => tracking()->get_current_email_id(),
+			'step_id'   => tracking()->get_current_step_id(),
+			'event_id'  => tracking()->get_current_event()->get_id(),
+			'referer'   => tracking()->get_leadsource(),
+		] );
+	}
 
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 

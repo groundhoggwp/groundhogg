@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.11.7
+Stable tag: 2.7.11.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.11.8 (2023-06-22) =
+* HOT FIX Visited pages not being tracked from form submissions.
+* HOT FIX `track_live_activity()` causing fatal error if no current event is being tracked.
 
 = 2.7.11.7 (2023-06-22) =
 * TWEAKED Shortened tracking URL structure, from `/gh/tracking/email/click/<contact>/<event>/<email>/<link>` to `/gh/c/<contact>/<event>/<link>`.

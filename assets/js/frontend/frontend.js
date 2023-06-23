@@ -170,7 +170,7 @@
 
     let pagesVisited = getVisitedPages()
 
-    if ( ! Array.isArray( pagesVisited ) ){
+    if (!Array.isArray(pagesVisited)) {
       pagesVisited = []
     }
 
@@ -179,17 +179,16 @@
       pagesVisited.shift()
     }
 
-    let unix = Date.now() / 1000
+    let unix = Math.floor(Date.now() / 1000)
+    let visited = pagesVisited.find(p => p[0] === url.pathname)
 
-    let visited = pagesVisited.find( p => p[0] === url.pathname )
+    if (visited) {
 
-    if ( visited ){
-
-      if ( visited[1].length >= 5 ){
+      if (visited[1].length >= 5) {
         visited[1].shift()
       }
 
-      visited[1].push( [unix, wasTracked ? 1 : 0] )
+      visited[1].push([unix, wasTracked ? 1 : 0])
 
     } else {
 
@@ -221,7 +220,7 @@
 
       if (this.isLoggedIn || this.hasContactTrackingCookie) {
 
-        apiPageView(url.href)
+        apiPageView(window.location.href)
 
         rememberPageVisit(true)
       } else {
@@ -313,8 +312,8 @@
 
       try {
         this.pageView()
-      } catch ( e ){
-        // do nothing
+      } catch (e) {
+        console.log(e)
       }
     },
 
