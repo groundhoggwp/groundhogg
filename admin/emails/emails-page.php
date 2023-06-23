@@ -7,6 +7,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
+use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\managed_page_url;
@@ -31,6 +32,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Admin
  */
 class Emails_Page extends Admin_Page {
+
+
+	protected function get_current_action() {
+		$action = parent::get_current_action();
+
+		if ( $action == 'view' && get_db( 'emails' )->is_empty() ){
+			$action = 'add';
+		}
+
+		return $action;
+	}
 
 
 	protected function add_ajax_actions() {
@@ -89,7 +101,7 @@ class Emails_Page extends Admin_Page {
 			wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
 			wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
 
-            $email_id = absint( Groundhogg\get_request_var( 'email' ) );
+			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
 
 			wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
 				'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
@@ -436,6 +448,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function view() {
+
 		if ( ! class_exists( 'Emails_Table' ) ) {
 			include __DIR__ . '/emails-table.php';
 		}
@@ -447,10 +460,10 @@ class Emails_Page extends Admin_Page {
 		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
 
 		?>
-        <form method="post">
+		<form method="post">
 			<?php $emails_table->prepare_items(); ?>
 			<?php $emails_table->display(); ?>
-        </form>
+		</form>
 		<?php
 	}
 
@@ -481,25 +494,25 @@ class Emails_Page extends Admin_Page {
 
 		if ( empty( $emails ) ):
 			?> <p
-                style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
+			style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		else:
 			?>
 			<?php foreach ( $emails as $email ):
 			$email = new Email( $email->ID );
 			?>
-            <div class="gh-panel">
-                <div class="gh-panel-header">
-                    <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
-                </div>
-                <div class="inside">
-                    <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
-                    <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
-                    <iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
-                            height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-                    <button class="choose-template gh-button primary" name="email_id"
-                            value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
-                </div>
-            </div>
+			<div class="gh-panel">
+				<div class="gh-panel-header">
+					<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+				</div>
+				<div class="inside">
+					<p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
+					<p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
+					<iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
+					        height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+					<button class="choose-template gh-button primary" name="email_id"
+					        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+				</div>
+			</div>
 		<?php endforeach;
 
 		endif;

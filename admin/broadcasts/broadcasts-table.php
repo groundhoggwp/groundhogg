@@ -68,8 +68,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 
@@ -138,12 +138,12 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return array
 	 */
 	protected function get_views() {
-		$count = array(
+		$count = [
 			'scheduled' => get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
 			'sent'      => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),
 			'cancelled' => get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
 			'pending'   => get_db( 'broadcasts' )->count( [ 'status' => 'pending' ] ),
-		);
+		];
 
 		$titles = [
 			'scheduled' => _x( 'Scheduled', 'view', 'groundhogg' ),
@@ -153,7 +153,7 @@ class Broadcasts_Table extends WP_List_Table {
 		];
 
 		// If there are no scheduled broadcasts, go to the sent view
-		if ( $count['scheduled'] === 0 && $this->get_view() === 'scheduled' ) {
+		if ( $count['scheduled'] == 0 && $this->get_view() === 'scheduled' ) {
 			$this->default_view = 'sent';
 		}
 
@@ -543,25 +543,20 @@ class Broadcasts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-		];
-
 		// Only look for emails.
-		if ( ! is_sms_plugin_active() ) {
-			$where[] = [ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ];
-		}
 
-		$args = array(
-			'where'      => $where,
-//			'search'  => $search,
+		$args = [
+			'status'     => $this->get_view(),
 			'limit'      => $per_page,
 			'offset'     => $offset,
 			'order'      => $order,
 			'orderby'    => $orderby,
 			'found_rows' => true,
-		);
+		];
+
+		if ( ! is_sms_plugin_active() ) {
+			$args['object_type'] = 'email';
+		}
 
 		$anonymous = function ( $clauses ) use ( $search ) {
 

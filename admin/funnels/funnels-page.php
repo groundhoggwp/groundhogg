@@ -27,6 +27,7 @@ use Groundhogg\Step;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\last_db_error;
+use function Groundhogg\notices;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,6 +47,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     groundhogg
  */
 class Funnels_Page extends Admin_Page {
+
+	protected function get_current_action() {
+		$action = parent::get_current_action();
+
+		if ( $action === 'view' && get_db('funnels')->is_empty() ){
+			$action = 'add';
+		}
+
+		return $action;
+	}
 
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
@@ -121,8 +132,8 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	/**
-	 * Redirect to the add screen if no funnels are present.
-	 */
+ * Redirect to the add screen if no funnels are present.
+ */
 	public function redirect_to_add() {
 		if ( get_db( 'funnels' )->count() == 0 ) {
 			die( wp_redirect( $this->admin_url( [ 'action' => 'add' ] ) ) );
@@ -133,10 +144,6 @@ class Funnels_Page extends Admin_Page {
 
 		add_disable_emojis_action();
 
-		if ( $this->is_current_page() && $this->get_current_action() === 'view' ) {
-			add_action( 'admin_init', [ $this, 'redirect_to_add' ] );
-		}
-
 		if ( $this->is_current_page() && $this->get_current_action() === 'edit' ) {
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 			/* just need to enqueue it... */
@@ -144,8 +151,8 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		add_action( "groundhogg/admin/gh_funnels/before", function () {
-			if ( ! get_db( 'funnels' )->count( [ 'status' => 'active' ] ) ) {
-				Plugin::$instance->notices->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active funnels.' ), html()->e( 'a', [
+			if ( get_db( 'funnels' )->exists( [ 'status' => 'inactive' ] ) && ! get_db( 'funnels' )->exists( [ 'status' => 'active' ] ) ) {
+				notices()->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active funnels.' ), html()->e( 'a', [
 					'href' => admin_url( 'admin.php?page=gh_funnels&status=inactive' ),
 				], __( 'Activate a funnel!' ) ) ), 'warning' );
 			}

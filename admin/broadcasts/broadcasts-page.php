@@ -16,6 +16,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_sms_plugin_active;
+use function Groundhogg\notices;
 use function Groundhogg\validate_tags;
 
 // Exit if accessed directly
@@ -53,6 +54,24 @@ class Broadcasts_Page extends Admin_Page {
 
 	protected function add_additional_actions() {
 		$this->scheduler = new Broadcast_Scheduler();
+
+		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ){
+
+			notices()->add( 'dne', __( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
+
+			wp_redirect( admin_page_url( 'gh_emails', [ 'action' => 'add' ] ) );
+			die();
+		}
+	}
+
+	protected function get_current_action() {
+		$action = parent::get_current_action();
+
+		if ( $action == 'view' && get_db( 'broadcasts' )->is_empty() ){
+			$action = 'add';
+		}
+
+		return $action;
 	}
 
 	/**
@@ -354,6 +373,7 @@ class Broadcasts_Page extends Admin_Page {
 	 * Display the table
 	 */
 	public function view() {
+
 		$broadcasts_table = new Broadcasts_Table();
 
 		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
