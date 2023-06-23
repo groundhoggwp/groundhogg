@@ -259,6 +259,8 @@ class Email extends Base_Object_With_Meta {
 
 		$this->data = $edited['data'];
 		$this->meta = $edited['meta'];
+
+		$this->set_event( new Event() );
 	}
 
 	/**
@@ -299,10 +301,9 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_open_tracking_link() {
 		return managed_page_url( sprintf(
-			"tracking/email/open/%s/%s/%s/",
+			"o/%s/%s",
 			dechex( $this->get_contact()->get_id() ),
 			! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
-			dechex( $this->get_id() )
 		) );
 	}
 
@@ -313,21 +314,11 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_click_tracking_link() {
 		return managed_page_url(
-			sprintf( 'tracking/email/click/%s/%s/%s/',
+			sprintf( 'c/%s/%s/',
 				dechex( $this->get_contact()->get_id() ),
 				! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
-				dechex( $this->get_id() )
 			)
 		);
-	}
-
-	/**
-	 * @param $link
-	 *
-	 * @return string
-	 */
-	public function click_tracking_link( $link ) {
-		return sprintf( "{$this->get_click_tracking_link()}/%s/", base64_encode( $link ) );
 	}
 
 	/**
@@ -939,8 +930,6 @@ class Email extends Base_Object_With_Meta {
 
 		$headers = $this->get_headers();
 
-//		add_filter( 'groundhogg/email_logger/before_create_log/log_data', [ $this, 'set_log_safe_version' ] );
-
 		if ( $this->is_transactional() ) {
 			// If the email is transactional, use the installed transactional system
 			$sent = \Groundhogg_Email_Services::send_transactional( $to, $subject, $content, $headers );
@@ -1191,23 +1180,30 @@ class Email extends Base_Object_With_Meta {
 
 	public function get_as_array() {
 
-		$contact = get_contactdata();
+		// Ensure there is a contact object there somewhere
+		if ( ! is_a_contact( $this->contact ) ){
+			$contact = get_contactdata();
 
-		if ( ! $contact && is_user_logged_in() ) {
-			$user = wp_get_current_user();
+			if ( ! $contact && is_user_logged_in() ) {
+				$user = wp_get_current_user();
 
-			$contact             = new Contact();
-			$contact->email      = $user->user_email;
-			$contact->first_name = $user->first_name;
-			$contact->last_name  = $user->last_name;
+				$contact             = new Contact();
+				$contact->email      = $user->user_email;
+				$contact->first_name = $user->first_name;
+				$contact->last_name  = $user->last_name;
+			}
+
+			if ( ! $contact ) {
+				return parent::get_as_array();
+			}
+
+			$this->set_contact( $contact );
 		}
 
-		if ( ! $contact ) {
-			return parent::get_as_array();
+		// Ensure there is an event object there somewhere
+		if ( ! $this->event ){
+			$this->set_event( new Event() );
 		}
-
-		$this->set_event( new Event() );
-		$this->set_contact( $contact );
 
 		$live_preview   = $this->build();
 		$edited_preview = $this->get_edited_preview();

@@ -123,14 +123,27 @@ class Tracking {
 	 * Adds the rewrite rules for tracking.
 	 */
 	public function add_rewrite_rules() {
-		// Short tracking structure.
+
+		// Shortened for clicks
+		add_managed_rewrite_rule(
+			'c/([^/]*)/([^/]*)/(.+)$',
+			'subpage=tracking&tracking_via=email&tracking_action=click&contact_id=$matches[1]&event_id=$matches[2]&target_url=$matches[3]'
+		);
+
+		// Shortened for opens
+		add_managed_rewrite_rule(
+			'o/([^/]*)/([^/]*)/?$',
+			'subpage=tracking&tracking_via=email&tracking_action=open&contact_id=$matches[1]&event_id=$matches[2]'
+		);
+
+		### LEGACY SUPPORT ###
+
 		// With Ref attribute
 		add_managed_rewrite_rule(
 			'tracking/([^/]*)/([^/]*)/([^/]*)/([^/]*)/([^/]*)/(.+)$',
 			'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]'
 		);
 
-		// New tracking structure.
 		// No Ref attribute
 		add_managed_rewrite_rule(
 			'tracking/([^/]*)/([^/]*)/([^/]*)/([^/]*)/([^/]*)/?$',
@@ -144,7 +157,7 @@ class Tracking {
 			'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]'
 		);
 
-		// New tracking structure.
+		// Long tracking structure.
 		// No Ref attribute
 		add_managed_rewrite_rule(
 			'tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/?$',
@@ -209,6 +222,37 @@ class Tracking {
 	}
 
 	/**
+	 * Bails during tracking stuff and outputs relevant headers
+	 */
+	protected function bail() {
+
+		if ( $this->doing_click ) {
+			$this->redirect_to_target();
+		}
+
+		if ( $this->doing_open ) {
+			$this->output_tracking_image();
+		}
+
+		$tracking_action = get_query_var( 'tracking_action' );
+
+		switch ( $tracking_action ) {
+			case 'open':
+
+				$this->output_tracking_image();
+
+				break;
+			case 'click':
+
+				$this->redirect_to_target();
+
+				break;
+		}
+
+		wp_die( 'This link is currently unavailable.' );
+	}
+
+	/**
 	 * Do a tracking redirect during the template_redirect hook
 	 */
 	public function template_redirect() {
@@ -226,16 +270,32 @@ class Tracking {
 		$tracking_action = get_query_var( 'tracking_action' );
 
 		$contact_id = absint( get_query_var( 'contact_id' ) );
-		$email_id   = absint( get_query_var( 'email_id' ) );
 		$event_id   = absint( get_query_var( 'event_id' ) );
+
+		$contact = get_contactdata( $contact_id );
+
+		// Contact does not exist
+		if ( ! is_a_contact( $contact ) ) {
+			$this->bail();
+		}
+
+		$event = get_event_by_queued_id( $event_id );
+
+		// Event does not exist
+		if ( ! $event || ! $event->exists() ) {
+			$this->bail();
+		}
+
+		// Event and contact ID do not match
+		if ( $event->get_contact_id() !== $contact->get_id() ) {
+			$this->bail();
+		}
 
 		// Add the tracking cookie params.
 		$this->add_tracking_cookie_param( 'contact_id', $contact_id );
-		$this->add_tracking_cookie_param( 'email_id', $email_id );
-		$this->add_tracking_cookie_param( 'event_id', $event_id );
+		$this->add_tracking_cookie_param( 'event_id', $event->get_id() );
 		$this->add_tracking_cookie_param( 'source', $tracking_via );
 		$this->add_tracking_cookie_param( 'action', $tracking_action );
-
 
 		switch ( $tracking_via ) {
 			case 'email':
@@ -248,20 +308,7 @@ class Tracking {
 						$this->doing_click = true;
 
 						$this->build_tracking_cookie();
-
-						$target_url = get_query_var( 'target_url' );
-
-						// Clean the URL, wonky encoding sometimes...
-						$target_url = str_replace( '&#038;', '&', $target_url );
-
-						if ( empty( $target_url ) ) {
-							$target_url = '/';
-						}
-
-						$target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
-
-
-						$this->email_link_clicked( $target_url );
+						$this->email_link_clicked();
 						break;
 				}
 
@@ -303,9 +350,9 @@ class Tracking {
 
 		// Get from the user if logged in and the ID is not available.
 		if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
-			$contact            = $this->get_current_contact();
+			$contact = $this->get_current_contact();
 
-			if ( ! $contact ){
+			if ( ! $contact ) {
 				return false;
 			}
 
@@ -448,9 +495,9 @@ class Tracking {
 
 		// It's likely that the event is being set by an email link click,
 		// so reference the `queued_id` rather than the actual event `ID`
-		$event = get_event_by_queued_id( $id );
+		$event = new Event( $id );
 
-		if ( ! $event || ! $event->exists() ) {
+		if ( ! $event->exists() ) {
 			return false;
 		}
 
@@ -487,7 +534,11 @@ class Tracking {
 	 * @return int
 	 */
 	public function get_current_email_id() {
-		return absint( $this->get_tracking_cookie_param( 'email_id' ) );
+		if ( ! $this->get_current_event() ) {
+			return false;
+		}
+
+		return $this->get_current_event()->get_email_id();
 	}
 
 	/**
@@ -507,27 +558,30 @@ class Tracking {
 	 * If the tracking cookie exists, deconstruct it into parts
 	 */
 	public function deconstruct_tracking_cookie() {
-		if ( ! isset_not_empty( $_COOKIE, self::TRACKING_COOKIE ) ) {
+
+		$enc_cookie = get_cookie( self::TRACKING_COOKIE );
+
+		if ( ! $enc_cookie ) {
 			return;
 		}
 
-		$enc_cookie   = $_COOKIE[ self::TRACKING_COOKIE ];
 		$dec_cookie   = decrypt( $enc_cookie );
 		$cookie_vars  = json_decode( $dec_cookie, true );
 		$cookie_vars  = apply_filters( 'groundhogg/tracking/get_cookie_vars', $cookie_vars );
 		$this->cookie = $cookie_vars;
+
+//		var_dump( $this->cookie );
 	}
 
 	/**
 	 * Build a tracking cookie based on the available information.
 	 */
 	protected function build_tracking_cookie() {
+
 		$cookie_vars = apply_filters( 'groundhogg/tracking/set_cookie_vars', $this->cookie );
-
-		$cookie = wp_json_encode( $cookie_vars );
-		$cookie = encrypt( $cookie );
-
-		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY * DAY_IN_SECONDS );
+		$cookie      = wp_json_encode( $cookie_vars );
+		$cookie      = encrypt( $cookie );
+		$expiry      = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY * DAY_IN_SECONDS );
 
 		return set_cookie( self::TRACKING_COOKIE, $cookie, $expiry );
 	}
@@ -541,11 +595,17 @@ class Tracking {
 	 * @param array $more
 	 */
 	public function start_tracking( $contact, $deprecated = null, $more = [] ) {
-		if ( ! $contact ) {
+
+		if ( ! is_a_contact( $contact ) ) {
 			return;
 		}
 
-		// Remove any previous tracking...
+		// Already tracking this contact
+		if ( $this->get_current_contact_id() === $contact->get_id() ) {
+			return;
+		}
+
+		// Remove previous contact
 		$this->cookie = [];
 
 		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
@@ -632,6 +692,53 @@ class Tracking {
 	}
 
 	/**
+	 * Temp cache the redirect URL here
+	 *
+	 * @var string
+	 */
+	protected $target_url;
+
+	/**
+	 * Allows getting the target URL at any point
+	 *
+	 * @return mixed|void
+	 */
+	protected function get_target_url() {
+
+		if ( $this->target_url ) {
+			return $this->target_url;
+		}
+
+		$target_url = get_query_var( 'target_url' );
+
+		// Clean the URL, wonky encoding sometimes...
+		$target_url = str_replace( '&#038;', '&', $target_url );
+
+		if ( empty( $target_url ) ) {
+			$target_url = '/';
+		}
+
+		// We removed the hostname from the url to shorten it
+//		if ( preg_match( '@^/@', $target_url ) ) {
+//			$scheme     = is_ssl() ? 'https' : 'http';
+//			$hostname   = wp_parse_url( home_url(), PHP_URL_HOST );
+//			$target_url = "{$scheme}://{$hostname}{$target_url}";
+//		}
+
+		$this->target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
+
+		return $this->target_url;
+	}
+
+	/**
+	 * Redirects to the target URL
+	 */
+	protected function redirect_to_target() {
+		wp_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
+		die();
+	}
+
+	/**
 	 * When an email is opened this function will be called at the INIT stage
 	 */
 	public function email_opened() {
@@ -639,21 +746,17 @@ class Tracking {
 		$event = $this->get_current_event();
 
 		if ( ! $event || ! $event->exists() ) {
-			if ( $this->doing_open ) {
-				$this->output_tracking_image();
-			} else {
-				return;
-			}
+			$this->bail();
 		}
 
-		$args = array(
+		$args = [
+			'event_id'      => $event->get_id(),
 			'contact_id'    => $event->get_contact_id(),
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
-			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
+			'email_id'      => $event->get_email_id(),
 			'activity_type' => Activity::EMAIL_OPENED,
-			'event_id'      => $event->get_id(),
-		);
+		];
 
 		// Check if exists first
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
@@ -681,29 +784,19 @@ class Tracking {
 	 *
 	 * @return int
 	 */
-	protected function redirect_http_status_code(){
+	protected function redirect_http_status_code() {
 		return apply_filters( 'groundhogg/tracking/redirect_http_status_code', 307 );
 	}
 
 	/**
 	 * When tracking a link click redirect the user to the destination after performing the necessary tracking
-	 *
-	 * @param $target string where to send the subscriber
 	 */
-	protected function email_link_clicked( $target = '' ) {
+	protected function email_link_clicked() {
 		/* track every click as an open */
 		$this->email_opened();
 
-		$orig_target = $target;
-
-		$event = $this->get_current_event();
-
-		// We removed the hostname from the url to shorten it
-		if ( preg_match( '@^/@', $target ) ) {
-			$scheme   = is_ssl() ? 'https' : 'http';
-			$hostname = wp_parse_url( home_url(), PHP_URL_HOST );
-			$target   = "$scheme://$hostname$target";
-		}
+		$event  = $this->get_current_event();
+		$target = $this->get_target_url();
 
 		/**
 		 * @since 2.1
@@ -715,22 +808,22 @@ class Tracking {
 		 * always.
 		 */
 		if ( ! $event || ! $event->exists() ) {
-			wp_redirect( $target, $this->redirect_http_status_code() );
+			$this->bail();
 
 			return;
 		}
 
-		$args = array(
+		$args = [
 			'timestamp'     => time(),
 			'contact_id'    => $event->get_contact_id(),
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
-			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
+			'email_id'      => $event->get_email_id(),
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'event_id'      => $event->get_id(),
-			'referer'       => $orig_target,
-			'referer_hash'  => generate_referer_hash( $orig_target )
-		);
+			'referer'       => $target,
+			'referer_hash'  => generate_referer_hash( $target )
+		];
 
 		if ( $id = get_db( 'activity' )->add( $args ) ) {
 			do_action( 'groundhogg/tracking/email/click', $this );
@@ -738,7 +831,7 @@ class Tracking {
 			// Add compat for new tracking actions for activity
 			track_activity_actions( new Activity( $id ) );
 
-			wp_redirect( $target, $this->redirect_http_status_code() );
+			$this->redirect_to_target();
 
 			return;
 		}
@@ -753,8 +846,7 @@ class Tracking {
 	 * @param $contact Contact
 	 */
 	public function form_filled( $contact ) {
-		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
-		$this->build_tracking_cookie();
+		$this->start_tracking( $contact );
 	}
 
 	/**
@@ -767,7 +859,7 @@ class Tracking {
 		$contact = get_current_contact();
 
 		// Check if the current tracked contact is also that is being unsubscribed
-		if ( ! is_a_contact( $contact ) || $contact !== $contact_id ){
+		if ( ! is_a_contact( $contact ) || $contact->get_id() !== $contact_id || ! $this->get_current_event() ) {
 			return;
 		}
 

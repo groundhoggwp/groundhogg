@@ -40,6 +40,7 @@ class Autoloader {
 		'Tag_Mapping'                       => 'includes/tag-mapping.php',
 		'Modal'                             => 'includes/modal.php',
 		'Main_Updater'                      => 'includes/main-updater.php',
+		'Old_Updater'                       => 'includes/old-updater.php',
 		'Main_Roles'                        => 'includes/main-roles.php',
 		'Main_Installer'                    => 'includes/main-installer.php',
 		'Compliance'                        => 'includes/compliance.php',
