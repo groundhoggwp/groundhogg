@@ -40,17 +40,55 @@ abstract class Updater {
 		add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 );
 
 		// Save previous updates when plugin installed.
-		add_action( 'activated_plugin', [ $this, 'save_previous_updates_when_installed' ], 99 );
+		register_activation_hook( $this->get_plugin_file(), [ $this, 'save_previous_updates_when_installed' ] );
 		add_action( 'groundhogg/reset', [ $this, 'save_previous_updates_when_installed' ], 99 );
 	}
 
 	/**
+	 * Unperformed automatic updates
+	 *
+	 * @return string[]
+	 */
+	public function get_automatic_updates_to_do() {
+		$done     = $this->get_previous_versions();
+		$not_done = array_diff( $this->_get_automatic_updates(), $done );
+
+		return $not_done;
+	}
+
+	/**
+	 * Unperformed updates that require confirmation (not automatic)
+	 *
+	 * @return string[]
+	 */
+	public function get_updates_to_do() {
+		$done     = $this->get_previous_versions();
+		$not_done = array_diff( $this->_get_updates(), $done );
+
+		return $not_done;
+	}
+
+	/**
 	 * Get the previous version which the plugin was updated to.
+	 * If the option is false/empty, we could be running the update script ahead of the installer,
+	 * Or we could have added a new updater after the plugin was initially installed
 	 *
 	 * @return string[]
 	 */
 	public function get_previous_versions() {
-		return Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
+		$done = get_option( $this->get_version_option_name(), [] );
+
+		// The option has not been set
+		if ( ! is_array( $done ) ) {
+			return [];
+		}
+
+		// If there are no completed updates yet
+		if ( empty( $done ) ) {
+			// Anything here?
+		}
+
+		return $done;
 	}
 
 	/**
@@ -61,13 +99,6 @@ abstract class Updater {
 	protected function get_version_option_name() {
 		return sanitize_key( sprintf( 'gh_%s_version_updates', $this->get_updater_name() ) );
 	}
-
-	/**
-	 * A unique name for the updater to avoid conflicts
-	 *
-	 * @return string
-	 */
-	abstract protected function get_updater_name();
 
 	/**
 	 * @param $plugins
@@ -94,7 +125,7 @@ abstract class Updater {
 		<p><?php _e( 'Click on a version to run the update process for that version.', 'groundhogg' ); ?></p>
 		<?php
 
-		$updates = array_merge( $this->_get_available_updates(), $this->get_optional_updates() );
+		$updates = $this->_get_all_updates();
 
 		usort( $updates, 'version_compare' );
 
@@ -117,7 +148,7 @@ abstract class Updater {
 							'confirm'       => 'yes',
 						], $_SERVER['REQUEST_URI'] )
 					], $update ),
-					esc_html( $_this->get_update_description( $update ) )
+					$_this->get_update_description( $update )
 				];
 			} )
 		);
@@ -151,11 +182,20 @@ abstract class Updater {
 	}
 
 	/**
+	 * Get all available updates
+	 *
+	 * @return string[] list of versions
+	 */
+	protected function _get_all_updates() {
+		return array_unique( array_merge( $this->_get_updates(), $this->_get_automatic_updates() ) );
+	}
+
+	/**
 	 * Handler for new update callback format
 	 *
-	 * @return array
+	 * @return string[] list of versions
 	 */
-	public function _get_available_updates() {
+	protected function _get_updates() {
 
 		$versions = [];
 
@@ -167,29 +207,13 @@ abstract class Updater {
 			}
 		}
 
-		return $versions;
-	}
-
-	/**
-	 * Get a list of updates which are available.
-	 *
-	 * @return string[]
-	 */
-	abstract protected function get_available_updates();
-
-	/**
-	 * Get a list of updates that do not update automatically, but will show on the updates page
-	 *
-	 * @return string[]
-	 */
-	protected function get_optional_updates() {
-		return [];
+		return array_diff( $versions, $this->_get_automatic_updates() );
 	}
 
 	/**
 	 * List of updates which will run automatically
 	 *
-	 * @return string[]
+	 * @return string[] list of versions
 	 */
 	protected function _get_automatic_updates() {
 
@@ -201,9 +225,27 @@ abstract class Updater {
 	}
 
 	/**
+	 * Get a list of updates which are available.
+	 *
+	 * @return array[]|string[] mixed back of version formats
+	 */
+	abstract protected function get_available_updates();
+
+	/**
+	 * Get a list of updates that do not update automatically, but will show on the updates page
+	 *
+	 * @return string[]
+	 * @deprecated
+	 */
+	protected function get_optional_updates() {
+		return [];
+	}
+
+	/**
 	 * List of updates which will run automatically
 	 *
 	 * @return string[]
+	 * @deprecated
 	 */
 	protected function get_automatic_updates() {
 		return [];
@@ -244,9 +286,8 @@ abstract class Updater {
 			return;
 		}
 
-		$update = get_url_var( 'manual_update' );
-
-		$updates = array_merge( $this->_get_available_updates(), $this->get_optional_updates() );
+		$update  = get_url_var( 'manual_update' );
+		$updates = $this->_get_updates();
 
 		if ( ! in_array( $update, $updates ) ) {
 			return;
@@ -274,12 +315,12 @@ abstract class Updater {
 		$func = $this->convert_version_to_function( $version );
 
 		// Handler for new format
-		if ( array_key_exists( $version, $this->get_available_updates() ) ){
+		if ( array_key_exists( $version, $this->get_available_updates() ) ) {
 
-			$update = get_array_var( $this->get_available_updates(), $version );
+			$update   = get_array_var( $this->get_available_updates(), $version );
 			$callback = get_array_var( $update, 'callback' );
 
-			if ( ! is_callable( $callback ) ){
+			if ( ! is_callable( $callback ) ) {
 				return false;
 			}
 
@@ -382,7 +423,7 @@ abstract class Updater {
 			return false;
 		}
 
-		return update_option( $this->get_version_option_name(), $this->_get_available_updates() );
+		return update_option( $this->get_version_option_name(), $this->_get_updates() );
 	}
 
 	/**
@@ -392,19 +433,11 @@ abstract class Updater {
 	 */
 	public function updates_notice() {
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || $this->did_updates ) {
 			return;
 		}
 
-		$previous_updates = $this->get_previous_versions();
-
-		// No previous updates, if this is the case something has gone wrong...
-		if ( empty( $previous_updates ) || $this->did_updates ) {
-			return;
-		}
-
-		$available_updates = $this->_get_available_updates();
-		$missing_updates   = array_diff( $available_updates, $previous_updates );
+		$missing_updates = $this->get_updates_to_do();
 
 		if ( empty( $missing_updates ) ) {
 			return;
@@ -487,15 +520,7 @@ abstract class Updater {
 		// Set lock so second update process cannot be run before this one is complete.
 		$this->lock_updates();
 
-		$previous_updates = $this->get_previous_versions();
-
-		// No previous updates, if this is the case something has gone wrong...
-		if ( empty( $previous_updates ) ) {
-			return false;
-		}
-
-		$available_updates = array_merge( $this->_get_available_updates(), $this->_get_automatic_updates() );
-		$missing_updates   = array_diff( $available_updates, $previous_updates );
+		$missing_updates = $this->get_updates_to_do();
 
 		if ( empty( $missing_updates ) ) {
 			return false;
@@ -519,15 +544,7 @@ abstract class Updater {
 	 */
 	public function do_automatic_updates() {
 
-		$previous_updates = $this->get_previous_versions();
-
-		// No previous updates, if this is the case something has gone wrong...
-		if ( empty( $previous_updates ) ) {
-			return false;
-		}
-
-		$available_updates = $this->_get_automatic_updates();
-		$missing_updates   = array_diff( $available_updates, $previous_updates );
+		$missing_updates = $this->get_automatic_updates_to_do();
 
 		if ( empty( $missing_updates ) ) {
 			return false;
@@ -562,6 +579,13 @@ abstract class Updater {
 	public function did_update( $version ) {
 		return in_array( $version, $this->get_previous_versions() );
 	}
+
+	/**
+	 * A unique name for the updater to avoid conflicts
+	 *
+	 * @return string
+	 */
+	abstract protected function get_updater_name();
 
 	/**
 	 * Get the plugin file for this extension
