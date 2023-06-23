@@ -917,6 +917,16 @@ abstract class DB {
 	}
 
 	/**
+	 * Whether the table has at least 1 row
+	 *
+	 * @return bool
+	 */
+	public function is_empty() {
+		$rows = $this->query( [ 'limit' => 1 ] );
+		return empty( $rows );
+	}
+
+	/**
 	 * Checks if a broadcast exists
 	 *
 	 * @access  public
