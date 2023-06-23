@@ -22,7 +22,6 @@ use function Groundhogg\split_name;
 use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Supports_Errors;
-use function Groundhogg\track_live_activity;
 use function Groundhogg\Ymd;
 
 if ( ! defined( 'ABSPATH' ) ) {
