@@ -30,8 +30,9 @@ if ( ! $contact ) {
 // Or has permissions key
 if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact, 'view_archive' ) ):
 
-	$event_id = absint( get_query_var( 'event_id' ) );
-	$event       = new Event( $event_id, 'events', 'queued_id' );
+	$use_queued = get_query_var( 'use_queued' );
+	$event_id    = absint( get_query_var( 'event_id' ) );
+	$event       = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
 
 	// Event does not exist, or mismatched contact ID
 	if ( ! $event->exists() || $event->get_contact_id() !== $contact->get_id() ) {
@@ -39,7 +40,8 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	}
 
 	$email_id = $event->email_id;
-	$email    = new Email( $email_id );
+
+	$email = new Email( $email_id );
 
 	if ( ! $email->exists() ) {
 		wp_die( __( 'Could not load email...' ) );

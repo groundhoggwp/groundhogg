@@ -63,7 +63,7 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 			return [
 				$date->format( get_option( 'date_format' ) ),
 				html()->e( 'a', [
-					'href' => managed_page_url( 'archive/' . dechex( $e->queued_id ) ),
+					'href' => managed_page_url( 'archive/p/' . dechex( $e->ID ) ),
 				], $email->get_merged_subject_line() )
 			];
 

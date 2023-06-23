@@ -23,10 +23,16 @@ class Rewrites {
 	 */
 	public function add_rewrite_rules() {
 
-		// View Emails
+		// Browser view using primary id
+		add_managed_rewrite_rule(
+			'archive/p/([^/]*)/?$',
+			'subpage=browser_view&event_id=$matches[1]'
+		);
+
+		// Browser view using queued ID
 		add_managed_rewrite_rule(
 			'archive/([^/]*)/?$',
-			'subpage=browser_view&event_id=$matches[1]'
+			'subpage=browser_view&use_queued=1&event_id=$matches[1]'
 		);
 
 		// Email Archive
@@ -115,6 +121,7 @@ class Rewrites {
 		$vars[] = 'email_id';
 		$vars[] = 'event_id';
 		$vars[] = 'link_id';
+		$vars[] = 'use_queued';
 
 		return $vars;
 	}
@@ -368,7 +375,7 @@ class Rewrites {
 			case 'auto_login':
 
 				$contact         = get_contactdata( get_url_var( 'cid' ) );
-				$permissions_key = get_permissions_key( 'auto-login' );
+				$permissions_key = get_permissions_key( 'auto_login' );
 
 				$target_fallback_page = get_option( 'gh_auto_login_fallback_page', home_url() );
 				$redirect_to          = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
@@ -377,14 +384,16 @@ class Rewrites {
 
 					// If the contact or permissions key is not available, exit now.
 					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ) {
-						wp_die( __( 'Unable to login. This link may have expired.', 'groundhogg' ) );
+						wp_redirect( wp_login_url( $redirect_to ) );
+						die();
 					}
 
 					$user = $contact->get_userdata();
 
 					// If there is no user account, send to the home page
 					if ( ! $user ) {
-						wp_die( __( 'Unable to login. There is no user account associated with your email address.', 'groundhogg' ) );
+						wp_redirect( wp_login_url( $redirect_to ) );
+						die();
 					}
 
 					wp_set_current_user( $user->ID );
