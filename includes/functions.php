@@ -73,6 +73,10 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
+		if ( $contact = tracking()->get_current_contact() ) {
+			return $contact;
+		}
+
 		// support for identity
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
@@ -82,17 +86,13 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 				$contact = get_contactdata( $identity );
 
 				if ( $contact ) {
-
-					// Start tracking if from the identity parameter
-					tracking()->start_tracking( $contact );
-
 					return $contact;
 				}
 			}
 
 		}
 
-		return tracking()->get_current_contact();
+		return false;
 	} else if ( in_array( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
@@ -313,7 +313,7 @@ function notices() {
 /**
  * @return Replacements
  */
-function replacements(){
+function replacements() {
 	return Plugin::instance()->replacements;
 }
 
@@ -1725,6 +1725,7 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'time'       => $time,
 		'funnel_id'  => 0,
 		'step_id'    => $email->get_id(),
+		'email_id'   => $email->get_id(),
 		'contact_id' => $contact->get_id(),
 		'event_type' => Event::EMAIL_NOTIFICATION,
 		'priority'   => 5,
@@ -5033,7 +5034,7 @@ function get_permissions_key( $usage = '', $set_cookie = false ) {
 
 	$cookie = 'gh-permissions-key';
 
-	if ( $usage ){
+	if ( $usage ) {
 		$cookie .= '-' . $usage;
 	}
 
@@ -5043,7 +5044,7 @@ function get_permissions_key( $usage = '', $set_cookie = false ) {
 	if ( $permissions_key ) {
 
 		// if we also want to set it as the cookie
-		if ( $set_cookie ){
+		if ( $set_cookie ) {
 			set_cookie( $cookie, $permissions_key, HOUR_IN_SECONDS );
 		}
 
@@ -5264,7 +5265,8 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 	$args = [
 		'funnel_id' => tracking()->get_current_funnel_id(),
 		'email_id'  => tracking()->get_current_email_id(),
-		'event_id'  => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
+		'step_id'   => tracking()->get_current_step_id(),
+		'event_id'  => tracking()->get_current_event()->get_id(),
 		'referer'   => tracking()->get_leadsource(),
 		'value'     => $value
 	];
