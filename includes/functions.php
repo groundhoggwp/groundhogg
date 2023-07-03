@@ -941,7 +941,7 @@ function delete_cookie( $cookie = '' ) {
 	unset( $_COOKIE[ $cookie ] );
 
 	// empty value and expiration one hour before
-	return set_cookie( $cookie, '', -3600 );
+	return set_cookie( $cookie, '', - 3600 );
 }
 
 /**
@@ -2827,19 +2827,10 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			// Only checks whether value is not empty.
 			case 'terms_agreement':
-				if ( ! empty( $value ) ) {
-					$terms_agreement = true;
-				}
-				break;
-			// Only checks whether value is not empty.
 			case 'gdpr_consent':
-				if ( ! empty( $value ) ) {
-					$gdpr_consent = true;
-				}
-				break;
 			case 'marketing_consent':
 				if ( ! empty( $value ) ) {
-					$marketing_consent = true;
+					$args[ $field ] = true;
 				}
 				break;
 			case 'country':
@@ -2987,18 +2978,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	// Update contact info
 	$contact->update( $args );
-
-	if ( $gdpr_consent ) {
-		$contact->set_gdpr_consent();
-	}
-
-	if ( $marketing_consent ) {
-		$contact->set_marketing_consent();
-	}
-
-	if ( $terms_agreement ) {
-		$contact->set_terms_agreement();
-	}
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
@@ -4322,10 +4301,6 @@ add_action( 'admin_menu', function () {
  * @return void
  */
 function maybe_print_menu_styles() {
-
-	if ( is_white_labeled() ) {
-		return;
-	}
 
 	?>
 	<style>
@@ -5932,6 +5907,16 @@ function sanitize_email_header( $header_value, $header_type ): string {
 			} );
 			$emails       = implode( ',', array_filter( $emails ) );
 			$header_value = $emails;
+			break;
+
+		case 'in-reply-to':
+
+			if ( preg_match( '/^<([^>]+)>$/', $header_value, $matches ) ) {
+				$header_value = sprintf( '<%s>', is_email( $matches[1] ) ? sanitize_email( $matches[1] ) : sanitize_text_field( $matches[1] ) ) ;
+			} else {
+				$header_value = sprintf( '<%s>', is_email( $header_value ) ? sanitize_email( $header_value ) : sanitize_text_field( $header_value ) ) ;
+			}
+
 			break;
 		default:
 			$header_value = sanitize_text_field( $header_value );
