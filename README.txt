@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.11.8
+Stable tag: 2.7.11.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.11.9 (2023-07-03) =
+* ADDED `thumbnail` argument for the `{posts.layout=h2 thumbnail}` replacement code to show thumbnails for the `h1-h6` layout formats.
+* ADDED `columns` argument for the `{posts.layout=grid columns=1}` replacement code show 1-3 columns for the cards/grid formats.
+* ADDED Handling for the `In-Reply-To` header to enable email threading in Gmail.
+* ADDED `hey.com` to list of known public email providers.
+* FIXED `{posts}` replacement causing timeout if post count is an odd number without a featured image.
 
 = 2.7.11.8 (2023-06-22) =
 * HOT FIX Visited pages not being tracked from form submissions.

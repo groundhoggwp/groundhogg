@@ -521,9 +521,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @since 1.9
-	 *
 	 * @param string $code to remove
+	 *
+	 * @since 1.9
 	 *
 	 */
 	public function remove( $code ) {
@@ -553,9 +553,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Returns a list of all replacement codes
 	 *
+	 * @return array
 	 * @since 1.9
 	 *
-	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -703,9 +703,9 @@ class Replacements implements \JsonSerializable {
 
 	public function replacements_in_footer() {
 		?>
-        <div id="footer-replacement-codes" class="hidden">
+		<div id="footer-replacement-codes" class="hidden">
 			<?php $this->get_table(); ?>
-        </div>
+		</div>
 		<?php
 	}
 
@@ -718,16 +718,16 @@ class Replacements implements \JsonSerializable {
 			} );
 
 			?>
-            <h3 class="replacements-group"><?php _e( $name ) ?></h3>
-            <table class="wp-list-table widefat fixed striped replacements-table">
-                <thead>
-                <tr>
-                    <th><?php _e( 'Name' ); ?></th>
-                    <th><?php _e( 'Code' ); ?></th>
-                    <th><?php _e( 'Description' ); ?></th>
-                </tr>
-                </thead>
-                <tbody>
+			<h3 class="replacements-group"><?php _e( $name ) ?></h3>
+			<table class="wp-list-table widefat fixed striped replacements-table">
+				<thead>
+				<tr>
+					<th><?php _e( 'Name' ); ?></th>
+					<th><?php _e( 'Code' ); ?></th>
+					<th><?php _e( 'Description' ); ?></th>
+				</tr>
+				</thead>
+				<tbody>
 
 				<?php foreach ( $codes as $code => $replacement ):
 
@@ -736,23 +736,23 @@ class Replacements implements \JsonSerializable {
 					}
 
 					?>
-                    <tr>
-                        <td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
-                        <td>
-                            <input class="replacement-selector code"
-                                   type="text"
-                                   style="border: none;outline: none;background: transparent;width: 100%;"
-                                   onfocus="this.select();"
-                                   value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
-                                   readonly>
-                        </td>
-                        <td>
-                            <span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
-                        </td>
-                    </tr>
+					<tr>
+						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+						<td>
+							<input class="replacement-selector code"
+							       type="text"
+							       style="border: none;outline: none;background: transparent;width: 100%;"
+							       onfocus="this.select();"
+							       value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+							       readonly>
+						</td>
+						<td>
+							<span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+						</td>
+					</tr>
 				<?php endforeach; ?>
-                </tbody>
-            </table>
+				</tbody>
+			</table>
 		<?php
 		endforeach;
 	}
@@ -1216,7 +1216,8 @@ class Replacements implements \JsonSerializable {
 	 */
 	function replacement_owner_signature( $user_id = 0, $contact_id = 0 ) {
 
-		$user_id = absint( $user_id );
+		$user_id    = absint( $user_id );
+		$contact_id = absint( $contact_id );
 
 		// If a specific user ID was passed
 		if ( $user_id > 0 && $contact_id > 0 ) {
@@ -1225,6 +1226,12 @@ class Replacements implements \JsonSerializable {
 			// Use contact's actual owner...
 			$user = $this->get_current_contact()->get_ownerdata();
 		}
+
+		$debug = [
+			$user_id,
+			$contact_id,
+			$user->user_login,
+		];
 
 		return $user->signature;
 	}
@@ -1625,9 +1632,9 @@ class Replacements implements \JsonSerializable {
 				/**
 				 * Filters the post content.
 				 *
-				 * @since 0.71
-				 *
 				 * @param string $content Content of the current post.
+				 *
+				 * @since 0.71
 				 *
 				 */
 				$content = apply_filters( 'the_content', $content );
@@ -1747,6 +1754,7 @@ class Replacements implements \JsonSerializable {
 			'layout'     => 'ul',
 			'featured'   => false,
 			'excerpt'    => false,
+			'thumbnail'  => false,
 			'post_type'  => 'post',
 			'category'   => '',
 			'tag'        => '',
@@ -1755,6 +1763,8 @@ class Replacements implements \JsonSerializable {
 			'meta_key'   => '',
 			'meta_value' => '',
 			'within'     => '',
+			'space'      => 0,
+			'columns'    => 2
 		] );
 
 		$query_vars = [
@@ -1834,6 +1844,16 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
+				$separator = '<div class="email-columns-cell gap" style="width: 20px;"></div>';
+
+				$render_column = function ( $content = '' ) {
+					return html()->e( 'div', [
+						'class' => 'email-columns-cell one-half'
+					], [
+						$content
+					] );
+				};
+
 				$render_post = function ( $thumbnail_size = 'thumbnail' ) use ( $props ) {
 
 					return html()->e( 'div', [
@@ -1864,46 +1884,37 @@ class Replacements implements \JsonSerializable {
 					$rows[] = $render_post( 'large' );
 				}
 
-				$rows[] = '<div class="email-columns">';
+				if ( $query->have_posts() ) {
 
+					$rendered_posts = [];
 
-				while ( $query->have_posts() ):
+					$rows[] = '<div class="email-columns">';
 
-					$render_column = function ( $content = '' ) {
-						return html()->e( 'div', [
-							'class' => 'email-columns-cell one-half'
-						], [
-							$content
-						] );
-					};
-
-					$query->the_post();
-
-					$columns = [
-						$render_column( $render_post() ),
-						'<div class="email-columns-cell gap" style="width: 20px;"></div>',
-					];
-
-					if ( $query->have_posts() ) {
+					while ( $query->have_posts() ):
 
 						$query->the_post();
+						$rendered_posts[] = $render_column( $render_post( absint( $props['columns'] ) === 1 ? 'large' : 'thumbnail' ) );
 
-						$columns[] = $render_column( $render_post() );
-					} else {
-						$columns[] = $render_column();
+					endwhile;
+
+					while ( ! empty( $rendered_posts ) ) {
+
+						$posts   = array_splice( $rendered_posts, 0, absint( $props['columns'] ) );
+						$columns = implode( $separator, $posts );
+
+						$rows[] = html()->e( 'div', [
+							'class' => 'email-columns-row'
+						], $columns );
 					}
 
-					$rows[] = html()->e( 'div', [
-						'class' => 'email-columns-row'
-					], $columns );
-
-				endwhile;
+					$rows[] = '</div>';
+				}
 
 				$content = html()->e( 'div', [
 					'class' => $props['layout']
 				], $rows );
 
-                $query->reset_postdata();
+				$query->reset_postdata();
 
 				break;
 
@@ -1919,16 +1930,29 @@ class Replacements implements \JsonSerializable {
 				while ( $query->have_posts() ) {
 					$query->the_post();
 
+					if ( $props['thumbnail'] && has_post_thumbnail() ) {
+						$html[] = html()->e( 'a', [
+							'href' => get_the_permalink()
+						], html()->e( 'img', [
+							'class' => 'post-thumbnail',
+							'src'   => get_the_post_thumbnail_url( null, 'large' ),
+						] ) );
+					}
+
 					$html[] = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );
 
 					if ( $props['excerpt'] ) {
 						$html[] = html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt() );
 					}
+
+					if ( $props['space'] ) {
+						$html[] = html()->e( 'div', [ 'style' => [ 'height' => absint( $props['space'] ) . 'px' ] ], '', false );
+					}
 				}
 
 				$content = implode( '', $html );
 
-                $query->reset_postdata();
+				$query->reset_postdata();
 
 				break;
 			case 'plain':
