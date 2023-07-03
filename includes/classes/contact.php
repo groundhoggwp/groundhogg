@@ -383,11 +383,11 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * @throws \Exception
-	 *
 	 * @param bool $as_date
 	 *
 	 * @return bool|mixed
+	 * @throws \Exception
+	 *
 	 */
 	public function get_date_created( $as_date = false ) {
 
@@ -693,6 +693,27 @@ class Contact extends Base_Object_With_Meta {
 		$orig_owner    = $this->owner;
 		$orig_owner_id = $this->owner_id;
 
+		// Handle consent
+		$consents = [
+			'gdpr_consent'      => [ $this, 'set_gdpr_consent' ],
+			'marketing_consent' => [ $this, 'set_marketing_consent' ],
+			'terms_agreement'   => [ $this, 'set_terms_agreement' ]
+		];
+
+		foreach ( $consents as $consent => $callback ) {
+			if ( ! isset_not_empty( $data, $consent ) ) {
+				continue;
+			}
+
+			if ( $data[$consent] ){
+				call_user_func( $callback );
+			} else {
+				$this->delete_compliance_and_date_meta( $consent );
+			}
+
+			unset( $data[ $consent ] );
+		}
+
 		$updated = parent::update( $data );
 
 		$maybe_changed_folders = $this->get_uploads_folder();
@@ -752,7 +773,7 @@ class Contact extends Base_Object_With_Meta {
 	public function change_marketing_preference( $preference ) {
 
 		// No change
-		if ( $this->get_optin_status() === $preference ){
+		if ( $this->get_optin_status() === $preference ) {
 			return;
 		}
 
@@ -769,7 +790,7 @@ class Contact extends Base_Object_With_Meta {
 	public function change_owner( $owner_id ) {
 
 		// No change
-		if ( $this->owner_is( $owner_id ) ){
+		if ( $this->owner_is( $owner_id ) ) {
 			return;
 		}
 
