@@ -15,6 +15,7 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\is_a_contact;
@@ -108,7 +109,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function create( WP_REST_Request $request ) {
 
 		// Create single maybe?
-		if ( $request->get_param( 'data' ) ) {
+		if ( $request->get_param( 'data' ) || $request->get_param( 'email' ) ) {
 			return $this->create_single( $request );
 		}
 
@@ -356,7 +357,7 @@ class Contacts_Api extends Base_Object_Api {
 	 *
 	 * @return bool
 	 */
-	protected function by_user_id( WP_REST_Request $request ){
+	protected function by_user_id( WP_REST_Request $request ) {
 		return $request->has_param( 'by_user_id' ) && $request->get_param( 'by_user_id' );
 	}
 
@@ -389,6 +390,32 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function create_single( WP_REST_Request $request ) {
 
+		// First order stuff
+		if ( $request->has_param( 'email' ) ) {
+			$fields  = $request->get_json_params();
+			$existed = is_email_address_in_use( $request->get_param( 'email' ) );
+
+			try {
+				$contact = generate_contact_with_map( $fields );
+			} catch ( \Exception $e ) {
+				return self::ERROR_500( 'error', $e->getMessage() );
+			}
+
+			if ( ! is_a_contact( $contact ) ) {
+				return self::ERROR_500( 'error', 'Unable to create contact record.' );
+			}
+
+			if ( $existed ) {
+				$this->do_object_updated_action( $contact );
+			} else {
+				$this->do_object_created_action( $contact );
+			}
+
+			return self::SUCCESS_RESPONSE( [
+				'item' => $contact
+			] );
+		}
+
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 		$tags = $request->get_param( 'tags' );
@@ -400,12 +427,15 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
-		if ( ! is_email( $email_address ) ){
+		if ( ! is_email( $email_address ) ) {
 			return self::ERROR_400( 'invalid_email', 'The provided email address is not valid.' );
 		}
 
+		$existed = false;
+
 		// If the email address is in use, treat as an update
 		if ( is_email_address_in_use( $email_address ) ) {
+			$existed = true;
 			$contact = new Contact( $email_address );
 			$contact->update( $data );
 		} // Create new contact record
@@ -417,7 +447,11 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact->apply_tag( $tags );
 
-		$this->do_object_created_action( $contact );
+		if ( $existed ) {
+			$this->do_object_updated_action( $contact );
+		} else {
+			$this->do_object_created_action( $contact );
+		}
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $contact
