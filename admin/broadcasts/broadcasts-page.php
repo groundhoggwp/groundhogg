@@ -41,6 +41,35 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Broadcasts_Page extends Admin_Page {
 
+	protected function get_parent_slug() {
+		return $this->get_slug();
+	}
+
+	public function register() {
+
+		$page = add_menu_page(
+			__( 'Marketing', 'groundhogg' ),
+			__( 'Marketing', 'groundhogg' ),
+			$this->get_cap(),
+			$this->get_slug(),
+			[ $this, 'page' ],
+			'dashicons-megaphone',
+			3.3
+		);
+
+		parent::register();
+	}
+
+//	/**
+//	 * Get the menu order between 1 - 99
+//	 *
+//	 * @return int
+//	 */
+//	public function get_priority() {
+////		return 30;
+//	}
+
+
 	/**
 	 * @var Broadcast_Scheduler
 	 */
@@ -55,7 +84,7 @@ class Broadcasts_Page extends Admin_Page {
 	protected function add_additional_actions() {
 		$this->scheduler = new Broadcast_Scheduler();
 
-		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ){
+		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ) {
 
 			notices()->add( 'dne', __( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
 
@@ -67,7 +96,7 @@ class Broadcasts_Page extends Admin_Page {
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
-		if ( $action == 'view' && get_db( 'broadcasts' )->is_empty() ){
+		if ( $action == 'view' && get_db( 'broadcasts' )->is_empty() ) {
 			$action = 'add';
 		}
 
@@ -83,10 +112,6 @@ class Broadcasts_Page extends Admin_Page {
 		wp_enqueue_script( 'groundhogg-admin-email-preview' );
 
 		enqueue_broadcast_assets();
-	}
-
-	public function get_priority() {
-		return 25;
 	}
 
 	public function get_slug() {

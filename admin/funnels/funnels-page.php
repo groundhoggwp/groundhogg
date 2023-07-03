@@ -48,6 +48,27 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Funnels_Page extends Admin_Page {
 
+	protected function get_parent_slug() {
+		return $this->get_slug();
+	}
+
+	public function register() {
+
+		$page = add_menu_page(
+			__( 'Automation', 'groundhogg' ),
+			__( 'Automation', 'groundhogg' ),
+			$this->get_cap(),
+			$this->get_slug(),
+			[ $this, 'page' ],
+			'',
+			3.4
+		);
+
+		parent::register();
+	}
+
+
+
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
@@ -176,7 +197,7 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 30;
+		return 10;
 	}
 
 	/**

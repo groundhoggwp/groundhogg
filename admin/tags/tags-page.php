@@ -25,6 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Admin
  */
 class Tags_Page extends Admin_Page {
+
+	protected function get_parent_slug() {
+		return 'gh_contacts';
+	}
+
 	// UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
 	}

@@ -33,6 +33,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Emails_Page extends Admin_Page {
 
+	protected function get_parent_slug() {
+		return 'gh_broadcasts';
+	}
 
 	protected function get_current_action() {
 		$action = parent::get_current_action();
@@ -79,7 +82,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function get_name() {
-		return _x( 'Emails', 'page_title', 'groundhogg' );
+		return _x( 'Email Templates', 'page_title', 'groundhogg' );
 	}
 
 	public function get_cap() {
@@ -88,10 +91,6 @@ class Emails_Page extends Admin_Page {
 
 	public function get_item_type() {
 		return 'email';
-	}
-
-	public function get_priority() {
-		return 15;
 	}
 
 	public function scripts() {

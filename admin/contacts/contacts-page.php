@@ -70,6 +70,35 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Contacts_Page extends Admin_Page {
 
+	protected function get_parent_slug() {
+		return $this->get_slug();
+	}
+
+	public function register() {
+
+		$page = add_menu_page(
+			__( 'CRM', 'groundhogg' ),
+			__( 'CRM', 'groundhogg' ),
+			$this->get_cap(),
+			$this->get_slug(),
+			[ $this, 'page' ],
+			'dashicons-id-alt',
+			3.2
+		);
+
+		parent::register();
+	}
+
+	/**
+	 * Get the menu order between 1 - 99
+	 *
+	 * @return int
+	 */
+	public function get_priority() {
+		return 2;
+	}
+
+
 	protected function add_additional_actions() {
 		if ( $this->get_current_action() === 'view' ) {
 			new Contact_Table_Columns();
@@ -117,10 +146,6 @@ class Contacts_Page extends Admin_Page {
 	public function get_cap() {
 		return 'view_contacts';
 
-	}
-
-	public function get_priority() {
-		return 5;
 	}
 
 	/**

@@ -122,14 +122,14 @@ class Admin_Menu {
 
 		$this->welcome  = new Welcome_Page();
 		$this->contacts = new Contacts_Page();
-		$this->tags     = new Tags_Page();
+		$this->broadcasts = new Broadcasts_Page();
+		$this->funnels    = new Funnels_Page();
 
 		if ( ! is_pro_features_active() || ! is_option_enabled( 'gh_use_advanced_email_editor' ) ) {
 			$this->emails = new Emails_Page();
 		}
 
-		$this->broadcasts = new Broadcasts_Page();
-		$this->funnels    = new Funnels_Page();
+		$this->tags     = new Tags_Page();
 
 		$this->events    = new Events_Page();
 		$this->tools     = new Tools_Page();
@@ -149,6 +149,16 @@ class Admin_Menu {
 
 		// user profile edits...
 		new Admin_User();
+
+
+		// Add menu seperators
+		add_action( 'admin_menu', function (){
+
+			global $menu;
+
+			$menu[3] = ['', 'read', '', '', 'wp-menu-separator'];
+			$menu[3.5] = ['', 'read', '', '', 'wp-menu-separator'];
+		}, 99 );
 
 		do_action( 'groundhogg/admin/init', $this );
 	}
