@@ -589,6 +589,10 @@ abstract class DB {
 
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
+		// Remove primary key
+		unset( $data[ $this->primary_key ] );
+		unset( $column_formats[ $this->primary_key ] );
+
 		$wpdb->insert( $this->table_name, $data, $column_formats );
 
 		$wpdb_insert_id = $wpdb->insert_id;
@@ -923,6 +927,7 @@ abstract class DB {
 	 */
 	public function is_empty() {
 		$rows = $this->query( [ 'limit' => 1 ] );
+
 		return empty( $rows );
 	}
 
