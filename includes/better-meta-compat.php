@@ -210,6 +210,11 @@ function add_custom_fields_to_mappable_fields( $fields = [] ) {
 
 		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
+		// Tab is missing, deleted?
+		if ( ! $tab ){
+			continue;
+		}
+
 		$group_name = sprintf( '%s: %s', $tab['name'], $group['name'] );
 
 		$custom_fields = Properties::instance()->get_fields( $group['id'] );
@@ -389,7 +394,7 @@ function register_contact_property_table_columns( $columns ) {
 	$custom_fields = Properties::instance()->get_fields();
 
 	foreach ( $custom_fields as $i => $custom_field ) {
-		$columns::register( $custom_field['id'], $custom_field['label'], __NAMESPACE__ . '\display_custom_field_column_callback', false, 100 + absint( get_array_var( $custom_field, 'order', $i ) ) );
+		$columns::register( $custom_field['id'], $custom_field['label'], __NAMESPACE__ . '\display_custom_field_column_callback', "cm.{$custom_field['name']}", 100 + absint( get_array_var( $custom_field, 'order', $i ) ) );
 	}
 }
 
