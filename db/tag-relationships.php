@@ -112,11 +112,16 @@ class Tag_Relationships extends DB {
 			'contact_id' => absint( $contact_id )
 		);
 
-		$result = $this->insert( $data );
-
-		return $result;
+		return $this->insert( $data );
 	}
 
+	/**
+	 * Wrapper for insert to use INSERT IGNORE
+	 *
+	 * @param $data
+	 *
+	 * @return int
+	 */
 	public function insert( $data ) {
 
 		add_filter( 'query', [ $this, '_insert_ignore' ] );
@@ -126,6 +131,13 @@ class Tag_Relationships extends DB {
 		return $result;
 	}
 
+	/**
+	 * Replace the INSERT statement with an INSERT IGNORE
+	 *
+	 * @param $query
+	 *
+	 * @return array|string|string[]
+	 */
 	public function _insert_ignore( $query ) {
 		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
 	}
@@ -261,27 +273,17 @@ class Tag_Relationships extends DB {
 	}
 
 	/**
-	 * Create the table
+	 * Create table command
 	 *
-	 * @access  public
-	 * @since   2.1
+	 * @return string
 	 */
-	public function create_table() {
-
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+	public function create_table_sql_command() {
+		return "CREATE TABLE " . $this->table_name . " (
 		tag_id bigint(20) unsigned NOT NULL,
 		contact_id bigint(20) unsigned NOT NULL,
 		PRIMARY KEY (tag_id,contact_id),
 		KEY tag_id (tag_id),
 		KEY contact_id (contact_id)
 		) {$this->get_charset_collate()};";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }

@@ -342,6 +342,23 @@ abstract class DB {
 	}
 
 	/**
+	 * Whether this table has an auto incrementing ID column
+	 *
+	 * @return bool
+	 */
+	public function is_auto_increment(){
+
+		$sql = $this->create_table_sql_command();
+
+		// Not configured, assume true for backwards compatibility
+		if ( empty( $sql ) ){
+			return true;
+		}
+
+		return str_contains( $sql, 'AUTO_INCREMENT' );
+	}
+
+	/**
 	 * Create a where clause given an array
 	 *
 	 * @param array  $args
@@ -515,6 +532,12 @@ abstract class DB {
 
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
+		// Remove primary key if auto incrementing primary key
+		if ( $this->is_auto_increment() ){
+			unset( $data[ $this->primary_key ] );
+			unset( $column_formats[ $this->primary_key ] );
+		}
+
 		if ( empty( $this->batch_columns ) ) {
 			$this->batch_columns = array_keys( $data );
 		}
@@ -589,9 +612,11 @@ abstract class DB {
 
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
-		// Remove primary key
-		unset( $data[ $this->primary_key ] );
-		unset( $column_formats[ $this->primary_key ] );
+		// Remove primary key if auto incrementing primary key
+		if ( $this->is_auto_increment() ){
+			unset( $data[ $this->primary_key ] );
+			unset( $column_formats[ $this->primary_key ] );
+		}
 
 		$wpdb->insert( $this->table_name, $data, $column_formats );
 
@@ -1703,9 +1728,25 @@ abstract class DB {
 	}
 
 	/**
+	 * The command to create a table
+	 *
+	 * @return string
+	 */
+	public function create_table_sql_command(){
+		return '';
+	}
+
+	/**
 	 * Create the DB
 	 */
-	abstract public function create_table();
+	public function create_table(){
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+		dbDelta( $this->create_table_sql_command() );
+
+		update_option( $this->table_name . '_db_version', $this->version );
+	}
 
 	/**
 	 * Delete orphaned meta

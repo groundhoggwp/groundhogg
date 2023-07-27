@@ -148,18 +148,12 @@ secondary_object_type = 'contact' AND secondary_object_id = $other->ID AND (prim
 	}
 
 	/**
-	 * Create the table
+	 * Create table command
 	 *
-	 * @access  public
-	 * @since   2.1
+	 * @return string
 	 */
-	public function create_table() {
-
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+	public function create_table_sql_command() {
+		return "CREATE TABLE " . $this->table_name . " (
 		primary_object_id bigint(20) unsigned NOT NULL,
 		primary_object_type varchar({$this->get_max_index_length()}) NOT NULL,
 		secondary_object_id bigint(20) unsigned NOT NULL,
@@ -168,9 +162,5 @@ secondary_object_type = 'contact' AND secondary_object_id = $other->ID AND (prim
 		KEY primary_object (primary_object_id,primary_object_type),
 		KEY secondary_object (secondary_object_id,secondary_object_type)
 		) {$this->get_charset_collate()} ENGINE=InnoDB;";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }
