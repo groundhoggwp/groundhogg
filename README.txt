@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.11.9
+Stable tag: 2.7.11.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,6 +321,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.11.10 (2023-07-27) =
+* ADDED Sort contacts by custom fields values and user meta (when available).
+* ADDED Sort contacts by tag count.
+* ADDED Sort contacts by birthday.
+* TWEAKED Do not add primary ID to `INSERT` command if table is using `AUTO_INCREMENT`.
+* FIXED Filtering by `datetime`, `tel`, and `url` custom field types not working.
 
 = 2.7.11.9 (2023-07-03) =
 * ADDED `thumbnail` argument for the `{posts.layout=h2 thumbnail}` replacement code to show thumbnails for the `h1-h6` layout formats.

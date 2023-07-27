@@ -213,9 +213,9 @@ class Contact_Table_Columns {
 		], 'date_created', 10 );
 
 		// Other Columns
-		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], false, 11 );
+		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], 'tc.tag_count', 11 );
 		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false, 11 );
-		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], false, 11 );
+		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11 );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
 	}

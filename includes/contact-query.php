@@ -436,18 +436,19 @@ class Contact_Query {
 
 		$this->query_vars['offset'] = absint( $this->query_vars['offset'] );
 
+
 		// Order by user meta
-		if ( $this->query_vars[ 'orderby' ] && str_starts_with( $this->query_vars['orderby'], 'um.' ) && $this->query_vars['orderby'] !== 'um.meta_value' ){
-			$parts = explode( '.', $this->query_vars[ 'orderby' ] );
+		if ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'um.' ) && $this->query_vars['orderby'] !== 'um.meta_value' ) {
+			$parts                             = explode( '.', $this->query_vars['orderby'] );
 			$this->query_vars['user_meta_key'] = sanitize_key( $parts[1] );
-			$this->query_vars['orderby'] = 'um.meta_value';
+			$this->query_vars['orderby']       = 'um.meta_value';
 		}
 
 		// order by contact meta
-		if ( $this->query_vars[ 'orderby' ] && str_starts_with( $this->query_vars['orderby'], 'cm.' ) ){
-			$parts = explode( '.', $this->query_vars[ 'orderby' ] );
+		if ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'cm.' ) ) {
+			$parts                        = explode( '.', $this->query_vars['orderby'] );
 			$this->query_vars['meta_key'] = sanitize_key( $parts[1] );
-			$this->query_vars['orderby'] = 'meta_value';
+			$this->query_vars['orderby']  = 'meta_value';
 		}
 
 		// Date query
@@ -772,14 +773,16 @@ class Contact_Query {
 			$join .= " $join_type $meta_table AS email_mt ON $this->table_name.$this->primary_key = email_mt.{$this->meta_type}_id";
 		}
 
-		if ( ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'um.' ) ) ){
+		// Order by user meta
+		if ( ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'um.' ) ) ) {
 			$join .= " LEFT JOIN $wpdb->usermeta AS um ON $this->table_name.user_id = um.user_id";
 		}
 
-//		if ( ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'cm.' ) ) ){
-//			$cm = get_db( 'contact_meta' );
-//			$join .= " LEFT JOIN {$cm->table_name} AS cm ON $this->table_name.ID = cm.contact_id";
-//		}
+		// Order by tag count
+		if ( $this->query_vars['orderby'] === 'tc.tag_count' ) {
+			$tag_rel = get_db( 'tag_relationships' );
+			$join    .= " LEFT JOIN ( SELECT tr.contact_id, COUNT(tr.tag_id) as tag_count FROM $tag_rel->table_name tr GROUP BY tr.contact_id ) as tc ON $this->table_name.ID = tc.contact_id";
+		}
 
 		return $join;
 	}
@@ -1045,7 +1048,7 @@ class Contact_Query {
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
 		}
 
-		if ( isset_not_empty( $this->query_vars, 'user_meta_key' ) ){
+		if ( isset_not_empty( $this->query_vars, 'user_meta_key' ) ) {
 			$where['user_meta_key'] = $wpdb->prepare( 'um.meta_key = %s', $this->query_vars['user_meta_key'] );
 		}
 
@@ -1276,11 +1279,15 @@ class Contact_Query {
 	 */
 	protected function get_allowed_orderby_keys() {
 
-		$meta_table = _get_meta_table( $this->meta_type );
+		$contact_meta_table = _get_meta_table( $this->meta_type );
+		$user_meta_table    = _get_meta_table( 'user' );
 
 		$allowed_keys = [
 			'um.meta_value',
-			"$meta_table.meta_value"
+			"$user_meta_table.meta_value",
+			"cm.meta_value",
+			"$contact_meta_table.meta_value",
+			"tc.tag_count"
 		];
 
 		$allowed_keys = array_merge( array_keys( $this->gh_db_contacts->get_columns() ), $allowed_keys );
@@ -1349,6 +1356,7 @@ class Contact_Query {
 			case 'datetime':
 				$clause1 = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
 				$clause2 = $meta_table_name . '.meta_value ' . self::standard_activity_filter_clause( $filter_vars );
+
 				return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 			case 'radio':
 				return self::meta_in( $filter_vars, $query );
@@ -3229,15 +3237,19 @@ class Contact_Query {
 				return $wpdb->prepare( "$column REGEXP BINARY %s", $value );
 			case 'less_than':
 				$rep = is_numeric( $value ) ? '%d' : '%s';
+
 				return $wpdb->prepare( "$column < $rep", $value );
 			case 'greater_than':
 				$rep = is_numeric( $value ) ? '%d' : '%s';
+
 				return $wpdb->prepare( "$column > $rep", $value );
 			case 'greater_than_or_equal_to':
 				$rep = is_numeric( $value ) ? '%d' : '%s';
+
 				return $wpdb->prepare( "$column >= $rep", $value );
 			case 'less_than_or_equal_to':
 				$rep = is_numeric( $value ) ? '%d' : '%s';
+
 				return $wpdb->prepare( "$column <= $rep", $value );
 		}
 	}
