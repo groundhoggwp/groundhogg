@@ -1479,6 +1479,9 @@ button.gh-submit.loud {
 .gh-modal-dialog.overflow-visible {
   overflow: visible;
 }
+.gh-modal-dialog.overflow-auto {
+  overflow: auto;
+}
 .gh-modal-dialog.no-padding .gh-modal-dialog-content {
   padding: 0;
 }
@@ -1797,12 +1800,16 @@ p.error,
 .gh-rows-and-columns input:not([type=checkbox], [type=radio]), .gh-rows-and-columns select {
   width: 100%;
 }
+.gh-rows-and-columns .row,
 .gh-rows-and-columns .gh-row {
   display: flex;
   gap: 10px;
   justify-content: space-between;
 }
-.gh-rows-and-columns .gh-row .gh-col, .gh-rows-and-columns .gh-row .gh-column {
+.gh-rows-and-columns .row .gh-col, .gh-rows-and-columns .row .gh-column, .gh-rows-and-columns .row .col,
+.gh-rows-and-columns .gh-row .gh-col,
+.gh-rows-and-columns .gh-row .gh-column,
+.gh-rows-and-columns .gh-row .col {
   width: 100%;
 }
 

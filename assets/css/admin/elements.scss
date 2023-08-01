@@ -1517,6 +1517,10 @@ button {
       overflow: visible;
     }
 
+    &.overflow-auto {
+      overflow: auto;
+    }
+
     &.no-padding {
       .gh-modal-dialog-content {
         padding: 0;
@@ -1919,12 +1923,13 @@ p.error,
     width: 100%;
   }
 
+  .row,
   .gh-row {
     display: flex;
     gap: 10px;
     justify-content: space-between;
 
-    .gh-col, .gh-column {
+    .gh-col, .gh-column, .col {
       width: 100%;
       //display: flex;
       //flex-direction: column;
