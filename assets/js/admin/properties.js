@@ -1,4 +1,4 @@
-( ($) => {
+(($) => {
 
   const {
     uuid,
@@ -26,7 +26,7 @@
 
     inputRepeaterWidget({
       selector,
-      rows: options.map(o => ( [o] )),
+      rows: options.map(o => ([o])),
       cellCallbacks: [input],
       cellProps: [{ placeholder: __('Option') }],
       sortable: true,
@@ -39,7 +39,7 @@
 
   const standardField = {
     onMount: ({ id, name }, onChange) => {
-      $(`#${ id }`).on('change', (e) => {
+      $(`#${id}`).on('change', (e) => {
         onChange({
           [name]: e.target.value,
         })
@@ -58,40 +58,46 @@
   const fieldTypes = {
 
     text: {
-      name: __('Text', 'groundhogg'), view: ({ label, ...props }) => {
+      name: __('Text', 'groundhogg'),
+      view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'text',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({ 
+            className: 'full-width', ...props, type: 'text', 
+        })}`
       },
-    }, textarea: {
-      name: __('Textarea', 'groundhogg'), view: ({ label, ...props }) => {
+    },
+    textarea: {
+      name: __('Textarea', 'groundhogg'),
+      view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ textarea({
-            className: 'full-width', ...props,
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${textarea({ 
+            className: 'full-width', ...props, 
+        })}`
       },
-    }, number: {
-      name: __('Number', 'groundhogg'), view: ({ label, ...props }) => {
+    },
+    number: {
+      name: __('Number', 'groundhogg'),
+      view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'number',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({ 
+            className: 'full-width', ...props, type: 'number', 
+        })}`
       },
-    }, url: {
+    },
+    url: {
       name: __('URL', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>
-        <div class="gh-input-group">${ input({
-            className: 'full-width', ...props, type: 'url',
-        }) }
-            <button id="link-${ props.id }" class="gh-button secondary small icon">
-                <span class="dashicons dashicons-external"></span>
-            </button>
-        </div>`
+        return `<label class="property-label" for="${props.id}">${label}</label>
+		<div class="gh-input-group">${input({
+			className: 'full-width', ...props, type: 'url',
+		})}
+			<button id="link-${props.id}" class="gh-button secondary small icon">
+				<span class="dashicons dashicons-external"></span>
+			</button>
+		</div>`
       }, onMount: ({ id, name }, onChange) => {
 
-        const $input = $(`#${ id }`)
+        const $input = $(`#${id}`)
 
         $input.on('change', (e) => {
           onChange({
@@ -99,7 +105,7 @@
           })
         })
 
-        $(`#link-${ id }`).on('click', (e) => {
+        $(`#link-${id}`).on('click', (e) => {
 
           let link = $input.val()
 
@@ -111,56 +117,59 @@
     }, tel: {
       name: __('Phone Number', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'tel',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width', ...props, type: 'tel',
+		})}`
       },
     }, custom_email: {
       name: __('Email Address', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'email',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width', ...props, type: 'email',
+		})}`
       },
     }, date: {
       name: __('Date', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'date',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width', ...props, type: 'date',
+		})}`
       },
     }, time: {
       name: __('Time', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'time',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width', ...props, type: 'time',
+		})}`
       },
     }, datetime: {
       name: __('Date & Time', 'groundhogg'), view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ input({
-            className: 'full-width', ...props, type: 'datetime-local',
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${input({
+			className: 'full-width', ...props, type: 'datetime-local',
+		})}`
       },
-    }, checkboxes: {
-      name: __('Checkboxes', 'groundhogg'), view: ({ label, id, name, options, value, ...props }) => {
+    },
+    checkboxes: {
+      name: __('Checkboxes', 'groundhogg'),
+      view: ({ label, id, name, options, value, ...props }) => {
 
         if (!Array.isArray(value)) {
           value = value.split(',').map(v => v.trim())
         }
 
         //language=HTML
-        return `<label class="property-label">${ label }</label>
-        ${ options.map(opt => `<label class="checkbox-label">${ input({
-            type: 'checkbox', value: opt, dataId: id, checked: value.includes(opt),
-        }) } ${ opt }</label>`).join('') }`
-      }, onMount: ({ id, name }, onChange) => {
-        $(`input[type=checkbox][data-id=${ id }]`).on('change', e => {
+        return `<label class="property-label">${label}</label>
+		${options.map(opt => `<label class="checkbox-label">${input({
+			type: 'checkbox', value: opt, dataId: id, checked: value.includes(opt),
+		})} ${opt}</label>`).join('')}`
+      },
+      onMount: ({ id, name }, onChange) => {
+        $(`input[type=checkbox][data-id=${id}]`).on('change', e => {
 
           let checked = []
 
-          $(`input[type=checkbox][data-id=${ id }]`).each((i, e) => {
+          $(`input[type=checkbox][data-id=${id}]`).each((i, e) => {
             if (e.checked) {
               checked.push(e.value)
             }
@@ -170,22 +179,24 @@
             [name]: checked,
           })
         })
-      }, edit: (field) => {
+      },
+      edit: (field) => {
 
         const { multiple, blankOption } = field
 
         //language=HTML
         return `
-            <div class="gh-rows-and-columns">
-                <div class="gh-row">
-                    <div class="gh-col">
-                        <label>${ __('Options', 'groundhogg') }</label>
-                        <div id="property-dropdown-options"></div>
-                    </div>
-                </div>
-            </div>
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Options', 'groundhogg')}</label>
+						<div id="property-dropdown-options"></div>
+					</div>
+				</div>
+			</div>
         `
-      }, onEditMount: (field, updateField) => {
+      },
+      onEditMount: (field, updateField) => {
         optionsRepeater({
           selector: '#property-dropdown-options',
           options: field.options || [''],
@@ -193,16 +204,15 @@
         })
       },
     },
-
     radio: {
       name: __('Radio Buttons', 'groundhogg'), view: ({ label, id, name, options, value, ...props }) => {
         //language=HTML
-        return `<label class="property-label">${ label }</label>
-        ${ options.map(opt => `<label class="checkbox-label">${ input({
-            type: 'radio', value: opt, name, checked: value === opt,
-        }) } ${ opt }</label>`).join('') }`
+        return `<label class="property-label">${label}</label>
+		${options.map(opt => `<label class="checkbox-label">${input({
+			type: 'radio', value: opt, name, checked: value === opt,
+		})} ${opt}</label>`).join('')}`
       }, onMount: ({ id, name }, onChange) => {
-        $(`input[type=radio][name=${ name }]`).on('change', e => {
+        $(`input[type=radio][name=${name}]`).on('change', e => {
           onChange({
             [name]: e.target.value,
           })
@@ -210,14 +220,14 @@
       }, edit: (field) => {
         //language=HTML
         return `
-            <div class="gh-rows-and-columns">
-                <div class="gh-row">
-                    <div class="gh-col">
-                        <label>${ __('Options', 'groundhogg') }</label>
-                        <div id="property-dropdown-options"></div>
-                    </div>
-                </div>
-            </div>
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Options', 'groundhogg')}</label>
+						<div id="property-dropdown-options"></div>
+					</div>
+				</div>
+			</div>
         `
       }, onEditMount: (field, updateField) => {
         optionsRepeater({
@@ -230,7 +240,7 @@
     dropdown: {
       name: __('Dropdown', 'groundhogg'), view: ({ label, value, options = [], ...props }) => {
 
-        options = options.map(o => ( { text: o, value: o } ))
+        options = options.map(o => ({ text: o, value: o }))
 
         options.unshift({ text: __('Select...'), value: '' })
 
@@ -239,18 +249,17 @@
         }
 
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ select({
-            className: 'full-width', options, selected: value, ...props,
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${select({
+			className: 'full-width', options, selected: value, ...props,
+		})}`
       }, onMount: ({ id, multiple, name, ...props }, onChange) => {
-        $(`#${ id }`).on('change', (e) => {
+        $(`#${id}`).on('change', (e) => {
 
           if (multiple) {
             onChange({
               [name]: [...e.target.selectedOptions].map(o => o.value),
             })
-          }
-          else {
+          } else {
             onChange({
               [name]: e.target.value,
             })
@@ -262,21 +271,21 @@
 
         //language=HTML
         return `
-            <div class="gh-rows-and-columns">
-                <div class="gh-row">
-                    <div class="gh-col">
-                        <label>${ __('Options', 'groundhogg') }</label>
-                        <div id="property-dropdown-options"></div>
-                    </div>
-                </div>
-                <div class="gh-row">
-                    <div class="gh-col">
-                        <label class="space-between">${ __('Allow multiple selections?', 'groundhogg') } ${ toggle({
-                            id: 'allow-multiple', checked: multiple,
-                        }) } </label>
-                    </div>
-                </div>
-            </div>
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Options', 'groundhogg')}</label>
+						<div id="property-dropdown-options"></div>
+					</div>
+				</div>
+				<div class="gh-row">
+					<div class="gh-col">
+						<label class="space-between">${__('Allow multiple selections?', 'groundhogg')} ${toggle({
+							id: 'allow-multiple', checked: multiple,
+						})} </label>
+					</div>
+				</div>
+			</div>
         `
       }, onEditMount: (field, updateField) => {
         optionsRepeater({
@@ -297,9 +306,9 @@
       name: __('HTML', 'groundhogg'),
       view: ({ label, ...props }) => {
         //language=HTML
-        return `<label class="property-label" for="${ props.id }">${ label }</label>${ textarea({
-          className: 'full-width', ...props,
-        }) }`
+        return `<label class="property-label" for="${props.id}">${label}</label>${textarea({
+			className: 'full-width', ...props,
+		})}`
       },
       onMount: ({ id, name, ...props }, onChange) => {
 
@@ -308,11 +317,11 @@
           quicktags: false,
         }, content => {
           onChange({
-            [name]:content
+            [name]: content,
           })
         })
-      }
-    }
+      },
+    },
   }
 
   const Templates = {
@@ -320,17 +329,17 @@
     noProperties: () => {
       //language=HTML
       return `
-          <button id="add-custom-property" class="gh-button secondary">
-              ${ __('Add custom properties', 'groundhogg') }
-          </button>`
+		  <button id="add-custom-property" class="gh-button secondary">
+			  ${__('Add custom properties', 'groundhogg')}
+		  </button>`
     },
 
     groups: ({ groups, fields = [] }, editable) => {
       //language=HTML
       return `
-          <div class="property-groups">
-              ${ groups.map(g => Templates.group(g, fields.filter(f => f.group == g.id), editable)).join('') }
-          </div>`
+		  <div class="property-groups">
+			  ${groups.map(g => Templates.group(g, fields.filter(f => f.group == g.id), editable)).join('')}
+		  </div>`
     },
 
     group: (group, fields = [], editable) => {
@@ -339,58 +348,58 @@
 
       //language=HTML
       return `
-          <div class="property-group">
-              <div class="property-group-header">
-                  <h3 data-id="${ group.id }">${ specialChars(group.name) }</h3>
-                  ${ editable ? `
-				  <button class="gh-button text icon secondary property-group-more" data-id="${ group.id }">
-					  ${ icons.verticalDots }
-				  </button>` : '' }
-              </div>
-              <div class="property-group-fields">
-                  ${ fields && fields.length
-                          ? fields.map(f => Templates.field(f)).join('')
-                          : `<button data-id="${ group.id }" class="gh-button secondary property-group-add-field">${ __(
-                                  'Add field', 'groundhogg') }</button>` }
-              </div>
-          </div>`
+		  <div class="property-group">
+			  <div class="property-group-header">
+				  <h3 data-id="${group.id}">${specialChars(group.name)}</h3>
+				  ${editable ? `
+				  <button class="gh-button text icon secondary property-group-more" data-id="${group.id}">
+					  ${icons.verticalDots}
+				  </button>` : ''}
+			  </div>
+			  <div class="property-group-fields">
+				  ${fields && fields.length
+					  ? fields.map(f => Templates.field(f)).join('')
+					  : `<button data-id="${group.id}" class="gh-button secondary property-group-add-field">${__(
+						  'Add field', 'groundhogg')}</button>`}
+			  </div>
+		  </div>`
     },
 
     addPropertyGroup: () => {
 
       //language=HTML
       return `
-          <div class="property-group">
-              <h3 class="no-margin-top">${ __('Add property group') }</h3>
-              <div class="gh-input-group">
-                  ${ input({
-                      id: 'property-group-name',
-                      name: 'property_group_name',
-                      placeholder: __('New property group name', 'groundhogg'),
-                  }) }
-                  <button class="gh-button primary" id="create-property-group">${ __('Create Group', 'groundhogg') }
-                  </button>
-              </div>
-          </div>`
+		  <div class="property-group">
+			  <h3 class="no-margin-top">${__('Add property group')}</h3>
+			  <div class="gh-input-group">
+				  ${input({
+					  id: 'property-group-name',
+					  name: 'property_group_name',
+					  placeholder: __('New property group name', 'groundhogg'),
+				  })}
+				  <button class="gh-button primary" id="create-property-group">${__('Create Group', 'groundhogg')}
+				  </button>
+			  </div>
+		  </div>`
     },
 
     renamePropertyGroup: (name) => {
 
       //language=HTML
       return `
-          <div class="property-group">
-              <h3 class="no-margin-top">${ __('Rename property group') }</h3>
-              <div class="gh-input-group">
-                  ${ input({
-                      id: 'property-group-name',
-                      name: 'property_group_name',
-                      value: name,
-                      placeholder: __('Property group name', 'groundhogg'),
-                  }) }
-                  <button class="gh-button primary" id="create-property-group">${ __('Rename Group', 'groundhogg') }
-                  </button>
-              </div>
-          </div>`
+		  <div class="property-group">
+			  <h3 class="no-margin-top">${__('Rename property group')}</h3>
+			  <div class="gh-input-group">
+				  ${input({
+					  id: 'property-group-name',
+					  name: 'property_group_name',
+					  value: name,
+					  placeholder: __('Property group name', 'groundhogg'),
+				  })}
+				  <button class="gh-button primary" id="create-property-group">${__('Rename Group', 'groundhogg')}
+				  </button>
+			  </div>
+		  </div>`
     },
 
     addField: (field) => {
@@ -401,81 +410,80 @@
 
       try {
         editUI = getFieldType(type).edit(field)
-      }
-      catch (e) {
+      } catch (e) {
         console.log(e)
       }
 
       //language=HTML
       return `
-          <div class="property-field">
-              <h3 class="no-margin-top">${ id ? __('Edit field', 'groundhogg') : __('Add field', 'groundhogg') }</h3>
-              <div class="gh-rows-and-columns">
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label class="">${ __('Field Label', 'groundhogg') }</label>
-                          ${ input({
-                              id: 'property-field-label',
-                              name: 'property_field_label',
-                              placeholder: __('New field label', 'groundhogg'),
-                              value: label,
-                          }) }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label class="">${ __('Internal Name', 'groundhogg') }</label>
-                          ${ input({
-                              id: 'property-field-name',
-                              name: 'property_field_name',
-                              placeholder: __('internal_field_name', 'groundhogg'),
-                              value: name,
-                          }) }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label class="">${ __('Field Type', 'groundhogg') }</label>
-                          ${ select({
-                              id: 'property-field-type', options: Object.keys(fieldTypes).
-                                      map(type => ( { value: type, text: fieldTypes[type].name } )), selected: type,
-                          }) }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          ${ editUI }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label class="">${ __('Order', 'groundhogg') }</label>
-                          ${ input({
-                              id: 'property-field-order',
-                              name: 'property_field_order',
-                              placeholder: __('10', 'groundhogg'),
-                              value: order,
-                              type: 'number',
-                          }) }
-                      </div>
-                      <div class="gh-col">
-                          <label class="">${ __('Width', 'groundhogg') }</label>
-                          ${ select({
-                              id: 'property-field-width', name: 'property_field_width',
-                          }, {
-                              1: __('Full'), 2: __('Half'),
-                          }, width) }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <button class="gh-button primary" id="create-property-field">
-                              ${ id ? __('Update Field') : __('Create Field', 'groundhogg') }
-                          </button>
-                      </div>
-                  </div>
-              </div>
-          </div>`
+		  <div class="property-field">
+			  <h3 class="no-margin-top">${id ? __('Edit field', 'groundhogg') : __('Add field', 'groundhogg')}</h3>
+			  <div class="gh-rows-and-columns">
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  <label class="">${__('Field Label', 'groundhogg')}</label>
+						  ${input({
+							  id: 'property-field-label',
+							  name: 'property_field_label',
+							  placeholder: __('New field label', 'groundhogg'),
+							  value: label,
+						  })}
+					  </div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  <label class="">${__('Internal Name', 'groundhogg')}</label>
+						  ${input({
+							  id: 'property-field-name',
+							  name: 'property_field_name',
+							  placeholder: __('internal_field_name', 'groundhogg'),
+							  value: name,
+						  })}
+					  </div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  <label class="">${__('Field Type', 'groundhogg')}</label>
+						  ${select({
+							  id: 'property-field-type', options: Object.keys(fieldTypes).
+							  map(type => ({ value: type, text: fieldTypes[type].name })), selected: type,
+						  })}
+					  </div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  ${editUI}
+					  </div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  <label class="">${__('Order', 'groundhogg')}</label>
+						  ${input({
+							  id: 'property-field-order',
+							  name: 'property_field_order',
+							  placeholder: __('10', 'groundhogg'),
+							  value: order,
+							  type: 'number',
+						  })}
+					  </div>
+					  <div class="gh-col">
+						  <label class="">${__('Width', 'groundhogg')}</label>
+						  ${select({
+							  id: 'property-field-width', name: 'property_field_width',
+						  }, {
+							  1: __('Full'), 2: __('Half'),
+						  }, width)}
+					  </div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
+						  <button class="gh-button primary" id="create-property-field">
+							  ${id ? __('Update Field') : __('Create Field', 'groundhogg')}
+						  </button>
+					  </div>
+				  </div>
+			  </div>
+		  </div>`
     },
 
     field: ({ group, ...field }) => {
@@ -484,18 +492,17 @@
 
       try {
         fieldUI = getFieldType(field.type).view(field)
-      }
-      catch (e) {
+      } catch (e) {
         console.log(e)
-        fieldUI = `<span class="gh-text danger">${ __('This field is corrupted', 'groundhogg') }</span>`
+        fieldUI = `<span class="gh-text danger">${__('This field is corrupted', 'groundhogg')}</span>`
       }
 
       let { width = 2 } = field
       //language=HTML
       return `
-          <div class="property-field col-width-${ width }" data-group="${ group }" data-id="${ field.id }">
-              ${ fieldUI }
-          </div>`
+		  <div class="property-field col-width-${width}" data-group="${group}" data-id="${field.id}">
+			  ${fieldUI}
+		  </div>`
     },
 
   }
@@ -701,8 +708,7 @@
 
         try {
           getFieldType(newField.type).onEditMount(newField, updateField)
-        }
-        catch (e) {
+        } catch (e) {
           console.log(e)
         }
       }
@@ -735,7 +741,7 @@
       const { fields = [] } = properties
 
       $(selector).html(Templates.groups({
-        ...properties, fields: fields.map(f => ( { ...f, value: values[f.name] || '' } )),
+        ...properties, fields: fields.map(f => ({ ...f, value: values[f.name] || '' })),
       }, canEdit()))
 
       onMount()
@@ -755,8 +761,7 @@
 
             onChange(props)
           })
-        }
-        catch (e) {
+        } catch (e) {
           console.log(e)
         }
       })
@@ -772,7 +777,7 @@
             {
               key: 'edit', text: __('Edit field', 'groundhogg'),
             }, {
-              key: 'delete', text: `<span class="gh-text danger">${ __('Delete') }</span>`,
+              key: 'delete', text: `<span class="gh-text danger">${__('Delete')}</span>`,
             },
           ], onSelect: k => {
 
@@ -790,7 +795,7 @@
                 break
               case 'delete':
                 dangerConfirmationModal({
-                  alert: `<p>${ __('Are you sure you want to delete this property?', 'groundhogg') }</p>`,
+                  alert: `<p>${__('Are you sure you want to delete this property?', 'groundhogg')}</p>`,
                   onConfirm: () => {
                     removeField(fieldId)
                   },
@@ -837,14 +842,14 @@
             } : null, index < properties.groups.length - 1 ? {
               key: 'move_down', text: __('Move down', 'groundhogg'),
             } : null, {
-              key: 'delete', text: `<span class="gh-text danger">${ __('Delete') }</span>`,
+              key: 'delete', text: `<span class="gh-text danger">${__('Delete')}</span>`,
             },
           ], onSelect: (k) => {
             switch (k) {
               case 'edit-fields':
 
                 confirmationModal({
-                  alert: `<p>${ __('Double click a field to edit it!', 'groundhogg') }</p>`,
+                  alert: `<p>${__('Double click a field to edit it!', 'groundhogg')}</p>`,
                   confirmText: __('Got it!', 'groundhogg'),
                   closeText: '',
                 })
@@ -874,7 +879,7 @@
               case 'delete':
 
                 dangerConfirmationModal({
-                  alert: `<p>${ __('Are you sure you want to delete this property group?', 'groundhogg') }</p>`,
+                  alert: `<p>${__('Are you sure you want to delete this property group?', 'groundhogg')}</p>`,
                   onConfirm: () => {
                     removeGroup(groupId)
                   },
@@ -892,4 +897,4 @@
 
   Groundhogg.propertiesEditor = Properties
 
-} )(jQuery)
+})(jQuery)
