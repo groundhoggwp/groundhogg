@@ -685,6 +685,10 @@ label.block {
 
   .report-placeholder {
 
+    &.header{
+      grid-column: span 4;
+    }
+
     &.table,
     &.pie_chart {
       grid-column: span 2;
@@ -697,6 +701,18 @@ label.block {
 
 
   .report {
+    &.header {
+      grid-column: span 4;
+      display: flex;
+      gap: 10px;
+      padding: 20px 0 0 0;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+        font-size: 36px;
+      }
+    }
     &.table,
     &.pie_chart {
       grid-column: span 2;
@@ -786,3 +802,45 @@ label.block {
     justify-content: center;
   }
 }
+
+
+@mixin filters {
+  padding: 20px;
+  border: 1px solid $secondary-purple;
+  border-radius: 10px;
+  position: relative;
+  margin-top: 20px;
+}
+
+@mixin filter-tag {
+  position: absolute;
+  transform: translateY( -50% );
+  background-color: $secondary-purple;
+  left: 20px;
+  top: 0;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
+}
+
+#filters-here {
+
+  @include filters();
+
+  &::after {
+    content: 'Include';
+    @include filter-tag();
+
+  }
+}
+
+#exclude-filters-here{
+  @include filters();
+
+  &::after {
+    content: 'Exclude';
+    @include filter-tag();
+  }
+}
+

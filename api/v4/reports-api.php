@@ -55,8 +55,14 @@ class Reports_Api extends Base_Api {
 
 	function get_report_data( $report ) {
 
+		$report = wp_parse_args( $report, [
+			'filters'         => [],
+			'exclude_filters' => [],
+		] );
+
 		$query = new Contact_Query( [
-			'filters' => $report['filters']
+			'filters'         => $report['filters'],
+			'exclude_filters' => $report['exclude_filters']
 		] );
 
 		switch ( $report['type'] ) {
@@ -70,7 +76,7 @@ class Reports_Api extends Base_Api {
 					[ 'meta_value', '!=', '' ],
 				];
 
-				if ( ! empty( $report['filters'] ) ) {
+				if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
 					$where[] = [ 'contact_id', 'IN', $sql ];
 				}
 
@@ -83,21 +89,78 @@ class Reports_Api extends Base_Api {
 
 				foreach ( $records as &$record ) {
 					$record->value = maybe_unserialize( $record->value );
+					$record->count = number_format_i18n( $record->count );
 				}
 
 				return $records;
-
 			case 'number':
 
 				switch ( $report['value'] ) {
+					case 'activity':
+
+						$query->set_query_var( 'select', 'ID' );
+						$sql = $query->get_sql();
+
+						$where = [
+							[ 'activity_type', '=', $report['activity'] ],
+						];
+
+						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
+							$where[] = [ 'contact_id', 'IN', $sql ];
+						}
+
+						$result = get_db( 'activity' )->count( [
+							'where' => $where,
+						] );
+
+						return number_format_i18n( $result );
+
+					case 'distinct':
+
+						$query->set_query_var( 'select', 'ID' );
+						$sql = $query->get_sql();
+
+						$where = [
+							[ 'meta_key', '=', $report['field'] ],
+						];
+
+						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
+							$where[] = [ 'contact_id', 'IN', $sql ];
+						}
+
+						$result = get_db( 'contactmeta' )->count( [
+							'select'   => 'meta_value',
+							'distinct' => true,
+							'where'    => $where,
+						] );
+
+						return number_format_i18n( $result );
+
 					case 'sum':
 					case 'average':
 
-						// todo
+						$query->set_query_var( 'select', 'ID' );
+						$sql = $query->get_sql();
+
+						$where = [
+							[ 'meta_key', '=', $report['field'] ],
+						];
+
+						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
+							$where[] = [ 'contact_id', 'IN', $sql ];
+						}
+
+						$result = get_db( 'contactmeta' )->query( [
+							'select' => 'meta_value',
+							'func'   => $report['value'] === 'sum' ? 'SUM' : 'AVG',
+							'where'  => $where,
+						] );
+
+						return number_format_i18n( $result );
 
 					default:
 					case 'contacts':
-						return $query->count();
+						return number_format_i18n( $query->count() );
 
 				}
 		}

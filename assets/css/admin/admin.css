@@ -629,9 +629,23 @@ label.block {
   background-color: rgba(16, 38, 64, 0.15);
   border-radius: 5px;
 }
+.report-grid .report-placeholder.header {
+  grid-column: span 4;
+}
 .report-grid .report-placeholder.table, .report-grid .report-placeholder.pie_chart {
   grid-column: span 2;
   grid-row: span 2;
+}
+.report-grid .report.header {
+  grid-column: span 4;
+  display: flex;
+  gap: 10px;
+  padding: 20px 0 0 0;
+  align-items: center;
+}
+.report-grid .report.header h2 {
+  margin: 0;
+  font-size: 36px;
 }
 .report-grid .report.table, .report-grid .report.pie_chart {
   grid-column: span 2;
@@ -703,6 +717,46 @@ label.block {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#filters-here {
+  padding: 20px;
+  border: 1px solid #6c19ad;
+  border-radius: 10px;
+  position: relative;
+  margin-top: 20px;
+}
+#filters-here::after {
+  content: "Include";
+  position: absolute;
+  transform: translateY(-50%);
+  background-color: #6c19ad;
+  left: 20px;
+  top: 0;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
+}
+
+#exclude-filters-here {
+  padding: 20px;
+  border: 1px solid #6c19ad;
+  border-radius: 10px;
+  position: relative;
+  margin-top: 20px;
+}
+#exclude-filters-here::after {
+  content: "Exclude";
+  position: absolute;
+  transform: translateY(-50%);
+  background-color: #6c19ad;
+  left: 20px;
+  top: 0;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
 }
 
 /*# sourceMappingURL=admin.css.map */

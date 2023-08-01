@@ -458,6 +458,7 @@ class Contact_Query {
 
 		// Meta Query
 		if ( $this->query_vars['meta_compare'] ) {
+
 			$map = [
 				'gt'    => '>',
 				'gt_eq' => '>=',
