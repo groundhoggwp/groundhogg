@@ -266,7 +266,7 @@ class Settings_Page extends Admin_Page {
 
 		$has_key = get_user_meta( $user_id, 'wpgh_user_secret_key', true );
 
-		if ( ! empty( $has_key ) ){
+		if ( ! empty( $has_key ) ) {
 			return new \WP_Error( 'error', 'An API key has already been issued for this user.' );
 		}
 
@@ -462,6 +462,11 @@ class Settings_Page extends Admin_Page {
 				'id'    => 'affiliate',
 				'title' => _x( 'Affiliate Section', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
+			],
+			'wordpress'             => [
+				'id'    => 'wordpress',
+				'title' => _x( 'WordPress', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'integrations'
 			],
 			'captcha'               => [
 				'id'    => 'captcha',
@@ -674,15 +679,27 @@ class Settings_Page extends Admin_Page {
 					'name' => 'gh_primary_user',
 				),
 			),
+			'gh_disable_user_sync'                   => array(
+				'id'      => 'gh_sync_users',
+				'section' => 'wordpress',
+				'label'   => __( 'Disable User Syncing', 'groundhogg' ),
+				'desc'    => _x( 'Disable the automatic syncing of WordPress users and contacts.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Disable' ),
+					'name'  => 'gh_disable_user_sync',
+					'id'    => 'gh_disable_user_sync',
+					'value' => 'on',
+				),
+			),
 			'gh_sync_user_meta'                      => array(
 				'id'      => 'gh_sync_user_meta',
-				'section' => 'general_other',
-				'label'   => __( 'Sync All User Meta', 'groundhogg' ),
-				'desc'    => _x( 'When enabled all user meta will be synced in real time with contact meta.', 'settings', 'groundhogg' ),
+				'section' => 'wordpress',
+				'label'   => __( 'Sync User Meta', 'groundhogg' ),
+				'desc'    => _x( 'When enabled all user meta will be synced in real time with contact meta if automatic user syncing is enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_sync_user_meta',
 					'id'    => 'gh_sync_user_meta',
 					'value' => 'on',
@@ -710,7 +727,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_opted_in_stats_collection',
 					'id'    => 'gh_opted_in_stats_collection',
 					'value' => 'on',
@@ -724,7 +740,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Allow' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_allow_unrestricted_file_access',
 					'id'    => 'gh_allow_unrestricted_file_access',
 					'value' => 'on',
@@ -738,7 +753,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_enable_experimental_features',
 					'id'    => 'gh_enable_experimental_features',
 					'value' => 'on',
@@ -752,7 +766,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_get_beta_versions',
 					'id'    => 'gh_get_beta_versions',
 					'value' => 'on',
@@ -778,7 +791,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable', 'groundhogg' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_affiliate_link_in_email',
 					'id'    => 'gh_affiliate_link_in_email',
 				],
@@ -856,7 +868,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Hide', 'groundhogg' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_hide_tooltips',
 					'id'    => 'gh_hide_tooltips',
 					'value' => 'on',
@@ -870,7 +881,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Hide', 'groundhogg' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_is_admin_bar_widget_disabled',
 					'id'    => 'gh_is_admin_bar_widget_disabled',
 					'value' => 'on',
@@ -897,7 +907,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Show', 'groundhogg' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_show_legacy_steps',
 					'id'    => 'gh_show_legacy_steps',
 					'value' => 'on',
@@ -911,7 +920,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable', 'groundhogg' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_force_custom_step_names',
 					'id'    => 'gh_force_custom_step_names',
 					'value' => 'on',
@@ -1002,7 +1010,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Disable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_disable_unnecessary_cookies',
 					'id'    => 'gh_disable_unnecessary_cookies',
 					'value' => 'on',
@@ -1015,7 +1022,6 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'The name of the cookie that records consent to allow cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
-					//keep brackets for backwards compat
 					'placeholder' => 'viewed_cookie_policy',
 					'name'        => 'gh_consent_cookie_name',
 					'id'          => 'gh_consent_cookie_name',
@@ -1028,7 +1034,6 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
-					//keep brackets for backwards compat
 					'placeholder' => 'yes',
 					'name'        => 'gh_consent_cookie_value',
 					'id'          => 'gh_consent_cookie_value',
@@ -1380,7 +1385,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Disable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_disable_click_tracking',
 					'id'    => 'gh_disable_click_tracking',
 					'value' => 'on',
@@ -1394,7 +1398,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Disable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_disable_open_tracking',
 					'id'    => 'gh_disable_open_tracking',
 					'value' => 'on',
@@ -1458,7 +1461,6 @@ class Settings_Page extends Admin_Page {
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' ),
-					//keep brackets for backwards compat
 					'name'  => 'gh_log_emails',
 					'id'    => 'gh_log_emails',
 					'value' => 'on',

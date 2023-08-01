@@ -1651,7 +1651,7 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 	 *
 	 * @return bool
 	 */
-	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ) {
+	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', ! is_option_enabled( 'gh_disable_user_sync' ), $userId, $user ) ) {
 		return;
 	}
 
@@ -2666,15 +2666,15 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
-	do_action_ref_array( 'groundhogg/generate_contact_with_map/before', [
-		&$fields,
-		&$map
-	] );
-
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
 		$map  = array_combine( $keys, $keys );
 	}
+
+	do_action_ref_array( 'groundhogg/generate_contact_with_map/before', [
+		&$fields,
+		&$map
+	] );
 
 	$meta  = [];
 	$tags  = [];

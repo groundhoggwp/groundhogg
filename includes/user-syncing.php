@@ -18,13 +18,61 @@ class User_Syncing {
 			add_action( 'updated_user_meta', [ $this, 'user_meta_updated' ], 10, 4 );
 			add_action( 'deleted_user_meta', [ $this, 'user_meta_deleted' ], 10, 4 );
 		}
+
+		add_filter( 'wp_privacy_personal_data_erasers', [ $this, 'register_eraser' ] );
+	}
+
+	/**
+	 * Registers an eraser for Groundhogg
+	 *
+	 * @param $erasers
+	 */
+	public function register_eraser( $erasers ) {
+		$erasers['groundhogg'] = array(
+			'eraser_friendly_name' => white_labeled_name(),
+			'callback'             => [ $this, 'eraser_callback' ],
+		);
+
+		return $erasers;
+	}
+
+	/**
+	 * Erase Groundhogg data when an erasure request is performed
+	 *
+	 * @param string $email_address
+	 * @param int $page
+	 *
+	 * @return array
+	 */
+	public function eraser_callback( $email_address, $page = 1 ) {
+
+		$contact = get_contactdata( $email_address );
+
+		// No contact record, we're done here
+		if ( ! is_a_contact( $contact ) ){
+			return [
+				'items_removed'  => false,
+				'items_retained' => false,
+				'messages'       => [],
+				'done'           => true,
+			];
+		}
+
+		$items_removed = $contact->delete();
+
+		return [
+			'items_removed'  => $items_removed,
+			'items_retained' => ! $items_removed,
+			'messages'       => [],
+			'done'           => true,
+		];
 	}
 
 	/**
 	 * Deletes the owners cache option if the role of a user is changed from or to an owner
 	 *
-	 * @param       $user_id int
-	 * @param       $role    string
+	 * @param       $user_id   int
+	 * @param       $role      string
 	 * @param array $old_roles string[]
 	 *
 	 * @return void
@@ -35,11 +83,11 @@ class User_Syncing {
 			delete_option( 'gh_owners' );
 		}
 
-		if ( count( array_intersect( $old_roles, get_owner_roles() ) ) > 0 ){
+		if ( count( array_intersect( $old_roles, get_owner_roles() ) ) > 0 ) {
 			delete_option( 'gh_owners' );
 		}
 
-		if ( empty( $role ) && empty( $old_roles ) && user_can( $user_id, 'view_contacts' ) ){
+		if ( empty( $role ) && empty( $old_roles ) && user_can( $user_id, 'view_contacts' ) ) {
 			delete_option( 'gh_owners' );
 		}
 	}
@@ -50,6 +98,11 @@ class User_Syncing {
 	 * @param $user_id
 	 */
 	public function sync_new_user( $user_id ) {
+
+		if ( is_option_enabled( 'gh_disable_user_sync' ) ) {
+			return;
+		}
+
 		convert_user_to_contact_when_user_registered( $user_id );
 	}
 
@@ -60,6 +113,11 @@ class User_Syncing {
 	 * @param $old_data
 	 */
 	public function sync_existing_user( $user_id, $old_data ) {
+
+		if ( is_option_enabled( 'gh_disable_user_sync' ) ) {
+			return;
+		}
+
 		create_contact_from_user( $user_id, is_option_enabled( 'gh_sync_user_meta' ) );
 	}
 
