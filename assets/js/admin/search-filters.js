@@ -514,7 +514,9 @@
       }
 
       this.filterPicker = searchOptionsWidget({
-        selector: '.add-filter-wrap',
+        // selector: '.add-filter-wrap',
+        position: 'fixed',
+        target: document.querySelector(`${el} .add-filter-wrap`),
         options: Object.values(Filters.types),
         groups: Filters.groups,
         onSelect: (option) => {
