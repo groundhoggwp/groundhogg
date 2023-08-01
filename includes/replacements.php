@@ -1227,12 +1227,6 @@ class Replacements implements \JsonSerializable {
 			$user = $this->get_current_contact()->get_ownerdata();
 		}
 
-		$debug = [
-			$user_id,
-			$contact_id,
-			$user->user_login,
-		];
-
 		return $user->signature;
 	}
 
