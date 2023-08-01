@@ -1224,6 +1224,7 @@
         Settings.columnWidth.type,
       ],
       advanced: [
+        Settings.value.type,
         Settings.id.type,
         Settings.className.type,
       ],
@@ -1237,6 +1238,7 @@
         required = false,
         className = '',
         multiple = false,
+        value = ''
       }) => {
 
         options = options.map(opt => ( {
@@ -1256,6 +1258,7 @@
           name: name,
           multiple,
           className: `gh-input ${ className }`,
+          selected: multiple ? value.split(',').map( v => v.trim() ) : value
         }
 
         if (multiple) {
@@ -1288,6 +1291,7 @@
         Settings.columnWidth.type,
       ],
       advanced: [
+        Settings.value.type,
         Settings.id.type,
         Settings.className.type,
       ],
@@ -1337,6 +1341,7 @@
         Settings.columnWidth.type,
       ],
       advanced: [
+        Settings.value.type,
         Settings.id.type,
         Settings.className.type,
       ],

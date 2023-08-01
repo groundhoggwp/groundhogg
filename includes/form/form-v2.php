@@ -735,13 +735,19 @@ class Form_v2 extends Step {
 						$name .= '[]';
 					}
 
+					$selected = false;
+
+					if ( $field['value'] ) {
+						$selected = array_map( 'trim', explode( ',', do_replacements( $field['value'], $contact ) ) );
+					}
+
 					return basic_field_with_label( $field, html()->dropdown( [
 						'id'          => $field['id'],
 						'name'        => $name,
 						'class'       => trim( 'gh-input ' . $field['className'] ),
 						'option_none' => $field['placeholder'],
 						'required'    => $field['required'],
-						'selected'    => $contact ? $contact->get_meta( $field['name'] ) : $field['value'],
+						'selected'    => $contact ? $contact->get_meta( $field['name'] ) : $selected,
 						'options'     => array_combine( $options, $options ),
 						'multiple'    => $multiple,
 					] ) );
@@ -787,6 +793,8 @@ class Form_v2 extends Step {
 						$field['label'] .= ' <span class="required">*</span>';
 					}
 
+					$selected = $contact ? $contact->get_meta( $field['name'] ) : do_replacements( $field['value'], $contact );
+
 					$i = 0;
 
 					return html()->e( 'label', [
@@ -794,7 +802,7 @@ class Form_v2 extends Step {
 						], $field['label'] ) . html()->e( 'div', [
 							'id'    => $field['id'],
 							'class' => trim( 'gh-radio-buttons ' . $field['className'] )
-						], array_map( function ( $opt ) use ( $field, $contact, &$i ) {
+						], array_map( function ( $opt ) use ( $field, $selected, &$i ) {
 
 							$i ++;
 
@@ -808,7 +816,7 @@ class Form_v2 extends Step {
 								'id'      => $field['id'] ? $field['id'] . '-' . $i : '',
 								'name'    => $field['name'],
 								'value'   => $opt,
-								'checked' => $contact ? $contact->get_meta( $field['name'] ) === $opt : $field['value'] === $opt
+								'checked' => $selected === $opt
 							] ) );
 
 						}, $field['options'] ) );
@@ -842,11 +850,11 @@ class Form_v2 extends Step {
 						$field['label'] .= ' <span class="required">*</span>';
 					}
 
-					$selected = $contact ? $contact->get_meta( $field['name'] ) : [];
+					$selected = $contact ? $contact->get_meta( $field['name'] ) : do_replacements( $field['value'], $contact );
 
 					// Force to array
 					if ( ! is_array( $selected ) ) {
-						$selected = [];
+						$selected = array_map( 'trim', explode( ',', $selected ) );
 					}
 
 					$i = 0;
@@ -868,7 +876,7 @@ class Form_v2 extends Step {
 								'id'      => $field['id'] ? $field['id'] . '-' . $i : '',
 								'name'    => $field['name'] . '[]',
 								'value'   => $opt,
-								'checked' => $contact ? in_array( $opt, $selected ) : $field['value'] === $opt
+								'checked' => in_array( $opt, $selected )
 							] ) );
 
 						}, $field['options'] ) );
@@ -1925,6 +1933,13 @@ class Form_v2 extends Step {
 			self::before_create_contact( $field, $posted_data, $data, $meta, $tags );
 		}
 
+		do_action_ref_array( 'groundhogg/form/v2/before_create_contact', [
+			$posted_data,
+			&$data,
+			&$meta,
+			&$tags
+		] );
+
 		$email = get_array_var( $data, 'email' );
 
 		if ( ! $email ) {
@@ -1946,6 +1961,11 @@ class Form_v2 extends Step {
 		foreach ( $fields as $field ) {
 			self::after_create_contact( $field, $posted_data, $contact );
 		}
+
+		do_action_ref_array( 'groundhogg/form/v2/after_create_contact', [
+			$posted_data,
+			$contact
+		] );
 
 		// Create the submission
 		$submission = new Submission();
