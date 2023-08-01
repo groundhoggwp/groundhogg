@@ -75,7 +75,7 @@ class Telemetry {
 	/**
 	 * @return void
 	 */
-	public function maybe_send_telemetry(){
+	public function maybe_send_telemetry() {
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
@@ -94,20 +94,23 @@ class Telemetry {
 		$_7daysago->modify( '6 days ago 12:00 am' );
 
 		$request = [
-			'email'       => get_option( 'gh_telemetry_email' ) ?: get_bloginfo( 'admin_email' ),
-			'date'        => Ymd_His(),
-			'system_info' => [
+			'email'            => get_option( 'gh_telemetry_email' ) ?: get_bloginfo( 'admin_email' ),
+			'date'             => Ymd_His(),
+			'is_licensed'      => has_premium_features(),
+			'master_license'   => get_option( 'gh_master_license' ),
+			'is_white_labeled' => is_white_labeled(),
+			'system_info'      => [
 				'php_version' => PHP_VERSION,
 				'wp_version'  => get_bloginfo( 'version' ),
 				'gh_version'  => GROUNDHOGG_VERSION,
 				'site_lang'   => get_bloginfo( 'language' ),
 			],
-			'usage'       => [
+			'usage'            => [
 				'funnels'    => get_db( 'funnels' )->count( [ 'status' => 'active' ] ),
 				'contacts'   => get_db( 'contacts' )->count( [ 'after' => $_7daysago->format( 'Y-m-d H:i:s' ) ] ),
 				'broadcasts' => get_db( 'broadcasts' )->count( [ 'after' => $_7daysago->getTimestamp() ] )
 			],
-			'extensions' => implode(',', Extension::$extension_ids )
+			'extensions'       => implode( ',', Extension::$extension_ids )
 		];
 
 		remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1727-receive-telemetry?token=JVq8f3u', $request );
