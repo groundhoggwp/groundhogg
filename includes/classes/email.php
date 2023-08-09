@@ -165,8 +165,8 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 *
-	 * @deprecated
 	 * @return bool
+	 * @deprecated
 	 */
 	public function has_custom_alt_body() {
 		return $this->using_custom_alt_body();
@@ -238,12 +238,21 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * If the email has the posts replacement code
+	 *
+	 * @return bool
+	 */
+	public function has_posts() {
+		return str_contains( $this->content, '{posts}' ) || str_contains( $this->content, '{posts.' );
+	}
+
+	/**
 	 * get the template type
 	 *
 	 * @return string
 	 */
 	public function get_template() {
-		return apply_filters( 'groundhogg/email/template', 'default' );
+		return apply_filters( 'groundhogg/email/template', 'boxed' );
 	}
 
 	/**
@@ -279,8 +288,8 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function browser_view_enabled( $bool ) {
-		return boolval( $this->get_meta( 'browser_view', true ) );
+	public function browser_view_enabled( $bool = false ) {
+		return boolval( $this->get_meta( 'browser_view') );
 	}
 
 	/**
@@ -290,7 +299,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function browser_view_link( $link ) {
+	public function browser_view_link( $link = '' ) {
 		return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
 	}
 
@@ -335,24 +344,30 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Add alignment CSS to the email content
+	 * Returns the alignment for an email
 	 *
-	 * @param $css array the email's current css
-	 *
-	 * @return array
+	 * @return string
 	 */
-	public function get_alignment( $css ) {
-		$alignment = $this->get_meta( 'alignment', true );
+	public function get_alignment( ) {
+		return $this->get_meta( 'alignment', true );
+	}
 
-		if ( $alignment === 'left' ) {
-			$css['margin-left']  = '0';
-			$css['margin-right'] = 'auto';
-		} else {
-			$css['margin-left']  = 'auto';
-			$css['margin-right'] = 'auto';
-		}
+	/**
+	 * Get the custom CSS for the email
+	 *
+	 * @return array|mixed
+	 */
+	public function get_css() {
+		return $this->get_meta( 'css' );
+	}
 
-		return $css;
+	/**
+	 * Width of the email in pixels
+	 *
+	 * @return int
+	 */
+	public function get_width() {
+		return apply_filters( 'groundhogg/email/width', absint( $this->get_meta( 'width' ) ?: get_default_email_width() ), $this );
 	}
 
 	/**
@@ -591,7 +606,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// Has posts replacement code
-		if ( strpos( $this->content, '{posts.' ) !== false ) {
+		if ( str_contains( $this->content, '{posts.' ) || str_contains( $this->content, '{posts}' ) ) {
 			add_filter( 'groundhogg/templates/email/has_posts', '__return_true' );
 		}
 	}
@@ -623,6 +638,8 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_edited_preview() {
 
+		the_email( $this );
+
 		$e = $this->get_meta( 'edited' );
 
 		if ( ! $e ) {
@@ -645,7 +662,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function build() {
+	public function build_old() {
 		$templates = new Template_Loader();
 
 		do_action( 'groundhogg/email/build/before', $this );
@@ -695,6 +712,26 @@ class Email extends Base_Object_With_Meta {
 		do_action( 'groundhogg/email/build/after', $this );
 
 		return $content;
+	}
+
+	/**
+	 * Build the email
+	 *
+	 * @return string
+	 */
+	public function build() {
+
+		the_email( $this );
+
+		$templates = new Template_Loader();
+
+		ob_start();
+
+		$templates->get_template_part( 'email/' . $this->get_template() );
+
+		$content = ob_get_clean();
+
+		return apply_filters( 'groundhogg/email/the_content', $content );
 	}
 
 	/**
@@ -885,6 +922,7 @@ class Email extends Base_Object_With_Meta {
 	public function send( $contact_id_or_email, $event = 0 ) {
 
 		is_sending( true );
+		the_email( $this );
 
 		// Clear any old previous errors.
 		$this->clear_errors();
@@ -1181,7 +1219,7 @@ class Email extends Base_Object_With_Meta {
 	public function get_as_array() {
 
 		// Ensure there is a contact object there somewhere
-		if ( ! is_a_contact( $this->contact ) ){
+		if ( ! is_a_contact( $this->contact ) ) {
 			$contact = get_contactdata();
 
 			if ( ! $contact && is_user_logged_in() ) {
@@ -1201,9 +1239,11 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// Ensure there is an event object there somewhere
-		if ( ! $this->event ){
+		if ( ! $this->event ) {
 			$this->set_event( new Event() );
 		}
+
+		the_email( $this );
 
 		$live_preview   = $this->build();
 		$edited_preview = $this->get_edited_preview();

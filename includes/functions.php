@@ -7595,3 +7595,20 @@ function day_of_week( $number = 0 ) {
 		'Saturday',
 	], absint( $number ) );
 }
+
+/**
+ * Sets/gets the email, for use with email templates
+ *
+ * @param null|Email $set_email
+ *
+ * @return Email
+ */
+function the_email( $set_email = null ){
+	static $email;
+
+	if ( $set_email ){
+		$email = $set_email;
+	}
+
+	return $email;
+}

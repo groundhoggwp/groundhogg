@@ -445,6 +445,13 @@ class Replacements implements \JsonSerializable {
 				'name'        => __( 'Post Featured Image', 'groundhogg' ),
 				'description' => _x( 'Return the featured image of a single recent post.', 'replacement', 'groundhogg' ),
 			],
+			[
+				'code'        => 'post_url',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_url' ],
+				'name'        => __( 'Post URL', 'groundhogg' ),
+				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -1665,6 +1672,8 @@ class Replacements implements \JsonSerializable {
 				$content = get_the_permalink();
 				break;
 		}
+
+		$query->reset_postdata();
 
 		return $content;
 	}
