@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.11.10
+Stable tag: 2.7.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -25,9 +25,9 @@ Groundhogg WordPress CRM, Email & Marketing Automation
 
 ## Join 3,000+ Small Businesses in 35+ Countries!
 
-### Groundhogg 2.6 brings major innovation including a the new Contact Activity Timeline and Free custom field management! [February 22nd, 2021](https://www.groundhogg.io/updates/new-contact-record-user-interface-in-groundhogg-2-6/)
+### Send automated/recurring newsletters to your subscribers with your latest posts!
 
-[youtube https://youtu.be/OzZD0_OSNVM]
+[youtube https://youtu.be/DnupLOepWMs]
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
@@ -106,6 +106,9 @@ We know funnels, CRM, and marketing automation like the back of our hands!
 
 You can trust us to not only provide you with stellar software and support, but also provide you guidance on the kinds of funnels and automation you should be building to get maximum value from our products.
 
+### Quickly and easily segment your list with Groundhogg's unrivaled search filter system!
+
+// todo change video url
 [youtube https://youtu.be/e-_QCUtdghw]
 
 ## ❤️ Businesses Love Groundhogg CRM & Marketing Automation!
@@ -179,9 +182,10 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Learn more about your audience with demographic reporting.
 * See which funnels/emails are under-performing.
 
-### Track how your contacts navigate your site!
+### Create custom reports so you always have access to your essential data!
 
-[youtube https://youtu.be/fHW3NpFehc4]
+// todo change video url
+[youtube https://youtu.be/e-_QCUtdghw]
 
 ### 🇪🇺 GDPR Ready
 
@@ -321,6 +325,19 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.7.12 (2023-08-01) =
+* ADDED New feature to add heading dividers to custom reports page to make grouping your custom reports easier.
+* ADDED Exclude filters to custom reports for more advanced reporting.
+* ADDED New report value types for number reports,
+ * Sum of a custom field
+ * Average of a custom field
+ * Number of distinct custom field values
+ * Total number of activities
+* ADDED Option to disable user syncing in WordPress integration settings.
+* ADDED Developer filters/actions to the new form submission handler.
+* TWEAKED Moved user meta sync option to WordPress integration settings.
+* TWEAKED Dropdown and checkbox fields can now be pre-selected with the value setting in the new form builder.
 
 = 2.7.11.10 (2023-07-27) =
 * ADDED Sort contacts by custom fields values and user meta (when available).
