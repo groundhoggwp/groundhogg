@@ -1,0 +1,621 @@
+@keyframes skeleton-loading {
+  0% {
+    background-color: rgba(16, 38, 64, 0.05);
+  }
+  100% {
+    background-color: rgba(16, 38, 64, 0.3);
+  }
+}
+.skeleton-loading {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes flashing {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+.flashing {
+  animation: flashing 1s linear infinite alternate;
+}
+
+.template-full-width {
+  padding: 0 20px 20px 20px;
+}
+
+.template-boxed {
+  margin: 0 20px 20px 20px;
+}
+.template-boxed.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.template-framed {
+  background: rgba(0, 117, 255, 0.07);
+  padding: 60px 0;
+}
+.template-framed .template-logo {
+  margin: 0 auto 30px auto;
+  display: block;
+}
+.template-framed > .inner-content {
+  margin: 0 auto;
+  padding: 30px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.alignleft {
+  margin-right: 10px;
+}
+
+.alignright {
+  margin-left: 10px;
+}
+
+#email-controls {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.block-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#email-block-editor {
+  display: flex;
+  gap: 20px;
+  max-height: calc(100vh - 92px);
+}
+#email-block-editor * {
+  box-sizing: border-box;
+}
+#email-block-editor #blocks-panel {
+  padding: 10px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+#email-block-editor .block-wrap .block-name {
+  text-align: center;
+  font-weight: 300;
+}
+#email-block-editor .block-wrap:not(:last-child) {
+  margin-bottom: 10px;
+}
+#email-block-editor .block {
+  height: 60px;
+  width: 60px;
+  padding: 10px;
+  border-radius: 5px;
+  background: #FFFFFF;
+  cursor: grab;
+  margin-bottom: 5px;
+}
+#email-block-editor .block.dragging {
+  cursor: grabbing;
+}
+#email-block-editor .block .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#email-block-editor .block .icon svg {
+  height: 100%;
+  width: 100%;
+}
+#email-block-editor #content {
+  width: 100%;
+  background: #FFFFFF;
+  overflow: auto;
+  margin-top: 20px;
+}
+#email-block-editor #content #builder-content {
+  min-height: 40px;
+}
+#email-block-editor #content #builder-content img {
+  max-width: 100%;
+}
+#email-block-editor #content #builder-content .block-placeholder {
+  background-color: rgba(0, 117, 255, 0.5);
+  border-radius: 2px;
+  width: 100%;
+  height: 5px;
+  margin: 15px 0;
+  box-sizing: border-box;
+}
+#email-block-editor #content #builder-content .builder-block {
+  position: relative;
+}
+#email-block-editor #content #builder-content .builder-block:not(:hover) {
+  overflow: hidden;
+}
+#email-block-editor #content #builder-content .builder-block div.filters-enabled {
+  background-color: #6c19ad;
+  color: #fff;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: auto;
+  height: 22px;
+  width: 22px;
+  border-bottom-left-radius: 5px;
+  padding: 2px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=spacer] .spacer-block {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text] button.edit-text-content {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text]:hover button.edit-text-content {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .maybe-edit-text > *:last-child,
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .text-content-wrap > *:last-child {
+  margin-bottom: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .maybe-edit-text > *:first-child,
+#email-block-editor #content #builder-content .builder-block[data-type=text] > .text-content-wrap > *:first-child {
+  margin-top: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] {
+  min-height: 30px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] button.edit-html-content {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html]:hover button.edit-html-content {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+#email-block-editor #content #builder-content .builder-block[data-type=html] .maybe-edit-html {
+  min-height: 30px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=columns]:has(table.one_column) > .block-toolbar {
+  right: -2px;
+  transform: none;
+}
+#email-block-editor #content #builder-content .builder-block .email-button {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns-row {
+  display: table-row;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns-cell {
+  display: table-cell;
+  vertical-align: top;
+}
+#email-block-editor #content #builder-content .builder-block img {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block .column.empty {
+  background-color: rgba(16, 38, 64, 0.05);
+  border-radius: 5px;
+  padding: 20px;
+  margin: 5px;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar {
+  display: none;
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  left: auto;
+  top: -22px;
+  background-color: #c8c8c8;
+  border-radius: 5px 5px 0 0;
+  z-index: 99;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .move-block {
+  cursor: grab;
+}
+#email-block-editor #content #builder-content .builder-block:hover {
+  outline: 2px solid #c8c8c8;
+}
+#email-block-editor #content #builder-content .builder-block:hover > .block-toolbar {
+  display: flex;
+  background-color: #c8c8c8;
+}
+#email-block-editor #content #builder-content .builder-block:has(.is-editing) {
+  overflow: visible;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing {
+  outline: 2px solid #0075ff;
+  overflow: visible;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
+  display: flex;
+  background-color: #0075ff;
+  z-index: 999;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar button {
+  color: #fff !important;
+}
+#email-block-editor #content #builder-content .builder-block .dynamic-content-loader {
+  position: relative;
+}
+#email-block-editor #content #builder-content .builder-block .dynamic-content-loader:empty {
+  min-height: 50px;
+}
+#email-block-editor #content #builder-content .builder-block .dynamic-content-loader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+#controls-panel {
+  width: 300px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  background: #fff;
+  border-left: 1px solid rgba(16, 38, 64, 0.15);
+}
+#controls-panel h3 {
+  padding-left: 10px;
+}
+#controls-panel .controls-nav {
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  align-items: center;
+  padding: 10px 3px 0 10px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+#controls-panel .controls-nav h2.breadcrumbs {
+  margin: 0;
+  display: flex;
+  gap: 3px;
+  font-size: 13px;
+  align-items: center;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+#controls-panel .controls-nav h2.breadcrumbs span.slash {
+  color: rgba(16, 38, 64, 0.5);
+  font-size: 12px;
+}
+#controls-panel .controls-nav .gh-button-nav {
+  display: flex;
+  gap: 3px;
+}
+#controls-panel .controls-nav .gh-button-nav button.tab {
+  border-radius: 0 0;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  border-bottom-width: 0;
+  background: rgba(16, 38, 64, 0.05);
+  font-size: 14px;
+  padding: 6px 12px;
+}
+#controls-panel .controls-nav .gh-button-nav button.tab.active {
+  font-weight: 500;
+  background: #fff;
+  box-shadow: 0 2px 0 -1px #fff;
+  z-index: 1;
+}
+#controls-panel .control-group:not(.closed) .controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#controls-panel .control-group:not(.closed) .controls p {
+  margin: 0;
+}
+#controls-panel .control-group:not(.closed) .controls hr {
+  width: calc( 100% + 40px );
+  margin: 3px -20px;
+}
+#controls-panel .control-group:not(.closed) .controls .space-between {
+  gap: 10px;
+}
+#controls-panel .control-group:not(.closed) .controls label {
+  font-weight: 500;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 10px 10px;
+  grid-auto-flow: row;
+  grid-template-areas: ". ." ". .";
+}
+#controls-panel .control-group:not(.closed) .controls .layout-choice {
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+#controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
+  background-color: rgba(0, 117, 255, 0.2);
+}
+#controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
+  background-color: rgba(0, 117, 255, 0.5);
+}
+#controls-panel .control-group:not(.closed) .controls .layout-choice svg {
+  width: 100%;
+}
+#controls-panel .gh-panel {
+  border-radius: 0;
+  box-shadow: none;
+  border: solid rgba(16, 38, 64, 0.15);
+  border-width: 1px 0 0 0;
+}
+#controls-panel .gh-panel:last-of-type {
+  border-bottom-width: 1px;
+}
+#controls-panel .control-input {
+  max-width: 75px;
+}
+#controls-panel .wp-picker-container.wp-picker-active {
+  position: relative;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder,
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+  position: absolute;
+  z-index: 99;
+  right: 0;
+  top: 30px;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder *,
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap * {
+  box-sizing: content-box;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+  display: flex;
+  box-sizing: border-box;
+  width: 202px;
+  background-color: #FFFFFF;
+  border: 1px solid #dcdcde;
+  border-bottom: none;
+  padding: 6px;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder {
+  top: 65px;
+}
+#controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder .iris-picker {
+  border-top: none;
+}
+
+body {
+  background: rgba(0, 117, 255, 0.02);
+}
+body #wpcontent {
+  padding: 0;
+}
+body .test-email-address-wrap {
+  display: flex;
+  gap: 10px;
+}
+body .test-email-address-wrap #initiate-test {
+  gap: 0;
+  display: flex;
+}
+body iframe#preview.mobile {
+  height: 600px;
+  width: 350px;
+}
+body iframe#preview.desktop {
+  height: 600px;
+  width: 800px;
+}
+
+#wpfooter {
+  display: none;
+}
+
+#email-editor {
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+}
+#email-editor input[type=text],
+#email-editor select {
+  max-width: 100%;
+}
+#email-editor .email-editor-p {
+  line-height: 1.5;
+  margin: 1em 0;
+}
+#email-editor .gh-header {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  padding: 0 10px 0 0;
+  border-radius: 0;
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+}
+#email-editor .gh-header > svg {
+  height: 60px;
+  padding: 10px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background-color: #102640;
+}
+#email-editor .gh-header .show-preview {
+  width: 35px;
+}
+#email-editor .gh-header #send-test {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+#email-editor .gh-header .admin-title-wrap {
+  font-size: 20px;
+  line-height: 44px;
+  width: 100%;
+}
+#email-editor .gh-header .admin-title-wrap #admin-title {
+  font-weight: 600;
+}
+#email-editor .gh-header .admin-title-wrap #admin-title-edit {
+  font-size: 20px;
+  width: 100%;
+}
+#email-editor .gh-header .actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+#email-editor-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+#email-editor-sidebar {
+  flex-basis: 300px;
+  flex-shrink: 0;
+}
+#email-editor-content {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  flex: 1;
+}
+#email-editor-controls {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+}
+#email-editor-sidebar label {
+  display: block;
+  padding-bottom: 0.382rem;
+}
+#email-editor-sidebar-controls button {
+  flex-basis: 40px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+}
+#email-editor-sidebar-controls button:first-child {
+  flex-grow: 1;
+}
+#email-editor-sidebar-options {
+  display: flex;
+  gap: 20px;
+}
+#email-editor-sidebar-message_type {
+  flex-grow: 1;
+}
+#email-editor-advanced {
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
+  margin-top: 20px;
+}
+#email-editor .inline-label {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  align-items: center;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+#email-editor .inline-label:focus-within {
+  border-color: #0075ff;
+}
+#email-editor .inline-label label {
+  font-weight: 500;
+  font-size: 18px;
+}
+#email-editor .inline-label .input-wrap {
+  width: 100%;
+}
+#email-editor .inline-label .input-wrap button {
+  background: none;
+  border: none;
+  opacity: 0.5;
+}
+#email-editor .inline-label .input-wrap button:hover, #email-editor .inline-label .input-wrap button:focus {
+  opacity: 1;
+}
+#email-editor .inline-label .input-wrap input {
+  width: 100%;
+  box-shadow: none;
+  border: none;
+  font-size: 18px;
+  outline: 0;
+  padding: 0;
+}
+
+.gh-modal-frame #email-editor {
+  position: relative;
+  left: initial;
+  right: initial;
+  top: initial;
+  bottom: initial;
+  background: #F6F9FB;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 90vw;
+  height: 85vh;
+}
+.gh-modal-frame #email-editor #email-block-editor {
+  height: calc( 100% - 60px);
+}
+
+@media only screen and (max-width: 960px) {
+  .auto-fold #email-editor {
+    left: 36px;
+  }
+}
+.folded #email-editor {
+  left: 36px;
+}
+
+.cards .post-card > .card-content {
+  border: 1px solid rgba(16, 38, 64, 0.1);
+  background-color: #fff;
+  padding: 20px;
+}
+
+.cards .post-card.has-thumbnail > .card-content {
+  border-top: none;
+}
+
+.cards .post-card img {
+  display: block;
+  vertical-align: bottom;
+}
+
+/*# sourceMappingURL=email-block-editor.css.map */
