@@ -1,5 +1,6 @@
 <?php
 
+use function Groundhogg\array_to_css;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
 use function Groundhogg\the_email;
@@ -10,14 +11,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $email = the_email();
 
+if ( $email->has_footer_block() ) {
+	return;
+}
+
 $custom_text = get_option( 'gh_custom_email_footer_text' );
 
 $alignment = $email->get_alignment();
 
-?>
+$p_style = [
+	'text-align'  => $alignment,
+	'line-height' => 1,
+	'margin'      => '0.5em 0'
+];
 
-<?php if ( ! empty( $custom_text ) ): ?>
-	<div class="pre-footer-content">
+if ( $email->get_template() === 'framed' ) {
+	$p_style['alignment'] = 'center';
+	$p_style['color']     = $email->get_meta( 'footerFontColor' ) ?: '#000';
+}
+
+$_p = function ( $content, $style = [] ) use ( $p_style ) {
+	echo html()->e( 'p', [
+		'style' => array_merge( $p_style, $style ),
+	], $content );
+};
+
+$show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/footer/show_custom_footer_text', ! empty( $custom_text ), $email );
+
+?>
+<?php if ( $show_custom_footer_text ): ?>
+	<?php
+	$custom_footer_text_style = apply_filters( 'groundhogg/templates/email/parts/footer/custom_footer_text_style', [
+		'margin-top' => '40px'
+	], $email );
+	?>
+	<div class="pre-footer-content" style="<?php echo array_to_css( $custom_footer_text_style ) ?>">
 		<?php echo wpautop( $custom_text ); ?>
 	</div>
 <?php endif; ?>
@@ -35,11 +63,16 @@ $alignment = $email->get_alignment();
 		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
 	] );
 
-	?>
-	<p><?php echo $business_name ?></p>
-	<p><?php echo $address ?></p>
-	<p><?php echo implode( ' | ', $links ); ?></p>
-	<?php include __DIR__ . '/unsubscribe.php' ?>
+	$_p( $business_name );
+	$_p( $address );
+	$_p( implode( ' | ', $links ) );
 
-	<?php include __DIR__ . '/affiliate-link.php' ?>
+	if ( ! $email->is_transactional() ) {
+		$_p( sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
+			'href' => $email->get_unsubscribe_link()
+		], __( 'Unsubscribe', 'groundhogg' ) ) ) );
+	}
+
+	include __DIR__ . '/affiliate-link.php' ?>
+
 </div>

@@ -621,9 +621,7 @@
     const mount = () => {
 
       let tasks = TasksStore.getItems().filter(t => !t.is_complete)
-
       $el.html(templates.myTasks(tasks))
-
       onMount()
     }
 

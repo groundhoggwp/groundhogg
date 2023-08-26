@@ -187,6 +187,13 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_alt_body() {
+
+		$plain_text = $this->get_meta( 'plain_text' );
+
+		if ( $plain_text ) {
+			return $plain_text;
+		}
+
 		$body = "";
 
 		if ( $this->using_custom_alt_body() ) {
@@ -206,7 +213,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_alt_body() {
-		return $this->strip_html_tags( do_replacements( $this->get_alt_body(), $this->get_contact() ) );
+		return Dynamic_Block_Handler::instance()->replace_content( $this->get_alt_body(), $this->get_blocks(), 'plain' );
 	}
 
 	/**
@@ -242,8 +249,8 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function has_posts() {
-		return str_contains( $this->content, '{posts}' ) || str_contains( $this->content, '{posts.' );
+	public function has_columns() {
+		return preg_match( '/\{posts|post-card|<!-- posts:|email-columns/', $this->content );
 	}
 
 	/**
@@ -252,7 +259,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_template() {
-		return apply_filters( 'groundhogg/email/template', 'boxed' );
+		return apply_filters( 'groundhogg/email/template', $this->get_meta( 'template' ) ?: 'boxed' );
 	}
 
 	/**
@@ -289,7 +296,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function browser_view_enabled( $bool = false ) {
-		return boolval( $this->get_meta( 'browser_view') );
+		return boolval( $this->get_meta( 'browser_view' ) );
 	}
 
 	/**
@@ -348,7 +355,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function get_alignment( ) {
+	public function get_alignment() {
 		return $this->get_meta( 'alignment', true );
 	}
 
@@ -422,6 +429,109 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Retrieves the email blocks
+	 *
+	 * @return array
+	 */
+	public function get_blocks() {
+		return $this->get_meta( 'blocks' ) ?: [];
+	}
+
+	/**
+	 * Whether this email has blocks or not
+	 *
+	 * @return bool
+	 */
+	public function has_blocks(){
+		$blocks = $this->get_blocks();
+		return ! empty( $blocks );
+	}
+
+	/**
+	 * If the email has the footer block
+	 *
+	 * @return bool
+	 */
+	public function has_footer_block(){
+		return $this->get_editor_type() === 'blocks' && str_contains( $this->content, '<div id="footer"');
+	}
+
+	/**
+	 * Returns the editor type based on the format of the content
+	 *
+	 * @return string
+	 */
+	public function get_editor_type(){
+
+		// New blocks
+		if ( $this->has_blocks() ){
+			return 'blocks';
+		}
+
+		// HTML editor
+		if ( $this->get_meta( 'type' ) === 'html' ){
+			return 'html';
+		}
+
+		// Legacy blocks
+		if ( str_contains( $this->content, 'data-block' ) || str_contains( $this->content, 'text_block' ) || str_contains( $this->content, '<div class="row"' ) ){
+			return 'legacy_blocks';
+		}
+
+		// Legacy plain
+		return 'legacy_plain';
+	}
+
+	/**
+	 * Hide blocks that have conditional visibility enabled
+	 *
+	 * @param $content
+	 * @param $blocks
+	 *
+	 * @return array|mixed|string|string[]|null
+	 */
+	protected function maybe_hide_blocks( $content, $blocks ) {
+		$blocks = array_filter( $blocks, function ( $block ) {
+			return key_exists( 'type', $block );
+		} );
+
+		foreach ( $blocks as $block ) {
+
+			// Block has filters enabled
+			if ( isset_not_empty( $block, 'filters_enabled' ) ) {
+				// Filters are not empty
+				if ( isset_not_empty( $block, 'include_filters' ) || isset_not_empty( $block, 'exclude_filters' ) ) {
+
+					$query = new Contact_Query( [
+						'filters'         => get_array_var( $block, 'include_filters', [] ),
+						'exclude_filters' => get_array_var( $block, 'exclude_filters', [] ),
+						'include'         => $this->get_contact()->get_id()
+					] );
+
+					$count = $query->count();
+
+					// If count is zero, no match and can't see
+					if ( $count === 0 ) {
+						// Remove the block
+						$content = preg_replace( "/<!-- START:{$block['id']} -->.*<!-- END:{$block['id']} -->/s", '', $content );
+
+						// This block is hidden, so we do not need to check children columns
+						continue;
+					}
+				}
+			}
+
+			if ( key_exists( 'columns', $block ) && is_array( $block['columns'] ) ) {
+				foreach ( $block['columns'] as $column ) {
+					$content = $this->maybe_hide_blocks( $content, $column );
+				}
+			}
+		}
+
+		return $content;
+	}
+
+	/**
 	 * Return email content
 	 * This is called by a filter rather than directly
 	 *
@@ -430,13 +540,25 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_content( $content = '' ) {
+
+		$content = $this->get_content();
+
+		if ( $this->has_blocks() ){
+			$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
+			$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks() );
+
+			// Special handling for footer unsub link
+			if ( $this->has_footer_block() ){
+				$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
+			}
+		}
+
 		$content = do_replacements(
-			$this->get_content(),
+			$content,
 			$this->get_contact()->get_id()
 		);
 
-		// Autop non blocked emails.
-		if ( strpos( $content, 'data-block' ) === false && apply_filters( 'groundhogg/email/should_autop', true ) ) {
+		if ( $this->get_editor_type() === 'legacy_plain' ){
 			$content = wpautop( $content );
 		}
 
@@ -521,6 +643,7 @@ class Email extends Base_Object_With_Meta {
 	 * @param $content
 	 *
 	 * @return string
+	 * @deprecated
 	 */
 	public function get_footer_text( $content ) {
 
@@ -586,6 +709,8 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 * Add all the filters relevant to the email content
+	 *
+	 * @deprecated
 	 */
 	private function add_filters() {
 		add_filter( 'groundhogg/email_template/alignment', [ $this, 'get_alignment_outlook' ] );
@@ -614,6 +739,8 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 * Once the content is complete you will need to remove all the filters related to that specific content.
+	 *
+	 * @deprecated
 	 */
 	private function remove_filters() {
 		remove_filter( 'groundhogg/email_template/alignment', [ $this, 'get_alignment_outlook' ] );
@@ -661,6 +788,7 @@ class Email extends Base_Object_With_Meta {
 	 * Build the email
 	 *
 	 * @return string
+	 * @deprecated use build() instead
 	 */
 	public function build_old() {
 		$templates = new Template_Loader();
@@ -721,6 +849,8 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function build() {
 
+		disable_emojis();
+
 		the_email( $this );
 
 		$templates = new Template_Loader();
@@ -730,6 +860,8 @@ class Email extends Base_Object_With_Meta {
 		$templates->get_template_part( 'email/' . $this->get_template() );
 
 		$content = ob_get_clean();
+
+		$content = $this->convert_to_tracking_links( $content );
 
 		return apply_filters( 'groundhogg/email/the_content', $content );
 	}
@@ -1246,18 +1378,24 @@ class Email extends Base_Object_With_Meta {
 		the_email( $this );
 
 		$live_preview   = $this->build();
-		$edited_preview = $this->get_edited_preview();
+
+		// Auto p the plain text content so we can create a new text block
+		if ( $this->get_editor_type() === 'legacy_plain' ){
+			$this->content = wpautop( $this->content );
+		}
+
+//		$edited_preview = $this->get_edited_preview();
 
 		return array_merge( parent::get_as_array(), [
 			'context' => [
+				'editor_type'    => $this->get_editor_type(),
+				'from_avatar'    => get_avatar_url( $this->get_from_user_id(), [
+					'size' => 40
+				] ),
 				'from_name'      => $this->get_from_name(),
 				'from_email'     => $this->get_from_email(),
 				'from_user'      => $this->get_from_user(),
 				'built'          => $live_preview,
-				'edited_preview' => $edited_preview,
-				'avatar'         => get_avatar_url( $this->get_from_user_id(), [
-					'size' => 30
-				] )
 			]
 		] );
 	}

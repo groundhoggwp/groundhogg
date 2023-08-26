@@ -824,6 +824,7 @@ label.block {
   width: max-content;
 }
 
+#block-include-filters,
 #filters-here {
 
   @include filters();
@@ -835,6 +836,7 @@ label.block {
   }
 }
 
+#block-exclude-filters,
 #exclude-filters-here{
   @include filters();
 

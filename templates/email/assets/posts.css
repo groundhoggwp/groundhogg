@@ -13,6 +13,10 @@
     vertical-align: top;
 }
 
+.email-columns .email-columns-row .email-columns-cell img.post-thumbnail {
+    width: 100%;
+}
+
 .text-content-wrap > *:last-child {
     margin-bottom: 0;
 }
@@ -21,16 +25,13 @@
     margin-top: 0;
 }
 
-.cards .post-card {
-    margin-bottom: 20px;
-}
-
 .cards .post-card img {
     display: block;
 }
 
 .cards .post-card > .card-content {
     border: 1px solid rgba(16, 38, 64, 0.1);
+    background-color: #fff;
     padding: 20px;
 }
 
@@ -43,7 +44,17 @@
     .email-columns .email-columns-row,
     .email-columns .email-columns-row .email-columns-cell {
         display: block;
-        padding: 0 !important;
+        /*padding: 0 !important;*/
+        width: 100% !important;
+    }
+}
+
+@media only screen and (max-device-width: 480px) {
+    .email-columns,
+    .email-columns .email-columns-row,
+    .email-columns .email-columns-row .email-columns-cell {
+        display: block;
+        /*padding: 0 !important;*/
         width: 100% !important;
     }
 }

@@ -489,7 +489,13 @@
       if (object.hasOwnProperty(prop)) {
 
         let attr = kebabize(prop)
-        let val = specialChars(object[prop])
+        let val = object[prop]
+
+        if (typeof val === 'undefined') {
+          continue
+        }
+
+        val = specialChars(val)
 
         switch (attr) {
           case 'font-size':
@@ -735,7 +741,7 @@
     let editor = tinyMCE.get(editor_id)
 
     editor.on('Change keyup', function (e) {
-      onChange(editor.getContent({ format: 'raw' }))
+      onChange(editor.getContent())
 
       if (e.type == 'keyup' && e.ctrlKey && e.shiftKey && e.which == 219) {
 
@@ -1969,7 +1975,7 @@ ${afterProgress()}`,
   }
 
   const setFrameContent = (frame, content) => {
-    var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
+    let blob = new Blob([content], { type: 'text/html; charset=utf-8' })
     frame.src = URL.createObjectURL(blob)
   }
 
@@ -2057,6 +2063,19 @@ ${afterProgress()}`,
   }
 
   const icons = {
+    // language=HTML
+    eye: `
+		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
+  <path fill="currentColor"
+        d="M509 246c-5-6-114-153-253-153S8 240 3 246c-4 6-4 14 0 20 5 6 114 153 253 153s248-147 253-153c4-6 4-14 0-20zM256 385c-103 0-191-97-218-129 27-32 115-129 218-129s191 97 218 129c-27 32-115 129-218 129z"/>
+			<path fill="currentColor"
+			      d="M256 155a101 101 0 1 0 0 203 101 101 0 0 0 0-203zm0 169a68 68 0 1 1 0-136 68 68 0 0 1 0 136z"/>
+</svg>`,
+    // language=HTML
+    text: `
+	    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 333 333">
+  <path fill="currentColor" d="M323 32H10C5 32 0 36 0 42s5 10 10 10h313a10 10 0 0 0 0-20zm-93 83H10c-5 0-10 4-10 10s5 10 10 10h220a10 10 0 0 0 0-20zm93 84H10c-5 0-10 4-10 10s5 10 10 10h313a10 10 0 0 0 0-20zm-172 83H10c-5 0-10 4-10 10s5 10 10 10h141a10 10 0 0 0 0-20z"/>
+</svg>`,
     // language=HTML
     tasks: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -2705,10 +2724,14 @@ ${afterProgress()}`,
     heartbeat: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 			<path fill="currentColor"
-				d="M7 24H4a8 8 0 0 1 8-7h9a8 8 0 0 1 7 4 1 1 0 0 0 2 0 10 10 0 0 0-9-6h-9A10 10 0 0 0 2 25a1 1 0 0 0 1 1h4a1 1 0 0 0 0-2z"/>
+			      d="M7 24H4a8 8 0 0 1 8-7h9a8 8 0 0 1 7 4 1 1 0 0 0 2 0 10 10 0 0 0-9-6h-9A10 10 0 0 0 2 25a1 1 0 0 0 1 1h4a1 1 0 0 0 0-2z"/>
 			<path fill="currentColor"
-				d="M29 24h-3l-4-6a1 1 0 0 0-2 1l-4 8-2-3a1 1 0 0 0-1 0h-2a1 1 0 0 0 0 2h2l2 4a1 1 0 0 0 1 0 1 1 0 0 0 1-1l4-8 3 5a1 1 0 0 0 1 0h4a1 1 0 0 0 0-2zM16 14a6 6 0 1 0-6-6 6 6 0 0 0 6 6zm0-10a4 4 0 1 1-4 4 4 4 0 0 1 4-4z"/>
+			      d="M29 24h-3l-4-6a1 1 0 0 0-2 1l-4 8-2-3a1 1 0 0 0-1 0h-2a1 1 0 0 0 0 2h2l2 4a1 1 0 0 0 1 0 1 1 0 0 0 1-1l4-8 3 5a1 1 0 0 0 1 0h4a1 1 0 0 0 0-2zM16 14a6 6 0 1 0-6-6 6 6 0 0 0 6 6zm0-10a4 4 0 1 1-4 4 4 4 0 0 1 4-4z"/>
 		</svg>`,
+    link: `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 277.279 277.279">
+  <path fill="currentColor" d="m149.245 191.671-42.425 42.426-.001.001-.001.001c-17.544 17.545-46.092 17.546-63.638 0-8.5-8.5-13.18-19.801-13.18-31.82 0-12.018 4.68-23.317 13.177-31.817l.003-.003 42.425-42.426c5.857-5.858 5.857-15.356-.001-21.213-5.857-5.857-15.355-5.857-21.213 0l-42.425 42.426-.009.01C7.798 163.42 0 182.251 0 202.279c0 20.033 7.801 38.867 21.967 53.033C36.589 269.933 55.794 277.244 75 277.244c19.206 0 38.412-7.311 53.032-21.932v-.001l.001-.001 42.425-42.426c5.857-5.857 5.857-15.355-.001-21.213-5.856-5.857-15.353-5.857-21.212 0zM277.279 75c0-20.033-7.802-38.867-21.968-53.033-29.243-29.242-76.824-29.241-106.065 0l-.004.005-42.424 42.423c-5.858 5.857-5.858 15.356 0 21.213a14.952 14.952 0 0 0 10.607 4.394c3.838 0 7.678-1.465 10.606-4.394l42.424-42.423.005-.005c17.544-17.544 46.092-17.545 63.638 0 8.499 8.5 13.181 19.801 13.181 31.82 0 12.018-4.68 23.317-13.178 31.817l-.003.003-42.425 42.426c-5.857 5.857-5.857 15.355.001 21.213a14.954 14.954 0 0 0 10.606 4.394c3.839 0 7.678-1.465 10.607-4.394l42.425-42.426.009-.01C269.48 113.859 277.279 95.028 277.279 75z"/>
+        <path fill="currentColor" d="M85.607 191.671a14.954 14.954 0 0 0 10.606 4.394c3.839 0 7.678-1.465 10.607-4.394l84.852-84.852c5.858-5.857 5.858-15.355 0-21.213-5.857-5.857-15.355-5.857-21.213 0l-84.852 84.851c-5.858 5.859-5.858 15.357 0 21.214z"/>
+</svg>`,
 
   }
 

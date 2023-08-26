@@ -1,9 +1,10 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Groundhogg\Email;
-use function Groundhogg\get_default_email_width;
 use function Groundhogg\the_email;
 
 $email = the_email();
@@ -17,20 +18,20 @@ $email_title = get_bloginfo( 'name', 'display' );
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
 $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_line(), $email_title );
 
+$bgcolor = $email->get_meta( 'backgroundColor' ) ?: ''
+
 ?>
 <!doctype html>
 <html>
 
 <!-- HEAD -->
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="x-apple-disable-message-reformatting"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-    <title><?php echo $email_title; ?></title>
-    <base target="_blank">
-    <style>
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="x-apple-disable-message-reformatting"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title><?php echo $email_title; ?></title>
+	<base target="_blank">
+	<style type="text/css">
         img {
             max-width: 100% !important;
         }
@@ -70,77 +71,80 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
         }
 
         .footer p {
-	        font-size: 13px;
-	        color: #999999;
-	        margin: .5em 0;
+            font-size: 13px;
+            color: #999999;
+            margin: .5em 0;
         }
 
         .footer p a {
-	        text-decoration: none;
+            text-decoration: none;
         }
 
-        <?php include __DIR__ . '/parts/posts-css.php'; ?>
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
 
-        <?php echo $email->get_css() ?>
+		<?php echo file_get_contents( __DIR__ . '/assets/posts.css' ); ?>
 
-        <?php
+		<?php echo $email->get_css() ?>
 
-        $alignment = $email->get_alignment(); // 'left' or 'center'
+		<?php
 
-        switch ( $alignment ):
-            default:
-            case 'left';
+		$alignment = $email->get_alignment(); // 'left' or 'center'
+
+		switch ( $alignment ):
+			default:
+			case 'left';
 				break;
 			case 'center';
-
 				?>
+        .footer p {
+            text-align: center;
+        }
 
-                .footer p {
-	                text-align: center;
-                }
+        table.content-container {
+            margin: auto;
+        }
 
-                table.alignment-container{
-	                margin: auto;
-                }
+		<?php
 
-                <?php
-
-				break;
-        endswitch;
-
-        ?>
-
-        <?php do_action( 'groundhogg/templates/email/boxed/style' ); ?>
-    </style>
+		break;
+endswitch;?>
+		<?php do_action( 'groundhogg/templates/email/boxed/style' ); ?>
+	</style>
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 </head>
-<body class="email">
-<table class="alignment-container">
-    <tr>
-	    <td align="<?php esc_attr_e( $alignment ); ?>">
-		    <table class="content-container">
-			    <tr>
-				    <td style="width: <?php esc_attr_e( $email->get_width() ); ?>px">
+<body class="email" style="background-color: <?php esc_attr_e( $bgcolor ); ?>">
+<table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0">
+	<tr>
+		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgcolor ); ?>"
+		    style="background-color: <?php esc_attr_e( $bgcolor ); ?>">
+			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse">
+				<tr>
+					<td width="<?php esc_attr_e( $email->get_width() ); ?>"
+					    style="width: <?php esc_attr_e( $email->get_width() ); ?>px">
 
-					    <?php include __DIR__ . '/parts/browser-view.php' ?>
+						<?php include __DIR__ . '/parts/browser-view.php' ?>
 
-					    <div class="body-content" style="text-align: left;">
-						    <?php do_action( 'groundhogg/templates/email/boxed/content/before' ); ?>
+						<div class="body-content" style="text-align: left;">
+							<?php do_action( 'groundhogg/templates/email/boxed/content/before' ); ?>
 
-						    <!-- START CONTENT -->
-						    <?php echo $email->get_merged_content(); ?>
-						    <!-- END CONTENT -->
+							<!-- START CONTENT -->
+							<?php echo $email->get_merged_content(); ?>
+							<!-- END CONTENT -->
 
-						    <?php do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>
-					    </div>
+							<?php do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>
+						</div>
 
-					    <?php include __DIR__ . '/parts/footer.php' ?>
-				    </td>
-			    </tr>
-		    </table>
-	    </td>
-    </tr>
+						<?php include __DIR__ . '/parts/footer.php' ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 </table>
-<?php include __DIR__ . '/open-tracking.php' ?>
+<?php include __DIR__ . '/parts/open-tracking.php' ?>
 </body>
 </html>

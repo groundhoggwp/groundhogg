@@ -8,6 +8,7 @@ use Groundhogg\Library;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
+use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -186,12 +187,12 @@ class Funnels_Page extends Admin_Page {
 
 		switch ( $this->get_current_action() ) {
 			case 'edit':
+
 				wp_enqueue_editor();
 
 				wp_enqueue_style( 'editor-buttons' );
 				wp_enqueue_style( 'jquery-ui' );
 
-				wp_enqueue_editor();
 				wp_enqueue_script( 'wplink' );
 
 				wp_enqueue_script( 'jquery-ui-sortable' );
@@ -232,6 +233,8 @@ class Funnels_Page extends Admin_Page {
 
 					return $class;
 				} );
+
+				enqueue_email_block_editor_assets();
 
 				do_action( 'groundhogg/admin/funnels/editor_scripts' );
 

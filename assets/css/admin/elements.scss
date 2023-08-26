@@ -26,6 +26,15 @@ $action-green-5: rgba(158, 206, 56, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
+@keyframes gh-rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 h3 {
   &.no-margin-top {
     margin-top: 0;
@@ -815,9 +824,13 @@ span.gh-text {
   }
 }
 
+.has-box-shadow {
+  box-shadow: $box-shadow;
+}
+
 .gh-panel {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  box-shadow: $box-shadow;
   /*margin: 20px;*/
   border-radius: 5px;
   border: none;
@@ -1177,6 +1190,18 @@ button {
     &.loud {
       text-transform: uppercase;
     }
+
+    .gh-spinner {
+      display: block;
+      margin: 0 auto;
+      height: 15px;
+      width: 15px;
+      border: 5px solid rgba(255, 255, 255, 0.4);
+      border-bottom-color: #ffffff;
+      border-radius: 50%;
+      position: relative;
+      animation: gh-rotation 1s linear infinite;
+    }
   }
 }
 
@@ -1486,6 +1511,13 @@ button {
     background: transparent !important;
   }
 
+  &-frame {
+    box-sizing: border-box;
+    max-width: calc(100vw - 100px);
+    max-height: calc(92vh - 64px);
+    position: relative;
+  }
+
   &-dialog {
 
     box-sizing: border-box;
@@ -1636,13 +1668,10 @@ p.error,
 }
 
 .wp-editor-container {
-  textarea.wp-editor-area {
+  textarea {
     width: 100%;
-    margin: 0;
+    //margin: 0;
     box-shadow: none;
-  }
-
-  .wp-editor-area {
     font-family: Consolas, Monaco, monospace;
     font-size: 13px;
     padding: 10px;
@@ -2414,3 +2443,173 @@ p.error,
 @-moz-keyframes spinning { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spinning { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spinning { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+.gh-color-picker {
+  display: flex;
+  align-items: stretch;
+
+  .current-color {
+    width: 30px;
+    border-radius: 5px 0 0 5px;
+    border: 1px solid $primary-dark-30;
+    border-right-width: 0;
+  }
+
+  button.gh-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.gh-color-picker-grid {
+  display: grid;
+  grid-template-areas:
+    'input clear'
+    'picker picker';
+  align-items: flex-start;
+
+  input {
+    grid-area: input;
+    width: 145px;
+  }
+
+  button {
+    grid-area: clear;
+  }
+
+  .iris-picker {
+    grid-area: picker;
+  }
+}
+
+.gh-picker {
+
+  min-height: 31px;
+
+  &.options-visible {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+
+    .gh-picker-options {
+      display: block;
+    }
+  }
+
+  position: relative;
+  border: 1px solid #8c8f94;
+  border-radius: 5px;
+
+  .gh-picker-selected {
+    padding: 3px;
+
+    &.single {
+      .gh-picker-item {
+        background: none;
+        font-size: 16px;
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 3px;
+
+    > .gh-picker-search {
+      flex-grow: 1;
+      width: 150px;
+      border: none;
+      min-height: 0;
+      line-height: 1.7;
+
+      &:focus {
+        border: none;
+        box-shadow: none;
+        outline: none;
+      }
+    }
+
+    > .gh-picker-item {
+      padding: 3px 3px 3px 7px;
+      background: $primary-dark-10;
+      border-radius: 3px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+
+      &.is-invalid {
+        background: $error-red-10;
+        color: darken( $error-red, 10 );
+      }
+
+      .gh-picker-item-delete {
+        display: inline-block;
+        padding: 3px;
+        line-height: 1;
+        cursor: pointer;
+
+        &:hover {
+          color: $primary-dark;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  &:focus-within {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 2px solid transparent;
+  }
+
+  .gh-picker-options {
+
+    position: fixed;
+    z-index: 9999;
+    display: none;
+    border-top: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 2px solid transparent;
+    border-radius: 0 0 5px 5px;
+    background: #FFF;
+    overflow-y: auto;
+
+    > .gh-picker-search {
+      //flex-grow: 1;
+      margin: 5px;
+      position: relative;
+      width: calc( 100% - 10px);
+      //box-sizing: border-box;
+      //border: none;
+      //min-height: 0;
+      line-height: 1.7;
+
+      &:focus {
+        //border: none;
+        //box-shadow: none;
+        //outline: none;
+      }
+    }
+
+    .gh-picker-no-options {
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+
+    .gh-picker-option {
+      cursor: pointer;
+      font-size: 14px;
+      padding: 5px 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      &:hover {
+        color: $primary-dark;
+        background: $primary-blue-7;
+      }
+    }
+  }
+
+}

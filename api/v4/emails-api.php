@@ -4,10 +4,12 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Dynamic_Block_Handler;
 use Groundhogg\Email;
 use Groundhogg\Event;
 use WP_REST_Server;
 use function Groundhogg\array_map_to_contacts;
+use function Groundhogg\base64_json_decode;
 use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
@@ -55,8 +57,58 @@ class Emails_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/test", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'sent_test' ],
+				'permission_callback' => [ $this, 'send_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/preview", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'generate_preview' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/preview", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'generate_preview' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/blocks/(?P<block_type>\w+)/", [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'render_block' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
 	}
 
+	/**
+	 * Render a dynamic block
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function render_block( \WP_REST_Request $request ) {
+
+		$block = $request->get_param( 'block_type' );
+		$props = base64_json_decode( $request->get_param( 'props' ) );
+
+		$html = Dynamic_Block_Handler::instance()->render_block( $block, $props );
+
+		return self::SUCCESS_RESPONSE( [
+			'content' => $html
+		] );
+	}
 
 	/**
 	 * Send emails to the contact based on email and contact ID
@@ -115,6 +167,7 @@ class Emails_Api extends Base_Object_Api {
 		$this->add_error( $error );
 	}
 
+
 	/**
 	 * Really basic send email handler
 	 *
@@ -142,10 +195,10 @@ class Emails_Api extends Base_Object_Api {
 		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
 		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
 
-		$content = $request->get_param( 'content' ) ;
+		$content = $request->get_param( 'content' );
 
 		// Replacements will be based on the first email address provided
-		if ( $contact && $contact->exists() ){
+		if ( $contact && $contact->exists() ) {
 			$content = do_replacements( $content, $contact );
 		}
 
@@ -213,31 +266,77 @@ class Emails_Api extends Base_Object_Api {
 		//get email
 		$email_id = absint( $request->get_param( $this->get_primary_key() ) );
 
-		$email = new Email( $email_id );
+		if ( $email_id ) {
+			$email = new Email( $email_id );
 
-		if ( ! $email->exists() ) {
-			return $this->ERROR_RESOURCE_NOT_FOUND();
+			if ( ! $email->exists() ) {
+				return $this->ERROR_RESOURCE_NOT_FOUND();
+			}
+		} // Temp email
+		else {
+			$email = new Email();
 		}
 
-		$to = sanitize_email( $request->get_param( 'to' ) );
+		$to = array_filter( array_map( 'sanitize_email', wp_parse_list( $request->get_param( 'to' ) ) ) );
 
-		if ( ! is_email( $to ) ) {
+		if ( empty( $to ) ) {
 			return self::ERROR_401( 'error', 'Invalid email address provided' );
 		}
 
-		set_user_test_email( $to );
+		update_user_meta( get_current_user_id(), 'gh_test_emails', $to );
 
+		// Use the current user as the contact data
 		$contact = new Contact( [
-			'email' => $to
+			'email' => wp_get_current_user()->user_email
 		] );
 
+		if ( $request->has_param( 'data' ) && $request->has_param( 'meta' ) ) {
+			// Override with the dump
+			$email->data = $request->get_param( 'data' );
+			$email->meta = $request->get_param( 'meta' );
+		}
+
 		$email->enable_test_mode();
+
+		add_filter( 'groundhogg/email/to', function ( $emails ) use ( $to ) {
+			return implode( ',', $to );
+		} );
 
 		$sent = $email->send( $contact, new Event() );
 
 		return self::SUCCESS_RESPONSE( [
 			'sent' => $sent
 		] );
+	}
+
+	/**
+	 * Takes a dump of an email and generates a preview of the content without saving it
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function generate_preview( \WP_REST_Request $request ) {
+
+		//get email
+		$email_id = absint( $request->get_param( $this->get_primary_key() ) );
+
+		if ( $email_id ) {
+			$email = new Email( $email_id );
+
+			if ( ! $email->exists() ) {
+				return $this->ERROR_RESOURCE_NOT_FOUND();
+			}
+		} // Temp email
+		else {
+			$email = new Email();
+		}
+
+		// Override with the dump
+		$email->data = $request->get_param( 'data' );
+		$email->meta = $request->get_param( 'meta' );
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
 	}
 
 	public function get_db_table_name() {

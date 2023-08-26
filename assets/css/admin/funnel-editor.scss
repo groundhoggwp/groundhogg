@@ -975,7 +975,7 @@ button.button.save-button {
       border: 1px solid $primary-dark-15;
       padding: 20px;
 
-      > .sub-group-label{
+      > .sub-group-label {
         position: absolute;
         top: -12px;
         //font-weight: bold;
@@ -1127,8 +1127,12 @@ table.embed-options td {
   width: 160px;
 }
 
-input, select, textarea {
-  max-width: 100% !important;
+#step-settings-inner {
+  input,
+  select,
+  textarea {
+    max-width: 100% !important;
+  }
 }
 
 #add-step-bottom {
@@ -1410,5 +1414,22 @@ input, select, textarea {
   svg {
     height: 20px;
     width: 20px;
+  }
+}
+
+.change-email {
+  align-items: center;
+}
+
+.from-preview {
+  padding: 20px;
+  position: relative;
+
+  h2 {
+    margin: 0 0 10px 0;
+  }
+
+  .from-email {
+    opacity: 0.7;
   }
 }

@@ -735,6 +735,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	}
 
+	protected function before_step_notes( Step $step ) {
+	}
+
 	/**
 	 * Generates the step title from the settings
 	 *
@@ -1074,8 +1077,5 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'group'   => $this->get_group(),
 			'context' => $this->get_context()
 		];
-	}
-
-	protected function before_step_notes( Step $step ) {
 	}
 }

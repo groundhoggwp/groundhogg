@@ -5912,9 +5912,9 @@ function sanitize_email_header( $header_value, $header_type ): string {
 		case 'in-reply-to':
 
 			if ( preg_match( '/^<([^>]+)>$/', $header_value, $matches ) ) {
-				$header_value = sprintf( '<%s>', is_email( $matches[1] ) ? sanitize_email( $matches[1] ) : sanitize_text_field( $matches[1] ) ) ;
+				$header_value = sprintf( '<%s>', is_email( $matches[1] ) ? sanitize_email( $matches[1] ) : sanitize_text_field( $matches[1] ) );
 			} else {
-				$header_value = sprintf( '<%s>', is_email( $header_value ) ? sanitize_email( $header_value ) : sanitize_text_field( $header_value ) ) ;
+				$header_value = sprintf( '<%s>', is_email( $header_value ) ? sanitize_email( $header_value ) : sanitize_text_field( $header_value ) );
 			}
 
 			break;
@@ -6319,6 +6319,46 @@ function enqueue_broadcast_assets() {
 	enqueue_filter_assets();
 
 	do_action( 'groundhogg_enqueue_broadcast_assets' );
+}
+
+/**
+ * Enqueue the new block editor
+ */
+function enqueue_email_block_editor_assets( $extra = [] ) {
+
+	wp_enqueue_style( 'groundhogg-email-block-editor' );
+	wp_enqueue_script( 'groundhogg-email-block-editor' );
+
+	enqueue_filter_assets();
+
+	wp_enqueue_editor();
+	wp_enqueue_media();
+	wp_enqueue_code_editor( [
+		'type' => 'text/html'
+	] );
+
+	wp_enqueue_script( 'htmlhint' );
+	wp_enqueue_script( 'csslint' );
+
+	$business_name  = get_option( 'gh_business_name', get_bloginfo() );
+	$address        = do_replacements( '{business_address}' );
+	$tel            = get_option( 'gh_phone' );
+	$terms          = get_option( 'gh_terms' );
+	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
+	$links          = implode( ' | ', array_filter( [
+		$tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
+		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy' ) ) : false,
+		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
+	] ) );
+	$unsubscribe    = sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
+		'href' => '#unsubscribe_link#'
+	], __( 'Unsubscribe', 'groundhogg' ) ) );
+
+	$localized = array_merge( [
+		'footer' => compact( 'business_name', 'address', 'links', 'unsubscribe' )
+	], $extra );
+
+	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );
 }
 
 /**
@@ -7603,12 +7643,102 @@ function day_of_week( $number = 0 ) {
  *
  * @return Email
  */
-function the_email( $set_email = null ){
+function the_email( $set_email = null ) {
 	static $email;
 
-	if ( $set_email ){
+	if ( $set_email ) {
 		$email = $set_email;
 	}
 
 	return $email;
+}
+
+/**
+ * Convert hex to RGB
+ * https://stackoverflow.com/questions/12228644/how-to-detect-light-colors-with-php
+ *
+ * @param $hexCode
+ *
+ * @return float|int
+ */
+function HEXToRGB( $hexCode ) {
+	if ( $hexCode[0] == '#' ) {
+		$hexCode = substr( $hexCode, 1 );
+	}
+
+	if ( strlen( $hexCode ) == 3 ) {
+		$hexCode = $hexCode[0] . $hexCode[0] . $hexCode[1] . $hexCode[1] . $hexCode[2] . $hexCode[2];
+	}
+
+	$r = hexdec( $hexCode[0] . $hexCode[1] );
+	$g = hexdec( $hexCode[2] . $hexCode[3] );
+	$b = hexdec( $hexCode[4] . $hexCode[5] );
+
+	return $b + ( $g << 0x8 ) + ( $r << 0x10 );
+}
+
+/**
+ * Convert RGD to HSL
+ * https://stackoverflow.com/questions/12228644/how-to-detect-light-colors-with-php
+ *
+ * @param $RGB
+ *
+ * @return object
+ */
+function RGBToHSL( $RGB ) {
+	$r = 0xFF & ( $RGB >> 0x10 );
+	$g = 0xFF & ( $RGB >> 0x8 );
+	$b = 0xFF & $RGB;
+
+	$r = ( (float) $r ) / 255.0;
+	$g = ( (float) $g ) / 255.0;
+	$b = ( (float) $b ) / 255.0;
+
+	$maxC = max( $r, $g, $b );
+	$minC = min( $r, $g, $b );
+
+	$l = ( $maxC + $minC ) / 2.0;
+
+	if ( $maxC == $minC ) {
+		$s = 0;
+		$h = 0;
+	} else {
+		if ( $l < .5 ) {
+			$s = ( $maxC - $minC ) / ( $maxC + $minC );
+		} else {
+			$s = ( $maxC - $minC ) / ( 2.0 - $maxC - $minC );
+		}
+		if ( $r == $maxC ) {
+			$h = ( $g - $b ) / ( $maxC - $minC );
+		}
+		if ( $g == $maxC ) {
+			$h = 2.0 + ( $b - $r ) / ( $maxC - $minC );
+		}
+		if ( $b == $maxC ) {
+			$h = 4.0 + ( $r - $g ) / ( $maxC - $minC );
+		}
+
+		$h = $h / 6.0;
+	}
+
+	$h = (int) round( 255.0 * $h );
+	$s = (int) round( 255.0 * $s );
+	$l = (int) round( 255.0 * $l );
+
+	return (object) array( 'hue' => $h, 'saturation' => $s, 'lightness' => $l );
+}
+
+/**
+ * Test the lightness of a hex color
+ *
+ * @param $hex
+ * @param $compare
+ *
+ * @return bool
+ */
+function hex_is_lighter_than( $hex, $compare ) {
+	$rgb = HEXToRGB( $hex );
+	$hsl = RGBToHSL( $rgb );
+
+	return $hsl->lightness > $compare;
 }

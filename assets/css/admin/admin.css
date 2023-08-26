@@ -719,6 +719,7 @@ label.block {
   justify-content: center;
 }
 
+#block-include-filters,
 #filters-here {
   padding: 20px;
   border: 1px solid #6c19ad;
@@ -726,6 +727,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#block-include-filters::after,
 #filters-here::after {
   content: "Include";
   position: absolute;
@@ -739,6 +741,7 @@ label.block {
   width: max-content;
 }
 
+#block-exclude-filters,
 #exclude-filters-here {
   padding: 20px;
   border: 1px solid #6c19ad;
@@ -746,6 +749,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#block-exclude-filters::after,
 #exclude-filters-here::after {
   content: "Exclude";
   position: absolute;

@@ -1234,7 +1234,7 @@ class Replacements implements \JsonSerializable {
 			$user = $this->get_current_contact()->get_ownerdata();
 		}
 
-		return $user->signature;
+		return wpautop( $user->signature );
 	}
 
 	/**
@@ -1520,6 +1520,11 @@ class Replacements implements \JsonSerializable {
 	 * @return array
 	 */
 	function parse_atts( $text ) {
+
+		if ( is_array( $text ) ) {
+			return $text;
+		}
+
 		$_atts = shortcode_parse_atts( $text );
 
 		if ( empty( $_atts ) ) {
@@ -1555,16 +1560,17 @@ class Replacements implements \JsonSerializable {
 		$props = $this->parse_atts( $args );
 
 		$props = wp_parse_args( $props, [
-			'id'         => '',
-			'offset'     => 0,
-			'post_type'  => 'post',
-			'category'   => '',
-			'tag'        => '',
-			'orderby'    => 'date',
-			'order'      => 'DESC',
-			'meta_key'   => '',
-			'meta_value' => '',
-			'within'     => '',
+			'id'             => '',
+			'offset'         => 0,
+			'post_type'      => 'post',
+			'category'       => '',
+			'tag'            => '',
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_key'       => '',
+			'meta_value'     => '',
+			'within'         => '',
+			'thumbnail_size' => 'thumbnail',
 		] );
 
 		$query_vars = [
@@ -1653,12 +1659,7 @@ class Replacements implements \JsonSerializable {
 
 				return html()->e( 'a', [
 					'href' => get_the_permalink()
-				], html()->e( 'img', [
-					'class'  => 'featured-image',
-					'src'    => get_the_post_thumbnail_url(),
-					'width'  => get_array_var( $props, 'width' ),
-					'height' => get_array_var( $props, 'height' ),
-				] ) );
+				], get_the_post_thumbnail( null, $props['thumbnail_size'] ) );
 			case 'featured_image_url':
 			case 'thumbnail_url':
 
@@ -1751,23 +1752,25 @@ class Replacements implements \JsonSerializable {
 		$props = $this->parse_atts( $args );
 
 		$props = wp_parse_args( $props, [
-			'id'         => '',
-			'number'     => 5,
-			'offset'     => 0,
-			'layout'     => 'ul',
-			'featured'   => false,
-			'excerpt'    => false,
-			'thumbnail'  => false,
-			'post_type'  => 'post',
-			'category'   => '',
-			'tag'        => '',
-			'orderby'    => 'date',
-			'order'      => 'DESC',
-			'meta_key'   => '',
-			'meta_value' => '',
-			'within'     => '',
-			'space'      => 0,
-			'columns'    => 2
+			'id'             => '',
+			'number'         => 5,
+			'offset'         => 0,
+			'layout'         => 'ul',
+			'featured'       => false,
+			'excerpt'        => false,
+			'thumbnail'      => false,
+			'thumbnail_size' => 'thumbnail',
+			'post_type'      => 'post',
+			'category'       => '',
+			'tag'            => '',
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_key'       => '',
+			'meta_value'     => '',
+			'within'         => '',
+			'space'          => 0,
+			'columns'        => 2,
+			'gap'            => 20,
 		] );
 
 		$query_vars = [
@@ -1845,19 +1848,37 @@ class Replacements implements \JsonSerializable {
 			case 'grid':
 			case 'cards':
 
+				add_filter( 'post_thumbnail_html', __NAMESPACE__ . '\remove_thumbnail_dimensions' );
+
 				$rows = [];
 
-				$separator = '<div class="email-columns-cell gap" style="width: 20px;"></div>';
+				$columnGap = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;" width="%1$d"></td>', $props['gap'] );
 
-				$render_column = function ( $content = '' ) {
-					return html()->e( 'div', [
-						'class' => 'email-columns-cell one-half'
+				$render_column = function ( $content = '' ) use ( $props ) {
+					return html()->e( 'td', [
+						'class' => 'email-columns-cell',
+						'style' => [
+							'padding-bottom' => $props['gap'] . 'px'
+						]
 					], [
 						$content
 					] );
 				};
 
-				$render_post = function ( $thumbnail_size = 'thumbnail' ) use ( $props ) {
+				$thumbnail = function ( $thumbnail_size ) {
+
+					$post_thumbnail_id = get_post_thumbnail_id();
+					$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+
+					return html()->e( 'img', [
+						'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
+						'alt'   => $alt,
+						'class' => 'post-thumbnail ' . $thumbnail_size . ' ',
+						'width' => '100%'
+					] );
+				};
+
+				$render_post = function ( $thumbnail_size = 'thumbnail' ) use ( $props, $thumbnail ) {
 
 					return html()->e( 'div', [
 						'class' => [
@@ -1869,10 +1890,7 @@ class Replacements implements \JsonSerializable {
 							'class' => 'featured-image-wrap'
 						], html()->e( 'a', [
 							'href' => get_the_permalink()
-						], html()->e( 'img', [
-							'class' => 'featured-image',
-							'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
-						] ) ) ) : '',
+						], $thumbnail( $thumbnail_size ) ) ) : '',
 						html()->e( 'div', [ 'class' => 'card-content' ], [
 							html()->e( 'h2', [], html()->e( 'a', [
 								'href' => get_the_permalink()
@@ -1891,26 +1909,30 @@ class Replacements implements \JsonSerializable {
 
 					$rendered_posts = [];
 
-					$rows[] = '<div class="email-columns">';
+					if ( $props['featured'] ) {
+						$rows[] = sprintf( '<div class="column-gap" style="height: %dpx"></div>', $props['gap'] );
+					}
+
+					$rows[] = '<table class="email-columns" style="border-collapse: collapse;" cellpadding="0" cellspacing="0">';
 
 					while ( $query->have_posts() ):
 
 						$query->the_post();
-						$rendered_posts[] = $render_column( $render_post( absint( $props['columns'] ) === 1 ? 'large' : 'thumbnail' ) );
+						$rendered_posts[] = $render_column( $render_post( absint( $props['columns'] ) === 1 ? 'large' : $props['thumbnail_size'] ) );
 
 					endwhile;
 
 					while ( ! empty( $rendered_posts ) ) {
 
 						$posts   = array_splice( $rendered_posts, 0, absint( $props['columns'] ) );
-						$columns = implode( $separator, $posts );
+						$columns = implode( $columnGap, $posts );
 
-						$rows[] = html()->e( 'div', [
-							'class' => 'email-columns-row'
+						$rows[] = html()->e( 'tr', [
+							'class' => 'email-columns-row',
 						], $columns );
 					}
 
-					$rows[] = '</div>';
+					$rows[] = '</table>';
 				}
 
 				$content = html()->e( 'div', [
@@ -1918,6 +1940,8 @@ class Replacements implements \JsonSerializable {
 				], $rows );
 
 				$query->reset_postdata();
+
+				remove_filter( 'post_thumbnail_html', __NAMESPACE__ . '\remove_thumbnail_dimensions' );
 
 				break;
 
@@ -1936,10 +1960,7 @@ class Replacements implements \JsonSerializable {
 					if ( $props['thumbnail'] && has_post_thumbnail() ) {
 						$html[] = html()->e( 'a', [
 							'href' => get_the_permalink()
-						], html()->e( 'img', [
-							'class' => 'post-thumbnail',
-							'src'   => get_the_post_thumbnail_url( null, 'large' ),
-						] ) );
+						], get_the_post_thumbnail( null, $props['thumbnail_size'] ) );
 					}
 
 					$html[] = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );

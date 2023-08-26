@@ -59,37 +59,13 @@ class Info_Cards {
 	 */
 	public function register_core_cards() {
 
-//		self::register( 'intro', __( '🎉 New Feature!', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/intro.php';
-//		} );
-
 		self::register( 'user', __( 'WordPress User', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/user.php';
 		}, 100, 'edit_users' );
 
-//		self::register( 'notes', __( 'Notes', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/notes.php';
-//		} );
-
-//		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/files.php';
-//		}, 100, 'download_contact_files' );
-
-//		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/email.php';
-//		}, 100, 'send_emails' );
-
 		self::register( 'page_visits', __( 'Page Visits', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/page-visits.php';
 		}, 100, 'view_contacts' );
-
-//		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/email-activity.php';
-//		} );
-//
-//		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ) {
-//			include __DIR__ . '/cards/example.php';
-//		} );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 

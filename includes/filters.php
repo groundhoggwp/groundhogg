@@ -461,3 +461,14 @@ function add_phone_contact_method( $methods, $user ) {
 add_filter( 'user_phone_label', function ( $label ){
 	return 'Mobile Number </label> <div style="font-weight: 400">Include <code>+</code> and country code.</div><label>';
 } );
+
+/**
+ * Removes the dimensions from thumbnails outputted by get_the_post_thumbnail()
+ *
+ * @param $html
+ *
+ * @return array|string|string[]|null
+ */
+function remove_thumbnail_dimensions( $html ) {
+	return preg_replace( '/(width|height)=\"\d*\"\s/', "", $html );
+}

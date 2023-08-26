@@ -91,6 +91,7 @@ class Autoloader {
 		'Form\Fields\First'                 => 'includes/form/fields/first.php',
 		'Form\Fields\Last'                  => 'includes/form/fields/last.php',
 		'Steps\Benchmarks\Form_Integration' => 'includes/steps/benchmarks/base/form-integration.php',
+		'Dynamic_Block_Handler'             => 'includes/dynamic-block-handler.php',
 	];
 
 	/**

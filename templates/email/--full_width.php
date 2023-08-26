@@ -1,21 +1,21 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Groundhogg\Email;
-use function Groundhogg\get_default_email_width;
+use Groundhogg\Plugin;
+use function Groundhogg\do_replacements;
+use function Groundhogg\html;
 use function Groundhogg\the_email;
 
 $email = the_email();
 
-/**
- * @var $email Email
- */
-
 $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_line(), $email_title );
+$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_title(), $email_title );
 
 ?>
 <!doctype html>
@@ -39,6 +39,7 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
             font-size: 14px;
             font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
             font-weight: 400;
+            margin-bottom: 50px;
         }
 
         .aligncenter {
@@ -59,6 +60,7 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
         }
 
         @media only screen and (max-width: 480px) {
+
             .alignright:not(.keep-float),
             .alignleft:not(.keep-float) {
                 display: block !important;
@@ -67,36 +69,26 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
                 margin-right: auto !important;
                 margin-bottom: 20px !important;
             }
-        }
 
-        .footer p {
-	        font-size: 13px;
-	        color: #999999;
-	        margin: .5em 0;
         }
 
         <?php include __DIR__ . '/parts/posts-css.php'; ?>
 
-        <?php echo $email->get_css() ?>
+        <?php echo $email->get_meta('css' ); ?>
 
-        <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
     </style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
 <body class="email">
-
-<?php include __DIR__ . '/parts/browser-view.php' ?>
-
 <div class="body-content">
-    <?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
+	<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
 
     <!-- START CONTENT -->
-    <?php echo $email->get_merged_content(); ?>
+	<?php echo $email->get_merged_content(); ?>
     <!-- END CONTENT -->
 
-    <?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
+	<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
 </div>
 <?php include __DIR__ . '/parts/footer.php' ?>
-<?php include __DIR__ . '/parts/open-tracking.php' ?>
 </body>
 </html>

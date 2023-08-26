@@ -97,58 +97,7 @@ class Send_Email extends Action {
 	 */
 	public function settings( $step ) {
 
-		$email_id = $this->get_setting( 'email_id' );
-		$email    = new Email( $email_id );
-
-		echo html()->e( 'p', [], __( 'Select an email template to send...', 'groundhogg' ) );
-
-		echo html()->dropdown_emails( [
-			'name'     => $this->setting_name_prefix( 'email_id' ),
-			'id'       => $this->setting_id_prefix( 'email_id' ),
-			'selected' => $this->get_setting( 'email_id' ),
-		] );
-
-		?><p></p><?php
-
-		echo html()->e( 'div', [
-			'class' => 'display-flex gap-10'
-		], [
-			html()->button( [
-				'title' => 'Edit Email',
-				'text'  => _x( 'Edit Email', 'action', 'groundhogg' ),
-				'class' => 'gh-button primary edit-email',
-			] ),
-			// ADD NEW EMAIL
-			html()->button( [
-				'title' => 'Create New Email',
-				'text'  => _x( 'Create New Email', 'action', 'groundhogg' ),
-				'class' => 'gh-button secondary add-email',
-			] ),
-		] );
-
-        echo html()->input( [
-	        'type'  => 'hidden',
-	        'name'  => $this->setting_name_prefix( 'add_email_override' ),
-	        'id'    => $this->setting_id_prefix( 'add_email_override' ),
-	        'class' => 'add-email-override',
-        ] );
-
-		if ( $email->is_confirmation_email() ) {
-
-			echo html()->e( 'div', [
-				'class' => 'display-flex gap-10 align-center'
-			], [
-				html()->e( 'p', [], __( "Skip this email if the contact's email address is already confirmed?", 'groundhogg' ) ),
-				html()->checkbox( [
-					'label'    => __( 'Yes' ),
-					'name'    => $this->setting_name_prefix( 'skip_if_confirmed' ),
-					'id'      => $this->setting_id_prefix( 'skip_if_confirmed' ),
-					'checked' => (bool) $this->get_setting( 'skip_if_confirmed' )
-				] )
-			] );
-		}
-
-		html()->end_form_table();
+		echo html()->e('div', [ 'id' => 'step_' . $step->get_id() . '_send_email' ], '', false )
 
         ?><p></p><?php
 	}
@@ -171,21 +120,21 @@ class Send_Email extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$email_id = absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) );
-
-		$this->save_setting( 'email_id', $email_id );
-
-		$email = new Email( $this->get_setting( 'email_id' ) );
-
-		if ( ! $email->exists() ) {
-			$this->add_error( 'email_dne', __( 'You have not selected an email to send in one of your steps.', 'groundhogg' ) );
-		}
-
-		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
-			$this->add_error( 'email_in_draft_mode', __( 'You still have emails in draft mode! These emails will not be sent and will cause automation to stop.' ) );
-		}
-
-		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
+//		$email_id = absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) );
+//
+//		$this->save_setting( 'email_id', $email_id );
+//
+//		$email = new Email( $this->get_setting( 'email_id' ) );
+//
+//		if ( ! $email->exists() ) {
+//			$this->add_error( 'email_dne', __( 'You have not selected an email to send in one of your steps.', 'groundhogg' ) );
+//		}
+//
+//		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
+//			$this->add_error( 'email_in_draft_mode', __( 'You still have emails in draft mode! These emails will not be sent and will cause automation to stop.' ) );
+//		}
+//
+//		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
 	}
 
 	public function generate_step_title( $step ) {

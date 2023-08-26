@@ -283,7 +283,7 @@
       },
     },
     tasks: {
-      cap: 'schedule_broadcasts',
+      cap: 'view_tasks',
       //language=HTML
       tooltip: 'My tasks',
       svg: icons.tasks,

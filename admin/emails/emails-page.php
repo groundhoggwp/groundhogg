@@ -37,13 +37,21 @@ class Emails_Page extends Admin_Page {
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
-		if ( $action == 'view' && get_db( 'emails' )->is_empty() ){
+		if ( $action == 'view' && get_db( 'emails' )->is_empty() ) {
 			$action = 'add';
 		}
 
 		return $action;
 	}
 
+	/**
+	 * @param $action
+	 *
+	 * @return bool
+	 */
+	protected function current_action_is( $action ) {
+		return $this->get_current_action() === $action;
+	}
 
 	protected function add_ajax_actions() {
 //		add_action( 'wp_ajax_gh_update_email', [ $this, 'update_email_ajax' ] );
@@ -96,28 +104,19 @@ class Emails_Page extends Admin_Page {
 
 	public function scripts() {
 
-		if ( in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
-
-			wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
-			wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
+		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
 
 			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
+			$email    = new Email( $email_id );
 
-			wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
-				'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
-				'email_id'         => $email_id,
-				'email'            => new Email( $email_id )
+			if ( ! $email->exists() ) {
+				$email->title = 'My new email';
+			}
+
+			Groundhogg\enqueue_email_block_editor_assets( [
+				'email_id' => $email_id,
+				'email'    => $email
 			] );
-
-			add_filter( 'mce_css', function ( $mce_css ) {
-				return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
-			} );
-
-			Groundhogg\iframe_compat();
-
-			wp_enqueue_script( 'groundhogg-admin-email-preview' );
-			wp_enqueue_style( 'groundhogg-admin-email-preview' );
-
 		}
 
 		remove_editor_styles();
@@ -480,7 +479,26 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/email-editor.php';
+		$this->block_editor();
+	}
+
+	public function block_editor() {
+		if ( ! current_user_can( 'edit_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/block-editor.php';
+	}
+
+	public function page() {
+
+		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
+			$this->edit();
+
+			return;
+		}
+
+		parent::page();
 	}
 
 

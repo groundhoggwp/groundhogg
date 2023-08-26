@@ -172,7 +172,6 @@
     getItemsFromResponse: (r) => r.items,
     getTotalItemsFromResponse: (r) => r.total_items,
     items: [],
-    item: {},
     total_items: 0,
     route: route,
 
@@ -183,16 +182,7 @@
      * @returns {{}|*}
      */
     get (id) {
-
-      let item
-
-      if (this.item[this.primaryKey] == id) {
-        item = this.item
-      } else {
-        item = this.items.find(item => item[this.primaryKey] == id)
-      }
-
-      return item
+      return this.items.find(item => item[this.primaryKey] == id)
     },
 
     getItems () {
@@ -204,7 +194,7 @@
     },
 
     hasItem (id) {
-      return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
+      return this.items.some(item => item[this.primaryKey] == id)
     },
 
     hasItems (itemIds = false) {
@@ -260,11 +250,23 @@
         })
     },
 
+    async maybeFetchItems (ids, opts = {}) {
+
+      if ( ids.every( id => this.hasItem( id ) ) ){
+        return Promise.resolve( ids.map( id => this.get(id ) ) )
+      }
+
+      return this.fetchItems({
+        ID: ids.filter( id => ! this.hasItem( id ) )
+      }, opts).then( items => {
+        return ids.map( id => this.get(id ) )
+      })
+    },
+
     async fetchItem (id, opts = {}) {
       return apiGet(`${this.route}/${id}`, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -278,15 +280,7 @@
         return Promise.resolve( this.get( id ) )
       }
 
-      return apiGet(`${this.route}/${id}`, opts)
-      .then(r => this.getItemFromResponse(r))
-      .then(item => {
-        this.item = item
-        this.itemsFetched([
-          item
-        ])
-        return item
-      })
+      return this.fetchItem( id, opts )
     },
 
     async create (...args) {
@@ -325,7 +319,6 @@
       return apiPatch(`${this.route}/${id}`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -346,7 +339,6 @@
       return apiPost(`${this.route}/${id}/duplicate`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -358,7 +350,6 @@
       return apiPatch(`${this.route}/${id}/meta`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -370,7 +361,6 @@
       return apiDelete(`${this.route}/${id}/meta`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -387,7 +377,6 @@
       return apiPost(`${this.route}/${id}/relationships`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -399,7 +388,6 @@
       return apiDelete(`${this.route}/${id}/relationships`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -415,10 +403,6 @@
 
       return apiDelete(`${this.route}/${id}`)
         .then(r => {
-
-          if (this.item[this.primaryKey] == id) {
-            this.item = {}
-          }
 
           this.items = [
             ...this.items.filter(item => item[this.primaryKey] != id),
@@ -626,7 +610,6 @@
           .then(r => this.getItemFromResponse(r))
           .then(item => {
 
-            this.item = item
             this.itemsFetched([
               item
             ])
@@ -673,7 +656,6 @@
         .then(r => this.getItemFromResponse(r))
         .then(item => {
 
-          this.item = item
           this.itemsFetched([
             item
           ])
@@ -685,7 +667,6 @@
         .then(r => this.getItemFromResponse(r))
         .then(item => {
 
-          this.item = item
           this.itemsFetched([
             item
           ])

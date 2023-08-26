@@ -158,6 +158,11 @@
         this.makeActive(parseInt(window.location.hash.substring(1)))
       }
 
+      let email_ids = this.steps.filter( step => step.data.step_type === 'send_email' ).map( step => parseInt( step.meta.email_id ) ).filter( id => Boolean(id) )
+      if ( email_ids.length ){
+        Groundhogg.stores.emails.maybeFetchItems( email_ids )
+      }
+
     },
 
     async save ($form) {

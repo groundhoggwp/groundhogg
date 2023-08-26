@@ -287,7 +287,7 @@ body:not(.funnel-full-screen) #close {
 .step-title-view .title,
 .title-view .title {
   font-weight: 600;
-  padding: 8px;
+  /*padding: 8px;*/
   line-height: 1em;
   cursor: pointer;
 }
@@ -875,7 +875,9 @@ table.embed-options td {
   width: 160px;
 }
 
-input, select, textarea {
+#step-settings-inner input,
+#step-settings-inner select,
+#step-settings-inner textarea {
   max-width: 100% !important;
 }
 
@@ -1110,6 +1112,21 @@ input, select, textarea {
 .inline-tag-picker svg {
   height: 20px;
   width: 20px;
+}
+
+.change-email {
+  align-items: center;
+}
+
+.from-preview {
+  padding: 20px;
+  position: relative;
+}
+.from-preview h2 {
+  margin: 0 0 10px 0;
+}
+.from-preview .from-email {
+  opacity: 0.7;
 }
 
 /*# sourceMappingURL=funnel-editor.css.map */
