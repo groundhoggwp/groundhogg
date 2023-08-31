@@ -199,7 +199,7 @@ class Funnels_Table extends WP_List_Table {
 			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
 			if ( $funnel->status === 'inactive' ) {
-				$html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Inactive', 'status', 'groundhogg' ) . ")</span>";
+				$html .= " &#x2014; " . "<span class='post-state'>" . _x( 'Inactive', 'status', 'groundhogg' ) . "</span>";
 			}
 		}
 		$html .= "</strong>";

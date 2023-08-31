@@ -58,7 +58,7 @@ h3.no-margin-top {
 
 .display-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: auto;
 }
 .display-grid.gap-10 {
@@ -602,6 +602,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   padding: 8px 12px;
   min-height: 60px;
   box-sizing: border-box;
+  position: relative;
 }
 .gh-header.is-sticky {
   position: sticky;
@@ -2284,9 +2285,14 @@ p.error,
 }
 .gh-picker .gh-picker-selected.single .gh-picker-item {
   background: none;
-  font-size: 16px;
+  font-size: 14px;
   width: 100%;
   justify-content: space-between;
+}
+.gh-picker .gh-picker-selected.single .gh-picker-item .gh-picker-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .gh-picker .gh-picker-selected > .gh-picker-search {
   flex-grow: 1;

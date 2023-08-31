@@ -53,22 +53,26 @@ abstract class Table extends \WP_List_Table {
 	 * Generate a view link.
 	 *
 	 * @param $view
-	 * @param $param
+	 * @param $query
 	 * @param $display
 	 * @param $count
 	 *
 	 * @return string
 	 */
-	protected function create_view( $view, $param, $display, $count = 0 ) {
+	protected function create_view( $view, $query, $display, $count = 0 ) {
 
-		$is_active = is_string( $param ) ? $this->get_view() === $view : get_request_query() === $param;
+		$params = [
+			$this->view_param() => $view,
+		];
+
+		$params = array_merge( $params, is_array( $query ) ? $query : [
+			$query => $view,
+		] );
 
 		return html()->e( 'a',
 			[
-				'class' => $is_active ? 'current' : '',
-				'href'  => add_query_arg( is_array( $param ) ? $param : [
-					$param => $view,
-				], $this->get_page_url() ),
+				'class' => $this->view_is( $view ) ? 'current' : '',
+				'href'  => add_query_arg( $params, $this->get_page_url() ),
 			],
 			sprintf( '%s <span class="count">(%s)</span>', $display, _nf( $count ) )
 		);
@@ -120,6 +124,11 @@ abstract class Table extends \WP_List_Table {
 		$actions = $this->get_row_actions( $item, $column_name, $primary );
 
 		foreach ( $actions as $action ) {
+
+			if ( is_string( $action ) ){
+				$row_actions[] = $action;
+				continue;
+			}
 
 			$action = wp_parse_args( $action, [
 				'display' => '',
@@ -176,15 +185,14 @@ abstract class Table extends \WP_List_Table {
 			$view = wp_parse_args( $view, [
 				'display' => '',
 				'view'    => '',
-				'count'   => 0,
-				'param'   => $this->view_param()
+				'query'   => [],
 			] );
 
-			if ( is_array( $view['count'] ) || is_object( $view['count'] ) ) {
-				$view['count'] = $this->get_db()->count( $view['count'] );
+			if ( is_array( $view['query'] ) ) {
+				$view['count'] = $this->get_db()->count( $view['query'] );
 			}
 
-			$views[] = $this->create_view( $view['view'], $view['param'], $view['display'], $view['count'] );
+			$views[] = $this->create_view( $view['view'], $view['query'], $view['display'], $view['count'] );
 		}
 
 		return apply_filters( "groundhogg/admin/table/{$this->get_table_id()}/get_views", $views );
@@ -259,6 +267,10 @@ abstract class Table extends \WP_List_Table {
 	 */
 	protected function get_view() {
 		return get_request_var( $this->view_param(), $this->get_default_view() );
+	}
+
+	protected function view_is( $view ){
+		return $this->get_view() === $view;
 	}
 
 	protected function get_default_view() {

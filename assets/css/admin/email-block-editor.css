@@ -322,11 +322,14 @@
   flex-direction: column;
   gap: 10px;
 }
+#controls-panel .control-group:not(.closed) .controls.inside:has(.CodeMirror) {
+  padding: 0;
+}
 #controls-panel .control-group:not(.closed) .controls p {
   margin: 0;
 }
 #controls-panel .control-group:not(.closed) .controls hr {
-  width: calc( 100% + 40px );
+  width: calc(100% + 40px);
   margin: 3px -20px;
 }
 #controls-panel .control-group:not(.closed) .controls .space-between {
@@ -346,25 +349,24 @@
 }
 #controls-panel .control-group:not(.closed) .controls .layout-choice {
   border: none;
-  padding: 10px;
-  border-radius: 5px;
+  background: none;
 }
 #controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
-  background-color: rgba(0, 117, 255, 0.2);
+  color: rgba(0, 117, 255, 0.5);
 }
 #controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
-  background-color: rgba(0, 117, 255, 0.5);
+  color: #0075ff;
 }
 #controls-panel .control-group:not(.closed) .controls .layout-choice svg {
   width: 100%;
 }
-#controls-panel .gh-panel {
+#controls-panel > .gh-panel {
   border-radius: 0;
   box-shadow: none;
   border: solid rgba(16, 38, 64, 0.15);
   border-width: 1px 0 0 0;
 }
-#controls-panel .gh-panel:last-of-type {
+#controls-panel > .gh-panel:last-of-type {
   border-bottom-width: 1px;
 }
 #controls-panel .control-input {
@@ -427,20 +429,12 @@ body iframe#preview.desktop {
   display: none;
 }
 
-#email-editor {
+#email-editor:has(#email-block-editor) {
   position: fixed;
   left: 160px;
   top: 32px;
   bottom: 0;
   right: 0;
-}
-#email-editor input[type=text],
-#email-editor select {
-  max-width: 100%;
-}
-#email-editor .email-editor-p {
-  line-height: 1.5;
-  margin: 1em 0;
 }
 #email-editor .gh-header {
   background: #FFFFFF;
@@ -455,8 +449,7 @@ body iframe#preview.desktop {
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 0;
-  position: relative;
-  z-index: 1;
+  z-index: 100;
 }
 #email-editor .gh-header > svg {
   height: 60px;
@@ -489,6 +482,14 @@ body iframe#preview.desktop {
   display: flex;
   gap: 10px;
   justify-content: space-between;
+}
+#email-editor input[type=text],
+#email-editor select {
+  max-width: 100%;
+}
+#email-editor .email-editor-p {
+  line-height: 1.5;
+  margin: 1em 0;
 }
 #email-editor-main {
   display: flex;
@@ -579,19 +580,27 @@ body iframe#preview.desktop {
 }
 
 .gh-modal-frame #email-editor {
-  position: relative;
-  left: initial;
-  right: initial;
-  top: initial;
-  bottom: initial;
   background: #F6F9FB;
   border-radius: 5px;
   overflow: hidden;
   width: 90vw;
   height: 85vh;
 }
+.gh-modal-frame #email-editor:has(#email-block-editor) {
+  position: relative;
+  left: initial;
+  right: initial;
+  top: initial;
+  bottom: initial;
+}
+.gh-modal-frame #email-editor:has(#template-grid) {
+  overflow: auto;
+}
+.gh-modal-frame #email-editor:has(#template-grid) .gh-header {
+  top: 0;
+}
 .gh-modal-frame #email-editor #email-block-editor {
-  height: calc( 100% - 60px);
+  height: calc(100% - 60px);
 }
 
 @media only screen and (max-width: 960px) {
@@ -616,6 +625,114 @@ body iframe#preview.desktop {
 .cards .post-card img {
   display: block;
   vertical-align: bottom;
+}
+
+#template-grid {
+  padding: 20px;
+}
+#template-grid .gh-panel {
+  overflow: hidden;
+}
+#template-grid p {
+  text-align: center;
+  font-size: 16px;
+}
+#template-grid .template {
+  --scale-factor: 0.5;
+  position: relative;
+  cursor: pointer;
+}
+#template-grid .template .overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+#template-grid .template iframe.template-preview {
+  height: 500px;
+  width: 100%;
+}
+#template-grid .template:hover {
+  z-index: 99;
+}
+#template-grid .template:hover .gh-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.1);
+  border: 2px solid #0075ff;
+}
+#template-grid .template:hover iframe {
+  height: 496px;
+}
+#template-grid .template:hover p {
+  font-weight: 500;
+  color: #0075ff;
+}
+
+@media only screen and (min-width: 2000px) {
+  .display-grid {
+    grid-template-columns: repeat(24, 1fr);
+  }
+}
+@media only screen and (max-width: 2000px) {
+  .display-grid {
+    grid-template-columns: repeat(20, 1fr);
+  }
+}
+@media only screen and (max-width: 1600px) {
+  .display-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+}
+@media only screen and (max-width: 1200px) {
+  .display-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+.font-controls {
+  width: 200px;
+}
+.font-controls .control-label {
+  font-weight: 500;
+}
+.font-controls .font-control {
+  max-width: 80px;
+}
+
+#email-editor-global-fonts .font span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#email-editor-global-fonts .font .danger {
+  display: none;
+}
+#email-editor-global-fonts .font:hover .danger {
+  display: inline-block;
+}
+
+.global-font-select {
+  overflow-y: auto;
+  width: 240px;
+}
+.global-font-select .select-font {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+.global-font-select .select-font.selected {
+  color: #0075ff;
+}
+.global-font-select .select-font:hover {
+  background: rgba(16, 38, 64, 0.15);
+}
+
+.gh-modal.mini .gh-modal-dialog:has(.global-font-select) {
+  padding: 0;
 }
 
 /*# sourceMappingURL=email-block-editor.css.map */

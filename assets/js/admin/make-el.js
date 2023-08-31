@@ -3,10 +3,10 @@
   const { clickedIn, isString, setFrameContent } = Groundhogg.element
 
   const AttributeHandlers = {
-    required: ( el, value ) => {
+    required: (el, value) => {
       el.require = value
     },
-    autofocus: ( el, value ) => {
+    autofocus: (el, value) => {
       el.autofocus = value
     },
     value: (el, value) => {
@@ -243,6 +243,7 @@
     cells = [],
     sortable = false,
     fillRow = () => Array(cells.length).fill(''),
+    maxRows = 0,
   }) => {
 
     const handleChange = (rows) => {
@@ -271,6 +272,7 @@
     }, [
       // Cells
       ...cells.map((cellCallback, cellIndex) => cellCallback({
+        id: `cell-${rowIndex}-${cellIndex}`,
         value: row[cellIndex] ?? '',
         dataRow: rowIndex,
         dataCell: cellIndex,
@@ -316,7 +318,7 @@
       },
     }, [
       ...rows.map((row, i) => RepeaterRow(row, i)),
-      Div({
+      maxRows === 0 || rows.length < maxRows ? Div({
         className: 'gh-input-repeater-row-add',
       }, [
         `<div class="spacer"></div>`,
@@ -326,7 +328,7 @@
           className: 'add-row gh-button dashicon',
           onClick: e => addRow(),
         }, Dashicon('plus-alt2')),
-      ]),
+      ]) : null,
     ])
 
     return Repeater()
@@ -496,6 +498,7 @@
     dialogClasses = '',
     onOpen = () => {},
     onClose = () => {},
+    // closeOnFocusout = false,
     closeOnFocusout = true,
   }, children) => {
 
@@ -543,7 +546,6 @@
           close()
         },
       }, Dashicon('no-alt')),
-      children,
     ]))
 
     const close = () => {
@@ -551,6 +553,7 @@
       modal.remove()
     }
 
+    modal.querySelector('.gh-modal-dialog').appendChild(Fragment(maybeCall(children, { close })))
     document.body.appendChild(modal)
 
     // Run before positioning
@@ -558,19 +561,17 @@
 
     let targetElement = document.querySelector(selector)
 
-    const {
+    let {
       right,
       left,
       bottom,
       top,
     } = targetElement.getBoundingClientRect()
 
-    const {
+    let {
       width,
       height,
     } = modal.getBoundingClientRect()
-
-    modal.style.top = top + 'px'
 
     switch (from) {
       case 'left':
@@ -579,6 +580,16 @@
       case 'right':
         modal.style.left = (right - width) + 'px'
         break
+    }
+
+    console.log({
+      // combined: top +
+    })
+
+    if ((top + height) > window.innerHeight) {
+      modal.style.top = (window.innerHeight - height - 20) + 'px'
+    } else {
+      modal.style.top = top + 'px'
     }
 
     modal.focus()
@@ -613,7 +624,7 @@
     }
 
     // ensure array
-    if (!multiple && ! Array.isArray(selected)) {
+    if (!multiple && !Array.isArray(selected)) {
       selected = [selected]
     }
 
@@ -670,20 +681,22 @@
       })
     }
 
-    const focusSearch = () => document.getElementById(id)?.querySelector( `input[type=search]`)?.focus()
+    const focusSearch = () => document.getElementById(id)?.querySelector(`input[type=search]`)?.focus()
 
     const createOption = (value) => {
-      let option = { id: value, text: value }
-      selected.push(option)
-      onChange(selected)
-      setState({
-        search: '',
-        options: [],
-      })
+      state.options.unshift({ id: value, text: value })
+      selectOption(value)
     }
 
     const selectOption = (id) => {
+
       let option = { ...state.options.find(opt => opt.id == id) }
+
+      console.log( id, option )
+
+      if (option.create) {
+        option.text = option.id
+      }
 
       if (multiple) {
         selected.push(option)
@@ -694,7 +707,7 @@
       setState({
         options: [],
         search: '',
-        searching: false
+        searching: false,
       })
 
       handleOnChange(selected)
@@ -706,13 +719,14 @@
       morph()
     }
 
-    const itemPickerItem = ({ id, text }) => {
+    const itemPickerItem = ({ id, text }, index) => {
       return Div({
         className: `gh-picker-item ${isValidSelection(id) ? '' : 'is-invalid'}`,
+        id: `item-${index}`,
       }, [
         Span({ className: 'gh-picker-item-text' }, text),
         Span({
-          id: `delete-${id}`,
+          id: `delete-${index}`,
           className: 'gh-picker-item-delete',
           tabindex: 0,
           dataId: id,
@@ -724,12 +738,12 @@
       ])
     }
 
-    const itemPickerOption = ({ id, text }) => {
+    const itemPickerOption = ({ id, text }, index) => {
       return Div({
         className: 'gh-picker-option',
         dataId: id,
         tabindex: '0',
-        id: `option-${id}`,
+        id: `option-${index}-${id}`,
         onClick: e => {
           selectOption(id)
           focusSearch()
@@ -757,6 +771,10 @@
         style.maxHeight = (window.innerHeight - bottom) + 'px'
       }
 
+      if (tags && isValidSelection(state.search)) {
+        state.options.unshift({ id: state.search, text: `Add "${state.search}"`, create: true })
+      }
+
       return Div({
         className: 'gh-picker-options',
         style,
@@ -779,18 +797,19 @@
             optionsContainer.style.width = width + 'px'
             optionsContainer.style.maxHeight = (window.innerHeight - bottom) + 'px'
 
-            if ( ! multiple ){
+            if (!multiple) {
               focusSearch()
             }
 
           }, 0)
         },
       }, [
-        multiple || ! selected.length ? null : SearchInput(),
+        multiple || !selected.length ? null : SearchInput(),
         state.searching && state.search ? Div({
           className: 'gh-picker-no-options',
         }, 'Searching...') : null,
-        ...state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id)).map(opt => itemPickerOption(opt)),
+        ...state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id)).
+        map((opt, i) => itemPickerOption(opt, i)),
         state.options.length || state.searching ? null : Div({
           className: 'gh-picker-no-options',
         }, 'No results found.'),
@@ -807,7 +826,7 @@
       placeholder: selected.length ? placeholder : noneSelected,
       onInput: e => {
 
-        if (!e.target.value && multiple ) {
+        if (!e.target.value && multiple) {
           setState({
             search: '',
             searching: false,
@@ -847,7 +866,7 @@
 
     const Render = () => Div({
       id,
-      className: `gh-picker ${state.search || (state.searching && ! multiple) ? 'options-visible' : ''}`,
+      className: `gh-picker ${state.search || (state.searching && !multiple) ? 'options-visible' : ''}`,
       tabindex: '0',
       onFocusout: e => {
 
@@ -862,12 +881,12 @@
         })
       },
       onFocus: e => {
-        if ( multiple ){
+        if (multiple) {
           return
         }
 
         setState({
-          searching: true
+          searching: true,
         })
 
       },
@@ -876,8 +895,8 @@
       Div({
         className: `gh-picker-selected ${multiple ? 'multiple' : 'single'}`,
       }, [
-        ...selected.map(item => itemPickerItem(item)),
-        multiple || ! selected.length ? SearchInput() : null,
+        ...selected.map((item, i) => itemPickerItem(item, i)),
+        multiple || !selected.length ? SearchInput() : null,
       ]),
       state.searching || state.options.length || state.search ? itemPickerOptions() : null,
     ])

@@ -6,6 +6,8 @@ use Groundhogg\Email;
 use function Groundhogg\get_default_email_width;
 use function Groundhogg\the_email;
 
+include_once __DIR__ . '/template-functions.php';
+
 $email = the_email();
 
 /**
@@ -20,8 +22,6 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
 ?>
 <!doctype html>
 <html>
-
-<!-- HEAD -->
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="x-apple-disable-message-reformatting"/>
@@ -29,74 +29,25 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
 
     <title><?php echo $email_title; ?></title>
     <base target="_blank">
-    <style>
-
-        img {
-            max-width: 100% !important;
-        }
-
-        body {
-            font-size: 14px;
-            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-            font-weight: 400;
-        }
-
-        .aligncenter {
-            display: block;
-            float: none;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .alignleft {
-            float: left;
-            margin: 0.5em 1em 0.5em 0;
-        }
-
-        .alignright {
-            float: right;
-            margin: 0.5em 0 0.5em 1em;
-        }
-
-        @media only screen and (max-width: 480px) {
-            .alignright:not(.keep-float),
-            .alignleft:not(.keep-float) {
-                display: block !important;
-                float: none !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-                margin-bottom: 20px !important;
-            }
-        }
-
-        .footer p {
-	        font-size: 13px;
-	        color: #999999;
-	        margin: .5em 0;
-        }
-
-        <?php include __DIR__ . '/parts/posts-css.php'; ?>
-
-        <?php echo $email->get_css() ?>
-
-        <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
+    <style id="global-style">
+	    <?php load_css( 'email' ); ?>
+	    <?php load_css( 'posts' ); ?>
+	    <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
     </style>
+	<style id="block-styles">
+		<?php echo $email->get_css() ?>
+	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
-<body class="email">
-
-<?php include __DIR__ . '/parts/browser-view.php' ?>
-
+<body class="email responsive">
+<?php load_part( 'preview-text' ); ?>
+<?php load_part( 'browser-view' ); ?>
 <div class="body-content">
     <?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
-
-    <!-- START CONTENT -->
     <?php echo $email->get_merged_content(); ?>
-    <!-- END CONTENT -->
-
     <?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
 </div>
-<?php include __DIR__ . '/parts/footer.php' ?>
-<?php include __DIR__ . '/parts/open-tracking.php' ?>
+<?php load_part( 'footer' ); ?>
+<?php load_part( 'open-tracking' ); ?>
 </body>
 </html>

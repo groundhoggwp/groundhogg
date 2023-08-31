@@ -74,35 +74,32 @@ class Email_Log_Table extends Table {
 			[
 				'view'    => '',
 				'display' => __( 'All' ),
-				'count'   => [],
+				'query'   => [],
 			],
 			[
 				'view'    => 'sent',
 				'display' => __( 'Sent', 'groundhogg' ),
-				'count'   => [ 'status' => 'sent' ],
+				'query'   => [ 'status' => 'sent' ],
 			],
 			[
 				'view'    => 'failed',
 				'display' => __( 'Failed', 'groundhogg' ),
-				'count'   => [ 'status' => 'failed' ],
+				'query'   => [ 'status' => 'failed' ],
 			],
 			[
 				'view'    => 'wordpress',
 				'display' => __( 'WordPress', 'groundhogg' ),
-				'count'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
-				'param'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
+				'query'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
 			],
 			[
 				'view'    => 'transactional',
 				'display' => __( 'Transactional', 'groundhogg' ),
-				'count'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
-				'param'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
+				'query'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
 			],
 			[
 				'view'    => 'marketing',
 				'display' => __( 'Marketing', 'groundhogg' ),
-				'count'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
-				'param'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
+				'query'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
 			]
 		];
 	}

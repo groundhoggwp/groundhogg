@@ -495,7 +495,7 @@
           continue
         }
 
-        val = specialChars(val)
+        // val = specialChars(val)
 
         switch (attr) {
           case 'font-size':

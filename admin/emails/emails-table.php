@@ -2,10 +2,13 @@
 
 namespace Groundhogg\Admin\Emails;
 
+use Groundhogg\Admin\Table;
+use Groundhogg\DB\DB;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
@@ -39,7 +42,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class Emails_Table extends WP_List_Table {
+class Emails_Table extends Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -66,14 +69,14 @@ class Emails_Table extends WP_List_Table {
 	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
-		$columns = array(
+		$columns = [
 			'cb'           => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'        => _x( 'Title', 'Column label', 'groundhogg' ),
 			'subject'      => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'from_user'    => _x( 'From User', 'Column label', 'groundhogg' ),
 			'author'       => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
-		);
+		];
 
 		return apply_filters( 'wpgh_email_columns', $columns );
 	}
@@ -87,12 +90,12 @@ class Emails_Table extends WP_List_Table {
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
-		$sortable_columns = array(
-			'subject'      => array( 'subject', false ),
-			'from_user'    => array( 'from_user', false ),
-			'author'       => array( 'author', false ),
-			'last_updated' => array( 'last_updated', false ),
-		);
+		$sortable_columns = [
+			'subject'      => [ 'subject', false ],
+			'from_user'    => [ 'from_user', false ],
+			'author'       => [ 'author', false ],
+			'last_updated' => [ 'last_updated', false ],
+		];
 
 		return apply_filters( 'wpgh_email_sortable_columns', $sortable_columns );
 	}
@@ -103,78 +106,14 @@ class Emails_Table extends WP_List_Table {
 		}
 		?>
 		<div class="alignleft gh-actions">
-			<a class="button"
+			<a class="button danger"
 			   href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
 		</div>
 		<?php
 	}
 
-	/**
-	 * Get the views for the emails, all, ready, unready, trash
-	 *
-	 * @return array
-	 */
-	protected function get_views() {
-		$views = array();
-
-		$count_ready = get_db( 'emails' )->count( array( 'status' => 'ready' ) );
-		$count_draft = get_db( 'emails' )->count( array( 'status' => 'draft' ) );
-		$count_trash = get_db( 'emails' )->count( array( 'status' => 'trash' ) );
-		$count_all   = $count_ready + $count_draft;
-
-		$views['all']   = "<a class='" . print_r( ( $this->get_view() === 'all' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails' ) . "'>" . __( 'All' ) . " <span class='count'>(" . _nf( $count_all ) . ")</span>" . "</a>";
-		$views['ready'] = "<a class='" . print_r( ( $this->get_view() === 'ready' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . _nf( $count_ready ) . ")</span>" . "</a>";
-		$views['draft'] = "<a class='" . print_r( ( $this->get_view() === 'draft' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . _nf( $count_draft ) . ")</span>" . "</a>";
-		$views['trash'] = "<a class='" . print_r( ( $this->get_view() === 'trash' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . _nf( $count_trash ) . ")</span>" . "</a>";
-
-		return apply_filters( 'groundhogg/admin/emails/table/views', $views );
-	}
-
-	protected function get_view() {
-		return get_url_var( 'status', [ 'ready', 'draft' ] );
-	}
-
-	/**
-	 * Generates content for a single row of the table
-	 *
-	 * @param object $item The current item
-	 *
-	 * @since 3.1.0
-	 *
-	 */
-	public function single_row( $item ) {
-
-		$email = new Email( $item->ID );
-
-		echo '<tr>';
-		$this->single_row_columns( $email );
-		echo '</tr>';
-	}
-
-	/**
-	 * @param        $email Email
-	 * @param string $column_name
-	 * @param string $primary
-	 *
-	 * @return string
-	 */
-	protected function handle_row_actions( $email, $column_name, $primary ) {
-		if ( $primary !== $column_name ) {
-			return '';
-		}
-
-		$actions = array();
-		$id      = $email->get_id();
-
-		if ( $this->get_view() === 'trash' ) {
-			$actions['restore'] = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email=' . $id ), 'restore' ) . "'>" . __( 'Restore' ) . "</a>";
-			$actions['delete']  = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email=' . $id ), 'delete' ) . "'>" . __( 'Delete Permanently' ) . "</a>";
-		} else {
-			$actions['edit']   = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
-			$actions['delete'] = "<a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email=' . $id ), 'trash' ) . "'>" . __( 'Trash' ) . "</a>";
-		}
-
-		return $this->row_actions( apply_filters( 'groundhogg/admin/emails/table/row_actions', $actions, $email, $column_name ) );
+	protected function parse_item( $item ) {
+		return new Email( $item );
 	}
 
 	/**
@@ -193,9 +132,14 @@ class Emails_Table extends WP_List_Table {
 
 			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
-			if ( $email->get_status() === 'draft' ) {
-				$html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
+			if ( $email->is_draft() && ! $this->view_is( 'draft' ) ) {
+				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Draft' ) . "</span>";
 			}
+
+			if ( $email->is_template()  && ! $this->view_is( 'template' ) ) {
+				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template' ) . "</span>";
+			}
+
 			$html .= "</strong>";
 		}
 
@@ -310,77 +254,86 @@ class Emails_Table extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 
-		if ( $this->get_view() === 'trash' ) {
+		$actions = [];
 
-			$actions = array(
-				'delete'  => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
-				'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
-			);
-
-		} else {
-
-			$actions = array(
-				'trash' => _x( 'Trash', 'List table bulk action', 'groundhogg' )
-			);
-
+		switch ( $this->get_view() ) {
+			default:
+				$actions['trash'] = _x( 'Trash', 'List table bulk action', 'groundhogg' );
+				break;
+			case 'trash':
+				$actions['delete']  = _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' );
+				$actions['restore'] = _x( 'Restore', 'List table bulk action', 'groundhogg' );
+				break;
 		}
 
 		return apply_filters( 'wpgh_email_bulk_actions', $actions );
 	}
 
+	function get_table_id() {
+		return 'emails_table';
+	}
+
+	function get_db() {
+		return get_db( 'emails' );
+	}
+
 	/**
-	 * Prepares the list of items for displaying.
+	 * @param $item Email
+	 * @param $column_name
+	 * @param $primary
 	 *
-	 * REQUIRED! This is where you prepare your data for display. This method will
-	 *
-	 * @global wpdb $wpdb
-	 * @uses $this->_column_headers
-	 * @uses $this->items
-	 * @uses $this->get_columns()
-	 * @uses $this->get_sortable_columns()
-	 * @uses $this->get_pagenum()
-	 * @uses $this->set_pagination_args()
+	 * @return array
 	 */
-	function prepare_items() {
+	protected function get_row_actions( $item, $column_name, $primary ) {
 
-		$columns  = $this->get_columns();
-		$hidden   = array(); // No hidden columns
-		$sortable = $this->get_sortable_columns();
+		$actions = [];
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		switch ( $this->get_view() ){
+			default:
+				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
+				$actions[] = [ 'class' => 'duplicate', 'display' => __( 'Duplicate' ), 'url' => action_url( 'duplicate', [ 'email' => $item->get_id() ] ) ];
+				$actions[] = [ 'class' => 'trash', 'display' => __( 'Trash' ), 'url' => action_url( 'trash', [ 'email' => $item->get_id() ] ) ];
+				break;
+			case 'trash':
+				$actions[] = [ 'class' => 'restore', 'display' => __( 'Restore' ), 'url' => action_url( 'restore', [ 'email' => $item->get_id() ] ) ];
+				$actions[] = [ 'class' => 'trash', 'display' => __( 'Delete' ), 'url' => action_url( 'delete', [ 'email' => $item->get_id() ] ) ];
+				break;
+		}
 
-		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
-		$paged    = $this->get_pagenum();
-		$offset   = $per_page * ( $paged - 1 );
-		$search   = trim( sanitize_text_field( get_url_var( 's' ) ) );
-		$order    = get_url_var( 'order', 'DESC' );
-		$orderby  = get_url_var( 'orderby', 'ID' );
+		return $actions;
+	}
 
-		$args = array_filter( [
-			'status'     => $this->get_view(),
-			'from_user'  => absint( get_url_var( 'from_user' ) ),
-			'author'     => absint( get_url_var( 'author' ) ),
-			'search'     => $search,
-			'limit'      => $per_page,
-			'offset'     => $offset,
-			'order'      => $order,
-			'orderby'    => $orderby,
-			'found_rows' => true,
-		] );
+	protected function get_views_setup() {
+		return [
+			[
+				'view'    => '',
+				'display' => __( 'All' ),
+				'query'   => [],
+			],
+			[
+				'view'    => 'ready',
+				'display' => __( 'Ready', 'groundhogg' ),
+				'query'   => [ 'status' => 'ready' ],
+			],
+			[
+				'view'    => 'template',
+				'display' => __( 'Templates', 'groundhogg' ),
+				'query'   => [ 'is_template' => 1 ],
+			],
+			[
+				'view'    => 'draft',
+				'display' => __( 'Draft', 'groundhogg' ),
+				'query'   => [ 'status' => 'draft' ],
+			],
+			[
+				'view'    => 'trash',
+				'display' => __( 'Trash', 'groundhogg' ),
+				'query'   => [ 'status' => 'trash' ],
+			]
+		];
+	}
 
-		$emails = get_db( 'emails' )->query( $args );
-		$total  = get_db( 'emails' )->found_rows();
-
-		$this->items = $emails;
-
-		// Add condition to be sure we don't divide by zero.
-		// If $this->per_page is 0, then set total pages to 1.
-		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
-
-		$this->set_pagination_args( array(
-			'total_items' => $total,
-			'per_page'    => $per_page,
-			'total_pages' => $total_pages,
-		) );
+	function get_default_query() {
+		return [];
 	}
 }

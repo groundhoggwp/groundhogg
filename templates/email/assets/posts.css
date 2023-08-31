@@ -1,19 +1,4 @@
-.email-columns {
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-}
-
-.email-columns .email-columns-row {
-    display: table-row;
-}
-
-.email-columns .email-columns-row .email-columns-cell {
-    display: table-cell;
-    vertical-align: top;
-}
-
-.email-columns .email-columns-row .email-columns-cell img.post-thumbnail {
+.email-columns .email-columns-row > .email-columns-cell img.post-thumbnail {
     width: 100%;
 }
 
@@ -40,21 +25,21 @@
 }
 
 @media only screen and (max-width: 480px) {
-    .email-columns,
-    .email-columns .email-columns-row,
-    .email-columns .email-columns-row .email-columns-cell {
-        display: block;
-        /*padding: 0 !important;*/
-        width: 100% !important;
+    body.responsive .email-columns,
+    body.responsive .email-columns > tbody,
+    body.responsive .email-columns .email-columns-row,
+    body.responsive .email-columns .email-columns-row > .email-columns-cell {
+        display: block !important;
+        width: auto !important;
     }
 }
 
-@media only screen and (max-device-width: 480px) {
-    .email-columns,
-    .email-columns .email-columns-row,
-    .email-columns .email-columns-row .email-columns-cell {
-        display: block;
-        /*padding: 0 !important;*/
-        width: 100% !important;
-    }
-}
+/*@media only screen and (max-device-width: 600px) {*/
+/*    .email-columns,*/
+/*    .email-columns tbody,*/
+/*    .email-columns .email-columns-row,*/
+/*    .email-columns .email-columns-row > .email-columns-cell {*/
+/*        display: block !important;*/
+/*        width: auto !important;*/
+/*    }*/
+/*}*/

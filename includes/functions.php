@@ -6313,6 +6313,9 @@ function enqueue_step_type_assets() {
 	do_action( 'groundhogg_enqueue_step_type_assets' );
 }
 
+/**
+ * Enqueue assets for scheduling broadcasts
+ */
 function enqueue_broadcast_assets() {
 	wp_enqueue_script( 'groundhogg-admin-send-broadcast' );
 	wp_enqueue_style( 'groundhogg-admin-element' );
@@ -6355,7 +6358,10 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
 
 	$localized = array_merge( [
-		'footer' => compact( 'business_name', 'address', 'links', 'unsubscribe' )
+		'footer'       => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
+		'templates'    => Plugin::instance()->library->get_email_templates(),
+		'colorPalette' => get_option( 'gh_email_editor_color_palette', [] ),
+		'globalFonts'  => get_option( 'gh_email_editor_global_fonts', [] ),
 	], $extra );
 
 	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );
@@ -7741,4 +7747,28 @@ function hex_is_lighter_than( $hex, $compare ) {
 	$hsl = RGBToHSL( $rgb );
 
 	return $hsl->lightness > $compare;
+}
+
+/**
+ * Downloads given json as JSON file
+ *
+ * @param $json mixed something json encodable
+ * @param $name string name fo the file to export
+ */
+function download_json( $json, $name ) {
+
+	status_header( 200 );
+	nocache_headers();
+
+	$export_string = wp_json_encode( $json );
+
+	$export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $name ) );
+
+	header( "Content-type: text/plain" );
+	header( "Content-disposition: attachment; filename=" . $export_name . ".json" );
+	$file = fopen( 'php://output', 'w' );
+	fputs( $file, $export_string );
+	fclose( $file );
+	exit();
+
 }

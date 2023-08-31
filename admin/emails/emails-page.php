@@ -151,6 +151,8 @@ class Emails_Page extends Admin_Page {
 	}
 
 	/**
+	 *
+	 *
 	 * @return array|array[]
 	 */
 	protected function get_title_actions() {
@@ -175,6 +177,11 @@ class Emails_Page extends Admin_Page {
 		];
 	}
 
+	/**
+	 * Restore trashed email
+	 *
+	 * @return false
+	 */
 	public function process_restore() {
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
@@ -196,6 +203,34 @@ class Emails_Page extends Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Duplicate an email
+	 *
+	 * @return string|\WP_Error
+	 */
+	public function process_duplicate() {
+		if ( ! current_user_can( 'add_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$email_id = absint( get_url_var( 'email' ) );
+
+		$email = new Email( $email_id );
+
+		if ( ! $email->exists() ) {
+			return new \WP_Error( 'error', 'Email does not exist.' );
+		}
+
+		$new = $email->duplicate();
+
+		return $new->admin_link();
+	}
+
+	/**
+	 * Empty trashed emails
+	 *
+	 * @return false
+	 */
 	public function process_empty_trash() {
 
 		if ( ! current_user_can( 'delete_emails' ) ) {
@@ -220,6 +255,11 @@ class Emails_Page extends Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Delete an email
+	 *
+	 * @return false|\WP_Error
+	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_emails' ) ) {
 			$this->wp_die_no_access();
@@ -240,6 +280,11 @@ class Emails_Page extends Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Move an email to the trash
+	 *
+	 * @return false
+	 */
 	public function process_trash() {
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
@@ -262,9 +307,78 @@ class Emails_Page extends Admin_Page {
 	}
 
 	/**
+	 *  Export an email as json
+	 */
+	public function process_export() {
+
+		if ( ! current_user_can( 'edit_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$email = new Email( absint( get_url_var( 'email' ) ) );
+
+		if ( ! $email->exists() ) {
+			return new \WP_Error( 'error', 'Email could not be exported.' );
+		}
+
+		Groundhogg\download_json( $email, $email->get_title() );
+	}
+
+	/**
+	 * Table
+	 *
+	 * @return mixed|void
+	 */
+	public function view() {
+
+		if ( ! class_exists( 'Emails_Table' ) ) {
+			include __DIR__ . '/emails-table.php';
+		}
+
+		$emails_table = new Emails_Table();
+
+		$emails_table->views();
+
+		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
+
+		?>
+		<form method="post">
+			<?php $emails_table->prepare_items(); ?>
+			<?php $emails_table->display(); ?>
+		</form>
+		<?php
+	}
+
+	/**
+	 * Output HTML necessary for the new block editor
+	 */
+	public function block_editor() {
+		if ( ! current_user_can( 'edit_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/block-editor.php';
+	}
+
+	/**
+	 * Output HTML for the page
+	 */
+	public function page() {
+
+		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
+			$this->edit();
+
+			return;
+		}
+
+		parent::page();
+	}
+
+	/**
 	 * Add the email to the DB
 	 *
 	 * @return bool|string|\WP_Error
+	 * @deprecated now using block editor
 	 */
 	public function process_add() {
 		if ( ! current_user_can( 'add_emails' ) ) {
@@ -329,6 +443,7 @@ class Emails_Page extends Admin_Page {
 	 * Process the editing actions of the email
 	 *
 	 * @return bool|\WP_Error
+	 * @deprecated now using block editor
 	 */
 	public function process_edit() {
 
@@ -446,34 +561,10 @@ class Emails_Page extends Admin_Page {
 		return true;
 	}
 
-	public function view() {
 
-		if ( ! class_exists( 'Emails_Table' ) ) {
-			include __DIR__ . '/emails-table.php';
-		}
-
-		$emails_table = new Emails_Table();
-
-		$emails_table->views();
-
-		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
-
-		?>
-		<form method="post">
-			<?php $emails_table->prepare_items(); ?>
-			<?php $emails_table->display(); ?>
-		</form>
-		<?php
-	}
-
-	public function add() {
-		if ( ! current_user_can( 'add_emails' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		include __DIR__ . '/add-new.php';
-	}
-
+	/**
+	 * @deprecated now using block editor
+	 */
 	public function edit() {
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
@@ -482,28 +573,21 @@ class Emails_Page extends Admin_Page {
 		$this->block_editor();
 	}
 
-	public function block_editor() {
-		if ( ! current_user_can( 'edit_emails' ) ) {
+	/**
+	 * @deprecated now using block editor
+	 */
+	public function add() {
+		if ( ! current_user_can( 'add_emails' ) ) {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/block-editor.php';
+		include __DIR__ . '/add-new.php';
 	}
-
-	public function page() {
-
-		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
-			$this->edit();
-
-			return;
-		}
-
-		parent::page();
-	}
-
 
 	/**
 	 * Get search results
+	 *
+	 * @deprecated  now using block editor
 	 */
 	public function get_my_emails_search_results() {
 		ob_start();

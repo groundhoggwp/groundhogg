@@ -10,6 +10,7 @@
     Table,
     Tr,
     Td,
+    Th,
     Modal,
     MiniModal,
     ModalFrame,
@@ -26,20 +27,18 @@
   } = MakeEl
 
   const {
-    el, objectToStyle, icons, inputWithReplacements, uuid, tinymceElement,
-    specialChars,
+    el, objectToStyle, icons, uuid, tinymceElement,
     improveTinyMCE,
     textarea,
     modal,
-    miniModal,
-    input,
     clickedIn,
-    select,
     copyObject,
-    codeEditor,
+    moreMenu,
     dialog,
     confirmationModal,
+    dangerConfirmationModal,
     adminPageURL,
+    isValidEmail,
   } = Groundhogg.element
 
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
@@ -53,6 +52,7 @@
   })
 
   let fontWeights = [
+    '300',
     '400',
     '500',
     '600',
@@ -65,18 +65,22 @@
   let fontFamilies = {
     'system-ui, sans-serif': 'System UI',
     'Arial, sans-serif': 'Arial',
-    'Arial Black, Arial, sans-serif': 'Arial Black',
-    'Century Gothic, Times, serif': 'Century Gothic',
+    '"Arial Black", Arial, sans-serif': 'Arial Black',
+    '"Century Gothic", Times, serif': 'Century Gothic',
     'Courier, monospace': 'Courier',
-    'Courier New, monospace': 'Courier New',
+    '"Courier New", monospace': 'Courier New',
     'Geneva, Tahoma, Verdana, sans-serif': 'Geneva',
     'Georgia, Times, Times New Roman, serif': 'Georgia',
     'Helvetica, Arial, sans-serif': 'Helvetica',
     'Lucida, Geneva, Verdana, sans-serif': 'Lucida',
     'Tahoma, Verdana, sans-serif': 'Tahoma',
-    'Times, Times New Roman, Baskerville, Georgia, serif': 'Times',
-    'Times New Roman, Times, Georgia, serif': 'Times New Roman',
+    'Times, "Times New Roman", Baskerville, Georgia, serif': 'Times',
+    '"Times New Roman", Times, Georgia, serif': 'Times New Roman',
     'Verdana, Geneva, sans-serif': 'Verdana',
+  }
+
+  function onlyUnique (value, index, array) {
+    return array.indexOf(value) === index
   }
 
   const DesignTemplates = [
@@ -246,148 +250,46 @@
         }`
       },
     },
-    {
-      id: 'framed',
-      name: __('Framed'),
-      controls: () => {
-
-        let {
-          width = 600,
-          frameColor = '#EDF5FF',
-          backgroundColor = '#fff',
-          footerFontColor = '#000',
-          logo = {},
-        } = getEmailMeta()
-
-        return Fragment([
-          ControlGroup({
-            name: 'Template Settings',
-          }, [
-            Control({
-              label: 'Email Width',
-            }, Input({
-              id: 'email-width',
-              name: 'width',
-              value: width,
-              className: 'control-input',
-              type: 'number',
-              onInput: e => {
-                updateSettings({
-                  width: parseInt(e.target.value),
-                  reRender: true,
-                })
-              },
-            })),
-            Control({
-              label: 'Background Color',
-            }, ColorPicker({
-              id: 'background-color',
-              value: backgroundColor,
-              onChange: backgroundColor => {
-                updateSettings({
-                  backgroundColor,
-                  reRender: true,
-                })
-              },
-            })),
-            Control({
-              label: 'Frame Color',
-            }, ColorPicker({
-              id: 'frame-color',
-              value: frameColor,
-              onChange: frameColor => {
-                updateSettings({
-                  frameColor,
-                  reRender: true,
-                })
-              },
-            })),
-            Control({
-              label: 'Footer Font Color',
-            }, ColorPicker({
-              id: 'footer-font-color',
-              value: footerFontColor,
-              onChange: footerFontColor => {
-                updateSettings({
-                  footerFontColor,
-                  // reRender: false,
-                })
-              },
-            })),
-          ]),
-          ControlGroup({ name: 'Template Logo' }, [
-            ImageControls({
-              id: 'logo',
-              image: logo,
-              maxWidth: width,
-              onChange: image => {
-                updateSettings({
-                  logo: image,
-                  reRender: true,
-                })
-              },
-            }),
-          ]),
-        ])
-      },
-      html: (blocks) => {
-
-        const {
-          logo = {},
-          width = 640,
-          frameColor = '#EDF5FF',
-          backgroundColor = '#fff',
-        } = getEmailMeta()
-
-        let {
-          src = '',
-          width: logoWidth = 320,
-          alt = '',
-          title = '',
-        } = logo
-
-        return Div({
-          className: `template-framed`,
-          style: {
-            backgroundColor,
-          },
-        }, [
-          makeEl('img', {
-            className: 'template-logo',
-            src,
-            width: logoWidth,
-            height: 'auto',
-            alt,
-            title,
-          }),
-          Div({
-            className: 'inner-content',
-            style: {
-              maxWidth: `${width || 640}px`,
-              backgroundColor: frameColor,
-            },
-          }, blocks),
-        ])
-      },
-      mceCss: () => {
-
-        let bodyStyle = {}
-
-        let {
-          frameColor,
-        } = getEmailMeta()
-
-        if (frameColor) {
-          bodyStyle.backgroundColor = frameColor
-        }
-
-        // language=CSS
-        return `body {
-            ${objectToStyle(bodyStyle)}
-        }`
-      },
-    },
   ]
+
+  const GlobalFonts = {
+    fonts: [],
+
+    add () {
+
+      let font = {
+        id: uuid(),
+        name: 'New font',
+        style: fontDefaults({}),
+      }
+
+      this.fonts.push(font)
+
+      return font
+    },
+
+    delete (id) {
+      this.fonts = this.fonts.filter(f => f.id !== id)
+    },
+
+    get (id) {
+      return this.fonts.find(f => f.id === id)
+    },
+
+    has (id) {
+      return this.fonts.some(f => f.id === id)
+    },
+
+    update (id, style) {
+      this.fonts = this.fonts.map(font => font.id === id ? { ...font, style: { ...font.style, ...style } } : font)
+    },
+
+    save () {
+      return Groundhogg.stores.options.patch({
+        gh_email_editor_global_fonts: this.fonts,
+      })
+    },
+  }
 
   const getStateCopy = () => JSON.parse(JSON.stringify(State))
 
@@ -522,6 +424,12 @@
    */
   const saveEmail = () => {
 
+    // Save editor settings
+    Groundhogg.stores.options.patch({
+      gh_email_editor_color_palette: colorPalette,
+      gh_email_editor_global_fonts: GlobalFonts.fonts,
+    })
+
     // No ID, creating the email
     if (!State.email.ID) {
 
@@ -575,36 +483,46 @@
 
     morphHeader()
 
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+
     const reset = () => {
       this.controller = new AbortController()
       this.signal = this.controller.signal
     }
 
-    if (!this.controller) {
-      reset()
-    } else {
-      this.controller.abort()
-      reset()
-    }
+    this.timeout = setTimeout(() => {
 
-    let endpoint = getEmail().ID ? `${EmailsStore.route}/${getEmail().ID}/preview` : `${EmailsStore.route}/preview`
+      if (!this.controller) {
+        reset()
+      } else {
+        this.controller.abort()
+        reset()
+      }
 
-    return post(endpoint, {
-      data: getEmailData(),
-      meta: getEmailMeta(),
-    }, {
-      signal: this.signal,
-    }).then(({ item }) => {
-      setState({
-        preview: item.context.built,
-        previewLoading: false,
-      })
-      morphHeader()
-    }).catch(err => {})
+      let endpoint = getEmail().ID ? `${EmailsStore.route}/${getEmail().ID}/preview` : `${EmailsStore.route}/preview`
+
+      return post(endpoint, {
+        data: getEmailData(),
+        meta: getEmailMeta(),
+      }, {
+        signal: this.signal,
+      }).then(({ item }) => {
+        setState({
+          preview: item.context.built,
+          previewLoading: false,
+        })
+        morphHeader()
+      }).catch(err => {})
+
+    }, 1000)
   }
 
   const setActiveBlock = (idOrNull) => {
-    State.activeBlock = idOrNull
+    setState({
+      activeBlock: idOrNull,
+    })
     morphBlocks()
     // Completely remove controls before changing to new block
     removeControls()
@@ -672,9 +590,27 @@
     History.addChange(getStateCopy())
   }
 
-  const openPanel = panel => State.openPanels[panel] = true
+  function getSubstringUpToSecondHyphen (inputString) {
+    const regex = /^([^-]*-[^-]*)/
+    const match = inputString.match(regex)
+    return match ? match[1] : inputString
+  }
+
+  const closeOtherPanels = panel => {
+    for (let p in State.openPanels) {
+      if (p === panel || !p.includes(getSubstringUpToSecondHyphen(panel))) {
+        continue
+      }
+
+      State.openPanels[p] = false
+    }
+  }
+  const openPanel = panel => {
+    State.openPanels[panel] = true
+    closeOtherPanels(panel)
+  }
   const closePanel = panel => State.openPanels[panel] = false
-  const togglePanel = panel => State.openPanels[panel] = !State.openPanels[panel]
+  const togglePanel = panel => isPanelOpen(panel) ? closePanel(panel) : openPanel(panel)
   const isPanelOpen = panel => State.openPanels[panel]
   const getTemplate = () => DesignTemplates.find(t => t.id === getEmailMeta().template)
 
@@ -783,9 +719,14 @@
 
   const TopRightBottomLeft = ({
     id = '',
-    values = { top: '', right: '', bottom: '', left: '', linked: true },
+    values = {},
     onChange = (values) => {},
   }) => {
+
+    values = {
+      top: '', right: '', bottom: '', left: '', linked: true,
+      ...values,
+    }
 
     const setValue = (which, val) => {
 
@@ -868,6 +809,7 @@
     value = '',
     ...attributes
   }) => {
+
     return Div({
       className: 'gh-color-picker',
       id,
@@ -893,8 +835,9 @@
                 hide: false,
                 border: false,
                 color: value,
-                palettes: ['#000', '#fff', '#dd3333', '#DD9933', '#EEEE22', '#81D742', '#1E73BE', '#8224E3'],
+                palettes: colorPalette,
                 change: (e, ui) => {
+                  document.getElementById(`${id}-current`).style.backgroundColor = ui.color.toString()
                   onChange(ui.color.toString())
                 },
               })
@@ -919,6 +862,7 @@
                 let $picker = $(`#${id}-picker`)
                 $picker.val('')
                 $picker.iris('color', '')
+                document.getElementById(`${id}-current`).style.backgroundColor = ''
               },
             }, 'Clear'),
           ]))
@@ -933,6 +877,7 @@
     maxWidth = 0,
     image = {},
     onChange = ({ src, alt, width }) => {},
+    supports = { alt: true, width: true },
   }) => {
 
     const setImage = (newProps) => {
@@ -1007,7 +952,7 @@
           },
         }, icons.image),
       ])),
-      Control({
+      supports.width ? Control({
         label: 'Width',
       }, Input({
         id: `${id}-width`,
@@ -1020,8 +965,8 @@
             width: parseInt(e.target.value),
           })
         },
-      })),
-      Control({
+      })) : null,
+      supports.alt ? Control({
         label: 'Alt Text',
       }, Input({
         id: `${id}-alt`,
@@ -1032,7 +977,7 @@
             alt: e.target.value,
           })
         },
-      })),
+      })) : null,
     ])
   }
 
@@ -1063,6 +1008,65 @@
     ])
   }
 
+  const BorderControlGroup = ({
+    borderStyle = 'none',
+    borderWidth = {},
+    borderColor = '',
+    borderRadius = {},
+    onChange = style => {},
+  }) => {
+
+    return ControlGroup({ name: 'Border' }, [
+      Control({
+        label: 'Style',
+      }, Select({
+        id: 'border-style',
+        options: {
+          none: __('None', 'groundhogg'),
+          solid: __('Solid', 'groundhogg'),
+          dashed: __('Dashed', 'groundhogg'),
+          dotted: __('Dotted', 'groundhogg'),
+        },
+        selected: borderStyle,
+        onChange: e => onChange({ borderStyle: e.target.value }),
+      })),
+      Control({
+        label: __('Color', 'groundhogg'),
+      }, ColorPicker({
+        type: 'text',
+        id: 'border-color',
+        value: borderColor,
+        onChange: borderColor => onChange({
+          borderColor,
+        }),
+      })),
+      Control({
+        label: 'Width',
+        stacked: true,
+      }, TopRightBottomLeft({
+        id: 'border-width',
+        values: borderWidth,
+        onChange: borderWidth => {
+          onChange({
+            borderWidth,
+          })
+        },
+      })),
+      Control({
+        label: 'Radius',
+        stacked: true,
+      }, TopRightBottomLeft({
+        id: 'border-radius',
+        values: borderRadius,
+        onChange: borderRadius => {
+          onChange({
+            borderRadius,
+          })
+        },
+      })),
+    ])
+  }
+
   const extract4 = ({ top = 0, right = 0, bottom = 0, left = 0 }) => {
     const usePixel = num => {
       num = isNaN(parseInt(num)) ? 0 : parseInt(num)
@@ -1076,6 +1080,27 @@
     ].map(usePixel).join(' ')
   }
 
+  const addBorderStyle = (style, initial = {}) => {
+    const {
+      borderStyle = 'none',
+      borderColor = 'transparent',
+      borderWidth = {},
+      borderRadius = {},
+    } = style
+
+    if (Object.values(borderRadius).some(v => v && parseInt(v) !== 0)) {
+      initial.borderRadius = extract4(borderRadius)
+    }
+
+    if (borderStyle !== 'none') {
+      initial.borderStyle = borderStyle
+      initial.borderColor = borderColor
+      initial.borderWidth = extract4(borderWidth)
+    }
+
+    return initial
+  }
+
   const AdvancedStyleControls = {
     getInlineStyle: block => {
       const { advancedStyle = {}, id, selector } = block
@@ -1087,17 +1112,33 @@
         borderWidth = {},
         borderRadius = {},
         backgroundColor = 'transparent',
+        backgroundImage = '',
       } = advancedStyle
 
-      return {
+      const style = {}
+
+      if (Object.values(padding).some(v => v && parseInt(v) !== 0)) {
+        style.padding = extract4(padding)
+      }
+
+      addBorderStyle({
         borderStyle,
         borderColor,
-        backgroundColor,
-        padding: extract4(padding),
-        // margin: extract4(margin),
-        borderWidth: extract4(borderWidth),
-        borderRadius: extract4(borderRadius),
+        borderWidth,
+        borderRadius,
+      }, style)
+
+      if (backgroundColor !== 'transparent') {
+        style.backgroundColor = backgroundColor
       }
+
+      if (backgroundImage) {
+        style.backgroundImage = `url(${backgroundImage})`
+        style.backgroundSize = 'cover'
+        style.backgroundRepeat = 'no-repeat'
+      }
+
+      return style
     },
     css: (block) => {
       const { selector } = block
@@ -1109,7 +1150,7 @@
           }
       `
     },
-    render: ({ advancedStyle = {}, updateBlock }) => {
+    render: ({ id, advancedStyle = {}, updateBlock }) => {
 
       const updateStyle = ({
         reRenderControls = false,
@@ -1133,20 +1174,20 @@
         ControlGroup({
           name: 'Layout',
         }, [
-          Control({
-            label: 'Width',
-            stacked: false,
-          }, Input({
-            type: 'number',
-            // max: getEmailMeta().width,
-            min: 0,
-            id: 'advanced-width',
-            value: advancedStyle.width || '',
-            name: 'advanced_width',
-            onInput: e => updateStyle({
-              width: e.target.value,
-            }),
-          })),
+          // Control({
+          //   label: 'Width',
+          //   stacked: false,
+          // }, Input({
+          //   type: 'number',
+          //   // max: getEmailMeta().width,
+          //   min: 0,
+          //   id: 'advanced-width',
+          //   value: advancedStyle.width || '',
+          //   name: 'advanced_width',
+          //   onInput: e => updateStyle({
+          //     width: e.target.value,
+          //   }),
+          // })),
           Control({
             label: 'Padding',
             stacked: true,
@@ -1161,58 +1202,13 @@
             },
           })),
         ]),
-        ControlGroup({ name: 'Border' }, [
-          Control({
-            label: 'Style',
-          }, Select({
-            id: 'border-style',
-            options: {
-              none: __('None', 'groundhogg'),
-              solid: __('Solid', 'groundhogg'),
-              dashed: __('Dashed', 'groundhogg'),
-              dotted: __('Dotted', 'groundhogg'),
-            },
-            selected: advancedStyle.borderStyle,
-            onChange: e => updateStyle({ borderStyle: e.target.value }),
-          })),
-          Control({
-            label: __('Color', 'groundhogg'),
-          }, ColorPicker({
-            type: 'text',
-            id: 'border-color',
-            value: advancedStyle.borderColor,
-            onChange: borderColor => updateStyle({
-              borderColor,
-              reRenderControls: true,
-            }),
-          })),
-          Control({
-            label: 'Width',
-            stacked: true,
-          }, TopRightBottomLeft({
-            id: 'border-width',
-            values: advancedStyle.borderWidth,
-            onChange: borderWidth => {
-              updateStyle({
-                borderWidth,
-                reRenderControls: true,
-              })
-            },
-          })),
-          Control({
-            label: 'Radius',
-            stacked: true,
-          }, TopRightBottomLeft({
-            id: 'border-radius',
-            values: advancedStyle.borderRadius,
-            onChange: borderRadius => {
-              updateStyle({
-                borderRadius,
-                reRenderControls: true,
-              })
-            },
-          })),
-        ]),
+        BorderControlGroup({
+          ...advancedStyle,
+          onChange: style => updateStyle({
+            ...style,
+            reRenderControls: true,
+          }),
+        }),
         ControlGroup({
           name: 'Background',
         }, [
@@ -1227,6 +1223,24 @@
               reRenderControls: true,
             }),
           })),
+          ImageControls({
+            id: 'background-image',
+            maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
+            image: {
+              src: advancedStyle.backgroundImage || '',
+            },
+            supports: {
+              alt: false,
+              width: false,
+            },
+            onChange: img => {
+              updateStyle({
+                backgroundImage: img.src,
+                reRenderControls: true,
+              })
+            },
+          }),
+          `<p><i>Background images to not function in any Windows desktop client. Always set the background color as a fallback.</i></p>`,
         ]),
       ])
     },
@@ -1257,6 +1271,10 @@
         ...block,
         selector: `#b-${block.id}`,
       })
+
+      if (block.css) {
+        css += '\n\n' + block.css.replaceAll(/selector/g, `#b-${block.id}`)
+      }
 
       return css
     },
@@ -1439,7 +1457,16 @@
       }
 
     } else {
-      panel = `email-${name.toLowerCase().replaceAll(' ', '-')}`
+
+      panel = `email-${getEmailControlsTab()}-${name.toLowerCase().replaceAll(' ', '-')}`
+
+      // Check to see if the block has no open panels
+      if (!Object.keys(getState().openPanels).
+      some(panelId => panelId.startsWith(`email-${getEmailControlsTab()}`) &&
+        State.openPanels[panelId])) {
+        // Open this one by default
+        openPanel(panel)
+      }
     }
 
     return Div({
@@ -1451,7 +1478,7 @@
         className: 'gh-panel-header',
         onClick: e => {
           if (closable) {
-            togglePanel(panel)
+            openPanel(panel)
             morphControls()
           }
         },
@@ -1508,18 +1535,25 @@
     let { advancedStyle = {} } = block
     let {
       backgroundColor = '',
+      backgroundImage = '',
     } = advancedStyle
 
     return Tr({}, [
       `<!-- START:${block.id} -->`,
       Td({
-        id: `b-${block.id}`,
-        style: {
-          ...AdvancedStyleControls.getInlineStyle(block),
-          overflow: 'hidden',
-        },
-        bgcolor: backgroundColor,
-      }, BlockRegistry.html(block)),
+          id: `b-${block.id}`,
+          style: {
+            ...AdvancedStyleControls.getInlineStyle(block),
+            overflow: 'hidden',
+          },
+          bgcolor: backgroundColor,
+          background: backgroundImage,
+          valign: 'top',
+          // width: '100%',
+        }, [
+          BlockRegistry.html(block),
+        ],
+      ),
       `<!-- END:${block.id} -->`,
     ])
   }
@@ -1998,43 +2032,73 @@
   const AdvancedBlockControls = () => {
     return Fragment([
       ControlGroup({
-        name: 'Conditional Visibility',
-      }, [
-        Control({
-          label: 'Enable conditional visibility',
-        }, Toggle({
-          id: 'toggle-filters',
-          checked: getActiveBlock().filters_enabled || false,
-          onChange: e => updateBlock({ filters_enabled: e.target.checked, reRenderControls: true }),
-        })),
-        getActiveBlock().filters_enabled ? Div({
-          id: 'block-include-filters',
+          name: 'Conditional Visibility',
+        },
+        [
+          Control({
+            label: 'Enable conditional visibility',
+          }, Toggle({
+            id: 'toggle-filters',
+            checked: getActiveBlock().filters_enabled || false,
+            onChange: e => updateBlock({ filters_enabled: e.target.checked, reRenderControls: true }),
+          })),
+          getActiveBlock().filters_enabled ? Div({
+            id: 'block-include-filters',
+            onCreate: el => {
+              setTimeout(() => {
+                Groundhogg.filters.functions.createFilters(
+                  '#block-include-filters', getActiveBlock().include_filters, (include_filters) => {
+                    updateBlock({
+                      include_filters,
+                      reRenderBlocks: false,
+                    })
+                  }).init()
+              })
+            },
+          }) : null,
+          getActiveBlock().filters_enabled ? Div({
+            id: 'block-exclude-filters',
+            onCreate: el => {
+              setTimeout(() => {
+                Groundhogg.filters.functions.createFilters(
+                  '#block-exclude-filters', getActiveBlock().exclude_filters, (exclude_filters) => {
+                    updateBlock({
+                      exclude_filters,
+                      reRenderBlocks: false,
+                    })
+                  }).init()
+              })
+            },
+          }) : null,
+        ]),
+      ControlGroup({ name: 'Custom CSS' }, [
+        Textarea({
+          id: 'code-css-editor',
+          value: getActiveBlock().css || '',
           onCreate: el => {
+
+            // Wait for add to dom
             setTimeout(() => {
-              Groundhogg.filters.functions.createFilters(
-                '#block-include-filters', getActiveBlock().include_filters, (include_filters) => {
-                  updateBlock({
-                    include_filters,
-                    reRenderBlocks: false,
-                  })
-                }).init()
-            })
+
+              let editor = wp.codeEditor.initialize('code-css-editor', {
+                ...wp.codeEditor.defaultSettings,
+                codemirror: {
+                  ...wp.codeEditor.defaultSettings.codemirror,
+                  mode: 'text/css',
+                  gutters: [
+                    'CodeMirror-lint-markers',
+                  ],
+                },
+              }).codemirror
+
+              editor.on('change', instance => updateBlock({
+                css: instance.getValue(),
+              }))
+
+              editor.setSize(null, 500)
+            }, 100)
           },
-        }) : null,
-        getActiveBlock().filters_enabled ? Div({
-          id: 'block-exclude-filters',
-          onCreate: el => {
-            setTimeout(() => {
-              Groundhogg.filters.functions.createFilters(
-                '#block-exclude-filters', getActiveBlock().exclude_filters, (exclude_filters) => {
-                  updateBlock({
-                    exclude_filters,
-                    reRenderBlocks: false,
-                  })
-                }).init()
-            })
-          },
-        }) : null,
+        }),
       ]),
     ])
   }
@@ -2110,7 +2174,23 @@
     let {
       message_type = 'marketing',
       reply_to_override = '',
+      browser_view = false,
     } = getEmailMeta()
+
+    let { from_user } = getEmailData()
+
+    let fromOptions = [
+      { id: 0, text: __('Contact Owner') },
+      { id: 'default', text: `${Groundhogg.defaults.from_name} &lt;${Groundhogg.defaults.from_email}&gt;` },
+      ...Groundhogg.filters.owners.map(({ data, ID }) => ({
+        id: ID,
+        text: `${data.display_name} &lt;${data.user_email}&gt;`,
+      }))]
+
+    let replyToOptions = [
+      Groundhogg.defaults.from_email,
+      ...Groundhogg.filters.owners.map(({ data }) => data.user_email),
+    ].filter(onlyUnique)
 
     return Fragment([
       ControlGroup({
@@ -2120,43 +2200,29 @@
         Control({
           label: 'Send this email from...',
           stacked: true,
-        }, Select({
+        }, ItemPicker({
           id: 'from-user',
-          name: 'from_user',
-          options: [
-            { value: 0, text: __('Contact Owner') },
-            { value: 'default', text: `${Groundhogg.defaults.from_name} &lt;${Groundhogg.defaults.from_email}&gt;` },
-            ...Groundhogg.filters.owners.map(({ data, ID }) => ({
-              value: ID,
-              text: `${data.display_name} &lt;${data.user_email}&gt;`,
-            })),
-          ],
-          selected: getEmailData().from_user,
-          onChange: e => setEmailData({ from_user: e.target.value }),
+          multiple: false,
+          placeholder: 'Search for a sender...',
+          noneSelected: 'Pick a sender...',
+          fetchOptions: search => Promise.resolve(fromOptions.filter(item => item.text.includes(search))),
+          selected: fromOptions.find(opt => from_user === opt.id),
+          onChange: item => setEmailData({ from_user: item.id }),
         })),
         Control({
           label: 'Send replies to...',
           stacked: true,
-        }, Input({
+        }, ItemPicker({
           id: 'reply-to',
-          type: 'email',
-          value: reply_to_override,
-          onInput: e => setEmailMeta({ reply_to_override: e.target.value }),
-          onChange: e => setEmailMeta({ reply_to_override: e.target.value }),
-          onCreate: el => {
-
-            let source = Groundhogg.filters.owners.map(({ data }) => ({
-              value: data.user_email,
-              label: data.display_name,
-            }))
-
-            // $(el).autocomplete({
-            //   source,
-            // }).autocomplete('instance')._renderItem = function (ul, item) {
-            //   return $('<li>').append(`<div><b>${item.label}</b><br/>${item.value}</div>`).appendTo(ul)
-            // }
-
-          },
+          multiple: false,
+          tags: true,
+          isValidSelection: id => isValidEmail(id),
+          placeholder: 'Type an email address...',
+          noneSelected: getEmail().context.from_email,
+          fetchOptions: search => Promise.resolve(
+            replyToOptions.filter(item => item.includes(search)).map(em => ({ id: em, text: em }))),
+          selected: reply_to_override ? { id: reply_to_override, text: reply_to_override } : [],
+          onChange: item => setEmailMeta({ reply_to_override: item ? item.id : '' }),
         })),
         Control({
           label: 'Message type',
@@ -2177,6 +2243,29 @@
           },
         })),
         Control({
+          label: 'Enable browser view',
+        }, Toggle({
+          id: 'enable-browser-view',
+          checked: Boolean(browser_view),
+          onChange: e => {
+            setEmailMeta({
+              browser_view: e.target.checked,
+            })
+          },
+        })),
+        Control({
+          label: 'Show in my templates',
+        }, Toggle({
+          id: 'save-as-template',
+          checked: Boolean(parseInt(getEmailData().is_template)),
+          onChange: e => {
+            setEmailData({
+              is_template: e.target.checked,
+            })
+          },
+        })),
+        `<hr/>`,
+        Control({
           label: 'Template',
         }, Select({
           id: 'select-template',
@@ -2194,6 +2283,112 @@
     ])
   }
 
+  const EditorControls = () => {
+
+    const DisplayFont = font => Div({
+      id: `font-${font.id}`,
+      className: 'font space-between',
+    }, [
+      Span({ style: { ...fillFontStyle(font.style), margin: '0' } }, font.name),
+      Div({
+        className: 'display-flex',
+      }, [
+        Button({
+          id: `delete-${font.id}`,
+          className: 'gh-button danger text icon small',
+          onClick: e => {
+
+            dangerConfirmationModal({
+              //language=HTML
+              alert: `<p>${__('You\'re about to delete a global font! This cannot be undone.')}</p>
+			  <p>${__('Any blocks currently using this font will inherit the font settings.')}</p>`,
+              confirmText: 'Delete',
+              onConfirm: () => {
+                GlobalFonts.delete(font.id)
+                morphControls()
+                // close()
+              },
+            })
+          },
+        }, Dashicon('trash')),
+        Button({
+          id: `edit-${font.id}`,
+          className: 'gh-button secondary text small icon',
+          onClick: e => {
+            MiniModal({
+                selector: `#font-${font.id}`,
+              }, ({ close }) => Div({
+                className: 'display-flex column gap-10',
+              }, [
+                Input({
+                  className: 'full-width',
+                  id: `font-name`,
+                  value: font.name,
+                  padding: 'Font name...',
+                  onChange: e => {
+                    GlobalFonts.get(font.id).name = e.target.value
+                    morphControls()
+                  },
+                }),
+                // `<hr/>`,
+                FontControls(GlobalFonts.get(font.id).style, style => {
+                  GlobalFonts.update(font.id, style)
+                  morphBlocks()
+                  morphControls()
+                }),
+              ]),
+            )
+          },
+        }, Dashicon('edit')),
+      ]),
+    ])
+
+    return Fragment([
+      // ControlGroup({ name: 'Buttons' }),
+      ControlGroup({ name: 'Global Fonts' }, [
+        ...GlobalFonts.fonts.map(f => DisplayFont(f)),
+        `<hr/>`,
+        Button({
+          id: 'add-new-font',
+          className: 'gh-button grey',
+          onClick: e => {
+            let font = GlobalFonts.add()
+            morphControls()
+            document.getElementById(`edit-${font.id}`).click()
+          },
+        }, 'Add Font'),
+      ]),
+      ControlGroup({ name: 'Color Palettes' }, [
+        `<p>Choose up to 8 colors for the color picker.</p>`,
+        InputRepeater({
+          id: 'global-colors',
+          rows: colorPalette.map(color => ['', color]),
+          maxRows: 8,
+          cells: [
+            ({ onChange, value, ...props }, row) => Div({
+              style: {
+                width: '33px',
+                flexShrink: 0,
+                border: 'solid white',
+                borderWidth: '3px 0 3px 3px',
+                borderRadius: '5px 0 0 5px',
+                backgroundColor: row[1],
+              },
+              ...props,
+            }),
+            props => Input({
+              ...props,
+              placeholder: '#FFFFFF',
+            }),
+          ],
+          onChange: rows => {
+            colorPalette = rows.map(r => r[1])
+          },
+        }),
+      ]),
+    ])
+  }
+
   const EmailControls = () => {
 
     let controls
@@ -2204,6 +2399,9 @@
         break
       case 'advanced':
         controls = AdvancedEmailControls()
+        break
+      case 'editor':
+        controls = EditorControls()
         break
     }
 
@@ -2256,6 +2454,13 @@
             morphControls()
           },
         }, __('Advanced')),
+        Button({
+          className: `tab ${getEmailControlsTab() === 'editor' ? 'active' : 'inactive'}`,
+          onClick: e => {
+            setEmailControlsTab('editor')
+            morphControls()
+          },
+        }, Dashicon('admin-settings')),
       ])
 
     }
@@ -2578,7 +2783,7 @@
         id: 'switch-to-draft',
         className: 'gh-button danger text',
         onClick: e => {
-          confirmationModal({
+          dangerConfirmationModal({
             alert: `<p>Are you sure you want to switch this email to <b>draft</b>?</p><p>Doing so will prevent it from being sent in any funnels.</p>`,
             onConfirm: () => {
               setEmailData({
@@ -2629,26 +2834,132 @@
       UndoRedo(),
       PreviewButtons(),
       PublishActions(),
-      !isEmailEditorPage() ? Button({
-        id: 'close-editor',
+      getEmail().ID ? Button({
+        id: 'email-more-menu',
         className: 'gh-button secondary text icon',
         onClick: e => {
+          moreMenu('#email-more-menu', [
+            {
+              key: 'broadcast',
+              text: 'Broadcast',
+              onSelect: e => {
 
-          if (getState().hasChanges) {
-            confirmationModal({
-              alert: `<p>You have unsaved changes! Are you sure you want to leave?</p>`,
-              onConfirm: onClose,
-            })
-            return
-          }
+                if (getEmailData().status !== 'ready') {
+                  dialog({
+                    message: 'This email must be published before it can be sent!',
+                    type: 'error',
+                  })
+                  return
+                }
 
-          onClose()
+                modal({
+                  dialogClasses: 'overflow-visible',
+                  content: `<div id="gh-broadcast-form" style="width: 400px"></div>`,
+                  onOpen: ({ close }) => {
+                    Groundhogg.SendBroadcast('#gh-broadcast-form', {
+                      email: EmailsStore.get(getEmail().ID),
+                    }, {
+                      onScheduled: () => {
+                        close()
+                        dialog({
+                          message: 'Broadcast scheduled!',
+                        })
+                      },
+                    })
+                  },
+                })
+
+              },
+            },
+            {
+              key: 'export',
+              text: 'Export',
+              onSelect: e => {
+
+                window.open(adminPageURL('gh_emails', {
+                  action: 'export',
+                  email: getEmail().ID,
+                  _wpnonce: Groundhogg.nonces._wpnonce,
+                }))
+
+              },
+            },
+            {
+              key: 'delete',
+              text: `<span class="gh-text danger">${__('Delete')}</span>`,
+              onSelect: e => {
+
+                dangerConfirmationModal({
+                  alert: `<p>Are you sure you want to delete this email?</p><p>This action cannot be undone.</p>`,
+                  onConfirm: () => {
+                    window.open(adminPageURL('gh_emails', {
+                      action: 'delete',
+                      email: getEmail().ID,
+                      _wpnonce: Groundhogg.nonces._wpnonce,
+                    }), '_self')
+                  },
+                })
+              },
+            },
+          ])
         },
-      }, Dashicon('no-alt')) : null,
+      }, icons.verticalDots) : null,
+      CloseButton(),
     ])
   }
 
+  const CloseButton = () => !isEmailEditorPage() ? Button({
+    id: 'close-editor',
+    className: 'gh-button secondary text icon',
+    onClick: e => {
+
+      if (getState().hasChanges) {
+        dangerConfirmationModal({
+          alert: `<p>You have unsaved changes! Are you sure you want to leave?</p>`,
+          onConfirm: onClose,
+        })
+        return
+      }
+
+      onClose()
+    },
+  }, Dashicon('no-alt')) : null
+
   const EmailEditor = () => {
+
+    if (getState().page === 'templates') {
+      return Div({
+        id: 'email-editor',
+      }, [
+        // Header
+        Div({
+            id: 'email-header',
+            className: 'gh-header is-sticky',
+          },
+          [
+            icons.groundhogg,
+            Div({
+              className: 'admin-title-wrap',
+              style: {
+                marginRight: 'auto',
+              },
+            }, __('Select a template...')),
+            Button({
+              id: 'start-from-scratch',
+              className: 'gh-button secondary',
+              onClick: e => {
+                setState({
+                  page: 'editor',
+                })
+                morphEmailEditor()
+              },
+            }, 'Start from scratch'),
+            CloseButton(),
+          ]),
+        // Templates
+        TemplatePicker(),
+      ])
+    }
 
     return Div({
       id: 'email-editor',
@@ -2658,6 +2969,90 @@
       // Block editor
       BlockEditor(),
     ])
+  }
+
+  const Template = ({
+    ID,
+    data,
+    meta,
+    context,
+  }) => {
+
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(context.built, 'text/html')
+    doc.querySelector('html').style.zoom = '50%'
+    doc.querySelector('html').style.overflow = 'hidden'
+    doc.body.style.padding = '20px'
+    doc.body.classList.remove('responsive')
+
+    return Div({
+      className: 'template span-4',
+    }, Div({
+      id: `template-${ID}`,
+      className: 'gh-panel',
+      onClick: e => {
+
+        setEmailData({
+          title: data.title,
+        })
+        setEmailMeta({
+          ...meta,
+        })
+        setBlocks(meta.blocks)
+        setState({ page: 'editor' })
+        renderEditor()
+      },
+      onMouseenter: e => {
+        const iframe = document.getElementById(`preview-${ID}`)
+        // *0.51 for zoom
+        iframe.style.height = (iframe.contentWindow.document.body.offsetHeight * 0.51) + 'px'
+      },
+      onMouseleave: e => {
+        const iframe = document.getElementById(`preview-${ID}`)
+        iframe.style.height = 500 + 'px'
+      },
+    }, [
+      `<div class="overlay"></div>`,
+      Iframe({
+        id: `preview-${ID}`,
+        className: 'template-preview',
+        style: {
+          // zoom: '80%',
+          // width: '100%',
+          backgroundColor: '#fff',
+        },
+      }, doc.documentElement.outerHTML),
+      `<p>${data.title}</p>`,
+    ]))
+  }
+
+  const TemplatePicker = () => {
+
+    const Grid = items => Div({
+      id: 'template-grid',
+      className: 'display-grid gap-20',
+    }, items)
+
+    let items
+
+    // Has templates
+    EmailsStore.fetchItems({ is_template: 1, status: 'ready' }).then(items => {
+      morph(Grid(items.map(t => Template(t))))
+    })
+
+    items = [...Array(9).keys()].map(k => Div({
+      className: 'gh-panel span-4',
+    }, [
+      Div({
+        className: 'skeleton-loading',
+        style: {
+          height: '500px',
+        },
+      }),
+      makeEl('p', {}, Span({ className: 'skeleton-loading', style: { width: '100px' } }, '&nbsp;'.repeat(30))),
+    ]))
+
+    return Grid(items)
   }
 
   /**
@@ -2678,14 +3073,15 @@
       // Controls
       ControlsPanel(),
     ])
-
   }
 
   const ColumnGap = (gap = 10) => Td({
     className: 'email-columns-cell gap',
     style: {
       width: `${gap}px`,
+      height: `${gap}px`,
     },
+    height: gap,
     width: gap,
   })
 
@@ -2697,12 +3093,14 @@
         style: {
           verticalAlign,
           ...style,
+          fontWeight: 'normal',
         },
         ...props,
       }, Table({
         className: `column ${blocks.length ? '' : 'empty'}`,
         cellpadding: '0',
         cellspacing: '0',
+        width: '100%',
       }, blocks.map(b => BlockHTML(b))))
     }
 
@@ -2741,88 +3139,57 @@
     return cells
   }
 
+  let columnProps = {
+    oneThird: {
+      className: 'one-third',
+      width: '33%',
+      style: {
+        width: '33%',
+      },
+    },
+    twoThirds: {
+      className: 'two-third',
+      width: '66%',
+      style: {
+        width: '66%',
+      },
+    },
+    onHalf: {
+      className: 'one-half',
+      width: '50%',
+      style: {
+        width: '50%',
+      },
+    },
+  }
+
   const columnLayouts = {
     three_columns: (columns, ...more) => {
       return [
-        {
-          className: 'one-third',
-          width: '33%',
-          style: {
-            width: '33%',
-          },
-        },
-        {
-          className: 'one-third',
-          width: '33%',
-          style: {
-            width: '33%',
-          },
-        },
-        {
-          className: 'one-third',
-          width: '33%',
-          style: {
-            width: '33%',
-          },
-        },
+        columnProps.oneThird,
+        columnProps.oneThird,
+        columnProps.oneThird,
       ].reduce(
         (cells, props, i) => cellReducer(cells, props, i, columns, ...more), [])
     },
     two_columns: (columns, ...more) => {
-      // console.log(more)
       return [
-        {
-          className: 'one-half',
-          width: '50%',
-          style: {
-            width: '50%',
-          },
-        },
-        {
-          className: 'one-half',
-          width: '50%',
-          style: {
-            width: '50%',
-          },
-        },
+        columnProps.onHalf,
+        columnProps.onHalf,
       ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
         [])
     },
     two_columns_right: (columns, ...more) => {
       return [
-        {
-          className: 'two-third',
-          width: '66%',
-          style: {
-            width: '66%',
-          },
-        },
-        {
-          className: 'one-third',
-          width: '33%',
-          style: {
-            width: '33%',
-          },
-        },
+        columnProps.twoThirds,
+        columnProps.oneThird,
       ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
         [])
     },
     two_columns_left: (columns, ...more) => {
       return [
-        {
-          className: 'one-third',
-          width: '33%',
-          style: {
-            width: '33%',
-          },
-        },
-        {
-          className: 'two-third',
-          width: '66%',
-          style: {
-            width: '66%',
-          },
-        },
+        columnProps.oneThird,
+        columnProps.twoThirds,
       ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
         [])
     },
@@ -2936,32 +3303,46 @@
     lineHeight: '1.4',
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 'normal',
-    color: '#1a1a1a',
+    // color: '#1a1a1a',
     fontSize: 13,
+    fontStyle: 'normal',
+    textTransform: 'none',
     ...style,
   })
 
-  const fillFontStyle = ({ fontSize = 16, ...style }) => ({
-    lineHeight: '1.4',
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 'normal',
-    color: '#000',
-    fontSize: `${fontSize}px`,
-    ...style,
-  })
+  const fillFontStyle = ({ use = 'custom', color = '', fontSize = 16, ...style }) => {
+
+    // global font
+    if (GlobalFonts.has(use)) {
+      let font = GlobalFonts.get(use).style
+      if (font) {
+        return fillFontStyle({
+          ...font,
+          color,
+        })
+      }
+    }
+
+    return {
+      ...fontDefaults(style),
+      color,
+      fontSize: `${fontSize}px`,
+    }
+  }
 
   const fontStyle = style => {
     return objectToStyle(fillFontStyle(style))
   }
 
-  const TagFontControlGroup = (name, tag, style, updateBlock, supports = {}) => {
+  const FontControls = (style = {}, onChange = style => {}, supports = {}) => {
 
     supports = {
       fontSize: true,
       fontFamily: true,
       fontWeight: true,
-      color: true,
       lineHeight: true,
+      fontStyle: true,
+      textTransform: true,
       ...supports,
     }
 
@@ -2969,13 +3350,86 @@
       fontSize = '14',
       fontFamily = '',
       fontWeight = 'normal',
-      color = '',
+      fontStyle = 'normal',
+      textTransform = 'none',
       lineHeight = '1.4',
+    } = fontDefaults(style)
+
+    return Div({
+      className: 'font-controls display-flex column gap-10',
+    }, [
+      !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, Input({
+        type: 'number',
+        id: `font-size`,
+        name: `font_size`,
+        className: 'font-control control-input',
+        value: fontSize,
+        onInput: e => onChange({ fontSize: e.target.value }),
+      })),
+      !supports.lineHeight ? null : Control({ label: __('Line Height', 'groundhogg') }, Input({
+        type: 'number',
+        id: `line-height`,
+        name: `line_height`,
+        className: 'font-control control-input',
+        value: lineHeight,
+        step: '0.1',
+        max: 10,
+        onInput: e => onChange({ lineHeight: e.target.value }),
+      })),
+      !supports.fontWeight ? null : Control({ label: __('Font Weight', 'groundhogg') }, Select({
+        id: `font-weight`,
+        name: `font_weight`,
+        className: 'font-control control-input',
+        selected: fontWeight,
+        options: fontWeights.map(i => ({ value: i, text: i })),
+        onChange: e => onChange({ fontWeight: e.target.value }),
+      })),
+      !supports.fontFamily ? null : Control({ label: __('Font Family', 'groundhogg') }, Select({
+        id: `font-family`,
+        name: `font_family`,
+        className: 'font-control control-input',
+        selected: fontFamily,
+        options: fontFamilies,
+        onChange: e => onChange({ fontFamily: e.target.value }),
+      })),
+      !supports.fontStyle ? null : Control({ label: __('Font Style', 'groundhogg') }, Select({
+        id: `font-style`,
+        name: `font_style`,
+        className: 'font-control control-input',
+        selected: fontStyle,
+        options: {
+          normal: 'Normal',
+          italic: 'Italic',
+          oblique: 'Oblique',
+        },
+        onChange: e => onChange({ fontStyle: e.target.value }),
+      })),
+      !supports.textTransform ? null : Control({ label: __('Transform', 'groundhogg') }, Select({
+        id: `text-transform`,
+        name: `text_transform`,
+        className: 'font-control control-input',
+        selected: textTransform,
+        options: {
+          none: 'None',
+          capitalize: 'Capitalize',
+          uppercase: 'Uppercase',
+          lowercase: 'Lowercase',
+        },
+        onChange: e => onChange({ textTransform: e.target.value }),
+      })),
+    ])
+  }
+
+  const TagFontControlGroup = (name, tag = '', style = {}, updateBlock = () => {}, supports = {}) => {
+
+    let {
+      use = 'global',
+      color = '',
     } = style
 
     const updateStyle = (newStyle) => {
       style = {
-        ...style,
+        ...getActiveBlock()[tag],
         ...newStyle,
       }
 
@@ -2984,44 +3438,77 @@
       })
     }
 
+    const DisplayFont = (font, selected, close) => {
+      return Div({
+        className: `select-font ${selected ? 'selected' : ''}`,
+        id: font.id,
+        onClick: e => {
+          use = font.id
+          updateStyle({
+            use,
+            ...font.style,
+          })
+          morphControls()
+          close()
+        },
+      }, Span({
+        style: {
+          ...fillFontStyle(font.style),
+          // margin: 0
+        },
+      }, font.name))
+    }
+
     return ControlGroup({
       name,
     }, [
-      !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, Input({
-        type: 'number',
-        id: `${tag}-font-size`,
-        name: `${tag}_font_size`,
-        className: 'font-control control-input',
-        value: style.fontSize,
-        onInput: e => updateStyle({ fontSize: e.target.value }),
-      })),
-      !supports.lineHeight ? null : Control({ label: __('Line Height', 'groundhogg') }, Input({
-        type: 'number',
-        id: `${tag}-line-height`,
-        name: `${tag}_line_height`,
-        className: 'font-control control-input',
-        value: style.lineHeight,
-        step: '0.1',
-        max: 10,
-        onInput: e => updateStyle({ lineHeight: e.target.value }),
-      })),
-      !supports.fontWeight ? null : Control({ label: __('Font Weight', 'groundhogg') }, Select({
-        id: `${tag}-font-weight`,
-        name: `${tag}_font_weight`,
-        className: 'font-control control-input',
-        selected: style.fontWeight,
-        options: fontWeights.map(i => ({ value: i, text: i })),
-        onChange: e => updateStyle({ fontWeight: e.target.value }),
-      })),
-      !supports.fontFamily ? null : Control({ label: __('Font Family', 'groundhogg') }, Select({
-        id: `${tag}-font-family`,
-        name: `${tag}_font_family`,
-        className: 'font-control control-input',
-        selected: style.fontFamily,
-        options: fontFamilies,
-        onChange: e => updateStyle({ fontFamily: e.target.value }),
-      })),
-      !supports.color ? null : Control({ label: __('Font Color', 'groundhogg') }, ColorPicker({
+
+      Control({
+        label: 'Font',
+      }, Div({
+        className: 'gh-input-group',
+      }, [
+        Button({
+          id: `${tag}-use-global`,
+          className: `gh-button small ${GlobalFonts.has(use) ? 'primary' : 'secondary'}`,
+          onClick: e => {
+            MiniModal({
+              selector: `#${tag}-use-global`,
+              dialogClasses: 'no-padding',
+            }, ({ close }) => Div({
+              className: 'display-flex column global-font-select',
+            }, [
+              ...GlobalFonts.fonts.map(font => DisplayFont(font, use === font.id, close)),
+            ]))
+          },
+        }, Dashicon('admin-site')),
+        Button({
+          id: `${tag}-use-custom`,
+          className: `gh-button small ${!GlobalFonts.has(use) ? 'primary' : 'secondary'}`,
+          onClick: e => {
+
+            updateStyle({
+              use: 'custom',
+            })
+
+            morphControls()
+
+            MiniModal({
+                dialogClasses: 'no-padding',
+                selector: `#${tag}-use-custom`,
+                // onClose: () => morphControls(),
+              }, Div({
+                className: 'display-flex column gap-10',
+              }, [
+                FontControls(style, style => {
+                  updateStyle(style)
+                }, supports),
+              ]),
+            )
+          },
+        }, Dashicon('edit')),
+      ])),
+      Control({ label: __('Color', 'groundhogg') }, ColorPicker({
         id: `${tag}-font-color`,
         value: color,
         onChange: color => updateStyle({ color }),
@@ -3033,15 +3520,17 @@
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
-		     style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
+		     style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path 
+        fill="currentColor"
+        d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
     controls: ({ layout = 'two_columns', gap = 0, verticalAlign = 'top', updateBlock }) => {
 
       const layoutChoices = {
-        one_column: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="16.549 60.934 499.999 150"><path d="M511.548 60.934c2.761 0 5 1.343 5 3v144c0 1.656-2.239 3-5 3H21.549c-2.761 0-5-1.344-5-3v-144c0-1.657 2.239-3 5-3Z"/></svg>`,
-        three_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="23.085 13.971 499.999 150"><path d="M28.085 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H28.085a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM201.418 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H201.418a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM374.751 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H374.751a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 5.588)"/></svg>`,
-        two_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="569.217 10.755 500 150"><path d="M574.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM834.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 4.302)"/></svg>`,
-        two_columns_right: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="24.417 277.63 499.999 150"><path d="M29.417 277.63h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H29.417a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM376.083 277.63h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H376.083a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.052)"/></svg>`,
-        two_columns_left: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="568.076 279.146 500 150"><path d="M746.409 279.146h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H746.409a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM573.076 279.146h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H573.076a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.658)"/></svg>`,
+        one_column: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="16.549 60.934 499.999 150"><path fill="currentColor" d="M511.548 60.934c2.761 0 5 1.343 5 3v144c0 1.656-2.239 3-5 3H21.549c-2.761 0-5-1.344-5-3v-144c0-1.657 2.239-3 5-3Z"/></svg>`,
+        three_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="23.085 13.971 499.999 150"><path fill="currentColor" d="M28.085 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H28.085a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM201.418 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H201.418a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM374.751 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H374.751a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 5.588)"/></svg>`,
+        two_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="569.217 10.755 500 150"><path fill="currentColor" d="M574.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM834.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 4.302)"/></svg>`,
+        two_columns_right: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="24.417 277.63 499.999 150"><path fill="currentColor" d="M29.417 277.63h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H29.417a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM376.083 277.63h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H376.083a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.052)"/></svg>`,
+        two_columns_left: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="568.076 279.146 500 150"><path fill="currentColor" d="M746.409 279.146h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H746.409a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM573.076 279.146h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H573.076a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.658)"/></svg>`,
       }
 
       return [
@@ -3102,16 +3591,6 @@
     css: ({ selector, id, columns, gap = 10 }) => {
       //language=CSS
       return `
-
-          ${selector} .email-columns .email-columns-cell.gap {
-              width: ${gap}px;
-              height: ${gap}px;
-          }
-
-          ${selector} .email-columns .email-columns-cell.one-third {
-              width: ${(1 / 3) * 100}%;
-          }
-
           ${columns.map(col => col.length ? renderBlocksCSS(col) : '').join('')}
       `
     },
@@ -3127,6 +3606,12 @@
   })
 
   const textContent = ({ content, p, h1, h2, h3, a }) => {
+
+    if (!content) {
+      return Div({
+        className: 'text-content-wrap',
+      }, '')
+    }
 
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
@@ -3165,7 +3650,9 @@
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
-		     viewBox="0 0 977.7 977.7"><path d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
+		     viewBox="0 0 977.7 977.7">
+        <path fill="currentColor"
+              d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
     controls: ({ p = {}, a = {}, h1 = {}, h2 = {}, h3 = {}, updateBlock, curBlock }) => {
 
       return Fragment([
@@ -3185,12 +3672,14 @@
 
         let editorId = `text-${id}`
 
-        modal({
-          content: textarea({
-            value: content,
-            id: editorId,
-          }),
-          width: 600,
+        ModalFrame({
+          // content: ,
+          // width: 600,
+          frameAttributes: {
+            style: {
+              width: '600px',
+            },
+          },
           onOpen: () => {
             wp.editor.remove(editorId)
             tinymceElement(editorId, {
@@ -3200,6 +3689,7 @@
               quicktags: true,
               settings: {
                 height: 800,
+                width: 800,
               },
             }, (newContent) => {
               content = newContent
@@ -3208,7 +3698,10 @@
               })
             })
           },
-        })
+        }, Textarea({
+          value: content,
+          id: editorId,
+        }))
       }
 
       return Fragment([
@@ -3304,10 +3797,10 @@
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-			<path fill="#444"
+			<path fill="currentColor"
 			      d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
 		</svg>`,
-    controls: ({ text, link, style, align, size, updateBlock }) => {
+    controls: ({ text, link, style, align, size, borderStyle = {}, updateBlock = () => {} }) => {
       return [
         ControlGroup({
           name: 'Content',
@@ -3367,10 +3860,20 @@
             }),
           })),
         ]),
-        TagFontControlGroup('Button Font', 'style', style, updateBlock),
+        BorderControlGroup({
+          ...borderStyle,
+          onChange: newStyle => updateBlock({
+            borderStyle: {
+              ...getActiveBlock().borderStyle,
+              ...newStyle,
+            },
+            reRenderControls: true,
+          }),
+        }),
+        TagFontControlGroup('Font', 'style', style, updateBlock),
       ]
     },
-    html: ({ text, align, style, size, link }) => {
+    html: ({ text, align, style, size, link, borderStyle = {} }) => {
       let padding
       switch (size) {
         case 'sm':
@@ -3405,6 +3908,7 @@
           style: {
             padding,
             borderRadius: '3px',
+            ...addBorderStyle(borderStyle),
           },
           align: 'center',
         }, makeEl('a', {
@@ -3418,7 +3922,7 @@
         }, text)))))),
       ])
     },
-    edit: ({ text, align, style, size, updateBlock }) => {
+    edit: ({ text, align, style, size, updateBlock, borderStyle = {} }) => {
 
       let padding
       switch (size) {
@@ -3461,6 +3965,7 @@
           style: {
             padding,
             borderRadius: '3px',
+            ...addBorderStyle(borderStyle),
           },
           align: 'center',
         }, makeEl('a', {
@@ -3482,9 +3987,13 @@
     plainText: ({ text, link = '' }) => {
       return `[${text}](${link})`
     },
-    css: ({ selector, style }) => {
+    css: ({ selector, style, borderStyle = {} }) => {
       //language=CSS
       return `
+          ${selector} td.email-button {
+              ${objectToStyle(addBorderStyle(borderStyle))}
+          }
+
           ${selector} a {
               ${fontStyle(style)}
           }`
@@ -3506,51 +4015,63 @@
 
   registerBlock('image', 'Image', {
     svg: icons.image,
-    controls: ({ id, src, link = '', width, height, alt = '', align = 'center', updateBlock }) => {
+    controls: ({ id, src, link = '', width, height, alt = '', align = 'center', updateBlock, borderStyle = {} }) => {
 
-      return ControlGroup({
-        name: 'Image',
-      }, [
-        ImageControls({
-          id: 'image',
-          image: {
-            src,
-            alt,
-            // title,
-            width,
-          },
-          maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
-          onChange: image => {
-            updateBlock({
-              ...image,
-              reRenderControls: true,
-            })
-          },
+      return Fragment([
+        ControlGroup({
+          name: 'Image',
+        }, [
+          ImageControls({
+            id: 'image',
+            image: {
+              src,
+              alt,
+              // title,
+              width,
+            },
+            maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
+            onChange: image => {
+              updateBlock({
+                ...image,
+                reRenderControls: true,
+              })
+            },
+          }),
+          Control({
+            label: 'Alignment',
+          }, AlignmentButtons({
+            alignment: align,
+            onChange: align => {
+              updateBlock({
+                align,
+                reRenderControls: true,
+              })
+            },
+          })),
+          Control({
+            label: 'Link',
+            stacked: true,
+          }, InputWithReplacements({
+            type: 'text',
+            id: 'image-link',
+            className: 'full-width',
+            value: link,
+            onChange: e => updateBlock({ link: e.target.value }),
+          })),
+        ]),
+        BorderControlGroup({
+          ...borderStyle,
+          onChange: newStyle => updateBlock({
+            borderStyle: {
+              ...getActiveBlock().borderStyle,
+              ...newStyle,
+            },
+            reRenderControls: true,
+          }),
         }),
-        Control({
-          label: 'Alignment',
-        }, AlignmentButtons({
-          alignment: align,
-          onChange: align => {
-            updateBlock({
-              align,
-              reRenderControls: true,
-            })
-          },
-        })),
-        Control({
-          label: 'Link',
-          stacked: true,
-        }, InputWithReplacements({
-          type: 'text',
-          id: 'image-link',
-          className: 'full-width',
-          value: link,
-          onChange: e => updateBlock({ link: e.target.value }),
-        })),
       ])
     },
-    edit: ({ src, width, height, alt = '', align = 'center', updateBlock }) => {
+    edit: ({ src, width, height, alt = '', align = 'center', updateBlock, borderStyle = {} }) => {
 
       return Div({
         className: 'img-container full-width',
@@ -3585,10 +4106,11 @@
           verticalAlign: 'bottom',
           height: 'auto',
           width,
+          ...addBorderStyle(borderStyle),
         },
       }))
     },
-    html: ({ src, width, height, link = '', alt = '', align = 'center' }) => {
+    html: ({ src, width, height, link = '', alt = '', align = 'center', borderStyle = {} }) => {
 
       let img = makeEl('img', {
         src,
@@ -3600,6 +4122,7 @@
           verticalAlign: 'bottom',
           height: 'auto',
           width,
+          ...addBorderStyle(borderStyle),
         },
       })
 
@@ -3632,7 +4155,7 @@
   registerBlock('spacer', 'Spacer', {
     svg: `
         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
-  <path color="currentColor"
+  <path fill="currentColor"
         d="M352 384h-48V128h48a16 16 0 0 0 11-27L267 5c-6-7-16-7-22 0l-96 96c-5 4-6 11-4 17 3 6 9 10 15 10h48v256h-48a16 16 0 0 0-11 27l96 96c6 7 16 7 22 0l96-96a16 16 0 0 0-11-27z"/>
 </svg>`,
     controls: ({ height = 10, updateBlock }) => {
@@ -3674,7 +4197,7 @@
   registerBlock('divider', 'Divider', {
     svg: `
         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 409.6 409.6">
-  <path d="M393 188H17a17 17 0 1 0 0 34h376a17 17 0 1 0 0-34z"/>
+  <path fill="currentColor" d="M393 188H17a17 17 0 1 0 0 34h376a17 17 0 1 0 0-34z"/>
 </svg>`,
     controls: ({ height = 10, width = 80, color, updateBlock, lineStyle }) => {
       return ControlGroup({
@@ -3758,38 +4281,21 @@
     // language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
-  <path
-	  d="M507 243 388 117a19 19 0 1 0-28 27l106 112-106 112a19 19 0 0 0 28 27l119-126c7-7 7-19 0-26zM152 368 46 256l106-112a19 19 0 0 0-28-27L5 243c-7 7-7 19 0 26l119 126a19 19 0 0 0 27 0c7-7 8-19 1-27zM287 53c-10-2-20 5-22 16l-56 368a19 19 0 0 0 38 6l56-368c2-11-5-21-16-22z"/>
+  <path fill="currentColor"
+        d="M507 243 388 117a19 19 0 1 0-28 27l106 112-106 112a19 19 0 0 0 28 27l119-126c7-7 7-19 0-26zM152 368 46 256l106-112a19 19 0 0 0-28-27L5 243c-7 7-7 19 0 26l119 126a19 19 0 0 0 27 0c7-7 8-19 1-27zM287 53c-10-2-20 5-22 16l-56 368a19 19 0 0 0 38 6l56-368c2-11-5-21-16-22z"/>
 </svg>`,
-    controls: ({ content, updateBlock }) => {
+    controls: ({ content = '', updateBlock }) => {
       return Fragment([
-        Div({
+        Textarea({
           id: 'code-block-editor',
+          value: content,
           onCreate: el => {
 
             // Wait for add to dom
             setTimeout(() => {
-              let editor = wp.CodeMirror(el, {
-                value: getActiveBlock().content,
-                mode: 'htmlmixed',
-                theme: 'default',
-                lineNumbers: true,
-                lineWrapping: true,
-                continueComments: true,
-                direction: 'ltr',
-                indentUnit: 4,
-                indentWithTabs: true,
-                inputStyle: 'contenteditable',
-                styleActiveLine: true,
-                lint: true,
-                autoCloseTags: true,
-                matchTags: {
-                  bothTags: true,
-                },
-                gutters: [
-                  'CodeMirror-lint-markers',
-                ],
-              })
+              let editor = wp.codeEditor.initialize('code-block-editor', {
+                ...wp.codeEditor.defaultSettings,
+              }).codemirror
 
               editor.on('change', instance => updateBlock({
                 content: instance.getValue(),
@@ -3821,7 +4327,9 @@
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
-		     style="enable-background:new 0 0 193.826 193.826" xml:space="preserve"><path d="M191.495 55.511 137.449 1.465a4.998 4.998 0 0 0-7.07 0l-.229.229a17.43 17.43 0 0 0-5.14 12.406c0 3.019.767 5.916 2.192 8.485l-56.55 48.533c-4.328-3.868-9.852-5.985-15.703-5.985a23.444 23.444 0 0 0-16.689 6.913l-.339.339a4.998 4.998 0 0 0 0 7.07l32.378 32.378-31.534 31.533c-.631.649-15.557 16.03-25.37 28.27-9.345 11.653-11.193 13.788-11.289 13.898a4.995 4.995 0 0 0 .218 6.822 4.987 4.987 0 0 0 3.543 1.471c1.173 0 2.349-.41 3.295-1.237.083-.072 2.169-1.885 13.898-11.289 12.238-9.813 27.619-24.74 28.318-25.421l31.483-31.483 30.644 30.644c.976.977 2.256 1.465 3.535 1.465s2.56-.488 3.535-1.465l.339-.339a23.446 23.446 0 0 0 6.913-16.689 23.43 23.43 0 0 0-5.985-15.703l48.533-56.55a17.434 17.434 0 0 0 8.485 2.192c4.687 0 9.093-1.825 12.406-5.14l.229-.229a5 5 0 0 0 0-7.072z"/></svg>`,
+		     style="enable-background:new 0 0 193.826 193.826" xml:space="preserve">
+        <path fill="currentColor"
+              d="M191.495 55.511 137.449 1.465a4.998 4.998 0 0 0-7.07 0l-.229.229a17.43 17.43 0 0 0-5.14 12.406c0 3.019.767 5.916 2.192 8.485l-56.55 48.533c-4.328-3.868-9.852-5.985-15.703-5.985a23.444 23.444 0 0 0-16.689 6.913l-.339.339a4.998 4.998 0 0 0 0 7.07l32.378 32.378-31.534 31.533c-.631.649-15.557 16.03-25.37 28.27-9.345 11.653-11.193 13.788-11.289 13.898a4.995 4.995 0 0 0 .218 6.822 4.987 4.987 0 0 0 3.543 1.471c1.173 0 2.349-.41 3.295-1.237.083-.072 2.169-1.885 13.898-11.289 12.238-9.813 27.619-24.74 28.318-25.421l31.483-31.483 30.644 30.644c.976.977 2.256 1.465 3.535 1.465s2.56-.488 3.535-1.465l.339-.339a23.446 23.446 0 0 0 6.913-16.689 23.43 23.43 0 0 0-5.985-15.703l48.533-56.55a17.434 17.434 0 0 0 8.485 2.192c4.687 0 9.093-1.825 12.406-5.14l.229-.229a5 5 0 0 0 0-7.072z"/></svg>`,
     controls: ({
       layout = '',
       featured = false,
@@ -4041,10 +4549,11 @@
   registerBlock('footer', 'Footer', {
     // language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
-  <path
-	  d="M507 243 388 117a19 19 0 1 0-28 27l106 112-106 112a19 19 0 0 0 28 27l119-126c7-7 7-19 0-26zM152 368 46 256l106-112a19 19 0 0 0-28-27L5 243c-7 7-7 19 0 26l119 126a19 19 0 0 0 27 0c7-7 8-19 1-27zM287 53c-10-2-20 5-22 16l-56 368a19 19 0 0 0 38 6l56-368c2-11-5-21-16-22z"/>
-</svg>`,
+		<svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
+		     xmlns="http://www.w3.org/2000/svg">
+				<path fill="currentColor" d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
+				<path fill="currentColor" d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
+		</svg>`,
     controls: ({ style = {}, linkStyle = {}, alignment = 'left', updateBlock }) => {
       return Fragment([
         ControlGroup({ name: 'Footer' }, [
@@ -4123,13 +4632,15 @@
 
   const morph = (selector, html = null) => {
 
-    if (html === null) {
-      return morphdom(document.getElementById(selector.id), selector)
-    }
+    try {
+      if (html === null) {
+        return morphdom(document.getElementById(selector.id), selector)
+      }
 
-    morphdom(document.querySelector(selector), Fragment(html), {
-      childrenOnly: true,
-    })
+      morphdom(document.querySelector(selector), Fragment(html), {
+        childrenOnly: true,
+      })
+    } catch (e) {}
   }
 
   const initialize = ({
@@ -4197,6 +4708,10 @@
         width: 600,
         custom_headers: {},
       }
+
+      setState({
+        page: 'templates',
+      })
     }
 
     if (!email.meta.template) {
@@ -4233,6 +4748,7 @@
     let html = Table({
       cellpadding: '0',
       cellspacing: '0',
+      width: '100%',
     }, blocks.filter(b => b.type).map(block => BlockHTML(block))).outerHTML
     setIsGeneratingHTML(false)
     return html
@@ -4307,11 +4823,36 @@
         case 'text':
         case 'text_block':
 
-          text = node.querySelector('.text_block').firstElementChild.innerHTML
+          let textContainer = node.querySelector('.text_block').firstElementChild
 
-          block = createBlock('text', {
+          text = textContainer.innerHTML
+
+          let props = {
             content: text,
-          })
+            p: fontDefaults({
+              fontSize: parseInt(textContainer.style.fontSize),
+              fontFamily: textContainer.style.fontFamily,
+            }),
+          }
+
+          const setFontProps = (tag) => {
+            el = textContainer.querySelector(tag)
+
+            if (!el) {
+              return
+            }
+
+            props[tag] = fontDefaults({
+              fontSize: parseInt(el.style.fontSize),
+              fontFamily: el.style.fontFamily,
+            })
+          }
+
+          setFontProps('h1')
+          setFontProps('h2')
+          setFontProps('h3')
+
+          block = createBlock('text', props)
 
           break
         case 'button':
@@ -4319,8 +4860,6 @@
 
           button = node.querySelector('td.email-button')
           a = button.querySelector('a')
-
-          // console.log(a.style.fontSize, a.style.color)
 
           block = createBlock('button', {
             text: a.innerHTML,
@@ -4393,6 +4932,54 @@
     })
   }
 
+  let {
+    colorPalette = [],
+    globalFonts = [],
+    blockDefaults = {},
+  } = _BlockEditor
+
+  // Fill global fonts if none defined
+  if (!globalFonts || !Array.isArray(globalFonts) || !globalFonts.length) {
+    GlobalFonts.fonts = [
+      {
+        name: 'Paragraph',
+        id: uuid(),
+        style: fontDefaults({}),
+      },
+      {
+        name: 'Heading 1',
+        id: uuid(),
+        style: fontDefaults({
+          fontSize: 42,
+        }),
+      },
+      {
+        name: 'Heading 2',
+        id: uuid(),
+        style: fontDefaults({
+          fontSize: 36,
+        }),
+      },
+      {
+        name: 'Heading 3',
+        id: uuid(),
+        style: fontDefaults({
+          fontSize: 24,
+        }),
+      },
+    ]
+  } else {
+    GlobalFonts.fonts = globalFonts
+  }
+
+  // Fill color palette if not custom
+  if (!colorPalette || !Array.isArray(colorPalette) || !colorPalette.length) {
+    // Default WordPress colors
+    colorPalette = ['#000', '#fff', '#dd3333', '#DD9933', '#EEEE22', '#81D742', '#1E73BE', '#8224E3']
+  }
+
+  console.log(colorPalette)
+
   if (isEmailEditorPage()) {
 
     let {
@@ -4400,6 +4987,9 @@
     } = _BlockEditor
 
     if (email) {
+
+      EmailsStore.itemsFetched([email])
+
       window.addEventListener('load', () => {
         initialize({
           email,
