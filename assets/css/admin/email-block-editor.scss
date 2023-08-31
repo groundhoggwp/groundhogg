@@ -138,6 +138,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     background: #FFFFFF;
     cursor: grab;
     margin-bottom: 5px;
+    color: $primary-dark;
 
     &.dragging {
       cursor: grabbing;
@@ -268,7 +269,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           }
         }
 
-        &[data-type="columns"]:has(table.one_column) {
+        &[data-type="columns"] {
           > .block-toolbar {
             right: -2px;
             transform: none;
@@ -443,8 +444,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       flex-direction: column;
       gap: 10px;
 
-      &.inside:has(.CodeMirror ){
-        padding: 0;
+      &.inside:has(.CodeMirror ) {
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 0;
+
+        p {
+          padding: 0 20px;
+        }
       }
 
       p {
@@ -469,31 +476,70 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr 1fr;
         grid-auto-rows: 1fr;
-        gap: 10px 10px;
+        gap: 20px;
         grid-auto-flow: row;
         grid-template-areas:
     ". ."
     ". .";
-      }
 
+        .layout-choice {
+          display: grid;
+          gap: 7px;
+          padding: 0;
 
-      .layout-choice {
+          border: none;
+          background: none;
 
-        &:hover {
-          color: $primary-blue-50;
-        }
+          span.col {
+            background-color: $primary-dark;
+            border-radius: 3px;
+            height: 33px;
+            display: block;
+          }
 
-        &.selected {
-          color: $primary-blue;
-        }
+          &:hover {
+            span {
+              background-color: $primary-blue-50;
+            }
+          }
 
-        border: none;
-        background: none;
-        //padding: 10px;
-        //border-radius: 5px;
+          &.selected {
+            span {
+              background-color: $primary-blue;
+            }
+          }
 
-        svg {
-          width: 100%;
+          &.three_columns {
+            grid-template-columns: repeat(3, 1fr);
+          }
+
+          &.four_columns {
+            grid-template-columns: repeat(4, 1fr);
+          }
+
+          &.three_columns_center {
+            grid-template-columns: 1fr 2fr 1fr;
+          }
+
+          &.three_columns_left {
+            grid-template-columns: 2fr 1fr 1fr;
+          }
+
+          &.three_columns_right {
+            grid-template-columns: 1fr 1fr 2fr;
+          }
+
+          &.two_columns {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          &.two_columns_right {
+            grid-template-columns: 1fr 2fr;
+          }
+
+          &.two_columns_left {
+            grid-template-columns: 2fr 1fr;
+          }
         }
       }
     }
@@ -600,7 +646,7 @@ body {
 
 #email-editor {
 
-  &:has(#email-block-editor){
+  &:has(#email-block-editor) {
     position: fixed;
     left: 160px;
     top: 32px;
@@ -786,7 +832,7 @@ body {
     width: 90vw;
     height: 85vh;
 
-    &:has(#email-block-editor){
+    &:has(#email-block-editor) {
       position: relative;
       left: initial;
       right: initial;
@@ -794,10 +840,10 @@ body {
       bottom: initial;
     }
 
-    &:has(#template-grid){
+    &:has(#template-grid) {
       overflow: auto;
 
-      .gh-header{
+      .gh-header {
         top: 0
       }
     }
@@ -838,7 +884,7 @@ body {
 
   padding: 20px;
 
-  .gh-panel{
+  .gh-panel {
     overflow: hidden;
   }
 
@@ -937,7 +983,7 @@ body {
 }
 
 #email-editor-global-fonts {
-  .font{
+  .font {
     span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -948,8 +994,8 @@ body {
       display: none;
     }
 
-    &:hover{
-      .danger{
+    &:hover {
+      .danger {
         display: inline-block;
       }
     }
@@ -977,6 +1023,6 @@ body {
   }
 }
 
-.gh-modal.mini .gh-modal-dialog:has(.global-font-select){
+.gh-modal.mini .gh-modal-dialog:has(.global-font-select) {
   padding: 0;
 }

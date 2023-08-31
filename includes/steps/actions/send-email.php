@@ -9,6 +9,7 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 
@@ -97,9 +98,9 @@ class Send_Email extends Action {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e('div', [ 'id' => 'step_' . $step->get_id() . '_send_email' ], '', false )
+		echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email' ], '', false )
 
-        ?><p></p><?php
+		?><p></p><?php
 	}
 
 	public function validate_settings( Step $step ) {
@@ -176,6 +177,35 @@ class Send_Email extends Action {
 	 */
 	public function import( $args, $step ) {
 
+		// Not doing new import
+		if ( ! isset_not_empty( $args, 'email' ) ) {
+			// Legacy import
+			if ( isset_not_empty( $args, 'content' ) ){
+				$this->legacy_import( $args, $step );
+			}
+			return;
+		}
+
+		$raw_email = json_decode( wp_json_encode( $args['email'] ), true );
+		$data      = wp_array_slice_assoc( $raw_email['data'], [ 'title', 'subject', 'pre_header', 'content' ] );
+		$meta      = $raw_email['meta'];
+
+		$email = new Email();
+
+		$email->create( $data );
+		$email->update_meta( $meta );
+
+		$step->update_meta( 'email_id', $email->get_id() );
+	}
+
+	/**
+	 * Create a new email and set the step email_id to the ID of the new email.
+	 *
+	 * @param $step Step
+	 * @param $args array list of args to provide criteria for import.
+	 */
+	public function legacy_import( $args, $step ) {
+
 		if ( ! isset_not_empty( $args, 'content' ) || ! isset_not_empty( $args, 'subject' ) ) {
 			return;
 		}
@@ -184,7 +214,7 @@ class Send_Email extends Action {
 			$args['pre_header'] = '';
 		}
 
-		$email_id = Plugin::$instance->dbs->get_db( 'emails' )->add( [
+		$email_id = get_db( 'emails' )->add( [
 			'content'    => $args['content'],
 			'subject'    => $args['subject'],
 			'pre_header' => $args['pre_header'],
@@ -212,15 +242,11 @@ class Send_Email extends Action {
 
 		$email = new Email( $email_id );
 
-		if ( ! $email || ! $email->exists() ) {
+		if ( ! $email->exists() ) {
 			return $args;
 		}
 
-		$args['subject']     = $email->get_subject_line();
-		$args['title']       = $email->get_title();
-		$args['pre_header']  = $email->get_pre_header();
-		$args['content']     = $email->get_content();
-		$args['from_select'] = $email->from_select;
+		$args['email'] = $email;
 
 		return $args;
 	}

@@ -612,7 +612,7 @@
   const closePanel = panel => State.openPanels[panel] = false
   const togglePanel = panel => isPanelOpen(panel) ? closePanel(panel) : openPanel(panel)
   const isPanelOpen = panel => State.openPanels[panel]
-  const getTemplate = () => DesignTemplates.find(t => t.id === getEmailMeta().template)
+  const getTemplate = () => DesignTemplates.find(t => t.id === getEmailMeta().template) || DesignTemplates[0]
 
   const setBlocks = (blocks = [], hasChanges = true) => {
 
@@ -1240,7 +1240,7 @@
               })
             },
           }),
-          `<p><i>Background images to not function in any Windows desktop client. Always set the background color as a fallback.</i></p>`,
+          `<p><i>Background images do not function in any Windows desktop client. Always set the background color as a fallback.</i></p>`,
         ]),
       ])
     },
@@ -2095,10 +2095,12 @@
                 css: instance.getValue(),
               }))
 
-              editor.setSize(null, 500)
+              editor.setSize(null, 300)
             }, 100)
           },
         }),
+        `<p>Use the <code>selector</code> tag to target elements withing the current block.</p>`,
+        `<p>CSS entered here may not be universally supported by email clients. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">CSS compatibility</a>.</p>`
       ]),
     ])
   }
@@ -2945,6 +2947,66 @@
               },
             }, __('Select a template...')),
             Button({
+              id: 'import-email',
+              className: 'gh-button secondary',
+              onClick: e => {
+                Modal({}, ({ close }) => Div({}, [
+                  `<h2>Select a template to import</h2>`,
+                  `<p>${__(
+                    'If you have a popup JSON file, you can upload it below 👇')}</p>`,
+                  Input({
+                    type: 'file',
+                    accept: 'application/json',
+                    id: 'import-email-file',
+                    onChange: e => {
+                      let file = e.target.files[0]
+
+                      let reader = new FileReader()
+                      reader.onload = function (e) {
+
+                        let contents = e.target.result
+                        let email = JSON.parse(contents)
+
+                        if (!email) {
+                          dialog({
+                            type: 'error',
+                            message: __('Invalid import. Choose another file.'),
+                          })
+                          return
+                        }
+
+                        if (!email.ID) {
+                          dialog({
+                            type: 'error',
+                            message: __('Invalid import. Choose another file.'),
+                          })
+                          return
+                        }
+
+                        let {
+                          meta,
+                          data,
+                        } = email
+
+                        setEmailMeta(meta)
+                        setEmailData({
+                          title: data.title,
+                          subject: data.subject,
+                          preview_text: data.preview_text,
+                        })
+                        setBlocks(meta.blocks, false)
+                        setState({ page: 'editor' })
+                        renderEditor()
+                        close()
+                      }
+
+                      reader.readAsText(file)
+                    },
+                  }),
+                ]))
+              },
+            }, [Dashicon('upload'), 'Import a template']),
+            Button({
               id: 'start-from-scratch',
               className: 'gh-button secondary',
               onClick: e => {
@@ -3085,7 +3147,7 @@
     width: gap,
   })
 
-  const Column = ({ blocks, col, className, style = {}, verticalAlign = 'top', ...props }) => {
+  const Column = ({ blocks = [], col, className, style = {}, verticalAlign = 'top', ...props }) => {
 
     if (isGeneratingHTML()) {
       return Td({
@@ -3118,25 +3180,28 @@
     }, blocks.map(b => EditBlockWrapper(b))))
   }
 
-  const cellReducer = (cells, props, i, columns, ...more) => {
+  const cellReducer = (cols, col, props, i) => {
 
-    let [
+    let {
+      columns = [],
       gap = 10,
       verticalAlign = 'top',
-    ] = more
+      ...rest
+    } = props
 
     if (i > 0) {
-      cells.push(ColumnGap(gap))
+      cols.push(ColumnGap(gap))
     }
 
-    cells.push(Column({
-      blocks: columns[i],
+    cols.push(Column({
+      blocks: columns[i] || [],
       col: i,
       verticalAlign,
-      ...props,
+      ...col,
+      ...rest,
     }))
 
-    return cells
+    return cols
   }
 
   let columnProps = {
@@ -3154,58 +3219,80 @@
         width: '66%',
       },
     },
-    onHalf: {
+    oneHalf: {
       className: 'one-half',
       width: '50%',
       style: {
         width: '50%',
       },
     },
+    oneQuarter: {
+      className: 'one-fourth',
+      width: '25%',
+      style: {
+        width: '25%',
+      },
+    },
+    threeQuarters: {
+      className: 'three-quarters',
+      width: '75%',
+      style: {
+        width: '75%',
+      },
+    },
+    full: {
+      className: 'full',
+      width: '100%',
+      style: {
+        width: '100%',
+      },
+    },
   }
 
+  const makeColumns = (cols, props) => cols.reduce((cols, col, i) => cellReducer(cols, col, props, i), [])
+
   const columnLayouts = {
-    three_columns: (columns, ...more) => {
-      return [
-        columnProps.oneThird,
-        columnProps.oneThird,
-        columnProps.oneThird,
-      ].reduce(
-        (cells, props, i) => cellReducer(cells, props, i, columns, ...more), [])
-    },
-    two_columns: (columns, ...more) => {
-      return [
-        columnProps.onHalf,
-        columnProps.onHalf,
-      ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
-        [])
-    },
-    two_columns_right: (columns, ...more) => {
-      return [
-        columnProps.twoThirds,
-        columnProps.oneThird,
-      ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
-        [])
-    },
-    two_columns_left: (columns, ...more) => {
-      return [
-        columnProps.oneThird,
-        columnProps.twoThirds,
-      ].reduce((cells, props, i) => cellReducer(cells, props, i, columns, ...more),
-        [])
-    },
-    one_column: (columns, ...more) => {
-      let [gap, verticalAlign] = more
-      return Column({
-        blocks: columns[0],
-        col: 0,
-        gap: 0,
-        verticalAlign,
-        width: '100%',
-        style: {
-          width: '100%',
-        },
-      })
-    },
+    one_column: [
+      columnProps.full,
+    ],
+    two_columns: [
+      columnProps.oneHalf,
+      columnProps.oneHalf,
+    ],
+    three_columns: [
+      columnProps.oneThird,
+      columnProps.oneThird,
+      columnProps.oneThird,
+    ],
+    four_columns: [
+      columnProps.oneQuarter,
+      columnProps.oneQuarter,
+      columnProps.oneQuarter,
+      columnProps.oneQuarter,
+    ],
+    three_columns_center: [
+      columnProps.oneQuarter,
+      columnProps.oneHalf,
+      columnProps.oneQuarter,
+    ],
+    three_columns_left: [
+      columnProps.oneHalf,
+      columnProps.oneQuarter,
+      columnProps.oneQuarter,
+    ],
+    three_columns_right: [
+      columnProps.oneQuarter,
+      columnProps.oneQuarter,
+      columnProps.oneHalf,
+    ],
+    two_columns_right: [
+      columnProps.oneThird,
+      columnProps.twoThirds,
+    ],
+    two_columns_left: [
+      columnProps.twoThirds,
+      columnProps.oneThird,
+    ],
   }
 
   /**
@@ -3525,13 +3612,17 @@
         d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
     controls: ({ layout = 'two_columns', gap = 0, verticalAlign = 'top', updateBlock }) => {
 
-      const layoutChoices = {
-        one_column: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="16.549 60.934 499.999 150"><path fill="currentColor" d="M511.548 60.934c2.761 0 5 1.343 5 3v144c0 1.656-2.239 3-5 3H21.549c-2.761 0-5-1.344-5-3v-144c0-1.657 2.239-3 5-3Z"/></svg>`,
-        three_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="23.085 13.971 499.999 150"><path fill="currentColor" d="M28.085 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H28.085a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM201.418 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H201.418a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM374.751 13.971h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H374.751a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 5.588)"/></svg>`,
-        two_columns: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="569.217 10.755 500 150"><path fill="currentColor" d="M574.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM834.217 10.755h230a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5h-230a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 4.302)"/></svg>`,
-        two_columns_right: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="24.417 277.63 499.999 150"><path fill="currentColor" d="M29.417 277.63h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H29.417a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM376.083 277.63h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H376.083a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.052)"/></svg>`,
-        two_columns_left: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="568.076 279.146 500 150"><path fill="currentColor" d="M746.409 279.146h316.667a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H746.409a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5ZM573.076 279.146h143.333a5 5 0 0 1 5 5v240a5 5 0 0 1-5 5H573.076a5 5 0 0 1-5-5v-240a5 5 0 0 1 5-5Z" transform="matrix(1 0 0 .6 0 111.658)"/></svg>`,
-      }
+      const LayoutChoice = l => Button({
+        className: `layout-choice ${l} ${layout === l ? 'selected' : ''}`,
+        dataLayout: l,
+        id: `layout-${l}`,
+        onClick: e => {
+          updateBlock({
+            layout: l,
+            reRenderControls: true,
+          })
+        },
+      }, columnLayouts[l].map((col, i) => `<span class="col col-${i + 1}"></span>`))
 
       return [
         ControlGroup({
@@ -3540,12 +3631,7 @@
           Div({
             className: 'layouts',
           }, [
-            ...Object.keys(layoutChoices).map(k => Button({
-              className: `layout-choice ${layout === k ? 'selected' : ''}`,
-              dataLayout: k,
-              id: `layout-${k}`,
-              onClick: e => updateBlock({ layout: k, reRenderControls: true }),
-            }, layoutChoices[k])),
+            ...Object.keys(columnLayouts).map(k => LayoutChoice(k)),
           ]),
           Control({
             label: 'Gap',
@@ -3583,7 +3669,7 @@
             width: '100%',
           },
         },
-        Tr({ className: 'email-columns-row' }, columnLayouts[layout](columns, gap, verticalAlign)))
+        Tr({ className: 'email-columns-row' }, makeColumns(columnLayouts[layout], { columns, gap, verticalAlign })))
     },
     plainText: ({ columns }) => {
       return columns.map(column => renderBlocksPlainText(column)).join('\n\n')
@@ -3597,9 +3683,7 @@
     defaults: {
       layout: 'two_columns',
       columns: [
-        [],
-        [],
-        [],
+        [], [], [], [],
       ],
       gap: 10,
     },
@@ -3638,8 +3722,13 @@
       ...a,
     })
 
-    doc.body.firstElementChild.style.marginTop = 0
-    doc.body.lastElementChild.style.marginBottom = 0
+    if (doc.body.firstElementChild) {
+      doc.body.firstElementChild.style.marginTop = 0
+    }
+
+    if (doc.body.lastElementChild) {
+      doc.body.lastElementChild.style.marginBottom = 0
+    }
 
     return Div({
       className: 'text-content-wrap',
@@ -3697,11 +3786,15 @@
                 content,
               })
             })
+
+            let butn = Button({ className: 'replacements-picker-start gh-button dashicon' }, Dashicon('admin-users'))
+            document.querySelector('.gh-modal .wp-editor-tools').prepend(butn)
           },
-        }, Textarea({
-          value: content,
-          id: editorId,
-        }))
+        }, Div({}, [
+          Textarea({
+            value: content,
+            id: editorId,
+          })]))
       }
 
       return Fragment([
@@ -4551,8 +4644,10 @@
     svg: `
 		<svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
 		     xmlns="http://www.w3.org/2000/svg">
-				<path fill="currentColor" d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
-				<path fill="currentColor" d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
+			<path fill="currentColor"
+			      d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
+			<path fill="currentColor"
+			      d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
 		</svg>`,
     controls: ({ style = {}, linkStyle = {}, alignment = 'left', updateBlock }) => {
       return Fragment([
@@ -4774,7 +4869,7 @@
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
   const morphEmailEditor = () => morph('#email-editor', EmailEditor())
   const morphHeader = () => morph('#email-header', Header())
-  const updateStyles = () => $('#builder-style').text(renderBlocksCSS(getBlocks()))
+  const updateStyles = () => $('#builder-style').text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
 
   const renderEditor = () => {
     morphEmailEditor()

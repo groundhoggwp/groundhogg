@@ -97,6 +97,7 @@
   background: #FFFFFF;
   cursor: grab;
   margin-bottom: 5px;
+  color: #102640;
 }
 #email-block-editor .block.dragging {
   cursor: grabbing;
@@ -188,7 +189,7 @@
 #email-block-editor #content #builder-content .builder-block[data-type=html] .maybe-edit-html {
   min-height: 30px;
 }
-#email-block-editor #content #builder-content .builder-block[data-type=columns]:has(table.one_column) > .block-toolbar {
+#email-block-editor #content #builder-content .builder-block[data-type=columns] > .block-toolbar {
   right: -2px;
   transform: none;
 }
@@ -323,7 +324,12 @@
   gap: 10px;
 }
 #controls-panel .control-group:not(.closed) .controls.inside:has(.CodeMirror) {
-  padding: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+#controls-panel .control-group:not(.closed) .controls.inside:has(.CodeMirror) p {
+  padding: 0 20px;
 }
 #controls-panel .control-group:not(.closed) .controls p {
   margin: 0;
@@ -343,22 +349,52 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   grid-auto-rows: 1fr;
-  gap: 10px 10px;
+  gap: 20px;
   grid-auto-flow: row;
   grid-template-areas: ". ." ". .";
 }
-#controls-panel .control-group:not(.closed) .controls .layout-choice {
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice {
+  display: grid;
+  gap: 7px;
+  padding: 0;
   border: none;
   background: none;
 }
-#controls-panel .control-group:not(.closed) .controls .layout-choice:hover {
-  color: rgba(0, 117, 255, 0.5);
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice span.col {
+  background-color: #102640;
+  border-radius: 3px;
+  height: 33px;
+  display: block;
 }
-#controls-panel .control-group:not(.closed) .controls .layout-choice.selected {
-  color: #0075ff;
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice:hover span {
+  background-color: rgba(0, 117, 255, 0.5);
 }
-#controls-panel .control-group:not(.closed) .controls .layout-choice svg {
-  width: 100%;
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.selected span {
+  background-color: #0075ff;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns {
+  grid-template-columns: repeat(3, 1fr);
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.four_columns {
+  grid-template-columns: repeat(4, 1fr);
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns_center {
+  grid-template-columns: 1fr 2fr 1fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns_left {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns_right {
+  grid-template-columns: 1fr 1fr 2fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.two_columns {
+  grid-template-columns: 1fr 1fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.two_columns_right {
+  grid-template-columns: 1fr 2fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.two_columns_left {
+  grid-template-columns: 2fr 1fr;
 }
 #controls-panel > .gh-panel {
   border-radius: 0;
