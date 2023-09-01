@@ -62,6 +62,7 @@ class Dynamic_Block_Handler {
 	 */
 	public function render_block( $type, $props, $context = 'html' ) {
 		$this->cur_block = $props;
+
 		return call_user_func( $this->blocks[ $type ][ $context ], $props );
 	}
 
@@ -71,8 +72,16 @@ class Dynamic_Block_Handler {
 	 * @param $query \WP_Query
 	 */
 	public function post_query_filter( &$query ) {
-		$query->set( 'tag__in', wp_parse_id_list( get_array_var( $this->cur_block, 'tag', [] ) ) );
-		$query->set( 'category__in', wp_parse_id_list( get_array_var( $this->cur_block, 'category', [] ) ) );
+
+		$args = wp_parse_args( $this->cur_block, [
+			'tag'          => [],
+			'tag_rel'      => 'any',
+			'category'     => [],
+			'category_rel' => 'any',
+		] );
+
+		$query->set( $args['tag_rel'] === 'all' ? 'tag__and' : 'tag__in', wp_parse_id_list( $args['tag'] ) );
+		$query->set( $args['category_rel'] === 'all' ? 'category__and' : 'category__in', wp_parse_id_list( $args['category'] ) );
 	}
 
 	/**

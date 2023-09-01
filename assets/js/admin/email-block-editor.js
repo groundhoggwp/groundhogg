@@ -62,22 +62,37 @@
     'bolder',
   ]
 
-  let fontFamilies = {
-    'system-ui, sans-serif': 'System UI',
-    'Arial, sans-serif': 'Arial',
-    '"Arial Black", Arial, sans-serif': 'Arial Black',
-    '"Century Gothic", Times, serif': 'Century Gothic',
-    'Courier, monospace': 'Courier',
-    '"Courier New", monospace': 'Courier New',
-    'Geneva, Tahoma, Verdana, sans-serif': 'Geneva',
-    'Georgia, Times, Times New Roman, serif': 'Georgia',
-    'Helvetica, Arial, sans-serif': 'Helvetica',
-    'Lucida, Geneva, Verdana, sans-serif': 'Lucida',
-    'Tahoma, Verdana, sans-serif': 'Tahoma',
-    'Times, "Times New Roman", Baskerville, Georgia, serif': 'Times',
-    '"Times New Roman", Times, Georgia, serif': 'Times New Roman',
-    'Verdana, Geneva, sans-serif': 'Verdana',
-  }
+  let fonts = [
+    'system-ui, sans-serif',
+    'Arial, sans-serif', // Web, Mobile, Desktop
+    '"Arial Black", Arial, sans-serif', // Web
+    '"Arial Narrow", Arial, sans-serif', // Web
+    '"Times New Roman", Times, serif', // All
+    'Georgia, serif',
+    '"Courier New", Courier, monospace',
+    'Verdana, Geneva, sans-serif',
+    'Tahoma, sans-serif',
+    '"Trebuchet MS", sans-serif',
+    'Calibri, sans-serif',
+    '"Century Gothic", sans-serif',
+    'Palatino, "Times New Roman", Times, serif',
+    'Garamond, Palatino, "Times New Roman", Times, serif',
+    '"Book Antiqua", Palatino, serif',
+    '"Lucida Grande", sans-serif',
+    '"Lucida Sans", "Lucida Grande", Arial, sans-serif',
+    'Impact, "Arial Black", sans-serif',
+    'Copperplate, sans-serif',
+    '"Copperplate Gothic Light", Copperplate, "Century Gothic", Arial, sans-serif',
+    'Futura, Calibri, Arial, sans-serif',
+  ]
+
+  const fontFamilies = {}
+
+  const fontName = font => font.split(',')[0].replaceAll('"', '')
+
+  fonts.sort((a, b) => fontName(a).localeCompare(fontName(b))).forEach(font => {
+    fontFamilies[font] = fontName(font)
+  })
 
   function onlyUnique (value, index, array) {
     return array.indexOf(value) === index
@@ -345,7 +360,6 @@
 
     restoreState () {
       let state = this.getState(this.pointer)
-      // console.log(state)
       setState(state)
       morphEmailEditor()
       updateStyles()
@@ -875,19 +889,10 @@
   const ImageControls = ({
     id = '',
     maxWidth = 0,
-    image = {},
+    src = '', alt = '', width = '',
     onChange = ({ src, alt, width }) => {},
     supports = { alt: true, width: true },
   }) => {
-
-    const setImage = (newProps) => {
-      image = {
-        ...image,
-        ...newProps,
-      }
-
-      onChange(image)
-    }
 
     return Fragment([
       Control({
@@ -897,11 +902,11 @@
         Input({
           type: 'text',
           id: `${id}-src`,
-          value: image.src,
+          value: src,
           className: 'control full-width',
           name: 'src',
           onChange: e => {
-            setImage({
+            onChange({
               src: e.target.value,
             })
           },
@@ -940,7 +945,7 @@
                 width = Math.min(maxWidth, width)
               }
 
-              setImage({
+              onChange({
                 src: attachment.url,
                 alt: attachment.alt,
                 // title: attachment.title,
@@ -959,9 +964,9 @@
         type: 'number',
         className: 'control-input',
         max: maxWidth,
-        value: image.width,
+        value: width,
         onChange: e => {
-          setImage({
+          onChange({
             width: parseInt(e.target.value),
           })
         },
@@ -971,9 +976,9 @@
       }, Input({
         id: `${id}-alt`,
         className: 'input',
-        value: image.alt,
+        value: alt,
         onChange: e => {
-          setImage({
+          onChange({
             alt: e.target.value,
           })
         },
@@ -1006,6 +1011,25 @@
         onClick: e => onChange('right'),
       }, icons.alignRight),
     ])
+  }
+
+  const ButtonToggle = ({
+    id = '',
+    options = [],
+    selected = '',
+    onChange = value => {},
+  }) => {
+
+    const ButtonOption = option => Button({
+      id: `${id}-opt-${option.id}`,
+      className: `gh-button gh-button small ${selected === option.id ? 'dark' : 'grey'}`,
+      onClick: e => onChange(option.id),
+    }, option.text)
+
+    return Div({
+      id,
+      className: 'gh-input-group',
+    }, options.map(opt => ButtonOption(opt)))
   }
 
   const BorderControlGroup = ({
@@ -1145,8 +1169,8 @@
 
       let style = objectToStyle(AdvancedStyleControls.getInlineStyle(block))
 
-      if ( ! style ){
-        return '';
+      if (!style) {
+        return ''
       }
 
       //language=CSS
@@ -1232,16 +1256,14 @@
           ImageControls({
             id: 'background-image',
             maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
-            image: {
-              src: advancedStyle.backgroundImage || '',
-            },
+            src: advancedStyle.backgroundImage || '',
             supports: {
               alt: false,
               width: false,
             },
-            onChange: img => {
+            onChange: ({ src }) => {
               updateStyle({
-                backgroundImage: img.src,
+                backgroundImage: src,
                 reRenderControls: true,
               })
             },
@@ -1263,26 +1285,26 @@
       let css = []
 
       try {
-        css.push( this.get(block.type).css({
+        css.push(this.get(block.type).css({
           ...this.defaults(block),
           ...block,
           selector: `#b-${block.id}`,
-        }) )
+        }))
       } catch (e) {
-        console.log( e )
+        // console.log(e)
       }
 
-      css.push( AdvancedStyleControls.css({
+      css.push(AdvancedStyleControls.css({
         ...this.defaults(block),
         ...block,
         selector: `#b-${block.id}`,
-      }) )
+      }))
 
       if (block.css) {
-        css.push( block.css.replaceAll(/selector/g, `#b-${block.id}`) )
+        css.push(block.css.replaceAll(/selector/g, `#b-${block.id}`))
       }
 
-      return css.filter( css => css && css.length > 0 ).join( '\n\n' )
+      return css.filter(css => css && css.length > 0).join('\n\n')
     },
 
     edit (block, editing) {
@@ -2106,7 +2128,7 @@
           },
         }),
         `<p>Use the <code>selector</code> tag to target elements withing the current block.</p>`,
-        `<p>CSS entered here may not be universally supported by email clients. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">CSS compatibility</a>.</p>`
+        `<p>CSS entered here may not be universally supported by email clients. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">CSS compatibility</a>.</p>`,
       ]),
     ])
   }
@@ -2431,6 +2453,7 @@
           className: `tab ${getBlockControlsTab() === 'block' ? 'active' : 'inactive'}`,
           onClick: e => {
             setBlockControlsTab('block')
+            removeControls()
             morphControls()
           },
         }, __('Block')),
@@ -2438,6 +2461,7 @@
           className: `tab ${getBlockControlsTab() === 'advanced' ? 'active' : 'inactive'}`,
           onClick: e => {
             setBlockControlsTab('advanced')
+            removeControls()
             morphControls()
           },
         }, __('Advanced')),
@@ -3152,7 +3176,7 @@
     },
     height: gap,
     width: gap,
-  }, '&nbsp;'.repeat(3) )
+  }, '&nbsp;'.repeat(3))
 
   const Column = ({ blocks = [], col, className, style = {}, verticalAlign = 'top', ...props }) => {
 
@@ -3449,9 +3473,20 @@
       lineHeight = '1.4',
     } = fontDefaults(style)
 
+    const fontDisplay = font => Span({ style: { fontFamily: font } }, fontFamilies[font])
+
     return Div({
       className: 'font-controls display-flex column gap-10',
     }, [
+      !supports.fontFamily ? null : Control({ label: __('Font Family', 'groundhogg'), stacked: true }, ItemPicker({
+        id: `font-family`,
+        multiple: false,
+        selected: { id: fontFamily, text: fontDisplay(fontFamily) },
+        fetchOptions: search => Promise.resolve(Object.keys(fontFamilies).
+        filter(font => fontFamilies[font].toLowerCase().includes(search.toLowerCase())).
+        map(font => ({ id: font, text: fontDisplay(font) }))),
+        onChange: item => onChange({ fontFamily: item.id }),
+      })),
       !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, Input({
         type: 'number',
         id: `font-size`,
@@ -3477,14 +3512,6 @@
         selected: fontWeight,
         options: fontWeights.map(i => ({ value: i, text: i })),
         onChange: e => onChange({ fontWeight: e.target.value }),
-      })),
-      !supports.fontFamily ? null : Control({ label: __('Font Family', 'groundhogg') }, Select({
-        id: `font-family`,
-        name: `font_family`,
-        className: 'font-control control-input',
-        selected: fontFamily,
-        options: fontFamilies,
-        onChange: e => onChange({ fontFamily: e.target.value }),
       })),
       !supports.fontStyle ? null : Control({ label: __('Font Style', 'groundhogg') }, Select({
         id: `font-style`,
@@ -4123,12 +4150,9 @@
         }, [
           ImageControls({
             id: 'image',
-            image: {
-              src,
-              alt,
-              // title,
-              width,
-            },
+            src,
+            alt,
+            width,
             maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
             onChange: image => {
               updateBlock({
@@ -4219,6 +4243,7 @@
         width,
         height: 'auto',
         style: {
+          boxSizing: 'border-box',
           verticalAlign: 'bottom',
           height: 'auto',
           width,
@@ -4442,8 +4467,10 @@
       headingStyle = {},
       selectedTags = [],
       tag = [],
+      tag_rel = 'any',
       selectedCategories = [],
       category = [],
+      category_rel = 'any',
       updateBlock,
       queryId = '',
     }) => {
@@ -4535,6 +4562,8 @@
               let terms = await get(`${Groundhogg.api.routes.wp.tags}`, {
                 search,
                 per_page: 20,
+                orderby: 'count',
+                order: 'desc',
               })
               terms = terms.map(({ id, name }) => ({ id, text: name }))
               return terms
@@ -4543,9 +4572,22 @@
               updateBlock({
                 selectedTags: selected,
                 tag: selected.map(opt => opt.id),
+                reRenderControls: true
               })
             },
           })),
+          selectedTags.length > 1 ? Control({
+            label: 'Relationship',
+          }, ButtonToggle({
+            id: 'tag-rel',
+            selected: tag_rel,
+            options: [
+              { id: 'any', text: 'Any' },
+              { id: 'all', text: 'All' },
+            ],
+            onChange: tag_rel => updateBlock({tag_rel, reRenderControls: true })
+          })) : null,
+          `<hr/>`,
           Control({
             label: 'Categories',
             stacked: true,
@@ -4557,6 +4599,8 @@
               let terms = await get(`${Groundhogg.api.routes.wp.categories}`, {
                 search,
                 per_page: 20,
+                orderby: 'count',
+                order: 'desc',
               })
               terms = terms.map(({ id, name }) => ({ id, text: name }))
               return terms
@@ -4565,9 +4609,21 @@
               updateBlock({
                 selectedCategories: selected,
                 category: selected.map(opt => opt.id),
+                reRenderControls: true
               })
             },
           })),
+          selectedCategories.length > 1 ? Control({
+            label: 'Relationship',
+          }, ButtonToggle({
+            id: 'category-rel',
+            selected: category_rel,
+            options: [
+              { id: 'any', text: 'Any' },
+              { id: 'all', text: 'All' },
+            ],
+            onChange: category_rel => updateBlock({category_rel, reRenderControls: true })
+          })) : null,
           `<hr/>`,
           Control({ label: 'Query ID' }, Input({
             id: 'query-id',
@@ -4612,6 +4668,8 @@
       tag,
       category,
       queryId,
+      tag_rel,
+      category_rel,
     }) => {
       return base64_json_encode({
         number,
@@ -4625,6 +4683,8 @@
         tag,
         category,
         queryId,
+        tag_rel,
+        category_rel,
       })
     },
     defaults: {
@@ -4637,6 +4697,8 @@
       post_type: 'post',
       columns: 2,
       gap: 20,
+      tag_rel: 'any',
+      category_rel: 'any',
       headingStyle: fontDefaults({
         fontSize: 24,
       }),
@@ -4732,6 +4794,15 @@
     },
   })
 
+  registerBlock('fonttest', 'Font Test', {
+    svg: icons.text,
+    controls: () => { Fragment([])},
+    html: () => {
+      return Fragment(fonts.map(f => makeEl('p', { style: { fontFamily: f, fontSize: '16px' } }, f)))
+    },
+    plainText: () => '',
+  })
+
   const morph = (selector, html = null) => {
 
     try {
@@ -4768,6 +4839,11 @@
 
             // Using for...of
             for (const node of elements.values()) {
+
+              if (node.nodeType !== Node.ELEMENT_NODE) {
+                continue
+              }
+
               if (node.classList.contains('row')) {
                 email.meta.blocks = convertProEditorToBlocks(email.data.content)
                 break
@@ -4876,7 +4952,8 @@
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
   const morphEmailEditor = () => morph('#email-editor', EmailEditor())
   const morphHeader = () => morph('#email-header', Header())
-  const updateStyles = () => $('#builder-style').text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
+  const updateStyles = () => $('#builder-style').
+  text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
 
   const renderEditor = () => {
     morphEmailEditor()
@@ -5079,8 +5156,6 @@
     // Default WordPress colors
     colorPalette = ['#000', '#fff', '#dd3333', '#DD9933', '#EEEE22', '#81D742', '#1E73BE', '#8224E3']
   }
-
-  console.log(colorPalette)
 
   if (isEmailEditorPage()) {
 

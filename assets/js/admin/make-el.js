@@ -509,8 +509,6 @@
       tabindex: 0,
       onMousedown: e => {
 
-        console.log('mousedown')
-
         // Don't focus out
         keepAlive = true
         setTimeout(() => {
@@ -582,10 +580,6 @@
         break
     }
 
-    console.log({
-      // combined: top +
-    })
-
     if ((top + height) > window.innerHeight) {
       modal.style.top = (window.innerHeight - height - 20) + 'px'
     } else {
@@ -619,8 +613,9 @@
     let state = {
       search: '',
       searching: false,
+      chose: false,
       options: [],
-      isFocused: false,
+      // isFocused: false,
     }
 
     // ensure array
@@ -631,11 +626,13 @@
     let timeout
     let isMorphing = false
 
-    const setState = newState => {
+    const setState = (newState, trigger) => {
       state = {
         ...state,
         ...newState,
       }
+
+      // console.log( state, trigger )
 
       morph()
     }
@@ -669,19 +666,8 @@
       isMorphing = false
     }
 
-    const setSearching = searching => {
-      setState({
-        searching,
-      })
-    }
-
-    const setOptions = options => {
-      setState({
-        options,
-      })
-    }
-
     const focusSearch = () => document.getElementById(id)?.querySelector(`input[type=search]`)?.focus()
+    const focusPicker = () => document.getElementById(id)?.focus()
 
     const createOption = (value) => {
       state.options.unshift({ id: value, text: value })
@@ -691,8 +677,6 @@
     const selectOption = (id) => {
 
       let option = { ...state.options.find(opt => opt.id == id) }
-
-      console.log( id, option )
 
       if (option.create) {
         option.text = option.id
@@ -704,11 +688,18 @@
         selected = [option]
       }
 
+      focusPicker()
+
       setState({
         options: [],
         search: '',
         searching: false,
-      })
+        chose: true,
+      }, 'select option')
+
+      setTimeout(() => {
+        setState({ chose: false }, 'clear chose')
+      }, 1 )
 
       handleOnChange(selected)
     }
@@ -728,7 +719,7 @@
         Span({
           id: `delete-${index}`,
           className: 'gh-picker-item-delete',
-          tabindex: 0,
+          tabindex: '0',
           dataId: id,
           onClick: e => {
             unSelectOption(id)
@@ -773,7 +764,7 @@
 
       if (tags && isValidSelection(state.search)) {
         // Remove other createable options
-        state.options = state.options.filter( opt => ! opt.create )
+        state.options = state.options.filter(opt => !opt.create)
         state.options.unshift({ id: state.search, text: `Add "${state.search}"`, create: true })
       }
 
@@ -797,7 +788,7 @@
             optionsContainer.style.top = bottom + 'px'
             optionsContainer.style.left = left + 'px'
             optionsContainer.style.width = width + 'px'
-            optionsContainer.style.maxHeight = (window.innerHeight - bottom) + 'px'
+            optionsContainer.style.maxHeight = (window.innerHeight - bottom - 20) + 'px'
 
             if (!multiple) {
               focusSearch()
@@ -807,7 +798,7 @@
         },
       }, [
         multiple || !selected.length ? null : SearchInput(),
-        state.searching && state.search ? Div({
+        state.searching ? Div({
           className: 'gh-picker-no-options',
         }, 'Searching...') : null,
         ...state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id)).
@@ -816,6 +807,28 @@
           className: 'gh-picker-no-options',
         }, 'No results found.'),
       ])
+    }
+
+    const startSearch = search => {
+
+      setState({
+        search,
+        searching: true,
+      }, 'start search')
+
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+
+      timeout = setTimeout(() => {
+        fetchOptions(state.search).then(options => {
+          // console.log( options )
+          setState({
+            searching: false,
+            options,
+          }, 'options fetched')
+        })
+      }, 500)
     }
 
     const SearchInput = () => Input({
@@ -832,28 +845,11 @@
           setState({
             search: '',
             searching: false,
-          })
+          }, 'search input')
           return
         }
 
-        setState({
-          search: e.target.value,
-          searching: true,
-        })
-
-        if (timeout) {
-          clearTimeout(timeout)
-        }
-
-        timeout = setTimeout(() => {
-          fetchOptions(state.search).then(options => {
-            // console.log( options )
-            setState({
-              searching: false,
-              options,
-            })
-          })
-        }, 500)
+        startSearch(e.target.value)
       },
       onKeydown: e => {
         if (tags) {
@@ -868,11 +864,11 @@
 
     const Render = () => Div({
       id,
-      className: `gh-picker ${state.search || (state.searching && !multiple) ? 'options-visible' : ''}`,
+      className: `gh-picker ${state.searching || state.options.length || state.search ? 'options-visible' : ''}`,
       tabindex: '0',
       onFocusout: e => {
 
-        if (e.relatedTarget && clickedIn(e.relatedTarget, '.gh-picker')) {
+        if (e.relatedTarget && clickedIn(e.relatedTarget, `.gh-picker#${id}`)) {
           return
         }
 
@@ -880,17 +876,29 @@
           search: '',
           options: [],
           searching: false,
-        })
+        }, 'picker focus out')
       },
-      onFocus: e => {
-        if (multiple) {
+      onClick: e => {
+
+        if (state.searching || multiple || state.chose ) {
           return
         }
 
-        setState({
-          searching: true,
-        })
+        startSearch('')
+      },
+      onFocus: e => {
 
+        // // Was already focused
+        // if (e.relatedTarget && clickedIn(e.relatedTarget, '.gh-picker')) {
+        //   return
+        // }
+        //
+        // // Don't start search if multiple
+        // if (multiple) {
+        //   return
+        // }
+        //
+        // startSearch('')
       },
       ...attributes,
     }, [

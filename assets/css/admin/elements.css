@@ -1015,10 +1015,10 @@ input[type=submit].gh-button.grey,
 input[type=submit].gh-submit.grey,
 button.gh-button.grey,
 button.gh-submit.grey {
-  border: none;
   background: rgba(16, 38, 64, 0.05);
   color: #102640;
   padding: 5px 10px;
+  border: 1px solid #102640;
 }
 a.gh-button.grey:hover:not(:disabled), a.gh-submit.grey:hover:not(:disabled),
 input[type=button].gh-button.grey:hover:not(:disabled),
@@ -1028,6 +1028,27 @@ input[type=submit].gh-submit.grey:hover:not(:disabled),
 button.gh-button.grey:hover:not(:disabled),
 button.gh-submit.grey:hover:not(:disabled) {
   background: rgba(16, 38, 64, 0.15);
+}
+a.gh-button.dark, a.gh-submit.dark,
+input[type=button].gh-button.dark,
+input[type=button].gh-submit.dark,
+input[type=submit].gh-button.dark,
+input[type=submit].gh-submit.dark,
+button.gh-button.dark,
+button.gh-submit.dark {
+  border: none;
+  background: #102640;
+  color: #fff;
+  padding: 5px 10px;
+}
+a.gh-button.dark:hover:not(:disabled), a.gh-submit.dark:hover:not(:disabled),
+input[type=button].gh-button.dark:hover:not(:disabled),
+input[type=button].gh-submit.dark:hover:not(:disabled),
+input[type=submit].gh-button.dark:hover:not(:disabled),
+input[type=submit].gh-submit.dark:hover:not(:disabled),
+button.gh-button.dark:hover:not(:disabled),
+button.gh-submit.dark:hover:not(:disabled) {
+  background: rgba(16, 38, 64, 0.5);
 }
 a.gh-button.secondary, a.gh-submit.secondary,
 input[type=button].gh-button.secondary,

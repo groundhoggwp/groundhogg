@@ -1072,13 +1072,25 @@ button {
     }
 
     &.grey {
-      border: none;
+      //border: none;
       background: $primary-dark-5;
       color: $primary-dark;
       padding: 5px 10px;
+      border: 1px solid $primary-dark;
 
       &:hover:not(:disabled) {
         background: $primary-dark-15;
+      }
+    }
+
+    &.dark {
+      border: none;
+      background: $primary-dark;
+      color: #fff;
+      padding: 5px 10px;
+
+      &:hover:not(:disabled) {
+        background: $primary-dark-50;
       }
     }
 
