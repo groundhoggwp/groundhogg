@@ -10,10 +10,10 @@ $email = the_email();
 
 if ( $email->get_pre_header() ):
 	?>
-	<div style="display: none; max-height: 0; overflow: hidden;">
+	<div style="display: none; max-height: 0px; overflow: hidden;">
 		<?php echo $email->get_merged_pre_header() ?>
 	</div>
-	<div style="display: none; max-height: 0; overflow: hidden;">
+	<div style="display: none; max-height: 0px; overflow: hidden;">
 		&#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
 	</div>
 <?php

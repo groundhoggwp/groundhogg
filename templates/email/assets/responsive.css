@@ -1,0 +1,18 @@
+@media only screen and (max-width: 480px) {
+    table.email-columns,
+    table.email-columns > tbody,
+    table.email-columns tr.email-columns-row,
+    table.email-columns tr.email-columns-row > td.email-columns-cell {
+        display: block !important;
+        width: auto !important;
+    }
+
+    .alignright:not(.keep-float),
+    .alignleft:not(.keep-float) {
+        display: block !important;
+        float: none !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 20px !important;
+    }
+}

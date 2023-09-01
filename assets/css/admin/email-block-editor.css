@@ -648,16 +648,6 @@ body iframe#preview.desktop {
   left: 36px;
 }
 
-.cards .post-card > .card-content {
-  border: 1px solid rgba(16, 38, 64, 0.1);
-  background-color: #fff;
-  padding: 20px;
-}
-
-.cards .post-card.has-thumbnail > .card-content {
-  border-top: none;
-}
-
 .cards .post-card img {
   display: block;
   vertical-align: bottom;

@@ -60,6 +60,10 @@ class Emails_Page extends Admin_Page {
 
 	protected function add_additional_actions() {
 		Groundhogg\add_disable_emojis_action();
+
+		if ( $this->is_current_page() && $this->current_action_is( 'edit' ) ){
+			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
+		}
 	}
 
 	public function admin_title( $admin_title, $title ) {

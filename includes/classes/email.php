@@ -543,24 +543,28 @@ class Email extends Base_Object_With_Meta {
 
 		$content = $this->get_content();
 
-		if ( $this->has_blocks() ){
-			$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
-			$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks() );
+		switch ( $this->get_editor_type() ){
+			case 'blocks':
+				$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
+				$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks() );
 
-			// Special handling for footer unsub link
-			if ( $this->has_footer_block() ){
-				$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
-			}
+				// Special handling for footer unsub link
+				if ( $this->has_footer_block() ){
+					$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
+				}
+				break;
+			case 'legacy_plain':
+				$content = wpautop( $content );
+				break;
+			case 'html':
+			case 'legacy_blocks':
+				break;
 		}
 
 		$content = do_replacements(
 			$content,
 			$this->get_contact()->get_id()
 		);
-
-		if ( $this->get_editor_type() === 'legacy_plain' ){
-			$content = wpautop( $content );
-		}
 
 		/* filter out double http based on bug where links have http:// prepended */
 		$schema  = is_ssl() ? 'https://' : 'http://';
@@ -861,7 +865,9 @@ class Email extends Base_Object_With_Meta {
 
 		$content = ob_get_clean();
 
-		$content = $this->convert_to_tracking_links( $content );
+		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ) {
+			$content = $this->convert_to_tracking_links( $content );
+		}
 
 		return apply_filters( 'groundhogg/email/the_content', $content );
 	}

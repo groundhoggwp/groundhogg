@@ -491,7 +491,7 @@
         let attr = kebabize(prop)
         let val = object[prop]
 
-        if (typeof val === 'undefined') {
+        if (typeof val === 'undefined' || val === null || val === '' || val === 'null') {
           continue
         }
 
@@ -514,7 +514,11 @@
       }
     }
 
-    return props.join(';')
+    if (props.length) {
+      return props.join(';') + ';'
+    }
+
+    return ''
   }
 
   function uuid () { // Public Domain/MIT
@@ -2073,8 +2077,9 @@ ${afterProgress()}`,
 </svg>`,
     // language=HTML
     text: `
-	    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 333 333">
-  <path fill="currentColor" d="M323 32H10C5 32 0 36 0 42s5 10 10 10h313a10 10 0 0 0 0-20zm-93 83H10c-5 0-10 4-10 10s5 10 10 10h220a10 10 0 0 0 0-20zm93 84H10c-5 0-10 4-10 10s5 10 10 10h313a10 10 0 0 0 0-20zm-172 83H10c-5 0-10 4-10 10s5 10 10 10h141a10 10 0 0 0 0-20z"/>
+		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 333 333">
+  <path fill="currentColor"
+        d="M323 32H10C5 32 0 36 0 42s5 10 10 10h313a10 10 0 0 0 0-20zm-93 83H10c-5 0-10 4-10 10s5 10 10 10h220a10 10 0 0 0 0-20zm93 84H10c-5 0-10 4-10 10s5 10 10 10h313a10 10 0 0 0 0-20zm-172 83H10c-5 0-10 4-10 10s5 10 10 10h141a10 10 0 0 0 0-20z"/>
 </svg>`,
     // language=HTML
     tasks: `

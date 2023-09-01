@@ -31,9 +31,11 @@ $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_l
     <base target="_blank">
     <style id="global-style">
 	    <?php load_css( 'email' ); ?>
-	    <?php load_css( 'posts' ); ?>
 	    <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
     </style>
+	<style id="responsive">
+		<?php load_css( 'responsive' ); ?>
+	</style>
 	<style id="block-styles">
 		<?php echo $email->get_css() ?>
 	</style>

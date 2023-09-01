@@ -5,6 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Email;
+use function Groundhogg\doing_rest;
+use function Groundhogg\get_url_var;
+use function Groundhogg\is_sending;
 use function Groundhogg\the_email;
 
 include_once __DIR__ . '/template-functions.php';
@@ -34,8 +37,10 @@ $alignment = $email->get_alignment(); // 'left' or 'center'
 	<base target="_blank">
 	<style id="global-styles">
 		<?php load_css( 'email' ); ?>
-		<?php load_css( 'posts' ); ?>
 		<?php do_action( 'groundhogg/templates/email/boxed/style' ); ?>
+	</style>
+	<style id="responsive">
+		<?php load_css( 'responsive' ); ?>
 	</style>
 	<style id="block-styles">
 		<?php echo $email->get_css() ?>

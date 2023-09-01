@@ -1771,6 +1771,8 @@ class Replacements implements \JsonSerializable {
 			'space'          => 0,
 			'columns'        => 2,
 			'gap'            => 20,
+			'headingStyle'   => [],
+			'excerptStyle'   => [],
 		] );
 
 		$query_vars = [
@@ -1852,18 +1854,8 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
-				$columnGap = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;" width="%1$d"></td>', $props['gap'] );
-
-				$render_column = function ( $content = '' ) use ( $props ) {
-					return html()->e( 'td', [
-						'class' => 'email-columns-cell',
-						'style' => [
-							'padding-bottom' => $props['gap'] . 'px'
-						]
-					], [
-						$content
-					] );
-				};
+				$columnTable = sprintf( '<table class="email-columns %s" width="100%%" style="border-collapse: collapse;width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
+				$columnGap   = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], str_repeat( '&nbsp;', 3 ) );
 
 				$thumbnail = function ( $thumbnail_size ) {
 
@@ -1878,12 +1870,23 @@ class Replacements implements \JsonSerializable {
 					] );
 				};
 
-				$render_post = function ( $thumbnail_size = 'thumbnail' ) use ( $props, $thumbnail ) {
+				$render_post = function ( $thumbnail_size = 'thumbnail', $width = false ) use ( $props, $thumbnail ) {
 
-					return html()->e( 'div', [
+					if ( ! $width ) {
+						$width = percentage( $props['columns'], 1 ) . '%';
+					}
+
+					return html()->e( 'td', [
 						'class' => [
+							'email-columns-cell',
 							$props['layout'] === 'grid' ? 'post' : 'post-card',
 							has_post_thumbnail() ? 'has-thumbnail' : ''
+						],
+						'width' => $width,
+						'style' => [
+							'width'            => $width,
+							'background-color' => '#FFFFFF',
+							'vertical-align'   => 'top',
 						]
 					], [
 						has_post_thumbnail() ? html()->e( 'div', [
@@ -1891,34 +1894,53 @@ class Replacements implements \JsonSerializable {
 						], html()->e( 'a', [
 							'href' => get_the_permalink()
 						], $thumbnail( $thumbnail_size ) ) ) : '',
-						html()->e( 'div', [ 'class' => 'card-content' ], [
-							html()->e( 'h2', [], html()->e( 'a', [
-								'href' => get_the_permalink()
-							], get_the_title() ) ),
-							$props['excerpt'] ? html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt() ) : ''
+						html()->e( 'table', [
+							'class'       => 'card-content',
+							'cellpadding' => '0',
+							'cellspacing' => '0',
+						], [
+							html()->e( 'tr', [], html()->e( 'td', [
+								'style' => [
+									'padding' => $props['layout'] === 'cards' ? '20px' : '20px 0'
+								]
+							], [
+								html()->e( 'h2', [
+									'style' => $props['headingStyle']
+								], html()->e( 'a', [
+									'href'  => get_the_permalink(),
+									'style' => $props['headingStyle']
+								], get_the_title() ) ),
+								$props['excerpt'] ? html()->e( 'p', [
+									'class' => 'post-excerpt',
+									'style' => $props['excerptStyle']
+								], get_the_excerpt() ) : ''
+							] ) )
 						] ),
 					] );
 				};
 
 				if ( $props['featured'] ) {
 					$query->the_post();
-					$rows[] = $render_post( 'large' );
+					$rows[] = $columnTable;
+					$rows[] = html()->e( 'tr', [
+						'class' => 'email-columns-row',
+					], $render_post( 'large', '100%' ) );
+					$rows[] = html()->e( 'tr', [
+						'class' => 'email-columns-row',
+					], $columnGap );
+					$rows[] = '</table>';
 				}
 
 				if ( $query->have_posts() ) {
 
 					$rendered_posts = [];
 
-					if ( $props['featured'] ) {
-						$rows[] = sprintf( '<div class="column-gap" style="height: %dpx"></div>', $props['gap'] );
-					}
-
-					$rows[] = '<table class="email-columns" style="border-collapse: collapse;" cellpadding="0" cellspacing="0">';
+					$rows[] = $columnTable;
 
 					while ( $query->have_posts() ):
 
 						$query->the_post();
-						$rendered_posts[] = $render_column( $render_post( absint( $props['columns'] ) === 1 ? 'large' : $props['thumbnail_size'] ) );
+						$rendered_posts[] = $render_post( absint( $props['columns'] ) === 1 ? 'large' : $props['thumbnail_size'] );
 
 					endwhile;
 
@@ -1930,14 +1952,16 @@ class Replacements implements \JsonSerializable {
 						$rows[] = html()->e( 'tr', [
 							'class' => 'email-columns-row',
 						], $columns );
+
+						$rows[] = html()->e( 'tr', [
+							'class' => 'email-columns-row',
+						], $columnGap );
 					}
 
 					$rows[] = '</table>';
 				}
 
-				$content = html()->e( 'div', [
-					'class' => $props['layout']
-				], $rows );
+				$content = implode( '', $rows );
 
 				$query->reset_postdata();
 

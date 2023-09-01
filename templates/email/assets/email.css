@@ -25,17 +25,6 @@ body {
     margin: 0.5em 0 0.5em 1em;
 }
 
-@media only screen and (max-width: 480px) {
-   body.responsive .alignright:not(.keep-float),
-   body.responsive .alignleft:not(.keep-float) {
-        display: block !important;
-        float: none !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        margin-bottom: 20px !important;
-    }
-}
-
 .footer p {
     font-size: 13px;
     color: #999999;

@@ -879,6 +879,15 @@ function array_to_atts( $atts ) {
 	return $tag;
 }
 
+function kebabize( $string ) {
+
+	$string = preg_replace_callback( '/([a-z])([A-Z])/', function ( $matches ) {
+		return strtolower( $matches[1] ) . '-' . strtolower( $matches[2] );
+	}, $string );
+
+	return sanitize_key( $string );
+}
+
 /**
  * Convert array to CSS style attributes
  *
@@ -895,11 +904,30 @@ function array_to_css( $atts ) {
 	$css = '';
 	foreach ( $atts as $key => $value ) {
 
+		if ( is_null( $value ) ){
+			continue;
+		}
+
 		if ( is_array( $value ) ) {
 			$value = implode( ' ', $value );
 		}
 
-		$css .= sanitize_key( $key ) . ':' . esc_attr( $value ) . ';';
+		$attribute = kebabize( $key );
+
+		switch ( $attribute ) {
+			case 'use':
+				continue 2;
+			case 'height':
+			case 'width':
+			case 'font-size':
+				$value = is_numeric( $value ) ? $value . 'px' : esc_attr( $value );
+				break;
+			default:
+				$value = esc_attr( $value );
+				break;
+		}
+
+		$css .= $attribute . ':' . $value . ';';
 	}
 
 	return $css;

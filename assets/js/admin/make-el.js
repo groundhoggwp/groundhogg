@@ -772,6 +772,8 @@
       }
 
       if (tags && isValidSelection(state.search)) {
+        // Remove other createable options
+        state.options = state.options.filter( opt => ! opt.create )
         state.options.unshift({ id: state.search, text: `Add "${state.search}"`, create: true })
       }
 

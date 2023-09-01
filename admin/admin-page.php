@@ -61,6 +61,15 @@ abstract class Admin_Page extends Supports_Errors {
 	}
 
 	/**
+	 * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
+	 */
+	public function prevent_notices() {
+		remove_all_actions( 'network_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+		remove_all_actions( 'admin_notices' );
+	}
+
+	/**
 	 * Modify the tab title...
 	 *
 	 * @param $admin_title string

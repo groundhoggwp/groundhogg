@@ -1143,6 +1143,12 @@
     css: (block) => {
       const { selector } = block
 
+      let style = objectToStyle(AdvancedStyleControls.getInlineStyle(block))
+
+      if ( ! style ){
+        return '';
+      }
+
       //language=CSS
       return `
           ${selector} {
@@ -1254,29 +1260,29 @@
 
     css (block) {
 
-      let css = ''
+      let css = []
 
       try {
-        css += this.get(block.type).css({
+        css.push( this.get(block.type).css({
           ...this.defaults(block),
           ...block,
           selector: `#b-${block.id}`,
-        })
+        }) )
       } catch (e) {
-        // css += '\n\n//oops\n\n'
+        console.log( e )
       }
 
-      css += '\n\n' + AdvancedStyleControls.css({
+      css.push( AdvancedStyleControls.css({
         ...this.defaults(block),
         ...block,
         selector: `#b-${block.id}`,
-      })
+      }) )
 
       if (block.css) {
-        css += '\n\n' + block.css.replaceAll(/selector/g, `#b-${block.id}`)
+        css.push( block.css.replaceAll(/selector/g, `#b-${block.id}`) )
       }
 
-      return css
+      return css.filter( css => css && css.length > 0 ).join( '\n\n' )
     },
 
     edit (block, editing) {
@@ -2720,6 +2726,7 @@
             }, [
               ItemPicker({
                 id: 'test-email-addresses',
+                isValidSelection: isValidEmail,
                 noneSelected: __('Type an email address...'),
                 selected: Groundhogg.user_test_emails.map(email => ({ id: email, text: email })),
                 fetchOptions: (search) => Promise.resolve(
@@ -3045,7 +3052,7 @@
     doc.querySelector('html').style.zoom = '50%'
     doc.querySelector('html').style.overflow = 'hidden'
     doc.body.style.padding = '20px'
-    doc.body.classList.remove('responsive')
+    doc.head.querySelector('style#responsive')?.remove()
 
     return Div({
       className: 'template span-4',
@@ -3145,7 +3152,7 @@
     },
     height: gap,
     width: gap,
-  })
+  }, '&nbsp;'.repeat(3) )
 
   const Column = ({ blocks = [], col, className, style = {}, verticalAlign = 'top', ...props }) => {
 

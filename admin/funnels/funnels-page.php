@@ -972,15 +972,6 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	/**
-	 * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
-	 */
-	public function prevent_notices() {
-		remove_all_actions( 'network_admin_notices' );
-		remove_all_actions( 'user_admin_notices' );
-		remove_all_actions( 'admin_notices' );
-	}
-
-	/**
 	 * Get template HTML via ajax
 	 */
 	public function get_funnel_templates_ajax() {

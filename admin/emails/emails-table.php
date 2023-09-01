@@ -318,7 +318,7 @@ class Emails_Table extends Table {
 			[
 				'view'    => 'template',
 				'display' => __( 'Templates', 'groundhogg' ),
-				'query'   => [ 'is_template' => 1 ],
+				'query'   => [ 'is_template' => 1, 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'draft',
