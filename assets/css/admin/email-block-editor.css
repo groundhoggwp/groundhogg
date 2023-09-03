@@ -189,9 +189,17 @@
 #email-block-editor #content #builder-content .builder-block[data-type=html] .maybe-edit-html {
   min-height: 30px;
 }
-#email-block-editor #content #builder-content .builder-block[data-type=columns] > .block-toolbar {
-  right: -2px;
-  transform: none;
+#email-block-editor #content #builder-content .builder-block:not([data-type=columns]) > .block-toolbar .move-block {
+  right: 0;
+  left: initial;
+  transform: translate(50%, -50%);
+  border-radius: 50%;
+}
+#email-block-editor #content #builder-content .builder-block:not([data-type=columns]) > .block-toolbar span.block-type {
+  top: initial;
+  bottom: 0;
+  transform: translateY(100%);
+  border-radius: 0 0 3px 3px;
 }
 #email-block-editor #content #builder-content .builder-block .email-button {
   display: inline-block;
@@ -214,44 +222,88 @@
 #email-block-editor #content #builder-content .builder-block .column.empty {
   background-color: rgba(16, 38, 64, 0.05);
   border-radius: 5px;
-  padding: 20px;
+  height: 40px;
   margin: 5px;
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar {
   display: none;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .block-buttons {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar span.block-type {
   position: absolute;
-  right: 50%;
-  transform: translateX(50%);
-  left: auto;
-  top: -22px;
+  right: -2px;
+  top: 0;
+  border-radius: 3px 3px 0 0;
+  transform: translateY(-100%);
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 6px;
   background-color: #c8c8c8;
-  border-radius: 5px 5px 0 0;
   z-index: 99;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar .move-block {
+  display: flex;
+  border: none;
+  padding: 6px;
+  border-radius: 0 30px 30px 0;
+  text-align: right;
   cursor: grab;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #102640;
+  background-color: #c8c8c8;
+  z-index: 99;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 }
-#email-block-editor #content #builder-content .builder-block:hover {
+#email-block-editor #content #builder-content .builder-block .block-toolbar .move-block svg {
+  height: 20px;
+  width: 20px;
+}
+#email-block-editor #content #builder-content .builder-block:hover:not(:has(td .builder-block:hover)) {
   outline: 2px solid #c8c8c8;
 }
-#email-block-editor #content #builder-content .builder-block:hover > .block-toolbar {
-  display: flex;
+#email-block-editor #content #builder-content .builder-block:hover:not(:has(td .builder-block:hover)) > .block-toolbar {
+  display: block;
   background-color: #c8c8c8;
 }
 #email-block-editor #content #builder-content .builder-block:has(.is-editing) {
   overflow: visible;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing {
-  outline: 2px solid #0075ff;
+  outline: 2px solid #0075ff !important;
   overflow: visible;
+  z-index: 9;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing:not([data-type=columns]) > .block-toolbar .block-buttons {
+  top: initial;
+  bottom: -4px;
+  right: -2px;
+  transform: translateY(100%);
+  z-index: 99;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
-  display: flex;
-  background-color: #0075ff;
-  z-index: 999;
+  display: block;
 }
-#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar button {
-  color: #fff !important;
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .move-block {
+  color: #FFF;
+  background-color: #0075ff;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar span.block-type {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons {
+  position: absolute;
+  display: flex;
+  gap: 3px;
+  top: -4px;
+  right: -2px;
+  transform: translateY(-100%);
+  z-index: 99;
 }
 #email-block-editor #content #builder-content .builder-block .dynamic-content-loader {
   position: relative;

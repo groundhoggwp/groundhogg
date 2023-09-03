@@ -1129,7 +1129,7 @@
     getInlineStyle: block => {
       const { advancedStyle = {}, id, selector } = block
       const {
-        padding = {},
+        padding = { top: 5, right: 5, left: 5, bottom: 5 },
         // margin = {},
         borderStyle = 'none',
         borderColor = 'transparent',
@@ -1531,23 +1531,28 @@
     return Div({
       className: 'block-toolbar',
     }, [
+      Span({ className: 'block-type' }, BlockRegistry.get(block.type).name),
       Button({
-        className: 'gh-button secondary small text icon move-block',
+        className: 'move-block',
       }, icons.move),
-      Button({
-        className: 'gh-button secondary small text icon duplicate-block',
-        id: `duplicate-${block.id}`,
-        onClick: e => {
-          duplicateBlock(block.id)
-        },
-      }, icons.duplicate),
-      Button({
-        className: 'gh-button secondary small text icon delete-block',
-        id: `delete-${block.id}`,
-        onClick: e => {
-          deleteBlock(block.id)
-        },
-      }, icons.close),
+      Div({
+        className: 'block-buttons',
+      }, [
+        Button({
+          className: 'gh-button primary small icon duplicate-block',
+          id: `duplicate-${block.id}`,
+          onClick: e => {
+            duplicateBlock(block.id)
+          },
+        }, Dashicon('admin-page')),
+        Button({
+          className: 'gh-button primary small delete-block',
+          id: `delete-${block.id}`,
+          onClick: e => {
+            deleteBlock(block.id)
+          },
+        }, Dashicon('trash')),
+      ]),
     ])
   }
 
@@ -1589,7 +1594,7 @@
   const EditBlockWrapper = (block) => {
 
     return Div({
-      id: `b-${block.id}`,
+      id: `edit-${block.id}`,
       className: `builder-block ${isActiveBlock(block.id) ? 'is-editing' : ''}`,
       dataId: block.id,
       dataType: block.type,
@@ -1609,7 +1614,11 @@
         e.stopPropagation()
       },
     }, [
-      isActiveBlock(block.id) ? BlockEdit(block) : BlockRegistry.html(block),
+      Div({
+        id: `b-${block.id}`,
+      }, [
+        isActiveBlock(block.id) ? BlockEdit(block) : BlockRegistry.html(block),
+      ]),
       block.filters_enabled ? Div({
         className: 'filters-enabled',
       }, icons.eye) : null,
@@ -4572,7 +4581,7 @@
               updateBlock({
                 selectedTags: selected,
                 tag: selected.map(opt => opt.id),
-                reRenderControls: true
+                reRenderControls: true,
               })
             },
           })),
@@ -4585,7 +4594,7 @@
               { id: 'any', text: 'Any' },
               { id: 'all', text: 'All' },
             ],
-            onChange: tag_rel => updateBlock({tag_rel, reRenderControls: true })
+            onChange: tag_rel => updateBlock({ tag_rel, reRenderControls: true }),
           })) : null,
           `<hr/>`,
           Control({
@@ -4609,7 +4618,7 @@
               updateBlock({
                 selectedCategories: selected,
                 category: selected.map(opt => opt.id),
-                reRenderControls: true
+                reRenderControls: true,
               })
             },
           })),
@@ -4622,7 +4631,7 @@
               { id: 'any', text: 'Any' },
               { id: 'all', text: 'All' },
             ],
-            onChange: category_rel => updateBlock({category_rel, reRenderControls: true })
+            onChange: category_rel => updateBlock({ category_rel, reRenderControls: true }),
           })) : null,
           `<hr/>`,
           Control({ label: 'Query ID' }, Input({
