@@ -2041,7 +2041,8 @@ p.error,
   }
 }
 
-.gh-has-tooltip {
+.gh-has-tooltip,
+:has(>.gh-tooltip) {
 
   position: relative;
   box-sizing: border-box;

@@ -125,6 +125,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     padding: 10px;
     overflow-y: auto;
     flex-shrink: 0;
+
+    .block-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+      gap: 10px;
+    }
   }
 
   .block-wrap {
@@ -134,7 +141,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
 
     &:not(:last-child) {
-      margin-bottom: 10px;
+      //margin-bottom: 10px;
     }
   }
 
@@ -729,6 +736,7 @@ body {
     bottom: 0;
     right: 0;
 
+    height: calc(100vh - 32px);
     max-height: calc(100vh - 32px);
   }
 
@@ -739,8 +747,8 @@ body {
     #email-html-editor {
       flex-grow: 1;
       align-items: stretch;
+      height: calc(100vh - 32px - 60px);
       max-height: calc(100vh - 32px - 60px);
-
     }
   }
 

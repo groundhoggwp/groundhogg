@@ -929,6 +929,10 @@
     })
   }
 
+  const ToolTip = ( content, position='bottom' ) => {
+    return Div( { className: `gh-tooltip ${position}`}, content )
+  }
+
   window.MakeEl = {
     InputGroup,
     makeEl,
@@ -936,6 +940,7 @@
     InputWithReplacements,
     Textarea,
     Select,
+    ToolTip,
     Button,
     Toggle,
     Div,

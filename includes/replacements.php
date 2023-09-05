@@ -446,11 +446,25 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Return the featured image of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'post_url',
+				'code'        => 'post_featured_image_url',
+				'group'       => 'post',
+				'callback'    => [ $this, 'post_featured_image_url' ],
+				'name'        => __( 'Post Featured Image URL', 'groundhogg' ),
+				'description' => _x( 'Return the featured image URL of a single recent post.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'post_link',
 				'group'       => 'post',
 				'callback'    => [ $this, 'post_url' ],
-				'name'        => __( 'Post URL', 'groundhogg' ),
+				'name'        => __( 'Post Link', 'groundhogg' ),
 				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'     => 'post_url',
+				'group'    => 'post',
+				'callback' => [ $this, 'post_link' ],
+//				'name'        => __( 'Post URL', 'groundhogg' ),
+//				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 		];
 
@@ -458,9 +472,9 @@ class Replacements implements \JsonSerializable {
 
 		foreach ( $replacements as $replacement ) {
 			$this->add(
-				$replacement['code'],
-				$replacement['callback'],
-				$replacement['description'],
+				get_array_var( $replacement, 'code', '' ),
+				get_array_var( $replacement, 'callback', '' ),
+				get_array_var( $replacement, 'description', '' ),
 				get_array_var( $replacement, 'name' ),
 				get_array_var( $replacement, 'group' ),
 				get_array_var( $replacement, 'default_args' )
@@ -1570,7 +1584,7 @@ class Replacements implements \JsonSerializable {
 			'meta_key'       => '',
 			'meta_value'     => '',
 			'within'         => '',
-			'thumbnail_size' => 'thumbnail',
+			'thumbnail_size' => 'large',
 		] );
 
 		$query_vars = [
@@ -1648,7 +1662,13 @@ class Replacements implements \JsonSerializable {
 				$content = str_replace( ']]>', ']]&gt;', $content );
 				break;
 			case 'excerpt':
+
+				add_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
+
 				$content = get_the_excerpt();
+
+				remove_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
+
 				break;
 			case 'thumbnail':
 			case 'featured_image':
@@ -1667,9 +1687,10 @@ class Replacements implements \JsonSerializable {
 					return '';
 				}
 
-				$content = get_the_post_thumbnail_url();
+				$content = get_the_post_thumbnail_url( null, $props['thumbnail_size'] );
 				break;
 			case 'url':
+			case 'link':
 				$content = get_the_permalink();
 				break;
 		}
@@ -1716,6 +1737,18 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+	 * Output a title from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	function post_featured_image_url( $args, $contact_id = null ) {
+		return $this->single_post( $args, 'featured_image_url' );
+	}
+
+	/**
 	 * Output the content from a recent post
 	 *
 	 * @param $args
@@ -1737,6 +1770,10 @@ class Replacements implements \JsonSerializable {
 	 */
 	function post_url( $args, $contact_id = null ) {
 		return $this->single_post( $args, 'url' );
+	}
+
+	function post_excerpt_ellipses( $more ) {
+		return '&hellip;';
 	}
 
 	/**
@@ -1843,6 +1880,8 @@ class Replacements implements \JsonSerializable {
 		 */
 		do_action( 'groundhogg/posts/before_render', $props );
 
+		add_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
+
 		switch ( $props['layout'] ) {
 			default:
 			case 'ul':
@@ -1862,7 +1901,7 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
-				$columnTable = sprintf( '<table class="email-columns %s" width="100%%" style="border-collapse: collapse;width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
+				$columnTable = sprintf( '<table class="email-columns %s" role="presentation" width="100%%" style="border-collapse: collapse;width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
 				$columnGap   = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], str_repeat( '&nbsp;', 3 ) );
 
 				$thumbnail = function ( $thumbnail_size ) {
@@ -1929,46 +1968,65 @@ class Replacements implements \JsonSerializable {
 					] );
 				};
 
-				if ( $props['featured'] ) {
-					$query->the_post();
-					$rows[] = $columnTable;
-					$rows[] = html()->e( 'tr', [
-						'class' => 'email-columns-row',
-					], $render_post( 'large', '100%' ) );
-					$rows[] = html()->e( 'tr', [
-						'class' => 'email-columns-row',
-					], $columnGap );
-					$rows[] = '</table>';
-				}
-
 				if ( $query->have_posts() ) {
 
 					$rendered_posts = [];
 
-					$rows[] = $columnTable;
-
 					while ( $query->have_posts() ):
 
 						$query->the_post();
-						$rendered_posts[] = $render_post( absint( $props['columns'] ) === 1 ? 'large' : $props['thumbnail_size'] );
+
+						// First post is featured
+						if ( $props['featured'] && empty( $rendered_posts ) ) {
+							$rendered_posts[] = $render_post( 'large', '100%' );
+						} else {
+							$rendered_posts[] = $render_post( absint( $props['columns'] ) === 1 ? 'large' : $props['thumbnail_size'] );
+						}
+
 
 					endwhile;
 
-					while ( ! empty( $rendered_posts ) ) {
-
-						$posts   = array_splice( $rendered_posts, 0, absint( $props['columns'] ) );
-						$columns = implode( $columnGap, $posts );
-
-						$rows[] = html()->e( 'tr', [
-							'class' => 'email-columns-row',
-						], $columns );
+					if ( $props['featured'] ) {
+						$post   = array_shift( $rendered_posts );
+						$rows[] = $columnTable;
 
 						$rows[] = html()->e( 'tr', [
 							'class' => 'email-columns-row',
-						], $columnGap );
+						], $post );
+
+						// Only add gap if more posts
+						if ( ! empty( $rendered_posts ) ) {
+							$rows[] = html()->e( 'tr', [
+								'class' => 'email-columns-row',
+							], $columnGap );
+						}
+
+						$rows[] = '</table>';
 					}
 
-					$rows[] = '</table>';
+					if ( ! empty( $rendered_posts ) ) {
+
+						$rows[] = $columnTable;
+
+						while ( ! empty( $rendered_posts ) ) {
+
+							$posts   = array_splice( $rendered_posts, 0, absint( $props['columns'] ) );
+							$columns = implode( $columnGap, $posts );
+
+							$rows[] = html()->e( 'tr', [
+								'class' => 'email-columns-row',
+							], $columns );
+
+							// Only add gap if more posts
+							if ( ! empty( $rendered_posts ) ) {
+								$rows[] = html()->e( 'tr', [
+									'class' => 'email-columns-row',
+								], $columnGap );
+							}
+						}
+
+						$rows[] = '</table>';
+					}
 				}
 
 				$content = implode( '', $rows );
@@ -2028,6 +2086,8 @@ class Replacements implements \JsonSerializable {
 		 * @param array $props
 		 */
 		do_action( 'groundhogg/posts/after_render', $props );
+
+		remove_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
 
 		return $content;
 	}

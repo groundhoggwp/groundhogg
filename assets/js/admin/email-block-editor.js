@@ -24,6 +24,7 @@
     makeEl,
     htmlToElements,
     Dashicon,
+    ToolTip,
   } = MakeEl
 
   const {
@@ -693,7 +694,6 @@
     let plain_text = extractPlainText(content)
     plain_text = plain_text.replaceAll(/(\s*\n|\s*\r\n|\s*\r){3,}/g, '\n\n')
     plain_text = plain_text.replace(/^\s+/, '')
-    console.log(plain_text)
 
     setEmailData({
       content,
@@ -2058,6 +2058,7 @@
   const isEmailEditorPage = () => _BlockEditor.hasOwnProperty('email')
 
   const makeSortable = el => {
+
     const sortableHelper = (e, $el) => {
       let blockId = $el.data('id')
       let blockType = $el.data('type')
@@ -2069,6 +2070,7 @@
 				</div>
 			</div>`
     }
+
     $(el).sortable({
       placeholder: 'block-placeholder',
       connectWith: '.sortable-blocks',
@@ -2086,8 +2088,10 @@
       },
       receive: (e, ui) => {
 
+        let $sortable = $(e.target)
+
         // moving block
-        let parent = $(e.target).is('.column') ? $(e.target).closest('.builder-block').data('id') : false
+        let parent = $sortable.is('.column') ? $sortable.closest('.builder-block').data('id') : false
         let column = parseInt(e.target.dataset.col)
 
         // adding block
@@ -2100,16 +2104,28 @@
           return
         }
 
+        let blockId = ui.item.data('id')
+        let index = ui.item.index()
+
+        if (blockId) {
+          moveBlock(blockId, index, parent, column)
+        }
       },
       update: (e, ui) => {
 
-        // moving block
-        let parent = $(e.target).is('.column') ? $(e.target).closest('.builder-block').data('id') : false
-        let column = parseInt(e.target.dataset.col)
-
-        // moving block
         let blockId = ui.item.data('id')
         let index = ui.item.index()
+
+        let $sortable = $(e.target)
+
+        // No longer in this sortable
+        if ( ! $sortable.has( `#edit-${blockId}` ).length ){
+          return
+        }
+
+        // moving block
+        let parent = $sortable.is('.column') ? $sortable.closest('.builder-block').data('id') : false
+        let column = parseInt(e.target.dataset.col)
 
         if (blockId) {
           moveBlock(blockId, index, parent, column)
@@ -2142,17 +2158,34 @@
    * @constructor
    */
   const Block = ({ type, name, svg }) => {
-    // language=HTML
-    return `
-		<div class="block-wrap">
-			<div class="block new-block gh-panel" data-type="${type}">
+
+    return Div({
+      className: 'block-wrap',
+      id: `add-${type}`,
+      title: name,
+      onDblclick: e => {
+
+        let newBlock = createBlock( type )
+
+        if ( hasActiveBlock() ){
+          insertBlockAfter( newBlock, getActiveBlock().id )
+          return
+        }
+
+        insertBlock( newBlock, getBlocks().length )
+
+        setActiveBlock( newBlock.id )
+        document.getElementById( `edit-${newBlock.id}` ).scrollIntoView( true )
+      }
+    }, [
+      // language=HTML
+      `<div class="block new-block gh-panel" data-type="${type}">
 				<div class="icon">
 					${svg}
 				</div>
 			</div>
-			<div class="block-name">${name}</div>
-		</div>
-    `
+      <div class="block-name">${name}</div>`
+    ])
   }
 
   /**
@@ -2175,7 +2208,7 @@
           },
         })
       },
-    }, Object.values(BlockRegistry.blocks).map(b => Block(b)))
+    }, Div({ className: 'block-grid'},Object.values(BlockRegistry.blocks).map(b => Block(b))))
   }
 
   const AdvancedBlockControls = () => {
@@ -2888,7 +2921,7 @@
             },
           }, getState().preview))
         },
-      }, icons.desktop),
+      }, [ icons.desktop, ToolTip( 'Desktop Preview' ) ] ),
       Button({
         id: 'preview-mobile',
         className: 'gh-button secondary icon',
@@ -2910,7 +2943,7 @@
             },
           }, getState().preview))
         },
-      }, icons.mobile),
+      }, [ icons.mobile, ToolTip( 'Mobile Preview' ) ]),
       Button({
         id: 'preview-plain-text',
         className: 'gh-button secondary icon',
@@ -2920,7 +2953,7 @@
             className: 'code',
           }, getEmailMeta().plain_text.replaceAll('\n', '<br/>')))
         },
-      }, icons.text),
+      }, [ icons.text, ToolTip( 'Plain Text Preview' ) ]),
       Button({
         id: 'send-test-email',
         className: 'gh-button secondary',
@@ -3057,7 +3090,7 @@
             selector: '#open-block-inspector',
           }, BlockInspector())
         },
-      }, icons.eye) : null,
+      }, [ icons.eye, ToolTip( 'Block Inspector' ) ]) : null,
       UndoRedo(),
       PreviewButtons(),
       PublishActions(),
@@ -3547,6 +3580,7 @@
         className: `column ${blocks.length ? '' : 'empty'}`,
         cellpadding: '0',
         cellspacing: '0',
+        role: 'presentation',
         width: '100%',
       }, blocks.map(b => BlockHTML(b))))
     }
@@ -4051,6 +4085,7 @@
           cellspacing: '0',
           cellpadding: '0',
           width: '100%',
+          role: 'presentation',
           style: {
             borderCollapse: 'collapse',
             tableLayout: 'fixed',
@@ -4369,6 +4404,7 @@
         border: '0',
         cellspacing: '0',
         cellpadding: '0',
+        role: 'presentation',
       }, [
         Tr({}, Td({
           align,
@@ -4376,6 +4412,7 @@
           border: '0',
           cellspacing: '0',
           cellpadding: '0',
+          role: 'presentation',
         }, Tr({}, Td({
           className: 'email-button',
           bgcolor: style.backgroundColor,
@@ -4423,6 +4460,7 @@
         border: '0',
         cellspacing: '0',
         cellpadding: '0',
+        role: 'presentation',
       }, [
         Tr({}, Td({
           align,
@@ -4430,6 +4468,7 @@
           border: '0',
           cellspacing: '0',
           cellpadding: '0',
+          role: 'presentation',
         }, Tr({}, Td({
           className: 'email-button',
           bgcolor: style.backgroundColor,
@@ -4651,6 +4690,7 @@
       return Table({
         cellspacing: '0',
         cellpadding: '0',
+        role: 'presentation',
       }, Tr({}, Td({
         height,
         style: {
@@ -5360,6 +5400,7 @@
       cellpadding: '0',
       cellspacing: '0',
       width: '100%',
+      role: 'presentation',
     }, blocks.filter(b => b.type).map(block => BlockHTML(block))).outerHTML
     setIsGeneratingHTML(false)
     return html

@@ -89,12 +89,15 @@
   overflow-y: auto;
   flex-shrink: 0;
 }
+#email-block-editor #blocks-panel .block-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto;
+  gap: 10px;
+}
 #email-block-editor .block-wrap .block-name {
   text-align: center;
   font-weight: 300;
-}
-#email-block-editor .block-wrap:not(:last-child) {
-  margin-bottom: 10px;
 }
 #email-block-editor .block {
   height: 60px;
@@ -530,6 +533,7 @@ body iframe#preview.desktop {
   top: 32px;
   bottom: 0;
   right: 0;
+  height: calc(100vh - 32px);
   max-height: calc(100vh - 32px);
 }
 #email-editor:has(#email-html-editor) {
@@ -539,6 +543,7 @@ body iframe#preview.desktop {
 #email-editor:has(#email-html-editor) #email-html-editor {
   flex-grow: 1;
   align-items: stretch;
+  height: calc(100vh - 32px - 60px);
   max-height: calc(100vh - 32px - 60px);
 }
 #email-editor .gh-header {
