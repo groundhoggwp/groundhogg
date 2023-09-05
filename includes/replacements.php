@@ -1758,7 +1758,7 @@ class Replacements implements \JsonSerializable {
 			'layout'         => 'ul',
 			'featured'       => false,
 			'excerpt'        => false,
-			'thumbnail'      => false,
+			'thumbnail'      => true,
 			'thumbnail_size' => 'thumbnail',
 			'post_type'      => 'post',
 			'category'       => '',
@@ -1797,7 +1797,9 @@ class Replacements implements \JsonSerializable {
 			}
 		}
 
-		if ( isset_not_empty( $props, 'id' ) ) {
+		$query_id = $props['id'];
+
+		if ( $query_id ) {
 
 			/**
 			 * Filter post query variables
@@ -1805,23 +1807,29 @@ class Replacements implements \JsonSerializable {
 			 * @param $query   array the query args
 			 * @param $contact Contact the current contact
 			 */
-			$query_vars = apply_filters( "groundhogg/posts/query/{$props['id']}", $query_vars, $this->current_contact );
+			$query_vars = apply_filters( "groundhogg/posts/query/{$query_id}", $query_vars, $this->current_contact );
+		}
+
+		if ( $query_id ) {
+
+			$filter_query = function ( $query ) use ( $query_id, $query_vars ) {
+				/**
+				 * Allow for modification of the query
+				 */
+				do_action_ref_array( "groundhogg/posts/wp_query/{$query_id}", [
+					&$query,
+					$query_vars,
+					$this->current_contact,
+				] );
+			};
+
+			add_action( 'pre_get_posts', $filter_query );
 		}
 
 		$query = new \WP_Query( $query_vars );
 
-		if ( isset_not_empty( $props, 'id' ) ) {
-
-			/**
-			 * Filter post query
-			 *
-			 * @param $query   \WP_Query the query
-			 * @param $contact Contact the current contact
-			 */
-			$query = apply_filters_ref_array( "groundhogg/posts/wp_query/{$props['id']}", [
-				&$query,
-				$this->current_contact
-			] );
+		if ( $query_id ) {
+			remove_action( 'pre_get_posts', $filter_query );
 		}
 
 		if ( ! $query->have_posts() ) {
@@ -1889,15 +1897,15 @@ class Replacements implements \JsonSerializable {
 							'vertical-align'   => 'top',
 						]
 					], [
-						has_post_thumbnail() ? html()->e( 'div', [
+						has_post_thumbnail() && $props['thumbnail'] ? html()->e( 'div', [
 							'class' => 'featured-image-wrap'
 						], html()->e( 'a', [
 							'href' => get_the_permalink()
 						], $thumbnail( $thumbnail_size ) ) ) : '',
 						html()->e( 'table', [
 							'class'       => 'card-content',
-							'cellpadding' => '0',
-							'cellspacing' => '0',
+							'cellpadding' => 0,
+							'cellspacing' => 0,
 						], [
 							html()->e( 'tr', [], html()->e( 'td', [
 								'style' => [
@@ -1905,7 +1913,9 @@ class Replacements implements \JsonSerializable {
 								]
 							], [
 								html()->e( 'h2', [
-									'style' => $props['headingStyle']
+									'style' => array_merge( [
+										'margin-top' => '0'
+									], $props['headingStyle'] )
 								], html()->e( 'a', [
 									'href'  => get_the_permalink(),
 									'style' => $props['headingStyle']

@@ -103,6 +103,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   gap: 20px;
 }
 
+#email-html-editor{
+  display: flex;
+
+  .CodeMirror {
+    flex-grow: 1;
+  }
+}
+
 #email-block-editor {
   display: flex;
   gap: 20px;
@@ -461,14 +469,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   .controls-nav {
     display: flex;
-    justify-content: space-between;
     background: #fff;
     align-items: center;
     padding: 10px 3px 0 10px;
     box-shadow: $box-shadow;
+    gap: 3px;
 
     h2.breadcrumbs {
-      margin: 0;
+      margin: 0 auto 0 0;
       display: flex;
       gap: 3px;
       font-size: 13px;
@@ -713,12 +721,27 @@ body {
 
 #email-editor {
 
-  &:has(#email-block-editor) {
+  &:has(#email-block-editor),
+  &:has(#email-html-editor){
     position: fixed;
     left: 160px;
     top: 32px;
     bottom: 0;
     right: 0;
+
+    max-height: calc(100vh - 32px);
+  }
+
+  &:has(#email-html-editor){
+    display: flex;
+    flex-direction: column;
+
+    #email-html-editor {
+      flex-grow: 1;
+      align-items: stretch;
+      max-height: calc(100vh - 32px - 60px);
+
+    }
   }
 
   .gh-header {
@@ -899,7 +922,8 @@ body {
     width: 90vw;
     height: 85vh;
 
-    &:has(#email-block-editor) {
+    &:has(#email-block-editor),
+    &:has(#email-html-editor) {
       position: relative;
       left: initial;
       right: initial;
@@ -1080,6 +1104,55 @@ body {
   }
 }
 
+
+.gh-modal.mini .gh-modal-dialog:has(.block-inspector),
 .gh-modal.mini .gh-modal-dialog:has(.global-font-select) {
   padding: 0;
+}
+
+
+.block-inspector {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+
+  .inspector-block {
+    display: flex;
+    gap: 5px;
+    border-width: 1px 0 0 0;
+    border-radius: 0;
+    padding: 6px 12px;
+    border-color: $primary-dark-50;
+    background-color: $primary-dark-5;
+    width: 100%;
+    color: $primary-dark;
+    align-items: center;
+
+    &:hover {
+      background-color: $primary-dark-15;
+    }
+
+    svg {
+      height: 14px;
+      width: 14px;
+    }
+
+    &.active {
+      background-color: $primary-blue;
+      color: #fff;
+    }
+  }
+
+  .inspector-column {
+    //padding-left: 16px;4
+    > div.column-header {
+      padding: 3px 8px;
+      border-top: 1px solid $primary-dark-50;
+      //padding-left: calc( 12px * ( 12px * var(--depth) ));
+    }
+
+    > .inspector-block {
+      //padding-left: calc( 24px + ( 12px * var(--depth) ));
+    }
+  }
 }

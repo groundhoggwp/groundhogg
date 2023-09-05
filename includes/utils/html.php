@@ -362,8 +362,13 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function e( $e = 'div', $atts = [], $content = '', $self_closing = true, $echo = false ) {
-		if ( ! empty( $content ) || ! $self_closing ) {
+	public function e( $e = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
+
+		if ( in_array( $e, ['img','input','br','hr', 'embed'] ) ){
+			$self_closing = true;
+		}
+
+		if ( !$self_closing ) {
 			$html = $this->wrap( $content, $e, $atts );
 		} else {
 			$html = sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );

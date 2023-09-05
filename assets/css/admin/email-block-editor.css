@@ -69,6 +69,13 @@
   gap: 20px;
 }
 
+#email-html-editor {
+  display: flex;
+}
+#email-html-editor .CodeMirror {
+  flex-grow: 1;
+}
+
 #email-block-editor {
   display: flex;
   gap: 20px;
@@ -333,14 +340,14 @@
 }
 #controls-panel .controls-nav {
   display: flex;
-  justify-content: space-between;
   background: #fff;
   align-items: center;
   padding: 10px 3px 0 10px;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  gap: 3px;
 }
 #controls-panel .controls-nav h2.breadcrumbs {
-  margin: 0;
+  margin: 0 auto 0 0;
   display: flex;
   gap: 3px;
   font-size: 13px;
@@ -517,12 +524,22 @@ body iframe#preview.desktop {
   display: none;
 }
 
-#email-editor:has(#email-block-editor) {
+#email-editor:has(#email-block-editor), #email-editor:has(#email-html-editor) {
   position: fixed;
   left: 160px;
   top: 32px;
   bottom: 0;
   right: 0;
+  max-height: calc(100vh - 32px);
+}
+#email-editor:has(#email-html-editor) {
+  display: flex;
+  flex-direction: column;
+}
+#email-editor:has(#email-html-editor) #email-html-editor {
+  flex-grow: 1;
+  align-items: stretch;
+  max-height: calc(100vh - 32px - 60px);
 }
 #email-editor .gh-header {
   background: #FFFFFF;
@@ -674,7 +691,7 @@ body iframe#preview.desktop {
   width: 90vw;
   height: 85vh;
 }
-.gh-modal-frame #email-editor:has(#email-block-editor) {
+.gh-modal-frame #email-editor:has(#email-block-editor), .gh-modal-frame #email-editor:has(#email-html-editor) {
   position: relative;
   left: initial;
   right: initial;
@@ -809,8 +826,42 @@ body iframe#preview.desktop {
   background: rgba(16, 38, 64, 0.15);
 }
 
+.gh-modal.mini .gh-modal-dialog:has(.block-inspector),
 .gh-modal.mini .gh-modal-dialog:has(.global-font-select) {
   padding: 0;
+}
+
+.block-inspector {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.block-inspector .inspector-block {
+  display: flex;
+  gap: 5px;
+  border-width: 1px 0 0 0;
+  border-radius: 0;
+  padding: 6px 12px;
+  border-color: rgba(16, 38, 64, 0.5);
+  background-color: rgba(16, 38, 64, 0.05);
+  width: 100%;
+  color: #102640;
+  align-items: center;
+}
+.block-inspector .inspector-block:hover {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+.block-inspector .inspector-block svg {
+  height: 14px;
+  width: 14px;
+}
+.block-inspector .inspector-block.active {
+  background-color: #0075ff;
+  color: #fff;
+}
+.block-inspector .inspector-column > div.column-header {
+  padding: 3px 8px;
+  border-top: 1px solid rgba(16, 38, 64, 0.5);
 }
 
 /*# sourceMappingURL=email-block-editor.css.map */

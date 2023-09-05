@@ -46,7 +46,7 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 	], $email );
 	?>
 	<div class="pre-footer-content" style="<?php echo array_to_css( $custom_footer_text_style ) ?>">
-		<?php echo wpautop( $custom_text ); ?>
+		<?php echo wpautop( do_replacements( $custom_text, $email->get_contact() ) ); ?>
 	</div>
 <?php endif; ?>
 <div class="footer" style="margin-top: 40px;">

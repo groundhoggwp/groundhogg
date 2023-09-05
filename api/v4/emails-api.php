@@ -336,6 +336,8 @@ class Emails_Api extends Base_Object_Api {
 		$email->data = $request->get_param( 'data' );
 		$email->meta = $request->get_param( 'meta' );
 
+		$email->enable_test_mode();
+
 		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
 	}
 

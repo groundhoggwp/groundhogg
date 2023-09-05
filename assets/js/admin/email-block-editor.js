@@ -98,6 +98,62 @@
     return array.indexOf(value) === index
   }
 
+  const InspectorBlock = (block, depth = 0) => {
+
+    let type = BlockRegistry.get(block.type)
+
+    return Button({
+      id: `inspector-${block.id}`,
+      className: `inspector-block ${isActiveBlock(block.id) ? 'active' : ''}`,
+      style: {
+        paddingLeft: `${12 * depth}px`,
+      },
+      onClick: e => {
+        setActiveBlock(block.id)
+        document.getElementById(`edit-${block.id}`).scrollIntoView(true)
+        morph(BlockInspector())
+      },
+      onMouseenter: e => {
+
+      },
+      onMouseleave: e => {
+
+      },
+    }, [type.svg, type.name])
+
+  }
+
+  const InspectorColumn = (blocks, depth = 1) => Div({
+    className: 'inspector-column',
+  }, [
+    Div({
+      className: 'column-header',
+      style: {
+        paddingLeft: `${12 * depth}px`,
+      },
+    }, 'Column'),
+    ...blocks.map(block => InspectorBlockWrapper(block, depth + 1)),
+  ])
+
+  const InspectorBlockWrapper = (block, depth = 1) => {
+
+    if (block.type === 'columns' && block.columns && Array.isArray(block.columns)) {
+      return Div({
+        className: 'inspector-columns',
+      }, [
+        InspectorBlock(block, depth),
+        ...block.columns.filter(blocks => blocks.length > 0).map(blocks => InspectorColumn(blocks, depth + 1)),
+      ])
+    }
+
+    return InspectorBlock(block, depth)
+  }
+
+  const BlockInspector = () => {
+    return Div({ className: 'block-inspector', id: 'block-inspector' },
+      getBlocks().map(block => InspectorBlockWrapper(block)))
+  }
+
   const DesignTemplates = [
     {
       id: 'boxed',
@@ -416,6 +472,7 @@
     isGeneratingHTML: false,
     hasChanges: false,
     preview: '',
+    page: 'editor',
   }
 
   const setState = newState => {
@@ -543,6 +600,9 @@
     morphControls()
   }
 
+  const isBlockEditor = () => State.page === 'editor'
+  const isHTMLEditor = () => State.page === 'html-editor'
+
   /**
    * IF the block is active
    *
@@ -628,6 +688,27 @@
   const isPanelOpen = panel => State.openPanels[panel]
   const getTemplate = () => DesignTemplates.find(t => t.id === getEmailMeta().template) || DesignTemplates[0]
 
+  const setHTML = (content, hasChanges = true) => {
+
+    let plain_text = extractPlainText(content)
+    plain_text = plain_text.replaceAll(/(\s*\n|\s*\r\n|\s*\r){3,}/g, '\n\n')
+    plain_text = plain_text.replace(/^\s+/, '')
+    console.log(plain_text)
+
+    setEmailData({
+      content,
+    })
+
+    setEmailMeta({
+      plain_text,
+    })
+
+    if (hasChanges) {
+      updatePreview()
+    }
+
+  }
+
   const setBlocks = (blocks = [], hasChanges = true) => {
 
     let css = renderBlocksCSS(blocks)
@@ -658,74 +739,83 @@
     History.addChange(getStateCopy())
   }
 
+  function extractPlainText (content) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(content, 'text/html')
+    return __extractPlainText(doc.body)
+  }
+
   /**
    * Parse HTML content to make better plain text emails
    *
    * @param node
    * @return {string|*}
    */
-  function extractPlainText (node) {
+  function __extractPlainText (node) {
 
     if (node.nodeType === Node.TEXT_NODE) {
+      // return node.textContent.replace(/^\s+/g, '');
       return node.textContent
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const tagName = node.tagName.toLowerCase()
 
-      if ([
-        'div',
-        'p',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'span',
-        'b',
-        'a',
-        'strong',
-        'em',
-        'i',
-        'ul',
-        'ol',
-        'li',
-        'body',
-        'br',
-      ].includes(tagName)) {
-        let text = ''
-        let index = Array.from(node.parentNode.childNodes).indexOf(node)
+      let text = ''
+      let index = Array.from(node.parentNode.childNodes).indexOf(node)
 
-        for (const childNode of node.childNodes) {
-          text += extractPlainText(childNode)
-        }
-
-        if (tagName === 'a') {
-          return `${text} (${node.getAttribute('href')})`
-        }
-
-        if (tagName === 'br') {
-          return '\n'
-        }
-
-        if (tagName === 'li') {
-
-          if (node.parentNode.tagName.toLowerCase() === 'ol') {
-            return `\n${index + 1}. ${text}`
-          }
-
-          return `\n- ${text}`
-        }
-
-        if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName) && index > 0) {
-          return `\n\n${text}`
-        }
-
-        if (['ul', 'ol'].includes(tagName) && index > 0) {
-          return `\n${text}`
-        }
-
-        return text
+      for (const childNode of node.childNodes) {
+        text += __extractPlainText(childNode)
       }
+
+      if (tagName === 'a') {
+        return `[${text}](${node.getAttribute('href')})`
+      }
+
+      if (tagName === 'br') {
+        return '  \n'
+      }
+
+      if (tagName === 'img') {
+        return `![${node.alt || 'image'}](${node.src})`
+      }
+
+      if (tagName === 'li') {
+
+        if (node.parentNode.tagName.toLowerCase() === 'ol') {
+          return `\n${index + 1}. ${text}`
+        }
+
+        return `\n- ${text}`
+      }
+
+      if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
+        let headingPrefix = '#'.repeat(parseInt(tagName.substr(1)))
+        if (headingPrefix) {
+          headingPrefix += ' '
+        }
+        return `${index > 0 ? '\n\n' : '\n'}${headingPrefix}${text}`
+      }
+
+      if (tagName === 'b' || tagName === 'strong') {
+        return `**${text}**`
+      }
+
+      if (tagName === 'i' || tagName === 'em') {
+        return `*${text}*`
+      }
+
+      if (tagName === 'hr') {
+        return '---'
+      }
+
+      if (tagName === 'code') {
+        return `\`${text}\``
+      }
+
+      if (['ul', 'ol'].includes(tagName) && index > 0) {
+        return `\n${text}`
+      }
+
+      return text
     }
 
     return ''
@@ -1387,7 +1477,7 @@
     return window.btoa(unescape(encodeURIComponent(str)))
   }
 
-  const registerDynamicBlock = (type, name, { generateCacheKey, ...block }) => {
+  const registerDynamicBlock = (type, name, { generateCacheKey, parseContent = () => {}, ...block }) => {
 
     let prevContent = null
     let timeout
@@ -1400,6 +1490,7 @@
 
       timeout = setTimeout(async () => {
         let { content = '' } = await get(`${EmailsStore.route}/blocks/${block.type}?props=${base64_json_encode(block)}`)
+        content = parseContent(content, block)
         dynamicContentCache.set(generateCacheKey(block), content)
         prevContent = content
         morphBlocks()
@@ -1411,7 +1502,7 @@
       let cacheKey = generateCacheKey(block)
 
       if (dynamicContentCache.has(cacheKey)) {
-        return dynamicContentCache.get(cacheKey)
+        return parseContent(dynamicContentCache.get(cacheKey), block)
       }
 
       return Div({
@@ -1844,8 +1935,19 @@
    * @param column
    */
   const addBlock = (type, index = 0, parent = false, column = 0) => {
-
     let newBlock = createBlock(type)
+    insertBlock(newBlock, index, parent, column)
+  }
+
+  /**
+   * Insert block at given index
+   *
+   * @param newBlock
+   * @param index
+   * @param parent
+   * @param column
+   */
+  const insertBlock = (newBlock, index = 0, parent = false, column = 0) => {
     let tempBlocks = getBlocksCopy()
 
     __insertBlock(newBlock, index, tempBlocks, parent, column)
@@ -1902,10 +2004,20 @@
    * @param blockId
    */
   const duplicateBlock = (blockId) => {
-    let tempBlocks = getBlocksCopy()
-    let block = __findBlock(blockId, tempBlocks)
+    let block = __findBlock(blockId, getBlocks())
+    insertBlockAfter(__replaceId(copyObject(block)), blockId)
+  }
 
-    __insertAfter(__replaceId(copyObject(block)), blockId, tempBlocks)
+  /**
+   * Insert a block after another one
+   *
+   * @param newBlock
+   * @param after
+   */
+  const insertBlockAfter = (newBlock, after) => {
+    let tempBlocks = getBlocksCopy()
+
+    __insertAfter(newBlock, after, tempBlocks)
 
     setBlocks(tempBlocks)
     morphBlocks()
@@ -2236,6 +2348,16 @@
         name: 'Email Settings',
         closable: false,
       }, [
+        isHTMLEditor() ? Control({
+          label: 'Subject line',
+          stacked: true,
+        }, InputWithReplacements({
+          type: 'text',
+          id: 'subject-line',
+          className: 'full-width',
+          value: getEmailData().subject,
+          onInput: e => setEmailData({ subject: e.target.value }),
+        })) : null,
         Control({
           label: 'Send this email from...',
           stacked: true,
@@ -2281,7 +2403,7 @@
             morphBlocks()
           },
         })),
-        Control({
+        isBlockEditor() ? Control({
           label: 'Enable browser view',
         }, Toggle({
           id: 'enable-browser-view',
@@ -2291,7 +2413,7 @@
               browser_view: e.target.checked,
             })
           },
-        })),
+        })) : null,
         Control({
           label: 'Show in my templates',
         }, Toggle({
@@ -2303,8 +2425,8 @@
             })
           },
         })),
-        `<hr/>`,
-        Control({
+        isBlockEditor() ? `<hr/>` : null,
+        isBlockEditor() ? Control({
           label: 'Template',
         }, Select({
           id: 'select-template',
@@ -2316,9 +2438,10 @@
             })
             morphEmailEditor()
           },
-        })),
+        })) : null,
       ]),
-      getTemplate().controls(),
+      isBlockEditor() ? getTemplate().controls() : null,
+      isHTMLEditor() ? ControlGroup({ name: 'HTML Editor Info'}, HTMLEditorNotice()) : null,
     ])
   }
 
@@ -2495,13 +2618,13 @@
             morphControls()
           },
         }, __('Advanced')),
-        Button({
-          className: `tab ${getEmailControlsTab() === 'editor' ? 'active' : 'inactive'}`,
+        isBlockEditor() ? Button({
+          className: `gh-button secondary text small ${getEmailControlsTab() === 'editor' ? 'active' : 'inactive'}`,
           onClick: e => {
             setEmailControlsTab('editor')
             morphControls()
           },
-        }, Dashicon('admin-settings')),
+        }, Dashicon('admin-settings')) : null,
       ])
 
     }
@@ -2530,6 +2653,54 @@
         className: 'breadcrumbs',
       }, breadcrumbs),
       nav,
+      hasActiveBlock() ? Button({
+        id: 'block-more',
+        className: 'gh-button secondary text small icon block-more',
+        onClick: e => {
+          moreMenu('#block-more', [
+            {
+              key: 'copy',
+              text: 'Copy Block',
+              onSelect: e => {
+                let input = document.createElement('input')
+                input.classList.add('hidden')
+                input.value = JSON.stringify(getActiveBlock())
+                document.body.append(input)
+                input.select()
+                navigator.clipboard.writeText(input.value)
+                input.remove()
+                dialog({
+                  message: 'Block copied!',
+                })
+              },
+            },
+            {
+              key: 'paste',
+              text: 'Paste Block',
+              onSelect: e => {
+                navigator.clipboard.readText().then(copiedText => {
+                  let block
+                  try {
+                    block = JSON.parse(copiedText)
+                  } catch (e) {
+                    dialog({ message: 'No block was copied', type: 'error' })
+                    return
+                  }
+
+                  if (!block || !block.id || !block.type) {
+                    dialog({ message: 'No block was copied', type: 'error' })
+                    return
+                  }
+
+                  insertBlockAfter(__replaceId(block), getActiveBlock().id)
+                  dialog({ message: 'Block pasted!' })
+
+                })
+              },
+            },
+          ])
+        },
+      }, icons.verticalDots) : null,
     ])
 
   }
@@ -2709,9 +2880,11 @@
               backgroundColor: '#fff',
             },
             onCreate: frame => {
-              setTimeout(() => {
-                document.getElementById('mobile-desktop-iframe').contentDocument.body.style.padding = '20px'
-              }, 100)
+              if (isBlockEditor()) {
+                setTimeout(() => {
+                  document.getElementById('mobile-desktop-iframe').contentDocument.body.style.padding = '20px'
+                }, 100)
+              }
             },
           }, getState().preview))
         },
@@ -2729,9 +2902,11 @@
               backgroundColor: '#fff',
             },
             onCreate: frame => {
-              setTimeout(() => {
-                document.getElementById('mobile-preview-iframe').contentDocument.body.style.padding = '20px'
-              }, 100)
+              if (isBlockEditor()) {
+                setTimeout(() => {
+                  document.getElementById('mobile-preview-iframe').contentDocument.body.style.padding = '20px'
+                }, 100)
+              }
             },
           }, getState().preview))
         },
@@ -2873,6 +3048,16 @@
     }, [
       icons.groundhogg,
       Title(),
+      isBlockEditor() ? Button({
+        className: 'gh-button secondary text icon',
+        id: 'open-block-inspector',
+        onClick: e => {
+          MiniModal({
+            closeOnFocusout: true,
+            selector: '#open-block-inspector',
+          }, BlockInspector())
+        },
+      }, icons.eye) : null,
       UndoRedo(),
       PreviewButtons(),
       PublishActions(),
@@ -2967,6 +3152,85 @@
     },
   }, Dashicon('no-alt')) : null
 
+  let codeMirror
+  let codeMirrorSize = 100
+
+  const resizeCodeMirror = () => {
+
+    let newSize = document.getElementById('email-html-editor').getBoundingClientRect().height
+
+    if (newSize === codeMirrorSize) {
+      // Have to set size small first otherwise doesn't get smaller :/
+      codeMirror.setSize(null, 100)
+      newSize = document.getElementById('email-html-editor').getBoundingClientRect().height
+    }
+
+    codeMirror.setSize(null, newSize)
+    codeMirrorSize = newSize
+  }
+
+  window.addEventListener('resize', e => {
+    if (isHTMLEditor()) {
+      resizeCodeMirror()
+    }
+  })
+
+  // language=HTML
+  const HTMLEditorNotice = () => `
+		  <p>${__(
+			  'You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
+			  'groundhogg-pro')}</p>
+		  <p><b>${__('Here\'s what you need to know:', 'groundhogg-pro')}</b></p>
+		  <p>${__(
+			  'The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
+			  'groundhogg-pro')}
+		  </p>
+		  <p>${__('You will need to manually add any information required for compliance:', 'groundhogg-pro')}</p>
+		  <ul class="styled">
+			  <li>${__('Your physical business location.', 'groundhogg-pro')}
+				  <code>{business_address}</code></li>
+			  <li>${__('Your business phone number.', 'groundhogg-pro')} <code>{business_phone}</code>
+			  </li>
+			  <li>${__('Links to your terms of service and privacy policy.', 'groundhogg-pro')}</li>
+			  <li>${__('The link to unsubscribe.', 'groundhogg-pro')} <code>{unsubscribe_link}</code>
+			  <li>${__('The link to view in browser.', 'groundhogg-pro')} <code>{view_in_browser_link}</code>
+			  </li>
+		  </ul>
+		  <p>${__('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro')}</p>
+		  <p>${__('Replacement codes and shortcodes will also still work as normal.', 'groundhogg-pro')}</p>`
+
+  const HTMLEditor = () => {
+    return Div({
+      id: 'email-html-editor',
+    }, [
+
+      // Code
+      Textarea({
+        id: 'code-block-editor',
+        value: getEmailData().content,
+        onCreate: el => {
+          // Wait for add to dom
+          setTimeout(() => {
+            codeMirror = wp.codeEditor.initialize('code-block-editor', {
+              ...wp.codeEditor.defaultSettings,
+              codemirror: {
+                ...wp.codeEditor.defaultSettings.codemirror,
+                lineWrapping: false,
+              },
+            }).codemirror
+
+            codeMirror.on('change', instance => setHTML(instance.getValue()))
+
+            resizeCodeMirror()
+          }, 100)
+        },
+      }),
+
+      // Controls
+      ControlsPanel(),
+    ])
+  }
+
   const EmailEditor = () => {
 
     if (getState().page === 'templates') {
@@ -2986,80 +3250,161 @@
                 marginRight: 'auto',
               },
             }, __('Select a template...')),
-            Button({
-              id: 'import-email',
-              className: 'gh-button secondary',
-              onClick: e => {
-                Modal({}, ({ close }) => Div({}, [
-                  `<h2>Select a template to import</h2>`,
-                  `<p>${__(
-                    'If you have a popup JSON file, you can upload it below 👇')}</p>`,
-                  Input({
-                    type: 'file',
-                    accept: 'application/json',
-                    id: 'import-email-file',
-                    onChange: e => {
-                      let file = e.target.files[0]
+            Div({
+              className: 'gh-input-group',
+            }, [
+              Button({
+                id: 'import-html',
+                className: 'gh-button secondary',
+                onClick: e => {
+                  Modal({}, ({ close }) => Div({}, [
+                    `<h2>Select a file to import</h2>`,
+                    `<p>${__(
+                      'If you have an HTML file, you can upload it below 👇')}</p>`,
+                    Input({
+                      type: 'file',
+                      accept: 'text/html',
+                      id: 'import-email-file',
+                      onChange: e => {
+                        let file = e.target.files[0]
 
-                      let reader = new FileReader()
-                      reader.onload = function (e) {
+                        let reader = new FileReader()
+                        reader.onload = function (e) {
 
-                        let contents = e.target.result
-                        let email = JSON.parse(contents)
+                          let contents = e.target.result
 
-                        if (!email) {
-                          dialog({
-                            type: 'error',
-                            message: __('Invalid import. Choose another file.'),
+                          if (!contents) {
+                            dialog({
+                              type: 'error',
+                              message: __('Invalid import. Choose another file.'),
+                            })
+                            return
+                          }
+
+                          let title
+
+                          try {
+                            const parser = new DOMParser()
+                            const doc = parser.parseFromString(contents, 'text/html')
+
+                            // no title? invalid
+                            title = doc.head.querySelector('title').innerText
+                          } catch (e) {
+                            dialog({
+                              type: 'error',
+                              message: __('Invalid import. Choose another file.'),
+                            })
+                            return
+                          }
+
+                          setEmailData({
+                            title,
+                            subject: title,
+                            preview_text: '',
+                            content: contents,
                           })
-                          return
+
+                          setState({
+                            page: 'html-editor',
+                            preview: contents,
+                          })
+                          renderEditor()
+                          close()
                         }
 
-                        if (!email.ID) {
-                          dialog({
-                            type: 'error',
-                            message: __('Invalid import. Choose another file.'),
+                        reader.readAsText(file)
+                      },
+                    }),
+                  ]))
+
+                },
+              }, [Dashicon('media-code'), 'Import HTML']),
+              Button({
+                id: 'import-email',
+                className: 'gh-button secondary',
+                onClick: e => {
+                  Modal({}, ({ close }) => Div({}, [
+                    `<h2>Select a template to import</h2>`,
+                    `<p>${__(
+                      'If you have a template JSON file, you can upload it below 👇')}</p>`,
+                    Input({
+                      type: 'file',
+                      accept: 'application/json',
+                      id: 'import-email-file',
+                      onChange: e => {
+                        let file = e.target.files[0]
+
+                        let reader = new FileReader()
+                        reader.onload = function (e) {
+
+                          let contents = e.target.result
+                          let email = JSON.parse(contents)
+
+                          if (!email) {
+                            dialog({
+                              type: 'error',
+                              message: __('Invalid import. Choose another file.'),
+                            })
+                            return
+                          }
+
+                          if (!email.ID) {
+                            dialog({
+                              type: 'error',
+                              message: __('Invalid import. Choose another file.'),
+                            })
+                            return
+                          }
+
+                          let {
+                            meta,
+                            data,
+                          } = email
+
+                          setEmailMeta(meta)
+                          setEmailData({
+                            title: data.title,
+                            subject: data.subject,
+                            preview_text: data.preview_text,
                           })
-                          return
+                          setBlocks(meta.blocks, false)
+                          setState({ page: 'editor' })
+                          renderEditor()
+                          close()
                         }
 
-                        let {
-                          meta,
-                          data,
-                        } = email
-
-                        setEmailMeta(meta)
-                        setEmailData({
-                          title: data.title,
-                          subject: data.subject,
-                          preview_text: data.preview_text,
-                        })
-                        setBlocks(meta.blocks, false)
-                        setState({ page: 'editor' })
-                        renderEditor()
-                        close()
-                      }
-
-                      reader.readAsText(file)
-                    },
-                  }),
-                ]))
-              },
-            }, [Dashicon('upload'), 'Import a template']),
-            Button({
-              id: 'start-from-scratch',
-              className: 'gh-button secondary',
-              onClick: e => {
-                setState({
-                  page: 'editor',
-                })
-                morphEmailEditor()
-              },
-            }, 'Start from scratch'),
+                        reader.readAsText(file)
+                      },
+                    }),
+                  ]))
+                },
+              }, [Dashicon('upload'), 'Import a template']),
+              Button({
+                id: 'start-from-scratch',
+                className: 'gh-button secondary',
+                onClick: e => {
+                  setState({
+                    page: 'editor',
+                  })
+                  morphEmailEditor()
+                },
+              }, 'Start from scratch'),
+            ]),
             CloseButton(),
           ]),
         // Templates
         TemplatePicker(),
+      ])
+    }
+
+    if (isHTMLEditor()) {
+      return Div({
+        id: 'email-editor',
+      }, [
+        // header
+        Header(),
+        // HTML editor
+        HTMLEditor(),
       ])
     }
 
@@ -3084,7 +3429,7 @@
     const doc = parser.parseFromString(context.built, 'text/html')
     doc.querySelector('html').style.zoom = '50%'
     doc.querySelector('html').style.overflow = 'hidden'
-    doc.body.style.padding = '20px'
+    // doc.body.style.padding = '20px'
     doc.head.querySelector('style#responsive')?.remove()
 
     return Div({
@@ -3732,6 +4077,15 @@
     },
   })
 
+  const inlineStyle = (doc, selector, style = {}) => {
+    style = fillFontStyle(style)
+    doc.querySelectorAll(selector).forEach(el => {
+      for (let attr in style) {
+        el.style[attr] = style[attr]
+      }
+    })
+  }
+
   const textContent = ({ content, p, h1, h2, h3, a }) => {
 
     if (!content) {
@@ -3743,24 +4097,15 @@
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
 
-    const inlineStyle = (tag, style) => {
-      style = fillFontStyle(style)
-      doc.querySelectorAll(tag).forEach(el => {
-        for (let attr in style) {
-          el.style[attr] = style[attr]
-        }
-      })
-    }
-
-    inlineStyle('p', {
+    inlineStyle(doc, 'p', {
       ...p,
       margin: '1em 0',
     })
-    inlineStyle('li', p)
-    inlineStyle('h1', h1)
-    inlineStyle('h2', h2)
-    inlineStyle('h3', h3)
-    inlineStyle('a', {
+    inlineStyle(doc, 'li', p)
+    inlineStyle(doc, 'h1', h1)
+    inlineStyle(doc, 'h2', h2)
+    inlineStyle(doc, 'h3', h3)
+    inlineStyle(doc, 'a', {
       ...p,
       ...a,
     })
@@ -3901,11 +4246,7 @@
           }
       `
     },
-    plainText: ({ content }) => {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(content, 'text/html')
-      return extractPlainText(doc.body)
-    },
+    plainText: ({ content }) => extractPlainText(content),
     defaults: {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
       p: fontDefaults({
@@ -4031,9 +4372,6 @@
       }, [
         Tr({}, Td({
           align,
-          style: {
-            padding: '20px 0',
-          },
         }, Table({
           border: '0',
           cellspacing: '0',
@@ -4088,9 +4426,6 @@
       }, [
         Tr({}, Td({
           align,
-          style: {
-            padding: '20px 0',
-          },
         }, Table({
           border: '0',
           cellspacing: '0',
@@ -4274,7 +4609,7 @@
       }, img)
     },
     plainText: ({ src = '', alt = '', link = '' }) => {
-      return `[${alt} ${src}] ${link ? `${link}` : ''}`
+      return `${link ? '[' : ''}![${alt || 'image'}](${src})${link ? `](${link})` : ''}`
     },
     defaults: {
       src: 'http://via.placeholder.com/600x338',
@@ -4403,6 +4738,7 @@
 		      style="border-width: ${height}px 0 0 0;width:${width}%;border-top-color: ${color};border-style: ${lineStyle};">
 		  </hr>`
     },
+    plainText: () => '---',
     defaults: {
       height: 3,
       color: '#ccc',
@@ -4447,11 +4783,7 @@
     html: ({ content }) => {
       return content
     },
-    plainText: ({ content }) => {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(content, 'text/html')
-      return extractPlainText(doc.body)
-    },
+    plainText: ({ content }) => extractPlainText(content),
     defaults: {
       content: '<p>HTML CODE</p>',
     },
@@ -4468,6 +4800,8 @@
       layout = '',
       featured = false,
       excerpt = false,
+      thumbnail = true,
+      thumbnail_size = '',
       gap = 20,
       number,
       offset,
@@ -4488,17 +4822,17 @@
         ControlGroup({
           name: 'Layout',
         }, [
-          Control({
-            label: 'Layout',
-          }, Select({
-            options: {
-              ul: 'List',
-              grid: 'Grid',
-              cards: 'Cards',
-            },
-            selected: layout,
-            onChange: e => updateBlock({ layout: e.target.value }),
-          })),
+          // Control({
+          //   label: 'Layout',
+          // }, Select({
+          //   options: {
+          //     ul: 'List',
+          //     grid: 'Grid',
+          //     cards: 'Cards',
+          //   },
+          //   selected: layout,
+          //   onChange: e => updateBlock({ layout: e.target.value }),
+          // })),
           Control({
             label: 'Featured',
           }, Toggle({
@@ -4507,12 +4841,22 @@
             onChange: e => updateBlock({ featured: e.target.checked }),
           })),
           Control({
-            label: 'Excerpt',
+            label: 'Excerpts',
           }, Toggle({
             id: 'toggle-excerpt',
             checked: excerpt,
             onChange: e => updateBlock({
               excerpt: e.target.checked,
+              reRenderControls: true,
+            }),
+          })),
+          Control({
+            label: 'Thumbnails',
+          }, Toggle({
+            id: 'toggle-thumbnails',
+            checked: thumbnail,
+            onChange: e => updateBlock({
+              thumbnail: e.target.checked,
               reRenderControls: true,
             }),
           })),
@@ -4528,6 +4872,19 @@
         ]),
         TagFontControlGroup(__('Heading'), 'headingStyle', headingStyle, updateBlock),
         excerpt ? TagFontControlGroup(__('Excerpt'), 'excerptStyle', excerptStyle, updateBlock) : null,
+        thumbnail ? ControlGroup({ name: 'Thumbnail' }, [
+          Control({
+            label: 'Thumbnail Size',
+          }, Select({
+            id: 'thumbnail-size',
+            style: {
+              width: '115px',
+            },
+            selected: thumbnail_size,
+            options: imageSizes.map(size => ({ value: size, text: size })),
+            onChange: e => updateBlock({ thumbnail_size: e.target.value }),
+          })),
+        ]) : null,
         ControlGroup({
           name: 'Query',
         }, [
@@ -4644,6 +5001,15 @@
         ]),
       ])
     },
+    parseContent: (content, { headingStyle = {}, excerptStyle = {} }) => {
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(content, 'text/html')
+
+      inlineStyle(doc, 'h2, h2 a', headingStyle)
+      inlineStyle(doc, 'p', excerptStyle)
+
+      return doc.body.innerHTML
+    },
     css: ({
       selector,
       headingStyle = {},
@@ -4652,12 +5018,9 @@
 
       //language=CSS
       return `
-          ${selector} h2 {
-              ${fontStyle(headingStyle)}
-          }
-
+          ${selector} h2,
           ${selector} h2 a {
-              color: inherit;
+              ${fontStyle(headingStyle)}
           }
 
           ${selector} p.post-excerpt {
@@ -4679,6 +5042,8 @@
       queryId,
       tag_rel,
       category_rel,
+      thumbnail_size,
+      thumbnail,
     }) => {
       return base64_json_encode({
         number,
@@ -4694,15 +5059,18 @@
         queryId,
         tag_rel,
         category_rel,
+        thumbnail_size,
+        thumbnail,
       })
     },
     defaults: {
-      layout: 'grid',
+      layout: 'cards',
       number: 5,
       offset: 0,
-      featured: false,
+      featured: true,
       excerpt: false,
-      thumbnail: false,
+      thumbnail: true,
+      thumbnail_size: 'thumbnail',
       post_type: 'post',
       columns: 2,
       gap: 20,
@@ -4714,6 +5082,7 @@
       excerptStyle: fontDefaults({
         fontSize: 16,
       }),
+      cardStyle: {},
     },
   })
 
@@ -4803,14 +5172,14 @@
     },
   })
 
-  registerBlock('fonttest', 'Font Test', {
-    svg: icons.text,
-    controls: () => { Fragment([])},
-    html: () => {
-      return Fragment(fonts.map(f => makeEl('p', { style: { fontFamily: f, fontSize: '16px' } }, f)))
-    },
-    plainText: () => '',
-  })
+  // registerBlock('fonttest', 'Font Test', {
+  //   svg: icons.text,
+  //   controls: () => { Fragment([])},
+  //   html: () => {
+  //     return Fragment(fonts.map(f => makeEl('p', { style: { fontFamily: f, fontSize: '16px' } }, f)))
+  //   },
+  //   plainText: () => '',
+  // })
 
   const morph = (selector, html = null) => {
 
@@ -4838,6 +5207,51 @@
 
     // existing email not using blocks
     if (email.ID) {
+
+      switch (email.context.editor_type) {
+
+        case 'blocks':
+          break
+        case 'legacy_blocks':
+
+          let elements = htmlToElements(email.data.content)
+
+          // Using for...of
+          for (const node of elements.values()) {
+
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+              continue
+            }
+
+            if (node.classList.contains('row')) {
+              email.meta.blocks = convertProEditorToBlocks(email.data.content)
+              break
+            }
+          }
+
+          break
+        case 'legacy_plain':
+
+          email.meta.blocks = [
+            createBlock('text', {
+              content: email.data.content,
+            }),
+          ]
+
+          break
+        case 'html':
+
+          setState({
+            page: 'html-editor',
+            email,
+            preview: email.context?.built,
+          })
+
+          setHTML(email.data.content, false)
+
+          renderEditor()
+          return
+      }
 
       // must convert to blocks
       if (email.context.editor_type !== 'blocks') {
@@ -4869,6 +5283,16 @@
             ]
 
             break
+          case 'html':
+
+            setState({
+              page: 'html-editor',
+              email,
+              preview: email.context?.built,
+            })
+
+            renderEditor()
+            return
         }
       }
 
@@ -5124,6 +5548,7 @@
     colorPalette = [],
     globalFonts = [],
     blockDefaults = {},
+    imageSizes = [],
   } = _BlockEditor
 
   // Fill global fonts if none defined

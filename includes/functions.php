@@ -845,13 +845,22 @@ function array_to_atts( $atts ) {
 
 	foreach ( $atts as $key => $value ) {
 
-		if ( empty( $value ) ) {
-			continue;
-		}
-
 		$key = strtolower( $key );
 
 		switch ( $key ) {
+			case 'cellpadding':
+			case 'cellspacing':
+				$value = absint( $value );
+				break;
+			case 'width':
+			case 'height':
+
+				if ( str_ends_with( $value, '%' ) ) {
+					$value = absint( substr( $value, 0, -1 ) ) . '%';
+				} else {
+					$value = absint( $value );
+				}
+				break;
 			case 'class':
 				$value = esc_attr( trim( is_array( $value ) ? implode( ' ', $value ) : $value ) );
 				break;
@@ -864,6 +873,11 @@ function array_to_atts( $atts ) {
 				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : esc_attr( $value );
 				break;
 			default:
+
+				if ( empty( $value ) ) {
+					continue 2;
+				}
+
 				if ( is_array( $value ) ) {
 					$value = implode( ' ', $value );
 				}
@@ -879,7 +893,14 @@ function array_to_atts( $atts ) {
 	return $tag;
 }
 
-function kebabize( $string ) {
+/**
+ * Converts Camel Case to Kebab Case
+ *
+ * @param $string
+ *
+ * @return string
+ */
+function camel_to_kebab( $string ) {
 
 	$string = preg_replace_callback( '/([a-z])([A-Z])/', function ( $matches ) {
 		return strtolower( $matches[1] ) . '-' . strtolower( $matches[2] );
@@ -904,7 +925,7 @@ function array_to_css( $atts ) {
 	$css = '';
 	foreach ( $atts as $key => $value ) {
 
-		if ( is_null( $value ) ){
+		if ( is_null( $value ) ) {
 			continue;
 		}
 
@@ -912,7 +933,7 @@ function array_to_css( $atts ) {
 			$value = implode( ' ', $value );
 		}
 
-		$attribute = kebabize( $key );
+		$attribute = camel_to_kebab( $key );
 
 		switch ( $attribute ) {
 			case 'use':
@@ -6390,6 +6411,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'templates'    => Plugin::instance()->library->get_email_templates(),
 		'colorPalette' => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'  => get_option( 'gh_email_editor_global_fonts', [] ),
+		'imageSizes'   => get_intermediate_image_sizes()
 	], $extra );
 
 	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );
