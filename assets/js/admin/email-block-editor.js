@@ -115,10 +115,10 @@
         morph(BlockInspector())
       },
       onMouseenter: e => {
-
+        document.getElementById(`edit-${block.id}`).classList.add( 'inspector-hover' )
       },
       onMouseleave: e => {
-
+        document.getElementById(`edit-${block.id}`).classList.remove( 'inspector-hover' )
       },
     }, [type.svg, type.name])
 
@@ -165,6 +165,10 @@
           alignment = 'left',
           width = 600,
           backgroundColor = 'transparent',
+          backgroundImage = '',
+          backgroundPosition = '',
+          backgroundSize = '',
+          backgroundRepeat = '',
         } = getEmailMeta()
 
         return ControlGroup({
@@ -172,12 +176,12 @@
         }, [
           Control({
             label: 'Email Width',
-          }, Input({
+          }, NumberControl({
             id: 'email-width',
             name: 'width',
             value: width,
-            className: 'control-input',
-            type: 'number',
+            step: 10,
+            unit: 'px',
             onInput: e => {
               updateSettings({
                 width: parseInt(e.target.value),
@@ -224,6 +228,20 @@
               })
             },
           })),
+          BackgroundImageControls({
+            id: 'background-image',
+            backgroundImage,
+            backgroundPosition,
+            backgroundSize,
+            backgroundRepeat,
+            onChange: (props) => {
+              updateSettings({
+                ...props,
+                reRenderControls: true,
+                reRender: true,
+              })
+            },
+          }),
         ])
       },
       html: (blocks) => {
@@ -232,17 +250,30 @@
           width = 640,
           alignment = 'left',
           backgroundColor = 'transparent',
+          backgroundImage = '',
+          backgroundPosition = '',
+          backgroundSize = '',
+          backgroundRepeat = '',
         } = getEmailMeta()
 
+        let style = {
+          backgroundColor
+        }
+
+        if (backgroundImage) {
+          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundSize = backgroundSize
+          style.backgroundRepeat = backgroundRepeat
+          style.backgroundPosition = backgroundPosition
+        }
+
         return Div({
-          style: {
-            backgroundColor,
-          },
+          className: 'template-bg',
+          style,
         }, Div({
           className: `template-boxed ${alignment}`,
           style: {
             maxWidth: `${width || 640}px`,
-            backgroundColor,
           },
         }, blocks))
       },
@@ -271,6 +302,10 @@
 
         let {
           backgroundColor = 'transparent',
+          backgroundImage = '',
+          backgroundPosition = '',
+          backgroundSize = '',
+          backgroundRepeat = '',
         } = getEmailMeta()
 
         // no settings
@@ -290,18 +325,45 @@
               })
             },
           })),
+          BackgroundImageControls({
+            id: 'background-image',
+            backgroundImage,
+            backgroundPosition,
+            backgroundSize,
+            backgroundRepeat,
+            onChange: (props) => {
+              updateSettings({
+                ...props,
+                reRenderControls: true,
+                reRender: true,
+              })
+            },
+          }),
         ])
       },
       html: (blocks) => {
         const {
           backgroundColor = 'transparent',
+          backgroundImage = '',
+          backgroundPosition = '',
+          backgroundSize = '',
+          backgroundRepeat = '',
         } = getEmailMeta()
+
+        let style = {
+          backgroundColor
+        }
+
+        if (backgroundImage) {
+          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundSize = backgroundSize
+          style.backgroundRepeat = backgroundRepeat
+          style.backgroundPosition = backgroundPosition
+        }
 
         return Div({
           className: `template-full-width`,
-          style: {
-            backgroundColor,
-          },
+          style
         }, blocks)
       },
       mceCss: () => {
@@ -821,6 +883,42 @@
     return ''
   }
 
+  const NumberControl = ({ step=1, id, unit = null, value, onChange, ...rest }) => Div({
+    id,
+    className: 'gh-input-group number-control',
+  }, [
+    Button({
+      id: `minus-${id}`,
+      className: 'gh-button grey small',
+      onClick: e => {
+        let input = document.getElementById(`input-${id}`)
+        input.stepDown()
+        input.dispatchEvent(new Event('input'))
+      }
+    }, Dashicon('minus')),
+    Input({
+      id: `input-${id}`,
+      type: `number`,
+      value,
+      step,
+      min: 0,
+      onInput: e => onChange(e),
+      ...rest,
+    }),
+    unit ? Div({
+      className: 'unit',
+    }, unit ) : null,
+    Button({
+      id: `add-${id}`,
+      className: 'gh-button grey small',
+      onClick: e => {
+        let input = document.getElementById(`input-${id}`)
+        input.stepUp()
+        input.dispatchEvent(new Event('input'))
+      }
+    }, Dashicon('plus-alt2')),
+  ])
+
   const TopRightBottomLeft = ({
     id = '',
     values = {},
@@ -868,6 +966,7 @@
         value: values.top,
         className: `design-attr full-width`,
         placeholder: 'Top',
+        min: 0,
         onInput: e => setValue('top', e.target.value),
       }),
       Input({
@@ -877,6 +976,7 @@
         value: values.right,
         className: `design-attr full-width`,
         placeholder: 'Right',
+        min: 0,
         onInput: e => setValue('right', e.target.value),
       }),
       Input({
@@ -886,6 +986,7 @@
         value: values.bottom,
         className: `design-attr full-width`,
         placeholder: 'Bottom',
+        min: 0,
         onInput: e => setValue('bottom', e.target.value),
       }),
       Input({
@@ -895,6 +996,7 @@
         value: values.left,
         className: `design-attr full-width`,
         placeholder: 'Left',
+        min: 0,
         onInput: e => setValue('left', e.target.value),
       }),
       Button({
@@ -1049,12 +1151,13 @@
       ])),
       supports.width ? Control({
         label: 'Width',
-      }, Input({
+      }, NumberControl({
         id: `${id}-width`,
-        type: 'number',
         className: 'control-input',
         max: maxWidth,
         value: width,
+        unit: 'px',
+        step: 10,
         onChange: e => {
           onChange({
             width: parseInt(e.target.value),
@@ -1073,6 +1176,130 @@
           })
         },
       })) : null,
+    ])
+  }
+
+  const BackgroundImageControls = ({
+    id = '',
+    backgroundImage = '',
+    backgroundPosition = '',
+    backgroundRepeat = '',
+    backgroundSize = '',
+    onChange = () => {},
+  }) => {
+
+    return Fragment([
+      Control({
+        label: 'Background Image',
+        stacked: true,
+      }, InputGroup([
+        Input({
+          type: 'text',
+          id: `${id}-src`,
+          value: backgroundImage,
+          className: 'control full-width',
+          name: 'src',
+          onChange: e => {
+            onChange({
+              backgroundImage: e.target.value,
+            })
+          },
+        }),
+        Button({
+          id: `${id}-select`,
+          className: 'gh-button secondary icon',
+          onClick: e => {
+
+            let file_frame
+
+            e.preventDefault()
+            // If the media frame already exists, reopen it.
+            if (file_frame) {
+              // Open frame
+              file_frame.open()
+              return
+            }
+            // Create the media frame.
+            file_frame = wp.media.frames.file_frame = wp.media({
+              title: __('Select a image to upload'),
+              button: {
+                text: __('Use this image'),
+              },
+              multiple: false,	// Set to true to allow multiple files to be selected
+
+            })
+            // When an image is selected, run a callback.
+            file_frame.on('select', function () {
+              // We set multiple to false so only get one image from the uploader
+              let attachment = file_frame.state().get('selection').first().toJSON()
+
+              onChange({
+                backgroundImage: attachment.url,
+              })
+            })
+            // Finally, open the modal
+            file_frame.open()
+          },
+        }, icons.image),
+      ])),
+      Control({
+        label: 'Position',
+      }, Select({
+        id: `${id}-position`,
+        options: {
+          'center center' : 'Center Center',
+          'center left' : 'Center Left',
+          'center right' : 'Center Right',
+          'top center' : 'Top Center',
+          'top left' : 'Top Left',
+          'top right' : 'Top Right',
+          'bottom center' : 'Bottom Center',
+          'bottom left' : 'Bottom Left',
+          'bottom right' : 'Bottom Right',
+        },
+        selected: backgroundPosition,
+        onChange: e => {
+          onChange({
+            backgroundPosition: e.target.value,
+          })
+        },
+      })),
+      Control({
+        label: 'Repeat',
+      }, Select({
+        id: `${id}-repeat`,
+        options: {
+          '' : 'Default',
+          'no-repeat' : 'No Repeat',
+          'repeat' : 'Repeat',
+          'repeat-x' : 'Repeat X',
+          'repeat-y' : 'Repeat Y',
+        },
+        selected: backgroundRepeat,
+        onChange: e => {
+          onChange({
+            backgroundRepeat: e.target.value,
+          })
+        },
+      })),
+      Control({
+        label: 'Size',
+      }, Select({
+        id: `${id}-size`,
+        options: {
+          '' : 'Default',
+          'auto' : 'Auto',
+          'cover' : 'Cover',
+          'contain' : 'Contain',
+        },
+        selected: backgroundSize,
+        onChange: e => {
+          onChange({
+            backgroundSize: e.target.value,
+          })
+        },
+      })),
+      `<p><i>Background images do not function in any Windows desktop client. Always set the background color as a fallback.</i></p>`,
     ])
   }
 
@@ -1227,6 +1454,9 @@
         borderRadius = {},
         backgroundColor = 'transparent',
         backgroundImage = '',
+        backgroundSize = '',
+        backgroundRepeat = '',
+        backgroundPosition = '',
       } = advancedStyle
 
       const style = {}
@@ -1248,8 +1478,9 @@
 
       if (backgroundImage) {
         style.backgroundImage = `url(${backgroundImage})`
-        style.backgroundSize = 'cover'
-        style.backgroundRepeat = 'no-repeat'
+        style.backgroundSize = backgroundSize
+        style.backgroundRepeat = backgroundRepeat
+        style.backgroundPosition = backgroundPosition
       }
 
       return style
@@ -1289,6 +1520,13 @@
           reRenderBlocks,
         })
       }
+      
+      let {
+        backgroundImage = '',
+        backgroundPosition = '',
+        backgroundSize = '',
+        backgroundRepeat = '',
+      } = advancedStyle
 
       return Fragment([
         ControlGroup({
@@ -1343,22 +1581,19 @@
               reRenderControls: true,
             }),
           })),
-          ImageControls({
+          BackgroundImageControls({
             id: 'background-image',
-            maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
-            src: advancedStyle.backgroundImage || '',
-            supports: {
-              alt: false,
-              width: false,
-            },
-            onChange: ({ src }) => {
+            backgroundImage,
+            backgroundSize,
+            backgroundRepeat,
+            backgroundPosition,
+            onChange: (props) => {
               updateStyle({
-                backgroundImage: src,
+                ...props,
                 reRenderControls: true,
               })
             },
           }),
-          `<p><i>Background images do not function in any Windows desktop client. Always set the background color as a fallback.</i></p>`,
         ]),
       ])
     },
@@ -1635,14 +1870,14 @@
           onClick: e => {
             duplicateBlock(block.id)
           },
-        }, Dashicon('admin-page')),
+        }, [ Dashicon('admin-page'), ToolTip('Duplicate') ] ),
         Button({
           className: 'gh-button primary small delete-block',
           id: `delete-${block.id}`,
           onClick: e => {
             deleteBlock(block.id)
           },
-        }, Dashicon('trash')),
+        }, [ Dashicon('trash'), ToolTip( 'Delete' ) ] ),
       ]),
     ])
   }
@@ -1953,7 +2188,7 @@
     __insertBlock(newBlock, index, tempBlocks, parent, column)
 
     setBlocks(tempBlocks)
-    morphBlocks()
+    setActiveBlock(newBlock.id)
     updateStyles()
   }
 
@@ -2119,7 +2354,7 @@
         let $sortable = $(e.target)
 
         // No longer in this sortable
-        if ( ! $sortable.has( `#edit-${blockId}` ).length ){
+        if (!$sortable.has(`#edit-${blockId}`).length) {
           return
         }
 
@@ -2165,26 +2400,27 @@
       title: name,
       onDblclick: e => {
 
-        let newBlock = createBlock( type )
+        let newBlock = createBlock(type)
 
-        if ( hasActiveBlock() ){
-          insertBlockAfter( newBlock, getActiveBlock().id )
+        if (hasActiveBlock()) {
+          insertBlockAfter(newBlock, getActiveBlock().id)
           return
         }
 
-        insertBlock( newBlock, getBlocks().length )
+        insertBlock(newBlock, getBlocks().length)
 
-        setActiveBlock( newBlock.id )
-        document.getElementById( `edit-${newBlock.id}` ).scrollIntoView( true )
-      }
+        setActiveBlock(newBlock.id)
+        document.getElementById(`edit-${newBlock.id}`).scrollIntoView(true)
+      },
     }, [
       // language=HTML
-      `<div class="block new-block gh-panel" data-type="${type}">
-				<div class="icon">
-					${svg}
-				</div>
-			</div>
-      <div class="block-name">${name}</div>`
+      `
+		  <div class="block new-block gh-panel" data-type="${type}">
+			  <div class="icon">
+				  ${svg}
+			  </div>
+		  </div>
+		  <div class="block-name">${name}</div>`,
     ])
   }
 
@@ -2208,7 +2444,7 @@
           },
         })
       },
-    }, Div({ className: 'block-grid'},Object.values(BlockRegistry.blocks).map(b => Block(b))))
+    }, Div({ className: 'block-grid' }, Object.values(BlockRegistry.blocks).map(b => Block(b))))
   }
 
   const AdvancedBlockControls = () => {
@@ -2281,7 +2517,7 @@
             }, 100)
           },
         }),
-        `<p>Use the <code>selector</code> tag to target elements withing the current block.</p>`,
+        `<p>Use the <code>selector</code> tag to target elements within the current block.</p>`,
         `<p>CSS entered here may not be universally supported by email clients. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">CSS compatibility</a>.</p>`,
       ]),
     ])
@@ -2474,7 +2710,7 @@
         })) : null,
       ]),
       isBlockEditor() ? getTemplate().controls() : null,
-      isHTMLEditor() ? ControlGroup({ name: 'HTML Editor Info'}, HTMLEditorNotice()) : null,
+      isHTMLEditor() ? ControlGroup({ name: 'HTML Editor Info' }, HTMLEditorNotice()) : null,
     ])
   }
 
@@ -2853,6 +3089,7 @@
         },
       })
     } else {
+
       title = Fragment([
         __('Now editing '),
         Span({
@@ -2861,7 +3098,7 @@
           onClick: e => {
             startEditing()
           },
-        }, getEmailData().title),
+        }, getEmailData().title || '_'.repeat(20)),
       ])
     }
 
@@ -2921,7 +3158,7 @@
             },
           }, getState().preview))
         },
-      }, [ icons.desktop, ToolTip( 'Desktop Preview' ) ] ),
+      }, [icons.desktop, ToolTip('Desktop Preview')]),
       Button({
         id: 'preview-mobile',
         className: 'gh-button secondary icon',
@@ -2943,7 +3180,7 @@
             },
           }, getState().preview))
         },
-      }, [ icons.mobile, ToolTip( 'Mobile Preview' ) ]),
+      }, [icons.mobile, ToolTip('Mobile Preview')]),
       Button({
         id: 'preview-plain-text',
         className: 'gh-button secondary icon',
@@ -2953,7 +3190,7 @@
             className: 'code',
           }, getEmailMeta().plain_text.replaceAll('\n', '<br/>')))
         },
-      }, [ icons.text, ToolTip( 'Plain Text Preview' ) ]),
+      }, [icons.text, ToolTip('Plain Text Preview')]),
       Button({
         id: 'send-test-email',
         className: 'gh-button secondary',
@@ -3090,7 +3327,7 @@
             selector: '#open-block-inspector',
           }, BlockInspector())
         },
-      }, [ icons.eye, ToolTip( 'Block Inspector' ) ]) : null,
+      }, [icons.eye, ToolTip('Block Inspector')]) : null,
       UndoRedo(),
       PreviewButtons(),
       PublishActions(),
@@ -3210,27 +3447,27 @@
 
   // language=HTML
   const HTMLEditorNotice = () => `
-		  <p>${__(
-			  'You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
-			  'groundhogg-pro')}</p>
-		  <p><b>${__('Here\'s what you need to know:', 'groundhogg-pro')}</b></p>
-		  <p>${__(
-			  'The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
-			  'groundhogg-pro')}
-		  </p>
-		  <p>${__('You will need to manually add any information required for compliance:', 'groundhogg-pro')}</p>
-		  <ul class="styled">
-			  <li>${__('Your physical business location.', 'groundhogg-pro')}
-				  <code>{business_address}</code></li>
-			  <li>${__('Your business phone number.', 'groundhogg-pro')} <code>{business_phone}</code>
-			  </li>
-			  <li>${__('Links to your terms of service and privacy policy.', 'groundhogg-pro')}</li>
-			  <li>${__('The link to unsubscribe.', 'groundhogg-pro')} <code>{unsubscribe_link}</code>
-			  <li>${__('The link to view in browser.', 'groundhogg-pro')} <code>{view_in_browser_link}</code>
-			  </li>
-		  </ul>
-		  <p>${__('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro')}</p>
-		  <p>${__('Replacement codes and shortcodes will also still work as normal.', 'groundhogg-pro')}</p>`
+	  <p>${__(
+		  'You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
+		  'groundhogg-pro')}</p>
+	  <p><b>${__('Here\'s what you need to know:', 'groundhogg-pro')}</b></p>
+	  <p>${__(
+		  'The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
+		  'groundhogg-pro')}
+	  </p>
+	  <p>${__('You will need to manually add any information required for compliance:', 'groundhogg-pro')}</p>
+	  <ul class="styled">
+		  <li>${__('Your physical business location.', 'groundhogg-pro')}
+			  <code>{business_address}</code></li>
+		  <li>${__('Your business phone number.', 'groundhogg-pro')} <code>{business_phone}</code>
+		  </li>
+		  <li>${__('Links to your terms of service and privacy policy.', 'groundhogg-pro')}</li>
+		  <li>${__('The link to unsubscribe.', 'groundhogg-pro')} <code>{unsubscribe_link}</code>
+		  <li>${__('The link to view in browser.', 'groundhogg-pro')} <code>{view_in_browser_link}</code>
+		  </li>
+	  </ul>
+	  <p>${__('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro')}</p>
+	  <p>${__('Replacement codes and shortcodes will also still work as normal.', 'groundhogg-pro')}</p>`
 
   const HTMLEditor = () => {
     return Div({
@@ -3875,22 +4112,23 @@
         map(font => ({ id: font, text: fontDisplay(font) }))),
         onChange: item => onChange({ fontFamily: item.id }),
       })),
-      !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, Input({
-        type: 'number',
+      !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, NumberControl({
         id: `font-size`,
         name: `font_size`,
         className: 'font-control control-input',
+        unit: 'px',
+        min: 0,
         value: fontSize,
         onInput: e => onChange({ fontSize: e.target.value }),
       })),
-      !supports.lineHeight ? null : Control({ label: __('Line Height', 'groundhogg') }, Input({
-        type: 'number',
+      !supports.lineHeight ? null : Control({ label: __('Line Height', 'groundhogg') }, NumberControl({
         id: `line-height`,
         name: `line_height`,
         className: 'font-control control-input',
         value: lineHeight,
-        step: '0.1',
+        step: 0.1,
         max: 10,
+        min: 0,
         onInput: e => onChange({ lineHeight: e.target.value }),
       })),
       !supports.fontWeight ? null : Control({ label: __('Font Weight', 'groundhogg') }, Select({
@@ -4057,12 +4295,12 @@
           ]),
           Control({
             label: 'Gap',
-          }, Input({
-            type: 'number',
+          }, NumberControl({
             id: 'column-gap',
-            className: 'control-input',
+            step: 5,
             value: gap,
-            onInput: e => updateBlock({ gap: e.target.value }),
+            unit: 'px',
+            onChange: e => updateBlock({ gap: e.target.value }),
           })),
           Control({
             label: 'Vertical Alignment',
@@ -4672,11 +4910,10 @@
       }, [
         Control({
           label: 'Height',
-        }, Input({
-          type: 'number',
+        }, NumberControl({
+          id: 'spacer-height',
           className: 'control-input',
           value: height,
-          id: 'spacer-height',
           onChange: e => {
             updateBlock({
               height: parseInt(e.target.value),
@@ -4726,11 +4963,11 @@
         })),
         Control({
           label: 'Height',
-        }, Input({
-          type: 'number',
+        }, NumberControl({
           className: 'control-input',
           value: height,
           id: 'divider-height',
+          unit: 'px',
           onChange: e => {
             updateBlock({
               height: parseInt(e.target.value),
@@ -4739,11 +4976,13 @@
         })),
         Control({
           label: 'Width',
-        }, Input({
-          type: 'number',
+        }, NumberControl({
           className: 'control-input',
           value: width,
           id: 'divider-width',
+          unit: '%',
+          step: 10,
+          max: 100,
           onChange: e => {
             updateBlock({
               width: parseInt(e.target.value),
@@ -4796,25 +5035,28 @@
 </svg>`,
     controls: ({ content = '', updateBlock }) => {
       return Fragment([
-        Textarea({
-          id: 'code-block-editor',
-          value: content,
-          onCreate: el => {
+        ControlGroup({name: 'HTML', closable: false }, [
+          Textarea({
+            id: 'code-block-editor',
+            value: content,
+            onCreate: el => {
 
-            // Wait for add to dom
-            setTimeout(() => {
-              let editor = wp.codeEditor.initialize('code-block-editor', {
-                ...wp.codeEditor.defaultSettings,
-              }).codemirror
+              // Wait for add to dom
+              setTimeout(() => {
+                let editor = wp.codeEditor.initialize('code-block-editor', {
+                  ...wp.codeEditor.defaultSettings,
+                }).codemirror
 
-              editor.on('change', instance => updateBlock({
-                content: instance.getValue(),
-              }))
+                editor.on('change', instance => updateBlock({
+                  content: instance.getValue(),
+                }))
 
-              editor.setSize(null, 500)
-            }, 100)
-          },
-        }),
+                editor.setSize(null, 500)
+              }, 100)
+            },
+          }),
+          `<p>Not HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`
+        ] ),
       ])
     },
     edit: ({ content }) => {
@@ -4902,11 +5144,12 @@
           })),
           Control({
             label: 'Gap',
-          }, Input({
-            type: 'number',
+          }, NumberControl({
             id: 'column-gap',
             className: 'control-input',
             value: gap,
+            step: 5,
+            unit: 'px',
             onInput: e => updateBlock({ gap: e.target.value }),
           })),
         ]),

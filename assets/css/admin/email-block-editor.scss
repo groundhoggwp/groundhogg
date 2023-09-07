@@ -1,5 +1,6 @@
 $primary-blue: rgb(0, 117, 255);
 $primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-60-hex: #66ACFF;
 $primary-blue-50: rgba(0, 117, 255, 0.50);
 $primary-blue-20: rgba(0, 117, 255, 0.20);
 $primary-blue-10: rgba(0, 117, 255, 0.10);
@@ -353,7 +354,8 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             display: inline-block;
             font-size: 12px;
             padding: 2px 6px;
-            background-color: rgb(200, 200, 200);
+            background-color: $primary-blue-60-hex;
+            color: #fff;
             z-index: 99;
             box-shadow: $box-shadow;
           }
@@ -369,8 +371,8 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            color: $primary-dark;
-            background-color: rgb(200, 200, 200);
+            color: #FFF;
+            background-color: $primary-blue-60-hex;
             z-index: 99;
             box-shadow: $box-shadow;
 
@@ -381,19 +383,30 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           }
         }
 
+        &.inspector-hover,
         &:hover:not(:has(td .builder-block:hover)) {
           //transition: 0.4s;
           //z-index: 10;
-          outline: 2px solid rgb(200, 200, 200);
+          outline: 2px solid $primary-blue-60-hex;
 
           > .block-toolbar {
             display: block;
-            background-color: rgb(200, 200, 200);
+            background-color: $primary-blue-60-hex;
           }
         }
 
+         &.inspector-hover,
+        &:has(.inspector-hover),
         &:has(.is-editing) {
           overflow: visible;
+        }
+
+        &.inspector-hover{
+          > .block-toolbar {
+            .move-block {
+              display: none;
+            }
+          }
         }
 
         &.is-editing {
@@ -927,8 +940,8 @@ body {
     background: #F6F9FB;
     border-radius: 5px;
     overflow: hidden;
-    width: 90vw;
-    height: 85vh;
+    width: 90vw !important;
+    height: 85vh !important;
 
     &:has(#email-block-editor),
     &:has(#email-html-editor) {
@@ -1060,14 +1073,14 @@ body {
 
 .font-controls {
 
-  width: 200px;
+  width: 250px;
 
   .control-label {
     font-weight: 500;
   }
 
   .font-control {
-    max-width: 80px;
+    max-width: 100px;
   }
 }
 
@@ -1161,6 +1174,35 @@ body {
 
     > .inspector-block {
       //padding-left: calc( 24px + ( 12px * var(--depth) ));
+    }
+  }
+}
+
+.number-control {
+  input[type=number]{
+    padding-right: 0;
+    width: 50px;
+    text-align: center;
+  }
+
+  .unit{
+    background: $primary-dark-5;
+    color: $primary-dark;
+    border: 1px solid $primary-dark-50;
+    width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gh-button {
+    display: flex;
+    align-items: center;
+
+    .dashicons {
+      font-size: 13px;
+      width: 13px;
+      height: 13px;
     }
   }
 }

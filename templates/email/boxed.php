@@ -23,8 +23,25 @@ $email_title = get_bloginfo( 'name', 'display' );
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
 $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_line(), $email_title );
 
-$bgcolor   = $email->get_meta( 'backgroundColor' ) ?: '';
-$alignment = $email->get_alignment(); // 'left' or 'center'
+$bgColor    = $email->get_meta( 'backgroundColor' ) ?: '';
+$bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';
+$bgPosition = $email->get_meta( 'backgroundPosition' ) ?: 'center center';
+$bgRepeat   = $email->get_meta( 'backgroundRepeat' ) ?: 'no-repeat';
+$bgSize     = $email->get_meta( 'backgroundSize' ) ?: 'auto';
+$alignment  = $email->get_alignment(); // 'left' or 'center'
+
+$bodyStyle = [
+	'background-color' => $bgColor
+];
+
+if ( $bgImage ) {
+	$bodyStyle = array_merge( $bodyStyle, [
+		'background-image'    => $bgImage,
+		'background-position' => $bgPosition,
+		'background-repeat'   => $bgRepeat,
+		'background-size'     => $bgSize,
+	] );
+}
 
 ?>
 <!doctype html>
@@ -47,12 +64,14 @@ $alignment = $email->get_alignment(); // 'left' or 'center'
 	</style>
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 </head>
-<body class="email responsive" style="background-color: <?php esc_attr_e( $bgcolor ); ?>">
+<body class="email responsive" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
 <?php load_part( 'preview-text' ); ?>
-<table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0">
+<table class="alignment-container"
+       style="width: 100%;border-collapse: collapse;background-color: <?php esc_attr_e( $bgColor ); ?>"
+       bgcolor="<?php esc_attr_e( $bgColor ); ?>" cellpadding="0" cellspacing="0">
 	<tr>
-		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgcolor ); ?>"
-		    style="background-color: <?php esc_attr_e( $bgcolor ); ?>">
+		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgColor ); ?>"
+		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle )?>">
 			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse">
 				<tr>
 					<td width="<?php esc_attr_e( $email->get_width() ); ?>"

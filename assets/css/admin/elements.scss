@@ -1076,7 +1076,7 @@ button {
       background: $primary-dark-5;
       color: $primary-dark;
       padding: 5px 10px;
-      border: 1px solid $primary-dark;
+      border: 1px solid $primary-dark-50;
 
       &:hover:not(:disabled) {
         background: $primary-dark-15;

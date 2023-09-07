@@ -1913,7 +1913,10 @@ class Replacements implements \JsonSerializable {
 						'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
 						'alt'   => $alt,
 						'class' => 'post-thumbnail ' . $thumbnail_size . ' ',
-						'width' => '100%'
+						'width' => '100%',
+						'style' => [
+							'vertical-align' => 'bottom'
+						]
 					] );
 				};
 

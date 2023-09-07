@@ -861,11 +861,7 @@ class Email extends Base_Object_With_Meta {
 	 * @param $contact Contact|int
 	 */
 	public function set_contact( $contact ) {
-		if ( is_numeric( $contact ) ) {
-			$contact = get_contactdata( $contact );
-		}
-
-		$this->contact = $contact;
+		$this->contact = get_contactdata( $contact );
 	}
 
 	/**
@@ -1204,8 +1200,22 @@ class Email extends Base_Object_With_Meta {
 
 	public function get_as_array() {
 
+		// Check if coming from contacts page
+		if ( current_user_can( 'edit_contacts' ) ) {
+
+			$referer = wp_get_referer();
+			$params  = [];
+			wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
+
+			if ( get_array_var( $params, 'page' ) === 'gh_contacts' && isset_not_empty( $params, 'contact' ) ) {
+				$contact_id = absint( $params['contact'] );
+				$this->set_contact( $contact_id );
+			}
+		}
+
 		// Ensure there is a contact object there somewhere
 		if ( ! is_a_contact( $this->contact ) ) {
+
 			$contact = get_contactdata();
 
 			if ( ! $contact && is_user_logged_in() ) {

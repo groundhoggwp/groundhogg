@@ -740,11 +740,11 @@
               // e.target.contentDocument.body.style.padding = '20px'
             },
             onCreate: frame => {
-              setTimeout(() => {
-                // frame = document.getElementById(frameId)
-                frame.contentDocument.body.style.padding = '20px'
-                // setFrameContent(frame, getEmail().context.built)
-              }, 100)
+              // setTimeout(() => {
+              //   // frame = document.getElementById(frameId)
+              //   // frame.contentDocument.body.style.padding = '20px'
+              //   // setFrameContent(frame, getEmail().context.built)
+              // }, 100)
             },
           }, getEmail().context.built) : Div({
             className: 'skeleton-loading',

@@ -943,6 +943,9 @@ function array_to_css( $atts ) {
 			case 'font-size':
 				$value = is_numeric( $value ) ? $value . 'px' : esc_attr( $value );
 				break;
+			case 'font-family':
+				$value = esc_attr( str_replace( '"', '\'', $value ) );
+				break;
 			default:
 				$value = esc_attr( $value );
 				break;
