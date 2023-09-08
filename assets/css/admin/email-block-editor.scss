@@ -49,8 +49,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   animation: flashing 1s linear infinite alternate;
 }
 
-.template-full-width {
+
+.template-full-width,
+.template-full-width-contained
+{
   padding: 0 20px 20px 20px;
+
 }
 
 .template-boxed {
@@ -205,6 +209,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         &:not(:hover) {
           overflow: hidden;
+        }
+
+        .block-inner-content{
+          margin: auto;
         }
 
         div.filters-enabled {

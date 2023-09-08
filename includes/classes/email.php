@@ -89,6 +89,13 @@ class Email extends Base_Object_With_Meta {
 		if ( $this->from_user > 0 ) {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
+
+		// Maybe update message type from meta
+		if ( ! $this->message_type ) {
+			$this->update( [
+				'message_type' => $this->get_meta( 'message_type' ) ?: 'marketing'
+			] );
+		}
 	}
 
 	/**
@@ -188,7 +195,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_alt_body() {
 
-		$plain_text = $this->get_meta( 'plain_text' );
+		$plain_text = $this->plain_text;
 
 		if ( $plain_text ) {
 			return $plain_text;
@@ -210,10 +217,26 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Get the merged alt body
+	 *
 	 * @return string
 	 */
 	public function get_merged_alt_body() {
-		return Dynamic_Block_Handler::instance()->replace_content( $this->get_alt_body(), $this->get_blocks(), 'plain' );
+
+		$content = $this->get_alt_body();
+
+		if ( $this->is_block_editor() ) {
+			$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
+			$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks(), 'plain' );
+		}
+
+		$content = do_replacements( $content, $this->get_contact() );
+
+		// Remove comments
+		$content = preg_replace( '/<!-- .* -->/', '', $content );
+
+		// Re-strip
+		return $this->strip_html_tags( $content );
 	}
 
 	/**
@@ -278,6 +301,43 @@ class Email extends Base_Object_With_Meta {
 	public function is_confirmation_email() {
 		return strpos( $this->get_content(), 'confirmation_link' ) !== false;
 	}
+
+	/**
+	 * Check if the message is transactional
+	 *
+	 * @return bool
+	 */
+	public function is_transactional() {
+		return $this->get_message_type() === 'transactional';
+	}
+
+	/**
+	 * If the message is marketing related
+	 *
+	 * @return bool
+	 */
+	public function is_marketing() {
+		return ! $this->is_transactional();
+	}
+
+	/**
+	 * Get the message_type
+	 *
+	 * @return bool|mixed
+	 */
+	public function get_message_type() {
+
+		// Maybe update from the meta message type
+		if ( ! $this->message_type ) {
+			$message_type = $this->get_meta( 'message_type' );
+			$this->update( [
+				'message_type' => $message_type
+			] );
+		}
+
+		return $this->message_type;
+	}
+
 
 	/**
 	 * Whether browser view is enabled
@@ -475,6 +535,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * If is using the block editor
+	 *
+	 * @return bool
+	 */
+	public function is_block_editor() {
+		return $this->get_editor_type() === 'blocks';
+	}
+
+	/**
 	 * Hide blocks that have conditional visibility enabled
 	 *
 	 * @param $content
@@ -575,6 +644,7 @@ class Email extends Base_Object_With_Meta {
 				break;
 			// Legacy Block Editor
 			case 'legacy_blocks':
+				// There's no post processing for legacy_blocks
 				break;
 		}
 
@@ -882,15 +952,6 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$this->event = $event;
-	}
-
-	/**
-	 * Check if the message is transactional
-	 *
-	 * @return bool
-	 */
-	public function is_transactional() {
-		return $this->get_meta( 'message_type' ) === 'transactional';
 	}
 
 	/**
@@ -1258,6 +1319,7 @@ class Email extends Base_Object_With_Meta {
 				'from_email'  => $this->get_from_email(),
 				'from_user'   => $this->get_from_user(),
 				'built'       => $live_preview,
+				'plain'       => $this->get_merged_alt_body()
 			]
 		] );
 	}

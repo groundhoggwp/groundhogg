@@ -11,7 +11,7 @@ class Main_Updater extends Old_Updater {
 	 *
 	 * @return array[]
 	 */
-	protected function get_updates(){
+	protected function get_updates() {
 		return [
 			'2.7.11.3' => [
 				'automatic'   => true,
@@ -45,6 +45,14 @@ class Main_Updater extends Old_Updater {
 					install_custom_rewrites();
 				}
 			],
+			'3.0'      => [
+				'automatic'   => true,
+				'description' => __( 'Update the emails table.', 'groundhogg' ),
+				'callback'    => function () {
+					// Update the emails table to add `plain` and `type` as a column
+					get_db( 'emails' )->create_table();
+				}
+			]
 		];
 	}
 

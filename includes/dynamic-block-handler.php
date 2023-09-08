@@ -136,11 +136,8 @@ class Dynamic_Block_Handler {
 		foreach ( $blocks as $block ) {
 
 			if ( key_exists( get_array_var( $block, 'type' ), $this->blocks ) ) {
-				if ( $context === 'html' ) {
-					$content = str_replace( "<!-- {$block['type']}:{$block['id']} -->", $this->render_block( $block['type'], $block, $context ), $content );
-				} else {
-					$content = str_replace( "[[{$block['type']}:{$block['id']}]]", $this->render_block( $block['type'], $block, $context ), $content );
-				}
+				$search  = "<!-- {$block['type']}:{$block['id']} -->";
+				$content = str_replace( $search, $this->render_block( $block['type'], $block, $context ), $content );
 			}
 
 			if ( key_exists( 'columns', $block ) && is_array( $block['columns'] ) ) {

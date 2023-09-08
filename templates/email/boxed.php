@@ -64,15 +64,15 @@ if ( $bgImage ) {
 	</style>
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 </head>
-<body class="email responsive" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
+<body class="email responsive template-boxed" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
 <?php load_part( 'preview-text' ); ?>
 <table class="alignment-container"
        style="width: 100%;border-collapse: collapse;background-color: <?php esc_attr_e( $bgColor ); ?>"
-       bgcolor="<?php esc_attr_e( $bgColor ); ?>" cellpadding="0" cellspacing="0">
+       bgcolor="<?php esc_attr_e( $bgColor ); ?>" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
 		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgColor ); ?>"
 		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle )?>">
-			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse">
+			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse" role="presentation">
 				<tr>
 					<td width="<?php esc_attr_e( $email->get_width() ); ?>"
 					    style="width: <?php esc_attr_e( $email->get_width() ); ?>px">

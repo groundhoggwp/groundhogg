@@ -1,6 +1,8 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Groundhogg\Email;
 use function Groundhogg\get_default_email_width;
@@ -43,16 +45,16 @@ if ( $bgImage ) {
 <!doctype html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="x-apple-disable-message-reformatting"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="x-apple-disable-message-reformatting"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title><?php echo $email_title; ?></title>
-    <base target="_blank">
-    <style id="global-style">
-	    <?php load_css( 'email' ); ?>
-	    <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
-    </style>
+	<title><?php echo $email_title; ?></title>
+	<base target="_blank">
+	<style id="global-style">
+		<?php load_css( 'email' ); ?>
+		<?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
+	</style>
 	<style id="responsive">
 		<?php load_css( 'responsive' ); ?>
 	</style>
@@ -61,16 +63,25 @@ if ( $bgImage ) {
 	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
-<body class="email template-full-width">
+<body class="email template-full-width-contained">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>
-		<td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
+		<td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"
+		    style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
 			<?php echo $email->get_merged_content(); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
-			<?php load_part( 'footer' ); ?>
+			<?php if ( ! $email->has_footer_block() ): ?>
+			<table cellspacing="0" cellpadding="0" role="presentation" align="center">
+				<tr>
+					<td width="<?php esc_attr_e( $email->get_width() ) ?>" style="width: <?php esc_attr_e( $email->get_width() ) ?>px">
+						<?php load_part( 'footer' ); ?>
+					</td>
+				</tr>
+			</table>
+			<?php endif; ?>
 		</td>
 	</tr>
 </table>

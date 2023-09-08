@@ -115,10 +115,10 @@
         morph(BlockInspector())
       },
       onMouseenter: e => {
-        document.getElementById(`edit-${block.id}`).classList.add( 'inspector-hover' )
+        document.getElementById(`edit-${block.id}`).classList.add('inspector-hover')
       },
       onMouseleave: e => {
-        document.getElementById(`edit-${block.id}`).classList.remove( 'inspector-hover' )
+        document.getElementById(`edit-${block.id}`).classList.remove('inspector-hover')
       },
     }, [type.svg, type.name])
 
@@ -159,91 +159,6 @@
     {
       id: 'boxed',
       name: __('Boxed'),
-      controls: () => {
-
-        let {
-          alignment = 'left',
-          width = 600,
-          backgroundColor = 'transparent',
-          backgroundImage = '',
-          backgroundPosition = '',
-          backgroundSize = '',
-          backgroundRepeat = '',
-        } = getEmailMeta()
-
-        return ControlGroup({
-          name: 'Template Settings',
-        }, [
-          Control({
-            label: 'Email Width',
-          }, NumberControl({
-            id: 'email-width',
-            name: 'width',
-            value: width,
-            step: 10,
-            unit: 'px',
-            onInput: e => {
-              updateSettings({
-                width: parseInt(e.target.value),
-                reRender: true,
-              })
-            },
-          })),
-          Control({
-            label: 'Alignment',
-          }, Div({
-            className: 'gh-input-group',
-          }, [
-            Button({
-              id: 'align-left',
-              className: `change-alignment gh-button ${alignment === 'left' ? 'primary' : 'secondary'}`,
-              onClick: e => {
-                updateSettings({
-                  alignment: 'left',
-                  reRender: true,
-                })
-              },
-            }, icons.alignLeft),
-            Button({
-              id: 'align-center',
-              className: `change-alignment gh-button ${alignment === 'center' ? 'primary' : 'secondary'}`,
-              onClick: e => {
-                updateSettings({
-                  alignment: 'center',
-                  reRender: true,
-                })
-              },
-            }, icons.alignCenter),
-          ])),
-          Control({
-            label: 'Background Color',
-          }, ColorPicker({
-            type: 'text',
-            id: 'background-color',
-            value: backgroundColor,
-            onChange: backgroundColor => {
-              updateSettings({
-                backgroundColor,
-                reRender: true,
-              })
-            },
-          })),
-          BackgroundImageControls({
-            id: 'background-image',
-            backgroundImage,
-            backgroundPosition,
-            backgroundSize,
-            backgroundRepeat,
-            onChange: (props) => {
-              updateSettings({
-                ...props,
-                reRenderControls: true,
-                reRender: true,
-              })
-            },
-          }),
-        ])
-      },
       html: (blocks) => {
 
         const {
@@ -257,7 +172,7 @@
         } = getEmailMeta()
 
         let style = {
-          backgroundColor
+          backgroundColor,
         }
 
         if (backgroundImage) {
@@ -277,70 +192,10 @@
           },
         }, blocks))
       },
-      mceCss: () => {
-
-        let bodyStyle = {}
-
-        let {
-          backgroundColor,
-        } = getEmailMeta()
-
-        if (backgroundColor) {
-          bodyStyle.backgroundColor = backgroundColor
-        }
-
-        // language=CSS
-        return `body {
-            ${objectToStyle(bodyStyle)}
-        }`
-      },
     },
     {
-      id: 'full_width',
-      name: __('Full-Width'),
-      controls: () => {
-
-        let {
-          backgroundColor = 'transparent',
-          backgroundImage = '',
-          backgroundPosition = '',
-          backgroundSize = '',
-          backgroundRepeat = '',
-        } = getEmailMeta()
-
-        // no settings
-        return ControlGroup({
-          name: 'Template Settings',
-        }, [
-          Control({
-            label: 'Background Color',
-          }, ColorPicker({
-            type: 'text',
-            id: 'background-color',
-            value: backgroundColor,
-            onChange: backgroundColor => {
-              updateSettings({
-                backgroundColor,
-                reRender: true,
-              })
-            },
-          })),
-          BackgroundImageControls({
-            id: 'background-image',
-            backgroundImage,
-            backgroundPosition,
-            backgroundSize,
-            backgroundRepeat,
-            onChange: (props) => {
-              updateSettings({
-                ...props,
-                reRenderControls: true,
-                reRender: true,
-              })
-            },
-          }),
-        ])
-      },
+      id: 'full_width_contained',
+      name: __('Full-Width Contained'),
       html: (blocks) => {
         const {
           backgroundColor = 'transparent',
@@ -351,7 +206,36 @@
         } = getEmailMeta()
 
         let style = {
-          backgroundColor
+          backgroundColor,
+        }
+
+        if (backgroundImage) {
+          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundSize = backgroundSize
+          style.backgroundRepeat = backgroundRepeat
+          style.backgroundPosition = backgroundPosition
+        }
+
+        return Div({
+          className: `template-full-width-contained`,
+          style,
+        }, blocks)
+      },
+    },
+    {
+      id: 'full_width',
+      name: __('Full-Width'),
+      html: (blocks) => {
+        const {
+          backgroundColor = 'transparent',
+          backgroundImage = '',
+          backgroundPosition = '',
+          backgroundSize = '',
+          backgroundRepeat = '',
+        } = getEmailMeta()
+
+        let style = {
+          backgroundColor,
         }
 
         if (backgroundImage) {
@@ -363,25 +247,8 @@
 
         return Div({
           className: `template-full-width`,
-          style
+          style,
         }, blocks)
-      },
-      mceCss: () => {
-
-        let bodyStyle = {}
-
-        let {
-          backgroundColor,
-        } = getEmailMeta()
-
-        if (backgroundColor) {
-          bodyStyle.backgroundColor = backgroundColor
-        }
-
-        // language=CSS
-        return `body {
-            ${objectToStyle(bodyStyle)}
-        }`
       },
     },
   ]
@@ -424,8 +291,6 @@
       })
     },
   }
-
-  const getStateCopy = () => JSON.parse(JSON.stringify(State))
 
   const History = {
     pointer: 0,
@@ -547,6 +412,7 @@
   }
 
   const getState = () => State
+  const getStateCopy = () => JSON.parse(JSON.stringify(getState()))
 
   let onSave = () => {}
   let onClose = () => {}
@@ -645,6 +511,7 @@
       }).then(({ item }) => {
         setState({
           preview: item.context.built,
+          previewPlainText: item.context.plain,
           previewLoading: false,
         })
         morphHeader()
@@ -684,6 +551,8 @@
   const getEmail = () => State.email
   const getEmailData = () => State.email.data
   const getEmailMeta = () => State.email.meta
+  const getEmailWidth = () => getEmailMeta().width || 600
+  const templateIs = template => getEmailMeta().template === template
   const getParentBlocks = () => {}
   const isGeneratingHTML = () => State.isGeneratingHTML
   const setIsGeneratingHTML = isGenerating => State.isGeneratingHTML = isGenerating
@@ -759,9 +628,6 @@
 
     setEmailData({
       content,
-    })
-
-    setEmailMeta({
       plain_text,
     })
 
@@ -784,12 +650,12 @@
         data: {
           ...State.email.data,
           content,
+          plain_text,
         },
         meta: {
           ...State.email.meta,
           blocks,
           css,
-          plain_text,
         },
       },
     })
@@ -816,13 +682,18 @@
   function __extractPlainText (node) {
 
     if (node.nodeType === Node.TEXT_NODE) {
-      // return node.textContent.replace(/^\s+/g, '');
+
+      // These are likely just newlines and should be excluded
+      if ( [ 'ol', 'ul' ].includes( node.parentNode.tagName.toLowerCase() ) ){
+        return ''
+      }
+
       return node.textContent
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const tagName = node.tagName.toLowerCase()
 
       let text = ''
-      let index = Array.from(node.parentNode.childNodes).indexOf(node)
+      let index = Array.from(node.parentNode.childNodes).filter( node => node.nodeType === Node.ELEMENT_NODE ).indexOf(node)
 
       for (const childNode of node.childNodes) {
         text += __extractPlainText(childNode)
@@ -847,6 +718,10 @@
         }
 
         return `\n- ${text}`
+      }
+
+      if (['del','strike'].includes(tagName)){
+        return `~~${text}~~`
       }
 
       if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
@@ -883,7 +758,7 @@
     return ''
   }
 
-  const NumberControl = ({ step=1, id, unit = null, value, onChange, ...rest }) => Div({
+  const NumberControl = ({ step = 1, id, unit = null, value, onChange, ...rest }) => Div({
     id,
     className: 'gh-input-group number-control',
   }, [
@@ -894,7 +769,7 @@
         let input = document.getElementById(`input-${id}`)
         input.stepDown()
         input.dispatchEvent(new Event('input'))
-      }
+      },
     }, Dashicon('minus')),
     Input({
       id: `input-${id}`,
@@ -907,7 +782,7 @@
     }),
     unit ? Div({
       className: 'unit',
-    }, unit ) : null,
+    }, unit) : null,
     Button({
       id: `add-${id}`,
       className: 'gh-button grey small',
@@ -915,7 +790,7 @@
         let input = document.getElementById(`input-${id}`)
         input.stepUp()
         input.dispatchEvent(new Event('input'))
-      }
+      },
     }, Dashicon('plus-alt2')),
   ])
 
@@ -1247,15 +1122,15 @@
       }, Select({
         id: `${id}-position`,
         options: {
-          'center center' : 'Center Center',
-          'center left' : 'Center Left',
-          'center right' : 'Center Right',
-          'top center' : 'Top Center',
-          'top left' : 'Top Left',
-          'top right' : 'Top Right',
-          'bottom center' : 'Bottom Center',
-          'bottom left' : 'Bottom Left',
-          'bottom right' : 'Bottom Right',
+          'center center': 'Center Center',
+          'center left': 'Center Left',
+          'center right': 'Center Right',
+          'top center': 'Top Center',
+          'top left': 'Top Left',
+          'top right': 'Top Right',
+          'bottom center': 'Bottom Center',
+          'bottom left': 'Bottom Left',
+          'bottom right': 'Bottom Right',
         },
         selected: backgroundPosition,
         onChange: e => {
@@ -1269,11 +1144,11 @@
       }, Select({
         id: `${id}-repeat`,
         options: {
-          '' : 'Default',
-          'no-repeat' : 'No Repeat',
-          'repeat' : 'Repeat',
-          'repeat-x' : 'Repeat X',
-          'repeat-y' : 'Repeat Y',
+          '': 'Default',
+          'no-repeat': 'No Repeat',
+          'repeat': 'Repeat',
+          'repeat-x': 'Repeat X',
+          'repeat-y': 'Repeat Y',
         },
         selected: backgroundRepeat,
         onChange: e => {
@@ -1287,10 +1162,10 @@
       }, Select({
         id: `${id}-size`,
         options: {
-          '' : 'Default',
-          'auto' : 'Auto',
-          'cover' : 'Cover',
-          'contain' : 'Contain',
+          '': 'Default',
+          'auto': 'Auto',
+          'cover': 'Cover',
+          'contain': 'Contain',
         },
         selected: backgroundSize,
         onChange: e => {
@@ -1446,6 +1321,7 @@
     getInlineStyle: block => {
       const { advancedStyle = {}, id, selector } = block
       const {
+        width = '',
         padding = { top: 5, right: 5, left: 5, bottom: 5 },
         // margin = {},
         borderStyle = 'none',
@@ -1474,6 +1350,10 @@
 
       if (backgroundColor !== 'transparent') {
         style.backgroundColor = backgroundColor
+      }
+
+      if (width) {
+        // style.width = `${width}px`
       }
 
       if (backgroundImage) {
@@ -1520,32 +1400,35 @@
           reRenderBlocks,
         })
       }
-      
+
       let {
         backgroundImage = '',
         backgroundPosition = '',
         backgroundSize = '',
         backgroundRepeat = '',
+        width = '',
       } = advancedStyle
 
       return Fragment([
         ControlGroup({
           name: 'Layout',
         }, [
-          // Control({
-          //   label: 'Width',
-          //   stacked: false,
-          // }, Input({
-          //   type: 'number',
-          //   // max: getEmailMeta().width,
-          //   min: 0,
-          //   id: 'advanced-width',
-          //   value: advancedStyle.width || '',
-          //   name: 'advanced_width',
-          //   onInput: e => updateStyle({
-          //     width: e.target.value,
-          //   }),
-          // })),
+          templateIs('full_width_contained') ? Control({
+            label: 'Width',
+            stacked: false,
+          }, NumberControl({
+            type: 'number',
+            min: 0,
+            step: 10,
+            id: 'advanced-width',
+            value: width,
+            placeholder: getEmailWidth(),
+            name: 'advanced_width',
+            onInput: e => updateStyle({
+              width: e.target.value,
+              reRenderBlocks: true,
+            }),
+          })) : null,
           Control({
             label: 'Padding',
             stacked: true,
@@ -1755,7 +1638,7 @@
       ...block,
       edit: renderHtml,
       html: (block) => isGeneratingHTML() ? `<!-- ${type}:${block.id} -->` : renderHtml(block),
-      plainText: ({ type, id }) => `[[${type}:${id}]]`,
+      plainText: ({ type, id }) => `<!-- ${type}:${id} -->`,
     })
   }
 
@@ -1870,14 +1753,14 @@
           onClick: e => {
             duplicateBlock(block.id)
           },
-        }, [ Dashicon('admin-page'), ToolTip('Duplicate') ] ),
+        }, [Dashicon('admin-page'), ToolTip('Duplicate')]),
         Button({
           className: 'gh-button primary small delete-block',
           id: `delete-${block.id}`,
           onClick: e => {
             deleteBlock(block.id)
           },
-        }, [ Dashicon('trash'), ToolTip( 'Delete' ) ] ),
+        }, [Dashicon('trash'), ToolTip('Delete')]),
       ]),
     ])
   }
@@ -1895,7 +1778,32 @@
     let {
       backgroundColor = '',
       backgroundImage = '',
+      width = '',
     } = advancedStyle
+
+    if (!width) {
+      width = getEmailWidth()
+    }
+
+    let html = BlockRegistry.html(block)
+
+    if (isTopLevelBlock(block.id) && templateIs('full_width_contained')) {
+      html = Table({
+        cellspacing: '0',
+        cellpadding: '0',
+        role: 'presentation',
+        align: 'center',
+        className: 'email-columns',
+      }, Tr({
+        className: 'email-columns-row',
+      }, Td({
+        width,
+        className: 'email-columns-cell',
+        style: {
+          width: `${width}px`,
+        },
+      }, html)))
+    }
 
     return Tr({}, [
       `<!-- START:${block.id} -->`,
@@ -1908,16 +1816,32 @@
           bgcolor: backgroundColor,
           background: backgroundImage,
           valign: 'top',
-          // width: '100%',
-        }, [
-          BlockRegistry.html(block),
-        ],
+        }, html,
       ),
       `<!-- END:${block.id} -->`,
     ])
   }
 
-  const EditBlockWrapper = (block) => {
+  const EditBlockWrapper = ({ advancedStyle = {}, ...block }) => {
+
+    let {
+      width = '',
+    } = advancedStyle
+
+    if (!width) {
+      width = getEmailWidth()
+    }
+
+    let html = isActiveBlock(block.id) ? BlockEdit(block) : BlockRegistry.html(block)
+
+    if (isTopLevelBlock(block.id) && templateIs('full_width_contained')) {
+      html = Div({
+        className: 'block-inner-content',
+        style: {
+          width: `${width}px`,
+        },
+      }, html)
+    }
 
     return Div({
       id: `edit-${block.id}`,
@@ -1943,7 +1867,7 @@
       Div({
         id: `b-${block.id}`,
       }, [
-        isActiveBlock(block.id) ? BlockEdit(block) : BlockRegistry.html(block),
+        html,
       ]),
       block.filters_enabled ? Div({
         className: 'filters-enabled',
@@ -2159,6 +2083,10 @@
 
     })
 
+  }
+
+  const isTopLevelBlock = (blockId) => {
+    return getBlocks().some(block => block.id === blockId)
   }
 
   /**
@@ -2589,15 +2517,119 @@
     ])
   }
 
+  const TemplateControls = () => {
+
+    let {
+      alignment = 'left',
+      width = 600,
+      backgroundColor = 'transparent',
+      backgroundImage = '',
+      backgroundPosition = '',
+      backgroundSize = '',
+      backgroundRepeat = '',
+    } = getEmailMeta()
+
+    return ControlGroup({
+      name: 'Template Settings',
+    }, [
+      Control({
+        label: 'Template',
+      }, Select({
+        id: 'select-template',
+        options: DesignTemplates.map(({ id, name }) => ({ value: id, text: name })),
+        selected: getTemplate().id,
+        onChange: e => {
+          updateSettings({
+            template: e.target.value,
+            reRender: true,
+          })
+        },
+      })),
+      templateIs('full_width') ? null : Control({
+        label: 'Email Width',
+      }, NumberControl({
+        id: 'email-width',
+        name: 'width',
+        value: width,
+        step: 10,
+        unit: 'px',
+        onInput: e => {
+          updateSettings({
+            width: parseInt(e.target.value),
+            reRender: true,
+          })
+        },
+      })),
+      templateIs('boxed') ? Control({
+        label: 'Alignment',
+      }, Div({
+        className: 'gh-input-group',
+      }, [
+        Button({
+          id: 'align-left',
+          className: `change-alignment gh-button ${alignment === 'left' ? 'primary' : 'secondary'}`,
+          onClick: e => {
+            updateSettings({
+              alignment: 'left',
+              reRender: true,
+            })
+          },
+        }, icons.alignLeft),
+        Button({
+          id: 'align-center',
+          className: `change-alignment gh-button ${alignment === 'center' ? 'primary' : 'secondary'}`,
+          onClick: e => {
+            updateSettings({
+              alignment: 'center',
+              reRender: true,
+            })
+          },
+        }, icons.alignCenter),
+      ])) : null,
+      `<hr/>`,
+      Control({
+        label: 'Background Color',
+      }, ColorPicker({
+        type: 'text',
+        id: 'background-color',
+        value: backgroundColor,
+        onChange: backgroundColor => {
+          updateSettings({
+            backgroundColor,
+            reRender: true,
+          })
+        },
+      })),
+      `<hr/>`,
+      BackgroundImageControls({
+        id: 'background-image',
+        backgroundImage,
+        backgroundPosition,
+        backgroundSize,
+        backgroundRepeat,
+        onChange: (props) => {
+          updateSettings({
+            ...props,
+            reRenderControls: true,
+            reRender: true,
+          })
+        },
+      }),
+    ])
+
+  }
+
   const BasicEmailControls = () => {
 
     let {
-      message_type = 'marketing',
       reply_to_override = '',
       browser_view = false,
     } = getEmailMeta()
 
-    let { from_user } = getEmailData()
+    let {
+      from_user,
+      message_type = 'marketing',
+    } = getEmailData()
 
     let fromOptions = [
       { id: 0, text: __('Contact Owner') },
@@ -2694,22 +2726,8 @@
             })
           },
         })),
-        isBlockEditor() ? `<hr/>` : null,
-        isBlockEditor() ? Control({
-          label: 'Template',
-        }, Select({
-          id: 'select-template',
-          options: DesignTemplates.map(({ id, name }) => ({ value: id, text: name })),
-          selected: getTemplate().id,
-          onChange: e => {
-            setEmailMeta({
-              template: e.target.value,
-            })
-            morphEmailEditor()
-          },
-        })) : null,
       ]),
-      isBlockEditor() ? getTemplate().controls() : null,
+      isBlockEditor() ? TemplateControls() : null,
       isHTMLEditor() ? ControlGroup({ name: 'HTML Editor Info' }, HTMLEditorNotice()) : null,
     ])
   }
@@ -3149,13 +3167,6 @@
             style: {
               backgroundColor: '#fff',
             },
-            onCreate: frame => {
-              if (isBlockEditor()) {
-                setTimeout(() => {
-                  document.getElementById('mobile-desktop-iframe').contentDocument.body.style.padding = '20px'
-                }, 100)
-              }
-            },
           }, getState().preview))
         },
       }, [icons.desktop, ToolTip('Desktop Preview')]),
@@ -3171,13 +3182,6 @@
             style: {
               backgroundColor: '#fff',
             },
-            onCreate: frame => {
-              if (isBlockEditor()) {
-                setTimeout(() => {
-                  document.getElementById('mobile-preview-iframe').contentDocument.body.style.padding = '20px'
-                }, 100)
-              }
-            },
           }, getState().preview))
         },
       }, [icons.mobile, ToolTip('Mobile Preview')]),
@@ -3188,7 +3192,7 @@
         onClick: e => {
           Modal({}, makeEl('p', {
             className: 'code',
-          }, getEmailMeta().plain_text.replaceAll('\n', '<br/>')))
+          }, getState().previewPlainText.replaceAll('\n', '<br/>')))
         },
       }, [icons.text, ToolTip('Plain Text Preview')]),
       Button({
@@ -3978,6 +3982,23 @@
     return ''
   }
 
+  const getTemplateMceCSS = () => {
+    let bodyStyle = {}
+
+    let {
+      backgroundColor,
+    } = getEmailMeta()
+
+    if (backgroundColor) {
+      bodyStyle.backgroundColor = backgroundColor
+    }
+
+    // language=CSS
+    return `body {
+        ${objectToStyle(bodyStyle)}
+    }`
+  }
+
   const tinyMceCSS = () => {
 
     let {
@@ -3986,6 +4007,7 @@
       h2,
       h3,
       a,
+      css = '',
     } = getActiveBlock()
 
     let bodyStyle = {}
@@ -3998,8 +4020,7 @@
 
     // language=CSS
     return `
-
-        ${getTemplate().mceCss()}
+        ${getTemplateMceCSS()}
         body {
             ${objectToStyle(bodyStyle)}
         }
@@ -4455,6 +4476,11 @@
           Textarea({
             value: content,
             id: editorId,
+            onInput: e => {
+              updateBlock({
+                content: e.target.value,
+              })
+            },
           })]))
       }
 
@@ -5035,7 +5061,7 @@
 </svg>`,
     controls: ({ content = '', updateBlock }) => {
       return Fragment([
-        ControlGroup({name: 'HTML', closable: false }, [
+        ControlGroup({ name: 'HTML', closable: false }, [
           Textarea({
             id: 'code-block-editor',
             value: content,
@@ -5055,8 +5081,8 @@
               }, 100)
             },
           }),
-          `<p>Not HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`
-        ] ),
+          `<p>Not all HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`,
+        ]),
       ])
     },
     edit: ({ content }) => {
@@ -5528,6 +5554,7 @@
             page: 'html-editor',
             email,
             preview: email.context?.built,
+            previewPlainText: email.context?.plain,
           })
 
           setHTML(email.data.content, false)
@@ -5572,6 +5599,7 @@
               page: 'html-editor',
               email,
               preview: email.context?.built,
+              previewPlainText: email.context?.plain,
             })
 
             renderEditor()
@@ -5613,9 +5641,11 @@
     }
 
     let preview = ''
+    let previewPlainText = ''
 
     if (email.context?.built) {
       preview = email.context.built
+      previewPlainText = email.context.plain
     }
 
     setState({
@@ -5626,6 +5656,7 @@
       isGeneratingHTML: false,
       email,
       preview,
+      previewPlainText,
     })
 
     setBlocks(email.meta.blocks, false)
@@ -5652,13 +5683,21 @@
   const renderBlocksPlainText = (blocks) => {
     setIsGeneratingHTML(true)
     let plain = blocks.filter(b => b.type).map(block => {
+
+      let text
+
       try {
-        return BlockRegistry.get(block.type).plainText(block)
+        text = BlockRegistry.get(block.type).plainText(block)
       } catch (e) {
-        return ''
+        text = ''
       }
+
+      if (block.filters_enabled && text) {
+        text = `<!-- START:${block.id} -->\n${text}\n<!-- END:${block.id} -->`
+      }
+
+      return text
     }).filter(text => text.length > 0).join('\n\n').replaceAll(/(\n|\r\n|\r){3,}/g, '\n\n')
-    // console.log( plain.match(/(\n|\r\n|\r){3,}/g) )
     setIsGeneratingHTML(false)
     return plain
   }

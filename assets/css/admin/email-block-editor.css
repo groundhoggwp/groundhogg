@@ -22,7 +22,8 @@
   animation: flashing 1s linear infinite alternate;
 }
 
-.template-full-width {
+.template-full-width,
+.template-full-width-contained {
   padding: 0 20px 20px 20px;
 }
 
@@ -146,6 +147,9 @@
 }
 #email-block-editor #content #builder-content .builder-block:not(:hover) {
   overflow: hidden;
+}
+#email-block-editor #content #builder-content .builder-block .block-inner-content {
+  margin: auto;
 }
 #email-block-editor #content #builder-content .builder-block div.filters-enabled {
   background-color: #6c19ad;

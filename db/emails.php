@@ -86,18 +86,18 @@ class Emails extends DB {
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 	}
 
-	public function owner_deleted( $prev, $new ){
-		$this->update([
+	public function owner_deleted( $prev, $new ) {
+		$this->update( [
 			'author' => $prev,
 		], [
 			'author' => $new,
-		]);
+		] );
 
-		$this->update([
+		$this->update( [
 			'from_user' => $prev,
 		], [
 			'from_user' => $new,
-		]);
+		] );
 	}
 
 
@@ -114,6 +114,8 @@ class Emails extends DB {
 			'title'        => '%s',
 			'pre_header'   => '%s',
 			'content'      => '%s',
+			'plain_text'   => '%s',
+			'message_type' => '%s',
 			'author'       => '%d',
 			'from_user'    => '%d',
 			'status'       => '%s',
@@ -136,6 +138,8 @@ class Emails extends DB {
 			'title'        => '',
 			'pre_header'   => '',
 			'content'      => '',
+			'plain_text'   => '',
+			'message_type' => 'marketing',
 			'author'       => get_current_user_id(),
 			'from_user'    => 0,
 			'is_template'  => 0,
@@ -151,6 +155,7 @@ class Emails extends DB {
 			'subject',
 			'pre_header',
 			'content',
+			'plain_text',
 		];
 	}
 
@@ -169,6 +174,7 @@ class Emails extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         content longtext NOT NULL,
+        plain_text longtext NOT NULL,
         subject text NOT NULL,
         title text NOT NULL,
         pre_header text NOT NULL,
@@ -176,6 +182,7 @@ class Emails extends DB {
         author bigint(20) unsigned NOT NULL,   
         is_template tinyint unsigned NOT NULL,   
         status VARCHAR(20) NOT NULL,
+        message_type VARCHAR(20) NOT NULL,
         last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         PRIMARY KEY  (ID)
