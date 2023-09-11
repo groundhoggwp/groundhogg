@@ -155,9 +155,13 @@
       getBlocks().map(block => InspectorBlockWrapper(block)))
   }
 
+  const BOXED = 'boxed'
+  const FULL_WIDTH = 'full_width'
+  const FULL_WIDTH_CONTAINED = 'full_width_contained'
+
   const DesignTemplates = [
     {
-      id: 'boxed',
+      id: BOXED,
       name: __('Boxed'),
       html: (blocks) => {
 
@@ -194,7 +198,7 @@
       },
     },
     {
-      id: 'full_width_contained',
+      id: FULL_WIDTH_CONTAINED,
       name: __('Full-Width Contained'),
       html: (blocks) => {
         const {
@@ -223,7 +227,7 @@
       },
     },
     {
-      id: 'full_width',
+      id: FULL_WIDTH,
       name: __('Full-Width'),
       html: (blocks) => {
         const {
@@ -432,7 +436,6 @@
 
     // No ID, creating the email
     if (!State.email.ID) {
-
       return EmailsStore.create(State.email).then(email => {
         dialog({
           message: 'Email created!',
@@ -452,6 +455,11 @@
         })
 
         onSave(email)
+      }).catch( err => {
+        dialog({
+          message: 'Oops, something went wrong. Try refreshing the page.',
+          type: 'error'
+        })
       })
 
     }
@@ -467,6 +475,11 @@
       })
 
       onSave(email)
+    }).catch( err => {
+      dialog({
+        message: 'Oops, something went wrong. Try refreshing the page.',
+        type: 'error'
+      })
     })
   }
 
@@ -515,7 +528,12 @@
           previewLoading: false,
         })
         morphHeader()
-      }).catch(err => {})
+      }).catch(err => {
+        dialog({
+          message: 'Oops, something went wrong. Try refreshing the page.',
+          type: 'error'
+        })
+      })
 
     }, 1000)
   }
@@ -684,7 +702,7 @@
     if (node.nodeType === Node.TEXT_NODE) {
 
       // These are likely just newlines and should be excluded
-      if ( [ 'ol', 'ul' ].includes( node.parentNode.tagName.toLowerCase() ) ){
+      if (['ol', 'ul'].includes(node.parentNode.tagName.toLowerCase())) {
         return ''
       }
 
@@ -693,7 +711,9 @@
       const tagName = node.tagName.toLowerCase()
 
       let text = ''
-      let index = Array.from(node.parentNode.childNodes).filter( node => node.nodeType === Node.ELEMENT_NODE ).indexOf(node)
+      let index = Array.from(node.parentNode.childNodes).
+      filter(node => node.nodeType === Node.ELEMENT_NODE).
+      indexOf(node)
 
       for (const childNode of node.childNodes) {
         text += __extractPlainText(childNode)
@@ -720,7 +740,7 @@
         return `\n- ${text}`
       }
 
-      if (['del','strike'].includes(tagName)){
+      if (['del', 'strike'].includes(tagName)) {
         return `~~${text}~~`
       }
 
@@ -1409,11 +1429,15 @@
         width = '',
       } = advancedStyle
 
+      if (!width) {
+        width = getEmailWidth()
+      }
+
       return Fragment([
         ControlGroup({
           name: 'Layout',
         }, [
-          templateIs('full_width_contained') ? Control({
+          templateIs(FULL_WIDTH_CONTAINED) ? Control({
             label: 'Width',
             stacked: false,
           }, NumberControl({
@@ -1464,6 +1488,7 @@
               reRenderControls: true,
             }),
           })),
+          `<hr/>`,
           BackgroundImageControls({
             id: 'background-image',
             backgroundImage,
@@ -1787,7 +1812,7 @@
 
     let html = BlockRegistry.html(block)
 
-    if (isTopLevelBlock(block.id) && templateIs('full_width_contained')) {
+    if (isTopLevelBlock(block.id) && templateIs(FULL_WIDTH_CONTAINED)) {
       html = Table({
         cellspacing: '0',
         cellpadding: '0',
@@ -1834,7 +1859,7 @@
 
     let html = isActiveBlock(block.id) ? BlockEdit(block) : BlockRegistry.html(block)
 
-    if (isTopLevelBlock(block.id) && templateIs('full_width_contained')) {
+    if (isTopLevelBlock(block.id) && templateIs(FULL_WIDTH_CONTAINED)) {
       html = Div({
         className: 'block-inner-content',
         style: {
@@ -2545,7 +2570,7 @@
           })
         },
       })),
-      templateIs('full_width') ? null : Control({
+      templateIs(FULL_WIDTH) ? null : Control({
         label: 'Email Width',
       }, NumberControl({
         id: 'email-width',
@@ -2560,7 +2585,7 @@
           })
         },
       })),
-      templateIs('boxed') ? Control({
+      templateIs(BOXED) ? Control({
         label: 'Alignment',
       }, Div({
         className: 'gh-input-group',
@@ -2696,7 +2721,7 @@
           },
           selected: message_type,
           onChange: e => {
-            setEmailMeta({
+            setEmailData({
               message_type: e.target.value,
             })
             // This may update the footer block
@@ -3245,6 +3270,11 @@
                       message: __('Test sent!'),
                     })
                     close()
+                  }).catch( err => {
+                    dialog({
+                      message: 'Oops, something went wrong. Try refreshing the page.',
+                      type: 'error'
+                    })
                   })
 
                 },
@@ -3320,7 +3350,7 @@
       id: 'email-header',
       className: 'gh-header sticky',
     }, [
-      icons.groundhogg,
+      Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
       Title(),
       isBlockEditor() ? Button({
         className: 'gh-button secondary text icon',
@@ -3517,7 +3547,7 @@
             className: 'gh-header is-sticky',
           },
           [
-            icons.groundhogg,
+            Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
             Div({
               className: 'admin-title-wrap',
               style: {
@@ -5442,7 +5472,7 @@
         footerLine(`&copy; ${business_name}`),
         footerLine(address),
         footerLine(links),
-        getEmailMeta().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
+        getEmailData().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
       ])
 
       linkStyle = fillFontStyle({
@@ -5617,6 +5647,7 @@
         pre_header: '',
         from_user: 0,
         status: 'draft',
+        message_type: 'marketing',
       }
 
       email.meta = {
@@ -5626,7 +5657,6 @@
         alignment: 'left',
         backgroundColor: '',
         frameColor: '',
-        message_type: 'marketing',
         width: 600,
         custom_headers: {},
       }
@@ -5637,7 +5667,7 @@
     }
 
     if (!email.meta.template) {
-      email.meta.template = 'boxed'
+      email.meta.template = BOXED
     }
 
     let preview = ''

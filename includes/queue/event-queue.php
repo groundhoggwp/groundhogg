@@ -313,6 +313,7 @@ ORDER BY ID" );
 				Event::SKIPPED,
 				Event::COMPLETE,
 				Event::FAILED,
+				Event::CANCELLED,
 			]
 		] );
 

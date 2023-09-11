@@ -326,6 +326,16 @@ class Emails_Table extends Table {
 				'query'   => [ 'status' => 'draft' ],
 			],
 			[
+				'view'    => 'marketing',
+				'display' => __( 'Marketing', 'groundhogg' ),
+				'query'   => [ 'message_type' => 'marketing', 'status' => [ 'ready', 'draft' ] ],
+			],
+			[
+				'view'    => 'transactional',
+				'display' => __( 'Transactional', 'groundhogg' ),
+				'query'   => [ 'message_type' => 'transactional', 'status' => [ 'ready', 'draft' ] ],
+			],
+			[
 				'view'    => 'trash',
 				'display' => __( 'Trash', 'groundhogg' ),
 				'query'   => [ 'status' => 'trash' ],
