@@ -85,6 +85,9 @@ h3.no-margin-top {
 .display-grid > .span-3 {
   grid-column: span 3;
 }
+.display-grid > .span-1 {
+  grid-column: span 1;
+}
 
 @media only screen and (max-width: 480px) {
   .display-grid {
@@ -1682,7 +1685,11 @@ p.error,
   padding: 6px;
   border-top-width: 0;
 }
+.gh-input-repeater .gh-input-repeater-row button:not(:last-child) {
+  border-right: none;
+}
 .gh-input-repeater .gh-input-repeater-row:first-child > select:first-child,
+.gh-input-repeater .gh-input-repeater-row:first-child > button:first-child,
 .gh-input-repeater .gh-input-repeater-row:first-child > input:first-child {
   border-top-left-radius: 4px;
 }
@@ -1692,7 +1699,7 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row:first-child button {
   border-top-width: 1px;
 }
-.gh-input-repeater .gh-input-repeater-row:first-child > button {
+.gh-input-repeater .gh-input-repeater-row:first-child > button:last-child {
   border-top-right-radius: 4px;
 }
 .gh-input-repeater .gh-input-repeater-row:not(:first-child) * {

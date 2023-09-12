@@ -1186,6 +1186,13 @@ body {
   }
 }
 
+.social-icon-theme {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px !important;
+}
+
 .number-control {
   input[type=number]{
     padding-right: 0;

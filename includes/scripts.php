@@ -448,6 +448,8 @@ class Scripts {
 				'user_test_email'  => get_user_test_email(),
 				'user_test_emails' => get_user_meta( get_current_user_id(), 'gh_test_emails', true ) ?: [],
 				'assets'           => [
+					'path'    => GROUNDHOGG_ASSETS_URL,
+					'images'    => GROUNDHOGG_ASSETS_URL . 'images/',
 					'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
 				],
 				'api'              => [

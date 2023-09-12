@@ -856,7 +856,7 @@ function array_to_atts( $atts ) {
 			case 'height':
 
 				if ( str_ends_with( $value, '%' ) ) {
-					$value = absint( substr( $value, 0, -1 ) ) . '%';
+					$value = absint( substr( $value, 0, - 1 ) ) . '%';
 				} else {
 					$value = absint( $value );
 				}
@@ -6410,11 +6410,12 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
 
 	$localized = array_merge( [
-		'footer'       => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
-		'templates'    => Plugin::instance()->library->get_email_templates(),
-		'colorPalette' => get_option( 'gh_email_editor_color_palette', [] ),
-		'globalFonts'  => get_option( 'gh_email_editor_global_fonts', [] ),
-		'imageSizes'   => get_intermediate_image_sizes()
+		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
+		'templates'     => Plugin::instance()->library->get_email_templates(),
+		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
+		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
+		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),
+		'imageSizes'    => get_intermediate_image_sizes()
 	], $extra );
 
 	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );

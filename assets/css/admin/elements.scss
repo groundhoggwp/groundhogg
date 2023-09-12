@@ -130,6 +130,10 @@ h3 {
   > .span-3{
     grid-column: span 3;
   }
+
+  > .span-1{
+    grid-column: span 1;
+  }
 }
 
 @media only screen and (max-width: 480px) {
@@ -1743,10 +1747,15 @@ p.error,
       border-radius: 0;
       padding: 6px;
       border-top-width: 0;
+
+      &:not(:last-child){
+        border-right: none;
+      }
     }
 
     &:first-child {
       > select:first-child,
+      > button:first-child,
       > input:first-child {
         border-top-left-radius: 4px;
       }
@@ -1759,7 +1768,7 @@ p.error,
         border-top-width: 1px;
       }
 
-      > button {
+      > button:last-child {
         border-top-right-radius: 4px;
       }
     }

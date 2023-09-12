@@ -876,6 +876,13 @@ body iframe#preview.desktop {
   padding: 3px 8px;
   border-top: 1px solid rgba(16, 38, 64, 0.5);
 }
+.social-icon-theme {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px !important;
+}
+
 .number-control input[type=number] {
   padding-right: 0;
   width: 50px;

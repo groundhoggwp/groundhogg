@@ -57,6 +57,7 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 
 	switch ( $option ) {
 		case 'gh_email_editor_color_palette':
+		case 'gh_email_editor_global_social_accounts':
 		case 'gh_email_editor_global_fonts':
 			return function ( $value ) {
 				return map_deep( $value, 'sanitize_text_field' );

@@ -272,11 +272,12 @@
     }, [
       // Cells
       ...cells.map((cellCallback, cellIndex) => cellCallback({
-        id: `cell-${rowIndex}-${cellIndex}`,
+        id: `${id}-cell-${rowIndex}-${cellIndex}`,
         value: row[cellIndex] ?? '',
         dataRow: rowIndex,
         dataCell: cellIndex,
         onChange: e => onCellChange(rowIndex, cellIndex, e.target.value),
+        setValue: value => onCellChange(rowIndex, cellIndex, value )
       }, row)),
       // Sortable Handle
       sortable ? makeEl('span', {

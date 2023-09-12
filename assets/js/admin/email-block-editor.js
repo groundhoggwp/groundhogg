@@ -432,6 +432,7 @@
     Groundhogg.stores.options.patch({
       gh_email_editor_color_palette: colorPalette,
       gh_email_editor_global_fonts: GlobalFonts.fonts,
+      gh_email_editor_global_social_accounts: globalSocials,
     })
 
     // No ID, creating the email
@@ -455,10 +456,10 @@
         })
 
         onSave(email)
-      }).catch( err => {
+      }).catch(err => {
         dialog({
           message: 'Oops, something went wrong. Try refreshing the page.',
-          type: 'error'
+          type: 'error',
         })
       })
 
@@ -475,10 +476,10 @@
       })
 
       onSave(email)
-    }).catch( err => {
+    }).catch(err => {
       dialog({
         message: 'Oops, something went wrong. Try refreshing the page.',
-        type: 'error'
+        type: 'error',
       })
     })
   }
@@ -529,10 +530,10 @@
         })
         morphHeader()
       }).catch(err => {
-        dialog({
-          message: 'Oops, something went wrong. Try refreshing the page.',
-          type: 'error'
-        })
+        // dialog({
+        //   message: 'Oops, something went wrong. Try refreshing the page.',
+        //   type: 'error',
+        // })
       })
 
     }, 1000)
@@ -1199,30 +1200,21 @@
   }
 
   const AlignmentButtons = ({
+    id = '',
     alignment = 'left',
     onChange = alignment => {},
   }) => {
 
-    return Div({
-      className: 'gh-input-group',
-    }, [
-      Button({
-        className: `gh-button change-alignment align-left gh-button ${alignment === 'left' ? 'primary' : 'secondary'}`,
-        onClick: e => onChange('left'),
-      }, icons.alignLeft),
-      Button({
-        className: `gh-button change-alignment align-center gh-button ${alignment === 'center'
-          ? 'primary'
-          : 'secondary'}`,
-        onClick: e => onChange('center'),
-      }, icons.alignCenter),
-      Button({
-        className: `gh-button change-alignment align-right gh-button ${alignment === 'right'
-          ? 'primary'
-          : 'secondary'}`,
-        onClick: e => onChange('right'),
-      }, icons.alignRight),
-    ])
+    return ButtonToggle({
+      id,
+      options: [
+        { id: 'left', text: icons.alignLeft },
+        { id: 'center', text: icons.alignCenter },
+        { id: 'right', text: icons.alignRight },
+      ],
+      selected: alignment,
+      onChange,
+    })
   }
 
   const ButtonToggle = ({
@@ -1404,8 +1396,8 @@
     render: ({ id, advancedStyle = {}, updateBlock }) => {
 
       const updateStyle = ({
-        reRenderControls = false,
-        reRenderBlocks = false,
+        morphControls = false,
+        morphBlocks = false,
         ...changes
       }) => {
 
@@ -1416,8 +1408,8 @@
 
         updateBlock({
           advancedStyle,
-          reRenderControls,
-          reRenderBlocks,
+          morphControls,
+          morphBlocks,
         })
       }
 
@@ -1450,7 +1442,7 @@
             name: 'advanced_width',
             onInput: e => updateStyle({
               width: e.target.value,
-              reRenderBlocks: true,
+              morphBlocks: true,
             }),
           })) : null,
           Control({
@@ -1462,7 +1454,7 @@
             onChange: padding => {
               updateStyle({
                 padding,
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           })),
@@ -1471,7 +1463,7 @@
           ...advancedStyle,
           onChange: style => updateStyle({
             ...style,
-            reRenderControls: true,
+            morphControls: true,
           }),
         }),
         ControlGroup({
@@ -1485,7 +1477,7 @@
             value: advancedStyle.backgroundColor,
             onChange: backgroundColor => updateStyle({
               backgroundColor,
-              reRenderControls: true,
+              morphControls: true,
             }),
           })),
           `<hr/>`,
@@ -1498,7 +1490,7 @@
             onChange: (props) => {
               updateStyle({
                 ...props,
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           }),
@@ -1701,14 +1693,16 @@
   }
 
   const ControlGroup = ({
+    id = '',
     name = '',
     closable = true,
   }, controls) => {
 
     let panel = ''
+    let panelId = id ? id : name.toLowerCase().replaceAll(' ', '-')
 
     if (hasActiveBlock()) {
-      panel = `${getActiveBlock().type}-${getBlockControlsTab()}-${name.toLowerCase().replaceAll(' ', '-')}`
+      panel = `${getActiveBlock().type}-${getBlockControlsTab()}-${panelId}`
 
       // Check to see if the block has no open panels
       if (!Object.keys(getState().openPanels).
@@ -1720,7 +1714,7 @@
 
     } else {
 
-      panel = `email-${getEmailControlsTab()}-${name.toLowerCase().replaceAll(' ', '-')}`
+      panel = `email-${getEmailControlsTab()}-${panelId}`
 
       // Check to see if the block has no open panels
       if (!Object.keys(getState().openPanels).
@@ -2215,13 +2209,13 @@
   /**
    * Update the active block with new settings
    *
-   * @param reRenderBlocks
-   * @param reRenderControls
+   * @param morphBlocks
+   * @param morphControls
    * @param newSettings
    */
   const updateBlock = ({
-    reRenderBlocks = true,
-    reRenderControls = false,
+    morphBlocks: _morphBlocks = true,
+    morphControls: _morphControls = false,
     ...newSettings
   }) => {
 
@@ -2232,11 +2226,11 @@
       ...newSettings,
     }))
 
-    if (reRenderBlocks) {
+    if (_morphBlocks) {
       morphBlocks()
     }
 
-    if (reRenderControls) {
+    if (_morphControls) {
       morphControls()
     }
 
@@ -2411,7 +2405,7 @@
           }, Toggle({
             id: 'toggle-filters',
             checked: getActiveBlock().filters_enabled || false,
-            onChange: e => updateBlock({ filters_enabled: e.target.checked, reRenderControls: true }),
+            onChange: e => updateBlock({ filters_enabled: e.target.checked, morphControls: true }),
           })),
           getActiveBlock().filters_enabled ? Div({
             id: 'block-include-filters',
@@ -2421,7 +2415,7 @@
                   '#block-include-filters', getActiveBlock().include_filters, (include_filters) => {
                     updateBlock({
                       include_filters,
-                      reRenderBlocks: false,
+                      morphBlocks: false,
                     })
                   }).init()
               })
@@ -2435,7 +2429,7 @@
                   '#block-exclude-filters', getActiveBlock().exclude_filters, (exclude_filters) => {
                     updateBlock({
                       exclude_filters,
-                      reRenderBlocks: false,
+                      morphBlocks: false,
                     })
                   }).init()
               })
@@ -2635,7 +2629,7 @@
         onChange: (props) => {
           updateSettings({
             ...props,
-            reRenderControls: true,
+            morphControls: true,
             reRender: true,
           })
         },
@@ -2857,6 +2851,17 @@
           ],
           onChange: rows => {
             colorPalette = rows.map(r => r[1])
+          },
+        }),
+      ]),
+      ControlGroup({ id: 'global-socials', name: 'Social Accounts' }, [
+        `<p>Choose your default/global social account links for the Socials block.</p>`,
+        SocialLinksRepeater({
+          socials: globalSocials,
+          theme: 'brand-circle',
+          onChange: socials => {
+            globalSocials = socials
+            morphBlocks()
           },
         }),
       ]),
@@ -3270,10 +3275,10 @@
                       message: __('Test sent!'),
                     })
                     close()
-                  }).catch( err => {
+                  }).catch(err => {
                     dialog({
                       message: 'Oops, something went wrong. Try refreshing the page.',
-                      type: 'error'
+                      type: 'error',
                     })
                   })
 
@@ -4330,7 +4335,7 @@
         onClick: e => {
           updateBlock({
             layout: l,
-            reRenderControls: true,
+            morphControls: true,
           })
         },
       }, columnLayouts[l].map((col, i) => `<span class="col col-${i + 1}"></span>`))
@@ -4646,10 +4651,11 @@
           Control({
             label: 'Alignment',
           }, AlignmentButtons({
+            id: 'button-align',
             alignment: align,
             onChange: align => updateBlock({
               align,
-              reRenderControls: true,
+              morphControls: true,
             }),
           })),
           Control({
@@ -4673,7 +4679,7 @@
               ...getActiveBlock().borderStyle,
               ...newStyle,
             },
-            reRenderControls: true,
+            morphControls: true,
           }),
         }),
         TagFontControlGroup('Font', 'style', style, updateBlock),
@@ -4745,7 +4751,7 @@
       const textUpdate = e => {
         updateBlock({
           text: e.currentTarget.textContent,
-          reRenderControls: true,
+          morphControls: true,
         })
       }
 
@@ -4834,18 +4840,19 @@
             onChange: image => {
               updateBlock({
                 ...image,
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           }),
           Control({
             label: 'Alignment',
           }, AlignmentButtons({
+            id: 'image-align',
             alignment: align,
             onChange: align => {
               updateBlock({
                 align,
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           })),
@@ -4867,7 +4874,7 @@
               ...getActiveBlock().borderStyle,
               ...newStyle,
             },
-            reRenderControls: true,
+            morphControls: true,
           }),
         }),
       ])
@@ -4891,8 +4898,8 @@
               stop: (e, ui) => {
                 updateBlock({
                   width: Math.ceil(ui.size.width),
-                  reRenderControls: true,
-                  reRenderBlocks: false,
+                  morphControls: true,
+                  morphBlocks: false,
                 })
               },
             })
@@ -5185,7 +5192,7 @@
             checked: excerpt,
             onChange: e => updateBlock({
               excerpt: e.target.checked,
-              reRenderControls: true,
+              morphControls: true,
             }),
           })),
           Control({
@@ -5195,7 +5202,7 @@
             checked: thumbnail,
             onChange: e => updateBlock({
               thumbnail: e.target.checked,
-              reRenderControls: true,
+              morphControls: true,
             }),
           })),
           Control({
@@ -5277,7 +5284,7 @@
               updateBlock({
                 selectedTags: selected,
                 tag: selected.map(opt => opt.id),
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           })),
@@ -5290,7 +5297,7 @@
               { id: 'any', text: 'Any' },
               { id: 'all', text: 'All' },
             ],
-            onChange: tag_rel => updateBlock({ tag_rel, reRenderControls: true }),
+            onChange: tag_rel => updateBlock({ tag_rel, morphControls: true }),
           })) : null,
           `<hr/>`,
           Control({
@@ -5314,7 +5321,7 @@
               updateBlock({
                 selectedCategories: selected,
                 category: selected.map(opt => opt.id),
-                reRenderControls: true,
+                morphControls: true,
               })
             },
           })),
@@ -5327,7 +5334,7 @@
               { id: 'any', text: 'Any' },
               { id: 'all', text: 'All' },
             ],
-            onChange: category_rel => updateBlock({ category_rel, reRenderControls: true }),
+            onChange: category_rel => updateBlock({ category_rel, morphControls: true }),
           })) : null,
           `<hr/>`,
           Control({ label: 'Query ID' }, Input({
@@ -5439,7 +5446,11 @@
       return Fragment([
         ControlGroup({ name: 'Footer' }, [
           Control({ label: 'Alignment' },
-            AlignmentButtons({ alignment, onChange: alignment => updateBlock({ alignment, reRenderControls: true }) })),
+            AlignmentButtons({
+              id: 'footer-align',
+              alignment,
+              onChange: alignment => updateBlock({ alignment, morphControls: true }),
+            })),
         ]),
         TagFontControlGroup('Font Style', 'style', style, updateBlock),
         TagFontControlGroup(__('Link Style'), 'linkStyle', linkStyle, updateBlock, {
@@ -5508,6 +5519,241 @@
       linkStyle: {
         color: '#488aff',
       },
+    },
+  })
+
+  const socialIcons = {
+    facebook: 'Facebook',
+    instagram: 'Instagram',
+    linkedin: 'LinkedIn',
+    pinterest: 'Pinterest',
+    reddit: 'Reddit',
+    tiktok: 'TikTok',
+    tumblr: 'Tumblr',
+    twitch: 'Twitch',
+    twitter: 'Twitter',
+    vimeo: 'Vimeo',
+    whatsapp: 'WhatsApp',
+    wordpress: 'WordPress',
+    youtube: 'YouTube',
+    // email: 'Email',
+  }
+
+  const socialIconThemes = {
+    // 'brand-filled': 'Brand Colors Square',
+    'brand-circle': 'Brand Colors Circular',
+    // 'brand-filled': 'Brand Colors Filled',
+    // 'black-square': 'Black Square',
+    // 'black-circle': 'Black Circular',
+    // 'black-filled': 'Black Filled',
+    // 'gray-square': 'Gray Square',
+    // 'gray-circle': 'Gray Circular',
+    // 'gray-filled': 'Gray Filled',
+    // 'white-square': 'White Square',
+    // 'white-circle': 'White Circular',
+    // 'white-filled': 'White Filled',
+  }
+
+  const SocialIcon = (icon, theme = 'brand-circle', size = 20) => makeEl('img', {
+    src: `${Groundhogg.assets.images}/social-icons/${theme}/${icon || 'facebook'}.png`,
+    alt: socialIcons[icon],
+    height: size,
+    width: size,
+    style: {
+      verticalAlign: 'bottom',
+    },
+  })
+
+  const SocialIconTheme = (theme, selected) => Button({
+    id: `select-${theme}`,
+    title: socialIconThemes[theme],
+    className: `gh-button ${theme === selected ? 'secondary' : 'secondary text'} span-6 social-icon-theme`,
+    onClick: e => updateBlock({ theme: theme, morphControls: true }),
+  }, [
+    SocialIcon('facebook', theme, 24),
+    SocialIcon('instagram', theme, 24),
+    SocialIcon('twitter', theme, 24),
+    // SocialIcon('reddit')
+  ])
+
+  const SocialLinksRepeater = ({ socials, theme, onChange }) => InputRepeater({
+    id: 'social-links',
+    rows: socials,
+    cells: [
+      ({ setValue, value, id, ...props }) => Button({
+        className: 'gh-button grey icon',
+        id,
+        onClick: e => {
+          MiniModal({
+            selector: `#${id}`,
+          }, ({ close }) => Div({
+            className: 'display-grid',
+          }, [
+            ...Object.keys(socialIcons).map(social => Button({
+              title: socialIcons[social],
+              id: `${id}-${social}`,
+              className: 'gh-button secondary text dashicon span-3',
+              onClick: e => {
+                setValue(social)
+                close()
+              },
+            }, SocialIcon(social, theme))),
+          ]))
+        },
+      }, SocialIcon(value || 'facebook', theme)),
+      ({ ...props }) => Input({
+        type: 'url',
+        placeholder: 'https://facebook.com/your-page/',
+        ...props,
+      }),
+    ],
+    sortable: true,
+    onChange,
+  })
+
+  registerBlock('social', 'Socials', {
+    //language=HTML
+    svg: `
+		<svg viewBox="-33 0 512 512.001" xmlns="http://www.w3.org/2000/svg">
+			<path fill="currentColor"
+			      d="M361.824 344.395c-24.531 0-46.633 10.593-61.972 27.445l-137.973-85.453A83.321 83.321 0 0 0 167.605 256a83.29 83.29 0 0 0-5.726-30.387l137.973-85.457c15.34 16.852 37.441 27.45 61.972 27.45 46.211 0 83.805-37.594 83.805-83.805C445.629 37.59 408.035 0 361.824 0c-46.21 0-83.804 37.594-83.804 83.805a83.403 83.403 0 0 0 5.726 30.386l-137.969 85.454c-15.34-16.852-37.441-27.45-61.972-27.45C37.594 172.195 0 209.793 0 256c0 46.21 37.594 83.805 83.805 83.805 24.53 0 46.633-10.594 61.972-27.45l137.97 85.454a83.408 83.408 0 0 0-5.727 30.39c0 46.207 37.593 83.801 83.804 83.801s83.805-37.594 83.805-83.8c0-46.212-37.594-83.805-83.805-83.805zm-53.246-260.59c0-29.36 23.887-53.246 53.246-53.246s53.246 23.886 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.887-53.246-53.246zM83.805 309.246c-29.364 0-53.25-23.887-53.25-53.246s23.886-53.246 53.25-53.246c29.36 0 53.242 23.887 53.242 53.246s-23.883 53.246-53.242 53.246zm224.773 118.95c0-29.36 23.887-53.247 53.246-53.247s53.246 23.887 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.886-53.246-53.246zm0 0"/>
+		</svg>`,
+    controls: ({
+      socials = [],
+      gap = 5,
+      size = 32,
+      theme = 'brand-circle',
+      align = 'center',
+      use = 'global',
+    }) => {
+
+      if (socials.length === 0) {
+        socials = JSON.parse(JSON.stringify(globalSocials))
+      }
+
+      return Fragment([
+        ControlGroup({
+          name: 'Social Media',
+        }, [
+          Control({ label: 'Theme', stacked: true }, Div({
+            className: 'display-grid',
+          }, [
+            ...Object.keys(socialIconThemes).map(t => SocialIconTheme(t, theme)),
+          ])),
+          Control({ label: 'Social Accounts' }, ButtonToggle({
+            id: 'socials-use',
+            options: [
+              { id: 'global', text: 'Global' },
+              { id: 'custom', text: 'Custom' },
+            ],
+            selected: use,
+            onChange: use => updateBlock({
+              use,
+              morphControls: true,
+            }),
+          })),
+          use === 'custom' ? SocialLinksRepeater({
+            socials,
+            theme,
+            onChange: socials => updateBlock({
+              socials,
+            }),
+          }) : null,
+          use === 'global' ? makeEl( 'a', {
+            href: '#',
+            onClick: e => {
+              setActiveBlock(null)
+              setEmailControlsTab('editor')
+              openPanel('email-editor-global-socials')
+              morphControls()
+            }
+          }, 'Edit global social accounts' ) : null,
+          Control({
+            label: 'Alignment',
+          }, AlignmentButtons({
+            id: 'socials-align',
+            alignment: align,
+            onChange: align => updateBlock({
+              align, morphControls: true,
+            }),
+          })),
+          Control({
+            label: 'Icon Size',
+          }, NumberControl({
+            id: 'icon-size',
+            value: size,
+            unit: 'px',
+            onChange: e => updateBlock({ size: e.target.value }),
+          })),
+          Control({
+            label: 'Gap',
+          }, NumberControl({
+            id: 'gap',
+            step: 5,
+            value: gap,
+            unit: 'px',
+            onChange: e => updateBlock({ gap: e.target.value }),
+          })),
+        ]),
+      ])
+
+    },
+    html: ({
+      align = 'center',
+      theme = 'brand-circle',
+      socials = [],
+      gap = 5,
+      size = 32,
+      use = 'global',
+    }) => {
+
+      if (use === 'global') {
+        socials = globalSocials
+      }
+
+      if (socials.length === 0) {
+        return ''
+      }
+
+      socials = socials.map(
+        ([icon, link]) => makeEl('a', { href: link }, SocialIcon(icon, theme, size)))
+
+      let cells = socials.reduce((cells, social, index) => {
+
+        if (index > 0) {
+          cells.push(Td({ width: gap, style: { width: `${gap}px` } }))
+        }
+
+        cells.push(Td({}, social))
+
+        return cells
+      }, [])
+
+      return Table({
+        className: 'socials',
+        cellpadding: 0,
+        cellspacing: 0,
+        role: 'presentation',
+        width: '100%',
+        style: {
+          width: '100%'
+        }
+      }, Tr({}, Td({
+        align
+      }, Table({
+        className: 'socials',
+        cellpadding: 0,
+        cellspacing: 0,
+        role: 'presentation',
+      }, Tr({}, cells )))))
+    },
+    defaults: {
+      align: 'center',
+      theme: 'brand-circle',
+      socials: [],
+      gap: 5,
+      size: 32,
+      use: 'global',
     },
   })
 
@@ -5900,6 +6146,7 @@
   let {
     colorPalette = [],
     globalFonts = [],
+    globalSocials = [],
     blockDefaults = {},
     imageSizes = [],
   } = _BlockEditor
