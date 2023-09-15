@@ -310,6 +310,9 @@ function kses_wrapper( $content ) {
  */
 function email_kses( $content ) {
 
+	// KSES does not like RBG values...
+	$content = safe_css_filter_rgb_to_hex( $content );
+
 	// Basic protocols
 	$basic_protocols = [ 'http', 'https', 'mailto', 'mms', 'sms', 'svn', 'tel', 'fax' ];
 
@@ -366,9 +369,7 @@ function _safe_display_css( $attributes ) {
  * @return mixed
  */
 function safe_css_filter_rgb_to_hex( $content ) {
-	$content = preg_replace_callback( '/rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/', __NAMESPACE__ . '\_safe_css_filter_rgb_to_hex_callback', $content );
-
-	return $content;
+	return preg_replace_callback( '/rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/', __NAMESPACE__ . '\_safe_css_filter_rgb_to_hex_callback', $content );
 }
 
 /**

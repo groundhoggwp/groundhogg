@@ -81,7 +81,7 @@
     '\'Book Antiqua\', Palatino, serif',
     '\'Lucida Grande\', sans-serif',
     '\'Lucida Sans\', \'Lucida Grande\', Arial, sans-serif',
-    'Impact, "Arial Black", sans-serif',
+    'Impact, \'Arial Black\', sans-serif',
     'Copperplate, sans-serif',
     '\'Copperplate Gothic Light\', Copperplate, \'Century Gothic\', Arial, sans-serif',
     'Futura, Calibri, Arial, sans-serif',
@@ -105,6 +105,7 @@
 
     return Button({
       id: `inspector-${block.id}`,
+      dataId: block.id,
       className: `inspector-block ${isActiveBlock(block.id) ? 'active' : ''}`,
       style: {
         paddingLeft: `${12 * depth}px`,
@@ -124,7 +125,53 @@
 
   }
 
-  const InspectorColumn = (blocks, depth = 1) => Div({
+  const inspectorSortable = el => {
+    $(el).sortable({
+      // placeholder: 'inspector-placeholder',
+      connectWith: '.inspector-column-sortable, #block-inspector',
+      // handle: '.move-block',
+      // helper: sortableHelper,
+      cancel: '',
+      update: (e, ui) => {
+
+        let blockId = ui.item.data('id')
+        let index = ui.item.index()
+
+        let $sortable = $(e.target)
+
+        // No longer in this sortable
+        if (!$sortable.has(`#inspector-${blockId}, #inspector-${blockId}-columns`).length) {
+          return
+        }
+
+        // moving block
+        let parent = $sortable.is('.inspector-column-sortable') ? $sortable.data('parent') : false
+        let column = parent ? $sortable.closest('.inspector-column').index() - 1 : 0
+
+        if (blockId) {
+          moveBlock(blockId, index, parent, column)
+        }
+      },
+      receive: (e, ui) => {
+
+        let $sortable = $(e.target)
+
+        // moving block
+        let parent = $sortable.is('.inspector-column-sortable') ? $sortable.data('parent') : false
+        let column = parent ? $sortable.closest('.inspector-column').index() - 1 : 0
+
+        let blockId = ui.item.data('id')
+        let index = ui.item.index()
+
+        if (blockId) {
+          moveBlock(blockId, index, parent, column)
+        }
+      },
+
+    })
+  }
+
+  const InspectorColumn = (parent, blocks, depth = 1) => Div({
     className: 'inspector-column',
   }, [
     Div({
@@ -133,17 +180,26 @@
         paddingLeft: `${12 * depth}px`,
       },
     }, 'Column'),
-    ...blocks.map(block => InspectorBlockWrapper(block, depth + 1)),
+    Div({
+      className: 'inspector-column-sortable',
+      dataParent: parent,
+      onCreate: inspectorSortable,
+    }, [
+      ...blocks.map(block => InspectorBlockWrapper(block, depth + 1)),
+    ]),
   ])
 
   const InspectorBlockWrapper = (block, depth = 1) => {
 
     if (block.type === 'columns' && block.columns && Array.isArray(block.columns)) {
       return Div({
+        id: `inspector-${block.id}-columns`,
         className: 'inspector-columns',
+        dataId: block.id,
       }, [
         InspectorBlock(block, depth),
-        ...block.columns.filter(blocks => blocks.length > 0).map(blocks => InspectorColumn(blocks, depth + 1)),
+        ...block.columns.filter(blocks => blocks.length > 0).
+        map(blocks => InspectorColumn(block.id, blocks, depth + 1)),
       ])
     }
 
@@ -151,7 +207,11 @@
   }
 
   const BlockInspector = () => {
-    return Div({ className: 'block-inspector', id: 'block-inspector' },
+    return Div({
+        className: 'block-inspector',
+        id: 'block-inspector',
+        onCreate: inspectorSortable,
+      },
       getBlocks().map(block => InspectorBlockWrapper(block)))
   }
 
@@ -548,7 +608,7 @@
     removeControls()
     morphControls()
 
-    if ( getState().blockInspector ){
+    if (getState().blockInspector) {
       morph(BlockInspector())
     }
   }
@@ -699,7 +759,7 @@
       updatePreview()
     }
 
-    if ( getState().blockInspector ){
+    if (getState().blockInspector) {
       morph(BlockInspector())
     }
 
@@ -1391,6 +1451,22 @@
 
       return value
     })(style),
+  })
+
+  /**
+   * Extract style given CSS declaration
+   *
+   * @param style
+   * @return {{fontFamily: string, color: string, lineHeight: string, fontSize: number, fontStyle: string, fontWeight: string, textTransform: string}}
+   */
+  const parseFontStyle = style => ({
+    color: style.getPropertyValue('color'),
+    fontFamily: style.getPropertyValue('font-family'),
+    lineHeight: style.getPropertyValue('line-height'),
+    fontWeight: style.getPropertyValue('font-weight'),
+    fontStyle: style.getPropertyValue('font-style'),
+    fontSize: parseInt(style.getPropertyValue('font-size')),
+    textTransform: style.getPropertyValue('text-transform'),
   })
 
   const AdvancedStyleControls = {
@@ -3242,7 +3318,7 @@
             setEmailControlsTab('editor')
             morphControls()
           },
-        }, [ Dashicon('admin-settings') , ToolTip( 'Editor Controls', 'bottom-right' ) ]) : null,
+        }, [Dashicon('admin-settings'), ToolTip('Editor Controls', 'bottom-right')]) : null,
       ])
 
     }
@@ -4122,17 +4198,17 @@
       id: 'block-editor-toolbar',
     }, Div({ className: 'display-flex column buttons' }, [
       Button({
-        className: `gh-button ${getState().blockInspector ? 'primary' : 'secondary' } text icon`,
+        className: `gh-button ${getState().blockInspector ? 'primary' : 'secondary'} text icon`,
         id: 'open-block-inspector',
         onClick: e => {
           setState({
-            blockInspector: ! getState().blockInspector
+            blockInspector: !getState().blockInspector,
           })
           morphBlockEditor()
         },
       }, [icons.inspect, ToolTip('Block Inspector', 'right')]),
       Button({
-        className: `gh-button ${getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary' } text icon`,
+        className: `gh-button ${getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary'} text icon`,
         id: 'set-responsive-desktop',
         onClick: e => {
           setState({
@@ -4142,11 +4218,11 @@
         },
       }, [icons.desktop, ToolTip('Desktop', 'right')]),
       Button({
-        className: `gh-button ${getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary' } text icon`,
+        className: `gh-button ${getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary'} text icon`,
         id: 'set-responsive-mobile',
         onClick: e => {
           setState({
-            responsiveDevice: 'mobile'
+            responsiveDevice: 'mobile',
           })
           morphBlockEditor()
         },
@@ -4631,7 +4707,7 @@
 
     return ControlGroup({
       name,
-      id: tag
+      id: tag,
     }, [
 
       Control({
@@ -4889,20 +4965,20 @@
       const doc = parser.parseFromString(content, 'text/html')
       let firstEl = doc.body.firstElementChild
 
-      if ( firstEl ){
+      if (firstEl) {
         let tag = firstEl.tagName.toLowerCase()
-        switch ( tag ){
+        switch (tag) {
           case 'h1':
           case 'h2':
           case 'h3':
           case 'p':
           case 'a':
-            openPanel( `text-block-${tag}` )
-            break;
+            openPanel(`text-block-${tag}`)
+            break
           case 'ul':
           case 'ol':
-            openPanel( `text-block-p` )
-            break;
+            openPanel(`text-block-p`)
+            break
         }
       }
 
@@ -5015,6 +5091,11 @@
       align: el => el.querySelector('td[align]').getAttribute('align'),
       borderStyle: el => parseBorderStyle(el.querySelector('td.email-button').style),
       backgroundColor: el => el.querySelector('td.email-button').getAttribute('bgcolor'),
+      style: el => {
+        let style = parseFontStyle(el.querySelector('a').style)
+        console.log(style)
+        return style
+      },
     },
     //language=HTML
     svg: `
@@ -5488,10 +5569,16 @@
     },
     html: ({ height, width, color, lineStyle = 'solid' }) => {
       // language=HTML
-      return `
-		  <hr class="divider"
-		      style="border-width: ${height}px 0 0 0;width:${width}%;border-top-color: ${color};border-style: ${lineStyle};">
-		  </hr>`
+
+      return makeEl('hr', {
+        className: 'divider',
+        style: {
+          borderWidth: `${height}px 0 0 0`,
+          width: `${width}%`,
+          borderColor: color,
+          borderStyle: lineStyle,
+        },
+      })
     },
     plainText: () => '---',
     defaults: {

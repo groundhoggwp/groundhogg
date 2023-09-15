@@ -39,11 +39,11 @@
 
         let value = style[attribute]
 
-        if ( attribute === 'fontFamily'){
-          value = value.replaceAll('"', "'")
-        }
+        // if ( attribute === 'fontFamily'){
+        //   value = value.replaceAll('"', "'")
+        // }
 
-        el.style[attribute] = style[attribute]
+        el.style[attribute] = value
       }
     },
     onCreate: (el, func) => func(el),
