@@ -27,6 +27,7 @@ use WP_REST_Server;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\sanitize_object_meta;
 
 //use Groundhogg\Webhook;
 

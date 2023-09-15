@@ -1,8 +1,12 @@
+.hide-on-desktop{
+    display: none;
+}
+
 @media only screen and (max-width: 480px) {
-    table.email-columns,
-    table.email-columns > tbody,
-    table.email-columns tr.email-columns-row,
-    table.email-columns tr.email-columns-row > td.email-columns-cell {
+    table.responsive.email-columns,
+    table.responsive.email-columns > tbody,
+    table.responsive.email-columns tr.email-columns-row,
+    table.responsive.email-columns tr.email-columns-row > td.email-columns-cell {
         display: block !important;
         width: auto !important;
     }
@@ -14,5 +18,13 @@
         margin-left: auto !important;
         margin-right: auto !important;
         margin-bottom: 20px !important;
+    }
+
+    .hide-on-desktop{
+        display: table-cell;
+    }
+
+    .hide-on-mobile{
+        display: none;
     }
 }

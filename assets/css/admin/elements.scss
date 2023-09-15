@@ -1531,7 +1531,7 @@ button {
   &-frame {
     box-sizing: border-box;
     max-width: calc(100vw - 100px);
-    max-height: calc(92vh - 64px);
+    //max-height: calc(92vh - 64px);
     position: relative;
   }
 
@@ -2157,6 +2157,25 @@ p.error,
         transform: translate(-50%, 0);
         top: -5px;
         left: 50%;
+      }
+    }
+
+    &.bottom-right {
+      top: calc(100% + 5px);
+      right: 0;
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid $primary-dark;
+        transform: translate(-50%, 0);
+        top: -4px;
+        right: 5%;
       }
     }
   }

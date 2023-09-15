@@ -764,9 +764,9 @@
         const render = () => panel.parentNode.replaceChild(Preview(), panel)
 
         if (email_id) {
-          EmailsStore.maybeFetchItem(email_id).then(email => {
-            morphPreview()
-          })
+          EmailsStore.maybeFetchItem(email_id).catch( err => {
+            email_id = false
+          }).finally(() => morphPreview() )
           render()
         } else {
           render()

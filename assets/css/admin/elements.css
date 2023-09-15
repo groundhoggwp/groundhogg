@@ -1510,7 +1510,6 @@ button.gh-submit .gh-spinner {
 .gh-modal-frame {
   box-sizing: border-box;
   max-width: calc(100vw - 100px);
-  max-height: calc(92vh - 64px);
   position: relative;
 }
 .gh-modal-dialog {
@@ -2021,6 +2020,25 @@ p.error,
   transform: translate(-50%, 0);
   top: -5px;
   left: 50%;
+}
+.gh-has-tooltip .gh-tooltip.bottom-right,
+:has(> .gh-tooltip) .gh-tooltip.bottom-right {
+  top: calc(100% + 5px);
+  right: 0;
+}
+.gh-has-tooltip .gh-tooltip.bottom-right:before,
+:has(> .gh-tooltip) .gh-tooltip.bottom-right:before {
+  position: absolute;
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #102640;
+  transform: translate(-50%, 0);
+  top: -4px;
+  right: 5%;
 }
 
 .gh-input-inline-label {

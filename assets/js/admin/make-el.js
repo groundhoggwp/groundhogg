@@ -36,6 +36,13 @@
       }
 
       for (let attribute in style) {
+
+        let value = style[attribute]
+
+        if ( attribute === 'fontFamily'){
+          value = value.replaceAll('"', "'")
+        }
+
         el.style[attribute] = style[attribute]
       }
     },

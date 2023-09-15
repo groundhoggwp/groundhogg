@@ -66,30 +66,30 @@
   let fonts = [
     'system-ui, sans-serif',
     'Arial, sans-serif', // Web, Mobile, Desktop
-    '"Arial Black", Arial, sans-serif', // Web
-    '"Arial Narrow", Arial, sans-serif', // Web
-    '"Times New Roman", Times, serif', // All
+    '\'Arial Black\', Arial, sans-serif', // Web
+    '\'Arial Narrow\', Arial, sans-serif', // Web
+    '\'Times New Roman\', Times, serif', // All
     'Georgia, serif',
-    '"Courier New", Courier, monospace',
+    '\'Courier New\', Courier, monospace',
     'Verdana, Geneva, sans-serif',
     'Tahoma, sans-serif',
-    '"Trebuchet MS", sans-serif',
+    '\'Trebuchet MS\', sans-serif',
     'Calibri, sans-serif',
-    '"Century Gothic", sans-serif',
-    'Palatino, "Times New Roman", Times, serif',
-    'Garamond, Palatino, "Times New Roman", Times, serif',
-    '"Book Antiqua", Palatino, serif',
-    '"Lucida Grande", sans-serif',
-    '"Lucida Sans", "Lucida Grande", Arial, sans-serif',
+    '\'Century Gothic\', sans-serif',
+    'Palatino, \'Times New Roman\', Times, serif',
+    'Garamond, Palatino, \'Times New Roman\', Times, serif',
+    '\'Book Antiqua\', Palatino, serif',
+    '\'Lucida Grande\', sans-serif',
+    '\'Lucida Sans\', \'Lucida Grande\', Arial, sans-serif',
     'Impact, "Arial Black", sans-serif',
     'Copperplate, sans-serif',
-    '"Copperplate Gothic Light", Copperplate, "Century Gothic", Arial, sans-serif',
+    '\'Copperplate Gothic Light\', Copperplate, \'Century Gothic\', Arial, sans-serif',
     'Futura, Calibri, Arial, sans-serif',
   ]
 
   const fontFamilies = {}
 
-  const fontName = font => font.split(',')[0].replaceAll('"', '')
+  const fontName = font => font.split(',')[0].replaceAll(/"|'/g, '')
 
   fonts.sort((a, b) => fontName(a).localeCompare(fontName(b))).forEach(font => {
     fontFamilies[font] = fontName(font)
@@ -397,6 +397,7 @@
 
   let State = {
     email: {},
+    changes: {},
     activeBlock: null,
     openPanels: {},
     blockControlsTab: 'block',
@@ -405,6 +406,9 @@
     hasChanges: false,
     preview: '',
     page: 'editor',
+    responsiveDevice: 'desktop',
+    blocks: [],
+    blockInspector: false,
   }
 
   const setState = newState => {
@@ -452,6 +456,7 @@
 
         setState({
           email,
+          changes: {},
           hasChanges: false,
         })
 
@@ -465,13 +470,14 @@
 
     }
 
-    return EmailsStore.patch(State.email.ID, State.email).then(email => {
+    return EmailsStore.patch(State.email.ID, State.changes).then(email => {
       dialog({
         message: 'Email updated!',
       })
 
       setState({
         email,
+        changes: {},
         hasChanges: false,
       })
 
@@ -529,13 +535,7 @@
           previewLoading: false,
         })
         morphHeader()
-      }).catch(err => {
-        // dialog({
-        //   message: 'Oops, something went wrong. Try refreshing the page.',
-        //   type: 'error',
-        // })
       })
-
     }, 1000)
   }
 
@@ -547,6 +547,10 @@
     // Completely remove controls before changing to new block
     removeControls()
     morphControls()
+
+    if ( getState().blockInspector ){
+      morph(BlockInspector())
+    }
   }
 
   const isBlockEditor = () => State.page === 'editor'
@@ -565,8 +569,8 @@
   const getEmailControlsTab = () => State.emailControlsTab
   const setBlockControlsTab = (tab) => State.blockControlsTab = tab
   const setEmailControlsTab = (tab) => State.emailControlsTab = tab
-  const getBlocks = () => State.email.meta.blocks
-  const getBlocksCopy = () => JSON.parse(JSON.stringify(State.email.meta.blocks))
+  const getBlocks = () => State.blocks
+  const getBlocksCopy = () => JSON.parse(JSON.stringify(State.blocks))
   const getEmail = () => State.email
   const getEmailData = () => State.email.data
   const getEmailMeta = () => State.email.meta
@@ -581,6 +585,11 @@
       ...data,
     }
 
+    State.changes.data = {
+      ...State.changes.data || {},
+      ...data,
+    }
+
     setState({
       hasChanges: true,
     })
@@ -589,6 +598,11 @@
   const setEmailMeta = (meta = {}) => {
     State.email.meta = {
       ...State.email.meta,
+      ...meta,
+    }
+
+    State.changes.meta = {
+      ...State.changes.meta || {},
       ...meta,
     }
 
@@ -641,6 +655,8 @@
 
   const setHTML = (content, hasChanges = true) => {
 
+    content = cleanHTML(content)
+
     let plain_text = extractPlainText(content)
     plain_text = plain_text.replaceAll(/(\s*\n|\s*\r\n|\s*\r){3,}/g, '\n\n')
     plain_text = plain_text.replace(/^\s+/, '')
@@ -650,10 +666,13 @@
       plain_text,
     })
 
+    setEmailMeta({
+      blocks: false,
+    })
+
     if (hasChanges) {
       updatePreview()
     }
-
   }
 
   const setBlocks = (blocks = [], hasChanges = true) => {
@@ -663,24 +682,25 @@
     let plain_text = renderBlocksPlainText(blocks)
 
     setState({
-      hasChanges,
-      email: {
-        ...State.email,
-        data: {
-          ...State.email.data,
-          content,
-          plain_text,
-        },
-        meta: {
-          ...State.email.meta,
-          blocks,
-          css,
-        },
-      },
+      blocks,
+    })
+
+    setEmailData({
+      content,
+      plain_text,
+    })
+
+    setEmailMeta({
+      css,
+      blocks: true,
     })
 
     if (hasChanges) {
       updatePreview()
+    }
+
+    if ( getState().blockInspector ){
+      morph(BlockInspector())
     }
 
     History.addChange(getStateCopy())
@@ -1329,6 +1349,50 @@
     return initial
   }
 
+  /**
+   * Extract a property into top, right, bottom, left
+   *
+   * @param attr
+   * @param style
+   * @return {{top: string, left: string, bottom: string, right: string}}
+   */
+  const parse4FromStyle = (attr, style) => {
+    let value = {
+      top: parseInt(style.getPropertyValue(sprintf(attr, 'top'))),
+      right: parseInt(style.getPropertyValue(sprintf(attr, 'right'))),
+      bottom: parseInt(style.getPropertyValue(sprintf(attr, 'bottom'))),
+      left: parseInt(style.getPropertyValue(sprintf(attr, 'left'))),
+    }
+
+    value.linked = Object.values(value).every(v => v === value.top)
+
+    return value
+  }
+
+  /**
+   * Given a CSS declaration, extract the border style into usable fragments
+   *
+   * @param style
+   * @return {{borderColor: string, borderRadius: {top: string, left: string, bottom: string, right: string}, borderWidth: {top: string, left: string, bottom: string, right: string}, borderStyle: string}}
+   */
+  const parseBorderStyle = style => ({
+    borderStyle: style.getPropertyValue('border-style'),
+    borderColor: style.getPropertyValue('border-color'),
+    borderWidth: parse4FromStyle('border-%s-width', style),
+    borderRadius: (style => {
+      let value = {
+        top: parseInt(style.getPropertyValue('border-top-left-radius')),
+        right: parseInt(style.getPropertyValue('border-top-right-radius')),
+        bottom: parseInt(style.getPropertyValue('border-bottom-right-radius')),
+        left: parseInt(style.getPropertyValue('border-bottom-left-radius')),
+      }
+
+      value.linked = Object.values(value).every(v => v === value.top)
+
+      return value
+    })(style),
+  })
+
   const AdvancedStyleControls = {
     getInlineStyle: block => {
       const { advancedStyle = {}, id, selector } = block
@@ -1377,6 +1441,43 @@
 
       return style
     },
+    parse: el => {
+
+      const attributeMap = {
+        width: (style, el) => {
+
+          let innerWidthTd = el.querySelector(`td#${el.id}-inner`)
+          if (innerWidthTd) {
+            return parseInt(innerWidthTd.getAttribute('width'))
+          }
+
+          return null
+        },
+        padding: style => parse4FromStyle('padding-%s', style),
+        backgroundColor: (style, el) => el.getAttribute('bgcolor'),
+        backgroundImage: (style, el) => el.getAttribute('background'),
+        backgroundSize: style => style.getPropertyValue('background-size'),
+        backgroundRepeat: style => style.getPropertyValue('background-repeat'),
+        backgroundPosition: style => style.getPropertyValue('background-position'),
+      }
+
+      let style = {}
+
+      for (let attribute in attributeMap) {
+        let value = attributeMap[attribute](el.style, el)
+        if (value) {
+          style[attribute] = value
+        }
+      }
+
+      style = {
+        ...style,
+        ...parseBorderStyle(el.style),
+      }
+
+      return style
+
+    },
     css: (block) => {
       const { selector } = block
 
@@ -1397,7 +1498,7 @@
 
       const updateStyle = ({
         morphControls = false,
-        morphBlocks = false,
+        morphBlocks = true,
         ...changes
       }) => {
 
@@ -1519,17 +1620,11 @@
         // console.log(e)
       }
 
-      css.push(AdvancedStyleControls.css({
-        ...this.defaults(block),
-        ...block,
-        selector: `#b-${block.id}`,
-      }))
-
       if (block.css) {
         css.push(block.css.replaceAll(/selector/g, `#b-${block.id}`))
       }
 
-      return css.filter(css => css && css.length > 0).join('\n\n')
+      return css.filter(css => css && css.length > 0).join('\n')
     },
 
     edit (block, editing) {
@@ -1572,9 +1667,10 @@
    * @param name
    * @param edit function
    * @param html function
+   * @param attributes
    * @param block
    */
-  const registerBlock = (type, name, { edit = false, html = false, ...block }) => {
+  const registerBlock = (type, name, { edit = false, html = false, attributes = {}, ...block }) => {
 
     // If edit is undefined copy the html method
     if (!edit) {
@@ -1587,11 +1683,12 @@
       collection: 'core',
       edit,
       html,
+      attributes,
       ...block,
     }
   }
 
-  const dynamicContentCache = {
+  const createCache = () => ({
     cache: {},
     has (key) {
       return this.cache.hasOwnProperty(key)
@@ -1602,7 +1699,10 @@
     set (key, value) {
       this.cache[key] = value
     },
-  }
+  })
+
+  const dynamicContentCache = createCache()
+  const attributesCache = createCache()
 
   const base64_json_encode = (stuff) => {
     return utf8_to_b64(JSON.stringify(stuff))
@@ -1612,11 +1712,49 @@
     return window.btoa(unescape(encodeURIComponent(str)))
   }
 
-  const registerDynamicBlock = (type, name, { generateCacheKey, parseContent = () => {}, ...block }) => {
+  /**
+   * Register a dynamic block
+   *
+   * @param type
+   * @param name
+   * @param attributes
+   * @param parseContent
+   * @param block
+   */
+  const registerDynamicBlock = (type, name, { attributes = [], parseContent = () => {}, ...block }) => {
 
     let prevContent = null
     let timeout
 
+    /**
+     * Extracts attributes from the block
+     *
+     * @param block
+     * @return {{}}
+     */
+    const extractAttributes = (block) => {
+      const props = {}
+      attributes.forEach(attr => {
+        props[attr] = block[attr]
+      })
+      return props
+    }
+
+    /**
+     * Generates a uniquer key based on the block attributes
+     *
+     * @param block
+     * @return {string}
+     */
+    const generateCacheKey = (block) => {
+      return base64_json_encode(extractAttributes(block))
+    }
+
+    /**
+     * Gets the dynamic content from the API
+     *
+     * @param block
+     */
     const fetchDynamicContent = (block) => {
 
       if (timeout) {
@@ -1632,6 +1770,13 @@
       }, 1000)
     }
 
+    /**
+     * Shows the preview of the dynamic content in the editor, or a placeholder animation
+     *
+     * @param updateBlock
+     * @param block
+     * @return {*}
+     */
     const renderHtml = ({ updateBlock = () => {}, ...block }) => {
 
       let cacheKey = generateCacheKey(block)
@@ -1648,14 +1793,54 @@
       }, Div({
         className: 'dynamic-content-loader',
       }, prevContent))
-
     }
+
+    const attributeGetters = {}
+
+    attributes.forEach(attr => {
+      attributeGetters[attr] = (el) => {
+
+        if (attributesCache.has(el.id)) {
+          return attributesCache.get(el.id)[attr]
+        }
+
+        let commentData = el.innerText.trim()
+
+        if (!commentData) {
+          return
+        }
+
+        let matches = commentData.match(/^\[([a-z]+):([a-zA-Z0-9\-]+):dynamicContent ({.*})\/\]$/)
+
+        if (!matches) {
+          return
+        }
+
+        let [unused, type, id, json] = matches
+        let attrs = JSON.parse(json)
+
+        attributesCache.set(el.id, attrs)
+
+        return attrs[attr]
+      }
+    })
+
+    /**
+     * Special string for dynamic content that works in both plain text and HTML
+     *
+     * @param block
+     * @return {`[${string}:${string}:dynamicContent ${string}]`}
+     * @constructor
+     */
+    const DynamicContentString = (block) => `[${block.type}:${block.id}:dynamicContent ${JSON.stringify(
+      extractAttributes(block))}/]`
 
     registerBlock(type, name, {
       ...block,
+      attributes: attributeGetters,
       edit: renderHtml,
-      html: (block) => isGeneratingHTML() ? `<!-- ${type}:${block.id} -->` : renderHtml(block),
-      plainText: ({ type, id }) => `<!-- ${type}:${id} -->`,
+      html: (block) => isGeneratingHTML() ? DynamicContentString(block) : renderHtml(block),
+      plainText: (block) => DynamicContentString(block),
     })
   }
 
@@ -1750,6 +1935,15 @@
     ])
   }
 
+  /**
+   * The block toolbar
+   *
+   * @param block
+   * @param duplicateBlock
+   * @param deleteBlock
+   * @return {*}
+   * @constructor
+   */
   const BlockToolbar = ({
     block,
     duplicateBlock,
@@ -1784,6 +1978,13 @@
     ])
   }
 
+  /**
+   * The eidt view of a block
+   *
+   * @param block
+   * @return {*}
+   * @constructor
+   */
   const BlockEdit = (block) => {
     return BlockRegistry.edit({
       ...block,
@@ -1791,6 +1992,42 @@
     })
   }
 
+  const BlockStartComment = block => `<!-- ${block.type}:${block.id} ${blockCommentProps(block)} -->`
+  const BlockEndComment = block => `<!-- /${block.type}:${block.id} -->`
+
+  /**
+   * Removes parseable attributes from the json comment
+   *
+   * @param block
+   * @return {string}
+   */
+  const blockCommentProps = block => {
+
+    let props = {}
+
+    for (let prop in block) {
+
+      if (['advancedStyle', 'type', 'id', 'hide_on_mobile', 'hide_on_desktop'].includes(prop)) {
+        continue
+      }
+
+      if (BlockRegistry.get(block.type).attributes.hasOwnProperty(prop)) {
+        continue
+      }
+
+      props[prop] = block[prop]
+    }
+
+    return JSON.stringify(props)
+  }
+
+  /**
+   * The final HTML of the block as rendered for the email content
+   *
+   * @param block
+   * @return {*}
+   * @constructor
+   */
   const BlockHTML = (block) => {
 
     let { advancedStyle = {} } = block
@@ -1812,11 +2049,12 @@
         cellpadding: '0',
         role: 'presentation',
         align: 'center',
-        className: 'email-columns',
+        className: 'email-columns responsive',
       }, Tr({
         className: 'email-columns-row',
       }, Td({
         width,
+        id: `b-${block.id}-inner`,
         className: 'email-columns-cell',
         style: {
           width: `${width}px`,
@@ -1824,10 +2062,21 @@
       }, html)))
     }
 
+    let classes = []
+
+    if (block.hide_on_mobile) {
+      classes.push('hide-on-mobile')
+    }
+
+    if (block.hide_on_desktop) {
+      classes.push('hide-on-desktop')
+    }
+
     return Tr({}, [
-      `<!-- START:${block.id} -->`,
+      BlockStartComment(block),
       Td({
           id: `b-${block.id}`,
+          className: classes.join(' '),
           style: {
             ...AdvancedStyleControls.getInlineStyle(block),
             overflow: 'hidden',
@@ -1837,11 +2086,22 @@
           valign: 'top',
         }, html,
       ),
-      `<!-- END:${block.id} -->`,
+      BlockEndComment(block),
     ])
   }
 
-  const EditBlockWrapper = ({ advancedStyle = {}, ...block }) => {
+  /**
+   * The html of a block as shown in the editor
+   *
+   * @param block
+   * @return {*}
+   * @constructor
+   */
+  const EditBlockWrapper = (block) => {
+
+    let {
+      advancedStyle = {},
+    } = block
 
     let {
       width = '',
@@ -1860,6 +2120,16 @@
           width: `${width}px`,
         },
       }, html)
+    }
+
+    let classes = []
+
+    if (block.hide_on_mobile) {
+      classes.push('hide-on-mobile')
+    }
+
+    if (block.hide_on_desktop) {
+      classes.push('hide-on-desktop')
     }
 
     return Div({
@@ -1885,6 +2155,10 @@
     }, [
       Div({
         id: `b-${block.id}`,
+        className: classes.join(' '),
+        style: {
+          ...AdvancedStyleControls.getInlineStyle(block),
+        },
       }, [
         html,
       ]),
@@ -1899,6 +2173,13 @@
     ])
   }
 
+  /**
+   * Creates a block object
+   *
+   * @param type
+   * @param props
+   * @return {*&{advancedStyle: {}, id: *, type}}
+   */
   const createBlock = (type, props = {}) => {
 
     return {
@@ -2397,11 +2678,29 @@
   const AdvancedBlockControls = () => {
     return Fragment([
       ControlGroup({
+        name: 'Responsive',
+      }, [
+        Control({
+          label: 'Hide on mobile',
+        }, Toggle({
+          id: 'hide-on-mobile',
+          checked: getActiveBlock().hide_on_mobile || false,
+          onChange: e => updateBlock({ hide_on_mobile: e.target.checked }),
+        })),
+        Control({
+          label: 'Hide on desktop',
+        }, Toggle({
+          id: 'hide-on-desktop',
+          checked: getActiveBlock().hide_on_desktop || false,
+          onChange: e => updateBlock({ hide_on_desktop: e.target.checked }),
+        })),
+      ]),
+      ControlGroup({
           name: 'Conditional Visibility',
         },
         [
           Control({
-            label: 'Enable conditional visibility',
+            label: 'Enable contact filters',
           }, Toggle({
             id: 'toggle-filters',
             checked: getActiveBlock().filters_enabled || false,
@@ -2646,7 +2945,7 @@
     } = getEmailMeta()
 
     let {
-      from_user,
+      from_select = 0,
       message_type = 'marketing',
     } = getEmailData()
 
@@ -2687,8 +2986,10 @@
           placeholder: 'Search for a sender...',
           noneSelected: 'Pick a sender...',
           fetchOptions: search => Promise.resolve(fromOptions.filter(item => item.text.includes(search))),
-          selected: fromOptions.find(opt => from_user === opt.id),
-          onChange: item => setEmailData({ from_user: item.id }),
+          selected: fromOptions.find(opt => from_select === opt.id),
+          onChange: item => {
+            setEmailData({ from_select: item.id })
+          },
         })),
         Control({
           label: 'Send replies to...',
@@ -2699,7 +3000,7 @@
           tags: true,
           isValidSelection: id => isValidEmail(id),
           placeholder: 'Type an email address...',
-          noneSelected: getEmail().context.from_email,
+          noneSelected: getEmail().context?.from_email,
           fetchOptions: search => Promise.resolve(
             replyToOptions.filter(item => item.includes(search)).map(em => ({ id: em, text: em }))),
           selected: reply_to_override ? { id: reply_to_override, text: reply_to_override } : [],
@@ -2941,7 +3242,7 @@
             setEmailControlsTab('editor')
             morphControls()
           },
-        }, Dashicon('admin-settings')) : null,
+        }, [ Dashicon('admin-settings') , ToolTip( 'Editor Controls', 'bottom-right' ) ]) : null,
       ])
 
     }
@@ -3052,6 +3353,8 @@
         }
       },
     }, [
+      // Toolbar
+      BlockEditorToolbar(),
       // Subject & Preview
       Div({
         className: 'inside',
@@ -3091,6 +3394,7 @@
       // Block Editor
       Div({
         id: 'block-editor-content-wrap',
+        className: getState().responsiveDevice,
       }, getTemplate().html(
         BlockEditorContent(),
       )),
@@ -3192,7 +3496,7 @@
         onClick: e => {
           ModalFrame({}, Iframe({
             id: 'mobile-desktop-iframe',
-            height: window.innerHeight * 0.9,
+            height: window.innerHeight * 0.85,
             width: Math.min(1200, window.innerWidth * 0.8),
             style: {
               backgroundColor: '#fff',
@@ -3207,14 +3511,14 @@
         onClick: e => {
           ModalFrame({}, Iframe({
             id: 'mobile-preview-iframe',
-            height: Math.min(915, window.innerHeight * 0.9),
+            height: Math.min(915, window.innerHeight * 0.85),
             width: 412,
             style: {
               backgroundColor: '#fff',
             },
           }, getState().preview))
         },
-      }, [icons.mobile, ToolTip('Mobile Preview')]),
+      }, [icons.smartphone, ToolTip('Mobile Preview')]),
       Button({
         id: 'preview-plain-text',
         className: 'gh-button secondary icon',
@@ -3227,7 +3531,7 @@
       }, [icons.text, ToolTip('Plain Text Preview')]),
       Button({
         id: 'send-test-email',
-        className: 'gh-button secondary',
+        className: 'gh-button secondary icon',
         disabled: !Boolean(getState().preview),
         onClick: e => {
 
@@ -3287,7 +3591,7 @@
             ]),
           ]))
         },
-      }, 'Send Test'),
+      }, [icons.email, ToolTip('Send a test email')]),
     ])
   }
 
@@ -3357,16 +3661,6 @@
     }, [
       Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
       Title(),
-      isBlockEditor() ? Button({
-        className: 'gh-button secondary text icon',
-        id: 'open-block-inspector',
-        onClick: e => {
-          MiniModal({
-            closeOnFocusout: true,
-            selector: '#open-block-inspector',
-          }, BlockInspector())
-        },
-      }, [icons.eye, ToolTip('Block Inspector')]) : null,
       UndoRedo(),
       PreviewButtons(),
       PublishActions(),
@@ -3613,6 +3907,10 @@
                             content: contents,
                           })
 
+                          setEmailMeta({
+                            type: 'html',
+                          })
+
                           setState({
                             page: 'html-editor',
                             preview: contents,
@@ -3812,6 +4110,51 @@
   }
 
   /**
+   * Block Inspector
+   * Mobile Responsive View
+   * Desktop Responsive View
+   *
+   * @return {*}
+   * @constructor
+   */
+  const BlockEditorToolbar = () => {
+    return Div({
+      id: 'block-editor-toolbar',
+    }, Div({ className: 'display-flex column buttons' }, [
+      Button({
+        className: `gh-button ${getState().blockInspector ? 'primary' : 'secondary' } text icon`,
+        id: 'open-block-inspector',
+        onClick: e => {
+          setState({
+            blockInspector: ! getState().blockInspector
+          })
+          morphBlockEditor()
+        },
+      }, [icons.inspect, ToolTip('Block Inspector', 'right')]),
+      Button({
+        className: `gh-button ${getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary' } text icon`,
+        id: 'set-responsive-desktop',
+        onClick: e => {
+          setState({
+            responsiveDevice: 'desktop',
+          })
+          morphBlockEditor()
+        },
+      }, [icons.desktop, ToolTip('Desktop', 'right')]),
+      Button({
+        className: `gh-button ${getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary' } text icon`,
+        id: 'set-responsive-mobile',
+        onClick: e => {
+          setState({
+            responsiveDevice: 'mobile'
+          })
+          morphBlockEditor()
+        },
+      }, [icons.smartphone, ToolTip('Mobile', 'right')]),
+    ]))
+  }
+
+  /**
    * The main block editor component
    *
    * @return {*}
@@ -3824,11 +4167,31 @@
     }, [
       // Blocks
       Blocks(),
+      // Inspector
+      getState().blockInspector ? BlockInspector() : null,
       // Content
       ContentEditor(),
       // Controls
       ControlsPanel(),
     ])
+  }
+
+  const ResponsiveControls = () => {
+    return ButtonToggle({
+      id: 'responsive-controls',
+      options: [
+        { id: 'desktop', text: icons.desktop },
+        { id: 'mobile', text: icons.smartphone },
+      ],
+      selected: getState().responsiveDevice,
+      onChange: value => {
+        setState({
+          responsiveDevice: value,
+        })
+        morphBlockEditor()
+        morph('#responsive-controls', ResponsiveControls())
+      },
+    })
   }
 
   const ColumnGap = (gap = 10) => Td({
@@ -3852,13 +4215,17 @@
           fontWeight: 'normal',
         },
         ...props,
-      }, Table({
-        className: `column ${blocks.length ? '' : 'empty'}`,
-        cellpadding: '0',
-        cellspacing: '0',
-        role: 'presentation',
-        width: '100%',
-      }, blocks.map(b => BlockHTML(b))))
+      }, [
+        `<!-- START:COLUMN -->`,
+        Table({
+          className: `column ${blocks.length ? '' : 'empty'}`,
+          cellpadding: '0',
+          cellspacing: '0',
+          role: 'presentation',
+          width: '100%',
+        }, blocks.map(b => BlockHTML(b))),
+        `<!-- END:COLUMN -->`,
+      ])
     }
 
     return Td({
@@ -4264,6 +4631,7 @@
 
     return ControlGroup({
       name,
+      id: tag
     }, [
 
       Control({
@@ -4320,13 +4688,46 @@
   }
 
   registerBlock('columns', 'Columns', {
+    attributes: {
+      layout: el => el.querySelector(`table.email-columns:not(:has(#${el.id}-inner))`).classList.item(1),
+      verticalAlign: (
+        el,
+        { layout = '' }) => el.querySelector(`table.email-columns.${layout} td.email-columns-cell:has(table.column)`).
+      style.
+      getPropertyValue('vertical-align'),
+      responsive: (el, { layout = '' }) => el.querySelector(`table.email-columns.${layout}`).
+      classList.
+      contains('responsive'),
+      columns: (el, { layout = '' }) => {
+
+        let columns = []
+        let table = el.querySelector(`table.email-columns.${layout}`)
+        let cells = table.querySelector('tr.email-columns-row').childNodes
+
+        for (let cell of cells) {
+
+          if (cell.nodeType !== Node.ELEMENT_NODE || cell.classList.contains('gap')) {
+            continue
+          }
+
+          columns.push(parseBlocksFromTable(cell.querySelector('table.column')))
+        }
+
+        // Polyfill columns to avoid missing blocks if layout changes
+        while (columns.length < 4) {
+          columns.push([])
+        }
+
+        return columns
+      },
+    },
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
 		     style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path 
         fill="currentColor"
         d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
-    controls: ({ layout = 'two_columns', gap = 0, verticalAlign = 'top', updateBlock }) => {
+    controls: ({ layout = 'two_columns', gap = 0, verticalAlign = 'top', updateBlock, responsive = true }) => {
 
       const LayoutChoice = l => Button({
         className: `layout-choice ${l} ${layout === l ? 'selected' : ''}`,
@@ -4349,6 +4750,7 @@
           }, [
             ...Object.keys(columnLayouts).map(k => LayoutChoice(k)),
           ]),
+          `<hr/>`,
           Control({
             label: 'Gap',
           }, NumberControl({
@@ -4370,12 +4772,18 @@
             },
             onChange: e => updateBlock({ verticalAlign: e.target.value }),
           })),
+          Control({ label: 'Responsive' }, Toggle({
+            id: 'columns-responsive',
+            checked: responsive,
+            onChange: e => updateBlock({ responsive: e.target.checked }),
+            value: 1,
+          })),
         ]),
       ]
     },
-    html: ({ columns, layout = 'two_columns', gap = 0, verticalAlign = 'top' }) => {
+    html: ({ columns, layout = 'two_columns', gap = 0, verticalAlign = 'top', responsive = true }) => {
       return Table({
-          className: `email-columns ${layout}`,
+          className: `email-columns ${layout} ${responsive ? 'responsive' : ''}`,
           cellspacing: '0',
           cellpadding: '0',
           width: '100%',
@@ -4403,6 +4811,7 @@
         [], [], [], [],
       ],
       gap: 10,
+      responsive: true,
     },
   })
 
@@ -4438,6 +4847,18 @@
       ...p,
       ...a,
     })
+    inlineStyle(doc, 'b,strong', {
+      fontWeight: 'bold',
+    })
+
+    inlineStyle(doc, 'ul', {
+      listStyle: 'disc',
+      paddingLeft: '30px',
+    })
+
+    inlineStyle(doc, 'ol', {
+      paddingLeft: '30px',
+    })
 
     if (doc.body.firstElementChild) {
       doc.body.firstElementChild.style.marginTop = 0
@@ -4453,13 +4874,37 @@
   }
 
   registerBlock('text', 'Text', {
+    attributes: {
+      content: el => el.querySelector('.text-content-wrap').innerHTML,
+    },
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
 		     viewBox="0 0 977.7 977.7">
         <path fill="currentColor"
               d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
-    controls: ({ p = {}, a = {}, h1 = {}, h2 = {}, h3 = {}, updateBlock, curBlock }) => {
+    controls: ({ p = {}, a = {}, h1 = {}, h2 = {}, h3 = {}, content = '', updateBlock, curBlock }) => {
+
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(content, 'text/html')
+      let firstEl = doc.body.firstElementChild
+
+      if ( firstEl ){
+        let tag = firstEl.tagName.toLowerCase()
+        switch ( tag ){
+          case 'h1':
+          case 'h2':
+          case 'h3':
+          case 'p':
+          case 'a':
+            openPanel( `text-block-${tag}` )
+            break;
+          case 'ul':
+          case 'ol':
+            openPanel( `text-block-p` )
+            break;
+        }
+      }
 
       return Fragment([
         TagFontControlGroup(__('Paragraphs'), 'p', p, updateBlock),
@@ -4539,47 +4984,6 @@
         }, __('Edit Content', 'groundhogg'))])
     },
     html: textContent,
-    css: ({ selector, p, h1, h2, h3, a = {} }) => {
-
-      //language=CSS
-      return `
-          ${selector} p, ${selector} li {
-              ${fontStyle(p)}
-          }
-
-          ${selector} a {
-              ${fontStyle({
-                  ...p,
-                  ...a,
-              })}
-          }
-
-          ${selector} b, ${selector} strong {
-              font-weight: bold;
-          }
-
-          ${selector} ul {
-              list-style: disc;
-              padding-left: 30px;
-          }
-
-          ${selector} ol {
-              padding-left: 30px;
-          }
-
-          ${selector} h1 {
-              ${fontStyle(h1)}
-          }
-
-          ${selector} h2 {
-              ${fontStyle(h2)}
-          }
-
-          ${selector} h3 {
-              ${fontStyle(h3)}
-          }
-      `
-    },
     plainText: ({ content }) => extractPlainText(content),
     defaults: {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
@@ -4605,13 +5009,20 @@
   })
 
   registerBlock('button', 'Button', {
+    attributes: {
+      text: el => el.querySelector('a').innerText,
+      link: el => el.querySelector('a').href,
+      align: el => el.querySelector('td[align]').getAttribute('align'),
+      borderStyle: el => parseBorderStyle(el.querySelector('td.email-button').style),
+      backgroundColor: el => el.querySelector('td.email-button').getAttribute('bgcolor'),
+    },
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 			<path fill="currentColor"
 			      d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
 		</svg>`,
-    controls: ({ text, link, style, align, size, borderStyle = {}, updateBlock = () => {} }) => {
+    controls: ({ text, link, style, align, size, backgroundColor, borderStyle = {}, updateBlock = () => {} }) => {
       return [
         ControlGroup({
           name: 'Content',
@@ -4663,12 +5074,9 @@
           }, ColorPicker({
             type: 'text',
             id: 'button-color',
-            value: style.backgroundColor,
+            value: backgroundColor,
             onChange: backgroundColor => updateBlock({
-              style: {
-                ...style,
-                backgroundColor,
-              },
+              backgroundColor,
             }),
           })),
         ]),
@@ -4685,7 +5093,7 @@
         TagFontControlGroup('Font', 'style', style, updateBlock),
       ]
     },
-    html: ({ text, align, style, size, link, borderStyle = {} }) => {
+    html: ({ text, align, style, size, link, backgroundColor, borderStyle = {} }) => {
       let padding
       switch (size) {
         case 'sm':
@@ -4715,11 +5123,12 @@
           role: 'presentation',
         }, Tr({}, Td({
           className: 'email-button',
-          bgcolor: style.backgroundColor,
+          bgcolor: backgroundColor,
           style: {
             padding,
             borderRadius: '3px',
             ...addBorderStyle(borderStyle),
+            backgroundColor,
           },
           align: 'center',
         }, makeEl('a', {
@@ -4729,11 +5138,14 @@
             fontSize: `${style.fontSize}px`,
             textDecoration: 'none',
             display: 'inline-block',
+            backgroundColor,
           },
         }, text)))))),
       ])
     },
-    edit: ({ text, align, style, size, updateBlock, borderStyle = {} }) => {
+    edit: ({
+      text, align, style, size, backgroundColor, updateBlock, borderStyle = {},
+    }) => {
 
       let padding
       switch (size) {
@@ -4771,10 +5183,11 @@
           role: 'presentation',
         }, Tr({}, Td({
           className: 'email-button',
-          bgcolor: style.backgroundColor,
+          bgcolor: backgroundColor,
           style: {
             padding,
             borderRadius: '3px',
+            backgroundColor,
             ...addBorderStyle(borderStyle),
           },
           align: 'center',
@@ -4786,6 +5199,7 @@
             fontSize: `${style.fontSize}px`,
             textDecoration: 'none !important',
             display: 'inline-block',
+            backgroundColor,
           },
           eventHandlers: {
             'input': textUpdate,
@@ -4797,24 +5211,13 @@
     plainText: ({ text, link = '' }) => {
       return `[${text}](${link})`
     },
-    css: ({ selector, style, borderStyle = {} }) => {
-      //language=CSS
-      return `
-          ${selector} td.email-button {
-              ${objectToStyle(addBorderStyle(borderStyle))}
-          }
-
-          ${selector} a {
-              ${fontStyle(style)}
-          }`
-    },
     defaults: {
       link: Groundhogg.url.home,
       align: 'center',
       text: 'Click me!',
       size: 'md',
+      backgroundColor: '#dd3333',
       style: {
-        backgroundColor: '#dd3333',
         color: '#ffffff',
         fontSize: 20,
         fontWeight: '600',
@@ -4824,6 +5227,15 @@
   })
 
   registerBlock('image', 'Image', {
+    attributes: {
+      src: el => el.querySelector('img').src,
+      height: el => parseInt(el.querySelector('img').height),
+      width: el => parseInt(el.querySelector('img').width),
+      alt: el => el.querySelector('img').alt,
+      link: el => el.querySelector('a')?.href,
+      borderStyle: el => parseBorderStyle(el.querySelector('img').style),
+      align: el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
+    },
     svg: icons.image,
     controls: ({ id, src, link = '', width, height, alt = '', align = 'center', updateBlock, borderStyle = {} }) => {
 
@@ -4962,6 +5374,9 @@
   })
 
   registerBlock('spacer', 'Spacer', {
+    attributes: {
+      height: el => parseInt(el.querySelector('td[height]').getAttribute('height')),
+    },
     svg: `
         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
   <path fill="currentColor"
@@ -5004,6 +5419,12 @@
   })
 
   registerBlock('divider', 'Divider', {
+    attributes: {
+      height: el => parseInt(el.querySelector('hr').style.getPropertyValue('border-top-width')),
+      width: el => parseInt(el.querySelector('hr').style.getPropertyValue('width')),
+      color: el => el.querySelector('hr').style.getPropertyValue('border-top-color'),
+      lineStyle: el => el.querySelector('hr').style.getPropertyValue('border-style'),
+    },
     svg: `
         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 409.6 409.6">
   <path fill="currentColor" d="M393 188H17a17 17 0 1 0 0 34h376a17 17 0 1 0 0-34z"/>
@@ -5065,14 +5486,6 @@
         })),
       ])
     },
-    edit: ({ height, width, color, lineStyle = 'solid' }) => {
-
-      // language=HTML
-      return `
-		  <hr class="divider"
-		      style="border-width: ${height}px 0 0 0;width:${width}%;border-top-color: ${color};border-style: ${lineStyle};">
-		  </hr>`
-    },
     html: ({ height, width, color, lineStyle = 'solid' }) => {
       // language=HTML
       return `
@@ -5089,7 +5502,39 @@
     },
   })
 
+  /**
+   * Remove bad tags and attributes from the HTML of the email
+   *
+   * @param html
+   * @return {string}
+   */
+  const cleanHTML = html => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+
+    const unsupportedTags = [
+      'script',
+      'form',
+      'button',
+      'input',
+      'textarea',
+      'menu',
+      'iframe',
+      'audio',
+      'video',
+      'embed',
+    ]
+
+    // Remove bad HTML
+    doc.querySelectorAll(unsupportedTags.join(', ')).forEach(el => el.remove())
+
+    return doc.body.innerHTML
+  }
+
   registerBlock('html', 'HTML', {
+    attributes: {
+      content: el => el.innerHTML,
+    },
     // language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
@@ -5111,7 +5556,7 @@
                 }).codemirror
 
                 editor.on('change', instance => updateBlock({
-                  content: instance.getValue(),
+                  content: cleanHTML(instance.getValue()),
                 }))
 
                 editor.setSize(null, 500)
@@ -5119,14 +5564,12 @@
             },
           }),
           `<p>Not all HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`,
+          `<p>Some elements such as <code>script</code> and <code>form</code> elements will be stripped out automatically.</p>`,
         ]),
       ])
     },
-    edit: ({ content }) => {
-      return content
-    },
     html: ({ content }) => {
-      return content
+      return cleanHTML(content)
     },
     plainText: ({ content }) => extractPlainText(content),
     defaults: {
@@ -5135,6 +5578,23 @@
   })
 
   registerDynamicBlock('posts', 'Posts', {
+    attributes: [
+      'number',
+      'layout',
+      'offset',
+      'featured',
+      'columns',
+      'post_type',
+      'excerpt',
+      'gap',
+      'tag',
+      'category',
+      'queryId',
+      'tag_rel',
+      'category_rel',
+      'thumbnail_size',
+      'thumbnail',
+    ],
     //language=HTML
     svg: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
@@ -5374,41 +5834,6 @@
           }
       `
     },
-    generateCacheKey: ({
-      number,
-      layout,
-      offset,
-      featured,
-      columns,
-      post_type,
-      excerpt,
-      gap,
-      tag,
-      category,
-      queryId,
-      tag_rel,
-      category_rel,
-      thumbnail_size,
-      thumbnail,
-    }) => {
-      return base64_json_encode({
-        number,
-        layout,
-        offset,
-        featured,
-        columns,
-        post_type,
-        excerpt,
-        gap,
-        tag,
-        category,
-        queryId,
-        tag_rel,
-        category_rel,
-        thumbnail_size,
-        thumbnail,
-      })
-    },
     defaults: {
       layout: 'cards',
       number: 5,
@@ -5612,6 +6037,15 @@
   })
 
   registerBlock('social', 'Socials', {
+    attributes: {
+      size: el => parseInt(el.querySelector('img').width),
+      gap: el => parseInt(el.querySelector('td.gap')?.width),
+      theme: el => el.querySelector('img').src.split('/').at(-2),
+      socials: el => Array.from(el.querySelectorAll('a')).map(el => {
+        let png = el.firstElementChild.src.split('/').at(-1)
+        return [png.substr(0, png.indexOf('.png')), el.href]
+      }),
+    },
     //language=HTML
     svg: `
 		<svg viewBox="-33 0 512 512.001" xmlns="http://www.w3.org/2000/svg">
@@ -5620,7 +6054,7 @@
 		</svg>`,
     controls: ({
       socials = [],
-      gap = 5,
+      gap = 4,
       size = 32,
       theme = 'brand-circle',
       align = 'center',
@@ -5659,15 +6093,15 @@
               socials,
             }),
           }) : null,
-          use === 'global' ? makeEl( 'a', {
+          use === 'global' ? makeEl('a', {
             href: '#',
             onClick: e => {
               setActiveBlock(null)
               setEmailControlsTab('editor')
               openPanel('email-editor-global-socials')
               morphControls()
-            }
-          }, 'Edit global social accounts' ) : null,
+            },
+          }, 'Edit global social accounts') : null,
           Control({
             label: 'Alignment',
           }, AlignmentButtons({
@@ -5689,7 +6123,7 @@
             label: 'Gap',
           }, NumberControl({
             id: 'gap',
-            step: 5,
+            step: 2,
             value: gap,
             unit: 'px',
             onChange: e => updateBlock({ gap: e.target.value }),
@@ -5702,7 +6136,7 @@
       align = 'center',
       theme = 'brand-circle',
       socials = [],
-      gap = 5,
+      gap = 4,
       size = 32,
       use = 'global',
     }) => {
@@ -5721,7 +6155,7 @@
       let cells = socials.reduce((cells, social, index) => {
 
         if (index > 0) {
-          cells.push(Td({ width: gap, style: { width: `${gap}px` } }))
+          cells.push(Td({ className: 'gap', width: gap, style: { width: `${gap}px` } }))
         }
 
         cells.push(Td({}, social))
@@ -5736,22 +6170,37 @@
         role: 'presentation',
         width: '100%',
         style: {
-          width: '100%'
-        }
+          width: '100%',
+        },
       }, Tr({}, Td({
-        align
+        align,
       }, Table({
         className: 'socials',
         cellpadding: 0,
         cellspacing: 0,
         role: 'presentation',
-      }, Tr({}, cells )))))
+      }, Tr({}, cells)))))
+    },
+    plainText: ({
+      socials = [],
+      use = 'global',
+    }) => {
+
+      if (use === 'global') {
+        socials = globalSocials
+      }
+
+      if (socials.length === 0) {
+        return ''
+      }
+
+      return socials.map(([social, url]) => `[${social}](${url})`).join(' | ')
     },
     defaults: {
       align: 'center',
       theme: 'brand-circle',
       socials: [],
-      gap: 5,
+      gap: 4,
       size: 32,
       use: 'global',
     },
@@ -5790,12 +6239,24 @@
 
     History.clear()
 
+    let blocks
+
     // existing email not using blocks
     if (email.ID) {
 
       switch (email.context.editor_type) {
 
         case 'blocks':
+
+          if (Array.isArray(email.meta.blocks) && email.meta.blocks.length) {
+            blocks = email.meta.blocks
+            setEmailMeta({
+              blocks: true,
+            })
+          } else {
+            blocks = parseBlocksFromContent(email.data.content)
+          }
+
           break
         case 'legacy_blocks':
 
@@ -5809,7 +6270,7 @@
             }
 
             if (node.classList.contains('row')) {
-              email.meta.blocks = convertProEditorToBlocks(email.data.content)
+              blocks = convertProEditorToBlocks(email.data.content)
               break
             }
           }
@@ -5817,7 +6278,7 @@
           break
         case 'legacy_plain':
 
-          email.meta.blocks = [
+          blocks = [
             createBlock('text', {
               content: email.data.content,
             }),
@@ -5839,50 +6300,6 @@
           return
       }
 
-      // must convert to blocks
-      if (email.context.editor_type !== 'blocks') {
-        switch (email.context.editor_type) {
-          case 'legacy_blocks':
-
-            let elements = htmlToElements(email.data.content)
-
-            // Using for...of
-            for (const node of elements.values()) {
-
-              if (node.nodeType !== Node.ELEMENT_NODE) {
-                continue
-              }
-
-              if (node.classList.contains('row')) {
-                email.meta.blocks = convertProEditorToBlocks(email.data.content)
-                break
-              }
-            }
-
-            break
-          case 'legacy_plain':
-
-            email.meta.blocks = [
-              createBlock('text', {
-                content: email.data.content,
-              }),
-            ]
-
-            break
-          case 'html':
-
-            setState({
-              page: 'html-editor',
-              email,
-              preview: email.context?.built,
-              previewPlainText: email.context?.plain,
-            })
-
-            renderEditor()
-            return
-        }
-      }
-
     }
     // Creating a new email
     else {
@@ -5891,21 +6308,22 @@
         title: 'My new email',
         subject: '',
         pre_header: '',
-        from_user: 0,
+        from_select: 0,
         status: 'draft',
         message_type: 'marketing',
       }
 
       email.meta = {
-        blocks: [
-          createBlock('text'),
-        ],
         alignment: 'left',
         backgroundColor: '',
         frameColor: '',
         width: 600,
         custom_headers: {},
       }
+
+      blocks = [
+        createBlock('text'),
+      ]
 
       setState({
         page: 'templates',
@@ -5935,15 +6353,27 @@
       previewPlainText,
     })
 
-    setBlocks(email.meta.blocks, false)
+    setBlocks(blocks, false)
 
     renderEditor()
   }
 
+  /**
+   * Compiles the CSS rules for each of the blocks
+   *
+   * @param blocks
+   * @return {*}
+   */
   const renderBlocksCSS = (blocks) => {
-    return blocks.filter(b => b.type).map(b => BlockRegistry.css(b)).join('')
+    return blocks.map(b => BlockRegistry.css(b)).join('\n').replaceAll(/(\s*\n|\s*\r\n|\s*\r){1,}/g, '\n')
   }
 
+  /**
+   * Renders the blocks in their final HTML format
+   *
+   * @param blocks
+   * @return {string}
+   */
   const renderBlocksHTML = (blocks) => {
     setIsGeneratingHTML(true)
     let html = Table({
@@ -5956,11 +6386,28 @@
     return html
   }
 
+  /**
+   * Renders the blocks as plain text
+   *
+   * @param blocks
+   * @return {string}
+   */
   const renderBlocksPlainText = (blocks) => {
     setIsGeneratingHTML(true)
     let plain = blocks.filter(b => b.type).map(block => {
 
       let text
+
+      let {
+        filters_enabled = false,
+        include_filters = [],
+        exclude_filters = [],
+        hide_on_desktop = false,
+      } = block
+
+      if (hide_on_desktop) {
+        return ''
+      }
 
       try {
         text = BlockRegistry.get(block.type).plainText(block)
@@ -5968,8 +6415,9 @@
         text = ''
       }
 
-      if (block.filters_enabled && text) {
-        text = `<!-- START:${block.id} -->\n${text}\n<!-- END:${block.id} -->`
+      if (filters_enabled && text) {
+        text = `[filters:${block.id} ${JSON.stringify(
+          { include_filters, exclude_filters })}]${text}[/filters:${block.id}]`
       }
 
       return text
@@ -5984,14 +6432,21 @@
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
   const morphEmailEditor = () => morph('#email-editor', EmailEditor())
   const morphHeader = () => morph('#email-header', Header())
-  const updateStyles = () => $('#builder-style').
-  text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
+  const updateStyles = () => {
+    $('#builder-style').text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
+  }
 
   const renderEditor = () => {
     morphEmailEditor()
     updateStyles()
   }
 
+  /**
+   * Converts HTML from the legacy block editor to the new block editor
+   *
+   * @param oldHtml
+   * @return {*[]}
+   */
   const convertProEditorToBlocks = (oldHtml) => {
 
     let blocks = []
@@ -6124,6 +6579,92 @@
     })
 
     return blocks
+  }
+
+  /**
+   * Given some content, parse the blocks from it
+   * @param content
+   */
+  const parseBlocksFromContent = content => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(content, 'text/html')
+
+    return parseBlocksFromTable(doc.body.firstElementChild)
+  }
+
+  /**
+   * Given a table, parse the blocks in it
+   *
+   * @param table
+   * @return {*[]}
+   */
+  const parseBlocksFromTable = table => {
+
+    let blocks = []
+
+    let rows = table.querySelector('tbody')?.childNodes
+
+    if (!rows) {
+      return []
+    }
+
+    for (let row of rows) {
+
+      let block = parseBlockFromRow(row)
+
+      if (block) {
+        blocks.push(block)
+      }
+    }
+
+    return blocks
+  }
+
+  /**
+   * Given a TR which contains the block, as well as the comments, return a block
+   *
+   * @param tr
+   * @return {any}
+   */
+  const parseBlockFromRow = tr => {
+    let comment = tr.firstChild
+    let commentData = comment?.nodeValue?.trim()
+
+    if (!commentData) {
+
+      console.log(tr)
+      return null
+    }
+
+    let attributes = {}
+    let unused, type, id, json
+
+    // has json
+    if (commentData.indexOf('{') > -1) {
+      [unused, type, id, json] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+) ({.*})$/)
+      attributes = JSON.parse(json)
+    } else {
+      [unused, type, id] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+)$/)
+    }
+
+    const getAttributes = BlockRegistry.get(type).attributes
+    const el = tr.querySelector(`td#b-${id}`)
+
+    let block = {
+      type,
+      id,
+      ...attributes,
+    }
+
+    for (let getter in getAttributes) {
+      block[getter] = getAttributes[getter](el, block)
+    }
+
+    block.advancedStyle = AdvancedStyleControls.parse(el)
+    block.hide_on_mobile = el.classList.contains('hide-on-mobile')
+    block.hide_on_desktop = el.classList.contains('hide-on-desktop')
+
+    return block
   }
 
   $('head').append(`<style id="builder-style" type="text/css"></style>`)

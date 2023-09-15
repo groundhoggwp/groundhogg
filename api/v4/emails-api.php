@@ -4,7 +4,7 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
-use Groundhogg\Dynamic_Block_Handler;
+use Groundhogg\Block_Registry;
 use Groundhogg\Email;
 use Groundhogg\Event;
 use WP_REST_Server;
@@ -103,7 +103,7 @@ class Emails_Api extends Base_Object_Api {
 		$block = $request->get_param( 'block_type' );
 		$props = base64_json_decode( $request->get_param( 'props' ) );
 
-		$html = Dynamic_Block_Handler::instance()->render_block( $block, $props );
+		$html = Block_Registry::instance()->render_block( $block, $props );
 
 		return self::SUCCESS_RESPONSE( [
 			'content' => $html

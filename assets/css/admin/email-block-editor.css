@@ -79,7 +79,6 @@
 
 #email-block-editor {
   display: flex;
-  gap: 20px;
   max-height: calc(100vh - 92px);
 }
 #email-block-editor * {
@@ -126,7 +125,65 @@
   width: 100%;
   background: #FFFFFF;
   overflow: auto;
-  margin-top: 20px;
+  margin: 20px 20px 0 20px;
+  position: relative;
+}
+#email-block-editor #content #block-editor-toolbar {
+  position: sticky;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  left: 0;
+  z-index: 999;
+}
+#email-block-editor #content #block-editor-toolbar .buttons {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  background-color: #FFF;
+  padding: 3px;
+  border-radius: 0 3px 3px 0;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile {
+  width: 400px;
+  margin: auto;
+  transition: 0.4s;
+  outline: 5px solid #102640;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile .hide-on-mobile {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile .template-full-width,
+#email-block-editor #content #block-editor-content-wrap.mobile .template-full-width-contained {
+  padding: 0;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile .block-inner-content,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns > tbody,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns tr.email-columns-row,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns tr.email-columns-row > td.email-columns-cell {
+  display: block !important;
+  width: auto !important;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile .alignright:not(.keep-float),
+#email-block-editor #content #block-editor-content-wrap.mobile .alignleft:not(.keep-float) {
+  display: block !important;
+  float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 20px !important;
+}
+#email-block-editor #content #block-editor-content-wrap.desktop {
+  transition: 0.4s;
+}
+#email-block-editor #content #block-editor-content-wrap.desktop .hide-on-desktop {
+  filter: grayscale(1);
+  opacity: 0.5;
 }
 #email-block-editor #content #builder-content {
   min-height: 40px;
@@ -344,6 +401,7 @@
   overflow-y: auto;
   flex-shrink: 0;
   background: #fff;
+  z-index: 1;
   border-left: 1px solid rgba(16, 38, 64, 0.15);
 }
 #controls-panel h3 {
@@ -552,7 +610,6 @@ body iframe#preview.desktop {
   flex-grow: 1;
   align-items: stretch;
   height: calc(100vh - 32px - 60px);
-  max-height: calc(100vh - 32px - 60px);
 }
 #email-editor .gh-header {
   background: #FFFFFF;
@@ -717,8 +774,9 @@ body iframe#preview.desktop {
 .gh-modal-frame #email-editor:has(#template-grid) .gh-header {
   top: 0;
 }
+.gh-modal-frame #email-editor #email-html-editor,
 .gh-modal-frame #email-editor #email-block-editor {
-  height: calc(100% - 60px);
+  height: calc(100% - 60px) !important;
 }
 
 @media only screen and (max-width: 960px) {
@@ -845,9 +903,12 @@ body iframe#preview.desktop {
 }
 
 .block-inspector {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
+  background-color: #fff;
+  border-right: 1px solid rgba(16, 38, 64, 0.15);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 .block-inspector .inspector-block {
   display: flex;

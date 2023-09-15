@@ -226,14 +226,11 @@ class Email extends Base_Object_With_Meta {
 		$content = $this->get_alt_body();
 
 		if ( $this->is_block_editor() ) {
-			$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
-			$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks(), 'plain' );
+			$content = $this->maybe_hide_blocks( $content, 'plain' );
+			$content = Block_Registry::instance()->replace_dynamic_content( $content, 'plain' );
 		}
 
 		$content = do_replacements( $content, $this->get_contact() );
-
-		// Remove comments
-		$content = preg_replace( '/<!-- .* -->/', '', $content );
 
 		// Re-strip
 		return $this->strip_html_tags( $content );
@@ -480,32 +477,12 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Retrieves the email blocks
-	 *
-	 * @return array
-	 */
-	public function get_blocks() {
-		return $this->get_meta( 'blocks' ) ?: [];
-	}
-
-	/**
-	 * Whether this email has blocks or not
-	 *
-	 * @return bool
-	 */
-	public function has_blocks() {
-		$blocks = $this->get_blocks();
-
-		return ! empty( $blocks );
-	}
-
-	/**
 	 * If the email has the footer block
 	 *
 	 * @return bool
 	 */
 	public function has_footer_block() {
-		return $this->get_editor_type() === 'blocks' && str_contains( $this->content, '<div id="footer"' );
+		return $this->is_block_editor() && str_contains( $this->content, '<div id="footer"' );
 	}
 
 	/**
@@ -526,7 +503,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// New blocks
-		if ( $this->has_blocks() ) {
+		if ( $this->get_meta( 'blocks' ) ) {
 			return 'blocks';
 		}
 
@@ -544,53 +521,81 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * If is using the HTML editor
+	 *
+	 * @return bool
+	 */
+	public function is_html_editor() {
+		return $this->get_editor_type() === 'html';
+	}
+
+	/**
+	 * Parses the content and retrieves blocks from the content
+	 * Not nested though
+	 *
+	 * @return array|false
+	 */
+	public function get_blocks() {
+
+		if ( ! $this->is_block_editor() ) {
+			return false;
+		}
+
+		return Block_Registry::instance()->parse_blocks( $this->content );
+	}
+
+	/**
 	 * Hide blocks that have conditional visibility enabled
 	 *
-	 * @param $content
-	 * @param $blocks
+	 * @param string $content
+	 * @param string $context
 	 *
 	 * @return array|mixed|string|string[]|null
 	 */
-	protected function maybe_hide_blocks( $content, $blocks ) {
+	protected function maybe_hide_blocks( $content, $context = 'html' ) {
 
-		if ( $this->is_testing() ) {
+		if ( $context === 'plain' ) {
+			$pattern = '/%s\\[filters:(?\'id\'[A-Za-z0-9-]+) (?\'attributes\'(?&json))\\](?\'content\'.*)\\[\\/filters:\\k\'id\'\]/s';
+		} else {
+			$pattern = '/%s<!-- (?\'type\'[a-z]+):(?\'id\'[A-Za-z0-9-]+) (?\'attributes\'(?&json)) -->(?\'content\'.*)<!-- \/\\k\'type\':\\k\'id\' -->/s';
+		}
+
+		$pattern = sprintf( $pattern, get_json_regex() );
+		$found   = preg_match_all( $pattern, $content, $matches );
+
+		if ( ! $found ) {
 			return $content;
 		}
 
-		$blocks = array_filter( $blocks, function ( $block ) {
-			return key_exists( 'type', $block );
-		} );
+		foreach ( $matches[0] as $i => $match ) {
+			$block_content = $matches['content'][ $i ];
 
-		foreach ( $blocks as $block ) {
-
-			// Block has filters enabled
-			if ( isset_not_empty( $block, 'filters_enabled' ) ) {
-				// Filters are not empty
-				if ( isset_not_empty( $block, 'include_filters' ) || isset_not_empty( $block, 'exclude_filters' ) ) {
-
-					$query = new Contact_Query( [
-						'filters'         => get_array_var( $block, 'include_filters', [] ),
-						'exclude_filters' => get_array_var( $block, 'exclude_filters', [] ),
-						'include'         => $this->get_contact()->get_id()
-					] );
-
-					$count = $query->count();
-
-					// If count is zero, no match and can't see
-					if ( $count === 0 ) {
-						// Remove the block
-						$content = preg_replace( "/<!-- START:{$block['id']} -->.*<!-- END:{$block['id']} -->/s", '', $content );
-
-						// This block is hidden, so we do not need to check children columns
-						continue;
-					}
-				}
+			if ( $this->is_testing() ) {
+				$content = str_replace( $match, $this->maybe_hide_blocks( $block_content, $context ), $content );
+				continue;
 			}
 
-			if ( key_exists( 'columns', $block ) && is_array( $block['columns'] ) ) {
-				foreach ( $block['columns'] as $column ) {
-					$content = $this->maybe_hide_blocks( $content, $column );
-				}
+			$block = json_decode( $matches['attributes'][ $i ], true );
+
+			if ( ! isset_not_empty( $block, 'include_filters' ) && ! isset_not_empty( $block, 'exclude_filters' ) ) {
+				$content = str_replace( $match, $block_content, $content );
+				continue;
+			}
+
+			$query = new Contact_Query( [
+				'filters'         => get_array_var( $block, 'include_filters', [] ),
+				'exclude_filters' => get_array_var( $block, 'exclude_filters', [] ),
+				'include'         => $this->get_contact()->get_id()
+			] );
+
+			$count = $query->count();
+
+			// If count is zero, no match and can't see
+			if ( $count === 0 ) {
+				// Remove the block
+				$content = str_replace( $match, '', $content );
+			} else {
+				$content = str_replace( $match, $this->maybe_hide_blocks( $block_content, $context ), $content );
 			}
 		}
 
@@ -612,8 +617,8 @@ class Email extends Base_Object_With_Meta {
 		switch ( $this->get_editor_type() ) {
 			// Block Editor
 			case 'blocks':
-				$content = $this->maybe_hide_blocks( $content, $this->get_blocks() );
-				$content = Dynamic_Block_Handler::instance()->replace_content( $content, $this->get_blocks() );
+				$content = $this->maybe_hide_blocks( $content );
+				$content = Block_Registry::instance()->replace_dynamic_content( $content );
 
 				// Special handling for footer unsub link
 				if ( $this->has_footer_block() ) {
@@ -631,12 +636,12 @@ class Email extends Base_Object_With_Meta {
 				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) ) {
 
 					if ( str_contains( $content, '</body>' ) ) {
-						$content = str_replace( $content, '</body>', html()->e( 'img', [
+						$content = str_replace( '</body>', html()->e( 'img', [
 								'src'    => $this->get_open_tracking_link(),
 								'width'  => '0',
 								'height' => '0',
 								'alt'    => '',
-							] ) . '</body>' );
+							] ) . '</body>', $content );
 					}
 
 				}
@@ -1165,6 +1170,165 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [] ) {
+
+		// map from_select to proper arguments
+		if ( isset_not_empty( $data, 'from_select' ) ) {
+			if ( $data['from_select'] === 'default' ) {
+				$data['from_user'] = 0;
+				$use_default_from  = 1;
+			} else {
+				$data['from_user'] = $data['from_select'];
+				$use_default_from  = 0;
+			}
+		}
+
+		$updated = parent::update( $data );
+
+		if ( isset( $use_default_from ) ) {
+			$this->update_meta( 'use_default_from', $use_default_from );
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Wrapper to handle sanitizing the email blocks
+	 *
+	 * @param       $key
+	 * @param false $value
+	 *
+	 * @return bool|mixed
+	 */
+	public function update_meta( $key, $value = false ) {
+
+		switch ( $key ) {
+			case 'blocks':
+				// Todo are we doing this?
+//				$value = Block_Registry::instance()->sanitize_blocks( $value );
+				break;
+		}
+
+		return parent::update_meta( $key, $value );
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return array|mixed
+	 */
+	protected function sanitize_columns( $data = [] ) {
+
+		foreach ( $data as $key => &$value ) {
+			switch ( $key ) {
+				case 'content':
+
+					$value = trim( $value );
+
+					// Is an HTML template
+					if ( str_starts_with( $value, '<!DOCTYPE' ) && str_contains( $value, '<html' ) ) {
+						// No sanitize as it's an HTML email
+					} else {
+						$value = email_kses( $value );
+					}
+
+					break;
+				case 'is_template':
+				case 'from_user':
+				case 'author':
+					$value = absint( $value );
+					break;
+				case 'plain_text':
+					$value = sanitize_textarea_field( $value );
+					break;
+				case 'subject':
+				case 'title':
+				case 'pre_header':
+				case 'status':
+				case 'message_type':
+				default:
+					$value = sanitize_text_field( $value );
+					break;
+			}
+		}
+
+		return $data;
+
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_as_array() {
+
+		// Check if coming from contacts page
+		if ( current_user_can( 'edit_contacts' ) ) {
+
+			$referer = wp_get_referer();
+			$params  = [];
+			wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
+
+			if ( get_array_var( $params, 'page' ) === 'gh_contacts' && isset_not_empty( $params, 'contact' ) ) {
+				$contact_id = absint( $params['contact'] );
+				$this->set_contact( $contact_id );
+			}
+		}
+
+		// Ensure there is a contact object there somewhere
+		if ( ! is_a_contact( $this->contact ) ) {
+
+			$contact = get_contactdata();
+
+			if ( ! $contact && is_user_logged_in() ) {
+				$user = wp_get_current_user();
+
+				$contact             = new Contact();
+				$contact->email      = $user->user_email;
+				$contact->first_name = $user->first_name;
+				$contact->last_name  = $user->last_name;
+			}
+
+			if ( ! $contact ) {
+				return parent::get_as_array();
+			}
+
+			$this->set_contact( $contact );
+		}
+
+		// Ensure there is an event object there somewhere
+		if ( ! $this->event ) {
+			$this->set_event( new Event() );
+		}
+
+		the_email( $this );
+
+		$live_preview = $this->build();
+
+		// Auto p the plain text content so we can create a new text block
+		if ( $this->get_editor_type() === 'legacy_plain' ) {
+			$this->content = wpautop( $this->content );
+		}
+
+		return array_merge( parent::get_as_array(), [
+			'context' => [
+				'editor_type' => $this->get_editor_type(),
+				'from_avatar' => get_avatar_url( $this->get_from_user_id(), [
+					'size' => 40
+				] ),
+				'from_name'   => $this->get_from_name(),
+				'from_email'  => $this->get_from_email(),
+				'from_user'   => $this->get_from_user(),
+				'built'       => $live_preview,
+				'plain'       => $this->get_merged_alt_body()
+			]
+		] );
+	}
+
+	/**
 	 * Get related email statistics
 	 *
 	 * @param $start
@@ -1257,70 +1421,5 @@ class Email extends Base_Object_With_Meta {
 			'unsubscribed'       => $unsubscribed,
 			'click_through_rate' => percentage( $opened, $clicked ),
 		];
-	}
-
-	public function get_as_array() {
-
-		// Check if coming from contacts page
-		if ( current_user_can( 'edit_contacts' ) ) {
-
-			$referer = wp_get_referer();
-			$params  = [];
-			wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
-
-			if ( get_array_var( $params, 'page' ) === 'gh_contacts' && isset_not_empty( $params, 'contact' ) ) {
-				$contact_id = absint( $params['contact'] );
-				$this->set_contact( $contact_id );
-			}
-		}
-
-		// Ensure there is a contact object there somewhere
-		if ( ! is_a_contact( $this->contact ) ) {
-
-			$contact = get_contactdata();
-
-			if ( ! $contact && is_user_logged_in() ) {
-				$user = wp_get_current_user();
-
-				$contact             = new Contact();
-				$contact->email      = $user->user_email;
-				$contact->first_name = $user->first_name;
-				$contact->last_name  = $user->last_name;
-			}
-
-			if ( ! $contact ) {
-				return parent::get_as_array();
-			}
-
-			$this->set_contact( $contact );
-		}
-
-		// Ensure there is an event object there somewhere
-		if ( ! $this->event ) {
-			$this->set_event( new Event() );
-		}
-
-		the_email( $this );
-
-		$live_preview = $this->build();
-
-		// Auto p the plain text content so we can create a new text block
-		if ( $this->get_editor_type() === 'legacy_plain' ) {
-			$this->content = wpautop( $this->content );
-		}
-
-		return array_merge( parent::get_as_array(), [
-			'context' => [
-				'editor_type' => $this->get_editor_type(),
-				'from_avatar' => get_avatar_url( $this->get_from_user_id(), [
-					'size' => 40
-				] ),
-				'from_name'   => $this->get_from_name(),
-				'from_email'  => $this->get_from_email(),
-				'from_user'   => $this->get_from_user(),
-				'built'       => $live_preview,
-				'plain'       => $this->get_merged_alt_body()
-			]
-		] );
 	}
 }

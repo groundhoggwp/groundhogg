@@ -5673,6 +5673,9 @@ function map_func_to_attr( &$arr, $key, $func ) {
  * @return string
  */
 function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) {
+
+	$original_meta_value = $meta_value;
+
 	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
 		$meta_value = sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {
@@ -5685,8 +5688,9 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 	 * @param mixed  $meta_value
 	 * @param string $meta_key
 	 * @param string $object_type
+	 * @param mixed  $original_meta_value
 	 */
-	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type );
+	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type, $original_meta_value );
 }
 
 /**
@@ -7825,4 +7829,21 @@ function download_json( $json, $name ) {
 	fclose( $file );
 	exit();
 
+}
+
+/**
+ * Regex that matches JSON
+ *
+ * @return string
+ */
+function get_json_regex() {
+	return '(?(DEFINE)'
+	. PHP_EOL . '(?\'json\'(?>\s*(?&object)\s*|\s*(?&array)\s*))'
+	. PHP_EOL . '(?\'object\'(?>\{\s*(?>(?&pair)(?>\s*,\s*(?&pair))*)?\s*\}))'
+	. PHP_EOL . '(?\'pair\'(?>(?&STRING)\s*:\s*(?&value)))'
+	. PHP_EOL . '(?\'array\'(?>\[\s*(?>(?&value)(?>\s*,\s*(?&value))*)?\s*\]))'
+	. PHP_EOL . '(?\'value\'(?>true|false|null|(?&STRING)|(?&NUMBER)|(?&object)|(?&array)))'
+	. PHP_EOL . '(?\'STRING\'(?>"(?>\\\\(?>["\/\\\\bfnrt]|u[a-fA-F0-9]{4})|[^\\\\"\0-\x1F\x7F]+)*"))'
+	. PHP_EOL . '(?\'NUMBER\'(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?))'
+	. PHP_EOL . ')';
 }
