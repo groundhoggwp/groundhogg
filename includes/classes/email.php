@@ -90,10 +90,11 @@ class Email extends Base_Object_With_Meta {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
 
-		// Maybe update message type from meta
-		if ( ! $this->message_type ) {
+		// Maybe update from the meta message type
+		if ( ! isset_not_empty( $this->data, 'message_type' ) ) {
+			$message_type = $this->get_meta( 'message_type' );
 			$this->update( [
-				'message_type' => $this->get_meta( 'message_type' ) ?: 'marketing'
+				'message_type' => $message_type ?: 'marketing'
 			] );
 		}
 	}
@@ -323,15 +324,6 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool|mixed
 	 */
 	public function get_message_type() {
-
-		// Maybe update from the meta message type
-		if ( ! $this->message_type ) {
-			$message_type = $this->get_meta( 'message_type' );
-			$this->update( [
-				'message_type' => $message_type
-			] );
-		}
-
 		return $this->message_type;
 	}
 
@@ -1228,13 +1220,7 @@ class Email extends Base_Object_With_Meta {
 				case 'content':
 
 					$value = trim( $value );
-
-					// Is an HTML template
-					if ( str_starts_with( $value, '<!DOCTYPE' ) && str_contains( $value, '<html' ) ) {
-						// No sanitize as it's an HTML email
-					} else {
-						$value = email_kses( $value );
-					}
+					$value = email_kses( $value );
 
 					break;
 				case 'is_template':

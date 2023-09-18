@@ -5,6 +5,7 @@ namespace Groundhogg\Admin;
 use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use function Groundhogg\_nf;
+use function Groundhogg\array_find;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
@@ -65,9 +66,9 @@ abstract class Table extends \WP_List_Table {
 			$this->view_param() => $view,
 		];
 
-		$params = array_merge( $params, is_array( $query ) ? $query : [
-			$query => $view,
-		] );
+//		$params = array_merge( $params, is_array( $query ) ? $query : [
+//			$query => $view,
+//		] );
 
 		return html()->e( 'a',
 			[
@@ -171,6 +172,23 @@ abstract class Table extends \WP_List_Table {
 	abstract protected function get_views_setup();
 
 	/**
+	 * Gets the query from the current view
+	 *
+	 * @return false|mixed
+	 */
+	protected function get_current_query() {
+		$view = array_find( $this->get_views_setup(), function ( $view ){
+			return $view['view'] === $this->get_view();
+		} );
+
+		if ( ! $view ){
+			return [];
+		}
+
+		return $view['query'];
+	}
+
+	/**
 	 * Parse the views and return them
 	 *
 	 * @return array
@@ -221,7 +239,7 @@ abstract class Table extends \WP_List_Table {
 		$orderby        = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
 		$search_columns = get_url_var( 'search_columns', '' );
 
-		$query = array_merge( $this->get_default_query(), get_request_query(), [
+		$query = array_merge( $this->get_default_query(), get_request_query(), $this->get_current_query(), [
 			'limit'          => $per_page,
 			'offset'         => $offset,
 			'order'          => $order,
@@ -230,6 +248,8 @@ abstract class Table extends \WP_List_Table {
 			'orderby'        => $orderby,
 			'found_rows'     => true,
 		] );
+
+//		var_dump( $query );
 
 		$items = $this->get_db()->query( $query );
 		$total = $this->get_db()->found_rows();

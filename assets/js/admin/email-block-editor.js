@@ -715,7 +715,7 @@
 
   const setHTML = (content, hasChanges = true) => {
 
-    content = cleanHTML(content)
+    content = cleanHTML(content, true)
 
     let plain_text = extractPlainText(content)
     plain_text = plain_text.replaceAll(/(\s*\n|\s*\r\n|\s*\r){3,}/g, '\n\n')
@@ -728,6 +728,7 @@
 
     setEmailMeta({
       blocks: false,
+      type: 'html'
     })
 
     if (hasChanges) {
@@ -753,6 +754,7 @@
     setEmailMeta({
       css,
       blocks: true,
+      type: 'blocks'
     })
 
     if (hasChanges) {
@@ -3886,7 +3888,7 @@
       // Code
       Textarea({
         id: 'code-block-editor',
-        value: getEmailData().content,
+        value: html_beautify(getEmailData().content, { indent_with_tabs: true }),
         onCreate: el => {
           // Wait for add to dom
           setTimeout(() => {
@@ -3899,6 +3901,7 @@
             }).codemirror
 
             codeMirror.on('change', instance => setHTML(instance.getValue()))
+            // codeMirror.autoFormatRange()
 
             resizeCodeMirror()
           }, 100)
@@ -3980,17 +3983,14 @@
                             title,
                             subject: title,
                             preview_text: '',
-                            content: contents,
-                          })
-
-                          setEmailMeta({
-                            type: 'html',
                           })
 
                           setState({
                             page: 'html-editor',
-                            preview: contents,
                           })
+                          
+                          setHTML( contents, false )
+                          
                           renderEditor()
                           close()
                         }
@@ -4044,14 +4044,15 @@
                             data,
                           } = email
 
-                          setEmailMeta(meta)
                           setEmailData({
                             title: data.title,
                             subject: data.subject,
                             preview_text: data.preview_text,
+                            message_type: data.message_type,
                           })
-                          setBlocks(meta.blocks, false)
+                          setEmailMeta(meta)
                           setState({ page: 'editor' })
+                          setBlocks(parseBlocksFromContent(data.content), false)
                           renderEditor()
                           close()
                         }
@@ -5595,7 +5596,7 @@
    * @param html
    * @return {string}
    */
-  const cleanHTML = html => {
+  const cleanHTML = ( html, wholeDoc = false ) => {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
 
@@ -5615,7 +5616,11 @@
     // Remove bad HTML
     doc.querySelectorAll(unsupportedTags.join(', ')).forEach(el => el.remove())
 
-    return doc.body.innerHTML
+    if ( ! wholeDoc ){
+      return doc.body.innerHTML
+    }
+
+    return new XMLSerializer().serializeToString(doc)
   }
 
   registerBlock('html', 'HTML', {
@@ -5633,7 +5638,7 @@
         ControlGroup({ name: 'HTML', closable: false }, [
           Textarea({
             id: 'code-block-editor',
-            value: content,
+            value: html_beautify( content ),
             onCreate: el => {
 
               // Wait for add to dom
@@ -6052,18 +6057,21 @@
   }
 
   const socialIconThemes = {
-    // 'brand-filled': 'Brand Colors Square',
+    'brand-boxed': 'Brand Colors Square',
     'brand-circle': 'Brand Colors Circular',
-    // 'brand-filled': 'Brand Colors Filled',
-    // 'black-square': 'Black Square',
-    // 'black-circle': 'Black Circular',
-    // 'black-filled': 'Black Filled',
-    // 'gray-square': 'Gray Square',
-    // 'gray-circle': 'Gray Circular',
-    // 'gray-filled': 'Gray Filled',
-    // 'white-square': 'White Square',
-    // 'white-circle': 'White Circular',
-    // 'white-filled': 'White Filled',
+    'brand-icons': 'Brand Colors Icons',
+    'black-boxed': 'Black Boxed',
+    'black-circle': 'Black Circular',
+    'black-icons': 'Black Icons',
+    'dark-grey-boxed': 'Gray Boxed',
+    'dark-grey-circle': 'Gray Circle',
+    'dark-grey-icons': 'Gray Icons',
+    'grey-boxed': 'Gray Boxed',
+    'grey-circle': 'Gray Circle',
+    'grey-icons': 'Gray Icons',
+    'white-boxed': 'White Boxed',
+    'white-circle': 'White Circular',
+    'white-icons': 'White Icons',
   }
 
   const SocialIcon = (icon, theme = 'brand-circle', size = 20) => makeEl('img', {
@@ -6079,12 +6087,12 @@
   const SocialIconTheme = (theme, selected) => Button({
     id: `select-${theme}`,
     title: socialIconThemes[theme],
-    className: `gh-button ${theme === selected ? 'secondary' : 'secondary text'} span-6 social-icon-theme`,
+    className: `gh-button ${theme === selected ? 'secondary' : 'secondary text'} social-icon-theme ${theme}`,
     onClick: e => updateBlock({ theme: theme, morphControls: true }),
   }, [
-    SocialIcon('facebook', theme, 24),
-    SocialIcon('instagram', theme, 24),
-    SocialIcon('twitter', theme, 24),
+    SocialIcon('facebook', theme, 20),
+    SocialIcon('instagram', theme, 20),
+    SocialIcon('twitter', theme, 20),
     // SocialIcon('reddit')
   ])
 
@@ -6157,7 +6165,7 @@
           name: 'Social Media',
         }, [
           Control({ label: 'Theme', stacked: true }, Div({
-            className: 'display-grid',
+            className: 'social-icon-themes-grid',
           }, [
             ...Object.keys(socialIconThemes).map(t => SocialIconTheme(t, theme)),
           ])),
@@ -6335,6 +6343,7 @@
 
         case 'blocks':
 
+          // back compat for us, public will never use this
           if (Array.isArray(email.meta.blocks) && email.meta.blocks.length) {
             blocks = email.meta.blocks
             setEmailMeta({
@@ -6675,8 +6684,11 @@
   const parseBlocksFromContent = content => {
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
-
-    return parseBlocksFromTable(doc.body.firstElementChild)
+    try {
+      return parseBlocksFromTable(doc.body.firstElementChild)
+    } catch (e) {
+      return []
+    }
   }
 
   /**

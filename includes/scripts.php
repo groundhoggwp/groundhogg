@@ -367,7 +367,6 @@ class Scripts {
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-email-block-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/email-block-editor' . $dot_min . '.js', [
-			'jquery',
 			'groundhogg-admin',
 			'groundhogg-admin-element',
 			'groundhogg-make-el',
@@ -376,6 +375,7 @@ class Scripts {
 			'jquery-ui-resizable',
 			'jquery-ui-autocomplete',
 			'wp-color-picker',
+			'beautify-html'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/setup' . $dot_min . '.js', [

@@ -104,7 +104,7 @@ function sender_email( $from_email ) {
 	$wp_from_email = 'wordpress@' . get_hostname();
 
 	// if from email starts with WP, or not a valid email address
-	if ( ! is_email( $from_email ) || $from_email === $wp_from_email ){
+	if ( ! is_email( $from_email ) || $from_email === $wp_from_email ) {
 		return get_default_from_email();
 	}
 
@@ -302,6 +302,106 @@ function kses_wrapper( $content ) {
 }
 
 /**
+ * Add more specialized attributes to the allowed css filter
+ *
+ * @param $attr
+ *
+ * @return mixed
+ */
+function more_allowed_css( $attr ) {
+
+	$attr[] = 'display';
+	$attr[] = 'outline';
+	$attr[] = 'Margin';
+	$attr[] = '-webkit-text-size-adjust';
+	$attr[] = '-ms-text-size-adjust';
+	$attr[] = 'mso-line-height-rule';
+	$attr[] = 'mso-text-raise';
+	$attr[] = 'mso-padding-alt';
+	$attr[] = 'mso-border-alt';
+	$attr[] = 'mso-table-lspace';
+	$attr[] = 'mso-table-rspace';
+	$attr[] = 'mso-style-priority';
+	$attr[] = 'v-text-anchor';
+	$attr[] = '-ms-interpolation-mode';
+	$attr[] = 'outline';
+	$attr[] = 'table-layout';
+
+	return $attr;
+}
+
+/**
+ * More tags for the kses
+ *
+ * @param $tags
+ *
+ * @return mixed
+ */
+function more_allowed_tags( $tags ) {
+//	$tags['!DOCTYPE'] = [
+//		'html' => true,
+//		'PUBLIC' => true,
+//	];
+	$tags['html']             = [];
+	$tags['head']             = [
+		'xlmns'   => true,
+		'xmlns:o' => true,
+	];
+	$tags['meta']             = [
+		'charset'    => true,
+		'content'    => true,
+		'name'       => true,
+		'http-equiv' => true,
+	];
+	$tags['title']            = [];
+	$tags['style']            = [
+		'type' => true
+	];
+	$tags['link']             = [
+		'href' => true
+	];
+	$tags['center']           = [
+		'id'    => true,
+		'class' => true,
+		'style' => true,
+	];
+	$tags['body']             = [
+		'id'    => true,
+		'class' => true,
+		'style' => true,
+	];
+	$tags['td']['background'] = true;
+	$tags['table']['role']    = true;
+
+	// MSO
+	$tags['xml'] = [];
+	$tags['w']   = [];
+	$tags['o']   = [];
+	$tags['v']   = [
+		'xmlns:v'        => true,
+		'xmlns:w'        => true,
+		'esdevVmlButton' => true,
+		'arcsize'        => true,
+		'stroke'         => true,
+		'fillcolor'      => true,
+	];
+
+	// Common unsupported tags
+	unset( $tags['script'] );
+	unset( $tags['embed'] );
+	unset( $tags['audio'] );
+	unset( $tags['video'] );
+	unset( $tags['form'] );
+	unset( $tags['select'] );
+	unset( $tags['input'] );
+	unset( $tags['button'] );
+	unset( $tags['iframe'] );
+	unset( $tags['menu'] );
+
+	return $tags;
+}
+
+/**
  * Compat for email links and replacements
  *
  * @param $content
@@ -312,6 +412,9 @@ function email_kses( $content ) {
 
 	// KSES does not like RBG values...
 	$content = safe_css_filter_rgb_to_hex( $content );
+
+	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
+	add_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
 
 	// Basic protocols
 	$basic_protocols = [ 'http', 'https', 'mailto', 'mms', 'sms', 'svn', 'tel', 'fax' ];
@@ -332,7 +435,14 @@ function email_kses( $content ) {
 		'{auto_login_link.http',
 	];
 
-	return wp_kses( $content, 'post', array_merge( $basic_protocols, $wacky_protocols ) );
+	include_once __DIR__ . '/kses.php';
+
+	$content = kses( $content, 'post', array_merge( $basic_protocols, $wacky_protocols ) );
+
+	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
+	remove_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
+
+	return $content;
 }
 
 /**
@@ -465,7 +575,7 @@ function add_phone_contact_method( $methods, $user ) {
 	return $methods;
 }
 
-add_filter( 'user_phone_label', function ( $label ){
+add_filter( 'user_phone_label', function ( $label ) {
 	return 'Mobile Number </label> <div style="font-weight: 400">Include <code>+</code> and country code.</div><label>';
 } );
 

@@ -1241,12 +1241,16 @@ abstract class DB {
 
 		if ( ! empty( $query_vars['meta_query'] ) ) {
 
+//			var_dump( $query_vars['meta_query']);
+
 			$meta_query = new \WP_Meta_Query( $query_vars['meta_query'] );
 
 			$meta_table = $this->get_meta_table();
 			$meta_table->maybe_resolve_table_conflict();
 
 			$meta_query_sql = $meta_query->get_sql( $this->get_object_type(), $this->table_name, 'ID' );
+
+//			var_dump( $meta_query_sql );
 
 			$meta_table->maybe_resolve_table_conflict();
 		}

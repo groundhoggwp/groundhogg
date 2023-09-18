@@ -937,11 +937,20 @@ body iframe#preview.desktop {
   padding: 3px 8px;
   border-top: 1px solid rgba(16, 38, 64, 0.5);
 }
-.social-icon-theme {
+.social-icon-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  grid-auto-rows: 1fr;
+}
+.social-icon-themes-grid .social-icon-theme {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 5px !important;
+}
+.social-icon-themes-grid .social-icon-theme#select-white-icons, .social-icon-themes-grid .social-icon-theme#select-white-circle, .social-icon-themes-grid .social-icon-theme#select-white-boxed {
+  background-color: rgba(16, 38, 64, 0.15);
 }
 
 .number-control input[type=number] {

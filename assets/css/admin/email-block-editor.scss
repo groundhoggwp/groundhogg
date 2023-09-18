@@ -1259,11 +1259,26 @@ body {
   }
 }
 
-.social-icon-theme {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px !important;
+.social-icon-themes-grid {
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  grid-auto-rows: 1fr;
+
+  .social-icon-theme {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px !important;
+
+    &#select-white-icons,
+    &#select-white-circle,
+    &#select-white-boxed {
+      background-color: $primary-dark-15;
+    }
+  }
+
 }
 
 .number-control {

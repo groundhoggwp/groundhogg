@@ -136,7 +136,7 @@ class Emails_Table extends Table {
 				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Draft' ) . "</span>";
 			}
 
-			if ( $email->is_template()  && ! $this->view_is( 'template' ) ) {
+			if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
 				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template' ) . "</span>";
 			}
 
@@ -288,15 +288,31 @@ class Emails_Table extends Table {
 
 		$actions = [];
 
-		switch ( $this->get_view() ){
+		switch ( $this->get_view() ) {
 			default:
 				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
-				$actions[] = [ 'class' => 'duplicate', 'display' => __( 'Duplicate' ), 'url' => action_url( 'duplicate', [ 'email' => $item->get_id() ] ) ];
-				$actions[] = [ 'class' => 'trash', 'display' => __( 'Trash' ), 'url' => action_url( 'trash', [ 'email' => $item->get_id() ] ) ];
+				$actions[] = [
+					'class'   => 'duplicate',
+					'display' => __( 'Duplicate' ),
+					'url'     => action_url( 'duplicate', [ 'email' => $item->get_id() ] )
+				];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => __( 'Trash' ),
+					'url'     => action_url( 'trash', [ 'email' => $item->get_id() ] )
+				];
 				break;
 			case 'trash':
-				$actions[] = [ 'class' => 'restore', 'display' => __( 'Restore' ), 'url' => action_url( 'restore', [ 'email' => $item->get_id() ] ) ];
-				$actions[] = [ 'class' => 'trash', 'display' => __( 'Delete' ), 'url' => action_url( 'delete', [ 'email' => $item->get_id() ] ) ];
+				$actions[] = [
+					'class'   => 'restore',
+					'display' => __( 'Restore' ),
+					'url'     => action_url( 'restore', [ 'email' => $item->get_id() ] )
+				];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => __( 'Delete' ),
+					'url'     => action_url( 'delete', [ 'email' => $item->get_id() ] )
+				];
 				break;
 		}
 
@@ -334,6 +350,34 @@ class Emails_Table extends Table {
 				'view'    => 'transactional',
 				'display' => __( 'Transactional', 'groundhogg' ),
 				'query'   => [ 'message_type' => 'transactional', 'status' => [ 'ready', 'draft' ] ],
+			],
+			[
+				'view'    => 'blocks',
+				'display' => __( 'Block Editor', 'groundhogg' ),
+				'query'   => [
+					'meta_query' => [
+						[
+							'key'     => 'blocks',
+							'value'   => 0,
+							'compare' => '!='
+						]
+					],
+					'status'     => [ 'ready', 'draft' ]
+				],
+			],
+			[
+				'view'    => 'html',
+				'display' => __( 'HTML', 'groundhogg' ),
+				'query'   => [
+					'meta_query' => [
+						[
+							'key'     => 'type',
+							'value'   => 'html',
+							'compare' => '='
+						]
+					],
+					'status'     => [ 'ready', 'draft' ]
+				],
 			],
 			[
 				'view'    => 'trash',
