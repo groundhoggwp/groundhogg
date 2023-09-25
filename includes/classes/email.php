@@ -196,7 +196,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_alt_body() {
 
-		$plain_text = $this->plain_text;
+		$plain_text = $this->plain_text ?: $this->get_meta( 'plain_text' );
 
 		if ( $plain_text ) {
 			return $plain_text;
@@ -224,14 +224,25 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_merged_alt_body() {
 
+		the_email( $this );
+
+		// Get the plain text version
 		$content = $this->get_alt_body();
 
+		// Block editor replacements
 		if ( $this->is_block_editor() ) {
 			$content = $this->maybe_hide_blocks( $content, 'plain' );
 			$content = Block_Registry::instance()->replace_dynamic_content( $content, 'plain' );
 		}
 
-		$content = do_replacements( $content, $this->get_contact() );
+		// Do plain text replacements
+		$content = do_replacements_plain_text( $content, $this->get_contact() );
+
+		// Unsub link that may be in the footer
+		$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
+
+		// Fix markdown line breaks
+		$content = preg_replace( '/(?<=[^\\S])\h\\n/', "  \n", $content );
 
 		// Re-strip
 		return $this->strip_html_tags( $content );
@@ -647,7 +658,7 @@ class Email extends Base_Object_With_Meta {
 
 		$content = do_replacements(
 			$content,
-			$this->get_contact()->get_id()
+			$this->get_contact()
 		);
 
 		/* filter out double http based on bug where links have http:// prepended */
@@ -1300,7 +1311,8 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		return array_merge( parent::get_as_array(), [
-			'context' => [
+			'campaigns' => $this->get_related_objects( 'campaign' ),
+			'context'   => [
 				'editor_type' => $this->get_editor_type(),
 				'from_avatar' => get_avatar_url( $this->get_from_user_id(), [
 					'size' => 40

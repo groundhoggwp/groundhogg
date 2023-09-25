@@ -524,7 +524,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function __unserialize( $data ) {
 
-		if ( ! is_array( $data ) ){
+		if ( ! is_array( $data ) ) {
 			return;
 		}
 
@@ -678,11 +678,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function get_related_objects( $secondary_type = false, $is_primary = true ) {
 
-		$relationships = $this->get_rel_db()->query( array_filter( [
+		if ( ! $this->exists() || ! $this->get_id() || ! $this->get_object_type() ){
+			return [];
+		}
+
+		$relationships = $this->get_rel_db()->query( [
 			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
 			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
 			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $secondary_type
-		] ) );
+		] );
 
 		return array_map( function ( $rel ) use ( $is_primary ) {
 
@@ -790,7 +794,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		} else if ( is_array( $note ) ) {
 
 			// Undefined content
-			if ( empty( $note['content'] ) ){
+			if ( empty( $note['content'] ) ) {
 				return false;
 			}
 
@@ -806,8 +810,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		/**
 		 * Triggered when a new note is added and related to an object
 		 *
-		 * @param $id int the ID of the current object
-		 * @param $note Note the object of the note that was just created
+		 * @param $id     int the ID of the current object
+		 * @param $note   Note the object of the note that was just created
 		 * @param $object Base_Object the primary object
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/note/added", $this->ID, $note, $this );

@@ -36,11 +36,18 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 	protected function get_table_data() {
 
+		$query = [
+			'status' => 'active',
+		];
+
+		$campaign_id = $this->get_campaign_id();
+		if ( $campaign_id ){
+			$query['related'] = [ 'ID' => $campaign_id, 'type' => 'campaign' ];
+		}
+
 		// Get list of funnels and plot it conversion rate
 		// Only include active funnels
-		$funnels = get_db( 'funnels' )->query( [
-			'status' => 'active'
-		] );
+		$funnels = get_db( 'funnels' )->query( $query );
 
 		array_map_to_class( $funnels, Funnel::class );
 

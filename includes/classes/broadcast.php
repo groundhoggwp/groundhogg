@@ -5,6 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
+use Groundhogg\Utils\Limits;
 use GroundhoggSMS\Classes\SMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,6 +48,22 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		return false;
+	}
+
+	public function is_scheduled() {
+		return $this->get_status() === 'scheduled';
+	}
+
+	public function is_pending() {
+		return $this->get_status() === 'pending';
+	}
+
+	public function is_sent() {
+		return $this->get_status() === 'sent';
+	}
+
+	public function schedule(){
+		return Background_Tasks::add( 'groundhogg/schedule_pending_broadcast', [ $this->get_id() ] );
 	}
 
 	/**
@@ -188,10 +205,6 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $this->status;
 	}
 
-	public function is_sent() {
-		return $this->get_status() === 'sent';
-	}
-
 	public function get_date_scheduled() {
 		return $this->date_scheduled;
 	}
@@ -209,6 +222,17 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		return $this->get_object()->get_title();
 
+	}
+
+	public function create( $data = [] ) {
+		$created = parent::create( $data );
+
+		// Start scheduling it
+		if ( $created ){
+			$this->schedule();
+		}
+
+		return $created;
 	}
 
 	/**
@@ -339,7 +363,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				$data['click_through_rate'] = percentage( $data['sent'], $data['clicked'] );
 
 			} else {
-				$data['email_id'] = $this->get_object_id();
+				$data['email_id']           = $this->get_object_id();
 				$data['opened']             = get_db( 'activity' )->count( [
 					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
@@ -398,10 +422,111 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $data;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_as_array() {
 		return array_merge( parent::get_as_array(), [
 			'object'           => $this->get_object(),
 			'date_sent_pretty' => format_date( convert_to_local_time( $this->get_send_time() ) )
 		] );
+	}
+
+	const BATCH_LIMIT = 500;
+
+	/**
+	 * Schedules a batch of events!
+	 *
+	 * @return false|float false if failed, a number of percentage complete
+	 */
+	public function schedule_batch() {
+
+		if ( ! $this->is_pending() ){
+			return false;
+		}
+
+		$query                  = $this->get_query();
+		$in_lt                  = (bool) $this->get_meta( 'send_in_local_time' );
+		$send_now               = (bool) $this->get_meta( 'send_now' );
+		$offset                 = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
+		$limit                  = self::BATCH_LIMIT;
+		$query['number']        = $limit;
+		$query['offset']        = $offset;
+		$query['no_found_rows'] = false;
+
+		$c_query  = new Contact_Query();
+		$contacts = $c_query->query( $query, true );
+		$total    = $c_query->found_items;
+
+		foreach ( $contacts as $contact ) {
+
+			$offset ++;
+
+			if ( ! $contact->is_deliverable() ) {
+				continue;
+			}
+
+			// No point in scheduling an email to a contact that is not marketable.
+			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
+				continue;
+			}
+
+			$local_time = $this->get_send_time();
+
+			if ( $in_lt && ! $send_now ) {
+
+				$local_time = $contact->get_local_time_in_utc_0( $local_time );
+
+				if ( $local_time < time() ) {
+					$local_time += DAY_IN_SECONDS;
+				}
+			}
+
+			$args = [
+				'time'       => $local_time,
+				'contact_id' => $contact->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::WAITING,
+				'priority'   => 100,
+			];
+
+			if ( $this->is_email() ) {
+				$args['email_id'] = $this->get_object_id();
+			}
+
+			event_queue_db()->batch_insert( $args );
+		}
+
+		$inserted = event_queue_db()->commit_batch_insert();
+
+		if ( $total > 0 && ! $inserted ) {
+			return false;
+		}
+
+		$this->update_meta( 'num_scheduled', $offset );
+		$this->update_meta( 'total_contacts', $total );
+
+		// Finished scheduling, unpause broadcast events
+		if ( $offset >= $total ) {
+			$this->update( [ 'status' => 'scheduled' ] );
+		}
+
+		return percentage( $total, $offset, 0 );
+
+	}
+
+	/**
+	 * A percentage value of the
+	 *
+	 * @return float|int
+	 */
+	public function get_percent_scheduled() {
+
+		$offset = absint( $this->get_meta( 'num_scheduled' ) );
+		$total  = absint( $this->get_meta( 'total_contacts' ) );
+
+		return percentage( $total, $offset );
 	}
 }

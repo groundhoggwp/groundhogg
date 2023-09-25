@@ -3,10 +3,12 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Campaign;
 use Groundhogg\Contact;
 use Groundhogg\Block_Registry;
 use Groundhogg\Email;
 use Groundhogg\Event;
+use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\array_map_to_contacts;
 use function Groundhogg\base64_json_decode;
@@ -15,6 +17,7 @@ use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\get_object_ids;
 use function Groundhogg\is_sending;
 use function Groundhogg\is_template_site;
 use function Groundhogg\process_events;
@@ -89,6 +92,100 @@ class Emails_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/play-button", [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'overlay_play_button' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+	}
+
+	/**
+	 * Handle campaigns
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|\WP_Error|\WP_REST_Response
+	 */
+	public function create_single( WP_REST_Request $request ) {
+		$data      = $request->get_param( 'data' );
+		$meta      = $request->get_param( 'meta' );
+		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+
+		$object = $this->create_new_object( $data, $meta, $request->has_param( 'force' ) );
+
+		if ( ! $object->exists() ) {
+
+			global $wpdb;
+
+			return self::ERROR_400( 'error', 'Bad request.', [
+				'data' => $data,
+				'meta' => $meta,
+				'wpdb' => $wpdb->last_error
+			] );
+		}
+
+		if ( ! empty( $campaigns ) ) {
+			foreach ( $campaigns as $campaign ) {
+				$object->create_relationship( new Campaign( $campaign ) );
+			}
+		}
+
+		$this->do_object_created_action( $object );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $object
+		] );
+	}
+
+	/**
+	 * Handle campaigns
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function update_single( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$data      = $request->get_param( 'data' );
+		$meta      = $request->get_param( 'meta' );
+		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+
+		$object->update( $data );
+
+		// If the current object supports meta data...
+		if ( method_exists( $object, 'update_meta' ) ) {
+			$object->update_meta( $meta );
+		}
+
+		$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
+		$add_campaigns    = array_diff( $campaigns, $has_campaigns );
+		$remove_campaigns = array_diff( $has_campaigns, $campaigns );
+
+		if ( ! empty( $add_campaigns ) ) {
+			foreach ( $add_campaigns as $campaign ) {
+				$object->create_relationship( new Campaign( $campaign ) );
+			}
+		}
+
+		if ( ! empty( $remove_campaigns ) ) {
+			foreach ( $remove_campaigns as $campaign ) {
+				$object->delete_relationship( new Campaign( $campaign ) );
+			}
+		}
+
+		$this->do_object_updated_action( $object );
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
 	}
 
 	/**
@@ -108,6 +205,81 @@ class Emails_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE( [
 			'content' => $html
 		] );
+	}
+
+	/**
+	 * Overlay a play button onto a video thumbnail
+	 *
+	 * @param $request
+	 */
+	public function overlay_play_button( \WP_REST_Request $request ) {
+
+		$thumb_url = $request->get_param( 'url' );
+
+		if ( ! $thumb_url ) {
+			return self::ERROR_404();
+		}
+
+		$response = wp_remote_get( $thumb_url );
+
+		if ( is_wp_error( $response ) ) {
+			return self::ERROR_404();
+		}
+
+		$image = wp_remote_retrieve_body( $response );
+
+		if ( function_exists( 'imagecreatefromjpeg' ) ) {
+
+			// Load the base image
+			$baseImage = imagecreatefromstring( $image );
+			if ( ! $baseImage ) {
+				return self::ERROR_404( 'error', 'Could not load thumbnail resource' );
+			}
+
+			// Load the play button image with a transparent background
+			$playButton = imagecreatefrompng( GROUNDHOGG_ASSETS_PATH . 'images/play-button.png' );
+
+			if ( ! $playButton ) {
+				return self::ERROR_404( 'error', 'Could not load play button resource' );
+			}
+
+			// Get the dimensions of the base image and play button
+			$baseWidth  = imagesx( $baseImage );
+			$baseHeight = imagesy( $baseImage );
+
+			// Square Image
+			$newSize = $baseWidth * 0.15;
+
+			$resizedPlayButton = imagescale( $playButton, $newSize, $newSize );
+
+			$buttonWidth  = imagesx( $resizedPlayButton );
+			$buttonHeight = imagesy( $resizedPlayButton );
+
+			// Calculate the position to place the play button in the center of the base image
+			$positionX = ( $baseWidth - $buttonWidth ) / 2;
+			$positionY = ( $baseHeight - $buttonHeight ) / 2;
+
+			// Copy the play button onto the base image
+			$result = imagecopy( $baseImage, $resizedPlayButton, $positionX, $positionY, 0, 0, $buttonWidth, $buttonHeight );
+
+			if ( ! $result ) {
+				return self::ERROR_404( 'error', 'Could not add play button to image' );
+			}
+
+			// Output the final image
+			header( 'Content-Type: image/jpeg' );
+			imagejpeg( $baseImage );
+
+			// Clean up resources
+			imagedestroy( $baseImage );
+			imagedestroy( $playButton );
+			imagedestroy( $resizedPlayButton );
+			die();
+		}
+
+		header( 'Content-Type: image/jpeg' );
+		echo $image;
+		die();
 	}
 
 	/**

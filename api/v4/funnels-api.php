@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Base_Object;
+use Groundhogg\Campaign;
 use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
@@ -12,6 +13,7 @@ use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\get_object_ids;
 use function Groundhogg\is_template_site;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\map_func_to_attr;
@@ -65,6 +67,54 @@ class Funnels_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+	}
+
+	/**
+	 * Handle campaigns
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function update_single( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$data      = $request->get_param( 'data' );
+		$meta      = $request->get_param( 'meta' );
+		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+
+		$object->update( $data );
+
+		// If the current object supports meta data...
+		if ( method_exists( $object, 'update_meta' ) ) {
+			$object->update_meta( $meta );
+		}
+
+		$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
+		$add_campaigns    = array_diff( $campaigns, $has_campaigns );
+		$remove_campaigns = array_diff( $has_campaigns, $campaigns );
+
+		if ( ! empty( $add_campaigns ) ) {
+			foreach ( $add_campaigns as $campaign ) {
+				$object->create_relationship( new Campaign( $campaign ) );
+			}
+		}
+
+		if ( ! empty( $remove_campaigns ) ) {
+			foreach ( $remove_campaigns as $campaign ) {
+				$object->delete_relationship( new Campaign( $campaign ) );
+			}
+		}
+
+		$this->do_object_updated_action( $object );
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
 	}
 
 	/**

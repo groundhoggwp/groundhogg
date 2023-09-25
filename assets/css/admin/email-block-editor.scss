@@ -1221,10 +1221,10 @@ body {
   .inspector-block {
     display: flex;
     gap: 5px;
-    border-width: 1px 0 0 0;
+    border-width: 0 0 1px 0;
     border-radius: 0;
     padding: 6px 12px;
-    border-color: $primary-dark-50;
+    border-color: $primary-dark-15;
     background-color: $primary-dark-5;
     width: 100%;
     color: $primary-dark;
@@ -1249,7 +1249,7 @@ body {
     //padding-left: 16px;4
     > div.column-header {
       padding: 3px 8px;
-      border-top: 1px solid $primary-dark-50;
+      border-bottom: 1px solid $primary-dark-15;
       //padding-left: calc( 12px * ( 12px * var(--depth) ));
     }
 
@@ -1272,9 +1272,9 @@ body {
     align-items: center;
     padding: 5px !important;
 
-    &#select-white-icons,
-    &#select-white-circle,
-    &#select-white-boxed {
+    &:not(.primary)#select-white-icons,
+    &:not(.primary)#select-white-circle,
+    &:not(.primary)#select-white-boxed {
       background-color: $primary-dark-15;
     }
   }

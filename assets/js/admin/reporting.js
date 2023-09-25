@@ -1,8 +1,7 @@
 function tool_tip_label (tooltipItem, data) {
   if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
     return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label
-  }
-  else {
+  } else {
     return data.datasets[tooltipItem.datasetIndex].label + ': ' +
       data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y
   }
@@ -12,7 +11,18 @@ function tool_tip_title () {
   return ''
 }
 
-( function (reporting, $, nonces) {
+(function (reporting, $, nonces) {
+
+  const { sprintf, __, _x, _n } = wp.i18n
+
+  const {
+    emails: EmailsStore,
+    campaigns: CampaignsStore,
+  } = Groundhogg.stores
+
+  const {
+    ItemPicker,
+  } = MakeEl
 
   const { loadingModal } = Groundhogg.element
 
@@ -28,6 +38,48 @@ function tool_tip_title () {
       this.initFunnels()
       this.initCountry()
       this.initBroadcast()
+      this.initCampaignFilter()
+
+    },
+
+    async initCampaignFilter () {
+
+      let el = document.getElementById('report-campaign-filter')
+
+      if (!el) {
+        return
+      }
+
+      let campaignId = this.other.campaign
+
+      if ( campaignId && ! CampaignsStore.has( campaignId ) ){
+        await CampaignsStore.fetchItem( campaignId )
+      }
+
+      el.append(ItemPicker({
+        id: 'report-campaign',
+        noneSelected: __('Filter by campaign...', 'groundhogg'),
+        multiple: false,
+        selected: campaignId ? (({ID, data}) => ({ id: ID, text: data.name }))(CampaignsStore.get(campaignId)) : [],
+        fetchOptions: async (search) => {
+          let campaigns = await CampaignsStore.fetchItems({
+            search,
+            limit: 20,
+          })
+
+          return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+        },
+        onChange: item => {
+
+          if ( ! item ){
+            this.other.campaign = null
+          } else {
+            this.other.campaign = item.id
+          }
+
+          this.refresh(this.calendar)
+        },
+      }))
 
     },
 
@@ -65,7 +117,7 @@ function tool_tip_title () {
           },
         ],
         format: {
-          preset: GroundhoggReporting.date_format
+          preset: GroundhoggReporting.date_format,
           // preset: 'MMM D, YYYY'
         },
         earliest_date: 'January 1, 2017',
@@ -127,7 +179,7 @@ function tool_tip_title () {
           start: start,
           end: end,
           data: {
-            ...reporting.other
+            ...reporting.other,
           },
         },
         success: function (json) {
@@ -183,7 +235,7 @@ function tool_tip_title () {
 
       var $report = $('#' + report_id)
 
-      if ( ! $report.length ){
+      if (!$report.length) {
         return
       }
 
@@ -207,15 +259,15 @@ function tool_tip_title () {
 
       $report.find('.groundhogg-quick-stat-number').html(report_data.number)
       $report.find('.groundhogg-quick-stat-previous').
-        removeClass('green red').
-        addClass(report_data.compare.arrow.color)
+      removeClass('green red').
+      addClass(report_data.compare.arrow.color)
       $report.find('.groundhogg-quick-stat-compare').
-        html(report_data.compare.text)
+      html(report_data.compare.text)
       $report.find('.groundhogg-quick-stat-arrow').
-        removeClass('up down').
-        addClass(report_data.compare.arrow.direction)
+      removeClass('up down').
+      addClass(report_data.compare.arrow.direction)
       $report.find('.groundhogg-quick-stat-prev-percent').
-        html(report_data.compare.percent)
+      html(report_data.compare.percent)
 
     },
 
@@ -317,7 +369,7 @@ function tool_tip_title () {
 
           let data = Object.values(report_data.data[i])
 
-          for (var k in data ) {
+          for (var k in data) {
             html = html + `<td data-colname="${report_data.label[k]}">${data[k]}</td>`
           }
           html += '</tr>'
@@ -326,15 +378,14 @@ function tool_tip_title () {
 
         html += '</table>'
 
-      }
-      else {
+      } else {
 
         html = report_data.no_data
 
       }
 
       $report.html(html)
-    }
+    },
 
   })
 
@@ -342,4 +393,4 @@ function tool_tip_title () {
     reporting.init()
   })
 
-} )(GroundhoggReporting, jQuery, groundhogg_nonces)
+})(GroundhoggReporting, jQuery, groundhogg_nonces)

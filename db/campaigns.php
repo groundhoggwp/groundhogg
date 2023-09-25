@@ -2,7 +2,7 @@
 
 namespace Groundhogg\DB;
 
-use function Groundhogg\isset_not_empty;
+use Groundhogg\Campaign;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,6 +56,15 @@ class Campaigns extends DB {
 	 */
 	public function get_object_type() {
 		return 'campaign';
+	}
+
+	/**
+	 * @param \Groundhogg\Base_Object $object
+	 *
+	 * @return Campaign
+	 */
+	public function create_object( $object ) {
+		return new Campaign( $object );
 	}
 
 	protected function add_additional_actions() {

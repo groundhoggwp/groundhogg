@@ -235,7 +235,7 @@ abstract class DB {
 	abstract public function get_object_type();
 
 	/**
-	 * @param $object Base_Object
+	 * @param $object object
 	 */
 	public function create_object( $object ) {
 		$meta_table = $this->get_meta_table();

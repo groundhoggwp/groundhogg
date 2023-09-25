@@ -1,7 +1,30 @@
-( function ($, funnel) {
+(function ($, funnel) {
 
-  const { uuid } = Groundhogg.element
   const { patch, routes, ajax } = Groundhogg.api
+
+  const { funnels: FunnelsStore, campaigns: CampaignsStore } = Groundhogg.stores
+
+  const {
+    Div,
+    Button,
+    Modal,
+    Textarea,
+    ItemPicker,
+  } = MakeEl
+
+  const {
+    icons, uuid,
+    moreMenu,
+    tooltip,
+    dialog,
+    dangerConfirmationModal,
+    adminPageURL,
+  } = Groundhogg.element
+
+  const { sprintf, __, _x, _n } = wp.i18n
+
+  const funnelId = parseInt(Funnel.id)
+  FunnelsStore.fetchItem(funnelId)
 
   $.extend(funnel, {
 
@@ -38,7 +61,7 @@
 
         ajax({
           action: 'gh_funnel_editor_full_screen_preference',
-          full_screen: $(document.body).hasClass('funnel-full-screen') ? 1 : 0
+          full_screen: $(document.body).hasClass('funnel-full-screen') ? 1 : 0,
         })
 
       })
@@ -61,7 +84,7 @@
         let group = e.currentTarget.dataset.group
 
         $(`.steps-grid`).addClass('hidden')
-        $(`#${ group }`).removeClass('hidden')
+        $(`#${group}`).removeClass('hidden')
 
         $('#step-toggle button').removeClass('active')
         $(e.currentTarget).addClass('active')
@@ -116,6 +139,20 @@
         $('.title-edit').hide()
       })
 
+      $('#status-toggle').on('change', e => {
+
+        if (!e.target.checked && Funnel.is_active) {
+          dangerConfirmationModal({
+            alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p><p>Any pending events will be paused. They will be resumed immediately when the funnel is reactivated.</p>`,
+            confirmText: __('Deactivate'),
+            onCancel: () => {
+              $('#status-toggle').prop('checked', true)
+            },
+          })
+        }
+
+      })
+
       // Step Title
       $document.on('click', '.step-title-view .title', function (e) {
 
@@ -145,23 +182,127 @@
         this.makeSortable()
       }
 
-      $('#add-contacts-button').click(function () {
-        self.addContacts()
-      })
-
-      $('#copy-share-link').click(function (e) {
-        e.preventDefault()
-        prompt('Copy this link.', $('#share-link').val())
-      })
-
       if (window.location.hash) {
         this.makeActive(parseInt(window.location.hash.substring(1)))
       }
 
-      let email_ids = this.steps.filter( step => step.data.step_type === 'send_email' ).map( step => parseInt( step.meta.email_id ) ).filter( id => Boolean(id) )
-      if ( email_ids.length ){
-        Groundhogg.stores.emails.maybeFetchItems( email_ids )
+      let email_ids = this.steps.filter(step => step.data.step_type === 'send_email').
+      map(step => parseInt(step.meta.email_id)).
+      filter(id => Boolean(id))
+      if (email_ids.length) {
+        Groundhogg.stores.emails.maybeFetchItems(email_ids)
       }
+
+      let header = document.querySelector('.funnel-editor-header > .actions')
+
+      header.append(Button({
+        id: 'funnel-more',
+        className: 'gh-button secondary text icon',
+        onClick: e => {
+          moreMenu('#funnel-more', [
+            {
+              key: 'export', text: 'Export', onSelect: e => {
+                window.open(Funnel.export_url, '_blank')
+              },
+            },
+            {
+              key: 'share', text: 'Share', onSelect: e => {
+                prompt('Copy this link to share', Funnel.export_url)
+              },
+            },
+            {
+              key: 'reports', text: 'Reports', onSelect: e => {
+                window.open(adminPageURL('gh_reporting', {
+                  tab: 'funnels',
+                  funnel: Funnel.id,
+                }), '_blank')
+              },
+            },
+          ])
+        },
+      }, icons.verticalDots))
+
+      tooltip('#full-screen', {
+        content: 'Toggle full Screen',
+      })
+
+      tooltip('#replacements', {
+        content: 'Replacement codes',
+      })
+
+      tooltip('#funnel-settings', {
+        content: 'Funnel settings',
+      })
+
+      document.getElementById('funnel-settings').addEventListener('click', e => {
+
+        Modal({}, ({ close }) => {
+
+          let funnel = FunnelsStore.get(funnelId)
+
+          let { description = '' } = funnel.meta
+          let { campaigns = [] } = funnel
+
+          let campaignIds = campaigns.map( c => c.ID )
+
+          return Div({}, [
+            `<h2>Funnel Settings</h2>`,
+            `<p>Use <b>campaigns</b> to organize your funnels. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
+            ItemPicker({
+              id: 'pick-campaigns',
+              noneSelected: 'Add a campaign...',
+              selected: campaigns.map(({ ID, data }) => ({ id: ID, text: data.name })),
+              tags: true,
+              fetchOptions: async (search) => {
+                let campaigns = await CampaignsStore.fetchItems({
+                  search,
+                  limit: 20,
+                })
+
+                return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+              },
+              createOption: async value => {
+                let campaign = await CampaignsStore.create({
+                  data: {
+                    name: value,
+                  },
+                })
+
+                return { id: campaign.ID, text: campaign.data.name }
+              },
+              onChange: items => campaignIds = items.map( item => item.id ),
+            }),
+            `<p>Add a simple funnel description.</p>`,
+            Textarea({
+              id: 'funnel-description',
+              className: 'full-width',
+              onInput: e => {
+                description = e.target.value
+              },
+              value: description,
+            }),
+            Div({
+              className: 'display-flex flex-end',
+            }, Button({
+              id: 'save-settings',
+              className: 'gh-button primary',
+              onClick: async e => {
+                await FunnelsStore.patch(funnelId, {
+                  campaigns: campaignIds,
+                  meta: {
+                    description,
+                  },
+                })
+
+                dialog({
+                  message: 'Changes saved!'
+                })
+              },
+            }, 'Save')),
+          ])
+        })
+
+      })
 
     },
 
@@ -177,8 +318,7 @@
 
       $('body').addClass('saving')
 
-      $saveButton.html(self.saving_text)
-      $saveButton.addClass('spin')
+      $saveButton.html(`<span class="gh-spinner"></span>`)
 
       var fd = $form.serialize()
       fd += '&action=gh_save_funnel_via_ajax&version=2'
@@ -190,12 +330,12 @@
       // Update the JS meta changes first
       if (Object.keys(this.metaUpdates).length) {
 
-        let changes = Object.keys(this.metaUpdates).map(ID => ( {
+        let changes = Object.keys(this.metaUpdates).map(ID => ({
           ID,
           meta: {
             ...this.metaUpdates[ID],
           },
-        } ))
+        }))
 
         let response = await patch(routes.v4.steps, changes)
         // reset
@@ -244,9 +384,9 @@
           let id = uuid()
           // language=HTML
           ui.helper.replaceWith(`
-              <div class="step step-placeholder ${ data.step_group }" id="${ id }">
-                  Loading...
-              </div>`)
+			  <div class="step step-placeholder ${data.step_group}" id="${id}">
+				  Loading...
+			  </div>`)
 
           var self = this
           var $steps = self.getSteps()
@@ -258,14 +398,13 @@
             this.steps.push(response.data.data.json)
 
             if (self.insertAfterStep) {
-              $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
-            }
-            else {
+              $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
+            } else {
               $steps.prepend(response.data.data.sortable)
             }
 
             $settings.append(response.data.data.settings)
-            $(`#${ id }`).remove()
+            $(`#${id}`).remove()
 
             hideSpinner()
             $(document).trigger('new-step')
@@ -306,7 +445,7 @@
 
         self._delete_step = id
 
-        $step.fadeOut( 400, () => {
+        $step.fadeOut(400, () => {
           $step.remove()
 
           let sid = '#settings-' + id
@@ -356,9 +495,8 @@
         this.steps.push(response.data.data.json)
 
         if (self.insertAfterStep) {
-          $(`#${ self.insertAfterStep }`).after(response.data.data.sortable)
-        }
-        else {
+          $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
+        } else {
           $steps.append(response.data.data.sortable)
         }
 
@@ -452,4 +590,4 @@
     funnel.init()
   })
 
-} )(jQuery, Funnel)
+})(jQuery, Funnel)

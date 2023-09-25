@@ -199,6 +199,14 @@ abstract class Base_Report {
 		return $funnel_id;
 	}
 
+	protected function get_campaign_id(){
+		return absint( $this->get_other_report_params( 'campaign' ) );
+	}
+
+	protected function get_other_report_params( $key, $default = false ){
+		return get_array_var( get_request_var( 'data', [] ), $key );
+	}
+
 	/**
 	 * @return Funnel
 	 */

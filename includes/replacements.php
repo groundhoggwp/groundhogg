@@ -344,11 +344,12 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Any data related to the contact\'s linked owner. Usage: {owner.attribute}', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'confirmation_link',
-				'group'       => 'compliance',
-				'callback'    => [ $this, 'replacement_confirmation_link' ],
-				'name'        => __( 'Confirmation Link', 'groundhogg' ),
-				'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
+				'code'           => 'confirmation_link',
+				'group'          => 'compliance',
+				'callback'       => [ $this, 'replacement_confirmation_link' ],
+				'callback_plain' => [ $this, 'replacement_confirmation_link_plain_text' ],
+				'name'           => __( 'Confirmation Link', 'groundhogg' ),
+				'description'    => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'confirmation_link_raw',
@@ -388,11 +389,12 @@ class Replacements implements \JsonSerializable {
 				'description'  => _x( 'Same as {date} but will display in local time of the contact instead of the site.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'files',
-				'group'       => 'crm',
-				'callback'    => [ $this, 'replacement_files' ],
-				'name'        => __( 'Files List', 'groundhogg' ),
-				'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
+				'code'           => 'files',
+				'group'          => 'crm',
+				'callback'       => [ $this, 'replacement_files' ],
+				'callback_plain' => [ $this, 'replacement_files_plain_text' ],
+				'name'           => __( 'Files List', 'groundhogg' ),
+				'description'    => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'GET',
@@ -410,12 +412,13 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray!', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'         => 'posts',
-				'default_args' => 'layout=grid number=5 featured excerpt',
-				'group'        => 'post',
-				'callback'     => [ $this, 'posts' ],
-				'name'         => __( 'Recent Posts', 'groundhogg' ),
-				'description'  => _x( 'Show links posts in your email.', 'replacement', 'groundhogg' ),
+				'code'           => 'posts',
+				'default_args'   => 'layout=grid number=5 featured excerpt',
+				'group'          => 'post',
+				'callback'       => [ $this, 'posts' ],
+				'callback_plain' => [ $this, 'posts_plain' ],
+				'name'           => __( 'Recent Posts', 'groundhogg' ),
+				'description'    => _x( 'Show links posts in your email.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'post_title',
@@ -439,11 +442,12 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Return the content of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'post_featured_image',
-				'group'       => 'post',
-				'callback'    => [ $this, 'post_featured_image' ],
-				'name'        => __( 'Post Featured Image', 'groundhogg' ),
-				'description' => _x( 'Return the featured image of a single recent post.', 'replacement', 'groundhogg' ),
+				'code'           => 'post_featured_image',
+				'group'          => 'post',
+				'callback'       => [ $this, 'post_featured_image' ],
+				'callback_plain' => [ $this, 'post_featured_image_plain_text' ],
+				'name'           => __( 'Post Featured Image', 'groundhogg' ),
+				'description'    => _x( 'Return the featured image of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'post_featured_image_url',
@@ -477,7 +481,8 @@ class Replacements implements \JsonSerializable {
 				get_array_var( $replacement, 'description', '' ),
 				get_array_var( $replacement, 'name' ),
 				get_array_var( $replacement, 'group' ),
-				get_array_var( $replacement, 'default_args' )
+				get_array_var( $replacement, 'default_args' ),
+				get_array_var( $replacement, 'callback_plain' )
 			);
 		}
 
@@ -487,29 +492,32 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Add a replacement code
 	 *
-	 * @param string   $code         the code
-	 * @param callable $callback     the callback function
-	 * @param string   $description  string description of the code
-	 * @param string   $name         the display name of the replacement for the dropdown
-	 * @param string   $group        the group where it should be displayed
-	 * @param string   $default_args the default args that should be inserted when selected
+	 * @param string   $code           the code
+	 * @param callable $callback       the callback function
+	 * @param string   $description    string description of the code
+	 * @param string   $name           the display name of the replacement for the dropdown
+	 * @param string   $group          the group where it should be displayed
+	 * @param string   $default_args   the default args that should be inserted when selected
+	 * @param callable $plain_callback callback for when rendering plain text replacements
 	 *
 	 * @return bool
 	 */
-	function add( $code, $callback, $description = '', $name = '', $group = 'other', $default_args = '' ) {
-		if ( ! $code || ! $callback ) {
+	function add( $code, $callback, $description = '', $name = '', $group = 'other', $default_args = '', $plain_callback = '' ) {
+
+		if ( ! $code || ! is_callable( $callback ) ) {
 			return false;
 		}
 
 		if ( is_callable( $callback ) ) {
 			$this->replacement_codes[ $code ] = [
-				'code'        => $code,
-				'callback'    => $callback,
-				'name'        => $name ?: $code,
-				'group'       => $group,
-				'description' => $description,
-				'insert'      => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code ),
-				'hidden'      => false,
+				'code'           => $code,
+				'callback'       => $callback,
+				'callback_plain' => $plain_callback,
+				'name'           => $name ?: $code,
+				'group'          => $group,
+				'description'    => $description,
+				'insert'         => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code ),
+				'hidden'         => false,
 			];
 
 			return true;
@@ -582,15 +590,48 @@ class Replacements implements \JsonSerializable {
 		return $this->replacement_codes;
 	}
 
+	protected $context = 'html';
+
 	/**
-	 * Process the codes based on the given contact ID
-	 *
-	 * @param $contact_id_or_email int|bool|Contact ID of the contact
-	 * @param $content
+	 * Get the replacements context
 	 *
 	 * @return string
 	 */
-	public function process( $content, $contact_id_or_email = false ) {
+	public function get_context() {
+		return $this->context;
+	}
+
+	/**
+	 * If the context is HTML
+	 *
+	 * @return bool
+	 */
+	public function context_is_html() {
+		return $this->get_context() === 'html';
+	}
+
+	/**
+	 * If the context is plain text
+	 *
+	 * @return bool
+	 */
+	public function context_is_plain() {
+		return $this->get_context() === 'plain';
+	}
+
+	/**
+	 * Process the codes based on the given contact ID
+	 *
+	 * @param string           $content
+	 *
+	 * @param int|bool|Contact $contact_id_or_email ID of the contact
+	 * @param string           $context             what context the replacements are in
+	 *
+	 * @return string
+	 */
+	public function process( $content, $contact_id_or_email = false, $context = 'html' ) {
+
+		$this->context = $context;
 
 		if ( is_a_contact( $contact_id_or_email ) ) {
 			$contact = $contact_id_or_email;
@@ -694,21 +735,45 @@ class Replacements implements \JsonSerializable {
 			return $default;
 		}
 
-		$cache_key   = 'key:' . ( $this->contact_id ?: 'anon' ) . ':' . md5( serialize( $parts ) ) . ':' . cache_get_last_changed( 'replacements' );
+		$cache_key = implode( ':', [
+			$this->get_context(),
+			$this->contact_id ?: 'anon',
+			md5( serialize( $parts ) ),
+			cache_get_last_changed( 'replacements' )
+		] );
+
 		$cache_value = wp_cache_get( $cache_key, 'replacements' );
 
 		if ( $cache_value ) {
 			return $cache_value;
 		}
 
+		$html_callback  = $this->replacement_codes[ $code ]['callback'];
+		$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
+
+		if ( ! is_callable( $plain_callback ) ) {
+			$plain_callback = function ( ...$args ) use ( $html_callback ) {
+
+				$content = $html_callback( ...$args );
+
+				if ( wp_strip_all_tags( $content ) !== $content ){
+					return html2markdown( $content );
+				}
+
+				return $content;
+			};
+		}
+
+		$callback = $this->context_is_html() ? $html_callback : $plain_callback;
+
 		// Access contact fields.
 		if ( substr( $code, 0, 1 ) === '_' ) {
 			$field = substr( $code, 1 );
 			$text  = $this->get_current_contact()->$field;
 		} else if ( $arg ) {
-			$text = call_user_func( $this->replacement_codes[ $code ]['callback'], $arg, $this->contact_id, $code );
+			$text = call_user_func( $callback, $arg, $this->contact_id, $code );
 		} else {
-			$text = call_user_func( $this->replacement_codes[ $code ]['callback'], $this->contact_id, $code );
+			$text = call_user_func( $callback, $this->contact_id, $code );
 		}
 
 		if ( empty( $text ) ) {
@@ -1281,10 +1346,25 @@ class Replacements implements \JsonSerializable {
 	function replacement_confirmation_link( $redirect_to ) {
 
 		$link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
-
-		$link_url = $this->replacement_confirmation_link_raw( $redirect_to );
+		$link_url  = $this->replacement_confirmation_link_raw( $redirect_to );
 
 		return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
+	}
+
+	/**
+	 * Return a confirmation link for the contact
+	 * This just gets the Opt-in Page link for now.
+	 *
+	 * @param $redirect_to string
+	 *
+	 * @return string the optin link
+	 */
+	function replacement_confirmation_link_plain_text( $redirect_to ) {
+
+		$link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
+		$link_url  = $this->replacement_confirmation_link_raw( $redirect_to );
+
+		return sprintf( "[%s](%s)", $link_text, $link_url );
 	}
 
 	/**
@@ -1493,6 +1573,36 @@ class Replacements implements \JsonSerializable {
 		}
 
 		return sprintf( '<ul>%s</ul>', $html );
+	}
+
+	/**
+	 * Get a file download link from a contact record.
+	 *
+	 * @param $key        string|int the key for the file
+	 * @param $contact_id int
+	 *
+	 * @return string
+	 */
+	function replacement_files_plain_text( $key = '', $contact_id = null ) {
+		// Backwards compat
+		if ( ! $contact_id ) {
+			$contact_id = $key;
+			$key        = false;
+		}
+
+		$files = $this->get_current_contact()->get_files();
+
+		if ( empty( $files ) ) {
+			return __( 'No files found.', 'groundhogg' );
+		}
+
+		$html = [];
+
+		foreach ( $files as $i => $file ) {
+			$html[] = sprintf( '- [%s](%s)', esc_html( $file['name'] ), maybe_permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) );
+		}
+
+		return implode( PHP_EOL, $html );
 	}
 
 	/**
@@ -1752,6 +1862,18 @@ class Replacements implements \JsonSerializable {
 	 *
 	 * @return string
 	 */
+	function post_featured_image_plain_text( $args, $contact_id = null ) {
+		return sprintf( '[![%1$s](%2$s)](%3$s)', __( 'Post Featured Image' ), $this->single_post( $args, 'featured_image_url' ), $this->single_post( $args, 'url' ) );
+	}
+
+	/**
+	 * Output a title from a recent post
+	 *
+	 * @param $args
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
 	function post_featured_image_url( $args, $contact_id = null ) {
 		return $this->single_post( $args, 'featured_image_url' );
 	}
@@ -1785,10 +1907,27 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+	 * handle posts dynamic block
+	 *
+	 * @param mixed    $args
+	 * @param int|null $contact_id
+	 *
+	 * @return string
+	 */
+	public function posts_plain( $args, $contact_id = null ) {
+
+		$props = $this->parse_atts( $args );
+
+		return $this->posts( array_merge( $props, [
+			'layout' => 'plain'
+		] ), $contact_id );
+	}
+
+	/**
 	 * Display posts!
 	 *
-	 * @param $args
-	 * @param $contact_id
+	 * @param mixed    $args
+	 * @param int|null $contact_id
 	 *
 	 * @return string
 	 */
@@ -1889,6 +2028,10 @@ class Replacements implements \JsonSerializable {
 		do_action( 'groundhogg/posts/before_render', $props );
 
 		add_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
+
+		if ( $this->context_is_plain() ) {
+			$props['layout'] = 'plain';
+		}
 
 		switch ( $props['layout'] ) {
 			default:

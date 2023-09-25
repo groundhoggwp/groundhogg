@@ -149,13 +149,18 @@ input[type=range].slider:focus::-ms-fill-upper {
   cursor: pointer;
   border: 1px solid rgba(16, 38, 64, 0.5);
   border-radius: 5px;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .onoffswitch-inner {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 200%;
   margin-left: -100%;
   transition: margin 0.3s ease-in 0s;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .big-toggle .onoffswitch-inner:before,
@@ -169,7 +174,6 @@ input[type=range].slider:focus::-ms-fill-upper {
   display: block;
   float: left;
   width: 50%;
-  height: 27px;
   line-height: 23px;
   padding: 0;
   font-size: 14px;
@@ -203,8 +207,9 @@ input[type=range].slider:focus::-ms-fill-upper {
 .onoffswitch-switch {
   display: block;
   width: 24px;
-  height: 27px;
-  margin: 0px;
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
   background: #e91f4f;
   position: absolute;
   top: 0;
@@ -719,6 +724,7 @@ label.block {
   justify-content: center;
 }
 
+#broadcast-include-filters,
 #block-include-filters,
 #filters-here {
   padding: 20px;
@@ -727,6 +733,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#broadcast-include-filters::after,
 #block-include-filters::after,
 #filters-here::after {
   content: "Include";
@@ -741,6 +748,7 @@ label.block {
   width: max-content;
 }
 
+#broadcast-exclude-filters,
 #block-exclude-filters,
 #exclude-filters-here {
   padding: 20px;
@@ -749,6 +757,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#broadcast-exclude-filters::after,
 #block-exclude-filters::after,
 #exclude-filters-here::after {
   content: "Exclude";
@@ -761,6 +770,22 @@ label.block {
   color: white;
   border-radius: 5px;
   width: max-content;
+}
+
+.from-preview {
+  padding: 20px;
+  position: relative;
+}
+.from-preview h2 {
+  margin: 0 0 10px 0;
+}
+.from-preview .from-email {
+  opacity: 0.7;
+}
+
+#broadcast-scheduler p {
+  margin: 0;
+  font-size: 16px;
 }
 
 /*# sourceMappingURL=admin.css.map */

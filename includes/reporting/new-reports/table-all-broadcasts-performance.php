@@ -26,15 +26,22 @@ class Table_All_Broadcasts_Performance extends Base_Table_Report {
 
 	protected function get_table_data() {
 
-		// Get list of funnels and plot it conversion rate
-		// Only include active funnels
-		$broadcasts = get_db( 'broadcasts' )->query( [
+		$query = [
 			'status'  => 'sent',
 			'after'   => $this->start,
 			'before'  => $this->end,
 			'orderby' => 'send_time',
 			'order'   => 'desc',
-		] );
+		];
+
+		$campaign_id = $this->get_campaign_id();
+		if ( $campaign_id ){
+			$query['related'] = [ 'ID' => $campaign_id, 'type' => 'campaign' ];
+		}
+
+		// Get list of funnels and plot it conversion rate
+		// Only include active funnels
+		$broadcasts = get_db( 'broadcasts' )->query( $query );
 
 		array_map_to_class( $broadcasts, Broadcast::class );
 

@@ -10,6 +10,7 @@ use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -81,6 +82,7 @@ class Broadcasts_Table extends WP_List_Table {
 			'send_time'      => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
 			'sending_to'     => _x( 'Sending To', 'Column label', 'groundhogg' ),
 			'stats'          => _x( 'Stats', 'Column label', 'groundhogg' ),
+			'campaigns'      => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'date_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 		);
 
@@ -463,6 +465,21 @@ class Broadcasts_Table extends WP_List_Table {
 	}
 
 	/**
+	 * @param Broadcast $broadcast
+	 */
+	protected function column_campaigns( $broadcast ) {
+		$campaigns = $broadcast->get_related_objects( 'campaign' );
+
+		return implode( ', ', array_map( function ( $campaign ) {
+			return html()->e( 'a', [
+				'href' => add_query_arg( [
+					'related' => [ 'ID' => $campaign->ID, 'type' => 'campaign' ]
+				], $_SERVER['REQUEST_URI'] ),
+			], $campaign->get_name() );
+		}, $campaigns ) );
+	}
+
+	/**
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
@@ -545,14 +562,16 @@ class Broadcasts_Table extends WP_List_Table {
 
 		// Only look for emails.
 
-		$args = [
+		$args = get_request_query();
+
+		$args = array_merge( $args, [
 			'status'     => $this->get_view(),
 			'limit'      => $per_page,
 			'offset'     => $offset,
 			'order'      => $order,
 			'orderby'    => $orderby,
 			'found_rows' => true,
-		];
+		] );
 
 		if ( ! is_sms_plugin_active() ) {
 			$args['object_type'] = 'email';

@@ -1,8 +1,9 @@
 (function ($) {
 
-  function ApiError (message) {
+  function ApiError (message, code = 'error') {
     this.name = 'ApiError'
     this.message = message
+    this.code = code
   }
 
   ApiError.prototype = Error.prototype
@@ -26,7 +27,7 @@
 
     if (!response.ok) {
       console.log(json)
-      throw new ApiError(json.message)
+      throw new ApiError(json.message, json.code)
     }
 
     return json
@@ -55,7 +56,7 @@
 
     if (!response.ok) {
       console.log(json)
-      throw new ApiError(json.message)
+      throw new ApiError(json.message, json.code)
     }
 
     return json
@@ -84,7 +85,7 @@
 
     if (!response.ok) {
       console.log(json)
-      throw new ApiError(json.message)
+      throw new ApiError(json.message, json.code)
     }
 
     return json
@@ -113,7 +114,7 @@
 
     if (!response.ok) {
       console.log(json)
-      throw new ApiError(json.message)
+      throw new ApiError(json.message, json.code)
     }
 
     return json

@@ -249,8 +249,6 @@ abstract class Table extends \WP_List_Table {
 			'found_rows'     => true,
 		] );
 
-//		var_dump( $query );
-
 		$items = $this->get_db()->query( $query );
 		$total = $this->get_db()->found_rows();
 

@@ -616,11 +616,11 @@ class Main_Roles extends Roles {
 			'perform_bulk_actions',
 			'manage_gh_licenses',
 			'edit_custom_properties',
+			'manage_campaigns'
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/other', $caps );
 	}
-
 
 	/**
 	 * Returns a list of all the caps added by GH

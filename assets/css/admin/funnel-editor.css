@@ -138,7 +138,7 @@ body:not(.funnel-full-screen) #close {
 
 #step-settings-inner {
   position: absolute;
-  top: 45px;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
@@ -241,13 +241,11 @@ body:not(.funnel-full-screen) #close {
   box-sizing: border-box;
   height: 60px;
   background: #FFFFFF;
-  border-bottom: 1px solid #ccd0d4;
   display: flex;
-  gap: 10px;
   align-items: center;
   padding-right: 10px;
 }
-.funnel-editor-header svg {
+.funnel-editor-header > svg {
   height: 60px;
   padding: 10px;
   box-sizing: border-box;
@@ -259,7 +257,7 @@ body:not(.funnel-full-screen) #close {
   font-weight: 600;
   width: 100%;
 }
-.funnel-editor-header .status-options {
+.funnel-editor-header .actions {
   display: flex;
   gap: 10px;
   align-items: stretch;
@@ -272,7 +270,8 @@ body:not(.funnel-full-screen) #close {
 }
 .funnel-editor-header .title-section {
   width: 100%;
-  margin-right: auto;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 .funnel-editor-header #close #close-button {
   padding: 12px;
@@ -287,7 +286,6 @@ body:not(.funnel-full-screen) #close {
 .step-title-view .title,
 .title-view .title {
   font-weight: 600;
-  /*padding: 8px;*/
   line-height: 1em;
   cursor: pointer;
 }

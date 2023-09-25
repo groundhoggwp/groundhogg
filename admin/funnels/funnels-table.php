@@ -2,16 +2,21 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Admin\Table;
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\DB;
+use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
 
@@ -37,7 +42,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class Funnels_Table extends WP_List_Table {
+class Funnels_Table extends Table {
 
 	protected $default_view = 'active';
 
@@ -62,8 +67,8 @@ class Funnels_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 
@@ -71,6 +76,7 @@ class Funnels_Table extends WP_List_Table {
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
 			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
+			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
@@ -102,83 +108,6 @@ class Funnels_Table extends WP_List_Table {
 		return apply_filters( 'groundhogg_funnels_get_sortable_columns', $sortable_columns );
 	}
 
-	/**
-	 * Get the views for the emails, all, ready, unready, trash
-	 *
-	 * @return array
-	 */
-	protected function get_views() {
-		$views = array();
-
-		$count = array(
-			'active'   => get_db( 'funnels' )->count( array( 'status' => 'active' ) ),
-			'inactive' => get_db( 'funnels' )->count( array( 'status' => 'inactive' ) ),
-			'archived' => get_db( 'funnels' )->count( array( 'status' => 'archived' ) )
-		);
-
-		// If there are no scheduled broadcasts, go to the sent view
-		if ( $count['active'] === 0 && $this->get_view() === 'active' ) {
-			$this->default_view = 'inactive';
-		}
-
-		$views['active']   = "<a class='" . print_r( ( $this->get_view() === 'active' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['active'] ) . ")</span>" . "</a>";
-		$views['inactive'] = "<a class='" . print_r( ( $this->get_view() === 'inactive' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['inactive'] ) . ")</span>" . "</a>";
-		$views['archived'] = "<a class='" . print_r( ( $this->get_view() === 'archived' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['archived'] ) . ")</span>" . "</a>";
-
-		return apply_filters( 'groundhogg_funnel_views', $views );
-	}
-
-	/**
-	 * Get the current view
-	 *
-	 * @return string
-	 */
-	protected function get_view() {
-		return sanitize_text_field( get_url_var( 'status', $this->default_view ) );
-	}
-
-	/**
-	 * Get default row steps...
-	 *
-	 * @param $funnel Funnel
-	 *
-	 * @return string a list of steps
-	 */
-	protected function handle_row_actions( $funnel, $column_name, $primary ) {
-		if ( $primary !== $column_name ) {
-			return '';
-		}
-
-		$actions = array();
-		$id      = $funnel->get_id();
-
-		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
-
-		$editUrlClassic = add_query_arg( [
-			'version' => 1
-		], $editUrl );
-
-		if ( $this->get_view() === 'archived' ) {
-			$actions['restore'] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel=' . $id ), 'restore' ) . "'>" . _x( 'Restore', 'action', 'groundhogg' ) . "</a></span>";
-			$actions['delete']  = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel=' . $id ), 'delete' ) . "'>" . _x( 'Delete Permanently', 'action', 'groundhogg' ) . "</a></span>";
-		} else {
-
-			$actions['edit'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
-
-			if ( $funnel->is_active() ) {
-				$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
-						'tab'    => 'funnels',
-						'funnel' => $id,
-					] ) ) . "'>" . __( 'Report', 'groundhogg' ) . "</a>";
-			}
-
-			$actions['duplicate'] = "<span class='duplicate'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel=' . $id ), 'duplicate' ) . "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
-			$actions['export']    = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
-			$actions['trash']     = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel=' . $id ), 'archive' ) . "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
-		}
-
-		return $this->row_actions( apply_filters( 'groundhogg_funnel_row_actions', $actions, $funnel, $column_name ) );
-	}
 
 	protected function column_title( $funnel ) {
 		$subject = ( ! $funnel->title ) ? '(' . __( 'no title' ) . ')' : $funnel->title;
@@ -254,6 +183,21 @@ class Funnels_Table extends WP_List_Table {
 	}
 
 	/**
+	 * @param Funnel $funnel
+	 */
+	protected function column_campaigns( $funnel ) {
+		$campaigns = $funnel->get_related_objects( 'campaign' );
+
+		return implode( ', ', array_map( function ( $campaign ) {
+			return html()->e( 'a', [
+				'href' => add_query_arg( [
+					'related' => [ 'ID' => $campaign->ID, 'type' => 'campaign' ]
+				], $_SERVER['REQUEST_URI'] ),
+			], $campaign->get_name() );
+		}, $campaigns ) );
+	}
+
+	/**
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
@@ -296,102 +240,134 @@ class Funnels_Table extends WP_List_Table {
 
 		switch ( $this->get_view() ) {
 			case 'active':
-
 				$actions = [
 					'deactivate' => _x( 'Deactivate', 'List table bulk action', 'groundhogg' ),
 					'archive'    => _x( 'Archive', 'List table bulk action', 'groundhogg' )
 				];
-
 				break;
 
 			case 'inactive':
-
 				$actions = [
 					'activate' => _x( 'Activate', 'List table bulk action', 'groundhogg' ),
 					'archive'  => _x( 'Archive', 'List table bulk action', 'groundhogg' )
 				];
-
 				break;
-
 			case 'archived':
-
 				$actions = [
 					'delete'  => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
 					'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
 				];
-
 				break;
-
 		}
 
 		return apply_filters( 'groundhogg_email_bulk_actions', $actions );
 	}
 
-	/**
-	 * Prepares the list of items for displaying.
-	 *
-	 * REQUIRED! This is where you prepare your data for display. This method will
-	 *
-	 * @global $wpdb \wpdb
-	 * @uses $this->_column_headers
-	 * @uses $this->items
-	 * @uses $this->get_columns()
-	 * @uses $this->get_sortable_columns()
-	 * @uses $this->get_pagenum()
-	 * @uses $this->set_pagination_args()
-	 */
-	function prepare_items() {
+	function get_table_id() {
+		return 'funnels';
+	}
 
-		$columns  = $this->get_columns();
-		$hidden   = array(); // No hidden columns
-		$sortable = $this->get_sortable_columns();
+	function get_db() {
+		return get_db( 'funnels' );
+	}
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
-
-		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
-		$paged    = $this->get_pagenum();
-		$offset   = $per_page * ( $paged - 1 );
-		$search   = trim( sanitize_text_field( get_url_var( 's' ) ) );
-		$order    = get_url_var( 'order', 'DESC' );
-		$orderby  = get_url_var( 'orderby', 'ID' );
-
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-		];
-
-		$args = array(
-			'where'      => $where,
-			'search'     => $search,
-			'limit'      => $per_page,
-			'offset'     => $offset,
-			'order'      => $order,
-			'orderby'    => $orderby,
-			'found_rows' => true,
-		);
-
-		$events = get_db( 'funnels' )->query( $args );
-		$total  = get_db( 'funnels' )->found_rows();
-
-		$this->items = $events;
-
-		// Add condition to be sure we don't divide by zero.
-		// If $this->per_page is 0, then set total pages to 1.
-		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
-
-		$this->set_pagination_args( array(
-			'total_items' => $total,
-			'per_page'    => $per_page,
-			'total_pages' => $total_pages,
-		) );
+	protected function parse_item( $item ) {
+		return new Funnel( $item );
 	}
 
 	/**
-	 * @param object $item
+	 * @param $item Funnel
+	 * @param $column_name
+	 * @param $primary
+	 *
+	 * @return array
 	 */
-	public function single_row( $item ) {
-		echo '<tr>';
-		$this->single_row_columns( new Funnel( $item->ID ) );
-		echo '</tr>';
+	protected function get_row_actions( $item, $column_name, $primary ) {
+		$actions = [];
+
+		switch ( $this->get_view() ) {
+			default:
+				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
+				$actions[] = [
+					'class'   => 'report',
+					'display' => __( 'Report' ),
+					'url'     => admin_page_url( 'gh_reporting', [
+						'tab'    => 'funnels',
+						'funnel' => $item->get_id(),
+					] )
+				];
+				$actions[] = [
+					'class'   => 'duplicate',
+					'display' => __( 'Duplicate' ),
+					'url'     => action_url( 'duplicate', [ 'funnel' => $item->get_id() ] )
+				];
+				$actions[] = [
+					'class'   => 'export',
+					'display' => __( 'Export' ),
+					'url'     => $item->export_url()
+				];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => __( 'Deactivate' ),
+					'url'     => action_url( 'deactivate', [ 'funnel' => $item->get_id() ] )
+				];
+				break;
+			case 'inactive':
+				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
+				$actions[] = [
+					'class'   => 'duplicate',
+					'display' => __( 'Duplicate' ),
+					'url'     => action_url( 'duplicate', [ 'funnel' => $item->get_id() ] )
+				];
+				$actions[] = [
+					'class'   => 'export',
+					'display' => __( 'Export' ),
+					'url'     => $item->export_url()
+				];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => __( 'Archive' ),
+					'url'     => action_url( 'archive', [ 'funnel' => $item->get_id() ] )
+				];
+				break;
+			case 'archived':
+				$actions[] = [
+					'class'   => 'restore',
+					'display' => __( 'Restore' ),
+					'url'     => action_url( 'restore', [ 'funnel' => $item->get_id() ] )
+				];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => __( 'Delete' ),
+					'url'     => action_url( 'delete', [ 'funnel' => $item->get_id() ] )
+				];
+				break;
+		}
+
+		return $actions;
+	}
+
+	protected function get_views_setup() {
+		return [
+			[
+				'view'    => 'active',
+				'display' => __( 'Active', 'groundhogg' ),
+				'query'   => [ 'status' => 'active' ],
+			],
+			[
+				'view'    => 'inactive',
+				'display' => __( 'Inactive', 'groundhogg' ),
+				'query'   => [ 'status' => 'inactive' ]
+			],
+			[
+				'view'    => 'archived',
+				'display' => __( 'Archived', 'groundhogg' ),
+				'query'   => [ 'status' => 'archived' ],
+			],
+		];
+	}
+
+	function get_default_query() {
+		return [];
 	}
 }

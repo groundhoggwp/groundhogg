@@ -352,6 +352,7 @@ class Plugin {
 
 		new Plugin_Compatibility();
 		new License_Manager();
+		new Background_Tasks();
 	}
 
 	/**

@@ -611,6 +611,10 @@
     fetchOptions = (search, resolve) => {},
     selected = [],
     onChange = () => {},
+    onSelect = () => {},
+    onCreate = () => {},
+    onUnselect = () => {},
+    createOption = val => Promise.resolve({id: val, text:val}),
     tags = false,
     noneSelected = 'Any',
     isValidSelection = () => true,
@@ -640,7 +644,7 @@
         ...newState,
       }
 
-      // console.log( state, trigger )
+      console.log( trigger )
 
       morph()
     }
@@ -677,16 +681,21 @@
     const focusSearch = () => document.getElementById(id)?.querySelector(`input[type=search]`)?.focus()
     const focusPicker = () => document.getElementById(id)?.focus()
 
-    const createOption = (value) => {
-      state.options.unshift({ id: value, text: value })
-      selectOption(value)
+    const handleCreateOption = (value) => {
+      state.options.unshift({ id: value, text: value, create: true })
+      handleSelectOption(value)
     }
 
-    const selectOption = (id) => {
+    /**
+     * Given an ID, select the option
+     *
+     * @param id
+     */
+    const handleSelectOption = (id) => {
 
       let option = { ...state.options.find(opt => opt.id == id) }
 
-      if (option.create) {
+      if ( option.create ){
         option.text = option.id
       }
 
@@ -709,11 +718,30 @@
         setState({ chose: false }, 'clear chose')
       }, 1 )
 
-      handleOnChange(selected)
+      if (option.create) {
+        createOption( option.id ).then( opt => {
+          // Replace created with new option
+          selected = selected.map(item => item.id == id ? opt : item )
+          // The do select actions
+          setState({}, 'option created')
+          onSelect( opt )
+          handleOnChange(selected)
+        })
+      } else {
+        onSelect( option )
+        handleOnChange(selected)
+      }
     }
 
-    const unSelectOption = (id) => {
+    /**
+     * Given an Id, unselect an option
+     *
+     * @param id
+     */
+    const handleUnselectOption = (id) => {
+      let opt = selected.find(opt => opt.id === id)
       selected = selected.filter(opt => opt.id != id)
+      onUnselect(opt)
       handleOnChange(selected)
       morph()
     }
@@ -721,17 +749,19 @@
     const itemPickerItem = ({ id, text }, index) => {
       return Div({
         className: `gh-picker-item ${isValidSelection(id) ? '' : 'is-invalid'}`,
-        id: `item-${index}`,
+        id: `item-${id}-${index}`,
       }, [
         Span({ className: 'gh-picker-item-text' }, text),
         Span({
-          id: `delete-${index}`,
+          id: `delete-${id}-${index}`,
           className: 'gh-picker-item-delete',
           tabindex: '0',
           dataId: id,
           onClick: e => {
-            unSelectOption(id)
-            focusSearch()
+            handleUnselectOption(id)
+            if ( multiple ){
+              focusSearch()
+            }
           },
         }, '&times;'),
       ])
@@ -744,7 +774,7 @@
         tabindex: '0',
         id: `option-${index}-${id}`,
         onClick: e => {
-          selectOption(id)
+          handleSelectOption(id)
           focusSearch()
         },
       }, text)
@@ -865,7 +895,7 @@
             return
           }
 
-          createOption(e.target.value)
+          handleCreateOption(e.target.value)
         }
       },
     })
@@ -888,25 +918,11 @@
       },
       onClick: e => {
 
-        if (state.searching || multiple || state.chose ) {
+        if (state.searching || multiple || state.chose || clickedIn(e, '.gh-picker-item-delete') ) {
           return
         }
 
         startSearch('')
-      },
-      onFocus: e => {
-
-        // // Was already focused
-        // if (e.relatedTarget && clickedIn(e.relatedTarget, '.gh-picker')) {
-        //   return
-        // }
-        //
-        // // Don't start search if multiple
-        // if (multiple) {
-        //   return
-        // }
-        //
-        // startSearch('')
       },
       ...attributes,
     }, [
@@ -941,6 +957,25 @@
     return Div( { className: `gh-tooltip ${position}`}, content )
   }
 
+  const ButtonToggle = ({
+    id = '',
+    options = [],
+    selected = '',
+    onChange = value => {},
+  }) => {
+
+    const ButtonOption = option => Button({
+      id: `${id}-opt-${option.id}`,
+      className: `gh-button gh-button small ${selected === option.id ? 'dark' : 'grey'}`,
+      onClick: e => onChange(option.id),
+    }, option.text)
+
+    return Div({
+      id,
+      className: 'gh-input-group',
+    }, options.map(opt => ButtonOption(opt)))
+  }
+
   window.MakeEl = {
     InputGroup,
     makeEl,
@@ -967,5 +1002,6 @@
     Iframe,
     htmlToElements,
     Dashicon,
+    ButtonToggle
   }
 })(jQuery)

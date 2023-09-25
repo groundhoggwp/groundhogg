@@ -92,6 +92,7 @@ class Autoloader {
 		'Form\Fields\Last'                  => 'includes/form/fields/last.php',
 		'Steps\Benchmarks\Form_Integration' => 'includes/steps/benchmarks/base/form-integration.php',
 		'Block_Registry'                    => 'includes/block-registry.php',
+		'Background_Tasks'                  => 'includes/background-tasks.php',
 	];
 
 	/**

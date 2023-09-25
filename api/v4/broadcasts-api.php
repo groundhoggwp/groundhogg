@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Broadcast;
+use Groundhogg\Campaign;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Email;
@@ -104,6 +105,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		$broadcast = new Broadcast();
+
 		$broadcast->create( [
 			'object_id'    => $object_id,
 			'object_type'  => $object_type,
@@ -118,6 +120,12 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		$broadcast->update_meta( $meta );
+
+		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+
+		foreach ( $campaigns as $campaign ){
+			$broadcast->create_relationship( new Campaign( $campaign ) );
+		}
 
 		/**
 		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
@@ -147,89 +155,11 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		if ( $broadcast->get_status() === 'pending' ) {
-			$broadcast->update( [
-				'status' => 'scheduled'
-			] );
-		}
-
-		$query = $broadcast->get_query();
-
-		$limit    = absint( $request->get_param( 'limit' ) ) ?: 500;
-		$offset   = absint( $broadcast->get_meta( 'num_scheduled' ) ) ?: 0;
-		$in_lt    = (bool) $broadcast->get_meta( 'send_in_local_time' );
-		$send_now = (bool) $broadcast->get_meta( 'send_now' );
-
-		$query['number'] = $limit;
-		$query['offset'] = $offset;
-
-		$c_query  = new Contact_Query();
-		$contacts = $c_query->query( $query, true );
-		$total    = $c_query->count( $query );
-
-		foreach ( $contacts as $contact ) {
-
-			$offset ++;
-
-			if ( ! $contact->is_deliverable() ) {
-				continue;
-			}
-
-			// No point in scheduling an email to a contact that is not marketable.
-			if ( ! $broadcast->is_transactional() && ! $contact->is_marketable() ) {
-				continue;
-			}
-
-			$local_time = $broadcast->get_send_time();
-
-			if ( $in_lt && ! $send_now ) {
-
-				$local_time = $contact->get_local_time_in_utc_0( $local_time );
-
-				if ( $local_time < time() ) {
-					$local_time += DAY_IN_SECONDS;
-				}
-			}
-
-			$args = [
-				'time'       => $local_time,
-				'contact_id' => $contact->get_id(),
-				'funnel_id'  => Broadcast::FUNNEL_ID,
-				'step_id'    => $broadcast->get_id(),
-				'event_type' => Event::BROADCAST,
-				'status'     => Event::PAUSED,
-				'priority'   => 100,
-			];
-
-			if ( $broadcast->is_email() ) {
-				$args['email_id'] = $broadcast->get_object_id();
-			}
-
-			event_queue_db()->batch_insert( $args );
-		}
-
-		$inserted = event_queue_db()->commit_batch_insert();
-
-		if ( $total > 0 && ! $inserted ){
-			return self::ERROR_500( 'error', 'Something went wrong: ' . event_queue_db()->last_error );
-		}
-
-		$broadcast->update_meta( 'num_scheduled', $offset );
-
-		// Finished scheduling, unpause broadcast events
-		if ( $offset >= $total ) {
-			get_db( 'event_queue' )->update( [
-				'status'     => Event::PAUSED,
-				'step_id'    => $broadcast->get_id(),
-				'event_type' => Event::BROADCAST,
-			], [
-				'status' => Event::WAITING
-			] );
-		}
+		$percent_complete = $broadcast->schedule_batch();
 
 		return self::SUCCESS_RESPONSE( [
-			'finished'  => $offset >= $total,
-			'scheduled' => $offset
+			'finished'  => $percent_complete == 100,
+//			'scheduled' => $offset
 		] );
 
 	}

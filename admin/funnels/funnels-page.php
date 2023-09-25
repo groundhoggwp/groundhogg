@@ -52,7 +52,7 @@ class Funnels_Page extends Admin_Page {
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
-		if ( $action === 'view' && get_db('funnels')->is_empty() ){
+		if ( $action === 'view' && get_db( 'funnels' )->is_empty() ) {
 			$action = 'add';
 		}
 
@@ -133,8 +133,8 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	/**
- * Redirect to the add screen if no funnels are present.
- */
+	 * Redirect to the add screen if no funnels are present.
+	 */
 	public function redirect_to_add() {
 		if ( get_db( 'funnels' )->count() == 0 ) {
 			die( wp_redirect( $this->admin_url( [ 'action' => 'add' ] ) ) );
@@ -202,22 +202,11 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-					'steps'                 => $funnel->get_steps(),
-					'id'                    => absint( get_request_var( 'funnel' ) ),
-					'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
-					'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
-					'disable_deselect_step' => is_white_labeled(),
-					'add_step_button'       => html()->modal_link( [
-						'title'              => __( 'Add Step' ),
-						'text'               => dashicon( 'plus' ),
-						'footer_button_text' => __( 'Cancel' ),
-						'class'              => 'add-step button button-secondary no-padding',
-						'source'             => 'steps',
-						'height'             => 700,
-						'width'              => 500,
-						'footer'             => 'true',
-						'preventSave'        => 'true',
-					] )
+					'steps'      => $funnel->get_steps(),
+					'id'         => absint( get_request_var( 'funnel' ) ),
+					'save_text'  => __( 'Update', 'groundhogg' ),
+					'export_url' => $funnel->export_url(),
+					'is_active'  => $funnel->is_active()
 				] );
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
@@ -307,30 +296,30 @@ class Funnels_Page extends Admin_Page {
 		return false;
 	}
 
-    public function update_funnels_status( $status ){
+	public function update_funnels_status( $status ) {
 
-        if ( ! current_user_can( 'edit_funnels' ) ) {
-		    $this->wp_die_no_access();
-	    }
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        $updated = 0;
+		$updated = 0;
 
-	    foreach ( $this->get_items() as $id ) {
-		    $funnel = new Funnel( $id );
+		foreach ( $this->get_items() as $id ) {
+			$funnel = new Funnel( $id );
 
-		    if ( ! $funnel->exists() ) {
-			    continue;
-		    }
+			if ( ! $funnel->exists() ) {
+				continue;
+			}
 
-		    if ( $funnel->update( [
-			    'status' => $status
-		    ] ) ){
-                $updated++;
-            }
-	    }
+			if ( $funnel->update( [
+				'status' => $status
+			] ) ) {
+				$updated ++;
+			}
+		}
 
-	    return $updated;
-    }
+		return $updated;
+	}
 
 	public function process_restore() {
 		$updated = $this->update_funnels_status( 'inactive' );
@@ -374,7 +363,7 @@ class Funnels_Page extends Admin_Page {
 
 	public function process_duplicate() {
 
-        if ( ! current_user_can( 'add_funnels' ) ) {
+		if ( ! current_user_can( 'add_funnels' ) ) {
 			$this->wp_die_no_access();
 		}
 
@@ -899,10 +888,10 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table->views();
 		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
 		?>
-        <form method="post" class="wp-clearfix">
+		<form method="post" class="wp-clearfix">
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>
-        </form>
+		</form>
 		<?php
 	}
 
@@ -1009,13 +998,13 @@ class Funnels_Page extends Admin_Page {
 
 			foreach ( $products->products as $product ):
 				?>
-                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-                    <div class="">
-                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
-                    </div>
-                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
-                    <div class="inside">
-                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
+				<div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
+					<div class="">
+						<img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
+					</div>
+					<h2 class="hndle"><?php echo $product->info->title; ?></h2>
+					<div class="inside">
+						<p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
 
 						<?php $pricing = (array) $product->pricing;
 						if ( count( $pricing ) > 1 ) {
@@ -1024,8 +1013,8 @@ class Funnels_Page extends Admin_Page {
 							$price2 = max( $pricing );
 
 							?>
-                            <a class="button-primary" target="_blank"
-                               href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+							<a class="button-primary" target="_blank"
+							   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -1033,24 +1022,24 @@ class Funnels_Page extends Admin_Page {
 
 							if ( $price > 0.00 ) {
 								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+								<a class="button-primary" target="_blank"
+								   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+								<a class="button-primary" target="_blank"
+								   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-                    </div>
-                </div>
+					</div>
+				</div>
 			<?php endforeach;
 		} else {
 			?>
-            <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
+			<p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		}
 	}
 

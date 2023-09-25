@@ -24,6 +24,7 @@
     makeEl,
     htmlToElements,
     Dashicon,
+    ButtonToggle,
     ToolTip,
   } = MakeEl
 
@@ -46,7 +47,7 @@
   const { __, _x, _n, _nx, sprintf } = wp.i18n
   const { linkPicker } = Groundhogg.pickers
   const { get, post } = Groundhogg.api
-  const { emails: EmailsStore } = Groundhogg.stores
+  const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
 
   improveTinyMCE({
     height: 400,
@@ -86,6 +87,24 @@
     '\'Copperplate Gothic Light\', Copperplate, \'Century Gothic\', Arial, sans-serif',
     'Futura, Calibri, Arial, sans-serif',
   ]
+
+  let fontsWithQuotes = fonts.reduce((fonts, font) => {
+    let subFonts = font.split(',').map(f => f.trim())
+    let hasQuotes = subFonts.filter(f => f.startsWith('\'') && f.endsWith('\''))
+
+    hasQuotes.forEach(f => {
+      if (!fonts.includes(f)) {
+        fonts.push(f)
+      }
+    })
+
+    return fonts
+  }, [])
+
+  const fixFontQuotes = data => {
+    return data.replaceAll(new RegExp(`"(${fontsWithQuotes.map(f => f.replaceAll('\'', '')).join('|')})"`, 'g'),
+      '\'$1\'')
+  }
 
   const fontFamilies = {}
 
@@ -500,8 +519,8 @@
     })
 
     // No ID, creating the email
-    if (!State.email.ID) {
-      return EmailsStore.create(State.email).then(email => {
+    if (isCreating()) {
+      return EmailsStore.create(State.changes).then(email => {
         dialog({
           message: 'Email created!',
         })
@@ -631,7 +650,10 @@
   const setEmailControlsTab = (tab) => State.emailControlsTab = tab
   const getBlocks = () => State.blocks
   const getBlocksCopy = () => JSON.parse(JSON.stringify(State.blocks))
+  const isEditing = () => Boolean(getEmailId())
+  const isCreating = () => !isEditing()
   const getEmail = () => State.email
+  const getEmailId = () => State.email.ID
   const getEmailData = () => State.email.data
   const getEmailMeta = () => State.email.meta
   const getEmailWidth = () => getEmailMeta().width || 600
@@ -669,6 +691,28 @@
     setState({
       hasChanges: true,
     })
+  }
+
+  /**
+   * The email's current campagins
+   *
+   * @return {*|*[]}
+   */
+  const getCampaigns = () => State.email.campaigns || []
+
+  /**
+   * Override the campaigns
+   *
+   * @param campaigns
+   */
+  const setCampaigns = campaigns => {
+    State.email.campaigns = [
+      ...campaigns,
+    ]
+
+    State.changes.campaigns = [
+      ...campaigns,
+    ]
   }
 
   /**
@@ -728,7 +772,7 @@
 
     setEmailMeta({
       blocks: false,
-      type: 'html'
+      type: 'html',
     })
 
     if (hasChanges) {
@@ -754,7 +798,7 @@
     setEmailMeta({
       css,
       blocks: true,
-      type: 'blocks'
+      type: 'blocks',
     })
 
     if (hasChanges) {
@@ -844,7 +888,7 @@
       }
 
       if (tagName === 'hr') {
-        return '---'
+        return '\n---'
       }
 
       if (tagName === 'code') {
@@ -1297,25 +1341,6 @@
       selected: alignment,
       onChange,
     })
-  }
-
-  const ButtonToggle = ({
-    id = '',
-    options = [],
-    selected = '',
-    onChange = value => {},
-  }) => {
-
-    const ButtonOption = option => Button({
-      id: `${id}-opt-${option.id}`,
-      className: `gh-button gh-button small ${selected === option.id ? 'dark' : 'grey'}`,
-      onClick: e => onChange(option.id),
-    }, option.text)
-
-    return Div({
-      id,
-      className: 'gh-input-group',
-    }, options.map(opt => ButtonOption(opt)))
   }
 
   const BorderControlGroup = ({
@@ -3016,7 +3041,6 @@
   }
 
   const BasicEmailControls = () => {
-
     let {
       reply_to_override = '',
       browser_view = false,
@@ -3126,6 +3150,36 @@
         })),
       ]),
       isBlockEditor() ? TemplateControls() : null,
+      ControlGroup({
+        id: 'campaigns',
+        name: 'Campaigns',
+      }, [
+        `<p>Use <b>campaigns</b> to organize your emails. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
+        ItemPicker({
+          id: 'pick-campaigns',
+          noneSelected: 'Add a campaign...',
+          tags: true,
+          selected: getCampaigns().map(({ ID, data }) => ({ id: ID, text: data.name })),
+          fetchOptions: async (search) => {
+            let campaigns = await CampaignsStore.fetchItems({
+              search,
+              limit: 20,
+            })
+
+            return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+          },
+          createOption: async (id) => {
+            let campaign = await CampaignsStore.create({
+              data: {
+                name: id,
+              },
+            })
+
+            return { id: campaign.ID, text: campaign.data.name }
+          },
+          onChange: items => setCampaigns(items.map(item => item.id)),
+        }),
+      ]),
       isHTMLEditor() ? ControlGroup({ name: 'HTML Editor Info' }, HTMLEditorNotice()) : null,
     ])
   }
@@ -3237,7 +3291,7 @@
         `<p>Choose your default/global social account links for the Socials block.</p>`,
         SocialLinksRepeater({
           socials: globalSocials,
-          theme: 'brand-circle',
+          theme: 'brand-boxed',
           onChange: socials => {
             globalSocials = socials
             morphBlocks()
@@ -3760,22 +3814,9 @@
                   return
                 }
 
-                modal({
-                  dialogClasses: 'overflow-visible',
-                  content: `<div id="gh-broadcast-form" style="width: 400px"></div>`,
-                  onOpen: ({ close }) => {
-                    Groundhogg.SendBroadcast('#gh-broadcast-form', {
-                      email: EmailsStore.get(getEmail().ID),
-                    }, {
-                      onScheduled: () => {
-                        close()
-                        dialog({
-                          message: 'Broadcast scheduled!',
-                        })
-                      },
-                    })
-                  },
-                })
+                Modal({}, () => Groundhogg.BroadcastScheduler({
+                  email: EmailsStore.get(getEmailId()),
+                }))
 
               },
             },
@@ -3988,9 +4029,9 @@
                           setState({
                             page: 'html-editor',
                           })
-                          
-                          setHTML( contents, false )
-                          
+
+                          setHTML(contents, false)
+
                           renderEditor()
                           close()
                         }
@@ -4122,14 +4163,17 @@
       id: `template-${ID}`,
       className: 'gh-panel',
       onClick: e => {
-
         setEmailData({
           title: data.title,
+          from_user: data.from_user,
+          message_type: data.message_type,
+          content: data.content,
+          plain_text: data.plain_text,
         })
         setEmailMeta({
           ...meta,
         })
-        setBlocks(meta.blocks)
+        setBlocks(parseBlocksFromContent(data.content))
         setState({ page: 'editor' })
         renderEditor()
       },
@@ -4892,8 +4936,10 @@
     },
   })
 
-  const inlineStyle = (doc, selector, style = {}) => {
-    style = fillFontStyle(style)
+  const inlineStyle = (doc, selector, style = {}, inherit = true) => {
+    if (inherit) {
+      style = fillFontStyle(style)
+    }
     doc.querySelectorAll(selector).forEach(el => {
       for (let attr in style) {
         el.style[attr] = style[attr]
@@ -4924,18 +4970,19 @@
       ...p,
       ...a,
     })
+
     inlineStyle(doc, 'b,strong', {
       fontWeight: 'bold',
-    })
+    }, false)
 
     inlineStyle(doc, 'ul', {
       listStyle: 'disc',
       paddingLeft: '30px',
-    })
+    }, false)
 
     inlineStyle(doc, 'ol', {
       paddingLeft: '30px',
-    })
+    }, false)
 
     if (doc.body.firstElementChild) {
       doc.body.firstElementChild.style.marginTop = 0
@@ -4962,24 +5009,27 @@
               d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
     controls: ({ p = {}, a = {}, h1 = {}, h2 = {}, h3 = {}, content = '', updateBlock, curBlock }) => {
 
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(content, 'text/html')
-      let firstEl = doc.body.firstElementChild
+      // If the element does not exist, this block was just clicked
+      if (!document.getElementById('text-block-h1')) {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(content, 'text/html')
+        let firstEl = doc.body.firstElementChild
 
-      if (firstEl) {
-        let tag = firstEl.tagName.toLowerCase()
-        switch (tag) {
-          case 'h1':
-          case 'h2':
-          case 'h3':
-          case 'p':
-          case 'a':
-            openPanel(`text-block-${tag}`)
-            break
-          case 'ul':
-          case 'ol':
-            openPanel(`text-block-p`)
-            break
+        if (firstEl) {
+          let tag = firstEl.tagName.toLowerCase()
+          switch (tag) {
+            case 'h1':
+            case 'h2':
+            case 'h3':
+            case 'p':
+            case 'a':
+              openPanel(`text-block-${tag}`)
+              break
+            case 'ul':
+            case 'ol':
+              openPanel(`text-block-p`)
+              break
+          }
         }
       }
 
@@ -5093,9 +5143,7 @@
       borderStyle: el => parseBorderStyle(el.querySelector('td.email-button').style),
       backgroundColor: el => el.querySelector('td.email-button').getAttribute('bgcolor'),
       style: el => {
-        let style = parseFontStyle(el.querySelector('a').style)
-        console.log(style)
-        return style
+        return parseFontStyle(el.querySelector('a').style)
       },
     },
     //language=HTML
@@ -5220,6 +5268,7 @@
             fontSize: `${style.fontSize}px`,
             textDecoration: 'none',
             display: 'inline-block',
+            verticalAlign: 'middle',
             backgroundColor,
           },
         }, text)))))),
@@ -5281,6 +5330,7 @@
             fontSize: `${style.fontSize}px`,
             textDecoration: 'none !important',
             display: 'inline-block',
+            verticalAlign: 'middle',
             backgroundColor,
           },
           eventHandlers: {
@@ -5455,6 +5505,193 @@
     },
   })
 
+  // registerBlock('video', 'Video', {
+  //   attributes: {
+  //     width: el => parseInt(el.querySelector('img').width),
+  //     playButton: el => {},
+  //     title: el => el.querySelector('img').alt,
+  //     video: el => el.querySelector('a')?.href,
+  //     borderStyle: el => parseBorderStyle(el.querySelector('img').style),
+  //     align: el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
+  //   },
+  //   svg: icons.image,
+  //   controls: ({ video = '', width, title = '', align = 'center', updateBlock, borderStyle = {} }) => {
+  //
+  //     return Fragment([
+  //       ControlGroup({
+  //         name: 'Video',
+  //       }, [
+  //         Control({
+  //           label: 'Video URL',
+  //           stacked: true
+  //         }, Input({
+  //           type: 'url',
+  //           id: 'video-url',
+  //           name: 'video_url',
+  //           placeholder: 'https://youtu.be/your-video-id',
+  //           value: video,
+  //           onChange: async e => {
+  //
+  //             let vidurl = e.target.value
+  //
+  //             let json = await fetch(`https://noembed.com/embed?dataType=json&url=${vidurl}`)
+  //             .then(res => res.json()).catch( err => {
+  //
+  //             })
+  //
+  //             if ( ! json.provider_name ){
+  //               dialog({
+  //                 message: 'The requested video could not be found.',
+  //                 type: 'error'
+  //               })
+  //               return;
+  //             }
+  //
+  //             let thumbnail_url, videoId
+  //
+  //             switch ( json.provider_name ){
+  //               case 'YouTube':
+  //                 thumbnail_url = json.thumbnail_url.replace( /hqdefault|mqdefault|sddefault/, 'maxresdefault' )
+  //                 break;
+  //               case 'Vimeo':
+  //
+  //                 let vidId = json.uri.match(/\/([0-9]+)\/?:?/)[1]
+  //                 let vimeoRes = await fetch( `https://vimeo.com/api/v2/video/${vidId}.json`).then( r => r.json() )
+  //                 thumbnail_url = vimeoRes[0].thumbnail_large
+  //
+  //                 break;
+  //
+  //               default:
+  //
+  //                 dialog({
+  //                   message: `${json.provider_name} is not supported for embed.`,
+  //                   type: 'error'
+  //                 })
+  //
+  //                 return;
+  //             }
+  //
+  //             updateBlock({
+  //               video: e.target.value,
+  //               src: thumbnail_url,
+  //               title: json.title
+  //             })
+  //           },
+  //         })),
+  //         `<p>Add a <a href="https://www.youtube.com" target="_blank">YouTube</a> or <a href="https://vimeo.com" target="_blank">Vimeo</a> URL to automatically generate a preview image. The image will link to the provided URL.</p>`,
+  //         Control({
+  //           label: 'Title',
+  //           stacked: true,
+  //         }, Input({
+  //           id: 'video-title',
+  //           name: 'video_title',
+  //           value: title,
+  //           onChange: e => updateBlock({ title: e.target.value }),
+  //         })),
+  //         Control({
+  //           label: 'Alignment',
+  //         }, AlignmentButtons({
+  //           id: 'image-align',
+  //           alignment: align,
+  //           onChange: align => {
+  //             updateBlock({
+  //               align,
+  //               morphControls: true,
+  //             })
+  //           },
+  //         })),
+  //       ]),
+  //       BorderControlGroup({
+  //         ...borderStyle,
+  //         onChange: newStyle => updateBlock({
+  //           borderStyle: {
+  //             ...getActiveBlock().borderStyle,
+  //             ...newStyle,
+  //           },
+  //           morphControls: true,
+  //         }),
+  //       }),
+  //     ])
+  //   },
+  //   edit: ({ src, width, title = '', align = 'center', updateBlock, borderStyle = {} }) => {
+  //
+  //     return Div({
+  //       className: 'vid-container full-width',
+  //       style: {
+  //         textAlign: align,
+  //       },
+  //     }, makeEl('img', {
+  //       className: 'resize-me',
+  //       onCreate: el => {
+  //
+  //         setTimeout(() => {
+  //           let $el = $('img.resize-me')
+  //           $el.resizable({
+  //             aspectRatio: true,
+  //             maxWidth: $el.parent().width(),
+  //             stop: (e, ui) => {
+  //               updateBlock({
+  //                 width: Math.ceil(ui.size.width),
+  //                 morphControls: true,
+  //                 morphBlocks: false,
+  //               })
+  //             },
+  //           })
+  //         }, 100)
+  //       },
+  //       src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`,
+  //       alt: title,
+  //       // title,
+  //       width,
+  //       height: 'auto',
+  //       style: {
+  //         verticalAlign: 'bottom',
+  //         height: 'auto',
+  //         width,
+  //         ...addBorderStyle(borderStyle),
+  //       },
+  //     }))
+  //   },
+  //   html: ({ src, width, video = '', title = '', align = 'center', borderStyle = {} }) => {
+  //
+  //     let img = makeEl('img', {
+  //       src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`,
+  //       alt: title,
+  //       // title,
+  //       width,
+  //       height: 'auto',
+  //       style: {
+  //         boxSizing: 'border-box',
+  //         verticalAlign: 'bottom',
+  //         height: 'auto',
+  //         width,
+  //         ...addBorderStyle(borderStyle),
+  //       },
+  //     })
+  //
+  //     img = makeEl('a', {
+  //       href: video,
+  //     }, img)
+  //
+  //     return Div({
+  //       className: 'img-container',
+  //       style: {
+  //         textAlign: align,
+  //       },
+  //     }, img)
+  //   },
+  //   plainText: ({ src = '', title = '', video = '' }) => {
+  //     return `[![${title || 'video'}](${src})](${video})`
+  //   },
+  //   defaults: {
+  //     src: 'http://via.placeholder.com/600x338',
+  //     video: '',
+  //     title: 'Your Video',
+  //     width: 600,
+  //     align: 'center',
+  //   },
+  // })
+
   registerBlock('spacer', 'Spacer', {
     attributes: {
       height: el => parseInt(el.querySelector('td[height]').getAttribute('height')),
@@ -5596,7 +5833,7 @@
    * @param html
    * @return {string}
    */
-  const cleanHTML = ( html, wholeDoc = false ) => {
+  const cleanHTML = (html, wholeDoc = false) => {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
 
@@ -5616,7 +5853,7 @@
     // Remove bad HTML
     doc.querySelectorAll(unsupportedTags.join(', ')).forEach(el => el.remove())
 
-    if ( ! wholeDoc ){
+    if (!wholeDoc) {
       return doc.body.innerHTML
     }
 
@@ -5638,7 +5875,7 @@
         ControlGroup({ name: 'HTML', closable: false }, [
           Textarea({
             id: 'code-block-editor',
-            value: html_beautify( content ),
+            value: html_beautify(content),
             onCreate: el => {
 
               // Wait for add to dom
@@ -6025,7 +6262,12 @@
         unsubscribe,
       } = _BlockEditor.footer
 
-      return `Copyright ${business_name}\n${address}`
+      return [
+        `Copyright ${business_name}`,
+        address,
+        extractPlainText(links),
+        extractPlainText(unsubscribe),
+      ].join('  \n')
     },
     defaults: {
       style: fontDefaults({
@@ -6084,17 +6326,26 @@
     },
   })
 
-  const SocialIconTheme = (theme, selected) => Button({
-    id: `select-${theme}`,
-    title: socialIconThemes[theme],
-    className: `gh-button ${theme === selected ? 'secondary' : 'secondary text'} social-icon-theme ${theme}`,
-    onClick: e => updateBlock({ theme: theme, morphControls: true }),
-  }, [
-    SocialIcon('facebook', theme, 20),
-    SocialIcon('instagram', theme, 20),
-    SocialIcon('twitter', theme, 20),
-    // SocialIcon('reddit')
-  ])
+  const SocialIconTheme = (theme, selected) => {
+
+    let themeIcons = ['facebook', 'instagram', 'twitter']
+
+    let { use = 'global', socials = [] } = getActiveBlock()
+
+    if (use === 'global' && globalSocials.length >= 3) {
+      themeIcons = globalSocials.map(([social]) => social).slice(0, 3)
+    } else if (use === 'custom' && socials.length >= 3) {
+      themeIcons = socials.map(([social]) => social).slice(0, 3)
+    }
+
+    return Button({
+        id: `select-${theme}`,
+        title: socialIconThemes[theme],
+        className: `gh-button ${theme === selected ? 'primary' : 'secondary text'} social-icon-theme ${theme}`,
+        onClick: e => updateBlock({ theme: theme, morphControls: true }),
+      },
+      themeIcons.map(icon => SocialIcon(icon, theme, 20)))
+  }
 
   const SocialLinksRepeater = ({ socials, theme, onChange }) => InputRepeater({
     id: 'social-links',
@@ -6133,9 +6384,9 @@
 
   registerBlock('social', 'Socials', {
     attributes: {
-      size: el => parseInt(el.querySelector('img').width),
+      size: el => parseInt(el.querySelector('img')?.width),
       gap: el => parseInt(el.querySelector('td.gap')?.width),
-      theme: el => el.querySelector('img').src.split('/').at(-2),
+      theme: el => el.querySelector('img')?.src.split('/').at(-2),
       socials: el => Array.from(el.querySelectorAll('a')).map(el => {
         let png = el.firstElementChild.src.split('/').at(-1)
         return [png.substr(0, png.indexOf('.png')), el.href]
@@ -6149,8 +6400,8 @@
 		</svg>`,
     controls: ({
       socials = [],
-      gap = 4,
-      size = 32,
+      gap = 10,
+      size = 24,
       theme = 'brand-circle',
       align = 'center',
       use = 'global',
@@ -6231,8 +6482,8 @@
       align = 'center',
       theme = 'brand-circle',
       socials = [],
-      gap = 4,
-      size = 32,
+      gap = 10,
+      size = 24,
       use = 'global',
     }) => {
 
@@ -6295,8 +6546,8 @@
       align: 'center',
       theme: 'brand-circle',
       socials: [],
-      gap: 4,
-      size: 32,
+      gap: 10,
+      size: 24,
       use: 'global',
     },
   })
@@ -6418,8 +6669,28 @@
       }
 
       blocks = [
-        createBlock('text'),
+        createBlock('spacer'),
+        createBlock('text', {
+          content: '<p>Hi {first}!</p>',
+        }),
+        createBlock('spacer'),
+        createBlock('button', {
+          text: '',
+        }),
+        createBlock('spacer'),
+        createBlock('text', {
+          content: '',
+        }),
+        createBlock('spacer'),
+        createBlock('footer'),
       ]
+
+      if (_BlockEditor.assets.logo) {
+        blocks.unshift(createBlock('image', {
+          src: _BlockEditor.assets.logo,
+          alt: `${Groundhogg.name} logo`,
+        }))
+      }
 
       setState({
         page: 'templates',
@@ -6687,6 +6958,7 @@
     try {
       return parseBlocksFromTable(doc.body.firstElementChild)
     } catch (e) {
+      console.log(e)
       return []
     }
   }
@@ -6738,15 +7010,27 @@
     let attributes = {}
     let unused, type, id, json
 
-    // has json
-    if (commentData.indexOf('{') > -1) {
-      [unused, type, id, json] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+) ({.*})$/)
-      attributes = JSON.parse(json)
-    } else {
-      [unused, type, id] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+)$/)
+    try {
+// has json
+      if (commentData.indexOf('{') > -1) {
+        [unused, type, id, json] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+) ({.*})$/)
+        attributes = JSON.parse(fixFontQuotes(json))
+      } else {
+        [unused, type, id] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+)$/)
+      }
+
+    } catch (e) {
+      console.log({
+        err: e,
+        commentData,
+        type,
+        id,
+      })
     }
 
-    const getAttributes = BlockRegistry.get(type).attributes
+    const BlockType = BlockRegistry.get(type)
+
+    const getAttributes = BlockType.attributes
     const el = tr.querySelector(`td#b-${id}`)
 
     let block = {
@@ -6756,7 +7040,11 @@
     }
 
     for (let getter in getAttributes) {
-      block[getter] = getAttributes[getter](el, block)
+      try {
+        block[getter] = getAttributes[getter](el, block)
+      } catch (e) {
+        block[getter] = BlockType.defaults[getter]
+      }
     }
 
     block.advancedStyle = AdvancedStyleControls.parse(el)

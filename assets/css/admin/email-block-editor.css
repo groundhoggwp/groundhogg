@@ -913,10 +913,10 @@ body iframe#preview.desktop {
 .block-inspector .inspector-block {
   display: flex;
   gap: 5px;
-  border-width: 1px 0 0 0;
+  border-width: 0 0 1px 0;
   border-radius: 0;
   padding: 6px 12px;
-  border-color: rgba(16, 38, 64, 0.5);
+  border-color: rgba(16, 38, 64, 0.15);
   background-color: rgba(16, 38, 64, 0.05);
   width: 100%;
   color: #102640;
@@ -935,7 +935,7 @@ body iframe#preview.desktop {
 }
 .block-inspector .inspector-column > div.column-header {
   padding: 3px 8px;
-  border-top: 1px solid rgba(16, 38, 64, 0.5);
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
 }
 .social-icon-themes-grid {
   display: grid;
@@ -949,7 +949,7 @@ body iframe#preview.desktop {
   align-items: center;
   padding: 5px !important;
 }
-.social-icon-themes-grid .social-icon-theme#select-white-icons, .social-icon-themes-grid .social-icon-theme#select-white-circle, .social-icon-themes-grid .social-icon-theme#select-white-boxed {
+.social-icon-themes-grid .social-icon-theme:not(.primary)#select-white-icons, .social-icon-themes-grid .social-icon-theme:not(.primary)#select-white-circle, .social-icon-themes-grid .social-icon-theme:not(.primary)#select-white-boxed {
   background-color: rgba(16, 38, 64, 0.15);
 }
 

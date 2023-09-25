@@ -293,7 +293,8 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-search-filters',
-			'moment'
+			'moment',
+			'groundhogg-make-el'
 		] );
 
 		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
@@ -408,7 +409,8 @@ class Scripts {
 			'baremetrics-calendar',
 			'moment',
 			'groundhogg-admin',
-			'groundhogg-admin-element'
+			'groundhogg-admin-element',
+			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-custom-reports', GROUNDHOGG_ASSETS_URL . 'js/admin/custom-reports' . $dot_min . '.js', [

@@ -1760,13 +1760,14 @@ p.error,
   justify-content: space-between;
   align-items: center;
   gap: 0;
-  margin-top: 10px;
-  margin-bottom: 40px;
 }
 .gh-step-nav .gh-step-nav-join {
   width: 100%;
-  border-top: 1px solid rgba(16, 38, 64, 0.5);
+  border-top: 1px solid #0075ff;
   border-bottom: none;
+}
+.gh-step-nav button:disabled + hr.gh-step-nav-join {
+  opacity: 0.5;
 }
 .gh-step-nav .gh-step-nav-step-num {
   display: flex;

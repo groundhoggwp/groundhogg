@@ -5,11 +5,13 @@ namespace Groundhogg\Admin\Emails;
 use Groundhogg\Admin\Table;
 use Groundhogg\DB\DB;
 use Groundhogg\Email;
+use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
@@ -74,6 +76,8 @@ class Emails_Table extends Table {
 			'title'        => _x( 'Title', 'Column label', 'groundhogg' ),
 			'subject'      => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'from_user'    => _x( 'From User', 'Column label', 'groundhogg' ),
+			'campaigns'    => _x( 'Campaigns', 'Column label', 'groundhogg' ),
+			'funnels'      => _x( 'Funnels', 'Column label', 'groundhogg' ),
 			'author'       => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 		];
@@ -213,6 +217,67 @@ class Emails_Table extends Table {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $email->get_last_updated() ) );
 
 		return scheduled_time_column( $ds_time, false, false, false );
+	}
+
+	/**
+	 * Show the list of funnels that the email is being used in
+	 *
+	 * @param $email
+	 *
+	 * @return string
+	 */
+	protected function column_funnels( $email ) {
+
+		$funnels = get_db( 'funnels' )->query( [
+			'where' => [
+				[
+					'ID',
+					'in',
+					get_db( 'steps' )->get_sql( [
+						'select' => 'funnel_id',
+						'where'  => [
+							[
+								'step_type',
+								'=',
+								'send_email'
+							],
+							[
+								'ID',
+								'in',
+								get_db( 'stepmeta' )->get_sql( [
+									'select'     => 'step_id',
+									'meta_key'   => 'email_id',
+									'meta_value' => $email->get_id()
+								] )
+							],
+						]
+					] )
+				]
+			]
+		] );
+
+		array_map_to_class( $funnels, Funnel::class );
+
+		return implode( ', ', array_map( function ( $funnel ) {
+			return html()->e( 'a', [
+				'href' => $funnel->admin_link()
+			], $funnel->get_title() );
+		}, $funnels ) );
+	}
+
+	/**
+	 * @param Email $email
+	 */
+	protected function column_campaigns( $email ) {
+		$campaigns = $email->get_related_objects( 'campaign' );
+
+		return implode( ', ', array_map( function ( $campaign ) {
+			return html()->e( 'a', [
+				'href' => add_query_arg( [
+					'related' => [ 'ID' => $campaign->ID, 'type' => 'campaign' ]
+				], $_SERVER['REQUEST_URI'] ),
+			], $campaign->get_name() );
+		}, $campaigns ) );
 	}
 
 	/**

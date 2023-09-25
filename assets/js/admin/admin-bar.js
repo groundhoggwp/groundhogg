@@ -272,14 +272,10 @@
       view: () => {
         // language=HTML
         return `
-            <div id="send-broadcast"></div>`
+            <div id="gh-admin-bar-send-broadcast"></div>`
       },
       onMount: ({ setTab }) => {
-        Groundhogg.SendBroadcast('#send-broadcast', {}, {
-          onScheduled: () => {
-            setTab('broadcast')
-          },
-        })
+        document.getElementById('gh-admin-bar-send-broadcast').append(Groundhogg.BroadcastScheduler())
       },
     },
     tasks: {

@@ -32,4 +32,8 @@ add_action( 'groundhogg/templates/email/head/after', function(){
 		<?php
 } );
 
-echo $email->build();
+if ( get_url_var( 'plain' ) ){
+	?><pre><?php esc_html_e( $email->get_merged_alt_body() ); ?></pre><?php
+} else {
+	echo $email->build();
+}

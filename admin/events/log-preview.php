@@ -22,7 +22,7 @@ $log_item = new Email_Log_Item( $log_item_id );
 					<?php break;
 				case 'failed': ?>
 					<div class="notice notice-error">
-						<p><?php printf( __( 'This email was was not sent! Error code: <code>%s</code>', 'groundhogg' ), $log_item->error_code ); ?></p>
+						<p><?php printf( __( 'This email was not sent! Error code: <code>%s</code>', 'groundhogg' ), $log_item->error_code ); ?></p>
 						<pre><code><?php esc_html_e( $log_item->error_message ); ?></code></pre>
 					</div>
 					<?php break;
