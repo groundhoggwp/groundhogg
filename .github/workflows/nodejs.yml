@@ -8,6 +8,7 @@ on:
       - "*.beta.*"
       - "*.alpha"
       - "*.alpha.*"
+      - "*.rc.*"
 jobs:
   tag:
     name: New tag
