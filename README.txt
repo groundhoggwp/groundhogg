@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.7.12
+Stable tag: 3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -325,6 +325,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.0 (2023-10-01) =
+* NEW [Drag & Drop block-based (not Gutenberg) email editor](https://www.groundhogg.io/press/groundhogg-3-0-columns-conditional-content-socials-and-more/)
+* NEW Campaigns as method for organizing funnels, emails, and broadcasts
 
 = 2.7.12 (2023-08-01) =
 * ADDED New feature to add heading dividers to custom reports page to make grouping your custom reports easier.
