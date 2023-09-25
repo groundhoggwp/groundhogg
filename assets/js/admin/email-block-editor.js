@@ -1329,15 +1329,12 @@
     id = '',
     alignment = 'left',
     onChange = alignment => {},
+    directions = ['left', 'center', 'right'],
   }) => {
 
     return ButtonToggle({
       id,
-      options: [
-        { id: 'left', text: icons.alignLeft },
-        { id: 'center', text: icons.alignCenter },
-        { id: 'right', text: icons.alignRight },
-      ],
+      options: directions.map(direction => ({ id: direction, text: Dashicon(`editor-align${direction}`) })),
       selected: alignment,
       onChange,
     })
@@ -1844,7 +1841,7 @@
     }
 
     /**
-     * Generates a uniquer key based on the block attributes
+     * Generates a unique key based on the block attributes
      *
      * @param block
      * @return {string}
@@ -2983,30 +2980,16 @@
       })),
       templateIs(BOXED) ? Control({
         label: 'Alignment',
-      }, Div({
-        className: 'gh-input-group',
-      }, [
-        Button({
-          id: 'align-left',
-          className: `change-alignment gh-button ${alignment === 'left' ? 'primary' : 'secondary'}`,
-          onClick: e => {
-            updateSettings({
-              alignment: 'left',
-              reRender: true,
-            })
-          },
-        }, icons.alignLeft),
-        Button({
-          id: 'align-center',
-          className: `change-alignment gh-button ${alignment === 'center' ? 'primary' : 'secondary'}`,
-          onClick: e => {
-            updateSettings({
-              alignment: 'center',
-              reRender: true,
-            })
-          },
-        }, icons.alignCenter),
-      ])) : null,
+      },
+        AlignmentButtons({
+          id: 'template-align',
+          alignment,
+          onChange: alignment => updateSettings({
+            reRender: true,
+            alignment,
+          }),
+          directions: [ 'left', 'center' ]
+        })) : null,
       `<hr/>`,
       Control({
         label: 'Background Color',
@@ -6669,28 +6652,19 @@
       }
 
       blocks = [
+        createBlock('text'),
         createBlock('spacer'),
-        createBlock('text', {
-          content: '<p>Hi {first}!</p>',
-        }),
+        createBlock('button'),
         createBlock('spacer'),
-        createBlock('button', {
-          text: '',
-        }),
+        createBlock('text'),
         createBlock('spacer'),
-        createBlock('text', {
-          content: '',
+        createBlock('social', {
+          socials: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(i => [i, `https://${i}.com`]),
+          align: 'left',
         }),
         createBlock('spacer'),
         createBlock('footer'),
       ]
-
-      if (_BlockEditor.assets.logo) {
-        blocks.unshift(createBlock('image', {
-          src: _BlockEditor.assets.logo,
-          alt: `${Groundhogg.name} logo`,
-        }))
-      }
 
       setState({
         page: 'templates',
