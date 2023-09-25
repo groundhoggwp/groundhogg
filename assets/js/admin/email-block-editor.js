@@ -67,32 +67,30 @@
   let fonts = [
     'system-ui, sans-serif',
     'Arial, sans-serif', // Web, Mobile, Desktop
-    '\'Arial Black\', Arial, sans-serif', // Web
-    '\'Arial Narrow\', Arial, sans-serif', // Web
-    '\'Times New Roman\', Times, serif', // All
+    'Arial Black, Arial, sans-serif', // Web
+    'Arial Narrow, Arial, sans-serif', // Web
+    'Times New Roman, Times, serif', // All
     'Georgia, serif',
-    '\'Courier New\', Courier, monospace',
+    'Courier New, Courier, monospace',
     'Verdana, Geneva, sans-serif',
     'Tahoma, sans-serif',
-    '\'Trebuchet MS\', sans-serif',
+    'Trebuchet MS, sans-serif',
     'Calibri, sans-serif',
-    '\'Century Gothic\', sans-serif',
-    'Palatino, \'Times New Roman\', Times, serif',
-    'Garamond, Palatino, \'Times New Roman\', Times, serif',
-    '\'Book Antiqua\', Palatino, serif',
-    '\'Lucida Grande\', sans-serif',
-    '\'Lucida Sans\', \'Lucida Grande\', Arial, sans-serif',
-    'Impact, \'Arial Black\', sans-serif',
+    'Century Gothic, sans-serif',
+    'Palatino, Times New Roman, Times, serif',
+    'Garamond, Palatino, Times New Roman, Times, serif',
+    'Book Antiqua, Palatino, serif',
+    'Lucida Grande, sans-serif',
+    'Lucida Sans, Lucida Grande, Arial, sans-serif',
+    'Impact, Arial Black, sans-serif',
     'Copperplate, sans-serif',
-    '\'Copperplate Gothic Light\', Copperplate, \'Century Gothic\', Arial, sans-serif',
+    'Copperplate Gothic Light, Copperplate, Century Gothic, Arial, sans-serif',
     'Futura, Calibri, Arial, sans-serif',
   ]
 
-  let fontsWithQuotes = fonts.reduce((fonts, font) => {
+  const subFonts = fonts.reduce((fonts, font) => {
     let subFonts = font.split(',').map(f => f.trim())
-    let hasQuotes = subFonts.filter(f => f.startsWith('\'') && f.endsWith('\''))
-
-    hasQuotes.forEach(f => {
+    subFonts.forEach(f => {
       if (!fonts.includes(f)) {
         fonts.push(f)
       }
@@ -101,14 +99,15 @@
     return fonts
   }, [])
 
-  const fixFontQuotes = data => {
-    return data.replaceAll(new RegExp(`"(${fontsWithQuotes.map(f => f.replaceAll('\'', '')).join('|')})"`, 'g'),
-      '\'$1\'')
+  const subFontsWithSpaces = subFonts.filter(font => font.includes(' '))
+  
+  const removeQuotes = data => {
+    return data.replaceAll(/"|'|(&quot;)/g, '')
   }
 
   const fontFamilies = {}
 
-  const fontName = font => font.split(',')[0].replaceAll(/"|'/g, '')
+  const fontName = font => font.split(',')[0]
 
   fonts.sort((a, b) => fontName(a).localeCompare(fontName(b))).forEach(font => {
     fontFamilies[font] = fontName(font)
@@ -1485,7 +1484,7 @@
    */
   const parseFontStyle = style => ({
     color: style.getPropertyValue('color'),
-    fontFamily: style.getPropertyValue('font-family'),
+    fontFamily: removeQuotes(style.getPropertyValue('font-family')),
     lineHeight: style.getPropertyValue('line-height'),
     fontWeight: style.getPropertyValue('font-weight'),
     fontStyle: style.getPropertyValue('font-style'),
@@ -2979,8 +2978,8 @@
         },
       })),
       templateIs(BOXED) ? Control({
-        label: 'Alignment',
-      },
+          label: 'Alignment',
+        },
         AlignmentButtons({
           id: 'template-align',
           alignment,
@@ -2988,7 +2987,7 @@
             reRender: true,
             alignment,
           }),
-          directions: [ 'left', 'center' ]
+          directions: ['left', 'center'],
         })) : null,
       `<hr/>`,
       Control({
@@ -4580,7 +4579,7 @@
     ...style,
   })
 
-  const fillFontStyle = ({ use = 'custom', color = '', fontSize = 16, ...style }) => {
+  const fillFontStyle = ({ use = 'custom', color = '', fontFamily = '', fontSize = 16, ...style }) => {
 
     // global font
     if (GlobalFonts.has(use)) {
@@ -4589,6 +4588,7 @@
         return fillFontStyle({
           ...font,
           color,
+          fontFamily,
         })
       }
     }
@@ -4597,6 +4597,7 @@
       ...fontDefaults(style),
       color,
       fontSize: `${fontSize}px`,
+      fontFamily: removeQuotes(fontFamily),
     }
   }
 
@@ -4626,6 +4627,8 @@
     } = fontDefaults(style)
 
     const fontDisplay = font => Span({ style: { fontFamily: font } }, fontFamilies[font])
+
+    fontFamily = removeQuotes( fontFamily )
 
     return Div({
       className: 'font-controls display-flex column gap-10',
@@ -6724,6 +6727,7 @@
       role: 'presentation',
     }, blocks.filter(b => b.type).map(block => BlockHTML(block))).outerHTML
     setIsGeneratingHTML(false)
+    html = html.replaceAll( new RegExp( `&quot;(${subFontsWithSpaces.join('')})&quot;`, 'g' ), "'$1'" )
     return html
   }
 
@@ -6988,7 +6992,7 @@
 // has json
       if (commentData.indexOf('{') > -1) {
         [unused, type, id, json] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+) ({.*})$/)
-        attributes = JSON.parse(fixFontQuotes(json))
+        attributes = JSON.parse(json)
       } else {
         [unused, type, id] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+)$/)
       }

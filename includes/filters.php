@@ -412,6 +412,7 @@ function email_kses( $content ) {
 
 	// KSES does not like RBG values...
 	$content = safe_css_filter_rgb_to_hex( $content );
+	$content = safe_css_font_quotes( $content );
 
 	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
 	add_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
@@ -480,6 +481,18 @@ function _safe_display_css( $attributes ) {
  */
 function safe_css_filter_rgb_to_hex( $content ) {
 	return preg_replace_callback( '/rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/', __NAMESPACE__ . '\_safe_css_filter_rgb_to_hex_callback', $content );
+}
+
+/**
+ * Using inline styles automatically adds &quot; to font families containing a space
+ * This will convert them to single quotes so that the kses filter actually works
+ *
+ * @param $content
+ *
+ * @return array|string|string[]|null
+ */
+function safe_css_font_quotes( $content ){
+	return preg_replace( '/&quot;(Arial Black|Arial Narrow|Times New Roman|Courier New|Trebuchet MS|Century Gothic|Book Antiqua|Lucida Grande|Lucida Sans|Copperplate Gothic Light)&quot;/', "'$1'", $content );
 }
 
 /**
