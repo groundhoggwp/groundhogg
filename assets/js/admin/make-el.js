@@ -940,16 +940,14 @@
 
   const InputGroup = inputs => Div({ className: 'gh-input-group' }, inputs)
 
-  const Iframe = ({ onCreate = () => {}, ...attributes }, content) => {
+  const Iframe = ({ onCreate = () => {}, ...attributes }, content = null ) => {
+
+    let blob = new Blob([content], { type: 'text/html; charset=utf-8' })
+    let src = URL.createObjectURL(blob)
 
     return makeEl('iframe', {
       ...attributes,
-      onCreate: el => {
-        setTimeout(() => {
-          setFrameContent(el, content)
-          onCreate(el)
-        })
-      },
+      src
     })
   }
 

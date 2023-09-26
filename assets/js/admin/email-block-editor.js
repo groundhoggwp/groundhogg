@@ -100,12 +100,13 @@
   }, [])
 
   const subFontsWithSpaces = subFonts.filter(font => font.includes(' '))
-  
+
   const removeQuotes = data => {
     return data.replaceAll(/"|'|(&quot;)/g, '')
   }
 
-  const removeFontQuotesFromCommentData = data => data.replaceAll( new RegExp( `["'](${subFontsWithSpaces.join('|')})["']`, 'g' ), '$1' )
+  const removeFontQuotesFromCommentData = data => data.replaceAll(
+    new RegExp(`["'](${subFontsWithSpaces.join('|')})["']`, 'g'), '$1')
 
   const fontFamilies = {}
 
@@ -486,6 +487,7 @@
     hasChanges: false,
     preview: '',
     page: 'editor',
+    templateSearch: '',
     responsiveDevice: 'desktop',
     blocks: [],
     blockInspector: false,
@@ -3941,6 +3943,7 @@
   const EmailEditor = () => {
 
     if (getState().page === 'templates') {
+
       return Div({
         id: 'email-editor',
       }, [
@@ -3957,6 +3960,28 @@
                 marginRight: 'auto',
               },
             }, __('Select a template...')),
+            InputGroup([
+              Select({
+                name: 'template-campaign',
+                id: 'template-campaign',
+                options: {
+                  '' : 'Filter by campaign',
+                }
+              }),
+              Input({
+                type: 'search',
+                name: 'template-search',
+                id: 'template-search',
+                placeholder: __('Search for a template...'),
+                value: getState().templateSearch,
+                onInput: e => {
+                  setState({
+                    templateSearch: e.target.value,
+                  })
+                  morphEmailEditor()
+                },
+              }),
+            ]),
             Div({
               className: 'gh-input-group',
             }, [
@@ -4194,9 +4219,23 @@
 
     let items
 
+    if (getState().templates) {
+
+      let { templates, templateSearch = '' } = getState()
+
+      if (templateSearch) {
+        templates = templates.filter(t => t.data.title.match(new RegExp(templateSearch, 'i')))
+      }
+
+      return Grid(templates.map(t => Template(t)))
+    }
+
     // Has templates
     EmailsStore.fetchItems({ is_template: 1, status: 'ready' }).then(items => {
-      morph(Grid(items.map(t => Template(t))))
+      setState({
+        templates: items,
+      })
+      morphEmailEditor()
     })
 
     items = [...Array(9).keys()].map(k => Div({
@@ -4630,7 +4669,7 @@
 
     const fontDisplay = font => Span({ style: { fontFamily: font } }, fontFamilies[font])
 
-    fontFamily = removeQuotes( fontFamily )
+    fontFamily = removeQuotes(fontFamily)
 
     return Div({
       className: 'font-controls display-flex column gap-10',
@@ -6729,7 +6768,7 @@
       role: 'presentation',
     }, blocks.filter(b => b.type).map(block => BlockHTML(block))).outerHTML
     setIsGeneratingHTML(false)
-    html = html.replaceAll( new RegExp( `&quot;(${subFontsWithSpaces.join('')})&quot;`, 'g' ), "'$1'" )
+    html = html.replaceAll(new RegExp(`&quot;(${subFontsWithSpaces.join('')})&quot;`, 'g'), '\'$1\'')
     return html
   }
 

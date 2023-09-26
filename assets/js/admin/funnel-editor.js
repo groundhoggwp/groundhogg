@@ -287,6 +287,9 @@
               id: 'save-settings',
               className: 'gh-button primary',
               onClick: async e => {
+
+                close()
+
                 await FunnelsStore.patch(funnelId, {
                   campaigns: campaignIds,
                   meta: {
