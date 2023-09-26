@@ -7854,14 +7854,14 @@ function download_json( $json, $name ) {
  */
 function get_json_regex() {
 	return '(?(DEFINE)'
-	       . PHP_EOL . '(?\'json\'(?>\s*(?&object)\s*|\s*(?&array)\s*))'
-	       . PHP_EOL . '(?\'object\'(?>\{\s*(?>(?&pair)(?>\s*,\s*(?&pair))*)?\s*\}))'
-	       . PHP_EOL . '(?\'pair\'(?>(?&STRING)\s*:\s*(?&value)))'
-	       . PHP_EOL . '(?\'array\'(?>\[\s*(?>(?&value)(?>\s*,\s*(?&value))*)?\s*\]))'
-	       . PHP_EOL . '(?\'value\'(?>true|false|null|(?&STRING)|(?&NUMBER)|(?&object)|(?&array)))'
-	       . PHP_EOL . '(?\'STRING\'(?>"(?>\\\\(?>["\/\\\\bfnrt]|u[a-fA-F0-9]{4})|[^\\\\"\0-\x1F\x7F]+)*"))'
-	       . PHP_EOL . '(?\'NUMBER\'(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?))'
-	       . PHP_EOL . ')';
+	       . '(?\'json\'(?>\s*(?&object)\s*|\s*(?&array)\s*))'
+	       . '(?\'object\'(?>\{\s*(?>(?&pair)(?>\s*,\s*(?&pair))*)?\s*\}))'
+	       . '(?\'pair\'(?>(?&STRING)\s*:\s*(?&value)))'
+	       . '(?\'array\'(?>\[\s*(?>(?&value)(?>\s*,\s*(?&value))*)?\s*\]))'
+	       . '(?\'value\'(?>true|false|null|(?&STRING)|(?&NUMBER)|(?&object)|(?&array)))'
+	       . '(?\'STRING\'(?>"(?>\\\\(?>["\/\\\\bfnrt]|u[a-fA-F0-9]{4})|[^\\\\"\0-\x1F\x7F]+)*"))'
+	       . '(?\'NUMBER\'(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?))'
+	       . ')';
 }
 
 /**
@@ -7912,7 +7912,7 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 			'h4',
 			'h5',
 			'h6'
-		]);
+		] );
 
 		$markdown = preg_replace( "/<($elements) [^>]*?>/", "<$1>", $markdown );
 	}

@@ -549,6 +549,7 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 * Hide blocks that have conditional visibility enabled
+	 * Also ends up removing HTML comments which is an added bonus
 	 *
 	 * @param string $content
 	 * @param string $context
@@ -560,7 +561,7 @@ class Email extends Base_Object_With_Meta {
 		if ( $context === 'plain' ) {
 			$pattern = '/%s\\[filters:(?\'id\'[A-Za-z0-9-]+) (?\'attributes\'(?&json))\\](?\'content\'.*)\\[\\/filters:\\k\'id\'\]/s';
 		} else {
-			$pattern = '/%s<!-- (?\'type\'[a-z]+):(?\'id\'[A-Za-z0-9-]+) (?\'attributes\'(?&json)) -->(?\'content\'.*)<!-- \/\\k\'type\':\\k\'id\' -->/s';
+			$pattern = '/%s<!--\\s*(?\'type\'[a-z]+):(?\'id\'[A-Za-z0-9-]+) (?\'attributes\'(?&json))\\s*-->(?\'content\'.*)<!--\\s*\/\\k\'type\':\\k\'id\'\\s*-->/s';
 		}
 
 		$pattern = sprintf( $pattern, get_json_regex() );
@@ -572,7 +573,9 @@ class Email extends Base_Object_With_Meta {
 
 		foreach ( $matches[0] as $i => $match ) {
 			$block_content = $matches['content'][ $i ];
+			$type          = $matches['type'][ $i ];
 
+			// Gets rid of the [filters {...}] code in the plain text
 			if ( $this->is_testing() ) {
 				$content = str_replace( $match, $this->maybe_hide_blocks( $block_content, $context ), $content );
 				continue;
@@ -580,8 +583,15 @@ class Email extends Base_Object_With_Meta {
 
 			$block = json_decode( $matches['attributes'][ $i ], true );
 
+			if ( ! $block ) {
+				// could not decode json
+				continue;
+			}
+
+			//  No filters
 			if ( ! isset_not_empty( $block, 'include_filters' ) && ! isset_not_empty( $block, 'exclude_filters' ) ) {
-				$content = str_replace( $match, $block_content, $content );
+				// Still have to check inner content
+				$content = str_replace( $match, $this->maybe_hide_blocks( $block_content, $context ), $content );
 				continue;
 			}
 
@@ -598,6 +608,7 @@ class Email extends Base_Object_With_Meta {
 				// Remove the block
 				$content = str_replace( $match, '', $content );
 			} else {
+				// Check inner content if any
 				$content = str_replace( $match, $this->maybe_hide_blocks( $block_content, $context ), $content );
 			}
 		}

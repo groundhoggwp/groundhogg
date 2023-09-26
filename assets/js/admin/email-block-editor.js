@@ -105,6 +105,8 @@
     return data.replaceAll(/"|'|(&quot;)/g, '')
   }
 
+  const removeFontQuotesFromCommentData = data => data.replaceAll( new RegExp( `["'](${subFontsWithSpaces.join('|')})["']`, 'g' ), '$1' )
+
   const fontFamilies = {}
 
   const fontName = font => font.split(',')[0]
@@ -6977,11 +6979,9 @@
    */
   const parseBlockFromRow = tr => {
     let comment = tr.firstChild
-    let commentData = comment?.nodeValue?.trim()
+    let commentData = removeFontQuotesFromCommentData(comment?.nodeValue?.trim())
 
     if (!commentData) {
-
-      console.log(tr)
       return null
     }
 
