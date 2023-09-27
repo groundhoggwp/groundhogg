@@ -8,6 +8,8 @@ use Groundhogg\Contact;
 use Groundhogg\Block_Registry;
 use Groundhogg\Email;
 use Groundhogg\Event;
+use Groundhogg\Library_Email;
+use Groundhogg\Plugin;
 use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\array_map_to_contacts;
@@ -20,9 +22,9 @@ use function Groundhogg\get_default_from_name;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\is_sending;
 use function Groundhogg\is_template_site;
+use function Groundhogg\map_to_class;
 use function Groundhogg\process_events;
 use function Groundhogg\send_email_notification;
-use function Groundhogg\set_user_test_email;
 use function Groundhogg\track_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -511,6 +513,38 @@ class Emails_Api extends Base_Object_Api {
 		$email->enable_test_mode();
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
+	}
+
+	public function read( WP_REST_Request $request ) {
+		$query = $request->get_params();
+
+		if ( $request->has_param( 'remote_templates' ) ) {
+			unset( $query['remote_templates'] );
+		}
+
+		$query = wp_parse_args( $query, [
+			'select'     => '*',
+			'orderby'    => $this->get_primary_key(),
+			'order'      => 'DESC',
+			'limit'      => 25,
+			'found_rows' => true,
+		] );
+
+		$items = $this->get_db_table()->query( $query );
+		$total = $this->get_db_table()->found_rows();
+
+		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
+
+		if ( $request->has_param( 'remote_templates' ) ) {
+			$remote_templates = map_to_class( Plugin::instance()->library->get_email_templates(), Library_Email::class );
+			$items            = array_merge( $items, $remote_templates );
+			$total            = $total + count( $remote_templates );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $total,
+			'items'       => $items
+		] );
 	}
 
 	public function get_db_table_name() {

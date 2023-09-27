@@ -664,7 +664,7 @@
   const getParentBlocks = () => {}
   const isGeneratingHTML = () => State.isGeneratingHTML
   const setIsGeneratingHTML = isGenerating => State.isGeneratingHTML = isGenerating
-  const setEmailData = (data = {}) => {
+  const setEmailData = (data = {}, hasChanges = true) => {
     State.email.data = {
       ...State.email.data,
       ...data,
@@ -675,12 +675,14 @@
       ...data,
     }
 
-    setState({
-      hasChanges: true,
-    })
+    if ( hasChanges ){
+      setState({
+        hasChanges: true,
+      })
+    }
   }
 
-  const setEmailMeta = (meta = {}) => {
+  const setEmailMeta = (meta = {}, hasChanges = true ) => {
     State.email.meta = {
       ...State.email.meta,
       ...meta,
@@ -691,9 +693,11 @@
       ...meta,
     }
 
-    setState({
-      hasChanges: true,
-    })
+    if ( hasChanges ){
+      setState({
+        hasChanges: true,
+      })
+    }
   }
 
   /**
@@ -796,13 +800,13 @@
     setEmailData({
       content,
       plain_text,
-    })
+    }, hasChanges )
 
     setEmailMeta({
       css,
       blocks: true,
       type: 'blocks',
-    })
+    }, hasChanges )
 
     if (hasChanges) {
       updatePreview()
@@ -812,7 +816,9 @@
       morph(BlockInspector())
     }
 
-    History.addChange(getStateCopy())
+    if ( hasChanges ){
+      History.addChange(getStateCopy())
+    }
   }
 
   function extractPlainText (content) {
@@ -1040,6 +1046,10 @@
     value = '',
     ...attributes
   }) => {
+
+    if (!value) {
+      value = ''
+    }
 
     return Div({
       className: 'gh-color-picker',
@@ -3961,13 +3971,13 @@
               },
             }, __('Select a template...')),
             InputGroup([
-              Select({
-                name: 'template-campaign',
-                id: 'template-campaign',
-                options: {
-                  '' : 'Filter by campaign',
-                }
-              }),
+              // Select({
+              //   name: 'template-campaign',
+              //   id: 'template-campaign',
+              //   options: {
+              //     '': 'Filter by campaign',
+              //   },
+              // }),
               Input({
                 type: 'search',
                 name: 'template-search',
@@ -4177,7 +4187,7 @@
           from_user: data.from_user,
           message_type: data.message_type,
           content: data.content,
-          plain_text: data.plain_text,
+          plain_text: data.plain_text || '',
         })
         setEmailMeta({
           ...meta,
@@ -4231,7 +4241,7 @@
     }
 
     // Has templates
-    EmailsStore.fetchItems({ is_template: 1, status: 'ready' }).then(items => {
+    EmailsStore.fetchItems({ is_template: 1, status: 'ready', remote_templates: true }).then(items => {
       setState({
         templates: items,
       })
@@ -6626,29 +6636,14 @@
             blocks = email.meta.blocks
             setEmailMeta({
               blocks: true,
-            })
+            }, false )
           } else {
             blocks = parseBlocksFromContent(email.data.content)
           }
 
           break
         case 'legacy_blocks':
-
-          let elements = htmlToElements(email.data.content)
-
-          // Using for...of
-          for (const node of elements.values()) {
-
-            if (node.nodeType !== Node.ELEMENT_NODE) {
-              continue
-            }
-
-            if (node.classList.contains('row')) {
-              blocks = convertProEditorToBlocks(email.data.content)
-              break
-            }
-          }
-
+          blocks = parseBlocksFromContent(email.data.content)
           break
         case 'legacy_plain':
 
@@ -6830,14 +6825,12 @@
   /**
    * Converts HTML from the legacy block editor to the new block editor
    *
-   * @param oldHtml
+   * @param nodes
    * @return {*[]}
    */
-  const convertProEditorToBlocks = (oldHtml) => {
+  const parseBlocksFromLegacyBlockEditor = (nodes) => {
 
     let blocks = []
-
-    let nodes = htmlToElements(oldHtml)
 
     nodes.forEach(node => {
 
@@ -6916,8 +6909,8 @@
           block = createBlock('button', {
             text: a.innerHTML,
             link: a.href,
+            backgroundColor: button.getAttribute('bgcolor'),
             style: {
-              backgroundColor: button.getAttribute('bgcolor'),
               color: a.style.color,
               fontSize: parseInt(a.style.fontSize),
               fontWeight: a.style.fontWeight,
@@ -6974,12 +6967,28 @@
   const parseBlocksFromContent = content => {
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
-    try {
-      return parseBlocksFromTable(doc.body.firstElementChild)
-    } catch (e) {
-      console.log(e)
-      return []
+
+    const parsers = [
+      doc => parseBlocksFromTable( doc.body.firstElementChild ),
+      doc => parseBlocksFromLegacyBlockEditor( doc.body.childNodes ),
+    ]
+
+    let blocks = []
+
+    for (let parser of parsers) {
+      try {
+        blocks = parser(doc)
+
+        if (blocks && blocks.length) {
+          return blocks
+        }
+
+      } catch (e) {
+        console.log(e)
+      }
     }
+
+    return []
   }
 
   /**
@@ -7076,9 +7085,8 @@
   if (isEmailEditorPage()) {
     window.addEventListener('beforeunload', e => {
 
-      e.preventDefault()
-
       if (getState().hasChanges) {
+        e.preventDefault()
         let msg = __('You have unsaved changes, are you sure you want to leave?')
         e.returnValue = msg
         return msg

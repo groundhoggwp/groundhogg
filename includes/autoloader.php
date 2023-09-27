@@ -70,6 +70,7 @@ class Autoloader {
 		'Submission'                        => 'includes/classes/submission.php',
 		'Reports'                           => 'includes/reporting/reports.php',
 		'Email'                             => 'includes/classes/email.php',
+		'Library_Email'                     => 'includes/classes/library-email.php',
 		'Event'                             => 'includes/classes/event.php',
 		'Event_Queue_Item'                  => 'includes/classes/event-queue-item.php',
 		'Tag'                               => 'includes/classes/tag.php',

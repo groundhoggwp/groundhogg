@@ -6124,6 +6124,27 @@ function array_map_to_class( &$array, $class ) {
 }
 
 /**
+ * Map items in an array to a specific class
+ *
+ * @param $array
+ * @param $class
+ *
+ * @return mixed[]
+ */
+function map_to_class( $array, $class ) {
+	foreach ( $array as &$mixed ) {
+
+		if ( is_a( $mixed, $class ) ) {
+			continue;
+		}
+
+		$mixed = new $class( $mixed );
+	}
+
+	return $array;
+}
+
+/**
  * @param $array
  *
  * @return Contact[]
@@ -6428,7 +6449,6 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 
 	$localized = array_merge( [
 		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
-		'templates'     => Plugin::instance()->library->get_email_templates(),
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
 		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),
