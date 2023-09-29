@@ -229,7 +229,7 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_optin_status( $contact ) {
 		?>
-        <span class="pill sm <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?></span>
+        <span class="pill sm gh-has-tooltip <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?><span class="gh-tooltip right"><?php _e( Plugin::instance()->preferences->get_optin_status_text( $contact ) ) ?></span></span>
 		<?php
 	}
 
