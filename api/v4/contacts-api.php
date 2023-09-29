@@ -479,9 +479,18 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
+		$add_tag_params = [ 'tags', 'add_tags', 'apply_tags' ];
+		$add_tags       = [];
+
+		foreach ( $add_tag_params as $add_tag_param ) {
+			if ( $request->has_param( $add_tag_param ) ) {
+				$add_tags = $request->get_param( $add_tag_param );
+				break;
+			}
+		}
+
 		$data        = $request->get_param( 'data' );
 		$meta        = $request->get_param( 'meta' );
-		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
 		$remove_tags = $request->get_param( 'remove_tags' );
 
 		// get the email address
