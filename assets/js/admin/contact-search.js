@@ -895,18 +895,4 @@
 
   })
 
-  const marketableTooltips = () => {
-    tooltip('.pill.marketable', {
-      content: __('Will receive marketing', 'groundhogg'),
-      position: 'right',
-    })
-
-    tooltip('.pill.unmarketable', {
-      content: __('Will <b>not</b> receive marketing', 'groundhogg'),
-      position: 'right',
-    })
-  }
-
-  $(marketableTooltips)
-
 } )(jQuery)
