@@ -675,14 +675,14 @@
       ...data,
     }
 
-    if ( hasChanges ){
+    if (hasChanges) {
       setState({
         hasChanges: true,
       })
     }
   }
 
-  const setEmailMeta = (meta = {}, hasChanges = true ) => {
+  const setEmailMeta = (meta = {}, hasChanges = true) => {
     State.email.meta = {
       ...State.email.meta,
       ...meta,
@@ -693,7 +693,7 @@
       ...meta,
     }
 
-    if ( hasChanges ){
+    if (hasChanges) {
       setState({
         hasChanges: true,
       })
@@ -800,13 +800,13 @@
     setEmailData({
       content,
       plain_text,
-    }, hasChanges )
+    }, hasChanges)
 
     setEmailMeta({
       css,
       blocks: true,
       type: 'blocks',
-    }, hasChanges )
+    }, hasChanges)
 
     if (hasChanges) {
       updatePreview()
@@ -816,7 +816,7 @@
       morph(BlockInspector())
     }
 
-    if ( hasChanges ){
+    if (hasChanges) {
       History.addChange(getStateCopy())
     }
   }
@@ -5960,6 +5960,8 @@
       'category_rel',
       'thumbnail_size',
       'thumbnail',
+      'include',
+      'exclude',
     ],
     //language=HTML
     svg: `
@@ -5987,6 +5989,10 @@
       category_rel = 'any',
       updateBlock,
       queryId = '',
+      include = [],
+      includedPosts = [],
+      exclude = [],
+      excludedPosts = [],
     }) => {
 
       return Fragment([
@@ -6162,6 +6168,58 @@
             ],
             onChange: category_rel => updateBlock({ category_rel, morphControls: true }),
           })) : null,
+          `<hr/>`,
+          Control({
+            label: 'Include these posts',
+            stacked: true,
+          }, ItemPicker({
+            id: 'post-includes',
+            selected: includedPosts,
+            tags: false,
+            fetchOptions: async (search) => {
+              let posts = await get(`${Groundhogg.api.routes.wp.posts}`, {
+                search,
+                per_page: 20,
+                orderby: 'relevance',
+                order: 'desc',
+              })
+              posts = posts.map(({ id, title }) => ({ id, text: title.rendered }))
+              return posts
+            },
+            onChange: selected => {
+              updateBlock({
+                includedPosts: selected,
+                include: selected.map(opt => opt.id),
+              })
+            },
+          })),
+          `<p>Limit result set to specific IDs.</p>`,
+          `<hr/>`,
+          Control({
+            label: 'Exclude these posts',
+            stacked: true,
+          }, ItemPicker({
+            id: 'post-excludes',
+            selected: excludedPosts,
+            tags: false,
+            fetchOptions: async (search) => {
+              let posts = await get(`${Groundhogg.api.routes.wp.posts}`, {
+                search,
+                per_page: 20,
+                orderby: 'relevance',
+                order: 'desc',
+              })
+              posts = posts.map(({ id, title }) => ({ id, text: title.rendered }))
+              return posts
+            },
+            onChange: selected => {
+              updateBlock({
+                excludedPosts: selected,
+                exclude: selected.map(opt => opt.id),
+              })
+            },
+          })),
+          `<p>Ensure result set excludes specific IDs.</p>`,
           `<hr/>`,
           Control({ label: 'Query ID' }, Input({
             id: 'query-id',
@@ -6636,7 +6694,7 @@
             blocks = email.meta.blocks
             setEmailMeta({
               blocks: true,
-            }, false )
+            }, false)
           } else {
             blocks = parseBlocksFromContent(email.data.content)
           }
@@ -6969,8 +7027,8 @@
     const doc = parser.parseFromString(content, 'text/html')
 
     const parsers = [
-      doc => parseBlocksFromTable( doc.body.firstElementChild ),
-      doc => parseBlocksFromLegacyBlockEditor( doc.body.childNodes ),
+      doc => parseBlocksFromTable(doc.body.firstElementChild),
+      doc => parseBlocksFromLegacyBlockEditor(doc.body.childNodes),
     ]
 
     let blocks = []

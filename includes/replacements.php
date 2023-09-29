@@ -756,7 +756,7 @@ class Replacements implements \JsonSerializable {
 
 				$content = $html_callback( ...$args );
 
-				if ( wp_strip_all_tags( $content ) !== $content ){
+				if ( wp_strip_all_tags( $content ) !== $content ) {
 					return html2markdown( $content );
 				}
 
@@ -1957,6 +1957,8 @@ class Replacements implements \JsonSerializable {
 			'gap'            => 20,
 			'headingStyle'   => [],
 			'excerptStyle'   => [],
+			'include'        => [],
+			'exclude'        => [],
 		] );
 
 		$query_vars = [
@@ -1970,6 +1972,8 @@ class Replacements implements \JsonSerializable {
 			'order'          => $props['order'],
 			'meta_key'       => $props['meta_key'],
 			'meta_value'     => $props['meta_value'],
+			'post__in'       => $props['include'],
+			'post__not_in'   => $props['exclude'],
 		];
 
 		if ( isset_not_empty( $props, 'within' ) ) {
