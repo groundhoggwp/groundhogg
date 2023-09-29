@@ -152,17 +152,17 @@ class Preferences {
 			case self::UNCONFIRMED:
 				if ( $this->is_confirmation_strict() ) {
 					if ( ! $this->is_in_grace_period( $contact->ID ) ) {
-						return _x( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'optin_status', 'groundhogg' );
+						return _x( 'This contact will not receive emails, they are passed the email confirmation grace period.', 'optin_status', 'groundhogg' );
 					}
 				}
 
-				return apply_filters( 'groundhogg/preferences/optin_status_text', _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' ), $contact );
+				return apply_filters( 'groundhogg/preferences/optin_status_text', _x( 'Will receive marketing.', 'optin_status', 'groundhogg' ), $contact );
 				break;
 			case self::CONFIRMED:
-				return _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
+				return _x( 'They will receive marketing.', 'optin_status', 'groundhogg' );
 				break;
 			case self::UNSUBSCRIBED:
-				return _x( 'Unsubscribed. They will not receive marketing.', 'optin_status', 'groundhogg' );
+				return _x( 'They will not receive marketing.', 'optin_status', 'groundhogg' );
 				break;
 			case self::WEEKLY:
 				return _x( 'This contact will only receive marketing weekly.', 'optin_status', 'groundhogg' );
