@@ -8,13 +8,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $email = the_email();
 
+do_action( 'groundhogg/templates/email/preview-text/before' );
+
 if ( $email->get_pre_header() ):
 	?>
 	<div style="display: none; max-height: 0px; overflow: hidden;">
 		<?php echo $email->get_merged_pre_header() ?>
 	</div>
 	<div style="display: none; max-height: 0px; overflow: hidden;">
-		&#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
+		<?php echo str_repeat( '&#847; &zwnj; &nbsp; &#8199; &shy;', 5 ); ?>
 	</div>
 <?php
 endif;
+
+do_action( 'groundhogg/templates/email/preview-text/after' );
