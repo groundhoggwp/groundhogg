@@ -301,7 +301,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 */
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
-		if ( ! $this->is_sent() ) {
+		// Wait until broadcast is fully scheduled before updating status to sent
+		if ( $this->is_scheduled() && ! $this->is_sent() ) {
 			$this->update( [ 'status' => 'sent' ] );
 		}
 
