@@ -5175,7 +5175,7 @@
   registerBlock('button', 'Button', {
     attributes: {
       text: el => el.querySelector('a').innerText,
-      link: el => el.querySelector('a').href,
+      link: el => el.querySelector('a').getAttribute('href'),
       align: el => el.querySelector('td[align]').getAttribute('align'),
       borderStyle: el => parseBorderStyle(el.querySelector('td.email-button').style),
       backgroundColor: el => el.querySelector('td.email-button').getAttribute('bgcolor'),
@@ -5401,7 +5401,7 @@
       height: el => parseInt(el.querySelector('img').height),
       width: el => parseInt(el.querySelector('img').width),
       alt: el => el.querySelector('img').alt,
-      link: el => el.querySelector('a')?.href,
+      link: el => el.querySelector('a')?.getAttribute( 'href' ),
       borderStyle: el => parseBorderStyle(el.querySelector('img').style),
       align: el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
     },
