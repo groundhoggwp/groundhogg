@@ -739,6 +739,10 @@ button.button.save-button {
         &.danger {
           background-color: $error-red !important;
         }
+
+        &.green {
+          background-color: $action-green;
+        }
       }
     }
 

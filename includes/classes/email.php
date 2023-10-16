@@ -457,7 +457,7 @@ class Email extends Base_Object_With_Meta {
 			$subject = sprintf( __( '[TEST] %s' ), $subject );
 		}
 
-		return apply_filters( 'groundhogg/email/subject', $subject );
+		return apply_filters( 'groundhogg/email/subject', $subject, $this, $this->get_contact() );
 	}
 
 	/**

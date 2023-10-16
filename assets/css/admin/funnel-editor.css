@@ -557,6 +557,9 @@ button.button.save-button {
 #step-flow .step .step-labels .step-label.danger {
   background-color: #e91f4f !important;
 }
+#step-flow .step .step-labels .step-label.green {
+  background-color: #9ece38;
+}
 #step-flow .step.step-placeholder {
   justify-content: center;
   padding: 20px;

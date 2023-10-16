@@ -6681,6 +6681,7 @@
     History.clear()
 
     let blocks
+    let page = 'editor'
 
     // existing email not using blocks
     if (email.ID) {
@@ -6763,9 +6764,7 @@
         createBlock('footer'),
       ]
 
-      setState({
-        page: 'templates',
-      })
+      page = 'templates'
     }
 
     if (!email.meta.template) {
@@ -6781,6 +6780,7 @@
     }
 
     setState({
+      page,
       activeBlock: null,
       openPanels: {},
       blockControlsTab: 'block',

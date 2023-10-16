@@ -543,6 +543,10 @@ class Event extends Base_Object {
 	 */
 	public function complete() {
 
+		if ( $this->is_complete() ){
+			return true;
+		}
+
 		do_action( 'groundhogg/event/complete', $this );
 
 		return $this->update( [

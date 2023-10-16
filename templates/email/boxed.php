@@ -5,9 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Email;
-use function Groundhogg\doing_rest;
-use function Groundhogg\get_url_var;
-use function Groundhogg\is_sending;
 use function Groundhogg\the_email;
 
 include_once __DIR__ . '/template-functions.php';
@@ -43,6 +40,8 @@ if ( $bgImage ) {
 	] );
 }
 
+$bodyStyle = array_filter( $bodyStyle );
+
 ?>
 <!doctype html>
 <html>
@@ -66,9 +65,7 @@ if ( $bgImage ) {
 </head>
 <body class="email responsive template-boxed" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
 <?php load_part( 'preview-text' ); ?>
-<table class="alignment-container"
-       style="width: 100%;border-collapse: collapse;background-color: <?php esc_attr_e( $bgColor ); ?>"
-       bgcolor="<?php esc_attr_e( $bgColor ); ?>" cellpadding="0" cellspacing="0" role="presentation">
+<table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
 		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgColor ); ?>"
 		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle )?>">

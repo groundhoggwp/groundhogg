@@ -274,24 +274,57 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Get the next step in the funnel of a specific type
 	 *
-	 * @param $type
+	 * @param string $type
 	 *
-	 * @return Step
+	 * @return Step|false
 	 */
 	public function get_next_of_type( $type = '' ) {
 
-		$items = $this->get_funnel()->get_steps();
+		$steps = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_order', '>', $this->get_order() ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ],
+				[ 'step_type', '=', $type ],
+			],
+			'orderby' => 'step_order',
+			'order'   => 'ASC',
+			'limit'   => 1,
+		] );
 
-		// Order = index + 1, so accessing array at order is actually getting the next step
-		for ( $i = $this->get_order(); $i < count( $items ); $i ++ ) {
-			$next = $items[ $i ];
-
-			if ( $next->get_type() === $type ) {
-				return $next;
-			}
+		if ( empty( $steps ) ) {
+			return false;
 		}
 
-		return $this->get_next_action();
+		return new Step( $steps[0] );
+	}
+
+	/**
+	 * Get the previous step in the funnel of a specific type
+	 *
+	 * @param string $type
+	 *
+	 * @return Step|false
+	 */
+	public function get_prev_of_type( $type = '' ) {
+
+		$steps = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_order', '<', $this->get_order() ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ],
+				[ 'step_type', '=', $type ],
+			],
+			'orderby' => 'step_order',
+			'order'   => 'DESC',
+			'limit'   => 1,
+		] );
+
+		if ( empty( $steps ) ) {
+			return false;
+		}
+
+		return new Step( $steps[0] );
 	}
 
 	/**
@@ -306,6 +339,27 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 				[ 'step_group', '=', self::ACTION ],
 				[ 'step_order', '<', $this->get_order() ],
 				[ 'funnel_id', '=', $this->get_funnel_id() ]
+			],
+			'orderby' => 'step_order',
+			'order'   => 'asc',
+		] );
+
+		return array_map_to_step( $steps );
+	}
+
+	/**
+	 * Returns all the actions that come before this one
+	 *
+	 * @return Step[]
+	 */
+	public function get_preceding_actions_of_type( $type = '' ) {
+		$steps = $this->get_db()->query( [
+			'where'   => [
+				'relationship' => 'AND',
+				[ 'step_group', '=', self::ACTION ],
+				[ 'step_order', '<', $this->get_order() ],
+				[ 'funnel_id', '=', $this->get_funnel_id() ],
+				[ 'step_type', '=', $type ],
 			],
 			'orderby' => 'step_order',
 			'order'   => 'asc',

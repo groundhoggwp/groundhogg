@@ -500,6 +500,10 @@
 
   const ActivityTimeline = {
 
+    hiddenActivity: [
+      'thread_reply'
+    ],
+
     addType (type, opts) {
       this.types[type] = {
         icon: '',
@@ -753,6 +757,10 @@
 				</li>`
         }
 
+        return ''
+      }
+
+      if ( this.hiddenActivity.includes( activity.data.activity_type ) ){
         return ''
       }
 

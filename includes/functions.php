@@ -537,7 +537,7 @@ function ensure_array( $array ) {
  * @return array
  */
 function validate_tags( $maybe_tags ) {
-	return get_db( 'tags' )->validate( $maybe_tags );
+	return parse_tag_list( $maybe_tags, 'ID', current_user_can( 'add_tags' ) );
 }
 
 /**

@@ -190,7 +190,7 @@ class Event_Queue extends Supports_Errors {
 		$events = get_db( 'event_queue' );
 
 		// 5-minute window.
-		$time = time() - ( MINUTE_IN_SECONDS * 5 );
+		$time = time() - MINUTE_IN_SECONDS;
 
 		$wpdb->query( "
 UPDATE {$events->get_table_name()} 

@@ -10,6 +10,7 @@ class Groundhogg_Email_Services {
 	const MARKETING = 'marketing';
 	const WORDPRESS = 'wordpress';
 
+	private static $message_id = '';
 	private static $current_message_type = null;
 	private static $current_email_service = null;
 
@@ -254,6 +255,7 @@ class Groundhogg_Email_Services {
 
 		$callback                    = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
 		self::$current_email_service = $service;
+		self::$message_id            = '';
 
 		add_action( 'wp_mail_failed', [ self::class, 'catch_wp_mail_failed' ] );
 
@@ -287,7 +289,7 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return WP_Error
 	 */
-	public static function get_last_error(){
+	public static function get_last_error() {
 		return self::$last_error;
 	}
 
@@ -296,8 +298,26 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool
 	 */
-	public static function has_error(){
+	public static function has_error() {
 		return is_wp_error( self::$last_error );
+	}
+
+	/**
+	 * Sets a message ID
+	 *
+	 * @param $message_id
+	 */
+	public static function set_message_id( $message_id ) {
+		self::$message_id = $message_id;
+	}
+
+	/**
+	 * Get a message Id
+	 *
+	 * @return null
+	 */
+	public static function get_message_id() {
+		return self::$message_id;
 	}
 
 	/**
