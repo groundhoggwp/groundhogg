@@ -113,9 +113,16 @@ class Send_Email extends Action {
 	 */
 	public function save( $step ) {
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
-		$this->save_setting( 'reply_in_thread', ( bool ) $this->get_posted_data( 'reply_in_thread', false ) );
+
+		$reply_in_thread = $this->get_posted_data( 'reply_in_thread', false );
+		$this->save_setting( 'reply_in_thread', absint( $reply_in_thread ) );
 	}
 
+	/**
+	 * @param Step $step
+	 *
+	 * @return false|string
+	 */
 	public function generate_step_title( $step ) {
 
 		$email = new Email( $this->get_setting( 'email_id' ) );
@@ -158,6 +165,18 @@ class Send_Email extends Action {
 	protected $subject;
 
 	/**
+	 * Whether there are replies for this step
+	 *
+	 * @return bool
+	 */
+	protected function has_replies() {
+		return get_db( 'stepmeta' )->exists( [
+			'meta_key'   => 'reply_in_thread',
+			'meta_value' => $this->get_current_step()->get_id()
+		] );
+	}
+
+	/**
 	 * Process the apply note step...
 	 *
 	 * @param $contact Contact
@@ -176,25 +195,20 @@ class Send_Email extends Action {
 
 		$reply_in_thread = $this->get_setting( 'reply_in_thread' );
 
-		// Either starting a thread, or replying to a thread
+		// replying to a thread
 		if ( $reply_in_thread ) {
 
-			// Get the previous email step in the funnel
-			$prev_email_step = $this->get_current_step()->get_prev_of_type( $this->get_type() );
-
-			// If the previous email in the funnel is part of the thread
-			$prev_is_thread = $prev_email_step && $prev_email_step->get_meta( 'reply_in_thread' );
+			$reply_to_step = new Step( $reply_in_thread );
 
 			// If the previous email is part of the thread
-			if ( $prev_is_thread ) {
+			if ( $reply_to_step->exists() && $reply_to_step->is_before( $this->get_current_step() ) ) {
 
 				// Check for thread activity
 				$thread_replies = get_db( 'activity' )->query( [
 					'activity_type' => 'thread_reply',
 					'funnel_id'     => $event->get_funnel_id(),
 					'contact_id'    => $contact->get_id(),
-					// Can only thread in sequence, no skipping
-					'step_id'       => $prev_email_step->get_id(),
+					'step_id'       => $reply_to_step->get_id(),
 					'orderby'       => 'ID',
 					'order'         => 'DESC',
 					'limit'         => 1
@@ -216,21 +230,18 @@ class Send_Email extends Action {
 			}
 		}
 
-		$sent = $email->send( $contact, $event );
+		$sent    = $email->send( $contact, $event );
+		$subject = $email->get_merged_subject_line();
 
-		if ( $reply_in_thread ) {
+		if ( $reply_in_thread && isset( $last_thread_reply ) ) {
+			$subject          = $this->subject;
+			$this->message_id = '';
+			$this->subject    = '';
+			remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
+			remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
+		}
 
-			if ( isset( $last_thread_reply ) ) {
-
-				$subject = $this->subject;
-
-				$this->message_id = '';
-				$this->subject    = '';
-				remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
-				remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
-			} else {
-				$subject = $email->get_merged_subject_line();
-			}
+		if ( $this->has_replies() ) {
 
 			$message_id = \Groundhogg_Email_Services::get_message_id();
 
@@ -259,11 +270,18 @@ class Send_Email extends Action {
 		$email            = new Email( $this->get_setting( 'email_id' ) );
 		$has_confirmation = $email->exists() && $email->is_confirmation_email();
 
-		$prev_email_step = $step->get_prev_of_type( 'send_email' );
-		$prev_is_reply   = false;
+		$prev_emails        = $step->get_preceding_actions_of_type( 'send_email' );
+		$prev_email_options = [];
 
-		if ( $prev_email_step ) {
-			$prev_is_reply = $prev_email_step->get_meta( 'reply_in_thread' );
+		foreach ( $prev_emails as $email_option ) {
+
+			$email = new Email( $email_option->get_meta( 'email_id' ) );
+
+			if ( ! $email->exists() ) {
+				continue;
+			}
+
+			$prev_email_options[ $email_option->get_id() ] = sprintf( 'Reply to "%s"', $email->get_title() );
 		}
 
 		?>
@@ -272,10 +290,12 @@ class Send_Email extends Action {
 				<h2><?php _e( 'Email Settings' ) ?></h2>
 			</div>
 			<div class="inside display-flex column gap-10">
-				<?php echo html()->checkbox( [
-					'label'   => $prev_is_reply ? __( 'Send as reply to the previous email', 'groundhogg' ) : __( 'Start an email thread', 'groundhogg' ),
-					'name'    => $this->setting_name_prefix( 'reply_in_thread' ),
-					'checked' => $this->get_setting( 'reply_in_thread' ),
+				<label for=""><?php _e( 'Email threading' ) ?></label>
+				<?php echo html()->dropdown( [
+					'name'        => $this->setting_name_prefix( 'reply_in_thread' ),
+					'option_none' => 'No threading',
+					'options'     => $prev_email_options,
+					'selected'    => $this->get_setting( 'reply_in_thread' ),
 				] ); ?>
 				<?php if ( $has_confirmation ): ?>
 					<?php echo html()->checkbox( [
@@ -291,8 +311,8 @@ class Send_Email extends Action {
 
 	protected function labels() {
 
-		if ( $this->get_setting( 'reply_in_thread' ) ): ?>
-			<div class="step-label green"><?php _e( 'Thread', 'groundhogg' ); ?></div>
+		if ( $this->get_setting( 'reply_in_thread' ) ):?>
+			<div class="step-label green"><?php _e( 'Reply', 'groundhogg' ); ?></div>
 		<?php
 		endif;
 	}
@@ -378,5 +398,34 @@ class Send_Email extends Action {
 		$args['email'] = $email;
 
 		return $args;
+	}
+
+	/**
+	 * We have to fix email threading
+	 *
+	 * @param Step $step
+	 */
+	public function post_import( $step ) {
+
+		// This will be the donor step ID
+		$reply_to = $step->get_meta( 'reply_in_thread' );
+
+		// Not threading...
+		if ( ! $reply_to ){
+			return;
+		}
+
+		// Get the new ID
+		$meta = get_db( 'stepmeta' )->query( [
+			'meta_key'   => 'imported_step_id',
+			'meta_value' => $reply_to,
+			'limit'      => 1,
+			'orderby'    => 'step_id',
+			'order'      => 'desc'
+		] );
+
+		$step_id = $meta[0]->step_id;
+
+		$step->update_meta( 'reply_in_thread', $step_id );
 	}
 }

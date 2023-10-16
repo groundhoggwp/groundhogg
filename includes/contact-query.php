@@ -492,10 +492,6 @@ class Contact_Query {
 
 				if ( ! empty( $this->query_vars['tags_include_needs_all'] ) ) {
 
-					if ( ! is_array( $this->query_vars['tags_include'] ) ) {
-						$this->query_vars['tags_include'] = explode( ',', $this->query_vars['tags_include'] );
-					}
-
 					foreach ( $this->query_vars['tags_include'] as $tag ) {
 						$backup_query[] = [
 							'tags'     => $tag,
@@ -516,10 +512,6 @@ class Contact_Query {
 			if ( ! empty( $this->query_vars['tags_exclude'] ) ) {
 
 				if ( ! empty( $this->query_vars['tags_exclude_needs_all'] ) ) {
-
-					if ( ! is_array( $this->query_vars['tags_exclude'] ) ) {
-						$this->query_vars['tags_exclude'] = explode( ',', $this->query_vars['tags_exclude'] );
-					}
 
 					foreach ( $this->query_vars['tags_exclude'] as $tag ) {
 						$backup_query[] = [
