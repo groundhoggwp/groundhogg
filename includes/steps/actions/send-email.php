@@ -144,8 +144,8 @@ class Send_Email extends Action {
 	public function set_thread_headers( $headers ) {
 		$message_id = sprintf( '<%s>', $this->message_id );
 
-		$headers['in-reply-to'] = $message_id;
-		$headers['references']  = $message_id;
+		$headers['in-reply-to'] = 'In-Reply-To: ' . $message_id;
+		$headers['references']  = 'References: ' . $message_id;
 
 		return $headers;
 	}
@@ -283,6 +283,8 @@ class Send_Email extends Action {
 
 			$prev_email_options[ $email_option->get_id() ] = sprintf( 'Reply to "%s"', $email->get_title() );
 		}
+
+		$prev_email_options = array_reverse( $prev_email_options, true );
 
 		?>
 		<div class="gh-panel">
