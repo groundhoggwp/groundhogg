@@ -1708,6 +1708,7 @@ class Replacements implements \JsonSerializable {
 			'order'          => $props['order'],
 			'meta_key'       => $props['meta_key'],
 			'meta_value'     => $props['meta_value'],
+			'no_found_rows'  => true,
 		];
 
 		if ( isset_not_empty( $props, 'within' ) ) {
@@ -1974,6 +1975,7 @@ class Replacements implements \JsonSerializable {
 			'meta_value'     => $props['meta_value'],
 			'post__in'       => $props['include'],
 			'post__not_in'   => $props['exclude'],
+			'no_found_rows'  => true,
 		];
 
 		if ( isset_not_empty( $props, 'within' ) ) {

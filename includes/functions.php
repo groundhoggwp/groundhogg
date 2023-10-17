@@ -7896,6 +7896,11 @@ function get_json_regex() {
  * @credit https://gist.github.com/gaffling/94eca5d545b1781a2ea34324b1cf7a6c
  */
 function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
+
+	if ( empty( $string ) ){
+		return '';
+	}
+
 	// INI
 	$markdown = $string;
 	// USE ONLY THE BODY OF A WEBPAGE
