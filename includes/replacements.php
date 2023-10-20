@@ -742,9 +742,9 @@ class Replacements implements \JsonSerializable {
 			cache_get_last_changed( 'replacements' )
 		] );
 
-		$cache_value = wp_cache_get( $cache_key, 'replacements' );
+		$cache_value = wp_cache_get( $cache_key, 'replacements', false, $found );
 
-		if ( $cache_value ) {
+		if ( $found ) {
 			return $cache_value;
 		}
 
