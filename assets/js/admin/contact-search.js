@@ -725,28 +725,22 @@
               break
             case 'broadcast':
 
-              const { close: closeModal } = modal({
+              modal({
                 content: `<h2>${ __('Send a broadcast',
                   'groundhogg') }</h2><div id="gh-broadcast-form" style="width: 400px"></div>`,
+                onOpen: () => {
+                  document.getElementById('gh-broadcast-form').append(Groundhogg.BroadcastScheduler({
+                    totalContacts,
+                    searchMethod: 'selection',
+                    selection: query
+                  }))
+                }
               })
 
-              Groundhogg.SendBroadcast('#gh-broadcast-form', {
-                query: {
-                  ...query
-                },
-                total_contacts: totalContacts,
-                which: 'from_table',
-
-              }, {
-                onScheduled: () => {
-                  closeModal()
-                },
-              })
 
               break
             case 'delete':
 
-              let number = 100
               let deleted = 0
 
               const deleteContacts = (onDelete, onComplete) => {

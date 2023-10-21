@@ -577,7 +577,7 @@
   }
 
   const getQuery = () => {
-    const query = {}
+    let query = {}
 
     const {
       searchMethod = 'filters',
@@ -585,6 +585,7 @@
       exclude_filters = [],
       savedSearch = '',
       email,
+      selection
     } = getState()
 
     switch (searchMethod) {
@@ -600,6 +601,11 @@
       case 'all-my-contacts':
         query.owner_id = Groundhogg.currentUser.ID
         break
+      case 'selection':
+        query = {
+          ...selection
+        }
+          break
       case 'search':
       default:
         query.saved_search = savedSearch
@@ -892,7 +898,12 @@
           { id: 'all-contacts', text: __('All contacts.', 'groundhogg') },
           { id: 'all-my-contacts', text: __('All contacts assigned to me.', 'groundhogg') },
           { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
+          { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
         ]
+
+        if ( getState().searchMethod === 'selection' ){
+          otherSearchMethods.push( { id: 'selection', text: sprintf( __( 'Selected %s contacts', 'groundhogg' ), formatNumber( getState().totalContacts ) ) } )
+        }
 
         return Fragment([
 
@@ -1093,15 +1104,7 @@
     },
   }
 
-  const BroadcastScheduler = (props = {}) => {
-
-    let { email = null } = props
-
-    if ( email ){
-      setState({
-        email
-      }, false )
-    }
+  const BroadcastScheduler = () => {
 
     return Div({
       id: 'broadcast-scheduler',
@@ -1141,6 +1144,10 @@
     ])
   }
 
-  Groundhogg.BroadcastScheduler = BroadcastScheduler
+  Groundhogg.BroadcastScheduler = ( initialState ) => {
+    setState( initialState )
+
+    return BroadcastScheduler()
+  }
 
 })(jQuery)
