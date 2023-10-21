@@ -326,6 +326,7 @@ function more_allowed_css( $attr ) {
 	$attr[] = '-ms-interpolation-mode';
 	$attr[] = 'outline';
 	$attr[] = 'table-layout';
+	$attr[] = 'background-repeat';
 
 	return $attr;
 }
