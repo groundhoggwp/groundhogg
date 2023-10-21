@@ -69,8 +69,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 
@@ -324,17 +324,16 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$link = admin_page_url( 'gh_contacts', [
 			'report' => [
-				'type' => Event::BROADCAST,
-				'step' => $broadcast->get_id(),
+				'type'   => Event::BROADCAST,
+				'step'   => $broadcast->get_id(),
+				'status' => Event::WAITING
 			]
 		] );
 
-		$link = sprintf( "<a href='%s'>%s</a>",
+		return sprintf( "<a href='%s'>%s</a>",
 			$link,
 			number_format_i18n( $num )
 		);
-
-		return $link;
 	}
 
 	/**
