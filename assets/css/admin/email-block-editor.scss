@@ -1046,13 +1046,13 @@ body {
 
 @media only screen and (max-width: 960px) {
   .auto-fold #email-editor {
-    left: 36px;
+    left: 36px !important;
   }
 
 }
 
 .folded #email-editor {
-  left: 36px;
+  left: 36px !important;
 }
 
 .cards .post-card img {
@@ -1306,6 +1306,28 @@ body {
       font-size: 13px;
       width: 13px;
       height: 13px;
+    }
+  }
+}
+
+.preview {
+  &.mobile,
+  &.desktop {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .from-preview {
+    padding: 20px;
+    position: relative;
+
+    h2 {
+      margin: 0 0 10px 0;
+    }
+
+    .from-email {
+      opacity: 0.7;
     }
   }
 }

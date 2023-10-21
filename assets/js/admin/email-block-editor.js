@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const {
     Div,
@@ -125,22 +125,22 @@
     let type = BlockRegistry.get(block.type)
 
     return Button({
-      id: `inspector-${block.id}`,
+      id: `inspector-${ block.id }`,
       dataId: block.id,
-      className: `inspector-block ${isActiveBlock(block.id) ? 'active' : ''}`,
+      className: `inspector-block ${ isActiveBlock(block.id) ? 'active' : '' }`,
       style: {
-        paddingLeft: `${12 * depth}px`,
+        paddingLeft: `${ 12 * depth }px`,
       },
       onClick: e => {
         setActiveBlock(block.id)
-        document.getElementById(`edit-${block.id}`).scrollIntoView(true)
+        document.getElementById(`edit-${ block.id }`).scrollIntoView(true)
         morph(BlockInspector())
       },
       onMouseenter: e => {
-        document.getElementById(`edit-${block.id}`).classList.add('inspector-hover')
+        document.getElementById(`edit-${ block.id }`).classList.add('inspector-hover')
       },
       onMouseleave: e => {
-        document.getElementById(`edit-${block.id}`).classList.remove('inspector-hover')
+        document.getElementById(`edit-${ block.id }`).classList.remove('inspector-hover')
       },
     }, [type.svg, type.name])
 
@@ -161,7 +161,7 @@
         let $sortable = $(e.target)
 
         // No longer in this sortable
-        if (!$sortable.has(`#inspector-${blockId}, #inspector-${blockId}-columns`).length) {
+        if (!$sortable.has(`#inspector-${ blockId }, #inspector-${ blockId }-columns`).length) {
           return
         }
 
@@ -198,7 +198,7 @@
     Div({
       className: 'column-header',
       style: {
-        paddingLeft: `${12 * depth}px`,
+        paddingLeft: `${ 12 * depth }px`,
       },
     }, 'Column'),
     Div({
@@ -214,13 +214,13 @@
 
     if (block.type === 'columns' && block.columns && Array.isArray(block.columns)) {
       return Div({
-        id: `inspector-${block.id}-columns`,
+        id: `inspector-${ block.id }-columns`,
         className: 'inspector-columns',
         dataId: block.id,
       }, [
         InspectorBlock(block, depth),
         ...block.columns.filter(blocks => blocks.length > 0).
-        map(blocks => InspectorColumn(block.id, blocks, depth + 1)),
+          map(blocks => InspectorColumn(block.id, blocks, depth + 1)),
       ])
     }
 
@@ -261,7 +261,7 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundImage = `url(${ backgroundImage })`
           style.backgroundSize = backgroundSize
           style.backgroundRepeat = backgroundRepeat
           style.backgroundPosition = backgroundPosition
@@ -271,9 +271,9 @@
           className: 'template-bg',
           style,
         }, Div({
-          className: `template-boxed ${alignment}`,
+          className: `template-boxed ${ alignment }`,
           style: {
-            maxWidth: `${width || 640}px`,
+            maxWidth: `${ width || 640 }px`,
           },
         }, blocks))
       },
@@ -295,7 +295,7 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundImage = `url(${ backgroundImage })`
           style.backgroundSize = backgroundSize
           style.backgroundRepeat = backgroundRepeat
           style.backgroundPosition = backgroundPosition
@@ -324,7 +324,7 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${backgroundImage})`
+          style.backgroundImage = `url(${ backgroundImage })`
           style.backgroundSize = backgroundSize
           style.backgroundRepeat = backgroundRepeat
           style.backgroundPosition = backgroundPosition
@@ -529,7 +529,7 @@
         })
 
         if (isEmailEditorPage()) {
-          window.history.pushState({}, `${email.data.title} &lsaquo; ${__('Edit')}`,
+          window.history.pushState({}, `${ email.data.title } &lsaquo; ${ __('Edit') }`,
             adminPageURL('gh_emails', {
               action: 'edit',
               email: email.ID,
@@ -598,12 +598,15 @@
 
       if (!this.controller) {
         reset()
-      } else {
+      }
+      else {
         this.controller.abort()
         reset()
       }
 
-      let endpoint = getEmail().ID ? `${EmailsStore.route}/${getEmail().ID}/preview` : `${EmailsStore.route}/preview`
+      let endpoint = getEmail().ID
+        ? `${ EmailsStore.route }/${ getEmail().ID }/preview`
+        : `${ EmailsStore.route }/preview`
 
       return post(endpoint, {
         data: getEmailData(),
@@ -843,20 +846,21 @@
       }
 
       return node.textContent
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
+    }
+    else if (node.nodeType === Node.ELEMENT_NODE) {
       const tagName = node.tagName.toLowerCase()
 
       let text = ''
       let index = Array.from(node.parentNode.childNodes).
-      filter(node => node.nodeType === Node.ELEMENT_NODE).
-      indexOf(node)
+        filter(node => node.nodeType === Node.ELEMENT_NODE).
+        indexOf(node)
 
       for (const childNode of node.childNodes) {
         text += __extractPlainText(childNode)
       }
 
       if (tagName === 'a') {
-        return `[${text}](${node.getAttribute('href')})`
+        return `[${ text }](${ node.getAttribute('href') })`
       }
 
       if (tagName === 'br') {
@@ -864,20 +868,20 @@
       }
 
       if (tagName === 'img') {
-        return `![${node.alt || 'image'}](${node.src})`
+        return `![${ node.alt || 'image' }](${ node.src })`
       }
 
       if (tagName === 'li') {
 
         if (node.parentNode.tagName.toLowerCase() === 'ol') {
-          return `\n${index + 1}. ${text}`
+          return `\n${ index + 1 }. ${ text }`
         }
 
-        return `\n- ${text}`
+        return `\n- ${ text }`
       }
 
       if (['del', 'strike'].includes(tagName)) {
-        return `~~${text}~~`
+        return `~~${ text }~~`
       }
 
       if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
@@ -885,15 +889,15 @@
         if (headingPrefix) {
           headingPrefix += ' '
         }
-        return `${index > 0 ? '\n\n' : '\n'}${headingPrefix}${text}`
+        return `${ index > 0 ? '\n\n' : '\n' }${ headingPrefix }${ text }`
       }
 
       if (tagName === 'b' || tagName === 'strong') {
-        return `**${text}**`
+        return `**${ text }**`
       }
 
       if (tagName === 'i' || tagName === 'em') {
-        return `*${text}*`
+        return `*${ text }*`
       }
 
       if (tagName === 'hr') {
@@ -901,11 +905,11 @@
       }
 
       if (tagName === 'code') {
-        return `\`${text}\``
+        return `\`${ text }\``
       }
 
       if (['ul', 'ol'].includes(tagName) && index > 0) {
-        return `\n${text}`
+        return `\n${ text }`
       }
 
       return text
@@ -919,16 +923,16 @@
     className: 'gh-input-group number-control',
   }, [
     Button({
-      id: `minus-${id}`,
+      id: `minus-${ id }`,
       className: 'gh-button grey small',
       onClick: e => {
-        let input = document.getElementById(`input-${id}`)
+        let input = document.getElementById(`input-${ id }`)
         input.stepDown()
         input.dispatchEvent(new Event('input'))
       },
     }, Dashicon('minus')),
     Input({
-      id: `input-${id}`,
+      id: `input-${ id }`,
       type: `number`,
       value,
       step,
@@ -940,10 +944,10 @@
       className: 'unit',
     }, unit) : null,
     Button({
-      id: `add-${id}`,
+      id: `add-${ id }`,
       className: 'gh-button grey small',
       onClick: e => {
-        let input = document.getElementById(`input-${id}`)
+        let input = document.getElementById(`input-${ id }`)
         input.stepUp()
         input.dispatchEvent(new Event('input'))
       },
@@ -971,7 +975,8 @@
           bottom: val,
           left: val,
         }
-      } else {
+      }
+      else {
         values = {
           ...values,
           [which]: val,
@@ -992,7 +997,7 @@
     }, [
       Input({
         type: 'number',
-        id: `${id}-top`,
+        id: `${ id }-top`,
         name: 'top',
         value: values.top,
         className: `design-attr full-width`,
@@ -1002,7 +1007,7 @@
       }),
       Input({
         type: 'number',
-        id: `${id}-right`,
+        id: `${ id }-right`,
         name: 'right',
         value: values.right,
         className: `design-attr full-width`,
@@ -1012,7 +1017,7 @@
       }),
       Input({
         type: 'number',
-        id: `${id}-bottom`,
+        id: `${ id }-bottom`,
         name: 'bottom',
         value: values.bottom,
         className: `design-attr full-width`,
@@ -1022,7 +1027,7 @@
       }),
       Input({
         type: 'number',
-        id: `${id}-left`,
+        id: `${ id }-left`,
         name: 'left',
         value: values.left,
         className: `design-attr full-width`,
@@ -1031,8 +1036,8 @@
         onInput: e => setValue('left', e.target.value),
       }),
       Button({
-        id: `${id}-link-toggle`,
-        className: `gh-button ${values.linked ? 'primary' : 'secondary'} icon small`,
+        id: `${ id }-link-toggle`,
+        className: `gh-button ${ values.linked ? 'primary' : 'secondary' } icon small`,
         value: values.linked ? 'linked' : 'not-linked',
         dataLinked: values.linked,
         onClick: e => toggleLinked(),
@@ -1056,21 +1061,21 @@
       id,
     }, [
       Div({
-        id: `${id}-current`,
+        id: `${ id }-current`,
         className: 'current-color',
         style: {
           backgroundColor: value,
         },
       }),
       Button({
-        id: `${id}-open-picker-${value.substr(1)}`,
+        id: `${ id }-open-picker-${ value.substr(1) }`,
         className: 'gh-button secondary small',
         onClick: e => {
 
           MiniModal({
-            selector: `#${id}`,
+            selector: `#${ id }`,
             onOpen: () => {
-              let $picker = $(`#${id}-picker`)
+              let $picker = $(`#${ id }-picker`)
 
               $picker.iris({
                 hide: false,
@@ -1078,7 +1083,7 @@
                 color: value,
                 palettes: colorPalette,
                 change: (e, ui) => {
-                  document.getElementById(`${id}-current`).style.backgroundColor = ui.color.toString()
+                  document.getElementById(`${ id }-current`).style.backgroundColor = ui.color.toString()
                   onChange(ui.color.toString())
                 },
               })
@@ -1088,7 +1093,7 @@
           }, [
             Input({
               type: 'text',
-              id: `${id}-picker`,
+              id: `${ id }-picker`,
               className: 'full-width code',
               style: {
                 marginBottom: '10px',
@@ -1096,14 +1101,14 @@
               value,
             }),
             Button({
-              id: `${id}-clear`,
+              id: `${ id }-clear`,
               className: 'gh-button secondary small clear-color',
               onClick: e => {
                 onChange('')
-                let $picker = $(`#${id}-picker`)
+                let $picker = $(`#${ id }-picker`)
                 $picker.val('')
                 $picker.iris('color', '')
-                document.getElementById(`${id}-current`).style.backgroundColor = ''
+                document.getElementById(`${ id }-current`).style.backgroundColor = ''
               },
             }, 'Clear'),
           ]))
@@ -1128,7 +1133,7 @@
       }, InputGroup([
         Input({
           type: 'text',
-          id: `${id}-src`,
+          id: `${ id }-src`,
           value: src,
           className: 'control full-width',
           name: 'src',
@@ -1139,7 +1144,7 @@
           },
         }),
         Button({
-          id: `${id}-select`,
+          id: `${ id }-select`,
           className: 'gh-button secondary icon',
           onClick: e => {
 
@@ -1187,7 +1192,7 @@
       supports.width ? Control({
         label: 'Width',
       }, NumberControl({
-        id: `${id}-width`,
+        id: `${ id }-width`,
         className: 'control-input',
         max: maxWidth,
         value: width,
@@ -1202,7 +1207,7 @@
       supports.alt ? Control({
         label: 'Alt Text',
       }, Input({
-        id: `${id}-alt`,
+        id: `${ id }-alt`,
         className: 'input',
         value: alt,
         onChange: e => {
@@ -1230,7 +1235,7 @@
       }, InputGroup([
         Input({
           type: 'text',
-          id: `${id}-src`,
+          id: `${ id }-src`,
           value: backgroundImage,
           className: 'control full-width',
           name: 'src',
@@ -1241,7 +1246,7 @@
           },
         }),
         Button({
-          id: `${id}-select`,
+          id: `${ id }-select`,
           className: 'gh-button secondary icon',
           onClick: e => {
 
@@ -1280,7 +1285,7 @@
       Control({
         label: 'Position',
       }, Select({
-        id: `${id}-position`,
+        id: `${ id }-position`,
         options: {
           'center center': 'Center Center',
           'center left': 'Center Left',
@@ -1302,7 +1307,7 @@
       Control({
         label: 'Repeat',
       }, Select({
-        id: `${id}-repeat`,
+        id: `${ id }-repeat`,
         options: {
           '': 'Default',
           'no-repeat': 'No Repeat',
@@ -1320,7 +1325,7 @@
       Control({
         label: 'Size',
       }, Select({
-        id: `${id}-size`,
+        id: `${ id }-size`,
         options: {
           '': 'Default',
           'auto': 'Auto',
@@ -1347,7 +1352,7 @@
 
     return ButtonToggle({
       id,
-      options: directions.map(direction => ({ id: direction, text: Dashicon(`editor-align${direction}`) })),
+      options: directions.map(direction => ( { id: direction, text: Dashicon(`editor-align${ direction }`) } )),
       selected: alignment,
       onChange,
     })
@@ -1415,7 +1420,7 @@
   const extract4 = ({ top = 0, right = 0, bottom = 0, left = 0 }) => {
     const usePixel = num => {
       num = isNaN(parseInt(num)) ? 0 : parseInt(num)
-      return num !== 0 ? `${num}px` : num
+      return num !== 0 ? `${ num }px` : num
     }
     return [
       top,
@@ -1470,13 +1475,14 @@
    * Given a CSS declaration, extract the border style into usable fragments
    *
    * @param style
-   * @return {{borderColor: string, borderRadius: {top: string, left: string, bottom: string, right: string}, borderWidth: {top: string, left: string, bottom: string, right: string}, borderStyle: string}}
+   * @return {{borderColor: string, borderRadius: {top: string, left: string, bottom: string, right: string},
+   *   borderWidth: {top: string, left: string, bottom: string, right: string}, borderStyle: string}}
    */
-  const parseBorderStyle = style => ({
+  const parseBorderStyle = style => ( {
     borderStyle: style.getPropertyValue('border-style'),
     borderColor: style.getPropertyValue('border-color'),
     borderWidth: parse4FromStyle('border-%s-width', style),
-    borderRadius: (style => {
+    borderRadius: ( style => {
       let value = {
         top: parseInt(style.getPropertyValue('border-top-left-radius')),
         right: parseInt(style.getPropertyValue('border-top-right-radius')),
@@ -1487,16 +1493,17 @@
       value.linked = Object.values(value).every(v => v === value.top)
 
       return value
-    })(style),
-  })
+    } )(style),
+  } )
 
   /**
    * Extract style given CSS declaration
    *
    * @param style
-   * @return {{fontFamily: string, color: string, lineHeight: string, fontSize: number, fontStyle: string, fontWeight: string, textTransform: string}}
+   * @return {{fontFamily: string, color: string, lineHeight: string, fontSize: number, fontStyle: string, fontWeight:
+   *   string, textTransform: string}}
    */
-  const parseFontStyle = style => ({
+  const parseFontStyle = style => ( {
     color: style.getPropertyValue('color'),
     fontFamily: removeQuotes(style.getPropertyValue('font-family')),
     lineHeight: style.getPropertyValue('line-height'),
@@ -1504,7 +1511,7 @@
     fontStyle: style.getPropertyValue('font-style'),
     fontSize: parseInt(style.getPropertyValue('font-size')),
     textTransform: style.getPropertyValue('text-transform'),
-  })
+  } )
 
   const AdvancedStyleControls = {
     getInlineStyle: block => {
@@ -1546,7 +1553,7 @@
       }
 
       if (backgroundImage) {
-        style.backgroundImage = `url(${backgroundImage})`
+        style.backgroundImage = `url(${ backgroundImage })`
         style.backgroundSize = backgroundSize
         style.backgroundRepeat = backgroundRepeat
         style.backgroundPosition = backgroundPosition
@@ -1559,7 +1566,7 @@
       const attributeMap = {
         width: (style, el) => {
 
-          let innerWidthTd = el.querySelector(`td#${el.id}-inner`)
+          let innerWidthTd = el.querySelector(`td#${ el.id }-inner`)
           if (innerWidthTd) {
             return parseInt(innerWidthTd.getAttribute('width'))
           }
@@ -1581,6 +1588,7 @@
         if (value) {
           style[attribute] = value
         }
+        console.log( { attribute, value } )
       }
 
       style = {
@@ -1602,8 +1610,8 @@
 
       //language=CSS
       return `
-          ${selector} {
-              ${objectToStyle(AdvancedStyleControls.getInlineStyle(block))}
+          ${ selector } {
+              ${ objectToStyle(AdvancedStyleControls.getInlineStyle(block)) }
           }
       `
     },
@@ -1727,14 +1735,15 @@
         css.push(this.get(block.type).css({
           ...this.defaults(block),
           ...block,
-          selector: `#b-${block.id}`,
+          selector: `#b-${ block.id }`,
         }))
-      } catch (e) {
+      }
+      catch (e) {
         // console.log(e)
       }
 
       if (block.css) {
-        css.push(block.css.replaceAll(/selector/g, `#b-${block.id}`))
+        css.push(block.css.replaceAll(/selector/g, `#b-${ block.id }`))
       }
 
       return css.filter(css => css && css.length > 0).join('\n')
@@ -1801,7 +1810,7 @@
     }
   }
 
-  const createCache = () => ({
+  const createCache = () => ( {
     cache: {},
     has (key) {
       return this.cache.hasOwnProperty(key)
@@ -1812,7 +1821,7 @@
     set (key, value) {
       this.cache[key] = value
     },
-  })
+  } )
 
   const dynamicContentCache = createCache()
   const attributesCache = createCache()
@@ -1875,7 +1884,8 @@
       }
 
       timeout = setTimeout(async () => {
-        let { content = '' } = await get(`${EmailsStore.route}/blocks/${block.type}?props=${base64_json_encode(block)}`)
+        let { content = '' } = await get(
+          `${ EmailsStore.route }/blocks/${ block.type }?props=${ base64_json_encode(block) }`)
         content = parseContent(content, block)
         dynamicContentCache.set(generateCacheKey(block), content)
         prevContent = content
@@ -1899,7 +1909,7 @@
       }
 
       return Div({
-        id: `dynamic-content-${block.id}`,
+        id: `dynamic-content-${ block.id }`,
         onCreate: el => {
           fetchDynamicContent(block)
         },
@@ -1945,8 +1955,8 @@
      * @return {`[${string}:${string}:dynamicContent ${string}]`}
      * @constructor
      */
-    const DynamicContentString = (block) => `[${block.type}:${block.id}:dynamicContent ${JSON.stringify(
-      extractAttributes(block))}/]`
+    const DynamicContentString = (block) => `[${ block.type }:${ block.id }:dynamicContent ${ JSON.stringify(
+      extractAttributes(block)) }/]`
 
     registerBlock(type, name, {
       ...block,
@@ -1971,7 +1981,8 @@
 
       if (control.id) {
         labelProps.for = control.id
-      } else {
+      }
+      else {
         let inputElement = control.querySelector('select, input, textarea')
 
         if (inputElement && inputElement.id) {
@@ -2000,31 +2011,32 @@
     let panelId = id ? id : name.toLowerCase().replaceAll(' ', '-')
 
     if (hasActiveBlock()) {
-      panel = `${getActiveBlock().type}-${getBlockControlsTab()}-${panelId}`
+      panel = `${ getActiveBlock().type }-${ getBlockControlsTab() }-${ panelId }`
 
       // Check to see if the block has no open panels
       if (!Object.keys(getState().openPanels).
-      some(panelId => panelId.startsWith(`${getActiveBlock().type}-${getBlockControlsTab()}`) &&
-        State.openPanels[panelId])) {
+        some(panelId => panelId.startsWith(`${ getActiveBlock().type }-${ getBlockControlsTab() }`) &&
+          State.openPanels[panelId])) {
         // Open this one by default
         openPanel(panel)
       }
 
-    } else {
+    }
+    else {
 
-      panel = `email-${getEmailControlsTab()}-${panelId}`
+      panel = `email-${ getEmailControlsTab() }-${ panelId }`
 
       // Check to see if the block has no open panels
       if (!Object.keys(getState().openPanels).
-      some(panelId => panelId.startsWith(`email-${getEmailControlsTab()}`) &&
-        State.openPanels[panelId])) {
+        some(panelId => panelId.startsWith(`email-${ getEmailControlsTab() }`) &&
+          State.openPanels[panelId])) {
         // Open this one by default
         openPanel(panel)
       }
     }
 
     return Div({
-      className: `gh-panel control-group ${isPanelOpen(panel) || !closable ? 'open' : 'closed'}`,
+      className: `gh-panel control-group ${ isPanelOpen(panel) || !closable ? 'open' : 'closed' }`,
       dataFor: getActiveBlock().id,
       id: panel,
     }, [
@@ -2037,7 +2049,7 @@
           }
         },
       }, [
-        `<h2>${name}</h2>`,
+        `<h2>${ name }</h2>`,
         closable ? Button({
           className: 'toggle-indicator',
         }) : null,
@@ -2075,14 +2087,14 @@
       }, [
         Button({
           className: 'gh-button primary small icon duplicate-block',
-          id: `duplicate-${block.id}`,
+          id: `duplicate-${ block.id }`,
           onClick: e => {
             duplicateBlock(block.id)
           },
         }, [Dashicon('admin-page'), ToolTip('Duplicate')]),
         Button({
           className: 'gh-button primary small delete-block',
-          id: `delete-${block.id}`,
+          id: `delete-${ block.id }`,
           onClick: e => {
             deleteBlock(block.id)
           },
@@ -2105,8 +2117,8 @@
     })
   }
 
-  const BlockStartComment = block => `<!-- ${block.type}:${block.id} ${blockCommentProps(block)} -->`
-  const BlockEndComment = block => `<!-- /${block.type}:${block.id} -->`
+  const BlockStartComment = block => `<!-- ${ block.type }:${ block.id } ${ blockCommentProps(block) } -->`
+  const BlockEndComment = block => `<!-- /${ block.type }:${ block.id } -->`
 
   /**
    * Removes parseable attributes from the json comment
@@ -2167,10 +2179,10 @@
         className: 'email-columns-row',
       }, Td({
         width,
-        id: `b-${block.id}-inner`,
+        id: `b-${ block.id }-inner`,
         className: 'email-columns-cell',
         style: {
-          width: `${width}px`,
+          width: `${ width }px`,
         },
       }, html)))
     }
@@ -2188,7 +2200,7 @@
     return Tr({}, [
       BlockStartComment(block),
       Td({
-          id: `b-${block.id}`,
+          id: `b-${ block.id }`,
           className: classes.join(' '),
           style: {
             ...AdvancedStyleControls.getInlineStyle(block),
@@ -2230,7 +2242,7 @@
       html = Div({
         className: 'block-inner-content',
         style: {
-          width: `${width}px`,
+          width: `${ width }px`,
         },
       }, html)
     }
@@ -2246,8 +2258,8 @@
     }
 
     return Div({
-      id: `edit-${block.id}`,
-      className: `builder-block ${isActiveBlock(block.id) ? 'is-editing' : ''}`,
+      id: `edit-${ block.id }`,
+      className: `builder-block ${ isActiveBlock(block.id) ? 'is-editing' : '' }`,
       dataId: block.id,
       dataType: block.type,
       onClick: e => {
@@ -2267,7 +2279,7 @@
       },
     }, [
       Div({
-        id: `b-${block.id}`,
+        id: `b-${ block.id }`,
         className: classes.join(' '),
         style: {
           ...AdvancedStyleControls.getInlineStyle(block),
@@ -2353,7 +2365,8 @@
               return found
             }
           }
-        } catch (e) {
+        }
+        catch (e) {
           // console.log(e, block)
         }
 
@@ -2640,9 +2653,9 @@
       let blockType = $el.data('type')
 
       return `
-			<div class="block gh-panel" data-id="${blockId}">
+			<div class="block gh-panel" data-id="${ blockId }">
 				<div class="icon">
-					${BlockRegistry.blocks[blockType].svg}
+					${ BlockRegistry.blocks[blockType].svg }
 				</div>
 			</div>`
     }
@@ -2695,7 +2708,7 @@
         let $sortable = $(e.target)
 
         // No longer in this sortable
-        if (!$sortable.has(`#edit-${blockId}`).length) {
+        if (!$sortable.has(`#edit-${ blockId }`).length) {
           return
         }
 
@@ -2737,7 +2750,7 @@
 
     return Div({
       className: 'block-wrap',
-      id: `add-${type}`,
+      id: `add-${ type }`,
       title: name,
       onDblclick: e => {
 
@@ -2751,17 +2764,17 @@
         insertBlock(newBlock, getBlocks().length)
 
         setActiveBlock(newBlock.id)
-        document.getElementById(`edit-${newBlock.id}`).scrollIntoView(true)
+        document.getElementById(`edit-${ newBlock.id }`).scrollIntoView(true)
       },
     }, [
       // language=HTML
       `
-		  <div class="block new-block gh-panel" data-type="${type}">
-			  <div class="icon">
-				  ${svg}
-			  </div>
-		  </div>
-		  <div class="block-name">${name}</div>`,
+          <div class="block new-block gh-panel" data-type="${ type }">
+              <div class="icon">
+                  ${ svg }
+              </div>
+          </div>
+          <div class="block-name">${ name }</div>`,
     ])
   }
 
@@ -2920,7 +2933,7 @@
       }, [
         InputRepeater({
           id: 'custom-headers-editor',
-          rows: Object.keys(customHeaders).map(k => ([k, customHeaders[k]])),
+          rows: Object.keys(customHeaders).map(k => ( [k, customHeaders[k]] )),
           cells: [
             props => Input({
               ...props,
@@ -2942,8 +2955,8 @@
             })
           },
         }),
-        `<p>${__('You can define custom email headers and override existing ones.')}</p>`,
-        `<p>${__('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>')}</p>`,
+        `<p>${ __('You can define custom email headers and override existing ones.') }</p>`,
+        `<p>${ __('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>') }</p>`,
       ]),
     ])
   }
@@ -2967,7 +2980,7 @@
         label: 'Template',
       }, Select({
         id: 'select-template',
-        options: DesignTemplates.map(({ id, name }) => ({ value: id, text: name })),
+        options: DesignTemplates.map(({ id, name }) => ( { value: id, text: name } )),
         selected: getTemplate().id,
         onChange: e => {
           updateSettings({
@@ -3049,11 +3062,12 @@
 
     let fromOptions = [
       { id: 0, text: __('Contact Owner') },
-      { id: 'default', text: `${Groundhogg.defaults.from_name} &lt;${Groundhogg.defaults.from_email}&gt;` },
-      ...Groundhogg.filters.owners.map(({ data, ID }) => ({
+      { id: 'default', text: `${ Groundhogg.defaults.from_name } &lt;${ Groundhogg.defaults.from_email }&gt;` },
+      ...Groundhogg.filters.owners.map(({ data, ID }) => ( {
         id: ID,
-        text: `${data.display_name} &lt;${data.user_email}&gt;`,
-      }))]
+        text: `${ data.display_name } &lt;${ data.user_email }&gt;`,
+      } )),
+    ]
 
     let replyToOptions = [
       Groundhogg.defaults.from_email,
@@ -3100,7 +3114,7 @@
           placeholder: 'Type an email address...',
           noneSelected: getEmail().context?.from_email,
           fetchOptions: search => Promise.resolve(
-            replyToOptions.filter(item => item.includes(search)).map(em => ({ id: em, text: em }))),
+            replyToOptions.filter(item => item.includes(search)).map(em => ( { id: em, text: em } ))),
           selected: reply_to_override ? { id: reply_to_override, text: reply_to_override } : [],
           onChange: item => setEmailMeta({ reply_to_override: item ? item.id : '' }),
         })),
@@ -3155,14 +3169,14 @@
           id: 'pick-campaigns',
           noneSelected: 'Add a campaign...',
           tags: true,
-          selected: getCampaigns().map(({ ID, data }) => ({ id: ID, text: data.name })),
+          selected: getCampaigns().map(({ ID, data }) => ( { id: ID, text: data.name } )),
           fetchOptions: async (search) => {
             let campaigns = await CampaignsStore.fetchItems({
               search,
               limit: 20,
             })
 
-            return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+            return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
           },
           createOption: async (id) => {
             let campaign = await CampaignsStore.create({
@@ -3183,7 +3197,7 @@
   const EditorControls = () => {
 
     const DisplayFont = font => Div({
-      id: `font-${font.id}`,
+      id: `font-${ font.id }`,
       className: 'font space-between',
     }, [
       Span({ style: { ...fillFontStyle(font.style), margin: '0' } }, font.name),
@@ -3191,14 +3205,14 @@
         className: 'display-flex',
       }, [
         Button({
-          id: `delete-${font.id}`,
+          id: `delete-${ font.id }`,
           className: 'gh-button danger text icon small',
           onClick: e => {
 
             dangerConfirmationModal({
               //language=HTML
-              alert: `<p>${__('You\'re about to delete a global font! This cannot be undone.')}</p>
-			  <p>${__('Any blocks currently using this font will inherit the font settings.')}</p>`,
+              alert: `<p>${ __('You\'re about to delete a global font! This cannot be undone.') }</p>
+              <p>${ __('Any blocks currently using this font will inherit the font settings.') }</p>`,
               confirmText: 'Delete',
               onConfirm: () => {
                 GlobalFonts.delete(font.id)
@@ -3209,11 +3223,11 @@
           },
         }, Dashicon('trash')),
         Button({
-          id: `edit-${font.id}`,
+          id: `edit-${ font.id }`,
           className: 'gh-button secondary text small icon',
           onClick: e => {
             MiniModal({
-                selector: `#font-${font.id}`,
+                selector: `#font-${ font.id }`,
               }, ({ close }) => Div({
                 className: 'display-flex column gap-10',
               }, [
@@ -3251,7 +3265,7 @@
           onClick: e => {
             let font = GlobalFonts.add()
             morphControls()
-            document.getElementById(`edit-${font.id}`).click()
+            document.getElementById(`edit-${ font.id }`).click()
           },
         }, 'Add Font'),
       ]),
@@ -3328,7 +3342,7 @@
         className: 'gh-button-nav',
       }, [
         Button({
-          className: `tab ${getBlockControlsTab() === 'block' ? 'active' : 'inactive'}`,
+          className: `tab ${ getBlockControlsTab() === 'block' ? 'active' : 'inactive' }`,
           onClick: e => {
             setBlockControlsTab('block')
             removeControls()
@@ -3336,7 +3350,7 @@
           },
         }, __('Block')),
         Button({
-          className: `tab ${getBlockControlsTab() === 'advanced' ? 'active' : 'inactive'}`,
+          className: `tab ${ getBlockControlsTab() === 'advanced' ? 'active' : 'inactive' }`,
           onClick: e => {
             setBlockControlsTab('advanced')
             removeControls()
@@ -3345,27 +3359,28 @@
         }, __('Advanced')),
       ])
 
-    } else {
+    }
+    else {
 
       nav = Div({
         className: 'gh-button-nav',
       }, [
         Button({
-          className: `tab ${getEmailControlsTab() === 'email' ? 'active' : 'inactive'}`,
+          className: `tab ${ getEmailControlsTab() === 'email' ? 'active' : 'inactive' }`,
           onClick: e => {
             setEmailControlsTab('email')
             morphControls()
           },
         }, __('Settings')),
         Button({
-          className: `tab ${getEmailControlsTab() === 'advanced' ? 'active' : 'inactive'}`,
+          className: `tab ${ getEmailControlsTab() === 'advanced' ? 'active' : 'inactive' }`,
           onClick: e => {
             setEmailControlsTab('advanced')
             morphControls()
           },
         }, __('Advanced')),
         isBlockEditor() ? Button({
-          className: `gh-button secondary text small ${getEmailControlsTab() === 'editor' ? 'active' : 'inactive'}`,
+          className: `gh-button secondary text small ${ getEmailControlsTab() === 'editor' ? 'active' : 'inactive' }`,
           onClick: e => {
             setEmailControlsTab('editor')
             morphControls()
@@ -3428,7 +3443,8 @@
                   let block
                   try {
                     block = JSON.parse(copiedText)
-                  } catch (e) {
+                  }
+                  catch (e) {
                     dialog({ message: 'No block was copied', type: 'error' })
                     return
                   }
@@ -3456,7 +3472,8 @@
     let controls
     if (hasActiveBlock()) {
       controls = BlockControls()
-    } else {
+    }
+    else {
       controls = EmailControls()
     }
 
@@ -3490,7 +3507,7 @@
         Div({
           className: 'inline-label',
         }, [
-          `<label for="subject">${__('Subject:', 'groundhogg')}</label>`,
+          `<label for="subject">${ __('Subject:', 'groundhogg') }</label>`,
           InputWithReplacements({
             id: 'subject-line',
             placeholder: 'Subject line...',
@@ -3505,7 +3522,7 @@
         Div({
           className: 'inline-label',
         }, [
-          `<label for="preview-text">${__('Preview:', 'groundhogg')}</label>`,
+          `<label for="preview-text">${ __('Preview:', 'groundhogg') }</label>`,
           InputWithReplacements({
             id: 'preview-text',
             name: 'pre_header',
@@ -3568,7 +3585,8 @@
           }
         },
       })
-    } else {
+    }
+    else {
 
       title = Fragment([
         __('Now editing '),
@@ -3612,24 +3630,49 @@
     ])
   }
 
+  const SubjectAndFromPreview = () => Div({
+    className: 'from-preview display-flex gap-20 has-box-shadow'
+  }, [
+    makeEl('img', {
+      src: getEmail().context.from_avatar,
+      className: 'from-avatar',
+      height: 40,
+      width: 40,
+      style: {
+        borderRadius: '50%',
+      },
+    }),
+    Div({
+      className: 'subject-and-from',
+    }, [
+      // Subject Line
+      `<h2>${getEmail().data.subject}</h2>`,
+      // From Name & Email
+      `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
+      // From Email
+    ])
+  ])
+
   const PreviewButtons = () => {
 
     return Div({
-      className: `gh-input-group ${getState().previewLoading ? 'flashing' : ''}`,
+      className: `gh-input-group ${ getState().previewLoading ? 'flashing' : '' }`,
     }, [
       Button({
         id: 'preview-desktop',
         className: 'gh-button secondary icon',
         disabled: !Boolean(getState().preview),
         onClick: e => {
-          ModalFrame({}, Iframe({
-            id: 'mobile-desktop-iframe',
-            height: window.innerHeight * 0.85,
-            width: Math.min(1200, window.innerWidth * 0.8),
-            style: {
-              backgroundColor: '#fff',
-            },
-          }, getState().preview))
+          ModalFrame({}, Div({
+            className: 'preview desktop'
+          }, [
+            SubjectAndFromPreview(),
+            Iframe({
+              id: 'desktop-preview-iframe',
+              height: window.innerHeight * 0.85,
+              width: Math.min(1200, window.innerWidth * 0.8),
+            }, getState().preview),
+          ]))
         },
       }, [icons.desktop, ToolTip('Desktop Preview')]),
       Button({
@@ -3637,14 +3680,17 @@
         className: 'gh-button secondary icon',
         disabled: !Boolean(getState().preview),
         onClick: e => {
-          ModalFrame({}, Iframe({
-            id: 'mobile-preview-iframe',
-            height: Math.min(915, window.innerHeight * 0.85),
-            width: 412,
-            style: {
-              backgroundColor: '#fff',
-            },
-          }, getState().preview))
+
+          ModalFrame({}, Div({
+            className: 'preview mobile'
+          }, [
+            SubjectAndFromPreview(),
+            Iframe({
+              id: 'mobile-desktop-iframe',
+              height: Math.min(915, window.innerHeight * 0.85),
+              width: 412,
+            }, getState().preview),
+          ]))
         },
       }, [icons.smartphone, ToolTip('Mobile Preview')]),
       Button({
@@ -3672,12 +3718,12 @@
                 id: 'test-email-addresses',
                 isValidSelection: isValidEmail,
                 noneSelected: __('Type an email address...'),
-                selected: Groundhogg.user_test_emails.map(email => ({ id: email, text: email })),
+                selected: Groundhogg.user_test_emails.map(email => ( { id: email, text: email } )),
                 fetchOptions: (search) => Promise.resolve(
-                  Groundhogg.filters.owners.filter(user => user.data.user_email.includes(search)).map(user => ({
+                  Groundhogg.filters.owners.filter(user => user.data.user_email.includes(search)).map(user => ( {
                     id: user.data.user_email,
                     text: user.data.user_email,
-                  }))),
+                  } ))),
                 onChange: items => {
                   Groundhogg.user_test_emails = items.map(({ id }) => id)
                 },
@@ -3695,8 +3741,8 @@
                   e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
                   let endpoint = getEmail().ID
-                    ? `${EmailsStore.route}/${getEmailData().ID}/test`
-                    : `${EmailsStore.route}/test`
+                    ? `${ EmailsStore.route }/${ getEmailData().ID }/test`
+                    : `${ EmailsStore.route }/test`
 
                   post(endpoint, {
                     to: Groundhogg.user_test_emails.join(','),
@@ -3831,7 +3877,7 @@
             },
             {
               key: 'delete',
-              text: `<span class="gh-text danger">${__('Delete')}</span>`,
+              text: `<span class="gh-text danger">${ __('Delete') }</span>`,
               onSelect: e => {
 
                 dangerConfirmationModal({
@@ -3895,27 +3941,27 @@
 
   // language=HTML
   const HTMLEditorNotice = () => `
-	  <p>${__(
-		  'You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
-		  'groundhogg-pro')}</p>
-	  <p><b>${__('Here\'s what you need to know:', 'groundhogg-pro')}</b></p>
-	  <p>${__(
-		  'The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
-		  'groundhogg-pro')}
-	  </p>
-	  <p>${__('You will need to manually add any information required for compliance:', 'groundhogg-pro')}</p>
-	  <ul class="styled">
-		  <li>${__('Your physical business location.', 'groundhogg-pro')}
-			  <code>{business_address}</code></li>
-		  <li>${__('Your business phone number.', 'groundhogg-pro')} <code>{business_phone}</code>
-		  </li>
-		  <li>${__('Links to your terms of service and privacy policy.', 'groundhogg-pro')}</li>
-		  <li>${__('The link to unsubscribe.', 'groundhogg-pro')} <code>{unsubscribe_link}</code>
-		  <li>${__('The link to view in browser.', 'groundhogg-pro')} <code>{view_in_browser_link}</code>
-		  </li>
-	  </ul>
-	  <p>${__('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro')}</p>
-	  <p>${__('Replacement codes and shortcodes will also still work as normal.', 'groundhogg-pro')}</p>`
+      <p>${ __(
+              'You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
+              'groundhogg-pro') }</p>
+      <p><b>${ __('Here\'s what you need to know:', 'groundhogg-pro') }</b></p>
+      <p>${ __(
+              'The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
+              'groundhogg-pro') }
+      </p>
+      <p>${ __('You will need to manually add any information required for compliance:', 'groundhogg-pro') }</p>
+      <ul class="styled">
+          <li>${ __('Your physical business location.', 'groundhogg-pro') }
+              <code>{business_address}</code></li>
+          <li>${ __('Your business phone number.', 'groundhogg-pro') } <code>{business_phone}</code>
+          </li>
+          <li>${ __('Links to your terms of service and privacy policy.', 'groundhogg-pro') }</li>
+          <li>${ __('The link to unsubscribe.', 'groundhogg-pro') } <code>{unsubscribe_link}</code>
+          <li>${ __('The link to view in browser.', 'groundhogg-pro') } <code>{view_in_browser_link}</code>
+          </li>
+      </ul>
+      <p>${ __('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro') }</p>
+      <p>${ __('Replacement codes and shortcodes will also still work as normal.', 'groundhogg-pro') }</p>`
 
   const HTMLEditor = () => {
     return Div({
@@ -4001,8 +4047,8 @@
                 onClick: e => {
                   Modal({}, ({ close }) => Div({}, [
                     `<h2>Select a file to import</h2>`,
-                    `<p>${__(
-                      'If you have an HTML file, you can upload it below 👇')}</p>`,
+                    `<p>${ __(
+                      'If you have an HTML file, you can upload it below 👇') }</p>`,
                     Input({
                       type: 'file',
                       accept: 'text/html',
@@ -4031,7 +4077,8 @@
 
                             // no title? invalid
                             title = doc.head.querySelector('title').innerText
-                          } catch (e) {
+                          }
+                          catch (e) {
                             dialog({
                               type: 'error',
                               message: __('Invalid import. Choose another file.'),
@@ -4068,8 +4115,8 @@
                 onClick: e => {
                   Modal({}, ({ close }) => Div({}, [
                     `<h2>Select a template to import</h2>`,
-                    `<p>${__(
-                      'If you have a template JSON file, you can upload it below 👇')}</p>`,
+                    `<p>${ __(
+                      'If you have a template JSON file, you can upload it below 👇') }</p>`,
                     Input({
                       type: 'file',
                       accept: 'application/json',
@@ -4179,7 +4226,7 @@
     return Div({
       className: 'template span-4',
     }, Div({
-      id: `template-${ID}`,
+      id: `template-${ ID }`,
       className: 'gh-panel',
       onClick: e => {
         setEmailData({
@@ -4197,18 +4244,18 @@
         renderEditor()
       },
       onMouseenter: e => {
-        const iframe = document.getElementById(`preview-${ID}`)
+        const iframe = document.getElementById(`preview-${ ID }`)
         // *0.51 for zoom
-        iframe.style.height = (iframe.contentWindow.document.body.offsetHeight * 0.51) + 'px'
+        iframe.style.height = ( iframe.contentWindow.document.body.offsetHeight * 0.51 ) + 'px'
       },
       onMouseleave: e => {
-        const iframe = document.getElementById(`preview-${ID}`)
+        const iframe = document.getElementById(`preview-${ ID }`)
         iframe.style.height = 500 + 'px'
       },
     }, [
       `<div class="overlay"></div>`,
       Iframe({
-        id: `preview-${ID}`,
+        id: `preview-${ ID }`,
         className: 'template-preview',
         style: {
           // zoom: '80%',
@@ -4216,7 +4263,7 @@
           backgroundColor: '#fff',
         },
       }, doc.documentElement.outerHTML),
-      `<p>${data.title}</p>`,
+      `<p>${ data.title }</p>`,
     ]))
   }
 
@@ -4276,7 +4323,7 @@
       id: 'block-editor-toolbar',
     }, Div({ className: 'display-flex column buttons' }, [
       Button({
-        className: `gh-button ${getState().blockInspector ? 'primary' : 'secondary'} text icon`,
+        className: `gh-button ${ getState().blockInspector ? 'primary' : 'secondary' } text icon`,
         id: 'open-block-inspector',
         onClick: e => {
           setState({
@@ -4286,7 +4333,7 @@
         },
       }, [icons.inspect, ToolTip('Block Inspector', 'right')]),
       Button({
-        className: `gh-button ${getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary'} text icon`,
+        className: `gh-button ${ getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary' } text icon`,
         id: 'set-responsive-desktop',
         onClick: e => {
           setState({
@@ -4296,7 +4343,7 @@
         },
       }, [icons.desktop, ToolTip('Desktop', 'right')]),
       Button({
-        className: `gh-button ${getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary'} text icon`,
+        className: `gh-button ${ getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary' } text icon`,
         id: 'set-responsive-mobile',
         onClick: e => {
           setState({
@@ -4351,8 +4398,8 @@
   const ColumnGap = (gap = 10) => Td({
     className: 'email-columns-cell gap',
     style: {
-      width: `${gap}px`,
-      height: `${gap}px`,
+      width: `${ gap }px`,
+      height: `${ gap }px`,
     },
     height: gap,
     width: gap,
@@ -4362,7 +4409,7 @@
 
     if (isGeneratingHTML()) {
       return Td({
-        className: `email-columns-cell ${className}`,
+        className: `email-columns-cell ${ className }`,
         style: {
           verticalAlign,
           ...style,
@@ -4372,7 +4419,7 @@
       }, [
         `<!-- START:COLUMN -->`,
         Table({
-          className: `column ${blocks.length ? '' : 'empty'}`,
+          className: `column ${ blocks.length ? '' : 'empty' }`,
           cellpadding: '0',
           cellspacing: '0',
           role: 'presentation',
@@ -4383,7 +4430,7 @@
     }
 
     return Td({
-      className: `email-columns-cell ${className}`,
+      className: `email-columns-cell ${ className }`,
       style: {
         verticalAlign,
         ...style,
@@ -4391,7 +4438,7 @@
       ...props,
     }, Div({
       dataCol: col,
-      className: `column sortable-blocks ${blocks.length ? '' : 'empty'}`,
+      className: `column sortable-blocks ${ blocks.length ? '' : 'empty' }`,
       onCreate: el => makeSortable(el),
     }, blocks.map(b => EditBlockWrapper(b))))
   }
@@ -4551,7 +4598,7 @@
 
     // language=CSS
     return `body {
-        ${objectToStyle(bodyStyle)}
+        ${ objectToStyle(bodyStyle) }
     }`
   }
 
@@ -4576,20 +4623,20 @@
 
     // language=CSS
     return `
-        ${getTemplateMceCSS()}
+        ${ getTemplateMceCSS() }
         body {
-            ${objectToStyle(bodyStyle)}
+            ${ objectToStyle(bodyStyle) }
         }
 
         p, li {
-            ${fontStyle(p)}
+            ${ fontStyle(p) }
         }
 
         a {
-            ${fontStyle({
+            ${ fontStyle({
                 ...p,
                 ...a,
-            })}
+            }) }
         }
 
         b, strong {
@@ -4606,20 +4653,20 @@
         }
 
         h1 {
-            ${fontStyle(h1)}
+            ${ fontStyle(h1) }
         }
 
         h2 {
-            ${fontStyle(h2)}
+            ${ fontStyle(h2) }
         }
 
         h3 {
-            ${fontStyle(h3)}
+            ${ fontStyle(h3) }
         }
     `
   }
 
-  const fontDefaults = style => ({
+  const fontDefaults = style => ( {
     lineHeight: '1.4',
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 'normal',
@@ -4628,7 +4675,7 @@
     fontStyle: 'normal',
     textTransform: 'none',
     ...style,
-  })
+  } )
 
   const fillFontStyle = ({ use = 'custom', color = '', fontFamily = '', fontSize = 16, ...style }) => {
 
@@ -4647,7 +4694,7 @@
     return {
       ...fontDefaults(style),
       color,
-      fontSize: `${fontSize}px`,
+      fontSize: `${ fontSize }px`,
       fontFamily: removeQuotes(fontFamily),
     }
   }
@@ -4689,8 +4736,8 @@
         multiple: false,
         selected: { id: fontFamily, text: fontDisplay(fontFamily) },
         fetchOptions: search => Promise.resolve(Object.keys(fontFamilies).
-        filter(font => fontFamilies[font].toLowerCase().includes(search.toLowerCase())).
-        map(font => ({ id: font, text: fontDisplay(font) }))),
+          filter(font => fontFamilies[font].toLowerCase().includes(search.toLowerCase())).
+          map(font => ( { id: font, text: fontDisplay(font) } ))),
         onChange: item => onChange({ fontFamily: item.id }),
       })),
       !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, NumberControl({
@@ -4717,7 +4764,7 @@
         name: `font_weight`,
         className: 'font-control control-input',
         selected: fontWeight,
-        options: fontWeights.map(i => ({ value: i, text: i })),
+        options: fontWeights.map(i => ( { value: i, text: i } )),
         onChange: e => onChange({ fontWeight: e.target.value }),
       })),
       !supports.fontStyle ? null : Control({ label: __('Font Style', 'groundhogg') }, Select({
@@ -4768,7 +4815,7 @@
 
     const DisplayFont = (font, selected, close) => {
       return Div({
-        className: `select-font ${selected ? 'selected' : ''}`,
+        className: `select-font ${ selected ? 'selected' : '' }`,
         id: font.id,
         onClick: e => {
           use = font.id
@@ -4798,11 +4845,11 @@
         className: 'gh-input-group',
       }, [
         Button({
-          id: `${tag}-use-global`,
-          className: `gh-button small ${GlobalFonts.has(use) ? 'primary' : 'secondary'}`,
+          id: `${ tag }-use-global`,
+          className: `gh-button small ${ GlobalFonts.has(use) ? 'primary' : 'secondary' }`,
           onClick: e => {
             MiniModal({
-              selector: `#${tag}-use-global`,
+              selector: `#${ tag }-use-global`,
               dialogClasses: 'no-padding',
             }, ({ close }) => Div({
               className: 'display-flex column global-font-select',
@@ -4812,8 +4859,8 @@
           },
         }, Dashicon('admin-site')),
         Button({
-          id: `${tag}-use-custom`,
-          className: `gh-button small ${!GlobalFonts.has(use) ? 'primary' : 'secondary'}`,
+          id: `${ tag }-use-custom`,
+          className: `gh-button small ${ !GlobalFonts.has(use) ? 'primary' : 'secondary' }`,
           onClick: e => {
 
             updateStyle({
@@ -4824,7 +4871,7 @@
 
             MiniModal({
                 dialogClasses: 'no-padding',
-                selector: `#${tag}-use-custom`,
+                selector: `#${ tag }-use-custom`,
                 // onClose: () => morphControls(),
               }, Div({
                 className: 'display-flex column gap-10',
@@ -4838,7 +4885,7 @@
         }, Dashicon('edit')),
       ])),
       Control({ label: __('Color', 'groundhogg') }, ColorPicker({
-        id: `${tag}-font-color`,
+        id: `${ tag }-font-color`,
         value: color,
         onChange: color => updateStyle({ color }),
       })),
@@ -4847,19 +4894,19 @@
 
   registerBlock('columns', 'Columns', {
     attributes: {
-      layout: el => el.querySelector(`table.email-columns:not(:has(#${el.id}-inner))`).classList.item(1),
+      layout: el => el.querySelector(`table.email-columns:not(:has(#${ el.id }-inner))`).classList.item(1),
       verticalAlign: (
         el,
-        { layout = '' }) => el.querySelector(`table.email-columns.${layout} td.email-columns-cell:has(table.column)`).
-      style.
-      getPropertyValue('vertical-align'),
-      responsive: (el, { layout = '' }) => el.querySelector(`table.email-columns.${layout}`).
-      classList.
-      contains('responsive'),
+        { layout = '' }) => el.querySelector(`table.email-columns.${ layout } td.email-columns-cell:has(table.column)`).
+        style.
+        getPropertyValue('vertical-align'),
+      responsive: (el, { layout = '' }) => el.querySelector(`table.email-columns.${ layout }`).
+        classList.
+        contains('responsive'),
       columns: (el, { layout = '' }) => {
 
         let columns = []
-        let table = el.querySelector(`table.email-columns.${layout}`)
+        let table = el.querySelector(`table.email-columns.${ layout }`)
         let cells = table.querySelector('tr.email-columns-row').childNodes
 
         for (let cell of cells) {
@@ -4881,23 +4928,23 @@
     },
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
-		     style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path 
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.667 426.667"
+             style="enable-background:new 0 0 426.667 426.667" xml:space="preserve"><path 
         fill="currentColor"
         d="M384 21.333h-42.667c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667H384c23.552 0 42.667-19.136 42.667-42.667V64c0-23.509-19.115-42.667-42.667-42.667zM234.667 21.333H192c-23.552 0-42.667 19.157-42.667 42.667v298.667c0 23.531 19.115 42.667 42.667 42.667h42.667c23.552 0 42.667-19.136 42.667-42.667V64c-.001-23.509-19.115-42.667-42.667-42.667zM85.333 21.333H42.667C19.136 21.333 0 40.491 0 64v298.667c0 23.531 19.136 42.667 42.667 42.667h42.667c23.531 0 42.667-19.136 42.667-42.667V64C128 40.491 108.864 21.333 85.333 21.333z"/></svg>`,
     controls: ({ layout = 'two_columns', gap = 0, verticalAlign = 'top', updateBlock, responsive = true }) => {
 
       const LayoutChoice = l => Button({
-        className: `layout-choice ${l} ${layout === l ? 'selected' : ''}`,
+        className: `layout-choice ${ l } ${ layout === l ? 'selected' : '' }`,
         dataLayout: l,
-        id: `layout-${l}`,
+        id: `layout-${ l }`,
         onClick: e => {
           updateBlock({
             layout: l,
             morphControls: true,
           })
         },
-      }, columnLayouts[l].map((col, i) => `<span class="col col-${i + 1}"></span>`))
+      }, columnLayouts[l].map((col, i) => `<span class="col col-${ i + 1 }"></span>`))
 
       return [
         ControlGroup({
@@ -4941,7 +4988,7 @@
     },
     html: ({ columns, layout = 'two_columns', gap = 0, verticalAlign = 'top', responsive = true }) => {
       return Table({
-          className: `email-columns ${layout} ${responsive ? 'responsive' : ''}`,
+          className: `email-columns ${ layout } ${ responsive ? 'responsive' : '' }`,
           cellspacing: '0',
           cellpadding: '0',
           width: '100%',
@@ -4960,7 +5007,7 @@
     css: ({ selector, id, columns, gap = 10 }) => {
       //language=CSS
       return `
-          ${columns.map(col => col.length ? renderBlocksCSS(col) : '').join('')}
+          ${ columns.map(col => col.length ? renderBlocksCSS(col) : '').join('') }
       `
     },
     defaults: {
@@ -5040,8 +5087,8 @@
     },
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
-		     viewBox="0 0 977.7 977.7">
+        <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
+             viewBox="0 0 977.7 977.7">
         <path fill="currentColor"
               d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
     controls: ({ p = {}, a = {}, h1 = {}, h2 = {}, h3 = {}, content = '', updateBlock, curBlock }) => {
@@ -5060,7 +5107,7 @@
             case 'h3':
             case 'p':
             case 'a':
-              openPanel(`text-block-${tag}`)
+              openPanel(`text-block-${ tag }`)
               break
             case 'ul':
             case 'ol':
@@ -5085,7 +5132,7 @@
 
       const editContent = () => {
 
-        let editorId = `text-${id}`
+        let editorId = `text-${ id }`
 
         ModalFrame({
           // content: ,
@@ -5125,7 +5172,8 @@
                 content: e.target.value,
               })
             },
-          })]))
+          }),
+        ]))
       }
 
       return Fragment([
@@ -5145,7 +5193,8 @@
           onClick: e => {
             editContent()
           },
-        }, __('Edit Content', 'groundhogg'))])
+        }, __('Edit Content', 'groundhogg')),
+      ])
     },
     html: textContent,
     plainText: ({ content }) => extractPlainText(content),
@@ -5185,10 +5234,10 @@
     },
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-			<path fill="currentColor"
-			      d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
-		</svg>`,
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path fill="currentColor"
+                  d="m15.7 5.3-1-1c-.2-.2-.4-.3-.7-.3H1c-.6 0-1 .4-1 1v5c0 .3.1.6.3.7l1 1c.2.2.4.3.7.3h13c.6 0 1-.4 1-1V6c0-.3-.1-.5-.3-.7zM14 10H1V5h13v5z"/>
+        </svg>`,
     controls: ({ text, link, style, align, size, backgroundColor, borderStyle = {}, updateBlock = () => {} }) => {
       return [
         ControlGroup({
@@ -5302,7 +5351,7 @@
           href: link,
           style: {
             ...style,
-            fontSize: `${style.fontSize}px`,
+            fontSize: `${ style.fontSize }px`,
             textDecoration: 'none',
             display: 'inline-block',
             verticalAlign: 'middle',
@@ -5364,7 +5413,7 @@
           contenteditable: true,
           style: {
             ...style,
-            fontSize: `${style.fontSize}px`,
+            fontSize: `${ style.fontSize }px`,
             textDecoration: 'none !important',
             display: 'inline-block',
             verticalAlign: 'middle',
@@ -5378,7 +5427,7 @@
 
     },
     plainText: ({ text, link = '' }) => {
-      return `[${text}](${link})`
+      return `[${ text }](${ link })`
     },
     defaults: {
       link: Groundhogg.url.home,
@@ -5401,7 +5450,7 @@
       height: el => parseInt(el.querySelector('img').height),
       width: el => parseInt(el.querySelector('img').width),
       alt: el => el.querySelector('img').alt,
-      link: el => el.querySelector('a')?.getAttribute( 'href' ),
+      link: el => el.querySelector('a')?.getAttribute('href'),
       borderStyle: el => parseBorderStyle(el.querySelector('img').style),
       align: el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
     },
@@ -5417,7 +5466,7 @@
             src,
             alt,
             width,
-            maxWidth: document.getElementById(`b-${id}`).getBoundingClientRect().width,
+            maxWidth: document.getElementById(`b-${ id }`).getBoundingClientRect().width,
             onChange: image => {
               updateBlock({
                 ...image,
@@ -5530,7 +5579,7 @@
       }, img)
     },
     plainText: ({ src = '', alt = '', link = '' }) => {
-      return `${link ? '[' : ''}![${alt || 'image'}](${src})${link ? `](${link})` : ''}`
+      return `${ link ? '[' : '' }![${ alt || 'image' }](${ src })${ link ? `](${ link })` : '' }`
     },
     defaults: {
       src: 'http://via.placeholder.com/600x338',
@@ -5615,119 +5664,17 @@
   //             })
   //           },
   //         })),
-  //         `<p>Add a <a href="https://www.youtube.com" target="_blank">YouTube</a> or <a href="https://vimeo.com" target="_blank">Vimeo</a> URL to automatically generate a preview image. The image will link to the provided URL.</p>`,
-  //         Control({
-  //           label: 'Title',
-  //           stacked: true,
-  //         }, Input({
-  //           id: 'video-title',
-  //           name: 'video_title',
-  //           value: title,
-  //           onChange: e => updateBlock({ title: e.target.value }),
-  //         })),
-  //         Control({
-  //           label: 'Alignment',
-  //         }, AlignmentButtons({
-  //           id: 'image-align',
-  //           alignment: align,
-  //           onChange: align => {
-  //             updateBlock({
-  //               align,
-  //               morphControls: true,
-  //             })
-  //           },
-  //         })),
-  //       ]),
-  //       BorderControlGroup({
-  //         ...borderStyle,
-  //         onChange: newStyle => updateBlock({
-  //           borderStyle: {
-  //             ...getActiveBlock().borderStyle,
-  //             ...newStyle,
-  //           },
-  //           morphControls: true,
-  //         }),
-  //       }),
-  //     ])
-  //   },
-  //   edit: ({ src, width, title = '', align = 'center', updateBlock, borderStyle = {} }) => {
-  //
-  //     return Div({
-  //       className: 'vid-container full-width',
-  //       style: {
-  //         textAlign: align,
-  //       },
-  //     }, makeEl('img', {
-  //       className: 'resize-me',
-  //       onCreate: el => {
-  //
-  //         setTimeout(() => {
-  //           let $el = $('img.resize-me')
-  //           $el.resizable({
-  //             aspectRatio: true,
-  //             maxWidth: $el.parent().width(),
-  //             stop: (e, ui) => {
-  //               updateBlock({
-  //                 width: Math.ceil(ui.size.width),
-  //                 morphControls: true,
-  //                 morphBlocks: false,
-  //               })
-  //             },
-  //           })
-  //         }, 100)
-  //       },
-  //       src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`,
-  //       alt: title,
-  //       // title,
-  //       width,
-  //       height: 'auto',
-  //       style: {
-  //         verticalAlign: 'bottom',
-  //         height: 'auto',
-  //         width,
-  //         ...addBorderStyle(borderStyle),
-  //       },
-  //     }))
-  //   },
-  //   html: ({ src, width, video = '', title = '', align = 'center', borderStyle = {} }) => {
-  //
-  //     let img = makeEl('img', {
-  //       src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`,
-  //       alt: title,
-  //       // title,
-  //       width,
-  //       height: 'auto',
-  //       style: {
-  //         boxSizing: 'border-box',
-  //         verticalAlign: 'bottom',
-  //         height: 'auto',
-  //         width,
-  //         ...addBorderStyle(borderStyle),
-  //       },
-  //     })
-  //
-  //     img = makeEl('a', {
-  //       href: video,
-  //     }, img)
-  //
-  //     return Div({
-  //       className: 'img-container',
-  //       style: {
-  //         textAlign: align,
-  //       },
-  //     }, img)
-  //   },
-  //   plainText: ({ src = '', title = '', video = '' }) => {
-  //     return `[![${title || 'video'}](${src})](${video})`
-  //   },
-  //   defaults: {
-  //     src: 'http://via.placeholder.com/600x338',
-  //     video: '',
-  //     title: 'Your Video',
-  //     width: 600,
-  //     align: 'center',
-  //   },
-  // })
+  //         `<p>Add a <a href="https://www.youtube.com" target="_blank">YouTube</a> or <a href="https://vimeo.com"
+  // target="_blank">Vimeo</a> URL to automatically generate a preview image. The image will link to the provided
+  // URL.</p>`, Control({ label: 'Title', stacked: true, }, Input({ id: 'video-title', name: 'video_title', value:
+  // title, onChange: e => updateBlock({ title: e.target.value }), })), Control({ label: 'Alignment', },
+  // AlignmentButtons({ id: 'image-align', alignment: align, onChange: align => { updateBlock({ align, morphControls:
+  // true, }) }, })), ]), BorderControlGroup({ ...borderStyle, onChange: newStyle => updateBlock({ borderStyle: {
+  // ...getActiveBlock().borderStyle, ...newStyle, }, morphControls: true, }), }), ]) }, edit: ({ src, width, title =
+  // '', align = 'center', updateBlock, borderStyle = {} }) => {  return Div({ className: 'vid-container full-width',
+  // style: { textAlign: align, }, }, makeEl('img', { className: 'resize-me', onCreate: el => {  setTimeout(() => { let
+  // $el = $('img.resize-me') $el.resizable({ aspectRatio: true, maxWidth: $el.parent().width(), stop: (e, ui) => {
+  // updateBlock({ width: Math.ceil(ui.size.width), morphControls: true, morphBlocks: false, }) }, }) }, 100) }, src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: { verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })) }, html: ({ src, width, video = '', title = '', align = 'center', borderStyle = {} }) => {  let img = makeEl('img', { src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: { boxSizing: 'border-box', verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })  img = makeEl('a', { href: video, }, img)  return Div({ className: 'img-container', style: { textAlign: align, }, }, img) }, plainText: ({ src = '', title = '', video = '' }) => { return `[![${title || 'video'}](${src})](${video})` }, defaults: { src: 'http://via.placeholder.com/600x338', video: '', title: 'Your Video', width: 600, align: 'center', }, })
 
   registerBlock('spacer', 'Spacer', {
     attributes: {
@@ -5765,7 +5712,7 @@
       }, Tr({}, Td({
         height,
         style: {
-          height: `${height}px`,
+          height: `${ height }px`,
         },
       })))
     },
@@ -5848,8 +5795,8 @@
       return makeEl('hr', {
         className: 'divider',
         style: {
-          borderWidth: `${height}px 0 0 0`,
-          width: `${width}%`,
+          borderWidth: `${ height }px 0 0 0`,
+          width: `${ width }%`,
           borderColor: color,
           borderStyle: lineStyle,
         },
@@ -5903,7 +5850,7 @@
     },
     // language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
+        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
   <path fill="currentColor"
         d="M507 243 388 117a19 19 0 1 0-28 27l106 112-106 112a19 19 0 0 0 28 27l119-126c7-7 7-19 0-26zM152 368 46 256l106-112a19 19 0 0 0-28-27L5 243c-7 7-7 19 0 26l119 126a19 19 0 0 0 27 0c7-7 8-19 1-27zM287 53c-10-2-20 5-22 16l-56 368a19 19 0 0 0 38 6l56-368c2-11-5-21-16-22z"/>
 </svg>`,
@@ -5965,8 +5912,8 @@
     ],
     //language=HTML
     svg: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
-		     style="enable-background:new 0 0 193.826 193.826" xml:space="preserve">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193.826 193.826"
+             style="enable-background:new 0 0 193.826 193.826" xml:space="preserve">
         <path fill="currentColor"
               d="M191.495 55.511 137.449 1.465a4.998 4.998 0 0 0-7.07 0l-.229.229a17.43 17.43 0 0 0-5.14 12.406c0 3.019.767 5.916 2.192 8.485l-56.55 48.533c-4.328-3.868-9.852-5.985-15.703-5.985a23.444 23.444 0 0 0-16.689 6.913l-.339.339a4.998 4.998 0 0 0 0 7.07l32.378 32.378-31.534 31.533c-.631.649-15.557 16.03-25.37 28.27-9.345 11.653-11.193 13.788-11.289 13.898a4.995 4.995 0 0 0 .218 6.822 4.987 4.987 0 0 0 3.543 1.471c1.173 0 2.349-.41 3.295-1.237.083-.072 2.169-1.885 13.898-11.289 12.238-9.813 27.619-24.74 28.318-25.421l31.483-31.483 30.644 30.644c.976.977 2.256 1.465 3.535 1.465s2.56-.488 3.535-1.465l.339-.339a23.446 23.446 0 0 0 6.913-16.689 23.43 23.43 0 0 0-5.985-15.703l48.533-56.55a17.434 17.434 0 0 0 8.485 2.192c4.687 0 9.093-1.825 12.406-5.14l.229-.229a5 5 0 0 0 0-7.072z"/></svg>`,
     controls: ({
@@ -6059,7 +6006,7 @@
               width: '115px',
             },
             selected: thumbnail_size,
-            options: imageSizes.map(size => ({ value: size, text: size })),
+            options: imageSizes.map(size => ( { value: size, text: size } )),
             onChange: e => updateBlock({ thumbnail_size: e.target.value }),
           })),
         ]) : null,
@@ -6103,13 +6050,13 @@
             selected: selectedTags,
             tags: false,
             fetchOptions: async (search) => {
-              let terms = await get(`${Groundhogg.api.routes.wp.tags}`, {
+              let terms = await get(`${ Groundhogg.api.routes.wp.tags }`, {
                 search,
                 per_page: 20,
                 orderby: 'count',
                 order: 'desc',
               })
-              terms = terms.map(({ id, name }) => ({ id, text: name }))
+              terms = terms.map(({ id, name }) => ( { id, text: name } ))
               return terms
             },
             onChange: selected => {
@@ -6140,13 +6087,13 @@
             selected: selectedCategories,
             tags: false,
             fetchOptions: async (search) => {
-              let terms = await get(`${Groundhogg.api.routes.wp.categories}`, {
+              let terms = await get(`${ Groundhogg.api.routes.wp.categories }`, {
                 search,
                 per_page: 20,
                 orderby: 'count',
                 order: 'desc',
               })
-              terms = terms.map(({ id, name }) => ({ id, text: name }))
+              terms = terms.map(({ id, name }) => ( { id, text: name } ))
               return terms
             },
             onChange: selected => {
@@ -6177,13 +6124,13 @@
             selected: includedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${Groundhogg.api.routes.wp.posts}`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
                 order: 'desc',
               })
-              posts = posts.map(({ id, title }) => ({ id, text: title.rendered }))
+              posts = posts.map(({ id, title }) => ( { id, text: title.rendered } ))
               return posts
             },
             onChange: selected => {
@@ -6203,13 +6150,13 @@
             selected: excludedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${Groundhogg.api.routes.wp.posts}`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
                 order: 'desc',
               })
-              posts = posts.map(({ id, title }) => ({ id, text: title.rendered }))
+              posts = posts.map(({ id, title }) => ( { id, text: title.rendered } ))
               return posts
             },
             onChange: selected => {
@@ -6248,13 +6195,13 @@
 
       //language=CSS
       return `
-          ${selector} h2,
-          ${selector} h2 a {
-              ${fontStyle(headingStyle)}
+          ${ selector } h2,
+          ${ selector } h2 a {
+              ${ fontStyle(headingStyle) }
           }
 
-          ${selector} p.post-excerpt {
-              ${fontStyle(excerptStyle)}
+          ${ selector } p.post-excerpt {
+              ${ fontStyle(excerptStyle) }
           }
       `
     },
@@ -6284,13 +6231,13 @@
   registerBlock('footer', 'Footer', {
     // language=HTML
     svg: `
-		<svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
-		     xmlns="http://www.w3.org/2000/svg">
-			<path fill="currentColor"
-			      d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
-			<path fill="currentColor"
-			      d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
-		</svg>`,
+        <svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
+             xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor"
+                  d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
+            <path fill="currentColor"
+                  d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
+        </svg>`,
     controls: ({ style = {}, linkStyle = {}, alignment = 'left', updateBlock }) => {
       return Fragment([
         ControlGroup({ name: 'Footer' }, [
@@ -6329,7 +6276,7 @@
         id: 'footer',
         className: 'footer',
       }, [
-        footerLine(`&copy; ${business_name}`),
+        footerLine(`&copy; ${ business_name }`),
         footerLine(address),
         footerLine(links),
         getEmailData().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
@@ -6358,7 +6305,7 @@
       } = _BlockEditor.footer
 
       return [
-        `Copyright ${business_name}`,
+        `Copyright ${ business_name }`,
         address,
         extractPlainText(links),
         extractPlainText(unsubscribe),
@@ -6412,7 +6359,7 @@
   }
 
   const SocialIcon = (icon, theme = 'brand-circle', size = 20) => makeEl('img', {
-    src: `${Groundhogg.assets.images}/social-icons/${theme}/${icon || 'facebook'}.png`,
+    src: `${ Groundhogg.assets.images }/social-icons/${ theme }/${ icon || 'facebook' }.png`,
     alt: socialIcons[icon],
     height: size,
     width: size,
@@ -6429,14 +6376,15 @@
 
     if (use === 'global' && globalSocials.length >= 3) {
       themeIcons = globalSocials.map(([social]) => social).slice(0, 3)
-    } else if (use === 'custom' && socials.length >= 3) {
+    }
+    else if (use === 'custom' && socials.length >= 3) {
       themeIcons = socials.map(([social]) => social).slice(0, 3)
     }
 
     return Button({
-        id: `select-${theme}`,
+        id: `select-${ theme }`,
         title: socialIconThemes[theme],
-        className: `gh-button ${theme === selected ? 'primary' : 'secondary text'} social-icon-theme ${theme}`,
+        className: `gh-button ${ theme === selected ? 'primary' : 'secondary text' } social-icon-theme ${ theme }`,
         onClick: e => updateBlock({ theme: theme, morphControls: true }),
       },
       themeIcons.map(icon => SocialIcon(icon, theme, 20)))
@@ -6451,13 +6399,13 @@
         id,
         onClick: e => {
           MiniModal({
-            selector: `#${id}`,
+            selector: `#${ id }`,
           }, ({ close }) => Div({
             className: 'display-grid',
           }, [
             ...Object.keys(socialIcons).map(social => Button({
               title: socialIcons[social],
-              id: `${id}-${social}`,
+              id: `${ id }-${ social }`,
               className: 'gh-button secondary text dashicon span-3',
               onClick: e => {
                 setValue(social)
@@ -6489,10 +6437,10 @@
     },
     //language=HTML
     svg: `
-		<svg viewBox="-33 0 512 512.001" xmlns="http://www.w3.org/2000/svg">
-			<path fill="currentColor"
-			      d="M361.824 344.395c-24.531 0-46.633 10.593-61.972 27.445l-137.973-85.453A83.321 83.321 0 0 0 167.605 256a83.29 83.29 0 0 0-5.726-30.387l137.973-85.457c15.34 16.852 37.441 27.45 61.972 27.45 46.211 0 83.805-37.594 83.805-83.805C445.629 37.59 408.035 0 361.824 0c-46.21 0-83.804 37.594-83.804 83.805a83.403 83.403 0 0 0 5.726 30.386l-137.969 85.454c-15.34-16.852-37.441-27.45-61.972-27.45C37.594 172.195 0 209.793 0 256c0 46.21 37.594 83.805 83.805 83.805 24.53 0 46.633-10.594 61.972-27.45l137.97 85.454a83.408 83.408 0 0 0-5.727 30.39c0 46.207 37.593 83.801 83.804 83.801s83.805-37.594 83.805-83.8c0-46.212-37.594-83.805-83.805-83.805zm-53.246-260.59c0-29.36 23.887-53.246 53.246-53.246s53.246 23.886 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.887-53.246-53.246zM83.805 309.246c-29.364 0-53.25-23.887-53.25-53.246s23.886-53.246 53.25-53.246c29.36 0 53.242 23.887 53.242 53.246s-23.883 53.246-53.242 53.246zm224.773 118.95c0-29.36 23.887-53.247 53.246-53.247s53.246 23.887 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.886-53.246-53.246zm0 0"/>
-		</svg>`,
+        <svg viewBox="-33 0 512 512.001" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor"
+                  d="M361.824 344.395c-24.531 0-46.633 10.593-61.972 27.445l-137.973-85.453A83.321 83.321 0 0 0 167.605 256a83.29 83.29 0 0 0-5.726-30.387l137.973-85.457c15.34 16.852 37.441 27.45 61.972 27.45 46.211 0 83.805-37.594 83.805-83.805C445.629 37.59 408.035 0 361.824 0c-46.21 0-83.804 37.594-83.804 83.805a83.403 83.403 0 0 0 5.726 30.386l-137.969 85.454c-15.34-16.852-37.441-27.45-61.972-27.45C37.594 172.195 0 209.793 0 256c0 46.21 37.594 83.805 83.805 83.805 24.53 0 46.633-10.594 61.972-27.45l137.97 85.454a83.408 83.408 0 0 0-5.727 30.39c0 46.207 37.593 83.801 83.804 83.801s83.805-37.594 83.805-83.8c0-46.212-37.594-83.805-83.805-83.805zm-53.246-260.59c0-29.36 23.887-53.246 53.246-53.246s53.246 23.886 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.887-53.246-53.246zM83.805 309.246c-29.364 0-53.25-23.887-53.25-53.246s23.886-53.246 53.25-53.246c29.36 0 53.242 23.887 53.242 53.246s-23.883 53.246-53.242 53.246zm224.773 118.95c0-29.36 23.887-53.247 53.246-53.247s53.246 23.887 53.246 53.246c0 29.36-23.886 53.246-53.246 53.246s-53.246-23.886-53.246-53.246zm0 0"/>
+        </svg>`,
     controls: ({
       socials = [],
       gap = 10,
@@ -6596,7 +6544,7 @@
       let cells = socials.reduce((cells, social, index) => {
 
         if (index > 0) {
-          cells.push(Td({ className: 'gap', width: gap, style: { width: `${gap}px` } }))
+          cells.push(Td({ className: 'gap', width: gap, style: { width: `${ gap }px` } }))
         }
 
         cells.push(Td({}, social))
@@ -6635,7 +6583,7 @@
         return ''
       }
 
-      return socials.map(([social, url]) => `[${social}](${url})`).join(' | ')
+      return socials.map(([social, url]) => `[${ social }](${ url })`).join(' | ')
     },
     defaults: {
       align: 'center',
@@ -6666,7 +6614,8 @@
       morphdom(document.querySelector(selector), Fragment(html), {
         childrenOnly: true,
       })
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   const initialize = ({
@@ -6696,7 +6645,8 @@
             setEmailMeta({
               blocks: true,
             }, false)
-          } else {
+          }
+          else {
             blocks = parseBlocksFromContent(email.data.content)
           }
 
@@ -6757,7 +6707,7 @@
         createBlock('text'),
         createBlock('spacer'),
         createBlock('social', {
-          socials: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(i => [i, `https://${i}.com`]),
+          socials: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(i => [i, `https://${ i }.com`]),
           align: 'left',
         }),
         createBlock('spacer'),
@@ -6850,13 +6800,14 @@
 
       try {
         text = BlockRegistry.get(block.type).plainText(block)
-      } catch (e) {
+      }
+      catch (e) {
         text = ''
       }
 
       if (filters_enabled && text) {
-        text = `[filters:${block.id} ${JSON.stringify(
-          { include_filters, exclude_filters })}]${text}[/filters:${block.id}]`
+        text = `[filters:${ block.id } ${ JSON.stringify(
+          { include_filters, exclude_filters }) }]${ text }[/filters:${ block.id }]`
       }
 
       return text
@@ -6872,7 +6823,7 @@
   const morphEmailEditor = () => morph('#email-editor', EmailEditor())
   const morphHeader = () => morph('#email-header', Header())
   const updateStyles = () => {
-    $('#builder-style').text(`#block-editor-content-wrap{ \n\n${renderBlocksCSS(getBlocks())}\n\n }`)
+    $('#builder-style').text(`#block-editor-content-wrap{ \n\n${ renderBlocksCSS(getBlocks()) }\n\n }`)
   }
 
   const renderEditor = () => {
@@ -7041,7 +6992,8 @@
           return blocks
         }
 
-      } catch (e) {
+      }
+      catch (e) {
         console.log(e)
       }
     }
@@ -7099,11 +7051,13 @@
       if (commentData.indexOf('{') > -1) {
         [unused, type, id, json] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+) ({.*})$/)
         attributes = JSON.parse(json)
-      } else {
+      }
+      else {
         [unused, type, id] = commentData.match(/^([a-z]+):([a-zA-Z0-9\-]+)$/)
       }
 
-    } catch (e) {
+    }
+    catch (e) {
       console.log({
         err: e,
         commentData,
@@ -7115,7 +7069,7 @@
     const BlockType = BlockRegistry.get(type)
 
     const getAttributes = BlockType.attributes
-    const el = tr.querySelector(`td#b-${id}`)
+    const el = tr.querySelector(`td#b-${ id }`)
 
     let block = {
       type,
@@ -7126,7 +7080,8 @@
     for (let getter in getAttributes) {
       try {
         block[getter] = getAttributes[getter](el, block)
-      } catch (e) {
+      }
+      catch (e) {
         block[getter] = BlockType.defaults[getter]
       }
     }
@@ -7192,7 +7147,8 @@
         }),
       },
     ]
-  } else {
+  }
+  else {
     GlobalFonts.fonts = globalFonts
   }
 
@@ -7223,4 +7179,4 @@
 
   Groundhogg.EmailEditor = initialize
 
-})(jQuery)
+} )(jQuery)

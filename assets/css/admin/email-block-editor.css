@@ -781,11 +781,11 @@ body iframe#preview.desktop {
 
 @media only screen and (max-width: 960px) {
   .auto-fold #email-editor {
-    left: 36px;
+    left: 36px !important;
   }
 }
 .folded #email-editor {
-  left: 36px;
+  left: 36px !important;
 }
 
 .cards .post-card img {
@@ -975,6 +975,22 @@ body iframe#preview.desktop {
   font-size: 13px;
   width: 13px;
   height: 13px;
+}
+
+.preview.mobile, .preview.desktop {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.preview .from-preview {
+  padding: 20px;
+  position: relative;
+}
+.preview .from-preview h2 {
+  margin: 0 0 10px 0;
+}
+.preview .from-preview .from-email {
+  opacity: 0.7;
 }
 
 /*# sourceMappingURL=email-block-editor.css.map */
