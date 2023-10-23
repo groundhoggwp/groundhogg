@@ -953,6 +953,10 @@ body iframe#preview.desktop {
   background-color: rgba(16, 38, 64, 0.15);
 }
 
+.social-icon-picker.white-icons, .social-icon-picker.white-circle, .social-icon-picker.white-boxed {
+  background-color: rgba(16, 38, 64, 0.1);
+}
+
 .number-control input[type=number] {
   padding-right: 0;
   width: 50px;

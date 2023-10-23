@@ -1376,6 +1376,11 @@
           solid: __('Solid', 'groundhogg'),
           dashed: __('Dashed', 'groundhogg'),
           dotted: __('Dotted', 'groundhogg'),
+          double: __('Double', 'groundhogg'),
+          ridge: __('Ridge', 'groundhogg'),
+          groove: __('Groove', 'groundhogg'),
+          inset: __('Inset', 'groundhogg'),
+          outset: __('Outset', 'groundhogg'),
         },
         selected: borderStyle,
         onChange: e => onChange({ borderStyle: e.target.value }),
@@ -1588,7 +1593,6 @@
         if (value) {
           style[attribute] = value
         }
-        console.log( { attribute, value } )
       }
 
       style = {
@@ -3631,7 +3635,7 @@
   }
 
   const SubjectAndFromPreview = () => Div({
-    className: 'from-preview display-flex gap-20 has-box-shadow'
+    className: 'from-preview display-flex gap-20 has-box-shadow',
   }, [
     makeEl('img', {
       src: getEmail().context.from_avatar,
@@ -3646,11 +3650,11 @@
       className: 'subject-and-from',
     }, [
       // Subject Line
-      `<h2>${getEmail().data.subject}</h2>`,
+      `<h2>${ getEmail().data.subject }</h2>`,
       // From Name & Email
-      `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
+      `<span class="from-name">${ getEmail().context.from_name }</span> <span class="from-email">&lt;${ getEmail().context.from_email }&gt;</span>`,
       // From Email
-    ])
+    ]),
   ])
 
   const PreviewButtons = () => {
@@ -3664,7 +3668,7 @@
         disabled: !Boolean(getState().preview),
         onClick: e => {
           ModalFrame({}, Div({
-            className: 'preview desktop'
+            className: 'preview desktop',
           }, [
             SubjectAndFromPreview(),
             Iframe({
@@ -3682,7 +3686,7 @@
         onClick: e => {
 
           ModalFrame({}, Div({
-            className: 'preview mobile'
+            className: 'preview mobile',
           }, [
             SubjectAndFromPreview(),
             Iframe({
@@ -5674,7 +5678,16 @@
   // '', align = 'center', updateBlock, borderStyle = {} }) => {  return Div({ className: 'vid-container full-width',
   // style: { textAlign: align, }, }, makeEl('img', { className: 'resize-me', onCreate: el => {  setTimeout(() => { let
   // $el = $('img.resize-me') $el.resizable({ aspectRatio: true, maxWidth: $el.parent().width(), stop: (e, ui) => {
-  // updateBlock({ width: Math.ceil(ui.size.width), morphControls: true, morphBlocks: false, }) }, }) }, 100) }, src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: { verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })) }, html: ({ src, width, video = '', title = '', align = 'center', borderStyle = {} }) => {  let img = makeEl('img', { src: `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: { boxSizing: 'border-box', verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })  img = makeEl('a', { href: video, }, img)  return Div({ className: 'img-container', style: { textAlign: align, }, }, img) }, plainText: ({ src = '', title = '', video = '' }) => { return `[![${title || 'video'}](${src})](${video})` }, defaults: { src: 'http://via.placeholder.com/600x338', video: '', title: 'Your Video', width: 600, align: 'center', }, })
+  // updateBlock({ width: Math.ceil(ui.size.width), morphControls: true, morphBlocks: false, }) }, }) }, 100) }, src:
+  // `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: {
+  // verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })) }, html: ({ src, width,
+  // video = '', title = '', align = 'center', borderStyle = {} }) => {  let img = makeEl('img', { src:
+  // `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: {
+  // boxSizing: 'border-box', verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })
+  // img = makeEl('a', { href: video, }, img)  return Div({ className: 'img-container', style: { textAlign: align, },
+  // }, img) }, plainText: ({ src = '', title = '', video = '' }) => { return `[![${title ||
+  // 'video'}](${src})](${video})` }, defaults: { src: 'http://via.placeholder.com/600x338', video: '', title: 'Your
+  // Video', width: 600, align: 'center', }, })
 
   registerBlock('spacer', 'Spacer', {
     attributes: {
@@ -5744,6 +5757,9 @@
             solid: __('Solid', 'groundhogg'),
             dashed: __('Dashed', 'groundhogg'),
             dotted: __('Dotted', 'groundhogg'),
+            double: __('Double', 'groundhogg'),
+            ridge: __('Ridge', 'groundhogg'),
+            groove: __('groove', 'groundhogg'),
           },
           selected: lineStyle,
           onChange: e => updateBlock({ lineStyle: e.target.value }),
@@ -6398,10 +6414,13 @@
         className: 'gh-button grey icon',
         id,
         onClick: e => {
+
+          theme = hasActiveBlock() ? getActiveBlock().theme : 'brand-boxed'
+
           MiniModal({
             selector: `#${ id }`,
           }, ({ close }) => Div({
-            className: 'display-grid',
+            className: `display-grid social-icon-picker ${ theme }`,
           }, [
             ...Object.keys(socialIcons).map(social => Button({
               title: socialIcons[social],
@@ -6415,9 +6434,9 @@
           ]))
         },
       }, SocialIcon(value || 'facebook', theme)),
-      ({ ...props }) => Input({
+      ({ ...props }, [icon]) => Input({
         type: 'url',
-        placeholder: 'https://facebook.com/your-page/',
+        placeholder: `https://${ icon }.com/your-profile/`,
         ...props,
       }),
     ],
