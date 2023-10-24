@@ -2295,10 +2295,29 @@ p.error,
   align-items: stretch;
 }
 .gh-color-picker .current-color {
-  width: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 5px 0 0 5px;
   border: 1px solid rgba(16, 38, 64, 0.3);
   border-right-width: 0;
+  padding: 7px;
+  box-sizing: border-box;
+  background-color: rgba(16, 38, 64, 0.05);
+}
+.gh-color-picker .current-color::after {
+  display: block;
+  box-sizing: border-box;
+  content: "";
+  height: 100%;
+  width: 100%;
+  border-radius: 3px;
+  background-color: var(--color);
+}
+.gh-color-picker .current-color.not-set {
+  background-color: rgba(233, 31, 79, 0.1);
+}
+.gh-color-picker .current-color.not-set::after {
+  background-color: rgba(16, 38, 64, 0.1);
 }
 .gh-color-picker button.gh-button {
   border-top-left-radius: 0;

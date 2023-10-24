@@ -2493,10 +2493,33 @@ p.error,
   align-items: stretch;
 
   .current-color {
-    width: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 5px 0 0 5px;
     border: 1px solid $primary-dark-30;
     border-right-width: 0;
+    padding: 7px;
+    box-sizing: border-box;
+    background-color: $primary-dark-5;
+
+    &::after {
+      display: block;
+      box-sizing: border-box;
+      content: '';
+      height: 100%;
+      width: 100%;
+      border-radius: 3px;
+      background-color: var( --color );
+    }
+
+    &.not-set {
+      background-color: $error-red-10;
+
+      &::after{
+        background-color: $primary-dark-10;
+      }
+
+    }
   }
 
   button.gh-button {

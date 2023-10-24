@@ -1062,9 +1062,9 @@
     }, [
       Div({
         id: `${ id }-current`,
-        className: 'current-color',
+        className: `current-color ${ value ? '' : 'not-set' }`,
         style: {
-          backgroundColor: value,
+          '--color': value,
         },
       }),
       Button({
@@ -1083,8 +1083,13 @@
                 color: value,
                 palettes: colorPalette,
                 change: (e, ui) => {
-                  document.getElementById(`${ id }-current`).style.backgroundColor = ui.color.toString()
-                  onChange(ui.color.toString())
+                  const color = ui.color.toString()
+
+                  const preview = document.getElementById(`${ id }-current`)
+                  preview.style.setProperty('--color', color)
+                  preview.classList.remove('not-set')
+
+                  onChange(color)
                 },
               })
             },
@@ -1104,11 +1109,16 @@
               id: `${ id }-clear`,
               className: 'gh-button secondary small clear-color',
               onClick: e => {
-                onChange('')
+
                 let $picker = $(`#${ id }-picker`)
                 $picker.val('')
                 $picker.iris('color', '')
-                document.getElementById(`${ id }-current`).style.backgroundColor = ''
+
+                const preview = document.getElementById(`${ id }-current`)
+                preview.style.setProperty( '--color', '' )
+                preview.classList.add('not-set')
+
+                onChange('')
               },
             }, 'Clear'),
           ]))
@@ -1583,7 +1593,28 @@
         backgroundImage: (style, el) => el.getAttribute('background'),
         backgroundSize: style => style.getPropertyValue('background-size'),
         backgroundRepeat: style => style.getPropertyValue('background-repeat'),
-        backgroundPosition: style => style.getPropertyValue('background-position'),
+        backgroundPosition: style => {
+
+          const positionMap = {
+            'left top': 'top left',
+            'left center': 'center left',
+            'left bottom': 'bottom left',
+            'right top': 'top right',
+            'right center': 'center right',
+            'right bottom': 'bottom right',
+            'center top': 'top center',
+            'center bottom': 'bottom center',
+          }
+
+          // For some reason these can get swapped, annoying.
+          let position = style.getPropertyValue('background-position')
+
+          if (positionMap.hasOwnProperty(position)) {
+            position = positionMap[position]
+          }
+
+          return position
+        },
       }
 
       let style = {}

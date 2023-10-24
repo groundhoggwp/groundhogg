@@ -37,13 +37,13 @@
 
       for (let attribute in style) {
 
-        let value = style[attribute]
+        // variable
+        if ( attribute.startsWith( '--' ) ){
+          el.style.setProperty( attribute, style[attribute] )
+          continue;
+        }
 
-        // if ( attribute === 'fontFamily'){
-        //   value = value.replaceAll('"', "'")
-        // }
-
-        el.style[attribute] = value
+        el.style[attribute] = style[attribute]
       }
     },
     onCreate: (el, func) => func(el),
