@@ -206,7 +206,9 @@
     },
     task: (task) => {
 
-      const { content, type, context, user_id, summary } = task.data
+      const { content, type, context, user_id } = task.data
+      const { summary } = task.esc_html
+
 
       const addedBy = () => {
 
@@ -277,8 +279,9 @@
     },
     myTask: (task) => {
 
-      const { content, type, summary } = task.data
+      const { content, type } = task.data
       const { associated, ID } = task
+      const { summary } = task.esc_html
 
       // language=HTML
       return `

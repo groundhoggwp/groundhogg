@@ -78,8 +78,8 @@ class Task extends Note {
 
 	protected function sanitize_columns( $data = [] ) {
 
-		foreach ( $data as $column => &$value ){
-			switch ( $column ){
+		foreach ( $data as $column => &$value ) {
+			switch ( $column ) {
 				case 'timestamp':
 				case 'step_id':
 				case 'funnel_id':
@@ -166,9 +166,9 @@ class Task extends Note {
 
 		// Base functionality for contacts
 		if ( is_a_contact( $object ) ) {
-			$associated['link']  = $object->admin_link() . '&_tab=tasks';
-			$associated['name']  = empty( trim( $object->get_full_name() ) ) ? $object->get_email() : $object->get_full_name();
-			$associated['type']  = $object->get_object_type();
+			$associated['link'] = $object->admin_link() . '&_tab=tasks';
+			$associated['name'] = empty( trim( $object->get_full_name() ) ) ? $object->get_email() : $object->get_full_name();
+			$associated['type'] = $object->get_object_type();
 		}
 
 		$associated = apply_filters( 'groundhogg/task/associated_context', $associated, $object );
@@ -183,6 +183,9 @@ class Task extends Note {
 				'completed'      => human_time_diff( strtotime( $this->date_completed ), time() ),
 				'due_date'       => $dueDate->format( get_date_time_format() ),
 				'completed_date' => $this->is_complete() ? $this->get_date_completed()->format( get_date_time_format() ) : '',
+			],
+			'esc_html'      => [
+				'summary' => esc_html( $this->summary )
 			],
 			'associated'    => $associated
 		] );

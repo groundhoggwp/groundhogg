@@ -735,7 +735,7 @@
     let editor = tinyMCE.get(editor_id)
 
     editor.on('Change keyup', function (e) {
-      onChange(editor.getContent({ format: 'raw' }))
+      onChange(editor.getContent())
 
       if (e.type == 'keyup' && e.ctrlKey && e.shiftKey && e.which == 219) {
 
