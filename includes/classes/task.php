@@ -76,6 +76,31 @@ class Task extends Note {
 		return new DateTimeHelper( $this->due_date );
 	}
 
+	protected function sanitize_columns( $data = [] ) {
+
+		foreach ( $data as $column => &$value ){
+			switch ( $column ){
+				case 'timestamp':
+				case 'step_id':
+				case 'funnel_id':
+				case 'object_id':
+				case 'user_id':
+					$value = absint( $value );
+					break;
+				case 'summary':
+				case 'type':
+				default:
+					$value = sanitize_text_field( $value );
+					break;
+				case 'content':
+					$value = wp_kses_post( $value );
+					break;
+			}
+		}
+
+		return $data;
+	}
+
 	/**
 	 * Update wrapper
 	 *

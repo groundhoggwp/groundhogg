@@ -353,6 +353,10 @@ function add_custom_property_replacements( $replacements ) {
 
 		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
+		if ( ! $tab ){
+			continue;
+		}
+
 		$replacements->add_group( $group['id'], sprintf( '%s: %s', $tab['name'], $group['name'] ) );
 
 		$custom_fields = Properties::instance()->get_fields( $group['id'] );
