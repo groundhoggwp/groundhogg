@@ -343,6 +343,10 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED Moved user meta sync option to WordPress integration settings.
 * TWEAKED Dropdown and checkbox fields can now be pre-selected with the value setting in the new form builder.
 
+= 2.7.11.11 (2023-10-25) =
+* FIXED Properly sanitize task data.
+* FIXED PHP Notice if custom fields tab was deleted.
+
 = 2.7.11.10 (2023-07-27) =
 * ADDED Sort contacts by custom fields values and user meta (when available).
 * ADDED Sort contacts by tag count.
