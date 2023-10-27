@@ -668,8 +668,7 @@
                       key: 'add',
                       text: __('Create New Email'),
                       onSelect: () => {
-                        // state.changing = true
-                        // morphPreview()
+                        openEmailEditor({})
                       },
                     },
                   ])

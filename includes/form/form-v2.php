@@ -18,6 +18,7 @@ use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_field_label;
 use function Groundhogg\html;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\is_recaptcha_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
@@ -1943,7 +1944,7 @@ class Form_v2 extends Step {
 		$email = get_array_var( $data, 'email' );
 
 		if ( ! $email ) {
-			$contact = get_current_contact();
+			$contact = is_a_contact( $this->contact ) ? $this->contact : get_current_contact();
 		} else {
 			$contact = new Contact( $data );
 		}

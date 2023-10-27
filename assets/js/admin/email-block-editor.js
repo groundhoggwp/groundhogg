@@ -617,9 +617,17 @@
         setState({
           preview: item.context.built,
           previewPlainText: item.context.plain,
+
+          previewFromName: item.context.from_name,
+          previewFromAvatar: item.context.from_avatar,
+          previewFromEmail: item.context.from_email,
+          previewSubject: item.context.subject,
+
           previewLoading: false,
         })
+
         morphHeader()
+
       })
     }, 1000)
   }
@@ -740,7 +748,7 @@
 
     updatePreview()
 
-    History.addChange(getStateCopy())
+    History.addChange(getStateCopy()) // updateSettings, email meta basically
   }
 
   function getSubstringUpToSecondHyphen (inputString) {
@@ -820,7 +828,7 @@
     }
 
     if (hasChanges) {
-      History.addChange(getStateCopy())
+      History.addChange(getStateCopy()) // setBlocks
     }
   }
 
@@ -1115,7 +1123,7 @@
                 $picker.iris('color', '')
 
                 const preview = document.getElementById(`${ id }-current`)
-                preview.style.setProperty( '--color', '' )
+                preview.style.setProperty('--color', '')
                 preview.classList.add('not-set')
 
                 onChange('')
@@ -3135,7 +3143,31 @@
           fetchOptions: search => Promise.resolve(fromOptions.filter(item => item.text.includes(search))),
           selected: fromOptions.find(opt => from_select === opt.id),
           onChange: item => {
-            setEmailData({ from_select: item.id })
+
+            if (item.id === 'default') {
+              setEmailData({
+                from_user: 0,
+                from_select: item.id,
+              })
+
+              setEmailMeta({
+                use_default_from: true,
+              })
+            }
+            else {
+              setEmailData({
+                from_user: item.id,
+                from_select: item.id,
+              })
+
+              setEmailMeta({
+                use_default_from: false,
+              })
+            }
+
+            History.addChange(getStateCopy()) // after change from
+
+            updatePreview()
           },
         })),
         Control({
@@ -3151,7 +3183,10 @@
           fetchOptions: search => Promise.resolve(
             replyToOptions.filter(item => item.includes(search)).map(em => ( { id: em, text: em } ))),
           selected: reply_to_override ? { id: reply_to_override, text: reply_to_override } : [],
-          onChange: item => setEmailMeta({ reply_to_override: item ? item.id : '' }),
+          onChange: item => {
+            setEmailMeta({ reply_to_override: item ? item.id : '' })
+            History.addChange(getStateCopy()) // after change reply-to
+          },
         })),
         Control({
           label: 'Message type',
@@ -3304,6 +3339,17 @@
           },
         }, 'Add Font'),
       ]),
+      ControlGroup({ id: 'global-socials', name: 'Social Accounts' }, [
+        `<p>Choose your default/global social account links for the Socials block.</p>`,
+        SocialLinksRepeater({
+          socials: globalSocials,
+          theme: 'brand-boxed',
+          onChange: socials => {
+            globalSocials = socials
+            morphBlocks()
+          },
+        }),
+      ]),
       ControlGroup({ name: 'Color Palettes' }, [
         `<p>Choose up to 8 colors for the color picker.</p>`,
         InputRepeater({
@@ -3329,17 +3375,6 @@
           ],
           onChange: rows => {
             colorPalette = rows.map(r => r[1])
-          },
-        }),
-      ]),
-      ControlGroup({ id: 'global-socials', name: 'Social Accounts' }, [
-        `<p>Choose your default/global social account links for the Socials block.</p>`,
-        SocialLinksRepeater({
-          socials: globalSocials,
-          theme: 'brand-boxed',
-          onChange: socials => {
-            globalSocials = socials
-            morphBlocks()
           },
         }),
       ]),
@@ -3669,7 +3704,7 @@
     className: 'from-preview display-flex gap-20 has-box-shadow',
   }, [
     makeEl('img', {
-      src: getEmail().context.from_avatar,
+      src: getState().previewFromAvatar,
       className: 'from-avatar',
       height: 40,
       width: 40,
@@ -3681,10 +3716,9 @@
       className: 'subject-and-from',
     }, [
       // Subject Line
-      `<h2>${ getEmail().data.subject }</h2>`,
+      `<h2>${ getState().previewSubject }</h2>`,
       // From Name & Email
-      `<span class="from-name">${ getEmail().context.from_name }</span> <span class="from-email">&lt;${ getEmail().context.from_email }&gt;</span>`,
-      // From Email
+      `<span class="from-name">${ getState().previewFromName }</span> <span class="from-email">&lt;${ getState().previewFromEmail }&gt;</span>`,
     ]),
   ])
 
@@ -5790,7 +5824,7 @@
             dotted: __('Dotted', 'groundhogg'),
             double: __('Double', 'groundhogg'),
             ridge: __('Ridge', 'groundhogg'),
-            groove: __('groove', 'groundhogg'),
+            groove: __('Groove', 'groundhogg'),
           },
           selected: lineStyle,
           onChange: e => updateBlock({ lineStyle: e.target.value }),
@@ -6771,12 +6805,17 @@
       email.meta.template = BOXED
     }
 
-    let preview = ''
-    let previewPlainText = ''
+    let preview, previewPlainText, previewFromName, previewFromEmail, previewFromAvatar, previewSubject = ''
 
     if (email.context?.built) {
-      preview = email.context.built
-      previewPlainText = email.context.plain
+      ;( {
+        built: preview,
+        plain: previewPlainText,
+        from_name: previewFromName,
+        from_email: previewFromEmail,
+        from_avatar: previewFromAvatar,
+        subject: previewSubject
+      } = email.context )
     }
 
     setState({
@@ -6787,8 +6826,14 @@
       emailControlsTab: 'email',
       isGeneratingHTML: false,
       email,
+
+      // preview stuff
       preview,
       previewPlainText,
+      previewFromName,
+      previewFromEmail,
+      previewFromAvatar,
+      previewSubject
     })
 
     setBlocks(blocks, false)

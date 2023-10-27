@@ -9,7 +9,6 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
-use function Groundhogg\get_object_ids;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\track_activity;
@@ -146,6 +145,7 @@ class Send_Email extends Action {
 
 		$headers['in-reply-to'] = 'In-Reply-To: ' . $message_id;
 		$headers['references']  = 'References: ' . $message_id;
+		$headers['from']        = $this->from;
 
 		return $headers;
 	}
@@ -163,6 +163,7 @@ class Send_Email extends Action {
 
 	protected $message_id;
 	protected $subject;
+	protected $from;
 
 	/**
 	 * Whether there are replies for this step
@@ -221,6 +222,7 @@ class Send_Email extends Action {
 
 					$this->message_id = $last_thread_reply->get_meta( 'message_id' );
 					$this->subject    = $last_thread_reply->get_meta( 'subject' );
+					$this->from       = $last_thread_reply->get_meta( 'from' );
 
 					// Filter subject line
 					add_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
@@ -232,12 +234,17 @@ class Send_Email extends Action {
 
 		$sent    = $email->send( $contact, $event );
 		$subject = $email->get_merged_subject_line();
+		$from    = $email->get_from_header();
 
 		if ( $reply_in_thread && isset( $last_thread_reply ) ) {
 			$subject          = $this->subject;
+			$from             = $this->from;
+
 			$this->message_id = '';
 			$this->subject    = '';
-			remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
+			$this->from       = '';
+
+            remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
 			remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
 		}
 
@@ -252,7 +259,8 @@ class Send_Email extends Action {
 				'email_id'  => $email->get_id(),
 			], [
 				'message_id' => $message_id,
-				'subject'    => $subject
+				'subject'    => $subject,
+				'from'       => $from
 			] );
 
 		}
@@ -287,12 +295,12 @@ class Send_Email extends Action {
 		$prev_email_options = array_reverse( $prev_email_options, true );
 
 		?>
-		<div class="gh-panel">
-			<div class="gh-panel-header">
-				<h2><?php _e( 'Email Settings' ) ?></h2>
-			</div>
-			<div class="inside display-flex column gap-10">
-				<label for=""><?php _e( 'Email threading' ) ?></label>
+        <div class="gh-panel">
+            <div class="gh-panel-header">
+                <h2><?php _e( 'Email Settings' ) ?></h2>
+            </div>
+            <div class="inside display-flex column gap-10">
+                <label for=""><?php _e( 'Email threading' ) ?></label>
 				<?php echo html()->dropdown( [
 					'name'        => $this->setting_name_prefix( 'reply_in_thread' ),
 					'option_none' => 'No threading',
@@ -306,15 +314,15 @@ class Send_Email extends Action {
 						'checked' => $this->get_setting( 'skip_if_confirmed' )
 					] ); ?>
 				<?php endif; ?>
-			</div>
-		</div>
+            </div>
+        </div>
 		<?php
 	}
 
 	protected function labels() {
 
 		if ( $this->get_setting( 'reply_in_thread' ) ):?>
-			<div class="step-label green"><?php _e( 'Reply', 'groundhogg' ); ?></div>
+            <div class="step-label green"><?php _e( 'Reply', 'groundhogg' ); ?></div>
 		<?php
 		endif;
 	}
@@ -413,7 +421,7 @@ class Send_Email extends Action {
 		$reply_to = $step->get_meta( 'reply_in_thread' );
 
 		// Not threading...
-		if ( ! $reply_to ){
+		if ( ! $reply_to ) {
 			return;
 		}
 

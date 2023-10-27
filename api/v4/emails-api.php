@@ -506,11 +506,11 @@ class Emails_Api extends Base_Object_Api {
 			$email = new Email();
 		}
 
-		// Override with the dump
-		$email->data = $request->get_param( 'data' );
-		$email->meta = $request->get_param( 'meta' );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
 
-		$email->enable_test_mode();
+		// Override with the dump
+		$email->set_preview_data( $data, $meta );
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
 	}

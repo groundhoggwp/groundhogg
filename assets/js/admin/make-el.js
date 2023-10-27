@@ -644,8 +644,6 @@
         ...newState,
       }
 
-      console.log( trigger )
-
       morph()
     }
 

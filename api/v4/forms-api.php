@@ -5,14 +5,15 @@ namespace Groundhogg\Api\V4;
 use Groundhogg\Form\Form;
 use Groundhogg\Form\Form_v2;
 use Groundhogg\Plugin;
-use Groundhogg\Step;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
 use function Groundhogg\after_form_submit_handler;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 
 class Forms_Api extends Base_Api {
 
@@ -115,15 +116,46 @@ class Forms_Api extends Base_Api {
 	}
 
 	/**
+	 * Fetches the contact from the request based on the referer or explicit passed param
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return false|\Groundhogg\Contact|WP_Error
+	 */
+	protected static function get_contact_from_request( WP_REST_Request $request ) {
+
+		if ( $request->has_param( 'contact' ) ) {
+			return get_contactdata( $request->get_param( 'contact' ) );
+		}
+
+		if ( $request->has_param( 'email' ) ) {
+			return get_contactdata( sanitize_email( $request->get_param( 'email' ) ) );
+		}
+
+		$referer = wp_get_referer();
+		$params  = [];
+		wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
+
+		if ( get_array_var( $params, 'page' ) === 'gh_contacts' && isset_not_empty( $params, 'contact' ) ) {
+			return get_contactdata( absint( $params['contact'] ) );
+		}
+
+		return parent::get_contact_from_request( $request );
+	}
+
+	/**
 	 * Handler to submit a specific form
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function admin_submit( WP_REST_Request $request ) {
-		$form_uuid = $request->get_param( 'form' );
-		$form      = new Form_v2( [
+
+		$form_uuid   = $request->get_param( 'form' );
+		$contact_ref = self::get_contact_from_request( $request );
+
+		$form = new Form_v2( [
 			'id'      => $form_uuid,
-			'contact' => $request->get_param( 'contact' )
+			'contact' => $contact_ref
 		] );
 
 		if ( ! $form->exists() ) {
@@ -170,6 +202,7 @@ class Forms_Api extends Base_Api {
 
 		$where = [
 			[ 'step_type', 'IN', [ 'form_fill', 'web_form' ] ],
+			[ 'step_status', '=', 'active' ],
 		];
 
 		if ( ! empty( $search ) ) {
@@ -184,29 +217,26 @@ class Forms_Api extends Base_Api {
 			'limit'   => 25,
 		];
 
-		$total = get_db( 'steps' )->count( $query );
-		$items = get_db( 'steps' )->query( $query );
+		$total       = get_db( 'steps' )->count( $query );
+		$items       = get_db( 'steps' )->query( $query );
+		$contact_ref = self::get_contact_from_request( $request );
 
-		$items = array_map( function ( $form ) use ( $request ){
+		$items = array_map( function ( $form ) use ( $request, $contact_ref ) {
 
-			switch ( $form->step_type ){
+			switch ( $form->step_type ) {
 				case 'web_form':
-
-					$atts = [ 'id' => $form->ID ];
-
-					if ( $request->has_param( 'contact' ) ){
-						$atts[ 'contact' ] = get_contactdata(  $request->get_param( 'contact' ) );
-					}
-
-					return new Form_v2( $atts );
+					return new Form_v2( [
+						'id'      => $form->ID,
+						'contact' => $contact_ref
+					] );
 				default:
 				case 'form_fill':
 					return new Form( [ 'id' => $form->ID ] );
 			}
 		}, $items );
 
-		if ( $request->get_param('active') ){
-			$items = array_filter( $items, function ( $form ){
+		if ( $request->get_param( 'active' ) ) {
+			$items = array_filter( $items, function ( $form ) {
 				return $form->is_active();
 			} );
 		}

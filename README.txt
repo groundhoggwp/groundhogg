@@ -329,8 +329,6 @@ You can purchase a premium plan for access to support and our premium extensions
 = 3.0 (2023-10-01) =
 * NEW [Drag & Drop block-based (not Gutenberg) email editor](https://www.groundhogg.io/press/groundhogg-3-0-columns-conditional-content-socials-and-more/)
 * NEW Campaigns as method for organizing funnels, emails, and broadcasts
-
-= 2.7.12 (2023-08-01) =
 * ADDED New feature to add heading dividers to custom reports page to make grouping your custom reports easier.
 * ADDED Exclude filters to custom reports for more advanced reporting.
 * ADDED New report value types for number reports,

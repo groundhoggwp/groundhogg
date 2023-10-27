@@ -75,20 +75,30 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Set the from_select and from_type properties
+	 *
+	 * @return void
+	 */
+	protected function set_from_select() {
+		$this->from_select = $this->from_user > 0 ? $this->from_user : ( $this->get_meta( 'use_default_from' ) ? 'default' : 0 );
+		$this->from_type   = $this->from_user > 0 ? 'user' : ( $this->get_meta( 'use_default_from' ) ? 'default' : 'owner' );
+	}
+
+	/**
 	 * Do any post setup actions.
 	 *
 	 * @return void
 	 */
 	protected function post_setup() {
 
-		$this->ID          = absint( $this->ID );
-		$this->from_user   = absint( $this->from_user );
-		$this->from_select = $this->from_user > 0 ? $this->from_user : ( $this->get_meta( 'use_default_from' ) ? 'default' : 0 );
-		$this->from_type   = $this->from_user > 0 ? 'user' : ( $this->get_meta( 'use_default_from' ) ? 'default' : 'owner' );
+		$this->ID        = absint( $this->ID );
+		$this->from_user = absint( $this->from_user );
 
 		if ( $this->from_user > 0 ) {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
+
+		$this->set_from_select();
 
 		// Maybe update from the meta message type
 		if ( ! isset_not_empty( $this->data, 'message_type' ) ) {
@@ -97,6 +107,22 @@ class Email extends Base_Object_With_Meta {
 				'message_type' => $message_type ?: 'marketing'
 			] );
 		}
+	}
+
+	/**
+	 * Sets data for preview reasons
+	 *
+	 * @param $data
+	 * @param $meta
+	 *
+	 * @return void
+	 */
+	public function set_preview_data( $data, $meta ) {
+		$this->data = $data;
+		$this->meta = $meta;
+
+		$this->post_setup();
+		$this->enable_test_mode();
 	}
 
 	/**
@@ -173,8 +199,8 @@ class Email extends Base_Object_With_Meta {
 
 	/**
 	 *
-	 * @return bool
 	 * @deprecated
+	 * @return bool
 	 */
 	public function has_custom_alt_body() {
 		return $this->using_custom_alt_body();
@@ -868,6 +894,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * The compiled from header
+	 *
+	 * @return string
+	 */
+	public function get_from_header(){
+		return sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() );
+	}
+
+	/**
 	 * The reply-to address
 	 *
 	 * @return string
@@ -898,7 +933,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$defaults = [
-			'from'         => sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() ),
+			'from'         => $this->get_from_header(),
 			'reply-to'     => $this->get_reply_to_address(),
 			'return-path'  => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
 			'content-type' => 'text/html; charset=UTF-8',
@@ -1178,56 +1213,7 @@ class Email extends Base_Object_With_Meta {
 			''
 		);
 
-		$buffer = preg_replace( $search, $replace, $content );
-
-		return $buffer;
-	}
-
-	/**
-	 * @param array $data
-	 *
-	 * @return bool
-	 */
-	public function update( $data = [] ) {
-
-		// map from_select to proper arguments
-		if ( isset_not_empty( $data, 'from_select' ) ) {
-			if ( $data['from_select'] === 'default' ) {
-				$data['from_user'] = 0;
-				$use_default_from  = 1;
-			} else {
-				$data['from_user'] = $data['from_select'];
-				$use_default_from  = 0;
-			}
-		}
-
-		$updated = parent::update( $data );
-
-		if ( isset( $use_default_from ) ) {
-			$this->update_meta( 'use_default_from', $use_default_from );
-		}
-
-		return $updated;
-	}
-
-	/**
-	 * Wrapper to handle sanitizing the email blocks
-	 *
-	 * @param       $key
-	 * @param false $value
-	 *
-	 * @return bool|mixed
-	 */
-	public function update_meta( $key, $value = false ) {
-
-		switch ( $key ) {
-			case 'blocks':
-				// Todo are we doing this?
-//				$value = Block_Registry::instance()->sanitize_blocks( $value );
-				break;
-		}
-
-		return parent::update_meta( $key, $value );
+		return preg_replace( $search, $replace, $content );
 	}
 
 	/**
@@ -1260,6 +1246,15 @@ class Email extends Base_Object_With_Meta {
 				case 'message_type':
 				default:
 					$value = sanitize_text_field( $value );
+					break;
+				case 'from_select':
+
+					if ( $value === 'default' ) {
+						$data['from_user'] = 0;
+					} else {
+						$data['from_user'] = $value;
+					}
+
 					break;
 			}
 		}
@@ -1321,6 +1316,9 @@ class Email extends Base_Object_With_Meta {
 			$this->content = wpautop( $this->content );
 		}
 
+		// Do this again just in case 🤷
+		$this->set_from_select();
+
 		return array_merge( parent::get_as_array(), [
 			'campaigns' => $this->get_related_objects( 'campaign' ),
 			'context'   => [
@@ -1330,9 +1328,10 @@ class Email extends Base_Object_With_Meta {
 				] ),
 				'from_name'   => $this->get_from_name(),
 				'from_email'  => $this->get_from_email(),
+				'subject'     => $this->get_merged_subject_line(),
 				'from_user'   => $this->get_from_user(),
 				'built'       => $live_preview,
-				'plain'       => $this->get_merged_alt_body()
+				'plain'       => $this->get_merged_alt_body(),
 			]
 		] );
 	}
