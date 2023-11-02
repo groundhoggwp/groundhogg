@@ -87,7 +87,6 @@ class Funnels_Api extends Base_Object_Api {
 
 		$data      = $request->get_param( 'data' );
 		$meta      = $request->get_param( 'meta' );
-		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
 
 		$object->update( $data );
 
@@ -96,20 +95,25 @@ class Funnels_Api extends Base_Object_Api {
 			$object->update_meta( $meta );
 		}
 
-		$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
-		$add_campaigns    = array_diff( $campaigns, $has_campaigns );
-		$remove_campaigns = array_diff( $has_campaigns, $campaigns );
+		if ( $request->has_param( 'campaigns' ) ){
 
-		if ( ! empty( $add_campaigns ) ) {
-			foreach ( $add_campaigns as $campaign ) {
-				$object->create_relationship( new Campaign( $campaign ) );
-			}
-		}
+			$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+			$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
+			$add_campaigns    = array_diff( $campaigns, $has_campaigns );
+			$remove_campaigns = array_diff( $has_campaigns, $campaigns );
 
-		if ( ! empty( $remove_campaigns ) ) {
-			foreach ( $remove_campaigns as $campaign ) {
-				$object->delete_relationship( new Campaign( $campaign ) );
+			if ( ! empty( $add_campaigns ) ) {
+				foreach ( $add_campaigns as $campaign ) {
+					$object->create_relationship( new Campaign( $campaign ) );
+				}
 			}
+
+			if ( ! empty( $remove_campaigns ) ) {
+				foreach ( $remove_campaigns as $campaign ) {
+					$object->delete_relationship( new Campaign( $campaign ) );
+				}
+			}
+
 		}
 
 		$this->do_object_updated_action( $object );

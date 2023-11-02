@@ -898,7 +898,6 @@
           { id: 'all-contacts', text: __('All contacts.', 'groundhogg') },
           { id: 'all-my-contacts', text: __('All contacts assigned to me.', 'groundhogg') },
           { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
-          { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
         ]
 
         if ( getState().searchMethod === 'selection' ){
@@ -918,11 +917,13 @@
             }))(SearchesStore.get(getState().savedSearch)),
             fetchOptions: async search => {
               let searches = await SearchesStore.fetchItems({ search })
-              searches = searches.map(s => ({ id: s.id, text: `Saved search "${s.name}"` }))
-              return [
-                ...otherSearchMethods,
-                ...searches,
-              ]
+              searches = searches.map(s => ({ id: s.id, text: `Saved search <b>${s.name}</b>` }))
+
+              if ( ! search ){
+                searches.unshift( ...otherSearchMethods )
+              }
+
+              return searches
             },
             onChange: (item) => {
 

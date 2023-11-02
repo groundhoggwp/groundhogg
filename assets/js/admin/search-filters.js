@@ -2294,6 +2294,7 @@
     onMount: ({ search }, updateFilter) => {
 
       SearchesStore.maybeFetchItems().then(items => {
+
         $('#filter-search').select2({
           data: [
             { id: '', text: '' },

@@ -748,32 +748,35 @@ class Replacements implements \JsonSerializable {
 			return $cache_value;
 		}
 
-		$html_callback  = $this->replacement_codes[ $code ]['callback'];
-		$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
-
-		if ( ! is_callable( $plain_callback ) ) {
-			$plain_callback = function ( ...$args ) use ( $html_callback ) {
-
-				$content = $html_callback( ...$args );
-
-				if ( wp_strip_all_tags( $content ) !== $content ) {
-					return html2markdown( $content );
-				}
-
-				return $content;
-			};
-		}
-
-		$callback = $this->context_is_html() ? $html_callback : $plain_callback;
-
 		// Access contact fields.
 		if ( substr( $code, 0, 1 ) === '_' ) {
 			$field = substr( $code, 1 );
 			$text  = $this->get_current_contact()->$field;
-		} else if ( $arg ) {
-			$text = call_user_func( $callback, $arg, $this->contact_id, $code );
 		} else {
-			$text = call_user_func( $callback, $this->contact_id, $code );
+
+			$html_callback  = $this->replacement_codes[ $code ]['callback'];
+			$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
+
+			if ( ! is_callable( $plain_callback ) ) {
+				$plain_callback = function ( ...$args ) use ( $html_callback ) {
+
+					$content = $html_callback( ...$args );
+
+					if ( wp_strip_all_tags( $content ) !== $content ) {
+						return html2markdown( $content );
+					}
+
+					return $content;
+				};
+			}
+
+			$callback = $this->context_is_html() ? $html_callback : $plain_callback;
+
+            if ( $arg ) {
+				$text = call_user_func( $callback, $arg, $this->contact_id, $code );
+			} else {
+				$text = call_user_func( $callback, $this->contact_id, $code );
+			}
 		}
 
 		if ( empty( $text ) ) {
