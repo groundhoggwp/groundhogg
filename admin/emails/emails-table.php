@@ -3,21 +3,16 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Admin\Table;
-use Groundhogg\DB\DB;
 use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use WP_List_Table;
-use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
-use function Groundhogg\get_request_query;
-use function Groundhogg\get_screen_option;
-use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
@@ -67,8 +62,8 @@ class Emails_Table extends Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = [
@@ -109,10 +104,10 @@ class Emails_Table extends Table {
 			return;
 		}
 		?>
-		<div class="alignleft gh-actions">
-			<a class="button danger"
-			   href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
-		</div>
+        <div class="alignleft gh-actions">
+            <a class="button danger"
+               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+        </div>
 		<?php
 	}
 
@@ -389,7 +384,7 @@ class Emails_Table extends Table {
 			[
 				'view'    => '',
 				'display' => __( 'All' ),
-				'query'   => [],
+				'query'   => [ 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'ready',

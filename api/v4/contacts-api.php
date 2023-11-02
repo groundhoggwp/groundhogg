@@ -546,6 +546,56 @@ class Contacts_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Delete contacts
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
+	public function delete( WP_REST_Request $request ) {
+
+		$query = wp_parse_args( $request->get_params() );
+
+		$query = wp_parse_args( $query, [
+			'orderby'       => $this->get_primary_key(),
+			'order'         => 'ASC',
+			'number'        => 500,
+			'no_found_rows' => false,
+		] );
+
+		$query = new Contact_Query( $query );
+
+		$items = $query->query( null, true );
+		$found = $query->found_items;
+
+		if ( empty( $items ) ) {
+			return self::ERROR_403( 'error', 'No items defined.' );
+		}
+
+		$deleted_item_ids = [];
+		$deleted_items    = 0;
+
+		/**
+		 * @var $contact Contact
+		 */
+		foreach ( $items as $contact ) {
+			$deleted_item_ids[] = $contact->get_id();
+
+			$contact->delete();
+
+			$this->do_object_deleted_action( $contact );
+
+			$deleted_items ++;
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'           => $deleted_item_ids,
+			'deleted_items'   => $deleted_items,
+			'items_remaining' => $found - $deleted_items,
+		] );
+	}
+
+	/**
 	 *
 	 * @param WP_REST_Request $request
 	 *

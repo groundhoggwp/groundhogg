@@ -531,6 +531,13 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$query = wp_parse_args( $request->get_params() );
 
+		$query = wp_parse_args( $query, [
+			'orderby'    => $this->get_primary_key(),
+			'order'      => 'ASC', // OLDEST FIRST
+			'limit'      => 100,
+			'found_rows' => false,
+		] );
+
 		if ( ! empty( $query ) ) {
 			$items = $this->get_db_table()->query( $query );
 		} else {

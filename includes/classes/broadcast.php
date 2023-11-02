@@ -463,6 +463,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 			$offset ++;
 
+			// Can't be delivered at all
 			if ( ! $contact->is_deliverable() ) {
 				continue;
 			}
@@ -509,7 +510,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$this->update_meta( 'num_scheduled', $offset );
 		$this->update_meta( 'total_contacts', $total );
 
-		// Finished scheduling, unpause broadcast events
+		// Finished scheduling
 		if ( $offset >= $total ) {
 			$this->update( [ 'status' => 'scheduled' ] );
 		}

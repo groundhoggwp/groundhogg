@@ -277,6 +277,15 @@ abstract class Admin_Page extends Supports_Errors {
 	}
 
 	/**
+	 * @param $action
+	 *
+	 * @return bool
+	 */
+	protected function current_action_is( $action ) {
+		return $this->get_current_action() === $action;
+	}
+
+	/**
 	 * Get the current action
 	 *
 	 * @return bool|string

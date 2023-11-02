@@ -44,24 +44,10 @@ class Emails_Page extends Admin_Page {
 		return $action;
 	}
 
-	/**
-	 * @param $action
-	 *
-	 * @return bool
-	 */
-	protected function current_action_is( $action ) {
-		return $this->get_current_action() === $action;
-	}
-
-	protected function add_ajax_actions() {
-//		add_action( 'wp_ajax_gh_update_email', [ $this, 'update_email_ajax' ] );
-		add_action( 'wp_ajax_get_my_emails_search_results', [ $this, 'get_my_emails_search_results' ] );
-	}
-
 	protected function add_additional_actions() {
 		Groundhogg\add_disable_emojis_action();
 
-		if ( $this->is_current_page() && $this->current_action_is( 'edit' ) ){
+		if ( $this->is_current_page() && in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 		}
 	}
@@ -192,7 +178,10 @@ class Emails_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			Plugin::$instance->dbs->get_db( 'emails' )->update( $id, [ 'status' => 'draft' ] );
+			$email = new Email( $id );
+			if ( $email->exists() ) {
+				$email->update( [ 'status' => 'draft' ] );
+			}
 		}
 
 		$this->add_notice(
@@ -241,10 +230,13 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( [ 'status' => 'trash' ] );
+		$emails = get_db( 'emails' )->query( [ 'status' => 'trash' ] );
 
 		foreach ( $emails as $email ) {
-			Plugin::$instance->dbs->get_db( 'emails' )->delete( $email->ID );
+			$email = new Email( $email );
+			if ( $email->exists() ) {
+				$email->delete();
+			}
 		}
 
 		$this->add_notice(
@@ -270,8 +262,9 @@ class Emails_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			if ( ! Plugin::$instance->dbs->get_db( 'emails' )->delete( $id ) ) {
-				return new \WP_Error( 'unable_to_delete_email', "Something went wrong deleting the email." );
+			$email = new Email( $id );
+			if ( $email->exists() ) {
+				$email->delete();
 			}
 		}
 
@@ -295,7 +288,10 @@ class Emails_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			Plugin::$instance->dbs->get_db( 'emails' )->update( $id, [ 'status' => 'trash' ] );
+			$email = new Email( $id );
+			if ( $email->exists() ) {
+				$email->update( [ 'status' => 'trash' ] );
+			}
 		}
 
 		$this->add_notice(
@@ -346,10 +342,10 @@ class Emails_Page extends Admin_Page {
 		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
 
 		?>
-		<form method="post">
+        <form method="post">
 			<?php $emails_table->prepare_items(); ?>
 			<?php $emails_table->display(); ?>
-		</form>
+        </form>
 		<?php
 	}
 
@@ -370,201 +366,13 @@ class Emails_Page extends Admin_Page {
 	public function page() {
 
 		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
-			$this->edit();
+			$this->block_editor();
 
 			return;
 		}
 
 		parent::page();
 	}
-
-	/**
-	 * Add the email to the DB
-	 *
-	 * @return bool|string|\WP_Error
-	 * @deprecated now using block editor
-	 */
-	public function process_add() {
-		if ( ! current_user_can( 'add_emails' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$default_tab = Groundhogg\is_option_enabled( 'gh_use_advanced_email_editor' ) ? 'my-emails' : 'new-email';
-
-		$tab = Groundhogg\get_url_var( 'tab', $default_tab );
-
-		switch ( $tab ) {
-
-			case 'new-email':
-
-				$email_id = Groundhogg\get_db( 'emails' )->add( [ 'author' => get_current_user_id() ] );
-
-				if ( ! $email_id ) {
-					return new \WP_Error( 'error', 'Unable to create email.' );
-				}
-
-				Groundhogg\set_request_var( 'email', $email_id );
-
-				$result = $this->process_edit();
-
-				if ( $result === true ) {
-					return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email_id ] );
-				}
-
-				return $result;
-
-				break;
-
-			case 'my-templates':
-			case 'my-emails':
-				$from_email = new Email( absint( Groundhogg\get_post_var( 'email_id' ) ) );
-
-				if ( ! $from_email->exists() ) {
-					return new \WP_Error( 'error', 'Invalid email ID!' );
-				}
-
-				$email = $from_email->duplicate( [
-					'title'  => sprintf( "%s - (copy)", $from_email->get_title() ),
-					'author' => get_current_user_id()
-				] );
-
-				if ( ! $email->exists() ) {
-					return new \WP_Error( 'error', 'Could not create email.' );
-				}
-
-				return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email->get_id() ] );
-
-				break;
-			default:
-				do_action( "groundhogg/admin/emails/process_add/{$tab}", $this );
-				break;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Process the editing actions of the email
-	 *
-	 * @return bool|\WP_Error
-	 * @deprecated now using block editor
-	 */
-	public function process_edit() {
-
-		if ( ! current_user_can( 'edit_emails' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$id    = absint( Groundhogg\get_request_var( 'email' ) );
-		$email = new Email( $id );
-
-		$args = array();
-
-		$status = sanitize_text_field( Groundhogg\get_request_var( 'email_status', 'draft' ) );
-
-		if ( $status === 'draft' ) {
-			$this->add_notice( 'email-in-draft-mode', __( 'Emails cannot be sent while in DRAFT mode.', 'groundhogg' ), 'warning' );
-		}
-
-		$from_user = Groundhogg\get_request_var( 'from_user' );
-
-		if ( $from_user === 'default' ) {
-			$email->update_meta( 'use_default_from', true );
-			$from_user = 0;
-		} else {
-			$email->delete_meta( 'use_default_from' );
-			$from_user = absint( $from_user );
-		}
-
-		$subject    = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
-		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
-		$content    = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'email_content' ) );
-
-		$args['status']       = $status;
-		$args['from_user']    = $from_user;
-		$args['subject']      = $subject;
-		$args['title']        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
-		$args['pre_header']   = $pre_header;
-		$args['content']      = $content;
-		$args['last_updated'] = current_time( 'mysql' );
-		$args['is_template']  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
-
-
-		if ( $email->update( $args ) ) {
-			$this->add_notice( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
-		} else {
-			return new \WP_Error( 'unable_to_update_email', 'Unable to update email!' );
-		}
-
-		$email->update_meta( 'message_type', sanitize_text_field( Groundhogg\get_request_var( 'message_type' ) ) );
-		$email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
-		$email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
-		$email->update_meta( 'reply_to_override', sanitize_email( Groundhogg\get_request_var( 'reply_to_override' ) ) );
-
-		if ( Groundhogg\get_request_var( 'use_custom_alt_body' ) ) {
-			$email->update_meta( 'use_custom_alt_body', 1 );
-			$email->update_meta( 'alt_body', sanitize_textarea_field( Groundhogg\get_request_var( 'alt_body' ) ) );
-		} else {
-			$email->delete_meta( 'use_custom_alt_body' );
-		}
-
-		$headers = [];
-
-		$headers_key   = Groundhogg\get_request_var( 'header_key' );
-		$headers_value = Groundhogg\get_request_var( 'header_value' );
-
-		if ( $headers_key && $headers_value ) {
-			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
-				if ( $headers_key[ $i ] ) {
-					$header_key             = strtolower( sanitize_key( $headers_key[ $i ] ) );
-					$header_value           = $headers_value[ $i ];
-					$headers[ $header_key ] = Groundhogg\sanitize_email_header( $header_value, $header_key );
-				}
-			}
-		}
-
-		$email->update_meta( 'custom_headers', $headers );
-
-		if ( Groundhogg\get_request_var( 'test_email' ) ) {
-
-			if ( ! current_user_can( 'send_emails' ) ) {
-				$this->wp_die_no_access();
-			}
-
-			$test_email = strtolower( sanitize_email( get_request_var( 'test_email', wp_get_current_user()->user_email ) ) );
-			$test_email = apply_filters( 'groundhogg/admin/emails/test_email', $test_email );
-
-			if ( $test_email && is_email( $test_email ) ) {
-
-				$contact = new Contact( [ 'email' => $test_email ] );
-
-				if ( $contact->exists() && $contact->get_email() === $test_email ) {
-
-					$email->enable_test_mode();
-
-					$sent = $email->send( $contact );
-
-					set_user_test_email( $test_email );
-
-					if ( ! $sent || is_wp_error( $sent ) ) {
-						$error = is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
-						$this->add_notice( $error );
-					} else {
-						$this->add_notice(
-							esc_attr( 'sent-test' ),
-							sprintf( "%s %s",
-								__( 'Sent test email to', 'groundhogg' ),
-								$contact->get_email() ),
-							'success'
-						);
-					}
-				}
-			}
-		}
-
-		return true;
-	}
-
 
 	/**
 	 * @deprecated now using block editor
@@ -585,45 +393,10 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/add-new.php';
+		$this->block_editor();
 	}
 
-	/**
-	 * Get search results
-	 *
-	 * @deprecated  now using block editor
-	 */
-	public function get_my_emails_search_results() {
-		ob_start();
-
-		$emails = array_slice( Plugin::$instance->dbs->get_db( 'emails' )->query( [ 'search' => sanitize_text_field( Groundhogg\get_request_var( 's' ) ) ] ), 0, 20 );
-
-		if ( empty( $emails ) ):
-			?> <p
-			style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
-		else:
-			?>
-			<?php foreach ( $emails as $email ):
-			$email = new Email( $email->ID );
-			?>
-			<div class="gh-panel">
-				<div class="gh-panel-header">
-					<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
-				</div>
-				<div class="inside">
-					<p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
-					<p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
-					<iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
-					        height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-					<button class="choose-template gh-button primary" name="email_id"
-					        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
-				</div>
-			</div>
-		<?php endforeach;
-
-		endif;
-
-		$response = [ 'html' => ob_get_clean() ];
-		wp_send_json( $response );
+	protected function add_ajax_actions() {
+		// TODO: Implement add_ajax_actions() method.
 	}
 }

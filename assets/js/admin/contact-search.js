@@ -732,35 +732,13 @@
                   document.getElementById('gh-broadcast-form').append(Groundhogg.BroadcastScheduler({
                     totalContacts,
                     searchMethod: 'selection',
-                    selection: query
+                    selection: query,
                   }))
-                }
+                },
               })
-
 
               break
             case 'delete':
-
-              let deleted = 0
-
-              const deleteContacts = (onDelete, onComplete) => {
-                ContactsStore.deleteMany({
-                  ...query
-                }).then(items => {
-
-                  deleted += items.length
-                  onDelete()
-
-                  if (items.length === 0 || deleted === totalContacts) {
-                    onComplete()
-                    return
-                  }
-
-                  deleteContacts(onDelete, onComplete)
-                }).catch(() => {
-                  onComplete()
-                })
-              }
 
               dangerConfirmationModal({
                 alert: `<p>${ sprintf(__(
@@ -769,28 +747,64 @@
                 onConfirm: () => {
 
                   modal({
-                    content: `<div id="delete-progress"></div>`,
+                    //language=HTML
+                    content: `
+                        <h2>${ __('Deleting contacts') }</h2>
+                        <div id="delete-progress"></div>`,
                     canClose: false,
+                    onOpen: ({ close }) => {
+
+                      loadingDots('.gh-modal h2')
+
+                      let totalDeleted = 0
+
+                      const { setProgress } = progressBar('#delete-progress')
+
+                      // Set the progress bar
+                      const onDelete = (deleted) => {
+                        totalDeleted += parseInt(deleted)
+                        setProgress(totalDeleted / parseInt(totalContacts))
+                      }
+
+                      // Go back to the root contacts page
+                      const onComplete = () => {
+                        dialog({
+                          message: sprintf(__('%s contacts deleted', 'groundhogg'),
+                            `<b>${ formatNumber( totalDeleted ) }</b>`),
+                        })
+
+                        window.location.href = adminPageURL('gh_contacts')
+                      }
+
+                      const deleteContacts = () => ContactsStore.deleteMany({
+                        ...query,
+                      }).then(({
+                        items_deleted,
+                        items_remaining
+                      }) => {
+
+                        onDelete(items_deleted)
+
+                        if ( items_remaining <= 0 ) {
+                          onComplete()
+                          return Promise.resolve({
+                            items_deleted,
+                            items_remaining
+                          })
+                        }
+
+                        return deleteContacts(onDelete, onComplete)
+                      }).catch(err => {
+                        dialog({
+                          message: err.message,
+                          type: 'error',
+                        })
+                        close()
+                      })
+
+                      deleteContacts()
+                    },
                   })
-
-                  const { setProgress } = progressBar('#delete-progress')
-
-                  // Set the progress bar
-                  const onDelete = () => {
-                    setProgress(deleted / parseInt(totalContacts))
-                  }
-
-                  // Go back to the root contacts page
-                  const onComplete = () => {
-                    dialog({
-                      message: sprintf(__('%s contacts deleted', 'groundhogg'),
-                        `<b>${ deleted }</b>`),
-                    })
-
-                    window.location.href = adminPageURL('gh_contacts')
-                  }
-
-                  deleteContacts(onDelete, onComplete)
                 },
               })
               break

@@ -1,4 +1,4 @@
-(function ($) {
+( function ($) {
 
   function ApiError (message, code = 'error') {
     this.name = 'ApiError'
@@ -20,7 +20,7 @@
       headers: {
         'X-WP-Nonce': Groundhogg.nonces._wprest,
       },
-      ...opts
+      ...opts,
     })
 
     let json = await response.json()
@@ -78,7 +78,7 @@
         'Content-Type': 'application/json',
         'X-WP-Nonce': Groundhogg.nonces._wprest,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
     let json = await response.json()
@@ -107,7 +107,7 @@
         'Content-Type': 'application/json',
         'X-WP-Nonce': Groundhogg.nonces._wprest,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
     let json = await response.json()
@@ -143,7 +143,7 @@
    */
   async function adminAjax (data = {}, opts = {}) {
 
-    if (!(data instanceof FormData)) {
+    if (!( data instanceof FormData )) {
       const fData = new FormData()
 
       for (const key in data) {
@@ -155,7 +155,7 @@
       data = fData
     }
 
-    data.append( 'gh_admin_ajax_nonce', Groundhogg.nonces._adminajax )
+    data.append('gh_admin_ajax_nonce', Groundhogg.nonces._adminajax)
 
     const response = await fetch(ajaxurl, {
       method: 'POST',
@@ -167,7 +167,7 @@
     return response.json()
   }
 
-  const ObjectStore = (route, extra = {}) => ({
+  const ObjectStore = (route, extra = {}) => ( {
     primaryKey: 'ID',
     getItemFromResponse: (r) => r.item,
     getItemsFromResponse: (r) => r.items,
@@ -228,7 +228,7 @@
 
       this.items = [
         ...items, // new items
-        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
+        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] == item[this.primaryKey])),
       ]
     },
 
@@ -241,47 +241,48 @@
     },
 
     async fetchItems (params, opts = {}) {
-      return apiGet(this.route, params, opts)
-        .then(r => {
-          this.total_items = this.getTotalItemsFromResponse(r)
-          return this.getItemsFromResponse(r)
-        }).then(items => {
-          this.itemsFetched(items)
-          return items
-        })
+      return apiGet(this.route, params, opts).then(r => {
+        this.total_items = this.getTotalItemsFromResponse(r)
+        return this.getItemsFromResponse(r)
+      }).then(items => {
+        this.itemsFetched(items)
+        return items
+      })
     },
 
-    async maybeFetchItems (ids, opts = {}) {
+    async maybeFetchItems (ids = [], opts = {}) {
 
-      if ( ids.every( id => this.hasItem( id ) ) ){
-        return Promise.resolve( ids.map( id => this.get(id ) ) )
+      if ( ( ! ids || ids.length === 0 ) && this.hasItems() ){
+        return Promise.resolve(this.items)
+      }
+
+      if (ids.every(id => this.hasItem(id))) {
+        return Promise.resolve(ids.map(id => this.get(id)))
       }
 
       return this.fetchItems({
-        ID: ids.filter( id => ! this.hasItem( id ) )
-      }, opts).then( items => {
-        return ids.map( id => this.get(id ) )
+        ID: ids.filter(id => !this.hasItem(id)),
+      }, opts).then(items => {
+        return ids.map(id => this.get(id))
       })
     },
 
     async fetchItem (id, opts = {}) {
-      return apiGet(`${this.route}/${id}`, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+      return apiGet(`${ this.route }/${ id }`, opts).then(r => this.getItemFromResponse(r)).then(item => {
+        this.itemsFetched([
+          item,
+        ])
+        return item
+      })
     },
 
     async maybeFetchItem (id, opts = {}) {
 
-      if ( this.hasItem( id ) ){
-        return Promise.resolve( this.get( id ) )
+      if (this.hasItem(id)) {
+        return Promise.resolve(this.get(id))
       }
 
-      return this.fetchItem( id, opts )
+      return this.fetchItem(id, opts)
     },
 
     async create (...args) {
@@ -293,23 +294,19 @@
     },
 
     async post (data, opts = {}) {
-      return apiPost(this.route, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+      return apiPost(this.route, data, opts).then(r => this.getItemFromResponse(r)).then(item => {
+        this.itemsFetched([
+          item,
+        ])
+        return item
+      })
     },
 
     async postMany (data, opts = {}) {
-      return apiPost(this.route, data, opts)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
-          this.itemsFetched(items)
-          return items
-        })
+      return apiPost(this.route, data, opts).then(r => this.getItemsFromResponse(r)).then(items => {
+        this.itemsFetched(items)
+        return items
+      })
     },
 
     async update (...args) {
@@ -317,80 +314,72 @@
     },
 
     async patch (id, data, opts = {}) {
-      return apiPatch(`${this.route}/${id}`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+      return apiPatch(`${ this.route }/${ id }`, data, opts).then(r => this.getItemFromResponse(r)).then(item => {
+        this.itemsFetched([
+          item,
+        ])
+        return item
+      })
     },
 
     async patchMany (items, opts = {}) {
-      return apiPatch(`${this.route}`, items, opts)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
-          this.itemsFetched(items)
-          return items
-        })
+      return apiPatch(`${ this.route }`, items, opts).then(r => this.getItemsFromResponse(r)).then(items => {
+        this.itemsFetched(items)
+        return items
+      })
     },
 
     async duplicate (id, data, opts = {}) {
-      return apiPost(`${this.route}/${id}/duplicate`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
+      return apiPost(`${ this.route }/${ id }/duplicate`, data, opts).
+        then(r => this.getItemFromResponse(r)).
+        then(item => {
           this.itemsFetched([
-            item
+            item,
           ])
           return item
         })
     },
 
     async patchMeta (id, data, opts = {}) {
-      return apiPatch(`${this.route}/${id}/meta`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+      return apiPatch(`${ this.route }/${ id }/meta`, data, opts).then(r => this.getItemFromResponse(r)).then(item => {
+        this.itemsFetched([
+          item,
+        ])
+        return item
+      })
     },
 
     async deleteMeta (id, data, opts = {}) {
-      return apiDelete(`${this.route}/${id}/meta`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+      return apiDelete(`${ this.route }/${ id }/meta`, data, opts).then(r => this.getItemFromResponse(r)).then(item => {
+        this.itemsFetched([
+          item,
+        ])
+        return item
+      })
     },
 
     async fetchRelationships (id, { other_type, ...rest }, opts = {}) {
-      return apiGet(`${this.route}/${id}/relationships`, { other_type, ...rest }, opts)
-        .then(r => this.getItemsFromResponse(r))
+      return apiGet(`${ this.route }/${ id }/relationships`, { other_type, ...rest }, opts).
+        then(r => this.getItemsFromResponse(r))
     },
 
     async createRelationships (id, data, opts = {}) {
-      return apiPost(`${this.route}/${id}/relationships`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
+      return apiPost(`${ this.route }/${ id }/relationships`, data, opts).
+        then(r => this.getItemFromResponse(r)).
+        then(item => {
           this.itemsFetched([
-            item
+            item,
           ])
           return item
         })
     },
 
     async deleteRelationships (id, data, opts = {}) {
-      return apiDelete(`${this.route}/${id}/relationships`, data, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
+      return apiDelete(`${ this.route }/${ id }/relationships`, data, opts).
+        then(r => this.getItemFromResponse(r)).
+        then(item => {
           this.itemsFetched([
-            item
+            item,
           ])
           return item
         })
@@ -402,42 +391,36 @@
         return this.deleteMany(id)
       }
 
-      return apiDelete(`${this.route}/${id}`)
-        .then(r => {
+      return apiDelete(`${ this.route }/${ id }`).then(r => {
 
-          this.items = [
-            ...this.items.filter(item => item[this.primaryKey] != id),
-          ]
+        this.items = [
+          ...this.items.filter(item => item[this.primaryKey] != id),
+        ]
 
-          return r
-        })
+        return r
+      })
     },
 
     async count (params) {
-      return apiGet(`${this.route}`, {
+      return apiGet(`${ this.route }`, {
         count: true,
         ...params,
-      })
-        .then(r => r.total_items)
+      }).then(r => r.total_items)
     },
 
     async deleteMany (query) {
-      return apiDelete(`${this.route}`, query)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
 
-          //items will be an int[] of the IDs of the deleted objects
-
-          this.items = [
-            ...this.items.filter(item => !items.includes(item[this.primaryKey])),
-          ]
-
-          return items
-        })
+      return apiDelete(`${ this.route }`, query).then(r => {
+        let items = this.getItemsFromResponse(r)
+        this.items = [
+          ...this.items.filter(item => !items.includes(item[this.primaryKey])),
+        ]
+        return r
+      })
     },
 
     ...extra,
-  })
+  } )
 
   Groundhogg.api.post = apiPost
   Groundhogg.api.postFormData = apiPostFormData
@@ -455,11 +438,11 @@
 
       get (opt, _default = false) {
 
-        if ( Array.isArray( opt ) ){
+        if (Array.isArray(opt)) {
 
           let opts = {}
 
-          opt.forEach( _opt => opts[_opt] = this.items[_opt] )
+          opt.forEach(_opt => opts[_opt] = this.items[_opt])
 
           return opts
 
@@ -472,61 +455,57 @@
 
         let req = {}
 
-        data.forEach( opt => req[opt] = 1)
+        data.forEach(opt => req[opt] = 1)
 
-        return apiGet(this.route, req, opts)
-          .then(r => {
+        return apiGet(this.route, req, opts).then(r => {
 
-            this.items = {
-              ...this.items,
-              ...r.items
-            }
+          this.items = {
+            ...this.items,
+            ...r.items,
+          }
 
-            return r.items
+          return r.items
 
-          })
+        })
       },
 
       post (data = {}, opts = {}) {
 
-        return apiPatch(this.route, data, opts)
-          .then(r => {
+        return apiPatch(this.route, data, opts).then(r => {
 
-            this.items = {
-              ...this.items,
-              ...r.items
-            }
+          this.items = {
+            ...this.items,
+            ...r.items,
+          }
 
-            return r.items
+          return r.items
 
-          })
+        })
       },
 
       patch (data = {}, opts = {}) {
 
-        return apiPatch(this.route, data, opts)
-          .then(r => {
+        return apiPatch(this.route, data, opts).then(r => {
 
-            this.items = {
-              ...this.items,
-              ...r.items
-            }
+          this.items = {
+            ...this.items,
+            ...r.items,
+          }
 
-            return r.items
+          return r.items
 
-          })
+        })
       },
 
       delete (data = {}, opts = {}) {
 
-        return apiDelete(this.route, data, opts)
-          .then(r => {
+        return apiDelete(this.route, data, opts).then(r => {
 
-            data.forEach(opt => {
-              delete this.items[opt]
-            })
-
+          data.forEach(opt => {
+            delete this.items[opt]
           })
+
+        })
       },
 
     },
@@ -545,20 +524,19 @@
       async validate (maybeTags) {
         var self = this
 
-        return await apiPost(`${this.route}/validate`, maybeTags)
-          .then(r => {
+        return await apiPost(`${ this.route }/validate`, maybeTags).then(r => {
 
-            if (!r.items) {
-              return []
-            }
+          if (!r.items) {
+            return []
+          }
 
-            self.items = [
-              ...r.items, // new items
-              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
-            ]
+          self.items = [
+            ...r.items, // new items
+            ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] == item[this.primaryKey])),
+          ]
 
-            return r.items
-          })
+          return r.items
+        })
       },
 
       preloadTags () {
@@ -567,7 +545,7 @@
 
         return apiGet(this.route, {
           limit: self.limit,
-          offet: self.offset
+          offet: self.offset,
         }).then(data => {
           if (!data.items) {
             return
@@ -586,8 +564,7 @@
     forms: ObjectStore(Groundhogg.api.routes.v4.forms),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts, {
       async fetchFiles (id, opts = {}) {
-        return apiGet(`${this.route}/${id}/files`, {}, opts)
-          .then(r => this.getItemsFromResponse(r))
+        return apiGet(`${ this.route }/${ id }/files`, {}, opts).then(r => this.getItemsFromResponse(r))
       },
     }),
     events: ObjectStore(Groundhogg.api.routes.v4.events),
@@ -599,7 +576,7 @@
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
       async addContacts ({ query, funnel_id, step_id }, opts = {}) {
-        return apiPost(`${this.route}/${funnel_id}/start`, {
+        return apiPost(`${ this.route }/${ funnel_id }/start`, {
           query,
           step_id,
           funnel_id,
@@ -607,20 +584,19 @@
       },
 
       async commit (id, data, opts = {}) {
-        return apiPost(`${this.route}/${id}/commit`, data, opts)
-          .then(r => this.getItemFromResponse(r))
-          .then(item => {
+        return apiPost(`${ this.route }/${ id }/commit`, data, opts).
+          then(r => this.getItemFromResponse(r)).
+          then(item => {
 
             this.itemsFetched([
-              item
+              item,
             ])
             return item
           })
       },
 
       isStartingStep (funnelId, stepId, checkEdited = false) {
-        return !this.getPrecedingSteps(funnelId, stepId, checkEdited)
-          .find(_step => _step.data.step_group == 'action')
+        return !this.getPrecedingSteps(funnelId, stepId, checkEdited).find(_step => _step.data.step_group == 'action')
       },
 
       getSteps (funnelId, checkEdited = false) {
@@ -630,56 +606,52 @@
 
       getFunnelAndStep (funnelId, stepId, checkEdited = false) {
         const funnel = funnelId ? this.items.find(f => f.ID == funnelId) : this.item
-        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID == stepId) : funnel.steps.find(s => s.ID == stepId)
+        const step = checkEdited && funnel.meta.edited
+          ? funnel.meta.edited.steps.find(s => s.ID == stepId)
+          : funnel.steps.find(s => s.ID == stepId)
         return { funnel, step }
       },
 
       getProceedingSteps (funnelId, stepId, checkEdited = false) {
         const { step, funnel } = this.getFunnelAndStep(funnelId, stepId, checkEdited)
-        return funnel.steps
-          .filter((_step) => _step.data.step_order > step.data.step_order)
-          .sort((a, b) => a.data.step_order - b.data.step_order)
+        return funnel.steps.filter((_step) => _step.data.step_order > step.data.step_order).
+          sort((a, b) => a.data.step_order - b.data.step_order)
       },
 
       getPrecedingSteps (funnelId, stepId, checkEdited = false) {
         const { step, funnel } = this.getFunnelAndStep(funnelId, stepId, checkEdited)
-        return funnel.steps
-          .filter((_step) => _step.data.step_order < step.data.step_order)
-          .sort((a, b) => a.data.step_order - b.data.step_order)
-      }
+        return funnel.steps.filter((_step) => _step.data.step_order < step.data.step_order).
+          sort((a, b) => a.data.step_order - b.data.step_order)
+      },
     }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
     notes: ObjectStore(Groundhogg.api.routes.v4.notes),
     tasks: ObjectStore(Groundhogg.api.routes.v4.tasks, {
-      complete( id ) {
-        return apiPatch(`${this.route}/${id}/complete`)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
+      complete (id) {
+        return apiPatch(`${ this.route }/${ id }/complete`).then(r => this.getItemFromResponse(r)).then(item => {
 
           this.itemsFetched([
-            item
+            item,
           ])
           return item
         })
       },
-      incomplete( id ) {
-        return apiPatch(`${this.route}/${id}/incomplete`)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
+      incomplete (id) {
+        return apiPatch(`${ this.route }/${ id }/incomplete`).then(r => this.getItemFromResponse(r)).then(item => {
 
           this.itemsFetched([
-            item
+            item,
           ])
           return item
         })
-      }
+      },
     }),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
-      primaryKey: 'id'
+      primaryKey: 'id',
     }),
     posts: ObjectStore(Groundhogg.api.routes.posts, {
-      primaryKey: 'id'
+      primaryKey: 'id',
     }),
   }
 
@@ -689,4 +661,4 @@
     return store
   }
 
-})(jQuery)
+} )(jQuery)
