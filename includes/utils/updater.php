@@ -199,9 +199,9 @@ abstract class Updater {
 
 		$versions = [];
 
-		foreach ( $this->get_available_updates() as $i => $version ) {
-			if ( is_array( $version ) ) {
-				$versions[] = $i;
+		foreach ( $this->get_available_updates() as $version => $args ) {
+			if ( ! is_array( $args ) ) {
+				$versions[] = $args;
 			} else {
 				$versions[] = $version;
 			}
@@ -282,21 +282,41 @@ abstract class Updater {
 	 */
 	public function do_manual_updates() {
 
-		if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'install_plugins' ) ) {
+		if ( get_url_var( 'updater' ) !== $this->get_updater_name() || ! get_url_var( 'manual_update' ) || ! get_url_var( 'manual_update_nonce' ) ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( get_url_var( 'manual_update_nonce' ), 'gh_manual_update' ) ) {
+			notices()->add( new \WP_Error( 'no', 'Something went wrong, could you try again?' ) );
+
+			return;
+		}
+
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			notices()->add( new \WP_Error( 'no', 'You are not allowed to do that.' ) );
+
 			return;
 		}
 
 		$update  = get_url_var( 'manual_update' );
-		$updates = $this->_get_updates();
+		$updates = $this->_get_all_updates();
 
 		if ( ! in_array( $update, $updates ) ) {
-			return;
+
+			notices()->add( new \WP_Error( 'no', 'The requested update path could not be found.' ) );
+
+			wp_safe_redirect( admin_page_url( 'gh_tools', [
+				'tab'     => 'system',
+				'action'  => 'view_updates',
+				'updater' => $this->get_updater_name()
+			] ) );
+			die();
 		}
 
 		if ( $this->update_to_version( $update ) ) {
-			Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
+			notices()->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
 		} else {
-			Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
+			notices()->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
 		}
 
 		wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'system' ] ) );

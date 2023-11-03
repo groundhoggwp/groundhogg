@@ -992,7 +992,6 @@ class Form_v2 extends Step {
 
 			// Birthday
 			'birthday'     => [
-
 				'render'   => function ( $field, $contact ) {
 
 					$selected_day   = false;
@@ -1008,9 +1007,7 @@ class Form_v2 extends Step {
 							$birthday_parts = explode( '-', $birthday );
 						}
 
-						$selected_day   = $birthday_parts[2];
-						$selected_month = $birthday_parts[1];
-						$selected_year  = $birthday_parts[0];
+						list ( $selected_year, $selected_month, $selected_day ) = $birthday_parts;
 					}
 
 					$field = wp_parse_args( $field, [
@@ -1118,34 +1115,26 @@ class Form_v2 extends Step {
 						return false;
 					}
 
-					$parts = [
-						'year',
-						'month',
-						'day',
-					];
+					[ 'month' => $month, 'day' => $day, 'year' => $year ] = (array) $input;
 
-					$birthday = [];
-
-					foreach ( $parts as $key ) {
-						$date       = get_array_var( $input, $key );
-						$birthday[] = $date;
-					}
-
-					if ( ! checkdate( $birthday[1], $birthday[2], $birthday[0] ) ) {
+					if ( ! checkdate( $month, $day, $year ) ) {
 						return new \WP_Error( 'invalid_date', 'Please provide a valid date!' );
 					}
 
 					return true;
 				},
-				'before'   => function ( $field, $posted_data, &$data, &$meta, &$tags ) {
+				'before'   => function ( $field, $posted_data, &$data, &$meta ) {
 
 					$input = $posted_data->birthday;
 
-					if ( ! empty( $input ) ) {
-						$date             = Ymd( mktime( 0, 0, 0, absint( $input['month'] ), absint( $input['day'] ), absint( $input['year'] ) ) );
-						$meta['birthday'] = $date;
+					if ( empty( $input ) ) {
+						return false;
 					}
 
+					[ 'month' => $month, 'day' => $day, 'year' => $year ] = (array) $input;
+
+					$date             = Ymd( mktime( 0, 0, 0, $month, $day, $year ) );
+					$meta['birthday'] = $date;
 				},
 				'required' => function ( $field, $posted_data ) {
 					$input = $posted_data->birthday;

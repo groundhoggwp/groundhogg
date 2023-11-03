@@ -283,15 +283,21 @@ class Emails_Page extends Admin_Page {
 	 * @return false
 	 */
 	public function process_trash() {
+
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
 		}
 
 		foreach ( $this->get_items() as $id ) {
 			$email = new Email( $id );
-			if ( $email->exists() ) {
-				$email->update( [ 'status' => 'trash' ] );
+
+			if ( ! $email->exists() ){
+				continue;
 			}
+
+			$email->update( [
+				'status' => 'trash'
+			] );
 		}
 
 		$this->add_notice(
