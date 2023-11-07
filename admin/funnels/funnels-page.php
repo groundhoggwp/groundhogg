@@ -561,7 +561,6 @@ class Funnels_Page extends Admin_Page {
 	 */
 	public function process_edit() {
 
-
 		if ( ! current_user_can( 'edit_funnels' ) ) {
 			$this->wp_die_no_access();
 		}
@@ -581,26 +580,7 @@ class Funnels_Page extends Admin_Page {
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
 
-		if ( wp_verify_nonce( get_request_var( 'add_contacts_nonce' ), 'add_contacts_to_funnel' ) ) {
-			if ( $funnel->is_active() ) {
-
-				$query = [
-					'step_id'                => absint( get_request_var( 'which_step' ) ),
-					'tags_include'           => wp_parse_id_list( get_request_var( 'include_tags' ) ),
-					'tags_exclude'           => wp_parse_id_list( get_request_var( 'exclude_tags' ) ),
-					'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
-					'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) ),
-				];
-
-				$query = array_filter( $query );
-
-				Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( $query );
-			} else {
-				return new \WP_Error( 'inactive', __( 'You cannot do this while the funnel is not active.', 'groundhogg' ) );
-			}
-		}
-
-		/* check if funnel is to big... */
+		/* check if funnel is too big... */
 		if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ) {
 			return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
 		}
@@ -627,31 +607,17 @@ class Funnels_Page extends Admin_Page {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
 		}
 
-		$completed_steps = [];
-
 		foreach ( $step_ids as $order => $stepId ) {
 
 			$step = new Step( $stepId );
 
 			$step->save();
-
-			$completed_steps[] = $step;
-
-		}
-
-		$first_step = array_shift( $completed_steps );
-
-		/* if it's not a benchmark then the funnel cant actually ever run */
-		if ( ! $first_step->is_benchmark() ) {
-			return new \WP_Error( 'invalid_config', _x( 'Funnels must start with 1 or more benchmarks', 'warning', 'groundhogg' ) );
 		}
 
 		/**
 		 * Runs after the funnel as been updated.
 		 */
 		do_action( 'groundhogg/admin/funnel/updated', $funnel );
-
-		$this->add_notice( esc_attr( 'updated' ), _x( 'Funnel updated', 'notice', 'groundhogg' ), 'success' );
 
 		return true;
 

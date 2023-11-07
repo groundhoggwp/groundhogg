@@ -18,6 +18,7 @@ use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\maybe_get_option_from_constant;
 use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1787,6 +1788,13 @@ class Settings_Page extends Admin_Page {
 	}
 
 	public function settings_callback( $field ) {
+
+		// Check if the option has been defined instead
+		if ( maybe_get_option_from_constant( null, $field['id'] ) !== null ){
+			printf( '<p class="description">%s</p>', __( 'This option has been defined elsewhere. Probably in <code>wp-config.php</code>.', 'groundhogg' ) );
+			return;
+		}
+
 		$value = Plugin::$instance->settings->get_option( $field['id'] );
 
 		switch ( $field['type'] ) {

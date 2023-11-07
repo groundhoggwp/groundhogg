@@ -17,6 +17,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Adds functional support for getting some options from constants instead
+ *
+ * @param $option_name string the name of the option
+ *
+ * @return void
+ */
+function add_constant_support( $option_name ) {
+
+	$hook     = "pre_option_$option_name";
+	$callback = __NAMESPACE__ . '\maybe_get_option_from_constant';
+
+	if ( ! has_filter( $hook, $callback ) ) {
+		add_filter( $hook, $callback, 10, 2 );
+	}
+}
+
+/**
+ * Given an option name, check if it's defined as a constant and if it is, return that value instead
+ *
+ * @param $value false|null
+ * @param $option_name string
+ *
+ * @return mixed
+ */
+function maybe_get_option_from_constant( $value, $option_name ) {
+	$constant = strtoupper( $option_name );
+
+	if ( defined( $constant ) ) {
+		return constant( $constant );
+	}
+
+	return $value;
+}
+
+add_constant_support( 'gh_master_license' );
+add_constant_support( 'gh_recaptcha_secret_key' );
+add_constant_support( 'gh_recaptcha_site_key' );
+
+/**
  * If an email address is provided but a space is in place of a plus then swap out the space for a plus
  *
  * @param $str string
@@ -823,9 +862,9 @@ function iframe_compat() {
 /**
  * Enqueues the modal scripts
  *
+ * @since 1.0.5
  * @return Modal
  *
- * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -1078,22 +1117,22 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
+ * @throws \Exception
+ *
+ * @since      1.2.10
+ * @deprecated 2.1.11
+ *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
+ *
  * @param string       $subject     Email subject
  *
  * @param string       $message     Message contents
  *
  * @param string|array $headers     Optional. Additional headers.
  *
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to          Array or comma-separated list of email addresses to send message.
- *
  * @return bool Whether the email contents were sent successfully.
- * @throws \Exception
- *
- * @since      1.2.10
- * @deprecated 2.1.11
- *
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -1101,10 +1140,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -1273,9 +1312,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @param string $from_email Email address to send from.
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param string $from_email Email address to send from.
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -1283,9 +1322,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @param string $from_name Name associated with the "from" email address.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $from_name Name associated with the "from" email address.
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -1353,9 +1392,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @param string $content_type Default wp_mail() content type.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $content_type Default wp_mail() content type.
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1382,9 +1421,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @param string $charset Default email charset.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $charset Default email charset.
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1413,9 +1452,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1449,10 +1488,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
+		 * @since 4.4.0
+		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
-		 *
-		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -2721,13 +2760,13 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @param $map    array map of field_ids to contact keys
+ * @throws \Exception
  *
  * @param $fields array the raw data from the source
  *
- * @return Contact|false
- * @throws \Exception
+ * @param $map    array map of field_ids to contact keys
  *
+ * @return Contact|false
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -3255,7 +3294,7 @@ function show_groundhogg_branding() {
  */
 function floating_phil() {
 	?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil"
-	       src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+           src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
 }
 
 /**
@@ -3445,20 +3484,20 @@ function preferences_center_shortcode() {
 	ob_start();
 
 	?>
-	<p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
-	<p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
-	<p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
-	<ul>
-		<li>
-			<a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
-		</li>
-		<li>
-			<a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
-		</li>
-		<li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
-		<li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
-	</ul>
-	<p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
+    <p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
+    <p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
+    <p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
+    <ul>
+        <li>
+            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
+        </li>
+        <li>
+            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
+        </li>
+        <li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
+        <li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
+    </ul>
+    <p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
 	<?php
 
 	return ob_get_clean();
@@ -3488,11 +3527,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
+ * @deprecated since 2.0.9.2
+ *
  * @param string $string
  *
  * @return string
- * @deprecated since 2.0.9.2
- *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -3510,7 +3549,7 @@ function is_managed_page() {
  */
 function no_index_tag() {
 	?>
-	<meta name="robots" content="noindex">
+    <meta name="robots" content="noindex">
 	<?php
 }
 
@@ -3545,15 +3584,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param int|string $action    Optional. Nonce action name. Default -1.
+ * @since 2.0.4
  *
  * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
  *
  * @param string     $actionurl URL to add nonce action.
  *
- * @return string
- * @since 2.0.4
+ * @param int|string $action    Optional. Nonce action name. Default -1.
  *
+ * @return string
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -4318,6 +4357,15 @@ function is_pro_features_active() {
 }
 
 /**
+ * Fetches the master license, if one is available
+ *
+ * @return void
+ */
+function get_master_license() {
+	return get_option( 'gh_master_license' );
+}
+
+/**
  * Checks if the Groundhogg helper plugin is installed
  *
  * @return bool
@@ -4368,14 +4416,14 @@ add_action( 'admin_menu', function () {
 function maybe_print_menu_styles() {
 
 	?>
-	<style>
+    <style>
 
-		<?php if ( $unread = notices()->count_unread() > 0 ): ?>
+        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
         .unread-notices::after {
             content: '<?php echo $unread ?>' !important;
         }
 
-		<?php endif; ?>
+        <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
@@ -4419,7 +4467,7 @@ function maybe_print_menu_styles() {
         #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before {
             margin-bottom: 8px;
         }
-	</style>
+    </style>
 	<?php
 }
 
@@ -7074,15 +7122,15 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $num_related_contacts > 0 ):
 
 		?>
-		<fieldset>
-			<p>
-				<legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
-			</p>
-			<p><?php echo html()->checkbox( [
+        <fieldset>
+            <p>
+                <legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
+            </p>
+            <p><?php echo html()->checkbox( [
 					'label' => sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ),
 					'name'  => 'delete_related_contact_records'
 				] ) ?></p>
-		</fieldset>
+        </fieldset>
 	<?php
 	endif;
 
@@ -7100,16 +7148,16 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $has_owned_content ):
 
 		?>
-		<fieldset>
-			<p>
-				<legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
-			</p>
-			<p><?php echo html()->dropdown_owners( [
+        <fieldset>
+            <p>
+                <legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
+            </p>
+            <p><?php echo html()->dropdown_owners( [
 					'name'        => 'reassign_groundhogg_owner',
 					'option_none' => false,
 					'exclude'     => $all_ids
 				] ) ?></p>
-		</fieldset>
+        </fieldset>
 	<?php
 
 	endif;
@@ -7242,11 +7290,11 @@ function maybe_url_decrypt_id( $data ) {
 
 function iframe_js() {
 	?>
-	<script>
+    <script>
       if (window.self !== window.top) {
         document.querySelector('html').classList.add('iframed')
       }
-	</script>
+    </script>
 	<?php
 }
 
@@ -7897,7 +7945,7 @@ function get_json_regex() {
  */
 function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 
-	if ( empty( $string ) ){
+	if ( empty( $string ) ) {
 		return '';
 	}
 

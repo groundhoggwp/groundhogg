@@ -3977,6 +3977,7 @@
         dangerConfirmationModal({
           alert: `<p>You have unsaved changes! Are you sure you want to leave?</p>`,
           onConfirm: onClose,
+          confirmText: __( 'Discard changes', 'groundhogg' ),
         })
         return
       }

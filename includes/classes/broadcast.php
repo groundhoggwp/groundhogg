@@ -5,7 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
-use Groundhogg\Utils\Limits;
+use Groundhogg\Utils\Micro_Time_Tracker;
 use GroundhoggSMS\Classes\SMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,8 +62,13 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_status() === 'sent';
 	}
 
-	public function schedule(){
-		return Background_Tasks::add( 'groundhogg/schedule_pending_broadcast', [ $this->get_id() ] );
+	/**
+	 * Calls the background task to schedule the broadcast
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function schedule() {
+		return Background_Tasks::add( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
 	}
 
 	/**
@@ -228,7 +233,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$created = parent::create( $data );
 
 		// Start scheduling it
-		if ( $created ){
+		if ( $created && $this->is_pending() ) {
 			$this->schedule();
 		}
 
@@ -442,7 +447,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function schedule_batch() {
 
-		if ( ! $this->is_pending() ){
+		if ( ! $this->is_pending() ) {
 			return false;
 		}
 
@@ -458,6 +463,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$c_query  = new Contact_Query();
 		$contacts = $c_query->query( $query, true );
 		$total    = $c_query->found_items;
+
+		$timer = new Micro_Time_Tracker();
 
 		foreach ( $contacts as $contact ) {
 
@@ -507,8 +514,11 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
+		$time_elapsed = $timer->time_elapsed();
+
 		$this->update_meta( 'num_scheduled', $offset );
 		$this->update_meta( 'total_contacts', $total );
+		$this->update_meta( 'batch_time_elapsed', round( $time_elapsed, 2 ) );
 
 		// Finished scheduling
 		if ( $offset >= $total ) {
@@ -517,6 +527,26 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		return percentage( $total, $offset, 0 );
 
+	}
+
+	/**
+	 * The estimated time to completed scheduling all the events in seconds
+	 *
+	 * @return false|float time in seconds
+	 */
+	public function get_estimated_scheduling_time_remaining() {
+
+		$total        = $this->get_meta( 'total_contacts' );
+		$scheduled    = $this->get_meta( 'num_scheduled' );
+		$time_elapsed = $this->get_meta( 'batch_time_elapsed' );
+
+		if ( ! $total || ! $scheduled || ! $time_elapsed ) {
+			return false;
+		}
+
+		$remaining = $total - $scheduled;
+
+		return ceil( ( $remaining / self::BATCH_LIMIT ) * $time_elapsed );
 	}
 
 	/**

@@ -96,7 +96,8 @@ class Broadcasts_Table extends WP_List_Table {
 		} else if ( $this->get_view() === 'pending' ) {
 			unset( $columns['stats'] );
 			unset( $columns['sending_to'] );
-			$columns['process_schedule'] = _x( 'Finish Scheduling', 'Column label', 'groundhogg' );
+
+			$columns['time'] = _x( 'Time Remaining', 'Column label', 'groundhogg' );
 		}
 
 		/**
@@ -433,6 +434,26 @@ class Broadcasts_Table extends WP_List_Table {
 		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ) : __( 'Sending', 'groundhogg' );
 
 		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
+	}
+
+	/**
+	 * Shows the time remaining for the broadcast to complete scheduling
+	 *
+	 * @param $broadcast Broadcast
+	 *
+	 * @return string
+	 */
+	protected function column_time( $broadcast ) {
+
+		$time_remaining = $broadcast->get_estimated_scheduling_time_remaining();
+
+		if ( $time_remaining === false ) {
+			return __( 'Estimating...', 'groundhogg' );
+		}
+
+		$complete = $broadcast->get_percent_scheduled();
+
+		return sprintf( __( '%d%% scheduled with %s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
 	}
 
 	/**

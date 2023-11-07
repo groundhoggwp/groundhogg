@@ -347,12 +347,8 @@
 
       // Do regular form update
       adminAjaxRequest(fd, (response) => {
-        handleNotices(response.data.notices)
+        // handleNotices(response.data.notices)
         this.steps = response.data.data.steps
-
-        setTimeout(function () {
-          $('.notice-success').fadeOut()
-        }, 3000)
 
         $saveButton.removeClass('spin')
         $saveButton.html(self.save_text)
@@ -364,6 +360,10 @@
 
         $('body').removeClass('saving')
         self.makeActive(self.currentlyActive)
+
+        dialog({
+          message: __( 'Funnel saved!', 'groundhogg' )
+        })
       })
     },
 

@@ -6,8 +6,10 @@ use Groundhogg\Utils\Limits;
 
 class Background_Tasks {
 
+	const SCHEDULE_BROADCAST = 'groundhogg/schedule_pending_broadcast';
+
 	public function __construct() {
-		add_action( 'groundhogg/schedule_pending_broadcast', [ $this, 'schedule_pending_broadcast' ] );
+		add_action( self::SCHEDULE_BROADCAST, [ $this, 'schedule_pending_broadcast' ] );
 	}
 
 	public static function add( $hook, $args ){
