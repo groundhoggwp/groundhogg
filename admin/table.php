@@ -10,6 +10,7 @@ use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\swap_array_keys;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -60,15 +61,13 @@ abstract class Table extends \WP_List_Table {
 	 *
 	 * @return string
 	 */
-	protected function create_view( $view, $query, $display, $count = 0 ) {
+	protected function create_view( $view, $query, $display ) {
 
 		$params = [
 			$this->view_param() => $view,
 		];
 
-//		$params = array_merge( $params, is_array( $query ) ? $query : [
-//			$query => $view,
-//		] );
+		$count = $this->get_db()->count( $query );
 
 		return html()->e( 'a',
 			[
@@ -126,7 +125,7 @@ abstract class Table extends \WP_List_Table {
 
 		foreach ( $actions as $action ) {
 
-			if ( is_string( $action ) ){
+			if ( is_string( $action ) ) {
 				$row_actions[] = $action;
 				continue;
 			}
@@ -163,7 +162,7 @@ abstract class Table extends \WP_List_Table {
 	 *   [
 	 *     'display' => '',
 	 *     'view' => '',
-	 *     'count' => [],
+	 *     'query' => [],
 	 *   ]
 	 * ]
 	 *
@@ -177,13 +176,18 @@ abstract class Table extends \WP_List_Table {
 	 * @return false|mixed
 	 */
 	protected function get_current_query() {
-		$view = array_find( $this->get_views_setup(), function ( $view ){
+
+		$setup = $this->get_views_setup();
+
+		$view = array_find( $setup, function ( $view ) {
 			return $view['view'] === $this->get_view();
 		} );
 
-		if ( ! $view ){
+		if ( ! $view ) {
 			return [];
 		}
+
+		$view = swap_array_keys( $view, [ 'count' => 'query' ] );
 
 		return $view['query'];
 	}
@@ -206,11 +210,9 @@ abstract class Table extends \WP_List_Table {
 				'query'   => [],
 			] );
 
-			if ( is_array( $view['query'] ) ) {
-				$view['count'] = $this->get_db()->count( $view['query'] );
-			}
+			$view = swap_array_keys( $view, [ 'count' => 'query' ] );
 
-			$views[] = $this->create_view( $view['view'], $view['query'], $view['display'], $view['count'] );
+			$views[] = $this->create_view( $view['view'], $view['query'], $view['display'] );
 		}
 
 		return apply_filters( "groundhogg/admin/table/{$this->get_table_id()}/get_views", $views );
@@ -287,10 +289,22 @@ abstract class Table extends \WP_List_Table {
 		return get_request_var( $this->view_param(), $this->get_default_view() );
 	}
 
-	protected function view_is( $view ){
+	/**
+	 * Compare the current view
+	 *
+	 * @param $view
+	 *
+	 * @return bool
+	 */
+	protected function view_is( $view ) {
 		return $this->get_view() === $view;
 	}
 
+	/**
+	 * The default view for the table
+	 *
+	 * @return string
+	 */
 	protected function get_default_view() {
 		$views = wp_list_pluck( $this->get_views_setup(), 'view' );
 
