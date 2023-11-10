@@ -363,6 +363,7 @@ class Broadcasts_Page extends Admin_Page {
 				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
 				'action' => __( 'Schedule SMS Broadcast', 'groundhogg' ),
 				'target' => '_self',
+				'id'     => 'gh-schedule-sms-broadcast'
 			];
 		}
 

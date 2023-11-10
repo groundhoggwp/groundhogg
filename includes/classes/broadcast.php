@@ -63,15 +63,6 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Calls the background task to schedule the broadcast
-	 *
-	 * @return bool|\WP_Error
-	 */
-	public function schedule() {
-		return Background_Tasks::add( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
-	}
-
-	/**
 	 * Do any post setup actions.
 	 *
 	 * @return void
@@ -238,6 +229,112 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		return $created;
+	}
+
+	/**
+	 * Calls the background task to schedule the broadcast
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function schedule() {
+		return Background_Tasks::add( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
+	}
+
+	/**
+	 * Schedules a batch of events!
+	 *
+	 * @return false|float false if failed, a number of percentage complete
+	 */
+	public function enqueue_batch() {
+
+		if ( $this->get_meta( 'schedule_lock' ) || ! $this->is_pending() ) {
+			return false;
+		}
+
+		$this->update_meta( 'schedule_lock', true );
+
+		$query                  = $this->get_query();
+		$in_lt                  = (bool) $this->get_meta( 'send_in_local_time' );
+		$send_now               = (bool) $this->get_meta( 'send_now' );
+		$offset                 = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
+		$limit                  = self::BATCH_LIMIT;
+		$query['number']        = $limit;
+		$query['offset']        = $offset;
+		$query['no_found_rows'] = false;
+
+		$c_query  = new Contact_Query();
+		$contacts = $c_query->query( $query, true );
+		$total    = $c_query->found_items;
+
+		$timer = new Micro_Time_Tracker();
+		$items = 0;
+
+		foreach ( $contacts as $contact ) {
+
+			$offset ++;
+			$items ++;
+
+			// Can't be delivered at all
+			if ( ! $contact->is_deliverable() ) {
+				continue;
+			}
+
+			// No point in scheduling an email to a contact that is not marketable.
+			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
+				continue;
+			}
+
+			$local_time = $this->get_send_time();
+
+			if ( $in_lt && ! $send_now ) {
+
+				$local_time = $contact->get_local_time_in_utc_0( $local_time );
+
+				if ( $local_time < time() ) {
+					$local_time += DAY_IN_SECONDS;
+				}
+			}
+
+			$args = [
+				'time'       => $local_time,
+				'contact_id' => $contact->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::WAITING,
+				'priority'   => 100,
+			];
+
+			if ( $this->is_email() ) {
+				$args['email_id'] = $this->get_object_id();
+			}
+
+			event_queue_db()->batch_insert( $args );
+		}
+
+		$inserted = event_queue_db()->commit_batch_insert();
+
+		if ( $total > 0 && ! $inserted ) {
+			$this->delete_meta( 'schedule_lock' );
+
+			return false;
+		}
+
+		$time_elapsed = $timer->time_elapsed();
+
+		$this->update_meta( 'num_scheduled', $offset );
+		$this->update_meta( 'total_contacts', $total );
+		$this->update_meta( 'batch_time_elapsed', round( $time_elapsed, 2 ) );
+
+		// Finished scheduling
+		if ( $offset >= $total ) {
+			$this->update( [ 'status' => 'scheduled' ] );
+		}
+
+		$this->delete_meta( 'schedule_lock' );
+
+		return $items;
+
 	}
 
 	/**
@@ -441,92 +538,19 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	const BATCH_LIMIT = 500;
 
 	/**
-	 * Schedules a batch of events!
+	 * Get the number of items remaining that require scheduling
 	 *
-	 * @return false|float false if failed, a number of percentage complete
+	 * @return array|false|mixed
 	 */
-	public function schedule_batch() {
+	public function get_items_remaining() {
+		$total     = $this->get_meta( 'total_contacts' );
+		$scheduled = $this->get_meta( 'num_scheduled' );
 
-		if ( ! $this->is_pending() ) {
+		if ( ! $total || ! $scheduled ) {
 			return false;
 		}
 
-		$query                  = $this->get_query();
-		$in_lt                  = (bool) $this->get_meta( 'send_in_local_time' );
-		$send_now               = (bool) $this->get_meta( 'send_now' );
-		$offset                 = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
-		$limit                  = self::BATCH_LIMIT;
-		$query['number']        = $limit;
-		$query['offset']        = $offset;
-		$query['no_found_rows'] = false;
-
-		$c_query  = new Contact_Query();
-		$contacts = $c_query->query( $query, true );
-		$total    = $c_query->found_items;
-
-		$timer = new Micro_Time_Tracker();
-
-		foreach ( $contacts as $contact ) {
-
-			$offset ++;
-
-			// Can't be delivered at all
-			if ( ! $contact->is_deliverable() ) {
-				continue;
-			}
-
-			// No point in scheduling an email to a contact that is not marketable.
-			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
-				continue;
-			}
-
-			$local_time = $this->get_send_time();
-
-			if ( $in_lt && ! $send_now ) {
-
-				$local_time = $contact->get_local_time_in_utc_0( $local_time );
-
-				if ( $local_time < time() ) {
-					$local_time += DAY_IN_SECONDS;
-				}
-			}
-
-			$args = [
-				'time'       => $local_time,
-				'contact_id' => $contact->get_id(),
-				'funnel_id'  => Broadcast::FUNNEL_ID,
-				'step_id'    => $this->get_id(),
-				'event_type' => Event::BROADCAST,
-				'status'     => Event::WAITING,
-				'priority'   => 100,
-			];
-
-			if ( $this->is_email() ) {
-				$args['email_id'] = $this->get_object_id();
-			}
-
-			event_queue_db()->batch_insert( $args );
-		}
-
-		$inserted = event_queue_db()->commit_batch_insert();
-
-		if ( $total > 0 && ! $inserted ) {
-			return false;
-		}
-
-		$time_elapsed = $timer->time_elapsed();
-
-		$this->update_meta( 'num_scheduled', $offset );
-		$this->update_meta( 'total_contacts', $total );
-		$this->update_meta( 'batch_time_elapsed', round( $time_elapsed, 2 ) );
-
-		// Finished scheduling
-		if ( $offset >= $total ) {
-			$this->update( [ 'status' => 'scheduled' ] );
-		}
-
-		return percentage( $total, $offset, 0 );
-
+		return $total - $scheduled;
 	}
 
 	/**
@@ -536,15 +560,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_estimated_scheduling_time_remaining() {
 
-		$total        = $this->get_meta( 'total_contacts' );
-		$scheduled    = $this->get_meta( 'num_scheduled' );
+		$remaining    = $this->get_items_remaining();
 		$time_elapsed = $this->get_meta( 'batch_time_elapsed' );
 
-		if ( ! $total || ! $scheduled || ! $time_elapsed ) {
+		if ( ! $remaining || ! $time_elapsed ) {
 			return false;
 		}
-
-		$remaining = $total - $scheduled;
 
 		return ceil( ( $remaining / self::BATCH_LIMIT ) * $time_elapsed );
 	}

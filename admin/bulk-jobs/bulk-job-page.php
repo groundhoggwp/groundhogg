@@ -317,8 +317,7 @@ class Bulk_Job_Page extends Admin_Page {
                       self.complete += response.complete
                       self.updateProgress()
 
-                      self.log.val(self.log.val() + '\n' + response.message)
-                      self.log.scrollTop(self.log[0].scrollHeight)
+                      self.log.val( response.message + '\n' + self.log.val() )
 
                       if (self.items.length > 0) {
                         self.send()

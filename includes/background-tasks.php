@@ -36,8 +36,10 @@ class Background_Tasks {
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit( MINUTE_IN_SECONDS );
 
-		while ( ! Limits::limits_exceeded() && $broadcast->is_pending() ) {
-			$broadcast->schedule_batch();
+		$scheduled = true;
+
+		while ( ! Limits::limits_exceeded() && $broadcast->is_pending() && $scheduled !== false ) {
+			$scheduled = $broadcast->enqueue_batch();
 			Limits::processed_action();
 		}
 
