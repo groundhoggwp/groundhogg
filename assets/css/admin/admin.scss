@@ -408,6 +408,19 @@ table.wp-list-table.funnels td.column-active_contacts {
   text-align: center;
 }
 
+table.wp-list-table {
+  th{
+    &#from_user {
+      width: 10%;
+    }
+
+    &#stats,
+    &#sending_to {
+      width: 7%;
+    }
+  }
+}
+
 #wpbody .dash-button {
   padding: 0 5px 1px;
 }

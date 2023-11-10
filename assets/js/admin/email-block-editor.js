@@ -26,6 +26,7 @@
     Dashicon,
     ButtonToggle,
     ToolTip,
+    Autocomplete
   } = MakeEl
 
   const {
@@ -46,7 +47,7 @@
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
   const { __, _x, _n, _nx, sprintf } = wp.i18n
   const { linkPicker } = Groundhogg.pickers
-  const { get, post } = Groundhogg.api
+  const { get, post, ajax } = Groundhogg.api
   const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
 
   improveTinyMCE({
@@ -3732,14 +3733,21 @@
         className: 'gh-button secondary icon',
         disabled: !Boolean(getState().preview),
         onClick: e => {
+
+          let width = Math.min(1200, window.innerWidth * 0.8)
+          let height = window.innerHeight * 0.85
+
           ModalFrame({}, Div({
             className: 'preview desktop',
+            style: {
+              width: `${width}px`,
+              height: `${height}px`
+            }
           }, [
             SubjectAndFromPreview(),
             Iframe({
               id: 'desktop-preview-iframe',
-              height: window.innerHeight * 0.85,
-              width: Math.min(1200, window.innerWidth * 0.8),
+              width,
             }, getState().preview),
           ]))
         },
@@ -3750,14 +3758,20 @@
         disabled: !Boolean(getState().preview),
         onClick: e => {
 
+          let width = 412
+          let height = Math.min(915, window.innerHeight * 0.85)
+
           ModalFrame({}, Div({
             className: 'preview mobile',
+            style: {
+              width: `${width}px`,
+              height: `${Math.min(915, window.innerHeight * 0.85)}px`
+            }
           }, [
             SubjectAndFromPreview(),
             Iframe({
               id: 'mobile-desktop-iframe',
-              height: Math.min(915, window.innerHeight * 0.85),
-              width: 412,
+              width,
             }, getState().preview),
           ]))
         },
@@ -3926,7 +3940,7 @@
                 }
 
                 Modal({}, () => Groundhogg.BroadcastScheduler({
-                  email: EmailsStore.get(getEmailId()),
+                  object: EmailsStore.get(getEmailId()),
                 }))
 
               },
@@ -5327,6 +5341,19 @@
             label: 'Link',
             stacked: true,
           }, InputWithReplacements({
+            inputCallback: (attributes) => Autocomplete({
+              ...attributes,
+              fetchResults: async search => {
+
+                let pages = await ajax( {
+                  action: 'wp-link-ajax',
+                  _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                  term: search,
+                } )
+
+                return pages.map( ({title, permalink}) => ({ id: permalink, text: title }))
+              }
+            }),
             type: 'text',
             id: 'button-link',
             className: 'full-width',
@@ -5500,7 +5527,7 @@
       return `[${ text }](${ link })`
     },
     defaults: {
-      link: Groundhogg.url.home,
+      link: '',
       align: 'center',
       text: 'Click me!',
       size: 'md',
@@ -5560,6 +5587,19 @@
             label: 'Link',
             stacked: true,
           }, InputWithReplacements({
+            inputCallback: (attributes) => Autocomplete({
+              ...attributes,
+              fetchResults: async search => {
+
+                let pages = await ajax( {
+                  action: 'wp-link-ajax',
+                  _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                  term: search,
+                } )
+
+                return pages.map( ({title, permalink}) => ({ id: permalink, text: title }))
+              }
+            }),
             type: 'text',
             id: 'image-link',
             className: 'full-width',

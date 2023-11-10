@@ -981,10 +981,19 @@ body iframe#preview.desktop {
   height: 13px;
 }
 
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 .preview.mobile, .preview.desktop {
   background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
+}
+.preview iframe {
+  height: 100%;
+  width: 100%;
 }
 .preview .from-preview {
   padding: 20px;

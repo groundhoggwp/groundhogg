@@ -2549,6 +2549,45 @@ p.error,
   }
 }
 
+.gh-autocomplete {
+  &.has-results {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.gh-autocomplete-results {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+  border-radius: 0 0 5px 5px;
+  background: #FFF;
+  overflow-y: auto;
+
+  &.hidden {
+    display: none;
+  }
+
+  a {
+    cursor: pointer;
+    font-size: 14px;
+    padding: 3px 8px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.pointer {
+      color: $primary-dark;
+      background: $primary-blue-7;
+    }
+  }
+
+}
+
 .gh-picker {
 
   min-height: 31px;
