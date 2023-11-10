@@ -3,31 +3,26 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\dashicon;
+use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
+use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
-use function Groundhogg\get_request_query;
-use function Groundhogg\get_store_products;
-use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_store_products;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use function Groundhogg\iframe_compat;
-use function Groundhogg\is_option_enabled;
-use Groundhogg\Plugin;
-use Groundhogg\Contact_Query;
-use Groundhogg\Step;
-use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\last_db_error;
 use function Groundhogg\notices;
 
 // Exit if accessed directly
@@ -280,6 +275,13 @@ class Funnels_Page extends Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Update the current funnels to a specific status
+	 *
+	 * @param $status
+	 *
+	 * @return int
+	 */
 	public function update_funnels_status( $status ) {
 
 		if ( ! current_user_can( 'edit_funnels' ) ) {
@@ -305,6 +307,11 @@ class Funnels_Page extends Admin_Page {
 		return $updated;
 	}
 
+	/**
+	 * Restore a funnel
+	 *
+	 * @return void
+	 */
 	public function process_restore() {
 		$updated = $this->update_funnels_status( 'inactive' );
 
@@ -315,6 +322,11 @@ class Funnels_Page extends Admin_Page {
 		);
 	}
 
+	/**
+	 * Archive a funnel
+	 *
+	 * @return void
+	 */
 	public function process_archive() {
 		$updated = $this->update_funnels_status( 'archived' );
 
@@ -325,6 +337,11 @@ class Funnels_Page extends Admin_Page {
 		);
 	}
 
+	/**
+	 * Deactivate a funnel
+	 *
+	 * @return void
+	 */
 	public function process_deactivate() {
 		$updated = $this->update_funnels_status( 'deactivate' );
 
@@ -335,6 +352,11 @@ class Funnels_Page extends Admin_Page {
 		);
 	}
 
+	/**
+	 * Activate a funnel
+	 *
+	 * @return void
+	 */
 	public function process_activate() {
 		$updated = $this->update_funnels_status( 'active' );
 
@@ -345,6 +367,11 @@ class Funnels_Page extends Admin_Page {
 		);
 	}
 
+	/**
+	 * Duplicate a funnel
+	 *
+	 * @return false|string
+	 */
 	public function process_duplicate() {
 
 		if ( ! current_user_can( 'add_funnels' ) ) {
@@ -376,6 +403,32 @@ class Funnels_Page extends Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Export a list of funnels
+	 *
+	 * @return void
+	 */
+	public function process_export() {
+
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$funnels = [];
+
+		foreach ( $this->get_items() as $item ) {
+			$funnel    = new Funnel( $item );
+			$funnels[] = $funnel->export();
+		}
+
+		download_json( $funnels, 'funnels' );
+	}
+
+	/**
+	 * Create a new funnel without using a template
+	 *
+	 * @return string
+	 */
 	public function process_start_from_scratch() {
 		if ( ! current_user_can( 'add_funnels' ) ) {
 			$this->wp_die_no_access();
@@ -430,10 +483,13 @@ class Funnels_Page extends Admin_Page {
 				return $error;
 			}
 
-			$validate = wp_check_filetype( $file['name'], [ 'funnel' => 'text/plain' ] );
+			$validate = wp_check_filetype( $file['name'], [
+				'funnel' => 'text/plain',
+				'json'   => 'application/json',
+			] );
 
-			if ( $validate['ext'] !== 'funnel' || isset_not_empty( $validate, 'text/plain' ) ) {
-				return new \WP_Error( 'invalid_template', sprintf( 'Please upload a valid funnel template. Expected mime type of <i>text/plain</i> but got <i>%s</i>', esc_html( $file['type'] ) ) );
+			if ( ! in_array( $validate['ext'], [ 'json', 'funnel' ] ) ) {
+				return new \WP_Error( 'invalid_template', __( 'Please upload a valid funnel template.', 'groundhogg' ) );
 			}
 
 			$json = file_get_contents( $file['tmp_name'] );
@@ -441,6 +497,18 @@ class Funnels_Page extends Admin_Page {
 
 			if ( ! $json ) {
 				return new \WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
+			}
+
+			// Importing multiple funnels
+			if ( is_array( $json ) ) {
+
+				foreach ( $json as $funnel ) {
+					$this->import_funnel( $funnel );
+				}
+
+				$this->add_notice( 'imported', sprintf( __( 'Imported %d funnels', 'groundhogg' ), count( $json ) ) );
+
+				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
 			}
 
 			$funnel_id = $this->import_funnel( $json );
@@ -453,6 +521,18 @@ class Funnels_Page extends Admin_Page {
 				return new \WP_Error( 'invalid_json', 'Invalid JSON provided.' );
 			}
 
+			// Importing multiple funnels
+			if ( is_array( $json ) ) {
+
+				foreach ( $json as $funnel ) {
+					$this->import_funnel( $funnel );
+				}
+
+				$this->add_notice( 'imported', sprintf( __( 'Imported %d funnels', 'groundhogg' ), count( $json ) ) );
+
+				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
+			}
+
 			$funnel_id = $this->import_funnel( $json );
 		}
 
@@ -460,7 +540,7 @@ class Funnels_Page extends Admin_Page {
 			return $funnel_id;
 		}
 
-		if ( ! isset( $funnel_id ) || empty( $funnel_id ) ) {
+		if ( empty( $funnel_id ) ) {
 			return new \WP_Error( 'error', __( 'Could not create funnel.', 'groundhogg' ) );
 		}
 
@@ -838,10 +918,10 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table->views();
 		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
 		?>
-		<form method="post" class="wp-clearfix">
+        <form method="post" class="wp-clearfix">
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>
-		</form>
+        </form>
 		<?php
 	}
 
@@ -916,13 +996,13 @@ class Funnels_Page extends Admin_Page {
 
 			foreach ( $products->products as $product ):
 				?>
-				<div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-					<div class="">
-						<img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
-					</div>
-					<h2 class="hndle"><?php echo $product->info->title; ?></h2>
-					<div class="inside">
-						<p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
+                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
+                    <div class="">
+                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
+                    </div>
+                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
+                    <div class="inside">
+                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
 
 						<?php $pricing = (array) $product->pricing;
 						if ( count( $pricing ) > 1 ) {
@@ -931,8 +1011,8 @@ class Funnels_Page extends Admin_Page {
 							$price2 = max( $pricing );
 
 							?>
-							<a class="button-primary" target="_blank"
-							   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+                            <a class="button-primary" target="_blank"
+                               href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -940,24 +1020,24 @@ class Funnels_Page extends Admin_Page {
 
 							if ( $price > 0.00 ) {
 								?>
-								<a class="button-primary" target="_blank"
-								   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-								<a class="button-primary" target="_blank"
-								   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-					</div>
-				</div>
+                    </div>
+                </div>
 			<?php endforeach;
 		} else {
 			?>
-			<p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
+            <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		}
 	}
 

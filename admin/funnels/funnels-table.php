@@ -4,8 +4,6 @@ namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Table;
 use Groundhogg\Contact_Query;
-use Groundhogg\DB\DB;
-use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
@@ -14,8 +12,6 @@ use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
-use function Groundhogg\get_screen_option;
-use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
@@ -44,8 +40,6 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 class Funnels_Table extends Table {
 
-	protected $default_view = 'active';
-
 	/**
 	 * TT_Example_List_Table constructor.
 	 *
@@ -67,8 +61,8 @@ class Funnels_Table extends Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 
@@ -242,14 +236,16 @@ class Funnels_Table extends Table {
 			case 'active':
 				$actions = [
 					'deactivate' => _x( 'Deactivate', 'List table bulk action', 'groundhogg' ),
-					'archive'    => _x( 'Archive', 'List table bulk action', 'groundhogg' )
+					'archive'    => _x( 'Archive', 'List table bulk action', 'groundhogg' ),
+					'export'     => _x( 'Export', 'List table bulk action', 'groundhogg' ),
 				];
 				break;
 
 			case 'inactive':
 				$actions = [
 					'activate' => _x( 'Activate', 'List table bulk action', 'groundhogg' ),
-					'archive'  => _x( 'Archive', 'List table bulk action', 'groundhogg' )
+					'archive'  => _x( 'Archive', 'List table bulk action', 'groundhogg' ),
+					'export'   => _x( 'Export', 'List table bulk action', 'groundhogg' ),
 				];
 				break;
 			case 'archived':
