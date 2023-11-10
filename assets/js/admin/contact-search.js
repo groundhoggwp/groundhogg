@@ -732,7 +732,13 @@
                   document.getElementById('gh-broadcast-form').append(Groundhogg.BroadcastScheduler({
                     totalContacts,
                     searchMethod: 'selection',
-                    selection: query,
+                    searchMethods: [{
+                      id: 'selection',
+                      text: sprintf(__('Selected %s contacts', 'groundhogg' ), formatNumber( totalContacts ) ),
+                      query: () => ({
+                        ...query
+                      })
+                    }],
                   }))
                 },
               })
