@@ -998,6 +998,8 @@ abstract class DB {
 	 */
 	public function parse_query_vars( $data = [] ) {
 
+		global $wpdb;
+
 		// parsed allready
 		if ( isset_not_empty( $data, '_was_parsed' ) ) {
 			return $data;
@@ -1050,7 +1052,7 @@ abstract class DB {
 					$where[]       = [
 						'col'     => $this->get_primary_key(),
 						'compare' => 'IN',
-						'val'     => sprintf( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s'", $val['ID'], $val['type'] )
+						'val'     => $wpdb->prepare( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s' AND primary_object_type = '%s'", $val['ID'], $val['type'], $this->get_object_type() )
 					];
 					break;
 				case 'count':

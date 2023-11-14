@@ -590,7 +590,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		return self::SUCCESS_RESPONSE( [
 			'items'           => $deleted_item_ids,
-			'deleted_items'   => $deleted_items,
+			'items_deleted'   => $deleted_items,
 			'items_remaining' => $found - $deleted_items,
 		] );
 	}

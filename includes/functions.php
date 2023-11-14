@@ -36,7 +36,7 @@ function add_constant_support( $option_name ) {
 /**
  * Given an option name, check if it's defined as a constant and if it is, return that value instead
  *
- * @param $value false|null
+ * @param $value       false|null
  * @param $option_name string
  *
  * @return mixed
@@ -2154,19 +2154,25 @@ function count_csv_rows( $file_path ) {
 	$file = new \SplFileObject( $file_path, 'r' );
 	$file->seek( PHP_INT_MAX );
 
-	return $file->key() + 1;
+	$lines = $file->key();
+
+	$file = null;
+
+    return $lines;
 }
 
 /**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
  * @param string $file_path   path to the CSV file
+ * @param int    $rows        the number of rows to retrieve, a negative number will mean all rows
+ * @param int    $offset      the offset to start
  * @param bool   $delimiter   the file delimiter, if false it will guess
  * @param bool   $associative whether to return the results as an associative array or regular array
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $delimiter = false, $associative = true ) {
+function get_items_from_csv( $file_path = '', $rows = - 1, $offset = 0, $delimiter = false, $associative = true ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
@@ -2179,51 +2185,36 @@ function get_items_from_csv( $file_path = '', $delimiter = false, $associative =
 
 	$data = array();
 
-	if ( $associative ) {
+	$file = new \SplFileObject( $file_path, 'r' );
 
-		$header       = null;
-		$header_count = 0;
+	// Headers are always the first row
+	$header       = $file->fgetcsv( $delimiter );
+	$header_count = count( $header );
 
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
-				if ( ! $header ) {
-					$header       = $row;
-					$header_count = count( $header );
-				} else {
+    if ( $offset > 0 ){
+	    $file->seek( $offset + 1 );
+    }
 
-					if ( count( $row ) > $header_count ) {
+	while ( ! $file->eof() && ( $rows < 0 || count( $data ) < $rows ) ) {
 
-						$row = array_slice( $row, 0, $header_count );
-					} else if ( count( $row ) < $header_count ) {
+		$row = $file->fgetcsv( $delimiter );
 
-						$row = array_pad( $row, $header_count, '' );
-					}
+        if ( $associative ){
+	        if ( count( $row ) > $header_count ) {
 
-					$data[] = array_combine( $header, $row );
-				}
-			}
+		        $row = array_slice( $row, 0, $header_count );
+	        } else if ( count( $row ) < $header_count ) {
 
-			fclose( $handle );
-		}
-	} else {
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
+		        $row = array_pad( $row, $header_count, '' );
+	        }
 
-			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
-
-				if ( empty( $row ) ) {
-					continue;
-				}
-
-				if ( count( $row ) === 1 && empty ( $row[0] ) ) {
-					continue;
-				}
-
-				$data[] = $row;
-			}
-
-			fclose( $handle );
-		}
+	        $data[] = array_combine( $header, $row );
+        } else {
+	        $data[] = $row;
+        }
 	}
+
+    $file = null;
 
 	return $data;
 }

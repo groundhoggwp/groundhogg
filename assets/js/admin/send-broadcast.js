@@ -625,12 +625,11 @@
 
     const {
       searchMethod = 'filters',
-      email,
     } = getState()
 
     query = getSearchMethods().find(({ id }) => id === searchMethod).query()
 
-    if (email && email.data.message_type !== 'transactional') {
+    if (getObject() && getObject().data.message_type !== 'transactional') {
       query.marketable = true
     }
 

@@ -1,4 +1,5 @@
 === WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
+
 Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
@@ -13,21 +14,27 @@ Groundhogg is the best WordPress CRM & Marketing Automation plugin. Create funne
 
 == Description ==
 
-Groundhogg WordPress CRM, Email & Marketing Automation
+# Groundhogg 3.0 is here!
+
+Groundhogg 3.0 introduces a new powerful email editor that rivals even the priciest SaaS CRM and email marketing platforms.
+
+Create beautiful email templates to send as broadcasts, or to use in funnels and automations.
+
+[youtube https://youtu.be/vVRbKys1Uc4]
+
+Do your business a favor and switch to Groundhogg.
+
+## Epic WordPress CRM, Email & Marketing Automation
+
+Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
-🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
+🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg) | [Ⅹ (Twitter)](https://twitter.com/Groundhoggwp/)
 
-🚀 [Free Quickstart Course — Launch your first funnel!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
+🚀 [**14-day demo!** Try before you buy.](https://groundhogg.io/try/)
 
 🏆 [2020 Gold Stevie Award Winner](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
-
-## Join 3,000+ Small Businesses in 35+ Countries!
-
-### Send automated/recurring newsletters to your subscribers with your latest posts!
-
-[youtube https://youtu.be/DnupLOepWMs]
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
@@ -37,11 +44,11 @@ You don’t have to sacrifice CRM features when you switch to our self-hosted so
 
 If you are an agency, WaaS, WordPress developer, LMS/Course Creator, WordPress freelancer, or CRM implementation service provider then the Groundhogg CRM and Marketing Automation suite is for you.
 
-## 💸 Eliminating the "Success Tax"
+## 🪓 Ax the "Success Tax"
 
 Other SaaS (Software as a Service) CRM platforms will charge you more as your list grows.
 
-But not us!
+**But not us!**
 
 When using the Groundhogg CRM & Marketing Automation suite free or with any of our paid plans, _we'll never charge you more_!
 
@@ -53,7 +60,21 @@ When using the Groundhogg CRM & Marketing Automation suite free or with any of o
 
 When using Groundhogg CRM & Marketing Automation you will **never** be limited on the amount of **anything**! Unlike [other SaaS platforms](https://www.groundhogg.io/comparison/).
 
+Businesses [save $1,000s a year](https://groundhogg.io/pricing/) after switching to Groundhogg.
+
+## 💽 You own your data!
+
+The reality of SaaS CRMs is that you pay, and pay, and pay, and you invest all this money into a system to help your business thrive, but it can be taken away at a moments notice.
+
+Putting your data in a SaaS CRM is like renting an apartment, but with less protection and stingier landlords. You can get evicted at any time, for any reason. There is no recourse.
+
+This leaves your business exposed. What would happen to your business if your CRM was turned off?
+
+With Groundhogg you actually [own your data](https://www.groundhogg.io/learn/email-and-self-hosting-is-now-more-critical-than-ever/)! No one expect you can make impactful changes.
+
 ## 🔎 At A Glance
+
+Everything your business needs to thrive!
 
 * Best in class CRM & Marketing Automation suite.
 * Organize and segment your contacts to send more relevant communications.
@@ -106,11 +127,6 @@ We know funnels, CRM, and marketing automation like the back of our hands!
 
 You can trust us to not only provide you with stellar software and support, but also provide you guidance on the kinds of funnels and automation you should be building to get maximum value from our products.
 
-### Quickly and easily segment your list with Groundhogg's unrivaled search filter system!
-
-// todo change video url
-[youtube https://youtu.be/e-_QCUtdghw]
-
 ## ❤️ Businesses Love Groundhogg CRM & Marketing Automation!
 
 3,000+ businesses in 35+ countries are using Groundhogg CRM & Marketing Automation to launch their funnels, grow their lists and scale their businesses.
@@ -130,9 +146,9 @@ From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-pro
 
 > Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
 
-There are over [90 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
+There are over [110 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
-### Why Kris Britton of the KAYBE marketing agency moved all of his clients from HubSpot to Groundhogg!
+**Kris Britton of the KAYBE marketing agency moved all of his clients from HubSpot to Groundhogg!**
 
 [youtube https://youtu.be/EzQW0oexYFs]
 
@@ -153,6 +169,15 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Sync contacts in the CRM with WordPress users
 * View congregated information other WordPress plugins in the contact record.
 
+**Quickly and easily segment your list with Groundhogg's unrivaled search filter system!**
+
+Groundhogg's search filters give you more control than any other CRM to segment your list to find exactly the leads you're looking for.
+
+Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocommerce/), [AffiliateWP](https://www.groundhogg.io/downloads/affiliatewp-integration/), [LearnDash](https://www.groundhogg.io/downloads/learndash-integration/), [and more](https://www.groundhogg.io/downloads/category/integrations/) add additional search filters you can use to create powerful segments so you can send hyper targeted messages.
+
+// Todo update
+[youtube https://youtu.be/e-_QCUtdghw]
+
 ### ⚙️ Funnels & Marketing Automation Features
 
 * Create highly effective customer journeys with our easy to learn funnel builder.
@@ -161,6 +186,11 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Measure the effectiveness of your funnels with easy to read metrics.
 * Start funnels from forms, payments, new users, and more!
 * Open API to add your own benchmarks & actions.
+
+**Our funnel builder makes it easy to create automations and email sequences that actually work!**
+
+// Todo update
+[youtube https://youtu.be/e-_QCUtdghw]
 
 ### 📧 Simple Email Marketing & SMTP
 
@@ -172,6 +202,9 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Send broadcast emails to your contact lists.
 * Distinguish between **transactional** and **marketing** emails.
 
+// Todo update
+[youtube https://youtu.be/e-_QCUtdghw]
+
 ### 📈 Unmatched Analytics Reporting
 
 * We track EVERYTHING in the CRM!
@@ -182,7 +215,7 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Learn more about your audience with demographic reporting.
 * See which funnels/emails are under-performing.
 
-### Create custom reports so you always have access to your essential data!
+**Create custom reports so you always have access to your essential data!**
 
 // todo change video url
 [youtube https://youtu.be/e-_QCUtdghw]
@@ -338,8 +371,10 @@ You can purchase a premium plan for access to support and our premium extensions
  * Total number of activities
 * ADDED Option to disable user syncing in WordPress integration settings.
 * ADDED Developer filters/actions to the new form submission handler.
+* ADDED Support for defining some options as constants in `wp-config.php`.
 * TWEAKED Moved user meta sync option to WordPress integration settings.
 * TWEAKED Dropdown and checkbox fields can now be pre-selected with the value setting in the new form builder.
+* TWEAKED Broadcasts are not scheduled in the background instead of using the loader.
 
 = 2.7.11.11 (2023-10-25) =
 * FIXED Properly sanitize task data.
