@@ -86,8 +86,7 @@ class Import_Contacts extends Bulk_Job {
 
 		$offset = absint( $item ) * self::LIMIT;
 
-		$items = get_items_from_csv( $this->file_path );
-		$items = array_slice( $items, $offset, self::LIMIT );
+		$items = get_items_from_csv( $this->file_path, self::LIMIT, $offset );
 
 		foreach ( $items as $item ) {
 
