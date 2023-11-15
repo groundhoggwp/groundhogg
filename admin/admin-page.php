@@ -173,6 +173,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 * Register the page
 	 */
 	public function register() {
+
 		$page = add_submenu_page(
 			$this->get_parent_slug(),
 			$this->get_name(),

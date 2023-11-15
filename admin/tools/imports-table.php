@@ -4,7 +4,9 @@ namespace Groundhogg\Admin\Tools;
 
 use \WP_List_Table;
 use Groundhogg\Plugin;
+use function Groundhogg\count_csv_rows;
 use function Groundhogg\file_access_url;
+use function Groundhogg\get_items_from_csv;
 
 /**
  * Contacts Table Class
@@ -98,7 +100,7 @@ class Imports_Table extends WP_List_Table {
 	 * @return mixed
 	 */
 	protected function column_rows( $import ) {
-		return $import['rows'];
+		return number_format_i18n( $import['rows'] );
 	}
 
 	/**
@@ -191,7 +193,7 @@ class Imports_Table extends WP_List_Table {
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/imports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count( file( $filepath, FILE_SKIP_EMPTY_LINES ) ) - 1,
+					'rows'      => count_csv_rows( $filepath ) - 1,
 				];
 
 				$data[] = $file;

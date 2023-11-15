@@ -2158,7 +2158,7 @@ function count_csv_rows( $file_path ) {
 
 	$file = null;
 
-    return $lines;
+	return $lines;
 }
 
 /**
@@ -2172,7 +2172,7 @@ function count_csv_rows( $file_path ) {
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $rows = - 1, $offset = 0, $delimiter = false, $associative = true ) {
+function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter = false, $associative = true ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
@@ -2191,30 +2191,40 @@ function get_items_from_csv( $file_path = '', $rows = - 1, $offset = 0, $delimit
 	$header       = $file->fgetcsv( $delimiter );
 	$header_count = count( $header );
 
-    if ( $offset > 0 ){
-	    $file->seek( $offset + 1 );
-    }
+	// Get all rows
+	if ( ! $rows ) {
+        $rows = 999999999;
+	}
 
-	while ( ! $file->eof() && ( $rows < 0 || count( $data ) < $rows ) ) {
-
-		$row = $file->fgetcsv( $delimiter );
-
-        if ( $associative ){
-	        if ( count( $row ) > $header_count ) {
-
-		        $row = array_slice( $row, 0, $header_count );
-	        } else if ( count( $row ) < $header_count ) {
-
-		        $row = array_pad( $row, $header_count, '' );
-	        }
-
-	        $data[] = array_combine( $header, $row );
+	if ( $offset > 0 ) {
+		// bug in PHP < 8.0.1 causes next line to be given after seek
+        if ( version_compare( PHP_VERSION, '8.0.1', '<' ) ){
+	        $file->seek( $offset );
         } else {
-	        $data[] = $row;
+	        $file->seek( $offset + 1 );
         }
 	}
 
-    $file = null;
+	while ( ! $file->eof() && count( $data ) < $rows ) {
+
+		$row = $file->fgetcsv( $delimiter );
+
+		if ( $associative ) {
+			if ( count( $row ) > $header_count ) {
+
+				$row = array_slice( $row, 0, $header_count );
+			} else if ( count( $row ) < $header_count ) {
+
+				$row = array_pad( $row, $header_count, '' );
+			}
+
+			$data[] = array_combine( $header, $row );
+		} else {
+			$data[] = $row;
+		}
+    }
+
+	$file = null;
 
 	return $data;
 }

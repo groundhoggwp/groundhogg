@@ -61,7 +61,7 @@ class Bulk_Job_Page extends Admin_Page {
 	}
 
 	protected function get_parent_slug() {
-		return null;
+		return 'gh_tools';
 	}
 
 	/**

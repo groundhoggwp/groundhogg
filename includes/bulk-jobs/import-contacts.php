@@ -58,7 +58,7 @@ class Import_Contacts extends Bulk_Job {
 
 		$num_requests = floor( $num_rows / self::LIMIT );
 
-		return range( 0, $num_requests );
+		return range( 0, $num_requests - 1 );
 	}
 
 	/**
