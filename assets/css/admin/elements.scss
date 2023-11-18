@@ -2517,7 +2517,7 @@ p.error,
     }
 
     &.not-set {
-      background-color: $error-red-10;
+      //background-color: $error-red-10;
 
       &::after{
         background-color: $primary-dark-10;

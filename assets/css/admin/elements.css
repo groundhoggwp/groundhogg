@@ -2322,9 +2322,6 @@ p.error,
   border-radius: 3px;
   background-color: var(--color);
 }
-.gh-color-picker .current-color.not-set {
-  background-color: rgba(233, 31, 79, 0.1);
-}
 .gh-color-picker .current-color.not-set::after {
   background-color: rgba(16, 38, 64, 0.1);
 }
