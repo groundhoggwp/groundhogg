@@ -786,7 +786,7 @@ class Funnels_Page extends Admin_Page {
 
 		$step = new Step( $step_id );
 
-		if ( ! $step ) {
+		if ( ! $step->exists() ) {
 			wp_send_json_error();
 		}
 
@@ -836,41 +836,6 @@ class Funnels_Page extends Admin_Page {
 		wp_send_json_error();
 	}
 
-	/**
-	 * Quickly add contacts to a funnel VIA the funnel editor UI
-	 */
-	public function add_contacts_to_funnel() {
-
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$tags = array_map( 'intval', get_post_var( 'tags' ) );
-
-		$query    = new Contact_Query();
-		$contacts = $query->query( array( 'tags_include' => $tags ) );
-
-		$step = new Step( intval( get_post_var( 'step' ) ) );
-
-		foreach ( $contacts as $contact ) {
-
-			$contact = get_contactdata( $contact->ID );
-			$step->enqueue( $contact );
-
-		}
-
-		$this->add_notice( 'contacts-added', sprintf( _nx( '%d contact added to funnel', '%d contacts added to funnel', count( $contacts ), 'notice', 'groundhogg' ), count( $contacts ) ), 'success' );
-
-		ob_start();
-
-		$this->add_notice();
-
-		$content = ob_get_clean();
-
-		wp_die( $content );
-
-	}
-
 	public function edit() {
 		if ( ! current_user_can( 'edit_funnels' ) ) {
 			$this->wp_die_no_access();
@@ -910,21 +875,6 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		include __DIR__ . '/add-to-funnel.php';
-	}
-
-	public function process_add_to_funnel() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$query   = get_post_var( 'query' );
-		$step_id = absint( get_post_var( 'step' ) );
-
-		$query['step_id'] = $step_id;
-
-		$query = array_filter( $query );
-
-		Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( $query );
 	}
 
 	public function page() {
