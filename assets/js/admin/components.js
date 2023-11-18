@@ -17,11 +17,12 @@
     tooltip,
     regexp,
     isValidEmail,
+    loadingModal,
     textarea,
     spinner,
 
   } = Groundhogg.element
-  const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore } = Groundhogg.stores
+  const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore, emails: EmailsStore } = Groundhogg.stores
   const { post, routes, postFormData } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
   const { userHasCap } = Groundhogg.user
@@ -1517,6 +1518,97 @@
     })
   }
 
+  const {
+    Div,
+    ModalFrame,
+    Iframe,
+    makeEl,
+    Button,
+    Dashicon
+  } = MakeEl
+
+  const EmailPreviewModal = async (emailId, {
+    height = window.innerHeight * 0.85,
+    width = 900
+  }) => {
+
+    const { close } = loadingModal()
+
+    await EmailsStore.maybeFetchItem( emailId )
+
+    close()
+
+    ModalFrame({}, ({close}) => Div({
+      style: {
+        width: `${width}px`,
+        height: `${height}px`
+      }
+    },  EmailPreview(emailId, {
+      close
+    })))
+  }
+
+  const EmailPreview = ( emailId, {
+    close = false
+  } ) => {
+
+    // assume already fetched?
+    const email = EmailsStore.get( emailId )
+
+    const {
+      from_avatar,
+      from_email,
+      from_name,
+      subject,
+      built,
+    } = email.context
+
+    return  Div({
+      className: 'email-preview',
+    }, [
+      Div({
+        className: 'from-preview display-flex gap-20 has-box-shadow',
+      }, [
+        makeEl('img', {
+          src: from_avatar,
+          className: 'from-avatar',
+          height: 40,
+          width: 40,
+          style: {
+            borderRadius: '50%',
+          },
+        }),
+        Div({
+          className: 'subject-and-from',
+        }, [
+          // Subject Line
+          `<h2>${ subject }</h2>`,
+          // From Name & Email
+          `<span class="from-name">${ from_name }</span> <span class="from-email">&lt;${ from_email }&gt;</span>`,
+        ]),
+        close !== false ? Button({
+          className: 'gh-button secondary icon text',
+          style: {
+            marginLeft: 'auto'
+          },
+          onClick: close
+        }, Dashicon( 'no-alt' )) : null
+      ]),
+      Iframe({
+        id: 'desktop-preview-iframe',
+      }, built ),
+    ])
+
+  }
+
+  $(() => {
+    $(document).on( 'click', 'table.wp-list-table .gh-email-preview', e => {
+      e.preventDefault()
+
+      EmailPreviewModal( parseInt( $(e.currentTarget).closest('tr').attr('id')), {})
+    } )
+  })
+
   Groundhogg.components = {
     addContactModal,
     internalForm,
@@ -1527,6 +1619,8 @@
     makeInput,
     emailModal,
     fileUploader,
+    EmailPreview,
+    EmailPreviewModal
   }
 
 } )(jQuery)

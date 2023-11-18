@@ -1104,6 +1104,10 @@ button {
       color: $primary-blue;
       padding: 5px 10px;
 
+      &.page-title-action{
+        padding: 0 10px;
+      }
+
       &.text {
         border: none;
         background: transparent;

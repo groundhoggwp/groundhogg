@@ -1065,6 +1065,15 @@ button.gh-submit.secondary {
   color: #0075ff;
   padding: 5px 10px;
 }
+a.gh-button.secondary.page-title-action, a.gh-submit.secondary.page-title-action,
+input[type=button].gh-button.secondary.page-title-action,
+input[type=button].gh-submit.secondary.page-title-action,
+input[type=submit].gh-button.secondary.page-title-action,
+input[type=submit].gh-submit.secondary.page-title-action,
+button.gh-button.secondary.page-title-action,
+button.gh-submit.secondary.page-title-action {
+  padding: 0 10px;
+}
 a.gh-button.secondary.text, a.gh-submit.secondary.text,
 input[type=button].gh-button.secondary.text,
 input[type=button].gh-submit.secondary.text,

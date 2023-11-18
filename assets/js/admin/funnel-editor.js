@@ -19,6 +19,7 @@
     dialog,
     dangerConfirmationModal,
     adminPageURL,
+    loadingModal
   } = Groundhogg.element
 
   const { sprintf, __, _x, _n } = wp.i18n
@@ -38,6 +39,19 @@
 
     getSettings: function () {
       return $('.step-settings')
+    },
+
+    stepCallbacks: {},
+
+
+
+    /**
+     * Register various step callbacks
+     *
+     * @param type
+     */
+    registerStepCallbacks ( type, callbacks ) {
+      this.stepCallbacks[type] = callbacks
     },
 
     init: function () {
@@ -98,7 +112,10 @@
 
       /* Bind Duplicate */
       $document.on('click', 'button.duplicate-step', function (e) {
-        self.duplicateStep(this.parentNode.parentNode.id)
+
+        let stepId = this.parentNode.parentNode.id
+
+        self.duplicateStep(stepId)
       })
 
       /* Activate Spinner */
@@ -348,13 +365,13 @@
       // Do regular form update
       adminAjaxRequest(fd, (response) => {
         // handleNotices(response.data.notices)
-        this.steps = response.data.data.steps
+        this.steps = response.data.steps
 
         $saveButton.removeClass('spin')
         $saveButton.html(self.save_text)
 
-        self.getSettings().html(response.data.data.settings)
-        self.getSteps().html(response.data.data.sortable)
+        self.getSettings().html(response.data.settings)
+        self.getSteps().html(response.data.sortable)
 
         $(document).trigger('new-step')
 
@@ -398,15 +415,15 @@
           showSpinner()
           adminAjaxRequest(data, (response) => {
 
-            this.steps.push(response.data.data.json)
+            this.steps.push(response.data.json)
 
             if (self.insertAfterStep) {
-              $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
+              $(`#${self.insertAfterStep}`).after(response.data.sortable)
             } else {
-              $steps.prepend(response.data.data.sortable)
+              $steps.prepend(response.data.sortable)
             }
 
-            $settings.append(response.data.data.settings)
+            $settings.append(response.data.settings)
             $(`#${id}`).remove()
 
             hideSpinner()
@@ -473,14 +490,40 @@
      *
      * @param id int
      */
-    duplicateStep: function (id) {
+    async duplicateStep (id) {
+
+      const step = this.steps.find( s => s.ID == id )
+
+      if ( ! step ){
+        return
+      }
+
       this.insertAfterStep = id
+
+      const type = step.data.step_type;
+
+      let extra = {}
+
+      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onDuplicate' ) ){
+        try {
+          extra = await new Promise((res,rej) => this.stepCallbacks[type].onDuplicate( step, res, rej ) )
+        } catch (e) {
+          throw e
+        }
+      }
+
       var data = {
         action: 'wpgh_duplicate_funnel_step',
         step_id: id,
         version: 2,
+        ...extra,
       }
-      this.getStepHtml(data)
+
+      const {close} = loadingModal()
+
+      await this.getStepHtml(data)
+
+      close()
     },
 
     /**
@@ -488,25 +531,26 @@
      *
      * @param obj
      */
-    getStepHtml: function (obj) {
-      var self = this
-      var $steps = self.getSteps()
-      var $settings = self.getSettings()
+    getStepHtml: async function (obj) {
+      let self = this
+      let $steps = self.getSteps()
+      let $settings = self.getSettings()
 
-      adminAjaxRequest(obj, (response) => {
+      let response = await ajax(obj)
 
-        this.steps.push(response.data.data.json)
+      this.steps.push(response.data.json)
 
-        if (self.insertAfterStep) {
-          $(`#${self.insertAfterStep}`).after(response.data.data.sortable)
-        } else {
-          $steps.append(response.data.data.sortable)
-        }
+      if (self.insertAfterStep) {
+        $(`#${self.insertAfterStep}`).after(response.data.sortable)
+      } else {
+        $steps.append(response.data.sortable)
+      }
 
-        $settings.append(response.data.data.settings)
+      $settings.append(response.data.settings)
 
-        $(document).trigger('new-step')
-      })
+      $(document).trigger('new-step')
+
+      return response
     },
 
     getActiveStep () {
@@ -538,12 +582,8 @@
      * @param id string
      * @param e object
      */
-    makeActive: function (id) {
+    makeActive (id) {
       var self = this
-
-      if (typeof e == 'undefined') {
-        e = false
-      }
 
       if (!id) {
         this.showAddStep()
@@ -583,6 +623,18 @@
       $step_settings.removeClass('hidden')
       $step_settings.addClass('active')
       $html.addClass('active-step')
+
+      const step = this.getActiveStep()
+
+      if ( ! step ){
+        return
+      }
+
+      const type = step.data.step_type;
+
+      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onDuplicate' ) ){
+        this.stepCallbacks[type].onActive( step )
+      }
 
       $(document).trigger('step-active')
 

@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\track_activity;
@@ -438,4 +439,36 @@ class Send_Email extends Action {
 
 		$step->update_meta( 'reply_in_thread', $step_id );
 	}
+
+	/**
+     * Duplicate the email if passed
+     *
+	 * @param $new Step
+	 * @param $original Step
+	 *
+	 * @return void
+	 */
+    public function duplicate( $new, $original ) {
+
+        if ( ! get_post_var( 'duplicate_email' ) ){
+            return;
+        }
+
+        $email_id = absint( $original->get_meta('email_id' ) );
+
+        // No email defined
+        if ( ! $email_id ){
+            return;
+        }
+
+        $email = new Email( $email_id );
+
+        if ( ! $email->exists() ){
+            return;
+        }
+
+        $new_email = $email->duplicate();
+
+        $new->update_meta( 'email_id', $new_email->get_id() );
+    }
 }

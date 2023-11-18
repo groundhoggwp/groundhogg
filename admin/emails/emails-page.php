@@ -94,7 +94,7 @@ class Emails_Page extends Admin_Page {
 
 	public function scripts() {
 
-		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
+		if ( $this->current_action_is( [ 'edit', 'add' ] ) ) {
 
 			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
 			$email    = new Email( $email_id );
@@ -108,6 +108,11 @@ class Emails_Page extends Admin_Page {
 				'email'    => $email
 			] );
 		}
+
+        if ( $this->current_action_is( 'view' ) ){
+//            wp_enqueue_style( 'groundhogg-email-block-editor' );
+            wp_enqueue_script( 'groundhogg-admin-components' );
+        }
 
 		remove_editor_styles();
 

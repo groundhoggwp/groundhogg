@@ -1306,15 +1306,15 @@
       }, Select({
         id: `${ id }-position`,
         options: {
+          'left top': 'Left Top',
+          'left center': 'Left Center',
+          'left bottom': 'Left Bottom',
+          'right top': 'Right Top',
+          'right center': 'Right Center',
+          'right bottom': 'Right Bottom',
+          'center top': 'Center Top',
           'center center': 'Center Center',
-          'center left': 'Center Left',
-          'center right': 'Center Right',
-          'top center': 'Top Center',
-          'top left': 'Top Left',
-          'top right': 'Top Right',
-          'bottom center': 'Bottom Center',
-          'bottom left': 'Bottom Left',
-          'bottom right': 'Bottom Right',
+          'center bottom': 'Center Bottom',
         },
         selected: backgroundPosition,
         onChange: e => {
@@ -1602,28 +1602,7 @@
         backgroundImage: (style, el) => el.getAttribute('background'),
         backgroundSize: style => style.getPropertyValue('background-size'),
         backgroundRepeat: style => style.getPropertyValue('background-repeat'),
-        backgroundPosition: style => {
-
-          const positionMap = {
-            'left top': 'top left',
-            'left center': 'center left',
-            'left bottom': 'bottom left',
-            'right top': 'top right',
-            'right center': 'center right',
-            'right bottom': 'bottom right',
-            'center top': 'top center',
-            'center bottom': 'bottom center',
-          }
-
-          // For some reason these can get swapped, annoying.
-          let position = style.getPropertyValue('background-position')
-
-          if (positionMap.hasOwnProperty(position)) {
-            position = positionMap[position]
-          }
-
-          return position
-        },
+        backgroundPosition: style => style.getPropertyValue('background-position')
       }
 
       let style = {}
@@ -3701,7 +3680,7 @@
     ])
   }
 
-  const SubjectAndFromPreview = () => Div({
+  const SubjectAndFromPreview = ( close ) => Div({
     className: 'from-preview display-flex gap-20 has-box-shadow',
   }, [
     makeEl('img', {
@@ -3721,6 +3700,13 @@
       // From Name & Email
       `<span class="from-name">${ getState().previewFromName }</span> <span class="from-email">&lt;${ getState().previewFromEmail }&gt;</span>`,
     ]),
+    Button({
+      className: 'gh-button secondary icon text',
+      style: {
+        marginLeft: 'auto'
+      },
+      onClick: close
+    }, Dashicon( 'no-alt' ))
   ])
 
   const PreviewButtons = () => {
@@ -3737,14 +3723,14 @@
           let width = Math.min(1200, window.innerWidth * 0.8)
           let height = window.innerHeight * 0.85
 
-          ModalFrame({}, Div({
+          ModalFrame({}, ({close}) =>  Div({
             className: 'preview desktop',
             style: {
               width: `${width}px`,
               height: `${height}px`
             }
           }, [
-            SubjectAndFromPreview(),
+            SubjectAndFromPreview( close ),
             Iframe({
               id: 'desktop-preview-iframe',
               width,
@@ -3761,14 +3747,14 @@
           let width = 412
           let height = Math.min(915, window.innerHeight * 0.85)
 
-          ModalFrame({}, Div({
+          ModalFrame({},({close}) => Div({
             className: 'preview mobile',
             style: {
               width: `${width}px`,
               height: `${Math.min(915, window.innerHeight * 0.85)}px`
             }
           }, [
-            SubjectAndFromPreview(),
+            SubjectAndFromPreview( close ),
             Iframe({
               id: 'mobile-desktop-iframe',
               width,
@@ -4160,7 +4146,7 @@
                             const doc = parser.parseFromString(contents, 'text/html')
 
                             // no title? invalid
-                            title = doc.head.querySelector('title').innerText
+                            title = doc.head.querySelector('title')?.innerText
                           }
                           catch (e) {
                             dialog({
@@ -4180,7 +4166,7 @@
                             page: 'html-editor',
                           })
 
-                          setHTML(contents, false)
+                          setHTML(contents, true)
 
                           renderEditor()
                           close()
@@ -6757,6 +6743,19 @@
     let blocks
     let page = 'editor'
 
+    let preview, previewPlainText, previewFromName, previewFromEmail, previewFromAvatar, previewSubject = ''
+
+    if (email?.context?.built) {
+      ;( {
+        built: preview,
+        plain: previewPlainText,
+        from_name: previewFromName,
+        from_email: previewFromEmail,
+        from_avatar: previewFromAvatar,
+        subject: previewSubject
+      } = email.context )
+    }
+
     // existing email not using blocks
     if (email.ID) {
 
@@ -6793,13 +6792,19 @@
           setState({
             page: 'html-editor',
             email,
-            preview: email.context?.built,
-            previewPlainText: email.context?.plain,
+
+            preview,
+            previewPlainText,
+            previewFromName,
+            previewFromEmail,
+            previewFromAvatar,
+            previewSubject
           })
 
           setHTML(email.data.content, false)
 
           renderEditor()
+
           return
       }
 
@@ -6844,19 +6849,6 @@
 
     if (!email.meta.template) {
       email.meta.template = BOXED
-    }
-
-    let preview, previewPlainText, previewFromName, previewFromEmail, previewFromAvatar, previewSubject = ''
-
-    if (email.context?.built) {
-      ;( {
-        built: preview,
-        plain: previewPlainText,
-        from_name: previewFromName,
-        from_email: previewFromEmail,
-        from_avatar: previewFromAvatar,
-        subject: previewSubject
-      } = email.context )
     }
 
     setState({

@@ -329,6 +329,12 @@ class Emails_Table extends Table {
 		return apply_filters( 'wpgh_email_bulk_actions', $actions );
 	}
 
+    public function single_row( $item ) {
+	    echo "<tr id=\"{$item->ID}\">";
+	    $this->single_row_columns( $item );
+	    echo '</tr>';
+    }
+
 	function get_table_id() {
 		return 'emails_table';
 	}
@@ -350,6 +356,7 @@ class Emails_Table extends Table {
 
 		switch ( $this->get_view() ) {
 			default:
+				$actions[] = [ 'class' => 'gh-email-preview', 'display' => __( 'Preview' ), 'url' => '#' ];
 				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
 				$actions[] = [
 					'class'   => 'duplicate',
@@ -418,8 +425,8 @@ class Emails_Table extends Table {
 					'meta_query' => [
 						[
 							'key'     => 'blocks',
-							'value'   => 0,
-							'compare' => '!='
+							'value'   => 1,
+							'compare' => '='
 						]
 					],
 					'status'     => [ 'ready', 'draft' ]

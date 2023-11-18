@@ -779,6 +779,23 @@ label.block {
   width: max-content;
 }
 
+.gh-modal-frame .email-preview {
+  height: 100%;
+}
+
+.email-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.email-preview iframe {
+  height: 100%;
+  width: 100%;
+}
+
 .from-preview {
   padding: 20px;
   position: relative;

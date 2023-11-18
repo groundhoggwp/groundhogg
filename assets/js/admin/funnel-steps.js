@@ -546,216 +546,8 @@
           case 'form_fill':
             this.formFill(active)
             break
-          case 'send_email':
-            this.sendEmail(active)
-            break
         }
       })
-    },
-
-    sendEmail ({ ID, meta, data }) {
-
-      let id = `step_${ID}_send_email`
-      let { email_id } = meta
-
-      let state = {
-        changing: false,
-      }
-
-      const morphPreview = () => {
-        let previewPanel = document.getElementById(`step-${ID}-email-preview-panel`)
-        morphdom(previewPanel, Preview())
-      }
-
-      const getEmail = () => EmailsStore.get(email_id)
-      const hasEmail = () => EmailsStore.has(email_id)
-
-      const openEmailEditor = email => {
-        ModalFrame({
-          closeOnOverlayClick: false,
-          onOpen: ({ close }) => {
-            Groundhogg.EmailEditor({
-              email,
-              onSave: email => {
-                Funnel.updateStepMeta({
-                  email_id: email.ID,
-                })
-                Funnel.save()
-              },
-              onClose: close,
-            })
-          },
-        }, Div({ id: 'email-editor' }))
-      }
-
-      const Preview = () => Div({
-          id: `step-${ID}-email-preview-panel`,
-          className: 'gh-panel email-preview',
-          style: {
-            backgroundColor: '#fff',
-            overflow: 'hidden',
-          },
-        }, [
-          Div({
-            className: 'space-between has-box-shadow',
-            style: {
-              paddingLeft: '20px',
-              paddingRight: '10px',
-              minHeight: '62px',
-            },
-          }, [
-            email_id && !getEmail() ? '<h2>Loading...</h2>' : ItemPicker({
-              id: `step-${ID}-email-picker`,
-              noneSelected: 'Search for an email...',
-              selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
-              multiple: false,
-              fetchOptions: (search) => {
-                return EmailsStore.fetchItems({ search }).
-                then(emails => emails.map(({ ID, data }) => ({ id: ID, text: data.title })))
-              },
-              onChange: item => {
-
-                email_id = item ? item.id : false
-
-                Funnel.updateStepMeta({
-                  email_id,
-                })
-
-                // Timout to avoid JS errors
-                setTimeout(() => {
-                  morphPreview()
-                }, 10)
-              },
-              style: {
-                minWidth: '50%',
-              },
-            }),
-            Div({
-              className: 'display-flex',
-            }, [
-
-              !hasEmail() ? null : Button({
-                id: `step_${ID}_edit_email`,
-                className: 'gh-button primary text gap-10 display-flex',
-                onClick: e => {
-                  openEmailEditor(getEmail())
-                },
-              }, [
-                Dashicon('edit'),
-                __('Edit'),
-              ]),
-              email_id ? null : Button({
-                id: `step_${ID}_create_email`,
-                className: 'gh-button primary text gap-10 display-flex',
-                onClick: e => {
-                  openEmailEditor({})
-                },
-              }, [
-                Dashicon('plus-alt2'),
-                __('Create new email'),
-              ]),
-              !hasEmail() ? null : Button({
-                id: `step_${ID}_email_more`,
-                className: 'gh-button secondary text icon',
-                onClick: e => {
-                  moreMenu(`#step_${ID}_email_more`, [
-                    {
-                      key: 'edit',
-                      text: __('Edit'),
-                      onSelect: () => openEmailEditor(getEmail()),
-                    },
-                    {
-                      key: 'add',
-                      text: __('Create New Email'),
-                      onSelect: () => {
-                        openEmailEditor({})
-                      },
-                    },
-                  ])
-                },
-              }, icons.verticalDots),
-            ]),
-          ]),
-          !email_id ? null : Div({
-            className: 'from-preview display-flex gap-20 has-box-shadow',
-          }, [
-            // Profile pick
-            getEmail() ? makeEl('img', {
-              src: getEmail().context.from_avatar,
-              className: 'from-avatar',
-              height: 40,
-              width: 40,
-              style: {
-                borderRadius: '50%',
-              },
-            }) : Div({
-              className: 'skeleton-loading',
-              style: {
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-              },
-            }),
-            getEmail() ? Div({
-              className: 'subject-and-from',
-            }, [
-              // Subject Line
-              `<h2>${getEmail().data.subject}</h2>`,
-              // From Name & Email
-              `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
-              // From Email
-            ]) : Div({
-              className: 'skeleton-loading',
-              style: {
-                width: 'auto',
-                flexGrow: '1',
-                height: '40px',
-                // borderRadius: '50%',
-              },
-            }),
-          ]),
-          !email_id ? null : (getEmail() ? Iframe({
-            id: `step-${ID}-preview-${email_id}`,
-            height: 500,
-            style: {
-              width: '100%',
-            },
-            onLoad: e => {
-              // e.target.contentDocument.body.style.padding = '20px'
-            },
-            onCreate: frame => {
-              // setTimeout(() => {
-              //   // frame = document.getElementById(frameId)
-              //   // frame.contentDocument.body.style.padding = '20px'
-              //   // setFrameContent(frame, getEmail().context.built)
-              // }, 100)
-            },
-          }, getEmail().context.built) : Div({
-            className: 'skeleton-loading',
-            style: {
-              height: '460px',
-              margin: '20px',
-            },
-          })),
-        ],
-      )
-
-      let panelInner = document.getElementById(id)
-
-      if (panelInner) {
-        let panel = panelInner.parentNode.parentNode
-
-        const render = () => panel.parentNode.replaceChild(Preview(), panel)
-
-        if (email_id) {
-          EmailsStore.maybeFetchItem(email_id).catch( err => {
-            email_id = false
-          }).finally(() => morphPreview() )
-          render()
-        } else {
-          render()
-        }
-      }
     },
 
     formFill ({ ID }) {
@@ -880,5 +672,235 @@
   }
 
   FunnelSteps.init()
+
+  Funnel.registerStepCallbacks( 'send_email', {
+    onActive: ({ ID, meta, data }) => {
+
+      let id = `step_${ID}_send_email`
+      let { email_id } = meta
+
+      let state = {
+        changing: false,
+      }
+
+      const morphPreview = () => {
+        let previewPanel = document.getElementById(`step-${ID}-email-preview-panel`)
+        morphdom(previewPanel, Preview())
+      }
+
+      const getEmail = () => EmailsStore.get(email_id)
+      const hasEmail = () => EmailsStore.has(email_id)
+
+      const openEmailEditor = email => {
+        ModalFrame({
+          closeOnOverlayClick: false,
+          onOpen: ({ close }) => {
+            Groundhogg.EmailEditor({
+              email,
+              onSave: email => {
+                Funnel.updateStepMeta({
+                  email_id: email.ID,
+                })
+                Funnel.save()
+              },
+              onClose: close,
+            })
+          },
+        }, Div({ id: 'email-editor' }))
+      }
+
+      const Preview = () => Div({
+          id: `step-${ID}-email-preview-panel`,
+          className: 'gh-panel email-preview',
+          style: {
+            backgroundColor: '#fff',
+            overflow: 'hidden',
+          },
+        }, [
+          Div({
+            className: 'space-between has-box-shadow',
+            style: {
+              paddingLeft: '20px',
+              paddingRight: '10px',
+              minHeight: '62px',
+            },
+          }, [
+            email_id && !getEmail() ? '<h2>Loading...</h2>' : ItemPicker({
+              id: `step-${ID}-email-picker`,
+              noneSelected: 'Search for an email...',
+              selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
+              multiple: false,
+              fetchOptions: (search) => {
+                return EmailsStore.fetchItems({ search }).
+                  then(emails => emails.map(({ ID, data }) => ({ id: ID, text: data.title })))
+              },
+              onChange: item => {
+
+                email_id = item ? item.id : false
+
+                Funnel.updateStepMeta({
+                  email_id,
+                })
+
+                // Timout to avoid JS errors
+                setTimeout(() => {
+                  morphPreview()
+                }, 10)
+              },
+              style: {
+                minWidth: '50%',
+              },
+            }),
+            Div({
+              className: 'display-flex',
+            }, [
+
+              !hasEmail() ? null : Button({
+                id: `step_${ID}_edit_email`,
+                className: 'gh-button primary text gap-10 display-flex',
+                onClick: e => {
+                  openEmailEditor(getEmail())
+                },
+              }, [
+                Dashicon('edit'),
+                __('Edit'),
+              ]),
+              email_id ? null : Button({
+                id: `step_${ID}_create_email`,
+                className: 'gh-button primary text gap-10 display-flex',
+                onClick: e => {
+                  openEmailEditor({})
+                },
+              }, [
+                Dashicon('plus-alt2'),
+                __('Create new email'),
+              ]),
+              !hasEmail() ? null : Button({
+                id: `step_${ID}_email_more`,
+                className: 'gh-button secondary text icon',
+                onClick: e => {
+                  moreMenu(`#step_${ID}_email_more`, [
+                    {
+                      key: 'edit',
+                      text: __('Edit'),
+                      onSelect: () => openEmailEditor(getEmail()),
+                    },
+                    {
+                      key: 'add',
+                      text: __('Create New Email'),
+                      onSelect: () => {
+                        openEmailEditor({})
+                      },
+                    },
+                  ])
+                },
+              }, icons.verticalDots),
+            ]),
+          ]),
+          !email_id ? null : Div({
+            className: 'from-preview display-flex gap-20 has-box-shadow',
+          }, [
+            // Profile pick
+            getEmail() ? makeEl('img', {
+              src: getEmail().context.from_avatar,
+              className: 'from-avatar',
+              height: 40,
+              width: 40,
+              style: {
+                borderRadius: '50%',
+              },
+            }) : Div({
+              className: 'skeleton-loading',
+              style: {
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+              },
+            }),
+            getEmail() ? Div({
+              className: 'subject-and-from',
+            }, [
+              // Subject Line
+              `<h2>${getEmail().data.subject}</h2>`,
+              // From Name & Email
+              `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
+              // From Email
+            ]) : Div({
+              className: 'skeleton-loading',
+              style: {
+                width: 'auto',
+                flexGrow: '1',
+                height: '40px',
+                // borderRadius: '50%',
+              },
+            }),
+          ]),
+          !email_id ? null : (getEmail() ? Iframe({
+            id: `step-${ID}-preview-${email_id}`,
+            height: 500,
+            style: {
+              width: '100%',
+              height: '500px'
+            },
+            onLoad: e => {
+              // e.target.contentDocument.body.style.padding = '20px'
+            },
+            onCreate: frame => {
+              // setTimeout(() => {
+              //   // frame = document.getElementById(frameId)
+              //   // frame.contentDocument.body.style.padding = '20px'
+              //   // setFrameContent(frame, getEmail().context.built)
+              // }, 100)
+            },
+          }, getEmail().context.built) : Div({
+            className: 'skeleton-loading',
+            style: {
+              height: '460px',
+              margin: '20px',
+            },
+          })),
+        ],
+      )
+
+      let panelInner = document.getElementById(id)
+
+      if (panelInner) {
+        let panel = panelInner.parentNode.parentNode
+
+        const render = () => panel.parentNode.replaceChild(Preview(), panel)
+
+        if (email_id) {
+          EmailsStore.maybeFetchItem(email_id).catch( err => {
+            email_id = false
+          }).finally(() => morphPreview() )
+          render()
+        } else {
+          render()
+        }
+      }
+    },
+    onDuplicate: ({ID, data, meta}, res, rej ) => {
+
+      // Email id was not set
+      if ( ! meta.email_id ){
+        res({})
+      }
+
+      confirmationModal({
+        alert: `<p>${__('Do you also want to make a new copy of the email template?', 'groundhogg')}</p>`,
+        confirmText: __('Yes, make a copy!', 'groundhogg'),
+        closeText: __('No, use the original.','groundhogg'),
+        onConfirm: e => {
+          res({
+            duplicate_email: true,
+          })
+        },
+        onCancel: e => {
+          res({})
+        },
+      })
+
+    }
+  } )
 
 })(jQuery)

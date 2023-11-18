@@ -223,6 +223,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-components', GROUNDHOGG_ASSETS_URL . 'js/admin/components' . $dot_min . '.js', [
 			'groundhogg-admin-element',
+			'groundhogg-make-el',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-properties', GROUNDHOGG_ASSETS_URL . 'js/admin/properties' . $dot_min . '.js', [

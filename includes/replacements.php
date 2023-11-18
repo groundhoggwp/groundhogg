@@ -73,6 +73,7 @@ class Replacements implements \JsonSerializable {
 			'site'       => __( 'Site', 'groundhogg' ),
 			'post'       => __( 'Post', 'groundhogg' ),
 			'compliance' => __( 'Compliance', 'groundhogg' ),
+			'email'      => __( 'Email', 'groundhogg' ),
 			'other'      => __( 'Other', 'groundhogg' ),
 		];
 
@@ -470,6 +471,13 @@ class Replacements implements \JsonSerializable {
 //				'name'        => __( 'Post URL', 'groundhogg' ),
 //				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],
+            [
+				'code'     => 'view_in_browser_link',
+				'group'    => 'email',
+				'callback' => [ $this, 'view_in_browser_link' ],
+				'name'        => __( 'View in browser link', 'groundhogg' ),
+				'description' => _x( 'Link ot view the email in the browser', 'replacement', 'groundhogg' ),
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -550,9 +558,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @param string $code to remove
-	 *
 	 * @since 1.9
+	 *
+	 * @param string $code to remove
 	 *
 	 */
 	public function remove( $code ) {
@@ -582,9 +590,9 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Returns a list of all replacement codes
 	 *
-	 * @return array
 	 * @since 1.9
 	 *
+	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -772,7 +780,7 @@ class Replacements implements \JsonSerializable {
 
 			$callback = $this->context_is_html() ? $html_callback : $plain_callback;
 
-            if ( $arg ) {
+			if ( $arg ) {
 				$text = call_user_func( $callback, $arg, $this->contact_id, $code );
 			} else {
 				$text = call_user_func( $callback, $this->contact_id, $code );
@@ -792,9 +800,9 @@ class Replacements implements \JsonSerializable {
 
 	public function replacements_in_footer() {
 		?>
-		<div id="footer-replacement-codes" class="hidden">
+        <div id="footer-replacement-codes" class="hidden">
 			<?php $this->get_table(); ?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -807,16 +815,16 @@ class Replacements implements \JsonSerializable {
 			} );
 
 			?>
-			<h3 class="replacements-group"><?php _e( $name ) ?></h3>
-			<table class="wp-list-table widefat fixed striped replacements-table">
-				<thead>
-				<tr>
-					<th><?php _e( 'Name' ); ?></th>
-					<th><?php _e( 'Code' ); ?></th>
-					<th><?php _e( 'Description' ); ?></th>
-				</tr>
-				</thead>
-				<tbody>
+            <h3 class="replacements-group"><?php _e( $name ) ?></h3>
+            <table class="wp-list-table widefat fixed striped replacements-table">
+                <thead>
+                <tr>
+                    <th><?php _e( 'Name' ); ?></th>
+                    <th><?php _e( 'Code' ); ?></th>
+                    <th><?php _e( 'Description' ); ?></th>
+                </tr>
+                </thead>
+                <tbody>
 
 				<?php foreach ( $codes as $code => $replacement ):
 
@@ -825,23 +833,23 @@ class Replacements implements \JsonSerializable {
 					}
 
 					?>
-					<tr>
-						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
-						<td>
-							<input class="replacement-selector code"
-							       type="text"
-							       style="border: none;outline: none;background: transparent;width: 100%;"
-							       onfocus="this.select();"
-							       value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
-							       readonly>
-						</td>
-						<td>
-							<span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
-						</td>
-					</tr>
+                    <tr>
+                        <td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+                        <td>
+                            <input class="replacement-selector code"
+                                   type="text"
+                                   style="border: none;outline: none;background: transparent;width: 100%;"
+                                   onfocus="this.select();"
+                                   value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+                                   readonly>
+                        </td>
+                        <td>
+                            <span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+                        </td>
+                    </tr>
 				<?php endforeach; ?>
-				</tbody>
-			</table>
+                </tbody>
+            </table>
 		<?php
 		endforeach;
 	}
@@ -1775,9 +1783,9 @@ class Replacements implements \JsonSerializable {
 				/**
 				 * Filters the post content.
 				 *
-				 * @param string $content Content of the current post.
-				 *
 				 * @since 0.71
+				 *
+				 * @param string $content Content of the current post.
 				 *
 				 */
 				$content = apply_filters( 'the_content', $content );
@@ -2254,6 +2262,22 @@ class Replacements implements \JsonSerializable {
 
 		return $content;
 	}
+
+	/**
+     * Show a view in browser link
+     *
+	 * @return false|string
+	 */
+	public function view_in_browser_link(  ) {
+
+        $email = the_email();
+
+        if ( ! $email || ! $email->exists() ){
+            return false;
+        }
+
+        return $email->browser_view_link();
+    }
 
 	/**
 	 * We don't want this to be serialized

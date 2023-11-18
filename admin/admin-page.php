@@ -283,6 +283,12 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @return bool
 	 */
 	protected function current_action_is( $action ) {
+
+        // Support array
+        if ( is_array( $action ) ){
+            return in_array( $this->get_current_action(), $action );
+        }
+
 		return $this->get_current_action() === $action;
 	}
 
@@ -605,16 +611,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		ob_start();
 
-		Plugin::instance()->notices->notices();
-
-		$notices = ob_get_clean();
-
-		$response = [
-			'notices' => $notices,
-			'data'    => $data
-		];
-
-		wp_send_json_success( $response );
+		wp_send_json_success( $data );
 	}
 
 	/**

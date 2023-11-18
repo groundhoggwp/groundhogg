@@ -22,7 +22,6 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 
 // Exit if accessed directly
@@ -343,7 +342,7 @@ class Funnels_Page extends Admin_Page {
 	 * @return void
 	 */
 	public function process_deactivate() {
-		$updated = $this->update_funnels_status( 'deactivate' );
+		$updated = $this->update_funnels_status( 'inactive' );
 
 		$this->add_notice(
 			esc_attr( 'deactivated' ),
@@ -391,11 +390,9 @@ class Funnels_Page extends Admin_Page {
 			$new_funnel = new Funnel();
 			$id         = $new_funnel->import( $json );
 
-			$this->add_notice(
-				esc_attr( 'duplicated' ),
-				_x( 'Funnel duplicated', 'notice', 'groundhogg' ),
-				'success'
-			);
+			$new_funnel->update( [
+				'title' => sprintf( __( 'Copy of %s', 'groundhogg' ), $funnel->get_title() ),
+			] );
 
 			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
 		}
@@ -793,25 +790,7 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-		$new_step = new Step();
-
-		$new_step_id = $new_step->create( [
-			'funnel_id'  => $step->get_funnel_id(),
-			'step_title' => $step->get_title(),
-			'step_type'  => $step->get_type(),
-			'step_group' => $step->get_group(),
-			'step_order' => $step->get_order() + 1,
-		] );
-
-		if ( ! $new_step_id || ! $new_step->exists() ) {
-			wp_send_json_error();
-		}
-
-		$meta = $step->get_meta();
-
-		foreach ( $meta as $key => $value ) {
-			$new_step->update_meta( $key, $value );
-		}
+		$new_step = $step->duplicate();
 
 		ob_start();
 		$new_step->sortable_item();

@@ -279,7 +279,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 .select2-container .select2-search--inline .select2-search__field {
   min-height: 0;
   line-height: 1;
-  width:initial !important;
+  width: initial !important;
   //padding-left: 10px;
 }
 
@@ -409,7 +409,7 @@ table.wp-list-table.funnels td.column-active_contacts {
 }
 
 table.wp-list-table {
-  th{
+  th {
     &#from_user {
       width: 10%;
     }
@@ -649,7 +649,7 @@ label.block {
     transform: translateX(30px);
   }
 
-  span  {
+  span {
 
     &.on,
     &.off {
@@ -703,7 +703,7 @@ label.block {
 
   .report-placeholder {
 
-    &.header{
+    &.header {
       grid-column: span 4;
     }
 
@@ -731,6 +731,7 @@ label.block {
         font-size: 36px;
       }
     }
+
     &.table,
     &.pie_chart {
       grid-column: span 2;
@@ -786,24 +787,24 @@ label.block {
   }
 }
 
-.gh-header.admin-header{
+.gh-header.admin-header {
   padding: 0 10px 0 0;
   border-bottom: 1px solid $primary-dark;
   margin-left: -20px;
 
-   .logo {
-     box-sizing: border-box;
-     width: 60px;
-     background: $primary-dark;
-     padding: 5px 10px;
-   }
+  .logo {
+    box-sizing: border-box;
+    width: 60px;
+    background: $primary-dark;
+    padding: 5px 10px;
+  }
 }
 
-.gh-has-notifications{
+.gh-has-notifications {
 
   position: relative;
 
-  &::after{
+  &::after {
     content: '0';
     position: absolute;
     right: 0;
@@ -832,7 +833,7 @@ label.block {
 
 @mixin filter-tag {
   position: absolute;
-  transform: translateY( -50% );
+  transform: translateY(-50%);
   background-color: $secondary-purple;
   left: 20px;
   top: 0;
@@ -857,12 +858,33 @@ label.block {
 
 #broadcast-exclude-filters,
 #block-exclude-filters,
-#exclude-filters-here{
+#exclude-filters-here {
   @include filters();
 
   &::after {
     content: 'Exclude';
     @include filter-tag();
+  }
+}
+
+.gh-modal-frame {
+  .email-preview {
+    height: 100%;
+  }
+}
+
+.email-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  //height: 100%;
+
+  iframe {
+    height: 100%;
+    width: 100%;
   }
 }
 

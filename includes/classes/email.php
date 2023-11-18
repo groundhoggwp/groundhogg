@@ -898,7 +898,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function get_from_header(){
+	public function get_from_header() {
 		return sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() );
 	}
 
@@ -1261,6 +1261,24 @@ class Email extends Base_Object_With_Meta {
 
 		return $data;
 
+	}
+
+	/**
+	 * Override title and status when duplicating
+	 *
+	 * @param $overrides
+	 * @param $meta_overrides
+	 *
+	 * @return Base_Object|Base_Object_With_Meta
+	 */
+	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+
+		$overrides = wp_parse_args( $overrides, [
+			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
+			'status' => 'draft'
+		] );
+
+		return parent::duplicate( $overrides, $meta_overrides );
 	}
 
 	/**
