@@ -175,8 +175,7 @@ Groundhogg's search filters give you more control than any other CRM to segment 
 
 Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocommerce/), [AffiliateWP](https://www.groundhogg.io/downloads/affiliatewp-integration/), [LearnDash](https://www.groundhogg.io/downloads/learndash-integration/), [and more](https://www.groundhogg.io/downloads/category/integrations/) add additional search filters you can use to create powerful segments so you can send hyper targeted messages.
 
-// Todo update
-[youtube https://youtu.be/e-_QCUtdghw]
+[youtube https://youtu.be/TI0WV62dSU0]
 
 ### ⚙️ Funnels & Marketing Automation Features
 
@@ -187,23 +186,15 @@ Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocomme
 * Start funnels from forms, payments, new users, and more!
 * Open API to add your own benchmarks & actions.
 
-**Our funnel builder makes it easy to create automations and email sequences that actually work!**
-
-// Todo update
-[youtube https://youtu.be/e-_QCUtdghw]
+[youtube https://youtu.be/uWZ8pNgBysg]
 
 ### 📧 Simple Email Marketing & SMTP
 
-* 2 Email editors to choose from.
-* Plain Text Editor or Drag & Drop Editor
 * Use images, headers, paragraph and more.
 * Simple preview & testing.
 * Perfect for sales emails, newsletters, transactional notifications and more.
 * Send broadcast emails to your contact lists.
 * Distinguish between **transactional** and **marketing** emails.
-
-// Todo update
-[youtube https://youtu.be/e-_QCUtdghw]
 
 ### 📈 Unmatched Analytics Reporting
 
@@ -215,10 +206,9 @@ Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocomme
 * Learn more about your audience with demographic reporting.
 * See which funnels/emails are under-performing.
 
-**Create custom reports so you always have access to your essential data!**
+**Use campaigns to make comparing reporting results easier**
 
-// todo change video url
-[youtube https://youtu.be/e-_QCUtdghw]
+[youtube https://youtu.be/LIEVWVBC2Ww]
 
 ### 🇪🇺 GDPR Ready
 
@@ -362,7 +352,9 @@ You can purchase a premium plan for access to support and our premium extensions
 = 3.0 (2023-10-01) =
 * NEW [Drag & Drop block-based (not Gutenberg) email editor](https://www.groundhogg.io/press/groundhogg-3-0-columns-conditional-content-socials-and-more/)
 * NEW Campaigns as method for organizing funnels, emails, and broadcasts
-* ADDED New feature to add heading dividers to custom reports page to make grouping your custom reports easier.
+* NEW Add heading dividers to custom reports page to make grouping your custom reports easier
+* NEW View detailed email logs in contact activity timeline.
+* NEW Background processing for broadcast scheduling.
 * ADDED Exclude filters to custom reports for more advanced reporting.
 * ADDED New report value types for number reports,
  * Sum of a custom field
@@ -372,9 +364,10 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Option to disable user syncing in WordPress integration settings.
 * ADDED Developer filters/actions to the new form submission handler.
 * ADDED Support for defining some options as constants in `wp-config.php`.
+* ADDED View email logs in contact activity timeline.
+* TWEAKED Improved the email log modal.
 * TWEAKED Moved user meta sync option to WordPress integration settings.
-* TWEAKED Dropdown and checkbox fields can now be pre-selected with the value setting in the new form builder.
-* TWEAKED Broadcasts are not scheduled in the background instead of using the loader.
+* TWEAKED Dropdown and checkbox fields can now be pre-selected with the value setting in the form builder.
 
 = 2.7.11.11 (2023-10-25) =
 * FIXED Properly sanitize task data.
