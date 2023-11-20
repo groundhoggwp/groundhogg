@@ -52,6 +52,13 @@ class Main_Updater extends Old_Updater {
 					// Update the emails table to add `plain` and `type` as a column
 					get_db( 'emails' )->create_table();
 				}
+			],
+			'3.0.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Disable the Advanced Email Editor automatically.', 'groundhogg' ),
+				'callback'    => function () {
+					delete_option( 'gh_use_advanced_email_editor' );
+				}
 			]
 		];
 	}
