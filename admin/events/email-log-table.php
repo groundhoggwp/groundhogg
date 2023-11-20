@@ -348,7 +348,7 @@ class Email_Log_Table extends Table {
 
 	/**
 	 * @param $email Email_Log_Item
-	 *
+	 *  
 	 * @return string|void
 	 */
 	protected function column_sent( $email ) {

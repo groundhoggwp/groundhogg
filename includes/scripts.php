@@ -250,13 +250,15 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
 			'jquery',
+			'moment',
 			'jquery-ui-sortable',
 			'groundhogg-admin-notes',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-components',
 			'groundhogg-admin-properties',
 			'groundhogg-admin',
-			'groundhogg-admin-data'
+			'groundhogg-admin-data',
+			'groundhogg-admin-email-log'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [

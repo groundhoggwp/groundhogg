@@ -818,7 +818,10 @@ label.block {
   gap: 20px;
   width: 640px;
 }
-.email-log-modal iframe {
+.email-log-modal .email-preview {
+  border: 1px solid rgba(16, 38, 64, 0.15);
+}
+.email-log-modal .email-preview iframe {
   height: 500px;
   width: 100%;
 }

@@ -27,7 +27,6 @@
 
   var $doc = $(document);
 
-
   const EmailLogModal = ( logItem ) => {
 
     const {
@@ -78,7 +77,6 @@
     ]))
   }
 
-
   $doc.on('click', 'a.view-email-log', async  function (e) {
 
     e.preventDefault();
@@ -94,5 +92,7 @@
     close()
 
   });
+
+  Groundhogg.components.EmailLogModal = EmailLogModal
 
 })(jQuery)

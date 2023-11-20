@@ -914,11 +914,18 @@ label.block {
   gap: 20px;
   width: 640px;
 
-  iframe{
-    height: 500px;
-    width: 100%;
-    //width: 600px;
+  .email-preview {
+
+    border: 1px solid $primary-dark-15;
+
+    iframe{
+      height: 500px;
+      width: 100%;
+      //width: 600px;
+    }
   }
+
+
 
   p {
     font-size: 18px;
