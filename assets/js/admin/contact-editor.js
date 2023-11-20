@@ -2161,7 +2161,8 @@
 
       dialog({
         message: err.message,
-        type: err,
+        type: 'error',
+        ttl: 5000
       })
 
     }
@@ -2184,7 +2185,7 @@
       let logItems = await LogsStore.fetchItems({
         subject: activity.meta.subject,
         recipients: ['RLIKE', getContact().data.email],
-        date_sent: moment.unix(activity.data.timestamp).format("YYYY-MM-DD"),
+        date_sent: moment.unix(activity.data.timestamp).utc().format("YYYY-MM-DD hh:mm:ss"),
         limit: 1
       })
 
@@ -2195,7 +2196,8 @@
 
       dialog({
         message: err.message,
-        type: err,
+        type: 'error',
+        ttl: 5000
       })
 
     }
