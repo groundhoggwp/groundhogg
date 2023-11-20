@@ -40,61 +40,13 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	//UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
-		add_action( 'wp_ajax_groundhogg_view_email_log', [ $this, 'output_email_log' ] );
-	}
 
-	public function output_email_log() {
-		if ( ! current_user_can( 'view_events' ) ) {
-			wp_send_json_error();
-		}
-
-		ob_start();
-
-		$this->view_log();
-
-		$content = ob_get_clean();
-
-		wp_send_json_success( [
-			'content' => $content
-		] );
-	}
-
-	public function raw_email_content() {
-		if ( get_url_var( 'action' ) !== 'view_log_content' ) {
-			return;
-		}
-
-		$preview_id = absint( get_url_var( 'log' ) );
-
-		$log_item = new Email_Log_Item( $preview_id );
-
-		if ( ! $log_item->exists() ) {
-			wp_die( 'Invalid log item ID.' );
-		}
-
-		echo $log_item->content;
-
-		die();
 	}
 
 	public function help() {
 	}
 
 	protected function add_additional_actions() {
-		add_action( 'admin_init', [ $this, 'raw_email_content' ] );
-		add_action( 'admin_head', function () {
-			?>
-            <style>
-                .email-sent {
-                    color: green;
-                }
-
-                .email-failed {
-                    color: red;
-                }
-            </style>
-			<?php
-		} );
 
 	}
 
@@ -871,17 +823,7 @@ ORDER BY ID" );
 		);
 	}
 
-	public function view_log() {
-		include __DIR__ . '/log-preview.php';
-	}
-
 	public function page() {
-
-		if ( $this->get_current_tab() === 'log' ) {
-			$this->view_log();
-
-			return;
-		}
 
 		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::is_enabled() ) {
 			$this->add_notice( 'inactive', sprintf( __( "Email logging is currently disabled. You can enable email logging in the <a href='%s'>email settings</a>.", 'groundhogg' ), admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) ), 'warning' );

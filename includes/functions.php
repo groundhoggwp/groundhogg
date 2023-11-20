@@ -1898,9 +1898,16 @@ function after_form_submit_handler( &$contact ) {
 		return;
 	}
 
-	// If they re-optin we will consider them unconfirmed
+	// If they re-opt-in we consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
-		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
+
+        // Opt-in status is already unconfirmed
+        if ( $contact->optin_status_is( Preferences::UNCONFIRMED ) ){
+            // this will take care of double opt-in requirements
+            $contact->reset_date_optin_status_changed();
+        } else {
+	        $contact->change_marketing_preference( Preferences::UNCONFIRMED );
+        }
 	}
 
 	/**

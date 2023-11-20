@@ -907,3 +907,42 @@ label.block {
     font-size: 16px;
   }
 }
+
+.email-log-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 640px;
+
+  iframe{
+    height: 500px;
+    width: 100%;
+    //width: 600px;
+  }
+
+  p {
+    font-size: 18px;
+  }
+
+  p, pre, h2 {
+    margin: 0;
+  }
+
+  .email-log-item-headers {
+
+    width: 100%;
+    overflow: auto;
+
+    table {
+
+      th {
+        text-align: left;
+        width: 100px;
+      }
+
+      pre {
+        margin: 0;
+      }
+    }
+  }
+}

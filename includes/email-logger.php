@@ -32,6 +32,8 @@ class Email_Logger {
 		// Do first
 		add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
 
+
+
 		add_action( 'init', [ $this, 'init' ] );
 
 		// Whenever retrieve_password happens, then following email should be sensitive
@@ -172,6 +174,11 @@ class Email_Logger {
 	 * @param $msg_id string
 	 */
 	public static function set_msg_id( $msg_id ) {
+
+		if ( ! self::is_enabled() || ! self::$log_item || ! self::$log_item->exists() ){
+			return;
+		}
+
 		self::$log_item->update( [
 			'msg_id' => $msg_id
 		] );
@@ -184,7 +191,7 @@ class Email_Logger {
 	 */
 	public function wp_mail_failed_callback( $error ) {
 
-		if ( ! self::is_enabled() || ! is_wp_error( $error ) || ! self::$log_item ) {
+		if ( ! self::is_enabled() || ! is_wp_error( $error ) || ! self::$log_item || ! self::$log_item->exists() ) {
 			return;
 		}
 

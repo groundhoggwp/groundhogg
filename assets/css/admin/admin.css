@@ -812,4 +812,32 @@ label.block {
   font-size: 16px;
 }
 
+.email-log-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 640px;
+}
+.email-log-modal iframe {
+  height: 500px;
+  width: 100%;
+}
+.email-log-modal p {
+  font-size: 18px;
+}
+.email-log-modal p, .email-log-modal pre, .email-log-modal h2 {
+  margin: 0;
+}
+.email-log-modal .email-log-item-headers {
+  width: 100%;
+  overflow: auto;
+}
+.email-log-modal .email-log-item-headers table th {
+  text-align: left;
+  width: 100px;
+}
+.email-log-modal .email-log-item-headers table pre {
+  margin: 0;
+}
+
 /*# sourceMappingURL=admin.css.map */

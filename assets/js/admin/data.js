@@ -662,6 +662,7 @@
     posts: ObjectStore(Groundhogg.api.routes.posts, {
       primaryKey: 'id',
     }),
+    email_log: ObjectStore(Groundhogg.api.routes.v4.email_log)
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {

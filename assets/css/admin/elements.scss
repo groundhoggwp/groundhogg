@@ -14,6 +14,7 @@ $primary-dark-5: rgba(16, 38, 64, 0.05);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
+$error-red-25: rgba(233, 31, 79, 0.25);
 $secondary-purple: rgb(108, 25, 173);
 $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
@@ -779,7 +780,7 @@ a.action-link {
   }
   &.danger,
   &.red {
-    background: $error-red-50;
+    background: $error-red-25;
     color: darken($error-red, 35)
   }
 
@@ -790,10 +791,15 @@ a.action-link {
 
 svg,
 p.gh-text,
+pre.gh-text,
 span.gh-text {
   &.red,
   &.danger {
     color: $error-red;
+
+    &.dark {
+      color: darken($error-red, 35)
+    }
   }
 
   &.orange,
@@ -1381,32 +1387,6 @@ button {
     h2 {
       margin: 0;
     }
-
-    .groundhogg-content-box {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-
-      table {
-
-        width: 100%;
-
-        th {
-          text-align: left;
-          width: 100px;
-        }
-
-        pre {
-          margin: 0;
-        }
-      }
-
-      #headers{
-        width: 100%;
-        overflow: auto;
-      }
-    }
-
   }
 
   h3.replacements-group {

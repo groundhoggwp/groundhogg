@@ -1347,7 +1347,7 @@
               <div class="space-between align-center"
                    style=" margin-top: 40px">
                   <button id="next" class="gh-button medium primary">
-                      ${ __('Your Eligible! Apply Now 👉', 'groundhogg') }
+                      ${ __('You\'re Eligible! Apply Now 👉', 'groundhogg') }
                   </button>
               </div>
               <div class="space-between align-center"

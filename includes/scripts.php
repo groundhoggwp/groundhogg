@@ -358,7 +358,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'js/admin/email-preview' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-email-log', GROUNDHOGG_ASSETS_URL . 'js/admin/email-log' . $dot_min . '.js', [
-			'groundhogg-admin-element'
+			'groundhogg-admin-components',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-email-editor-expand', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor-expand' . $dot_min . '.js', [
@@ -490,6 +490,7 @@ class Scripts {
 							'page_visits' => rest_url( Base_Api::NAME_SPACE . '/page_visits' ),
 							'submissions' => rest_url( Base_Api::NAME_SPACE . '/submissions' ),
 							'tasks'       => rest_url( Base_Api::NAME_SPACE . '/tasks' ),
+							'email_log'       => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
 						]
 					]
 				],

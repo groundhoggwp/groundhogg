@@ -242,6 +242,16 @@ class Contact extends Base_Object_With_Meta {
 		return absint( $this->optin_status );
 	}
 
+	/**
+	 * Compare the current opt-in status to whatever was given
+	 *
+	 * @param $status array|int
+	 *
+	 * @return bool
+	 */
+	public function optin_status_is( $status ){
+		return is_array( $status ) ? in_array( $this->get_optin_status(), $status ) : $this->get_optin_status() === $status;
+	}
 
 	/**
 	 * Get the contact's first name
@@ -387,11 +397,11 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * @throws \Exception
+	 *
 	 * @param bool $as_date
 	 *
 	 * @return bool|mixed
-	 * @throws \Exception
-	 *
 	 */
 	public function get_date_created( $as_date = false ) {
 
@@ -709,7 +719,7 @@ class Contact extends Base_Object_With_Meta {
 				continue;
 			}
 
-			if ( $data[$consent] ){
+			if ( $data[ $consent ] ) {
 				call_user_func( $callback );
 			} else {
 				$this->delete_compliance_and_date_meta( $consent );
@@ -767,6 +777,17 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		return $updated;
+	}
+
+	/**
+	 * Sets the date the opt-in stats was last changed to the current time
+	 *
+	 * @return bool
+	 */
+	public function reset_date_optin_status_changed() {
+		return $this->update( [
+			'date_optin_status_changed' => current_time( 'mysql' )
+		] );
 	}
 
 	/**

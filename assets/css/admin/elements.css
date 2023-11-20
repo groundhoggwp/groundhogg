@@ -662,7 +662,7 @@ a.action-link {
   color: #334310;
 }
 .pill.danger, .pill.red {
-  background: rgba(233, 31, 79, 0.5);
+  background: rgba(233, 31, 79, 0.25);
   color: #4e0818;
 }
 .pill.sm {
@@ -672,34 +672,51 @@ a.action-link {
 svg.red, svg.danger,
 p.gh-text.red,
 p.gh-text.danger,
+pre.gh-text.red,
+pre.gh-text.danger,
 span.gh-text.red,
 span.gh-text.danger {
   color: #e91f4f;
 }
+svg.red.dark, svg.danger.dark,
+p.gh-text.red.dark,
+p.gh-text.danger.dark,
+pre.gh-text.red.dark,
+pre.gh-text.danger.dark,
+span.gh-text.red.dark,
+span.gh-text.danger.dark {
+  color: #4e0818;
+}
 svg.orange, svg.warning,
 p.gh-text.orange,
 p.gh-text.warning,
+pre.gh-text.orange,
+pre.gh-text.warning,
 span.gh-text.orange,
 span.gh-text.warning {
   color: #f58115;
 }
 svg.green,
 p.gh-text.green,
+pre.gh-text.green,
 span.gh-text.green {
   color: #9ece38;
 }
 svg.md,
 p.gh-text.md,
+pre.gh-text.md,
 span.gh-text.md {
   font-size: 15px;
 }
 svg.sm,
 p.gh-text.sm,
+pre.gh-text.sm,
 span.gh-text.sm {
   font-size: 13px;
 }
 svg.lg,
 p.gh-text.lg,
+pre.gh-text.lg,
 span.gh-text.lg {
   font-size: 18px;
 }
@@ -1400,25 +1417,6 @@ button.gh-submit .gh-spinner {
 }
 .gh-legacy-modal #modal-log-details-view h2 {
   margin: 0;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table {
-  width: 100%;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table th {
-  text-align: left;
-  width: 100px;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table pre {
-  margin: 0;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box #headers {
-  width: 100%;
-  overflow: auto;
 }
 .gh-legacy-modal h3.replacements-group {
   padding-left: 20px;

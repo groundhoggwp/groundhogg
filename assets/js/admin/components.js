@@ -1534,7 +1534,15 @@
 
     const { close } = loadingModal()
 
-    await EmailsStore.maybeFetchItem( emailId )
+    const email = await EmailsStore.maybeFetchItem( emailId )
+
+    const {
+      from_avatar,
+      from_email,
+      from_name,
+      subject,
+      built: content,
+    } = email.context
 
     close()
 
@@ -1543,25 +1551,24 @@
         width: `${width}px`,
         height: `${height}px`
       }
-    },  EmailPreview(emailId, {
-      close
-    })))
-  }
-
-  const EmailPreview = ( emailId, {
-    close = false
-  } ) => {
-
-    // assume already fetched?
-    const email = EmailsStore.get( emailId )
-
-    const {
+    },  EmailPreview( {
+      close,
       from_avatar,
       from_email,
       from_name,
       subject,
-      built,
-    } = email.context
+      content,
+    })))
+  }
+
+  const EmailPreview = ( {
+    close = false,
+    from_avatar,
+    from_email,
+    from_name,
+    subject,
+    content,
+  } ) => {
 
     return  Div({
       className: 'email-preview',
@@ -1596,9 +1603,8 @@
       ]),
       Iframe({
         id: 'desktop-preview-iframe',
-      }, built ),
+      }, content ),
     ])
-
   }
 
   $(() => {

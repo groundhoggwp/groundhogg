@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Email_Log_Item;
 use function Groundhogg\Ymd_His;
 
 class Email_Log extends DB {
@@ -25,6 +26,10 @@ class Email_Log extends DB {
 
 	public function get_date_key() {
 		return 'date_sent';
+	}
+
+	public function create_object( $object ) {
+		return new Email_Log_Item( $object );
 	}
 
 	/**
