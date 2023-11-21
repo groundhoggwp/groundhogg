@@ -287,16 +287,16 @@ abstract class Updater {
 		}
 
 		$update  = get_url_var( 'manual_update' );
-		$updates = $this->_get_updates();
+		$updates = $this->_get_all_updates();
 
 		if ( ! in_array( $update, $updates ) ) {
 			return;
 		}
 
 		if ( $this->update_to_version( $update ) ) {
-			Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
+			notices()->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
 		} else {
-			Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
+			notices()->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
 		}
 
 		wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'system' ] ) );
