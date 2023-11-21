@@ -476,7 +476,7 @@ class Replacements implements \JsonSerializable {
 				'group'    => 'email',
 				'callback' => [ $this, 'view_in_browser_link' ],
 				'name'        => __( 'View in browser link', 'groundhogg' ),
-				'description' => _x( 'Link ot view the email in the browser', 'replacement', 'groundhogg' ),
+				'description' => _x( 'Link to view the email in the browser', 'replacement', 'groundhogg' ),
 			],
 		];
 

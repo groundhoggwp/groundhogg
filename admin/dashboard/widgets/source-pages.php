@@ -46,6 +46,6 @@ class Source_Pages extends Table_Widget {
 	 * @return string
 	 */
 	function column_title() {
-		return __( 'Singup Page', 'groundhogg' );
+		return __( 'Signup Page', 'groundhogg' );
 	}
 }
