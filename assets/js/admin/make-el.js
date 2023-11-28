@@ -1134,7 +1134,7 @@
     }, Div({
       className: 'gh-progress-bar-fill',
       style: {
-        width: `${percent}px`
+        width: `${percent}%`
       }
     }, Span({
       className: 'fill-amount'
