@@ -431,7 +431,12 @@ class Location {
 			DateTimeZone::PACIFIC,
 		);
 
-		$timezones = array();
+		static $timezones = [];
+
+		if ( ! empty( $timezones ) ){
+			return $timezones;
+		}
+
 		foreach ( $regions as $region ) {
 			$timezones = array_merge( $timezones, DateTimeZone::listIdentifiers( $region ) );
 		}

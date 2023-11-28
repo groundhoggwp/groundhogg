@@ -189,22 +189,61 @@ class Contacts extends DB {
 
 		$args = $this->sanitize_columns( $args );
 
-		if ( $this->exists( $args['email'], 'email' ) ) {
+		return $this->insert_on_duplicate_update( $args );
+	}
 
-			// update an existing contact
-			$contact = $this->get_contact_by( 'email', $args['email'] );
+	/**
+	 * Inserts, on duplicate it updates
+	 *
+	 * @param $data
+	 *
+	 * @return int
+	 */
+	public function insert_on_duplicate_update( $data ){
 
-			$contact_id = absint( $contact->ID );
+		if ( key_exists( 'email', $data ) ){
 
-			$this->update( $contact_id, $data );
-			$result = $contact_id;
+			// Initialise column format array
+			$column_formats = $this->get_columns();
 
-		} else {
-			$result = $this->insert( $args );
+			// Force fields to lower case
+			$data = array_change_key_case( $data );
+
+			// White list columns
+			$data = array_intersect_key( $data, $column_formats );
+
+			$update_func = function ( $query ) use ( $data, $column_formats ){
+
+				if ( ! preg_match( '/^INSERT/i', $query ) ){
+					return $query;
+				}
+
+				global $wpdb;
+
+				unset( $data[ 'email' ] );
+				unset( $data[ 'id' ] );
+
+				$pairs = [];
+
+				foreach ( $data as $column => $value ){
+					$format = $column_formats[$column];
+					$pairs[] = $wpdb->prepare( "$column = $format", $value );
+				}
+
+				$query .= 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+				return $query;
+			};
+
+			add_filter( 'query', $update_func );
 		}
 
-		return $result;
+		$inserted = $this->insert( $data );
 
+		if ( key_exists( 'email', $data ) && isset( $update_func ) ){
+			remove_filter( 'query', $update_func );
+		}
+
+		return $inserted;
 	}
 
 	/**

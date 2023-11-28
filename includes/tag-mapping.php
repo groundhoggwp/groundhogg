@@ -98,8 +98,8 @@ class Tag_Mapping extends Bulk_Job {
 
 	public function reset_tags_ui() {
 		?>
-		<a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
-		   class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
+        <a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
+           class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
 		<?php
 	}
 
@@ -138,7 +138,7 @@ class Tag_Mapping extends Bulk_Job {
 	public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles ) {
 
 		// Exit if installing because the tables would not have yet been installed...
-		if ( wp_installing() ){
+		if ( wp_installing() ) {
 			return;
 		}
 
@@ -308,7 +308,8 @@ class Tag_Mapping extends Bulk_Job {
 	public function get_tag_map() {
 
 		if ( empty( $this->tag_map ) ) {
-			$this->tag_map = [
+
+			$tag_map = [
 				Preferences::CONFIRMED    => get_option( 'gh_confirmed_tag', false ),
 				Preferences::UNCONFIRMED  => get_option( 'gh_unconfirmed_tag', false ),
 				Preferences::UNSUBSCRIBED => get_option( 'gh_unsubscribed_tag', false ),
@@ -320,6 +321,9 @@ class Tag_Mapping extends Bulk_Job {
 				self::MARKETABLE          => get_option( 'gh_marketable_tag', false ),
 				self::NON_MARKETABLE      => get_option( 'gh_non_marketable_tag', false ),
 			];
+
+			$tags = get_db( 'tags' )->query( [ 'tag_id' => $tag_map ] );
+
 		}
 
 		return $this->tag_map;

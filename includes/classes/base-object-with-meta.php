@@ -181,7 +181,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	public function update_meta( $key, $value = false ) {
 
 		if ( is_array( $key ) && ! $value ) {
-
 			$updated = true;
 
 			foreach ( $key as $meta_key => $meta_value ) {
@@ -189,8 +188,13 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			}
 
 			return $updated;
+		}
 
-		} else if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
+		if ( ! isset( $key, $this->meta ) ){
+			return $this->add_meta( $key, $value );
+		}
+
+		if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value, $this->meta[$key] ?? '' ) ) {
 			$this->meta[ $key ] = $value;
 
 			return true;
@@ -219,7 +223,9 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 			return $added;
 
-		} else if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
+		}
+
+		if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
 			return true;
@@ -248,7 +254,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 		unset( $this->meta[ $key ] );
 
-		return $this->get_meta_db()->delete_meta( $this->get_id(), $key );
+		return $this->get_meta_db()->delete_meta( $this->get_id(), $key, $this->meta[$key] ?? '' );
 	}
 
 	/**

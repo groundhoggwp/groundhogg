@@ -1901,13 +1901,13 @@ function after_form_submit_handler( &$contact ) {
 	// If they re-opt-in we consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 
-        // Opt-in status is already unconfirmed
-        if ( $contact->optin_status_is( Preferences::UNCONFIRMED ) ){
-            // this will take care of double opt-in requirements
-            $contact->reset_date_optin_status_changed();
-        } else {
-	        $contact->change_marketing_preference( Preferences::UNCONFIRMED );
-        }
+		// Opt-in status is already unconfirmed
+		if ( $contact->optin_status_is( Preferences::UNCONFIRMED ) ) {
+			// this will take care of double opt-in requirements
+			$contact->reset_date_optin_status_changed();
+		} else {
+			$contact->change_marketing_preference( Preferences::UNCONFIRMED );
+		}
 	}
 
 	/**
@@ -2200,16 +2200,16 @@ function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter
 
 	// Get all rows
 	if ( ! $rows ) {
-        $rows = 999999999;
+		$rows = 999999999;
 	}
 
 	if ( $offset > 0 ) {
 		// bug in PHP < 8.0.1 causes next line to be given after seek
-        if ( version_compare( PHP_VERSION, '8.0.1', '<' ) ){
-	        $file->seek( $offset );
-        } else {
-	        $file->seek( $offset + 1 );
-        }
+		if ( version_compare( PHP_VERSION, '8.0.1', '<' ) ) {
+			$file->seek( $offset );
+		} else {
+			$file->seek( $offset + 1 );
+		}
 	}
 
 	while ( ! $file->eof() && count( $data ) < $rows ) {
@@ -2229,7 +2229,7 @@ function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter
 		} else {
 			$data[] = $row;
 		}
-    }
+	}
 
 	$file = null;
 
@@ -2947,7 +2947,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'country':
 				if ( strlen( $value ) !== 2 ) {
-					$countries = Plugin::$instance->utils->location->get_countries_list();
+					$countries = utils()->location->get_countries_list();
 					$code      = array_search( $value, $countries );
 					if ( $code ) {
 						$value = $code;
@@ -3010,7 +3010,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'time_zone':
-				$zones = Plugin::$instance->utils->location->get_time_zones();
+				$zones = utils()->location->get_time_zones();
 				// valid timezone
 				if ( key_exists( $value, $zones ) ) {
 					$meta[ $field ] = $value;
@@ -3063,33 +3063,40 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			return false;
 		}
 
-		$contact = new Contact( [
-			'email' => $args['email']
-		] );
+		$contact = new Contact();
 
-	} else if ( isset_not_empty( $args, 'user_id' ) ) {
+		$contact->create( $args );
 
-		// Get by given user id
-		$contact = get_contactdata( $args['user_id'], true );
+	} else {
 
-	} else if ( isset_not_empty( $args, 'contact_id' ) ) {
+		if ( isset_not_empty( $args, 'user_id' ) ) {
 
-		// Get by given contact id
-		$contact = get_contactdata( $args['contact_id'] );
-		unset( $args['contact_id'] );
+			// Get by given user id
+			$contact = get_contactdata( $args['user_id'], true );
 
-	} else if ( ! current_user_can( 'view_contacts' ) ) {
+		} else if ( isset_not_empty( $args, 'contact_id' ) ) {
 
-		// Is there an active contact record?
-		$contact = get_contactdata();
+			// Get by given contact id
+			$contact = get_contactdata( $args['contact_id'] );
+			unset( $args['contact_id'] );
+
+		} else if ( ! current_user_can( 'view_contacts' ) ) {
+
+			// Is there an active contact record?
+			$contact = get_contactdata();
+		}
+
+		if ( ! is_a_contact( $contact ) ) {
+			return false;
+		}
+
+		// Update contact info
+		$contact->update( $args );
 	}
 
-	if ( ! $contact || ! $contact->exists() ) {
+	if ( ! $contact->exists() ) {
 		return false;
 	}
-
-	// Update contact info
-	$contact->update( $args );
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
@@ -3105,9 +3112,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	//	 update meta data
 	if ( ! empty( $meta ) ) {
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( $key, $value );
-		}
+        $contact->update_meta( $meta );
 	}
 
 	if ( ! empty( $files ) ) {
@@ -4093,7 +4098,7 @@ function get_default_country_code() {
 	// Get the IP of the logged in user
 	if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
 
-		$cc = Plugin::instance()->utils->location->ip_info( null, 'countrycode' );
+		$cc = utils()->location->ip_info( null, 'countrycode' );
 
 		if ( $cc ) {
 			update_option( 'gh_default_country_code', $cc );
@@ -4108,7 +4113,7 @@ function get_default_country_code() {
 
 	if ( $parse_url ) {
 		$ip = gethostbyname( $parse_url );
-		$cc = Plugin::instance()->utils->location->ip_info( $ip, 'countrycode' );
+		$cc = utils()->location->ip_info( $ip, 'countrycode' );
 
 		if ( $cc ) {
 			update_option( 'gh_default_country_code', $cc );

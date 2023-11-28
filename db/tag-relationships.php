@@ -131,6 +131,13 @@ class Tag_Relationships extends DB {
 		return $result;
 	}
 
+	public function commit_batch_insert() {
+		add_filter( 'query', [ $this, '_insert_ignore' ] );
+		$result = parent::commit_batch_insert();
+		remove_filter( 'query', [ $this, '_insert_ignore' ] );
+		return $result;
+	}
+
 	/**
 	 * Replace the INSERT statement with an INSERT IGNORE
 	 *

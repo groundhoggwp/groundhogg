@@ -288,6 +288,7 @@ abstract class Meta_DB extends DB {
 	 * @access  private
 	 */
 	public function update_meta( $object_id = 0, $meta_key = '', $meta_value = '', $prev_value = '' ) {
+
 		$object_id = $this->sanitize_id( $object_id );
 
 		if ( false === $object_id ) {
