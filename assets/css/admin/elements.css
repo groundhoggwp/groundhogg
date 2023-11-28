@@ -1906,6 +1906,12 @@ p.error,
   overflow: hidden;
   box-sizing: border-box;
 }
+.gh-progress-bar.error {
+  background-color: rgba(233, 31, 79, 0.1);
+}
+.gh-progress-bar.error .gh-progress-bar-fill {
+  background-color: #e91f4f;
+}
 .gh-progress-bar .gh-progress-bar-fill {
   box-sizing: border-box;
   width: 1px;

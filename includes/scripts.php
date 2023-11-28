@@ -426,6 +426,12 @@ class Scripts {
 			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-big-file-upload', GROUNDHOGG_ASSETS_URL . 'js/admin/big-file-upload' . $dot_min . '.js', [
+			'jquery',
+			'groundhogg-admin',
+			'groundhogg-make-el'
+		], GROUNDHOGG_VERSION, true );
+
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [

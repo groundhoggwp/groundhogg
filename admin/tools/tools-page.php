@@ -433,6 +433,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Add new import view
 	 */
 	public function import_add() {
+
+        wp_enqueue_script( 'groundhogg-admin-big-file-upload' );
+        wp_localize_script( 'groundhogg-admin-big-file-upload', 'BigFileUploader', [
+            'location' => 'imports',
+            'selector' => '#import_file'
+        ] );
+
 		include __DIR__ . '/add-import.php';
 	}
 

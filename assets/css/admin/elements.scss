@@ -2008,6 +2008,15 @@ p.error,
   //height: 25px;
   //box-sizing: content-box;
 
+  &.error {
+
+    background-color: $error-red-10;
+
+    .gh-progress-bar-fill {
+      background-color: $error-red;
+    }
+  }
+
   .gh-progress-bar-fill {
     box-sizing: border-box;
     //position: absolute;

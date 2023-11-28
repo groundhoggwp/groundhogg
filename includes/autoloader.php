@@ -94,6 +94,7 @@ class Autoloader {
 		'Steps\Benchmarks\Form_Integration' => 'includes/steps/benchmarks/base/form-integration.php',
 		'Block_Registry'                    => 'includes/block-registry.php',
 		'Background_Tasks'                  => 'includes/background-tasks.php',
+		'Big_File_Uploader'                 => 'includes/big-file-uploader.php',
 	];
 
 	/**
@@ -114,11 +115,11 @@ class Autoloader {
 	 *
 	 * For a given class name, require the class file.
 	 *
-	 * @param string $relative_class_name Class name.
-	 *
 	 * @since  1.6.0
 	 * @access private
 	 * @static
+	 *
+	 * @param string $relative_class_name Class name.
 	 *
 	 */
 	private static function load_class( $relative_class_name ) {
@@ -153,11 +154,11 @@ class Autoloader {
 	 *
 	 * For a given class, check if it exist and load it.
 	 *
-	 * @param string $class Class name.
-	 *
 	 * @since  1.6.0
 	 * @access private
 	 * @static
+	 *
+	 * @param string $class Class name.
 	 *
 	 */
 	private static function autoload( $class ) {

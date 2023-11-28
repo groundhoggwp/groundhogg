@@ -1124,6 +1124,24 @@
     }, options.map(opt => ButtonOption(opt)))
   }
 
+  const ProgressBar = ({
+    percent = 100,
+    error = false
+  }) => {
+
+    return Div({
+      className: `gh-progress-bar ${error ? 'error' : ''}`
+    }, Div({
+      className: 'gh-progress-bar-fill',
+      style: {
+        width: `${percent}px`
+      }
+    }, Span({
+      className: 'fill-amount'
+    }, `${Math.ceil( percent )}%` )))
+
+  }
+
   window.MakeEl = {
     InputGroup,
     makeEl,
@@ -1151,6 +1169,7 @@
     htmlToElements,
     Dashicon,
     ButtonToggle,
-    Autocomplete
+    Autocomplete,
+    ProgressBar
   }
 } )(jQuery)
