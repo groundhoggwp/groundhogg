@@ -186,6 +186,40 @@ class HTML {
 		<?php
 	}
 
+	/**
+	 * @param $columns array [ 'key' => 'Name' ]
+	 *
+	 * @return void
+	 */
+    public function export_columns_table( $columns ){
+
+	    html()->list_table( [
+		    'class' => 'export-table'
+	    ], [
+		    [
+			    'class' => 'check-column',
+			    'name'  => "<input type='checkbox' value='1' class='select-all'>",
+			    'tag'   => 'td'
+		    ],
+		    __( 'Pretty Name', 'groundhogg' ),
+		    __( 'Field ID', 'groundhogg' ),
+	    ], array_map_with_keys( $columns, function ( $label, $key ) {
+		    return [
+			    html()->checkbox( [
+				    'label'   => '',
+				    'type'    => 'checkbox',
+				    'name'    => 'headers[' . $key . ']',
+				    'id'      => 'header_' . $key,
+				    'value'   => '1',
+				    'checked' => false,
+			    ] ),
+			    $label,
+			    '<code>' . esc_html( $key ) . '</code>'
+		    ];
+	    } ) );
+
+    }
+
 	public function tabs( $tabs = [], $active_tab = false, $class = "nav-tab-wrapper" ) {
 		if ( empty( $tabs ) ) {
 			return;

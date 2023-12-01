@@ -664,31 +664,7 @@ class Tools_Page extends Tabbed_Admin_Page {
             <h3><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h3>
 			<?php
 
-			html()->list_table( [
-				'class' => 'export-table'
-			], [
-				[
-					'class' => 'check-column',
-					'name'  => "<input type='checkbox' value='1' checked class='select-all'>",
-					'tag'   => 'td'
-				],
-				__( 'Pretty Name', 'groundhogg' ),
-				__( 'Field ID', 'groundhogg' ),
-			], map_deep( array_keys( $default_exportable_fields ), function ( $header ) use ( $default_exportable_fields ) {
-				return [
-					html()->checkbox( [
-						'label'   => '',
-						'type'    => 'checkbox',
-						'name'    => 'headers[' . $header . ']',
-						'id'      => 'header_' . $header,
-						'class'   => 'basic header',
-						'value'   => '1',
-						'checked' => true,
-					] ),
-					$default_exportable_fields[ $header ],
-					'<code>' . esc_html( $header ) . '</code>'
-				];
-			} ) );
+            html()->export_columns_table( $default_exportable_fields );
 
 			$tabs = Properties::instance()->get_tabs();
 
@@ -701,31 +677,14 @@ class Tools_Page extends Tabbed_Admin_Page {
 				foreach ( $groups as $group ):
 					?><h4><?php esc_html_e( $group['name'] ); ?></h4><?php
 
-					html()->list_table( [
-						'class' => 'export-table'
-					], [
-						[
-							'class' => 'check-column',
-							'name'  => "<input type='checkbox' value='1' class='select-all'>",
-							'tag'   => 'td'
-						],
-						__( 'Pretty Name', 'groundhogg' ),
-						__( 'Field ID', 'groundhogg' ),
-					], array_map( function ( $field ) {
-						return [
-							html()->checkbox( [
-								'label'   => '',
-								'type'    => 'checkbox',
-								'name'    => 'headers[' . $field['id'] . ']',
-								'id'      => 'header_' . $field['name'],
-								'class'   => 'meta header',
-								'value'   => '1',
-								'checked' => false,
-							] ),
-							esc_html( $field['label'] ),
-							'<code>' . esc_html( $field['name'] ) . '</code>'
-						];
-					}, Properties::instance()->get_fields( $group['id'] ) ) );
+                    $columns = [];
+                    $fields = Properties::instance()->get_fields( $group['id'] );
+
+                    foreach ( $fields as $field ){
+                        $columns[ $field['id']] = $field['label'];
+                    }
+
+					html()->export_columns_table( $columns );
 				endforeach;
 
 			endforeach;
@@ -739,31 +698,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                 <h3><?php _e( 'Custom Meta Information', 'groundhogg' ) ?></h3>
 				<?php
 
-				html()->list_table( [
-					'class' => 'export-table'
-				], [
-					[
-						'class' => 'check-column',
-						'name'  => "<input type='checkbox' value='1' class='select-all'>",
-						'tag'   => 'td'
-					],
-					__( 'Pretty Name', 'groundhogg' ),
-					__( 'Field ID', 'groundhogg' ),
-				], map_deep( $meta_keys, function ( $header ) {
-					return [
-						html()->checkbox( [
-							'label'   => '',
-							'type'    => 'checkbox',
-							'name'    => 'headers[' . $header . ']',
-							'id'      => 'header_' . $header,
-							'class'   => 'meta header',
-							'value'   => '1',
-							'checked' => false,
-						] ),
-						key_to_words( $header ),
-						'<code>' . esc_html( $header ) . '</code>'
-					];
-				} ) );
+                html()->export_columns_table( array_combine( $meta_keys, array_map( '\Groundhogg\key_to_words', $meta_keys ) ) );
 
 			endif;
 			?>
