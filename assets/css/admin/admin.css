@@ -731,6 +731,7 @@ label.block {
   justify-content: center;
 }
 
+#funnel-include-filters,
 #broadcast-include-filters,
 #block-include-filters,
 #filters-here {
@@ -740,6 +741,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#funnel-include-filters::after,
 #broadcast-include-filters::after,
 #block-include-filters::after,
 #filters-here::after {
@@ -755,6 +757,7 @@ label.block {
   width: max-content;
 }
 
+#funnel-exclude-filters,
 #broadcast-exclude-filters,
 #block-exclude-filters,
 #exclude-filters-here {
@@ -764,6 +767,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+#funnel-exclude-filters::after,
 #broadcast-exclude-filters::after,
 #block-exclude-filters::after,
 #exclude-filters-here::after {
@@ -807,6 +811,7 @@ label.block {
   opacity: 0.7;
 }
 
+#funnel-scheduler p,
 #broadcast-scheduler p {
   margin: 0;
   font-size: 16px;
@@ -841,6 +846,29 @@ label.block {
 }
 .email-log-modal .email-log-item-headers table pre {
   margin: 0;
+}
+
+#table-filters {
+  margin-top: 10px;
+}
+
+.gh-fixed-ui {
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+  height: calc(100vh - 32px);
+  max-height: calc(100vh - 32px);
+}
+
+@media only screen and (max-width: 960px) {
+  .auto-fold .gh-fixed-ui {
+    left: 36px !important;
+  }
+}
+.folded .gh-fixed-ui {
+  left: 36px !important;
 }
 
 /*# sourceMappingURL=admin.css.map */

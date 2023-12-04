@@ -64,11 +64,6 @@ body {
 }
 
 #funnel-form {
-  position: fixed;
-  top: 32px;
-  left: 160px;
-  bottom: 0;
-  right: 0;
 
   display: flex;
   flex-direction: column;
@@ -1225,6 +1220,10 @@ table.embed-options td {
   }
 }
 
+.form-style {
+  margin-top: 30px;
+}
+
 .form-builder-main {
   margin-bottom: 30px;
 
@@ -1354,7 +1353,7 @@ table.embed-options td {
           padding-left: 10px;
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: stretch;
 
           .field-type {
             font-size: 8px;
@@ -1365,15 +1364,19 @@ table.embed-options td {
 
           .field-label {
             font-size: 13px;
+            line-height: 1.1;
+            margin-top: 7px;
+            margin-right: 7px;
           }
 
           .actions {
             display: flex;
+            align-items: stretch;
 
             button {
               background: #FFFFFF;
               width: 40px;
-              height: 40px;
+              //height: 40px;
               border-top: none;
               border-right: none;
               border-bottom: none;

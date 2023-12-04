@@ -818,18 +818,6 @@ body {
 
 #email-editor {
 
-  &:has(#email-block-editor),
-  &:has(#email-html-editor) {
-    position: fixed;
-    left: 160px;
-    top: 32px;
-    bottom: 0;
-    right: 0;
-
-    height: calc(100vh - 32px);
-    max-height: calc(100vh - 32px);
-  }
-
   &:has(#email-html-editor) {
     display: flex;
     flex-direction: column;
@@ -1041,17 +1029,6 @@ body {
       height: calc(100% - 60px) !important;
     }
   }
-}
-
-@media only screen and (max-width: 960px) {
-  .auto-fold #email-editor {
-    left: 36px !important;
-  }
-
-}
-
-.folded #email-editor {
-  left: 36px !important;
 }
 
 .cards .post-card img {

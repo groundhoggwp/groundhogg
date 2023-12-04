@@ -843,6 +843,7 @@ label.block {
   width: max-content;
 }
 
+#funnel-include-filters,
 #broadcast-include-filters,
 #block-include-filters,
 #filters-here {
@@ -856,6 +857,7 @@ label.block {
   }
 }
 
+#funnel-exclude-filters,
 #broadcast-exclude-filters,
 #block-exclude-filters,
 #exclude-filters-here {
@@ -901,6 +903,7 @@ label.block {
   }
 }
 
+#funnel-scheduler,
 #broadcast-scheduler {
   p {
     margin: 0;
@@ -952,4 +955,30 @@ label.block {
       }
     }
   }
+}
+
+#table-filters{
+  margin-top: 10px;
+}
+
+.gh-fixed-ui {
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+
+  height: calc(100vh - 32px);
+  max-height: calc(100vh - 32px);
+}
+
+@media only screen and (max-width: 960px) {
+  .auto-fold .gh-fixed-ui {
+    left: 36px !important;
+  }
+
+}
+
+.folded .gh-fixed-ui {
+  left: 36px !important;
 }
