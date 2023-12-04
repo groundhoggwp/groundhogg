@@ -546,6 +546,9 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
 		$query['filters'] = base64_json_decode( $query['filters'] );
 	}
+	if ( isset_not_empty( $query, 'include_filters' ) && is_string( $query['include_filters'] ) ) {
+		$query['include_filters'] = base64_json_decode( $query['include_filters'] );
+	}
 	if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
 		$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
 	}
@@ -3112,7 +3115,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	//	 update meta data
 	if ( ! empty( $meta ) ) {
-        $contact->update_meta( $meta );
+		$contact->update_meta( $meta );
 	}
 
 	if ( ! empty( $files ) ) {
@@ -6508,6 +6511,33 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'href' => '#unsubscribe_link#'
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
 
+	$post_types = array_map( function ( $post_type ) {
+
+		/**
+		 * @var $post_type \WP_Post_Type
+		 */
+		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
+
+		$taxonomies = array_map( function ( $tax ) {
+			return [
+				'label'        => $tax->label,
+				'name'         => $tax->name,
+				'rest_base'    => $tax->rest_base,
+				'show_in_rest' => $tax->show_in_rest,
+				'public'       => $tax->public
+			];
+		}, $taxonomies );
+
+		return [
+			'name'         => $post_type->name,
+			'labels'       => $post_type->labels,
+			'taxonomies'   => $taxonomies,
+			'show_in_rest' => $post_type->show_in_rest,
+			'rest_base'    => $post_type->rest_base
+		];
+
+	}, get_post_types( [ 'public' => true ], false ) );
+
 	$localized = array_merge( [
 		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
@@ -6516,10 +6546,11 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'imageSizes'    => get_intermediate_image_sizes(),
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
-		]
+		],
+		'post_types'    => $post_types
 	], $extra );
 
-	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );
+	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
 }
 
 /**

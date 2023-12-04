@@ -127,14 +127,83 @@ class Block_Registry {
 	public function post_query_filter( &$query ) {
 
 		$args = wp_parse_args( $this->cur_block, [
+
+			// Deprecated
 			'tag'          => [],
 			'tag_rel'      => 'any',
 			'category'     => [],
 			'category_rel' => 'any',
+
+			// Use theses
+			'terms'        => [],
+			'post_type'    => 'post',
+			'offset'       => 0,
+			'include'      => [],
+			'exclude'      => [],
 		] );
 
-		$query->set( $args['tag_rel'] === 'all' ? 'tag__and' : 'tag__in', wp_parse_id_list( $args['tag'] ) );
-		$query->set( $args['category_rel'] === 'all' ? 'category__and' : 'category__in', wp_parse_id_list( $args['category'] ) );
+		[
+			'post_type' => $post_type,
+			'terms'     => $terms
+		] = $args;
+
+		$query->set( 'post_type', $post_type );
+		$query->set( 'status', 'publish' );
+
+		if ( $post_type === 'post' && ! empty( 'category' ) ) {
+			$query->set( $args['category_rel'] === 'all' ? 'category__and' : 'category__in', wp_parse_id_list( $args['category'] ) );
+		}
+
+		if ( $post_type === 'post' && ! empty( 'tag' ) ) {
+			$query->set( $args['tag_rel'] === 'all' ? 'tag__and' : 'tag__in', wp_parse_id_list( $args['tag'] ) );
+		}
+
+		$tax_query = [
+			'relation' => 'AND'
+		];
+
+		$taxonomies = get_object_taxonomies( $post_type );
+
+		foreach ( $taxonomies as $taxonomy ) {
+
+			if ( ! isset_not_empty( $terms, $taxonomy ) ) {
+				continue;
+			}
+
+			$tax_rel = get_array_var( $terms, "{$taxonomy}_rel", 'any' );
+			$terms   = $terms[ $taxonomy ];
+
+			// ANY
+			if ( $tax_rel === 'any' ){
+				$tax_query[] = [
+					'taxonomy' => $taxonomy,
+					'field'    => 'term_id',
+					'terms'    => wp_parse_id_list( $terms ),
+				];
+			}
+			// ALL
+			else {
+				foreach ( $terms as $term ){
+					$tax_query[] = [
+						'taxonomy' => $taxonomy,
+						'field'    => 'term_id',
+						'terms'    => $term,
+					];
+				}
+			}
+		}
+
+		$query->set( 'tax_query', $tax_query );
+
+		if ( ! empty( $args['include'] ) ){
+			$query->set( 'post__in', wp_parse_id_list( $args[ 'include' ] ) );
+		}
+
+		if ( ! empty( $args['exclude'] ) ){
+			$query->set( 'post__not_in', wp_parse_id_list( $args[ 'exclude' ] ) );
+		}
+
+		$query->set( 'offset', absint( $args['offset'] ) );
 	}
 
 	/**
@@ -151,6 +220,11 @@ class Block_Registry {
 		// Handled by the query filter above
 		unset( $props['tag'] );
 		unset( $props['category'] );
+		unset( $props['terms'] );
+		unset( $props['offset'] );
+		unset( $props['post_type'] );
+		unset( $props['include'] );
+		unset( $props['exclude'] );
 
 		$posts = replacements()->posts( $props );
 

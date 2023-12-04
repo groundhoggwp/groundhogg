@@ -26,7 +26,7 @@
     Dashicon,
     ButtonToggle,
     ToolTip,
-    Autocomplete
+    Autocomplete,
   } = MakeEl
 
   const {
@@ -1602,7 +1602,7 @@
         backgroundImage: (style, el) => el.getAttribute('background'),
         backgroundSize: style => style.getPropertyValue('background-size'),
         backgroundRepeat: style => style.getPropertyValue('background-repeat'),
-        backgroundPosition: style => style.getPropertyValue('background-position')
+        backgroundPosition: style => style.getPropertyValue('background-position'),
       }
 
       let style = {}
@@ -3680,7 +3680,7 @@
     ])
   }
 
-  const SubjectAndFromPreview = ( close ) => Div({
+  const SubjectAndFromPreview = (close) => Div({
     className: 'from-preview display-flex gap-20 has-box-shadow',
   }, [
     makeEl('img', {
@@ -3703,10 +3703,10 @@
     Button({
       className: 'gh-button secondary icon text',
       style: {
-        marginLeft: 'auto'
+        marginLeft: 'auto',
       },
-      onClick: close
-    }, Dashicon( 'no-alt' ))
+      onClick: close,
+    }, Dashicon('no-alt')),
   ])
 
   const PreviewButtons = () => {
@@ -3723,14 +3723,14 @@
           let width = Math.min(1200, window.innerWidth * 0.8)
           let height = window.innerHeight * 0.85
 
-          ModalFrame({}, ({close}) =>  Div({
+          ModalFrame({}, ({ close }) => Div({
             className: 'preview desktop',
             style: {
-              width: `${width}px`,
-              height: `${height}px`
-            }
+              width: `${ width }px`,
+              height: `${ height }px`,
+            },
           }, [
-            SubjectAndFromPreview( close ),
+            SubjectAndFromPreview(close),
             Iframe({
               id: 'desktop-preview-iframe',
               width,
@@ -3747,14 +3747,14 @@
           let width = 412
           let height = Math.min(915, window.innerHeight * 0.85)
 
-          ModalFrame({},({close}) => Div({
+          ModalFrame({}, ({ close }) => Div({
             className: 'preview mobile',
             style: {
-              width: `${width}px`,
-              height: `${Math.min(915, window.innerHeight * 0.85)}px`
-            }
+              width: `${ width }px`,
+              height: `${ Math.min(915, window.innerHeight * 0.85) }px`,
+            },
           }, [
-            SubjectAndFromPreview( close ),
+            SubjectAndFromPreview(close),
             Iframe({
               id: 'mobile-desktop-iframe',
               width,
@@ -3977,7 +3977,7 @@
         dangerConfirmationModal({
           alert: `<p>You have unsaved changes! Are you sure you want to leave?</p>`,
           onConfirm: onClose,
-          confirmText: __( 'Discard changes', 'groundhogg' ),
+          confirmText: __('Discard changes', 'groundhogg'),
         })
         return
       }
@@ -4072,6 +4072,7 @@
 
       return Div({
         id: 'email-editor',
+        className: 'gh-fixed-ui',
       }, [
         // Header
         Div({
@@ -4261,6 +4262,7 @@
     if (isHTMLEditor()) {
       return Div({
         id: 'email-editor',
+        className: 'gh-fixed-ui',
       }, [
         // header
         Header(),
@@ -4271,6 +4273,7 @@
 
     return Div({
       id: 'email-editor',
+      className: 'gh-fixed-ui',
     }, [
       // header
       Header(),
@@ -5331,14 +5334,14 @@
               ...attributes,
               fetchResults: async search => {
 
-                let pages = await ajax( {
+                let pages = await ajax({
                   action: 'wp-link-ajax',
                   _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
                   term: search,
-                } )
+                })
 
-                return pages.map( ({title, permalink}) => ({ id: permalink, text: title }))
-              }
+                return pages.map(({ title, permalink }) => ( { id: permalink, text: title } ))
+              },
             }),
             type: 'text',
             id: 'button-link',
@@ -5577,14 +5580,14 @@
               ...attributes,
               fetchResults: async search => {
 
-                let pages = await ajax( {
+                let pages = await ajax({
                   action: 'wp-link-ajax',
                   _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
                   term: search,
-                } )
+                })
 
-                return pages.map( ({title, permalink}) => ({ id: permalink, text: title }))
-              }
+                return pages.map(({ title, permalink }) => ( { id: permalink, text: title } ))
+              },
             }),
             type: 'text',
             id: 'image-link',
@@ -6008,15 +6011,12 @@
       'post_type',
       'excerpt',
       'gap',
-      'tag',
-      'category',
       'queryId',
-      'tag_rel',
-      'category_rel',
       'thumbnail_size',
       'thumbnail',
       'include',
       'exclude',
+      'terms',
     ],
     //language=HTML
     svg: `
@@ -6033,46 +6033,145 @@
       gap = 20,
       number,
       offset,
-      post_type,
+      post_type = 'post',
       excerptStyle = {},
       headingStyle = {},
-      selectedTags = [],
-      tag = [],
-      tag_rel = 'any',
-      selectedCategories = [],
-      category = [],
-      category_rel = 'any',
       updateBlock,
       queryId = '',
       include = [],
       includedPosts = [],
       exclude = [],
       excludedPosts = [],
+      terms = {}
     }) => {
+
+      const Supports = {
+        featured: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        excerpts: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        headingStyle: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        thumbnails: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        gap: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+      }
+
+      const postTypeOptions = {}
+
+      for ( let type in _BlockEditor.post_types ){
+        postTypeOptions[type] = _BlockEditor.post_types[type].labels.name
+      }
+
+      const currentPostType = _BlockEditor.post_types[post_type]
+
+      const termControls = []
+
+      for ( let tax in currentPostType.taxonomies ){
+        const taxonomy = currentPostType.taxonomies[tax]
+
+        if ( ! taxonomy.public || ! taxonomy.show_in_rest ){
+          continue;
+        }
+
+        let selected = terms[tax] ?? []
+        let selectedCache = terms[`${tax}_cache`] ?? []
+        let tax_rel = terms[`${tax}_rel`] ?? 'any'
+
+        termControls.push( ...[
+          `<hr>`,
+
+          // Terms
+          Control({
+            label: taxonomy.label,
+            stacked: true,
+          }, ItemPicker({
+            id: `select-${tax}`,
+            selected: selectedCache,
+            tags: false,
+            fetchOptions: async (search) => {
+              let terms = await get(`${ Groundhogg.api.routes.wp.v2 }/${ taxonomy.rest_base || tax }/`, {
+                search,
+                per_page: 20,
+                orderby: 'count',
+                order: 'desc',
+              })
+              terms = terms.map(({ id, name }) => ( { id, text: name } ))
+              return terms
+            },
+            onChange: selected => {
+
+              terms = {
+                ...terms,
+                [`${tax}_cache`]: selected,
+                [tax]: selected.map(opt => opt.id),
+              }
+
+              updateBlock({
+                terms,
+                morphControls: true,
+              })
+            },
+          })),
+
+          // Terms Any || All
+          selected.length > 1 ? Control({
+            label: 'Relationship',
+          }, ButtonToggle({
+            id: `${tax}-rel`,
+            selected: tax_rel,
+            options: [
+              { id: 'any', text: 'Any' },
+              { id: 'all', text: 'All' },
+            ],
+            onChange: rel => {
+              terms = {
+                ...terms,
+                [`${tax}_rel`]: rel,
+              }
+
+              updateBlock({
+                terms,
+                morphControls: true,
+              })
+            },
+          })) : null,
+        ] )
+      }
 
       return Fragment([
         ControlGroup({
           name: 'Layout',
         }, [
-          // Control({
-          //   label: 'Layout',
-          // }, Select({
-          //   options: {
-          //     ul: 'List',
-          //     grid: 'Grid',
-          //     cards: 'Cards',
-          //   },
-          //   selected: layout,
-          //   onChange: e => updateBlock({ layout: e.target.value }),
-          // })),
+
+          // layout
           Control({
+            label: 'Layout',
+          }, Select({
+            options: {
+              cards: 'Cards',
+              ol: 'Numbered List',
+              ul: 'Unordered List',
+              h1: 'H1',
+              h2: 'H2',
+              h3: 'H3',
+              h4: 'H4',
+              h5: 'H5',
+            },
+            selected: layout,
+            onChange: e => updateBlock({
+              layout: e.target.value,
+              morphControls: true,
+            }),
+          })),
+
+          // Features
+          Supports.featured ? Control({
             label: 'Featured',
           }, Toggle({
             id: 'toggle-featured',
             checked: featured,
             onChange: e => updateBlock({ featured: e.target.checked }),
-          })),
-          Control({
+          })) : null,
+
+          // Excerpt
+          Supports.excerpts ? Control({
             label: 'Excerpts',
           }, Toggle({
             id: 'toggle-excerpt',
@@ -6081,8 +6180,10 @@
               excerpt: e.target.checked,
               morphControls: true,
             }),
-          })),
-          Control({
+          })) : null,
+
+          // Thumbnails
+          Supports.thumbnails ? Control({
             label: 'Thumbnails',
           }, Toggle({
             id: 'toggle-thumbnails',
@@ -6091,8 +6192,10 @@
               thumbnail: e.target.checked,
               morphControls: true,
             }),
-          })),
-          Control({
+          })) : null,
+
+          // Gap
+          Supports.gap ? Control({
             label: 'Gap',
           }, NumberControl({
             id: 'column-gap',
@@ -6101,11 +6204,17 @@
             step: 5,
             unit: 'px',
             onInput: e => updateBlock({ gap: e.target.value }),
-          })),
+          })) : null,
         ]),
-        TagFontControlGroup(__('Heading'), 'headingStyle', headingStyle, updateBlock),
-        excerpt ? TagFontControlGroup(__('Excerpt'), 'excerptStyle', excerptStyle, updateBlock) : null,
-        thumbnail ? ControlGroup({ name: 'Thumbnail' }, [
+
+        // Heading Style
+        TagFontControlGroup( [ 'ol', 'ul' ].includes( layout ) ? __('Font') :  __('Heading'), 'headingStyle', headingStyle, updateBlock),
+
+        // Excerpt Style
+        excerpt && Supports.excerpts ? TagFontControlGroup(__('Excerpt'), 'excerptStyle', excerptStyle, updateBlock) : null,
+
+        // Thumbnail controls
+        thumbnail && Supports.thumbnails ? ControlGroup({ name: 'Thumbnail' }, [
           Control({
             label: 'Thumbnail Size',
           }, Select({
@@ -6118,19 +6227,32 @@
             onChange: e => updateBlock({ thumbnail_size: e.target.value }),
           })),
         ]) : null,
+
+        // Query
         ControlGroup({
           name: 'Query',
         }, [
+
+          // Post type
           Control({
             label: 'Post Type',
           }, Select({
             id: 'post-type',
             selected: post_type,
-            options: {
-              posts: 'Posts',
-            },
-            onChange: e => updateBlock({ post_type: e.target.value }),
+            options: postTypeOptions,
+            onChange: e => updateBlock({
+              post_type: e.target.value,
+              morphControls: true,
+
+              // Clear these when changing the post type
+              include: [],
+              includedPosts: [],
+              exclude: [],
+              excludedPosts: [],
+            }),
           })),
+
+          // Number of posts
           Control({
             label: 'Number of posts',
           }, Input({
@@ -6140,6 +6262,8 @@
             value: number,
             onChange: e => updateBlock({ number: e.target.value }),
           })),
+
+          // Query offset
           Control({
             label: 'Offset',
           }, Input({
@@ -6149,90 +6273,21 @@
             value: offset,
             onChange: e => updateBlock({ offset: e.target.value }),
           })),
+
+          // Term controls
+          ...termControls,
+
+          // Include Ids
           `<hr/>`,
           Control({
-            label: 'Tags',
-            stacked: true,
-          }, ItemPicker({
-            id: 'post-tags',
-            selected: selectedTags,
-            tags: false,
-            fetchOptions: async (search) => {
-              let terms = await get(`${ Groundhogg.api.routes.wp.tags }`, {
-                search,
-                per_page: 20,
-                orderby: 'count',
-                order: 'desc',
-              })
-              terms = terms.map(({ id, name }) => ( { id, text: name } ))
-              return terms
-            },
-            onChange: selected => {
-              updateBlock({
-                selectedTags: selected,
-                tag: selected.map(opt => opt.id),
-                morphControls: true,
-              })
-            },
-          })),
-          selectedTags.length > 1 ? Control({
-            label: 'Relationship',
-          }, ButtonToggle({
-            id: 'tag-rel',
-            selected: tag_rel,
-            options: [
-              { id: 'any', text: 'Any' },
-              { id: 'all', text: 'All' },
-            ],
-            onChange: tag_rel => updateBlock({ tag_rel, morphControls: true }),
-          })) : null,
-          `<hr/>`,
-          Control({
-            label: 'Categories',
-            stacked: true,
-          }, ItemPicker({
-            id: 'post-cats',
-            selected: selectedCategories,
-            tags: false,
-            fetchOptions: async (search) => {
-              let terms = await get(`${ Groundhogg.api.routes.wp.categories }`, {
-                search,
-                per_page: 20,
-                orderby: 'count',
-                order: 'desc',
-              })
-              terms = terms.map(({ id, name }) => ( { id, text: name } ))
-              return terms
-            },
-            onChange: selected => {
-              updateBlock({
-                selectedCategories: selected,
-                category: selected.map(opt => opt.id),
-                morphControls: true,
-              })
-            },
-          })),
-          selectedCategories.length > 1 ? Control({
-            label: 'Relationship',
-          }, ButtonToggle({
-            id: 'category-rel',
-            selected: category_rel,
-            options: [
-              { id: 'any', text: 'Any' },
-              { id: 'all', text: 'All' },
-            ],
-            onChange: category_rel => updateBlock({ category_rel, morphControls: true }),
-          })) : null,
-          `<hr/>`,
-          Control({
-            label: 'Include these posts',
+            label: `Include these ${currentPostType.labels.name.toLowerCase()}`,
             stacked: true,
           }, ItemPicker({
             id: 'post-includes',
             selected: includedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${currentPostType.rest_base || post_type}`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
@@ -6249,16 +6304,18 @@
             },
           })),
           `<p>Limit result set to specific IDs.</p>`,
+
+          // Exclude Ids
           `<hr/>`,
           Control({
-            label: 'Exclude these posts',
+            label: `Exclude these ${currentPostType.labels.name.toLowerCase()}`,
             stacked: true,
           }, ItemPicker({
             id: 'post-excludes',
             selected: excludedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${currentPostType.rest_base || post_type}`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
@@ -6275,6 +6332,8 @@
             },
           })),
           `<p>Ensure result set excludes specific IDs.</p>`,
+
+          // Query ID
           `<hr/>`,
           Control({ label: 'Query ID' }, Input({
             id: 'query-id',
@@ -6324,8 +6383,6 @@
       post_type: 'post',
       columns: 2,
       gap: 20,
-      tag_rel: 'any',
-      category_rel: 'any',
       headingStyle: fontDefaults({
         fontSize: 24,
       }),
@@ -6752,7 +6809,7 @@
         from_name: previewFromName,
         from_email: previewFromEmail,
         from_avatar: previewFromAvatar,
-        subject: previewSubject
+        subject: previewSubject,
       } = email.context )
     }
 
@@ -6798,7 +6855,7 @@
             previewFromName,
             previewFromEmail,
             previewFromAvatar,
-            previewSubject
+            previewSubject,
           })
 
           setHTML(email.data.content, false)
@@ -6866,7 +6923,7 @@
       previewFromName,
       previewFromEmail,
       previewFromAvatar,
-      previewSubject
+      previewSubject,
     })
 
     setBlocks(blocks, false)
@@ -6969,13 +7026,9 @@
 
     let blocks = []
 
-    nodes.forEach(node => {
+    let timeout
 
-      // Skip text nodes
-      if (node.nodeType === Node.TEXT_NODE) {
-        return
-      }
-
+    const parseBlock = node => {
       let oldBlockType = node.dataset.block
 
       // Get from classList of first child
@@ -7090,8 +7143,31 @@
           break
       }
 
-      blocks.push(block)
+      return block
+    }
 
+    nodes.forEach(node => {
+
+      // Skip text nodes
+      if (node.nodeType === Node.TEXT_NODE) {
+        return
+      }
+
+      try {
+        blocks.push(parseBlock(node))
+      }
+      catch (e) {
+
+        clearTimeout(timeout)
+
+        setTimeout(() => {
+          dialog({
+            type: 'error',
+            message: 'Some blocks could not be converted to the new editor.',
+          })
+        }, 100)
+
+      }
     })
 
     return blocks
