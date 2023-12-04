@@ -471,10 +471,10 @@ class Replacements implements \JsonSerializable {
 //				'name'        => __( 'Post URL', 'groundhogg' ),
 //				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],
-            [
-				'code'     => 'view_in_browser_link',
-				'group'    => 'email',
-				'callback' => [ $this, 'view_in_browser_link' ],
+			[
+				'code'        => 'view_in_browser_link',
+				'group'       => 'email',
+				'callback'    => [ $this, 'view_in_browser_link' ],
 				'name'        => __( 'View in browser link', 'groundhogg' ),
 				'description' => _x( 'Link to view the email in the browser', 'replacement', 'groundhogg' ),
 			],
@@ -1964,7 +1964,6 @@ class Replacements implements \JsonSerializable {
 			'meta_key'       => '',
 			'meta_value'     => '',
 			'within'         => '',
-			'space'          => 0,
 			'columns'        => 2,
 			'gap'            => 20,
 			'headingStyle'   => [],
@@ -2057,8 +2056,10 @@ class Replacements implements \JsonSerializable {
 
 				$posts = $query->get_posts();
 
-				$content = html()->e( $props['layout'] ?? 'ul', [], array_map( function ( $post ) {
-					return html()->e( 'li', [], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
+				$content = html()->e( $props['layout'] ?? 'ul', [], array_map( function ( $post ) use ( $props ) {
+					return html()->e( 'li', [
+						'style' => $props['headingStyle']
+					], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
 				}, $posts ) );
 
 				break;
@@ -2226,14 +2227,19 @@ class Replacements implements \JsonSerializable {
 						], get_the_post_thumbnail( null, $props['thumbnail_size'] ) );
 					}
 
-					$html[] = html()->e( $tag, [], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );
+					$html[] = html()->e( $tag, [
+						'style' => $props['headingStyle']
+					], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );
 
 					if ( $props['excerpt'] ) {
-						$html[] = html()->e( 'p', [ 'class' => 'post-excerpt' ], get_the_excerpt() );
+						$html[] = html()->e( 'p', [
+							'class' => 'post-excerpt',
+							'style' => $props['excerptStyle']
+						], get_the_excerpt() );
 					}
 
-					if ( $props['space'] ) {
-						$html[] = html()->e( 'div', [ 'style' => [ 'height' => absint( $props['space'] ) . 'px' ] ], '', false );
+					if ( $props['gap'] ) {
+						$html[] = html()->e( 'div', [ 'style' => [ 'height' => absint( $props['gap'] ) . 'px' ] ], '', false );
 					}
 				}
 
@@ -2264,20 +2270,20 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * Show a view in browser link
-     *
+	 * Show a view in browser link
+	 *
 	 * @return false|string
 	 */
-	public function view_in_browser_link(  ) {
+	public function view_in_browser_link() {
 
-        $email = the_email();
+		$email = the_email();
 
-        if ( ! $email || ! $email->exists() ){
-            return false;
-        }
+		if ( ! $email || ! $email->exists() ) {
+			return false;
+		}
 
-        return $email->browser_view_link();
-    }
+		return $email->browser_view_link();
+	}
 
 	/**
 	 * We don't want this to be serialized
