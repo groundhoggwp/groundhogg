@@ -584,11 +584,12 @@
     submissions: ObjectStore(Groundhogg.api.routes.v4.submissions),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
-      async addContacts ({ query, funnel_id, step_id }, opts = {}) {
+      async addContacts ({ query, funnel_id, step_id, ...rest }, opts = {}) {
         return apiPost(`${ this.route }/${ funnel_id }/start`, {
           query,
           step_id,
           funnel_id,
+          ...rest
         }, opts).then(d => d.added)
       },
 

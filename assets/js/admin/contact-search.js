@@ -578,167 +578,47 @@
               break
             case 'funnel':
 
-              let funnel = FunnelsStore.hasItems() ? FunnelsStore.getItems()[0] : null
-              let step = funnel ? funnel.steps[0] : null
-
-              const addToFunnel = () => {
-
-                const steps = () => {
-                  // language=HTML
-                  return `
-                      <div class="gh-row">
-                          <div class="gh-col">
-                              <label class="block">${ __('Select a step',
-                                      'groundhogg') }</label>
-                              ${ select({
-                                  id: 'select-step',
-                                  name: 'step',
-                              }) }
-                          </div>
-                      </div>`
-                }
-
-                const submit = () => {
-                  //language=HTML
-                  return `
-                      <div class="gh-row">
-                          <div class="gh-col">
-                              <button id="add-to-funnel"
-                                      class="gh-button primary">
-                                  ${ sprintf(__('Add %1$s contacts to %2$s',
-                                                  'groundhogg'), totalContactsFormatted,
-                                          bold(funnel.data.title)) }
-                              </button>
-                          </div>
-                      </div>`
-                }
-
-                // language=HTML
-                return `
-                    <h2>${ __('Add contacts to a funnel', 'groundhogg') }</h2>
-                    <div class="gh-rows-and-columns">
-                        <div class="gh-row">
-                            <div class="gh-col">
-                                <label class="block">${ __('Select a funnel',
-                                        'groundhogg') }</label>
-                                ${ select({
-                                    id: 'select-funnel',
-                                    name: 'funnel',
-                                }, FunnelsStore.getItems().map(f => ( {
-                                    value: f.ID,
-                                    text: f.data.title,
-                                } )), funnel && funnel.ID) }
-                            </div>
-                        </div>
-                        ${ funnel ? steps() : '' }
-                        ${ funnel && step ? submit() : '' }
-                    </div>`
-              }
-
-              const mounted = () => {
-                funnelPicker('#select-funnel', false, (items) => {
-                  FunnelsStore.itemsFetched(items)
-                }, {
-                  status: 'active',
-                }, {
-                  placeholder: __('Select a funnel...', 'groundhogg'),
-                }).on('change', ({ target }) => {
-                  funnel = FunnelsStore.get(parseInt($(target).val()))
-
-                  step = funnel.steps.find(s => s.data.step_order == 1)
-                  setContent(addToFunnel())
-                  mounted()
-
-                })
-
-                $('#select-step').select2({
-                  placeholder: __('Select a step...', 'groundhogg'),
-                  data: funnel ? funnel.steps.sort(
-                    (a, b) => a.data.step_order - b.data.step_order).
-                    map(s => ( {
-                      id: s.ID,
-                      text: `${ s.data.step_title } (${ Groundhogg.rawStepTypes[s.data.step_type].name })`,
-                      selected: s.ID == step.ID,
-                    } )) : [],
-                  // templateSelection: template,
-                  // templateResult: template
-                }).on('change', ({ target }) => {
-                  step = funnel.steps.find(
-                    s => s.ID === parseInt($(target).val()))
-                  setContent(addToFunnel())
-                  mounted()
-                })
-
-                $('#add-to-funnel').on('click', () => {
-
-                  let limit = 500
-                  let offset = 0
-
-                  setContent(`<h2 id="has-dots">${ __(
-                    'Adding contacts to funnel') }</h2><div id="funnel-progress"></div>`)
-
-                  const { stop: stopDots } = loadingDots('#has-dots')
-                  const { setProgress } = progressBar('#funnel-progress')
-
-                  const scheduleEvents = () => {
-                    FunnelsStore.addContacts({
-                      funnel_id: funnel.ID,
-                      step_id: step.ID,
-                      query: {
-                        ...query,
-                        limit,
-                        offset,
+              modal({
+                //language=HTML
+                content: `<h2>${ __('Add contacts to a funnel', 'groundhogg') }</h2>
+                <div id="gh-add-to-funnel" style="width: 500px"></div>`,
+                onOpen: () => {
+                  document.getElementById('gh-add-to-funnel').append(Groundhogg.FunnelScheduler({
+                    totalContacts,
+                    searchMethod: 'selection',
+                    searchMethods: [
+                      {
+                        id: 'selection',
+                        text: sprintf(__('Selected %s contacts', 'groundhogg'), formatNumber(totalContacts)),
+                        query: () => ( {
+                          ...query,
+                        } ),
                       },
-                    }).then(() => {
-
-                      limit = Math.min(totalContacts - offset, limit)
-                      offset += limit
-
-                      setProgress(offset / totalContacts)
-
-                      if (offset >= totalContacts) {
-                        closeFunnelModal()
-                        stopDots()
-                        dialog({
-                          message: sprintf(__('%s contacts added to "%s"'),
-                            totalContactsFormatted, funnel.data.title),
-                        })
-                        return
-                      }
-
-                      scheduleEvents()
-                    })
-                  }
-
-                  scheduleEvents()
-
-                })
-              }
-
-              const { setContent, close: closeFunnelModal } = modal({
-                content: addToFunnel(),
-                width: 400,
+                    ],
+                  }))
+                },
               })
-
-              mounted()
 
               break
             case 'broadcast':
 
               modal({
-                content: `<h2>${ __('Send a broadcast',
-                  'groundhogg') }</h2><div id="gh-broadcast-form" style="width: 400px"></div>`,
+                //language=HTML
+                content: `<h2>${ __('Send a broadcast', 'groundhogg') }</h2>
+                <div id="gh-broadcast-form"></div>`,
                 onOpen: () => {
                   document.getElementById('gh-broadcast-form').append(Groundhogg.BroadcastScheduler({
                     totalContacts,
                     searchMethod: 'selection',
-                    searchMethods: [{
-                      id: 'selection',
-                      text: sprintf(__('Selected %s contacts', 'groundhogg' ), formatNumber( totalContacts ) ),
-                      query: () => ({
-                        ...query
-                      })
-                    }],
+                    searchMethods: [
+                      {
+                        id: 'selection',
+                        text: sprintf(__('Selected %s contacts', 'groundhogg'), formatNumber(totalContacts)),
+                        query: () => ( {
+                          ...query,
+                        } ),
+                      },
+                    ],
                   }))
                 },
               })
@@ -776,7 +656,7 @@
                       const onComplete = () => {
                         dialog({
                           message: sprintf(__('%s contacts deleted', 'groundhogg'),
-                            `<b>${ formatNumber( totalDeleted ) }</b>`),
+                            `<b>${ formatNumber(totalDeleted) }</b>`),
                         })
 
                         window.location.href = adminPageURL('gh_contacts')
@@ -786,16 +666,16 @@
                         ...query,
                       }).then(({
                         items_deleted,
-                        items_remaining
+                        items_remaining,
                       }) => {
 
                         onDelete(items_deleted)
 
-                        if ( items_remaining <= 0 ) {
+                        if (items_remaining <= 0) {
                           onComplete()
                           return Promise.resolve({
                             items_deleted,
-                            items_remaining
+                            items_remaining,
                           })
                         }
 

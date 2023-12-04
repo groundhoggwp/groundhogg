@@ -524,4 +524,15 @@
     return none
   }
 
+  function utf8_to_b64 (str) {
+    return window.btoa(unescape(encodeURIComponent(str)))
+  }
+
+  const base64_json_encode = (stuff) => {
+    return utf8_to_b64(JSON.stringify(stuff))
+  }
+
+  gh.functions.utf8_to_b64 = utf8_to_b64
+  gh.functions.base64_json_encode = base64_json_encode
+
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
