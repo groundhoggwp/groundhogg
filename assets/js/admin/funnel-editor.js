@@ -559,9 +559,15 @@
 
     metaUpdates: {},
 
-    updateStepMeta (_meta) {
+    updateStepMeta (_meta, stepId = false ) {
 
-      let step = this.getActiveStep()
+      let step
+
+      if (  stepId ){
+        step = this.steps.find( s => s.ID == stepId)
+      } else {
+        step = this.getActiveStep()
+      }
 
       step.meta = {
         ...step.meta,
@@ -632,8 +638,8 @@
 
       const type = step.data.step_type;
 
-      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onDuplicate' ) ){
-        this.stepCallbacks[type].onActive( step )
+      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onActive' ) ){
+        this.stepCallbacks[type].onActive( { ...step, updateStep: meta => this.updateStepMeta(meta, step.ID ) } )
       }
 
       $(document).trigger('step-active')
