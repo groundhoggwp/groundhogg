@@ -1669,21 +1669,29 @@ class Form_v2 extends Step {
 
 		wp_enqueue_script( 'groundhogg-form-v2' );
 
-		$atts = [
+		$attrs = [
 			'method'  => 'post',
 			'class'   => 'gh-form gh-form-v2',
 			'target'  => '_parent',
 			'enctype' => 'multipart/form-data',
 			'name'    => $this->get_name(),
-			'id'      => $this->get_id(),
+			'id'      => "gh-form-{$this->get_id()}",
 			'data-id' => $this->get_id(),
 		];
 
-		if ( get_query_var( 'doing_iframe' ) ) {
-			$atts['action'] = $this->get_submission_url();
+		$theme        = $this->get_meta( 'theme' );
+		$accent_color = $this->get_meta( 'accent_color' );
+
+		if ( $theme && $theme !== 'default' ) {
+			$attrs['class'] .= ' ' . $theme;
+			$attrs['style'] = [ '--gh-accent-color' => $accent_color ];
 		}
 
-		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		if ( get_query_var( 'doing_iframe' ) ) {
+			$attrs['action'] = $this->get_submission_url();
+		}
+
+		$form .= sprintf( "<form %s>", array_to_atts( $attrs ) );
 
 		$form .= '<div class="gh-form-fields">';
 

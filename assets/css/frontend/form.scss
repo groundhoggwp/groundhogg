@@ -26,7 +26,250 @@ $action-green-10: rgba(158, 206, 56, 0.1);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
+:root {
+  --gh-accent-color: rgb(0, 117, 255);
+}
+
 .gh-form-wrapper {
+  form {
+
+    &.simple {
+      textarea,
+      select,
+      input[type='text'],
+      input[type='date'],
+      input[type='time'],
+      input[type='datetime-local'],
+      input[type='datetime'],
+      input[type='email'],
+      input[type='number'],
+      input[type='password'],
+      input[type='search'],
+      input[type='tel'],
+      input[type='url'] {
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+        border-radius: 0;
+        border-color: #0F181E;
+        border-style: solid;
+        border-width: 1px;
+        font-size: 14px;
+        padding: 15px;
+        box-shadow: none;
+
+        &:focus{
+          transition: 0.4s;
+          border-color: var( --gh-accent-color);
+        }
+
+        &[disabled]{
+          background-color: rgb( 230, 230, 230 );
+          opacity: 0.3;
+        }
+
+        &[readonly]{
+          background-color: rgb( 230, 230, 230 );
+        }
+      }
+
+      input[type='checkbox']{
+
+      }
+
+      input[type='radio']{
+
+      }
+
+      input[type='button'],
+      input[type='submit'],
+      button[type='submit']{
+        background-color: var(--gh-accent-color);
+        color: #fff;
+        border-radius: 0;
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 15px;
+        box-shadow: none;
+        transition: 0.4s;
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.9;
+          transition: 0.4s;
+        }
+      }
+    }
+
+    &.modern {
+      textarea,
+      select,
+      input[type='text'],
+      input[type='date'],
+      input[type='time'],
+      input[type='datetime-local'],
+      input[type='datetime'],
+      input[type='email'],
+      input[type='number'],
+      input[type='password'],
+      input[type='search'],
+      input[type='tel'],
+      input[type='url'] {
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+
+        border-radius: 5px;
+        border-color: var( --gh-accent-color );
+        border-style: solid;
+        border-width: 1px;
+
+        padding: 15px;
+
+        &:focus{
+
+          --gh-focus-shadow: color-mix(in srgb, var(--gh-accent-color) 20%, rgba( 255, 255, 255, 0.5 ) );
+
+          transition: 0.4s;
+          box-shadow:
+                  0 0 0 2px white,
+                  0 0 0 4px var(--gh-focus-shadow);
+        }
+
+        &[disabled]{
+          background-color: rgb( 230, 230, 230 );
+          opacity: 0.3;
+        }
+
+        &[readonly]{
+          background-color: rgb( 230, 230, 230 );
+        }
+      }
+
+      input[type='checkbox']{
+      }
+
+      input[type='radio']{
+
+      }
+
+      input[type='button'],
+      input[type='submit'],
+      button[type='submit']{
+        cursor: pointer;
+        padding: 15px;
+        background-color: var(--gh-accent-color);
+
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        //text-transform: uppercase;
+
+        border: none;
+        border-radius: 5px;
+
+        box-shadow: none;
+        transition: 0.4s;
+
+        &:hover {
+          opacity: 0.8;
+          transition: 0.4s;
+        }
+
+        &:focus{
+
+          --gh-focus-shadow: color-mix(in srgb, var(--gh-accent-color) 20%, rgba( 255, 255, 255, 0.5 ) );
+
+          transition: 0.4s;
+          box-shadow:
+                  0 0 0 2px white,
+                  0 0 0 4px var(--gh-focus-shadow);
+        }
+      }
+    }
+
+    &.classic {
+      textarea,
+      select,
+      input[type='text'],
+      input[type='date'],
+      input[type='time'],
+      input[type='datetime-local'],
+      input[type='datetime'],
+      input[type='email'],
+      input[type='number'],
+      input[type='password'],
+      input[type='search'],
+      input[type='tel'],
+      input[type='url'] {
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+
+        border-radius: 3px;
+        border-color: #0F181E;
+        border-style: solid;
+        border-width: 1px 1px 3px 1px;
+
+        padding: 15px;
+
+        &:focus{
+          transition: 0.4s;
+          border-color: var(--gh-accent-color);
+        }
+
+        &[disabled]{
+          background-color: rgb( 230, 230, 230 );
+          opacity: 0.3;
+        }
+
+        &[readonly]{
+          background-color: rgb( 230, 230, 230 );
+        }
+      }
+
+      input[type='checkbox']{
+      }
+
+      input[type='radio']{
+
+      }
+
+      input[type='button'],
+      input[type='submit'],
+      button[type='submit']{
+        cursor: pointer;
+        padding: 15px;
+        background-color: color-mix(in srgb, var(--gh-accent-color) 1%, rgba( 255, 255, 255, 0.1 ) );
+        //background-color: var(--gh-accent-color);
+
+        color: color-mix(in srgb, var(--gh-accent-color) 50%, black );
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        border-style: outset;
+        border-width: 1px 1px 3px 1px;
+        border-radius: 3px;
+        border-color: var(--gh-accent-color);
+
+        box-shadow: none;
+        transition: 0.4s;
+
+
+        &:hover {
+          opacity: 0.9;
+          transition: 0.4s;
+        }
+      }
+    }
+  }
 
   * {
     box-sizing: border-box;
@@ -132,7 +375,6 @@ $background-color: #F6F9FB;
     }
 
   }
-
 
   label {
     display: block;
