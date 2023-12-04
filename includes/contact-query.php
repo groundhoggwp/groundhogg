@@ -436,6 +436,11 @@ class Contact_Query {
 
 		$this->query_vars['offset'] = absint( $this->query_vars['offset'] );
 
+		if ( isset( $this->query_vars['ID'] ) ) {
+			$this->query_vars['include'] = wp_parse_id_list( $this->query_vars['ID'] );
+			unset( $this->query_vars['ID'] );
+		}
+
 
 		// Order by user meta
 		if ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'um.' ) && $this->query_vars['orderby'] !== 'um.meta_value' ) {
@@ -2324,7 +2329,7 @@ class Contact_Query {
 			'tags'     => []
 		] );
 
-		$tag_ids =  wp_parse_id_list( $filter_vars['tags'] );
+		$tag_ids = wp_parse_id_list( $filter_vars['tags'] );
 
 		switch ( $filter_vars['compare'] ) {
 			default:
@@ -2335,7 +2340,11 @@ class Contact_Query {
 						$tag_query = get_db( 'tag_relationships' )->get_sql( [
 							'select'  => 'contact_id',
 							'where'   => [
-								[ 'tag_id', count( $tag_ids ) > 1 ? 'IN' : '=', count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0] ]
+								[
+									'tag_id',
+									count( $tag_ids ) > 1 ? 'IN' : '=',
+									count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0]
+								]
 							],
 							'orderby' => false,
 							'order'   => false,
@@ -2382,7 +2391,11 @@ class Contact_Query {
 						$tag_query = get_db( 'tag_relationships' )->get_sql( [
 							'select'  => 'contact_id',
 							'where'   => [
-								[ 'tag_id', count( $tag_ids ) > 1 ? 'IN' : '=', count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0] ]
+								[
+									'tag_id',
+									count( $tag_ids ) > 1 ? 'IN' : '=',
+									count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0]
+								]
 							],
 							'orderby' => false,
 							'order'   => false,
