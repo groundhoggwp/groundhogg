@@ -189,7 +189,7 @@ class Files {
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/imports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count( file( $filepath, FILE_SKIP_EMPTY_LINES ) ) - 1,
+					'rows'      => count_csv_rows( $filepath ),
 				];
 
 				$data[] = $file;
