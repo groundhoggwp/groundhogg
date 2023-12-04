@@ -2272,7 +2272,7 @@
 
   registerFilter('saved_search', 'site', __('Saved Search'), {
     view: ({ compare = 'in', search }) => {
-      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold( SearchesStore.get(search)?.name ) )
+      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold(SearchesStore.get(search)?.name))
     },
     edit: ({ compare }) => {
       return [
@@ -2797,6 +2797,10 @@
         activity: '',
       },
     })
+
+  if ( ! Groundhogg.filters ){
+    Groundhogg.filters = {}
+  }
 
   Groundhogg.filters.functions = {
     createFilters,

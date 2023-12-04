@@ -53,8 +53,98 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_script( 'groundhogg-admin-fullframe' );
-		wp_enqueue_script( 'groundhogg-admin-email-log' );
+
+		switch ( $this->get_current_tab() ) {
+			case 'emails':
+
+				$error_codes = array_filter( get_db( 'email_log' )->get_unique_column_values( 'error_code' ) );
+				$error_codes = array_combine( $error_codes, $error_codes );
+
+				$this->enqueue_table_filters( [
+					'selectColumns' => [
+						'email_service' => [ 'Email service', \Groundhogg_Email_Services::dropdown() ],
+						'message_type'  => [
+							'Message Type',
+							[
+								\Groundhogg_Email_Services::MARKETING     => 'Marketing',
+								\Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+								\Groundhogg_Email_Services::WORDPRESS     => 'WordPress'
+							],
+						],
+						'status'        => [
+							'Status',
+							[
+								'sent'   => 'Sent',
+								'failed' => 'Failed'
+							]
+						],
+						'error_code'    => [ 'Error code', $error_codes ]
+					],
+					'stringColumns' => [
+						'from_address'  => 'From address',
+						'subject'       => 'Subject',
+						'content'       => 'Content',
+						'headers'       => 'Headers',
+						'error_message' => 'Error message',
+					],
+					'dateColumns'   => [
+						'date_sent' => 'Date sent'
+					]
+				] );
+
+				wp_enqueue_script( 'groundhogg-admin-email-log-filters' );
+				wp_enqueue_script( 'groundhogg-admin-email-log' );
+
+				break;
+			case 'events':
+
+				switch ( get_url_var( 'status' ) ) {
+					default:
+					case 'waiting':
+					case 'paused':
+					case 'pending':
+
+						$this->enqueue_table_filters( [
+							'futureDateColumns' => [
+								'time' => 'Will complete'
+							],
+						] );
+
+						break;
+					case 'complete':
+					case 'cancelled':
+						$this->enqueue_table_filters( [
+							'dateColumns' => [
+								'time' => 'Date completed'
+							]
+						] );
+
+						break;
+					case 'failed':
+					case 'skipped':
+
+						$error_codes = array_filter( get_db( 'events' )->get_unique_column_values( 'error_code' ) );
+						$error_codes = array_combine( $error_codes, $error_codes );
+
+						$this->enqueue_table_filters( [
+							'stringColumns' => [
+								'error_message' => 'Error message',
+							],
+							'dateColumns'   => [
+								'time' => 'Date attempted'
+							],
+							'selectColumns' => [
+								'error_code' => [ 'Error code', $error_codes ]
+							]
+						] );
+
+						break;
+				}
+
+				wp_enqueue_script( 'groundhogg-admin-event-filters' );
+
+				break;
+		}
 	}
 
 	public function get_slug() {
@@ -408,6 +498,10 @@ class Events_Page extends Tabbed_Admin_Page {
 		$events_table = new Events_Table();
 
 		$events_table->views();
+
+		$this->table_filters();
+
+		$this->filters_search_form();
 		?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
@@ -449,10 +543,9 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table = new Email_Log_Table();
 
-		if ( method_exists( $this, 'get_current_tab' ) ) {
-			?>
-            <div style="margin-top: 10px"></div><?php
-		}
+		$log_table->views();
+
+		$this->table_filters();
 
 		?>
         <form method="get" class="search-form">
@@ -460,21 +553,29 @@ class Events_Page extends Tabbed_Admin_Page {
             <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
 
+			<?php if ( ! get_url_var( 'include_filters' ) ):
+				echo html()->input( [
+					'type' => 'hidden',
+					'name' => 'include_filters'
+				] );
+			endif; ?>
+
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"
                        value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
 				<?php
 
 				echo html()->dropdown( [
-					'options'     => [
+					'options'           => [
 						'subject'    => __( 'Subject', 'groundhogg' ),
 						'content'    => __( 'Body', 'groundhogg' ),
 						'recipients' => __( 'Recipients', 'groundhogg' ),
 						'headers'    => __( 'Headers', 'groundhogg' )
 					],
-					'option_none' => 'Everywhere',
-					'name'        => 'search_columns',
-					'selected'    => get_request_var( 'search_columns' )
+					'option_none'       => __( 'Everywhere', 'groundhogg' ),
+					'option_none_value' => '',
+					'name'              => 'search_columns',
+					'selected'          => get_request_var( 'search_columns' )
 				] );
 
 				?>
@@ -482,9 +583,6 @@ class Events_Page extends Tabbed_Admin_Page {
                         class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
             </div>
         </form>
-		<?php
-		$log_table->views();
-		?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
 			<?php $log_table->prepare_items(); ?>

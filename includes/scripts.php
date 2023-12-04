@@ -239,6 +239,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-contact-search', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-search' . $dot_min . '.js', [
 			'groundhogg-admin-search-filters',
 			'groundhogg-admin-send-broadcast',
+			'groundhogg-admin-funnel-scheduler',
 			'groundhogg-admin-components'
 		], GROUNDHOGG_VERSION, true );
 
@@ -291,6 +292,16 @@ class Scripts {
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/send-broadcast' . $dot_min . '.js', [
+			'groundhogg-admin',
+			'groundhogg-admin-data',
+			'groundhogg-admin-element',
+			'groundhogg-admin-functions',
+			'groundhogg-admin-search-filters',
+			'moment',
+			'groundhogg-make-el'
+		] );
+
+		wp_register_script( 'groundhogg-admin-funnel-scheduler', GROUNDHOGG_ASSETS_URL . '/js/admin/funnel-scheduler' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
@@ -432,6 +443,22 @@ class Scripts {
 			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/filters/filters' . $dot_min . '.js', [
+			'jquery',
+			'groundhogg-admin',
+			'groundhogg-admin-data',
+			'groundhogg-admin-element',
+			'groundhogg-make-el'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-event-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/filters/events' . $dot_min . '.js', [
+			'groundhogg-admin-filters'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-email-log-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/filters/email-log' . $dot_min . '.js', [
+			'groundhogg-admin-filters'
+		], GROUNDHOGG_VERSION, true );
+
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
@@ -460,13 +487,14 @@ class Scripts {
 				'user_test_emails' => get_user_meta( get_current_user_id(), 'gh_test_emails', true ) ?: [],
 				'assets'           => [
 					'path'    => GROUNDHOGG_ASSETS_URL,
-					'images'    => GROUNDHOGG_ASSETS_URL . 'images/',
+					'images'  => GROUNDHOGG_ASSETS_URL . 'images/',
 					'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
 				],
 				'api'              => [
 					'routes' => [
 						'base'  => rest_url(),
 						'wp'    => [
+							'v2'         => rest_url( 'wp/v2' ),
 							'posts'      => rest_url( 'wp/v2/posts' ),
 							'categories' => rest_url( 'wp/v2/categories' ),
 							'tags'       => rest_url( 'wp/v2/tags' ),
@@ -498,7 +526,7 @@ class Scripts {
 							'page_visits' => rest_url( Base_Api::NAME_SPACE . '/page_visits' ),
 							'submissions' => rest_url( Base_Api::NAME_SPACE . '/submissions' ),
 							'tasks'       => rest_url( Base_Api::NAME_SPACE . '/tasks' ),
-							'email_log'       => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
+							'email_log'   => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
 						]
 					]
 				],

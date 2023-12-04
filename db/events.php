@@ -3,7 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Contact;
+use Groundhogg\Broadcast;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -144,6 +144,50 @@ class Events extends DB {
 		return $this->insert( $args );
 	}
 
+	protected function maybe_register_filters() {
+		parent::maybe_register_filters();
+
+		$this->query_filters->register_filter( 'funnel', function ( $filter, $where ) {
+			$filter = wp_parse_args( $filter, [
+				'funnel_id' => false,
+				'step_id'   => false,
+			] );
+
+			if ( $filter['funnel_id'] ){
+				$where->equals( 'funnel_id', absint( $filter['funnel_id'] ) );
+			}
+
+			if ( $filter['step_id'] ){
+				$where->equals( 'step_id', absint( $filter['step_id'] ) );
+			}
+
+			$where->equals( 'event_type', Event::FUNNEL );
+		} );
+
+		$this->query_filters->register_filter( 'broadcast', function ( $filter, $where ) {
+			$filter = wp_parse_args( $filter, [
+				'broadcast_id' => false,
+			] );
+
+			if ( $filter['broadcast_id'] ){
+				$where->equals( 'step_id', absint( $filter['broadcast_id'] ) );
+			}
+
+			$where->equals( 'event_type', Event::BROADCAST );
+			$where->equals( 'funnel_id', Broadcast::FUNNEL_ID );
+
+			var_dump( $filter );
+		} );
+
+		$this->query_filters->register_filter( 'contacts', function ( $filter, $where ) {
+			$filter = wp_parse_args( $filter, [
+				'contacts' => [],
+			] );
+
+			$where->in( 'contact_id', wp_parse_id_list( $filter['contacts'] ) );
+		} );
+	}
+
 	/**
 	 * Move events from this table to the event queue
 	 *
@@ -258,7 +302,7 @@ class Events extends DB {
 	 */
 	public function contact_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 
@@ -274,7 +318,7 @@ class Events extends DB {
 	 */
 	public function funnel_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 
@@ -290,7 +334,7 @@ class Events extends DB {
 	 */
 	public function step_deleted( $id ) {
 
-		if ( ! is_numeric( $id ) ){
+		if ( ! is_numeric( $id ) ) {
 			return false;
 		}
 

@@ -23,6 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 abstract class Meta_DB extends DB {
 
+
+	public function render_table_name() {
+		parent::render_table_name();
+		$this->alias = $this->get_object_type() . 'Meta';
+	}
+
 	/**
 	 * Always return Meta ID
 	 *

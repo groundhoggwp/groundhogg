@@ -210,6 +210,20 @@ class Email_Log extends DB {
 		];
 	}
 
+	protected function maybe_register_filters() {
+
+		parent::maybe_register_filters();
+
+		$this->query_filters->register_filter( 'recipients', function ( $filter, $where ){
+			global $wpdb;
+			$recipients = array_map( 'sanitize_email', $filter['recipients'] );
+			$subWhere = $where->subWhere();
+			foreach ( $recipients as $recipient ){
+				$subWhere->like( 'recipients', '%' . $wpdb->esc_like( $recipient ) . '%' );
+			}
+		} );
+	}
+
 	public function create_table() {
 
 		global $wpdb;

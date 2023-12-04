@@ -2,13 +2,15 @@
 
 namespace Groundhogg\Admin;
 
+use Groundhogg\Plugin;
+use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\base64_json_decode;
+use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\Pointers;
 
 /**
  * Abstract Admin Page
@@ -284,10 +286,10 @@ abstract class Admin_Page extends Supports_Errors {
 	 */
 	protected function current_action_is( $action ) {
 
-        // Support array
-        if ( is_array( $action ) ){
-            return in_array( $this->get_current_action(), $action );
-        }
+		// Support array
+		if ( is_array( $action ) ) {
+			return in_array( $this->get_current_action(), $action );
+		}
 
 		return $this->get_current_action() === $action;
 	}
@@ -366,7 +368,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 */
 	protected function wp_die_no_access() {
 
-        if ( wp_doing_ajax() ) {
+		if ( wp_doing_ajax() ) {
 			wp_send_json_error( __( "Invalid permissions.", 'groundhogg' ) );
 		}
 
@@ -382,7 +384,8 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function search_form( $title, $name = 's' ) {
 
 		if ( method_exists( $this, 'get_current_tab' ) ) {
-			?><div style="margin-top: 10px"></div><?php
+			?>
+            <div style="margin-top: 10px"></div><?php
 		}
 
 		?>
@@ -394,10 +397,51 @@ abstract class Admin_Page extends Supports_Errors {
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="<?php echo $name ?>"
                        value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
-                <button type="submit" id="search-submit" class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                <button type="submit" id="search-submit"
+                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
             </div>
         </form>
 		<?php
+	}
+
+	protected function filters_search_form() {
+		?>
+        <form method="get" class="search-form">
+			<?php html()->hidden_GET_inputs( true ); ?>
+			<?php if ( ! get_url_var( 'include_filters' ) ):
+				echo html()->input( [
+					'type' => 'hidden',
+					'name' => 'include_filters'
+				] );
+			endif; ?>
+            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <div style="float: right" class="gh-input-group">
+                <button type="submit" id="search-submit"
+                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+            </div>
+        </form>
+		<?php
+	}
+
+    protected function table_filters(){
+        ?>
+        <div class="wp-clearfix"></div>
+        <div id="table-filters"></div>
+        <?php
+    }
+
+	protected function enqueue_table_filters( $columns = [] ) {
+
+		wp_enqueue_style( 'groundhogg-admin-search-filters' );
+
+		wp_enqueue_script( 'groundhogg-admin-filters' );
+
+		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( [
+				'id'      => 'table-filters',
+				'name'    => $this->get_title(),
+				'filters' => base64_json_decode( get_url_var( 'include_filters', base64_json_encode( [] ) ) ),
+			], $columns ) ), 'before' );
+
 	}
 
 	/**
@@ -567,7 +611,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @param string $code
 	 * @param string $message
 	 * @param string $type
-	 * @param bool $cap
+	 * @param bool   $cap
 	 */
 	protected function add_notice( $code = '', $message = '', $type = 'success', $cap = false ) {
 		if ( ! $cap ) {
