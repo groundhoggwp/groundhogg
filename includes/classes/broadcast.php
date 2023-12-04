@@ -237,7 +237,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool|\WP_Error
 	 */
 	public function schedule() {
-		return Background_Tasks::add( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
+		return Background_Tasks::schedule_pending_broadcast( $this->get_id() );
 	}
 
 	/**
