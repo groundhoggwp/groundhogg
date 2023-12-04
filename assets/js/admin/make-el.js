@@ -769,6 +769,7 @@
     noneSelected = 'Any',
     isValidSelection = () => true,
     multiple = true,
+    clearable = true,
     ...attributes
   }) => {
 
@@ -902,7 +903,7 @@
         id: `item-${ id }-${ index }`,
       }, [
         Span({ className: 'gh-picker-item-text' }, text),
-        Span({
+        selected.length > 1 || clearable ? Span({
           id: `delete-${ id }-${ index }`,
           className: 'gh-picker-item-delete',
           tabindex: '0',
@@ -913,7 +914,7 @@
               focusSearch()
             }
           },
-        }, '&times;'),
+        }, '&times;') : null,
       ])
     }
 
