@@ -233,7 +233,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'total_engaged_contacts',
 				'total_unsubscribed_contacts',
 				'chart_contacts_by_optin_status',
-				'chart_contacts_by_region',
+//				'chart_contacts_by_region',
 				'chart_contacts_by_country',
 				'table_contacts_by_lead_source',
 				'table_contacts_by_search_engines',
