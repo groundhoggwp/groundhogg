@@ -58,6 +58,11 @@ class Block_Registry {
 			'html'  => [ $this, 'posts' ],
 			'plain' => [ $this, 'posts_plain' ],
 		] );
+
+		$this->register( 'shortcode', [
+			'html'  => [ $this, 'shortcode' ],
+			'plain' => [ $this, 'shortcode_plain' ],
+		] );
 	}
 
 	/**
@@ -241,9 +246,26 @@ class Block_Registry {
 	 * @return string
 	 */
 	public function posts_plain( $props ) {
+
 		return $this->posts( array_merge( $props, [
 			'layout' => 'plain'
 		] ) );
+	}
+
+	public function shortcode( $props ){
+		$props = wp_parse_args( $props, [
+			'shortcode' => ''
+		] );
+
+		return do_shortcode( $props['shortcode'] );
+	}
+
+	public function shortcode_plain( $props ){
+		$props = wp_parse_args( $props, [
+			'shortcode' => ''
+		] );
+
+		return html2markdown( do_shortcode( $props['shortcode'] ) );
 	}
 
 	/**
