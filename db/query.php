@@ -84,6 +84,11 @@ class Where {
 	 * @return $this
 	 */
 	public function addClause( $clause ) {
+
+		if ( empty( $clause ) ){
+			return $this;
+		}
+
 		$this->clauses[] = $clause;
 
 		return $this;
@@ -154,14 +159,18 @@ class Where {
 	 */
 	public function compare( $column, $value, $compare = '=' ) {
 
-		switch ( $compare ) {
+		switch ( strtoupper( $compare ) ) {
 			case 'IN':
-			case 'in':
 				$this->in( $column, $value );
 				break;
+			case 'NOT IN':
+				$this->notIn( $column, $value );
+				break;
 			case 'LIKE':
-			case 'like':
 				$this->like( $column, $value );
+				break;
+			case 'NOT LIKE':
+				$this->notLike( $column, $value );
 				break;
 		}
 
@@ -380,6 +389,14 @@ class Where {
 		return $this;
 	}
 
+	public function notEmpty( $column ){
+		return $this->compare( $column, '', '!=' );
+	}
+
+	public function empty( $column ){
+		return $this->compare( $column, '' );
+	}
+
 	/**
 	 * Adds a sub where clause, in brackets
 	 *
@@ -409,7 +426,7 @@ class Query {
 	protected $table_name = '';
 	protected $alias = '';
 	protected $select = '*';
-	protected $limit = 20;
+	protected $limits = [];
 	protected $offset = 0;
 	protected $order = 'DESC';
 	protected $orderby = '';
@@ -445,12 +462,16 @@ class Query {
 		return $this->$name;
 	}
 
-	public function setLimit( $limit ) {
-		$this->limit = absint( $limit );
+	public function setLimit( ...$limits ) {
+		$this->limits = wp_parse_id_list( $limits );
 	}
 
 	public function setOffset( $offset ) {
 		$this->offset = absint( $offset );
+	}
+
+	public function setGroupby( $groupby ) {
+		$this->groupby = $groupby;
 	}
 
 	public function setOrderby( $orderby ) {
@@ -507,7 +528,9 @@ class Query {
 	}
 
 	protected function _limit() {
-		return $this->limit ? "LIMIT $this->limit" : '';
+		$limits = implode( ', ', $this->limits );
+
+		return ! empty( $this->limits ) ? "LIMIT $limits" : '';
 	}
 
 	protected function _offset() {
@@ -519,7 +542,7 @@ class Query {
 	}
 
 	protected function _groupby() {
-		return $this->groupby ? "GROUPBY $this->groupby" : '';
+		return $this->groupby ? "GROUP BY $this->groupby" : '';
 	}
 
 
@@ -635,7 +658,7 @@ class Query {
 
 		$query = [
 			'DELETE FROM',
-			$this->table_name,
+			$this->_table_name(),
 			$this->_joins(),
 			$this->_where(),
 			$this->_orderby(),
@@ -683,7 +706,7 @@ class Query {
 
 		$query = [
 			'UPDATE',
-			$this->table_name,
+			$this->_table_name(),
 			$this->_joins(),
 			'SET',
 			$fields,
@@ -715,7 +738,7 @@ class Query {
 				$this->joins,
 				$this->alias,
 				$this->_where(),
-				$this->limit,
+				$this->limits,
 				$this->offset,
 				$this->order,
 				$this->orderby,
@@ -761,9 +784,9 @@ class Query {
 	 * @return false|mixed|string|null
 	 */
 	public function count() {
-		$this->select = "COUNT(*)";
+		$this->select = "COUNT($this->select)";
 
-		return $this->get_var();
+		return absint( $this->get_var() );
 	}
 
 	/**
@@ -787,11 +810,11 @@ class Query {
 			$this->_where(),
 		];
 
-		$items = $this->db->get_var( implode( ' ', $query ) );
+		$result = $this->db->get_var( implode( ' ', $query ) );
 
-		$this->table->cache_set( $cache_key, $items );
+		$this->table->cache_set( $cache_key, $result );
 
-		return $items;
+		return $result;
 
 	}
 
