@@ -180,11 +180,22 @@ class Events extends DB {
 		} );
 
 		$this->query_filters->register_filter( 'contacts', function ( $filter, $where ) {
+
 			$filter = wp_parse_args( $filter, [
 				'contacts' => [],
 			] );
 
-			$where->in( 'contact_id', wp_parse_id_list( $filter['contacts'] ) );
+			$ids = wp_parse_id_list( $filter['contacts'] );
+
+			if ( empty( $ids ) ){
+				return;
+			}
+
+			if ( count( $ids ) === 1 ){
+				$where->equals( 'contact_id', $ids[0] );
+			}
+
+			$where->in( 'contact_id', $ids );
 		} );
 	}
 
