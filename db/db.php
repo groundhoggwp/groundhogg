@@ -1239,12 +1239,29 @@ abstract class DB {
 				continue;
 			}
 
-			switch ( $key ) {
+			switch ( strtolower( $key ) ) {
 				case 'select':
 					if ( is_array( $val ) ){
 						$query->select( ...$val );
 					} else {
 						$query->select( $val );
+					}
+					break;
+				case 'func':
+					$func      = strtoupper( $val );
+
+					if ( $func === 'COUNT' ){
+						$operation = 'COUNT';
+						break;
+					}
+
+					$operation = 'VAR';
+					$select    = "{$func}({$query_vars['select']})";
+					$query->select( $select );
+					break;
+				case 'distinct':
+					if ( $query_vars['select'] !== '*' ){
+						$query->select( "DISTINCT {$query_vars['select']}" );
 					}
 					break;
 				case 'where':
@@ -1272,22 +1289,26 @@ abstract class DB {
 					$query->where()->greaterThanEqualTo( $this->get_date_key(), $val );
 					break;
 				case 'related' :
-					$relationships = get_db( 'object_relationships' );
-					$where[]       = [
-						'col'     => $this->get_primary_key(),
-						'compare' => 'IN',
-						'val'     => $wpdb->prepare( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s' AND primary_object_type = '%s'", $val['ID'], $val['type'], $this->get_object_type() )
-					];
+
+					$alias = $query->leftJoin( get_db('object_relationships' ), 'primary_object_id' );
+
+					$query->where( "$alias.secondary_object_id", $val['ID'] );
+					$query->where( "$alias.secondary_object_type", $val['type'] );
+					$query->where( "$alias.primary_object_type", $this->get_object_type() );
+
 					break;
 				case 'count':
 					$operation = 'COUNT';
 					break;
 				case 'limit':
-				case 'LIMIT':
-					$query->setLimit( $val );
+
+					if ( is_array( $val ) ){
+						$query->setLimit( ...$val );
+					} else {
+						$query->setLimit( $val );
+					}
+
 					break;
-				case 'ORDER_BY':
-				case 'ORDERBY':
 				case 'orderby':
 				case 'order_by':
 					$query->setOrderby( $val );
@@ -1296,11 +1317,12 @@ abstract class DB {
 				case 'ORDER':
 					$query->setOrder( $val );
 					break;
-				case 'func':
-					$func      = strtoupper( $val );
-					$operation = 'VAR';
-					$select    = "{$func}({$query_vars['select']})";
-					$query->select( $select );
+				case 'offset':
+					$query->setOffset( $val );
+					break;
+				case 'groupby':
+				case 'group_by':
+					$query->setGroupby( $val );
 					break;
 				case 'include_filters':
 
@@ -1336,43 +1358,47 @@ abstract class DB {
 
 					break;
 				default:
-					if ( in_array( $key, $this->get_allowed_columns() ) ) {
 
-						if ( is_array( $val ) ) {
+					if ( ! in_array( $key, $this->get_allowed_columns() ) ) {
+						break;
+					}
 
-							// Compare and val defined explicitly
-							if ( array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
-								$query->where( $key, $val['val'], $val['compare'] );
-								break;
-							}
+					if ( is_array( $val ) ) {
 
-							// Compare is provided as first item in array of 2
-							if ( count( $val ) === 2 && in_array( $val[0], $this->get_allowed_comparisons() ) ) {
-								$query->where( $key, $val[1], $val[2] );
-								break;
-							}
-						}
-
-						// Select Clause
-						if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
-							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
-							$query->whereIn( $key, $val );
+						// Compare and val defined explicitly
+						if ( array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
+							$query->where( $key, $val['val'], $val['compare'] );
 							break;
 						}
 
-						if ( is_array( $val ) ) {
-							$query->whereIn( $key, $val );
-						} else {
-							$query->where( $key, $val );
+						// Compare is provided as first item in array of 2
+						if ( count( $val ) === 2 && in_array( $val[0], $this->get_allowed_comparisons() ) ) {
+							$query->where( $key, $val[1], $val[0] );
+							break;
 						}
-
-						// Basic column clause
-						$where[] = [ 'col' => $key, 'val' => $val, 'compare' => is_array( $val ) ? 'IN' : '=' ];
-
-					} else {
-						// Pass along
-						$query_vars[ $key ] = $val;
 					}
+
+					// Select Clause
+					if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
+						$query->whereIn( $key, $val );
+						break;
+					}
+
+					if ( is_array( $val ) ) {
+						$query->whereIn( $key, $val );
+						break;
+					}
+
+					switch ( $val ){
+						case 'NOT_EMPTY':
+							$query->where()->notEmpty( $key );
+							break 2;
+						case 'EMPTY':
+							$query->where()->empty( $key );
+							break 2;
+					}
+
+					$query->where( $key, $val );
 
 					break;
 			}
@@ -1425,11 +1451,14 @@ abstract class DB {
 			case 'UPDATE':
 
 				$results = $query->update( $query_vars['data'] );
-
 				break;
 			case 'DELETE':
 
 				$results = $query->delete();
+				break;
+			case 'VAR':
+
+				$results = $query->get_var();
 				break;
 		}
 
