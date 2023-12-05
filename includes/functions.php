@@ -2798,11 +2798,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$files = [];
 	$copy  = [];
 
-	// flags
-	$gdpr_consent      = false;
-	$marketing_consent = false;
-	$terms_agreement   = false;
-
 	foreach ( $fields as $column => $value ) {
 
 		// ignore if we are not mapping it.
@@ -3066,9 +3061,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			return false;
 		}
 
-		$contact = new Contact();
-
-		$contact->create( $args );
+		$contact = new Contact( [ 'email' => $args['email'] ] );
 
 	} else {
 
@@ -3089,17 +3082,14 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			$contact = get_contactdata();
 		}
 
-		if ( ! is_a_contact( $contact ) ) {
-			return false;
-		}
-
-		// Update contact info
-		$contact->update( $args );
 	}
 
-	if ( ! $contact->exists() ) {
+	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 		return false;
 	}
+
+	// Update contact info
+	$contact->update( $args );
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
