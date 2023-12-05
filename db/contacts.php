@@ -222,6 +222,7 @@ class Contacts extends DB {
 
 				unset( $data[ 'email' ] );
 				unset( $data[ 'id' ] );
+				unset( $data[ 'date_created' ] );
 
 				$pairs = [];
 
