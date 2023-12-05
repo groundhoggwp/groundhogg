@@ -1948,28 +1948,30 @@ class Replacements implements \JsonSerializable {
 		$props = $this->parse_atts( $args );
 
 		$props = wp_parse_args( $props, [
-			'id'             => '',
-			'number'         => 5,
-			'offset'         => 0,
-			'layout'         => 'ul',
-			'featured'       => false,
-			'excerpt'        => false,
-			'thumbnail'      => true,
-			'thumbnail_size' => 'thumbnail',
-			'post_type'      => 'post',
-			'category'       => '',
-			'tag'            => '',
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'meta_key'       => '',
-			'meta_value'     => '',
-			'within'         => '',
-			'columns'        => 2,
-			'gap'            => 20,
-			'headingStyle'   => [],
-			'excerptStyle'   => [],
-			'include'        => [],
-			'exclude'        => [],
+			'id'                 => '',
+			'number'             => 5,
+			'offset'             => 0,
+			'layout'             => 'ul',
+			'featured'           => false,
+			'excerpt'            => false,
+			'thumbnail'          => true,
+			'thumbnail_size'     => 'thumbnail',
+			'thumbnail_position' => 'above',
+			'post_type'          => 'post',
+			'category'           => '',
+			'tag'                => '',
+			'orderby'            => 'date',
+			'order'              => 'DESC',
+			'meta_key'           => '',
+			'meta_value'         => '',
+			'within'             => '',
+			'columns'            => 2,
+			'gap'                => 20,
+			'include'            => [],
+			'exclude'            => [],
+			'cardStyle'          => [],
+			'headingStyle'       => [],
+			'excerptStyle'       => [],
 		] );
 
 		$query_vars = [
@@ -2059,7 +2061,10 @@ class Replacements implements \JsonSerializable {
 				$content = html()->e( $props['layout'] ?? 'ul', [], array_map( function ( $post ) use ( $props ) {
 					return html()->e( 'li', [
 						'style' => $props['headingStyle']
-					], html()->e( 'a', [ 'href' => get_permalink( $post ) ], get_the_title( $post ) ) );
+					], html()->e( 'a', [
+						'href'  => get_permalink( $post ),
+						'style' => [ 'color' => 'inherit' ]
+					], get_the_title( $post ) ) );
 				}, $posts ) );
 
 				break;
@@ -2070,7 +2075,7 @@ class Replacements implements \JsonSerializable {
 
 				$rows = [];
 
-				$columnTable = sprintf( '<table class="email-columns %s responsive" role="presentation" width="100%%" style="border-collapse: collapse;width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
+				$columnTable = sprintf( '<table class="email-columns %s responsive" role="presentation" width="100%%" style="width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
 				$columnGap   = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], str_repeat( '&nbsp;', 3 ) );
 
 				$thumbnail = function ( $thumbnail_size ) {
@@ -2091,6 +2096,19 @@ class Replacements implements \JsonSerializable {
 
 				$render_post = function ( $thumbnail_size = 'thumbnail', $width = false ) use ( $props, $thumbnail ) {
 
+					$card_style = wp_parse_args( $props['cardStyle'], [
+						'borderStyle'     => 'none',
+						'backgroundColor' => '#FFF',
+						'padding'         => [ 'top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20 ]
+					] );
+
+//                    var_dump( $props );
+
+					extract( $card_style['padding'] );
+					unset( $card_style['padding'] );
+
+					$content_padding = implode( 'px ', [ $top, $right, $bottom, $left ] ) . 'px';
+
 					if ( ! $width ) {
 						$width = percentage( $props['columns'], 1 ) . '%';
 					}
@@ -2102,16 +2120,16 @@ class Replacements implements \JsonSerializable {
 							has_post_thumbnail() ? 'has-thumbnail' : ''
 						],
 						'width' => $width,
-						'style' => [
-							'width'            => $width,
-							'background-color' => '#FFFFFF',
-							'vertical-align'   => 'top',
-						]
+						'style' => array_merge( [
+							'width'          => $width,
+//							'background-color' => '#FFFFFF',
+							'vertical-align' => 'top',
+						], $card_style )
 					], [
 						has_post_thumbnail() && $props['thumbnail'] ? html()->e( 'div', [
 							'class' => 'featured-image-wrap'
 						], html()->e( 'a', [
-							'href' => get_the_permalink()
+							'href' => get_the_permalink(),
 						], $thumbnail( $thumbnail_size ) ) ) : '',
 						html()->e( 'table', [
 							'class'       => 'card-content',
@@ -2120,7 +2138,7 @@ class Replacements implements \JsonSerializable {
 						], [
 							html()->e( 'tr', [], html()->e( 'td', [
 								'style' => [
-									'padding' => $props['layout'] === 'cards' ? '20px' : '20px 0'
+									'padding' => $props['layout'] === 'cards' ? $content_padding : '20px 0'
 								]
 							], [
 								html()->e( 'h2', [
@@ -2129,7 +2147,7 @@ class Replacements implements \JsonSerializable {
 									], $props['headingStyle'] )
 								], html()->e( 'a', [
 									'href'  => get_the_permalink(),
-									'style' => $props['headingStyle']
+									'style' => [ 'color' => 'inherit' ]
 								], get_the_title() ) ),
 								$props['excerpt'] ? html()->e( 'p', [
 									'class' => 'post-excerpt',
@@ -2215,35 +2233,87 @@ class Replacements implements \JsonSerializable {
 			case 'h4':
 			case 'h5':
 
-				$tag  = $props['layout'];
-				$html = [];
+				$tag = $props['layout'];
 
-				while ( $query->have_posts() ) {
-					$query->the_post();
+				$columnGap = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], '&nbsp;' );
 
-					if ( $props['thumbnail'] && has_post_thumbnail() ) {
-						$html[] = html()->e( 'a', [
-							'href' => get_the_permalink()
-						], get_the_post_thumbnail( null, $props['thumbnail_size'] ) );
-					}
+				ob_start();
 
-					$html[] = html()->e( $tag, [
-						'style' => $props['headingStyle']
-					], html()->e( 'a', [ 'href' => get_the_permalink() ], get_the_title() ) );
+				?>
+                <table class="email-columns posts-table responsive" width="100%" style="width:100%">
+					<?php while ( $query->have_posts() ):
+						$query->the_post();
 
-					if ( $props['excerpt'] ) {
-						$html[] = html()->e( 'p', [
+						$heading = html()->e( $tag, [
+							'style' => $props['headingStyle']
+						], html()->e( 'a', [
+							'href'  => get_the_permalink(),
+							'style' => [ 'color' => 'inherit' ],
+						], get_the_title() ) );
+
+						$excerpt = $props['excerpt'] ? html()->e( 'p', [
 							'class' => 'post-excerpt',
 							'style' => $props['excerptStyle']
-						], get_the_excerpt() );
-					}
+						], get_the_excerpt() ) : '';
 
-					if ( $props['gap'] ) {
-						$html[] = html()->e( 'div', [ 'style' => [ 'height' => absint( $props['gap'] ) . 'px' ] ], '', false );
-					}
-				}
+						$thumbnail_size    = $props['thumbnail_size'];
+						$post_thumbnail_id = get_post_thumbnail_id();
+						$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
 
-				$content = implode( '', $html );
+						$thumbnail = html()->e( 'img', [
+							'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
+							'alt'   => $alt,
+							'class' => 'post-thumbnail ' . $thumbnail_size . ' ',
+							'style' => [
+								'vertical-align' => 'bottom'
+							]
+						] );
+
+						?>
+                        <tr class="email-columns-row">
+                            <td class="post email-columns-cell post">
+                                <table class="email-columns responsive post-table" width="100%" style="width:100%">
+                                    <tr class="email-columns-row">
+										<?php if ( $props['thumbnail'] && $props['thumbnail_position'] === 'left' ): ?>
+                                            <td class="email-columns-cell one-half thumbnail" width="45%"
+                                                style="width: 45%">
+												<?php echo $thumbnail ?>
+                                            </td>
+											<?php echo $columnGap ?>
+										<?php endif; ?>
+                                        <td class="email-columns-cell post-details">
+											<?php if ( $props['thumbnail'] && $props['thumbnail_position'] === 'above' ):
+												echo $thumbnail;
+											endif;
+
+											echo $heading;
+
+											if ( $props['thumbnail'] && $props['thumbnail_position'] === 'below' ):
+												echo $thumbnail;
+											endif;
+
+											echo $excerpt
+											?>
+                                        </td>
+										<?php if ( $props['thumbnail'] && $props['thumbnail_position'] === 'right' ): ?>
+											<?php echo $columnGap ?>
+                                            <td class="email-columns-cell one-half thumbnail" width="45%"
+                                                style="width: 45%">
+												<?php echo $thumbnail ?>
+                                            </td>
+										<?php endif; ?>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr class="email-columns-row">
+							<?php echo $columnGap ?>
+                        </tr>
+					<?php endwhile; ?>
+                </table>
+				<?php
+
+				$content = ob_get_clean();
 
 				$query->reset_postdata();
 
