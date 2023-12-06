@@ -397,7 +397,7 @@
 }
 
 #controls-panel {
-  width: 300px;
+  width: 320px;
   overflow-y: auto;
   flex-shrink: 0;
   background: #fff;

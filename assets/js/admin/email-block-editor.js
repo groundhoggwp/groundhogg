@@ -7515,7 +7515,7 @@
 
       if (getState().hasChanges) {
         e.preventDefault()
-        let msg = __('You have unsaved changes, are you sure you want to leave?')
+        let msg = __('You have unsaved changes, are you sure you want to leave?', 'groundhogg')
         e.returnValue = msg
         return msg
       }

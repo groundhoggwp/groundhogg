@@ -688,4 +688,16 @@
     funnel.init()
   })
 
+  window.addEventListener('beforeunload', e => {
+
+    if ( Object.keys(Funnel.metaUpdates).length ) {
+      e.preventDefault()
+      let msg = __('You have unsaved changes, are you sure you want to leave?', 'groundhogg')
+      e.returnValue = msg
+      return msg
+    }
+
+    return null
+  })
+
 } )(jQuery, Funnel)
