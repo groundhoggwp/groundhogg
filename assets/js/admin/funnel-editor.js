@@ -1,4 +1,4 @@
-(function ($, funnel) {
+( function ($, funnel) {
 
   const { patch, routes, ajax } = Groundhogg.api
 
@@ -19,13 +19,16 @@
     dialog,
     dangerConfirmationModal,
     adminPageURL,
-    loadingModal
+    loadingModal,
+    modal,
   } = Groundhogg.element
 
   const { sprintf, __, _x, _n } = wp.i18n
 
   const funnelId = parseInt(Funnel.id)
   FunnelsStore.fetchItem(funnelId)
+
+  const getFunnel = () => FunnelsStore.get(funnelId)
 
   $.extend(funnel, {
 
@@ -43,14 +46,12 @@
 
     stepCallbacks: {},
 
-
-
     /**
      * Register various step callbacks
      *
      * @param type
      */
-    registerStepCallbacks ( type, callbacks ) {
+    registerStepCallbacks (type, callbacks) {
       this.stepCallbacks[type] = callbacks
     },
 
@@ -98,7 +99,7 @@
         let group = e.currentTarget.dataset.group
 
         $(`.steps-grid`).addClass('hidden')
-        $(`#${group}`).removeClass('hidden')
+        $(`#${ group }`).removeClass('hidden')
 
         $('#step-toggle button').removeClass('active')
         $(e.currentTarget).addClass('active')
@@ -162,6 +163,9 @@
           dangerConfirmationModal({
             alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p><p>Any pending events will be paused. They will be resumed immediately when the funnel is reactivated.</p>`,
             confirmText: __('Deactivate'),
+            onConfirm: () => {
+              setTimeout(() => this.save(), 100)
+            },
             onCancel: () => {
               $('#status-toggle').prop('checked', true)
             },
@@ -204,8 +208,8 @@
       }
 
       let email_ids = this.steps.filter(step => step.data.step_type === 'send_email').
-      map(step => parseInt(step.meta.email_id)).
-      filter(id => Boolean(id))
+        map(step => parseInt(step.meta.email_id)).
+        filter(id => Boolean(id))
       if (email_ids.length) {
         Groundhogg.stores.emails.maybeFetchItems(email_ids)
       }
@@ -235,6 +239,21 @@
                 }), '_blank')
               },
             },
+            {
+              key: 'contacts', text: 'Add Contacts', onSelect: e => {
+                modal({
+                  //language=HTML
+                  content: `<h2>${ __('Add contacts to this funnel', 'groundhogg') }</h2>
+                  <div id="gh-add-to-funnel" style="width: 500px"></div>`,
+                  onOpen: () => {
+                    document.getElementById('gh-add-to-funnel').append(Groundhogg.FunnelScheduler({
+                      funnel: getFunnel(),
+                      funnelStep: getFunnel().steps[0],
+                    }))
+                  },
+                })
+              },
+            },
           ])
         },
       }, icons.verticalDots))
@@ -260,7 +279,7 @@
           let { description = '' } = funnel.meta
           let { campaigns = [] } = funnel
 
-          let campaignIds = campaigns.map( c => c.ID )
+          let campaignIds = campaigns.map(c => c.ID)
 
           return Div({}, [
             `<h2>Funnel Settings</h2>`,
@@ -268,7 +287,7 @@
             ItemPicker({
               id: 'pick-campaigns',
               noneSelected: 'Add a campaign...',
-              selected: campaigns.map(({ ID, data }) => ({ id: ID, text: data.name })),
+              selected: campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } )),
               tags: true,
               fetchOptions: async (search) => {
                 let campaigns = await CampaignsStore.fetchItems({
@@ -276,7 +295,7 @@
                   limit: 20,
                 })
 
-                return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+                return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
               },
               createOption: async value => {
                 let campaign = await CampaignsStore.create({
@@ -287,7 +306,7 @@
 
                 return { id: campaign.ID, text: campaign.data.name }
               },
-              onChange: items => campaignIds = items.map( item => item.id ),
+              onChange: items => campaignIds = items.map(item => item.id),
             }),
             `<p>Add a simple funnel description.</p>`,
             Textarea({
@@ -315,7 +334,7 @@
                 })
 
                 dialog({
-                  message: 'Changes saved!'
+                  message: 'Changes saved!',
                 })
               },
             }, 'Save')),
@@ -350,14 +369,22 @@
       // Update the JS meta changes first
       if (Object.keys(this.metaUpdates).length) {
 
-        let changes = Object.keys(this.metaUpdates).map(ID => ({
+        let changes = Object.keys(this.metaUpdates).map(ID => ( {
           ID,
           meta: {
             ...this.metaUpdates[ID],
           },
-        }))
+        } ))
 
-        let response = await patch(routes.v4.steps, changes)
+        try {
+          let response = await patch(routes.v4.steps, changes)
+        } catch (e) {
+          dialog({
+            message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
+            type: 'error',
+          })
+          throw e
+        }
         // reset
         this.metaUpdates = {}
       }
@@ -379,8 +406,14 @@
         self.makeActive(self.currentlyActive)
 
         dialog({
-          message: __( 'Funnel saved!', 'groundhogg' )
+          message: __('Funnel saved!', 'groundhogg'),
         })
+      }, err => {
+        dialog({
+          message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
+          type: 'error',
+        })
+        throw err
       })
     },
 
@@ -404,9 +437,9 @@
           let id = uuid()
           // language=HTML
           ui.helper.replaceWith(`
-			  <div class="step step-placeholder ${data.step_group}" id="${id}">
-				  Loading...
-			  </div>`)
+              <div class="step step-placeholder ${ data.step_group }" id="${ id }">
+                  Loading...
+              </div>`)
 
           var self = this
           var $steps = self.getSteps()
@@ -418,13 +451,14 @@
             this.steps.push(response.data.json)
 
             if (self.insertAfterStep) {
-              $(`#${self.insertAfterStep}`).after(response.data.sortable)
-            } else {
+              $(`#${ self.insertAfterStep }`).after(response.data.sortable)
+            }
+            else {
               $steps.prepend(response.data.sortable)
             }
 
             $settings.append(response.data.settings)
-            $(`#${id}`).remove()
+            $(`#${ id }`).remove()
 
             hideSpinner()
             $(document).trigger('new-step')
@@ -492,22 +526,23 @@
      */
     async duplicateStep (id) {
 
-      const step = this.steps.find( s => s.ID == id )
+      const step = this.steps.find(s => s.ID == id)
 
-      if ( ! step ){
+      if (!step) {
         return
       }
 
       this.insertAfterStep = id
 
-      const type = step.data.step_type;
+      const type = step.data.step_type
 
       let extra = {}
 
-      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onDuplicate' ) ){
+      if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onDuplicate')) {
         try {
-          extra = await new Promise((res,rej) => this.stepCallbacks[type].onDuplicate( step, res, rej ) )
-        } catch (e) {
+          extra = await new Promise((res, rej) => this.stepCallbacks[type].onDuplicate(step, res, rej))
+        }
+        catch (e) {
           throw e
         }
       }
@@ -519,7 +554,7 @@
         ...extra,
       }
 
-      const {close} = loadingModal()
+      const { close } = loadingModal()
 
       await this.getStepHtml(data)
 
@@ -541,8 +576,9 @@
       this.steps.push(response.data.json)
 
       if (self.insertAfterStep) {
-        $(`#${self.insertAfterStep}`).after(response.data.sortable)
-      } else {
+        $(`#${ self.insertAfterStep }`).after(response.data.sortable)
+      }
+      else {
         $steps.append(response.data.sortable)
       }
 
@@ -559,13 +595,14 @@
 
     metaUpdates: {},
 
-    updateStepMeta (_meta, stepId = false ) {
+    updateStepMeta (_meta, stepId = false) {
 
       let step
 
-      if (  stepId ){
-        step = this.steps.find( s => s.ID == stepId)
-      } else {
+      if (stepId) {
+        step = this.steps.find(s => s.ID == stepId)
+      }
+      else {
         step = this.getActiveStep()
       }
 
@@ -632,14 +669,14 @@
 
       const step = this.getActiveStep()
 
-      if ( ! step ){
+      if (!step) {
         return
       }
 
-      const type = step.data.step_type;
+      const type = step.data.step_type
 
-      if ( this.stepCallbacks.hasOwnProperty( type ) && this.stepCallbacks[type].hasOwnProperty( 'onActive' ) ){
-        this.stepCallbacks[type].onActive( { ...step, updateStep: meta => this.updateStepMeta(meta, step.ID ) } )
+      if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onActive')) {
+        this.stepCallbacks[type].onActive({ ...step, updateStep: meta => this.updateStepMeta(meta, step.ID) })
       }
 
       $(document).trigger('step-active')
@@ -651,4 +688,4 @@
     funnel.init()
   })
 
-})(jQuery, Funnel)
+} )(jQuery, Funnel)
