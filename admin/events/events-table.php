@@ -488,7 +488,8 @@ class Events_Table extends WP_List_Table {
 		$this->table = in_array( $this->get_view(), [
 			Event::PAUSED,
 			Event::WAITING,
-			'unprocessed'
+			Event::IN_PROGRESS,
+			'unprocessed',
 		] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
