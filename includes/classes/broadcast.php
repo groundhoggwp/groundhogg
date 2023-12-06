@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Elementor\Core\Base\Background_Task_Manager;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
@@ -241,6 +242,34 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Cancel the broadcast
+	 *
+	 * @noinspection PhpPossiblePolymorphicInvocationInspection
+	 */
+	public function cancel() {
+
+		get_db( 'event_queue' )->mass_update(
+			[
+				'status' => Event::CANCELLED
+			],
+			[
+				'step_id'    => $this->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
+				'event_type' => Event::BROADCAST
+			]
+		);
+
+		get_db( 'event_queue' )->move_events_to_history( [
+			'status' => Event::CANCELLED,
+		] );
+
+		$this->update( [ 'status' => 'cancelled' ] );
+
+		// Also cancel the cron job
+		Background_Tasks::remove( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
+	}
+
+	/**
 	 * Schedules a batch of events!
 	 *
 	 * @return false|float false if failed, a number of percentage complete
@@ -335,30 +364,6 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		return $items;
 
-	}
-
-	/**
-	 * Cancel the broadcast
-	 *
-	 * @noinspection PhpPossiblePolymorphicInvocationInspection
-	 */
-	public function cancel() {
-		get_db( 'event_queue' )->mass_update(
-			[
-				'status' => Event::CANCELLED
-			],
-			[
-				'step_id'    => $this->get_id(),
-				'funnel_id'  => Broadcast::FUNNEL_ID,
-				'event_type' => Event::BROADCAST
-			]
-		);
-
-		get_db( 'event_queue' )->move_events_to_history( [
-			'status' => Event::CANCELLED,
-		] );
-
-		$this->update( [ 'status' => 'cancelled' ] );
 	}
 
 	/**
