@@ -1438,7 +1438,7 @@ abstract class DB {
 			}
 		}
 
-		switch ( $operation ) {
+		switch ( strtoupper( $operation ) ) {
 			default:
 			case 'SELECT':
 
