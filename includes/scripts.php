@@ -339,7 +339,8 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-form-builder-v2',
-			'groundhogg-email-block-editor'
+			'groundhogg-email-block-editor',
+			'groundhogg-admin-funnel-scheduler',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-funnel-steps', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps' . $dot_min . '.js', [
