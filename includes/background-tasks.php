@@ -31,10 +31,19 @@ class Background_Tasks {
 		return wp_schedule_single_event( $when, $hook, $args );
 	}
 
-	public static function remove( $hook ) {
-		return wp_clear_scheduled_hook( $hook );
+	public static function remove( $hook, $args = [] ) {
+		return wp_clear_scheduled_hook( $hook, $args );
 	}
 
+	/**
+	 * Wrapper function to add contacts to a funnel
+	 *
+	 * @param $step_id
+	 * @param $query
+	 * @param $batch
+	 *
+	 * @return void
+	 */
 	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0 ) {
 		self::add( self::ADD_CONTACTS_TO_FUNNEL, [ $step_id, $query, $batch ] );
 	}
