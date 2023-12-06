@@ -7989,7 +7989,13 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 	if ( $clean_up == true ) {
 		// CORRECT THE HTML - or use https://www.barattalo.it/html-fixer/
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
-		@$dom->loadHTML( mb_convert_encoding( $markdown, 'HTML-ENTITIES', 'UTF-8' ) );
+
+        if ( function_exists( 'iconv' ) ){
+	        @$dom->loadHTML( htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1', htmlentities($markdown, ENT_COMPAT, 'UTF-8')), ENT_QUOTES) );
+        } else {
+	        @$dom->loadHTML( $markdown );
+        }
+
 		$markdown = $dom->saveHTML();
 		// preg_match() IS NOT SO NICE, BUT WORKS FOR ME
 		preg_match( "/<body[^>]*>(.*?)<\/body>/is", $markdown, $matches );
