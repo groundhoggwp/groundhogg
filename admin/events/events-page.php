@@ -402,15 +402,19 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
-
 		$event_queue = get_db( 'event_queue' );
-		$event_ids   = implode( ',', $this->get_items() );
-		$time        = time();
 
-		$wpdb->query( "UPDATE {$event_queue->get_table_name()} SET `time` = {$time} WHERE `ID` in ({$event_ids})" );
+		$updated = $event_queue->query( [
+			'operation' => 'UPDATE',
+			'data'      => [
+				'time'   => time(),
+				'status' => Event::WAITING,
+				'claim'  => '',
+			],
+            'ID' => wp_parse_id_list( $this->get_items() ),
+		] );
 
-		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
 
 		return false;
 	}
