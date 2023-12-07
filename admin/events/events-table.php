@@ -325,7 +325,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . $count . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . number_format_i18n( $count ) . ')' )
 			] );
 		} );
 
