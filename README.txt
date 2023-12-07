@@ -349,16 +349,17 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.1 (2023-12-05) =
-* ADDED Custom post type and taxonomy support to the posts block.
-* ADDED Card style options for the posts block.
+= 3.1 (2023-12-07) =
+* ADDED Custom post type and taxonomy support to the email editor posts block.
+* ADDED Card style options for the email editor posts block.
 * ADDED Dynamic Shortcode block to the email editor.
 * ADDED Search filters to events and email logs (more to come).
 * ADDED Specify search columns for the emails table quick search.
 * TWEAKED Adding contacts to a funnel is now a similar experience to scheduling a broadcast.
 * TWEAKED Contacts are added to a funnel via a background task instead of the loader.
 * TWEAKED Introduced the new DB\Query class and DB\Filters class to facilitate search filters for more data types.
-* TWEAKED Optimized several of the contact reports to perform queries faster.
+* TWEAKED Optimized several of the contact demographic reports to perform queries faster.
+* DEPRECATED User role, opt-in status, and marketability tag mapping will continue to be supported, but will no longer be active by default on new installs.
 
 = 3.0.1 (2023-11-20) =
 * TWEAKED Disable the advanced email editor automatically

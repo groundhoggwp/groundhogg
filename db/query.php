@@ -657,12 +657,12 @@ class Query {
 	public function delete() {
 
 		$query = [
-			'DELETE FROM',
-			$this->_table_name(),
+			"DELETE {$this->alias} FROM",
+			"$this->table_name as $this->alias",
 			$this->_joins(),
 			$this->_where(),
-			$this->_orderby(),
-			$this->_limit()
+//			$this->_orderby(),
+//			$this->_limit()
 		];
 
 		$result = $this->db->query( implode( ' ', $query ) );
@@ -711,8 +711,7 @@ class Query {
 			'SET',
 			$fields,
 			$this->_where(),
-			$this->_orderby(),
-			$this->_limit()
+			$this->_orderby()
 		];
 
 

@@ -9,6 +9,7 @@ use Groundhogg\Extension;
 use Groundhogg\License_Manager;
 use Groundhogg\Mailhawk;
 use Groundhogg\Plugin;
+use Groundhogg\Tag_Mapping;
 use Groundhogg_Email_Services;
 use function Groundhogg\action_input;
 use function Groundhogg\get_array_var;
@@ -557,14 +558,22 @@ class Settings_Page extends Admin_Page {
 //				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
 //				'tab'   => 'api_tab'
 //			),
+			'tag_mapping'     => [
+				'id'       => 'tag_mapping',
+				'title'    => _x( 'Tag mapping', 'settings_sections', 'groundhogg' ),
+				'tab'      => 'tags',
+			],
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Opt-in Status Tags', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'tags',
 				'callback' => [ Plugin::$instance->tag_mapping, 'reset_tags_ui' ],
-
 			],
 		];
+
+		if ( ! Tag_Mapping::enabled() ){
+			unset( $sections['optin_status_tags'] );
+		}
 
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
 	}
@@ -1258,6 +1267,19 @@ class Settings_Page extends Admin_Page {
 //					'value' => 'on',
 //				),
 //			),
+			'gh_enable_tag_mapping'               => [
+				'id'      => 'gh_enable_tag_mapping',
+				'section' => 'tag_mapping',
+				'label'   => _x( 'Enable automatic tag mapping.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Tag mapping for opt-in status and user roles was originally introduced as a stop-gap measure. There are now much better methods of filtering contacts based on opt-in status and user role.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Enable' ),
+					'name'  => 'gh_enable_tag_mapping',
+					'id'    => 'gh_enable_tag_mapping',
+					'value' => 'on',
+				],
+			],
 			'gh_confirmed_tag'                       => [
 				'id'      => 'gh_confirmed_tag',
 				'section' => 'optin_status_tags',
@@ -1554,6 +1576,8 @@ class Settings_Page extends Admin_Page {
 				],
 			],
 		);
+
+        // Dependent settings
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );
 	}

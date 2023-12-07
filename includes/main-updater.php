@@ -59,6 +59,13 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					delete_option( 'gh_use_advanced_email_editor' );
 				}
+			],
+			'3.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Enable tag mapping.', 'groundhogg' ),
+				'callback'    => function () {
+					update_option( 'gh_enable_tag_mapping', 'on' );
+				}
 			]
 		];
 	}
