@@ -2378,7 +2378,7 @@ function export_field( $contact, $field = '' ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		__( 'Contact Info' )  => [
+		__( 'Contact Info', 'groundhogg' )  => [
 			'full_name'                 => __( 'Full Name', 'groundhogg' ),
 			'first_name'                => __( 'First Name', 'groundhogg' ),
 			'last_name'                 => __( 'Last Name', 'groundhogg' ),
@@ -2396,22 +2396,22 @@ function get_mappable_fields( $extra = [] ) {
 			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
 			'user_email' => __( 'User Email', 'groundhogg' ),
 		],
-		__( 'Contact Owner' ) => [
+		__( 'Contact Owner', 'groundhogg' ) => [
 			'owner_id'    => __( 'Owner Id/Login', 'groundhogg' ),
 			'owner_email' => __( 'Owner Email', 'groundhogg' ),
 		],
-		__( 'CRM' )           => [
+		__( 'CRM', 'groundhogg' )           => [
 			'notes'     => __( 'Add To Notes', 'groundhogg' ),
 			'tags'      => __( 'Apply Value as Tag', 'groundhogg' ),
 			'meta'      => __( 'Add as Custom Meta', 'groundhogg' ),
 			'copy_file' => __( 'Add as File', 'groundhogg' ),
 		],
-		__( 'Compliance' )    => [
+		__( 'Compliance', 'groundhogg' )    => [
 			'terms_agreement'   => __( 'Terms Agreement', 'groundhogg' ),
 			'gdpr_consent'      => __( 'Data Processing Consent', 'groundhogg' ),
 			'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
 		],
-		__( 'Address' )       => [
+		__( 'Address', 'groundhogg' )       => [
 			'street_address_1' => __( 'Line 1', 'groundhogg' ),
 			'street_address_2' => __( 'Line 2', 'groundhogg' ),
 			'city'             => __( 'City', 'groundhogg' ),
@@ -2421,7 +2421,7 @@ function get_mappable_fields( $extra = [] ) {
 			'time_zone'        => __( 'Time Zone', 'groundhogg' ),
 			'ip_address'       => __( 'IP Address', 'groundhogg' ),
 		],
-		__( 'Tracking' )      => [
+		__( 'Tracking', 'groundhogg' )      => [
 			'utm_campaign' => __( 'UTM Campaign', 'groundhogg' ),
 			'utm_content'  => __( 'UTM Content', 'groundhogg' ),
 			'utm_medium'   => __( 'UTM Medium', 'groundhogg' ),
@@ -3081,12 +3081,16 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			// Is there an active contact record?
 			$contact = get_contactdata();
 		}
-
 	}
 
 	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 		return false;
 	}
+
+    // Prevent sales reps from importing or making changes to existing contacts of which they are not assigned
+    if ( current_user_can( 'add_contacts' ) && ! current_user_can( 'edit_contact', $contact ) ){
+        return false;
+    }
 
 	// Update contact info
 	$contact->update( $args );
@@ -6421,7 +6425,7 @@ function get_object_relationships( $object, $is_primary = true ) {
  */
 function maybe_swap_dates( &$before, &$after ) {
 	// If after is > than before, swap them
-	if ( strtotime( $after ) > strtotime( $before ) ) {
+	if ( $after > $before ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
@@ -6533,7 +6537,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
 		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),
-		'imageSizes'    => get_intermediate_image_sizes(),
+		'imageSizes'    => array_values( get_intermediate_image_sizes() ),
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
 		],
@@ -7006,15 +7010,22 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 				return new Tag( $maybe_tag );
 			}
 
-			// This will create a new tag if it doesn't exist already :)
-			if ( $create ) {
-				return new Tag( [
-					'tag_name' => $maybe_tag,
-					'tag_slug' => sanitize_title( $maybe_tag )
-				] );
+			if ( is_string( $maybe_tag ) ) {
+
+                $slug = sanitize_title( $maybe_tag );
+
+				// This will create a new tag if it doesn't exist already :)
+				if ( $create ) {
+					return new Tag( [
+						'tag_name' => $maybe_tag,
+						'tag_slug' => $slug
+					] );
+				}
+
+				return new Tag( $slug, 'tag_slug' );
 			}
 
-			return new Tag( sanitize_title( $maybe_tag ), 'tag_slug' );
+			return false;
 
 		}, $maybe_tags );
 
@@ -7055,6 +7066,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 			return array_map_to_method( $tags, 'get_name' );
 		default:
 		case 'tags':
+		case 'object':
 			return $tags;
 	}
 }
@@ -7990,11 +8002,11 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 		// CORRECT THE HTML - or use https://www.barattalo.it/html-fixer/
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
 
-        if ( function_exists( 'iconv' ) ){
-	        @$dom->loadHTML( htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1', htmlentities($markdown, ENT_COMPAT, 'UTF-8')), ENT_QUOTES) );
-        } else {
-	        @$dom->loadHTML( $markdown );
-        }
+		if ( function_exists( 'iconv' ) ) {
+			@$dom->loadHTML( htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $markdown, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES ) );
+		} else {
+			@$dom->loadHTML( $markdown );
+		}
 
 		$markdown = $dom->saveHTML();
 		// preg_match() IS NOT SO NICE, BUT WORKS FOR ME
