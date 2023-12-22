@@ -26,6 +26,7 @@
     Dashicon,
     ButtonToggle,
     ToolTip,
+    Autocomplete,
   } = MakeEl
 
   const {
@@ -46,7 +47,7 @@
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
   const { __, _x, _n, _nx, sprintf } = wp.i18n
   const { linkPicker } = Groundhogg.pickers
-  const { get, post } = Groundhogg.api
+  const { get, post, ajax } = Groundhogg.api
   const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
 
   improveTinyMCE({
@@ -1305,15 +1306,15 @@
       }, Select({
         id: `${ id }-position`,
         options: {
+          'left top': 'Left Top',
+          'left center': 'Left Center',
+          'left bottom': 'Left Bottom',
+          'right top': 'Right Top',
+          'right center': 'Right Center',
+          'right bottom': 'Right Bottom',
+          'center top': 'Center Top',
           'center center': 'Center Center',
-          'center left': 'Center Left',
-          'center right': 'Center Right',
-          'top center': 'Top Center',
-          'top left': 'Top Left',
-          'top right': 'Top Right',
-          'bottom center': 'Bottom Center',
-          'bottom left': 'Bottom Left',
-          'bottom right': 'Bottom Right',
+          'center bottom': 'Center Bottom',
         },
         selected: backgroundPosition,
         onChange: e => {
@@ -1376,6 +1377,67 @@
     })
   }
 
+  const BorderControls = ({
+    borderStyle = 'none',
+    borderWidth = {},
+    borderColor = '',
+    borderRadius = {},
+    onChange = style => {},
+  }) => Fragment([
+    Control({
+      label: 'Style',
+    }, Select({
+      id: 'border-style',
+      options: {
+        none: __('None', 'groundhogg'),
+        solid: __('Solid', 'groundhogg'),
+        dashed: __('Dashed', 'groundhogg'),
+        dotted: __('Dotted', 'groundhogg'),
+        double: __('Double', 'groundhogg'),
+        ridge: __('Ridge', 'groundhogg'),
+        groove: __('Groove', 'groundhogg'),
+        inset: __('Inset', 'groundhogg'),
+        outset: __('Outset', 'groundhogg'),
+      },
+      selected: borderStyle,
+      onChange: e => onChange({ borderStyle: e.target.value }),
+    })),
+    Control({
+      label: __('Color', 'groundhogg'),
+    }, ColorPicker({
+      type: 'text',
+      id: 'border-color',
+      value: borderColor,
+      onChange: borderColor => onChange({
+        borderColor,
+      }),
+    })),
+    Control({
+      label: 'Width',
+      stacked: true,
+    }, TopRightBottomLeft({
+      id: 'border-width',
+      values: borderWidth,
+      onChange: borderWidth => {
+        onChange({
+          borderWidth,
+        })
+      },
+    })),
+    Control({
+      label: 'Radius',
+      stacked: true,
+    }, TopRightBottomLeft({
+      id: 'border-radius',
+      values: borderRadius,
+      onChange: borderRadius => {
+        onChange({
+          borderRadius,
+        })
+      },
+    })),
+  ])
+
   const BorderControlGroup = ({
     borderStyle = 'none',
     borderWidth = {},
@@ -1384,60 +1446,13 @@
     onChange = style => {},
   }) => {
 
-    return ControlGroup({ name: 'Border' }, [
-      Control({
-        label: 'Style',
-      }, Select({
-        id: 'border-style',
-        options: {
-          none: __('None', 'groundhogg'),
-          solid: __('Solid', 'groundhogg'),
-          dashed: __('Dashed', 'groundhogg'),
-          dotted: __('Dotted', 'groundhogg'),
-          double: __('Double', 'groundhogg'),
-          ridge: __('Ridge', 'groundhogg'),
-          groove: __('Groove', 'groundhogg'),
-          inset: __('Inset', 'groundhogg'),
-          outset: __('Outset', 'groundhogg'),
-        },
-        selected: borderStyle,
-        onChange: e => onChange({ borderStyle: e.target.value }),
-      })),
-      Control({
-        label: __('Color', 'groundhogg'),
-      }, ColorPicker({
-        type: 'text',
-        id: 'border-color',
-        value: borderColor,
-        onChange: borderColor => onChange({
-          borderColor,
-        }),
-      })),
-      Control({
-        label: 'Width',
-        stacked: true,
-      }, TopRightBottomLeft({
-        id: 'border-width',
-        values: borderWidth,
-        onChange: borderWidth => {
-          onChange({
-            borderWidth,
-          })
-        },
-      })),
-      Control({
-        label: 'Radius',
-        stacked: true,
-      }, TopRightBottomLeft({
-        id: 'border-radius',
-        values: borderRadius,
-        onChange: borderRadius => {
-          onChange({
-            borderRadius,
-          })
-        },
-      })),
-    ])
+    return ControlGroup({ name: 'Border' }, BorderControls({
+      borderStyle,
+      borderWidth,
+      borderColor,
+      borderRadius,
+      onChange,
+    }))
   }
 
   const extract4 = ({ top = 0, right = 0, bottom = 0, left = 0 }) => {
@@ -1601,28 +1616,7 @@
         backgroundImage: (style, el) => el.getAttribute('background'),
         backgroundSize: style => style.getPropertyValue('background-size'),
         backgroundRepeat: style => style.getPropertyValue('background-repeat'),
-        backgroundPosition: style => {
-
-          const positionMap = {
-            'left top': 'top left',
-            'left center': 'center left',
-            'left bottom': 'bottom left',
-            'right top': 'top right',
-            'right center': 'center right',
-            'right bottom': 'bottom right',
-            'center top': 'top center',
-            'center bottom': 'bottom center',
-          }
-
-          // For some reason these can get swapped, annoying.
-          let position = style.getPropertyValue('background-position')
-
-          if (positionMap.hasOwnProperty(position)) {
-            position = positionMap[position]
-          }
-
-          return position
-        },
+        backgroundPosition: style => style.getPropertyValue('background-position'),
       }
 
       let style = {}
@@ -1883,13 +1877,34 @@
    * @param type
    * @param name
    * @param attributes
+   * @param ignoreForRefresh
    * @param parseContent
    * @param block
    */
-  const registerDynamicBlock = (type, name, { attributes = [], parseContent = () => {}, ...block }) => {
+  const registerDynamicBlock = (type, name, {
+    attributes = [],
+    ignoreForRefresh = [],
+    parseContent = content => content,
+    ...block
+  }) => {
 
     let prevContent = null
     let timeout
+
+    /**
+     * Extracts attributes from the block given a key list
+     *
+     * @param block
+     * @param keys
+     * @return {{}}
+     */
+    const extractFromBlock = (block, keys) => {
+      const props = {}
+      keys.forEach(attr => {
+        props[attr] = block[attr]
+      })
+      return props
+    }
 
     /**
      * Extracts attributes from the block
@@ -1897,13 +1912,7 @@
      * @param block
      * @return {{}}
      */
-    const extractAttributes = (block) => {
-      const props = {}
-      attributes.forEach(attr => {
-        props[attr] = block[attr]
-      })
-      return props
-    }
+    const extractAttributes = (block) => extractFromBlock(block, attributes)
 
     /**
      * Generates a unique key based on the block attributes
@@ -1912,7 +1921,7 @@
      * @return {string}
      */
     const generateCacheKey = (block) => {
-      return base64_json_encode(extractAttributes(block))
+      return base64_json_encode(extractFromBlock(block, attributes.filter(a => !ignoreForRefresh.includes(a))))
     }
 
     /**
@@ -3700,7 +3709,7 @@
     ])
   }
 
-  const SubjectAndFromPreview = () => Div({
+  const SubjectAndFromPreview = (close) => Div({
     className: 'from-preview display-flex gap-20 has-box-shadow',
   }, [
     makeEl('img', {
@@ -3720,6 +3729,13 @@
       // From Name & Email
       `<span class="from-name">${ getState().previewFromName }</span> <span class="from-email">&lt;${ getState().previewFromEmail }&gt;</span>`,
     ]),
+    Button({
+      className: 'gh-button secondary icon text',
+      style: {
+        marginLeft: 'auto',
+      },
+      onClick: close,
+    }, Dashicon('no-alt')),
   ])
 
   const PreviewButtons = () => {
@@ -3732,14 +3748,21 @@
         className: 'gh-button secondary icon',
         disabled: !Boolean(getState().preview),
         onClick: e => {
-          ModalFrame({}, Div({
+
+          let width = Math.min(1200, window.innerWidth * 0.8)
+          let height = window.innerHeight * 0.85
+
+          ModalFrame({}, ({ close }) => Div({
             className: 'preview desktop',
+            style: {
+              width: `${ width }px`,
+              height: `${ height }px`,
+            },
           }, [
-            SubjectAndFromPreview(),
+            SubjectAndFromPreview(close),
             Iframe({
               id: 'desktop-preview-iframe',
-              height: window.innerHeight * 0.85,
-              width: Math.min(1200, window.innerWidth * 0.8),
+              width,
             }, getState().preview),
           ]))
         },
@@ -3750,14 +3773,20 @@
         disabled: !Boolean(getState().preview),
         onClick: e => {
 
-          ModalFrame({}, Div({
+          let width = 412
+          let height = Math.min(915, window.innerHeight * 0.85)
+
+          ModalFrame({}, ({ close }) => Div({
             className: 'preview mobile',
+            style: {
+              width: `${ width }px`,
+              height: `${ Math.min(915, window.innerHeight * 0.85) }px`,
+            },
           }, [
-            SubjectAndFromPreview(),
+            SubjectAndFromPreview(close),
             Iframe({
               id: 'mobile-desktop-iframe',
-              height: Math.min(915, window.innerHeight * 0.85),
-              width: 412,
+              width,
             }, getState().preview),
           ]))
         },
@@ -3926,7 +3955,7 @@
                 }
 
                 Modal({}, () => Groundhogg.BroadcastScheduler({
-                  email: EmailsStore.get(getEmailId()),
+                  object: EmailsStore.get(getEmailId()),
                 }))
 
               },
@@ -3977,6 +4006,7 @@
         dangerConfirmationModal({
           alert: `<p>You have unsaved changes! Are you sure you want to leave?</p>`,
           onConfirm: onClose,
+          confirmText: __('Discard changes', 'groundhogg'),
         })
         return
       }
@@ -4071,6 +4101,7 @@
 
       return Div({
         id: 'email-editor',
+        className: 'gh-fixed-ui',
       }, [
         // Header
         Div({
@@ -4145,7 +4176,7 @@
                             const doc = parser.parseFromString(contents, 'text/html')
 
                             // no title? invalid
-                            title = doc.head.querySelector('title').innerText
+                            title = doc.head.querySelector('title')?.innerText
                           }
                           catch (e) {
                             dialog({
@@ -4165,7 +4196,7 @@
                             page: 'html-editor',
                           })
 
-                          setHTML(contents, false)
+                          setHTML(contents, true)
 
                           renderEditor()
                           close()
@@ -4260,6 +4291,7 @@
     if (isHTMLEditor()) {
       return Div({
         id: 'email-editor',
+        className: 'gh-fixed-ui',
       }, [
         // header
         Header(),
@@ -4270,6 +4302,7 @@
 
     return Div({
       id: 'email-editor',
+      className: 'gh-fixed-ui',
     }, [
       // header
       Header(),
@@ -5326,6 +5359,19 @@
             label: 'Link',
             stacked: true,
           }, InputWithReplacements({
+            inputCallback: (attributes) => Autocomplete({
+              ...attributes,
+              fetchResults: async search => {
+
+                let pages = await ajax({
+                  action: 'wp-link-ajax',
+                  _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                  term: search,
+                })
+
+                return pages.map(({ title, permalink }) => ( { id: permalink, text: title } ))
+              },
+            }),
             type: 'text',
             id: 'button-link',
             className: 'full-width',
@@ -5499,7 +5545,7 @@
       return `[${ text }](${ link })`
     },
     defaults: {
-      link: Groundhogg.url.home,
+      link: '',
       align: 'center',
       text: 'Click me!',
       size: 'md',
@@ -5559,6 +5605,19 @@
             label: 'Link',
             stacked: true,
           }, InputWithReplacements({
+            inputCallback: (attributes) => Autocomplete({
+              ...attributes,
+              fetchResults: async search => {
+
+                let pages = await ajax({
+                  action: 'wp-link-ajax',
+                  _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                  term: search,
+                })
+
+                return pages.map(({ title, permalink }) => ( { id: permalink, text: title } ))
+              },
+            }),
             type: 'text',
             id: 'image-link',
             className: 'full-width',
@@ -5971,6 +6030,45 @@
     },
   })
 
+  registerDynamicBlock('shortcode', 'Shortcode', {
+    attributes: [
+      'shortcode',
+    ],
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96.24 96.24">
+  <path fill="currentColor" d="M48.122 0C21.587 0 .001 21.585.001 48.118c0 26.535 21.587 48.122 48.12 48.122 26.532 0 48.117-21.587 48.117-48.122C96.239 21.586 74.654 0 48.122 0zM4.857 48.118a43.085 43.085 0 0 1 3.746-17.606l20.638 56.544C14.81 80.042 4.857 65.243 4.857 48.118zm43.265 43.267c-4.247 0-8.346-.623-12.222-1.763l12.98-37.719 13.301 36.433c.086.215.191.411.308.596a43.204 43.204 0 0 1-14.367 2.453zm5.961-63.551c2.604-.137 4.953-.412 4.953-.412 2.33-.276 2.057-3.701-.277-3.564 0 0-7.007.549-11.532.549-4.25 0-11.396-.549-11.396-.549-2.332-.137-2.604 3.427-.273 3.564 0 0 2.208.275 4.537.412l6.74 18.469-9.468 28.395-15.752-46.863c2.608-.136 4.952-.412 4.952-.412 2.33-.275 2.055-3.702-.278-3.562 0 0-7.004.549-11.53.549a94.6 94.6 0 0 1-2.784-.052C19.709 12.611 33.008 4.856 48.122 4.856c11.265 0 21.519 4.306 29.215 11.357-.187-.01-.368-.035-.562-.035-4.248 0-7.264 3.702-7.264 7.679 0 3.564 2.055 6.582 4.248 10.146 1.647 2.882 3.567 6.585 3.567 11.932 0 3.704-1.422 8-3.293 13.986l-4.315 14.421zm15.788 57.682 13.215-38.208c2.471-6.171 3.29-11.106 3.29-15.497 0-1.591-.104-3.07-.292-4.449a43.011 43.011 0 0 1 5.301 20.758c-.001 15.96-8.653 29.896-21.514 37.396z"/>
+</svg>`,
+    controls: ({
+      shortcode,
+      updateBlock,
+    }) => Fragment([
+      ControlGroup({
+        id: 'shortcode',
+        name: 'Shortcode',
+        closable: false,
+      }, [
+        Control({
+            label: 'Shortcode',
+            stacked: true,
+          }, Textarea({
+            className: 'code',
+            value: shortcode,
+            id: 'shortcode-paste',
+            onChange: e => {
+              updateBlock({
+                shortcode: e.target.value,
+              })
+            },
+          })),
+        `<p>Only basic or email specific shortcodes will work.</p>`,
+        `<p>Not all HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`,
+        `<p>Some elements such as <code>script</code> and <code>form</code> elements will be stripped out automatically.</p>`,
+        `<p>Shortcodes will <b>not</b> load any JavaScript or CSS dependencies. You can add style using custom CSS in the advanced tab.</p>`,
+      ]),
+    ]),
+    parseContent: content => cleanHTML(content)
+  })
+
+  // Posts Block
   registerDynamicBlock('posts', 'Posts', {
     attributes: [
       'number',
@@ -5981,15 +6079,21 @@
       'post_type',
       'excerpt',
       'gap',
-      'tag',
-      'category',
       'queryId',
-      'tag_rel',
-      'category_rel',
       'thumbnail_size',
+      'thumbnail_position',
       'thumbnail',
       'include',
       'exclude',
+      'terms',
+      'headingStyle',
+      'cardStyle',
+      'excerptStyle',
+    ],
+    ignoreForRefresh: [
+      'headingStyle',
+      'cardStyle',
+      'excerptStyle',
     ],
     //language=HTML
     svg: `
@@ -6003,49 +6107,152 @@
       excerpt = false,
       thumbnail = true,
       thumbnail_size = '',
+      thumbnail_position = 'above',
       gap = 20,
       number,
       offset,
-      post_type,
+      post_type = 'post',
       excerptStyle = {},
       headingStyle = {},
-      selectedTags = [],
-      tag = [],
-      tag_rel = 'any',
-      selectedCategories = [],
-      category = [],
-      category_rel = 'any',
       updateBlock,
       queryId = '',
       include = [],
       includedPosts = [],
       exclude = [],
       excludedPosts = [],
+      terms = {},
+      cardStyle = {},
     }) => {
+
+      const Supports = {
+        featured: ['cards'].includes(layout),
+        card: ['cards'].includes(layout),
+        excerpts: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        headingStyle: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        thumbnails: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        thumbnailPosition: ['h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+        gap: ['cards', 'h1', 'h2', 'h3', 'h4', 'h5'].includes(layout),
+      }
+
+      const postTypeOptions = {}
+
+      for (let type in _BlockEditor.post_types) {
+        postTypeOptions[type] = _BlockEditor.post_types[type].labels.name
+      }
+
+      const currentPostType = _BlockEditor.post_types[post_type]
+
+      const termControls = []
+
+      for (let tax in currentPostType.taxonomies) {
+        const taxonomy = currentPostType.taxonomies[tax]
+
+        if (!taxonomy.public || !taxonomy.show_in_rest) {
+          continue
+        }
+
+        let selected = terms[tax] ?? []
+        let selectedCache = terms[`${ tax }_cache`] ?? []
+        let tax_rel = terms[`${ tax }_rel`] ?? 'any'
+
+        termControls.push(...[
+          `<hr>`,
+
+          // Terms
+          Control({
+            label: taxonomy.label,
+            stacked: true,
+          }, ItemPicker({
+            id: `select-${ tax }`,
+            selected: selectedCache,
+            tags: false,
+            fetchOptions: async (search) => {
+              let terms = await get(`${ Groundhogg.api.routes.wp.v2 }/${ taxonomy.rest_base || tax }/`, {
+                search,
+                per_page: 20,
+                orderby: 'count',
+                order: 'desc',
+              })
+              terms = terms.map(({ id, name }) => ( { id, text: name } ))
+              return terms
+            },
+            onChange: selected => {
+
+              terms = {
+                ...terms,
+                [`${ tax }_cache`]: selected,
+                [tax]: selected.map(opt => opt.id),
+              }
+
+              updateBlock({
+                terms,
+                morphControls: true,
+              })
+            },
+          })),
+
+          // Terms Any || All
+          selected.length > 1 ? Control({
+            label: 'Relationship',
+          }, ButtonToggle({
+            id: `${ tax }-rel`,
+            selected: tax_rel,
+            options: [
+              { id: 'any', text: 'Any' },
+              { id: 'all', text: 'All' },
+            ],
+            onChange: rel => {
+              terms = {
+                ...terms,
+                [`${ tax }_rel`]: rel,
+              }
+
+              updateBlock({
+                terms,
+                morphControls: true,
+              })
+            },
+          })) : null,
+        ])
+      }
 
       return Fragment([
         ControlGroup({
           name: 'Layout',
         }, [
-          // Control({
-          //   label: 'Layout',
-          // }, Select({
-          //   options: {
-          //     ul: 'List',
-          //     grid: 'Grid',
-          //     cards: 'Cards',
-          //   },
-          //   selected: layout,
-          //   onChange: e => updateBlock({ layout: e.target.value }),
-          // })),
+
+          // layout
           Control({
+            label: 'Layout',
+          }, Select({
+            options: {
+              cards: 'Cards',
+              ol: 'Numbered List',
+              ul: 'Unordered List',
+              h1: 'H1',
+              h2: 'H2',
+              h3: 'H3',
+              h4: 'H4',
+              h5: 'H5',
+            },
+            selected: layout,
+            onChange: e => updateBlock({
+              layout: e.target.value,
+              morphControls: true,
+            }),
+          })),
+
+          // Features
+          Supports.featured ? Control({
             label: 'Featured',
           }, Toggle({
             id: 'toggle-featured',
             checked: featured,
             onChange: e => updateBlock({ featured: e.target.checked }),
-          })),
-          Control({
+          })) : null,
+
+          // Excerpt
+          Supports.excerpts ? Control({
             label: 'Excerpts',
           }, Toggle({
             id: 'toggle-excerpt',
@@ -6054,8 +6261,10 @@
               excerpt: e.target.checked,
               morphControls: true,
             }),
-          })),
-          Control({
+          })) : null,
+
+          // Thumbnails
+          Supports.thumbnails ? Control({
             label: 'Thumbnails',
           }, Toggle({
             id: 'toggle-thumbnails',
@@ -6064,8 +6273,10 @@
               thumbnail: e.target.checked,
               morphControls: true,
             }),
-          })),
-          Control({
+          })) : null,
+
+          // Gap
+          Supports.gap ? Control({
             label: 'Gap',
           }, NumberControl({
             id: 'column-gap',
@@ -6074,11 +6285,75 @@
             step: 5,
             unit: 'px',
             onInput: e => updateBlock({ gap: e.target.value }),
-          })),
+          })) : null,
         ]),
-        TagFontControlGroup(__('Heading'), 'headingStyle', headingStyle, updateBlock),
-        excerpt ? TagFontControlGroup(__('Excerpt'), 'excerptStyle', excerptStyle, updateBlock) : null,
-        thumbnail ? ControlGroup({ name: 'Thumbnail' }, [
+
+        // Card style
+        Supports.card ? ControlGroup({
+          id: 'post-cards',
+          name: 'Card Style',
+        }, [
+          // Padding
+          Control({
+            label: 'Content Padding',
+            stacked: true,
+          }, TopRightBottomLeft({
+            id: 'content-padding',
+            values: cardStyle.padding,
+            onChange: padding => {
+              updateBlock({
+                cardStyle: {
+                  ...getActiveBlock().cardStyle,
+                  padding,
+                },
+                morphControls: true,
+              })
+            },
+          })),
+          makeEl('hr'),
+          // Background Color
+          Control({
+            label: 'Background Color',
+          }, ColorPicker({
+            type: 'text',
+            id: 'background-color',
+            value: cardStyle.backgroundColor,
+            onChange: backgroundColor => updateBlock({
+              cardStyle: {
+                ...getActiveBlock().cardStyle,
+                backgroundColor,
+              },
+              morphControls: true,
+            }),
+          })),
+          makeEl('hr'),
+          // Border
+          Control({
+            stacked: true,
+            label: 'Border',
+          }, BorderControls({
+            ...cardStyle,
+            onChange: newStyle => updateBlock({
+              cardStyle: {
+                ...getActiveBlock().cardStyle,
+                ...newStyle,
+              },
+              morphControls: true,
+            }),
+          })),
+        ]) : null,
+
+        // Heading Style
+        TagFontControlGroup(['ol', 'ul'].includes(layout) ? __('Font') : __('Heading'), 'headingStyle', headingStyle,
+          updateBlock),
+
+        // Excerpt Style
+        excerpt && Supports.excerpts
+          ? TagFontControlGroup(__('Excerpt'), 'excerptStyle', excerptStyle, updateBlock)
+          : null,
+
+        // Thumbnail controls
+        thumbnail && Supports.thumbnails ? ControlGroup({ name: 'Thumbnail' }, [
           Control({
             label: 'Thumbnail Size',
           }, Select({
@@ -6090,20 +6365,46 @@
             options: imageSizes.map(size => ( { value: size, text: size } )),
             onChange: e => updateBlock({ thumbnail_size: e.target.value }),
           })),
+          Supports.thumbnailPosition ? Control({
+            label: 'Position',
+          }, Select({
+            id: 'thumbnail-position',
+            selected: thumbnail_position,
+            options: {
+              above: 'Above Headline',
+              below: 'Below Headline',
+              left: 'Left',
+              right: 'Right',
+            },
+            onChange: e => updateBlock({ thumbnail_position: e.target.value }),
+          })) : null,
         ]) : null,
+
+        // Query
         ControlGroup({
           name: 'Query',
         }, [
+
+          // Post type
           Control({
             label: 'Post Type',
           }, Select({
             id: 'post-type',
             selected: post_type,
-            options: {
-              posts: 'Posts',
-            },
-            onChange: e => updateBlock({ post_type: e.target.value }),
+            options: postTypeOptions,
+            onChange: e => updateBlock({
+              post_type: e.target.value,
+              morphControls: true,
+
+              // Clear these when changing the post type
+              include: [],
+              includedPosts: [],
+              exclude: [],
+              excludedPosts: [],
+            }),
           })),
+
+          // Number of posts
           Control({
             label: 'Number of posts',
           }, Input({
@@ -6113,6 +6414,8 @@
             value: number,
             onChange: e => updateBlock({ number: e.target.value }),
           })),
+
+          // Query offset
           Control({
             label: 'Offset',
           }, Input({
@@ -6122,90 +6425,21 @@
             value: offset,
             onChange: e => updateBlock({ offset: e.target.value }),
           })),
+
+          // Term controls
+          ...termControls,
+
+          // Include Ids
           `<hr/>`,
           Control({
-            label: 'Tags',
-            stacked: true,
-          }, ItemPicker({
-            id: 'post-tags',
-            selected: selectedTags,
-            tags: false,
-            fetchOptions: async (search) => {
-              let terms = await get(`${ Groundhogg.api.routes.wp.tags }`, {
-                search,
-                per_page: 20,
-                orderby: 'count',
-                order: 'desc',
-              })
-              terms = terms.map(({ id, name }) => ( { id, text: name } ))
-              return terms
-            },
-            onChange: selected => {
-              updateBlock({
-                selectedTags: selected,
-                tag: selected.map(opt => opt.id),
-                morphControls: true,
-              })
-            },
-          })),
-          selectedTags.length > 1 ? Control({
-            label: 'Relationship',
-          }, ButtonToggle({
-            id: 'tag-rel',
-            selected: tag_rel,
-            options: [
-              { id: 'any', text: 'Any' },
-              { id: 'all', text: 'All' },
-            ],
-            onChange: tag_rel => updateBlock({ tag_rel, morphControls: true }),
-          })) : null,
-          `<hr/>`,
-          Control({
-            label: 'Categories',
-            stacked: true,
-          }, ItemPicker({
-            id: 'post-cats',
-            selected: selectedCategories,
-            tags: false,
-            fetchOptions: async (search) => {
-              let terms = await get(`${ Groundhogg.api.routes.wp.categories }`, {
-                search,
-                per_page: 20,
-                orderby: 'count',
-                order: 'desc',
-              })
-              terms = terms.map(({ id, name }) => ( { id, text: name } ))
-              return terms
-            },
-            onChange: selected => {
-              updateBlock({
-                selectedCategories: selected,
-                category: selected.map(opt => opt.id),
-                morphControls: true,
-              })
-            },
-          })),
-          selectedCategories.length > 1 ? Control({
-            label: 'Relationship',
-          }, ButtonToggle({
-            id: 'category-rel',
-            selected: category_rel,
-            options: [
-              { id: 'any', text: 'Any' },
-              { id: 'all', text: 'All' },
-            ],
-            onChange: category_rel => updateBlock({ category_rel, morphControls: true }),
-          })) : null,
-          `<hr/>`,
-          Control({
-            label: 'Include these posts',
+            label: `Include these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
             id: 'post-includes',
             selected: includedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
@@ -6222,16 +6456,18 @@
             },
           })),
           `<p>Limit result set to specific IDs.</p>`,
+
+          // Exclude Ids
           `<hr/>`,
           Control({
-            label: 'Exclude these posts',
+            label: `Exclude these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
             id: 'post-excludes',
             selected: excludedPosts,
             tags: false,
             fetchOptions: async (search) => {
-              let posts = await get(`${ Groundhogg.api.routes.wp.posts }`, {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`, {
                 search,
                 per_page: 20,
                 orderby: 'relevance',
@@ -6248,8 +6484,13 @@
             },
           })),
           `<p>Ensure result set excludes specific IDs.</p>`,
+
+          // Query ID
           `<hr/>`,
-          Control({ label: 'Query ID' }, Input({
+          Control({
+            label: 'Query ID',
+            stacked: true,
+          }, Input({
             id: 'query-id',
             name: 'query_id',
             value: queryId,
@@ -6259,29 +6500,85 @@
         ]),
       ])
     },
-    parseContent: (content, { headingStyle = {}, excerptStyle = {} }) => {
+    parseContent: (content, { layout, headingStyle = {}, excerptStyle = {}, cardStyle = {} }) => {
       const parser = new DOMParser()
       const doc = parser.parseFromString(content, 'text/html')
 
-      inlineStyle(doc, 'h2, h2 a', headingStyle)
+      inlineStyle(doc, 'h1,h2,h3,h4,h5,li', headingStyle)
       inlineStyle(doc, 'p', excerptStyle)
+
+      if (layout === 'cards') {
+
+        let {
+          padding = {},
+          backgroundColor = '',
+        } = cardStyle
+
+        let style = {}
+
+        if (backgroundColor) {
+          style.backgroundColor = backgroundColor
+        }
+
+        addBorderStyle(cardStyle, style)
+
+        doc.querySelectorAll('.post-card').forEach(el => {
+          for (let attr in style) {
+            el.style[attr] = style[attr]
+          }
+        })
+
+        doc.querySelectorAll('.post-card .card-content td').forEach(el => {
+          el.style['padding'] = extract4(padding)
+        })
+      }
 
       return doc.body.innerHTML
     },
     css: ({
       selector,
+      layout = '',
       headingStyle = {},
       excerptStyle = {},
+      cardStyle = {},
     }) => {
+
+      let {
+        padding = {},
+        backgroundColor = '',
+      } = cardStyle
+
+      let style = {}
+
+      if (backgroundColor) {
+        style.backgroundColor = backgroundColor
+      }
+
+      addBorderStyle(cardStyle, style)
 
       //language=CSS
       return `
+
+          ${ selector } .post-card {
+              ${ layout === 'cards' ? objectToStyle(style) : '' }
+          }
+
+          ${ selector } .post-card .card-content td {
+              ${ layout === 'cards' ? objectToStyle({
+                  padding: extract4(padding),
+              }) : '' }
+          }
+
+          ${ selector } li,
+          ${ selector } h1,
           ${ selector } h2,
-          ${ selector } h2 a {
+          ${ selector } h3,
+          ${ selector } h4,
+          ${ selector } h5 {
               ${ fontStyle(headingStyle) }
           }
 
-          ${ selector } p.post-excerpt {
+          ${ selector } p {
               ${ fontStyle(excerptStyle) }
           }
       `
@@ -6297,8 +6594,6 @@
       post_type: 'post',
       columns: 2,
       gap: 20,
-      tag_rel: 'any',
-      category_rel: 'any',
       headingStyle: fontDefaults({
         fontSize: 24,
       }),
@@ -6306,101 +6601,6 @@
         fontSize: 16,
       }),
       cardStyle: {},
-    },
-  })
-
-  registerBlock('footer', 'Footer', {
-    // language=HTML
-    svg: `
-        <svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
-             xmlns="http://www.w3.org/2000/svg">
-            <path fill="currentColor"
-                  d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
-            <path fill="currentColor"
-                  d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
-        </svg>`,
-    controls: ({ style = {}, linkStyle = {}, alignment = 'left', updateBlock }) => {
-      return Fragment([
-        ControlGroup({ name: 'Footer' }, [
-          Control({ label: 'Alignment' },
-            AlignmentButtons({
-              id: 'footer-align',
-              alignment,
-              onChange: alignment => updateBlock({ alignment, morphControls: true }),
-            })),
-        ]),
-        TagFontControlGroup('Font Style', 'style', style, updateBlock),
-        TagFontControlGroup(__('Link Style'), 'linkStyle', linkStyle, updateBlock, {
-          fontSize: false,
-          lineHeight: false,
-        }),
-      ])
-    },
-    html: ({ style = {}, linkStyle = {}, alignment = 'left' }) => {
-
-      const footerLine = (content) => makeEl('p', {
-        style: {
-          ...fillFontStyle(style),
-          textAlign: alignment,
-          margin: '0.5em 0',
-        },
-      }, content)
-
-      let {
-        business_name,
-        address,
-        links,
-        unsubscribe,
-      } = _BlockEditor.footer
-
-      let footer = Div({
-        id: 'footer',
-        className: 'footer',
-      }, [
-        footerLine(`&copy; ${ business_name }`),
-        footerLine(address),
-        footerLine(links),
-        getEmailData().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
-      ])
-
-      linkStyle = fillFontStyle({
-        ...style,
-        ...linkStyle,
-      })
-
-      footer.querySelectorAll('a').forEach(el => {
-        for (let attr in linkStyle) {
-          el.style[attr] = linkStyle[attr]
-        }
-      })
-
-      return footer
-    },
-    plainText: ({}) => {
-
-      let {
-        business_name,
-        address,
-        links,
-        unsubscribe,
-      } = _BlockEditor.footer
-
-      return [
-        `Copyright ${ business_name }`,
-        address,
-        extractPlainText(links),
-        extractPlainText(unsubscribe),
-      ].join('  \n')
-    },
-    defaults: {
-      style: fontDefaults({
-        fontSize: 13,
-        color: '#999',
-        lineHeight: 1,
-      }),
-      linkStyle: {
-        color: '#488aff',
-      },
     },
   })
 
@@ -6679,6 +6879,101 @@
     },
   })
 
+  registerBlock('footer', 'Footer', {
+    // language=HTML
+    svg: `
+        <svg id="fi_3596176" enable-background="new 0 0 24 24" height="512" viewBox="0 0 24 24" width="512"
+             xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor"
+                  d="m21.5 24h-19c-1.379 0-2.5-1.121-2.5-2.5v-19c0-1.379 1.121-2.5 2.5-2.5h19c1.379 0 2.5 1.121 2.5 2.5v19c0 1.379-1.121 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5z"></path>
+            <path fill="currentColor"
+                  d="m19.5 21h-15c-.827 0-1.5-.673-1.5-1.5v-4c0-.827.673-1.5 1.5-1.5h15c.827 0 1.5.673 1.5 1.5v4c0 .827-.673 1.5-1.5 1.5zm-15-6c-.275 0-.5.225-.5.5v4c0 .275.225.5.5.5h15c.275 0 .5-.225.5-.5v-4c0-.275-.225-.5-.5-.5z"></path>
+        </svg>`,
+    controls: ({ style = {}, linkStyle = {}, alignment = 'left', updateBlock }) => {
+      return Fragment([
+        ControlGroup({ name: 'Footer' }, [
+          Control({ label: 'Alignment' },
+            AlignmentButtons({
+              id: 'footer-align',
+              alignment,
+              onChange: alignment => updateBlock({ alignment, morphControls: true }),
+            })),
+        ]),
+        TagFontControlGroup('Font Style', 'style', style, updateBlock),
+        TagFontControlGroup(__('Link Style'), 'linkStyle', linkStyle, updateBlock, {
+          fontSize: false,
+          lineHeight: false,
+        }),
+      ])
+    },
+    html: ({ style = {}, linkStyle = {}, alignment = 'left' }) => {
+
+      const footerLine = (content) => makeEl('p', {
+        style: {
+          ...fillFontStyle(style),
+          textAlign: alignment,
+          margin: '0.5em 0',
+        },
+      }, content)
+
+      let {
+        business_name,
+        address,
+        links,
+        unsubscribe,
+      } = _BlockEditor.footer
+
+      let footer = Div({
+        id: 'footer',
+        className: 'footer',
+      }, [
+        footerLine(`&copy; ${ business_name }`),
+        footerLine(address),
+        footerLine(links),
+        getEmailData().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
+      ])
+
+      linkStyle = fillFontStyle({
+        ...style,
+        ...linkStyle,
+      })
+
+      footer.querySelectorAll('a').forEach(el => {
+        for (let attr in linkStyle) {
+          el.style[attr] = linkStyle[attr]
+        }
+      })
+
+      return footer
+    },
+    plainText: ({}) => {
+
+      let {
+        business_name,
+        address,
+        links,
+        unsubscribe,
+      } = _BlockEditor.footer
+
+      return [
+        `Copyright ${ business_name }`,
+        address,
+        extractPlainText(links),
+        extractPlainText(unsubscribe),
+      ].join('  \n')
+    },
+    defaults: {
+      style: fontDefaults({
+        fontSize: 13,
+        color: '#999',
+        lineHeight: 1,
+      }),
+      linkStyle: {
+        color: '#488aff',
+      },
+    },
+  })
+
   // registerBlock('fonttest', 'Font Test', {
   //   svg: icons.text,
   //   controls: () => { Fragment([])},
@@ -6716,6 +7011,19 @@
     let blocks
     let page = 'editor'
 
+    let preview, previewPlainText, previewFromName, previewFromEmail, previewFromAvatar, previewSubject = ''
+
+    if (email?.context?.built) {
+      ;( {
+        built: preview,
+        plain: previewPlainText,
+        from_name: previewFromName,
+        from_email: previewFromEmail,
+        from_avatar: previewFromAvatar,
+        subject: previewSubject,
+      } = email.context )
+    }
+
     // existing email not using blocks
     if (email.ID) {
 
@@ -6752,13 +7060,19 @@
           setState({
             page: 'html-editor',
             email,
-            preview: email.context?.built,
-            previewPlainText: email.context?.plain,
+
+            preview,
+            previewPlainText,
+            previewFromName,
+            previewFromEmail,
+            previewFromAvatar,
+            previewSubject,
           })
 
           setHTML(email.data.content, false)
 
           renderEditor()
+
           return
       }
 
@@ -6805,19 +7119,6 @@
       email.meta.template = BOXED
     }
 
-    let preview, previewPlainText, previewFromName, previewFromEmail, previewFromAvatar, previewSubject = ''
-
-    if (email.context?.built) {
-      ;( {
-        built: preview,
-        plain: previewPlainText,
-        from_name: previewFromName,
-        from_email: previewFromEmail,
-        from_avatar: previewFromAvatar,
-        subject: previewSubject
-      } = email.context )
-    }
-
     setState({
       page,
       activeBlock: null,
@@ -6833,7 +7134,7 @@
       previewFromName,
       previewFromEmail,
       previewFromAvatar,
-      previewSubject
+      previewSubject,
     })
 
     setBlocks(blocks, false)
@@ -6936,13 +7237,9 @@
 
     let blocks = []
 
-    nodes.forEach(node => {
+    let timeout
 
-      // Skip text nodes
-      if (node.nodeType === Node.TEXT_NODE) {
-        return
-      }
-
+    const parseBlock = node => {
       let oldBlockType = node.dataset.block
 
       // Get from classList of first child
@@ -7057,8 +7354,31 @@
           break
       }
 
-      blocks.push(block)
+      return block
+    }
 
+    nodes.forEach(node => {
+
+      // Skip text nodes
+      if (node.nodeType === Node.TEXT_NODE) {
+        return
+      }
+
+      try {
+        blocks.push(parseBlock(node))
+      }
+      catch (e) {
+
+        clearTimeout(timeout)
+
+        setTimeout(() => {
+          dialog({
+            type: 'error',
+            message: 'Some blocks could not be converted to the new editor.',
+          })
+        }, 100)
+
+      }
     })
 
     return blocks
@@ -7195,7 +7515,7 @@
 
       if (getState().hasChanges) {
         e.preventDefault()
-        let msg = __('You have unsaved changes, are you sure you want to leave?')
+        let msg = __('You have unsaved changes, are you sure you want to leave?', 'groundhogg')
         e.returnValue = msg
         return msg
       }

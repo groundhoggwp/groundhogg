@@ -23,6 +23,8 @@ class GH_EDD_SL_Plugin_Updater {
 
 	private $health_check_timeout = 5;
 
+	private $beta = false;
+
 	/**
 	 * Class constructor.
 	 *
@@ -271,15 +273,11 @@ class GH_EDD_SL_Plugin_Updater {
 	public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
 
 		if ( $_action != 'plugin_information' ) {
-
 			return $_data;
-
 		}
 
 		if ( ! isset( $_args->slug ) || ( $_args->slug != $this->slug ) ) {
-
 			return $_data;
-
 		}
 
 		$to_send = array(

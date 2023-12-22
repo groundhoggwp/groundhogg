@@ -72,7 +72,7 @@ div.info-card.postbox {
 }
 
 .info-card ul.info-list li {
-  margin-bottom: 10px;
+  margin-bottom: 3px;
 }
 
 .info-card ul.info-list li span.label {
@@ -91,7 +91,7 @@ div.info-card.postbox {
   /*color: #1b1b1b;*/
 }
 
-.ic-section:not(:last-child) {
+.ic-section:not(:last-of-type) {
   /*background-color: #f1f1f1;*/
   /*padding: 10px;*/
   /*border: 1px solid #ccc;*/

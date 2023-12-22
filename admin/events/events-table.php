@@ -73,6 +73,11 @@ class Events_Table extends WP_List_Table {
 			'error_message' => _x( 'Error Message', 'Column label', 'groundhogg' ),
 		);
 
+        if ( ! in_array( $this->get_view(), [ 'skipped', 'failed' ] ) ){
+            unset( $columns['error_code'] );
+            unset( $columns['error_message'] );
+        }
+
 		return apply_filters( 'groundhogg_event_columns', $columns );
 	}
 
@@ -320,7 +325,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . $count . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . number_format_i18n( $count ) . ')' )
 			] );
 		} );
 
@@ -467,30 +472,24 @@ class Events_Table extends WP_List_Table {
 			];
 		}
 
-
-		$request_query = get_request_query( [], [], array_keys( get_db( 'events' )->get_columns() ) );
+		$request_query = get_request_query( [], [], array_merge( array_keys( get_db( 'events' )->get_columns() ), [ 'include_filters' ] ) );
 
 		unset( $request_query['status'] );
 
-		if ( ! empty( $request_query ) ) {
-			foreach ( $request_query as $key => $value ) {
-				$where[] = [ 'col' => $key, 'val' => $value, 'compare' => '=' ];
-			}
-		}
-
-		$args = [
+		$args = array_merge( [
 			'where'      => $where,
 			'limit'      => $per_page,
 			'offset'     => $offset,
 			'order'      => $order,
 			'orderby'    => $orderby,
 			'found_rows' => true
-		];
+		], $request_query );
 
 		$this->table = in_array( $this->get_view(), [
 			Event::PAUSED,
 			Event::WAITING,
-			'unprocessed'
+			Event::IN_PROGRESS,
+			'unprocessed',
 		] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );

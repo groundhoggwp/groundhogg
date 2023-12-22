@@ -662,7 +662,7 @@ a.action-link {
   color: #334310;
 }
 .pill.danger, .pill.red {
-  background: rgba(233, 31, 79, 0.5);
+  background: rgba(233, 31, 79, 0.25);
   color: #4e0818;
 }
 .pill.sm {
@@ -672,34 +672,51 @@ a.action-link {
 svg.red, svg.danger,
 p.gh-text.red,
 p.gh-text.danger,
+pre.gh-text.red,
+pre.gh-text.danger,
 span.gh-text.red,
 span.gh-text.danger {
   color: #e91f4f;
 }
+svg.red.dark, svg.danger.dark,
+p.gh-text.red.dark,
+p.gh-text.danger.dark,
+pre.gh-text.red.dark,
+pre.gh-text.danger.dark,
+span.gh-text.red.dark,
+span.gh-text.danger.dark {
+  color: #4e0818;
+}
 svg.orange, svg.warning,
 p.gh-text.orange,
 p.gh-text.warning,
+pre.gh-text.orange,
+pre.gh-text.warning,
 span.gh-text.orange,
 span.gh-text.warning {
   color: #f58115;
 }
 svg.green,
 p.gh-text.green,
+pre.gh-text.green,
 span.gh-text.green {
   color: #9ece38;
 }
 svg.md,
 p.gh-text.md,
+pre.gh-text.md,
 span.gh-text.md {
   font-size: 15px;
 }
 svg.sm,
 p.gh-text.sm,
+pre.gh-text.sm,
 span.gh-text.sm {
   font-size: 13px;
 }
 svg.lg,
 p.gh-text.lg,
+pre.gh-text.lg,
 span.gh-text.lg {
   font-size: 18px;
 }
@@ -1065,6 +1082,15 @@ button.gh-submit.secondary {
   color: #0075ff;
   padding: 5px 10px;
 }
+a.gh-button.secondary.page-title-action, a.gh-submit.secondary.page-title-action,
+input[type=button].gh-button.secondary.page-title-action,
+input[type=button].gh-submit.secondary.page-title-action,
+input[type=submit].gh-button.secondary.page-title-action,
+input[type=submit].gh-submit.secondary.page-title-action,
+button.gh-button.secondary.page-title-action,
+button.gh-submit.secondary.page-title-action {
+  padding: 0 10px;
+}
 a.gh-button.secondary.text, a.gh-submit.secondary.text,
 input[type=button].gh-button.secondary.text,
 input[type=button].gh-submit.secondary.text,
@@ -1391,25 +1417,6 @@ button.gh-submit .gh-spinner {
 }
 .gh-legacy-modal #modal-log-details-view h2 {
   margin: 0;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table {
-  width: 100%;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table th {
-  text-align: left;
-  width: 100px;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box table pre {
-  margin: 0;
-}
-.gh-legacy-modal #modal-log-details-view .groundhogg-content-box #headers {
-  width: 100%;
-  overflow: auto;
 }
 .gh-legacy-modal h3.replacements-group {
   padding-left: 20px;
@@ -1899,6 +1906,12 @@ p.error,
   overflow: hidden;
   box-sizing: border-box;
 }
+.gh-progress-bar.error {
+  background-color: rgba(233, 31, 79, 0.1);
+}
+.gh-progress-bar.error .gh-progress-bar-fill {
+  background-color: #e91f4f;
+}
 .gh-progress-bar .gh-progress-bar-fill {
   box-sizing: border-box;
   width: 1px;
@@ -2313,9 +2326,6 @@ p.error,
   border-radius: 3px;
   background-color: var(--color);
 }
-.gh-color-picker .current-color.not-set {
-  background-color: rgba(233, 31, 79, 0.1);
-}
 .gh-color-picker .current-color.not-set::after {
   background-color: rgba(16, 38, 64, 0.1);
 }
@@ -2338,6 +2348,39 @@ p.error,
 }
 .gh-color-picker-grid .iris-picker {
   grid-area: picker;
+}
+
+.gh-autocomplete.has-results {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.gh-autocomplete-results {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+  border-radius: 0 0 5px 5px;
+  background: #FFF;
+  overflow-y: auto;
+}
+.gh-autocomplete-results.hidden {
+  display: none;
+}
+.gh-autocomplete-results a {
+  cursor: pointer;
+  font-size: 14px;
+  padding: 3px 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.gh-autocomplete-results a.pointer {
+  color: #102640;
+  background: rgba(0, 117, 255, 0.07);
 }
 
 .gh-picker {

@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\track_activity;
@@ -232,38 +233,42 @@ class Send_Email extends Action {
 			}
 		}
 
-		$sent    = $email->send( $contact, $event );
-		$subject = $email->get_merged_subject_line();
-		$from    = $email->get_from_header();
+		$sent = $email->send( $contact, $event );
 
-		if ( $reply_in_thread && isset( $last_thread_reply ) ) {
-			$subject          = $this->subject;
-			$from             = $this->from;
+        // Thread stuff only if email was sent successfully
+		if ( $sent === true ) {
 
-			$this->message_id = '';
-			$this->subject    = '';
-			$this->from       = '';
+			$subject = $email->get_merged_subject_line();
+			$from    = $email->get_from_header();
 
-            remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
-			remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
+			if ( $reply_in_thread && isset( $last_thread_reply ) ) {
+				$subject = $this->subject;
+				$from    = $this->from;
+
+				$this->message_id = '';
+				$this->subject    = '';
+				$this->from       = '';
+			}
+
+			if ( $this->has_replies() ) {
+
+				$message_id = \Groundhogg_Email_Services::get_message_id();
+
+				track_activity( $contact, 'thread_reply', [
+					'funnel_id' => $event->get_funnel_id(),
+					'step_id'   => $event->get_step_id(),
+					'event_id'  => $event->get_id(),
+					'email_id'  => $email->get_id(),
+				], [
+					'message_id' => $message_id,
+					'subject'    => $subject,
+					'from'       => $from
+				] );
+			}
 		}
 
-		if ( $this->has_replies() ) {
-
-			$message_id = \Groundhogg_Email_Services::get_message_id();
-
-			track_activity( $contact, 'thread_reply', [
-				'funnel_id' => $event->get_funnel_id(),
-				'step_id'   => $event->get_step_id(),
-				'event_id'  => $event->get_id(),
-				'email_id'  => $email->get_id(),
-			], [
-				'message_id' => $message_id,
-				'subject'    => $subject,
-				'from'       => $from
-			] );
-
-		}
+		remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
+		remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
 
 		return $sent;
 	}
@@ -437,5 +442,37 @@ class Send_Email extends Action {
 		$step_id = $meta[0]->step_id;
 
 		$step->update_meta( 'reply_in_thread', $step_id );
+	}
+
+	/**
+	 * Duplicate the email if passed
+	 *
+	 * @param $new      Step
+	 * @param $original Step
+	 *
+	 * @return void
+	 */
+	public function duplicate( $new, $original ) {
+
+		if ( ! get_post_var( 'duplicate_email' ) ) {
+			return;
+		}
+
+		$email_id = absint( $original->get_meta( 'email_id' ) );
+
+		// No email defined
+		if ( ! $email_id ) {
+			return;
+		}
+
+		$email = new Email( $email_id );
+
+		if ( ! $email->exists() ) {
+			return;
+		}
+
+		$new_email = $email->duplicate();
+
+		$new->update_meta( 'email_id', $new_email->get_id() );
 	}
 }

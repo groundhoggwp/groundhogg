@@ -76,7 +76,7 @@
 
     let fd = new FormData(form)
 
-    let uuid = form.id
+    let uuid = form.dataset.id
 
     apiPostFormData(`${ routes.forms }/${ uuid }/`, fd).then(r => {
 

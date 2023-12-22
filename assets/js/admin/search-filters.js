@@ -1608,7 +1608,7 @@
       },
       preload: ({ email_id }) => {
         if (email_id) {
-          return EmailsStore.fetchItem(email_id)
+          return EmailsStore.maybeFetchItem(email_id)
         }
       },
     })
@@ -1667,7 +1667,7 @@
     },
     preload: ({ email_id }) => {
       if (email_id) {
-        return EmailsStore.fetchItem(email_id)
+        return EmailsStore.maybeFetchItem(email_id)
       }
     },
   })
@@ -1752,7 +1752,7 @@
       },
       preload: ({ email_id }) => {
         if (email_id) {
-          return EmailsStore.fetchItem(email_id)
+          return EmailsStore.maybeFetchItem(email_id)
         }
       },
     })
@@ -2076,7 +2076,7 @@
       },
       preload: ({ funnel_id }) => {
         if (funnel_id) {
-          return FunnelsStore.fetchItem(funnel_id)
+          return FunnelsStore.maybeFetchItem(funnel_id)
         }
       },
     })
@@ -2134,7 +2134,7 @@
       },
       preload: ({ broadcast_id }) => {
         if (broadcast_id) {
-          return BroadcastsStore.fetchItem(broadcast_id)
+          return BroadcastsStore.maybeFetchItem(broadcast_id)
         }
       },
     })
@@ -2184,7 +2184,7 @@
       },
       preload: ({ broadcast_id }) => {
         if (broadcast_id) {
-          return BroadcastsStore.fetchItem(broadcast_id)
+          return BroadcastsStore.maybeFetchItem(broadcast_id)
         }
       },
     })
@@ -2263,7 +2263,7 @@
       },
       preload: ({ broadcast_id }) => {
         if (broadcast_id) {
-          return BroadcastsStore.fetchItem(broadcast_id)
+          return BroadcastsStore.maybeFetchItem(broadcast_id)
         }
       },
     })
@@ -2272,7 +2272,7 @@
 
   registerFilter('saved_search', 'site', __('Saved Search'), {
     view: ({ compare = 'in', search }) => {
-      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold( SearchesStore.get(search)?.name ) )
+      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold(SearchesStore.get(search)?.name))
     },
     edit: ({ compare }) => {
       return [
@@ -2294,6 +2294,7 @@
     onMount: ({ search }, updateFilter) => {
 
       SearchesStore.maybeFetchItems().then(items => {
+
         $('#filter-search').select2({
           data: [
             { id: '', text: '' },
@@ -2796,6 +2797,10 @@
         activity: '',
       },
     })
+
+  if ( ! Groundhogg.filters ){
+    Groundhogg.filters = {}
+  }
 
   Groundhogg.filters.functions = {
     createFilters,

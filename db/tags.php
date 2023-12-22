@@ -67,9 +67,9 @@ class Tags extends DB {
 	}
 
 	protected function add_additional_actions() {
-		add_action( 'groundhogg/db/post_insert/tag_relationship', [ $this, 'increase_contact_count' ], 10, 2 );
-		add_action( 'groundhogg/db/post_delete/tag_relationship', [ $this, 'decrease_contact_count' ], 10 );
-		add_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', [ $this, 'bulk_decrease_tag_count' ], 10 );
+//		add_action( 'groundhogg/db/post_insert/tag_relationship', [ $this, 'increase_contact_count' ], 10, 2 );
+//		add_action( 'groundhogg/db/post_delete/tag_relationship', [ $this, 'decrease_contact_count' ], 10 );
+//		add_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', [ $this, 'bulk_decrease_tag_count' ], 10 );
 	}
 
 	/**
@@ -348,7 +348,7 @@ class Tags extends DB {
 
 		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count+1 WHERE tag_id = {$tag_id}" );
 
-		$this->cache_set_last_changed();
+//		$this->cache_set_last_changed();
 	}
 
 	/**
@@ -368,7 +368,7 @@ class Tags extends DB {
 
 		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count-1 WHERE tag_id = {$tag_id}" );
 
-		$this->cache_set_last_changed();
+//		$this->cache_set_last_changed();
 	}
 
 	/**

@@ -106,6 +106,7 @@ class Library extends Supports_Errors {
 
 		$response = $this->request( 'emails', [
 			'is_template' => 1,
+			'status'      => 'ready'
 		] );
 
 		$emails = get_array_var( $response, 'items', [] );

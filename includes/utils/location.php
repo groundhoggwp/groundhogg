@@ -431,7 +431,12 @@ class Location {
 			DateTimeZone::PACIFIC,
 		);
 
-		$timezones = array();
+		static $timezones = [];
+
+		if ( ! empty( $timezones ) ){
+			return $timezones;
+		}
+
 		foreach ( $regions as $region ) {
 			$timezones = array_merge( $timezones, DateTimeZone::listIdentifiers( $region ) );
 		}
@@ -454,9 +459,9 @@ class Location {
 			$offset_prefix    = $offset < 0 ? '-' : '+';
 			$offset_formatted = gmdate( 'H:i', abs( $offset ) );
 
-			$pretty_offset = "UTC${offset_prefix}${offset_formatted}";
+			$pretty_offset = "UTC{$offset_prefix}{$offset_formatted}";
 
-			$timezone_list[ $timezone ] = "(${pretty_offset}) $timezone";
+			$timezone_list[ $timezone ] = "({$pretty_offset}) $timezone";
 		}
 
 		return $timezone_list;

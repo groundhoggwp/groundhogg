@@ -477,7 +477,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_subject_line() {
-		$subject = do_replacements( $this->get_subject_line(), $this->get_contact()->get_id() );
+		$subject = do_replacements( $this->get_subject_line(), $this->get_contact() );
 
 		if ( $this->is_testing() ) {
 			$subject = sprintf( __( '[TEST] %s' ), $subject );
@@ -898,7 +898,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function get_from_header(){
+	public function get_from_header() {
 		return sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() );
 	}
 
@@ -1024,13 +1024,9 @@ class Email extends Base_Object_With_Meta {
 		// Clear any old previous errors.
 		$this->clear_errors();
 
-		if ( ! $this->is_ready() && ! $this->is_testing() ) {
-			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
-		}
+		$contact = get_contactdata( $contact_id_or_email );
 
-		$contact = $contact_id_or_email instanceof Contact ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
-
-		if ( ! $contact ) {
+		if ( ! is_a_contact( $contact ) ) {
 			return new WP_Error( 'no_recipient', __( 'No valid recipient was provided.' ) );
 		}
 
@@ -1041,14 +1037,19 @@ class Email extends Base_Object_With_Meta {
 			$this->set_event( $event );
 		}
 
+		// If email isn't set to ready
+		if ( ! $this->is_ready() && ! $this->is_testing() ) {
+			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
+		}
+
 		// Contact is undeliverable
 		if ( ! $contact->is_deliverable() ) {
-			return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.' ) );
+			return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.', 'groundhogg' ) );
 		}
 
 		// Ignore if testing or the message is transactional
 		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() ) {
-			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
+			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
 		}
 
 		do_action( 'groundhogg/email/before_send', $this );
@@ -1261,6 +1262,24 @@ class Email extends Base_Object_With_Meta {
 
 		return $data;
 
+	}
+
+	/**
+	 * Override title and status when duplicating
+	 *
+	 * @param $overrides
+	 * @param $meta_overrides
+	 *
+	 * @return Base_Object|Base_Object_With_Meta
+	 */
+	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+
+		$overrides = wp_parse_args( $overrides, [
+			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
+			'status' => 'draft'
+		] );
+
+		return parent::duplicate( $overrides, $meta_overrides );
 	}
 
 	/**

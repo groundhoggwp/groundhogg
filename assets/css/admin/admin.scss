@@ -279,7 +279,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 .select2-container .select2-search--inline .select2-search__field {
   min-height: 0;
   line-height: 1;
-  width:initial !important;
+  width: initial !important;
   //padding-left: 10px;
 }
 
@@ -406,6 +406,19 @@ table.wp-list-table.funnels th#title {
 table.wp-list-table.funnels th.column-active_contacts,
 table.wp-list-table.funnels td.column-active_contacts {
   text-align: center;
+}
+
+table.wp-list-table {
+  th {
+    &#from_user {
+      width: 10%;
+    }
+
+    &#stats,
+    &#sending_to {
+      width: 7%;
+    }
+  }
 }
 
 #wpbody .dash-button {
@@ -636,7 +649,7 @@ label.block {
     transform: translateX(30px);
   }
 
-  span  {
+  span {
 
     &.on,
     &.off {
@@ -690,7 +703,7 @@ label.block {
 
   .report-placeholder {
 
-    &.header{
+    &.header {
       grid-column: span 4;
     }
 
@@ -718,6 +731,7 @@ label.block {
         font-size: 36px;
       }
     }
+
     &.table,
     &.pie_chart {
       grid-column: span 2;
@@ -773,24 +787,24 @@ label.block {
   }
 }
 
-.gh-header.admin-header{
+.gh-header.admin-header {
   padding: 0 10px 0 0;
   border-bottom: 1px solid $primary-dark;
   margin-left: -20px;
 
-   .logo {
-     box-sizing: border-box;
-     width: 60px;
-     background: $primary-dark;
-     padding: 5px 10px;
-   }
+  .logo {
+    box-sizing: border-box;
+    width: 60px;
+    background: $primary-dark;
+    padding: 5px 10px;
+  }
 }
 
-.gh-has-notifications{
+.gh-has-notifications {
 
   position: relative;
 
-  &::after{
+  &::after {
     content: '0';
     position: absolute;
     right: 0;
@@ -819,7 +833,7 @@ label.block {
 
 @mixin filter-tag {
   position: absolute;
-  transform: translateY( -50% );
+  transform: translateY(-50%);
   background-color: $secondary-purple;
   left: 20px;
   top: 0;
@@ -829,6 +843,7 @@ label.block {
   width: max-content;
 }
 
+#funnel-include-filters,
 #broadcast-include-filters,
 #block-include-filters,
 #filters-here {
@@ -842,14 +857,36 @@ label.block {
   }
 }
 
+#funnel-exclude-filters,
 #broadcast-exclude-filters,
 #block-exclude-filters,
-#exclude-filters-here{
+#exclude-filters-here {
   @include filters();
 
   &::after {
     content: 'Exclude';
     @include filter-tag();
+  }
+}
+
+.gh-modal-frame {
+  .email-preview {
+    height: 100%;
+  }
+}
+
+.email-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  //height: 100%;
+
+  iframe {
+    height: 100%;
+    width: 100%;
   }
 }
 
@@ -866,9 +903,82 @@ label.block {
   }
 }
 
+#funnel-scheduler,
 #broadcast-scheduler {
   p {
     margin: 0;
     font-size: 16px;
   }
+}
+
+.email-log-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 640px;
+
+  .email-preview {
+
+    border: 1px solid $primary-dark-15;
+
+    iframe{
+      height: 500px;
+      width: 100%;
+      //width: 600px;
+    }
+  }
+
+
+
+  p {
+    font-size: 18px;
+  }
+
+  p, pre, h2 {
+    margin: 0;
+  }
+
+  .email-log-item-headers {
+
+    width: 100%;
+    overflow: auto;
+
+    table {
+
+      th {
+        text-align: left;
+        width: 100px;
+      }
+
+      pre {
+        margin: 0;
+      }
+    }
+  }
+}
+
+#table-filters{
+  margin-top: 10px;
+}
+
+.gh-fixed-ui {
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+
+  height: calc(100vh - 32px);
+  max-height: calc(100vh - 32px);
+}
+
+@media only screen and (max-width: 960px) {
+  .auto-fold .gh-fixed-ui {
+    left: 36px !important;
+  }
+
+}
+
+.folded .gh-fixed-ui {
+  left: 36px !important;
 }

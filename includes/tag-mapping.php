@@ -16,10 +16,34 @@ class Tag_Mapping extends Bulk_Job {
 	 */
 	private $tag_map = [];
 
+	public static function enabled() {
+		return is_option_enabled( 'gh_enable_tag_mapping' );
+	}
+
+	/**
+     * If the tag mapping option is enabled, maybe install the default tags
+     *
+	 * @param $old_value
+	 * @param $new_value
+	 *
+	 * @return void
+	 */
+    public function maybe_install_default_tag_mapping( $old_value, $new_value ){
+        if ( $old_value !== $new_value && $new_value){
+            $this->install_default_tags();
+        }
+    }
+
 	/**
 	 * Tag_Mapping constructor.
 	 */
 	public function __construct() {
+
+		if ( ! self::enabled() ) {
+			return;
+		}
+
+        add_action( 'update_option_gh_enable_tag_mapping', [ $this, 'maybe_install_default_tag_mapping' ], 10, 2 );
 
 		// Listen for an explicit status change.
 		add_action( 'groundhogg/contact/preferences/updated', [ $this, 'optin_status_changed' ], 10, 4 );
@@ -97,9 +121,14 @@ class Tag_Mapping extends Bulk_Job {
 	}
 
 	public function reset_tags_ui() {
+
+        if ( ! self::enabled() ){
+            return;
+        }
+
 		?>
-		<a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
-		   class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
+        <a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
+           class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
 		<?php
 	}
 
@@ -138,7 +167,7 @@ class Tag_Mapping extends Bulk_Job {
 	public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles ) {
 
 		// Exit if installing because the tables would not have yet been installed...
-		if ( wp_installing() ){
+		if ( wp_installing() ) {
 			return;
 		}
 

@@ -1,3 +1,288 @@
+:root {
+  --gh-accent-color: rgb(0, 117, 255);
+}
+
+.gh-form-wrapper form.simple textarea,
+.gh-form-wrapper form.simple select,
+.gh-form-wrapper form.simple input[type=text],
+.gh-form-wrapper form.simple input[type=date],
+.gh-form-wrapper form.simple input[type=time],
+.gh-form-wrapper form.simple input[type=datetime-local],
+.gh-form-wrapper form.simple input[type=datetime],
+.gh-form-wrapper form.simple input[type=email],
+.gh-form-wrapper form.simple input[type=number],
+.gh-form-wrapper form.simple input[type=password],
+.gh-form-wrapper form.simple input[type=search],
+.gh-form-wrapper form.simple input[type=tel],
+.gh-form-wrapper form.simple input[type=url] {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  border-radius: 0;
+  border-color: #0F181E;
+  border-style: solid;
+  border-width: 1px;
+  font-size: 14px;
+  padding: 15px;
+  box-shadow: none;
+}
+.gh-form-wrapper form.simple textarea:focus,
+.gh-form-wrapper form.simple select:focus,
+.gh-form-wrapper form.simple input[type=text]:focus,
+.gh-form-wrapper form.simple input[type=date]:focus,
+.gh-form-wrapper form.simple input[type=time]:focus,
+.gh-form-wrapper form.simple input[type=datetime-local]:focus,
+.gh-form-wrapper form.simple input[type=datetime]:focus,
+.gh-form-wrapper form.simple input[type=email]:focus,
+.gh-form-wrapper form.simple input[type=number]:focus,
+.gh-form-wrapper form.simple input[type=password]:focus,
+.gh-form-wrapper form.simple input[type=search]:focus,
+.gh-form-wrapper form.simple input[type=tel]:focus,
+.gh-form-wrapper form.simple input[type=url]:focus {
+  transition: 0.4s;
+  border-color: var(--gh-accent-color);
+}
+.gh-form-wrapper form.simple textarea[disabled],
+.gh-form-wrapper form.simple select[disabled],
+.gh-form-wrapper form.simple input[type=text][disabled],
+.gh-form-wrapper form.simple input[type=date][disabled],
+.gh-form-wrapper form.simple input[type=time][disabled],
+.gh-form-wrapper form.simple input[type=datetime-local][disabled],
+.gh-form-wrapper form.simple input[type=datetime][disabled],
+.gh-form-wrapper form.simple input[type=email][disabled],
+.gh-form-wrapper form.simple input[type=number][disabled],
+.gh-form-wrapper form.simple input[type=password][disabled],
+.gh-form-wrapper form.simple input[type=search][disabled],
+.gh-form-wrapper form.simple input[type=tel][disabled],
+.gh-form-wrapper form.simple input[type=url][disabled] {
+  background-color: #e6e6e6;
+  opacity: 0.3;
+}
+.gh-form-wrapper form.simple textarea[readonly],
+.gh-form-wrapper form.simple select[readonly],
+.gh-form-wrapper form.simple input[type=text][readonly],
+.gh-form-wrapper form.simple input[type=date][readonly],
+.gh-form-wrapper form.simple input[type=time][readonly],
+.gh-form-wrapper form.simple input[type=datetime-local][readonly],
+.gh-form-wrapper form.simple input[type=datetime][readonly],
+.gh-form-wrapper form.simple input[type=email][readonly],
+.gh-form-wrapper form.simple input[type=number][readonly],
+.gh-form-wrapper form.simple input[type=password][readonly],
+.gh-form-wrapper form.simple input[type=search][readonly],
+.gh-form-wrapper form.simple input[type=tel][readonly],
+.gh-form-wrapper form.simple input[type=url][readonly] {
+  background-color: #e6e6e6;
+}
+.gh-form-wrapper form.simple input[type=button],
+.gh-form-wrapper form.simple input[type=submit],
+.gh-form-wrapper form.simple button[type=submit] {
+  background-color: var(--gh-accent-color);
+  color: #fff;
+  border-radius: 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 15px;
+  box-shadow: none;
+  transition: 0.4s;
+  border: none;
+  cursor: pointer;
+}
+.gh-form-wrapper form.simple input[type=button]:hover,
+.gh-form-wrapper form.simple input[type=submit]:hover,
+.gh-form-wrapper form.simple button[type=submit]:hover {
+  opacity: 0.9;
+  transition: 0.4s;
+}
+.gh-form-wrapper form.modern textarea,
+.gh-form-wrapper form.modern select,
+.gh-form-wrapper form.modern input[type=text],
+.gh-form-wrapper form.modern input[type=date],
+.gh-form-wrapper form.modern input[type=time],
+.gh-form-wrapper form.modern input[type=datetime-local],
+.gh-form-wrapper form.modern input[type=datetime],
+.gh-form-wrapper form.modern input[type=email],
+.gh-form-wrapper form.modern input[type=number],
+.gh-form-wrapper form.modern input[type=password],
+.gh-form-wrapper form.modern input[type=search],
+.gh-form-wrapper form.modern input[type=tel],
+.gh-form-wrapper form.modern input[type=url] {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  border-radius: 5px;
+  border-color: var(--gh-accent-color);
+  border-style: solid;
+  border-width: 1px;
+  padding: 15px;
+}
+.gh-form-wrapper form.modern textarea:focus,
+.gh-form-wrapper form.modern select:focus,
+.gh-form-wrapper form.modern input[type=text]:focus,
+.gh-form-wrapper form.modern input[type=date]:focus,
+.gh-form-wrapper form.modern input[type=time]:focus,
+.gh-form-wrapper form.modern input[type=datetime-local]:focus,
+.gh-form-wrapper form.modern input[type=datetime]:focus,
+.gh-form-wrapper form.modern input[type=email]:focus,
+.gh-form-wrapper form.modern input[type=number]:focus,
+.gh-form-wrapper form.modern input[type=password]:focus,
+.gh-form-wrapper form.modern input[type=search]:focus,
+.gh-form-wrapper form.modern input[type=tel]:focus,
+.gh-form-wrapper form.modern input[type=url]:focus {
+  --gh-focus-shadow: color-mix(in srgb, var(--gh-accent-color) 20%, rgba( 255, 255, 255, 0.5 ) );
+  transition: 0.4s;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--gh-focus-shadow);
+}
+.gh-form-wrapper form.modern textarea[disabled],
+.gh-form-wrapper form.modern select[disabled],
+.gh-form-wrapper form.modern input[type=text][disabled],
+.gh-form-wrapper form.modern input[type=date][disabled],
+.gh-form-wrapper form.modern input[type=time][disabled],
+.gh-form-wrapper form.modern input[type=datetime-local][disabled],
+.gh-form-wrapper form.modern input[type=datetime][disabled],
+.gh-form-wrapper form.modern input[type=email][disabled],
+.gh-form-wrapper form.modern input[type=number][disabled],
+.gh-form-wrapper form.modern input[type=password][disabled],
+.gh-form-wrapper form.modern input[type=search][disabled],
+.gh-form-wrapper form.modern input[type=tel][disabled],
+.gh-form-wrapper form.modern input[type=url][disabled] {
+  background-color: #e6e6e6;
+  opacity: 0.3;
+}
+.gh-form-wrapper form.modern textarea[readonly],
+.gh-form-wrapper form.modern select[readonly],
+.gh-form-wrapper form.modern input[type=text][readonly],
+.gh-form-wrapper form.modern input[type=date][readonly],
+.gh-form-wrapper form.modern input[type=time][readonly],
+.gh-form-wrapper form.modern input[type=datetime-local][readonly],
+.gh-form-wrapper form.modern input[type=datetime][readonly],
+.gh-form-wrapper form.modern input[type=email][readonly],
+.gh-form-wrapper form.modern input[type=number][readonly],
+.gh-form-wrapper form.modern input[type=password][readonly],
+.gh-form-wrapper form.modern input[type=search][readonly],
+.gh-form-wrapper form.modern input[type=tel][readonly],
+.gh-form-wrapper form.modern input[type=url][readonly] {
+  background-color: #e6e6e6;
+}
+.gh-form-wrapper form.modern input[type=button],
+.gh-form-wrapper form.modern input[type=submit],
+.gh-form-wrapper form.modern button[type=submit] {
+  cursor: pointer;
+  padding: 15px;
+  background-color: var(--gh-accent-color);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  box-shadow: none;
+  transition: 0.4s;
+}
+.gh-form-wrapper form.modern input[type=button]:hover,
+.gh-form-wrapper form.modern input[type=submit]:hover,
+.gh-form-wrapper form.modern button[type=submit]:hover {
+  opacity: 0.8;
+  transition: 0.4s;
+}
+.gh-form-wrapper form.modern input[type=button]:focus,
+.gh-form-wrapper form.modern input[type=submit]:focus,
+.gh-form-wrapper form.modern button[type=submit]:focus {
+  --gh-focus-shadow: color-mix(in srgb, var(--gh-accent-color) 20%, rgba( 255, 255, 255, 0.5 ) );
+  transition: 0.4s;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--gh-focus-shadow);
+}
+.gh-form-wrapper form.classic textarea,
+.gh-form-wrapper form.classic select,
+.gh-form-wrapper form.classic input[type=text],
+.gh-form-wrapper form.classic input[type=date],
+.gh-form-wrapper form.classic input[type=time],
+.gh-form-wrapper form.classic input[type=datetime-local],
+.gh-form-wrapper form.classic input[type=datetime],
+.gh-form-wrapper form.classic input[type=email],
+.gh-form-wrapper form.classic input[type=number],
+.gh-form-wrapper form.classic input[type=password],
+.gh-form-wrapper form.classic input[type=search],
+.gh-form-wrapper form.classic input[type=tel],
+.gh-form-wrapper form.classic input[type=url] {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  border-radius: 3px;
+  border-color: #0F181E;
+  border-style: solid;
+  border-width: 1px 1px 3px 1px;
+  padding: 15px;
+}
+.gh-form-wrapper form.classic textarea:focus,
+.gh-form-wrapper form.classic select:focus,
+.gh-form-wrapper form.classic input[type=text]:focus,
+.gh-form-wrapper form.classic input[type=date]:focus,
+.gh-form-wrapper form.classic input[type=time]:focus,
+.gh-form-wrapper form.classic input[type=datetime-local]:focus,
+.gh-form-wrapper form.classic input[type=datetime]:focus,
+.gh-form-wrapper form.classic input[type=email]:focus,
+.gh-form-wrapper form.classic input[type=number]:focus,
+.gh-form-wrapper form.classic input[type=password]:focus,
+.gh-form-wrapper form.classic input[type=search]:focus,
+.gh-form-wrapper form.classic input[type=tel]:focus,
+.gh-form-wrapper form.classic input[type=url]:focus {
+  transition: 0.4s;
+  border-color: var(--gh-accent-color);
+}
+.gh-form-wrapper form.classic textarea[disabled],
+.gh-form-wrapper form.classic select[disabled],
+.gh-form-wrapper form.classic input[type=text][disabled],
+.gh-form-wrapper form.classic input[type=date][disabled],
+.gh-form-wrapper form.classic input[type=time][disabled],
+.gh-form-wrapper form.classic input[type=datetime-local][disabled],
+.gh-form-wrapper form.classic input[type=datetime][disabled],
+.gh-form-wrapper form.classic input[type=email][disabled],
+.gh-form-wrapper form.classic input[type=number][disabled],
+.gh-form-wrapper form.classic input[type=password][disabled],
+.gh-form-wrapper form.classic input[type=search][disabled],
+.gh-form-wrapper form.classic input[type=tel][disabled],
+.gh-form-wrapper form.classic input[type=url][disabled] {
+  background-color: #e6e6e6;
+  opacity: 0.3;
+}
+.gh-form-wrapper form.classic textarea[readonly],
+.gh-form-wrapper form.classic select[readonly],
+.gh-form-wrapper form.classic input[type=text][readonly],
+.gh-form-wrapper form.classic input[type=date][readonly],
+.gh-form-wrapper form.classic input[type=time][readonly],
+.gh-form-wrapper form.classic input[type=datetime-local][readonly],
+.gh-form-wrapper form.classic input[type=datetime][readonly],
+.gh-form-wrapper form.classic input[type=email][readonly],
+.gh-form-wrapper form.classic input[type=number][readonly],
+.gh-form-wrapper form.classic input[type=password][readonly],
+.gh-form-wrapper form.classic input[type=search][readonly],
+.gh-form-wrapper form.classic input[type=tel][readonly],
+.gh-form-wrapper form.classic input[type=url][readonly] {
+  background-color: #e6e6e6;
+}
+.gh-form-wrapper form.classic input[type=button],
+.gh-form-wrapper form.classic input[type=submit],
+.gh-form-wrapper form.classic button[type=submit] {
+  cursor: pointer;
+  padding: 15px;
+  background-color: color-mix(in srgb, var(--gh-accent-color) 1%, rgba(255, 255, 255, 0.1));
+  color: color-mix(in srgb, var(--gh-accent-color) 50%, black);
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-style: outset;
+  border-width: 1px 1px 3px 1px;
+  border-radius: 3px;
+  border-color: var(--gh-accent-color);
+  box-shadow: none;
+  transition: 0.4s;
+}
+.gh-form-wrapper form.classic input[type=button]:hover,
+.gh-form-wrapper form.classic input[type=submit]:hover,
+.gh-form-wrapper form.classic button[type=submit]:hover {
+  opacity: 0.9;
+  transition: 0.4s;
+}
 .gh-form-wrapper * {
   box-sizing: border-box;
 }

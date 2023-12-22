@@ -3,7 +3,6 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Base_Object;
 use Groundhogg\Contact;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
@@ -15,6 +14,7 @@ use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\maybe_implode_in_quotes;
 use function Groundhogg\preg_quote_except;
+use function Groundhogg\swap_array_keys;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -53,6 +53,11 @@ abstract class DB {
 	 * @since   2.1
 	 */
 	public $table_name;
+
+	/**
+	 * @var The easy query alias
+	 */
+	public $alias;
 	/**
 	 * The version of our database table
 	 *
@@ -136,6 +141,7 @@ abstract class DB {
 		 * @param DB     $db
 		 */
 		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
+		$this->alias      = $this->get_object_type() . 's';
 	}
 
 	/**
@@ -160,9 +166,9 @@ abstract class DB {
 	/**
 	 * Check if the site is global multisite enabled
 	 *
+	 * @deprecated
 	 * @return bool
 	 *
-	 * @deprecated
 	 */
 	private function is_global_multisite() {
 		return false;
@@ -317,8 +323,8 @@ abstract class DB {
 	 * Whitelist of columns
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_columns() {
 		return [];
@@ -346,12 +352,12 @@ abstract class DB {
 	 *
 	 * @return bool
 	 */
-	public function is_auto_increment(){
+	public function is_auto_increment() {
 
 		$sql = $this->create_table_sql_command();
 
 		// Not configured, assume true for backwards compatibility
-		if ( empty( $sql ) ){
+		if ( empty( $sql ) ) {
 			return true;
 		}
 
@@ -396,8 +402,8 @@ abstract class DB {
 	 * Retrieve a row by the primary key
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get( $row_id ) {
 		return $this->get_by( $this->primary_key, $row_id );
@@ -407,8 +413,8 @@ abstract class DB {
 	 * Retrieve a row by a specific column / value
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
@@ -432,19 +438,26 @@ abstract class DB {
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column( $column, $row_id ) {
 		return $this->get_column_by( $column, $this->primary_key, $row_id );
+	}
+
+	public function get_unique_column_values( $column ) {
+		return wp_list_pluck( $this->query( [
+			'select' => "DISTINCT $column",
+			'limit'  => 100,
+		] ), $column );
 	}
 
 	/**
 	 * Retrieve a specific column's value by the the specified column / value
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column_by( $column, $column_where, $column_value ) {
 		global $wpdb;
@@ -485,8 +498,8 @@ abstract class DB {
 	 * Default column values
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_column_defaults() {
 		return [];
@@ -533,7 +546,7 @@ abstract class DB {
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
 		// Remove primary key if auto incrementing primary key
-		if ( $this->is_auto_increment() ){
+		if ( $this->is_auto_increment() ) {
 			unset( $data[ $this->primary_key ] );
 			unset( $column_formats[ $this->primary_key ] );
 		}
@@ -586,8 +599,8 @@ abstract class DB {
 	 * Insert a new row
 	 *
 	 * @access  public
-	 * @return  int
 	 * @since   2.1
+	 * @return  int
 	 */
 	public function insert( $data ) {
 		global $wpdb;
@@ -613,7 +626,7 @@ abstract class DB {
 		$data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
 		// Remove primary key if auto incrementing primary key
-		if ( $this->is_auto_increment() ){
+		if ( $this->is_auto_increment() ) {
 			unset( $data[ $this->primary_key ] );
 			unset( $column_formats[ $this->primary_key ] );
 		}
@@ -784,8 +797,8 @@ abstract class DB {
 	 * Update a row
 	 *
 	 * @access  public
-	 * @return  bool
 	 * @since   2.1
+	 * @return  bool
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -898,11 +911,11 @@ abstract class DB {
 	 *
 	 * @access  public
 	 *
+	 * @since   2.1
+	 *
 	 * @param mixed $id
 	 *
 	 * @return  bool
-	 * @since   2.1
-	 *
 	 */
 	public function delete( $id = null ) {
 
@@ -998,6 +1011,8 @@ abstract class DB {
 	 */
 	public function parse_query_vars( $data = [] ) {
 
+		global $wpdb;
+
 		// parsed allready
 		if ( isset_not_empty( $data, '_was_parsed' ) ) {
 			return $data;
@@ -1050,7 +1065,7 @@ abstract class DB {
 					$where[]       = [
 						'col'     => $this->get_primary_key(),
 						'compare' => 'IN',
-						'val'     => sprintf( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s'", $val['ID'], $val['type'] )
+						'val'     => $wpdb->prepare( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s' AND primary_object_type = '%s'", $val['ID'], $val['type'], $this->get_object_type() )
 					];
 					break;
 				case 'count':
@@ -1072,6 +1087,16 @@ abstract class DB {
 					break;
 				case 'func':
 					$query_vars['func'] = strtoupper( $val );
+					break;
+				case 'include_filters':
+
+					// Parse the filters
+					$where[] = $this->parse_filters( $val );
+
+					break;
+				case 'exclude_filters':
+					// Parse the filters
+					$where[] = 'NOT ( ' . $this->parse_filters( $val ) . ')';
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
@@ -1116,23 +1141,334 @@ abstract class DB {
 	}
 
 	/**
+	 * @var Query_Filters
+	 */
+	protected $query_filters;
+
+	protected function maybe_register_filters() {
+		if ( $this->query_filters ) {
+			return;
+		}
+
+		$filters = new Query_Filters();
+
+		foreach ( $this->get_columns() as $column => $format ) {
+
+			switch ( $format ) {
+				case '%s':
+
+					if ( str_starts_with( $column, 'date' ) ) {
+
+						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+							Query_Filters::mysqlDate( $column, $filter, $where );
+						} );
+
+						break;
+					}
+
+					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+						Query_Filters::string( $column, $filter, $where );
+					} );
+
+					break;
+				case '%d':
+
+					if ( in_array( $column, [ 'time', 'timestamp', 'time_scheduled' ] ) ) {
+
+						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+							Query_Filters::timestamp( $column, $filter, $where );
+						} );
+
+						break;
+					}
+
+					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+						Query_Filters::number( $column, $filter, $where );
+					} );
+					break;
+			}
+
+		}
+
+		$this->query_filters = $filters;
+	}
+
+	/**
 	 * @param array        $data
 	 * @param string|false $ORDER_BY
 	 * @param bool         $from_cache
 	 *
 	 * @return array|bool|null|object
 	 */
-	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
+	public function query( $query_vars = [], $ORDER_BY = '', $from_cache = true ) {
+
+		global $wpdb;
 
 		if ( $ORDER_BY ) {
-			$data['orderby'] = $ORDER_BY;
+			$query_vars['orderby'] = $ORDER_BY;
 		}
 
-		return $this->advanced_query( $data, $from_cache );
+		$query_vars = wp_parse_args( $query_vars, [
+			'operation'      => 'SELECT',
+			'data'           => [],
+			'where'          => [],
+			'limit'          => false,
+			'offset'         => false,
+			'orderby'        => $this->get_primary_key(),
+			'search_columns' => $this->get_searchable_columns(),
+			'order'          => 'desc', // ASC || DESC
+			'select'         => '*',
+			'search'         => false,
+			'func'           => false, // COUNT | AVG | SUM
+			'groupby'        => false,
+			'meta_query'     => [],
+			'found_rows'     => false,
+		] );
+
+		$operation = $query_vars['operation'];
+
+		$query = new Query( $this );
+
+		$moreWhere = [];
+		$searched = false;
+
+		// Parse data and turn into an advanced query search instead
+		foreach ( $query_vars as $key => $val ) {
+
+			if ( empty( $val ) ) {
+				continue;
+			}
+
+			switch ( strtolower( $key ) ) {
+				case 'select':
+					if ( is_array( $val ) ){
+						$query->select( ...$val );
+					} else {
+						$query->select( $val );
+					}
+					break;
+				case 'func':
+					$func      = strtoupper( $val );
+
+					if ( $func === 'COUNT' ){
+						$operation = 'COUNT';
+						break;
+					}
+
+					$operation = 'VAR';
+					$select    = "{$func}({$query_vars['select']})";
+					$query->select( $select );
+					break;
+				case 'distinct':
+					if ( $query_vars['select'] !== '*' ){
+						$query->select( "DISTINCT {$query_vars['select']}" );
+					}
+					break;
+				case 'where':
+					$moreWhere = array_merge( $moreWhere, $val );
+					break;
+				case 's':
+				case 'search':
+				case 'term':
+					if ( $searched ){
+						break;
+					}
+					$query->search( $val, wp_parse_list( $query_vars['search_columns'] ) );
+					$searched = true;
+					break;
+				case 'include':
+					$query->whereIn( $this->get_primary_key(), $val );
+					break;
+				case 'exclude':
+					$query->whereNotIn( $this->get_primary_key(), $val );
+					break;
+				case 'before':
+					$query->where()->lessThanEqualTo( $this->get_date_key(), $val );
+					break;
+				case 'after':
+					$query->where()->greaterThanEqualTo( $this->get_date_key(), $val );
+					break;
+				case 'related' :
+
+					$alias = $query->leftJoin( get_db('object_relationships' ), 'primary_object_id' );
+
+					$query->where( "$alias.secondary_object_id", $val['ID'] );
+					$query->where( "$alias.secondary_object_type", $val['type'] );
+					$query->where( "$alias.primary_object_type", $this->get_object_type() );
+
+					break;
+				case 'count':
+					$operation = 'COUNT';
+					break;
+				case 'limit':
+
+					if ( is_array( $val ) ){
+						$query->setLimit( ...$val );
+					} else {
+						$query->setLimit( $val );
+					}
+
+					break;
+				case 'orderby':
+				case 'order_by':
+					$query->setOrderby( $val );
+					break;
+				case 'order':
+				case 'ORDER':
+					$query->setOrder( $val );
+					break;
+				case 'offset':
+					$query->setOffset( $val );
+					break;
+				case 'groupby':
+				case 'group_by':
+					$query->setGroupby( $val );
+					break;
+				case 'include_filters':
+
+					$this->maybe_register_filters();
+					$this->query_filters->parse_filters( $val, $query );
+
+					break;
+				case 'exclude_filters':
+
+					$this->maybe_register_filters();
+					$this->query_filters->parse_filters( $val, $query, true );
+
+					break;
+				case 'found_rows':
+					$query->setFoundRows( $val );
+					break;
+				case 'meta_query':
+
+					foreach ( $val as $meta_query ) {
+
+						$meta_query = swap_array_keys( $meta_query, [
+							'val'  => 'value',
+							'comp' => 'compare'
+						] );
+
+						[ 'key' => $key, 'value' => $value, 'compare' => $compare ] = $meta_query;
+
+						$alias = $query->joinMeta();
+
+						$query->where( "$alias.meta_key", $key );
+						$query->where( "$alias.meta_value", $value, $compare );
+					}
+
+					break;
+				default:
+
+					if ( ! in_array( $key, $this->get_allowed_columns() ) ) {
+						break;
+					}
+
+					if ( is_array( $val ) ) {
+
+						// Compare and val defined explicitly
+						if ( array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
+							$query->where( $key, $val['val'], $val['compare'] );
+							break;
+						}
+
+						// Compare is provided as first item in array of 2
+						if ( count( $val ) === 2 && in_array( $val[0], $this->get_allowed_comparisons() ) ) {
+							$query->where( $key, $val[1], $val[0] );
+							break;
+						}
+					}
+
+					// Select Clause
+					if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
+						$query->whereIn( $key, $val );
+						break;
+					}
+
+					if ( is_array( $val ) ) {
+						$query->whereIn( $key, $val );
+						break;
+					}
+
+					switch ( $val ){
+						case 'NOT_EMPTY':
+							$query->where()->notEmpty( $key );
+							break 2;
+						case 'EMPTY':
+							$query->where()->empty( $key );
+							break 2;
+					}
+
+					$query->where( $key, $val );
+
+					break;
+			}
+		}
+
+		foreach ( $moreWhere as $key => $row ) {
+
+			if ( $key === 'relationship' ) {
+				continue;
+			}
+
+			$row = swap_array_keys( $row, [
+				'key'  => 'column',
+				0      => 'column',
+				'col'  => 'column',
+				1      => 'compare',
+				'comp' => 'compare',
+				'val'  => 'value',
+				2      => 'value'
+			] );
+
+			[ 'column' => $column, 'compare' => $compare, 'value' => $value ] = $row;
+
+			if ( ! in_array( $column, $this->get_allowed_columns() ) ) {
+				continue;
+			}
+
+			$compare = $this->symbolize_comparison( $compare );
+
+			switch ( $compare ) {
+				case 'IN':
+					$query->whereIn( $column, $value );
+					break;
+				default:
+					$query->where( $column, $value, $compare );
+					break;
+			}
+		}
+
+		switch ( strtoupper( $operation ) ) {
+			default:
+			case 'SELECT':
+
+				$results = $query->get_results();
+				break;
+			case 'COUNT':
+
+				$results = $query->count();
+				break;
+			case 'UPDATE':
+
+				$results = $query->update( $query_vars['data'] );
+				break;
+			case 'DELETE':
+
+				$results = $query->delete();
+				break;
+			case 'VAR':
+
+				$results = $query->get_var();
+				break;
+		}
+
+		return $results;
 	}
 
 	public $last_query = '';
+
 	public $last_error = '';
+
 
 	/**
 	 * New and improved query function to access DB in more complex and interesting ways.
@@ -1453,10 +1789,19 @@ abstract class DB {
 		foreach ( $where as $i => $unparsed_clause ) {
 
 			if ( ! is_array( $unparsed_clause ) ) {
-				// Assume first order ==
 
+				if ( is_int( $i ) && is_string( $unparsed_clause ) ) {
+					$parsed_clauses[] = $unparsed_clause;
+					continue;
+				}
+
+				// Assume first order
 				$value = $unparsed_clause;
 				$col   = $i;
+
+				if ( ! in_array( $col, $this->get_allowed_columns() ) ) {
+					continue;
+				}
 
 				if ( is_numeric( $value ) ) {
 					$parsed_clauses[] = $wpdb->prepare( "$col = %d", $value );
@@ -1661,9 +2006,9 @@ abstract class DB {
 	/**
 	 * Retrieve the date created via an SQL query
 	 *
-	 * @return \DateTimeInterface
 	 * @throws \Exception
 	 *
+	 * @return \DateTimeInterface
 	 */
 	public function get_date_created() {
 
@@ -1708,8 +2053,8 @@ abstract class DB {
 	/**
 	 * Check if the table was ever installed
 	 *
-	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 * @since  2.4
+	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 */
 	public function installed() {
 		return $this->table_exists( $this->table_name );
@@ -1718,11 +2063,11 @@ abstract class DB {
 	/**
 	 * Check if the given table exists
 	 *
+	 * @since  2.4
+	 *
 	 * @param string $table The table name
 	 *
 	 * @return bool          If the table name exists
-	 * @since  2.4
-	 *
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;
@@ -1736,14 +2081,14 @@ abstract class DB {
 	 *
 	 * @return string
 	 */
-	public function create_table_sql_command(){
+	public function create_table_sql_command() {
 		return '';
 	}
 
 	/**
 	 * Create the DB
 	 */
-	public function create_table(){
+	public function create_table() {
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 

@@ -60,25 +60,9 @@ use function Groundhogg\utils;
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
-            <div class="actions">
-				<?php
-
-				echo html()->select2( [
-					'name'        => 'country',
-					'id'          => 'country',
-					'class'       => 'gh-select2 post-data',
-					'data'        => utils()->location->get_countries_list( '', true ),
-					'selected'    => [ utils()->location->site_country_code() ],
-					'option_none' => false,
-				] );
-
-				?>
-            </div>
+            <h2 class="title"><?php _e( 'Engagement', 'groundhogg' ); ?></h2>
         </div>
-        <div class="gh-donut-chart-wrap inside">
-            <canvas id="chart_contacts_by_region"></canvas>
-        </div>
+        <div id="table_list_engagement"></div>
     </div>
 
     <div class="gh-panel span-6">
@@ -107,10 +91,4 @@ use function Groundhogg\utils;
         <div id="table_contacts_by_lead_source"></div>
     </div>
 
-    <div class="gh-panel span-12">
-        <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Engagement', 'groundhogg' ); ?></h2>
-        </div>
-        <div id="table_list_engagement"></div>
-    </div>
 </div>

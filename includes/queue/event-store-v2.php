@@ -6,6 +6,7 @@ use Groundhogg\DB\Events;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
 use function Groundhogg\array_map_to_class;
+use function Groundhogg\event_queue_db;
 use function Groundhogg\get_db;
 
 /**
@@ -22,7 +23,7 @@ class Event_Store_V2 {
 	 * @return \Groundhogg\DB\Event_Queue
 	 */
 	public function db() {
-		return get_db( 'event_queue' );
+		return event_queue_db();
 	}
 
 	/**

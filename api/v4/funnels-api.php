@@ -3,21 +3,17 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
-use Groundhogg\Base_Object;
+use Groundhogg\Background_Tasks;
 use Groundhogg\Campaign;
 use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_REST_Request;
 use WP_REST_Server;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_db;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\is_template_site;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\map_func_to_attr;
-use function Groundhogg\sanitize_object_meta;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -85,9 +81,8 @@ class Funnels_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$data      = $request->get_param( 'data' );
-		$meta      = $request->get_param( 'meta' );
-		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
 
 		$object->update( $data );
 
@@ -96,20 +91,25 @@ class Funnels_Api extends Base_Object_Api {
 			$object->update_meta( $meta );
 		}
 
-		$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
-		$add_campaigns    = array_diff( $campaigns, $has_campaigns );
-		$remove_campaigns = array_diff( $has_campaigns, $campaigns );
+		if ( $request->has_param( 'campaigns' ) ) {
 
-		if ( ! empty( $add_campaigns ) ) {
-			foreach ( $add_campaigns as $campaign ) {
-				$object->create_relationship( new Campaign( $campaign ) );
-			}
-		}
+			$campaigns        = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+			$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
+			$add_campaigns    = array_diff( $campaigns, $has_campaigns );
+			$remove_campaigns = array_diff( $has_campaigns, $campaigns );
 
-		if ( ! empty( $remove_campaigns ) ) {
-			foreach ( $remove_campaigns as $campaign ) {
-				$object->delete_relationship( new Campaign( $campaign ) );
+			if ( ! empty( $add_campaigns ) ) {
+				foreach ( $add_campaigns as $campaign ) {
+					$object->create_relationship( new Campaign( $campaign ) );
+				}
 			}
+
+			if ( ! empty( $remove_campaigns ) ) {
+				foreach ( $remove_campaigns as $campaign ) {
+					$object->delete_relationship( new Campaign( $campaign ) );
+				}
+			}
+
 		}
 
 		$this->do_object_updated_action( $object );
@@ -143,16 +143,35 @@ class Funnels_Api extends Base_Object_Api {
 			] );
 		}
 
-		$query    = new Contact_Query();
-		$contacts = $query->query( $query_vars, true );
+		// Doing it this way...
+		if ( isset( $query_vars['limit'] ) || isset( $query_vars[ 'number' ] ) ){
+			$query    = new Contact_Query();
+			$contacts = $query->query( $query_vars, true );
 
-		foreach ( $contacts as $contact ) {
-			$step->enqueue( $contact );
+			foreach ( $contacts as $contact ) {
+				$step->enqueue( $contact );
+			}
+
+			return self::SUCCESS_RESPONSE( [
+				'added' => count( $contacts )
+			] );
 		}
 
-		return self::SUCCESS_RESPONSE( [
-			'added' => count( $contacts )
-		] );
+		// Then later
+		if ( ! $request->get_param( 'now' ) ){
+			$date = sanitize_text_field( $request->get_param( 'date' ) );
+			$time = sanitize_text_field( $request->get_param( 'time' ) );
+
+			$date = new DateTimeHelper( "$date $time", wp_timezone() );
+
+			add_filter( 'groundhogg/background_tasks/schedule_time', function ( $when ) use ( $date ){
+				return $date->getTimestamp();
+			} );
+		}
+
+		Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+
+		return self::SUCCESS_RESPONSE();
 	}
 
 	/**
@@ -194,7 +213,7 @@ class Funnels_Api extends Base_Object_Api {
 		$funnel = new Funnel();
 		$result = $funnel->import( $template );
 
-		if ( is_wp_error( $result ) ){
+		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 

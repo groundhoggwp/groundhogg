@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Email_Log_Item;
 use function Groundhogg\Ymd_His;
 
 class Email_Log extends DB {
@@ -25,6 +26,10 @@ class Email_Log extends DB {
 
 	public function get_date_key() {
 		return 'date_sent';
+	}
+
+	public function create_object( $object ) {
+		return new Email_Log_Item( $object );
 	}
 
 	/**
@@ -203,6 +208,20 @@ class Email_Log extends DB {
 			'content',
 			'headers'
 		];
+	}
+
+	protected function maybe_register_filters() {
+
+		parent::maybe_register_filters();
+
+		$this->query_filters->register_filter( 'recipients', function ( $filter, $where ){
+			global $wpdb;
+			$recipients = array_map( 'sanitize_email', $filter['recipients'] );
+			$subWhere = $where->subWhere();
+			foreach ( $recipients as $recipient ){
+				$subWhere->like( 'recipients', '%' . $wpdb->esc_like( $recipient ) . '%' );
+			}
+		} );
 	}
 
 	public function create_table() {

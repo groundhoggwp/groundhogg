@@ -40,69 +40,111 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	//UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
-		add_action( 'wp_ajax_groundhogg_view_email_log', [ $this, 'output_email_log' ] );
-	}
 
-	public function output_email_log() {
-		if ( ! current_user_can( 'view_events' ) ) {
-			wp_send_json_error();
-		}
-
-		ob_start();
-
-		$this->view_log();
-
-		$content = ob_get_clean();
-
-		wp_send_json_success( [
-			'content' => $content
-		] );
-	}
-
-	public function raw_email_content() {
-		if ( get_url_var( 'action' ) !== 'view_log_content' ) {
-			return;
-		}
-
-		$preview_id = absint( get_url_var( 'log' ) );
-
-		$log_item = new Email_Log_Item( $preview_id );
-
-		if ( ! $log_item->exists() ) {
-			wp_die( 'Invalid log item ID.' );
-		}
-
-		echo $log_item->content;
-
-		die();
 	}
 
 	public function help() {
 	}
 
 	protected function add_additional_actions() {
-		add_action( 'admin_init', [ $this, 'raw_email_content' ] );
-		add_action( 'admin_head', function () {
-			?>
-            <style>
-                .email-sent {
-                    color: green;
-                }
-
-                .email-failed {
-                    color: red;
-                }
-            </style>
-			<?php
-		} );
 
 	}
 
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_script( 'groundhogg-admin-fullframe' );
-		wp_enqueue_script( 'groundhogg-admin-email-log' );
+
+		switch ( $this->get_current_tab() ) {
+			case 'emails':
+
+				$error_codes = array_filter( get_db( 'email_log' )->get_unique_column_values( 'error_code' ) );
+				$error_codes = array_combine( $error_codes, $error_codes );
+
+				$this->enqueue_table_filters( [
+					'selectColumns' => [
+						'email_service' => [ 'Email service', \Groundhogg_Email_Services::dropdown() ],
+						'message_type'  => [
+							'Message Type',
+							[
+								\Groundhogg_Email_Services::MARKETING     => 'Marketing',
+								\Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+								\Groundhogg_Email_Services::WORDPRESS     => 'WordPress'
+							],
+						],
+						'status'        => [
+							'Status',
+							[
+								'sent'   => 'Sent',
+								'failed' => 'Failed'
+							]
+						],
+						'error_code'    => [ 'Error code', $error_codes ]
+					],
+					'stringColumns' => [
+						'from_address'  => 'From address',
+						'subject'       => 'Subject',
+						'content'       => 'Content',
+						'headers'       => 'Headers',
+						'error_message' => 'Error message',
+					],
+					'dateColumns'   => [
+						'date_sent' => 'Date sent'
+					]
+				] );
+
+				wp_enqueue_script( 'groundhogg-admin-email-log-filters' );
+				wp_enqueue_script( 'groundhogg-admin-email-log' );
+
+				break;
+			case 'events':
+
+				switch ( get_url_var( 'status' ) ) {
+					default:
+					case 'waiting':
+					case 'paused':
+					case 'pending':
+
+						$this->enqueue_table_filters( [
+							'futureDateColumns' => [
+								'time' => 'Will complete'
+							],
+						] );
+
+						break;
+					case 'complete':
+					case 'cancelled':
+						$this->enqueue_table_filters( [
+							'dateColumns' => [
+								'time' => 'Date completed'
+							]
+						] );
+
+						break;
+					case 'failed':
+					case 'skipped':
+
+						$error_codes = array_filter( get_db( 'events' )->get_unique_column_values( 'error_code' ) );
+						$error_codes = array_combine( $error_codes, $error_codes );
+
+						$this->enqueue_table_filters( [
+							'stringColumns' => [
+								'error_message' => 'Error message',
+							],
+							'dateColumns'   => [
+								'time' => 'Date attempted'
+							],
+							'selectColumns' => [
+								'error_code' => [ 'Error code', $error_codes ]
+							]
+						] );
+
+						break;
+				}
+
+				wp_enqueue_script( 'groundhogg-admin-event-filters' );
+
+				break;
+		}
 	}
 
 	public function get_slug() {
@@ -360,15 +402,19 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
-
 		$event_queue = get_db( 'event_queue' );
-		$event_ids   = implode( ',', $this->get_items() );
-		$time        = time();
 
-		$wpdb->query( "UPDATE {$event_queue->get_table_name()} SET `time` = {$time} WHERE `ID` in ({$event_ids})" );
+		$updated = $event_queue->query( [
+			'operation' => 'UPDATE',
+			'data'      => [
+				'time'   => time(),
+				'status' => Event::WAITING,
+				'claim'  => '',
+			],
+            'ID' => wp_parse_id_list( $this->get_items() ),
+		] );
 
-		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
 
 		return false;
 	}
@@ -456,6 +502,10 @@ class Events_Page extends Tabbed_Admin_Page {
 		$events_table = new Events_Table();
 
 		$events_table->views();
+
+		$this->table_filters();
+
+		$this->filters_search_form();
 		?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
@@ -497,10 +547,9 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table = new Email_Log_Table();
 
-		if ( method_exists( $this, 'get_current_tab' ) ) {
-			?>
-            <div style="margin-top: 10px"></div><?php
-		}
+		$log_table->views();
+
+		$this->table_filters();
 
 		?>
         <form method="get" class="search-form">
@@ -508,21 +557,29 @@ class Events_Page extends Tabbed_Admin_Page {
             <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
 
+			<?php if ( ! get_url_var( 'include_filters' ) ):
+				echo html()->input( [
+					'type' => 'hidden',
+					'name' => 'include_filters'
+				] );
+			endif; ?>
+
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"
                        value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
 				<?php
 
 				echo html()->dropdown( [
-					'options'     => [
+					'options'           => [
 						'subject'    => __( 'Subject', 'groundhogg' ),
 						'content'    => __( 'Body', 'groundhogg' ),
 						'recipients' => __( 'Recipients', 'groundhogg' ),
 						'headers'    => __( 'Headers', 'groundhogg' )
 					],
-					'option_none' => 'Everywhere',
-					'name'        => 'search_columns',
-					'selected'    => get_request_var( 'search_columns' )
+					'option_none'       => __( 'Everywhere', 'groundhogg' ),
+					'option_none_value' => '',
+					'name'              => 'search_columns',
+					'selected'          => get_request_var( 'search_columns' )
 				] );
 
 				?>
@@ -530,9 +587,6 @@ class Events_Page extends Tabbed_Admin_Page {
                         class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
             </div>
         </form>
-		<?php
-		$log_table->views();
-		?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
 			<?php $log_table->prepare_items(); ?>
@@ -871,17 +925,7 @@ ORDER BY ID" );
 		);
 	}
 
-	public function view_log() {
-		include __DIR__ . '/log-preview.php';
-	}
-
 	public function page() {
-
-		if ( $this->get_current_tab() === 'log' ) {
-			$this->view_log();
-
-			return;
-		}
 
 		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::is_enabled() ) {
 			$this->add_notice( 'inactive', sprintf( __( "Email logging is currently disabled. You can enable email logging in the <a href='%s'>email settings</a>.", 'groundhogg' ), admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) ), 'warning' );

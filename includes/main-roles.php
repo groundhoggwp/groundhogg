@@ -53,7 +53,6 @@ class Main_Roles extends Roles {
 	 * @return array[]
 	 */
 	public function get_roles() {
-		// TODO Revisit sales rep & sales manager caps...
 
 		return apply_filters( 'groundhogg/roles/get_roles', [
 			[
@@ -89,6 +88,7 @@ class Main_Roles extends Roles {
 					'read_private_pages'     => true,
 					'read_private_posts'     => true,
 					'view_admin_dashboard'   => true,
+					'level_1'                => true, // Deprecated capability required for showing in authors dropdown
 				]
 			],
 			[
@@ -191,7 +191,7 @@ class Main_Roles extends Roles {
 				$file_path = $args[0];
 
 				// Compat for WooCommerce usage of download file
-				if ( ! is_string( $file_path ) ){
+				if ( ! is_string( $file_path ) ) {
 					return $caps;
 				}
 
@@ -223,7 +223,7 @@ class Main_Roles extends Roles {
 						}
 
 						// Trying to download files of contacts that don't belong to them
-						if ( ! $contact->owner_is( $user_id ) ){
+						if ( ! $contact->owner_is( $user_id ) ) {
 							$caps[] = 'view_others_contacts';
 						}
 

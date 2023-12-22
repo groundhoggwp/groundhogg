@@ -4,14 +4,11 @@ namespace Groundhogg\Admin\Emails;
 
 use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\Contact;
 use Groundhogg\Email;
-use Groundhogg\Plugin;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
-use function Groundhogg\managed_page_url;
-use function Groundhogg\set_user_test_email;
+use function Groundhogg\html;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,6 +32,7 @@ class Emails_Page extends Admin_Page {
 
 
 	protected function get_current_action() {
+
 		$action = parent::get_current_action();
 
 		if ( $action == 'view' && get_db( 'emails' )->is_empty() ) {
@@ -94,7 +92,7 @@ class Emails_Page extends Admin_Page {
 
 	public function scripts() {
 
-		if ( $this->current_action_is( 'edit' ) || $this->current_action_is( 'add' ) ) {
+		if ( $this->current_action_is( [ 'edit', 'add' ] ) ) {
 
 			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
 			$email    = new Email( $email_id );
@@ -107,6 +105,11 @@ class Emails_Page extends Admin_Page {
 				'email_id' => $email_id,
 				'email'    => $email
 			] );
+		}
+
+		if ( $this->current_action_is( 'view' ) ) {
+//            wp_enqueue_style( 'groundhogg-email-block-editor' );
+			wp_enqueue_script( 'groundhogg-admin-components' );
 		}
 
 		remove_editor_styles();
@@ -328,6 +331,37 @@ class Emails_Page extends Admin_Page {
 		}
 
 		Groundhogg\download_json( $email, $email->get_title() );
+	}
+
+	protected function search_form( $title, $name = 's' ) {
+		?>
+        <form method="get" class="search-form">
+			<?php html()->hidden_GET_inputs( true ); ?>
+            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
+
+            <div style="float: right" class="gh-input-group">
+                <input type="search" id="gh-post-search-input" name="s"
+                       value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
+				<?php
+
+				echo html()->dropdown( [
+					'options'           => [
+						'title'   => __( 'Title', 'groundhogg' ),
+						'subject' => __( 'Subject', 'groundhogg' ),
+						'content' => __( 'Content', 'groundhogg' ),
+					],
+					'option_none'       => __( 'Everywhere', 'groundhogg' ),
+					'option_none_value' => '',
+					'name'              => 'search_columns',
+					'selected'          => get_request_var( 'search_columns' )
+				] );
+
+				?>
+                <button type="submit" id="search-submit" class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+            </div>
+        </form>
+		<?php
 	}
 
 	/**

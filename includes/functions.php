@@ -17,6 +17,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Adds functional support for getting some options from constants instead
+ *
+ * @param $option_name string the name of the option
+ *
+ * @return void
+ */
+function add_constant_support( $option_name ) {
+
+	$hook     = "pre_option_$option_name";
+	$callback = __NAMESPACE__ . '\maybe_get_option_from_constant';
+
+	if ( ! has_filter( $hook, $callback ) ) {
+		add_filter( $hook, $callback, 10, 2 );
+	}
+}
+
+/**
+ * Given an option name, check if it's defined as a constant and if it is, return that value instead
+ *
+ * @param $value       false|null
+ * @param $option_name string
+ *
+ * @return mixed
+ */
+function maybe_get_option_from_constant( $value, $option_name ) {
+	$constant = strtoupper( $option_name );
+
+	if ( defined( $constant ) ) {
+		return constant( $constant );
+	}
+
+	return $value;
+}
+
+add_constant_support( 'gh_master_license' );
+add_constant_support( 'gh_recaptcha_secret_key' );
+add_constant_support( 'gh_recaptcha_site_key' );
+
+/**
  * If an email address is provided but a space is in place of a plus then swap out the space for a plus
  *
  * @param $str string
@@ -507,6 +546,9 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
 		$query['filters'] = base64_json_decode( $query['filters'] );
 	}
+	if ( isset_not_empty( $query, 'include_filters' ) && is_string( $query['include_filters'] ) ) {
+		$query['include_filters'] = base64_json_decode( $query['include_filters'] );
+	}
 	if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
 		$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
 	}
@@ -823,9 +865,9 @@ function iframe_compat() {
 /**
  * Enqueues the modal scripts
  *
+ * @since 1.0.5
  * @return Modal
  *
- * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -1078,22 +1120,22 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
+ * @throws \Exception
+ *
+ * @since      1.2.10
+ * @deprecated 2.1.11
+ *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
+ *
  * @param string       $subject     Email subject
  *
  * @param string       $message     Message contents
  *
  * @param string|array $headers     Optional. Additional headers.
  *
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to          Array or comma-separated list of email addresses to send message.
- *
  * @return bool Whether the email contents were sent successfully.
- * @throws \Exception
- *
- * @since      1.2.10
- * @deprecated 2.1.11
- *
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -1101,10 +1143,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -1273,9 +1315,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @param string $from_email Email address to send from.
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param string $from_email Email address to send from.
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -1283,9 +1325,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @param string $from_name Name associated with the "from" email address.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $from_name Name associated with the "from" email address.
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -1353,9 +1395,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @param string $content_type Default wp_mail() content type.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $content_type Default wp_mail() content type.
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1382,9 +1424,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @param string $charset Default email charset.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $charset Default email charset.
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1413,9 +1455,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1449,10 +1491,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
+		 * @since 4.4.0
+		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
-		 *
-		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -1859,9 +1901,16 @@ function after_form_submit_handler( &$contact ) {
 		return;
 	}
 
-	// If they re-optin we will consider them unconfirmed
+	// If they re-opt-in we consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
-		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
+
+		// Opt-in status is already unconfirmed
+		if ( $contact->optin_status_is( Preferences::UNCONFIRMED ) ) {
+			// this will take care of double opt-in requirements
+			$contact->reset_date_optin_status_changed();
+		} else {
+			$contact->change_marketing_preference( Preferences::UNCONFIRMED );
+		}
 	}
 
 	/**
@@ -2115,19 +2164,25 @@ function count_csv_rows( $file_path ) {
 	$file = new \SplFileObject( $file_path, 'r' );
 	$file->seek( PHP_INT_MAX );
 
-	return $file->key() + 1;
+	$lines = $file->key();
+
+	$file = null;
+
+	return $lines;
 }
 
 /**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
  * @param string $file_path   path to the CSV file
+ * @param int    $rows        the number of rows to retrieve, a negative number will mean all rows
+ * @param int    $offset      the offset to start
  * @param bool   $delimiter   the file delimiter, if false it will guess
  * @param bool   $associative whether to return the results as an associative array or regular array
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $delimiter = false, $associative = true ) {
+function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter = false, $associative = true ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
@@ -2140,51 +2195,46 @@ function get_items_from_csv( $file_path = '', $delimiter = false, $associative =
 
 	$data = array();
 
-	if ( $associative ) {
+	$file = new \SplFileObject( $file_path, 'r' );
 
-		$header       = null;
-		$header_count = 0;
+	// Headers are always the first row
+	$header       = $file->fgetcsv( $delimiter );
+	$header_count = count( $header );
 
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
-				if ( ! $header ) {
-					$header       = $row;
-					$header_count = count( $header );
-				} else {
+	// Get all rows
+	if ( ! $rows ) {
+		$rows = 999999999;
+	}
 
-					if ( count( $row ) > $header_count ) {
-
-						$row = array_slice( $row, 0, $header_count );
-					} else if ( count( $row ) < $header_count ) {
-
-						$row = array_pad( $row, $header_count, '' );
-					}
-
-					$data[] = array_combine( $header, $row );
-				}
-			}
-
-			fclose( $handle );
-		}
-	} else {
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-
-			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
-
-				if ( empty( $row ) ) {
-					continue;
-				}
-
-				if ( count( $row ) === 1 && empty ( $row[0] ) ) {
-					continue;
-				}
-
-				$data[] = $row;
-			}
-
-			fclose( $handle );
+	if ( $offset > 0 ) {
+		// bug in PHP < 8.0.1 causes next line to be given after seek
+		if ( version_compare( PHP_VERSION, '8.0.1', '<' ) ) {
+			$file->seek( $offset );
+		} else {
+			$file->seek( $offset + 1 );
 		}
 	}
+
+	while ( ! $file->eof() && count( $data ) < $rows ) {
+
+		$row = $file->fgetcsv( $delimiter );
+
+		if ( $associative ) {
+			if ( count( $row ) > $header_count ) {
+
+				$row = array_slice( $row, 0, $header_count );
+			} else if ( count( $row ) < $header_count ) {
+
+				$row = array_pad( $row, $header_count, '' );
+			}
+
+			$data[] = array_combine( $header, $row );
+		} else {
+			$data[] = $row;
+		}
+	}
+
+	$file = null;
 
 	return $data;
 }
@@ -2721,13 +2771,13 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @param $map    array map of field_ids to contact keys
+ * @throws \Exception
  *
  * @param $fields array the raw data from the source
  *
- * @return Contact|false
- * @throws \Exception
+ * @param $map    array map of field_ids to contact keys
  *
+ * @return Contact|false
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -2747,11 +2797,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$args  = [];
 	$files = [];
 	$copy  = [];
-
-	// flags
-	$gdpr_consent      = false;
-	$marketing_consent = false;
-	$terms_agreement   = false;
 
 	foreach ( $fields as $column => $value ) {
 
@@ -2900,7 +2945,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'country':
 				if ( strlen( $value ) !== 2 ) {
-					$countries = Plugin::$instance->utils->location->get_countries_list();
+					$countries = utils()->location->get_countries_list();
 					$code      = array_search( $value, $countries );
 					if ( $code ) {
 						$value = $code;
@@ -2963,7 +3008,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'time_zone':
-				$zones = Plugin::$instance->utils->location->get_time_zones();
+				$zones = utils()->location->get_time_zones();
 				// valid timezone
 				if ( key_exists( $value, $zones ) ) {
 					$meta[ $field ] = $value;
@@ -3016,28 +3061,30 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			return false;
 		}
 
-		$contact = new Contact( [
-			'email' => $args['email']
-		] );
+		$contact = new Contact( [ 'email' => $args['email'] ] );
 
-	} else if ( isset_not_empty( $args, 'user_id' ) ) {
+	} else {
 
-		// Get by given user id
-		$contact = get_contactdata( $args['user_id'], true );
+		if ( isset_not_empty( $args, 'user_id' ) ) {
 
-	} else if ( isset_not_empty( $args, 'contact_id' ) ) {
+			// Get by given user id
+			$contact = get_contactdata( $args['user_id'], true );
 
-		// Get by given contact id
-		$contact = get_contactdata( $args['contact_id'] );
-		unset( $args['contact_id'] );
+		} else if ( isset_not_empty( $args, 'contact_id' ) ) {
 
-	} else if ( ! current_user_can( 'view_contacts' ) ) {
+			// Get by given contact id
+			$contact = get_contactdata( $args['contact_id'] );
+			unset( $args['contact_id'] );
 
-		// Is there an active contact record?
-		$contact = get_contactdata();
+		} else if ( ! current_user_can( 'view_contacts' ) ) {
+
+			// Is there an active contact record?
+			$contact = get_contactdata();
+		}
+
 	}
 
-	if ( ! $contact || ! $contact->exists() ) {
+	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 		return false;
 	}
 
@@ -3058,9 +3105,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	//	 update meta data
 	if ( ! empty( $meta ) ) {
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( $key, $value );
-		}
+		$contact->update_meta( $meta );
 	}
 
 	if ( ! empty( $files ) ) {
@@ -3255,7 +3300,7 @@ function show_groundhogg_branding() {
  */
 function floating_phil() {
 	?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil"
-	       src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+           src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
 }
 
 /**
@@ -3445,20 +3490,20 @@ function preferences_center_shortcode() {
 	ob_start();
 
 	?>
-	<p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
-	<p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
-	<p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
-	<ul>
-		<li>
-			<a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
-		</li>
-		<li>
-			<a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
-		</li>
-		<li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
-		<li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
-	</ul>
-	<p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
+    <p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
+    <p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
+    <p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
+    <ul>
+        <li>
+            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
+        </li>
+        <li>
+            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
+        </li>
+        <li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
+        <li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
+    </ul>
+    <p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
 	<?php
 
 	return ob_get_clean();
@@ -3488,11 +3533,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
+ * @deprecated since 2.0.9.2
+ *
  * @param string $string
  *
  * @return string
- * @deprecated since 2.0.9.2
- *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -3510,7 +3555,7 @@ function is_managed_page() {
  */
 function no_index_tag() {
 	?>
-	<meta name="robots" content="noindex">
+    <meta name="robots" content="noindex">
 	<?php
 }
 
@@ -3545,15 +3590,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param int|string $action    Optional. Nonce action name. Default -1.
+ * @since 2.0.4
  *
  * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
  *
  * @param string     $actionurl URL to add nonce action.
  *
- * @return string
- * @since 2.0.4
+ * @param int|string $action    Optional. Nonce action name. Default -1.
  *
+ * @return string
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -4046,7 +4091,7 @@ function get_default_country_code() {
 	// Get the IP of the logged in user
 	if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
 
-		$cc = Plugin::instance()->utils->location->ip_info( null, 'countrycode' );
+		$cc = utils()->location->ip_info( null, 'countrycode' );
 
 		if ( $cc ) {
 			update_option( 'gh_default_country_code', $cc );
@@ -4061,7 +4106,7 @@ function get_default_country_code() {
 
 	if ( $parse_url ) {
 		$ip = gethostbyname( $parse_url );
-		$cc = Plugin::instance()->utils->location->ip_info( $ip, 'countrycode' );
+		$cc = utils()->location->ip_info( $ip, 'countrycode' );
 
 		if ( $cc ) {
 			update_option( 'gh_default_country_code', $cc );
@@ -4318,6 +4363,15 @@ function is_pro_features_active() {
 }
 
 /**
+ * Fetches the master license, if one is available
+ *
+ * @return void
+ */
+function get_master_license() {
+	return get_option( 'gh_master_license' );
+}
+
+/**
  * Checks if the Groundhogg helper plugin is installed
  *
  * @return bool
@@ -4368,14 +4422,14 @@ add_action( 'admin_menu', function () {
 function maybe_print_menu_styles() {
 
 	?>
-	<style>
+    <style>
 
-		<?php if ( $unread = notices()->count_unread() > 0 ): ?>
+        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
         .unread-notices::after {
             content: '<?php echo $unread ?>' !important;
         }
 
-		<?php endif; ?>
+        <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
@@ -4419,7 +4473,7 @@ function maybe_print_menu_styles() {
         #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before {
             margin-bottom: 8px;
         }
-	</style>
+    </style>
 	<?php
 }
 
@@ -6447,6 +6501,33 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'href' => '#unsubscribe_link#'
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
 
+	$post_types = array_map( function ( $post_type ) {
+
+		/**
+		 * @var $post_type \WP_Post_Type
+		 */
+		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
+
+		$taxonomies = array_map( function ( $tax ) {
+			return [
+				'label'        => $tax->label,
+				'name'         => $tax->name,
+				'rest_base'    => $tax->rest_base,
+				'show_in_rest' => $tax->show_in_rest,
+				'public'       => $tax->public
+			];
+		}, $taxonomies );
+
+		return [
+			'name'         => $post_type->name,
+			'labels'       => $post_type->labels,
+			'taxonomies'   => $taxonomies,
+			'show_in_rest' => $post_type->show_in_rest,
+			'rest_base'    => $post_type->rest_base
+		];
+
+	}, get_post_types( [ 'public' => true ], false ) );
+
 	$localized = array_merge( [
 		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
@@ -6455,10 +6536,11 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'imageSizes'    => get_intermediate_image_sizes(),
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
-		]
+		],
+		'post_types'    => $post_types
 	], $extra );
 
-	wp_localize_script( 'groundhogg-email-block-editor', '_BlockEditor', $localized );
+	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
 }
 
 /**
@@ -7074,15 +7156,15 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $num_related_contacts > 0 ):
 
 		?>
-		<fieldset>
-			<p>
-				<legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
-			</p>
-			<p><?php echo html()->checkbox( [
+        <fieldset>
+            <p>
+                <legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
+            </p>
+            <p><?php echo html()->checkbox( [
 					'label' => sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ),
 					'name'  => 'delete_related_contact_records'
 				] ) ?></p>
-		</fieldset>
+        </fieldset>
 	<?php
 	endif;
 
@@ -7100,16 +7182,16 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 	if ( $has_owned_content ):
 
 		?>
-		<fieldset>
-			<p>
-				<legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
-			</p>
-			<p><?php echo html()->dropdown_owners( [
+        <fieldset>
+            <p>
+                <legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
+            </p>
+            <p><?php echo html()->dropdown_owners( [
 					'name'        => 'reassign_groundhogg_owner',
 					'option_none' => false,
 					'exclude'     => $all_ids
 				] ) ?></p>
-		</fieldset>
+        </fieldset>
 	<?php
 
 	endif;
@@ -7242,11 +7324,11 @@ function maybe_url_decrypt_id( $data ) {
 
 function iframe_js() {
 	?>
-	<script>
+    <script>
       if (window.self !== window.top) {
         document.querySelector('html').classList.add('iframed')
       }
-	</script>
+    </script>
 	<?php
 }
 
@@ -7897,7 +7979,7 @@ function get_json_regex() {
  */
 function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 
-	if ( empty( $string ) ){
+	if ( empty( $string ) ) {
 		return '';
 	}
 
@@ -7907,7 +7989,13 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 	if ( $clean_up == true ) {
 		// CORRECT THE HTML - or use https://www.barattalo.it/html-fixer/
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
-		@$dom->loadHTML( mb_convert_encoding( $markdown, 'HTML-ENTITIES', 'UTF-8' ) );
+
+        if ( function_exists( 'iconv' ) ){
+	        @$dom->loadHTML( htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1', htmlentities($markdown, ENT_COMPAT, 'UTF-8')), ENT_QUOTES) );
+        } else {
+	        @$dom->loadHTML( $markdown );
+        }
+
 		$markdown = $dom->saveHTML();
 		// preg_match() IS NOT SO NICE, BUT WORKS FOR ME
 		preg_match( "/<body[^>]*>(.*?)<\/body>/is", $markdown, $matches );

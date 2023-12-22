@@ -85,7 +85,7 @@ function render_draggable_step_grid( $steps ) {
 }
 
 ?>
-<form method="post" id="funnel-form">
+<form method="post" id="funnel-form" class="gh-fixed-ui">
 	<?php wp_nonce_field(); ?>
 	<?php $args = array(
 		'type'  => 'hidden',

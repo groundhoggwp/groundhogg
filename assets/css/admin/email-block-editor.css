@@ -397,7 +397,7 @@
 }
 
 #controls-panel {
-  width: 300px;
+  width: 320px;
   overflow-y: auto;
   flex-shrink: 0;
   background: #fff;
@@ -593,15 +593,6 @@ body iframe#preview.desktop {
   display: none;
 }
 
-#email-editor:has(#email-block-editor), #email-editor:has(#email-html-editor) {
-  position: fixed;
-  left: 160px;
-  top: 32px;
-  bottom: 0;
-  right: 0;
-  height: calc(100vh - 32px);
-  max-height: calc(100vh - 32px);
-}
 #email-editor:has(#email-html-editor) {
   display: flex;
   flex-direction: column;
@@ -777,15 +768,6 @@ body iframe#preview.desktop {
 .gh-modal-frame #email-editor #email-html-editor,
 .gh-modal-frame #email-editor #email-block-editor {
   height: calc(100% - 60px) !important;
-}
-
-@media only screen and (max-width: 960px) {
-  .auto-fold #email-editor {
-    left: 36px !important;
-  }
-}
-.folded #email-editor {
-  left: 36px !important;
 }
 
 .cards .post-card img {
@@ -981,10 +963,19 @@ body iframe#preview.desktop {
   height: 13px;
 }
 
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 .preview.mobile, .preview.desktop {
   background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
+}
+.preview iframe {
+  height: 100%;
+  width: 100%;
 }
 .preview .from-preview {
   padding: 20px;

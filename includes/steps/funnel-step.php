@@ -99,6 +99,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'after_save' ], 99 );
 
 			add_action( "admin_enqueue_scripts", [ $this, 'admin_scripts' ] );
+
+            add_action( 'groundhogg/step/duplicated', [ $this, 'after_duplicate' ], 10, 2 );
 		}
 
 		/**
@@ -121,6 +123,26 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$this->add_additional_actions();
 	}
+
+	/**
+     * Process after duplicate step stuff
+     *
+	 * @param $new Step
+	 * @param $original Step
+	 *
+	 * @return void
+	 */
+    public function after_duplicate( $new, $original ){
+
+        // not the right step type, exit out
+        if ( $new->get_type() !== $this->get_type() ){
+            return;
+        }
+
+        $this->set_current_step( $new );
+
+        $this->duplicate( $new, $original );
+    }
 
 	protected function add_additional_actions() {
 	}
@@ -1024,6 +1046,18 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function import( $args, $step ) {
 		//silence is golden
 	}
+
+	/**
+     * Stuff to do when duplicating a step
+     *
+	 * @param $new
+	 * @param $original
+	 *
+	 * @return void
+	 */
+    public function duplicate( $new, $original ){
+
+    }
 
 	/**
 	 * Cleanup actions after the import of a step

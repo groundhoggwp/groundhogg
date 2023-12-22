@@ -309,6 +309,8 @@ class Groundhogg_Email_Services {
 	 */
 	public static function set_message_id( $message_id ) {
 		self::$message_id = $message_id;
+
+        Email_Logger::set_msg_id( $message_id );
 	}
 
 	/**

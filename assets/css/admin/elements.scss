@@ -14,6 +14,7 @@ $primary-dark-5: rgba(16, 38, 64, 0.05);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
+$error-red-25: rgba(233, 31, 79, 0.25);
 $secondary-purple: rgb(108, 25, 173);
 $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
@@ -779,7 +780,7 @@ a.action-link {
   }
   &.danger,
   &.red {
-    background: $error-red-50;
+    background: $error-red-25;
     color: darken($error-red, 35)
   }
 
@@ -790,10 +791,15 @@ a.action-link {
 
 svg,
 p.gh-text,
+pre.gh-text,
 span.gh-text {
   &.red,
   &.danger {
     color: $error-red;
+
+    &.dark {
+      color: darken($error-red, 35)
+    }
   }
 
   &.orange,
@@ -1104,6 +1110,10 @@ button {
       color: $primary-blue;
       padding: 5px 10px;
 
+      &.page-title-action{
+        padding: 0 10px;
+      }
+
       &.text {
         border: none;
         background: transparent;
@@ -1377,32 +1387,6 @@ button {
     h2 {
       margin: 0;
     }
-
-    .groundhogg-content-box {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-
-      table {
-
-        width: 100%;
-
-        th {
-          text-align: left;
-          width: 100px;
-        }
-
-        pre {
-          margin: 0;
-        }
-      }
-
-      #headers{
-        width: 100%;
-        overflow: auto;
-      }
-    }
-
   }
 
   h3.replacements-group {
@@ -2024,6 +2008,15 @@ p.error,
   //height: 25px;
   //box-sizing: content-box;
 
+  &.error {
+
+    background-color: $error-red-10;
+
+    .gh-progress-bar-fill {
+      background-color: $error-red;
+    }
+  }
+
   .gh-progress-bar-fill {
     box-sizing: border-box;
     //position: absolute;
@@ -2513,7 +2506,7 @@ p.error,
     }
 
     &.not-set {
-      background-color: $error-red-10;
+      //background-color: $error-red-10;
 
       &::after{
         background-color: $primary-dark-10;
@@ -2547,6 +2540,45 @@ p.error,
   .iris-picker {
     grid-area: picker;
   }
+}
+
+.gh-autocomplete {
+  &.has-results {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.gh-autocomplete-results {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+  border-radius: 0 0 5px 5px;
+  background: #FFF;
+  overflow-y: auto;
+
+  &.hidden {
+    display: none;
+  }
+
+  a {
+    cursor: pointer;
+    font-size: 14px;
+    padding: 3px 8px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.pointer {
+      color: $primary-dark;
+      background: $primary-blue-7;
+    }
+  }
+
 }
 
 .gh-picker {

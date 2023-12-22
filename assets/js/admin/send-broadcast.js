@@ -1,4 +1,4 @@
-(function ($) {
+( function ($) {
 
   const {
     modal,
@@ -66,16 +66,16 @@
 
       // language=HTML
       return `
-		  <div class="gh-row">
-			  <div class="gh-col">
-				  <iframe id="${elPrefix}-email-preview"></iframe>
-			  </div>
-		  </div>`
+          <div class="gh-row">
+              <div class="gh-col">
+                  <iframe id="${ elPrefix }-email-preview"></iframe>
+              </div>
+          </div>`
     }
 
     const showFrame = () => {
       if (state.email_id) {
-        setFrameContent($(`#${elPrefix}-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
+        setFrameContent($(`#${ elPrefix }-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
       }
     }
 
@@ -83,31 +83,31 @@
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-email"><b>${__('Which email do you want to send?', 'groundhogg')}</b></label>
-					  ${select({
-						  name: 'email',
-						  id: `${elPrefix}-email`,
-						  options: [
-							  { text: '', value: '' },
-							  ...EmailsStore.getItems().map(e => ({ text: e.data.title, value: e.ID })),
-						  ],
-						  selected: state.email_id,
-					  })}
-				  </div>
-			  </div>
-			  ${state.email_id ? preview() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>
-						  ${__('Next', 'groundhogg')} &rarr;
-					  </button>
-				  </div>
-			  </div>
-		  </div>
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-email"><b>${ __('Which email do you want to send?', 'groundhogg') }</b></label>
+                      ${ select({
+                          name: 'email',
+                          id: `${ elPrefix }-email`,
+                          options: [
+                              { text: '', value: '' },
+                              ...EmailsStore.getItems().map(e => ( { text: e.data.title, value: e.ID } )),
+                          ],
+                          selected: state.email_id,
+                      }) }
+                  </div>
+              </div>
+              ${ state.email_id ? preview() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button class="gh-next-step gh-button primary" ${ state.email_id ? '' : 'disabled' }>
+                          ${ __('Next', 'groundhogg') } &rarr;
+                      </button>
+                  </div>
+              </div>
+          </div>
       `
     }
 
@@ -116,75 +116,75 @@
       const laterSettings = () => {
         // language=HTML
         return `
-			<div class="gh-row">
-				<div class="gh-col">
-					<label for="${elPrefix}-date"><b>${__('Set the date and time...', 'groundhogg')}</b></label>
-					<div class="gh-input-group">
-						${input({
-							id: `${elPrefix}-date`,
-							type: 'date',
-							name: 'date',
-							value: state.date,
-							min: moment().format('YYYY-MM-DD'),
-						})}
-						${input({
-							id: `${elPrefix}-time`,
-							type: 'time',
-							name: 'time',
-							value: state.time,
-						})}
-					</div>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
-					<label>${__('Send in the contact\'s local time?', 'groundhogg')} ${toggle({
-						onLabel: __('Yes'),
-						offLabel: __('No'),
-						id: `${elPrefix}-local-time`,
-						name: 'send_in_local_time',
-						checked: state.send_in_local_time,
-					})}</label>
-				</div>
-			</div>`
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label for="${ elPrefix }-date"><b>${ __('Set the date and time...', 'groundhogg') }</b></label>
+                    <div class="gh-input-group">
+                        ${ input({
+                            id: `${ elPrefix }-date`,
+                            type: 'date',
+                            name: 'date',
+                            value: state.date,
+                            min: moment().format('YYYY-MM-DD'),
+                        }) }
+                        ${ input({
+                            id: `${ elPrefix }-time`,
+                            type: 'time',
+                            name: 'time',
+                            value: state.time,
+                        }) }
+                    </div>
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <label>${ __('Send in the contact\'s local time?', 'groundhogg') } ${ toggle({
+                        onLabel: __('Yes'),
+                        offLabel: __('No'),
+                        id: `${ elPrefix }-local-time`,
+                        name: 'send_in_local_time',
+                        checked: state.send_in_local_time,
+                    }) }</label>
+                </div>
+            </div>`
       }
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-when"><b>${__('When should this email be sent?',
-						  'groundhogg')}</b></label>
-					  <div class="gh-radio-group">
-						  <label>${input({
-							  type: 'radio',
-							  className: 'change-when',
-							  name: 'gh_send_when',
-							  value: 'now',
-							  checked: state.when === 'now',
-						  })} ${__('Now', 'groundhogg')}</label>
-						  <label>${input({
-							  type: 'radio',
-							  name: 'gh_send_when',
-							  className: 'change-when',
-							  value: 'later',
-							  checked: state.when === 'later',
-						  })} ${__('Later', 'groundhogg')}</label>
-					  </div>
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-when"><b>${ __('When should this email be sent?',
+                              'groundhogg') }</b></label>
+                      <div class="gh-radio-group">
+                          <label>${ input({
+                              type: 'radio',
+                              className: 'change-when',
+                              name: 'gh_send_when',
+                              value: 'now',
+                              checked: state.when === 'now',
+                          }) } ${ __('Now', 'groundhogg') }</label>
+                          <label>${ input({
+                              type: 'radio',
+                              name: 'gh_send_when',
+                              className: 'change-when',
+                              value: 'later',
+                              checked: state.when === 'later',
+                          }) } ${ __('Later', 'groundhogg') }</label>
+                      </div>
 
-				  </div>
-			  </div>
-			  ${state.when === 'later' ? laterSettings() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary"
-					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>
-						  ${__('Next', 'groundhogg')} &rarr;
-					  </button>
-				  </div>
-			  </div>`
+                  </div>
+              </div>
+              ${ state.when === 'later' ? laterSettings() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button class="gh-next-step gh-button primary"
+                              ${ state.when === 'later' && ( !state.date || !state.time ) ? 'disabled' : '' }>
+                          ${ __('Next', 'groundhogg') } &rarr;
+                      </button>
+                  </div>
+              </div>`
     }
 
     const step3 = () => {
@@ -194,69 +194,69 @@
       const totalAndNext = () => {
         //language=HTML
         return `
-			<div class="gh-row">
-				<div class="gh-col">
-					<div id="${elPrefix}-total-contacts">
-						<p>
-							${sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'),
-								bold(formatNumber(total_contacts)))}
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="gh-row">
-				<div class="gh-col">
-					<button class="gh-next-step gh-button primary" ${total_contacts ? '' : 'disabled'}>
-						${__('Next', 'groundhogg')}
-						&rarr;
-					</button>
-				</div>
-			</div>`
+            <div class="gh-row">
+                <div class="gh-col">
+                    <div id="${ elPrefix }-total-contacts">
+                        <p>
+                            ${ sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'),
+                                    bold(formatNumber(total_contacts))) }
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="gh-row">
+                <div class="gh-col">
+                    <button class="gh-next-step gh-button primary" ${ total_contacts ? '' : 'disabled' }>
+                        ${ __('Next', 'groundhogg') }
+                        &rarr;
+                    </button>
+                </div>
+            </div>`
         // language=HTML
       }
 
       if (state.which === 'from_table') {
-        return `<div class="gh-rows-and-columns">${totalAndNext()}</div>`
+        return `<div class="gh-rows-and-columns">${ totalAndNext() }</div>`
       }
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <label
-						  for="${elPrefix}-search-which"><b>${__('Select contacts to receive this email...',
-						  'groundhogg')}</b></label>
-					  <div class="gh-radio-group">
-						  <label>${input({
-							  type: 'radio',
-							  className: 'change-search-which',
-							  name: 'gh_send_search_which',
-							  value: 'filters',
-							  checked: state.which === 'filters',
-						  })} ${__('Search for Contacts', 'groundhogg')}</label>
-						  <label>${input({
-							  type: 'radio',
-							  name: 'gh_send_search_which',
-							  className: 'change-search-which',
-							  value: 'searches',
-							  checked: state.which === 'searches',
-						  })} ${__('Use a Saved Search', 'groundhogg')}</label>
-					  </div>
-				  </div>
-			  </div>
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <div id="${elPrefix}-search-method">
-						  ${state.which === 'searches' ? select({
-							  id: `${elPrefix}-search-method-searches`,
-							  name: 'searches',
-						  }) : ''}
-					  </div>
-				  </div>
-			  </div>
-			  ${totalAndNext()}
-		  </div>`
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <label
+                              for="${ elPrefix }-search-which"><b>${ __('Select contacts to receive this email...',
+                              'groundhogg') }</b></label>
+                      <div class="gh-radio-group">
+                          <label>${ input({
+                              type: 'radio',
+                              className: 'change-search-which',
+                              name: 'gh_send_search_which',
+                              value: 'filters',
+                              checked: state.which === 'filters',
+                          }) } ${ __('Search for Contacts', 'groundhogg') }</label>
+                          <label>${ input({
+                              type: 'radio',
+                              name: 'gh_send_search_which',
+                              className: 'change-search-which',
+                              value: 'searches',
+                              checked: state.which === 'searches',
+                          }) } ${ __('Use a Saved Search', 'groundhogg') }</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <div id="${ elPrefix }-search-method">
+                          ${ state.which === 'searches' ? select({
+                              id: `${ elPrefix }-search-method-searches`,
+                              name: 'searches',
+                          }) : '' }
+                      </div>
+                  </div>
+              </div>
+              ${ totalAndNext() }
+          </div>`
     }
 
     const step4 = () => {
@@ -276,25 +276,25 @@
 
       // language=HTML
       return `
-		  <div class="gh-rows-and-columns">
-			  <div class="gh-row">
-				  <div class="gh-col">
+          <div class="gh-rows-and-columns">
+              <div class="gh-row">
+                  <div class="gh-col">
               <span class="gh-text md">
-                  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)),
-	                  state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '')}
+                  ${ sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)),
+                          state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '') }
               </span>
-				  </div>
-			  </div>
-			  ${state.email_id ? preview() : ''}
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button id="${elPrefix}-confirm" class="gh-button primary">
-						  ${state.when === 'later' ? __('Confirm and Schedule', 'groundhogg') : __('Confirm and Send',
-							  'groundhogg')}
-					  </button>
-				  </div>
-			  </div>
-		  </div>`
+                  </div>
+              </div>
+              ${ state.email_id ? preview() : '' }
+              <div class="gh-row">
+                  <div class="gh-col">
+                      <button id="${ elPrefix }-confirm" class="gh-button primary">
+                          ${ state.when === 'later' ? __('Confirm and Schedule', 'groundhogg') : __('Confirm and Send',
+                                  'groundhogg') }
+                      </button>
+                  </div>
+              </div>
+          </div>`
     }
 
     $(selector).html(`<div id="gh-send-broadcast-form"></div>`)
@@ -328,7 +328,7 @@
         switch (step) {
           case 0:
 
-            emailPicker(`#${elPrefix}-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
+            emailPicker(`#${ elPrefix }-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
               status: 'ready',
             }, {
               placeholder: 'Select an email to send...',
@@ -356,22 +356,22 @@
 
             const updateButton = () => {
 
-              const isValid = state.when === 'now' || moment().isBefore(`${state.date} ${state.time}`)
+              const isValid = state.when === 'now' || moment().isBefore(`${ state.date } ${ state.time }`)
 
               $('.gh-next-step').prop('disabled', !isValid)
             }
 
-            $(`#${elPrefix}-date`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-date`).on('change', ({ target }) => {
               setState({ date: target.value })
               updateButton()
             })
 
-            $(`#${elPrefix}-time`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-time`).on('change', ({ target }) => {
               setState({ time: target.value })
               updateButton()
             })
 
-            $(`#${elPrefix}-local-time`).on('change', ({ target }) => {
+            $(`#${ elPrefix }-local-time`).on('change', ({ target }) => {
               setState({ send_in_local_time: target.checked })
             })
 
@@ -389,9 +389,9 @@
               }
 
               ContactsStore.count(query).then(total => {
-                $(`#${elPrefix}-total-contacts`).
-                html(`<p>${sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'),
-                  bold(formatNumber(total)))}</p>`)
+                $(`#${ elPrefix }-total-contacts`).
+                  html(`<p>${ sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'),
+                    bold(formatNumber(total))) }</p>`)
                 $('.gh-next-step').prop('disabled', total === 0)
                 setState({
                   total_contacts: total,
@@ -408,7 +408,7 @@
             })
 
             if (state.which === 'filters') {
-              createFilters(`#${elPrefix}-search-method`, state.query.filters, (filters) => {
+              createFilters(`#${ elPrefix }-search-method`, state.query.filters, (filters) => {
                 setState({
                   query: {
                     filters,
@@ -416,15 +416,16 @@
                 })
                 updateTotal()
               }).mount()
-            } else {
+            }
+            else {
 
               SearchesStore.fetchItems().then(() => {
 
-                $(`#${elPrefix}-search-method-searches`).select2({
+                $(`#${ elPrefix }-search-method-searches`).select2({
                   placeholder: __('Select a saved search...', 'groundhogg'),
                   data: [
                     { id: '', text: '' },
-                    ...SearchesStore.getItems().map(s => ({ id: s.id, text: s.name })),
+                    ...SearchesStore.getItems().map(s => ( { id: s.id, text: s.name } )),
                   ],
                 }).on('select2:select', ({ target }) => {
                   setState({
@@ -446,7 +447,7 @@
 
             showFrame()
 
-            $(`#${elPrefix}-confirm`).on('click', ({ currentTarget }) => {
+            $(`#${ elPrefix }-confirm`).on('click', ({ currentTarget }) => {
 
               $(currentTarget).prop('disabled', true)
 
@@ -472,10 +473,10 @@
                 const scheduling = () => {
                   // language=HTML
                   return `
-					  <h2 id="broadcast-progress-header">${__('Scheduling', 'groundhogg')}</h2>
-					  <p class="pill orange"><b>${__('Do not close this window while the broadcast is scheduling!',
-						  'groundhogg')}</b></p>
-					  <div id="broadcast-progress"></div>`
+                      <h2 id="broadcast-progress-header">${ __('Scheduling', 'groundhogg') }</h2>
+                      <p class="pill orange"><b>${ __('Do not close this window while the broadcast is scheduling!',
+                              'groundhogg') }</b></p>
+                      <div id="broadcast-progress"></div>`
                 }
 
                 $('#gh-send-broadcast-form').html(scheduling())
@@ -484,11 +485,12 @@
                 const { setProgress } = progressBar('#broadcast-progress')
 
                 const schedule = () => {
-                  post(`${routes.v4.broadcasts}/${b.ID}/schedule`).then(({ finished, scheduled }) => {
+                  post(`${ routes.v4.broadcasts }/${ b.ID }/schedule`).then(({ finished, scheduled }) => {
                     setProgress(scheduled / total_contacts)
                     if (!finished) {
                       schedule()
-                    } else {
+                    }
+                    else {
                       setTimeout(() => {
                         stopDots()
                         dialog({
@@ -531,12 +533,12 @@
 
     $('#gh-schedule-broadcast').on('click', (e) => {
       e.preventDefault()
-      Modal({}, () => BroadcastScheduler() )
+      Modal({}, () => Groundhogg.BroadcastScheduler())
     })
 
     if (typeof GroundhoggNewBroadcast !== 'undefined') {
       document.getElementById('gh-broadcast-form-inline').append(BroadcastScheduler({
-        email: GroundhoggNewBroadcast.email,
+        object: GroundhoggNewBroadcast.email,
         onScheduled: () => {
           window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
         },
@@ -561,15 +563,57 @@
   } = MakeEl
 
   const initialState = {
-    step: 'email',
-    email: null,
+    step: 'object',
+    steps: [],
+    object: null,
     when: 'later',
     campaigns: [],
     searchMethod: 'filters', // 'filters' or 'search'
+    searchMethods: [],
     totalContacts: 0,
     date: moment().format('YYYY-MM-DD'),
     time: moment().add(1, 'hour').format('HH:00:00'),
     broadcast: null,
+  }
+
+  const getSearchMethods = () => {
+    return [
+      ...getState().searchMethods ?? [],
+      {
+        id: 'filters',
+        text: __('Search for contacts using filters.', 'groundhogg'),
+        query: () => ( {
+          filters: getState().include_filters,
+          exclude_filters: getState().exclude_filters,
+        } ),
+      },
+      {
+        id: 'all-contacts',
+        text: __('All contacts.', 'groundhogg'),
+        query: () => ( {} ),
+      },
+      {
+        id: 'all-my-contacts',
+        text: __('All contacts assigned to me.', 'groundhogg'),
+        query: () => ( {
+          owner_id: Groundhogg.currentUser.ID,
+        } ),
+      },
+      {
+        id: 'confirmed-contacts',
+        text: __('All confirmed contacts.', 'groundhogg'),
+        query: () => ( {
+          optin_status: 2,
+        } ),
+      },
+      ...SearchesStore.getItems().map(({ id, name }) => ( {
+        id,
+        text: sprintf(__('Saved search %s', 'groundhogg'), bold(name)),
+        query: () => ( {
+          saved_search: id,
+        } ),
+      } )),
+    ]
   }
 
   let State = {
@@ -581,49 +625,27 @@
 
     const {
       searchMethod = 'filters',
-      include_filters = [],
-      exclude_filters = [],
-      savedSearch = '',
-      email,
-      selection
     } = getState()
 
-    switch (searchMethod) {
-      case 'filters':
-        query.filters = include_filters
-        query.exclude_filters = exclude_filters
-        break
-      case 'all-contacts':
-        break
-      case 'confirmed-contacts':
-        query.optin_status = 2
-        break
-      case 'all-my-contacts':
-        query.owner_id = Groundhogg.currentUser.ID
-        break
-      case 'selection':
-        query = {
-          ...selection
-        }
-          break
-      case 'search':
-      default:
-        query.saved_search = savedSearch
-        break
-    }
+    query = getSearchMethods().find(({ id }) => id === searchMethod).query()
 
-    if (email && email.data.message_type !== 'transactional') {
+    if (getObject() && getObject().data.message_type !== 'transactional') {
       query.marketable = true
     }
 
     return query
   }
 
-  const updateTotalContacts = () => {
+  /**
+   * Update the total contact size
+   *
+   * @returns {Promise<T>}
+   */
+  const updateTotalContacts = (morph = true) => {
     return ContactsStore.count(getQuery()).then(total => {
       setState({
         totalContacts: total,
-      })
+      }, morph)
     })
   }
 
@@ -637,13 +659,14 @@
     if (morph) {
       try {
         morphdom(document.getElementById('broadcast-scheduler'), BroadcastScheduler())
-      } catch (e) {
+      }
+      catch (e) {
         console.log(e)
       }
     }
   }
 
-  const getEmail = () => getState().email
+  const getObject = () => getState().object
 
   /**
    *
@@ -655,7 +678,7 @@
   }, [
     // Profile pick
     makeEl('img', {
-      src: getEmail().context.from_avatar,
+      src: getObject().context.from_avatar,
       className: 'from-avatar',
       height: 40,
       width: 40,
@@ -667,9 +690,9 @@
       className: 'subject-and-from',
     }, [
       // Subject Line
-      `<h2>${getEmail().data.subject}</h2>`,
+      `<h2>${ getObject().data.subject }</h2>`,
       // From Name & Email
-      `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
+      `<span class="from-name">${ getObject().context.from_name }</span> <span class="from-email">&lt;${ getObject().context.from_email }&gt;</span>`,
       // From Email
     ]),
   ])
@@ -695,12 +718,12 @@
         style: {
           width: '100%',
         },
-      }, getState().email.context.built),
+      }, getObject().context.built),
     ])
   }
 
   const Steps = {
-    'email': {
+    'object': {
       name: __('Email', 'groundhogg'),
       icon: icons.email,
       requirements: () => true,
@@ -710,29 +733,29 @@
           Div({
             className: 'display-flex column gap-10',
           }, [
-            `<p>${__('Select an email to send...', 'groundhogg')}</p>`,
+            `<p>${ __('Select an email to send...', 'groundhogg') }</p>`,
             Div({
-              className: 'display-flex gap-10'
+              className: 'display-flex gap-10',
             }, [
               ItemPicker({
                 id: `broadcast-select-email`,
                 noneSelected: __('Select an email to send...', 'groundhogg'),
-                selected: getEmail() ? { id: getEmail().ID, text: getEmail().data.title } : [],
+                selected: getObject() ? { id: getObject().ID, text: getObject().data.title } : [],
                 multiple: false,
                 style: {
-                  flexGrow: 1
+                  flexGrow: 1,
                 },
                 fetchOptions: (search) => {
                   return EmailsStore.fetchItems({
                     search,
                     status: 'ready',
                   }).
-                  then(emails => emails.map(({ ID, data }) => ({ id: ID, text: data.title })))
+                    then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
                 },
                 onChange: item => {
                   if (!item) {
                     setState({
-                      email: null,
+                      object: null,
                     })
                     return
                   }
@@ -740,16 +763,12 @@
                   let email = EmailsStore.get(item.id)
 
                   setState({
-                    email: email,
+                    object: email,
                     campaigns: email.campaigns,
                   })
-
-                  setTimeout(() => {
-                    setFrameContent(document.getElementById('broadcast-email-preview'), email.context.built)
-                  }, 10)
                 },
               }),
-              getEmail() ? Button({
+              getObject() ? Button({
                 id: 'go-to-campaigns',
                 className: 'gh-button primary',
                 style: {
@@ -761,31 +780,31 @@
                   })
                 },
               }, sprintf('%s &rarr;', __('Campaigns', 'groundhogg'))) : null,
-            ] ),
+            ]),
           ]),
-          getEmail() ? EmailPreview() : null,
+          getObject() ? EmailPreview() : null,
         ])
       },
     },
     'campaigns': {
       name: __('Campaigns', 'groundhogg'),
-      requirements: () => getState().email,
+      requirements: () => getObject(),
       icon: Dashicon('flag'),
       render: () => {
         return Fragment([
-          `<p>${__('Use campaigns to organize your broadcasts! Select one or more campaigns...', 'groundhogg')}</p>`,
+          `<p>${ __('Use campaigns to organize your broadcasts! Select one or more campaigns...', 'groundhogg') }</p>`,
           ItemPicker({
             id: 'broadcast-campaigns',
             noneSelected: __('Select a campaign...', 'groundhogg'),
             tags: true,
-            selected: getState().campaigns.map(({ ID, data }) => ({ id: ID, text: data.name })),
+            selected: getState().campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } )),
             fetchOptions: async (search) => {
               let campaigns = await CampaignsStore.fetchItems({
                 search,
                 limit: 20,
               })
 
-              return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+              return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
             },
             createOption: async (id) => {
               let campaign = await CampaignsStore.create({
@@ -818,14 +837,14 @@
     'schedule': {
       name: __('Schedule', 'groundhogg'),
       icon: Dashicon('calendar'),
-      requirements: () => getState().email,
+      requirements: () => getObject(),
       render: () => {
 
         return Fragment([
           Div({
             className: 'space-between',
           }, [
-            `<p>${__('When do you want the broadcast to go out?', 'groundhogg')}</p>`,
+            `<p>${ __('When do you want the broadcast to go out?', 'groundhogg') }</p>`,
             ButtonToggle({
               id: 'send-when',
               options: [
@@ -862,7 +881,7 @@
           getState().when === 'later' ? Div({
             className: 'display-flex gap-10 align-center',
           }, [
-            `<p>${__('Send in the \'s local time?', 'groundhogg')}</p>`,
+            `<p>${ __('Send in the \'s local time?', 'groundhogg') }</p>`,
             Toggle({
               id: 'send-in-local',
               checked: getState().send_in_local_time,
@@ -874,7 +893,7 @@
           Button({
             id: 'go-to-contacts',
             className: 'gh-button primary',
-            disabled: getState().when === 'later' && moment().isAfter(`${getState().date} ${getState().time}`),
+            disabled: getState().when === 'later' && moment().isAfter(`${ getState().date } ${ getState().time }`),
             style: {
               alignSelf: 'flex-end',
             },
@@ -889,47 +908,24 @@
     },
     'contacts': {
       name: __('Contacts', 'groundhogg'),
-      requirements: () => getState().email && (getState().when === 'now' || (getState().time && getState().date)),
+      requirements: () => getObject() && ( getState().when === 'now' || ( getState().time && getState().date ) ),
       icon: icons.contact,
       render: () => {
 
-        let otherSearchMethods = [
-          { id: 'filters', text: __('Search for contacts using filters.', 'groundhogg') },
-          { id: 'all-contacts', text: __('All contacts.', 'groundhogg') },
-          { id: 'all-my-contacts', text: __('All contacts assigned to me.', 'groundhogg') },
-          { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
-          { id: 'confirmed-contacts', text: __('All confirmed contacts.', 'groundhogg') },
-        ]
-
-        if ( getState().searchMethod === 'selection' ){
-          otherSearchMethods.push( { id: 'selection', text: sprintf( __( 'Selected %s contacts', 'groundhogg' ), formatNumber( getState().totalContacts ) ) } )
-        }
-
         return Fragment([
-
-          `<p>${__('Select contacts to receive this broadcast...', 'groundhogg')}</p>`,
+          `<p>${ __('Select contacts to receive this broadcast...', 'groundhogg') }</p>`,
           ItemPicker({
             id: 'select-search-method',
             multiple: false,
-            selected: getState().searchMethod !== 'search' ? otherSearchMethods.find(
-              method => method.id === getState().searchMethod) : (({ id, name }) => ({
-              id,
-              text: name,
-            }))(SearchesStore.get(getState().savedSearch)),
+            selected: getSearchMethods().find(({ id }) => id === getState().searchMethod),
             fetchOptions: async search => {
-              let searches = await SearchesStore.fetchItems({ search })
-              searches = searches.map(s => ({ id: s.id, text: `Saved search "${s.name}"` }))
-              return [
-                ...otherSearchMethods,
-                ...searches,
-              ]
+              return getSearchMethods().filter(({ text }) => text.match(new RegExp(search, 'i')))
             },
             onChange: (item) => {
 
               if (!item) {
                 setState({
                   searchMethod: 'filters',
-                  savedSearch: null,
                 })
                 updateTotalContacts()
                 return
@@ -937,21 +933,11 @@
 
               let { id } = item
 
-              if (otherSearchMethods.find(method => method.id === id)) {
-                setState({
-                  searchMethod: id,
-                  savedSearch: null,
-                })
-                updateTotalContacts()
-                return
-              }
-
               setState({
-                searchMethod: 'search',
-                savedSearch: id,
+                searchMethod: id,
               })
-              updateTotalContacts()
 
+              updateTotalContacts()
             },
           }),
           getState().searchMethod === 'filters' ? Div({
@@ -982,8 +968,8 @@
               })
             },
           }) : null,
-          `<p>${sprintf(__('%s contacts will receive this broadcast.', 'groundhogg'),
-            formatNumber(getState().totalContacts))}</p>`,
+          `<p>${ sprintf(__('%s contacts will receive this broadcast.', 'groundhogg'),
+            formatNumber(getState().totalContacts)) }</p>`,
           Button({
             id: 'go-to-review',
             className: 'gh-button primary',
@@ -1003,25 +989,26 @@
     'review': {
       name: 'Review',
       icon: Dashicon('thumbs-up'),
-      requirements: () => getState().email && (getState().when === 'now' || (getState().time && getState().date)) &&
+      requirements: () => getObject() && ( getState().when === 'now' || ( getState().time && getState().date ) ) &&
         getState().totalContacts,
       render: () => {
 
         let preview
 
         if (getState().when === 'now') {
-          preview = sprintf(__('Send %1$s to %2$s contacts <b>now</b>!', 'groundhogg'), bold(getEmail().data.title),
+          preview = sprintf(__('Send %1$s to %2$s contacts <b>now</b>!', 'groundhogg'), bold(getObject().data.title),
             bold(formatNumber(
               getState().totalContacts)))
-        } else {
-          preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getEmail().data.title),
+        }
+        else {
+          preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getObject().data.title),
             bold(formatNumber(
-              getState().totalContacts)), formatDateTime(`${getState().date} ${getState().time}`))
+              getState().totalContacts)), formatDateTime(`${ getState().date } ${ getState().time }`))
         }
 
         return Fragment([
-          `<p>${preview}</p>`,
-          getEmail() ? EmailPreview() : null,
+          `<p>${ preview }</p>`,
+          getObject() ? EmailPreview() : null,
           Button({
             id: 'confirm-and-schedule',
             className: 'gh-button primary medium',
@@ -1034,18 +1021,18 @@
                 date = '',
                 time = '',
                 send_in_local_time = false,
-                campaigns = []
+                campaigns = [],
               } = getState()
 
               post(routes.v4.broadcasts, {
-                object_id: getState().email.ID,
+                object_id: getObject().ID,
                 object_type: 'email',
                 query: getQuery(),
                 date,
                 time,
                 send_now: when === 'now',
                 send_in_local_time,
-                campaigns: campaigns.map(({ID}) => ID)
+                campaigns: campaigns.map(({ ID }) => ID),
               }).then(r => {
 
                 setState({
@@ -1085,7 +1072,7 @@
       requirements: () => getState().broadcast,
       render: () => {
         return Fragment([
-          `<p>${__('🎉 Your broadcast is being scheduled in the background!', 'groundhogg')}</p>`,
+          `<p>${ __('🎉 Your broadcast is being scheduled in the background!', 'groundhogg') }</p>`,
           // `<p>${__('', 'groundhogg')}</p>`,
           Button({
             id: 're-schedule',
@@ -1104,15 +1091,44 @@
     },
   }
 
+  /**
+   *
+   * Facilitates the merging of step overrides
+   *
+   * @returns {{}}
+   */
+  const getSteps = () => {
+
+    const merged = {}
+    const overrides = getState().steps
+
+    for (let step in Steps) {
+
+      if (overrides.hasOwnProperty(step)) {
+        merged[step] = {
+          ...Steps[step],
+          ...overrides[step],
+        }
+      }
+      else {
+        merged[step] = Steps[step]
+      }
+    }
+
+    return merged
+  }
+
   const BroadcastScheduler = () => {
+
+    const order = ['object', 'campaigns', 'schedule', 'contacts', 'review', 'scheduled']
 
     return Div({
       id: 'broadcast-scheduler',
       className: 'display-flex column gap-10',
       style: {
         width: '500px',
-        maxWidth: '100%'
-      }
+        maxWidth: '100%',
+      },
     }, [
       getState().step !== 'scheduled' ? Div({
         className: 'gh-step-nav',
@@ -1120,16 +1136,16 @@
           marginBottom: '20px',
         },
       }, [
-        ...Object.keys(Steps).map(step => Button({
-          id: `select-${step}`,
-          className: `gh-button icon ${getState().step === step ? 'primary' : 'secondary'}`,
-          disabled: !Steps[step].requirements(),
+        ...order.map(step => Button({
+          id: `select-${ step }`,
+          className: `gh-button icon ${ getState().step === step ? 'primary' : 'secondary' }`,
+          disabled: !getSteps()[step].requirements(),
           onClick: e => {
             setState({
               step,
             })
           },
-        }, Steps[step].icon)).reduce((steps, step, i) => {
+        }, getSteps()[step].icon)).reduce((steps, step, i) => {
 
           if (i > 0) {
             steps.push(makeEl('hr', { className: 'gh-step-nav-join' }))
@@ -1140,14 +1156,26 @@
           return steps
         }, []),
       ]) : null,
-      Steps[getState().step].render(),
+      getSteps()[getState().step].render({ getState, getObject, setState, getQuery }),
     ])
   }
 
-  Groundhogg.BroadcastScheduler = ( initialState ) => {
-    setState( initialState )
+  Groundhogg.BroadcastScheduler = (newState = {}) => {
+
+    // Preload searches
+    SearchesStore.maybeFetchItems()
+
+    setState({
+      ...initialState,
+      ...newState,
+    }, false)
+
+    // Preload the contact count
+    if (getState().searchMethod !== 'filters') {
+      updateTotalContacts(false)
+    }
 
     return BroadcastScheduler()
   }
 
-})(jQuery)
+} )(jQuery)

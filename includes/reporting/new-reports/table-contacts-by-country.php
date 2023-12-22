@@ -3,11 +3,12 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
-use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
-use function Groundhogg\percentage;
+use function Groundhogg\utils;
 
 class Table_Contacts_By_Country extends Base_Table_Report {
 
@@ -23,26 +24,38 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 
+		global $wpdb;
+		$contacts_table = get_db( 'contacts' )->table_name;
+
 		$rows = get_db( 'contactmeta' )->query( [
-			'contact_id' => $this->get_new_contact_ids_in_time_period(),
-			'meta_key'   => 'country'
-		], false );
+			'contact_id' => $wpdb->prepare( "SELECT ID FROM $contacts_table WHERE date_created BETWEEN %s AND %s", $this->startDate->format( 'Y-m-d H:i:s' ), $this->endDate->format( 'Y-m-d H:i:s' ) ),
+			'meta_key'   => 'country',
+			'select'     => [ 'COUNT(contact_id) as total', 'meta_value as country' ],
+			'meta_value' => 'NOT_EMPTY',
+			'groupby'    => 'country',
+			'orderby'    => 'total',
+			'order'      => 'desc',
+			'limit'      => 10,
+		] );
 
-		$values = wp_list_pluck( $rows, 'meta_value' );
-		$counts = array_count_values( $values );
-		$data   = $this->normalize_data( $counts );
-		$total  = array_sum( wp_list_pluck( $data, 'data' ) );
+		$data = [];
 
-		foreach ( $data as $i => $datum ) {
-			$sub_tal    = $datum['data'];
-			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
+		foreach ( $rows as $i => $row ) {
 
-			$datum['data'] = html()->wrap( $datum['data'], 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			unset( $datum['url'] );
-			$data[ $i ] = $datum;
+			$data[] = [
+				utils()->location->get_countries_list( $row->country ),
+				html()->e( 'a', [
+					'class' => 'number-total',
+					'href'  => admin_page_url( 'gh_contacts', [
+						'filters' => base64_json_encode( [
+							[
+								[ 'type' => 'date_created', 'date_range' => 'between', 'before' => $this->endDate->format('Y-m-d H:i:s' ), 'after' => $this->startDate->format('Y-m-d H:i:s' ) ],
+								[ 'type' => 'country', 'value' => $row->country, 'compare' => 'equals' ]
+							]
+						] )
+					] )
+				], $row->total ),
+			];
 		}
 
 		return $data;
@@ -59,15 +72,6 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
 
-		$label = ! empty( $item_key ) ? Plugin::$instance->utils->location->get_countries_list( $item_key ) : __( 'Unknown' );
-		$data  = $item_data;
-		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $item_key ) ) : '#';
-
-		return [
-			'label' => $label,
-			'data'  => $data,
-			'url'   => $url
-		];
 	}
 
 

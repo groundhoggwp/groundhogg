@@ -198,9 +198,9 @@
       return this.items.some(item => item[this.primaryKey] == id)
     },
 
-    hasItems (itemIds = false) {
+    hasItems (itemIds = []) {
 
-      if (!itemIds) {
+      if (!itemIds || itemIds.length === 0) {
         return this.items.length > 0
       }
 
@@ -250,21 +250,30 @@
       })
     },
 
+    /**
+     * Fetches items if they are not present in the set
+     *
+     * @param ids
+     * @param opts
+     * @returns {Promise<*|({}|*)[]|[]>}
+     */
     async maybeFetchItems (ids = [], opts = {}) {
 
       if ( ( ! ids || ids.length === 0 ) && this.hasItems() ){
         return Promise.resolve(this.items)
       }
 
-      if (ids.every(id => this.hasItem(id))) {
+      if (ids && ids.length > 0 && ids.every(id => this.hasItem(id))) {
         return Promise.resolve(ids.map(id => this.get(id)))
       }
 
-      return this.fetchItems({
-        ID: ids.filter(id => !this.hasItem(id)),
-      }, opts).then(items => {
-        return ids.map(id => this.get(id))
-      })
+      const params = {}
+
+      if ( ids && ids.length ){
+        params.ID = ids.filter(id => !this.hasItem(id))
+      }
+
+      return this.fetchItems(params, opts)
     },
 
     async fetchItem (id, opts = {}) {
@@ -575,11 +584,12 @@
     submissions: ObjectStore(Groundhogg.api.routes.v4.submissions),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
-      async addContacts ({ query, funnel_id, step_id }, opts = {}) {
+      async addContacts ({ query, funnel_id, step_id, ...rest }, opts = {}) {
         return apiPost(`${ this.route }/${ funnel_id }/start`, {
           query,
           step_id,
           funnel_id,
+          ...rest
         }, opts).then(d => d.added)
       },
 
@@ -653,6 +663,7 @@
     posts: ObjectStore(Groundhogg.api.routes.posts, {
       primaryKey: 'id',
     }),
+    email_log: ObjectStore(Groundhogg.api.routes.v4.email_log)
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {

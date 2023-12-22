@@ -9,6 +9,7 @@ use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\bulk_jobs;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
@@ -77,12 +78,12 @@ class Broadcasts_Table extends WP_List_Table {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'object_id'      => _x( 'Email/SMS', 'Column label', 'groundhogg' ),
-			'from_user'      => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
-//			'query'          => _x( 'Query', 'Column label', 'groundhogg' ),
 			'send_time'      => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
+			'from_user'      => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
+			'campaigns'      => _x( 'Campaigns', 'Column label', 'groundhogg' ),
+//			'query'          => _x( 'Query', 'Column label', 'groundhogg' ),
 			'sending_to'     => _x( 'Sending To', 'Column label', 'groundhogg' ),
 			'stats'          => _x( 'Stats', 'Column label', 'groundhogg' ),
-			'campaigns'      => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'date_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 		);
 
@@ -96,7 +97,8 @@ class Broadcasts_Table extends WP_List_Table {
 		} else if ( $this->get_view() === 'pending' ) {
 			unset( $columns['stats'] );
 			unset( $columns['sending_to'] );
-			$columns['process_schedule'] = _x( 'Finish Scheduling', 'Column label', 'groundhogg' );
+
+			$columns['time'] = _x( 'Time Remaining', 'Column label', 'groundhogg' );
 		}
 
 		/**
@@ -221,6 +223,12 @@ class Broadcasts_Table extends WP_List_Table {
 			$actions['edit'] = "<a href='" . esc_url( admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $broadcast->get_object_id() ) ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg' ) . "</a>";
 		}
 
+		if ( $broadcast->is_pending() ){
+			$actions['schedule'] = html()->e('a', [
+				'href' => bulk_jobs()->broadcast_scheduler->get_start_url( [ 'broadcast' => $broadcast->get_id() ] )
+			], __('Schedule manually'));
+		}
+
 		// Add query action
 		$query = $broadcast->get_query();
 
@@ -234,7 +242,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$report_data = $broadcast->get_report_data();
 
-		if ( $broadcast->get_send_time() > time() && $report_data['waiting'] > 0 ) {
+		if ( $broadcast->is_pending() || $broadcast->is_scheduled() ) {
 			$actions['trash'] = "<a class='delete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel' ) . "'>" . _x( 'Cancel', 'action', 'groundhogg' ) . "</a>";
 		}
 
@@ -433,6 +441,26 @@ class Broadcasts_Table extends WP_List_Table {
 		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ) : __( 'Sending', 'groundhogg' );
 
 		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
+	}
+
+	/**
+	 * Shows the time remaining for the broadcast to complete scheduling
+	 *
+	 * @param $broadcast Broadcast
+	 *
+	 * @return string
+	 */
+	protected function column_time( $broadcast ) {
+
+		$time_remaining = $broadcast->get_estimated_scheduling_time_remaining();
+
+		if ( $time_remaining === false ) {
+			return __( 'Estimating...', 'groundhogg' );
+		}
+
+		$complete = $broadcast->get_percent_scheduled();
+
+		return sprintf( __( '%d%% scheduled with %s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
 	}
 
 	/**

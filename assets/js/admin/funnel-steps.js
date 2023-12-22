@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const {
     select,
@@ -133,7 +133,7 @@
     const formatTime = (time) => {
       return Intl.DateTimeFormat(Groundhogg.locale, {
         timeStyle: 'short',
-      }).format(new Date(`2021-01-01 ${time}`))
+      }).format(new Date(`2021-01-01 ${ time }`))
     }
 
     switch (run_when) {
@@ -141,12 +141,12 @@
         preview.unshift(_x('at any time', 'groundhogg'))
         break
       case 'later':
-        preview.unshift(sprintf(_x('at %s', 'at a specific time', 'groundhogg'), `<b>${formatTime(run_time)}</b>`))
+        preview.unshift(sprintf(_x('at %s', 'at a specific time', 'groundhogg'), `<b>${ formatTime(run_time) }</b>`))
         break
       case 'between':
         preview.unshift(
-          sprintf(_x('between %1$s and %2$s', 'within a time from', 'groundhogg'), `<b>${formatTime(run_time)}</b>`,
-            `<b>${formatTime(run_time_to)}</b>`))
+          sprintf(_x('between %1$s and %2$s', 'within a time from', 'groundhogg'), `<b>${ formatTime(run_time) }</b>`,
+            `<b>${ formatTime(run_time_to) }</b>`))
         break
     }
 
@@ -164,14 +164,14 @@
         preview.unshift(_x('run on <b>a weekend</b>', 'verb meaning to start a process - on a weekend', 'groundhogg'))
         break
       case 'day_of_week':
-        let dowList = orList(run_on_dow.map((i) => `<b>${delay_timer_i18n.days_of_week[i]}</b>`))
+        let dowList = orList(run_on_dow.map((i) => `<b>${ delay_timer_i18n.days_of_week[i] }</b>`))
         days = run_on_dow_type === 'any'
           ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList)
           : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
             delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
         months = run_on_month_type === 'specific' ? orList(
-          run_on_months.map((i) => `<b>${delay_timer_i18n.months[i]}</b>`)) : `<b>${__('any month',
-          'groundhogg')}</b>`
+          run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
+          'groundhogg') }</b>`
         preview.unshift(sprintf(
           _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month',
             'groundhogg'), days, months))
@@ -179,11 +179,11 @@
       case 'day_of_month':
         days = run_on_dom.length > 0
           ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(
-            run_on_dom.map((i) => `<b>${i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i)}</b>`)))
-          : `<b>${__('any day', 'groundhogg')}</b>`
+            run_on_dom.map((i) => `<b>${ i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i) }</b>`)))
+          : `<b>${ __('any day', 'groundhogg') }</b>`
         months = run_on_month_type === 'specific' ? orList(
-          run_on_months.map((i) => `<b>${delay_timer_i18n.months[i]}</b>`)) : `<b>${__('any month',
-          'groundhogg')}</b>`
+          run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
+          'groundhogg') }</b>`
         preview.unshift(sprintf(
           _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month',
             'groundhogg'), days, months))
@@ -205,7 +205,7 @@
 
       preview.unshift(
         sprintf(_x('Wait at least %s and then', 'wait for a duration', 'groundhogg'),
-          `<b>${delay_amount} ${delayTypes[delay_type]}</b>`),
+          `<b>${ delay_amount } ${ delayTypes[delay_type] }</b>`),
       )
     }
 
@@ -265,122 +265,122 @@
 
       //language=HTML
       const runOnMonthOptions = `
-		  <div class="gh-input-group">${select({
-			  className: 'delay-input re-render',
-			  name: 'run_on_month_type',
-		  }, runOnMonthTypes, run_on_month_type)}
-			  ${run_on_month_type === 'specific' ? select({
-				  className: 'delay-input select2__picker',
-				  name: 'run_on_months',
-				  multiple: true,
-			  }, delay_timer_i18n.months, run_on_months) : ''}
-		  </div>`
+          <div class="gh-input-group">${ select({
+              className: 'delay-input re-render',
+              name: 'run_on_month_type',
+          }, runOnMonthTypes, run_on_month_type) }
+              ${ run_on_month_type === 'specific' ? select({
+                  className: 'delay-input select2__picker',
+                  name: 'run_on_months',
+                  multiple: true,
+              }, delay_timer_i18n.months, run_on_months) : '' }
+          </div>`
 
       //language=HTML
       const daysOfWeekOptions = `
-		  <div class="gh-input-group">${select({
-			  className: 'delay-input',
-			  name: 'run_on_dow_type',
-		  }, delay_timer_i18n.day_of_week_determiners, run_on_dow_type)}
-			  ${select({
-				  className: 'select2__picker',
-				  name: 'run_on_dow',
-				  multiple: true,
-			  }, delay_timer_i18n.days_of_week, run_on_dow)}
-		  </div>
-		  ${runOnMonthOptions}`
+          <div class="gh-input-group">${ select({
+              className: 'delay-input',
+              name: 'run_on_dow_type',
+          }, delay_timer_i18n.day_of_week_determiners, run_on_dow_type) }
+              ${ select({
+                  className: 'select2__picker',
+                  name: 'run_on_dow',
+                  multiple: true,
+              }, delay_timer_i18n.days_of_week, run_on_dow) }
+          </div>
+          ${ runOnMonthOptions }`
 
       //language=HTML
       const daysOfMonthOptions = `
-		  <div>
-			  ${select({
-				  className: 'select2__picker',
-				  name: 'run_on_dom',
-				  multiple: true,
-			  }, runOnDaysOfMonth, run_on_dom)}
-		  </div>
-		  ${runOnMonthOptions}`
+          <div>
+              ${ select({
+                  className: 'select2__picker',
+                  name: 'run_on_dom',
+                  multiple: true,
+              }, runOnDaysOfMonth, run_on_dom) }
+          </div>
+          ${ runOnMonthOptions }`
 
       //language=HTML
       return `
-		  <div class="display-flex column gap-10">
-			  <h3 class="delay-preview" style="font-weight: normal"></h3>
-			  <div class="row display-flex column gap-10">
-				  <label class="row-label">${__('Wait at least...', 'groundhogg')}</label>
-				  <div class="gh-input-group">
-					  ${input({
-						  className: 'delay-input',
-						  type: 'number',
-						  name: 'delay_amount',
-						  value: delay_amount,
-						  placeholder: 3,
-						  disabled: delay_type === 'none',
-					  })}
-					  ${select({
-						  className: 'delay-input re-render',
-						  name: 'delay_type',
-					  }, delay_timer_i18n.delay_duration_types, delay_type)}
-				  </div>
-			  </div>
-			  <div class="row display-flex column gap-10">
-				  <label
-					  class="row-label">${_x('Then run on...', 'meaning to run a process on a certain date',
-					  'groundhogg')}</label>
-				  <div class="display-flex gap-10">
-					  ${select({
-						  className: 'delay-input re-render',
-						  name: 'run_on_type',
-					  }, runOnTypes, run_on_type)}
-				  </div>
-				  ${run_on_type === 'day_of_week' ? daysOfWeekOptions : ''}
-				  ${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
-			  </div>
-			  <div class="row display-flex column gap-10">
-				  <label class="row-label">${_x('Then run at...', 'meaning to run a process at a certain time',
-					  'groundhogg')}</label>
-				  <div class="gh-input-group">
-					  ${select({
-						  className: 'delay-input re-render',
-						  name: 'run_when',
-						  options: runWhenTypes,
-						  selected: run_when,
-					  })}
-					  ${run_when === 'later'
-						  ? input({
-							  className: 'delay-input',
-							  type: 'time',
-							  name: 'run_time',
-							  value: run_time,
-						  }) : ''}
-					  ${run_when === 'between'
-						  ? [
-							  input({
-								  className: 'delay-input',
-								  type: 'time',
-								  name: 'run_time',
-								  value: run_time,
-							  }),
-							  input({
-								  className: 'delay-input',
-								  type: 'time',
-								  name: 'run_time_to',
-								  value: run_time_to,
-							  }),
-						  ].join('')
-						  : ''}
-				  </div>
-			  </div>
-			  <div class="display-flex align-center gap-10">
-				  <p>${__('Run in the contact\'s timezone?', 'groundhogg')}</p>
-				  ${toggle({
-					  onLabel: 'Yes',
-					  offLabel: 'No',
-					  id: `${ID}_send_in_timezone`,
-					  name: 'send_in_timezone',
-					  checked: Boolean(send_in_timezone),
-				  })}
-			  </div>
-		  </div>`
+          <div class="display-flex column gap-10">
+              <h3 class="delay-preview" style="font-weight: normal"></h3>
+              <div class="row display-flex column gap-10">
+                  <label class="row-label">${ __('Wait at least...', 'groundhogg') }</label>
+                  <div class="gh-input-group">
+                      ${ input({
+                          className: 'delay-input',
+                          type: 'number',
+                          name: 'delay_amount',
+                          value: delay_amount,
+                          placeholder: 3,
+                          disabled: delay_type === 'none',
+                      }) }
+                      ${ select({
+                          className: 'delay-input re-render',
+                          name: 'delay_type',
+                      }, delay_timer_i18n.delay_duration_types, delay_type) }
+                  </div>
+              </div>
+              <div class="row display-flex column gap-10">
+                  <label
+                          class="row-label">${ _x('Then run on...', 'meaning to run a process on a certain date',
+                          'groundhogg') }</label>
+                  <div class="display-flex gap-10">
+                      ${ select({
+                          className: 'delay-input re-render',
+                          name: 'run_on_type',
+                      }, runOnTypes, run_on_type) }
+                  </div>
+                  ${ run_on_type === 'day_of_week' ? daysOfWeekOptions : '' }
+                  ${ run_on_type === 'day_of_month' ? daysOfMonthOptions : '' }
+              </div>
+              <div class="row display-flex column gap-10">
+                  <label class="row-label">${ _x('Then run at...', 'meaning to run a process at a certain time',
+                          'groundhogg') }</label>
+                  <div class="gh-input-group">
+                      ${ select({
+                          className: 'delay-input re-render',
+                          name: 'run_when',
+                          options: runWhenTypes,
+                          selected: run_when,
+                      }) }
+                      ${ run_when === 'later'
+                              ? input({
+                                  className: 'delay-input',
+                                  type: 'time',
+                                  name: 'run_time',
+                                  value: run_time,
+                              }) : '' }
+                      ${ run_when === 'between'
+                              ? [
+                                  input({
+                                      className: 'delay-input',
+                                      type: 'time',
+                                      name: 'run_time',
+                                      value: run_time,
+                                  }),
+                                  input({
+                                      className: 'delay-input',
+                                      type: 'time',
+                                      name: 'run_time_to',
+                                      value: run_time_to,
+                                  }),
+                              ].join('')
+                              : '' }
+                  </div>
+              </div>
+              <div class="display-flex align-center gap-10">
+                  <p>${ __('Run in the contact\'s timezone?', 'groundhogg') }</p>
+                  ${ toggle({
+                      onLabel: 'Yes',
+                      offLabel: 'No',
+                      id: `${ ID }_send_in_timezone`,
+                      name: 'send_in_timezone',
+                      checked: Boolean(send_in_timezone),
+                  }) }
+              </div>
+          </div>`
     },
 
     onMount ({ ID, meta }, updateStepMeta, updateStepData, getCurrentState) {
@@ -395,16 +395,16 @@
           delay_preview: preview,
         })
 
-        $(`#settings-${ID} .delay-preview`).html(preview)
+        $(`#settings-${ ID } .delay-preview`).html(preview)
       }
 
-      $(`#${ID}_send_in_timezone`).on('change', (e) => {
+      $(`#${ ID }_send_in_timezone`).on('change', (e) => {
         updateStepMeta({
           send_in_timezone: e.target.checked,
         })
       })
 
-      $(`#settings-${ID} .select2__picker`).select2({
+      $(`#settings-${ ID } .select2__picker`).select2({
         width: 'auto',
       }).on('change', function (e) {
         // console.log(e)
@@ -414,7 +414,7 @@
         updatePreview()
       })
 
-      $(`#settings-${ID} .delay-input`).on('change', ({ target }) => {
+      $(`#settings-${ ID } .delay-input`).on('change', ({ target }) => {
 
         const reRender = target.classList.contains('re-render')
 
@@ -423,8 +423,9 @@
         }, reRender)
 
         if (reRender) {
-          $(`#settings-${ID} [name=${target.name}]`).focus()
-        } else {
+          $(`#settings-${ ID } [name=${ target.name }]`).focus()
+        }
+        else {
           updatePreview()
         }
       }).on('input', function (e) {
@@ -438,66 +439,98 @@
   const WebForm = {
     edit ({ meta }) {
       // language=html
-      const redirectToURL = `<label class="row-label">${__('Redirect to this URL...', 'groundhogg')}</label>
-	  ${inputWithReplacements({
-		  name: 'success_page',
-		  className: 'full-width',
-		  value: meta.success_page || '',
-	  })}`
+      const redirectToURL = `<label class="row-label">${ __('Redirect to this URL...', 'groundhogg') }</label>
+      ${ inputWithReplacements({
+          name: 'success_page',
+          className: 'full-width',
+          value: meta.success_page || '',
+      }) }`
 
       // language=html
-      const stayOnPage = `<label class="row-label">${__('Show this message...', 'groundhogg')}</label>
-	  ${textAreaWithReplacements({
-		  name: 'success_message',
-		  className: 'full-width',
-		  value: meta.success_message || '',
-	  })}`
+      const stayOnPage = `<label class="row-label">${ __('Show this message...', 'groundhogg') }</label>
+      ${ textAreaWithReplacements({
+          name: 'success_message',
+          className: 'full-width',
+          value: meta.success_message || '',
+      }) }`
 
       //language=HTML
       return `
-		  <div class="edit-form"></div>
-		  <div class="after-submit gh-panel ${meta.enable_ajax ? 'ajax-enabled' : ''}">
-			  <div class="gh-panel-header">
-				  <h2>After submit...</h2>
-			  </div>
-			  <div class="inside display-flex column gap-10">
-				  <div class="display-flex gap-10">
-					  <p>${__('Stay on page after submitting?', 'groundhogg')}</p>
-					  ${toggle({
-						  name: 'enable_ajax',
-						  checked: Boolean(meta.enable_ajax),
-						  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
-						  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
-					  })}
-				  </div>
-				  <div class="success-message">
-					  ${stayOnPage}
-				  </div>
-				  <div class="success-redirect">
-					  ${redirectToURL}
-				  </div>
-			  </div>
-		  </div>`
+          <div class="edit-form"></div>
+          <div class="after-submit gh-panel ${ meta.enable_ajax ? 'ajax-enabled' : '' }">
+              <div class="gh-panel-header">
+                  <h2>After submit...</h2>
+              </div>
+              <div class="inside display-flex column gap-10">
+                  <div class="display-flex gap-10">
+                      <p>${ __('Stay on page after submitting?', 'groundhogg') }</p>
+                      ${ toggle({
+                          name: 'enable_ajax',
+                          checked: Boolean(meta.enable_ajax),
+                          onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+                          offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+                      }) }
+                  </div>
+                  <div class="success-message">
+                      ${ stayOnPage }
+                  </div>
+                  <div class="success-redirect">
+                      ${ redirectToURL }
+                  </div>
+              </div>
+          </div>
+          <div class="form-style gh-panel">
+              <div class="gh-panel-header">
+                  <h2>${ __('Form Style', 'groundhogg') }</h2>
+              </div>
+              <div class="inside display-flex gap-10">
+                  <div class="display-flex column gap-10">
+                      <label for="form-theme">${ __('Theme') }</label>
+                      ${ select({
+                          id: 'form-theme',
+                          name: 'form_theme',
+                          options: {
+                              default: _x('Theme Default', 'form theme', 'groundhogg'),
+                              simple: _x('Simple', 'form theme', 'groundhogg'),
+                              modern: _x('Modern', 'form theme', 'groundhogg'),
+                              classic: _x('Classic', 'form theme', 'groundhogg'),
+                          },
+                          selected: meta.theme ?? 'default'
+                      }) }
+                  </div>
+                  <div class="display-flex column gap-10">
+                      <label for="form-accent-color">${ __('Accent Color') }</label>
+                      ${ input({
+                          id: 'form-accent',
+                          name: 'form_accent_color',
+                          type:'color',
+                          className: 'color-picker',
+                          value: meta.accent_color
+                      }) }
+                  </div>
+              </div>
+          </div>
+      `
     },
     onMount ({ ID, meta }, updateStepMeta) {
 
-      const parent = `#settings-${ID}`
+      const parent = `#settings-${ ID }`
 
-      linkPicker(`${parent} input[name=success_page]`).on('change', (e) => {
+      linkPicker(`${ parent } input[name=success_page]`).on('change', (e) => {
         updateStepMeta({
           success_page: e.target.value,
         })
       })
 
-      $(`${parent} textarea[name=success_message]`).on('change', (e) => {
+      $(`${ parent } textarea[name=success_message]`).on('change', (e) => {
         updateStepMeta({
           success_message: e.target.value,
         })
       })
 
-      const $panel = $(`${parent} .after-submit`)
+      const $panel = $(`${ parent } .after-submit`)
 
-      $(`${parent} input[name=enable_ajax]`).on('change', (e) => {
+      $(`${ parent } input[name=enable_ajax]`).on('change', (e) => {
 
         updateStepMeta({
           enable_ajax: e.target.checked,
@@ -505,16 +538,31 @@
 
         if (e.target.checked) {
           $panel.addClass('ajax-enabled')
-        } else {
+        }
+        else {
           $panel.removeClass('ajax-enabled')
         }
       })
 
-      Groundhogg.FormBuilder(`${parent} div.edit-form`, meta.form, (form) => {
+      $(`${ parent } select[name=form_theme]`).on('change', e=> {
+        updateStepMeta({
+          theme: e.target.value
+        })
+      })
+
+      $(`${ parent } input[name=form_accent_color]`).on('change', e=> {
+        updateStepMeta({
+          accent_color: e.target.value
+        })
+      })
+
+      const formBuilder = Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form, (form) => {
         updateStepMeta({
           form,
         })
-      }).mount()
+      })
+
+      formBuilder.mount()
 
     },
   }
@@ -546,16 +594,137 @@
           case 'form_fill':
             this.formFill(active)
             break
-          case 'send_email':
-            this.sendEmail(active)
-            break
         }
       })
     },
 
-    sendEmail ({ ID, meta, data }) {
+    formFill ({ ID }) {
 
-      let id = `step_${ID}_send_email`
+      let id = `step_${ ID }_upgrade_form`
+      const $btn = $(`#${ id }`)
+
+      if ($btn.data('flag')) {
+        return
+      }
+
+      $btn.data('flag', true)
+
+      $btn.on('click', e => {
+
+        confirmationModal({
+          alert: `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.',
+            'groundhogg') }</p>`,
+          confirmText: __('Upgrade Form', 'groundhogg'),
+          onConfirm: () => {
+
+            $(`#step_${ ID }_upgrade_form_confirm`).val('confirm')
+            Funnel.save()
+
+          },
+        })
+
+      })
+
+    },
+
+    webForm (step) {
+
+      let id = `step_${ step.ID }_web_form_builder`
+
+      const mount = (step) => {
+        $(`#${ id }`).html(WebForm.edit(step))
+
+        WebForm.onMount(step, (meta, reRender) => {
+
+          let step = Funnel.updateStepMeta(meta)
+
+          if (reRender) {
+            mount(step)
+          }
+
+        }, () => {}, () => Funnel.getActiveStep())
+      }
+
+      mount(step)
+
+    },
+
+    adminNotification (step) {
+
+      let $customEmail = $('.active .custom-settings input.custom-email')
+      let $replyType = $('.active .custom-settings select.reply-to-type')
+
+      $replyType.on('change', e => {
+
+        switch ($replyType.val()) {
+          case 'contact':
+          case 'owner':
+            $customEmail.addClass('hidden')
+            break
+          case 'custom':
+            $customEmail.removeClass('hidden')
+            break
+        }
+
+      })
+
+      this.applyNote(step)
+    },
+
+    applyNote (step) {
+      let id = `step_${ step.ID }_note_text`
+
+      wp.editor.remove(id)
+      tinymceElement(id, {
+        quicktags: false,
+      }, (content) => {
+        Funnel.updateStepMeta({
+          note_text: content,
+        })
+      })
+    },
+
+    createTask (step) {
+      let id = `step_${ step.ID }_task_content`
+
+      wp.editor.remove(id)
+      tinymceElement(id, {
+        quicktags: false,
+      }, (content) => {
+        Funnel.updateStepMeta({
+          content,
+        })
+      })
+    },
+
+    delayTimer (step) {
+      let id = `step_${ step.ID }_delay_timer_settings`
+
+      const mount = (step) => {
+        $(`#${ id }`).html(DelayTimer.edit(step))
+
+        DelayTimer.onMount(step, (meta, reRender) => {
+
+          let step = Funnel.updateStepMeta(meta)
+
+          if (reRender) {
+            mount(step)
+          }
+
+        }, () => {}, () => Funnel.getActiveStep())
+      }
+
+      mount(step)
+
+    },
+  }
+
+  FunnelSteps.init()
+
+  Funnel.registerStepCallbacks('send_email', {
+    onActive: ({ ID, meta, data }) => {
+
+      let id = `step_${ ID }_send_email`
       let { email_id } = meta
 
       let state = {
@@ -563,7 +732,7 @@
       }
 
       const morphPreview = () => {
-        let previewPanel = document.getElementById(`step-${ID}-email-preview-panel`)
+        let previewPanel = document.getElementById(`step-${ ID }-email-preview-panel`)
         morphdom(previewPanel, Preview())
       }
 
@@ -589,7 +758,7 @@
       }
 
       const Preview = () => Div({
-          id: `step-${ID}-email-preview-panel`,
+          id: `step-${ ID }-email-preview-panel`,
           className: 'gh-panel email-preview',
           style: {
             backgroundColor: '#fff',
@@ -605,13 +774,13 @@
             },
           }, [
             email_id && !getEmail() ? '<h2>Loading...</h2>' : ItemPicker({
-              id: `step-${ID}-email-picker`,
+              id: `step-${ ID }-email-picker`,
               noneSelected: 'Search for an email...',
               selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
               multiple: false,
               fetchOptions: (search) => {
                 return EmailsStore.fetchItems({ search }).
-                then(emails => emails.map(({ ID, data }) => ({ id: ID, text: data.title })))
+                  then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
               },
               onChange: item => {
 
@@ -635,7 +804,7 @@
             }, [
 
               !hasEmail() ? null : Button({
-                id: `step_${ID}_edit_email`,
+                id: `step_${ ID }_edit_email`,
                 className: 'gh-button primary text gap-10 display-flex',
                 onClick: e => {
                   openEmailEditor(getEmail())
@@ -645,7 +814,7 @@
                 __('Edit'),
               ]),
               email_id ? null : Button({
-                id: `step_${ID}_create_email`,
+                id: `step_${ ID }_create_email`,
                 className: 'gh-button primary text gap-10 display-flex',
                 onClick: e => {
                   openEmailEditor({})
@@ -655,10 +824,10 @@
                 __('Create new email'),
               ]),
               !hasEmail() ? null : Button({
-                id: `step_${ID}_email_more`,
+                id: `step_${ ID }_email_more`,
                 className: 'gh-button secondary text icon',
                 onClick: e => {
-                  moreMenu(`#step_${ID}_email_more`, [
+                  moreMenu(`#step_${ ID }_email_more`, [
                     {
                       key: 'edit',
                       text: __('Edit'),
@@ -700,9 +869,9 @@
               className: 'subject-and-from',
             }, [
               // Subject Line
-              `<h2>${getEmail().data.subject}</h2>`,
+              `<h2>${ getEmail().data.subject }</h2>`,
               // From Name & Email
-              `<span class="from-name">${getEmail().context.from_name}</span> <span class="from-email">&lt;${getEmail().context.from_email}&gt;</span>`,
+              `<span class="from-name">${ getEmail().context.from_name }</span> <span class="from-email">&lt;${ getEmail().context.from_email }&gt;</span>`,
               // From Email
             ]) : Div({
               className: 'skeleton-loading',
@@ -714,11 +883,12 @@
               },
             }),
           ]),
-          !email_id ? null : (getEmail() ? Iframe({
-            id: `step-${ID}-preview-${email_id}`,
+          !email_id ? null : ( getEmail() ? Iframe({
+            id: `step-${ ID }-preview-${ email_id }`,
             height: 500,
             style: {
               width: '100%',
+              height: '500px',
             },
             onLoad: e => {
               // e.target.contentDocument.body.style.padding = '20px'
@@ -736,7 +906,7 @@
               height: '460px',
               margin: '20px',
             },
-          })),
+          }) ),
         ],
       )
 
@@ -748,137 +918,38 @@
         const render = () => panel.parentNode.replaceChild(Preview(), panel)
 
         if (email_id) {
-          EmailsStore.maybeFetchItem(email_id).catch( err => {
+          EmailsStore.maybeFetchItem(email_id).catch(err => {
             email_id = false
-          }).finally(() => morphPreview() )
+          }).finally(() => morphPreview())
           render()
-        } else {
+        }
+        else {
           render()
         }
       }
     },
+    onDuplicate: ({ ID, data, meta }, res, rej) => {
 
-    formFill ({ ID }) {
-
-      let id = `step_${ID}_upgrade_form`
-      const $btn = $(`#${id}`)
-
-      if ($btn.data('flag')) {
-        return
+      // Email id was not set
+      if (!meta.email_id) {
+        res({})
       }
 
-      $btn.data('flag', true)
-
-      $btn.on('click', e => {
-
-        confirmationModal({
-          alert: `<p>${__('Once you upgrade to this form to the new form builder there is no going back.',
-            'groundhogg')}</p>`,
-          confirmText: __('Upgrade Form', 'groundhogg'),
-          onConfirm: () => {
-
-            $(`#step_${ID}_upgrade_form_confirm`).val('confirm')
-            Funnel.save()
-
-          },
-        })
-
+      confirmationModal({
+        alert: `<p>${ __('Do you also want to make a new copy of the email template?', 'groundhogg') }</p>`,
+        confirmText: __('Yes, make a copy!', 'groundhogg'),
+        closeText: __('No, use the original.', 'groundhogg'),
+        onConfirm: e => {
+          res({
+            duplicate_email: true,
+          })
+        },
+        onCancel: e => {
+          res({})
+        },
       })
 
     },
+  })
 
-    webForm (step) {
-
-      let id = `step_${step.ID}_web_form_builder`
-
-      const mount = (step) => {
-        $(`#${id}`).html(WebForm.edit(step))
-
-        WebForm.onMount(step, (meta, reRender) => {
-
-          let step = Funnel.updateStepMeta(meta)
-
-          if (reRender) {
-            mount(step)
-          }
-
-        }, () => {}, () => Funnel.getActiveStep())
-      }
-
-      mount(step)
-
-    },
-
-    adminNotification (step) {
-
-      let $customEmail = $('.active .custom-settings input.custom-email')
-      let $replyType = $('.active .custom-settings select.reply-to-type')
-
-      $replyType.on('change', e => {
-
-        switch ($replyType.val()) {
-          case 'contact':
-          case 'owner':
-            $customEmail.addClass('hidden')
-            break
-          case 'custom':
-            $customEmail.removeClass('hidden')
-            break
-        }
-
-      })
-
-      this.applyNote(step)
-    },
-
-    applyNote (step) {
-      let id = `step_${step.ID}_note_text`
-
-      wp.editor.remove(id)
-      tinymceElement(id, {
-        quicktags: false,
-      }, (content) => {
-        Funnel.updateStepMeta({
-          note_text: content,
-        })
-      })
-    },
-
-    createTask (step) {
-      let id = `step_${step.ID}_task_content`
-
-      wp.editor.remove(id)
-      tinymceElement(id, {
-        quicktags: false,
-      }, (content) => {
-        Funnel.updateStepMeta({
-          content,
-        })
-      })
-    },
-
-    delayTimer (step) {
-      let id = `step_${step.ID}_delay_timer_settings`
-
-      const mount = (step) => {
-        $(`#${id}`).html(DelayTimer.edit(step))
-
-        DelayTimer.onMount(step, (meta, reRender) => {
-
-          let step = Funnel.updateStepMeta(meta)
-
-          if (reRender) {
-            mount(step)
-          }
-
-        }, () => {}, () => Funnel.getActiveStep())
-      }
-
-      mount(step)
-
-    },
-  }
-
-  FunnelSteps.init()
-
-})(jQuery)
+} )(jQuery)

@@ -101,7 +101,7 @@ if ( get_url_var( 'flush' ) ) {
 			<?php wp_nonce_field(); ?>
             <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
             <hr/>
-            <input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
+            <input type="file" name="funnel_template" id="funnel_template" accept=".funnel,.json">
             <button style="float: right" class="gh-button primary" name="funnel_import"
                     value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
             <div class="wp-clearfix"></div>

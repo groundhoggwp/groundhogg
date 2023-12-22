@@ -3,22 +3,16 @@
 namespace Groundhogg\Admin\Events;
 
 // Exit if accessed directly
-use Groundhogg\Admin\Guided_Setup\Steps\Email;
 use Groundhogg\Admin\Table;
-use Groundhogg\DB\DB;
 use Groundhogg\Email_Log_Item;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\dashicon;
-use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -117,7 +111,7 @@ class Email_Log_Table extends Table {
 		}
 
 		?>
-		<script>(function ($) {
+        <script>( function ($) {
             $(() => {
 
               const $before = $('#before')
@@ -135,7 +129,7 @@ class Email_Log_Table extends Table {
                     $search.removeClass('hidden')
                     $before.removeClass('hidden')
                     $after.addClass('hidden').val('')
-	                break
+                    break
                   case 'after':
                     $search.removeClass('hidden')
                     $after.removeClass('hidden')
@@ -149,8 +143,8 @@ class Email_Log_Table extends Table {
                 }
               })
             })
-          })(jQuery)</script>
-		<div class="alignleft gh-actions" style="display: flex;gap: 3px;align-items: center">
+          } )(jQuery)</script>
+        <div class="alignleft gh-actions" style="display: flex;gap: 3px;align-items: center">
 			<?php
 
 			echo html()->dropdown( [
@@ -187,7 +181,7 @@ class Email_Log_Table extends Table {
 				'type'  => 'submit',
 				'value' => 'filter_logs',
 				'name'  => 'action',
-				'class' => 'button button-secondary' . ( get_url_var( 'before' ) || get_url_var( 'after' )  ? '' : ' hidden' )
+				'class' => 'button button-secondary' . ( get_url_var( 'before' ) || get_url_var( 'after' ) ? '' : ' hidden' )
 			] )
 
 			?></div><?php
@@ -199,8 +193,8 @@ class Email_Log_Table extends Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -261,16 +255,11 @@ class Email_Log_Table extends Table {
 				'email' => $email->get_id()
 			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
 
-		$actions['view-details'] = html()->modal_link( [
-			'title'       => __( 'Log Details', 'groundhogg' ),
-			'text'        => __( 'View Details', 'groundhogg' ),
+		$actions['view-details'] = html()->e( 'a', [
+			'href'        => '#',
 			'class'       => 'view-email-log',
-			'footer'      => 'false',
-			'height'      => 500,
-			'width'       => 500,
-			'source'      => 'modal-log-details',
 			'data-log-id' => $email->get_id()
-		] );
+		], __( 'View Details' ) );
 
 		return $this->row_actions( apply_filters( 'groundhogg/log/row_actions', $actions, $email, $column_name ) );
 	}
@@ -336,7 +325,7 @@ class Email_Log_Table extends Table {
 			case 'delivered':
 
 				?>
-				<span class="email-sent"><?php _e( 'Sent', 'groundhogg' ) ?></span>
+                <span class="pill success"><?php _e( 'Sent', 'groundhogg' ) ?></span>
 				<?php
 
 				break;
@@ -345,7 +334,10 @@ class Email_Log_Table extends Table {
 			case 'softfail':
 
 				?>
-				<span class="email-failed"><?php _e( 'Failed', 'groundhogg' ) ?></span>
+                <span class="pill danger gh-has-tooltip">
+                    <?php _e( 'Failed', 'groundhogg' ) ?>
+                    <span class="gh-tooltip bottom"><?php esc_html_e( $email->error_message ); ?></span>
+                </span>
 				<?php
 
 				break;
@@ -356,7 +348,7 @@ class Email_Log_Table extends Table {
 
 	/**
 	 * @param $email Email_Log_Item
-	 *
+	 *  
 	 * @return string|void
 	 */
 	protected function column_sent( $email ) {

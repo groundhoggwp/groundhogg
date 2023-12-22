@@ -4,23 +4,13 @@ namespace Groundhogg\Api\V4;
 
 use Groundhogg\Broadcast;
 use Groundhogg\Campaign;
-use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\Email;
-use Groundhogg\Event;
-use Groundhogg\Plugin;
-use Groundhogg\Preferences;
-use function Groundhogg\create_object_from_type;
-use function Groundhogg\enqueue_event;
-use function Groundhogg\event_queue;
-use function Groundhogg\event_queue_db;
-use function Groundhogg\get_db;
-use Groundhogg\Tag;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
-use function Groundhogg\utils;
+use WP_REST_Server;
+use function Groundhogg\create_object_from_type;
+use function Groundhogg\get_db;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -123,7 +113,7 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
 
-		foreach ( $campaigns as $campaign ){
+		foreach ( $campaigns as $campaign ) {
 			$broadcast->create_relationship( new Campaign( $campaign ) );
 		}
 
@@ -134,6 +124,9 @@ class Broadcasts_Api extends Base_Object_Api {
 		 * @param array $meta         the config object which is passed to the scheduler
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
+
+		// Sets up the initial state for the scheduler
+		$broadcast->enqueue_batch();
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $broadcast
@@ -155,11 +148,11 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$percent_complete = $broadcast->schedule_batch();
+		$processed = $broadcast->enqueue_batch();
 
 		return self::SUCCESS_RESPONSE( [
-			'finished'  => $percent_complete == 100,
-//			'scheduled' => $offset
+			'finished'         => $broadcast->is_scheduled(),
+			'percent_complete' => $broadcast->get_percent_scheduled()
 		] );
 
 	}

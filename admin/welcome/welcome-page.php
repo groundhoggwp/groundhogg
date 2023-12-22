@@ -426,7 +426,7 @@ class Welcome_Page extends Admin_Page {
             $('.show-video').on('click', e => {
               let $img = $(e.currentTarget)
               Groundhogg.element.modal({
-                content: `<iframe width="800" height="450" src="${$img.data('yt-src')}"
+                content: `<iframe width="800" height="450" src="{$img.data('yt-src')}"
                                             frameborder="0"
                                             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                                             allowfullscreen></iframe>`

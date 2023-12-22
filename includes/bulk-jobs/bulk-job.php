@@ -3,10 +3,10 @@
 namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\_nf;
 use function Groundhogg\get_post_var;
-use Groundhogg\Plugin;
 use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
 
@@ -35,12 +35,26 @@ abstract class Bulk_Job {
 	protected $skipped = 0;
 	protected $completed = 0;
 
-	protected function _skipped() {
-		$this->skipped ++;
+	protected function _skipped( $num = 0 ) {
+
+		if ( ! $num ) {
+			$this->skipped ++;
+
+			return;
+		}
+
+		$this->skipped += $num;
 	}
 
-	protected function _completed() {
-		$this->completed ++;
+	protected function _completed( $num = 0 ) {
+
+		if ( ! $num ) {
+			$this->completed ++;
+
+			return;
+		}
+
+		$this->completed += $num;
 	}
 
 	/**
@@ -171,7 +185,7 @@ abstract class Bulk_Job {
 		foreach ( $items as $item ) {
 			$this->process_item( $item );
 
-			if ( $item_count > 1 ){
+			if ( $item_count > 1 ) {
 				$this->_completed();
 			}
 		}
@@ -215,7 +229,7 @@ abstract class Bulk_Job {
 	 *
 	 * @return string
 	 */
-	protected function get_log_message( $completed, $time, $skipped = 0 ){
+	protected function get_log_message( $completed, $time, $skipped = 0 ) {
 		if ( $skipped > 0 ) {
 			return sprintf( __( 'Processed %s items in %s seconds. Skipped %s items.', 'groundhogg' ), _nf( $completed ), $time, _nf( $skipped ) );
 		} else {

@@ -436,6 +436,11 @@ class Contact_Query {
 
 		$this->query_vars['offset'] = absint( $this->query_vars['offset'] );
 
+		if ( isset( $this->query_vars['ID'] ) ) {
+			$this->query_vars['include'] = wp_parse_id_list( $this->query_vars['ID'] );
+			unset( $this->query_vars['ID'] );
+		}
+
 
 		// Order by user meta
 		if ( $this->query_vars['orderby'] && str_starts_with( $this->query_vars['orderby'], 'um.' ) && $this->query_vars['orderby'] !== 'um.meta_value' ) {
@@ -1017,22 +1022,9 @@ class Contact_Query {
 		}
 
 		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
-
-			$exclude_filters = $this->query_vars['exclude_filters'];
-
-			if ( ! is_array( $exclude_filters ) ) {
-				$exclude_filters = base64_json_decode( $this->query_vars['exclude_filters'] );
-			}
-
+			$exclude_filters = $this->parse_filters( $this->query_vars['exclude_filters'] );
 			if ( ! empty( $exclude_filters ) ) {
-				$query = new Contact_Query();
-				$sql   = $query->get_sql( [
-					'filters' => $exclude_filters,
-					'select'  => 'ID',
-					'orderby' => 'none'
-				] );
-
-				$where['exclude_filters'] = "{$this->table_name}.ID NOT IN ( $sql )";
+				$where['exclude_filters'] = "NOT ( $exclude_filters )";
 			}
 		}
 
@@ -1429,7 +1421,7 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	protected function parse_filters( $filters, $exclude = false ): string {
+	protected function parse_filters( $filters ): string {
 
 		if ( ! is_array( $filters ) ) {
 			$filters = base64_json_decode( $filters );
@@ -1460,14 +1452,18 @@ class Contact_Query {
 				continue;
 			}
 
-			$or_clauses[] = '(' . implode( ' AND ', $and_clauses ) . ')';
+			$and_sql = implode( ' AND ', $and_clauses );
+
+			$or_clauses[] = count( $and_clauses ) > 1 ? "( $and_sql )" : $and_sql;
 		}
 
 		if ( empty( $or_clauses ) ) {
 			return false;
 		}
 
-		return '( ' . implode( " OR ", $or_clauses ) . ' )';
+		$or_sql = implode( " OR ", $or_clauses );
+
+		return count( $or_clauses ) > 1 ? "( $or_sql )" : $or_sql;
 	}
 
 	/**
@@ -1753,18 +1749,19 @@ class Contact_Query {
 		}
 
 		$search_query = new Contact_Query( [
-			'select'       => 'ID',
 			'saved_search' => $filter_vars['search']
 		] );
 
-		$search_sql = $search_query->get_sql();
+		$search_query->parse_query();
+
+		$search_sql = implode( ' AND ', $search_query->construct_request_where() );
 
 		switch ( $filter_vars['compare'] ) {
 			default:
 			case 'in':
-				return sprintf( "{$query->table_name}.ID IN ( %s )", $search_sql );
+				return "( $search_sql )";
 			case 'not_in':
-				return sprintf( "{$query->table_name}.ID NOT IN ( %s )", $search_sql );
+				return "NOT ( $search_sql )";
 		}
 	}
 
@@ -2332,6 +2329,8 @@ class Contact_Query {
 			'tags'     => []
 		] );
 
+		$tag_ids = wp_parse_id_list( $filter_vars['tags'] );
+
 		switch ( $filter_vars['compare'] ) {
 			default:
 			case 'includes':
@@ -2341,7 +2340,11 @@ class Contact_Query {
 						$tag_query = get_db( 'tag_relationships' )->get_sql( [
 							'select'  => 'contact_id',
 							'where'   => [
-								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+								[
+									'tag_id',
+									count( $tag_ids ) > 1 ? 'IN' : '=',
+									count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0]
+								]
 							],
 							'orderby' => false,
 							'order'   => false,
@@ -2363,7 +2366,7 @@ class Contact_Query {
 
 								return "{$query->table_name}.ID IN ( $tag_query )";
 
-							}, $filter_vars['tags'] ) ) . ')';
+							}, $tag_ids ) ) . ')';
 				}
 			case 'excludes':
 				switch ( $filter_vars['compare2'] ) {
@@ -2382,13 +2385,17 @@ class Contact_Query {
 
 								return "{$query->table_name}.ID NOT IN ( $tag_query )";
 
-							}, $filter_vars['tags'] ) ) . ')';
+							}, $tag_ids ) ) . ')';
 
 					case 'all':
 						$tag_query = get_db( 'tag_relationships' )->get_sql( [
 							'select'  => 'contact_id',
 							'where'   => [
-								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+								[
+									'tag_id',
+									count( $tag_ids ) > 1 ? 'IN' : '=',
+									count( $tag_ids ) > 1 ? $tag_ids : $tag_ids[0]
+								]
 							],
 							'orderby' => false,
 							'order'   => false,

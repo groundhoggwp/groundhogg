@@ -3,13 +3,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Contact_Query;
-use Groundhogg\Event;
-use function Groundhogg\enqueue_event;
-use function Groundhogg\get_contactdata;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_query;
-use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_url_var;
 
 /**
@@ -25,23 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Broadcast_Scheduler extends Bulk_Job {
 
-	protected $config = [];
-	protected $broadcast_id;
-	protected $send_time;
-	protected $send_now;
-	protected $send_in_timezone;
-	protected $is_email;
-	protected $object_id;
-
-
-	/**
-	 * The number of emails which have been scheduled so far.
-	 *
-	 * @var int
-	 */
-	protected $emails_scheduled = 0;
-	private $is_transactional;
-
 	/**
 	 * Get the action reference.
 	 *
@@ -50,6 +27,11 @@ class Broadcast_Scheduler extends Bulk_Job {
 	function get_action() {
 		return 'gh_schedule_broadcast';
 	}
+
+	/**
+	 * @var Broadcast
+	 */
+	private $broadcast;
 
 	/**
 	 * Get an array of items someway somehow
@@ -64,14 +46,13 @@ class Broadcast_Scheduler extends Bulk_Job {
 		}
 
 		$broadcast = new Broadcast( absint( get_url_var( 'broadcast' ) ) );
+		set_transient( 'gh_current_broadcast_id', $broadcast->get_id() );
 
-		$query = new Contact_Query();
+		$items_remaining = $broadcast->get_items_remaining();
 
-		$contacts = $query->query( $broadcast->get_query() );
+		$batches = ceil( $items_remaining / $broadcast::BATCH_LIMIT );
 
-		$ids = wp_list_pluck( $contacts, 'ID' );
-
-		return $ids;
+		return range( 1, $batches );
 	}
 
 	/**
@@ -83,13 +64,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return int
 	 */
 	public function max_items( $max, $items ) {
-		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
-			return $max;
-		}
-
-		$max = intval( ini_get( 'max_input_vars' ) );
-
-		return min( $max, 100 );
+		return 1;
 	}
 
 	/**
@@ -105,62 +80,14 @@ class Broadcast_Scheduler extends Bulk_Job {
 			return;
 		}
 
-		$id = absint( $item );
+		$items = $this->broadcast->enqueue_batch();
 
-		$contact = get_contactdata( $id );
-
-		// No point in scheduling an email to a contact that is not marketable.
-		if ( ! $contact || ( ! $this->is_transactional && ! $contact->is_marketable() ) ) {
-			$this->skip_item( $item );
-
-			return;
+		if ( $items ) {
+			$this->_completed( $items );
+		} else {
+			// force a retry
+			wp_send_json_error();
 		}
-
-		$local_time = $this->get_send_time();
-
-		if ( $this->send_in_timezone && ! $this->send_now ) {
-
-			$local_time = $contact->get_local_time_in_utc_0( $this->send_time );
-
-			if ( $local_time < time() ) {
-				$local_time += DAY_IN_SECONDS;
-			}
-		}
-
-		$args = [
-			'time'       => $local_time,
-			'contact_id' => $id,
-			'funnel_id'  => Broadcast::FUNNEL_ID,
-			'step_id'    => $this->broadcast_id,
-			'event_type' => Event::BROADCAST,
-			'status'     => 'waiting',
-			'priority'   => 100,
-		];
-
-		if ( $this->is_email ) {
-			$args['email_id'] = $this->object_id;
-		}
-
-		$args = apply_filters( 'groundhogg/admin/bulkjobs/broadcast/schedule_broadcast/args', $args );
-		enqueue_event( $args );
-		$this->emails_scheduled += 1;
-	}
-
-	/**
-	 * @return int
-	 */
-	protected function get_send_time() {
-		return $this->send_time;
-	}
-
-	/**
-	 * The maximum number of emails which can be scheduled within 1 minute.
-	 * A.k.a Email throttling
-	 *
-	 * @return int
-	 */
-	protected function get_max_emails_per_minute() {
-		return apply_filters( 'groundhogg/broadcasts/max_per_minute', 500 );
 	}
 
 	/**
@@ -169,35 +96,11 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return void
 	 */
 	protected function pre_loop() {
-
-
-		$broadcast_id = absint( get_transient( 'gh_current_broadcast_id' ) );
-		$broadcast    = new Broadcast( $broadcast_id );
-
-		$config = wp_parse_args( $broadcast->get_all_meta(), [
-			'send_time'          => time(),
-			'send_now'           => false,
-			'send_in_local_time' => false
-		] );
-
-		$this->config = $config;
-
-		$this->broadcast_id = $broadcast_id;
-
-		if ( $broadcast->get_broadcast_type() === Broadcast::TYPE_EMAIL ) {
-			$this->is_email = true;
-		} else {
-			$this->is_email = false;
+		$broadcast_id    = absint( get_transient( 'gh_current_broadcast_id' ) );
+		$this->broadcast = new Broadcast( $broadcast_id );
+		if ( ! $this->broadcast->exists() ) {
+			wp_send_json_error();
 		}
-
-		$this->object_id = $broadcast->get_object_id();
-
-		$this->send_time        = absint( $config['send_time'] );
-		$this->send_now         = filter_var( $config['send_now'], FILTER_VALIDATE_BOOLEAN );
-		$this->send_in_timezone = filter_var( $config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN );
-		$this->is_transactional = filter_var( $config['is_transactional'], FILTER_VALIDATE_BOOLEAN );
-
-		$this->emails_scheduled = absint( get_transient( 'gh_emails_scheduled' ) );
 	}
 
 	/**
@@ -206,18 +109,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return void
 	 */
 	protected function post_loop() {
-		set_transient( 'gh_emails_scheduled', $this->emails_scheduled, HOUR_IN_SECONDS );
-	}
-
-	/**
-	 * Send the json response, add additional params to the response
-	 *
-	 * @param $response
-	 */
-	protected function send_response( $response ) {
-		$response['total'] = $this->emails_scheduled;
-
-		parent::send_response( $response );
 	}
 
 	/**
@@ -227,7 +118,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 */
 	protected function clean_up() {
 		delete_transient( 'gh_current_broadcast_id' );
-		delete_transient( 'gh_emails_scheduled' );
 	}
 
 	/**
@@ -236,11 +126,12 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return string
 	 */
 	protected function get_return_url() {
-		$url = admin_url( 'admin.php?page=gh_broadcasts' );
-
-		return $url;
+		return admin_page_url( 'gh_broadcasts', [ 'view' => 'scheduled' ] );
 	}
 
+	/**
+	 * @return string|null
+	 */
 	protected function get_finished_notice() {
 		return _x( 'Broadcast scheduled!', 'notice', 'groundhogg' );
 	}
