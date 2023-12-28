@@ -160,8 +160,8 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->query = $query;
 
-		$c_query     = new Contact_Query();
-		$this->items = $c_query->query( $query, true );
+		$c_query     = new Contact_Query( $query );
+		$this->items = $c_query->query( null, true );
 		$total       = $c_query->found_items;
 
 		// Add condition to be sure we don't divide by zero.
