@@ -743,8 +743,12 @@ class Replacements implements \JsonSerializable {
 			return $default;
 		}
 
+		$html_callback  = $this->replacement_codes[ $code ]['callback'];
+		$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
+
 		$cache_key = implode( ':', [
-			$this->get_context(),
+            // if there is no defined plain callback we should reference the html version
+			is_callable( $plain_callback ) ? $this->get_context() : 'html',
 			$this->contact_id ?: 'anon',
 			md5( serialize( $parts ) ),
 			cache_get_last_changed( 'replacements' )
@@ -761,9 +765,6 @@ class Replacements implements \JsonSerializable {
 			$field = substr( $code, 1 );
 			$text  = $this->get_current_contact()->$field;
 		} else {
-
-			$html_callback  = $this->replacement_codes[ $code ]['callback'];
-			$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
 
 			if ( ! is_callable( $plain_callback ) ) {
 				$plain_callback = function ( ...$args ) use ( $html_callback ) {
