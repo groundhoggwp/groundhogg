@@ -147,7 +147,7 @@ class Events extends DB {
 	protected function maybe_register_filters() {
 		parent::maybe_register_filters();
 
-		$this->query_filters->register_filter( 'funnel', function ( $filter, $where ) {
+		$this->query_filters->register( 'funnel', function ( $filter, $where ) {
 			$filter = wp_parse_args( $filter, [
 				'funnel_id' => false,
 				'step_id'   => false,
@@ -164,7 +164,7 @@ class Events extends DB {
 			$where->equals( 'event_type', Event::FUNNEL );
 		} );
 
-		$this->query_filters->register_filter( 'broadcast', function ( $filter, $where ) {
+		$this->query_filters->register( 'broadcast', function ( $filter, $where ) {
 			$filter = wp_parse_args( $filter, [
 				'broadcast_id' => false,
 			] );
@@ -179,7 +179,7 @@ class Events extends DB {
 			var_dump( $filter );
 		} );
 
-		$this->query_filters->register_filter( 'contacts', function ( $filter, $where ) {
+		$this->query_filters->register( 'contacts', function ( $filter, $where ) {
 
 			$filter = wp_parse_args( $filter, [
 				'contacts' => [],

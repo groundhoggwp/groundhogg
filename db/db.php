@@ -1159,14 +1159,14 @@ abstract class DB {
 
 					if ( str_starts_with( $column, 'date' ) ) {
 
-						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
-							Query_Filters::mysqlDate( $column, $filter, $where );
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+							Query_Filters::mysqlDateTime( $column, $filter, $where );
 						} );
 
 						break;
 					}
 
-					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
 						Query_Filters::string( $column, $filter, $where );
 					} );
 
@@ -1175,14 +1175,14 @@ abstract class DB {
 
 					if ( in_array( $column, [ 'time', 'timestamp', 'time_scheduled' ] ) ) {
 
-						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
 							Query_Filters::timestamp( $column, $filter, $where );
 						} );
 
 						break;
 					}
 
-					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
 						Query_Filters::number( $column, $filter, $where );
 					} );
 					break;
@@ -1290,7 +1290,7 @@ abstract class DB {
 					break;
 				case 'related' :
 
-					$alias = $query->leftJoin( get_db('object_relationships' ), 'primary_object_id' );
+					$alias = $query->leftJoinTable( get_db('object_relationships' ), 'primary_object_id' );
 
 					$query->where( "$alias.secondary_object_id", $val['ID'] );
 					$query->where( "$alias.secondary_object_type", $val['type'] );
@@ -1327,13 +1327,13 @@ abstract class DB {
 				case 'include_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query );
+					$this->query_filters->parse_filters( $val, $query->where() );
 
 					break;
 				case 'exclude_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query, true );
+					$this->query_filters->parse_filters( $val, $query->where(), true );
 
 					break;
 				case 'found_rows':
@@ -1350,7 +1350,7 @@ abstract class DB {
 
 						[ 'key' => $key, 'value' => $value, 'compare' => $compare ] = $meta_query;
 
-						$alias = $query->joinMeta();
+						$alias = $query->joinMeta( $key );
 
 						$query->where( "$alias.meta_key", $key );
 						$query->where( "$alias.meta_value", $value, $compare );
