@@ -37,10 +37,10 @@ class Email_Log_Api extends Base_Object_Api {
 
 		if ( is_wp_error( $response ) ) {
 			if ( ! Email_Logger::is_enabled() ) {
-				return new \WP_Error( 'not_enabled', 'Email logging is not currently enabled. Enable it to track detailed outgoing email information.' );
+				return self::ERROR_401( 'not_enabled', 'Email logging is not currently enabled. Enable it to track detailed outgoing email information.' );
 			}
 
-			return new \WP_Error( 'not_found', 'The requested email log could not be found. It may have been deleted in accordance with your log retention settings.' );
+			return self::ERROR_404( 'not_found', 'The requested email log could not be found. It may have been deleted in accordance with your log retention settings.' );
 		}
 
 		return $response;
