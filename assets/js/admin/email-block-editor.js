@@ -4101,7 +4101,7 @@
 
       return Div({
         id: 'email-editor',
-        className: 'gh-fixed-ui',
+        // className: 'gh-fixed-ui',
       }, [
         // Header
         Div({
@@ -6983,7 +6983,7 @@
   //   plainText: () => '',
   // })
 
-  const morph = (selector, html = null) => {
+  const morph = (selector, html = null, childrenOnly = true ) => {
 
     try {
       if (html === null) {
@@ -6991,7 +6991,7 @@
       }
 
       morphdom(document.querySelector(selector), Fragment(html), {
-        childrenOnly: true,
+        childrenOnly,
       })
     }
     catch (e) {}
@@ -7216,7 +7216,10 @@
   const removeControls = () => morph('#controls-panel', Div())
   const morphControls = () => morph('#controls-panel', ControlsPanel())
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
-  const morphEmailEditor = () => morph('#email-editor', EmailEditor())
+  const morphEmailEditor = () => {
+    morph('#email-editor', EmailEditor(), false )
+    window.dispatchEvent( new Event( 'resize' ) )
+  }
   const morphHeader = () => morph('#email-header', Header())
   const updateStyles = () => {
     $('#builder-style').text(`#block-editor-content-wrap{ \n\n${ renderBlocksCSS(getBlocks()) }\n\n }`)
