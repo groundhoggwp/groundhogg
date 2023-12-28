@@ -35,7 +35,7 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 				] );
 
 				echo html()->submit( [
-					'text' => 'Search',
+					'text' => __( 'Search' ),
                     'class' => 'gh-button primary small'
 				] );
 

@@ -121,8 +121,8 @@ class Emails_Table extends Table {
 	 * @return string
 	 */
 	protected function column_title( $email ) {
-		$subject = ( ! $email->get_title() ) ? '(' . __( 'no title' ) . ')' : $email->get_title();
-		$editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->get_id() );
+		$subject = $email->get_title();
+		$editUrl = $email->admin_link();
 
 		if ( $this->get_view() === 'trash' ) {
 			$html = "<strong>{$subject}</strong>";
@@ -136,7 +136,7 @@ class Emails_Table extends Table {
 			}
 
 			if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
-				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template' ) . "</span>";
+				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template', 'groundhogg' ) . "</span>";
 			}
 
 			$html .= "</strong>";
@@ -405,7 +405,7 @@ class Emails_Table extends Table {
 			],
 			[
 				'view'    => 'draft',
-				'display' => __( 'Draft', 'groundhogg' ),
+				'display' => __( 'Drafts' ),
 				'query'   => [ 'status' => 'draft' ],
 			],
 			[
