@@ -359,9 +359,7 @@
                   FunnelsStore.addContacts({
                     funnel_id: funnel.ID,
                     step_id: step.ID,
-                    query: {
-                      include: [getContact().ID],
-                    },
+                    contact_id: getContact().ID
                   }).then(() => {
 
                     dialog({
@@ -670,8 +668,8 @@
             // language=HTML
             return `
                 <li class="activity-item">
-                    <div class="activity-icon ${ step.data.step_group }">
-                        ${ pending ? icons.hourglass : icons.funnel }
+                    <div class="activity-icon ${ step.data.step_group } ${pending ? 'pending' : '' }">
+                        ${ pending ? icons.hourglass : `<img class="step-icon" src="${Groundhogg.rawStepTypes[step.data.step_type].icon}" alt="${Groundhogg.rawStepTypes[step.data.step_type].name}"/>` }
                     </div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
@@ -693,7 +691,7 @@
                                                 },
                                                 Groundhogg.rawStepTypes[step.data.step_type].name),
                                         el('a', {
-                                            href: funnel.admin,
+                                            href: funnel.admin + '#' + activity.data.step_id,
                                         }, funnel.data.title)) }
                             </div>
                             <div class="diff-time">
@@ -2136,7 +2134,7 @@
   })
 
   const { email_log: LogsStore } = Groundhogg.stores
-  const { EmailLogModal } = Groundhogg.components
+  const { EmailLogModal, EmailPreviewModal } = Groundhogg.components
 
   // Handle log items
   $(document).on('click', 'a.view-event-email-log-item', async e => {
@@ -2156,8 +2154,21 @@
 
       EmailLogModal(logItems[0])
 
+      close()
+
     }
     catch (err) {
+
+      close()
+
+      if ( event.data.email_id ){
+        try {
+          await EmailPreviewModal( event.data.email_id, {} )
+          return
+        } catch ( err2 ) {
+          // Silence
+        }
+      }
 
       dialog({
         message: err.message,
@@ -2167,12 +2178,12 @@
 
     }
 
-    close()
-
   })
 
   // Handle log items
   $(document).on('click', 'a.view-composed-email-log-item', async e => {
+
+    e.preventDefault()
 
     let activityId = parseInt($(e.currentTarget).data('activity-id'))
 

@@ -369,6 +369,7 @@ code.meta-replacement-code {
 
       position: absolute;
       left: -34px;
+      box-sizing: border-box;
 
       height: 25px;
       width: 25px;
@@ -379,18 +380,36 @@ code.meta-replacement-code {
       background: $primary-blue;
       color: #FFFFFF;
 
+      img {
+        max-width: 100%;
+      }
+
       &.page-visit{
         background: $primary-dark;
       }
 
-      &.benchmark {
-        background: $benchmark-orange;
-        border-radius: 4px;
+      &.benchmark:not(.pending) {
+        border: 2px solid $benchmark-orange;
+        background-color: white;
+
+        &.pending{
+          border: none;
+          background-color: $benchmark-orange;
+        }
       }
 
-      &.broadcast,
       &.action {
-        background: $action-green;
+        border: 2px solid $action-green;
+        background-color: white;
+
+        &.pending{
+          border: none;
+          background-color: $action-green;
+        }
+      }
+
+      &.broadcast{
+        background-color: $action-green;
       }
 
       svg {

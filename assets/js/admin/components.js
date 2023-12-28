@@ -1534,7 +1534,14 @@
 
     const { close } = loadingModal()
 
-    const email = await EmailsStore.maybeFetchItem( emailId )
+    let email
+
+    try {
+      email = await EmailsStore.maybeFetchItem( emailId )
+    } catch ( err ) {
+      close()
+      throw err
+    }
 
     const {
       from_avatar,
@@ -1546,7 +1553,7 @@
 
     close()
 
-    ModalFrame({}, ({close}) => Div({
+    return ModalFrame({}, ({close}) => Div({
       style: {
         width: `${width}px`,
         height: `${height}px`
