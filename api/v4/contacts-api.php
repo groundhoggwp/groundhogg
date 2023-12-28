@@ -484,7 +484,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		foreach ( $add_tag_params as $add_tag_param ) {
 			if ( $request->has_param( $add_tag_param ) ) {
-				$add_tags = $request->get_param( $add_tag_param );
+				$add_tags = array_merge( $add_tags, $request->get_param( $add_tag_param ) );
 				break;
 			}
 		}
