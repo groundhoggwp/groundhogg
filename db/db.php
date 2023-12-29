@@ -1194,15 +1194,16 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array        $data
+	 * @throws FilterException
+	 *
 	 * @param string|false $ORDER_BY
 	 * @param bool         $from_cache
+	 *
+	 * @param array        $data
 	 *
 	 * @return array|bool|null|object
 	 */
 	public function query( $query_vars = [], $ORDER_BY = '', $from_cache = true ) {
-
-		global $wpdb;
 
 		if ( $ORDER_BY ) {
 			$query_vars['orderby'] = $ORDER_BY;
@@ -1230,7 +1231,7 @@ abstract class DB {
 		$query = new Query( $this );
 
 		$moreWhere = [];
-		$searched = false;
+		$searched  = false;
 
 		// Parse data and turn into an advanced query search instead
 		foreach ( $query_vars as $key => $val ) {
@@ -1241,27 +1242,28 @@ abstract class DB {
 
 			switch ( strtolower( $key ) ) {
 				case 'select':
-					if ( is_array( $val ) ){
-						$query->select( ...$val );
-					} else {
-						$query->select( $val );
+
+					if ( ! is_array( $val ) ){
+						$val = array_map( 'trim', explode( ',', $val ) );
 					}
+
+					$query->setSelect( ...$val );
 					break;
 				case 'func':
-					$func      = strtoupper( $val );
+					$func = strtoupper( $val );
 
-					if ( $func === 'COUNT' ){
+					if ( $func === 'COUNT' ) {
 						$operation = 'COUNT';
 						break;
 					}
 
 					$operation = 'VAR';
 					$select    = "{$func}({$query_vars['select']})";
-					$query->select( $select );
+					$query->setSelect( $select );
 					break;
 				case 'distinct':
-					if ( $query_vars['select'] !== '*' ){
-						$query->select( "DISTINCT {$query_vars['select']}" );
+					if ( $query_vars['select'] !== '*' ) {
+						$query->setSelect( "DISTINCT {$query_vars['select']}" );
 					}
 					break;
 				case 'where':
@@ -1270,7 +1272,7 @@ abstract class DB {
 				case 's':
 				case 'search':
 				case 'term':
-					if ( $searched ){
+					if ( $searched ) {
 						break;
 					}
 					$query->search( $val, wp_parse_list( $query_vars['search_columns'] ) );
@@ -1290,7 +1292,7 @@ abstract class DB {
 					break;
 				case 'related' :
 
-					$alias = $query->leftJoinTable( get_db('object_relationships' ), 'primary_object_id' );
+					$alias = $query->leftJoinTable( get_db( 'object_relationships' ), 'primary_object_id' );
 
 					$query->where( "$alias.secondary_object_id", $val['ID'] );
 					$query->where( "$alias.secondary_object_type", $val['type'] );
@@ -1302,7 +1304,7 @@ abstract class DB {
 					break;
 				case 'limit':
 
-					if ( is_array( $val ) ){
+					if ( is_array( $val ) ) {
 						$query->setLimit( ...$val );
 					} else {
 						$query->setLimit( $val );
@@ -1389,7 +1391,7 @@ abstract class DB {
 						break;
 					}
 
-					switch ( $val ){
+					switch ( $val ) {
 						case 'NOT_EMPTY':
 							$query->where()->notEmpty( $key );
 							break 2;
@@ -1426,16 +1428,7 @@ abstract class DB {
 				continue;
 			}
 
-			$compare = $this->symbolize_comparison( $compare );
-
-			switch ( $compare ) {
-				case 'IN':
-					$query->whereIn( $column, $value );
-					break;
-				default:
-					$query->where( $column, $value, $compare );
-					break;
-			}
+			$query->where( $column, $value, $compare );
 		}
 
 		switch ( strtoupper( $operation ) ) {

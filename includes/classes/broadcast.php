@@ -505,7 +505,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			if ( use_experimental_features() && $data['sent'] > 0 ) {
 
 				$events = get_db( 'events' )->query( [
-					'select'     => 'count(ID)',
+					'select'     => 'COUNT(ID) as total',
 					'step_id'    => $this->get_id(),
 					'event_type' => Event::BROADCAST,
 					'status'     => Event::COMPLETE,
@@ -514,7 +514,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 					'order'      => false,
 				] );
 
-				$counts = wp_list_pluck( $events, 'count(ID)' );
+				$counts = wp_list_pluck( $events, 'total' );
 
 				$total = array_sum( $counts );
 				$count = count( $counts );

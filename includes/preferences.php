@@ -361,10 +361,29 @@ class Preferences {
 	 *
 	 * @return mixed
 	 */
-	public function get_grace_period() {
+	public function get_grace_period( $as_date = false ) {
 		return Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 );
 	}
 
+	/**
+	 * Get the
+	 *
+	 * @throws \Exception
+	 *
+	 * @param $format
+	 *
+	 * @return \DateTime|string
+	 */
+	public function get_grace_period_cutoff_date( $format = false ){
+		$gracePeriod = new \DateTime( 'today', wp_timezone() );
+		$gracePeriod->modify( sprintf( '%d days ago', $this->get_grace_period() ) );
+
+		if ( $format ){
+			return $gracePeriod->format( $format );
+		}
+
+		return $gracePeriod;
+	}
 
 	/**
 	 * Return whether the given contact is within the strict confirmation grace period

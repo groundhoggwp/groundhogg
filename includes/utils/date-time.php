@@ -125,6 +125,7 @@ class Date_Time {
 	 * Convert a unix timestamp to local time
 	 *
 	 * @param $time
+	 * @deprecated use DateTimeHelper instead ya goof
 	 *
 	 * @return int
 	 */

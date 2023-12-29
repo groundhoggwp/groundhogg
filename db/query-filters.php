@@ -2,16 +2,20 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\day_of_week;
 use function Groundhogg\get_array_var;
 use function Groundhogg\maybe_swap_dates;
 
+class FilterException extends \Exception {
+
+}
+
 /**
  * Holder class for common filters
  */
 class Query_Filters {
-
 
 	/**
 	 * Registered filters
@@ -21,14 +25,14 @@ class Query_Filters {
 	protected $filters = [];
 
 	/**
-	 * Register a filter callback which will return an SQL statement
+	 * Register a filter callback which will modify the current query
 	 *
 	 * @param string   $type
-	 * @param callable $filter_callback
+	 * @param callable $filter_callback function that modifies the query
 	 *
 	 * @return bool
 	 */
-	public function register_filter( string $type, callable $filter_callback ): bool {
+	public function register( string $type, callable $filter_callback ): bool {
 		if ( ! $type || ! is_callable( $filter_callback ) ) {
 			return false;
 		}
@@ -44,11 +48,15 @@ class Query_Filters {
 	/**
 	 * Parse a single filter
 	 *
-	 * @param $filter
+	 * @throws FilterException
+	 *
+	 * @param Where $where
+	 *
+	 * @param array $filter
 	 *
 	 * @return false|string
 	 */
-	protected function parse_filter( $filter, $query ) {
+	protected function parse_filter( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'type' => ''
@@ -59,20 +67,30 @@ class Query_Filters {
 		$handler = get_array_var( $this->filters, $type );
 
 		// No filter handler available
-		if ( ! $handler || ! is_callable( $handler['filter_callback'] ) ) {
-			return false;
+		if ( ! $handler ) {
+			throw new FilterException( sprintf( "%s is not a registered filter", $type ) );
 		}
 
-		return call_user_func( $handler['filter_callback'], $filter, $query );
+		if ( ! is_callable( $handler['filter_callback'] ) ) {
+			throw new FilterException( sprintf( "%s does not have a valid callback", $type ) );
+		}
+
+		return call_user_func( $handler['filter_callback'], $filter, $where );
 	}
 
 	/**
-	 * @param $filters array[]
-	 * @param $query   Query
+	 * Parse a given filter set based on the registered filters
+	 *
+	 * @throws FilterException
+	 *
+	 * @param Where          $where
+	 * @param bool           $negate  Whether this is NOT IN or IN
+	 *
+	 * @param array[]|string $filters could be base 64 json encoded
 	 *
 	 * @return void
 	 */
-	public function parse_filters( $filters, $query, $negate = false ) {
+	public function parse_filters( $filters, Where $where, bool $negate = false ) {
 
 		if ( ! is_array( $filters ) ) {
 			$filters = base64_json_decode( $filters );
@@ -82,56 +100,51 @@ class Query_Filters {
 			return;
 		}
 
-		$ors = new Where( $query, 'OR', $negate );
+		$ors = $where->subWhere( 'OR', $negate );
 
 		// Or Group
 		foreach ( $filters as $filter_group ) {
 
-			$ands = new Where( $query, 'AND' );
+			$ands = $ors->subWhere( 'AND' );
 
 			// And Group
 			foreach ( $filter_group as $filter ) {
 				$this->parse_filter( $filter, $ands );
 			}
-
-			$ors->addClause( $ands );
 		}
-
-		$query->where( $ors );
 	}
 
 	/**
-	 * Build a standard date filter clause
+	 * Given a date range, create a before & and after
 	 *
-	 * @param array $filter_vars
+	 * @param array $filter
 	 *
-	 * @return \DateTime[]
+	 * @return DateTimeHelper[]
 	 */
-	public static function get_before_and_after_from_date_range( $filter_vars ) {
+	public static function get_before_and_after_from_date_range( $filter, $format = false ) {
 
-		$filter_vars = wp_parse_args( $filter_vars, [
+		$filter = wp_parse_args( $filter, [
 			'date_range' => 'any',
 			'after'      => '',
 			'before'     => '',
 		] );
 
-		$after  = new \DateTime( 'today', wp_timezone() );
-		$before = new \DateTime( 'now', wp_timezone() );
+		$after  = new DateTimeHelper( 'today' );
+		$before = new DateTimeHelper( 'now' );
 
 		// Future date range
-		if ( str_starts_with( $filter_vars['date_range'], 'f_' ) ) {
+		if ( str_starts_with( $filter['date_range'], 'f_' ) ) {
 			$after->modify( 'now' );
 			$before->modify( '+99 years' );
 		}
 
-		switch ( $filter_vars['date_range'] ) {
+		switch ( $filter['date_range'] ) {
 			default:
-			case 'any':
-				$after  = $after->setTimestamp( 1 );
-				$before = time();
-				break;
 			case 'f_any':
 			case 'today':
+				break;
+			case 'any':
+				$after->setTimestamp( 0 );
 				break;
 			case 'f_today':
 				$before->modify( 'tomorrow' );
@@ -176,6 +189,12 @@ class Query_Filters {
 			case 'f_7_days':
 				$after->modify( '+7 days' );
 				break;
+			case '14_days':
+				$after->modify( '14 days ago' );
+				break;
+			case 'f_14_days':
+				$after->modify( '+14 days' );
+				break;
 			case '30_days':
 				$after->modify( '30 days ago' );
 				break;
@@ -201,22 +220,53 @@ class Query_Filters {
 				$after->modify( '+365 days' );
 				break;
 			case 'before':
-				$before->modify( $filter_vars['before'] );
+				$before->modify( $filter['before'] );
 				$after->setTimestamp( 1 );
 				break;
 			case 'after':
-				$after->modify( $filter_vars['after'] );
+				$after->modify( $filter['after'] );
 				$before->modify( 'now' );
 				break;
 			case 'between':
-				$tbefore = $filter_vars['before'];
-				$tafter  = $filter_vars['after'];
-
-				maybe_swap_dates( $tbefore, $tafter );
-
-				$after->modify( $tafter );
-				$before->modify( $tbefore );
+				$before = new DateTimeHelper( $filter['before'] );
+				$after  = new DateTimeHelper( $filter['after'] );
+				maybe_swap_dates( $before, $after );
 				break;
+		}
+
+		if ( $format ) {
+			switch ( $format ) {
+				case 'mysql':
+				case 'ymdhis':
+					return [
+						'before' => $before->ymdhis(),
+						'after'  => $after->ymdhis()
+					];
+				case 'date':
+				case 'ymd':
+					return [
+						'before' => $before->ymd(),
+						'after'  => $after->ymd()
+					];
+				case 'unix':
+				case 'timestamp':
+					return [
+						'before' => $before->getTimestamp(),
+						'after'  => $after->getTimestamp()
+					];
+				default:
+					if ( method_exists( $before, $format ) ) {
+						return [
+							'before' => call_user_func( [ $before, $format ] ),
+							'after'  => call_user_func( [ $after, $format ] ),
+						];
+					}
+
+					return [
+						'before' => $before->format( $format ),
+						'after'  => $after->format( $format )
+					];
+			}
 		}
 
 		return [
@@ -226,75 +276,115 @@ class Query_Filters {
 	}
 
 	/**
-	 * @param $column
-	 * @param $filter
-	 * @param $where Where
+	 * Handler for date related query filter clauses
+	 *
+	 * @param string          $column the table column
+	 * @param array           $filter the filter args
+	 * @param Where           $where
+	 * @param string|callable $format a callback for DateTimeHelper or a custom format string
 	 *
 	 * @return void
 	 */
-	public static function mysqlDate( $column, $filter, $where ) {
+	public static function date_filter_handler( string $column, array $filter, Where $where, $format = '' ) {
+
+		if ( empty( $format ) ) {
+			$format = 'ymdhis';
+		}
 
 		$filter = wp_parse_args( $filter, [
 			'date_range' => '24_hours',
 		] );
 
-		[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter );
+		try {
+
+			[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter );
+
+			if ( method_exists( $before, $format ) ) {
+				$before = call_user_func( [ $before, $format ] );
+				$after  = call_user_func( [ $after, $format ] );
+			} else {
+				$before = $before->format( $format );
+				$after  = $after->format( $format );
+			}
+		} catch ( \Exception $exception ) {
+			return;
+		}
 
 		switch ( $filter['date_range'] ) {
-			default:
+//			case 'any':
+//				$where->
+//				break;
+			case 'today':
+			case 'this_week':
+			case 'this_month':
+			case 'this_year':
 			case '24_hours':
 			case '7_days':
+			case '14_days':
 			case '30_days':
 			case '60_days':
 			case '90_days':
 			case '365_days':
 			case 'after':
-				$where->greaterThan( $column, $after->format( 'Y-m-d H:i:s' ) );
+				$where->greaterThan( $column, $after );
 				break;
+			case 'f_today':
+			case 'f_this_week':
+			case 'f_this_month':
+			case 'f_this_year':
+			case 'f_24_hours':
+			case 'f_7_days':
+			case 'f_14_days':
+			case 'f_30_days':
+			case 'f_60_days':
+			case 'f_90_days':
+			case 'f_365_days':
 			case 'before':
-				$where->lessThan( $column, $after->format( 'Y-m-d H:i:s' ) );
+				$where->lessThan( $column, $after );
 				break;
+			default:
 			case 'between':
-			case 'today':
-				$where->between( $column, $after->format( 'Y-m-d H:i:s' ), $before->format( 'Y-m-d H:i:s' ) );
+				$where->between( $column, $after, $before );
 				break;
 		}
 	}
 
 	/**
-	 * @param $column
-	 * @param $filter
-	 * @param $where Where
+	 *  Formats before and after as Y-m-d H:i:s
+	 *
+	 * @param string $column
+	 * @param array  $filter
+	 * @param Where  $where
 	 *
 	 * @return void
 	 */
-	public static function timestamp( $column, $filter, $where ) {
+	public static function mysqlDateTime( string $column, array $filter, Where $where ) {
+		self::date_filter_handler( $column, $filter, $where, 'ymdhis' );
+	}
 
-		$filter = wp_parse_args( $filter, [
-			'date_range' => '24_hours',
-		] );
+	/**
+	 * Formats before and after as Y-m-d
+	 *
+	 * @param $column string
+	 * @param $filter array
+	 * @param $where  Where
+	 *
+	 * @return void
+	 */
+	public static function mysqlDate( string $column, array $filter, Where $where ) {
+		self::date_filter_handler( $column, $filter, $where, 'ymd' );
+	}
 
-		[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter );
 
-		switch ( $filter['date_range'] ) {
-			default:
-			case '24_hours':
-			case '7_days':
-			case '30_days':
-			case '60_days':
-			case '90_days':
-			case '365_days':
-			case 'after':
-				$where->greaterThan( $column, $after->getTimestamp() );
-				break;
-			case 'before':
-				$where->lessThan( $column, $after->getTimestamp() );
-				break;
-			case 'between':
-			case 'today':
-				$where->between( $column, $after->getTimestamp(), $before->getTimestamp() );
-				break;
-		}
+	/**
+	 * @param string $column
+	 * @param array  $filter
+	 * @param Where  $where
+	 *
+	 * @return void
+	 */
+	public static function timestamp( string $column, array $filter, Where $where ) {
+		self::date_filter_handler( $column, $filter, $where, 'getTimestamp' );
 	}
 
 	/**
@@ -302,11 +392,11 @@ class Query_Filters {
 	 *
 	 * @param $column
 	 * @param $filter
-	 * @param Where
+	 * @param $where Where
 	 *
 	 * @return void
 	 */
-	public static function number( $column, $filter, $where ) {
+	public static function number( $column, $filter, Where $where ) {
 
 		[ 'value' => $value, 'compare' => $compare ] = wp_parse_args( $filter, [
 			'compare' => '',
@@ -337,13 +427,100 @@ class Query_Filters {
 	}
 
 	/**
+	 * Filter by meta
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function meta_filter( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'meta' => ''
+		] );
+
+		if ( empty( $filter['meta'] ) ) {
+			return;
+		}
+
+		$alias = $where->query->joinMeta( sanitize_key( $filter['meta'] ) );
+		Query_Filters::string( "$alias.meta_value", $filter, $where );
+	}
+
+	/**
+	 * Will check if the custom field is one of the supplied options
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function is_one_of_filter( $column, $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'compare' => 'in',
+			'options' => []
+		] );
+
+		if ( empty( $filter['options'] ) ) {
+			return;
+		}
+
+		if ( $filter['compare'] === 'in' ) {
+			$where->in( $column, $filter['options'] );
+		} else {
+			$where->notIn( $column, $filter['options'] );
+		}
+	}
+
+	/**
+	 * Custom field checkboxes and multi-selects have selected options stored as a serialized array
+	 * This will see if all the options are selected within that serialized array
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function custom_field_has_all_seclected( $column, $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'compare' => 'all_in',
+			'options' => []
+		] );
+
+		if ( empty( $filter['options'] ) ) {
+			return;
+		}
+
+		switch ( $filter['compare'] ) {
+			default:
+			case 'all_checked':
+			case 'all_in':
+				foreach ( $filter['options'] as $option ) {
+					$where->like( $column, '%' . $where->query->db->esc_like( $option ) . '%' );
+				}
+				break;
+			case 'not_checked':
+			case 'all_not_in':
+				foreach ( $filter['options'] as $option ) {
+					$where->notLike( $column, '%' . $where->query->db->esc_like( $option ) . '%' );
+				}
+				break;
+		}
+	}
+
+	/**
+	 * Do a string comparison
+	 *
 	 * @param $column
 	 * @param $filter
 	 * @param $where Where
 	 *
 	 * @return void
 	 */
-	public static function string( $column, $filter, $where ) {
+	public static function string( $column, $filter, Where $where ) {
 		global $wpdb;
 
 		[ 'value' => $value, 'compare' => $compare ] = wp_parse_args( $filter, [
@@ -383,30 +560,30 @@ class Query_Filters {
 				$where->notLike( $column, '%' . $wpdb->esc_like( $value ) );
 				break;
 			case 'empty':
-				$where->addClause( "$column = ''" );
+				$where->addCondition( "$column = ''" );
 				break;
 			case 'not_empty':
-				$where->addClause( "$column != ''" );
+				$where->addCondition( "$column != ''" );
 				break;
 			case 'regex':
-				$where->addClause( $wpdb->prepare( "$column REGEXP BINARY %s", $value ) );
+				$where->addCondition( $wpdb->prepare( "$column REGEXP BINARY %s", $value ) );
 				break;
 			case 'less_than':
+			case '<':
 				$where->lessThan( $column, $value );
 				break;
 			case 'greater_than':
+			case '>':
 				$where->greaterThan( $column, $value );
 				break;
 			case 'greater_than_or_equal_to':
+			case '>=':
 				$where->greaterThanEqualTo( $column, $value );
 				break;
 			case 'less_than_or_equal_to':
+			case '<=':
 				$where->lessThanEqualTo( $column, $value );
 				break;
 		}
-	}
-
-	public function meta( $query ) {
-
 	}
 }

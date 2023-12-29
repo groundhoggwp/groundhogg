@@ -4,10 +4,10 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
 use Groundhogg\Preferences;
 use function Groundhogg\get_primary_owner_id;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\Contact_Query;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -199,9 +199,9 @@ class Contacts extends DB {
 	 *
 	 * @return int
 	 */
-	public function insert_on_duplicate_update( $data ){
+	public function insert_on_duplicate_update( $data ) {
 
-		if ( key_exists( 'email', $data ) ){
+		if ( key_exists( 'email', $data ) ) {
 
 			// Initialise column format array
 			$column_formats = $this->get_columns();
@@ -212,26 +212,27 @@ class Contacts extends DB {
 			// White list columns
 			$data = array_intersect_key( $data, $column_formats );
 
-			$update_func = function ( $query ) use ( $data, $column_formats ){
+			$update_func = function ( $query ) use ( $data, $column_formats ) {
 
-				if ( ! preg_match( '/^INSERT/i', $query ) ){
+				if ( ! preg_match( '/^INSERT/i', $query ) ) {
 					return $query;
 				}
 
 				global $wpdb;
 
-				unset( $data[ 'email' ] );
-				unset( $data[ 'id' ] );
-				unset( $data[ 'date_created' ] );
+				unset( $data['email'] );
+				unset( $data['id'] );
+				unset( $data['date_created'] );
 
 				$pairs = [];
 
-				foreach ( $data as $column => $value ){
-					$format = $column_formats[$column];
+				foreach ( $data as $column => $value ) {
+					$format  = $column_formats[ $column ];
 					$pairs[] = $wpdb->prepare( "$column = $format", $value );
 				}
 
 				$query .= 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+
 				return $query;
 			};
 
@@ -240,7 +241,7 @@ class Contacts extends DB {
 
 		$inserted = $this->insert( $data );
 
-		if ( key_exists( 'email', $data ) && isset( $update_func ) ){
+		if ( key_exists( 'email', $data ) && isset( $update_func ) ) {
 			remove_filter( 'query', $update_func );
 		}
 
@@ -393,10 +394,9 @@ class Contacts extends DB {
 		unset( $args['limit'] );
 		unset( $args['number'] );
 
-		$query   = new Contact_Query( '', $this );
-		$results = $query->query( $args );
+		$query = new Contact_Query( $args );
 
-		return $results;
+		return $query->count();
 	}
 
 	/**

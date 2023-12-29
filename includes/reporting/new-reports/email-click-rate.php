@@ -3,7 +3,6 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Classes\Activity;
-use Groundhogg\Event;
 use function Groundhogg\get_db;
 
 class Email_Click_Rate extends Base_Quick_Stat_Percent {
@@ -22,7 +21,7 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 		$db = get_db( 'activity' );
 
 		$query = [
-			'select'        => 'DISTINCT contact_id',
+			'groupby'       => 'contact_id',
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'before'        => $end,
 			'after'         => $start
