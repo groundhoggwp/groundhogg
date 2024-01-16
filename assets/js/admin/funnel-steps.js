@@ -495,7 +495,7 @@
                               modern: _x('Modern', 'form theme', 'groundhogg'),
                               classic: _x('Classic', 'form theme', 'groundhogg'),
                           },
-                          selected: meta.theme ?? 'default'
+                          selected: meta.theme ?? 'default',
                       }) }
                   </div>
                   <div class="display-flex column gap-10">
@@ -503,9 +503,9 @@
                       ${ input({
                           id: 'form-accent',
                           name: 'form_accent_color',
-                          type:'color',
+                          type: 'color',
                           className: 'color-picker',
-                          value: meta.accent_color
+                          value: meta.accent_color,
                       }) }
                   </div>
               </div>
@@ -544,15 +544,15 @@
         }
       })
 
-      $(`${ parent } select[name=form_theme]`).on('change', e=> {
+      $(`${ parent } select[name=form_theme]`).on('change', e => {
         updateStepMeta({
-          theme: e.target.value
+          theme: e.target.value,
         })
       })
 
-      $(`${ parent } input[name=form_accent_color]`).on('change', e=> {
+      $(`${ parent } input[name=form_accent_color]`).on('change', e => {
         updateStepMeta({
-          accent_color: e.target.value
+          accent_color: e.target.value,
         })
       })
 
@@ -913,9 +913,17 @@
       let panelInner = document.getElementById(id)
 
       if (panelInner) {
-        let panel = panelInner.parentNode.parentNode
+        // The top level panel
+        let panel = panelInner.closest('.gh-panel')
 
-        const render = () => panel.parentNode.replaceChild(Preview(), panel)
+        // Custom step titles
+        if (panel.querySelector('.step-title-edit input.edit-title')) {
+          panel.querySelector('.custom-settings' ).remove()
+          panel.insertAdjacentElement('afterend', Div({ id }))
+          panel = document.getElementById( id )
+        }
+
+        const render = () => panel.replaceWith(Preview())
 
         if (email_id) {
           EmailsStore.maybeFetchItem(email_id).catch(err => {
