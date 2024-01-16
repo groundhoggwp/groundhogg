@@ -259,7 +259,7 @@
      */
     async maybeFetchItems (ids = [], opts = {}) {
 
-      if ( ( ! ids || ids.length === 0 ) && this.hasItems() ){
+      if (( !ids || ids.length === 0 ) && this.hasItems()) {
         return Promise.resolve(this.items)
       }
 
@@ -269,7 +269,7 @@
 
       const params = {}
 
-      if ( ids && ids.length ){
+      if (ids && ids.length) {
         params.ID = ids.filter(id => !this.hasItem(id))
       }
 
@@ -589,7 +589,7 @@
           query,
           step_id,
           funnel_id,
-          ...rest
+          ...rest,
         }, opts).then(d => d.added)
       },
 
@@ -663,7 +663,7 @@
     posts: ObjectStore(Groundhogg.api.routes.posts, {
       primaryKey: 'id',
     }),
-    email_log: ObjectStore(Groundhogg.api.routes.v4.email_log)
+    email_log: ObjectStore(Groundhogg.api.routes.v4.email_log),
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {
@@ -671,5 +671,61 @@
     Groundhogg.stores[id] = store
     return store
   }
+
+  const createState = (initialState = {}) => ( {
+    state: {
+      ...initialState,
+    },
+
+    /**
+     * Add props to the state
+     *
+     * @param newState
+     */
+    set (newState) {
+      this.state = {
+        ...this.state,
+        ...newState,
+      }
+    },
+
+    /**
+     * Clear the state
+     */
+    clear () {
+      this.state = {}
+    },
+
+    /**
+     * Get a specific key from the state
+     *
+     * @param key
+     * @returns {*|boolean|{}}
+     */
+    get (key = '') {
+
+      if (key) {
+        return this.state[key] ?? false
+      }
+
+      return this.state
+    },
+
+    /**
+     * If the state has a specific key
+     *
+     * @param key
+     * @returns {boolean}
+     */
+    has (key = '') {
+      if (key) {
+        return this.state.hasOwnProperty(key)
+      }
+
+      return Object.keys(this.state).length > 0
+    },
+  } )
+
+  Groundhogg.createState = createState
 
 } )(jQuery)
