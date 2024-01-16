@@ -66,6 +66,8 @@ class Admin_User {
 			</tr>
 		</table>
 		<?php
+
+        do_action( 'groundhogg/user_profile', $profile_user );
 	}
 
 	/**
