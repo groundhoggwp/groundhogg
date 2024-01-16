@@ -1,10 +1,32 @@
 ( ($) => {
 
-  const { clickedIn, isString, setFrameContent } = Groundhogg.element
+  const clickedIn = (e, selector) => {
+    var el = e.tagName ? e : e.srcElement || e.target
+
+    if (el && el.matches(selector)) {
+      return el
+    } else {
+      while (el = el.parentNode) {
+        if (typeof el.matches !== 'undefined' && el.matches(selector)) {
+          return el
+        }
+      }
+    }
+
+    return false
+  }
+
+  function isString (string) {
+    return typeof string === 'string'
+  }
+
+  function isNumeric (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n)
+  }
 
   const AttributeHandlers = {
     required: (el, value) => {
-      el.require = value
+      el.required = value
     },
     autofocus: (el, value) => {
       el.autofocus = value
@@ -1173,4 +1195,4 @@
     Autocomplete,
     ProgressBar
   }
-} )(jQuery)
+} )(jQuery ?? function (){ throw new Error( 'jQuery was not loaded.' ) })
