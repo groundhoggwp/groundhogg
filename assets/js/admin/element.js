@@ -453,6 +453,10 @@
     return typeof string === 'string'
   }
 
+  function isNumeric (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n)
+  }
+
   /**
    * If it's not a string just return the value
    *
@@ -476,10 +480,6 @@
         ? `${idx !== 0 ? '-' : ''}${letter.toLowerCase()}`
         : letter
     }).join('')
-  }
-
-  function isNumeric (n) {
-    return !isNaN(parseFloat(n)) && isFinite(n)
   }
 
   const objectToStyle = (object) => {
@@ -745,6 +745,7 @@
     let editor = tinyMCE.get(editor_id)
 
     editor.on('Change keyup', function (e) {
+      Insert.to_mce = true
       onChange(editor.getContent())
 
       if (e.type == 'keyup' && e.ctrlKey && e.shiftKey && e.which == 219) {
