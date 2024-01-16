@@ -834,10 +834,14 @@ class Contact extends Base_Object_With_Meta {
 
 		// No change
 		if ( $this->owner_is( $owner_id ) ) {
-			return;
+			return true;
 		}
 
-		$this->update( [
+		if ( ! user_can( $owner_id, 'edit_contacts' ) ){
+			return false;
+		}
+
+		return $this->update( [
 			'owner_id' => $owner_id
 		] );
 	}
