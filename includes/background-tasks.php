@@ -26,7 +26,7 @@ class Background_Tasks {
 	 */
 	public static function add( $hook, $args ) {
 
-		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', time(), $hook, $args );
+		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', time() + 10, $hook, $args );
 
 		return wp_schedule_single_event( $when, $hook, $args );
 	}
@@ -38,14 +38,14 @@ class Background_Tasks {
 	/**
 	 * Wrapper function to add contacts to a funnel
 	 *
-	 * @param $step_id
-	 * @param $query
-	 * @param $batch
+	 * @param     $step_id
+	 * @param     $query
+	 * @param int $batch
 	 *
-	 * @return void
+	 * @return bool|\WP_Error
 	 */
 	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0 ) {
-		self::add( self::ADD_CONTACTS_TO_FUNNEL, [ $step_id, $query, $batch ] );
+		return self::add( self::ADD_CONTACTS_TO_FUNNEL, [ $step_id, $query, $batch ] );
 	}
 
 	/**
