@@ -60,6 +60,24 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+	 * Get the codes that appear on the frontent
+	 *
+	 * @return array
+	 */
+	public function get_codes_for_frontend() {
+		return array_map( function ( $replacement ) {
+
+			unset( $replacement['hidden'] );
+			unset( $replacement['callback'] );
+			unset( $replacement['callback_plain'] );
+
+			return $replacement;
+		}, array_filter( $this->replacement_codes, function ( $replacement ) {
+			return ! $replacement['hidden'];
+		} ) );
+	}
+
+	/**
 	 * Setup the default replacement codes
 	 */
 	public function setup_defaults() {
@@ -718,7 +736,6 @@ class Replacements implements \JsonSerializable {
 			'arg'     => $arg,
 			'default' => $default
 		];
-
 	}
 
 	/**
@@ -738,34 +755,28 @@ class Replacements implements \JsonSerializable {
 		$code    = $parts['code'];
 		$default = $parts['default'];
 
-		// Return tag if tag not set
-		if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
-			return $default;
-		}
+		// The code exists and is set
+		if ( $this->has_replacement( $code ) ) {
 
-		$html_callback  = $this->replacement_codes[ $code ]['callback'];
-		$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
+			$html_callback  = $this->replacement_codes[ $code ]['callback'];
+			$plain_callback = $this->replacement_codes[ $code ]['callback_plain'];
 
-		$cache_key = implode( ':', [
-            // if there is no defined plain callback we should reference the html version
-			is_callable( $plain_callback ) ? $this->get_context() : 'html',
-			$this->contact_id ?: 'anon',
-			md5( serialize( $parts ) ),
-			cache_get_last_changed( 'replacements' )
-		] );
+			$cache_key = implode( ':', [
+				// if there is no defined plain callback we should reference the html version
+				is_callable( $plain_callback ) ? $this->get_context() : 'html',
+				$this->contact_id ?: 'anon',
+				md5( serialize( $parts ) ),
+				cache_get_last_changed( 'replacements' )
+			] );
 
-		$cache_value = wp_cache_get( $cache_key, 'replacements', false, $found );
+			$cache_value = wp_cache_get( $cache_key, 'replacements', false, $found );
 
-		if ( $found ) {
-			return $cache_value;
-		}
+			if ( $found ) {
+				return $cache_value;
+			}
 
-		// Access contact fields.
-		if ( substr( $code, 0, 1 ) === '_' ) {
-			$field = substr( $code, 1 );
-			$text  = $this->get_current_contact()->$field;
-		} else {
-
+            // If the plain callback is not callable
+            // Set it to a version that parses as markdown
 			if ( ! is_callable( $plain_callback ) ) {
 				$plain_callback = function ( ...$args ) use ( $html_callback ) {
 
@@ -786,17 +797,27 @@ class Replacements implements \JsonSerializable {
 			} else {
 				$text = call_user_func( $callback, $this->contact_id, $code );
 			}
+
+			if ( empty( $text ) ) {
+				$text = $default;
+			}
+
+			$value = apply_filters( "groundhogg/replacements/{$code}", $text );
+
+			wp_cache_set( $cache_key, $value, 'replacements' );
+
+			return $value;
 		}
 
-		if ( empty( $text ) ) {
-			$text = $default;
+		// Access contact fields directly
+		if ( str_starts_with( $code, '_' ) ) {
+			$field = substr( $code, 1 );
+			$text  = $this->get_current_contact()->$field;
+
+			return $text ?: $default;
 		}
 
-		$value = apply_filters( "groundhogg/replacements/{$code}", $text );
-		wp_cache_set( $cache_key, $value, 'replacements' );
-
-		return $value;
-
+		return $default;
 	}
 
 	public function replacements_in_footer() {
