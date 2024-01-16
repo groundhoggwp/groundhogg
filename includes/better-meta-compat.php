@@ -362,6 +362,7 @@ function add_custom_property_replacements( $replacements ) {
 		$custom_fields = Properties::instance()->get_fields( $group['id'] );
 
 		foreach ( $custom_fields as $custom_field ) {
+
 			$replacements->add(
 				$custom_field['name'],
 				function ( $contact_id, $name ) {
@@ -371,6 +372,11 @@ function add_custom_property_replacements( $replacements ) {
 				$custom_field['label'],
 				$group['id']
 			);
+
+			// Name & ID are the same (some legacy custom fields)
+			if ( $custom_field[ 'id' ] === $custom_field['name'] ){
+				continue;
+			}
 
 			// For backwards compatibility with ugly replacement codes.
 			$replacements->add(
