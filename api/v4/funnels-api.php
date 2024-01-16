@@ -188,7 +188,11 @@ class Funnels_Api extends Base_Object_Api {
 			} );
 		}
 
-		Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+
+		if ( is_wp_error( $scheduled ) ){
+			return $scheduled;
+		}
 
 		return self::SUCCESS_RESPONSE();
 	}
