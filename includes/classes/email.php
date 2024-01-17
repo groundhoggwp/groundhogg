@@ -933,10 +933,12 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$defaults = [
-			'from'         => $this->get_from_header(),
-			'reply-to'     => $this->get_reply_to_address(),
-			'return-path'  => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
-			'content-type' => 'text/html; charset=UTF-8',
+			'from'                     => $this->get_from_header(),
+			'reply-to'                 => $this->get_reply_to_address(),
+			'return-path'              => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
+			'content-type'             => 'text/html; charset=UTF-8',
+			'precedence'               => 'bulk',
+			'x-auto-response-suppress' => 'AutoReply'
 		];
 
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
