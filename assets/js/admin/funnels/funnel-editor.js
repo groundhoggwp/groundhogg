@@ -207,11 +207,35 @@
         this.makeActive(parseInt(window.location.hash.substring(1)))
       }
 
-      let email_ids = this.steps.filter(step => step.data.step_type === 'send_email').
+      // Preload emails
+      let emails = this.steps.filter(step => step.data.step_type === 'send_email').
         map(step => parseInt(step.meta.email_id)).
         filter(id => Boolean(id))
-      if (email_ids.length) {
-        Groundhogg.stores.emails.maybeFetchItems(email_ids)
+
+      if (emails.length) {
+        Groundhogg.stores.emails.maybeFetchItems(emails)
+      }
+
+      // Preload tags
+      let tags = this.steps.filter(
+        ({ data: { step_type } }) => ['apply_tag', 'remove_tag', 'tag_applied', 'tag_removed'].includes(step_type)).
+        reduce((allTags, { meta: { tags } }) => {
+
+          if (!Array.isArray(tags)) {
+            return allTags
+          }
+
+          tags.forEach(id => {
+            if (!allTags.includes(id)) {
+              allTags.push(id)
+            }
+          })
+
+          return allTags
+        }, [])
+
+      if ( tags.length ){
+        Groundhogg.stores.tags.maybeFetchItems(tags)
       }
 
       let header = document.querySelector('.funnel-editor-header > .actions')
@@ -378,7 +402,8 @@
 
         try {
           let response = await patch(routes.v4.steps, changes)
-        } catch (e) {
+        }
+        catch (e) {
           dialog({
             message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
             type: 'error',
@@ -690,7 +715,7 @@
 
   window.addEventListener('beforeunload', e => {
 
-    if ( Object.keys(Funnel.metaUpdates).length ) {
+    if (Object.keys(Funnel.metaUpdates).length) {
       e.preventDefault()
       let msg = __('You have unsaved changes, are you sure you want to leave?', 'groundhogg')
       e.returnValue = msg

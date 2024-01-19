@@ -20,7 +20,7 @@
     linkPicker,
   } = Groundhogg.pickers
 
-  const { emails: EmailsStore } = Groundhogg.stores
+  const { emails: EmailsStore, tags: TagsStore } = Groundhogg.stores
 
   const {
     Div,
@@ -721,6 +721,87 @@
 
   FunnelSteps.init()
 
+  const TagPicker = ({
+    id,
+    tagIds,
+    onChange = () => {},
+  }) => {
+
+    return ItemPicker({
+      id,
+      noneSelected: 'Select tags...',
+      tags: true,
+      selected: tagIds.map(id => {
+        let tag = TagsStore.get(id)
+        return {
+          id,
+          text: tag.data.tag_name,
+        }
+      }),
+      fetchOptions: async (search) => {
+        let tags = await TagsStore.fetchItems({
+          search,
+          limit: 30,
+        })
+
+        return tags.map(({ ID, data }) => ( { id: ID, text: data.tag_name } ))
+      },
+      createOption: async (id) => {
+        let tag = await TagsStore.create({
+          data: {
+            tag_name: id,
+          },
+        })
+
+        return { id: tag.ID, text: tag.data.tag_name }
+      },
+      onChange: items => onChange(items.map(({ id }) => id)),
+    })
+  }
+
+  const tagPickerCallback = async ({ ID, meta, data }) => {
+
+    let picker = document.getElementById(`step_${ ID }_tags`)
+
+    let { tags = [] } = meta
+
+    if (!tags) {
+      tags = []
+    }
+
+    if (picker) {
+
+      // Might have to preload
+      if (tags.length) {
+        await TagsStore.maybeFetchItems(tags)
+      }
+
+      picker.replaceWith(TagPicker({
+        id: `step-tags-${ ID }`,
+        tagIds: tags,
+        onChange: tags => Funnel.updateStepMeta({
+          tags,
+        }),
+      }))
+    }
+  }
+
+  Funnel.registerStepCallbacks('apply_tag', {
+    onActive: tagPickerCallback,
+  })
+
+  Funnel.registerStepCallbacks('tag_applied', {
+    onActive: tagPickerCallback,
+  })
+
+  Funnel.registerStepCallbacks('tag_removed', {
+    onActive: tagPickerCallback,
+  })
+
+  Funnel.registerStepCallbacks('remove_tag', {
+    onActive: tagPickerCallback,
+  })
+
   Funnel.registerStepCallbacks('send_email', {
     onActive: ({ ID, meta, data }) => {
 
@@ -918,9 +999,9 @@
 
         // Custom step titles
         if (panel.querySelector('.step-title-edit input.edit-title')) {
-          panel.querySelector('.custom-settings' ).remove()
+          panel.querySelector('.custom-settings').remove()
           panel.insertAdjacentElement('afterend', Div({ id }))
-          panel = document.getElementById( id )
+          panel = document.getElementById(id)
         }
 
         const render = () => panel.replaceWith(Preview())

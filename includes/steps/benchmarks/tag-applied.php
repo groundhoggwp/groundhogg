@@ -3,18 +3,14 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use Groundhogg\HTML;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
-use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
-use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,9 +55,9 @@ class Tag_Applied extends Benchmark {
 		return 'tag_applied';
 	}
 
-    public function get_sub_group() {
-	    return 'crm';
-    }
+	public function get_sub_group() {
+		return 'crm';
+	}
 
 	/**
 	 * Get the description
@@ -90,7 +86,7 @@ class Tag_Applied extends Benchmark {
 		echo html()->e( 'p', [], __( 'Run when the following tags are applied to the contact...', 'groundhogg' ) );
 
 		echo html()->e( 'div', [
-			'class' => 'gh-input-group'
+			'class' => 'display-flex gap-10'
 		], [
 			html()->dropdown( [
 				'name'        => $this->setting_name_prefix( 'condition' ),
@@ -99,18 +95,16 @@ class Tag_Applied extends Benchmark {
 				'style'       => [ 'vertical-align' => 'middle' ],
 				'options'     =>
 					[
-						'any' => __( 'Any' ),
-						'all' => __( 'All' ),
+						'any' => __( 'Any of...' ),
+						'all' => __( 'All of...' ),
 					]
 			] ),
-			html()->tag_picker( [
-				'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
-				'multiple' => true,
-				'selected' => $this->get_setting( 'tags' )
+			html()->dropdown( [
+				'id' => $this->setting_id_prefix( 'tags' )
 			] )
 		] );
 
-		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
+		echo html()->e( 'p' );
 	}
 
 	/**
@@ -119,9 +113,7 @@ class Tag_Applied extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$tags      = validate_tags( $this->get_posted_data( 'tags', [] ) );
 		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
-		$this->save_setting( 'tags', $tags );
 		$this->save_setting( 'condition', $condition );
 	}
 

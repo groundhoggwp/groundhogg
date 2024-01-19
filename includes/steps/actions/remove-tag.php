@@ -4,15 +4,11 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\HTML;
 use Groundhogg\Step;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
-use function Groundhogg\force_custom_step_names;
-use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\parse_tag_list;
-use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Elements
  */
-class Remove_Tag extends Action {
+class Remove_Tag extends Apply_Tag {
 
 	/**
 	 * @return string
@@ -55,10 +51,6 @@ class Remove_Tag extends Action {
 	 */
 	public function get_type() {
 		return 'remove_tag';
-	}
-
-	public function get_sub_group() {
-		return 'crm';
 	}
 
 	/**
@@ -87,39 +79,29 @@ class Remove_Tag extends Action {
 
 		echo html()->e( 'p', [], __( 'Remove all of the following tags...', 'groundhogg' ) );
 
-		echo html()->tag_picker( [
-			'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
-			'multiple' => true,
-			'selected' => $this->get_setting( 'tags' )
+
+		echo html()->dropdown( [
+			'id' => $this->setting_id_prefix( 'tags' )
 		] );
 
-		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
+		echo html()->e( 'p' );
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$tags = validate_tags( $this->get_posted_data( 'tags', [] ) );
-		$this->save_setting( 'tags', $tags );
+
+	public function generate_step_title( $step ) {
+
+		$tags = array_bold( parse_tag_list( $this->get_setting( 'tags' ), 'name', false ) );
+
+		if ( empty( $tags ) ) {
+			$name = __( 'Remove tags', 'groundhogg' );
+		} else if ( count( $tags ) >= 4 ) {
+			$name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+		} else {
+			$name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
+		}
+
+		return $name;
 	}
-
-    public function generate_step_title( $step ) {
-
-	    $tags = array_bold( parse_tag_list( $this->get_setting( 'tags' ), 'name', false ) );
-
-        if ( empty( $tags ) ) {
-		    $name = __( 'Remove tags', 'groundhogg' );
-	    } else if ( count( $tags ) >= 4 ) {
-		    $name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
-	    } else {
-		    $name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
-	    }
-
-	    return $name;
-    }
 
 	/**
 	 * Process the apply tag step...
@@ -133,47 +115,5 @@ class Remove_Tag extends Action {
 		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
 
 		return $contact->remove_tag( $tags );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step  $step
-	 */
-	public function import( $args, $step ) {
-		if ( empty( $args['tags'] ) ) {
-			return;
-		}
-
-		$tags = validate_tags( $args['tags'] );
-
-		$this->save_setting( 'tags', $tags );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step  $step
-	 *
-	 * @return array
-	 */
-	public function export( $args, $step ) {
-		$args['tags'] = array();
-
-		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
-
-		if ( empty( $tags ) ) {
-			return $args;
-		}
-
-		foreach ( $tags as $tag_id ) {
-
-			$tag = get_db( 'tags' )->get( $tag_id );
-
-			if ( $tag ) {
-				$args['tags'][] = $tag->tag_name;
-			}
-
-		}
-
-		return $args;
 	}
 }
