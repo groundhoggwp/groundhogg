@@ -7,7 +7,6 @@ use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Queue\Event_Queue;
-use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
 use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
 
@@ -190,11 +189,6 @@ class Plugin {
 	public $bulk_jobs;
 
 	/**
-	 * @var Reporting
-	 */
-	public $reporting;
-
-	/**
 	 * @var Library
 	 */
 	public $library;
@@ -309,7 +303,6 @@ class Plugin {
 		$this->tag_mapping  = new Tag_Mapping();
 		$this->step_manager = new Step_Manager();
 		$this->bulk_jobs    = new Bulk_Job_Manager();
-		$this->reporting    = new Reporting();
 
 		$this->bounce_checker = new Bounce_Checker();
 //		$this->imap_inbox     = new Imap_Inbox();
