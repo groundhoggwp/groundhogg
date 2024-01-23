@@ -514,7 +514,7 @@ class Contact_Query extends Query {
 			$where = $where->subWhere( 'AND', true );
 		}
 
-		self::set_where_vars( $search['query'], $where );
+		self::set_where_conditions( $search['query'], $where );
 	}
 
 	/**
@@ -676,9 +676,13 @@ class Contact_Query extends Query {
 		if ( isset_not_empty( $filter, 'funnel_id' ) ) {
 			$where->equals( "$alias.funnel_id", $filter['funnel_id'] );
 		}
+
 		if ( isset_not_empty( $filter, 'email_id' ) ) {
 			$where->equals( "$alias.email_id", $filter['email_id'] );
+		} else {
+			$where->notEquals( "$alias.email_id", 0 );
 		}
+
 		if ( isset_not_empty( $filter, 'step_id' ) ) {
 			$where->equals( "$alias.step_id", $filter['step_id'] );
 		}
@@ -965,18 +969,24 @@ class Contact_Query extends Query {
 			default:
 			case 'text':
 			case 'textarea':
-			case 'number':
 			case 'url':
 			case 'tel':
 			case 'custom_email':
 			case 'html':
 				Query_Filters::string( $meta_value_column, $filter, $where );
 				break;
+			case 'number':
+				Query_Filters::number( "CAST($meta_value_column as UNSIGNED)", $filter, $where );
+				break;
 			case 'date':
-				Query_Filters::mysqlDate( $meta_value_column, $filter, $where );
+				Query_Filters::mysqlDate( "CAST($meta_value_column as DATE)", $filter, $where );
 				break;
 			case 'datetime':
-				Query_Filters::mysqlDateTime( $meta_value_column, $filter, $where );
+				Query_Filters::mysqlDateTime( "CAST($meta_value_column as DATETIME)", $filter, $where );
+				break;
+			case 'time':
+				// todo this is wrong
+				Query_Filters::mysqlDateTime( "CAST($meta_value_column as TIME)", $filter, $where );
 				break;
 			case 'radio':
 				Query_Filters::is_one_of_filter( $meta_value_column, $filter, $where );
@@ -1024,60 +1034,13 @@ class Contact_Query extends Query {
 			} );
 		}
 
-//		do_action( 'groundhogg/contact_query/register_filters', '' );
+		/**
+		 * Enable registering more filters
+		 *
+		 * @param $filters Query_Filters
+		 */
+		do_action( 'groundhogg/contact_query/filters/register', self::$filters );
 
-	}
-
-	/**
-	 * Get the contacts
-	 *
-	 * @param $query_vars
-	 * @param $as_objects
-	 *
-	 * @return Contact[]|mixed[]|void|null
-	 */
-	public function query( $query_vars = [], $as_objects = false ) {
-
-		if ( ! empty( $query_vars ) ) {
-			$this->query_vars = $query_vars;
-		}
-
-		try {
-			$items = $this->get_items();
-		} catch ( FilterException|\Exception $exception ) {
-			$items = $this->legacy_query->query( $query_vars );
-		}
-
-		if ( $as_objects ) {
-			$items = array_map_to_contacts( $items );
-		}
-
-		$this->items = $items;
-
-		return $items;
-	}
-
-	/**
-	 * Number of contacts that match the query
-	 *
-	 * @param $query_vars
-	 *
-	 * @return int
-	 */
-	public function count( $query_vars = [] ) {
-
-		if ( ! empty( $query_vars ) ) {
-			$this->query_vars = wp_parse_args( $query_vars );
-		}
-
-		try {
-			$this->parse_query_vars();
-			self::set_where_vars( $this->query_vars, $this->where );
-		} catch ( FilterException|\Exception $exception ) {
-			return $this->legacy_query->count( $query_vars );
-		}
-
-		return parent::count();
 	}
 
 	/**
@@ -1096,45 +1059,7 @@ class Contact_Query extends Query {
 
 		// Parse default query vars
 		$query_vars = wp_parse_args( $query_vars, [
-//			'select'                 => array_keys( get_db( 'contacts' )->get_columns() ),
-			'select'                 => '*',
-			'limit'                  => - 1,
-			'offset'                 => 0,
-			'orderby'                => 'ID',
-			'order'                  => 'DESC',
-			'include'                => '',
-			'exclude'                => '',
-			'users_include'          => '',
-			'users_exclude'          => '',
-			'has_user'               => false,
-			'tags_include'           => [],
-			'tags_include_needs_all' => false,
-			'tags_exclude'           => [],
-			'tags_exclude_needs_all' => false,
-			'tags_relation'          => 'AND',
-			'tag_query'              => [],
-			'optin_status'           => [],
-			'optin_status_exclude'   => false,
-			'marketable'             => 'any',
-			'owner'                  => 0,
-			'report'                 => false,
-			'activity'               => false,
-			'email'                  => '',
-			'search'                 => '',
-			'first_name'             => '',
-			'last_name'              => '',
-			'meta_key'               => '',
-			'meta_value'             => '',
-			'meta_compare'           => '=',
-			'meta_query'             => '',
-			'date_query'             => null,
-			'before'                 => false,
-			'after'                  => false,
-			'count'                  => false,
-			'found_rows'             => false,
-			'filters'                => [],
-			'exclude_filters'        => [],
-			'date_key'               => $this->date_key
+			'date_key' => $this->date_key
 		] );
 
 		// Merge saved search query filters. They take priority and override anything previously set
@@ -1190,9 +1115,9 @@ class Contact_Query extends Query {
 		}
 
 		// Make sure user meta orderby works
-		if ( $query_vars['orderby'] && str_starts_with( $query_vars['orderby'], 'um.' ) && $query_vars['orderby'] !== 'um.meta_value' ) {
+		if ( isset( $query_vars['orderby'] ) && str_starts_with( $query_vars['orderby'], 'um.' ) && $query_vars['orderby'] !== 'um.meta_value' ) {
 			$parts                 = explode( '.', $query_vars['orderby'] );
-			$alias                 = $this->leftJoinExternalTable( [
+			$alias                 = $this->joinExternalTable( 'LEFT', [
 				$this->db->usermeta,
 				'um'
 			], 'user_id', 'user_id', 'um.' . $parts[1] );
@@ -1200,16 +1125,39 @@ class Contact_Query extends Query {
 		}
 
 		// Make sure meta orderby works
-		if ( $query_vars['orderby'] && str_starts_with( $query_vars['orderby'], 'cm.' ) ) {
-			$parts                 = explode( '.', $query_vars['orderby'] );
-			$alias                 = $this->joinMeta( $parts[1] );
-			$query_vars['orderby'] = "$alias.meta_value";
+		if ( isset( $query_vars['orderby'] ) && str_starts_with( $query_vars['orderby'], 'cm.' ) ) {
+			$parts    = explode( '.', $query_vars['orderby'] );
+			$meta_key = $parts[1];
+			$alias    = $this->joinMeta( $meta_key );
+			$orderby  = "$alias.meta_value";
+
+			$customField = Properties::instance()->get_field( $meta_key );
+
+			// Ensure appropriate type casting
+			if ( $customField ) {
+				switch ( $customField['type'] ) {
+					case 'date':
+						$orderby = "CAST($orderby as DATE)";
+						break;
+					case 'datetime':
+						$orderby = "CAST($orderby as DATETIME)";
+						break;
+					case 'time':
+						$orderby = "CAST($orderby as TIME)";
+						break;
+					case 'number':
+						$orderby = "CAST($orderby as SIGNED)";
+						break;
+				}
+			}
+
+			$query_vars['orderby'] = $orderby;
 		}
 
 		// Make sure tag count orderby works
-		if ( $query_vars['orderby'] && $query_vars['orderby'] === 'tc.tag_count' ) {
+		if ( isset( $query_vars['orderby'] ) && $query_vars['orderby'] === 'tc.tag_count' ) {
 			$tag_rel = get_db( 'tag_relationships' );
-			$this->leftJoinExternalTable( [
+			$this->joinExternalTable( 'LEFT', [
 				"(SELECT tr.contact_id, COUNT(tr.tag_id) as tag_count FROM $tag_rel->table_name tr GROUP BY tr.contact_id)",
 				'tc'
 			], 'contact_id', 'ID', true );
@@ -1218,16 +1166,25 @@ class Contact_Query extends Query {
 		$this->query_vars = $query_vars;
 	}
 
+	protected $setup_flag = false;
+
 	/**
-	 * Parse the query vars and build the query to get the items
+	 * Setup the query vars
 	 *
-	 * @return object[]
+	 * @throws FilterException
+	 * @return void
 	 */
-	protected function get_items() {
+	protected function maybe_setup_query() {
+
+		if ( $this->setup_flag ) {
+			return;
+		}
+
+		$this->setup_flag = true;
 
 		$this->parse_query_vars();
 
-		self::set_where_vars( $this->query_vars, $this->where );
+		self::set_where_conditions( $this->query_vars, $this->where );
 
 		foreach ( $this->query_vars as $query_var => $value ) {
 			switch ( $query_var ) {
@@ -1260,19 +1217,6 @@ class Contact_Query extends Query {
 					break;
 			}
 		}
-
-		// backwards compat for 'count' => true
-		if ( isset_not_empty( $this->query_vars, 'count' ) ) {
-			return parent::count();
-		}
-
-		$items = $this->get_results();
-
-		if ( $this->query_vars['found_rows'] ) {
-			$this->found_items = $this->table->found_rows();
-		}
-
-		return $items;
 	}
 
 	/**
@@ -1281,7 +1225,7 @@ class Contact_Query extends Query {
 	 * @throws \Exception|FilterException
 	 * @return void
 	 */
-	protected static function set_where_vars( $query_vars, Where $where ) {
+	protected static function set_where_conditions( $query_vars, Where $where ) {
 
 		foreach ( $query_vars as $query_var => $value ) {
 			switch ( $query_var ) {
@@ -1416,18 +1360,35 @@ class Contact_Query extends Query {
 						'type'   => 'event_type',
 					] );
 
-					$tempWhere = $event_query['exclude'] ? $where->subWhere( 'AND', true ) : $where;
-					$alias     = $tempWhere->query->joinEvents( $event_query['event_type'], $event_query['status'] === 'waiting' ? 'event_queue' : 'events' );
+					$eventWhere = $event_query['exclude'] ? $where->subWhere( 'AND', true ) : $where;
+					$eventJoin  = $where->query->addJoin( 'LEFT', $event_query['status'] === Event::WAITING ? 'event_queue' : 'events' );
+					$eventJoin->onColumn( 'contact_id' );
+					$eventJoin->conditions->equals( 'status', $event_query['status'] );
+					$eventJoin->conditions->equals( 'event_type', $event_query['event_type'] );
+					$alias = $eventJoin->alias;
 
 					if ( isset( $event_query['funnel_id'] ) ) {
-						$tempWhere->equals( "$alias.funnel_id", $event_query['funnel_id'] );
+						$eventWhere->equals( "$alias.funnel_id", $event_query['funnel_id'] );
 					}
 
 					if ( isset( $event_query['step_id'] ) ) {
-						$tempWhere->equals( "$alias.step_id", $event_query['step_id'] );
+						$eventWhere->in( "$alias.step_id", $event_query['step_id'] );
 					}
 
-					Query_Filters::timestamp( "$alias.time", $event_query, $tempWhere );
+					if ( isset( $event_query['before'] ) && isset( $event_query['after'] ) ) {
+						Query_Filters::timestamp( "$alias.time", array_merge( $event_query, [
+							'date_range' => 'between'
+						] ), $eventWhere );
+					} else if ( isset( $event_query['after'] ) ) {
+						Query_Filters::timestamp( "$alias.time", array_merge( $event_query, [
+							'date_range' => 'after'
+						] ), $eventWhere );
+					} else if ( isset( $event_query['before'] ) ) {
+						Query_Filters::timestamp( "$alias.time", array_merge( $event_query, [
+							'date_range' => 'before'
+						] ), $eventWhere );
+					}
+
 
 					break;
 				case 'activity':
@@ -1451,19 +1412,19 @@ class Contact_Query extends Query {
 						'type'   => 'activity_type',
 					] );
 
-					$tempWhere = $activity_query['exclude'] ? $where->subWhere( 'AND', true ) : $where;
+					$eventWhere = $activity_query['exclude'] ? $where->subWhere( 'AND', true ) : $where;
 
-					$alias = $tempWhere->query->joinActivity( $activity_query['type'] );
+					$alias = $eventWhere->query->joinActivity( $activity_query['type'] );
 
 					if ( isset( $activity_query['funnel_id'] ) ) {
-						$tempWhere->equals( "$alias.funnel_id", $activity_query['funnel_id'] );
+						$eventWhere->equals( "$alias.funnel_id", $activity_query['funnel_id'] );
 					}
 
 					if ( isset( $activity_query['step_id'] ) ) {
-						$tempWhere->equals( "$alias.step_id", $activity_query['step_id'] );
+						$eventWhere->equals( "$alias.step_id", $activity_query['step_id'] );
 					}
 
-					Query_Filters::timestamp( "$alias.timestamp", $activity_query, $tempWhere );
+					Query_Filters::timestamp( "$alias.timestamp", $activity_query, $eventWhere );
 
 					break;
 				case 'meta_key':
@@ -1534,14 +1495,14 @@ class Contact_Query extends Query {
 						'date_key' => get_array_var( $query_vars, 'date_key', $where->query->table->get_date_key() ),
 					] );
 
-					if ( $date_query['before'] ) {
-						$beforeDate = new DateTimeHelper( $date_query['before'] );
-						$where->greaterThanEqualTo( $date_query['date_key'], $beforeDate->ymdhis() );
-					}
-
 					if ( $date_query['after'] ) {
 						$afterDate = new DateTimeHelper( $date_query['after'] );
 						$where->greaterThanEqualTo( $date_query['date_key'], $afterDate->ymdhis() );
+					}
+
+					if ( $date_query['before'] ) {
+						$beforeDate = new DateTimeHelper( $date_query['before'] );
+						$where->lessThanEqualTo( $date_query['date_key'], $beforeDate->ymdhis() );
 					}
 
 					break;
@@ -1552,11 +1513,25 @@ class Contact_Query extends Query {
 					}
 					break;
 				case 'exclude_filters':
-					if ( ! empty( $value ) ) {
-						self::filters()->parse_filters( $value, $where, true );
-					}
-					break;
 
+					if ( ! empty( $value ) ) {
+
+						$exclude_query = new Contact_Query( [
+							'select'  => 'ID',
+							'filters' => $value,
+							'order'   => false,
+							'orderby' => false,
+							'limit'   => 0
+						] );
+
+						$exclude_query->maybe_setup_query();
+
+						if ( ! $exclude_query->where->isEmpty() ) {
+							$where->notIn( 'ID', "$exclude_query" );
+						}
+					}
+
+					break;
 			}
 		}
 
@@ -1637,24 +1612,11 @@ class Contact_Query extends Query {
 	 */
 	public function joinActivityTotal( $activity_type, $filter, $select = [] ) {
 
-		$filter = wp_parse_args( $filter, [
-			'date_range' => '',
-			'before'     => '',
-			'after'      => '',
-		] );
-
-		[
-			'date_range' => $date_range,
-		] = $filter;
-
-		$activity_table_alias = 'activity_' . sanitize_key( implode( '_', array_merge( [
-				$activity_type,
-				$date_range
-			], $select ) ) );
+		$activity_table_alias = 'activity_' . $activity_type . '_' . md5( serialize( $filter ) );
 
 		// only join once per key
 		if ( key_exists( $activity_table_alias, $this->joins ) ) {
-			return $activity_table_alias;
+			return $this->joins[ $activity_table_alias ];
 		}
 
 		$activity_query = new Query( 'activity' );
@@ -1667,44 +1629,29 @@ class Contact_Query extends Query {
 			$activity_query->where( 'activity_type', $activity_type );
 		}
 
-		Query_Filters::timestamp( 'timestamp', $filter, $activity_query->where() );
+		Query_Filters::timestamp( 'timestamp', $filter, $activity_query->where );
 		$activity_query->setGroupby( 'contact_id', ...$select );
 
-		$join = "LEFT JOIN ( $activity_query ) as $activity_table_alias ON $activity_table_alias.contact_id = $this->alias.ID";
-
-		$this->joins[ $activity_table_alias ] = $join;
-
+		$join = $this->addJoin( 'LEFT', [ $activity_query, $activity_table_alias ] );
+		$join->onColumn( 'contact_id' );
 		$this->setGroupby( 'ID' );
 
-		return $activity_table_alias;
+		return $join->alias;
 	}
 
 	/**
 	 * Join the page visits table
 	 *
-	 * @param $activity_type
-	 * @param $after
-	 * @param $before
+	 * @throws \Exception
+	 *
+	 * @param array $select
+	 * @param       $filter
 	 *
 	 * @return string
 	 */
 	public function joinPageVisits( $filter, $select = [] ) {
 
-		$filter = wp_parse_args( $filter, [
-			'date_range' => '',
-			'before'     => '',
-			'after'      => '',
-		] );
-
-		[
-			'date_range' => $date_range,
-		] = $filter;
-
-		$page_visits_alias = 'page_visits_' . $date_range;
-
-		if ( ! empty( $select ) ) {
-			$page_visits_alias .= '_' . implode( '_', $select );
-		}
+		$page_visits_alias = 'page_visits_' . md5( serialize( $filter ) );
 
 		// only join once per key
 		if ( key_exists( $page_visits_alias, $this->joins ) ) {
@@ -1719,16 +1666,40 @@ class Contact_Query extends Query {
 			...$select
 		);
 
-		Query_Filters::timestamp( 'timestamp', $filter, $page_visit_query->where() );
+		Query_Filters::timestamp( 'timestamp', $filter, $page_visit_query->where );
 		$page_visit_query->setGroupby( 'contact_id', ...$select );
 
-		$join = "LEFT JOIN ( $page_visit_query ) as $page_visits_alias ON $page_visits_alias.contact_id = $this->alias.ID";
-
-		$this->joins[ $page_visits_alias ] = $join;
+		$join = $this->addJoin( 'LEFT', [ $page_visit_query, $page_visits_alias ] );
+		$join->onColumn( 'contact_id' );
 
 		$this->setGroupby( 'ID' );
 
 		return $page_visits_alias;
+	}
+
+	/**
+	 * Join the tags table
+	 *
+	 * @param $tag_id
+	 *
+	 * @return string
+	 */
+	public function joinTags( $tag_id = 0 ) {
+
+		$alias = $tag_id ? 'tag_' . $tag_id : 'tags';
+
+		$join = $this->addJoin( 'LEFT', [
+			get_db( 'tag_relationships' )->table_name,
+			$alias
+		] );
+
+		$join->onColumn( 'contact_id' );
+
+		if ( $tag_id ){
+			$join->conditions->equals( "$alias.tag_id", $tag_id );
+		}
+
+		return $alias;
 	}
 
 	/**
@@ -1751,7 +1722,8 @@ class Contact_Query extends Query {
 		$where->query->setGroupby( 'ID' );
 
 		if ( count( $tags ) === 1 ) {
-			$alias = $where->query->leftJoinTable( get_db( 'tag_relationships' ), 'contact_id' );
+
+			$alias = $where->query->joinTags( $tags[0] );
 			$where->equals( "$alias.tag_id", $tags[0] );
 
 			return;
@@ -1760,14 +1732,14 @@ class Contact_Query extends Query {
 		if ( $all ) {
 
 			foreach ( $tags as $tag ) {
-				$alias = $where->query->leftJoinTable( get_db( 'tag_relationships' ), 'contact_id' );
+				$alias = $where->query->joinTags( $tag );
 				$where->equals( "$alias.tag_id", $tag );
 			}
 
 			return;
 		}
 
-		$alias = $where->query->leftJoinTable( get_db( 'tag_relationships' ), 'contact_id' );
+		$alias = $where->query->joinTags();
 
 		$where->in( "$alias.tag_id", $tags );
 	}
@@ -1898,15 +1870,154 @@ class Contact_Query extends Query {
 	/**
 	 * Updates the date key
 	 *
-	 * @depreacted since 3.2
+	 * @depreacted 3.2
 	 *
 	 * @param string $string
 	 *
 	 * @return void
 	 */
 	public function set_date_key( string $string ) {
+		_deprecated_function( 'Contact_Query::set_date_key()', '3.2' );
+
 		$this->date_key = $string;
 		$this->legacy_query->set_date_key( $string );
+	}
+
+	/**
+	 * Backwards compat for Legacy Contact Query
+	 *
+	 * @deprecated use the Contact_Query::$filters->register() instead
+	 *
+	 * @param ...$args
+	 *
+	 * @return void
+	 */
+	public static function register_filter( ...$args ) {
+		_deprecated_function( 'Contact_Query::register_filter()', '3.2', 'Contact_Query::filters()->register()' );
+		Legacy_Contact_Query::register_filter( ...$args );
+	}
+
+	/**
+	 * Set a query var
+	 *
+	 * @param string $var
+	 * @param        $value
+	 */
+	public function set_query_var( string $var, $value ) {
+		$this->query_vars[ $var ] = $value;
+		$this->legacy_query->set_query_var( $var, $value );
+	}
+
+	/**
+	 * Retrieve the SQL statement instead of the actual items
+	 *
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public function get_sql( $query = [] ) {
+
+		if ( ! empty( $query ) ) {
+			$this->query_vars = wp_parse_args( $query );
+		}
+		try {
+			$this->maybe_setup_query();
+		} catch ( \Exception|FilterException $exception ) {
+			return $this->legacy_query->get_sql( $query );
+		}
+
+		return $this->get_select_sql();
+	}
+
+	/**
+	 * Get the contacts
+	 *
+	 * @param $query_vars
+	 * @param $as_objects
+	 *
+	 * @return Contact[]|mixed[]|int
+	 */
+	public function query( $query_vars = [], $as_objects = false ) {
+
+		if ( ! empty( $query_vars ) ) {
+			$this->query_vars = $query_vars;
+		}
+
+		// Might be doing a count instead
+		if ( isset_not_empty( $this->query_vars, 'count' ) ) {
+			return $this->count( $query_vars );
+		}
+
+		try {
+			$items = $this->get_results();
+		} catch ( FilterException|\Exception $exception ) {
+			$items             = $this->legacy_query->query( $query_vars );
+			$this->found_items = $this->legacy_query->found_items;
+		}
+
+		if ( $as_objects ) {
+			$items = array_map_to_contacts( $items );
+		}
+
+		$this->items = $items;
+
+		return $items;
+	}
+
+	/**
+	 * Number of contacts that match the query
+	 *
+	 * @param $query_vars
+	 *
+	 * @return int
+	 */
+	public function count( $query_vars = [] ) {
+
+		if ( ! empty( $query_vars ) ) {
+			$this->query_vars = wp_parse_args( $query_vars );
+		}
+
+		try {
+			$this->maybe_setup_query();
+		} catch ( FilterException|\Exception $exception ) {
+			return $this->legacy_query->count( $query_vars );
+		}
+
+		return parent::count();
+	}
+
+	/**
+	 * Get var after query setup
+	 *
+	 * @throws FilterException
+	 * @return false|mixed|string|null
+	 */
+	public function get_var() {
+		$this->maybe_setup_query();
+
+		return parent::get_var();
+	}
+
+	/**
+	 * @throws FilterException
+	 * @return object[]
+	 */
+	public function get_results(): array {
+
+		$this->maybe_setup_query();
+
+		/**
+		 * Before getting the results of the query
+		 */
+		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
+
+		$items = parent::get_results();
+
+		if ( isset_not_empty( $this->query_vars, 'found_rows' ) ) {
+			$this->found_items = $this->table->found_rows();
+		}
+
+		return $items;
 	}
 
 }
