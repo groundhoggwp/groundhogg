@@ -901,6 +901,9 @@ function array_to_atts( $atts ) {
 		$key = strtolower( $key );
 
 		switch ( $key ) {
+            case 'value':
+                $value = esc_attr( $value );
+                break;
 			case 'cellpadding':
 			case 'cellspacing':
 				$value = absint( $value );
