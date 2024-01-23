@@ -136,13 +136,11 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return $cache[ $cache_key ];
 	}
 
-	$contact = new Contact( $contact_id_or_email, $by_user_id );
+	$contact = new Contact( $contact_id_or_email );
 
 	if ( $contact->exists() ) {
-
 //		Set the contact in the cache
 		$cache[ $cache_key ] = $contact;
-
 		return $contact;
 	}
 
@@ -4926,8 +4924,8 @@ function has_replacements( $content ) {
  *
  * @return bool
  */
-function is_a_contact( $contact ) {
-	return $contact && $contact instanceof Contact && $contact->exists();
+function is_a_contact( $contact ): bool {
+	return is_a( $contact, Contact::class );
 }
 
 /**
@@ -4937,8 +4935,8 @@ function is_a_contact( $contact ) {
  *
  * @return bool
  */
-function is_a_user( $user ) {
-	return $user && $user instanceof \WP_User;
+function is_a_user( $user ): bool {
+    return is_a( $user, \WP_User::class );
 }
 
 /**
@@ -7674,21 +7672,6 @@ function qualifies_for_review_your_funnel() {
 	];
 
 	return ! in_array( false, $conditions );
-}
-
-/**
- * Enqueue the admin header
- *
- * @return void
- */
-function enqueue_admin_header() {
-	if ( is_white_labeled() ) {
-		return;
-	}
-
-	wp_enqueue_script( 'groundhogg-admin-header' );
-
-	do_action( 'groundhogg/enqueue_admin_header' );
 }
 
 /**
