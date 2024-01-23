@@ -1553,11 +1553,15 @@
 
     close()
 
-    return ModalFrame({}, ({close}) => Div({
+    return ModalFrame({
+      frameAttributes: {
+        className: 'gh-modal-frame gh-email-preview-modal',
+      }
+    }, ({close}) => Div({
       style: {
         width: `${width}px`,
         height: `${height}px`
-      }
+      },
     },  EmailPreview( {
       close,
       from_avatar,

@@ -783,7 +783,10 @@ label.block {
   width: max-content;
 }
 
-.gh-modal-frame .email-preview {
+.gh-email-preview-modal .email-preview {
+  height: 100%;
+}
+.gh-email-preview-modal .email-preview iframe {
   height: 100%;
 }
 
@@ -796,7 +799,6 @@ label.block {
   overflow: hidden;
 }
 .email-preview iframe {
-  height: 100%;
   width: 100%;
 }
 
