@@ -70,6 +70,10 @@ class Tag extends Base_Object {
 		return $this->tag_slug;
 	}
 
+	public function exists() {
+		return $this->tag_id && $this->tag_name && $this->tag_slug;
+	}
+
 	/**
 	 * @return int[]
 	 */
