@@ -330,7 +330,7 @@ abstract class DB {
 		return [];
 	}
 
-	public function has_column( $column ) {
+	public function has_column( string $column ) {
 		return array_key_exists( $column, $this->get_columns() );
 	}
 
@@ -657,7 +657,7 @@ abstract class DB {
 			return;
 		}
 
-		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group(), MINUTE_IN_SECONDS );
+		wp_cache_set_last_changed( $this->get_cache_group() );
 	}
 
 	/**
@@ -680,18 +680,7 @@ abstract class DB {
 			}
 		}
 
-		if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-			return wp_cache_get_last_changed( $this->get_cache_group() );
-		}
-
-		$last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
-
-		if ( ! $last_changed ) {
-			$last_changed = microtime();
-			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group(), MINUTE_IN_SECONDS );
-		}
-
-		return $last_changed;
+		return wp_cache_get_last_changed( $this->get_cache_group() );
 	}
 
 	/**
@@ -774,7 +763,12 @@ abstract class DB {
 	 * Clears the cache group
 	 */
 	public function clear_cache() {
-		unset( self::$cache[ $this->get_cache_group() ] );
+
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+			unset( self::$cache[ $this->get_cache_group() ] );
+		} else {
+			wp_cache_flush_group( $this->get_cache_group() );
+		}
 	}
 
 	/**
@@ -1243,7 +1237,7 @@ abstract class DB {
 			switch ( strtolower( $key ) ) {
 				case 'select':
 
-					if ( ! is_array( $val ) ){
+					if ( ! is_array( $val ) ) {
 						$val = array_map( 'trim', explode( ',', $val ) );
 					}
 
