@@ -175,13 +175,7 @@ class Contacts extends DB {
 	 */
 	public function add( $data = array() ) {
 
-		$args = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
 		if ( empty( $args['email'] ) ) {
-
 			$this->last_error = 'No email field provided.';
 
 			return false;
@@ -189,7 +183,7 @@ class Contacts extends DB {
 
 		$args = $this->sanitize_columns( $args );
 
-		return $this->insert_on_duplicate_update( $args );
+		return $this->insert_on_duplicate_key_update( $args );
 	}
 
 	/**
@@ -199,12 +193,16 @@ class Contacts extends DB {
 	 *
 	 * @return int
 	 */
-	public function insert_on_duplicate_update( $data ) {
+	public function insert_on_duplicate_key_update( $data ) {
+
+		$orig = $data;
+		$data = wp_parse_args( $data, $this->get_column_defaults() );
 
 		if ( key_exists( 'email', $data ) ) {
 
 			// Initialise column format array
-			$column_formats = $this->get_columns();
+			$column_formats  = $this->get_columns();
+			$column_defaults = $this->get_column_defaults();
 
 			// Force fields to lower case
 			$data = array_change_key_case( $data );
@@ -212,16 +210,21 @@ class Contacts extends DB {
 			// White list columns
 			$data = array_intersect_key( $data, $column_formats );
 
-			$update_func = function ( $query ) use ( $data, $column_formats ) {
+			// Function to rewrite the INSERT query to include ON DUPLICATE KEY UPDATE
+			$update_func = function ( $query ) use ( $orig, $column_formats, $column_defaults ) {
 
 				if ( ! preg_match( '/^INSERT/i', $query ) ) {
 					return $query;
 				}
 
+				// Don't update with default values
+				$data = array_diff_assoc( $orig, $column_defaults );
+
 				global $wpdb;
 
+				// never update these columns
+				unset( $data['ID'] );
 				unset( $data['email'] );
-				unset( $data['id'] );
 				unset( $data['date_created'] );
 
 				$pairs = [];
@@ -231,7 +234,7 @@ class Contacts extends DB {
 					$pairs[] = $wpdb->prepare( "$column = $format", $value );
 				}
 
-				$query .= 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+				$query .= ' ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
 
 				return $query;
 			};
