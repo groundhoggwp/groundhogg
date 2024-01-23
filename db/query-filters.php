@@ -129,103 +129,94 @@ class Query_Filters {
 			'before'     => '',
 		] );
 
-		$after  = new DateTimeHelper( 'today' );
-		$before = new DateTimeHelper( 'now' );
-
-		// Future date range
-		if ( str_starts_with( $filter['date_range'], 'f_' ) ) {
-			$after->modify( 'now' );
-			$before->modify( '+99 years' );
-		}
+		$after  = new DateTimeHelper(); // now
+		$before = new DateTimeHelper(); // now
 
 		switch ( $filter['date_range'] ) {
 			default:
-			case 'f_any':
-			case 'today':
-				break;
 			case 'any':
-				$after->setTimestamp( 0 );
+				// what to do here?
 				break;
-			case 'f_today':
-				$before->modify( 'tomorrow' );
+			case 'today':
+				$after->modify( 'today 00:00:00' );
+				$before->modify( 'today 23:59:59' );
+				break;
+			case 'yesterday':
+				$after->modify( 'yesterday 00:00:00' );
+				$before->modify( 'yesterday 23:59:59' );
+				break;
+			case 'tomorrow':
+				$after->modify( 'tomorrow 00:00:00' );
+				$before->modify( 'tomorrow 23:59:59' );
 				break;
 			case 'this_week':
 				$start_of_week = day_of_week( get_option( 'start_of_week' ) );
 
-				if ( $before->format( 'l' ) !== $start_of_week ) {
-					$after->modify( sprintf( 'last %s', $start_of_week ) );
-				}
-
-				break;
-			case 'f_this_week':
-				$start_of_week = day_of_week( get_option( 'start_of_week' ) );
-
 				if ( $after->format( 'l' ) !== $start_of_week ) {
-					$before->modify( sprintf( 'next %s', $start_of_week ) );
+					$after->modify( sprintf( 'last %s 00:00:00', $start_of_week ) );
 				}
 
+				$before = ( clone $after )->modify( '+7 days 23:59:59' );
+
 				break;
+
 			case 'this_month':
-				$after->modify( 'first day of this month' );
-				break;
-			case 'f_this_month':
-				$after->modify( 'first day of next month' );
+				$after->modify( 'first day of this month 00:00:00' );
+				$before->modify( 'last day of this month 23:59:59' );
 				break;
 			case 'this_year':
-				$after->modify( 'first day of January this year' );
-				break;
-			case 'f_this_year':
-				$after->modify( 'first day of January next year' );
+				$after->modify( 'first day of January this year 00:00:00' );
+				$before->modify( 'last day of December this year 23:59:59' );
 				break;
 			case '24_hours':
 				$after->modify( '24 hours ago' );
 				break;
-			case 'f_24_hours':
-				$after->modify( '+24 hours' );
+			case 'next_24_hours':
+				$after->modify( 'now' );
+				$before->modify( '+24 hours' );
 				break;
 			case '7_days':
 				$after->modify( '7 days ago' );
 				break;
-			case 'f_7_days':
-				$after->modify( '+7 days' );
+			case 'next_7_days':
+				$after->modify( 'now' );
+				$before->modify( '+ 7 days' );
 				break;
 			case '14_days':
 				$after->modify( '14 days ago' );
 				break;
-			case 'f_14_days':
-				$after->modify( '+14 days' );
+			case 'next_14_days':
+				$before->modify( '+14 days' );
 				break;
 			case '30_days':
 				$after->modify( '30 days ago' );
 				break;
-			case 'f_30_days':
-				$after->modify( '+30 days' );
+			case 'next_30_days':
+				$before->modify( '+30 days' );
 				break;
 			case '60_days':
 				$after->modify( '60 days ago' );
 				break;
-			case 'f_60_days':
-				$after->modify( '+60 days' );
+			case 'next_60_days':
+				$before->modify( '+60 days' );
 				break;
 			case '90_days':
 				$after->modify( '90 days ago' );
 				break;
-			case 'f_90_days':
-				$after->modify( '+90 days' );
+			case 'next_90_days':
+				$before->modify( '+90 days' );
 				break;
 			case '365_days':
 				$after->modify( '365 days ago' );
 				break;
-			case 'f_365_days':
-				$after->modify( '+365 days' );
+			case 'next_365_days':
+				$before->modify( '+365 days' );
 				break;
 			case 'before':
 				$before->modify( $filter['before'] );
-				$after->setTimestamp( 1 );
 				break;
 			case 'after':
 				$after->modify( $filter['after'] );
-				$before->modify( 'now' );
 				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );
@@ -295,6 +286,10 @@ class Query_Filters {
 			'date_range' => '24_hours',
 		] );
 
+		if ( $filter['date_range'] === 'any' ){
+			return;
+		}
+
 		try {
 
 			[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter );
@@ -311,13 +306,7 @@ class Query_Filters {
 		}
 
 		switch ( $filter['date_range'] ) {
-//			case 'any':
-//				$where->
-//				break;
-			case 'today':
-			case 'this_week':
-			case 'this_month':
-			case 'this_year':
+			default:
 			case '24_hours':
 			case '7_days':
 			case '14_days':
@@ -325,26 +314,27 @@ class Query_Filters {
 			case '60_days':
 			case '90_days':
 			case '365_days':
-			case 'after':
-				$where->greaterThan( $column, $after );
+			case 'next_24_hours':
+			case 'next_7_days':
+			case 'next_14_days':
+			case 'next_30_days':
+			case 'next_60_days':
+			case 'next_90_days':
+			case 'next_365_days':
+			case 'today':
+			case 'yesterday':
+			case 'tomorrow':
+			case 'this_week':
+			case 'this_month':
+			case 'this_year':
+			case 'between':
+				$where->between( $column, $after, $before );
 				break;
-			case 'f_today':
-			case 'f_this_week':
-			case 'f_this_month':
-			case 'f_this_year':
-			case 'f_24_hours':
-			case 'f_7_days':
-			case 'f_14_days':
-			case 'f_30_days':
-			case 'f_60_days':
-			case 'f_90_days':
-			case 'f_365_days':
 			case 'before':
 				$where->lessThan( $column, $after );
 				break;
-			default:
-			case 'between':
-				$where->between( $column, $after, $before );
+			case 'after':
+				$where->greaterThan( $column, $after );
 				break;
 		}
 	}
@@ -499,13 +489,13 @@ class Query_Filters {
 			case 'all_checked':
 			case 'all_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->like( $column, '%' . $where->query->db->esc_like( $option ) . '%' );
+					$where->like( $column, '%"' . $where->query->db->esc_like( $option ) . '"%' );
 				}
 				break;
 			case 'not_checked':
 			case 'all_not_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->notLike( $column, '%' . $where->query->db->esc_like( $option ) . '%' );
+					$where->notLike( $column, '%"' . $where->query->db->esc_like( $option ) . '"%' );
 				}
 				break;
 		}
