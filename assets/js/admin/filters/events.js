@@ -27,7 +27,7 @@
 
   const broadcastTitle = ({ date_sent_pretty, object: { data: { title } } }) => `${ title } ${ date_sent_pretty }`
 
-  const params = new URLSearchParams( location.search.substring(1) )
+  const params = new URLSearchParams(location.search.substring(1))
 
   FilterRegistry.registerFilter(createFilter('broadcast', 'Broadcast', 'table', {
     display: ({ broadcast_id = false }) => {
@@ -50,7 +50,7 @@
         fetchOptions: (search) => {
           return BroadcastsStore.fetchItems({
             search,
-            status: [ 'complete', 'cancelled', 'failed', 'skipped' ].includes( params.get( 'status' ) ) ? 'sent' : 'scheduled'
+            status: ['complete', 'cancelled', 'failed', 'skipped'].includes(params.get('status')) ? 'sent' : 'scheduled',
           }).then(broadcasts => broadcasts.map(broadcast => ( { id: broadcast.ID, text: broadcastTitle(broadcast) } )))
         },
         onChange: item => {
@@ -106,17 +106,19 @@
           if (!item) {
             updateFilter({
               funnel_id: null,
-            })
+              step_id: null,
+            }, true)
             return
           }
 
           updateFilter({
             funnel_id: item.id,
-          })
+            step_id: FunnelsStore.get( item.id ).steps[0].ID
+          }, true)
         },
       }),
       funnel_id ? ItemPicker({
-        id: `select-a-step`,
+        id: `select-step-from-${funnel_id}`,
         noneSelected: __('Select a step...', 'groundhogg'),
         selected: step_id ? {
           id: step_id,
@@ -126,10 +128,10 @@
         style: {
           flexGrow: 1,
         },
-        fetchOptions: (search) => {
-          return Promise.resolve(
-            FunnelsStore.get(funnel_id).steps.map(({ ID, data }) => ( { id: ID, text: data.step_title } )))
-        },
+        fetchOptions: async (search) => FunnelsStore.get(funnel_id).
+          steps.
+          map(({ ID, data }) => ( { id: ID, text: data.step_title } )).
+          filter(opt => opt.text.match(new RegExp(search, 'i'))),
         onChange: item => {
           if (!item) {
             updateFilter({
