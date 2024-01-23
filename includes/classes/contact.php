@@ -81,6 +81,14 @@ class Contact extends Base_Object_With_Meta {
 			$field                = 'user_id';
 		}
 
+		// Extract email if provided and if exists, update
+		if ( is_array( $_id_or_email_or_args ) && key_exists( 'email', $_id_or_email_or_args ) ) {
+			parent::__construct( $_id_or_email_or_args['email'], 'email' );
+			$this->update( $_id_or_email_or_args );
+
+			return;
+		}
+
 		parent::__construct( $_id_or_email_or_args, $field );
 	}
 
@@ -509,7 +517,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return void
 	 */
-	protected function handle_consents_in_data( $data ){
+	protected function handle_consents_in_data( $data ) {
 
 		// Handle consent
 		$consents = [
@@ -670,7 +678,7 @@ class Contact extends Base_Object_With_Meta {
 		// Apply tags that the contact doesn't already have
 		$apply = array_diff( $tags, $this->tags );
 
-		if ( empty( $apply ) ){
+		if ( empty( $apply ) ) {
 			return false;
 		}
 
@@ -729,7 +737,7 @@ class Contact extends Base_Object_With_Meta {
 
 		$remove = array_intersect( $tags, $this->tags );
 
-		if ( empty( $remove ) ){
+		if ( empty( $remove ) ) {
 			return false;
 		}
 
@@ -837,7 +845,7 @@ class Contact extends Base_Object_With_Meta {
 			return true;
 		}
 
-		if ( ! user_can( $owner_id, 'edit_contacts' ) ){
+		if ( ! user_can( $owner_id, 'edit_contacts' ) ) {
 			return false;
 		}
 

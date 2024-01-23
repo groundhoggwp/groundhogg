@@ -32,7 +32,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	/**
 	 * Base_Object constructor.
 	 *
-	 * @param $identifier_or_args int|string the identifier to look for
+	 * @param $identifier_or_args int|string|object|array the identifier to look for
 	 * @param $field              string the file to query
 	 *
 	 * @return void
@@ -320,11 +320,13 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function update( $data = [] ) {
 
+		// Only update different data from the current.
+		$data = $this->sanitize_columns( $data );
+		$data = array_diff_assoc( $data, $this->data );
+
 		if ( empty( $data ) ) {
 			return false;
 		}
-
-		$data = $this->sanitize_columns( $data );
 
 		$old_data = $this->data;
 
