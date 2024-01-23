@@ -79,8 +79,6 @@ class Broadcasts_Page extends Admin_Page {
 	 */
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_style( 'groundhogg-admin-email-preview' );
-		wp_enqueue_script( 'groundhogg-admin-email-preview' );
 
 		enqueue_broadcast_assets();
 	}
