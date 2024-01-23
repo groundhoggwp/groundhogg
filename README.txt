@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2 (2024-01-22) =
+* ADDED New backed query improvements to help create more complex and performant queries
+* TWEAKED Date ranges for custom fields are now more flexible.
+* TWEAKED Refactored many of the reports to be more performant.
+* TWEAKED Refactored many of the search filters to be more performant.
+* FIXED Custom fields built with the legacy custom fields builder not showing up in replacement codes
+* FIXED using the `Between` comparison in date filters not working.
 
 = 3.1 (2023-12-07) =
 * ADDED Custom post type and taxonomy support to the email editor posts block.
