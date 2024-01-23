@@ -4,7 +4,6 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Email;
-use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -78,7 +77,7 @@ class Emails extends DB {
 				'users' => [],
 			] );
 
-			$where->in( 'from_user', wp_parse_id_list( $filter[ 'users' ] ) );
+			$where->in( 'from_user', wp_parse_id_list( $filter['users'] ) );
 		} );
 
 		// Author
@@ -87,30 +86,35 @@ class Emails extends DB {
 				'users' => [],
 			] );
 
-			$where->in( 'author', wp_parse_id_list( $filter[ 'users' ] ) );
+			$where->in( 'author', wp_parse_id_list( $filter['users'] ) );
 		} );
 
-		// Campaigns filter
-		$this->query_filters->register( 'campaigns', function ( $filter, Where $where ) {
-
+		// Funnel filter
+		$this->query_filters->register( 'funnel', function ( $filter, Where $where ) {
 			$filter = wp_parse_args( $filter, [
-				'campaigns' => [],
+				'funnel_id' => 0,
 			] );
 
-			$campaigns = wp_parse_id_list( $filter[ 'campaigns' ] );
+			$funnel_id = absint( $filter['funnel_id'] );
 
-			foreach ( $campaigns as $campaign ){
+			$stepQuery  = new Query( 'steps' );
+			$meta_alias = $stepQuery->joinMeta( 'email_id' );
+			$stepQuery->where( 'step_type', 'send_email' );
+			$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
-				$join = $where->query->addJoin( 'LEFT', [ get_db( 'object_relationships' )->table_name, 'campaign_' . $campaign ] );
-				$join->onColumn( 'primary_object_id' );
-				$join->conditions->equals( "$join->alias.primary_object_type", 'email' );
-				$join->conditions->equals( "$join->alias.secondary_object_type", 'campaign' );
-				$join->conditions->equals( "$join->alias.secondary_object_id", $campaign );
+			$alias = $funnel_id ? 'funnel_' . $funnel_id : 'in_funnel';
 
-				$where->equals( "$join->alias.secondary_object_id", $campaign );
+			$join = $where->query->addJoin( 'LEFT', [ $stepQuery, $alias ] );
+			$join->onColumn( "email_id" );
+
+			if ( $funnel_id ){
+				$where->equals( "$alias.funnel_id", $funnel_id );
+			} else {
+				$where->isNotNull( "$alias.funnel_id" );
 			}
 
 			$where->query->setGroupby( 'ID' );
+
 		} );
 	}
 
