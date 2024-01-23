@@ -3,9 +3,8 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Email;
+use Groundhogg\DB\Query;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\get_db;
 use function Groundhogg\percentage;
 
 class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Report {
@@ -17,17 +16,11 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	 */
 	protected function get_send_email_steps() {
 
-		$broadcasts = get_db( 'broadcasts' )->query( [
-			'where' => [
-				'relationship' => "AND",
-				[ 'col' => 'status', 'val' => 'sent', 'compare' => '=' ],
-				[ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ],
-				[ 'col' => 'send_time', 'val' => $this->start, 'compare' => '>=' ],
-				[ 'col' => 'send_time', 'val' => $this->end, 'compare' => '<=' ],
-			],
-		] );
-
-		return wp_parse_id_list( wp_list_pluck( $broadcasts, 'ID' ) );
+		$query = new Query( 'broadcasts' );
+		$query->where( 'status', 'sent' )
+		      ->equals( 'object_type', 'email' )
+		      ->greaterThanEqualTo( 'send_time', $this->start )
+		      ->lessThanEqualTo( 'send_time', $this->end );
 
 	}
 
@@ -36,33 +29,32 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	}
 
 	protected function get_table_data() {
-		$emails = $this->get_send_email_steps();
+
+		$query = new Query( 'broadcasts' );
+		$query->where( 'status', 'sent' )
+		      ->equals( 'object_type', 'email' )
+		      ->greaterThanEqualTo( 'send_time', $this->start )
+		      ->lessThanEqualTo( 'send_time', $this->end );
+
+		$broadcasts = $query->get_objects( Broadcast::class );
 
 		$list = [];
 
-		foreach ( $emails as $email ) {
+		foreach ( $broadcasts as $broadcast ) {
 
-			$email_id = is_object( $email ) ? $email->ID : $email;
+			$report = $broadcast->get_report_data();
+			$title  = $broadcast->get_title();
 
-			$email  = new Broadcast( $email_id );
-			$report = $email->get_report_data();
-
-			$title = $email->get_title();
-
-			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
-				$list[] = [
-					'label'   => $title,
-					'url'     => admin_page_url( 'gh_reporting', [
-						'tab'       => 'broadcasts',
-						'broadcast' => $email->get_id()
-					] ),
-					'sent'    => $report['sent'],
-					'opened'  => percentage( $report['sent'], $report['opened'] ),
-					'clicked' => percentage( $report['opened'], $report['clicked'] ),
-				];
-
-			}
-
+			$list[] = [
+				'label'   => $title,
+				'url'     => admin_page_url( 'gh_reporting', [
+					'tab'       => 'broadcasts',
+					'broadcast' => $broadcast->get_id()
+				] ),
+				'sent'    => $report['sent'],
+				'opened'  => percentage( $report['sent'], $report['opened'] ),
+				'clicked' => percentage( $report['opened'], $report['clicked'] ),
+			];
 		}
 
 		return $this->normalize_data( $list );

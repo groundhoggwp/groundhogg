@@ -57,7 +57,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 				'href'  => $datum['url'],
 				'class' => 'number-total'
 			] );
-			$datum['data']  = $datum['data'] . '%';
+			$datum['data']  = number_format_i18n( $datum['data'], 1 ) . '%';
 
 			unset( $datum['url'] );
 			$data[ $i ] = $datum;
@@ -97,8 +97,8 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		$where = [
 			'relationship' => "AND",
-			[ 'col' => 'funnel_id', 'val' => $funnel_id, 'compare' => '=' ],
 			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
+			[ 'col' => 'funnel_id', 'val' => $funnel_id, 'compare' => '=' ],
 			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],

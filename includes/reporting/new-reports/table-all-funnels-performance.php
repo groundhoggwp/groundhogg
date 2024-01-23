@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\base64_json_encode;
@@ -59,7 +60,6 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		foreach ( $funnels as $funnel ) {
 
-
 			$sent   = $this->count_emails_sent( $funnel );
 			$opens  = $this->count_email_opens( $funnel );
 			$clicks = $this->count_email_clicks( $funnel );
@@ -93,7 +93,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						] )
 					] ),
 					'target' => '_blank'
-				], $active, false ),
+				], _nf( $active ), false ),
 				'conversions' => ! empty( $conversion_ids ) ? html()->e( 'a', [
 					'href'   => admin_page_url( 'gh_contacts', [
 						'filters' => base64_json_encode( array_values( array_map( function ( $step_id ) use ( $funnel ) {
@@ -111,11 +111,11 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						}, $conversion_ids ) ) )
 					] ),
 					'target' => '_blank'
-				], $conversions, false ) : 'N/A',
-				'cvr'         => ! empty( $conversion_ids ) ? percentage( $active, $conversions ) . '%' : 'N/A',
-				'sent'        => $sent,
-				'open'        => percentage( $sent, $opens ) . '%',
-				'ctr'         => percentage( $opens, $clicks ) . '%',
+				], _nf( $conversions ), false ) : 'N/A',
+				'cvr'         => ! empty( $conversion_ids ) ? _nf( percentage( $active, $conversions ), 1 ) . '%' : 'N/A',
+				'sent'        => _nf( $sent ),
+				'open'        => _nf( percentage( $sent, $opens ), 1 ) . '%',
+				'ctr'         => _nf( percentage( $opens, $clicks ), 1 ) . '%',
 			];
 		}
 
@@ -250,9 +250,9 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		$where_events = [
 			'relationship' => "AND",
+			[ 'col' => 'step_id', 'val' => $ids, 'compare' => 'IN' ],
 			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
 			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-			[ 'col' => 'step_id', 'val' => $ids, 'compare' => 'IN' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
 			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],

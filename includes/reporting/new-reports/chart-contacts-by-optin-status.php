@@ -2,33 +2,32 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\DB\DB;
-use Groundhogg\Event;
-use Groundhogg\Funnel;
+use Groundhogg\DB\Query;
 use Groundhogg\Preferences;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
 
 class Chart_Contacts_By_Optin_Status extends Base_Doughnut_Chart_Report {
 
 	protected function get_chart_data() {
 
-		$values = wp_list_pluck( $this->get_new_contacts_in_time_period(), 'optin_status' );
-		$counts = array_count_values( $values );
+		$query = new Query( 'contacts' );
+		$query->setSelect( 'optin_status', [ 'COUNT(ID)', 'total' ] );
+		$query->where()->greaterThanEqualTo( 'date_created', $this->startDate->ymdhis() );
+		$query->where()->lessThanEqualTo( 'date_created', $this->endDate->ymdhis() );
+		$query->setGroupby( 'optin_status' );
+		$query->setOrderby( 'total' );
+
+		$results = $query->get_results();
 
 		$data  = [];
 		$label = [];
 		$color = [];
 
 		// normalize data
-		foreach ( $counts as $key => $datum ) {
-			$normalized = $this->normalize_datum( $key, $datum );
-			$label []   = $normalized ['label'];
-			$data[]     = $normalized ['data'];
-			$color[]    = $normalized ['color'];
+		foreach ( $results as $result ) {
+			$normalized = $this->normalize_datum( absint( $result->optin_status ), absint( $result->total ) );
+			$label[]    = $normalized['label'];
+			$data[]     = $normalized['data'];
+			$color[]    = $normalized['color'];
 		}
 
 		return [
