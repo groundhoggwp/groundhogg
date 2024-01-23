@@ -108,9 +108,17 @@ class Emails_Page extends Admin_Page {
 		}
 
 		if ( $this->current_action_is( 'view' ) ) {
-//            wp_enqueue_style( 'groundhogg-email-block-editor' );
 			wp_enqueue_script( 'groundhogg-admin-components' );
-		}
+
+			$this->enqueue_table_filters( [
+				'stringColumns' => [
+					'subject'       => 'Subject',
+					'content'       => 'Content',
+				],
+			] );
+
+			wp_enqueue_script( 'groundhogg-admin-email-filters' );
+        }
 
 		remove_editor_styles();
 
@@ -327,11 +335,19 @@ class Emails_Page extends Admin_Page {
 		Groundhogg\download_json( $email, $email->get_title() );
 	}
 
-	protected function search_form( $title, $name = 's' ) {
+	protected function search_form( $title = false, $name = 's' ) {
+
 		?>
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
-            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+
+	        <?php if ( ! get_url_var( 'include_filters' ) ):
+		        echo html()->input( [
+			        'type' => 'hidden',
+			        'name' => 'include_filters'
+		        ] );
+	        endif; ?>
+
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
 
             <div style="float: right" class="gh-input-group">
@@ -372,8 +388,9 @@ class Emails_Page extends Admin_Page {
 		$emails_table = new Emails_Table();
 
 		$emails_table->views();
+        $this->table_filters();
 
-		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
+		$this->search_form();
 
 		?>
         <form method="post">

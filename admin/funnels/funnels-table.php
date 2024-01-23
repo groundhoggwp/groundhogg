@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Table;
 use Groundhogg\Contact_Query;
+use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
@@ -71,6 +72,7 @@ class Funnels_Table extends Table {
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
 			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
 			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
+			'author'          => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
@@ -95,6 +97,7 @@ class Funnels_Table extends Table {
 		$sortable_columns = array(
 			'title'        => array( 'title', false ),
 //			'active_contacts' => array( 'active_contacts', false ),
+			'author'       => array( 'author', false ),
 			'last_updated' => array( 'last_updated', false ),
 			'date_created' => array( 'date_created', false )
 		);
@@ -137,17 +140,16 @@ class Funnels_Table extends Table {
 	 */
 	protected function column_active_contacts( $funnel ) {
 
-		$query = new Contact_Query();
-
 		$query_args = [
 			'report' => array(
 				'funnel' => $funnel->get_id(),
-				'status' => 'waiting'
+				'status' => Event::WAITING
 			)
 		];
 
+		$query = new Contact_Query( $query_args );
 
-		$count = _nf( $query->query( array_merge( [ 'count' => true ], $query_args ) ) );
+		$count = _nf( $query->count() );
 
 		$queryUrl = admin_page_url( 'gh_contacts', $query_args );
 
@@ -189,6 +191,24 @@ class Funnels_Table extends Table {
 				], $_SERVER['REQUEST_URI'] ),
 			], $campaign->get_name() );
 		}, $campaigns ) );
+	}
+
+	/**
+	 * @param $funnel Funnel
+	 *
+	 * @return string
+	 */
+	protected function column_author( Funnel $funnel ) {
+		$user = get_userdata( intval( ( $funnel->author ) ) );
+		if ( ! $user ) {
+			return __( 'Unknown', 'groundhogg' );
+		}
+		$from_user = esc_html( $user->display_name );
+		$queryUrl  = admin_page_url( 'gh_funnels', [
+			'author' => $funnel->author
+		] );
+
+		return "<a href='$queryUrl'>$from_user</a>";
 	}
 
 	/**

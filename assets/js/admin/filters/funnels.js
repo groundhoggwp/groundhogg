@@ -10,7 +10,6 @@
 
   const {
     contacts: ContactsStore,
-    funnels: FunnelsStore,
     campaigns: CampaignsStore,
   } = Groundhogg.stores
   const { sprintf, __, _x, _n } = wp.i18n
@@ -30,7 +29,7 @@
     getOwner,
   } = Groundhogg.user
 
-  const OwnerPicker = (users, updateFilter) => ItemPicker({
+  const AuthorPicker = (users, updateFilter) => ItemPicker({
     id: `select-users`,
     noneSelected: __('Select a user...', 'groundhogg'),
     selected: users.map(user_id => ( { id: user_id, text: getOwner(user_id).data.user_email } )),
@@ -38,15 +37,10 @@
     style: {
       flexGrow: 1,
     },
-    fetchOptions: (search) => {
+    fetchOptions: async (search) => {
       search = new RegExp(search, 'i')
 
-      let options = [
-        ...Groundhogg.filters.owners.map(u => ( { id: u.ID, text: u.data.display_name } )),
-        { id: 0, text: 'The contact owner' },
-      ].filter(({ text }) => text.match(search))
-
-      return Promise.resolve(options)
+      return Groundhogg.authors.map(id => ( { id, text: getOwner(id).data.display_name } )).filter(({ text }) => text.match(search))
     },
     onChange: items => {
       updateFilter({
@@ -54,20 +48,6 @@
       })
     },
   })
-
-  FilterRegistry.registerFilter(createFilter('from_user', 'From User', 'table', {
-    display: ({ users = [] }) => {
-
-      if (!users.length) {
-        return 'Any user'
-      }
-
-      return sprintf('From %s', orList(users.map(user_id => bold(getOwner(user_id).data.user_email))))
-    },
-    edit: ({ users = [], updateFilter }) => Fragment([
-      OwnerPicker(users, updateFilter),
-    ]),
-  }))
 
   FilterRegistry.registerFilter(createFilter('author', 'Author', 'table', {
     display: ({ users = [] }) => {
@@ -79,54 +59,37 @@
       return sprintf('Author is %s', orList(users.map(user_id => bold(getOwner(user_id).data.display_name))))
     },
     edit: ({ users = [], updateFilter }) => Fragment([
-      OwnerPicker(users, updateFilter),
+      AuthorPicker(users, updateFilter),
     ]),
   }))
 
-  FilterRegistry.registerFilter(createFilter('funnel', 'Funnel', 'table', {
-    display: ({ funnel_id = false }) => {
+  FilterRegistry.registerFilter(createFilter('step_type', 'Step types', 'table', {
+    display: ({ types = [] }) => {
 
-      if (!funnel_id) {
-        return 'Any funnel'
+      if (!types.length) {
+        throw new Error('You must choose at least 1 step type')
       }
 
-      return sprintf('In funnel %s', bold( FunnelsStore.get(funnel_id).data.title ) )
+      return sprintf('Has step type %s', orList(types.map(type => bold(Groundhogg.rawStepTypes[type].name))))
     },
-    edit: ({ funnel_id = false, updateFilter }) => Fragment([
+    edit: ({ types = [], updateFilter }) => Fragment([
       ItemPicker({
-        id: `select-a-funnel`,
-        noneSelected: __('Select a funnel...', 'groundhogg'),
-        selected: funnel_id ? { id: funnel_id, text: FunnelsStore.get(funnel_id).data.title } : [],
-        multiple: false,
-        style: {
-          flexGrow: 1,
+        id: 'select-types',
+        selected: types.map(type => ( { id: type, text: Groundhogg.rawStepTypes[type].name } )),
+        multiple: true,
+        fetchOptions: async (search) => {
+          return Object.keys(Groundhogg.rawStepTypes).
+            map(type => ( { id: type, text: Groundhogg.rawStepTypes[type].name } )).
+            filter(opt => opt.text.match(new RegExp(search, 'i')))
         },
-        fetchOptions: (search) => {
-          return FunnelsStore.fetchItems({
-            search,
-          }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
-        },
-        onChange: item => {
-          if (!item) {
-            updateFilter({
-              funnel_id: null,
-            })
-            return
-          }
-
+        onChange: items => {
           updateFilter({
-            funnel_id: item.id,
+            types: items.map( opt => opt.id )
           })
-        },
+        }
       }),
     ]),
-    preload: ({ funnel_id }) => {
-      if (funnel_id) {
-        return FunnelsStore.maybeFetchItem(funnel_id)
-      }
-    },
   }))
-
 
   FilterRegistry.registerFilter(createFilter('campaigns', 'Campaigns', 'table', {
     display: ({ campaigns = [] }) => {

@@ -34,6 +34,15 @@ $funnel_id = absint( get_request_var( 'funnel' ) );
 
 $funnel = new Funnel( $funnel_id );
 
+if ( ! $funnel->exists() ){
+
+    ?>
+    <p>This funnel does not exist. It may have been deleted.</p>
+    <?php
+
+    return;
+}
+
 /**
  * @param $steps Funnel_Step[]
  *

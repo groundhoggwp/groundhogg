@@ -25,6 +25,7 @@ $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
+.search-filters .filters-loading,
 #search-loading-dots-pill {
   display: inline-block;
   background: $secondary-purple;
@@ -60,6 +61,15 @@ $background-color: #F6F9FB;
   }
 }
 
+.search-filters {
+  .filters-loading {
+    display: inline-block;
+    background: $secondary-purple;
+    border-radius: 5px;
+    padding: 1px 5px;
+    color: #FFFFFF;
+  }
+}
 
 .search-filters-editor,
 #search-filters-editor {

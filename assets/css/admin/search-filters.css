@@ -1,3 +1,4 @@
+.search-filters .filters-loading,
 #search-loading-dots-pill {
   display: inline-block;
   background: #6c19ad;
@@ -27,6 +28,14 @@
   border-radius: 5px;
   left: 10px;
   top: -10px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+
+.search-filters .filters-loading {
+  display: inline-block;
+  background: #6c19ad;
+  border-radius: 5px;
   padding: 1px 5px;
   color: #FFFFFF;
 }

@@ -3,7 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Plugin;
@@ -14,7 +14,6 @@ use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -169,6 +168,12 @@ class Funnels_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			case 'edit':
 
+				$funnel = new Funnel( get_url_var( 'funnel' ) );
+
+                if ( ! $funnel->exists() ){
+                    return;
+                }
+
 				wp_enqueue_editor();
 
 				wp_enqueue_style( 'editor-buttons' );
@@ -178,7 +183,6 @@ class Funnels_Page extends Admin_Page {
 
 				wp_enqueue_script( 'jquery-ui-sortable' );
 				wp_enqueue_script( 'jquery-ui-draggable' );
-				$funnel = new Funnel( get_url_var( 'funnel' ) );
 
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
@@ -212,6 +216,25 @@ class Funnels_Page extends Admin_Page {
 			case 'add':
 				wp_enqueue_style( 'groundhogg-admin-element' );
 				break;
+            case 'view':
+	            $this->enqueue_table_filters( [
+		            'stringColumns' => [
+			            'title' => 'Title',
+		            ],
+		            'dateColumns'   => [
+			            'date_created' => 'Date Created',
+			            'last_updated' => 'Last Updated',
+		            ],
+	            ] );
+
+                $query = new Query( 'funnels' );
+                $query->setSelect( 'DISTINCT author' );
+                $results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
+
+                wp_enqueue_script( 'groundhogg-admin-funnel-filters' );
+                wp_add_inline_script( 'groundhogg-admin-funnel-filters', "Groundhogg.authors = " . wp_json_encode( $results ) );
+
+                break;
 		}
 
 		wp_enqueue_style( 'groundhogg-admin' );
@@ -860,7 +883,10 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table = new Funnels_Table();
 
 		$funnels_table->views();
-		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
+
+		$this->table_filters();
+        $this->search_form();
+
 		?>
         <form method="post" class="wp-clearfix">
 			<?php $funnels_table->prepare_items(); ?>
