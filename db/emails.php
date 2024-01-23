@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Email;
+use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -66,6 +67,51 @@ class Emails extends DB {
 	 */
 	public function get_db_version() {
 		return '2.1';
+	}
+
+	protected function maybe_register_filters() {
+		parent::maybe_register_filters();
+
+		// From user filter
+		$this->query_filters->register( 'from_user', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'from_user', wp_parse_id_list( $filter[ 'users' ] ) );
+		} );
+
+		// Author
+		$this->query_filters->register( 'author', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'author', wp_parse_id_list( $filter[ 'users' ] ) );
+		} );
+
+		// Campaigns filter
+		$this->query_filters->register( 'campaigns', function ( $filter, Where $where ) {
+
+			$filter = wp_parse_args( $filter, [
+				'campaigns' => [],
+			] );
+
+			$campaigns = wp_parse_id_list( $filter[ 'campaigns' ] );
+
+			foreach ( $campaigns as $campaign ){
+
+				$join = $where->query->addJoin( 'LEFT', [ get_db( 'object_relationships' )->table_name, 'campaign_' . $campaign ] );
+				$join->onColumn( 'primary_object_id' );
+				$join->conditions->equals( "$join->alias.primary_object_type", 'email' );
+				$join->conditions->equals( "$join->alias.secondary_object_type", 'campaign' );
+				$join->conditions->equals( "$join->alias.secondary_object_id", $campaign );
+
+				$where->equals( "$join->alias.secondary_object_id", $campaign );
+			}
+
+			$where->query->setGroupby( 'ID' );
+		} );
 	}
 
 	/**
