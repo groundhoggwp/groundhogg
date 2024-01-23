@@ -575,11 +575,11 @@ class Legacy_Contact_Query {
 		 *
 		 * @deprecated
 		 *
-		 * @param Contact_Query &$this Current instance of Contact_Query, passed by reference.
+		 * @param Legacy_Contact_Query &$this Current instance of Contact_Query, passed by reference.
 		 *
 		 */
 		do_action_ref_array( 'gh_pre_get_contacts', [ &$this ] );
-		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
+//		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
 
 		// $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
 		$key = md5( serialize( wp_array_slice_assoc( $this->query_vars, array_keys( $this->query_var_defaults ) ) ) );
@@ -1764,7 +1764,7 @@ class Legacy_Contact_Query {
 	 * Filter based on inclusion in a saved search
 	 *
 	 * @param $filter
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1783,7 +1783,7 @@ class Legacy_Contact_Query {
 			return '0=1';
 		}
 
-		$search_query = new Contact_Query( [
+		$search_query = new Legacy_Contact_Query( [
 			'saved_search' => $filter_vars['search']
 		] );
 
@@ -1802,7 +1802,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1817,7 +1817,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1834,7 +1834,7 @@ class Legacy_Contact_Query {
 	 * Filter by page visit history
 	 *
 	 * @param $filter
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1881,7 +1881,7 @@ class Legacy_Contact_Query {
 	 * Filter by user role
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1900,7 +1900,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1912,7 +1912,7 @@ class Legacy_Contact_Query {
 	 * Was inactive
 	 *
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1932,7 +1932,7 @@ class Legacy_Contact_Query {
 	 * Was active
 	 *
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1951,7 +1951,7 @@ class Legacy_Contact_Query {
 	 * has not logged in
 	 *
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1972,7 +1972,7 @@ class Legacy_Contact_Query {
 	 * Logged out
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -1992,7 +1992,7 @@ class Legacy_Contact_Query {
 	 * Logged in
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2013,7 +2013,7 @@ class Legacy_Contact_Query {
 	 * Filter by email recieved
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2038,7 +2038,7 @@ class Legacy_Contact_Query {
 	 * Email opened
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2064,7 +2064,7 @@ class Legacy_Contact_Query {
 	 * Broadcast link clicked
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2091,7 +2091,7 @@ class Legacy_Contact_Query {
 	 * Broadcast link clicked
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2120,7 +2120,7 @@ class Legacy_Contact_Query {
 	 * Broadcast opened
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2145,7 +2145,7 @@ class Legacy_Contact_Query {
 	 * Filter by broadcast events
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2174,7 +2174,7 @@ class Legacy_Contact_Query {
 	 * Generic filter for activity type
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2197,7 +2197,7 @@ class Legacy_Contact_Query {
 	 * Filter by funnel events
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2227,7 +2227,7 @@ class Legacy_Contact_Query {
 	 * Filter by owner
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2252,7 +2252,7 @@ class Legacy_Contact_Query {
 	 * Whether a contact is marketable or not
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2323,7 +2323,7 @@ class Legacy_Contact_Query {
 	 * Filter by optin status
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2352,7 +2352,7 @@ class Legacy_Contact_Query {
 	 * Filter by tags
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2445,7 +2445,7 @@ class Legacy_Contact_Query {
 	 * Wrapper function to filter by events easily
 	 *
 	 * @param $event_query
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2507,7 +2507,7 @@ class Legacy_Contact_Query {
 	 * Wrapper function to filter by events easily
 	 *
 	 * @param $activity_query
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2573,7 +2573,7 @@ class Legacy_Contact_Query {
 	 * Wrapper function to filter by events easily
 	 *
 	 * @param $activity_query
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2915,7 +2915,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2928,7 +2928,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2941,7 +2941,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2954,7 +2954,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -2973,7 +2973,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3075,7 +3075,7 @@ class Legacy_Contact_Query {
 
 	/**
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3091,7 +3091,7 @@ class Legacy_Contact_Query {
 	 * Filter by the phone number
 	 *
 	 * @param $filter_vars
-	 * @param $query Contact_Query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3114,7 +3114,7 @@ class Legacy_Contact_Query {
 	 * Filter by country
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3135,7 +3135,7 @@ class Legacy_Contact_Query {
 	 * Filter by region
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3156,7 +3156,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3177,7 +3177,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3197,7 +3197,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3217,7 +3217,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3237,7 +3237,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
@@ -3257,7 +3257,7 @@ class Legacy_Contact_Query {
 	 * Filter by city
 	 *
 	 * @param $filter_vars
-	 * @param $query
+	 * @param $query Legacy_Contact_Query
 	 *
 	 * @return string
 	 */
