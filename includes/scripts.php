@@ -438,6 +438,10 @@ class Scripts {
 			'groundhogg-admin-filters'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-funnel-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/filters/funnels' . $dot_min . '.js', [
+			'groundhogg-admin-filters'
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-form-fields-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/forms/form-fields-editor' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-make-el',
