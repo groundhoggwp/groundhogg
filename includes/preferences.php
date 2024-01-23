@@ -213,17 +213,20 @@ class Preferences {
 			return self::UNCONFIRMED;
 		}
 
-		$string_map = [
+		$string_map = array_merge( [
 			'pending'      => self::UNCONFIRMED,
 			'unconfirm'    => self::UNCONFIRMED,
 			'unconfirmed'  => self::UNCONFIRMED,
 			'confirm'      => self::CONFIRMED,
 			'confirmed'    => self::CONFIRMED,
+			'subscribe'    => self::CONFIRMED,
+			'subscribed'   => self::CONFIRMED,
 			'unsubscribe'  => self::UNSUBSCRIBED,
 			'unsubscribed' => self::UNSUBSCRIBED,
 			'weekly'       => self::WEEKLY,
 			'monthly'      => self::MONTHLY,
 			'hard_bounce'  => self::HARD_BOUNCE,
+			'hard bounce'  => self::HARD_BOUNCE,
 			'bounce'       => self::HARD_BOUNCE,
 			'bounced'      => self::HARD_BOUNCE,
 			'complain'     => self::COMPLAINED,
@@ -232,7 +235,7 @@ class Preferences {
 			'spam'         => self::SPAM,
 			'spammed'      => self::SPAM,
 			'fake'         => self::SPAM,
-		];
+		] );
 
 		// Add translated names as well!
 		$pretty_names = array_map( 'strtolower', self::get_preference_names() );
@@ -374,11 +377,11 @@ class Preferences {
 	 *
 	 * @return \DateTime|string
 	 */
-	public function get_grace_period_cutoff_date( $format = false ){
+	public function get_grace_period_cutoff_date( $format = false ) {
 		$gracePeriod = new \DateTime( 'today', wp_timezone() );
 		$gracePeriod->modify( sprintf( '%d days ago', $this->get_grace_period() ) );
 
-		if ( $format ){
+		if ( $format ) {
 			return $gracePeriod->format( $format );
 		}
 
@@ -395,6 +398,10 @@ class Preferences {
 	public function is_in_grace_period( $id_or_email ) {
 
 		$contact = get_contactdata( $id_or_email );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return false;
+		}
 
 		$grace = absint( $this->get_grace_period() ) * 24 * HOUR_IN_SECONDS;
 
