@@ -77,7 +77,7 @@ class Tag_Removed extends Tag_Applied {
 
 		echo html()->e( 'p', [], __( 'Run when the following tags are removed from the contact...', 'groundhogg' ) );
 
-		parent::settings( $step );
+		$this->tag_settings();
 	}
 
 	public function generate_step_title( $step ) {

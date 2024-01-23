@@ -78,15 +78,9 @@ class Tag_Applied extends Benchmark {
 		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.svg';
 	}
 
-	/**
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-
-		echo html()->e( 'p', [], __( 'Run when the following tags are applied to the contact...', 'groundhogg' ) );
-
+	public function tag_settings(){
 		echo html()->e( 'div', [
-			'class' => 'display-flex gap-10'
+			'class' => 'display-flex gap-10 align-top'
 		], [
 			html()->dropdown( [
 				'name'        => $this->setting_name_prefix( 'condition' ),
@@ -105,6 +99,16 @@ class Tag_Applied extends Benchmark {
 		] );
 
 		echo html()->e( 'p' );
+	}
+
+	/**
+	 * @param $step Step
+	 */
+	public function settings( $step ) {
+
+		echo html()->e( 'p', [], __( 'Run when the following tags are applied to the contact...', 'groundhogg' ) );
+
+		$this->tag_settings();
 	}
 
 	/**

@@ -731,7 +731,7 @@
       id,
       noneSelected: 'Select tags...',
       tags: true,
-      selected: tagIds.map(id => {
+      selected: tagIds.filter(id => TagsStore.has(id)).map(id => {
         let tag = TagsStore.get(id)
         return {
           id,
@@ -838,6 +838,33 @@
         }, Div({ id: 'email-editor' }))
       }
 
+      const EmailPicker = ItemPicker({
+        id: `step-${ ID }-email-picker`,
+        noneSelected: 'Search for an email...',
+        selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
+        multiple: false,
+        fetchOptions: (search) => {
+          return EmailsStore.fetchItems({ search }).
+            then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+        },
+        onChange: item => {
+
+          email_id = item ? item.id : false
+
+          Funnel.updateStepMeta({
+            email_id,
+          })
+
+          setTimeout( morphPreview, 100 )
+
+          // morphPreview()
+
+        },
+        style: {
+          minWidth: '50%',
+        },
+      })
+
       const Preview = () => Div({
           id: `step-${ ID }-email-preview-panel`,
           className: 'gh-panel email-preview',
@@ -854,32 +881,7 @@
               minHeight: '62px',
             },
           }, [
-            email_id && !getEmail() ? '<h2>Loading...</h2>' : ItemPicker({
-              id: `step-${ ID }-email-picker`,
-              noneSelected: 'Search for an email...',
-              selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
-              multiple: false,
-              fetchOptions: (search) => {
-                return EmailsStore.fetchItems({ search }).
-                  then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
-              },
-              onChange: item => {
-
-                email_id = item ? item.id : false
-
-                Funnel.updateStepMeta({
-                  email_id,
-                })
-
-                // Timout to avoid JS errors
-                setTimeout(() => {
-                  morphPreview()
-                }, 10)
-              },
-              style: {
-                minWidth: '50%',
-              },
-            }),
+            email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker,
             Div({
               className: 'display-flex',
             }, [
@@ -970,16 +972,6 @@
             style: {
               width: '100%',
               height: '500px',
-            },
-            onLoad: e => {
-              // e.target.contentDocument.body.style.padding = '20px'
-            },
-            onCreate: frame => {
-              // setTimeout(() => {
-              //   // frame = document.getElementById(frameId)
-              //   // frame.contentDocument.body.style.padding = '20px'
-              //   // setFrameContent(frame, getEmail().context.built)
-              // }, 100)
             },
           }, getEmail().context.built) : Div({
             className: 'skeleton-loading',
