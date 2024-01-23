@@ -6,7 +6,93 @@ use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\maybe_implode_in_quotes;
-use function Groundhogg\preg_quote_except;
+
+class Join {
+	// Left or Right
+	public string $table = '';
+	public string $alias = '';
+	public string $direction = '';
+	public Query $query;
+	public Where $conditions;
+
+	/**
+	 * Create a new JOIN
+	 *
+	 * @throws \Exception
+	 *
+	 * @param array|string|DB $maybe_table
+	 * @param Query           $query
+	 * @param string          $direction
+	 */
+	public function __construct( string $direction, $maybe_table, Query $query ) {
+
+		if ( is_string( $maybe_table ) && get_db( $maybe_table ) ) {
+			$table = get_db( $maybe_table )->table_name;
+			$alias = get_db( $maybe_table )->alias;
+		} else if ( is_a( $maybe_table, DB::class ) ) {
+			$table = $maybe_table->table_name;
+			$alias = $maybe_table->alias;
+		} else if ( is_array( $maybe_table ) && count( $maybe_table ) === 2 ) {
+			[ 0 => $table, 1 => $alias ] = $maybe_table;
+		} else if ( is_string( $maybe_table ) ) {
+			$table = $maybe_table;
+			$alias = str_replace( $query->db->prefix, '', $table );
+		} else if ( is_a( $maybe_table, Query::class ) ) {
+			$table = $maybe_table;
+			$alias = uniqid( 'join_' );
+		} else {
+			throw new \Exception( 'Invalid table specified for join clause' );
+		}
+
+		$this->direction  = $direction;
+		$this->table      = trim( "$table" );
+		$this->alias      = $alias;
+		$this->query      = $query;
+		$this->conditions = new Where( $this->query, 'AND' );
+	}
+
+	/**
+	 * Adds an a.column = b.column condition
+	 *
+	 * @param string $a
+	 * @param string $b
+	 *
+	 * @return Where
+	 */
+	public function onColumn( string $a, string $b = '' ): Where {
+
+		// Assume primary key for simplicity
+		if ( empty( $b ) ) {
+			$b = "{$this->query->alias}.{$this->query->table->primary_key}";
+		}
+
+		if ( ! Query::isAliased( $b ) ) {
+			$b = "{$this->query->alias}.$b";
+		}
+
+		$this->conditions->addCondition( "$this->alias.$a = $b" );
+
+		return $this->conditions;
+	}
+
+	public function __toString(): string {
+
+		if ( str_starts_with( $this->table, 'SELECT' ) ) {
+			return "$this->direction JOIN ( $this->table ) $this->alias ON $this->conditions";
+		}
+
+		return "$this->direction JOIN $this->table $this->alias ON $this->conditions";
+	}
+
+	public function __serialize(): array {
+		return [
+			'table_name' => $this->table,
+			'alias'      => $this->alias,
+			'direction'  => $this->direction,
+			'where'      => $this->conditions
+		];
+	}
+}
 
 class Where {
 
@@ -15,35 +101,28 @@ class Where {
 	 *
 	 * @var string[]|Where[]
 	 */
-	protected $conditions = [];
-
-	/**
-	 * List of having statements
-	 *
-	 * @var string[]
-	 */
-	protected $havingConditions = [];
+	protected array $conditions = [];
 
 	/**
 	 * How the clauses are evaluated ion relation to each other
 	 *
-	 * @var mixed|string
+	 * @var string
 	 */
-	protected $relation = 'AND';
+	protected string $relation = 'AND';
 
 	/**
 	 * The query this Where is attached to
 	 *
 	 * @var Query
 	 */
-	protected $query;
+	protected Query $query;
 
 	/**
 	 * The main table for the current query
 	 *
 	 * @var DB
 	 */
-	protected $table;
+	protected DB $table;
 
 	/**
 	 * Whether this clause should be negated, NOT ( ... )
@@ -97,14 +176,11 @@ class Where {
 		$this->parentRelation = $parentRelation;
 	}
 
-	public function addHavingCondition( $condition ) {
-		if ( empty( $condition ) ) {
-			return $this;
-		}
-
-		$this->havingConditions[] = $condition;
-
-		return $this;
+	public function __serialize(): array {
+		return [
+			'relation'   => $this->relation,
+			'conditions' => $this->conditions
+		];
 	}
 
 	/**
@@ -126,17 +202,6 @@ class Where {
 	}
 
 	/**
-	 * Check if the column has been aliased already
-	 *
-	 * @param $column
-	 *
-	 * @return bool
-	 */
-	protected function isAliased( $column ) {
-		return str_contains( $column, '.' );
-	}
-
-	/**
 	 * Sanitize a column
 	 *
 	 * @param $column
@@ -144,19 +209,8 @@ class Where {
 	 * @return string
 	 */
 	protected function sanitize_column( $column ) {
-
-		$aggregate_functions = [
-			'COALESCE',
-			'DATE',
-		];
-
-		$aggregate_functions_regex = implode( '\(|', $aggregate_functions ) . '\(';
-
-		if ( preg_match( "/$aggregate_functions_regex/i", $column ) ){
-			return $this->query->sanitize_aggregate_column( $column );
-		}
-
-		return $this->query->sanitize_column( $column );
+		// It'll check anyway *shrug*
+		return $this->query->maybe_sanitize_aggregate_column( $column );
 	}
 
 	/**
@@ -170,7 +224,7 @@ class Where {
 	public function getColumnFormat( $column, $value = false ) {
 		$column_formats = $this->table->get_columns();
 
-		if ( $this->isAliased( $column ) ) {
+		if ( Query::isAliased( $column ) ) {
 			$column = substr( $column, strpos( $column, '.' ) + 1 );
 		}
 
@@ -188,10 +242,16 @@ class Where {
 			return '';
 		}
 
-		if ( count( $this->conditions ) > 1 ) {
-			$conditions = '(' . implode( " $this->relation ", $this->conditions ) . ')';
-		} else {
-			$conditions = "{$this->conditions[0]}";
+		$conditions = array_filter( array_map( function ( $condition ) {
+			return "$condition";
+		}, $this->conditions ) );
+
+		$numConditions = count( $conditions );
+
+		$conditions = implode( " $this->relation ", $conditions );
+
+		if ( $numConditions > 1 ) {
+			$conditions = "( $conditions )";
 		}
 
 		if ( $this->negate ) {
@@ -444,6 +504,14 @@ class Where {
 		return $this->compare( $column, '', '!=' );
 	}
 
+	public function isNotNull( $column ) {
+		$column = $this->sanitize_column( $column );
+
+		$this->addCondition( "$column IS NOT NULL" );
+
+		return $this;
+	}
+
 	public function empty( $column ) {
 		return $this->compare( $column, '' );
 	}
@@ -512,24 +580,53 @@ class Query {
 		}
 
 		global $wpdb;
-		$this->db = $wpdb;
-//		$this->orderby    = $table->get_primary_key();
+		$this->db         = $wpdb;
 		$this->table      = $table;
 		$this->table_name = $table->table_name;
 		$this->alias      = $table->alias;
 		$this->where      = new Where( $this );
+		$this->select     = "$this->alias.*";
 	}
 
 	public function __get( $name ) {
 		return $this->$name;
 	}
 
+	/**
+	 * Set the LIMIT
+	 *
+	 * @param ...$limits
+	 *
+	 * @return $this
+	 */
 	public function setLimit( ...$limits ) {
-		$this->limits = wp_parse_id_list( $limits );
+		$this->limits = array_filter( wp_parse_id_list( $limits ) );
+
+		return $this;
 	}
 
+	/**
+	 * Set the OFFSET
+	 *
+	 * @param $offset
+	 *
+	 * @return $this
+	 */
 	public function setOffset( $offset ) {
 		$this->offset = absint( $offset );
+
+		return $this;
+	}
+
+	/**
+	 * Replace anything that can't be used as an SQL column key name
+	 *
+	 * @param $column
+	 *
+	 * @return array|string|string[]|null
+	 */
+	protected function _sanitize_column_key( $column ) {
+		return preg_replace( '/[^A-Za-z0-9_.]/', '', $column );
 	}
 
 	/**
@@ -541,6 +638,10 @@ class Query {
 	 */
 	public function sanitize_column( $maybe_column ) {
 
+		if ( $maybe_column === '*' ) {
+			return $maybe_column;
+		}
+
 		// Standard column
 		if ( $this->table->has_column( $maybe_column ) ) {
 			return "$this->alias.$maybe_column";
@@ -548,14 +649,14 @@ class Query {
 
 		// Probably an aliased column
 		if ( str_contains( $maybe_column, '.' ) ) {
-			$alias  = sanitize_key( substr( $maybe_column, 0, strpos( $maybe_column, '.' ) ) );
-			$column = sanitize_key( substr( $maybe_column, strpos( $maybe_column, '.' ) + 1 ) );
+			$alias  = $this->_sanitize_column_key( substr( $maybe_column, 0, strpos( $maybe_column, '.' ) ) );
+			$column = $this->_sanitize_column_key( substr( $maybe_column, strpos( $maybe_column, '.' ) + 1 ) );
 
 			return "$alias.$column";
 		}
 
 		// Should be a column
-		return sanitize_key( $maybe_column );
+		return $this->_sanitize_column_key( $maybe_column );
 	}
 
 	/**
@@ -565,69 +666,92 @@ class Query {
 	 *
 	 * @return string
 	 */
-	public function sanitize_aggregate_column( $maybe_column ) {
+	public function maybe_sanitize_aggregate_column( $maybe_column ) {
 
-		$aggregate_functions = [
-			'COUNT(%s)',
-			'SUM(%s)',
-			'AVG(%s)',
-			'COALESCE(%s)',
-			'DATE(FROM_UNIXTIME(%s))'
-		];
-
-		if ( in_array( $maybe_column, [ 'COUNT(*)', 'COUNT(ID)' ] ) ){
-			return $maybe_column;
+		if ( ! preg_match( "/(COALESCE|COUNT|CAST|SUM|AVG|DATE)\(/i", $maybe_column ) ) {
+			return $this->sanitize_column( $maybe_column );
 		}
 
-		foreach ( $aggregate_functions as $aggregate_function ) {
+		$column_regex = '([A-Za-z0-9_\.]+)';
 
-			$aggregate_function_regex = sprintf( preg_quote_except( $aggregate_function ), '([.a-z,0-9_\-]+)' );
+		$aggregate_functions = [
+			"/COUNT\(((?:[A-Za-z0-9_.]+)|\*)\)/i"                              => function ( $matches ) {
+				return sprintf( "COUNT(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/SUM\($column_regex\)/i"                                          => function ( $matches ) {
+				return sprintf( "SUM(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/AVG\($column_regex\)/i"                                          => function ( $matches ) {
+				return sprintf( "AVG(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/COALESCE\($column_regex,\s*(?:'|\")?(\w+)(?:'|\")?\)/i"          => function ( $matches ) {
+				$column = $this->sanitize_column( $matches[1] );
+				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
 
-			if ( ! preg_match( "/$aggregate_function_regex/i", $maybe_column, $matches ) ) {
-				continue;
+				return $this->db->prepare( "COALESCE($column, $format)", $matches[2] );
+			},
+			"/CAST\($column_regex as (SIGNED|UNSIGNED|DATE|TIME|DATETIME)\)/i" => function ( $matches ) {
+				return sprintf( "CAST(%s as %s)", $this->sanitize_column( $matches[1] ), strtoupper( $matches[2] ) );
+			},
+			"/DATE\(FROM_UNIXTIME\($column_regex\)\)/i"                        => function ( $matches ) {
+				return sprintf( "DATE(FROM_UNIXTIME(%s))", $this->sanitize_column( $matches[1] ) );
+			},
+		];
+
+		foreach ( $aggregate_functions as $aggregate_regex => $callback ) {
+
+			$column = preg_replace_callback( $aggregate_regex, $callback, $maybe_column, 1, $count );
+
+			if ( $count ) {
+				return $column;
 			}
-
-			$args   = array_map( 'trim', explode( ',', $matches[1] ) );
-			$column = $args[0];
-			unset( $args[0] );
-
-			$column = $this->sanitize_column( $column );
-
-			if ( empty( $args ) ){
-				return sprintf( $aggregate_function, $column );
-			}
-
-			$formats = implode( ', ', array_map( function ( $arg ){
-				return is_numeric( $arg ) ? '%d' : '%s';
-			}, $args ) );
-
-			return $this->db->prepare( sprintf( $aggregate_function, $column . ', ' . $formats ), ...$args );
 		}
 
 		return $this->sanitize_column( $maybe_column );
 	}
 
+	/**
+	 * Set the GROUP BY
+	 *
+	 * @param ...$columns
+	 *
+	 * @return $this
+	 */
 	public function setGroupby( ...$columns ) {
 		$columns = array_map( function ( $col ) {
-
-			if ( $col === '*' ) {
-				return $col;
-			}
-
 			return $this->sanitize_column( $col );
-
 		}, $columns );
 
 		$this->groupby = implode( ', ', $columns );
+
+		return $this;
 	}
 
+	/**
+	 * SET THE ORDER BY
+	 *
+	 * @param $orderby
+	 *
+	 * @return $this
+	 */
 	public function setOrderby( $orderby ) {
-		$this->orderby = $this->sanitize_column( $orderby );
+		$this->orderby = $this->maybe_sanitize_aggregate_column( $orderby );
+
+		return $this;
 	}
 
+	/**
+	 * Set the order to ASC or DESC
+	 *
+	 * @param $order
+	 *
+	 * @return $this
+	 */
 	public function setOrder( $order ) {
 		$order       = strtoupper( $order );
 		$this->order = $order === 'ASC' ? 'ASC' : 'DESC';
+
+		return $this;
 	}
 
 	/**
@@ -635,7 +759,7 @@ class Query {
 	 *
 	 * @param ...$columns
 	 *
-	 * @return void
+	 * @return Query
 	 */
 	public function setSelect( ...$columns ) {
 
@@ -657,7 +781,7 @@ class Query {
 				// Fix case
 				$col = preg_replace( '/ as /i', ' as ', $col );
 				[ 0 => $aggregate, 1 => $alias ] = explode( ' as ', $col );
-				$aggregate = $this->sanitize_aggregate_column( $aggregate );
+				$aggregate = $this->maybe_sanitize_aggregate_column( $aggregate );
 				$alias     = $this->sanitize_column( $alias );
 
 				return "$aggregate as $alias";
@@ -665,21 +789,32 @@ class Query {
 
 			if ( is_array( $col ) && count( $col ) == 2 ) {
 				[ 0 => $aggregate, 1 => $alias ] = $col;
-				$aggregate = $this->sanitize_aggregate_column( $aggregate );
+				$aggregate = $this->maybe_sanitize_aggregate_column( $aggregate );
 				$alias     = $this->sanitize_column( $alias );
 
 				return "$aggregate as $alias";
 			}
 
-			return $this->sanitize_aggregate_column( $col );
+			return $this->maybe_sanitize_aggregate_column( $col );
 
 		}, $columns );
 
 		$this->select = implode( ', ', $columns );
+
+		return $this;
 	}
 
-	public function setFoundRows( $val ) {
-		$this->found_rows = boolval( $val );
+	/**
+	 * Set SQL_FOUND_ROWS maybe
+	 *
+	 * @param bool $val
+	 *
+	 * @return $this
+	 */
+	public function setFoundRows( bool $val ) {
+		$this->found_rows = $val;
+
+		return $this;
 	}
 
 	protected function _select() {
@@ -688,6 +823,17 @@ class Query {
 
 	protected function _table_name() {
 		return $this->table_name . ' ' . $this->alias;
+	}
+
+	/**
+	 * Check if the column has been aliased already
+	 *
+	 * @param $column
+	 *
+	 * @return bool
+	 */
+	public static function isAliased( $column ) {
+		return str_contains( $column, '.' );
 	}
 
 	protected function _alias() {
@@ -708,7 +854,7 @@ class Query {
 	}
 
 	protected function _limit() {
-		$limits = implode( ', ', $this->limits );
+		$limits = trim( implode( ', ', $this->limits ) );
 
 		return ! empty( $this->limits ) ? "LIMIT $limits" : '';
 	}
@@ -798,16 +944,34 @@ class Query {
 	}
 
 	/**
+	 * Add a join
+	 *
+	 * @throws \Exception
+	 *
+	 * @param $table
+	 * @param $direction
+	 *
+	 * @return Join
+	 */
+	public function addJoin( $direction, $table ) {
+		$join                        = new Join( $direction, $table, $this );
+		$this->joins[ $join->alias ] = $join;
+
+		return $join;
+	}
+
+	/**
 	 * Left join an external table that's not always a GH DB
 	 *
-	 * @param $table_name array|string array if also passing alias
-	 * @param $on         mixed the column to join on
-	 * @param $primary_on string the column of the primary table to join on
-	 * @param $joinOnce   bool|string true if the table should not be joined more than once, string to only join for specific keys, for example a meta key
+	 * @param        $direction  string the direction of the join LEFT or RIGHT
+	 * @param        $table_name array|string array if also passing alias
+	 * @param        $on         mixed the column to join on
+	 * @param        $primary_on string the column of the primary table to join on
+	 * @param        $joinOnce   bool|string true if the table should not be joined more than once, string to only join for specific keys, for example a meta key
 	 *
 	 * @return string the alias of the table
 	 */
-	public function leftJoinExternalTable( $table_name, $on, $primary_on = '', $joinOnce = false ) {
+	public function joinExternalTable( string $direction, $table_name, $on, $primary_on = '', $joinOnce = false ): string {
 
 		if ( empty( $primary_on ) ) {
 			$primary_on = $this->table->primary_key;
@@ -821,7 +985,7 @@ class Query {
 			$alias = str_replace( $this->db->prefix, $table_name, $table_name );
 		}
 
-		$join = "LEFT JOIN $table_name $alias ON $this->alias.$primary_on = $alias.$on";
+		$join = "$direction JOIN $table_name $alias ON $this->alias.$primary_on = $alias.$on";
 
 		// Already joined this table
 		if ( $joinOnce === true && in_array( $join, $this->joins ) ) {
@@ -836,7 +1000,7 @@ class Query {
 		$i = 0;
 		while ( in_array( $join, $this->joins ) ) {
 			$i ++;
-			$join = "LEFT JOIN $table_name $alias$i ON $this->alias.$primary_on = $alias$i.$on";
+			$join = "$direction JOIN $table_name $alias$i ON $this->alias.$primary_on = $alias$i.$on";
 		}
 
 		if ( $i > 0 ) {
@@ -860,17 +1024,18 @@ class Query {
 	 *
 	 * @return string
 	 */
-	public function leftJoinTable( DB $table, $on, string $primary_on = '', $joinOnce = false ) {
-		return $this->leftJoinExternalTable( [ $table->table_name, $table->alias ], $on, $primary_on, $joinOnce );
+	public function leftJoinTable( DB $table, $on, string $primary_on = '', $joinOnce = false ): string {
+		return $this->joinExternalTable( 'LEFT', [ $table->table_name, $table->alias ], $on, $primary_on, $joinOnce );
 	}
-
-	protected static $metaJoinSuffix = 0;
 
 	/**
 	 *
-	 * @param string       $meta_key
+	 * @throws \Exception
+	 *
 	 * @param bool         $table
 	 * @param string|array $on
+	 *
+	 * @param string       $meta_key
 	 *
 	 * @return string
 	 */
@@ -914,9 +1079,9 @@ class Query {
 			return $meta_table_alias;
 		}
 
-		$join = $this->db->prepare( "LEFT JOIN $table_name $meta_table_alias ON {$this->alias}.$table_id_col = $meta_table_alias.$meta_id_col AND $meta_table_alias.meta_key = %s", $meta_key );
-
-		$this->joins[ $meta_table_alias ] = $join;
+		$join = $this->addJoin( 'LEFT', [ $table_name, $meta_table_alias ] );
+		$join->onColumn( $meta_id_col, "$this->alias.$table_id_col" );
+		$join->conditions->equals( "$meta_table_alias.meta_key", $meta_key );
 
 		return $meta_table_alias;
 	}
@@ -996,6 +1161,20 @@ class Query {
 		return $result;
 	}
 
+	public function __serialize(): array {
+		return [
+			$this->select,
+			$this->joins,
+			$this->alias,
+			$this->where,
+			$this->limits,
+			$this->offset,
+			$this->order,
+			$this->orderby,
+			$this->groupby
+		];
+	}
+
 	/**
 	 * Get the cache key for the current query
 	 *
@@ -1003,18 +1182,8 @@ class Query {
 	 *
 	 * @return string
 	 */
-	protected function cache_key( $method ) {
-		return $method . ":" . md5( serialize( [
-				$this->select,
-				$this->joins,
-				$this->alias,
-				$this->_where(),
-				$this->limits,
-				$this->offset,
-				$this->order,
-				$this->orderby,
-				$this->groupby
-			] ) );
+	protected function create_cache_key( $method ) {
+		return $method . ":" . md5( serialize( $this ) );
 	}
 
 	/**
@@ -1045,8 +1214,12 @@ class Query {
 	 */
 	public function get_results() {
 
-		$cache_key = $this->cache_key( __METHOD__ );
+		/**
+		 * Before getting the results from a specific query
+		 */
+		do_action_ref_array( 'groundhogg/query/pre_get_results', [ $this ] );
 
+		$cache_key   = $this->create_cache_key( __METHOD__ );
 		$cache_value = $this->table->cache_get( $cache_key, $found );
 
 		if ( $found ) {
@@ -1085,6 +1258,7 @@ class Query {
 	 */
 	public function count() {
 		$this->setSelect( "COUNT(*)" );
+		$this->setFoundRows( false );
 
 		return absint( $this->get_var() );
 	}
@@ -1096,7 +1270,7 @@ class Query {
 	 */
 	public function get_var() {
 
-		$cache_key = $this->cache_key( __METHOD__ );
+		$cache_key = $this->create_cache_key( __METHOD__ );
 
 		$cache_value = $this->table->cache_get( $cache_key, $found );
 
@@ -1108,6 +1282,7 @@ class Query {
 			$this->_select(),
 			$this->_joins(),
 			$this->_where(),
+//			$this->_groupby(),
 		];
 
 		$result = $this->db->get_var( implode( ' ', $query ) );
