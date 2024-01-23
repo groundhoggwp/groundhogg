@@ -1140,11 +1140,35 @@ abstract class DB {
 	protected $query_filters;
 
 	protected function maybe_register_filters() {
+
 		if ( $this->query_filters ) {
 			return;
 		}
 
 		$filters = new Query_Filters();
+
+		// Campaigns filter
+		$filters->register( 'campaigns', function ( $filter, Where $where ) {
+
+			$filter = wp_parse_args( $filter, [
+				'campaigns' => [],
+			] );
+
+			$campaigns = wp_parse_id_list( $filter['campaigns'] );
+
+			foreach ( $campaigns as $campaign ) {
+
+				$join = $where->query->addJoin( 'LEFT', [ get_db( 'object_relationships' )->table_name, 'campaign_' . $campaign ] );
+				$join->onColumn( 'primary_object_id' )
+				     ->equals( "$join->alias.primary_object_type", $this->get_object_type() )
+				     ->equals( "$join->alias.secondary_object_type", 'campaign' )
+				     ->equals( "$join->alias.secondary_object_id", $campaign );
+
+				$where->equals( "$join->alias.secondary_object_id", $campaign );
+			}
+
+			$where->query->setGroupby( 'ID' );
+		} );
 
 		foreach ( $this->get_columns() as $column => $format ) {
 
@@ -1207,16 +1231,16 @@ abstract class DB {
 			'operation'      => 'SELECT',
 			'data'           => [],
 			'where'          => [],
-			'limit'          => false,
-			'offset'         => false,
+//			'limit'          => false,
+//			'offset'         => false,
 			'orderby'        => $this->get_primary_key(),
 			'search_columns' => $this->get_searchable_columns(),
 			'order'          => 'desc', // ASC || DESC
-			'select'         => '*',
-			'search'         => false,
-			'func'           => false, // COUNT | AVG | SUM
-			'groupby'        => false,
-			'meta_query'     => [],
+//			'select'         => '*',
+//			'search'         => false,
+//			'func'           => false, // COUNT | AVG | SUM
+//			'groupby'        => false,
+//			'meta_query'     => [],
 			'found_rows'     => false,
 		] );
 
