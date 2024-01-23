@@ -9,12 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
+use function Groundhogg\_nf;
 use function Groundhogg\array_find;
-use function Groundhogg\array_map_with_keys;
 use function Groundhogg\get_db;
 
 class Reports_Api extends Base_Api {
@@ -65,9 +65,81 @@ class Reports_Api extends Base_Api {
 			'exclude_filters' => $report['exclude_filters']
 		] );
 
+		try {
+			// Attempt to do it the modern way
+
+			switch ( $report['type'] ) {
+				case 'pie_chart':
+				case 'table':
+
+					$alias = $query->joinMeta( $report['field'] );
+					$query->setSelect( [ "$alias.meta_value", 'value' ], [ 'COUNT(*)', 'total' ] );
+					$query->where()->isNotNull( "$alias.meta_value" );
+					$query->setGroupby( 'value' );
+					$query->setOrderby( 'total' );
+					$records = $query->get_results();
+
+					foreach ( $records as &$record ) {
+						$record->value = maybe_unserialize( $record->value );
+						$record->count = $report['type'] === 'table' ? _nf( $record->total ) : $record->total;
+					}
+
+					return $records;
+
+				case 'number':
+
+					switch ( $report['value'] ) {
+						case 'activity':
+
+							$activityJoin = $query->addJoin( 'RIGHT', 'activity' );
+							$activityJoin->onColumn( 'contact_id' );
+							$activityJoin->conditions->equals( 'activity_type', $report['activity'] );
+
+							return number_format_i18n( $query->count() );
+
+						case 'distinct':
+
+							$alias = $query->joinMeta( $report['field'] );
+							$query->setSelect( [ "$alias.meta_value", 'value' ] );
+							$query->setGroupby( 'value' );
+							$records = $query->get_results();
+
+							return number_format_i18n( count( $records ) );
+
+						case 'sum':
+							$alias = $query->joinMeta( $report['field'] );
+							$query->setSelect( [ "SUM($alias.meta_value)", 'value' ] );
+							$result = $query->get_var();
+
+							return number_format_i18n( $result );
+
+						case 'average':
+							$alias = $query->joinMeta( $report['field'] );
+							$query->setSelect( [ "AVG($alias.meta_value)", 'value' ] );
+							$result = $query->get_var();
+
+							return number_format_i18n( $result );
+
+						default:
+						case 'contacts':
+							return number_format_i18n( $query->count() );
+					}
+			}
+
+
+		} catch ( \Exception $exception ) {
+
+			// Reset the query
+			$query = new Contact_Query( [
+				'filters'         => $report['filters'],
+				'exclude_filters' => $report['exclude_filters']
+			] );
+		}
+
 		switch ( $report['type'] ) {
 			case 'pie_chart':
 			case 'table':
+
 				$query->set_query_var( 'select', 'ID' );
 				$sql = $query->get_sql();
 
@@ -216,7 +288,7 @@ class Reports_Api extends Base_Api {
 	}
 
 	/**
-	 * Verify the reporting dat is valid
+	 * Verify the reporting data is valid
 	 *
 	 * @param $param
 	 * @param $request
@@ -236,6 +308,7 @@ class Reports_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
+
 		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
 		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 
