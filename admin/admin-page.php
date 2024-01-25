@@ -455,6 +455,9 @@ abstract class Admin_Page extends Supports_Errors {
 
 		$this->has_table_filters = true;
 
+		$filters = get_url_var( 'include_filters', base64_json_encode( [] ) );
+		$filters = base64_json_decode( $filters );
+
 		wp_enqueue_style( 'groundhogg-admin-search-filters' );
 
 		wp_enqueue_script( 'groundhogg-admin-filters' );
@@ -462,7 +465,7 @@ abstract class Admin_Page extends Supports_Errors {
 		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( [
 				'id'      => 'table-filters',
 				'name'    => $this->get_name(),
-				'filters' => base64_json_decode( get_url_var( 'include_filters', base64_json_encode( [] ) ) ),
+				'filters' => $filters,
 			], $columns ) ), 'before' );
 
 	}
