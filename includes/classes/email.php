@@ -734,14 +734,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Temp array to store a map if the original link to the tracking link
-	 * For sanitization later
-	 *
-	 * @var array
-	 */
-	protected $tracking_link_map = [];
-
-	/**
 	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
 	 *
 	 * @param $matches
@@ -766,9 +758,13 @@ class Email extends Base_Object_With_Meta {
 			$clean_url = preg_replace( "@https?://$regex@", '', $clean_url );
 		}
 
-		// Save to link map...
-		$tracking_link                         = trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) );
-		$this->tracking_link_map[ $clean_url ] = $tracking_link;
+		// Tracking link does not support empty
+		// "/" sends it to the homepage.
+		if ( empty( $clean_url ) ) {
+			$clean_url = '/';
+		}
+
+		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
 
 		return $matches[1] . $tracking_link . $matches[3];
 	}
