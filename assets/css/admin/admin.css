@@ -731,6 +731,7 @@ label.block {
   justify-content: center;
 }
 
+.include-search-filters,
 #funnel-include-filters,
 #broadcast-include-filters,
 #block-include-filters,
@@ -741,6 +742,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+.include-search-filters::after,
 #funnel-include-filters::after,
 #broadcast-include-filters::after,
 #block-include-filters::after,
@@ -757,6 +759,7 @@ label.block {
   width: max-content;
 }
 
+.exclude-search-filters,
 #funnel-exclude-filters,
 #broadcast-exclude-filters,
 #block-exclude-filters,
@@ -767,6 +770,7 @@ label.block {
   position: relative;
   margin-top: 20px;
 }
+.exclude-search-filters::after,
 #funnel-exclude-filters::after,
 #broadcast-exclude-filters::after,
 #block-exclude-filters::after,
