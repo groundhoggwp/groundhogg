@@ -5,7 +5,6 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Contact_Query;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\Ymd_His;
 
 class Total_New_Contacts extends Base_Quick_Stat {
 
@@ -16,8 +15,8 @@ class Total_New_Contacts extends Base_Quick_Stat {
 					[
 						'type'       => 'date_created',
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				]
 			] )

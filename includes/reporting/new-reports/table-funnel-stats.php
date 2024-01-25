@@ -3,7 +3,7 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
@@ -32,7 +32,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 		$data = [];
 
-		$query = new Query( 'events' );
+		$query = new Table_Query( 'events' );
 
 		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
 		      ->setGroupby( 'step_id' )
@@ -44,7 +44,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 		$completed_results = $query->get_results();
 
-		$query = new Query( 'event_queue' );
+		$query = new Table_Query( 'event_queue' );
 
 		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
 		      ->setGroupby( 'step_id' )

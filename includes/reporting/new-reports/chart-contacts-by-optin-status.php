@@ -2,14 +2,14 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
 
 class Chart_Contacts_By_Optin_Status extends Base_Doughnut_Chart_Report {
 
 	protected function get_chart_data() {
 
-		$query = new Query( 'contacts' );
+		$query = new Table_Query( 'contacts' );
 		$query->setSelect( 'optin_status', [ 'COUNT(ID)', 'total' ] );
 		$query->where()->greaterThanEqualTo( 'date_created', $this->startDate->ymdhis() );
 		$query->where()->lessThanEqualTo( 'date_created', $this->endDate->ymdhis() );

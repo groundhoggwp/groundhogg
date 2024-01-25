@@ -2,8 +2,8 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use function Groundhogg\html;
 use function Groundhogg\percentage;
-use function Sodium\compare;
 
 abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 
@@ -47,9 +47,14 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 		// Get arrow props
 		$arrow = $this->get_arrow_properties( $current_percentage, $compare_percentage );
 
+		$output = esc_html( number_format_i18n( $current_percentage ) . '%' );
+
 		return [
 			'type'    => 'quick_stat',
-			'number'  => esc_html( number_format_i18n( $current_percentage ) . '%' ),
+			'number' => $this->get_link() ? html()->e( 'a', [
+				'href'   => $this->get_link(),
+				'target' => '_blank'
+			], $output, false ) : $output,
 			'compare' => [
 				'arrow'   => [
 					'direction' => $arrow['direction'],

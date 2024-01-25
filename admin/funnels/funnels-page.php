@@ -3,7 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Plugin;
@@ -227,7 +227,7 @@ class Funnels_Page extends Admin_Page {
 		            ],
 	            ] );
 
-                $query = new Query( 'funnels' );
+	            $query = new Table_Query( 'funnels' );
                 $query->setSelect( 'DISTINCT author' );
                 $results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
 

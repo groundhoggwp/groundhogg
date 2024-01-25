@@ -3,7 +3,7 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Broadcast;
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\percentage;
 
@@ -16,7 +16,7 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	 */
 	protected function get_send_email_steps() {
 
-		$query = new Query( 'broadcasts' );
+		$query = new Table_Query( 'broadcasts' );
 		$query->where( 'status', 'sent' )
 		      ->equals( 'object_type', 'email' )
 		      ->greaterThanEqualTo( 'send_time', $this->start )
@@ -30,7 +30,7 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 
 	protected function get_table_data() {
 
-		$query = new Query( 'broadcasts' );
+		$query = new Table_Query( 'broadcasts' );
 		$query->where( 'status', 'sent' )
 		      ->equals( 'object_type', 'email' )
 		      ->greaterThanEqualTo( 'send_time', $this->start )

@@ -2,7 +2,7 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
@@ -50,7 +50,7 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 		$datasets = [];
 		$labels   = [];
 
-		$query = new Query( 'events' );
+		$query = new Table_Query( 'events' );
 
 		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
 		      ->setGroupby( 'step_id' )

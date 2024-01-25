@@ -2,10 +2,9 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\DB\Query\Table_Query;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\get_db;
-use function Groundhogg\Ymd_His;
 
 class Total_Active_Contacts extends Base_Quick_Stat {
 
@@ -16,8 +15,8 @@ class Total_Active_Contacts extends Base_Quick_Stat {
 					[
 						'type'       => 'was_active',
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				]
 			] )
@@ -34,31 +33,12 @@ class Total_Active_Contacts extends Base_Quick_Stat {
 	 */
 	protected function query( $start, $end ) {
 
-		$count = get_db( 'activity' )->count( [
-			'select'   => 'contact_id',
-			'distinct' => true,
-			'where'    => [
-				'relationship' => 'AND',
-				// Start
-				[
-					'col'     => 'timestamp',
-					'val'     => $start,
-					'compare' => '>='
-				],
-				// END
-				[
-					'col'     => 'timestamp',
-					'val'     => $end,
-					'compare' => '<='
-				],
-				[
-					'col'     => 'activity_type',
-					'val'     => 'email_opened',
-					'compare' => '='
-				]
-			]
-		] );
+		$query = new Table_Query( 'activity' );
+		$query->setSelect( [ 'COUNT(DISTINCT(contact_id))', 'unique_contacts' ] );
+		$query->where()
+		      ->greaterThanEqualTo( 'timestamp', $start )
+		      ->lessThanEqualTo( 'timestamp', $end );
 
-		return $count;
+		return $query->get_var();
 	}
 }

@@ -2,14 +2,10 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use Groundhogg\Funnel;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\Ymd_His;
 
 class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 
@@ -22,8 +18,8 @@ class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 						'funnel_id'  => $this->get_funnel()->ID,
 						'status'     => 'complete',
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				]
 			] )
