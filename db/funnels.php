@@ -105,7 +105,7 @@ class Funnels extends DB {
 
 		// Date last updated
 		$this->query_filters->register( 'last_updated', function ( $filter, $where ) {
-			Query_Filters::mysqlDateTime( 'last_updated', $filter, $where );
+			Filters::mysqlDateTime( 'last_updated', $filter, $where );
 		} );
 	}
 

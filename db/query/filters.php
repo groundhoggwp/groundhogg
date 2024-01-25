@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\DB;
+namespace Groundhogg\DB\Query;
 
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\base64_json_decode;
@@ -15,7 +15,7 @@ class FilterException extends \Exception {
 /**
  * Holder class for common filters
  */
-class Query_Filters {
+class Filters {
 
 	/**
 	 * Registered filters
@@ -75,7 +75,7 @@ class Query_Filters {
 			throw new FilterException( sprintf( "%s does not have a valid callback", $type ) );
 		}
 
-		return call_user_func( $handler['filter_callback'], $filter, $where );
+		return call_user_func( $handler['filter_callback'], $filter, $where, $where->query );
 	}
 
 	/**
@@ -393,6 +393,21 @@ class Query_Filters {
 			'value'   => 0
 		] );
 
+		// Convert to float or int to be on the safe side
+		if ( is_string( $value ) ){
+			if ( str_contains( $value, ',' ) ){
+				$value = floatval( $value );
+			} else {
+				$value = intval( $value );
+			}
+		}
+
+		if ( is_float( $value ) ){
+			$where->setColumnFormat( $column, '%f' );
+		} else {
+			$where->setColumnFormat( $column, '%d' );
+		}
+
 		switch ( $compare ) {
 			default:
 			case 'equals':
@@ -435,7 +450,7 @@ class Query_Filters {
 		}
 
 		$alias = $where->query->joinMeta( sanitize_key( $filter['meta'] ) );
-		Query_Filters::string( "$alias.meta_value", $filter, $where );
+		Filters::string( "$alias.meta_value", $filter, $where );
 	}
 
 	/**
@@ -473,7 +488,7 @@ class Query_Filters {
 	 *
 	 * @return void
 	 */
-	public static function custom_field_has_all_seclected( $column, $filter, Where $where ) {
+	public static function custom_field_has_all_selected( $column, $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'compare' => 'all_in',
@@ -519,6 +534,8 @@ class Query_Filters {
 		] );
 
 		$value = sanitize_text_field( $value );
+
+		$where->setColumnFormat( $column, '%s' );
 
 		switch ( $compare ) {
 			default:

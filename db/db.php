@@ -4,6 +4,8 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\DB\Query\FilterException;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
@@ -1135,7 +1137,7 @@ abstract class DB {
 	}
 
 	/**
-	 * @var Query_Filters
+	 * @var Filters
 	 */
 	protected $query_filters;
 
@@ -1145,7 +1147,45 @@ abstract class DB {
 			return;
 		}
 
-		$filters = new Query_Filters();
+		$filters = new Filters();
+
+		foreach ( $this->get_columns() as $column => $format ) {
+
+			switch ( $format ) {
+				case '%s':
+
+					if ( str_starts_with( $column, 'date' ) ) {
+
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+							Filters::mysqlDateTime( $column, $filter, $where );
+						} );
+
+						break;
+					}
+
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+						Filters::string( $column, $filter, $where );
+					} );
+
+					break;
+				case '%d':
+
+					if ( in_array( $column, [ 'time', 'timestamp', 'time_scheduled' ] ) ) {
+
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+							Filters::timestamp( $column, $filter, $where );
+						} );
+
+						break;
+					}
+
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+						Filters::number( $column, $filter, $where );
+					} );
+					break;
+			}
+
+		}
 
 		// Campaigns filter
 		$filters->register( 'campaigns', function ( $filter, Where $where ) {
@@ -1169,44 +1209,6 @@ abstract class DB {
 
 			$where->query->setGroupby( 'ID' );
 		} );
-
-		foreach ( $this->get_columns() as $column => $format ) {
-
-			switch ( $format ) {
-				case '%s':
-
-					if ( str_starts_with( $column, 'date' ) ) {
-
-						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
-							Query_Filters::mysqlDateTime( $column, $filter, $where );
-						} );
-
-						break;
-					}
-
-					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
-						Query_Filters::string( $column, $filter, $where );
-					} );
-
-					break;
-				case '%d':
-
-					if ( in_array( $column, [ 'time', 'timestamp', 'time_scheduled' ] ) ) {
-
-						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
-							Query_Filters::timestamp( $column, $filter, $where );
-						} );
-
-						break;
-					}
-
-					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
-						Query_Filters::number( $column, $filter, $where );
-					} );
-					break;
-			}
-
-		}
 
 		$this->query_filters = $filters;
 	}
@@ -1246,7 +1248,7 @@ abstract class DB {
 
 		$operation = $query_vars['operation'];
 
-		$query = new Query( $this );
+		$query = new Table_Query( $this );
 
 		$moreWhere = [];
 		$searched  = false;
@@ -1344,6 +1346,7 @@ abstract class DB {
 				case 'group_by':
 					$query->setGroupby( $val );
 					break;
+				case 'filters':
 				case 'include_filters':
 
 					$this->maybe_register_filters();
