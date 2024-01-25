@@ -200,7 +200,7 @@ class Tracking {
 
 			//Decode & Decode
 			$this->map_query_var( $vars, 'target_url', 'urldecode' );
-			$this->map_query_var( $vars, 'target_url', 'base64_decode' );
+			$this->map_query_var( $vars, 'target_url', 'Groundhogg\base64url_decode' );
 		}
 
 		return $vars;
@@ -211,7 +211,7 @@ class Tracking {
 	 * @param $key
 	 * @param $func
 	 */
-	public function map_query_var( &$array, $key, $func ) {
+	public function map_query_var( &$array, $key, callable $func ) {
 		if ( ! function_exists( $func ) ) {
 			return;
 		}

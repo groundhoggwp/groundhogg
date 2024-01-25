@@ -141,6 +141,7 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 	if ( $contact->exists() ) {
 //		Set the contact in the cache
 		$cache[ $cache_key ] = $contact;
+
 		return $contact;
 	}
 
@@ -473,21 +474,59 @@ function get_url_param( $key = '', $default = false ) {
 }
 
 /**
+ * base64 encode safe for url
+ *
+ * @param $stuff
+ *
+ * @return array|string|string[]
+ */
+function base64url_encode( $stuff ) {
+	return str_replace( [ '+', '/', '=' ], [ '-', '_', '' ], base64_encode( $stuff ) );
+}
+
+/**
+ * Base64 decode stuff from url
+ *
+ * @param $stuff
+ *
+ * @return false|string
+ */
+function base64url_decode( $stuff ) {
+	return base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $stuff ) );
+}
+
+/**
+ * Encodes a string via json and base64, typically for a URL
+ *
  * @param $query
  *
  * @return string
  */
 function base64_json_encode( $query ) {
-	return base64_encode( wp_json_encode( $query ) );
+	return base64url_encode( wp_json_encode( $query ) );
 }
 
 /**
- * @param $query
+ * Given a string which is assumed to be base64 encoded json, decode it
+ *
+ * @param $query $string
  *
  * @return mixed
  */
-function base64_json_decode( $query ) {
-	return json_decode( base64_decode( $query ), true );
+function base64_json_decode( $string ) {
+	return json_decode( base64url_decode( $string ), true );
+}
+
+/**
+ * Utility function to serialize stuff and md5 it, useful for creating
+ * keys based on prop values
+ *
+ * @param $stuff
+ *
+ * @return string
+ */
+function md5serialize( $stuff ) {
+	return md5( maybe_serialize( $stuff ) );
 }
 
 /**
@@ -901,9 +940,9 @@ function array_to_atts( $atts ) {
 		$key = strtolower( $key );
 
 		switch ( $key ) {
-            case 'value':
-                $value = esc_attr( $value );
-                break;
+			case 'value':
+				$value = esc_attr( $value );
+				break;
 			case 'cellpadding':
 			case 'cellspacing':
 				$value = absint( $value );
@@ -2393,7 +2432,7 @@ function get_mappable_fields( $extra = [] ) {
 			'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
 			'contact_id'                => __( 'Contact ID', 'groundhogg' ),
 		],
-		__( 'User' )          => [
+		__( 'User' ) => [
 			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
 			'user_email' => __( 'User Email', 'groundhogg' ),
 		],
@@ -3088,10 +3127,10 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		return false;
 	}
 
-    // Prevent sales reps from importing or making changes to existing contacts of which they are not assigned
-    if ( current_user_can( 'add_contacts' ) && ! current_user_can( 'edit_contact', $contact ) ){
-        return false;
-    }
+	// Prevent sales reps from importing or making changes to existing contacts of which they are not assigned
+	if ( current_user_can( 'add_contacts' ) && ! current_user_can( 'edit_contact', $contact ) ) {
+		return false;
+	}
 
 	// Update contact info
 	$contact->update( $args );
@@ -4939,7 +4978,7 @@ function is_a_contact( $contact ): bool {
  * @return bool
  */
 function is_a_user( $user ): bool {
-    return is_a( $user, \WP_User::class );
+	return is_a( $user, \WP_User::class );
 }
 
 /**
@@ -7013,7 +7052,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 
 			if ( is_string( $maybe_tag ) ) {
 
-                $slug = sanitize_title( $maybe_tag );
+				$slug = sanitize_title( $maybe_tag );
 
 				// This will create a new tag if it doesn't exist already :)
 				if ( $create ) {
