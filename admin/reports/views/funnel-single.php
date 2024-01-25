@@ -4,11 +4,6 @@ namespace Groundhogg\Admin\Reports\Views;
 
 // Overview
 use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\get_cookie;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
@@ -60,6 +55,24 @@ if ( ! $funnel->exists() ) {
             <canvas id="chart_funnel_breakdown"></canvas>
         </div>
     </div>
+
+	<?php
+
+	quick_stat_report( [
+		'id'    => 'total_emails_sent',
+		'title' => __( 'Emails Sent', 'groundhogg' ),
+		'class' => 'span-4'
+	] );
+	quick_stat_report( [
+		'id'    => 'email_open_rate',
+		'title' => __( 'Open Rate', 'groundhogg' ),
+		'class' => 'span-4'
+	] );
+	quick_stat_report( [
+		'id'    => 'email_click_rate',
+		'title' => __( 'Click Thru Rate', 'groundhogg' ),
+		'class' => 'span-4'
+	] ); ?>
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
