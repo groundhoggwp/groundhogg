@@ -179,9 +179,9 @@ class Contacts_Api extends Base_Object_Api {
 		$default_offset      = absint( $request->get_param( 'offset' ) ) ?: 0;
 
 		$query = wp_parse_args( $query, [
-			'number'        => $default_query_limit,
-			'offset'        => $default_offset,
-			'no_found_rows' => false
+			'number'     => $default_query_limit,
+			'offset'     => $default_offset,
+			'found_rows' => true
 		] );
 
 		if ( $request->get_param( 'count' ) ) {
