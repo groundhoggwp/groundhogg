@@ -112,13 +112,23 @@ class Emails_Page extends Admin_Page {
 
 			$this->enqueue_table_filters( [
 				'stringColumns' => [
-					'subject'       => 'Subject',
-					'content'       => 'Content',
+					'title'   => 'Title',
+					'subject' => 'Subject',
+					'content' => 'Content',
 				],
+				'selectColumns' => [
+					'message_type' => [
+						'Message Type',
+						[
+							\Groundhogg_Email_Services::MARKETING     => 'Marketing',
+							\Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+						]
+					]
+				]
 			] );
 
 			wp_enqueue_script( 'groundhogg-admin-email-filters' );
-        }
+		}
 
 		remove_editor_styles();
 
@@ -368,7 +378,8 @@ class Emails_Page extends Admin_Page {
 				] );
 
 				?>
-                <button type="submit" id="search-submit" class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                <button type="submit" id="search-submit"
+                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
             </div>
         </form>
 		<?php
@@ -388,7 +399,7 @@ class Emails_Page extends Admin_Page {
 		$emails_table = new Emails_Table();
 
 		$emails_table->views();
-        $this->table_filters();
+		$this->table_filters();
 
 		$this->search_form();
 

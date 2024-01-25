@@ -3,14 +3,13 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Admin\Table;
-use Groundhogg\DB\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
@@ -225,12 +224,12 @@ class Emails_Table extends Table {
 	 */
 	protected function column_funnels( $email ) {
 
-		$stepQuery  = new Query( 'steps' );
+		$stepQuery = new Table_Query( 'steps' );
 		$meta_alias = $stepQuery->joinMeta( 'email_id' );
 		$stepQuery->where( 'step_type', 'send_email' );
 		$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
-        $funnelQuery = new Query( 'funnels' );
+		$funnelQuery = new Table_Query( 'funnels' );
         $join = $funnelQuery->addJoin( 'LEFT', $stepQuery );
         $join->onColumn( 'funnel_id' );
 
