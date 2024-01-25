@@ -26,7 +26,8 @@
     quickEditContactModal,
     addContactModal,
   } = Groundhogg.components
-  const { post, get, patch, routes, ajax } = Groundhogg.api
+  const { ajax } = Groundhogg.api
+  const { base64_json_encode } = Groundhogg.functions
   const {
     searches: SearchesStore,
     contacts: ContactsStore,
@@ -43,23 +44,7 @@
   } = Groundhogg.formatting
   const { sprintf, __, _x, _n } = wp.i18n
 
-  // const { StepTypes } = Groundhogg
-
-  // StepTypes.setup()
-
   SearchesStore.itemsFetched(ContactSearch.searches)
-
-  function utf8_to_b64 (str) {
-    return window.btoa(unescape(encodeURIComponent(str)))
-  }
-
-  function b64_to_utf8 (str) {
-    return decodeURIComponent(escape(window.atob(str)))
-  }
-
-  const base64_json_encode = (stuff) => {
-    return utf8_to_b64(JSON.stringify(stuff))
-  }
 
   const loadFilters = (query) => {
     window.location.href = ContactSearch.url + '&' + query

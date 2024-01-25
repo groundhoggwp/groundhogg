@@ -34,6 +34,7 @@
     ItemPicker,
     Select,
     Input,
+    Div,
   } = MakeEl
 
   const {
@@ -1606,54 +1607,6 @@
       },
     })
 
-  registerFilterGroup('site', 'Site')
-
-  registerFilter('saved_search', 'site', __('Saved Search'), {
-    view: ({ compare = 'in', search }) => {
-      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold(SearchesStore.get(search)?.name))
-    }, edit: ({ compare }) => {
-      return [
-        select({
-          name: 'filter_compare', id: 'filter-compare', options: {
-            in: __('In'), not_in: __('Not in'),
-          }, selected: compare,
-        }), select({
-          name: 'filter_search', id: 'filter-search',
-        }),
-      ].join('')
-    }, onMount: ({ search }, updateFilter) => {
-
-      SearchesStore.maybeFetchItems().then(items => {
-
-        $('#filter-search').select2({
-          data: [
-            { id: '', text: '' }, ...items.map(({ id, name }) => ( {
-              id, text: name, selected: id === search,
-            } )),
-          ], placeholder: __('Type to search...'),
-        }).on('change', e => {
-          updateFilter({
-            search: e.target.value,
-          })
-        })
-      })
-
-      $('#filter-compare').on('change', e => {
-        updateFilter({
-          compare: e.target.value,
-        })
-      })
-
-    }, defaults: {
-      compare: 'in', search: null,
-    }, preload: ({ search }) => {
-      // just preload all searches
-      if (!SearchesStore.hasItems()) {
-        return SearchesStore.fetchItems([])
-      }
-    },
-  })
-
   const {
     tabs, fields, groups,
   } = Groundhogg.filters.gh_contact_custom_properties
@@ -1938,6 +1891,105 @@
         activity: '',
       },
     })
+
+  registerFilterGroup('query', 'Query')
+
+  registerFilter('saved_search', 'query', __('Saved Search'), {
+    view: ({ compare = 'in', search }) => {
+      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold(SearchesStore.get(search)?.name))
+    }, edit: ({ compare }) => {
+      return [
+        select({
+          name: 'filter_compare', id: 'filter-compare', options: {
+            in: __('In'), not_in: __('Not in'),
+          }, selected: compare,
+        }), select({
+          name: 'filter_search', id: 'filter-search',
+        }),
+      ].join('')
+    }, onMount: ({ search }, updateFilter) => {
+
+      SearchesStore.maybeFetchItems().then(items => {
+
+        $('#filter-search').select2({
+          data: [
+            { id: '', text: '' }, ...items.map(({ id, name }) => ( {
+              id, text: name, selected: id === search,
+            } )),
+          ], placeholder: __('Type to search...'),
+        }).on('change', e => {
+          updateFilter({
+            search: e.target.value,
+          })
+        })
+      })
+
+      $('#filter-compare').on('change', e => {
+        updateFilter({
+          compare: e.target.value,
+        })
+      })
+
+    }, defaults: {
+      compare: 'in', search: null,
+    }, preload: ({ search }) => {
+      // just preload all searches
+      if (!SearchesStore.hasItems()) {
+        return SearchesStore.fetchItems([])
+      }
+    },
+  })
+
+  ContactFilterRegistry.registerFilter( createFilter( 'sub_query', 'Sub Query', 'query', {
+    display: ({ include_filters = [], exclude_filters = [] }) => {
+
+      let texts = [
+        ContactFilterRegistry.displayFilters(include_filters),
+        ContactFilterRegistry.displayFilters(exclude_filters)
+      ].filter( s => s);
+
+      return texts.join( ' <abbr title="exclude">and exclude</abbr> ' )
+    },
+    edit: ({
+      include_filters = [],
+      exclude_filters = [],
+      updateFilter
+    }) => {
+
+      return Fragment([
+        Div({
+          className: 'include-search-filters',
+        },[
+          Filters({
+            id: 'sub-query-filters',
+            filters: include_filters,
+            filterRegistry: ContactFilterRegistry,
+            onChange: include_filters => updateFilter({
+              include_filters
+            })
+          })
+        ]),
+        Div({
+          className: 'exclude-search-filters',
+        },[
+          Filters({
+            id: 'sub-query-exclude-filters',
+            filters: exclude_filters,
+            filterRegistry: ContactFilterRegistry,
+            onChange: exclude_filters => updateFilter({
+              exclude_filters
+            })
+          })
+        ])
+      ])
+    },
+    preload: ({ include_filters = [], exclude_filters = [] }) => {
+      return Promise.all( [
+        ContactFilterRegistry.preloadFilters( include_filters ),
+        ContactFilterRegistry.preloadFilters( exclude_filters ),
+      ] )
+    },
+  }, {} ) )
 
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}

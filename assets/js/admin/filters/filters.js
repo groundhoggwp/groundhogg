@@ -704,8 +704,18 @@
       return name
     },
 
+    displayFilters( filters ){
+      return filters.map(group => group.map(filter => {
+        return Div( {}, this.display( filter ) ).innerHTML
+      }).join(' and ')).join(' or ')
+    },
+
     filterName (filter) {
       return this.getFilter(filter).name
+    },
+
+    display (filter) {
+      return this.getFilter(filter).display(filter)
     },
 
     edit (filter, updateFilter) {
@@ -752,6 +762,13 @@
     filters = [],
     onChange = (filters) => {},
   }) => {
+
+    // parse the filters to make sure they have ids...
+    filters.forEach(filterGroup => filterGroup.forEach(filter => {
+      if (!filter.id) {
+        filter.id = uuid()
+      }
+    }))
 
     /**
      * Morhps the filters
@@ -913,7 +930,7 @@
 
       return Div({
         id: `edit-filter-${ filter.id }`,
-        className: 'filter filter-edit-wrap',
+        className: `filter filter-edit-wrap filter-${filter.type}`,
         tabindex: 0,
       }, Div({
         className: 'filter-edit',

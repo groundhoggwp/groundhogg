@@ -34,17 +34,7 @@
     replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2))
   }
 
-  function utf8_to_b64 (str) {
-    return window.btoa(unescape(encodeURIComponent(str)))
-  }
-
-  function b64_to_utf8 (str) {
-    return decodeURIComponent(escape(window.atob(str)))
-  }
-
-  const base64_json_encode = (stuff) => {
-    return utf8_to_b64(JSON.stringify(stuff))
-  }
+  const { base64_json_encode } = Groundhogg.functions
 
   const ReportTypes = {
 
@@ -81,7 +71,7 @@
 			</div>
         `
       },
-      onMount: ({ id, field, data }) => {
+      onMount: ({ id, field, data, filters = [], exclude_filters = [] }) => {
 
         let cuttoff = 11
 
@@ -97,6 +87,28 @@
           }, 0)
 
           _data.push({ count: _rest, value: __('Other') })
+        }
+
+        const openInContactsView = (e, arr) => {
+
+          if (arr.length && arr[0]._view) {
+            window.open(adminPageURL('gh_contacts', {
+              filters: base64_json_encode( [[
+                {
+                  type: 'sub_query',
+                  include_filters: filters,
+                  exclude_filters,
+                },
+                {
+                  type: 'meta',
+                  meta: field,
+                  value: arr[0]._view.label,
+                  compare: 'equals'
+                }
+              ]] ),
+            }), '_blank')
+          }
+
         }
 
         let chart = new Chart(ctx, {
@@ -138,16 +150,7 @@
 
                         maintainAspectRatio: false,
                         aspectRatio: 1,
-                        onClick: (e, arr) => {
-
-                          if (arr.length && arr[0]._view) {
-                            window.open(adminPageURL('gh_contacts', {
-                              meta_key: field,
-                              meta_value: arr[0]._view.label,
-                            }), '_blank')
-                          }
-
-                        },
+                        onClick: openInContactsView,
                         legend: {
                           position: 'bottom',
                         },
@@ -159,12 +162,7 @@
                 return
               }
 
-              if (arr.length && arr[0]._view) {
-                window.open(adminPageURL('gh_contacts', {
-                  meta_key: field,
-                  meta_value: arr[0]._view.label,
-                }), '_blank')
-              }
+              openInContactsView(e, arr)
 
             },
             legend: {
@@ -216,7 +214,7 @@
                 </div>
             </div>` : ''}`
       },
-      onMount: ({ id, data, field }) => {
+      onMount: ({ id, data, field, filters = [], exclude_filters = [] }) => {
 
         let num = 10
 
@@ -234,8 +232,19 @@
 
           $(`.number-total[data-id=${id}]`).on('click', e => {
             window.open(adminPageURL('gh_contacts', {
-              meta_key: field,
-              meta_value: e.target.dataset.value,
+              filters: base64_json_encode( [[
+                {
+                  type: 'sub_query',
+                  include_filters: filters,
+                  exclude_filters,
+                },
+                {
+                  type: 'meta',
+                  meta: field,
+                  value: e.target.dataset.value,
+                  compare: 'equals'
+                }
+              ]] ),
             }), '_blank')
           })
         }

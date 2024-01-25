@@ -1816,7 +1816,6 @@
     },
 
     blocks: {},
-
   }
 
   /**
@@ -1863,13 +1862,7 @@
   const dynamicContentCache = createCache()
   const attributesCache = createCache()
 
-  const base64_json_encode = (stuff) => {
-    return utf8_to_b64(JSON.stringify(stuff))
-  }
-
-  function utf8_to_b64 (str) {
-    return window.btoa(unescape(encodeURIComponent(str)))
-  }
+  const { base64_json_encode } = Groundhogg.functions
 
   /**
    * Register a dynamic block
@@ -6047,25 +6040,25 @@
         closable: false,
       }, [
         Control({
-            label: 'Shortcode',
-            stacked: true,
-          }, Textarea({
-            className: 'code',
-            value: shortcode,
-            id: 'shortcode-paste',
-            onChange: e => {
-              updateBlock({
-                shortcode: e.target.value,
-              })
-            },
-          })),
+          label: 'Shortcode',
+          stacked: true,
+        }, Textarea({
+          className: 'code',
+          value: shortcode,
+          id: 'shortcode-paste',
+          onChange: e => {
+            updateBlock({
+              shortcode: e.target.value,
+            })
+          },
+        })),
         `<p>Only basic or email specific shortcodes will work.</p>`,
         `<p>Not all HTML or CSS works in email. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">HTML and CSS compatibility</a>.</p>`,
         `<p>Some elements such as <code>script</code> and <code>form</code> elements will be stripped out automatically.</p>`,
         `<p>Shortcodes will <b>not</b> load any JavaScript or CSS dependencies. You can add style using custom CSS in the advanced tab.</p>`,
       ]),
     ]),
-    parseContent: content => cleanHTML(content)
+    parseContent: content => cleanHTML(content),
   })
 
   // Posts Block
@@ -6983,7 +6976,7 @@
   //   plainText: () => '',
   // })
 
-  const morph = (selector, html = null, childrenOnly = true ) => {
+  const morph = (selector, html = null, childrenOnly = true) => {
 
     try {
       if (html === null) {
@@ -7217,8 +7210,8 @@
   const morphControls = () => morph('#controls-panel', ControlsPanel())
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
   const morphEmailEditor = () => {
-    morph('#email-editor', EmailEditor(), false )
-    window.dispatchEvent( new Event( 'resize' ) )
+    morph('#email-editor', EmailEditor(), false)
+    window.dispatchEvent(new Event('resize'))
   }
   const morphHeader = () => morph('#email-header', Header())
   const updateStyles = () => {

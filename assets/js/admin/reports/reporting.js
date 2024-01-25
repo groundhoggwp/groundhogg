@@ -1,7 +1,8 @@
 function tool_tip_label (tooltipItem, data) {
   if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
     return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label
-  } else {
+  }
+  else {
     return data.datasets[tooltipItem.datasetIndex].label + ': ' +
       data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y
   }
@@ -11,7 +12,7 @@ function tool_tip_title () {
   return ''
 }
 
-(function (reporting, $, nonces) {
+( function (reporting, $, nonces) {
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -52,28 +53,29 @@ function tool_tip_title () {
 
       let campaignId = this.other.campaign
 
-      if ( campaignId && ! CampaignsStore.has( campaignId ) ){
-        await CampaignsStore.fetchItem( campaignId )
+      if (campaignId && !CampaignsStore.has(campaignId)) {
+        await CampaignsStore.fetchItem(campaignId)
       }
 
       el.append(ItemPicker({
         id: 'report-campaign',
         noneSelected: __('Filter by campaign...', 'groundhogg'),
         multiple: false,
-        selected: campaignId ? (({ID, data}) => ({ id: ID, text: data.name }))(CampaignsStore.get(campaignId)) : [],
+        selected: campaignId ? ( ({ ID, data }) => ( { id: ID, text: data.name } ) )(CampaignsStore.get(campaignId)) : [],
         fetchOptions: async (search) => {
           let campaigns = await CampaignsStore.fetchItems({
             search,
             limit: 20,
           })
 
-          return campaigns.map(({ ID, data }) => ({ id: ID, text: data.name }))
+          return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
         },
         onChange: item => {
 
-          if ( ! item ){
+          if (!item) {
             this.other.campaign = null
-          } else {
+          }
+          else {
             this.other.campaign = item.id
           }
 
@@ -191,6 +193,8 @@ function tool_tip_title () {
 
           $('.wrap').removeClass('blurred')
 
+          window.dispatchEvent(new Event('resize'))
+
         },
         failure: function (response) {
 
@@ -259,15 +263,15 @@ function tool_tip_title () {
 
       $report.find('.groundhogg-quick-stat-number').html(report_data.number)
       $report.find('.groundhogg-quick-stat-previous').
-      removeClass('green red').
-      addClass(report_data.compare.arrow.color)
+        removeClass('green red').
+        addClass(report_data.compare.arrow.color)
       $report.find('.groundhogg-quick-stat-compare').
-      html(report_data.compare.text)
+        html(report_data.compare.text)
       $report.find('.groundhogg-quick-stat-arrow').
-      removeClass('up down').
-      addClass(report_data.compare.arrow.direction)
+        removeClass('up down').
+        addClass(report_data.compare.arrow.direction)
       $report.find('.groundhogg-quick-stat-prev-percent').
-      html(report_data.compare.percent)
+        html(report_data.compare.percent)
 
     },
 
@@ -370,7 +374,7 @@ function tool_tip_title () {
           let data = Object.values(report_data.data[i])
 
           for (var k in data) {
-            html = html + `<td data-colname="${report_data.label[k]}">${data[k]}</td>`
+            html = html + `<td data-colname="${ report_data.label[k] }">${ data[k] }</td>`
           }
           html += '</tr>'
 
@@ -378,7 +382,8 @@ function tool_tip_title () {
 
         html += '</table>'
 
-      } else {
+      }
+      else {
 
         html = report_data.no_data
 
@@ -393,4 +398,4 @@ function tool_tip_title () {
     reporting.init()
   })
 
-})(GroundhoggReporting, jQuery, groundhogg_nonces)
+} )(GroundhoggReporting, jQuery, groundhogg_nonces)
