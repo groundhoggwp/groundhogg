@@ -2139,6 +2139,8 @@
   // Handle log items
   $(document).on('click', 'a.view-event-email-log-item', async e => {
 
+    e.preventDefault()
+
     let eventId = parseInt($(e.currentTarget).data('event-id'))
 
     let event = EventsStore.get(eventId)
