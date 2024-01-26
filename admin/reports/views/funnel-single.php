@@ -27,22 +27,28 @@ if ( ! $funnel->exists() ) {
 <div class="display-grid gap-20">
 
 	<?php quick_stat_report( [
+		'id'    => 'total_contacts_added_to_funnel',
+		'title' => __( 'Contacts Added', 'groundhogg' ),
+		'class' => 'span-3',
+	] ); ?>
+
+	<?php quick_stat_report( [
 		'id'    => 'total_contacts_in_funnel',
 		'title' => __( 'Active Contacts', 'groundhogg' ),
-		'class' => 'span-4',
+		'class' => 'span-3',
 	] ); ?>
 
 	<?php quick_stat_report( [
 		'id'    => 'total_funnel_conversions',
 		'title' => __( 'Conversions', 'groundhogg' ),
-		'class' => 'span-4',
+		'class' => 'span-3',
 	] );
 	?>
 
 	<?php quick_stat_report( [
 		'id'    => 'total_funnel_conversion_rate',
 		'title' => __( 'Conversion Rate', 'groundhogg' ),
-		'class' => 'span-4',
+		'class' => 'span-3',
 	] ); ?>
 
 	<?php do_action( 'groundhogg/admin/reports/pages/funnels/after_quick_stats' ); ?>

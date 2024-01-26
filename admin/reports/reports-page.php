@@ -184,6 +184,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'table_worst_performing_emails',
 				'total_funnel_conversion_rate',
 				'total_funnel_conversions',
+				'total_contacts_added_to_funnel',
 				'total_contacts_in_funnel',
 				'table_form_activity',
 				'table_funnel_stats',

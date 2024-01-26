@@ -776,8 +776,32 @@
         }, 500)
       },
     })
-
   }
+
+  const Ellipses = ( content, atts = {} ) => Span({
+    ...atts,
+    onCreate: el => {
+
+      let ellipses = ''
+      let count = 0
+
+      let interval = setInterval(() => {
+
+        // parentNode will be null once removed from the dom
+        if (!el.parentNode) {
+          clearInterval(interval)
+          return
+        }
+
+        count = ( count + 1 ) % 4
+        ellipses = '.'.repeat(count)
+        el.textContent = content + ellipses
+
+      }, 500)
+
+    },
+  }, content + '...' )
+
 
   const ItemPicker = ({
     id = '',
@@ -1059,7 +1083,7 @@
         multiple || !selected.length ? null : SearchInput(),
 
         // "Searching..."
-        state.searching ? Div({ className: 'gh-picker-no-options' }, 'Searching...') : null,
+        state.searching ? Div({ className: 'gh-picker-no-options' }, Ellipses( wp.i18n.__('Searching') ) ) : null,
 
         // The actual options
         ...options.map((opt, i) => itemPickerOption(opt, i)),
@@ -1258,6 +1282,7 @@
   window.MakeEl = {
     InputGroup,
     makeEl,
+    Ellipses,
     Input,
     InputWithReplacements,
     Textarea,

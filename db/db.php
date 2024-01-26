@@ -1312,11 +1312,12 @@ abstract class DB {
 					break;
 				case 'related' :
 
-					$alias = $query->leftJoinTable( get_db( 'object_relationships' ), 'primary_object_id' );
+					$join = $query->addJoin( 'LEFT', 'object_relationships' );
+					$join->onColumn( 'primary_object_id' );
 
-					$query->where( "$alias.secondary_object_id", $val['ID'] );
-					$query->where( "$alias.secondary_object_type", $val['type'] );
-					$query->where( "$alias.primary_object_type", $this->get_object_type() );
+					$query->where( "$join->alias.secondary_object_id", $val['ID'] );
+					$query->where( "$join->alias.secondary_object_type", $val['type'] );
+					$query->where( "$join->alias.primary_object_type", $this->get_object_type() );
 
 					break;
 				case 'count':

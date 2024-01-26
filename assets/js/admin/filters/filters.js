@@ -20,6 +20,7 @@
     Input,
     Select,
     Span,
+    Ellipses,
     Dashicon,
     ToolTip,
   } = MakeEl
@@ -1127,27 +1128,7 @@
     }, Span({
       id: `${ id }-loading`,
       className: 'filters-loading',
-      onCreate: el => {
-
-        let ellipses = ''
-        let count = 0
-
-        let interval = setInterval(() => {
-
-          // parentNode will be null once removed from the dom
-          if (!el.parentNode) {
-            clearInterval(interval)
-            return
-          }
-
-          count = ( count + 1 ) % 4
-          ellipses = '.'.repeat(count)
-          el.textContent = __('Loading') + ellipses
-
-        }, 500)
-
-      },
-    }, __('Loading')))
+    }, Ellipses(  __('Loading') )))
 
     /**
      * The wrapper for all the filters

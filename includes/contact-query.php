@@ -1513,19 +1513,13 @@ class Contact_Query extends Table_Query {
 						$eventWhere->in( "$alias.step_id", $event_query['step_id'] );
 					}
 
-					if ( isset( $event_query['before'] ) && isset( $event_query['after'] ) ) {
-						Filters::timestamp( "$alias.time", array_merge( $event_query, [
-							'date_range' => 'between'
-						] ), $eventWhere );
-					} else if ( isset( $event_query['after'] ) ) {
-						Filters::timestamp( "$alias.time", array_merge( $event_query, [
-							'date_range' => 'after'
-						] ), $eventWhere );
+					if ( isset( $event_query['after'] ) ) {
+						$where->greaterThanEqualTo( "$alias.time", $event_query['after'] );
 					} else if ( isset( $event_query['before'] ) ) {
-						Filters::timestamp( "$alias.time", array_merge( $event_query, [
-							'date_range' => 'before'
-						] ), $eventWhere );
+						$where->lessThanEqualTo( "$alias.time", $event_query['before'] );
 					}
+
+					$where->query->setGroupby( 'ID' );
 
 
 					break;

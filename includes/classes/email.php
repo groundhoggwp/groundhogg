@@ -599,7 +599,7 @@ class Email extends Base_Object_With_Meta {
 
 		foreach ( $matches[0] as $i => $match ) {
 			$block_content = $matches['content'][ $i ];
-			$type          = $matches['type'][ $i ];
+//			$type          = $matches['type'][ $i ];
 
 			// Gets rid of the [filters {...}] code in the plain text
 			if ( $this->is_testing() ) {

@@ -26,7 +26,6 @@
   const { sprintf, __, _x, _n } = wp.i18n
 
   const funnelId = parseInt(Funnel.id)
-  FunnelsStore.fetchItem(funnelId)
 
   const getFunnel = () => FunnelsStore.get(funnelId)
 
@@ -55,7 +54,7 @@
       this.stepCallbacks[type] = callbacks
     },
 
-    init: function () {
+    init: async function () {
 
       var self = this
 
@@ -63,6 +62,46 @@
       var $form = $('#funnel-form')
       var $steps = self.getSteps()
       var $settings = self.getSettings()
+
+      let preloaders = [
+        FunnelsStore.maybeFetchItem(funnelId)
+      ]
+
+      // Preload emails
+      let emails = this.steps.filter(step => step.data.step_type === 'send_email').
+        map(step => parseInt(step.meta.email_id))
+
+      if (emails.length) {
+        preloaders.push(Groundhogg.stores.emails.maybeFetchItems(emails))
+      }
+
+      // Preload tags
+      let tags = this.steps.filter(
+          ({ data: { step_type } }) => ['apply_tag', 'remove_tag', 'tag_applied', 'tag_removed'].includes(step_type)).
+        reduce((allTags, { meta: { tags } }) => {
+
+          if (!Array.isArray(tags)) {
+            return allTags
+          }
+
+          tags.forEach(id => {
+            if (!allTags.includes(id)) {
+              allTags.push(id)
+            }
+          })
+
+          return allTags
+        }, [])
+
+      if ( tags.length ){
+        preloaders.push(Groundhogg.stores.tags.maybeFetchItems(tags))
+      }
+
+      if ( tags.length || emails.length ){
+        const {close} = loadingModal()
+        await Promise.all( preloaders )
+        close()
+      }
 
       $document.on('change input', '.step-title-large', function () {
         var $title = $(this)
@@ -205,37 +244,6 @@
 
       if (window.location.hash) {
         this.makeActive(parseInt(window.location.hash.substring(1)))
-      }
-
-      // Preload emails
-      let emails = this.steps.filter(step => step.data.step_type === 'send_email').
-        map(step => parseInt(step.meta.email_id)).
-        filter(id => Boolean(id))
-
-      if (emails.length) {
-        Groundhogg.stores.emails.maybeFetchItems(emails)
-      }
-
-      // Preload tags
-      let tags = this.steps.filter(
-        ({ data: { step_type } }) => ['apply_tag', 'remove_tag', 'tag_applied', 'tag_removed'].includes(step_type)).
-        reduce((allTags, { meta: { tags } }) => {
-
-          if (!Array.isArray(tags)) {
-            return allTags
-          }
-
-          tags.forEach(id => {
-            if (!allTags.includes(id)) {
-              allTags.push(id)
-            }
-          })
-
-          return allTags
-        }, [])
-
-      if ( tags.length ){
-        Groundhogg.stores.tags.maybeFetchItems(tags)
       }
 
       let header = document.querySelector('.funnel-editor-header > .actions')

@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB\Query;
 
+use function Groundhogg\ensure_array;
 use function Groundhogg\get_array_var;
 use function Groundhogg\maybe_implode_in_quotes;
 
@@ -399,6 +400,8 @@ class Where {
 
 			return $this;
 		}
+
+		$values = ensure_array( $values );
 
 		$values = array_values( $values );
 		$values = map_deep( $values, 'sanitize_text_field' );
