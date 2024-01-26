@@ -207,6 +207,34 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 	return $url;
 }
 
+function report_link( $content, $params ){
+    return html()->e('a', [
+        'href' => admin_page_url( 'gh_reporting', $params )
+    ], $content );
+}
+
+/**
+ * open the contacts page with specific filters
+ *
+ * @param $content
+ * @param $filters
+ *
+ * @return string
+ */
+function contact_filters_link( $content, $filters, $no_link = false ) {
+
+    if ( ! $no_link ){
+        return $content;
+    }
+
+	return html()->e( 'a', [
+		'target' => '_blank',
+		'href'   => admin_page_url( 'gh_contacts', [
+			'filters' => base64_json_encode( $filters )
+		] )
+	], $content );
+}
+
 /**
  * Removes evertything after the ? from the URL
  *
@@ -780,21 +808,31 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param     $a int denominator
- * @param     $b int numerator
+ * @param     $denom int denominator
+ * @param     $numer int numerator
  * @param int $precision
  *
  * @return float
  */
-function percentage( $a, $b, $precision = 2 ) {
-	$a = intval( $a );
-	$b = intval( $b );
+function percentage( $denom, $numer, $precision = 2 ) {
+	$denom = intval( $denom );
+	$numer = intval( $numer );
 
-	if ( ! $a ) {
+	if ( ! $denom ) {
 		return 0;
 	}
 
-	return round( ( $b / $a ) * 100, $precision );
+	return round( ( $numer / $denom ) * 100, $precision );
+}
+
+/**
+ * @param $num
+ * @param $compare
+ *
+ * @return string
+ */
+function format_number_with_percentage( $num, $compare ) {
+	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ), );
 }
 
 function sort_by_string_in_array( $key ) {

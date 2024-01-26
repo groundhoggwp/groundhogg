@@ -3,6 +3,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Query\Query;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\DB\Query\Where;
 use Groundhogg\Email;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -97,7 +100,7 @@ class Emails extends DB {
 
 			$funnel_id = absint( $filter['funnel_id'] );
 
-			$stepQuery  = new Query( 'steps' );
+			$stepQuery  = new Table_Query( 'steps' );
 			$meta_alias = $stepQuery->joinMeta( 'email_id' );
 			$stepQuery->where( 'step_type', 'send_email' );
 			$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );

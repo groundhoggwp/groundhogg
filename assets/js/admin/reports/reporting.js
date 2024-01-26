@@ -23,6 +23,16 @@ function tool_tip_title () {
 
   const {
     ItemPicker,
+    Table,
+    Tr,
+    Td,
+    Th,
+    THead,
+    TBody,
+    Fragment,
+    Button,
+    Div,
+
   } = MakeEl
 
   const { loadingModal } = Groundhogg.element
@@ -253,7 +263,7 @@ function tool_tip_title () {
           this.renderChartReport($report, report_data.chart, report_id)
           break
         case 'table':
-          this.renderTable($report, report_data)
+          this.renderTable($report, report_data, report_id)
           break
       }
 
@@ -347,49 +357,79 @@ function tool_tip_title () {
 
     },
 
-    renderTable: function ($report, report_data) {
+    renderTable: function ($report, report_data, id) {
 
-      var html = ''
-      if (report_data.data && report_data.data.length > 0) {
+      let { label, data, no_data = '' } = report_data
 
-        html = html + '<table class=\'groundhogg-report-table\'>'
-
-        var length = report_data.data.length
-
-        if (report_data.label.length > 0) {
-
-          html += '<tr>'
-
-          for (var key in report_data.label) {
-            html += '<th>' + report_data.label[key] + '</th>'
-          }
-
-          html += '</tr>'
-        }
-
-        for (var i = 0; i < length; i++) {
-
-          html += '<tr >'
-
-          let data = Object.values(report_data.data[i])
-
-          for (var k in data) {
-            html = html + `<td data-colname="${ report_data.label[k] }">${ data[k] }</td>`
-          }
-          html += '</tr>'
-
-        }
-
-        html += '</table>'
-
-      }
-      else {
-
-        html = report_data.no_data
-
+      if (!Array.isArray(label)) {
+        label = Object.values(label)
       }
 
-      $report.html(html)
+      if (!data.length) {
+        $report.html(no_data)
+        return
+      }
+
+      const ReportTable = () => {
+
+        const State = Groundhogg.createState({
+          per_page: 10,
+          page: 0,
+        })
+
+        const morph = () => morphdom($report[0], Div({}, Render()), { childrenOnly: true })
+
+        const getData = () => data.slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
+
+        const TableBody = () => TBody({}, getData().map(row => Tr({}, Object.keys(row).map(k => {
+          return Td({ dataColname: k }, `${ row[k] }`)
+        }))))
+
+        const replaceBody = () => {
+          $report[0].querySelector('tbody').replaceWith(TableBody())
+        }
+
+        const Render = () => Fragment([
+          Table({
+            className: 'groundhogg-report-table',
+          }, [
+            THead({}, Tr({}, label.map(label => Th({}, label)))),
+            TableBody(),
+          ]),
+          Div({
+            style: {
+              padding: '10px',
+            },
+            className: 'display-flex gap-10 flex-end',
+          }, [
+            State.page > 0 ? Button({
+              id: `${id}-prev`,
+              className: 'gh-button secondary',
+              onClick: e => {
+                State.set({
+                  page: State.page - 1,
+                })
+                morph()
+              },
+            }, 'Prev') : null,
+            ( State.page + 1 ) * State.per_page < data.length ? Button({
+              id: `${id}-next`,
+              className: 'gh-button secondary',
+              onClick: e => {
+                State.set({
+                  page: State.page + 1,
+                })
+                morph()
+              },
+            }, 'Next') : null,
+          ]),
+
+        ])
+
+        return Render()
+      }
+
+      $report.html(ReportTable())
     },
 
   })

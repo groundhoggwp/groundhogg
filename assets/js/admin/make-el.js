@@ -378,6 +378,9 @@
   }
 
   const Table = (atts, children) => makeEl('table', atts, children)
+  const THead = (atts, children) => makeEl('thead', atts, children)
+  const TBody = (atts, children) => makeEl('tbody', atts, children)
+  const TFoot = (atts, children) => makeEl('tfoot', atts, children)
   const Tr = (atts, children) => makeEl('tr', atts, children)
   const Td = (atts, children) => makeEl('td', atts, children)
   const Th = (atts, children) => makeEl('th', atts, children)
@@ -1296,6 +1299,9 @@
     InputRepeater,
     Fragment,
     Table,
+    TBody,
+    THead,
+    TFoot,
     Tr,
     Td,
     Th,

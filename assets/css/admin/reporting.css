@@ -238,7 +238,7 @@ h1.report-title {
   padding: 13px;
 }
 .gh-panel table.groundhogg-report-table tr th:not(:first-child), .gh-panel table.groundhogg-report-table tr td:not(:first-child) {
-  width: 120px;
+  width: 80px;
   padding-left: 0;
 }
 .gh-panel table.groundhogg-report-table tr th .step-type, .gh-panel table.groundhogg-report-table tr td .step-type {

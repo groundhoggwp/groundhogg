@@ -7,22 +7,7 @@ use Groundhogg\DB\Query\Table_Query;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\percentage;
 
-class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Report {
-
-	/**
-	 * Get email IDs from broadcasts...
-	 *
-	 * @return array
-	 */
-	protected function get_send_email_steps() {
-
-		$query = new Table_Query( 'broadcasts' );
-		$query->where( 'status', 'sent' )
-		      ->equals( 'object_type', 'email' )
-		      ->greaterThanEqualTo( 'send_time', $this->start )
-		      ->lessThanEqualTo( 'send_time', $this->end );
-
-	}
+class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Table_Report {
 
 	protected function should_include( $sent, $opened, $clicked ) {
 		return $sent > 10 && percentage( $sent, $opened ) > 20 && percentage( $opened, $clicked ) > 10;

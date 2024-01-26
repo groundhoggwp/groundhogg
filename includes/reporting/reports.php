@@ -31,8 +31,8 @@ use Groundhogg\Reporting\New_Reports\Table_Funnel_Stats;
 use Groundhogg\Reporting\New_Reports\Table_List_Engagement;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
-use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
-use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Emails;
+use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Funnel_Emails;
+use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Funnel_Emails;
 use Groundhogg\Reporting\New_Reports\Total_Abandonment_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Benchmark_Conversion_Rate;
@@ -537,7 +537,7 @@ class Reports {
 	 */
 	public function table_top_performing_emails() {
 
-		$report = new Table_Top_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Top_Performing_Funnel_Emails( $this->start, $this->end );
 
 		return $report->get_data();
 
@@ -548,7 +548,7 @@ class Reports {
 	 */
 	public function table_worst_performing_emails() {
 
-		$report = new Table_Worst_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Worst_Performing_Funnel_Emails( $this->start, $this->end );
 
 		return $report->get_data();
 

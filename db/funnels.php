@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Where;
 use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
