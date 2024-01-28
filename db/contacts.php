@@ -175,15 +175,15 @@ class Contacts extends DB {
 	 */
 	public function add( $data = array() ) {
 
-		if ( empty( $args['email'] ) ) {
+		if ( empty( $data['email'] ) ) {
 			$this->last_error = 'No email field provided.';
 
 			return false;
 		}
 
-		$args = $this->sanitize_columns( $args );
+		$data = $this->sanitize_columns( $data );
 
-		return $this->insert_on_duplicate_key_update( $args );
+		return $this->insert_on_duplicate_key_update( $data );
 	}
 
 	/**
@@ -195,58 +195,63 @@ class Contacts extends DB {
 	 */
 	public function insert_on_duplicate_key_update( $data ) {
 
-		$orig = $data;
-		$data = wp_parse_args( $data, $this->get_column_defaults() );
+		$orig_data = $data;
 
-		if ( key_exists( 'email', $data ) ) {
+		// Initialise column format array
+		$column_formats  = $this->get_columns();
+		$column_defaults = $this->get_column_defaults();
 
-			// Initialise column format array
-			$column_formats  = $this->get_columns();
-			$column_defaults = $this->get_column_defaults();
+		// Orig data does not get parsed
+		$data = wp_parse_args( $data, $column_defaults );
 
-			// Force fields to lower case
-			$data = array_change_key_case( $data );
+		// Force fields to lower case
+		$data      = array_change_key_case( $data );
+		$orig_data = array_change_key_case( $orig_data );
 
-			// White list columns
-			$data = array_intersect_key( $data, $column_formats );
+		// White list columns
+		$data      = array_intersect_key( $data, $column_formats );
+		$orig_data = array_intersect_key( $orig_data, $column_formats );
 
-			// Function to rewrite the INSERT query to include ON DUPLICATE KEY UPDATE
-			$update_func = function ( $query ) use ( $orig, $column_formats, $column_defaults ) {
+		// Function to rewrite the INSERT query to include ON DUPLICATE KEY UPDATE
+		$update_func = function ( $query ) use ( $orig_data, $column_formats, $column_defaults ) {
 
-				if ( ! preg_match( '/^INSERT/i', $query ) ) {
-					return $query;
-				}
-
-				// Don't update with default values
-				$data = array_diff_assoc( $orig, $column_defaults );
-
-				global $wpdb;
-
-				// never update these columns
-				unset( $data['ID'] );
-				unset( $data['email'] );
-				unset( $data['date_created'] );
-
-				$pairs = [];
-
-				foreach ( $data as $column => $value ) {
-					$format  = $column_formats[ $column ];
-					$pairs[] = $wpdb->prepare( "$column = $format", $value );
-				}
-
-				$query .= ' ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
-
+			// Not an insert query
+			if ( ! preg_match( '/^INSERT/i', $query ) ) {
 				return $query;
-			};
+			}
 
-			add_filter( 'query', $update_func );
-		}
+			// Don't update with default values
+			$update_data = array_diff_assoc( $orig_data, $column_defaults );
+
+			global $wpdb;
+
+			// never update these columns
+			unset( $update_data['ID'] );
+			unset( $update_data['email'] );
+			unset( $update_data['date_created'] );
+
+			// No data to update if key exists already
+			if ( empty( $update_data ) ) {
+				return $query;
+			}
+
+			$pairs = [];
+
+			foreach ( $update_data as $column => $value ) {
+				$format  = $column_formats[ $column ];
+				$pairs[] = $wpdb->prepare( "$column = $format", $value );
+			}
+
+			$query .= ' ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+
+			return $query;
+		};
+
+		add_filter( 'query', $update_func );
 
 		$inserted = $this->insert( $data );
 
-		if ( key_exists( 'email', $data ) && isset( $update_func ) ) {
-			remove_filter( 'query', $update_func );
-		}
+		remove_filter( 'query', $update_func );
 
 		return $inserted;
 	}

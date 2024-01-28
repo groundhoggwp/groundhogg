@@ -7,6 +7,7 @@ use Groundhogg\Contact;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\DB\Query\Where;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;

@@ -2,11 +2,11 @@
 
 namespace Groundhogg;
 
+use ArrayAccess;
 use Groundhogg\Classes\Note;
 use Groundhogg\DB\DB;
 use JsonSerializable;
 use Serializable;
-use ArrayAccess;
 
 abstract class Base_Object extends Supports_Errors implements Serializable, ArrayAccess, JsonSerializable {
 
@@ -76,9 +76,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			// Only get 1 record
 			$identifier_or_args['limit'] = 1;
 
-			$query = $this->get_db()->query( $identifier_or_args );
-
-			$object = array_shift( $query );
+			$results = $this->get_db()->query( $identifier_or_args );
+			$object  = array_shift( $results );
 
 			if ( ! empty( $object ) && is_object( $object ) ) {
 

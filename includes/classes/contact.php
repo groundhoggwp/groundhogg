@@ -81,14 +81,6 @@ class Contact extends Base_Object_With_Meta {
 			$field                = 'user_id';
 		}
 
-		// Extract email if provided and if exists, update
-		if ( is_array( $_id_or_email_or_args ) && key_exists( 'email', $_id_or_email_or_args ) ) {
-			parent::__construct( $_id_or_email_or_args['email'], 'email' );
-			$this->update( $_id_or_email_or_args );
-
-			return;
-		}
-
 		parent::__construct( $_id_or_email_or_args, $field );
 	}
 
