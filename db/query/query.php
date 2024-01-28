@@ -149,6 +149,12 @@ class Query {
 
 				return $this->db->prepare( "COALESCE($column, $format)", $matches[2] );
 			},
+			"/^DATE_FORMAT\($column_regex,\s*(?:'|\")?([^'\"]+)(?:'|\")?\)/i"   => function ( $matches ) {
+				$column = $this->sanitize_column( $matches[1] );
+				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
+
+				return $this->db->prepare( "DATE_FORMAT($column, $format)", $matches[2] );
+			},
 			"/^CAST\($column_regex as (SIGNED|UNSIGNED|DATE|TIME|DATETIME)\)/i" => function ( $matches ) {
 				return sprintf( "CAST(%s as %s)", $this->sanitize_column( $matches[1] ), strtoupper( $matches[2] ) );
 			},
@@ -497,7 +503,7 @@ class Query {
 	 * @return false|mixed|string|null
 	 */
 	public function count() {
-		$this->setSelect( "COUNT(*)" );
+		$this->setSelect( "COUNT($this->select)" );
 		$this->setFoundRows( false );
 
 		return absint( $this->get_var() );

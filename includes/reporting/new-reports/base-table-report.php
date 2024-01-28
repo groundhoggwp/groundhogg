@@ -3,11 +3,8 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
-use Groundhogg\Plugin;
 
 /**
  * Created by PhpStorm.
@@ -16,6 +13,9 @@ use Groundhogg\Plugin;
  * Time: 9:13 AM
  */
 abstract class Base_Table_Report extends Base_Report {
+
+	protected $per_page = 10;
+	protected $orderby = 0;
 
 	/**
 	 * @return array
@@ -26,6 +26,8 @@ abstract class Base_Table_Report extends Base_Report {
 			'label'   => $this->get_label(),
 			'data'    => $this->get_table_data(),
 			'no_data' => $this->no_data_notice(),
+			'per_page' => $this->per_page,
+			'orderby'  => $this->orderby,
 		];
 	}
 

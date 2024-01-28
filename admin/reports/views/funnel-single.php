@@ -80,29 +80,17 @@ if ( ! $funnel->exists() ) {
 		'class' => 'span-4'
 	] ); ?>
 
-    <div class="gh-panel span-6">
+    <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Top Performing Emails in Funnel', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php _e( 'Email Performance', 'groundhogg' ); ?></h2>
         </div>
-        <div id="table_top_performing_emails" class="emails-list"></div>
-    </div>
-    <div class="gh-panel span-6">
-        <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Emails Needing Improvement', 'groundhogg' ); ?></h2>
-        </div>
-        <div id="table_worst_performing_emails" class="emails-list"></div>
+        <div id="table_all_funnel_emails_performance"></div>
     </div>
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
             <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_form_activity"></div>
-    </div>
-    <div class="gh-panel span-12">
-        <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'All Email Activity', 'groundhogg' ); ?></h2>
-        </div>
-        <div id="table_all_funnel_emails_performance"></div>
     </div>
     <div class="gh-panel span-12">
         <div class="gh-panel-header">

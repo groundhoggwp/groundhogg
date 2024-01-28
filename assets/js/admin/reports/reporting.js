@@ -32,7 +32,7 @@ function tool_tip_title () {
     Fragment,
     Button,
     Div,
-
+    Span,
   } = MakeEl
 
   const { loadingModal } = Groundhogg.element
@@ -359,7 +359,7 @@ function tool_tip_title () {
 
     renderTable: function ($report, report_data, id) {
 
-      let { label, data, no_data = '' } = report_data
+      let { label, data, no_data = '', per_page = 10, orderby = 0 } = report_data
 
       if (!Array.isArray(label)) {
         label = Object.values(label)
@@ -373,27 +373,79 @@ function tool_tip_title () {
       const ReportTable = () => {
 
         const State = Groundhogg.createState({
-          per_page: 10,
+          per_page,
+          orderby,
+          orderby2: 0,
+          order: 'DESC',
           page: 0,
         })
 
         const morph = () => morphdom($report[0], Div({}, Render()), { childrenOnly: true })
 
-        const getData = () => data.slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
+        const compareRows = (a, b, k = State.orderby) => {
 
-        const TableBody = () => TBody({}, getData().map(row => Tr({}, Object.keys(row).map(k => {
-          return Td({ dataColname: k }, `${ row[k] }`)
-        }))))
+          if (!a.orderby) {
+            return 0
+          }
 
-        const replaceBody = () => {
-          $report[0].querySelector('tbody').replaceWith(TableBody())
+          let av = a.orderby[k]
+          let bv = b.orderby[k]
+
+          // Avoid deep recursion if already checking orderby2
+          if ( av === bv && k !== State.orderby2 ){
+            return compareRows( a, b, State.orderby2 )
+          }
+
+          if (State.order === 'ASC') {
+            return av - bv
+          }
+
+          return bv - av
         }
+
+        const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
+
+        const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
+          return Td({ dataColname: k, className: `${cellClasses[i]}` }, `${ row[k] }`)
+        }))))
 
         const Render = () => Fragment([
           Table({
             className: 'groundhogg-report-table',
           }, [
-            THead({}, Tr({}, label.map(label => Th({}, label)))),
+            THead({}, Tr({}, label.map((label, i) => Th({
+              id: `order-${ i }`,
+              className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
+              onClick: e => {
+                if (State.orderby === i) {
+                  State.set({
+                    order: State.order === 'ASC' ? 'DESC' : 'ASC',
+                  })
+                }
+                else {
+                  State.set({
+                    orderby: i,
+                    orderby2: State.orderby,
+                    order: 'DESC',
+                  })
+                }
+                morph()
+              },
+            }, [
+              label,
+              Span({
+                style: {
+                  float: 'right'
+                }
+              }, [
+                Span({
+                  className: 'sorting-indicator asc',
+                }),
+                Span({
+                  className: 'sorting-indicator desc',
+                }),
+              ]),
+            ])))),
             TableBody(),
           ]),
           Div({

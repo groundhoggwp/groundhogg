@@ -8,21 +8,27 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email;
 use Groundhogg\Event;
+use Groundhogg\Step;
 use function Groundhogg\_nf;
 use function Groundhogg\array_find;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\format_number_with_percentage;
-use function Groundhogg\html;
+use function Groundhogg\is_good_fair_or_poor;
+use function Groundhogg\percentage;
 use function Groundhogg\report_link;
 
 abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Report {
 
+	protected $orderby = 1;
+
 	public function get_label() {
 		return [
 			__( 'Emails', 'groundhogg' ),
+//			__( 'Ored', 'groundhogg' ),
 			__( 'Sent', 'groundhogg' ),
 			__( 'Opens', 'groundhogg' ),
-			__( 'Clicks', 'groundhogg' )
+			__( 'Clicks', 'groundhogg' ),
+			__( 'Unsubs', 'groundhogg' ),
 		];
 	}
 
@@ -59,7 +65,8 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 		              ->setOrderby( 'total' )
 		              ->whereIn( 'activity_type', [
 			              Activity::EMAIL_OPENED,
-			              Activity::EMAIL_CLICKED
+			              Activity::EMAIL_CLICKED,
+			              Activity::UNSUBSCRIBED
 		              ] )
 		              ->lessThanEqualTo( 'timestamp', $this->end )
 		              ->greaterThanEqualTo( 'timestamp', $this->start )
@@ -82,8 +89,9 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 			$step_id  = absint( $sentResult->step_id );
 
 			$email = new Email( $email_id );
+			$step = new Step( $step_id );
 
-			if ( ! $email->exists() ) {
+			if ( ! $email->exists() || ! $step->exists() ) {
 				continue;
 			}
 
@@ -105,12 +113,21 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 
 			$clicked = $clickedResult ? absint( $clickedResult->total ) : 0;
 
+			$unsubedResult = array_find( $activityResults, function ( $result ) use ( $email_id, $step_id ) {
+				return $result->activity_type === Activity::UNSUBSCRIBED
+				       && $result->email_id == $email_id
+				       && $result->step_id == $step_id;
+			} );
+
+			$unsubscribed = $unsubedResult ? absint( $unsubedResult->total ) : 0;
+
 			if ( $this->should_include( $sent, $opened, $clicked ) ) {
 				$list[] = [
 					'label'   => report_link( $email->get_title(), [
 						'tab'  => 'funnels',
 						'step' => $step_id
 					] ),
+//					'order'        => $step->get_order(),
 					'sent'    => contact_filters_link( _nf( $sent ), [
 						// Group
 						[
@@ -124,7 +141,7 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 								'after'      => $this->startDate->ymd()
 							]
 						]
-					] ),
+					], $sent ),
 					'opened'  => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
 						[
 							[
@@ -149,6 +166,34 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 							]
 						]
 					], $clicked ),
+					'unsubscribes' => contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
+						[
+							[
+								'type'       => 'unsubscribed',
+								'email_id'   => $email_id,
+								'step_id'    => $step_id,
+								'date_range' => 'between',
+								'before'     => $this->endDate->ymd(),
+								'after'      => $this->startDate->ymd()
+							]
+						]
+					], $unsubscribed ),
+					'orderby'    => [
+						// The value to compare, and the secondary column to compare
+						$step->get_order(),
+						$sent,
+						$opened,
+						$clicked,
+						$unsubscribed,
+					],
+					'cellClasses'    => [
+						// One of Good/Fair/Poor
+						'', // Email title
+						'', // sent
+						is_good_fair_or_poor( percentage( $sent, $opened ), 40, 30, 20, 10 ), // Sent
+						is_good_fair_or_poor( percentage( $opened, $clicked ), 30, 20, 10, 5 ), // clicks
+						is_good_fair_or_poor( 100 - percentage( $sent, $unsubscribed ), 99, 98, 97, 95 ), // unsubscribed
+					]
 				];
 
 			}
@@ -158,55 +203,7 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 		return $list;
 	}
 
-	protected function normalize_data( $data ) {
-		$data = parent::normalize_data( $data );
-
-		foreach ( $data as $i => &$datum ) {
-
-			$datum['label'] = html()->e( 'a', [
-				'title' => $datum['label'],
-				'href'  => $datum['url'],
-			], $datum['label'] );
-
-			unset( $datum['url'] );
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Normalize a datum
-	 *
-	 * @param $item_key
-	 * @param $item_data
-	 *
-	 * @return array
-	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-		return $item_data;
+		// TODO: Implement normalize_datum() method.
 	}
-
-
-	/**
-	 * Sort stuff
-	 *
-	 * @param $a
-	 * @param $b
-	 *
-	 * @return mixed
-	 */
-	public function sort( $a, $b ) {
-
-		if ( $a['sent'] === $b['sent'] ) {
-
-			if ( $a['opened'] === $b['opened'] ) {
-				return $a['clicked'] - $b['clicked'];
-			}
-
-			return $a['opened'] - $b['opened'];
-		}
-
-		return $a['sent'] - $b['sent'];
-	}
-
 }

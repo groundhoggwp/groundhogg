@@ -230,7 +230,7 @@ function contact_filters_link( $content, $filters, $no_link = false ) {
 	return html()->e( 'a', [
 		'target' => '_blank',
 		'href'   => admin_page_url( 'gh_contacts', [
-			'filters' => base64_json_encode( $filters )
+			'filters' => base64_json_encode( array_values( $filters ) )
 		] )
 	], $content );
 }
@@ -8227,4 +8227,37 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 	}
 
 	return trim( $markdown );
+}
+
+/**
+ * Returns a string representing Good Fiar or Poor given specific thresholds
+ *
+ * @param int  $number
+ * @param int  $great
+ * @param int  $good
+ * @param int  $fair
+ * @param int  $poor
+ * @param bool $inverse
+ *
+ * @return string good|fair|poor|bad
+ */
+function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, int $poor ){
+
+	if ( $number >= $great ){
+		return 'great';
+	}
+
+    if ( $number >= $good ){
+        return 'good';
+    }
+
+    if ( $number >= $fair ){
+        return 'fair';
+    }
+
+    if ( $number >= $poor ){
+        return 'poor';
+    }
+
+	return 'bad';
 }

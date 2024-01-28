@@ -3,25 +3,26 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
-use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
-use Groundhogg\Email;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Step;
-use function Groundhogg\admin_page_url;
+use function Groundhogg\contact_filters_link;
+use function Groundhogg\format_number_with_percentage;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\html;
+use function Groundhogg\is_good_fair_or_poor;
 use function Groundhogg\percentage;
+use function Groundhogg\report_link;
+use function Groundhogg\Ymd_His;
 
 class Table_Top_Converting_Funnels extends Base_Table_Report {
+
+	protected $orderby = 1;
 
 	public function get_label() {
 		return [
 			__( 'Funnel', 'groundhogg' ),
-			__( 'Conversion Rate', 'groundhogg' )
+			__( 'Conversions', 'groundhogg' )
 		];
 
 	}
@@ -30,37 +31,70 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		// Get list of funnels and plot it conversion rate
 		// Only include active funnels
-		$funnels = get_db( 'funnels' )->query( [
-			'status' => 'active'
-		] );
 
-		if ( empty( $funnels ) ) {
-			return [];
-		}
+		$conversionStepQuery = new Table_Query( 'steps' );
+		$conversionStepQuery->setSelect( 'ID' )->where( 'is_conversion', 1 )->equals( 'step_status', 'active' );
 
-		$list = [];
-		foreach ( $funnels as $funnel ) {
-			$list [] = [
-				'label' => $funnel->title,
-				'data'  => $this->get_conversion_rate( $funnel->ID ),
-				'url'   => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->ID ] ),
+		$conversionQuery = new Table_Query( 'events' );
+		$conversionQuery->setSelect( 'funnel_id', [ 'COUNT(DISTINCT(contact_id))', 'conversions' ] )
+		                ->setGroupby( 'funnel_id' )
+		                ->setOrderby( 'conversions' )
+		                ->where( 'event_type', Event::FUNNEL )
+		                ->equals( 'status', Event::COMPLETE )
+		                ->greaterThanEqualTo( 'time', $this->start )
+		                ->lessThanEqualTo( 'time', $this->end )
+			// only funnels that have conversion steps
+			            ->in( 'step_id', $conversionStepQuery );
+
+//		var_dump( "$conversionQuery" );
+
+		$results = $conversionQuery->get_results();
+
+		$data = [];
+
+		foreach ( $results as $result ) {
+
+			$funnel      = new Funnel( $result->funnel_id );
+			$conversions = absint( $result->conversions );
+
+			$active = ( new Table_Query( 'events' ) )
+				->setSelect( 'COUNT(DISTINCT(contact_id))' )
+				->where( 'funnel_id', $funnel->ID )
+				->equals( 'event_type', Event::FUNNEL )
+				->equals( 'status', Event::COMPLETE )
+				->greaterThanEqualTo( 'time', $this->start )
+				->lessThanEqualTo( 'time', $this->end )
+				->query->get_var();
+
+			$data[] = [
+
+				'funnel' => report_link( $funnel->title, [
+					'tab'    => 'funnels',
+					'funnel' => $funnel->ID
+				] ),
+
+				'conversions' => contact_filters_link( format_number_with_percentage( $conversions, $active ), array_map( function ( $step_id ) use ( $funnel ) {
+					return [
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->ID,
+							'step_id'    => $step_id,
+							'status'     => 'complete',
+							'date_range' => 'between',
+							'before'     => Ymd_His( $this->end ),
+							'after'      => Ymd_His( $this->start )
+						]
+					];
+				}, $funnel->get_conversion_step_ids() ), $conversions ),
+				'orderby'     => [
+					$funnel->ID,
+					$conversions
+				],
+				'cellClasses' => [
+					'',
+					is_good_fair_or_poor( percentage( $active, $conversions ), 40, 30, 20, 10 )
+				]
 			];
-		}
-
-
-		$list = $this->normalize_data( $list );
-
-		foreach ( $list as $i => $datum ) {
-
-
-			$datum['label'] = html()->wrap( $datum['label'], 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			$datum['data']  = number_format_i18n( $datum['data'], 1 ) . '%';
-
-			unset( $datum['url'] );
-			$data[ $i ] = $datum;
 		}
 
 		return $data;
@@ -77,55 +111,6 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-
-		return [
-			'label' => $item_data ['label'],
-			'data'  => $item_data ['data'],
-			'url'   => $item_data ['url'],
-		];
 	}
-
-
-	protected function get_conversion_rate( $funnel_id ) {
-
-		$funnel           = new Funnel( $funnel_id );
-		$conversion_steps = $funnel->get_conversion_step_ids();
-
-		if ( empty( $conversion_steps ) ){
-			return 0;
-		}
-
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
-			[ 'col' => 'funnel_id', 'val' => $funnel_id, 'compare' => '=' ],
-			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
-		];
-
-		$num_of_conversions = get_db( 'events' )->count( [
-			'where'  => $where,
-			'select' => 'DISTINCT contact_id'
-		] );
-
-		$cquery = new Contact_Query();
-
-		$num_events_completed = $cquery->query( [
-			'count'  => true,
-			'report' => [
-				'funnel_id' => $funnel->get_id(),
-				'step_id'   => $funnel->get_entry_step_ids(),
-				'start'     => $this->start,
-				'end'       => $this->end,
-				'status'    => Event::COMPLETE
-			]
-		] );
-
-		return percentage( $num_events_completed, $num_of_conversions );
-
-	}
-
 
 }

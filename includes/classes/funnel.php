@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
-use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
 class Funnel extends Base_Object_With_Meta {
@@ -377,6 +376,12 @@ class Funnel extends Base_Object_With_Meta {
 		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_starting() || $step->is_entry();
 		} ) );
+	}
+
+	public function get_email_steps() {
+		return array_filter( $this->get_steps(), function ( $step ) {
+			return $step->type_is( 'send_email' );
+		} );
 	}
 
 	/**

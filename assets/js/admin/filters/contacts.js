@@ -39,6 +39,10 @@
 
   const {
     Filters, FilterRegistry, createFilter, createGroup,
+    createDateFilter,
+    createStringFilter,
+    createNumberFilter,
+    createTimeFilter,
   } = Groundhogg.filters
 
   const ContactFilterRegistry = FilterRegistry({})
@@ -495,19 +499,7 @@
   // registerFilter('primary_phone', 'contact', {}, 'Primary Phone')
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
 
-  registerFilter('birthday', 'contact', __('Birthday', 'groundhogg'), {
-    view (filter) {
-      //language=HTMl
-      return standardActivityDateTitle('<b>Birthday is</b>', filter)
-    }, edit (filter) {
-      // language=html
-      return standardActivityDateOptions(filter)
-    }, onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    }, defaults: {
-      ...standardActivityDateDefaults,
-    },
-  })
+  ContactFilterRegistry.registerFilter(createDateFilter('birthday', __('Birthday', 'groundhogg'), 'contact'))
 
   registerFilter('date_created', 'contact', __('Date Created', 'groundhogg'), {
     view (filter) {
@@ -1614,13 +1606,6 @@
   const getField = (id) => {
     return fields.find(f => f.id == id)
   }
-
-  const {
-    createDateFilter,
-    createStringFilter,
-    createNumberFilter,
-    createTimeFilter,
-  } = Groundhogg.filters
 
   const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
     id: 'filter-options',

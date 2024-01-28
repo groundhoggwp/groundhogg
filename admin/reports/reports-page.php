@@ -180,8 +180,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 		if ( get_url_var( 'funnel' ) ) {
 			return [
 				'chart_funnel_breakdown',
-				'table_top_performing_emails',
-				'table_worst_performing_emails',
+//				'table_top_performing_emails',
+//				'table_worst_performing_emails',
 				'total_funnel_conversion_rate',
 				'total_funnel_conversions',
 				'total_contacts_added_to_funnel',

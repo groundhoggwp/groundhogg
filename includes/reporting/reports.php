@@ -30,7 +30,7 @@ use Groundhogg\Reporting\New_Reports\Table_Form_Activity;
 use Groundhogg\Reporting\New_Reports\Table_Funnel_Stats;
 use Groundhogg\Reporting\New_Reports\Table_List_Engagement;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
-use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
+use Groundhogg\Reporting\New_Reports\Table_Funnel_Top_Performing_Broadcasts;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Funnel_Emails;
 use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Funnel_Emails;
 use Groundhogg\Reporting\New_Reports\Total_Abandonment_Rate;
@@ -559,7 +559,7 @@ class Reports {
 	 */
 	public function table_top_performing_broadcasts() {
 
-		$report = new Table_Top_Performing_Broadcasts( $this->start, $this->end );
+		$report = new Table_Funnel_Top_Performing_Broadcasts( $this->start, $this->end );
 
 		return $report->get_data();
 

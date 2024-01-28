@@ -213,9 +213,33 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return void
 	 */
-	public static function filter_unsubscribed( $filter, $where ) {
-		$where->equals( 'optin_status', Preferences::UNSUBSCRIBED );
-		Filters::mysqlDateTime( 'date_optin_status_changed', $filter, $where );
+	public static function filter_unsubscribed( $filter, Where $where ) {
+
+		// Don't reference activity table
+		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) ) {
+			$where->equals( 'optin_status', Preferences::UNSUBSCRIBED );
+			Filters::mysqlDateTime( 'date_optin_status_changed', $filter, $where );
+
+			return;
+		}
+
+		$alias = $where->query->joinActivityTotal( Activity::UNSUBSCRIBED, $filter, [
+			'funnel_id',
+			'step_id',
+			'email_id'
+		] );
+
+		if ( isset_not_empty( $filter, 'funnel_id' ) ) {
+			$where->equals( "$alias.funnel_id", $filter['funnel_id'] );
+		}
+		if ( isset_not_empty( $filter, 'email_id' ) ) {
+			$where->equals( "$alias.email_id", $filter['email_id'] );
+		}
+		if ( isset_not_empty( $filter, 'step_id' ) ) {
+			$where->equals( "$alias.step_id", $filter['step_id'] );
+		}
+
+		$where->greaterThanEqualTo( "COALESCE($alias.total_events,0)", 1 );
 	}
 
 	/**
@@ -227,6 +251,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_optin_status_changed( $filter, $where ) {
+
 		$filter = wp_parse_args( $filter, [
 			'value' => []
 		] );
@@ -243,9 +268,19 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return void
 	 */
-	public static function filter_birthday( $filter, $where ) {
+	public static function filter_birthday( $filter, Where $where ) {
+
 		$alias = $where->query->joinMeta( 'birthday' );
-		Filters::mysqlDate( "$alias.meta_value", $filter, $where );
+
+		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
+
+		$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
+                INTERVAL YEAR(\'%2$s\')-YEAR(%1$s)
+                         + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0)
+                YEAR)  
+            BETWEEN \'%2$s\' AND \'%3$s\'', "$alias.meta_value", $after->ymd(), $before->ymd() ) );
+
+//		Filters::date_filter_handler( "DATE_FORMAT($alias.meta_value, '%m-%d')", $filter, $where, 'm-d' );
 	}
 
 	/**

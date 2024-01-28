@@ -136,6 +136,8 @@ class Filters {
 			default:
 			case 'any':
 				// what to do here?
+				$after->setTimestamp( 0 );
+				$before->modify( '+99 years' );
 				break;
 			case 'today':
 				$after->modify( 'today 00:00:00' );
@@ -213,10 +215,12 @@ class Filters {
 				$before->modify( '+365 days' );
 				break;
 			case 'before':
+				$after->setTimestamp( 0 );
 				$before->modify( $filter['before'] );
 				break;
 			case 'after':
 				$after->modify( $filter['after'] );
+				$before->modify( '+99 years' );
 				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );

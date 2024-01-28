@@ -480,7 +480,7 @@
               formatDate(before))
           default:
             return sprintf('%s %s', bold(name),
-              pastDateRanges[date_range].toLowerCase())
+              allDateRanges[date_range].toLowerCase())
         }
       },
       preload,
