@@ -1503,19 +1503,17 @@ class Contact_Query extends Table_Query {
 					self::tags_exclude( $where, $value, isset_not_empty( $query_vars, 'tags_exclude_needs_all' ) );
 					break;
 				case 'marketable':
-					switch ( $value ) {
-						default:
-						case 'any':
-							break;
-						case $value === true:
-						case 'yes':
-							self::marketable( $where );
-							break;
-						case $value === false:
-						case 'no':
-							self::not_marketable( $where );
-							break;
+
+					if ( $value === true || $value === 'yes' ){
+						self::marketable( $where );
+						break;
 					}
+
+					if ( $value === false || $value === 'no' ){
+						self::not_marketable( $where );
+						break;
+					}
+
 					break;
 				case 'report':
 

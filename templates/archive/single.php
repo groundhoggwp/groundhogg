@@ -31,8 +31,8 @@ if ( ! $contact ) {
 if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact, 'view_archive' ) ):
 
 	$use_queued = get_query_var( 'use_queued' );
-	$event_id    = absint( get_query_var( 'event_id' ) );
-	$event       = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
+	$event_id   = absint( get_query_var( 'event_id' ) );
+	$event      = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
 
 	// Event does not exist, or mismatched contact ID
 	if ( ! $event->exists() || $event->get_contact_id() !== $contact->get_id() ) {

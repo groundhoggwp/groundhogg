@@ -30,20 +30,28 @@
     getOwner,
   } = Groundhogg.user
 
-  const OwnerPicker = (users, updateFilter) => ItemPicker({
+  const OwnerPicker = (userIds, updateFilter) => ItemPicker({
     id: `select-users`,
     noneSelected: __('Select a user...', 'groundhogg'),
-    selected: users.map(user_id => ( { id: user_id, text: getOwner(user_id).data.user_email } )),
+    selected: userIds.map(user_id => {
+
+      if (user_id == 0) {
+        return { id: 0, text: __('The contact owner', 'groundhogg') }
+      }
+
+      return { id: user_id, text: getOwner(user_id).data.user_email }
+    }),
     multiple: true,
     style: {
       flexGrow: 1,
     },
+    isValidSelection: id => id === 0 || getOwner(id),
     fetchOptions: (search) => {
       search = new RegExp(search, 'i')
 
       let options = [
         ...Groundhogg.filters.owners.map(u => ( { id: u.ID, text: u.data.display_name } )),
-        { id: 0, text: 'The contact owner' },
+        { id: 0, text: __('The contact owner', 'groundhogg') },
       ].filter(({ text }) => text.match(search))
 
       return Promise.resolve(options)
@@ -62,7 +70,14 @@
         return 'Any user'
       }
 
-      return sprintf('From %s', orList(users.map(user_id => bold(getOwner(user_id).data.user_email))))
+      return sprintf('From %s', orList(users.map(user_id => {
+
+        if (user_id == 0) {
+          return bold(__('The contact owner', 'groundhogg'))
+        }
+
+        return bold(getOwner(user_id).data.user_email)
+      })))
     },
     edit: ({ users = [], updateFilter }) => Fragment([
       OwnerPicker(users, updateFilter),

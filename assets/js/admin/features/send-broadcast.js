@@ -385,7 +385,7 @@
               }
 
               if (EmailsStore.get(state.email_id).meta.message_type === 'marketing') {
-                query.marketable = true
+                query.marketable = 'yes'
               }
 
               ContactsStore.count(query).then(total => {
@@ -630,7 +630,7 @@
     query = getSearchMethods().find(({ id }) => id === searchMethod).query()
 
     if (getObject() && getObject().data.message_type !== 'transactional') {
-      query.marketable = true
+      query.marketable = 'yes'
     }
 
     return query
