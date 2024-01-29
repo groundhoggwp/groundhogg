@@ -370,6 +370,8 @@ function tool_tip_title () {
         return
       }
 
+      let sortable = data.length && data[0].orderby
+
       const ReportTable = () => {
 
         const State = Groundhogg.createState({
@@ -384,7 +386,7 @@ function tool_tip_title () {
 
         const compareRows = (a, b, k = State.orderby) => {
 
-          if (!a.orderby) {
+          if (!sortable || !a.orderby) {
             return 0
           }
 
@@ -406,17 +408,24 @@ function tool_tip_title () {
         const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
 
         const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
-          return Td({ dataColname: k, className: `${cellClasses[i]}` }, `${ row[k] }`)
+          return Td({ dataColname: k, className: `${cellClasses[i] ?? ''}` }, `${ row[k] }`)
         }))))
 
         const Render = () => Fragment([
-          Table({
+          Div({
+            className: 'table-scroll'
+          }, Table({
             className: 'groundhogg-report-table',
           }, [
             THead({}, Tr({}, label.map((label, i) => Th({
               id: `order-${ i }`,
               className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
               onClick: e => {
+
+                if (!sortable) {
+                  return
+                }
+
                 if (State.orderby === i) {
                   State.set({
                     order: State.order === 'ASC' ? 'DESC' : 'ASC',
@@ -433,7 +442,7 @@ function tool_tip_title () {
               },
             }, [
               label,
-              Span({
+              sortable ? Span({
                 style: {
                   float: 'right'
                 }
@@ -444,11 +453,11 @@ function tool_tip_title () {
                 Span({
                   className: 'sorting-indicator desc',
                 }),
-              ]),
+              ]) : null,
             ])))),
             TableBody(),
-          ]),
-          Div({
+          ])),
+          data.length > State.per_page ? Div({
             style: {
               padding: '10px',
             },
@@ -474,7 +483,7 @@ function tool_tip_title () {
                 morph()
               },
             }, 'Next') : null,
-          ]),
+          ]) : null,
 
         ])
 

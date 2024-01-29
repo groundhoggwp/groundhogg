@@ -233,6 +233,9 @@ h1.report-title {
   font-size: 16px;
   font-weight: normal;
 }
+.gh-panel .table-scroll {
+  overflow-x: auto;
+}
 .gh-panel table.groundhogg-report-table tr th, .gh-panel table.groundhogg-report-table tr td {
   font-size: 14px;
   padding: 13px;

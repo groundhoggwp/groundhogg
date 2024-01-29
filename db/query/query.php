@@ -94,9 +94,9 @@ class Query {
 	 *
 	 * @return string
 	 */
-	public function sanitize_column( $maybe_column ) {
+	public function sanitize_column( string $maybe_column ) {
 
-		if ( $maybe_column === '*' ) {
+		if ( $this->column_is_safe( $maybe_column ) ) {
 			return $maybe_column;
 		}
 
@@ -112,6 +112,21 @@ class Query {
 		return $this->_sanitize_column_key( $maybe_column );
 	}
 
+	protected array $safe_columns = [
+		'*'        => true,
+		'COUNT(*)' => true
+	];
+
+	public function add_safe_column( string $col ) {
+		$this->safe_columns[ $col ] = true;
+
+		return $this;
+	}
+
+	public function column_is_safe( string $col ) {
+		return key_exists( $col, $this->safe_columns ) && $this->safe_columns[ $col ];
+	}
+
 	/**
 	 * Sanitizes an aggregate function like SUM(column)
 	 *
@@ -119,7 +134,11 @@ class Query {
 	 *
 	 * @return string
 	 */
-	public function maybe_sanitize_aggregate_column( $maybe_column ) {
+	public function maybe_sanitize_aggregate_column( string $maybe_column ) {
+
+		if ( $this->column_is_safe( $maybe_column ) ) {
+			return $maybe_column;
+		}
 
 		if ( ! preg_match( "/(COALESCE|COUNT|CAST|SUM|AVG|DATE|DISTINCT)\(/i", $maybe_column ) ) {
 			return $this->sanitize_column( $maybe_column );
@@ -131,8 +150,14 @@ class Query {
 			"/^COUNT\(DISTINCT\($column_regex\)\)/i"                            => function ( $matches ) {
 				return sprintf( "COUNT(DISTINCT(%s))", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COUNT\(((?:[A-Za-z0-9_.]+)|\*)\)/i"                              => function ( $matches ) {
+			"/^COUNT\((?:$column_regex\.\*)\)/i" => function ( $matches ) {
+				return "COUNT(*)";
+			},
+			"/^COUNT\($column_regex\)/i"         => function ( $matches ) {
 				return sprintf( "COUNT(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/^COUNT\(\*\)/i"                    => function ( $matches ) {
+				return "COUNT(*)";
 			},
 			"/^DISTINCT\($column_regex\)/i"                                     => function ( $matches ) {
 				return sprintf( "DISTINCT(%s)", $this->sanitize_column( $matches[1] ) );
@@ -238,7 +263,7 @@ class Query {
 			if ( is_string( $col ) && str_starts_with( $col, 'DISTINCT' ) ) {
 				[ 1 => $column ] = explode( ' ', $col );
 
-				return "DISTINCT " . $this->sanitize_column( $column );
+				return "DISTINCT(" . $this->sanitize_column( $column ) . ')';
 			}
 
 			// Back compat aggregates with alias
@@ -506,7 +531,11 @@ class Query {
 		$this->setSelect( "COUNT($this->select)" );
 		$this->setFoundRows( false );
 
-		return absint( $this->get_var() );
+		$count = absint( $this->get_var() );
+
+//		wp_send_json( $this->db->last_query );
+
+		return $count;
 	}
 
 	/**

@@ -287,7 +287,7 @@ class Filters {
 		}
 
 		$filter = wp_parse_args( $filter, [
-			'date_range' => '24_hours',
+			'date_range' => 'any',
 		] );
 
 		if ( $filter['date_range'] === 'any' ){

@@ -759,7 +759,12 @@ class Contact_Query extends Table_Query {
 			'count_compare' => 'greater_than_or_equal_to'
 		] );
 
-		$alias = $where->query->joinActivityTotal( Activity::EMAIL_CLICKED, $filter, [
+		$broadcast_id = absint( $filter['broadcast_id'] );
+		$broadcast = new Broadcast( $broadcast_id );
+
+		$activity     = $broadcast->is_email() ? Activity::EMAIL_CLICKED : Activity::SMS_CLICKED;
+
+		$alias = $where->query->joinActivityTotal( $activity, $filter, [
 			'funnel_id',
 			'step_id',
 			'referer'
@@ -914,7 +919,7 @@ class Contact_Query extends Table_Query {
 		];
 
 		if ( ! empty( $path ) ) {
-			$select[] = 'path';
+			$select[] = 'referer';
 		}
 
 		$alias = $where->query->joinActivityTotal( Activity::EMAIL_CLICKED, $filter, $select );

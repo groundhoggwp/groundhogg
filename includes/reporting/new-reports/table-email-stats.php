@@ -6,25 +6,29 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
-use Groundhogg\Event;
-use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
+use function Groundhogg\contact_filters_link;
+use function Groundhogg\format_number_with_percentage;
 use function Groundhogg\html;
-use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
 
 class Table_Email_Stats extends Base_Table_Report {
 
 	protected function get_table_data() {
-
+		$step = new Step( $this->get_step_id() );
 		$email = new Email( $this->get_email_id() );
 
 		$title = $email->get_subject_line();
 		$stats = $email->get_email_stats( $this->start, $this->end );
+
+		[
+			'sent'         => $sent,
+			'clicked'      => $clicked,
+			'opened'       => $opened,
+			'unsubscribed' => $unsubscribed
+		] = $stats;
 
 		return [
 			[
@@ -36,83 +40,68 @@ class Table_Email_Stats extends Base_Table_Report {
 				] )
 			],
 			[
-				'label' => __( 'Total Delivered', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['sent'], 'a', [
-					'href'  => add_query_arg(
+				'label' => __( 'Sent', 'groundhogg' ),
+				'data'  => contact_filters_link( _nf( $sent ), [
+					[
 						[
-							'report' => [
-								'step'   => $stats['steps'],
-								'type'   => Event::FUNNEL,
-								'status' => Event::COMPLETE,
-								'before' => $this->end,
-								'after'  => $this->start
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+							'type'       => 'email_received',
+							'email_id'   => $email->get_id(),
+							'step_id'    => $step->get_id(),
+							'funnel_id'  => $step->get_funnel_id(),
+							'date_range' => 'between',
+							'after'      => $this->startDate->ymd(),
+							'before'     => $this->endDate->ymd(),
+						]
+					]
+				], $sent )
 			],
 			[
 				'label' => __( 'Opens', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['opened'] . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'data' => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_OPENED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+							'type'       => 'email_opened',
+							'email_id'   => $email->get_id(),
+							'step_id'    => $step->get_id(),
+							'funnel_id'  => $step->get_funnel_id(),
+							'date_range' => 'between',
+							'after'      => $this->startDate->ymd(),
+							'before'     => $this->endDate->ymd(),
+						]
+					]
+				], $opened )
 			],
 			[
-				'label' => __( 'Total Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['all_clicks'], 'span', [
-					'class' => 'number-total'
-				] )
-			],
-			[
-				'label' => __( 'Unique Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['clicked'] . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'label' => __( 'Clicks', 'groundhogg' ),
+				'data'  => contact_filters_link( format_number_with_percentage( $clicked, $opened ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
-			],
-			[
-				'label' => __( 'Click Thru Rate', 'groundhogg' ),
-				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
+							'type'       => 'email_link_clicked',
+							'email_id'   => $email->get_id(),
+							'step_id'    => $step->get_id(),
+							'funnel_id'  => $step->get_funnel_id(),
+							'date_range' => 'between',
+							'after'      => $this->startDate->ymd(),
+							'before'     => $this->endDate->ymd(),
+						]
+					]
+				], $clicked )
 			],
 			[
 				'label' => __( 'Unsubscribed', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['unsubscribed'] . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'data'  => contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => Activity::UNSUBSCRIBED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+							'type'       => 'unsubscribed',
+							'email_id'   => $email->get_id(),
+							'step_id'    => $step->get_id(),
+							'funnel_id'  => $step->get_funnel_id(),
+							'date_range' => 'between',
+							'after'      => $this->startDate->ymd(),
+							'before'     => $this->endDate->ymd(),
+						]
+					]
+				], $unsubscribed )
 			],
 		];
 

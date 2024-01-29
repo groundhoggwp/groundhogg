@@ -2,16 +2,12 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
-use Groundhogg\Email;
-use Groundhogg\Plugin;
+use Groundhogg\DB\Query\Table_Query;
 use function Groundhogg\_nf;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\generate_referer_hash;
-use function Groundhogg\get_db;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\html;
-use function Groundhogg\managed_page_url;
-use function Groundhogg\remove_query_string_from_url;
 
 class Table_Email_Links_Clicked extends Base_Table_Report {
 
@@ -26,83 +22,86 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 		];
 	}
 
-	protected function get_activities(){
-		$email = new Email( $this->get_email_id() );
-
-		return get_db( 'activity' )->query( [
-			'email_id'      => $email->get_id(),
-			'activity_type' => Activity::EMAIL_CLICKED,
-			'before'        => $this->end,
-			'after'         => $this->start,
-		] );
-	}
-
-	protected function get_contact_query_link( $link ){
-		return admin_page_url( 'gh_contacts', [
-			'activity' => [
-				'activity_type' => Activity::EMAIL_CLICKED,
-				'email_id'      => $this->get_email_id(),
-				'referer'       => $link['referer'],
-				'before'        => $this->end,
-				'after'         => $this->start
+	protected function contact_filters( $url ) {
+		return [
+			[
+				array_filter( [
+					'type'       => 'email_link_clicked',
+					'funnel_id'  => $this->get_funnel_id(),
+					'step_id'    => $this->get_step_id(),
+					'email_id'   => $this->get_email_id(),
+					'link'       => $url,
+					'date_range' => 'between',
+					'after'      => $this->startDate->ymd(),
+					'before'     => $this->endDate->ymd(),
+				] )
 			]
-		] );
+		];
 	}
 
 	protected function get_table_data() {
 
-		$activity = $this->get_activities();
+		$activityQuery = new Table_Query( 'activity' );
 
-		$links = [];
+		$urlCol = 'SUBSTRING_INDEX(referer, \'?\', 1)';
+		$activityQuery->add_safe_column( $urlCol );
 
-		foreach ( $activity as $event ) {
+		$activityQuery
+			->setSelect( [ $urlCol, 'url' ], [ 'COUNT(ID)', 'clicks' ], [ 'COUNT(DISTINCT(contact_id))', 'contacts' ] )
+			->setOrderby( 'clicks' )
+			->setGroupby( $urlCol )->whereIn( 'activity_type', [
+				Activity::EMAIL_CLICKED,
+				Activity::SMS_CLICKED
+			] );
 
-			// Links with permissions keys
-			if ( strpos( $event->referer, '?pk=' ) !== false ) {
-				$event->referer      = remove_query_string_from_url( $event->referer );
-				$event->referer_hash = generate_referer_hash( $event->referer );
-			}
-
-			if ( ! isset( $links[ $event->referer_hash ] ) ) {
-				$links[ $event->referer_hash ] = [
-					'referer'  => $event->referer,
-					'hash'     => $event->referer_hash,
-					'contacts' => [],
-					'uniques'  => 0,
-					'clicks'   => 0,
-				];
-			}
-
-			$links[ $event->referer_hash ]['clicks'] ++;
-			$links[ $event->referer_hash ]['contacts'][] = $event->contact_id;
-			$links[ $event->referer_hash ]['uniques']    = count( array_unique( $links[ $event->referer_hash ]['contacts'] ) );
+		if ( $this->get_broadcast_id() ) {
+			$activityQuery->where( 'funnel_id', Broadcast::FUNNEL_ID )
+			              ->equals( 'step_id', $this->get_broadcast_id() );
+		} else {
+			$activityQuery->where()
+			              ->greaterThanEqualTo( 'timestamp', $this->start )
+			              ->lessThanEqualTo( 'timestamp', $this->end );
 		}
 
-		if ( empty( $links ) ) {
-			return [];
+		if ( $this->get_step_id() ) {
+			$activityQuery->where( 'step_id', $this->get_step_id() )
+			              ->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
 		}
+
+		if ( $this->get_funnel_id() ){
+			$activityQuery->where( 'funnel_id', $this->get_funnel_id() );
+		}
+
+		if ( $this->get_email_id() ) {
+			$activityQuery->where( 'email_id', $this->get_email_id() );
+		}
+
+		$linkResults = $activityQuery->get_results();
 
 		$data = [];
 
-		foreach ( $links as $hash => $link ) {
+		foreach ( $linkResults as $result ) {
+
+			$clicks   = absint( $result->clicks );
+			$contacts = absint( $result->contacts );
+			$url      = $result->url;
+
 			$data[] = [
-				'label'   => html()->wrap( $link['referer'], 'a', [
-					'href'   => $link['referer'],
-					'class'  => 'number-total',
-					'title'  => $link['referer'],
-					'target' => '_blank',
-				] ),
-				'uniques' => html()->wrap( _nf( $link['uniques'] ), 'a', [
-					'href'  => $this->get_contact_query_link( $link ),
-					'class' => 'number-total'
-				] ),
-				'clicks'  => html()->wrap( _nf( $link['clicks'] ), 'span', [ 'class' => 'number-total' ] ),
+				'label'    => html()->e( 'a', [
+					'href'   => $url,
+					'target' => '_blank'
+				], preg_replace( '@https?://(?:www\.)?@', '', $url ) ),
+				'contacts' => contact_filters_link( _nf( $contacts ), $this->contact_filters( $url ), $contacts ),
+				'clicks'   => _nf( $clicks ),
+				'orderby'  => [
+					false,
+					$contacts,
+					$clicks
+				]
 			];
 		}
 
 		return $data;
-
-
 	}
 
 	/**

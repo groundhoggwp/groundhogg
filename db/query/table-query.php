@@ -33,6 +33,11 @@ class Table_Query extends Query {
 		parent::__construct( $table->table_name, $table->alias );
 	}
 
+	protected $sanitize_columns = true;
+
+	protected function toggleColumnSanitization() {
+
+	}
 
 	/**
 	 * Sanitizes what should be a column
