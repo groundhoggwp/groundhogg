@@ -417,7 +417,7 @@ function tool_tip_title () {
           }, Table({
             className: 'groundhogg-report-table',
           }, [
-            THead({}, Tr({}, label.map((label, i) => Th({
+            THead({}, Tr({}, label.map((l, i) => Th({
               id: `order-${ i }`,
               className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
               onClick: e => {
@@ -440,13 +440,13 @@ function tool_tip_title () {
                 }
                 morph()
               },
+            }, Div({
+              className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' )}`,
             }, [
-              label,
-              sortable ? Span({
-                style: {
-                  float: 'right'
-                }
-              }, [
+              Span({
+                className: 'column-name',
+              }, l),
+              sortable ? Span({}, [
                 Span({
                   className: 'sorting-indicator asc',
                 }),
@@ -454,7 +454,7 @@ function tool_tip_title () {
                   className: 'sorting-indicator desc',
                 }),
               ]) : null,
-            ])))),
+            ]))))),
             TableBody(),
           ])),
           data.length > State.per_page ? Div({

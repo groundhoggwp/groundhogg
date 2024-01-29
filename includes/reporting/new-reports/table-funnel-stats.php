@@ -12,6 +12,7 @@ use function Groundhogg\html;
 
 class Table_Funnel_Stats extends Base_Table_Report {
 
+	protected $per_page = 99;
 
 	public function get_label() {
 		return [

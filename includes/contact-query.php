@@ -75,7 +75,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_contact_id( $filter, Where $where ) {
-		Filters::number( 'contact_id', $filter, $where );
+		Filters::number( 'ID', $filter, $where );
 	}
 
 	/**

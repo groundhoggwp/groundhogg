@@ -832,6 +832,11 @@ function percentage( $denom, $numer, $precision = 2 ) {
  * @return string
  */
 function format_number_with_percentage( $num, $compare ) {
+
+    if ( empty ($num) && empty($compare)){
+        return '-';
+    }
+
 	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ), );
 }
 

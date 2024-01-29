@@ -244,7 +244,7 @@ h1.report-title {
   padding-left: 0;
 }
 .gh-panel table.groundhogg-report-table tr th.great, .gh-panel table.groundhogg-report-table tr td.great {
-  background-color: #B6D7A8;
+  background-color: #d3e6cb;
 }
 .gh-panel table.groundhogg-report-table tr th.good, .gh-panel table.groundhogg-report-table tr td.good {
   background-color: #eef7e3;
@@ -278,7 +278,7 @@ h1.report-title {
   left: 6px;
 }
 /* NEW CSS FOR TABLE */
-table.groundhogg-report-table tr:nth-child(odd) {
+table.groundhogg-report-table tbody tr:nth-child(odd) {
   background-color: rgba(0, 117, 255, 0.02);
 }
 
@@ -331,7 +331,6 @@ table.groundhogg-report-table td {
   color: #666666;
   line-height: 1.2;
   /*font-weight: unset !important;*/
-  border-top: 1px solid #f2f2f2;
   display: table-cell;
   padding: 15px;
   text-decoration: none;

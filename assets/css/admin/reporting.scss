@@ -297,7 +297,7 @@ h1.report-title {
         }
 
         &.great {
-          background-color: #B6D7A8;
+          background-color: #d3e6cb;
         }
         &.good {
           background-color: #eef7e3;
@@ -348,7 +348,7 @@ h1.report-title {
 }
 
 /* NEW CSS FOR TABLE */
-table.groundhogg-report-table tr:nth-child(odd) {
+table.groundhogg-report-table tbody tr:nth-child(odd) {
   background-color: $primary-blue-2;
 }
 
@@ -402,7 +402,7 @@ table.groundhogg-report-table td {
   color: #666666;
   line-height: 1.2;
   /*font-weight: unset !important;*/
-  border-top: 1px solid #f2f2f2;
+  //border-top: 1px solid #f2f2f2;
   display: table-cell;
   padding: 15px;
   text-decoration: none;

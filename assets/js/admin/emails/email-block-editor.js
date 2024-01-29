@@ -3142,6 +3142,7 @@
           multiple: false,
           placeholder: 'Search for a sender...',
           noneSelected: 'Pick a sender...',
+          isValidSelection: id => true,
           fetchOptions: search => Promise.resolve(fromOptions.filter(item => item.text.includes(search))),
           selected: fromOptions.find(opt => from_select === opt.id),
           onChange: item => {
@@ -6428,14 +6429,14 @@
             label: `Include these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
-            id: 'post-includes',
+            id: `${post_type}-includes`,
             selected: includedPosts,
             tags: false,
             fetchOptions: async (search) => {
               let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`, {
                 search,
                 per_page: 20,
-                orderby: 'relevance',
+                orderby: search ? 'relevance' : 'modified',
                 order: 'desc',
               })
               posts = posts.map(({ id, title }) => ( { id, text: title.rendered } ))
@@ -6456,7 +6457,7 @@
             label: `Exclude these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
-            id: 'post-excludes',
+            id: `${post_type}-excludes`,
             selected: excludedPosts,
             tags: false,
             fetchOptions: async (search) => {

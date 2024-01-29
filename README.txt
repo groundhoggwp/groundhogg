@@ -349,13 +349,20 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.2 (2024-01-22) =
-* ADDED New backed query improvements to help create more complex and performant queries
+= 3.2 (2024-01-29) =
+* ADDED New under the hood query improvements to help create more complex and performant queries.
+* ADDED Color coding, sorting, and pagination to performance report tables.
+* TWEAKED The funnel reports now shows *Added* and *Active* as separate metrics.
+* TWEAKED The conversion rate of a funnel will be calculated with the *Active* metric and not *Added* as it was previously. This may reduce your funnel conversion rates.
 * TWEAKED Date ranges for custom fields are now more flexible.
 * TWEAKED Refactored many of the reports to be more performant.
 * TWEAKED Refactored many of the search filters to be more performant.
+* TWEAKED Funnel editor will preload email and tag assets before being editable.
 * FIXED Custom fields built with the legacy custom fields builder not showing up in replacement codes
 * FIXED using the `Between` comparison in date filters not working.
+* FIXED Funnel campaigns not saving in PHP 8.0+
+* FIXED Selecting posts by ID not working when using a custom post type in the email posts block.
+* FIXED Unable to scroll the email templates.
 
 = 3.1 (2023-12-07) =
 * ADDED Custom post type and taxonomy support to the email editor posts block.

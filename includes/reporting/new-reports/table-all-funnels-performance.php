@@ -180,11 +180,11 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 					'', // Funnel
 					'', // Added
 					'', // Active
-					empty( $conversion_ids ) ? '' : is_good_fair_or_poor( percentage( $active, $conversions ), 40, 30, 20, 10 ), // Conversions
+					empty( $conversion_ids ) || ! $active ? '' : is_good_fair_or_poor( percentage( $active, $conversions ), 40, 30, 20, 10 ), // Conversions
 					'', // Sent
-					! $has_email_steps ? '' : is_good_fair_or_poor( percentage( $sent, $opens ), 40, 30, 20, 10 ), // Sent
-					! $has_email_steps ? '' : is_good_fair_or_poor( percentage( $opens, $clicks ), 30, 20, 10, 5 ), // clicks
-					! $has_email_steps ? '' : is_good_fair_or_poor( 100 - percentage( $sent, $unsubscribed ), 99, 98, 97, 95 ), // unsubscribed
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( percentage( $sent, $opens ), 40, 30, 20, 10 ), // Sent
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( percentage( $opens, $clicks ), 30, 20, 10, 5 ), // clicks
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( 100 - percentage( $sent, $unsubscribed ), 99, 98, 97, 95 ), // unsubscribed
 				]
 			];
 		}

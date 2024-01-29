@@ -319,12 +319,17 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function update( $data = [] ) {
 
+		if ( ! is_array( $data ) ){
+			return false;
+		}
+
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
 		$data = array_diff_assoc( $data, $this->data );
 
+		// updating with existing data
 		if ( empty( $data ) ) {
-			return false;
+			return true;
 		}
 
 		$old_data = $this->data;
