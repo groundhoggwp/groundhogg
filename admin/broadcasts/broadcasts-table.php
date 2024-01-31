@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_List_Table;
@@ -604,26 +605,38 @@ class Broadcasts_Table extends WP_List_Table {
 			$args['object_type'] = 'email';
 		}
 
-		$anonymous = function ( $clauses ) use ( $search ) {
+		if ( ! empty( $search ) ) {
 
-			if ( ! empty( $search ) ) {
+			unset( $args['s'] );
+			unset( $args['search'] );
 
-				$emails_table       = get_db( 'emails' )->table_name;
-				$email_table_search = "SELECT ID FROM $emails_table WHERE `title` RLIKE '{$search}' OR `subject` RLIKE '{$search}'";
-				$clauses['where']   .= " AND object_id IN ({$email_table_search})";
-			}
+			// Handle search
+			add_action( 'groundhogg/broadcast/pre_get_results', function ( Table_Query &$query ) use ( $search ) {
 
-			return $clauses;
-		};
+				$emailJoin = $query->addJoin( 'LEFT', 'emails' );
+				$emailJoin->onColumn( 'ID', 'object_id' )
+				          ->equals( "$query->alias.object_type", 'email' );
 
-		add_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
+				$searchWhere = $query->where()->subWhere();
 
-		$events = get_db( 'broadcasts' )->query( $args );
-		$total  = get_db( 'broadcasts' )->found_rows();
+				$searchWhere->like( "$emailJoin->alias.title", '%' . $query->db->esc_like( $search ) . '%' );
+				$searchWhere->like( "$emailJoin->alias.subject", '%' . $query->db->esc_like( $search ) . '%' );
 
-		remove_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
+				if ( is_sms_plugin_active() ) {
+					$smsJoin = $query->addJoin( 'LEFT', 'sms' );
+					$smsJoin->onColumn( 'ID', 'object_id' )
+					        ->equals( "$query->alias.object_type", 'sms' );
 
-		$this->items = $events;
+					$searchWhere->like( "$smsJoin->alias.title", '%' . $query->db->esc_like( $search ) . '%' );
+				}
+
+			} );
+		}
+
+		$items = get_db( 'broadcasts' )->query( $args );
+		$total = get_db( 'broadcasts' )->found_rows();
+
+		$this->items = $items;
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
