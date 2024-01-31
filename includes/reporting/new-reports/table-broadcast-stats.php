@@ -97,6 +97,8 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 						[
 							'type'         => 'broadcast_opened',
 							'broadcast_id' => $broadcast->ID,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $opened )
@@ -108,6 +110,8 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 						[
 							'type'         => 'broadcast_link_clicked',
 							'broadcast_id' => $broadcast->ID,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $clicked )

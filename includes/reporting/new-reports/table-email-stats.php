@@ -51,6 +51,8 @@ class Table_Email_Stats extends Base_Table_Report {
 							'date_range' => 'between',
 							'after'      => $this->startDate->ymd(),
 							'before'     => $this->endDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $sent )
@@ -67,6 +69,8 @@ class Table_Email_Stats extends Base_Table_Report {
 							'date_range' => 'between',
 							'after'      => $this->startDate->ymd(),
 							'before'     => $this->endDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $opened )
@@ -83,6 +87,8 @@ class Table_Email_Stats extends Base_Table_Report {
 							'date_range' => 'between',
 							'after'      => $this->startDate->ymd(),
 							'before'     => $this->endDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $clicked )

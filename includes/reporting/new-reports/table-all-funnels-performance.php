@@ -127,7 +127,9 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 							'funnel_id'  => $funnel->ID,
 							'date_range' => 'between',
 							'before'     => $this->endDate->ymd(),
-							'after'      => $this->startDate->ymd()
+							'after'      => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $sent ),
@@ -138,7 +140,9 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 							'funnel_id'  => $funnel->ID,
 							'date_range' => 'between',
 							'before'     => $this->endDate->ymd(),
-							'after'      => $this->startDate->ymd()
+							'after'         => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $opens ),
@@ -149,7 +153,9 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 							'funnel_id'  => $funnel->ID,
 							'date_range' => 'between',
 							'before'     => $this->endDate->ymd(),
-							'after'      => $this->startDate->ymd()
+							'after'         => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $clicks ),

@@ -138,7 +138,9 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 								'step_id'    => $step_id,
 								'date_range' => 'between',
 								'before'     => $this->endDate->ymd(),
-								'after'      => $this->startDate->ymd()
+								'after'      => $this->startDate->ymd(),
+								'count'         => 1,
+								'count_compare' => 'greater_than_or_equal_to',
 							]
 						]
 					], $sent ),
@@ -150,7 +152,9 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 								'step_id'    => $step_id,
 								'date_range' => 'between',
 								'before'     => $this->endDate->ymd(),
-								'after'      => $this->startDate->ymd()
+								'after'         => $this->startDate->ymd(),
+								'count'         => 1,
+								'count_compare' => 'greater_than_or_equal_to',
 							]
 						]
 					], $opened ),
@@ -162,7 +166,9 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 								'step_id'    => $step_id,
 								'date_range' => 'between',
 								'before'     => $this->endDate->ymd(),
-								'after'      => $this->startDate->ymd()
+								'after'      => $this->startDate->ymd(),
+								'count'         => 1,
+								'count_compare' => 'greater_than_or_equal_to',
 							]
 						]
 					], $clicked ),

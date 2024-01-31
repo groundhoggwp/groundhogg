@@ -108,6 +108,8 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 						[
 							'type'         => 'broadcast_opened',
 							'broadcast_id' => $broadcast_id,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $opened ),
@@ -116,6 +118,8 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 						[
 							'type'         => 'broadcast_link_clicked',
 							'broadcast_id' => $broadcast_id,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
 						]
 					]
 				], $clicked ),

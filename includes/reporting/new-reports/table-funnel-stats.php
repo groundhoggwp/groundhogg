@@ -8,6 +8,7 @@ use Groundhogg\Event;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_find;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\html;
 
 class Table_Funnel_Stats extends Base_Table_Report {
@@ -69,22 +70,6 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$count_waiting = $waiting_result ? absint( $waiting_result->total ) : 0;
 
-			$url_waiting = admin_page_url( 'gh_contacts', [
-				'report' => [
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => Event::WAITING,
-				]
-			] );
-
-			$url_completed = admin_page_url( 'gh_contacts', [
-				'report' => [
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => Event::COMPLETE,
-				]
-			] );
-
 			$img = html()->e( 'img', [
 				'src'   => $step->icon(),
 				'class' => implode( ' ', [
@@ -106,14 +91,32 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$data[] = [
 				'step'      => $title,
-				'completed' => html()->wrap( _nf( $count_completed ), 'a', [
-					'href'  => $url_completed,
-					'class' => 'number-total'
-				] ),
-				'waiting'   => html()->wrap( _nf( $count_waiting ), 'a', [
-					'href'  => $url_waiting,
-					'class' => 'number-total'
-				] )
+				'completed' => contact_filters_link( _nf( $count_completed ), [
+					// Group
+					[
+						// Filter
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->get_id(),
+							'step_id'    => $step->get_id(),
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'      => $this->startDate->ymd(),
+						]
+					]
+				], $count_completed ),
+				'waiting'   => contact_filters_link( _nf( $count_waiting ), [
+					// Group
+					[
+						// Filter
+						[
+							'type'      => 'funnel_history',
+							'status'    => Event::WAITING,
+							'funnel_id' => $funnel->get_id(),
+							'step_id'   => $step->get_id(),
+						]
+					]
+				], $count_waiting )
 			];
 
 		}
