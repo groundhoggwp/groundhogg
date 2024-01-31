@@ -1305,15 +1305,13 @@
     __('Has Not Logged In', 'groundhogg'), {
       view (filter) {
         return standardActivityDateTitle(
-          filterCountTitle(`<b>${ __('Has not logged in', 'groundhogg') }</b>`,
-            filter), filter)
+          `<b>${ __('Has not logged in', 'groundhogg') }</b>`, filter)
       }, edit (filter) {
-        return filterCount(filter) + standardActivityDateOptions(filter)
+        return standardActivityDateOptions(filter)
       }, onMount (filter, updateFilter) {
-        filterCountOnMount(updateFilter)
         standardActivityDateFilterOnMount(filter, updateFilter)
       }, defaults: {
-        ...filterCountDefaults, ...standardActivityDateDefaults,
+        ...standardActivityDateDefaults,
       },
     })
 
@@ -1356,7 +1354,14 @@
 
   registerFilter('funnel_history', 'funnels',
     __('Funnel History', 'groundhogg'), {
-      view ({ status, funnel_id, step_id, date_range, before, after }) {
+      view ({
+        status = 'complete',
+        funnel_id = 0,
+        step_id = 0,
+        date_range = 'any',
+        before,
+        after
+      }) {
 
         let prepend
 
@@ -1599,157 +1604,7 @@
       },
     })
 
-  const {
-    tabs, fields, groups,
-  } = Groundhogg.filters.gh_contact_custom_properties
-
-  const getField = (id) => {
-    return fields.find(f => f.id == id)
-  }
-
-  const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
-    id: 'filter-options',
-    noneSelected: 'Type to search...',
-    selected: options.map(opt => ( { id: opt, text: opt } )),
-    fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).map(opt => ( { id: opt, text: opt } )),
-    onChange: items => updateFilter({
-      options: items.map(item => item.id),
-    }),
-  })
-
-  const filterFactory = {
-
-    text: ({ id, label, group }) => createStringFilter(id, label, group),
-    url: ({ id, label, group }) => createStringFilter(id, label, group),
-    custom_email: ({ id, label, group }) => createStringFilter(id, label, group),
-    tel: ({ id, label, group }) => createStringFilter(id, label, group),
-    textarea: ({ id, label, group }) => createStringFilter(id, label, group),
-    number: ({ id, label, group }) => createNumberFilter(id, label, group),
-    date: ({ id, label, group }) => createDateFilter(id, label, group),
-    datetime: ({ id, label, group }) => createDateFilter(id, label, group),
-    time: ({ id, label, group }) => createTimeFilter(id, label, group),
-
-    radio: ({ id, label, group, ...field }) => createFilter(id, label, group, {
-      edit: ({ options, compare, updateFilter }) => Fragment([
-        Select({
-          id: 'filter-compare',
-          selected: compare,
-          options: {
-            in: _x('Is one of', 'comparison, groundhogg'),
-            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-          },
-          onChange: e => updateFilter({
-            compare: e.target.value,
-          }),
-        }),
-        OptionsPicker({
-          field,
-          options,
-          updateFilter,
-        }),
-      ]),
-      display: ({ options, compare }) => ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o)))),
-    }, {
-      compare: 'in',
-      options: [],
-    }),
-
-    dropdown: ({ id, label, group, ...field }) => createFilter(id, label, group, {
-      edit: ({ options, compare, updateFilter }) => Fragment([
-        Select({
-          id: 'filter-compare',
-          selected: compare,
-          options: field.multiple ? {
-            all_in: __('Has all selected'),
-            all_not_in: __('Does not have all selected'),
-          } : {
-            in: _x('Is one of', 'comparison, groundhogg'),
-            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
-          },
-          onChange: e => updateFilter({
-            compare: e.target.value,
-          }),
-        }),
-        OptionsPicker({
-          field,
-          options,
-          updateFilter,
-        }),
-      ]),
-      display: ({ options, compare }) => {
-        if (ComparisonsTitleGenerators[compare]) {
-          return ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o))))
-        }
-        return moreComparisonTitles[compare](bold(label), options)
-      },
-    }, {
-      compare: field.multiple ? 'all_in' : 'in',
-      options: [],
-    }),
-
-    checkboxes: ({ id, label, group, ...field }) => createFilter(id, label, group, {
-      edit: ({ options, compare, updateFilter }) => Fragment([
-        Select({
-          id: 'filter-compare',
-          selected: compare,
-          options: {
-            all_checked: __('Is Checked', 'groundhogg-better-meta'),
-            not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
-          },
-          onChange: e => updateFilter({
-            compare: e.target.value,
-          }),
-        }),
-        OptionsPicker({
-          field,
-          options,
-          updateFilter,
-        }),
-      ]),
-      display: ({ options = [], compare = '' }) => moreComparisonTitles[compare](bold(label), options),
-    }, {
-      compare: 'all_checked',
-      options: [],
-    }),
-  }
-
-  const moreComparisonTitles = {
-    all_checked: (prefix, options) => sprintf(
-      __('%2$s is checked for %1$s', 'groundhogg-better-meta'), prefix,
-      andList(options.map(b => bold(b)))),
-    not_checked: (prefix, options) => sprintf(
-      __('%2$s is not checked for %1$s', 'groundhogg-better-meta'), prefix,
-      andList(options.map(b => bold(b)))),
-    all_in: (prefix, options) => sprintf(
-      __('%2$s is selected for %1$s', 'groundhogg-better-meta'), prefix,
-      andList(options.map(b => bold(b)))),
-    all_not_in: (prefix, options) => sprintf(
-      __('%2$s is not selected for %1$s', 'groundhogg-better-meta'), prefix,
-      andList(options.map(b => bold(b)))),
-  }
-
-  Object.values(tabs).forEach(t => {
-
-    Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
-
-      let groupId = `${ t.id }-${ s.id }`
-
-      registerFilterGroup(groupId, `${ t.name }: ${ s.name }`)
-
-      Object.values(fields).filter(f => f.group === s.id).forEach(f => {
-
-        if (f.type in filterFactory) {
-          ContactFilterRegistry.registerFilter(filterFactory[f.type]({
-            ...f,
-            group: groupId,
-          }))
-        }
-
-      })
-
-    })
-
-  })
+  ContactFilterRegistry.registerFromProperties(Groundhogg.filters.gh_contact_custom_properties)
 
   const registerActivityFilter = (id, group, label, {
     view = () => {
