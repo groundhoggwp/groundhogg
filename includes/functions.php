@@ -558,6 +558,27 @@ function md5serialize( $stuff ) {
 }
 
 /**
+ * Helper function to generate a semi unique JOIN alias given a filter
+ *
+ * @param $filter
+ * @param $prefix
+ *
+ * @return string
+ */
+function alias_from_filter( $filter ) {
+
+	$type = $filter['type'];
+
+	unset( $filter['type'] );
+	unset( $filter['id'] );
+	unset( $filter['count'] ); // not relevant to JOIN
+	unset( $filter['count_compare'] ); // not relevant to JOIN
+	ksort( $filter );
+
+	return $type . '_' . preg_replace( '/[^A-Za-z0-9_]+/', '_', implode( '_', array_filter( $filter ) ) );
+}
+
+/**
  * Get a db query from the URL.
  *
  * @param array $default       a default query if the given is empty
@@ -578,7 +599,8 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'action',
 		'bulk_action',
 		'_wpnonce',
-		'submit'
+		'submit',
+        'operation'
 	] );
 
 	foreach ( $ignore as $key ) {
