@@ -251,8 +251,13 @@ abstract class Table extends \WP_List_Table {
 			'found_rows'     => true,
 		] );
 
-		$items = $this->get_db()->query( $query );
-		$total = $this->get_db()->found_rows();
+		try {
+			$items = $this->get_db()->query( $query );
+			$total = $this->get_db()->found_rows();
+		} catch ( \Exception $e ) {
+			$items = [];
+			$total = 0;
+		}
 
 		foreach ( $items as $i => $item ) {
 			$items[ $i ] = $this->parse_item( $item );
