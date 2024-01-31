@@ -6,6 +6,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\day_of_week;
 use function Groundhogg\get_array_var;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\maybe_swap_dates;
 
 class FilterException extends \Exception {
@@ -596,5 +597,78 @@ class Filters {
 				$where->lessThanEqualTo( $column, $value );
 				break;
 		}
+	}
+
+	/**
+	 * Handle the filter for a custom field
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 * @param       $field
+	 *
+	 * @return void
+	 */
+	public static function custom_field_filter_handler( $filter, Where $where, $field ) {
+		// Use most recent available key?
+		$meta_key       = $field['name'];
+		$filter['meta'] = $meta_key;
+
+		$alias             = $where->query->joinMeta( $meta_key );
+		$meta_value_column = "$alias.meta_value";
+
+		switch ( $field['type'] ) {
+			default:
+			case 'text':
+			case 'textarea':
+			case 'url':
+			case 'tel':
+			case 'custom_email':
+			case 'html':
+				self::string( $meta_value_column, $filter, $where );
+				break;
+			case 'number':
+				self::number( "CAST($meta_value_column as UNSIGNED)", $filter, $where );
+				break;
+			case 'date':
+				self::mysqlDate( "CAST($meta_value_column as DATE)", $filter, $where );
+				break;
+			case 'datetime':
+				self::mysqlDateTime( "CAST($meta_value_column as DATETIME)", $filter, $where );
+				break;
+			case 'time':
+				// todo this is wrong
+				self::mysqlDateTime( "CAST($meta_value_column as TIME)", $filter, $where );
+				break;
+			case 'radio':
+				self::is_one_of_filter( $meta_value_column, $filter, $where );
+				break;
+			case 'checkboxes':
+				self::custom_field_has_all_selected( $meta_value_column, $filter, $where );
+				break;
+			case 'dropdown':
+				if ( isset_not_empty( $field, 'multiple' ) ) {
+					self::custom_field_has_all_selected( $meta_value_column, $filter, $where );
+				} else {
+					self::is_one_of_filter( $meta_value_column, $filter, $where );
+				}
+				break;
+		}
+	}
+
+	/**
+	 * Automatically registers fields given properties
+	 *
+	 * @param array $fields
+	 *
+	 * @return void
+	 */
+	public function register_from_properties( array $fields ) {
+
+		foreach ( $fields as $field ) {
+			$this->register( $field['id'], function ( $filter, Where $where ) use ( $field ) {
+				self::custom_field_filter_handler( $filter, $where, $field );
+			} );
+		}
+
 	}
 }

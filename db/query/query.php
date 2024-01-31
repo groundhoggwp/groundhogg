@@ -168,6 +168,9 @@ class Query {
 			"/^AVG\($column_regex\)/i"                                          => function ( $matches ) {
 				return sprintf( "AVG(%s)", $this->sanitize_column( $matches[1] ) );
 			},
+			"/^MAX\($column_regex\)/i"                                          => function ( $matches ) {
+				return sprintf( "MAX(%s)", $this->sanitize_column( $matches[1] ) );
+			},
 			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w+)(?:'|\")?\)/i"          => function ( $matches ) {
 				$column = $this->sanitize_column( $matches[1] );
 				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
@@ -523,6 +526,27 @@ class Query {
 	}
 
 	/**
+	 * Return the number of found rows for a query
+	 *
+	 * @return int
+	 */
+	public function get_found_rows(){
+
+		$cache_key   = $this->create_cache_key( __METHOD__ );
+		$cache_value = wp_cache_get( $cache_key, 'groundhogg', false, $found );
+
+		if ( $found ) {
+			return $cache_value;
+		}
+
+		$rows = (int) $this->db->get_var( 'SELECT FOUND_ROWS()' );
+
+		wp_cache_set( $cache_key, $rows, 'groundhogg' );
+
+		return $rows;
+	}
+
+	/**
 	 * Get the count
 	 *
 	 * @return false|mixed|string|null
@@ -531,11 +555,7 @@ class Query {
 		$this->setSelect( "COUNT($this->select)" );
 		$this->setFoundRows( false );
 
-		$count = absint( $this->get_var() );
-
-//		wp_send_json( $this->db->last_query );
-
-		return $count;
+		return absint( $this->get_var() );
 	}
 
 	/**

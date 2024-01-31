@@ -275,7 +275,7 @@ class Table_Query extends Query {
 		/**
 		 * Before getting the results from a specific query
 		 */
-		do_action_ref_array( 'groundhogg/query/pre_get_results', [ $this ] );
+		do_action_ref_array( "groundhogg/{$this->db_table->get_object_type()}/pre_get_results", [ &$this ] );
 
 		$cache_key   = $this->create_cache_key( __METHOD__ );
 		$cache_value = $this->db_table->cache_get( $cache_key, $found );
@@ -289,6 +289,27 @@ class Table_Query extends Query {
 		$this->db_table->cache_set( $cache_key, $items );
 
 		return $items;
+	}
+
+	/**
+	 * Return the number of found rows for a query
+	 *
+	 * @return int
+	 */
+	public function get_found_rows(){
+
+		$cache_key   = $this->create_cache_key( __METHOD__ );
+		$cache_value = $this->db_table->cache_get( $cache_key, $found );
+
+		if ( $found ) {
+			return $cache_value;
+		}
+
+		$rows = (int) $this->db->get_var( 'SELECT FOUND_ROWS()' );
+
+		$this->db_table->cache_set( $cache_key, $rows );
+
+		return $rows;
 	}
 
 	/**

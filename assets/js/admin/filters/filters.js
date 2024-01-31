@@ -659,9 +659,129 @@
       }),
     },
     {
-      value: options[Object.keys(options)[0]],
+      value: Object.keys(options)[0],
     },
   )
+
+  /**
+   * Simple options picker
+   *
+   * @param field
+   * @param options
+   * @param updateFilter
+   * @returns {*}
+   * @constructor
+   */
+  const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
+    id: 'filter-options',
+    noneSelected: 'Type to search...',
+    selected: options.map(opt => ( { id: opt, text: opt } )),
+    fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).map(opt => ( { id: opt, text: opt } )),
+    onChange: items => updateFilter({
+      options: items.map(item => item.id),
+    }),
+  })
+
+  /**
+   * When given a field property the factory will auto generate filters
+   *
+   * @type {{date: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), number: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), datetime: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), checkboxes: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), textarea: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), tel: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), text: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), time: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), url: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), dropdown: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), custom_email: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), radio: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group})}}
+   */
+  const filterFactory = {
+
+    text: ({ id, label, group }) => createStringFilter(id, label, group),
+    url: ({ id, label, group }) => createStringFilter(id, label, group),
+    custom_email: ({ id, label, group }) => createStringFilter(id, label, group),
+    tel: ({ id, label, group }) => createStringFilter(id, label, group),
+    textarea: ({ id, label, group }) => createStringFilter(id, label, group),
+    number: ({ id, label, group }) => createNumberFilter(id, label, group),
+    date: ({ id, label, group }) => createDateFilter(id, label, group),
+    datetime: ({ id, label, group }) => createDateFilter(id, label, group),
+    time: ({ id, label, group }) => createTimeFilter(id, label, group),
+
+    radio: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: {
+            in: _x('Is one of', 'comparison, groundhogg'),
+            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options, compare }) => ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o)))),
+    }, {
+      compare: 'in',
+      options: [],
+    }),
+
+    dropdown: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: field.multiple ? {
+            all_in: __('Has all selected'),
+            all_not_in: __('Does not have all selected'),
+          } : {
+            in: _x('Is one of', 'comparison, groundhogg'),
+            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options, compare }) => {
+        if (ComparisonsTitleGenerators[compare]) {
+          return ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o))))
+        }
+        return moreComparisonTitleGenerators[compare](bold(label), options)
+      },
+    }, {
+      compare: field.multiple ? 'all_in' : 'in',
+      options: [],
+    }),
+
+    checkboxes: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: {
+            all_checked: __('Is Checked', 'groundhogg-better-meta'),
+            not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options = [], compare = '' }) => moreComparisonTitleGenerators[compare](bold(label), options),
+    }, {
+      compare: 'all_checked',
+      options: [],
+    }),
+  }
 
   /**
    * Create a filters registry
@@ -745,6 +865,39 @@
       return Promise.all(promises)
 
     },
+
+    registerFromProperties ( properties ) {
+
+      const {
+        tabs, fields, groups,
+      } = properties
+
+      Object.values(tabs).forEach(t => {
+
+        Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
+
+          let groupId = `${ t.id }-${ s.id }`
+
+          this.registerGroup( createGroup( groupId, `${ t.name }: ${ s.name }` ) )
+
+          Object.values(fields).filter(f => f.group === s.id).forEach(f => {
+
+            if (f.type in filterFactory) {
+              this.registerFilter(filterFactory[f.type]({
+                ...f,
+                group: groupId,
+              }))
+            }
+
+          })
+
+        })
+
+      })
+
+
+    }
+
   } )
 
   /**
@@ -1015,10 +1168,15 @@
             options,
             groups,
             onSelect: (option) => {
-              addFilter({
+
+              let newFilter = {
                 type: option.type,
                 ...option.defaults,
-              }, group)
+              }
+
+              console.log( newFilter )
+
+              addFilter(newFilter, group)
             },
             filterOption: (option, search) => {
               return option.name.match(regexp(search))
@@ -1210,8 +1368,7 @@
 
     for (let column in selectColumns) {
       TableFilterRegistry.registerFilter(
-        createSelectFilter(column, selectColumns[column][0], 'table',
-          selectColumns[column][1]))
+        createSelectFilter(column, selectColumns[column][0], 'table', selectColumns[column][1]))
     }
 
     for (let column in dateColumns) {

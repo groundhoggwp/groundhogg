@@ -223,23 +223,7 @@ class Contact_Query extends Table_Query {
 			return;
 		}
 
-		$alias = $where->query->joinActivityTotal( Activity::UNSUBSCRIBED, $filter, [
-			'funnel_id',
-			'step_id',
-			'email_id'
-		] );
-
-		if ( isset_not_empty( $filter, 'funnel_id' ) ) {
-			$where->equals( "$alias.funnel_id", $filter['funnel_id'] );
-		}
-		if ( isset_not_empty( $filter, 'email_id' ) ) {
-			$where->equals( "$alias.email_id", $filter['email_id'] );
-		}
-		if ( isset_not_empty( $filter, 'step_id' ) ) {
-			$where->equals( "$alias.step_id", $filter['step_id'] );
-		}
-
-		$where->greaterThanEqualTo( "COALESCE($alias.total_events,0)", 1 );
+		self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
 	}
 
 	/**
@@ -592,44 +576,9 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_funnel_pending( $filter, Where $where ) {
-		$filter = wp_parse_args( $filter, [
-			'funnel_id' => 0,
-			'step_id'   => 0,
-		] );
-
-		$funnel_id = absint( $filter['funnel_id'] );
-		$step_id   = absint( $filter['step_id'] );
-
-		$alias = 'waiting_funnel_events';
-
-		if ( $funnel_id ) {
-			$alias .= '_' . $funnel_id;
-		}
-
-		if ( $step_id ) {
-			$alias .= '_' . $step_id;
-		}
-
-		$join = $where->query->addJoin( 'LEFT', [ 'event_queue', $alias ] );
-
-		$join->onColumn( 'contact_id' )
-		     ->equals( "$alias.event_type", Event::FUNNEL );
-
-		$where->equals( "$alias.status", Event::WAITING );
-
-		if ( $funnel_id ) {
-			$where->equals( "$alias.funnel_id", $funnel_id );
-		} else {
-			$where->isNotNull( "$alias.funnel_id" );
-		}
-
-		if ( $step_id ) {
-			$where->equals( "$alias.step_id", $step_id );
-		}
-
-		Filters::timestamp( "$alias.time", $filter, $where );
-
-		$where->query->setGroupby( 'ID' );
+		$filter['status']     = Event::WAITING;
+		$filter['event_type'] = Event::FUNNEL;
+		self::basic_event_filter( $filter, $where );
 	}
 
 	/**
@@ -641,43 +590,75 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_funnel_history( $filter, Where $where ) {
+//		$filter['status']     = Event::COMPLETE;
+		$filter['event_type'] = Event::FUNNEL;
+		self::basic_event_filter( $filter, $where );
+	}
+
+	public static function basic_event_filter( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'funnel_id' => 0,
-			'step_id'   => 0,
+			'funnel_id'  => 0,
+			'step_id'    => 0,
+			'email_id'   => 0,
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::COMPLETE
 		] );
 
-		$funnel_id = absint( $filter['funnel_id'] );
-		$step_id   = absint( $filter['step_id'] );
+		$funnel_id  = absint( $filter['funnel_id'] );
+		$step_id    = absint( $filter['step_id'] );
+		$email_id   = absint( $filter['email_id'] );
+		$event_type = absint( $filter['event_type'] );
+		$status     = $filter['status'];
 
-		$alias = 'complete_funnel_events';
+		$table = $status === Event::WAITING ? 'event_queue' : 'events';
+
+		if ( $where->hasCondition( $table ) ) {
+
+			$eventQuery = new Table_Query( $table );
+			$eventQuery->setSelect( 'contact_id' );
+
+			$eventQuery->where()
+			           ->equals( 'event_type', $event_type )
+			           ->equals( 'status', $status );
+
+			if ( $funnel_id ) {
+				$eventQuery->where()->equals( 'funnel_id', $funnel_id );
+			}
+
+			if ( $step_id ) {
+				$eventQuery->where()->equals( 'funnel_id', $step_id );
+			}
+
+			if ( $email_id ) {
+				$eventQuery->where()->equals( 'email_id', $email_id );
+			}
+
+			$where->in( 'ID', $eventQuery );
+
+			return;
+		}
+
+		$conditions = $where->query
+			->addJoin( 'LEFT', [ $table, $table ] )
+			->onColumn( 'contact_id' );
+
+		Filters::timestamp( 'time', $filter, $where );
+
+		$where->equals( "$table.status", $status );
+		$where->equals( "$table.event_type", $event_type );
 
 		if ( $funnel_id ) {
-			$alias .= '_' . $funnel_id;
+			$conditions->equals( "$table.funnel_id", $funnel_id );
 		}
 
 		if ( $step_id ) {
-			$alias .= '_' . $step_id;
+			$conditions->equals( "$table.step_id", $step_id );
 		}
 
-		$join = $where->query->addJoin( 'LEFT', [ 'events', $alias ] );
-
-		$join->onColumn( 'contact_id' )
-		     ->equals( "$alias.event_type", Event::FUNNEL );
-
-		$where->equals( "$alias.status", Event::COMPLETE );
-
-		if ( $funnel_id ) {
-			$where->equals( "$alias.funnel_id", $funnel_id );
-		} else {
-			$where->isNotNull( "$alias.funnel_id" );
+		if ( $email_id ) {
+			$conditions->equals( "$table.email_id", $email_id );
 		}
-
-		if ( $step_id ) {
-			$where->equals( "$alias.step_id", $step_id );
-		}
-
-		Filters::timestamp( "$alias.time", $filter, $where );
 
 		$where->query->setGroupby( 'ID' );
 	}
@@ -692,27 +673,16 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_broadcast_received( $filter, Where $where ) {
 
-		$filter = wp_parse_args( $filter, [
-			'broadcast_id' => 0,
-		] );
-
 		$broadcast_id = absint( $filter['broadcast_id'] );
 
-		$alias = $broadcast_id ? 'broadcast_received_' . $broadcast_id : 'broadcast_received';
-
-		$join = $where->query->addJoin( 'LEFT', [ 'events', $alias ] );
-		$join->onColumn( 'contact_id' )
-		     ->equals( "$alias.event_type", Event::BROADCAST );
-
-		$where->equals( "$alias.status", Event::COMPLETE );
+		unset( $filter['broadcast_id'] );
+		$filter['funnel_id'] = Broadcast::FUNNEL_ID;
 
 		if ( $broadcast_id ) {
-			$where->equals( "$alias.step_id", $broadcast_id );
-		} else {
-			$where->isNotNull( "$alias.step_id" );
+			$filter['step_id'] = $broadcast_id;
 		}
 
-		$where->query->setGroupby( 'ID' );
+		self::filter_email_received( $filter, $where );
 	}
 
 	/**
@@ -725,21 +695,16 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_broadcast_opened( $filter, Where $where ) {
 
-		$filter = wp_parse_args( $filter, [
-			'broadcast_id'  => 0,
-			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
-		] );
+		$broadcast_id = absint( $filter['broadcast_id'] );
 
-		$alias = $where->query->joinActivityTotal( Activity::EMAIL_OPENED, $filter, [ 'funnel_id', 'step_id' ] );
+		unset( $filter['broadcast_id'] );
+		$filter['funnel_id'] = Broadcast::FUNNEL_ID;
 
-		$where->equals( "$alias.funnel_id", Broadcast::FUNNEL_ID );
-
-		if ( isset_not_empty( $filter, 'broadcast_id' ) ) {
-			$where->equals( "$alias.step_id", $filter['broadcast_id'] );
+		if ( $broadcast_id ) {
+			$filter['step_id'] = $broadcast_id;
 		}
 
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		self::filter_email_opened( $filter, $where );
 	}
 
 	/**
@@ -752,34 +717,18 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_broadcast_link_clicked( $filter, Where $where ) {
 
-		$filter = wp_parse_args( $filter, [
-			'broadcast_id'  => 0,
-			'link'          => '',
-			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
-		] );
-
 		$broadcast_id = absint( $filter['broadcast_id'] );
-		$broadcast = new Broadcast( $broadcast_id );
 
-		$activity     = $broadcast->is_email() ? Activity::EMAIL_CLICKED : Activity::SMS_CLICKED;
+		unset( $filter['broadcast_id'] );
+		$filter['funnel_id'] = Broadcast::FUNNEL_ID;
 
-		$alias = $where->query->joinActivityTotal( $activity, $filter, [
-			'funnel_id',
-			'step_id',
-			'referer'
-		] );
-
-		$where->equals( "$alias.funnel_id", Broadcast::FUNNEL_ID );
-
-		if ( isset_not_empty( $filter, 'broadcast_id' ) ) {
-			$where->equals( "$alias.step_id", $filter['broadcast_id'] );
+		if ( $broadcast_id ) {
+			$filter['step_id'] = $broadcast_id;
 		}
 
-		$where->like( "$alias.referer", '%' . $where->esc_like( $filter['link'] ) . '%' );
-
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		self::filter_email_link_clicked( $filter, $where );
 	}
+
 
 	/**
 	 * If they received a specific email
@@ -796,62 +745,42 @@ class Contact_Query extends Table_Query {
 			'funnel_id'     => 0,
 			'step_id'       => 0,
 			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to',
+			'count_compare' => 'greater_than_or_equal_to'
 		] );
 
 		$funnel_id = absint( $filter['funnel_id'] );
-		$email_id  = absint( $filter['email_id'] );
 		$step_id   = absint( $filter['step_id'] );
-
-		$alias = 'received_email';
-
-		$select = [
-			'contact_id'
-		];
-
-		if ( $email_id ) {
-			$alias    .= '_' . $email_id;
-			$select[] = 'email_id';
-		}
-
-		if ( $funnel_id ) {
-			$alias    .= '_' . $funnel_id;
-			$select[] = 'funnel_id';
-		}
-
-		if ( $step_id ) {
-			$alias    .= '_' . $step_id;
-			$select[] = 'step_id';
-		}
+		$email_id = absint( $filter['email_id'] );
 
 		$eventQuery = new Table_Query( 'events' );
-		$eventQuery->setSelect( [ 'COUNT(ID)', 'total_events' ], ...$select );
-		$eventQuery->setGroupby( ...$select );
-		$eventQuery->where->equals( 'status', Event::COMPLETE )
-		                  ->equals( 'event_type', Event::FUNNEL )
-		                  ->notEquals( 'email_id', 0 );
+
+		$eventQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'sent' ] )
+		           ->setGroupby( 'contact_id' )
+		           ->where()
+		           ->equals( 'event_type', $funnel_id === 1 ? Event::BROADCAST : Event::FUNNEL );
 
 		Filters::timestamp( 'time', $filter, $eventQuery->where );
 
-		$join = $where->query->addJoin( 'LEFT', [ $eventQuery, $alias ] );
-
-		$join->onColumn( 'contact_id' );
-
-		if ( $email_id ) {
-			$where->equals( "$alias.email_id", $email_id );
+		if ( $funnel_id ) {
+			$eventQuery->where->equals( 'funnel_id', $funnel_id );
 		}
 
-		if ( $funnel_id ) {
-			$where->equals( "$alias.funnel_id", $funnel_id );
+		if ( $email_id ) {
+			$eventQuery->where->equals( 'email_id', $email_id );
+		} else {
+			$eventQuery->where->notEquals( 'email_id', 0 );
 		}
 
 		if ( $step_id ) {
-			$where->equals( "$alias.step_id", $step_id );
+			$eventQuery->where->equals( 'step_id', $step_id );
 		}
 
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		$alias = alias_from_filter( $filter );
 
-		$where->query->setGroupby( 'ID' );
+		$join = $where->query->addJoin( 'LEFT', [ $eventQuery, $alias ] );
+		$join->onColumn( 'contact_id' );
+
+		$where->compare( "COALESCE($alias.sent,0)", $filter['count'], $filter['count_compare'] );
 	}
 
 	/**
@@ -872,23 +801,39 @@ class Contact_Query extends Table_Query {
 			'count_compare' => 'greater_than_or_equal_to'
 		] );
 
-		$alias = $where->query->joinActivityTotal( Activity::EMAIL_OPENED, $filter, [
-			'funnel_id',
-			'step_id',
-			'email_id'
-		] );
+		$funnel_id = absint( $filter['funnel_id'] );
+		$step_id   = absint( $filter['step_id'] );
+		$email_id  = absint( $filter['email_id'] );
 
-		if ( isset_not_empty( $filter, 'funnel_id' ) ) {
-			$where->equals( "$alias.funnel_id", $filter['funnel_id'] );
-		}
-		if ( isset_not_empty( $filter, 'email_id' ) ) {
-			$where->equals( "$alias.email_id", $filter['email_id'] );
-		}
-		if ( isset_not_empty( $filter, 'step_id' ) ) {
-			$where->equals( "$alias.step_id", $filter['step_id'] );
+		$activityQuery = new Table_Query( 'activity' );
+
+		$activityQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'opens' ] )
+		              ->setGroupby( 'contact_id' )
+		              ->where()
+		              ->equals( 'activity_type', Activity::EMAIL_OPENED );
+
+		Filters::timestamp( 'timestamp', $filter, $activityQuery->where );
+
+		if ( $funnel_id ) {
+			$activityQuery->where->equals( 'funnel_id', $funnel_id );
+		} else {
+			$activityQuery->where->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
 		}
 
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		if ( $email_id ) {
+			$activityQuery->where->equals( 'email_id', $email_id );
+		}
+
+		if ( $step_id ) {
+			$activityQuery->where->equals( 'step_id', $step_id );
+		}
+
+		$alias = alias_from_filter( $filter );
+
+		$join = $where->query->addJoin( 'LEFT', [ $activityQuery, $alias ] );
+		$join->onColumn( 'contact_id' );
+
+		$where->compare( "COALESCE($alias.opens,0)", $filter['count'], $filter['count_compare'] );
 	}
 
 	/**
@@ -910,35 +855,45 @@ class Contact_Query extends Table_Query {
 			'count_compare' => 'greater_than_or_equal_to'
 		] );
 
-		$path = $filter['link'];
+		$path = sanitize_text_field( $filter['link'] );
 
-		$select = [
-			'funnel_id',
-			'step_id',
-			'email_id'
-		];
+		$funnel_id = absint( $filter['funnel_id'] );
+		$step_id   = absint( $filter['step_id'] );
+		$email_id  = absint( $filter['email_id'] );
 
-		if ( ! empty( $path ) ) {
-			$select[] = 'referer';
+		$activityQuery = new Table_Query( 'activity' );
+
+		$activityQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'clicks' ] )
+		              ->setGroupby( 'contact_id' )
+		              ->where()
+		              ->equals( 'activity_type', Activity::EMAIL_CLICKED );
+
+		Filters::timestamp( 'timestamp', $filter, $activityQuery->where );
+
+		if ( $funnel_id ) {
+			$activityQuery->where->equals( 'funnel_id', $funnel_id );
+		} else {
+			$activityQuery->where->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
 		}
 
-		$alias = $where->query->joinActivityTotal( Activity::EMAIL_CLICKED, $filter, $select );
-
-		if ( isset_not_empty( $filter, 'funnel_id' ) ) {
-			$where->equals( "$alias.funnel_id", $filter['funnel_id'] );
-		}
-		if ( isset_not_empty( $filter, 'email_id' ) ) {
-			$where->equals( "$alias.email_id", $filter['email_id'] );
-		}
-		if ( isset_not_empty( $filter, 'step_id' ) ) {
-			$where->equals( "$alias.step_id", $filter['step_id'] );
+		if ( $email_id ) {
+			$activityQuery->where->equals( 'email_id', $email_id );
 		}
 
-		if ( ! empty( $path ) ) {
-			$where->like( "$alias.referer", '%' . $where->esc_like( $filter['link'] ) . '%' );
+		if ( $step_id ) {
+			$activityQuery->where->equals( 'step_id', $step_id );
 		}
 
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		if ( $path ) {
+			$activityQuery->where->like( 'referer', '%' . $where->query->db->esc_like( $path ) . '%' );
+		}
+
+		$alias = alias_from_filter( $filter );
+
+		$join = $where->query->addJoin( 'LEFT', [ $activityQuery, $alias ] );
+		$join->onColumn( 'contact_id' );
+
+		$where->compare( "COALESCE($alias.clicks,0)", $filter['count'], $filter['count_compare'] );
 	}
 
 	/**
@@ -953,27 +908,76 @@ class Contact_Query extends Table_Query {
 
 		$filter = wp_parse_args( $filter, [
 			'activity'      => '',
-			'value'         => 0,
-			'value_compare' => 'greater_than_or_equal_to',
-			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
 		] );
 
-		$alias = $where->query->joinActivityTotal( sanitize_key( $filter['activity'] ), $filter, [
-			'funnel_id',
-			'step_id',
-			'value',
-		] );
-
-		if ( $filter['value'] ) {
-			$where->compare( "COALESCE($alias.value,0)", $filter['value'], $filter['value_compare'] );
-		}
-
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		self::basic_activity_filter( $filter['activity'], $filter, $where );
 	}
 
 	/**
-	 * Filter by the custom activity
+	 * @throws \Exception
+	 *
+	 * @param array        $filter
+	 * @param Where $where
+	 * @param string|array $activity_type
+	 *
+	 * @return void
+	 */
+	public static function basic_activity_filter( $activity_type, $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'value'         => 0,
+			'value_compare' => 'greater_than_or_equal_to',
+			'count'         => 1,
+			'count_compare' => 'greater_than_or_equal_to',
+			'funnel_id'     => 0,
+			'step_id'       => 0,
+			'email_id'      => 0,
+		] );
+
+		$funnel_id = absint( $filter['funnel_id'] );
+		$step_id   = absint( $filter['step_id'] );
+		$email_id  = absint( $filter['email_id'] );
+
+		$activityQuery = new Table_Query( 'activity' );
+
+		$activityQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'activities' ] )
+		              ->setGroupby( 'contact_id' );
+
+		if ( ! empty( $activity_type ) ) {
+			$activityQuery->whereIn( 'activity_type', $activity_type );
+		}
+
+		Filters::timestamp( 'timestamp', $filter, $activityQuery->where );
+
+		if ( $filter['value'] ) {
+			$activityQuery->where->compare( 'value', $filter['value'], $filter['value_compare'] );
+		} else {
+			unset( $filter['value'] );
+			unset( $filter['value_compare'] );
+		}
+
+		if ( $funnel_id ) {
+			$activityQuery->where->equals( 'funnel_id', $funnel_id );
+		}
+
+		if ( $email_id ) {
+			$activityQuery->where->equals( 'email_id', $email_id );
+		}
+
+		if ( $step_id ) {
+			$activityQuery->where->equals( 'step_id', $step_id );
+		}
+
+		$alias = alias_from_filter( $filter );
+
+		$join = $where->query->addJoin( 'LEFT', [ $activityQuery, $alias ] );
+		$join->onColumn( 'contact_id' );
+
+		$where->compare( "COALESCE($alias.activities,0)", $filter['count'], $filter['count_compare'] );
+	}
+
+	/**
+	 * Filter by the loging activity
 	 *
 	 * @param       $filter
 	 * @param Where $where
@@ -981,20 +985,11 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_logged_in( $filter, Where $where ) {
-
-		$filter = wp_parse_args( $filter, [
-			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
-		] );
-
-		$filter['activity_type'] = 'wp_login';
-
-		$alias = $where->query->joinActivityTotal( 'wp_login', $filter );
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		self::basic_activity_filter( Activity::LOGIN, $filter, $where );
 	}
 
 	/**
-	 * Filter by the custom activity
+	 * Filter by logged out activity
 	 *
 	 * @param       $filter
 	 * @param Where $where
@@ -1002,16 +997,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_logged_out( $filter, Where $where ) {
-
-		$filter = wp_parse_args( $filter, [
-			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
-		] );
-
-		$filter['activity_type'] = 'wp_logout';
-
-		$alias = $where->query->joinActivityTotal( 'wp_logout', $filter );
-		$where->compare( "COALESCE($alias.total_events,0)", $filter['count'], $filter['count_compare'] );
+		self::basic_activity_filter( Activity::LOGOUT, $filter, $where );
 	}
 
 	/**
@@ -1024,9 +1010,10 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_not_logged_in( $filter, Where $where ) {
 
-		$where->greaterThan( 'user_id', 0 );
-		$alias = $where->query->joinActivityTotal( 'wp_login', $filter );
-		$where->equals( "COALESCE($alias.total_events,0)", 0 );
+		$filter['count']         = 0;
+		$filter['count_compare'] = 'equals';
+
+		self::filter_logged_in( $filter, $where );
 	}
 
 	/**
@@ -1038,8 +1025,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_was_active( $filter, Where $where ) {
-		$alias = $where->query->joinActivityTotal( '', $filter );
-		$where->greaterThan( "COALESCE($alias.total_events,0)", 0 );
+		self::basic_activity_filter( '', $filter, $where );
 	}
 
 	/**
@@ -1051,8 +1037,10 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_was_not_active( $filter, Where $where ) {
-		$alias = $where->query->joinActivityTotal( '', $filter );
-		$where->equals( "COALESCE($alias.total_events,0)", 0 );
+		$filter['count']         = 0;
+		$filter['count_compare'] = 'equals';
+
+		self::basic_activity_filter( '', $filter, $where );
 	}
 
 	/**
@@ -1121,63 +1109,6 @@ class Contact_Query extends Table_Query {
 		$where->compare( "COALESCE($alias.total_views,0)", $filter['count'], $filter['count_compare'] );
 	}
 
-
-	/**
-	 * Handle the filter for a custom field
-	 *
-	 * @param       $filter
-	 * @param Where $where
-	 * @param       $field
-	 *
-	 * @return void
-	 */
-	public static function custom_field_filter_handler( $filter, Where $where, $field ) {
-		// Use most recent available key?
-		$meta_key       = $field['name'];
-		$filter['meta'] = $meta_key;
-
-		$alias             = $where->query->joinMeta( $meta_key );
-		$meta_value_column = "$alias.meta_value";
-
-		switch ( $field['type'] ) {
-			default:
-			case 'text':
-			case 'textarea':
-			case 'url':
-			case 'tel':
-			case 'custom_email':
-			case 'html':
-				Filters::string( $meta_value_column, $filter, $where );
-				break;
-			case 'number':
-				Filters::number( "CAST($meta_value_column as UNSIGNED)", $filter, $where );
-				break;
-			case 'date':
-				Filters::mysqlDate( "CAST($meta_value_column as DATE)", $filter, $where );
-				break;
-			case 'datetime':
-				Filters::mysqlDateTime( "CAST($meta_value_column as DATETIME)", $filter, $where );
-				break;
-			case 'time':
-				// todo this is wrong
-				Filters::mysqlDateTime( "CAST($meta_value_column as TIME)", $filter, $where );
-				break;
-			case 'radio':
-				Filters::is_one_of_filter( $meta_value_column, $filter, $where );
-				break;
-			case 'checkboxes':
-				Filters::custom_field_has_all_selected( $meta_value_column, $filter, $where );
-				break;
-			case 'dropdown':
-				if ( isset_not_empty( $field, 'multiple' ) ) {
-					Filters::custom_field_has_all_selected( $meta_value_column, $filter, $where );
-				} else {
-					Filters::is_one_of_filter( $meta_value_column, $filter, $where );
-				}
-				break;
-		}
-	}
-
 	/**
 	 * Registers the standard filters
 	 *
@@ -1199,14 +1130,7 @@ class Contact_Query extends Table_Query {
 			self::$filters->register( str_replace( 'filter_', '', $filter_method ), [ self::class, $filter_method ] );
 		}
 
-		// Register custom field filters
-		$fields = Properties::instance()->get_fields();
-
-		foreach ( $fields as $field ) {
-			self::$filters->register( $field['id'], function ( $filter, Where $where ) use ( $field ) {
-				self::custom_field_filter_handler( $filter, $where, $field );
-			} );
-		}
+		self::$filters->register_from_properties( Properties::instance()->get_fields() );
 
 		/**
 		 * Enable registering more filters
@@ -1408,11 +1332,13 @@ class Contact_Query extends Table_Query {
 		foreach ( $query_vars as $query_var => $value ) {
 			switch ( $query_var ) {
 				case 'include': // Include contacts by ID
+				case 'includes': // Include contacts by ID
 					if ( ! empty( $value ) ) {
 						$where->in( 'ID', wp_parse_id_list( $value ) );
 					}
 					break;
 				case 'exclude': // Exclude contacts by ID
+				case 'excludes': // Exclude contacts by ID
 					if ( ! empty( $value ) ) {
 						$where->notIn( 'ID', wp_parse_id_list( $value ) );
 					}
@@ -1716,39 +1642,6 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return string
 	 */
-	public function joinEvents( $event_type, $table = 'events' ) {
-
-		$events_table_alias = $table . '_' . $event_type;
-
-		// only join once per key
-		if ( key_exists( $events_table_alias, $this->joins ) ) {
-			return $events_table_alias;
-		}
-
-		$events_table = get_db( $table );
-
-		$join = $this->db->prepare( "LEFT JOIN $events_table->table_name $events_table_alias 
-		ON {$this->alias}.ID = $events_table_alias.contact_id 
-		AND $events_table_alias.event_type = %d
-		AND $events_table_alias.status = %s
-		", $event_type, Event::COMPLETE );
-
-		$this->joins[ $events_table_alias ] = $join;
-
-		$this->setGroupby( 'ID' );
-
-		return $events_table_alias;
-	}
-
-	/**
-	 * Join the activity table
-	 *
-	 * @param $activity_type
-	 * @param $after
-	 * @param $before
-	 *
-	 * @return string
-	 */
 	public function joinActivity( $activity_type = '' ) {
 
 		$activity_table_alias = 'activity_' . $activity_type;
@@ -1769,44 +1662,6 @@ class Contact_Query extends Table_Query {
 		$this->setGroupby( 'ID' );
 
 		return $activity_table_alias;
-	}
-
-	/**
-	 * Join the activity table
-	 *
-	 * @param $activity_type
-	 * @param $after
-	 * @param $before
-	 *
-	 * @return string
-	 */
-	public function joinActivityTotal( $activity_type, $filter, $select = [] ) {
-
-		$activity_table_alias = 'activity_' . $activity_type . '_' . md5serialize( $filter );
-
-		// only join once per key
-		if ( key_exists( $activity_table_alias, $this->joins ) ) {
-			return $this->joins[ $activity_table_alias ];
-		}
-
-		$activity_query = new Table_Query( 'activity' );
-		$activity_query->setSelect( 'contact_id', [
-			'COUNT(*)',
-			'total_events'
-		], ...$select );
-
-		if ( $activity_type ) {
-			$activity_query->where( 'activity_type', $activity_type );
-		}
-
-		Filters::timestamp( 'timestamp', $filter, $activity_query->where );
-		$activity_query->setGroupby( 'contact_id', ...$select );
-
-		$join = $this->addJoin( 'LEFT', [ $activity_query, $activity_table_alias ] );
-		$join->onColumn( 'contact_id' );
-		$this->setGroupby( 'ID' );
-
-		return $join->alias;
 	}
 
 	/**
@@ -2208,7 +2063,7 @@ class Contact_Query extends Table_Query {
 		$items = parent::get_results();
 
 		if ( isset_not_empty( $this->query_vars, 'found_rows' ) || $this->found_rows ) {
-			$this->found_items = $this->db_table->found_rows();
+			$this->found_items = $this->get_found_rows();
 		}
 
 		return $items;

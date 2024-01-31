@@ -1216,6 +1216,11 @@ abstract class DB {
 	}
 
 	/**
+	 * @var Table_Query
+	 */
+	protected $current_query;
+
+	/**
 	 * @throws FilterException
 	 *
 	 * @param string|false $ORDER_BY
@@ -1251,6 +1256,7 @@ abstract class DB {
 		$operation = $query_vars['operation'];
 
 		$query = new Table_Query( $this );
+		$this->current_query = $query;
 
 		$moreWhere = [];
 		$searched  = false;
@@ -1482,10 +1488,20 @@ abstract class DB {
 		return $results;
 	}
 
+	public function found_rows() {
+
+		if ( $this->current_query ){
+			return $this->current_query->get_found_rows();
+		}
+
+		global $wpdb;
+
+		return (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
+	}
+
 	public $last_query = '';
 
 	public $last_error = '';
-
 
 	/**
 	 * New and improved query function to access DB in more complex and interesting ways.
@@ -1555,12 +1571,6 @@ abstract class DB {
 		}
 
 		return $results;
-	}
-
-	public function found_rows() {
-		global $wpdb;
-
-		return (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 	}
 
 	/**
