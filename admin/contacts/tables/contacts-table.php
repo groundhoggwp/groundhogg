@@ -4,14 +4,15 @@ namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_find;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\base64_json_decode;
-use function Groundhogg\get_db;
 use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -318,53 +319,34 @@ class Contacts_Table extends WP_List_Table {
 
 	protected function get_views() {
 
-		$views = [
-			'all'          => [
-				'id'    => 'all',
-				'name'  => __( 'All', 'groundhogg' ),
-				'query' => []
-			],
-			'unconfirmed'  => [
-				'id'    => 'unconfirmed',
-				'name'  => __( 'Unconfirmed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::UNCONFIRMED ]
-			],
-			'confirmed'    => [
-				'id'    => 'confirmed',
-				'name'  => __( 'Confirmed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::CONFIRMED ],
-			],
-			'weekly'       => [
-				'id'    => 'weekly',
-				'name'  => __( 'Weekly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::WEEKLY ],
-			],
-			'monthly'      => [
-				'id'    => 'monthly',
-				'name'  => __( 'Monthly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::MONTHLY ],
-			],
-			'unsubscribed' => [
-				'id'    => 'unsubscribed',
-				'name'  => __( 'Unsubscribed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::UNSUBSCRIBED ],
-			],
-			'spam'         => [
-				'id'    => 'spam',
-				'name'  => __( 'Spam', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::SPAM ],
-			],
-			'bounced'      => [
-				'id'    => 'bounced',
-				'name'  => __( 'Bounced', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::HARD_BOUNCE ],
-			],
-			'complained'   => [
-				'id'    => 'complained',
-				'name'  => __( 'Complained', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::COMPLAINED ],
-			],
-		];
+		$statusQuery = new Table_Query( 'contacts' );
+		$statusQuery->setSelect( 'optin_status', [ 'COUNT(ID)', 'contacts' ] )->setGroupby( 'optin_status' );
+
+		$statusCounts = $statusQuery->get_results();
+
+		$views = [[
+			'id'    => 'all',
+			'name'  => __( 'All', 'groundhogg' ),
+			'query' => [],
+            'count' => array_sum( wp_list_pluck( $statusCounts, 'contacts' ) )
+        ]];
+
+		foreach ( Preferences::get_preference_names() as $status => $name ) {
+
+			$result = array_find( $statusCounts, function ( $result ) use ( $status ) {
+				return $result->optin_status == $status;
+			} );
+
+			$count = $result ? absint( $result->contacts ) : 0;
+
+			$views[] = [
+				'id'    => $status,
+				'name'  => $name,
+				'query' => [ 'optin_status' => $status ],
+				'count' => $count
+			];
+
+		}
 
 		$parsed = [];
 
@@ -374,11 +356,10 @@ class Contacts_Table extends WP_List_Table {
 				'query' => [],
 				'name'  => '',
 				'id'    => '',
+                'count' => 0
 			] );
 
 			$view['query']['view'] = $view['id'];
-
-            $query = new Contact_Query( $view['query'] );
 
 			$parsed[] = html()->e( 'a', [
 				'href'  => admin_page_url( 'gh_contacts', $view['query'] ),
@@ -386,7 +367,7 @@ class Contacts_Table extends WP_List_Table {
 			], sprintf(
 					'%s <span class="count">(%s)</span>',
 					$view['name'],
-					_nf( $query->count() )
+					_nf( $view['count'] )
 				)
 			);
 		}
