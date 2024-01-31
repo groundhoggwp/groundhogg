@@ -688,6 +688,7 @@
       return Div({
         className: 'gh-autocomplete-results',
         style: {
+          zIndex: 999999,
           top: `${ top + height }px`,
           left: `${ left }px`,
           width: `${ width }px`,
