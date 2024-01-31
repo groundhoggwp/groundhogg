@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.2
+Stable tag: 3.2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2.1 (2024-01-30) =
+* TWEAKED Further optimized activity and event based filters.
+ * Setting `count equals 0` will now return results similar to using the inverse `count at least 1` in the exclude group.
+* TWEAKED Delayed localization of gutenberg block js assets.
+* TWEAKED Filters can now be registered directly from custom properties. This will be helpful for addons!
+* TWEAKED Reduced number of queries for the views on the contacts table screen.
+* FIXED `count()` not always returning a correct number because `FOUND_ROWS()` was not cached.
+* FIXED Broadcast search not working.
 
 = 3.2 (2024-01-29) =
 * ADDED New under the hood query improvements to help create more complex and performant queries.
