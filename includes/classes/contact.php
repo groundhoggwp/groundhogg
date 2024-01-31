@@ -460,7 +460,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function is_marketable() {
-		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this->ID ), $this );
+		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this ), $this );
 	}
 
 	/**
@@ -559,29 +559,32 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function update( $data = [] ) {
 
-		$preference_updated = false;
-		$old_preference     = $this->get_optin_status();
-		$new_preference     = Preferences::sanitize( get_array_var( $data, 'optin_status' ), $old_preference );
+		// Only update different data from the current.
+		$data = $this->sanitize_columns( $data );
+		$data = array_diff_assoc( $data, $this->data );
 
-		if ( $old_preference !== $new_preference ) {
-			$preference_updated                = true;
-			$data['optin_status']              = $new_preference;
-			$data['date_optin_status_changed'] = current_time( 'mysql' );
-		} else {
-			unset( $data['optin_status'] );
+		// updating with existing data
+		if ( empty( $data ) ) {
+			return true;
 		}
 
-		// Email might be changing
+		// If opt-in status is set at this point, it's a new status
+		if ( isset_not_empty( $data, 'optin_status' ) ) {
+			$old_preference     = $this->get_optin_status();
+			$new_preference     = $data['optin_status'];
+
+			if ( ! isset( $data['date_optin_status_changed'] ) ) {
+				$data['date_optin_status_changed'] = current_time( 'mysql' );
+			}
+		}
+
+		// Email is attempting to be changed
 		if ( isset_not_empty( $data, 'email' ) ) {
 			$new_email = $data['email'];
 
-			// Email is different
-			if ( $new_email !== $this->email ) {
-
-				// Invalid email, or in use by another contact record
-				if ( ! is_email( $new_email ) || is_email_address_in_use( $new_email ) ) {
-					unset( $data['email'] );
-				}
+			// Invalid email, or in use by another contact record
+			if ( ! is_email( $new_email ) || is_email_address_in_use( $new_email ) ) {
+				unset( $data['email'] );
 			}
 		}
 
@@ -596,7 +599,7 @@ class Contact extends Base_Object_With_Meta {
 
 		$maybe_changed_folders = $this->get_uploads_folder();
 
-		// Uploads directory has been changed, rename the folder to preserve field uploads
+		// Uploads directory has been changed, rename the folder to preserve file uploads
 		if ( $updated && $folders['path'] !== $maybe_changed_folders['path'] ) {
 			@rename( $folders['path'], $maybe_changed_folders['path'] );
 		}
@@ -614,7 +617,7 @@ class Contact extends Base_Object_With_Meta {
 			do_action( 'groundhogg/contact/owner_changed', $this->owner, $this, $orig_owner );
 		}
 
-		if ( $updated && $preference_updated ) {
+		if ( $updated && isset( $old_preference ) && isset( $new_preference ) ) {
 
 			/**
 			 * When the preference is updated
@@ -641,6 +644,32 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		return $updated;
+	}
+
+	protected function sanitize_columns( $data = [] ) {
+
+		foreach ( $data as $key => &$value ) {
+			switch ( $key ) {
+				case 'email':
+					$value = strtolower( sanitize_email( $value ) );
+					break;
+				case 'first_name':
+				case 'last_name':
+				case 'date_created':
+				case 'date_optin_status_changed':
+					$value = sanitize_text_field( $value );
+					break;
+				case 'owner_id':
+				case 'user_id':
+					$value = absint( $value );
+					break;
+				case 'optin_status':
+					$value = Preferences::sanitize( $value );
+					break;
+			}
+		}
+
+		return $data;
 	}
 
 	/**

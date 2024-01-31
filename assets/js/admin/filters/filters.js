@@ -628,7 +628,7 @@
       preload,
     }, {
       ...defaults,
-      date_range: 'f_24_hours',
+      date_range: 'next_24_hours',
       before: '',
       after: '',
     })

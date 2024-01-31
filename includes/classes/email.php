@@ -1050,19 +1050,18 @@ class Email extends Base_Object_With_Meta {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
 		}
 
-		do_action( 'groundhogg/email/before_send', $this );
-
 		/* Additional settings */
 		add_action( 'phpmailer_init', [ $this, 'set_bounce_return_path' ] );
 		add_action( 'phpmailer_init', [ $this, 'set_plaintext_body' ] );
 		add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		add_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
 
+		$content = $this->build();
 		$to      = $this->get_to_address();
 		$subject = $this->get_merged_subject_line();
-		$content = $this->build();
-
 		$headers = $this->get_headers();
+
+		do_action_ref_array( 'groundhogg/email/before_send', [ $this, &$to, &$subject, &$content, &$headers ] );
 
 		if ( $this->is_transactional() ) {
 			// If the email is transactional, use the installed transactional system
@@ -1080,13 +1079,9 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
 
 		if ( ! $sent ) {
-
 			do_action( 'groundhogg/email/send_failed', $this );
-
 		} else {
-
 			$contact->update_meta( 'last_sent', time() );
-
 		}
 
 		do_action( 'groundhogg/email/after_send', $this );

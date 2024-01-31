@@ -280,6 +280,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
+		$timer = new Micro_Time_Tracker();
+		$items = 0;
+
 		$this->update_meta( 'schedule_lock', true );
 
 		$query                  = $this->get_query();
@@ -291,12 +294,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$query['offset']        = $offset;
 		$query['no_found_rows'] = false;
 
-		$c_query  = new Contact_Query();
-		$contacts = $c_query->query( $query, true );
+		$c_query  = new Contact_Query( $query );
+		$contacts = $c_query->query( null, true );
 		$total    = $c_query->found_items;
-
-		$timer = new Micro_Time_Tracker();
-		$items = 0;
 
 		foreach ( $contacts as $contact ) {
 
@@ -315,6 +315,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 			$local_time = $this->get_send_time();
 
+			// Send in the local time, maybe
 			if ( $in_lt && ! $send_now ) {
 
 				$local_time = $contact->get_local_time_in_utc_0( $local_time );
@@ -353,7 +354,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$this->update_meta( 'num_scheduled', $offset );
 		$this->update_meta( 'total_contacts', $total );
-		$this->update_meta( 'batch_time_elapsed', round( $time_elapsed, 2 ) );
+		$this->update_meta( 'batch_time_elapsed', number_format( $time_elapsed, 2 ) );
 
 		// Finished scheduling
 		if ( $offset >= $total ) {

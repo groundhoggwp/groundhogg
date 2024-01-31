@@ -349,7 +349,16 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.2.1 (2024-01-30) =
+= 3.2.2 (2024-01-31) =
+* ADDED Background task for completing benchmarks.
+* TWEAKED The limits exceeded calculation for background tasks.
+* FIXED Default date range for future date filters didn't exist.
+* FIXED Caching for the `get_contactdata()` was not working causing slowness when checking contact marketability.
+* IMPROVED Hardened the auto-login link functionality.
+ * If the {auto_login_link} is detected in the email, the `to` address of that email will be forcibly changed to the associated user's email address if it's different than the contact's.
+ * Changing of the `user_id` or `email` of a contact will invalidate previously issued login links.
+
+= 3.2.1 (2024-01-31) =
 * TWEAKED Further optimized activity and event based filters.
  * Setting `count equals 0` will now return results similar to using the inverse `count at least 1` in the exclude group.
 * TWEAKED Delayed localization of gutenberg block js assets.

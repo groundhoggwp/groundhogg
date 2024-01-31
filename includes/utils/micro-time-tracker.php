@@ -19,7 +19,7 @@ class Micro_Time_Tracker {
 	}
 
 	public function time_elapsed_rounded( $precision = 2 ) {
-		return round( $this->time_elapsed(), $precision );
+		return number_format( $this->time_elapsed(), $precision );
 	}
 
 	public function show_time_elapsed( $precision = 2 ) {

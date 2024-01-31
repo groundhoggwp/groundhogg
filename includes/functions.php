@@ -132,7 +132,7 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		}
 
 		return false;
-	} else if ( in_array( $cache_key, $cache ) ) {
+	} else if ( key_exists( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
 
@@ -5092,6 +5092,55 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 
 	return $key;
 }
+
+/**
+ * Invalidate the permissions keys for a specific contact
+ *
+ * @param Contact $contact
+ * @param         $usage
+ *
+ * @return bool
+ */
+function invalidate_contact_permissions_keys( Contact $contact, string $usage = '' ) {
+
+    $query = [
+	    'contact_id' => $contact->get_id()
+    ];
+
+    if ( ! empty( $usage ) ){
+        $query[ 'usage_type' ] = $usage;
+    }
+
+	$deleted = get_db( 'permissions_keys' )->delete( $query );
+
+    return $deleted;
+}
+
+/**
+ * If the user_id or email address is changed, invalidate existing permissions keys for that contact.
+ *
+ * @param int $id
+ * @param array $updated
+ * @param Contact $contact
+ * @param array $old
+ *
+ * @return void
+ */
+function maybe_invalidate_permissions_keys_when_contact_updated( $id, $updated, $contact, $old ){
+
+    // All permissions keys
+    if ( isset( $updated['email'] ) && $updated['email'] !== $old[ 'email' ] ){
+        invalidate_contact_permissions_keys( $contact );
+        return;
+    }
+
+    // If the user_id was updated, only invalidate permissions keys for auto login
+    if ( isset( $updated['user_id'] ) && $updated['user_id'] !== $old[ 'user_id' ] ){
+	    invalidate_contact_permissions_keys( $contact, 'auto_login' );
+    }
+}
+
+add_action( 'groundhogg/contact/post_update', __NAMESPACE__ . '\maybe_invalidate_permissions_keys_when_contact_updated', 10, 4 );
 
 /**
  * Check the validity of a permissions key

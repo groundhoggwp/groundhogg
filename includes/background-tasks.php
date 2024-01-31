@@ -8,12 +8,14 @@ class Background_Tasks {
 
 	const SCHEDULE_BROADCAST = 'groundhogg/schedule_pending_broadcast';
 	const ADD_CONTACTS_TO_FUNNEL = 'groundhogg/add_contacts_to_funnel';
+	const COMPLETE_BENCHMARK = 'groundhogg/complete_benchmark';
 
 	const BATCH_LIMIT = 500;
 
 	public function __construct() {
 		add_action( self::SCHEDULE_BROADCAST, [ $this, '_schedule_pending_broadcast' ], 10, 1 );
 		add_action( self::ADD_CONTACTS_TO_FUNNEL, [ $this, '_add_contacts_to_funnel' ], 10, 3 );
+		add_action( self::COMPLETE_BENCHMARK, [ $this, '_complete_benchmark' ], 10, 3 );
 	}
 
 	/**
@@ -76,7 +78,7 @@ class Background_Tasks {
 			$query = new Contact_Query( array_merge( $query_vars, [
 				'offset'        => $offset,
 				'limit'         => self::BATCH_LIMIT,
-				'no_found_rows' => true,
+				'found_rows' => false,
 			] ) );
 
 			$contacts = $query->query( null, true );
@@ -96,6 +98,73 @@ class Background_Tasks {
 		}
 
 		self::add_contacts_to_funnel( $step_id, $query_vars, $batch );
+
+		Limits::stop();
+	}
+
+	/**
+	 * Wrapper function to add contacts to a funnel
+	 *
+	 * @param     $step_id
+	 * @param     $query
+	 * @param int $batch
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public static function complete_benchmark( $step_id, $query, $batch = 0 ) {
+		return self::add( self::COMPLETE_BENCHMARK, [ $step_id, $query, $batch ] );
+	}
+
+	/**
+	 * Same as add_contact_to_funnel but uses benchmark_enqueue() instead
+	 *
+	 * @param $step_id int
+	 * @param $query   array
+	 * @param $batch   int
+	 */
+	public function _complete_benchmark( $step_id, $query_vars, $batch = 0 ) {
+
+		Limits::start();
+
+		Limits::raise_memory_limit();
+		Limits::raise_time_limit( MINUTE_IN_SECONDS );
+
+		$step = new Step( $step_id );
+
+		// Funnel is not active
+		if ( ! $step->is_active() || ! $step->is_benchmark() ) {
+			return;
+		}
+
+		while ( ! Limits::limits_exceeded() ) {
+
+			$offset = $batch * self::BATCH_LIMIT;
+
+			$query = new Contact_Query( array_merge( $query_vars, [
+				'offset'     => $offset,
+				'limit'      => self::BATCH_LIMIT,
+				'found_rows' => false,
+			] ) );
+
+			$contacts = $query->query( null, true );
+
+			// No more contacts to add to the funnel
+			if ( empty( $contacts ) ) {
+				return;
+			}
+
+			foreach ( $contacts as $contact ) {
+				$step->benchmark_enqueue( $contact );
+			}
+
+			$batch ++;
+
+			Limits::processed_action();
+		}
+
+		self::complete_benchmark( $step_id, $query_vars, $batch );
+
+		Limits::stop();
 	}
 
 	/**

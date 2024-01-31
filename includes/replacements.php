@@ -1439,6 +1439,11 @@ class Replacements implements \JsonSerializable {
 			return $redirect_to;
 		}
 
+		if ( is_sending() ) {
+            // Temporarily force the email to be sent to the user's email address instead
+			the_email()->contact->email = the_email()->contact->get_userdata()->user_email;
+		}
+
 		$link_url = maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {

@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Events;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_List_Table;
+use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
@@ -304,7 +305,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . $count . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . _nf( $count ) . ')' )
 			] );
 		} );
 
@@ -325,7 +326,7 @@ class Events_Table extends WP_List_Table {
 				] )
 			], [
 				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . number_format_i18n( $count ) . ')' )
+				html()->e( 'span', [ 'class' => 'count' ], '(' . _nf( $count ) . ')' )
 			] );
 		} );
 
