@@ -369,7 +369,7 @@ class Contact_Query extends Table_Query {
 
 		$capability_key = $where->query->db->prefix . 'capabilities';
 		$alias          = $where->query->joinMeta( $capability_key, $where->query->db->usermeta, 'user_id' );
-		$where->like( "$alias.meta_value", '%' . $where->esc_like( $role ) . '%' );
+		$where->like( "$alias.meta_value", '%"' . $where->esc_like( $role ) . '"%' );
 	}
 
 	/**

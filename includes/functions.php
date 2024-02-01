@@ -8337,3 +8337,14 @@ function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, in
 
 	return 'bad';
 }
+
+/**
+ * Get the pretty name of a role
+ *
+ * @param $role string
+ *
+ * @return string
+ */
+function get_role_display_name( $role ) {
+	return translate_user_role( wp_roles()->roles[ $role ]['name'] );
+}

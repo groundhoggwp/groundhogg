@@ -195,10 +195,15 @@ class Table_Query extends Query {
 		$fields = [];
 
 		foreach ( $data as $column => $value ) {
-			$fields[] = "`$column` = {$column_formats[$column]}";
+
+			if ( $this->column_is_safe( $value ) ){
+				$fields[] ="`$column` = $value";
+			} else {
+				$fields[] = $this->db->prepare( "`$column` = {$column_formats[$column]}", $value );
+			}
 		}
 
-		$fields = $this->db->prepare( implode( ', ', $fields ), array_values( $data ) );
+		$fields = implode( ', ', $fields );
 
 		$query = [
 			'UPDATE',

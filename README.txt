@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.2.1
+Stable tag: 3.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -351,6 +351,8 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.2.2 (2024-01-31) =
 * ADDED Background task for completing benchmarks.
+* ADDED Tool to re-sync user IDs based on email address equality.
+* ADDED If user email address and contact email address are not equal show an button to unlink the user from the contact in the user info card.
 * TWEAKED The limits exceeded calculation for background tasks.
 * FIXED Default date range for future date filters didn't exist.
 * FIXED Caching for the `get_contactdata()` was not working causing slowness when checking contact marketability.

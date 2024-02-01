@@ -15,10 +15,18 @@ use function Groundhogg\html;
         </div>
         <div class="inside">
             <p><?php _e( 'Sync any existing WordPress users with your contacts. Meta will be synced based on the general settings.', 'groundhogg' ); ?></p>
-            <p><?php echo html()->e( 'a', [
-					'class' => 'button',
-					'href'  => Plugin::instance()->bulk_jobs->sync_contacts->get_start_url(),
-				], __( 'Process', 'groundhogg' ) ) ?></p>
+            <div class="display-flex gap-10">
+		        <?php echo html()->e( 'a', [
+			        'class' => 'button',
+			        'href'  => Plugin::instance()->bulk_jobs->sync_contacts->get_start_url(),
+		        ], __( 'Sync Users', 'groundhogg' ) ) ?></p>
+
+	            <?php echo html()->e( 'a', [
+		            'class' => 'button',
+		            'href'  => action_url( 're_sync_user_ids' ),
+	            ], __( 'Only re-sync user IDs', 'groundhogg' ) ) ?></p>
+
+            </div>
         </div>
     </div>
     <div class="gh-panel">

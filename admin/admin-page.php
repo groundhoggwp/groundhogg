@@ -7,6 +7,7 @@ use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\base64_json_encode;
+use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -276,7 +277,7 @@ abstract class Admin_Page extends Supports_Errors {
 			return false;
 		}
 
-		return is_array( $items ) ? $items : array( $items );
+		return ensure_array( $items );
 	}
 
 	/**

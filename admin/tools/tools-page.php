@@ -4,32 +4,27 @@ namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
-use Groundhogg\Bulk_Jobs\Delete_Contacts;
-use Groundhogg\Properties;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
+use Groundhogg\Plugin;
+use Groundhogg\Properties;
 use Groundhogg\Queue\Event_Queue;
+use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\check_permissions_key;
-use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
-use function Groundhogg\get_permissions_key;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use Groundhogg\Plugin;
-use \WP_Error;
 use function Groundhogg\install_gh_cron_file;
 use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
 use function Groundhogg\restore_missing_funnel_events;
@@ -1118,6 +1113,44 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function misc_view() {
 		include __DIR__ . '/misc.php';
+	}
+
+	/**
+     * Re-sync user IDs
+     *
+	 * @throws \Exception
+	 * @return void
+	 */
+	public function process_re_sync_user_ids() {
+
+        if ( ! current_user_can( 'edit_users' ) ){
+            $this->wp_die_no_access();
+        }
+
+		$query = new Table_Query( 'contacts' );
+
+        // Set all IDs to 0
+		$query->update( [
+			'user_id' => 0
+		] );
+
+		$join = $query->addJoin( 'LEFT', $query->db->users );
+		$join->onColumn( 'user_email', 'email' );
+
+        $query->add_safe_column(  "$join->alias.ID" );
+
+        // Update the user_id col from the ID in the table
+        $updated = $query->update( [
+            'user_id' => "$join->alias.ID"
+        ] );
+
+        if ( $updated ){
+            $this->add_notice( 'success', 'User IDs have been synced.' );
+        } else {
+	        $this->add_notice( 'failed', 'Re-sync failed.', 'error' );
+        }
+
+        return true;
 	}
 
 }
