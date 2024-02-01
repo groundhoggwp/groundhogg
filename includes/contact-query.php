@@ -595,6 +595,16 @@ class Contact_Query extends Table_Query {
 		self::basic_event_filter( $filter, $where );
 	}
 
+	/**
+	 * Handler for basic event joins or sub queries
+	 *
+	 * @throws \Exception
+	 *
+	 * @param Where $where
+	 * @param       $filter
+	 *
+	 * @return void
+	 */
 	public static function basic_event_filter( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
@@ -643,21 +653,21 @@ class Contact_Query extends Table_Query {
 			->addJoin( 'LEFT', [ $table, $table ] )
 			->onColumn( 'contact_id' );
 
-		Filters::timestamp( 'time', $filter, $where );
-
 		$where->equals( "$table.status", $status );
 		$where->equals( "$table.event_type", $event_type );
 
+		Filters::timestamp( "$table.time", $filter, $where );
+
 		if ( $funnel_id ) {
-			$conditions->equals( "$table.funnel_id", $funnel_id );
+			$where->equals( "$table.funnel_id", $funnel_id );
 		}
 
 		if ( $step_id ) {
-			$conditions->equals( "$table.step_id", $step_id );
+			$where->equals( "$table.step_id", $step_id );
 		}
 
 		if ( $email_id ) {
-			$conditions->equals( "$table.email_id", $email_id );
+			$where->equals( "$table.email_id", $email_id );
 		}
 
 		$where->query->setGroupby( 'ID' );

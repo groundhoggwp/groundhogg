@@ -223,15 +223,17 @@ class Filters {
 				break;
 			case 'after':
 				$after->modify( $filter['after'] );
+				$after->modify( '00:00:00' );
 				$before->modify( '+99 years' );
 				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );
-
 				// set before time to EOD
 				$before->modify( '23:59:59' );
 
 				$after  = new DateTimeHelper( $filter['after'] );
+				// Set to SOD
+				$after->modify( '00:00:00' );
 				break;
 		}
 
