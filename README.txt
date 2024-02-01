@@ -356,6 +356,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED The limits exceeded calculation for background tasks.
 * FIXED Default date range for future date filters didn't exist.
 * FIXED Caching for the `get_contactdata()` was not working causing slowness when checking contact marketability.
+* FIXED New filters not setting between before date to EOD.
+* FIXED Refresh button in contact activity not working because our caching was too good.
 * IMPROVED Hardened the auto-login link functionality.
  * If the {auto_login_link} is detected in the email, the `to` address of that email will be forcibly changed to the associated user's email address if it's different than the contact's.
  * Changing of the `user_id` or `email` of a contact will invalidate previously issued login links.

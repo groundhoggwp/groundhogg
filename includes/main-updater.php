@@ -66,6 +66,14 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					update_option( 'gh_enable_tag_mapping', 'on' );
 				}
+			],
+			'3.2.2'    => [
+				'automatic'   => true,
+				'description' => __( 'Rename cron job hooks.', 'groundhogg' ),
+				'callback'    => function () {
+					wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
+					wp_clear_scheduled_hook( 'gh_purge_page_visits' );
+				}
 			]
 		];
 	}

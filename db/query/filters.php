@@ -126,8 +126,8 @@ class Filters {
 
 		$filter = wp_parse_args( $filter, [
 			'date_range' => 'any',
-			'after'      => '',
-			'before'     => '',
+			'after'      => '', // typically Y-m-d formatted string
+			'before'     => '', // typically Y-m-d formatted string
 		] );
 
 		$after  = new DateTimeHelper(); // now
@@ -218,6 +218,8 @@ class Filters {
 			case 'before':
 				$after->setTimestamp( 0 );
 				$before->modify( $filter['before'] );
+
+				// todo maybe set to EOD?
 				break;
 			case 'after':
 				$after->modify( $filter['after'] );
@@ -225,8 +227,11 @@ class Filters {
 				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );
+
+				// set before time to EOD
+				$before->modify( '23:59:59' );
+
 				$after  = new DateTimeHelper( $filter['after'] );
-				maybe_swap_dates( $before, $after );
 				break;
 		}
 

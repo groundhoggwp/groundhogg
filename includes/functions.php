@@ -6236,11 +6236,11 @@ function uninstall_groundhogg() {
 	wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
-	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
-	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
-	wp_clear_scheduled_hook( 'groundhogg/aws/remove_old_logs' );
-	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
+	wp_clear_scheduled_hook( 'groundhogg/purge_email_logs' );
 	wp_clear_scheduled_hook( 'groundhogg/purge_page_visits' );
+	wp_clear_scheduled_hook( 'groundhogg/aws/remove_old_logs' );
+	wp_clear_scheduled_hook( 'groundhogg/birthday' );
+	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
 	wp_clear_scheduled_hook( 'groundhogg/check_bounces' );
 	wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 

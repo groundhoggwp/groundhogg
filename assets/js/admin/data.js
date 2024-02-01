@@ -289,6 +289,13 @@
     },
 
     /**
+     * Clear items from this store
+     */
+    clearItems () {
+      this.items = []
+    },
+
+    /**
      * Find an item based on a predicate
      *
      * @param f

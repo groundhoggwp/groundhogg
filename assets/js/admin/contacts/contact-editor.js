@@ -1033,12 +1033,23 @@
         },
         onMount: () => {
 
+          const clearFeedCache = () => {
+            EventQueue.clearItems()
+            EventQueue.clearResultsCache()
+            EventsStore.clearResultsCache()
+            SubmissionsStore.clearResultsCache()
+            ActivityStore.clearResultsCache()
+            PageVisitsStore.clearResultsCache()
+          }
+
           let order = 'desc'
           let filter = 'all'
 
           $('#refresh-timeline').on('click', e => {
 
             $(e.currentTarget).find('.dashicons').addClass('spinning')
+
+            clearFeedCache()
 
             fetchActivity().then(() => {
               $(e.currentTarget).find('.dashicons').removeClass('spinning')
@@ -1052,6 +1063,7 @@
 
           $('#activity-order').on('change', (e) => {
             order = e.target.value
+            clearFeedCache()
             fetchActivity()
           })
 
