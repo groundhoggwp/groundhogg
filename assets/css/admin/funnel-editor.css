@@ -267,6 +267,7 @@ body:not(.funnel-full-screen) #close {
   width: 100%;
   margin-right: 20px;
   margin-left: 20px;
+  overflow: hidden;
 }
 .funnel-editor-header #close #close-button {
   padding: 12px;
@@ -276,6 +277,10 @@ body:not(.funnel-full-screen) #close {
   line-height: 44px;
   font-size: 20px;
   font-weight: 400;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .step-title-view .title,
@@ -283,6 +288,7 @@ body:not(.funnel-full-screen) #close {
   font-weight: 600;
   line-height: 1em;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .funnel-editor-header div {

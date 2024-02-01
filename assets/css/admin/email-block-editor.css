@@ -634,6 +634,9 @@ body iframe#preview.desktop {
 #email-editor .gh-header .admin-title-wrap {
   font-size: 20px;
   line-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   width: 100%;
 }
 #email-editor .gh-header .admin-title-wrap #admin-title {
