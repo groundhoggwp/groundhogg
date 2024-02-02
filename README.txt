@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.2.2.1
+Stable tag: 3.2.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2.2.2 (2024-02-01) =
+* HOT FIX User info updating incorrect contact records.
+* TWEAKED Optimized the recount tag associations function to perform in a single query.
+* FIXED If filters aren't registered the filters don't work. Now shows a broken filter message instead.
 
 = 3.2.2.1 (2024-01-31) =
 * FIXED Funnel history filters not working if in multiple OR conditions.

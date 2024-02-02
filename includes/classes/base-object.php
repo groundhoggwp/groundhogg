@@ -319,6 +319,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function update( $data = [] ) {
 
+		// Invalid data for update
 		if ( ! is_array( $data ) ){
 			return false;
 		}

@@ -286,7 +286,6 @@ class Contacts_Api extends Base_Object_Api {
 				// If the current object supports meta data...
 				if ( ! empty( $meta ) && is_array( $meta ) ) {
 					$contact->update_meta( $meta );
-
 				}
 
 				$contact->apply_tag( $add_tags );
@@ -493,27 +492,33 @@ class Contacts_Api extends Base_Object_Api {
 		$meta        = $request->get_param( 'meta' );
 		$remove_tags = $request->get_param( 'remove_tags' );
 
-		// get the email address
-		$email_address = get_array_var( $data, 'email' );
-
-		// will return false if the email address is not being used
-		if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+		if ( empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ){
+			return self::ERROR_401( 'no_changes', 'No changes were made.' );
 		}
 
-		$contact->update( $data );
+		if ( ! empty( $data ) ){
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
 
-		if ( $meta ) {
+			// will return false if the email address is not being used
+			if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
+				return self::ERROR_409( 'error', 'Email address already in use.' );
+			}
+
+			$contact->update( $data );
+		}
+
+		if ( ! empty( $meta ) ) {
 			foreach ( $meta as $key => $value ) {
 				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
 		}
 
-		if ( $add_tags ) {
+		if ( ! empty( $add_tags ) ) {
 			$contact->apply_tag( $add_tags );
 		}
 
-		if ( $remove_tags ) {
+		if ( ! empty( $remove_tags ) ) {
 			$contact->remove_tag( $remove_tags );
 		}
 

@@ -59,6 +59,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @param bool                  $by_user_id
 	 */
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
+
 		$field = false;
 
 		if ( ! is_array( $_id_or_email_or_args ) && ! is_object( $_id_or_email_or_args ) ) {
@@ -75,7 +76,7 @@ class Contact extends Base_Object_With_Meta {
 			}
 		}
 
-		// Support fetching contact by user id
+		// Support fetching contact by user
 		if ( is_a( $_id_or_email_or_args, '\WP_User' ) ) {
 			$_id_or_email_or_args = $_id_or_email_or_args->ID;
 			$field                = 'user_id';
@@ -558,6 +559,11 @@ class Contact extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function update( $data = [] ) {
+
+		// Not an array, send them home
+		if ( ! is_array( $data ) ) {
+			return false;
+		}
 
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );

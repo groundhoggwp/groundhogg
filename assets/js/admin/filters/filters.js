@@ -685,7 +685,20 @@
   /**
    * When given a field property the factory will auto generate filters
    *
-   * @type {{date: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), number: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), datetime: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), checkboxes: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), textarea: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), tel: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), text: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), time: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), url: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), dropdown: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), custom_email: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), radio: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group})}}
+   * @type {{date: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload,
+   *   group}), number: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload:
+   *   preload, group}), datetime: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type,
+   *   preload: preload, group}), checkboxes: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display:
+   *   (function(): null), name, type, preload: preload, group}), textarea: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null),
+   *   display: (function(): null), name, type, preload: preload, group}), tel: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function():
+   *   null), display: (function(): null), name, type, preload: preload, group}), text: (function({id: *, label: *, group: *}): {defaults: {}, edit:
+   *   (function(): null), display: (function(): null), name, type, preload: preload, group}), time: (function({id: *, label: *, group: *}): {defaults: {},
+   *   edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), url: (function({id: *, label: *, group: *}): {defaults:
+   *   {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), dropdown: (function({id: *, label: *, group: *, [p:
+   *   string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), custom_email: (function({id:
+   *   *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), radio:
+   *   (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload:
+   *   preload, group})}}
    */
   const filterFactory = {
 
@@ -799,19 +812,27 @@
     filters = [],
   } = {}) => ( {
 
-    groups,
-    filters,
+    groups: groups.reduce((carr, curr) => {
+      carr[curr.id] = curr.name
+      return carr
+    }, {}),
 
-    registerGroup (group) {
-      this.groups.push(group)
+    filters: filters.reduce((filters, filter) => {
+      filters[filter.type] = filter
+      return filters
+    }, {}),
+
+    registerGroup (group, name) {
+      if (group && name) {
+        this.groups[group] = name
+      }
+      else {
+        this.groups[group.id] = group.name
+      }
     },
 
     registerFilter (filter) {
-      if (this.getFilter(filter)) {
-        return
-      }
-
-      this.filters.push(filter)
+      this.filters[filter.type] = filter
     },
 
     displayName (filter) {
@@ -844,7 +865,11 @@
     },
 
     getFilter ({ type }) {
-      return this.filters.find(f => f.type === type)
+      return this.filters[type] ?? {}
+    },
+
+    hasFilter ({ type }) {
+      return type in this.filters
     },
 
     preloadFilter (filter) {
@@ -856,10 +881,13 @@
       const promises = []
 
       filters.forEach(filterGroup => filterGroup.forEach(filter => {
-        const promise = this.preloadFilter(filter)
-        if (promise) {
-          promises.push(promise)
+        try {
+          const promise = this.preloadFilter(filter)
+          if (promise) {
+            promises.push(promise)
+          }
         }
+        catch (err) {}
       }))
 
       return Promise.all(promises)
@@ -878,7 +906,7 @@
 
           let groupId = `${ t.id }-${ s.id }`
 
-          this.registerGroup( createGroup( groupId, `${ t.name }: ${ s.name }` ) )
+          this.registerGroup(groupId, `${ t.name }: ${ s.name }`)
 
           Object.values(fields).filter(f => f.group === s.id).forEach(f => {
 
@@ -964,32 +992,45 @@
      * @returns HTMLElement
      * @constructor
      */
-    const FilterBroken = (filter, group, index, err) => Div({
-      id: `filter-${ filter.id }`,
-      className: 'filter filter-view filter-broken',
-      tabindex: 0,
-      onClick: e => {
-        if (clickedIn(e, '.delete-filter')) {
-          return
-        }
+    const FilterBroken = (filter, group, index, err) => {
 
-        editFilter(filter.id)
-      },
-    }, [
-      Span({
-        className: 'filter-name text',
-      }, err instanceof Error ? err.message : sprintf(
-        __('This %s filter is corrupted', 'groundhogg'),
-        bold(filterRegistry.filterName(filter)))),
-      Button({
-        id: `delete-${ group }-${ index }`,
-        className: 'delete-filter',
+      let message
+
+      if (filterRegistry.hasFilter(filter)) {
+        message = err instanceof Error ? err.message : sprintf(
+          __('This %s filter is corrupted', 'groundhogg'),
+          bold(filterRegistry.filterName(filter)))
+      }
+      else {
+        message = sprintf(__('This %s filter is not available.', 'groundhogg'),
+          bold(filter.type))
+      }
+
+      return Div({
+        id: `filter-${ filter.id }`,
+        className: 'filter filter-view filter-broken',
+        tabindex: 0,
         onClick: e => {
-          e.preventDefault()
-          deleteFilter(group, index)
+          if (clickedIn(e, '.delete-filter')) {
+            return
+          }
+
+          editFilter(filter.id)
         },
-      }, Dashicon('no-alt')),
-    ])
+      }, [
+        Span({
+          className: 'filter-name text',
+        }, message),
+        Button({
+          id: `delete-${ group }-${ index }`,
+          className: 'delete-filter',
+          onClick: e => {
+            e.preventDefault()
+            deleteFilter(group, index)
+          },
+        }, Dashicon('no-alt')),
+      ])
+    }
 
     /**
      * The filter pill
@@ -1048,9 +1089,7 @@
           morphdom(document.getElementById(`filter-${ id }-settings`),
             FilterSettings())
         }
-        catch (e) {
-          console.log(e)
-        }
+        catch (e) {}
       }
 
       /**
@@ -1066,7 +1105,6 @@
         }
 
         if (doMorph) {
-          console.log(tempFilterSettings)
           morphFilter()
         }
       }
@@ -1135,17 +1173,13 @@
       className: 'group',
     }, [
       ...filters.map((filter, index) => {
-
         try {
-
           if (State.activeFilter === filter.id) {
             return EditFilter(filter, group, index)
           }
-
           return Filter(filter, group, index)
         }
         catch (err) {
-          console.log(err)
           return FilterBroken(filter, group, index, err)
         }
 
@@ -1155,11 +1189,8 @@
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
 
-          let options = filterRegistry.filters
-          let groups = filterRegistry.groups.reduce((carr, curr) => {
-            carr[curr.id] = curr.name
-            return carr
-          }, {})
+          let options = Object.values(filterRegistry.filters)
+          let groups = filterRegistry.groups
 
           searchOptionsWidget({
             // selector: '.add-filter-wrap',

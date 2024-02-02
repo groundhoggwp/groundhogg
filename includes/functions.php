@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
@@ -102,21 +103,19 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return $contact_id_or_email;
 	}
 
-	static $cache = [];
+	if ( empty( $contact_id_or_email ) ) {
 
-	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
-
-	if ( ! $contact_id_or_email ) {
-
+        // From queue?
 		if ( Event_Queue::is_processing() ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
+        // From tracking?
 		if ( $contact = tracking()->get_current_contact() ) {
 			return $contact;
 		}
 
-		// support for identity
+		// Support for identity
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
 
@@ -132,14 +131,20 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		}
 
 		return false;
-	} else if ( key_exists( $cache_key, $cache ) ) {
+	}
+
+	static $cache = [];
+
+	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
+
+    if ( key_exists( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
 
-	$contact = new Contact( $contact_id_or_email );
+	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
 	if ( $contact->exists() ) {
-//		Set the contact in the cache
+        // Set the contact in the cache
 		$cache[ $cache_key ] = $contact;
 
 		return $contact;
@@ -1672,15 +1677,19 @@ function recount_tag_contacts_count() {
 	// Delete the orphaned relationships
 	get_db( 'tag_relationships' )->delete_orphaned_relationships();
 
-	// Recount the tags
-	$tags = get_db( 'tags' )->query();
+    $tagQuery = new Table_Query( 'tags' );
+    $tagQuery->update( [ 'contact_count' => 0 ] );
 
-	if ( ! empty( $tags ) ) {
-		foreach ( $tags as $tag ) {
-			$count = get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
-			get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
-		}
-	}
+    $tagRelQuery = new Table_Query('tag_relationships');
+    $tagRelQuery->setSelect( 'tag_id', ['COUNT(contact_id)', 'contacts' ] )
+                ->setGroupby('tag_id');
+
+    $tagQuery->add_safe_column( "tag_rels.contacts" );
+
+    $tagQuery->addJoin( 'LEFT', [ $tagRelQuery, 'tag_rels' ] )->onColumn( 'tag_id', 'tag_id' );
+	$tagQuery->update([
+        'contact_count' => 'tag_rels.contacts'
+    ]);
 }
 
 /**
