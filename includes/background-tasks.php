@@ -2,39 +2,112 @@
 
 namespace Groundhogg;
 
+use Groundhogg\background\Add_Contacts_To_Funnel;
+use Groundhogg\Background\Complete_Benchmark;
+use Groundhogg\background\Delete_Contacts;
+use Groundhogg\Background\Schedule_Broadcast;
+use Groundhogg\Background\Task;
+use Groundhogg\Background\Update_Contacts;
 use Groundhogg\Utils\Limits;
 
 class Background_Tasks {
 
-	const SCHEDULE_BROADCAST = 'groundhogg/schedule_pending_broadcast';
-	const ADD_CONTACTS_TO_FUNNEL = 'groundhogg/add_contacts_to_funnel';
-	const COMPLETE_BENCHMARK = 'groundhogg/complete_benchmark';
+	const HOOK = 'groundhogg/background_tasks';
 
-	const BATCH_LIMIT = 500;
+	protected static array $tasks = [];
 
 	public function __construct() {
-		add_action( self::SCHEDULE_BROADCAST, [ $this, '_schedule_pending_broadcast' ], 10, 1 );
-		add_action( self::ADD_CONTACTS_TO_FUNNEL, [ $this, '_add_contacts_to_funnel' ], 10, 3 );
-		add_action( self::COMPLETE_BENCHMARK, [ $this, '_complete_benchmark' ], 10, 3 );
+		add_action( self::HOOK, [ $this, 'handle_task' ], 10, 1 );
+	}
+
+	/**
+	 * Do callback for the background task to be completed
+	 *
+	 * @param Task $task
+	 *
+	 * @return void
+	 */
+	public function handle_task( Task $task ){
+
+		if ( ! $task->can_run() ){
+			return;
+		}
+
+		Limits::start();
+
+		Limits::raise_memory_limit();
+		Limits::raise_time_limit( MINUTE_IN_SECONDS );
+
+		$complete = false;
+
+		while ( ! Limits::limits_exceeded() && ! $complete ){
+			$complete = $task->process();
+			Limits::processed_action();
+		}
+
+		$task->stop();
+
+		if ( ! $complete ){
+			self::add( $task );
+		}
+
+		Limits::stop();
 	}
 
 	/**
 	 * Schedules the background task wp-cron event
 	 *
-	 * @param $hook
-	 * @param $args
+	 * @param Task $task
+	 * @param bool $time
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function add( $hook, $args ) {
+	public static function add( Task $task, $time = false ) {
 
-		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', time() + 10, $hook, $args );
+		if ( ! is_int( $time ) ){
+			$time = time();
+		}
 
-		return wp_schedule_single_event( $when, $hook, $args );
+		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', $time + 10, $task );
+
+		return wp_schedule_single_event( $when, self::HOOK, [ $task ] );
 	}
 
+	/**
+	 * Remove a background task
+	 *
+	 * @param $hook
+	 * @param $args
+	 *
+	 * @return false|int|\WP_Error
+	 */
 	public static function remove( $hook, $args = [] ) {
 		return wp_clear_scheduled_hook( $hook, $args );
+	}
+
+	/**
+	 * Update contacts in the background
+	 *
+	 * @param $query
+	 * @param $data
+	 * @param $batch
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public static function update_contacts( $query, $data ){
+		return self::add( new Update_Contacts( $query, $data ) );
+	}
+
+	/**
+	 * Delete contacts in the background
+	 *
+	 * @param $query
+	 * @param $batch
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public static function delete_contacts( $query ){
+		return self::add( new Delete_Contacts( $query ) );
 	}
 
 	/**
@@ -47,59 +120,7 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0 ) {
-		return self::add( self::ADD_CONTACTS_TO_FUNNEL, [ $step_id, $query, $batch ] );
-	}
-
-	/**
-	 * Add contacts to a funnel with a background task
-	 *
-	 * @param $step_id int
-	 * @param $query   array
-	 * @param $batch   int
-	 */
-	public function _add_contacts_to_funnel( $step_id, $query_vars, $batch = 0 ) {
-
-		Limits::start();
-
-		Limits::raise_memory_limit();
-		Limits::raise_time_limit( MINUTE_IN_SECONDS );
-
-		$step = new Step( $step_id );
-
-		// Funnel is not active
-		if ( ! $step->is_active() ) {
-			return;
-		}
-
-		while ( ! Limits::limits_exceeded() ) {
-
-			$offset = $batch * self::BATCH_LIMIT;
-
-			$query = new Contact_Query( array_merge( $query_vars, [
-				'offset'        => $offset,
-				'limit'         => self::BATCH_LIMIT,
-				'found_rows' => false,
-			] ) );
-
-			$contacts = $query->query( null, true );
-
-			// No more contacts to add to the funnel
-			if ( empty( $contacts ) ) {
-				return;
-			}
-
-			foreach ( $contacts as $contact ) {
-				$step->enqueue( $contact );
-			}
-
-			$batch ++;
-
-			Limits::processed_action();
-		}
-
-		self::add_contacts_to_funnel( $step_id, $query_vars, $batch );
-
-		Limits::stop();
+		return self::add( new Add_Contacts_To_Funnel( $step_id, $query, $batch ) );
 	}
 
 	/**
@@ -112,59 +133,7 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function complete_benchmark( $step_id, $query, $batch = 0 ) {
-		return self::add( self::COMPLETE_BENCHMARK, [ $step_id, $query, $batch ] );
-	}
-
-	/**
-	 * Same as add_contact_to_funnel but uses benchmark_enqueue() instead
-	 *
-	 * @param $step_id int
-	 * @param $query   array
-	 * @param $batch   int
-	 */
-	public function _complete_benchmark( $step_id, $query_vars, $batch = 0 ) {
-
-		Limits::start();
-
-		Limits::raise_memory_limit();
-		Limits::raise_time_limit( MINUTE_IN_SECONDS );
-
-		$step = new Step( $step_id );
-
-		// Funnel is not active
-		if ( ! $step->is_active() || ! $step->is_benchmark() ) {
-			return;
-		}
-
-		while ( ! Limits::limits_exceeded() ) {
-
-			$offset = $batch * self::BATCH_LIMIT;
-
-			$query = new Contact_Query( array_merge( $query_vars, [
-				'offset'     => $offset,
-				'limit'      => self::BATCH_LIMIT,
-				'found_rows' => false,
-			] ) );
-
-			$contacts = $query->query( null, true );
-
-			// No more contacts to add to the funnel
-			if ( empty( $contacts ) ) {
-				return;
-			}
-
-			foreach ( $contacts as $contact ) {
-				$step->benchmark_enqueue( $contact );
-			}
-
-			$batch ++;
-
-			Limits::processed_action();
-		}
-
-		self::complete_benchmark( $step_id, $query_vars, $batch );
-
-		Limits::stop();
+		return self::add( new Complete_Benchmark( $step_id, $query, $batch ) );
 	}
 
 	/**
@@ -175,36 +144,6 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function schedule_pending_broadcast( $broadcast_id ) {
-		return self::add( self::SCHEDULE_BROADCAST, [ $broadcast_id ] );
-	}
-
-	/**
-	 * Schedules any pending broadcasts
-	 */
-	public function _schedule_pending_broadcast( $broadcast_id ) {
-
-		$broadcast = new Broadcast( $broadcast_id );
-
-		if ( ! $broadcast->exists() || ! $broadcast->is_pending() ) {
-			return;
-		}
-
-		Limits::start();
-
-		Limits::raise_memory_limit();
-		Limits::raise_time_limit( MINUTE_IN_SECONDS );
-
-		$scheduled = true;
-
-		while ( ! Limits::limits_exceeded() && $broadcast->is_pending() && $scheduled !== false ) {
-			$scheduled = $broadcast->enqueue_batch();
-			Limits::processed_action();
-		}
-
-		if ( $broadcast->is_pending() ) {
-			$broadcast->schedule();
-		}
-
-		Limits::stop();
+		return self::add( new Schedule_Broadcast( $broadcast_id ) );
 	}
 }

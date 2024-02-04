@@ -59,6 +59,10 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_status() === 'pending';
 	}
 
+	public function is_cancelled() {
+		return $this->get_status() === 'cancelled';
+	}
+
 	public function is_sent() {
 		return $this->get_status() === 'sent';
 	}
@@ -264,9 +268,6 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		] );
 
 		$this->update( [ 'status' => 'cancelled' ] );
-
-		// Also cancel the cron job
-		Background_Tasks::remove( Background_Tasks::SCHEDULE_BROADCAST, [ $this->get_id() ] );
 	}
 
 	/**

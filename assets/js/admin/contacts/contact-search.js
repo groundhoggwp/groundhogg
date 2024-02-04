@@ -612,69 +612,31 @@
             case 'delete':
 
               dangerConfirmationModal({
+                width: 600,
                 alert: `<p>${ sprintf(__(
                   'Are you sure you want to delete %s contacts? This cannot be undone. Consider <i>exporting</i> first!',
                   'groundhogg'), `<b>${ totalContactsFormatted }</b>`) }</p>`,
                 onConfirm: () => {
 
-                  modal({
-                    //language=HTML
-                    content: `
-                        <h2>${ __('Deleting contacts') }</h2>
-                        <div id="delete-progress"></div>`,
-                    canClose: false,
-                    onOpen: ({ close }) => {
+                  ContactsStore.deleteMany({
+                    ...query,
+                    bg: true,
+                  }).then(r => {
 
-                      loadingDots('.gh-modal h2')
+                    confirmationModal({
+                      width: 600,
+                      alert: `<p>${ sprintf(__(
+                          '🗑️ %s contacts are being deleted in the background. <i>It may take a while.</i> We\'ll let you know when it\'s done!', 'groundhogg'),
+                        `<b>${ totalContactsFormatted }</b>`) }</p>`,
+                      cancelButtonType: 'hidden',
+                      confirmText: __('Sounds good!', 'groundhogg'),
+                    })
 
-                      let totalDeleted = 0
-
-                      const { setProgress } = progressBar('#delete-progress')
-
-                      // Set the progress bar
-                      const onDelete = (deleted) => {
-                        totalDeleted += parseInt(deleted)
-                        setProgress(totalDeleted / parseInt(totalContacts))
-                      }
-
-                      // Go back to the root contacts page
-                      const onComplete = () => {
-                        dialog({
-                          message: sprintf(__('%s contacts deleted', 'groundhogg'),
-                            `<b>${ formatNumber(totalDeleted) }</b>`),
-                        })
-
-                        window.location.href = adminPageURL('gh_contacts')
-                      }
-
-                      const deleteContacts = () => ContactsStore.deleteMany({
-                        ...query,
-                      }).then(({
-                        items_deleted,
-                        items_remaining,
-                      }) => {
-
-                        onDelete(items_deleted)
-
-                        if (items_remaining <= 0) {
-                          onComplete()
-                          return Promise.resolve({
-                            items_deleted,
-                            items_remaining,
-                          })
-                        }
-
-                        return deleteContacts(onDelete, onComplete)
-                      }).catch(err => {
-                        dialog({
-                          message: err.message,
-                          type: 'error',
-                        })
-                        close()
-                      })
-
-                      deleteContacts()
-                    },
+                  }).catch(err => {
+                    dialog({
+                      message: err.message,
+                      type: 'error',
+                    })
                   })
                 },
               })

@@ -376,7 +376,7 @@ class Scripts {
 			'beautify-html'
 		], GROUNDHOGG_VERSION );
 
-		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/setup' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/features/setup' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );
@@ -600,7 +600,7 @@ class Scripts {
 
 		wp_register_style( 'groundhogg-admin-extensions', GROUNDHOGG_ASSETS_URL . 'css/admin/extensions.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'css/admin/iframe.css', [], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'css/admin/features/setup.css', [
+		wp_register_style( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'css/admin/setup.css', [
 			'groundhogg-admin',
 			'groundhogg-admin-element',
 		], GROUNDHOGG_VERSION );

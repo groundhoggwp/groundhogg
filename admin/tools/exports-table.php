@@ -4,6 +4,8 @@ namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Plugin;
 use \WP_List_Table;
+use function Groundhogg\_nf;
+use function Groundhogg\count_csv_rows;
 use function Groundhogg\file_access_url;
 
 /**
@@ -98,7 +100,7 @@ class Exports_Table extends WP_List_Table {
 	 * @return mixed
 	 */
 	protected function column_rows( $export ) {
-		return $export['rows'];
+		return _nf( $export['rows'] );
 	}
 
 	/**
@@ -192,7 +194,7 @@ class Exports_Table extends WP_List_Table {
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/exports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count( file( $filepath, FILE_SKIP_EMPTY_LINES ) ) - 1,
+					'rows'      => count_csv_rows( $filepath ) - 1,
 				];
 
 				$data[] = $file;

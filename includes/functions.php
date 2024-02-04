@@ -4,11 +4,11 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
-use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
 use Groundhogg\Utils\DateTimeHelper;
+use Groundhogg\Utils\Micro_Time_Tracker;
 use WP_Error;
 
 
@@ -226,9 +226,9 @@ function report_link( $content, $params ){
  *
  * @return string
  */
-function contact_filters_link( $content, $filters, $no_link = false ) {
+function contact_filters_link( $content, $filters, $link = true ) {
 
-    if ( ! $no_link ){
+    if ( ! $link  ){
         return $content;
     }
 
@@ -1671,25 +1671,11 @@ function wpgh_get_referer() {
 
 /**
  * Recount the contacts per tag...
+ *
+ * @deprecated 3.2 no replacement
  */
 function recount_tag_contacts_count() {
-
-	// Delete the orphaned relationships
-	get_db( 'tag_relationships' )->delete_orphaned_relationships();
-
-    $tagQuery = new Table_Query( 'tags' );
-    $tagQuery->update( [ 'contact_count' => 0 ] );
-
-    $tagRelQuery = new Table_Query('tag_relationships');
-    $tagRelQuery->setSelect( 'tag_id', ['COUNT(contact_id)', 'contacts' ] )
-                ->setGroupby('tag_id');
-
-    $tagQuery->add_safe_column( "tag_rels.contacts" );
-
-    $tagQuery->addJoin( 'LEFT', [ $tagRelQuery, 'tag_rels' ] )->onColumn( 'tag_id', 'tag_id' );
-	$tagQuery->update([
-        'contact_count' => 'tag_rels.contacts'
-    ]);
+	_deprecated_function( 'recount_tag_contacts_count', '3.2.3' );
 }
 
 /**
@@ -3267,7 +3253,7 @@ endif;
 if ( ! function_exists( 'multi_implode' ) ):
 	function multi_implode( $glue, $array ) {
 		$ret = '';
-
+//
 		foreach ( $array as $item ) {
 			if ( is_array( $item ) ) {
 				$ret .= multi_implode( $glue, $item ) . $glue;

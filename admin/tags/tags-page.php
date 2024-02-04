@@ -3,11 +3,10 @@
 namespace Groundhogg\Admin\Tags;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
-use Groundhogg\Plugin;
-use function Groundhogg\recount_tag_contacts_count;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,12 +35,6 @@ class Tags_Page extends Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin' );
 	}
 
-	protected function add_additional_actions() {
-		if ( isset( $_GET['recount_contacts'] ) ) {
-			add_action( 'init', array( $this, 'recount' ) );
-		}
-	}
-
 	public function get_slug() {
 		return 'gh_tags';
 	}
@@ -60,10 +53,6 @@ class Tags_Page extends Admin_Page {
 
 	public function get_priority() {
 		return 10;
-	}
-
-	public function recount() {
-		recount_tag_contacts_count();
 	}
 
 	/**
@@ -175,17 +164,6 @@ class Tags_Page extends Admin_Page {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function process_recount() {
-		recount_tag_contacts_count();
-
-		$this->add_notice( 'recount', __( 'Tag associations reset.', 'groundhogg' ) );
-
-		return false;
-	}
-
-	/**
 	 * Delete tags from the admin
 	 *
 	 * @return bool|\WP_Error
@@ -290,5 +268,9 @@ class Tags_Page extends Admin_Page {
 		}
 
 		include __DIR__ . '/edit.php';
+	}
+
+	protected function add_additional_actions() {
+		// TODO: Implement add_additional_actions() method.
 	}
 }

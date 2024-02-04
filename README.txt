@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.2.2.2
+Stable tag: 3.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2.3 (2024-02-03) =
+* ADDED Notifications when background tasks are complete.
+* IMPROVED The background task system to be more reliable.
+* TWEAKED Bulk deleting, updating, importing, and exporting contacts will be handled as background tasks.
+* FIXED Guided setup screen blank.
 
 = 3.2.2.2 (2024-02-01) =
 * HOT FIX User info updating incorrect contact records.

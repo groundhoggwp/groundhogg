@@ -13,7 +13,6 @@ use function Groundhogg\get_items_from_csv;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -186,8 +185,6 @@ class Import_Contacts extends Bulk_Job {
 		delete_transient( 'gh_import_tags' );
 		delete_transient( 'gh_import_compliance' );
 		delete_transient( 'gh_import_file_path' );
-
-		recount_tag_contacts_count();
 
 		do_action( 'groundhogg/import_contacts/clean_up' );
 	}

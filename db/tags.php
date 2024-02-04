@@ -67,9 +67,7 @@ class Tags extends DB {
 	}
 
 	protected function add_additional_actions() {
-//		add_action( 'groundhogg/db/post_insert/tag_relationship', [ $this, 'increase_contact_count' ], 10, 2 );
-//		add_action( 'groundhogg/db/post_delete/tag_relationship', [ $this, 'decrease_contact_count' ], 10 );
-//		add_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', [ $this, 'bulk_decrease_tag_count' ], 10 );
+
 	}
 
 	/**
@@ -84,7 +82,6 @@ class Tags extends DB {
 			'tag_name'           => '%s',
 			'tag_slug'           => '%s',
 			'tag_description'    => '%s',
-			'contact_count'      => '%d',
 			'show_as_preference' => '%d',
 		);
 	}
@@ -101,7 +98,6 @@ class Tags extends DB {
 			'tag_name'           => '',
 			'tag_slug'           => '',
 			'tag_description'    => '',
-			'contact_count'      => 0,
 			'show_as_preference' => 0,
 		);
 	}
@@ -210,43 +206,7 @@ class Tags extends DB {
 			return false;
 		}
 
-		$tag = $this->get_tag( $id );
-
-		if ( $tag->tag_id > 0 ) {
-
-			$result = parent::delete( $id );
-
-			if ( $result ) {
-				unset( $this->tag_cache[ md5( $id ) ] );
-			}
-
-			return $result;
-
-		} else {
-			return false;
-		}
-
-	}
-
-	/**
-	 * Retrieves the tag by the ID.
-	 *
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get_tag( $id ) {
-		$id        = absint( $id );
-		$cache_key = md5( $id );
-
-		if ( key_exists( $cache_key, $this->tag_cache ) ) {
-			return $this->tag_cache[ $cache_key ];
-		}
-
-		$tag                           = $this->get_tag_by( 'tag_id', $id );
-		$this->tag_cache[ $cache_key ] = $tag;
-
-		return $tag;
+		return parent::delete( $id );
 	}
 
 	/**
@@ -299,95 +259,6 @@ class Tags extends DB {
 	}
 
 	/**
-	 * Retrieve tags from the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_tags() {
-
-		global $wpdb;
-		$results = $wpdb->get_results( "SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
-
-		return $results;
-
-	}
-
-	/**
-	 * Get tags in an array format that is select friendly.
-	 *
-	 * @return array
-	 */
-	public function get_tags_select() {
-		global $wpdb;
-		$results = $wpdb->get_results( "SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
-
-		$tags = [];
-
-		foreach ( $results as $tag ) {
-			$tags[ $tag->tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
-		}
-
-		return $tags;
-	}
-
-	/**
-	 * Increase the contact tag count
-	 *
-	 * @param $insert_id
-	 * @param $args
-	 */
-	public function increase_contact_count( $insert_id = 0, $args = [] ) {
-		if ( ! isset_not_empty( $args, 'tag_id' ) ) {
-			return;
-		}
-
-		$tag_id = absint( $args[ 'tag_id' ] );
-
-		global $wpdb;
-
-		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count+1 WHERE tag_id = {$tag_id}" );
-
-//		$this->cache_set_last_changed();
-	}
-
-	/**
-	 * Decrease the contact tag count
-	 *
-	 * @param $insert_id
-	 * @param $args
-	 */
-	public function decrease_contact_count( $args = [] ) {
-		if ( ! isset_not_empty( $args, 'tag_id' ) ) {
-			return;
-		}
-
-		$tag_id = absint( $args[ 'tag_id' ] );
-
-		global $wpdb;
-
-		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count-1 WHERE tag_id = {$tag_id}" );
-
-//		$this->cache_set_last_changed();
-	}
-
-	/**
-	 * Bulk decrease the contact count.
-	 *
-	 * @param $tag_ids
-	 */
-	public function bulk_decrease_tag_count( $tag_ids ) {
-
-		if ( empty( $tag_ids ) ) {
-			return;
-		}
-
-		foreach ( $tag_ids as $id ) {
-			$this->decrease_contact_count( [ 'tag_id' => $id ] );
-		}
-	}
-
-	/**
 	 * Create the table
 	 *
 	 * @access  public
@@ -404,7 +275,6 @@ class Tags extends DB {
         tag_slug varchar({$this->get_max_index_length()}) NOT NULL,
         tag_name mediumtext NOT NULL,
         tag_description text NOT NULL,
-        contact_count bigint(20) unsigned NOT NULL,
         show_as_preference tinyint unsigned NOT NULL,
         PRIMARY KEY (tag_id),
         UNIQUE KEY tag_slug (tag_slug)

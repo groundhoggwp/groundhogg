@@ -170,7 +170,7 @@
   const ObjectStore = (route, extra = {}) => ( {
     primaryKey: 'ID',
     getItemFromResponse: (r) => r.item,
-    getItemsFromResponse: (r) => r.items,
+    getItemsFromResponse: (r) => r.items ?? [],
     getTotalItemsFromResponse: (r) => r.total_items,
     items: [],
     total_items: 0,

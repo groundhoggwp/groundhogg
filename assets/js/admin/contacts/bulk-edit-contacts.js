@@ -347,11 +347,19 @@
     remove_tags: [],
   }
 
+  const State = Groundhogg.createState({
+    hasChanges: false
+  })
+
   const updateData = (_data) => {
     data = {
       ...data,
       ..._data,
     }
+
+    State.set({
+      hasChanges: true
+    })
   }
 
   const updateMeta = (_meta) => {
@@ -359,6 +367,10 @@
       ...meta,
       ..._meta,
     }
+
+    State.set({
+      hasChanges: true
+    })
   }
 
   const deleteMeta = (key) => {
@@ -370,6 +382,10 @@
       ...payload,
       ..._p,
     }
+
+    State.set({
+      hasChanges: true
+    })
   }
 
   const fetchContactCount = () => {
@@ -414,75 +430,50 @@
 
     $('#commit').on('click', () => {
 
+      if ( ! State.hasChanges ){
+        dialog({
+          message: __( 'Make some changes first!' ),
+          type: 'error'
+        })
+        return
+      }
+
       confirmationModal({
+        width: 600,
         alert: `<p>${ sprintf(__(
           'Are you sure you want to edit %s contacts? This action cannot be undone.',
           'groundhogg'), bold(formatNumber(totalContacts))) }</p>`,
         onConfirm: () => {
-          progressModal({
-            beforeProgress: () => {
-              return `<h2>${ __('Updating Contacts...',
-                'groundhogg') }</h2><p class="gh-text danger">${ __(
-                'Do not close this window!') }</p>`
-            },
-            onOpen: ({ setProgress, close }) => {
 
-              const limit = 500
-              let offset = Math.max(totalContacts - limit, 0)
+          ContactsStore.patchMany({
+            bg: true,
+            query,
+            data,
+            meta,
+            ...payload,
+          }).then(r => {
 
-              const patchContacts = () => {
+            confirmationModal({
+              width: 600,
+              alert: `<p>${ __(
+                'Your contacts are being updated in the background. <i>It may take a while.</i> We\'ll let you know what it\'s done!', 'groundhogg')}</p>`,
+              onConfirm: () => {
+                let url = new URL(window.location.href)
 
-                ContactsStore.patchMany({
-                  total_only: true,
-                  query: {
-                    ...query,
-                    offset,
-                    limit,
-                  },
-                  data,
-                  meta,
-                  ...payload,
-                }).then(r => {
+                url.searchParams.delete('action')
+                url.searchParams.delete('number')
+                url.searchParams.delete('offset')
+                url.searchParams.delete('search')
 
-                  setProgress(( ( totalContacts - offset ) / totalContacts ) * 100)
-
-                  if (offset > 0) {
-
-                    offset -= limit
-
-                    // limit can't be less than 0
-                    if (offset < 0) {
-                      offset = 0
-                    }
-
-                    patchContacts()
-                    return
-                  }
-
-                  dialog({
-                    message: __('Contacts updated!', 'groundhogg'),
-                  })
-
-                  let url = new URL(window.location.href)
-
-                  url.searchParams.delete('action')
-                  url.searchParams.delete('number')
-                  url.searchParams.delete('offset')
-                  url.searchParams.delete('search')
-
-                  window.open(url, '_self')
-
-                }).catch(err => {
-                  dialog({
-                    message: err.message,
-                    type: 'error',
-                  })
-                })
-
+                window.open(url, '_self')
               }
+            })
 
-              patchContacts()
-            },
+          }).catch(err => {
+            dialog({
+              message: err.message,
+              type: 'error',
+            })
           })
         },
       })

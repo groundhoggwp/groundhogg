@@ -5,9 +5,7 @@ namespace Groundhogg\Bulk_Jobs;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\create_contact_from_user;
-use Groundhogg\Plugin;
 use function Groundhogg\is_option_enabled;
-use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -104,7 +102,6 @@ class Sync_Users extends Bulk_Job {
 	 * @return void
 	 */
 	protected function clean_up() {
-		recount_tag_contacts_count();
 	}
 
 	/**

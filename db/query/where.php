@@ -470,6 +470,24 @@ class Where {
 	}
 
 	/**
+	 * LIKE %string%
+	 *
+	 * @param $column
+	 * @param $string
+	 *
+	 * @return $this
+	 */
+	public function wLike( $column, $string ) {
+		global $wpdb;
+
+		$column = $this->sanitize_column( $column );
+
+		$this->addCondition( $wpdb->prepare( "$column LIKE %s", '%' . $this->esc_like( $string ) . '%' ) );
+
+		return $this;
+	}
+
+	/**
 	 * NOT LIKE %string%
 	 *
 	 * @param $column

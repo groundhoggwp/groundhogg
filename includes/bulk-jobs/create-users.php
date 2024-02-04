@@ -8,7 +8,6 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
-use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

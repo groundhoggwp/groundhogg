@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
+use Groundhogg\Background_Tasks;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
@@ -302,10 +303,20 @@ class Contacts_Api extends Base_Object_Api {
 			] );
 		}
 
+		if ( $request->has_param( 'bg' ) ) {
+
+			Background_Tasks::update_contacts( $query, [
+				'data'        => $data,
+				'meta'        => $meta,
+				'add_tags'    => $add_tags,
+				'remove_tags' => $remove_tags,
+			] );
+
+			return self::SUCCESS_RESPONSE();
+		}
+
 		$contact_query = new Contact_Query();
-
 		$contacts = $contact_query->query( $query, true );
-
 		$updated = 0;
 
 		/**
@@ -559,16 +570,24 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query = wp_parse_args( $request->get_params() );
+		$query_vars = wp_parse_args( $request->get_params() );
 
-		$query = wp_parse_args( $query, [
+		$query_vars = wp_parse_args( $query_vars, [
 			'orderby'       => $this->get_primary_key(),
 			'order'         => 'ASC',
 			'number'        => 500,
 			'no_found_rows' => false,
 		] );
 
-		$query = new Contact_Query( $query );
+		// Don't bother to check if there are any matching contacts
+		// Just add the background task for deleting them
+		if ( $request->has_param( 'bg' ) ){
+			unset( $query_vars['bg']);
+			Background_Tasks::delete_contacts( $query_vars );
+			return self::SUCCESS_RESPONSE();
+		}
+
+		$query = new Contact_Query( $query_vars );
 
 		$items = $query->query( null, true );
 		$found = $query->found_items;

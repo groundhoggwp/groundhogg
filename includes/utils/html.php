@@ -1015,7 +1015,7 @@ class HTML {
 
 					$tag = get_db( 'tags' )->get( $tag_id );
 
-					$a['data'][ $tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+					$a['data'][ $tag_id ] = $tag->tag_name;
 
 				}
 
@@ -1549,7 +1549,7 @@ class HTML {
 
 			$json[] = array(
 				'id'   => $tag->tag_id,
-				'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
+				'text' => $tag->tag_name
 			);
 
 		}
