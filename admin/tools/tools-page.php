@@ -768,7 +768,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public function process_choose_columns() {
 
 		$columns = array_keys( get_post_var( 'headers' ) );
-		$query   = get_request_var( 'query' );
+		$query   = get_request_var( 'query', [] );
 
 		if ( empty( $columns ) ) {
 			return new WP_Error( 'error', 'Please choose columns to export.' );
@@ -776,12 +776,18 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$header_type = sanitize_text_field( get_post_var( 'header_type', 'basic' ) );
 
-		$columns = array_combine( $columns, array_map( function ( $col ) use ( $header_type ) {
+		$headers = array_map( function ( $col ) use ( $header_type ) {
 			return export_header_pretty_name( $col, $header_type );
-		}, $columns ) );
+		}, $columns );
 
 		$file_name = sanitize_file_name( get_post_var( 'file_name' ) . '.csv' );
 		$file_name = wp_unique_filename( files()->get_csv_exports_dir(), $file_name );
+		$file_path = files()->get_csv_exports_dir( $file_name, true );
+
+        // Add headers to the file first
+        $pointer = fopen( $file_path, 'w' );
+		fputcsv( $pointer, array_values( $headers ) );
+        fclose( $pointer );
 
 		Background_Tasks::add( new Export_Contacts( $query, $file_name, $columns ) );
 

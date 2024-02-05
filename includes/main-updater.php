@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Steps\Actions\Send_Email;
 
 class Main_Updater extends Old_Updater {
@@ -73,6 +74,19 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
 					wp_clear_scheduled_hook( 'gh_purge_page_visits' );
+				}
+			],
+			'3.2.3.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Re-sync funnel step statuses.', 'groundhogg' ),
+				'callback'    => function () {
+
+					$query = new Table_Query( 'funnels' );
+					$funnels = $query->get_objects( Funnel::class );
+
+					foreach ( $funnels as $funnel ) {
+						$funnel->update_step_status();
+					}
 				}
 			]
 		];

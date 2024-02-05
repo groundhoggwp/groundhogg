@@ -293,9 +293,10 @@ class Funnel extends Base_Object_With_Meta {
 		$updated    = parent::update( $data );
 		$new_status = $this->get_status();
 
+		$this->update_step_status();
+
 		// When the status of the funnel changes
 		if ( $new_status !== $old_status ) {
-			$this->update_step_status();
 			$this->update_events_from_status();
 		}
 

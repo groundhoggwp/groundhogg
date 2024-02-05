@@ -745,13 +745,13 @@ class Funnels_Page extends Admin_Page {
 			$funnel_id  = $after_step->get_funnel_id();
 		} else {
 			$funnel_id = absint( get_post_var( 'funnel_id' ) );
-			$funnel    = new Funnel( $funnel_id );
-
-			if ( ! $funnel->exists() ) {
-				wp_send_json_error();
-			}
-
 			$step_order = 1;
+		}
+
+		$funnel = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ) {
+			wp_send_json_error();
 		}
 
 		$elements = Plugin::$instance->step_manager->get_elements();
@@ -767,6 +767,7 @@ class Funnels_Page extends Admin_Page {
 			'step_type'  => $step_type,
 			'step_group' => $step_group,
 			'step_order' => $step_order,
+			'step_status' => $funnel->is_active() ? 'active' : 'inactive'
 		] );
 
 		if ( ! $step_id || ! $step->exists() ) {
@@ -994,12 +995,5 @@ class Funnels_Page extends Admin_Page {
 			?>
             <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function is_reporting_enabled() {
-		return (bool) get_request_var( 'reporting_on' );
 	}
 }

@@ -30,7 +30,7 @@ class Export_Contacts extends Task {
 	public function __construct( array $query, string $fileName, array $columns, int $batch = 0 ) {
 		$this->query    = $query;
 		$this->user_id  = get_current_user_id();
-		$this->filePath = files()->get_csv_exports_dir( $fileName, true );
+		$this->filePath = files()->get_csv_exports_dir( $fileName );
 		$this->columns  = $columns;
 		$this->batch    = $batch;
 	}
@@ -41,20 +41,13 @@ class Export_Contacts extends Task {
 	 * @return void
 	 */
 	protected function openFile() {
-
-		if ( $this->batch === 0 ) {
-
-			//write the headers to the export.
-			$this->filePointer = fopen( $this->filePath, 'w' );
-
-			// Add the header row
-			fputcsv( $this->filePointer, array_values( $this->columns ) );
-		} else {
-			// File path is known, open the file
-			$this->filePointer = fopen( $this->filePath, 'a' );
-		}
+		// File path is known, open the file in add mode
+		$this->filePointer = fopen( $this->filePath, 'a' );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function can_run() {
 
 		if ( ! isset( $this->filePointer ) ) {
@@ -105,7 +98,7 @@ class Export_Contacts extends Task {
 				continue;
 			}
 
-			foreach ( array_keys( $this->columns ) as $column ) {
+			foreach ( $this->columns as $column ) {
 				$line[] = export_field( $contact, $column );
 			}
 

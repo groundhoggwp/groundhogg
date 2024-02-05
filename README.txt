@@ -4,7 +4,7 @@ Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 6.2
+Tested up to: 6.4
 Requires PHP: 7.1
 Stable tag: 3.2.3
 License: GPLv3
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2.3.1 (2024-02-05) =
+* TWEAKED The export file headers are added to the CSV before the background process starts rather than during.
+* TWEAKED Funnels will sync step status with every update instead of only during a status change.
+* FIXED When adding new steps to an active funnel the step status is `inactive` when it should be `active`.
+* FIXED Initiating an export from the tools page causing fatal error.
 
 = 3.2.3 (2024-02-03) =
 * ADDED Notifications when background tasks are complete.
