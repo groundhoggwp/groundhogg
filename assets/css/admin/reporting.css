@@ -233,13 +233,30 @@ h1.report-title {
   font-size: 16px;
   font-weight: normal;
 }
+.gh-panel .table-scroll {
+  overflow-x: auto;
+}
 .gh-panel table.groundhogg-report-table tr th, .gh-panel table.groundhogg-report-table tr td {
   font-size: 14px;
   padding: 13px;
 }
 .gh-panel table.groundhogg-report-table tr th:not(:first-child), .gh-panel table.groundhogg-report-table tr td:not(:first-child) {
-  width: 120px;
   padding-left: 0;
+}
+.gh-panel table.groundhogg-report-table tr th.great, .gh-panel table.groundhogg-report-table tr td.great {
+  background-color: #d3e6cb;
+}
+.gh-panel table.groundhogg-report-table tr th.good, .gh-panel table.groundhogg-report-table tr td.good {
+  background-color: #eef7e3;
+}
+.gh-panel table.groundhogg-report-table tr th.fair, .gh-panel table.groundhogg-report-table tr td.fair {
+  background-color: #fef8e3;
+}
+.gh-panel table.groundhogg-report-table tr th.poor, .gh-panel table.groundhogg-report-table tr td.poor {
+  background-color: #ffe6dd;
+}
+.gh-panel table.groundhogg-report-table tr th.bad, .gh-panel table.groundhogg-report-table tr td.bad {
+  background-color: #F4CCCC;
 }
 .gh-panel table.groundhogg-report-table tr th .step-type, .gh-panel table.groundhogg-report-table tr td .step-type {
   font-weight: bold;
@@ -261,7 +278,7 @@ h1.report-title {
   left: 6px;
 }
 /* NEW CSS FOR TABLE */
-table.groundhogg-report-table tr:nth-child(odd) {
+table.groundhogg-report-table tbody tr:nth-child(odd) {
   background-color: rgba(0, 117, 255, 0.02);
 }
 
@@ -271,7 +288,7 @@ table.groundhogg-report-table tr:nth-child(odd) {
 }
 
 table.groundhogg-report-table {
-  table-layout: fixed;
+  table-layout: auto;
   width: 100%;
   text-align: left;
   border-collapse: collapse;
@@ -314,7 +331,6 @@ table.groundhogg-report-table td {
   color: #666666;
   line-height: 1.2;
   /*font-weight: unset !important;*/
-  border-top: 1px solid #f2f2f2;
   display: table-cell;
   padding: 15px;
   text-decoration: none;

@@ -3,6 +3,10 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Where;
+use function Groundhogg\get_db;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -12,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Store information about funnels
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Funnels extends DB {
 
@@ -57,17 +61,62 @@ class Funnels extends DB {
 		return 'funnel';
 	}
 
+	/**
+	 * Additional actions
+	 *
+	 * @return void
+	 */
 	protected function add_additional_actions() {
 		parent::add_additional_actions();
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 	}
 
-	public function owner_deleted( $prev, $new ){
-		$this->update([
+	/**
+	 * Register the filters
+	 *
+	 * @return void
+	 */
+	protected function maybe_register_filters() {
+
+		parent::maybe_register_filters();
+
+		// Author
+		$this->query_filters->register( 'author', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'author', wp_parse_id_list( $filter['users'] ) );
+		} );
+
+		// Step type filter
+		$this->query_filters->register( 'step_type', function ( $filter, Where $where ) {
+
+			$filter = wp_parse_args( $filter, [
+				'types' => [],
+			] );
+
+			$join = $where->query->addJoin( 'LEFT', [ get_db( 'steps' )->table_name, 'steps_' . md5( serialize( $filter ) ) ] );
+			$join->onColumn( 'funnel_id' )
+			     ->in( "$join->alias.step_type", $filter['types'] );
+
+			$where->in( "$join->alias.step_type", $filter['types'] );
+
+			$where->query->setGroupby( 'ID' );
+		} );
+
+		// Date last updated
+		$this->query_filters->register( 'last_updated', function ( $filter, $where ) {
+			Filters::mysqlDateTime( 'last_updated', $filter, $where );
+		} );
+	}
+
+	public function owner_deleted( $prev, $new ) {
+		$this->update( [
 			'author' => $prev,
 		], [
 			'author' => $new,
-		]);
+		] );
 	}
 
 	/**
@@ -78,13 +127,12 @@ class Funnels extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'              => '%d',
-			'author'          => '%d',
-			'title'           => '%s',
-			'status'          => '%s',
-			'date_created'    => '%s',
-			'last_updated'    => '%s',
-			'conversion_step' => '%d'
+			'ID'           => '%d',
+			'author'       => '%d',
+			'title'        => '%s',
+			'status'       => '%s',
+			'date_created' => '%s',
+			'last_updated' => '%s',
 		);
 	}
 
@@ -96,13 +144,12 @@ class Funnels extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID'              => 0,
-			'author'          => get_current_user_id(),
-			'title'           => '',
-			'status'          => 'inactive',
-			'date_created'    => current_time( 'mysql' ),
-			'last_updated'    => current_time( 'mysql' ),
-			'conversion_step' => 0
+			'ID'           => 0,
+			'author'       => get_current_user_id(),
+			'title'        => '',
+			'status'       => 'inactive',
+			'date_created' => current_time( 'mysql' ),
+			'last_updated' => current_time( 'mysql' ),
 		);
 	}
 
@@ -123,10 +170,8 @@ class Funnels extends DB {
         title text NOT NULL,
         status varchar(20) NOT NULL,
         author bigint(20) unsigned NOT NULL,
-        active_contacts bigint(20) unsigned NOT NULL,
         last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        conversion_step bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID)
 		) {$this->get_charset_collate()};";
 

@@ -214,7 +214,7 @@ class Email_Log extends DB {
 
 		parent::maybe_register_filters();
 
-		$this->query_filters->register_filter( 'recipients', function ( $filter, $where ){
+		$this->query_filters->register( 'recipients', function ( $filter, $where ){
 			global $wpdb;
 			$recipients = array_map( 'sanitize_email', $filter['recipients'] );
 			$subWhere = $where->subWhere();

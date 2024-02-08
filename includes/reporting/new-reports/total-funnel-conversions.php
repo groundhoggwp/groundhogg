@@ -2,21 +2,12 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\percentage;
-use function Groundhogg\Ymd_His;
 
 class Total_Funnel_Conversions extends Base_Quick_Stat {
-
 
 	public function get_link() {
 
@@ -31,8 +22,8 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 						'step_id'    => $step_id,
 						'status'     => 'complete',
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				];
 			}, $funnel->get_conversion_step_ids() ) ) )

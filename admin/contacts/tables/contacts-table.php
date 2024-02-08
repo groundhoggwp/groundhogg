@@ -4,14 +4,15 @@ namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_find;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\base64_json_decode;
-use function Groundhogg\get_db;
 use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -160,8 +161,8 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->query = $query;
 
-		$c_query     = new Contact_Query();
-		$this->items = $c_query->query( $query, true );
+		$c_query     = new Contact_Query( $query );
+		$this->items = $c_query->query( null, true );
 		$total       = $c_query->found_items;
 
 		// Add condition to be sure we don't divide by zero.
@@ -229,123 +230,6 @@ class Contacts_Table extends WP_List_Table {
         <tr id="contact-<?php echo $contact->get_id(); ?>">
 			<?php $this->single_row_columns( $contact ); ?>
         </tr>
-		<?php
-	}
-
-	/**
-	 * Outputs the hidden row displayed when inline editing
-	 *
-	 * @global string $mode List table view mode.
-	 */
-	public function inline_edit() {
-
-		$colspan = min( $this->get_column_count(), 7 );
-
-		?>
-        <table style="display: none">
-            <tbody id="inlineedit">
-            <tr id="inline-edit"
-                class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
-                style="display: none">
-                <td colspan="<?php echo $colspan ?>" class="colspanchange">
-                    <fieldset class="inline-edit-col-left">
-                        <legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e( 'Email' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="email"
-                                                                     class="cemail regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="first_name"
-                                                                     class="cfirst_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="last_name"
-                                                                     class="clast_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
-                                    <?php $args = array(
-	                                    'id'    => 'owner',
-	                                    'name'  => 'owner',
-	                                    'class' => 'cowner'
-                                    ); ?>
-                                    <?php echo html()->dropdown_owners( $args ); ?>
-                                </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Status', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
-                                    <?php echo html()->dropdown( [
-	                                    'id'      => 'optin_status',
-	                                    'name'    => 'optin_status',
-	                                    'options' => Preferences::get_preference_names()
-                                    ] ); ?>
-                                </span>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="inline-edit-col-right">
-                        <legend class="inline-edit-legend">&nbsp;</legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e( 'Primary', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
-	                            <?php echo html()->input( [
-		                            'type'  => 'tel',
-		                            'class' => 'input',
-		                            'id'    => 'primary_phone',
-		                            'name'  => 'primary_phone',
-	                            ] ); ?>
-	                            <?php _e( 'ext.', 'groundhogg' ) ?>
-	                            <?php echo html()->number( [
-		                            'id'    => 'primary_phone_extension',
-		                            'name'  => 'primary_phone_extension',
-		                            'class' => 'phone-ext',
-	                            ] ); ?>
-                                </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Mobile', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
-								<?php echo html()->input( [
-									'type'  => 'tel',
-									'class' => 'input',
-									'id'    => 'mobile_phone',
-									'name'  => 'mobile_phone',
-								] ); ?>
-                                </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Tags' ); ?></span>
-                                <span class="input-text-wrap">
-								<?php echo html()->dropdown( [
-									'id'   => 'tags',
-									'name' => 'tags[]'
-								] ); ?>
-                                </span>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <div class="submit inline-edit-save">
-                        <button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
-						<?php wp_nonce_field( 'inlineeditnonce', '_inline_edit' ); ?>
-                        <button type="button"
-                                class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
-                        <span class="spinner"></span>
-                        <br class="clear"/>
-                        <div class="notice notice-error notice-alt inline hidden">
-                            <p class="error"></p>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
 		<?php
 	}
 
@@ -435,53 +319,34 @@ class Contacts_Table extends WP_List_Table {
 
 	protected function get_views() {
 
-		$views = [
-			'all'          => [
-				'id'    => 'all',
-				'name'  => __( 'All', 'groundhogg' ),
-				'query' => []
-			],
-			'unconfirmed'  => [
-				'id'    => 'unconfirmed',
-				'name'  => __( 'Unconfirmed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::UNCONFIRMED ]
-			],
-			'confirmed'    => [
-				'id'    => 'confirmed',
-				'name'  => __( 'Confirmed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::CONFIRMED ],
-			],
-			'weekly'       => [
-				'id'    => 'weekly',
-				'name'  => __( 'Weekly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::WEEKLY ],
-			],
-			'monthly'      => [
-				'id'    => 'monthly',
-				'name'  => __( 'Monthly', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::MONTHLY ],
-			],
-			'unsubscribed' => [
-				'id'    => 'unsubscribed',
-				'name'  => __( 'Unsubscribed', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::UNSUBSCRIBED ],
-			],
-			'spam'         => [
-				'id'    => 'spam',
-				'name'  => __( 'Spam', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::SPAM ],
-			],
-			'bounced'      => [
-				'id'    => 'bounced',
-				'name'  => __( 'Bounced', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::HARD_BOUNCE ],
-			],
-			'complained'   => [
-				'id'    => 'complained',
-				'name'  => __( 'Complained', 'groundhogg' ),
-				'query' => [ 'optin_status' => Preferences::COMPLAINED ],
-			],
-		];
+		$statusQuery = new Table_Query( 'contacts' );
+		$statusQuery->setSelect( 'optin_status', [ 'COUNT(ID)', 'contacts' ] )->setGroupby( 'optin_status' );
+
+		$statusCounts = $statusQuery->get_results();
+
+		$views = [[
+			'id'    => 'all',
+			'name'  => __( 'All', 'groundhogg' ),
+			'query' => [],
+            'count' => array_sum( wp_list_pluck( $statusCounts, 'contacts' ) )
+        ]];
+
+		foreach ( Preferences::get_preference_names() as $status => $name ) {
+
+			$result = array_find( $statusCounts, function ( $result ) use ( $status ) {
+				return $result->optin_status == $status;
+			} );
+
+			$count = $result ? absint( $result->contacts ) : 0;
+
+			$views[] = [
+				'id'    => $status,
+				'name'  => $name,
+				'query' => [ 'optin_status' => $status ],
+				'count' => $count
+			];
+
+		}
 
 		$parsed = [];
 
@@ -491,6 +356,7 @@ class Contacts_Table extends WP_List_Table {
 				'query' => [],
 				'name'  => '',
 				'id'    => '',
+                'count' => 0
 			] );
 
 			$view['query']['view'] = $view['id'];
@@ -501,7 +367,7 @@ class Contacts_Table extends WP_List_Table {
 			], sprintf(
 					'%s <span class="count">(%s)</span>',
 					$view['name'],
-					_nf( get_db( 'contacts' )->count( $view['query'] ) )
+					_nf( $view['count'] )
 				)
 			);
 		}

@@ -82,7 +82,7 @@ class Autoloader {
 		'Bulk_Jobs\Broadcast_Bulk_Job'      => 'includes/bulk-jobs/broadcast-bulk-job.php',
 		'Event_Process'                     => 'includes/interfaces/event-process.php',
 		// Form
-		'Form\FormV2'                       => 'includes/form/form.php',
+		'Form\Form'                       => 'includes/form/form.php',
 		'Form\Fields\Field'                 => 'includes/form/fields/field.php',
 		'Form\Fields\Column'                => 'includes/form/fields/column.php',
 		'Form\Fields\Row'                   => 'includes/form/fields/row.php',
@@ -92,6 +92,7 @@ class Autoloader {
 		'Form\Fields\First'                 => 'includes/form/fields/first.php',
 		'Form\Fields\Last'                  => 'includes/form/fields/last.php',
 		'Steps\Benchmarks\Form_Integration' => 'includes/steps/benchmarks/base/form-integration.php',
+		//
 		'Block_Registry'                    => 'includes/block-registry.php',
 		'Background_Tasks'                  => 'includes/background-tasks.php',
 		'Big_File_Uploader'                 => 'includes/big-file-uploader.php',

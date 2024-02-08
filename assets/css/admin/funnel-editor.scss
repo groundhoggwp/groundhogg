@@ -395,6 +395,8 @@ html {
     width: 100%;
     margin-right: 20px;
     margin-left: 20px;
+
+    overflow: hidden;
   }
 
   #close {
@@ -416,6 +418,10 @@ html {
   line-height: 44px;
   font-size: 20px;
   font-weight: 400;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .step-title-view .title,
@@ -423,6 +429,7 @@ html {
   font-weight: 600;
   line-height: 1em;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .funnel-editor-header div {

@@ -4,12 +4,10 @@ namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\is_a_contact;
-use function Groundhogg\recount_tag_contacts_count;
 use function Groundhogg\update_contact_with_map;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,7 +99,6 @@ class Edit_Contacts extends Bulk_Job {
 	protected function clean_up() {
 		delete_transient( 'gh_bulk_edit_fields' );
 		delete_transient( 'gh_bulk_edit_query' );
-		recount_tag_contacts_count();
 	}
 
 	/**

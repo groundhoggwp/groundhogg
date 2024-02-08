@@ -3,33 +3,34 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\background\Export_Contacts;
+use Groundhogg\background\Import_Contacts;
+use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
-use Groundhogg\Bulk_Jobs\Delete_Contacts;
-use Groundhogg\Properties;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
+use Groundhogg\Plugin;
+use Groundhogg\Properties;
 use Groundhogg\Queue\Event_Queue;
+use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\check_permissions_key;
+use function Groundhogg\count_csv_rows;
 use function Groundhogg\export_header_pretty_name;
+use function Groundhogg\files;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
-use function Groundhogg\get_permissions_key;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use Groundhogg\Plugin;
-use \WP_Error;
 use function Groundhogg\install_gh_cron_file;
 use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
 use function Groundhogg\restore_missing_funnel_events;
@@ -38,7 +39,6 @@ use function Groundhogg\uninstall_groundhogg;
 use function Groundhogg\utils;
 use function Groundhogg\validate_tags;
 use function Groundhogg\white_labeled_name;
-use function set_transient;
 
 /**
  * Created by PhpStorm.
@@ -469,10 +469,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			return new WP_Error( 'invalid_csv', sprintf( 'Please upload a valid CSV. Expected mime type of <i>text/csv</i> but got <i>%s</i>', esc_html( $file['type'] ) ) );
 		}
 
-		$file_name = str_replace( '.csv', '', $file['name'] );
-		$file_name .= '-' . current_time( 'mysql' ) . '.csv';
-
-		$file['name'] = sanitize_file_name( $file_name );
+		$file['name'] = wp_unique_filename( files()->get_csv_imports_dir(), $file['name'] );
 
 		$result = $this->handle_file_upload( $file );
 
@@ -574,15 +571,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$tags = validate_tags( $tags );
 
-		set_transient( 'gh_import_tags', $tags, DAY_IN_SECONDS );
-		set_transient( 'gh_import_map', $map, DAY_IN_SECONDS );
-		set_transient( 'gh_import_compliance', [
+		Background_Tasks::add( new Import_Contacts( $file_name, [
 			'is_confirmed'      => (bool) get_post_var( 'email_is_confirmed' ),
 			'gdpr_consent'      => (bool) get_post_var( 'data_processing_consent_given' ),
 			'marketing_consent' => (bool) get_post_var( 'marketing_consent_given' ),
-		], DAY_IN_SECONDS );
+			'field_map' => $map,
+			'tags'      => $tags,
+		] ) );
 
-		$this->importer->start( [ 'import' => $file_name ] );
+		$rows = count_csv_rows( files()->get_csv_imports_dir( $file_name ) );
+
+        $time = human_time_diff( time(), time() + ( ceil( $rows / 1000 ) * MINUTE_IN_SECONDS ) );
+
+		$this->add_notice( 'success', sprintf( __( 'Your contacts are being imported in the background! <i>We\'re estimating it will take ~%s.</i> We\'ll let you know when it\'s done!', 'groundhogg' ), $time ) );
+
+		return admin_page_url( 'gh_tools', [ 'tab' => 'import' ] );
 	}
 
 	/**
@@ -661,6 +664,16 @@ class Tools_Page extends Tabbed_Admin_Page {
 
         <form method="post">
 			<?php action_input( 'choose_columns', true, true ); ?>
+
+            <h3><?php _e( 'Name your export', 'groundhogg' ) ?></h3>
+
+	        <?php echo html()->input( [
+		        'name'        => 'file_name',
+		        'placeholder' => 'My export...',
+		        'required'    => true,
+		        'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
+	        ] ); ?>
+
             <h3><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h3>
 			<?php
 
@@ -754,24 +767,33 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_choose_columns() {
 
-		$headers = array_keys( get_post_var( 'headers' ) );
-		$query   = get_request_var( 'query' );
+		$columns = array_keys( get_post_var( 'headers' ) );
+		$query   = get_request_var( 'query', [] );
 
-		if ( empty( $headers ) ) {
+		if ( empty( $columns ) ) {
 			return new WP_Error( 'error', 'Please choose columns to export.' );
 		}
 
 		$header_type = sanitize_text_field( get_post_var( 'header_type', 'basic' ) );
 
-		set_transient( 'gh_export_query', $query, DAY_IN_SECONDS );
-		set_transient( 'gh_export_headers', $headers, DAY_IN_SECONDS );
-		set_transient( 'gh_export_header_type', $header_type, DAY_IN_SECONDS );
+		$headers = array_map( function ( $col ) use ( $header_type ) {
+			return export_header_pretty_name( $col, $header_type );
+		}, $columns );
 
-		Plugin::$instance->bulk_jobs->export_contacts->start( [
-			'query' => $query,
-		] );
+		$file_name = sanitize_file_name( get_post_var( 'file_name' ) . '.csv' );
+		$file_name = wp_unique_filename( files()->get_csv_exports_dir(), $file_name );
+		$file_path = files()->get_csv_exports_dir( $file_name, true );
 
-		return false;
+        // Add headers to the file first
+        $pointer = fopen( $file_path, 'w' );
+		fputcsv( $pointer, array_values( $headers ) );
+        fclose( $pointer );
+
+		Background_Tasks::add( new Export_Contacts( $query, $file_name, $columns ) );
+
+		notices()->add_user_notice( __( 'We\'re exporting your contacts in the background. We\'ll let you know when it\'s ready for download.', 'groundhogg' ) );
+
+		return admin_page_url( 'gh_contacts' );
 	}
 
 	/**
@@ -1118,6 +1140,44 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function misc_view() {
 		include __DIR__ . '/misc.php';
+	}
+
+	/**
+     * Re-sync user IDs
+     *
+	 * @throws \Exception
+	 * @return void
+	 */
+	public function process_re_sync_user_ids() {
+
+        if ( ! current_user_can( 'edit_users' ) ){
+            $this->wp_die_no_access();
+        }
+
+		$query = new Table_Query( 'contacts' );
+
+        // Set all IDs to 0
+		$query->update( [
+			'user_id' => 0
+		] );
+
+		$join = $query->addJoin( 'LEFT', $query->db->users );
+		$join->onColumn( 'user_email', 'email' );
+
+        $query->add_safe_column(  "$join->alias.ID" );
+
+        // Update the user_id col from the ID in the table
+        $updated = $query->update( [
+            'user_id' => "$join->alias.ID"
+        ] );
+
+        if ( $updated ){
+            $this->add_notice( 'success', 'User IDs have been synced.' );
+        } else {
+	        $this->add_notice( 'failed', 'Re-sync failed.', 'error' );
+        }
+
+        return true;
 	}
 
 }

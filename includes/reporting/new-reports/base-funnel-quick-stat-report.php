@@ -34,7 +34,7 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 			],
-			'select' => 'DISTINCT contact_id'
+			'groupby' => 'contact_id'
 		] );
 	}
 

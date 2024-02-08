@@ -3,6 +3,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Query\Query;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\DB\Query\Where;
 use Groundhogg\Email;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,6 +69,56 @@ class Emails extends DB {
 	 */
 	public function get_db_version() {
 		return '2.1';
+	}
+
+	protected function maybe_register_filters() {
+		parent::maybe_register_filters();
+
+		// From user filter
+		$this->query_filters->register( 'from_user', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'from_user', wp_parse_id_list( $filter['users'] ) );
+		} );
+
+		// Author
+		$this->query_filters->register( 'author', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'author', wp_parse_id_list( $filter['users'] ) );
+		} );
+
+		// Funnel filter
+		$this->query_filters->register( 'funnel', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'funnel_id' => 0,
+			] );
+
+			$funnel_id = absint( $filter['funnel_id'] );
+
+			$stepQuery  = new Table_Query( 'steps' );
+			$meta_alias = $stepQuery->joinMeta( 'email_id' );
+			$stepQuery->where( 'step_type', 'send_email' );
+			$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
+
+			$alias = $funnel_id ? 'funnel_' . $funnel_id : 'in_funnel';
+
+			$join = $where->query->addJoin( 'LEFT', [ $stepQuery, $alias ] );
+			$join->onColumn( "email_id" );
+
+			if ( $funnel_id ){
+				$where->equals( "$alias.funnel_id", $funnel_id );
+			} else {
+				$where->isNotNull( "$alias.funnel_id" );
+			}
+
+			$where->query->setGroupby( 'ID' );
+
+		} );
 	}
 
 	/**

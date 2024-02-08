@@ -4,15 +4,11 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Step;
-use Groundhogg\Tag;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
-use function Groundhogg\force_custom_step_names;
-use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
-use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Elements
  */
-class Tag_Removed extends Benchmark {
+class Tag_Removed extends Tag_Applied {
 
 	public function get_help_article() {
 		return 'https://docs.groundhogg.io/docs/builder/benchmarks/tag-removed/';
@@ -53,10 +49,6 @@ class Tag_Removed extends Benchmark {
 	 */
 	public function get_type() {
 		return 'tag_removed';
-	}
-
-	public function get_sub_group() {
-		return 'crm';
 	}
 
 	/**
@@ -85,28 +77,7 @@ class Tag_Removed extends Benchmark {
 
 		echo html()->e( 'p', [], __( 'Run when the following tags are removed from the contact...', 'groundhogg' ) );
 
-		echo html()->e( 'div', [
-			'class' => 'gh-input-group'
-		], [
-			html()->dropdown( [
-				'name'        => $this->setting_name_prefix( 'condition' ),
-				'selected'    => $this->get_setting( 'condition', 'any' ),
-				'option_none' => false,
-				'style'       => [ 'vertical-align' => 'middle' ],
-				'options'     =>
-					[
-						'any' => __( 'Any' ),
-						'all' => __( 'All' ),
-					]
-			] ),
-			html()->tag_picker( [
-				'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
-				'multiple' => true,
-				'selected' => $this->get_setting( 'tags' )
-			] )
-		] );
-
-		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
+		$this->tag_settings();
 	}
 
 	public function generate_step_title( $step ) {
@@ -142,62 +113,6 @@ class Tag_Removed extends Benchmark {
 		}
 
 		return $name;
-	}
-
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$tags      = validate_tags( $this->get_posted_data( 'tags', [] ) );
-		$this->save_setting( 'tags', $tags );
-		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
-		$this->save_setting( 'condition', $condition );
-
-		$tags = array_bold( parse_tag_list( $tags, 'name', false ) );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step  $step
-	 */
-	public function import( $args, $step ) {
-		if ( empty( $args['tags'] ) ) {
-			return;
-		}
-
-		$tags = get_db( 'tags' )->validate( $args['tags'] );
-
-		$this->save_setting( 'tags', $tags );
-	}
-
-	/**
-	 * @param array $args
-	 * @param Step  $step
-	 *
-	 * @return array
-	 */
-	public function export( $args, $step ) {
-		$args['tags'] = array();
-
-		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
-
-		if ( empty( $tags ) ) {
-			return $args;
-		}
-
-		foreach ( $tags as $tag_id ) {
-
-			$tag = new Tag( $tag_id );
-
-			if ( $tag ) {
-				$args['tags'][] = $tag->get_name();
-			}
-
-		}
-
-		return $args;
 	}
 
 	/**

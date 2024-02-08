@@ -4,9 +4,9 @@ Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 6.2
+Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.1
+Stable tag: 3.2.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,63 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.2.3.1 (2024-02-05) =
+* TWEAKED The export file headers are added to the CSV before the background process starts rather than during.
+* TWEAKED Funnels will sync step status with every update instead of only during a status change.
+* FIXED When adding new steps to an active funnel the step status is `inactive` when it should be `active`.
+* FIXED Initiating an export from the tools page causing fatal error.
+
+= 3.2.3 (2024-02-03) =
+* ADDED Notifications when background tasks are complete.
+* IMPROVED The background task system to be more reliable.
+* TWEAKED Bulk deleting, updating, importing, and exporting contacts will be handled as background tasks.
+* FIXED Guided setup screen blank.
+
+= 3.2.2.2 (2024-02-01) =
+* HOT FIX User info updating incorrect contact records.
+* TWEAKED Optimized the recount tag associations function to perform in a single query.
+* FIXED If filters aren't registered the filters don't work. Now shows a broken filter message instead.
+
+= 3.2.2.1 (2024-01-31) =
+* FIXED Funnel history filters not working if in multiple OR conditions.
+
+= 3.2.2 (2024-01-31) =
+* ADDED Background task for completing benchmarks.
+* ADDED Tool to re-sync user IDs based on email address equality.
+* ADDED If user email address and contact email address are not equal show an button to unlink the user from the contact in the user info card.
+* TWEAKED The limits exceeded calculation for background tasks.
+* FIXED Default date range for future date filters didn't exist.
+* FIXED Caching for the `get_contactdata()` was not working causing slowness when checking contact marketability.
+* FIXED New filters not setting between before date to EOD.
+* FIXED Refresh button in contact activity not working because our caching was too good.
+* IMPROVED Hardened the auto-login link functionality.
+ * If the {auto_login_link} is detected in the email, the `to` address of that email will be forcibly changed to the associated user's email address if it's different than the contact's.
+ * Changing of the `user_id` or `email` of a contact will invalidate previously issued login links.
+
+= 3.2.1 (2024-01-31) =
+* TWEAKED Further optimized activity and event based filters.
+ * Setting `count equals 0` will now return results similar to using the inverse `count at least 1` in the exclude group.
+* TWEAKED Delayed localization of gutenberg block js assets.
+* TWEAKED Filters can now be registered directly from custom properties. This will be helpful for addons!
+* TWEAKED Reduced number of queries for the views on the contacts table screen.
+* FIXED `count()` not always returning a correct number because `FOUND_ROWS()` was not cached.
+* FIXED Broadcast search not working.
+
+= 3.2 (2024-01-29) =
+* ADDED New under the hood query improvements to help create more complex and performant queries.
+* ADDED Color coding, sorting, and pagination to performance report tables.
+* TWEAKED The funnel reports now shows *Added* and *Active* as separate metrics.
+* TWEAKED The conversion rate of a funnel will be calculated with the *Active* metric and not *Added* as it was previously. This may reduce your funnel conversion rates.
+* TWEAKED Date ranges for custom fields are now more flexible.
+* TWEAKED Refactored many of the reports to be more performant.
+* TWEAKED Refactored many of the search filters to be more performant.
+* TWEAKED Funnel editor will preload email and tag assets before being editable.
+* FIXED Custom fields built with the legacy custom fields builder not showing up in replacement codes
+* FIXED using the `Between` comparison in date filters not working.
+* FIXED Funnel campaigns not saving in PHP 8.0+
+* FIXED Selecting posts by ID not working when using a custom post type in the email posts block.
+* FIXED Unable to scroll the email templates.
 
 = 3.1 (2023-12-07) =
 * ADDED Custom post type and taxonomy support to the email editor posts block.

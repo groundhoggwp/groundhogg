@@ -43,13 +43,17 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 	 * Mail the contact profile to the contact which requested it.
 	 * Uses the regular wp_mail function.
 	 *
-	 * @param $contact_id
+	 * @param $contact
 	 *
 	 * @return bool
 	 */
-	function mail_gdpr_data( $contact_id ) {
+	function mail_gdpr_data( $contact ) {
 
-		$contact = get_contactdata( $contact_id );
+		$contact = get_contactdata( $contact );
+
+        if ( ! is_a_contact( $contact ) ){
+            return false;
+        }
 
 		ob_start();
 
@@ -304,7 +308,7 @@ switch ( $action ):
 	case 'download':
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'download_profile' ) ) {
-			if ( mail_gdpr_data( $contact->get_id() ) ) {
+			if ( mail_gdpr_data( $contact ) ) {
 
 				$notice = 'notice_gdpr_email_sent';
 

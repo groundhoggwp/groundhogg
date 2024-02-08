@@ -180,14 +180,18 @@ class Reports_Page extends Tabbed_Admin_Page {
 		if ( get_url_var( 'funnel' ) ) {
 			return [
 				'chart_funnel_breakdown',
-				'table_top_performing_emails',
-				'table_worst_performing_emails',
+//				'table_top_performing_emails',
+//				'table_worst_performing_emails',
 				'total_funnel_conversion_rate',
 				'total_funnel_conversions',
+				'total_contacts_added_to_funnel',
 				'total_contacts_in_funnel',
 				'table_form_activity',
 				'table_funnel_stats',
-				'table_all_funnel_emails_performance'
+				'table_all_funnel_emails_performance',
+				'total_emails_sent',
+				'email_open_rate',
+				'email_click_rate',
 			];
 		}
 

@@ -4,7 +4,6 @@ namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
-use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\files;
@@ -14,7 +13,6 @@ use function Groundhogg\get_items_from_csv;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,7 +56,7 @@ class Import_Contacts extends Bulk_Job {
 		$num_rows     = count_csv_rows( $file_path ) - 1;
 		$num_requests = floor( $num_rows / self::LIMIT );
 
-		return range( 0, $num_requests - 1 );
+		return range( 0, $num_requests );
 	}
 
 	/**
@@ -87,7 +85,6 @@ class Import_Contacts extends Bulk_Job {
 		$offset = absint( $item ) * self::LIMIT;
 
 		$items = get_items_from_csv( $this->file_path, self::LIMIT, $offset );
-
 
 		foreach ( $items as $item ) {
 
@@ -128,6 +125,15 @@ class Import_Contacts extends Bulk_Job {
 
 
 	protected function get_log_message( $completed, $time, $skipped = 0 ) {
+
+		if ( $skipped > 0 ) {
+			return sprintf( 'Imported %s contacts in %s seconds. Skipped %d rows.',
+				$completed,
+				$time,
+				$skipped,
+			);
+		}
+
 		return sprintf( 'Imported %s contacts in %s seconds.',
 			$completed,
 			$time,
@@ -179,8 +185,6 @@ class Import_Contacts extends Bulk_Job {
 		delete_transient( 'gh_import_tags' );
 		delete_transient( 'gh_import_compliance' );
 		delete_transient( 'gh_import_file_path' );
-
-		recount_tag_contacts_count();
 
 		do_action( 'groundhogg/import_contacts/clean_up' );
 	}

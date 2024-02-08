@@ -31,11 +31,16 @@ if ( ! $contact ) {
 if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact, 'view_archive' ) ):
 
 	$use_queued = get_query_var( 'use_queued' );
-	$event_id    = absint( get_query_var( 'event_id' ) );
-	$event       = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
+	$event_id   = absint( get_query_var( 'event_id' ) );
+	$event      = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
 
 	// Event does not exist, or mismatched contact ID
 	if ( ! $event->exists() || $event->get_contact_id() !== $contact->get_id() ) {
+
+        if ( current_user_can( 'view_emails' ) ){
+	        wp_die( 'The view in browser feature does not work for tests and previews because it is not associated with an event. It only works when the email is sent to a recipient from a broadcast or funnel.' );
+        }
+
 		wp_die( 'Unable to view archive...' );
 	}
 

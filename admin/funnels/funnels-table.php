@@ -3,7 +3,8 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Table;
-use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
@@ -11,6 +12,7 @@ use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
@@ -71,6 +73,7 @@ class Funnels_Table extends Table {
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
 			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
 			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
+			'author'          => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
@@ -95,6 +98,7 @@ class Funnels_Table extends Table {
 		$sortable_columns = array(
 			'title'        => array( 'title', false ),
 //			'active_contacts' => array( 'active_contacts', false ),
+			'author'       => array( 'author', false ),
 			'last_updated' => array( 'last_updated', false ),
 			'date_created' => array( 'date_created', false )
 		);
@@ -137,21 +141,24 @@ class Funnels_Table extends Table {
 	 */
 	protected function column_active_contacts( $funnel ) {
 
-		$query = new Contact_Query();
+		$eventQuery = new Table_Query( 'event_queue' );
+		$eventQuery
+			->where()
+			->equals( 'funnel_id', $funnel->get_id() )
+			->equals( 'event_type', Event::FUNNEL )
+			->equals( 'status', Event::WAITING );
 
-		$query_args = [
-			'report' => array(
-				'funnel' => $funnel->get_id(),
-				'status' => 'waiting'
-			)
-		];
+		$count_waiting = $eventQuery->count();
 
-
-		$count = _nf( $query->query( array_merge( [ 'count' => true ], $query_args ) ) );
-
-		$queryUrl = admin_page_url( 'gh_contacts', $query_args );
-
-		return "<a href='$queryUrl'>$count</a>";
+		return contact_filters_link( _nf( $count_waiting ), [
+			[
+				[
+					'type'      => 'funnel_history',
+					'status'    => Event::WAITING,
+					'funnel_id' => $funnel->get_id(),
+				]
+			]
+		], $count_waiting );
 	}
 
 	/**
@@ -189,6 +196,24 @@ class Funnels_Table extends Table {
 				], $_SERVER['REQUEST_URI'] ),
 			], $campaign->get_name() );
 		}, $campaigns ) );
+	}
+
+	/**
+	 * @param $funnel Funnel
+	 *
+	 * @return string
+	 */
+	protected function column_author( Funnel $funnel ) {
+		$user = get_userdata( intval( ( $funnel->author ) ) );
+		if ( ! $user ) {
+			return __( 'Unknown', 'groundhogg' );
+		}
+		$from_user = esc_html( $user->display_name );
+		$queryUrl  = admin_page_url( 'gh_funnels', [
+			'author' => $funnel->author
+		] );
+
+		return "<a href='$queryUrl'>$from_user</a>";
 	}
 
 	/**

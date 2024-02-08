@@ -3,23 +3,17 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\Email;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Step;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
+use function Groundhogg\array_find;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\html;
-use function Groundhogg\key_to_words;
-use function Groundhogg\percentage;
 
 class Table_Funnel_Stats extends Base_Table_Report {
 
+	protected $per_page = 99;
 
 	public function get_label() {
 		return [
@@ -36,39 +30,45 @@ class Table_Funnel_Stats extends Base_Table_Report {
 		//get list of benchmark
 		$funnel = $this->get_funnel();
 
-		$steps  = $funnel->get_steps();
+		$steps = $funnel->get_steps();
 
 		$data = [];
 
+		$query = new Table_Query( 'events' );
+
+		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
+		      ->setGroupby( 'step_id' )
+		      ->where( 'funnel_id', $funnel->get_id() )
+		      ->equals( 'status', Event::COMPLETE )
+		      ->equals( 'event_type', Event::FUNNEL )
+		      ->greaterThanEqualTo( 'time', $this->start )
+		      ->lessThanEqualTo( 'time', $this->end );
+
+		$completed_results = $query->get_results();
+
+		$query = new Table_Query( 'event_queue' );
+
+		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
+		      ->setGroupby( 'step_id' )
+		      ->where( 'funnel_id', $funnel->get_id() )
+		      ->equals( 'status', Event::WAITING )
+		      ->equals( 'event_type', Event::FUNNEL );
+
+		$waiting_results = $query->get_results();
+
 		foreach ( $steps as $i => $step ) {
 
-			$query = new Contact_Query();
+			$complete_result = array_find( $completed_results, function ( $result ) use ( $step ) {
+				return $result->step_id == $step->get_id();
+			} );
 
-			$args = array(
-				'report' => array(
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => Event::COMPLETE,
-					'start'  => $this->start,
-					'end'    => $this->end,
-				)
-			);
+			$count_completed = $complete_result ? absint( $complete_result->total ) : 0;
 
-			$count_completed = count( $query->query( $args ) );
+			$waiting_result = array_find( $waiting_results, function ( $result ) use ( $step ) {
+				return $result->step_id == $step->get_id();
+			} );
 
-			$url_completed = admin_page_url( 'gh_contacts', $args );
-
-			$args = [
-				'report' => [
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => Event::WAITING,
-				]
-			];
-
-			$count_waiting = count( $query->query( $args ) );
-
-			$url_waiting = admin_page_url( 'gh_contacts', $args );
+			$count_waiting = $waiting_result ? absint( $waiting_result->total ) : 0;
 
 			$img = html()->e( 'img', [
 				'src'   => $step->icon(),
@@ -83,7 +83,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 				'href'   => admin_page_url( 'gh_funnels', [
 					'action' => 'edit',
 					'funnel' => $step->get_funnel_id()
- 				], $step->ID ),
+				], $step->ID ),
 				'target' => '_blank'
 			], $step->get_title() );
 
@@ -91,14 +91,32 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$data[] = [
 				'step'      => $title,
-				'completed' => html()->wrap( _nf( $count_completed ), 'a', [
-					'href'  => $url_completed,
-					'class' => 'number-total'
-				] ),
-				'waiting'   => html()->wrap( _nf( $count_waiting ), 'a', [
-					'href'  => $url_waiting,
-					'class' => 'number-total'
-				] )
+				'completed' => contact_filters_link( _nf( $count_completed ), [
+					// Group
+					[
+						// Filter
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->get_id(),
+							'step_id'    => $step->get_id(),
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'      => $this->startDate->ymd(),
+						]
+					]
+				], $count_completed ),
+				'waiting'   => contact_filters_link( _nf( $count_waiting ), [
+					// Group
+					[
+						// Filter
+						[
+							'type'      => 'funnel_history',
+							'status'    => Event::WAITING,
+							'funnel_id' => $funnel->get_id(),
+							'step_id'   => $step->get_id(),
+						]
+					]
+				], $count_waiting )
 			];
 
 		}

@@ -166,19 +166,15 @@ abstract class Base_Report {
 	 * @return array
 	 */
 	protected function get_new_contacts_in_time_period() {
-		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->start );
-		$this->end   = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
 
 		$query = new Contact_Query();
 
-		$contacts = $query->query( [
+		return $query->query( [
 			'date_query' => [
-				'after'  => date( 'Y-m-d H:i:s', $this->start ),
-				'before' => date( 'Y-m-d H:i:s', $this->end ),
+				'after'  => $this->start,
+				'before' => $this->end,
 			]
 		] );
-
-		return $contacts;
 	}
 
 	protected $funnel_cookie_set = false;

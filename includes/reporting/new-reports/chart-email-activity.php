@@ -69,7 +69,7 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 		$db = get_db( 'activity' );
 
 		$data = $db->query( [
-			'select'        => 'count(ID) y, DATE(FROM_UNIXTIME(timestamp)) t',
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
 			'activity_type' => Activity::EMAIL_OPENED,
 			'before'        => $this->end,
 			'after'         => $this->start,
@@ -90,7 +90,7 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 		$db = get_db( 'activity' );
 
 		$data = $db->query( [
-			'select'        => 'count(ID) y, DATE(FROM_UNIXTIME(timestamp)) t',
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'before'        => $this->end,
 			'after'         => $this->start,

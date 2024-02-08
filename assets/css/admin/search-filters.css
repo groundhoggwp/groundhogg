@@ -1,3 +1,4 @@
+.search-filters .filters-loading,
 #search-loading-dots-pill {
   display: inline-block;
   background: #6c19ad;
@@ -13,7 +14,7 @@
 }
 
 .include-filters-wrap, .exclude-filters-wrap {
-  border: 1px solid #AE85CF;
+  border: 1px solid #6c19ad;
   border-radius: 5px;
   padding: 20px 10px 10px 10px;
   position: relative;
@@ -23,12 +24,27 @@
 }
 .include-filters-wrap .include-block, .include-filters-wrap .exclude-block, .exclude-filters-wrap .include-block, .exclude-filters-wrap .exclude-block {
   position: absolute;
-  background: #AE85CF;
+  background: #6c19ad;
   border-radius: 5px;
   left: 10px;
   top: -10px;
   padding: 1px 5px;
   color: #FFFFFF;
+}
+
+.search-filters .filters-loading {
+  display: inline-block;
+  background: #6c19ad;
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+
+.filter-sub_query .search-filters-editor .group {
+  flex-wrap: nowrap !important;
+}
+.filter-sub_query .search-filters-editor .group .filter-view {
+  white-space: nowrap !important;
 }
 
 .search-filters-editor,

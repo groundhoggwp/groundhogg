@@ -4,33 +4,35 @@ namespace Groundhogg\Reporting\New_Reports;
 
 
 use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\Email;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Step;
-use function Groundhogg\admin_page_url;
+use function Groundhogg\_nf;
 use function Groundhogg\array_map_to_class;
-use function Groundhogg\base64_json_encode;
+use function Groundhogg\contact_filters_link;
+use function Groundhogg\format_number_with_percentage;
 use function Groundhogg\get_db;
 use function Groundhogg\get_object_ids;
-use function Groundhogg\get_request_var;
-use function Groundhogg\html;
+use function Groundhogg\is_good_fair_or_poor;
 use function Groundhogg\percentage;
+use function Groundhogg\report_link;
 use function Groundhogg\Ymd_His;
 
 class Table_All_Funnels_Performance extends Base_Table_Report {
 
+	protected $per_page = 20;
+	protected $orderby = 2;
+
 	public function get_label() {
 		return [
 			__( 'Funnel', 'groundhogg' ),
-			__( 'Active Contacts', 'groundhogg' ),
+			__( 'Added', 'groundhogg' ),
+			__( 'Active', 'groundhogg' ),
 			__( 'Conversions', 'groundhogg' ),
-			__( 'Conversion Rate', 'groundhogg' ),
 			__( 'Emails Sent', 'groundhogg' ),
-			__( 'Open Rate', 'groundhogg' ),
-			__( 'Click Thru Rate', 'groundhogg' ),
+			__( 'Opens', 'groundhogg' ),
+			__( 'Clicks', 'groundhogg' ),
+			__( 'Unsubs', 'groundhogg' ),
 		];
 	}
 
@@ -59,63 +61,137 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 		foreach ( $funnels as $funnel ) {
 
-
-			$sent   = $this->count_emails_sent( $funnel );
-			$opens  = $this->count_email_opens( $funnel );
-			$clicks = $this->count_email_clicks( $funnel );
+			$has_email_steps = count( $funnel->get_email_steps() ) > 0;
+			// No sense in query if there are no email steps...
+			$sent         = $has_email_steps ? $this->count_emails_sent( $funnel ) : 0;
+			$opens        = $has_email_steps ? $this->count_email_opens( $funnel ) : 0;
+			$clicks       = $has_email_steps ? $this->count_email_clicks( $funnel ) : 0;
+			$unsubscribed = $has_email_steps ? $this->count_unsubscribed( $funnel ) : 0;
 
 			$conversion_ids = $funnel->get_conversion_step_ids();
 			$conversions    = $this->count_conversions( $funnel );
 			$active         = $this->count_active_contacts( $funnel );
+			$added        = $this->count_added_contacts( $funnel );
 
 			$data[] = [
 				'active' => $active,
-				'title'  => html()->e( 'a', [
-					'href' => admin_page_url( 'gh_reporting', [
-						'tab'    => 'funnels',
-						'funnel' => $funnel->ID,
-					] )
-				], $funnel->title ),
+				'title' => report_link( $funnel->title, [
+					'tab'    => 'funnels',
+					'funnel' => $funnel->ID
+				] ),
 
-				'contacts'    => html()->e( 'a', [
-					'href'   => admin_page_url( 'gh_contacts', [
-						'filters' => base64_json_encode( [
-							[
-								[
-									'type'       => 'funnel_history',
-									'funnel_id'  => $funnel->ID,
-									'status'     => 'complete',
-									'date_range' => 'between',
-									'before'     => Ymd_His( $this->end ),
-									'after'      => Ymd_His( $this->start )
-								]
-							]
-						] )
-					] ),
-					'target' => '_blank'
-				], $active, false ),
-				'conversions' => ! empty( $conversion_ids ) ? html()->e( 'a', [
-					'href'   => admin_page_url( 'gh_contacts', [
-						'filters' => base64_json_encode( array_values( array_map( function ( $step_id ) use ( $funnel ) {
-							return [
-								[
-									'type'       => 'funnel_history',
-									'funnel_id'  => $funnel->ID,
-									'step_id'    => $step_id,
-									'status'     => 'complete',
-									'date_range' => 'between',
-									'before'     => Ymd_His( $this->end ),
-									'after'      => Ymd_His( $this->start )
-								]
-							];
-						}, $conversion_ids ) ) )
-					] ),
-					'target' => '_blank'
-				], $conversions, false ) : 'N/A',
-				'cvr'         => ! empty( $conversion_ids ) ? percentage( $active, $conversions ) . '%' : 'N/A',
-				'sent'        => $sent,
-				'open'        => percentage( $sent, $opens ) . '%',
-				'ctr'         => percentage( $opens, $clicks ) . '%',
+				'added' => contact_filters_link( _nf( $added ), array_map( function ( $step_id ) use ( $funnel ) {
+					return [
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->ID,
+							'step_id'    => $step_id,
+							'status'     => 'complete',
+							'date_range' => 'between',
+							'before'     => Ymd_His( $this->end ),
+							'after'      => Ymd_His( $this->start )
+						]
+					];
+				}, $funnel->get_entry_step_ids() ), $added ),
+
+				'contacts' => contact_filters_link( _nf( $active ), [
+					[
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->ID,
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'      => $this->startDate->ymd()
+						]
+					]
+				], $active ),
+
+				'conversions' => empty( $conversion_ids ) ? 'N/A' : contact_filters_link( format_number_with_percentage( $conversions, $active ), array_map( function ( $step_id ) use ( $funnel ) {
+					return [
+						[
+							'type'       => 'funnel_history',
+							'funnel_id'  => $funnel->ID,
+							'step_id'    => $step_id,
+							'status'     => 'complete',
+							'date_range' => 'between',
+							'before'     => Ymd_His( $this->end ),
+							'after'      => Ymd_His( $this->start )
+						]
+					];
+				}, $conversion_ids ), $conversions ),
+
+				'sent'         => ! $has_email_steps ? 'N/A' : contact_filters_link( _nf( $sent ), [
+					[
+						[
+							'type'       => 'email_received',
+							'funnel_id'  => $funnel->ID,
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'      => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
+						]
+					]
+				], $sent ),
+				'opened'       => ! $has_email_steps ? 'N/A' : contact_filters_link( format_number_with_percentage( $opens, $sent ), [
+					[
+						[
+							'type'       => 'email_opened',
+							'funnel_id'  => $funnel->ID,
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'         => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
+						]
+					]
+				], $opens ),
+				'clicked'      => ! $has_email_steps ? 'N/A' : contact_filters_link( format_number_with_percentage( $clicks, $opens ), [
+					[
+						[
+							'type'       => 'email_link_clicked',
+							'funnel_id'  => $funnel->ID,
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'         => $this->startDate->ymd(),
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
+						]
+					]
+				], $clicks ),
+				'unsubscribes' => ! $has_email_steps ? 'N/A' : contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
+					[
+						[
+							'type'       => 'unsubscribed',
+							'funnel_id'  => $funnel->ID,
+							'date_range' => 'between',
+							'before'     => $this->endDate->ymd(),
+							'after'      => $this->startDate->ymd()
+						]
+					]
+				], $unsubscribed ),
+				'orderby'      => [
+					// The value to compare, and the secondary column to compare
+					$funnel->ID,
+					$added, // added
+					$active, // active,
+					$conversions, // conversions
+					$sent,
+					$opens,
+					$clicks,
+					$unsubscribed,
+				],
+				'cellClasses'  => [
+					// One of Good/Fair/Poor
+					'', // Funnel
+					'', // Added
+					'', // Active
+					empty( $conversion_ids ) || ! $active ? '' : is_good_fair_or_poor( percentage( $active, $conversions ), 40, 30, 20, 10 ), // Conversions
+					'', // Sent
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( percentage( $sent, $opens ), 40, 30, 20, 10 ), // Sent
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( percentage( $opens, $clicks ), 30, 20, 10, 5 ), // clicks
+					! $has_email_steps || ! $sent ? '' : is_good_fair_or_poor( 100 - percentage( $sent, $unsubscribed ), 99, 98, 97, 95 ), // unsubscribed
+				]
 			];
 		}
 
@@ -215,22 +291,63 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	 *
 	 * @return int
 	 */
-	protected function count_active_contacts( $funnel ) {
+	protected function count_unsubscribed( $funnel ) {
 
-		$where_events = [
+		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
-			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-			[ 'col' => 'step_id', 'val' => $funnel->get_entry_step_ids(), 'compare' => 'IN' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
+			[ 'col' => 'activity_type', 'val' => Activity::UNSUBSCRIBED, 'compare' => '=' ],
+			[ 'col' => 'timestamp', 'val' => $this->start, 'compare' => '>=' ],
+			[ 'col' => 'timestamp', 'val' => $this->end, 'compare' => '<=' ],
 		];
 
-		return get_db( 'events' )->count( [
-			'where'  => $where_events,
-			'select' => 'DISTINCT contact_id'
+		return get_db( 'activity' )->count( [
+			'where'  => $where,
+			'select' => 'contact_id'
 		] );
+	}
+
+	/**
+	 * Count the number of  contacts that entered the funnel at one of the entry steps
+	 *
+	 * @param $funnel Funnel
+	 *
+	 * @return int
+	 */
+	protected function count_added_contacts( $funnel ) {
+
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
+		           ->where()
+		           ->lessThanEqualTo( 'time', $this->end )
+		           ->greaterThanEqualTo( 'time', $this->start )
+		           ->equals( 'status', Event::COMPLETE )
+		           ->equals( 'event_type', Event::FUNNEL )
+		           ->equals( 'funnel_id', $funnel->ID )
+		           ->in( 'step_id', $funnel->get_entry_step_ids() );
+
+		return $eventQuery->get_var();
+	}
+
+	/**
+	 * Count the number of  contacts that entered the funnel at one of the entry steps
+	 *
+	 * @param $funnel Funnel
+	 *
+	 * @return int
+	 */
+	protected function count_active_contacts( $funnel ) {
+
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
+		           ->where()
+		           ->lessThanEqualTo( 'time', $this->end )
+		           ->greaterThanEqualTo( 'time', $this->start )
+		           ->equals( 'status', Event::COMPLETE )
+		           ->equals( 'event_type', Event::FUNNEL )
+		           ->equals( 'funnel_id', $funnel->ID );
+
+		return $eventQuery->get_var();
 	}
 
 	/**
@@ -248,20 +365,17 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 			return 0;
 		}
 
-		$where_events = [
-			'relationship' => "AND",
-			[ 'col' => 'funnel_id', 'val' => $funnel->get_id(), 'compare' => '=' ],
-			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-			[ 'col' => 'step_id', 'val' => $ids, 'compare' => 'IN' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
-		];
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
+		           ->where()
+		           ->lessThanEqualTo( 'time', $this->end )
+		           ->greaterThanEqualTo( 'time', $this->start )
+		           ->equals( 'status', Event::COMPLETE )
+		           ->equals( 'event_type', Event::FUNNEL )
+		           ->equals( 'funnel_id', $funnel->ID )
+		           ->in( 'step_id', $ids );
 
-		return get_db( 'events' )->count( [
-			'where'  => $where_events,
-			'select' => 'DISTINCT contact_id'
-		] );
+		return $eventQuery->get_var();
 	}
 
 

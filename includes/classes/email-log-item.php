@@ -19,6 +19,9 @@ class Email_Log_Item extends Base_Object {
 			$this->$prop = intval( $this->$prop );
 		}
 
+		$this->recipients = maybe_unserialize( $this->recipients );
+		$this->headers    = maybe_unserialize( $this->headers );
+
 	}
 
 	/**

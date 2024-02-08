@@ -7,7 +7,6 @@ use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\Ymd_His;
 
 class Total_Bounces_Contacts extends Base_Negative_Quick_Stat {
 
@@ -19,8 +18,8 @@ class Total_Bounces_Contacts extends Base_Negative_Quick_Stat {
 						'type'       => 'optin_status_changed',
 						'value'      => [ Preferences::HARD_BOUNCE ],
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				]
 			] )

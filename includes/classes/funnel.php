@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
-use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
 class Funnel extends Base_Object_With_Meta {
@@ -162,7 +161,7 @@ class Funnel extends Base_Object_With_Meta {
 	 *
 	 * @return void
 	 */
-	public function update_events_from_status(){
+	public function update_events_from_status() {
 		switch ( $this->get_status() ) {
 			case 'active':
 				$this->unpause_events();
@@ -290,14 +289,14 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function update( $data = [] ) {
 
-		$status         = $this->get_status();
-		$updated        = parent::update( $data );
-		$current_status = $this->get_status();
+		$old_status = $this->get_status();
+		$updated    = parent::update( $data );
+		$new_status = $this->get_status();
 
 		$this->update_step_status();
 
 		// When the status of the funnel changes
-		if ( $current_status !== $status ) {
+		if ( $new_status !== $old_status ) {
 			$this->update_events_from_status();
 		}
 
@@ -309,7 +308,7 @@ class Funnel extends Base_Object_With_Meta {
 	 *
 	 * @return Step[]
 	 */
-	public function get_conversion_steps(){
+	public function get_conversion_steps() {
 		return array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_conversion();
 		} );
@@ -378,6 +377,12 @@ class Funnel extends Base_Object_With_Meta {
 		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_starting() || $step->is_entry();
 		} ) );
+	}
+
+	public function get_email_steps() {
+		return array_filter( $this->get_steps(), function ( $step ) {
+			return $step->type_is( 'send_email' );
+		} );
 	}
 
 	/**

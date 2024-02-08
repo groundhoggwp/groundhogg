@@ -163,7 +163,7 @@ class Main_Roles extends Roles {
 				$object = $args[0];
 
 				// didn't pass the full object
-				if ( ! method_exists( $object, 'get_id' ) ) {
+				if ( ! is_object( $object ) || ! method_exists( $object, 'get_id' ) ) {
 					$object = create_object_from_type( $object, $object_type );
 				}
 

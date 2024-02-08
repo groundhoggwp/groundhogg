@@ -8,13 +8,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
-use WP_REST_Server;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
+use function Groundhogg\_nf;
 use function Groundhogg\array_find;
-use function Groundhogg\array_map_with_keys;
 use function Groundhogg\get_db;
 
 class Reports_Api extends Base_Api {
@@ -65,9 +67,92 @@ class Reports_Api extends Base_Api {
 			'exclude_filters' => $report['exclude_filters']
 		] );
 
+		try {
+			// Attempt to do it the modern way
+
+			switch ( $report['type'] ) {
+				case 'pie_chart':
+				case 'table':
+
+					$alias = $query->joinMeta( $report['field'] );
+					$query->setSelect( [ "$alias.meta_value", 'value' ], [ 'COUNT(*)', 'total' ] );
+					$query->where()->isNotNull( "$alias.meta_value" );
+					$query->setOrderby( 'total' );
+
+					$setGroupby = function ( Contact_Query &$query ){
+						$query->setGroupby( 'value' );
+					};
+
+					add_action( 'groundhogg/contact_query/pre_get_contacts', $setGroupby );
+
+					$records = $query->get_results();
+
+					remove_action( 'groundhogg/contact_query/pre_get_contacts', $setGroupby );
+
+					foreach ( $records as &$record ) {
+						$record->value = maybe_unserialize( $record->value ) ?: 'Empty';
+						$record->count = $report['type'] === 'table' ? _nf( $record->total ) : $record->total;
+					}
+
+					return $records;
+
+				case 'number':
+
+					$report_type = sanitize_text_field( $report['value'] );
+					$meta_key    = sanitize_key( $report['field'] );
+
+					switch ( $report_type ) {
+						case 'activity':
+
+							$activityJoin = $query->addJoin( 'RIGHT', 'activity' );
+							$activityJoin->onColumn( 'contact_id' );
+							$activityJoin->conditions->equals( 'activity_type', sanitize_key( $report['activity'] ) );
+
+							return number_format_i18n( $query->count() );
+
+						case 'distinct':
+
+							$alias = $query->joinMeta( $meta_key );
+							$query->setSelect( [ "COUNT(DISTINCT($alias.meta_value))", 'unique_values' ] );
+							$query->where()->isNotNull( "$alias.meta_value" );
+
+							return number_format_i18n( $query->get_var() );
+
+						case 'sum':
+							$alias = $query->joinMeta( $meta_key );
+							$query->setSelect( [ "SUM($alias.meta_value)", 'value' ] );
+							$query->where()->isNotNull( "$alias.meta_value" );
+
+							return number_format_i18n( $query->get_var() );
+
+						case 'average':
+							$alias = $query->joinMeta( $meta_key );
+							$query->setSelect( [ "AVG($alias.meta_value)", 'value' ] );
+							$query->where()->isNotNull( "$alias.meta_value" );
+							$result = $query->get_var();
+
+							return number_format_i18n( $result );
+
+						default:
+						case 'contacts':
+							return number_format_i18n( $query->count() );
+					}
+			}
+
+
+		} catch ( \Exception $exception ) {
+
+			// Reset the query
+			$query = new Contact_Query( [
+				'filters'         => $report['filters'],
+				'exclude_filters' => $report['exclude_filters']
+			] );
+		}
+
 		switch ( $report['type'] ) {
 			case 'pie_chart':
 			case 'table':
+
 				$query->set_query_var( 'select', 'ID' );
 				$sql = $query->get_sql();
 
@@ -95,7 +180,10 @@ class Reports_Api extends Base_Api {
 				return $records;
 			case 'number':
 
-				switch ( $report['value'] ) {
+				$report_type = sanitize_text_field( $report['value'] );
+				$meta_key    = sanitize_key( $report['field'] );
+
+				switch ( $report_type ) {
 					case 'activity':
 
 						$query->set_query_var( 'select', 'ID' );
@@ -120,21 +208,17 @@ class Reports_Api extends Base_Api {
 						$query->set_query_var( 'select', 'ID' );
 						$sql = $query->get_sql();
 
-						$where = [
-							[ 'meta_key', '=', $report['field'] ],
-						];
+						$metaQuery = new Table_Query( 'contactmeta' );
+						$metaQuery->setSelect( 'COUNT(DISTINCT(meta_value))' );
+						$metaQuery->where( 'meta_key', $meta_key )
+						          ->isNotNull( 'meta_value' );
+//						          ->notEmpty( 'meta_value' );
 
 						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
-							$where[] = [ 'contact_id', 'IN', $sql ];
+							$metaQuery->whereIn( 'contact_id', $sql );
 						}
 
-						$result = get_db( 'contactmeta' )->count( [
-							'select'   => 'meta_value',
-							'distinct' => true,
-							'where'    => $where,
-						] );
-
-						return number_format_i18n( $result );
+						return number_format_i18n( $metaQuery->get_var() );
 
 					case 'sum':
 					case 'average':
@@ -143,7 +227,7 @@ class Reports_Api extends Base_Api {
 						$sql = $query->get_sql();
 
 						$where = [
-							[ 'meta_key', '=', $report['field'] ],
+							[ 'meta_key', '=', $meta_key ],
 						];
 
 						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
@@ -152,7 +236,7 @@ class Reports_Api extends Base_Api {
 
 						$result = get_db( 'contactmeta' )->query( [
 							'select' => 'meta_value',
-							'func'   => $report['value'] === 'sum' ? 'SUM' : 'AVG',
+							'func' => $report_type === 'sum' ? 'SUM' : 'AVG',
 							'where'  => $where,
 						] );
 
@@ -216,7 +300,7 @@ class Reports_Api extends Base_Api {
 	}
 
 	/**
-	 * Verify the reporting dat is valid
+	 * Verify the reporting data is valid
 	 *
 	 * @param $param
 	 * @param $request
@@ -236,6 +320,7 @@ class Reports_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
+
 		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
 		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 

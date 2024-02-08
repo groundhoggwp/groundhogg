@@ -3,9 +3,8 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
-use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
-use function Groundhogg\recount_tag_contacts_count;
+use function Groundhogg\get_request_query;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -92,7 +91,6 @@ class Delete_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function clean_up() {
-		recount_tag_contacts_count();
 	}
 
 	/**

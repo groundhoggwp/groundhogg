@@ -21,6 +21,7 @@ class Activity extends Base_Object_With_Meta {
 	const UNSUBSCRIBED = 'unsubscribed';
 	const PAGE_VIEW = 'page_view';
 	const LOGIN = 'wp_login';
+	const LOGOUT = 'wp_logout';
 
 	public $contact;
 

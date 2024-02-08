@@ -529,7 +529,7 @@
   }
 
   const base64_json_encode = (stuff) => {
-    return utf8_to_b64(JSON.stringify(stuff))
+    return utf8_to_b64(JSON.stringify(stuff)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')
   }
 
   gh.functions.utf8_to_b64 = utf8_to_b64

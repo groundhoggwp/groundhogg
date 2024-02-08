@@ -43,6 +43,33 @@ $items       = get_items_from_csv( $file_path, 1, $selected );
 $sample_item = $items[0];
 $total_items = count_csv_rows( $file_path ) - 1;
 
+function guess_column_map_to( $column ) {
+
+	$column = get_key_from_column_label( $column );
+
+	$guesses = [
+		'address1'      => 'line1',
+		'address_1'     => 'line1',
+		'address2'      => 'line2',
+		'address_2'     => 'line2',
+		'province'      => 'region',
+		'state'         => 'region',
+		'postal_code'   => 'postal_zip',
+		'postal'        => 'postal_zip',
+		'zip'           => 'postal_zip',
+		'zip_code'      => 'postal_zip',
+		'first'         => 'first_name',
+		'last'          => 'last_name',
+		'email_address' => 'email',
+	];
+
+    if ( key_exists( $column, $guesses ) ){
+        return $guesses[$column];
+    }
+
+	return $column;
+}
+
 ?>
 <form method="post">
 	<?php wp_nonce_field(); ?>
@@ -110,7 +137,7 @@ $total_items = count_csv_rows( $file_path ) - 1;
 			html()->dropdown( [
 				'name'        => sprintf( 'map[%s]', $key ),
 				'id'          => sprintf( 'map_%s', $key ),
-				'selected'    => apply_filters( 'groundhogg/default_field_mappings', get_key_from_column_label( $key ) ),
+				'selected'    => guess_column_map_to( $key ),
 				'options'     => get_mappable_fields(),
 				'option_none' => '* Do Not Map *'
 			] )

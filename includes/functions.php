@@ -8,6 +8,7 @@ use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
 use Groundhogg\Utils\DateTimeHelper;
+use Groundhogg\Utils\Micro_Time_Tracker;
 use WP_Error;
 
 
@@ -102,21 +103,19 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return $contact_id_or_email;
 	}
 
-	static $cache = [];
+	if ( empty( $contact_id_or_email ) ) {
 
-	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
-
-	if ( ! $contact_id_or_email ) {
-
+        // From queue?
 		if ( Event_Queue::is_processing() ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
+        // From tracking?
 		if ( $contact = tracking()->get_current_contact() ) {
 			return $contact;
 		}
 
-		// support for identity
+		// Support for identity
 		if ( $enc_identity = get_url_var( 'identity' ) ) {
 			$identity = decrypt( $enc_identity );
 
@@ -132,15 +131,20 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		}
 
 		return false;
-	} else if ( in_array( $cache_key, $cache ) ) {
+	}
+
+	static $cache = [];
+
+	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
+
+    if ( key_exists( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
 
 	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
 	if ( $contact->exists() ) {
-
-//		Set the contact in the cache
+        // Set the contact in the cache
 		$cache[ $cache_key ] = $contact;
 
 		return $contact;
@@ -206,6 +210,34 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 	}
 
 	return $url;
+}
+
+function report_link( $content, $params ){
+    return html()->e('a', [
+        'href' => admin_page_url( 'gh_reporting', $params )
+    ], $content );
+}
+
+/**
+ * open the contacts page with specific filters
+ *
+ * @param $content
+ * @param $filters
+ *
+ * @return string
+ */
+function contact_filters_link( $content, $filters, $link = true ) {
+
+    if ( ! $link  ){
+        return $content;
+    }
+
+	return html()->e( 'a', [
+		'target' => '_blank',
+		'href'   => admin_page_url( 'gh_contacts', [
+			'filters' => base64_json_encode( array_values( $filters ) )
+		] )
+	], $content );
 }
 
 /**
@@ -475,21 +507,80 @@ function get_url_param( $key = '', $default = false ) {
 }
 
 /**
+ * base64 encode safe for url
+ *
+ * @param $stuff
+ *
+ * @return array|string|string[]
+ */
+function base64url_encode( $stuff ) {
+	return str_replace( [ '+', '/', '=' ], [ '-', '_', '' ], base64_encode( $stuff ) );
+}
+
+/**
+ * Base64 decode stuff from url
+ *
+ * @param $stuff
+ *
+ * @return false|string
+ */
+function base64url_decode( $stuff ) {
+	return base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $stuff ) );
+}
+
+/**
+ * Encodes a string via json and base64, typically for a URL
+ *
  * @param $query
  *
  * @return string
  */
 function base64_json_encode( $query ) {
-	return base64_encode( wp_json_encode( $query ) );
+	return base64url_encode( wp_json_encode( $query ) );
 }
 
 /**
- * @param $query
+ * Given a string which is assumed to be base64 encoded json, decode it
+ *
+ * @param $query $string
  *
  * @return mixed
  */
-function base64_json_decode( $query ) {
-	return json_decode( base64_decode( $query ), true );
+function base64_json_decode( $string ) {
+	return json_decode( base64url_decode( $string ), true );
+}
+
+/**
+ * Utility function to serialize stuff and md5 it, useful for creating
+ * keys based on prop values
+ *
+ * @param $stuff
+ *
+ * @return string
+ */
+function md5serialize( $stuff ) {
+	return md5( maybe_serialize( $stuff ) );
+}
+
+/**
+ * Helper function to generate a semi unique JOIN alias given a filter
+ *
+ * @param $filter
+ * @param $prefix
+ *
+ * @return string
+ */
+function alias_from_filter( $filter ) {
+
+	$type = $filter['type'];
+
+	unset( $filter['type'] );
+	unset( $filter['id'] );
+	unset( $filter['count'] ); // not relevant to JOIN
+	unset( $filter['count_compare'] ); // not relevant to JOIN
+	ksort( $filter );
+
+	return $type . '_' . preg_replace( '/[^A-Za-z0-9_]+/', '_', implode( '_', array_filter( $filter ) ) );
 }
 
 /**
@@ -513,7 +604,8 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'action',
 		'bulk_action',
 		'_wpnonce',
-		'submit'
+		'submit',
+        'operation'
 	] );
 
 	foreach ( $ignore as $key ) {
@@ -743,21 +835,36 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param     $a int denominator
- * @param     $b int numerator
+ * @param     $denom int denominator
+ * @param     $numer int numerator
  * @param int $precision
  *
  * @return float
  */
-function percentage( $a, $b, $precision = 2 ) {
-	$a = intval( $a );
-	$b = intval( $b );
+function percentage( $denom, $numer, $precision = 2 ) {
+	$denom = intval( $denom );
+	$numer = intval( $numer );
 
-	if ( ! $a ) {
+	if ( ! $denom ) {
 		return 0;
 	}
 
-	return round( ( $b / $a ) * 100, $precision );
+	return round( ( $numer / $denom ) * 100, $precision );
+}
+
+/**
+ * @param $num
+ * @param $compare
+ *
+ * @return string
+ */
+function format_number_with_percentage( $num, $compare ) {
+
+    if ( empty ($num) && empty($compare)){
+        return '-';
+    }
+
+	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ), );
 }
 
 function sort_by_string_in_array( $key ) {
@@ -903,6 +1010,9 @@ function array_to_atts( $atts ) {
 		$key = strtolower( $key );
 
 		switch ( $key ) {
+			case 'value':
+				$value = esc_attr( $value );
+				break;
 			case 'cellpadding':
 			case 'cellspacing':
 				$value = absint( $value );
@@ -1561,21 +1671,11 @@ function wpgh_get_referer() {
 
 /**
  * Recount the contacts per tag...
+ *
+ * @deprecated 3.2 no replacement
  */
 function recount_tag_contacts_count() {
-
-	// Delete the orphaned relationships
-	get_db( 'tag_relationships' )->delete_orphaned_relationships();
-
-	// Recount the tags
-	$tags = get_db( 'tags' )->query();
-
-	if ( ! empty( $tags ) ) {
-		foreach ( $tags as $tag ) {
-			$count = get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
-			get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
-		}
-	}
+	_deprecated_function( 'recount_tag_contacts_count', '3.2.3' );
 }
 
 /**
@@ -2378,7 +2478,7 @@ function export_field( $contact, $field = '' ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		__( 'Contact Info' )  => [
+		__( 'Contact Info', 'groundhogg' )  => [
 			'full_name'                 => __( 'Full Name', 'groundhogg' ),
 			'first_name'                => __( 'First Name', 'groundhogg' ),
 			'last_name'                 => __( 'Last Name', 'groundhogg' ),
@@ -2392,26 +2492,26 @@ function get_mappable_fields( $extra = [] ) {
 			'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
 			'contact_id'                => __( 'Contact ID', 'groundhogg' ),
 		],
-		__( 'User' )          => [
+		__( 'User' ) => [
 			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
 			'user_email' => __( 'User Email', 'groundhogg' ),
 		],
-		__( 'Contact Owner' ) => [
+		__( 'Contact Owner', 'groundhogg' ) => [
 			'owner_id'    => __( 'Owner Id/Login', 'groundhogg' ),
 			'owner_email' => __( 'Owner Email', 'groundhogg' ),
 		],
-		__( 'CRM' )           => [
+		__( 'CRM', 'groundhogg' )           => [
 			'notes'     => __( 'Add To Notes', 'groundhogg' ),
 			'tags'      => __( 'Apply Value as Tag', 'groundhogg' ),
 			'meta'      => __( 'Add as Custom Meta', 'groundhogg' ),
 			'copy_file' => __( 'Add as File', 'groundhogg' ),
 		],
-		__( 'Compliance' )    => [
+		__( 'Compliance', 'groundhogg' )    => [
 			'terms_agreement'   => __( 'Terms Agreement', 'groundhogg' ),
 			'gdpr_consent'      => __( 'Data Processing Consent', 'groundhogg' ),
 			'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
 		],
-		__( 'Address' )       => [
+		__( 'Address', 'groundhogg' )       => [
 			'street_address_1' => __( 'Line 1', 'groundhogg' ),
 			'street_address_2' => __( 'Line 2', 'groundhogg' ),
 			'city'             => __( 'City', 'groundhogg' ),
@@ -2421,7 +2521,7 @@ function get_mappable_fields( $extra = [] ) {
 			'time_zone'        => __( 'Time Zone', 'groundhogg' ),
 			'ip_address'       => __( 'IP Address', 'groundhogg' ),
 		],
-		__( 'Tracking' )      => [
+		__( 'Tracking', 'groundhogg' )      => [
 			'utm_campaign' => __( 'UTM Campaign', 'groundhogg' ),
 			'utm_content'  => __( 'UTM Content', 'groundhogg' ),
 			'utm_medium'   => __( 'UTM Medium', 'groundhogg' ),
@@ -3081,10 +3181,14 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			// Is there an active contact record?
 			$contact = get_contactdata();
 		}
-
 	}
 
 	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
+		return false;
+	}
+
+	// Prevent sales reps from importing or making changes to existing contacts of which they are not assigned
+	if ( current_user_can( 'add_contacts' ) && ! current_user_can( 'edit_contact', $contact ) ) {
 		return false;
 	}
 
@@ -3149,7 +3253,7 @@ endif;
 if ( ! function_exists( 'multi_implode' ) ):
 	function multi_implode( $glue, $array ) {
 		$ret = '';
-
+//
 		foreach ( $array as $item ) {
 			if ( is_array( $item ) ) {
 				$ret .= multi_implode( $glue, $item ) . $glue;
@@ -4922,8 +5026,8 @@ function has_replacements( $content ) {
  *
  * @return bool
  */
-function is_a_contact( $contact ) {
-	return $contact && $contact instanceof Contact && $contact->exists();
+function is_a_contact( $contact ): bool {
+	return is_a( $contact, Contact::class );
 }
 
 /**
@@ -4933,8 +5037,8 @@ function is_a_contact( $contact ) {
  *
  * @return bool
  */
-function is_a_user( $user ) {
-	return $user && $user instanceof \WP_User;
+function is_a_user( $user ): bool {
+	return is_a( $user, \WP_User::class );
 }
 
 /**
@@ -4983,6 +5087,55 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 
 	return $key;
 }
+
+/**
+ * Invalidate the permissions keys for a specific contact
+ *
+ * @param Contact $contact
+ * @param         $usage
+ *
+ * @return bool
+ */
+function invalidate_contact_permissions_keys( Contact $contact, string $usage = '' ) {
+
+    $query = [
+	    'contact_id' => $contact->get_id()
+    ];
+
+    if ( ! empty( $usage ) ){
+        $query[ 'usage_type' ] = $usage;
+    }
+
+	$deleted = get_db( 'permissions_keys' )->delete( $query );
+
+    return $deleted;
+}
+
+/**
+ * If the user_id or email address is changed, invalidate existing permissions keys for that contact.
+ *
+ * @param int $id
+ * @param array $updated
+ * @param Contact $contact
+ * @param array $old
+ *
+ * @return void
+ */
+function maybe_invalidate_permissions_keys_when_contact_updated( $id, $updated, $contact, $old ){
+
+    // All permissions keys
+    if ( isset( $updated['email'] ) && $updated['email'] !== $old[ 'email' ] ){
+        invalidate_contact_permissions_keys( $contact );
+        return;
+    }
+
+    // If the user_id was updated, only invalidate permissions keys for auto login
+    if ( isset( $updated['user_id'] ) && $updated['user_id'] !== $old[ 'user_id' ] ){
+	    invalidate_contact_permissions_keys( $contact, 'auto_login' );
+    }
+}
+
+add_action( 'groundhogg/contact/post_update', __NAMESPACE__ . '\maybe_invalidate_permissions_keys_when_contact_updated', 10, 4 );
 
 /**
  * Check the validity of a permissions key
@@ -6078,11 +6231,11 @@ function uninstall_groundhogg() {
 	wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
-	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
-	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
-	wp_clear_scheduled_hook( 'groundhogg/aws/remove_old_logs' );
-	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
+	wp_clear_scheduled_hook( 'groundhogg/purge_email_logs' );
 	wp_clear_scheduled_hook( 'groundhogg/purge_page_visits' );
+	wp_clear_scheduled_hook( 'groundhogg/aws/remove_old_logs' );
+	wp_clear_scheduled_hook( 'groundhogg/birthday' );
+	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
 	wp_clear_scheduled_hook( 'groundhogg/check_bounces' );
 	wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 
@@ -6421,7 +6574,7 @@ function get_object_relationships( $object, $is_primary = true ) {
  */
 function maybe_swap_dates( &$before, &$after ) {
 	// If after is > than before, swap them
-	if ( strtotime( $after ) > strtotime( $before ) ) {
+	if ( $after > $before ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
@@ -6533,7 +6686,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
 		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),
-		'imageSizes'    => get_intermediate_image_sizes(),
+		'imageSizes'    => array_values( get_intermediate_image_sizes() ),
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
 		],
@@ -7006,15 +7159,22 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 				return new Tag( $maybe_tag );
 			}
 
-			// This will create a new tag if it doesn't exist already :)
-			if ( $create ) {
-				return new Tag( [
-					'tag_name' => $maybe_tag,
-					'tag_slug' => sanitize_title( $maybe_tag )
-				] );
+			if ( is_string( $maybe_tag ) ) {
+
+				$slug = sanitize_title( $maybe_tag );
+
+				// This will create a new tag if it doesn't exist already :)
+				if ( $create ) {
+					return new Tag( [
+						'tag_name' => $maybe_tag,
+						'tag_slug' => $slug
+					] );
+				}
+
+				return new Tag( $slug, 'tag_slug' );
 			}
 
-			return new Tag( sanitize_title( $maybe_tag ), 'tag_slug' );
+			return false;
 
 		}, $maybe_tags );
 
@@ -7055,6 +7215,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 			return array_map_to_method( $tags, 'get_name' );
 		default:
 		case 'tags':
+		case 'object':
 			return $tags;
 	}
 }
@@ -7665,21 +7826,6 @@ function qualifies_for_review_your_funnel() {
 }
 
 /**
- * Enqueue the admin header
- *
- * @return void
- */
-function enqueue_admin_header() {
-	if ( is_white_labeled() ) {
-		return;
-	}
-
-	wp_enqueue_script( 'groundhogg-admin-header' );
-
-	do_action( 'groundhogg/enqueue_admin_header' );
-}
-
-/**
  * Parses a list into number and non-numeric items
  *
  * @param $list     array|string
@@ -7990,11 +8136,11 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 		// CORRECT THE HTML - or use https://www.barattalo.it/html-fixer/
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
 
-        if ( function_exists( 'iconv' ) ){
-	        @$dom->loadHTML( htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1', htmlentities($markdown, ENT_COMPAT, 'UTF-8')), ENT_QUOTES) );
-        } else {
-	        @$dom->loadHTML( $markdown );
-        }
+		if ( function_exists( 'iconv' ) ) {
+			@$dom->loadHTML( htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $markdown, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES ) );
+		} else {
+			@$dom->loadHTML( $markdown );
+		}
 
 		$markdown = $dom->saveHTML();
 		// preg_match() IS NOT SO NICE, BUT WORKS FOR ME
@@ -8152,4 +8298,48 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 	}
 
 	return trim( $markdown );
+}
+
+/**
+ * Returns a string representing Good Fiar or Poor given specific thresholds
+ *
+ * @param int  $number
+ * @param int  $great
+ * @param int  $good
+ * @param int  $fair
+ * @param int  $poor
+ * @param bool $inverse
+ *
+ * @return string good|fair|poor|bad
+ */
+function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, int $poor ){
+
+	if ( $number >= $great ){
+		return 'great';
+	}
+
+    if ( $number >= $good ){
+        return 'good';
+    }
+
+    if ( $number >= $fair ){
+        return 'fair';
+    }
+
+    if ( $number >= $poor ){
+        return 'poor';
+    }
+
+	return 'bad';
+}
+
+/**
+ * Get the pretty name of a role
+ *
+ * @param $role string
+ *
+ * @return string
+ */
+function get_role_display_name( $role ) {
+	return translate_user_role( wp_roles()->roles[ $role ]['name'] );
 }

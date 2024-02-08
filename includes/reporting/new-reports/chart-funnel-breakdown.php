@@ -2,15 +2,13 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
+use function Groundhogg\array_find;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
+use function Groundhogg\get_object_ids;
 
 class Chart_Funnel_Breakdown extends Base_Chart_Report {
 
@@ -49,31 +47,37 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 			'step_group' => Step::BENCHMARK
 		] );
 
-		$dataset = [];
+		$datasets = [];
+		$labels   = [];
 
-		foreach ( $steps as $i => $step ) {
+		$query = new Table_Query( 'events' );
 
-			$query = new Contact_Query();
-			$args  = array(
-				'report' => array(
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => 'complete',
-					'start'  => $this->start,
-					'end'    => $this->end,
-				)
-			);
+		$query->setSelect( [ 'COUNT(ID)', 'total' ], 'step_id' )
+		      ->setGroupby( 'step_id' )
+		      ->where( 'funnel_id', $funnel->get_id() )
+		      ->equals( 'status', Event::COMPLETE )
+		      ->equals( 'event_type', Event::FUNNEL )
+		      ->in( 'step_id', get_object_ids( $steps ) )
+		      ->greaterThanEqualTo( 'time', $this->start )
+		      ->lessThanEqualTo( 'time', $this->end );
 
-			$count     = count( $query->query( $args ) );
-			$label[]   = $step->get_title();
-			$dataset[] = $count;
+		$results = $query->get_results();
 
+		foreach ( $steps as $step ) {
+
+			$result = array_find( $results, function ( $result ) use ( $step ) {
+				return $result->step_id == $step->get_id();
+			} );
+
+			$total = $result ? absint( $result->total ) : 0;
+
+			$labels[]   = $step->get_title();
+			$datasets[] = $total;
 		}
 
-
 		return [
-			'label' => $label,
-			'data'  => $dataset,
+			'label' => $labels,
+			'data'  => $datasets,
 		];
 
 

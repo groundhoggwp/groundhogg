@@ -34,6 +34,15 @@ $funnel_id = absint( get_request_var( 'funnel' ) );
 
 $funnel = new Funnel( $funnel_id );
 
+if ( ! $funnel->exists() ){
+
+    ?>
+    <p>This funnel does not exist. It may have been deleted.</p>
+    <?php
+
+    return;
+}
+
 /**
  * @param $steps Funnel_Step[]
  *
@@ -204,7 +213,6 @@ function render_draggable_step_grid( $steps ) {
 		</div>
 		<div id="step-settings-container" class="postbox-container">
 			<div id="step-settings-inner">
-				<?php Plugin::$instance->notices->print_notices(); ?>
 				<div id="add-steps">
 					<div class="steps-select">
 						<div id="step-toggle" class="gh-button-group">
@@ -226,9 +234,7 @@ function render_draggable_step_grid( $steps ) {
 					</div>
 				</div>
 				<div class="step-settings hidden">
-					<?php
-
-					foreach ( $funnel->get_steps() as $step ):
+					<?php foreach ( $funnel->get_steps() as $step ):
 						$step->html_v2();
 					endforeach; ?>
 				</div>

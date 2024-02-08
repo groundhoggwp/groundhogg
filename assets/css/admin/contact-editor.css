@@ -304,6 +304,7 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) {
   position: absolute;
   left: -34px;
+  box-sizing: border-box;
   height: 25px;
   width: 25px;
   display: flex;
@@ -313,15 +314,30 @@ code.meta-replacement-code {
   background: #0075ff;
   color: #FFFFFF;
 }
+#activity-timeline li.activity-item .activity-icon:not(.no-frame) img {
+  max-width: 100%;
+}
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
-  background: #f58115;
-  border-radius: 4px;
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending) {
+  border: 2px solid #f58115;
+  background-color: white;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).broadcast, #activity-timeline li.activity-item .activity-icon:not(.no-frame).action {
-  background: #9ece38;
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending).pending {
+  border: none;
+  background-color: #f58115;
+}
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).action {
+  border: 2px solid #9ece38;
+  background-color: white;
+}
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).action.pending {
+  border: none;
+  background-color: #9ece38;
+}
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).broadcast {
+  background-color: #9ece38;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   width: 15px;

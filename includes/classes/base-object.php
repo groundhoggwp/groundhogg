@@ -2,11 +2,11 @@
 
 namespace Groundhogg;
 
+use ArrayAccess;
 use Groundhogg\Classes\Note;
 use Groundhogg\DB\DB;
 use JsonSerializable;
 use Serializable;
-use ArrayAccess;
 
 abstract class Base_Object extends Supports_Errors implements Serializable, ArrayAccess, JsonSerializable {
 
@@ -32,7 +32,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	/**
 	 * Base_Object constructor.
 	 *
-	 * @param $identifier_or_args int|string the identifier to look for
+	 * @param $identifier_or_args int|string|object|array the identifier to look for
 	 * @param $field              string the file to query
 	 *
 	 * @return void
@@ -76,9 +76,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			// Only get 1 record
 			$identifier_or_args['limit'] = 1;
 
-			$query = $this->get_db()->query( $identifier_or_args );
-
-			$object = array_shift( $query );
+			$results = $this->get_db()->query( $identifier_or_args );
+			$object  = array_shift( $results );
 
 			if ( ! empty( $object ) && is_object( $object ) ) {
 
@@ -320,11 +319,19 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function update( $data = [] ) {
 
-		if ( empty( $data ) ) {
+		// Invalid data for update
+		if ( ! is_array( $data ) ){
 			return false;
 		}
 
+		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
+		$data = array_diff_assoc( $data, $this->data );
+
+		// updating with existing data
+		if ( empty( $data ) ) {
+			return true;
+		}
 
 		$old_data = $this->data;
 

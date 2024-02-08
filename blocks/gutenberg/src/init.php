@@ -42,17 +42,6 @@ add_action( 'init', 'groundhogg_gutenberg_form_selector_init' );
  */
 function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 
-
-	$i18n = array(
-		'title'            => \Groundhogg\white_labeled_name(),
-		'description'      => esc_html__( 'Select and display one of your forms.', 'groundhogg' ),
-		'form_select'      => esc_html__( 'Select a Form', 'groundhogg' ),
-		'form_settings'    => esc_html__( 'Form Settings', 'groundhogg' ),
-		'form_selected'    => esc_html__( 'Form', 'groundhogg' ),
-		'show_title'       => esc_html__( 'Show Title', 'groundhogg' ),
-		'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
-	);
-
 	// Register block editor script for backend.
 	wp_register_script(
 		'groundhogg-form-block-js', // Handle.
@@ -62,18 +51,31 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 		true // Enqueue the script in the footer.
 	);
 
-	$forms = \Groundhogg\get_form_list();
+	add_action( 'enqueue_block_editor_assets', function (){
 
-	wp_localize_script(
-		'groundhogg-form-block-js',
-		'groundhogg_gutenberg_form_selector',
-		array(
-			'logo_url' => GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png',
-			'forms'    => ! empty( $forms ) ? $forms : array(),
-			'i18n'     => $i18n,
-		)
-	);
+		$forms = \Groundhogg\get_form_list();
 
+		$i18n = array(
+			'title'            => \Groundhogg\white_labeled_name(),
+			'description'      => esc_html__( 'Select and display one of your forms.', 'groundhogg' ),
+			'form_select'      => esc_html__( 'Select a Form', 'groundhogg' ),
+			'form_settings'    => esc_html__( 'Form Settings', 'groundhogg' ),
+			'form_selected'    => esc_html__( 'Form', 'groundhogg' ),
+			'show_title'       => esc_html__( 'Show Title', 'groundhogg' ),
+			'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
+		);
+
+		wp_localize_script(
+			'groundhogg-form-block-js',
+			'groundhogg_gutenberg_form_selector',
+			array(
+				'logo_url' => GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png',
+				'forms'    => ! empty( $forms ) ? $forms : array(),
+				'i18n'     => $i18n,
+			)
+		);
+
+	} );
 
 	// Enqueue the Groundhogg form style.
 	register_block_type( 'groundhogg/forms', array(

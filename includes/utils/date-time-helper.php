@@ -32,7 +32,7 @@ class DateTimeHelper extends \DateTime {
 		$compare   = new \DateTime( 'today', $this->getTimezone() );
 		$timestamp = $this->getTimestamp();
 		$this->setTime( 0, 0, 0 );
-		$interval  = $compare->diff( $this );
+		$interval = $compare->diff( $this );
 		$this->setTimestamp( $timestamp );
 
 		if ( $interval->days == 0 ) {
@@ -58,6 +58,14 @@ class DateTimeHelper extends \DateTime {
 
 	public function isYesterday() {
 		return $this->whenIs() === 'yesterday';
+	}
+
+	public function ymdhis() {
+		return $this->format( 'Y-m-d H:i:s' );
+	}
+
+	public function ymd() {
+		return $this->format( 'Y-m-d' );
 	}
 
 	public function i18n() {

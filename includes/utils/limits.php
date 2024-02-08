@@ -2,8 +2,6 @@
 
 namespace Groundhogg\Utils;
 
-use function Groundhogg\micro_seconds;
-
 class Limits {
 
 	/**
@@ -205,14 +203,15 @@ class Limits {
 	 */
 	public static function time_likely_to_be_exceeded() {
 
-		if ( ! self::$total_processed_actions ) {
+		if ( ! self::$total_processed_actions || ! self::$processed_actions ) {
 			return false;
 		}
 
-		$execution_time     = self::get_execution_time();
-		$max_execution_time = self::get_time_limit();
-		$time_per_action    = $execution_time / self::$total_processed_actions ?: 1;
-		$estimated_time     = $execution_time + ( $time_per_action * 3 );
+		$execution_time     = self::get_execution_time(); // The total execution time since we started tracking it
+		$time_elapsed       = self::time_elapsed(); // The time since we last called start()
+		$max_execution_time = self::get_time_limit(); // The site's time limit
+		$time_per_action    = $time_elapsed / self::$processed_actions ?: 1; // The average amount of time it takes to complete 1 action since we called start()
+		$estimated_time     = $execution_time + ( $time_per_action * 1.5 ) + 3 ; // Add 3 seconds for safety net
 
 		return $estimated_time > $max_execution_time;
 	}

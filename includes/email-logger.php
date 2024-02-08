@@ -53,7 +53,7 @@ class Email_Logger {
 
 			$this->setup_cron();
 
-			add_action( 'gh_purge_old_email_logs', [ $this, 'purge_old_logs' ] );
+			add_action( 'groundhogg/purge_email_logs', [ $this, 'purge_old_logs' ] );
 
 		}
 	}
@@ -62,8 +62,8 @@ class Email_Logger {
 	 * Setup the CRON listener to purge old events
 	 */
 	public function setup_cron() {
-		if ( ! wp_next_scheduled( 'gh_purge_old_email_logs' ) ) {
-			wp_schedule_event( time(), 'daily', 'gh_purge_old_email_logs' );
+		if ( ! wp_next_scheduled( 'groundhogg/purge_email_logs' ) ) {
+			wp_schedule_event( time(), 'daily', 'groundhogg/purge_email_logs' );
 		}
 	}
 

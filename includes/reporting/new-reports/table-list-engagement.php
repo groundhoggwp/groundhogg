@@ -32,8 +32,6 @@ class Table_List_Engagement extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 
-		$query = new Contact_Query();
-
 		$engaged_filters = [
 			[
 				[
@@ -45,7 +43,7 @@ class Table_List_Engagement extends Base_Table_Report {
 			]
 		];
 
-		$engaged = $query->count( [
+		$engaged = new Contact_Query( [
 			'filters' => $engaged_filters
 		] );
 
@@ -57,10 +55,10 @@ class Table_List_Engagement extends Base_Table_Report {
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $engaged_filters )
 				] )
-			], _nf( $engaged ), false )
+			], _nf( $engaged->count() ), false )
 		];
 
-		$unengaged = $query->count( [
+		$unengaged = new Contact_Query( [
 			'exclude_filters' => $engaged_filters
 		] );
 
@@ -70,7 +68,7 @@ class Table_List_Engagement extends Base_Table_Report {
 				'href' => admin_page_url( 'gh_contacts', [
 					'exclude_filters' => base64_json_encode( $engaged_filters )
 				] )
-			], _nf( $unengaged ), false )
+			], _nf( $unengaged->count() ), false )
 		];
 
 		$marketable_filters = [
@@ -82,9 +80,8 @@ class Table_List_Engagement extends Base_Table_Report {
 			]
 		];
 
-		$marketable = $query->count( [
+		$marketable = new Contact_Query( [
 			'filters' => $marketable_filters
-
 		] );
 
 		$rows[] = [
@@ -93,7 +90,7 @@ class Table_List_Engagement extends Base_Table_Report {
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $marketable_filters )
 				] )
-			], _nf( $marketable ), false )
+			], _nf( $marketable->count() ), false )
 		];
 
 		$unmarketable_filters = [
@@ -105,7 +102,7 @@ class Table_List_Engagement extends Base_Table_Report {
 			]
 		];
 
-		$unmarketable = $query->count( [
+		$unmarketable = new Contact_Query( [
 			'filters' => $unmarketable_filters
 		] );
 
@@ -115,7 +112,7 @@ class Table_List_Engagement extends Base_Table_Report {
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $unmarketable_filters )
 				] )
-			], _nf( $unmarketable ), false )
+			], _nf( $unmarketable->count() ), false )
 		];
 
 		return $rows;

@@ -20,11 +20,17 @@
     Input,
     Select,
     Span,
+    Ellipses,
     Dashicon,
     ToolTip,
   } = MakeEl
 
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
   const { sprintf, __, _x, _n } = wp.i18n
   const { base64_json_encode } = Groundhogg.functions
 
@@ -73,53 +79,75 @@
 
   const ComparisonsTitleGenerators = {
     equals: (k, v) => sprintf(
-      _x('%1$s equals %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s equals %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     not_equals: (k, v) => sprintf(
-      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     contains: (k, v) => sprintf(
-      _x('%1$s contains %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s contains %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     not_contains: (k, v) => sprintf(
-      _x('%1$s does not contain %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not contain %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     starts_with: (k, v) => sprintf(
-      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     ends_with: (k, v) => sprintf(
-      _x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     does_not_start_with: (k, v) => sprintf(
-      _x('%1$s does not start with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not start with %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     does_not_end_with: (k, v) => sprintf(
-      _x('%1$s does not end with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s does not end with %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     less_than: (k, v) => sprintf(
-      _x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     less_than_or_equal_to: (k, v) => sprintf(
       _x('%1$s is less than or equal to %2$s',
         '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     greater_than: (k, v) => sprintf(
-      _x('%1$s is greater than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is greater than %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     greater_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is greater than or equal to %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is greater than or equal to %2$s',
+        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     in: (k, v) => sprintf(
-      _x('%1$s is %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     not_in: (k, v) => sprintf(
-      _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     empty: (k, v) => sprintf(
-      _x('%1$s is empty', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is empty', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     not_empty: (k, v) => sprintf(
-      _x('%1$s is not empty', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is not empty', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     includes: (k, v) => sprintf(
-      _x('%1$s includes %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s includes %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     excludes: (k, v) => sprintf(
-      _x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     before: (k, v) => sprintf(
-      _x('%1$s is before %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is before %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     after: (k, v) => sprintf(
-      _x('%1$s is after %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      _x('%1$s is after %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     between: (k, v, v2) => sprintf(
-      _x('%1$s is between %2$s and %3$s', '%1 is a key and %2 and %3 are user defined values', 'groundhogg'), k, v, v2),
+      _x('%1$s is between %2$s and %3$s',
+        '%1 is a key and %2 and %3 are user defined values', 'groundhogg'), k,
+      v, v2),
   }
 
   const pastDateRanges = {
     'any': __('At any time', 'groundhogg'),
     'today': __('Today', 'groundhogg'),
+    'yesterday': __('Yesterday', 'groundhogg'),
     'this_week': __('This week', 'groundhogg'),
     'this_month': __('This month', 'groundhogg'),
     'this_year': __('This year', 'groundhogg'),
@@ -135,20 +163,26 @@
   }
 
   const futureDateRanges = {
-    'f_any': __('At any time', 'groundhogg'),
-    'f_today': __('Today', 'groundhogg'),
-    'f_this_week': __('This week', 'groundhogg'),
-    'f_this_month': __('This month', 'groundhogg'),
-    'f_this_year': __('This year', 'groundhogg'),
-    'f_24_hours': __('In the next 24 hours', 'groundhogg'),
-    'f_7_days': __('In the next 7 days', 'groundhogg'),
-    'f_30_days': __('In the next 30 days', 'groundhogg'),
-    'f_60_days': __('In the next 60 days', 'groundhogg'),
-    'f_90_days': __('In the next 90 days', 'groundhogg'),
-    'f_365_days': __('In the next 365 days', 'groundhogg'),
+    'any': __('At any time', 'groundhogg'),
+    'today': __('Today', 'groundhogg'),
+    'tomorrow': __('Tomorrow', 'groundhogg'),
+    'this_week': __('This week', 'groundhogg'),
+    'this_month': __('This month', 'groundhogg'),
+    'this_year': __('This year', 'groundhogg'),
+    'next_24_hours': __('In the next 24 hours', 'groundhogg'),
+    'next_7_days': __('In the next 7 days', 'groundhogg'),
+    'next_30_days': __('In the next 30 days', 'groundhogg'),
+    'next_60_days': __('In the next 60 days', 'groundhogg'),
+    'next_90_days': __('In the next 90 days', 'groundhogg'),
+    'next_365_days': __('In the next 365 days', 'groundhogg'),
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
+  }
+
+  const allDateRanges = {
+    ...pastDateRanges,
+    ...futureDateRanges,
   }
 
   const activityFilterComparisons = {
@@ -209,10 +243,13 @@
    * @param display
    * @param preload
    * @param defaults
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
   const createFilter = (
-    type, name, group, { edit = () => null, display = () => null, preload = () => {} }, defaults = {}) => ( {
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} },
+    defaults = {}) => ( {
     type,
     name,
     group,
@@ -232,10 +269,12 @@
    * @param display
    * @param preload
    * @param defaults
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
   const createStringFilter = (
-    type, name, group, { edit = () => null, display = () => null, preload = () => {} } = {},
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
     defaults = {}) => createFilter(
     type,
     name,
@@ -250,9 +289,9 @@
           selected: compare,
           onChange: e => updateFilter({
             compare: e.target.value,
-          }),
+          }, true),
         }),
-        Input({
+        ['empty', 'not_empty'].includes(compare) ? null : Input({
           id: 'filter-value',
           value,
           onChange: e => updateFilter({
@@ -261,7 +300,8 @@
         }),
       ]),
       display: ({ compare, value, ...rest }) => {
-        return Fragment(ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+        return Fragment(
+          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
       },
       preload,
     },
@@ -282,10 +322,12 @@
    * @param display
    * @param preload
    * @param defaults
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
   const createNumberFilter = (
-    type, name, group, { edit = () => null, display = () => null, preload = () => {} } = {},
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
     defaults = {}) => createFilter(
     type,
     name,
@@ -312,7 +354,62 @@
         }),
       ]),
       display: ({ compare, value, ...rest }) => {
-        return Fragment(ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+        return Fragment(
+          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+      },
+      preload,
+    },
+    {
+      value: '',
+      compare: 'equals',
+      ...defaults,
+    },
+  )
+
+  /**
+   * Create a filter that allow you to compare a time value
+   *
+   * @param type
+   * @param name
+   * @param group
+   * @param edit
+   * @param display
+   * @param preload
+   * @param defaults
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
+   */
+  const createTimeFilter = (
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
+    defaults = {}) => createFilter(
+    type,
+    name,
+    group,
+    {
+      edit: ({ value, compare, updateFilter, ...rest }) => Fragment([
+        edit({ ...rest, updateFilter }),
+        Select({
+          id: 'filter-compare',
+          name: 'filter_compare',
+          options: NumericComparisons,
+          selected: compare,
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        Input({
+          type: 'time',
+          id: 'filter-value',
+          value,
+          onChange: e => updateFilter({
+            value: e.target.value,
+          }),
+        }),
+      ]),
+      display: ({ compare, value, ...rest }) => {
+        return Fragment(
+          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
       },
       preload,
     },
@@ -333,10 +430,12 @@
    * @param display
    * @param preload
    * @param defaults
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
-  const createPastDateFilter = (
-    type, name, group, { edit = () => null, display = () => null, preload = () => {} } = {},
+  const createDateFilter = (
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
     defaults = {}) => createFilter(type,
     name, group, {
       edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
@@ -344,11 +443,11 @@
         Select({
           id: 'filter-date-range',
           name: 'date_range',
-          options: pastDateRanges,
+          options: allDateRanges,
           selected: date_range,
           onChange: e => updateFilter({
             date_range: e.target.value,
-          }),
+          }, true),
         }),
         date_range === 'after' || date_range === 'between' ? Input({
           type: 'date',
@@ -371,13 +470,88 @@
 
         switch (date_range) {
           case 'between':
-            return ComparisonsTitleGenerators.between(bold(name), formatDate(after), formatDate(before))
+            return ComparisonsTitleGenerators.between(bold(name),
+              formatDate(after), formatDate(before))
           case 'after':
-            return ComparisonsTitleGenerators.after(bold(name), formatDate(after))
+            return ComparisonsTitleGenerators.after(bold(name),
+              formatDate(after))
           case 'before':
-            return ComparisonsTitleGenerators.before(bold(name), formatDate(before))
+            return ComparisonsTitleGenerators.before(bold(name),
+              formatDate(before))
           default:
-            return sprintf('%s %s', bold(name), pastDateRanges[date_range].toLowerCase())
+            return sprintf('%s %s', bold(name),
+              allDateRanges[date_range].toLowerCase())
+        }
+      },
+      preload,
+    }, {
+      ...defaults,
+      date_range: 'this_month',
+      before: '',
+      after: '',
+    })
+
+  /**
+   * Create a filter that compares against previous dates
+   *
+   * @param type
+   * @param name
+   * @param group
+   * @param edit
+   * @param display
+   * @param preload
+   * @param defaults
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
+   */
+  const createPastDateFilter = (
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
+    defaults = {}) => createFilter(type,
+    name, group, {
+      edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
+        edit({ ...rest, updateFilter }),
+        Select({
+          id: 'filter-date-range',
+          name: 'date_range',
+          options: pastDateRanges,
+          selected: date_range,
+          onChange: e => updateFilter({
+            date_range: e.target.value,
+          }, true),
+        }),
+        date_range === 'after' || date_range === 'between' ? Input({
+          type: 'date',
+          value: after.split(' ')[0],
+          id: 'filter-after',
+          onChange: e => updateFilter({
+            after: e.target.value,
+          }),
+        }) : null,
+        date_range === 'before' || date_range === 'between' ? Input({
+          type: 'date',
+          value: before.split(' ')[0],
+          id: 'filter-before',
+          onChange: e => updateFilter({
+            before: e.target.value,
+          }),
+        }) : null,
+      ]),
+      display: ({ date_range, after, before, ...rest }) => {
+
+        switch (date_range) {
+          case 'between':
+            return ComparisonsTitleGenerators.between(bold(name),
+              formatDate(after), formatDate(before))
+          case 'after':
+            return ComparisonsTitleGenerators.after(bold(name),
+              formatDate(after))
+          case 'before':
+            return ComparisonsTitleGenerators.before(bold(name),
+              formatDate(before))
+          default:
+            return sprintf('%s %s', bold(name),
+              pastDateRanges[date_range].toLowerCase())
         }
       },
       preload,
@@ -398,10 +572,12 @@
    * @param display
    * @param preload
    * @param defaults
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
   const createFutureDateFilter = (
-    type, name, group, { edit = () => null, display = () => null, preload = () => {} } = {},
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
     defaults = {}) => createFilter(type,
     name, group, {
       edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
@@ -413,7 +589,7 @@
           selected: date_range,
           onChange: e => updateFilter({
             date_range: e.target.value,
-          }),
+          }, true),
         }),
         date_range === 'after' || date_range === 'between' ? Input({
           type: 'date',
@@ -436,38 +612,45 @@
 
         switch (date_range) {
           case 'between':
-            return ComparisonsTitleGenerators.between(bold(name), formatDate(after), formatDate(before))
+            return ComparisonsTitleGenerators.between(bold(name),
+              formatDate(after), formatDate(before))
           case 'after':
-            return ComparisonsTitleGenerators.after(bold(name), formatDate(after))
+            return ComparisonsTitleGenerators.after(bold(name),
+              formatDate(after))
           case 'before':
-            return ComparisonsTitleGenerators.before(bold(name), formatDate(before))
+            return ComparisonsTitleGenerators.before(bold(name),
+              formatDate(before))
           default:
-            return sprintf('%s %s', bold(name), futureDateRanges[date_range].toLowerCase())
+            return sprintf('%s %s', bold(name),
+              futureDateRanges[date_range].toLowerCase())
         }
       },
       preload,
     }, {
       ...defaults,
-      date_range: 'f_24_hours',
+      date_range: 'next_24_hours',
       before: '',
       after: '',
     })
 
   /**
-   * Create a select filter, which is just a comparison filter with fixed values
+   * Create a select filter, which is just a comparison filter with fixed
+   * values
    *
    * @param type
    * @param name
    * @param group
    * @param options
-   * @returns {{defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}}
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
    */
-  const createSelectFilter = (type, name, group, options ) => createFilter(
+  const createSelectFilter = (type, name, group, options) => createFilter(
     type,
     name,
     group,
     {
-      display: ({ value }) => sprintf('%s is %s', bold(name), bold(options[value])),
+      display: ({ value }) => sprintf('%s is %s', bold(name),
+        bold(options[value])),
       edit: ({ value, updateFilter }) => Select({
         id: 'filter-select',
         options,
@@ -476,17 +659,152 @@
       }),
     },
     {
-      value: options[Object.keys(options)[0]]
-    }
+      value: Object.keys(options)[0],
+    },
   )
+
+  /**
+   * Simple options picker
+   *
+   * @param field
+   * @param options
+   * @param updateFilter
+   * @returns {*}
+   * @constructor
+   */
+  const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
+    id: 'filter-options',
+    noneSelected: 'Type to search...',
+    selected: options.map(opt => ( { id: opt, text: opt } )),
+    fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).map(opt => ( { id: opt, text: opt } )),
+    onChange: items => updateFilter({
+      options: items.map(item => item.id),
+    }),
+  })
+
+  /**
+   * When given a field property the factory will auto generate filters
+   *
+   * @type {{date: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload,
+   *   group}), number: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload:
+   *   preload, group}), datetime: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type,
+   *   preload: preload, group}), checkboxes: (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display:
+   *   (function(): null), name, type, preload: preload, group}), textarea: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function(): null),
+   *   display: (function(): null), name, type, preload: preload, group}), tel: (function({id: *, label: *, group: *}): {defaults: {}, edit: (function():
+   *   null), display: (function(): null), name, type, preload: preload, group}), text: (function({id: *, label: *, group: *}): {defaults: {}, edit:
+   *   (function(): null), display: (function(): null), name, type, preload: preload, group}), time: (function({id: *, label: *, group: *}): {defaults: {},
+   *   edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), url: (function({id: *, label: *, group: *}): {defaults:
+   *   {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), dropdown: (function({id: *, label: *, group: *, [p:
+   *   string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), custom_email: (function({id:
+   *   *, label: *, group: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload: preload, group}), radio:
+   *   (function({id: *, label: *, group: *, [p: string]: *}): {defaults: {}, edit: (function(): null), display: (function(): null), name, type, preload:
+   *   preload, group})}}
+   */
+  const filterFactory = {
+
+    text: ({ id, label, group }) => createStringFilter(id, label, group),
+    url: ({ id, label, group }) => createStringFilter(id, label, group),
+    custom_email: ({ id, label, group }) => createStringFilter(id, label, group),
+    tel: ({ id, label, group }) => createStringFilter(id, label, group),
+    textarea: ({ id, label, group }) => createStringFilter(id, label, group),
+    number: ({ id, label, group }) => createNumberFilter(id, label, group),
+    date: ({ id, label, group }) => createDateFilter(id, label, group),
+    datetime: ({ id, label, group }) => createDateFilter(id, label, group),
+    time: ({ id, label, group }) => createTimeFilter(id, label, group),
+
+    radio: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: {
+            in: _x('Is one of', 'comparison, groundhogg'),
+            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options, compare }) => ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o)))),
+    }, {
+      compare: 'in',
+      options: [],
+    }),
+
+    dropdown: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: field.multiple ? {
+            all_in: __('Has all selected'),
+            all_not_in: __('Does not have all selected'),
+          } : {
+            in: _x('Is one of', 'comparison, groundhogg'),
+            not_in: _x('Is not one of', 'comparison', 'groundhogg'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options, compare }) => {
+        if (ComparisonsTitleGenerators[compare]) {
+          return ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o))))
+        }
+        return moreComparisonTitleGenerators[compare](bold(label), options)
+      },
+    }, {
+      compare: field.multiple ? 'all_in' : 'in',
+      options: [],
+    }),
+
+    checkboxes: ({ id, label, group, ...field }) => createFilter(id, label, group, {
+      edit: ({ options, compare, updateFilter }) => Fragment([
+        Select({
+          id: 'filter-compare',
+          selected: compare,
+          options: {
+            all_checked: __('Is Checked', 'groundhogg-better-meta'),
+            not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+          },
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }),
+        }),
+        OptionsPicker({
+          field,
+          options,
+          updateFilter,
+        }),
+      ]),
+      display: ({ options = [], compare = '' }) => moreComparisonTitleGenerators[compare](bold(label), options),
+    }, {
+      compare: 'all_checked',
+      options: [],
+    }),
+  }
 
   /**
    * Create a filters registry
    *
    * @param groups
    * @param filters
-   * @returns {{getFilter({type: *}): *, edit(*, *): *, preloadFilters(*): Promise<Awaited<unknown>[]>, displayName(*):
-   *   *, registerGroup(), filterName(*): *, groups: {}, filters: {}, registerFilter(), preloadFilter(*): *}}
+   * @returns {{getFilter({type: *}): *, edit(*, *): *, preloadFilters(*):
+   *   Promise<Awaited<unknown>[]>, displayName(*):
+   *   *, registerGroup(), filterName(*): *, groups: {}, filters: {},
+   *   registerFilter(), preloadFilter(*): *}}
    * @constructor
    */
   const FilterRegistry = ({
@@ -494,19 +812,27 @@
     filters = [],
   } = {}) => ( {
 
-    groups,
-    filters,
+    groups: groups.reduce((carr, curr) => {
+      carr[curr.id] = curr.name
+      return carr
+    }, {}),
 
-    registerGroup (group) {
-      this.groups.push(group)
+    filters: filters.reduce((filters, filter) => {
+      filters[filter.type] = filter
+      return filters
+    }, {}),
+
+    registerGroup (group, name) {
+      if (group && name) {
+        this.groups[group] = name
+      }
+      else {
+        this.groups[group.id] = group.name
+      }
     },
 
     registerFilter (filter) {
-      if (this.getFilter(filter)) {
-        return
-      }
-
-      this.filters.push(filter)
+      this.filters[filter.type] = filter
     },
 
     displayName (filter) {
@@ -520,8 +846,18 @@
       return name
     },
 
+    displayFilters( filters ){
+      return filters.map(group => group.map(filter => {
+        return Div( {}, this.display( filter ) ).innerHTML
+      }).join(' and ')).join(' or ')
+    },
+
     filterName (filter) {
       return this.getFilter(filter).name
+    },
+
+    display (filter) {
+      return this.getFilter(filter).display(filter)
     },
 
     edit (filter, updateFilter) {
@@ -529,7 +865,11 @@
     },
 
     getFilter ({ type }) {
-      return this.filters.find(f => f.type === type)
+      return this.filters[type] ?? {}
+    },
+
+    hasFilter ({ type }) {
+      return type in this.filters
     },
 
     preloadFilter (filter) {
@@ -541,15 +881,51 @@
       const promises = []
 
       filters.forEach(filterGroup => filterGroup.forEach(filter => {
-        const promise = this.preloadFilter(filter)
-        if (promise) {
-          promises.push(promise)
+        try {
+          const promise = this.preloadFilter(filter)
+          if (promise) {
+            promises.push(promise)
+          }
         }
+        catch (err) {}
       }))
 
       return Promise.all(promises)
 
     },
+
+    registerFromProperties ( properties ) {
+
+      const {
+        tabs, fields, groups,
+      } = properties
+
+      Object.values(tabs).forEach(t => {
+
+        Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
+
+          let groupId = `${ t.id }-${ s.id }`
+
+          this.registerGroup(groupId, `${ t.name }: ${ s.name }`)
+
+          Object.values(fields).filter(f => f.group === s.id).forEach(f => {
+
+            if (f.type in filterFactory) {
+              this.registerFilter(filterFactory[f.type]({
+                ...f,
+                group: groupId,
+              }))
+            }
+
+          })
+
+        })
+
+      })
+
+
+    }
+
   } )
 
   /**
@@ -569,6 +945,13 @@
     onChange = (filters) => {},
   }) => {
 
+    // parse the filters to make sure they have ids...
+    filters.forEach(filterGroup => filterGroup.forEach(filter => {
+      if (!filter.id) {
+        filter.id = uuid()
+      }
+    }))
+
     /**
      * Morhps the filters
      */
@@ -582,10 +965,10 @@
       }
     }
 
-    let State = {
+    const State = Groundhogg.createState({
       preloaded: false,
       activeFilter: null,
-    }
+    })
 
     /**
      * Updates the current state of the filters
@@ -594,13 +977,7 @@
      * @param doMorph
      */
     const setState = (newState, doMorph = true) => {
-      State = {
-        ...State,
-        ...newState,
-      }
-
-      console.log(State)
-
+      State.set(newState)
       if (doMorph) {
         morph()
       }
@@ -615,32 +992,45 @@
      * @returns HTMLElement
      * @constructor
      */
-    const FilterBroken = (filter, group, index) => Div({
-      id: `filter-${ filter.id }`,
-      className: 'filter filter-view filter-broken',
-      tabindex: 0,
-      onClick: e => {
-        if (clickedIn(e, '.delete-filter')) {
-          return
-        }
+    const FilterBroken = (filter, group, index, err) => {
 
-        editFilter(filter.id)
-      },
-    }, [
-      Span({
-        className: 'filter-name text',
-      }, sprintf(
-        __('This %s filter is corrupted', 'groundhogg'),
-        bold(filterRegistry.filterName(filter)))),
-      Button({
-        id: `delete-${ group }-${ index }`,
-        className: 'delete-filter',
+      let message
+
+      if (filterRegistry.hasFilter(filter)) {
+        message = err instanceof Error ? err.message : sprintf(
+          __('This %s filter is corrupted', 'groundhogg'),
+          bold(filterRegistry.filterName(filter)))
+      }
+      else {
+        message = sprintf(__('This %s filter is not available.', 'groundhogg'),
+          bold(filter.type))
+      }
+
+      return Div({
+        id: `filter-${ filter.id }`,
+        className: 'filter filter-view filter-broken',
+        tabindex: 0,
         onClick: e => {
-          e.preventDefault()
-          deleteFilter(group, index)
+          if (clickedIn(e, '.delete-filter')) {
+            return
+          }
+
+          editFilter(filter.id)
         },
-      }, Dashicon('no-alt')),
-    ])
+      }, [
+        Span({
+          className: 'filter-name text',
+        }, message),
+        Button({
+          id: `delete-${ group }-${ index }`,
+          className: 'delete-filter',
+          onClick: e => {
+            e.preventDefault()
+            deleteFilter(group, index)
+          },
+        }, Dashicon('no-alt')),
+      ])
+    }
 
     /**
      * The filter pill
@@ -696,25 +1086,27 @@
        */
       const morphFilter = () => {
         try {
-          morphdom(document.getElementById(`filter-${ id }-settings`), FilterSettings())
+          morphdom(document.getElementById(`filter-${ id }-settings`),
+            FilterSettings())
         }
-        catch (e) {
-          console.log(e)
-        }
+        catch (e) {}
       }
 
       /**
        * Updates temporary filter state
        *
        * @param newSettings
+       * @param doMorph
        */
-      const updateTempFilterSettings = (newSettings) => {
+      const updateTempFilterSettings = (newSettings, doMorph = false) => {
         tempFilterSettings = {
           ...tempFilterSettings,
           ...newSettings,
         }
 
-        morphFilter()
+        if (doMorph) {
+          morphFilter()
+        }
       }
 
       /**
@@ -730,7 +1122,7 @@
 
       return Div({
         id: `edit-filter-${ filter.id }`,
-        className: 'filter filter-edit-wrap',
+        className: `filter filter-edit-wrap filter-${filter.type}`,
         tabindex: 0,
       }, Div({
         className: 'filter-edit',
@@ -781,18 +1173,14 @@
       className: 'group',
     }, [
       ...filters.map((filter, index) => {
-
         try {
-
           if (State.activeFilter === filter.id) {
             return EditFilter(filter, group, index)
           }
-
           return Filter(filter, group, index)
         }
-        catch (e) {
-          console.log(e)
-          return FilterBroken(filter, group, index)
+        catch (err) {
+          return FilterBroken(filter, group, index, err)
         }
 
       }),
@@ -801,11 +1189,8 @@
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
 
-          let options = filterRegistry.filters
-          let groups = filterRegistry.groups.reduce((carr, curr) => {
-            carr[curr.id] = curr.name
-            return carr
-          }, {})
+          let options = Object.values(filterRegistry.filters)
+          let groups = filterRegistry.groups
 
           searchOptionsWidget({
             // selector: '.add-filter-wrap',
@@ -814,10 +1199,15 @@
             options,
             groups,
             onSelect: (option) => {
-              addFilter({
+
+              let newFilter = {
                 type: option.type,
                 ...option.defaults,
-              }, group)
+              }
+
+              console.log( newFilter )
+
+              addFilter(newFilter, group)
             },
             filterOption: (option, search) => {
               return option.name.match(regexp(search))
@@ -827,7 +1217,10 @@
           }).mount()
 
         },
-      }, [ Dashicon('plus-alt2'), ToolTip( __( 'Add a filter', 'groundhogg' ), 'right' ) ] ),
+      }, [
+        Dashicon('plus-alt2'),
+        ToolTip(__('Add a filter', 'groundhogg'), 'right'),
+      ]),
     ])
 
     /**
@@ -850,8 +1243,6 @@
       }
 
       editFilter(filter.id)
-
-      onChange(filters)
     }
 
     /**
@@ -924,8 +1315,9 @@
       id,
       className: `search-filters`,
     }, Span({
+      id: `${ id }-loading`,
       className: 'filters-loading',
-    }, __('Loading')))
+    }, Ellipses(  __('Loading') )))
 
     /**
      * The wrapper for all the filters
@@ -935,9 +1327,10 @@
      */
     const FiltersEditor = () => {
 
-      if (!State.preloaded) {
+      if (!State.get('preloaded')) {
 
-        filterRegistry.preloadFilters(filters).then(() => setState({ preloaded: true }))
+        filterRegistry.preloadFilters(filters).
+          then(() => setState({ preloaded: true }))
 
         return FiltersLoading()
       }
@@ -968,9 +1361,13 @@
   Groundhogg.filters.Filters = Filters
   Groundhogg.filters.FilterRegistry = FilterRegistry
   Groundhogg.filters.createFilter = createFilter
+  Groundhogg.filters.createGroup = createGroup
   Groundhogg.filters.createStringFilter = createStringFilter
   Groundhogg.filters.createNumberFilter = createNumberFilter
-  Groundhogg.filters.createDateFilter = createPastDateFilter
+  Groundhogg.filters.createTimeFilter = createTimeFilter
+  Groundhogg.filters.createPastDateFilter = createPastDateFilter
+  Groundhogg.filters.createFutureDateFilter = createFutureDateFilter
+  Groundhogg.filters.createDateFilter = createDateFilter
   Groundhogg.filters.createSelectFilter = createSelectFilter
 
   if (window.GroundhoggTableFilters) {
@@ -991,27 +1388,32 @@
     TableFilterRegistry.registerGroup(createGroup('table', name))
 
     for (let column in stringColumns) {
-      TableFilterRegistry.registerFilter(createStringFilter(column, stringColumns[column], 'table'))
+      TableFilterRegistry.registerFilter(
+        createStringFilter(column, stringColumns[column], 'table'))
     }
 
     for (let column in numberColumns) {
-      TableFilterRegistry.registerFilter(createNumberFilter(column, numberColumns[column], 'table'))
+      TableFilterRegistry.registerFilter(
+        createNumberFilter(column, numberColumns[column], 'table'))
     }
 
     for (let column in selectColumns) {
-      TableFilterRegistry.registerFilter(createSelectFilter(column, selectColumns[column][0], 'table', selectColumns[column][1]))
+      TableFilterRegistry.registerFilter(
+        createSelectFilter(column, selectColumns[column][0], 'table', selectColumns[column][1]))
     }
 
     for (let column in dateColumns) {
-      TableFilterRegistry.registerFilter(createPastDateFilter(column, dateColumns[column], 'table'), {
-        display: () => bold(name),
-      })
+      TableFilterRegistry.registerFilter(
+        createPastDateFilter(column, dateColumns[column], 'table'), {
+          display: () => bold(name),
+        })
     }
 
     for (let column in futureDateColumns) {
-      TableFilterRegistry.registerFilter(createFutureDateFilter(column, futureDateColumns[column], 'table'), {
-        display: () => bold(name),
-      })
+      TableFilterRegistry.registerFilter(
+        createFutureDateFilter(column, futureDateColumns[column], 'table'), {
+          display: () => bold(name),
+        })
     }
 
     GroundhoggTableFilters.FilterRegistry = TableFilterRegistry
@@ -1022,7 +1424,8 @@
         filterRegistry: TableFilterRegistry,
         filters,
         onChange: filters => document.querySelector(
-          'form.search-form input[name="include_filters"]').value = base64_json_encode(filters),
+          'form.search-form input[name="include_filters"]').value = base64_json_encode(
+          filters),
       }))
     })
   }

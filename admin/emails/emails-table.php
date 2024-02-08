@@ -3,13 +3,13 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Admin\Table;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
@@ -90,6 +90,7 @@ class Emails_Table extends Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = [
+			'title'        => [ 'title', false ],
 			'subject'      => [ 'subject', false ],
 			'from_user'    => [ 'from_user', false ],
 			'author'       => [ 'author', false ],
@@ -121,8 +122,8 @@ class Emails_Table extends Table {
 	 * @return string
 	 */
 	protected function column_title( $email ) {
-		$subject = ( ! $email->get_title() ) ? '(' . __( 'no title' ) . ')' : $email->get_title();
-		$editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->get_id() );
+		$subject = $email->get_title();
+		$editUrl = $email->admin_link();
 
 		if ( $this->get_view() === 'trash' ) {
 			$html = "<strong>{$subject}</strong>";
@@ -136,7 +137,7 @@ class Emails_Table extends Table {
 			}
 
 			if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
-				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template' ) . "</span>";
+				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template', 'groundhogg' ) . "</span>";
 			}
 
 			$html .= "</strong>";
@@ -217,41 +218,25 @@ class Emails_Table extends Table {
 	/**
 	 * Show the list of funnels that the email is being used in
 	 *
-	 * @param $email
+	 * @param Email $email
 	 *
 	 * @return string
 	 */
 	protected function column_funnels( $email ) {
 
-		$funnels = get_db( 'funnels' )->query( [
-			'where' => [
-				[
-					'ID',
-					'in',
-					get_db( 'steps' )->get_sql( [
-						'select' => 'funnel_id',
-						'where'  => [
-							[
-								'step_type',
-								'=',
-								'send_email'
-							],
-							[
-								'ID',
-								'in',
-								get_db( 'stepmeta' )->get_sql( [
-									'select'     => 'step_id',
-									'meta_key'   => 'email_id',
-									'meta_value' => $email->get_id()
-								] )
-							],
-						]
-					] )
-				]
-			]
-		] );
+		$stepQuery = new Table_Query( 'steps' );
+		$meta_alias = $stepQuery->joinMeta( 'email_id' );
+		$stepQuery->where( 'step_type', 'send_email' );
+		$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
-		array_map_to_class( $funnels, Funnel::class );
+		$funnelQuery = new Table_Query( 'funnels' );
+        $join = $funnelQuery->addJoin( 'LEFT', $stepQuery );
+        $join->onColumn( 'funnel_id' );
+
+        $funnelQuery->where( 'email_id', $email->ID );
+        $funnelQuery->setGroupby( 'ID' );
+
+		$funnels = $funnelQuery->get_objects( Funnel::class );
 
 		return implode( ', ', array_map( function ( $funnel ) {
 			return html()->e( 'a', [
@@ -329,11 +314,11 @@ class Emails_Table extends Table {
 		return apply_filters( 'wpgh_email_bulk_actions', $actions );
 	}
 
-    public function single_row( $item ) {
-	    echo "<tr id=\"{$item->ID}\">";
-	    $this->single_row_columns( $item );
-	    echo '</tr>';
-    }
+	public function single_row( $item ) {
+		echo "<tr id=\"{$item->ID}\">";
+		$this->single_row_columns( $item );
+		echo '</tr>';
+	}
 
 	function get_table_id() {
 		return 'emails_table';
@@ -405,7 +390,7 @@ class Emails_Table extends Table {
 			],
 			[
 				'view'    => 'draft',
-				'display' => __( 'Draft', 'groundhogg' ),
+				'display' => __( 'Drafts' ),
 				'query'   => [ 'status' => 'draft' ],
 			],
 			[

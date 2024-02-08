@@ -3,12 +3,37 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Classes\Activity;
-use Groundhogg\Email;
-use Groundhogg\Event;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
 
 class Email_Open_Rate extends Base_Quick_Stat_Percent {
 
+	public function get_link() {
+
+		$filter = [
+			'type'       => 'email_opened',
+			'date_range' => 'between',
+			'before'     => $this->endDate->ymd(),
+			'after'      => $this->startDate->ymd()
+		];
+
+		if ( $this->get_email_id() ) {
+			$filter['email_id'] = $this->get_email_id();
+		}
+
+		if ( $this->get_funnel_id() ) {
+			$filter['funnel_id'] = $this->get_funnel_id();
+		}
+
+		return admin_page_url( 'gh_contacts', [
+			'filters' => base64_json_encode( [
+				[
+					$filter
+				]
+			] )
+		] );
+	}
 
 	/**
 	 * Query the results
@@ -32,6 +57,10 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 			$query['email_id'] = $this->get_email_id();
 		}
 
+		if ( $this->get_funnel_id() ) {
+			$query['funnel_id'] = $this->get_funnel_id();
+		}
+
 		return $db->count( $query );
 	}
 
@@ -44,31 +73,8 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 	 * @return mixed
 	 */
 	protected function query_vs( $start, $end ) {
+		$report = new Total_Emails_Sent( $start, $end );
 
-		if ( $this->get_email_id() ) {
-
-			$email = new Email( $this->get_email_id() );
-			$stats = $email->get_email_stats( $start, $end );
-			$data  = $stats['sent'];
-
-		} else {
-			global $wpdb;
-
-			$events_table = get_db( 'events' )->get_table_name();
-			$steps_table  = get_db( 'steps' )->get_table_name();
-
-			$data = $wpdb->get_var( $wpdb->prepare(
-				"SELECT COUNT(*) FROM $events_table e 
-                        LEFT JOIN $steps_table s ON e.step_id = s.ID 
-                        WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %d OR e.event_type = %d)
-                        AND e.time >= %d AND e.time <= %d
-                        ORDER BY time DESC"
-				, 'complete', 'send_email', Event::BROADCAST, Event::EMAIL_NOTIFICATION,
-				$start, $end )
-			);
-		}
-
-		return $data;
-
+		return $report->query( $start, $end );
 	}
 }

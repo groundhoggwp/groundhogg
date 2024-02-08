@@ -12,7 +12,9 @@ use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_REST_Request;
 use WP_REST_Server;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_object_ids;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\is_template_site;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -133,6 +135,7 @@ class Funnels_Api extends Base_Object_Api {
 
 		// Search for contacts, may contain limit/offset
 		$query_vars = $request->get_param( 'query' );
+		$contact_id = $request->get_param( 'contact_id' );
 		$step_id    = absint( $request->get_param( 'step_id' ) );
 
 		$step = $step_id ? new Step( $step_id ) : new Step( $funnel->get_first_action_id() );
@@ -143,8 +146,24 @@ class Funnels_Api extends Base_Object_Api {
 			] );
 		}
 
-		// Doing it this way...
-		if ( isset( $query_vars['limit'] ) || isset( $query_vars[ 'number' ] ) ){
+		// Using the contact ID because it's only a single contact
+		if ( $contact_id ){
+
+			$contact = get_contactdata( $contact_id );
+
+			if ( ! is_a_contact( $contact ) ){
+				return self::ERROR_401( 'error', 'Given contact not found', [
+					'contact_id' => $contact_id
+				] );
+			}
+
+			$step->enqueue( $contact );
+
+			return self::SUCCESS_RESPONSE();
+		}
+
+		// Doing it with batches and limit
+		if ( isset( $query_vars['limit'] ) || isset( $query_vars['number'] ) ) {
 			$query    = new Contact_Query();
 			$contacts = $query->query( $query_vars, true );
 
@@ -158,18 +177,22 @@ class Funnels_Api extends Base_Object_Api {
 		}
 
 		// Then later
-		if ( ! $request->get_param( 'now' ) ){
+		if ( ! $request->get_param( 'now' ) ) {
 			$date = sanitize_text_field( $request->get_param( 'date' ) );
 			$time = sanitize_text_field( $request->get_param( 'time' ) );
 
 			$date = new DateTimeHelper( "$date $time", wp_timezone() );
 
-			add_filter( 'groundhogg/background_tasks/schedule_time', function ( $when ) use ( $date ){
+			add_filter( 'groundhogg/background_tasks/schedule_time', function ( $when ) use ( $date ) {
 				return $date->getTimestamp();
 			} );
 		}
 
-		Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+
+		if ( is_wp_error( $scheduled ) ){
+			return $scheduled;
+		}
 
 		return self::SUCCESS_RESPONSE();
 	}

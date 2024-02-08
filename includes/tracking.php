@@ -200,7 +200,7 @@ class Tracking {
 
 			//Decode & Decode
 			$this->map_query_var( $vars, 'target_url', 'urldecode' );
-			$this->map_query_var( $vars, 'target_url', 'base64_decode' );
+			$this->map_query_var( $vars, 'target_url', 'Groundhogg\base64url_decode' );
 		}
 
 		return $vars;
@@ -211,7 +211,7 @@ class Tracking {
 	 * @param $key
 	 * @param $func
 	 */
-	public function map_query_var( &$array, $key, $func ) {
+	public function map_query_var( &$array, $key, callable $func ) {
 		if ( ! function_exists( $func ) ) {
 			return;
 		}
@@ -386,37 +386,29 @@ class Tracking {
 	}
 
 	/**
-	 * Get the appropriate variable for get_contactdata
-	 *
-	 * @return int|string|null
-	 */
-	protected function _get_current_contact_id_or_email() {
-		$logged_in_email = function_exists( 'is_user_logged_in' ) && is_user_logged_in() ? wp_get_current_user()->user_email : null;
-		$tracked_id      = $this->get_tracking_cookie_param( 'contact_id', null );
-
-		// If both are well-defined, use based on precedence setting
-		if ( $logged_in_email && $tracked_id ) {
-			return is_ignore_user_tracking_precedence_enabled() ? $tracked_id : $logged_in_email;
-		}
-
-		// Use whichever is defined
-		return $logged_in_email ?? $tracked_id;
-	}
-
-	/**
 	 * Get the contact which is currently being tracked.
 	 *
 	 * @return Contact|false
 	 */
 	public function get_current_contact() {
 
-		$id_or_email = $this->_get_current_contact_id_or_email();
+		$user_id    = function_exists( 'is_user_logged_in' ) && is_user_logged_in() ? wp_get_current_user()->ID : null;
+		$contact_id = $this->get_tracking_cookie_param( 'contact_id', null );
 
-		if ( ! $id_or_email ) {
-			return false;
+		// If both are well-defined, use based on precedence setting
+		if ( $user_id && $contact_id ) {
+			return is_ignore_user_tracking_precedence_enabled() ? get_contactdata( $contact_id ) : get_contactdata( $user_id, true );
 		}
 
-		return get_contactdata( $id_or_email );
+		if ( $contact_id ) {
+			return get_contactdata( $contact_id );
+		}
+
+		if ( $user_id ) {
+			return get_contactdata( $user_id, true );
+		}
+
+		return false;
 	}
 
 	/**

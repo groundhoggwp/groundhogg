@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
+use Groundhogg\Background_Tasks;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
@@ -179,9 +180,9 @@ class Contacts_Api extends Base_Object_Api {
 		$default_offset      = absint( $request->get_param( 'offset' ) ) ?: 0;
 
 		$query = wp_parse_args( $query, [
-			'number'        => $default_query_limit,
-			'offset'        => $default_offset,
-			'no_found_rows' => false
+			'number'     => $default_query_limit,
+			'offset'     => $default_offset,
+			'found_rows' => true
 		] );
 
 		if ( $request->get_param( 'count' ) ) {
@@ -286,7 +287,6 @@ class Contacts_Api extends Base_Object_Api {
 				// If the current object supports meta data...
 				if ( ! empty( $meta ) && is_array( $meta ) ) {
 					$contact->update_meta( $meta );
-
 				}
 
 				$contact->apply_tag( $add_tags );
@@ -303,10 +303,20 @@ class Contacts_Api extends Base_Object_Api {
 			] );
 		}
 
+		if ( $request->has_param( 'bg' ) ) {
+
+			Background_Tasks::update_contacts( $query, [
+				'data'        => $data,
+				'meta'        => $meta,
+				'add_tags'    => $add_tags,
+				'remove_tags' => $remove_tags,
+			] );
+
+			return self::SUCCESS_RESPONSE();
+		}
+
 		$contact_query = new Contact_Query();
-
 		$contacts = $contact_query->query( $query, true );
-
 		$updated = 0;
 
 		/**
@@ -484,7 +494,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		foreach ( $add_tag_params as $add_tag_param ) {
 			if ( $request->has_param( $add_tag_param ) ) {
-				$add_tags = $request->get_param( $add_tag_param );
+				$add_tags = array_merge( $add_tags, $request->get_param( $add_tag_param ) );
 				break;
 			}
 		}
@@ -493,27 +503,33 @@ class Contacts_Api extends Base_Object_Api {
 		$meta        = $request->get_param( 'meta' );
 		$remove_tags = $request->get_param( 'remove_tags' );
 
-		// get the email address
-		$email_address = get_array_var( $data, 'email' );
-
-		// will return false if the email address is not being used
-		if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+		if ( empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ){
+			return self::ERROR_401( 'no_changes', 'No changes were made.' );
 		}
 
-		$contact->update( $data );
+		if ( ! empty( $data ) ){
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
 
-		if ( $meta ) {
+			// will return false if the email address is not being used
+			if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
+				return self::ERROR_409( 'error', 'Email address already in use.' );
+			}
+
+			$contact->update( $data );
+		}
+
+		if ( ! empty( $meta ) ) {
 			foreach ( $meta as $key => $value ) {
 				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
 		}
 
-		if ( $add_tags ) {
+		if ( ! empty( $add_tags ) ) {
 			$contact->apply_tag( $add_tags );
 		}
 
-		if ( $remove_tags ) {
+		if ( ! empty( $remove_tags ) ) {
 			$contact->remove_tag( $remove_tags );
 		}
 
@@ -554,16 +570,24 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query = wp_parse_args( $request->get_params() );
+		$query_vars = wp_parse_args( $request->get_params() );
 
-		$query = wp_parse_args( $query, [
+		$query_vars = wp_parse_args( $query_vars, [
 			'orderby'       => $this->get_primary_key(),
 			'order'         => 'ASC',
 			'number'        => 500,
 			'no_found_rows' => false,
 		] );
 
-		$query = new Contact_Query( $query );
+		// Don't bother to check if there are any matching contacts
+		// Just add the background task for deleting them
+		if ( $request->has_param( 'bg' ) ){
+			unset( $query_vars['bg']);
+			Background_Tasks::delete_contacts( $query_vars );
+			return self::SUCCESS_RESPONSE();
+		}
+
+		$query = new Contact_Query( $query_vars );
 
 		$items = $query->query( null, true );
 		$found = $query->found_items;

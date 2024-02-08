@@ -13,20 +13,33 @@
 if ( $contact->get_userdata() ):
 
 	?>
-	<ul class="info-list">
-		<li>
-			<span class="label"><?php _e( 'User ID', 'groundhogg' ) ?></span>
-			<span class="data">
-			        <a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo '#' . $contact->get_user_id(); ?></a>
-		        </span>
-		</li>
-		<li>
-			<span class="label"><?php _e( 'Username', 'groundhogg' ) ?></span>
-			<span class="data">
-			        <a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo $contact->get_userdata()->user_login; ?></a>
-		        </span>
-		</li>
-	</ul>
+<table>
+    <tr>
+        <th><?php _e( 'User ID', 'groundhogg' ) ?></th>
+        <td><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo '#' . $contact->get_user_id(); ?></a></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Username', 'groundhogg' ) ?></th>
+        <td><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo $contact->get_userdata()->user_login; ?></a></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Email', 'groundhogg' ) ?></th>
+        <td><?php esc_attr_e( $contact->user->user_email ); ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Display Name', 'groundhogg' ) ?></th>
+        <td><?php esc_attr_e( $contact->user->display_name ); ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Roles', 'groundhogg' ) ?></th>
+        <td><?php esc_html_e( \Groundhogg\andList( array_map( '\Groundhogg\get_role_display_name', $contact->user->roles ) ) ) ?></td>
+    </tr>
+</table>
+    <?php if ( ! \Groundhogg\contact_and_user_match( $contact, $contact->user ) ): ?>
+        <p><?php echo \Groundhogg\html()->e( 'a', [
+                'href' => \Groundhogg\action_url( 'unlink_user', [ 'contact' => $contact->get_id() ] )
+            ], __( 'Unlink this user', 'groundhogg' ) ) ?></p>
+    <?php endif; ?>
 <?php else: ?>
 	<p><?php _e( 'This contact does not have a WordPress user account.', 'groundhogg' ); ?></p>
 	<form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">

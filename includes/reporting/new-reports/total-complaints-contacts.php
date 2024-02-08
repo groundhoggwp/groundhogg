@@ -3,11 +3,9 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
-use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\Ymd_His;
 
 class Total_Complaints_Contacts extends Base_Negative_Quick_Stat {
 
@@ -19,8 +17,8 @@ class Total_Complaints_Contacts extends Base_Negative_Quick_Stat {
 						'type'       => 'optin_status_changed',
 						'value'      => [ Preferences::COMPLAINED ],
 						'date_range' => 'between',
-						'before'     => Ymd_His( $this->end ),
-						'after'      => Ymd_His( $this->start )
+						'before' => $this->endDate->ymd(),
+						'after'  => $this->startDate->ymd()
 					]
 				]
 			] )
@@ -37,20 +35,15 @@ class Total_Complaints_Contacts extends Base_Negative_Quick_Stat {
 	 */
 	protected function query( $start, $end ) {
 
-		$query = new Contact_Query();
-
-		$query->set_date_key( 'date_optin_status_changed' );
-
-		$start = Plugin::instance()->utils->date_time->convert_to_local_time( $start );
-		$end   = Plugin::instance()->utils->date_time->convert_to_local_time( $end );
-
-		return $query->query( [
-			'count'        => true,
+		$query = new Contact_Query( [
 			'optin_status' => Preferences::COMPLAINED,
 			'date_query'   => [
-				'after'  => date( 'Y-m-d H:i:s', $start ),
-				'before' => date( 'Y-m-d H:i:s', $end ),
+				'date_key' => 'date_optin_status_changed',
+				'after'    => $start,
+				'before'   => $end,
 			]
 		] );
+
+		return $query->count();
 	}
 }

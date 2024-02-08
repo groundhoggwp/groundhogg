@@ -12,6 +12,7 @@ use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
+use function Groundhogg\contact_and_user_match;
 use function Groundhogg\do_replacements;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\generate_contact_with_map;
@@ -670,6 +671,31 @@ class Contacts_Page extends Admin_Page {
 
 		return true;
 	}
+
+	/**
+     * Unlink a user from the contact record but only if they don't match
+     *
+	 * @return true
+	 */
+    public function process_unlink_user(){
+
+	    if ( ! current_user_can( 'edit_users' ) ) {
+		    $this->wp_die_no_access();
+	    }
+
+	    $contact = new Contact( get_url_var( 'contact' ) );
+
+        if ( ! $contact->user_id || contact_and_user_match( $contact, $contact->user ) ){
+            return $contact->admin_link();
+        }
+
+        // Set the user_id to 0
+        $contact->update( [ 'user_id' => 0 ] );
+
+        $this->add_notice( 'success', 'User unlinked!' );
+
+        return $contact->admin_link();
+    }
 
 	/**
 	 * Delete a bunch of contacts

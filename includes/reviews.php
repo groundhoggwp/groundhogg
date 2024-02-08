@@ -19,19 +19,27 @@ class Reviews {
 
 		$message = sprintf(
 			esc_html__( 'Is Groundhogg working for you? Show your appreciation by leaving a %1$s review! %2$s | %3$s | %4$s', 'groundhogg' ),
+
+            // Stars
 			'&#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;',
+
+            // Leave a review
 			html()->e( 'a', [
 				'class' => '',
 				'style' => [ 'color' => 'green' ],
 				'href' => 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post',
 				'target' => '_blank'
 			], __( 'I\'ll leave a review!', 'groundhogg' ) ),
+
+            // Don't want to leave a review
 			html()->e( 'a', [
 				'class' => 'notice-dismiss-link',
 				'style' => [ 'color' => '#a00' ],
 				'href'  => '#'
 			], __( 'I don\'t want to', 'groundhogg' ) ),
-			html()->e( 'a', [
+
+            // already reviewed
+            html()->e( 'a', [
 				'class' => 'notice-dismiss-link permanent',
 				'style' => [ 'color' => '' ],
 				'href'  => '#'

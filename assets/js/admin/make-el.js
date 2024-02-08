@@ -1,10 +1,33 @@
 ( ($) => {
 
-  const { clickedIn, isString, setFrameContent } = Groundhogg.element
+  const clickedIn = (e, selector) => {
+    var el = e.tagName ? e : e.srcElement || e.target
+
+    if (el && el.matches(selector)) {
+      return el
+    }
+    else {
+      while (el = el.parentNode) {
+        if (typeof el.matches !== 'undefined' && el.matches(selector)) {
+          return el
+        }
+      }
+    }
+
+    return false
+  }
+
+  function isString (string) {
+    return typeof string === 'string'
+  }
+
+  function isNumeric (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n)
+  }
 
   const AttributeHandlers = {
     required: (el, value) => {
-      el.require = value
+      el.required = value
     },
     autofocus: (el, value) => {
       el.autofocus = value
@@ -232,8 +255,8 @@
     })
   }
 
-  const Fragment = (children) => {
-    return makeEl('fragment', {}, children)
+  const Fragment = (children, atts = {}) => {
+    return makeEl('fragment', atts, children)
   }
 
   const Span = (attributes = {}, children = []) => {
@@ -355,6 +378,9 @@
   }
 
   const Table = (atts, children) => makeEl('table', atts, children)
+  const THead = (atts, children) => makeEl('thead', atts, children)
+  const TBody = (atts, children) => makeEl('tbody', atts, children)
+  const TFoot = (atts, children) => makeEl('tfoot', atts, children)
   const Tr = (atts, children) => makeEl('tr', atts, children)
   const Td = (atts, children) => makeEl('td', atts, children)
   const Th = (atts, children) => makeEl('th', atts, children)
@@ -613,7 +639,7 @@
     const State = {
       pointer: 0,
       results: [],
-      input: null
+      input: null,
     }
 
     const setValue = () => {
@@ -621,33 +647,34 @@
       let item = State.results[State.pointer]
 
       State.input.value = item.id
-      State.input.dispatchEvent( new Event('change') )
+      State.input.dispatchEvent(new Event('change'))
 
       closeResults()
     }
 
     const updateResults = () => {
 
-      if ( ! State.results.length ){
+      if (!State.results.length) {
         closeResults()
         return
       }
 
-      let resultsContainer = document.querySelector( '.gh-autocomplete-results' )
+      let resultsContainer = document.querySelector('.gh-autocomplete-results')
       let newResults = Results()
 
-      if ( ! resultsContainer ){
-        document.body.appendChild( newResults )
-      } else {
-        morphdom( resultsContainer, newResults )
+      if (!resultsContainer) {
+        document.body.appendChild(newResults)
+      }
+      else {
+        morphdom(resultsContainer, newResults)
       }
 
     }
 
     const closeResults = () => {
-      let resultsContainer = document.querySelector( '.gh-autocomplete-results' )
+      let resultsContainer = document.querySelector('.gh-autocomplete-results')
 
-      if ( resultsContainer ){
+      if (resultsContainer) {
         resultsContainer.remove()
       }
     }
@@ -661,12 +688,13 @@
       return Div({
         className: 'gh-autocomplete-results',
         style: {
+          zIndex: 999999,
           top: `${ top + height }px`,
           left: `${ left }px`,
           width: `${ width }px`,
         },
-      }, results.map(({ id, text }, index ) => makeEl('a', {
-        className: `${index === State.pointer ? 'pointer' : ''}`,
+      }, results.map(({ id, text }, index) => makeEl('a', {
+        className: `${ index === State.pointer ? 'pointer' : '' }`,
         href: id,
         onClick: e => {
           e.preventDefault()
@@ -675,7 +703,7 @@
         onMouseenter: e => {
           State.pointer = [...e.target.parentNode.children].indexOf(e.target)
           updateResults()
-        }
+        },
       }, text)))
     }
 
@@ -683,9 +711,9 @@
       ...attributes,
       onFocusout: e => {
         const input = e.target
-        input.classList.remove( 'has-results' )
+        input.classList.remove('has-results')
 
-        if ( e.relatedTarget && clickedIn( e.relatedTarget, 'a.pointer' ) ){
+        if (e.relatedTarget && clickedIn(e.relatedTarget, 'a.pointer')) {
           setValue()
         }
 
@@ -705,7 +733,7 @@
           case 'ArrowDown':
             e.preventDefault()
 
-            if ( State.pointer < State.results.length ){
+            if (State.pointer < State.results.length) {
               State.pointer++
             }
 
@@ -714,7 +742,7 @@
           case 'ArrowUp':
             e.preventDefault()
 
-            if ( State.pointer > 0 ){
+            if (State.pointer > 0) {
               State.pointer--
             }
 
@@ -733,11 +761,11 @@
       },
       onInput: e => {
 
-        if ( timeout ){
-          clearTimeout( timeout )
+        if (timeout) {
+          clearTimeout(timeout)
         }
 
-        timeout = setTimeout( async () => {
+        timeout = setTimeout(async () => {
           const input = e.target
 
           let search = input.value
@@ -748,12 +776,36 @@
 
           updateResults()
 
-          input.classList.add( 'gh-autocomplete', 'has-results' )
-        }, 500 )
+          input.classList.add('gh-autocomplete', 'has-results')
+        }, 500)
       },
     })
-
   }
+
+  const Ellipses = ( content, atts = {} ) => Span({
+    ...atts,
+    onCreate: el => {
+
+      let ellipses = ''
+      let count = 0
+
+      let interval = setInterval(() => {
+
+        // parentNode will be null once removed from the dom
+        if (!el.parentNode) {
+          clearInterval(interval)
+          return
+        }
+
+        count = ( count + 1 ) % 4
+        ellipses = '.'.repeat(count)
+        el.textContent = content + ellipses
+
+      }, 500)
+
+    },
+  }, content + '...' )
+
 
   const ItemPicker = ({
     id = '',
@@ -767,18 +819,27 @@
     createOption = val => Promise.resolve({ id: val, text: val }),
     tags = false,
     noneSelected = 'Any',
-    isValidSelection = () => true,
+    // Any none empty value
+    isValidSelection = string => Boolean(string),
     multiple = true,
     clearable = true,
     ...attributes
   }) => {
 
-    let state = {
+    const state = Groundhogg.createState({
       search: '',
       searching: false,
-      chose: false,
+      choosing: false,
       options: [],
-      // isFocused: false,
+      focused: false,
+      morphing: false,
+      clicked: false,
+    })
+
+    const optionsVisible = () => {
+      return multiple
+        ? state.focused && ( state.searching || state.options.length || ( tags && isValidSelection(state.search) ) )
+        : state.focused
     }
 
     // ensure array
@@ -787,14 +848,13 @@
     }
 
     let timeout
-    let isMorphing = false
 
     const setState = (newState, trigger) => {
-      state = {
-        ...state,
-        ...newState,
-      }
-
+      state.set(newState)
+      // console.log({
+      //   state: state.get(),
+      //   trigger,
+      // })
       morph()
     }
 
@@ -803,6 +863,10 @@
      * @param selected
      */
     const handleOnChange = selected => {
+
+      if (timeout) {
+        clearTimeout(timeout)
+      }
 
       if (multiple) {
         onChange(selected)
@@ -818,13 +882,20 @@
     }
 
     const morph = () => {
-      if (isMorphing) {
+
+      if (state.morphing) {
         return
       }
 
-      isMorphing = true
+      state.set({
+        morphing: true,
+      })
+
       morphdom(document.getElementById(id), Render())
-      isMorphing = false
+
+      state.set({
+        morphing: false,
+      })
     }
 
     const focusSearch = () => document.getElementById(id)?.querySelector(`input[type=search]`)?.focus()
@@ -840,7 +911,7 @@
      *
      * @param id
      */
-    const handleSelectOption = (id) => {
+    const handleSelectOption = async (id) => {
 
       let option = { ...state.options.find(opt => opt.id == id) }
 
@@ -855,33 +926,29 @@
         selected = [option]
       }
 
-      focusPicker()
-
-      setState({
-        options: [],
-        search: '',
-        searching: false,
-        chose: true,
-      }, 'select option')
-
-      setTimeout(() => {
-        setState({ chose: false }, 'clear chose')
-      }, 1)
-
       if (option.create) {
-        createOption(option.id).then(opt => {
+        await createOption(option.id).then(opt => {
           // Replace created with new option
           selected = selected.map(item => item.id == id ? opt : item)
-          // The do select actions
-          setState({}, 'option created')
-          onSelect(opt)
-          handleOnChange(selected)
+          option = opt
         })
       }
-      else {
-        onSelect(option)
-        handleOnChange(selected)
+
+      onSelect(option)
+      handleOnChange(selected)
+
+      if ( ! multiple ){
+        state.set({
+          focused: false
+        })
       }
+
+      morph()
+
+      if ( multiple ){
+        focusSearch()
+      }
+
     }
 
     /**
@@ -890,13 +957,26 @@
      * @param id
      */
     const handleUnselectOption = (id) => {
+
       let opt = selected.find(opt => opt.id === id)
       selected = selected.filter(opt => opt.id != id)
       onUnselect(opt)
       handleOnChange(selected)
       morph()
+
+      if ( multiple ){
+        focusSearch()
+      }
     }
 
+    /**
+     * Item picker item, what shows in the picker
+     *
+     * @param id
+     * @param text
+     * @param index
+     * @returns {*}
+     */
     const itemPickerItem = ({ id, text }, index) => {
       return Div({
         className: `gh-picker-item ${ isValidSelection(id) ? '' : 'is-invalid' }`,
@@ -910,14 +990,19 @@
           dataId: id,
           onClick: e => {
             handleUnselectOption(id)
-            if (multiple) {
-              focusSearch()
-            }
           },
         }, '&times;') : null,
       ])
     }
 
+    /**
+     * The items for the actual dropdown
+     *
+     * @param id
+     * @param text
+     * @param index
+     * @returns {*}
+     */
     const itemPickerOption = ({ id, text }, index) => {
       return Div({
         className: 'gh-picker-option',
@@ -926,11 +1011,15 @@
         id: `option-${ index }-${ id }`,
         onClick: e => {
           handleSelectOption(id)
-          focusSearch()
         },
       }, text)
     }
 
+    /**
+     * The item picker options
+     *
+     * @returns {*}
+     */
     const itemPickerOptions = () => {
 
       let picker = document.getElementById(id)
@@ -951,11 +1040,19 @@
         style.maxHeight = ( window.innerHeight - bottom ) + 'px'
       }
 
-      if (tags && isValidSelection(state.search)) {
-        // Remove other createable options
-        state.options = state.options.filter(opt => !opt.create)
-        state.options.unshift({ id: state.search, text: `Add "${ state.search }"`, create: true })
+      // Remove createable options
+      state.options = state.options.filter(opt => !opt.create)
+
+      // Only show create option after search is complete
+      if (!state.searching && tags && isValidSelection(state.search)) {
+        // Only show create if there is not a similar option already
+        if (!state.options.find(opt => opt.id == state.search || opt.text == state.search)) {
+          state.options.unshift({ id: state.search, text: `Add "${ state.search }"`, create: true })
+        }
       }
+
+      // Filter out already selected options
+      let options = state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id))
 
       return Div({
         className: 'gh-picker-options',
@@ -986,18 +1083,25 @@
           }, 0)
         },
       }, [
+        // Search input
         multiple || !selected.length ? null : SearchInput(),
-        state.searching ? Div({
-          className: 'gh-picker-no-options',
-        }, 'Searching...') : null,
-        ...state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id)).
-          map((opt, i) => itemPickerOption(opt, i)),
-        state.options.length || state.searching ? null : Div({
-          className: 'gh-picker-no-options',
-        }, 'No results found.'),
+
+        // "Searching..."
+        state.searching ? Div({ className: 'gh-picker-no-options' }, Ellipses( wp.i18n.__('Searching') ) ) : null,
+
+        // The actual options
+        ...options.map((opt, i) => itemPickerOption(opt, i)),
+
+        // If there are no options
+        options.length || state.searching ? null : Div({ className: 'gh-picker-no-options' }, 'No results found.'),
       ])
     }
 
+    /**
+     * Start searching for options
+     *
+     * @param search
+     */
     const startSearch = search => {
 
       setState({
@@ -1010,8 +1114,13 @@
       }
 
       timeout = setTimeout(() => {
-        fetchOptions(state.search).then(options => {
-          // console.log( options )
+        fetchOptions(search).then(options => {
+
+          // Search may have changed since then...
+          if (search !== state.search) {
+            return
+          }
+
           setState({
             searching: false,
             options,
@@ -1020,24 +1129,23 @@
       }, 500)
     }
 
+    /**
+     * The search input
+     *
+     * @returns {*}
+     * @constructor
+     */
     const SearchInput = () => Input({
       className: 'gh-picker-search',
       value: state.search,
       name: 'search',
       type: 'search',
       autocomplete: 'off',
+      id: `${id}-search-input`,
       // autofocus: true,
       placeholder: selected.length ? placeholder : noneSelected,
-      onInput: e => {
-
-        if (!e.target.value && multiple) {
-          setState({
-            search: '',
-            searching: false,
-          }, 'search input')
-          return
-        }
-
+      onInput: e => startSearch(e.target.value),
+      onFocus: e => {
         startSearch(e.target.value)
       },
       onKeydown: e => {
@@ -1051,29 +1159,45 @@
       },
     })
 
+    /**
+     * Render the input picker
+     *
+     * @returns {*}
+     * @constructor
+     */
     const Render = () => Div({
       id,
-      className: `gh-picker ${ state.searching || state.options.length || state.search ? 'options-visible' : '' }`,
+      className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
       tabindex: '0',
-      onFocusout: e => {
+      onCreate: el => {
+        el.addEventListener('focusout', e => {
 
-        if (e.relatedTarget && clickedIn(e.relatedTarget, `.gh-picker#${ id }`)) {
-          return
-        }
+          setTimeout( () => {
 
-        setState({
-          search: '',
-          options: [],
-          searching: false,
-        }, 'picker focus out')
-      },
-      onClick: e => {
+            if ( state.morphing || document.getElementById(id).contains( document.activeElement ) ){
+              return
+            }
 
-        if (state.searching || multiple || state.chose || clickedIn(e, '.gh-picker-item-delete')) {
-          return
-        }
+            setState({
+              search: '',
+              options: [],
+              searching: false,
+              focused: false,
+            }, 'picker focusout')
 
-        startSearch('')
+          }, 10 )
+        })
+
+        el.addEventListener('focusin', e => {
+
+          if ( state.focused ){
+            return
+          }
+
+          setState({
+            focused: true,
+          }, 'picker focused')
+        })
       },
       ...attributes,
     }, [
@@ -1083,14 +1207,30 @@
         ...selected.map((item, i) => itemPickerItem(item, i)),
         multiple || !selected.length ? SearchInput() : null,
       ]),
-      state.searching || state.options.length || state.search ? itemPickerOptions() : null,
+      optionsVisible() ? itemPickerOptions() : null,
     ])
 
     return Render()
   }
 
+  /**
+   * And input group
+   *
+   * @param inputs
+   * @returns {*}
+   * @constructor
+   */
   const InputGroup = inputs => Div({ className: 'gh-input-group' }, inputs)
 
+  /**
+   * IFrame, useful for email previews
+   *
+   * @param onCreate
+   * @param attributes
+   * @param content
+   * @returns {*}
+   * @constructor
+   */
   const Iframe = ({ onCreate = () => {}, ...attributes }, content = null) => {
 
     let blob = new Blob([content], { type: 'text/html; charset=utf-8' })
@@ -1127,25 +1267,26 @@
 
   const ProgressBar = ({
     percent = 100,
-    error = false
+    error = false,
   }) => {
 
     return Div({
-      className: `gh-progress-bar ${error ? 'error' : ''}`
+      className: `gh-progress-bar ${ error ? 'error' : '' }`,
     }, Div({
       className: 'gh-progress-bar-fill',
       style: {
-        width: `${percent}%`
-      }
+        width: `${ percent }%`,
+      },
     }, Span({
-      className: 'fill-amount'
-    }, `${Math.ceil( percent )}%` )))
+      className: 'fill-amount',
+    }, `${ Math.ceil(percent) }%`)))
 
   }
 
   window.MakeEl = {
     InputGroup,
     makeEl,
+    Ellipses,
     Input,
     InputWithReplacements,
     Textarea,
@@ -1159,6 +1300,9 @@
     InputRepeater,
     Fragment,
     Table,
+    TBody,
+    THead,
+    TFoot,
     Tr,
     Td,
     Th,
@@ -1171,6 +1315,6 @@
     Dashicon,
     ButtonToggle,
     Autocomplete,
-    ProgressBar
+    ProgressBar,
   }
-} )(jQuery)
+} )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

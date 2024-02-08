@@ -16,7 +16,7 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 			],
 			'orderby' => 'date_created',
 			'order'   => 'ASC',
-			'select'  => "count(ID) y, DATE(date_created) t, CONCAT( DATE_FORMAT(date_created, '%b %e, %Y'), ': ', count(ID) ) label",
+			'select'  => "COUNT(ID) y, DATE(date_created) t, CONCAT( DATE_FORMAT(date_created, '%b %e, %Y'), ': ', count(ID) ) label",
 			'groupby' => 't'
 		] );
 

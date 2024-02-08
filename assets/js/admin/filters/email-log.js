@@ -1,7 +1,6 @@
 ( () => {
 
   if (!window.GroundhoggTableFilters) {
-    console.log('here')
     return
   }
 

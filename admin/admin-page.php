@@ -7,6 +7,7 @@ use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\base64_json_encode;
+use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -276,7 +277,7 @@ abstract class Admin_Page extends Supports_Errors {
 			return false;
 		}
 
-		return is_array( $items ) ? $items : array( $items );
+		return ensure_array( $items );
 	}
 
 	/**
@@ -381,7 +382,11 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @param        $title
 	 * @param string $name
 	 */
-	protected function search_form( $title, $name = 's' ) {
+	protected function search_form( $title = false, $name = 's' ) {
+
+        if ( $title === false ){
+            $title = sprintf( __( 'Search %s', 'groundhogg' ), $this->get_name() );
+        }
 
 		if ( method_exists( $this, 'get_current_tab' ) ) {
 			?>
@@ -391,7 +396,14 @@ abstract class Admin_Page extends Supports_Errors {
 		?>
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
-            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+
+	        <?php if ( ! get_url_var( 'include_filters' ) && $this->has_table_filters ):
+		        echo html()->input( [
+			        'type' => 'hidden',
+			        'name' => 'include_filters'
+		        ] );
+	        endif; ?>
+
             <label class="screen-reader-text" for="gh-post-search-input"><?php echo $title; ?>:</label>
 
             <div style="float: right" class="gh-input-group">
@@ -423,7 +435,17 @@ abstract class Admin_Page extends Supports_Errors {
 		<?php
 	}
 
+	/**
+     * Whether this page has table filters
+     *
+	 * @var bool
+	 */
+    protected $has_table_filters = false;
+
     protected function table_filters(){
+
+        $this->has_table_filters = true;
+
         ?>
         <div class="wp-clearfix"></div>
         <div id="table-filters"></div>
@@ -432,14 +454,19 @@ abstract class Admin_Page extends Supports_Errors {
 
 	protected function enqueue_table_filters( $columns = [] ) {
 
+		$this->has_table_filters = true;
+
+		$filters = get_url_var( 'include_filters', base64_json_encode( [] ) );
+		$filters = base64_json_decode( $filters );
+
 		wp_enqueue_style( 'groundhogg-admin-search-filters' );
 
 		wp_enqueue_script( 'groundhogg-admin-filters' );
 
 		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( [
 				'id'      => 'table-filters',
-				'name'    => $this->get_title(),
-				'filters' => base64_json_decode( get_url_var( 'include_filters', base64_json_encode( [] ) ) ),
+				'name'    => $this->get_name(),
+				'filters' => $filters,
 			], $columns ) ), 'before' );
 
 	}

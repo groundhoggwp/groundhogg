@@ -87,13 +87,11 @@ class Apply_Tag extends Action {
 
 		echo html()->e( 'p', [], __( 'Apply all of the following tags...', 'groundhogg' ) );
 
-		echo html()->tag_picker( [
-			'name'     => $this->setting_name_prefix( 'tags' ) . '[]',
-			'multiple' => true,
-			'selected' => $this->get_setting( 'tags' )
+		echo html()->dropdown( [
+			'id' => $this->setting_id_prefix( 'tags' )
 		] );
 
-		echo html()->e( 'p', [], __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ) );
+		echo html()->e( 'p' );
 	}
 
 	/**
@@ -102,8 +100,7 @@ class Apply_Tag extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$tags = validate_tags( $this->get_posted_data( 'tags', [] ) );
-		$this->save_setting( 'tags', $tags );
+
 	}
 
 	public function generate_step_title( $step ) {

@@ -6,16 +6,16 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
-use Groundhogg\Plugin;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\convert_to_local_time;
+use function Groundhogg\format_number_with_percentage;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
 
 class Table_Broadcast_Stats extends Base_Table_Report {
@@ -53,6 +53,14 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 
 		$stats = $broadcast->get_report_data();
 
+		[
+			'sent'         => $sent,
+			'clicked'      => $clicked,
+			'opened'       => $opened,
+			'unsubscribed' => $unsubscribed
+		] = $stats;
+
+
 		$title  = $broadcast->is_email() ? $broadcast->get_object()->get_subject_line() : $broadcast->get_title();
 		$object = $broadcast->get_object();
 
@@ -68,66 +76,45 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				] ) : $title
 			],
 			[
-				'label' => __( 'Sent', 'groundhogg' ),
+				'label' => __( 'Date', 'groundhogg' ),
 				'data'  => date_i18n( get_date_time_format(), convert_to_local_time( $broadcast->get_send_time() ) ),
 			],
 			[
-				'label' => __( 'Total Delivered', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['sent'] ), 'a', [
-					'href'  => add_query_arg(
+				'label' => __( 'Sent', 'groundhogg' ),
+				'data'  => contact_filters_link( _nf( $sent ), [
+					[
 						[
-							'report' => [
-								'type'   => Event::BROADCAST,
-								'step'   => $broadcast->get_id(),
-								'status' => Event::COMPLETE
-							]
-						],
-						admin_page_url( 'gh_contacts' )
-					),
-					'class' => 'number-total'
-				] )
+							'type'         => 'broadcast_received',
+							'broadcast_id' => $broadcast->ID,
+						]
+					]
+				], $sent )
 			],
 			$broadcast->is_sms() ? false : [
 				'label' => __( 'Opens', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['opened'] ) . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'data'  => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_OPENED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+							'type'         => 'broadcast_opened',
+							'broadcast_id' => $broadcast->ID,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
+						]
+					]
+				], $opened )
 			],
 			[
-				'label' => __( 'Total Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['all_clicks'] ), 'span', [
-					'class' => 'number-total'
-				] )
-			],
-			[
-				'label' => __( 'Unique Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['clicked'] ) . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'label' => __( 'Clicks', 'groundhogg' ),
+				'data'  => contact_filters_link( format_number_with_percentage( $clicked, $broadcast->is_email() ? $opened : $sent ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => $broadcast->is_sms() ? Activity::SMS_CLICKED : Activity::EMAIL_CLICKED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
-			],
-			[
-				'label' => __( 'Click Thru Rate', 'groundhogg' ),
-				'data'  => percentage( $stats[ $broadcast->is_sms() ? 'sent' : 'opened'], $stats['clicked'] ) . '%'
+							'type'         => 'broadcast_link_clicked',
+							'broadcast_id' => $broadcast->ID,
+							'count'         => 1,
+							'count_compare' => 'greater_than_or_equal_to',
+						]
+					]
+				], $clicked )
 			],
 			$broadcast->is_sms() ? false : [
 				'label' => __( 'Unopened', 'groundhogg' ),
@@ -135,19 +122,15 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Unsubscribed', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['unsubscribed'] ) . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
+				'data' => contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
+					[
 						[
-							'activity' => [
-								'activity_type' => Activity::UNSUBSCRIBED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+							'type'       => 'unsubscribed',
+							'funnel_id'  => Broadcast::FUNNEL_ID,
+							'step_id'    => $broadcast->ID,
+						]
+					]
+				], $unsubscribed ),
 			],
 
 		];

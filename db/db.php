@@ -4,6 +4,10 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\DB\Query\FilterException;
+use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\DB\Query\Where;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
@@ -330,7 +334,7 @@ abstract class DB {
 		return [];
 	}
 
-	public function has_column( $column ) {
+	public function has_column( string $column ) {
 		return array_key_exists( $column, $this->get_columns() );
 	}
 
@@ -657,7 +661,7 @@ abstract class DB {
 			return;
 		}
 
-		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group(), MINUTE_IN_SECONDS );
+		wp_cache_set_last_changed( $this->get_cache_group() );
 	}
 
 	/**
@@ -680,18 +684,7 @@ abstract class DB {
 			}
 		}
 
-		if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-			return wp_cache_get_last_changed( $this->get_cache_group() );
-		}
-
-		$last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
-
-		if ( ! $last_changed ) {
-			$last_changed = microtime();
-			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group(), MINUTE_IN_SECONDS );
-		}
-
-		return $last_changed;
+		return wp_cache_get_last_changed( $this->get_cache_group() );
 	}
 
 	/**
@@ -774,7 +767,12 @@ abstract class DB {
 	 * Clears the cache group
 	 */
 	public function clear_cache() {
-		unset( self::$cache[ $this->get_cache_group() ] );
+
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+			unset( self::$cache[ $this->get_cache_group() ] );
+		} else {
+			wp_cache_flush_group( $this->get_cache_group() );
+		}
 	}
 
 	/**
@@ -1141,16 +1139,17 @@ abstract class DB {
 	}
 
 	/**
-	 * @var Query_Filters
+	 * @var Filters
 	 */
 	protected $query_filters;
 
 	protected function maybe_register_filters() {
+
 		if ( $this->query_filters ) {
 			return;
 		}
 
-		$filters = new Query_Filters();
+		$filters = new Filters();
 
 		foreach ( $this->get_columns() as $column => $format ) {
 
@@ -1159,15 +1158,15 @@ abstract class DB {
 
 					if ( str_starts_with( $column, 'date' ) ) {
 
-						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
-							Query_Filters::mysqlDate( $column, $filter, $where );
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+							Filters::mysqlDateTime( $column, $filter, $where );
 						} );
 
 						break;
 					}
 
-					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
-						Query_Filters::string( $column, $filter, $where );
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+						Filters::string( $column, $filter, $where );
 					} );
 
 					break;
@@ -1175,34 +1174,63 @@ abstract class DB {
 
 					if ( in_array( $column, [ 'time', 'timestamp', 'time_scheduled' ] ) ) {
 
-						$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
-							Query_Filters::timestamp( $column, $filter, $where );
+						$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+							Filters::timestamp( $column, $filter, $where );
 						} );
 
 						break;
 					}
 
-					$filters->register_filter( $column, function ( $filter, $where ) use ( $column ) {
-						Query_Filters::number( $column, $filter, $where );
+					$filters->register( $column, function ( $filter, $where ) use ( $column ) {
+						Filters::number( $column, $filter, $where );
 					} );
 					break;
 			}
 
 		}
 
+		// Campaigns filter
+		$filters->register( 'campaigns', function ( $filter, Where $where ) {
+
+			$filter = wp_parse_args( $filter, [
+				'campaigns' => [],
+			] );
+
+			$campaigns = wp_parse_id_list( $filter['campaigns'] );
+
+			foreach ( $campaigns as $campaign ) {
+
+				$join = $where->query->addJoin( 'LEFT', [ get_db( 'object_relationships' )->table_name, 'campaign_' . $campaign ] );
+				$join->onColumn( 'primary_object_id' )
+				     ->equals( "$join->alias.primary_object_type", $this->get_object_type() )
+				     ->equals( "$join->alias.secondary_object_type", 'campaign' )
+				     ->equals( "$join->alias.secondary_object_id", $campaign );
+
+				$where->equals( "$join->alias.secondary_object_id", $campaign );
+			}
+
+			$where->query->setGroupby( 'ID' );
+		} );
+
 		$this->query_filters = $filters;
 	}
 
 	/**
-	 * @param array        $data
+	 * @var Table_Query
+	 */
+	protected $current_query;
+
+	/**
+	 * @throws FilterException
+	 *
 	 * @param string|false $ORDER_BY
 	 * @param bool         $from_cache
+	 *
+	 * @param array        $data
 	 *
 	 * @return array|bool|null|object
 	 */
 	public function query( $query_vars = [], $ORDER_BY = '', $from_cache = true ) {
-
-		global $wpdb;
 
 		if ( $ORDER_BY ) {
 			$query_vars['orderby'] = $ORDER_BY;
@@ -1212,25 +1240,26 @@ abstract class DB {
 			'operation'      => 'SELECT',
 			'data'           => [],
 			'where'          => [],
-			'limit'          => false,
-			'offset'         => false,
+//			'limit'          => false,
+//			'offset'         => false,
 			'orderby'        => $this->get_primary_key(),
 			'search_columns' => $this->get_searchable_columns(),
 			'order'          => 'desc', // ASC || DESC
-			'select'         => '*',
-			'search'         => false,
-			'func'           => false, // COUNT | AVG | SUM
-			'groupby'        => false,
-			'meta_query'     => [],
+//			'select'         => '*',
+//			'search'         => false,
+//			'func'           => false, // COUNT | AVG | SUM
+//			'groupby'        => false,
+//			'meta_query'     => [],
 			'found_rows'     => false,
 		] );
 
 		$operation = $query_vars['operation'];
 
-		$query = new Query( $this );
+		$query = new Table_Query( $this );
+		$this->current_query = $query;
 
 		$moreWhere = [];
-		$searched = false;
+		$searched  = false;
 
 		// Parse data and turn into an advanced query search instead
 		foreach ( $query_vars as $key => $val ) {
@@ -1241,27 +1270,28 @@ abstract class DB {
 
 			switch ( strtolower( $key ) ) {
 				case 'select':
-					if ( is_array( $val ) ){
-						$query->select( ...$val );
-					} else {
-						$query->select( $val );
+
+					if ( ! is_array( $val ) ) {
+						$val = array_map( 'trim', explode( ',', $val ) );
 					}
+
+					$query->setSelect( ...$val );
 					break;
 				case 'func':
-					$func      = strtoupper( $val );
+					$func = strtoupper( $val );
 
-					if ( $func === 'COUNT' ){
+					if ( $func === 'COUNT' ) {
 						$operation = 'COUNT';
 						break;
 					}
 
 					$operation = 'VAR';
 					$select    = "{$func}({$query_vars['select']})";
-					$query->select( $select );
+					$query->setSelect( $select );
 					break;
 				case 'distinct':
-					if ( $query_vars['select'] !== '*' ){
-						$query->select( "DISTINCT {$query_vars['select']}" );
+					if ( $query_vars['select'] !== '*' ) {
+						$query->setSelect( "DISTINCT {$query_vars['select']}" );
 					}
 					break;
 				case 'where':
@@ -1270,7 +1300,7 @@ abstract class DB {
 				case 's':
 				case 'search':
 				case 'term':
-					if ( $searched ){
+					if ( $searched ) {
 						break;
 					}
 					$query->search( $val, wp_parse_list( $query_vars['search_columns'] ) );
@@ -1290,11 +1320,12 @@ abstract class DB {
 					break;
 				case 'related' :
 
-					$alias = $query->leftJoin( get_db('object_relationships' ), 'primary_object_id' );
+					$join = $query->addJoin( 'LEFT', 'object_relationships' );
+					$join->onColumn( 'primary_object_id' );
 
-					$query->where( "$alias.secondary_object_id", $val['ID'] );
-					$query->where( "$alias.secondary_object_type", $val['type'] );
-					$query->where( "$alias.primary_object_type", $this->get_object_type() );
+					$query->where( "$join->alias.secondary_object_id", $val['ID'] );
+					$query->where( "$join->alias.secondary_object_type", $val['type'] );
+					$query->where( "$join->alias.primary_object_type", $this->get_object_type() );
 
 					break;
 				case 'count':
@@ -1302,7 +1333,7 @@ abstract class DB {
 					break;
 				case 'limit':
 
-					if ( is_array( $val ) ){
+					if ( is_array( $val ) ) {
 						$query->setLimit( ...$val );
 					} else {
 						$query->setLimit( $val );
@@ -1324,16 +1355,17 @@ abstract class DB {
 				case 'group_by':
 					$query->setGroupby( $val );
 					break;
+				case 'filters':
 				case 'include_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query );
+					$this->query_filters->parse_filters( $val, $query->where() );
 
 					break;
 				case 'exclude_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query, true );
+					$this->query_filters->parse_filters( $val, $query->where(), true );
 
 					break;
 				case 'found_rows':
@@ -1350,7 +1382,7 @@ abstract class DB {
 
 						[ 'key' => $key, 'value' => $value, 'compare' => $compare ] = $meta_query;
 
-						$alias = $query->joinMeta();
+						$alias = $query->joinMeta( $key );
 
 						$query->where( "$alias.meta_key", $key );
 						$query->where( "$alias.meta_value", $value, $compare );
@@ -1389,7 +1421,7 @@ abstract class DB {
 						break;
 					}
 
-					switch ( $val ){
+					switch ( $val ) {
 						case 'NOT_EMPTY':
 							$query->where()->notEmpty( $key );
 							break 2;
@@ -1426,16 +1458,7 @@ abstract class DB {
 				continue;
 			}
 
-			$compare = $this->symbolize_comparison( $compare );
-
-			switch ( $compare ) {
-				case 'IN':
-					$query->whereIn( $column, $value );
-					break;
-				default:
-					$query->where( $column, $value, $compare );
-					break;
-			}
+			$query->where( $column, $value, $compare );
 		}
 
 		switch ( strtoupper( $operation ) ) {
@@ -1465,10 +1488,20 @@ abstract class DB {
 		return $results;
 	}
 
+	public function found_rows() {
+
+		if ( $this->current_query ){
+			return $this->current_query->get_found_rows();
+		}
+
+		global $wpdb;
+
+		return (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
+	}
+
 	public $last_query = '';
 
 	public $last_error = '';
-
 
 	/**
 	 * New and improved query function to access DB in more complex and interesting ways.
@@ -1538,12 +1571,6 @@ abstract class DB {
 		}
 
 		return $results;
-	}
-
-	public function found_rows() {
-		global $wpdb;
-
-		return (int) $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 	}
 
 	/**

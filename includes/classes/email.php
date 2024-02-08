@@ -599,7 +599,7 @@ class Email extends Base_Object_With_Meta {
 
 		foreach ( $matches[0] as $i => $match ) {
 			$block_content = $matches['content'][ $i ];
-			$type          = $matches['type'][ $i ];
+//			$type          = $matches['type'][ $i ];
 
 			// Gets rid of the [filters {...}] code in the plain text
 			if ( $this->is_testing() ) {
@@ -734,14 +734,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Temp array to store a map if the original link to the tracking link
-	 * For sanitization later
-	 *
-	 * @var array
-	 */
-	protected $tracking_link_map = [];
-
-	/**
 	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
 	 *
 	 * @param $matches
@@ -766,9 +758,13 @@ class Email extends Base_Object_With_Meta {
 			$clean_url = preg_replace( "@https?://$regex@", '', $clean_url );
 		}
 
-		// Save to link map...
-		$tracking_link                         = trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) );
-		$this->tracking_link_map[ $clean_url ] = $tracking_link;
+		// Tracking link does not support empty
+		// "/" sends it to the homepage.
+		if ( empty( $clean_url ) ) {
+			$clean_url = '/';
+		}
+
+		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
 
 		return $matches[1] . $tracking_link . $matches[3];
 	}
@@ -933,10 +929,12 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$defaults = [
-			'from'         => $this->get_from_header(),
-			'reply-to'     => $this->get_reply_to_address(),
-			'return-path'  => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
-			'content-type' => 'text/html; charset=UTF-8',
+			'from'                     => $this->get_from_header(),
+			'reply-to'                 => $this->get_reply_to_address(),
+			'return-path'              => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
+			'content-type'             => 'text/html; charset=UTF-8',
+			'precedence'               => 'bulk',
+			'x-auto-response-suppress' => 'AutoReply'
 		];
 
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
@@ -1052,19 +1050,18 @@ class Email extends Base_Object_With_Meta {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
 		}
 
-		do_action( 'groundhogg/email/before_send', $this );
-
 		/* Additional settings */
 		add_action( 'phpmailer_init', [ $this, 'set_bounce_return_path' ] );
 		add_action( 'phpmailer_init', [ $this, 'set_plaintext_body' ] );
 		add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		add_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
 
+		$content = $this->build();
 		$to      = $this->get_to_address();
 		$subject = $this->get_merged_subject_line();
-		$content = $this->build();
-
 		$headers = $this->get_headers();
+
+		do_action_ref_array( 'groundhogg/email/before_send', [ $this, &$to, &$subject, &$content, &$headers ] );
 
 		if ( $this->is_transactional() ) {
 			// If the email is transactional, use the installed transactional system
@@ -1082,13 +1079,9 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
 
 		if ( ! $sent ) {
-
 			do_action( 'groundhogg/email/send_failed', $this );
-
 		} else {
-
 			$contact->update_meta( 'last_sent', time() );
-
 		}
 
 		do_action( 'groundhogg/email/after_send', $this );

@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Tags;
 
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Tag;
 use WP_List_Table;
 use function Groundhogg\_nf;
@@ -56,7 +57,7 @@ class Tags_Table extends WP_List_Table {
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'tag_name'        => _x( 'Name', 'Column label', 'groundhogg' ),
 			'tag_description' => _x( 'Description', 'Column label', 'groundhogg' ),
-			'contact_count'   => _x( 'Count', 'Column label', 'groundhogg' ),
+			'contacts' => _x( 'Count', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg/admin/tags/table/get_columns', $columns );
@@ -69,35 +70,10 @@ class Tags_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'tag_name'        => array( 'tag_name', false ),
 			'tag_description' => array( 'tag_description', false ),
-			'contact_count'   => array( 'contact_count', false ),
+			'contacts' => array( 'contacts', false ),
 		);
 
 		return apply_filters( 'groundhogg/admin/tags/table/sortable_columns', $sortable_columns );
-	}
-
-	protected function extra_tablenav( $which ) {
-		?>
-        <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [
-				'page'   => 'gh_tags',
-				'action' => 'recount'
-			], admin_url( 'admin.php' ) ) ) ?>"><?php _ex( 'Recount Contacts', 'action', 'groundhogg' ); ?></a>
-        </div>
-		<?php
-	}
-
-	/**
-	 * Generates content for a single row of the table
-	 *
-	 * @since 3.1.0
-	 *
-	 * @param object $item The current item
-	 *
-	 */
-	public function single_row( $item ) {
-		echo '<tr>';
-		$this->single_row_columns( new Tag( absint( $item->tag_id ) ) );
-		echo '</tr>';
 	}
 
 	/**
@@ -117,7 +93,7 @@ class Tags_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
-	protected function column_contact_count( $tag ) {
+	protected function column_contacts( $tag ) {
 		$count = $tag->get_contact_count();
 
 		return $count ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ) . '">' . _nf( $count ) . '</a>' : '0';
@@ -196,17 +172,32 @@ class Tags_Table extends WP_List_Table {
 		$order    = strtoupper( get_url_var( 'order', 'DESC' ) );
 		$orderby  = get_url_var( 'orderby', 'tag_id' );
 
-		$args = [
-			'search'     => $search,
-			'limit'      => $per_page,
-			'offset'     => $offset,
-			'order'      => $order,
-			'orderby'    => $orderby,
-			'found_rows' => true,
-		];
+        $query = new Table_Query( 'tags' );
+        $query->setLimit( $per_page )
+              ->setOffset( $offset )
+              ->setOrder( $order)
+              ->setOrderby( $orderby )
+              ->setFoundRows( true );
 
-		$items = get_db( 'tags' )->query( $args );
-		$total = get_db( 'tags' )->found_rows();
+        if ( $search ){
+            $query->where()->subWhere()
+                           ->wlike( 'tag_name', $search )
+                           ->wlike( 'tag_slug', $search )
+                           ->wLike( 'tag_description', $search );
+        }
+
+        if ( $orderby === 'contacts' ){
+
+	        $tagRelQuery = new Table_Query('tag_relationships');
+	        $tagRelQuery->setSelect( 'tag_id', ['COUNT(contact_id)', 'contacts' ] )
+	                    ->setGroupby('tag_id');
+
+            $query->addJoin( 'LEFT', [ $tagRelQuery, 'relationships' ] )->onColumn( 'tag_id', 'tag_id' );
+            $query->setOrderby( 'relationships.contacts' );
+        }
+
+		$items = $query->get_objects( Tag::class );
+		$total = $query->get_found_rows();
 
 		$this->items = $items;
 

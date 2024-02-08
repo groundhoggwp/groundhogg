@@ -31,14 +31,15 @@ use Groundhogg\Reporting\New_Reports\Table_Funnel_Stats;
 use Groundhogg\Reporting\New_Reports\Table_List_Engagement;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
-use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
-use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Emails;
+use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Funnel_Emails;
+use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Funnel_Emails;
 use Groundhogg\Reporting\New_Reports\Total_Abandonment_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Benchmark_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Bounces_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Complaints_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Contacts_Added_To_Funnel;
 use Groundhogg\Reporting\New_Reports\Total_Contacts_In_Funnel;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
 use Groundhogg\Reporting\New_Reports\Total_Funnel_Conversion_Rate;
@@ -200,6 +201,10 @@ class Reports {
 			[
 				'id'       => 'total_contacts_in_funnel',
 				'callback' => [ $this, 'total_contacts_in_funnel' ]
+			],
+			[
+				'id'       => 'total_contacts_added_to_funnel',
+				'callback' => [ $this, 'total_contacts_added_to_funnel' ]
 			],
 			[
 				'id'       => 'total_funnel_conversion_rate',
@@ -532,7 +537,7 @@ class Reports {
 	 */
 	public function table_top_performing_emails() {
 
-		$report = new Table_Top_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Top_Performing_Funnel_Emails( $this->start, $this->end );
 
 		return $report->get_data();
 
@@ -543,7 +548,7 @@ class Reports {
 	 */
 	public function table_worst_performing_emails() {
 
-		$report = new Table_Worst_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Worst_Performing_Funnel_Emails( $this->start, $this->end );
 
 		return $report->get_data();
 
@@ -635,6 +640,17 @@ class Reports {
 	public function total_contacts_in_funnel() {
 
 		$report = new Total_Contacts_In_Funnel( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_contacts_added_to_funnel() {
+
+		$report = new Total_Contacts_Added_To_Funnel( $this->start, $this->end );
 
 		return $report->get_data();
 

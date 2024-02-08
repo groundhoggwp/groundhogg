@@ -4,10 +4,10 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
 use Groundhogg\Preferences;
 use function Groundhogg\get_primary_owner_id;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\Contact_Query;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -160,7 +160,7 @@ class Contacts extends DB {
 			'first_name'                => '',
 			'last_name'                 => '',
 			'user_id'                   => 0,
-			'owner_id'                  => current_user_can( 'edit_contacts' ) ? get_current_user_id() : get_primary_owner_id(),
+			'owner_id'                  => current_user_can( 'add_contacts' ) ? get_current_user_id() : get_primary_owner_id(),
 			'optin_status'              => Preferences::UNCONFIRMED,
 			'date_created'              => current_time( 'mysql' ),
 			'date_optin_status_changed' => current_time( 'mysql' ),
@@ -175,21 +175,15 @@ class Contacts extends DB {
 	 */
 	public function add( $data = array() ) {
 
-		$args = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
-		if ( empty( $args['email'] ) ) {
-
+		if ( empty( $data['email'] ) ) {
 			$this->last_error = 'No email field provided.';
 
 			return false;
 		}
 
-		$args = $this->sanitize_columns( $args );
+		$data = $this->sanitize_columns( $data );
 
-		return $this->insert_on_duplicate_update( $args );
+		return $this->insert_on_duplicate_key_update( $data );
 	}
 
 	/**
@@ -199,50 +193,65 @@ class Contacts extends DB {
 	 *
 	 * @return int
 	 */
-	public function insert_on_duplicate_update( $data ){
+	public function insert_on_duplicate_key_update( $data ) {
 
-		if ( key_exists( 'email', $data ) ){
+		$orig_data = $data;
 
-			// Initialise column format array
-			$column_formats = $this->get_columns();
+		// Initialise column format array
+		$column_formats  = $this->get_columns();
+		$column_defaults = $this->get_column_defaults();
 
-			// Force fields to lower case
-			$data = array_change_key_case( $data );
+		// Orig data does not get parsed
+		$data = wp_parse_args( $data, $column_defaults );
 
-			// White list columns
-			$data = array_intersect_key( $data, $column_formats );
+		// Force fields to lower case
+		$data      = array_change_key_case( $data );
+		$orig_data = array_change_key_case( $orig_data );
 
-			$update_func = function ( $query ) use ( $data, $column_formats ){
+		// White list columns
+		$data      = array_intersect_key( $data, $column_formats );
+		$orig_data = array_intersect_key( $orig_data, $column_formats );
 
-				if ( ! preg_match( '/^INSERT/i', $query ) ){
-					return $query;
-				}
+		// Function to rewrite the INSERT query to include ON DUPLICATE KEY UPDATE
+		$update_func = function ( $query ) use ( $orig_data, $column_formats, $column_defaults ) {
 
-				global $wpdb;
-
-				unset( $data[ 'email' ] );
-				unset( $data[ 'id' ] );
-				unset( $data[ 'date_created' ] );
-
-				$pairs = [];
-
-				foreach ( $data as $column => $value ){
-					$format = $column_formats[$column];
-					$pairs[] = $wpdb->prepare( "$column = $format", $value );
-				}
-
-				$query .= 'ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+			// Not an insert query
+			if ( ! preg_match( '/^INSERT/i', $query ) ) {
 				return $query;
-			};
+			}
 
-			add_filter( 'query', $update_func );
-		}
+			// Don't update with default values
+			$update_data = array_diff_assoc( $orig_data, $column_defaults );
+
+			global $wpdb;
+
+			// never update these columns
+			unset( $update_data['ID'] );
+			unset( $update_data['email'] );
+			unset( $update_data['date_created'] );
+
+			// No data to update if key exists already
+			if ( empty( $update_data ) ) {
+				return $query;
+			}
+
+			$pairs = [];
+
+			foreach ( $update_data as $column => $value ) {
+				$format  = $column_formats[ $column ];
+				$pairs[] = $wpdb->prepare( "$column = $format", $value );
+			}
+
+			$query .= ' ON DUPLICATE KEY UPDATE ' . implode( ', ', $pairs );
+
+			return $query;
+		};
+
+		add_filter( 'query', $update_func );
 
 		$inserted = $this->insert( $data );
 
-		if ( key_exists( 'email', $data ) && isset( $update_func ) ){
-			remove_filter( 'query', $update_func );
-		}
+		remove_filter( 'query', $update_func );
 
 		return $inserted;
 	}
@@ -393,10 +402,9 @@ class Contacts extends DB {
 		unset( $args['limit'] );
 		unset( $args['number'] );
 
-		$query   = new Contact_Query( '', $this );
-		$results = $query->query( $args );
+		$query = new Contact_Query( $args );
 
-		return $results;
+		return $query->count();
 	}
 
 	/**

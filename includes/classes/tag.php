@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\DB;
+use Groundhogg\DB\Query\Table_Query;
 
 /**
  * Created by PhpStorm.
@@ -53,7 +54,7 @@ class Tag extends Base_Object {
 	 * @return int
 	 */
 	public function get_contact_count() {
-		return absint( $this->contact_count );
+		return get_db( 'tag_relationships' )->count( [ 'tag_id' => $this->get_id() ] );
 	}
 
 	/**
@@ -71,14 +72,21 @@ class Tag extends Base_Object {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function exists() {
+		return $this->tag_id && $this->tag_name && $this->tag_slug;
+	}
+
+	/**
 	 * @return int[]
 	 */
 	public function get_contact_ids() {
-		$query       = new Contact_Query();
-		$contacts    = $query->query( [ 'tags_include' => $this->get_id() ] );
-		$contact_ids = wp_parse_id_list( wp_list_pluck( $contacts, 'ID' ) );
 
-		return $contact_ids;
+		$query = new Table_Query( 'tag_relationships' );
+		$query->where('tag_id', $this->get_id() );
+
+		return wp_parse_id_list( wp_list_pluck( $query->get_results(), 'contact_id' ) );
 	}
 
 	/**

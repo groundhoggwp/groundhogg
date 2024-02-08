@@ -280,6 +280,10 @@ h1.report-title {
     }
   }
 
+  .table-scroll {
+    overflow-x: auto;
+  }
+
   table.groundhogg-report-table {
 
     tr {
@@ -288,8 +292,24 @@ h1.report-title {
         padding: 13px;
 
         &:not(:first-child) {
-          width: 120px;
+          //width: 80px;
           padding-left: 0;
+        }
+
+        &.great {
+          background-color: #d3e6cb;
+        }
+        &.good {
+          background-color: #eef7e3;
+        }
+        &.fair {
+          background-color: #fef8e3;
+        }
+        &.poor {
+          background-color: #ffe6dd;
+        }
+        &.bad {
+          background-color: #F4CCCC;
         }
 
         .step-type {
@@ -328,7 +348,7 @@ h1.report-title {
 }
 
 /* NEW CSS FOR TABLE */
-table.groundhogg-report-table tr:nth-child(odd) {
+table.groundhogg-report-table tbody tr:nth-child(odd) {
   background-color: $primary-blue-2;
 }
 
@@ -339,7 +359,7 @@ table.groundhogg-report-table tr:nth-child(odd) {
 
 table.groundhogg-report-table {
 
-  table-layout: fixed;
+  table-layout: auto;
   width: 100%;
   text-align: left;
   border-collapse: collapse;
@@ -382,7 +402,7 @@ table.groundhogg-report-table td {
   color: #666666;
   line-height: 1.2;
   /*font-weight: unset !important;*/
-  border-top: 1px solid #f2f2f2;
+  //border-top: 1px solid #f2f2f2;
   display: table-cell;
   padding: 15px;
   text-decoration: none;
