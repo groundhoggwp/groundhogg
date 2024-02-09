@@ -68,6 +68,14 @@ class DateTimeHelper extends \DateTime {
 		return $this->format( 'Y-m-d' );
 	}
 
+	public function wpDateTimeFormat(){
+		return $this->format( get_date_time_format() );
+	}
+
+	public function wpDateFormat(){
+		return $this->format( get_option( 'date_format' ) );
+	}
+
 	public function i18n() {
 
 		switch ( $this->whenIs() ) {
@@ -78,7 +86,7 @@ class DateTimeHelper extends \DateTime {
 			case 'yesterday':
 				return sprintf( __( 'yesterday at %s', 'groundhogg' ), $this->format( get_time_format() ) );
 			default:
-				return $this->format( get_date_time_format() );
+				return $this->wpDateTimeFormat();
 		}
 
 	}
