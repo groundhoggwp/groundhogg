@@ -2255,6 +2255,7 @@ function get_csv_delimiter( $file_path ) {
 
 /**
  * Return the number of rows in a CSV file
+ * Does not respect "\n" in cells, do we care?
  *
  * @param $file_path
  *
@@ -2277,12 +2278,12 @@ function count_csv_rows( $file_path ) {
  * @param string $file_path   path to the CSV file
  * @param int    $rows        the number of rows to retrieve, a negative number will mean all rows
  * @param int    $offset      the offset to start
- * @param bool   $delimiter   the file delimiter, if false it will guess
+ * @param string $delimiter   the file delimiter, if false it will guess
  * @param bool   $associative whether to return the results as an associative array or regular array
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter = false, $associative = true ) {
+function get_items_from_csv( string $file_path = '', int $rows = 0, int $offset = 0, string $delimiter = '', bool $associative = true ): array {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
@@ -2306,12 +2307,11 @@ function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter
 		$rows = 999999999;
 	}
 
+    // Advance the file pointer
 	if ( $offset > 0 ) {
-		// bug in PHP < 8.0.1 causes next line to be given after seek
-		if ( version_compare( PHP_VERSION, '8.0.1', '<' ) ) {
-			$file->seek( $offset );
-		} else {
-			$file->seek( $offset + 1 );
+        while ( ! $file->eof() && $offset > 0 ){
+            $file->fgets();
+			$offset--;
 		}
 	}
 
@@ -2342,7 +2342,8 @@ function get_items_from_csv( $file_path = '', $rows = 0, $offset = 0, $delimiter
 /**
  * Get the pretty name for the header in the export file
  *
- * @param string $key
+ * @param string $header
+ * @param string $type
  *
  * @return mixed|string
  */
