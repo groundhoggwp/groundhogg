@@ -1839,6 +1839,9 @@ class Settings_Page extends Admin_Page {
 			case 'checkbox':
 				$field['atts']['checked'] = (bool) $value;
 				break;
+			case 'checkboxes':
+				$field['atts']['checked'] = $value;
+				break;
 			case 'input':
 			default:
 				$field['atts']['value'] = $value;
@@ -1848,7 +1851,7 @@ class Settings_Page extends Admin_Page {
 		$field['atts']['id'] = esc_attr( sanitize_key( $field['id'] ) );
 
 		echo html()->wrap( call_user_func( array(
-			Plugin::$instance->utils->html,
+			html(),
 			$field['type']
 		), $field['atts'] ), 'div', [ 'style' => [ 'max-width' => '700px' ] ] );
 
