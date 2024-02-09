@@ -12,7 +12,7 @@ use function Groundhogg\contact_filters_link;
 use function Groundhogg\files;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_items_from_csv;
+use function Groundhogg\get_csv_delimiter;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
@@ -25,8 +25,10 @@ class Import_Contacts extends Task {
 	protected string $fileName;
 	protected string $filePath;
 	protected array $settings;
+	protected string $delimiter;
+	protected array $headers;
 
-	protected \SplFileObject $file;
+	protected ?\SplFileObject $file;
 
 	const BATCH_LIMIT = 100;
 
@@ -38,26 +40,99 @@ class Import_Contacts extends Task {
 	}
 
 	/**
+	 * Only runs once at the beginning of the task
+	 *
 	 * @return bool
 	 */
 	public function can_run() {
 		$this->filePath = wp_normalize_path( files()->get_csv_imports_dir( $this->fileName ) );
 
-		return file_exists( $this->filePath ) && user_can( $this->user_id, 'import_contacts' );
+		if ( ! file_exists( $this->filePath ) ) {
+			return false;
+		}
+
+		$this->advance();
+
+		return user_can( $this->user_id, 'import_contacts' );
 	}
 
 	/**
+	 * Advance the file to where we need to be
+	 *
+	 * Seek does not work with cells that contain "\n" !!!!
+	 *
+	 * @return void
+	 */
+	protected function advance() {
+
+		$this->delimiter = get_csv_delimiter( $this->filePath ) ?: ',';
+		$this->file      = new \SplFileObject( $this->filePath, 'r' );
+
+		// Advance past the headers
+		$this->headers = $this->file->fgetcsv( $this->delimiter );
+		$offset        = $this->batch * self::BATCH_LIMIT;
+
+		if ( $offset === 0 ) {
+			return;
+		}
+
+		while ( ! $this->file->eof() && $offset > 0 ) {
+			// Advance row
+			$this->file->fgets();
+			$offset --;
+		}
+	}
+
+	public function stop() {
+		$this->file = null;
+	}
+
+	public function __serialize(): array {
+		return [
+			'fileName' => $this->fileName,
+			'batch'    => $this->batch,
+			'user_id'  => $this->user_id,
+			'settings' => $this->settings,
+		];
+	}
+
+	/**
+	 * Get items from the csv
+	 *
+	 * @return array
+	 */
+	protected function get_items_from_csv() {
+
+		$data         = [];
+		$header_count = count( $this->headers );
+
+		while ( ! $this->file->eof() && count( $data ) < self::BATCH_LIMIT ) {
+
+			$row = $this->file->fgetcsv( $this->delimiter );
+
+			if ( count( $row ) > $header_count ) {
+				$row = array_slice( $row, 0, $header_count );
+			} else if ( count( $row ) < $header_count ) {
+				$row = array_pad( $row, $header_count, '' );
+			}
+
+			$data[] = array_combine( $this->headers, $row );
+		}
+
+		return $data;
+
+	}
+
+	/**
+	 * Process the items
+	 *
 	 * @return bool
 	 */
 	public function process(): bool {
 
-		$offset = $this->batch * self::BATCH_LIMIT;
-
-
-		$items = get_items_from_csv( $this->filePath, self::BATCH_LIMIT, $offset );
-
-		$map  = get_array_var( $this->settings, 'field_map' );
-		$tags = get_array_var( $this->settings, 'tags' );
+		$items = $this->get_items_from_csv();
+		$map   = get_array_var( $this->settings, 'field_map' );
+		$tags  = get_array_var( $this->settings, 'tags' );
 
 		if ( empty( $items ) ) {
 
