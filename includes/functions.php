@@ -3227,6 +3227,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	/**
+     * After the contact is generated with the map
+     *
 	 * @param $contact Contact the contact record
 	 * @param $map     array the map of given data to contact data
 	 * @param $fields  array the values of the given fields
