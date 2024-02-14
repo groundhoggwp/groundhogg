@@ -373,7 +373,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 
 							echo html()->submit( [
-								'class' => 'gh-button primary',
+								'class' => 'gh-button danger',
 								'text'  => __( '⚠️ Reset', 'groundhogg' )
 							] )
 							?>
@@ -837,7 +837,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		uninstall_groundhogg();
 
+        // Flush the object cache
+        wp_cache_flush();
+
 		do_action( 'groundhogg/reset' );
+
+		die();
 
 		return admin_page_url( 'gh_guided_setup' );
 	}

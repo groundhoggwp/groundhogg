@@ -17,7 +17,7 @@ class License_Notice {
 	 */
 	public function show_expired_license_nag() {
 
-		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ) {
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) || ! is_admin_groundhogg_page() ) {
 			return;
 		}
 
@@ -45,12 +45,12 @@ class License_Notice {
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
                  src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
             <p><?php printf( __( "<b>Oops!</b> Your Groundhogg license <code>%s</code> has expired. Please renew it to continue receiving critical updates and support.", 'groundhogg' ), $license_key ) ?></p>
-            <p>
-                <a class="button button-primary" target="_blank"
+            <p class="display-flex gap-10">
+                <a class="gh-button primary small" target="_blank"
                    href="<?php echo esc_url( $renewal_url ); ?>"><?php _e( "👉 Yes, I'd like to renew my license!", 'groundhogg' ); ?></a>
-                <a class="button button-secondary"
+                <a class="gh-button primary text small"
                    href="<?php echo esc_url( $check_license_url ); ?>"><?php _e( "Verify my renewal", 'groundhogg' ); ?></a>
-                <a class="button button-secondary"
+                <a class="gh-button danger text small"
                    href="<?php echo esc_url( $deactivate_url ); ?>"><?php _e( "Deactivate this license.", 'groundhogg' ); ?></a>
             </p>
             <p>
@@ -65,7 +65,7 @@ class License_Notice {
 	 */
 	public function show_non_licensed_extensions_nag() {
 
-		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ) {
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) || ! is_admin_groundhogg_page() ) {
 			return;
 		}
 
@@ -89,9 +89,9 @@ class License_Notice {
                  src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
             <p><?php printf( __( "<b>License your extensions!</b> Some of your premium extensions are missing a license key. Remember to add your license key to receive critical updates and support.", 'groundhogg' ) ); ?></p>
             <p>
-                <a class="button button-primary"
+                <a class="gh-button primary small"
                    href="<?php echo esc_url( $license_page_url ); ?>"><?php _e( "Set my license key!", 'groundhogg' ); ?></a>
-                <a class="button button-secondary" target="_blank"
+                <a class="gh-button primary text small" target="_blank"
                    href="<?php echo esc_url( 'https://groundhogg.io/pricing/' ); ?>"><?php _e( "Purchase a new license.", 'groundhogg' ); ?></a>
             </p>
             <p>

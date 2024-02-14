@@ -3783,7 +3783,7 @@ function is_replacement_code_format( string $code, $exact = true ) {
 function is_admin_groundhogg_page() {
 	$page = get_request_var( 'page' );
 
-	return is_admin() && $page && ( preg_match( '/^gh/', $page ) || $page === 'groundhogg' );
+	return is_admin() && $page && ( preg_match( '/^gh_/', $page ) || $page === 'groundhogg' );
 }
 
 
@@ -6220,7 +6220,6 @@ function uninstall_groundhogg() {
 
 	global $wpdb;
 
-
 	//Delete DBS
 	Plugin::$instance->dbs->drop_dbs();
 
@@ -6247,16 +6246,17 @@ function uninstall_groundhogg() {
 	delete_metadata( 'user', 0, 'wpgh_user_secret_key', '', true );
 
 	// Remove any transients and options we've left behind
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'wpgh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_wpgh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_gh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_wpgh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_gh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_wpgh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_gh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_wpgh\_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_gh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'wpgh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'wp_gh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'transient_wpgh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_gh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_wpgh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_gh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_wpgh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_gh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_timeout_wpgh_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_timeout_gh_%'" );
 
 	uninstall_gh_cron_file();
 

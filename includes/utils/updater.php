@@ -25,7 +25,7 @@ abstract class Updater {
 
 		// Show updates are required
 		add_action( 'admin_init', [ $this, 'listen_for_updates' ], 9 );
-		add_action( 'groundhogg/notices/before', [ $this, 'updates_notice' ] );
+		add_action( 'admin_notices', [ $this, 'updates_notice' ] );
 		add_action( "groundhogg/updater/{$this->get_updater_name()}/force_updates", [ $this, 'force_updates' ] );
 
 		// Do automatic updates
@@ -63,9 +63,8 @@ abstract class Updater {
 	 */
 	public function get_updates_to_do() {
 		$done     = $this->get_previous_versions();
-		$not_done = array_diff( $this->_get_updates(), $done );
 
-		return $not_done;
+		return array_diff( $this->_get_updates(), $done );
 	}
 
 	/**
@@ -423,8 +422,8 @@ abstract class Updater {
 			return false;
 		}
 
-		return update_option( $this->get_version_option_name(), $this->_get_all_updates() );
-	}
+        return update_option( $this->get_version_option_name(), $this->_get_all_updates() );
+    }
 
 	/**
 	 * If there are missing updates, show a notice to run the upgrade path.
@@ -452,25 +451,21 @@ abstract class Updater {
 
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
-			'class' => 'button button-secondary'
+			'class' => 'gh-button secondary small'
 		], __( 'Update Now!', 'groundhogg' ) );
 
-		$update_descriptions = "";
+?><div class="notice notice-info">
+    <p><?php printf( __( "%s (%s) requires an update. Consider backing up your site before updating.", 'groundhogg' ), bold_it( $this->get_display_name() ), white_labeled_name() ); ?></p>
+    <ul>
+        <?php foreach ( $missing_updates as $missing_update ) :
 
-		foreach ( $missing_updates as $missing_update ) {
-			if ( $this->get_update_description( $missing_update ) ) {
-				$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
-			} else {
-				$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b></li>', $missing_update );
-			}
-		}
+            $description = $this->get_update_description( $missing_update );
 
-		if ( ! empty( $update_descriptions ) ) {
-			$update_descriptions = sprintf( __( "Required Upgrades:<span style='font-weight: normal'><ul>%s</ul></span>", 'groundhogg' ), $update_descriptions );
-		}
-
-		$notice = sprintf( __( "%s requires an update. Consider backing up your site before updating. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
-		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
+            ?><li style="margin-left: 10px"><?php _e( $missing_update ); if ($description) _e( ' - ' . $description ); ?></li><?php
+        endforeach; ?>
+    </ul>
+        <p><?php echo $update_button; ?></p>
+</div><?php
 	}
 
 	/**
@@ -480,7 +475,7 @@ abstract class Updater {
 
 		$action = 'gh_' . $this->get_updater_name() . '_do_updates';
 
-		if ( ! current_user_can( 'manage_options' ) || ! get_url_var( 'action' ) === $action || ! wp_verify_nonce( get_url_var( '_wpnonce' ), $action ) ) {
+		if ( ! current_user_can( 'manage_options' ) || get_url_var( 'action' ) !== $action || ! wp_verify_nonce( get_url_var( '_wpnonce' ), $action ) ) {
 			return;
 		}
 

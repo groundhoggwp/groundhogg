@@ -558,11 +558,6 @@ class Settings_Page extends Admin_Page {
 //				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
 //				'tab'   => 'api_tab'
 //			),
-			'tag_mapping'     => [
-				'id'       => 'tag_mapping',
-				'title'    => _x( 'Tag mapping', 'settings_sections', 'groundhogg' ),
-				'tab'      => 'tags',
-			],
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Opt-in Status Tags', 'settings_sections', 'groundhogg' ),
@@ -1254,23 +1249,10 @@ class Settings_Page extends Admin_Page {
 				'args'    => [ 'sanitize_callback' => 'wp_kses_post' ],
 				'atts'    => [ 'replacements_button' => true ],
 			],
-//			'gh_disable_api'                         => array(
-//				'id'      => 'gh_disable_api',
-//				'section' => 'api_settings',
-//				'label'   => sprintf( _x( 'Disable the %s API', 'settings', 'groundhogg' ), white_labeled_name() ),
-//				'desc'    => _x( 'Disabling the API will prevent other platforms from accessing information on this site. Functionality in some extensions may be affected as well.', 'settings', 'groundhogg' ),
-//				'type'    => 'checkbox',
-//				'atts'    => array(
-//					'label' => __( 'Disable' ),
-//					'name'  => 'gh_disable_api',
-//					'id'    => 'gh_disable_api',
-//					'value' => 'on',
-//				),
-//			),
 			'gh_enable_tag_mapping'               => [
 				'id'      => 'gh_enable_tag_mapping',
-				'section' => 'tag_mapping',
-				'label'   => _x( 'Enable automatic tag mapping.', 'settings', 'groundhogg' ),
+				'section' => 'interface',
+				'label'   => _x( 'Enable Legacy Tag Mapping', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Tag mapping for opt-in status and user roles was originally introduced as a stop-gap measure. There are now much better methods of filtering contacts based on opt-in status and user role.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
