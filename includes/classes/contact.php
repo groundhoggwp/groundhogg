@@ -53,32 +53,103 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param bool|int|string|array $_id_or_email_or_args
 	 * @param bool                  $by_user_id
+	 *
+	 * @return void
 	 */
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
 
-		$field = false;
-
-		if ( ! is_array( $_id_or_email_or_args ) && ! is_object( $_id_or_email_or_args ) ) {
-			if ( false === $_id_or_email_or_args || ( is_numeric( $_id_or_email_or_args ) && (int) $_id_or_email_or_args !== absint( $_id_or_email_or_args ) ) ) {
-				return;
-			}
-
+		if ( is_numeric( $_id_or_email_or_args ) ) {
 			$by_user_id = is_bool( $by_user_id ) ? $by_user_id : false;
+			$field = $by_user_id ? 'user_id' : 'ID';
 
-			if ( is_numeric( $_id_or_email_or_args ) ) {
-				$field = $by_user_id ? 'user_id' : 'ID';
-			} else {
-				$field = 'email';
+			parent::__construct( $_id_or_email_or_args, $field );
+
+			if ( $by_user_id && ! $this->exists() ) {
+				$this->create_from_user( $by_user_id );
 			}
+
+			return;
+		}
+
+		if ( is_string( $_id_or_email_or_args ) && is_email( $_id_or_email_or_args ) ) {
+			parent::__construct( $_id_or_email_or_args, 'email' );
+
+			return;
+		}
+
+		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'email' ) ) {
+			parent::__construct( $_id_or_email_or_args['email'], 'email' );
+
+			if ( ! $this->exists() ) {
+				$this->create( $_id_or_email_or_args );
+			} else {
+				$this->update( $_id_or_email_or_args );
+			}
+
+			return;
+		}
+
+		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'ID' ) ) {
+			parent::__construct( absint( $_id_or_email_or_args['ID'] ), 'ID' );
+
+			if ( $this->exists() ) {
+				$this->update( $_id_or_email_or_args );
+			}
+
+			return;
+		}
+
+		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'user_id' ) ) {
+
+			$user_id = absint( $_id_or_email_or_args['user_id'] );
+			parent::__construct( $user_id, 'user_id' );
+
+			if ( ! $this->exists() ) {
+				$this->create_from_user( $user_id );
+			}
+
+			$this->update( $_id_or_email_or_args );
+
+			return;
 		}
 
 		// Support fetching contact by user
 		if ( is_a( $_id_or_email_or_args, '\WP_User' ) ) {
-			$_id_or_email_or_args = $_id_or_email_or_args->ID;
-			$field                = 'user_id';
+			parent::__construct( $_id_or_email_or_args->ID, 'user_id' );
+
+			if ( ! $this->exists() ) {
+				$this->create_from_user( $_id_or_email_or_args );
+			}
+
+			return;
 		}
 
-		parent::__construct( $_id_or_email_or_args, $field );
+		parent::__construct( $_id_or_email_or_args );
+	}
+
+
+	/**
+	 * Create the contact from a user
+	 *
+	 * @param $user WP_User|int
+	 *
+	 * @return bool
+	 */
+	protected function create_from_user( $user ) {
+
+		if ( ! is_int( $user ) ) {
+			$user = get_userdata( $user );
+		}
+
+		if ( ! is_a( $user, WP_User::class ) ) {
+			return false;
+		}
+
+		return $this->create( [
+			'first_name' => $user->first_name,
+			'last_name'  => $user->last_name,
+			'email'      => $user->user_email,
+		] );
 	}
 
 	/**
