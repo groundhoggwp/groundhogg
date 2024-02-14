@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.2.3.2
+Stable tag: 3.2.33
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.2.3.2 (2024-02-09) =
+= 3.2.3.3 (2024-02-13) =
+* FIXED Uninstall function was not deleting all options.
+* FIXED Need to flush cache after using the reset tool.
+
+= 3.2.3.2 (2024-02-13) =
 * ADDED Checkboxes settings field type.
 * ADDED Additional date format helper functions to the DateTimeHelper class.
 * FIXED Coalesce `null` meta values to the empty string `''` for `NOT IN` comparisons.
