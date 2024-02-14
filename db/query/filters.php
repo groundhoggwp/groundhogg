@@ -516,13 +516,13 @@ class Filters {
 			case 'all_checked':
 			case 'all_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->wLike( $column, '"' . $option . '"' );
+					$where->contains( $column, '"' . $option . '"' );
 				}
 				break;
 			case 'not_checked':
 			case 'all_not_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->wNotLike( "COALESCE($column,'')", '"' . $option . '"' );
+					$where->notContains( "COALESCE($column,'')", '"' . $option . '"' );
 				}
 				break;
 		}
@@ -559,20 +559,20 @@ class Filters {
 				$where->notEquals( $column, $value );
 				break;
 			case 'contains':
-				$where->wLike( $column, $value );
+				$where->contains( $column, $value );
 				break;
 			case 'not_contains':
-				$where->wNotLike( $column, $value );
+				$where->notContains( $column, $value );
 				break;
 			case 'starts_with':
 			case 'begins_with':
-				$where->like( $column, $where->esc_like( $value ) . '%' );
+				$where->startsWith( $column, $value );
 				break;
 			case 'does_not_start_with':
 				$where->notLike( $column, $where->esc_like( $value ) . '%' );
 				break;
 			case 'ends_with':
-				$where->like( $column, '%' . $where->esc_like( $value ) );
+				$where->endsWith( $column, $value );
 				break;
 			case 'does_not_end_with':
 				$where->notLike( $column, '%' . $where->esc_like( $value ) );

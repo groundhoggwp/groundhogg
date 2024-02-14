@@ -466,7 +466,19 @@ class Where {
 	 * @return $this
 	 */
 	public function wLike( $column, $string ) {
+		return $this->contains( $column, $string );
+	}
+
+	public function contains( $column, $string  ){
 		return $this->like( $column, '%' . $this->esc_like( $string ) . '%' );
+	}
+
+	public function startsWith( $column, $string  ){
+		return $this->like( $column, $this->esc_like( $string ) . '%' );
+	}
+
+	public function endsWith( $column, $string  ){
+		return $this->like( $column, '%' . $this->esc_like( $string ) );
 	}
 
 	/**
@@ -492,6 +504,10 @@ class Where {
 	 * @return $this
 	 */
 	public function wNotLike( $column, $string ) {
+		return $this->notContains( $column, $string );
+	}
+
+	public function notContains( $column, $string ) {
 		return $this->notLike( $column, '%' . $this->esc_like( $string ) . '%' );
 	}
 
