@@ -37,13 +37,6 @@ class Where {
 	protected $negate = false;
 
 	/**
-	 * The parent where relation
-	 *
-	 * @var mixed|string
-	 */
-	protected $parentRelation;
-
-	/**
 	 * If this Where has no clauses
 	 *
 	 * @return bool
@@ -73,11 +66,10 @@ class Where {
 	 * @param $query Query
 	 * @param $relation
 	 */
-	public function __construct( $query, $relation = 'AND', $negate = false, $parentRelation = 'AND' ) {
+	public function __construct( $query, $relation = 'AND', $negate = false ) {
 		$this->relation       = $relation;
 		$this->query          = $query;
 		$this->negate         = $negate;
-		$this->parentRelation = $parentRelation;
 	}
 
 	public function __serialize(): array {
@@ -545,13 +537,22 @@ class Where {
 	/**
 	 * Adds a sub where clause, in brackets
 	 *
-	 * @param $relation
+	 * @param string $relation 'OR' or 'AND'
 	 *
 	 * @return Where
 	 */
-	public function subWhere( $relation = 'OR', $negate = false ) {
-		$where = new Where( $this->query, $relation, $negate, $this->relation );
-		return $this->addCondition( $where );
+	public function subWhere( string $relation = 'OR', $negate = false ) {
+		$where = new Where( $this->query, $relation, $negate );
+		$this->addCondition( $where );
+		return $where;
+	}
+
+	public function subOr(){
+		return $this->subWhere( 'OR' );
+	}
+
+	public function subAnd(){
+		return $this->subWhere( 'AND' );
 	}
 
 	/**

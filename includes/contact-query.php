@@ -1180,8 +1180,9 @@ class Contact_Query extends Table_Query {
 
 		// Map 'search' to more specific columns depending on the term format
 		if ( isset_not_empty( $query_vars, 'search' ) ) {
+
 			$search = trim( $query_vars['search'] );
-			if ( str_contains( $search, '@' ) ) { // Search for an email address
+			if ( str_contains( $search, '@' ) || preg_match( '/\.[a-z]{2,5}$/', $search ) ) { // Search for an email address
 				$query_vars['email_like'] = str_replace( ' ', '+', $search );
 				unset( $query_vars['search'] );
 			} else if ( str_contains( $search, ' ' ) ) { // Search for first and last name
