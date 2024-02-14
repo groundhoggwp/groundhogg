@@ -39,6 +39,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function __construct( $identifier_or_args = 0, $field = null ) {
 
+		// Can't create from nothing
 		if ( ! $identifier_or_args ) {
 			return;
 		}
@@ -48,62 +49,63 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			emergency_init_dbs();
 		}
 
-		if ( ! $field ) {
-			$field = $this->get_identifier_key();
-		}
+		// Raw object from DB
+		if ( is_object( $identifier_or_args ) ){
 
-		// Assume we are creating an object...
-		if ( is_array( $identifier_or_args ) || is_object( $identifier_or_args ) ) {
-
-			// Primary key is available, maybe it's a full raw object?
-			if ( $primary = get_array_var( $identifier_or_args, $this->get_identifier_key() ) ) {
-
-				if ( is_object( $identifier_or_args ) ) {
-					$object = $identifier_or_args;
-				} else {
-					$object = $this->get_from_db( $this->get_identifier_key(), $primary );
-
-					if ( empty( $object ) || ! is_object( $object ) ) {
-						return;
-					}
-				}
-
-				$this->setup_object( $object );
-
+			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ){
+				$this->setup_object( $identifier_or_args );
 				return;
 			}
 
-			// Only get 1 record
-			$identifier_or_args['limit'] = 1;
+			// Cast to array
+			$identifier_or_args = (array) $identifier_or_args;
+		}
 
-			$results = $this->get_db()->query( $identifier_or_args );
-			$object  = array_shift( $results );
+		// Creating or fetching based on array key-value pairs
+		if ( is_array( $identifier_or_args ) ){
 
-			if ( ! empty( $object ) && is_object( $object ) ) {
-
-				$this->setup_object( $object );
-
-			} else {
-
-				$primary_key = $this->get_db()->get_primary_key();
-
-				// ignore if the primary key is passed in the args
-				if ( ! key_exists( $primary_key, $identifier_or_args ) ) {
-					$this->create( $identifier_or_args );
-				}
-
+			// If the primary key (ID in most cases) is set
+			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ){
+				$this->setup_object( $this->get_from_db( $this->get_identifier_key(), $identifier_or_args[$this->get_identifier_key()] ) );
+				// Update in one go
+				$this->update($identifier_or_args);
+				return;
 			}
 
-		} else {
+			$query = $identifier_or_args;
 
-			$object = $this->get_from_db( $field, $identifier_or_args );
+			// Get a result treating the args as query
+			$query['limit'] = 1;
+			$results = $this->get_db()->query( $query );
 
-			if ( empty( $object ) || ! is_object( $object ) ) {
+			// Create it if no results
+			if ( empty( $results ) ){
+				$this->create( $identifier_or_args );
+				return;
+			}
+
+			$object = array_shift( $results );
+
+			// Something's wrong
+			if ( ! is_object($object) ){
 				return;
 			}
 
 			$this->setup_object( $object );
+			return;
 		}
+
+		if ( ! $field ) {
+			$field = $this->get_identifier_key();
+		}
+
+		$object = $this->get_from_db( $field, $identifier_or_args );
+
+		if ( empty( $object ) || ! is_object( $object ) ) {
+			return;
+		}
+
+		$this->setup_object( $object );
 	}
 
 	/**
