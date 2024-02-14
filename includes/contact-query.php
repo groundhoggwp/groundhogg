@@ -1180,19 +1180,18 @@ class Contact_Query extends Table_Query {
 
 		// Map 'search' to more specific columns depending on the term format
 		if ( isset_not_empty( $query_vars, 'search' ) ) {
-			$search = $query_vars['search'];
+			$search = trim( $query_vars['search'] );
 			if ( str_contains( $search, '@' ) ) { // Search for an email address
-				$query_vars['email'] = str_replace( ' ', '+', $search );
+				$query_vars['email_like'] = str_replace( ' ', '+', $search );
 				unset( $query_vars['search'] );
 			} else if ( str_contains( $search, ' ' ) ) { // Search for first and last name
 				$full_name = split_name( trim( $query_vars['search'] ) );
 				if ( $full_name[0] && $full_name[1] ) {
-					$query_vars['first_name'] = $full_name[0];
-					$query_vars['last_name']  = $full_name[1];
+					$query_vars['first_name_like'] = $full_name[0];
+					$query_vars['last_name_like']  = $full_name[1];
 					unset( $query_vars['search'] );
 				}
 			} else if ( is_numeric( $search ) ) {
-
 				unset( $query_vars['search'] );
 			}
 
@@ -1417,19 +1416,19 @@ class Contact_Query extends Table_Query {
 						}
 					}
 					break;
-				case 'email': // Email search
+				case 'email_like': // Email search
 					if ( $value ) {
-						$where->like( 'email', '%' . $where->query->db->esc_like( $value ) . '%' );
+						$where->contains( 'email', $value );
 					}
 					break;
-				case 'first_name': // First name search
+				case 'first_name_like': // First name search
 					if ( $value ) {
-						$where->like( 'first_name', $where->query->db->esc_like( $value ) . '%' );
+						$where->contains( 'first_name', $value );
 					}
 					break;
-				case 'last_name': // Last name search
+				case 'last_name_like': // Last name search
 					if ( $value ) {
-						$where->like( 'last_name', $where->query->db->esc_like( $value ) . '%' );
+						$where->contains( 'last_name', $value );
 					}
 					break;
 				case 'tags_include':
@@ -1637,6 +1636,11 @@ class Contact_Query extends Table_Query {
 						}
 					}
 
+					break;
+				default:
+					if ( $where->query->db_table->has_column( $query_var ) ){
+						$where->equals( $query_var, $value );
+					}
 					break;
 			}
 		}
