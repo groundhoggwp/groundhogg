@@ -423,7 +423,7 @@ abstract class Updater {
 			return false;
 		}
 
-		return update_option( $this->get_version_option_name(), $this->_get_updates() );
+		return update_option( $this->get_version_option_name(), $this->_get_all_updates() );
 	}
 
 	/**
