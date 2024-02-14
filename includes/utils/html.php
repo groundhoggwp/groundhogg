@@ -638,7 +638,7 @@ class HTML {
 			] );
 		}
 
-		return implode( '', $checkboxes );
+		return html()->e( 'div', [ 'class' => 'display-flex column gap-5' ], $checkboxes );
 	}
 
 
