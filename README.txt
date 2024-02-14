@@ -353,6 +353,9 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Checkboxes settings field type.
 * ADDED Additional date format helper functions to the DateTimeHelper class.
 * FIXED Coalesce `null` meta values to the empty string `''` for `NOT IN` comparisons.
+* FIXED Newlines in CSV cells breaking imports.
+* FIXED Search for a contact by email not returning results on email equality.
+* FIXED Force data to save as serialized when mapping to a checkbox list or multi-select custom field.
 
 = 3.2.3.1 (2024-02-05) =
 * TWEAKED The export file headers are added to the CSV before the background process starts rather than during.
