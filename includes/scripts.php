@@ -266,7 +266,8 @@ class Scripts {
 			'groundhogg-admin-properties',
 			'groundhogg-admin',
 			'groundhogg-admin-data',
-			'groundhogg-admin-email-log'
+			'groundhogg-admin-email-log',
+			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/contacts/info-cards' . $dot_min . '.js', [

@@ -442,11 +442,18 @@
       modal.remove()
     }
 
-    modal.querySelector('.gh-modal-dialog-content').appendChild(Fragment(maybeCall(children, { close })))
+    const morph = () => morphdom( modal.querySelector('.gh-modal-dialog-content'), Div( {}, getContent() ), {
+      childrenOnly: true
+    } )
+
+    const getContent = () => maybeCall(children, { close, modal, morph })
+
     document.body.appendChild(modal)
 
+    morph()
+
     // Run before positioning
-    onOpen({ close })
+    onOpen({ modal, close, morph })
 
     modal.focus()
 
@@ -1253,16 +1260,22 @@
     onChange = value => {},
   }) => {
 
-    const ButtonOption = option => Button({
-      id: `${ id }-opt-${ option.id }`,
-      className: `gh-button gh-button small ${ selected === option.id ? 'dark' : 'grey' }`,
-      onClick: e => onChange(option.id),
-    }, option.text)
-
-    return Div({
+    const render = () => Div({
       id,
       className: 'gh-input-group',
     }, options.map(opt => ButtonOption(opt)))
+
+    const ButtonOption = option => Button({
+      id: `${ id }-opt-${ option.id }`,
+      className: `gh-button gh-button small ${ selected === option.id ? 'dark' : 'grey' }`,
+      onClick: e => {
+        selected = option.id
+        morphdom(document.getElementById(id), render())
+        onChange(option.id)
+      },
+    }, option.text)
+
+    return render()
   }
 
   const ProgressBar = ({

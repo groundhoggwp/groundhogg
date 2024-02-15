@@ -382,5 +382,21 @@ code.meta-replacement-code {
     gap: 20px;
   }
 }
+#add-to-funnel-dialog {
+  width: 400px;
+}
+
+#send-email-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 500px;
+}
+#send-email-dialog h3 {
+  margin: 0;
+}
+#send-email-dialog iframe {
+  height: 300px;
+}
 
 /*# sourceMappingURL=contact-editor.css.map */
