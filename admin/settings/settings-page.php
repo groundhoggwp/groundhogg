@@ -566,6 +566,11 @@ class Settings_Page extends Admin_Page {
 			],
 		];
 
+        // If SMTP or WP Mail is not in use, hide the bounce settings. We don't need them.
+        if ( ! Groundhogg_Email_Services::service_in_use( 'wp_mail' ) && ! Groundhogg_Email_Services::service_in_use( 'smtp' ) ){
+            unset( $sections['bounces'] );
+        }
+
 		if ( ! Tag_Mapping::enabled() ){
 			unset( $sections['optin_status_tags'] );
 		}
