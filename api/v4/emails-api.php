@@ -16,6 +16,7 @@ use function Groundhogg\array_map_to_contacts;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
+use function Groundhogg\enqueue_event;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
@@ -454,6 +455,8 @@ class Emails_Api extends Base_Object_Api {
 			$email = new Email();
 		}
 
+		$test_type = $request->get_param( 'type' ) ?: 'design';
+
 		$to = array_filter( array_map( 'sanitize_email', wp_parse_list( $request->get_param( 'to' ) ) ) );
 
 		if ( empty( $to ) ) {
@@ -462,6 +465,53 @@ class Emails_Api extends Base_Object_Api {
 
 		update_user_meta( get_current_user_id(), 'gh_test_emails', $to );
 
+		if ( $test_type === 'functional' ){
+
+			if ( ! $email->exists() ){
+				return self::ERROR_401( 'error', 'The email must be saved before it can be functionally tested.' );
+			}
+
+			add_action( 'groundhogg/test_email/before_send', function ( Email $email ) use ( $to, $request ){
+
+				if ( $request->has_param( 'data' ) && $request->has_param( 'meta' ) ) {
+					$email->set_preview_data( $request->get_param( 'data' ), $request->get_param( 'meta' ) );
+				}
+
+				// Force ready status to bypass checks
+				$email->status  = 'ready';
+
+			} );
+
+			add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
+
+			foreach ( $to as $email_address ){
+
+				$contact = new Contact( [ 'email' => $email_address ] );
+
+				enqueue_event([
+					'email_id'   => $email->get_id(),
+					'contact_id' => $contact->get_id(),
+					'event_type' => Event::TEST_EMAIL,
+					'priority'   => 1,
+					'status'     => Event::WAITING,
+				]);
+
+				$result = process_events( $contact );
+
+				if ( $result !== true ) {
+					return $result[0];
+				}
+
+				if ( $this->has_errors() ) {
+					return $this->get_last_error();
+				}
+			}
+
+			return self::SUCCESS_RESPONSE( [
+				'sent' => true
+			] );
+		}
+
 		// Use the current user as the contact data
 		$contact = new Contact( [
 			'email' => wp_get_current_user()->user_email
@@ -469,17 +519,22 @@ class Emails_Api extends Base_Object_Api {
 
 		if ( $request->has_param( 'data' ) && $request->has_param( 'meta' ) ) {
 			// Override with the dump
-			$email->data = $request->get_param( 'data' );
-			$email->meta = $request->get_param( 'meta' );
+			$email->set_preview_data( $request->get_param( 'data' ), $request->get_param( 'meta' ) );
 		}
 
 		$email->enable_test_mode();
 
+		// CC other emails
 		add_filter( 'groundhogg/email/to', function ( $emails ) use ( $to ) {
 			return implode( ',', $to );
 		} );
 
-		$sent = $email->send( $contact, new Event() );
+		// Prefix subject line with [TEST]
+		add_filter( 'groundhogg/email/subject', function ( $subject ){
+			return sprintf( __( '[TEST] %s', 'groundhogg' ), $subject );
+		} );
+
+		$sent = $email->send( $contact );
 
 		return self::SUCCESS_RESPONSE( [
 			'sent' => $sent
@@ -514,6 +569,7 @@ class Emails_Api extends Base_Object_Api {
 
 		// Override with the dump
 		$email->set_preview_data( $data, $meta );
+		$email->enable_test_mode();
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
 	}

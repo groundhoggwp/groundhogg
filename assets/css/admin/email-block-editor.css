@@ -991,4 +991,8 @@ body iframe#preview.desktop {
   opacity: 0.7;
 }
 
+#test-type-explanation p {
+  font-size: 14px;
+}
+
 /*# sourceMappingURL=email-block-editor.css.map */

@@ -2,7 +2,7 @@
 
 namespace Groundhogg;
 
-use Groundhogg\Api\V3\Unsubscribe_Api;
+use Groundhogg\Api\V4\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
@@ -122,7 +122,6 @@ class Email extends Base_Object_With_Meta {
 		$this->meta = $meta;
 
 		$this->post_setup();
-		$this->enable_test_mode();
 	}
 
 	/**
@@ -325,7 +324,6 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function enable_test_mode() {
 		$this->testing = true;
-		$this->set_event( new Event() );
 	}
 
 	/**
@@ -383,8 +381,14 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function browser_view_link( $link = '' ) {
-		return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
+	public function browser_view_link() {
+
+		if ( $this->event && $this->event->exists() ){
+			return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
+		}
+
+		return managed_page_url( 'archive' );
+
 	}
 
 	/**
@@ -396,7 +400,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url( sprintf(
 			"o/%s/%s",
 			dechex( $this->get_contact()->get_id() ),
-			! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
+			dechex( $this->get_event()->get_id( true ) )
 		) );
 	}
 
@@ -409,7 +413,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url(
 			sprintf( 'c/%s/%s/',
 				dechex( $this->get_contact()->get_id() ),
-				! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
+				dechex( $this->get_event()->get_id( true ) )
 			)
 		);
 	}
@@ -477,11 +481,8 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_subject_line() {
-		$subject = do_replacements( $this->get_subject_line(), $this->get_contact() );
 
-		if ( $this->is_testing() ) {
-			$subject = sprintf( __( '[TEST] %s' ), $subject );
-		}
+		$subject = do_replacements( $this->get_subject_line(), $this->get_contact() );
 
 		return apply_filters( 'groundhogg/email/subject', $subject, $this, $this->get_contact() );
 	}
@@ -824,7 +825,8 @@ class Email extends Base_Object_With_Meta {
 				break;
 		}
 
-		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) ) {
+		// Tracking must be enabled and there must be a valid event to track with
+		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) && $this->event && $this->event->exists() ) {
 			$content = $this->convert_to_tracking_links( $content );
 		}
 
@@ -938,17 +940,26 @@ class Email extends Base_Object_With_Meta {
 		];
 
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
-		if ( ! $this->is_transactional() && ! is_option_enabled( 'gh_disable_unsubscribe_header' ) ) {
+		if ( ! $this->is_transactional() && ! is_option_enabled( 'gh_disable_unsubscribe_header' ) && $this->event && $this->event->exists() ) {
+
+			$one_click_unsub_link = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, dechex( $this->event->get_id() ), generate_permissions_key( $this->contact, 'preferences' ) ) );
 
 			$list_unsub_header = sprintf(
 				'<%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
-				add_query_arg( [
-					'contact' => encrypt( $this->get_contact()->get_email() )
-				], rest_url( Unsubscribe_Api::NAME_SPACE . '/unsubscribe' ) ),
+				$one_click_unsub_link,
 				get_bloginfo( 'admin_email' ),
 				$this->get_to_address(),
 				get_bloginfo()
 			);
+
+			/**
+			 * Filter the list unsubscribe header
+			 *
+			 * @param string $list_unsub_header
+			 * @param string $one_click_unsub_link
+			 * @param Email $email
+			 */
+			$list_unsub_header = apply_filters( 'groundhogg/email/list_unsubscribe_header_content', $list_unsub_header, $one_click_unsub_link, $this );
 
 			$defaults['list-unsubscribe']      = $list_unsub_header;
 			$defaults['list-unsubscribe-post'] = 'List-Unsubscribe=One-Click';
@@ -961,6 +972,15 @@ class Email extends Base_Object_With_Meta {
 
 		// Merge the custom headers with the defaults...
 		$headers = wp_parse_args( $headers, $defaults );
+
+		/**
+		 * Filter the headers while they are still in the associated array format
+		 *
+		 * @param $headers array
+		 * @param $email   Email
+		 * @param $contact Contact
+		 */
+		$headers = apply_filters( "groundhogg/email/headers_assoc", $headers, $this, $this->contact );
 
 		// Format the headers as they would have been formatted before.
 		foreach ( $headers as $header_key => &$header_value ) {
@@ -994,13 +1014,9 @@ class Email extends Base_Object_With_Meta {
 	 * @param $event Event|int
 	 */
 	public function set_event( $event ) {
-		if ( ! is_object( $event ) ) {
-			$event = absint( $event );
-			$event = get_queued_event_by_id( $event );
 
-			if ( ! $event ) {
-				$event = new Event( 0 );
-			}
+		if ( is_int( $event ) ) {
+			$event = get_queued_event_by_id( $event );
 		}
 
 		$this->event = $event;
@@ -1014,7 +1030,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function send( $contact_id_or_email, $event = 0 ) {
+	public function send( $contact_id_or_email, $event = null ) {
 
 		is_sending( true );
 		the_email( $this );
@@ -1031,23 +1047,27 @@ class Email extends Base_Object_With_Meta {
 		$this->set_contact( $contact );
 
 		/* we got an event so all is well */
-		if ( is_object( $event ) ) {
+		if ( $event !== null ) {
 			$this->set_event( $event );
 		}
 
-		// If email isn't set to ready
-		if ( ! $this->is_ready() && ! $this->is_testing() ) {
-			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
-		}
+		// We're not testing
+		if ( ! $this->is_testing() ){
 
-		// Contact is undeliverable
-		if ( ! $contact->is_deliverable() ) {
-			return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.', 'groundhogg' ) );
-		}
+			// If email isn't set to ready
+			if ( ! $this->is_ready() ) {
+				return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
+			}
 
-		// Ignore if testing or the message is transactional
-		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() ) {
-			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
+			// Contact is undeliverable
+			if ( ! $contact->is_deliverable()) {
+				return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.', 'groundhogg' ) );
+			}
+
+			// Ignore if testing or the message is transactional
+			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
+				return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
+			}
 		}
 
 		/* Additional settings */
@@ -1280,17 +1300,27 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_as_array() {
 
+		$referer = wp_get_referer();
+		$params  = [];
+		wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
+
 		// Check if coming from contacts page
-		if ( current_user_can( 'edit_contacts' ) ) {
+		if ( current_user_can( 'edit_contacts' )
+		     && get_array_var( $params, 'page' ) === 'gh_contacts'
+		     && isset_not_empty( $params, 'contact' )
+		) {
+			// We're previewing from a contact's perspective
+			$contact_id = absint( $params['contact'] );
+			$this->set_contact( $contact_id );
+		}
 
-			$referer = wp_get_referer();
-			$params  = [];
-			wp_parse_str( wp_parse_url( $referer, PHP_URL_QUERY ), $params );
-
-			if ( get_array_var( $params, 'page' ) === 'gh_contacts' && isset_not_empty( $params, 'contact' ) ) {
-				$contact_id = absint( $params['contact'] );
-				$this->set_contact( $contact_id );
-			}
+		// Maybe we're editing the email
+		if ( current_user_can( 'edit_emails' )
+		     && get_array_var( $params, 'page' ) === 'gh_emails'
+		     && get_array_var( 'action' ) === 'edit'
+		){
+			// Enable test mode for previews from the edit screen
+			$this->enable_test_mode();
 		}
 
 		// Ensure there is a contact object there somewhere
@@ -1312,11 +1342,6 @@ class Email extends Base_Object_With_Meta {
 			}
 
 			$this->set_contact( $contact );
-		}
-
-		// Ensure there is an event object there somewhere
-		if ( ! $this->event ) {
-			$this->set_event( new Event() );
 		}
 
 		the_email( $this );

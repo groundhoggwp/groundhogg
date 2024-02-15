@@ -96,6 +96,7 @@ class Emails_Page extends Admin_Page {
 
 			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
 			$email    = new Email( $email_id );
+            $email->enable_test_mode();
 
 			if ( ! $email->exists() ) {
 				$email->title = 'My new email';

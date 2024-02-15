@@ -14,6 +14,27 @@ if ( ! class_exists( '\PHPMailer\PHPMailer\PHPMailer' ) ) {
 
 class GH_Mailer extends PHPMailer {
 	// Util class for SMTP integrations
+
+	public function createHeader() {
+
+		// Remove List-* from custom headers because encoding them breaks functionality in some clients
+		$ListUnsubscribeHeaders = array_filter_splice( $this->CustomHeader, function ( $header ){
+			return str_starts_with( strtolower( $header[0] ), 'list-' );
+		} );
+
+		// The original header
+		$result = parent::createHeader();
+
+		// Add list unsubscribe headers here so that they don't get encoded because iCloud does not decode them.
+		foreach ($ListUnsubscribeHeaders as $header) {
+			$result .= $this->headerLine(
+				trim($header[0]),
+				trim($header[1]) // NO ENCODING
+			);
+		}
+
+		return $result;
+	}
 }
 
 class GH_SMTP extends SMTP{
