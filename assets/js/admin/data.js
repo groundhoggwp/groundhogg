@@ -355,7 +355,9 @@
         return ids.map(id => this.get(id))
       }
 
-      const params = {}
+      const params = {
+        limit: 0 // No limit if getting by ID specifically
+      }
 
       if (ids && ids.length) {
         params.ID = ids.filter(id => !this.hasItem(id))
@@ -862,7 +864,11 @@
           sort((a, b) => a.data.step_order - b.data.step_order)
       },
     }),
-    emails: ObjectStore(Groundhogg.api.routes.v4.emails),
+    emails: ObjectStore(Groundhogg.api.routes.v4.emails, {
+      send(id, data){
+        return apiPost(`${ this.route }/${ id }/send`, data)
+      }
+    }),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
     notes: ObjectStore(Groundhogg.api.routes.v4.notes),
     tasks: ObjectStore(Groundhogg.api.routes.v4.tasks, {

@@ -88,6 +88,14 @@ class Main_Updater extends Old_Updater {
 						$funnel->update_step_status();
 					}
 				}
+			],
+			'3.3'    => [
+				'automatic'   => true,
+				'description' => __( 'List-Unsubscribe header is now required.', 'groundhogg' ),
+				'callback'    => function () {
+					// List-Unsubscribe is now required
+					delete_option( 'gh_disable_unsubscribe_header' );
+				}
 			]
 		];
 	}

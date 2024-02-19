@@ -799,7 +799,7 @@ label.block {
   flex-direction: column;
   align-items: stretch;
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
 }
 .email-preview iframe {

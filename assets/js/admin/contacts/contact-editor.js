@@ -10,10 +10,8 @@
     inputRepeaterWidget,
     inputRepeater,
     el,
-    searchOptionsWidget,
     input,
     select,
-    isNumeric,
     textarea,
     icons,
     bold,
@@ -29,6 +27,7 @@
     spinner,
     dialog,
   } = Groundhogg.element
+
   const {
     currentUser,
     filters,
@@ -130,109 +129,84 @@
                 break
               case 'template':
 
-                let emailId
+                const State = Groundhogg.createState({
+                  email: null,
+                })
 
-                const preview = () => {
+                MakeEl.Modal({}, ({morph, close}) => MakeEl.Div({
+                  id: 'send-email-dialog'
+                }, [
+                  `<h3>${sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name )}</h3>`,
+                  MakeEl.ItemPicker({
+                    id: `select-email`,
+                    noneSelected: __('Select an email to send...', 'groundhogg'),
+                    selected: State.email ? { id: State.email.ID, text: State.email.data.title } : [],
+                    multiple: false,
+                    style: {
+                      flexGrow: 1,
+                    },
+                    fetchOptions: (search) => {
+                      return EmailsStore.fetchItems({
+                          search,
+                          status: 'ready',
+                        }).
+                        then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+                    },
+                    onChange: item => {
+                      if (!item) {
+                        State.set({
+                          email: null,
+                        })
+                      } else {
+                        let email = EmailsStore.get(item.id)
 
-                  // language=HTML
-                  return `
-                      <div class="gh-row">
-                          <div class="gh-col">
-                              <iframe id="select-email-preview"
-                                      class="hidden"></iframe>
-                          </div>
-                      </div>`
-                }
+                        State.set({
+                          email,
+                        })
+                      }
 
-                const showFrame = () => {
-                  if (emailId) {
-                    let $frm = $('#select-email-preview')
-                    setFrameContent($frm[0],
-                      EmailsStore.get(emailId).context.built)
-                    $frm.removeClass('hidden')
-                  }
-                }
+                      morph()
+                    },
+                  }),
 
-                modal({
-                  width: 500,
-                  // language=HTML
-                  content:
-                    `
-                        <h2>${ __('Select an email template to send',
-                                'groundhogg') }</h2>
-                        <div class="gh-rows-and-columns">
-                            <div class="gh-row">
-                                <div class="gh-col">
-                                    ${ select({
-                                        name: 'email',
-                                        id: `select-email`,
-                                        options: [
-                                            { text: '', value: '' },
-                                            ...EmailsStore.getItems().
-                                                    map(e => ( {
-                                                        text: e.data.title,
-                                                        value: e.ID,
-                                                    } )),
-                                        ],
-                                        selected: emailId,
-                                    }) }
-                                </div>
-                            </div>
-                            ${ preview() }
-                            <div class="gh-row">
-                                <div class="gh-col">
-                                    <button id="send-email-template"
-                                            class="gh-button primary" disabled>
-                                        ${ __('Send Email', 'groundhogg') }
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                  onOpen: ({ close }) => {
-
-                    let $btn = $('#send-email-template')
-
-                    emailPicker(`#select-email`, false,
-                      (items) => {EmailsStore.itemsFetched(items)}, {
-                        status: 'ready',
-                      }, {
-                        placeholder: __('Select an email to send...',
-                          'groundhogg'),
-                      }).on('change', ({ target }) => {
-
-                      emailId = parseInt(target.value)
-                      showFrame()
-
-                      $btn.prop('disabled', false)
-
+                  State.email ? MakeEl.Div({
+                      className: 'gh-panel outlined'
+                    },
+                    Groundhogg.components.EmailPreview({
+                      ...State.email.context,
+                      content: State.email.context.built
                     })
+                  ) : null,
 
-                    $btn.on('click', e => {
+                  State.email ? MakeEl.Button({
+                    id: 'send-email',
+                    className: 'gh-button primary medium',
+                    onClick: e => {
 
-                      $btn.prop('disabled', true)
-                      let { stop } = loadingDots(e.currentTarget)
+                      e.currentTarget.disabled = true;
+                      e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
-                      post(`${ EmailsStore.route }/${ emailId }/send`, {
-                        to: getContact().ID,
-                      }).then(r => {
+                      EmailsStore.send( State.email.ID, {
+                        to: getContact().ID
+                      } ).then(r => {
+
                         dialog({
                           message: __('Email sent!'),
                         })
-                        stop()
+
                         close()
+
                       }).catch(e => {
-                        stop()
-                        $btn.prop('disabled', false)
                         dialog({
                           type: 'error',
                           message: e.message,
                         })
+                        morph()
                       })
 
-                    })
-                  },
-                })
+                    }
+                  }, __( 'Send email now!', 'groundhogg' ) ) : null
+                ]))
 
                 break
 
@@ -265,121 +239,94 @@
       tooltip: __('Add to a funnel', 'groundhogg'),
       show: contact => true,
       onClick: e => {
-        modal({
-          content: ``,
-          onOpen: ({ close, setContent }) => {
 
-            let funnel = FunnelsStore.hasItems()
-              ? FunnelsStore.getItems()[0]
-              : null
-            let step = funnel ? funnel.steps[0] : null
+        const State = Groundhogg.createState({})
 
-            const addToFunnelUi = () => {
-              // language=HTML
-              return `
-                  <div>
-                      <h2>${ sprintf(__('Add %s to a funnel', 'groundhogg'),
-                              getContact().data.full_name) }</h2>
-                      <div class="gh-rows-and-columns">
-                          <div class="gh-row">
-                              <div class="gh-col">
-                                  ${ select({ id: 'select-funnel' }) }
-                              </div>
-                          </div>
-                          <div class="gh-row">
-                              <div class="gh-col">
-                                  ${ funnel ? select({ id: 'select-step' }) : '' }
-                              </div>
-                          </div>
-                          <div class="gh-row">
-                              <div class="gh-col">
-                                  ${ funnel && step
-                                          ? `<button id="confirm-add-to-funnel" class="gh-button primary">${ __(
-                                                  'Add to funnel') }</button>`
-                                          : '' }
-                              </div>
-                          </div>
-                      </div>
-                  </div>`
-            }
+        MakeEl.Modal({}, ({morph, close}) => MakeEl.Div({
+          id: 'add-to-funnel-dialog',
+          className: 'display-flex gap-10 column'
+        }, [
+          `<h3 style="margin: 0">${sprintf(__('Add %s to a funnel', 'groundhogg'), getContact().data.full_name )}</h3>`,
+          MakeEl.ItemPicker({
+            id: `select-a-funnel`,
+            noneSelected: __('Select a funnel...', 'groundhogg'),
+            selected: State.funnel_id ? { id: State.funnel_id, text: FunnelsStore.get(State.funnel_id).data.title } : [],
+            multiple: false,
+            clearable: false,
+            style: {
+              flexGrow: 1,
+            },
+            fetchOptions: (search) => {
+              return FunnelsStore.fetchItems({
+                search,
+              }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+            },
+            onChange: item => {
+              State.set({
+                funnel_id: item.id,
+                step_id: FunnelsStore.get( item.id ).steps[0].ID
+              })
+              morph()
+            },
+          }),
+          State.funnel_id ? MakeEl.ItemPicker({
+            id: `select-step-from-${State.funnel_id}`,
+            noneSelected: __('Select a step...', 'groundhogg'),
+            clearable: false,
+            selected: State.step_id ? {
+              id: State.step_id,
+              text: FunnelsStore.get(State.funnel_id).steps.find(s => s.ID === State.step_id).data.step_title,
+            } : [],
+            multiple: false,
+            style: {
+              flexGrow: 1,
+            },
+            fetchOptions: async (search) => FunnelsStore.get(State.funnel_id).
+              steps.
+              map(({ ID, data }) => ( { id: ID, text: data.step_title } )).
+              filter(opt => opt.text.match(new RegExp(search, 'i'))),
+            onChange: item => {
+              State.set({
+                step_id: item.id,
+              })
+              morph()
 
-            setContent(addToFunnelUi())
+            },
+          }) : null,
+          State.funnel_id && State.step_id ? MakeEl.Button({
+            id: 'add-to-funnel',
+            className: 'gh-button primary medium',
+            onClick: e => {
 
-            const onMount = () => {
+              e.currentTarget.disabled = true;
+              e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
-              $('#select-funnel').ghPicker({
-                endpoint: FunnelsStore.route,
-                getParams: (q) => {
-                  return {
-                    ...q,
-                    status: 'active',
-                  }
-                },
-                data: FunnelsStore.getItems().map(f => ( {
-                  id: f.ID,
-                  text: f.data.title,
-                  selected: funnel && f.ID === funnel.ID,
-                } )),
-                getResults: ({ items }) => {
-                  FunnelsStore.itemsFetched(items)
-                  return items.map(f => ( { id: f.ID, text: f.data.title } ))
-                },
-                placeholder: __('Select a funnel...', 'groundhogg'),
-              }).on('change', ({ target }) => {
-                funnel = FunnelsStore.get(parseInt($(target).val()))
+              FunnelsStore.addContacts({
+                funnel_id: State.funnel_id,
+                step_id: State.step_id,
+                contact_id: getContact().ID
+              }).then(() => {
 
-                step = funnel.steps.find(s => s.data.step_order == 1)
-                setContent(addToFunnelUi())
-                onMount()
+                dialog({
+                  message: sprintf(__('%s added to funnel!', 'groundhogg'),
+                    getContact().data.full_name),
+                })
 
+                close()
+
+              }).catch( err => {
+
+                dialog({
+                  type: 'error',
+                  message: err.message
+                })
+
+                morph()
               })
 
-              if (funnel) {
-                $('#select-step').select2({
-                  placeholder: __('Select a step...', 'groundhogg'),
-                  data: funnel.steps.sort(
-                    (a, b) => a.data.step_order - b.data.step_order).map(s => ( {
-                    id: s.ID,
-                    text: `${ s.data.step_title } (${ Groundhogg.rawStepTypes[s.data.step_type].name })`,
-                    selected: s.ID == step.ID,
-                  } )),
-                  // templateSelection: template,
-                  // templateResult: template
-                }).on('change', ({ target }) => {
-                  step = funnel.steps.find(
-                    s => s.ID === parseInt($(target).val()))
-                  setContent(addToFunnelUi())
-                  onMount()
-                })
-              }
-
-              if (funnel && step) {
-                $('#confirm-add-to-funnel').on('click', e => {
-
-                  FunnelsStore.addContacts({
-                    funnel_id: funnel.ID,
-                    step_id: step.ID,
-                    contact_id: getContact().ID
-                  }).then(() => {
-
-                    dialog({
-                      message: sprintf(__('%s added to funnel!', 'groundhogg'),
-                        getContact().data.full_name),
-                    })
-
-                    close()
-
-                  })
-
-                })
-              }
-
             }
-
-            onMount()
-
-          },
-        })
+          }, sprintf( __( 'Add to %s now!', 'groundhogg' ), bold( FunnelsStore.get(State.funnel_id).data.title ) ) ) : null
+        ]))
       },
     },
     {

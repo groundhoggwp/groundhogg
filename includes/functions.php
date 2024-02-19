@@ -8,7 +8,6 @@ use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
 use Groundhogg\Utils\DateTimeHelper;
-use Groundhogg\Utils\Micro_Time_Tracker;
 use WP_Error;
 
 
@@ -5215,6 +5214,30 @@ function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $exp
 }
 
 /**
+ * Adds params to the url for failsafe tracking if for whatever reason the tracking links aren't working.
+ *
+ * @param string  $url
+ * @param Contact $contact
+ *
+ * @return string
+ */
+function add_failsafe_tracking_params( string $url, Contact $contact ){
+
+	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
+		$url = add_query_arg( [
+			'e' => dechex( the_email()->get_event()->get_id() )
+		], $url );
+	} else {
+		// add identity as tracking failsafe
+		$url = add_query_arg( [
+			'identity' => encrypt( $contact->get_email() )
+		], $url );
+	}
+
+    return $url;
+}
+
+/**
  * Generate a url with the permissions key on it.
  *
  * @param string    $url              the url to append the key to
@@ -5244,10 +5267,7 @@ function confirmation_url( $contact ) {
 	// create permissions url
 	$url = permissions_key_url( $url, $contact, 'preferences' );
 
-	// add identity as tracking failsafe
-	$url = add_query_arg( [
-		'identity' => encrypt( $contact->get_email() )
-	], $url );
+	$url = add_failsafe_tracking_params( $url, $contact );
 
 	return apply_filters( 'groundhogg/confirmation_url', $url, $contact );
 }
@@ -5265,12 +5285,41 @@ function unsubscribe_url( $contact ) {
 	// create permissions url
 	$url = permissions_key_url( $url, $contact, 'preferences' );
 
-	// add identity as tracking failsafe
-	$url = add_query_arg( [
-		'identity' => encrypt( $contact->get_email() )
-	], $url );
+	$url = add_failsafe_tracking_params( $url, $contact );
 
 	return apply_filters( 'groundhogg/unsubscribe_url', $url, $contact );
+}
+
+/**
+ * @param $usage
+ *
+ * @return bool|mixed
+ */
+function get_permissions_key_cookie( $usage ) {
+	$cookie = 'gh-permissions-key';
+
+	if ( $usage ) {
+		$cookie .= '-' . $usage;
+	}
+
+	return get_cookie( $cookie );
+}
+
+/**
+ * @param $key
+ * @param $usage
+ *
+ * @return void
+ */
+function set_permissions_key_cookie( $key, $usage = '' ) {
+
+	$cookie = 'gh-permissions-key';
+
+	if ( $usage ) {
+		$cookie .= '-' . $usage;
+	}
+
+	set_cookie( $cookie, $key, HOUR_IN_SECONDS );
 }
 
 /**
@@ -5282,12 +5331,6 @@ function unsubscribe_url( $contact ) {
  */
 function get_permissions_key( $usage = '', $set_cookie = false ) {
 
-	$cookie = 'gh-permissions-key';
-
-	if ( $usage ) {
-		$cookie .= '-' . $usage;
-	}
-
 	// Try to get from URL
 	$permissions_key = get_url_var( 'pk' );
 
@@ -5295,14 +5338,14 @@ function get_permissions_key( $usage = '', $set_cookie = false ) {
 
 		// if we also want to set it as the cookie
 		if ( $set_cookie ) {
-			set_cookie( $cookie, $permissions_key, HOUR_IN_SECONDS );
+			set_permissions_key_cookie( $permissions_key, $usage );
 		}
 
 		return $permissions_key;
 	}
 
 	// Try to get from cookies
-	return get_cookie( $cookie );
+	return get_permissions_key_cookie( $usage );
 }
 
 /**
@@ -5556,6 +5599,60 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 		'activity_type' => $type,
 		'timestamp'     => time(),
 		'contact_id'    => $contact->get_id()
+	];
+
+	// Merge overrides with args
+	$args = wp_parse_args( $args, $defaults );
+
+	$args = apply_filters( 'groundhogg/track_activity/args', $args, $contact );
+
+	// Add the activity to the DB
+	$id = get_db( 'activity' )->add( $args );
+
+	if ( ! $id ) {
+		return false;
+	}
+
+	$activity = new Activity( $id );
+
+	// Add any details to the activity meta
+	foreach ( $details as $detail_key => $value ) {
+		$activity->update_meta( $detail_key, $value );
+	}
+
+	track_activity_actions( $activity );
+
+	return $activity;
+}
+
+/**
+ * Track activity associated with a specific event
+ *
+ * @param Event  $event
+ * @param string $type
+ * @param array  $details
+ * @param array  $args
+ *
+ * @return Activity|False
+ */
+function track_event_activity( Event $event, string $type = '', array $details = [], array $args = [] ) {
+
+	$contact = $event->get_contact();
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+	}
+
+	// use tracking cookies to generate information for the activity log
+	$defaults = [
+		'activity_type' => $type,
+		'timestamp'     => time(),
+		'contact_id'    => $contact->get_id(),
+		'event_id'      => $event->ID,
+		'funnel_id'     => $event->funnel_id,
+		'step_id'       => $event->step_id,
+		'email_id'      => $event->email_id,
 	];
 
 	// Merge overrides with args

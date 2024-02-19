@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.2.33
+Stable tag: 3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.3 (2024-02-15) =
+* ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
+* TWEAKED Email previews in the editor will ignore conditional blocks and show all content.
+* TWEAKED Bounce inbox IMAP settings are hidden if using API based outgoing email service.
+* IMPROVED UI of sending email templates from the contact record.
+* IMPROVED UI of adding a contact to a funnel from the contact record.
+* FIXED If more than 25 emails in a funnel they were not all preloading.
+* FIXED List-Unsubscribe header not working in iCloud because iCloud desktop does not decode it properly.
 
 = 3.2.3.3 (2024-02-13) =
 * FIXED Uninstall function was not deleting all options.

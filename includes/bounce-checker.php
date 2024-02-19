@@ -206,6 +206,11 @@ class Bounce_Checker {
 
 		$this->setup();
 
+        // Using an API based email client means that there is no need to check bounces remotely
+        if ( ! \Groundhogg_Email_Services::service_in_use( 'wp_mail' ) && ! \Groundhogg_Email_Services::service_in_use( 'smtp' ) ){
+            return;
+        }
+
 		if ( ! function_exists( 'imap_open' ) ) {
 			return;
 		}

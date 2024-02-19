@@ -495,11 +495,6 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Cookies', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			],
-			'unsubscribe'           => [
-				'id'    => 'unsubscribe',
-				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'marketing'
-			],
 //			'sendwp'            => [
 //				'id'       => 'sendwp',
 //				'title'    => _x( 'SendWP', 'settings_sections', 'groundhogg' ),
@@ -532,6 +527,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
 			],
+			'unsubscribe' => [
+				'id'    => 'unsubscribe',
+				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email'
+			],
 			'email_logging'         => [
 				'id'       => 'email_logging',
 				'title'    => _x( 'Email Logging', 'settings_sections', 'groundhogg' ),
@@ -541,23 +541,12 @@ class Settings_Page extends Admin_Page {
 					<div id="email-logging"></div><?php
 				}
 			],
-//			'imap'               => array(
-//				'id'       => 'imap',
-//				'title'    => _x( 'Email Imap', 'settings_sections', 'groundhogg' ),
-//				'tab'      => 'email',
-//				'callback' => [ Plugin::$instance->imap_inbox, 'test_connection_ui' ],
-//			),
 			'bounces'               => [
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
 				'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
 			],
-//			'api_settings'      => array(
-//				'id'    => 'api_settings',
-//				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
-//				'tab'   => 'api_tab'
-//			),
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Opt-in Status Tags', 'settings_sections', 'groundhogg' ),
@@ -565,6 +554,11 @@ class Settings_Page extends Admin_Page {
 				'callback' => [ Plugin::$instance->tag_mapping, 'reset_tags_ui' ],
 			],
 		];
+
+        // If SMTP or WP Mail is not in use, hide the bounce settings. We don't need them.
+        if ( ! Groundhogg_Email_Services::service_in_use( 'wp_mail' ) && ! Groundhogg_Email_Services::service_in_use( 'smtp' ) ){
+            unset( $sections['bounces'] );
+        }
 
 		if ( ! Tag_Mapping::enabled() ){
 			unset( $sections['optin_status_tags'] );
@@ -1490,7 +1484,8 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed rather than required to unsubscribe in the email preferences area.', 'settings', 'groundhogg' ),
+				'desc' => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed rather than required to confirm unsubscribing in the preferences screen.', 'settings', 'groundhogg' ),
+
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' ),
@@ -1499,17 +1494,17 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				],
 			],
-			'gh_disable_unsubscribe_header'          => [
-				'id'      => 'gh_disable_unsubscribe_header',
+			'gh_unsubscribe_email'                   => [
+				'id'      => 'gh_unsubscribe_email',
 				'section' => 'unsubscribe',
-				'label'   => _x( 'Disable the Unsubscribe header.', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'The unsubscribe header is recommended for promotional emails and will improve deliverability among large email senders. Disabling it may result in your email going to spam.', 'settings', 'groundhogg' ),
-				'type'    => 'checkbox',
+				'label'   => _x( 'Send Unsubscribe Email Notifications to...', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Outlook, iCloud, Yahoo, and other inboxes will send unsubscribes email notifications to this email address.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
 				'atts'    => [
-					'label' => __( 'Disable' ),
-					'name'  => 'gh_disable_unsubscribe_header',
-					'id'    => 'gh_disable_unsubscribe_header',
-					'value' => 'on',
+					'type'        => 'email',
+					'name'        => 'gh_unsubscribe_email',
+					'id'          => 'gh_unsubscribe_email',
+					'placeholder' => get_bloginfo( 'admin_email' ),
 				],
 			],
 			'gh_disable_wp_cron'                     => [

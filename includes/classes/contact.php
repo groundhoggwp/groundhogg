@@ -1388,6 +1388,7 @@ class Contact extends Base_Object_With_Meta {
 		$additional_phones   = array_unique_cb( $additional_phones, function ( $r ) {
 			return $r[1];
 		} );
+
 		$this->update_meta( 'alternate_phones', $additional_phones );
 
 		// Update the date
@@ -1398,8 +1399,14 @@ class Contact extends Base_Object_With_Meta {
 
 		$uploads_dir = $this->get_uploads_folder();
 
-		// Move any files to this contacts uploads folder.
+		// Might have to create the directory
+		if ( ! is_dir( $uploads_dir['path'] ) ){
+			wp_mkdir_p( $uploads_dir['path'] );
+		}
+
+		// Move any files to this contact's uploads folder.
 		foreach ( $other->get_files() as $file ) {
+
 			$file_path = $file['path'];
 			$file_name = $file['name'];
 

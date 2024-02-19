@@ -571,13 +571,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$tags = validate_tags( $tags );
 
-		Background_Tasks::add( new Import_Contacts( $file_name, [
+		$result = Background_Tasks::add( new Import_Contacts( $file_name, [
 			'is_confirmed'      => (bool) get_post_var( 'email_is_confirmed' ),
 			'gdpr_consent'      => (bool) get_post_var( 'data_processing_consent_given' ),
 			'marketing_consent' => (bool) get_post_var( 'marketing_consent_given' ),
 			'field_map' => $map,
 			'tags'      => $tags,
 		] ) );
+
+        if ( is_wp_error( $result ) ){
+            return $result;
+        }
+
+        if ( $result === false ){
+            return new WP_Error( 'oops', 'Something went wrong.' );
+        }
 
 		$rows = count_csv_rows( files()->get_csv_imports_dir( $file_name ) );
 

@@ -7,28 +7,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Groundhogg\Plugin;
-use WP_REST_Server;
+use Groundhogg\Classes\Activity;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
-use function Groundhogg\decrypt;
-use function Groundhogg\get_contactdata;
+use WP_REST_Server;
+use function Groundhogg\check_permissions_key;
+use function Groundhogg\get_event_by_queued_id;
+use function Groundhogg\get_permissions_key;
+use function Groundhogg\managed_page_url;
+use function Groundhogg\set_permissions_key_cookie;
+use function Groundhogg\track_activity;
+use function Groundhogg\track_event_activity;
+use function Groundhogg\tracking;
+use function Groundhogg\unsubscribe_url;
 
 class Unsubscribe_Api extends Base_Api {
 
 	public function register_routes() {
-		register_rest_route( self::NAME_SPACE, '/unsubscribe', [
+
+		register_rest_route( self::NAME_SPACE, '/unsubscribe/(?P<event>\w+)/(?P<pk>\w+)', [
 			[
 				'methods'              => WP_REST_Server::EDITABLE,
 				'callback'             => [ $this, 'unsubscribe' ],
 				'permission_callback' => '__return_true',
-				'args'                 => [
-					'contact' => [
-						'description' => 'Encrypted contact ID or Email address',
-						'required'    => true
-					]
-				]
+			],
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'unsubscribe' ],
+				'permission_callback' => '__return_true',
 			]
 		] );
 	}
@@ -42,20 +49,32 @@ class Unsubscribe_Api extends Base_Api {
 	 */
 	public function unsubscribe( WP_REST_Request $request ) {
 
-		$enc_contact_id_or_email = $request->get_param( 'contact' );
-		$contact_id_or_email     = decrypt( $enc_contact_id_or_email );
+		$pk    = $request->get_param( 'pk' );
+		$event = absint( hexdec( $request->get_param( 'event' ) ) );
 
-		if ( ! $contact_id_or_email ) {
-			return self::ERROR_401( 'invalid_contact_id_or_email', 'The provided contact is invalid.' );
+		$event = get_event_by_queued_id( $event );
+
+		if ( ! $event || ! $event->exists() ) {
+			return self::ERROR_404( 'not_found', 'No contact could be found for the provided info.' );
 		}
 
-		$contact = get_contactdata( $contact_id_or_email );
-
-		if ( ! $contact ) {
-			return self::ERROR_401( 'invalid_contact_id_or_email', 'The provided contact is invalid.' );
+		if ( ! check_permissions_key( $pk, $event->get_contact() ) ) {
+			return self::ERROR_401( 'invalid_token', 'Could not verify the request was authentic.' );
 		}
 
-		$contact->unsubscribe();
+		$event->get_contact()->unsubscribe();
+
+		track_event_activity( $event, Activity::UNSUBSCRIBED );
+
+		if ( $request->get_method() === 'GET' ){
+
+			tracking()->set_current_contact( $event->get_contact() );
+
+			set_permissions_key_cookie( $pk, 'preferences' );
+
+			wp_redirect( wp_nonce_url( managed_page_url( 'preferences/unsubscribe' ), 'unsubscribe' ) );
+			die();
+		}
 
 		return self::SUCCESS_RESPONSE();
 	}

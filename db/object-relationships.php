@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Base_Object;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -80,6 +82,39 @@ class Object_Relationships extends DB {
 
 	}
 
+	public function swap_relationships( string $which, string $type, int $old, int $new ) {
+
+		$object_id   = $which . '_object_id';
+		$object_type = $which . '_object_id';
+
+		$relationships = $this->query( [
+			$object_id   => $old,
+			$object_type => 'contact'
+		] );
+
+		foreach ( $relationships as $relationship ) {
+			$relationship->$object_id = $new;
+			$this->insert( (array) $relationship );
+		}
+	}
+
+	/**
+		$this->delete( [
+			$object_id   => $old,
+			$object_type => 'contact'
+		] );
+	 * When an object is merged, swap the relationships for it
+	 *
+	 * @param Base_Object $from
+	 * @param Base_Object $to
+	 *
+	 * @return void
+	 */
+	public function object_merged( Base_Object $to, Base_Object $from ){
+		$this->swap_relationships( 'primary', $from->get_object_type, $from->get_id(), $to->get_id() );
+		$this->swap_relationships( 'secondary', $from->get_object_type, $from->get_id(), $to->get_id() );
+	}
+
 	/**
 	 * update the secondary and primary based on non-existing relationships
 	 *
@@ -87,21 +122,8 @@ class Object_Relationships extends DB {
 	 * @param \Groundhogg\Contact $other
 	 */
 	public function contact_merged( $contact, $other ) {
-
-		global $wpdb;
-
-		// update primary
-		$wpdb->query( "UPDATE $this->table_name SET primary_object_id = $contact->ID WHERE 
-primary_object_type = 'contact' AND primary_object_id = $other->ID AND (secondary_object_id,secondary_object_type) NOT IN (
-    SELECT secondary_object_id,secondary_object_type FROM $this->table WHERE primary_object_id = $contact->ID AND primary_object_type = 'contact'
-) " );
-
-		// Update Secondary
-		$wpdb->query( "UPDATE $this->table_name SET secondary_object_id = $contact->ID WHERE 
-secondary_object_type = 'contact' AND secondary_object_id = $other->ID AND (primary_object_id,primary_object_type) NOT IN (
-    SELECT primary_object_id,primary_object_type FROM $this->table WHERE secondary_object_id = $contact->ID AND secondary_object_type = 'contact'
-) " );
-
+		$this->swap_relationships( 'primary', 'contact', $other->ID, $contact->ID );
+		$this->swap_relationships( 'secondary', 'contact', $other->ID, $contact->ID );
 	}
 
 	public function insert( $data ) {

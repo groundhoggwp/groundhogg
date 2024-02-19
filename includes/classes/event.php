@@ -6,6 +6,7 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Events;
 use Groundhogg\Queue\Email_Notification;
 
+use Groundhogg\queue\Test_Email;
 use Groundhogg\Queue\Test_Event_Failure;
 use Groundhogg\Queue\Test_Event_Success;
 use Groundhogg\Utils\DateTimeHelper;
@@ -44,6 +45,7 @@ class Event extends Base_Object {
 	const FUNNEL = 1;
 	const BROADCAST = 2;
 	const EMAIL_NOTIFICATION = 3;
+	const TEST_EMAIL = 97;
 	const TEST_SUCCESS = 98;
 	const TEST_FAILURE = 99;
 
@@ -247,16 +249,18 @@ class Event extends Base_Object {
 	 * @return bool|Email
 	 */
 	public function get_email() {
+
+		if ( $this->get_email_id() ){
+			return new Email( $this->get_email_id() );
+		}
+
 		switch ( $this->get_event_type() ) {
 			case Event::FUNNEL;
 				return new Email( absint( $this->get_step()->get_meta( 'email_id' ) ) );
-				break;
 			case Event::EMAIL_NOTIFICATION;
 				return new Email( $this->get_step()->get_id() );
-				break;
 			case Event::BROADCAST;
 				return new Email( $this->get_step()->get_object_id() );
-				break;
 		}
 
 		return false;
@@ -277,6 +281,55 @@ class Event extends Base_Object {
 	}
 
 	/**
+	 * Callbacks the create the Event Process based on the event type
+	 *
+	 * @var array
+	 */
+	protected static array $step_setup_callbacks = [];
+
+	public static function register_step_setup_callback( int $type, callable $callback ){
+		self::$step_setup_callbacks[$type] = $callback;
+	}
+
+	/**
+	 * Initially registers step callbacks
+	 *
+	 * @return void
+	 */
+	public static function maybe_register_step_setup_callbacks(){
+
+		if ( ! empty( self::$step_setup_callbacks ) ){
+			return;
+		}
+
+		self::register_step_setup_callback( self::FUNNEL, function ( Event $event ){
+			return new Step( $event->get_step_id() );
+		} );
+
+		self::register_step_setup_callback( self::BROADCAST, function ( Event $event ){
+			return new Broadcast( $event->get_step_id() );
+		} );
+
+		self::register_step_setup_callback( self::EMAIL_NOTIFICATION, function ( Event $event ){
+			return new Email_Notification( $event->get_email_id() );
+		} );
+
+		self::register_step_setup_callback( self::TEST_SUCCESS, function ( Event $event ){
+			return new Test_Event_Success();
+		} );
+
+		self::register_step_setup_callback( self::TEST_FAILURE, function ( Event $event ){
+			return new Test_Event_Failure();
+		} );
+
+		self::register_step_setup_callback( self::TEST_EMAIL, function ( Event $event ){
+			return new Test_Email( $event->get_email_id() );
+		} );
+
+		do_action( 'groundhogg/event/maybe_register_step_callbacks' );
+	}
+
+	/**
 	 * Do any post setup actions.
 	 *
 	 * @return void
@@ -285,31 +338,19 @@ class Event extends Base_Object {
 
 		$this->contact = new Contact( $this->get_contact_id() );
 
-		switch ( $this->get_event_type() ) {
-			case self::FUNNEL:
-				$this->step = new Step( $this->get_step_id() );
-				break;
-			case self::EMAIL_NOTIFICATION:
-				$this->step = new Email_Notification( $this->get_step_id() );
-				break;
-			case self::BROADCAST:
-				$this->step = new Broadcast( $this->get_step_id() );
-				break;
-			case self::TEST_SUCCESS:
-				$this->step = new Test_Event_Success();
-				break;
-			case self::TEST_FAILURE:
-				$this->step = new Test_Event_Failure();
-				break;
-			default:
-				$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
+		self::maybe_register_step_setup_callbacks();
 
-				if ( class_exists( $class ) ) {
-					$this->step = new $class( $this->get_step_id() );
-				}
+		$callback = get_array_var( self::$step_setup_callbacks, $this->get_event_type(), function ( Event $event ){
+			$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
 
-				break;
-		}
+			if ( class_exists( $class ) ) {
+				return new $class( $this->get_step_id() );
+			}
+
+			return null;
+		} );
+
+		$this->step = call_user_func( $callback, $this );
 
 		do_action( 'groundhogg/event/post_setup', $this );
 	}
@@ -389,7 +430,6 @@ class Event extends Base_Object {
 		}
 
 		$result = $this->get_step()->run( $this->get_contact(), $this );
-
 
 		// Hard fail when WP Error
 		if ( is_wp_error( $result ) ) {

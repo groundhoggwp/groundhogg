@@ -490,6 +490,7 @@
     page: 'editor',
     templateSearch: '',
     responsiveDevice: 'desktop',
+    testType: 'design',
     blocks: [],
     blockInspector: false,
   }
@@ -3801,10 +3802,75 @@
         disabled: !Boolean(getState().preview),
         onClick: e => {
 
-          Modal({}, ({ close }) => Fragment([
-            `<h2>Send a test email to the following addresses...</h2>`,
+          const TestTypeExplanation = () => {
+
+            let content
+
+            switch ( getState().testType ){
+              default:
+              case 'design':
+                // language=HTML
+                content = `<p>Design tests are <b>only</b> for verifying your design in the inbox.</p>
+                <p>This test will use data from <b>your contact record</b>, but send only to the email addresses you selected.</p>
+                <p>
+                    ✅ <b>[TEST]</b> in subject line.<br/>
+                    ❌ Conditional blocks (all blocks will be visible).<br/>
+                    ❌ Tracking links.<br/>
+                    ❌ Unsubscribe links.<br/>
+                    ❌ View in browser links.<br/>
+                    ❌ Superlinks.<br/>
+                    ❌ Open tracking.
+                </p>`
+                break;
+              case 'functional':
+                // language=HTML
+                content = `<p>Functional tests simulate sending the email to a contact record from a broadcast or a funnel.</p>
+                <p>The email will be sent to your selected email addresses, using information from the associated contact records. If no contact exists, a new one will be created.</p>
+                <p>When testing links, we recommend opening them in an incognito window or different browser. See our <a target="_blank" href="https://help.groundhogg.io/article/888-testing-funnels-and-emails">recommended testing procedures.</a></p>
+                <p>
+                    ❌ <b>[TEST]</b> in subject line.<br/>
+                    ✅ Conditional blocks.<br/>
+                    ✅ Tracking links.<br/>
+                    ✅ Unsubscribe links.<br/>
+                    ✅ View in browser links.<br/>
+                    ✅ Superlinks.<br/>
+                    ✅ Open tracking.
+                </p>`
+                break;
+            }
+
+            return Div({id: 'test-type-explanation'}, content)
+          }
+
+          Modal({
+            onOpen: ({modal}) => {
+              modal.querySelector( '.gh-modal-dialog' ).style.width = '500px'
+            }
+          }, ({ close, morph }) => Fragment([
+            `<h2>Send a test email!</h2>`,
+            ButtonToggle({
+              id: 'test-type',
+              options: [
+                {
+                  id: 'design',
+                  text: 'Design only',
+                },
+                {
+                  id: 'functional',
+                  text: 'Functional',
+                },
+              ],
+              selected: getState().testType ?? 'design',
+              onChange: type => {
+                setState({
+                  testType: type
+                })
+                morph( '#test-type-explanation', TestTypeExplanation(), false)
+              }
+            }),
+            TestTypeExplanation(),
             Div({
-              className: 'display-flex gap-10',
+              className: 'display-flex gap-10 align-bottom',
             }, [
               ItemPicker({
                 id: 'test-email-addresses',
@@ -3828,9 +3894,13 @@
               Button({
                 id: 'send-test',
                 className: 'gh-button primary',
-                onClick: e => {
+                onClick: async e => {
 
                   e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
+
+                  if ( ! getEmail().ID ){
+                    await saveEmail()
+                  }
 
                   let endpoint = getEmail().ID
                     ? `${ EmailsStore.route }/${ getEmailData().ID }/test`
@@ -3840,6 +3910,7 @@
                     to: Groundhogg.user_test_emails.join(','),
                     data: getEmailData(),
                     meta: getEmailMeta(),
+                    type: getState().testType
                   }).then((r) => {
                     dialog({
                       message: __('Test sent!'),
@@ -3850,6 +3921,7 @@
                       message: 'Oops, something went wrong. Try refreshing the page.',
                       type: 'error',
                     })
+                    morph()
                   })
 
                 },
@@ -3964,6 +4036,30 @@
                   email: getEmail().ID,
                   _wpnonce: Groundhogg.nonces._wpnonce,
                 }))
+
+              },
+            },
+            {
+              key: 'html',
+              text: 'Export as HTML',
+              onSelect: e => {
+
+                const blob = new Blob([getState().preview], { type: 'text/html' })
+
+                // Create a temporary <a> element
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+
+                // Set the file name
+                link.download = getEmail().data.title + '.html'
+
+                // Append the link to the body and trigger the download
+                document.body.appendChild(link)
+                link.click()
+
+                // Clean up
+                document.body.removeChild(link)
+                URL.revokeObjectURL(link.href)
 
               },
             },
