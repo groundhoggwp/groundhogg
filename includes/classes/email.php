@@ -931,16 +931,16 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$defaults = [
-			'from'                     => $this->get_from_header(),
-			'reply-to'                 => $this->get_reply_to_address(),
-			'return-path'              => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
-			'content-type'             => 'text/html; charset=UTF-8',
-			'precedence'               => 'bulk',
-			'x-auto-response-suppress' => 'AutoReply'
+			'From'                     => $this->get_from_header(),
+			'Reply-To'                 => $this->get_reply_to_address(),
+			'Return-Path'              => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
+			'Content-Type'             => 'text/html; charset=UTF-8',
+			'Precedence'               => 'bulk',
+			'X-Auto-Response-Suppress' => 'AutoReply'
 		];
 
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
-		if ( ! $this->is_transactional() && ! is_option_enabled( 'gh_disable_unsubscribe_header' ) && $this->event && $this->event->exists() ) {
+		if ( ! $this->is_transactional() && $this->event && $this->event->exists() ) {
 
 			$one_click_unsub_link = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, dechex( $this->event->get_id() ), generate_permissions_key( $this->contact, 'preferences' ) ) );
 
@@ -961,13 +961,13 @@ class Email extends Base_Object_With_Meta {
 			 */
 			$list_unsub_header = apply_filters( 'groundhogg/email/list_unsubscribe_header_content', $list_unsub_header, $one_click_unsub_link, $this );
 
-			$defaults['list-unsubscribe']      = $list_unsub_header;
-			$defaults['list-unsubscribe-post'] = 'List-Unsubscribe=One-Click';
+			$defaults['List-Unsubscribe']      = $list_unsub_header;
+			$defaults['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
 		}
 
 		// Add list-id header to marketing emails
 		if ( ! $this->is_transactional() ) {
-			$defaults['list-id'] = wp_parse_url( home_url(), PHP_URL_HOST );
+			$defaults['List-Id'] = wp_parse_url( home_url(), PHP_URL_HOST );
 		}
 
 		// Merge the custom headers with the defaults...
