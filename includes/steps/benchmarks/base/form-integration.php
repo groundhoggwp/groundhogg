@@ -177,7 +177,7 @@ abstract class Form_Integration extends Benchmark {
 
 	public function validate_settings( Step $step ) {
 
-		$field_map = $step->get_meta( 'field_map' );
+		$field_map = (array) $step->get_meta( 'field_map' ) ?: [];
 
 		if ( empty( $field_map ) ) {
 			$step->add_error( 'invalid_field_map', __( 'Map your form fields to capture submissions.', 'groundhogg' ) );
