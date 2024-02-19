@@ -75,7 +75,7 @@ class Background_Tasks {
 
 		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', $time, $task );
 
-		return wp_schedule_single_event( $when, self::HOOK, [ $task ] );
+		return wp_schedule_single_event( $when, self::HOOK, [ $task ], true );
 	}
 
 	/**
