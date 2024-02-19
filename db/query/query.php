@@ -171,7 +171,7 @@ class Query {
 			"/^MAX\($column_regex\)/i"                                          => function ( $matches ) {
 				return sprintf( "MAX(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w+)(?:'|\")?\)/i"          => function ( $matches ) {
+			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w*)(?:'|\")?\)/i"          => function ( $matches ) {
 				$column = $this->sanitize_column( $matches[1] );
 				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
 

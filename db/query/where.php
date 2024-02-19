@@ -37,13 +37,6 @@ class Where {
 	protected $negate = false;
 
 	/**
-	 * The parent where relation
-	 *
-	 * @var mixed|string
-	 */
-	protected $parentRelation;
-
-	/**
 	 * If this Where has no clauses
 	 *
 	 * @return bool
@@ -73,11 +66,10 @@ class Where {
 	 * @param $query Query
 	 * @param $relation
 	 */
-	public function __construct( $query, $relation = 'AND', $negate = false, $parentRelation = 'AND' ) {
+	public function __construct( $query, $relation = 'AND', $negate = false ) {
 		$this->relation       = $relation;
 		$this->query          = $query;
 		$this->negate         = $negate;
-		$this->parentRelation = $parentRelation;
 	}
 
 	public function __serialize(): array {
@@ -289,15 +281,11 @@ class Where {
 				return $this->notLike( $column, $value );
 		}
 
-		global $wpdb;
-
 		if ( $format === false ) {
 			$format = $this->getColumnFormat( $column, $value );
 		}
 
-		$this->addCondition( $wpdb->prepare( "$column $compare $format", $value ) );
-
-		return $this;
+		return $this->addCondition( $this->prepare( "$column $compare $format", $value ) );
 	}
 
 	/**
@@ -413,9 +401,7 @@ class Where {
 
 		$values = maybe_implode_in_quotes( $values );
 
-		$this->addCondition( "$column IN ( $values )" );
-
-		return $this;
+		return $this->addCondition( "$column IN ( $values )" );
 	}
 
 	/**
@@ -446,9 +432,7 @@ class Where {
 
 		$values = maybe_implode_in_quotes( $values );
 
-		$this->addCondition( "$column NOT IN ( $values )" );
-
-		return $this;
+		return $this->addCondition( "$column NOT IN ( $values )" );
 	}
 
 	/**
@@ -460,13 +444,9 @@ class Where {
 	 * @return $this
 	 */
 	public function like( $column, $string ) {
-		global $wpdb;
-
 		$column = $this->sanitize_column( $column );
 
-		$this->addCondition( $wpdb->prepare( "$column LIKE %s", $string ) );
-
-		return $this;
+		return $this->addCondition( $this->prepare( "$column LIKE %s", $string ) );
 	}
 
 	/**
@@ -478,13 +458,19 @@ class Where {
 	 * @return $this
 	 */
 	public function wLike( $column, $string ) {
-		global $wpdb;
+		return $this->contains( $column, $string );
+	}
 
-		$column = $this->sanitize_column( $column );
+	public function contains( $column, $string  ){
+		return $this->like( $column, '%' . $this->esc_like( $string ) . '%' );
+	}
 
-		$this->addCondition( $wpdb->prepare( "$column LIKE %s", '%' . $this->esc_like( $string ) . '%' ) );
+	public function startsWith( $column, $string  ){
+		return $this->like( $column, $this->esc_like( $string ) . '%' );
+	}
 
-		return $this;
+	public function endsWith( $column, $string  ){
+		return $this->like( $column, '%' . $this->esc_like( $string ) );
 	}
 
 	/**
@@ -496,14 +482,25 @@ class Where {
 	 * @return $this
 	 */
 	public function notLike( $column, $string ) {
-
 		$column = $this->sanitize_column( $column );
 
-		global $wpdb;
+		return $this->addCondition( $this->prepare( "$column NOT LIKE %s", $string ) );;
+	}
 
-		$this->addCondition( $wpdb->prepare( "$column NOT LIKE %s", $string ) );
+	/**
+	 * NOT LIKE %string%
+	 *
+	 * @param $column
+	 * @param $string
+	 *
+	 * @return $this
+	 */
+	public function wNotLike( $column, $string ) {
+		return $this->notContains( $column, $string );
+	}
 
-		return $this;
+	public function notContains( $column, $string ) {
+		return $this->notLike( $column, '%' . $this->esc_like( $string ) . '%' );
 	}
 
 	/**
@@ -519,14 +516,9 @@ class Where {
 	public function between( $column, $a, $b ) {
 
 		$format = $this->getColumnFormat( $column, $a );
-
 		$column = $this->sanitize_column( $column );
 
-		global $wpdb;
-
-		$this->addCondition( $wpdb->prepare( "$column BETWEEN $format AND $format", $a, $b ) );
-
-		return $this;
+		return $this->addCondition( $this->prepare( "$column BETWEEN $format AND $format", $a, $b ) );
 	}
 
 	public function notEmpty( $column ) {
@@ -535,10 +527,7 @@ class Where {
 
 	public function isNotNull( $column ) {
 		$column = $this->sanitize_column( $column );
-
-		$this->addCondition( "$column IS NOT NULL" );
-
-		return $this;
+		return $this->addCondition( "$column IS NOT NULL" );
 	}
 
 	public function empty( $column ) {
@@ -548,15 +537,22 @@ class Where {
 	/**
 	 * Adds a sub where clause, in brackets
 	 *
-	 * @param $relation
+	 * @param string $relation 'OR' or 'AND'
 	 *
 	 * @return Where
 	 */
-	public function subWhere( $relation = 'OR', $negate = false ) {
-		$where = new Where( $this->query, $relation, $negate, $this->relation );
+	public function subWhere( string $relation = 'OR', $negate = false ) {
+		$where = new Where( $this->query, $relation, $negate );
 		$this->addCondition( $where );
-
 		return $where;
+	}
+
+	public function subOr(){
+		return $this->subWhere( 'OR' );
+	}
+
+	public function subAnd(){
+		return $this->subWhere( 'AND' );
 	}
 
 	/**

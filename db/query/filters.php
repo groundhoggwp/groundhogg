@@ -487,7 +487,7 @@ class Filters {
 		if ( $filter['compare'] === 'in' ) {
 			$where->in( $column, $filter['options'] );
 		} else {
-			$where->notIn( $column, $filter['options'] );
+			$where->notIn( "COALESCE($column,'')", $filter['options'] );
 		}
 	}
 
@@ -516,13 +516,13 @@ class Filters {
 			case 'all_checked':
 			case 'all_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->like( $column, '%"' . $where->query->db->esc_like( $option ) . '"%' );
+					$where->contains( $column, '"' . $option . '"' );
 				}
 				break;
 			case 'not_checked':
 			case 'all_not_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->notLike( $column, '%"' . $where->query->db->esc_like( $option ) . '"%' );
+					$where->notContains( "COALESCE($column,'')", '"' . $option . '"' );
 				}
 				break;
 		}
@@ -538,7 +538,6 @@ class Filters {
 	 * @return void
 	 */
 	public static function string( $column, $filter, Where $where ) {
-		global $wpdb;
 
 		[ 'value' => $value, 'compare' => $compare ] = wp_parse_args( $filter, [
 			'compare' => '',
@@ -560,23 +559,23 @@ class Filters {
 				$where->notEquals( $column, $value );
 				break;
 			case 'contains':
-				$where->like( $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				$where->contains( $column, $value );
 				break;
 			case 'not_contains':
-				$where->notLike( $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				$where->notContains( $column, $value );
 				break;
 			case 'starts_with':
 			case 'begins_with':
-				$where->like( $column, $wpdb->esc_like( $value ) . '%' );
+				$where->startsWith( $column, $value );
 				break;
 			case 'does_not_start_with':
-				$where->notLike( $column, $wpdb->esc_like( $value ) . '%' );
+				$where->notLike( $column, $where->esc_like( $value ) . '%' );
 				break;
 			case 'ends_with':
-				$where->like( $column, '%' . $wpdb->esc_like( $value ) );
+				$where->endsWith( $column, $value );
 				break;
 			case 'does_not_end_with':
-				$where->notLike( $column, '%' . $wpdb->esc_like( $value ) );
+				$where->notLike( $column, '%' . $where->esc_like( $value ) );
 				break;
 			case 'empty':
 				$where->addCondition( "$column = ''" );
@@ -585,7 +584,7 @@ class Filters {
 				$where->addCondition( "$column != ''" );
 				break;
 			case 'regex':
-				$where->addCondition( $wpdb->prepare( "$column REGEXP BINARY %s", $value ) );
+				$where->addCondition( $where->prepare( "$column REGEXP BINARY %s", $value ) );
 				break;
 			case 'less_than':
 			case '<':

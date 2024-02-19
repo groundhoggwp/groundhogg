@@ -24,6 +24,7 @@ class HTML {
 	const BUTTON = 'button';
 	const TOGGLE = 'toggle';
 	const CHECKBOX = 'checkbox';
+	const CHECKBOXES = 'checkboxes';
 	const MODAL_LINK = 'modal_link';
 	const RANGE = 'range';
 	const TEXTAREA = 'textarea';
@@ -614,6 +615,32 @@ class HTML {
 
 		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}
+
+	public function checkboxes( $args = [] ) {
+		$a = wp_parse_args( $args, array(
+			'name'    => '',
+			'class'   => '',
+			'value'   => '1',
+			'checked' => [],
+			'options' => [],
+		) );
+
+        $checked = $a['checked'] ?: [];
+
+		$checkboxes = [];
+
+		foreach ( $a['options'] as $value => $label ) {
+			$checkboxes[] = html()->checkbox( [
+				'name'    => $a['name'] . '[]',
+				'value'   => $value,
+				'checked' => in_array( $value, $checked ),
+				'label'   => $label
+			] );
+		}
+
+		return html()->e( 'div', [ 'class' => 'display-flex column gap-5' ], $checkboxes );
+	}
+
 
 	public function help_icon( $link = '' ) {
 		return $this->modal_link( [

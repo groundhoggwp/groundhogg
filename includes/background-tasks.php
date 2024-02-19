@@ -29,6 +29,7 @@ class Background_Tasks {
 	 */
 	public function handle_task( Task $task ){
 
+		// Can the task be run
 		if ( ! $task->can_run() ){
 			return;
 		}
@@ -40,13 +41,16 @@ class Background_Tasks {
 
 		$complete = false;
 
+		// While there is still more of the task to do
 		while ( ! Limits::limits_exceeded() && ! $complete ){
 			$complete = $task->process();
 			Limits::processed_action();
 		}
 
+		// Cleanup
 		$task->stop();
 
+		// If the task is not complete yet, re-schedule it
 		if ( ! $complete ){
 			self::add( $task );
 		}
@@ -58,17 +62,18 @@ class Background_Tasks {
 	 * Schedules the background task wp-cron event
 	 *
 	 * @param Task $task
-	 * @param bool $time
+	 * @param int  $time
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function add( Task $task, $time = false ) {
+	public static function add( Task $task, int $time = 0 ) {
 
-		if ( ! is_int( $time ) ){
-			$time = time();
+		if ( ! $time ){
+			// Add 10 seconds to avoid cron being fussy
+			$time = time() + 10;
 		}
 
-		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', $time + 10, $task );
+		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', $time, $task );
 
 		return wp_schedule_single_event( $when, self::HOOK, [ $task ] );
 	}

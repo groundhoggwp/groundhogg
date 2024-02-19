@@ -30,9 +30,6 @@ class Main_Installer extends Installer {
 		// Add roles and caps...
 		Plugin::$instance->roles->install_roles_and_caps();
 
-		// Install Default tags for tag mapping.
-		Plugin::$instance->tag_mapping->install_default_tags();
-
 		Plugin::$instance->utils->files->mk_dir();
 
 		$settings = [

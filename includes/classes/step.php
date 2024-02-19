@@ -966,4 +966,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function can_run() {
 		return true;
 	}
+
+	public function admin_link() {
+		return admin_page_url( 'gh_funnels', [
+			'action' => 'edit',
+			'funnel' => $this->get_funnel_id()
+		], $this->get_id() );
+	}
 }

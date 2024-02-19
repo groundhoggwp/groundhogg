@@ -181,9 +181,9 @@ class Tags_Table extends WP_List_Table {
 
         if ( $search ){
             $query->where()->subWhere()
-                           ->wlike( 'tag_name', $search )
-                           ->wlike( 'tag_slug', $search )
-                           ->wLike( 'tag_description', $search );
+                           ->contains( 'tag_name', $search )
+                           ->contains( 'tag_slug', $search )
+                           ->contains( 'tag_description', $search );
         }
 
         if ( $orderby === 'contacts' ){

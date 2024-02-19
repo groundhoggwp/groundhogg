@@ -157,8 +157,12 @@
 
     const render = () => {
 
-      wp.editor.remove('edit-note-editor')
-      wp.editor.remove('add-note-editor')
+      try {
+        wp.editor.remove('edit-note-editor')
+        wp.editor.remove('add-note-editor')
+      } catch (e) {
+        
+      }
 
       const notes = NotesStore.filter(({ data }) => data.object_type == object_type && data.object_id == object_id).
         sort((a, b) => b.data.timestamp - a.data.timestamp)
