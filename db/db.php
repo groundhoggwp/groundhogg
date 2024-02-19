@@ -124,9 +124,9 @@ abstract class DB {
 			$this->update( [
 				'contact_id' => $other->get_id(),
 			],
-				[
-					'contact_id' => $contact->get_id()
-				] );
+			[
+				'contact_id' => $contact->get_id()
+			] );
 		}
 
 	}
