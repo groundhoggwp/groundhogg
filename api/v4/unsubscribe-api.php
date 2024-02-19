@@ -7,12 +7,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Groundhogg\Classes\Activity;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use function Groundhogg\check_permissions_key;
 use function Groundhogg\get_event_by_queued_id;
+use function Groundhogg\get_permissions_key;
+use function Groundhogg\managed_page_url;
+use function Groundhogg\set_permissions_key_cookie;
+use function Groundhogg\track_activity;
+use function Groundhogg\track_event_activity;
+use function Groundhogg\tracking;
+use function Groundhogg\unsubscribe_url;
 
 class Unsubscribe_Api extends Base_Api {
 
@@ -22,6 +30,11 @@ class Unsubscribe_Api extends Base_Api {
 			[
 				'methods'              => WP_REST_Server::EDITABLE,
 				'callback'             => [ $this, 'unsubscribe' ],
+				'permission_callback' => '__return_true',
+			],
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'unsubscribe' ],
 				'permission_callback' => '__return_true',
 			]
 		] );
@@ -42,7 +55,7 @@ class Unsubscribe_Api extends Base_Api {
 		$event = get_event_by_queued_id( $event );
 
 		if ( ! $event || ! $event->exists() ) {
-			return self::ERROR_404( 'not_found', ' contact could be found for the provided info.' );
+			return self::ERROR_404( 'not_found', 'No contact could be found for the provided info.' );
 		}
 
 		if ( ! check_permissions_key( $pk, $event->get_contact() ) ) {
@@ -50,6 +63,18 @@ class Unsubscribe_Api extends Base_Api {
 		}
 
 		$event->get_contact()->unsubscribe();
+
+		track_event_activity( $event, Activity::UNSUBSCRIBED );
+
+		if ( $request->get_method() === 'GET' ){
+
+			tracking()->set_current_contact( $event->get_contact() );
+
+			set_permissions_key_cookie( $pk, 'preferences' );
+
+			wp_redirect( wp_nonce_url( managed_page_url( 'preferences/unsubscribe' ), 'unsubscribe' ) );
+			die();
+		}
 
 		return self::SUCCESS_RESPONSE();
 	}

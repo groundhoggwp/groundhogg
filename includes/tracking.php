@@ -752,16 +752,19 @@ class Tracking {
 
 		// Check if exists first
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
+			$activity = track_event_activity( $event, Activity::EMAIL_OPENED );
 
-			// Does not exist, add the timestamp
-			$args['timestamp'] = time();
+			if ( $activity ){
 
-			if ( $id = get_db( 'activity' )->add( $args ) ) {
-				do_action( 'groundhogg/tracking/email/opened', $this );
-
-				// Add compat for new tracking actions for activity
-				track_activity_actions( new Activity( $id ) );
+				/**
+				 * When an email is opened and the tracking image is loaded
+				 *
+				 * @param Tracking $tracking
+				 * @param Activity $activity
+				 */
+				do_action( 'groundhogg/tracking/email/opened', $this, $activity );
 			}
+
 		}
 
 		/* only fire if actually doing an open as this may be called by the email_link_clicked method */
@@ -805,31 +808,25 @@ class Tracking {
 			return;
 		}
 
-		$args = [
-			'timestamp'     => time(),
-			'contact_id'    => $event->get_contact_id(),
-			'funnel_id'     => $event->get_funnel_id(),
-			'step_id'       => $event->get_step_id(),
-			'email_id'      => $event->get_email_id(),
-			'activity_type' => Activity::EMAIL_CLICKED,
-			'event_id'      => $event->get_id(),
+		$activity = track_event_activity( $event, Activity::EMAIL_CLICKED, [], [
 			'referer'       => $target,
 			'referer_hash'  => generate_referer_hash( $target )
-		];
+		] );
 
-		if ( $id = get_db( 'activity' )->add( $args ) ) {
-			do_action( 'groundhogg/tracking/email/click', $this );
-
-			// Add compat for new tracking actions for activity
-			track_activity_actions( new Activity( $id ) );
-
-			$this->redirect_to_target();
-
-			return;
+		if ( ! $activity ) {
+			// Tracking not available.
+			wp_die( __( 'Oops... This link is currently unavailable.', 'groundhogg' ) );
 		}
 
-		// Tracking not available.
-		wp_die( __( 'Oops... This link is currently unavailable.', 'groundhogg' ) );
+		/**
+		 * When an email tracking link is clicked
+		 *
+		 * @param Tracking $tracking
+		 * @param Activity $activity
+		 */
+		do_action( 'groundhogg/tracking/email/click', $this, $activity );
+
+		$this->redirect_to_target();
 	}
 
 	/**
