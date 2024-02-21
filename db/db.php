@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
@@ -1365,7 +1366,14 @@ abstract class DB {
 				case 'exclude_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query->where(), true );
+
+					$exclude_query = new Table_Query( $this );
+					$exclude_query->setSelect( $this->get_primary_key() );
+					$this->query_filters->parse_filters( $val, $exclude_query->where() );
+
+					if ( ! $exclude_query->where->isEmpty() ) {
+						$query->where()->notIn( $this->get_primary_key(), "$exclude_query" );
+					}
 
 					break;
 				case 'found_rows':
