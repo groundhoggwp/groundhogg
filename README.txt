@@ -351,7 +351,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.3 (2024-02-15) =
 * ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
-* ADDED **Last 14 days** and **Last X days** ranges for date filters.
+* ADDED **Last/Next 14 days** and **Last/Next X days** ranges for date filters.
+* ADDED Setting to enable sending unsubscribe notifications to a custom email address.
+* ADDED Filters for the List-Unsubscribe header so it can be hijacked by custom implementations.
+* TWEAKED Made the text block editor inline rather than a modal.
+* TWEAKED Made the editor replacements button an MCE toolbar widget.
+* TWEAKED Moved the email editor block inspector and inspector toolbar to the right of the email content.
 * TWEAKED Email previews in the editor will ignore conditional blocks and show all content.
 * TWEAKED Bounce inbox IMAP settings are hidden if using API based outgoing email service.
 * IMPROVED UI of sending email templates from the contact record.
@@ -360,7 +365,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * IMPROVED The One-Click List-Unsubscribe unsubscribe endpoint requires a token.
 * IMPROVED The One-Click List-Unsubscribe endpoint track the unsubscribe to the associated funnel or broadcast.
 * FIXED If more than 25 emails in a funnel they were not all preloading.
-* FIXED List-Unsubscribe header not working in iCloud because iCloud desktop does not decode it properly.
+* FIXED List-Unsubscribe header not working in iCloud because iCloud does not decode it properly.
 
 = 3.2.3.3 (2024-02-13) =
 * FIXED Uninstall function was not deleting all options.

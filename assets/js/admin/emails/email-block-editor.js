@@ -50,9 +50,7 @@
   const { get, post, ajax } = Groundhogg.api
   const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
 
-  improveTinyMCE({
-    height: 400,
-  })
+  improveTinyMCE({})
 
   let fontWeights = [
     '300',
@@ -2311,13 +2309,19 @@
       onClick: e => {
         e.preventDefault()
 
+        // Using the toolbar
         if (clickedIn(e, '.delete-block, .duplicate-block')) {
           return
         }
 
+        // It's the block we're editing
         if (isActiveBlock(block.id)) {
-          e.stopPropagation()
           return
+        }
+
+        // We clicked in a block INSIDE this one
+        if ( e.target.closest( '.builder-block' ).dataset.id !== block.id ){
+          return;
         }
 
         setActiveBlock(block.id)
@@ -4523,7 +4527,7 @@
           })
           morphBlockEditor()
         },
-      }, [icons.inspect, ToolTip('Block Inspector', 'right')]),
+      }, [icons.inspect, ToolTip('Block Inspector', 'left')]),
       Button({
         className: `gh-button ${ getState().responsiveDevice === 'desktop' ? 'primary' : 'secondary' } text icon`,
         id: 'set-responsive-desktop',
@@ -4533,7 +4537,7 @@
           })
           morphBlockEditor()
         },
-      }, [icons.desktop, ToolTip('Desktop', 'right')]),
+      }, [icons.desktop, ToolTip('Desktop', 'left')]),
       Button({
         className: `gh-button ${ getState().responsiveDevice === 'mobile' ? 'primary' : 'secondary' } text icon`,
         id: 'set-responsive-mobile',
@@ -4543,7 +4547,7 @@
           })
           morphBlockEditor()
         },
-      }, [icons.smartphone, ToolTip('Mobile', 'right')]),
+      }, [icons.smartphone, ToolTip('Mobile', 'left')]),
     ]))
   }
 
@@ -4560,10 +4564,10 @@
     }, [
       // Blocks
       Blocks(),
-      // Inspector
-      getState().blockInspector ? BlockInspector() : null,
       // Content
       ContentEditor(),
+      // Inspector
+      getState().blockInspector ? BlockInspector() : null,
       // Controls
       ControlsPanel(),
     ])
@@ -4895,6 +4899,15 @@
     return objectToStyle(fillFontStyle(style))
   }
 
+  /**
+   * Font controls
+   *
+   * @param style
+   * @param onChange
+   * @param supports
+   * @returns {*}
+   * @constructor
+   */
   const FontControls = (style = {}, onChange = style => {}, supports = {}) => {
 
     supports = {
@@ -5273,6 +5286,20 @@
     }, doc.body.childNodes)
   }
 
+  $( document ).on( 'tinymce-editor-setup', function( event, editor ) {
+    editor.settings.toolbar1 += ',gh_replacements';
+
+    editor.addButton( 'gh_replacements', {
+      title: 'Replacements',
+      image: '',
+      onclick: e => {
+        Groundhogg.element.replacementsWidget({
+          target: e.target
+        }).mount()
+      }
+    });
+  });
+
   registerBlock('text', 'Text', {
     attributes: {
       content: el => el.querySelector('.text-content-wrap').innerHTML,
@@ -5309,83 +5336,89 @@
         }
       }
 
-      return Fragment([
-        TagFontControlGroup(__('Paragraphs'), 'p', p, updateBlock),
-        TagFontControlGroup(__('Links'), 'a', a, updateBlock, {
-          fontSize: false,
-          lineHeight: false,
-        }),
-        TagFontControlGroup(__('Heading 1'), 'h1', h1, updateBlock),
-        TagFontControlGroup(__('Heading 2'), 'h2', h2, updateBlock),
-        TagFontControlGroup(__('Heading 3'), 'h3', h3, updateBlock),
-      ])
-    },
-    edit: ({ id, content, updateBlock, ...block }) => {
+      const usurpUpdateBlock = ( settings ) => {
+        updateBlock({
+          ...settings,
+          morphBlocks: false,
+        })
 
-      const editContent = () => {
+        // Update the content style...
+        tinyMCE
+          .activeEditor
+          .iframeElement
+          .contentDocument
+          .getElementsByTagName('style')[1].innerHTML = tinyMceCSS()
 
-        let editorId = `text-${ id }`
-
-        ModalFrame({
-          // content: ,
-          // width: 600,
-          frameAttributes: {
-            style: {
-              width: '600px',
-            },
-          },
-          onOpen: () => {
-            wp.editor.remove(editorId)
-            tinymceElement(editorId, {
-              tinymce: {
-                content_style: tinyMceCSS(),
-              },
-              quicktags: true,
-              settings: {
-                height: 800,
-                width: 800,
-              },
-            }, (newContent) => {
-              content = newContent
-              updateBlock({
-                content,
-              })
-            })
-
-            let butn = Button({ className: 'replacements-picker-start gh-button dashicon' }, Dashicon('admin-users'))
-            document.querySelector('.gh-modal .wp-editor-tools').prepend(butn)
-          },
-        }, Div({}, [
-          Textarea({
-            value: content,
-            id: editorId,
-            onInput: e => {
-              updateBlock({
-                content: e.target.value,
-              })
-            },
-          }),
-        ]))
+        // Replace the content after formatting
+        tinyMCE
+          .activeEditor
+          .setContent(textContent({
+          ...getActiveBlock()
+        }).innerHTML)
       }
 
       return Fragment([
-        Div({
-          className: 'maybe-edit-text',
-          style: {
-            textAlign: 'left',
+        TagFontControlGroup(__('Paragraphs'), 'p', p, usurpUpdateBlock),
+        TagFontControlGroup(__('Links'), 'a', a, usurpUpdateBlock, {
+          fontSize: false,
+          lineHeight: false,
+        }),
+        TagFontControlGroup(__('Heading 1'), 'h1', h1, usurpUpdateBlock),
+        TagFontControlGroup(__('Heading 2'), 'h2', h2, usurpUpdateBlock),
+        TagFontControlGroup(__('Heading 3'), 'h3', h3, usurpUpdateBlock),
+      ])
+    },
+    edit: ({ id, selector, content, updateBlock, ...block }) => {
+
+      let editorId = `text-${ id }`
+
+      let blockEl = document.getElementById( `b-${ id }` )
+      let height = 200
+
+      if ( blockEl ){
+         height = blockEl.getBoundingClientRect().height
+      }
+
+      return Div( ({
+        id: 'mce-editor-wrap',
+        style: {
+          height: `${height}px`
+        }
+      }),[
+        Textarea({
+          onCreate: el => {
+            setTimeout(() => {
+
+              wp.editor.remove(editorId)
+              tinymceElement(editorId, {
+                tinymce: {
+                  content_style: tinyMceCSS(),
+                  height,
+                  // inline: true,
+                },
+                quicktags: true,
+              }, (newContent) => {
+                content = newContent
+                updateBlock({
+                  content,
+                  morphBlocks: false,
+                })
+              })
+
+              document.getElementById( 'mce-editor-wrap' ).style.removeProperty( 'height' )
+            })
           },
-        }, [
-          textContent({
-            content,
-            ...block,
-          }),
-        ]),
-        Button({
-          className: `gh-button primary edit-text-content`,
-          onClick: e => {
-            editContent()
+          value: textContent({
+            content, ...block
+          }).innerHTML,
+          id: editorId,
+          onInput: e => {
+            updateBlock({
+              content: e.target.value,
+              morphBlocks: false,
+            })
           },
-        }, __('Edit Content', 'groundhogg')),
+        }),
       ])
     },
     html: textContent,

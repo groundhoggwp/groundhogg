@@ -93,7 +93,7 @@ class Main_Updater extends Old_Updater {
 				'automatic'   => true,
 				'description' => __( 'List-Unsubscribe header is now required.', 'groundhogg' ),
 				'callback'    => function () {
-					// List-Unsubscribe is now required
+					// List-Unsubscribe is now required, delete this options since it has become unused
 					delete_option( 'gh_disable_unsubscribe_header' );
 				}
 			]
