@@ -2,7 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\Notices\add_notice;
 use function Groundhogg\Notices\wp_redirect_with_notice;
 
@@ -131,7 +130,7 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 		<h3><?php _e( 'Email Archive', 'groundhogg' ); ?></h3>
 		<p><?php _e( 'See an archive of emails you\'ve received from us in the past.', 'groundhogg' ); ?></p>
 		<p><?php echo html()->e( 'a', [
-				'href' => add_query_arg( 'identity', encrypt( $contact->get_email() ), permissions_key_url( managed_page_url( 'archive' ), $contact, 'view_archive' ) )
+				'href' => add_failsafe_tracking_params( permissions_key_url( managed_page_url( 'archive' ), $contact, 'view_archive' ), $contact )
 			], __( 'View email archive' ) ); ?></p>
 		<?php
 
@@ -196,7 +195,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 
 		$preferences_link = managed_page_url( 'preferences/manage' );
 		$preferences_link = permissions_key_url( $preferences_link, $contact, 'preferences' );
-		$preferences_link = add_query_arg( 'identity', encrypt( $email ), $preferences_link );
+		$preferences_link = add_failsafe_tracking_params( $preferences_link, $contact );
 
 		$message = __( 'Someone has requested to manage your email preferences:', 'groundhogg' ) . "\r\n\r\n";
 		/* translators: %s: Site name. */
@@ -225,8 +224,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		return \Groundhogg_Email_Services::send_transactional(
 			$contact->get_email(),
 			wp_specialchars_decode( $subject ),
-			make_clickable( wpautop( $message ) ),
-			[
+			make_clickable( wpautop( $message ) ), [
 				'Content-Type: text/html'
 			] );
 	}
@@ -234,16 +232,6 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 
 $contact         = get_contactdata();
 $permissions_key = get_permissions_key( 'preferences', true );
-
-if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
-	$identity = decrypt( $enc_identity );
-	$contact  = get_contactdata( $identity );
-
-	// If the identity passed is valid and we can validate the permissions key we're good!
-	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact, 'preferences' ) ) {
-		tracking()->start_tracking( $contact );
-	}
-}
 
 $action = get_query_var( 'action', 'profile' );
 
@@ -523,8 +511,6 @@ switch ( $action ):
 
 		$preferences = [
 			'confirm'     => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
-//			'weekly'      => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
-//			'monthly'     => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
 			'unsubscribe' => _x( 'I no longer wish to receive any form of communication. <b>Unsubscribe me!</b>', 'preferences', 'groundhogg' )
 		];
 
@@ -535,8 +521,7 @@ switch ( $action ):
 		$preferences = apply_filters( 'manage_email_preferences_options', $preferences );
 
 		$params = [
-			'pk'       => $permissions_key,
-			'identity' => get_url_var( 'identity' ),
+			'pk' => $permissions_key,
 		];
 
 		do_action( 'groundhogg/preferences/manage/form/before' );
@@ -551,9 +536,9 @@ switch ( $action ):
 			<div class="preference-options">
 				<?php foreach ( $preferences as $preference => $text ):
 
-					$url = add_query_arg( wp_parse_args( [
+					$url = add_failsafe_tracking_params( add_query_arg( wp_parse_args( [
 						'preference' => $preference
-					], $params ), managed_page_url( 'preferences/manage/' ) )
+					], $params ), managed_page_url( 'preferences/manage/' ) ), $contact )
 
 					?>
 					<a href="<?php echo wp_nonce_url( $url, 'manage_email_preferences' ); ?>"

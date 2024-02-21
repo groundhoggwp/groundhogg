@@ -103,6 +103,7 @@ class Tracking {
 
 		add_action( 'template_redirect', [ $this, 'fix_tracking_ssl' ] );
 		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
+		add_action( 'template_redirect', [ $this, 'handle_failsafe_tracking' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
 		add_action( 'groundhogg/contact/preferences/unsubscribed', [ $this, 'contact_unsubscribed' ], 10, 1 );
@@ -250,6 +251,43 @@ class Tracking {
 		}
 
 		wp_die( 'This link is currently unavailable.' );
+	}
+
+	/**
+	 * Parses params for `ge` and `identity` to set the tracking cookie
+	 *
+	 * @return void
+	 */
+	public function handle_failsafe_tracking(){
+
+		// `identity` is the email address or id encrypted with the secret
+		if ( $identity = get_url_var( 'gi' ) ){
+			$id_or_email = decrypt( base64url_decode( $identity ) );
+
+			if ( ! $id_or_email ){
+				return;
+			}
+
+			$contact = get_contactdata( $id_or_email );
+
+			if ( is_a_contact( $contact ) ){
+				$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
+
+				// `id` is the event ID in hexadecimal
+				if ( $event_id = get_url_var( 'ge' ) ){
+					$event_id = absint( hexdec( $event_id ) );
+
+					$event = get_event_by_queued_id( $event_id );
+
+					// Make sure the event matches the identity
+					if ( $event && $event->exists() && $event->get_contact_id() === $contact->get_id() ){
+						$this->add_tracking_cookie_param( 'event_id', $event->get_id() );
+					}
+				}
+
+				$this->build_tracking_cookie();
+			}
+		}
 	}
 
 	/**

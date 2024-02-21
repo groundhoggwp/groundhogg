@@ -88,7 +88,7 @@ function get_current_contact() {
 }
 
 /**
- * Wrapper function for Utils function.
+ * Get a contact
  *
  * @param $contact_id_or_email mixed
  * @param $by_user_id
@@ -112,21 +112,6 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
         // From tracking?
 		if ( $contact = tracking()->get_current_contact() ) {
 			return $contact;
-		}
-
-		// Support for identity
-		if ( $enc_identity = get_url_var( 'identity' ) ) {
-			$identity = decrypt( $enc_identity );
-
-			// A valid Identity was found.
-			if ( $identity ) {
-				$contact = get_contactdata( $identity );
-
-				if ( $contact ) {
-					return $contact;
-				}
-			}
-
 		}
 
 		return false;
@@ -165,9 +150,9 @@ function current_user_is( $role = 'subscriber' ) {
 		$roles = ( array ) $user->roles;
 
 		return in_array( $role, $roles );
-	} else {
-		return false;
 	}
+
+    return false;
 }
 
 /**
@@ -5223,22 +5208,21 @@ function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $exp
  */
 function add_failsafe_tracking_params( string $url, Contact $contact ){
 
-	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
-		$url = add_query_arg( [
-			'e' => dechex( the_email()->get_event()->get_id() )
-		], $url );
-	} else {
-		// add identity as tracking failsafe
-		$url = add_query_arg( [
-			'identity' => encrypt( $contact->get_email() )
-		], $url );
-	}
+    $params = [
+	    'gi' => base64url_encode( encrypt( $contact->get_email() ) )
+    ];
 
-    return $url;
+	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
+		$params['ge'] = dechex( the_email()->get_event()->get_id() );
+    } else if ( Event_Queue::is_processing() ){
+		$params['ge'] = dechex( \Groundhogg\event_queue()->get_current_event()->get_id() );
+    }
+
+    return add_query_arg( $params, $url );
 }
 
 /**
- * Generate a url with the permissions key on it.
+ * Generate a URL with the permissions key on it.
  *
  * @param string    $url              the url to append the key to
  * @param Contact   $contact          the contact the key is to be created for
@@ -5547,6 +5531,12 @@ function track_page_visit( $ref, $contact, $override = [] ) {
  */
 function track_live_activity( $type, $details = [], $value = 0 ) {
 
+    if ( tracking()->get_current_event() ){
+        return track_event_activity( tracking()->get_current_event(), $type, $details, [
+	        'value' => $value
+        ] );
+    }
+
 	// Use tracked contact
 	$contact = get_contactdata();
 
@@ -5558,16 +5548,6 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 	$args = [
 		'value' => $value
 	];
-
-	if ( tracking()->get_current_event() ) {
-		$args = array_merge( $args, [
-			'funnel_id' => tracking()->get_current_funnel_id(),
-			'email_id'  => tracking()->get_current_email_id(),
-			'step_id'   => tracking()->get_current_step_id(),
-			'event_id'  => tracking()->get_current_event()->get_id(),
-			'referer'   => tracking()->get_leadsource(),
-		] );
-	}
 
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 
@@ -5644,39 +5624,14 @@ function track_event_activity( Event $event, string $type = '', array $details =
 		return false;
 	}
 
-	// use tracking cookies to generate information for the activity log
-	$defaults = [
-		'activity_type' => $type,
-		'timestamp'     => time(),
-		'contact_id'    => $contact->get_id(),
+	$args = wp_parse_args( $args, [
 		'event_id'      => $event->ID,
 		'funnel_id'     => $event->funnel_id,
 		'step_id'       => $event->step_id,
 		'email_id'      => $event->email_id,
-	];
+	] );
 
-	// Merge overrides with args
-	$args = wp_parse_args( $args, $defaults );
-
-	$args = apply_filters( 'groundhogg/track_activity/args', $args, $contact );
-
-	// Add the activity to the DB
-	$id = get_db( 'activity' )->add( $args );
-
-	if ( ! $id ) {
-		return false;
-	}
-
-	$activity = new Activity( $id );
-
-	// Add any details to the activity meta
-	foreach ( $details as $detail_key => $value ) {
-		$activity->update_meta( $detail_key, $value );
-	}
-
-	track_activity_actions( $activity );
-
-	return $activity;
+    return track_activity( $contact, $type, $args, $details );
 }
 
 /**
