@@ -193,16 +193,26 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 			return false;
 		}
 
-		$preferences_link = managed_page_url( 'preferences/manage' );
-		$preferences_link = permissions_key_url( $preferences_link, $contact, 'preferences' );
-		$preferences_link = add_failsafe_tracking_params( $preferences_link, $contact );
+		$preferences_url = add_failsafe_tracking_params( permissions_key_url( managed_page_url( 'preferences/manage' ), $contact ), $contact );
+		$unsubscribe_url = wp_nonce_url( add_failsafe_tracking_params( permissions_key_url( managed_page_url( 'preferences/unsubscribe' ), $contact ), $contact ), 'unsubscribe' );
+		$erase_url       = add_failsafe_tracking_params( permissions_key_url( managed_page_url( 'preferences/erase' ), $contact ), $contact );
 
-		$message = __( 'Someone has requested to manage your email preferences:', 'groundhogg' ) . "\r\n\r\n";
-		/* translators: %s: Site name. */
-		$message .= sprintf( __( 'Site Name: %s', 'groundhogg' ), get_bloginfo( 'name' ) ) . "\r\n\r\n";
-		$message .= __( 'If this was a mistake, just ignore this email and nothing will happen.', 'groundhogg' ) . "\r\n\r\n";
-		$message .= __( 'To manage your preferences, visit the following address:', 'groundhogg' ) . "\r\n\r\n";
-		$message .= $preferences_link;
+		$links = [
+			html()->e( 'a', [ 'href' => $preferences_url ], __( 'Update my preferences', 'groundhogg' ) ),
+			html()->e( 'a', [ 'href' => $unsubscribe_url, 'style' => [ 'color' => 'red' ] ], __( 'Unsubscribe', 'groundhogg' ) ),
+			html()->e( 'a', [ 'href' => $erase_url, 'style' => [ 'color' => 'red' ] ], __( 'Erase my data', 'groundhogg' ) ),
+		];
+
+        ob_start();
+
+		?>
+        <p><?php printf( __( 'Someone has requested to manage your email preferences on %s.', 'groundhogg' ), get_bloginfo() ) ?></p>
+        <p><?php _e( 'If you did not initiate this request, just ignore this email and nothing will happen.', 'groundhogg' ) ?></p>
+        <p><?php _e( 'Use any of the following links to manage your preferences.', 'groundhogg' ) ?></p>
+        <p><?php echo implode( ' | ', $links ) ?></p>
+		<?php
+
+		$message = ob_get_clean();
 
 		$subject = sprintf( _x( '[%s] Manage your preferences', 'subject line', 'groundhogg' ), get_bloginfo( 'name' ) );
 

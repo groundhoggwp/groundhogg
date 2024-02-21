@@ -364,6 +364,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * IMPROVED Fallback event and contact tracking when tracking cookie is not working.
 * IMPROVED The One-Click List-Unsubscribe unsubscribe endpoint requires a token.
 * IMPROVED The One-Click List-Unsubscribe endpoint track the unsubscribe to the associated funnel or broadcast.
+* IMPROVED The manage preferences email now uses HTML links and offers a direct unsubscribe link.
 * FIXED If more than 25 emails in a funnel they were not all preloading.
 * FIXED List-Unsubscribe header not working in iCloud because iCloud does not decode it properly.
 
