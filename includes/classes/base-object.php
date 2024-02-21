@@ -328,7 +328,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
-		$data = array_diff_assoc( $data, $this->data );
+
+		// array_diff_assoc only handles 1 dimensional arrays, so we have to serialize stuff that might be serialized later.
+		$data = array_udiff_assoc( $data, $this->data, function ( $a, $b ){
+
+			$a = maybe_serialize( $a );
+			$b = maybe_serialize( $b );
+
+			return $a <=> $b;
+		} );
 
 		// updating with existing data
 		if ( empty( $data ) ) {
