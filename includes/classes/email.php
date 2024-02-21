@@ -915,7 +915,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_headers() {
-		/* Use default mail-server */
+
 		$headers = [];
 
 		$custom_headers = $this->get_meta( 'custom_headers' ) ?: [];
@@ -942,24 +942,38 @@ class Email extends Base_Object_With_Meta {
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
 		if ( ! $this->is_transactional() && $this->event && $this->event->exists() ) {
 
-			$one_click_unsub_link = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, dechex( $this->event->get_id() ), generate_permissions_key( $this->contact, 'preferences' ) ) );
+			$unsub_pk = generate_permissions_key( $this->contact, 'preferences' );
+			$event_id = dechex( $this->event->get_id() );
+
+			$one_click = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, $event_id, $unsub_pk ) );
+			$mail_to   = sprintf( '%s?subject=%s',
+				get_option( 'gh_unsubscribe_email' ) ?: get_bloginfo( 'admin_email' ),
+				sprintf( __( 'Unsubscribe %s from %s', 'groundhogg' ), $this->contact->get_email(), get_bloginfo() ) );
+
+			/**
+			 * Filter the email address the unsubscribe notification is sent to
+			 *
+			 * @param string $email_address
+			 * @param Email  $email
+			 * @param string $key      The key required to unsubscribe the contact
+			 * @param string $event_id the event id
+			 */
+			$mail_to = apply_filters( 'groundhogg/list_unsubscribe_header/mailto', $mail_to, $this, $unsub_pk, $event_id );
 
 			$list_unsub_header = sprintf(
-				'<%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
-				$one_click_unsub_link,
-				get_bloginfo( 'admin_email' ),
-				$this->get_to_address(),
-				get_bloginfo()
+				'<%s>, <mailto:%s>',
+				$one_click,
+				$mail_to
 			);
 
 			/**
 			 * Filter the list unsubscribe header
 			 *
 			 * @param string $list_unsub_header
-			 * @param string $one_click_unsub_link
+			 * @param string $one_click
 			 * @param Email $email
 			 */
-			$list_unsub_header = apply_filters( 'groundhogg/email/list_unsubscribe_header_content', $list_unsub_header, $one_click_unsub_link, $this );
+			$list_unsub_header = apply_filters( 'groundhogg/list_unsubscribe_header', $list_unsub_header, $this, $unsub_pk, $event_id );
 
 			$defaults['List-Unsubscribe']      = $list_unsub_header;
 			$defaults['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
