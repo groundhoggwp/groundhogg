@@ -351,10 +351,14 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.3 (2024-02-15) =
 * ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
+* ADDED **Last 14 days** and **Last X days** ranges for date filters.
 * TWEAKED Email previews in the editor will ignore conditional blocks and show all content.
 * TWEAKED Bounce inbox IMAP settings are hidden if using API based outgoing email service.
 * IMPROVED UI of sending email templates from the contact record.
 * IMPROVED UI of adding a contact to a funnel from the contact record.
+* IMPROVED Fallback event and contact tracking when tracking cookie is not working.
+* IMPROVED The One-Click List-Unsubscribe unsubscribe endpoint requires a token.
+* IMPROVED The One-Click List-Unsubscribe endpoint track the unsubscribe to the associated funnel or broadcast.
 * FIXED If more than 25 emails in a funnel they were not all preloading.
 * FIXED List-Unsubscribe header not working in iCloud because iCloud desktop does not decode it properly.
 
