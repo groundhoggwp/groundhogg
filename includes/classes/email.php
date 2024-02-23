@@ -939,7 +939,7 @@ class Email extends Base_Object_With_Meta {
 			'X-Auto-Response-Suppress' => 'AutoReply'
 		];
 
-		// Do not add this header to transactional emails or if the header is disabled in the settings.
+		// Do not add this header to transactional. Only add the header if we can tie it to an event
 		if ( ! $this->is_transactional() && $this->event && $this->event->exists() ) {
 
 			$unsub_pk = generate_permissions_key( $this->contact, 'preferences' );

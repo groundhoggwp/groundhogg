@@ -703,7 +703,7 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * @return Contact
 	 */
-	protected function get_current_contact() {
+	public function get_current_contact() {
 		return $this->current_contact;
 	}
 

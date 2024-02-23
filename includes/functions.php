@@ -2247,13 +2247,17 @@ function get_csv_delimiter( $file_path ) {
  */
 function count_csv_rows( $file_path ) {
 	$file = new \SplFileObject( $file_path, 'r' );
-	$file->seek( PHP_INT_MAX );
 
-	$lines = $file->key();
+    $rows = 0;
+
+	while ( ! $file->eof() ){
+		$file->fgets();
+		$rows++;
+	}
 
 	$file = null;
 
-	return $lines;
+	return $rows - 1; // -1 to account for the header row
 }
 
 /**
@@ -8397,4 +8401,15 @@ function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, in
  */
 function get_role_display_name( $role ) {
 	return translate_user_role( wp_roles()->roles[ $role ]['name'] );
+}
+
+/**
+ * Generate a unique string to serve as a claim
+ *
+ * @return false|string
+ */
+function generate_claim(){
+	$claim_id    = md5( uniqid( microtime() ) );
+
+	return substr( $claim_id, 0, 20 );
 }
