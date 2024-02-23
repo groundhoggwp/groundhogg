@@ -589,10 +589,10 @@ class Filters {
 				$where->notLike( $column, '%' . $where->esc_like( $value ) );
 				break;
 			case 'empty':
-				$where->addCondition( "$column = ''" );
+				$where->subOr()->empty( $column )->isNull( $column );
 				break;
 			case 'not_empty':
-				$where->addCondition( "$column != ''" );
+				$where->notEmpty( $column );
 				break;
 			case 'regex':
 				$where->addCondition( $where->prepare( "$column REGEXP BINARY %s", $value ) );

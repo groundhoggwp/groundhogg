@@ -590,28 +590,34 @@
       return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`,
         `<b>"${ value }"</b>`)
     }, edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
+
       // language=html
-      return `
-          ${ input({
-              id: 'filter-meta',
-              name: 'meta',
-              className: 'meta-picker',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value: meta,
-          }) }
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-          }, AllComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value,
-          }) }`
+      return [
+        input({
+          id: 'filter-meta',
+          name: 'meta',
+          className: 'meta-picker',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+          value: meta,
+        }),
+
+        select({
+          id: 'filter-compare',
+          name: 'compare',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+        }, AllComparisons, compare),
+
+        [ 'empty', 'not_empty' ].includes( compare ) ? '' : input({
+          id: 'filter-value',
+          name: 'value',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+          value,
+        }),
+      ].join('')
+
     }, onMount (filter, updateFilter) {
 
       metaPicker('#filter-meta')
@@ -619,10 +625,11 @@
       $('#filter-compare, #filter-value, #filter-meta').
         on('change blur', function (e) {
           const $el = $(this)
-          const { compare } = updateFilter({
+          updateFilter({
             [$el.prop('name')]: $el.val(),
-          })
+          }, true)
         })
+
     }, defaults: {
       meta: '', compare: 'equals', value: '',
     },

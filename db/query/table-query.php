@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB\Query;
 
+use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
 use function Groundhogg\array_map_to_class;
@@ -126,7 +127,7 @@ class Table_Query extends Query {
 			}
 		}
 
-		$meta_table_alias = $table_alias_prefix . '_' . $meta_key;
+		$meta_table_alias = $table_alias_prefix . '_' . $this->_sanitize_column_key( $meta_key );
 
 		// only join once per key
 		if ( key_exists( $meta_table_alias, $this->joins ) ) {
@@ -321,16 +322,17 @@ class Table_Query extends Query {
 	 * Map the items to a specific class
 	 * Wrapper for get_results
 	 *
-	 * @return object[]
+	 * @return Base_Object[]
 	 */
 	public function get_objects( $as = '' ) {
-		if ( ! class_exists( $as ) ) {
-			return [];
-		}
 
 		$items = $this->get_results();
 
-		array_map_to_class( $items, $as );
+		if ( $as && class_exists( $as ) ) {
+			array_map_to_class( $items, $as );
+		} else {
+			$items = array_map( [ $this->db_table, 'create_object' ], $items );
+		}
 
 		return $items;
 	}

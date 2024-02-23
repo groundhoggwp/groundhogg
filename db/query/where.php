@@ -530,6 +530,11 @@ class Where {
 		return $this->addCondition( "$column IS NOT NULL" );
 	}
 
+	public function isNull( $column ) {
+		$column = $this->sanitize_column( $column );
+		return $this->addCondition( "$column IS NULL" );
+	}
+
 	public function empty( $column ) {
 		return $this->compare( $column, '' );
 	}

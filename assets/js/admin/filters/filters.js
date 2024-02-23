@@ -52,6 +52,8 @@
       'groundhogg'),
     empty: _x('Is empty', 'comparison', 'groundhogg'),
     not_empty: _x('Is not empty', 'comparison', 'groundhogg'),
+    // null: _x('Is null', 'comparison', 'groundhogg'),
+    // not_null: _x('Is not null', 'comparison', 'groundhogg'),
   }
 
   const StringComparisons = {
