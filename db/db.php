@@ -801,6 +801,11 @@ abstract class DB {
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
+		// Nothing to update
+		if ( empty( $data ) ){
+			return true;
+		}
+
 		global $wpdb;
 
 		if ( is_string( $row_id ) || is_numeric( $row_id ) ) {
@@ -809,6 +814,7 @@ abstract class DB {
 			$where = $row_id;
 		}
 
+		// Don't know who to update
 		if ( empty( $where ) ) {
 			return false;
 		}
