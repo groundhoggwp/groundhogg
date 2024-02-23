@@ -351,7 +351,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.3.1 (2024-02-15) =
 * ADDED New background tasks tab in the logs page.
-* FIXED Background tasks not always scheduling correctly, moved to using a dedicated table.
+* FIXED Background tasks not always scheduling correctly, moved to using a dedicated table instead of using internal WP Cron.
 * FIXED The `Empty` comparison for meta filters was not respecting `NULL` values.
 * FIXED Meta filters with keys containing `-` were not working.
 

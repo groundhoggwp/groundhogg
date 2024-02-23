@@ -30,7 +30,6 @@ define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '3.3' );
 define( 'GROUNDHOGG__FILE__', __FILE__ );
 define( 'GROUNDHOGG_PLUGIN_BASE', plugin_basename( GROUNDHOGG__FILE__ ) );
 define( 'GROUNDHOGG_PATH', plugin_dir_path( GROUNDHOGG__FILE__ ) );
-
 define( 'GROUNDHOGG_URL', plugins_url( '/', GROUNDHOGG__FILE__ ) );
 
 define( 'GROUNDHOGG_ASSETS_PATH', GROUNDHOGG_PATH . 'assets/' );
