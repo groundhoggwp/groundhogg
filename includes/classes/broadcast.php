@@ -225,23 +225,17 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	}
 
-	public function create( $data = [] ) {
-		$created = parent::create( $data );
-
-		// Start scheduling it
-		if ( $created && $this->is_pending() ) {
-			$this->schedule();
-		}
-
-		return $created;
-	}
-
 	/**
 	 * Calls the background task to schedule the broadcast
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function schedule() {
+	public function schedule_in_background() {
+
+		if ( ! $this->is_pending() ){
+			return false;
+		}
+
 		return Background_Tasks::schedule_pending_broadcast( $this->get_id() );
 	}
 

@@ -96,6 +96,14 @@ class Main_Updater extends Old_Updater {
 					// List-Unsubscribe is now required, delete this options since it has become unused
 					delete_option( 'gh_disable_unsubscribe_header' );
 				}
+			],
+			'3.3.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Add background tasks table for better logging and management of background tasks.', 'groundhogg' ),
+				'callback'    => function () {
+					// List-Unsubscribe is now required, delete this options since it has become unused
+					get_db( 'background_tasks' )->create_table();
+				}
 			]
 		];
 	}

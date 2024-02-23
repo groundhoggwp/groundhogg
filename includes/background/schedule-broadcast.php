@@ -15,9 +15,11 @@ class Schedule_Broadcast extends Task {
 		$this->broadcast_id = $broadcast_id;
 	}
 
-	public function can_run() {
-		$this->broadcast = new Broadcast( $this->broadcast_id );
+	public function get_title(){
+		return sprintf( 'Schedule broadcast %s', bold_it( $this->broadcast->get_title() ) );
+	}
 
+	public function can_run() {
 		return $this->broadcast->exists() && $this->broadcast->is_pending();
 	}
 
@@ -37,6 +39,16 @@ class Schedule_Broadcast extends Task {
 		}
 
 		return false;
+	}
+
+	public function get_progress(){
+		return $this->broadcast->get_percent_scheduled();
+	}
+
+	public function __unserialize( array $data ): void {
+		parent::__unserialize( $data );
+
+		$this->broadcast = new Broadcast( $this->broadcast_id );
 	}
 
 	public function __serialize(): array {

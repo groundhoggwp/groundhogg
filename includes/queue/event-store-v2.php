@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\event_queue_db;
+use function Groundhogg\generate_claim;
 use function Groundhogg\get_db;
 
 /**
@@ -74,9 +75,7 @@ class Event_Store_V2 {
 	 * @return string
 	 */
 	public function generate_claim_id() {
-		$claim_id    = md5( uniqid( microtime() ) );
-		$claim_id    = substr( $claim_id, 0, 20 );
-		$this->claim = $claim_id;
+		$this->claim = generate_claim();
 
 		return $this->claim;
 	}

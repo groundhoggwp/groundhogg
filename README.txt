@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.3
+Stable tag: 3.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.3.1 (2024-02-15) =
+* ADDED New background tasks tab in the logs page.
+* FIXED Background tasks not always scheduling correctly, moved to using a dedicated table.
+* FIXED The `Empty` comparison for meta filters was not respecting `NULL` values.
+* FIXED Meta filters with keys containing `-` were not working.
 
 = 3.3 (2024-02-15) =
 * ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
