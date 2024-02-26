@@ -393,6 +393,7 @@
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
 
   ContactFilterRegistry.registerFilter(createDateFilter('birthday', __('Birthday', 'groundhogg'), 'contact'))
+  ContactFilterRegistry.registerFilter(createNumberFilter('age', __('Age', 'groundhogg'), 'contact'))
   ContactFilterRegistry.registerFilter(createPastDateFilter('date_created', __('Date Created', 'groundhogg'), 'contact'))
 
   const { optin_status, owners, countries, roles } = Groundhogg.filters

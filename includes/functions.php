@@ -2239,7 +2239,7 @@ function get_csv_delimiter( $file_path ) {
 
 /**
  * Return the number of rows in a CSV file
- * Does not respect "\n" in cells, do we care?
+ * todo this seems to be over-counting the total rows by 2
  *
  * @param $file_path
  *
@@ -2257,7 +2257,7 @@ function count_csv_rows( $file_path ) {
 
 	$file = null;
 
-	return $rows - 1; // -1 to account for the header row
+	return $rows - 2; // -1 to account for the header row
 }
 
 /**

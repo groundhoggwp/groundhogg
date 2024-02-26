@@ -259,6 +259,7 @@
             fetchOptions: (search) => {
               return FunnelsStore.fetchItems({
                 search,
+                status: 'active',
               }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
             },
             onChange: item => {

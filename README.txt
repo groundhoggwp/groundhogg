@@ -351,9 +351,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.3.1 (2024-02-15) =
 * ADDED New background tasks tab in the logs page.
+* ADDED New Age filter!
 * FIXED Background tasks not always scheduling correctly, moved to using a dedicated table instead of using internal WP Cron.
 * FIXED The `Empty` comparison for meta filters was not respecting `NULL` values.
 * FIXED Meta filters with keys containing `-` were not working.
+* FIXED Is/Is Not comparison for the birthday filter not working.
+* FIXED Email not loading after duplicating an email step in a funnel.
+* FIXED Only show active funnels in **Add to funnel** tool in the contact record.
 
 = 3.3 (2024-02-15) =
 * ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
