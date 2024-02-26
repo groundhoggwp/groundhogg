@@ -349,7 +349,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.3.1 (2024-02-15) =
+= 3.3.1 (2024-02-26) =
 * ADDED New background tasks tab in the logs page.
 * ADDED New Age filter!
 * FIXED Background tasks not always scheduling correctly, moved to using a dedicated table instead of using internal WP Cron.
