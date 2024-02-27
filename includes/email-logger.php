@@ -108,6 +108,15 @@ class Email_Logger {
 	}
 
 	/**
+	 *
+	 *
+	 * @return int
+	 */
+	public static function get_last_log_id(): int {
+		return self::$log_item_id;
+	}
+
+	/**
 	 * Log any emails sent through calls to PHPMailer
 	 * Most Groundhogg plugins use this method, as do many other SMTP plugins.
 	 *

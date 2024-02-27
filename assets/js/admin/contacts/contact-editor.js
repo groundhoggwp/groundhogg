@@ -2155,14 +2155,44 @@
 
     try {
 
-      let logItems = await LogsStore.fetchItems({
-        subject: activity.meta.subject,
-        recipients: ['RLIKE', getContact().data.email],
-        date_sent: moment.unix(activity.data.timestamp).utc().format("YYYY-MM-DD hh:mm:ss"),
-        limit: 1
-      })
+      let logItem
 
-      EmailLogModal(logItems[0])
+      const {
+        log_id = 0,
+        sent_by,
+        from: from_address,
+        subject,
+      } = activity.meta
+
+      if (log_id) {
+        logItem = await LogsStore.maybeFetchItem(log_id)
+      }
+      else {
+
+        let logItems = await LogsStore.fetchItems({
+          subject,
+          sent_by,
+          from_address,
+          filters: [
+            [
+              {
+                type: 'recipients',
+                recipients: [getContact().data.email],
+              },
+              {
+                type: 'date_sent',
+                date_range: 'day_of',
+                after: moment.unix(activity.data.timestamp).utc().format('YYYY-MM-DD'),
+              },
+            ],
+          ],
+          limit: 1,
+        })
+
+        logItem = logItems[0]
+      }
+
+      EmailLogModal(logItem)
 
     }
     catch (err) {
