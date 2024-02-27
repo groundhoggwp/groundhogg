@@ -349,9 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.3.1 (2024-02-26) =
+= 3.3.1 (2024-02-27) =
 * ADDED New background tasks tab in the logs page.
 * ADDED New Age filter!
+* ADDED New "Day Of" date range for date filters.
 * FIXED Background tasks not always scheduling correctly, moved to using a dedicated table instead of using internal WP Cron.
 * FIXED The `Empty` comparison for meta filters was not respecting `NULL` values.
 * FIXED Meta filters with keys containing `-` were not working.
