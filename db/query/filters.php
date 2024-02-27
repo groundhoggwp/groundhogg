@@ -232,6 +232,10 @@ class Filters {
 				$after->modify( '00:00:00' );
 				$before->modify( '+99 years' );
 				break;
+			case 'day_of':
+				$after->modify( "{$filter['after']} 00:00:00" );
+				$before->modify( "{$filter['after']} 23:59:59" );
+				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );
 				// set before time to EOD

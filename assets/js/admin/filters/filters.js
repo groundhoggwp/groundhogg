@@ -138,6 +138,9 @@
     before: (k, v) => sprintf(
       _x('%1$s is before %2$s', '%1 is a key and %2 is user defined value',
         'groundhogg'), k, v),
+    day_of: (k, v) => sprintf(
+      _x('%1$s on %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     after: (k, v) => sprintf(
       _x('%1$s is after %2$s', '%1 is a key and %2 is user defined value',
         'groundhogg'), k, v),
@@ -165,6 +168,7 @@
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
+    'day_of': __('Day of', 'groundhogg'),
   }
 
   const futureDateRanges = {
@@ -185,6 +189,7 @@
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
+    'day_of': __('Day of', 'groundhogg'),
   }
 
   const allDateRanges = {
@@ -451,7 +456,7 @@
             }, true),
           }),
         ]),
-        date_range === 'after' || date_range === 'between' ? Input({
+        ['after', 'between', 'day_of'].includes(date_range) ? Input({
           type: 'date',
           value: after.split(' ')[0],
           id: 'filter-after',
@@ -489,7 +494,8 @@
             return ComparisonsTitleGenerators.between(prefix,
               formatDate(after), formatDate(before))
           case 'after':
-            return ComparisonsTitleGenerators.after(prefix,
+          case 'day_of':
+            return ComparisonsTitleGenerators[date_range](prefix,
               formatDate(after))
           case 'before':
             return ComparisonsTitleGenerators.before(prefix,

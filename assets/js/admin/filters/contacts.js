@@ -149,6 +149,7 @@
               $before.removeClass('hidden')
               $after.removeClass('hidden')
               break
+            case 'day_of':
             case 'after':
               $after.removeClass('hidden')
               break
@@ -186,6 +187,10 @@
         return `${ prepend } ${ sprintf(
           _x('after %s', '%s is a date', 'groundhogg'),
           `<b>${ formatDate(after) }</b>`) }`
+      case 'day_of':
+        return `${ prepend } ${ sprintf(
+          _x('on %s', '%s is a date', 'groundhogg'),
+          `<b>${ formatDate(after) }</b>`) }`
     }
   }
 
@@ -205,7 +210,7 @@
         type: 'date',
         value: after.split(' ')[0],
         id: 'filter-after',
-        className: `date ${ ['between', 'after'].includes(date_range)
+        className: `date ${ ['between', 'after', 'day_of'].includes(date_range)
           ? ''
           : 'hidden' }`,
         name: 'after',
@@ -223,7 +228,7 @@
         type: 'number',
         value: days,
         id: 'filter-days',
-        className: `value ${ ['x_days'].includes(date_range)
+        className: `value ${ ['x_days', 'next_x_days'].includes(date_range)
           ? ''
           : 'hidden' }`,
         name: 'days',
