@@ -4127,7 +4127,7 @@
   }
 
   window.addEventListener('resize', e => {
-    if (isHTMLEditor()) {
+    if (isHTMLEditor() && codeMirror) {
       resizeCodeMirror()
     }
   })
