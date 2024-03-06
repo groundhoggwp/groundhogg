@@ -929,16 +929,6 @@ ORDER BY ID" );
 
 	}
 
-
-	public function process_filter_logs() {
-		return admin_page_url( 'gh_events', [
-			'tab'         => 'emails',
-			'date_filter' => get_post_var( 'date_filter' ),
-			'before'      => get_post_var( 'before' ),
-			'after'       => get_post_var( 'after' ),
-		] );
-	}
-
 	/**
 	 * Delete some of the email logs
 	 */
