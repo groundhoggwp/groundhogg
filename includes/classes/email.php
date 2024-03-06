@@ -410,12 +410,11 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_click_tracking_link() {
-		return managed_page_url(
-			sprintf( 'c/%s/%s/',
-				dechex( $this->get_contact()->get_id() ),
-				dechex( $this->get_event()->get_id( true ) )
-			)
-		);
+		return managed_page_url( sprintf(
+			'c/%s/%s/',
+			dechex( $this->get_contact()->get_id() ),
+			dechex( $this->get_event()->get_id( true ) )
+		) );
 	}
 
 	/**
@@ -674,7 +673,7 @@ class Email extends Base_Object_With_Meta {
 			case 'html':
 
 				// Handle open tracking image
-				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) ) {
+				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) && $this->event && $this->event->exists() ) {
 
 					if ( str_contains( $content, '</body>' ) ) {
 						$content = str_replace( '</body>', html()->e( 'img', [
