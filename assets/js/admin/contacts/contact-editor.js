@@ -925,6 +925,10 @@
         return arr
       }, [])
 
+      // Broadcast Events
+      activities.filter(a => a.type === 'event' && a.data.event_type == 2).
+        forEach(a => BroadcastsStore.itemsFetched([a.broadcast]))
+
       let promises = [
         // Preload activities
         ...activities.filter(a => a.type === 'activity' && a.hasOwnProperty( 'preload' ) ).
@@ -939,10 +943,6 @@
         emailIds.length && !EmailsStore.hasItems(emailIds)
           ? FunnelsStore.maybeFetchItems(emailIds)
           : null,
-
-        // Broadcast Events
-        ...activities.filter(a => a.type === 'event' && a.data.event_type == 2).
-          map(a => BroadcastsStore.itemsFetched([a.broadcast])),
       ]
 
       Promise.all(promises).then(() => {

@@ -1335,7 +1335,7 @@ class Contact extends Base_Object_With_Meta {
 				'admin'          => $this->admin_link(),
 				'is_marketable'  => $this->is_marketable(),
 				'is_deliverable' => $this->is_deliverable(),
-				'locale'         => [
+				'i18n'         => [
 					'created' => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() )
 				]
 			]

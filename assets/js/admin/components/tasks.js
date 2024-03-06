@@ -37,17 +37,17 @@
   const dueBy = (task) => {
 
     if (task.is_overdue) {
-      return `<span class="pill orange" title="${ task.locale.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
-        task.locale.due_in) }</span>`
+      return `<span class="pill orange" title="${ task.i18n.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
+        task.i18n.due_in) }</span>`
     }
 
     if (task.is_complete) {
-      return `<span class="pill green" title="${ task.locale.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
-        task.locale.completed) }</span>`
+      return `<span class="pill green" title="${ task.i18n.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
+        task.i18n.completed) }</span>`
     }
 
-    return `<span class="pill" title="${ task.locale.due_date }">${ sprintf(__('In %s', 'groundhogg'),
-      task.locale.due_in) }</span>`
+    return `<span class="pill" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
+      task.i18n.due_in) }</span>`
   }
 
   const templates = {
@@ -212,7 +212,7 @@
 
       const addedBy = () => {
 
-        let date_created = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.locale.time_diff }</abbr>`
+        let date_created = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.i18n.time_diff }</abbr>`
 
         switch (context) {
           case 'user':

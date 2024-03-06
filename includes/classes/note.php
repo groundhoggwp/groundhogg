@@ -44,7 +44,7 @@ class Note extends Base_Object {
 
 	public function get_as_array() {
 		return array_merge( parent::get_as_array(), [
-			'locale' => [
+			'i18n' => [
 				'time_diff' => human_time_diff( $this->timestamp, time() )
 			]
 		]);

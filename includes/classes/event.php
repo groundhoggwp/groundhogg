@@ -609,7 +609,7 @@ class Event extends Base_Object {
 			$diff_time = sprintf( $this->is_waiting() ? __( 'Runs %s', 'groundhogg' ) : __( 'Ran %s', 'groundhogg' ),  $date->i18n() );
 		}
 
-		$array['locale'] = [
+		$array['i18n'] = [
 			'diff_time' => $diff_time
 		];
 
