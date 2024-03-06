@@ -12,7 +12,7 @@ use function Groundhogg\notices;
 class Add_Contacts_To_Funnel extends Complete_Benchmark {
 
 	public function get_title(){
-		return sprintf( 'Adding %s contacts to %s in %s', _nf( $this->contacts ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
+		return sprintf( 'Adding %s contacts to %s in %s', bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
 	}
 
 	public function process(): bool {

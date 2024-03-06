@@ -18,6 +18,7 @@ use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 use function Groundhogg\percentage;
+use function Groundhogg\track_activity;
 use function Groundhogg\white_labeled_name;
 
 class Import_Contacts extends Task {
@@ -216,6 +217,11 @@ class Import_Contacts extends Task {
 			if ( is_a_contact( $contact ) ) {
 
 				$contact->apply_tag( $tags );
+
+				track_activity( $contact, 'imported', [], [
+					'file' => $this->fileName,
+					'user' => $this->user_id,
+				] );
 
 				/**
 				 * Whenever a contact is imported

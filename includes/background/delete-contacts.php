@@ -29,7 +29,7 @@ class Delete_Contacts extends Task {
 	 * @return string
 	 */
 	public function get_title() {
-		return sprintf( 'Delete %s contacts', _nf( $this->contacts ) );
+		return sprintf( 'Delete %s contacts', bold_it( _nf( $this->contacts ) ) );
 	}
 
 	public function get_progress() {

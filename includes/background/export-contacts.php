@@ -51,7 +51,16 @@ class Export_Contacts extends Task {
 	 * @return string
 	 */
 	public function get_title(){
-		return sprintf( 'Export %s contacts to %s', _nf( $this->contacts ), bold_it( basename( $this->filePath ) ) );
+
+		$fileName = bold_it( basename( $this->filePath ) );
+
+		if ( $this->get_progress() >= 100 ){
+			$fileName = html()->e('a', [
+				'href' => file_access_url( '/exports/' . basename( $this->filePath ), true )
+			], $fileName );
+		}
+
+		return sprintf( 'Export %s contacts to %s', _nf( $this->contacts ), $fileName );
 	}
 
 	/**
@@ -145,6 +154,17 @@ class Export_Contacts extends Task {
 			'query'    => $this->query,
 			'columns'  => $this->columns,
 			'batch'    => $this->batch,
+			'contacts' => $this->contacts,
 		];
+	}
+
+	public function __unserialize( array $data ): void {
+		parent::__unserialize( $data );
+
+		// Backup in case contacts was not saved originally
+		if ( ! isset( $data[ 'contacts' ] ) ) {
+			$query = new Contact_Query( $this->query );
+			$this->contacts = $query->count();
+		}
 	}
 }
