@@ -769,6 +769,8 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$object->update_meta( $meta );
 
+		$this->do_object_updated_action( $object );
+
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object
 		] );
@@ -792,6 +794,8 @@ abstract class Base_Object_Api extends Base_Api {
 		$meta = $request->get_json_params();
 
 		$object->delete_meta( $meta );
+
+		$this->do_object_updated_action( $object );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object
