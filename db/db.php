@@ -836,7 +836,8 @@ abstract class DB {
 
 		$data = apply_filters( 'groundhogg/db/pre_update/' . $this->get_object_type(), $data, $where );
 
-		if ( false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
+		// Empty data at this point, return false.
+		if ( empty( $data ) || false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
 			return false;
 		}
 
