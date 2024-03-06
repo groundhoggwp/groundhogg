@@ -637,12 +637,16 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
+		// If we do this first, then it makes dealing with other stuff much easier because sanitize columns will remove unknown table columns
+		$this->handle_consents_in_data( $data );
+
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
 		$data = array_diff_assoc( $data, $this->data );
 
 		// updating with existing data
 		if ( empty( $data ) ) {
+			// Only updating consents
 			return true;
 		}
 
@@ -677,13 +681,10 @@ class Contact extends Base_Object_With_Meta {
 			return $updated;
 		}
 
-		// Handle consent
-		$this->handle_consents_in_data( $data );
-
 		$maybe_changed_folders = $this->get_uploads_folder();
 
 		// Uploads directory has been changed, rename the folder to preserve file uploads
-		if ( $updated && $folders['path'] !== $maybe_changed_folders['path'] ) {
+		if ( $folders['path'] !== $maybe_changed_folders['path'] ) {
 			@rename( $folders['path'], $maybe_changed_folders['path'] );
 		}
 
@@ -700,7 +701,7 @@ class Contact extends Base_Object_With_Meta {
 			do_action( 'groundhogg/contact/owner_changed', $this->owner, $this, $orig_owner );
 		}
 
-		if ( $updated && isset( $old_preference ) && isset( $new_preference ) ) {
+		if ( isset( $old_preference ) && isset( $new_preference ) ) {
 
 			/**
 			 * When the preference is updated
@@ -729,7 +730,16 @@ class Contact extends Base_Object_With_Meta {
 		return $updated;
 	}
 
+	/**
+	 * Ensure columns are sanitized
+	 *
+	 * @param $data
+	 *
+	 * @return array|mixed
+	 */
 	protected function sanitize_columns( $data = [] ) {
+
+		$data = array_intersect_key( $data, $this->get_db()->get_columns() );
 
 		foreach ( $data as $key => &$value ) {
 			switch ( $key ) {
