@@ -4,19 +4,13 @@ namespace Groundhogg\Queue;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\Event_Queue_Item;
-use Groundhogg\Utils\Limits;
-use function Groundhogg\get_date_time_format;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
-use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use Groundhogg\Utils\Limits;
+use function Groundhogg\get_db;
 use function Groundhogg\gh_cron_installed;
-use function Groundhogg\gh_doing_cron;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_event_queue_processing;
-use function Groundhogg\track_wp_cron_ping;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -102,16 +96,9 @@ class Event_Queue extends Supports_Errors {
 	 * If the cron job file is not installed also execute events during the heartbeat.
 	 */
 	public function heartbeat() {
-
-		// If the cron file is installed and the queue is processing do not do heartbeat
-		if ( is_event_queue_processing() && gh_cron_installed() ) {
-			return;
-		}
-
-		// 10 second cap on heartbeat
+		// 10 second cap on events for heartbeat
 		Limits::set_max_execution_time( 10 );
-
-		$this->run_queue();
+		$this->wp_cron();
 	}
 
 	/**
@@ -176,29 +163,6 @@ class Event_Queue extends Supports_Errors {
 		}
 
 		wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
-	}
-
-	/**
-	 * If the event queue failed for whatever reason, fix events which are still in progress.
-	 * Update status back to waiting
-	 * Delete the claim
-	 * Only for events which were scheduled to be complete but never did.
-	 */
-	protected function cleanup_unprocessed_events() {
-		global $wpdb;
-
-		$events = get_db( 'event_queue' );
-
-		// 5-minute window.
-		$time = time() - MINUTE_IN_SECONDS;
-
-		$wpdb->query( "
-UPDATE {$events->get_table_name()} 
-SET status = 'waiting', claim = '' 
-WHERE status IN ( 'in_progress', 'waiting' ) AND claim != '' AND `time` < {$time}
-ORDER BY ID" );
-
-		$events->cache_set_last_changed();
 	}
 
 	/**
