@@ -57,6 +57,9 @@ class Replacements implements \JsonSerializable {
 			add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
 		}
 
+		// Todo: add additional hooks that might trigger a cache invalidation
+		add_action( 'groundhogg/contact/post_update', [ $this, 'invalidate_replacements_cache' ] );
+		add_action( 'groundhogg/api/contact/updated', [ $this, 'invalidate_replacements_cache' ] );
 	}
 
 	/**
@@ -676,6 +679,8 @@ class Replacements implements \JsonSerializable {
 		return $this->tackle_replacements( $content );
 	}
 
+    const PATTERN = '/{([A-Za-z_][^{}\n]+)}/';
+
 	/**
 	 * Recursive function to tackle nested replacement codes until no more replacements are found.
 	 *
@@ -685,19 +690,16 @@ class Replacements implements \JsonSerializable {
 	 */
 	public function tackle_replacements( $content ) {
 
-		$pattern = '/{([^{}\n]+)}/';
-
-		if ( ! preg_match( $pattern, $content ) ) {
-			return $content;
-		} // Check if there is at least one tag added
-		else if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
+		if ( ! preg_match( self::PATTERN, $content ) ) {
 			return $content;
 		}
 
-		return $this->tackle_replacements( preg_replace_callback( $pattern . 's', [
+		$content = preg_replace_callback( self::PATTERN . 's', [
 			$this,
 			'do_replacement'
-		], $content ) );
+		], $content );
+
+		return $this->tackle_replacements( $content );
 	}
 
 	/**
@@ -765,18 +767,18 @@ class Replacements implements \JsonSerializable {
 				// if there is no defined plain callback we should reference the html version
 				is_callable( $plain_callback ) ? $this->get_context() : 'html',
 				$this->contact_id ?: 'anon',
-				md5( serialize( $parts ) ),
-				cache_get_last_changed( 'replacements' )
+				md5serialize( $parts ),
+				cache_get_last_changed( 'groundhogg/replacements' )
 			] );
 
-			$cache_value = wp_cache_get( $cache_key, 'replacements', false, $found );
+			$cache_value = wp_cache_get( $cache_key, 'groundhogg/replacements', false, $found );
 
 			if ( $found ) {
 				return $cache_value;
 			}
 
-            // If the plain callback is not callable
-            // Set it to a version that parses as markdown
+			// If the plain callback is not callable
+			// Set it to a version that parses as markdown
 			if ( ! is_callable( $plain_callback ) ) {
 				$plain_callback = function ( ...$args ) use ( $html_callback ) {
 
@@ -804,20 +806,52 @@ class Replacements implements \JsonSerializable {
 
 			$value = apply_filters( "groundhogg/replacements/{$code}", $text );
 
-			wp_cache_set( $cache_key, $value, 'replacements' );
+			wp_cache_set( $cache_key, $value, 'groundhogg/replacements' );
 
 			return $value;
 		}
 
-		// Access contact fields directly
-		if ( str_starts_with( $code, '_' ) ) {
-			$field = substr( $code, 1 );
-			$text  = $this->get_current_contact()->$field;
+		// Try to access contact fields directly
+		$field     = str_starts_with( $code, '_' ) ? substr( $code, 1 ) : $code;
+		$cache_key = implode( ':', [
+			$this->contact_id ?: 'anon',
+			$field,
+			cache_get_last_changed( 'groundhogg/replacements' )
+		] );
 
-			return $text ?: $default;
+		$cache_value = wp_cache_get( $cache_key, 'groundhogg/replacements', false, $found );
+
+		if ( $found ) {
+			return $cache_value;
 		}
 
-		return $default;
+		if ( $property = Properties::instance()->get_field( $field ) ) {
+			$text = display_custom_field( $property, $this->current_contact, false );
+		} else {
+			$text = $this->get_current_contact()->$field;
+
+			if ( is_array( $text ) || is_object( $text ) ) {
+				$text = wp_json_encode( $this->get_current_contact()->$field );
+			}
+		}
+
+		if ( ! $text ) {
+			$text = $default;
+		}
+
+		wp_cache_set( $cache_key, $text, 'groundhogg/replacements' );
+
+		return $text;
+	}
+
+	/**
+	 * Invalidate the replacements cache by setting the last changed
+	 * - when contact is updated
+	 *
+	 * @return void
+	 */
+	public function invalidate_replacements_cache() {
+		cache_set_last_changed( 'groundhogg/replacements' );
 	}
 
 	public function replacements_in_footer() {
@@ -1440,7 +1474,7 @@ class Replacements implements \JsonSerializable {
 		}
 
 		if ( is_sending() ) {
-            // Temporarily force the email to be sent to the user's email address instead
+			// Temporarily force the email to be sent to the user's email address instead
 			the_email()->contact->email = the_email()->contact->get_userdata()->user_email;
 		}
 

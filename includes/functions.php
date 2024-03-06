@@ -5009,7 +5009,7 @@ function contact_action( $contact = 0, $hook = 'created' ) {
  * @return false|int
  */
 function has_replacements( $content ) {
-	return preg_match( '/{([^{}]+)}/', $content );
+	return preg_match( Replacements::PATTERN, $content );
 }
 
 /**

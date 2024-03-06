@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.3.1
+Stable tag: 3.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,20 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.3.2 (2024-03-05) =
+* ADDED 4x per day the queue will be "cleaned" and events that failed to process within the last 6 hours will be fixed.
+* ADDED Activity for when a contact is imported from a CSV file.
+* IMPROVED using `_` to prefix meta for replacements like `{_meta_key}` is no longer required. You can simply do `{meta_key}` even if it's not a registered custom field.
+* TWEAKED Meta that can be serialized, but is not associated with a custom field and thus has no pretty output, will be output as JSON encoded.
+* TWEAKED The replacements cache group has been changed from `replacements` to `groundhogg\replacements`.
+* TWEAKED Combined several cron task hooks into one.
+* TWEAKED Funnel conversion activity in timeline now has proper UI.
+* TWEAKED Optimized how emails are preloaded for email activity in the timeline.
+* FIXED Export contacts BG task causing error in tasks log.
+* FIXED HTML email template previews not working.
+* FIXED DB error when passing consent attributes to the contact update method.
+* FIXED Changed all button types in the filters component to `button` to prevent form submission in custom post types.
 
 = 3.3.1 (2024-02-27) =
 * ADDED New background tasks tab in the logs page.
