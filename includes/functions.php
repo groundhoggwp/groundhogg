@@ -5901,11 +5901,12 @@ add_action( 'groundhogg/event_queue/before_process', __NAMESPACE__ . '\track_gh_
 
 /**
  * Whether the queue is processing every single minute
+ * Let's use a 90 second grace period though, instead of 60 seconds to try and avoid a race condition
  *
  * @return mixed|void
  */
 function is_event_queue_processing() {
-	$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
+	$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= 90;
 
 	return apply_filters( 'groundhogg/cron_is_working', $gh_cron_setup );
 }
@@ -6296,6 +6297,7 @@ function uninstall_groundhogg() {
 	wp_clear_scheduled_hook( 'groundhogg/telemetry' );
 	wp_clear_scheduled_hook( 'groundhogg/check_bounces' );
 	wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
+	wp_clear_scheduled_hook( 'groundhogg/cleanup' );
 
 	//delete api keys from user_meta
 	delete_metadata( 'user', 0, 'wpgh_user_public_key', '', true );
