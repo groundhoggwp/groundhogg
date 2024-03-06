@@ -8,25 +8,6 @@ use function Groundhogg\gh_cron_installed;
 class Permissions_Keys extends DB {
 
 	/**
-	 * Permissions_Keys constructor.
-	 */
-	public function __construct() {
-		parent::__construct();
-
-		add_action( 'init', [ $this, 'setup_cron' ] );
-		add_action( 'groundhogg/purge_expired_permissions_keys', [ $this, 'purge_old_permission_keys' ] );
-	}
-
-	/**
-	 * Setup the cron job to remove old permissions keys
-	 */
-	public function setup_cron() {
-		if ( ! wp_next_scheduled( 'groundhogg/purge_expired_permissions_keys' ) ) {
-			wp_schedule_event( time(), 'daily', 'groundhogg/purge_expired_permissions_keys' );
-		}
-	}
-
-	/**
 	 * Get the DB suffix
 	 *
 	 * @return string
@@ -144,11 +125,5 @@ class Permissions_Keys extends DB {
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
-	}
-
-	public function purge_old_permission_keys() {
-		global $wpdb;
-
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE `expiration_date` < %s", date( 'Y-m-d H:i:s' ) ) );
 	}
 }

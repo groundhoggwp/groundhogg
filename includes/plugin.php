@@ -347,6 +347,7 @@ class Plugin {
 		new License_Manager();
 		new Background_Tasks();
 		new Big_File_Uploader();
+		new Cleanup_Actions();
 	}
 
 	/**
