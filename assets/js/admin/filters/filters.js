@@ -956,6 +956,7 @@
           className: 'filter-name text',
         }, message),
         Button({
+          type: 'button',
           id: `delete-${ group }-${ index }`,
           className: 'delete-filter',
           onClick: e => {
@@ -994,6 +995,7 @@
         // }
       }, filterRegistry.displayName(filter)),
       Button({
+        type: 'button',
         id: `delete-${ group }-${ index }`,
         className: 'delete-filter',
         onClick: e => deleteFilter(group, index),
@@ -1067,6 +1069,7 @@
         }, [
           bold(filterRegistry.filterName(filter)),
           Button({
+            type: 'button',
             className: 'close-edit',
             onClick: e => editFilter(null),
           }, Dashicon('no-alt')),
@@ -1079,12 +1082,14 @@
         }, [
 
           Button({
+            type: 'button',
             id: `delete-${ group }-${ index }`,
             className: 'delete delete-filter',
             onClick: e => deleteFilter(group, index),
           }, Dashicon('trash')),
 
           Button({
+            type: 'button',
             id: `commit-${ group }-${ index }`,
             className: 'commit commit-filter',
             onClick: e => updateFilter(tempFilterSettings, group, index),
@@ -1119,6 +1124,7 @@
 
       }),
       Button({
+        type: 'button',
         id: `add-filter-to-${ group }`,
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
