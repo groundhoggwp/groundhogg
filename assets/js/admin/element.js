@@ -2060,14 +2060,20 @@ ${afterProgress()}`,
     return Date.now()
   }
 
-  const adminPageURL = (page, params) => {
+  const adminPageURL = (page, params, fragment = '') => {
 
     params = $.param({
       page,
       ...params,
     })
 
-    return `${Groundhogg.url.admin.replace(/(\/|\\)$/, '')}/admin.php?${params}`
+    let url = `${Groundhogg.url.admin.replace(/(\/|\\)$/, '')}/admin.php?${params}`
+
+    if ( fragment ){
+      url += `#${fragment}`
+    }
+
+    return url
   }
 
   const icons = {

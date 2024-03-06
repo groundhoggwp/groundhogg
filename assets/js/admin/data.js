@@ -355,12 +355,11 @@
         return ids.map(id => this.get(id))
       }
 
-      const params = {
-        limit: 0 // No limit if getting by ID specifically
-      }
+      let missingIds = ids.filter(id => !this.hasItem(id))
 
-      if (ids && ids.length) {
-        params.ID = ids.filter(id => !this.hasItem(id))
+      const params = {
+        [this.primaryKey]: missingIds,
+        limit: missingIds.length
       }
 
       return this.fetchItems(params, opts)
