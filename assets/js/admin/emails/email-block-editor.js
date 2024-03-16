@@ -5255,10 +5255,7 @@
     inlineStyle(doc, 'h1', h1)
     inlineStyle(doc, 'h2', h2)
     inlineStyle(doc, 'h3', h3)
-    inlineStyle(doc, 'a', {
-      ...p,
-      ...a,
-    })
+    inlineStyle(doc, 'a', a)
 
     inlineStyle(doc, 'b,strong', {
       fontWeight: 'bold',
