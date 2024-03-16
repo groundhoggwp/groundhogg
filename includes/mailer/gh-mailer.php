@@ -12,9 +12,16 @@ if ( ! class_exists( '\PHPMailer\PHPMailer\PHPMailer' ) ) {
 	require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
 }
 
+/**
+ * Other sending services should inherit this class
+ */
 class GH_Mailer extends PHPMailer {
-	// Util class for SMTP integrations
 
+	/**
+	 * Compat for list-unsubscribe and related headers to avoid encoding.
+	 *
+	 * @return string
+	 */
 	public function createHeader() {
 
 		// Remove List-* from custom headers because encoding them breaks functionality in some clients
