@@ -371,14 +371,30 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Get entry steps
+	 *
+	 * @return Step[]
+	 */
+	public function get_entry_steps(){
+		return array_filter( $this->get_steps(), function ( $step ) {
+			return $step->is_starting() || $step->is_entry();
+		} );
+	}
+
+	/**
+	 * Get IDs of entry steps
+	 *
 	 * @return array
 	 */
 	public function get_entry_step_ids() {
-		return get_object_ids( array_filter( $this->get_steps(), function ( $step ) {
-			return $step->is_starting() || $step->is_entry();
-		} ) );
+		return get_object_ids( $this->get_entry_steps() );
 	}
 
+	/**
+	 * All send_email steps
+	 *
+	 * @return Step[]
+	 */
 	public function get_email_steps() {
 		return array_filter( $this->get_steps(), function ( $step ) {
 			return $step->type_is( 'send_email' );
@@ -386,7 +402,7 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Get the step IDs associate with this funnel
+	 * Get the step IDs associated with this funnel
 	 *
 	 * @param array $query
 	 *

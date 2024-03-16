@@ -403,6 +403,7 @@ class Plugin {
 		require __DIR__ . '/filters.php';
 		require __DIR__ . '/tools.php';
 		require __DIR__ . '/better-meta-compat.php';
+		require __DIR__ . '/cli/bootstrap.php';
 	}
 }
 

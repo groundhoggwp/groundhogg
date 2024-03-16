@@ -6,9 +6,11 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
 use Groundhogg\Steps\Actions\Send_Email;
+use Groundhogg\Steps\Funnel_Step;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -333,18 +335,16 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Step[]
 	 */
 	public function get_preceding_actions() {
-		$steps = $this->get_db()->query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'step_group', '=', self::ACTION ],
-				[ 'step_order', '<', $this->get_order() ],
-				[ 'funnel_id', '=', $this->get_funnel_id() ]
-			],
-			'orderby' => 'step_order',
-			'order'   => 'asc',
-		] );
+		$query = new Table_Query( 'steps' );
 
-		return array_map_to_step( $steps );
+		$query->setOrderby('step_order')
+		      ->setOrder('ASC')
+		      ->where()
+		      ->equals( 'step_group', self::ACTION )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->lessThan( 'step_order', $this->get_order() );
+
+		return $query->get_objects( Step::class );
 	}
 
 	/**
@@ -353,19 +353,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Step[]
 	 */
 	public function get_preceding_actions_of_type( $type = '' ) {
-		$steps = $this->get_db()->query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'step_group', '=', self::ACTION ],
-				[ 'step_order', '<', $this->get_order() ],
-				[ 'funnel_id', '=', $this->get_funnel_id() ],
-				[ 'step_type', '=', $type ],
-			],
-			'orderby' => 'step_order',
-			'order'   => 'asc',
-		] );
+		$query = new Table_Query( 'steps' );
 
-		return array_map_to_step( $steps );
+		$query->setOrderby('step_order')
+		      ->setOrder('ASC')
+		      ->where()
+		      ->equals( 'step_group', self::ACTION )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->equals( 'step_type', $type )
+		      ->lessThan( 'step_order', $this->get_order() );
+
+		return $query->get_objects( Step::class );
 	}
 
 	/**
@@ -375,18 +373,35 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_proceeding_actions() {
 
-		$steps = $this->get_db()->query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'step_group', '=', self::ACTION ],
-				[ 'step_order', '>', $this->get_order() ],
-				[ 'funnel_id', '=', $this->get_funnel_id() ]
-			],
-			'orderby' => 'step_order',
-			'order'   => 'asc',
-		] );
+		$query = new Table_Query( 'steps' );
 
-		return array_map_to_step( $steps );
+		$query->setOrderby('step_order')
+		      ->setOrder('ASC')
+		      ->where()
+		      ->equals( 'step_group', self::ACTION )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->greaterThan( 'step_order', $this->get_order() );
+
+		return $query->get_objects( Step::class );
+	}
+
+	/**
+	 * Returns all the actions that come after this one
+	 *
+	 * @return Step[]
+	 */
+	public function get_proceeding_benchmarks() {
+
+		$query = new Table_Query( 'steps' );
+
+		$query->setOrderby('step_order')
+		      ->setOrder('ASC')
+		      ->where()
+		      ->equals( 'step_group', self::BENCHMARK )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->greaterThan( 'step_order', $this->get_order() );
+
+		return $query->get_objects( Step::class );
 	}
 
 	/**
@@ -396,27 +411,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_next_action() {
 
-		$next = $this->get_db()->query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'step_group', '=', self::ACTION ],
-				[ 'step_order', $this->is_action() ? '=' : '>=', $this->get_order() + 1 ],
-				[ 'funnel_id', '=', $this->get_funnel_id() ]
-			],
-			'orderby' => 'step_order',
-			'order'   => 'asc',
-			'limit'   => 1,
-		] );
+		$query = new Table_Query( 'steps' );
 
-		if ( is_array( $next ) ) {
+		$query->setOrderby('step_order')
+		      ->setOrder('ASC')
+		      ->setLimit(1)
+		      ->where()
+		      ->equals( 'step_group', self::ACTION )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->compare( 'step_order', $this->get_order() + 1, $this->is_action() ? '=' : '>=' );
 
-			$next = array_shift( $next );
+		$next = $query->get_objects( Step::class );
 
-			if ( ! empty( $next ) ) {
-				$next = new Step( $next );
-			}
-
-		}
+		$next = ! empty( $next ) ? $next[0] : false;
 
 		/**
 		 * Filters the next action
@@ -434,27 +441,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_prev_action() {
 
-		$next = $this->get_db()->query( [
-			'where'   => [
-				'relationship' => 'AND',
-				[ 'step_group', '=', self::ACTION ],
-				[ 'step_order', $this->is_action() ? '=' : '<=', $this->get_order() - 1 ],
-				[ 'funnel_id', '=', $this->get_funnel_id() ]
-			],
-			'orderby' => 'step_order',
-			'order'   => 'desc',
-			'limit'   => 1,
-		] );
+		$query = new Table_Query( 'steps' );
 
-		if ( is_array( $next ) ) {
+		$query->setOrderby('step_order')
+		      ->setOrder('DESC')
+		      ->setLimit(1)
+		      ->where()
+		      ->equals( 'step_group', self::ACTION )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->compare( 'step_order', $this->get_order() - 1, $this->is_action() ? '=' : '<=' );
 
-			$next = array_shift( $next );
+		$next = $query->get_objects( Step::class );
 
-			if ( ! empty( $next ) ) {
-				$next = new Step( $next );
-			}
-
-		}
+		$next = ! empty( $next ) ? $next[0] : false;
 
 		/**
 		 * Filters the next action
@@ -499,18 +498,29 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the delay time for enqueueing the next action
+	 * Get the run time for when this step should run
+	 *
+	 * Previously get_delay_time
 	 *
 	 * @return int
 	 */
-	public function get_delay_time() {
-		$time = apply_filters( "groundhogg/steps/{$this->get_type()}/enqueue", $this );
+	public function get_run_time( $baseTimestamp = 0 ) {
 
-		if ( ! is_numeric( $time ) ) {
-			$time = time();
+		if ( ! $baseTimestamp ){
+			$baseTimestamp = time();
 		}
 
-		return $time;
+		return apply_filters( "groundhogg/steps/{$this->get_type()}/run_time", $baseTimestamp, $this );
+	}
+
+	/**
+	 * Use get_run_time instead
+	 *
+	 * @return int
+	 */
+	public function get_delay_time(){
+		_deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
+		return $this->get_run_time( time() );
 	}
 
 	/**
@@ -608,7 +618,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Set up the new event args
 		$event = [
-			'time'       => $this->get_delay_time(),
+			'time'       => $this->get_run_time(),
 			'funnel_id'  => $this->get_funnel_id(),
 			'step_id'    => $this->get_id(),
 			'contact_id' => $contact->get_id(),
@@ -750,6 +760,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
+	}
+
+	/**
+	 * Get the controller/element for doing the actios and stuff
+	 *
+	 * @return Funnel_Step
+	 */
+	public function get_step_type_controller(){
+		$controller = Plugin::instance()->step_manager->get_element( $this->get_type() );
+		$controller->set_current_step( $this );
+
+		return $controller;
 	}
 
 	/**

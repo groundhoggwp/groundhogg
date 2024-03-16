@@ -362,7 +362,6 @@ class Email extends Base_Object_With_Meta {
 		return $this->message_type;
 	}
 
-
 	/**
 	 * Whether browser view is enabled
 	 *
@@ -373,6 +372,7 @@ class Email extends Base_Object_With_Meta {
 	public function browser_view_enabled( $bool = false ) {
 		return boolval( $this->get_meta( 'browser_view' ) );
 	}
+
 
 	/**
 	 * Return the browser view option for this email.
@@ -704,7 +704,7 @@ class Email extends Base_Object_With_Meta {
 		$content = str_replace( 'http://http://', $schema, $content );
 
 		/* Other filters */
-		$content = apply_filters( 'wpgh_email_template_make_clickable', true ) ? make_clickable( $content ) : $content;
+		$content = make_clickable( $content );
 		$content = str_replace( '&#038;', '&amp;', $content );
 		$content = do_shortcode( $content );
 		$content = fix_nested_p( $content );
@@ -731,6 +731,19 @@ class Email extends Base_Object_With_Meta {
 			$this,
 			'tracking_link_callback'
 		], $content );
+	}
+
+	/**
+	 * Get URLs from the content.
+	 * This will only get static URLs, dynamic URLs possibly added by replacement codes will not be retrieved.
+	 *
+	 * @return string[]
+	 */
+	public function get_urls() {
+
+		preg_match_all( '@href="(?<url>https?://[^"]+)"@i', $this->event && $this->contact ? $this->get_merged_content() : $this->content, $matches );
+
+		return $matches['url'];
 	}
 
 	/**

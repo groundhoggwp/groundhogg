@@ -786,7 +786,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @param string   $context
 	 * @param bool|int $user_id
 	 *
-	 * @return $note
+	 * @return Note|false
 	 */
 	public function add_note( $note, $context = 'system', $user_id = false ) {
 		if ( ! is_string( $note ) && ! is_array( $note ) ) {

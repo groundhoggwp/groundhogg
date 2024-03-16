@@ -28,7 +28,7 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 		] );
 
 
-		$this->assertEquals( strtotime( '+1 hours' ), $timer->get_delay_time() );
+		$this->assertEquals( strtotime( '+1 hours' ), $timer->get_run_time() );
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 		] );
 
 
-		$this->assertEquals( strtotime( '+1 days' ), $timer->get_delay_time() );
+		$this->assertEquals( strtotime( '+1 days' ), $timer->get_run_time() );
 	}
 
 	/**
@@ -76,9 +76,9 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 		] );
 
 		if ( time() < strtotime( 'today 8:00:00' ) ){
-			$this->assertEquals( strtotime( 'today 8:00:00' ), $timer->get_delay_time() );
+			$this->assertEquals( strtotime( 'today 8:00:00' ), $timer->get_run_time() );
 		} else {
-			$this->assertEquals( strtotime( 'tomorrow 8:00:00' ), $timer->get_delay_time() );
+			$this->assertEquals( strtotime( 'tomorrow 8:00:00' ), $timer->get_run_time() );
 		}
 	}
 
@@ -103,9 +103,9 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 		] );
 
 		if ( time() < strtotime( 'today 00:01:00' ) ){
-			$this->assertEquals( strtotime( 'today 00:01:00' ), $timer->get_delay_time() );
+			$this->assertEquals( strtotime( 'today 00:01:00' ), $timer->get_run_time() );
 		} else {
-			$this->assertEquals( strtotime( 'tomorrow 00:01:00' ), $timer->get_delay_time() );
+			$this->assertEquals( strtotime( 'tomorrow 00:01:00' ), $timer->get_run_time() );
 		}
 	}
 

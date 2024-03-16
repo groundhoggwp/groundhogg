@@ -4,8 +4,8 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Step;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\html;
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class DelayDateTime extends \DateTime {
+class DelayDateTime extends DateTimeHelper {
 
 	private $min;
 	private $max;
@@ -141,6 +141,13 @@ class Delay_Timer extends Action {
 
 	}
 
+	/**
+     * Show a preview of the run time
+     *
+	 * @param Step $step
+	 *
+	 * @return void
+	 */
 	protected function before_step_notes( Step $step ) {
 
 		?>
@@ -151,55 +158,44 @@ class Delay_Timer extends Action {
             <div class="inside">
 				<?php
 
-				$date = new \DateTime( 'now', wp_timezone() );
+				$date = new DelayDateTime( 'now' );
 
-				//                $tracker = new Micro_Time_Tracker();
-
-				$date->setTimestamp( self::get_enqueue_time( $step->get_meta() ) );
-
-				//                $tracker->show_time_elapsed( 10 );
+				$date->setTimestamp( self::get_run_time( time(), $step ) );
 
 				echo html()->e( 'div', [
 					'class' => "display-flex gap-10 column"
 				], [
 					'<b>' . __( 'Runs on...' ) . '</b>',
-					'<span>' . $date->format( get_date_time_format() ) . '</span>'
+					'<span>' . $date->wpDateTimeFormat() . '</span>'
 				] );
 
 				?>
             </div>
         </div>
 		<?php
-
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
+    public function save( $step ) {
+        // silence is golden
+    }
 
-		$preview = $step->get_meta( 'delay_preview' );
-
-		if ( ! force_custom_step_names() && ! empty( $preview ) ) {
-			$step->update( [
-				'step_title' => $preview
-			] );
-		}
-
-	}
+	public function generate_step_title( $step ) {
+	    return $step->get_meta( 'delay_preview' );
+    }
 
 	/**
-	 * Get the enqueue time
+     * Replaces the get_enqueue_time() method and utilizes a base timestamp
+     *
+	 * @throws \Exception
 	 *
-	 * @param array   $settings
-	 * @param Contact $contact
+	 * @param Step $step
+	 * @param int  $baseTimestamp
 	 *
 	 * @return int
 	 */
-	protected static function get_enqueue_time( $settings, $contact = false ) {
-		$settings = wp_parse_args( $settings, [
+	public function get_run_time( int $baseTimestamp, Step $step ): int {
+
+		$settings = wp_parse_args( $step->get_meta(), [
 			'delay_amount'      => 3,
 			'delay_type'        => 'days',
 			'run_on_type'       => 'any',
@@ -214,9 +210,9 @@ class Delay_Timer extends Action {
 			'run_on_dom'        => [], // Run on days of month,
 		] );
 
-
-		$date = new DelayDateTime();
-		$tz   = $settings['send_in_timezone'] && $contact ? new \DateTimeZone( $contact->get_time_zone() ) : wp_timezone();
+		$contact = $step->enqueued_contact;
+		$date    = new DelayDateTime( $baseTimestamp );
+		$tz      = $settings['send_in_timezone'] && $contact ? $contact->get_time_zone( false ) : wp_timezone();
 		$date->setTimezone( $tz );
 
 		// The base amount of time which we need to wait for
@@ -374,55 +370,7 @@ class Delay_Timer extends Action {
 	}
 
 	/**
-	 * @param Step $step
-	 *
-	 * @return int|void
-	 */
-	public function enqueue( $step ) {
-		return self::get_enqueue_time( $step->get_meta(), $step->enqueued_contact );
-	}
-
-	/**
-	 * Override the parent and set the run time of this function to the settings
-	 *
-	 * @param Step $step
-	 *
-	 * @return int
-	 */
-	public function old_enqueue( $step ) {
-
-		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
-		$run_when         = $this->get_setting( 'run_when', 'now' );
-		$date             = new \DateTime( 'now', wp_timezone() );
-
-		// Timezone change is only important when time of day is specified
-		if ( $send_in_timezone && $run_when === 'later' && Event_Queue::is_processing() ) {
-			try {
-				$date->setTimezone( \Groundhogg\event_queue()->get_current_contact()->get_time_zone( false ) );
-			} catch ( \Exception $e ) {
-				// Ignore.
-			}
-		}
-
-		$amount   = absint( $this->get_setting( 'delay_amount' ) );
-		$type     = $this->get_setting( 'delay_type', 'days' );
-		$run_time = $this->get_setting( 'run_time', '09:00:00' );
-
-		$date->modify( sprintf( '+%d %s', $amount, $type ) );
-
-		if ( $run_when !== 'now' ) {
-			$date->modify( $run_time );
-
-			if ( $date->getTimestamp() < time() ) {
-				$date->modify( '+1 day' );
-			}
-		}
-
-		return $date->getTimestamp();
-	}
-
-	/**
-	 * Process the apply tag step...
+	 * Delay timers don't do anything, they just have the delay and enqueue the next step.
 	 *
 	 * @param $contact Contact
 	 * @param $event   Event
@@ -433,19 +381,5 @@ class Delay_Timer extends Action {
 		//do nothing
 		return true;
 	}
-
-	public function step_title_edit( $step ) {
-
-		if ( force_custom_step_names() ) {
-			parent::step_title_edit( $step );
-
-			return;
-		}
-
-		?>
-        <div class="gh-panel-header">
-            <h2><?php _e( 'Timer Settings' ) ?></h2>
-        </div>
-		<?php
-	}
+    
 }

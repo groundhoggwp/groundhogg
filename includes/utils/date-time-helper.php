@@ -98,4 +98,12 @@ class DateTimeHelper extends \DateTime {
 	public function isPast() {
 		return $this->getTimestamp() < time();
 	}
+
+	public function isFuture() {
+		return $this->getTimestamp() > time();
+	}
+
+	public function isNow() {
+		return $this->getTimestamp() === time();
+	}
 }
