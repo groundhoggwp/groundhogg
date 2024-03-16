@@ -941,7 +941,7 @@
 
         // events with funnel IDs
         emailIds.length && !EmailsStore.hasItems(emailIds)
-          ? FunnelsStore.maybeFetchItems(emailIds)
+          ? EmailsStore.maybeFetchItems(emailIds)
           : null,
       ]
 
