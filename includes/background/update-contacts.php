@@ -7,6 +7,7 @@ use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
 use function Groundhogg\get_array_var;
 use function Groundhogg\notices;
+use function Groundhogg\percentage;
 
 class Update_Contacts extends Task {
 
@@ -26,7 +27,14 @@ class Update_Contacts extends Task {
 		$query          = new Contact_Query( $query );
 		$this->contacts = $query->count();
 		$this->batch    = floor( $this->contacts / self::BATCH_LIMIT );
+	}
 
+	public function get_title(){
+		return sprintf( 'Update %s contacts', bold_it( _nf( $this->contacts ) ) );
+	}
+
+	public function get_progress(){
+		return percentage( $this->contacts, $this->batch * self::BATCH_LIMIT );
 	}
 
 	public function can_run() {

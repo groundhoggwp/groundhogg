@@ -192,10 +192,9 @@ class Create_Task extends Action {
 		$time   = $this->get_setting( 'time', '17:00:00' );
 		$type   = $this->get_setting( 'task_type', 'task' );
 
-		$dueDate = new DateTimeHelper();
+		$dueDate = new DateTimeHelper( $event->get_time() );
 
-		$dueDate->modify( "+$amount $unit" );
-		$dueDate->modify( "$time" );
+		$dueDate->modify( "+$amount $unit $time" );
 
 		$task = new Task( [
 			'due_date'    => $dueDate->format( 'Y-m-d H:i:s' ),
@@ -208,6 +207,8 @@ class Create_Task extends Action {
 			'context'     => 'funnel',
 			'user_id'     => $contact->get_owner_id(),
 			'type'        => $type,
+			'timestamp'    => $event->get_time(),
+			'date_created' => Ymd_His( $event->get_time() )
 		] );
 
 		return true;

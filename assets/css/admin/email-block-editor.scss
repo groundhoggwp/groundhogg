@@ -23,6 +23,17 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+.mce-ico {
+  &.mce-i-gh_replacements{
+
+    font-family: 'dashicons';
+
+    &::before {
+      content: "\f110";
+    }
+  }
+}
+
 @keyframes skeleton-loading {
   0% {
     background-color: $primary-dark-5;
@@ -186,20 +197,20 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     #block-editor-toolbar {
       position: sticky;
       top: 50%;
-      width: 0;
+      width: 100%;
       height: 0;
       transform: translateY(-50%);
-      left: 0;
       z-index: 999;
 
       .buttons {
         position: absolute;
-        left: 0;
+        right: 0;
+        //left: 0;
         transform: translateY(-50%);
         box-shadow: $box-shadow;
         background-color: #FFF;
         padding: 3px;
-        border-radius: 0 3px 3px 0;
+        border-radius: 3px 0 0 3px;
       }
     }
 
@@ -337,6 +348,20 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
             > *:first-child {
               margin-top: 0;
+            }
+          }
+
+          &.is-editing{
+            .mce-top-part {
+              position: sticky;
+              top: 0;
+              left: 0;
+            }
+
+            .wp-editor-tabs {
+              button {
+                box-sizing: content-box !important;
+              }
             }
           }
         }
@@ -1193,7 +1218,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  border-right: 1px solid $primary-dark-15;
+  border-left: 1px solid $primary-dark-15;
   overflow-y: auto;
   flex-shrink: 0;
 

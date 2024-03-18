@@ -128,6 +128,9 @@ class Broadcasts_Api extends Base_Object_Api {
 		// Sets up the initial state for the scheduler
 		$broadcast->enqueue_batch();
 
+		// If the broadcast is still pending, create a background task
+		$broadcast->schedule_in_background();
+
 		return self::SUCCESS_RESPONSE( [
 			'item' => $broadcast
 		] );

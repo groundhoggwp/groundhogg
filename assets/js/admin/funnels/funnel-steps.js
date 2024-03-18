@@ -803,13 +803,17 @@
   })
 
   Funnel.registerStepCallbacks('send_email', {
-    onActive: ({ ID, meta, data }) => {
+    onActive: async ({ ID, meta, data }) => {
 
       let id = `step_${ ID }_send_email`
       let { email_id } = meta
 
       let state = {
         changing: false,
+      }
+
+      if ( email_id ){
+        await EmailsStore.maybeFetchItem( email_id )
       }
 
       const morphPreview = () => {

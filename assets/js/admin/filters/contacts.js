@@ -40,10 +40,21 @@
   const {
     Filters, FilterRegistry, createFilter, createGroup,
     createDateFilter,
+    createPastDateFilter,
     createStringFilter,
     createNumberFilter,
     createTimeFilter,
   } = Groundhogg.filters
+
+  const {
+    ComparisonsTitleGenerators,
+    AllComparisons,
+    StringComparisons,
+    NumericComparisons,
+    pastDateRanges,
+    futureDateRanges,
+    allDateRanges,
+  } = Groundhogg.filters.comparisons
 
   const ContactFilterRegistry = FilterRegistry({})
 
@@ -115,138 +126,8 @@
     }, defaults))
   }
 
-  const AllComparisons = {
-    equals: _x('Equals', 'comparison', 'groundhogg'),
-    not_equals: _x('Not equals', 'comparison', 'groundhogg'),
-    contains: _x('Contains', 'comparison', 'groundhogg'),
-    not_contains: _x('Does not contain', 'comparison', 'groundhogg'),
-    starts_with: _x('Starts with', 'comparison', 'groundhogg'),
-    ends_with: _x('Ends with', 'comparison', 'groundhogg'),
-    does_not_start_with: _x('Does not start with', 'comparison', 'groundhogg'),
-    does_not_end_with: _x('Does not end with', 'comparison', 'groundhogg'),
-    less_than: _x('Less than', 'comparison', 'groundhogg'),
-    less_than_or_equal_to: _x('Less than or equal to', 'comparison',
-      'groundhogg'),
-    greater_than: _x('Greater than', 'comparison', 'groundhogg'),
-    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison',
-      'groundhogg'),
-    empty: _x('Is empty', 'comparison', 'groundhogg'),
-    not_empty: _x('Is not empty', 'comparison', 'groundhogg'),
-  }
-
-  const StringComparisons = {
-    equals: _x('Equals', 'comparison', 'groundhogg'),
-    not_equals: _x('Not equals', 'comparison', 'groundhogg'),
-    contains: _x('Contains', 'comparison', 'groundhogg'),
-    not_contains: _x('Does not contain', 'comparison', 'groundhogg'),
-    starts_with: _x('Starts with', 'comparison', 'groundhogg'),
-    ends_with: _x('Ends with', 'comparison', 'groundhogg'),
-    does_not_start_with: _x('Does not start with', 'comparison', 'groundhogg'),
-    does_not_end_with: _x('Does not end with', 'comparison', 'groundhogg'),
-    empty: _x('Is empty', 'comparison', 'groundhogg'),
-    not_empty: _x('Is not empty', 'comparison', 'groundhogg'),
-  }
-
-  const NumericComparisons = {
-    equals: _x('Equals', 'comparison', 'groundhogg'),
-    not_equals: _x('Not equals', 'comparison', 'groundhogg'),
-    less_than: _x('Less than', 'comparison', 'groundhogg'),
-    less_than_or_equal_to: _x('Less than or equal to', 'comparison',
-      'groundhogg'),
-    greater_than: _x('Greater than', 'comparison', 'groundhogg'),
-    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison',
-      'groundhogg'),
-  }
-
-  const ComparisonsTitleGenerators = {
-    equals: (k, v) => sprintf(
-      _x('%1$s equals %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    not_equals: (k, v) => sprintf(
-      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    contains: (k, v) => sprintf(
-      _x('%1$s contains %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    not_contains: (k, v) => sprintf(_x('%1$s does not contain %2$s',
-      '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    starts_with: (k, v) => sprintf(
-      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    ends_with: (k, v) => sprintf(
-      _x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    does_not_start_with: (k, v) => sprintf(_x('%1$s does not start with %2$s',
-      '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    does_not_end_with: (k, v) => sprintf(_x('%1$s does not end with %2$s',
-      '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    less_than: (k, v) => sprintf(
-      _x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    less_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is less than or equal to %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    greater_than: (k, v) => sprintf(_x('%1$s is greater than %2$s',
-      '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    greater_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is greater than or equal to %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
-    in: (k, v) => sprintf(
-      _x('%1$s is %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    not_in: (k, v) => sprintf(
-      _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    empty: (k, v) => sprintf(
-      _x('%1$s is empty', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    not_empty: (k, v) => sprintf(
-      _x('%1$s is not empty', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    includes: (k, v) => sprintf(
-      _x('%1$s includes %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-    excludes: (k, v) => sprintf(
-      _x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
-  }
-
-  const pastDateRanges = {
-    'any': __('At any time', 'groundhogg'),
-    'today': __('Today', 'groundhogg'),
-    'this_week': __('This week', 'groundhogg'),
-    'this_month': __('This month', 'groundhogg'),
-    'this_year': __('This year', 'groundhogg'),
-    '24_hours': __('In the last 24 hours', 'groundhogg'),
-    '7_days': __('In the last 7 days', 'groundhogg'),
-    '30_days': __('In the last 30 days', 'groundhogg'),
-    '60_days': __('In the last 60 days', 'groundhogg'),
-    '90_days': __('In the last 90 days', 'groundhogg'),
-    '365_days': __('In the last 365 days', 'groundhogg'),
-    'before': __('Before', 'groundhogg'),
-    'after': __('After', 'groundhogg'),
-    'between': __('Between', 'groundhogg'),
-  }
-
-  const futureDateRanges = {
-    'any': __('At any time', 'groundhogg'),
-    'today': __('Today', 'groundhogg'),
-    'this_week': __('This week', 'groundhogg'),
-    'this_month': __('This month', 'groundhogg'),
-    'this_year': __('This year', 'groundhogg'),
-    '24_hours': __('In the next 24 hours', 'groundhogg'),
-    '7_days': __('In the next 7 days', 'groundhogg'),
-    '30_days': __('In the next 30 days', 'groundhogg'),
-    '60_days': __('In the next 60 days', 'groundhogg'),
-    '90_days': __('In the next 90 days', 'groundhogg'),
-    '365_days': __('In the next 365 days', 'groundhogg'),
-    'before': __('Before', 'groundhogg'),
-    'after': __('After', 'groundhogg'),
-    'between': __('Between', 'groundhogg'),
-  }
-
   const standardActivityDateFilterOnMount = (filter, updateFilter) => {
-    $('#filter-date-range, #filter-before, #filter-after').
+    $('#filter-date-range, #filter-before, #filter-after, #filter-days').
       on('change', function (e) {
         const $el = $(this)
         updateFilter({
@@ -257,23 +138,26 @@
 
           const $before = $('#filter-before')
           const $after = $('#filter-after')
+          const $days = $('#filter-days')
+
+          $before.addClass( 'hidden' );
+          $after.addClass( 'hidden' );
+          $days.addClass( 'hidden' );
 
           switch ($el.val()) {
             case 'between':
               $before.removeClass('hidden')
               $after.removeClass('hidden')
               break
+            case 'day_of':
             case 'after':
               $after.removeClass('hidden')
-              $before.addClass('hidden')
               break
             case 'before':
               $before.removeClass('hidden')
-              $after.addClass('hidden')
               break
-            default:
-              $before.addClass('hidden')
-              $after.addClass('hidden')
+            case 'x_days':
+              $days.removeClass('hidden')
               break
           }
         }
@@ -281,14 +165,14 @@
   }
 
   const standardActivityDateTitle = (
-    prepend, { date_range, before, after, future = false }) => {
+    prepend, { date_range, before, after, days=0, future = false }) => {
 
     let ranges = future ? futureDateRanges : pastDateRanges
 
     switch (date_range) {
       default:
         return `${ prepend } ${ ranges[date_range]
-          ? ranges[date_range].toLowerCase()
+          ? ranges[date_range].replace( 'X', days ).toLowerCase()
           : '' }`
       case 'between':
         return `${ prepend } ${ sprintf(
@@ -303,6 +187,10 @@
         return `${ prepend } ${ sprintf(
           _x('after %s', '%s is a date', 'groundhogg'),
           `<b>${ formatDate(after) }</b>`) }`
+      case 'day_of':
+        return `${ prepend } ${ sprintf(
+          _x('on %s', '%s is a date', 'groundhogg'),
+          `<b>${ formatDate(after) }</b>`) }`
     }
   }
 
@@ -310,36 +198,46 @@
     date_range = '24_hours',
     after = '',
     before = '',
+    days = 0,
     future = false,
   }) => {
 
-    return ` ${ select({
-      id: 'filter-date-range', name: 'date_range',
-    }, future ? futureDateRanges : pastDateRanges, date_range) }
-
-		  ${ input({
-      type: 'date',
-      value: after.split(' ')[0],
-      id: 'filter-after',
-      className: `date ${ ['between', 'after'].includes(date_range)
-        ? ''
-        : 'hidden' }`,
-      name: 'after',
-    }) }
-
-		  ${ input({
-      type: 'date',
-      value: before.split(' ')[0],
-      id: 'filter-before',
-      className: `value ${ ['between', 'before'].includes(date_range)
-        ? ''
-        : 'hidden' }`,
-      name: 'before',
-    }) }`
+    return [
+      select({
+        id: 'filter-date-range', name: 'date_range',
+      }, future ? futureDateRanges : pastDateRanges, date_range),
+      input({
+        type: 'date',
+        value: after.split(' ')[0],
+        id: 'filter-after',
+        className: `date ${ ['between', 'after', 'day_of'].includes(date_range)
+          ? ''
+          : 'hidden' }`,
+        name: 'after',
+      }),
+      input({
+        type: 'date',
+        value: before.split(' ')[0],
+        id: 'filter-before',
+        className: `value ${ ['between', 'before'].includes(date_range)
+          ? ''
+          : 'hidden' }`,
+        name: 'before',
+      }),
+      input({
+        type: 'number',
+        value: days,
+        id: 'filter-days',
+        className: `value ${ ['x_days', 'next_x_days'].includes(date_range)
+          ? ''
+          : 'hidden' }`,
+        name: 'days',
+      }),
+    ].join('')
   }
 
   const standardActivityDateDefaults = {
-    date_range: 'any', before: '', after: '', count: 1,
+    date_range: 'any', before: '', after: '', count: 1, days: 0,
   }
 
   const filterCountDefaults = {
@@ -500,20 +398,8 @@
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
 
   ContactFilterRegistry.registerFilter(createDateFilter('birthday', __('Birthday', 'groundhogg'), 'contact'))
-
-  registerFilter('date_created', 'contact', __('Date Created', 'groundhogg'), {
-    view (filter) {
-      //language=HTMl
-      return standardActivityDateTitle('<b>Created</b>', filter)
-    }, edit (filter) {
-      // language=html
-      return standardActivityDateOptions(filter)
-    }, onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    }, defaults: {
-      ...standardActivityDateDefaults,
-    },
-  })
+  ContactFilterRegistry.registerFilter(createNumberFilter('age', __('Age', 'groundhogg'), 'contact'))
+  ContactFilterRegistry.registerFilter(createPastDateFilter('date_created', __('Date Created', 'groundhogg'), 'contact'))
 
   const { optin_status, owners, countries, roles } = Groundhogg.filters
 
@@ -710,28 +596,34 @@
       return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`,
         `<b>"${ value }"</b>`)
     }, edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
+
       // language=html
-      return `
-          ${ input({
-              id: 'filter-meta',
-              name: 'meta',
-              className: 'meta-picker',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value: meta,
-          }) }
-          ${ select({
-              id: 'filter-compare',
-              name: 'compare',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-          }, AllComparisons, compare) } ${ input({
-              id: 'filter-value',
-              name: 'value',
-              dataGroup: filterIndex,
-              dataKey: filterIndex,
-              value,
-          }) }`
+      return [
+        input({
+          id: 'filter-meta',
+          name: 'meta',
+          className: 'meta-picker',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+          value: meta,
+        }),
+
+        select({
+          id: 'filter-compare',
+          name: 'compare',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+        }, AllComparisons, compare),
+
+        [ 'empty', 'not_empty' ].includes( compare ) ? '' : input({
+          id: 'filter-value',
+          name: 'value',
+          dataGroup: filterIndex,
+          dataKey: filterIndex,
+          value,
+        }),
+      ].join('')
+
     }, onMount (filter, updateFilter) {
 
       metaPicker('#filter-meta')
@@ -739,10 +631,11 @@
       $('#filter-compare, #filter-value, #filter-meta').
         on('change blur', function (e) {
           const $el = $(this)
-          const { compare } = updateFilter({
+          updateFilter({
             [$el.prop('name')]: $el.val(),
-          })
+          }, true)
         })
+
     }, defaults: {
       meta: '', compare: 'equals', value: '',
     },
@@ -1786,9 +1679,22 @@
       let texts = [
         ContactFilterRegistry.displayFilters(include_filters),
         ContactFilterRegistry.displayFilters(exclude_filters)
-      ].filter( s => s);
+      ]
 
-      return texts.join( ' <abbr title="exclude">and exclude</abbr> ' )
+      if (include_filters.length && exclude_filters.length) {
+        return texts.join(' <abbr title="exclude">and exclude</abbr> ')
+      }
+
+      if (exclude_filters.length) {
+        return sprintf('<abbr title="exclude">Exclude</abbr> %s', texts[1])
+      }
+
+      if (include_filters.length) {
+        return texts[0]
+      }
+
+      throw new Error('No filters defined.')
+
     },
     edit: ({
       include_filters = [],

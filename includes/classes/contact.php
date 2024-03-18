@@ -58,6 +58,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
 
+		// ID given
 		if ( is_numeric( $_id_or_email_or_args ) ) {
 			$by_user_id = is_bool( $by_user_id ) ? $by_user_id : false;
 			$field = $by_user_id ? 'user_id' : 'ID';
@@ -71,12 +72,14 @@ class Contact extends Base_Object_With_Meta {
 			return;
 		}
 
+		// Email given
 		if ( is_string( $_id_or_email_or_args ) && is_email( $_id_or_email_or_args ) ) {
 			parent::__construct( $_id_or_email_or_args, 'email' );
 
 			return;
 		}
 
+		// Pass email in array
 		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'email' ) ) {
 			parent::__construct( $_id_or_email_or_args['email'], 'email' );
 
@@ -89,6 +92,7 @@ class Contact extends Base_Object_With_Meta {
 			return;
 		}
 
+		// Pass ID in array
 		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'ID' ) ) {
 			parent::__construct( absint( $_id_or_email_or_args['ID'] ), 'ID' );
 
@@ -99,6 +103,7 @@ class Contact extends Base_Object_With_Meta {
 			return;
 		}
 
+		// Pass user_id in array
 		if ( is_array( $_id_or_email_or_args ) && isset_not_empty( $_id_or_email_or_args, 'user_id' ) ) {
 
 			$user_id = absint( $_id_or_email_or_args['user_id'] );
@@ -632,12 +637,16 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
+		// If we do this first, then it makes dealing with other stuff much easier because sanitize columns will remove unknown table columns
+		$this->handle_consents_in_data( $data );
+
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
 		$data = array_diff_assoc( $data, $this->data );
 
 		// updating with existing data
 		if ( empty( $data ) ) {
+			// Only updating consents
 			return true;
 		}
 
@@ -667,13 +676,15 @@ class Contact extends Base_Object_With_Meta {
 
 		$updated = parent::update( $data );
 
-		// Handle consent
-		$this->handle_consents_in_data( $data );
+		// failed to update, no point in going further
+		if ( ! $updated ){
+			return $updated;
+		}
 
 		$maybe_changed_folders = $this->get_uploads_folder();
 
 		// Uploads directory has been changed, rename the folder to preserve file uploads
-		if ( $updated && $folders['path'] !== $maybe_changed_folders['path'] ) {
+		if ( $folders['path'] !== $maybe_changed_folders['path'] ) {
 			@rename( $folders['path'], $maybe_changed_folders['path'] );
 		}
 
@@ -690,7 +701,7 @@ class Contact extends Base_Object_With_Meta {
 			do_action( 'groundhogg/contact/owner_changed', $this->owner, $this, $orig_owner );
 		}
 
-		if ( $updated && isset( $old_preference ) && isset( $new_preference ) ) {
+		if ( isset( $old_preference ) && isset( $new_preference ) ) {
 
 			/**
 			 * When the preference is updated
@@ -719,7 +730,16 @@ class Contact extends Base_Object_With_Meta {
 		return $updated;
 	}
 
+	/**
+	 * Ensure columns are sanitized
+	 *
+	 * @param $data
+	 *
+	 * @return array|mixed
+	 */
 	protected function sanitize_columns( $data = [] ) {
+
+		$data = array_intersect_key( $data, $this->get_db()->get_columns() );
 
 		foreach ( $data as $key => &$value ) {
 			switch ( $key ) {
@@ -1315,7 +1335,7 @@ class Contact extends Base_Object_With_Meta {
 				'admin'          => $this->admin_link(),
 				'is_marketable'  => $this->is_marketable(),
 				'is_deliverable' => $this->is_deliverable(),
-				'locale'         => [
+				'i18n'         => [
 					'created' => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() )
 				]
 			]

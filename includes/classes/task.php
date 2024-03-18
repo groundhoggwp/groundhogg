@@ -177,7 +177,7 @@ class Task extends Note {
 			'is_overdue'    => $this->is_overdue(),
 			'is_complete'   => $this->is_complete(),
 			'due_timestamp' => $dueDate->getTimestamp(),
-			'locale'        => [
+			'i18n'          => [
 				'time_diff'      => human_time_diff( $this->timestamp, time() ),
 				'due_in'         => human_time_diff( $dueDate->getTimestamp(), time() ),
 				'completed'      => human_time_diff( strtotime( $this->date_completed ), time() ),

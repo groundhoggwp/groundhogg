@@ -110,7 +110,7 @@ class Apply_Note extends Action {
 		$finished_note = do_replacements( $note, $contact );
 
 		// Add funnel context
-		$contact->add_note( $finished_note, 'funnel', $event->get_funnel_id() );
+		$note = $contact->add_note( $finished_note, 'funnel', $event->get_funnel_id() );
 
 		return true;
 

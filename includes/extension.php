@@ -84,11 +84,11 @@ abstract class Extension {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
-	 * @return Extension
 	 * @since  1.0.0
 	 * @access public
 	 * @static
 	 *
+	 * @return Extension
 	 */
 	public static function instance() {
 
@@ -181,7 +181,7 @@ abstract class Extension {
 		if ( ! $this->dependent_plugins_are_installed() ) {
 
 			// hide if white-labelled
-			if ( ! is_white_labeled() ){
+			if ( ! is_white_labeled() ) {
 				add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
 			}
 
@@ -551,7 +551,18 @@ abstract class Extension {
 	}
 
 	/**
+	 * Whether the license is valid
 	 *
+	 * @return bool
+	 */
+	public function license_is_valid() {
+		$status = get_array_var( $this->get_extension_details(), 'status' );
+
+		return $status === 'valid';
+	}
+
+	/**
+	 * Return the license status string
 	 */
 	public function license_status() {
 		$status  = get_array_var( $this->get_extension_details(), 'status' );
@@ -599,7 +610,7 @@ abstract class Extension {
 						'extension' => $this->get_download_id()
 					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
 				] ),
-			], 'div',  [ 'class' => 'display-flex gap-10' ]);
+			], 'div', [ 'class' => 'display-flex gap-10' ] );
 		} else {
 			$content .= html()->wrap( html()->input( [
 				'type'  => 'submit',

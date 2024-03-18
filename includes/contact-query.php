@@ -245,26 +245,67 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
-	 * Filter by the birthdate
+	 * Filter by age
 	 *
-	 * @param $filter
-	 * @param $where
+	 * @param       $filter
+	 * @param Where $where
 	 *
 	 * @return void
 	 */
-	public static function filter_birthday( $filter, Where $where ) {
+	public static function filter_age( $filter, Where $where ) {
 
-		$alias = $where->query->joinMeta( 'birthday' );
+		$alias  = $where->query->joinMeta( 'birthday' );
+		$column = "FLOOR(DATEDIFF(CURDATE(), $alias.meta_value) / 365.25)";
+		$where->query->add_safe_column( $column );
+
+		Filters::number( $column, $filter, $where );
+	}
+
+	/**
+	 * This filter enables to look for the "anniversary" of a date within a time range
+	 * Could be the anniversary of a contact, or maybe their birthday?
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_anniversary( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'meta_key'   => 'birthday', // You can use any meta key
+			'date_range' => 'today',
+			'compare'    => 'is'
+		] );
+
+		$meta_key = $filter['meta_key'];
+		$alias    = $where->query->joinMeta( $meta_key );
 
 		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
+
+		if ( $filter['compare'] === 'is_not' ) {
+			$where->not();
+		}
 
 		$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
                 INTERVAL YEAR(\'%2$s\')-YEAR(%1$s)
                          + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0)
                 YEAR)  
             BETWEEN \'%2$s\' AND \'%3$s\'', "$alias.meta_value", $after->ymd(), $before->ymd() ) );
+	}
 
-//		Filters::date_filter_handler( "DATE_FORMAT($alias.meta_value, '%m-%d')", $filter, $where, 'm-d' );
+	/**
+	 * Filter by the birthdate
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_birthday( $filter, Where $where ) {
+		self::filter_anniversary( wp_parse_args( $filter, [
+			'meta_key' => 'birthday'
+		] ), $where );
 	}
 
 	/**

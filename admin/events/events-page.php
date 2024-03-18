@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Background_Task;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
@@ -144,6 +145,35 @@ class Events_Page extends Tabbed_Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-event-filters' );
 
 				break;
+			case 'tasks':
+
+				$user_ids = array_filter( get_db( 'background_tasks' )->get_unique_column_values( 'user_id' ) );
+				$users    = array_combine( $user_ids, array_map( function ( $user_id ) {
+					return ( new \WP_User( $user_id ) )->display_name;
+				}, $user_ids ) );
+
+				$this->enqueue_table_filters( [
+					'dateColumns'   => [
+						'date_created' => 'Date created'
+					],
+					'selectColumns' => [
+						'task_type'    => [
+							'Task Type',
+							[
+								'Import_Contacts'        => __( 'Import contacts', 'groundhogg' ),
+								'Export_Contacts'        => __( 'Export contacts', 'groundhogg' ),
+								'Schedule_Broadcast'     => __( 'Schedule broadcast', 'groundhogg' ),
+								'Update_Contacts'        => __( 'Update contacts', 'groundhogg' ),
+								'Delete_Contacts'        => __( 'Delete contacts', 'groundhogg' ),
+								'Add_Contacts_To_Funnel' => __( 'Add contacts to funnel', 'groundhogg' ),
+								'Complete_Benchmark'     => __( 'Complete benchmark', 'groundhogg' ),
+							]
+						],
+						'user_id' => [ 'User', $users ]
+					]
+				] );
+
+				break;
 		}
 	}
 
@@ -163,6 +193,8 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		switch ( $this->get_current_tab() ) {
 			default:
+			case 'tasks' :
+				return 'task';
 			case 'events' :
 				return 'event';
 			case 'emails' :
@@ -515,6 +547,27 @@ class Events_Page extends Tabbed_Admin_Page {
 		<?php
 	}
 
+	public function view_tasks() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$table = new Background_Tasks_Table();
+
+		$table->views();
+
+		$this->table_filters();
+
+		$this->filters_search_form();
+		?>
+        <form method="post" class="search-form wp-clearfix">
+            <!-- search form -->
+			<?php $table->prepare_items(); ?>
+			<?php $table->display(); ?>
+        </form>
+		<?php
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -530,6 +583,11 @@ class Events_Page extends Tabbed_Admin_Page {
 				'slug' => 'emails',
 				'cap'  => 'view_logs'
 
+			],
+			[
+				'name' => __( 'Background Tasks', 'groundhogg' ),
+				'slug' => 'tasks',
+				'cap'  => 'manage_options'
 			],
 			[
 				'name' => __( 'Manage', 'groundhogg' ),
@@ -871,16 +929,6 @@ ORDER BY ID" );
 
 	}
 
-
-	public function process_filter_logs() {
-		return admin_page_url( 'gh_events', [
-			'tab'         => 'emails',
-			'date_filter' => get_post_var( 'date_filter' ),
-			'before'      => get_post_var( 'before' ),
-			'after'       => get_post_var( 'after' ),
-		] );
-	}
-
 	/**
 	 * Delete some of the email logs
 	 */
@@ -922,6 +970,40 @@ ORDER BY ID" );
 			esc_attr( 'resent' ),
 			sprintf( _nx( 'Resent %d email', 'Resent %d emails', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
+		);
+	}
+
+	public function process_cancel_task() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		foreach ( $this->get_items() as $id ) {
+			$task = new Background_Task( $id );
+			$task->cancel();
+		}
+
+		$this->add_notice(
+			esc_attr( 'cancelled' ),
+			sprintf( _nx( 'Cancelled %d task', 'Cancelled %d task', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+		);
+	}
+
+	public function process_resume_task() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		foreach ( $this->get_items() as $id ) {
+			$task = new Background_Task( $id );
+			$task->resume();
+		}
+
+		$this->add_notice(
+			esc_attr( 'resume' ),
+			sprintf( _nx( 'Resumed %d task', 'Resumed %d task', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 		);
 	}
 

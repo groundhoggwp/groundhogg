@@ -8,6 +8,9 @@ use Groundhogg\background\Delete_Contacts;
 use Groundhogg\Background\Schedule_Broadcast;
 use Groundhogg\Background\Task;
 use Groundhogg\Background\Update_Contacts;
+use Groundhogg\Classes\Background_Task;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Utils\Limits;
 
 class Background_Tasks {
@@ -17,45 +20,52 @@ class Background_Tasks {
 	protected static array $tasks = [];
 
 	public function __construct() {
-		add_action( self::HOOK, [ $this, 'handle_task' ], 10, 1 );
+		add_action( self::HOOK, [ $this, 'do_tasks' ] );
+		add_action( 'init', [ $this, 'add_cron' ] );
 	}
 
-	/**
-	 * Do callback for the background task to be completed
-	 *
-	 * @param Task $task
-	 *
-	 * @return void
-	 */
-	public function handle_task( Task $task ){
+	public function add_cron(){
+		if ( ! wp_next_scheduled( self::HOOK ) ){
+			wp_schedule_event( time(), Event_Queue::WP_CRON_INTERVAL, self::HOOK );
+		}
+	}
 
-		// Can the task be run
-		if ( ! $task->can_run() ){
+	public function do_tasks() {
+
+		$claim = generate_claim();
+
+		$taskQuery = new Table_Query( 'background_tasks' );
+		$taskQuery->where->in( 'status', [ 'pending', 'in_progress' ] )
+		          ->empty( 'claim' )
+		          ->lessThan( 'time', time() );
+
+		// No tasks
+		if ( ! $taskQuery->count() ) {
 			return;
 		}
 
-		Limits::start();
+		// Claim the tasks
+		$taskQuery->update( [ 'claim' => $claim, 'status' => 'in_progress' ] );
+
+		// Fetch the claimed tasks
+		$claimQuery = new Table_Query( 'background_tasks' );
+		$claimQuery->where->equals( 'claim', $claim );
+		$tasks = $claimQuery->get_objects();
+
+		if ( empty( $tasks ) ) {
+			return;
+		}
 
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit( MINUTE_IN_SECONDS );
 
-		$complete = false;
-
-		// While there is still more of the task to do
-		while ( ! Limits::limits_exceeded() && ! $complete ){
-			$complete = $task->process();
-			Limits::processed_action();
+		while ( ! Limits::limits_exceeded() && ! empty( $tasks ) ) {
+			$task = array_shift( $tasks );
+			$task->process();
 		}
 
-		// Cleanup
-		$task->stop();
-
-		// If the task is not complete yet, re-schedule it
-		if ( ! $complete ){
-			self::add( $task );
-		}
-
-		Limits::stop();
+		// Release the claim
+		$claimQuery->update( [ 'claim' => '' ] );
 	}
 
 	/**
@@ -69,25 +79,39 @@ class Background_Tasks {
 	public static function add( Task $task, int $time = 0 ) {
 
 		if ( ! $time ){
-			// Add 10 seconds to avoid cron being fussy
-			$time = time() + 10;
+			$time = time();
 		}
 
-		$when = apply_filters( 'groundhogg/background_tasks/schedule_time', $time, $task );
+		$time = apply_filters( 'groundhogg/background_tasks/schedule_time', $time, $task );
 
-		return wp_schedule_single_event( $when, self::HOOK, [ $task ], true );
+		$bg_task = new Background_Task();
+		$bg_task->create( [
+			'task'    => $task,
+			'time'    => $time,
+			'user_id' => get_current_user_id()
+		] );
+
+		if ( ! $bg_task->exists() ) {
+			return new \WP_Error( 'oops', 'Unable to add background task.' );
+		}
+
+		return true;
 	}
 
 	/**
 	 * Remove a background task
 	 *
-	 * @param $hook
-	 * @param $args
+	 * @deprecated 3.3.1
 	 *
-	 * @return false|int|\WP_Error
+	 * @param $args
+	 * @param $hook
+	 *
+	 * @return false
 	 */
 	public static function remove( $hook, $args = [] ) {
-		return wp_clear_scheduled_hook( $hook, $args );
+		_deprecated_function( __METHOD__, '3.3.1' );
+
+		return false;
 	}
 
 	/**

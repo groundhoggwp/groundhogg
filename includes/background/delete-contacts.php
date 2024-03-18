@@ -1,11 +1,12 @@
 <?php
 
-namespace Groundhogg\background;
+namespace Groundhogg\Background;
 
 use Groundhogg\Contact_Query;
 use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
 use function Groundhogg\notices;
+use function Groundhogg\percentage;
 
 class Delete_Contacts extends Task {
 
@@ -20,6 +21,23 @@ class Delete_Contacts extends Task {
 
 		$query          = new Contact_Query( $query );
 		$this->contacts = $query->count();
+	}
+
+	/**
+	 * Delete the contacts
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return sprintf( 'Delete %s contacts', bold_it( _nf( $this->contacts ) ) );
+	}
+
+	public function get_progress() {
+
+		$query = new Contact_Query( $this->query );
+		$left  = $query->count();
+
+		return percentage( $this->contacts, $this->contacts - $left );
 	}
 
 	public function can_run() {

@@ -410,6 +410,7 @@
     dialogClasses = '',
     onOpen = () => {},
     onClose = () => {},
+    width,
   }, children) => {
 
     let modal = Div({
@@ -424,6 +425,9 @@
       }),
       Div({
         className: `gh-modal-dialog ${ dialogClasses }`,
+        style: {
+          width
+        }
       }, [
         Div({
           className: 'gh-modal-dialog-content',

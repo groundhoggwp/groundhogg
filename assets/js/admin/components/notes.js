@@ -93,7 +93,7 @@
 
       const addedBy = () => {
 
-        let date_created = `<abbr title="${ formatDateTime( note.data.date_created ) }">${ note.locale.time_diff }</abbr>`
+        let date_created = `<abbr title="${ formatDateTime( note.data.date_created ) }">${ note.i18n.time_diff }</abbr>`
 
         switch (context) {
           case 'user':
@@ -161,7 +161,7 @@
         wp.editor.remove('edit-note-editor')
         wp.editor.remove('add-note-editor')
       } catch (e) {
-        
+
       }
 
       const notes = NotesStore.filter(({ data }) => data.object_type == object_type && data.object_id == object_id).

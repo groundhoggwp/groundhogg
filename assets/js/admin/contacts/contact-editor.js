@@ -133,10 +133,10 @@
                   email: null,
                 })
 
-                MakeEl.Modal({}, ({morph, close}) => MakeEl.Div({
-                  id: 'send-email-dialog'
+                MakeEl.Modal({}, ({ morph, close }) => MakeEl.Div({
+                  id: 'send-email-dialog',
                 }, [
-                  `<h3>${sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name )}</h3>`,
+                  `<h3>${ sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name) }</h3>`,
                   MakeEl.ItemPicker({
                     id: `select-email`,
                     noneSelected: __('Select an email to send...', 'groundhogg'),
@@ -157,7 +157,8 @@
                         State.set({
                           email: null,
                         })
-                      } else {
+                      }
+                      else {
                         let email = EmailsStore.get(item.id)
 
                         State.set({
@@ -170,12 +171,12 @@
                   }),
 
                   State.email ? MakeEl.Div({
-                      className: 'gh-panel outlined'
+                      className: 'gh-panel outlined',
                     },
                     Groundhogg.components.EmailPreview({
                       ...State.email.context,
-                      content: State.email.context.built
-                    })
+                      content: State.email.context.built,
+                    }),
                   ) : null,
 
                   State.email ? MakeEl.Button({
@@ -183,12 +184,12 @@
                     className: 'gh-button primary medium',
                     onClick: e => {
 
-                      e.currentTarget.disabled = true;
+                      e.currentTarget.disabled = true
                       e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
-                      EmailsStore.send( State.email.ID, {
-                        to: getContact().ID
-                      } ).then(r => {
+                      EmailsStore.send(State.email.ID, {
+                        to: getContact().ID,
+                      }).then(r => {
 
                         dialog({
                           message: __('Email sent!'),
@@ -204,8 +205,8 @@
                         morph()
                       })
 
-                    }
-                  }, __( 'Send email now!', 'groundhogg' ) ) : null
+                    },
+                  }, __('Send email now!', 'groundhogg')) : null,
                 ]))
 
                 break
@@ -242,11 +243,11 @@
 
         const State = Groundhogg.createState({})
 
-        MakeEl.Modal({}, ({morph, close}) => MakeEl.Div({
+        MakeEl.Modal({}, ({ morph, close }) => MakeEl.Div({
           id: 'add-to-funnel-dialog',
-          className: 'display-flex gap-10 column'
+          className: 'display-flex gap-10 column',
         }, [
-          `<h3 style="margin: 0">${sprintf(__('Add %s to a funnel', 'groundhogg'), getContact().data.full_name )}</h3>`,
+          `<h3 style="margin: 0">${ sprintf(__('Add %s to a funnel', 'groundhogg'), getContact().data.full_name) }</h3>`,
           MakeEl.ItemPicker({
             id: `select-a-funnel`,
             noneSelected: __('Select a funnel...', 'groundhogg'),
@@ -259,18 +260,19 @@
             fetchOptions: (search) => {
               return FunnelsStore.fetchItems({
                 search,
+                status: 'active',
               }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
             },
             onChange: item => {
               State.set({
                 funnel_id: item.id,
-                step_id: FunnelsStore.get( item.id ).steps[0].ID
+                step_id: FunnelsStore.get(item.id).steps[0].ID,
               })
               morph()
             },
           }),
           State.funnel_id ? MakeEl.ItemPicker({
-            id: `select-step-from-${State.funnel_id}`,
+            id: `select-step-from-${ State.funnel_id }`,
             noneSelected: __('Select a step...', 'groundhogg'),
             clearable: false,
             selected: State.step_id ? {
@@ -298,13 +300,13 @@
             className: 'gh-button primary medium',
             onClick: e => {
 
-              e.currentTarget.disabled = true;
+              e.currentTarget.disabled = true
               e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
               FunnelsStore.addContacts({
                 funnel_id: State.funnel_id,
                 step_id: State.step_id,
-                contact_id: getContact().ID
+                contact_id: getContact().ID,
               }).then(() => {
 
                 dialog({
@@ -314,18 +316,18 @@
 
                 close()
 
-              }).catch( err => {
+              }).catch(err => {
 
                 dialog({
                   type: 'error',
-                  message: err.message
+                  message: err.message,
                 })
 
                 morph()
               })
 
-            }
-          }, sprintf( __( 'Add to %s now!', 'groundhogg' ), bold( FunnelsStore.get(State.funnel_id).data.title ) ) ) : null
+            },
+          }, sprintf(__('Add to %s now!', 'groundhogg'), bold(FunnelsStore.get(State.funnel_id).data.title))) : null,
         ]))
       },
     },
@@ -462,7 +464,7 @@
       wp_fusion: {
         icon: icons.wp_fusion,
         iconFramed: false,
-        render: ({ data, meta }) => {
+        render: ({ meta }) => {
           const { event_name, event_value } = meta
           return `${ event_name }: <code>${ event_value }</code>`
         },
@@ -470,39 +472,36 @@
       },
       wp_login: {
         icon: icons.login,
-        render: ({ email }) => {
+        render: () => {
           return __('Logged in', 'groundhogg')
         },
         preload: () => {},
       },
       wp_logout: {
         icon: icons.logout,
-        render: ({ email }) => {
+        render: () => {
           return __('Logged out', 'groundhogg')
+        },
+        preload: () => {},
+      },
+      composed_email_sent: {
+        icon: icons.open_email,
+        render: ({ meta, i18n, ID }) => {
+          return sprintf(__('%s sent an email with subject %s', 'groundhogg'),
+            bold(i18n.sent_by),
+            `<a href="#" class="view-composed-email-log-item" data-activity-id="${ ID }">${ bold(meta.subject) }</a>`)
         },
         preload: () => {},
       },
       email_opened: {
         icon: icons.open_email,
-        render: ({ email }) => {
-          return sprintf(__('Opened %s', 'groundhogg'), bold(email.data.title))
+        render: ({ data }) => {
+          return sprintf(__('Opened %s', 'groundhogg'), bold(EmailsStore.get(data.email_id).data.title))
         },
-        preload: ({ email }) => {
-          EmailsStore.itemsFetched([email])
-        },
-      },
-      composed_email_sent: {
-        icon: icons.open_email,
-        render: ({ meta, sent_by, ID }) => {
-          return sprintf(__('%s sent an email with subject %s', 'groundhogg'),
-            bold(sent_by),
-            `<a href="#" class="view-composed-email-log-item" data-activity-id="${ ID }">${ bold(meta.subject) }</a>`)
-        },
-        preload: () => {},
       },
       email_link_click: {
         icon: icons.link_click,
-        render: ({ email, data }) => {
+        render: ({ data }) => {
 
           const maybeTruncateLink = (link) => {
             return link.length > 50 ? `${ link.substring(0, 47) }...` : link
@@ -511,10 +510,25 @@
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
             target: '_blank',
             href: data.referer,
-          }, bold(maybeTruncateLink(data.referer))), bold(email.data.title))
+          }, bold(maybeTruncateLink(data.referer))), bold(EmailsStore.get(data.email_id).data.title))
         },
-        preload: ({ email }) => {
-          EmailsStore.itemsFetched([email])
+      },
+      imported: {
+        icon: '<span class="dashicons dashicons-upload"></span>',
+        render: ({ i18n }) => {
+          return sprintf(__('Imported by %s from %s', 'groundhogg'), bold(i18n.by), bold(i18n.file))
+        },
+      },
+      funnel_conversion: {
+        icon: '<span class="dashicons dashicons-flag"></span>',
+        render: ({ data }) => {
+
+          let funnelTitle = bold(FunnelsStore.get(data.funnel_id).data.title)
+          let link = el( 'a', {
+            href: adminPageURL( 'gh_funnels', { action: 'edit', funnel: data.funnel_id }, data.step_id )
+          }, funnelTitle )
+
+          return sprintf(__('Converted in %s', 'groundhogg'), link )
         },
       },
       fallback: {
@@ -567,7 +581,7 @@
                         </p>
                     </div>
                     <div class="diff-time">
-                        ${ activity.locale.diff_time }
+                        ${ activity.i18n.diff_time }
                     </div>
                 </div>
             </li>`
@@ -586,7 +600,7 @@
                                         activity.data.path) }</a>`) }
                     </div>
                     <div class="diff-time">
-                        ${ activity.locale.diff_time }
+                        ${ activity.i18n.diff_time }
                     </div>
                 </div>
             </li>`
@@ -615,8 +629,10 @@
             // language=HTML
             return `
                 <li class="activity-item">
-                    <div class="activity-icon ${ step.data.step_group } ${pending ? 'pending' : '' }">
-                        ${ pending ? icons.hourglass : `<img class="step-icon" src="${Groundhogg.rawStepTypes[step.data.step_type].icon}" alt="${Groundhogg.rawStepTypes[step.data.step_type].name}"/>` }
+                    <div class="activity-icon ${ step.data.step_group } ${ pending ? 'pending' : '' }">
+                        ${ pending
+                                ? icons.hourglass
+                                : `<img class="step-icon" src="${ Groundhogg.rawStepTypes[step.data.step_type].icon }" alt="${ Groundhogg.rawStepTypes[step.data.step_type].name }"/>` }
                     </div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
@@ -642,7 +658,7 @@
                                         }, funnel.data.title)) }
                             </div>
                             <div class="diff-time">
-                                ${ activity.locale.diff_time }
+                                ${ activity.i18n.diff_time }
                             </div>
                         </div>
                         <button
@@ -682,7 +698,7 @@
                                         objectTitleDisplay) }</span>
                             </div>
                             <div class="diff-time">
-                                ${ activity.locale.diff_time }
+                                ${ activity.i18n.diff_time }
                             </div>
                         </div>
                         <button
@@ -721,7 +737,7 @@
                                         emailTitleDisplay) }</span>
                             </div>
                             <div class="diff-time">
-                                ${ activity.locale.diff_time }
+                                ${ activity.i18n.diff_time }
                             </div>
                         </div>
                         <button
@@ -762,7 +778,7 @@
                       ${ type.render(activity) }
                   </div>
                   <div class="diff-time">
-                      ${ activity.locale.diff_time }
+                      ${ activity.i18n.diff_time }
                   </div>
               </div>
           </li>`
@@ -896,21 +912,37 @@
         return arr
       }, [])
 
+      let emailIds = activities.reduce((arr, e) => {
+
+        let emailId = parseInt(e.data?.email_id)
+
+        if (emailId > 1) {
+          if (!arr.includes(emailId)) {
+            arr.push(emailId)
+          }
+        }
+
+        return arr
+      }, [])
+
+      // Broadcast Events
+      activities.filter(a => a.type === 'event' && a.data.event_type == 2).
+        forEach(a => BroadcastsStore.itemsFetched([a.broadcast]))
+
       let promises = [
         // Preload activities
-        ...activities.filter(a => a.type === 'activity').
+        ...activities.filter(a => a.type === 'activity' && a.hasOwnProperty( 'preload' ) ).
           map(a => this.types[a.data.activity_type]?.preload(a)),
 
         // events with funnel IDs
         funnelIds.length && !FunnelsStore.hasItems(funnelIds)
-          ? FunnelsStore.fetchItems({
-            ID: funnelIds,
-          })
+          ? FunnelsStore.maybeFetchItems(funnelIds)
           : null,
 
-        // Broadcast Events
-        ...activities.filter(a => a.type === 'event' && a.data.event_type == 2).
-          map(a => BroadcastsStore.itemsFetched([a.broadcast])),
+        // events with funnel IDs
+        emailIds.length && !EmailsStore.hasItems(emailIds)
+          ? EmailsStore.maybeFetchItems(emailIds)
+          : null,
       ]
 
       Promise.all(promises).then(() => {
@@ -1280,7 +1312,7 @@
           const mount = () => {
 
             $('#files-here').html(files.filter(
-              f => !fileSearch || f.name.match(regexp(fileSearch))).
+                f => !fileSearch || f.name.match(regexp(fileSearch))).
               map(f => renderFile(f)).
               join(''))
             onMount()
@@ -2110,7 +2142,7 @@
 
       let logItems = await LogsStore.fetchItems({
         queued_event_id: event.data.queued_id,
-        limit: 1
+        limit: 1,
       })
 
       EmailLogModal(logItems[0])
@@ -2122,11 +2154,12 @@
 
       close()
 
-      if ( event.data.email_id ){
+      if (event.data.email_id) {
         try {
-          await EmailPreviewModal( event.data.email_id, {} )
+          await EmailPreviewModal(event.data.email_id, {})
           return
-        } catch ( err2 ) {
+        }
+        catch (err2) {
           // Silence
         }
       }
@@ -2134,7 +2167,7 @@
       dialog({
         message: err.message,
         type: 'error',
-        ttl: 5000
+        ttl: 5000,
       })
 
     }
@@ -2154,14 +2187,44 @@
 
     try {
 
-      let logItems = await LogsStore.fetchItems({
-        subject: activity.meta.subject,
-        recipients: ['RLIKE', getContact().data.email],
-        date_sent: moment.unix(activity.data.timestamp).utc().format("YYYY-MM-DD hh:mm:ss"),
-        limit: 1
-      })
+      let logItem
 
-      EmailLogModal(logItems[0])
+      const {
+        log_id = 0,
+        sent_by,
+        from: from_address,
+        subject,
+      } = activity.meta
+
+      if (log_id) {
+        logItem = await LogsStore.maybeFetchItem(log_id)
+      }
+      else {
+
+        let logItems = await LogsStore.fetchItems({
+          subject,
+          sent_by,
+          from_address,
+          filters: [
+            [
+              {
+                type: 'recipients',
+                recipients: [getContact().data.email],
+              },
+              {
+                type: 'date_sent',
+                date_range: 'day_of',
+                after: moment.unix(activity.data.timestamp).utc().format('YYYY-MM-DD'),
+              },
+            ],
+          ],
+          limit: 1,
+        })
+
+        logItem = logItems[0]
+      }
+
+      EmailLogModal(logItem)
 
     }
     catch (err) {
@@ -2169,7 +2232,7 @@
       dialog({
         message: err.message,
         type: 'error',
-        ttl: 5000
+        ttl: 5000,
       })
 
     }

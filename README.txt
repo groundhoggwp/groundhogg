@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.3
+Stable tag: 3.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,14 +349,49 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.3.2 (2024-03-05) =
+* ADDED 4x per day the queue will be "cleaned" and events that failed to process within the last 6 hours will be fixed.
+* ADDED Activity for when a contact is imported from a CSV file.
+* IMPROVED using `_` to prefix meta for replacements like `{_meta_key}` is no longer required. You can simply do `{meta_key}` even if it's not a registered custom field.
+* TWEAKED Meta that can be serialized, but is not associated with a custom field and thus has no pretty output, will be output as JSON encoded.
+* TWEAKED The replacements cache group has been changed from `replacements` to `groundhogg\replacements`.
+* TWEAKED Combined several cron task hooks into one.
+* TWEAKED Funnel conversion activity in timeline now has proper UI.
+* TWEAKED Optimized how emails are preloaded for email activity in the timeline.
+* FIXED Export contacts BG task causing error in tasks log.
+* FIXED HTML email template previews not working.
+* FIXED DB error when passing consent attributes to the contact update method.
+* FIXED Changed all button types in the filters component to `button` to prevent form submission in custom post types.
+
+= 3.3.1 (2024-02-27) =
+* ADDED New background tasks tab in the logs page.
+* ADDED New Age filter!
+* ADDED New "Day Of" date range for date filters.
+* FIXED Background tasks not always scheduling correctly, moved to using a dedicated table instead of using internal WP Cron.
+* FIXED The `Empty` comparison for meta filters was not respecting `NULL` values.
+* FIXED Meta filters with keys containing `-` were not working.
+* FIXED Is/Is Not comparison for the birthday filter not working.
+* FIXED Email not loading after duplicating an email step in a funnel.
+* FIXED Only show active funnels in **Add to funnel** tool in the contact record.
+
 = 3.3 (2024-02-15) =
 * ADDED Alternate email testing methods. *Design* for inbox compatibility testing or *Functional* to simulate a real email send.
+* ADDED **Last/Next 14 days** and **Last/Next X days** ranges for date filters.
+* ADDED Setting to enable sending unsubscribe notifications to a custom email address.
+* ADDED Filters for the List-Unsubscribe header so it can be hijacked by custom implementations.
+* TWEAKED Made the text block editor inline rather than a modal.
+* TWEAKED Made the editor replacements button an MCE toolbar widget.
+* TWEAKED Moved the email editor block inspector and inspector toolbar to the right of the email content.
 * TWEAKED Email previews in the editor will ignore conditional blocks and show all content.
 * TWEAKED Bounce inbox IMAP settings are hidden if using API based outgoing email service.
 * IMPROVED UI of sending email templates from the contact record.
 * IMPROVED UI of adding a contact to a funnel from the contact record.
+* IMPROVED Fallback event and contact tracking when tracking cookie is not working.
+* IMPROVED The One-Click List-Unsubscribe unsubscribe endpoint requires a token.
+* IMPROVED The One-Click List-Unsubscribe endpoint track the unsubscribe to the associated funnel or broadcast.
+* IMPROVED The manage preferences email now uses HTML links and offers a direct unsubscribe link.
 * FIXED If more than 25 emails in a funnel they were not all preloading.
-* FIXED List-Unsubscribe header not working in iCloud because iCloud desktop does not decode it properly.
+* FIXED List-Unsubscribe header not working in iCloud because iCloud does not decode it properly.
 
 = 3.2.3.3 (2024-02-13) =
 * FIXED Uninstall function was not deleting all options.

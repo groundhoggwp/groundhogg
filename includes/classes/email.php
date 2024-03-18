@@ -362,7 +362,6 @@ class Email extends Base_Object_With_Meta {
 		return $this->message_type;
 	}
 
-
 	/**
 	 * Whether browser view is enabled
 	 *
@@ -373,6 +372,7 @@ class Email extends Base_Object_With_Meta {
 	public function browser_view_enabled( $bool = false ) {
 		return boolval( $this->get_meta( 'browser_view' ) );
 	}
+
 
 	/**
 	 * Return the browser view option for this email.
@@ -410,12 +410,11 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_click_tracking_link() {
-		return managed_page_url(
-			sprintf( 'c/%s/%s/',
-				dechex( $this->get_contact()->get_id() ),
-				dechex( $this->get_event()->get_id( true ) )
-			)
-		);
+		return managed_page_url( sprintf(
+			'c/%s/%s/',
+			dechex( $this->get_contact()->get_id() ),
+			dechex( $this->get_event()->get_id( true ) )
+		) );
 	}
 
 	/**
@@ -674,7 +673,7 @@ class Email extends Base_Object_With_Meta {
 			case 'html':
 
 				// Handle open tracking image
-				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) ) {
+				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) && $this->event && $this->event->exists() ) {
 
 					if ( str_contains( $content, '</body>' ) ) {
 						$content = str_replace( '</body>', html()->e( 'img', [
@@ -705,7 +704,7 @@ class Email extends Base_Object_With_Meta {
 		$content = str_replace( 'http://http://', $schema, $content );
 
 		/* Other filters */
-		$content = apply_filters( 'wpgh_email_template_make_clickable', true ) ? make_clickable( $content ) : $content;
+		$content = make_clickable( $content );
 		$content = str_replace( '&#038;', '&amp;', $content );
 		$content = do_shortcode( $content );
 		$content = fix_nested_p( $content );
@@ -732,6 +731,19 @@ class Email extends Base_Object_With_Meta {
 			$this,
 			'tracking_link_callback'
 		], $content );
+	}
+
+	/**
+	 * Get URLs from the content.
+	 * This will only get static URLs, dynamic URLs possibly added by replacement codes will not be retrieved.
+	 *
+	 * @return string[]
+	 */
+	public function get_urls() {
+
+		preg_match_all( '@href="(?<url>https?://[^"]+)"@i', $this->event && $this->contact ? $this->get_merged_content() : $this->content, $matches );
+
+		return $matches['url'];
 	}
 
 	/**
@@ -915,7 +927,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_headers() {
-		/* Use default mail-server */
+
 		$headers = [];
 
 		$custom_headers = $this->get_meta( 'custom_headers' ) ?: [];
@@ -939,27 +951,41 @@ class Email extends Base_Object_With_Meta {
 			'X-Auto-Response-Suppress' => 'AutoReply'
 		];
 
-		// Do not add this header to transactional emails or if the header is disabled in the settings.
+		// Do not add this header to transactional. Only add the header if we can tie it to an event
 		if ( ! $this->is_transactional() && $this->event && $this->event->exists() ) {
 
-			$one_click_unsub_link = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, dechex( $this->event->get_id() ), generate_permissions_key( $this->contact, 'preferences' ) ) );
+			$unsub_pk = generate_permissions_key( $this->contact, 'preferences' );
+			$event_id = dechex( $this->event->get_id() );
+
+			$one_click = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, $event_id, $unsub_pk ) );
+			$mail_to   = sprintf( '%s?subject=%s',
+				get_option( 'gh_unsubscribe_email' ) ?: get_bloginfo( 'admin_email' ),
+				sprintf( __( 'Unsubscribe %s from %s', 'groundhogg' ), $this->contact->get_email(), get_bloginfo() ) );
+
+			/**
+			 * Filter the email address the unsubscribe notification is sent to
+			 *
+			 * @param string $email_address
+			 * @param Email  $email
+			 * @param string $key      The key required to unsubscribe the contact
+			 * @param string $event_id the event id
+			 */
+			$mail_to = apply_filters( 'groundhogg/list_unsubscribe_header/mailto', $mail_to, $this, $unsub_pk, $event_id );
 
 			$list_unsub_header = sprintf(
-				'<%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
-				$one_click_unsub_link,
-				get_bloginfo( 'admin_email' ),
-				$this->get_to_address(),
-				get_bloginfo()
+				'<%s>, <mailto:%s>',
+				$one_click,
+				$mail_to
 			);
 
 			/**
 			 * Filter the list unsubscribe header
 			 *
 			 * @param string $list_unsub_header
-			 * @param string $one_click_unsub_link
+			 * @param string $one_click
 			 * @param Email $email
 			 */
-			$list_unsub_header = apply_filters( 'groundhogg/email/list_unsubscribe_header_content', $list_unsub_header, $one_click_unsub_link, $this );
+			$list_unsub_header = apply_filters( 'groundhogg/list_unsubscribe_header', $list_unsub_header, $this, $unsub_pk, $event_id );
 
 			$defaults['List-Unsubscribe']      = $list_unsub_header;
 			$defaults['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';

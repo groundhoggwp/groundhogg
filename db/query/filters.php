@@ -7,7 +7,6 @@ use function Groundhogg\base64_json_decode;
 use function Groundhogg\day_of_week;
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\maybe_swap_dates;
 
 class FilterException extends \Exception {
 
@@ -128,6 +127,7 @@ class Filters {
 			'date_range' => 'any',
 			'after'      => '', // typically Y-m-d formatted string
 			'before'     => '', // typically Y-m-d formatted string
+			'days' => 0, // any positive integer
 		] );
 
 		$after  = new DateTimeHelper(); // now
@@ -215,6 +215,12 @@ class Filters {
 			case 'next_365_days':
 				$before->modify( '+365 days' );
 				break;
+			case 'x_days':
+				$after->modify( sprintf( '%d days ago', absint( $filter['days'] ) ) );
+				break;
+			case 'next_x_days':
+				$before->modify( sprintf( '+%d days', absint( $filter['days'] ) ) );
+				break;
 			case 'before':
 				$after->setTimestamp( 0 );
 				$before->modify( $filter['before'] );
@@ -225,6 +231,10 @@ class Filters {
 				$after->modify( $filter['after'] );
 				$after->modify( '00:00:00' );
 				$before->modify( '+99 years' );
+				break;
+			case 'day_of':
+				$after->modify( "{$filter['after']} 00:00:00" );
+				$before->modify( "{$filter['after']} 23:59:59" );
 				break;
 			case 'between':
 				$before = new DateTimeHelper( $filter['before'] );
@@ -296,6 +306,7 @@ class Filters {
 
 		$filter = wp_parse_args( $filter, [
 			'date_range' => 'any',
+			'compare'    => 'is',
 		] );
 
 		if ( $filter['date_range'] === 'any' ){
@@ -315,6 +326,10 @@ class Filters {
 			}
 		} catch ( \Exception $exception ) {
 			return;
+		}
+
+		if ( $filter['compare'] === 'is_not' ){
+			$where->not();
 		}
 
 		switch ( $filter['date_range'] ) {
@@ -578,10 +593,10 @@ class Filters {
 				$where->notLike( $column, '%' . $where->esc_like( $value ) );
 				break;
 			case 'empty':
-				$where->addCondition( "$column = ''" );
+				$where->subOr()->empty( $column )->isNull( $column );
 				break;
 			case 'not_empty':
-				$where->addCondition( "$column != ''" );
+				$where->notEmpty( $column );
 				break;
 			case 'regex':
 				$where->addCondition( $where->prepare( "$column REGEXP BINARY %s", $value ) );

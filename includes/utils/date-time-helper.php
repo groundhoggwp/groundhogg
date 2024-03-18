@@ -76,6 +76,10 @@ class DateTimeHelper extends \DateTime {
 		return $this->format( get_option( 'date_format' ) );
 	}
 
+	public function human_time_diff(){
+		return human_time_diff( $this->getTimestamp(), time() );
+	}
+
 	public function i18n() {
 
 		switch ( $this->whenIs() ) {
@@ -93,5 +97,13 @@ class DateTimeHelper extends \DateTime {
 
 	public function isPast() {
 		return $this->getTimestamp() < time();
+	}
+
+	public function isFuture() {
+		return $this->getTimestamp() > time();
+	}
+
+	public function isNow() {
+		return $this->getTimestamp() === time();
 	}
 }

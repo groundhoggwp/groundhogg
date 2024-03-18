@@ -4,7 +4,7 @@
     return Intl.DateTimeFormat(Groundhogg.locale, {
       timeStyle: 'short',
       // dateStyle: 'medium'
-      timeZone: 'UTC'
+      // timeZone: 'UTC'
     }).format(new Date(date))
   }
 

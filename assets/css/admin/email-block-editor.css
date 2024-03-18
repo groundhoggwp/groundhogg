@@ -1,3 +1,11 @@
+@charset "UTF-8";
+.mce-ico.mce-i-gh_replacements {
+  font-family: "dashicons";
+}
+.mce-ico.mce-i-gh_replacements::before {
+  content: "";
+}
+
 @keyframes skeleton-loading {
   0% {
     background-color: rgba(16, 38, 64, 0.05);
@@ -131,20 +139,19 @@
 #email-block-editor #content #block-editor-toolbar {
   position: sticky;
   top: 50%;
-  width: 0;
+  width: 100%;
   height: 0;
   transform: translateY(-50%);
-  left: 0;
   z-index: 999;
 }
 #email-block-editor #content #block-editor-toolbar .buttons {
   position: absolute;
-  left: 0;
+  right: 0;
   transform: translateY(-50%);
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   background-color: #FFF;
   padding: 3px;
-  border-radius: 0 3px 3px 0;
+  border-radius: 3px 0 0 3px;
 }
 #email-block-editor #content #block-editor-content-wrap.mobile {
   width: 400px;
@@ -243,6 +250,14 @@
 #email-block-editor #content #builder-content .builder-block[data-type=text] > .maybe-edit-text > *:first-child,
 #email-block-editor #content #builder-content .builder-block[data-type=text] > .text-content-wrap > *:first-child {
   margin-top: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text].is-editing .mce-top-part {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=text].is-editing .wp-editor-tabs button {
+  box-sizing: content-box !important;
 }
 #email-block-editor #content #builder-content .builder-block[data-type=html] {
   min-height: 30px;
@@ -891,7 +906,7 @@ body iframe#preview.desktop {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  border-right: 1px solid rgba(16, 38, 64, 0.15);
+  border-left: 1px solid rgba(16, 38, 64, 0.15);
   overflow-y: auto;
   flex-shrink: 0;
 }

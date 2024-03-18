@@ -6,7 +6,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Step;
 use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
-use function Groundhogg\notices;
+use function Groundhogg\percentage;
 
 class Complete_Benchmark extends Task {
 
@@ -14,6 +14,7 @@ class Complete_Benchmark extends Task {
 	protected int $step_id;
 	protected int $user_id;
 	protected int $batch;
+	protected int $contacts = 0;
 	protected Step $step;
 
 	const BATCH_LIMIT = 100;
@@ -28,11 +29,21 @@ class Complete_Benchmark extends Task {
 		$this->query   = $query;
 		$this->batch   = $batch;
 		$this->user_id = get_current_user_id();
+
+		$query          = new Contact_Query( $this->query );
+		$this->contacts = $query->count();
+		$this->step     = new Step( $step_id );
+	}
+
+	public function get_title() {
+		return sprintf( '%s contacts completing %s in %s', _nf( $this->contacts ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
+	}
+
+	public function get_progress() {
+		return percentage( $this->contacts, $this->batch * self::BATCH_LIMIT );
 	}
 
 	public function can_run() {
-		$this->step = new Step( $this->step_id );
-
 		return $this->step->is_active();
 	}
 
@@ -68,6 +79,13 @@ class Complete_Benchmark extends Task {
 			'query'   => $this->query,
 			'batch'   => $this->batch,
 			'user_id' => $this->user_id,
+			'contacts' => $this->contacts,
 		];
+	}
+
+	public function __unserialize( array $data ): void {
+		parent::__unserialize( $data );
+
+		$this->step = new Step( $this->step_id );
 	}
 }

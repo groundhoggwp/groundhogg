@@ -793,7 +793,7 @@
   function improveTinyMCE (settings = {}) {
 
     const {
-      height = 200,
+      height = 0,
     } = settings
 
     if (typeof this.flag !== 'undefined') {
@@ -805,7 +805,10 @@
         'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,wp_add_media,dfw'
       editor.settings.toolbar2 =
         'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-      editor.settings.height = height
+      if ( height > 0 ){
+        editor.settings.height = height
+      }
+
       editor.on('click', function (ed, e) {
         $doc.trigger('to_mce')
       })
@@ -2057,14 +2060,20 @@ ${afterProgress()}`,
     return Date.now()
   }
 
-  const adminPageURL = (page, params) => {
+  const adminPageURL = (page, params, fragment = '') => {
 
     params = $.param({
       page,
       ...params,
     })
 
-    return `${Groundhogg.url.admin.replace(/(\/|\\)$/, '')}/admin.php?${params}`
+    let url = `${Groundhogg.url.admin.replace(/(\/|\\)$/, '')}/admin.php?${params}`
+
+    if ( fragment ){
+      url += `#${fragment}`
+    }
+
+    return url
   }
 
   const icons = {

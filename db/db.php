@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
@@ -800,6 +801,11 @@ abstract class DB {
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
+		// Nothing to update
+		if ( empty( $data ) ){
+			return true;
+		}
+
 		global $wpdb;
 
 		if ( is_string( $row_id ) || is_numeric( $row_id ) ) {
@@ -808,6 +814,7 @@ abstract class DB {
 			$where = $row_id;
 		}
 
+		// Don't know who to update
 		if ( empty( $where ) ) {
 			return false;
 		}
@@ -829,7 +836,8 @@ abstract class DB {
 
 		$data = apply_filters( 'groundhogg/db/pre_update/' . $this->get_object_type(), $data, $where );
 
-		if ( false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
+		// Empty data at this point, return false.
+		if ( empty( $data ) || false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
 			return false;
 		}
 
@@ -1365,7 +1373,14 @@ abstract class DB {
 				case 'exclude_filters':
 
 					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query->where(), true );
+
+					$exclude_query = new Table_Query( $this );
+					$exclude_query->setSelect( $this->get_primary_key() );
+					$this->query_filters->parse_filters( $val, $exclude_query->where() );
+
+					if ( ! $exclude_query->where->isEmpty() ) {
+						$query->where()->notIn( $this->get_primary_key(), "$exclude_query" );
+					}
 
 					break;
 				case 'found_rows':

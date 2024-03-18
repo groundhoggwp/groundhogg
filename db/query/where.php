@@ -30,13 +30,6 @@ class Where {
 	protected Query $query;
 
 	/**
-	 * Whether this clause should be negated, NOT ( ... )
-	 *
-	 * @var false|mixed
-	 */
-	protected $negate = false;
-
-	/**
 	 * If this Where has no clauses
 	 *
 	 * @return bool
@@ -66,10 +59,9 @@ class Where {
 	 * @param $query Query
 	 * @param $relation
 	 */
-	public function __construct( $query, $relation = 'AND', $negate = false ) {
+	public function __construct( $query, $relation = 'AND' ) {
 		$this->relation       = $relation;
 		$this->query          = $query;
-		$this->negate         = $negate;
 	}
 
 	public function __serialize(): array {
@@ -144,6 +136,13 @@ class Where {
 	}
 
 	/**
+	 * Whether to prefix the next condition with NOT
+	 *
+	 * @var bool
+	 */
+	protected bool $prefix_condition_with_not = false;
+
+	/**
 	 * Adds a clause to the list of clauses
 	 *
 	 * @param $condition
@@ -154,6 +153,11 @@ class Where {
 
 		if ( empty( $condition ) ) {
 			return $this;
+		}
+
+		if ( $this->prefix_condition_with_not && is_string( $condition ) ){
+			$condition = "NOT $condition";
+			$this->prefix_condition_with_not = false;
 		}
 
 		$this->conditions[] = $condition;
@@ -240,10 +244,6 @@ class Where {
 
 		if ( $numConditions > 1 ) {
 			$conditions = "( $conditions )";
-		}
-
-		if ( $this->negate ) {
-			$conditions = 'NOT ' . $conditions;
 		}
 
 		return $conditions;
@@ -484,7 +484,7 @@ class Where {
 	public function notLike( $column, $string ) {
 		$column = $this->sanitize_column( $column );
 
-		return $this->addCondition( $this->prepare( "$column NOT LIKE %s", $string ) );;
+		return $this->addCondition( $this->prepare( "$column NOT LIKE %s", $string ) );
 	}
 
 	/**
@@ -530,6 +530,11 @@ class Where {
 		return $this->addCondition( "$column IS NOT NULL" );
 	}
 
+	public function isNull( $column ) {
+		$column = $this->sanitize_column( $column );
+		return $this->addCondition( "$column IS NULL" );
+	}
+
 	public function empty( $column ) {
 		return $this->compare( $column, '' );
 	}
@@ -541,8 +546,8 @@ class Where {
 	 *
 	 * @return Where
 	 */
-	public function subWhere( string $relation = 'OR', $negate = false ) {
-		$where = new Where( $this->query, $relation, $negate );
+	public function subWhere( string $relation = 'OR' ) {
+		$where = new Where( $this->query, $relation );
 		$this->addCondition( $where );
 		return $where;
 	}
@@ -564,5 +569,15 @@ class Where {
 	 */
 	public function prepare( ...$args ) {
 		return $this->query->db->prepare( ...$args );
+	}
+
+	/**
+	 * Prefixes the next condition added with NOT
+	 *
+	 * @return Where
+	 */
+	public function not() {
+		$this->prefix_condition_with_not = true;
+		return $this;
 	}
 }

@@ -77,6 +77,7 @@ class Manager {
 		$this->object_relationships = new Object_Relationships();
 		$this->page_visits          = new Page_Visits();
 		$this->logs                 = new Logs();
+		$this->background_tasks     = new Background_Tasks();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

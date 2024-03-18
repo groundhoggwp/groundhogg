@@ -32,52 +32,12 @@ class Email_Logger {
 		// Do first
 		add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
 
-
-
-		add_action( 'init', [ $this, 'init' ] );
-
 		// Whenever retrieve_password happens, then following email should be sensitive
 		add_action( 'retrieve_password', [ self::class, 'email_is_sensitive' ] );
 	}
 
 	public static function is_enabled() {
 		return is_option_enabled( 'gh_log_emails' );
-	}
-
-	/**
-	 * Lazy load the initial actions so we can check that email logging is enabled.
-	 */
-	public function init() {
-
-		if ( self::is_enabled() ) {
-
-			$this->setup_cron();
-
-			add_action( 'groundhogg/purge_email_logs', [ $this, 'purge_old_logs' ] );
-
-		}
-	}
-
-	/**
-	 * Setup the CRON listener to purge old events
-	 */
-	public function setup_cron() {
-		if ( ! wp_next_scheduled( 'groundhogg/purge_email_logs' ) ) {
-			wp_schedule_event( time(), 'daily', 'groundhogg/purge_email_logs' );
-		}
-	}
-
-	/**
-	 * Purge old logs to conserve space
-	 */
-	public function purge_old_logs() {
-		global $wpdb;
-
-		$retention_in_days = get_option( 'gh_email_log_retention', 14 ) ?: 14;
-		$log               = get_db( 'email_log' );
-		$compare_date      = date( 'Y-m-d H:i:s', strtotime( $retention_in_days . ' days ago' ) );
-
-		$wpdb->query( "DELETE from {$log->get_table_name()} WHERE `date_sent` <= '{$compare_date}'" );
 	}
 
 	/**
@@ -105,6 +65,15 @@ class Email_Logger {
 	 */
 	public static function email_is_sensitive(){
 		self::$is_sensitive = true;
+	}
+
+	/**
+	 *
+	 *
+	 * @return int
+	 */
+	public static function get_last_log_id(): int {
+		return self::$log_item_id;
 	}
 
 	/**

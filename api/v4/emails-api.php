@@ -7,6 +7,7 @@ use Groundhogg\Campaign;
 use Groundhogg\Contact;
 use Groundhogg\Block_Registry;
 use Groundhogg\Email;
+use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Library_Email;
 use Groundhogg\Plugin;
@@ -425,7 +426,8 @@ class Emails_Api extends Base_Object_Api {
 			track_activity( $contact, 'composed_email_sent', [], [
 				'subject' => $subject,
 				'from'    => $from_email,
-				'sent_by' => get_current_user_id()
+				'sent_by' => get_current_user_id(),
+				'log_id'  => Email_Logger::get_last_log_id()
 			] );
 		}
 

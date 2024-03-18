@@ -165,7 +165,7 @@
                           <div class="name">${ item.data.first_name } ${ item.data.last_name } <span class="subscribed">— ${ sprintf(
                                   __('Subscribed %s'),
                                   `<abbr title="${ formatDateTime(item.data.date_created) }">${ sprintf(__('%s ago '),
-                                          item.locale.created) }</abbr>`) }</span></div>
+                                          item.i18n.created) }</abbr>`) }</span></div>
                           <div class="email">${ item.data.email } — <span class="gh-text ${ item.is_marketable
                                   ? 'green'
                                   : 'red' }"><b>${ Groundhogg.filters.optin_status[item.data.optin_status] }</b></span>

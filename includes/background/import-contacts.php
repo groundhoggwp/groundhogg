@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\background;
+namespace Groundhogg\Background;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
@@ -9,6 +9,7 @@ use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
 use function Groundhogg\code_it;
 use function Groundhogg\contact_filters_link;
+use function Groundhogg\count_csv_rows;
 use function Groundhogg\files;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
@@ -16,6 +17,8 @@ use function Groundhogg\get_csv_delimiter;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
+use function Groundhogg\percentage;
+use function Groundhogg\track_activity;
 use function Groundhogg\white_labeled_name;
 
 class Import_Contacts extends Task {
@@ -27,6 +30,7 @@ class Import_Contacts extends Task {
 	protected array $settings;
 	protected string $delimiter;
 	protected array $headers;
+	protected int $rows = 0;
 
 	protected ?\SplFileObject $file;
 
@@ -37,6 +41,27 @@ class Import_Contacts extends Task {
 		$this->settings = $settings;
 		$this->user_id  = get_current_user_id();
 		$this->batch    = $batch;
+	}
+
+	public function get_rows(){
+		if ( ! $this->rows ){
+			$this->rows = count_csv_rows( wp_normalize_path( files()->get_csv_imports_dir( $this->fileName ) ) );
+		}
+
+		return $this->rows;
+	}
+
+	public function get_progress() {
+		return percentage( $this->get_rows(), $this->batch * self::BATCH_LIMIT );
+	}
+
+	/**
+	 * Title of the task
+	 *
+	 * @return string
+	 */
+	public function get_title(){
+		return sprintf( 'Import %s rows from %s', bold_it( _nf( $this->get_rows() ) ), bold_it( $this->fileName ) );
 	}
 
 	/**
@@ -192,6 +217,11 @@ class Import_Contacts extends Task {
 			if ( is_a_contact( $contact ) ) {
 
 				$contact->apply_tag( $tags );
+
+				track_activity( $contact, 'imported', [], [
+					'file' => $this->fileName,
+					'user' => $this->user_id,
+				] );
 
 				/**
 				 * Whenever a contact is imported

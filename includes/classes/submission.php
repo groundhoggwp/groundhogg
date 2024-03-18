@@ -112,7 +112,7 @@ class Submission extends Base_Object_With_Meta {
 
 		$array['data']['time'] =$date->getTimestamp();
 		$array['form']         = new Step( $this->get_form_id() );
-		$array['locale']       = [
+		$array['i18n']       = [
 			'diff_time' => ucfirst( $date->i18n() )
 		];
 

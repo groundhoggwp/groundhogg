@@ -36,6 +36,10 @@ abstract class Base_Api extends Supports_Errors {
 		add_action( 'groundhogg/api/v4/init', array( $this, 'register_routes' ) );
 	}
 
+	public function admin_permissions_callback(){
+		return current_user_can( 'administrator' );
+	}
+
 	/**
 	 * Register the relevant REST routes
 	 *

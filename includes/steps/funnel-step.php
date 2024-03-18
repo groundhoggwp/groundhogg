@@ -3,7 +3,6 @@
 namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
@@ -114,8 +113,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'pre_enqueue' ], 1 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'enqueue' ] );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_get_run_time' ], 1, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'get_run_time' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
@@ -214,6 +213,31 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+	 * Replacement for enqueue/get_delay_time
+	 *
+	 * @param int  $baseTimestamp
+	 * @param Step $step
+	 *
+	 * @return int
+	 */
+	public function pre_get_run_time( int $baseTimestamp, Step $step ): int {
+        $this->set_current_step( $step );
+        return $baseTimestamp;
+	}
+
+	/**
+	 * Replacement for enqueue/get_delay_time
+	 *
+	 * @param int  $baseTime
+	 * @param Step $step
+	 *
+	 * @return int
+	 */
+	public function get_run_time( int $baseTimestamp, Step $step ) : int{
+        return $this->enqueue( $step );
+    }
+
+	/**
 	 * Get the delay time in seconds.
 	 *
 	 * @param Step
@@ -221,6 +245,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @return int
 	 */
 	public function get_delay_time( $step ) {
+        _deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
 		return 0;
 	}
 
@@ -232,6 +257,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @return int
 	 */
 	public function enqueue( $step ) {
+		_deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
 		return time() + $this->get_delay_time( $step );
 	}
 
@@ -417,21 +443,21 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	/**
 	 * @param Step $step
 	 */
-	protected function set_current_step( Step $step ) {
+	public function set_current_step( Step $step ) {
 		$this->current_step = $step;
 	}
 
 	/**
 	 * @param Contact $contact
 	 */
-	protected function set_current_contact( Contact $contact ) {
+	public function set_current_contact( Contact $contact ) {
 		$this->current_contact = $contact;
 	}
 
 	/**
 	 * @param Event $event
 	 */
-	protected function set_current_event( Event $event ) {
+	public function set_current_event( Event $event ) {
 		$this->current_event = $event;
 	}
 
@@ -471,168 +497,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @param $step Step
 	 */
 	abstract public function settings( $step );
-
-	/**
-	 * Todo Get the reporting interval.
-	 * Returns the reporting interval for the reporting view.
-	 *
-	 * @return array
-	 */
-	protected function get_reporting_interval() {
-		$times = [
-			'start_time' => Plugin::$instance->reporting->get_start_time(),
-			'end_time'   => Plugin::$instance->reporting->get_end_time(),
-			'range'      => Plugin::$instance->reporting->get_range(),
-		];
-
-		return $times;
-	}
-
-	/**
-	 * Get the reporting view for the STEP
-	 * Most steps will use the default step reporting given here...
-	 *
-	 * @param $step Step
-	 */
-	public function reporting( $step ) {
-
-		$times = $this->get_reporting_interval();
-
-		$start_time = $times['start_time'];
-		$end_time   = $times['end_time'];
-
-		$cquery = new Contact_Query();
-
-		if ( $step->is_action() ):
-
-			$num_events_waiting = $cquery->query( [
-				'count'  => true,
-				'report' => [
-					'step'   => $step->get_id(),
-					'funnel' => $step->get_funnel_id(),
-					'status' => 'waiting'
-				]
-			] );
-
-			?>
-			<p class="report">
-				<?php _e( 'Waiting:', 'groundhogg' ) ?>
-				<a target="_blank" href="<?php echo add_query_arg( [
-					'report' => [
-						'step'   => $step->get_id(),
-						'funnel' => $step->get_funnel_id(),
-						'status' => 'waiting'
-					]
-				], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-					<b><?php echo $num_events_waiting; ?></b>
-				</a>
-			</p>
-			<hr>
-		<?php
-		endif;
-
-		$num_events_completed = $cquery->query( [
-			'count'  => true,
-			'report' => [
-				'start'  => $start_time,
-				'end'    => $end_time,
-				'step'   => $step->get_id(),
-				'funnel' => $step->get_funnel_id(),
-				'status' => 'complete'
-			]
-		] );
-
-		?>
-		<p class="report">
-			<?php _e( 'Completed:', 'groundhogg' ) ?>
-			<a target="_blank" href="<?php echo add_query_arg( [
-				'report' => [
-					'step'   => $step->get_id(),
-					'funnel' => $step->get_funnel_id(),
-					'status' => 'complete',
-					'start'  => $start_time,
-					'end'    => $end_time,
-				]
-			], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-				<b><?php echo $num_events_completed; ?></b>
-			</a>
-		</p>
-		<?php
-	}
-
-	/**
-	 * Get the reporting view for the STEP
-	 * Most steps will use the default step reporting given here...
-	 *
-	 * @param $step Step
-	 *
-	 * @return array
-	 */
-	public function quick_stats( $step ) {
-
-		$times = $this->get_reporting_interval();
-
-		$start_time = $times['start_time'];
-		$end_time   = $times['end_time'];
-
-		$cquery = new Contact_Query();
-
-		$stats = [];
-
-		$num_events_waiting = $cquery->query( [
-			'count'  => true,
-			'report' => [
-				'step'   => $step->get_id(),
-				'funnel' => $step->get_funnel_id(),
-				'status' => 'waiting'
-			]
-		] );
-
-		$stats[] = [
-			__( 'Waiting', 'groundhogg' ),
-			html()->e( 'a', [
-				'target' => '_blank',
-				'class'  => 'number',
-				'href'   => add_query_arg( [
-					'report' => [
-						'step'   => $step->get_id(),
-						'funnel' => $step->get_funnel_id(),
-						'status' => 'waiting'
-					]
-				], admin_url( 'admin.php?page=gh_contacts' ) )
-			], absint( $num_events_waiting ), false )
-		];
-
-		$num_events_completed = $cquery->query( [
-			'count'  => true,
-			'report' => [
-				'start'  => $start_time,
-				'end'    => $end_time,
-				'step'   => $step->get_id(),
-				'funnel' => $step->get_funnel_id(),
-				'status' => 'complete'
-			]
-		] );
-
-		$stats[] = [
-			__( 'Complete', 'groundhogg' ),
-			html()->e( 'a', [
-				'target' => '_blank',
-				'class'  => 'number',
-				'href'   => add_query_arg( [
-					'report' => [
-						'start'  => $start_time,
-						'end'    => $end_time,
-						'step'   => $step->get_id(),
-						'funnel' => $step->get_funnel_id(),
-						'status' => 'complete'
-					]
-				], admin_url( 'admin.php?page=gh_contacts' ) )
-			], absint( $num_events_completed ), false )
-		];
-
-		return apply_filters( "groundhogg/steps/{$this->get_type()}/reporting_v2", $stats );
-	}
 
 	/**
 	 * Get similar steps which can be used by benchmarks.
@@ -1019,17 +883,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function run( $contact, $event ) {
 		return true;
-	}
-
-	/**
-	 * @param $step
-	 *
-	 * @return Step
-	 */
-	public function pre_enqueue( $step ) {
-		$this->set_current_step( $step );
-
-		return $step;
 	}
 
 	/**

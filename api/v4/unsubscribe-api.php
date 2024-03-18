@@ -26,7 +26,7 @@ class Unsubscribe_Api extends Base_Api {
 
 	public function register_routes() {
 
-		register_rest_route( self::NAME_SPACE, '/unsubscribe/(?P<event>\w+)/(?P<pk>\w+)', [
+		register_rest_route( self::NAME_SPACE, '/unsubscribe/(?P<event>[A-Za-z0-9]+)/(?P<pk>[A-Za-z0-9]+)', [
 			[
 				'methods'              => WP_REST_Server::EDITABLE,
 				'callback'             => [ $this, 'unsubscribe' ],
@@ -68,7 +68,9 @@ class Unsubscribe_Api extends Base_Api {
 
 		if ( $request->get_method() === 'GET' ){
 
-			tracking()->set_current_contact( $event->get_contact() );
+			tracking()->start_tracking( $event->get_contact(), '', [
+				'event_id' => $event->get_id()
+			] );
 
 			set_permissions_key_cookie( $pk, 'preferences' );
 

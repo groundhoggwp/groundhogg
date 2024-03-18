@@ -22,6 +22,7 @@
     Span,
     Ellipses,
     Dashicon,
+    InputGroup,
     ToolTip,
   } = MakeEl
 
@@ -51,6 +52,8 @@
       'groundhogg'),
     empty: _x('Is empty', 'comparison', 'groundhogg'),
     not_empty: _x('Is not empty', 'comparison', 'groundhogg'),
+    // null: _x('Is null', 'comparison', 'groundhogg'),
+    // not_null: _x('Is not null', 'comparison', 'groundhogg'),
   }
 
   const StringComparisons = {
@@ -135,6 +138,9 @@
     before: (k, v) => sprintf(
       _x('%1$s is before %2$s', '%1 is a key and %2 is user defined value',
         'groundhogg'), k, v),
+    day_of: (k, v) => sprintf(
+      _x('%1$s on %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
     after: (k, v) => sprintf(
       _x('%1$s is after %2$s', '%1 is a key and %2 is user defined value',
         'groundhogg'), k, v),
@@ -153,13 +159,16 @@
     'this_year': __('This year', 'groundhogg'),
     '24_hours': __('In the last 24 hours', 'groundhogg'),
     '7_days': __('In the last 7 days', 'groundhogg'),
+    '14_days': __('In the last 14 days', 'groundhogg'),
     '30_days': __('In the last 30 days', 'groundhogg'),
     '60_days': __('In the last 60 days', 'groundhogg'),
     '90_days': __('In the last 90 days', 'groundhogg'),
     '365_days': __('In the last 365 days', 'groundhogg'),
+    'x_days': __('In the last X days', 'groundhogg'),
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
+    'day_of': __('Day of', 'groundhogg'),
   }
 
   const futureDateRanges = {
@@ -171,13 +180,16 @@
     'this_year': __('This year', 'groundhogg'),
     'next_24_hours': __('In the next 24 hours', 'groundhogg'),
     'next_7_days': __('In the next 7 days', 'groundhogg'),
+    'next_14_days': __('In the next 14 days', 'groundhogg'),
     'next_30_days': __('In the next 30 days', 'groundhogg'),
     'next_60_days': __('In the next 60 days', 'groundhogg'),
     'next_90_days': __('In the next 90 days', 'groundhogg'),
     'next_365_days': __('In the next 365 days', 'groundhogg'),
+    'next_x_days': __('In the next X days', 'groundhogg'),
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
+    'day_of': __('Day of', 'groundhogg'),
   }
 
   const allDateRanges = {
@@ -194,19 +206,11 @@
   }
 
   const filterCountComparisons = {
-    equals: (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'),
-      v),
-    less_than: (v) => sprintf(
-      _n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'),
-      v),
-    less_than_or_equal_to: (v) => sprintf(
-      _n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
-    greater_than: (v) => sprintf(
-      _n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'),
-      v),
-    greater_than_or_equal_to: (v) => sprintf(
-      _n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'),
-      v),
+    equals: (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'), v),
+    less_than: (v) => sprintf(_n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'), v),
+    less_than_or_equal_to: (v) => sprintf(_n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
+    greater_than: (v) => sprintf(_n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'), v),
+    greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'), v),
   }
 
   const moreComparisonTitleGenerators = {
@@ -420,76 +424,112 @@
     },
   )
 
+  const dateFilterFactory = (
+    type, name, group,
+    { edit = () => null, display = () => null, preload = () => {} } = {},
+    defaults = {},
+    dateRanges = {}
+  ) => createFilter(type,
+    name, group, {
+      edit: ({ date_range, compare = 'is', before, after, updateFilter, days = 0, ...rest }) => Fragment([
+        edit({ ...rest, updateFilter }),
+        InputGroup([
+          Select({
+            id: 'filter-compare',
+            name: 'compare',
+            options: {
+              is: 'Is',
+              is_not: 'Is not'
+            },
+            selected: compare,
+            onChange: e => updateFilter({
+              compare: e.target.value,
+            }),
+          }),
+          Select({
+            id: 'filter-date-range',
+            name: 'date_range',
+            options: dateRanges,
+            selected: date_range,
+            onChange: e => updateFilter({
+              date_range: e.target.value,
+            }, true),
+          }),
+        ]),
+        ['after', 'between', 'day_of'].includes(date_range) ? Input({
+          type: 'date',
+          value: after.split(' ')[0],
+          id: 'filter-after',
+          onChange: e => updateFilter({
+            after: e.target.value,
+          }),
+        }) : null,
+        date_range === 'before' || date_range === 'between' ? Input({
+          type: 'date',
+          value: before.split(' ')[0],
+          id: 'filter-before',
+          onChange: e => updateFilter({
+            before: e.target.value,
+          }),
+        }) : null,
+        date_range === 'x_days' || date_range === 'next_x_days'  ? Input({
+          type: 'number',
+          value: days,
+          id: 'filter-days',
+          onChange: e => updateFilter({
+            days: parseInt(e.target.value),
+          }),
+        }) : null,
+      ]),
+      display: ({ compare = 'is', date_range, after, before, days = 0, ...rest }) => {
+
+        let prefix = bold(name)
+
+        if ( compare === 'is_not' ){
+          prefix += ' is not'
+        }
+
+        switch (date_range) {
+          case 'between':
+            return ComparisonsTitleGenerators.between(prefix,
+              formatDate(after), formatDate(before))
+          case 'after':
+          case 'day_of':
+            return ComparisonsTitleGenerators[date_range](prefix,
+              formatDate(after))
+          case 'before':
+            return ComparisonsTitleGenerators.before(prefix,
+              formatDate(before))
+          default:
+            return sprintf('%s %s', prefix, dateRanges[date_range].replace( 'X', days ).toLowerCase() )
+        }
+      },
+      preload,
+    }, {
+      ...defaults,
+      before: '',
+      after: '',
+      days: 0,
+      compare: 'is'
+    })
+
   /**
    * Create a filter that compares against previous dates
    *
    * @param type
    * @param name
    * @param group
-   * @param edit
-   * @param display
-   * @param preload
+   * @param callbacks
    * @param defaults
    * @returns {{defaults: {}, edit: (function(): null), display: (function():
    *   null), name, type, preload: preload, group}}
    */
   const createDateFilter = (
-    type, name, group,
-    { edit = () => null, display = () => null, preload = () => {} } = {},
-    defaults = {}) => createFilter(type,
-    name, group, {
-      edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
-        edit({ ...rest, updateFilter }),
-        Select({
-          id: 'filter-date-range',
-          name: 'date_range',
-          options: allDateRanges,
-          selected: date_range,
-          onChange: e => updateFilter({
-            date_range: e.target.value,
-          }, true),
-        }),
-        date_range === 'after' || date_range === 'between' ? Input({
-          type: 'date',
-          value: after.split(' ')[0],
-          id: 'filter-after',
-          onChange: e => updateFilter({
-            after: e.target.value,
-          }),
-        }) : null,
-        date_range === 'before' || date_range === 'between' ? Input({
-          type: 'date',
-          value: before.split(' ')[0],
-          id: 'filter-before',
-          onChange: e => updateFilter({
-            before: e.target.value,
-          }),
-        }) : null,
-      ]),
-      display: ({ date_range, after, before, ...rest }) => {
-
-        switch (date_range) {
-          case 'between':
-            return ComparisonsTitleGenerators.between(bold(name),
-              formatDate(after), formatDate(before))
-          case 'after':
-            return ComparisonsTitleGenerators.after(bold(name),
-              formatDate(after))
-          case 'before':
-            return ComparisonsTitleGenerators.before(bold(name),
-              formatDate(before))
-          default:
-            return sprintf('%s %s', bold(name),
-              allDateRanges[date_range].toLowerCase())
-        }
-      },
-      preload,
-    }, {
-      ...defaults,
-      date_range: 'this_month',
-      before: '',
-      after: '',
-    })
+    type, name, group, callbacks, defaults = {},
+  ) => dateFilterFactory( type, name, group, callbacks, {
+    date_range: '24_hours',
+    ...defaults
+  }, allDateRanges )
 
   /**
    * Create a filter that compares against previous dates
@@ -497,70 +537,17 @@
    * @param type
    * @param name
    * @param group
-   * @param edit
-   * @param display
-   * @param preload
+   * @param callbacks
    * @param defaults
    * @returns {{defaults: {}, edit: (function(): null), display: (function():
    *   null), name, type, preload: preload, group}}
    */
   const createPastDateFilter = (
-    type, name, group,
-    { edit = () => null, display = () => null, preload = () => {} } = {},
-    defaults = {}) => createFilter(type,
-    name, group, {
-      edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
-        edit({ ...rest, updateFilter }),
-        Select({
-          id: 'filter-date-range',
-          name: 'date_range',
-          options: pastDateRanges,
-          selected: date_range,
-          onChange: e => updateFilter({
-            date_range: e.target.value,
-          }, true),
-        }),
-        date_range === 'after' || date_range === 'between' ? Input({
-          type: 'date',
-          value: after.split(' ')[0],
-          id: 'filter-after',
-          onChange: e => updateFilter({
-            after: e.target.value,
-          }),
-        }) : null,
-        date_range === 'before' || date_range === 'between' ? Input({
-          type: 'date',
-          value: before.split(' ')[0],
-          id: 'filter-before',
-          onChange: e => updateFilter({
-            before: e.target.value,
-          }),
-        }) : null,
-      ]),
-      display: ({ date_range, after, before, ...rest }) => {
-
-        switch (date_range) {
-          case 'between':
-            return ComparisonsTitleGenerators.between(bold(name),
-              formatDate(after), formatDate(before))
-          case 'after':
-            return ComparisonsTitleGenerators.after(bold(name),
-              formatDate(after))
-          case 'before':
-            return ComparisonsTitleGenerators.before(bold(name),
-              formatDate(before))
-          default:
-            return sprintf('%s %s', bold(name),
-              pastDateRanges[date_range].toLowerCase())
-        }
-      },
-      preload,
-    }, {
-      ...defaults,
-      date_range: '24_hours',
-      before: '',
-      after: '',
-    })
+    type, name, group, callbacks, defaults = {},
+  ) => dateFilterFactory( type, name, group, callbacks, {
+    date_range: '24_hours',
+    ...defaults
+  }, pastDateRanges )
 
   /**
    * Create a filter that compares a value to given dates in the future
@@ -568,70 +555,17 @@
    * @param type
    * @param name
    * @param group
-   * @param edit
-   * @param display
-   * @param preload
+   * @param callbacks
    * @param defaults
    * @returns {{defaults: {}, edit: (function(): null), display: (function():
    *   null), name, type, preload: preload, group}}
    */
   const createFutureDateFilter = (
-    type, name, group,
-    { edit = () => null, display = () => null, preload = () => {} } = {},
-    defaults = {}) => createFilter(type,
-    name, group, {
-      edit: ({ date_range, before, after, updateFilter, ...rest }) => Fragment([
-        edit({ ...rest, updateFilter }),
-        Select({
-          id: 'filter-date-range',
-          name: 'date_range',
-          options: futureDateRanges,
-          selected: date_range,
-          onChange: e => updateFilter({
-            date_range: e.target.value,
-          }, true),
-        }),
-        date_range === 'after' || date_range === 'between' ? Input({
-          type: 'date',
-          value: after.split(' ')[0],
-          id: 'filter-after',
-          onChange: e => updateFilter({
-            after: e.target.value,
-          }),
-        }) : null,
-        date_range === 'before' || date_range === 'between' ? Input({
-          type: 'date',
-          value: before.split(' ')[0],
-          id: 'filter-before',
-          onChange: e => updateFilter({
-            before: e.target.value,
-          }),
-        }) : null,
-      ]),
-      display: ({ date_range, after, before, ...rest }) => {
-
-        switch (date_range) {
-          case 'between':
-            return ComparisonsTitleGenerators.between(bold(name),
-              formatDate(after), formatDate(before))
-          case 'after':
-            return ComparisonsTitleGenerators.after(bold(name),
-              formatDate(after))
-          case 'before':
-            return ComparisonsTitleGenerators.before(bold(name),
-              formatDate(before))
-          default:
-            return sprintf('%s %s', bold(name),
-              futureDateRanges[date_range].toLowerCase())
-        }
-      },
-      preload,
-    }, {
-      ...defaults,
-      date_range: 'next_24_hours',
-      before: '',
-      after: '',
-    })
+    type, name, group, callbacks, defaults = {},
+  ) => dateFilterFactory( type, name, group, callbacks, {
+    date_range: 'next_24_hours',
+    ...defaults
+  }, futureDateRanges )
 
   /**
    * Create a select filter, which is just a comparison filter with fixed
@@ -1022,6 +956,7 @@
           className: 'filter-name text',
         }, message),
         Button({
+          type: 'button',
           id: `delete-${ group }-${ index }`,
           className: 'delete-filter',
           onClick: e => {
@@ -1060,6 +995,7 @@
         // }
       }, filterRegistry.displayName(filter)),
       Button({
+        type: 'button',
         id: `delete-${ group }-${ index }`,
         className: 'delete-filter',
         onClick: e => deleteFilter(group, index),
@@ -1133,6 +1069,7 @@
         }, [
           bold(filterRegistry.filterName(filter)),
           Button({
+            type: 'button',
             className: 'close-edit',
             onClick: e => editFilter(null),
           }, Dashicon('no-alt')),
@@ -1145,12 +1082,14 @@
         }, [
 
           Button({
+            type: 'button',
             id: `delete-${ group }-${ index }`,
             className: 'delete delete-filter',
             onClick: e => deleteFilter(group, index),
           }, Dashicon('trash')),
 
           Button({
+            type: 'button',
             id: `commit-${ group }-${ index }`,
             className: 'commit commit-filter',
             onClick: e => updateFilter(tempFilterSettings, group, index),
@@ -1185,6 +1124,7 @@
 
       }),
       Button({
+        type: 'button',
         id: `add-filter-to-${ group }`,
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
@@ -1369,6 +1309,16 @@
   Groundhogg.filters.createFutureDateFilter = createFutureDateFilter
   Groundhogg.filters.createDateFilter = createDateFilter
   Groundhogg.filters.createSelectFilter = createSelectFilter
+  Groundhogg.filters.comparisons = {
+    ComparisonsTitleGenerators,
+    AllComparisons,
+    StringComparisons,
+    NumericComparisons,
+    pastDateRanges,
+    futureDateRanges,
+    allDateRanges,
+    moreComparisonTitleGenerators,
+  }
 
   if (window.GroundhoggTableFilters) {
 

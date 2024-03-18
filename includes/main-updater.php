@@ -93,8 +93,23 @@ class Main_Updater extends Old_Updater {
 				'automatic'   => true,
 				'description' => __( 'List-Unsubscribe header is now required.', 'groundhogg' ),
 				'callback'    => function () {
-					// List-Unsubscribe is now required
+					// List-Unsubscribe is now required, delete this options since it has become unused
 					delete_option( 'gh_disable_unsubscribe_header' );
+				}
+			],
+			'3.3.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Add background tasks table for better logging and management of background tasks.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'background_tasks' )->create_table();
+				}
+			],
+			'3.3.2'    => [
+				'automatic'   => true,
+				'description' => __( 'Combine cron tasks into a single hook.', 'groundhogg' ),
+				'callback'    => function () {
+					wp_clear_scheduled_hook( 'groundhogg/purge_email_logs' );
+					wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 				}
 			]
 		];
