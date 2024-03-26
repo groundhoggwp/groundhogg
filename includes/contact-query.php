@@ -1921,9 +1921,9 @@ class Contact_Query extends Table_Query {
 
 		if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
 			$alias = $where->query->joinMeta( 'gdpr_consent' );
-			$where->equals( "$alias.gdpr_consent", 'yes' );
+			$where->equals( "$alias.meta_value", 'yes' );
 			$alias = $where->query->joinMeta( 'marketing_consent' );
-			$where->equals( "$alias.marketing_consent", 'yes' );
+			$where->equals( "$alias.meta_value", 'yes' );
 		}
 
 	}
@@ -1954,9 +1954,9 @@ class Contact_Query extends Table_Query {
 
 		if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
 			$alias = $where->query->joinMeta( 'gdpr_consent' );
-			$where->notEquals( "$alias.gdpr_consent", 'yes' );
+			$where->notEquals( "$alias.meta_value", 'yes' );
 			$alias = $where->query->joinMeta( 'marketing_consent' );
-			$where->notEquals( "$alias.marketing_consent", 'yes' );
+			$where->notEquals( "$alias.meta_value", 'yes' );
 		}
 	}
 

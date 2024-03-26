@@ -806,7 +806,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 				$note_data['user_id'] = get_current_user_id();
 			}
 
-			$note = new Note( $note_data );
+			$note = new Note();
+			$note->create( $note_data );
 
 		} else if ( is_array( $note ) ) {
 
@@ -821,7 +822,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 				'object_type' => $this->get_object_type(),
 			] );
 
-			$note = new Note( $note_data );
+			$note = new Note();
+			$note->create( $note_data );
 		}
 
 		/**
