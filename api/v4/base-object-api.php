@@ -27,7 +27,7 @@ use WP_REST_Server;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
-use function Groundhogg\sanitize_object_meta;
+use function Groundhogg\isset_not_empty;
 
 //use Groundhogg\Webhook;
 
@@ -430,6 +430,15 @@ abstract class Base_Object_Api extends Base_Api {
 			'limit'      => 25,
 			'found_rows' => true,
 		] );
+
+
+		if ( isset_not_empty( $query, 'count' ) ) {
+			$total = $this->get_db_table()->count( $query );
+
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => $total,
+			] );
+		}
 
 		$items = $this->get_db_table()->query( $query );
 		$total = $this->get_db_table()->found_rows();
