@@ -5373,7 +5373,11 @@
       let height = 200
 
       if ( blockEl ){
-         height = blockEl.getBoundingClientRect().height
+        height = blockEl.getBoundingClientRect().height
+        let iframe = blockEl.querySelector( 'iframe' )
+        if ( iframe ){
+          height = iframe.getBoundingClientRect().height
+        }
       }
 
       return Div( ({
