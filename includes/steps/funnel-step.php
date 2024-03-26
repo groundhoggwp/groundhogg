@@ -113,8 +113,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_get_run_time' ], 1, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'get_run_time' ], 10, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_calc_run_time' ], 1, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'calc_run_time' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
@@ -220,7 +220,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @return int
 	 */
-	public function pre_get_run_time( int $baseTimestamp, Step $step ): int {
+	public function pre_calc_run_time( int $baseTimestamp, Step $step ): int {
         $this->set_current_step( $step );
         return $baseTimestamp;
 	}
@@ -233,7 +233,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @return int
 	 */
-	public function get_run_time( int $baseTimestamp, Step $step ) : int{
+	public function calc_run_time( int $baseTimestamp, Step $step ) : int{
         return $this->enqueue( $step );
     }
 
