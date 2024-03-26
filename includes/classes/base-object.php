@@ -788,12 +788,14 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return Note|false
 	 */
-	public function add_note( $note, $context = 'system', $user_id = false ) {
+	public function add_note( $note, $context = 'system', $user_id = false, $overrides = [] ) {
+
 		if ( ! is_string( $note ) && ! is_array( $note ) ) {
 			return false;
 		}
 
 		if ( is_string( $note ) ) {
+
 			$note_data = [
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_object_type(),
@@ -805,6 +807,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			if ( $context == 'user' && ! $user_id ) {
 				$note_data['user_id'] = get_current_user_id();
 			}
+
+			$note_data = array_merge( $note_data, $overrides );
 
 			$note = new Note();
 			$note->create( $note_data );
@@ -820,7 +824,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$note_data = array_merge( $note, [
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_object_type(),
-			] );
+			], $overrides );
 
 			$note = new Note();
 			$note->create( $note_data );
