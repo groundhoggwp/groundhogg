@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 7.1
-Stable tag: 3.3.2
+Stable tag: 3.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,18 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.3.3 (2024-03-26) =
+* ADDED A better way to handle all the different mailer handlers with the `gh_mail()` function.
+* ADDED Some WP CLI tooling which will be improved on and documented at a later date.
+* ADDED Tools to generate fake data for funnels, broadcasts, and contacts.
+* TWEAKED Funnel timers will calculate delay time based on the enqueued time rather than the current time.
+* TWEAKED No longer use `p` style for `a` tags in the email editor.
+* TWEAKED Replacement codes for custom date fields will output `Y-m-d` or `Y-m-d H:i:s` format by default so that they are easier to use in other functions. You can use the `{date}` or `{local_date}` replacement codes to format your dates.
+* FIXED Emails not preloading in contact activity timeline.
+* FIXED Removed a bunch of unused files and code.
+* FIXED Notes not being added from funnels when the content is exactly the same as a previous note.
+* FIXED WYSIWYG Editor in text block gets large when editing CSS.
 
 = 3.3.2 (2024-03-05) =
 * ADDED 4x per day the queue will be "cleaned" and events that failed to process within the last 6 hours will be fixed.
