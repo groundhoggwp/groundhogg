@@ -2140,6 +2140,10 @@
 
     try {
 
+      if ( ! parseInt( event.data.queued_id ) ){
+        throw new Error( 'Invalid queued event ID' );
+      }
+
       let logItems = await LogsStore.fetchItems({
         queued_event_id: event.data.queued_id,
         limit: 1,
