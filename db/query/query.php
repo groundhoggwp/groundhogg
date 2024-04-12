@@ -114,7 +114,8 @@ class Query {
 
 	protected array $safe_columns = [
 		'*'        => true,
-		'COUNT(*)' => true
+		'COUNT(*)' => true,
+		'RAND()'   => true,
 	];
 
 	public function add_safe_column( string $col ) {
@@ -241,6 +242,12 @@ class Query {
 	 * @return $this
 	 */
 	public function setOrder( $order ) {
+
+		if ( empty( $order ) ){
+			$this->order = '';
+			return $this;
+		}
+
 		$order       = strtoupper( $order );
 		$this->order = $order === 'ASC' ? 'ASC' : 'DESC';
 
