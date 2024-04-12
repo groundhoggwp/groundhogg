@@ -108,6 +108,7 @@ h3 {
     }
   }
 
+  > .full,
   > .span-12{
     grid-column: span 12;
   }
@@ -120,14 +121,17 @@ h3 {
     grid-column: span 8;
   }
 
+  > .half,
   > .span-6{
     grid-column: span 6;
   }
 
+  > .third,
   > .span-4{
     grid-column: span 4;
   }
 
+  > .quarter,
   > .span-3{
     grid-column: span 3;
   }
