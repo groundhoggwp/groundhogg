@@ -67,6 +67,7 @@ h3.no-margin-top {
 .display-grid.gap-20 {
   gap: 20px;
 }
+.display-grid > .full,
 .display-grid > .span-12 {
   grid-column: span 12;
 }
@@ -76,12 +77,15 @@ h3.no-margin-top {
 .display-grid > .span-8 {
   grid-column: span 8;
 }
+.display-grid > .half,
 .display-grid > .span-6 {
   grid-column: span 6;
 }
+.display-grid > .third,
 .display-grid > .span-4 {
   grid-column: span 4;
 }
+.display-grid > .quarter,
 .display-grid > .span-3 {
   grid-column: span 3;
 }
