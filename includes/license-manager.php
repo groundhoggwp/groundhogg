@@ -6,7 +6,7 @@ namespace Groundhogg;
 /**
  * Module Manager
  *
- * This class is a helper class for the settigns page. it essentially provides an api with Groundhogg.io for managing premium extension licenses.
+ * This class is a helper class for the settings page. it essentially provides an api with Groundhogg.io for managing premium extension licenses.
  *
  * @since       File available since Release 0.1
  * @subpackage  Admin/Settings
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class License_Manager {
 
 	static $extensions = array(); // array( item_id => array( license, status ) )
-	static $storeUrl = "https://www.groundhogg.io";
+	static $storeUrl = "https://www.groundhogg.io/license-api/";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
 	public function __construct() {
