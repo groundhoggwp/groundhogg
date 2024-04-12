@@ -369,6 +369,66 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Filter by primary object relationships
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_primary_related( $filter, Where $where ) {
+
+		if ( $where->hasCondition( 'object_relationships' ) ) {
+			$query = new Table_Query( 'object_relationships' );
+			$query->setSelect( 'primary_object_id' )
+			      ->where()
+			      ->equals( 'primary_object_type', 'contact' )
+			      ->equals( 'secondary_object_type', $filter['object_type'] )
+			      ->equals( 'secondary_object_id', $filter['object_id'] );
+
+			$where->in( 'ID', $query );
+
+			return;
+		}
+
+		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
+		$join->onColumn( 'primary_object_id', 'ID' )->equals( 'primary_object_type', 'contact' );
+
+		$where->equals( "$join->alias.secondary_object_id", $filter['object_id'] );
+		$where->equals( "$join->alias.secondary_object_type", $filter['object_type'] );
+	}
+
+	/**
+	 * Filter by secondary object relationships
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_secondary_related( $filter, Where $where ) {
+
+		if ( $where->hasCondition( 'object_relationships' ) ) {
+			$query = new Table_Query( 'object_relationships' );
+			$query->setSelect( 'secondary_object_id' )
+			      ->where()
+			      ->equals( 'secondary_object_type', 'contact' )
+			      ->equals( 'primary_object_type', $filter['object_type'] )
+			      ->equals( 'primary_object_id', $filter['object_id'] );
+
+			$where->in( 'ID', $query );
+
+			return;
+		}
+
+		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
+		$join->onColumn( 'secondary_object_id', 'ID' )->equals( 'secondary_object_type', 'contact' );
+
+		$where->equals( "$join->alias.primary_object_id", $filter['object_id'] );
+		$where->equals( "$join->alias.primary_object_type", $filter['object_type'] );
+	}
+
+	/**
 	 * Filter by the user ID
 	 *
 	 * @param       $filter
@@ -801,7 +861,7 @@ class Contact_Query extends Table_Query {
 
 		$funnel_id = absint( $filter['funnel_id'] );
 		$step_id   = absint( $filter['step_id'] );
-		$email_id = absint( $filter['email_id'] );
+		$email_id  = absint( $filter['email_id'] );
 
 		$eventQuery = new Table_Query( 'events' );
 
@@ -958,7 +1018,7 @@ class Contact_Query extends Table_Query {
 	public static function filter_custom_activity( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'activity'      => '',
+			'activity' => '',
 		] );
 
 		self::basic_activity_filter( $filter['activity'], $filter, $where );
@@ -968,7 +1028,7 @@ class Contact_Query extends Table_Query {
 	 * @throws \Exception
 	 *
 	 * @param array        $filter
-	 * @param Where $where
+	 * @param Where        $where
 	 * @param string|array $activity_type
 	 *
 	 * @return void
@@ -1265,7 +1325,7 @@ class Contact_Query extends Table_Query {
 
 		// Make sure user meta orderby works
 		if ( isset( $query_vars['orderby'] ) && str_starts_with( $query_vars['orderby'], 'um.' ) && $query_vars['orderby'] !== 'um.meta_value' ) {
-			$parts                 = explode( '.', $query_vars['orderby'] );
+			$parts    = explode( '.', $query_vars['orderby'] );
 			$meta_key = $parts[1];
 
 			$join = $this->addJoin( 'LEFT', [ $this->db->usermeta, 'um' ] );
@@ -1481,12 +1541,12 @@ class Contact_Query extends Table_Query {
 					break;
 				case 'marketable':
 
-					if ( $value === true || $value === 'yes' ){
+					if ( $value === true || $value === 'yes' ) {
 						self::marketable( $where );
 						break;
 					}
 
-					if ( $value === false || $value === 'no' ){
+					if ( $value === false || $value === 'no' ) {
 						self::not_marketable( $where );
 						break;
 					}
@@ -1680,7 +1740,7 @@ class Contact_Query extends Table_Query {
 
 					break;
 				default:
-					if ( $where->query->db_table->has_column( $query_var ) ){
+					if ( $where->query->db_table->has_column( $query_var ) ) {
 						$where->equals( $query_var, $value );
 					}
 					break;
@@ -1821,7 +1881,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		// Already joined tags, so use a sub query
-		if ( $where->hasCondition( 'tags' ) ){
+		if ( $where->hasCondition( 'tags' ) ) {
 
 			$tagQuery = new Table_Query( 'tag_relationships' );
 			$tagQuery->setSelect( 'contact_id' );
