@@ -13,6 +13,7 @@ use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\Cli\doing_cli;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
@@ -2033,7 +2034,7 @@ abstract class DB {
 	 */
 	public function drop() {
 
-		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) && ! doing_cli() ) {
 			exit;
 		}
 
