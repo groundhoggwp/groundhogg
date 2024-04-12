@@ -1858,6 +1858,11 @@ function get_csv_delimiter( $file_path ) {
  * @return int
  */
 function count_csv_rows( $file_path ) {
+
+    if ( ! file_exists( $file_path ) ){
+        return 0;
+    }
+
 	$file = new \SplFileObject( $file_path, 'r' );
 
     $rows = 0;
@@ -6426,7 +6431,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[0][] = [
 			'type'    => 'optin_status',
 			'compare' => 'in',
-			'value'   => ensure_array( $query['optin_status'] )
+			'value'   => wp_parse_id_list( $query['optin_status'] )
 		];
 	}
 
@@ -6435,7 +6440,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[0][] = [
 			'type'    => 'optin_status',
 			'compare' => 'not_in',
-			'value'   => wp_parse_id_list( ensure_array( $query['optin_status_exclude'] ) )
+			'value'   => wp_parse_id_list( $query['optin_status_exclude'] )
 		];
 	}
 
@@ -6444,7 +6449,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[0][] = [
 			'type'    => 'owner',
 			'compare' => 'in',
-			'value'   => wp_parse_id_list( ensure_array( $query['owner'] ) )
+			'value'   => wp_parse_id_list( $query['owner'] )
 		];
 	}
 
@@ -6454,7 +6459,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			'type'     => 'tags',
 			'compare'  => 'includes',
 			'compare2' => isset_not_empty( $query, 'tags_include_needs_all' ) ? 'any' : 'all',
-			'tags'     => wp_parse_id_list( ensure_array( $query['tags_include'] ) )
+			'tags'     => wp_parse_id_list( $query['tags_include'] )
 		];
 	}
 
@@ -6464,7 +6469,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			'type'     => 'tags',
 			'compare'  => 'excludes',
 			'compare2' => isset_not_empty( $query, 'tags_excludes_needs_all' ) ? 'any' : 'all',
-			'tags'     => wp_parse_id_list( ensure_array( $query['tags_exclude'] ) ),
+			'tags'     => wp_parse_id_list( $query['tags_exclude'] ),
 		];
 	}
 
