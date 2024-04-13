@@ -736,4 +736,9 @@
 
   })
 
+  // Column presets
+  $(()=>{
+
+  })
+
 } )(jQuery)

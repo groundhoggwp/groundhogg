@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
@@ -7420,15 +7421,17 @@ function clear_pending_events_by_step_type( $type, $contact = false ) {
 		return false;
 	}
 
-	return event_queue_db()->query( [
-		'operation' => 'DELETE',
-		'where'     => [
-			[ 'step_id', 'IN', wp_parse_id_list( wp_list_pluck( $steps, 'ID' ) ) ],
-			[ 'event_type', '=', Event::FUNNEL ],
-			[ 'status', '=', Event::WAITING ],
-			[ 'contact_id', '=', $contact->get_id() ]
-		]
-	] );
+    $query = new Table_Query( 'event_queue' );
+    $join = $query->addJoin( 'LEFT',  'steps' )->onColumn( 'ID', 'step_id' );
+
+    $query->where()
+          ->equals( "$join->alias.step_type", $type )
+//          ->equals( "$join->alias.step_status", 'active' )
+          ->equals( 'event_type', Event::FUNNEL )
+          ->equals( 'status', Event::WAITING )
+          ->equals( 'contact_id', $contact->get_id() );
+
+	return $query->delete();
 }
 
 /**

@@ -461,6 +461,12 @@
     },
 
     types: {
+      unsubscribed: {
+        icon: icons.bell,
+        render: () => {
+          return __( 'Unsubscribed' )
+        }
+      },
       wp_fusion: {
         icon: icons.wp_fusion,
         iconFramed: false,

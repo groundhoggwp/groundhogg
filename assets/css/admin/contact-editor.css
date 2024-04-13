@@ -317,6 +317,9 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) img {
   max-width: 100%;
 }
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).unsubscribed {
+  background-color: #e91f4f;
+}
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
 }

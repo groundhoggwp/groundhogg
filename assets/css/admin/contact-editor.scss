@@ -384,6 +384,10 @@ code.meta-replacement-code {
         max-width: 100%;
       }
 
+      &.unsubscribed{
+        background-color: $error-red;
+      }
+
       &.page-visit{
         background: $primary-dark;
       }
