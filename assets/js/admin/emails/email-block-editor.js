@@ -4817,6 +4817,15 @@
       bodyStyle.backgroundColor = backgroundColor
     }
 
+    // For the a tags
+    let {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      fontStyle: aFontStyle,
+      ...aStyle
+    } = fillFontStyle(a)
+
     // language=CSS
     return `
         ${ getTemplateMceCSS() }
@@ -4829,10 +4838,7 @@
         }
 
         a {
-            ${ fontStyle({
-                ...p,
-                ...a,
-            }) }
+            ${ objectToStyle(aStyle) }
         }
 
         b, strong {
@@ -4873,6 +4879,10 @@
     ...style,
   } )
 
+  const fontStyle = style => {
+    return objectToStyle(fillFontStyle(style))
+  }
+
   const fillFontStyle = ({ use = 'custom', color = '', fontFamily = '', fontSize = 16, ...style }) => {
 
     // global font
@@ -4893,10 +4903,6 @@
       fontSize: `${ fontSize }px`,
       fontFamily: removeQuotes(fontFamily),
     }
-  }
-
-  const fontStyle = style => {
-    return objectToStyle(fillFontStyle(style))
   }
 
   /**
@@ -5255,7 +5261,7 @@
     inlineStyle(doc, 'h1', h1)
     inlineStyle(doc, 'h2', h2)
     inlineStyle(doc, 'h3', h3)
-    inlineStyle(doc, 'a', a)
+    inlineStyle(doc, 'a', a, false)
 
     inlineStyle(doc, 'b,strong', {
       fontWeight: 'bold',
@@ -5359,6 +5365,8 @@
         TagFontControlGroup(__('Links'), 'a', a, usurpUpdateBlock, {
           fontSize: false,
           lineHeight: false,
+          fontWeight: false,
+          fontStyle: false
         }),
         TagFontControlGroup(__('Heading 1'), 'h1', h1, usurpUpdateBlock),
         TagFontControlGroup(__('Heading 2'), 'h2', h2, usurpUpdateBlock),
