@@ -323,11 +323,11 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending) {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
   border: 2px solid #f58115;
   background-color: white;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending).pending {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark.pending {
   border: none;
   background-color: #f58115;
 }
