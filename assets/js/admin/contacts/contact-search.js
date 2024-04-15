@@ -54,6 +54,11 @@
     window.location.href = ContactSearch.url + '&saved_search=' + search
   }
 
+  const {
+    Div,
+    Button,
+  } = MakeEl
+
   let abortHandler
 
   const SearchApp = {
@@ -736,8 +741,94 @@
 
   })
 
+  /**
+   * Returns true if at least one column is hidden
+   *
+   * @param columns
+   * @returns {*}
+   */
+  const columnIsHidden = columns => columns.some( column => {
+    return ! document.getElementById( `${column}-hide` ).checked
+  })
+
+  /**
+   * Check all these columns
+   *
+   * @param columns
+   */
+  const checkAll = columns => columns.forEach( column => {
+
+    let el = document.getElementById( `${column}-hide` )
+
+    if ( ! el.checked ){
+      el.click()
+    }
+  })
+
+  /**
+   * Uncheck all these columns
+   *
+   * @param columns
+   */
+  const uncheckAll = columns => columns.forEach( column => {
+    let el = document.getElementById( `${column}-hide` )
+    if ( el.checked ){
+      el.click()
+    }
+  })
+
   // Column presets
   $(()=>{
+
+    const PresetsBar = () => Div({
+      id: 'presets-bar',
+      className: 'display-flex gap-10 wrap',
+    }, [
+      Button({
+        id: 'select-all-columns',
+        className: 'gh-button secondary small',
+        type: 'button',
+        onClick: e => {
+          document.querySelectorAll( '.hide-column-tog' ).forEach( el => {
+            if ( ! el.checked ){
+              el.click()
+            }
+          })
+        }
+      }, __('Show All')),
+      Button({
+        id: 'unselect-all-columns',
+        className: 'gh-button secondary small',
+        type: 'button',
+        onClick: e => {
+          document.querySelectorAll( '.hide-column-tog' ).forEach( el => {
+            if ( el.checked ){
+              el.click()
+            }
+          })
+        }
+      }, __('Hide All')),
+    ...ContactSearch.presets.map(preset => Button({
+        id: `toggle-${ preset.id }`,
+        type: 'button',
+        className: `gh-button ${ columnIsHidden( preset.columns ) ? 'secondary' : 'primary' } small`,
+        onClick: e => {
+
+          if ( columnIsHidden( preset.columns ) ){
+            checkAll( preset.columns )
+          } else {
+            uncheckAll( preset.columns )
+          }
+
+        },
+      }, preset.name)),
+    ])
+
+    const morphPresets = () => morphdom( document.getElementById( 'presets-bar' ), PresetsBar() )
+
+    document.querySelector('fieldset.metabox-prefs').insertAdjacentElement('afterend', PresetsBar())
+
+    $('input.hide-column-tog').on('change', e => morphPresets() )
 
   })
 

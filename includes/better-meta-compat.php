@@ -414,10 +414,24 @@ add_action( 'groundhogg/replacements/init', __NAMESPACE__ . '\add_custom_propert
  */
 function register_contact_property_table_columns( $columns ) {
 
-	$custom_fields = Properties::instance()->get_fields();
+	$groups = Properties::instance()->get_groups();
 
-	foreach ( $custom_fields as $i => $custom_field ) {
-		$columns::register( $custom_field['id'], $custom_field['label'], __NAMESPACE__ . '\display_custom_field_column_callback', "cm.{$custom_field['name']}", 100 + absint( get_array_var( $custom_field, 'order', $i ) ) );
+	foreach ( $groups as $i => $group ) {
+
+		$columns::register_preset( 'g-' . $group['id'], $group['name'] );
+
+		$custom_fields = Properties::instance()->get_fields( $group['id'] );
+
+		foreach ( $custom_fields as $y => $custom_field ) {
+			$columns::register( $custom_field['id'],
+				$custom_field['label'],
+				__NAMESPACE__ . '\display_custom_field_column_callback',
+				"cm.{$custom_field['name']}",
+				( 100 * ( $i + 1 ) ) + absint( get_array_var( $custom_field, 'order', $y ) ),
+				'view_contacts',
+				'g-' . $custom_field['group']
+			);
+		}
 	}
 }
 
