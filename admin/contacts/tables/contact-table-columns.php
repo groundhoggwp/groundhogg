@@ -161,7 +161,7 @@ class Contact_Table_Columns {
 			$columns = array_map( function ( $column ){
                 return $column['id'];
             }, array_filter( self::$columns, function ( $column ) use ( $id ) {
-				return is_string( $column['preset'] ) ? $column['preset'] === $id : in_array( $id, $column['preset'] );
+				return current_user_can( $column[ 'capability' ] ) && is_string( $column['preset'] ) ? $column['preset'] === $id : in_array( $id, $column['preset'] );
             } ) );
 
             if ( empty( $columns ) ){

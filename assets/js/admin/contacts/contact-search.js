@@ -786,7 +786,7 @@
     }, [
       Button({
         id: 'select-all-columns',
-        className: 'gh-button secondary small',
+        className: 'gh-button grey small',
         type: 'button',
         onClick: e => {
           document.querySelectorAll( '.hide-column-tog' ).forEach( el => {
@@ -798,7 +798,7 @@
       }, __('Show All')),
       Button({
         id: 'unselect-all-columns',
-        className: 'gh-button secondary small',
+        className: 'gh-button grey small',
         type: 'button',
         onClick: e => {
           document.querySelectorAll( '.hide-column-tog' ).forEach( el => {

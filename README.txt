@@ -350,12 +350,14 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.3.3 (2024-03-26) =
+* ADDED Column preset buttons for easier column management in the contacts list.
 * ADDED A better way to handle all the different mailer handlers with the `gh_mail()` function.
 * ADDED Some WP CLI tooling which will be improved on and documented at a later date.
 * ADDED Tools to generate fake data for funnels, broadcasts, and contacts.
 * TWEAKED Funnel timers will calculate delay time based on the enqueued time rather than the current time.
 * TWEAKED No longer use `p` style for `a` tags in the email editor.
 * TWEAKED Replacement codes for custom date fields will output `Y-m-d` or `Y-m-d H:i:s` format by default so that they are easier to use in other functions. You can use the `{date}` or `{local_date}` replacement codes to format your dates.
+* TWEAKED Column checkbox toggle order is now more consistent.
 * FIXED Emails not preloading in contact activity timeline.
 * FIXED Removed a bunch of unused files and code.
 * FIXED Notes not being added from funnels when the content is exactly the same as a previous note.
