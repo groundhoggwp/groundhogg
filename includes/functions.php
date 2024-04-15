@@ -7422,10 +7422,11 @@ function clear_pending_events_by_step_type( $type, $contact = false ) {
 	}
 
     $query = new Table_Query( 'event_queue' );
-    $join = $query->addJoin( 'LEFT',  'steps' )->onColumn( 'ID', 'step_id' );
+    $join = $query->addJoin( 'LEFT',  'steps' );
+    $join->onColumn( 'ID', 'step_id' );
 
     $query->where()
-          ->equals( "$join->alias.step_type", $type )
+          ->equals( "{$join->alias}.step_type", $type )
 //          ->equals( "$join->alias.step_status", 'active' )
           ->equals( 'event_type', Event::FUNNEL )
           ->equals( 'status', Event::WAITING )
