@@ -362,6 +362,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Removed a bunch of unused files and code.
 * FIXED Notes not being added from funnels when the content is exactly the same as a previous note.
 * FIXED WYSIWYG Editor in text block gets large when editing CSS.
+* FIXED Fatal error in PHP 8+ if no log ID in Email_Logger.
 
 = 3.3.2 (2024-03-05) =
 * ADDED 4x per day the queue will be "cleaned" and events that failed to process within the last 6 hours will be fixed.
