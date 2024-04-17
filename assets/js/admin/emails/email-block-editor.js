@@ -724,9 +724,7 @@
    * @param campaigns
    */
   const setCampaigns = campaigns => {
-    State.email.campaigns = [
-      ...campaigns,
-    ]
+    State.email.campaigns = campaigns.map( id => CampaignsStore.get( id ) )
 
     State.changes.campaigns = [
       ...campaigns,

@@ -937,7 +937,7 @@
 
       let promises = [
         // Preload activities
-        ...activities.filter(a => a.type === 'activity' && a.hasOwnProperty( 'preload' ) ).
+        ...activities.filter(a => a.type === 'activity' && this.types[a.data.activity_type].hasOwnProperty( 'preload' ) ).
           map(a => this.types[a.data.activity_type]?.preload(a)),
 
         // events with funnel IDs
