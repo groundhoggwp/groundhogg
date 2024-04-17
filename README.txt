@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.3.3
+Stable tag: 3.3.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.3.3 (2024-03-26) =
+= 3.3.3.1 (2024-04-17) =
+* FIXED Fatal error in the contact list view for lower permission users.
+
+= 3.3.3 (2024-04-15) =
 * ADDED Column preset buttons for easier column management in the contacts list.
 * ADDED A better way to handle all the different mailer handlers with the `gh_mail()` function.
 * ADDED Some WP CLI tooling which will be improved on and documented at a later date.
