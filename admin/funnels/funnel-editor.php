@@ -167,7 +167,7 @@ function render_draggable_step_grid( $steps ) {
 				'type'  => 'button',
 			], dashicon( 'admin-settings' ) );
 
-			echo html()->toggle( [
+			echo html()->bigToggle( [
 				'name'    => 'funnel_status',
 				'id'      => 'status-toggle',
 //					'class'   => 'big-toggle',

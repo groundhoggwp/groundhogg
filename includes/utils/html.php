@@ -1510,7 +1510,7 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function toggle( $args = [] ) {
+	public function bigToggle( $args = [] ) {
 		$a = shortcode_atts( array(
 			'name'       => '',
 			'id'         => '',
@@ -1546,6 +1546,38 @@ class HTML {
 		);
 
 		return apply_filters( 'groundhogg/html/toggle', $html, $a );
+	}
+
+	/**
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function toggle( $args = [] ) {
+
+		$args = wp_parse_args( $args, [
+			'onLabel'  => __( 'On' ),
+			'offLabel' => __( 'Off' ),
+			'checked'  => false,
+			'name'     => '',
+			'value'    => 1,
+			'id'
+		] );
+
+		return html()->e( 'label', [
+			'class' => 'gh-switch'
+		], [
+			html()->input( [
+				'type'    => 'checkbox',
+				'id'      => $args['id'],
+				'name'    => $args['name'],
+				'value'   => $args['value'],
+				'checked' => $args['checked'],
+			] ),
+            html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
+            html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
+            html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
+		] );
 	}
 
 	/**
