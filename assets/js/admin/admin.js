@@ -532,7 +532,17 @@
     return utf8_to_b64(JSON.stringify(stuff)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')
   }
 
+  const assoc2array = (obj, a = 'id', b = 'text') => {
+    let array = []
+    Object.keys(obj).forEach(key => {
+      array.push({ [a]: key, [b]: obj[key] })
+    })
+
+    return array
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
+  gh.functions.assoc2array = assoc2array
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
