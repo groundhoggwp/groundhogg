@@ -483,7 +483,10 @@
       ]),
       display: ({ compare = 'is', date_range, after, before, days = 0, ...rest }) => {
 
-        let prefix = bold(name)
+        let prefix = display( rest )
+        if ( ! prefix || prefix.length === 0 ){
+          prefix = bold( name )
+        }
 
         if ( compare === 'is_not' ){
           prefix += ' is not'

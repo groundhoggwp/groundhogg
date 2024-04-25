@@ -16,6 +16,10 @@
   } = Groundhogg.pickers
 
   const {
+    assoc2array
+  } = Groundhogg.functions
+
+  const {
     broadcasts: BroadcastsStore,
     emails: EmailsStore,
     tags: TagsStore,
@@ -44,6 +48,7 @@
     createStringFilter,
     createNumberFilter,
     createTimeFilter,
+    unsubReasons
   } = Groundhogg.filters
 
   const {
@@ -1063,18 +1068,39 @@
       },
     })
 
-  registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
-    view (filter) {
-      return standardActivityDateTitle(
-        `<b>${ __('Unsubscribed', 'groundhogg') }</b>`, filter)
-    }, edit (filter) {
-      return standardActivityDateOptions(filter)
-    }, onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    }, defaults: {
-      ...standardActivityDateDefaults,
-    },
-  })
+
+
+  ContactFilterRegistry.registerFilter(createPastDateFilter('unsubscribed', __('Unsubscribed', 'groundhogg'), 'activity', {
+    edit: ({ reasons = [], updateFilter }) => Fragment([
+      ItemPicker({
+        id: 'unsub-reasons',
+        placeholder: __('Search', 'groundhogg'),
+        fetchOptions: async (s) => assoc2array( unsubReasons ),
+        selected: reasons.map( reason => ({ id: reason, text: unsubReasons[reason] ?? reason })),
+        onChange: items => {
+          let reasons = items.map(({ id }) => id)
+          console.log(reasons)
+          updateFilter({
+            reasons,
+          })
+        },
+      }),
+    ]),
+    display: ({ reasons = [] }) => sprintf( 'Unsubscribed %s', orList( reasons.map( r => bold( unsubReasons[r] ?? r ) ) ) ),
+  }))
+
+  // registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
+  //   view (filter) {
+  //     return standardActivityDateTitle(
+  //       `<b>${ __('Unsubscribed', 'groundhogg') }</b>`, filter)
+  //   }, edit (filter) {
+  //     return standardActivityDateOptions(filter)
+  //   }, onMount (filter, updateFilter) {
+  //     standardActivityDateFilterOnMount(filter, updateFilter)
+  //   }, defaults: {
+  //     ...standardActivityDateDefaults,
+  //   },
+  // })
 
   registerFilter('optin_status_changed', 'activity',
     __('Opt-in Status Changed', 'groundhogg'), {
