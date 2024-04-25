@@ -22,6 +22,7 @@ use function Groundhogg\get_filters_from_old_query_vars;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\normalize_files;
@@ -223,6 +224,7 @@ class Contacts_Page extends Admin_Page {
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'marketable'                   => $contact->is_marketable(),
+					'unsubReasons'                 => get_unsub_reasons(),
 					'i18n'                         => [
 						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
 					],

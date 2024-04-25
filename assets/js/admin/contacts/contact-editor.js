@@ -1,6 +1,6 @@
 ( ($, editor) => {
 
-  const { contact, meta_exclusions } = editor
+  const { contact, meta_exclusions, unsubReasons } = editor
 
   const { gh_contact_custom_properties } = Groundhogg.filters
 
@@ -25,6 +25,7 @@
     setFrameContent,
     loadingDots,
     spinner,
+    escHTML,
     dialog,
   } = Groundhogg.element
 
@@ -462,9 +463,23 @@
 
     types: {
       unsubscribed: {
-        icon: icons.bell,
-        render: () => {
-          return __( 'Unsubscribed' )
+        icon: icons.brokenHeart,
+        render: ({ meta }) => {
+          let { reason = '', feedback = '' } = meta
+
+          let parts = [
+            __('Unsubscribed', 'groundhogg'),
+          ]
+
+          if (reason.length) {
+            parts.push(`; ${ bold( escHTML(unsubReasons[reason] ?? reason )) }`)
+          }
+
+          if (feedback.length) {
+            parts.push(`<div class="contact-input">"${ escHTML(feedback) }"</div>`)
+          }
+
+          return parts.join('')
         }
       },
       wp_fusion: {
@@ -937,7 +952,7 @@
 
       let promises = [
         // Preload activities
-        ...activities.filter(a => a.type === 'activity' && this.types[a.data.activity_type].hasOwnProperty( 'preload' ) ).
+        ...activities.filter(a => a.type === 'activity' && this.types[a.data.activity_type]?.hasOwnProperty('preload')).
           map(a => this.types[a.data.activity_type]?.preload(a)),
 
         // events with funnel IDs
@@ -999,6 +1014,7 @@
                                   funnel: __('Funnel Activity', 'groundhogg'),
                                   email: __('Email Activity', 'groundhogg'),
                                   web: __('Web Activity', 'groundhogg'),
+                                  form: __('Form Submissions', 'groundhogg'),
                                   ...isWPFusionActive ? {
                                       wp_fusion: __('WPFusion Activity',
                                               'groundhogg'),

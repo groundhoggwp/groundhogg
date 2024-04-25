@@ -2,14 +2,17 @@
 
 namespace Groundhogg\Admin\Contacts\Tables;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Tag;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_gh_page_screen_id;
+use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
@@ -277,6 +280,61 @@ class Contact_Table_Columns {
 		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11, 'view_contacts', 'defaults' );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
+
+		self::register_preset( 'unsub', __( 'Unsubscribe', 'groundhogg' ) );
+
+		self::register( 'date_unsubscribed', __( 'Unsubscribed', 'groundhogg' ), function ( Contact $contact ) {
+            if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+                return '';
+            }
+
+            $activity = new Activity([
+               'activity_type' => Activity::UNSUBSCRIBED,
+               'contact_id' => $contact->ID
+            ]);
+
+            if ( ! $activity->exists() ){
+                $date = new DateTimeHelper( $contact->date_optin_status_changed );
+            } else {
+                $date = new DateTimeHelper( $activity->get_timestamp() );
+            }
+
+			return $date->wpDateTimeFormat();
+		}, 'date_optin_status_changed', 90, 'view_contacts', 'unsub' );
+
+		self::register( 'unsub_reason', __( 'Unsub Reason', 'groundhogg' ), function ( Contact $contact ) {
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+				return '';
+			}
+
+			$activity = new Activity([
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id' => $contact->ID
+			]);
+
+			if ( ! $activity->exists() ){
+				return '';
+			}
+
+			return esc_html( get_array_var( get_unsub_reasons(), $activity->get_meta( 'reason' ) ) );
+		}, false, 91, 'view_contacts', 'unsub' );
+
+		self::register( 'unsub_feedback', __( 'Unsub Feedback', 'groundhogg' ), function ( Contact $contact ) {
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+				return '';
+			}
+
+			$activity = new Activity([
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id' => $contact->ID
+			]);
+
+			if ( ! $activity->exists() ){
+				return '';
+			}
+
+			return esc_html( $activity->get_meta( 'feedback' ) );
+		}, false, 92, 'view_contacts', 'unsub' );
 	}
 
 	# =============== COLUMN CALLBACKS FOR CORE COLUMNS =============== #

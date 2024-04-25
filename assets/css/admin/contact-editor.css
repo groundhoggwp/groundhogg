@@ -274,6 +274,14 @@ code.meta-replacement-code {
   margin-bottom: 4px;
   word-break: break-word;
 }
+#activity-timeline li.activity-item .contact-input {
+  padding: 5px 10px;
+  background-color: rgba(16, 38, 64, 0.05);
+  font-size: 14px;
+  border-radius: 5px;
+  margin-top: 5px;
+  width: fit-content;
+}
 #activity-timeline li.activity-item .event-extra,
 #activity-timeline li.activity-item .diff-time {
   color: rgba(16, 38, 64, 0.5);

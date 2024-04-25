@@ -215,15 +215,25 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_unsubscribed( $filter, Where $where ) {
 
-		// Don't reference activity table
-		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) ) {
+		$filter = wp_parse_args( $filter, [
+			'reasons' => []
+		] );
+
+		// Simple, use date_optin_status_changed
+		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) && empty( $filter['reasons' ] ) ) {
 			$where->equals( 'optin_status', Preferences::UNSUBSCRIBED );
 			Filters::mysqlDateTime( 'date_optin_status_changed', $filter, $where );
 
 			return;
 		}
 
-		self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
+		$activityQuery = self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
+
+		// Filter by reason as well
+		if ( ! empty( $filter['reasons'] ) ){
+			$metaAlias = $activityQuery->joinMeta( 'reason' );
+			$activityQuery->where()->in( "COALESCE($metaAlias.meta_value,'')", array_map( 'sanitize_key', $filter['reasons'] ) );
+		}
 	}
 
 	/**
@@ -1031,7 +1041,7 @@ class Contact_Query extends Table_Query {
 	 * @param Where        $where
 	 * @param string|array $activity_type
 	 *
-	 * @return void
+	 * @return Table_Query
 	 */
 	public static function basic_activity_filter( $activity_type, $filter, Where $where ) {
 
@@ -1085,6 +1095,8 @@ class Contact_Query extends Table_Query {
 		$join->onColumn( 'contact_id' );
 
 		$where->compare( "COALESCE($alias.activities,0)", $filter['count'], $filter['count_compare'] );
+
+		return $activityQuery;
 	}
 
 	/**
