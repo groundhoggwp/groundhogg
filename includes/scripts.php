@@ -537,7 +537,8 @@ class Scripts {
 					'current'                      => get_request_var( 'filters', [] ),
 					'roles'                        => get_editable_roles(),
 					'countries'                    => utils()->location->get_countries_list(),
-					'gh_contact_custom_properties' => Properties::instance()->get_all()
+					'gh_contact_custom_properties' => Properties::instance()->get_all(),
+					'unsubReasons'                 => get_unsub_reasons(),
 				],
 				'managed_page'     => [
 					'root' => managed_page_url()
