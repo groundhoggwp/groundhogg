@@ -2299,6 +2299,10 @@
       classes.push('hide-on-desktop')
     }
 
+    if (block.hide_in_browser) {
+      classes.push('hide-in-browser')
+    }
+
     return Div({
       id: `edit-${ block.id }`,
       className: `builder-block ${ isActiveBlock(block.id) ? 'is-editing' : '' }`,
@@ -2908,6 +2912,14 @@
               })
             },
           }) : null,
+          `<hr/>`,
+          Control({
+            label: 'Hide in browser view',
+          }, Toggle({
+            id: 'hide-in-browser',
+            checked: getActiveBlock().hide_in_browser || false,
+            onChange: e => updateBlock({ hide_in_browser: e.target.checked }),
+          })),
         ]),
       ControlGroup({ name: 'Custom CSS' }, [
         Textarea({
@@ -7637,6 +7649,7 @@
     block.advancedStyle = AdvancedStyleControls.parse(el)
     block.hide_on_mobile = el.classList.contains('hide-on-mobile')
     block.hide_on_desktop = el.classList.contains('hide-on-desktop')
+    block.hide_in_browser = el.classList.contains('hide-in-browser')
 
     return block
   }
