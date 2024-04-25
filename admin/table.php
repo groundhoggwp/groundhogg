@@ -154,6 +154,11 @@ abstract class Table extends \WP_List_Table {
 	 * @return string
 	 */
 	protected function create_row_action( $class, $url, $display ) {
+
+		if ( empty( $url ) ){
+			return html()->e( 'span', [ 'class' => $class ], $display );
+		}
+
 		return html()->wrap( html()->e( 'a', [ 'href' => $url ], $display ), 'span', [ 'class' => $class ] );
 	}
 

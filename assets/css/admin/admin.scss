@@ -586,11 +586,12 @@ label.block {
   overflow: hidden;
 }
 
-.gh-switch {
+label.gh-switch {
   position: relative;
   display: inline-block;
   width: 50px;
   height: 20px;
+  padding: 0 !important;
 
   input {
     opacity: 0;

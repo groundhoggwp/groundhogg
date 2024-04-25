@@ -2,10 +2,12 @@
 
 namespace Groundhogg\Admin\Tags;
 
+use Groundhogg\Admin\Table;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Tag;
 use WP_List_Table;
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
@@ -32,7 +34,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class Tags_Table extends WP_List_Table {
+class Tags_Table extends Table {
 	/**
 	 * TT_Example_List_Table constructor.
 	 *
@@ -69,7 +71,7 @@ class Tags_Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
 			'tag_name'        => array( 'tag_name', false ),
-			'tag_description' => array( 'tag_description', false ),
+//			'tag_description' => array( 'tag_description', false ),
 			'contacts' => array( 'contacts', false ),
 		);
 
@@ -117,23 +119,7 @@ class Tags_Table extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $tag, $column_name ) {
-
 		return do_action( "groundhogg/admin/tags/table/{$column_name}", $tag );
-
-	}
-
-
-	/**
-	 * @param  $tag Tag A singular item (one full row's worth of data).
-	 *
-	 * @return string Text to be placed inside the column <td>.
-	 */
-	protected function column_cb( $tag ) {
-		return sprintf(
-			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$tag->get_id()               // The value of the checkbox should be the record's ID.
-		);
 	}
 
 	/**
@@ -145,6 +131,48 @@ class Tags_Table extends WP_List_Table {
 		);
 
 		return apply_filters( 'wpgh_contact_tag_bulk_actions', $actions );
+	}
+
+	function get_table_id() {
+		return 'tags';
+	}
+
+	function get_db() {
+		return get_db( 'tags' );
+	}
+
+	/**
+	 * @param $item Tag
+	 * @param $column_name
+	 * @param $primary
+	 *
+	 * @return array[]
+	 */
+	protected function get_row_actions( $item, $column_name, $primary ) {
+		return [
+			[
+				'display' => 'ID: ' . $item->get_id(),
+				'url'     => false
+			],
+			[
+				'class'   => 'edit',
+				'display' => __( 'Edit' ),
+				'url'     => $item->admin_link()
+			],
+			[
+				'class'   => 'trash',
+				'display' => __( 'Delete' ),
+				'url'     => action_url( 'delete', [ 'tag' => $item->get_id() ] )
+			]
+		];
+	}
+
+	protected function get_views_setup() {
+		return [];
+	}
+
+	function get_default_query() {
+		return [];
 	}
 
 	/**
@@ -172,29 +200,29 @@ class Tags_Table extends WP_List_Table {
 		$order    = strtoupper( get_url_var( 'order', 'DESC' ) );
 		$orderby  = get_url_var( 'orderby', 'tag_id' );
 
-        $query = new Table_Query( 'tags' );
-        $query->setLimit( $per_page )
-              ->setOffset( $offset )
-              ->setOrder( $order)
-              ->setOrderby( $orderby )
-              ->setFoundRows( true );
+		$query = new Table_Query( 'tags' );
+		$query->setLimit( $per_page )
+		      ->setOffset( $offset )
+		      ->setOrder( $order )
+		      ->setOrderby( $orderby )
+		      ->setFoundRows( true );
 
-        if ( $search ){
-            $query->where()->subWhere()
-                           ->contains( 'tag_name', $search )
-                           ->contains( 'tag_slug', $search )
-                           ->contains( 'tag_description', $search );
-        }
+		if ( $search ) {
+			$query->where()->subWhere()
+			      ->contains( 'tag_name', $search )
+			      ->contains( 'tag_slug', $search )
+			      ->contains( 'tag_description', $search );
+		}
 
-        if ( $orderby === 'contacts' ){
+		if ( $orderby === 'contacts' ) {
 
-	        $tagRelQuery = new Table_Query('tag_relationships');
-	        $tagRelQuery->setSelect( 'tag_id', ['COUNT(contact_id)', 'contacts' ] )
-	                    ->setGroupby('tag_id');
+			$tagRelQuery = new Table_Query( 'tag_relationships' );
+			$tagRelQuery->setSelect( 'tag_id', [ 'COUNT(contact_id)', 'contacts' ] )
+			            ->setGroupby( 'tag_id' );
 
-            $query->addJoin( 'LEFT', [ $tagRelQuery, 'relationships' ] )->onColumn( 'tag_id', 'tag_id' );
-            $query->setOrderby( 'relationships.contacts' );
-        }
+			$query->addJoin( 'LEFT', [ $tagRelQuery, 'relationships' ] )->onColumn( 'tag_id', 'tag_id' );
+			$query->setOrderby( 'relationships.contacts' );
+		}
 
 		$items = $query->get_objects( Tag::class );
 		$total = $query->get_found_rows();
@@ -210,43 +238,5 @@ class Tags_Table extends WP_List_Table {
 			'per_page'    => $per_page,
 			'total_pages' => $total_pages,
 		) );
-	}
-
-	/**
-	 * Generates and displays row actions.
-	 *
-	 * @param        $tag         Tag      Contact being acted upon.
-	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
-	 *
-	 * @return string Row steps output for posts.
-	 */
-	protected function handle_row_actions( $tag, $column_name, $primary ) {
-		if ( $primary !== $column_name ) {
-			return '';
-		}
-
-		$actions = array();
-		$title   = $tag->get_name();
-
-		$actions['id'] = 'ID: ' . $tag->get_id();
-
-		$actions['edit'] = sprintf(
-			'<a href="%s" class="editinline" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() ),
-			esc_attr( sprintf( __( 'Edit' ), $title ) ),
-			__( 'Edit' )
-		);
-
-		$actions['delete'] = sprintf(
-			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url( admin_url( 'admin.php?page=gh_tags&tag=' . $tag->get_id() . '&action=delete' ) ),
-			/* translators: %s: title */
-			esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
-			__( 'Delete' )
-		);
-
-		return $this->row_actions( $actions );
 	}
 }
