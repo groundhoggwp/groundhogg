@@ -106,7 +106,6 @@ class Tracking {
 		add_action( 'template_redirect', [ $this, 'handle_failsafe_tracking' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
-		add_action( 'groundhogg/contact/preferences/unsubscribed', [ $this, 'contact_unsubscribed' ], 10, 1 );
 
 		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
 
@@ -875,22 +874,4 @@ class Tracking {
 	public function form_filled( $contact ) {
 		$this->start_tracking( $contact );
 	}
-
-	/**
-	 * Track the activity if the contact unsubscribed
-	 *
-	 * @param $contact_id
-	 */
-	public function contact_unsubscribed( $contact_id ) {
-
-		$contact = get_current_contact();
-
-		// Check if the current tracked contact is also that is being unsubscribed
-		if ( ! is_a_contact( $contact ) || $contact->get_id() !== $contact_id || ! $this->get_current_event() ) {
-			return;
-		}
-
-		track_live_activity( Activity::UNSUBSCRIBED );
-	}
-
 }
