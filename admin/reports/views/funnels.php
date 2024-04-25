@@ -50,7 +50,15 @@ else: ?>
 		</div>
 		<div class="gh-panel span-12">
 			<div class="gh-panel-header">
-				<h2 class="title"><?php _e( 'All Funnel Performance', 'groundhogg' ); ?></h2>
+				<h2 class="title">
+                    <?php _e( 'All Funnel Performance', 'groundhogg' ); ?>
+                    <span class="gh-has-tooltip dashicons dashicons-info">
+                    <span class="gh-tooltip top">
+                        <?php _e( '<b>Added:</b> The number of contacts that were added to the funnel.', 'groundhogg' ) ?><br/><br/>
+                        <?php _e( '<b>Active:</b> The number of contacts that were completed any step within the funnel during the time range.', 'groundhogg' ) ?>
+                    </span>
+                </span>
+                </h2>
 			</div>
 			<div id="table_all_funnels_performance"></div>
 		</div>

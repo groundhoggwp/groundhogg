@@ -26,7 +26,8 @@ namespace Groundhogg\Admin\Reports\Views;
 	quick_stat_report( [
 		'id'    => 'total_engaged_contacts',
 		'title' => __( 'Engaged Contacts', 'groundhogg' ),
-		'class' => 'span-3'
+		'class' => 'span-3',
+		'info' => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
 	] );
 	quick_stat_report( [
 		'id'    => 'total_unsubscribed_contacts',
