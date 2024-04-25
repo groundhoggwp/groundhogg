@@ -8,7 +8,7 @@ namespace Groundhogg\Notices;
  * @param $url
  * @param $notice
  */
-function wp_redirect_with_notice( $url, $notice ){
+function redirect_with_notice( $url, $notice ){
 	die( wp_safe_redirect( add_query_arg( 'notice', $notice, $url ) ) );
 }
 
@@ -80,6 +80,7 @@ function notice_preferences_link_sent(){
 	</div>
 	<?php
 }
+
 
 function notice_gdpr_email_sent(){
 	?>
