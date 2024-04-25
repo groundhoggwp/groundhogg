@@ -537,7 +537,7 @@
     })
 
     if (typeof GroundhoggNewBroadcast !== 'undefined') {
-      document.getElementById('gh-broadcast-form-inline').append(BroadcastScheduler({
+      document.getElementById('gh-broadcast-form-inline').append( Groundhogg.BroadcastScheduler({
         object: GroundhoggNewBroadcast.email,
         onScheduled: () => {
           window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
@@ -881,7 +881,7 @@
           getState().when === 'later' ? Div({
             className: 'display-flex gap-10 align-center',
           }, [
-            `<p>${ __('Send in the \'s local time?', 'groundhogg') }</p>`,
+            `<p>${ __('Send in the contact\'s local time?', 'groundhogg') }</p>`,
             Toggle({
               id: 'send-in-local',
               checked: getState().send_in_local_time,

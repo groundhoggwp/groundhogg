@@ -3018,6 +3018,58 @@
         `<p>${ __('You can define custom email headers and override existing ones.') }</p>`,
         `<p>${ __('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>') }</p>`,
       ]),
+      ControlGroup({
+        id: 'utm',
+        name: 'UTM Parameters'
+      }, [
+        `<p>${__('Automatically add UTM parameters to all links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.', 'groundhogg' )}</p>`,
+        `<p>${__('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg' )}</p>`,
+        Control({
+          label: 'Campaign Source',
+          stacked: true,
+        }, Input({
+          name: 'utm_source',
+          id: 'utm-source',
+          value: getEmail().meta.utm_source ?? '',
+          onInput: e => setEmailMeta({ utm_source: e.target.value })
+        }) ),
+        Control({
+          label: 'Campaign Medium',
+          stacked: true,
+        }, Input({
+          name: 'utm_medium',
+          id: 'utm-medium',
+          value: getEmail().meta.utm_medium ?? '',
+          onInput: e => setEmailMeta({ utm_medium: e.target.value })
+        }) ),
+        Control({
+          label: 'Campaign Name',
+          stacked: true,
+        }, Input({
+          name: 'utm_campaign',
+          id: 'utm-campaign',
+          value: getEmail().meta.utm_campaign ?? '',
+          onInput: e => setEmailMeta({ utm_campaign: e.target.value })
+        }) ),
+        Control({
+          label: 'Campaign Term',
+          stacked: true,
+        }, Input({
+          name: 'utm_term',
+          id: 'utm-term',
+          value: getEmail().meta.utm_term ?? '',
+          onInput: e => setEmailMeta({ utm_term: e.target.value })
+        }) ),
+        Control({
+          label: 'Campaign Content',
+          stacked: true,
+        }, Input({
+          name: 'utm_content',
+          id: 'utm-content',
+          value: getEmail().meta.utm_content ?? '',
+          onInput: e => setEmailMeta({ utm_content: e.target.value })
+        }) ),
+      ])
     ])
   }
 

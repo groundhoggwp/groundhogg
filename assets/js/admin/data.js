@@ -347,14 +347,22 @@
      */
     async maybeFetchItems (ids = [], opts = {}) {
 
+      // No items requested, return all present items
       if (( !ids || ids.length === 0 ) && this.hasItems()) {
         return this.items
       }
 
+      // All items are present
       if (ids && ids.length > 0 && ids.every(id => this.hasItem(id))) {
         return ids.map(id => this.get(id))
       }
 
+      // Fetch some of the items
+      if ( ! ids || ! ids.length ){
+        return this.fetchItems({}, opts)
+      }
+
+      // Only fetch missing items
       let missingIds = ids.filter(id => !this.hasItem(id))
 
       const params = {

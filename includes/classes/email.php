@@ -714,27 +714,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Convert links to tracking links
-	 *
-	 * @param $content string content which may contain Superlinks
-	 *
-	 * @return string
-	 */
-	public function convert_to_tracking_links( $content ) {
-		/* Filter the links to include data about the email, campaign, and funnel steps... */
-		$content = preg_replace_callback( '/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [
-			$this,
-			'tracking_link_callback'
-		], $content );
-
-		// Also get single quote HTML since that's a thing that can happen.
-		return preg_replace_callback( '/(href=\')(?!mailto)(?!tel)([^"]*)(\')/i', [
-			$this,
-			'tracking_link_callback'
-		], $content );
-	}
-
-	/**
 	 * Get URLs from the content.
 	 * This will only get static URLs, dynamic URLs possibly added by replacement codes will not be retrieved.
 	 *
@@ -748,6 +727,21 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Convert links to tracking links
+	 *
+	 * @param $content string content which may contain Superlinks
+	 *
+	 * @return string
+	 */
+	public function convert_to_tracking_links( $content ) {
+		/* Filter the links to include data about the email, campaign, and funnel steps... */
+		return preg_replace_callback( '/href=["\'](?!mailto)(?!tel)([^"\']*)["\']/i', [
+			$this,
+			'tracking_link_callback'
+		], $content );
+	}
+
+	/**
 	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
 	 *
 	 * @param $matches
@@ -756,11 +750,11 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function tracking_link_callback( $matches ) {
 
-		$clean_url = no_and_amp( html_entity_decode( $matches[2] ) );
+		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
 
 		// If the url is not to be tracked leave it alone.
 		if ( is_url_excluded_from_tracking( $clean_url ) ) {
-			return $matches[1] . $clean_url . $matches[3];
+			return sprintf( 'href="%s"', $clean_url );
 		}
 
 		$local_hostname = wp_parse_url( home_url(), PHP_URL_HOST );
@@ -780,7 +774,58 @@ class Email extends Base_Object_With_Meta {
 
 		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
 
-		return $matches[1] . $tracking_link . $matches[3];
+		return sprintf( 'href="%s"', $tracking_link );
+	}
+
+	/**
+	 * Add UTM params to tracking links
+	 *
+	 * @param $content
+	 *
+	 * @return array|string|string[]|null
+	 */
+	public function maybe_add_utm_to_links( $content ){
+
+		$utm_params = array_filter( [
+			'utm_source' => $this->utm_source,
+			'utm_campaign' => $this->utm_campaign,
+			'utm_content' => $this->utm_content,
+			'utm_term' => $this->utm_term,
+			'utm_medium' => $this->utm_medium,
+		] );
+
+		if ( empty( $utm_params ) ){
+			return $content;
+		}
+
+		$url = untrailingslashit( home_url() );
+
+		return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+			$this,
+			'utm_link_callback'
+		], $content );
+	}
+
+	/**
+	 * Add the utm params to a link
+	 *
+	 * @param array $matches
+	 *
+	 * @return string
+	 */
+	protected function utm_link_callback( $matches ){
+
+		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
+
+		$utm_params = urlencode_deep( array_filter( [
+			'utm_source' => $this->utm_source,
+			'utm_campaign' => $this->utm_campaign,
+			'utm_content' => $this->utm_content,
+			'utm_term' => $this->utm_term,
+			'utm_medium' => $this->utm_medium,
+		] ) );
+
+		return sprintf( 'href="%s"', add_query_arg( $utm_params, $clean_url ) );
 	}
 
 	/**
@@ -837,6 +882,8 @@ class Email extends Base_Object_With_Meta {
 				$content = ob_get_clean();
 				break;
 		}
+
+		$content = $this->maybe_add_utm_to_links( $content );
 
 		// Tracking must be enabled and there must be a valid event to track with
 		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) && $this->event && $this->event->exists() ) {
