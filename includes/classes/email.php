@@ -1364,7 +1364,7 @@ class Email extends Base_Object_With_Meta {
 			}
 
 			if ( ! $contact ) {
-				return parent::get_as_array();
+				$contact = new Contact();
 			}
 
 			$this->set_contact( $contact );

@@ -9,5 +9,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 $email = the_email();
 
 if ( $email->has_columns() ){
-	echo file_get_contents( __DIR__ . '/../assets/responsive.css' );
+	load_css( 'responsive' );
 }

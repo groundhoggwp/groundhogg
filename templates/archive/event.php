@@ -6,6 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
+
 include_once __DIR__ . '/../managed-page.php';
 
 $contact         = get_contactdata();
@@ -55,43 +57,7 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	$email->set_contact( $contact );
 	$email->set_event( $event );
 
-	$subject = $email->get_merged_subject_line();
-
-	managed_page_head( $subject, 'view' );
-
-	?>
-	<div class="box">
-		<h2 class="subject-line"><?php _e( $subject ); ?></h2>
-		<iframe width="100%" id="email-preview"></iframe>
-		<script>
-
-          const setFrameContent = (iframe, content) => {
-            var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
-            iframe.onload = () => {
-              iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 10 + 'px'
-            }
-            iframe.src = URL.createObjectURL(blob)
-          }
-
-          let iframe = document.getElementById('email-preview')
-
-          let email = <?php echo wp_json_encode( $email ); ?>;
-
-          setFrameContent(iframe, email.context.built)
-		</script>
-	</div>
-	<?php
-
-	add_filter( 'groundhogg/managed_page/footer_links', function ( $links ) {
-
-		$links[] = html()->e( 'a', [
-			'href' => managed_page_url( 'archive' )
-		], __( 'Email Archive', 'groundhogg' ) );
-
-		return $links;
-	} );
-
-	managed_page_footer();
+	echo $email->build();
 
 else:
 

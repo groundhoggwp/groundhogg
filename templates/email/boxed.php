@@ -62,8 +62,10 @@ $bodyStyle = array_filter( $bodyStyle );
 		<?php echo $email->get_css() ?>
 	</style>
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
+	<?php load_part( 'head-close' ) ?>
 </head>
 <body class="email responsive template-boxed" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
+<?php load_part( 'body-open' ); ?>
 <?php load_part( 'preview-text' ); ?>
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>

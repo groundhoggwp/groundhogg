@@ -82,6 +82,7 @@ class Campaigns extends DB {
 			'name'        => '%s',
 			'slug'        => '%s',
 			'description' => '%s',
+			'visibility'  => '%s'
 		);
 	}
 
@@ -97,6 +98,7 @@ class Campaigns extends DB {
 			'name'        => '',
 			'slug'        => '',
 			'description' => '',
+			'visibility'  => 'hidden', // public, limited, hidden?
 		);
 	}
 
@@ -142,6 +144,7 @@ class Campaigns extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         slug varchar({$this->get_max_index_length()}) NOT NULL,
+        visibility varchar(20) NOT NULL,
         name mediumtext NOT NULL,
         description text NOT NULL,
         PRIMARY KEY (ID),
