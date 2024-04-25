@@ -573,6 +573,11 @@ abstract class DB {
 	 */
 	public function commit_batch_insert() {
 
+		// Nothing to batch insert
+		if ( empty( $this->batch_inserts ) ){
+			return false;
+		}
+
 		global $wpdb;
 
 		$INSERTS = [];
@@ -1098,12 +1103,12 @@ abstract class DB {
 				case 'include_filters':
 
 					// Parse the filters
-					$where[] = $this->parse_filters( $val );
+//					$where[] = $this->parse_filters( $val );
 
 					break;
 				case 'exclude_filters':
 					// Parse the filters
-					$where[] = 'NOT ( ' . $this->parse_filters( $val ) . ')';
+//					$where[] = 'NOT ( ' . $this->parse_filters( $val ) . ')';
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
@@ -1151,6 +1156,21 @@ abstract class DB {
 	 * @var Filters
 	 */
 	protected $query_filters;
+
+	/**
+	 * Wrapper for Filters::parse_filters()
+	 *
+	 * @throws FilterException
+	 *
+	 * @param Where $where
+	 * @param array $filters
+	 *
+	 * @return void
+	 */
+	public function parse_filters( array $filters, Where $where ){
+		$this->maybe_register_filters();
+		$this->query_filters->parse_filters( $filters, $where );
+	}
 
 	protected function maybe_register_filters() {
 
@@ -1367,17 +1387,14 @@ abstract class DB {
 				case 'filters':
 				case 'include_filters':
 
-					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query->where() );
+					$this->parse_filters( $val, $query->where() );
 
 					break;
 				case 'exclude_filters':
 
-					$this->maybe_register_filters();
-
 					$exclude_query = new Table_Query( $this );
 					$exclude_query->setSelect( $this->get_primary_key() );
-					$this->query_filters->parse_filters( $val, $exclude_query->where() );
+					$this->parse_filters( $val, $exclude_query->where() );
 
 					if ( ! $exclude_query->where->isEmpty() ) {
 						$query->where()->notIn( $this->get_primary_key(), "$exclude_query" );
