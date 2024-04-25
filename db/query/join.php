@@ -7,7 +7,7 @@ use function Groundhogg\get_db;
 
 class Join {
 	// Left or Right
-	public string $table = '';
+	public $table = '';
 	public string $alias = '';
 	public string $direction = '';
 	public Query $query;
@@ -46,7 +46,7 @@ class Join {
 		}
 
 		$this->direction  = $direction;
-		$this->table      = trim( "$table" );
+		$this->table      = $table;
 		$this->alias      = $alias;
 		$this->query      = $query;
 		$this->conditions = new Where( $this->query, 'AND' );
@@ -78,11 +78,13 @@ class Join {
 
 	public function __toString(): string {
 
-		if ( str_starts_with( $this->table, 'SELECT' ) ) {
-			return "$this->direction JOIN ( $this->table ) $this->alias ON $this->conditions";
+		$strTable = trim( "$this->table" );
+
+		if ( str_starts_with( $strTable, 'SELECT' ) ) {
+			return "$this->direction JOIN ( $strTable ) $this->alias ON $this->conditions";
 		}
 
-		return "$this->direction JOIN $this->table $this->alias ON $this->conditions";
+		return "$this->direction JOIN $strTable $this->alias ON $this->conditions";
 	}
 
 	public function __serialize(): array {
