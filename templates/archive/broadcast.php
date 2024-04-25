@@ -24,6 +24,9 @@ if ( ! $email->exists() ) {
 }
 
 $contact = get_contactdata();
+if ( ! $contact ){
+	$contact = new Contact();
+}
 
 $email->set_contact( $contact );
 //$email->set_event( $event );

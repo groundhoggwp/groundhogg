@@ -495,9 +495,10 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_pre_header( $content = '' ) {
+
 		$pre_header = do_replacements(
 			$this->get_pre_header(),
-			$this->get_contact()->get_id()
+			$this->get_contact()
 		);
 
 		$pre_header = apply_filters( 'wpgh_email_pre_header', $pre_header );
