@@ -3,7 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use function Groundhogg\isset_not_empty;
+use Groundhogg\Broadcast;
+use Groundhogg\DB\Query\Where;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -61,6 +62,20 @@ class Broadcasts extends DB {
 
 	public function get_date_key() {
 		return 'send_time';
+	}
+
+	protected function maybe_register_filters() {
+		parent::maybe_register_filters();
+
+		// From user filter
+		$this->query_filters->register( 'from_user', function ( $filter, Where $where ) {
+
+			$filter = wp_parse_args( $filter, [
+				'users' => [],
+			] );
+
+			$where->in( 'scheduled_by', wp_parse_id_list( $filter['users'] ) );
+		} );
 	}
 
 	/**
@@ -122,6 +137,15 @@ class Broadcasts extends DB {
 		$data->query = maybe_unserialize( $data->query );
 
 		return $data;
+	}
+
+	/**
+	 * @param $object
+	 *
+	 * @return Broadcast
+	 */
+	public function create_object( $object ) {
+		return new Broadcast( $object );
 	}
 
 	/**
