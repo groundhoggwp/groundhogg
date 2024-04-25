@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.3.3.2
+Stable tag: 3.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -338,7 +338,7 @@ Yes, Groundhogg has a builtin connection with the WordPress user API, meaning it
 = Is Groundhogg secure? =
 We follow all best WordPress security practices. Plus it's open source, so we have a large community looking out for potential weaknesses when it comes to your data.
 
-= Is Groundhogg GDPR, CANSPAM, or CASL compliant? =
+= Is Groundhogg GDPR, CANSPAM, or CASL compliant?
 Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & privacy legislation.
 
 = Is Groundhogg better than my current CRM/Marketing Automation tool? =
@@ -348,6 +348,22 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4 (2024-04-25) =
+* IMPROVED New unsubscribe features!
+ * Instead of link options there is now a form in the preferences center.
+ * The form collects standard reasons for unsubscribing, as well as optional written feedback.
+ * Responses are compiled into the Unsubscribe Reasons chart in the contacts report.
+ * Unsubscribe reasons and feedback can be viewed in the activity timeline, contacts list, and exported.
+ * For users of the one-click unsubscribe feature, the option to offer feedback is provided after they've unsubscribed.
+ * Go to `https://yoursite.com/gh/preferences/manage/` to see what subscribers will see.
+* ADDED Campaigns management in the admin. Edit, delete, etc...
+* ADDED You can now create public campaign archives.
+ * Visit `https://yoursite.com/gh/campaigns/`.
+ * All public campaigns will be listed.
+ * Campaign archives can be searched by subject and content.
+* ADDED Shortcode to embed email content into posts.
+* FIXED Contact activity timeline sometimes not loading.
 
 = 3.3.3.2 (2024-04-17) =
 * FIXED Some activity not preloading correctly in the contact activity timeline
@@ -714,6 +730,6 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Transactional broadcasts not being sent to all deliverable contacts.
 * FIXED Contact column screen options missing when white labeled.
 
-Logs older than 2023 have been removed due to a new 5000 word changelog size restrictions.
+Logs older than 2023 have been removed due to a new 5000 word changelog size restriction. Groundhogg has been in active development since 2018!
 
 To see older logs you can view them on [github](https://github.com/groundhoggwp/groundhogg/blob/3.3.3.2/README.txt).

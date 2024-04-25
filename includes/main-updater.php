@@ -111,6 +111,15 @@ class Main_Updater extends Old_Updater {
 					wp_clear_scheduled_hook( 'groundhogg/purge_email_logs' );
 					wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 				}
+			],
+			'3.4'    => [
+				'automatic'   => true,
+				'description' => __( 'Update permalinks, submissions table, and the campaigns table.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'campaigns' )->create_table();
+					get_db( 'submissions' )->create_table();
+					install_custom_rewrites();
+				}
 			]
 		];
 	}
