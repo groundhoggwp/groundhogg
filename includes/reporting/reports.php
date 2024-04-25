@@ -10,6 +10,7 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Chart_Unsub_Reasons;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_All_Broadcasts_Performance;
@@ -138,6 +139,10 @@ class Reports {
 			[
 				'id'       => 'chart_contacts_by_optin_status',
 				'callback' => [ $this, 'chart_contacts_by_optin_status' ]
+			],
+			[
+				'id'       => 'chart_unsub_reasons',
+				'callback' => [ $this, 'chart_unsub_reasons' ]
 			],
 			[
 				'id'       => 'chart_contacts_by_region',
@@ -443,6 +448,12 @@ class Reports {
 
 		return $report->get_data();
 
+	}/**
+	 * @return mixed
+	 */
+	public function chart_unsub_reasons() {
+		$report = new Chart_Unsub_Reasons( $this->start, $this->end );
+		return $report->get_data();
 	}
 
 	/**

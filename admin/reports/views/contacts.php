@@ -4,9 +4,6 @@ namespace Groundhogg\Admin\Reports\Views;
 
 // Overview
 
-use function Groundhogg\html;
-use function Groundhogg\utils;
-
 ?>
 <div class="display-grid gap-20">
     <div class="gh-panel span-12">
@@ -31,6 +28,7 @@ use function Groundhogg\utils;
 	<?php quick_stat_report( [
 		'id'    => 'total_engaged_contacts',
 		'title' => __( 'Engaged Contacts', 'groundhogg' ),
+		'info' => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
 	] ); ?>
 
 	<?php quick_stat_report( [
@@ -47,7 +45,21 @@ use function Groundhogg\utils;
         </div>
     </div>
 
-	<?php include __DIR__ . '/leadscoring.php'; ?>
+    <div class="gh-panel span-6">
+        <div class="gh-panel-header">
+            <h2 class="title">
+				<?php _e( 'Unsubscribe Reasons', 'groundhogg' ); ?>
+                <span class="gh-has-tooltip dashicons dashicons-info">
+                    <span class="gh-tooltip top">
+                        <?php _e( 'This chart shows individual unsubscribe events with their reasons, which may be larger that the total number of unsubscribed contacts.' ) ?>
+                    </span>
+                </span>
+            </h2>
+        </div>
+        <div class="gh-donut-chart-wrap inside">
+            <canvas id="chart_unsub_reasons"></canvas>
+        </div>
+    </div>
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">

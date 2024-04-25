@@ -565,7 +565,8 @@ function alias_from_filter( $filter ) {
 	unset( $filter['count_compare'] ); // not relevant to JOIN
 	ksort( $filter );
 
-	return $type . '_' . preg_replace( '/[^A-Za-z0-9_]+/', '_', implode( '_', array_filter( $filter ) ) );
+//	return $type . '_' . preg_replace( '/[^A-Za-z0-9_]+/', '_', multi_implode( '_', $filter ) );
+	return $type . '_' . md5serialize( $filter );
 }
 
 /**
@@ -2027,6 +2028,9 @@ function get_exportable_fields( $extra = [] ) {
 		'utm_medium'             => __( 'UTM Medium', 'groundhogg' ),
 		'utm_term'               => __( 'UTM Term', 'groundhogg' ),
 		'utm_source'             => __( 'UTM Source', 'groundhogg' ),
+		'unsub_date'     => __( 'Unsubscribe Date', 'groundhogg' ),
+		'unsub_reason'   => __( 'Unsubscribe Reason', 'groundhogg' ),
+		'unsub_feedback' => __( 'Unsubscribe Feedback', 'groundhogg' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -2061,6 +2065,44 @@ function export_field( $contact, $field = '' ) {
 			$tags   = $contact->get_tags( true );
 			$names  = array_map_to_method( $tags, 'get_name' );
 			$return = implode( ',', $names );
+			break;
+		case 'unsub_date':
+		case 'unsub_reason':
+		case 'unsub_feedback':
+			// not unsubscribed
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
+				break;
+			}
+
+			// get most recent activity
+			$activity = new Activity( [
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id'    => $contact->ID,
+			] );
+
+			// The activity does not exist
+			if ( ! $activity->exists() ) {
+
+				// Fallback
+				if ( $field === 'unsub_date' ) {
+					$return = $contact->date_optin_status_changed;
+				}
+
+				break;
+			}
+
+			switch ( $field ) {
+				case 'unsub_date':
+					$return = ( new DateTimeHelper( $activity->get_timestamp() ) )->ymdhis();
+					break;
+				case 'unsub_reason':
+					$reason = $activity->get_meta( 'reason' );
+					$return = get_array_var( get_unsub_reasons(), $reason, $reason );
+					break;
+				case 'unsub_feedback':
+					$return = $activity->get_meta( 'feedback' );
+					break;
+			}
 
 			break;
 	}
@@ -8034,4 +8076,18 @@ function generate_claim(){
 	$claim_id    = md5( uniqid( microtime() ) );
 
 	return substr( $claim_id, 0, 20 );
+}
+
+function get_unsub_reasons() {
+	return apply_filters( 'groundhogg/admin/unsubscribe_reasons', [
+		'not_subscribed'  => _x( 'Doesn\'t know why they\'re subscribed', 'admin unsubscribe reason', 'groundhogg' ),
+		'not_interested'  => _x( 'Not interested', 'admin unsubscribe reason', 'groundhogg' ),
+		'irrelevant'      => _x( 'Irrelevant content', 'admin unsubscribe reason', 'groundhogg' ),
+		'too_often'       => _x( 'Too many emails', 'admin unsubscribe reason', 'groundhogg' ),
+		'too_complicated' => _x( 'Too complicated', 'admin unsubscribe reason', 'groundhogg' ),
+		'repetitive'      => _x( 'Too Repetitive', 'admin unsubscribe reason', 'groundhogg' ),
+		'spam'            => _x( 'Spamming', 'admin unsubscribe reason', 'groundhogg' ),
+		'one_click'       => _x( 'One-click', 'admin unsubscribe reason', 'groundhogg' ),
+		'other'           => _x( 'Other', 'admin unsubscribe reason', 'groundhogg' ),
+	] );
 }
