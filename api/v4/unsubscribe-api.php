@@ -64,7 +64,9 @@ class Unsubscribe_Api extends Base_Api {
 
 		$event->get_contact()->unsubscribe();
 
-		track_event_activity( $event, Activity::UNSUBSCRIBED );
+		track_event_activity( $event, Activity::UNSUBSCRIBED, [
+			'reason' => 'one_click'
+		] );
 
 		if ( $request->get_method() === 'GET' ){
 
