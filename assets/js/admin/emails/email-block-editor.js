@@ -3022,7 +3022,7 @@
         id: 'utm',
         name: 'UTM Parameters'
       }, [
-        `<p>${__('Automatically add UTM parameters to all links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.', 'groundhogg' )}</p>`,
+        `<p>${__('Automatically add UTM parameters to links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.', 'groundhogg' )}</p>`,
         `<p>${__('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg' )}</p>`,
         Control({
           label: 'Campaign Source',
@@ -4128,6 +4128,34 @@
                 URL.revokeObjectURL(link.href)
 
               },
+            },
+            {
+              key: 'embed',
+              text: __( 'Embed', 'groundhogg' ),
+              onSelect: e => {
+                Modal({}, Div({
+                  className: 'display-flex column gap-10'
+                },[
+                  `<label for="embed-with-iframe"><b>${__('Embed with iFrame', 'groundhogg')}</b></label>`,
+                  Input({
+                    id: 'embed-with-iframe',
+                    value: sprintf( '[gh_email id=%d]', getEmailId() ),
+                    onFocus: e => e.target.select(),
+                    readonly: true,
+                    className: 'code'
+                  }),
+                  `<p style="margin-top: 0;">${__('Formatting and styling will be <b>exactly</b> as shown. The content will not be indexed by search engines.', 'groundhogg')}</p>`,
+                  `<label for="embed-with-html"><b>${__('Embed with HTML', 'groundhogg')}</b></label>`,
+                  Input({
+                    id: 'embed-with-html',
+                    value: sprintf( '[gh_email id=%d iframe=false]', getEmailId() ),
+                    onFocus: e => e.target.select(),
+                    readonly: true,
+                    className: 'code'
+                  }),
+                  `<p style="margin: 0;">${__('Theme styles <b>may</b> impact the design and layout. The content will be indexed by search engines.', 'groundhogg')}</p>`,
+                ]))
+              }
             },
             {
               key: 'delete',
