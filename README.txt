@@ -365,6 +365,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Shortcode to embed email content into posts.
 * ADDED UTM Parameters support in the email editor.
 * FIXED Contact activity timeline sometimes not loading.
+* FIXED Missing strings in the POT file.
 
 = 3.3.3.2 (2024-04-17) =
 * FIXED Some activity not preloading correctly in the contact activity timeline
