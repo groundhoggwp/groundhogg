@@ -351,7 +351,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.4 (2024-04-25) =
 * IMPROVED New unsubscribe features!
- * Instead of link options there is now a form in the preferences center.
+ * Instead of link options there is now an unsubscribe form in the preferences center.
  * The form collects standard reasons for unsubscribing, as well as optional written feedback.
  * Responses are compiled into the Unsubscribe Reasons chart in the contacts report.
  * Unsubscribe reasons and feedback can be viewed in the activity timeline, contacts list, and exported.
@@ -363,6 +363,7 @@ You can purchase a premium plan for access to support and our premium extensions
  * All public campaigns will be listed.
  * Campaign archives can be searched by subject and content.
 * ADDED Shortcode to embed email content into posts.
+* ADDED UTM Parameters support in the email editor.
 * FIXED Contact activity timeline sometimes not loading.
 
 = 3.3.3.2 (2024-04-17) =
