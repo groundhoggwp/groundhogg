@@ -18,3 +18,12 @@ if ( is_browser_view() && ( ( isset( $campaign ) && isset( $broadcast ) ) || iss
     </style>
 	<?php
 }
+
+if ( is_browser_view() ){
+    ?><style>
+        .hide-in-browser{
+            display: none;
+            visibility: hidden;
+        }
+    </style><?php
+}

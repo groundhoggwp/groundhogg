@@ -2174,7 +2174,7 @@
 
     for (let prop in block) {
 
-      if (['advancedStyle', 'type', 'id', 'hide_on_mobile', 'hide_on_desktop'].includes(prop)) {
+      if (['advancedStyle', 'type', 'id', 'hide_on_mobile', 'hide_on_desktop', 'hide_in_browser'].includes(prop)) {
         continue
       }
 
@@ -2237,6 +2237,10 @@
 
     if (block.hide_on_desktop) {
       classes.push('hide-on-desktop')
+    }
+
+    if (block.hide_in_browser) {
+      classes.push('hide-in-browser')
     }
 
     return Tr({}, [
