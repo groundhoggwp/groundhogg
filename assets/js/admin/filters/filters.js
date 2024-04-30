@@ -504,7 +504,7 @@
             return ComparisonsTitleGenerators.before(prefix,
               formatDate(before))
           default:
-            return sprintf('%s %s', prefix, dateRanges[date_range].replace( 'X', days ).toLowerCase() )
+            return sprintf('%s %s', prefix, dateRanges[date_range ?? 'any']?.replace( 'X', days ).toLowerCase() )
         }
       },
       preload,
