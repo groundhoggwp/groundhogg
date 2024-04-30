@@ -228,38 +228,28 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	/**
 	 * Replacement for enqueue/get_delay_time
 	 *
-	 * @param int  $baseTime
+	 * @param int  $baseTimestamp
 	 * @param Step $step
 	 *
 	 * @return int
 	 */
 	public function calc_run_time( int $baseTimestamp, Step $step ) : int{
-        return $this->enqueue( $step );
+
+        // Step is still using the legacy enqueue method
+        if ( method_exists( $this, 'enqueue' ) ){
+	        _deprecated_function( get_called_class() . '::enqueue', '3.4', __CLASS__. '::calc_run_time' );
+            return $this->enqueue( $step );
+        }
+
+		// Step is still using the legacy enqueue method
+		if ( method_exists( $this, 'get_delay_time' ) ){
+			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__. '::calc_run_time' );
+			return $baseTimestamp + $this->get_delay_time( $step );
+		}
+
+        // Run now
+        return $baseTimestamp;
     }
-
-	/**
-	 * Get the delay time in seconds.
-	 *
-	 * @param Step
-	 *
-	 * @return int
-	 */
-	public function get_delay_time( $step ) {
-        _deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
-		return 0;
-	}
-
-	/**
-	 * Enqueue the step in the event queue...
-	 *
-	 * @param $step Step
-	 *
-	 * @return int
-	 */
-	public function enqueue( $step ) {
-		_deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
-		return time() + $this->get_delay_time( $step );
-	}
 
 	/**
 	 * Get the ICON of this action/benchmark

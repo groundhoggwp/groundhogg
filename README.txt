@@ -354,6 +354,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Set a delay to ignore clicks and opens in the email settings. This will mitigate bot activity inflating reports.
 * FIXED No path to guided setup after WP 6.5 update.
 * FIXED Replaced legacy SMS broadcast scheduler with the new on the add screen from the SMS page. Requires updating the SMS addon.
+* FIXED Deprecated function notices coming from funnels.
 
 = 3.4 (2024-04-25) =
 * IMPROVED New unsubscribe features!
