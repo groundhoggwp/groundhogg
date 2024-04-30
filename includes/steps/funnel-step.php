@@ -227,6 +227,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	/**
 	 * Replacement for enqueue/get_delay_time
+     * This method should be overridden by child classes.
 	 *
 	 * @param int  $baseTimestamp
 	 * @param Step $step
@@ -241,7 +242,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             return $this->enqueue( $step );
         }
 
-		// Step is still using the legacy enqueue method
+		// Step is still using the legacy get_delay_time method
 		if ( method_exists( $this, 'get_delay_time' ) ){
 			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__. '::calc_run_time' );
 			return $baseTimestamp + $this->get_delay_time( $step );
