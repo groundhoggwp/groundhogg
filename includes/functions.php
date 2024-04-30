@@ -5164,22 +5164,17 @@ function get_current_user_agent_id() {
 		return false;
 	}
 
-	$id = get_db( 'user_agents' )->add( $ua );
+	$hashed_ua = hex2bin( hash( 'sha256', $ua ) );
+	$ua_id = get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua );
 
-	// INSERT IGNORE probably
-	if ( $id ) {
-		return $id;
+	if ( $ua_id ) {
+		return absint( $ua_id );
 	}
 
-	$hashed_ua = hex2bin( hash( 'sha256', $ua ) );
-
-    $ua_id = get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua );
-
-    if ( ! $ua_id ){
-        return false;
-    }
-
-	return absint( $ua_id );
+	return get_db( 'user_agents' )->add( [
+		'user_agent'      => $ua,
+		'user_agent_hash' => $hashed_ua
+	] );
 }
 
 /**
