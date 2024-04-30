@@ -12,6 +12,9 @@ function load_part( $part = '' ) {
 	$file = __DIR__ . '/parts/' . $part . '.php';
 
 	if ( file_exists( $file ) ){
+
+		do_action( "groundhogg/templates/email/part/$part" );
+
 		include $file;
 	}
 
@@ -26,6 +29,9 @@ function load_css( $file = '' ) {
 	$file = __DIR__ . '/assets/' . $file . '.css';
 
 	if ( file_exists( $file ) ){
+
+		do_action( "groundhogg/templates/email/css/$file" );
+
 		echo file_get_contents( $file );
 	}
 }
