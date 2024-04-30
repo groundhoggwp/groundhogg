@@ -269,6 +269,11 @@ class Email extends Base_Object_With_Meta {
 		// Fix markdown line breaks
 		$content = preg_replace( '/(?<=[^\\S])\h\\n/', "  \n", $content );
 
+		// Tracking must be enabled and there must be a valid event to track with
+//		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) && $this->event && $this->event->exists() ) {
+//			$content = $this->convert_to_tracking_links( $content, 'plain' );
+//		}
+
 		// Re-strip
 		return $this->strip_html_tags( $content );
 	}
@@ -396,7 +401,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function get_open_tracking_link() {
+	public function get_open_tracking_src() {
 		return managed_page_url( sprintf(
 			"o/%s/%s",
 			dechex( $this->get_contact()->get_id() ),
@@ -678,7 +683,7 @@ class Email extends Base_Object_With_Meta {
 
 					if ( str_contains( $content, '</body>' ) ) {
 						$content = str_replace( '</body>', html()->e( 'img', [
-								'src'    => $this->get_open_tracking_link(),
+								'src'    => $this->get_open_tracking_src(),
 								'width'  => '0',
 								'height' => '0',
 								'alt'    => '',
@@ -733,12 +738,29 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function convert_to_tracking_links( $content ) {
-		/* Filter the links to include data about the email, campaign, and funnel steps... */
-		return preg_replace_callback( '/href=["\'](?!mailto)(?!tel)([^"\']*)["\']/i', [
+	public function convert_to_tracking_links( $content, $context = 'html' ) {
+		if ( $context === 'plain' ){
+			return preg_replace_callback( '@\((https?://[^)]+)\)@i', [
+				$this,
+				'tracking_link_callback_plain'
+			], $content );
+		}
+
+		return preg_replace_callback( '@href=["\'](https?://[^"\']+)["\']@i', [
 			$this,
 			'tracking_link_callback'
 		], $content );
+	}
+
+	/**
+	 * Convert plain text version tracking links
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	public function tracking_link_callback_plain( $matches ){
+		return $this->tracking_link_callback( $matches, '(%s)' );
 	}
 
 	/**
@@ -748,13 +770,13 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function tracking_link_callback( $matches ) {
+	public function tracking_link_callback( $matches, $replacement = 'href="%s"' ) {
 
 		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
 
 		// If the url is not to be tracked leave it alone.
 		if ( is_url_excluded_from_tracking( $clean_url ) ) {
-			return sprintf( 'href="%s"', $clean_url );
+			return sprintf( $replacement, $clean_url );
 		}
 
 		$local_hostname = wp_parse_url( home_url(), PHP_URL_HOST );
@@ -774,7 +796,7 @@ class Email extends Base_Object_With_Meta {
 
 		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
 
-		return sprintf( 'href="%s"', $tracking_link );
+		return sprintf( $replacement, $tracking_link );
 	}
 
 	/**
@@ -784,7 +806,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return array|string|string[]|null
 	 */
-	public function maybe_add_utm_to_links( $content ){
+	public function maybe_add_utm_to_links( $content, $context = 'html' ){
 
 		$utm_params = array_filter( [
 			'utm_source' => $this->utm_source,
@@ -800,10 +822,29 @@ class Email extends Base_Object_With_Meta {
 
 		$url = untrailingslashit( home_url() );
 
-		return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+		if ( $context === 'plain' ){
+			return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+				$this,
+				'utm_link_callback'
+			], $content );
+		}
+
+		return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
 			$this,
-			'utm_link_callback'
+			'utm_link_callback_plain'
 		], $content );
+
+	}
+
+	/**
+	 * Add UTM links to plain text
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	protected function utm_link_callback_plain( $matches ){
+		return $this->utm_link_callback( $matches, '(%s)' );
 	}
 
 	/**
@@ -813,7 +854,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	protected function utm_link_callback( $matches ){
+	protected function utm_link_callback( $matches, $format='href="%s"' ){
 
 		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
 
@@ -825,7 +866,7 @@ class Email extends Base_Object_With_Meta {
 			'utm_medium' => $this->utm_medium,
 		] ) );
 
-		return sprintf( 'href="%s"', add_query_arg( $utm_params, $clean_url ) );
+		return sprintf( $format, add_query_arg( $utm_params, $clean_url ) );
 	}
 
 	/**
