@@ -5,7 +5,7 @@ namespace Groundhogg\DB;
 class User_Agents extends DB {
 
 	public function get_db_suffix() {
-		return 'user_agents';
+		return 'gh_user_agents';
 	}
 
 	public function get_primary_key() {
@@ -28,6 +28,17 @@ class User_Agents extends DB {
 	 * @return int
 	 */
 	public function add( $data = array() ) {
+
+		// UA passed as string directly
+		if ( is_string( $data ) ){
+			$data = [
+				'user_agent' => $data
+			];
+		}
+
+		if ( empty( $data[ 'user_agent' ] ) ){
+			return false;
+		}
 
 		if ( ! isset( $data['user_agent_hash'] ) ) {
 			$data['user_agent_hash'] = hex2bin( hash( 'sha256', $data['user_agent'] ) );
@@ -86,7 +97,7 @@ class User_Agents extends DB {
 		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         user_agent TEXT NOT NULL,
-        user_agent_hash BINARY(64) NOT NULL,
+        user_agent_hash BINARY(32) NOT NULL,
         PRIMARY KEY (ID),
         UNIQUE KEY (user_agent_hash)
 		) $charset_collate;";

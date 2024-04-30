@@ -477,7 +477,11 @@ abstract class DB {
 			return $cache_value;
 		}
 
-		$results = apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
+		$column_format = get_array_var( $this->get_columns(), $column_where, '%s' );
+
+		$results = apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(),
+			$wpdb->get_var(
+				$wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = $column_format LIMIT 1;", $column_value ) ) );
 
 		$this->cache_set( $cache_key, $results );
 

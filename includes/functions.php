@@ -5173,7 +5173,13 @@ function get_current_user_agent_id() {
 
 	$hashed_ua = hex2bin( hash( 'sha256', $ua ) );
 
-	return absint( get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua ) );
+    $ua_id = get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua );
+
+    if ( ! $ua_id ){
+        return false;
+    }
+
+	return absint( $ua_id );
 }
 
 /**
