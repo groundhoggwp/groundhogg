@@ -55,23 +55,23 @@ class Join {
 	/**
 	 * Adds an a.column = b.column condition
 	 *
-	 * @param string $a
-	 * @param string $b
+	 * @param string $joinCol
+	 * @param string $mainCol
 	 *
 	 * @return Where
 	 */
-	public function onColumn( string $a, string $b = '' ): Where {
+	public function onColumn( string $joinCol, string $mainCol = '' ): Where {
 
 		// Assume primary key for simplicity
-		if ( empty( $b ) ) {
-			$b = "{$this->query->alias}.{$this->query->db_table->primary_key}";
+		if ( empty( $mainCol ) ) {
+			$mainCol = "{$this->query->alias}.{$this->query->db_table->primary_key}";
 		}
 
-		if ( ! Query::isAliased( $b ) ) {
-			$b = "{$this->query->alias}.$b";
+		if ( ! Query::isAliased( $mainCol ) ) {
+			$mainCol = "{$this->query->alias}.$mainCol";
 		}
 
-		$this->conditions->addCondition( "$this->alias.$a = $b" );
+		$this->conditions->addCondition( "$this->alias.$joinCol = $mainCol" );
 
 		return $this->conditions;
 	}
