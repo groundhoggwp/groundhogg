@@ -49,7 +49,8 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 		$activityQuery
 			->setSelect( [ $urlCol, 'url' ], [ 'COUNT(ID)', 'clicks' ], [ 'COUNT(DISTINCT(contact_id))', 'contacts' ] )
 			->setOrderby( 'clicks' )
-			->setGroupby( $urlCol )->whereIn( 'activity_type', [
+			->setGroupby( $urlCol )
+			->whereIn( 'activity_type', [
 				Activity::EMAIL_CLICKED,
 				Activity::SMS_CLICKED
 			] );
