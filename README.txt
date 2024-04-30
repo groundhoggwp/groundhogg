@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4
+Stable tag: 3.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4.1 (2024-04-30) =
+* ADDED Begin tracking user agents and IP address with activity and page visits
+* ADDED Set a delay to ignore clicks and opens in the email settings. This will mitigate bot activity inflating reports.
+* ADDED
+* FIXED Replaced legacy SMS broadcast scheduler with the new on the add screen from the SMS page. Requires updating the SMS addon.
 
 = 3.4 (2024-04-25) =
 * IMPROVED New unsubscribe features!
