@@ -352,7 +352,7 @@ You can purchase a premium plan for access to support and our premium extensions
 = 3.4.1 (2024-04-30) =
 * ADDED Begin tracking user agents and IP address with activity and page visits
 * ADDED Set a delay to ignore clicks and opens in the email settings. This will mitigate bot activity inflating reports.
-* ADDED
+* FIXED No path to guided setup after WP 6.5 update.
 * FIXED Replaced legacy SMS broadcast scheduler with the new on the add screen from the SMS page. Requires updating the SMS addon.
 
 = 3.4 (2024-04-25) =

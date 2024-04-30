@@ -58,6 +58,11 @@ class Main_Installer extends Installer {
 		if ( is_a_contact( $contact ) ){
 			$contact->change_marketing_preference( Preferences::CONFIRMED );
 		}
+
+		// Setup no longer redirects after activation from the add plugins screen
+		if ( ! is_option_enabled( 'gh_guided_setup_finished' ) && ! is_white_labeled() ){
+			update_option( 'gh_force_to_setup', 1 );
+		}
 	}
 
 	public function get_display_name() {
@@ -108,7 +113,7 @@ class Main_Installer extends Installer {
 		}
 
 		if ( $plugin == plugin_basename( GROUNDHOGG__FILE__ ) && ! is_white_labeled() ) {
-			if ( Plugin::$instance->settings->is_option_enabled( 'gh_guided_setup_finished' ) ) {
+			if ( is_option_enabled( 'gh_guided_setup_finished' ) ) {
 				exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
 			} else {
 				exit( wp_redirect( admin_url( 'admin.php?page=gh_guided_setup' ) ) );

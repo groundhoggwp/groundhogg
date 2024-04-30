@@ -5,12 +5,15 @@ namespace Groundhogg\Admin;
 use Groundhogg\Plugin;
 use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 
 /**
@@ -47,6 +50,8 @@ abstract class Admin_Page extends Supports_Errors {
 
 		if ( $this->is_current_page() ) {
 
+            $this->maybe_redirect_to_guided_setup();
+
 			add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'register_pointers' ] );
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
@@ -62,6 +67,24 @@ abstract class Admin_Page extends Supports_Errors {
 			$this->add_additional_actions();
 		}
 	}
+
+	/**
+     * Redirect to the guided setup after installation
+     *
+	 * @return void
+	 */
+    public function maybe_redirect_to_guided_setup(){
+
+        if ( ! get_option( 'gh_force_to_setup' ) || ! current_user_can( 'manage_options' ) || is_white_labeled() ) {
+            return;
+        }
+
+        // we only do it once.
+        delete_option( 'gh_force_to_setup' );
+
+        wp_safe_redirect( admin_page_url( 'gh_guided_setup' ) );
+        exit;
+    }
 
 	/**
 	 * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.

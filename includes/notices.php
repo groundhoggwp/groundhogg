@@ -249,6 +249,21 @@ class Notices {
 	}
 
 	/**
+	 * Mark a notice as dismissed
+	 *
+	 * @param $ids
+	 */
+	public function undismiss_notice( $ids ) {
+
+		$notices = parse_maybe_numeric_list( $ids );
+		foreach ( $notices as $notice ) {
+			unset( self::$dismissed_notices[ $notice ] );
+		}
+
+		update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
+	}
+
+	/**
 	 * Is a notice dismissed
 	 *
 	 * @param $id

@@ -13,6 +13,7 @@ use function Groundhogg\files;
 use function Groundhogg\get_db;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\modal_link_url;
 
 // MailHawk is installed but not connected -> redirect to the mailhawk connect page
@@ -30,6 +31,13 @@ else:
 endif;
 
 $checklist_items = [
+	[
+		'title'       => __( 'Complete the Guided Setup', 'groundhogg' ),
+		'description' => __( "Configure your initial settings and discover potential opportunities.", 'groundhogg' ),
+		'completed'   => is_option_enabled( 'gh_guided_setup_finished' ),
+		'fix'         => admin_page_url( 'gh_guided_setup' ),
+		'cap'         => 'manage_options'
+	],
 	[
 		'title'       => __( 'Integrate An SMTP Service', 'groundhogg' ),
 		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
@@ -78,7 +86,7 @@ $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 	return $carry && $item['completed'];
 }, true );
 
-$hidden = \Groundhogg\is_option_enabled( 'gh_hide_groundhogg_quickstart' );
+$hidden = is_option_enabled( 'gh_hide_groundhogg_quickstart' );
 
 ?>
 	<div id="checklist" class="gh-panel onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : '' ); ?>">

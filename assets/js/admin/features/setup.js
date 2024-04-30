@@ -1327,6 +1327,10 @@
 
         })
 
+        Options.patch({
+          gh_guided_setup_finished: true
+        })
+
         $('.gh-button.link').on('click', e => {
           let link = e.currentTarget.dataset.link
           window.open(link, e.currentTarget.dataset.target)
