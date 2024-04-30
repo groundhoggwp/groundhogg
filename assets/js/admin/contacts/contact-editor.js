@@ -517,7 +517,11 @@
       email_opened: {
         icon: icons.open_email,
         render: ({ data }) => {
-          return sprintf(__('Opened %s', 'groundhogg'), bold(EmailsStore.get(data.email_id).data.title))
+          return sprintf(__('Opened %s', 'groundhogg'), el( 'a', {
+            href: parseInt(data.funnel_id) === 1
+              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
+              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+          }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
       email_link_click: {
@@ -531,7 +535,11 @@
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
             target: '_blank',
             href: data.referer,
-          }, bold(maybeTruncateLink(data.referer))), bold(EmailsStore.get(data.email_id).data.title))
+          }, bold(maybeTruncateLink(data.referer))), el( 'a', {
+            href: parseInt(data.funnel_id) === 1
+              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
+              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+          }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
       imported: {
