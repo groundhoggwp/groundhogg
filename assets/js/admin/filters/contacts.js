@@ -1075,6 +1075,7 @@
       ItemPicker({
         id: 'unsub-reasons',
         placeholder: __('Search', 'groundhogg'),
+        noneSelected: __( 'Any reason', 'groundhogg' ),
         fetchOptions: async (s) => assoc2array( unsubReasons ),
         selected: reasons.map( reason => ({ id: reason, text: unsubReasons[reason] ?? reason })),
         onChange: items => {
