@@ -120,6 +120,15 @@ class Main_Updater extends Old_Updater {
 					get_db( 'submissions' )->create_table();
 					install_custom_rewrites();
 				}
+			],
+			'3.4.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Create new user agents table and add user agent columns to page visits and activity.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'user_agents' )->create_table();
+					get_db( 'activity' )->create_table();
+					get_db( 'page_visits' )->create_table();
+				}
 			]
 		];
 	}
