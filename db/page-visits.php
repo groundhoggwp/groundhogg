@@ -6,6 +6,7 @@ namespace Groundhogg\DB;
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use function Groundhogg\get_current_ip_address;
+use function Groundhogg\get_current_user_agent_id;
 use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
 
@@ -142,8 +143,9 @@ class Page_Visits extends DB {
 			'hostname'   => '%s',
 			'query'      => '%s',
 			'fragment'   => '%s',
+			'views'      => '%d',
 			'ip_address' => '%s',
-			'views'      => '%d'
+			'user_agent' => '%d'
 		];
 	}
 
@@ -162,8 +164,9 @@ class Page_Visits extends DB {
 			'path'       => '',
 			'query'      => '',
 			'fragment'   => '',
-			'ip_address' => get_current_ip_address(),
-			'views'      => 1
+			'views'      => 1,
+			'ip_address' => '',
+			'user_agent' => 0
 		];
 	}
 
@@ -232,6 +235,7 @@ class Page_Visits extends DB {
         query text NOT NULL,
         fragment text NOT NULL,
         views bigint(20) unsigned NOT NULL,
+        user_agent bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY ip_address (ip_address),

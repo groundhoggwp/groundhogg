@@ -78,6 +78,7 @@ class Manager {
 		$this->page_visits          = new Page_Visits();
 		$this->logs                 = new Logs();
 		$this->background_tasks     = new Background_Tasks();
+		$this->user_agents          = new User_Agents();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

@@ -89,6 +89,8 @@ class Activity extends DB {
 			'referer'       => '%s',
 			'referer_hash'  => '%s',
 			'value'         => '%f',
+			'ip_address'    => '%s',
+			'user_agent'    => '%d',
 		];
 	}
 
@@ -111,6 +113,8 @@ class Activity extends DB {
 			'referer'       => '',
 			'referer_hash'  => '',
 			'value'         => 0,
+			'ip_address'    => '',
+			'user_agent'    => 0,
 		);
 	}
 
@@ -221,6 +225,8 @@ class Activity extends DB {
         referer text NOT NULL,
         referer_hash varchar(20) NOT NULL,
         value decimal(10,2) unsigned NOT NULL DEFAULT 0,
+        ip_address varchar(15) NOT NULL,
+        user_agent BIGINT(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY funnel_id (funnel_id),
