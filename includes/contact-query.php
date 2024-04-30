@@ -839,15 +839,18 @@ class Contact_Query extends Table_Query {
 	public static function filter_broadcast_link_clicked( $filter, Where $where ) {
 
 		$broadcast_id = absint( $filter['broadcast_id'] );
-
 		unset( $filter['broadcast_id'] );
 		$filter['funnel_id'] = Broadcast::FUNNEL_ID;
-
 		if ( $broadcast_id ) {
 			$filter['step_id'] = $broadcast_id;
 		}
 
-		self::filter_email_link_clicked( $filter, $where );
+		if ( isset_not_empty( $filter, 'is_sms' ) ) {
+			$filter['activity_type'] = Activity::SMS_CLICKED;
+			unset( $filter['is_sms'] );
+		}
+
+		self::filter_link_clicked( $filter, $where );
 	}
 
 
@@ -965,7 +968,7 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return void
 	 */
-	public static function filter_email_link_clicked( $filter, Where $where ) {
+	public static function filter_link_clicked( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'email_id'      => 0,
@@ -973,7 +976,8 @@ class Contact_Query extends Table_Query {
 			'step_id'       => 0,
 			'link'          => '',
 			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
+			'count_compare' => 'greater_than_or_equal_to',
+			'activity_type' => Activity::EMAIL_CLICKED
 		] );
 
 		$path = sanitize_text_field( $filter['link'] );
@@ -987,7 +991,7 @@ class Contact_Query extends Table_Query {
 		$activityQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'clicks' ] )
 		              ->setGroupby( 'contact_id' )
 		              ->where()
-		              ->equals( 'activity_type', Activity::EMAIL_CLICKED );
+		              ->equals( 'activity_type', $filter['activity_type'] );
 
 		Filters::timestamp( 'timestamp', $filter, $activityQuery->where );
 
