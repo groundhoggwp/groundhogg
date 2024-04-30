@@ -778,6 +778,13 @@ class Tracking {
 			$this->bail();
 		}
 
+		$open_delay = absint( get_option( 'gh_open_tracking_delay' ) );
+
+		// if diff between current time and sent time is suspicious we should assume bot?
+		if ( $open_delay && $event->is_broadcast_event() && time() - $event->get_time() < $open_delay ) {
+			$this->bail();
+		}
+
 		$args = [
 			'event_id'      => $event->get_id(),
 			'contact_id'    => $event->get_contact_id(),
@@ -789,7 +796,10 @@ class Tracking {
 
 		// Check if exists first
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
-			$activity = track_event_activity( $event, Activity::EMAIL_OPENED );
+			$activity = track_event_activity( $event, Activity::EMAIL_OPENED, [], [
+				'ip_address' => get_current_ip_address(),
+				'user_agent' => get_current_user_agent_id()
+			] );
 
 			if ( $activity ){
 
@@ -824,11 +834,8 @@ class Tracking {
 	 * When tracking a link click redirect the user to the destination after performing the necessary tracking
 	 */
 	protected function email_link_clicked() {
-		/* track every click as an open */
-		$this->email_opened();
 
-		$event  = $this->get_current_event();
-		$target = $this->get_target_url();
+		$event = $this->get_current_event();
 
 		/**
 		 * @since 2.1
@@ -845,9 +852,23 @@ class Tracking {
 			return;
 		}
 
+		$click_delay = absint( get_option( 'gh_click_tracking_delay' ) );
+
+		// if diff between current time and sent time is suspicious we should assume bot?
+		if ( $click_delay && $event->is_broadcast_event() && time() - $event->get_time() < $click_delay ) {
+			$this->bail();
+			return;
+		}
+
+		/* track every click as an open */
+		$this->email_opened();
+
+		$target   = $this->get_target_url();
 		$activity = track_event_activity( $event, Activity::EMAIL_CLICKED, [], [
-			'referer'       => $target,
-			'referer_hash'  => generate_referer_hash( $target )
+			'referer'      => $target,
+			'referer_hash' => generate_referer_hash( $target ),
+			'ip_address'   => get_current_ip_address(),
+			'user_agent'   => get_current_user_agent_id()
 		] );
 
 		if ( ! $activity ) {

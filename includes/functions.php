@@ -55,6 +55,8 @@ function maybe_get_option_from_constant( $value, $option_name ) {
 add_constant_support( 'gh_master_license' );
 add_constant_support( 'gh_recaptcha_secret_key' );
 add_constant_support( 'gh_recaptcha_site_key' );
+add_constant_support( 'gh_click_tracking_delay' );
+add_constant_support( 'gh_open_tracking_delay' );
 
 /**
  * If an email address is provided but a space is in place of a plus then swap out the space for a plus
@@ -1736,7 +1738,9 @@ function track_page_visits_after_signup( $contact ) {
 			}
 
 			track_page_visit( $url, $contact, [
-				'timestamp' => absint( $time[0] )
+				'timestamp' => absint( $time[0] ),
+                'ip_address' => get_current_ip_address(),
+				'user_agent' => get_current_user_agent_id()
 			] );
 		}
 	}
@@ -5148,6 +5152,31 @@ function fix_nested_p( $content ) {
 }
 
 /**
+ * Retrieve the ID of the current user agent being used
+ *
+ * @return int|false
+ */
+function get_current_user_agent_id() {
+
+	$ua = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] );
+
+	if ( empty( $ua ) ) {
+		return false;
+	}
+
+	$id = get_db( 'user_agents' )->add( $ua );
+
+	// INSERT IGNORE probably
+	if ( $id ) {
+		return $id;
+	}
+
+	$hashed_ua = hex2bin( hash( 'sha256', $ua ) );
+
+	return absint( get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua ) );
+}
+
+/**
  * Track a page visit
  *
  * @param       $ref     string a URL
@@ -5209,13 +5238,16 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 	}
 
 	$args = [
-		'value' => $value
+		'value'      => $value,
+		'ip_address' => get_current_ip_address(),
+		'user_agent' => get_current_user_agent_id()
 	];
 
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 
 	return track_activity( $contact, $type, $args, $details );
 }
+
 
 /**
  * Log an activity conducted by the contact while they are performing actions on the site.
@@ -5241,7 +5273,7 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	$defaults = [
 		'activity_type' => $type,
 		'timestamp'     => time(),
-		'contact_id'    => $contact->get_id()
+		'contact_id' => $contact->get_id(),
 	];
 
 	// Merge overrides with args
@@ -8078,6 +8110,11 @@ function generate_claim(){
 	return substr( $claim_id, 0, 20 );
 }
 
+/**
+ * Get the list of common unsub reasons
+ *
+ * @return mixed|null
+ */
 function get_unsub_reasons() {
 	return apply_filters( 'groundhogg/admin/unsubscribe_reasons', [
 		'not_subscribed'  => _x( 'Doesn\'t know why they\'re subscribed', 'admin unsubscribe reason', 'groundhogg' ),
