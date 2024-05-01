@@ -492,7 +492,7 @@ class Location {
 
 		$ips = array_map( 'trim', explode( ',', $found ) );
 
-		return array_pop( $ips );
+		return apply_filters( 'groundhogg/location/get_real_ip', array_pop( $ips ) );
 	}
 
 
