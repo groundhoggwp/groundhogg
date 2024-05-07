@@ -293,7 +293,16 @@ function parse_select2_results( $data = [], $id_col = 'ID', $title_col = 'title'
  * @return DB\DB|DB\Meta_DB|DB\Tags
  */
 function get_db( $name ) {
-	return Plugin::$instance->dbs->get_db( $name );
+	return db()->get_db( $name );
+}
+
+/**
+ * Get the db manager
+ *
+ * @return DB\Manager
+ */
+function db(): DB\Manager {
+	return Plugin::$instance->dbs;
 }
 
 /**
