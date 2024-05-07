@@ -59,7 +59,7 @@ class Tags_Table extends Table {
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'tag_name'        => _x( 'Name', 'Column label', 'groundhogg' ),
 			'tag_description' => _x( 'Description', 'Column label', 'groundhogg' ),
-			'contacts' => _x( 'Count', 'Column label', 'groundhogg' ),
+			'contacts'        => _x( 'Count', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg/admin/tags/table/get_columns', $columns );
@@ -70,7 +70,7 @@ class Tags_Table extends Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'tag_name'        => array( 'tag_name', false ),
+			'tag_name' => array( 'tag_name', false ),
 //			'tag_description' => array( 'tag_description', false ),
 			'contacts' => array( 'contacts', false ),
 		);
@@ -203,8 +203,7 @@ class Tags_Table extends Table {
 		$query = new Table_Query( 'tags' );
 		$query->setLimit( $per_page )
 		      ->setOffset( $offset )
-		      ->setOrder( $order )
-		      ->setOrderby( $orderby )
+		      ->setOrderby( [ $orderby, $order ] )
 		      ->setFoundRows( true );
 
 		if ( $search ) {
@@ -221,7 +220,7 @@ class Tags_Table extends Table {
 			            ->setGroupby( 'tag_id' );
 
 			$query->addJoin( 'LEFT', [ $tagRelQuery, 'relationships' ] )->onColumn( 'tag_id', 'tag_id' );
-			$query->setOrderby( 'relationships.contacts' );
+			$query->setOrderby( [ 'relationships.contacts', $order ] );
 		}
 
 		$items = $query->get_objects( Tag::class );
