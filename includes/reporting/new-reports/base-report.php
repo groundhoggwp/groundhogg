@@ -190,10 +190,10 @@ abstract class Base_Report {
 		return new Funnel( $this->get_funnel_id() );
 	}
 
-	protected $funnel_id;
-	protected $step_id;
-	protected $email_id;
-	protected $broadcast_id;
+	protected static $funnel_id;
+	protected static $step_id;
+	protected static $email_id;
+	protected static $broadcast_id;
 
 	/**
 	 * Get the funnel IDs if available
@@ -202,22 +202,22 @@ abstract class Base_Report {
 	 */
 	protected function get_funnel_id() {
 
-		if ( $this->funnel_id ) {
-			return $this->funnel_id;
+		if ( self::$funnel_id ) {
+			return self::$funnel_id;
 		}
 
 		if ( $this->get_step_id() ) {
 			$step = new Step( $this->get_step_id() );
 			if ( $step->exists() ) {
-				$this->funnel_id = $step->get_funnel_id();
+				self::$funnel_id = $step->get_funnel_id();
 
-				return $this->funnel_id;
+				return self::$funnel_id;
 			}
 		}
 
-		$this->funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
+		self::$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
 
-		return $this->funnel_id;
+		return self::$funnel_id;
 	}
 
 	/**
@@ -225,23 +225,23 @@ abstract class Base_Report {
 	 */
 	protected function get_email_id() {
 
-		if ( $this->email_id ) {
-			return $this->email_id;
+		if ( self::$email_id ) {
+			return self::$email_id;
 		}
 
 		if ( $this->get_step_id() ) {
 			$step = new Step( $this->get_step_id() );
 			if ( $step->exists() && $step->type_is( 'send_email' ) ) {
 
-				$this->email_id = absint( $step->get_meta( 'email_id' ) );
+				self::$email_id = absint( $step->get_meta( 'email_id' ) );
 
-				return $this->email_id;
+				return self::$email_id;
 			}
 		}
 
-		$this->email_id = absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
+		self::$email_id = absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
 
-		return $this->email_id;
+		return self::$email_id;
 	}
 
 	/**
@@ -249,13 +249,13 @@ abstract class Base_Report {
 	 */
 	protected function get_step_id() {
 
-		if ( $this->step_id ) {
-			return $this->step_id;
+		if ( self::$step_id ) {
+			return self::$step_id;
 		}
 
-		$this->step_id = absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
+		self::$step_id = absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
 
-		return $this->step_id;
+		return self::$step_id;
 	}
 
 	/**
@@ -263,13 +263,13 @@ abstract class Base_Report {
 	 */
 	protected function get_broadcast_id() {
 
-		if ( $this->broadcast_id ) {
-			return $this->broadcast_id;
+		if (self::$broadcast_id ) {
+			return self::$broadcast_id;
 		}
 
-		$this->broadcast_id = absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
+		self::$broadcast_id = absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
 
-		return $this->broadcast_id;
+		return self::$broadcast_id;
 	}
 
 }

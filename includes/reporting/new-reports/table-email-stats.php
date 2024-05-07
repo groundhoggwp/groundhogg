@@ -31,6 +31,7 @@ class Table_Email_Stats extends Base_Table_Report {
 			'sent' => $sent,
 			'opened' => $opened,
 			'clicked' => $clicked,
+			'unsubscribed' => $unsubscribed
 		] = $this->get_funnel_email_stats();
 
 		return [
