@@ -297,6 +297,7 @@ function tool_tip_title () {
 
       if (report_data.data.labels && report_data.data.labels.length === 0) {
         $report.closest('.gh-donut-chart-wrap').html(report_data.no_data)
+        return;
       }
 
       if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
