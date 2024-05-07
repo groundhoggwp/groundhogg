@@ -5226,7 +5226,9 @@ function track_live_activity( $type, $details = [], $value = 0 ) {
 
     if ( tracking()->get_current_event() ){
         return track_event_activity( tracking()->get_current_event(), $type, $details, [
-	        'value' => $value
+	        'value'      => $value,
+            'ip_address' => get_current_ip_address(),
+	        'user_agent' => get_current_user_agent_id()
         ] );
     }
 
