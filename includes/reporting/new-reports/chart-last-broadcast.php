@@ -2,205 +2,64 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Broadcast;
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\DB\DB;
-use Groundhogg\Event;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Preferences;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\key_to_words;
+use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 
-class Chart_Last_Broadcast extends Base_Chart_Report {
+class Chart_Last_Broadcast extends Base_Doughnut_Chart_Report {
 
-	protected function get_type() {
-		return 'doughnut';
-	}
+	use Broadcast_Stats;
 
-	protected function get_datasets() {
+	protected function get_chart_data() {
 
-		$data = $this->get_last_broadcast_details();
+		[
+			'sent'    => $sent,
+			'opened'  => $opened,
+			'clicked' => $clicked,
+		] = $this->get_broadcast_stats();
 
-		if ( empty( $data ) ){
-			return $data;
+		// SMS Stats
+		if ( $this->get_broadcast() && $this->get_broadcast()->is_sms() ){
+
+			return [
+				'label' => [
+					_x( 'Clicked', 'stats', 'groundhogg' ),
+					_x( 'Sent', 'stats', 'groundhogg' ),
+				],
+				'data'  => [
+					$clicked,
+					$sent - $opened,
+				],
+				'color' => [
+					$this->get_random_color(),
+					$this->get_random_color(),
+				]
+			];
+
 		}
 
 		return [
-			'labels'   => $data['label'],
-			'datasets' => [
-				[
-					'data'            => $data['data'],
-					'backgroundColor' => $data['color']
-				]
+			'label' => [
+				_x( 'Clicked', 'stats', 'groundhogg' ),
+				_x( 'Opened', 'stats', 'groundhogg' ),
+				_x( 'Unopened', 'stats', 'groundhogg' ),
+			],
+			'data'  => [
+				$clicked,
+				$opened - $clicked,
+				$sent - $opened,
+			],
+			'color' => [
+				$this->get_random_color(),
+				$this->get_random_color(),
+				$this->get_random_color()
 			]
 		];
 	}
 
-	protected function get_options() {
-		return $this->get_pie_chart_options();
-	}
-
-	protected function get_broadcast_id() {
-		return get_array_var( get_request_var( 'data' ), 'broadcast_id' );
-	}
-
-	protected function get_last_broadcast_details() {
-
-		$broadcast = $this->get_broadcast();
-
-		if ( $broadcast && $broadcast->exists() ) {
-
-			$counts = $this->normalize_data( $broadcast->get_report_data() );
-
-			$data  = [];
-			$label = [];
-			$color = [];
-
-			// normalize data
-			foreach ( $counts as $key => $datum ) {
-
-				$label [] = $datum ['label'];
-				$data[]   = $datum ['data'];
-				$color[]  = $datum ['color'];
-
-			}
-
-			return [
-				'label' => $label,
-				'data'  => $data,
-				'color' => $color
-			];
-
-
-		}
-
-		return [];
-
-	}
-
-	/**
-	 * @return bool|Broadcast
-	 */
-	public function get_broadcast() {
-
-		if ( $this->get_broadcast_id() ) {
-			return new Broadcast( $this->get_broadcast_id() );
-		}
-
-		$all_broadcasts = get_db( 'broadcasts' )->query( [
-			'status'  => 'sent',
-			'orderby' => 'send_time',
-			'order'   => 'desc',
-			'limit'   => 1
-		] );
-
-		if ( empty( $all_broadcasts ) ) {
-			return false;
-		}
-
-		$last_broadcast    = array_shift( $all_broadcasts );
-		$last_broadcast_id = absint( $last_broadcast->ID );
-
-		return new Broadcast( $last_broadcast_id );
-	}
-
-
 	protected function normalize_data( $stats ) {
 
-		if ( empty( $stats ) ) {
-			return $stats;
-		}
-
-		/*
-		* create array  of data ..
-		*/
-		$dataset = [];
-
-		if ( isset_not_empty( $stats, 'sms_id') ){
-
-			$dataset[] = [
-				'label' => _x( 'Sent', 'stats', 'groundhogg' ),
-				'data'  => $stats['sent'] - $stats['clicked'],
-				'url'   => add_query_arg(
-					[
-						'activity' => [
-							'step_id'       => $stats['id'],
-							'activity_type' => Activity::SMS_CLICKED,
-							'funnel_id'     => Broadcast::FUNNEL_ID
-						]
-					],
-					admin_page_url( 'gh_contacts' )
-				),
-				'color' => $this->get_random_color()
-			];
-
-			$dataset[] = [
-				'label' => _x( 'Clicked', 'stats', 'groundhogg' ),
-				'data'  => $stats['clicked'],
-				'url'   => add_query_arg(
-					[
-						'report' => [
-							'type'   => Event::BROADCAST,
-							'step'   => $stats['id'],
-							'status' => Event::COMPLETE
-						]
-					],
-					admin_page_url( 'gh_contacts' )
-				),
-				'color' => $this->get_random_color()
-			];
-
-
-			return $dataset;
-		}
-
-
-		$dataset[] = [
-			'label' => _x( 'Opened', 'stats', 'groundhogg' ),
-			'data'  => $stats['opened'] - $stats['clicked'],
-			'url'   => add_query_arg(
-				[
-					'activity' => [
-						'activity_type' => Activity::EMAIL_OPENED,
-						'step_id'       => $stats['id'],
-						'funnel_id'     => Broadcast::FUNNEL_ID
-					]
-				],
-				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-			),
-			'color' => $this->get_random_color()
-		];
-
-		$dataset[] = [
-			'label' => _x( 'Clicked', 'stats', 'groundhogg' ),
-			'data'  => $stats['clicked'],
-			'url'   => add_query_arg(
-				[
-					'activity' => [
-						'activity_type' => Activity::EMAIL_CLICKED,
-						'step_id'       => $stats['id'],
-						'funnel_id'     => Broadcast::FUNNEL_ID
-					]
-				],
-				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-			),
-			'color' => $this->get_random_color()
-		];
-
-		$dataset[] = [
-			'label' => _x( 'Unopened', 'stats', 'groundhogg' ),
-			'data'  => $stats['unopened'],
-			'url'   => '#',
-			'color' => $this->get_random_color()
-		];
-
-		return $dataset;
 	}
 
+	protected function normalize_datum( $item_key, $item_data ) {
+		// TODO: Implement normalize_datum() method.
+	}
 }

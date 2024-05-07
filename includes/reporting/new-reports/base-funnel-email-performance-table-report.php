@@ -69,13 +69,15 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 			              Activity::UNSUBSCRIBED
 		              ] )
 		              ->lessThanEqualTo( 'timestamp', $this->end )
-		              ->greaterThanEqualTo( 'timestamp', $this->start )
-		              ->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
+		              ->greaterThanEqualTo( 'timestamp', $this->start );
 
 
 		if ( $this->get_funnel_id() ) {
 			$sentQuery->where( 'funnel_id', $this->get_funnel_id() );
 			$activityQuery->where( 'funnel_id', $this->get_funnel_id() );
+		} else {
+			$sentQuery->where()->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
+			$activityQuery->where()->greaterThan( 'funnel_id', Broadcast::FUNNEL_ID );
 		}
 
 		$sentResults     = $sentQuery->get_results();
@@ -89,7 +91,7 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 			$step_id  = absint( $sentResult->step_id );
 
 			$email = new Email( $email_id );
-			$step = new Step( $step_id );
+			$step  = new Step( $step_id );
 
 			if ( ! $email->exists() || ! $step->exists() ) {
 				continue;
@@ -123,50 +125,50 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 
 			if ( $this->should_include( $sent, $opened, $clicked ) ) {
 				$list[] = [
-					'label'   => report_link( $email->get_title(), [
+					'label'        => report_link( $email->get_title(), [
 						'tab'  => 'funnels',
 						'step' => $step_id
 					] ),
 //					'order'        => $step->get_order(),
-					'sent'    => contact_filters_link( _nf( $sent ), [
+					'sent'         => contact_filters_link( _nf( $sent ), [
 						// Group
 						[
 							// Filter
 							[
-								'type'       => 'email_received',
-								'email_id'   => $email_id,
-								'step_id'    => $step_id,
-								'date_range' => 'between',
-								'before'     => $this->endDate->ymd(),
-								'after'      => $this->startDate->ymd(),
+								'type'          => 'email_received',
+								'email_id'      => $email_id,
+								'step_id'       => $step_id,
+								'date_range'    => 'between',
+								'before'        => $this->endDate->ymd(),
+								'after'         => $this->startDate->ymd(),
 								'count'         => 1,
 								'count_compare' => 'greater_than_or_equal_to',
 							]
 						]
 					], $sent ),
-					'opened'  => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
+					'opened'       => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
 						[
 							[
-								'type'       => 'email_opened',
-								'email_id'   => $email_id,
-								'step_id'    => $step_id,
-								'date_range' => 'between',
-								'before'     => $this->endDate->ymd(),
+								'type'          => 'email_opened',
+								'email_id'      => $email_id,
+								'step_id'       => $step_id,
+								'date_range'    => 'between',
+								'before'        => $this->endDate->ymd(),
 								'after'         => $this->startDate->ymd(),
 								'count'         => 1,
 								'count_compare' => 'greater_than_or_equal_to',
 							]
 						]
 					], $opened ),
-					'clicked' => contact_filters_link( format_number_with_percentage( $clicked, $opened ), [
+					'clicked'      => contact_filters_link( format_number_with_percentage( $clicked, $opened ), [
 						[
 							[
-								'type'       => 'email_link_clicked',
-								'email_id'   => $email_id,
-								'step_id'    => $step_id,
-								'date_range' => 'between',
-								'before'     => $this->endDate->ymd(),
-								'after'      => $this->startDate->ymd(),
+								'type'          => 'email_link_clicked',
+								'email_id'      => $email_id,
+								'step_id'       => $step_id,
+								'date_range'    => 'between',
+								'before'        => $this->endDate->ymd(),
+								'after'         => $this->startDate->ymd(),
 								'count'         => 1,
 								'count_compare' => 'greater_than_or_equal_to',
 							]
@@ -184,7 +186,7 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 							]
 						]
 					], $unsubscribed ),
-					'orderby'    => [
+					'orderby'      => [
 						// The value to compare, and the secondary column to compare
 						$step->get_order(),
 						$sent,
@@ -192,7 +194,7 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 						$clicked,
 						$unsubscribed,
 					],
-					'cellClasses'    => [
+					'cellClasses'  => [
 						// One of Good/Fair/Poor
 						'', // Email title
 						'', // sent

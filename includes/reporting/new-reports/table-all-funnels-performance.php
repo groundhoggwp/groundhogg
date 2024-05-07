@@ -43,6 +43,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 		];
 
 		$campaign_id = $this->get_campaign_id();
+
 		if ( $campaign_id ){
 			$query['related'] = [ 'ID' => $campaign_id, 'type' => 'campaign' ];
 		}
@@ -208,7 +209,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	}
 
 	/**
-	 * Count the number of  contacts that entered the funnel at one of the entry steps
+	 * Count the number of emails sent by this funnel
 	 *
 	 * @param $funnel Funnel
 	 *

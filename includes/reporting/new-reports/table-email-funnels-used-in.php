@@ -62,9 +62,9 @@ class Table_Email_Funnels_Used_In extends Base_Table_Report {
 			$opened = get_db( 'activity' )->count( [
 				'select'        => 'DISTINCT contact_id',
 				'activity_type' => Activity::EMAIL_OPENED,
-				'email_id'      => $email_id,
-				'step_id'       => $step->get_id(),
 				'funnel_id'     => $step->get_funnel_id(),
+				'step_id'       => $step->get_id(),
+				'email_id'      => $email_id,
 				'before'        => $this->end,
 				'after'         => $this->start
 			] );
@@ -72,9 +72,9 @@ class Table_Email_Funnels_Used_In extends Base_Table_Report {
 			$clicked = get_db( 'activity' )->count( [
 				'select'        => 'DISTINCT contact_id',
 				'activity_type' => Activity::EMAIL_CLICKED,
-				'email_id'      => $email_id,
-				'step_id'       => $step->get_id(),
 				'funnel_id'     => $step->get_funnel_id(),
+				'step_id'       => $step->get_id(),
+				'email_id'      => $email_id,
 				'before'        => $this->end,
 				'after'         => $this->start
 			] );

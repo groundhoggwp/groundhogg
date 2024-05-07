@@ -15,8 +15,7 @@ class Chart_Unsub_Reasons extends Base_Doughnut_Chart_Report {
 		$alias = $query->joinMeta( 'reason' );
 		$query->setSelect( [ 'COUNT(ID)', 'total' ], [ "$alias.meta_value", 'reason' ] )
 		      ->setGroupby( 'reason' )
-		      ->setOrderby( 'total' )
-		      ->setOrder( 'DESC' )
+		      ->setOrderby( [ 'total', 'DESC' ] )
 		      ->where()
 		      ->equals( 'activity_type', Activity::UNSUBSCRIBED )
 		      ->greaterThanEqualTo( 'timestamp', $this->start )

@@ -22,6 +22,10 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 			$filter['email_id'] = $this->get_email_id();
 		}
 
+		if ( $this->get_step_id() ) {
+			$filter['step_id'] = $this->get_step_id();
+		}
+
 		if ( $this->get_funnel_id() ) {
 			$filter['funnel_id'] = $this->get_funnel_id();
 		}
@@ -54,14 +58,17 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 			'after'         => $start
 		];
 
-		if ( $this->get_email_id() ) {
-			$query['email_id'] = $this->get_email_id();
-		}
-
 		if ( $this->get_funnel_id() ) {
 			$query['funnel_id'] = $this->get_funnel_id();
 		}
 
+		if ( $this->get_step_id() ) {
+			$query['step_id'] = $this->get_step_id();
+		}
+
+		if ( $this->get_email_id() ) {
+			$query['email_id'] = $this->get_email_id();
+		}
 
 		return $db->count( $query );
 	}
