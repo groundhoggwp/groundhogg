@@ -2127,7 +2127,7 @@ abstract class DB {
 	public function drop_index( string $index ) {
 
 		global $wpdb;
-		$wpdb->query( "DROP INDEX $index ON {$this->table_name}" );
+		$wpdb->query( "DROP INDEX $index ON {$this->table_name};" );
 	}
 
 	/**

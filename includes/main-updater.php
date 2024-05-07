@@ -129,6 +129,17 @@ class Main_Updater extends Old_Updater {
 					get_db( 'activity' )->create_table();
 					get_db( 'page_visits' )->create_table();
 				}
+			],
+			'3.4.2'    => [
+				'automatic'   => true,
+				'description' => __( 'Convert IP Address columns to binary and optimize table indexes.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->activity->update_3_4_2();
+					db()->events->update_3_4_2();
+					db()->event_queue->update_3_4_2();
+					db()->page_visits->update_3_4_2();
+					db()->form_impressions->update_3_4_2();
+				}
 			]
 		];
 	}

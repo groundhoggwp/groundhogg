@@ -26,11 +26,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Events extends DB {
 
-	public function __construct() {
-		parent::__construct();
-		wp_cache_add_non_persistent_groups( $this->get_cache_group() );
-	}
-
 	/**
 	 * Get the DB suffix
 	 *
@@ -72,6 +67,17 @@ class Events extends DB {
 	 */
 	public function get_date_key() {
 		return 'time';
+	}
+
+	/**
+	 * Create an event object from a raw one
+	 *
+	 * @param $object
+	 *
+	 * @return Event
+	 */
+	public function create_object( $object ) {
+		return new Event( $object );
 	}
 
 	/**
@@ -268,7 +274,7 @@ class Events extends DB {
 	 *
 	 * @access  public
 	 *
-	 * @since   2.1
+	 * @since 2.1
 	 *
 	 * @param $row_id
 	 *
@@ -277,6 +283,11 @@ class Events extends DB {
 	 * @return  object
 	 */
 	public function get_by( $column, $row_id ) {
+
+		if ( $column === $this->primary_key ){
+			return parent::get_by( $column, $row_id );
+		}
+
 		global $wpdb;
 		$column = esc_sql( $column );
 
@@ -374,18 +385,35 @@ class Events extends DB {
 	}
 
 	/**
+	 * Drop and recreate indexes
+	 *
+	 * @return void
+	 */
+	public function update_3_4_2(){
+
+		$this->drop_indexes( [
+			'time',
+			'time_scheduled',
+			'time_and_micro_time',
+			'contact_id',
+			'queued_id',
+			'funnel_id',
+			'step_id',
+			'priority'
+		] );
+
+		$this->create_table();
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
+	public function create_table_sql_command() {
 
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
@@ -401,18 +429,10 @@ class Events extends DB {
         priority int unsigned NOT NULL,
         status varchar(20) NOT NULL,
         PRIMARY KEY (ID),
-        KEY time (time),
-        KEY time_scheduled (time_scheduled),
-        KEY time_and_micro_time (time, micro_time),
-        KEY contact_id (contact_id),
-        KEY queued_id (queued_id),
-        KEY funnel_id (funnel_id),
-        KEY step_id (step_id),
-        KEY priority (priority)
+        KEY queued_idx (queued_id),
+        KEY contact_idx (contact_id),
+        KEY time_micro_time_idx (time, micro_time),
+        KEY funnel_step_email_idx (funnel_id,step_id,email_id)
 		) {$this->get_charset_collate()};";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }

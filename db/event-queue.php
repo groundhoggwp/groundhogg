@@ -322,18 +322,35 @@ class Event_Queue extends DB {
 	}
 
 	/**
+	 * Drop and recreate indexes
+	 *
+	 * @return void
+	 */
+	public function update_3_4_2(){
+
+		$this->drop_indexes( [
+			'time',
+			'time_scheduled',
+			'time_and_micro_time',
+			'contact_id',
+			'queued_id',
+			'funnel_id',
+			'step_id',
+			'priority'
+		] );
+
+		$this->create_table();
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
+	public function create_table_sql_command() {
 
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
@@ -349,17 +366,12 @@ class Event_Queue extends DB {
         status varchar(20) NOT NULL,
         claim varchar(20) NOT NULL,
         PRIMARY KEY (ID),
-        KEY time (time),
-        KEY time_scheduled (time_scheduled),
-        KEY contact_id (contact_id),
-        KEY funnel_id (funnel_id),
-        KEY step_id (step_id),
-        KEY priority (priority)
+        KEY time_idx (time),
+        KEY contact_idx (contact_id),
+        KEY funnel_idx (funnel_id),
+        KEY step_idx (step_id),
+        KEY claim_idx (claim)
 		) {$this->get_charset_collate()};";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 
 	public function create_object( $object ) {

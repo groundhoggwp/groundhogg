@@ -3,7 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Plugin;
+use Groundhogg\DB\Traits\IP_Address;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -14,14 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Stores information about a contact's site activity.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Form_Impressions extends DB {
+
+	use IP_Address;
 
 	/**
 	 * Get the DB suffix
@@ -107,8 +109,8 @@ class Form_Impressions extends DB {
 		$records = $this->query( [
 			'ip_address' => $args['ip_address'],
 			'form_id'    => $args['form_id'],
-			'before'     => time(),
-			'after'      => time() - DAY_IN_SECONDS
+			'after'      => time() - DAY_IN_SECONDS,
+			'limit'      => 1
 		] );
 
 		if ( ! empty( $records ) ) {
@@ -138,35 +140,31 @@ class Form_Impressions extends DB {
 		$result = $wpdb->query( "ALTER TABLE `{$this->get_table_name()}` DROP `count`;" );
 	}
 
+	public function update_3_4_2() {
+		$this->drop_indexes( [ 'timestamp', 'ip_address', 'form_id', 'views' ] ); // remove old indexes
+		$this->convert_ip_address_to_varbinary(); // convert the table
+		$this->create_table(); // recreates indexes
+	}
+
 	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
+	public function create_table_sql_command() {
 
-		global $wpdb;
+		$charset_collate = $this->get_charset_collate();
 
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         timestamp bigint(20) unsigned NOT NULL,
         form_id bigint(20) unsigned NOT NULL,
-        ip_address varchar(15) NOT NULL,
+        ip_address varbinary(16) NOT NULL,
         views bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
-        KEY timestamp (timestamp),
-        KEY ip_address (ip_address),
-        KEY form_id (form_id),
-        KEY views (views)
+        KEY time_idx (timestamp),
+        KEY form_ip_idx (form_id,ip_address)
 		) $charset_collate;";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }
