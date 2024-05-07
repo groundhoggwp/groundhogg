@@ -775,7 +775,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_choose_columns() {
 
-		$columns = array_keys( get_post_var( 'headers' ) );
+		$columns = array_keys( get_post_var( 'headers', [] ) );
 		$query   = get_request_var( 'query', [] );
 
 		if ( empty( $columns ) ) {
