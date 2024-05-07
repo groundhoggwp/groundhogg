@@ -2,7 +2,11 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\DB\Traits\Insert_Ignore;
+
 class User_Agents extends DB {
+
+	use Insert_Ignore;
 
 	public function get_db_suffix() {
 		return 'gh_user_agents';
@@ -47,33 +51,6 @@ class User_Agents extends DB {
 		return parent::add( $data );
 	}
 
-	/**
-	 * Wrapper for insert to use INSERT IGNORE
-	 *
-	 * @param $data
-	 *
-	 * @return int
-	 */
-	public function insert( $data ) {
-
-		add_filter( 'query', [ $this, '_insert_ignore' ] );
-		$result = parent::insert( $data );
-		remove_filter( 'query', [ $this, '_insert_ignore' ] );
-
-		return $result;
-	}
-
-	/**
-	 * Replace the INSERT statement with an INSERT IGNORE
-	 *
-	 * @param $query
-	 *
-	 * @return array|string|string[]
-	 */
-	public function _insert_ignore( $query ) {
-		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
-	}
-
 	public function get_columns() {
 		return [
 			'ID'              => '%d',
@@ -99,7 +76,7 @@ class User_Agents extends DB {
         user_agent TEXT NOT NULL,
         user_agent_hash BINARY(32) NOT NULL,
         PRIMARY KEY (ID),
-        UNIQUE KEY (user_agent_hash)
+        UNIQUE KEY user_agent_hash (user_agent_hash)
 		) $charset_collate;";
 	}
 }
