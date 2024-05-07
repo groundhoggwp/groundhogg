@@ -241,8 +241,6 @@ class Broadcasts_Table extends WP_List_Table {
 			], 'View Query' );
 		}
 
-		$report_data = $broadcast->get_report_data();
-
 		if ( $broadcast->is_pending() || $broadcast->is_scheduled() ) {
 			$actions['trash'] = "<a class='delete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel' ) . "'>" . _x( 'Cancel', 'action', 'groundhogg' ) . "</a>";
 		}
