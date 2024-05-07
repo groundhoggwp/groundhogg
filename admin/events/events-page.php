@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Events;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Background_Task;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
@@ -58,7 +59,10 @@ class Events_Page extends Tabbed_Admin_Page {
 		switch ( $this->get_current_tab() ) {
 			case 'emails':
 
-				$error_codes = array_filter( get_db( 'email_log' )->get_unique_column_values( 'error_code' ) );
+				$errorCodeQuery = new Table_Query( 'email_log' );
+				$errorCodeQuery
+					->setSelect( 'error_code' )->setGroupby( 'error_code' );
+				$error_codes = array_filter( wp_list_pluck( $errorCodeQuery->get_results(), 'error_code' ) );
 				$error_codes = array_combine( $error_codes, $error_codes );
 
 				$this->enqueue_table_filters( [
@@ -99,7 +103,9 @@ class Events_Page extends Tabbed_Admin_Page {
 				break;
 			case 'events':
 
-				switch ( get_url_var( 'status' ) ) {
+                $status = get_url_var( 'status' );
+
+				switch ( $status ) {
 					default:
 					case 'waiting':
 					case 'paused':
@@ -124,10 +130,14 @@ class Events_Page extends Tabbed_Admin_Page {
 					case 'failed':
 					case 'skipped':
 
-						$error_codes = array_filter( get_db( 'events' )->get_unique_column_values( 'error_code' ) );
-						$error_codes = array_combine( $error_codes, $error_codes );
+					$errorCodeQuery = new Table_Query( 'events' );
+					$errorCodeQuery
+						->setSelect( 'error_code' )->setGroupby( 'error_code' )
+						->where( 'status', $status );
+					$error_codes = array_filter( wp_list_pluck( $errorCodeQuery->get_results(), 'error_code' ) );
+					$error_codes = array_combine( $error_codes, $error_codes );
 
-						$this->enqueue_table_filters( [
+					$this->enqueue_table_filters( [
 							'stringColumns' => [
 								'error_message' => 'Error message',
 							],

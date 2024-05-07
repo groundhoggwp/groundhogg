@@ -6,6 +6,7 @@ use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
+use function Groundhogg\find_object;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -32,7 +33,7 @@ trait Broadcast_Stats {
 		           ->equals( 'step_id', $broadcast->get_id() );
 
 		$sent   = $eventQuery->count();
-		$opened = 0;
+		$opens = 0;
 
 		if ( $broadcast->is_sms() ) {
 			$activityQuery = new Table_Query( 'activity' );
@@ -43,8 +44,8 @@ trait Broadcast_Stats {
 			              ->equals( 'step_id', $broadcast->get_id() );
 
 			$results      = $activityQuery->get_results();
-			$clicked      = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ], 'and', 'total' ), 0, 0 ) );
-			$unsubscribed = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ], 'and', 'total' ), 0, 0 ) );
+			$clicks       = get_array_var( find_object( $results, [ 'activity_type' => Activity::SMS_CLICKED ] ), 'total', 0 );
+			$unsubscribed = get_array_var( find_object( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ] ), 'total', 0 );
 		} else {
 			$activityQuery = new Table_Query( 'activity' );
 			$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
@@ -55,16 +56,16 @@ trait Broadcast_Stats {
 
 			$results = $activityQuery->get_results();
 
-			$opened       = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_OPENED ], 'and', 'total' ), 0, 0 ) );
-			$clicked      = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ], 'and', 'total' ), 0, 0 ) );
-			$unsubscribed = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ], 'and', 'total' ), 0, 0 ) );
+			$opens        = get_array_var( find_object( $results, [ 'activity_type' => Activity::EMAIL_OPENED ] ), 'total', 0 );
+			$clicks       = get_array_var( find_object( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ] ), 'total', 0 );
+			$unsubscribed = get_array_var( find_object( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ] ), 'total', 0 );
 
 		}
 
 		return [
 			'sent'         => $sent,
-			'opened'       => $opened,
-			'clicked'      => $clicked,
+			'opened'       => $opens,
+			'clicked'      => $clicks,
 			'unsubscribed' => $unsubscribed
 		];
 	}

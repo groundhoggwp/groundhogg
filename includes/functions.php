@@ -737,6 +737,18 @@ function array_find( array $array, callable $predicate ) {
 	return false;
 }
 
+function find_object( array $array, array $args ){
+   return array_find( $array, function ( object $object ) use ( $args ){
+
+       foreach ( $args as $key => $value ){
+           if ( get_array_var( $object, $key ) !== $value ){
+               return false;
+           }
+       }
+
+       return true;
+   } );
+}
 
 /**
  * Get a variable from an array or default if it doesn't exist.
@@ -7278,12 +7290,37 @@ function force_custom_step_names() {
 	return is_option_enabled( 'gh_force_custom_step_names' ) || ! site_locale_is_english();
 }
 
+/**
+ * Wrap text in <b> tag
+ *
+ * @param $content
+ *
+ * @return string
+ */
 function bold_it( $content ) {
 	return html()->e( 'b', [], $content, false );
 }
 
+/**
+ * Wrap text in <code> tag
+ *
+ * @param $content
+ *
+ * @return string
+ */
 function code_it( $content ) {
 	return html()->e( 'code', [], $content, false );
+}
+
+/**
+ * Wrap text in <pre> tag
+ *
+ * @param $content
+ *
+ * @return string
+ */
+function pre_it( $content ) {
+	return html()->e( 'pre', [], $content, false );
 }
 
 function array_bold( $array ) {

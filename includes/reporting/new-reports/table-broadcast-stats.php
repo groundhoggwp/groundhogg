@@ -4,22 +4,20 @@ namespace Groundhogg\Reporting\New_Reports;
 
 
 use Groundhogg\Broadcast;
-use Groundhogg\Classes\Activity;
-use Groundhogg\DB\Query\Table_Query;
-use Groundhogg\Event;
+use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_find;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\format_number_with_percentage;
-use function Groundhogg\get_array_var;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
 class Table_Broadcast_Stats extends Base_Table_Report {
+
+	use Broadcast_Stats;
 
 	/**
 	 * @return mixed
@@ -52,47 +50,13 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			return [];
 		}
 
-		$eventQuery = new Table_Query( 'events' );
-		$eventQuery->where()
-		           ->equals( 'event_type', Event::BROADCAST )
-		           ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
-		           ->equals( 'step_id', $broadcast->get_id() );
+		[
+			'sent'         => $sent,
+			'opened'       => $opened,
+			'clicked'      => $clicked,
+			'unsubscribed' => $unsubscribed
 
-		$sent         = $eventQuery->count();
-		$opened       = 0;
-		$clicked      = 0;
-		$unsubscribed = 0;
-
-		if ( $broadcast->is_sms() ) {
-
-			$activityQuery = new Table_Query( 'activity' );
-			$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
-			              ->where()
-			              ->in( 'activity_type', [ Activity::SMS_CLICKED, Activity::UNSUBSCRIBED ] )
-			              ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
-			              ->equals( 'step_id', $broadcast->get_id() );
-
-			$results = $activityQuery->get_results();
-
-			$clicked      = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::SMS_CLICKED ], 'and', 'total' ), 0, 0 ) );
-			$unsubscribed = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ], 'and', 'total' ), 0, 0 ) );
-
-		} else {
-
-			$activityQuery = new Table_Query( 'activity' );
-			$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
-			              ->where()
-			              ->in( 'activity_type', [ Activity::EMAIL_OPENED, Activity::EMAIL_CLICKED, Activity::UNSUBSCRIBED ] )
-			              ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
-			              ->equals( 'step_id', $broadcast->get_id() );
-
-			$results = $activityQuery->get_results();
-
-			$opened       = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_OPENED ], 'and', 'total' ), 0, 0 ) );
-			$clicked      = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ], 'and', 'total' ), 0, 0 ) );
-			$unsubscribed = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ], 'and', 'total' ), 0, 0 ) );
-		}
-
+		] = $this->get_broadcast_stats();
 
 		$title  = $broadcast->is_email() ? $broadcast->get_object()->get_subject_line() : $broadcast->get_title();
 		$object = $broadcast->get_object();

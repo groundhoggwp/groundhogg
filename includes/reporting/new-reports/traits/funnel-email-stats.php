@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports\Traits;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
+use function Groundhogg\find_object;
 use function Groundhogg\get_array_var;
 
 trait Funnel_Email_Stats {
@@ -24,6 +25,7 @@ trait Funnel_Email_Stats {
 
 		$activityQuery = new Table_Query( 'activity' );
 		$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
+		              ->setGroupby( 'activity_type' )
 		              ->where()
 		              ->in( 'activity_type', [ Activity::EMAIL_OPENED, Activity::EMAIL_CLICKED, Activity::UNSUBSCRIBED ] )
 		              ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -34,14 +36,14 @@ trait Funnel_Email_Stats {
 
 		$results = $activityQuery->get_results();
 
-		$opened       = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_OPENED ], 'and', 'total' ), 0, 0 ) );
-		$clicked      = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ], 'and', 'total' ), 0, 0 ) );
-		$unsubscribed = absint( get_array_var( wp_filter_object_list( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ], 'and', 'total' ), 0, 0 ) );
+		$opens        = get_array_var( find_object( $results, [ 'activity_type' => Activity::EMAIL_OPENED ] ), 'total', 0 );
+		$clicks       = get_array_var( find_object( $results, [ 'activity_type' => Activity::EMAIL_CLICKED ] ), 'total', 0 );
+		$unsubscribed = get_array_var( find_object( $results, [ 'activity_type' => Activity::UNSUBSCRIBED ] ), 'total', 0 );
 
 		return [
 			'sent'         => $sent,
-			'opened'       => $opened,
-			'clicked'      => $clicked,
+			'opened'       => $opens,
+			'clicked'      => $clicks,
 			'unsubscribed' => $unsubscribed
 		];
 	}

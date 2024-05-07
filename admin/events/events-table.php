@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Events;
 
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_List_Table;
@@ -9,12 +10,16 @@ use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
+use function Groundhogg\code_it;
+use function Groundhogg\find_object;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\pre_it;
 use function Groundhogg\scheduled_time_column;
 
 /**
@@ -74,10 +79,10 @@ class Events_Table extends WP_List_Table {
 			'error_message' => _x( 'Error Message', 'Column label', 'groundhogg' ),
 		);
 
-        if ( ! in_array( $this->get_view(), [ 'skipped', 'failed' ] ) ){
-            unset( $columns['error_code'] );
-            unset( $columns['error_message'] );
-        }
+		if ( ! in_array( $this->get_view(), [ 'skipped', 'failed' ] ) ) {
+			unset( $columns['error_code'] );
+			unset( $columns['error_message'] );
+		}
 
 		return apply_filters( 'groundhogg_event_columns', $columns );
 	}
@@ -207,7 +212,7 @@ class Events_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_error_code( $event ) {
-		return $event->get_error_code() ? '<b>' . esc_html( strtolower( $event->get_error_code() ) ) . '</b>' : '&#x2014;';
+		return $event->get_error_code() ? code_it( esc_html( strtolower( $event->get_error_code() ) ) ) : '&#x2014;';
 	}
 
 
@@ -217,7 +222,7 @@ class Events_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_error_message( $event ) {
-		return $event->get_error_message() ? '<b>' . esc_html( strtolower( $event->get_error_message() ) ) . '</b>' : '&#x2014;';
+		return $event->get_error_message() ? esc_html( strtolower( $event->get_error_message() ) ) : '&#x2014;';
 	}
 
 	/**
@@ -289,14 +294,19 @@ class Events_Table extends WP_List_Table {
 
 		$view = $this->get_view();
 
+		$eventQuery = new Table_Query( 'event_queue' );
+		$eventQuery->setSelect( 'status', [ 'COUNT(ID)', 'total' ] )
+                   ->setGroupby('status');
+		$results = $eventQuery->get_results();
+
 		$views = [
 			Event::WAITING     => __( 'Waiting', 'groundhogg' ),
 			Event::PAUSED      => __( 'Paused', 'groundhogg' ),
 			Event::IN_PROGRESS => __( 'In Progress', 'groundhogg' ),
 		];
 
-		$views = array_map_with_keys( $views, function ( $text, $status ) use ( $view ) {
-			$count = get_db( 'event_queue' )->count( [ 'status' => $status ] );
+		$views = array_map_with_keys( $views, function ( $text, $status ) use ( $view, $results ) {
+			$count = get_array_var( find_object( $results, [ 'status' => $status ] ), 'total', 0 );
 
 			return html()->e( 'a', [
 				'class' => [ $status, $view == $status ? 'current' : '' ],
@@ -316,8 +326,13 @@ class Events_Table extends WP_List_Table {
 			Event::FAILED    => __( 'Failed', 'groundhogg' ),
 		];
 
-		$more_views = array_map_with_keys( $more_views, function ( $text, $status ) use ( $view ) {
-			$count = get_db( 'events' )->count( [ 'status' => $status ] );
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setSelect( 'status', [ 'COUNT(ID)', 'total' ] )
+                   ->setGroupby('status');
+		$results = $eventQuery->get_results();
+
+		$more_views = array_map_with_keys( $more_views, function ( $text, $status ) use ( $view, $results ) {
+			$count = get_array_var( find_object( $results, [ 'status' => $status ] ), 'total', 0 );
 
 			return html()->e( 'a', [
 				'class' => [ $status, $view == $status ? 'current' : '' ],

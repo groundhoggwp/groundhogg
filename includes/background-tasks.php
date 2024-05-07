@@ -39,13 +39,13 @@ class Background_Tasks {
 		          ->empty( 'claim' )
 		          ->lessThan( 'time', time() );
 
-		// No tasks
-		if ( ! $taskQuery->count() ) {
+		// Claim the tasks
+		$updated = $taskQuery->update( [ 'claim' => $claim, 'status' => 'in_progress' ] );
+
+		// No tasks were claimed
+		if ( ! $updated ){
 			return;
 		}
-
-		// Claim the tasks
-		$taskQuery->update( [ 'claim' => $claim, 'status' => 'in_progress' ] );
 
 		// Fetch the claimed tasks
 		$claimQuery = new Table_Query( 'background_tasks' );
