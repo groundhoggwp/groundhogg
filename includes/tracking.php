@@ -747,13 +747,6 @@ class Tracking {
 			$target_url = '/';
 		}
 
-		// We removed the hostname from the url to shorten it
-//		if ( preg_match( '@^/@', $target_url ) ) {
-//			$scheme     = is_ssl() ? 'https' : 'http';
-//			$hostname   = wp_parse_url( home_url(), PHP_URL_HOST );
-//			$target_url = "{$scheme}://{$hostname}{$target_url}";
-//		}
-
 		$this->target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		return $this->target_url;
@@ -787,14 +780,10 @@ class Tracking {
 
 		$args = [
 			'event_id'      => $event->get_id(),
-			'contact_id'    => $event->get_contact_id(),
-			'funnel_id'     => $event->get_funnel_id(),
-			'step_id'       => $event->get_step_id(),
-			'email_id'      => $event->get_email_id(),
 			'activity_type' => Activity::EMAIL_OPENED,
 		];
 
-		// Check if exists first
+		// We've already tracked an open for this event
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
 			$activity = track_event_activity( $event, Activity::EMAIL_OPENED, [], [
 				'ip_address' => get_current_ip_address(),
