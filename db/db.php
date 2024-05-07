@@ -4,7 +4,6 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
@@ -578,7 +577,7 @@ abstract class DB {
 	public function commit_batch_insert() {
 
 		// Nothing to batch insert
-		if ( empty( $this->batch_inserts ) ){
+		if ( empty( $this->batch_inserts ) ) {
 			return false;
 		}
 
@@ -809,19 +808,19 @@ abstract class DB {
 	 * @since   2.1
 	 * @return  bool
 	 */
-	public function update( $row_id = 0, $data = [], $where = [] ) {
+	public function update( $row_id_or_where = 0, $data = [], $where = [] ) {
 
 		// Nothing to update
-		if ( empty( $data ) ){
+		if ( empty( $data ) ) {
 			return true;
 		}
 
 		global $wpdb;
 
-		if ( is_string( $row_id ) || is_numeric( $row_id ) ) {
-			$where = [ $this->get_primary_key() => $row_id ];
-		} else if ( is_array( $row_id ) ) {
-			$where = $row_id;
+		if ( is_string( $row_id_or_where ) || is_numeric( $row_id_or_where ) ) {
+			$where = [ $this->get_primary_key() => $row_id_or_where ];
+		} else if ( is_array( $row_id_or_where ) ) {
+			$where = $row_id_or_where;
 		}
 
 		// Don't know who to update
@@ -1171,7 +1170,7 @@ abstract class DB {
 	 *
 	 * @return void
 	 */
-	public function parse_filters( array $filters, Where $where ){
+	public function parse_filters( array $filters, Where $where ) {
 		$this->maybe_register_filters();
 		$this->query_filters->parse_filters( $filters, $where );
 	}
@@ -1288,7 +1287,7 @@ abstract class DB {
 
 		$operation = $query_vars['operation'];
 
-		$query = new Table_Query( $this );
+		$query               = new Table_Query( $this );
 		$this->current_query = $query;
 
 		$moreWhere = [];
@@ -1375,7 +1374,11 @@ abstract class DB {
 					break;
 				case 'orderby':
 				case 'order_by':
-					$query->setOrderby( $val );
+					if ( is_array( $val ) ) {
+						$query->setOrderby( ...$val );
+					} else {
+						$query->setOrderby( $val );
+					}
 					break;
 				case 'order':
 				case 'ORDER':
@@ -1527,7 +1530,7 @@ abstract class DB {
 
 	public function found_rows() {
 
-		if ( $this->current_query ){
+		if ( $this->current_query ) {
 			return $this->current_query->get_found_rows();
 		}
 
@@ -2097,6 +2100,37 @@ abstract class DB {
 	}
 
 	/**
+	 * Drop an index
+	 *
+	 * @param array $indexes
+	 *
+	 * @return void
+	 */
+	public function drop_indexes( array $indexes ) {
+
+		$queries = array_map( function ( string $index ) {
+			return "DROP INDEX $index ON {$this->table_name};";
+		}, $indexes );
+
+		global $wpdb;
+
+		mysqli_multi_query( $wpdb->dbh, implode( ' ', $queries ) );
+	}
+
+	/**
+	 * Drop an index
+	 *
+	 * @param array $indexes
+	 *
+	 * @return void
+	 */
+	public function drop_index( string $index ) {
+
+		global $wpdb;
+		$wpdb->query( "DROP INDEX $index ON {$this->table_name}" );
+	}
+
+	/**
 	 * Empty the table
 	 */
 	public function truncate() {
@@ -2167,5 +2201,4 @@ abstract class DB {
 	public function delete_orphaned_meta() {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
 	}
-
 }
