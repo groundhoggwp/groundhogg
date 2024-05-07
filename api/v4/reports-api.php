@@ -77,7 +77,7 @@ class Reports_Api extends Base_Api {
 					$alias = $query->joinMeta( $report['field'] );
 					$query->setSelect( [ "$alias.meta_value", 'value' ], [ 'COUNT(*)', 'total' ] );
 					$query->where()->isNotNull( "$alias.meta_value" );
-					$query->setOrderby( 'total' );
+					$query->setOrderby( [ 'total', 'DESC' ] );
 
 					$setGroupby = function ( Contact_Query &$query ){
 						$query->setGroupby( 'value' );

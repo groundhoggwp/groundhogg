@@ -88,7 +88,7 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 			->setLimit( $per_page )
 			->setOffset( ( $current_page - 1 ) * $per_page )
 			->setFoundRows( true )
-			->setOrderby( 'time' )
+			->setOrderby( [ 'time', 'DESC' ], [ 'micro_time', 'DESC' ] )
 			->where()
 			->equals( 'status', Event::COMPLETE )
 			->greaterThan( 'email_id', 0 )
@@ -147,13 +147,13 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 
 			?>
             <p><?php printf( __( 'You\'ve received %s emails matching %s.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ), bold_it( esc_html( $search ) ) ); ?></p>
-		    <?php
+		<?php
 
 		else:
 
 			?>
             <p><?php printf( __( 'You\'ve received %s emails from us.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ) ); ?></p>
-		    <?php
+		<?php
 
 		endif;
 

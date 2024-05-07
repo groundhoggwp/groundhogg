@@ -85,7 +85,7 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 			->setLimit( $per_page )
 			->setOffset( ( $current_page - 1 ) * $per_page )
 			->setFoundRows( true )
-			->setOrderby( 'send_time' )->setOrder( 'DESC' )
+			->setOrderby( [ 'send_time', 'DESC' ] )
 			->where()
 			->equals( 'object_type', 'email' )
 			->equals( 'status', 'sent' );
