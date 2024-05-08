@@ -17,7 +17,7 @@ class Page_Visit extends Base_Object {
 	 * @return void
 	 */
 	protected function post_setup() {
-		// TODO: Implement post_setup() method.
+		$this->ip_address = inet_ntop( $this->ip_address ); // IP stored in binary
 	}
 
 	public function get_timestamp() {

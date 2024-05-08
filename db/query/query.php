@@ -237,6 +237,7 @@ class Query {
 			return $this;
 		}
 
+		// Columns passed
 		$columns = array_map( function ( $col ) {
 
 			// column and order
@@ -249,7 +250,7 @@ class Query {
 				return "$column $order";
 			}
 
-			return "{$this->maybe_sanitize_aggregate_column( $col )} {$this->order}";
+			return trim( "{$this->maybe_sanitize_aggregate_column( $col )} {$this->order}" );
 		}, $columns );
 
 		$this->orderby = implode( ', ', $columns );
@@ -397,11 +398,12 @@ class Query {
 	 * @return string
 	 */
 	protected function _orderby() {
-		return $this->orderby ? "ORDER BY $this->orderby $this->order" : '';
+		$this->orderby = trim( $this->orderby );
+		return ! empty( $this->orderby ) ? "ORDER BY $this->orderby $this->order" : '';
 	}
 
 	protected function _groupby() {
-		return $this->groupby ? "GROUP BY $this->groupby" : '';
+		return ! empty( $this->groupby ) ? "GROUP BY $this->groupby" : '';
 	}
 
 

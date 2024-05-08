@@ -2107,14 +2107,9 @@ abstract class DB {
 	 * @return void
 	 */
 	public function drop_indexes( array $indexes ) {
-
-		$queries = array_map( function ( string $index ) {
-			return "DROP INDEX $index ON {$this->table_name};";
-		}, $indexes );
-
-		global $wpdb;
-
-		mysqli_multi_query( $wpdb->dbh, implode( ' ', $queries ) );
+		foreach ( $indexes as $index ){
+			$this->drop_index( $index );
+		}
 	}
 
 	/**
@@ -2135,7 +2130,6 @@ abstract class DB {
 	 */
 	public function truncate() {
 		global $wpdb;
-
 		$wpdb->query( "DELETE FROM " . $this->table_name );
 	}
 

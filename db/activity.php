@@ -74,6 +74,15 @@ class Activity extends DB {
 	}
 
 	/**
+	 * @param $object
+	 *
+	 * @return \Groundhogg\Classes\Activity
+	 */
+	public function create_object( $object ) {
+		return new \Groundhogg\Classes\Activity( $object );
+	}
+
+	/**
 	 * Get columns and formats
 	 *
 	 * @access  public

@@ -11,7 +11,7 @@ trait IP_Address {
 
 		$queries = [
 			// Create the varbinary column
-			"ALTER TABLE {$this->table_name} ADD COLUMN ip_binary VARBINARY(16);",
+			"ALTER TABLE {$this->table_name} ADD COLUMN ip_binary VARBINARY(16) NOT NULL;",
 			// Copy the data from ip_address to ip_binary
 			"UPDATE {$this->table_name} SET ip_binary = INET6_ATON(ip_address);",
 			// Drop the OG ip_address column
@@ -20,7 +20,9 @@ trait IP_Address {
 			"ALTER TABLE {$this->table_name} RENAME COLUMN ip_binary TO ip_address;",
 		];
 
-		mysqli_multi_query( $wpdb->dbh, implode( ' ', $queries ) );
+		foreach ( $queries as $query ) {
+			$wpdb->query( $query );
+		}
 	}
 
 	/**
@@ -40,14 +42,18 @@ trait IP_Address {
 	/**
 	 * If IP address is in the array, unpack it.
 	 *
-	 * @param array $data
+	 * @param array|object $data
 	 *
 	 * @return void
 	 */
-	protected function unpackIP( array &$data ) {
+	protected function unpackIP( &$data ) {
 		// Convert IP Address to binary
 		if ( isset_not_empty( $data, 'ip_address' ) ) {
-			$data['ip_address'] = inet_ntop( $data['ip_address'] );
+			if ( is_array( $data ) ) {
+				$data['ip_address'] = inet_ntop( $data['ip_address'] );
+			} else if ( is_object( $data ) ) {
+				$data->ip_address = inet_ntop( $data->ip_address );
+			}
 		}
 	}
 
@@ -67,11 +73,11 @@ trait IP_Address {
 	}
 
 	public function update( $id_or_where = 0, $data = [], $where = [] ) {
-		if ( is_array( $id_or_where ) ){
+		if ( is_array( $id_or_where ) ) {
 			$this->packIP( $id_or_where );
 		}
 
-		if ( is_array( $where ) && ! empty( $where ) ){
+		if ( is_array( $where ) && ! empty( $where ) ) {
 			$this->packIP( $where );
 		}
 
