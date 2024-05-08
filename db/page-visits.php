@@ -215,7 +215,12 @@ class Page_Visits extends DB {
 	 * @return void
 	 */
 	public function update_3_4_2() {
-		$this->drop_indexes( [ 'timestamp', 'ip_address', 'contact_id', 'path' ] ); // remove old indexes
+		$this->drop_indexes( [
+			'timestamp',
+			'ip_address',
+			'contact_id',
+			'path'
+		] ); // remove old indexes
 		$this->convert_ip_address_to_varbinary(); // convert the table
 		$this->create_table(); // recreates indexes
 	}

@@ -229,9 +229,11 @@ class Activity extends DB {
 	public function update_3_4_2(){
 		$this->drop_indexes( [
 			'timestamp',
-			'ip_address',
-			'from_id',
-			'views'
+			'funnel_id',
+			'step_id',
+			'event_id',
+			'referer_hash',
+			'activity_type',
 		] ); // remove old indexes
 
 		$this->convert_ip_address_to_varbinary(); // convert the table
@@ -270,3 +272,5 @@ class Activity extends DB {
 		) $charset_collate;";
 	}
 }
+
+
