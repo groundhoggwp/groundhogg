@@ -2126,6 +2126,19 @@ abstract class DB {
 	}
 
 	/**
+	 * Create a new index
+	 *
+	 * @param string $name
+	 * @param array  $columns
+	 *
+	 * @return void
+	 */
+	public function create_index( string $name, array $columns ){
+		global $wpdb;
+		$wpdb->query( sprintf( "CREATE INDEX $name ON {$this->table_name} (%s);", implode(',', $columns ) ) );
+	}
+
+	/**
 	 * Empty the table
 	 */
 	public function truncate() {
