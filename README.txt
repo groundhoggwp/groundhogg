@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.1
+Stable tag: 3.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4.2 (2024-05-08) =
+* IMPROVED Optimized indexes for activity and events tables for faster reporting.
+* IMPROVED Optimized more queries for faster reporting.
+* TWEAKED IP Addresses will now be stored in binary rather than plain text.
+* FIXED Activity not saving when visitor accesses the site via IPv6.
+* FIXED Guided setup notice not dismissing.
+* FIXED Broken premium link in checklist items.
 
 = 3.4.1 (2024-04-30) =
 * ADDED Begin tracking user agents and IP address with activity and page visits

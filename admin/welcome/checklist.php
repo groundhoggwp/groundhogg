@@ -86,7 +86,7 @@ $checklist_items = [
 		'title'       => __( 'Upgrade to Premium', 'groundhogg' ),
 		'description' => __( 'Get a premium plan and activate more powerful features that will help you grow and scale.', 'groundhogg' ),
 		'completed'   => has_premium_features(),
-		'fix'         => 'https://groundhogg.io/pricing/utm_source=plugin&utm_medium=checklist&utm_campaign=welcome&utm_content=fix',
+		'fix'         => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=checklist&utm_campaign=welcome&utm_content=fix',
 		'cap'         => 'manage_options'
 	],
 ];

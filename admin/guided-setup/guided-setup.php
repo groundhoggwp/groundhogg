@@ -52,9 +52,12 @@ class Guided_Setup extends Admin_Page {
 	 */
 	function maybe_show_guided_setup_nag() {
 
-        notices()->undismiss_notice( 'guided_setup_nag' );
-
-		if ( $this->is_current_page() || ! current_user_can( 'manage_options' ) || is_option_enabled( 'gh_guided_setup_finished' ) || notices()->is_dismissed( 'guided_setup_nag' ) || is_white_labeled() ) {
+		if ( $this->is_current_page()
+             || ! current_user_can( 'manage_options' )
+             || is_option_enabled( 'gh_guided_setup_finished' )
+             || notices()->is_dismissed( 'guided_setup_nag' )
+             || is_white_labeled()
+        ) {
 			return;
 		}
 
