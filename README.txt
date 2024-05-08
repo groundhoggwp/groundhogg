@@ -349,6 +349,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.4.2.1 (2024-05-08) =
+* HOT FIX Renaming IP address column not working in MySQL 5.6
+
 = 3.4.2 (2024-05-08) =
 * IMPROVED Optimized indexes for activity and events tables for faster reporting.
 * IMPROVED Optimized more queries for faster reporting.

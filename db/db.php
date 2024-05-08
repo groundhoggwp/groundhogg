@@ -2162,7 +2162,7 @@ abstract class DB {
 	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 */
 	public function installed() {
-		return $this->table_exists( $this->table_name );
+		return self::table_exists( $this->table_name );
 	}
 
 	/**
@@ -2174,11 +2174,28 @@ abstract class DB {
 	 *
 	 * @return bool          If the table name exists
 	 */
-	public function table_exists( $table ) {
+	public static function table_exists( $table ) {
 		global $wpdb;
 		$table = sanitize_text_field( $table );
 
 		return $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE '%s'", $table ) ) === $table;
+	}
+
+	/**
+	 * The column exists
+	 *
+	 * @param $column_name
+	 *
+	 * @return bool
+	 */
+	public function column_exists( $column_name ){
+		global $wpdb;
+
+		if ( in_array( $column_name, $wpdb->get_col( "DESC $this->table_name", 0 ), true ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

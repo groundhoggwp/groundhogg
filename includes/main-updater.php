@@ -140,6 +140,15 @@ class Main_Updater extends Old_Updater {
 					db()->page_visits->update_3_4_2();
 					db()->form_impressions->update_3_4_2();
 				}
+			],
+			'3.4.2.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Fix IP Address column not renamed correctly.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->activity->maybe_fix_ip_column();
+					db()->page_visits->maybe_fix_ip_column();
+					db()->form_impressions->maybe_fix_ip_column();
+				}
 			]
 		];
 	}

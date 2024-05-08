@@ -15,14 +15,34 @@ trait IP_Address {
 			// Copy the data from ip_address to ip_binary
 			"UPDATE {$this->table_name} SET ip_binary = INET6_ATON(ip_address);",
 			// Drop the OG ip_address column
-			"ALTER TABLE {$this->table_name} DROP COLUMN ip_address;",
+			"ALTER TABLE {$this->table_name} DROP COLUMN `ip_address`;",
 			// Rename the column to ip_address
-			"ALTER TABLE {$this->table_name} RENAME COLUMN ip_binary TO ip_address;",
+			"ALTER TABLE {$this->table_name} CHANGE `ip_binary` `ip_address` VARBINARY(16);",
 		];
 
 		foreach ( $queries as $query ) {
 			$wpdb->query( $query );
 		}
+	}
+
+	/**
+	 * Oops! Our SQL was bad and now we have to fix it.
+	 *
+	 * @return void
+	 */
+	public function maybe_fix_ip_column(){
+
+		global $wpdb;
+
+		// ip_binary does not exist, so we're good
+		if ( ! $this->column_exists( 'ip_binary' ) ){
+			return;
+		}
+
+		// Update the ip_address column with the data from ip_binary
+		$wpdb->query( "UPDATE {$this->table_name} SET ip_address = ip_binary WHERE ip_binary != '';" );
+		// Drop the ip_binary column
+		$this->drop_column( 'ip_binary' );
 	}
 
 	/**
