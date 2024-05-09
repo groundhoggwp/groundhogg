@@ -103,7 +103,7 @@ trait IP_Address {
 
 		$this->packIP( $data );
 
-		return $this->update( $id_or_where, $data, $where );
+		return parent::update( $id_or_where, $data, $where );
 	}
 
 	/**

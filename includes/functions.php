@@ -5210,7 +5210,7 @@ function track_page_visit( $ref, $contact, $override = [] ) {
 	$query    = sanitize_text_field( wp_parse_url( $ref, PHP_URL_QUERY ) );
 	$fragment = sanitize_text_field( wp_parse_url( $ref, PHP_URL_FRAGMENT ) );
 
-	$visit = get_db( 'page_visits' )->add( array_merge( [
+	$visit = db()->page_visits->add( array_merge( [
 		'contact_id' => $contact->get_id(),
 		'path'       => $path,
 		'query'      => $query,

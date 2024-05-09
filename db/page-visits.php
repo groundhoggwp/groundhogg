@@ -191,11 +191,13 @@ class Page_Visits extends DB {
 			'order'      => 'DESC'
 		] );
 
+		// Record for this visit already exists
 		if ( ! empty( $records ) ) {
 
 			$record = array_shift( $records );
 			$id     = absint( $record->ID );
 
+			// increment page views
 			if ( $this->update( $id, [ 'views' => absint( $record->views ) + absint( $args['views'] ) ] ) ) {
 				return $id;
 			}
