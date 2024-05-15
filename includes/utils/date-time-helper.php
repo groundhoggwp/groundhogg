@@ -84,6 +84,15 @@ class DateTimeHelper extends \DateTime {
 		return human_time_diff( $this->getTimestamp(), time() );
 	}
 
+	/**
+	 * Whether the current date represents a leap year
+	 *
+	 * @return bool
+	 */
+	public function isLeapYear(){
+		return absint( $this->format('L') ) === 1;
+	}
+
 	public function i18n() {
 
 		switch ( $this->whenIs() ) {

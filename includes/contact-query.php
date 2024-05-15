@@ -220,7 +220,7 @@ class Contact_Query extends Table_Query {
 		] );
 
 		// Simple, use date_optin_status_changed
-		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) && empty( $filter['reasons' ] ) ) {
+		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) && empty( $filter['reasons'] ) ) {
 			$where->equals( 'optin_status', Preferences::UNSUBSCRIBED );
 			Filters::mysqlDateTime( 'date_optin_status_changed', $filter, $where );
 
@@ -230,7 +230,7 @@ class Contact_Query extends Table_Query {
 		$activityQuery = self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
 
 		// Filter by reason as well
-		if ( ! empty( $filter['reasons'] ) ){
+		if ( ! empty( $filter['reasons'] ) ) {
 			$metaAlias = $activityQuery->joinMeta( 'reason' );
 			$activityQuery->where()->in( "COALESCE($metaAlias.meta_value,'')", array_map( 'sanitize_key', $filter['reasons'] ) );
 		}
@@ -291,17 +291,35 @@ class Contact_Query extends Table_Query {
 		$meta_key = $filter['meta_key'];
 		$alias    = $where->query->joinMeta( $meta_key );
 
+		/**
+		 * @type $before DateTimeHelper
+		 * @type $after DateTimeHelper
+		 */
 		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
 
 		if ( $filter['compare'] === 'is_not' ) {
 			$where->not();
 		}
 
-		$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
-                INTERVAL YEAR(\'%2$s\')-YEAR(%1$s)
-                         + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0)
-                YEAR)  
+		// If the dates are the same; day of, today, tomorrow, yesterday, etc...
+		if ( $after->ymd() === $before->ymd() ) {
+
+			$subWhere = $where->subWhere();
+
+			// On feb 28 of non leap years, also include peoples whose anniversary is feb 29
+			if ( ! $before->isLeapYear() && $before->format( 'm-d' ) === '02-28' ){
+				$subWhere->addCondition( "DATE_FORMAT($alias.meta_value,'%m-%d') = '02-29'" );
+			}
+
+			$subWhere->addCondition( "DATE_FORMAT($alias.meta_value,'%m-%d') = '{$before->format('m-d')}'" );
+
+		} else {
+			// Range selection
+			$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
+			INTERVAL YEAR(\'%2$s\')-YEAR(%1$s) + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0) YEAR
+			)  
             BETWEEN \'%2$s\' AND \'%3$s\'', "$alias.meta_value", $after->ymd(), $before->ymd() ) );
+		}
 	}
 
 	/**
