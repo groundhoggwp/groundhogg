@@ -9,6 +9,7 @@ use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 class Info_Cards {
 
@@ -39,7 +40,7 @@ class Info_Cards {
 	 * Save the user card info to the user meta when they change the order of the cards in the UI
 	 */
 	public function save_card_atts() {
-		if ( ! current_user_can( 'view_contacts' ) ) {
+		if ( ! current_user_can( 'view_contacts' ) || ! verify_admin_ajax_nonce() ) {
 			return;
 		}
 
@@ -52,6 +53,8 @@ class Info_Cards {
 		}, get_post_var( 'cardOrder', [] ) );
 
 		update_user_meta( get_current_user_id(), 'groundhogg_info_card_order', $card_order );
+
+        wp_send_json_success();
 	}
 
 	/**

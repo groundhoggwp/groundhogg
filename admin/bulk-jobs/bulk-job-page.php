@@ -130,7 +130,15 @@ class Bulk_Job_Page extends Admin_Page {
 		<?php
 	}
 
+    public function process_action() {
+	    return;
+    }
+
 	public function view() {
+
+        if ( ! $this->verify_action() || ! current_user_can( 'perform_bulk_actions' ) ){
+            $this->wp_die_no_access();
+        }
 
 		$items     = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/query", [] );
 		$max_items = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/max_items", 25, $items );
