@@ -20,6 +20,32 @@ class Scripts {
 		add_action( 'enqueue_block_editor_assets', [ $this, 'register_block_editor_assets' ] );
 
 		add_action( 'wp_after_admin_bar_render', [ $this, 'toolbar_scripts' ] );
+
+		add_filter( 'wp_refresh_nonces', [ $this, 'refresh_nonces' ], 10, 3 );
+	}
+
+	/**
+	 * Refresh the groundhogg nonces
+	 *
+	 * @param array $response
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function refresh_nonces( array $response, array $data ) {
+
+		// We're need to refresh the nonces for stuff
+		if ( isset_not_empty( $data, 'groundhogg-refresh-nonces' ) ) {
+
+			$response['groundhogg_nonces'] = [
+				'_wpnonce'            => wp_create_nonce(),
+				'_meta_nonce'         => wp_create_nonce( 'meta-picker' ),
+				'_adminajax'          => wp_create_nonce( 'admin_ajax' ),
+				'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
+			];
+		}
+
+		return $response;
 	}
 
 	public function toolbar_scripts() {
@@ -212,6 +238,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin',
+			'wp-api-request' // needed for wpApiSettigns.nonce
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-morphdom', GROUNDHOGG_ASSETS_URL . 'js/admin/morphdom' . $dot_min . '.js', [], GROUNDHOGG_VERSION );
@@ -447,6 +474,12 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-make-el',
 			'wp-i18n'
+		] );
+
+		wp_register_script( 'groundhogg-admin-edit-lock', GROUNDHOGG_ASSETS_URL . 'js/admin/edit-lock' . $dot_min . '.js', [
+			'jquery',
+			'wp-i18n',
+			'groundhogg-make-el',
 		] );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );

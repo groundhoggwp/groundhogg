@@ -59,7 +59,7 @@
         dataType: 'json',
         data: getParams,
         beforeSend: function (xhr) {
-          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+          xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
           return {
@@ -109,7 +109,7 @@
         dataType: 'json',
         data: getParams,
         beforeSend: function (xhr) {
-          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+          xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
           return {
@@ -544,5 +544,21 @@
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
+
+  // refresh the nonces
+  $( document ).on( 'heartbeat-send.groundhogg-refresh-nonces', function ( event, data ) {
+    data['groundhogg-refresh-nonces'] = true
+  }).on( 'heartbeat-tick.groundhogg-refresh-nonces', function( e, data ) {
+
+    let newNonces = data.groundhogg_nonces;
+
+    if ( newNonces ) {
+      Object.keys( newNonces ).forEach( nonce => {
+        groundhogg_nonces[nonce] = newNonces[nonce]
+        Groundhogg.nonces[nonce] = newNonces[nonce]
+      })
+    }
+
+  } );
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

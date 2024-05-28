@@ -18,7 +18,7 @@
 
     const response = await fetch(route + '?' + $.param(params), {
       headers: {
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
+        'X-WP-Nonce': wpApiSettings.nonce,
       },
       ...opts,
     })
@@ -46,7 +46,7 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
+        'X-WP-Nonce': wpApiSettings.nonce,
       },
       body: JSON.stringify(data),
       ...opts,
@@ -76,7 +76,7 @@
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
+        'X-WP-Nonce': wpApiSettings.nonce,
       },
       body: JSON.stringify(data),
     })
@@ -105,7 +105,7 @@
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
+        'X-WP-Nonce': wpApiSettings.nonce,
       },
       body: JSON.stringify(data),
     })
@@ -125,7 +125,7 @@
       method: 'POST',
       credentials: 'same-origin',
       headers: {
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
+        'X-WP-Nonce': wpApiSettings.nonce,
       },
       body: data,
       ...opts,
