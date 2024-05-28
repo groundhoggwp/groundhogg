@@ -724,7 +724,7 @@
    * @param campaigns
    */
   const setCampaigns = campaigns => {
-    State.email.campaigns = campaigns.map( id => CampaignsStore.get( id ) )
+    State.email.campaigns = campaigns.map(id => CampaignsStore.get(id))
 
     State.changes.campaigns = [
       ...campaigns,
@@ -2326,8 +2326,8 @@
         }
 
         // We clicked in a block INSIDE this one
-        if ( e.target.closest( '.builder-block' ).dataset.id !== block.id ){
-          return;
+        if (e.target.closest('.builder-block').dataset.id !== block.id) {
+          return
         }
 
         setActiveBlock(block.id)
@@ -3024,10 +3024,12 @@
       ]),
       ControlGroup({
         id: 'utm',
-        name: 'UTM Parameters'
+        name: 'UTM Parameters',
       }, [
-        `<p>${__('Automatically add UTM parameters to links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.', 'groundhogg' )}</p>`,
-        `<p>${__('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg' )}</p>`,
+        `<p>${ __(
+          'Automatically add UTM parameters to links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.',
+          'groundhogg') }</p>`,
+        `<p>${ __('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg') }</p>`,
         Control({
           label: 'Campaign Source',
           stacked: true,
@@ -3035,8 +3037,8 @@
           name: 'utm_source',
           id: 'utm-source',
           value: getEmail().meta.utm_source ?? '',
-          onInput: e => setEmailMeta({ utm_source: e.target.value })
-        }) ),
+          onInput: e => setEmailMeta({ utm_source: e.target.value }),
+        })),
         Control({
           label: 'Campaign Medium',
           stacked: true,
@@ -3044,8 +3046,8 @@
           name: 'utm_medium',
           id: 'utm-medium',
           value: getEmail().meta.utm_medium ?? '',
-          onInput: e => setEmailMeta({ utm_medium: e.target.value })
-        }) ),
+          onInput: e => setEmailMeta({ utm_medium: e.target.value }),
+        })),
         Control({
           label: 'Campaign Name',
           stacked: true,
@@ -3053,8 +3055,8 @@
           name: 'utm_campaign',
           id: 'utm-campaign',
           value: getEmail().meta.utm_campaign ?? '',
-          onInput: e => setEmailMeta({ utm_campaign: e.target.value })
-        }) ),
+          onInput: e => setEmailMeta({ utm_campaign: e.target.value }),
+        })),
         Control({
           label: 'Campaign Term',
           stacked: true,
@@ -3062,8 +3064,8 @@
           name: 'utm_term',
           id: 'utm-term',
           value: getEmail().meta.utm_term ?? '',
-          onInput: e => setEmailMeta({ utm_term: e.target.value })
-        }) ),
+          onInput: e => setEmailMeta({ utm_term: e.target.value }),
+        })),
         Control({
           label: 'Campaign Content',
           stacked: true,
@@ -3071,9 +3073,9 @@
           name: 'utm_content',
           id: 'utm-content',
           value: getEmail().meta.utm_content ?? '',
-          onInput: e => setEmailMeta({ utm_content: e.target.value })
-        }) ),
-      ])
+          onInput: e => setEmailMeta({ utm_content: e.target.value }),
+        })),
+      ]),
     ])
   }
 
@@ -3876,7 +3878,7 @@
 
             let content
 
-            switch ( getState().testType ){
+            switch (getState().testType) {
               default:
               case 'design':
                 // language=HTML
@@ -3891,12 +3893,15 @@
                     ❌ Superlinks.<br/>
                     ❌ Open tracking.
                 </p>`
-                break;
+                break
               case 'functional':
                 // language=HTML
                 content = `<p>Functional tests simulate sending the email to a contact record from a broadcast or a funnel.</p>
-                <p>The email will be sent to your selected email addresses, using information from the associated contact records. If no contact exists, a new one will be created.</p>
-                <p>When testing links, we recommend opening them in an incognito window or different browser. See our <a target="_blank" href="https://help.groundhogg.io/article/888-testing-funnels-and-emails">recommended testing procedures.</a></p>
+                <p>The email will be sent to your selected email addresses, using information from the associated contact records. If no contact exists, a new
+                    one will be created.</p>
+                <p>When testing links, we recommend opening them in an incognito window or different browser. See our <a target="_blank"
+                                                                                                                         href="https://help.groundhogg.io/article/888-testing-funnels-and-emails">recommended
+                    testing procedures.</a></p>
                 <p>
                     ❌ <b>[TEST]</b> in subject line.<br/>
                     ✅ Conditional blocks.<br/>
@@ -3906,16 +3911,16 @@
                     ✅ Superlinks.<br/>
                     ✅ Open tracking.
                 </p>`
-                break;
+                break
             }
 
-            return Div({id: 'test-type-explanation'}, content)
+            return Div({ id: 'test-type-explanation' }, content)
           }
 
           Modal({
-            onOpen: ({modal}) => {
-              modal.querySelector( '.gh-modal-dialog' ).style.width = '500px'
-            }
+            onOpen: ({ modal }) => {
+              modal.querySelector('.gh-modal-dialog').style.width = '500px'
+            },
           }, ({ close, morph }) => Fragment([
             `<h2>Send a test email!</h2>`,
             ButtonToggle({
@@ -3933,10 +3938,10 @@
               selected: getState().testType ?? 'design',
               onChange: type => {
                 setState({
-                  testType: type
+                  testType: type,
                 })
-                morph( '#test-type-explanation', TestTypeExplanation(), false)
-              }
+                morph('#test-type-explanation', TestTypeExplanation(), false)
+              },
             }),
             TestTypeExplanation(),
             Div({
@@ -3968,7 +3973,7 @@
 
                   e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
 
-                  if ( ! getEmail().ID ){
+                  if (!getEmail().ID) {
                     await saveEmail()
                   }
 
@@ -3980,7 +3985,7 @@
                     to: Groundhogg.user_test_emails.join(','),
                     data: getEmailData(),
                     meta: getEmailMeta(),
-                    type: getState().testType
+                    type: getState().testType,
                   }).then((r) => {
                     dialog({
                       message: __('Test sent!'),
@@ -4135,31 +4140,33 @@
             },
             {
               key: 'embed',
-              text: __( 'Embed', 'groundhogg' ),
+              text: __('Embed', 'groundhogg'),
               onSelect: e => {
                 Modal({}, Div({
-                  className: 'display-flex column gap-10'
-                },[
-                  `<label for="embed-with-iframe"><b>${__('Embed with iFrame', 'groundhogg')}</b></label>`,
+                  className: 'display-flex column gap-10',
+                }, [
+                  `<label for="embed-with-iframe"><b>${ __('Embed with iFrame', 'groundhogg') }</b></label>`,
                   Input({
                     id: 'embed-with-iframe',
-                    value: sprintf( '[gh_email id=%d]', getEmailId() ),
+                    value: sprintf('[gh_email id=%d]', getEmailId()),
                     onFocus: e => e.target.select(),
                     readonly: true,
-                    className: 'code'
+                    className: 'code',
                   }),
-                  `<p style="margin-top: 0;">${__('Formatting and styling will be <b>exactly</b> as shown. The content will not be indexed by search engines.', 'groundhogg')}</p>`,
-                  `<label for="embed-with-html"><b>${__('Embed with HTML', 'groundhogg')}</b></label>`,
+                  `<p style="margin-top: 0;">${ __('Formatting and styling will be <b>exactly</b> as shown. The content will not be indexed by search engines.',
+                    'groundhogg') }</p>`,
+                  `<label for="embed-with-html"><b>${ __('Embed with HTML', 'groundhogg') }</b></label>`,
                   Input({
                     id: 'embed-with-html',
-                    value: sprintf( '[gh_email id=%d iframe=false]', getEmailId() ),
+                    value: sprintf('[gh_email id=%d iframe=false]', getEmailId()),
                     onFocus: e => e.target.select(),
                     readonly: true,
-                    className: 'code'
+                    className: 'code',
                   }),
-                  `<p style="margin: 0;">${__('Theme styles <b>may</b> impact the design and layout. The content will be indexed by search engines.', 'groundhogg')}</p>`,
+                  `<p style="margin: 0;">${ __('Theme styles <b>may</b> impact the design and layout. The content will be indexed by search engines.',
+                    'groundhogg') }</p>`,
                 ]))
-              }
+              },
             },
             {
               key: 'delete',
@@ -5383,19 +5390,19 @@
     }, doc.body.childNodes)
   }
 
-  $( document ).on( 'tinymce-editor-setup', function( event, editor ) {
-    editor.settings.toolbar1 += ',gh_replacements';
+  $(document).on('tinymce-editor-setup', function (event, editor) {
+    editor.settings.toolbar1 += ',gh_replacements'
 
-    editor.addButton( 'gh_replacements', {
+    editor.addButton('gh_replacements', {
       title: 'Replacements',
       image: '',
       onclick: e => {
         Groundhogg.element.replacementsWidget({
-          target: e.target
+          target: e.target,
         }).mount()
-      }
-    });
-  });
+      },
+    })
+  })
 
   registerBlock('text', 'Text', {
     attributes: {
@@ -5433,24 +5440,18 @@
         }
       }
 
-      const usurpUpdateBlock = ( settings ) => {
+      const usurpUpdateBlock = (settings) => {
         updateBlock({
           ...settings,
           morphBlocks: false,
         })
 
         // Update the content style...
-        tinyMCE
-          .activeEditor
-          .iframeElement
-          .contentDocument
-          .getElementsByTagName('style')[1].innerHTML = tinyMceCSS()
+        tinyMCE.activeEditor.iframeElement.contentDocument.getElementsByTagName('style')[1].innerHTML = tinyMceCSS()
 
         // Replace the content after formatting
-        tinyMCE
-          .activeEditor
-          .setContent(textContent({
-          ...getActiveBlock()
+        tinyMCE.activeEditor.setContent(textContent({
+          ...getActiveBlock(),
         }).innerHTML)
       }
 
@@ -5460,7 +5461,7 @@
           fontSize: false,
           lineHeight: false,
           fontWeight: false,
-          fontStyle: false
+          fontStyle: false,
         }),
         TagFontControlGroup(__('Heading 1'), 'h1', h1, usurpUpdateBlock),
         TagFontControlGroup(__('Heading 2'), 'h2', h2, usurpUpdateBlock),
@@ -5471,23 +5472,23 @@
 
       let editorId = `text-${ id }`
 
-      let blockEl = document.getElementById( `b-${ id }` )
+      let blockEl = document.getElementById(`b-${ id }`)
       let height = 200
 
-      if ( blockEl ){
+      if (blockEl) {
         height = blockEl.getBoundingClientRect().height
-        let iframe = blockEl.querySelector( 'iframe' )
-        if ( iframe ){
+        let iframe = blockEl.querySelector('iframe')
+        if (iframe) {
           height = iframe.getBoundingClientRect().height
         }
       }
 
-      return Div( ({
+      return Div(( {
         id: 'mce-editor-wrap',
         style: {
-          height: `${height}px`
-        }
-      }),[
+          height: `${ height }px`,
+        },
+      } ), [
         Textarea({
           onCreate: el => {
             setTimeout(() => {
@@ -5508,11 +5509,11 @@
                 })
               })
 
-              document.getElementById( 'mce-editor-wrap' ).style.removeProperty( 'height' )
+              document.getElementById('mce-editor-wrap').style.removeProperty('height')
             })
           },
           value: textContent({
-            content, ...block
+            content, ...block,
           }).innerHTML,
           id: editorId,
           onInput: e => {
@@ -5770,6 +5771,15 @@
     plainText: ({ text, link = '' }) => {
       return `[${ text }](${ link })`
     },
+    gutenberg: ({ text, align, style, size, link }) => {
+      return [
+        `<!-- wp:image ${ JSON.stringify({ width, align }) } -->`,
+        `<figure class="wp-block-image align${ align }">`,
+        `<img src="${ src }" alt="${ alt }">`,
+        `</figure>`,
+        `<!-- /wp:image -->`,
+      ].join('\n')
+    },
     defaults: {
       link: '',
       align: 'center',
@@ -5935,6 +5945,15 @@
     plainText: ({ src = '', alt = '', link = '' }) => {
       return `${ link ? '[' : '' }![${ alt || 'image' }](${ src })${ link ? `](${ link })` : '' }`
     },
+    gutenberg: ({ src, width, link = '', alt = '', align = 'center' }) => {
+      return [
+        `<!-- wp:image ${ JSON.stringify({ width, align }) } -->`,
+        `<figure class="wp-block-image align${ align }">`,
+        `<img src="${ src }" alt="${ alt }">`,
+        `</figure>`,
+        `<!-- /wp:image -->`,
+      ].join('\n')
+    },
     defaults: {
       src: 'http://via.placeholder.com/600x338',
       alt: 'placeholder image',
@@ -5944,100 +5963,6 @@
       align: 'center',
     },
   })
-
-  // registerBlock('video', 'Video', {
-  //   attributes: {
-  //     width: el => parseInt(el.querySelector('img').width),
-  //     playButton: el => {},
-  //     title: el => el.querySelector('img').alt,
-  //     video: el => el.querySelector('a')?.href,
-  //     borderStyle: el => parseBorderStyle(el.querySelector('img').style),
-  //     align: el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
-  //   },
-  //   svg: icons.image,
-  //   controls: ({ video = '', width, title = '', align = 'center', updateBlock, borderStyle = {} }) => {
-  //
-  //     return Fragment([
-  //       ControlGroup({
-  //         name: 'Video',
-  //       }, [
-  //         Control({
-  //           label: 'Video URL',
-  //           stacked: true
-  //         }, Input({
-  //           type: 'url',
-  //           id: 'video-url',
-  //           name: 'video_url',
-  //           placeholder: 'https://youtu.be/your-video-id',
-  //           value: video,
-  //           onChange: async e => {
-  //
-  //             let vidurl = e.target.value
-  //
-  //             let json = await fetch(`https://noembed.com/embed?dataType=json&url=${vidurl}`)
-  //             .then(res => res.json()).catch( err => {
-  //
-  //             })
-  //
-  //             if ( ! json.provider_name ){
-  //               dialog({
-  //                 message: 'The requested video could not be found.',
-  //                 type: 'error'
-  //               })
-  //               return;
-  //             }
-  //
-  //             let thumbnail_url, videoId
-  //
-  //             switch ( json.provider_name ){
-  //               case 'YouTube':
-  //                 thumbnail_url = json.thumbnail_url.replace( /hqdefault|mqdefault|sddefault/, 'maxresdefault' )
-  //                 break;
-  //               case 'Vimeo':
-  //
-  //                 let vidId = json.uri.match(/\/([0-9]+)\/?:?/)[1]
-  //                 let vimeoRes = await fetch( `https://vimeo.com/api/v2/video/${vidId}.json`).then( r => r.json() )
-  //                 thumbnail_url = vimeoRes[0].thumbnail_large
-  //
-  //                 break;
-  //
-  //               default:
-  //
-  //                 dialog({
-  //                   message: `${json.provider_name} is not supported for embed.`,
-  //                   type: 'error'
-  //                 })
-  //
-  //                 return;
-  //             }
-  //
-  //             updateBlock({
-  //               video: e.target.value,
-  //               src: thumbnail_url,
-  //               title: json.title
-  //             })
-  //           },
-  //         })),
-  //         `<p>Add a <a href="https://www.youtube.com" target="_blank">YouTube</a> or <a href="https://vimeo.com"
-  // target="_blank">Vimeo</a> URL to automatically generate a preview image. The image will link to the provided
-  // URL.</p>`, Control({ label: 'Title', stacked: true, }, Input({ id: 'video-title', name: 'video_title', value:
-  // title, onChange: e => updateBlock({ title: e.target.value }), })), Control({ label: 'Alignment', },
-  // AlignmentButtons({ id: 'image-align', alignment: align, onChange: align => { updateBlock({ align, morphControls:
-  // true, }) }, })), ]), BorderControlGroup({ ...borderStyle, onChange: newStyle => updateBlock({ borderStyle: {
-  // ...getActiveBlock().borderStyle, ...newStyle, }, morphControls: true, }), }), ]) }, edit: ({ src, width, title =
-  // '', align = 'center', updateBlock, borderStyle = {} }) => {  return Div({ className: 'vid-container full-width',
-  // style: { textAlign: align, }, }, makeEl('img', { className: 'resize-me', onCreate: el => {  setTimeout(() => { let
-  // $el = $('img.resize-me') $el.resizable({ aspectRatio: true, maxWidth: $el.parent().width(), stop: (e, ui) => {
-  // updateBlock({ width: Math.ceil(ui.size.width), morphControls: true, morphBlocks: false, }) }, }) }, 100) }, src:
-  // `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: {
-  // verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })) }, html: ({ src, width,
-  // video = '', title = '', align = 'center', borderStyle = {} }) => {  let img = makeEl('img', { src:
-  // `${Groundhogg.api.routes.v4.emails}/play-button?url=${src}`, alt: title, // title, width, height: 'auto', style: {
-  // boxSizing: 'border-box', verticalAlign: 'bottom', height: 'auto', width, ...addBorderStyle(borderStyle), }, })
-  // img = makeEl('a', { href: video, }, img)  return Div({ className: 'img-container', style: { textAlign: align, },
-  // }, img) }, plainText: ({ src = '', title = '', video = '' }) => { return `[![${title ||
-  // 'video'}](${src})](${video})` }, defaults: { src: 'http://via.placeholder.com/600x338', video: '', title: 'Your
-  // Video', width: 600, align: 'center', }, })
 
   registerBlock('spacer', 'Spacer', {
     attributes: {
@@ -6661,7 +6586,7 @@
             label: `Include these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
-            id: `${post_type}-includes`,
+            id: `${ post_type }-includes`,
             selected: includedPosts,
             tags: false,
             fetchOptions: async (search) => {
@@ -6689,7 +6614,7 @@
             label: `Exclude these ${ currentPostType.labels.name.toLowerCase() }`,
             stacked: true,
           }, ItemPicker({
-            id: `${post_type}-excludes`,
+            id: `${ post_type }-excludes`,
             selected: excludedPosts,
             tags: false,
             fetchOptions: async (search) => {
@@ -7819,7 +7744,6 @@
         })
       })
     }
-
   }
 
   Groundhogg.EmailEditor = initialize
