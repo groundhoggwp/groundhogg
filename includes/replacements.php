@@ -1005,7 +1005,6 @@ class Replacements implements \JsonSerializable {
 		}
 	}
 
-
 	/**
 	 * Return the profile_picture
 	 *
@@ -1098,7 +1097,7 @@ class Replacements implements \JsonSerializable {
 	 * @return mixed
 	 */
 	public function replacement_get_params( $key ) {
-		return get_url_var( $key );
+		return esc_html( get_url_var( $key ) );
 	}
 
 

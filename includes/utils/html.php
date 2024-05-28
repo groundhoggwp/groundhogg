@@ -389,7 +389,7 @@ class HTML {
 	/**
 	 * Generate an html element.
 	 *
-	 * @param string $e
+	 * @param string $tag
 	 * @param array  $atts
 	 * @param string $content
 	 * @param bool   $self_closing
@@ -397,16 +397,16 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function e( $e = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
+	public function e( $tag = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
 
-		if ( in_array( $e, ['img','input','br','hr', 'embed'] ) ){
+		if ( in_array( $tag, ['img','input','br','hr', 'embed'] ) ){
 			$self_closing = true;
 		}
 
 		if ( !$self_closing ) {
-			$html = $this->wrap( $content, $e, $atts );
+			$html = $this->wrap( $content, $tag, $atts );
 		} else {
-			$html = sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );
+			$html = sprintf( '<%1$s %2$s/>', esc_html( $tag ), array_to_atts( $atts ) );
 		}
 
 		if ( $echo === true ) {
