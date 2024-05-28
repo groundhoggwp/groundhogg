@@ -678,19 +678,19 @@ class Settings_Page extends Admin_Page {
 					'name' => 'gh_primary_user',
 				),
 			),
-			'gh_disable_user_sync'                   => array(
-				'id'      => 'gh_sync_users',
+			'gh_disable_user_sync'                   => [
+				'id'      => 'gh_disable_user_sync',
 				'section' => 'wordpress',
 				'label'   => __( 'Disable User Syncing', 'groundhogg' ),
 				'desc'    => _x( 'Disable the automatic syncing of WordPress users and contacts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_disable_user_sync',
 					'id'    => 'gh_disable_user_sync',
 					'value' => 'on',
-				),
-			),
+				],
+			],
 			'gh_sync_user_meta'                      => array(
 				'id'      => 'gh_sync_user_meta',
 				'section' => 'wordpress',
