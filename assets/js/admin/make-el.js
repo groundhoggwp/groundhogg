@@ -411,6 +411,8 @@
     onOpen = () => {},
     onClose = () => {},
     width,
+    closeButton = true,
+    closeOnOverlayClick = true
   }, children) => {
 
     let modal = Div({
@@ -420,7 +422,9 @@
       Div({
         className: 'gh-modal-overlay',
         onClick: e => {
-          close()
+          if ( closeOnOverlayClick ){
+            close()
+          }
         },
       }),
       Div({
@@ -432,12 +436,12 @@
         Div({
           className: 'gh-modal-dialog-content',
         }),
-        Button({
+        closeButton ? Button({
           className: 'dashicon-button gh-modal-button-close-top gh-modal-button-close',
           onClick: e => {
             close()
           },
-        }, Dashicon('no-alt')),
+        }, Dashicon('no-alt')) : null,
       ]),
     ])
 

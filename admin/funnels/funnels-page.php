@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\check_lock;
 use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
@@ -22,6 +23,7 @@ use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\notices;
+use function Groundhogg\use_edit_lock;
 use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
@@ -216,6 +218,8 @@ class Funnels_Page extends Admin_Page {
 
 				enqueue_email_block_editor_assets();
 
+                use_edit_lock( $funnel );
+
 				do_action( 'groundhogg/admin/funnels/editor_scripts' );
 
 				break;
@@ -287,7 +291,7 @@ class Funnels_Page extends Admin_Page {
 		foreach ( $this->get_items() as $id ) {
 			$funnel = new Funnel( $id );
 
-			if ( ! $funnel->exists() ) {
+			if ( ! $funnel->exists() || check_lock( $funnel ) ) {
 				continue;
 			}
 
@@ -321,7 +325,7 @@ class Funnels_Page extends Admin_Page {
 		foreach ( $this->get_items() as $id ) {
 			$funnel = new Funnel( $id );
 
-			if ( ! $funnel->exists() ) {
+			if ( ! $funnel->exists() || check_lock( $funnel ) ) {
 				continue;
 			}
 

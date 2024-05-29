@@ -400,6 +400,7 @@ class Plugin {
 	 */
 	private function includes() {
 		require __DIR__ . '/functions.php';
+		require __DIR__ . '/edit-lock.php';
 		require __DIR__ . '/filters.php';
 		require __DIR__ . '/tools.php';
 		require __DIR__ . '/better-meta-compat.php';

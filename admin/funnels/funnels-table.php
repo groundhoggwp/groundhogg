@@ -12,9 +12,11 @@ use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\check_lock;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\row_item_locked_text;
 use function Groundhogg\scheduled_time_column;
 
 
@@ -108,6 +110,7 @@ class Funnels_Table extends Table {
 
 
 	protected function column_title( $funnel ) {
+
 		$subject = ( ! $funnel->title ) ? '(' . __( 'no title' ) . ')' : $funnel->title;
 
 		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
@@ -119,8 +122,11 @@ class Funnels_Table extends Table {
 //		}
 
 		if ( $this->get_view() === 'archived' ) {
-			$html = "<strong>{$subject}</strong>";
+			$html = "<strong class='row-title'>{$subject}</strong>";
 		} else {
+
+			row_item_locked_text( $funnel );
+
 			$html = "<strong>";
 
 			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
@@ -128,8 +134,10 @@ class Funnels_Table extends Table {
 			if ( $funnel->status === 'inactive' ) {
 				$html .= " &#x2014; " . "<span class='post-state'>" . _x( 'Inactive', 'status', 'groundhogg' ) . "</span>";
 			}
+
+			$html .= "</strong>";
 		}
-		$html .= "</strong>";
+
 
 		return $html;
 	}
@@ -234,21 +242,6 @@ class Funnels_Table extends Table {
 	}
 
 	/**
-	 * Get value for checkbox column.
-	 *
-	 * @param  $funnel Funnel A singular item (one full row's worth of data).
-	 *
-	 * @return string Text to be placed inside the column <td>.
-	 */
-	protected function column_cb( $funnel ) {
-		return sprintf(
-			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$funnel->get_id()                // The value of the checkbox should be the record's ID.
-		);
-	}
-
-	/**
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk steps available on this table.
 	 *
@@ -327,11 +320,15 @@ class Funnels_Table extends Table {
 					'display' => __( 'Export' ),
 					'url'     => $item->export_url()
 				];
-				$actions[] = [
-					'class'   => 'trash',
-					'display' => __( 'Deactivate' ),
-					'url'     => action_url( 'deactivate', [ 'funnel' => $item->get_id() ] )
-				];
+
+				if ( ! check_lock($item) ){
+					$actions[] = [
+						'class'   => 'trash',
+						'display' => __( 'Deactivate' ),
+						'url'     => action_url( 'deactivate', [ 'funnel' => $item->get_id() ] )
+					];
+				}
+
 				break;
 			case 'inactive':
 				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
@@ -345,11 +342,15 @@ class Funnels_Table extends Table {
 					'display' => __( 'Export' ),
 					'url'     => $item->export_url()
 				];
-				$actions[] = [
-					'class'   => 'trash',
-					'display' => __( 'Archive' ),
-					'url'     => action_url( 'archive', [ 'funnel' => $item->get_id() ] )
-				];
+
+				if ( ! check_lock($item) ){
+					$actions[] = [
+						'class'   => 'trash',
+						'display' => __( 'Archive' ),
+						'url'     => action_url( 'archive', [ 'funnel' => $item->get_id() ] )
+					];
+				}
+
 				break;
 			case 'archived':
 				$actions[] = [

@@ -10,11 +10,11 @@
       return currentUser.allcaps[cap] || currentUser.caps[cap] || isSuperAdmin
     },
     getOwner: (id) => {
-      return Groundhogg.filters.owners.find( u => u.ID == id )
+      return Groundhogg.filters.owners.find(u => u.ID == id)
     },
     getOwnerDisplayName: (id) => {
-      return Groundhogg.filters.owners.find( u => u.ID == id ).data.display_name
-    }
+      return Groundhogg.filters.owners.find(u => u.ID == id).data.display_name
+    },
   }
 
   // Serialize better
@@ -545,20 +545,35 @@
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
 
-  // refresh the nonces
-  $( document ).on( 'heartbeat-send.groundhogg-refresh-nonces', function ( event, data ) {
-    data['groundhogg-refresh-nonces'] = true
-  }).on( 'heartbeat-tick.groundhogg-refresh-nonces', function( e, data ) {
+  var check, timeout
 
-    let newNonces = data.groundhogg_nonces;
+  /**
+   * Only allow to check for nonce refresh every 30 seconds.
+   */
+  function schedule () {
+    check = false
+    window.clearTimeout(timeout)
+    timeout = window.setTimeout(function () { check = true }, 300000)
+  }
 
-    if ( newNonces ) {
-      Object.keys( newNonces ).forEach( nonce => {
+  $(function () {
+    schedule()
+  }).on('heartbeat-send.groundhogg-refresh-nonces', function (e, data) {
+
+    if (check) {
+      data['groundhogg-refresh-nonces'] = true
+    }
+
+  }).on('heartbeat-tick.groundhogg-refresh-nonces', function (e, data) {
+    let newNonces = data.groundhogg_nonces
+
+    if (newNonces) {
+      Object.keys(newNonces).forEach(nonce => {
         groundhogg_nonces[nonce] = newNonces[nonce]
         Groundhogg.nonces[nonce] = newNonces[nonce]
       })
     }
 
-  } );
+  })
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

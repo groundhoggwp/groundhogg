@@ -480,6 +480,7 @@ class Scripts {
 			'jquery',
 			'wp-i18n',
 			'groundhogg-make-el',
+			'heartbeat'
 		] );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );

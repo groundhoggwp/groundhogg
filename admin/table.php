@@ -3,9 +3,11 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\DB\DB;
 use function Groundhogg\_nf;
 use function Groundhogg\array_find;
+use function Groundhogg\check_lock;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
@@ -79,18 +81,44 @@ abstract class Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Get value for checkbox column.
+	 * Output a checkbox column.
 	 *
 	 * @param $item Base_Object A singular item (one full row's worth of data).
 	 *
-	 * @return string Text to be placed inside the column <td>.
+	 * @return void
 	 */
 	protected function column_cb( $identity ) {
-		return sprintf(
+
+        printf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			$this->_args['singular'],
 			$identity->get_id()
 		);
+
+		if ( method_exists( $identity, 'get_title' ) ):
+			?>
+            <label for="cb-select-<?php echo $identity->ID; ?>">
+				<span class="screen-reader-text">
+				<?php
+				/* translators: %s: Post title. */
+				printf( __( 'Select %s' ), $identity->get_title() );
+				?>
+				</span>
+            </label>
+            <div class="locked-indicator">
+                <span class="locked-indicator-icon" aria-hidden="true"></span>
+                <span class="screen-reader-text">
+				<?php
+				printf(
+				/* translators: Hidden accessibility text. %s: Post title. */
+					__( '&#8220;%s&#8221; is locked' ),
+					$identity->get_title()
+				);
+				?>
+				</span>
+            </div>
+		<?php
+		endif;
 	}
 
 	/**
@@ -155,7 +183,7 @@ abstract class Table extends \WP_List_Table {
 	 */
 	protected function create_row_action( $class, $url, $display ) {
 
-		if ( empty( $url ) ){
+		if ( empty( $url ) ) {
 			return html()->e( 'span', [ 'class' => $class ], $display );
 		}
 
@@ -336,6 +364,27 @@ abstract class Table extends \WP_List_Table {
 	 */
 	protected function view_param() {
 		return 'view';
+	}
+
+	public function single_row( $item ) {
+
+		$classes = [];
+
+		if ( is_a( $item, Base_Object_With_Meta::class ) ) {
+
+			if ( check_lock( $item ) ) {
+				$classes[] = 'wp-locked';
+			}
+
+			$classes[] = $item->object_type;
+
+		}
+
+		$classes = implode( ' ', $classes );
+
+		echo "<tr id=\"$item->ID\" class=\"$classes\">";
+		$this->single_row_columns( $item );
+		echo '</tr>';
 	}
 
 }

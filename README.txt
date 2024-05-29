@@ -349,6 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.4.3 (2024-05-29) =
+* ADDED Asset editing lock. Emails and funnels will now be "locked" while editing. Similar to WordPress posts.
+*
+
 = 3.4.2.3 (2024-05-15) =
 * ADDED Option in the custom properties editor to move fields between property groups.
 * FIXED Bug with birthday filter caused birthdays during non-leap years to be excluded when using the 'today' range.
