@@ -107,12 +107,12 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
 	if ( empty( $contact_id_or_email ) ) {
 
-        // From queue?
+		// From queue?
 		if ( Event_Queue::is_processing() ) {
 			return \Groundhogg\event_queue()->get_current_contact();
 		}
 
-        // From tracking?
+		// From tracking?
 		if ( $contact = tracking()->get_current_contact() ) {
 			return $contact;
 		}
@@ -124,14 +124,14 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
 	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
 
-    if ( key_exists( $cache_key, $cache ) ) {
+	if ( key_exists( $cache_key, $cache ) ) {
 		return $cache[ $cache_key ];
 	}
 
 	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
 	if ( $contact->exists() ) {
-        // Set the contact in the cache
+		// Set the contact in the cache
 		$cache[ $cache_key ] = $contact;
 
 		return $contact;
@@ -155,7 +155,7 @@ function current_user_is( $role = 'subscriber' ) {
 		return in_array( $role, $roles );
 	}
 
-    return false;
+	return false;
 }
 
 /**
@@ -199,10 +199,10 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 	return $url;
 }
 
-function report_link( $content, $params ){
-    return html()->e('a', [
-        'href' => admin_page_url( 'gh_reporting', $params )
-    ], $content );
+function report_link( $content, $params ) {
+	return html()->e( 'a', [
+		'href' => admin_page_url( 'gh_reporting', $params )
+	], $content );
 }
 
 /**
@@ -215,9 +215,9 @@ function report_link( $content, $params ){
  */
 function contact_filters_link( $content, $filters, $link = true ) {
 
-    if ( ! $link  ){
-        return $content;
-    }
+	if ( ! $link ) {
+		return $content;
+	}
 
 	return html()->e( 'a', [
 		'target' => '_blank',
@@ -288,12 +288,17 @@ function parse_select2_results( $data = [], $id_col = 'ID', $title_col = 'title'
 /**
  * Get DB
  *
- * @param $name
+ * @param $table
  *
- * @return DB\DB|DB\Meta_DB|DB\Tags
+ * @return DB\DB|DB\Manager|DB\Meta_DB|DB\Tags
  */
-function get_db( $name ) {
-	return db()->get_db( $name );
+function get_db( $table = '' ) {
+
+    if ( empty( $table ) ){
+        return db();
+    }
+
+	return db()->get_db( $table );
 }
 
 /**
@@ -602,7 +607,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'bulk_action',
 		'_wpnonce',
 		'submit',
-        'operation'
+		'operation'
 	] );
 
 	foreach ( $ignore as $key ) {
@@ -746,17 +751,17 @@ function array_find( array $array, callable $predicate ) {
 	return false;
 }
 
-function find_object( array $array, array $args ){
-   return array_find( $array, function ( object $object ) use ( $args ){
+function find_object( array $array, array $args ) {
+	return array_find( $array, function ( object $object ) use ( $args ) {
 
-       foreach ( $args as $key => $value ){
-           if ( get_array_var( $object, $key ) !== $value ){
-               return false;
-           }
-       }
+		foreach ( $args as $key => $value ) {
+			if ( get_array_var( $object, $key ) !== $value ) {
+				return false;
+			}
+		}
 
-       return true;
-   } );
+		return true;
+	} );
 }
 
 /**
@@ -869,9 +874,9 @@ function percentage( $denom, $numer, $precision = 2 ) {
  */
 function format_number_with_percentage( $num, $compare ) {
 
-    if ( empty ($num) && empty($compare)){
-        return '-';
-    }
+	if ( empty ( $num ) && empty( $compare ) ) {
+		return '-';
+	}
 
 	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ), );
 }
@@ -1759,8 +1764,8 @@ function track_page_visits_after_signup( $contact ) {
 			}
 
 			track_page_visit( $url, $contact, [
-				'timestamp' => absint( $time[0] ),
-                'ip_address' => get_current_ip_address(),
+				'timestamp'  => absint( $time[0] ),
+				'ip_address' => get_current_ip_address(),
 				'user_agent' => get_current_user_agent_id()
 			] );
 		}
@@ -1886,17 +1891,17 @@ function get_csv_delimiter( $file_path ) {
  */
 function count_csv_rows( $file_path ) {
 
-    if ( ! file_exists( $file_path ) ){
-        return 0;
-    }
+	if ( ! file_exists( $file_path ) ) {
+		return 0;
+	}
 
 	$file = new \SplFileObject( $file_path, 'r' );
 
-    $rows = 0;
+	$rows = 0;
 
-	while ( ! $file->eof() ){
+	while ( ! $file->eof() ) {
 		$file->fgets();
-		$rows++;
+		$rows ++;
 	}
 
 	$file = null;
@@ -1939,11 +1944,11 @@ function get_items_from_csv( string $file_path = '', int $rows = 0, int $offset 
 		$rows = 999999999;
 	}
 
-    // Advance the file pointer
+	// Advance the file pointer
 	if ( $offset > 0 ) {
-        while ( ! $file->eof() && $offset > 0 ){
-            $file->fgets();
-			$offset--;
+		while ( ! $file->eof() && $offset > 0 ) {
+			$file->fgets();
+			$offset --;
 		}
 	}
 
@@ -2053,9 +2058,9 @@ function get_exportable_fields( $extra = [] ) {
 		'utm_medium'             => __( 'UTM Medium', 'groundhogg' ),
 		'utm_term'               => __( 'UTM Term', 'groundhogg' ),
 		'utm_source'             => __( 'UTM Source', 'groundhogg' ),
-		'unsub_date'     => __( 'Unsubscribe Date', 'groundhogg' ),
-		'unsub_reason'   => __( 'Unsubscribe Reason', 'groundhogg' ),
-		'unsub_feedback' => __( 'Unsubscribe Feedback', 'groundhogg' ),
+		'unsub_date'             => __( 'Unsubscribe Date', 'groundhogg' ),
+		'unsub_reason'           => __( 'Unsubscribe Reason', 'groundhogg' ),
+		'unsub_feedback'         => __( 'Unsubscribe Feedback', 'groundhogg' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -2166,7 +2171,7 @@ function get_mappable_fields( $extra = [] ) {
 			'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
 			'contact_id'                => __( 'Contact ID', 'groundhogg' ),
 		],
-		__( 'User' ) => [
+		__( 'User' )                        => [
 			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
 			'user_email' => __( 'User Email', 'groundhogg' ),
 		],
@@ -2900,8 +2905,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	/**
-     * After the contact is generated with the map
-     *
+	 * After the contact is generated with the map
+	 *
 	 * @param $contact Contact the contact record
 	 * @param $map     array the map of given data to contact data
 	 * @param $fields  array the values of the given fields
@@ -4773,41 +4778,42 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
  */
 function invalidate_contact_permissions_keys( Contact $contact, string $usage = '' ) {
 
-    $query = [
-	    'contact_id' => $contact->get_id()
-    ];
+	$query = [
+		'contact_id' => $contact->get_id()
+	];
 
-    if ( ! empty( $usage ) ){
-        $query[ 'usage_type' ] = $usage;
-    }
+	if ( ! empty( $usage ) ) {
+		$query['usage_type'] = $usage;
+	}
 
 	$deleted = get_db( 'permissions_keys' )->delete( $query );
 
-    return $deleted;
+	return $deleted;
 }
 
 /**
  * If the user_id or email address is changed, invalidate existing permissions keys for that contact.
  *
- * @param int $id
- * @param array $updated
+ * @param int     $id
+ * @param array   $updated
  * @param Contact $contact
- * @param array $old
+ * @param array   $old
  *
  * @return void
  */
-function maybe_invalidate_permissions_keys_when_contact_updated( $id, $updated, $contact, $old ){
+function maybe_invalidate_permissions_keys_when_contact_updated( $id, $updated, $contact, $old ) {
 
-    // All permissions keys
-    if ( isset( $updated['email'] ) && $updated['email'] !== $old[ 'email' ] ){
-        invalidate_contact_permissions_keys( $contact );
-        return;
-    }
+	// All permissions keys
+	if ( isset( $updated['email'] ) && $updated['email'] !== $old['email'] ) {
+		invalidate_contact_permissions_keys( $contact );
 
-    // If the user_id was updated, only invalidate permissions keys for auto login
-    if ( isset( $updated['user_id'] ) && $updated['user_id'] !== $old[ 'user_id' ] ){
-	    invalidate_contact_permissions_keys( $contact, 'auto_login' );
-    }
+		return;
+	}
+
+	// If the user_id was updated, only invalidate permissions keys for auto login
+	if ( isset( $updated['user_id'] ) && $updated['user_id'] !== $old['user_id'] ) {
+		invalidate_contact_permissions_keys( $contact, 'auto_login' );
+	}
 }
 
 add_action( 'groundhogg/contact/post_update', __NAMESPACE__ . '\maybe_invalidate_permissions_keys_when_contact_updated', 10, 4 );
@@ -4894,19 +4900,19 @@ function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $exp
  *
  * @return string
  */
-function add_failsafe_tracking_params( string $url, Contact $contact ){
+function add_failsafe_tracking_params( string $url, Contact $contact ) {
 
-    $params = [
-	    'gi' => base64url_encode( encrypt( $contact->get_email() ) )
-    ];
+	$params = [
+		'gi' => base64url_encode( encrypt( $contact->get_email() ) )
+	];
 
 	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
 		$params['ge'] = dechex( the_email()->get_event()->get_id() );
-    } else if ( Event_Queue::is_processing() ){
+	} else if ( Event_Queue::is_processing() ) {
 		$params['ge'] = dechex( \Groundhogg\event_queue()->get_current_event()->get_id() );
-    }
+	}
 
-    return add_query_arg( $params, $url );
+	return add_query_arg( $params, $url );
 }
 
 /**
@@ -5186,7 +5192,7 @@ function get_current_user_agent_id() {
 	}
 
 	$hashed_ua = hex2bin( hash( 'sha256', $ua ) );
-	$ua_id = get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua );
+	$ua_id     = get_db( 'user_agents' )->get_column_by( 'ID', 'user_agent_hash', $hashed_ua );
 
 	if ( $ua_id ) {
 		return absint( $ua_id );
@@ -5245,13 +5251,13 @@ function track_page_visit( $ref, $contact, $override = [] ) {
  */
 function track_live_activity( $type, $details = [], $value = 0 ) {
 
-    if ( tracking()->get_current_event() ){
-        return track_event_activity( tracking()->get_current_event(), $type, $details, [
-	        'value'      => $value,
-            'ip_address' => get_current_ip_address(),
-	        'user_agent' => get_current_user_agent_id()
-        ] );
-    }
+	if ( tracking()->get_current_event() ) {
+		return track_event_activity( tracking()->get_current_event(), $type, $details, [
+			'value'      => $value,
+			'ip_address' => get_current_ip_address(),
+			'user_agent' => get_current_user_agent_id()
+		] );
+	}
 
 	// Use tracked contact
 	$contact = get_contactdata();
@@ -5297,7 +5303,7 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	$defaults = [
 		'activity_type' => $type,
 		'timestamp'     => time(),
-		'contact_id' => $contact->get_id(),
+		'contact_id'    => $contact->get_id(),
 	];
 
 	// Merge overrides with args
@@ -5344,13 +5350,13 @@ function track_event_activity( Event $event, string $type = '', array $details =
 	}
 
 	$args = wp_parse_args( $args, [
-		'event_id'      => $event->ID,
-		'funnel_id'     => $event->funnel_id,
-		'step_id'       => $event->step_id,
-		'email_id'      => $event->email_id,
+		'event_id'  => $event->ID,
+		'funnel_id' => $event->funnel_id,
+		'step_id'   => $event->step_id,
+		'email_id'  => $event->email_id,
 	] );
 
-    return track_activity( $contact, $type, $args, $details );
+	return track_activity( $contact, $type, $args, $details );
 }
 
 /**
@@ -7544,16 +7550,16 @@ function clear_pending_events_by_step_type( $type, $contact = false ) {
 		return false;
 	}
 
-    $query = new Table_Query( 'event_queue' );
-    $join = $query->addJoin( 'LEFT',  'steps' );
-    $join->onColumn( 'ID', 'step_id' );
+	$query = new Table_Query( 'event_queue' );
+	$join  = $query->addJoin( 'LEFT', 'steps' );
+	$join->onColumn( 'ID', 'step_id' );
 
-    $query->where()
-          ->equals( "{$join->alias}.step_type", $type )
+	$query->where()
+	      ->equals( "{$join->alias}.step_type", $type )
 //          ->equals( "$join->alias.step_status", 'active' )
           ->equals( 'event_type', Event::FUNNEL )
-          ->equals( 'status', Event::WAITING )
-          ->equals( 'contact_id', $contact->get_id() );
+	      ->equals( 'status', Event::WAITING )
+	      ->equals( 'contact_id', $contact->get_id() );
 
 	return $query->delete();
 }
@@ -8116,23 +8122,23 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
  *
  * @return string good|fair|poor|bad
  */
-function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, int $poor ){
+function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, int $poor ) {
 
-	if ( $number >= $great ){
+	if ( $number >= $great ) {
 		return 'great';
 	}
 
-    if ( $number >= $good ){
-        return 'good';
-    }
+	if ( $number >= $good ) {
+		return 'good';
+	}
 
-    if ( $number >= $fair ){
-        return 'fair';
-    }
+	if ( $number >= $fair ) {
+		return 'fair';
+	}
 
-    if ( $number >= $poor ){
-        return 'poor';
-    }
+	if ( $number >= $poor ) {
+		return 'poor';
+	}
 
 	return 'bad';
 }
@@ -8153,8 +8159,8 @@ function get_role_display_name( $role ) {
  *
  * @return false|string
  */
-function generate_claim(){
-	$claim_id    = md5( uniqid( microtime() ) );
+function generate_claim() {
+	$claim_id = md5( uniqid( microtime() ) );
 
 	return substr( $claim_id, 0, 20 );
 }
