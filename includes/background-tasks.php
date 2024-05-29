@@ -24,12 +24,22 @@ class Background_Tasks {
 		add_action( 'init', [ $this, 'add_cron' ] );
 	}
 
+	/**
+	 * Schedule recurring cron job
+	 *
+	 * @return void
+	 */
 	public function add_cron(){
 		if ( ! wp_next_scheduled( self::HOOK ) ){
 			wp_schedule_event( time(), Event_Queue::WP_CRON_INTERVAL, self::HOOK );
 		}
 	}
 
+	/**
+	 * Do the tasks
+	 *
+	 * @return void
+	 */
 	public function do_tasks() {
 
 		$claim = generate_claim();
@@ -65,8 +75,13 @@ class Background_Tasks {
 		}
 
 		// Release the claim
-		$claimQuery->update( [ 'claim' => '' ] );
+		$claimQuery->update( [
+			'claim' => '',
+			'time'  => time()
+		] );
 	}
+
+	protected static int $last_added_task_id = 0;
 
 	/**
 	 * Schedules the background task wp-cron event
@@ -95,7 +110,18 @@ class Background_Tasks {
 			return new \WP_Error( 'oops', 'Unable to add background task.' );
 		}
 
+		self::$last_added_task_id = $bg_task->ID;
+
 		return true;
+	}
+
+	/**
+	 * Return the ID of the most recently added task
+	 *
+	 * @return int
+	 */
+	public static function get_last_added_task_id(): int {
+		return self::$last_added_task_id;
 	}
 
 	/**

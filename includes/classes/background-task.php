@@ -109,4 +109,8 @@ class Background_Task extends Base_Object {
 		] );
 	}
 
+	public function is_done(){
+		return $this->status === 'done';
+	}
+
 }

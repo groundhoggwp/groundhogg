@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Elementor\Core\Base\Background_Task_Manager;
 use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\Utils\Micro_Time_Tracker;
@@ -222,7 +223,6 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		return $this->get_object()->get_title();
-
 	}
 
 	/**
@@ -236,7 +236,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		return Background_Tasks::schedule_pending_broadcast( $this->get_id() );
+		$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
+
+		if ( is_wp_error( $added ) ){
+			return $added;
+		}
+
+		$task_id = Background_Tasks::get_last_added_task_id();
+		$this->update_meta( 'task_id', $task_id );
+
+		return true;
 	}
 
 	/**
@@ -246,6 +255,15 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function cancel() {
 
+		// Also cancel the associated background task
+		if ( $task_id = $this->get_meta( 'task_id' ) ){
+			$task = new Background_Task( $task_id );
+			if ( ! $task->is_done() ){
+				$task->cancel();
+			}
+		}
+
+		// Cancel events in the event queue
 		get_db( 'event_queue' )->mass_update(
 			[
 				'status' => Event::CANCELLED
@@ -257,10 +275,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			]
 		);
 
+		// Move them to the history table
 		get_db( 'event_queue' )->move_events_to_history( [
 			'status' => Event::CANCELLED,
 		] );
 
+		// Set status to cancelled finally
 		$this->update( [ 'status' => 'cancelled' ] );
 	}
 
@@ -271,13 +291,20 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function enqueue_batch() {
 
-		if ( $this->get_meta( 'schedule_lock' ) || ! $this->is_pending() ) {
+		// This broadcast is already being scheduled
+		if ( $this->get_meta( 'schedule_lock' ) ) {
+			return 0;
+		}
+
+		// The broadcast is not pending
+		if ( ! $this->is_pending() ){
 			return false;
 		}
 
 		$timer = new Micro_Time_Tracker();
 		$items = 0;
 
+		// Lock scheduling
 		$this->update_meta( 'schedule_lock', true );
 
 		$query                  = $this->get_query();
@@ -287,11 +314,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$limit                  = self::BATCH_LIMIT;
 		$query['number']        = $limit;
 		$query['offset']        = $offset;
-		$query['no_found_rows'] = false;
+		$query['found_rows']    = true;
 
 		$c_query  = new Contact_Query( $query );
 		$contacts = $c_query->query( null, true );
 		$total    = $c_query->found_items;
+
+		// No contacts to send to?
+		if ( $total === 0 ){
+			return false;
+		}
 
 		foreach ( $contacts as $contact ) {
 
@@ -339,10 +371,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$inserted = event_queue_db()->commit_batch_insert();
 
+		// Failed to add an events, but there are contacts to send to
 		if ( $total > 0 && ! $inserted ) {
+			// Reset the lock
 			$this->delete_meta( 'schedule_lock' );
 
-			return false;
+			return 0;
 		}
 
 		$time_elapsed = $timer->time_elapsed();

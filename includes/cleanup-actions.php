@@ -12,6 +12,7 @@ class Cleanup_Actions {
 		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
 		add_action( 'groundhogg/cleanup', [ $this, 'fix_unprocessed_events' ] );
+		add_action( 'groundhogg/cleanup', [ $this, 'fix_unprocessed_tasks' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'delete_expired_permission_keys' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'purge_email_logs' ] );
 	}
@@ -52,8 +53,29 @@ class Cleanup_Actions {
 		$query->where()
 		      ->in( 'status', [ Event::WAITING, Event::IN_PROGRESS ] ) // Event is waiting or in progress
 		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
-		      ->lessThan( 'time', time() - HOUR_IN_SECONDS ) // older than 1 our seconds
-		      ->greaterThanEqualTo( 'time', time() - ( 7 * HOUR_IN_SECONDS ) ); //
+		      ->lessThan( 'time', time() - HOUR_IN_SECONDS ) // older than 1 hour
+		      ->greaterThanEqualTo( 'time', time() - ( 7 * HOUR_IN_SECONDS ) ); // Within the last 7 hours
+
+		$query->update( [
+			'status' => Event::WAITING,
+			'claim'  => ''
+		] );
+
+	}
+
+	/**
+	 * Automatically fix background tasks that are not processed
+	 *
+	 * @return void
+	 */
+	public function fix_unprocessed_tasks() {
+
+		$query = new Table_Query( 'background_tasks' );
+		$query->where()
+		      ->in( 'status', [ 'pending', 'in_progress' ] ) // Task is pending or in progress
+		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
+		      ->lessThan( 'time', time() - HOUR_IN_SECONDS ) // older than 1 hour
+		      ->greaterThanEqualTo( 'time', time() - ( 7 * HOUR_IN_SECONDS ) ); // Within the last 7 hours
 
 		$query->update( [
 			'status' => Event::WAITING,
