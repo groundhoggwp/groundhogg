@@ -194,7 +194,7 @@
      */
     getResultsFromCache (query = {}) {
       let results = this.cache[JSON.stringify(query)] ?? []
-      return results.map( id => this.get( id ) );
+      return results.map(id => this.get(id))
     },
 
     /**
@@ -358,7 +358,7 @@
       }
 
       // Fetch some of the items
-      if ( ! ids || ! ids.length ){
+      if (!ids || !ids.length) {
         return this.fetchItems({}, opts)
       }
 
@@ -367,7 +367,7 @@
 
       const params = {
         [this.primaryKey]: missingIds,
-        limit: missingIds.length
+        limit: missingIds.length,
       }
 
       return this.fetchItems(params, opts)
@@ -595,7 +595,6 @@
         })
     },
 
-
     /**
      * Get the total count of items that match a query
      *
@@ -661,6 +660,7 @@
   Groundhogg.api.patch = apiPatch
   Groundhogg.api.delete = apiDelete
   Groundhogg.api.ajax = adminAjax
+  Groundhogg.api.ApiError = ApiError
 
   Groundhogg.stores = {
 
@@ -872,9 +872,9 @@
       },
     }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails, {
-      send(id, data){
+      send (id, data) {
         return apiPost(`${ this.route }/${ id }/send`, data)
-      }
+      },
     }),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
     notes: ObjectStore(Groundhogg.api.routes.v4.notes),
@@ -917,86 +917,169 @@
     return store
   }
 
-  const createState = (initialState = {}) => {
+  const createState = (initialState = {}) => new Proxy({
+    state: {
+      ...initialState,
+    },
 
-    return new Proxy({
-      state: {
-        ...initialState,
-      },
+    /**
+     * Add props to the state
+     *
+     * @param newState
+     */
+    set (newState) {
+      this.state = {
+        ...this.state,
+        ...newState,
+      }
+    },
 
-      /**
-       * Add props to the state
-       *
-       * @param newState
-       */
-      set (newState) {
-        this.state = {
-          ...this.state,
-          ...newState,
-        }
-      },
+    /**
+     * Clear the state
+     */
+    clear () {
+      this.state = {}
+    },
 
-      /**
-       * Clear the state
-       */
-      clear () {
-        this.state = {}
-      },
+    /**
+     * Get a specific key from the state
+     *
+     * @param key
+     * @returns {*|boolean|{}}
+     */
+    get (key = '') {
 
-      /**
-       * Get a specific key from the state
-       *
-       * @param key
-       * @returns {*|boolean|{}}
-       */
-      get (key = '') {
+      if (key) {
+        return this.state[key]
+      }
 
-        if (key) {
-          return this.state[key]
-        }
+      return this.state
+    },
 
-        return this.state
-      },
+    /**
+     * If the state has a specific key
+     *
+     * @param key
+     * @returns {boolean}
+     */
+    has (key = '') {
+      if (key) {
+        return key in this.state
+      }
 
-      /**
-       * If the state has a specific key
-       *
-       * @param key
-       * @returns {boolean}
-       */
-      has (key = '') {
-        if (key) {
-          return key in this.state
-        }
+      return Object.keys(this.state).length > 0
+    },
+  }, {
+    set (manager, key, val) { // to intercept property writing
 
-        return Object.keys(this.state).length > 0
-      },
-    }, {
-      set (manager, key, val) { // to intercept property writing
+      if (key === 'state') {
+        return Reflect.set(manager, key, val)
+      }
 
-        if (key === 'state') {
-          return Reflect.set(manager, key, val)
-        }
+      return Reflect.set(Reflect.get(manager, 'state'), key, val)
+    },
+    get (manager, key, receiver) {
 
-        return Reflect.set(Reflect.get(manager, 'state'), key, val)
-      },
-      get (manager, key, receiver) {
-
-        if (key === 'state') {
-          return Reflect.get(manager, key)
-        }
-
-        let state = Reflect.get(manager, 'state')
-
-        if (Reflect.has(state, key)) {
-          return Reflect.get(state, key)
-        }
-
+      if (key === 'state') {
         return Reflect.get(manager, key)
-      },
-    })
-  }
+      }
+
+      let state = Reflect.get(manager, 'state')
+
+      if (Reflect.has(state, key)) {
+        return Reflect.get(state, key)
+      }
+
+      return Reflect.get(manager, key)
+    },
+  })
+
+  /**
+   * Create a registry that contacts items based on IDs
+   *
+   * @returns {{add(*, *), getItems(), get(*), has(*), remove(*)}}
+   * @param initialItems
+   */
+  const createRegistry = (initialItems = {}) => new Proxy({
+    items: {
+      ...initialItems,
+    },
+
+    /**
+     * Add props to the state
+     *
+     * @param key
+     * @param newItem
+     */
+    add (key, newItem) {
+      this.items[key] = newItem
+    },
+
+    /**
+     * Clear the state
+     */
+    clear () {
+      this.items = {}
+    },
+
+    /**
+     * Get a specific key from the registry
+     *
+     * @param key
+     * @returns {*|boolean|{}}
+     */
+    get (key = '') {
+
+      if (key) {
+        return this.items[key]
+      }
+
+      return this.items
+    },
+
+    keys () {
+      return Object.keys(this.items)
+    },
+
+    /**
+     * If the registry has a specific key
+     *
+     * @param key
+     * @returns {boolean}
+     */
+    has (key = '') {
+      if (key) {
+        return key in this.items
+      }
+
+      return Object.keys(this.items).length > 0
+    },
+  }, {
+    set (manager, key, val) { // to intercept property writing
+
+      if (key === 'items') {
+        return Reflect.set(manager, key, val)
+      }
+
+      return Reflect.set(Reflect.get(manager, 'items'), key, val)
+    },
+    get (manager, key, receiver) {
+
+      if (key === 'items') {
+        return Reflect.get(manager, key)
+      }
+
+      let items = Reflect.get(manager, 'items')
+
+      if (Reflect.has(items, key)) {
+        return Reflect.get(items, key)
+      }
+
+      return Reflect.get(manager, key)
+    },
+  })
 
   Groundhogg.createState = createState
+  Groundhogg.createRegistry = createRegistry
 
 } )(jQuery)

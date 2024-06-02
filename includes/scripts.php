@@ -474,14 +474,22 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-make-el',
 			'wp-i18n'
-		] );
+		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-edit-lock', GROUNDHOGG_ASSETS_URL . 'js/admin/edit-lock' . $dot_min . '.js', [
 			'jquery',
 			'wp-i18n',
 			'groundhogg-make-el',
 			'heartbeat'
-		] );
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-api-docs', GROUNDHOGG_ASSETS_URL . 'js/admin/features/api-docs' . $dot_min . '.js', [
+			'groundhogg-make-el',
+			'groundhogg-admin-data',
+			'groundhogg-admin-element',
+			'wp-i18n',
+			'moment'
+		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 

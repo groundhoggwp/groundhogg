@@ -452,7 +452,8 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
-	 * Updates a contact given a contact array
+	 * Updates an object given an query and new data/meta
+	 * Or updates given an array of objects
 	 *
 	 * @param WP_REST_Request $request
 	 *

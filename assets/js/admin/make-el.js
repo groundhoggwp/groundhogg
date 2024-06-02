@@ -123,6 +123,8 @@
           return
         }
 
+        child = maybeCall( child )
+
         // Template literals
         if (isString(child)) {
           let _children = htmlToElements(child)
@@ -553,33 +555,13 @@
     closeOnFocusout = true,
   }, children) => {
 
-    let keepAlive = false
-
     let modal = Div({
       className: 'gh-modal mini gh-panel',
       tabindex: 0,
-      onMousedown: e => {
-
-        // Don't focus out
-        keepAlive = true
-        setTimeout(() => {
-          keepAlive = false
-        }, 10)
-      },
       onFocusout: e => {
-
-        if (keepAlive) {
-          return
-        }
-
         if (closeOnFocusout) {
           if (!e.relatedTarget || !clickedIn(e.relatedTarget, '.gh-modal.mini')) {
-            setTimeout(() => {
-              if (!keepAlive) {
-                close()
-              }
-            })
-            // close()
+            close()
           }
         }
       },
@@ -1049,10 +1031,19 @@
           width,
         } = picker.getBoundingClientRect()
 
-        style.top = bottom + 'px'
-        style.left = left + 'px'
-        style.width = width + 'px'
-        style.maxHeight = ( window.innerHeight - bottom ) + 'px'
+        let maxHeight = window.innerHeight - bottom - 20
+
+        if ( maxHeight > 100 ){
+          style.top = bottom + 'px'
+          style.left = left + 'px'
+          style.width = width + 'px'
+          style.maxHeight = ( maxHeight ) + 'px'
+        } else {
+          style.bottom = window.innerHeight - top + 'px'
+          style.left = left + 'px'
+          style.width = width + 'px'
+          style.maxHeight = ( top - 20 ) + 'px'
+        }
       }
 
       // Remove createable options
@@ -1086,10 +1077,20 @@
               width,
             } = picker.getBoundingClientRect()
 
-            optionsContainer.style.top = bottom + 'px'
-            optionsContainer.style.left = left + 'px'
-            optionsContainer.style.width = width + 'px'
-            optionsContainer.style.maxHeight = ( window.innerHeight - bottom - 20 ) + 'px'
+            let maxHeight = window.innerHeight - bottom - 20
+
+            if ( maxHeight > 100 ){
+              optionsContainer.style.top = bottom + 'px'
+              optionsContainer.style.left = left + 'px'
+              optionsContainer.style.width = width + 'px'
+              optionsContainer.style.maxHeight = maxHeight + 'px'
+
+            } else {
+              optionsContainer.style.bottom = window.innerHeight - top + 'px'
+              optionsContainer.style.left = left + 'px'
+              optionsContainer.style.width = width + 'px'
+              optionsContainer.style.maxHeight = top - 20 + 'px'
+            }
 
             if (!multiple) {
               focusSearch()
@@ -1304,6 +1305,12 @@
 
   }
 
+  const Pg = (props, children) => makeEl( 'p', props, children )
+  const An = (props, children) => makeEl( 'a', props, children )
+  const Ul = (props, children) => makeEl( 'ul', props, children )
+  const Ol = (props, children) => makeEl( 'Ol', props, children )
+  const Li = (props, children) => makeEl( 'li', props, children )
+
   window.MakeEl = {
     InputGroup,
     makeEl,
@@ -1337,5 +1344,10 @@
     ButtonToggle,
     Autocomplete,
     ProgressBar,
+    Pg,
+    An,
+    Ul,
+    Ol,
+    Li,
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

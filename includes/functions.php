@@ -294,9 +294,9 @@ function parse_select2_results( $data = [], $id_col = 'ID', $title_col = 'title'
  */
 function get_db( $table = '' ) {
 
-    if ( empty( $table ) ){
-        return db();
-    }
+	if ( empty( $table ) ) {
+		return db();
+	}
 
 	return db()->get_db( $table );
 }
@@ -7581,7 +7581,18 @@ function is_base64_encoded( $data ) {
  * @return \DateTimeInterface
  */
 function date_started_using_groundhogg() {
-	return get_db( 'contacts' )->get_date_created();
+
+	$oldestContacts = db()->contacts->query( [
+		'limit'   => 1,
+		'orderby' => 'date_created',
+		'order'   => 'ASC'
+	] );
+
+    if ( empty( $oldestContacts ) ){
+        return new DateTimeHelper();
+    }
+
+    return new DateTimeHelper( $oldestContacts[0]->date_created );
 }
 
 /**

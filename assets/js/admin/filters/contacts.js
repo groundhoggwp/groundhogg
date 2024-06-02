@@ -83,14 +83,16 @@
       container.innerHTML = ''
 
       // Add the filters
-      document.querySelector(el).appendChild(Filters({
-        id: this.id,
-        filterRegistry: ContactFilterRegistry,
-        filters: this.filters,
-        onChange: this.onChange,
-      }))
+      document.querySelector(el).appendChild( ContactFilters( this.id, this.filters, this.onChange ) )
     },
   } )
+
+  const ContactFilters = ( id, filters, onChange ) => Filters({
+    id,
+    filterRegistry: ContactFilterRegistry,
+    filters,
+    onChange
+  })
 
   const registerFilterGroup = (group, name) => {
     ContactFilterRegistry.registerGroup(createGroup(group, name))
@@ -1767,6 +1769,8 @@
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}
   }
+
+  Groundhogg.filters.ContactFilters = ContactFilters
 
   Groundhogg.filters.functions = {
     createFilters,

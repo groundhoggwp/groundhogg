@@ -878,4 +878,117 @@ label.gh-switch input:checked ~ span.off {
   left: 36px !important;
 }
 
+#api-docs {
+  background-color: #F6F9FB;
+}
+#api-docs .gh-header {
+  padding: 0 10px 0 0;
+  border-radius: 0;
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0;
+  z-index: 100;
+}
+#api-docs .gh-header > svg {
+  height: 60px;
+  padding: 10px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background-color: #102640;
+}
+#api-docs code {
+  border-radius: 4px;
+}
+#api-docs code.get {
+  background-color: #9ece38;
+  color: #fff;
+}
+#api-docs code.post, #api-docs code.patch {
+  background-color: #0075ff;
+  color: #fff;
+}
+#api-docs code.delete {
+  background-color: #e91f4f;
+  color: #fff;
+}
+#api-docs nav {
+  width: 220px;
+  flex-shrink: 0;
+}
+#api-docs nav a {
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 16px 8px 12px;
+  color: #102640;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#api-docs nav ul, #api-docs nav li {
+  margin: 0;
+}
+#api-docs nav > ul > li > a {
+  font-weight: 600;
+}
+#api-docs nav li.current > a {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+#api-docs nav li.current li.current > a {
+  background-color: rgba(16, 38, 64, 0.5);
+  color: #FFF;
+}
+#api-docs nav li.current > ul a {
+  padding-left: 24px;
+}
+#api-docs nav li:not(.current) > ul {
+  display: none;
+}
+#api-docs #docs-ui {
+  height: calc( 100% - 60px );
+}
+#api-docs #endpoint-display {
+  padding: 20px;
+  background-color: #fff;
+  overflow: auto;
+}
+#api-docs #endpoint-display p, #api-docs #endpoint-display li, #api-docs #endpoint-display a {
+  font-size: 14px;
+}
+#api-docs #endpoint-display .parameter {
+  padding: 10px 0;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+#api-docs #endpoint-display code.param {
+  background-color: transparent;
+  padding: 0;
+}
+#api-docs #endpoint-display .gh-panel.outlined .parameter:first-of-type {
+  border-top: none;
+}
+#api-docs #endpoint-display .gh-panel.outlined .parameter {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+#api-docs pre {
+  color: #fff;
+  background-color: #102640;
+  padding: 10px;
+  margin: 0;
+  overflow: auto;
+}
+#api-docs #request-display {
+  width: 400px;
+  flex-shrink: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+#api-docs #request-display h2 {
+  margin: 0;
+}
+
 /*# sourceMappingURL=admin.css.map */

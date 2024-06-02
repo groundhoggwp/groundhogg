@@ -17,6 +17,7 @@ use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\count_csv_rows;
+use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\files;
 use function Groundhogg\get_array_var;
@@ -81,6 +82,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin-element' );
+
+        if ( $this->get_current_tab() === 'api'){
+	        enqueue_filter_assets();
+	        wp_enqueue_script( 'groundhogg-admin-api-docs' );
+//            var_dump( 'here' );
+        }
 	}
 
 	public function help() {
@@ -190,6 +197,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'slug' => 'misc',
 				'cap'  => 'manage_options'
 			],
+            [
+				'name' => __( 'API', 'groundhogg' ),
+				'slug' => 'api',
+				'cap'  => 'manage_options'
+			],
 		];
 
 		// If old customer updating to new version.
@@ -201,6 +213,28 @@ class Tools_Page extends Tabbed_Admin_Page {
 //		}
 
 		return apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
+	}
+
+    public function page() {
+
+        if ( $this->get_current_tab() === 'api' ){
+            $this->api_view();
+            return;
+        }
+
+	    parent::page();
+    }
+
+	/**
+     * View API
+     *
+	 * @return void
+	 */
+	public function api_view(){
+
+        ?>
+        <div id="api-docs"></div>
+        <?php
 	}
 
 	####### SYSTEM TAB FUNCTIONS #########

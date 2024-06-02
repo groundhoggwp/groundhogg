@@ -5050,7 +5050,10 @@
         fetchOptions: search => Promise.resolve(Object.keys(fontFamilies).
           filter(font => fontFamilies[font].toLowerCase().includes(search.toLowerCase())).
           map(font => ( { id: font, text: fontDisplay(font) } ))),
-        onChange: item => onChange({ fontFamily: item.id }),
+        onChange: item => {
+          onChange({ fontFamily: item.id })
+          // document.getElementById('font-family').click()
+        },
       })),
       !supports.fontSize ? null : Control({ label: __('Font Size', 'groundhogg') }, NumberControl({
         id: `font-size`,

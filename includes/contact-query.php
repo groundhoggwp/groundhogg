@@ -1455,7 +1455,7 @@ class Contact_Query extends Table_Query {
 					$this->setOrder( $value );
 					break;
 				case 'found_rows':
-					$this->setFoundRows( $value );
+					$this->setFoundRows( filter_var( $value, FILTER_VALIDATE_BOOLEAN ) );
 					break;
 				case 'search':
 					if ( $value ) {
