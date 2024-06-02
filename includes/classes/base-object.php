@@ -243,9 +243,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			return call_user_func( [ $this, $name ] );
 		}
 
-		if ( method_exists( $this, 'get_' . $name ) && is_callable( [ $this, 'get_' . $name ] ) ) {
-			return call_user_func( [ $this, 'get_' . $name ] );
-		}
+//		if ( method_exists( $this, 'get_' . $name ) && is_callable( [ $this, 'get_' . $name ] ) ) {
+//			return call_user_func( [ $this, 'get_' . $name ] );
+//		}
 
 		return false;
 	}
@@ -314,6 +314,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	protected function get_object_type() {
 		return $this->get_db()->get_object_type();
+	}
+
+	/**
+	 * Retrieve the object type
+	 *
+	 * @return string
+	 */
+	public function _get_object_type(){
+		return $this->get_object_type();
 	}
 
 	/**

@@ -39,7 +39,7 @@ function row_item_locked_text( Base_Object_With_Meta $object ) {
  */
 function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 
-	if ( get_url_var( 'take-over' ) == 1 && $can_take_over    ){
+	if ( get_url_var( 'take-over' ) == 1 && $can_take_over ){
 		check_admin_referer( 'take-over' );
 		set_lock( $object );
 		wp_redirect( $object->admin_link() );
@@ -47,7 +47,7 @@ function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 	}
 
 	$lock_data = [
-		'type' => $object->object_type,
+		'type' => $object->_get_object_type(),
 		'id'   => $object->ID,
 		'user' => get_current_user_id(),
 		'exit' => admin_page_url( get_url_var( 'page' ) ),
