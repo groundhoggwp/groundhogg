@@ -86,7 +86,19 @@ class Tools_Page extends Tabbed_Admin_Page {
         if ( $this->get_current_tab() === 'api'){
 	        enqueue_filter_assets();
 	        wp_enqueue_script( 'groundhogg-admin-api-docs' );
-//            var_dump( 'here' );
+            $routes = [
+                'contacts',
+                'tags',
+                'broadcasts',
+                'emails',
+                'funnels',
+            ];
+            $dot_min = is_option_enabled( 'gh_script_debug' ) ? '.min' : '';
+            foreach ( $routes as $route ){
+                wp_enqueue_script( "groundhogg-admin-api-docs-$route", GROUNDHOGG_ASSETS_URL . "js/admin/api-docs/{$route}{$dot_min}.js", ['groundhogg-admin-api-docs'], GROUNDHOGG_VERSION );
+            }
+
+            do_action( 'groundhogg/enqueue_api_docs' );
         }
 	}
 

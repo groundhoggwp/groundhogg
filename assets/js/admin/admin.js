@@ -541,9 +541,50 @@
     return array
   }
 
+  const jsonCopy = stuff => JSON.parse(JSON.stringify(stuff))
+
+  function setNestedValue (obj, path, value) {
+    const keys = path.split('.')
+    let current = obj
+
+    // Iterate over the keys, except for the last one
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i]
+
+      // If the key doesn't exist, create an empty object
+      if (!current[key]) {
+        current[key] = {}
+      }
+
+      current = current[key]
+    }
+
+    // Set the value at the final key
+    current[keys[keys.length - 1]] = value
+  }
+
+  function getNestedValue (obj, path) {
+    const keys = path.split('.')
+    let current = obj
+
+    for (let i = 0; i < keys.length; i++) {
+
+      if (!current.hasOwnProperty(keys[i])) {
+        return undefined
+      }
+
+      current = current[keys[i]]
+    }
+
+    return current
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
+  gh.functions.jsonCopy = jsonCopy
+  gh.functions.setNestedValue = setNestedValue
+  gh.functions.getNestedValue = getNestedValue
 
   var check, timeout
 

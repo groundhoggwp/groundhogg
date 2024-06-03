@@ -483,7 +483,7 @@ class Scripts {
 			'heartbeat'
 		], GROUNDHOGG_VERSION );
 
-		wp_register_script( 'groundhogg-admin-api-docs', GROUNDHOGG_ASSETS_URL . 'js/admin/features/api-docs' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-api-docs', GROUNDHOGG_ASSETS_URL . 'js/admin/api-docs/api-docs' . $dot_min . '.js', [
 			'groundhogg-make-el',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
