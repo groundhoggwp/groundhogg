@@ -258,8 +258,18 @@ class Contacts_Api extends Base_Object_Api {
 
 			foreach ( $items as $item ) {
 
-				$id      = get_array_var( $item, 'ID' );
-				$contact = new Contact( $id );
+				$id          = get_array_var( $item, 'ID' );
+				$data        = get_array_var( $item, 'data', [] );
+				$meta        = get_array_var( $item, 'meta', [] );
+				$add_tags    = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
+				$remove_tags = get_array_var( $item, 'remove_tags', [] );
+				$email_address = get_array_var( $data, 'email' );
+
+				if ( ! $id && ! $email_address ) {
+					continue;
+				}
+
+				$contact = new Contact( $id ?: $email_address );
 
 				if ( ! $contact->exists() ) {
 					continue;
@@ -268,14 +278,6 @@ class Contacts_Api extends Base_Object_Api {
 				if ( ! current_user_can( 'edit_contact', $contact ) ) {
 					continue;
 				}
-
-				$data        = get_array_var( $item, 'data', [] );
-				$meta        = get_array_var( $item, 'meta', [] );
-				$add_tags    = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
-				$remove_tags = get_array_var( $item, 'remove_tags', [] );
-
-				// get the email address
-				$email_address = get_array_var( $data, 'email' );
 
 				// skip if the email address is not being used
 				if ( is_email_address_in_use( $email_address, $contact ) ) {
@@ -316,8 +318,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		$contact_query = new Contact_Query();
-		$contacts = $contact_query->query( $query, true );
-		$updated = 0;
+		$contacts      = $contact_query->query( $query, true );
+		$updated       = 0;
 
 		/**
 		 * @var $contact Contact
@@ -503,11 +505,11 @@ class Contacts_Api extends Base_Object_Api {
 		$meta        = $request->get_param( 'meta' );
 		$remove_tags = $request->get_param( 'remove_tags' );
 
-		if ( empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ){
+		if ( empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ) {
 			return self::ERROR_401( 'no_changes', 'No changes were made.' );
 		}
 
-		if ( ! empty( $data ) ){
+		if ( ! empty( $data ) ) {
 			// get the email address
 			$email_address = get_array_var( $data, 'email' );
 
@@ -581,9 +583,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		// Don't bother to check if there are any matching contacts
 		// Just add the background task for deleting them
-		if ( $request->has_param( 'bg' ) ){
-			unset( $query_vars['bg']);
+		if ( $request->has_param( 'bg' ) ) {
+			unset( $query_vars['bg'] );
 			Background_Tasks::delete_contacts( $query_vars );
+
 			return self::SUCCESS_RESPONSE();
 		}
 
@@ -824,7 +827,9 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
 		}
 
-		$others = $request->get_json_params();
+		$others = $request->has_param( 'others' )
+			? wp_parse_list( $request->get_param( 'others' ) )
+			: $request->get_json_params();
 
 		foreach ( $others as $other ) {
 			$contact->merge( $other );

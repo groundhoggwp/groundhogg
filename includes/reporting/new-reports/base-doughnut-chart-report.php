@@ -24,7 +24,7 @@ abstract class Base_Doughnut_Chart_Report extends Base_Chart_Report {
 				[
 					'data'            => $data['data'],
 					'backgroundColor' => $data['color']
-				]
+				],
 			]
 		];
 	}

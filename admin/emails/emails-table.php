@@ -10,10 +10,12 @@ use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\check_lock;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\html;
+use function Groundhogg\row_item_locked_text;
 use function Groundhogg\scheduled_time_column;
 
 /**
@@ -122,26 +124,29 @@ class Emails_Table extends Table {
 	 * @return string
 	 */
 	protected function column_title( $email ) {
-		$subject = $email->get_title();
+
+        $subject = $email->get_title();
 		$editUrl = $email->admin_link();
 
 		if ( $this->get_view() === 'trash' ) {
-			$html = "<strong>{$subject}</strong>";
-		} else {
-			$html = "<strong>";
-
-			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
-
-			if ( $email->is_draft() && ! $this->view_is( 'draft' ) ) {
-				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Draft' ) . "</span>";
-			}
-
-			if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
-				$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template', 'groundhogg' ) . "</span>";
-			}
-
-			$html .= "</strong>";
+			return "<strong class='row-title'>{$subject}</strong>";
 		}
+
+        row_item_locked_text( $email );
+
+		$html = "<strong>";
+
+		$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+		if ( $email->is_draft() && ! $this->view_is( 'draft' ) ) {
+			$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Draft' ) . "</span>";
+		}
+
+		if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
+			$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template', 'groundhogg' ) . "</span>";
+		}
+
+		$html .= "</strong>";
 
 		return $html;
 	}
@@ -224,17 +229,17 @@ class Emails_Table extends Table {
 	 */
 	protected function column_funnels( $email ) {
 
-		$stepQuery = new Table_Query( 'steps' );
+		$stepQuery  = new Table_Query( 'steps' );
 		$meta_alias = $stepQuery->joinMeta( 'email_id' );
 		$stepQuery->where( 'step_type', 'send_email' );
 		$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
 		$funnelQuery = new Table_Query( 'funnels' );
-        $join = $funnelQuery->addJoin( 'LEFT', $stepQuery );
-        $join->onColumn( 'funnel_id' );
+		$join        = $funnelQuery->addJoin( 'LEFT', $stepQuery );
+		$join->onColumn( 'funnel_id' );
 
-        $funnelQuery->where( 'email_id', $email->ID );
-        $funnelQuery->setGroupby( 'ID' );
+		$funnelQuery->where( 'email_id', $email->ID );
+		$funnelQuery->setGroupby( 'ID' );
 
 		$funnels = $funnelQuery->get_objects( Funnel::class );
 
@@ -277,21 +282,6 @@ class Emails_Table extends Table {
 	}
 
 	/**
-	 * Get value for checkbox column.
-	 *
-	 * @param object $email A singular item (one full row's worth of data).
-	 *
-	 * @return string Text to be placed inside the column <td>.
-	 */
-	protected function column_cb( $email ) {
-		return sprintf(
-			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$email->ID                // The value of the checkbox should be the record's ID.
-		);
-	}
-
-	/**
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk steps available on this table.
 	 *
@@ -312,12 +302,6 @@ class Emails_Table extends Table {
 		}
 
 		return apply_filters( 'wpgh_email_bulk_actions', $actions );
-	}
-
-	public function single_row( $item ) {
-		echo "<tr id=\"{$item->ID}\">";
-		$this->single_row_columns( $item );
-		echo '</tr>';
 	}
 
 	function get_table_id() {

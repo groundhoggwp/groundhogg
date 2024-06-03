@@ -2,8 +2,6 @@
 
 namespace Groundhogg\DB;
 
-use Groundhogg\Contact;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -87,6 +85,7 @@ class Submissions extends DB {
 		return array(
 			'ID'           => '%d',
 			'step_id'      => '%d',
+			'type'         => '%s',
 			'contact_id'   => '%d',
 			'date_created' => '%s',
 		);
@@ -102,6 +101,7 @@ class Submissions extends DB {
 		return array(
 			'ID'           => 0,
 			'step_id'      => 0,
+			'type'         => 'form',
 			'contact_id'   => 0,
 			'date_created' => current_time( 'mysql' ),
 		);
@@ -142,6 +142,7 @@ class Submissions extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         step_id bigint(20) unsigned NOT NULL,
+        type varchar(20) NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         date_created datetime NOT NULL,
         PRIMARY KEY (ID)

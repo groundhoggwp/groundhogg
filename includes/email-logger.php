@@ -68,11 +68,11 @@ class Email_Logger {
 	}
 
 	/**
-	 *
+	 * Retrieve the ID of the last log created by the logger
 	 *
 	 * @return int
 	 */
-	public static function get_last_log_id(): int {
+	public static function get_last_log_id() {
 		return self::$log_item_id;
 	}
 

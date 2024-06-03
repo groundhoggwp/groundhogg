@@ -2,10 +2,8 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\DB;
 use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
-use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
@@ -337,8 +335,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function get_preceding_actions() {
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('ASC')
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -355,8 +352,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function get_preceding_actions_of_type( $type = '' ) {
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('ASC')
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -375,8 +371,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('ASC')
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -394,8 +389,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('ASC')
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
 		      ->where()
 		      ->equals( 'step_group', self::BENCHMARK )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -413,9 +407,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('ASC')
-		      ->setLimit(1)
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
+		      ->setLimit( 1 )
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -443,9 +436,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$query = new Table_Query( 'steps' );
 
-		$query->setOrderby('step_order')
-		      ->setOrder('DESC')
-		      ->setLimit(1)
+		$query->setOrderby( [ 'step_order', 'DESC' ] )
+		      ->setLimit( 1 )
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
@@ -506,7 +498,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_run_time( $baseTimestamp = 0 ) {
 
-		if ( ! $baseTimestamp ){
+		if ( ! $baseTimestamp ) {
 			$baseTimestamp = time();
 		}
 
@@ -518,8 +510,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return int
 	 */
-	public function get_delay_time(){
-		_deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
+	public function get_delay_time() {
+		_deprecated_function( __CLASS__ . '::' . __METHOD__, '3.4', __CLASS__ . '::get_run_time' );
+
 		return $this->get_run_time( time() );
 	}
 
@@ -644,18 +637,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_current_funnel_step_order( $contact ) {
 
-		// Search waiting events, automatically the current event.
-		$events = $this->get_event_queue_db()->query( [
-			'funnel_id'  => $this->get_funnel_id(),
-			'contact_id' => $contact->get_id(),
-			'event_type' => Event::FUNNEL,
-			'status'     => Event::WAITING,
-			'limit'      => 1,
-		] );
+		$eventQuery = new Table_Query( 'event_queue' );
+		$eventQuery->setLimit( 1 )
+		           ->where()
+		           ->equals( 'contact_id', $contact->get_id() )
+		           ->equals( 'event_type', Event::FUNNEL )
+		           ->equals( 'funnel_id', $this->get_funnel_id() )
+		           ->equals( 'status', Event::WAITING );
+
+		$events = $eventQuery->get_objects();
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
-			$event = new Event( $event, 'event_queue' );
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
@@ -663,21 +656,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			}
 		}
 
-		// The most recent completed event for this funnel and contact.
-		$events = $this->get_events_db()->query( [
-			'funnel_id'  => $this->get_funnel_id(),
-			'contact_id' => $contact->get_id(),
-			'event_type' => Event::FUNNEL,
-			'status'     => Event::COMPLETE,
-			'order'      => 'DESC',
-			'orderby'    => 'time',
-			'limit'      => 1,
-		] );
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setLimit( 1 )
+		           ->setOrderby( [ 'time', 'DESC' ], [ 'micro_time', 'DESC' ] )
+		           ->where()
+		           ->equals( 'contact_id', $contact->get_id() )
+		           ->equals( 'event_type', Event::FUNNEL )
+		           ->equals( 'funnel_id', $this->get_funnel_id() )
+		           ->equals( 'status', Event::COMPLETE );
+
+		$events = $eventQuery->get_objects();
 
 		if ( ! empty( $events ) ) {
 			// get top element.
 			$event = array_shift( $events );
-			$event = new Event( $event );
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
@@ -752,11 +744,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
@@ -767,7 +759,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return Funnel_Step
 	 */
-	public function get_step_type_controller(){
+	public function get_step_type_controller() {
 		$controller = Plugin::instance()->step_manager->get_element( $this->get_type() );
 		$controller->set_current_step( $this );
 

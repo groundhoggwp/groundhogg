@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
+use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -110,7 +111,10 @@ class Apply_Note extends Action {
 		$finished_note = do_replacements( $note, $contact );
 
 		// Add funnel context
-		$note = $contact->add_note( $finished_note, 'funnel', $event->get_funnel_id() );
+		$note = $contact->add_note( $finished_note, 'funnel', $event->get_funnel_id(), [
+			'timestamp'    => $event->get_time(),
+			'date_created' => Ymd_His( $event->get_time() )
+		] );
 
 		return true;
 

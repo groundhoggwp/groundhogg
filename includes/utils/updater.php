@@ -581,6 +581,8 @@ abstract class Updater {
 
 		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
 
+        notices()->add( 'updated', sprintf( __( '%s database upgraded to %s in the background.', 'groundhogg' ), $this->get_display_name(), $update ) );
+
 		return true;
 	}
 

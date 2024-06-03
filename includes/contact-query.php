@@ -215,15 +215,25 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_unsubscribed( $filter, Where $where ) {
 
-		// Don't reference activity table
-		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) ) {
+		$filter = wp_parse_args( $filter, [
+			'reasons' => []
+		] );
+
+		// Simple, use date_optin_status_changed
+		if ( ! isset( $filter['funnel_id'] ) && ! isset( $filter['email_id'] ) && ! isset( $filter['step_id'] ) && empty( $filter['reasons'] ) ) {
 			$where->equals( 'optin_status', Preferences::UNSUBSCRIBED );
 			Filters::mysqlDateTime( 'date_optin_status_changed', $filter, $where );
 
 			return;
 		}
 
-		self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
+		$activityQuery = self::basic_activity_filter( Activity::UNSUBSCRIBED, $filter, $where );
+
+		// Filter by reason as well
+		if ( ! empty( $filter['reasons'] ) ) {
+			$metaAlias = $activityQuery->joinMeta( 'reason' );
+			$activityQuery->where()->in( "COALESCE($metaAlias.meta_value,'')", array_map( 'sanitize_key', $filter['reasons'] ) );
+		}
 	}
 
 	/**
@@ -281,17 +291,35 @@ class Contact_Query extends Table_Query {
 		$meta_key = $filter['meta_key'];
 		$alias    = $where->query->joinMeta( $meta_key );
 
+		/**
+		 * @type $before DateTimeHelper
+		 * @type $after DateTimeHelper
+		 */
 		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
 
 		if ( $filter['compare'] === 'is_not' ) {
 			$where->not();
 		}
 
-		$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
-                INTERVAL YEAR(\'%2$s\')-YEAR(%1$s)
-                         + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0)
-                YEAR)  
+		// If the dates are the same; day of, today, tomorrow, yesterday, etc...
+		if ( $after->ymd() === $before->ymd() ) {
+
+			$subWhere = $where->subWhere();
+
+			// On feb 28 of non leap years, also include peoples whose anniversary is feb 29
+			if ( ! $before->isLeapYear() && $before->format( 'm-d' ) === '02-28' ){
+				$subWhere->addCondition( "DATE_FORMAT($alias.meta_value,'%m-%d') = '02-29'" );
+			}
+
+			$subWhere->addCondition( "DATE_FORMAT($alias.meta_value,'%m-%d') = '{$before->format('m-d')}'" );
+
+		} else {
+			// Range selection
+			$where->addCondition( sprintf( 'DATE_ADD(%1$s, 
+			INTERVAL YEAR(\'%2$s\')-YEAR(%1$s) + IF(DAYOFYEAR(\'%2$s\') > DAYOFYEAR(%1$s),1,0) YEAR
+			)  
             BETWEEN \'%2$s\' AND \'%3$s\'', "$alias.meta_value", $after->ymd(), $before->ymd() ) );
+		}
 	}
 
 	/**
@@ -366,6 +394,66 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_meta( $filter, Where $where ) {
 		Filters::meta_filter( $filter, $where );
+	}
+
+	/**
+	 * Filter by primary object relationships
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_primary_related( $filter, Where $where ) {
+
+		if ( $where->hasCondition( 'object_relationships' ) ) {
+			$query = new Table_Query( 'object_relationships' );
+			$query->setSelect( 'primary_object_id' )
+			      ->where()
+			      ->equals( 'primary_object_type', 'contact' )
+			      ->equals( 'secondary_object_type', $filter['object_type'] )
+			      ->equals( 'secondary_object_id', $filter['object_id'] );
+
+			$where->in( 'ID', $query );
+
+			return;
+		}
+
+		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
+		$join->onColumn( 'primary_object_id', 'ID' )->equals( 'primary_object_type', 'contact' );
+
+		$where->equals( "$join->alias.secondary_object_id", $filter['object_id'] );
+		$where->equals( "$join->alias.secondary_object_type", $filter['object_type'] );
+	}
+
+	/**
+	 * Filter by secondary object relationships
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_secondary_related( $filter, Where $where ) {
+
+		if ( $where->hasCondition( 'object_relationships' ) ) {
+			$query = new Table_Query( 'object_relationships' );
+			$query->setSelect( 'secondary_object_id' )
+			      ->where()
+			      ->equals( 'secondary_object_type', 'contact' )
+			      ->equals( 'primary_object_type', $filter['object_type'] )
+			      ->equals( 'primary_object_id', $filter['object_id'] );
+
+			$where->in( 'ID', $query );
+
+			return;
+		}
+
+		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
+		$join->onColumn( 'secondary_object_id', 'ID' )->equals( 'secondary_object_type', 'contact' );
+
+		$where->equals( "$join->alias.primary_object_id", $filter['object_id'] );
+		$where->equals( "$join->alias.primary_object_type", $filter['object_type'] );
 	}
 
 	/**
@@ -769,15 +857,18 @@ class Contact_Query extends Table_Query {
 	public static function filter_broadcast_link_clicked( $filter, Where $where ) {
 
 		$broadcast_id = absint( $filter['broadcast_id'] );
-
 		unset( $filter['broadcast_id'] );
 		$filter['funnel_id'] = Broadcast::FUNNEL_ID;
-
 		if ( $broadcast_id ) {
 			$filter['step_id'] = $broadcast_id;
 		}
 
-		self::filter_email_link_clicked( $filter, $where );
+		if ( isset_not_empty( $filter, 'is_sms' ) ) {
+			$filter['activity_type'] = Activity::SMS_CLICKED;
+			unset( $filter['is_sms'] );
+		}
+
+		self::filter_link_clicked( $filter, $where );
 	}
 
 
@@ -801,7 +892,7 @@ class Contact_Query extends Table_Query {
 
 		$funnel_id = absint( $filter['funnel_id'] );
 		$step_id   = absint( $filter['step_id'] );
-		$email_id = absint( $filter['email_id'] );
+		$email_id  = absint( $filter['email_id'] );
 
 		$eventQuery = new Table_Query( 'events' );
 
@@ -895,7 +986,7 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return void
 	 */
-	public static function filter_email_link_clicked( $filter, Where $where ) {
+	public static function filter_link_clicked( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'email_id'      => 0,
@@ -903,7 +994,8 @@ class Contact_Query extends Table_Query {
 			'step_id'       => 0,
 			'link'          => '',
 			'count'         => 1,
-			'count_compare' => 'greater_than_or_equal_to'
+			'count_compare' => 'greater_than_or_equal_to',
+			'activity_type' => Activity::EMAIL_CLICKED
 		] );
 
 		$path = sanitize_text_field( $filter['link'] );
@@ -917,7 +1009,7 @@ class Contact_Query extends Table_Query {
 		$activityQuery->setSelect( 'contact_id', [ 'COUNT(ID)', 'clicks' ] )
 		              ->setGroupby( 'contact_id' )
 		              ->where()
-		              ->equals( 'activity_type', Activity::EMAIL_CLICKED );
+		              ->equals( 'activity_type', $filter['activity_type'] );
 
 		Filters::timestamp( 'timestamp', $filter, $activityQuery->where );
 
@@ -958,7 +1050,7 @@ class Contact_Query extends Table_Query {
 	public static function filter_custom_activity( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'activity'      => '',
+			'activity' => '',
 		] );
 
 		self::basic_activity_filter( $filter['activity'], $filter, $where );
@@ -968,10 +1060,10 @@ class Contact_Query extends Table_Query {
 	 * @throws \Exception
 	 *
 	 * @param array        $filter
-	 * @param Where $where
+	 * @param Where        $where
 	 * @param string|array $activity_type
 	 *
-	 * @return void
+	 * @return Table_Query
 	 */
 	public static function basic_activity_filter( $activity_type, $filter, Where $where ) {
 
@@ -1025,6 +1117,8 @@ class Contact_Query extends Table_Query {
 		$join->onColumn( 'contact_id' );
 
 		$where->compare( "COALESCE($alias.activities,0)", $filter['count'], $filter['count_compare'] );
+
+		return $activityQuery;
 	}
 
 	/**
@@ -1265,7 +1359,7 @@ class Contact_Query extends Table_Query {
 
 		// Make sure user meta orderby works
 		if ( isset( $query_vars['orderby'] ) && str_starts_with( $query_vars['orderby'], 'um.' ) && $query_vars['orderby'] !== 'um.meta_value' ) {
-			$parts                 = explode( '.', $query_vars['orderby'] );
+			$parts    = explode( '.', $query_vars['orderby'] );
 			$meta_key = $parts[1];
 
 			$join = $this->addJoin( 'LEFT', [ $this->db->usermeta, 'um' ] );
@@ -1361,7 +1455,7 @@ class Contact_Query extends Table_Query {
 					$this->setOrder( $value );
 					break;
 				case 'found_rows':
-					$this->setFoundRows( $value );
+					$this->setFoundRows( filter_var( $value, FILTER_VALIDATE_BOOLEAN ) );
 					break;
 				case 'search':
 					if ( $value ) {
@@ -1481,12 +1575,12 @@ class Contact_Query extends Table_Query {
 					break;
 				case 'marketable':
 
-					if ( $value === true || $value === 'yes' ){
+					if ( $value === true || $value === 'yes' ) {
 						self::marketable( $where );
 						break;
 					}
 
-					if ( $value === false || $value === 'no' ){
+					if ( $value === false || $value === 'no' ) {
 						self::not_marketable( $where );
 						break;
 					}
@@ -1680,7 +1774,7 @@ class Contact_Query extends Table_Query {
 
 					break;
 				default:
-					if ( $where->query->db_table->has_column( $query_var ) ){
+					if ( $where->query->db_table->has_column( $query_var ) ) {
 						$where->equals( $query_var, $value );
 					}
 					break;
@@ -1821,7 +1915,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		// Already joined tags, so use a sub query
-		if ( $where->hasCondition( 'tags' ) ){
+		if ( $where->hasCondition( 'tags' ) ) {
 
 			$tagQuery = new Table_Query( 'tag_relationships' );
 			$tagQuery->setSelect( 'contact_id' );
@@ -1921,9 +2015,9 @@ class Contact_Query extends Table_Query {
 
 		if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
 			$alias = $where->query->joinMeta( 'gdpr_consent' );
-			$where->equals( "$alias.gdpr_consent", 'yes' );
+			$where->equals( "$alias.meta_value", 'yes' );
 			$alias = $where->query->joinMeta( 'marketing_consent' );
-			$where->equals( "$alias.marketing_consent", 'yes' );
+			$where->equals( "$alias.meta_value", 'yes' );
 		}
 
 	}
@@ -1954,9 +2048,9 @@ class Contact_Query extends Table_Query {
 
 		if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
 			$alias = $where->query->joinMeta( 'gdpr_consent' );
-			$where->notEquals( "$alias.gdpr_consent", 'yes' );
+			$where->notEquals( "$alias.meta_value", 'yes' );
 			$alias = $where->query->joinMeta( 'marketing_consent' );
-			$where->notEquals( "$alias.marketing_consent", 'yes' );
+			$where->notEquals( "$alias.meta_value", 'yes' );
 		}
 	}
 

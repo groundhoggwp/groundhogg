@@ -23,17 +23,18 @@ class Rewrites {
 	 */
 	public function add_rewrite_rules() {
 
-		// Browser view using primary id
+		// Archive single using primary event id
 		add_managed_rewrite_rule(
-			'archive/p/([^/]*)/?$',
+			'archive/p/([0-9a-fA-F]+)/?$',
 			'subpage=browser_view&event_id=$matches[1]'
 		);
 
-		// Browser view using queued ID
+		// Archive single using queued ID
 		add_managed_rewrite_rule(
-			'archive/([^/]*)/?$',
+			'archive/([0-9a-fA-F]+)/?$',
 			'subpage=browser_view&use_queued=1&event_id=$matches[1]'
 		);
+
 
 		// Email Archive
 		add_managed_rewrite_rule(
@@ -45,6 +46,24 @@ class Rewrites {
 		add_managed_rewrite_rule(
 			'emails/([^/]*)/?$',
 			'subpage=emails&email_id=$matches[1]'
+		);
+
+		// Campaigns Archive
+		add_managed_rewrite_rule(
+			'campaigns/?$',
+			'subpage=campaigns'
+		);
+
+		// Campaign broadcast archive
+		add_managed_rewrite_rule(
+			'campaigns/([0-9a-zA-Z-]+)/?$',
+			'subpage=campaigns&campaign=$matches[1]'
+		);
+
+		// Campaign Archive Single
+		add_managed_rewrite_rule(
+			'campaigns/([0-9a-zA-Z-]+)/b/([0-9]+)/?$',
+			'subpage=campaigns&campaign=$matches[1]&broadcast=$matches[2]'
 		);
 
 		// Benchmark links
@@ -122,6 +141,8 @@ class Rewrites {
 		$vars[] = 'event_id';
 		$vars[] = 'link_id';
 		$vars[] = 'use_queued';
+		$vars[] = 'campaign';
+		$vars[] = 'broadcast';
 
 		return $vars;
 	}
@@ -192,7 +213,7 @@ class Rewrites {
 					break;
 				}
 
-				$template = $template_loader->get_template_part( 'archive/single', '', false );
+				$template = $template_loader->get_template_part( 'archive/event', '', false );
 				break;
 			case 'archive':
 
@@ -201,8 +222,44 @@ class Rewrites {
 					break;
 				}
 
-				$template = $template_loader->get_template_part( 'archive/list', '', false );
+				$template = $template_loader->get_template_part( 'archive/events', '', false );
 				break;
+			case 'campaigns':
+
+				global $wp_query;
+
+				$campaign_slug = get_query_var( 'campaign' );
+
+				if ( empty( $campaign_slug ) ) {
+					$template = $template_loader->get_template_part( 'archive/campaigns', '', false );
+					break;
+				}
+
+				$campaign = new Campaign( $campaign_slug, 'slug' );
+
+				if ( ! $campaign->exists() || ( ! $campaign->is_public() && ! current_user_can( 'manage_campaigns' ) ) ) {
+
+					status_header( 404 );
+					$wp_query->set_404();
+					$template = get_query_template( '404' );
+
+					break;
+				}
+
+				$broadcast_id = get_query_var( 'broadcast' );
+
+				if ( $broadcast_id ) {
+					$broadcast = new Broadcast( $broadcast_id );
+
+					if ( $broadcast->exists() ) {
+						$template = $template_loader->get_template_part( 'archive/broadcast', '', false );
+						break;
+					}
+				}
+
+				$template = $template_loader->get_template_part( 'archive/campaign', '', false );
+				break;
+
 			case 'emails':
 				$template = $template_loader->get_template_part( 'emails/email', '', false );
 				break;

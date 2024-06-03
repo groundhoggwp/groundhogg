@@ -31,7 +31,7 @@ class Searches_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, "/searches/(?P<id>[a-z0-9\-]+)", [
+		register_rest_route( self::NAME_SPACE, "/searches/(?P<id>[a-z0-9\-_]+)", [
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_single' ],

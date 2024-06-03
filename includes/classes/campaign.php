@@ -2,8 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\DB;
-
 /**
  * Created by PhpStorm.
  * User: atty
@@ -54,5 +52,17 @@ class Campaign extends Base_Object {
 	 */
 	public function get_slug() {
 		return $this->slug;
+	}
+
+	public function is_public(){
+		return $this->visibility === 'public';
+	}
+
+	public function admin_link() {
+		return admin_page_url( 'gh_tags', [
+			'tab'                    => 'campaigns',
+			'action'                 => 'edit',
+			$this->get_object_type() => $this->get_id(),
+		] );
 	}
 }

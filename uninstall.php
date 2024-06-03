@@ -27,8 +27,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 // Load WPGH file.
 include_once __DIR__ . '/groundhogg.php';
 
-global $wpdb;
-
 if( is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 	uninstall_groundhogg();
 }

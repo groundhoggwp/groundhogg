@@ -1,0 +1,52 @@
+.archive-header {
+    /*padding: 10px 20px;*/
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    position: sticky;
+    top: 0;
+    background: #FFFFFF;
+    display: flex;
+    gap: 1em;
+    align-items: stretch;
+
+    & div.subject-and-preview{
+        padding: 0.75em 0;
+
+        & p,
+        & h1 {
+            margin: 0;
+            font-family: 'system-ui', Arial, "Helvetica Neue", Helvetica, sans-serif;
+        }
+
+        & h1 {
+            font-size: 1.5rem;
+        }
+
+        & p {
+            font-size: 16px;
+        }
+
+    }
+
+    & a {
+        padding: 1em 1.5em;
+        /*background: #0F181E;*/
+        background-color: #eeeeee;
+        /*border-radius: 10px;*/
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #0F181E;
+        transition: 0.4s;
+        font-size: 14px;
+
+        &:hover{
+            background-color: #cccccc;
+            text-decoration: underline;
+        }
+    }
+
+}
+
+/*body.template-full-width{*/
+/*    background-color: #F6F9FB;*/
+/*}*/

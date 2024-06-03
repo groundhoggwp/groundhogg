@@ -269,6 +269,11 @@ class Email extends Base_Object_With_Meta {
 		// Fix markdown line breaks
 		$content = preg_replace( '/(?<=[^\\S])\h\\n/', "  \n", $content );
 
+		// Tracking must be enabled and there must be a valid event to track with
+//		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) && $this->event && $this->event->exists() ) {
+//			$content = $this->convert_to_tracking_links( $content, 'plain' );
+//		}
+
 		// Re-strip
 		return $this->strip_html_tags( $content );
 	}
@@ -396,7 +401,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function get_open_tracking_link() {
+	public function get_open_tracking_src() {
 		return managed_page_url( sprintf(
 			"o/%s/%s",
 			dechex( $this->get_contact()->get_id() ),
@@ -495,9 +500,10 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_merged_pre_header( $content = '' ) {
+
 		$pre_header = do_replacements(
 			$this->get_pre_header(),
-			$this->get_contact()->get_id()
+			$this->get_contact()
 		);
 
 		$pre_header = apply_filters( 'wpgh_email_pre_header', $pre_header );
@@ -677,7 +683,7 @@ class Email extends Base_Object_With_Meta {
 
 					if ( str_contains( $content, '</body>' ) ) {
 						$content = str_replace( '</body>', html()->e( 'img', [
-								'src'    => $this->get_open_tracking_link(),
+								'src'    => $this->get_open_tracking_src(),
 								'width'  => '0',
 								'height' => '0',
 								'alt'    => '',
@@ -713,27 +719,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Convert links to tracking links
-	 *
-	 * @param $content string content which may contain Superlinks
-	 *
-	 * @return string
-	 */
-	public function convert_to_tracking_links( $content ) {
-		/* Filter the links to include data about the email, campaign, and funnel steps... */
-		$content = preg_replace_callback( '/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [
-			$this,
-			'tracking_link_callback'
-		], $content );
-
-		// Also get single quote HTML since that's a thing that can happen.
-		return preg_replace_callback( '/(href=\')(?!mailto)(?!tel)([^"]*)(\')/i', [
-			$this,
-			'tracking_link_callback'
-		], $content );
-	}
-
-	/**
 	 * Get URLs from the content.
 	 * This will only get static URLs, dynamic URLs possibly added by replacement codes will not be retrieved.
 	 *
@@ -747,19 +732,51 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Convert links to tracking links
+	 *
+	 * @param $content string content which may contain Superlinks
+	 *
+	 * @return string
+	 */
+	public function convert_to_tracking_links( $content, $context = 'html' ) {
+		if ( $context === 'plain' ){
+			return preg_replace_callback( '@\((https?://[^)]+)\)@i', [
+				$this,
+				'tracking_link_callback_plain'
+			], $content );
+		}
+
+		return preg_replace_callback( '@href=["\'](https?://[^"\']+)["\']@i', [
+			$this,
+			'tracking_link_callback'
+		], $content );
+	}
+
+	/**
+	 * Convert plain text version tracking links
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	public function tracking_link_callback_plain( $matches ){
+		return $this->tracking_link_callback( $matches, '(%s)' );
+	}
+
+	/**
 	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
 	 *
 	 * @param $matches
 	 *
 	 * @return string
 	 */
-	public function tracking_link_callback( $matches ) {
+	public function tracking_link_callback( $matches, $replacement = 'href="%s"' ) {
 
-		$clean_url = no_and_amp( html_entity_decode( $matches[2] ) );
+		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
 
 		// If the url is not to be tracked leave it alone.
 		if ( is_url_excluded_from_tracking( $clean_url ) ) {
-			return $matches[1] . $clean_url . $matches[3];
+			return sprintf( $replacement, $clean_url );
 		}
 
 		$local_hostname = wp_parse_url( home_url(), PHP_URL_HOST );
@@ -779,7 +796,77 @@ class Email extends Base_Object_With_Meta {
 
 		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
 
-		return $matches[1] . $tracking_link . $matches[3];
+		return sprintf( $replacement, $tracking_link );
+	}
+
+	/**
+	 * Add UTM params to tracking links
+	 *
+	 * @param $content
+	 *
+	 * @return array|string|string[]|null
+	 */
+	public function maybe_add_utm_to_links( $content, $context = 'html' ){
+
+		$utm_params = array_filter( [
+			'utm_source' => $this->utm_source,
+			'utm_campaign' => $this->utm_campaign,
+			'utm_content' => $this->utm_content,
+			'utm_term' => $this->utm_term,
+			'utm_medium' => $this->utm_medium,
+		] );
+
+		if ( empty( $utm_params ) ){
+			return $content;
+		}
+
+		$url = untrailingslashit( home_url() );
+
+		if ( $context === 'plain' ){
+			return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+				$this,
+				'utm_link_callback'
+			], $content );
+		}
+
+		return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
+			$this,
+			'utm_link_callback_plain'
+		], $content );
+
+	}
+
+	/**
+	 * Add UTM links to plain text
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	protected function utm_link_callback_plain( $matches ){
+		return $this->utm_link_callback( $matches, '(%s)' );
+	}
+
+	/**
+	 * Add the utm params to a link
+	 *
+	 * @param array $matches
+	 *
+	 * @return string
+	 */
+	protected function utm_link_callback( $matches, $format='href="%s"' ){
+
+		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
+
+		$utm_params = urlencode_deep( array_filter( [
+			'utm_source' => $this->utm_source,
+			'utm_campaign' => $this->utm_campaign,
+			'utm_content' => $this->utm_content,
+			'utm_term' => $this->utm_term,
+			'utm_medium' => $this->utm_medium,
+		] ) );
+
+		return sprintf( $format, add_query_arg( $utm_params, $clean_url ) );
 	}
 
 	/**
@@ -836,6 +923,8 @@ class Email extends Base_Object_With_Meta {
 				$content = ob_get_clean();
 				break;
 		}
+
+		$content = $this->maybe_add_utm_to_links( $content );
 
 		// Tracking must be enabled and there must be a valid event to track with
 		if ( ! is_option_enabled( 'gh_disable_click_tracking' ) && $this->event && $this->event->exists() ) {
@@ -1364,7 +1453,7 @@ class Email extends Base_Object_With_Meta {
 			}
 
 			if ( ! $contact ) {
-				return parent::get_as_array();
+				$contact = new Contact();
 			}
 
 			$this->set_contact( $contact );
@@ -1397,100 +1486,5 @@ class Email extends Base_Object_With_Meta {
 				'plain'       => $this->get_merged_alt_body(),
 			]
 		] );
-	}
-
-	/**
-	 * Get related email statistics
-	 *
-	 * @param $start
-	 * @param $end
-	 *
-	 * @return array
-	 */
-	public function get_email_stats( $start, $end, $steps_ids = [] ) {
-
-		if ( empty( $steps_ids ) ) {
-
-			$steps = get_db( 'stepmeta' )->query( [
-				'meta_key'   => 'email_id',
-				'meta_value' => $this->get_id()
-			] );
-
-			$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
-		}
-
-		$count        = 0;
-		$opened       = 0;
-		$clicked      = 0;
-		$all_clicked  = 0;
-		$unsubscribed = 0;
-
-		if ( ! empty( $steps_ids ) ) {
-
-			$steps_ids = wp_parse_id_list( $steps_ids );
-
-			$where_events = [
-				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
-				[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-				[ 'col' => 'status', 'val' => Event::COMPLETE, 'compare' => '=' ],
-				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
-				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
-			];
-
-			$count = get_db( 'events' )->count( [
-				'where' => $where_events,
-			] );
-
-			$where_opened = [
-				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
-				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
-				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_OPENED, 'compare' => '=' ],
-				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
-				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
-			];
-
-			$opened = get_db( 'activity' )->count( [
-				'where' => $where_opened
-			] );
-
-			$where_clicked = [
-				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
-				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
-				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
-				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
-				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
-			];
-
-			$clicked = get_db( 'activity' )->count( [
-				'select' => 'DISTINCT contact_id',
-				'where'  => $where_clicked
-			] );
-
-			$all_clicked = get_db( 'activity' )->count( [
-				'where' => $where_clicked
-			] );
-
-			$unsubscribed = get_db( 'activity' )->count( [
-				'email_id'      => $this->get_id(),
-				'step_id'       => $steps_ids,
-				'activity_type' => Activity::UNSUBSCRIBED,
-				'before'        => $end,
-				'after'         => $start,
-			] );
-		}
-
-		return [
-			'steps'              => $steps_ids,
-			'sent'               => $count,
-			'opened'             => $opened,
-			'open_rate'          => percentage( $count, $opened ),
-			'clicked'            => $clicked,
-			'all_clicks'         => $all_clicked,
-			'unsubscribed'       => $unsubscribed,
-			'click_through_rate' => percentage( $opened, $clicked ),
-		];
 	}
 }

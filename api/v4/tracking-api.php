@@ -7,15 +7,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Groundhogg\Tracking;
-use function Groundhogg\get_cookie;
-use function Groundhogg\get_current_contact;
-use function Groundhogg\get_db;
 use Groundhogg\Plugin;
-use WP_REST_Server;
+use Groundhogg\Tracking;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_Error;
+use WP_REST_Server;
+use function Groundhogg\get_cookie;
+use function Groundhogg\get_current_contact;
+use function Groundhogg\get_current_ip_address;
+use function Groundhogg\get_current_user_agent_id;
+use function Groundhogg\get_db;
 use function Groundhogg\track_page_visit;
 
 class Tracking_Api extends Base_Api {
@@ -83,7 +85,10 @@ class Tracking_Api extends Base_Api {
 			return self::ERROR_400( 'no_ref', 'Cannot track blank pages...' );
 		}
 
-		$visit = track_page_visit( $ref, $contact );
+		$visit = track_page_visit( $ref, $contact, [
+			'ip_address' => get_current_ip_address(),
+			'user_agent' => get_current_user_agent_id()
+		] );
 
 		if ( ! current_user_can( 'view_activity' ) ){
 			return self::SUCCESS_RESPONSE();

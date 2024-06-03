@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\check_lock;
 use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
@@ -22,6 +23,8 @@ use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\notices;
+use function Groundhogg\use_edit_lock;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,6 +73,11 @@ class Funnels_Page extends Admin_Page {
 	 * @return void
 	 */
 	function update_user_full_screen_preference() {
+
+        if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_funnels' ) ){
+            $this->wp_die_no_access();
+        }
+
 		$is_full_screen = filter_var( get_post_var( 'full_screen', false ), FILTER_VALIDATE_BOOLEAN );
 		update_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', $is_full_screen );
 
@@ -210,6 +218,8 @@ class Funnels_Page extends Admin_Page {
 
 				enqueue_email_block_editor_assets();
 
+                use_edit_lock( $funnel );
+
 				do_action( 'groundhogg/admin/funnels/editor_scripts' );
 
 				break;
@@ -281,7 +291,7 @@ class Funnels_Page extends Admin_Page {
 		foreach ( $this->get_items() as $id ) {
 			$funnel = new Funnel( $id );
 
-			if ( ! $funnel->exists() ) {
+			if ( ! $funnel->exists() || check_lock( $funnel ) ) {
 				continue;
 			}
 
@@ -315,7 +325,7 @@ class Funnels_Page extends Admin_Page {
 		foreach ( $this->get_items() as $id ) {
 			$funnel = new Funnel( $id );
 
-			if ( ! $funnel->exists() ) {
+			if ( ! $funnel->exists() || check_lock( $funnel ) ) {
 				continue;
 			}
 
@@ -727,7 +737,7 @@ class Funnels_Page extends Admin_Page {
 	 * Add new step via admin ajax
 	 */
 	public function add_step() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
+		if ( ! current_user_can( 'edit_funnels' ) || ! $this->verify_action() ) {
 			$this->wp_die_no_access();
 		}
 
@@ -793,7 +803,7 @@ class Funnels_Page extends Admin_Page {
 
 	public function duplicate_step() {
 
-		if ( ! current_user_can( 'edit_funnels' ) ) {
+		if ( ! current_user_can( 'edit_funnels' ) || ! $this->verify_action() ) {
 			$this->wp_die_no_access();
 		}
 
@@ -828,34 +838,6 @@ class Funnels_Page extends Admin_Page {
 			'id'       => $new_step->get_id(),
 			'json'     => $new_step
 		] );
-
-		wp_send_json_error();
-	}
-
-	/**
-	 * Ajax function to delete steps from the funnel view
-	 */
-	public function delete_step() {
-
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		/* exit out if not doing ajax */
-		if ( ! wp_doing_ajax() ) {
-			return;
-		}
-
-		$step_id = absint( get_request_var( 'step_id' ) );
-		$step    = new Step( $step_id );
-
-		if ( ! $step->exists() ) {
-			wp_send_json_error();
-		}
-
-		if ( $step->delete() ) {
-			wp_send_json_success( [ 'id' => $step_id ] );
-		}
 
 		wp_send_json_error();
 	}

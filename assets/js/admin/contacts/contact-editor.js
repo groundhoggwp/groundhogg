@@ -1,6 +1,6 @@
 ( ($, editor) => {
 
-  const { contact, meta_exclusions } = editor
+  const { contact, meta_exclusions, unsubReasons } = editor
 
   const { gh_contact_custom_properties } = Groundhogg.filters
 
@@ -25,6 +25,7 @@
     setFrameContent,
     loadingDots,
     spinner,
+    escHTML,
     dialog,
   } = Groundhogg.element
 
@@ -461,6 +462,26 @@
     },
 
     types: {
+      unsubscribed: {
+        icon: icons.brokenHeart,
+        render: ({ meta }) => {
+          let { reason = '', feedback = '' } = meta
+
+          let parts = [
+            __('Unsubscribed', 'groundhogg'),
+          ]
+
+          if (reason.length) {
+            parts.push(`; ${ bold( escHTML(unsubReasons[reason] ?? reason )) }`)
+          }
+
+          if (feedback.length) {
+            parts.push(`<div class="contact-input">"${ escHTML(feedback) }"</div>`)
+          }
+
+          return parts.join('')
+        }
+      },
       wp_fusion: {
         icon: icons.wp_fusion,
         iconFramed: false,
@@ -496,7 +517,11 @@
       email_opened: {
         icon: icons.open_email,
         render: ({ data }) => {
-          return sprintf(__('Opened %s', 'groundhogg'), bold(EmailsStore.get(data.email_id).data.title))
+          return sprintf(__('Opened %s', 'groundhogg'), el( 'a', {
+            href: parseInt(data.funnel_id) === 1
+              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
+              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+          }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
       email_link_click: {
@@ -510,7 +535,11 @@
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
             target: '_blank',
             href: data.referer,
-          }, bold(maybeTruncateLink(data.referer))), bold(EmailsStore.get(data.email_id).data.title))
+          }, bold(maybeTruncateLink(data.referer))), el( 'a', {
+            href: parseInt(data.funnel_id) === 1
+              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
+              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+          }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
       imported: {
@@ -931,7 +960,7 @@
 
       let promises = [
         // Preload activities
-        ...activities.filter(a => a.type === 'activity' && a.hasOwnProperty( 'preload' ) ).
+        ...activities.filter(a => a.type === 'activity' && this.types[a.data.activity_type]?.hasOwnProperty('preload')).
           map(a => this.types[a.data.activity_type]?.preload(a)),
 
         // events with funnel IDs
@@ -993,6 +1022,7 @@
                                   funnel: __('Funnel Activity', 'groundhogg'),
                                   email: __('Email Activity', 'groundhogg'),
                                   web: __('Web Activity', 'groundhogg'),
+                                  form: __('Form Submissions', 'groundhogg'),
                                   ...isWPFusionActive ? {
                                       wp_fusion: __('WPFusion Activity',
                                               'groundhogg'),
@@ -2139,6 +2169,10 @@
     let { close } = loadingModal()
 
     try {
+
+      if ( ! parseInt( event.data.queued_id ) ){
+        throw new Error( 'Invalid queued event ID' );
+      }
 
       let logItems = await LogsStore.fetchItems({
         queued_event_id: event.data.queued_id,

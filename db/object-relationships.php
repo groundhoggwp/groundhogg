@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 use Groundhogg\Base_Object;
+use Groundhogg\DB\Traits\Insert_Ignore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,6 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Object_Relationships extends DB {
+
+	use Insert_Ignore;
 
 	/**
 	 * Get the DB suffix
@@ -124,19 +127,6 @@ class Object_Relationships extends DB {
 	public function contact_merged( $contact, $other ) {
 		$this->swap_relationships( 'primary', 'contact', $other->ID, $contact->ID );
 		$this->swap_relationships( 'secondary', 'contact', $other->ID, $contact->ID );
-	}
-
-	public function insert( $data ) {
-
-		add_filter( 'query', [ $this, '_insert_ignore' ] );
-		$result = parent::insert( $data );
-		remove_filter( 'query', [ $this, '_insert_ignore' ] );
-
-		return $result;
-	}
-
-	public function _insert_ignore( $query ) {
-		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
 	}
 
 	/**

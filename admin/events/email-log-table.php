@@ -348,7 +348,7 @@ class Email_Log_Table extends Table {
 
 	/**
 	 * @param $email Email_Log_Item
-	 *  
+	 *
 	 * @return string|void
 	 */
 	protected function column_sent( $email ) {
@@ -381,21 +381,6 @@ class Email_Log_Table extends Table {
 	 */
 	protected function column_default( $email, $column_name ) {
 		do_action( 'groundhogg/log/custom_column', $email, $column_name );
-	}
-
-	/**
-	 * Get value for checkbox column.
-	 *
-	 * @param object $email A singular item (one full row's worth of data).
-	 *
-	 * @return string Text to be placed inside the column <td>.
-	 */
-	protected function column_cb( $email ) {
-		return sprintf(
-			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$email->ID                // The value of the checkbox should be the record's ID.
-		);
 	}
 
 	/**

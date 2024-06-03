@@ -106,7 +106,6 @@ class Tracking {
 		add_action( 'template_redirect', [ $this, 'handle_failsafe_tracking' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
-		add_action( 'groundhogg/contact/preferences/unsubscribed', [ $this, 'contact_unsubscribed' ], 10, 1 );
 
 		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
 
@@ -748,13 +747,6 @@ class Tracking {
 			$target_url = '/';
 		}
 
-		// We removed the hostname from the url to shorten it
-//		if ( preg_match( '@^/@', $target_url ) ) {
-//			$scheme     = is_ssl() ? 'https' : 'http';
-//			$hostname   = wp_parse_url( home_url(), PHP_URL_HOST );
-//			$target_url = "{$scheme}://{$hostname}{$target_url}";
-//		}
-
 		$this->target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		return $this->target_url;
@@ -779,18 +771,24 @@ class Tracking {
 			$this->bail();
 		}
 
+		$open_delay = absint( get_option( 'gh_open_tracking_delay' ) );
+
+		// if diff between current time and sent time is suspicious we should assume bot?
+		if ( $open_delay && $event->is_broadcast_event() && time() - $event->get_time() < $open_delay ) {
+			$this->bail();
+		}
+
 		$args = [
 			'event_id'      => $event->get_id(),
-			'contact_id'    => $event->get_contact_id(),
-			'funnel_id'     => $event->get_funnel_id(),
-			'step_id'       => $event->get_step_id(),
-			'email_id'      => $event->get_email_id(),
 			'activity_type' => Activity::EMAIL_OPENED,
 		];
 
-		// Check if exists first
+		// We've already tracked an open for this event
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
-			$activity = track_event_activity( $event, Activity::EMAIL_OPENED );
+			$activity = track_event_activity( $event, Activity::EMAIL_OPENED, [], [
+				'ip_address' => get_current_ip_address(),
+				'user_agent' => get_current_user_agent_id()
+			] );
 
 			if ( $activity ){
 
@@ -825,11 +823,8 @@ class Tracking {
 	 * When tracking a link click redirect the user to the destination after performing the necessary tracking
 	 */
 	protected function email_link_clicked() {
-		/* track every click as an open */
-		$this->email_opened();
 
-		$event  = $this->get_current_event();
-		$target = $this->get_target_url();
+		$event = $this->get_current_event();
 
 		/**
 		 * @since 2.1
@@ -846,9 +841,23 @@ class Tracking {
 			return;
 		}
 
+		$click_delay = absint( get_option( 'gh_click_tracking_delay' ) );
+
+		// if diff between current time and sent time is suspicious we should assume bot?
+		if ( $click_delay && $event->is_broadcast_event() && time() - $event->get_time() < $click_delay ) {
+			$this->bail();
+			return;
+		}
+
+		/* track every click as an open */
+		$this->email_opened();
+
+		$target   = $this->get_target_url();
 		$activity = track_event_activity( $event, Activity::EMAIL_CLICKED, [], [
-			'referer'       => $target,
-			'referer_hash'  => generate_referer_hash( $target )
+			'referer'      => $target,
+			'referer_hash' => generate_referer_hash( $target ),
+			'ip_address'   => get_current_ip_address(),
+			'user_agent'   => get_current_user_agent_id()
 		] );
 
 		if ( ! $activity ) {
@@ -875,22 +884,4 @@ class Tracking {
 	public function form_filled( $contact ) {
 		$this->start_tracking( $contact );
 	}
-
-	/**
-	 * Track the activity if the contact unsubscribed
-	 *
-	 * @param $contact_id
-	 */
-	public function contact_unsubscribed( $contact_id ) {
-
-		$contact = get_current_contact();
-
-		// Check if the current tracked contact is also that is being unsubscribed
-		if ( ! is_a_contact( $contact ) || $contact->get_id() !== $contact_id || ! $this->get_current_event() ) {
-			return;
-		}
-
-		track_live_activity( Activity::UNSUBSCRIBED );
-	}
-
 }

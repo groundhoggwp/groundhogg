@@ -46,6 +46,7 @@ class Activity extends Base_Object_With_Meta {
 	 */
 	protected function post_setup() {
 		$this->type = $this->activity_type;
+		$this->ip_address = inet_ntop( $this->ip_address ); // IP stored in binary
 	}
 
 	public function get_timestamp() {

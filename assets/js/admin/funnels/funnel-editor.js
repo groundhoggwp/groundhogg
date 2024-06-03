@@ -468,33 +468,18 @@
           this.insertAfterStep = data.after_step
 
           let id = uuid()
+
           // language=HTML
           ui.helper.replaceWith(`
               <div class="step step-placeholder ${ data.step_group }" id="${ id }">
                   Loading...
               </div>`)
 
-          var self = this
-          var $steps = self.getSteps()
-          var $settings = self.getSettings()
-
           showSpinner()
-          adminAjaxRequest(data, (response) => {
 
-            this.steps.push(response.data.json)
-
-            if (self.insertAfterStep) {
-              $(`#${ self.insertAfterStep }`).after(response.data.sortable)
-            }
-            else {
-              $steps.prepend(response.data.sortable)
-            }
-
-            $settings.append(response.data.settings)
-            $(`#${ id }`).remove()
-
+          this.getStepHtml( data ).then( r => {
             hideSpinner()
-            $(document).trigger('new-step')
+            $(`#${id}`).remove()
           })
         },
       })
@@ -604,6 +589,9 @@
       let $steps = self.getSteps()
       let $settings = self.getSettings()
 
+      // Make sure the nonce is there
+      obj._wpnonce = Groundhogg.nonces._wpnonce
+
       let response = await ajax(obj)
 
       this.steps.push(response.data.json)
@@ -622,6 +610,11 @@
       return response
     },
 
+    /**
+     * The step that is currently being edited.
+     *
+     * @returns {unknown}
+     */
     getActiveStep () {
       return this.steps.find(s => s.ID == this.currentlyActive)
     },

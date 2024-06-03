@@ -64,7 +64,13 @@ class Event_Store_V2 {
 	public function get_events( $count = 100 ) {
 
 		$this->generate_claim_id();
-		$this->claim_events( $count );
+
+		$claimed = $this->claim_events( $count );
+
+		// Claim did not claim any events, so no point in doing the select
+		if ( $claimed === false || $claimed === 0 ){
+			return [];
+		}
 
 		return $this->get_events_by_claim();
 	}
@@ -85,7 +91,7 @@ class Event_Store_V2 {
 	 *
 	 * @param $count int
 	 *
-	 * @return bool
+	 * @return bool|int
 	 */
 	public function claim_events( $count ) {
 
@@ -111,6 +117,11 @@ class Event_Store_V2 {
 			$wpdb->print_error( 'Restarting transaction after deadlock' );
 
 			return $this->claim_events( $count );
+		}
+
+		// No rows affected
+		if ( $result === 0 ){
+			return false;
 		}
 
 		$this->db()->cache_set_last_changed();

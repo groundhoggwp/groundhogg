@@ -113,8 +113,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_get_run_time' ], 1, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'get_run_time' ], 10, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_calc_run_time' ], 1, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'calc_run_time' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
@@ -220,46 +220,37 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @return int
 	 */
-	public function pre_get_run_time( int $baseTimestamp, Step $step ): int {
+	public function pre_calc_run_time( int $baseTimestamp, Step $step ): int {
         $this->set_current_step( $step );
         return $baseTimestamp;
 	}
 
 	/**
 	 * Replacement for enqueue/get_delay_time
+     * This method should be overridden by child classes.
 	 *
-	 * @param int  $baseTime
+	 * @param int  $baseTimestamp
 	 * @param Step $step
 	 *
 	 * @return int
 	 */
-	public function get_run_time( int $baseTimestamp, Step $step ) : int{
-        return $this->enqueue( $step );
+	public function calc_run_time( int $baseTimestamp, Step $step ) : int{
+
+        // Step is still using the legacy enqueue method
+        if ( method_exists( $this, 'enqueue' ) ){
+	        _deprecated_function( get_called_class() . '::enqueue', '3.4', __CLASS__. '::calc_run_time' );
+            return $this->enqueue( $step );
+        }
+
+		// Step is still using the legacy get_delay_time method
+		if ( method_exists( $this, 'get_delay_time' ) ){
+			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__. '::calc_run_time' );
+			return $baseTimestamp + $this->get_delay_time( $step );
+		}
+
+        // Run now
+        return $baseTimestamp;
     }
-
-	/**
-	 * Get the delay time in seconds.
-	 *
-	 * @param Step
-	 *
-	 * @return int
-	 */
-	public function get_delay_time( $step ) {
-        _deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
-		return 0;
-	}
-
-	/**
-	 * Enqueue the step in the event queue...
-	 *
-	 * @param $step Step
-	 *
-	 * @return int
-	 */
-	public function enqueue( $step ) {
-		_deprecated_function( __CLASS__. '::' . __METHOD__, '3.4', __CLASS__. '::get_run_time' );
-		return time() + $this->get_delay_time( $step );
-	}
 
 	/**
 	 * Get the ICON of this action/benchmark

@@ -151,6 +151,8 @@ class Main_Roles extends Roles {
 			case 'edit_task':
 			case 'view_task':
 			case 'delete_task':
+			case 'edit_funnel':
+			case 'edit_email':
 
 				$caps = [];
 

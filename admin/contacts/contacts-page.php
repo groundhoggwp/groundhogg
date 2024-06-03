@@ -4,45 +4,32 @@ namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
-use Groundhogg\Classes\Note;
+use Groundhogg\Contact;
+use Groundhogg\Plugin;
+use Groundhogg\Preferences;
 use Groundhogg\Properties;
 use Groundhogg\Saved_Searches;
-use Groundhogg\Scripts;
-use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\contact_and_user_match;
-use function Groundhogg\do_replacements;
 use function Groundhogg\enqueue_filter_assets;
-use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_db;
 use function Groundhogg\get_default_contact_tab;
 use function Groundhogg\get_filters_from_old_query_vars;
-use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
-use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\get_url_var;
-use function Groundhogg\html;
-use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\kses_wrapper;
-use function Groundhogg\modal_link_url;
 use function Groundhogg\normalize_files;
-use Groundhogg\Plugin;
-use Groundhogg\Contact;
-use Groundhogg\Preferences;
-use function Groundhogg\sanitize_email_header;
-use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\utils;
-use function Groundhogg\validate_tags;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\Ymd;
-use function Groundhogg\Ymd_His;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -237,6 +224,7 @@ class Contacts_Page extends Admin_Page {
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => Properties::instance()->get_all(),
 					'marketable'                   => $contact->is_marketable(),
+					'unsubReasons'                 => get_unsub_reasons(),
 					'i18n'                         => [
 						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
 					],
@@ -257,7 +245,8 @@ class Contacts_Page extends Admin_Page {
 					'query'         => get_request_query(),
 					'filter_query'  => $filter_query,
 					'searches'      => array_values( Saved_Searches::instance()->get_all() ),
-					'currentSearch' => $saved_search
+					'currentSearch' => $saved_search,
+					'presets'       => Contact_Table_Columns::get_presets()
 				] );
 				break;
 		}

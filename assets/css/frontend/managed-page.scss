@@ -1,3 +1,30 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow-50: rgba(255, 238, 88, 0.50);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$benchmark-orange-25: rgba(245, 129, 21, 0.25);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+$background-color: #F6F9FB;
+
 html, body.managed-page, #main {
     background-color: #F6F9FB;
     position: initial !important;
@@ -9,7 +36,7 @@ html, body.managed-page, #main {
 
 #main * {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    font-size: 14px;
+    //font-size: 14px;
     line-height: 1.6em;
 }
 
@@ -20,6 +47,14 @@ html, body.managed-page, #main {
 }
 
 body.managed-page {
+
+    p {
+        font-size: 14px;
+    }
+
+    .no-margin-top {
+        margin-top: 0;
+    }
 
     &.view,
     &.archive {
@@ -61,7 +96,7 @@ body.managed-page {
     }
 }
 
-#main form:not(.gdpr-consent), #main .box {
+#main .box {
     margin-top: 20px;
     margin-left: 0;
     padding: 30px;
@@ -75,6 +110,10 @@ body.managed-page {
 
     > p:first-child{
         margin-top: 0;
+    }
+
+    > p:last-child {
+        margin-bottom: 0;
     }
 }
 
@@ -149,8 +188,10 @@ a:active, a:hover {
 }
 
 label {
-    font-weight: normal;
+    //font-weight: normal;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 p#credit,
@@ -169,6 +210,7 @@ p#credit img {
     display: inline-block;
     width: 100%;
     border-radius: 5px;
+    font-size: 14px;
 }
 
 #main .preference-options a:hover{
@@ -187,27 +229,6 @@ p#credit img {
     background-color: rgba(194, 19, 61, 0.05);
 }
 
-#main p label {
-    color: #72777c;
-    font-size: 14px;
-}
-
-#main input[type="email"],
-#main input[type="tel"],
-#main input[type="text"] {
-    background: #fbfbfb;
-    border-radius: 4px;
-    font-size: 18px;
-    width: 100%;
-    padding: 4px 8px;
-    margin: 2px 6px 16px 0;
-    border: 1px solid #7e8993;
-    box-shadow: 0 0 0 transparent;
-    color: #32373c;
-    outline: 0;
-    transition: 50ms border-color ease-in-out;
-}
-
 #main{
 
     label.gh-checkbox-label {
@@ -224,12 +245,19 @@ p#credit img {
         display: none;
     }
 
+    span.optional{
+        font-weight: normal;
+    }
+
+    select,
+    textarea,
     input[type="email"],
     input[type="tel"],
+    input[type="search"],
     input[type="text"] {
         background: #fbfbfb;
         border-radius: 4px;
-        font-size: 18px;
+        font-size: 15px;
         width: 100%;
         padding: 4px 8px;
         margin: 2px 6px 16px 0;
@@ -264,6 +292,11 @@ p#credit img {
             background: #005ecc;
         }
 
+        &.secondary {
+            background-color: $primary-blue-2;
+            color: $primary-dark;
+        }
+
         &.danger {
             background: #e91f4f;
 
@@ -281,4 +314,21 @@ p#credit img {
 .erase #main ul {
     padding-left: 20px;
     list-style-type: disc;
+}
+
+form.list-search {
+    display: flex;
+    gap: 5px;
+    align-items: stretch;
+    float: right;
+    margin-bottom: 10px;
+
+    input#search-input {
+        margin: 0 !important;
+        font-size: 14px;
+    }
+
+    button#search-submit {
+        font-size: 14px;
+    }
 }

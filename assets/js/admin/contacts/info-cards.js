@@ -74,7 +74,8 @@
     adminAjaxRequest(
       {
         action: 'groundhogg_save_card_order',
-        cardOrder: cardOrder
+        cardOrder: cardOrder,
+        gh_admin_ajax_nonce: Groundhogg.nonces._adminajax
       }
     )
   }

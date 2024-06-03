@@ -2034,22 +2034,51 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 		return get_array_var( $this->posted, $name );
 	}
 
+	/**
+	 * @param $offset
+	 *
+	 * @return bool
+	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists( $offset ) {
 		return isset( $this->posted[ $offset ] );
 	}
 
+	/**
+	 * @param $offset
+	 *
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		return $this->posted[ $offset ];
 	}
 
+	/**
+	 * @param $offset
+	 * @param $value
+	 *
+	 * @return void
+	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
 		$this->posted[ $offset ] = $value;
 	}
 
+	/**
+	 * @param $offset
+	 *
+	 * @return void
+	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {
 		unset( $this->posted[ $offset ] );
 	}
 
+	/**
+	 * @return array|mixed|string
+	 */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->posted;
 	}

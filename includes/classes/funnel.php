@@ -402,6 +402,24 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Retrieve all email assets within a funnel
+	 *
+	 * @return Email[]
+	 */
+	public function get_emails(){
+		return array_filter( array_map( function ( Step $step ){
+
+			$email_id = $step->get_meta( 'email_id' );
+			if ( ! $email_id ){
+				return false;
+			}
+
+			return new Email( $email_id );
+
+		}, $this->get_email_steps() ) );
+	}
+
+	/**
 	 * Get the step IDs associated with this funnel
 	 *
 	 * @param array $query

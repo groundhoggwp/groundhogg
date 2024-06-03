@@ -483,7 +483,10 @@
       ]),
       display: ({ compare = 'is', date_range, after, before, days = 0, ...rest }) => {
 
-        let prefix = bold(name)
+        let prefix = display( rest )
+        if ( ! prefix || prefix.length === 0 ){
+          prefix = bold( name )
+        }
 
         if ( compare === 'is_not' ){
           prefix += ' is not'
@@ -501,7 +504,7 @@
             return ComparisonsTitleGenerators.before(prefix,
               formatDate(before))
           default:
-            return sprintf('%s %s', prefix, dateRanges[date_range].replace( 'X', days ).toLowerCase() )
+            return sprintf('%s %s', prefix, dateRanges[date_range ?? 'any']?.replace( 'X', days ).toLowerCase() )
         }
       },
       preload,

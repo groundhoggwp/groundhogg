@@ -1,0 +1,165 @@
+( () => {
+
+  const { ApiRegistry, CommonParams, setInRequest, getFromRequest } = Groundhogg.apiDocs
+  const { root: apiRoot } = Groundhogg.api.routes.v4
+  const { sprintf, __, _x, _n } = wp.i18n
+
+  const {
+    Fragment,
+    Pg,
+    Input,
+    Textarea,
+    InputRepeater,
+  } = MakeEl
+
+  ApiRegistry.add('emails', {
+    name: __('Emails'),
+    description: '',
+    endpoints: Groundhogg.createRegistry(),
+  })
+
+  const EmailRepeater = ({ param, name, id }) => {
+
+    let others = getFromRequest(param, [])
+    let rows = others.map(em => ( [em] ))
+
+    return InputRepeater({
+      id,
+      rows: rows,
+      cells: [
+        props => Input({
+          ...props,
+          type: 'email',
+        }),
+      ],
+      onChange: rows => {
+        setInRequest(param, rows.map(([em]) => em))
+      },
+    })
+  }
+
+  ApiRegistry.emails.endpoints.add('compose', {
+    name: __('Send a composed email', 'groundhogg'),
+    description: () => Pg({}, __('Send a composed (custom) email to a contact.', 'groundhogg')),
+    method: 'POST',
+    endpoint: `${ apiRoot }/emails/send`,
+    params: [
+      {
+        param: 'to',
+        description: () => Pg({}, __('An array of email addresses to send the email.', 'groundhogg')),
+        type: 'string[]',
+        required: true,
+        control: EmailRepeater,
+      },
+      {
+        param: 'cc',
+        description: () => Pg({}, __('An array of email addresses to CC on the email.', 'groundhogg')),
+        type: 'string[]',
+        control: EmailRepeater,
+      },
+      {
+        param: 'bcc',
+        description: () => Pg({}, __('An array of email addresses to BCC on the email.', 'groundhogg')),
+        type: 'string[]',
+        control: EmailRepeater,
+      },
+      {
+        param: 'from_email',
+        description: () => Pg({}, __('The email to send the email from. If using a sending service the email address must be authenticated.', 'groundhogg')),
+        type: 'string',
+        default: Groundhogg.defaults.from_email,
+        control: ({ param, id, name }) => Input({
+          id,
+          name,
+          type: 'email',
+          value: getFromRequest(param),
+          onInput: e => {
+            setInRequest(param, e.target.value)
+          },
+        }),
+      },
+      {
+        param: 'from_name',
+        description: () => Pg({}, __('The name that will appear in the from header.', 'groundhogg')),
+        type: 'string',
+        default: Groundhogg.defaults.from_name,
+      },
+      {
+        param: 'type',
+        description: () => Pg({}, __('The type of email so that the appropriate sending service is used.', 'groundhogg')),
+        type: 'string',
+        default: 'wordpress',
+        options: [
+          'wordpress',
+          'marketing',
+          'transactional',
+        ],
+      },
+      {
+        param: 'subject',
+        description: () => Pg({}, __('The subject line of the email.', 'groundhogg')),
+        type: 'string',
+      },
+      {
+        param: 'content',
+        description: () => Pg({}, __('The HTML content of the email.', 'groundhogg')),
+        type: 'string',
+        control: ({ param, id, name }) => Textarea({
+          id,
+          name,
+          className: 'full-width',
+          value: getFromRequest(param),
+          onInput: e => {
+            setInRequest(param, e.target.value)
+          },
+        }),
+      },
+    ],
+    request: {
+      to: [Groundhogg.user.getCurrentUser().data.user_email],
+      subject: 'Hey there!',
+      content: `<p>I'm sending you an email from the API!</p>`,
+    },
+    response: {
+      'status': 'success',
+    },
+  })
+
+  ApiRegistry.emails.endpoints.add('send', {
+    name: __('Send an email template', 'groundhogg'),
+    description: () => Pg({}, __('Send an email using a template to a contact.', 'groundhogg')),
+    method: 'POST',
+    endpoint: `${ apiRoot }/emails/<id>/send`,
+    identifiers: [
+      {
+        param: 'id',
+        type: 'int',
+        required: true,
+        description: () => Pg({}, 'The ID of the template to send.' )
+      }
+    ],
+    params: [
+      {
+        param: 'to',
+        type: 'int|string',
+        required: true,
+        description: () => Pg({}, 'The ID or email address of the contact to send to.' ),
+        control: ({ param, id, name }) => Input({
+          id,
+          name,
+          value: getFromRequest(param),
+          onInput: e => {
+            setInRequest(param, e.target.value)
+          },
+        }),
+      }
+    ],
+    request: {
+      to: Groundhogg.user.getCurrentUser().data.user_email,
+    },
+    response: {
+      'status': 'success',
+    }
+  })
+
+} )()

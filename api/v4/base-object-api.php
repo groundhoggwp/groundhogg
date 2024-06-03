@@ -27,7 +27,7 @@ use WP_REST_Server;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
-use function Groundhogg\sanitize_object_meta;
+use function Groundhogg\isset_not_empty;
 
 //use Groundhogg\Webhook;
 
@@ -431,6 +431,15 @@ abstract class Base_Object_Api extends Base_Api {
 			'found_rows' => true,
 		] );
 
+
+		if ( isset_not_empty( $query, 'count' ) ) {
+			$total = $this->get_db_table()->count( $query );
+
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => $total,
+			] );
+		}
+
 		$items = $this->get_db_table()->query( $query );
 		$total = $this->get_db_table()->found_rows();
 
@@ -443,7 +452,8 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
-	 * Updates a contact given a contact array
+	 * Updates an object given an query and new data/meta
+	 * Or updates given an array of objects
 	 *
 	 * @param WP_REST_Request $request
 	 *

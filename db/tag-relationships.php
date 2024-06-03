@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 use Groundhogg\Base_Object;
 use Groundhogg\Contact;
+use Groundhogg\DB\Traits\Insert_Ignore;
 use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,6 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since       File available since Release 0.1
  */
 class Tag_Relationships extends DB {
+
+	use Insert_Ignore;
 
 	/**
 	 * Get the DB suffix
@@ -113,40 +116,6 @@ class Tag_Relationships extends DB {
 		);
 
 		return $this->insert( $data );
-	}
-
-	/**
-	 * Wrapper for insert to use INSERT IGNORE
-	 *
-	 * @param $data
-	 *
-	 * @return int
-	 */
-	public function insert( $data ) {
-
-		add_filter( 'query', [ $this, '_insert_ignore' ] );
-		$result = parent::insert( $data );
-		remove_filter( 'query', [ $this, '_insert_ignore' ] );
-
-		return $result;
-	}
-
-	public function commit_batch_insert() {
-		add_filter( 'query', [ $this, '_insert_ignore' ] );
-		$result = parent::commit_batch_insert();
-		remove_filter( 'query', [ $this, '_insert_ignore' ] );
-		return $result;
-	}
-
-	/**
-	 * Replace the INSERT statement with an INSERT IGNORE
-	 *
-	 * @param $query
-	 *
-	 * @return array|string|string[]
-	 */
-	public function _insert_ignore( $query ) {
-		return str_replace( 'INSERT', 'INSERT IGNORE', $query );
 	}
 
 	/**

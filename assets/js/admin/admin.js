@@ -10,11 +10,11 @@
       return currentUser.allcaps[cap] || currentUser.caps[cap] || isSuperAdmin
     },
     getOwner: (id) => {
-      return Groundhogg.filters.owners.find( u => u.ID == id )
+      return Groundhogg.filters.owners.find(u => u.ID == id)
     },
     getOwnerDisplayName: (id) => {
-      return Groundhogg.filters.owners.find( u => u.ID == id ).data.display_name
-    }
+      return Groundhogg.filters.owners.find(u => u.ID == id).data.display_name
+    },
   }
 
   // Serialize better
@@ -59,7 +59,7 @@
         dataType: 'json',
         data: getParams,
         beforeSend: function (xhr) {
-          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+          xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
           return {
@@ -109,7 +109,7 @@
         dataType: 'json',
         data: getParams,
         beforeSend: function (xhr) {
-          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+          xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
           return {
@@ -532,7 +532,89 @@
     return utf8_to_b64(JSON.stringify(stuff)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')
   }
 
+  const assoc2array = (obj, a = 'id', b = 'text') => {
+    let array = []
+    Object.keys(obj).forEach(key => {
+      array.push({ [a]: key, [b]: obj[key] })
+    })
+
+    return array
+  }
+
+  const jsonCopy = stuff => JSON.parse(JSON.stringify(stuff))
+
+  function setNestedValue (obj, path, value) {
+    const keys = path.split('.')
+    let current = obj
+
+    // Iterate over the keys, except for the last one
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i]
+
+      // If the key doesn't exist, create an empty object
+      if (!current[key]) {
+        current[key] = {}
+      }
+
+      current = current[key]
+    }
+
+    // Set the value at the final key
+    current[keys[keys.length - 1]] = value
+  }
+
+  function getNestedValue (obj, path) {
+    const keys = path.split('.')
+    let current = obj
+
+    for (let i = 0; i < keys.length; i++) {
+
+      if (!current.hasOwnProperty(keys[i])) {
+        return undefined
+      }
+
+      current = current[keys[i]]
+    }
+
+    return current
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
+  gh.functions.assoc2array = assoc2array
+  gh.functions.jsonCopy = jsonCopy
+  gh.functions.setNestedValue = setNestedValue
+  gh.functions.getNestedValue = getNestedValue
+
+  var check, timeout
+
+  /**
+   * Only allow to check for nonce refresh every 30 seconds.
+   */
+  function schedule () {
+    check = false
+    window.clearTimeout(timeout)
+    timeout = window.setTimeout(function () { check = true }, 300000)
+  }
+
+  $(function () {
+    schedule()
+  }).on('heartbeat-send.groundhogg-refresh-nonces', function (e, data) {
+
+    if (check) {
+      data['groundhogg-refresh-nonces'] = true
+    }
+
+  }).on('heartbeat-tick.groundhogg-refresh-nonces', function (e, data) {
+    let newNonces = data.groundhogg_nonces
+
+    if (newNonces) {
+      Object.keys(newNonces).forEach(nonce => {
+        groundhogg_nonces[nonce] = newNonces[nonce]
+        Groundhogg.nonces[nonce] = newNonces[nonce]
+      })
+    }
+
+  })
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

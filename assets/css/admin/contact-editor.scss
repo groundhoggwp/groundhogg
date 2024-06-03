@@ -332,6 +332,15 @@ code.meta-replacement-code {
       word-break: break-word;
     }
 
+    .contact-input {
+      padding: 5px 10px;
+      background-color: $primary-dark-5;
+      font-size: 14px;
+      border-radius: 5px;
+      margin-top: 5px;
+      width: fit-content;
+    }
+
     .event-extra,
     .diff-time {
       color: $primary-dark-50;
@@ -384,11 +393,15 @@ code.meta-replacement-code {
         max-width: 100%;
       }
 
+      &.unsubscribed{
+        background-color: $error-red;
+      }
+
       &.page-visit{
         background: $primary-dark;
       }
 
-      &.benchmark:not(.pending) {
+      &.benchmark {
         border: 2px solid $benchmark-orange;
         background-color: white;
 

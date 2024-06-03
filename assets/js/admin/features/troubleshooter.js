@@ -1676,10 +1676,14 @@
           }
         })
 
-        $('#next').on('click', () => next())
+        $('#ticket-subject').on('input', e => ticket.subject = e.target.value)
+
         tinymceElement('ticket-message', {
           quicktags: false,
         }, content => ticket.message = content)
+
+        $('#next').on('click', () => next())
+
       }, next: () => 'ticket-2',
 
     },
@@ -1762,12 +1766,14 @@
 
         $('#host').autocomplete({
           source: [
-            'AWS',
+            'AWS (S2)',
             'A2 Hosting',
+            'Azure',
             'AccuWeb',
             'BlueHost',
             'Cloudways',
             'Closte',
+            'Convesio',
             'Digital Ocean',
             'DreamHost',
             'Flywheel',

@@ -35,7 +35,15 @@ function tool_tip_title () {
     Span,
   } = MakeEl
 
-  const { loadingModal } = Groundhogg.element
+  const { loadingModal, adminPageURL } = Groundhogg.element
+
+  const { base64_json_encode } = Groundhogg.functions
+
+  const openInContactsView = (filters) => {
+    window.open(adminPageURL('gh_contacts', {
+      filters: base64_json_encode(filters),
+    }), '_blank')
+  }
 
   $.extend(reporting, {
 
@@ -289,6 +297,7 @@ function tool_tip_title () {
 
       if (report_data.data.labels && report_data.data.labels.length === 0) {
         $report.closest('.gh-donut-chart-wrap').html(report_data.no_data)
+        return;
       }
 
       if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
@@ -306,6 +315,27 @@ function tool_tip_title () {
       }
 
       var ctx = $report[0].getContext('2d')
+
+      switch (report_id) {
+        case 'chart_unsub_reasons':
+          report_data.options.onClick = (e, arr) => {
+            let index = arr[0]._index
+            let { reason } = report_data.data.rawResults[index]
+
+            openInContactsView([
+              [
+                {
+                  type: 'unsubscribed',
+                  reasons: [reason],
+                  date_range: 'between',
+                  before: this.calendar.end_date.format('YYYY-MM-DD'),
+                  after: this.calendar.start_date.format('YYYY-MM-DD'),
+                },
+              ],
+            ])
+          }
+          break
+      }
 
       var chart = new Chart(ctx, report_data)
       this.charts[report_id] = chart

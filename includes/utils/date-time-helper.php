@@ -76,8 +76,21 @@ class DateTimeHelper extends \DateTime {
 		return $this->format( get_option( 'date_format' ) );
 	}
 
+	public function wpTimeFormat() {
+		return $this->format( get_option( 'time_format' ) );
+	}
+
 	public function human_time_diff(){
 		return human_time_diff( $this->getTimestamp(), time() );
+	}
+
+	/**
+	 * Whether the current date represents a leap year
+	 *
+	 * @return bool
+	 */
+	public function isLeapYear(){
+		return absint( $this->format('L') ) === 1;
 	}
 
 	public function i18n() {

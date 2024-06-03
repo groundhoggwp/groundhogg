@@ -101,12 +101,12 @@ class Faker {
 	 * @param Email $email
 	 * @param Event $event
 	 *
-	 * @return void
+	 * @return void|int
 	 */
 	public static function email_activity( Email $email, Event $event ) {
 
-		// 30% chance of open
-		if ( self::chance( 30 ) ) {
+		// 40% chance of open
+		if ( self::chance( 40 ) ) {
 
 			$date = new DateTimeHelper( $event->get_time() );
 			$date->modify( sprintf( '+%d minutes', rand( 2, 10 ) ) );
@@ -115,8 +115,8 @@ class Faker {
 				'timestamp' => $date->getTimestamp()
 			] );
 
-			// 15% chance of click
-			if ( self::chance( 15 ) ) {
+			// 20% chance of click
+			if ( self::chance( 20 ) ) {
 
 				$date->modify( '+1 minute' );
 
@@ -135,7 +135,14 @@ class Faker {
 							'timestamp' => $date->getTimestamp()
 						] );
 
-						track_page_visit( $url, $event->get_contact() );
+						// Clicked a funnel tracking link
+						if ( preg_match( '@/gh/click/(?<id>[0-9]+)-[^/]+@', $url, $matches ) ) {
+							return absint( $matches['id'] );
+						}
+
+						track_page_visit( $url, $event->get_contact(), [
+							'timestamp' => $date->getTimestamp()
+						] );
 					}
 				}
 			}
@@ -162,8 +169,9 @@ class Faker {
 					'optin_status'              => Preferences::UNSUBSCRIBED
 				] );
 
-				track_page_visit( $url, $event->get_contact() );
-
+				track_page_visit( $url, $event->get_contact(), [
+					'timestamp' => $date->getTimestamp()
+				] );
 			}
 		}
 	}
@@ -174,12 +182,12 @@ class Faker {
 	 * @throws \Exception
 	 *
 	 * @param array  $query  The contacts to create fake data for
-	 * @param int    $days
+	 * @param string $modifier modifier of the start tie based on the date the contact was created
 	 * @param Funnel $funnel The funnel to create the fake data for
 	 *
 	 * @return void
 	 */
-	public static function funnel_journeys( Funnel $funnel, array $query, int $days = 0 ) {
+	public static function funnel_journeys( Funnel $funnel, array $query, string $modifier = '' ) {
 
 		$query    = new Contact_Query( $query );
 		$contacts = $query->query( null, true );
@@ -191,8 +199,8 @@ class Faker {
 		foreach ( $contacts as $contact ) {
 			$start = $contact->get_date_created( true );
 
-			if ( $days ) {
-				$start->modify( sprintf( '+%d days', $days ) );
+			if ( $modifier ) {
+				$start->modify( $modifier );
 			}
 
 			if ( $start->isFuture() ){
@@ -246,14 +254,6 @@ class Faker {
 
 		$step = $entry[ array_rand( $entry ) ];
 
-		// We want notes to be for the   current date
-		add_filter( 'groundhogg/db/pre_insert/note', function ( $data ) use ( $date ) {
-			$data['timestamp']    = $date->getTimestamp();
-			$data['date_created'] = Ymd_His( $date->getTimestamp() );
-
-			return $data;
-		} );
-
 		do {
 
 			$event_args = [
@@ -270,6 +270,8 @@ class Faker {
 			$event = new Event();
 			$event->create( $event_args );
 
+			$next = $step->get_next_action();
+
 			switch ( $step->get_type() ) {
 				case 'send_email':
 
@@ -279,7 +281,11 @@ class Faker {
 						'email_id' => $email->get_id()
 					] );
 
-					self::email_activity( $email, $event );
+					$link_click_benchmark_id = self::email_activity( $email, $event );
+
+					if ( $link_click_benchmark_id ){
+						$next = new Step( $link_click_benchmark_id );
+					}
 
 					break;
 				case 'delay_timer':
@@ -330,12 +336,20 @@ class Faker {
 					] );
 					break;
 				case 'apply_tag':
-				case 'tag_applied':
 					$contact->apply_tag( wp_parse_id_list( $step->get_meta( 'tags' ) ) );
 					break;
+				case 'tag_applied':
+					if ( $step->is_inner() ) {
+						$contact->apply_tag( wp_parse_id_list( $step->get_meta( 'tags' ) ) );
+					}
+					break;
 				case 'remove_tag':
-				case 'tag_removed':
 					$contact->remove_tag( wp_parse_id_list( $step->get_meta( 'tags' ) ) );
+					break;
+				case 'tag_removed':
+					if ( $step->is_inner() ) {
+						$contact->remove_tag( wp_parse_id_list( $step->get_meta( 'tags' ) ) );
+					}
 					break;
 				case 'apply_note':
 				case 'create_task':
@@ -345,16 +359,18 @@ class Faker {
 				case 'edit_meta':
 					$step->run( $contact, $event );
 					break;
+				case 'link_click':
+					track_page_visit( $step->get_meta( 'redirect_to' ), $contact, [
+						'timestamp' => $date->getTimestamp()
+					] );
+					break;
 			}
 
-			$next = $step->get_next_action();
-
 			// Then it's the end of the funnel or there is a benchmark
-			if ( ! $next ) {
-
+			if ( ! $next || ! $next->exists() ) {
 				$benchmarks = $step->get_proceeding_benchmarks();
-
-				if ( ! empty( $benchmarks ) ) {
+				// ~50% of contacts will continue through benchmarks
+				if ( ! empty( $benchmarks ) && self::chance( 50 ) ) {
 					$next = $benchmarks[ array_rand( $benchmarks ) ];
 				}
 			}
@@ -362,8 +378,6 @@ class Faker {
 			$step = $next;
 
 		} while ( $step );
-
-		remove_all_filters( 'groundhogg/db/pre_insert/note' );
 	}
 
 }

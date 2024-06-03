@@ -6,6 +6,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
@@ -91,7 +92,13 @@ abstract class Bulk_Job {
 	 * @return string
 	 */
 	public function get_start_url( $additional = [] ) {
-		return add_query_arg( array_merge( [ 'action' => $this->get_action() ], $this->get_start_query_args(), $additional ), admin_url( 'admin.php?page=gh_bulk_jobs' ) );
+
+		return action_url( $this->get_action(), array_merge( [
+			'page' => 'gh_bulk_jobs',
+			'tab'  => false
+		], $this->get_start_query_args(), $additional ) );
+
+//		return add_query_arg( array_merge( [ 'action' => $this->get_action() ], $this->get_start_query_args(), $additional ), admin_url( 'admin.php?page=gh_bulk_jobs' ) );
 	}
 
 	/**

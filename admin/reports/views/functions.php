@@ -2,8 +2,6 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
-use function Groundhogg\array_to_css;
-
 function get_img_url( $img ) {
 	echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/reports/' . $img );
 }
@@ -68,13 +66,23 @@ function quick_stat_report( $args = [] ) {
 		'title' => 'Report',
         'class' => 'span-3',
 		'style' => [],
+		'info'  => '',
 	] );
 
 	?>
 
 	<div class="groundhogg-quick-stat gh-panel <?php esc_attr_e( $args[ 'class' ] ); ?>" id="<?php esc_attr_e( $args['id'] ); ?>">
         <div class="gh-panel-header">
-            <h2 class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></h2>
+            <h2 class="title">
+		        <?php esc_html_e( $args['title'] ) ?>
+		        <?php if ( $args['info'] ): ?>
+                    <span class="gh-has-tooltip dashicons dashicons-info">
+                        <span class="gh-tooltip top">
+                            <?php _e( $args['info'] ); ?>
+                        </span>
+                    </span>
+		        <?php endif; ?>
+            </h2>
         </div>
         <div class="inside">
             <div class="groundhogg-quick-stat-number">...</div>

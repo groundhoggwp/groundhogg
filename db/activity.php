@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Traits\IP_Address;
 use function Groundhogg\generate_referer_hash;
 use function Groundhogg\isset_not_empty;
 
@@ -23,6 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Activity extends DB {
+
+	use IP_Address;
 
 	/**
 	 * Get the DB suffix
@@ -71,6 +74,15 @@ class Activity extends DB {
 	}
 
 	/**
+	 * @param $object
+	 *
+	 * @return \Groundhogg\Classes\Activity
+	 */
+	public function create_object( $object ) {
+		return new \Groundhogg\Classes\Activity( $object );
+	}
+
+	/**
 	 * Get columns and formats
 	 *
 	 * @access  public
@@ -89,6 +101,8 @@ class Activity extends DB {
 			'referer'       => '%s',
 			'referer_hash'  => '%s',
 			'value'         => '%f',
+			'ip_address'    => '%s',
+			'user_agent'    => '%d',
 		];
 	}
 
@@ -111,6 +125,8 @@ class Activity extends DB {
 			'referer'       => '',
 			'referer_hash'  => '',
 			'value'         => 0,
+			'ip_address'    => '',
+			'user_agent'    => 0,
 		);
 	}
 
@@ -145,6 +161,16 @@ class Activity extends DB {
 
 		if ( isset_not_empty( $data, 'referer' ) ) {
 			$data['referer_hash'] = generate_referer_hash( $data['referer'] );
+		}
+
+		$this->packIP( $data );
+
+		if ( is_array( $row_id ) && ! empty( $row_id ) ){
+			$this->packIP( $row_id );
+		}
+
+		if ( ! empty( $where ) ){
+			$this->packIP( $where );
 		}
 
 		return parent::update( $row_id, $data, $where );
@@ -196,20 +222,35 @@ class Activity extends DB {
 	}
 
 	/**
+	 * Convert the IP address column and recreate indexes
+	 *
+	 * @return void
+	 */
+	public function update_3_4_2(){
+		$this->drop_indexes( [
+			'timestamp',
+			'funnel_id',
+			'step_id',
+			'event_id',
+			'referer_hash',
+			'activity_type',
+		] ); // remove old indexes
+
+		$this->convert_ip_address_to_varbinary(); // convert the table
+		$this->create_table(); // recreates indexes
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
+	public function create_table_sql_command() {
 
-		global $wpdb;
+		$charset_collate = $this->get_charset_collate();
 
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         timestamp bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
@@ -221,17 +262,15 @@ class Activity extends DB {
         referer text NOT NULL,
         referer_hash varchar(20) NOT NULL,
         value decimal(10,2) unsigned NOT NULL DEFAULT 0,
+        ip_address varbinary(16) NOT NULL,
+        user_agent bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
-        KEY timestamp (timestamp),
-        KEY funnel_id (funnel_id),
-        KEY step_id (step_id),
-        KEY event_id (event_id),
-        KEY referer_hash (referer_hash),
-        KEY activity_type (activity_type)
+        KEY event_idx (event_id),
+        KEY contact_idx (contact_id),
+        KEY time_idx (timestamp),
+        KEY funnel_step_email_idx (funnel_id,step_id,email_id)
 		) $charset_collate;";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }
+
+

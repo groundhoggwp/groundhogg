@@ -4,7 +4,6 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
@@ -13,6 +12,7 @@ use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\Cli\doing_cli;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
@@ -476,7 +476,11 @@ abstract class DB {
 			return $cache_value;
 		}
 
-		$results = apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
+		$column_format = get_array_var( $this->get_columns(), $column_where, '%s' );
+
+		$results = apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(),
+			$wpdb->get_var(
+				$wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = $column_format LIMIT 1;", $column_value ) ) );
 
 		$this->cache_set( $cache_key, $results );
 
@@ -571,6 +575,11 @@ abstract class DB {
 	 * @return false|int
 	 */
 	public function commit_batch_insert() {
+
+		// Nothing to batch insert
+		if ( empty( $this->batch_inserts ) ) {
+			return false;
+		}
 
 		global $wpdb;
 
@@ -799,19 +808,19 @@ abstract class DB {
 	 * @since   2.1
 	 * @return  bool
 	 */
-	public function update( $row_id = 0, $data = [], $where = [] ) {
+	public function update( $row_id_or_where = 0, $data = [], $where = [] ) {
 
 		// Nothing to update
-		if ( empty( $data ) ){
+		if ( empty( $data ) ) {
 			return true;
 		}
 
 		global $wpdb;
 
-		if ( is_string( $row_id ) || is_numeric( $row_id ) ) {
-			$where = [ $this->get_primary_key() => $row_id ];
-		} else if ( is_array( $row_id ) ) {
-			$where = $row_id;
+		if ( is_string( $row_id_or_where ) || is_numeric( $row_id_or_where ) ) {
+			$where = [ $this->get_primary_key() => $row_id_or_where ];
+		} else if ( is_array( $row_id_or_where ) ) {
+			$where = $row_id_or_where;
 		}
 
 		// Don't know who to update
@@ -1097,12 +1106,12 @@ abstract class DB {
 				case 'include_filters':
 
 					// Parse the filters
-					$where[] = $this->parse_filters( $val );
+//					$where[] = $this->parse_filters( $val );
 
 					break;
 				case 'exclude_filters':
 					// Parse the filters
-					$where[] = 'NOT ( ' . $this->parse_filters( $val ) . ')';
+//					$where[] = 'NOT ( ' . $this->parse_filters( $val ) . ')';
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
@@ -1150,6 +1159,21 @@ abstract class DB {
 	 * @var Filters
 	 */
 	protected $query_filters;
+
+	/**
+	 * Wrapper for Filters::parse_filters()
+	 *
+	 * @throws FilterException
+	 *
+	 * @param Where $where
+	 * @param array $filters
+	 *
+	 * @return void
+	 */
+	public function parse_filters( array $filters, Where $where ) {
+		$this->maybe_register_filters();
+		$this->query_filters->parse_filters( $filters, $where );
+	}
 
 	protected function maybe_register_filters() {
 
@@ -1263,7 +1287,7 @@ abstract class DB {
 
 		$operation = $query_vars['operation'];
 
-		$query = new Table_Query( $this );
+		$query               = new Table_Query( $this );
 		$this->current_query = $query;
 
 		$moreWhere = [];
@@ -1350,7 +1374,11 @@ abstract class DB {
 					break;
 				case 'orderby':
 				case 'order_by':
-					$query->setOrderby( $val );
+					if ( is_array( $val ) ) {
+						$query->setOrderby( ...$val );
+					} else {
+						$query->setOrderby( $val );
+					}
 					break;
 				case 'order':
 				case 'ORDER':
@@ -1366,17 +1394,14 @@ abstract class DB {
 				case 'filters':
 				case 'include_filters':
 
-					$this->maybe_register_filters();
-					$this->query_filters->parse_filters( $val, $query->where() );
+					$this->parse_filters( $val, $query->where() );
 
 					break;
 				case 'exclude_filters':
 
-					$this->maybe_register_filters();
-
 					$exclude_query = new Table_Query( $this );
 					$exclude_query->setSelect( $this->get_primary_key() );
-					$this->query_filters->parse_filters( $val, $exclude_query->where() );
+					$this->parse_filters( $val, $exclude_query->where() );
 
 					if ( ! $exclude_query->where->isEmpty() ) {
 						$query->where()->notIn( $this->get_primary_key(), "$exclude_query" );
@@ -1505,7 +1530,7 @@ abstract class DB {
 
 	public function found_rows() {
 
-		if ( $this->current_query ){
+		if ( $this->current_query ) {
 			return $this->current_query->get_found_rows();
 		}
 
@@ -2033,7 +2058,7 @@ abstract class DB {
 	 */
 	public function drop() {
 
-		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) && ! doing_cli() ) {
 			exit;
 		}
 
@@ -2075,11 +2100,49 @@ abstract class DB {
 	}
 
 	/**
+	 * Drop an index
+	 *
+	 * @param array $indexes
+	 *
+	 * @return void
+	 */
+	public function drop_indexes( array $indexes ) {
+		foreach ( $indexes as $index ){
+			$this->drop_index( $index );
+		}
+	}
+
+	/**
+	 * Drop an index
+	 *
+	 * @param array $indexes
+	 *
+	 * @return void
+	 */
+	public function drop_index( string $index ) {
+
+		global $wpdb;
+		$wpdb->query( "DROP INDEX $index ON {$this->table_name};" );
+	}
+
+	/**
+	 * Create a new index
+	 *
+	 * @param string $name
+	 * @param array  $columns
+	 *
+	 * @return void
+	 */
+	public function create_index( string $name, array $columns ){
+		global $wpdb;
+		$wpdb->query( sprintf( "CREATE INDEX $name ON {$this->table_name} (%s);", implode(',', $columns ) ) );
+	}
+
+	/**
 	 * Empty the table
 	 */
 	public function truncate() {
 		global $wpdb;
-
 		$wpdb->query( "DELETE FROM " . $this->table_name );
 	}
 
@@ -2099,7 +2162,7 @@ abstract class DB {
 	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 */
 	public function installed() {
-		return $this->table_exists( $this->table_name );
+		return self::table_exists( $this->table_name );
 	}
 
 	/**
@@ -2111,11 +2174,28 @@ abstract class DB {
 	 *
 	 * @return bool          If the table name exists
 	 */
-	public function table_exists( $table ) {
+	public static function table_exists( $table ) {
 		global $wpdb;
 		$table = sanitize_text_field( $table );
 
 		return $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE '%s'", $table ) ) === $table;
+	}
+
+	/**
+	 * The column exists
+	 *
+	 * @param $column_name
+	 *
+	 * @return bool
+	 */
+	public function column_exists( $column_name ){
+		global $wpdb;
+
+		if ( in_array( $column_name, $wpdb->get_col( "DESC $this->table_name", 0 ), true ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -2145,5 +2225,4 @@ abstract class DB {
 	public function delete_orphaned_meta() {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
 	}
-
 }

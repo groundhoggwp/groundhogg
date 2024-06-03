@@ -77,6 +77,29 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 add_filter( 'groundhogg/api/v4/options_sanitize_callback', __NAMESPACE__ . '\filter_option_sanitize_callback', 10, 3 );
 
 /**
+ * Sanitize step meta
+ *
+ * @param $meta_value
+ * @param $meta_key
+ * @param $object_id
+ * @param $prev_value
+ *
+ * @return mixed|string
+ */
+function sanitize_step_meta( $meta_value, $meta_key, $object_id, $prev_value ){
+
+	switch ( $meta_key ){
+		case 'note_text':
+			$meta_value = wp_kses_post( $meta_value );
+			break;
+	}
+
+	return $meta_value;
+}
+
+add_filter( 'groundhogg/meta/step/update/filter_value', __NAMESPACE__ . '\sanitize_step_meta', 10, 4 );
+
+/**
  * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
  *
  * @param $message

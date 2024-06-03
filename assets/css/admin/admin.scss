@@ -586,11 +586,12 @@ label.block {
   overflow: hidden;
 }
 
-.gh-switch {
+label.gh-switch {
   position: relative;
   display: inline-block;
   width: 50px;
   height: 20px;
+  padding: 0 !important;
 
   input {
     opacity: 0;
@@ -985,4 +986,150 @@ label.block {
 
 .folded .gh-fixed-ui {
   left: 36px !important;
+}
+
+#api-docs {
+
+  background-color: $background-color;
+
+  .gh-header {
+    padding: 0 10px 0 0;
+    border-radius: 0;
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0;
+    z-index: 100;
+
+    > svg {
+      height: 60px;
+      padding: 10px;
+      box-sizing: border-box;
+      //border-right: 1px solid #ccd0d4;
+      flex-shrink: 0;
+      background-color: $primary-dark;
+    }
+  }
+
+  code {
+    border-radius: 4px;
+
+    &.get {
+      background-color: $action-green;
+      color: #fff;
+
+    }
+
+    &.post,&.patch{
+      background-color: $primary-blue;
+      color: #fff;
+
+    }
+
+    &.delete{
+      background-color: $error-red;
+      color: #fff;
+
+    }
+  }
+
+  nav {
+
+    width: 220px;
+    flex-shrink: 0;
+
+    a {
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 16px 8px 12px;
+      color: $primary-dark;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    ul, li {
+      margin: 0;
+    }
+
+    > ul > li > a {
+      font-weight: 600;
+    }
+
+    li.current > a {
+      background-color: $primary-dark-15;
+    }
+
+    li.current li.current > a {
+      background-color: $primary-dark-50;
+      color: #FFF;
+    }
+
+    li.current > ul a {
+      padding-left: 24px;
+      //display: none;
+    }
+
+    li:not(.current) > ul {
+      display: none;
+    }
+  }
+
+  #docs-ui{
+    height: calc( 100% - 60px );
+  }
+
+  #endpoint-display {
+    padding: 20px;
+    background-color: #fff;
+    overflow: auto;
+
+    p, li, a {
+      font-size: 14px;
+    }
+
+    .parameter {
+      padding: 10px 0;
+      border-top: 1px solid $primary-dark-15;
+    }
+
+    code.param {
+      background-color: transparent;
+      padding: 0;
+    }
+
+    .gh-panel.outlined {
+      .parameter:first-of-type{
+        border-top: none;
+      }
+
+      .parameter{
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+  }
+
+  pre {
+    color: #fff;
+    background-color: $primary-dark;
+    padding: 10px;
+    margin: 0;
+    overflow: auto;
+  }
+
+  #request-display {
+    width: 400px;
+    flex-shrink: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: auto;
+
+    h2 {
+      margin: 0;
+    }
+  }
 }

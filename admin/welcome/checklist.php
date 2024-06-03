@@ -12,7 +12,10 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
 use function Groundhogg\gh_cron_installed;
+use function Groundhogg\has_premium_features;
 use function Groundhogg\html;
+use function Groundhogg\is_event_queue_processing;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\modal_link_url;
 
 // MailHawk is installed but not connected -> redirect to the mailhawk connect page
@@ -30,6 +33,13 @@ else:
 endif;
 
 $checklist_items = [
+	[
+		'title'       => __( 'Complete the Guided Setup', 'groundhogg' ),
+		'description' => __( "Configure your initial settings and discover potential opportunities.", 'groundhogg' ),
+		'completed'   => is_option_enabled( 'gh_guided_setup_finished' ),
+		'fix'         => admin_page_url( 'gh_guided_setup' ),
+		'cap'         => 'manage_options'
+	],
 	[
 		'title'       => __( 'Integrate An SMTP Service', 'groundhogg' ),
 		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
@@ -68,8 +78,15 @@ $checklist_items = [
 	[
 		'title'       => __( 'Configure Cron Jobs', 'groundhogg' ),
 		'description' => __( 'This is an optional best practice and will improve the performance of your site.', 'groundhogg' ),
-		'completed'   => gh_cron_installed() && \Groundhogg\is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
+		'completed'   => gh_cron_installed() && is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
 		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
+		'cap'         => 'manage_options'
+	],
+	[
+		'title'       => __( 'Upgrade to Premium', 'groundhogg' ),
+		'description' => __( 'Get a premium plan and activate more powerful features that will help you grow and scale.', 'groundhogg' ),
+		'completed'   => has_premium_features(),
+		'fix'         => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=checklist&utm_campaign=welcome&utm_content=fix',
 		'cap'         => 'manage_options'
 	],
 ];
@@ -78,7 +95,7 @@ $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 	return $carry && $item['completed'];
 }, true );
 
-$hidden = \Groundhogg\is_option_enabled( 'gh_hide_groundhogg_quickstart' );
+$hidden = is_option_enabled( 'gh_hide_groundhogg_quickstart' );
 
 ?>
 	<div id="checklist" class="gh-panel onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : '' ); ?>">
@@ -121,8 +138,7 @@ $hidden = \Groundhogg\is_option_enabled( 'gh_hide_groundhogg_quickstart' );
                             <p class="description"><?php echo $item['description']; ?></p>
                         </div>
 				        <?php if ( ! $item['completed'] ): ?>
-                            <span
-                                    class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'], 'class' => 'gh-button primary' ], __( 'Fix', 'groundhogg' ) ); ?></span>
+                            <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'], 'class' => 'gh-button primary' ], __( 'Fix', 'groundhogg' ) ); ?></span>
 				        <?php endif; ?>
                     </div>
 		        <?php endforeach;

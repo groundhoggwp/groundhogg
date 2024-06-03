@@ -383,7 +383,7 @@ class GH_EDD_SL_Plugin_Updater {
 	 *
 	 * @return false|object
 	 * @uses get_bloginfo()
-	 * @uses wp_remote_post()
+	 * @uses wp_remote_get()
 	 * @uses is_wp_error()
 	 *
 	 */
@@ -439,7 +439,7 @@ class GH_EDD_SL_Plugin_Updater {
 		);
 
 		$verify_ssl = $this->verify_ssl();
-		$request    = wp_remote_post( $this->api_url, array(
+		$request    = wp_remote_get( $this->api_url, array(
 			'timeout'   => 15,
 			'sslverify' => $verify_ssl,
 			'body'      => $api_params
@@ -510,7 +510,7 @@ class GH_EDD_SL_Plugin_Updater {
 			);
 
 			$verify_ssl = $this->verify_ssl();
-			$request    = wp_remote_post( $this->api_url, array(
+			$request    = wp_remote_get( $this->api_url, array(
 				'timeout'   => 15,
 				'sslverify' => $verify_ssl,
 				'body'      => $api_params

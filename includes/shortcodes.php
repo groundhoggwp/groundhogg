@@ -26,8 +26,9 @@ class Shortcodes {
 	}
 
 	public function register_shortcodes() {
-		add_filter( 'no_texturize_shortcodes', [ $this, 'no_texturize_form' ] );
+		add_filter( 'no_texturize_shortcodes', [ $this, 'no_texturize_shortcodes' ] );
 
+		add_shortcode( 'gh_email', [ $this, 'email_shortcode' ] );
 		add_shortcode( 'gh_form', [ $this, 'custom_form_shortcode' ] );
 		add_shortcode( 'gh_replacements', [ $this, 'merge_replacements_shortcode' ] );
 		add_shortcode( 'ghr', [ $this, 'merge_replacements_shortcode' ] );
@@ -69,13 +70,79 @@ class Shortcodes {
 	}
 
 	/**
-	 * Prevent the shortcode api from texturizing the contents of [gh_form_alt]
+	 * Alternate form shortcode
+	 *
+	 * @param $atts
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function email_shortcode( $atts ) {
+
+		$atts = shortcode_atts( [
+			'id'    => 0,
+			'iframe' => true,
+		], $atts );
+
+		$email = new Email( $atts['id'] );
+
+		if ( ! $email->exists() ){
+
+			if ( current_user_can( 'edit_emails' ) ){
+				return __( 'The requested email does not exist.', 'groundhogg' );
+			}
+
+			return '';
+		}
+
+		$email->set_contact( get_contactdata() );
+
+		if ( ! defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) ){
+			define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
+		}
+
+		// output the raw message
+		if ( ! filter_var( $atts['iframe'], FILTER_VALIDATE_BOOLEAN ) ){
+			return html()->e( 'div', [
+				'class' => 'gh-email-preview-wrapper no-iframe'
+			], $email->get_merged_content() );
+		}
+
+		ob_start();
+
+		?>
+		<div class="gh-email-preview-wrapper has-iframe">
+			<iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php esc_attr_e( $atts['id']); ?>"></iframe>
+			<script>
+
+              let iframe = document.getElementById('gh-email-preview-<?php esc_attr_e( $atts['id']); ?>')
+
+              let email = <?php echo wp_json_encode( $email ); ?>;
+
+              let blob = new Blob([email.context.built], { type: 'text/html; charset=utf-8' })
+
+              iframe.onload = () => {
+                iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 10 + 'px'
+              }
+
+              iframe.src = URL.createObjectURL(blob)
+			</script>
+		</div>
+		<?php
+
+
+		return ob_get_clean();
+	}
+
+
+	/**
+	 * Prevent the shortcode api from texturizing the contents of [gh_form]
 	 *
 	 * @param $list
 	 *
 	 * @return array
 	 */
-	public function no_texturize_form( $list ) {
+	public function no_texturize_shortcodes( $list ) {
 		$list[] = 'gh_form';
 
 		return $list;

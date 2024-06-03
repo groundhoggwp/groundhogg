@@ -274,6 +274,14 @@ code.meta-replacement-code {
   margin-bottom: 4px;
   word-break: break-word;
 }
+#activity-timeline li.activity-item .contact-input {
+  padding: 5px 10px;
+  background-color: rgba(16, 38, 64, 0.05);
+  font-size: 14px;
+  border-radius: 5px;
+  margin-top: 5px;
+  width: fit-content;
+}
 #activity-timeline li.activity-item .event-extra,
 #activity-timeline li.activity-item .diff-time {
   color: rgba(16, 38, 64, 0.5);
@@ -317,14 +325,17 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) img {
   max-width: 100%;
 }
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).unsubscribed {
+  background-color: #e91f4f;
+}
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending) {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
   border: 2px solid #f58115;
   background-color: white;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark:not(.pending).pending {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark.pending {
   border: none;
   background-color: #f58115;
 }

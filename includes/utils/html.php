@@ -389,7 +389,7 @@ class HTML {
 	/**
 	 * Generate an html element.
 	 *
-	 * @param string $e
+	 * @param string $tag
 	 * @param array  $atts
 	 * @param string $content
 	 * @param bool   $self_closing
@@ -397,16 +397,16 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function e( $e = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
+	public function e( $tag = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
 
-		if ( in_array( $e, ['img','input','br','hr', 'embed'] ) ){
+		if ( in_array( $tag, ['img','input','br','hr', 'embed'] ) ){
 			$self_closing = true;
 		}
 
 		if ( !$self_closing ) {
-			$html = $this->wrap( $content, $e, $atts );
+			$html = $this->wrap( $content, $tag, $atts );
 		} else {
-			$html = sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );
+			$html = sprintf( '<%1$s %2$s/>', esc_html( $tag ), array_to_atts( $atts ) );
 		}
 
 		if ( $echo === true ) {
@@ -1510,7 +1510,7 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function toggle( $args = [] ) {
+	public function bigToggle( $args = [] ) {
 		$a = shortcode_atts( array(
 			'name'       => '',
 			'id'         => '',
@@ -1546,6 +1546,38 @@ class HTML {
 		);
 
 		return apply_filters( 'groundhogg/html/toggle', $html, $a );
+	}
+
+	/**
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function toggle( $args = [] ) {
+
+		$args = wp_parse_args( $args, [
+			'onLabel'  => __( 'On' ),
+			'offLabel' => __( 'Off' ),
+			'checked'  => false,
+			'name'     => '',
+			'value'    => 1,
+			'id'
+		] );
+
+		return html()->e( 'label', [
+			'class' => 'gh-switch'
+		], [
+			html()->input( [
+				'type'    => 'checkbox',
+				'id'      => $args['id'],
+				'name'    => $args['name'],
+				'value'   => $args['value'],
+				'checked' => $args['checked'],
+			] ),
+            html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
+            html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
+            html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
+		] );
 	}
 
 	/**

@@ -13,55 +13,101 @@ use function WP_CLI\Utils\make_progress_bar;
  *
  * ## EXAMPLES
  *
+ *     # Reset contact dates
+ *     $ wp groundhogg-faker reset-dates 180
+ *     Success: All contact creation dates have been reset
+ *
  *     # Fake a broadcast
- *     $ wp groundhogg/faker broadcast 1234 '30 days ago' --tags_include=1
+ *     $ wp groundhogg-faker broadcast 1234 '30 days ago' --tags_include=1
  *     Success: Created fake broadcast.
  *
  *     # Fake funnel activity
- *     $ wp groundhogg/faker funnel 4321 '30 days ago' --include=1
+ *     $ wp groundhogg-faker funnel 4321 '30 days ago' --include=1
  *     Success: Created fake activity and events for funnel.
  */
 class Faker {
 
 	/**
-	 * Reset the date_created of contacts to be within the last few months.
-	 * Prefer 6:00 am to 9:00 pm
+	 * Reset the date_created of contacts to be within the given range.
 	 *
-	 * @when after_wp_load
+	 * ## OPTIONS
+	 *
+	 * <days>
+	 * : How far back to reset the dates
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp groundhogg-faker reset-dates 90
+	 *
+	 * @subcommand reset-dates
 	 */
-	function reset_dates() {
+	function reset_dates( $args ) {
 
-		$base_date = new DateTimeHelper( 'yesterday 9:00 pm' );
+		$days = absint( $args[0] );
+
+		$base_date  = new DateTimeHelper( 'yesterday 9:00:00' );
+		$start_date = new DateTimeHelper( $days . ' days ago' );
+
 		$query     = new Contact_Query( [
 			'orderby'    => 'ID',
-			'order'      => 'DESC',
+			'order' => 'ASC',
 			'found_rows' => true,
 		] );
+
 		$contacts  = $query->query( null, true );
 		$progress  = make_progress_bar( 'Resetting contact dates...', $query->found_items );
 
-		$max_time_in_minutes = 92 * 12 * 60; // 92 days, 15 hours (6:00-21:00), 60 minutes
-		$distribution = floor( $max_time_in_minutes / $query->found_items ) * 2;
+		$avg_records_per_day = ceil( $query->found_items / $days );
+		$records_per_day     = $avg_records_per_day * 2;
+		$daily_modifier      = $records_per_day / $days;
 
-		foreach ( $contacts as $contact ) {
+		while ( $base_date > $start_date && ! empty( $contacts ) ) {
 
-			$base_date->modify( sprintf( '-%d minutes', rand( 1, $distribution ) ) );
+			$num_records = rand( $avg_records_per_day, ceil( $records_per_day ) );
 
-			$contact->update( [
-				'date_created'              => $base_date->ymdhis(),
-				'date_optin_status_changed' => $base_date->ymdhis(),
-			] );
+			$eod = ( clone $base_date )->modify( '9:00 pm' );
+			$sod = ( clone $eod )->modify( '6:00 am' );
 
-			// Prefer 6:00 am to 9:00 pm
-			if ( absint( $base_date->format( 'H' ) ) < 6 ) {
-				$base_date->modify( 'yesterday 9:00 pm' );
+			$times = [];
+
+			for ( $i = 0; $i < $num_records; $i ++ ) {
+				$times[] = mt_rand( $sod->getTimestamp(), $eod->getTimestamp() );
 			}
 
-			$progress->tick();
+			rsort( $times );
+
+			foreach ( $times as $timestamp ) {
+
+				$contact = array_pop( $contacts );
+
+				if ( ! $contact ) {
+					break 2;
+				}
+
+				$date = new DateTimeHelper( $timestamp );
+
+				$contact->update( [
+					'date_created'              => $date->ymdhis(),
+					'date_optin_status_changed' => $date->ymdhis(),
+				] );
+
+				$progress->tick();
+			}
+
+			if ( $records_per_day > 5 ) {
+				$records_per_day -= $daily_modifier;
+			}
+
+			$base_date->modify( '-1 day' );
+
+			if ( ! empty( $contacts ) && $base_date < $start_date ) {
+				$start_date->modify( '-1 day' );
+			}
 		}
 
 		$progress->finish();
 
+		\WP_CLI::success( 'All contact creation dates have been reset' );
 	}
 
 	/**
@@ -72,12 +118,15 @@ class Faker {
 	 * <funnel>
 	 * : ID of the funnel
 	 *
-	 * [--query=<param>]
+	 * [<modifier>]
+	 * : Modify when the funnel journey should start based on the contact's date_created. Must be strtotime friendly.
+	 *
+	 * [--<field>=<value>]
 	 * : Query parameters to select contacts
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp groundhogg/faker funnel 1234 '30 days ago' --search=FooBar
+	 *     wp groundhogg-faker funnel 1234 14 --search=FooBar
 	 *
 	 * @when after_wp_load
 	 */
@@ -85,6 +134,7 @@ class Faker {
 
 		$query     = $assoc_args;
 		$funnel_id = $args[0];
+		$modifier = $args[1] ?? '';
 
 		$funnel = new Funnel( $funnel_id );
 
@@ -92,7 +142,7 @@ class Faker {
 			\WP_CLI::error( 'The given funnel does not exist.' );
 		}
 
-		\Groundhogg\Faker::funnel_journeys( $funnel, $query );
+		\Groundhogg\Faker::funnel_journeys( $funnel, $query, $modifier );
 
 		\WP_CLI::success( sprintf( 'Generated activity and events for %s', $funnel->get_title() ) );
 	}
@@ -108,20 +158,20 @@ class Faker {
 	 * [<date>]
 	 * : the base time the broadcast was sent. Unix timestamp or an English textual datetime description compatible with `strtotime()`
 	 *
-	 * [--query=<param>]
+	 * [--<field>=<value>]
 	 * : Query parameters to select contacts
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp groundhogg/faker broadcast 1234 '30 days ago' --search=FooBar
+	 *     wp groundhogg-faker broadcast 1234 '30 days ago' --search=FooBar
 	 *
 	 * @when after_wp_load
 	 */
 	function broadcast( $args, $assoc_args ) {
 
 		$query    = $assoc_args;
-		$email_id = $args[0];
-		$date     = absint( $args[1] );
+		$email_id = absint( $args[0] );
+		$date     = $args[1];
 
 		$date  = new DateTimeHelper( $date );
 		$email = new Email( $email_id );

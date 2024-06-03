@@ -8,9 +8,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_cookie;
 use function Groundhogg\get_request_var;
-use function Groundhogg\set_cookie;
 
 abstract class Base_Report {
 
@@ -177,29 +175,11 @@ abstract class Base_Report {
 		] );
 	}
 
-	protected $funnel_cookie_set = false;
-
-	/**
-	 * Get the funnel IDs if available
-	 *
-	 * @return mixed
-	 */
-	protected function get_funnel_id() {
-		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
-
-		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id && ! $this->funnel_cookie_set ) {
-			set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
-			$this->funnel_cookie_set = true;
-		}
-
-		return $funnel_id;
-	}
-
-	protected function get_campaign_id(){
+	protected function get_campaign_id() {
 		return absint( $this->get_other_report_params( 'campaign' ) );
 	}
 
-	protected function get_other_report_params( $key, $default = false ){
+	protected function get_other_report_params( $key, $default = false ) {
 		return get_array_var( get_request_var( 'data', [] ), $key );
 	}
 
@@ -210,33 +190,86 @@ abstract class Base_Report {
 		return new Funnel( $this->get_funnel_id() );
 	}
 
+	protected static $funnel_id;
+	protected static $step_id;
+	protected static $email_id;
+	protected static $broadcast_id;
+
+	/**
+	 * Get the funnel IDs if available
+	 *
+	 * @return mixed
+	 */
+	protected function get_funnel_id() {
+
+		if ( self::$funnel_id ) {
+			return self::$funnel_id;
+		}
+
+		if ( $this->get_step_id() ) {
+			$step = new Step( $this->get_step_id() );
+			if ( $step->exists() ) {
+				self::$funnel_id = $step->get_funnel_id();
+
+				return self::$funnel_id;
+			}
+		}
+
+		self::$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
+
+		return self::$funnel_id;
+	}
+
 	/**
 	 * @return mixed
 	 */
 	protected function get_email_id() {
 
+		if ( self::$email_id ) {
+			return self::$email_id;
+		}
+
 		if ( $this->get_step_id() ) {
 			$step = new Step( $this->get_step_id() );
 			if ( $step->exists() && $step->type_is( 'send_email' ) ) {
-				return $step->get_meta( 'email_id' );
+
+				self::$email_id = absint( $step->get_meta( 'email_id' ) );
+
+				return self::$email_id;
 			}
 		}
 
-		return absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
+		self::$email_id = absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
+
+		return self::$email_id;
 	}
 
 	/**
 	 * @return mixed
 	 */
 	protected function get_step_id() {
-		return absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
+
+		if ( self::$step_id ) {
+			return self::$step_id;
+		}
+
+		self::$step_id = absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
+
+		return self::$step_id;
 	}
 
 	/**
 	 * @return mixed
 	 */
 	protected function get_broadcast_id() {
-		return absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
+
+		if (self::$broadcast_id ) {
+			return self::$broadcast_id;
+		}
+
+		self::$broadcast_id = absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
+
+		return self::$broadcast_id;
 	}
 
 }

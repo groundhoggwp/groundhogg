@@ -111,6 +111,44 @@ class Main_Updater extends Old_Updater {
 					wp_clear_scheduled_hook( 'groundhogg/purge_email_logs' );
 					wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 				}
+			],
+			'3.4'    => [
+				'automatic'   => true,
+				'description' => __( 'Update permalinks, submissions table, and the campaigns table.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'campaigns' )->create_table();
+					get_db( 'submissions' )->create_table();
+					install_custom_rewrites();
+				}
+			],
+			'3.4.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Create new user agents table and add user agent columns to page visits and activity.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'user_agents' )->create_table();
+					get_db( 'activity' )->create_table();
+					get_db( 'page_visits' )->create_table();
+				}
+			],
+			'3.4.2'    => [
+				'automatic'   => true,
+				'description' => __( 'Convert IP Address columns to binary and optimize table indexes.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->activity->update_3_4_2();
+					db()->events->update_3_4_2();
+					db()->event_queue->update_3_4_2();
+					db()->page_visits->update_3_4_2();
+					db()->form_impressions->update_3_4_2();
+				}
+			],
+			'3.4.2.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Fix IP Address column not renamed correctly.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->activity->maybe_fix_ip_column();
+					db()->page_visits->maybe_fix_ip_column();
+					db()->form_impressions->maybe_fix_ip_column();
+				}
 			]
 		];
 	}

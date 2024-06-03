@@ -545,19 +545,20 @@ label.block {
   overflow: hidden;
 }
 
-.gh-switch {
+label.gh-switch {
   position: relative;
   display: inline-block;
   width: 50px;
   height: 20px;
+  padding: 0 !important;
 }
-.gh-switch input {
+label.gh-switch input {
   opacity: 0;
   width: 0;
   height: 0;
   display: none;
 }
-.gh-switch .slider {
+label.gh-switch .slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -568,7 +569,7 @@ label.block {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-.gh-switch .slider:before {
+label.gh-switch .slider:before {
   position: absolute;
   content: "";
   height: 16px;
@@ -579,27 +580,27 @@ label.block {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-.gh-switch .slider.round {
+label.gh-switch .slider.round {
   border-radius: 34px;
 }
-.gh-switch .slider.round:before {
+label.gh-switch .slider.round:before {
   border-radius: 50%;
 }
-.gh-switch input:checked + .slider {
+label.gh-switch input:checked + .slider {
   background-color: #2196F3;
 }
-.gh-switch input:focus + .slider {
+label.gh-switch input:focus + .slider {
   box-shadow: 0 0 1px #2196F3;
 }
-.gh-switch input:disabled + .slider {
+label.gh-switch input:disabled + .slider {
   opacity: 0.5;
 }
-.gh-switch input:checked + .slider:before {
+label.gh-switch input:checked + .slider:before {
   -webkit-transform: translateX(30px);
   -ms-transform: translateX(30px);
   transform: translateX(30px);
 }
-.gh-switch span.on, .gh-switch span.off {
+label.gh-switch span.on, label.gh-switch span.off {
   font-weight: 500;
   color: white;
   position: absolute;
@@ -608,17 +609,17 @@ label.block {
   font-size: 10px;
   font-family: Verdana, sans-serif;
 }
-.gh-switch span.on {
+label.gh-switch span.on {
   display: none;
   left: 7px;
 }
-.gh-switch span.off {
+label.gh-switch span.off {
   right: 7px;
 }
-.gh-switch input:checked ~ span.on {
+label.gh-switch input:checked ~ span.on {
   display: block;
 }
-.gh-switch input:checked ~ span.off {
+label.gh-switch input:checked ~ span.off {
   display: none;
 }
 
@@ -875,6 +876,119 @@ label.block {
 }
 .folded .gh-fixed-ui {
   left: 36px !important;
+}
+
+#api-docs {
+  background-color: #F6F9FB;
+}
+#api-docs .gh-header {
+  padding: 0 10px 0 0;
+  border-radius: 0;
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0;
+  z-index: 100;
+}
+#api-docs .gh-header > svg {
+  height: 60px;
+  padding: 10px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background-color: #102640;
+}
+#api-docs code {
+  border-radius: 4px;
+}
+#api-docs code.get {
+  background-color: #9ece38;
+  color: #fff;
+}
+#api-docs code.post, #api-docs code.patch {
+  background-color: #0075ff;
+  color: #fff;
+}
+#api-docs code.delete {
+  background-color: #e91f4f;
+  color: #fff;
+}
+#api-docs nav {
+  width: 220px;
+  flex-shrink: 0;
+}
+#api-docs nav a {
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 16px 8px 12px;
+  color: #102640;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#api-docs nav ul, #api-docs nav li {
+  margin: 0;
+}
+#api-docs nav > ul > li > a {
+  font-weight: 600;
+}
+#api-docs nav li.current > a {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+#api-docs nav li.current li.current > a {
+  background-color: rgba(16, 38, 64, 0.5);
+  color: #FFF;
+}
+#api-docs nav li.current > ul a {
+  padding-left: 24px;
+}
+#api-docs nav li:not(.current) > ul {
+  display: none;
+}
+#api-docs #docs-ui {
+  height: calc( 100% - 60px );
+}
+#api-docs #endpoint-display {
+  padding: 20px;
+  background-color: #fff;
+  overflow: auto;
+}
+#api-docs #endpoint-display p, #api-docs #endpoint-display li, #api-docs #endpoint-display a {
+  font-size: 14px;
+}
+#api-docs #endpoint-display .parameter {
+  padding: 10px 0;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+#api-docs #endpoint-display code.param {
+  background-color: transparent;
+  padding: 0;
+}
+#api-docs #endpoint-display .gh-panel.outlined .parameter:first-of-type {
+  border-top: none;
+}
+#api-docs #endpoint-display .gh-panel.outlined .parameter {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+#api-docs pre {
+  color: #fff;
+  background-color: #102640;
+  padding: 10px;
+  margin: 0;
+  overflow: auto;
+}
+#api-docs #request-display {
+  width: 400px;
+  flex-shrink: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+#api-docs #request-display h2 {
+  margin: 0;
 }
 
 /*# sourceMappingURL=admin.css.map */

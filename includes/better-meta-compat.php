@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
+use Groundhogg\Utils\DateTimeHelper;
 
 /**
  * Sanitize user input based on a field configuration
@@ -87,43 +88,52 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 
 	$data = $contact->get_meta( $field['name'] );
 
-	if ( ! empty( $data ) ){
-		switch ( $field['type'] ):
-			default:
-			case 'text':
-			case 'custom_email':
-			case 'email':
-			case 'url':
-			case 'tel':
-			case 'radio':
-			case 'textarea':
-				$data = esc_html( $data );
-				break;
-			case 'datetime':
-				$data = date_i18n( get_date_time_format(), strtotime( $data ) );
-				break;
-			case 'time':
-				$data = date_i18n( get_time_format(), strtotime( $data ) );
-				break;
-			case 'date':
-				$data = date_i18n( get_option( 'date_format' ), strtotime( $data ) );
-				break;
-			case 'number':
-				$data = floatval( $data );
-				$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
-				break;
-			case 'dropdown':
-			case 'checkboxes':
-				if ( is_array( $data ) ) {
-					$data = esc_html( implode( ', ', $data ) );
-				} else {
+	try {
+
+		if ( ! empty( $data ) ){
+			switch ( $field['type'] ):
+				default:
+				case 'text':
+				case 'custom_email':
+				case 'email':
+				case 'url':
+				case 'tel':
+				case 'radio':
+				case 'textarea':
 					$data = esc_html( $data );
-				}
-				break;
-			case 'html':
-				// output with no change as already HTML
-				break;
-		endswitch;
+					break;
+				case 'datetime':
+					$date = new DateTimeHelper( $data );
+					$data = $date->ymdhis();
+					break;
+				case 'time':
+					$date = new DateTimeHelper( $data );
+					$data = $date->format( 'H:i:s' );
+					break;
+				case 'date':
+					$date = new DateTimeHelper( $data );
+					$data = $date->ymd();
+					break;
+				case 'number':
+					$data = floatval( $data );
+					$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
+					break;
+				case 'dropdown':
+				case 'checkboxes':
+					if ( is_array( $data ) ) {
+						$data = esc_html( implode( ', ', $data ) );
+					} else {
+						$data = esc_html( $data );
+					}
+					break;
+				case 'html':
+					// output with no change as already HTML
+					break;
+			endswitch;
+		}
+
+	} catch (\Exception $e){
+		return '';
 	}
 
 	/**
@@ -340,6 +350,8 @@ add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property'
 
 
 /**
+ * Register all the replacement codes for all of the custom fields
+ *
  * @param \Groundhogg\Replacements $replacements
  */
 function add_custom_property_replacements( $replacements ) {
@@ -402,10 +414,24 @@ add_action( 'groundhogg/replacements/init', __NAMESPACE__ . '\add_custom_propert
  */
 function register_contact_property_table_columns( $columns ) {
 
-	$custom_fields = Properties::instance()->get_fields();
+	$groups = Properties::instance()->get_groups();
 
-	foreach ( $custom_fields as $i => $custom_field ) {
-		$columns::register( $custom_field['id'], $custom_field['label'], __NAMESPACE__ . '\display_custom_field_column_callback', "cm.{$custom_field['name']}", 100 + absint( get_array_var( $custom_field, 'order', $i ) ) );
+	foreach ( $groups as $i => $group ) {
+
+		$columns::register_preset( 'g-' . $group['id'], $group['name'] );
+
+		$custom_fields = Properties::instance()->get_fields( $group['id'] );
+
+		foreach ( $custom_fields as $y => $custom_field ) {
+			$columns::register( $custom_field['id'],
+				$custom_field['label'],
+				__NAMESPACE__ . '\display_custom_field_column_callback',
+				"cm.{$custom_field['name']}",
+				( 100 * ( $i + 1 ) ) + absint( get_array_var( $custom_field, 'order', $y ) ),
+				'view_contacts',
+				'g-' . $custom_field['group']
+			);
+		}
 	}
 }
 

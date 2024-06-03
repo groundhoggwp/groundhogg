@@ -3,10 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Contact;
-use Groundhogg\Plugin;
-use function Groundhogg\get_current_ip_address;
-use function Groundhogg\get_db;
+use Groundhogg\DB\Traits\IP_Address;
 use function Groundhogg\is_option_enabled;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,6 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Page_Visits extends DB {
+
+	use IP_Address;
 
 	public function __construct() {
 		parent::__construct();
@@ -142,8 +141,9 @@ class Page_Visits extends DB {
 			'hostname'   => '%s',
 			'query'      => '%s',
 			'fragment'   => '%s',
+			'views'      => '%d',
 			'ip_address' => '%s',
-			'views'      => '%d'
+			'user_agent' => '%d'
 		];
 	}
 
@@ -162,8 +162,9 @@ class Page_Visits extends DB {
 			'path'       => '',
 			'query'      => '',
 			'fragment'   => '',
-			'ip_address' => get_current_ip_address(),
-			'views'      => 1
+			'views'      => 1,
+			'ip_address' => '',
+			'user_agent' => 0
 		];
 	}
 
@@ -184,17 +185,19 @@ class Page_Visits extends DB {
 			'contact_id' => $args['contact_id'],
 			'ip_address' => $args['ip_address'],
 			'path'       => $args['path'],
-			'query'      => $args['query'],
-			'fragment'   => $args['fragment'],
-			'before'     => time(),
-			'after'      => time() - HOUR_IN_SECONDS
+			'after'      => time() - HOUR_IN_SECONDS,
+			'limit'      => 1,
+			'orderby'    => 'timestamp',
+			'order'      => 'DESC'
 		] );
 
+		// Record for this visit already exists
 		if ( ! empty( $records ) ) {
 
 			$record = array_shift( $records );
 			$id     = absint( $record->ID );
 
+			// increment page views
 			if ( $this->update( $id, [ 'views' => absint( $record->views ) + absint( $args['views'] ) ] ) ) {
 				return $id;
 			}
@@ -209,38 +212,45 @@ class Page_Visits extends DB {
 	}
 
 	/**
+	 * Improve table for binary storage of IP addresses
+	 *
+	 * @return void
+	 */
+	public function update_3_4_2() {
+		$this->drop_indexes( [
+			'timestamp',
+			'ip_address',
+			'contact_id',
+			'path'
+		] ); // remove old indexes
+		$this->convert_ip_address_to_varbinary(); // convert the table
+		$this->create_table(); // recreates indexes
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
+	public function create_table_sql_command() {
 
-		global $wpdb;
+		$charset_collate = $this->get_charset_collate();
 
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         timestamp bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
-        ip_address varchar(15) NOT NULL,
         hostname varchar({$this->get_max_index_length()}) NOT NULL,
         path varchar({$this->get_max_index_length()}) NOT NULL,
         query text NOT NULL,
         fragment text NOT NULL,
         views bigint(20) unsigned NOT NULL,
+        ip_address varbinary(16) NOT NULL,
+        user_agent bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
-        KEY timestamp (timestamp),
-        KEY ip_address (ip_address),
-        KEY contact_id (contact_id),
-        KEY path (path)
+        KEY contact_ip_path_idx (contact_id,ip_address,path),
+        KEY time_idx (timestamp)
 		) $charset_collate;";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }

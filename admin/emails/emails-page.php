@@ -30,7 +30,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Emails_Page extends Admin_Page {
 
-
 	protected function get_current_action() {
 
 		$action = parent::get_current_action();
@@ -48,7 +47,7 @@ class Emails_Page extends Admin_Page {
 		if ( $this->is_current_page() && in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 		}
-	}
+    }
 
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
@@ -106,6 +105,8 @@ class Emails_Page extends Admin_Page {
 				'email_id' => $email_id,
 				'email'    => $email
 			] );
+
+            Groundhogg\use_edit_lock( $email );
 		}
 
 		if ( $this->current_action_is( 'view' ) ) {
@@ -285,7 +286,7 @@ class Emails_Page extends Admin_Page {
 
 		foreach ( $this->get_items() as $id ) {
 			$email = new Email( $id );
-			if ( $email->exists() ) {
+			if ( $email->exists() && ! Groundhogg\check_lock( $email ) ) {
 				$email->delete();
 			}
 		}
@@ -305,21 +306,15 @@ class Emails_Page extends Admin_Page {
 	 * @return false
 	 */
 	public function process_trash() {
-
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
 		}
 
 		foreach ( $this->get_items() as $id ) {
 			$email = new Email( $id );
-
-			if ( ! $email->exists() ){
-				continue;
+			if ( $email->exists() && ! Groundhogg\check_lock( $email ) ) {
+				$email->update( [ 'status' => 'trash' ] );
 			}
-
-			$email->update( [
-				'status' => 'trash'
-			] );
 		}
 
 		$this->add_notice(

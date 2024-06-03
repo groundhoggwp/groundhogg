@@ -65,16 +65,15 @@ class Faker_Api extends Base_Api {
 	 */
 	public function fake_funnel_journey( \WP_REST_Request $request ) {
 		$query      = $request->get_param( 'query' ) ?: [];
-		$date       = $request->get_param( 'date' );
+		$modifier = sanitize_text_field( $request->get_param( 'modifier' ) );
 		$funnel_id  = absint( $request->get_param( 'funnel_id' ) );
 		$contact_id = absint( $request->get_param( 'contact_id' ) );
-		$range      = absint( $request->get_param( 'range' ) );
 
-		$date   = new DateTimeHelper( $date );
+		$date   = new DateTimeHelper( $modifier );
 		$funnel = new Funnel( $funnel_id );
 
 		if ( ! empty( $query ) ) {
-			Faker::funnel_journeys( $funnel, $query, $date, $range );
+			Faker::funnel_journeys( $funnel, $query, $modifier );
 
 			return self::SUCCESS_RESPONSE();
 		}

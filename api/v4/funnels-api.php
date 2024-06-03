@@ -176,16 +176,21 @@ class Funnels_Api extends Base_Object_Api {
 			] );
 		}
 
+		$date = sanitize_text_field( $request->get_param( 'date' ) );
+		$time = sanitize_text_field( $request->get_param( 'time' ) );
+		$now  = filter_var( $request->get_param( 'now' ), FILTER_VALIDATE_BOOLEAN );
+
 		// Then later
-		if ( ! $request->get_param( 'now' ) ) {
-			$date = sanitize_text_field( $request->get_param( 'date' ) );
-			$time = sanitize_text_field( $request->get_param( 'time' ) );
+		if ( $date && $time && ! $now ) {
+			try {
+				$date = new DateTimeHelper( "$date $time", wp_timezone() );
 
-			$date = new DateTimeHelper( "$date $time", wp_timezone() );
-
-			add_filter( 'groundhogg/background_tasks/schedule_time', function ( $when ) use ( $date ) {
-				return $date->getTimestamp();
-			} );
+				add_filter( 'groundhogg/background_tasks/schedule_time', function ( $when ) use ( $date ) {
+					return $date->getTimestamp();
+				} );
+			} catch ( \Exception $e ){
+				return self::ERROR_500( 'invalid_date', $e->getMessage() );
+			}
 		}
 
 		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );

@@ -160,7 +160,7 @@ class Delay_Timer extends Action {
 
 				$date = new DelayDateTime( 'now' );
 
-				$date->setTimestamp( self::get_run_time( time(), $step ) );
+				$date->setTimestamp( self::calc_run_time( time(), $step ) );
 
 				echo html()->e( 'div', [
 					'class' => "display-flex gap-10 column"
@@ -193,7 +193,7 @@ class Delay_Timer extends Action {
 	 *
 	 * @return int
 	 */
-	public function get_run_time( int $baseTimestamp, Step $step ): int {
+	public function calc_run_time( int $baseTimestamp, Step $step ): int {
 
 		$settings = wp_parse_args( $step->get_meta(), [
 			'delay_amount'      => 3,
@@ -381,5 +381,5 @@ class Delay_Timer extends Action {
 		//do nothing
 		return true;
 	}
-    
+
 }

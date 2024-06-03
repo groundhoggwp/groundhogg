@@ -88,7 +88,7 @@ class Broadcasts_Api extends Base_Object_Api {
 			$query['marketable'] = true;
 		}
 
-		$num_contacts = get_db( 'contacts' )->count( $query );
+		$num_contacts = get_db()->contacts->count( $query );
 
 		if ( $num_contacts === 0 ) {
 			return self::ERROR_401( 'error', __( 'No contacts match the given filters.', 'groundhogg' ) );

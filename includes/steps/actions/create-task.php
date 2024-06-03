@@ -151,14 +151,11 @@ class Create_Task extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-
-//        $this->save_setting( 'content', wp_kses_post( $this->get_posted_data( 'content' ) ) );
-		$this->save_setting( 'summary', sanitize_text_field( $this->get_posted_data( 'summary' ) ) );
+        $this->save_setting( 'summary', sanitize_text_field( $this->get_posted_data( 'summary' ) ) );
 		$this->save_setting( 'task_type', sanitize_text_field( $this->get_posted_data( 'task_type' ) ) );
 		$this->save_setting( 'time', sanitize_text_field( $this->get_posted_data( 'time', '17:00:00' ) ) );
 		$this->save_setting( 'delay_unit', sanitize_text_field( $this->get_posted_data( 'delay_unit', '17:00:00' ) ) );
 		$this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount', 7 ) ) );
-
 	}
 
 	public function generate_step_title( $step ) {

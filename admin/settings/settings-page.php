@@ -678,19 +678,19 @@ class Settings_Page extends Admin_Page {
 					'name' => 'gh_primary_user',
 				),
 			),
-			'gh_disable_user_sync'                   => array(
-				'id'      => 'gh_sync_users',
+			'gh_disable_user_sync'                   => [
+				'id'      => 'gh_disable_user_sync',
 				'section' => 'wordpress',
 				'label'   => __( 'Disable User Syncing', 'groundhogg' ),
 				'desc'    => _x( 'Disable the automatic syncing of WordPress users and contacts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_disable_user_sync',
 					'id'    => 'gh_disable_user_sync',
 					'value' => 'on',
-				),
-			),
+				],
+			],
 			'gh_sync_user_meta'                      => array(
 				'id'      => 'gh_sync_user_meta',
 				'section' => 'wordpress',
@@ -1376,6 +1376,41 @@ class Settings_Page extends Admin_Page {
 					'class' => 'gh-single-tag-picker'
 				),
 			],
+			'gh_open_tracking_delay'   => [
+				'section' => 'tracking',
+				'label'   => _x( 'Open Tracking Delay', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Opens that happen within the delay period (in seconds) after an email is sent will be ignored. <br/>Recommended value <code>60</code> seconds. <br/>Set to <code>0</code> or leave empty for no delay.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					'type'     => 'number',
+					'class'    => 'input',
+					'disabled' => defined( 'GH_OPEN_TRACKING_DELAY' )
+				]
+			],
+			'gh_click_tracking_delay'  => [
+				'section' => 'tracking',
+				'label'   => _x( 'Click Tracking Delay', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Clicks that are tracked within the delay period (in seconds) after an email is sent will be ignored. <br/>Recommended value <code>90</code> seconds. <br/>Set to <code>0</code> or leave empty for no delay.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					'type'     => 'number',
+					'class'    => 'input',
+					'disabled' => defined( 'GH_CLICK_TRACKING_DELAY' )
+				]
+			],
+			'gh_disable_open_tracking' => [
+				'id'      => 'gh_disable_open_tracking',
+				'section' => 'tracking',
+				'label'   => _x( 'Disable Email Open Tracking', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Disable all email open tracking.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable' ),
+					'name'  => 'gh_disable_open_tracking',
+					'id'    => 'gh_disable_open_tracking',
+					'value' => 'on',
+				],
+			],
 			'gh_disable_click_tracking'              => [
 				'id'      => 'gh_disable_click_tracking',
 				'section' => 'tracking',
@@ -1386,19 +1421,6 @@ class Settings_Page extends Admin_Page {
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_disable_click_tracking',
 					'id'    => 'gh_disable_click_tracking',
-					'value' => 'on',
-				],
-			],
-			'gh_disable_open_tracking'               => [
-				'id'      => 'gh_disable_open_tracking',
-				'section' => 'tracking',
-				'label'   => _x( 'Disable Email Open Tracking', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Disable all email open tracking.', 'settings', 'groundhogg' ),
-				'type'    => 'checkbox',
-				'atts'    => [
-					'label' => __( 'Disable' ),
-					'name'  => 'gh_disable_open_tracking',
-					'id'    => 'gh_disable_open_tracking',
 					'value' => 'on',
 				],
 			],
@@ -1566,6 +1588,19 @@ class Settings_Page extends Admin_Page {
 		do_action( 'groundhogg/admin/register_settings/before', $this );
 
 		foreach ( $this->settings as $id => $setting ) {
+
+			$setting = wp_parse_args( $setting, [
+				'id'   => $id,
+				'type' => 'input',
+				'atts' => []
+			] );
+
+			$setting['atts'] = wp_parse_args( $setting['atts'], [
+				'id'   => $id,
+				'name' => $id
+			] );
+
+			$this->settings[ $id ] = $setting;
 
 			if ( ! isset_not_empty( $this->sections, $setting['section'] ) ) {
 				continue;
@@ -1789,9 +1824,11 @@ class Settings_Page extends Admin_Page {
 
 	public function settings_callback( $field ) {
 
+        $constant_value = maybe_get_option_from_constant( null, $field['id'] ) ;
+
 		// Check if the option has been defined instead
-		if ( maybe_get_option_from_constant( null, $field['id'] ) !== null ){
-			printf( '<p class="description">%s</p>', __( 'This option has been defined elsewhere. Probably in <code>wp-config.php</code>.', 'groundhogg' ) );
+		if ( $constant_value !== null ){
+			printf( '<p class="description">%s</p>', sprintf( __( 'This option has been defined elsewhere and is set to <code>%s</code>. Probably in <code>wp-config.php</code>.', 'groundhogg' ), $constant_value ) );
 			return;
 		}
 

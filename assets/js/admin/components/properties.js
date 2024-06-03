@@ -475,6 +475,12 @@
 						  }, width)}
 					  </div>
 				  </div>
+          <div class="gh-row">
+              <div class="gh-col">
+                  <label class="">${__('Group', 'groundhogg')}</label>
+                  <select id="property-field-group"></select>
+              </div>
+          </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
 						  <button class="gh-button primary" id="create-property-field">
@@ -694,6 +700,11 @@
           updateField({ width: parseInt(e.target.value) })
         })
 
+        $('#property-field-group').select2({
+          data: properties.groups.map( ({id, name}) => ({id, text:name, selected: newField.group === id }) ),
+          multiple: false,
+        }).on( 'change', e => newField.group = e.target.value )
+
         $('#property-field-type').on('change', (e) => {
           newField.type = e.target.value
           setContent(Templates.addField(newField))
@@ -776,7 +787,8 @@
           items: [
             {
               key: 'edit', text: __('Edit field', 'groundhogg'),
-            }, {
+            },
+            {
               key: 'delete', text: `<span class="gh-text danger">${__('Delete')}</span>`,
             },
           ], onSelect: k => {

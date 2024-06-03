@@ -237,6 +237,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'total_engaged_contacts',
 				'total_unsubscribed_contacts',
 				'chart_contacts_by_optin_status',
+				'chart_unsub_reasons',
 //				'chart_contacts_by_region',
 				'chart_contacts_by_country',
 				'table_contacts_by_lead_source',
@@ -501,6 +502,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 
 	public function refresh_report_data() {
+
+        if ( ! current_user_can( 'view_reports' ) ){
+            $this->wp_die_no_access();
+        }
 
 		$start = new \DateTime( get_post_var( 'start' ) . ' 00:00:00', wp_timezone() );
 		$end   = new \DateTime( get_post_var( 'end' ) . ' 23:59:59', wp_timezone() );

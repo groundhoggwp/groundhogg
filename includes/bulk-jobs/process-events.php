@@ -17,7 +17,7 @@ class Process_Events extends Bulk_Job {
 	 * @return string
 	 */
 	public function get_action() {
-		return 'process_events';
+		return 'run_queue';
 	}
 
 	/**

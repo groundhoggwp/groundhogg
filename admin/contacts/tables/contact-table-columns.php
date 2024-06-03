@@ -2,14 +2,17 @@
 
 namespace Groundhogg\Admin\Contacts\Tables;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Tag;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_gh_page_screen_id;
+use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
 
@@ -128,6 +131,60 @@ class Contact_Table_Columns {
 	 */
 	public static $columns = [];
 
+	/**
+	 * All the presets
+	 *
+	 * @var array
+	 */
+	public static $presets = [];
+
+	/**
+	 * Register a preset
+	 *
+	 * @param string $id
+	 * @param string $title
+	 *
+	 * @return void
+	 */
+	public static function register_preset( string $id, string $title ) {
+		self::$presets[ $id ] = $title;
+	}
+
+	/**
+     * Get list of visible presets
+     *
+	 * @return array
+	 */
+	public static function get_presets() {
+
+		$presets = [];
+
+		foreach ( self::$presets as $id => $name ) {
+
+			$columns = array_map( function ( $column ){
+                return $column['id'];
+            }, array_filter( self::$columns, function ( $column ) use ( $id ) {
+
+				if ( ! current_user_can( $column['capability'] ) ) {
+					return false;
+				}
+
+				return is_array( $column['preset'] ) ? in_array( $id, $column['preset'] ) : $column['preset'] === $id;
+            } ) );
+
+            if ( empty( $columns ) ){
+                continue;
+            }
+
+			$presets[] = [
+				'id'      => $id,
+				'name'    => $name,
+				'columns' => array_values( $columns )
+			];
+		}
+
+		return $presets;
+	}
 
 	/**
 	 * Register a new contact table column
@@ -138,8 +195,9 @@ class Contact_Table_Columns {
 	 * @param string   $orderby    if the column will be sortable
 	 * @param int      $priority   how high in the cards it should be displayed
 	 * @param string   $capability the minimum capability for the viewing user to see the data in this card.
+	 * @param string   $preset     the preset this column is added to.
 	 */
-	public static function register( string $id, string $title, callable $callback, $orderby = false, $priority = 100, $capability = 'view_contacts' ) {
+	public static function register( string $id, string $title, callable $callback, $orderby = false, $priority = 100, $capability = 'view_contacts', $preset = '' ) {
 
 		if ( empty( $id ) || ! is_callable( $callback ) ) {
 			return;
@@ -152,6 +210,7 @@ class Contact_Table_Columns {
 			'orderby'    => $orderby,
 			'priority'   => $priority,
 			'capability' => $capability,
+			'preset'     => $preset,
 		];
 
         // If order by is defined, make sure that it's a registered key for the contact query
@@ -190,34 +249,92 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
+        self::register_preset( 'defaults', __( 'Defaults', 'groundhogg' ) );
+        self::register_preset( 'minimal', __( 'Minimal', 'groundhogg' ) );
+
 		self::register( 'status', __( 'Status', 'groundhogg' ), [
 			self::class,
 			'column_optin_status'
-		], 'optin_status', 1 );
+		], 'optin_status', 1, 'view_contacts', [ 'defaults', 'minimal' ] );
 
 		// Core columns
 		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
 			self::class,
 			'column_first_name'
-		], 'first_name', 2 );
+		], 'first_name', 2, 'view_contacts', [ 'defaults', 'minimal' ] );
 		self::register( 'last_name', __( 'Last Name', 'groundhogg' ), [
 			self::class,
 			'column_last_name'
-		], 'last_name', 3 );
-		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10 );
-		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10 );
-		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10 );
+		], 'last_name', 3, 'view_contacts', [ 'defaults', 'minimal' ] );
+		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10, 'list_users', 'defaults' );
+		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10, 'view_contacts', 'defaults' );
+		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10, 'view_contacts', 'defaults' );
 		self::register( 'date_created', __( 'Date Created', 'groundhogg' ), [
 			self::class,
 			'column_date_created'
-		], 'date_created', 10 );
+		], 'date_created', 10, 'view_contacts', 'defaults' );
 
 		// Other Columns
-		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], 'tc.tag_count', 11 );
-		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false, 11 );
-		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11 );
+		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], 'tc.tag_count', 11, 'view_contacts', [ 'defaults', 'minimal' ] );
+		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false, 11, 'view_contacts', 'defaults' );
+		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11, 'view_contacts', 'defaults' );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
+
+		self::register_preset( 'unsub', __( 'Unsubscribe', 'groundhogg' ) );
+
+		self::register( 'date_unsubscribed', __( 'Unsubscribed', 'groundhogg' ), function ( Contact $contact ) {
+            if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+                return '';
+            }
+
+            $activity = new Activity([
+               'activity_type' => Activity::UNSUBSCRIBED,
+               'contact_id' => $contact->ID
+            ]);
+
+            if ( ! $activity->exists() ){
+                $date = new DateTimeHelper( $contact->date_optin_status_changed );
+            } else {
+                $date = new DateTimeHelper( $activity->get_timestamp() );
+            }
+
+			return $date->wpDateTimeFormat();
+		}, 'date_optin_status_changed', 90, 'view_contacts', 'unsub' );
+
+		self::register( 'unsub_reason', __( 'Unsub Reason', 'groundhogg' ), function ( Contact $contact ) {
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+				return '';
+			}
+
+			$activity = new Activity([
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id' => $contact->ID
+			]);
+
+			if ( ! $activity->exists() ){
+				return '';
+			}
+
+			return esc_html( get_array_var( get_unsub_reasons(), $activity->get_meta( 'reason' ) ) );
+		}, false, 91, 'view_contacts', 'unsub' );
+
+		self::register( 'unsub_feedback', __( 'Unsub Feedback', 'groundhogg' ), function ( Contact $contact ) {
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+				return '';
+			}
+
+			$activity = new Activity([
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id' => $contact->ID
+			]);
+
+			if ( ! $activity->exists() ){
+				return '';
+			}
+
+			return esc_html( $activity->get_meta( 'feedback' ) );
+		}, false, 92, 'view_contacts', 'unsub' );
 	}
 
 	# =============== COLUMN CALLBACKS FOR CORE COLUMNS =============== #

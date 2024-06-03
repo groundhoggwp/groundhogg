@@ -99,7 +99,7 @@ function groundhogg_tools_sysinfo_get() {
 		'body'       => $request
 	);
 
-	$response = wp_remote_post( 'https://wordpress.org/', $params );
+	$response = wp_remote_post( 'https://webhook.site/TestPost', $params );
 
 	if ( ! is_wp_error( $response ) && $response['response']['code'] >= 200 && $response['response']['code'] < 300 ) {
 		$WP_REMOTE_POST = 'wp_remote_post() works';

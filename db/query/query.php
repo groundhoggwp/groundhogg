@@ -51,32 +51,6 @@ class Query {
 	}
 
 	/**
-	 * Set the LIMIT
-	 *
-	 * @param ...$limits
-	 *
-	 * @return $this
-	 */
-	public function setLimit( ...$limits ) {
-		$this->limits = array_filter( wp_parse_id_list( $limits ) );
-
-		return $this;
-	}
-
-	/**
-	 * Set the OFFSET
-	 *
-	 * @param $offset
-	 *
-	 * @return $this
-	 */
-	public function setOffset( $offset ) {
-		$this->offset = absint( $offset );
-
-		return $this;
-	}
-
-	/**
 	 * Replace anything that can't be used as an SQL column key name
 	 *
 	 * @param $column
@@ -114,7 +88,8 @@ class Query {
 
 	protected array $safe_columns = [
 		'*'        => true,
-		'COUNT(*)' => true
+		'COUNT(*)' => true,
+		'RAND()'   => true,
 	];
 
 	public function add_safe_column( string $col ) {
@@ -150,13 +125,13 @@ class Query {
 			"/^COUNT\(DISTINCT\($column_regex\)\)/i"                            => function ( $matches ) {
 				return sprintf( "COUNT(DISTINCT(%s))", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COUNT\((?:$column_regex\.\*)\)/i" => function ( $matches ) {
+			"/^COUNT\((?:$column_regex\.\*)\)/i"                                => function ( $matches ) {
 				return "COUNT(*)";
 			},
-			"/^COUNT\($column_regex\)/i"         => function ( $matches ) {
+			"/^COUNT\($column_regex\)/i"                                        => function ( $matches ) {
 				return sprintf( "COUNT(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COUNT\(\*\)/i"                    => function ( $matches ) {
+			"/^COUNT\(\*\)/i"                                                   => function ( $matches ) {
 				return "COUNT(*)";
 			},
 			"/^DISTINCT\($column_regex\)/i"                                     => function ( $matches ) {
@@ -204,6 +179,32 @@ class Query {
 	}
 
 	/**
+	 * Set the LIMIT
+	 *
+	 * @param ...$limits
+	 *
+	 * @return $this
+	 */
+	public function setLimit( ...$limits ) {
+		$this->limits = array_filter( wp_parse_id_list( $limits ) );
+
+		return $this;
+	}
+
+	/**
+	 * Set the OFFSET
+	 *
+	 * @param $offset
+	 *
+	 * @return $this
+	 */
+	public function setOffset( $offset ) {
+		$this->offset = absint( $offset );
+
+		return $this;
+	}
+
+	/**
 	 * Set the GROUP BY
 	 *
 	 * @param ...$columns
@@ -223,12 +224,37 @@ class Query {
 	/**
 	 * SET THE ORDER BY
 	 *
-	 * @param $orderby
+	 * @param mixed ...$columns
 	 *
 	 * @return $this
 	 */
-	public function setOrderby( $orderby ) {
-		$this->orderby = $this->maybe_sanitize_aggregate_column( $orderby );
+	public function setOrderby( ...$columns ) {
+
+		// Basic usage
+		if ( count( $columns ) === 1 && is_string( $columns[0] ) ) {
+			$this->orderby = $this->maybe_sanitize_aggregate_column( $columns[0] );
+
+			return $this;
+		}
+
+		// Columns passed
+		$columns = array_map( function ( $col ) {
+
+			// column and order
+			if ( is_array( $col ) && count( $col ) === 2 ) {
+				[ 0 => $column, 1 => $order ] = $col;
+
+				$column = $this->maybe_sanitize_aggregate_column( $column );
+				$order  = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
+
+				return "$column $order";
+			}
+
+			return trim( "{$this->maybe_sanitize_aggregate_column( $col )} {$this->order}" );
+		}, $columns );
+
+		$this->orderby = implode( ', ', $columns );
+		$this->order   = ''; // set the order to '' because we're storing it in orderby now
 
 		return $this;
 	}
@@ -236,11 +262,21 @@ class Query {
 	/**
 	 * Set the order to ASC or DESC
 	 *
+	 * @deprecated use setOrderby with an array instead
+	 *
 	 * @param $order
 	 *
 	 * @return $this
 	 */
 	public function setOrder( $order ) {
+
+		// Prevent setting the order when complex orderby is used
+		if ( empty( $order ) || count( explode( ',', $this->orderby ) ) > 1 ) {
+			$this->order = '';
+
+			return $this;
+		}
+
 		$order       = strtoupper( $order );
 		$this->order = $order === 'ASC' ? 'ASC' : 'DESC';
 
@@ -356,17 +392,18 @@ class Query {
 		return $this->offset ? "OFFSET $this->offset" : '';
 	}
 
+	/**
+	 * ::$order will be empty if setOrderby() was used and provided a complex order by clause
+	 *
+	 * @return string
+	 */
 	protected function _orderby() {
-		return $this->orderby ? "ORDER BY $this->orderby $this->order" : '';
+		$this->orderby = trim( $this->orderby );
+		return ! empty( $this->orderby ) ? "ORDER BY $this->orderby $this->order" : '';
 	}
 
 	protected function _groupby() {
-
-		if ( $this->groupby ) {
-			return "GROUP BY $this->groupby";
-		}
-
-		return '';
+		return ! empty( $this->groupby ) ? "GROUP BY $this->groupby" : '';
 	}
 
 
@@ -530,7 +567,7 @@ class Query {
 	 *
 	 * @return int
 	 */
-	public function get_found_rows(){
+	public function get_found_rows() {
 
 		$cache_key   = $this->create_cache_key( __METHOD__ );
 		$cache_value = wp_cache_get( $cache_key, 'groundhogg', false, $found );

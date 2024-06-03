@@ -243,6 +243,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			return call_user_func( [ $this, $name ] );
 		}
 
+//		if ( method_exists( $this, 'get_' . $name ) && is_callable( [ $this, 'get_' . $name ] ) ) {
+//			return call_user_func( [ $this, 'get_' . $name ] );
+//		}
+
 		return false;
 	}
 
@@ -310,6 +314,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	protected function get_object_type() {
 		return $this->get_db()->get_object_type();
+	}
+
+	/**
+	 * Retrieve the object type
+	 *
+	 * @return string
+	 */
+	public function _get_object_type(){
+		return $this->get_object_type();
 	}
 
 	/**
@@ -788,12 +801,14 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return Note|false
 	 */
-	public function add_note( $note, $context = 'system', $user_id = false ) {
+	public function add_note( $note, $context = 'system', $user_id = false, $overrides = [] ) {
+
 		if ( ! is_string( $note ) && ! is_array( $note ) ) {
 			return false;
 		}
 
 		if ( is_string( $note ) ) {
+
 			$note_data = [
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_object_type(),
@@ -806,7 +821,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 				$note_data['user_id'] = get_current_user_id();
 			}
 
-			$note = new Note( $note_data );
+			$note_data = array_merge( $note_data, $overrides );
+
+			$note = new Note();
+			$note->create( $note_data );
 
 		} else if ( is_array( $note ) ) {
 
@@ -819,9 +837,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$note_data = array_merge( $note, [
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_object_type(),
-			] );
+			], $overrides );
 
-			$note = new Note( $note_data );
+			$note = new Note();
+			$note->create( $note_data );
 		}
 
 		/**

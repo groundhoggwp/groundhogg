@@ -36,6 +36,19 @@ class Table_Query extends Query {
 
 	protected $sanitize_columns = true;
 
+	/**
+	 * Given filters, modify the query accordingly
+	 *
+	 * @throws FilterException
+	 *
+	 * @param $filters
+	 *
+	 * @return void
+	 */
+	public function parseFilters( $filters ) {
+		$this->db_table->parse_filters( $filters, $this->where );
+	}
+
 	protected function toggleColumnSanitization() {
 
 	}
@@ -327,6 +340,11 @@ class Table_Query extends Query {
 	public function get_objects( $as = '' ) {
 
 		$items = $this->get_results();
+
+		// We should do this here because subsequent queries during object creation might impact
+		if ( $this->found_rows ){
+			$this->get_found_rows();
+		}
 
 		if ( $as && class_exists( $as ) ) {
 			array_map_to_class( $items, $as );

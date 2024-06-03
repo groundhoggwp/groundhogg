@@ -162,7 +162,7 @@ function managed_page_footer() {
 
     // A contact is being tracked...
 	if ( get_contactdata() ) {
-		$footer_links[] = html()->e( 'a', [ 'href' => managed_page_url( 'preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) );
+		$footer_links[] = html()->e( 'a', [ 'href' => managed_page_url( 'preferences/profile/' ) ], __( 'My Profile', 'groundhogg' ) );
     }
 
 	/**

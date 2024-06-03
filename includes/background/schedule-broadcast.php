@@ -3,6 +3,7 @@
 namespace Groundhogg\Background;
 
 use Groundhogg\Broadcast;
+use Groundhogg\Plugin;
 use function Groundhogg\bold_it;
 use function Groundhogg\notices;
 
@@ -27,12 +28,21 @@ class Schedule_Broadcast extends Task {
 	 * @return bool true when broadcast is fully scheduled
 	 */
 	public function process(): bool {
-		$this->broadcast->enqueue_batch();
+
+		$items_scheduled = $this->broadcast->enqueue_batch();
+
+		// If items scheduled is false, there was an error scheduling the broadcast
+		if ( $items_scheduled === false ){
+
+			$message = sprintf( __( 'There was a problem scheduling your broadcast %s', 'groundhogg' ), bold_it( $this->broadcast->get_title() ) );
+			notices()->add_user_notice( $message, 'warning', true, $this->broadcast->get_scheduled_by_id() );
+
+			return true;
+		}
 
 		if ( $this->broadcast->is_scheduled() ) {
 
 			$message = sprintf( __( 'Your broadcast %s has been fully scheduled!', 'groundhogg' ), bold_it( $this->broadcast->get_title() ) );
-
 			notices()->add_user_notice( $message, 'success', true, $this->broadcast->get_scheduled_by_id() );
 
 			return true;
