@@ -172,9 +172,6 @@
     description: () => Pg({}, __('Delete a tag.', 'groundhogg')),
     method: 'DELETE',
     endpoint: `${ apiRoot }/tags/<id>`,
-    required: [
-      'id'
-    ],
     identifiers: [
       CommonParams.id('tag'),
     ],

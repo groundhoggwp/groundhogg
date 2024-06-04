@@ -1,4 +1,4 @@
-( ($) => {
+(($) => {
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -35,13 +35,37 @@
   const { root: apiRoot } = Groundhogg.api.routes.v4
   const { base64_json_encode, setNestedValue, getNestedValue } = Groundhogg.functions
 
+  const IdRepeater = ({ param, name, id }) => {
+
+    let others = getFromRequest(param, [])
+    let rows = others.map(id => ( [id] ))
+
+    return InputRepeater({
+      id,
+      rows: rows,
+      cells: [
+        props => Input({
+          ...props,
+          type: 'number',
+        }),
+      ],
+      onChange: rows => {
+        setInRequest(param, rows.map(([id]) => parseInt(id)))
+      },
+    })
+  }
+
   const CommonParams = {
-    filters: (plural) => ( {
+    filters: (plural) => ({
       param: 'filters',
       description: () => Fragment([
-        Pg({}, sprintf(__('Filters are the most comprehensive way to search for %s that match your criteria.', 'groundhogg'), plural)),
+        Pg({},
+          sprintf(__('Filters are the most comprehensive way to search for %s that match your criteria.', 'groundhogg'),
+            plural)),
         currEndpoint().method === 'GET' ? Pg({},
-          sprintf(__('When using filters with <code class="get">GET</code> it is best to JSON encode and then base64 encode the filters.', 'groundhogg'),
+          sprintf(__(
+              'When using filters with <code class="get">GET</code> it is best to JSON encode and then base64 encode the filters.',
+              'groundhogg'),
             plural)) : '',
       ]),
       type: 'array',
@@ -64,58 +88,73 @@
           setInRequest(param, filters)
         })
       },
-    } ),
-    search: (plural, columns = []) => ( {
+    }),
+    include: (plural) => ({
+      param: 'include',
+      type: 'int[]',
+      control: IdRepeater,
+      description: () => Pg({}, sprintf(__('IDs of %s to include.', 'groundhogg'), plural))
+    }),
+    exclude: (plural) => ({
+      param: 'exclude',
+      type: 'int[]',
+      control: IdRepeater,
+      description: () => Pg({}, sprintf(__('IDs of %s to exclude.', 'groundhogg'), plural))
+    }),
+    search: (plural, columns = []) => ({
       param: 'search',
       description: () => Pg({},
-        sprintf(__('Search for %s using a search phrase. Will match %s.', 'groundhogg'), plural, andList(columns.map(col => el('code', {}, col))))),
+        sprintf(__('Search for %s using a search phrase. Will match %s.', 'groundhogg'), plural,
+          andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
-    } ),
-    limit: (plural) => ( {
+    }),
+    limit: (plural) => ({
       param: 'limit',
       description: () => Pg({}, sprintf(__('The number of %s to return.', 'groundhogg'), plural)),
       type: 'int',
       default: 20,
-    } ),
-    id: (singular) => ( {
+    }),
+    id: (singular) => ({
       param: 'id',
       description: () => Pg({}, sprintf(__('The id of the %s to return.', 'groundhogg'), singular)),
       type: 'int',
       required: true,
-    } ),
-    offset: (plural) => ( {
+    }),
+    offset: (plural) => ({
       param: 'offset',
       description: () => Pg({}, sprintf(__('Paginate through %s.', 'groundhogg'), plural)),
       type: 'int',
       default: 0,
-    } ),
-    order: (plural) => ( {
+    }),
+    order: (plural) => ({
       param: 'order',
       description: () => Pg({}, sprintf(__('How to order %s.', 'groundhogg'), plural)),
       type: 'string',
       default: 'DESC',
       options: ['ASC', 'DESC'],
-    } ),
-    orderby: (plural, columns = []) => ( {
+    }),
+    orderby: (plural, columns = []) => ({
       param: 'orderby',
       description: () => Pg({},
-        sprintf(__('Order %s by a specific column. Supported columns are %s.', 'groundhogg'), plural, andList(columns.map(col => el('code', {}, col))))),
+        sprintf(__('Order %s by a specific column. Supported columns are %s.', 'groundhogg'), plural,
+          andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
       default: 'ID',
-    } ),
-    found_rows: (plural) => ( {
+    }),
+    found_rows: (plural) => ({
       param: 'found_rows',
       description: () => Pg({},
         sprintf(__('Whether to return the total number of %s matching the query.', 'groundhogg'), plural)),
       type: 'bool',
       default: 'true',
-    } ),
-    tags: (param) => ( {
+    }),
+    tags: (param) => ({
       param,
       type: 'int[]|string[]',
       description: () => Fragment([
         Pg({},
-          __('An array of tag names or tag IDs. If passing names, if the tag does not exist it will be created. The array can be a mix of strings and IDs.',
+          __(
+            'An array of tag names or tag IDs. If passing names, if the tag does not exist it will be created. The array can be a mix of strings and IDs.',
             'groundhogg')),
       ]),
       control: ({ param, id }) => ItemPicker({
@@ -128,11 +167,50 @@
             limit: 30,
           })
 
-          return tags.map(({ ID, data }) => ( { id: ID, text: data.tag_name } ))
+          return tags.map(({ ID, data }) => ({ id: ID, text: data.tag_name }))
         },
         onChange: items => setInRequest(param, items.map(({ id }) => id)),
       }),
-    } ),
+    }),
+    meta: () => ({
+      param: 'meta',
+      type: 'object',
+      required: false,
+      subParams: [
+        {
+          param: '<key>',
+          description: () => Fragment([
+            Pg({}, __('Any arbitrary key with any arbitrary value.', 'groundhogg')),
+          ]),
+          type: 'mixed',
+          required: false,
+          control: ({ param, id, name }) => {
+
+            param = param.replace('.<key>', '') // remove <key> from param since we're editing the meta object directly
+
+            let meta = getFromRequest(param, {})
+            let rows = Object.keys(meta).map(key => ([key, meta[key]]))
+
+            return InputRepeater({
+              id,
+              rows: rows,
+              cells: [
+                props => Input(props),
+                props => Input(props),
+              ],
+              onChange: rows => {
+                let newMeta = {}
+                rows.forEach(([key, val]) => newMeta[key] = val)
+                setInRequest(param.replace('.<key>', ''), newMeta)
+              },
+            })
+          },
+        },
+      ],
+      description: () => Fragment([
+        Pg({}, __('The meta object can contain any number of arbitrary key&rarr;value pairs.', 'groundhogg')),
+      ]),
+    }),
   }
 
   const setInRequest = (param, value) => {
@@ -149,7 +227,7 @@
     ...props
   }) => {
 
-    let id = `param-${ param.replaceAll('.', '-') }`
+    let id = `param-${param.replaceAll('.', '-')}`
     let name = param
 
     if (control) {
@@ -192,40 +270,46 @@
 
   const isParamRequired = param => {
 
-    if ( ! currEndpoint().required ){
+    if (!currEndpoint().required) {
       return false
     }
 
-    if ( currEndpoint().repeater ){
-      param = param.substring(param.indexOf('.')+1)
+    if (currEndpoint().repeater) {
+      param = param.substring(param.indexOf('.') + 1)
     }
 
-    return currEndpoint().required.includes( param )
+    return currEndpoint().required.includes(param)
   }
 
-  const ParamsList = (params, parentParam = '') => Fragment(params.map(({ param, description, required = false, type, ...props }) => {
+  const ParamsList = (params, parentParam = '') => Fragment(
+    params.map(({ param, description, required = false, type, ...props }) => {
 
-    if (parentParam) {
-      param = `${ parentParam }.${ param }`
-    }
+      if (parentParam) {
+        param = `${parentParam}.${param}`
+      }
 
-    return Div({
-      className: 'parameter',
-    }, [
-      Div({ className: 'display-flex gap-10 align-center' }, [
-        `<code class="param">${ escHTML(param) }</code>`,
-        `<span class="type">${ escHTML(type) }</span>`,
-        isParamRequired( param ) || required ? `<span class="required">${ __('Required', 'groundhogg') }</span>` : null,
-      ]),
-      description,
-      typeof props.default !== 'undefined' && props.default !== null ? `<p>${ sprintf(__('Defaults to %s.'), `<code>${ props.default }</code>`) }</p>` : null,
-      props.subParams ? null : ControlFromParam({ param, type, ...props }),
-      props.subParams ? Div({ className: 'subparams gh-panel outlined' }, [
-        Div({ className: 'gh-panel-header' }, `<h2>Child parameters</h2>`),
-        ParamsList(props.subParams, param),
-      ]) : null,
-    ])
-  }))
+      if ( typeof description === 'string' ){
+        description = Pg({}, description)
+      }
+
+      return Div({
+        className: 'parameter',
+      }, [
+        Div({ className: 'display-flex gap-10 align-center' }, [
+          `<code class="param">${escHTML(param)}</code>`,
+          `<span class="type">${escHTML(type)}</span>`,
+          isParamRequired(param) || required ? `<span class="required">${__('Required', 'groundhogg')}</span>` : null,
+        ]),
+        description,
+        typeof props.default !== 'undefined' && props.default !== null ? `<p>${sprintf(__('Defaults to %s.'),
+          `<code>${props.default}</code>`)}</p>` : null,
+        props.subParams ? null : ControlFromParam({ param, type, ...props }),
+        props.subParams ? Div({ className: 'subparams gh-panel outlined' }, [
+          Div({ className: 'gh-panel-header' }, `<h2>Child parameters</h2>`),
+          ParamsList(props.subParams, param),
+        ]) : null,
+      ])
+    }))
 
   const ParamsRepeater = (params) => {
     return Fragment([
@@ -237,9 +321,9 @@
           Div({
             className: 'gh-panel-header',
           }, [
-            makeEl('h2', {}, `Index ${ i }`),
+            makeEl('h2', {}, `Index ${i}`),
             Button({
-              id: `delete-item-index-${ i }`,
+              id: `delete-item-index-${i}`,
               className: 'gh-button icon danger text small',
               onClick: e => {
                 State.request.splice(i, 1)
@@ -247,7 +331,7 @@
               },
             }, Dashicon('trash')),
           ]),
-          ParamsList(params, `${ i }`),
+          ParamsList(params, `${i}`),
         ])
       }),
       Button({
@@ -271,7 +355,7 @@
       currEndpoint().identifiers.forEach(({ param }) => {
         // replace it in the URL
         if (params[param]) {
-          url = url.replace(`<${ param }>`, params[param])
+          url = url.replace(`<${param}>`, params[param])
         }
         // remove it from the other request because it's in the URL
         delete params[param]
@@ -280,7 +364,7 @@
 
     // Method for GET is to use URL params
     if (METHOD === 'GET' && Object.keys(params).length) {
-      url = `${ url }?${ $.param(params) }`
+      url = `${url}?${$.param(params)}`
     }
 
     return {
@@ -311,7 +395,8 @@
                 fontSize: '16px',
                 marginTop: 0,
               },
-            }, __('Are you sure you want to execute this API call? It will make real changes to the database.', 'groundhogg')),
+            }, __('Are you sure you want to execute this API call? It will make real changes to the database.',
+              'groundhogg')),
             Div({
               className: 'display-flex flex-end gap-10',
             }, [
@@ -332,8 +417,7 @@
           ]))
         })
 
-      }
-      catch (err) {
+      } catch (err) {
         return
       }
 
@@ -346,8 +430,7 @@
           'X-WP-Nonce': wpApiSettings.nonce,
         },
       })
-    }
-    else {
+    } else {
       response = await fetch(url, {
         method: METHOD,
         headers: {
@@ -381,18 +464,18 @@
       METHOD === 'GET' ?
         // GET
         makeEl('pre', {}, escHTML([
-          `curl -X ${ METHOD } ${ url }`,
+          `curl -X ${METHOD} ${url}`,
         ].join('\n')))
 
         // Other methods
         : makeEl('pre', {}, escHTML([
-          `curl -X ${ METHOD } ${ url } \\`,
+          `curl -X ${METHOD} ${url} \\`,
           `-H 'Content-Type: application/json' \\`,
-          Object.keys(params).length ? `-d '${ JSON.stringify(params, null, 2) }'` : '',
+          Object.keys(params).length ? `-d '${JSON.stringify(params, null, 2)}'` : '',
         ].join('\n'))),
 
       Button({
-        id: `test-${ State.route }-${ State.endpoint }`,
+        id: `test-${State.route}-${State.endpoint}`,
         className: 'gh-button secondary full-width',
         onClick: sendTestRequest,
       }, __('Test Request')),
@@ -433,7 +516,7 @@
         className: 'gh-header sticky',
       }, [
         Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
-        `<h1>${ __('Rest API', 'groundhogg') }</h1>`,
+        `<h1>${__('Rest API', 'groundhogg')}</h1>`,
       ]),
 
       Div({
@@ -447,19 +530,19 @@
           let endpoints = item.endpoints
 
           return makeEl('li', {
-            id: `route-${ key }`,
+            id: `route-${key}`,
             className: State.route === key ? 'current' : '',
           }, [
-            makeEl('a', { href: `#${ key }` }, item.name),
+            makeEl('a', { href: `#${key}` }, item.name),
             makeEl('ul', {}, endpoints.keys().map(key2 => {
 
               let endpoint = endpoints[key2]
 
               return makeEl('li', {
-                id: `route-${ key }-endpoint-${ key2 }`,
+                id: `route-${key}-endpoint-${key2}`,
                 className: State.endpoint === key2 ? 'current' : '',
               }, makeEl('a', {
-                href: `#${ key }/${ key2 }`,
+                href: `#${key}/${key2}`,
               }, [
                 // endpoint.method ? `<code class="${ endpoint.method.toLowerCase() }">${ endpoint.method.toUpperCase() }</code>` : null,
                 endpoint.name,
@@ -477,8 +560,8 @@
           currEndpoint.description,
           currEndpoint.endpoint ? makeEl('h2', {}, __('Endpoint', 'groundhogg')) : null,
           currEndpoint.endpoint
-            ? `<pre><code class="${ currEndpoint.method.toLowerCase() }">${ currEndpoint.method.toUpperCase() }</code> ${ escHTML(
-              currEndpoint.endpoint) }</pre>`
+            ? `<pre><code class="${currEndpoint.method.toLowerCase()}">${currEndpoint.method.toUpperCase()}</code> ${escHTML(
+              currEndpoint.endpoint)}</pre>`
             : null,
           currEndpoint.identifiers?.length ? Fragment([
             makeEl('h2', {}, __('Identifiers', 'groundhogg')),
@@ -517,6 +600,12 @@
     // childrenOnly: true,
   })
 
+  const clear = () => {
+    morphdom(document.getElementById('api-docs'), Div({}, Div({})), {
+      childrenOnly: true,
+    })
+  }
+
   const stateFromHash = () => {
     let hash = location.hash
     let [route, endpoint = ''] = hash.substring(1).split('/')
@@ -531,9 +620,8 @@
 
   window.addEventListener('hashchange', e => {
     stateFromHash()
-
+    clear() // some weirdness happening here
     morph()
-
   })
 
   $(() => {
@@ -547,17 +635,205 @@
     document.getElementById('wpfooter').remove()
   })
 
+  const swv = word => ['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase())
+
+  const addBaseObjectCRUDEndpoints = (registry, {
+    plural = '',
+    singular = '',
+    route = '',
+    columns = [],
+    searchableColumns = [],
+    orderByColumns = [],
+    readParams = [],
+    dataParams = [],
+    metaParams = [],
+    moreParams = [],
+    meta = false,
+    commonMeta = [],
+    strings = {},
+  }) => {
+
+    strings = {
+      read: sprintf(__('List %s', 'groundhogg'), plural),
+      readDesc: sprintf(__('Retrieve multiple %s using a query.', 'groundhogg'), plural),
+      create: sprintf(__('Create %s', 'groundhogg'), plural),
+      createDesc: sprintf(__('Create multiple %s at once.', 'groundhogg'), plural),
+      update: sprintf(__('Update %s', 'groundhogg'), plural),
+      updateDesc: sprintf(__('Update multiple %s at once.', 'groundhogg'), plural),
+      delete: sprintf(__('Delete %s', 'groundhogg'), plural),
+      deleteDesc: sprintf(__('Delete multiple %s at once.', 'groundhogg'), plural),
+      readSingle: sprintf(swv(singular) ? __('Retrieve an %s', 'groundhogg') : __('Retrieve a %s', 'groundhogg'),
+        singular),
+      readSingleDesc: sprintf(__('Retrieves a single %s.', 'groundhogg'), singular),
+      createSingle: sprintf(swv(singular) ? __('Create an %s', 'groundhogg') : __('Create a %s', 'groundhogg'), singular),
+      createSingleDesc: sprintf(__('Create a single %s.', 'groundhogg'), singular),
+      updateSingle: sprintf(swv(singular) ? __('Update an %s', 'groundhogg') : __('Update a %s', 'groundhogg'), singular),
+      updateSingleDesc: sprintf(__('Update a single %s.', 'groundhogg'), singular),
+      deleteSingle: sprintf(swv(singular) ? __('Delete an %s', 'groundhogg') : __('Delete a %s', 'groundhogg'), singular),
+      deleteSingleDesc: sprintf(__('Delete a single %s.', 'groundhogg'), singular),
+      ...strings,
+    }
+
+    registry.add('read', {
+      name: strings.read,
+      description: () => Pg({}, strings.readDesc),
+      method: 'GET',
+      endpoint: route,
+      params: [
+        ...readParams,
+        CommonParams.include(plural),
+        CommonParams.exclude(plural),
+        CommonParams.search(plural, searchableColumns),
+        CommonParams.limit(plural),
+        CommonParams.offset(plural),
+        CommonParams.order(plural),
+        CommonParams.orderby(plural, orderByColumns),
+      ],
+      request: {},
+      response: {
+        items: [],
+        total_items: 0
+      },
+    })
+
+    registry.add('create', {
+      name: strings.create,
+      description: () => Pg({}, strings.createDesc),
+      method: 'POST',
+      endpoint: route,
+      repeater: true,
+      params: [
+        {
+          param: 'data',
+          type: 'object',
+          required: true,
+          subParams: [
+            ...dataParams,
+          ],
+          description: () => Fragment([
+            Pg({}, sprintf(__('The data object contains all the necessary information for a new %s.', 'groundhogg'), singular)),
+          ]),
+        },
+        ...moreParams
+      ],
+      request: [
+        {
+          data: {},
+        }],
+      response: {},
+    })
+
+    if (meta) {
+
+      const metaParam = CommonParams.meta()
+      if ( metaParams && metaParams.length ){
+        metaParam.subParams.push(...metaParams)
+      }
+
+      registry.create.params.push(metaParam)
+    }
+
+    registry.add('update', {
+      name: strings.update,
+      description: () => Pg({}, strings.updateDesc),
+      method: 'PATCH',
+      endpoint: route,
+      repeater: true,
+      params: [
+        {
+          param: 'ID',
+          type: 'int',
+          required: true,
+          description: () => Fragment([
+            Pg({}, sprintf(__('The ID of the %s to update.', 'groundhogg'), singular)),
+          ]),
+        },
+        ...registry.create.params,
+      ],
+      request: [
+        {
+          data: {},
+        }],
+      response: {},
+    })
+
+    registry.add('delete', {
+      name: strings.delete,
+      description: () => Pg({}, strings.deleteDesc),
+      method: 'DELETE',
+      endpoint: route,
+      params: [],
+      request: {},
+      response: {},
+    })
+
+    registry.add('create-single', {
+      name: strings.createSingle,
+      description: () => Pg({}, strings.createSingleDesc),
+      method: 'POST',
+      endpoint: `${route}/<id>`,
+      params: [
+        ...registry.create.params,
+      ],
+      request: {},
+      response: {},
+    })
+
+    registry.add('read-single', {
+      name: strings.readSingle,
+      description: () => Pg({}, strings.readSingleDesc),
+      method: 'GET',
+      endpoint: `${route}/<id>`,
+      identifiers: [
+        CommonParams.id(singular),
+      ],
+      request: {},
+      response: {},
+    })
+
+    registry.add('update-single', {
+      name: strings.updateSingle,
+      description: () => Pg({}, strings.updateSingleDesc),
+      method: 'PATCH',
+      endpoint: `${route}/<id>`,
+      identifiers: [
+        CommonParams.id(singular),
+      ],
+      params: [
+        ...registry.create.params,
+      ],
+      request: {},
+      response: {},
+    })
+
+    registry.add('delete-single', {
+      name: strings.deleteSingle,
+      description: () => Pg({}, strings.deleteSingleDesc),
+      method: 'DELETE',
+      endpoint: `${route}/<id>`,
+      identifiers: [
+        CommonParams.id(singular),
+      ],
+      request: {},
+      response: {},
+    })
+  }
+
   Groundhogg.apiDocs = {
     ApiRegistry,
     CommonParams,
     setInRequest,
-    getFromRequest
+    getFromRequest,
+    addBaseObjectCRUDEndpoints,
+    currEndpoint,
+    currRoute
   }
 
   ApiRegistry.add('auth', {
     name: __('Authentication'),
     description: () => Fragment([
-      Pg({}, __('Groundhogg offers a variety of authentication methods for you to use to access the REST API.', 'groundhogg')),
+      Pg({}, __('Groundhogg offers a variety of authentication methods for you to use to access the REST API.',
+        'groundhogg')),
       Ul({}, [
         Li({}, An({ href: '#auth/apikeys' }, __('Using API keys'))),
         Li({}, An({ href: '#auth/pswd' }, __('Using application passwords'))),
@@ -573,12 +849,15 @@
   ApiRegistry.auth.endpoints.add('apikeys', {
     name: __('Using API keys', 'groundhogg'),
     description: () => Fragment([
-      Pg({}, __('Using API keys is an easy way to get started with the REST API. And is suitable for most backend applications.', 'groundhogg')),
-      Pg({}, __('When creating an API key, you are provided with a <b>token</b> and a <b>public key</b>. Both are required to authenticate requests.',
+      Pg({}, __(
+        'Using API keys is an easy way to get started with the REST API. And is suitable for most backend applications.',
+        'groundhogg')),
+      Pg({}, __(
+        'When creating an API key, you are provided with a <b>token</b> and a <b>public key</b>. Both are required to authenticate requests.',
         'groundhogg')),
       Pg({}, __('You must add both to the header of your request.', 'groundhogg')),
       makeEl('pre', {}, escHTML([
-        `curl ${ apiRoot }/<endpoint> \\`,
+        `curl ${apiRoot}/<endpoint> \\`,
         `\t-H "Gh-Token: <token>" \\`,
         `\t-H "Gh-Public-Key: <public-key>"`,
       ].join('\n'))),
@@ -589,12 +868,14 @@
   ApiRegistry.auth.endpoints.add('pswd', {
     name: __('Using application passwords', 'groundhogg'),
     description: () => Fragment([
-      Pg({}, __('Using application passwords is the <b>BEST WAY</b> to use the Groundhogg REST API from external applications.', 'groundhogg')),
+      Pg({}, __(
+        'Using application passwords is the <b>BEST WAY</b> to use the Groundhogg REST API from external applications.',
+        'groundhogg')),
       Pg({}, __(
         'Applications passwords use basic authentication, which is supported by most external applications that you might want to integrate with Groundhogg.',
         'groundhogg')),
       makeEl('pre', {}, escHTML([
-        `curl --user "<username>:<application password>" ${ apiRoot }/<endpoint>`,
+        `curl --user "<username>:<application password>" ${apiRoot}/<endpoint>`,
       ].join('\n'))),
       Pg({}, __(
         'For more on application passwords, see the <a href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/" target="_blank">WordPress application password integration guide</a>.',
@@ -603,4 +884,4 @@
 
   })
 
-} )(jQuery)
+})(jQuery)

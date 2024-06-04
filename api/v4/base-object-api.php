@@ -531,7 +531,7 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
-	 * Delete contacts
+	 * Delete items
 	 *
 	 * @param WP_REST_Request $request
 	 *

@@ -1,4 +1,4 @@
-( ($) => {
+(($) => {
 
   const {
     searchOptionsWidget,
@@ -235,7 +235,7 @@
    * @param name
    * @returns {{name, id}}
    */
-  const createGroup = (id, name) => ( { id, name } )
+  const createGroup = (id, name) => ({ id, name })
 
   /**
    * Create a filter base function
@@ -253,7 +253,7 @@
   const createFilter = (
     type, name, group,
     { edit = () => null, display = () => null, preload = () => {} },
-    defaults = {}) => ( {
+    defaults = {}) => ({
     type,
     name,
     group,
@@ -261,7 +261,7 @@
     display,
     preload,
     defaults,
-  } )
+  })
 
   /**
    * Create a string comparison filter
@@ -428,7 +428,7 @@
     type, name, group,
     { edit = () => null, display = () => null, preload = () => {} } = {},
     defaults = {},
-    dateRanges = {}
+    dateRanges = {},
   ) => createFilter(type,
     name, group, {
       edit: ({ date_range, compare = 'is', before, after, updateFilter, days = 0, ...rest }) => Fragment([
@@ -439,7 +439,7 @@
             name: 'compare',
             options: {
               is: 'Is',
-              is_not: 'Is not'
+              is_not: 'Is not',
             },
             selected: compare,
             onChange: e => updateFilter({
@@ -472,7 +472,7 @@
             before: e.target.value,
           }),
         }) : null,
-        date_range === 'x_days' || date_range === 'next_x_days'  ? Input({
+        date_range === 'x_days' || date_range === 'next_x_days' ? Input({
           type: 'number',
           value: days,
           id: 'filter-days',
@@ -483,12 +483,12 @@
       ]),
       display: ({ compare = 'is', date_range, after, before, days = 0, ...rest }) => {
 
-        let prefix = display( rest )
-        if ( ! prefix || prefix.length === 0 ){
-          prefix = bold( name )
+        let prefix = display(rest)
+        if (!prefix || prefix.length === 0) {
+          prefix = bold(name)
         }
 
-        if ( compare === 'is_not' ){
+        if (compare === 'is_not') {
           prefix += ' is not'
         }
 
@@ -504,7 +504,7 @@
             return ComparisonsTitleGenerators.before(prefix,
               formatDate(before))
           default:
-            return sprintf('%s %s', prefix, dateRanges[date_range ?? 'any']?.replace( 'X', days ).toLowerCase() )
+            return sprintf('%s %s', prefix, dateRanges[date_range ?? 'any']?.replace('X', days).toLowerCase())
         }
       },
       preload,
@@ -513,7 +513,7 @@
       before: '',
       after: '',
       days: 0,
-      compare: 'is'
+      compare: 'is',
     })
 
   /**
@@ -529,10 +529,10 @@
    */
   const createDateFilter = (
     type, name, group, callbacks, defaults = {},
-  ) => dateFilterFactory( type, name, group, callbacks, {
+  ) => dateFilterFactory(type, name, group, callbacks, {
     date_range: '24_hours',
-    ...defaults
-  }, allDateRanges )
+    ...defaults,
+  }, allDateRanges)
 
   /**
    * Create a filter that compares against previous dates
@@ -547,10 +547,10 @@
    */
   const createPastDateFilter = (
     type, name, group, callbacks, defaults = {},
-  ) => dateFilterFactory( type, name, group, callbacks, {
+  ) => dateFilterFactory(type, name, group, callbacks, {
     date_range: '24_hours',
-    ...defaults
-  }, pastDateRanges )
+    ...defaults,
+  }, pastDateRanges)
 
   /**
    * Create a filter that compares a value to given dates in the future
@@ -565,10 +565,10 @@
    */
   const createFutureDateFilter = (
     type, name, group, callbacks, defaults = {},
-  ) => dateFilterFactory( type, name, group, callbacks, {
+  ) => dateFilterFactory(type, name, group, callbacks, {
     date_range: 'next_24_hours',
-    ...defaults
-  }, futureDateRanges )
+    ...defaults,
+  }, futureDateRanges)
 
   /**
    * Create a select filter, which is just a comparison filter with fixed
@@ -612,8 +612,9 @@
   const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
     id: 'filter-options',
     noneSelected: 'Type to search...',
-    selected: options.map(opt => ( { id: opt, text: opt } )),
-    fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).map(opt => ( { id: opt, text: opt } )),
+    selected: options.map(opt => ({ id: opt, text: opt })),
+    fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).
+    map(opt => ({ id: opt, text: opt })),
     onChange: items => updateFilter({
       options: items.map(item => item.id),
     }),
@@ -668,7 +669,8 @@
           updateFilter,
         }),
       ]),
-      display: ({ options, compare }) => ComparisonsTitleGenerators[compare](bold(label), orList(options.map(o => bold(o)))),
+      display: ({ options, compare }) => ComparisonsTitleGenerators[compare](bold(label),
+        orList(options.map(o => bold(o)))),
     }, {
       compare: 'in',
       options: [],
@@ -747,7 +749,7 @@
   const FilterRegistry = ({
     groups = [],
     filters = [],
-  } = {}) => ( {
+  } = {}) => ({
 
     groups: groups.reduce((carr, curr) => {
       carr[curr.id] = curr.name
@@ -762,8 +764,7 @@
     registerGroup (group, name) {
       if (group && name) {
         this.groups[group] = name
-      }
-      else {
+      } else {
         this.groups[group.id] = group.name
       }
     },
@@ -783,9 +784,9 @@
       return name
     },
 
-    displayFilters( filters ){
+    displayFilters (filters) {
       return filters.map(group => group.map(filter => {
-        return Div( {}, this.display( filter ) ).innerHTML
+        return Div({}, this.display(filter)).innerHTML
       }).join(' and ')).join(' or ')
     },
 
@@ -823,15 +824,14 @@
           if (promise) {
             promises.push(promise)
           }
-        }
-        catch (err) {}
+        } catch (err) {}
       }))
 
       return Promise.all(promises)
 
     },
 
-    registerFromProperties ( properties ) {
+    registerFromProperties (properties) {
 
       const {
         tabs, fields, groups,
@@ -841,9 +841,9 @@
 
         Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
 
-          let groupId = `${ t.id }-${ s.id }`
+          let groupId = `${t.id}-${s.id}`
 
-          this.registerGroup(groupId, `${ t.name }: ${ s.name }`)
+          this.registerGroup(groupId, `${t.name}: ${s.name}`)
 
           Object.values(fields).filter(f => f.group === s.id).forEach(f => {
 
@@ -860,10 +860,9 @@
 
       })
 
+    },
 
-    }
-
-  } )
+  })
 
   /**
    * Create a filters editor
@@ -895,8 +894,7 @@
     const morph = () => {
       try {
         morphdom(document.getElementById(id), FiltersEditor())
-      }
-      catch (e) {
+      } catch (e) {
         // not in the dom yet
         console.log(e)
       }
@@ -937,14 +935,13 @@
         message = err instanceof Error ? err.message : sprintf(
           __('This %s filter is corrupted', 'groundhogg'),
           bold(filterRegistry.filterName(filter)))
-      }
-      else {
+      } else {
         message = sprintf(__('This %s filter is not available.', 'groundhogg'),
           bold(filter.type))
       }
 
       return Div({
-        id: `filter-${ filter.id }`,
+        id: `filter-${filter.id}`,
         className: 'filter filter-view filter-broken',
         tabindex: 0,
         onClick: e => {
@@ -960,7 +957,7 @@
         }, message),
         Button({
           type: 'button',
-          id: `delete-${ group }-${ index }`,
+          id: `delete-${group}-${index}`,
           className: 'delete-filter',
           onClick: e => {
             e.preventDefault()
@@ -980,7 +977,7 @@
      * @constructor
      */
     const Filter = (filter, group, index) => Div({
-      id: `filter-${ filter.id }`,
+      id: `filter-${filter.id}`,
       onClick: e => {
         if (clickedIn(e, '.delete-filter')) {
           return
@@ -999,7 +996,7 @@
       }, filterRegistry.displayName(filter)),
       Button({
         type: 'button',
-        id: `delete-${ group }-${ index }`,
+        id: `delete-${group}-${index}`,
         className: 'delete-filter',
         onClick: e => deleteFilter(group, index),
       }, Dashicon('no-alt')),
@@ -1025,10 +1022,9 @@
        */
       const morphFilter = () => {
         try {
-          morphdom(document.getElementById(`filter-${ id }-settings`),
+          morphdom(document.getElementById(`filter-${id}-settings`),
             FilterSettings())
-        }
-        catch (e) {}
+        } catch (e) {}
       }
 
       /**
@@ -1055,12 +1051,12 @@
        * @constructor
        */
       const FilterSettings = () => Div({
-        id: `filter-${ id }-settings`,
+        id: `filter-${id}-settings`,
         className: 'settings',
       }, filterRegistry.edit(tempFilterSettings, updateTempFilterSettings))
 
       return Div({
-        id: `edit-filter-${ filter.id }`,
+        id: `edit-filter-${filter.id}`,
         className: `filter filter-edit-wrap filter-${filter.type}`,
         tabindex: 0,
       }, Div({
@@ -1086,14 +1082,14 @@
 
           Button({
             type: 'button',
-            id: `delete-${ group }-${ index }`,
+            id: `delete-${group}-${index}`,
             className: 'delete delete-filter',
             onClick: e => deleteFilter(group, index),
           }, Dashicon('trash')),
 
           Button({
             type: 'button',
-            id: `commit-${ group }-${ index }`,
+            id: `commit-${group}-${index}`,
             className: 'commit commit-filter',
             onClick: e => updateFilter(tempFilterSettings, group, index),
           }, Dashicon('yes')),
@@ -1111,7 +1107,7 @@
      * @constructor
      */
     const FilterGroup = (filters, group) => Div({
-      id: `group-${ group }`,
+      id: `group-${group}`,
       className: 'group',
     }, [
       ...filters.map((filter, index) => {
@@ -1120,15 +1116,14 @@
             return EditFilter(filter, group, index)
           }
           return Filter(filter, group, index)
-        }
-        catch (err) {
+        } catch (err) {
           return FilterBroken(filter, group, index, err)
         }
 
       }),
       Button({
         type: 'button',
-        id: `add-filter-to-${ group }`,
+        id: `add-filter-to-${group}`,
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
 
@@ -1148,7 +1143,7 @@
                 ...option.defaults,
               }
 
-              console.log( newFilter )
+              console.log(newFilter)
 
               addFilter(newFilter, group)
             },
@@ -1180,8 +1175,7 @@
 
       if (filters[group]) {
         filters[group].push(filter)
-      }
-      else {
+      } else {
         filters.push([filter])
       }
 
@@ -1242,7 +1236,7 @@
      * @constructor
      */
     const GroupSeparator = (after) => Div({
-      id: `after-${ after }`,
+      id: `after-${after}`,
       className: 'or-separator',
     }, Span({
       className: 'or-circle',
@@ -1258,9 +1252,9 @@
       id,
       className: `search-filters`,
     }, Span({
-      id: `${ id }-loading`,
+      id: `${id}-loading`,
       className: 'filters-loading',
-    }, Ellipses(  __('Loading') )))
+    }, Ellipses(__('Loading'))))
 
     /**
      * The wrapper for all the filters
@@ -1273,7 +1267,7 @@
       if (!State.get('preloaded')) {
 
         filterRegistry.preloadFilters(filters).
-          then(() => setState({ preloaded: true }))
+        then(() => setState({ preloaded: true }))
 
         return FiltersLoading()
       }
@@ -1297,6 +1291,52 @@
     return FiltersEditor()
   }
 
+  const createFilterRegistryFromConfig = ({
+    stringColumns = {},
+    numberColumns = {},
+    dateColumns = {},
+    futureDateColumns = {},
+    selectColumns = {},
+    name = '',
+    group = 'table'
+  }) => {
+
+    const Registry = FilterRegistry({})
+
+    Registry.registerGroup(createGroup(group, name))
+
+    for (let column in stringColumns) {
+      Registry.registerFilter(
+        createStringFilter(column, stringColumns[column], group))
+    }
+
+    for (let column in numberColumns) {
+      Registry.registerFilter(
+        createNumberFilter(column, numberColumns[column], group))
+    }
+
+    for (let column in selectColumns) {
+      Registry.registerFilter(
+        createSelectFilter(column, selectColumns[column][0], group, selectColumns[column][1]))
+    }
+
+    for (let column in dateColumns) {
+      Registry.registerFilter(
+        createPastDateFilter(column, dateColumns[column], group), {
+          display: () => bold(name),
+        })
+    }
+
+    for (let column in futureDateColumns) {
+      Registry.registerFilter(
+        createFutureDateFilter(column, futureDateColumns[column], group), {
+          display: () => bold(name),
+        })
+    }
+
+    return Registry
+  }
+
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}
   }
@@ -1312,6 +1352,7 @@
   Groundhogg.filters.createFutureDateFilter = createFutureDateFilter
   Groundhogg.filters.createDateFilter = createDateFilter
   Groundhogg.filters.createSelectFilter = createSelectFilter
+  Groundhogg.filters.createFilterRegistryFromConfig = createFilterRegistryFromConfig
   Groundhogg.filters.comparisons = {
     ComparisonsTitleGenerators,
     AllComparisons,
@@ -1327,47 +1368,14 @@
 
     const {
       id = '',
-      name = '',
-      stringColumns = {},
-      numberColumns = {},
-      dateColumns = {},
-      futureDateColumns = {},
-      selectColumns = {},
       filters = [],
+      ...TableFilterConfig
     } = GroundhoggTableFilters
 
-    const TableFilterRegistry = FilterRegistry({})
-
-    TableFilterRegistry.registerGroup(createGroup('table', name))
-
-    for (let column in stringColumns) {
-      TableFilterRegistry.registerFilter(
-        createStringFilter(column, stringColumns[column], 'table'))
-    }
-
-    for (let column in numberColumns) {
-      TableFilterRegistry.registerFilter(
-        createNumberFilter(column, numberColumns[column], 'table'))
-    }
-
-    for (let column in selectColumns) {
-      TableFilterRegistry.registerFilter(
-        createSelectFilter(column, selectColumns[column][0], 'table', selectColumns[column][1]))
-    }
-
-    for (let column in dateColumns) {
-      TableFilterRegistry.registerFilter(
-        createPastDateFilter(column, dateColumns[column], 'table'), {
-          display: () => bold(name),
-        })
-    }
-
-    for (let column in futureDateColumns) {
-      TableFilterRegistry.registerFilter(
-        createFutureDateFilter(column, futureDateColumns[column], 'table'), {
-          display: () => bold(name),
-        })
-    }
+    const TableFilterRegistry = createFilterRegistryFromConfig({
+      ...TableFilterConfig,
+      group: 'table'
+    })
 
     GroundhoggTableFilters.FilterRegistry = TableFilterRegistry
 
@@ -1383,4 +1391,4 @@
     })
   }
 
-} )(jQuery)
+})(jQuery)

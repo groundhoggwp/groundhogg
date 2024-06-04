@@ -258,11 +258,11 @@ class Contacts_Api extends Base_Object_Api {
 
 			foreach ( $items as $item ) {
 
-				$id          = get_array_var( $item, 'ID' );
-				$data        = get_array_var( $item, 'data', [] );
-				$meta        = get_array_var( $item, 'meta', [] );
-				$add_tags    = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
-				$remove_tags = get_array_var( $item, 'remove_tags', [] );
+				$id            = get_array_var( $item, 'ID' );
+				$data          = get_array_var( $item, 'data', [] );
+				$meta          = get_array_var( $item, 'meta', [] );
+				$add_tags      = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
+				$remove_tags   = get_array_var( $item, 'remove_tags', [] );
 				$email_address = get_array_var( $data, 'email' );
 
 				if ( ! $id && ! $email_address ) {
@@ -572,7 +572,7 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query_vars = wp_parse_args( $request->get_params() );
+		$query_vars = $request->has_param( 'query' ) ? wp_parse_args( $request->get_param( 'query' ) ?: [] ) : wp_parse_args( $request->get_params() );
 
 		$query_vars = wp_parse_args( $query_vars, [
 			'orderby'       => $this->get_primary_key(),

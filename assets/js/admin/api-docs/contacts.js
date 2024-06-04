@@ -128,48 +128,67 @@
             ]),
             type: 'int',
           },
-        ],
-      },
-      {
-        param: 'meta',
-        description: () => Fragment([
-          Pg({}, __('The meta object can contain any number of arbitrary key&rarr;value pairs.', 'groundhogg')),
-          Pg({},
-            __('All custom fields, as well as some of the other basic fields (primary_phone, street_address_1, etc.) must be added within the meta object.',
-              'groundhogg')),
-        ]),
-        type: 'object',
-        required: false,
-        subParams: [
           {
-            param: '<key>',
-            description: Pg({}, __('Any arbitrary key with any arbitrary value.', 'groundhogg')),
-            type: 'mixed',
-            required: false,
-            control: ({ param, id, name }) => {
-
-              param = param.replace('.<key>', '') // remove <key> from param since we're editing the meta object directly
-
-              let meta = getFromRequest(param, {})
-              let rows = Object.keys(meta).map(key => ( [key, meta[key]] ))
-
-              return InputRepeater({
-                id,
-                rows: rows,
-                cells: [
-                  props => Input(props),
-                  props => Input(props),
-                ],
-                onChange: rows => {
-                  let newMeta = {}
-                  rows.forEach(([key, val]) => newMeta[key] = val)
-                  setInRequest(param.replace('.<key>', ''), newMeta)
-                },
-              })
-            },
+            param: 'owner_id',
+            description: () => Fragment([
+              Pg({}, __('The ID of the WordPress user assigned to the contact.', 'groundhogg')),
+            ]),
+            type: 'int',
           },
         ],
       },
+      (metaParam => {
+
+        let metaParams = [
+          {
+            param: 'mobile_phone',
+            type: 'string',
+            description: __( 'Mobile phone number', 'groundhogg' )
+          },
+          {
+            param: 'primary_phone',
+            type: 'string',
+            description: __( 'Primary phone number', 'groundhogg' )
+          },
+          {
+            param: 'street_address_1',
+            type: 'string',
+            description: __( 'Address line 1', 'groundhogg' )
+          },
+          {
+            param: 'street_address_2',
+            type: 'string',
+            description: __( 'Address line 2', 'groundhogg' )
+          },
+          {
+            param: 'city',
+            type: 'string',
+            description: __( 'City', 'groundhogg' )
+          },
+          {
+            param: 'region',
+            type: 'string',
+            description: __( 'The state/province/district', 'groundhogg' )
+          },
+          {
+            param: 'country',
+            type: 'string',
+            description: __( 'The 2 character country code.', 'groundhogg' )
+          },
+          {
+            param: 'postal_zip',
+            type: 'string',
+            description: __( 'The postal/zip code.', 'groundhogg' )
+          },
+        ]
+
+        metaParam.subParams = [
+          ...metaParam.subParams,
+          ...metaParams
+        ]
+
+        return metaParam
+      })(CommonParams.meta()),
       CommonParams.tags('tags'),
     ],
     repeater: true,
@@ -609,6 +628,7 @@
               props => Input({
                 ...props,
                 type: 'number',
+                placeholder: __('Contact ID')
               }),
             ],
             onChange: rows => {

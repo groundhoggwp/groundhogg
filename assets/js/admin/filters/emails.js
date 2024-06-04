@@ -1,15 +1,8 @@
 ( () => {
 
-  if (!window.GroundhoggTableFilters) {
-    console.log('here')
-    return
-  }
-
-  const { FilterRegistry } = GroundhoggTableFilters
   const { createFilter } = Groundhogg.filters
 
   const {
-    contacts: ContactsStore,
     funnels: FunnelsStore,
     campaigns: CampaignsStore,
   } = Groundhogg.stores
@@ -63,123 +56,131 @@
     },
   })
 
-  FilterRegistry.registerFilter(createFilter('from_user', 'From User', 'table', {
-    display: ({ users = [] }) => {
+  const registerEmailFilters = (Registry, group = 'table') => {
 
-      if (!users.length) {
-        return 'Any user'
-      }
+    Registry.registerFilter(createFilter('from_user', 'From User', group, {
+      display: ({ users = [] }) => {
 
-      return sprintf('From %s', orList(users.map(user_id => {
-
-        if (user_id == 0) {
-          return bold(__('The contact owner', 'groundhogg'))
+        if (!users.length) {
+          return 'Any user'
         }
 
-        return bold(getOwner(user_id).data.user_email)
-      })))
-    },
-    edit: ({ users = [], updateFilter }) => Fragment([
-      OwnerPicker(users, updateFilter),
-    ]),
-  }))
+        return sprintf('From %s', orList(users.map(user_id => {
 
-  FilterRegistry.registerFilter(createFilter('author', 'Author', 'table', {
-    display: ({ users = [] }) => {
-
-      if (!users.length) {
-        return 'Any author'
-      }
-
-      return sprintf('Author is %s', orList(users.map(user_id => bold(getOwner(user_id).data.display_name))))
-    },
-    edit: ({ users = [], updateFilter }) => Fragment([
-      OwnerPicker(users, updateFilter),
-    ]),
-  }))
-
-  FilterRegistry.registerFilter(createFilter('funnel', 'Funnel', 'table', {
-    display: ({ funnel_id = false }) => {
-
-      if (!funnel_id) {
-        return 'Any funnel'
-      }
-
-      return sprintf('In funnel %s', bold( FunnelsStore.get(funnel_id).data.title ) )
-    },
-    edit: ({ funnel_id = false, updateFilter }) => Fragment([
-      ItemPicker({
-        id: `select-a-funnel`,
-        noneSelected: __('Select a funnel...', 'groundhogg'),
-        selected: funnel_id ? { id: funnel_id, text: FunnelsStore.get(funnel_id).data.title } : [],
-        multiple: false,
-        style: {
-          flexGrow: 1,
-        },
-        fetchOptions: (search) => {
-          return FunnelsStore.fetchItems({
-            search,
-          }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
-        },
-        onChange: item => {
-          if (!item) {
-            updateFilter({
-              funnel_id: null,
-            })
-            return
+          if (user_id == 0) {
+            return bold(__('The contact owner', 'groundhogg'))
           }
 
-          updateFilter({
-            funnel_id: item.id,
-          })
-        },
-      }),
-    ]),
-    preload: ({ funnel_id }) => {
-      if (funnel_id) {
-        return FunnelsStore.maybeFetchItem(funnel_id)
-      }
-    },
-  }))
+          return bold(getOwner(user_id).data.user_email)
+        })))
+      },
+      edit: ({ users = [], updateFilter }) => Fragment([
+        OwnerPicker(users, updateFilter),
+      ]),
+    }))
+
+    Registry.registerFilter(createFilter('author', 'Author', group, {
+      display: ({ users = [] }) => {
+
+        if (!users.length) {
+          return 'Any author'
+        }
+
+        return sprintf('Author is %s', orList(users.map(user_id => bold(getOwner(user_id).data.display_name))))
+      },
+      edit: ({ users = [], updateFilter }) => Fragment([
+        OwnerPicker(users, updateFilter),
+      ]),
+    }))
+
+    Registry.registerFilter(createFilter('funnel', 'Funnel', group, {
+      display: ({ funnel_id = false }) => {
+
+        if (!funnel_id) {
+          return 'Any funnel'
+        }
+
+        return sprintf('In funnel %s', bold( FunnelsStore.get(funnel_id).data.title ) )
+      },
+      edit: ({ funnel_id = false, updateFilter }) => Fragment([
+        ItemPicker({
+          id: `select-a-funnel`,
+          noneSelected: __('Select a funnel...', 'groundhogg'),
+          selected: funnel_id ? { id: funnel_id, text: FunnelsStore.get(funnel_id).data.title } : [],
+          multiple: false,
+          style: {
+            flexGrow: 1,
+          },
+          fetchOptions: (search) => {
+            return FunnelsStore.fetchItems({
+              search,
+            }).then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+          },
+          onChange: item => {
+            if (!item) {
+              updateFilter({
+                funnel_id: null,
+              })
+              return
+            }
+
+            updateFilter({
+              funnel_id: item.id,
+            })
+          },
+        }),
+      ]),
+      preload: ({ funnel_id }) => {
+        if (funnel_id) {
+          return FunnelsStore.maybeFetchItem(funnel_id)
+        }
+      },
+    }))
 
 
-  FilterRegistry.registerFilter(createFilter('campaigns', 'Campaigns', 'table', {
-    display: ({ campaigns = [] }) => {
+    Registry.registerFilter(createFilter('campaigns', 'Campaigns', group, {
+      display: ({ campaigns = [] }) => {
 
-      if (!campaigns.length) {
-        return 'Any campaign'
-      }
+        if (!campaigns.length) {
+          return 'Any campaign'
+        }
 
-      return sprintf('Campaigns are %s', andList(campaigns.map(id => bold(CampaignsStore.get(id).data.name))))
-    },
-    edit: ({ campaigns = [], updateFilter }) => Fragment([
-      ItemPicker({
-        id: `select-campaigns`,
-        noneSelected: __('Select campaigns...', 'groundhogg'),
-        selected: campaigns.map(id => ( { id, text: CampaignsStore.get(id).data.name } )),
-        multiple: true,
-        style: {
-          flexGrow: 1,
-        },
-        fetchOptions: async (search) => {
-          let items = await CampaignsStore.fetchItems({
-            search,
-          })
+        return sprintf('Campaigns are %s', andList(campaigns.map(id => bold(CampaignsStore.get(id).data.name))))
+      },
+      edit: ({ campaigns = [], updateFilter }) => Fragment([
+        ItemPicker({
+          id: `select-campaigns`,
+          noneSelected: __('Select campaigns...', 'groundhogg'),
+          selected: campaigns.map(id => ( { id, text: CampaignsStore.get(id).data.name } )),
+          multiple: true,
+          style: {
+            flexGrow: 1,
+          },
+          fetchOptions: async (search) => {
+            let items = await CampaignsStore.fetchItems({
+              search,
+            })
 
-          return items.map(({ ID: id, data: { name } }) => ( { id, text: name } ))
-        },
-        onChange: items => {
-          updateFilter({
-            campaigns: items.map(({ id }) => id),
-          })
-        },
-      }),
-    ]),
-    preload: ({ campaigns = [] }) => {
-      if (campaigns && campaigns.length) {
-        return CampaignsStore.maybeFetchItems(campaigns)
-      }
-    },
-  }))
+            return items.map(({ ID: id, data: { name } }) => ( { id, text: name } ))
+          },
+          onChange: items => {
+            updateFilter({
+              campaigns: items.map(({ id }) => id),
+            })
+          },
+        }),
+      ]),
+      preload: ({ campaigns = [] }) => {
+        if (campaigns && campaigns.length) {
+          return CampaignsStore.maybeFetchItems(campaigns)
+        }
+      },
+    }))
+  }
 
-} )()
+  if ( window.GroundhoggTableFilters ){
+    registerEmailFilters( GroundhoggTableFilters.FilterRegistry )
+  }
+
+  Groundhogg.filters.registerEmailFilters = registerEmailFilters
+})()
