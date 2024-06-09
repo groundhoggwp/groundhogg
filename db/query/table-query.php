@@ -18,7 +18,7 @@ class Table_Query extends Query {
 	/**
 	 * @var DB
 	 */
-	protected $db_table = '';
+	protected $db_table;
 
 	/**
 	 * @param $table      DB|string
@@ -34,7 +34,74 @@ class Table_Query extends Query {
 		parent::__construct( $table->table_name, $table->alias );
 	}
 
-	protected $sanitize_columns = true;
+	/**
+	 * Parse params from an array into the query
+	 *
+	 * @throws FilterException
+	 *
+	 * @param array $params
+	 *
+	 * @return Table_Query
+	 */
+	public function set_query_params( array $params ) {
+
+		$params = wp_parse_args( $params, [
+			'search_columns' => $this->db_table->get_searchable_columns(),
+		] );
+
+		foreach ( $params as $param => $value ){
+			$param = strtolower( $param );
+
+			// handle column
+			if ( $this->db_table->has_column( $param ) ){
+
+				if ( is_array( $value ) ){
+					$this->where->in( $param, $value );
+				} else {
+					$this->where->equals( $param, $value );
+				}
+
+				continue;
+			}
+
+			switch ( $param ){
+				case 's':
+				case 'search':
+				case 'term':
+					$this->search( $value, wp_parse_list( $params['search_columns'] ) );
+					break;
+				case 'filters':
+				case 'include_filters':
+					$this->parseFilters( $value );
+					break;
+				case 'exclude_filters':
+
+					$exclude_query = new Table_Query( $this->db_table );
+					$exclude_query->setSelect( $this->db_table->get_primary_key() );
+					$exclude_query->parseFilters( $value );
+
+					if ( ! $exclude_query->where->isEmpty() ) {
+						$this->where()->notIn( $this->db_table->get_primary_key(), "$exclude_query" );
+					}
+
+					break;
+				case 'include':
+					$this->whereIn( $this->db_table->get_primary_key(), $value );
+					break;
+				case 'exclude':
+					$this->whereNotIn( $this->db_table->get_primary_key(), $value );
+					break;
+				case 'before':
+					$this->where->lessThanEqualTo( $this->db_table->get_date_key(), $value );
+					break;
+				case 'after':
+					$this->where->greaterThanEqualTo( $this->db_table->get_date_key(), $value );
+					break;
+			}
+		}
+
+		return parent::set_query_params( $params );
+	}
 
 	/**
 	 * Given filters, modify the query accordingly
@@ -48,6 +115,8 @@ class Table_Query extends Query {
 	public function parseFilters( $filters ) {
 		$this->db_table->parse_filters( $filters, $this->where );
 	}
+
+	protected $sanitize_columns = true;
 
 	protected function toggleColumnSanitization() {
 
@@ -335,9 +404,11 @@ class Table_Query extends Query {
 	 * Map the items to a specific class
 	 * Wrapper for get_results
 	 *
+	 * @param string $as pass a specific class, by default uses whatever is provided by the table
+	 *
 	 * @return Base_Object[]
 	 */
-	public function get_objects( $as = '' ) {
+	public function get_objects( string $as = '' ) {
 
 		$items = $this->get_results();
 

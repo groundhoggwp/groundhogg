@@ -519,17 +519,6 @@ function base64url_encode( $stuff ) {
 }
 
 /**
- * Base64 decode stuff from url
- *
- * @param $stuff
- *
- * @return false|string
- */
-function base64url_decode( $stuff ) {
-	return base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $stuff ) );
-}
-
-/**
  * Encodes a string via json and base64, typically for a URL
  *
  * @param $query
@@ -538,6 +527,17 @@ function base64url_decode( $stuff ) {
  */
 function base64_json_encode( $query ) {
 	return base64url_encode( wp_json_encode( $query ) );
+}
+
+/**
+ * Base64 decode stuff from url
+ *
+ * @param $stuff
+ *
+ * @return false|string
+ */
+function base64url_decode( $stuff ) {
+	return base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $stuff ) );
 }
 
 /**
@@ -6254,64 +6254,36 @@ function disable_emojis_remove_dns_prefetch( $urls, $relation_type ) {
 }
 
 /**
- * Returns an array of all the meta keys in a table.
- *
- * @return array
- */
-function get_keys() {
-	global $wpdb;
-	$table = get_db( 'contactmeta' );
-
-	$keys = $wpdb->get_col(
-		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} ORDER BY meta_key ASC"
-	);
-
-	$key_array = array_combine( $keys, $keys );
-
-	return $key_array;
-}
-
-function get_pages_list() {
-	$pages      = get_pages();
-	$lists_page = array();
-	foreach ( $pages as $page ) {
-		$lists_page[] = get_page_link( $page->ID );
-	}
-
-	return $lists_page;
-}
-
-/**
  * Creates a relationship between two objects
  *
- * @param $primary   Base_Object
- * @param $secondary Base_Object
+ * @param $parent   Base_Object
+ * @param $child    Base_Object
  *
  * @return bool
  */
-function create_object_relationship( $primary, $secondary ) {
+function create_object_relationship( $parent, $child ) {
 	return (bool) get_db( 'object_relationships' )->add( [
-		'primary_object_id'     => $primary->get_id(),
-		'primary_object_type'   => $primary->get_object_type,
-		'secondary_object_id'   => $secondary->get_id(),
-		'secondary_object_type' => $secondary->get_object_type,
+		'primary_object_id'     => $parent->get_id(),
+		'primary_object_type'   => $parent->_get_object_type(),
+		'secondary_object_id'   => $child->get_id(),
+		'secondary_object_type' => $child->_get_object_type(),
 	] );
 }
 
 /**
  * Delete a relationship between two objects
  *
- * @param Base_Object $primary
- * @param Base_Object $secondary
+ * @param Base_Object $parent
+ * @param Base_Object $child
  *
  * @return bool
  */
-function delete_object_relationship( $primary, $secondary ) {
+function delete_object_relationship( $parent, $child ) {
 	return get_db( 'object_relationships' )->delete( [
-		'primary_object_id'     => $primary->get_id(),
-		'primary_object_type'   => $primary->get_object_type,
-		'secondary_object_id'   => $secondary->get_id(),
-		'secondary_object_type' => $secondary->get_object_type,
+		'primary_object_id'     => $parent->get_id(),
+		'primary_object_type'   => $parent->_get_object_type(),
+		'secondary_object_id'   => $child->get_id(),
+		'secondary_object_type' => $child->_get_object_type(),
 	] );
 }
 
@@ -6319,17 +6291,17 @@ function delete_object_relationship( $primary, $secondary ) {
 /**
  * Delete a relationship between two objects
  *
- * @param Base_Object $primary
- * @param Base_Object $secondary
+ * @param Base_Object $parent
+ * @param Base_Object $child
  *
  * @return bool
  */
-function has_object_relationship( $primary, $secondary ) {
+function has_object_relationship( $parent, $child ) {
 	return get_db( 'object_relationships' )->exists( [
-		'primary_object_id'     => $primary->get_id(),
-		'primary_object_type'   => $primary->get_object_type,
-		'secondary_object_id'   => $secondary->get_id(),
-		'secondary_object_type' => $secondary->get_object_type,
+		'primary_object_id'     => $parent->get_id(),
+		'primary_object_type'   => $parent->_get_object_type(),
+		'secondary_object_id'   => $child->get_id(),
+		'secondary_object_type' => $child->_get_object_type(),
 	] );
 }
 
@@ -6337,12 +6309,12 @@ function has_object_relationship( $primary, $secondary ) {
  * Get relationships for an object
  *
  * @param Base_Object $object
- * @param bool        $is_primary
+ * @param bool        $is_parent
  */
-function get_object_relationships( $object, $is_primary = true ) {
+function get_object_relationships( $object, $is_parent = true ) {
 	return get_db( 'object_relationships' )->query( [
-		$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $object->get_id(),
-		$is_primary ? 'primary_object_type' : 'secondary_object_type' => $object->get_object_type,
+		$is_parent ? 'primary_object_id' : 'secondary_object_id'     => $object->get_id(),
+		$is_parent ? 'primary_object_type' : 'secondary_object_type' => $object->_get_object_type(),
 	] );
 }
 
@@ -6483,8 +6455,8 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
  */
 function enqueue_filter_assets() {
 
-	wp_enqueue_script( 'groundhogg-admin-search-filters' );
-	wp_enqueue_style( 'groundhogg-admin-search-filters' );
+	wp_enqueue_script( 'groundhogg-admin-filter-contacts' );
+	wp_enqueue_style( 'groundhogg-admin-filters' );
 
 	do_action( 'groundhogg_enqueue_filter_assets' );
 }
@@ -7588,11 +7560,11 @@ function date_started_using_groundhogg() {
 		'order'   => 'ASC'
 	] );
 
-    if ( empty( $oldestContacts ) ){
-        return new DateTimeHelper();
-    }
+	if ( empty( $oldestContacts ) ) {
+		return new DateTimeHelper();
+	}
 
-    return new DateTimeHelper( $oldestContacts[0]->date_created );
+	return new DateTimeHelper( $oldestContacts[0]->date_created );
 }
 
 /**

@@ -6,6 +6,7 @@ $primary-blue-10: rgba(0, 117, 255, 0.10);
 $primary-blue-7: rgba(0, 117, 255, 0.07);
 $primary-blue-2: rgba(0, 117, 255, 0.02);
 $primary-dark: rgb(16, 38, 64);
+$primary-dark-75: rgba(16, 38, 64, 0.75);
 $primary-dark-50: rgba(16, 38, 64, 0.5);
 $primary-dark-30: rgba(16, 38, 64, 0.3);
 $primary-dark-15: rgba(16, 38, 64, 0.15);
@@ -26,6 +27,30 @@ $action-green-50: rgba(158, 206, 56, 0.5);
 $action-green-5: rgba(158, 206, 56, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
+
+.bg {
+  &-dark{
+    background-color: $primary-dark;
+
+    &-75{
+      background-color: $primary-dark-75;
+    }
+
+    &-50{
+      background-color: $primary-dark-50;
+    }
+
+    &-30{
+      background-color: $primary-dark-30;
+    }
+  }
+}
+
+.fc {
+  &-white{
+    color: #FFF
+  }
+}
 
 @keyframes gh-rotation {
   0% {

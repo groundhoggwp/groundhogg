@@ -2,11 +2,11 @@
 
 namespace Groundhogg;
 
-use Elementor\Core\Base\Background_Task_Manager;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use GroundhoggSMS\Classes\SMS;
 
@@ -232,13 +232,13 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function schedule_in_background() {
 
-		if ( ! $this->is_pending() ){
+		if ( ! $this->is_pending() ) {
 			return false;
 		}
 
 		$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
 
-		if ( is_wp_error( $added ) ){
+		if ( is_wp_error( $added ) ) {
 			return $added;
 		}
 
@@ -249,16 +249,42 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * If there is at least 1 pending event
+	 *
+	 * @return bool
+	 */
+	public function has_pending_events() {
+
+		$query = new Table_Query( 'event_queue' );
+		$query->setLimit(1)->where()->equals( 'step_id', $this->ID )
+		      ->equals( 'funnel_id', self::FUNNEL_ID )
+		      ->equals( 'event_type', Event::BROADCAST )
+		      ->equals( 'status', Event::WAITING );
+
+		return count( $query->get_results() ) > 0;
+	}
+
+	/**
 	 * Cancel the broadcast
 	 *
 	 * @noinspection PhpPossiblePolymorphicInvocationInspection
 	 */
 	public function cancel() {
 
+		// already cancelled
+		if ( $this->is_cancelled() ) {
+			return true;
+		}
+
+		// if there are no pending events for this broadcast that means it's already fully sent
+		if ( ! $this->has_pending_events() ) {
+			return false;
+		}
+
 		// Also cancel the associated background task
-		if ( $task_id = $this->get_meta( 'task_id' ) ){
+		if ( $task_id = $this->get_meta( 'task_id' ) ) {
 			$task = new Background_Task( $task_id );
-			if ( ! $task->is_done() ){
+			if ( ! $task->is_done() ) {
 				$task->cancel();
 			}
 		}
@@ -282,6 +308,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		// Set status to cancelled finally
 		$this->update( [ 'status' => 'cancelled' ] );
+
+		return true;
 	}
 
 	/**
@@ -297,7 +325,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// The broadcast is not pending
-		if ( ! $this->is_pending() ){
+		if ( ! $this->is_pending() ) {
 			return false;
 		}
 
@@ -307,21 +335,21 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		// Lock scheduling
 		$this->update_meta( 'schedule_lock', true );
 
-		$query                  = $this->get_query();
-		$in_lt                  = (bool) $this->get_meta( 'send_in_local_time' );
-		$send_now               = (bool) $this->get_meta( 'send_now' );
-		$offset                 = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
-		$limit                  = self::BATCH_LIMIT;
-		$query['number']        = $limit;
-		$query['offset']        = $offset;
-		$query['found_rows']    = true;
+		$query               = $this->get_query();
+		$in_lt               = (bool) $this->get_meta( 'send_in_local_time' );
+		$send_now            = (bool) $this->get_meta( 'send_now' );
+		$offset              = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
+		$limit               = self::BATCH_LIMIT;
+		$query['number']     = $limit;
+		$query['offset']     = $offset;
+		$query['found_rows'] = true;
 
 		$c_query  = new Contact_Query( $query );
 		$contacts = $c_query->query( null, true );
 		$total    = $c_query->found_items;
 
 		// No contacts to send to?
-		if ( $total === 0 ){
+		if ( $total === 0 ) {
 			return false;
 		}
 

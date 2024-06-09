@@ -1,4 +1,4 @@
-(() => {
+( () => {
 
   const {
     ApiRegistry,
@@ -29,7 +29,7 @@
   const EmailRepeater = ({ param, name, id }) => {
 
     let others = getFromRequest(param, [])
-    let rows = others.map(em => ([em]))
+    let rows = others.map(em => ( [em] ))
 
     return InputRepeater({
       id,
@@ -46,11 +46,23 @@
     })
   }
 
+  const FiltersConfig = {
+    'group': 'email',
+    'name': 'Emails',
+    'stringColumns': { 'title': 'Title', 'subject': 'Subject', 'content': 'Content' },
+    'selectColumns': {
+      'message_type': [
+        'Message Type',
+        { 'marketing': 'Marketing', 'transactional': 'Transactional' },
+      ],
+    },
+  }
+
   ApiRegistry.emails.endpoints.add('compose', {
     name: __('Send a composed email', 'groundhogg'),
     description: () => Pg({}, __('Send a composed (custom) email to a contact.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${apiRoot}/emails/send`,
+    endpoint: `${ apiRoot }/emails/send`,
     params: [
       {
         param: 'to',
@@ -140,7 +152,7 @@
     name: __('Send an email template', 'groundhogg'),
     description: () => Pg({}, __('Send an email using a template to a contact.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${apiRoot}/emails/<id>/send`,
+    endpoint: `${ apiRoot }/emails/:id/send`,
     identifiers: [
       {
         param: 'id',
@@ -176,7 +188,7 @@
   addBaseObjectCRUDEndpoints(ApiRegistry.emails.endpoints, {
     plural: __('emails'),
     singular: __('email'),
-    route: `${apiRoot}/emails`,
+    route: `${ apiRoot }/emails`,
     meta: true,
     searchableColumns: [
       'title',
@@ -201,57 +213,14 @@
             filters = []
           }
 
-          const filterRegistry = Groundhogg.filters.createFilterRegistryFromConfig({
-            'group': 'email',
-            'name': 'Emails',
-            'filters': [],
-            'stringColumns': { 'title': 'Title', 'subject': 'Subject', 'content': 'Content' },
-            'selectColumns': {
-              'message_type': [
-                'Message Type',
-                { 'marketing': 'Marketing', 'transactional': 'Transactional' }],
-            },
-            'FilterRegistry': {
-              'groups': { 'table': 'Emails' },
-              'filters': {
-                'title': {
-                  'type': 'title',
-                  'name': 'Title',
-                  'group': 'table',
-                  'defaults': { 'value': '', 'compare': 'equals' },
-                },
-                'subject': {
-                  'type': 'subject',
-                  'name': 'Subject',
-                  'group': 'table',
-                  'defaults': { 'value': '', 'compare': 'equals' },
-                },
-                'content': {
-                  'type': 'content',
-                  'name': 'Content',
-                  'group': 'table',
-                  'defaults': { 'value': '', 'compare': 'equals' },
-                },
-                'message_type': {
-                  'type': 'message_type',
-                  'name': 'Message Type',
-                  'group': 'table',
-                  'defaults': { 'value': 'marketing' },
-                },
-                'from_user': { 'type': 'from_user', 'name': 'From User', 'group': 'table', 'defaults': {} },
-                'author': { 'type': 'author', 'name': 'Author', 'group': 'table', 'defaults': {} },
-                'funnel': { 'type': 'funnel', 'name': 'Funnel', 'group': 'table', 'defaults': {} },
-                'campaigns': { 'type': 'campaigns', 'name': 'Campaigns', 'group': 'table', 'defaults': {} },
-              },
-            },
-          })
-
-          Groundhogg.filters.registerEmailFilters(filterRegistry, 'email')
+          const FilterRegistry = Groundhogg.filters.FilterRegistry()
+          FilterRegistry.registerFromConfig(FiltersConfig)
+          Groundhogg.filters.registerEmailFilters(FilterRegistry, 'email')
 
           return Groundhogg.filters.Filters({
             id,
             filters,
-            filterRegistry,
+            filterRegistry: FilterRegistry,
             onChange: filters => {
 
               filters = filters.map(group => group.map(({ id, ...filter }) => filter))
@@ -377,7 +346,7 @@
         control: ({ param, name, id }) => {
 
           let others = getFromRequest(param, [])
-          let rows = others.map(id => ([id]))
+          let rows = others.map(id => ( [id] ))
 
           return InputRepeater({
             id,
@@ -398,4 +367,4 @@
     ],
   })
 
-})()
+} )()

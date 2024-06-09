@@ -20,7 +20,7 @@
     name: __('Add contacts to a funnel', 'groundhogg'),
     description: () => Pg({}, __('Add contacts to a funnel in bulk. Using this endpoint will create a background task, the contacts will not be added instantly.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${ apiRoot }/funnels/<id>/start`,
+    endpoint: `${ apiRoot }/funnels/:id/start`,
     identifiers: [
       {
         ...CommonParams.id('funnel'),
@@ -98,7 +98,7 @@
     name: __('Add a contact to a funnel', 'groundhogg'),
     description: () => Pg({}, __('Add a single contact to a funnel.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${ apiRoot }/funnels/<id>/start`,
+    endpoint: `${ apiRoot }/funnels/:id/start`,
     identifiers: [
       {
         ...CommonParams.id('funnel'),

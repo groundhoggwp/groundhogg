@@ -399,6 +399,7 @@ class Plugin {
 	 * Include other files
 	 */
 	private function includes() {
+		require __DIR__ . '/polyfill.php';
 		require __DIR__ . '/functions.php';
 		require __DIR__ . '/edit-lock.php';
 		require __DIR__ . '/filters.php';

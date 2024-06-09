@@ -1041,6 +1041,10 @@
       return Object.keys(this.items)
     },
 
+    map( func ) {
+      return this.keys().map( key => func( this[key], key ) )
+    },
+
     /**
      * If the registry has a specific key
      *

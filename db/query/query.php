@@ -46,6 +46,56 @@ class Query {
 		$this->select = "$this->alias.*";
 	}
 
+	/**
+	 * Set query params from an array format
+	 *
+	 * @param array $params
+	 *
+	 * @return Query
+	 */
+	public function set_query_params( array $params ) {
+
+		foreach ( $params as $param => $value ) {
+			$param = strtolower( $param );
+			switch ( $param ) {
+				case 'select':
+					if ( ! is_array( $value ) ) {
+						$value = array_map( 'trim', explode( ',', $value ) );
+					}
+
+					$this->setSelect( ...$value );
+					break;
+				case 'limit':
+					if ( is_array( $value ) ) {
+						$this->setLimit( ...$value );
+					} else {
+						$this->setLimit( $value );
+					}
+					break;
+				case 'orderby':
+				case 'order_by':
+					if ( is_array( $value ) ) {
+						$this->setOrderby( ...$value );
+					} else {
+						$this->setOrderby( $value );
+					}
+					break;
+				case 'order':
+					$this->setOrder( $value );
+					break;
+				case 'offset':
+					$this->setOffset( $value );
+					break;
+				case 'found_rows':
+					$this->setFoundRows( $value );
+					break;
+			}
+		}
+
+		return $this;
+
+	}
+
 	public function __get( $name ) {
 		return $this->$name;
 	}
@@ -399,6 +449,7 @@ class Query {
 	 */
 	protected function _orderby() {
 		$this->orderby = trim( $this->orderby );
+
 		return ! empty( $this->orderby ) ? "ORDER BY $this->orderby $this->order" : '';
 	}
 

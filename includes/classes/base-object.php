@@ -50,10 +50,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		}
 
 		// Raw object from DB
-		if ( is_object( $identifier_or_args ) ){
+		if ( is_object( $identifier_or_args ) ) {
 
-			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ){
+			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ) {
 				$this->setup_object( $identifier_or_args );
+
 				return;
 			}
 
@@ -62,13 +63,14 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		}
 
 		// Creating or fetching based on array key-value pairs
-		if ( is_array( $identifier_or_args ) ){
+		if ( is_array( $identifier_or_args ) ) {
 
 			// If the primary key (ID in most cases) is set
-			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ){
-				$this->setup_object( $this->get_from_db( $this->get_identifier_key(), $identifier_or_args[$this->get_identifier_key()] ) );
+			if ( isset_not_empty( $identifier_or_args, $this->get_identifier_key() ) ) {
+				$this->setup_object( $this->get_from_db( $this->get_identifier_key(), $identifier_or_args[ $this->get_identifier_key() ] ) );
 				// Update in one go
-				$this->update($identifier_or_args);
+				$this->update( $identifier_or_args );
+
 				return;
 			}
 
@@ -76,22 +78,24 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			// Get a result treating the args as query
 			$query['limit'] = 1;
-			$results = $this->get_db()->query( $query );
+			$results        = $this->get_db()->query( $query );
 
 			// Create it if no results
-			if ( empty( $results ) ){
+			if ( empty( $results ) ) {
 				$this->create( $identifier_or_args );
+
 				return;
 			}
 
 			$object = array_shift( $results );
 
 			// Something's wrong
-			if ( ! is_object($object) ){
+			if ( ! is_object( $object ) ) {
 				return;
 			}
 
 			$this->setup_object( $object );
+
 			return;
 		}
 
@@ -253,10 +257,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	/**
 	 * is triggered by calling isset() or empty() on inaccessible members.
 	 *
+	 * @link https://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.members
+	 *
 	 * @param $name string
 	 *
 	 * @return bool
-	 * @link https://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.members
 	 */
 	public function __isset( $name ) {
 		return isset( $this->$name );
@@ -321,7 +326,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return string
 	 */
-	public function _get_object_type(){
+	public function _get_object_type() {
 		return $this->get_object_type();
 	}
 
@@ -335,7 +340,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	public function update( $data = [] ) {
 
 		// Invalid data for update
-		if ( ! is_array( $data ) ){
+		if ( ! is_array( $data ) ) {
 			return false;
 		}
 
@@ -343,7 +348,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		$data = $this->sanitize_columns( $data );
 
 		// array_diff_assoc only handles 1 dimensional arrays, so we have to serialize stuff that might be serialized later.
-		$data = array_udiff_assoc( $data, $this->data, function ( $a, $b ){
+		$data = array_udiff_assoc( $data, $this->data, function ( $a, $b ) {
 
 			$a = maybe_serialize( $a );
 			$b = maybe_serialize( $b );
@@ -701,26 +706,28 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	/**
 	 * Get any objects related to this object
 	 *
-	 * @param false $secondary_type
-	 * @param bool  $is_primary
+	 * @param false $other_type
+	 * @param bool  $is_parent
 	 *
 	 * @return array|DB_Object[]|DB_Object_With_Meta[]
 	 */
-	public function get_related_objects( $secondary_type = false, $is_primary = true ) {
+	public function get_related_objects( $other_type = false, $is_parent = true ) {
 
-		if ( ! $this->exists() || ! $this->get_id() || ! $this->get_object_type() ){
+		if ( ! $this->exists() || ! $this->get_id() || ! $this->get_object_type() ) {
 			return [];
 		}
 
 		$relationships = $this->get_rel_db()->query( [
-			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
-			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
-			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $secondary_type
+			$is_parent ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_parent ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_parent ? 'secondary_object_type' : 'primary_object_type' => $other_type,
+			'orderby'                                                    => $is_parent ? 'secondary_object_id' : 'primary_object_id',
+			'order'                                                      => 'DESC',
 		] );
 
-		return array_map( function ( $rel ) use ( $is_primary ) {
+		return array_map( function ( $rel ) use ( $is_parent ) {
 
-			if ( $is_primary ) {
+			if ( $is_parent ) {
 				return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
 			} else {
 				return create_object_from_type( $rel->primary_object_id, $rel->primary_object_type );
@@ -731,20 +738,20 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * @param      $other
-	 * @param bool $is_primary
+	 * @param bool $is_parent
 	 *
 	 * @return false|int
 	 */
-	public function is_related( $other, $is_primary = true ) {
+	public function is_related( $other, $is_parent = true ) {
 		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
 		return $this->get_rel_db()->exists( [
-			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
-			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
-			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
-			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
+			$is_parent ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_parent ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_parent ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_parent ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
 		] );
 	}
 
@@ -752,21 +759,21 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * Create a relationship between this object and another object
 	 *
 	 * @param      $other Base_Object
-	 * @param bool $is_primary
+	 * @param bool $is_parent
 	 *
 	 * @return false|int
 	 */
-	public function create_relationship( $other, $is_primary = true ) {
+	public function create_relationship( $other, $is_parent = true ) {
 
 		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
 		return $this->get_rel_db()->add( [
-			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
-			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
-			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
-			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
+			$is_parent ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_parent ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_parent ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_parent ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
 		] );
 	}
 
@@ -774,21 +781,21 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * Delete a relationship between this object and another object
 	 *
 	 * @param      $other Base_Object
-	 * @param bool $is_primary
+	 * @param bool $is_parent
 	 *
 	 * @return false|int
 	 */
-	public function delete_relationship( $other, $is_primary = true ) {
+	public function delete_relationship( $other, $is_parent = true ) {
 
 		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
 		return $this->get_rel_db()->delete( [
-			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
-			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
-			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
-			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
+			$is_parent ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_parent ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_parent ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_parent ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
 		] );
 	}
 

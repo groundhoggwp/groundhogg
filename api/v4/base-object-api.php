@@ -72,7 +72,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return void
 	 */
-	protected function do_object_created_action( $object ){
+	protected function do_object_created_action( $object ) {
 		do_action( "groundhogg/api/{$this->get_object_type()}/created", $object );
 	}
 
@@ -83,7 +83,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return void
 	 */
-	protected function do_object_updated_action( $object ){
+	protected function do_object_updated_action( $object ) {
 		do_action( "groundhogg/api/{$this->get_object_type()}/updated", $object );
 	}
 
@@ -94,7 +94,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return void
 	 */
-	protected function do_object_deleted_action( $object ){
+	protected function do_object_deleted_action( $object ) {
 		do_action( "groundhogg/api/{$this->get_object_type()}/deleted", $object );
 	}
 
@@ -244,6 +244,10 @@ abstract class Base_Object_Api extends Base_Api {
 		return new $class_name( $item );
 	}
 
+	public function supports_meta() {
+		return method_exists( $this->get_object_class(), 'update_meta' );
+	}
+
 	/**
 	 * Register the REST routes
 	 *
@@ -295,7 +299,7 @@ abstract class Base_Object_Api extends Base_Api {
 			],
 		] );
 
-		if ( method_exists( $this->get_object_class(), 'update_meta' ) ) {
+		if ( $this->supports_meta() ) {
 
 			register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/meta", [
 				[
@@ -368,6 +372,56 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * Given an arbitrary, if first party data is detected, group it into the data object
+	 * Anything else should be added to the meta object
+	 *
+	 * @param array|WP_REST_Request $request The item
+	 * @param array                 $ignore  keys to omit from both data and meta, leave where it is
+	 *
+	 * @return void
+	 */
+	protected function maybe_group_into_data_and_meta( &$request, array $ignore = [] ) {
+
+		// Using data already, assume well-formed
+		if ( isset( $request['data'] ) ) {
+			return;
+		}
+
+		// if first party keys are detected
+		// data keys are just basically the table columns
+		$data = array_intersect_key( $request, $this->get_db_table()->get_columns() );
+
+		if ( ! empty( $data ) ) {
+			$request['data'] = $data;
+
+			foreach ( $data as $key => $val ) {
+				unset( $request[ $key ] );
+			}
+		}
+
+		if ( $this->supports_meta() ) {
+
+			if ( ! isset( $request['meta'] ) ) {
+				$request['meta'] = [];
+
+				return;
+			}
+
+			$ignore_keys = array_merge( $ignore, [ 'meta', 'data' ] );
+			$ignore_keys = array_combine( $ignore_keys, $ignore_keys );
+
+			// move anything else into meta...
+			$meta = array_diff_key( $request, $ignore_keys );
+
+			foreach ( $meta as $key => $value ) {
+				unset( $request[ $key ] );
+				$request['meta'][ $key ] = $value;
+			}
+		}
+
+	}
+
+	/**
 	 * Create a contact or multiple contacts
 	 * Should handle both cases
 	 *
@@ -383,14 +437,16 @@ abstract class Base_Object_Api extends Base_Api {
 			return self::ERROR_422( 'error', 'No data provided.' );
 		}
 
-		// Create single resource
-		if ( get_array_var( $items, 'data' ) ) {
+		// If not passing multiple items, create a single resource
+		if ( ! array_is_list( $items ) ) {
 			return $this->create_single( $request );
 		}
 
 		$added = [];
 
 		foreach ( $items as $item ) {
+			$item = (array) $item;
+			$this->maybe_group_into_data_and_meta( $item );
 
 			$data = get_array_var( $item, 'data' ) ?: $item;
 			$meta = get_array_var( $item, 'meta' );
@@ -587,6 +643,8 @@ abstract class Base_Object_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create_single( WP_REST_Request $request ) {
+
+		$this->maybe_group_into_data_and_meta($request);
 
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
@@ -828,10 +886,7 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$other_id   = $request->get_param( 'other_id' );
-		$other_type = $request->get_param( 'other_type' );
-
-		if ( $other_id && $other_type ) {
+		if ( $request->has_param( 'other_id' ) || $request->has_param( 'parent_id' ) || $request->has_param( 'child_id' ) ) {
 			return $this->create_single_relationship( $request );
 		}
 
@@ -839,16 +894,25 @@ abstract class Base_Object_Api extends Base_Api {
 
 		foreach ( $relationships as $relationship ) {
 
-			$other_id   = get_array_var( $relationship, 'other_id' );
-			$other_type = get_array_var( $relationship, 'other_type' );
+			$child_id    = get_array_var( $relationship, 'child_id', get_array_var( $relationship, 'other_id' ) );
+			$child_type  = get_array_var( $relationship, 'child_type', get_array_var( $relationship, 'other_type' ) );
+			$parent_id   = get_array_var( $relationship, 'parent_id' );
+			$parent_type = get_array_var( $relationship, 'parent_type' );
 
-			if ( ! $other_id || ! $other_type ) {
-				continue;
+			if ( $child_id && $child_type ) {
+
+				// Add a child relationship
+				$other = create_object_from_type( $child_id, $child_type );
+				$object->create_relationship( $other );
+
+			} else if ( $parent_id && $parent_type ) {
+
+				// parent relationship
+				$other = create_object_from_type( $parent_id, $parent_type );
+				$object->create_relationship( $other, false );
+
 			}
 
-			$other = create_object_from_type( $other_id, $other_type );
-
-			$object->create_relationship( $other );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -873,12 +937,22 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$other_id   = $request->get_param( 'other_id' );
-		$other_type = $request->get_param( 'other_type' );
+		$child_id   = $request->get_param( 'child_id' ) ?: $request->get_param( 'other_id' );
+		$child_type = $request->get_param( 'child_type' ) ?: $request->get_param( 'other_type' );
 
-		$other = create_object_from_type( $other_id, $other_type );
+		$parent_id   = $request->get_param( 'parent_id' );
+		$parent_type = $request->get_param( 'parent_type' );
 
-		$object->create_relationship( $other );
+		if ( $child_id && $child_type ) {
+
+			$other = create_object_from_type( $child_id, $child_type );
+			$object->create_relationship( $other );
+
+		} else if ( $parent_id && $parent_type ) {
+
+			$other = create_object_from_type( $parent_id, $parent_type );
+			$object->create_relationship( $other, false );
+		}
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object
@@ -902,10 +976,17 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$other_type = $request->get_param( 'other_type' );
+		$child_type = $request->get_param( 'child_type' ) ?: $request->get_param( 'other_type' );
+		$parent_type = $request->get_param( 'parent_type' );
+
+		if ( $parent_type ){
+			$items = $object->get_related_objects( $parent_type, false );
+		} else {
+			$items = $object->get_related_objects( $child_type );
+		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items' => $object->get_related_objects( $other_type )
+			'items' => $items
 		] );
 	}
 
@@ -925,10 +1006,7 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$other_id   = $request->get_param( 'other_id' );
-		$other_type = $request->get_param( 'other_type' );
-
-		if ( $other_id && $other_type ) {
+		if ( $request->has_param( 'other_id' ) || $request->has_param( 'parent_id' ) || $request->has_param( 'child_id' ) ) {
 			return $this->delete_single_relationship( $request );
 		}
 
@@ -936,16 +1014,24 @@ abstract class Base_Object_Api extends Base_Api {
 
 		foreach ( $relationships as $relationship ) {
 
-			$other_id   = get_array_var( $relationship, 'other_id' );
-			$other_type = get_array_var( $relationship, 'other_type' );
+			$child_id    = get_array_var( $relationship, 'child_id', get_array_var( $relationship, 'other_id' ) );
+			$child_type  = get_array_var( $relationship, 'child_type', get_array_var( $relationship, 'other_type' ) );
+			$parent_id   = get_array_var( $relationship, 'parent_id' );
+			$parent_type = get_array_var( $relationship, 'parent_type' );
 
-			if ( ! $other_id || ! $other_type ) {
-				continue;
+			if ( $child_id && $child_type ) {
+
+				// Add a child relationship
+				$other = create_object_from_type( $child_id, $child_type );
+				$object->delete_relationship( $other );
+
+			} else if ( $parent_id && $parent_type ) {
+
+				// parent relationship
+				$other = create_object_from_type( $parent_id, $parent_type );
+				$object->delete_relationship( $other, false );
+
 			}
-
-			$other = create_object_from_type( $other_id, $other_type );
-
-			$object->delete_relationship( $other );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -970,12 +1056,22 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$other_id   = $request->get_param( 'other_id' );
-		$other_type = $request->get_param( 'other_type' );
+		$child_id   = $request->get_param( 'child_id' ) ?: $request->get_param( 'other_id' );
+		$child_type = $request->get_param( 'child_type' ) ?: $request->get_param( 'other_type' );
 
-		$other = create_object_from_type( $other_id, $other_type );
+		$parent_id   = $request->get_param( 'parent_id' );
+		$parent_type = $request->get_param( 'parent_type' );
 
-		$object->delete_relationship( $other );
+		if ( $child_id && $child_type ) {
+
+			$other = create_object_from_type( $child_id, $child_type );
+			$object->delete_relationship( $other );
+
+		} else if ( $parent_id && $parent_type ) {
+
+			$other = create_object_from_type( $parent_id, $parent_type );
+			$object->delete_relationship( $other, false );
+		}
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object

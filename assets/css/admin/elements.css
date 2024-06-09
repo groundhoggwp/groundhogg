@@ -1,4 +1,21 @@
 @charset "UTF-8";
+.bg-dark {
+  background-color: #102640;
+}
+.bg-dark-75 {
+  background-color: rgba(16, 38, 64, 0.75);
+}
+.bg-dark-50 {
+  background-color: rgba(16, 38, 64, 0.5);
+}
+.bg-dark-30 {
+  background-color: rgba(16, 38, 64, 0.3);
+}
+
+.fc-white {
+  color: #FFF;
+}
+
 @keyframes gh-rotation {
   0% {
     transform: rotate(0deg);

@@ -1,4 +1,7 @@
-(($) => {
+import me from '../../../lib/calendar/js/locale/me'
+import sw from '../../../lib/calendar/js/locale/sw'
+
+( ($) => {
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -6,6 +9,7 @@
     route: 'auth',
     endpoint: 'apikeys',
     request: {},
+    playground: true,
   })
 
   const {
@@ -26,14 +30,15 @@
     Dashicon,
     InputRepeater,
     ItemPicker,
+    ToolTip,
   } = MakeEl
 
-  const { icons, andList, el, escHTML, copyObject } = Groundhogg.element
+  const { icons, andList, el, escHTML, copyObject, adminPageURL } = Groundhogg.element
 
   const ApiRegistry = Groundhogg.createRegistry()
 
   const { root: apiRoot } = Groundhogg.api.routes.v4
-  const { base64_json_encode, setNestedValue, getNestedValue } = Groundhogg.functions
+  const { base64_json_encode, setNestedValue, getNestedValue, jsonCopy } = Groundhogg.functions
 
   const IdRepeater = ({ param, name, id }) => {
 
@@ -56,18 +61,8 @@
   }
 
   const CommonParams = {
-    filters: (plural) => ({
+    filters: (plural) => ( {
       param: 'filters',
-      description: () => Fragment([
-        Pg({},
-          sprintf(__('Filters are the most comprehensive way to search for %s that match your criteria.', 'groundhogg'),
-            plural)),
-        currEndpoint().method === 'GET' ? Pg({},
-          sprintf(__(
-              'When using filters with <code class="get">GET</code> it is best to JSON encode and then base64 encode the filters.',
-              'groundhogg'),
-            plural)) : '',
-      ]),
       type: 'array',
       control: ({ param, id }) => {
 
@@ -88,67 +83,77 @@
           setInRequest(param, filters)
         })
       },
-    }),
-    include: (plural) => ({
+      description: () => Fragment([
+        Pg({},
+          sprintf(__('Filters are the most comprehensive way to search for %s that match your criteria.', 'groundhogg'),
+            plural)),
+        currEndpoint().method === 'GET' ? Pg({},
+          sprintf(__(
+              'When using filters with <code class="get">GET</code> it is best to JSON encode and then base64 encode the filters.',
+              'groundhogg'),
+            plural)) : '',
+      ]),
+    } ),
+    include: (plural) => ( {
       param: 'include',
       type: 'int[]',
       control: IdRepeater,
-      description: () => Pg({}, sprintf(__('IDs of %s to include.', 'groundhogg'), plural))
-    }),
-    exclude: (plural) => ({
+      description: () => Pg({}, sprintf(__('IDs of %s to include.', 'groundhogg'), plural)),
+    } ),
+    exclude: (plural) => ( {
       param: 'exclude',
       type: 'int[]',
       control: IdRepeater,
-      description: () => Pg({}, sprintf(__('IDs of %s to exclude.', 'groundhogg'), plural))
-    }),
-    search: (plural, columns = []) => ({
+      description: () => Pg({}, sprintf(__('IDs of %s to exclude.', 'groundhogg'), plural)),
+    } ),
+    search: (plural, columns = []) => ( {
       param: 'search',
       description: () => Pg({},
         sprintf(__('Search for %s using a search phrase. Will match %s.', 'groundhogg'), plural,
           andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
-    }),
-    limit: (plural) => ({
+    } ),
+    limit: (plural) => ( {
       param: 'limit',
       description: () => Pg({}, sprintf(__('The number of %s to return.', 'groundhogg'), plural)),
       type: 'int',
       default: 20,
-    }),
-    id: (singular) => ({
+    } ),
+    id: (singular) => ( {
       param: 'id',
-      description: () => Pg({}, sprintf(__('The id of the %s to return.', 'groundhogg'), singular)),
+      description: () => Pg({}, sprintf(__('The ID of the %s to return.', 'groundhogg'), singular)),
       type: 'int',
       required: true,
-    }),
-    offset: (plural) => ({
+    } ),
+    offset: (plural) => ( {
       param: 'offset',
       description: () => Pg({}, sprintf(__('Paginate through %s.', 'groundhogg'), plural)),
       type: 'int',
       default: 0,
-    }),
-    order: (plural) => ({
+    } ),
+    order: (plural) => ( {
       param: 'order',
       description: () => Pg({}, sprintf(__('How to order %s.', 'groundhogg'), plural)),
       type: 'string',
       default: 'DESC',
       options: ['ASC', 'DESC'],
-    }),
-    orderby: (plural, columns = []) => ({
+    } ),
+    orderby: (plural, columns = []) => ( {
       param: 'orderby',
       description: () => Pg({},
         sprintf(__('Order %s by a specific column. Supported columns are %s.', 'groundhogg'), plural,
           andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
       default: 'ID',
-    }),
-    found_rows: (plural) => ({
+    } ),
+    found_rows: (plural) => ( {
       param: 'found_rows',
       description: () => Pg({},
         sprintf(__('Whether to return the total number of %s matching the query.', 'groundhogg'), plural)),
       type: 'bool',
       default: 'true',
-    }),
-    tags: (param) => ({
+    } ),
+    tags: (param) => ( {
       param,
       type: 'int[]|string[]',
       description: () => Fragment([
@@ -167,12 +172,12 @@
             limit: 30,
           })
 
-          return tags.map(({ ID, data }) => ({ id: ID, text: data.tag_name }))
+          return tags.map(({ ID, data }) => ( { id: ID, text: data.tag_name } ))
         },
         onChange: items => setInRequest(param, items.map(({ id }) => id)),
       }),
-    }),
-    meta: () => ({
+    } ),
+    meta: () => ( {
       param: 'meta',
       type: 'object',
       required: false,
@@ -189,7 +194,7 @@
             param = param.replace('.<key>', '') // remove <key> from param since we're editing the meta object directly
 
             let meta = getFromRequest(param, {})
-            let rows = Object.keys(meta).map(key => ([key, meta[key]]))
+            let rows = Object.keys(meta).map(key => ( [key, meta[key]] ))
 
             return InputRepeater({
               id,
@@ -210,7 +215,7 @@
       description: () => Fragment([
         Pg({}, __('The meta object can contain any number of arbitrary key&rarr;value pairs.', 'groundhogg')),
       ]),
-    }),
+    } ),
   }
 
   const setInRequest = (param, value) => {
@@ -227,7 +232,11 @@
     ...props
   }) => {
 
-    let id = `param-${param.replaceAll('.', '-')}`
+    if (!State.playground) {
+      return null
+    }
+
+    let id = `param-${ param.replaceAll('.', '-') }`
     let name = param
 
     if (control) {
@@ -285,10 +294,10 @@
     params.map(({ param, description, required = false, type, ...props }) => {
 
       if (parentParam) {
-        param = `${parentParam}.${param}`
+        param = `${ parentParam }.${ param }`
       }
 
-      if ( typeof description === 'string' ){
+      if (typeof description === 'string') {
         description = Pg({}, description)
       }
 
@@ -296,13 +305,13 @@
         className: 'parameter',
       }, [
         Div({ className: 'display-flex gap-10 align-center' }, [
-          `<code class="param">${escHTML(param)}</code>`,
-          `<span class="type">${escHTML(type)}</span>`,
-          isParamRequired(param) || required ? `<span class="required">${__('Required', 'groundhogg')}</span>` : null,
+          `<code class="param">${ escHTML(param) }</code>`,
+          `<span class="type">${ escHTML(type) }</span>`,
+          isParamRequired(param) || required ? `<span class="required">${ __('Required', 'groundhogg') }</span>` : null,
         ]),
         description,
-        typeof props.default !== 'undefined' && props.default !== null ? `<p>${sprintf(__('Defaults to %s.'),
-          `<code>${props.default}</code>`)}</p>` : null,
+        typeof props.default !== 'undefined' && props.default !== null ? `<p>${ sprintf(__('Defaults to %s.'),
+          `<code>${ props.default }</code>`) }</p>` : null,
         props.subParams ? null : ControlFromParam({ param, type, ...props }),
         props.subParams ? Div({ className: 'subparams gh-panel outlined' }, [
           Div({ className: 'gh-panel-header' }, `<h2>Child parameters</h2>`),
@@ -321,9 +330,9 @@
           Div({
             className: 'gh-panel-header',
           }, [
-            makeEl('h2', {}, `Index ${i}`),
+            makeEl('h2', {}, `Index ${ i }`),
             Button({
-              id: `delete-item-index-${i}`,
+              id: `delete-item-index-${ i }`,
               className: 'gh-button icon danger text small',
               onClick: e => {
                 State.request.splice(i, 1)
@@ -331,7 +340,7 @@
               },
             }, Dashicon('trash')),
           ]),
-          ParamsList(params, `${i}`),
+          ParamsList(params, `${ i }`),
         ])
       }),
       Button({
@@ -355,7 +364,7 @@
       currEndpoint().identifiers.forEach(({ param }) => {
         // replace it in the URL
         if (params[param]) {
-          url = url.replace(`<${param}>`, params[param])
+          url = url.replace(`:${ param }`, params[param])
         }
         // remove it from the other request because it's in the URL
         delete params[param]
@@ -364,7 +373,7 @@
 
     // Method for GET is to use URL params
     if (METHOD === 'GET' && Object.keys(params).length) {
-      url = `${url}?${$.param(params)}`
+      url = `${ url }?${ $.param(params) }`
     }
 
     return {
@@ -380,7 +389,7 @@
 
     let response
 
-    if (['DELETE', 'PATCH'].includes(METHOD)) {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(METHOD)) {
 
       try {
 
@@ -417,7 +426,8 @@
           ]))
         })
 
-      } catch (err) {
+      }
+      catch (err) {
         return
       }
 
@@ -430,7 +440,8 @@
           'X-WP-Nonce': wpApiSettings.nonce,
         },
       })
-    } else {
+    }
+    else {
       response = await fetch(url, {
         method: METHOD,
         headers: {
@@ -451,43 +462,85 @@
 
   }
 
+  const curlRequest = () => {
+    let { url, params, METHOD } = getGeneratedRequest()
+
+    return METHOD === 'GET' ?
+      // GET
+      [
+        `curl -X GET ${ url }`,
+      ].join('\n')
+
+      // Other methods
+      : [
+        `curl -X ${ METHOD } ${ url } \\`,
+        `-H 'Content-Type: application/json' \\`,
+        Object.keys(params).length ? `-d '${ JSON.stringify(params, null, 2) }'` : '',
+      ].join('\n')
+  }
+
+  const phpRequest = () => {
+
+    return [
+      '<?php',
+
+    ].join('')
+  }
+
   const ExampleRequest = () => {
 
-    let { url, params, METHOD } = getGeneratedRequest()
+    let request = ''
+
+    if ( currEndpoint().examples?.hasOwnProperty( State.language ) ){
+      request = currEndpoint().examples[State.language]()
+    } else {
+      switch ( State.language ){
+        case 'curl':
+        default:
+          request = curlRequest()
+          break;
+        case 'php':
+          request = phpRequest()
+          break;
+      }
+    }
 
     return Div({
       id: 'example-request',
-      className: 'display-flex column gap-10',
+      className: 'gh-panel',
+      style: {
+        overflow: 'auto',
+      },
     }, [
-      makeEl('h2', {}, __('Example request')),
+      Div({ className: 'gh-panel-header bg-dark-75' }, [
+        makeEl('h2', {
+          className: 'fc-white',
+        }, __('Example request')),
+      ]),
 
-      METHOD === 'GET' ?
-        // GET
-        makeEl('pre', {}, escHTML([
-          `curl -X ${METHOD} ${url}`,
-        ].join('\n')))
-
-        // Other methods
-        : makeEl('pre', {}, escHTML([
-          `curl -X ${METHOD} ${url} \\`,
-          `-H 'Content-Type: application/json' \\`,
-          Object.keys(params).length ? `-d '${JSON.stringify(params, null, 2)}'` : '',
-        ].join('\n'))),
-
-      Button({
-        id: `test-${State.route}-${State.endpoint}`,
-        className: 'gh-button secondary full-width',
-        onClick: sendTestRequest,
-      }, __('Test Request')),
+      makeEl('pre', {}, escHTML( request ) )
     ])
   }
 
+  const TestButton = () => Button({
+    id: `test-${ State.route }-${ State.endpoint }`,
+    className: 'gh-button secondary',
+    onClick: sendTestRequest,
+  }, __('Test Request'))
+
   const ExampleResponse = () => Div({
     id: 'example-response',
-    className: 'display-flex column gap-10',
+    className: 'gh-panel',
+    style: {
+      marginTop: '20px',
+    },
   }, [
-    makeEl('h2', {}, __('Example response')),
-    makeEl('pre', {}, escHTML(JSON.stringify(State.response ?? currEndpoint().response, null, 2))),
+    Div({ className: 'gh-panel-header' }, [
+      makeEl('h2', {}, __('Example response')),
+    ]),
+    makeEl('pre', {
+      className: 'light',
+    }, escHTML(JSON.stringify(State.response ?? currEndpoint().response, null, 2))),
   ])
 
   const currEndpoint = () => State.endpoint ? currRoute().endpoints[State.endpoint] : undefined
@@ -516,7 +569,24 @@
         className: 'gh-header sticky',
       }, [
         Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
-        `<h1>${__('Rest API', 'groundhogg')}</h1>`,
+        `<h1>${ __('Rest API', 'groundhogg') }</h1>`,
+        Div({
+          className: 'display-flex gap-10',
+        }, [
+          Span({}, __('Playground Features')),
+          Toggle({
+            id: 'enable-play',
+            name: 'enable_playground',
+            checked: State.playground,
+            onChange: e => {
+              State.set({
+                playground: e.target.checked,
+              })
+              morph()
+            },
+          }),
+        ]),
+        State.playground ? TestButton() : null,
       ]),
 
       Div({
@@ -530,19 +600,19 @@
           let endpoints = item.endpoints
 
           return makeEl('li', {
-            id: `route-${key}`,
+            id: `route-${ key }`,
             className: State.route === key ? 'current' : '',
           }, [
-            makeEl('a', { href: `#${key}` }, item.name),
+            makeEl('a', { href: `#${ key }` }, item.name),
             makeEl('ul', {}, endpoints.keys().map(key2 => {
 
               let endpoint = endpoints[key2]
 
               return makeEl('li', {
-                id: `route-${key}-endpoint-${key2}`,
+                id: `route-${ key }-endpoint-${ key2 }`,
                 className: State.endpoint === key2 ? 'current' : '',
               }, makeEl('a', {
-                href: `#${key}/${key2}`,
+                href: `#${ key }/${ key2 }`,
               }, [
                 // endpoint.method ? `<code class="${ endpoint.method.toLowerCase() }">${ endpoint.method.toUpperCase() }</code>` : null,
                 endpoint.name,
@@ -560,8 +630,8 @@
           currEndpoint.description,
           currEndpoint.endpoint ? makeEl('h2', {}, __('Endpoint', 'groundhogg')) : null,
           currEndpoint.endpoint
-            ? `<pre><code class="${currEndpoint.method.toLowerCase()}">${currEndpoint.method.toUpperCase()}</code> ${escHTML(
-              currEndpoint.endpoint)}</pre>`
+            ? `<pre><code class="${ currEndpoint.method.toLowerCase() }">${ currEndpoint.method.toUpperCase() }</code> ${ escHTML(
+              currEndpoint.endpoint) }</pre>`
             : null,
           currEndpoint.identifiers?.length ? Fragment([
             makeEl('h2', {}, __('Identifiers', 'groundhogg')),
@@ -586,6 +656,48 @@
         }, [
           ExampleRequest(),
           currEndpoint.response ? ExampleResponse() : null,
+        ]) : null,
+
+        !currEndpoint && !currRoute.hideEndpoints ? Div({
+          id: 'request-display',
+          className: 'request',
+        }, [
+          Div({
+            className: 'gh-panel',
+            style: {
+              overflow: 'auto',
+            },
+          }, [
+            Div({
+              className: 'gh-panel-header bg-dark-75',
+            }, [
+              makeEl('h2', {
+                className: 'fc-white',
+              }, __('Endpoints')),
+            ]),
+
+            makeEl('pre', {
+              className: 'display-flex column gap-20 bg-dark',
+            }, currRoute.endpoints.map(({ endpoint = '', method, name }, key) => {
+
+              if (!endpoint || !method) {
+                return null
+              }
+
+              return makeEl('a', {
+                href: `#${ State.route }/${ key }`,
+                style: {
+                  display: 'block',
+                },
+                // className:'gh-has-tooltip'
+              }, [
+                `<code class="${ method.toLowerCase() }">${ method.toUpperCase() }</code>`,
+                '&nbsp;',
+                endpoint.replace(Groundhogg.url.home, ''),
+                ToolTip(name, 'left'),
+              ])
+            })),
+          ]),
         ]) : null,
       ]),
     ])
@@ -649,9 +761,30 @@
     metaParams = [],
     moreParams = [],
     meta = false,
+    relationships = false,
     commonMeta = [],
     strings = {},
+    exampleItem = {
+      'ID': '1234',
+      'data': {},
+    },
+    createExample = null,
+    updateExample = null
   }) => {
+
+    if ( ! createExample ){
+      createExample = {
+        data: {
+          ...exampleItem.data
+        }
+      }
+
+      if ( meta ){
+        createExample.meta = {
+          ...exampleItem.meta
+        }
+      }
+    }
 
     strings = {
       read: sprintf(__('List %s', 'groundhogg'), plural),
@@ -691,9 +824,19 @@
       ],
       request: {},
       response: {
-        items: [],
-        total_items: 0
+        items: [
+          exampleItem,
+        ],
+        total_items: 0,
       },
+      examples: {
+        php: () => [
+          `$query = new Table_Query( '${plural}' );`,
+          `$query->set_query_params([]);`,
+          `$items = $query->get_objects();`,
+          `$items = $query->found_rows();`,
+        ].join('\n')
+      }
     })
 
     registry.add('create', {
@@ -714,19 +857,23 @@
             Pg({}, sprintf(__('The data object contains all the necessary information for a new %s.', 'groundhogg'), singular)),
           ]),
         },
-        ...moreParams
+        ...moreParams,
       ],
       request: [
-        {
-          data: {},
-        }],
-      response: {},
+        createExample
+      ],
+      response: {
+        "items" : [
+          exampleItem
+        ],
+        "status" : "success"
+      },
     })
 
     if (meta) {
 
       const metaParam = CommonParams.meta()
-      if ( metaParams && metaParams.length ){
+      if (metaParams && metaParams.length) {
         metaParam.subParams.push(...metaParams)
       }
 
@@ -751,10 +898,11 @@
         ...registry.create.params,
       ],
       request: [
-        {
-          data: {},
-        }],
-      response: {},
+        updateExample
+      ],
+      response: {
+        item: exampleItem
+      },
     })
 
     registry.add('delete', {
@@ -762,20 +910,24 @@
       description: () => Pg({}, strings.deleteDesc),
       method: 'DELETE',
       endpoint: route,
-      params: [],
+      params: [
+        ...registry.read.params,
+      ],
       request: {},
-      response: {},
+      response: {
+        "success": "true"
+      },
     })
 
     registry.add('create-single', {
       name: strings.createSingle,
       description: () => Pg({}, strings.createSingleDesc),
       method: 'POST',
-      endpoint: `${route}/<id>`,
+      endpoint: route,
       params: [
         ...registry.create.params,
       ],
-      request: {},
+      request: createExample,
       response: {},
     })
 
@@ -783,7 +935,7 @@
       name: strings.readSingle,
       description: () => Pg({}, strings.readSingleDesc),
       method: 'GET',
-      endpoint: `${route}/<id>`,
+      endpoint: `${ route }/:id`,
       identifiers: [
         CommonParams.id(singular),
       ],
@@ -795,14 +947,14 @@
       name: strings.updateSingle,
       description: () => Pg({}, strings.updateSingleDesc),
       method: 'PATCH',
-      endpoint: `${route}/<id>`,
+      endpoint: `${ route }/:id`,
       identifiers: [
         CommonParams.id(singular),
       ],
       params: [
         ...registry.create.params,
       ],
-      request: {},
+      request: updateExample,
       response: {},
     })
 
@@ -810,7 +962,7 @@
       name: strings.deleteSingle,
       description: () => Pg({}, strings.deleteSingleDesc),
       method: 'DELETE',
-      endpoint: `${route}/<id>`,
+      endpoint: `${ route }/:id`,
       identifiers: [
         CommonParams.id(singular),
       ],
@@ -826,11 +978,13 @@
     getFromRequest,
     addBaseObjectCRUDEndpoints,
     currEndpoint,
-    currRoute
+    currRoute,
   }
 
   ApiRegistry.add('auth', {
     name: __('Authentication'),
+    hideEndpoints: true,
+    endpoints: Groundhogg.createRegistry(),
     description: () => Fragment([
       Pg({}, __('Groundhogg offers a variety of authentication methods for you to use to access the REST API.',
         'groundhogg')),
@@ -842,7 +996,6 @@
         'The Groundhogg REST API is permission based. Regardless of the authentication method, only users accessing the API with the required permissions will be able to perform requests.',
         'groundhogg')),
     ]),
-    endpoints: Groundhogg.createRegistry(),
   })
 
   // API Keys
@@ -857,10 +1010,13 @@
         'groundhogg')),
       Pg({}, __('You must add both to the header of your request.', 'groundhogg')),
       makeEl('pre', {}, escHTML([
-        `curl ${apiRoot}/<endpoint> \\`,
-        `\t-H "Gh-Token: <token>" \\`,
-        `\t-H "Gh-Public-Key: <public-key>"`,
+        `curl ${ apiRoot }/:endpoint \\`,
+        `  -H "Gh-Token: :token" \\`,
+        `  -H "Gh-Public-Key: :public-key"`,
       ].join('\n'))),
+      Pg({}, An({
+        href: adminPageURL('gh_settings', { tab: 'api_tab' }),
+      }, __('Manage your API keys in the settings area.', 'groundhogg'))),
     ]),
   })
 
@@ -875,7 +1031,7 @@
         'Applications passwords use basic authentication, which is supported by most external applications that you might want to integrate with Groundhogg.',
         'groundhogg')),
       makeEl('pre', {}, escHTML([
-        `curl --user "<username>:<application password>" ${apiRoot}/<endpoint>`,
+        `curl --user "<username>:<application password>" ${ apiRoot }/<endpoint>`,
       ].join('\n'))),
       Pg({}, __(
         'For more on application passwords, see the <a href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/" target="_blank">WordPress application password integration guide</a>.',
@@ -884,4 +1040,23 @@
 
   })
 
-})(jQuery)
+  // Application Passwords
+  ApiRegistry.auth.endpoints.add('nonce', {
+    name: __('Using a Nonce', 'groundhogg'),
+    description: () => Fragment([
+      Pg({}, __(
+        'If you are using the API from a front-end application, such as in the WordPress admin dashboard, you can use a <b>nonce</b> so that application passwords and API keys are not exposed.',
+        'groundhogg')),
+      Pg({}, __('', 'groundhogg')),
+      makeEl('pre', {}, escHTML([
+        `curl -X GET ${ apiRoot }/<endpoint>`,
+        `  -H "X-WP-Nonce: <nonce>"`,
+      ].join('\n'))),
+      Pg({}, __(
+        'For more on authenticating API requests using a nonce, see the <a href="https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/" target="_blank">WordPress cookie authentication guide</a>.',
+        'groundhogg')),
+    ]),
+
+  })
+
+} )(jQuery)

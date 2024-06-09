@@ -862,6 +862,49 @@
 
     },
 
+    registerFromConfig ({
+      stringColumns = {},
+      numberColumns = {},
+      dateColumns = {},
+      futureDateColumns = {},
+      selectColumns = {},
+      name = '',
+      group = 'table'
+    }) {
+
+      this.registerGroup(group, name)
+
+      for (let column in stringColumns) {
+        this.registerFilter(
+          createStringFilter(column, stringColumns[column], group))
+      }
+
+      for (let column in numberColumns) {
+        this.registerFilter(
+          createNumberFilter(column, numberColumns[column], group))
+      }
+
+      for (let column in selectColumns) {
+        this.registerFilter(
+          createSelectFilter(column, selectColumns[column][0], group, selectColumns[column][1]))
+      }
+
+      for (let column in dateColumns) {
+        this.registerFilter(
+          createPastDateFilter(column, dateColumns[column], group), {
+            display: () => bold(name),
+          })
+      }
+
+      for (let column in futureDateColumns) {
+        this.registerFilter(
+          createFutureDateFilter(column, futureDateColumns[column], group), {
+            display: () => bold(name),
+          })
+      }
+
+      return this
+    },
   })
 
   /**
@@ -1291,56 +1334,6 @@
     return FiltersEditor()
   }
 
-  const createFilterRegistryFromConfig = ({
-    stringColumns = {},
-    numberColumns = {},
-    dateColumns = {},
-    futureDateColumns = {},
-    selectColumns = {},
-    name = '',
-    group = 'table'
-  }) => {
-
-    const Registry = FilterRegistry({})
-
-    Registry.registerGroup(createGroup(group, name))
-
-    for (let column in stringColumns) {
-      Registry.registerFilter(
-        createStringFilter(column, stringColumns[column], group))
-    }
-
-    for (let column in numberColumns) {
-      Registry.registerFilter(
-        createNumberFilter(column, numberColumns[column], group))
-    }
-
-    for (let column in selectColumns) {
-      Registry.registerFilter(
-        createSelectFilter(column, selectColumns[column][0], group, selectColumns[column][1]))
-    }
-
-    for (let column in dateColumns) {
-      Registry.registerFilter(
-        createPastDateFilter(column, dateColumns[column], group), {
-          display: () => bold(name),
-        })
-    }
-
-    for (let column in futureDateColumns) {
-      Registry.registerFilter(
-        createFutureDateFilter(column, futureDateColumns[column], group), {
-          display: () => bold(name),
-        })
-    }
-
-    return Registry
-  }
-
-  if (!Groundhogg.filters) {
-    Groundhogg.filters = {}
-  }
-
   Groundhogg.filters.Filters = Filters
   Groundhogg.filters.FilterRegistry = FilterRegistry
   Groundhogg.filters.createFilter = createFilter
@@ -1352,7 +1345,6 @@
   Groundhogg.filters.createFutureDateFilter = createFutureDateFilter
   Groundhogg.filters.createDateFilter = createDateFilter
   Groundhogg.filters.createSelectFilter = createSelectFilter
-  Groundhogg.filters.createFilterRegistryFromConfig = createFilterRegistryFromConfig
   Groundhogg.filters.comparisons = {
     ComparisonsTitleGenerators,
     AllComparisons,
@@ -1372,7 +1364,9 @@
       ...TableFilterConfig
     } = GroundhoggTableFilters
 
-    const TableFilterRegistry = createFilterRegistryFromConfig({
+    const TableFilterRegistry = FilterRegistry({})
+
+    TableFilterRegistry.registerFromConfig({
       ...TableFilterConfig,
       group: 'table'
     })
@@ -1385,8 +1379,7 @@
         filterRegistry: TableFilterRegistry,
         filters,
         onChange: filters => document.querySelector(
-          'form.search-form input[name="include_filters"]').value = base64_json_encode(
-          filters),
+          'form.search-form input[name="include_filters"]').value = base64_json_encode(filters),
       }))
     })
   }

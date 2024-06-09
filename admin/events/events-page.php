@@ -97,7 +97,7 @@ class Events_Page extends Tabbed_Admin_Page {
 					]
 				] );
 
-				wp_enqueue_script( 'groundhogg-admin-email-log-filters' );
+				wp_enqueue_script( 'groundhogg-admin-filter-email-log' );
 				wp_enqueue_script( 'groundhogg-admin-email-log' );
 
 				break;
@@ -152,7 +152,7 @@ class Events_Page extends Tabbed_Admin_Page {
 						break;
 				}
 
-				wp_enqueue_script( 'groundhogg-admin-event-filters' );
+				wp_enqueue_script( 'groundhogg-admin-filter-events' );
 
 				break;
 			case 'tasks':

@@ -482,8 +482,7 @@ abstract class Admin_Page extends Supports_Errors {
 		$filters = get_url_var( 'include_filters', base64_json_encode( [] ) );
 		$filters = base64_json_decode( $filters );
 
-		wp_enqueue_style( 'groundhogg-admin-search-filters' );
-
+		wp_enqueue_style( 'groundhogg-admin-filters' );
 		wp_enqueue_script( 'groundhogg-admin-filters' );
 
 		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( [

@@ -405,7 +405,7 @@
       CommonParams.tags('remove_tags'),
       {
         param: 'bg',
-        description: () => Pg({}, __('Whether to update the contacts using a background task.', 'groundhogg')),
+        description: () => Pg({}, __('Whether to update the contacts using a background task. Recommended for queries with many contacts.', 'groundhogg')),
         type: 'bool',
         required: false,
         default: false,
@@ -551,7 +551,7 @@
     name: __('Retrieve a contact', 'groundhogg'),
     description: () => Pg({}, __('Retrieve a single contact.', 'groundhogg')),
     method: 'GET',
-    endpoint: `${ apiRoot }/contacts/<id>`,
+    endpoint: `${ apiRoot }/contacts/:id`,
     identifiers: [
       CommonParams.id('contact'),
     ],
@@ -563,7 +563,7 @@
     name: __('Update a contact', 'groundhogg'),
     description: () => Pg({}, __('Update a single contact.', 'groundhogg')),
     method: 'PATCH',
-    endpoint: `${ apiRoot }/contacts/<id>`,
+    endpoint: `${ apiRoot }/contacts/:id`,
     identifiers: [
       CommonParams.id('contact'),
     ],
@@ -589,7 +589,7 @@
     name: __('Delete a contact', 'groundhogg'),
     description: () => Pg({}, __('Delete a single contact.', 'groundhogg')),
     method: 'DELETE',
-    endpoint: `${ apiRoot }/contacts/<id>`,
+    endpoint: `${ apiRoot }/contacts/:id`,
     identifiers: [
       CommonParams.id('contact'),
     ],
@@ -607,7 +607,7 @@
         __('All activity, events, and history will be retained. The most recent available information will be used from each contact record.', 'groundhogg')),
     ]),
     method: 'POST',
-    endpoint: `${ apiRoot }/contacts/<id>/merge`,
+    endpoint: `${ apiRoot }/contacts/:id/merge`,
     identifiers: [
       CommonParams.id('contact'),
     ],

@@ -111,4 +111,18 @@
     },
     response: {},
   })
+
+  ApiRegistry.broadcasts.endpoints.add('cancel', {
+    name: __('Cancel a broadcast', 'groundhogg'),
+    description: () => Pg({}, __('Cancel a broadcast.', 'groundhogg')),
+    method: 'POST',
+    endpoint: `${ apiRoot }/broadcasts/:id`,
+    identifiers: [
+      CommonParams.id('broadcast')
+    ],
+    request: {},
+    response: {
+      status:'success'
+    }
+  })
 })()

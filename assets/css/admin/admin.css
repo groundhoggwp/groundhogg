@@ -972,19 +972,27 @@ label.gh-switch input:checked ~ span.off {
   padding-right: 20px;
 }
 #api-docs pre {
-  color: #fff;
-  background-color: #102640;
   padding: 10px;
   margin: 0;
   overflow: auto;
+}
+#api-docs pre:not(.light) {
+  color: #fff;
+  background-color: #102640;
+}
+#api-docs pre:not(.light) a {
+  color: #fff;
+}
+#api-docs pre a {
+  text-decoration: none;
+}
+#api-docs pre a:hover {
+  text-decoration: underline;
 }
 #api-docs #request-display {
   width: 400px;
   flex-shrink: 0;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   overflow: auto;
 }
 #api-docs #request-display h2 {

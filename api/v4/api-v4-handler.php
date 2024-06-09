@@ -32,31 +32,31 @@ class API_V4_HANDLER {
 	 */
 	public function declare_base_endpoints() {
 
-		$this->contacts        = new Contacts_Api();
-		$this->notes_api       = new Notes_Api();
-		$this->tags            = new Tags_Api();
-		$this->fields          = new Fields_Api();
-		$this->properties      = new Properties_Api();
-		$this->emails          = new Emails_Api();
-		$this->broadcasts      = new Broadcasts_Api();
-		$this->funnels_api     = new Funnels_Api();
-		$this->steps_api       = new Steps_Api();
-		$this->activity_api    = new Activity_Api();
-		$this->events_api      = new Events_Api();
-		$this->event_queue_api = new Event_Queue_Api();
-		$this->submissions_api = new Submissions_Api();
-		$this->files_api       = new Files_Api();
-		$this->searches_api    = new Searches_Api();
-		$this->reports         = new Reports_Api();
-		$this->email_log       = new Email_Log_Api();
-		$this->unsubscribe_api = new Unsubscribe_Api();
-		$this->campaings_api   = new Campaigns_Api();
-		$this->tracking_api    = new Tracking_Api();
-		$this->forms           = new Forms_Api();
-		$this->options         = new Options_Api();
-		$this->page_visits     = new Page_Visits_Api();
-		$this->tasks           = new Tasks_Api();
-		$this->faker           = new Faker_Api();
+		$this->contacts    = new Contacts_Api();
+		$this->notes       = new Notes_Api();
+		$this->tags        = new Tags_Api();
+		$this->fields      = new Fields_Api();
+		$this->properties  = new Properties_Api();
+		$this->emails      = new Emails_Api();
+		$this->broadcasts  = new Broadcasts_Api();
+		$this->funnels     = new Funnels_Api();
+		$this->steps       = new Steps_Api();
+		$this->activity    = new Activity_Api();
+		$this->events      = new Events_Api();
+		$this->event_queue = new Event_Queue_Api();
+		$this->submissions = new Submissions_Api();
+		$this->files       = new Files_Api();
+		$this->searches    = new Searches_Api();
+		$this->reports     = new Reports_Api();
+		$this->email_log   = new Email_Log_Api();
+		$this->unsubscribe = new Unsubscribe_Api();
+		$this->campaings   = new Campaigns_Api();
+		$this->tracking    = new Tracking_Api();
+		$this->forms       = new Forms_Api();
+		$this->options     = new Options_Api();
+		$this->page_visits = new Page_Visits_Api();
+		$this->tasks       = new Tasks_Api();
+		$this->faker       = new Faker_Api();
 	}
 
 	/**

@@ -129,7 +129,7 @@ class Emails_Page extends Admin_Page {
 				]
 			] );
 
-			wp_enqueue_script( 'groundhogg-admin-email-filters' );
+			wp_enqueue_script( 'groundhogg-admin-filter-emails' );
 		}
 
 		remove_editor_styles();

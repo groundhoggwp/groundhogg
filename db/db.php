@@ -1166,11 +1166,11 @@ abstract class DB {
 	 * @throws FilterException
 	 *
 	 * @param Where $where
-	 * @param array $filters
+	 * @param array|string $filters
 	 *
 	 * @return void
 	 */
-	public function parse_filters( array $filters, Where $where ) {
+	public function parse_filters( $filters, Where $where ) {
 		$this->maybe_register_filters();
 		$this->query_filters->parse_filters( $filters, $where );
 	}

@@ -1112,20 +1112,34 @@ label.gh-switch {
   }
 
   pre {
-    color: #fff;
-    background-color: $primary-dark;
     padding: 10px;
     margin: 0;
     overflow: auto;
+
+    &:not(.light){
+      color: #fff;
+      background-color: $primary-dark;
+      a {
+        color: #fff;
+      }
+    }
+
+    a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   #request-display {
     width: 400px;
     flex-shrink: 0;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    //display: flex;
+    //flex-direction: column;
+    //gap: 10px;
     overflow: auto;
 
     h2 {

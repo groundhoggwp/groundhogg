@@ -21,7 +21,6 @@
     method: 'GET',
     endpoint: `${ apiRoot }/tags`,
     params: [
-      // name, type, required, default, description
       CommonParams.search('tags', ['tag_name', 'tag_description', 'tag_slug']),
       CommonParams.limit('tags'),
       CommonParams.offset('tags'),
@@ -34,47 +33,20 @@
       limit: 20,
     },
     response: {
-      'total_items': 99,
-      'items': [
+      "total_items": 1,
+      "items": [
         {
-          'ID': 1234,
-          'data': {
-            'email': 'john@example.com',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'full_name': 'John Doe',
-            'user_id': 0,
-            'owner_id': 1,
-            'optin_status': 2,
-            'date_created': '2023-10-18 13:05:25',
-            'date_optin_status_changed': '2023-10-18 13:05:25',
-            'age': false,
+          "ID": 22,
+          "data": {
+            "tag_id": 22,
+            "tag_slug": "customer",
+            "tag_name": "Customer",
+            "tag_description": "Custom tag description",
+            "show_as_preference": "0"
           },
-          'meta': {
-            'locale': 'en_US',
-            'primary_phone': '4658444269',
-            'mobile_phone': '',
-            'country': 'US',
-            'region': 'NY',
-            'city': 'New York',
-            'birthday': '',
-          },
-          'tags': [
-            {
-              'ID': 11,
-              'data': {
-                'tag_id': 11,
-                'tag_slug': 'customer',
-                'tag_name': 'Customer',
-              },
-            },
-          ],
-          'user': false,
-          'is_marketable': true,
-          'is_deliverable': true,
-        },
+        }
       ],
-      'status': 'success',
+      "status": "success"
     },
   })
 
@@ -149,7 +121,7 @@
     name: __('Update a tag', 'groundhogg'),
     description: () => Pg({}, __('Update a tag.', 'groundhogg')),
     method: 'PATCH',
-    endpoint: `${ apiRoot }/tags/<id>`,
+    endpoint: `${ apiRoot }/tags/:id`,
     identifiers: [
       CommonParams.id('tag'),
     ],
@@ -171,7 +143,7 @@
     name: __('Delete a tag', 'groundhogg'),
     description: () => Pg({}, __('Delete a tag.', 'groundhogg')),
     method: 'DELETE',
-    endpoint: `${ apiRoot }/tags/<id>`,
+    endpoint: `${ apiRoot }/tags/:id`,
     identifiers: [
       CommonParams.id('tag'),
     ],

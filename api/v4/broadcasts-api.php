@@ -32,6 +32,11 @@ class Broadcasts_Api extends Base_Object_Api {
 			'callback'            => [ $this, 'schedule_broadcast' ],
 		] );
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/cancel", [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'permission_callback' => [ $this, 'update_permissions_callback' ],
+			'callback'            => [ $this, 'cancel_broadcast' ],
+		] );
 	}
 
 	/**
@@ -158,6 +163,28 @@ class Broadcasts_Api extends Base_Object_Api {
 			'percent_complete' => $broadcast->get_percent_scheduled()
 		] );
 
+	}
+
+	/**
+	 * Cancel a broadcast
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function cancel_broadcast( WP_REST_Request $request ){
+
+		$broadcast = new Broadcast( $request->get_param( $this->get_primary_key() ) );
+
+		if ( ! $broadcast->exists() ) {
+			return self::ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		if ( ! $broadcast->cancel() ){
+			return self::ERROR_400( 'error', 'The broadcast could not be cancelled.' );
+		}
+
+		return self::SUCCESS_RESPONSE();
 	}
 
 	/**
