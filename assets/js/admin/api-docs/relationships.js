@@ -30,7 +30,7 @@
 
   const identifiers = [
     {
-      param: 'object_route',
+      param: 'type',
       type: 'string',
       required: true,
       description: () => Pg({}, __('The route for the object you wish to reference.')),
@@ -76,7 +76,7 @@
     description: () => Pg({},
       __('Retrieve related child objects of a specific type.', 'groundhogg')),
     method: 'GET',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: [
       childParams[1]
@@ -94,7 +94,7 @@
     description: () => Pg({},
       __('Retrieve related parent objects of a specific type.', 'groundhogg')),
     method: 'GET',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: [
       parentParams[1]
@@ -112,7 +112,7 @@
     description: () => Pg({},
       __('Creates a new parent&rarr;child relationship.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: childParams,
     request: {
@@ -129,7 +129,7 @@
     description: () => Pg({},
       __('Creates a new child&rarr;parent relationship.', 'groundhogg')),
     method: 'POST',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: parentParams,
     request: {
@@ -146,7 +146,7 @@
     description: () => Pg({},
       __('Deletes an existing parent&rarr;child relationship.', 'groundhogg')),
     method: 'DELETE',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: childParams,
     request: {
@@ -164,7 +164,7 @@
     description: () => Pg({},
       __('Deletes an existing child&rarr;parent relationship.', 'groundhogg')),
     method: 'DELETE',
-    endpoint: `${ apiRoot }/:object_route/:id/relationships`,
+    endpoint: `${ apiRoot }/:type/:id/relationships`,
     identifiers,
     params: parentParams,
     request: {

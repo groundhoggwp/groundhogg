@@ -12,6 +12,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Tag_Mapping;
 use Groundhogg_Email_Services;
 use function Groundhogg\action_input;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -29,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin Settings
  *
- * This  is your fairly typical settigns page.
+ * This  is your fairly typical settings page.
  * It's a BIT of a mess, but I digress.
  *
  * @since       File available since Release 0.1
@@ -170,13 +171,18 @@ class Settings_Page extends Admin_Page {
 		html()->start_form_table();
 		html()->start_row();
 		html()->th( __( 'API v4 Route', 'groundhogg' ) );
-		html()->td( html()->input( [
-				'class'    => 'code input regular-text',
-				'readonly' => true,
-				'value'    => rest_url( Base_Api::NAME_SPACE ),
-				'onfocus'  => 'this.select()'
-			]
-		) );
+		html()->td( [
+			html()->input( [
+					'class'    => 'code input regular-text',
+					'readonly' => true,
+					'value'    => rest_url( Base_Api::NAME_SPACE ),
+					'onfocus'  => 'this.select()'
+				]
+			),
+			html()->description( html()->e('a',[
+				'href' => admin_page_url( 'gh_tools', [ 'tab' => 'api' ] )
+			],__('Test out the API in the new Rest API Playground.', 'groundhogg' ) )),
+		] );
 		html()->end_row();
 		html()->start_row();
 		html()->th( __( 'API v3 Route', 'groundhogg' ) );

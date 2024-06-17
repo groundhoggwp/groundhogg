@@ -22,7 +22,9 @@
 
   ApiRegistry.add('notes', {
     name: __('Notes'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Add or manage notes for contacts, or other types.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 

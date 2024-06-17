@@ -12,7 +12,9 @@
 
   ApiRegistry.add('funnels', {
     name: __('Funnels'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Add one ore multiple contacts to funnels.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 

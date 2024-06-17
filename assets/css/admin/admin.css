@@ -916,6 +916,7 @@ label.gh-switch input:checked ~ span.off {
 #api-docs nav {
   width: 220px;
   flex-shrink: 0;
+  overflow: auto;
 }
 #api-docs nav a {
   text-decoration: none;

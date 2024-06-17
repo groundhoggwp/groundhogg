@@ -22,7 +22,9 @@
 
   ApiRegistry.add('emails', {
     name: __('Emails'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Add or update emails remotely.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 

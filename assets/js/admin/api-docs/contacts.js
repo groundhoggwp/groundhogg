@@ -15,7 +15,9 @@
   // Contacts
   ApiRegistry.add('contacts', {
     name: __('Contacts', 'groundhogg'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Add, update, and manage your contacts remotely.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 

@@ -783,6 +783,12 @@
       }
     }
 
+    if ( ! updateExample ){
+      updateExample = {
+        ...createExample
+      }
+    }
+
     strings = {
       read: sprintf(__('List %s', 'groundhogg'), plural),
       readDesc: sprintf(__('Retrieve multiple %s using a query.', 'groundhogg'), plural),

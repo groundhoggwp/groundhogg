@@ -11,7 +11,9 @@
 
   ApiRegistry.add('tags', {
     name: __('Tags'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Add, update, or manage tags remotely.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 

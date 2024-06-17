@@ -12,7 +12,9 @@
 
   ApiRegistry.add('broadcasts', {
     name: __('Broadcasts'),
-    description: '',
+    description: () => Fragment([
+      Pg({}, __('Send or manage broadcasts remotely.', 'groundhogg'))
+    ]),
     endpoints: Groundhogg.createRegistry(),
   })
 
@@ -25,7 +27,7 @@
       {
         param: 'query',
         description: () => Fragment([
-          Pg({}, __('The query object is how you select the contacts that will recieve the broadcast.', 'groundhogg')),
+          Pg({}, __('The query object is how you select the contacts that will receive the broadcast.', 'groundhogg')),
         ]),
         type: 'object',
         required: true,

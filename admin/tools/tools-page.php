@@ -213,7 +213,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'manage_options'
 			],
             [
-				'name' => __( 'API Playground', 'groundhogg' ),
+				'name' => __( 'Rest API Playground', 'groundhogg' ),
 				'slug' => 'api',
 				'cap'  => 'manage_options'
 			],
