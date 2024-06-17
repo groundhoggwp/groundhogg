@@ -1,6 +1,3 @@
-import me from '../../../lib/calendar/js/locale/me'
-import sw from '../../../lib/calendar/js/locale/sw'
-
 ( ($) => {
 
   const { sprintf, __, _x, _n } = wp.i18n

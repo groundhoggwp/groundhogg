@@ -648,7 +648,7 @@ class Filters {
 				self::string( $meta_value_column, $filter, $where );
 				break;
 			case 'number':
-				self::number( "CAST($meta_value_column as UNSIGNED)", $filter, $where );
+				self::number( "CAST($meta_value_column as DECIMAL(10,2))", $filter, $where );
 				break;
 			case 'date':
 				self::mysqlDate( "CAST($meta_value_column as DATE)", $filter, $where );
