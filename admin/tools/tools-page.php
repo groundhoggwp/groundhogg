@@ -1208,7 +1208,7 @@ class Tools_Page extends Tabbed_Admin_Page {
      * Re-sync user IDs
      *
 	 * @throws \Exception
-	 * @return void
+	 * @return bool
 	 */
 	public function process_re_sync_user_ids() {
 

@@ -13,7 +13,7 @@ abstract class Task implements \JsonSerializable {
 	 *
 	 * @return bool true for complete, false otherwise
 	 */
-	abstract public function process():bool;
+	abstract public function process();
 
 	public function stop(){}
 

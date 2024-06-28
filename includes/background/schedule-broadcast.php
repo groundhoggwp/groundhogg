@@ -27,7 +27,7 @@ class Schedule_Broadcast extends Task {
 	/**
 	 * @return bool true when broadcast is fully scheduled
 	 */
-	public function process(): bool {
+	public function process() {
 
 		$items_scheduled = $this->broadcast->enqueue_batch();
 
@@ -38,6 +38,10 @@ class Schedule_Broadcast extends Task {
 			notices()->add_user_notice( $message, 'warning', true, $this->broadcast->get_scheduled_by_id() );
 
 			return true;
+		}
+
+		if ( $items_scheduled === 0 ){
+			return null; // This will exit the process while loop.
 		}
 
 		if ( $this->broadcast->is_scheduled() ) {

@@ -227,7 +227,7 @@ class Broadcasts_Table extends WP_List_Table {
 		if ( $broadcast->is_pending() ){
 			$actions['schedule'] = html()->e('a', [
 				'href' => bulk_jobs()->broadcast_scheduler->get_start_url( [ 'broadcast' => $broadcast->get_id() ] )
-			], __('Schedule manually'));
+			], __('Schedule manually', 'groundhogg'));
 		}
 
 		// Add query action
@@ -238,7 +238,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 			$actions['query'] = html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', $query )
-			], 'View Query' );
+			], __( 'View Query', 'groundhogg' ) );
 		}
 
 		if ( $broadcast->is_pending() || $broadcast->is_scheduled() ) {

@@ -6845,7 +6845,7 @@ function has_accepted_cookies() {
 	$cookie_name  = get_option( 'gh_consent_cookie_name' );
 	$cookie_value = get_option( 'gh_consent_cookie_value' );
 
-	return apply_filters( 'groundhogg/has_accepted_cookies', get_cookie( $cookie_name ) === $cookie_value );
+	return apply_filters( 'groundhogg/has_accepted_cookies', get_cookie( $cookie_name ) == $cookie_value );
 }
 
 /**

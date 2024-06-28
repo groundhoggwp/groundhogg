@@ -68,6 +68,14 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_status() === 'sent';
 	}
 
+	public function is_sending() {
+		return $this->is_sent() && $this->has_pending_events();
+	}
+
+	public function is_fully_sent() {
+		return $this->is_sent() && ! $this->has_pending_events();
+	}
+
 	/**
 	 * Do any post setup actions.
 	 *
@@ -277,7 +285,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// if there are no pending events for this broadcast that means it's already fully sent
-		if ( ! $this->has_pending_events() ) {
+		if ( $this->is_fully_sent() ) {
 			return false;
 		}
 
@@ -319,8 +327,10 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function enqueue_batch() {
 
+		$lock = absint( $this->get_meta( 'schedule_lock' ) );
+
 		// This broadcast is already being scheduled
-		if ( $this->get_meta( 'schedule_lock' ) ) {
+		if ( $lock > 1 && time() - $lock < MINUTE_IN_SECONDS ) {
 			return 0;
 		}
 
@@ -333,7 +343,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$items = 0;
 
 		// Lock scheduling
-		$this->update_meta( 'schedule_lock', true );
+		$this->update_meta( 'schedule_lock', time() );
 
 		$query               = $this->get_query();
 		$in_lt               = (bool) $this->get_meta( 'send_in_local_time' );

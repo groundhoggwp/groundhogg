@@ -61,7 +61,7 @@ class Background_Task extends Base_Object {
 		$complete = false;
 
 		// While there is still more of the task to do
-		while ( ! Limits::limits_exceeded() && ! $complete ) {
+		while ( ! Limits::limits_exceeded() && $complete === false ) {
 			$complete = $this->task->process();
 			Limits::processed_action();
 		}
@@ -73,7 +73,7 @@ class Background_Task extends Base_Object {
 			'task' => $this->task
 		];
 
-		if ( $complete ) {
+		if ( $complete === true ) {
 			$data['status'] = 'done';
 		}
 

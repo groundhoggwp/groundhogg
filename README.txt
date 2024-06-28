@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.3
+Stable tag: 3.4.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4.3.1 (2024-05-29) =
+* ADDED Filter `groundhogg/has_accepted_cookies` for compatibility with 3rd party cookie compliance plugins.
+* ADDED Filter `groundhogg/location/get_real_ip` to filter the IP address. Just for you Paul ;).
+* FIXED Issue with the broadcast schedule lock not being reset, resulting in broadcast scheduling hanging up sometimes.
+* FIXED Unable to cancel pending broadcasts if no events have been scheduled yet.
 
 = 3.4.3 (2024-05-29) =
 * ADDED Asset editing lock. Emails and funnels will now be "locked" while editing. Similar to WordPress posts.
