@@ -69,7 +69,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	/**
 	 * Retrieves the cap for the current tab
 	 *
-	 * @return bool
+	 * @return string
 	 */
 	public function get_current_tab_cap() {
 
