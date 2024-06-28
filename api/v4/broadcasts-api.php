@@ -131,7 +131,16 @@ class Broadcasts_Api extends Base_Object_Api {
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
 
 		// Sets up the initial state for the scheduler
-		$broadcast->enqueue_batch();
+		$items_scheduled = $broadcast->enqueue_batch();
+
+		// Something is wrong scheduling the broadcast
+		if ( ! $items_scheduled ){
+
+			$broadcast->cancel();
+			$broadcast->delete();
+
+			return self::ERROR_500();
+		}
 
 		// If the broadcast is still pending, create a background task
 		$broadcast->schedule_in_background();
