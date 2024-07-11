@@ -2,7 +2,6 @@
 
 namespace Groundhogg\DB\Query;
 
-use function Groundhogg\array_filter_splice;
 use function Groundhogg\md5serialize;
 
 class Query {
@@ -187,37 +186,37 @@ class Query {
 		$column_regex = '([A-Za-z0-9_\.]+)';
 
 		$aggregate_functions = [
-			"/^COUNT\(DISTINCT\($column_regex\)\)/i"                            => function ( $matches ) {
+			"/^COUNT\(DISTINCT\($column_regex\)\)/i"                                                 => function ( $matches ) {
 				return sprintf( "COUNT(DISTINCT(%s))", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COUNT\((?:$column_regex\.\*)\)/i"                                => function ( $matches ) {
+			"/^COUNT\((?:$column_regex\.\*)\)/i"                                                     => function ( $matches ) {
 				return "COUNT(*)";
 			},
-			"/^COUNT\($column_regex\)/i"                                        => function ( $matches ) {
+			"/^COUNT\($column_regex\)/i"                                                             => function ( $matches ) {
 				return sprintf( "COUNT(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COUNT\(\*\)/i"                                                   => function ( $matches ) {
+			"/^COUNT\(\*\)/i"                                                                        => function ( $matches ) {
 				return "COUNT(*)";
 			},
-			"/^DISTINCT\($column_regex\)/i"                                     => function ( $matches ) {
+			"/^DISTINCT\($column_regex\)/i"                                                          => function ( $matches ) {
 				return sprintf( "DISTINCT(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^SUM\($column_regex\)/i"                                          => function ( $matches ) {
+			"/^SUM\($column_regex\)/i"                                                               => function ( $matches ) {
 				return sprintf( "SUM(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^AVG\($column_regex\)/i"                                          => function ( $matches ) {
+			"/^AVG\($column_regex\)/i"                                                               => function ( $matches ) {
 				return sprintf( "AVG(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^MAX\($column_regex\)/i"                                          => function ( $matches ) {
+			"/^MAX\($column_regex\)/i"                                                               => function ( $matches ) {
 				return sprintf( "MAX(%s)", $this->sanitize_column( $matches[1] ) );
 			},
-			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w*)(?:'|\")?\)/i"          => function ( $matches ) {
+			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w*)(?:'|\")?\)/i"                               => function ( $matches ) {
 				$column = $this->sanitize_column( $matches[1] );
 				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
 
 				return $this->db->prepare( "COALESCE($column, $format)", $matches[2] );
 			},
-			"/^DATE_FORMAT\($column_regex,\s*(?:'|\")?([^'\"]+)(?:'|\")?\)/i"   => function ( $matches ) {
+			"/^DATE_FORMAT\($column_regex,\s*(?:'|\")?([^'\"]+)(?:'|\")?\)/i"                        => function ( $matches ) {
 				$column = $this->sanitize_column( $matches[1] );
 				$format = is_numeric( $matches[2] ) ? '%d' : '%s';
 
@@ -226,7 +225,7 @@ class Query {
 			"/^CAST\($column_regex as (SIGNED|UNSIGNED|DATE|TIME|INT|DATETIME|DECIMAL\([^)]+\))\)/i" => function ( $matches ) {
 				return sprintf( "CAST(%s as %s)", $this->sanitize_column( $matches[1] ), strtoupper( $matches[2] ) );
 			},
-			"/^DATE\(FROM_UNIXTIME\($column_regex\)\)/i"                        => function ( $matches ) {
+			"/^DATE\(FROM_UNIXTIME\($column_regex\)\)/i"                                             => function ( $matches ) {
 				return sprintf( "DATE(FROM_UNIXTIME(%s))", $this->sanitize_column( $matches[1] ) );
 			},
 		];
@@ -691,19 +690,19 @@ class Query {
 
 	}
 
-	public static function cast2decimal(string $col, int $precision, int $scale){
+	public static function cast2decimal( string $col, int $precision, int $scale ) {
 		return "CAST($col as DECIMAL($precision, $scale))";
 	}
 
-	public static function cast2date(string $col){
+	public static function cast2date( string $col ) {
 		return "CAST($col as DATE)";
 	}
 
-	public static function cast2datetime(string $col){
+	public static function cast2datetime( string $col ) {
 		return "CAST($col as DATETIME)";
 	}
 
-	public static function cast2time(string $col){
+	public static function cast2time( string $col ) {
 		return "CAST($col as TIME)";
 	}
 
