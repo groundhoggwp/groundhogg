@@ -1381,16 +1381,16 @@ class Contact_Query extends Table_Query {
 			if ( $customField ) {
 				switch ( $customField['type'] ) {
 					case 'date':
-						$orderby = "CAST($orderby as DATE)";
+						$orderby = self::cast2date($orderby);
 						break;
 					case 'datetime':
-						$orderby = "CAST($orderby as DATETIME)";
+						$orderby = self::cast2datetime($orderby);
 						break;
 					case 'time':
-						$orderby = "CAST($orderby as TIME)";
+						$orderby = self::cast2time($orderby);
 						break;
 					case 'number':
-						$orderby = "CAST($orderby as SIGNED)";
+						$orderby = self::cast2decimal($orderby,10,2);
 						break;
 				}
 			}
