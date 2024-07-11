@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB\Query;
 
+use function Groundhogg\array_filter_splice;
 use function Groundhogg\md5serialize;
 
 class Query {
@@ -142,12 +143,26 @@ class Query {
 		'RAND()'   => true,
 	];
 
+	/**
+	 * Support explicitly defining safe column formats
+	 *
+	 * @param string $col
+	 *
+	 * @return $this
+	 */
 	public function add_safe_column( string $col ) {
 		$this->safe_columns[ $col ] = true;
 
 		return $this;
 	}
 
+	/**
+	 * Test whether a column string is safe to use in the query
+	 *
+	 * @param string $col
+	 *
+	 * @return bool
+	 */
 	public function column_is_safe( string $col ) {
 		return key_exists( $col, $this->safe_columns ) && $this->safe_columns[ $col ];
 	}
@@ -208,7 +223,7 @@ class Query {
 
 				return $this->db->prepare( "DATE_FORMAT($column, $format)", $matches[2] );
 			},
-			"/^CAST\($column_regex as (SIGNED|UNSIGNED|DATE|TIME|DATETIME)\)/i" => function ( $matches ) {
+			"/^CAST\($column_regex as (SIGNED|UNSIGNED|DATE|TIME|INT|DATETIME|DECIMAL\([^)]+\))\)/i" => function ( $matches ) {
 				return sprintf( "CAST(%s as %s)", $this->sanitize_column( $matches[1] ), strtoupper( $matches[2] ) );
 			},
 			"/^DATE\(FROM_UNIXTIME\($column_regex\)\)/i"                        => function ( $matches ) {
@@ -674,6 +689,22 @@ class Query {
 
 		return $result;
 
+	}
+
+	public static function cast2decimal(string $col, int $precision, int $scale){
+		return "CAST($col as DECIMAL($precision, $scale))";
+	}
+
+	public static function cast2date(string $col){
+		return "CAST($col as DATE)";
+	}
+
+	public static function cast2datetime(string $col){
+		return "CAST($col as DATETIME)";
+	}
+
+	public static function cast2time(string $col){
+		return "CAST($col as TIME)";
 	}
 
 }

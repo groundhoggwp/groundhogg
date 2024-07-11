@@ -127,7 +127,7 @@ class Filters {
 			'date_range' => 'any',
 			'after'      => '', // typically Y-m-d formatted string
 			'before'     => '', // typically Y-m-d formatted string
-			'days' => 0, // any positive integer
+			'days'       => 0, // any positive integer
 		] );
 
 		$after  = new DateTimeHelper(); // now
@@ -241,7 +241,7 @@ class Filters {
 				// set before time to EOD
 				$before->modify( '23:59:59' );
 
-				$after  = new DateTimeHelper( $filter['after'] );
+				$after = new DateTimeHelper( $filter['after'] );
 				// Set to SOD
 				$after->modify( '00:00:00' );
 				break;
@@ -309,7 +309,7 @@ class Filters {
 			'compare'    => 'is',
 		] );
 
-		if ( $filter['date_range'] === 'any' ){
+		if ( $filter['date_range'] === 'any' ) {
 			return;
 		}
 
@@ -328,7 +328,7 @@ class Filters {
 			return;
 		}
 
-		if ( $filter['compare'] === 'is_not' ){
+		if ( $filter['compare'] === 'is_not' ) {
 			$where->not();
 		}
 
@@ -421,15 +421,15 @@ class Filters {
 		] );
 
 		// Convert to float or int to be on the safe side
-		if ( is_string( $value ) ){
-			if ( str_contains( $value, ',' ) ){
+		if ( is_string( $value ) ) {
+			if ( str_contains( $value, ',' ) ) {
 				$value = floatval( $value );
 			} else {
 				$value = intval( $value );
 			}
 		}
 
-		if ( is_float( $value ) ){
+		if ( is_float( $value ) ) {
 			$where->setColumnFormat( $column, '%f' );
 		} else {
 			$where->setColumnFormat( $column, '%d' );
@@ -648,17 +648,17 @@ class Filters {
 				self::string( $meta_value_column, $filter, $where );
 				break;
 			case 'number':
-				self::number( "CAST($meta_value_column as DECIMAL(10,2))", $filter, $where );
+				self::number( Query::cast2decimal( $meta_value_column, 10, 2 ), $filter, $where );
 				break;
 			case 'date':
-				self::mysqlDate( "CAST($meta_value_column as DATE)", $filter, $where );
+				self::mysqlDate( Query::cast2date( $meta_value_column ), $filter, $where );
 				break;
 			case 'datetime':
-				self::mysqlDateTime( "CAST($meta_value_column as DATETIME)", $filter, $where );
+				self::mysqlDateTime( Query::cast2datetime( $meta_value_column ), $filter, $where );
 				break;
 			case 'time':
 				// todo this is wrong
-				self::mysqlDateTime( "CAST($meta_value_column as TIME)", $filter, $where );
+				self::mysqlDateTime( Query::cast2time( $meta_value_column ), $filter, $where );
 				break;
 			case 'radio':
 				self::is_one_of_filter( $meta_value_column, $filter, $where );
