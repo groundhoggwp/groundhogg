@@ -11,9 +11,6 @@ class Query {
 	 */
 	protected $db;
 
-	/**
-	 * @var DB
-	 */
 	protected string $table = '';
 	protected string $alias = '';
 	protected string $select = '*';
@@ -29,7 +26,7 @@ class Query {
 	protected Where $where;
 
 	/**
-	 * @param $table      DB|string
+	 * @param $table string
 	 */
 	public function __construct( string $table, string $alias = '' ) {
 
