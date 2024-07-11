@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.3.1
+Stable tag: 3.4.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.4.3.1 (2024-05-29) =
+= 3.4.3.2 (2024-07-10) =
+* FIXED Casting to decimal for number custom field filters was not working in conditional logic.
+
+= 3.4.3.1 (2024-06-28) =
 * ADDED Filter `groundhogg/has_accepted_cookies` for compatibility with 3rd party cookie compliance plugins.
 * ADDED Filter `groundhogg/location/get_real_ip` to filter the IP address. Just for you Paul ;).
 * FIXED Issue with the broadcast schedule lock not being reset, resulting in broadcast scheduling hanging up sometimes.
