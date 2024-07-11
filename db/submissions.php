@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Submission;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -62,6 +64,10 @@ class Submissions extends DB {
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
 		parent::add_additional_actions();
+	}
+
+	public function create_object( $object ) {
+		return new Submission( $object );
 	}
 
 	/**
