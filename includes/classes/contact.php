@@ -332,7 +332,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_first_name() {
-		return $this->first_name;
+		return ucwords( $this->first_name );
 	}
 
 	/**
@@ -341,7 +341,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_last_name() {
-		return $this->last_name;
+		return ucwords($this->last_name);
 	}
 
 	/**
