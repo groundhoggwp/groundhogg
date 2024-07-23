@@ -2284,5 +2284,23 @@
   Groundhogg.ActivityTimeline = ActivityTimeline
   Groundhogg.ContactActions = ContactActions
 
+  $(document).on('heartbeat-send.groundhogg-refresh-local-time', function (event, data) {
+
+    data['groundhogg-refresh-local-time'] = getContact().ID
+
+  }).on('heartbeat-tick.groundhogg-refresh-local -time', function (e, data) {
+
+    // Post locks: update the lock string or show the dialog if somebody has taken over editing.
+    let received;
+
+    if ( data['groundhogg-refresh-local-time'] ) {
+      received = data['groundhogg-refresh-local-time'];
+
+      if ( received.local_time ) {
+        $('#contact-localtime abbr').replaceWith( received.local_time )
+      }
+    }
+  })
+
 } )(jQuery, ContactEditor)
 
