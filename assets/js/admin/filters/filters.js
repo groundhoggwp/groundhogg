@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const {
     searchOptionsWidget,
@@ -235,7 +235,7 @@
    * @param name
    * @returns {{name, id}}
    */
-  const createGroup = (id, name) => ({ id, name })
+  const createGroup = (id, name) => ( { id, name } )
 
   /**
    * Create a filter base function
@@ -253,7 +253,7 @@
   const createFilter = (
     type, name, group,
     { edit = () => null, display = () => null, preload = () => {} },
-    defaults = {}) => ({
+    defaults = {}) => ( {
     type,
     name,
     group,
@@ -261,7 +261,7 @@
     display,
     preload,
     defaults,
-  })
+  } )
 
   /**
    * Create a string comparison filter
@@ -612,9 +612,9 @@
   const OptionsPicker = ({ field, options, updateFilter }) => ItemPicker({
     id: 'filter-options',
     noneSelected: 'Type to search...',
-    selected: options.map(opt => ({ id: opt, text: opt })),
+    selected: options.map(opt => ( { id: opt, text: opt } )),
     fetchOptions: async search => field.options.filter(opt => opt.match(new RegExp(search, 'i'))).
-    map(opt => ({ id: opt, text: opt })),
+      map(opt => ( { id: opt, text: opt } )),
     onChange: items => updateFilter({
       options: items.map(item => item.id),
     }),
@@ -749,7 +749,7 @@
   const FilterRegistry = ({
     groups = [],
     filters = [],
-  } = {}) => ({
+  } = {}) => ( {
 
     groups: groups.reduce((carr, curr) => {
       carr[curr.id] = curr.name
@@ -764,7 +764,8 @@
     registerGroup (group, name) {
       if (group && name) {
         this.groups[group] = name
-      } else {
+      }
+      else {
         this.groups[group.id] = group.name
       }
     },
@@ -824,7 +825,8 @@
           if (promise) {
             promises.push(promise)
           }
-        } catch (err) {}
+        }
+        catch (err) {}
       }))
 
       return Promise.all(promises)
@@ -841,9 +843,9 @@
 
         Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
 
-          let groupId = `${t.id}-${s.id}`
+          let groupId = `${ t.id }-${ s.id }`
 
-          this.registerGroup(groupId, `${t.name}: ${s.name}`)
+          this.registerGroup(groupId, `${ t.name }: ${ s.name }`)
 
           Object.values(fields).filter(f => f.group === s.id).forEach(f => {
 
@@ -869,7 +871,7 @@
       futureDateColumns = {},
       selectColumns = {},
       name = '',
-      group = 'table'
+      group = 'table',
     }) {
 
       this.registerGroup(group, name)
@@ -905,7 +907,7 @@
 
       return this
     },
-  })
+  } )
 
   /**
    * Create a filters editor
@@ -937,7 +939,8 @@
     const morph = () => {
       try {
         morphdom(document.getElementById(id), FiltersEditor())
-      } catch (e) {
+      }
+      catch (e) {
         // not in the dom yet
         console.log(e)
       }
@@ -978,13 +981,14 @@
         message = err instanceof Error ? err.message : sprintf(
           __('This %s filter is corrupted', 'groundhogg'),
           bold(filterRegistry.filterName(filter)))
-      } else {
+      }
+      else {
         message = sprintf(__('This %s filter is not available.', 'groundhogg'),
           bold(filter.type))
       }
 
       return Div({
-        id: `filter-${filter.id}`,
+        id: `filter-${ filter.id }`,
         className: 'filter filter-view filter-broken',
         tabindex: 0,
         onClick: e => {
@@ -1000,7 +1004,7 @@
         }, message),
         Button({
           type: 'button',
-          id: `delete-${group}-${index}`,
+          id: `delete-${ group }-${ index }`,
           className: 'delete-filter',
           onClick: e => {
             e.preventDefault()
@@ -1020,7 +1024,7 @@
      * @constructor
      */
     const Filter = (filter, group, index) => Div({
-      id: `filter-${filter.id}`,
+      id: `filter-${ filter.id }`,
       onClick: e => {
         if (clickedIn(e, '.delete-filter')) {
           return
@@ -1039,7 +1043,7 @@
       }, filterRegistry.displayName(filter)),
       Button({
         type: 'button',
-        id: `delete-${group}-${index}`,
+        id: `delete-${ group }-${ index }`,
         className: 'delete-filter',
         onClick: e => deleteFilter(group, index),
       }, Dashicon('no-alt')),
@@ -1065,9 +1069,10 @@
        */
       const morphFilter = () => {
         try {
-          morphdom(document.getElementById(`filter-${id}-settings`),
+          morphdom(document.getElementById(`filter-${ id }-settings`),
             FilterSettings())
-        } catch (e) {}
+        }
+        catch (e) {}
       }
 
       /**
@@ -1094,13 +1099,13 @@
        * @constructor
        */
       const FilterSettings = () => Div({
-        id: `filter-${id}-settings`,
+        id: `filter-${ id }-settings`,
         className: 'settings',
       }, filterRegistry.edit(tempFilterSettings, updateTempFilterSettings))
 
       return Div({
-        id: `edit-filter-${filter.id}`,
-        className: `filter filter-edit-wrap filter-${filter.type}`,
+        id: `edit-filter-${ filter.id }`,
+        className: `filter filter-edit-wrap filter-${ filter.type }`,
         tabindex: 0,
       }, Div({
         className: 'filter-edit',
@@ -1125,14 +1130,14 @@
 
           Button({
             type: 'button',
-            id: `delete-${group}-${index}`,
+            id: `delete-${ group }-${ index }`,
             className: 'delete delete-filter',
             onClick: e => deleteFilter(group, index),
           }, Dashicon('trash')),
 
           Button({
             type: 'button',
-            id: `commit-${group}-${index}`,
+            id: `commit-${ group }-${ index }`,
             className: 'commit commit-filter',
             onClick: e => updateFilter(tempFilterSettings, group, index),
           }, Dashicon('yes')),
@@ -1150,7 +1155,7 @@
      * @constructor
      */
     const FilterGroup = (filters, group) => Div({
-      id: `group-${group}`,
+      id: `group-${ group }`,
       className: 'group',
     }, [
       ...filters.map((filter, index) => {
@@ -1159,14 +1164,15 @@
             return EditFilter(filter, group, index)
           }
           return Filter(filter, group, index)
-        } catch (err) {
+        }
+        catch (err) {
           return FilterBroken(filter, group, index, err)
         }
 
       }),
       Button({
         type: 'button',
-        id: `add-filter-to-${group}`,
+        id: `add-filter-to-${ group }`,
         className: 'add-filter gh-has-tooltip',
         onClick: e => {
 
@@ -1218,7 +1224,8 @@
 
       if (filters[group]) {
         filters[group].push(filter)
-      } else {
+      }
+      else {
         filters.push([filter])
       }
 
@@ -1279,7 +1286,7 @@
      * @constructor
      */
     const GroupSeparator = (after) => Div({
-      id: `after-${after}`,
+      id: `after-${ after }`,
       className: 'or-separator',
     }, Span({
       className: 'or-circle',
@@ -1295,7 +1302,7 @@
       id,
       className: `search-filters`,
     }, Span({
-      id: `${id}-loading`,
+      id: `${ id }-loading`,
       className: 'filters-loading',
     }, Ellipses(__('Loading'))))
 
@@ -1310,7 +1317,7 @@
       if (!State.get('preloaded')) {
 
         filterRegistry.preloadFilters(filters).
-        then(() => setState({ preloaded: true }))
+          then(() => setState({ preloaded: true }))
 
         return FiltersLoading()
       }
@@ -1334,7 +1341,30 @@
     return FiltersEditor()
   }
 
+  /**
+   * Display filters in text
+   *
+   * @param filters
+   * @param filterRegistry
+   * @returns {*}
+   * @constructor
+   */
+  const FilterDisplay = ({ filters, filterRegistry }) => {
+    return Span({}, filters.map(row => {
+
+      return row.map(filter => {
+
+        let result = filterRegistry.displayName(filter)
+
+        return Span({}, result).innerHTML
+
+      }).join(' <i>AND</i> ')
+
+    }).join(' <br/><i>OR</i> '))
+  }
+
   Groundhogg.filters.Filters = Filters
+  Groundhogg.filters.FilterDisplay = FilterDisplay
   Groundhogg.filters.FilterRegistry = FilterRegistry
   Groundhogg.filters.createFilter = createFilter
   Groundhogg.filters.createGroup = createGroup
@@ -1368,7 +1398,7 @@
 
     TableFilterRegistry.registerFromConfig({
       ...TableFilterConfig,
-      group: 'table'
+      group: 'table',
     })
 
     GroundhoggTableFilters.FilterRegistry = TableFilterRegistry
@@ -1384,4 +1414,4 @@
     })
   }
 
-})(jQuery)
+} )(jQuery)

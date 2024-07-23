@@ -43,6 +43,7 @@
 
   const {
     Filters, FilterRegistry, createFilter, createGroup,
+    FilterDisplay,
     createDateFilter,
     createPastDateFilter,
     createStringFilter,
@@ -92,6 +93,11 @@
     filterRegistry: ContactFilterRegistry,
     filters,
     onChange
+  })
+
+  const ContactFilterDisplay = ( filters ) => FilterDisplay({
+    filters,
+    filterRegistry: ContactFilterRegistry,
   })
 
   const registerFilterGroup = (group, name) => {
@@ -1771,6 +1777,7 @@
   }
 
   Groundhogg.filters.ContactFilters = ContactFilters
+  Groundhogg.filters.ContactFilterDisplay = ContactFilterDisplay
 
   Groundhogg.filters.functions = {
     createFilters,
