@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Utils\DateTimeHelper;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -86,9 +88,9 @@ add_filter( 'groundhogg/api/v4/options_sanitize_callback', __NAMESPACE__ . '\fil
  *
  * @return mixed|string
  */
-function sanitize_step_meta( $meta_value, $meta_key, $object_id, $prev_value ){
+function sanitize_step_meta( $meta_value, $meta_key, $object_id, $prev_value ) {
 
-	switch ( $meta_key ){
+	switch ( $meta_key ) {
 		case 'note_text':
 			$meta_value = wp_kses_post( $meta_value );
 			break;
@@ -208,8 +210,7 @@ function responsive_tag_compat( $content ) {
 		return $content;
 	}
 
-	$tags = [
-//        'figure',
+	$tags = [//        'figure',
 		'img'
 	];
 
@@ -250,11 +251,7 @@ function _responsive_tag_compat_callback( $matches ) {
 
 	$img_width = min( $given_width, $default_email_width );
 
-	$style = array_merge( $style, [
-		'width'     => $img_width . 'px',
-		'height'    => 'auto',
-		'max-width' => '100%',
-	] );
+	$style = array_merge( $style, [ 'width' => $img_width . 'px', 'height' => 'auto', 'max-width' => '100%', ] );
 
 	foreach ( $classes as $class ) {
 		switch ( $class ) {
@@ -279,9 +276,7 @@ function _responsive_tag_compat_callback( $matches ) {
 	$atts['style'] = $style;
 	$atts['width'] = $img_width;
 
-	$self_closing = [
-		'img'
-	];
+	$self_closing = [ 'img' ];
 
 	if ( in_array( $tag_name, $self_closing ) ) {
 		return html()->e( $tag_name, $atts );
@@ -367,33 +362,13 @@ function more_allowed_tags( $tags ) {
 //		'PUBLIC' => true,
 //	];
 	$tags['html']             = [];
-	$tags['head']             = [
-		'xlmns'   => true,
-		'xmlns:o' => true,
-	];
-	$tags['meta']             = [
-		'charset'    => true,
-		'content'    => true,
-		'name'       => true,
-		'http-equiv' => true,
-	];
+	$tags['head']             = [ 'xlmns' => true, 'xmlns:o' => true, ];
+	$tags['meta']             = [ 'charset' => true, 'content' => true, 'name' => true, 'http-equiv' => true, ];
 	$tags['title']            = [];
-	$tags['style']            = [
-		'type' => true
-	];
-	$tags['link']             = [
-		'href' => true
-	];
-	$tags['center']           = [
-		'id'    => true,
-		'class' => true,
-		'style' => true,
-	];
-	$tags['body']             = [
-		'id'    => true,
-		'class' => true,
-		'style' => true,
-	];
+	$tags['style']            = [ 'type' => true ];
+	$tags['link']             = [ 'href' => true ];
+	$tags['center']           = [ 'id' => true, 'class' => true, 'style' => true, ];
+	$tags['body']             = [ 'id' => true, 'class' => true, 'style' => true, ];
 	$tags['td']['background'] = true;
 	$tags['table']['role']    = true;
 
@@ -401,14 +376,7 @@ function more_allowed_tags( $tags ) {
 	$tags['xml'] = [];
 	$tags['w']   = [];
 	$tags['o']   = [];
-	$tags['v']   = [
-		'xmlns:v'        => true,
-		'xmlns:w'        => true,
-		'esdevVmlButton' => true,
-		'arcsize'        => true,
-		'stroke'         => true,
-		'fillcolor'      => true,
-	];
+	$tags['v']   = [ 'xmlns:v' => true, 'xmlns:w' => true, 'esdevVmlButton' => true, 'arcsize' => true, 'stroke' => true, 'fillcolor' => true, ];
 
 	// Common unsupported tags
 	unset( $tags['script'] );
@@ -515,7 +483,7 @@ function safe_css_filter_rgb_to_hex( $content ) {
  *
  * @return array|string|string[]|null
  */
-function safe_css_font_quotes( $content ){
+function safe_css_font_quotes( $content ) {
 	return preg_replace( '/&quot;(Arial Black|Arial Narrow|Times New Roman|Courier New|Trebuchet MS|Century Gothic|Book Antiqua|Lucida Grande|Lucida Sans|Copperplate Gothic Light)&quot;/', "'$1'", $content );
 }
 
@@ -626,3 +594,38 @@ add_filter( 'user_phone_label', function ( $label ) {
 function remove_thumbnail_dimensions( $html ) {
 	return preg_replace( '/(width|height)=\"\d*\"\s/', "", $html );
 }
+
+/**
+ * Pass back a new local time for the contact details card
+ *
+ * @param array $response
+ * @param array $data
+ * @param       $screen_id
+ *
+ * @return array
+ */
+function maybe_refresh_local_time( array $response, array $data, $screen_id ) {
+
+	if ( ! isset_not_empty( $data, 'groundhogg-refresh-local-time' ) ) {
+		return $response;
+	}
+
+	$contact_id = absint( $data['groundhogg-refresh-local-time'] );
+	$contact    = new Contact( $contact_id );
+
+	if ( ! $contact->exists() ) {
+		return $response;
+	}
+
+	$today   = new DateTimeHelper();
+	$local   = new DateTimeHelper( 'now', $contact->get_time_zone( false ) );
+	$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->wpTimeFormat() : $local->wpDateTimeFormat();
+
+	$display = html()->e( 'abbr', [ 'title' => $local->wpDateTimeFormat() ], $display );
+
+	$response['groundhogg-refresh-local-time'] = [ 'local_time' => $display ];
+
+	return $response;
+}
+
+add_filter( 'heartbeat_received', __NAMESPACE__ . '\maybe_refresh_local_time', 10, 3 );
