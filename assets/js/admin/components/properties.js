@@ -477,7 +477,7 @@
 				  </div>
           <div class="gh-row">
               <div class="gh-col">
-                  <label class="">${__('Group', 'groundhogg')}</label>
+                  <label style="display: block">${__('Group', 'groundhogg')}</label>
                   <select id="property-field-group"></select>
               </div>
           </div>
