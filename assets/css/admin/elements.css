@@ -138,6 +138,9 @@ h3.no-margin-top {
 .display-flex.stretch {
   align-items: stretch;
 }
+.display-flex.gap-5 {
+  gap: 5px;
+}
 .display-flex.gap-10 {
   gap: 10px;
 }

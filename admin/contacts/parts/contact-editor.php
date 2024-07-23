@@ -36,11 +36,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 ?>
 <div class="align-left-space-between align-top two-columns">
     <div id="primary-contact-stuff">
-        <div class="gh-panel contact-details">
+        <div class="contact-details">
 			<?php include __DIR__ . '/details-card.php'; ?>
-            <div id="contact-more-actions" class="align-center-space-between" style="padding-bottom: 20px">
-
-            </div>
         </div>
         <div class="gh-panel tags-panel">
             <div class="gh-panel-header">
@@ -421,9 +418,9 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						<?php endif; ?>
                         </tbody>
                     </table>
-                    <p>
+                    <div class="sticky-submit has-box-shadow">
                         <button class="gh-button primary" id="save-primary"><?php _e( 'Save Changes' ) ?></button>
-                    </p>
+                    </div>
 
 					<?php
 				}

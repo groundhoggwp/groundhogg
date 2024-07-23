@@ -50,7 +50,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 }
 
 .basic-details > div:not(:last-child) {
-  margin-bottom: 8px;
+  //margin-bottom: 8px;
 }
 
 .contact-details div .dashicons {
@@ -103,6 +103,9 @@ a.change-status.complained:hover {
 
 .contact-picture img {
   border-radius: 3px;
+  float: left;
+  margin: 0 20px 16px 20px;
+
 }
 
 .two-columns {
@@ -115,6 +118,21 @@ a.change-status.complained:hover {
     flex-direction: column;
     gap: 20px;
   }
+}
+
+.sticky-submit{
+  background-color: #fff;
+  position: sticky;
+  bottom: 0;
+  padding: 10px 20px;
+  margin: 20px -20px -20px -20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#contact-full-name{
+  font-weight: 500;
 }
 
 .basic-details {
@@ -172,6 +190,10 @@ a.change-status.complained:hover {
   .tab-content-wrapper:not(.active) {
     display: none;
   }
+}
+
+.tab-content-wrapper .inside{
+  position: relative;
 }
 
 #other-contact-stuff a,

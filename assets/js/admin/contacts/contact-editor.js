@@ -1529,7 +1529,8 @@
 
       ajax(data).then(r => {
 
-        $('.gh-panel.contact-details .inside').replaceWith(r.data.details)
+        $('#primary-contact-stuff .contact-details').replaceWith(r.data.details)
+        contactMoreActions()
 
         ContactsStore.itemsFetched([r.data.contact])
 
@@ -1699,14 +1700,14 @@
                 <div class="inside">
                     <div id="custom-fields-here">
                     </div>
-                    <p>
-                        <button id="save-meta" class="gh-button primary">
-                            ${ __('Save Changes') }
-                        </button>
+                    <div class="sticky-submit has-box-shadow">
                         <button id="cancel-meta-changes"
                                 class="gh-button danger text">${ __('Cancel') }
                         </button>
-                    </p>
+                        <button id="save-meta" class="gh-button primary">
+                            ${ __('Save Changes') }
+                        </button>
+                    </div>
                 </div>
             </div>`
 
@@ -1883,14 +1884,14 @@
                     <h2>${ __('Meta') }</h2>
                     <div id="meta-here">
                     </div>
-                    <p>
-                        <button id="save-meta" class="gh-button primary">
-                            ${ __('Save Changes') }
-                        </button>
+                    <div class="sticky-submit has-box-shadow">
                         <button id="cancel-meta-changes"
                                 class="gh-button danger text">${ __('Cancel') }
                         </button>
-                    </p>
+                        <button id="save-meta" class="gh-button primary">
+                            ${ __('Save Changes') }
+                        </button>
+                    </div>
                 </div>
             </div>`
 
@@ -1899,23 +1900,24 @@
 
         let { alternate_emails = [], alternate_phones = [] } = getContact().meta
 
-        inputRepeaterWidget({
-          selector: '#contact-phones-here',
+        inputRepeater( '#contact-phones-here', {
           rows: alternate_phones,
-          cellProps: [
-            {
-              type: 'email',
+          cells: [
+            ({value, ...props}) => select({
               options: {
                 mobile: __('Mobile'),
                 home: __('Home'),
                 work: __('Work'),
               },
-            }, {
+              selected: value,
+              ...props
+            }),
+            props => input({
               type: 'tel',
               placeholder: __('(123) 456-7890'),
-            },
+              ...props
+            }),
           ],
-          cellCallbacks: [select, input],
           onMount: () => {
           },
           onChange: (rows) => {

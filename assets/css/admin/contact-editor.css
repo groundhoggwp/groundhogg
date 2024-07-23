@@ -26,10 +26,6 @@
   font-weight: 500;
 }
 
-.basic-details > div:not(:last-child) {
-  margin-bottom: 8px;
-}
-
 .contact-details div a {
   text-decoration: none;
 }
@@ -74,6 +70,8 @@ a.change-status.complained:hover {
 
 .contact-picture img {
   border-radius: 3px;
+  float: left;
+  margin: 0 20px 16px 20px;
 }
 
 .two-columns {
@@ -84,6 +82,21 @@ a.change-status.complained:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.sticky-submit {
+  background-color: #fff;
+  position: sticky;
+  bottom: 0;
+  padding: 10px 20px;
+  margin: 20px -20px -20px -20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#contact-full-name {
+  font-weight: 500;
 }
 
 .basic-details .email p.marketable-reason {
@@ -127,6 +140,10 @@ a.change-status.complained:hover {
 }
 #primary-contact-stuff .tab-content-wrapper:not(.active) {
   display: none;
+}
+
+.tab-content-wrapper .inside {
+  position: relative;
 }
 
 #other-contact-stuff a,
