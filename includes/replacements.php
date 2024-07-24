@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Query\Table_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -91,6 +93,7 @@ class Replacements implements \JsonSerializable {
 			'address'    => __( 'Address', 'groundhogg' ),
 			'user'       => __( 'WP User', 'groundhogg' ),
 			'owner'      => __( 'Contact Owner', 'groundhogg' ),
+			'activity'   => __( 'Activity', 'groundhogg' ),
 			'site'       => __( 'Site', 'groundhogg' ),
 			'post'       => __( 'Post', 'groundhogg' ),
 			'compliance' => __( 'Compliance', 'groundhogg' ),
@@ -411,6 +414,14 @@ class Replacements implements \JsonSerializable {
 				'description'  => _x( 'Same as {date} but will display in local time of the contact instead of the site.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'         => 'form_submission',
+				'group'        => 'activity',
+				'default_args' => 'layout="stacked" fields="all" form="recent"',
+				'callback'     => [ $this, 'replacement_form_submission' ],
+				'name'         => __( 'Form Submission', 'groundhogg' ),
+				'description'  => _x( 'All the responses from the most recent form submission.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'           => 'files',
 				'group'          => 'crm',
 				'callback'       => [ $this, 'replacement_files' ],
@@ -679,7 +690,7 @@ class Replacements implements \JsonSerializable {
 		return $this->tackle_replacements( $content );
 	}
 
-    const PATTERN = '/{([A-Za-z_][^{}\n]+)}/';
+	const PATTERN = '/{([A-Za-z_][^{}\n]+)}/';
 
 	/**
 	 * Recursive function to tackle nested replacement codes until no more replacements are found.
@@ -1714,7 +1725,7 @@ class Replacements implements \JsonSerializable {
 	 *
 	 * @return array
 	 */
-	function parse_atts( $text ) {
+	function parse_atts( $text, $defaults = [] ) {
 
 		if ( is_array( $text ) ) {
 			return $text;
@@ -1726,7 +1737,7 @@ class Replacements implements \JsonSerializable {
 			return [];
 		}
 
-		$atts = [];
+		$atts = $defaults;
 
 		foreach ( $_atts as $key => $value ) {
 
@@ -1739,7 +1750,7 @@ class Replacements implements \JsonSerializable {
 			$atts[ $key ] = $value;
 		}
 
-		return $atts;
+		return wp_parse_args( $atts, $defaults );
 	}
 
 	/**
@@ -2397,6 +2408,87 @@ class Replacements implements \JsonSerializable {
 		remove_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
 
 		return $content;
+	}
+
+	/**
+	 * Output the responses of a form submission in a structured format
+	 *
+	 * @param $args
+	 *
+	 * @return string|void
+	 */
+	public function replacement_form_submission( $args ) {
+
+		$props = $this->parse_atts( $args, [
+			'layout' => 'stacked',
+			'form'   => 'newest',
+			'fields' => 'all',
+			'hidden' => false
+		] );
+
+		$query = new Table_Query( 'submissions' );
+		$query->setLimit( 1 )
+		      ->setOrderby( [ 'date_created', 'DESC' ] )
+		      ->where()
+		      ->equals( 'contact_id', $this->get_current_contact()->get_id() )
+		      ->equals( 'type', 'form' );
+
+		if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) ) {
+
+			// get the most recent form submission
+
+		} else if ( in_array( $props['form'], [ 'first', 'oldest' ] ) ) {
+
+			// get the first form submission
+			$query->setOrderby( [ 'date_created', 'ASC' ] );
+
+		} else if ( absint( $props['form'] ) > 0 ) {
+
+			// get the most recent submission for a specific form
+			$query->where()->equals( 'form_id', absint( $props['form'] ) );
+		}
+
+		$submissions = $query->get_objects();
+
+		if ( empty( $submissions ) ) {
+			return '';
+		}
+
+		$submission = $submissions[0];
+
+		$answers = $submission->get_answers( $props['hidden'] );
+
+		switch ( $props['layout'] ) {
+			case 'table':
+
+				return html()->e( 'table', [], array_map( function ( $answer ) {
+					return html()->e( 'tr', [], [
+						html()->e( 'th', [], $answer['label'] ),
+						html()->e( 'td', [], $answer['value'] ),
+					] );
+				}, $answers ) );
+
+			case 'beside':
+				return implode( '', array_map( function ( $answer ) {
+					return html()->e( 'p', [], bold_it( $answer['label'] ) . ': ' . $answer['value'] );
+				}, $answers ) );
+			case 'stacked':
+			case 'below':
+				return implode( '', array_map( function ( $answer ) {
+					return html()->e( 'p', [], bold_it( $answer['label'] ) . '<br/>' . $answer['value'] );
+				}, $answers ) );
+			default:
+			case 'normal':
+
+				return implode( '', array_map( function ( $answer ) {
+
+					return implode( '', [
+						html()->e( 'p', [], bold_it( $answer['label'] ) ),
+						html()->e( 'p', [], $answer['value'] )
+					] );
+
+				}, $answers ) );
+		}
 	}
 
 	/**

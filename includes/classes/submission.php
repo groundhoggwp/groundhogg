@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\Form\Form_v2;
 use Groundhogg\Utils\DateTimeHelper;
 
 /**
@@ -74,7 +75,7 @@ class Submission extends Base_Object_With_Meta {
 	 * @throws \Exception
 	 * @return \DateTime
 	 */
-	public function get_date(){
+	public function get_date() {
 		return new \DateTime( $this->get_date_created(), wp_timezone() );
 	}
 
@@ -101,6 +102,27 @@ class Submission extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Returns an associative array of names to answers
+	 *
+	 * [
+	 *   'field_name' => [ 'label' => 'my field', 'value' => 'Some value' ]
+	 * ]
+	 *
+	 * @return array[]
+	 */
+	public function get_answers( $include_hidden = false ) {
+
+		// ignore webhooks for now
+		if ( $this->type !== 'form' ) {
+			return [];
+		}
+
+		$form = new Form_v2( $this->get_form_id() );
+
+		return $form->get_submission_answers( $this, $include_hidden );
+	}
+
+	/**
 	 * Modify return
 	 *
 	 * @return array
@@ -110,10 +132,11 @@ class Submission extends Base_Object_With_Meta {
 
 		$date = new DateTimeHelper( $this->get_date_created(), wp_timezone() );
 
-		$array['data']['time'] =$date->getTimestamp();
+		$array['data']['time'] = $date->getTimestamp();
 		$array['form']         = new Step( $this->get_form_id() );
-		$array['i18n']       = [
-			'diff_time' => ucfirst( $date->i18n() )
+		$array['i18n']         = [
+			'diff_time' => ucfirst( $date->i18n() ),
+			'answers'   => $this->get_answers( true )
 		];
 
 		return $array;

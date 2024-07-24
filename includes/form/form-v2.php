@@ -7,11 +7,13 @@ use Groundhogg\Contact;
 use Groundhogg\Properties;
 use Groundhogg\Step;
 use Groundhogg\Submission;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\array_find;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\current_contact_and_logged_in_user_match;
 use function Groundhogg\do_replacements;
+use function Groundhogg\file_access_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
@@ -127,6 +129,18 @@ function standard_meta_callback( $field, $posted_data, &$data, &$meta ) {
 	if ( isset( $posted_data[ $field['name'] ] ) ) {
 		$meta[ $field['name'] ] = sanitize_text_field( $posted_data[ $field['name'] ] );
 	}
+}
+
+/**
+ * Retrieve data from the submission given the name of the field
+ *
+ * @param Submission $submission
+ * @param            $field
+ *
+ * @return array|mixed
+ */
+function standard_meta_retrieve( Submission $submission, $field ) {
+	return $submission->get_meta( $field['name'] );
 }
 
 /**
@@ -278,6 +292,9 @@ class Form_v2 extends Step {
 				'required' => function ( $field, $posted_data ) {
 					return isset( $posted_data['first_name'] ) && ! empty( $posted_data['first_name'] );
 				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->first_name;
+				}
 			],
 
 			// Last Name
@@ -315,6 +332,9 @@ class Form_v2 extends Step {
 				'required' => function ( $field, $posted_data ) {
 					return isset( $posted_data['last_name'] ) && ! empty( $posted_data['last_name'] );
 				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->last_name;
+				}
 			],
 
 			// Email
@@ -333,6 +353,9 @@ class Form_v2 extends Step {
 				},
 				'before'   => function ( $field, $posted_data, &$args ) {
 					$args['email'] = sanitize_email( $posted_data->email );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->email;
 				}
 			],
 
@@ -369,6 +392,15 @@ class Form_v2 extends Step {
 
 					$type          = $field['phone_type'] . '_phone';
 					$meta[ $type ] = sanitize_text_field( $posted_data->$type );
+				},
+				'retrieve' => function ( Submission $submission, $field ) {
+					$field = wp_parse_args( $field, [
+						'phone_type' => 'primary'
+					] );
+
+					$type = $field['phone_type'] . '_phone';
+
+					return $submission->$type;
 				}
 			],
 
@@ -384,6 +416,9 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['street_address_1'] = sanitize_text_field( $posted_data->line1 );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->street_address_1;
 				}
 			],
 
@@ -399,6 +434,9 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['street_address_2'] = sanitize_text_field( $posted_data->line2 );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->street_address_2;
 				}
 			],
 
@@ -414,6 +452,9 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['city'] = sanitize_text_field( $posted_data->city );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->city;
 				}
 			],
 
@@ -429,6 +470,9 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['region'] = sanitize_text_field( $posted_data->state );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->region;
 				}
 			],
 
@@ -444,6 +488,9 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['postal_zip'] = sanitize_text_field( $posted_data->zip_code );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->postal_zip;
 				}
 			],
 
@@ -480,6 +527,9 @@ class Form_v2 extends Step {
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['country'] = sanitize_text_field( $posted_data->country );
+				},
+				'retrieve' => function ( Submission $submission ) {
+					return $submission->country ? utils()->location->get_countries_list( $submission->country ) : '';
 				}
 			],
 
@@ -491,8 +541,6 @@ class Form_v2 extends Step {
 						'id'        => '',
 						'className' => '',
 					] );
-
-					$business_name = get_option( 'gh_business_name', get_bloginfo( 'name' ) );
 
 					return html()->e( 'div', [
 						'class' => trim( 'consent ' . $field['className'] ),
@@ -525,6 +573,10 @@ class Form_v2 extends Step {
 
 					return true;
 				},
+				'before'   => function ( $field, $posted_data, &$args, &$meta, &$tags, &$submission ) {
+					$submission['gdpr_consent']      = __( 'Yes' );
+					$submission['marketing_consent'] = $posted_data->marketing_consent === 'yes' ? __( 'Yes' ) : __( 'No' );
+				},
 				'after'    => function ( $field, Posted_Data $posted_data, Contact $contact ) {
 					$contact->set_gdpr_consent();
 
@@ -532,7 +584,14 @@ class Form_v2 extends Step {
 						$contact->set_marketing_consent();
 					}
 				},
-				'required' => '__return_true'
+				'required' => '__return_true',
+				'retrieve' => function ( Submission $submission ) {
+					return implode( '', [
+						__( 'Data Processing Consent: Yes', 'groundhogg' ),
+						'<br/>',
+						$submission->marketing_consent === 'Yes' ? __( 'Marketing Consent: Yes', 'groundhogg' ) : __( 'Marketing Consent: No', 'groundhogg' )
+					] );
+				}
 			],
 
 			// Terms & Conditions checkbox
@@ -565,25 +624,32 @@ class Form_v2 extends Step {
 
 					return true;
 				},
+				'before'   => function ( $field, $posted_data, &$args, &$meta, &$tags, &$submission ) {
+					$submission['terms'] = __( 'Yes' );
+				},
 				'after'    => function ( $field, Posted_Data $posted_data, Contact $contact ) {
 					$contact->set_terms_agreement();
 				},
-				'required' => '__return_true'
+				'required' => '__return_true',
+				'retrieve' => function ( Submission $submission ) {
+					return __( 'Terms: Yes', 'groundhogg' );
+				}
 			],
 
 			// Generic Text
 			'text'         => [
-				'render' => function ( $field, $contact ) {
+				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
 						'type' => 'text',
 					] ), $contact );
 				},
-				'before' => __NAMESPACE__ . '\standard_meta_callback',
+				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// Generic Hidden
 			'hidden'       => [
-				'render' => function ( $field, $contact ) {
+				'render'   => function ( $field, $contact ) {
 
 					if ( empty( $field['id'] ) ) {
 						$field['id'] = $field['name'];
@@ -593,7 +659,8 @@ class Form_v2 extends Step {
 
 					return basic_input( $field, $contact );
 				},
-				'before' => __NAMESPACE__ . '\standard_meta_callback',
+				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// Generic Email
@@ -611,15 +678,29 @@ class Form_v2 extends Step {
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta[ $field['name'] ] = sanitize_email( $posted_data[ $field['name'] ] );
 				},
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value = standard_meta_retrieve( $submission, $field );
+
+					return html()->e( 'a', [
+						'href' => 'mailto:' . $value
+					], esc_html( $value ) );
+				}
 			],
 			// Generic Tel
 			'tel'          => [
-				'render' => function ( $field, $contact ) {
+				'render'   => function ( $field, $contact ) {
 					return basic_text_field( array_merge( $field, [
 						'type' => 'tel',
 					] ), $contact );
 				},
-				'before' => __NAMESPACE__ . '\standard_meta_callback',
+				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value = standard_meta_retrieve( $submission, $field );
+
+					return html()->e( 'a', [
+						'href' => 'tel:' . $value
+					], esc_html( $value ) );
+				}
 			],
 			// Generic URL
 			'url'          => [
@@ -632,6 +713,13 @@ class Form_v2 extends Step {
 					return filter_var( $posted_data[ $field['name'] ], FILTER_VALIDATE_URL ) ? true : new \WP_Error( 'invalid_url', __( 'Invalid URL', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value = standard_meta_retrieve( $submission, $field );
+
+					return html()->e( 'a', [
+						'href' => $value
+					], esc_html( $value ) );
+				}
 			],
 
 			// Generic Date
@@ -645,6 +733,12 @@ class Form_v2 extends Step {
 					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new \WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value    = standard_meta_retrieve( $submission, $field );
+					$dateTime = new DateTimeHelper( $value );
+
+					return $dateTime->wpDateFormat();
+				}
 			],
 
 			// Generic Date & Time
@@ -658,6 +752,12 @@ class Form_v2 extends Step {
 					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new \WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value    = standard_meta_retrieve( $submission, $field );
+					$dateTime = new DateTimeHelper( $value );
+
+					return $dateTime->wpDateTimeFormat();
+				}
 			],
 
 			// Generic Time
@@ -673,6 +773,12 @@ class Form_v2 extends Step {
 					return $d && $d->format( 'H:i:s' ) == $posted_data[ $field['name'] ] ? true : new \WP_Error( 'invalid_time', __( 'Invalid Time', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value    = standard_meta_retrieve( $submission, $field );
+					$dateTime = new DateTimeHelper( $value );
+
+					return $dateTime->wpTimeFormat();
+				}
 			],
 
 			// Generic Number
@@ -689,6 +795,7 @@ class Form_v2 extends Step {
 					$num                    = $posted_data[ $field['name'] ];
 					$meta[ $field['name'] ] = strpos( $num, '.' ) !== false ? floatval( $num ) : intval( $num );
 				},
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// Generic Textarea
@@ -702,7 +809,8 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => function ( $field, $posted_data, &$data, &$meta ) {
 					$meta[ $field['name'] ] = sanitize_textarea_field( $posted_data[ $field['name'] ] );
-				}
+				},
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// Generic Dropdown
@@ -773,6 +881,11 @@ class Form_v2 extends Step {
 					return in_array( $value, $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value = standard_meta_retrieve( $submission, $field );
+
+					return is_array( $value ) ? implode( ', ', $value ) : $value;
+				}
 			],
 
 			// Generic Radio
@@ -830,6 +943,7 @@ class Form_v2 extends Step {
 					return empty( $posted_data[ $field['name'] ] ) || in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// Generic Checkboxes
@@ -892,6 +1006,11 @@ class Form_v2 extends Step {
 					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new \WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_multiselect_callback',
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value = standard_meta_retrieve( $submission, $field );
+
+					return implode( ', ', $value );
+				}
 			],
 
 			// Generic Checkbox
@@ -927,7 +1046,8 @@ class Form_v2 extends Step {
 					if ( $posted_data->isset_not_empty( $field['name'] ) ) {
 						$contact->apply_tag( $field['tags'] );
 					}
-				}
+				},
+				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
 			],
 
 			// File Upload
@@ -982,11 +1102,19 @@ class Form_v2 extends Step {
 					return true;
 
 				},
-				'after'    => function ( $field, $posted_data, $contact ) {
-					$file = $contact->upload_file( $_FILES[ $field['name'] ] );
+				'after'    => function ( $field, $posted_data, Contact $contact, &$submission ) {
+					$file                        = $contact->upload_file( $_FILES[ $field['name'] ] );
+					$submission[ $file['name'] ] = $file['file']; // store the filename
 				},
 				'required' => function ( $field, $posted_data ) {
 					return isset_not_empty( $_FILES, $field['name'] );
+				},
+				'retrieve' => function ( Submission $submission, $field ) {
+					$filename = $submission->get_meta( $field['name'] );
+
+					return html()->e( 'a', [
+						'href' => file_access_url( '/uploads/' . $submission->get_contact()->get_upload_folder_basename() . '/' . $filename )
+					], $filename );
 				},
 			],
 
@@ -1141,6 +1269,12 @@ class Form_v2 extends Step {
 
 					return ! empty( $input );
 				},
+				'retrieve' => function ( Submission $submission, $field ) {
+					$value    = standard_meta_retrieve( $submission, $field );
+					$dateTime = new DateTimeHelper( $value );
+
+					return $dateTime->wpDateFormat();
+				}
 			],
 
 			// Custom Fields
@@ -1174,7 +1308,7 @@ class Form_v2 extends Step {
 						'required'  => $field['required'],
 					] ), $posted_data );
 				},
-				'before'   => function ( $field, $posted_data, &$data, &$meta, &$tags ) {
+				'before'   => function ( $field, $posted_data, &$data, &$meta, &$tags, &$submission ) {
 					$property = $field['property'];
 					$property = Properties::instance()->get_field( $property );
 					if ( ! $property ) {
@@ -1186,7 +1320,7 @@ class Form_v2 extends Step {
 						'id'        => $field['id'],
 						'className' => $field['className'],
 						'required'  => $field['required'],
-					] ), $posted_data, $data, $meta, $tags );
+					] ), $posted_data, $data, $meta, $tags, $submission );
 				},
 				'required' => function ( $field, $posted_data ) {
 					$property = $field['property'];
@@ -1202,6 +1336,16 @@ class Form_v2 extends Step {
 						'required'  => $field['required'],
 					] ), $posted_data );
 				},
+				'retrieve' => function ( Submission $submission, $field ) {
+					$property = $field['property'];
+					$property = Properties::instance()->get_field( $property );
+					if ( ! $property ) {
+						return false;
+					}
+
+					$name = $property['name'];
+					return $submission->$name;
+				}
 			],
 
 			// HTML & Text
@@ -1321,7 +1465,8 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => '__return_null',
 				'after'    => '__return_null',
-				'required' => __NAMESPACE__ . '\basic_required_check'
+				'required' => __NAMESPACE__ . '\basic_required_check',
+				'retrieve' => '__return_null',
 			] );
 
 			self::register_field( $type,
@@ -1329,7 +1474,8 @@ class Form_v2 extends Step {
 				$callbacks['validate'],
 				$callbacks['before'],
 				$callbacks['after'],
-				$callbacks['required']
+				$callbacks['required'],
+				$callbacks['retrieve']
 			);
 		}
 
@@ -1349,12 +1495,13 @@ class Form_v2 extends Step {
 	 * @return void
 	 */
 	public static function register_field(
-		$type,
-		$render,
-		$validate,
-		$before,
-		$after,
-		$required
+		string $type,
+		callable $render,
+		callable $validate,
+		callable $before,
+		callable $after,
+		callable $required,
+		callable $retrieve
 	) {
 
 		if ( ! is_callable( $render ) ) {
@@ -1362,12 +1509,13 @@ class Form_v2 extends Step {
 		}
 
 		self::$fields[ $type ] = [
-			'type'                  => $type,
-			'render'                => $render,
-			'validate'              => $validate,
-			'before_create_contact' => $before,
-			'after_create_contact'  => $after,
-			'check_required'        => $required,
+			'type'                      => $type,
+			'render'                    => $render,
+			'validate'                  => $validate,
+			'before_create_contact'     => $before,
+			'after_create_contact'      => $after,
+			'check_required'            => $required,
+			'retrieve_submission_value' => $retrieve,
 		];
 	}
 
@@ -1778,13 +1926,14 @@ class Form_v2 extends Step {
 	 *
 	 * @param $field
 	 * @param $posted_data
-	 * @param $data array contact data
-	 * @param $meta array contact meta
-	 * @param $tags array contact tags
+	 * @param $data       array contact data
+	 * @param $meta       array contact meta
+	 * @param $tags       array contact tags
+	 * @param $submission array any information to add to the submission
 	 *
 	 * @return false|mixed|string
 	 */
-	public static function before_create_contact( $field, $posted_data, &$data, &$meta, &$tags ) {
+	public static function before_create_contact( $field, $posted_data, &$data, &$meta, &$tags, &$submission ) {
 		$type = $field['type'];
 
 		$field_type = get_array_var( self::$fields, $type );
@@ -1799,19 +1948,21 @@ class Form_v2 extends Step {
 			&$data,
 			&$meta,
 			&$tags,
+			&$submission,
 		] );
 	}
 
 	/**
 	 * Validates a field
 	 *
-	 * @param $field
-	 * @param $posted_data
-	 * @param $contact Contact
+	 * @param             $field
+	 * @param Posted_Data $posted_data
+	 * @param Contact     $contact
+	 * @param array       $submission
 	 *
 	 * @return false|mixed|string
 	 */
-	public static function after_create_contact( $field, $posted_data, $contact ) {
+	public static function after_create_contact( $field, Posted_Data $posted_data, Contact $contact, &$submission ) {
 		$type = $field['type'];
 
 		$field_type = get_array_var( self::$fields, $type );
@@ -1824,6 +1975,7 @@ class Form_v2 extends Step {
 			$field,
 			$posted_data,
 			$contact,
+			&$submission
 		] );
 	}
 
@@ -1866,6 +2018,17 @@ class Form_v2 extends Step {
 		$message = $this->get_meta( 'success_message' );
 
 		return wpautop( do_replacements( $message, get_contactdata() ) );
+	}
+
+	/**
+	 * Return all fields
+	 *
+	 * @return mixed
+	 */
+	public function get_fields() {
+		$config = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
+
+		return $config['fields'];
 	}
 
 	/**
@@ -1923,12 +2086,13 @@ class Form_v2 extends Step {
 			return false;
 		}
 
-		$data = [];
-		$meta = [];
-		$tags = [];
+		$data                  = [];
+		$meta                  = [];
+		$tags                  = [];
+		$submission_additional = []; // arbitrary additional information to add to the submission record
 
 		foreach ( $fields as $field ) {
-			self::before_create_contact( $field, $posted_data, $data, $meta, $tags );
+			self::before_create_contact( $field, $posted_data, $data, $meta, $tags, $submission_additional );
 		}
 
 		do_action_ref_array( 'groundhogg/form/v2/before_create_contact', [
@@ -1957,7 +2121,7 @@ class Form_v2 extends Step {
 		$contact->add_tag( $tags );
 
 		foreach ( $fields as $field ) {
-			self::after_create_contact( $field, $posted_data, $contact );
+			self::after_create_contact( $field, $posted_data, $contact, $submission_additional );
 		}
 
 		do_action_ref_array( 'groundhogg/form/v2/after_create_contact', [
@@ -1973,7 +2137,7 @@ class Form_v2 extends Step {
 		] );
 
 		// Add the submission data.
-		$submission_data = array_merge( $data, $meta );
+		$submission_data = array_merge( $data, $meta, $submission_additional );
 		$submission->add_posted_data( $submission_data );
 
 		/**
@@ -1990,6 +2154,62 @@ class Form_v2 extends Step {
 		}
 
 		return $contact;
+	}
+
+	/**
+	 * Given a submission and a field, retrieve the value for the field from the submission
+	 *
+	 * @param Submission $submission
+	 * @param $field
+	 *
+	 * @return mixed|string
+	 */
+	public function retrieve_field_submission_answer( Submission $submission, $field ) {
+
+		$type = $field['type'];
+
+		$field_type = get_array_var( self::$fields, $type );
+
+		if ( ! $field_type ) {
+			return '';
+		}
+
+		return call_user_func( $field_type['retrieve_submission_value'], $submission, $field );
+	}
+
+	/**
+	 * Given a submission, provide an array of field answers that includes the field label
+	 *
+	 * @param Submission $submission     the submission to pull answers from
+	 * @param bool       $include_hidden whether to include hidden fields in the response
+	 *
+	 * @return array[]
+	 */
+	public function get_submission_answers( Submission $submission, bool $include_hidden = false ) {
+
+		$fields = $this->get_fields();
+
+		$answers = [];
+
+		foreach ( $fields as $field ) {
+
+			// ignore html blocks
+			if ( $field['type'] === 'html' ){
+				continue;
+			}
+
+			// ignore hidden fields
+			if ( $field['type'] === 'hidden' && ! $include_hidden ){
+				continue;
+			}
+
+			$answers[] = [
+				'label' => isset_not_empty( $field, 'label' ) ? $field['label'] : ( $field['name'] ?? $field['type'] ),
+				'value' => $this->retrieve_field_submission_answer( $submission, $field )
+			];
+		}
+
+		return $answers;
 	}
 
 	public function get_impressions_count( $start, $end ) {
