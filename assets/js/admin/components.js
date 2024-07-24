@@ -160,8 +160,8 @@
       return `
           <div class="gh-tags">
               ${ selected.map(tag => `<span class="gh-tag${ removeTags.includes(tag.ID)
-                      ? ' remove'
-                      : '' }">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
+                              ? ' remove'
+                              : '' }">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
                       join('') }
               ${ addTags.map(id => TagsStore.get(id)).
                       map(tag => `<span class="gh-tag adding">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).
@@ -219,9 +219,9 @@
 
       $el.find('.add-tag').on('click', (e) => {
 
-        const filterTags = ( tags ) => tags.filter( t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID) ).sort( (a,b) => b.ID - a.ID )
+        const filterTags = (tags) => tags.filter(t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)).sort((a, b) => b.ID - a.ID)
 
-        let initialOptions = filterTags( TagsStore.getItems() )
+        let initialOptions = filterTags(TagsStore.getItems())
 
         searchOptionsWidget({
           target: e.currentTarget,
@@ -259,7 +259,7 @@
               TagsStore.fetchItems({
                 search,
               }).then(() => {
-                widget.options = filterTags( TagsStore.getItems() )
+                widget.options = filterTags(TagsStore.getItems())
                 widget.mountOptions()
               })
             }, 1500)
@@ -288,9 +288,9 @@
           },
           onOpen: (widget) => {
 
-            if ( ! initialOptions.length ){
+            if (!initialOptions.length) {
               TagsStore.fetchItems().then(() => {
-                widget.options = filterTags( TagsStore.getItems() )
+                widget.options = filterTags(TagsStore.getItems())
                 widget.mountOptions()
               })
             }
@@ -634,10 +634,12 @@
                       ${ select({
                           id: `${ prefix }-owner`,
                           name: 'owner_id',
-                      }, Groundhogg.filters.owners.map(u => ( {
-                          text: u.data.user_email,
-                          value: u.ID,
-                      } ))) }
+                          options: Groundhogg.filters.owners.map(u => ( {
+                              text: `${u.data.display_name} &lt;${u.data.user_email}&gt;`,
+                              value: u.ID,
+                          } )),
+                          selected: Groundhogg.user.getCurrentUser().ID,
+                      }) }
                   </div>
                   <div class="gh-col"></div>
               </div>
@@ -752,6 +754,8 @@
         },
       })
     })
+
+    $(`#${ prefix }-owner`).select2()
 
     $(`
     #${ prefix }-terms,
@@ -1421,7 +1425,7 @@
           let fd = new FormData()
 
           fd.append(fileName, file, file.name)
-          fd.append( 'gh_admin_ajax_nonce', Groundhogg.nonces._adminajax )
+          fd.append('gh_admin_ajax_nonce', Groundhogg.nonces._adminajax)
           fd.append('action', action)
 
           beforeUpload(fd)
@@ -1524,12 +1528,12 @@
     Iframe,
     makeEl,
     Button,
-    Dashicon
+    Dashicon,
   } = MakeEl
 
   const EmailPreviewModal = async (emailId, {
     height = window.innerHeight * 0.85,
-    width = 900
+    width = 900,
   }) => {
 
     const { close } = loadingModal()
@@ -1537,8 +1541,9 @@
     let email
 
     try {
-      email = await EmailsStore.maybeFetchItem( emailId )
-    } catch ( err ) {
+      email = await EmailsStore.maybeFetchItem(emailId)
+    }
+    catch (err) {
       close()
       throw err
     }
@@ -1556,13 +1561,13 @@
     return ModalFrame({
       frameAttributes: {
         className: 'gh-modal-frame gh-email-preview-modal',
-      }
-    }, ({close}) => Div({
-      style: {
-        width: `${width}px`,
-        height: `${height}px`
       },
-    },  EmailPreview( {
+    }, ({ close }) => Div({
+      style: {
+        width: `${ width }px`,
+        height: `${ height }px`,
+      },
+    }, EmailPreview({
       close,
       from_avatar,
       from_email,
@@ -1572,16 +1577,16 @@
     })))
   }
 
-  const EmailPreview = ( {
+  const EmailPreview = ({
     close = false,
     from_avatar,
     from_email,
     from_name,
     subject,
     content,
-  } ) => {
+  }) => {
 
-    return  Div({
+    return Div({
       className: 'email-preview',
     }, [
       Div({
@@ -1607,23 +1612,23 @@
         close !== false ? Button({
           className: 'gh-button secondary icon text',
           style: {
-            marginLeft: 'auto'
+            marginLeft: 'auto',
           },
-          onClick: close
-        }, Dashicon( 'no-alt' )) : null
+          onClick: close,
+        }, Dashicon('no-alt')) : null,
       ]),
       Iframe({
         id: 'desktop-preview-iframe',
-      }, content ),
+      }, content),
     ])
   }
 
   $(() => {
-    $(document).on( 'click', 'table.wp-list-table .gh-email-preview', e => {
+    $(document).on('click', 'table.wp-list-table .gh-email-preview', e => {
       e.preventDefault()
 
-      EmailPreviewModal( parseInt( $(e.currentTarget).closest('tr').attr('id')), {})
-    } )
+      EmailPreviewModal(parseInt($(e.currentTarget).closest('tr').attr('id')), {})
+    })
   })
 
   Groundhogg.components = {
@@ -1637,7 +1642,7 @@
     emailModal,
     fileUploader,
     EmailPreview,
-    EmailPreviewModal
+    EmailPreviewModal,
   }
 
 } )(jQuery)

@@ -633,7 +633,7 @@
                 <div class="activity-icon submission">${ icons.webhook }</div>
                 <div class="activity-rendered gh-panel">
                     <div class="activity-info">
-                        ${ sprintf(__('Request received to %s in funnel %s', 'groundhogg'),
+                        ${ sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
                           bold(activity.form.data.step_title), el('a', {
                             href: funnel.admin + `#${activity.data.step_id}`,
                             target: '_blank',

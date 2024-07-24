@@ -180,16 +180,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php echo html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
                             </div>
                             <div class="gh-col">
-                                <label><?php
-									_e( 'Birthday', 'groundhogg' );
-
-									if ( $contact->get_age() ) :
-										?><span style="margin-left: 10px"
-                                                class="pill green"><?php printf( __( '%d years old', 'groundhogg' ), $contact->get_age() ); ?></span>
-									<?php
-									endif; ?>
-                                    </span>
-                                </label>
+                                <label><?php _e( 'Birthday', 'groundhogg' ); ?></label>
 								<?php
 
 								$years  = array_reverse( range( date( 'Y' ) - 100, date( 'Y' ) ) );

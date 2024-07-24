@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.3.2
+Stable tag: 3.4.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,20 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4.4 (2024-07-24) =
+* ADDED New `{form_submission}` replacement code which can add all recent form fields into an email.
+* IMPROVED The contact record UX:
+ * The local time now updates automatically with WP Heartbeat.
+ * Added a "Subscribed since" date to the details card.
+ * Added birthday and age to the details card.
+ * Rearranged the details and components in the details card to maximize space.
+ * Webhook requests and form submissions now appear in more readable user-friendly formats in the activity timeline.
+ * The Save Changes button is now sticky to the bottom of the screen to reduce scrolling while editing.
+* TWEAKED First and last name will have the first letter uppercase automatically.
+* TWEAKED When using the contact quick add form the owner is set to the current user by default. Also now searchable.
+* FIXED UI issue in properties editor.
+* FIXED Additional phone number types reverting to mobile after saving.
 
 = 3.4.3.2 (2024-07-10) =
 * FIXED Casting to decimal for number custom field filters was not working in conditional logic.
