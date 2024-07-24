@@ -46,6 +46,16 @@ $background-color: #F6F9FB;
   }
 }
 
+.overflow {
+  &-hidden{
+    overflow: hidden;
+  }
+
+  &-visible{
+    overflow: visible;
+  }
+}
+
 .fc {
   &-white{
     color: #FFF

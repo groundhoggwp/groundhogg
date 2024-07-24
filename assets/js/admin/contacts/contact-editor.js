@@ -587,7 +587,7 @@
 
     renderActivity (activity) {
 
-      if (activity.type === 'submission') {
+      if (activity.type === 'submission' && activity.data.type === 'form') {
 
         let funnel = FunnelsStore.get(activity.form.data.funnel_id)
         // language=HTML
@@ -598,16 +598,61 @@
                     <div class="activity-info">
                         ${ sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
                                 bold(activity.form.data.step_title), el('a', {
-                                    href: funnel.admin,
+                                    href: funnel.admin  + `#${activity.data.step_id}`,
                                     target: '_blank',
                                 }, bold(funnel.data.title))) }
-                        <p>
-                            ${ textarea({
-                                className: 'full-width code',
-                                value: JSON.stringify(activity.meta, null, 2),
-                                readonly: true,
-                            }) }
-                        </p>
+                        <div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
+                            <div class="gh-panel-header">
+                                <h2>${ __('Submission') }</h2>
+                                <button type="button" class="toggle-indicator" aria-expanded="false"></button>
+                            </div>
+                            <div class="inside" style="padding: 0">
+                                <table class="wp-list-table widefat striped" style="border: none">
+                                    <tbody>
+                                    ${ activity.i18n.answers.map(({ label, value }) => {
+                                        return `<tr><th><b>${ label }</b></th><td>${ value }</td></tr>`
+                                    }).join('') }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="diff-time">
+                        ${ activity.i18n.diff_time }
+                    </div>
+                </div>
+            </li>`
+      }
+
+      if (activity.type === 'submission' && activity.data.type === 'webhook') {
+
+        let funnel = FunnelsStore.get(activity.form.data.funnel_id)
+        // language=HTML
+        return `
+            <li class="activity-item">
+                <div class="activity-icon submission">${ icons.webhook }</div>
+                <div class="activity-rendered gh-panel">
+                    <div class="activity-info">
+                        ${ sprintf(__('Request received to %s in funnel %s', 'groundhogg'),
+                          bold(activity.form.data.step_title), el('a', {
+                            href: funnel.admin + `#${activity.data.step_id}`,
+                            target: '_blank',
+                          }, bold(funnel.data.title))) }
+                        <div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
+                            <div class="gh-panel-header">
+                                <h2>${ __('Request') }</h2>
+                                <button type="button" class="toggle-indicator" aria-expanded="false"></button>
+                            </div>
+                            <div class="inside" style="padding: 0">
+                                <table class="wp-list-table widefat striped" style="border: none">
+                                    <tbody>
+                                    ${ Object.keys(activity.meta).map(key => {
+                                      return `<tr><td><code>${ key }</code></td><td>${ activity.meta[key] }</td></tr>`
+                                    }).join('') }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <div class="diff-time">
                         ${ activity.i18n.diff_time }
@@ -831,6 +876,10 @@
     },
 
     onMount () {
+
+      $('.gh-panel.form-submission-details button.toggle-indicator').on('click', e => {
+        $(e.target).closest('.gh-panel.form-submission-details').toggleClass('closed')
+      })
 
       $('.event-queue-more').on('click', (e) => {
 

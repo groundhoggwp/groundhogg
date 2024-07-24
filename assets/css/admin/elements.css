@@ -12,6 +12,13 @@
   background-color: rgba(16, 38, 64, 0.3);
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-visible {
+  overflow: visible;
+}
+
 .fc-white {
   color: #FFF;
 }
