@@ -64,7 +64,7 @@
       var $settings = self.getSettings()
 
       let preloaders = [
-        FunnelsStore.maybeFetchItem(funnelId)
+        FunnelsStore.maybeFetchItem(funnelId),
       ]
 
       // Preload emails
@@ -93,13 +93,13 @@
           return allTags
         }, [])
 
-      if ( tags.length ){
+      if (tags.length) {
         preloaders.push(Groundhogg.stores.tags.maybeFetchItems(tags))
       }
 
-      if ( tags.length || emails.length ){
-        const {close} = loadingModal()
-        await Promise.all( preloaders )
+      if (tags.length || emails.length) {
+        const { close } = loadingModal()
+        await Promise.all(preloaders)
         close()
       }
 
@@ -126,7 +126,7 @@
           return
         }
 
-        self.makeActive(this.id, e)
+        self.makeActive(this.id, true)
       })
 
       $document.on('click', '.add-step-bottom-wrap button', e => {
@@ -242,9 +242,21 @@
         this.makeSortable()
       }
 
-      if (window.location.hash) {
-        this.makeActive(parseInt(window.location.hash.substring(1)))
+      const dealWithHash = () => {
+        let hash = window.location.hash.substring(1)
+
+        if ( hash === 'add' ){
+          this.showAddStep()
+        } else {
+          this.makeActive(parseInt(window.location.hash.substring(1)))
+        }
       }
+
+      if (window.location.hash) {
+        dealWithHash()
+      }
+
+      window.addEventListener('hashchange', dealWithHash )
 
       let header = document.querySelector('.funnel-editor-header > .actions')
 
@@ -477,9 +489,9 @@
 
           showSpinner()
 
-          this.getStepHtml( data ).then( r => {
+          this.getStepHtml(data).then(r => {
             hideSpinner()
-            $(`#${id}`).remove()
+            $(`#${ id }`).remove()
           })
         },
       })
@@ -498,6 +510,8 @@
       $('#step-sortable .step').removeClass('active')
 
       this.currentlyActive = false
+
+      history.pushState(null, null, '#add')
     },
 
     /**
@@ -651,7 +665,7 @@
      * @param id string
      * @param e object
      */
-    makeActive (id) {
+    makeActive (id, hps = false) {
       var self = this
 
       if (!id) {
@@ -706,6 +720,13 @@
       }
 
       $(document).trigger('step-active')
+
+      if (hps) {
+        history.pushState(null, null, `#${ step.ID }`)
+      }
+      else {
+        history.replaceState(null, null, `#${ step.ID }`)
+      }
 
     },
   })
