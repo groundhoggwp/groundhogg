@@ -362,11 +362,12 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'The contact owner\'s signature.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'owner',
-				'group'       => 'owner',
-				'callback'    => [ $this, 'replacement_owner' ],
-				'name'        => __( 'Owner Data', 'groundhogg' ),
-				'description' => _x( 'Any data related to the contact\'s linked owner. Usage: {owner.attribute}', 'replacement', 'groundhogg' ),
+				'code'         => 'owner',
+				'group'        => 'owner',
+				'default_args' => 'attribute',
+				'callback'     => [ $this, 'replacement_owner' ],
+				'name'         => __( 'Owner Data', 'groundhogg' ),
+				'description'  => _x( 'Any data related to the contact\'s linked owner. Usage: {owner.attribute}', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'           => 'confirmation_link',
@@ -2331,14 +2332,16 @@ class Replacements implements \JsonSerializable {
 						$post_thumbnail_id = get_post_thumbnail_id();
 						$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
 
-						$thumbnail = html()->e( 'img', [
+						$thumbnail = html()->e( 'a', [
+							'href' => get_the_permalink()
+						], html()->e( 'img', [
 							'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
 							'alt'   => $alt,
 							'class' => 'post-thumbnail ' . $thumbnail_size . ' ',
 							'style' => [
 								'vertical-align' => 'bottom'
 							]
-						] );
+						] ) );
 
 						?>
                         <tr class="email-columns-row">
