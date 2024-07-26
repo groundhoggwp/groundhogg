@@ -333,6 +333,10 @@ code.meta-replacement-code {
   margin-left: 15px;
   border-left: 2px solid $primary-dark-10;
 
+  code {
+    border-radius: 4px;
+  }
+
   li.activity-item {
 
     &:not(:hover,:active,:focus){

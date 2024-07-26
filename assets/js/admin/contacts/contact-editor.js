@@ -472,7 +472,7 @@
           ]
 
           if (reason.length) {
-            parts.push(`; ${ bold( escHTML(unsubReasons[reason] ?? reason )) }`)
+            parts.push(`; ${ bold(escHTML(unsubReasons[reason] ?? reason)) }`)
           }
 
           if (feedback.length) {
@@ -480,7 +480,7 @@
           }
 
           return parts.join('')
-        }
+        },
       },
       wp_fusion: {
         icon: icons.wp_fusion,
@@ -517,10 +517,10 @@
       email_opened: {
         icon: icons.open_email,
         render: ({ data }) => {
-          return sprintf(__('Opened %s', 'groundhogg'), el( 'a', {
+          return sprintf(__('Opened %s', 'groundhogg'), el('a', {
             href: parseInt(data.funnel_id) === 1
-              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
-              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+              ? adminPageURL('gh_reporting', { tab: 'broadcasts', broadcast: data.step_id })
+              : adminPageURL('gh_reporting', { tab: 'funnels', step: data.step_id }),
           }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
@@ -535,10 +535,10 @@
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
             target: '_blank',
             href: data.referer,
-          }, bold(maybeTruncateLink(data.referer))), el( 'a', {
+          }, bold(maybeTruncateLink(data.referer))), el('a', {
             href: parseInt(data.funnel_id) === 1
-              ? adminPageURL( 'gh_reporting', { tab: 'broadcasts', broadcast: data.step_id } )
-              : adminPageURL( 'gh_reporting', { tab: 'funnels', step: data.step_id } ),
+              ? adminPageURL('gh_reporting', { tab: 'broadcasts', broadcast: data.step_id })
+              : adminPageURL('gh_reporting', { tab: 'funnels', step: data.step_id }),
           }, bold(EmailsStore.get(data.email_id).data.title)))
         },
       },
@@ -553,11 +553,11 @@
         render: ({ data }) => {
 
           let funnelTitle = bold(FunnelsStore.get(data.funnel_id).data.title)
-          let link = el( 'a', {
-            href: adminPageURL( 'gh_funnels', { action: 'edit', funnel: data.funnel_id }, data.step_id )
-          }, funnelTitle )
+          let link = el('a', {
+            href: adminPageURL('gh_funnels', { action: 'edit', funnel: data.funnel_id }, data.step_id),
+          }, funnelTitle)
 
-          return sprintf(__('Converted in %s', 'groundhogg'), link )
+          return sprintf(__('Converted in %s', 'groundhogg'), link)
         },
       },
       fallback: {
@@ -565,19 +565,29 @@
         render: ({ data, meta }) => {
 
           let html = [
-            data.activity_type,
+            `Tracked <code>${data.activity_type}</code>`,
           ]
 
           if (data.value) {
-            html.push(`: <code>${ data.value }</code>`)
+            html.push(` for <b>${ data.value }</b>`)
           }
 
           if (Object.keys(meta).length) {
-            html.push(textarea({
-              className: 'full-width code custom-activity-meta space-above-20',
-              value: JSON.stringify(meta, null, 2),
-              readonly: true,
-            }))
+            html.push(`<div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
+              <div class="gh-panel-header">
+                  <h2>${ __('Request') }</h2>
+                  <button type="button" class="toggle-indicator" aria-expanded="false"></button>
+              </div>
+              <div class="inside" style="padding: 0">
+                  <table class="wp-list-table widefat striped" style="border: none">
+                      <tbody>
+                      ${ Object.keys(meta).map(key => {
+                        return `<tr><td><code>${ key }</code></td><td>${ meta[key] }</td></tr>`
+                      }).join('') }
+                      </tbody>
+                  </table>
+              </div>
+          </div>`)
           }
 
           return html.join('')
@@ -598,7 +608,7 @@
                     <div class="activity-info">
                         ${ sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
                                 bold(activity.form.data.step_title), el('a', {
-                                    href: funnel.admin  + `#${activity.data.step_id}`,
+                                    href: funnel.admin + `#${ activity.data.step_id }`,
                                     target: '_blank',
                                 }, bold(funnel.data.title))) }
                         <div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
@@ -634,10 +644,10 @@
                 <div class="activity-rendered gh-panel">
                     <div class="activity-info">
                         ${ sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
-                          bold(activity.form.data.step_title), el('a', {
-                            href: funnel.admin + `#${activity.data.step_id}`,
-                            target: '_blank',
-                          }, bold(funnel.data.title))) }
+                                bold(activity.form.data.step_title), el('a', {
+                                    href: funnel.admin + `#${ activity.data.step_id }`,
+                                    target: '_blank',
+                                }, bold(funnel.data.title))) }
                         <div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
                             <div class="gh-panel-header">
                                 <h2>${ __('Request') }</h2>
@@ -647,7 +657,7 @@
                                 <table class="wp-list-table widefat striped" style="border: none">
                                     <tbody>
                                     ${ Object.keys(activity.meta).map(key => {
-                                      return `<tr><td><code>${ key }</code></td><td>${ activity.meta[key] }</td></tr>`
+                                        return `<tr><td><code>${ key }</code></td><td>${ activity.meta[key] }</td></tr>`
                                     }).join('') }
                                     </tbody>
                                 </table>
@@ -877,8 +887,8 @@
 
     onMount () {
 
-      $('.gh-panel.form-submission-details button.toggle-indicator').on('click', e => {
-        $(e.target).closest('.gh-panel.form-submission-details').toggleClass('closed')
+      $('.gh-panel.outlined button.toggle-indicator').on('click', e => {
+        $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
       })
 
       $('.event-queue-more').on('click', (e) => {
@@ -1949,22 +1959,22 @@
 
         let { alternate_emails = [], alternate_phones = [] } = getContact().meta
 
-        inputRepeater( '#contact-phones-here', {
+        inputRepeater('#contact-phones-here', {
           rows: alternate_phones,
           cells: [
-            ({value, ...props}) => select({
+            ({ value, ...props }) => select({
               options: {
                 mobile: __('Mobile'),
                 home: __('Home'),
                 work: __('Work'),
               },
               selected: value,
-              ...props
+              ...props,
             }),
             props => input({
               type: 'tel',
               placeholder: __('(123) 456-7890'),
-              ...props
+              ...props,
             }),
           ],
           onMount: () => {
@@ -2221,8 +2231,8 @@
 
     try {
 
-      if ( ! parseInt( event.data.queued_id ) ){
-        throw new Error( 'Invalid queued event ID' );
+      if (!parseInt(event.data.queued_id)) {
+        throw new Error('Invalid queued event ID')
       }
 
       let logItems = await LogsStore.fetchItems({
@@ -2340,13 +2350,13 @@
   }).on('heartbeat-tick.groundhogg-refresh-local -time', function (e, data) {
 
     // Post locks: update the lock string or show the dialog if somebody has taken over editing.
-    let received;
+    let received
 
-    if ( data['groundhogg-refresh-local-time'] ) {
-      received = data['groundhogg-refresh-local-time'];
+    if (data['groundhogg-refresh-local-time']) {
+      received = data['groundhogg-refresh-local-time']
 
-      if ( received.local_time ) {
-        $('#contact-localtime abbr').replaceWith( received.local_time )
+      if (received.local_time) {
+        $('#contact-localtime abbr').replaceWith(received.local_time)
       }
     }
   })

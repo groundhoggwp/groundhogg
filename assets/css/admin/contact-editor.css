@@ -276,6 +276,9 @@ code.meta-replacement-code {
   margin-left: 15px;
   border-left: 2px solid rgba(16, 38, 64, 0.1);
 }
+#activity-timeline code {
+  border-radius: 4px;
+}
 #activity-timeline li.activity-item {
   position: relative;
   margin-left: 20px;
