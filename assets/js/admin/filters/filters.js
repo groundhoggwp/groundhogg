@@ -1350,17 +1350,26 @@
    * @constructor
    */
   const FilterDisplay = ({ filters, filterRegistry }) => {
-    return Span({}, filters.map(row => {
 
-      return row.map(filter => {
+    let el = Span()
 
-        let result = filterRegistry.displayName(filter)
+    filterRegistry.preloadFilters(filters).then(r => {
 
-        return Span({}, result).innerHTML
+      morphdom(el, Span({}, filters.map(row => {
 
-      }).join(' <i>AND</i> ')
+        return row.map(filter => {
 
-    }).join(' <br/><i>OR</i> '))
+          let result = filterRegistry.displayName(filter)
+
+          return Span({}, result).innerHTML
+
+        }).join(' <i>AND</i> ')
+
+      }).join(' <br/><i>OR</i> ')))
+
+    })
+
+    return el
   }
 
   Groundhogg.filters.Filters = Filters

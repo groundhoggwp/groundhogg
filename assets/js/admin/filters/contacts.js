@@ -1,7 +1,7 @@
 ( function ($) {
 
   const {
-    input, select, orList, andList, bold,
+    input, select, orList, andList, bold, inputRepeater,
   } = Groundhogg.element
 
   const {
@@ -16,7 +16,7 @@
   } = Groundhogg.pickers
 
   const {
-    assoc2array
+    assoc2array,
   } = Groundhogg.functions
 
   const {
@@ -49,7 +49,7 @@
     createStringFilter,
     createNumberFilter,
     createTimeFilter,
-    unsubReasons
+    unsubReasons,
   } = Groundhogg.filters
 
   const {
@@ -84,18 +84,18 @@
       container.innerHTML = ''
 
       // Add the filters
-      document.querySelector(el).appendChild( ContactFilters( this.id, this.filters, this.onChange ) )
+      document.querySelector(el).appendChild(ContactFilters(this.id, this.filters, this.onChange))
     },
   } )
 
-  const ContactFilters = ( id, filters, onChange ) => Filters({
+  const ContactFilters = (id, filters, onChange) => Filters({
     id,
     filterRegistry: ContactFilterRegistry,
     filters,
-    onChange
+    onChange,
   })
 
-  const ContactFilterDisplay = ( filters ) => FilterDisplay({
+  const ContactFilterDisplay = (filters) => FilterDisplay({
     filters,
     filterRegistry: ContactFilterRegistry,
   })
@@ -153,9 +153,9 @@
           const $after = $('#filter-after')
           const $days = $('#filter-days')
 
-          $before.addClass( 'hidden' );
-          $after.addClass( 'hidden' );
-          $days.addClass( 'hidden' );
+          $before.addClass('hidden')
+          $after.addClass('hidden')
+          $days.addClass('hidden')
 
           switch ($el.val()) {
             case 'between':
@@ -178,14 +178,14 @@
   }
 
   const standardActivityDateTitle = (
-    prepend, { date_range, before, after, days=0, future = false }) => {
+    prepend, { date_range, before, after, days = 0, future = false }) => {
 
     let ranges = future ? futureDateRanges : pastDateRanges
 
     switch (date_range) {
       default:
         return `${ prepend } ${ ranges[date_range]
-          ? ranges[date_range].replace( 'X', days ).toLowerCase()
+          ? ranges[date_range].replace('X', days).toLowerCase()
           : '' }`
       case 'between':
         return `${ prepend } ${ sprintf(
@@ -628,7 +628,7 @@
           dataKey: filterIndex,
         }, AllComparisons, compare),
 
-        [ 'empty', 'not_empty' ].includes( compare ) ? '' : input({
+        ['empty', 'not_empty'].includes(compare) ? '' : input({
           id: 'filter-value',
           name: 'value',
           dataGroup: filterIndex,
@@ -1076,16 +1076,14 @@
       },
     })
 
-
-
   ContactFilterRegistry.registerFilter(createPastDateFilter('unsubscribed', __('Unsubscribed', 'groundhogg'), 'activity', {
     edit: ({ reasons = [], updateFilter }) => Fragment([
       ItemPicker({
         id: 'unsub-reasons',
         placeholder: __('Search', 'groundhogg'),
-        noneSelected: __( 'Any reason', 'groundhogg' ),
-        fetchOptions: async (s) => assoc2array( unsubReasons ),
-        selected: reasons.map( reason => ({ id: reason, text: unsubReasons[reason] ?? reason })),
+        noneSelected: __('Any reason', 'groundhogg'),
+        fetchOptions: async (s) => assoc2array(unsubReasons),
+        selected: reasons.map(reason => ( { id: reason, text: unsubReasons[reason] ?? reason } )),
         onChange: items => {
           let reasons = items.map(({ id }) => id)
           console.log(reasons)
@@ -1095,7 +1093,7 @@
         },
       }),
     ]),
-    display: ({ reasons = [] }) => sprintf( 'Unsubscribed %s', orList( reasons.map( r => bold( unsubReasons[r] ?? r ) ) ) ),
+    display: ({ reasons = [] }) => sprintf('Unsubscribed %s', orList(reasons.map(r => bold(unsubReasons[r] ?? r)))),
   }))
 
   // registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
@@ -1288,7 +1286,7 @@
         step_id = 0,
         date_range = 'any',
         before,
-        after
+        after,
       }) {
 
         let prepend
@@ -1641,12 +1639,16 @@
     __('Custom Activity', 'groundhogg'), {
       view: ({ activity }) => `<b>${ activity }</b>`,
       edit: ({ activity, ...filter }) => {
-        return input({
-          id: 'filter-activity-type',
-          name: 'activity',
-          value: activity,
-          placeholder: 'custom_activity',
-        })
+        return [
+          input({
+            id: 'filter-activity-type',
+            name: 'activity',
+            value: activity,
+            placeholder: 'custom_activity',
+          }),
+          `<label>${__('Filter by activity meta','groundhogg')}</label>`,
+          `<div id="custom-activity-meta-filters"></div>`,
+        ].join('')
       },
       onMount (filter, updateFilter) {
         $('#filter-activity-type').on('input', e => {
@@ -1654,9 +1656,38 @@
             activity: e.target.value,
           })
         })
+
+        let { meta_filters = [] } = filter
+
+        inputRepeater('#custom-activity-meta-filters', {
+          rows: meta_filters,
+          cells: [
+            props => input({
+              placeholder: 'Key',
+              className: 'input',
+              ...props
+            }),
+            ({value, ...props}) => select({
+              selected: value,
+              options: AllComparisons,
+              ...props
+            }),
+            props => input({
+              placeholder: 'Value',
+              className: 'input',
+              ...props
+            })
+          ],
+          onChange: rows => {
+            updateFilter({
+              meta_filters: rows
+            })
+          }
+        }).mount()
       },
       defaults: {
         activity: '',
+        meta_filters: []
       },
     })
 
@@ -1708,12 +1739,12 @@
     },
   })
 
-  ContactFilterRegistry.registerFilter( createFilter( 'sub_query', 'Sub Query', 'query', {
+  ContactFilterRegistry.registerFilter(createFilter('sub_query', 'Sub Query', 'query', {
     display: ({ include_filters = [], exclude_filters = [] }) => {
 
       let texts = [
         ContactFilterRegistry.displayFilters(include_filters),
-        ContactFilterRegistry.displayFilters(exclude_filters)
+        ContactFilterRegistry.displayFilters(exclude_filters),
       ]
 
       if (include_filters.length && exclude_filters.length) {
@@ -1734,43 +1765,43 @@
     edit: ({
       include_filters = [],
       exclude_filters = [],
-      updateFilter
+      updateFilter,
     }) => {
 
       return Fragment([
         Div({
           className: 'include-search-filters',
-        },[
+        }, [
           Filters({
             id: 'sub-query-filters',
             filters: include_filters,
             filterRegistry: ContactFilterRegistry,
             onChange: include_filters => updateFilter({
-              include_filters
-            })
-          })
+              include_filters,
+            }),
+          }),
         ]),
         Div({
           className: 'exclude-search-filters',
-        },[
+        }, [
           Filters({
             id: 'sub-query-exclude-filters',
             filters: exclude_filters,
             filterRegistry: ContactFilterRegistry,
             onChange: exclude_filters => updateFilter({
-              exclude_filters
-            })
-          })
-        ])
+              exclude_filters,
+            }),
+          }),
+        ]),
       ])
     },
     preload: ({ include_filters = [], exclude_filters = [] }) => {
-      return Promise.all( [
-        ContactFilterRegistry.preloadFilters( include_filters ),
-        ContactFilterRegistry.preloadFilters( exclude_filters ),
-      ] )
+      return Promise.all([
+        ContactFilterRegistry.preloadFilters(include_filters),
+        ContactFilterRegistry.preloadFilters(exclude_filters),
+      ])
     },
-  }, {} ) )
+  }, {}))
 
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}

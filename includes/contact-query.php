@@ -293,7 +293,7 @@ class Contact_Query extends Table_Query {
 
 		/**
 		 * @type $before DateTimeHelper
-		 * @type $after DateTimeHelper
+		 * @type $after  DateTimeHelper
 		 */
 		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
 
@@ -307,7 +307,7 @@ class Contact_Query extends Table_Query {
 			$subWhere = $where->subWhere();
 
 			// On feb 28 of non leap years, also include peoples whose anniversary is feb 29
-			if ( ! $before->isLeapYear() && $before->format( 'm-d' ) === '02-28' ){
+			if ( ! $before->isLeapYear() && $before->format( 'm-d' ) === '02-28' ) {
 				$subWhere->addCondition( "DATE_FORMAT($alias.meta_value,'%m-%d') = '02-29'" );
 			}
 
@@ -1050,10 +1050,23 @@ class Contact_Query extends Table_Query {
 	public static function filter_custom_activity( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'activity' => '',
+			'activity'     => '',
+			'meta_filters' => []
 		] );
 
-		self::basic_activity_filter( $filter['activity'], $filter, $where );
+		$activityQuery = self::basic_activity_filter( $filter['activity'], $filter, $where );
+
+		foreach ( $filter['meta_filters'] as $metaFilter ) {
+
+			[ 0 => $key, 1 => $compare, 2 => $value ] = $metaFilter;
+
+			if ( ! $key || ! $compare ){
+				continue;
+			}
+
+			$alias = $activityQuery->joinMeta( $key );
+			$activityQuery->where()->compare( "$alias.meta_key", $value, $compare );
+		}
 	}
 
 	/**
@@ -1381,16 +1394,16 @@ class Contact_Query extends Table_Query {
 			if ( $customField ) {
 				switch ( $customField['type'] ) {
 					case 'date':
-						$orderby = self::cast2date($orderby);
+						$orderby = self::cast2date( $orderby );
 						break;
 					case 'datetime':
-						$orderby = self::cast2datetime($orderby);
+						$orderby = self::cast2datetime( $orderby );
 						break;
 					case 'time':
-						$orderby = self::cast2time($orderby);
+						$orderby = self::cast2time( $orderby );
 						break;
 					case 'number':
-						$orderby = self::cast2decimal($orderby,10,2);
+						$orderby = self::cast2decimal( $orderby, 10, 2 );
 						break;
 				}
 			}
