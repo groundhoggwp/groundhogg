@@ -351,6 +351,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.4.4 (2024-07-24) =
 * ADDED New `{form_submission}` replacement code which can add all recent form fields into an email.
+* ADDED Forward/Back history button navigation within the funnel editor (This is not undo/redo).
+* ADDED Meta filtering to the custom activity filter.
+* ADDED Sum of activity values & Average of activity values as custom report types.
 * IMPROVED The contact record UX:
  * The local time now updates automatically with WP Heartbeat.
  * Added a "Subscribed since" date to the details card.
@@ -360,8 +363,10 @@ You can purchase a premium plan for access to support and our premium extensions
  * The Save Changes button is now sticky to the bottom of the screen to reduce scrolling while editing.
 * TWEAKED First and last name will have the first letter uppercase automatically.
 * TWEAKED When using the contact quick add form the owner is set to the current user by default. Also now searchable.
-* FIXED UI issue in properties editor.
+* TWEAKED Thumbnails in H1-H5 posts format now link to the post.
+* FIXED Group select UI issue in properties editor.
 * FIXED Additional phone number types reverting to mobile after saving.
+* FIXED Importing multiple values into Checkbox type not working.
 
 = 3.4.3.2 (2024-07-10) =
 * FIXED Casting to decimal for number custom field filters was not working in conditional logic.
