@@ -8,7 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Contact_Query;
-use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
 use WP_Error;
@@ -79,7 +78,7 @@ class Reports_Api extends Base_Api {
 					$query->where()->isNotNull( "$alias.meta_value" );
 					$query->setOrderby( [ 'total', 'DESC' ] );
 
-					$setGroupby = function ( Contact_Query &$query ){
+					$setGroupby = function ( Contact_Query &$query ) {
 						$query->setGroupby( 'value' );
 					};
 
@@ -103,10 +102,24 @@ class Reports_Api extends Base_Api {
 
 					switch ( $report_type ) {
 						case 'activity':
+						case 'activity_sum_value':
+						case 'activity_avg_value':
 
 							$activityJoin = $query->addJoin( 'RIGHT', 'activity' );
 							$activityJoin->onColumn( 'contact_id' );
 							$activityJoin->conditions->equals( 'activity_type', sanitize_key( $report['activity'] ) );
+
+							if ( $report_type === 'activity_sum_value' ) {
+								$query->setSelect( [ "SUM({$activityJoin->alias}.value)", 'value' ] );
+
+								return number_format_i18n( $query->get_var() );
+							}
+
+							if ( $report_type === 'activity_avg_value' ) {
+								$query->setSelect( [ "AVG({$activityJoin->alias}.value)", 'value' ] );
+
+								return number_format_i18n( $query->get_var() );
+							}
 
 							return number_format_i18n( $query->count() );
 
@@ -236,7 +249,7 @@ class Reports_Api extends Base_Api {
 
 						$result = get_db( 'contactmeta' )->query( [
 							'select' => 'meta_value',
-							'func' => $report_type === 'sum' ? 'SUM' : 'AVG',
+							'func'   => $report_type === 'sum' ? 'SUM' : 'AVG',
 							'where'  => $where,
 						] );
 

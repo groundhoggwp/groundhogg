@@ -290,6 +290,8 @@
 					  </div>
 				  </div>`
             case 'activity':
+            case 'activity_sum_value':
+            case 'activity_avg_value':
               // language=HTML
               return `
 				  <div class="row">
@@ -302,7 +304,6 @@
 					  </div>
 				  </div>`
           }
-
         }
 
         // language=HTML
@@ -317,7 +318,9 @@
 						sum: __('Sum of a custom field', 'groundhogg'),
 						average: __('Average of a custom field', 'groundhogg'),
 						distinct: __('Number of distinct custom field values', 'groundhogg'),
-						activity: __('Total number of activities'),
+						activity: __('Count of activities'),
+						activity_sum_value: __('Sum value of activities'),
+						activity_avg_value: __('Average value of activities'),
 					}, value)}
 				</div>
 			</div>
