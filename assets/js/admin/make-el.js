@@ -561,7 +561,15 @@
       onFocusout: e => {
         if (closeOnFocusout) {
           if (!e.relatedTarget || !clickedIn(e.relatedTarget, '.gh-modal.mini')) {
-            close()
+
+            // this is a bit of a hack
+            setTimeout( () => {
+              // if the focused element is no longer within the modal
+              if ( !clickedIn(document.activeElement, '.gh-modal.mini') ){
+                close()
+              }
+
+            }, 10 )
           }
         }
       },
@@ -897,6 +905,7 @@
 
     const focusSearch = () => document.getElementById(id)?.querySelector(`input[type=search]`)?.focus()
     const focusPicker = () => document.getElementById(id)?.focus()
+    const focusParent = () => document.getElementById(id)?.parentElement.focus()
 
     const handleCreateOption = (value) => {
       state.options.unshift({ id: value, text: value, create: true })
@@ -945,6 +954,8 @@
       if ( multiple ){
         focusSearch()
       }
+
+      focusPicker()
 
     }
 
@@ -1183,6 +1194,10 @@
      */
     const Render = () => Div({
       id,
+      className: `gh-picker-container`,
+      tabindex: '0',
+    }, Div({
+      id: `${id}-picker`,
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
       tabindex: '0',
       onCreate: el => {
@@ -1224,7 +1239,7 @@
         multiple || !selected.length ? SearchInput() : null,
       ]),
       optionsVisible() ? itemPickerOptions() : null,
-    ])
+    ]))
 
     return Render()
   }

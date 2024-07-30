@@ -74,7 +74,7 @@
 
     insert: function (text) {
 
-      console.log('insert', { text: text })
+      // console.log('insert', { text: text })
 
       // CHECK TINY MCE
       if (typeof tinymce != 'undefined' && tinymce.activeEditor != null &&
@@ -186,9 +186,9 @@
 
       const step = steps[this.currStep]
 
-      console.log({
-        step: this.currStep,
-      })
+      // console.log({
+      //   step: this.currStep,
+      // })
 
       //language=HTML
       const html = `
@@ -746,9 +746,9 @@
 
     let editor = tinyMCE.get(editor_id)
 
-    editor.on('Change keyup', function (e) {
+    // handle replacements
+    editor.on('keyup', e => {
       Insert.to_mce = true
-      onChange(editor.getContent())
 
       if (e.type == 'keyup' && e.ctrlKey && e.shiftKey && e.which == 219) {
 
@@ -772,7 +772,11 @@
       }
     })
 
-    return tinyMCE.get(editor_id)
+    editor.on('Change', e => {
+      onChange(editor.getContent())
+    })
+
+    return editor
   }
 
   function addMediaToBasicTinyMCE () {
