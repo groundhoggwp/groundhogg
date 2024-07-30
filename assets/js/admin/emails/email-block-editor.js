@@ -633,6 +633,14 @@
   }
 
   const setActiveBlock = (idOrNull) => {
+
+    // Hack to remove the editor when closing a block
+    // When the editor is removed ahead of any state changes grammarly actually saves
+    if ( hasActiveBlock() && getActiveBlock().type === 'text' ){
+      let editorId = `text-${ getActiveBlock().id }`
+      wp.editor.remove(editorId)
+    }
+
     setState({
       activeBlock: idOrNull,
     })
@@ -5474,6 +5482,8 @@
     edit: ({ id, selector, content, updateBlock, ...block }) => {
 
       let editorId = `text-${ id }`
+      wp.editor.remove(editorId)
+
 
       let blockEl = document.getElementById(`b-${ id }`)
       let height = 200
@@ -5495,8 +5505,6 @@
         Textarea({
           onCreate: el => {
             setTimeout(() => {
-
-              wp.editor.remove(editorId)
               tinymceElement(editorId, {
                 tinymce: {
                   content_style: tinyMceCSS(),
@@ -5528,7 +5536,12 @@
         }),
       ])
     },
-    html: textContent,
+    html: ({id, ...block}) => {
+      let editorId = `text-${ id }`
+      // wp.editor.remove(editorId)
+
+      return textContent(block)
+    },
     plainText: ({ content }) => extractPlainText(content),
     defaults: {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
