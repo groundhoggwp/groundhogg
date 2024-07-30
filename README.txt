@@ -350,6 +350,8 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.4.4.1 (2024-07-29) =
+* ADDED Column style to the column block.
+* ADDED Justify alignment option to make buttons full width.
 * FIXED Issue of the last accepted Grammarly suggestion not saving when exiting from a text block in the email editor.
 * FIXED Color picker closing in email editor if selecting from palette then using dropper.
 * FIXED Font controls closing after selecting new font choice for text blocks.
