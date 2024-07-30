@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.4
+Stable tag: 3.4.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.4.4.1 (2024-07-29) =
+* FIXED Issue of the last accepted Grammarly suggestion not saving when exiting from a text block in the email editor.
+* FIXED Color picker closing in email editor if selecting from palette then using dropper.
+* FIXED Font controls closing after selecting new font choice for text blocks.
 
 = 3.4.4 (2024-07-24) =
 * ADDED New `{form_submission}` replacement code which can add all recent form fields into an email.
