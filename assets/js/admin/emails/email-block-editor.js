@@ -53,6 +53,7 @@
   const { linkPicker } = Groundhogg.pickers
   const { get, post, ajax } = Groundhogg.api
   const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
+  const { base64_json_encode, jsonCopy } = Groundhogg.functions
 
   improveTinyMCE({})
 
@@ -377,7 +378,18 @@
   }
 
   const History = {
-    pointer: 0, changes: [], timeout: null, addChange (state) {
+
+    // The size of the stack to maintain
+    stackSize: 50,
+    // Where we are in the history
+    pointer: 0,
+    // The changes we've made
+    changes: [],
+
+    timeout: null,
+
+    // Add a state to the history
+    addChange (state) {
 
       // use a timeout to avoid creating too many states from onInput events
       if (this.timeout) {
@@ -393,7 +405,7 @@
           this.changes.push(state)
 
           // Maintain size of 50 for memory reasons
-          if (this.changes.length > 50) {
+          if (this.changes.length > this.stackSize) {
             this.changes.shift()
           }
 
@@ -494,12 +506,11 @@
   const setState = newState => {
     State = {
       ...State, ...newState, id: uuid(),
-
     }
   }
 
   const getState = () => State
-  const getStateCopy = () => JSON.parse(JSON.stringify(getState()))
+  const getStateCopy = () => jsonCopy(getState())
 
   let onSave = () => {
   }
@@ -648,7 +659,60 @@
     if (getState().blockInspector) {
       morph(BlockInspector())
     }
+
+    if ( idOrNull ){
+      document.getElementById( `edit-${idOrNull}` ).focus()
+    }
   }
+
+  /**
+   * Copy the active block to the clipboard
+   */
+  const copyActiveBlock = () => copyBlock( getActiveBlock() )
+
+  /**
+   * Copy a block to the clipboard
+   *
+   * @param block
+   */
+  const copyBlock = (block) => {
+    let input = document.createElement('input')
+    input.classList.add('hidden')
+    input.value = JSON.stringify(block)
+    document.body.append(input)
+    input.select()
+    navigator.clipboard.writeText(input.value)
+    input.remove()
+    dialog({
+      message: 'Block copied!',
+    })
+  }
+
+  /**
+   * Paste a block from the clipboard if there is one
+   *
+   * @returns {Promise<string>}
+   */
+  const pasteBlock = () => navigator.clipboard.readText().then(copiedText => {
+    let block
+    try {
+      block = JSON.parse(copiedText)
+    }
+    catch (e) {
+      dialog({ message: 'No block was copied', type: 'error' })
+      return
+    }
+
+    if (!block || !block.id || !block.type) {
+      dialog({ message: 'No block was copied', type: 'error' })
+      return
+    }
+
+    insertBlockAfter(__replaceId(block),
+      getActiveBlock().id)
+    dialog({ message: 'Block pasted!' })
+  })
+
 
   const isBlockEditor = () => State.page === 'editor'
   const isHTMLEditor = () => State.page === 'html-editor'
@@ -797,6 +861,8 @@
     if (hasChanges) {
       updatePreview()
     }
+
+    History.addChange(getStateCopy())
   }
 
   const setBlocks = (blocks = [], hasChanges = true) => {
@@ -827,9 +893,8 @@
       morph(BlockInspector())
     }
 
-    if (hasChanges) {
-      History.addChange(getStateCopy()) // setBlocks
-    }
+    // Log a new state in history whenever we set the blocks
+    History.addChange(getStateCopy())
   }
 
   function extractPlainText (content) {
@@ -1890,8 +1955,6 @@
   const dynamicContentCache = createCache()
   const attributesCache = createCache()
 
-  const { base64_json_encode, jsonCopy } = Groundhogg.functions
-
   /**
    * Register a dynamic block
    *
@@ -2151,7 +2214,9 @@
    * @constructor
    */
   const BlockToolbar = ({
-    block, duplicateBlock, deleteBlock,
+    block,
+    duplicateBlock,
+    deleteBlock,
   }) => {
 
     return Div({
@@ -2323,7 +2388,7 @@
     } = block
 
     let {
-      width = '',
+      width = '',a
     } = advancedStyle
 
     if (!width) {
@@ -2360,9 +2425,9 @@
         id: `edit-${ block.id }`,
 
         className: `builder-block ${ isActiveBlock(block.id) ? 'is-editing' : '' }`,
-
         dataId: block.id,
         dataType: block.type,
+        tabindex: 0,
         onClick: e => {
           e.preventDefault()
 
@@ -2384,6 +2449,24 @@
           setActiveBlock(block.id)
           e.stopPropagation()
         },
+        onKeydown: e => {
+          if (e.key === 'Delete' && isActiveBlock(block.id)) {
+            deleteBlock(block.id)
+          }
+
+          if (e.key === 'd' && e.ctrlKey && isActiveBlock(block.id)) {
+            duplicateBlock(block.id)
+            e.preventDefault()
+          }
+
+          if (e.key === 'c' && e.ctrlKey && isActiveBlock(block.id)) {
+            copyActiveBlock()
+          }
+
+          if (e.key === 'v' && e.ctrlKey && isActiveBlock(block.id)) {
+            pasteBlock()
+          }
+        },
       },
       [
         Div({
@@ -2399,7 +2482,9 @@
             className: 'filters-enabled',
           },
           icons.eye) : null, BlockToolbar({
-        block, duplicateBlock, deleteBlock,
+        block,
+        duplicateBlock,
+        deleteBlock,
       }),
 
       ])
@@ -2594,7 +2679,6 @@
 
     return {
       ...block, id: uuid(),
-
     }
 
   }
@@ -2702,8 +2786,11 @@
    */
   const duplicateBlock = (blockId) => {
     let block = __findBlock(blockId, getBlocks())
-    insertBlockAfter(__replaceId(copyObject(block)),
-      blockId)
+    let newBlock = __replaceId(copyObject(block))
+
+    insertBlockAfter( newBlock, blockId)
+
+    setActiveBlock(newBlock.id)
   }
 
   /**
@@ -3639,7 +3726,6 @@
           },
         },
         'Email'),
-
     ]
 
     if (hasActiveBlock()) {
@@ -3663,42 +3749,10 @@
           id: 'block-more', className: 'gh-button secondary text small icon block-more', onClick: e => {
             moreMenu('#block-more', [
               {
-                key: 'copy', text: 'Copy Block', onSelect: e => {
-                  let input = document.createElement('input')
-                  input.classList.add('hidden')
-                  input.value = JSON.stringify(getActiveBlock())
-                  document.body.append(input)
-                  input.select()
-                  navigator.clipboard.writeText(input.value)
-                  input.remove()
-                  dialog({
-                    message: 'Block copied!',
-                  })
-                },
+                key: 'copy', text: 'Copy Block', onSelect: e => copyActiveBlock(),
               },
               {
-                key: 'paste', text: 'Paste Block', onSelect: e => {
-                  navigator.clipboard.readText().then(copiedText => {
-                    let block
-                    try {
-                      block = JSON.parse(copiedText)
-                    }
-                    catch (e) {
-                      dialog({ message: 'No block was copied', type: 'error' })
-                      return
-                    }
-
-                    if (!block || !block.id || !block.type) {
-                      dialog({ message: 'No block was copied', type: 'error' })
-                      return
-                    }
-
-                    insertBlockAfter(__replaceId(block),
-                      getActiveBlock().id)
-                    dialog({ message: 'Block pasted!' })
-
-                  })
-                },
+                key: 'paste', text: 'Paste Block', onSelect: e => pasteBlock(),
               },
             ])
           },
@@ -4868,8 +4922,6 @@
 
       style = addBorderStyle(columnStyle, style)
     }
-
-    console.log(style)
 
     if (isGeneratingHTML()) {
       return Td({
@@ -7412,8 +7464,7 @@
    * @param onCloseCallback
    */
   const initialize = ({
-    email, onSave: onSaveCallback = () => {
-    },
+    email, onSave: onSaveCallback = () => {},
     onClose: onCloseCallback = () => {
     },
   }) => {

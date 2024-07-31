@@ -350,11 +350,18 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.4.4.1 (2024-07-29) =
-* ADDED Column style to the column block.
+* ADDED New shortcut support for the email editor
+ * Using the `Delete` key on a block will delete it.
+ * `CTRL + C` Will copy a block.
+ * `CTRL + V` Will paste a block.
+ * `CTRL + D` Will duplicate a block.
+* ADDED Column style options to the Column block.
 * ADDED Justify alignment option to make buttons full width.
+* TWEAKED After duplicating a block, the new block becomes active instead of the original block staying active.
 * FIXED Issue of the last accepted Grammarly suggestion not saving when exiting from a text block in the email editor.
 * FIXED Color picker closing in email editor if selecting from palette then using dropper.
 * FIXED Font controls closing after selecting new font choice for text blocks.
+* FIXED First change in the email editor was not undoable.
 
 = 3.4.4 (2024-07-24) =
 * ADDED New `{form_submission}` replacement code which can add all recent form fields into an email.
