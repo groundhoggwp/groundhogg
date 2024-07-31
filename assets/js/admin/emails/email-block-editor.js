@@ -5164,7 +5164,6 @@
             id: 'columns-style', name: 'Column Style',
           },
           [
-            makeEl('hr'),
             // Padding
             Control({
                 label: 'Column Padding', stacked: true,
