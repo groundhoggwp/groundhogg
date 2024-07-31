@@ -708,8 +708,9 @@
       return
     }
 
-    insertBlockAfter(__replaceId(block),
-      getActiveBlock().id)
+    let newBlock = __replaceId(block)
+    insertBlockAfter(newBlock, getActiveBlock().id)
+    setActiveBlock( newBlock.id)
     dialog({ message: 'Block pasted!' })
   })
 
@@ -7416,17 +7417,16 @@
 
     let block = __findBlock(blockId, getBlocks())
 
-    let {
-      backgroundColor = '',
-    } = block.advancedStyle
+    // if using the columns block the column style
+    if ( block.type === 'columns' && block.columnStyle?.backgroundColor){
+      return block.columnStyle.backgroundColor
+    }
 
-    if (backgroundColor) {
-      return backgroundColor
+    if ( block.advancedStyle?.backgroundColor ){
+      return block.advancedStyle.backgroundColor
     }
 
     let parent = __findParent(blockId, getBlocks())
-
-    // console.log( parent )
 
     if (parent) {
       return getBlockBackgroundColor(parent.id, getBlocks())
