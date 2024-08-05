@@ -251,10 +251,10 @@
     return makeEl('div', attributes, children)
   }
 
-  const Dashicon = (icon) => {
+  const Dashicon = (icon, children = null ) => {
     return makeEl('span', {
       className: `dashicons dashicons-${ icon }`,
-    })
+    }, children )
   }
 
   const Fragment = (children, atts = {}) => {
@@ -953,9 +953,9 @@
 
       if ( multiple ){
         focusSearch()
+      } else {
+        focusPicker()
       }
-
-      focusPicker()
 
     }
 
