@@ -2110,11 +2110,12 @@
     })
   }
 
-  const Control = (
-    {
-      label = '', stacked = false, ...rest
-    },
-    control) => {
+  const Control = ({
+      label = '',
+      stacked = false,
+      tooltip = false,
+      ...rest
+    }, control) => {
 
     let labelProps = {
       className: 'control-label',
@@ -2139,7 +2140,10 @@
         dataFor: hasActiveBlock() ? getActiveBlock().id : null, ...rest,
       },
       [
-        makeEl('label', labelProps, label),
+        makeEl('label', labelProps, [
+          label,
+          tooltip ? Dashicon( 'editor-help', ToolTip( tooltip, 'top' ) ) : null
+        ]),
         control,
       ])
   }
@@ -3412,6 +3416,7 @@
             })),
           Control({
               label: 'Message type',
+            tooltip: '<a href="https://help.groundhogg.io/article/523-what-is-transactional-email">Transactional</a> emails bypass contact marketability.<br><b>Marketing</b> emails respect contact marketability.'
             },
             Select({
               id: 'message-type', options: {
@@ -6486,7 +6491,11 @@
               label: 'Shortcode', stacked: true,
             },
             Textarea({
-              className: 'code', value: shortcode, id: 'shortcode-paste', onChange: e => {
+              className: 'code',
+              value: shortcode,
+              id: 'shortcode-paste',
+              placeholder: '[your-shortcode]',
+              onChange: e => {
                 updateBlock({
                   shortcode: e.target.value,
                 })
@@ -6499,6 +6508,9 @@
         ]),
     ]),
     parseContent: content => cleanHTML(content),
+    defaults: {
+      shortcode: ''
+    }
   })
 
   // Register the post block
@@ -6593,7 +6605,9 @@
             },
             ItemPicker({
               id: `select-${ tax }`,
-              selected: selectedCache, tags: false, fetchOptions: async (search) => {
+              selected: selectedCache,
+              tags: false,
+              fetchOptions: async (search) => {
                 let terms = await get(`${ Groundhogg.api.routes.wp.v2 }/${ taxonomy.rest_base || tax }/`,
                   {
                     search, per_page: 20, orderby: 'count', order: 'desc',
@@ -6605,18 +6619,24 @@
 
                 terms = {
                   ...terms, [`${ tax }_cache`]: selected, [tax]: selected.map(opt => opt.id),
-
                 }
 
                 updateBlock({
-                  terms, morphControls: true,
+                  terms,
                 })
+
+                if ( terms.length > 1 ){
+
+                } else {
+
+                }
               },
             })),
 
           // Terms Any || All
-          selected.length > 1 ? Control({
+          Control({
               label: 'Relationship',
+              tooltip: 'If the post should have at least one, or all of the terms.'
             },
             ButtonToggle({
               id: `${ tax }-rel`,
@@ -6635,7 +6655,7 @@
                   terms, morphControls: true,
                 })
               },
-            })) : null,
+            }))
         ])
       }
 
@@ -6831,6 +6851,7 @@
             // Query offset
             Control({
                 label: 'Offset',
+                tooltip: 'The number of posts to skip'
               },
               Input({
                 type: 'number',
@@ -6851,7 +6872,6 @@
               },
               ItemPicker({
                 id: `${ post_type }-includes`,
-
                 selected: includedPosts,
                 tags: false,
                 fetchOptions: async (search) => {
@@ -7018,7 +7038,7 @@
       excerptStyle: fontDefaults({
         fontSize: 16,
       }),
-
+      queryId: '',
       cardStyle: {},
     },
   })
@@ -7029,14 +7049,20 @@
     linkedin: 'LinkedIn',
     pinterest: 'Pinterest',
     reddit: 'Reddit',
+    threads: 'Threads',
     tiktok: 'TikTok',
     tumblr: 'Tumblr',
     twitch: 'Twitch',
-    twitter: 'Twitter',
+    twitter: 'X',
     vimeo: 'Vimeo',
     whatsapp: 'WhatsApp',
     wordpress: 'WordPress',
     youtube: 'YouTube', // email: 'Email',
+    github: 'GitHub',
+    truthsocial: 'Truth Social',
+    odysee: 'Odysee',
+    discord: 'Discord',
+    rumble: 'Rumble',
   }
 
   const socialIconThemes = {
