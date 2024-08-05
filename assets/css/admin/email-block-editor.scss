@@ -666,6 +666,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
       label {
         font-weight: 500;
+
+        .gh-tooltip{
+          max-width: 180px;
+        }
       }
 
       .layouts {

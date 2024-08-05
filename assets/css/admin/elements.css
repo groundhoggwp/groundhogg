@@ -1985,6 +1985,17 @@ p.error,
   border-radius: 5px;
   font-size: 13px;
   font-weight: normal;
+  font-family: "system-ui", Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+.gh-has-tooltip .gh-tooltip a,
+:has(> .gh-tooltip) .gh-tooltip a {
+  text-decoration: underline;
+  color: #FFFFFF;
+  opacity: 0.8;
+}
+.gh-has-tooltip .gh-tooltip a:hover,
+:has(> .gh-tooltip) .gh-tooltip a:hover {
+  opacity: 0.4;
 }
 .gh-has-tooltip .gh-tooltip.right,
 :has(> .gh-tooltip) .gh-tooltip.right {

@@ -2113,6 +2113,17 @@ p.error,
     font-size: 13px;
     font-weight: normal;
     //position: relative;
+    font-family: 'system-ui', Arial, "Helvetica Neue", Helvetica, sans-serif;
+
+    a {
+      text-decoration: underline;
+      color: #FFFFFF;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 0.4;
+      }
+    }
 
     &.right {
       left: calc(100% + 5px);

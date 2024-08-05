@@ -487,6 +487,9 @@
 #controls-panel .control-group:not(.closed) .controls label {
   font-weight: 500;
 }
+#controls-panel .control-group:not(.closed) .controls label .gh-tooltip {
+  max-width: 180px;
+}
 #controls-panel .control-group:not(.closed) .controls .layouts {
   display: grid;
   grid-template-columns: 1fr 1fr;
