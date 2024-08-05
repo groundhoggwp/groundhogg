@@ -220,6 +220,7 @@ class Block_Registry {
 	 */
 	public function posts( $props ) {
 
+		// Special
 		add_action( 'pre_get_posts', [ $this, 'post_query_filter' ] );
 
 		// Handled by the query filter above
@@ -230,6 +231,9 @@ class Block_Registry {
 		unset( $props['post_type'] );
 		unset( $props['include'] );
 		unset( $props['exclude'] );
+
+		// Replace the ID of the block with the Query ID so that the filters work
+		$props['id'] = $props['queryId'] ?? '';
 
 		$posts = replacements()->posts( $props );
 
