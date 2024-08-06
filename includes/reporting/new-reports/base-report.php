@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use Groundhogg\Reports;
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_array_var;
@@ -71,31 +72,59 @@ abstract class Base_Report {
 	}
 
 	/**
+	 * Swaps start with compare_start because I'm a lazy coder.
+	 *
+	 * @return void
+	 */
+	public function swap_range_with_compare_dates() {
+		$origStart     = $this->start;
+		$origEnd       = $this->end;
+		$origStartDate = $this->startDate;
+		$origEndDate   = $this->endDate;
+
+		$this->start     = $this->compare_start;
+		$this->end       = $this->compare_end;
+		$this->startDate = $this->startDateCompare;
+		$this->endDate   = $this->endDateCompare;
+
+		$this->compare_start    = $origStart;
+		$this->compare_end      = $origEnd;
+		$this->startDateCompare = $origStartDate;
+		$this->endDateCompare   = $origEndDate;
+	}
+
+	/**
+	 * Retrieve the human diff time string for the reporting comparison
+	 *
+	 * @return mixed|string
+	 */
+	protected function get_human_time_diff() {
+		$diff = $this->startDate->human_time_diff( $this->endDate );
+
+		$parts = explode( ' ', $diff );
+		if ( absint( $parts[0] ) === 1 ){
+			return $parts[1];
+		}
+
+		return $diff;
+	}
+
+	/**
 	 * Set the appropriate time interval for the comparison period.
 	 */
 	protected function set_compare_dates() {
-		// Calculate the difference in days
-		$date_diff = $this->end - $this->start;
-		$num_days  = floor( $date_diff / DAY_IN_SECONDS ) + 1;
+		$interval = $this->startDate->diff( $this->endDate );
 
-		$this->num_days = $num_days;
+		$this->startDateCompare = clone $this->startDate;
+		$this->endDateCompare   = clone $this->endDate;
 
-		// Get the comparison
-		$startdate = date_create( date( 'Y-m-d H:i:s', $this->start ) );
-		$enddate   = date_create( date( 'Y-m-d H:i:s', $this->end ) );
+		// We modify by an additional second because the interval is 1 second short of the full deal
+		$this->startDateCompare->sub( $interval )->modify( '-1 second' );
+		$this->endDateCompare->sub( $interval )->modify( '-1 second' );
 
-		// subtract number of days
-		$previous_start = date_sub( $startdate, date_interval_create_from_date_string( $num_days . " days" ) );
-		$previous_end   = date_sub( $enddate, date_interval_create_from_date_string( $num_days . " days" ) );
-
-		// previous period
-		$this->compare_start = absint( $previous_start->format( 'U' ) );
-		$this->compare_end   = absint( $previous_end->format( 'U' ) );
-
-		$this->startDateCompare = new DateTimeHelper( $this->compare_start );
-		$this->endDateCompare   = new DateTimeHelper( $this->compare_end );
+		$this->compare_end   = $this->endDateCompare->getTimestamp();
+		$this->compare_start = $this->startDateCompare->getTimestamp();
 	}
-
 
 	protected function random_color_part() {
 		return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT );
@@ -180,7 +209,7 @@ abstract class Base_Report {
 	}
 
 	protected function get_other_report_params( $key, $default = false ) {
-		return get_array_var( get_request_var( 'data', [] ), $key );
+		return Reports::get_param( $key );
 	}
 
 	/**
@@ -215,7 +244,7 @@ abstract class Base_Report {
 			}
 		}
 
-		self::$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
+		self::$funnel_id = absint( Reports::get_param( 'funnel_id' ) );
 
 		return self::$funnel_id;
 	}
@@ -239,7 +268,7 @@ abstract class Base_Report {
 			}
 		}
 
-		self::$email_id = absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
+		self::$email_id = absint( Reports::get_param( 'email_id' ) );
 
 		return self::$email_id;
 	}
@@ -253,7 +282,7 @@ abstract class Base_Report {
 			return self::$step_id;
 		}
 
-		self::$step_id = absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
+		self::$step_id = absint( Reports::get_param( 'step_id' ) );
 
 		return self::$step_id;
 	}
@@ -263,11 +292,11 @@ abstract class Base_Report {
 	 */
 	protected function get_broadcast_id() {
 
-		if (self::$broadcast_id ) {
+		if ( self::$broadcast_id ) {
 			return self::$broadcast_id;
 		}
 
-		self::$broadcast_id = absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
+		self::$broadcast_id = absint( Reports::get_param( 'broadcast_id' ) );
 
 		return self::$broadcast_id;
 	}

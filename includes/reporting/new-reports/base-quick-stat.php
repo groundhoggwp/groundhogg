@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use function Groundhogg\_nf;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
+use function Groundhogg\percentage_change;
 use function Sodium\compare;
 
 abstract class Base_Quick_Stat extends Base_Report {
@@ -60,8 +61,7 @@ abstract class Base_Quick_Stat extends Base_Report {
 		$current_data = $this->query( $this->start, $this->end );
 		$compare_data = $this->query( $this->compare_start, $this->compare_end );
 
-		$compare_diff = $current_data - $compare_data;
-		$percentage   = percentage( $current_data, $compare_diff, 0 );
+		$percentage   = percentage_change( $compare_data, $current_data);
 		$arrow        = $this->get_arrow_properties( $current_data, $compare_data );
 
 		return [
@@ -75,12 +75,12 @@ abstract class Base_Quick_Stat extends Base_Report {
 					'direction' => $arrow['direction'],
 					'color'     => $arrow['color'],
 				],
-				'percent' => absint( $percentage ) . '%',
-				'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
+				'percent' => _nf( absint( $percentage ) ) . '%',
+				'text'    => sprintf( __( '.vs prev %s', 'groundhogg' ), $this->get_human_time_diff() )
 			],
 			'data'    => [
-				'current' => _nf( $current_data ),
-				'compare' => _nf( $compare_data )
+				'current' => $current_data,
+				'compare' => $compare_data,
 			]
 		];
 

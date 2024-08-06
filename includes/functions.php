@@ -200,6 +200,7 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 }
 
 function report_link( $content, $params ) {
+
 	return html()->e( 'a', [
 		'href' => admin_page_url( 'gh_reporting', $params )
 	], $content );
@@ -847,6 +848,28 @@ function words_to_key( $words ) {
 }
 
 /**
+ * Calc the percentage change
+ *
+ * @param $oldValue
+ * @param $newValue
+ * @param int $precision
+ *
+ * @return float|int
+ */
+function percentage_change( $oldValue, $newValue, int $precision = 0 ){
+	// Ensure the old value is not zero to avoid division by zero error
+	if ($oldValue == 0) {
+		return 0;
+	}
+
+	// Calculate the difference between the new value and the old value
+	$difference = $newValue - $oldValue;
+
+	// Calculate the percentage change
+	return percentage( $oldValue, $difference, $precision );
+}
+
+/**
  * Return the percentage to the second degree.
  *
  * @param     $denom int denominator
@@ -855,7 +878,7 @@ function words_to_key( $words ) {
  *
  * @return float
  */
-function percentage( $denom, $numer, $precision = 2 ) {
+function percentage( $denom, $numer, int $precision = 2 ) {
 	$denom = intval( $denom );
 	$numer = intval( $numer );
 

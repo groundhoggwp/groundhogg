@@ -254,6 +254,14 @@ h2.title {
   border-radius: 5px;
 }
 
+.percentage-change.bad{
+  color: #ff0000;
+}
+
+.percentage-change.good{
+  color: #99cc00;
+}
+
 @media only screen and (max-width: 480px) {
   .groundhogg-quick-stat .groundhogg-quick-stat-number,
   .groundhogg-quick-stat .groundhogg-quick-stat-previous,

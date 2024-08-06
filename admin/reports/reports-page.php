@@ -4,10 +4,12 @@ namespace Groundhogg\Admin\Reports;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Reports;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
@@ -136,19 +138,32 @@ class Reports_Page extends Tabbed_Admin_Page {
 				wp_enqueue_style( 'baremetrics-calendar' );
 				wp_enqueue_script( 'groundhogg-admin-reporting' );
 
-				$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
+				$start = get_request_var( 'start' );
+				$end   = get_request_var( 'end' );
 
-				if ( ! $dates ) {
+				// Check dates in URL
+				if ( $start && $end ) {
 					$dates = [
-						'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
-						'end_date'   => date( 'Y-m-d', time() ),
+						'start_date' => ( new DateTimeHelper( $start ) )->ymd(),
+						'end_date'   => ( new DateTimeHelper( $end ) )->ymd(),
 					];
-				} else {
-					$dates = explode( '|', $dates );
+				} //
+				// Check dates in cookie
+				else if ( $cookie_dates = get_cookie( 'groundhogg_reporting_dates', '' ) ) {
+
+					$cookie_dates = explode( '|', $cookie_dates );
 
 					$dates = [
-						'start_date' => $dates[0],
-						'end_date'   => $dates[1],
+						'start_date' => ( new DateTimeHelper( $cookie_dates[0] ) )->ymd(),
+						'end_date'   => ( new DateTimeHelper( $cookie_dates[1] ) )->ymd(),
+					];
+
+				} //
+				// Default to last 7 days
+				else {
+					$dates = [
+						'start_date' => ( new DateTimeHelper( '6 days ago' ) )->ymd(),
+						'end_date'   => ( new DateTimeHelper( 'today' ) )->ymd(),
 					];
 				}
 
@@ -385,20 +400,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include __DIR__ . '/views/functions.php';
 
 		?>
-		<div class="loader-wrap">
-			<div class="gh-loader-overlay" style="display:none;"></div>
-			<div class="gh-loader" style="display: none"></div>
-		</div>
-		<div class="wrap blurred">
+        <div class="loader-wrap">
+            <div class="gh-loader-overlay" style="display:none;"></div>
+            <div class="gh-loader" style="display: none"></div>
+        </div>
+        <div class="wrap blurred">
 			<?php if ( ! is_white_labeled() ): ?>
-				<h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
+                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
-				<h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
+                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
 			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
-			<hr class="wp-header-end">
+            <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
@@ -425,7 +440,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			}
 
 			?>
-		</div>
+        </div>
 		<?php
 
 	}
@@ -435,12 +450,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function range_picker() {
 		?>
-		<div id="groundhogg-datepicker-wrap">
-			<div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
-		</div>
-		<!--        <div id="groundhogg-datepicker-wrap">-->
-		<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-		<!--        </div>-->
+        <div id="groundhogg-datepicker-wrap">
+            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+        </div>
+        <!--        <div id="groundhogg-datepicker-wrap">-->
+        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+        <!--        </div>-->
 		<?php
 	}
 
@@ -503,9 +518,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	public function refresh_report_data() {
 
-        if ( ! current_user_can( 'view_reports' ) ){
-            $this->wp_die_no_access();
-        }
+		if ( ! current_user_can( 'view_reports' ) ) {
+			$this->wp_die_no_access();
+		}
 
 		$start = new \DateTime( get_post_var( 'start' ) . ' 00:00:00', wp_timezone() );
 		$end   = new \DateTime( get_post_var( 'end' ) . ' 23:59:59', wp_timezone() );
@@ -519,7 +534,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 		$reports = map_deep( get_post_var( 'reports' ), 'sanitize_key' );
 
-		$reporting = new Reports( $start->getTimestamp(), $end->getTimestamp() );
+		$reporting = new Reports( $start->getTimestamp(), $end->getTimestamp(), get_request_var( 'data', [] ) );
 
 		$results = [];
 

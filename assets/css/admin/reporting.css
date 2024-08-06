@@ -220,6 +220,14 @@ h2.title .dashicons, h2.title .dashicons-before:before {
   border-radius: 5px;
 }
 
+.percentage-change.bad {
+  color: #ff0000;
+}
+
+.percentage-change.good {
+  color: #99cc00;
+}
+
 .gh-panel #table_funnel_stats td:first-child a.step-title {
   font-size: 16px;
   font-weight: normal;

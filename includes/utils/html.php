@@ -192,34 +192,34 @@ class HTML {
 	 *
 	 * @return void
 	 */
-    public function export_columns_table( $columns ){
+	public function export_columns_table( $columns ) {
 
-	    html()->list_table( [
-		    'class' => 'export-table'
-	    ], [
-		    [
-			    'class' => 'check-column',
-			    'name'  => "<input type='checkbox' value='1' class='select-all'>",
-			    'tag'   => 'td'
-		    ],
-		    __( 'Pretty Name', 'groundhogg' ),
-		    __( 'Field ID', 'groundhogg' ),
-	    ], array_map_with_keys( $columns, function ( $label, $key ) {
-		    return [
-			    html()->checkbox( [
-				    'label'   => '',
-				    'type'    => 'checkbox',
-				    'name'    => 'headers[' . $key . ']',
-				    'id'      => 'header_' . $key,
-				    'value'   => '1',
-				    'checked' => false,
-			    ] ),
-			    $label,
-			    '<code>' . esc_html( $key ) . '</code>'
-		    ];
-	    } ) );
+		html()->list_table( [
+			'class' => 'export-table'
+		], [
+			[
+				'class' => 'check-column',
+				'name'  => "<input type='checkbox' value='1' class='select-all'>",
+				'tag'   => 'td'
+			],
+			__( 'Pretty Name', 'groundhogg' ),
+			__( 'Field ID', 'groundhogg' ),
+		], array_map_with_keys( $columns, function ( $label, $key ) {
+			return [
+				html()->checkbox( [
+					'label'   => '',
+					'type'    => 'checkbox',
+					'name'    => 'headers[' . $key . ']',
+					'id'      => 'header_' . $key,
+					'value'   => '1',
+					'checked' => false,
+				] ),
+				$label,
+				'<code>' . esc_html( $key ) . '</code>'
+			];
+		} ) );
 
-    }
+	}
 
 	public function tabs( $tabs = [], $active_tab = false, $class = "nav-tab-wrapper" ) {
 		if ( empty( $tabs ) ) {
@@ -399,11 +399,11 @@ class HTML {
 	 */
 	public function e( $tag = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
 
-		if ( in_array( $tag, ['img','input','br','hr', 'embed'] ) ){
+		if ( in_array( $tag, [ 'img', 'input', 'br', 'hr', 'embed' ] ) ) {
 			$self_closing = true;
 		}
 
-		if ( !$self_closing ) {
+		if ( ! $self_closing ) {
 			$html = $this->wrap( $content, $tag, $atts );
 		} else {
 			$html = sprintf( '<%1$s %2$s/>', esc_html( $tag ), array_to_atts( $atts ) );
@@ -625,7 +625,7 @@ class HTML {
 			'options' => [],
 		) );
 
-        $checked = $a['checked'] ?: [];
+		$checked = $a['checked'] ?: [];
 
 		$checkboxes = [];
 
@@ -1574,9 +1574,9 @@ class HTML {
 				'value'   => $args['value'],
 				'checked' => $args['checked'],
 			] ),
-            html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
-            html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
-            html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
+			html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
+			html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
+			html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
 		] );
 	}
 
@@ -1771,6 +1771,42 @@ class HTML {
 	 */
 	public function replacements_dropdown() {
 		return Plugin::instance()->replacements->show_replacements_dropdown( false );
+	}
+
+	/**
+     * The percentage change for a thing
+     *
+	 * @param float $percentage
+	 * @param bool  $down_is_good
+	 *
+	 * @return string
+	 */
+	public function percentage_change( float $percentage, bool $down_is_good = false ) {
+
+		// No change
+		if ( $percentage == 0 ){
+//			return '';
+		}
+
+		$classes = [
+            'percentage-change'
+        ];
+
+		if ( $percentage < 0 ) {
+			$classes[] = $down_is_good ? 'good' : 'bad';
+//			$tri       = '&blacktriangledown;';
+			$tri       = '&#x25BE;';
+//			$tri       = '&#9662;';
+		} else {
+			$classes[] = $down_is_good ? 'bad' : 'good';
+//			$tri       = '&blacktriangle;';
+			$tri       = '&#x25B4;';
+//			$tri       = '&#9652;';
+		}
+
+		return html()->e( 'span', [
+			'class' => $classes
+		], $tri . number_format( abs( $percentage ) ) . '%' );
 	}
 
 }

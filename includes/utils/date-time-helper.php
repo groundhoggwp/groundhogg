@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Utils;
 
+use Groundhogg\Plugin;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_time_format;
 
@@ -81,6 +82,11 @@ class DateTimeHelper extends \DateTime {
 	}
 
 	public function human_time_diff( $time = 0 ){
+
+		if ( ! is_int( $time ) && is_object( $time ) && method_exists( $time, 'getTimestamp' )){
+			$time = $time->getTimestamp();
+		}
+
 		return human_time_diff( $this->getTimestamp(), $time ?: time() );
 	}
 

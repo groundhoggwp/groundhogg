@@ -15,8 +15,10 @@ use function Groundhogg\find_object;
 use function Groundhogg\format_number_with_percentage;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use function Groundhogg\is_good_fair_or_poor;
 use function Groundhogg\percentage;
+use function Groundhogg\percentage_change;
 use function Groundhogg\report_link;
 use function Groundhogg\Ymd_His;
 
@@ -96,13 +98,21 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 			$active         = $this->count_active_contacts( $funnel );
 			$added          = $this->count_added_contacts( $funnel );
 
+			$this->swap_range_with_compare_dates();
+
+			$conversions_comp = percentage_change( $this->count_conversions( $funnel ), $conversions );
+			$active_comp      = percentage_change( $this->count_active_contacts( $funnel ), $active );
+			$added_comp       = percentage_change( $this->count_added_contacts( $funnel ), $added );
+
+			$this->swap_range_with_compare_dates();
+
 			$data[] = [
 				'active'       => $active,
 				'title'        => report_link( $funnel->title, [
 					'tab'    => 'funnels',
 					'funnel' => $funnel->ID
 				] ),
-				'added'        => contact_filters_link( _nf( $added ), array_map( function ( $step_id ) use ( $funnel ) {
+				'added'        => contact_filters_link( _nf( $added ) . ' ' . html()->percentage_change( $added_comp ), array_map( function ( $step_id ) use ( $funnel ) {
 					return [
 						[
 							'type'       => 'funnel_history',
@@ -115,7 +125,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						]
 					];
 				}, $funnel->get_entry_step_ids() ), $added ),
-				'contacts'     => contact_filters_link( _nf( $active ), [
+				'contacts'     => contact_filters_link( _nf( $active ) . ' ' . html()->percentage_change( $active_comp ), [
 					[
 						[
 							'type'       => 'funnel_history',
@@ -126,7 +136,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 						]
 					]
 				], $active ),
-				'conversions'  => empty( $conversion_ids ) ? 'N/A' : contact_filters_link( format_number_with_percentage( $conversions, $active ), array_map( function ( $step_id ) use ( $funnel ) {
+				'conversions'  => empty( $conversion_ids ) ? 'N/A' : contact_filters_link( format_number_with_percentage( $conversions, $active ) . ' ' . html()->percentage_change( $conversions_comp ), array_map( function ( $step_id ) use ( $funnel ) {
 					return [
 						[
 							'type'       => 'funnel_history',

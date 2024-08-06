@@ -16,6 +16,7 @@ use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_All_Broadcasts_Performance;
 use Groundhogg\Reporting\New_Reports\Table_All_Funnel_Emails_Performance;
 use Groundhogg\Reporting\New_Reports\Table_All_Funnels_Performance;
+use Groundhogg\Reporting\New_Reports\Table_All_Funnels_Performance_Without_Email;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Link_Clicked;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Stats;
@@ -69,12 +70,19 @@ class Reports {
 	protected $reports = [];
 
 	/**
+	 * Static params, set from $_POST[data] usually
+	 *
+	 * @var array|mixed
+	 */
+	protected static $params = [];
+
+	/**
 	 * Reports constructor.
 	 *
 	 * @param $start int unix timestamps
 	 * @param $end   int unix timestamps
 	 */
-	public function __construct( $start, $end ) {
+	public function __construct( $start, $end, $params = [] ) {
 
 		if ( is_string( $start ) ) {
 			$start = strtotime( $start );
@@ -87,8 +95,22 @@ class Reports {
 		$this->start = absint( $start );
 		$this->end   = absint( $end );
 
+		self::$params = $params;
+
 		$this->setup_default_reports();
 
+	}
+
+	/**
+	 * Get a param
+	 *
+	 * @param string $name
+	 * @param        $default
+	 *
+	 * @return bool|mixed
+	 */
+	public static function get_param( string $name, $default = false ){
+		return get_array_var( self::$params, $name, $default );
 	}
 
 	/**
@@ -246,6 +268,9 @@ class Reports {
 			[
 				'id'       => 'table_all_funnels_performance',
 				'callback' => [ $this, 'table_all_funnels_performance' ]
+			],[
+				'id'       => 'table_all_funnels_performance_without_email',
+				'callback' => [ $this, 'table_all_funnels_performance_without_email' ]
 			],
 			[
 				'id'       => 'table_form_activity',
@@ -314,7 +339,7 @@ class Reports {
 	}
 
 	/**
-	 * Get the a report result
+	 * Get the report result
 	 *
 	 * @param $report_id
 	 *
@@ -326,9 +351,7 @@ class Reports {
 			return false;
 		}
 
-		$results = call_user_func( $this->reports[ $report_id ]['callback'] );
-
-		return $results;
+		return call_user_func( $this->reports[ $report_id ]['callback'] );
 	}
 
 	/**
@@ -730,6 +753,12 @@ class Reports {
 
 	public function table_all_funnels_performance() {
 		$report = new Table_All_Funnels_Performance( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_all_funnels_performance_without_email() {
+		$report = new Table_All_Funnels_Performance_Without_Email( $this->start, $this->end );
 
 		return $report->get_data();
 	}

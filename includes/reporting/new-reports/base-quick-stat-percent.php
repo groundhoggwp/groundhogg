@@ -4,6 +4,7 @@ namespace Groundhogg\Reporting\New_Reports;
 
 use function Groundhogg\html;
 use function Groundhogg\percentage;
+use function Groundhogg\percentage_change;
 
 abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 
@@ -38,11 +39,8 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 		// Calc percentage
 		$compare_percentage = percentage( $compare_data_vs, $compare_data, 0 );
 
-		// Get the difference in the percentages
-		$compare_diff = $current_percentage - $compare_percentage;
-
 		// Calc that percentage
-		$percentage = percentage( $compare_percentage, $compare_diff, 0 );
+		$percentage = percentage_change( $compare_percentage, $current_percentage, 0 );
 
 		// Get arrow props
 		$arrow = $this->get_arrow_properties( $current_percentage, $compare_percentage );
@@ -61,7 +59,7 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 					'color'     => $arrow['color'],
 				],
 				'percent' => absint( $percentage ) . '%',
-				'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
+				'text'    => sprintf( __( '.vs prev %s', 'groundhogg' ), $this->get_human_time_diff() )
 			],
 			'data'    => [
 				'current' => $current_percentage,
