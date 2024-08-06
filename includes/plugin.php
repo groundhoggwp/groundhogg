@@ -348,6 +348,7 @@ class Plugin {
 		new Background_Tasks();
 		new Big_File_Uploader();
 		new Cleanup_Actions();
+		new Daily_Actions();
 	}
 
 	/**
