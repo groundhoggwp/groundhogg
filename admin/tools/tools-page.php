@@ -95,6 +95,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                 'emails',
                 'funnels',
                 'relationships',
+                'reports',
             ];
             $dot_min = is_option_enabled( 'gh_script_debug' ) ? '' : '.min';
             foreach ( $routes as $route ){

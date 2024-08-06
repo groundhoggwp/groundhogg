@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
+use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -54,6 +55,15 @@ class Reports_Api extends Base_Api {
 		] );
 	}
 
+	/**
+	 * Get custom report data for a singel custom report
+	 *
+	 * @throws \Groundhogg\DB\Query\FilterException
+	 *
+	 * @param $report
+	 *
+	 * @return array|array[]|bool|int|object|object[]|string|null
+	 */
 	function get_report_data( $report ) {
 
 		$report = wp_parse_args( $report, [
@@ -266,7 +276,7 @@ class Reports_Api extends Base_Api {
 	}
 
 	/**
-	 *
+	 * Get the results of all custom reports
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -287,7 +297,7 @@ class Reports_Api extends Base_Api {
 	}
 
 	/**
-	 *
+	 * Get the results of a single custom report
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -334,13 +344,13 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
+		$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
 
 		$params  = $request->get_param( 'params' );
 		$reports = map_deep( $request->get_param( 'reports' ), 'sanitize_key' );
 
-		$reporting = new Reports( $start, $end, $params );
+		$reporting = new Reports( $start->getTimestamp(), $end->getTimestamp(), $params );
 
 		if ( empty( $reports ) ) {
 			return self::ERROR_404( 'error', 'report not found' );
@@ -349,13 +359,10 @@ class Reports_Api extends Base_Api {
 		$results = [];
 
 		foreach ( $reports as $report_id ) {
-			$data                  = $reporting->get_data_3_0( $report_id );
-			$results[ $report_id ] = array_merge( [ 'id' => $report_id ], $data );
+			$results[ $report_id ] = $reporting->get_data( $report_id );
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'start'   => $start,
-			'end'     => $end,
 			'reports' => $results
 		] );
 	}
@@ -369,19 +376,17 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read_single( WP_REST_Request $request ) {
 
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
-		$context = $request->get_param( 'context' );
+		$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
+		$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
 
-		$report    = $request->get_param( 'id' );
-		$reporting = new Reports( $start, $end, $context );
+		$params    = $request->get_param( 'params' ) ?: [];
+		$report    = sanitize_key( $request->get_param( 'id' ) );
+		$reporting = new Reports( $start->getTimestamp(), $end->getTimestamp(), $params );
 
 		$results = $reporting->get_data( $report );
 
 		return self::SUCCESS_RESPONSE( [
-			'start' => $start,
-			'end'   => $end,
-			'items' => $results
+			'report' => $results
 		] );
 	}
 
