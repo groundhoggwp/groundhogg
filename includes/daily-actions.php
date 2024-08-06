@@ -12,12 +12,7 @@ class Daily_Actions {
 		add_action( 'init', [ $this, 'schedule_event' ] );
 
 		add_action( 'groundhogg/daily', [ $this, 'send_broadcast_reports_by_email' ] );
-
-//		if ( get_request_var( 'test_email_report' ) ) {
-//			add_action( 'template_redirect', [ $this, 'send_broadcast_reports_by_email' ] );
-//			add_action( 'template_redirect', [ $this, 'maybe_send_overview_report' ] );
-//		}
-
+		add_action( 'groundhogg/daily', [ $this, 'maybe_send_overview_report' ] );
 	}
 
 	/**
@@ -155,14 +150,13 @@ class Daily_Actions {
 		$email_content = file_get_contents( GROUNDHOGG_ASSETS_PATH . 'emails/broadcast-results.html' );
 		$email_content = $replacer->replace( $email_content );
 
+		// Send the report
+		// todo add additional emails
 		\Groundhogg_Email_Services::send_wordpress( [
 			get_option( 'admin_email' )
 		], '[Groundhogg] Yesterday\'s broadcast performance', $email_content, [
 			'Content-Type: text/html',
 		] );
-
-//		echo $email_content;
-//		die();
 	}
 
 	private function generate_compare_html( $performance ) {
@@ -198,10 +192,7 @@ class Daily_Actions {
 		} //
 		// Otherwise do nothing
 		else {
-			$after  = new DateTimeHelper( '7 days ago 00:00:00' );
-			$before = new DateTimeHelper( 'yesterday 23:59:59' );
-			$subject = '[Groundhogg] Review last week\'s performance';
-//			return;
+			return;
 		}
 
 		$reports = new Reports( $after->getTimestamp(), $before->getTimestamp() );
@@ -242,13 +233,13 @@ class Daily_Actions {
 		$email_content = file_get_contents( GROUNDHOGG_ASSETS_PATH . 'emails/overview.html' );
 		$email_content = $replacer->replace( $email_content );
 
+		// Send the report
+		// todo add additional emails
 		\Groundhogg_Email_Services::send_wordpress( [
 			get_option( 'admin_email' )
 		], $subject, $email_content, [
 			'Content-Type: text/html',
 		] );
 
-//		echo $email_content;
-//		die();
 	}
 }
