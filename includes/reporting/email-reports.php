@@ -19,7 +19,7 @@ use function Groundhogg\percentage_change;
 class Email_Reports extends Notification_Builder {
 
 	public function __construct() {
-		add_action( 'init', [ $this, 'test_report' ] );
+//		add_action( 'init', [ $this, 'test_report' ] );
 	}
 
 	public function test_report() {
