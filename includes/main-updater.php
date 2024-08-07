@@ -159,6 +159,9 @@ class Main_Updater extends Old_Updater {
 						update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
 						update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
 					}
+
+					// Clear the purge page visits hook because we're going to use the daily hook instead
+					wp_clear_scheduled_hook( 'groundhogg/purge_page_visits' );
 				}
 			]
 		];
