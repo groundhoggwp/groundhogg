@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Reports;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;

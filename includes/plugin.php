@@ -7,6 +7,7 @@ use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Queue\Event_Queue;
+use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Steps\Manager as Step_Manager;
 use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
 
@@ -349,6 +350,7 @@ class Plugin {
 		new Big_File_Uploader();
 		new Cleanup_Actions();
 		new Daily_Actions();
+		new Email_Reports(); // Todo remove this because it's just for testing right now
 	}
 
 	/**

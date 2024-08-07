@@ -149,6 +149,17 @@ class Main_Updater extends Old_Updater {
 					db()->page_visits->maybe_fix_ip_column();
 					db()->form_impressions->maybe_fix_ip_column();
 				}
+			],
+			'3.5'    => [
+				'automatic'   => true,
+				'description' => __( 'Subscribe admins that can view reports to the new email performance reports.', 'groundhogg' ),
+				'callback'    => function () {
+					$owners = filter_by_cap( get_owners(), 'view_reports' );
+					foreach ( $owners as $owner ){
+						update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
+						update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
+					}
+				}
 			]
 		];
 	}

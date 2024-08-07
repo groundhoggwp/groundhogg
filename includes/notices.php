@@ -177,6 +177,19 @@ class Notices {
     }
 
 	/**
+     * Fetches only the  remote notices
+     *
+	 * @return array|mixed
+	 */
+    function fetch_unread_remote_notices(){
+        $notices = $this->fetch_remote_notices();
+
+        return array_filter( $notices, function ( $notice ){
+            return ! in_array( $notice['id'], self::$read_notices );
+        } );
+    }
+
+	/**
 	 * Retrieve the number of unread notices...
 	 *
 	 * @return int

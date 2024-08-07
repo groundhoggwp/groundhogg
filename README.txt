@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.4.4.1
+Stable tag: 3.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,19 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.5 (2024-08-05) =
+* ADDED New social networks for the social icons block: Threads, GitHub, Discord, Rumble, Truth Social, and Odysee
+* ADDED Reports API to the Rest API Playground
+* ADDED Automated weekly and monthly emailed overview reports to admins.
+* ADDED Automated next day reports for broadcast emails.
+* ADDED Comparison growth indicators to the funnel performance table.
+* ADDED New Menu block to the email editor
+* IMPROVED Comparison date calculations for all reports.
+* TWEAKED Term relationship toggle in the posts block will now always show, instead of being shown conditionally.
+* TWEAKED Block copy/paste is now done with HTML rather than the block JSON. The HTML is parsed into the appropriate block(s).
+* FIXED Tag picker options not collapsing after unfocusing from the picker.
+* FIXED Filtering the WP_Query for the posts block not working.
 
 = 3.4.4.1 (2024-07-29) =
 * ADDED New shortcut support for the email editor

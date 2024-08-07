@@ -3,15 +3,19 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Replacer;
 
+/**
+ * Todo add better white label support for the emails
+ */
 class Daily_Actions {
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'schedule_event' ] );
 
-		add_action( 'groundhogg/daily', [ $this, 'send_broadcast_reports_by_email' ] );
+		add_action( 'groundhogg/daily', [ $this, 'send_broadcast_reports' ] );
 		add_action( 'groundhogg/daily', [ $this, 'maybe_send_overview_report' ] );
 	}
 
@@ -31,140 +35,16 @@ class Daily_Actions {
 	}
 
 	/**
-	 * Generate the table for the broadcasts performance
-	 *
-	 * @param array    $performance
-	 * @param callable $ignoreRow
-	 *
-	 * @return string
-	 */
-	private function generate_performance_table_html( array $performance, callable $ignoreRow ) {
-
-		$rows = [];
-
-		foreach ( $performance['data'] as $i => $row ) {
-
-			if ( call_user_func( $ignoreRow, $row ) ) {
-				continue;
-			}
-
-			extract( $row );
-
-			$cells = [];
-			$k     = 0;
-
-			foreach ( $row as $cellId => $value ) {
-
-				if ( $cellId === 'cellClasses' || $cellId === 'orderby' ) {
-					continue;
-				}
-
-				$classes = [
-					$cellClasses[ $k ]
-				];
-
-				$style = [
-					'padding' => '8px 8px 8px 12px',
-				];
-
-				if ( $k > 0 ) {
-					$style['text-align'] = 'center';
-					$classes[]           = 'num';
-				}
-
-				$cells[] = html()->e( 'td', [
-					'style' => $style,
-					'class' => $classes
-				], $value );
-
-				$k ++;
-			}
-
-			$rows[] = html()->e( 'tr', [
-				'style' => [
-					'background-color' => $i % 2 === 0 ? '#F6F9FB' : ''
-				]
-			], $cells );
-		}
-
-		return html()->e( 'table', [
-			'style' => [
-				'border-collapse' => 'collapse',
-				'width'           => '100%',
-				'table-layout'    => 'auto',
-			],
-			'width' => '100%'
-		], [
-			html()->e( 'thead', [], [
-				html()->e( 'tr', [], array_map_with_keys( $performance['label'], function ( $header, $i ) {
-
-					$style = [
-						'padding' => '8px 8px 8px 12px',
-					];
-
-					if ( $i > 0 ) {
-						$style['text-align'] = 'center';
-					}
-
-					return html()->e( 'th', [
-						'style' => $style
-					], $header );
-				} ) )
-			] ),
-			html()->e( 'tbody', [], $rows )
-		] );
-
-	}
-
-	/**
 	 * Send reports for broadcasts sent the previous day.
 	 *
 	 * @return void
 	 */
-	public function send_broadcast_reports_by_email() {
+	public function send_broadcast_reports() {
 
-		$yesterday   = new DateTimeHelper( 'yesterday' );
-		$reports     = new Reports( $yesterday->getTimestamp(), $yesterday->getTimestamp() + DAY_IN_SECONDS - 1 );
-		$performance = $reports->get_data( 'table_all_broadcasts_performance' );
+		$yesterday = new DateTimeHelper( 'yesterday 00:00:00' );
+		$yesterdayEod = (clone $yesterday)->modify('23:59:59');
 
-		// No broadcasts were sent
-		if ( empty( $performance['data'] ) ) {
-			return;
-		}
-
-		$table_html = $this->generate_performance_table_html( $performance, '__return_false' );
-
-		$replacer = new Replacer( [
-			'logo_url'                => is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png',
-			'num_broadcasts'          => count( $performance['data'] ),
-			'broadcast_results_table' => $table_html,
-			'full_report_link'        => admin_page_url( 'gh_reporting', [
-				'tab'   => 'broadcasts',
-				'start' => $yesterday->ymd(),
-				'end'   => $yesterday->ymd(),
-			] ),
-			'site_name'                => get_bloginfo(),
-			'site_url'                 => home_url(),
-		] );
-
-		$email_content = file_get_contents( GROUNDHOGG_ASSETS_PATH . 'emails/broadcast-results.html' );
-		$email_content = $replacer->replace( $email_content );
-
-		// Send the report
-		// todo add additional emails
-		\Groundhogg_Email_Services::send_wordpress( [
-			get_option( 'admin_email' )
-		], '[Groundhogg] Yesterday\'s broadcast performance', $email_content, [
-			'Content-Type: text/html',
-		] );
-	}
-
-	private function generate_compare_html( $performance ) {
-
-		$percentage   = percentage_change( absint( $performance['data']['compare'] ), absint( $performance['data']['current'] ) );
-		$down_is_good = ( $performance['compare']['arrow']['color'] === 'red' && $performance['compare']['arrow']['direction'] === 'up' ) || ( $performance['compare']['arrow']['color'] === 'green' && $performance['compare']['arrow']['direction'] === 'down' );
-
-		return html()->percentage_change( $percentage, $down_is_good );
+		Email_Reports::send_broadcast_report( $yesterday, $yesterdayEod );
 	}
 
 	/**
@@ -195,51 +75,6 @@ class Daily_Actions {
 			return;
 		}
 
-		$reports = new Reports( $after->getTimestamp(), $before->getTimestamp() );
-
-		$broadcastPerformance = $reports->get_data( 'table_all_broadcasts_performance' );
-		$funnelPerformance    = $reports->get_data( 'table_all_funnels_performance_without_email' );
-		$totalNewContacts     = $reports->get_data( 'total_new_contacts' );
-		$totalEngagedContacts = $reports->get_data( 'total_engaged_contacts' );
-		$totalUnsubContacts   = $reports->get_data( 'total_unsubscribed_contacts' );
-
-		$replacer = new Replacer( [
-			'logo_url'                 => is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png',
-			'time_range'               => $after->human_time_diff( $before ),
-			'start_date'               => $after->wpDateFormat(),
-			'end_date'                 => $before->wpDateFormat(),
-			'compare_text'             => $totalNewContacts['compare']['text'],
-			'broadcast_results_table'  => $this->generate_performance_table_html( $broadcastPerformance, '__return_false' ),
-			'funnel_results_table'     => $this->generate_performance_table_html( $funnelPerformance, function ( $row ) {
-				return $row['orderby'][2] == 0;
-			} ),
-			'full_report_link'         => admin_page_url( 'gh_reporting', [
-				'start' => $after->ymd(),
-				'end'   => $before->ymd()
-			] ),
-			'site_name'                => get_bloginfo(),
-			'site_url'                 => home_url(),
-			// New contacts
-			'new_contacts_compare'     => $this->generate_compare_html( $totalNewContacts ),
-			'new_contacts_num'         => $totalNewContacts['number'],
-			// Engaged
-			'engaged_contacts_compare' => $this->generate_compare_html( $totalEngagedContacts ),
-			'engaged_contacts_num'     => $totalEngagedContacts['number'],
-			// Unsubscribes
-			'unsub_contacts_compare'   => $this->generate_compare_html( $totalUnsubContacts ),
-			'unsub_contacts_num'       => $totalUnsubContacts['number'],
-		] );
-
-		$email_content = file_get_contents( GROUNDHOGG_ASSETS_PATH . 'emails/overview.html' );
-		$email_content = $replacer->replace( $email_content );
-
-		// Send the report
-		// todo add additional emails
-		\Groundhogg_Email_Services::send_wordpress( [
-			get_option( 'admin_email' )
-		], $subject, $email_content, [
-			'Content-Type: text/html',
-		] );
-
+		Email_Reports::send_overview_report( $after, $before, $subject );
 	}
 }

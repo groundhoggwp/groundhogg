@@ -8189,3 +8189,25 @@ function get_unsub_reasons() {
 		'other'           => _x( 'Other', 'admin unsubscribe reason', 'groundhogg' ),
 	] );
 }
+
+/**
+ * Filter a list of users by capabilities
+ *
+ * @param $users \WP_User[]|int[]
+ * @param $cap string|array
+ *
+ * @return \WP_User[]|int[]
+ */
+function filter_by_cap( $users, $cap ){
+    $caps = wp_parse_list( $cap );
+
+    return array_filter( $users, function ($user) use ( $caps ){
+        foreach ( $caps as $cap ){
+            if ( ! user_can( $user, $cap ) ){
+                return false;
+            }
+        }
+
+        return true;
+    } );
+}
