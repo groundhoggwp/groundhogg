@@ -436,6 +436,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           border-radius: 5px;
           height: 40px;
           margin: 5px;
+          min-width: 40px;
         }
 
         .block-toolbar {
@@ -720,6 +721,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
           &.three_columns_center {
             grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 1fr 2fr 1fr;
           }
 
           &.three_columns_left {
@@ -740,6 +742,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
           &.two_columns_left {
             grid-template-columns: 2fr 1fr;
+          }
+
+          &.custom_columns {
+            grid-template-columns: 2fr 1fr 3fr 1.5fr ;
           }
         }
       }

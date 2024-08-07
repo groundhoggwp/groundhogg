@@ -310,6 +310,7 @@
   border-radius: 5px;
   height: 40px;
   margin: 5px;
+  min-width: 40px;
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar {
   display: none;
@@ -526,6 +527,7 @@
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns_center {
   grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 1fr 2fr 1fr;
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns_left {
   grid-template-columns: 2fr 1fr 1fr;
@@ -541,6 +543,9 @@
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.two_columns_left {
   grid-template-columns: 2fr 1fr;
+}
+#controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.custom_columns {
+  grid-template-columns: 2fr 1fr 3fr 1.5fr;
 }
 #controls-panel > .gh-panel {
   border-radius: 0;
