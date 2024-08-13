@@ -361,6 +361,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED Block copy/paste is now done with HTML rather than the block JSON. The HTML is parsed into the appropriate block(s).
 * FIXED Tag picker options not collapsing after unfocusing from the picker.
 * FIXED Filtering the WP_Query for the posts block not working.
+* FIXED Mapping to checkboxes not working if there is a space " " in the value.
 
 = 3.4.4.1 (2024-07-29) =
 * ADDED New shortcut support for the email editor
