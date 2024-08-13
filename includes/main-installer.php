@@ -63,6 +63,13 @@ class Main_Installer extends Installer {
 		if ( ! is_option_enabled( 'gh_guided_setup_finished' ) && ! is_white_labeled() ){
 			update_option( 'gh_force_to_setup', 1 );
 		}
+
+		// Auto optin admins to get performance reports
+		$owners = filter_by_cap( get_owners(), 'view_reports' );
+		foreach ( $owners as $owner ){
+			update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
+			update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
+		}
 	}
 
 	public function get_display_name() {

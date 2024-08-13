@@ -1785,7 +1785,7 @@ class HTML {
 
 		// No change
 		if ( $percentage == 0 ){
-//			return '';
+			return '';
 		}
 
 		$classes = [

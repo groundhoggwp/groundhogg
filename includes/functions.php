@@ -2741,9 +2741,26 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'terms_agreement':
 			case 'gdpr_consent':
 			case 'marketing_consent':
-				if ( ! empty( $value ) ) {
-					$args[ $field ] = true;
-				}
+
+                switch ( $value ){
+                    case 'false':
+                    case 'False':
+                    case 'no':
+                    case 'No':
+	                     break;
+	                case 'yes':
+	                case 'Yes':
+	                case 'true':
+	                case 'True':
+	                    $args[ $field ] = true;
+                        break;
+                    default:
+	                    if ( ! empty( $value ) ) {
+		                    $args[ $field ] = true;
+	                    }
+                        break;
+                }
+
 				break;
 			case 'country':
 				if ( strlen( $value ) !== 2 ) {

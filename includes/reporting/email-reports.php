@@ -11,7 +11,9 @@ use function Groundhogg\array_map_with_keys;
 use function Groundhogg\db;
 use function Groundhogg\filter_by_cap;
 use function Groundhogg\get_request_var;
+use function Groundhogg\has_premium_features;
 use function Groundhogg\html;
+use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
 use function Groundhogg\percentage_change;
@@ -19,7 +21,7 @@ use function Groundhogg\percentage_change;
 class Email_Reports extends Notification_Builder {
 
 	public function __construct() {
-//		add_action( 'init', [ $this, 'test_report' ] );
+		add_action( 'init', [ $this, 'test_report' ] );
 	}
 
 	public function test_report() {
@@ -31,7 +33,7 @@ class Email_Reports extends Notification_Builder {
 		$after  = new DateTimeHelper( '7 days ago 00:00:00' );
 		$before = new DateTimeHelper( 'yesterday 23:59:59' );
 
-		self::send_broadcast_report( $after, $before );
+		self::send_overview_report( $after, $before );
 	}
 
 	/**
@@ -39,7 +41,7 @@ class Email_Reports extends Notification_Builder {
 	 *
 	 * @param string $meta_key
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function get_recipients( string $meta_key ) {
 
@@ -52,9 +54,16 @@ class Email_Reports extends Notification_Builder {
 		$user_query = new \WP_User_Query( $args );
 
 		// Get the results
-		$users = filter_by_cap( $user_query->get_results(), 'view_reports' );
+		$users  = filter_by_cap( $user_query->get_results(), 'view_reports' );
+		$emails = wp_list_pluck( $users, 'user_email' );
 
-		return wp_list_pluck( $users, 'user_email' );
+		/**
+		 * Filter the recipients of email reports
+		 *
+		 * @param $emails   string[] an array of emails
+		 * @param $meta_key string typically the meta key used to identify which users to send the overview to.
+		 */
+		return apply_filters( 'groundhogg/email_reports/recipients', $emails, $meta_key );
 	}
 
 	/**
@@ -156,7 +165,7 @@ class Email_Reports extends Notification_Builder {
 
 		$recipients = self::get_recipients( 'gh_broadcast_results' );
 
-		if ( empty( $recipients ) ){
+		if ( empty( $recipients ) ) {
 			return false;
 		}
 
@@ -171,16 +180,12 @@ class Email_Reports extends Notification_Builder {
 		$table_html = self::generate_performance_table_html( $performance, '__return_false' );
 
 		$replacer = new Replacer( [
-			'logo_url'                => is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png',
-			'num_broadcasts'          => count( $performance['data'] ),
 			'broadcast_results_table' => $table_html,
 			'full_report_link'        => admin_page_url( 'gh_reporting', [
 				'tab'   => 'broadcasts',
 				'start' => $after->ymd(),
 				'end'   => $before->ymd(),
 			] ),
-			'site_name'               => get_bloginfo(),
-			'site_url'                => home_url(),
 		] );
 
 		$email_content = $replacer->replace( self::get_general_notification_template_html( 'broadcast-results' ) );
@@ -219,7 +224,7 @@ class Email_Reports extends Notification_Builder {
 		$recipients = self::get_recipients( 'gh_weekly_overview' );
 
 		// No recipients, don't bother sending
-		if ( empty( $recipients ) ){
+		if ( empty( $recipients ) ) {
 			return false;
 		}
 
@@ -272,7 +277,7 @@ class Email_Reports extends Notification_Builder {
 					'#admin#'          => untrailingslashit( admin_url() ),
 					'#home#'           => untrailingslashit( home_url() ),
 					'#name#'           => get_bloginfo(),
-					'#display_name#'   => wp_get_current_user()->display_name,
+					'#display_name#'   => wp_get_current_user()->display_name || 'Admin',
 				] );
 
 				return $html . $replacer->replace( self::get_template_part( 'remote-notice' ) );
@@ -305,16 +310,30 @@ class Email_Reports extends Notification_Builder {
 				'start' => $after->ymd(),
 				'end'   => $before->ymd()
 			] ),
+			'funnels_report_url'       => admin_page_url( 'gh_reporting', [
+				'tab'   => 'funnels',
+				'start' => $after->ymd(),
+				'end'   => $before->ymd()
+			] ),
+			'broadcasts_report_url'    => admin_page_url( 'gh_reporting', [
+				'tab'   => 'broadcasts',
+				'start' => $after->ymd(),
+				'end'   => $before->ymd()
+			] ),
 			'send_new_broadcast'       => admin_page_url( 'gh_emails', [ 'action' => 'add' ] ),
 			'review_your_funnels'      => admin_page_url( 'gh_funnels', [ 'view' => 'active' ] ),
 			'create_new_funnel'        => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
 			'create_better_journey'    => '#',
 			'what_funnel_to_create'    => '#',
-			'remote_notices'           => $notices
+			'remote_notices'           => $notices,
+			'get_pro'                  => has_premium_features() ? '' : self::get_template_part( 'funnels-upgrade-to-pro' ),
 		] );
 
 		$email_content = self::get_general_notification_template_html( 'overview' );
 		$email_content = $replacer->replace( $email_content );
+
+		echo $email_content;
+		die();
 
 		// Send the report
 		return \Groundhogg_Email_Services::send_wordpress( $recipients, $subject, $email_content, [

@@ -47,12 +47,13 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'datetime':
 			return date( 'Y-m-d H:i:s', strtotime( $value ) );
 		case 'dropdown':
-			if ( isset_not_empty( $field, 'multiple' ) ){
-				return map_deep( wp_parse_list( $value ), 'sanitize_text_field' );
+			if ( isset_not_empty( $field, 'multiple' ) ) {
+				return map_deep( explode( ',', $value ), 'sanitize_text_field' );
 			}
+
 			return sanitize_text_field( $value );
 		case 'checkboxes':
-			return map_deep( wp_parse_list( $value ), 'sanitize_text_field' );
+			return map_deep( explode( ',', $value ), 'sanitize_text_field' );
 		case 'html':
 			return wp_kses_post( $value );
 	endswitch;
@@ -89,7 +90,7 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 
 	try {
 
-		if ( ! empty( $data ) ){
+		if ( ! empty( $data ) ) {
 			switch ( $field['type'] ):
 				default:
 				case 'text':
@@ -131,14 +132,14 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 			endswitch;
 		}
 
-	} catch (\Exception $e){
+	} catch ( \Exception $e ) {
 		return '';
 	}
 
 	/**
 	 * Filter the display value of a custom field
 	 *
-	 * @param $data mixed the custom field display value
+	 * @param $data    mixed the custom field display value
 	 * @param $contact Contact
 	 */
 	$data = apply_filters( 'groundhogg/display_custom_field', $data, $contact );
@@ -221,7 +222,7 @@ function add_custom_fields_to_mappable_fields( $fields = [] ) {
 		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
 		// Tab is missing, deleted?
-		if ( ! $tab ){
+		if ( ! $tab ) {
 			continue;
 		}
 
@@ -365,7 +366,7 @@ function add_custom_property_replacements( $replacements ) {
 
 		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
-		if ( ! $tab ){
+		if ( ! $tab ) {
 			continue;
 		}
 
@@ -386,7 +387,7 @@ function add_custom_property_replacements( $replacements ) {
 			);
 
 			// Name & ID are the same (some legacy custom fields)
-			if ( $custom_field[ 'id' ] === $custom_field['name'] ){
+			if ( $custom_field['id'] === $custom_field['name'] ) {
 				continue;
 			}
 

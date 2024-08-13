@@ -5659,7 +5659,6 @@
     50,
   ]
   let adjustedArr = adjustArrayToSum100(arr)
-  console.log(adjustedArr) // Output: Array where the sum is 100
 
   // Register the columns block
   registerBlock('columns', 'Columns', {
@@ -6993,6 +6992,7 @@
           }, InputRepeater({
             id      : 'menu-link-editor',
             rows    : links,
+            sortable: true,
             cells   : [
               props => Input({
                 ...props,
@@ -9298,7 +9298,7 @@
 
       }
       catch (e) {
-        console.log(e)
+        // console.log(e)
       }
     }
 
@@ -9371,12 +9371,12 @@
 
     }
     catch (e) {
-      console.log({
-        err: e,
-        commentData,
-        type,
-        id,
-      })
+      // console.log({
+      //   err: e,
+      //   commentData,
+      //   type,
+      //   id,
+      // })
     }
 
     const BlockType = BlockRegistry.get(type)
