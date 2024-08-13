@@ -21,7 +21,7 @@ use function Groundhogg\percentage_change;
 class Email_Reports extends Notification_Builder {
 
 	public function __construct() {
-		add_action( 'init', [ $this, 'test_report' ] );
+//		add_action( 'init', [ $this, 'test_report' ] );
 	}
 
 	public function test_report() {
@@ -332,8 +332,8 @@ class Email_Reports extends Notification_Builder {
 		$email_content = self::get_general_notification_template_html( 'overview' );
 		$email_content = $replacer->replace( $email_content );
 
-		echo $email_content;
-		die();
+//		echo $email_content;
+//		die();
 
 		// Send the report
 		return \Groundhogg_Email_Services::send_wordpress( $recipients, $subject, $email_content, [
