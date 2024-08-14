@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5
+Stable tag: 3.5.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.5 (2024-08-05) =
+= 3.5.0.1 (2024-08-14) =
+* FIXED Pickers not appearing full width
+
+= 3.5 (2024-08-14) =
 * ADDED New social networks for the social icons block: Threads, GitHub, Discord, Rumble, Truth Social, and Odysee
 * ADDED Reports API to the Rest API Playground
 * ADDED Automated weekly and monthly emailed overview reports to admins.

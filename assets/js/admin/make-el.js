@@ -1196,6 +1196,7 @@
       id,
       className: `gh-picker-container`,
       tabindex: '0',
+      ...attributes,
     }, Div({
       id: `${id}-picker`,
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
@@ -1230,7 +1231,6 @@
           }, 'picker focused')
         })
       },
-      ...attributes,
     }, [
       Div({
         className: `gh-picker-selected ${ multiple ? 'multiple' : 'single' }`,
