@@ -5,8 +5,8 @@
 @media only screen and (max-width: 480px) {
     table.responsive.email-columns,
     table.responsive.email-columns > tbody,
-    table.responsive.email-columns tr.email-columns-row,
-    table.responsive.email-columns tr.email-columns-row > td.email-columns-cell {
+    table.responsive.email-columns > tbody > tr.email-columns-row,
+    table.responsive.email-columns > tbody > tr.email-columns-row > td.email-columns-cell {
         display: block !important;
         width: auto !important;
     }

@@ -362,6 +362,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Tag picker options not collapsing after unfocusing from the picker.
 * FIXED Filtering the WP_Query for the posts block not working.
 * FIXED Mapping to checkboxes not working if there is a space " " in the value.
+* FIXED Non-responsive columns still responsive if nested in a responsive column.
 
 = 3.4.4.1 (2024-07-29) =
 * ADDED New shortcut support for the email editor

@@ -6998,10 +6998,22 @@
                 ...props,
                 placeholder: 'Link Text',
               }),
-              props => Input({
+              props => Autocomplete({
                 ...props,
-                type       : 'url',
-                placeholder: Groundhogg.url.home,
+                fetchResults: async search => {
+                  let pages = await ajax({
+                    action             : 'wp-link-ajax',
+                    _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                    term               : search,
+                  })
+
+                  return pages.map(({
+                    title,
+                    permalink,
+                    id  : permalink,
+                    text: title,
+                  } ))
+                },
               }),
             ],
             onChange: links => updateBlock({
@@ -7018,7 +7030,7 @@
                 '' : 'None',
                 '&vert;' : '&vert;',
                 '&Vert;' : '&Vert;',
-                '&tilde;' : '&tilde;',
+                // '&tilde;' : '&tilde;',
                 '&middot;' : '&middot;',
                 '&bull;' : '&bull;',
               },
@@ -7145,8 +7157,10 @@
       align    : 'center',
       fontStyle: {
         fontSize: 13,
+        fontFamily: 'system-ui, sans-serif',
+        fontWeight: 400
       },
-      gap      : 10,
+      gap      : 20,
       separator : ''
     },
   })
