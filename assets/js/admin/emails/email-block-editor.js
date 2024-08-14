@@ -751,7 +751,7 @@
   const pasteBlock = () => navigator.clipboard.readText().then(copiedText => {
     let blocks
     try {
-      blocks =  parseBlocksFromContent(copiedText)
+      blocks = parseBlocksFromContent(copiedText)
     }
     catch (e) {
       dialog({
@@ -771,7 +771,7 @@
 
     let newBlock
 
-    blocks.forEach( block => {
+    blocks.forEach(block => {
       newBlock = __replaceId(block)
       insertBlockAfter(newBlock, getActiveBlock().id)
       setActiveBlock(newBlock.id)
@@ -4879,11 +4879,11 @@
   const HTMLEditorNotice = () => `
       <p>
           ${ __('You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
-                  'groundhogg-pro') }</p>
+    'groundhogg-pro') }</p>
       <p><b>${ __('Here\'s what you need to know:', 'groundhogg-pro') }</b></p>
       <p>
           ${ __('The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
-                  'groundhogg-pro') }
+    'groundhogg-pro') }
       </p>
       <p>${ __('You will need to manually add any information required for compliance:', 'groundhogg-pro') }</p>
       <ul class="styled">
@@ -5410,16 +5410,16 @@
   }
 
   const ColumnGap = (gap = 10, height = 0, content = '') => gap > 0 ? Td({
-      className: 'email-columns-cell gap',
-      style    : {
-        width : `${ gap }px`,
-        height: `${ height || gap }px`,
-        textAlign: 'center'
-      },
-      height   : height || gap,
-      width    : gap,
-      align: 'center'
-    }, ! content ? '&nbsp;'.repeat(gap > 5 ? 3 : 1) : content ) : null
+    className: 'email-columns-cell gap',
+    style    : {
+      width    : `${ gap }px`,
+      height   : `${ height || gap }px`,
+      textAlign: 'center',
+    },
+    height   : height || gap,
+    width    : gap,
+    align    : 'center',
+  }, !content ? '&nbsp;'.repeat(gap > 5 ? 3 : 1) : content) : null
 
   const Column = ({
     blocks = [],
@@ -6470,6 +6470,25 @@
     })
   })
 
+  const LinkPicker = props => Autocomplete({
+    ...props,
+    fetchResults: async search => {
+      let pages = await ajax({
+        action             : 'wp-link-ajax',
+        _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+        term               : search,
+      })
+
+      return pages.map(({
+        title,
+        permalink,
+      }) => ( {
+        id  : permalink,
+        text: title,
+      } ))
+    },
+  })
+
   // Register the text vblock
   registerBlock('text', 'Text', {
     attributes: {
@@ -6691,24 +6710,7 @@
                 stacked: true,
               },
               InputWithReplacements({
-                inputCallback: (attributes) => Autocomplete({
-                  ...attributes,
-                  fetchResults: async search => {
-                    let pages = await ajax({
-                      action             : 'wp-link-ajax',
-                      _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
-                      term               : search,
-                    })
-
-                    return pages.map(({
-                      title,
-                      permalink,
-                    }) => ( {
-                      id  : permalink,
-                      text: title,
-                    } ))
-                  },
-                }),
+                inputCallback: LinkPicker,
                 type         : 'text',
                 id           : 'button-link',
                 className    : 'full-width',
@@ -6960,7 +6962,7 @@
 
   registerBlock('menu', 'Menu', {
     attributes: {
-      links     : el => {
+      links    : el => {
         return [...el.querySelectorAll('a')].map(a => ( [
           a.innerText,
           a.getAttribute('href'),
@@ -6980,7 +6982,7 @@
       align = 'center',
       fontStyle = {},
       gap = 10,
-      separator = ''
+      separator = '',
     }) => {
       return [
         ControlGroup({
@@ -6998,24 +7000,7 @@
                 ...props,
                 placeholder: 'Link Text',
               }),
-              props => Autocomplete({
-                ...props,
-                fetchResults: async search => {
-                  let pages = await ajax({
-                    action             : 'wp-link-ajax',
-                    _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
-                    term               : search,
-                  })
-
-                  return pages.map(({
-                    title,
-                    permalink,
-                  }) => ( {
-                    id  : permalink,
-                    text: title,
-                  } ))
-                },
-              }),
+              props => LinkPicker(props),
             ],
             onChange: links => updateBlock({
               links,
@@ -7025,18 +7010,18 @@
               label: 'Separator',
             },
             Select({
-              id        : 'menu-separator',
-              selected : separator,
-              options: {
-                '' : 'None',
-                '&vert;' : '&vert;',
-                '&Vert;' : '&Vert;',
+              id      : 'menu-separator',
+              selected: separator,
+              options : {
+                ''      : 'None',
+                '&vert;': '&vert;',
+                '&Vert;': '&Vert;',
                 // '&tilde;' : '&tilde;',
-                '&middot;' : '&middot;',
-                '&bull;' : '&bull;',
+                '&middot;': '&middot;',
+                '&bull;'  : '&bull;',
               },
-              onChange  : e => updateBlock({
-                separator: e.target.value
+              onChange: e => updateBlock({
+                separator: e.target.value,
               }),
             })),
           Control({
@@ -7076,13 +7061,13 @@
       fontStyle = {},
       gap = 10,
       align = 'center',
-      separator = ''
+      separator = '',
     }) => {
 
       const menuItem = (text, href) => Td({
         style: {
-          textAlign: 'center'
-        }
+          textAlign: 'center',
+        },
       }, makeEl('a', {
         href,
         style: {
@@ -7096,7 +7081,7 @@
 
         if (i > 0) {
 
-          let Gap = ColumnGap(gap, 10, separator);
+          let Gap = ColumnGap(gap, 10, separator)
           Gap.style.color = fontStyle.color
 
           cells.push(Gap)
@@ -7115,8 +7100,8 @@
           cellspacing: '0',
           cellpadding: '0',
           role       : 'presentation',
-          style: {
-            borderCollapse: 'collapse'
+          style      : {
+            borderCollapse: 'collapse',
           },
         },
         [
@@ -7129,11 +7114,11 @@
                 cellspacing: '0',
                 cellpadding: '0',
                 role       : 'presentation',
-                style: {
-                  borderCollapse: 'collapse'
+                style      : {
+                  borderCollapse: 'collapse',
                 },
                 width,
-              }, Tr({}, cells )))),
+              }, Tr({}, cells)))),
         ])
     },
     // edit: () => {},
@@ -7141,7 +7126,7 @@
       return links.map(([text, href]) => `[${ text }](${ href })`).join(' | ')
     },
     defaults : {
-      links     : [
+      links    : [
         [
           'Link 1',
           '',
@@ -7157,12 +7142,12 @@
       ],
       align    : 'center',
       fontStyle: {
-        fontSize: 13,
+        fontSize  : 13,
         fontFamily: 'system-ui, sans-serif',
-        fontWeight: 400
+        fontWeight: 400,
       },
       gap      : 20,
-      separator : ''
+      separator: '',
     },
   })
 
@@ -7226,25 +7211,7 @@
                 stacked: true,
               },
               InputWithReplacements({
-                inputCallback: (attributes) => Autocomplete({
-                  ...attributes,
-                  fetchResults: async search => {
-
-                    let pages = await ajax({
-                      action             : 'wp-link-ajax',
-                      _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
-                      term               : search,
-                    })
-
-                    return pages.map(({
-                      title,
-                      permalink,
-                    }) => ( {
-                      id  : permalink,
-                      text: title,
-                    } ))
-                  },
-                }),
+                inputCallback: LinkPicker,
                 type         : 'text',
                 id           : 'image-link',
                 className    : 'full-width',
@@ -8283,9 +8250,9 @@
 
           ${ selector } .post-card .card-content td {
               ${ layout === 'cards' ? objectToStyle({
-                  padding: extract4(padding),
+        padding: extract4(padding),
 
-              }) : '' }
+      }) : '' }
           }
 
           ${ selector } li,
