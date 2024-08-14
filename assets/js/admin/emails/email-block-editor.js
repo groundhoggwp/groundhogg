@@ -7010,6 +7010,7 @@
                   return pages.map(({
                     title,
                     permalink,
+                  }) => ( {
                     id  : permalink,
                     text: title,
                   } ))
