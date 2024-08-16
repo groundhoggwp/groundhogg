@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.0.1
+Stable tag: 3.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.5.1 (2024-08-16) =
+* ADDED Opt-in Status Changed benchmark.
+* TWEAKED Order by param in the API docs is now a dropdown.
+* FIXED `site_name` not being replaced in the broadcast email report.
+* FIXED When moving a field in the form editor the open field does not persist.
 
 = 3.5.0.1 (2024-08-14) =
 * FIXED Pickers not appearing full width
