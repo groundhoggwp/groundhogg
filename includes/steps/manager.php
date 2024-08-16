@@ -23,6 +23,7 @@ use Groundhogg\Steps\Benchmarks\Email_Confirmed;
 use Groundhogg\Steps\Benchmarks\Form_Filled;
 use Groundhogg\Steps\Benchmarks\Link_Clicked;
 use Groundhogg\Steps\Benchmarks\Login_Status;
+use Groundhogg\steps\benchmarks\Optin_Status_Changed;
 use Groundhogg\Steps\Benchmarks\Page_Visited;
 use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
@@ -98,10 +99,11 @@ class Manager {
 
 		$this->add_step( new Web_Form() );
 		$this->add_step( new Account_Created() );
-		$this->add_step( new Email_Confirmed() );
 		$this->add_step( new Link_Clicked() );
 		$this->add_step( new Tag_Applied() );
 		$this->add_step( new Tag_Removed() );
+		$this->add_step( new Email_Confirmed() );
+		$this->add_step( new Optin_Status_Changed() );
 		$this->add_step( new Form_Filled() );
 		$this->add_step( new Task_Completed() );
 
