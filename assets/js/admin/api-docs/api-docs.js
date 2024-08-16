@@ -138,9 +138,9 @@
     orderby: (plural, columns = []) => ( {
       param: 'orderby',
       description: () => Pg({},
-        sprintf(__('Order %s by a specific column. Supported columns are %s.', 'groundhogg'), plural,
-          andList(columns.map(col => el('code', {}, col))))),
+        sprintf(__('Order %s by a specific column.', 'groundhogg'), plural)),
       type: 'string',
+      options: columns,
       default: 'ID',
     } ),
     found_rows: (plural) => ( {
