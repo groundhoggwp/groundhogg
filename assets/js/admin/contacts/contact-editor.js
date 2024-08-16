@@ -886,11 +886,6 @@
     },
 
     onMount () {
-
-      $('.gh-panel.outlined button.toggle-indicator').on('click', e => {
-        $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
-      })
-
       $('.event-queue-more').on('click', (e) => {
 
         let eventId = e.currentTarget.dataset.event
@@ -2208,6 +2203,10 @@
       $('#primary-contact-stuff .toggle-indicator').on('click', e => {
         $(e.target).closest('.gh-panel').toggleClass('closed')
       })
+
+      $(document).on( '.gh-panel.outlined button.toggle-indicator', 'click', e => {
+        $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
+      } )
 
       if (window.location.href.match(/send_email=true/)) {
         sendEmail()
