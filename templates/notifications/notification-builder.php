@@ -31,6 +31,7 @@ class Notification_Builder {
 			'the_footer'  => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
 			'assets_url'  => GROUNDHOGG_ASSETS_URL,
 			'site_url'    => home_url(),
+			'site_name'   => get_bloginfo(),
 			'home_url'    => home_url(),
 			'admin_url'   => admin_url(),
 			'profile_url' => admin_url( 'profile.php' )
