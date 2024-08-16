@@ -1655,7 +1655,7 @@
 
       //language=HTML
       return `
-          <div class="form-field" data-key="${ key }">
+          <div class="form-field ${isEditing ? 'active' : ''}" data-key="${ key }">
               <div class="field-header">
                   <div class="details">
                       <div class="field-label">${ fieldName }</div>
@@ -1918,10 +1918,7 @@
           ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())
         },
-        update: function (e, ui) {
-
-          this.activeField = false
-          this.activeFieldTab = 'content'
+        update: (e, ui) => {
 
           const newFields = []
 
@@ -1930,10 +1927,16 @@
             newFields.push(self.form.fields[fieldId])
           })
 
-          self.form.fields = newFields
+          this.form.fields = newFields
+
+          console.log(ui)
+
+          if ( ui.item.hasClass('active')){
+            this.activeField = ui.item.index()
+          }
 
           render()
-          onChange(self.form)
+          onChange(this.form)
         },
       })
     },
