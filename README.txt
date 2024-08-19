@@ -349,17 +349,15 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.5.1.1 =
+= 3.5.1 (2024-08-19) =
+* ADDED Opt-in Status Changed benchmark.
 * ADDED PHP API methods to better handle hard bounces, soft bounces, and complaints.
 * ADDED After 4 consecutive soft bounces a contact's status will change to **hard bounced**.
 * ADDED Filters for subject and content for the email reports.
 * TWEAKED Automatically unsubscribe users from email reports whose email domain does not match the url of the site.
 * TWEAKED Automatically unsubscribe super admins on multisites from email reports.
-* FIXED Use white-label name in email report subject lines
-
-= 3.5.1 (2024-08-16) =
-* ADDED Opt-in Status Changed benchmark.
 * TWEAKED Order by param in the API docs is now a dropdown.
+* FIXED Use white-label name in email report subject lines
 * FIXED `site_name` not being replaced in the broadcast email report.
 * FIXED When moving a field in the form editor the open field does not persist.
 
