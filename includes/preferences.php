@@ -477,6 +477,8 @@ class Preferences {
 			return track_activity( $contact, Activity::SOFT_BOUNCE, [], $info );
 		}
 
+		$info[ 'Reason' ] = 'Soft bounce limit exceeded.';
+
 		return self::bounced( $contact, $info );
 	}
 
