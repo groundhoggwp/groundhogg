@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.1.1
+Stable tag: 3.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -352,11 +352,11 @@ You can purchase a premium plan for access to support and our premium extensions
 = 3.5.1 (2024-08-19) =
 * ADDED Opt-in Status Changed benchmark.
 * ADDED PHP API methods to better handle hard bounces, soft bounces, and complaints.
-* ADDED After 4 consecutive soft bounces a contact's status will change to **hard bounced**.
-* ADDED Filters for subject and content for the email reports.
-* TWEAKED Automatically unsubscribe users from email reports whose email domain does not match the url of the site.
-* TWEAKED Automatically unsubscribe super admins on multisites from email reports.
-* TWEAKED Order by param in the API docs is now a dropdown.
+* ADDED PHP filters for subject and content for the email reports.
+* TWEAKED After 4 consecutive soft bounces a contact's status will change to **hard bounced**.
+* TWEAKED Automatically unsubscribe users from email reports whose email domain does not match the url of the site (those users can still opt-in).
+* TWEAKED Automatically unsubscribe super admins on multisites from email reports (those users can still opt-in).
+* TWEAKED `Orderby` param in the API docs is now a dropdown.
 * FIXED Use white-label name in email report subject lines
 * FIXED `site_name` not being replaced in the broadcast email report.
 * FIXED When moving a field in the form editor the open field does not persist.
@@ -378,6 +378,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Filtering the WP_Query for the posts block not working.
 * FIXED Mapping to checkboxes not working if there is a space " " in the value.
 * FIXED Non-responsive columns still responsive if nested in a responsive column.
+* FIXED File upload field in forms causing server error if nothing was uploaded.
+* FIXED Link to view uploaded file in submission details not working.
 
 = 3.4.4.1 (2024-07-29) =
 * ADDED New shortcut support for the email editor

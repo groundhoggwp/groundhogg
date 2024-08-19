@@ -1543,10 +1543,10 @@
       name: _x('File', 'form field', 'groundhogg'),
       content: [
         Settings.type.type,
+        Settings.label.type,
         Settings.name.type,
         Settings.required.type,
         Settings.hideLabel.type,
-        Settings.label.type,
         Settings.fileTypes.type,
         Settings.columnWidth.type,
       ],

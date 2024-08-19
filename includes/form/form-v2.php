@@ -1103,17 +1103,40 @@ class Form_v2 extends Step {
 
 				},
 				'after'    => function ( $field, $posted_data, Contact $contact, &$submission ) {
-					$file                        = $contact->upload_file( $_FILES[ $field['name'] ] );
-					$submission[ $file['name'] ] = $file['file']; // store the filename
+
+					// file was not uploaded
+					if ( ! isset( $_FILES[ $field['name'] ] ) ) {
+						return;
+					}
+
+					$file = $contact->upload_file( $_FILES[ $field['name'] ] );
+
+					// Something went wrong
+					if ( is_wp_error( $file ) ) {
+						return;
+					}
+
+					$submission[ $field['name'] ] = $file['file']; // store the filename
 				},
 				'required' => function ( $field, $posted_data ) {
 					return isset_not_empty( $_FILES, $field['name'] );
 				},
 				'retrieve' => function ( Submission $submission, $field ) {
-					$filename = $submission->get_meta( $field['name'] );
+					$filename = basename( $submission->get_meta( $field['name'] ) );
+
+					// No file was provided.
+					if ( empty( $filename ) ) {
+						return __( 'Not provided.', 'groundhogg' );
+					}
+
+					$access_url = file_access_url( '/uploads/' . $submission->get_contact()->get_upload_folder_basename() . '/' . $filename );
+
+					if ( current_user_can( 'view_contact', $submission->get_contact() ) ){
+						$access_url = add_query_arg( 'contact', $submission->get_contact_id(), $access_url );
+					}
 
 					return html()->e( 'a', [
-						'href' => file_access_url( '/uploads/' . $submission->get_contact()->get_upload_folder_basename() . '/' . $filename )
+						'href' => $access_url
 					], $filename );
 				},
 			],
@@ -1344,6 +1367,7 @@ class Form_v2 extends Step {
 					}
 
 					$name = $property['name'];
+
 					return $submission->$name;
 				}
 			],
@@ -2160,7 +2184,7 @@ class Form_v2 extends Step {
 	 * Given a submission and a field, retrieve the value for the field from the submission
 	 *
 	 * @param Submission $submission
-	 * @param $field
+	 * @param            $field
 	 *
 	 * @return mixed|string
 	 */
@@ -2194,12 +2218,12 @@ class Form_v2 extends Step {
 		foreach ( $fields as $field ) {
 
 			// ignore html blocks
-			if ( $field['type'] === 'html' ){
+			if ( $field['type'] === 'html' ) {
 				continue;
 			}
 
 			// ignore hidden fields
-			if ( $field['type'] === 'hidden' && ! $include_hidden ){
+			if ( $field['type'] === 'hidden' && ! $include_hidden ) {
 				continue;
 			}
 
