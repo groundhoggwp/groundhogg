@@ -17,6 +17,7 @@ use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
 use function Groundhogg\percentage_change;
+use function Groundhogg\white_labeled_name;
 
 class Email_Reports extends Notification_Builder {
 
@@ -34,6 +35,27 @@ class Email_Reports extends Notification_Builder {
 		$before = new DateTimeHelper( 'yesterday 23:59:59' );
 
 		self::send_overview_report( $after, $before );
+	}
+
+	/**
+	 * Send the report via email
+	 *
+	 * @param string $report_type
+	 * @param array $recipients
+	 * @param string $subject
+	 * @param string $content
+	 *
+	 * @return bool
+	 */
+	protected static function mail_report( string $report_type, array $recipients, string $subject, string $content ) {
+
+		$recipients = apply_filters( 'groundhogg/email_reports/recipients', $recipients, $report_type );
+		$subject    = apply_filters( 'groundhogg/email_reports/subject', $subject, $report_type );
+		$content    = apply_filters( 'groundhogg/email_reports/content', $content, $report_type );
+
+		return \Groundhogg_Email_Services::send_wordpress( $recipients, $subject, $content, [
+			'Content-Type: text/html',
+		] );
 	}
 
 	/**
@@ -63,7 +85,7 @@ class Email_Reports extends Notification_Builder {
 		 * @param $emails   string[] an array of emails
 		 * @param $meta_key string typically the meta key used to identify which users to send the overview to.
 		 */
-		return apply_filters( 'groundhogg/email_reports/recipients', $emails, $meta_key );
+		return apply_filters( 'groundhogg/email_reports/get_recipients', $emails, $meta_key );
 	}
 
 	/**
@@ -190,9 +212,12 @@ class Email_Reports extends Notification_Builder {
 
 		$email_content = $replacer->replace( self::get_general_notification_template_html( 'broadcast-results' ) );
 
-		return \Groundhogg_Email_Services::send_wordpress( $recipients, '[Groundhogg] Yesterday\'s broadcast performance', $email_content, [
-			'Content-Type: text/html',
-		] );
+		return self::mail_report(
+			'broadcast-results',
+			$recipients,
+			sprintf( '[%s] Yesterday\'s broadcast performance', white_labeled_name() ),
+			$email_content,
+		);
 	}
 
 	/**
@@ -229,7 +254,7 @@ class Email_Reports extends Notification_Builder {
 		}
 
 		if ( empty( $subject ) ) {
-			$subject = '[Groundhogg] Your performance overview';
+			$subject = sprintf( '[%s] Your performance overview', white_labeled_name() );
 		}
 
 		$reports = new Reports( $after->getTimestamp(), $before->getTimestamp() );
@@ -266,7 +291,7 @@ class Email_Reports extends Notification_Builder {
 		// Do not fetch notices if the site is white labeled
 		$notices = is_white_labeled() ? [] : notices()->fetch_remote_notices();
 
-		if ( ! empty( $notices ) ) {
+		if ( ! empty( $notices ) && ! is_white_labeled() ) {
 			$notices = array_reduce( $notices, function ( $html, $notice ) {
 
 				$replacer = new Replacer( [
@@ -332,13 +357,11 @@ class Email_Reports extends Notification_Builder {
 		$email_content = self::get_general_notification_template_html( 'overview' );
 		$email_content = $replacer->replace( $email_content );
 
-//		echo $email_content;
-//		die();
-
-		// Send the report
-		return \Groundhogg_Email_Services::send_wordpress( $recipients, $subject, $email_content, [
-			'Content-Type: text/html',
-		] );
-
+		return self::mail_report(
+			'performance-overview',
+			$recipients,
+			$subject,
+			$email_content,
+		);
 	}
 }

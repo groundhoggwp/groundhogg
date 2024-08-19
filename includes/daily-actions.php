@@ -61,14 +61,14 @@ class Daily_Actions {
 		if ( $today->format( 'j' ) === '1' ) {
 			$after  = new DateTimeHelper( 'first day of last month 00:00:00' );
 			$before = new DateTimeHelper( 'last day of last month 23:59:59' );
-			$subject = '[Groundhogg] Your month in review';
+			$subject = sprintf( '[%s] Your month in review', white_labeled_name() );
 		} // --
 		// Mondays,
 		// send last 7 days
 		else if ( $today->format( 'l' ) === 'Monday' ) {
 			$after  = new DateTimeHelper( '7 days ago 00:00:00' );
 			$before = new DateTimeHelper( 'yesterday 23:59:59' );
-			$subject = '[Groundhogg] Review last week\'s performance';
+			$subject = sprintf( '[%s] Review last week\'s performance', white_labeled_name() );
 		} //
 		// Otherwise do nothing
 		else {
