@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
+
 class Preferences {
 	// Optin Statuses
 	const UNCONFIRMED = 1;
@@ -414,6 +416,68 @@ class Preferences {
 		$time_passed = time() - $base;
 
 		return $time_passed < $grace;
+	}
+
+	/**
+	 * Same as bounce, but complained
+	 *
+	 * @param Contact $contact the contact that complained
+	 * @param array   $info additional info to display in the activity timeline
+	 *
+	 * @return False|Activity
+	 */
+	public static function complained( Contact $contact, array $info = [] ) {
+		$contact->change_marketing_preference( self::COMPLAINED );
+
+		return track_activity( $contact, Activity::COMPLAINT, [], $info );
+	}
+
+	/**
+	 * Track a bounce
+	 *
+	 * @param Contact $contact the contact that bounced
+	 * @param array   $info additional info to display in the activity timeline
+	 *
+	 * @return Activity|False
+	 */
+	public static function bounced( Contact $contact, array $info = [] ) {
+		$contact->change_marketing_preference( self::HARD_BOUNCE );
+
+		return track_activity( $contact, Activity::BOUNCE, [], $info );
+	}
+
+	/**
+	 * Track a soft bounce. If too many soft bounces, mark the contact as actually bounced.
+	 *
+	 * Get the last 4 soft bounces & opens
+	 * if there are no opens in the list, all activities are soft bounces
+	 * that means we should mark as perma bounce.
+	 *
+	 * @param Contact $contact the contact that soft bounced
+	 * @param array   $info additional info to display in the activity timeline
+	 *
+	 * @return Activity|False
+	 */
+	public static function soft_bounced( Contact $contact, array $info = [] ) {
+
+		$recent_activity = db()->activity->query( [
+			'select'        => 'activity_type',
+			'contact_id'    => $contact->ID,
+			'activity_type' => [ Activity::EMAIL_OPENED, Activity::SOFT_BOUNCE ],
+			'limit'         => 4,
+			'orderby'       => 'timestamp',
+			'order'         => 'DESC',
+		] );
+
+		$activities = wp_list_pluck( $recent_activity, 'activity_type' );
+
+		// If there is no recent activity, or we don't have enough information, track a soft bounce
+		// Or if we recently tracked an open
+		if ( count( $recent_activity ) < 4 || in_array( Activity::EMAIL_OPENED, $activities ) ) {
+			return track_activity( $contact, Activity::SOFT_BOUNCE, [], $info );
+		}
+
+		return self::bounced( $contact, $info );
 	}
 
 }

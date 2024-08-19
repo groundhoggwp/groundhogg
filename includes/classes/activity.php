@@ -21,6 +21,9 @@ class Activity extends Base_Object_With_Meta {
 	const PAGE_VIEW = 'page_view';
 	const LOGIN = 'wp_login';
 	const LOGOUT = 'wp_logout';
+	const BOUNCE = 'bounce';
+	const SOFT_BOUNCE = 'soft_bounce';
+	const COMPLAINT = 'complaint';
 
 	public $contact;
 
