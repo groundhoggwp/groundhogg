@@ -156,12 +156,34 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					$owners = filter_by_cap( get_owners(), 'view_reports' );
 					foreach ( $owners as $owner ){
+
+						// Ignore super admin and admins that do not have an email the belongs to the current site. For example agency users
+						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ){
+							continue;
+						}
+
 						update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
 						update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
 					}
 
 					// Clear the purge page visits hook because we're going to use the daily hook instead
 					wp_clear_scheduled_hook( 'groundhogg/purge_page_visits' );
+				}
+			],
+			'3.5.1.1'    => [
+				'automatic'   => true,
+				'description' => __( 'Unsubscribe super admins, support, and unrelated emails from email reports.', 'groundhogg' ),
+				'callback'    => function () {
+					$owners = filter_by_cap( get_owners(), 'view_reports' );
+
+					foreach ( $owners as $owner ){
+
+						// Unsubscribe super admin and admins that do not have an email the belongs to the current site. For example agency users
+						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ){
+							delete_user_meta( $owner->ID, 'gh_broadcast_results' );
+							delete_user_meta( $owner->ID, 'gh_weekly_overview' );
+						}
+					}
 				}
 			]
 		];

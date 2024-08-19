@@ -67,6 +67,12 @@ class Main_Installer extends Installer {
 		// Auto optin admins to get performance reports
 		$owners = filter_by_cap( get_owners(), 'view_reports' );
 		foreach ( $owners as $owner ){
+
+			// Ignore super admin and admins that do not have an email the belongs to the current site. For example agency users
+			if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ){
+				continue;
+			}
+
 			update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
 			update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
 		}
