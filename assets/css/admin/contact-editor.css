@@ -345,11 +345,15 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) img {
   max-width: 100%;
 }
-#activity-timeline li.activity-item .activity-icon:not(.no-frame).unsubscribed {
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).unsubscribed, #activity-timeline li.activity-item .activity-icon:not(.no-frame).bounce, #activity-timeline li.activity-item .activity-icon:not(.no-frame).complaint {
   background-color: #e91f4f;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
   background: #102640;
+}
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).soft_bounce {
+  background-color: #ffee58;
+  color: #102640;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
   border: 2px solid #f58115;
