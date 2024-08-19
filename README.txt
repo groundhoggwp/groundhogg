@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.1
+Stable tag: 3.5.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.5.1.1 =
+* ADDED PHP API methods to better handle hard bounces, soft bounces, and complaints.
+* ADDED After 4 consecutive soft bounces a contact's status will change to **hard bounced**.
+* ADDED Filters for subject and content for the email reports.
+* TWEAKED Automatically unsubscribe users from email reports whose email domain does not match the url of the site.
+* TWEAKED Automatically unsubscribe super admins on multisites from email reports.
+* FIXED Use white-label name in email report subject lines
 
 = 3.5.1 (2024-08-16) =
 * ADDED Opt-in Status Changed benchmark.
