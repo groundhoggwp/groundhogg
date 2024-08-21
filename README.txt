@@ -349,6 +349,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.5.1.1 (2024-08-21) =
+* FIXED "quotes" in the value of a radio button or dropdown custom field not filterable due to double escaping.
+
 = 3.5.1 (2024-08-19) =
 * ADDED Opt-in Status Changed benchmark.
 * ADDED PHP API methods to better handle hard bounces, soft bounces, and complaints.

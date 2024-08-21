@@ -670,7 +670,7 @@ class Replacements implements \JsonSerializable {
 	 *
 	 * @return string
 	 */
-	public function process( $content, $contact_id_or_email = false, $context = 'html' ) {
+	public function process( string $content, $contact_id_or_email = false, $context = 'html' ) {
 
 		$this->context = $context;
 
@@ -696,11 +696,11 @@ class Replacements implements \JsonSerializable {
 	/**
 	 * Recursive function to tackle nested replacement codes until no more replacements are found.
 	 *
-	 * @param $content
+	 * @param string $content
 	 *
 	 * @return mixed
 	 */
-	public function tackle_replacements( $content ) {
+	public function tackle_replacements( string $content ) {
 
 		if ( ! preg_match( self::PATTERN, $content ) ) {
 			return $content;
