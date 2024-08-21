@@ -181,8 +181,6 @@ class Events extends DB {
 
 			$where->equals( 'event_type', Event::BROADCAST );
 			$where->equals( 'funnel_id', Broadcast::FUNNEL_ID );
-
-			var_dump( $filter );
 		} );
 
 		$this->query_filters->register( 'contacts', function ( $filter, $where ) {

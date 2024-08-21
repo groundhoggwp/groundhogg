@@ -285,7 +285,13 @@ class Where {
 			$format = $this->getColumnFormat( $column, $value );
 		}
 
-		return $this->addCondition( $this->prepare( "$column $compare $format", $value ) );
+//		var_dump( $column, $compare, $format, $value );
+
+		$condition = $this->prepare( "$column $compare $format", $value );
+
+//		var_dump( $condition );
+
+		return $this->addCondition( $condition );
 	}
 
 	/**
@@ -389,11 +395,8 @@ class Where {
 			return $this;
 		}
 
-		$values = ensure_array( $values );
-
-		$values = array_values( $values );
+		$values = array_values( ensure_array( $values ) );
 		$values = map_deep( $values, 'sanitize_text_field' );
-		$values = map_deep( $values, 'esc_sql' );
 
 		if ( count( $values ) === 1 ) {
 			return $this->equals( $column, $values[0] );
@@ -422,9 +425,8 @@ class Where {
 			return $this;
 		}
 
+		$values = array_values( ensure_array( $values ) );
 		$values = map_deep( $values, 'sanitize_text_field' );
-
-		$values = map_deep( $values, 'esc_sql' );
 
 		if ( count( $values ) === 1 ) {
 			return $this->notEquals( $column, $values[0] );

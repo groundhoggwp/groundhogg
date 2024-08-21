@@ -544,11 +544,11 @@ function base64url_decode( $stuff ) {
 /**
  * Given a string which is assumed to be base64 encoded json, decode it
  *
- * @param $query $string
+ * @param string $string
  *
  * @return mixed
  */
-function base64_json_decode( $string ) {
+function base64_json_decode( string $string ) {
 	return json_decode( base64url_decode( $string ), true );
 }
 
@@ -6807,6 +6807,7 @@ function is_admin_bar_widget_disabled() {
 
 /**
  * Implodes a string list surrounded by quotes, useful for SQL queries.
+ * Also uses esc_sql, so don't forget to not double escape.
  *
  * @param $items
  *
@@ -6822,6 +6823,7 @@ function implode_in_quotes( $items ) {
 
 /**
  * Same as implode in quotes but will handle integers differently
+ * Also uses esc_sql, so don't forget to not double escape.
  *
  * @param $items
  *

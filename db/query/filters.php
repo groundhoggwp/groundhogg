@@ -75,6 +75,8 @@ class Filters {
 			throw new FilterException( sprintf( "%s does not have a valid callback", $type ) );
 		}
 
+//		var_dump( $filter );
+
 		return call_user_func( $handler['filter_callback'], $filter, $where, $where->query );
 	}
 
@@ -92,7 +94,7 @@ class Filters {
 	 */
 	public function parse_filters( $filters, Where $where, bool $negate = false ) {
 
-		if ( ! is_array( $filters ) ) {
+		if ( is_string( $filters ) ) {
 			$filters = base64_json_decode( $filters );
 		}
 

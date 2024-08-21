@@ -1953,10 +1953,7 @@ abstract class DB {
 						case 'NOT IN':
 
 							if ( is_array( $value ) ) {
-
 								$value = map_deep( $value, 'sanitize_text_field' );
-
-								$value = map_deep( $value, 'esc_sql' );
 								$value = maybe_implode_in_quotes( $value );
 							}
 
