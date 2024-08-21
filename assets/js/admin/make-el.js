@@ -306,6 +306,7 @@
       // Cells
       ...cells.map((cellCallback, cellIndex) => cellCallback({
         id: `${ id }-cell-${ rowIndex }-${ cellIndex }`,
+        name: `${ id }[${ rowIndex }][${ cellIndex }]`,
         value: row[cellIndex] ?? '',
         dataRow: rowIndex,
         dataCell: cellIndex,

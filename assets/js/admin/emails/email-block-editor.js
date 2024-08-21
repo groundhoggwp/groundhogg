@@ -3962,7 +3962,6 @@
               morphBlocks()
             },
           }),
-
         ]),
       ControlGroup({ name: 'Color Palettes' },
         [
@@ -3973,16 +3972,15 @@
               '',
               color,
             ]),
-
             maxRows : 8,
             cells   : [
-              (
-                {
-                  onChange,
-                  value,
-                  ...props
-                },
-                row) => Div({
+              ({
+                onChange,
+                value,
+                setValue,
+                name,
+                ...props
+              }, row) => Div({
                 style: {
                   width          : '33px',
                   flexShrink     : 0,
@@ -3993,11 +3991,13 @@
                 },
                 ...props,
               }),
-              props => Input({
+              ({
+                setValue,
+                ...props
+              }) => Input({
                 ...props,
                 placeholder: '#FFFFFF',
               }),
-
             ],
             onChange: rows => {
               colorPalette = rows.map(r => r[1])
@@ -4879,11 +4879,11 @@
   const HTMLEditorNotice = () => `
       <p>
           ${ __('You can now import HTML email templates from third party platforms! Simply copy and paste the HTML code into the editor.',
-    'groundhogg-pro') }</p>
+                  'groundhogg-pro') }</p>
       <p><b>${ __('Here\'s what you need to know:', 'groundhogg-pro') }</b></p>
       <p>
           ${ __('The HTML you provide will not be validated or sanitized. So make sure you are using templates from trusted sources only.',
-    'groundhogg-pro') }
+                  'groundhogg-pro') }
       </p>
       <p>${ __('You will need to manually add any information required for compliance:', 'groundhogg-pro') }</p>
       <ul class="styled">
@@ -8250,9 +8250,9 @@
 
           ${ selector } .post-card .card-content td {
               ${ layout === 'cards' ? objectToStyle({
-        padding: extract4(padding),
+                  padding: extract4(padding),
 
-      }) : '' }
+              }) : '' }
           }
 
           ${ selector } li,
@@ -8433,7 +8433,10 @@
         },
         SocialIcon(value || 'facebook', theme)),
       (
-        { ...props },
+        {
+          setValue,
+          ...props
+        },
         [icon]) => Input({
         type       : 'url',
         placeholder: `https://${ icon }.com/your-profile/`,
