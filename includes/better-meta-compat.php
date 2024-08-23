@@ -47,10 +47,10 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'datetime':
 			return date( 'Y-m-d H:i:s', strtotime( $value ) );
 		case 'dropdown':
+			// Multiple options can be selected
 			if ( isset_not_empty( $field, 'multiple' ) ) {
 				return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
 			}
-
 			return sanitize_text_field( $value );
 		case 'checkboxes':
 			return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
