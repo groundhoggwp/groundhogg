@@ -165,10 +165,54 @@ abstract class Extension {
 		return in_array( $id, self::$extension_ids );
 	}
 
+	/**
+	 * Show a notice displaying which dependencies might be missing
+	 *
+	 * @return void
+	 */
 	public function dependencies_missing_notice() {
-		$message      = sprintf( esc_html__( '%s is missing required plugins to be active: %s', 'groundhogg' ), $this->get_display_name(), implode( ', ', $this->get_dependent_plugins() ) );
-		$html_message = sprintf( '<div class="notice notice-error">%s</div>', wpautop( $message ) );
-		echo wp_kses_post( $html_message );
+
+		groundhogg_logo()
+
+		?>
+		<div class="notice notice-warning display-flex gap-20">
+			<?php groundhogg_icon(30 ) ?>
+			<div class="error-description">
+				<p><?php printf( esc_html__( '%s requires the following plugins also be active.', 'groundhogg' ), bold_it( $this->get_display_name() ) ) ?></p>
+				<ul style="list-style-type: disc; padding-left: 20px;margin: 0">
+					<?php foreach ( $this->get_dependent_plugins() as $plugin ): ?>
+						<li><?php echo $plugin ?></li>
+					<?php endforeach; ?>
+				</ul>
+                <p><?php _e( 'Either activate the required plugin dependencies or deactivate this add-on.', 'groundhogg' ); ?></p>
+                <p class="display-flex gap-10">
+                    <a class="" href="<?php echo esc_url( admin_url('plugins.php') ); ?>"><?php _e( 'Manage plugins' ); ?></a>
+                    |
+                    <a class="gh-text danger" href="<?php echo esc_url( $this->deactivate_url() ) ?>"><?php printf( __( 'Deactivate %s' ), $this->get_display_name() ); ?></a>
+                </p>
+			</div>
+		</div><?php
+	}
+
+	/**
+	 * Get the URL to deactivate this plugin
+	 *
+	 * @return string
+	 */
+	public function deactivate_url(){
+		$plugin_slug = plugin_basename( $this->get_plugin_file() );
+
+		// Create the URL for deactivating the plugin
+		return wp_nonce_url(
+			add_query_arg(
+				array(
+					'action' => 'deactivate',
+					'plugin' => urlencode($plugin_slug)
+				),
+				admin_url('plugins.php')
+			),
+			'deactivate-plugin_' . $plugin_slug
+		);
 	}
 
 	/**
@@ -178,10 +222,13 @@ abstract class Extension {
 	 */
 	public function init() {
 
+		// Include updater before checking dependencies otherwise it won't check for updates.
+		$this->get_edd_updater();
+
 		if ( ! $this->dependent_plugins_are_installed() ) {
 
 			// hide if white-labelled
-			if ( ! is_white_labeled() ) {
+			if ( ! is_white_labeled() && current_user_can( 'activate_plugins' ) ) {
 				add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
 			}
 
@@ -222,8 +269,6 @@ abstract class Extension {
 
 		add_filter( 'groundhogg/templates/emails', [ $this, 'register_email_templates' ] );
 		add_filter( 'groundhogg/templates/funnels', [ $this, 'register_funnel_templates' ] );
-
-		$this->get_edd_updater();
 	}
 
 	/**
