@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.1
+Stable tag: 3.5.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,8 +349,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.5.1.1 (2024-08-21) =
+= 3.5.1.1 (2024-08-23) =
+* IMPROVED The dependencies missing notice for addons to make it more obvious what action to take.
 * FIXED "quotes" in the value of a radio button or dropdown custom field not filterable due to double escaping.
+* FIXED Mapping custom field checkbox values not working if values are already provided as an array.
+* FIXED Clear replacements cache when posts are published.
 
 = 3.5.1 (2024-08-19) =
 * ADDED Opt-in Status Changed benchmark.
