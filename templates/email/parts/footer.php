@@ -76,3 +76,6 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 	include __DIR__ . '/affiliate-link.php' ?>
 
 </div>
+<?php
+
+do_action( 'groundhogg/templates/email/footer/after' );
