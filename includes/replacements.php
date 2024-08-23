@@ -62,6 +62,12 @@ class Replacements implements \JsonSerializable {
 		// Todo: add additional hooks that might trigger a cache invalidation
 		add_action( 'groundhogg/contact/post_update', [ $this, 'invalidate_replacements_cache' ] );
 		add_action( 'groundhogg/api/contact/updated', [ $this, 'invalidate_replacements_cache' ] );
+		// New post is published
+		add_action( 'new_to_publish', [ $this, 'invalidate_replacements_cache' ] );
+		add_action( 'draft_to_publish', [ $this, 'invalidate_replacements_cache' ] );
+		add_action( 'future_to_publish', [ $this, 'invalidate_replacements_cache' ] );
+		// When post is saved (todo might not need)
+		add_action( 'save_post', [ $this, 'invalidate_replacements_cache' ] );
 	}
 
 	/**
@@ -1765,78 +1771,13 @@ class Replacements implements \JsonSerializable {
 	function single_post( $args, $which = '' ) {
 
 		$props = $this->parse_atts( $args );
-
 		$props = wp_parse_args( $props, [
 			'id'             => '',
-			'offset'         => 0,
-			'post_type'      => 'post',
-			'category'       => '',
-			'tag'            => '',
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'meta_key'       => '',
-			'meta_value'     => '',
-			'within'         => '',
 			'thumbnail_size' => 'large',
 		] );
 
-		$query_vars = [
-			'post_status'    => 'publish',
-			'posts_per_page' => 1,
-			'offset'         => $props['offset'],
-			'post_type'      => $props['post_type'],
-			'category'       => $props['category'],
-			'tag'            => $props['tag'],
-			'orderby'        => $props['orderby'],
-			'order'          => $props['order'],
-			'meta_key'       => $props['meta_key'],
-			'meta_value'     => $props['meta_value'],
-			'no_found_rows'  => true,
-		];
-
-		if ( isset_not_empty( $props, 'within' ) ) {
-			$days = absint( $props['within'] );
-			if ( $days ) {
-				$query_vars['date_query'] = [
-					'after' => $days . ' days ago'
-				];
-			}
-		}
-
-		$query_id = $props['id'];
-
-		if ( $query_id ) {
-
-			/**
-			 * Filter post query variables
-			 *
-			 * @param $query   array the query args
-			 * @param $contact Contact the current contact
-			 */
-			$query_vars = apply_filters( "groundhogg/posts/query/{$query_id}", $query_vars, $this->current_contact );
-		}
-
-		if ( $query_id ) {
-
-			$filter_query = function ( $query ) use ( $query_id, $query_vars ) {
-				/**
-				 * Allow for modification of the query
-				 */
-				do_action_ref_array( "groundhogg/posts/wp_query/{$query_id}", [
-					&$query,
-					$query_vars,
-					$this->current_contact,
-				] );
-			};
-
-			add_action( 'pre_get_posts', $filter_query );
-		}
-
-		$query = new \WP_Query( $query_vars );
-
-		if ( $query_id ) {
-			remove_action( 'pre_get_posts', $filter_query );
-		}
+		$props['number'] = 1;
+		$query           = $this->create_post_query( $props );
 
 		if ( ! $query->have_posts() ) {
 			return '';
@@ -2008,42 +1949,28 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-	 * Display posts!
+	 * Create a post query from the props given
 	 *
-	 * @param mixed    $args
-	 * @param int|null $contact_id
+	 * @param array $props the replacement props
 	 *
-	 * @return string
+	 * @return \WP_Query
 	 */
-	function posts( $args, $contact_id = null ) {
-
-		$props = $this->parse_atts( $args );
+	public function create_post_query( $props = [] ) {
 
 		$props = wp_parse_args( $props, [
-			'id'                 => '',
-			'number'             => 5,
-			'offset'             => 0,
-			'layout'             => 'ul',
-			'featured'           => false,
-			'excerpt'            => false,
-			'thumbnail'          => true,
-			'thumbnail_size'     => 'thumbnail',
-			'thumbnail_position' => 'above',
-			'post_type'          => 'post',
-			'category'           => '',
-			'tag'                => '',
-			'orderby'            => 'date',
-			'order'              => 'DESC',
-			'meta_key'           => '',
-			'meta_value'         => '',
-			'within'             => '',
-			'columns'            => 2,
-			'gap'                => 20,
-			'include'            => [],
-			'exclude'            => [],
-			'cardStyle'          => [],
-			'headingStyle'       => [],
-			'excerptStyle'       => [],
+			'id'         => '',
+			'number'     => 5,
+			'offset'     => 0,
+			'post_type'  => 'post',
+			'category'   => '',
+			'tag'        => '',
+			'orderby'    => 'date',
+			'order'      => 'DESC',
+			'meta_key'   => '',
+			'meta_value' => '',
+			'within'     => '',
+			'include'    => [],
+			'exclude'    => [],
 		] );
 
 		$query_vars = [
@@ -2105,6 +2032,38 @@ class Replacements implements \JsonSerializable {
 		if ( $query_id ) {
 			remove_action( 'pre_get_posts', $filter_query );
 		}
+
+		return $query;
+	}
+
+	/**
+	 * Display posts!
+	 *
+	 * @param mixed    $args
+	 * @param int|null $contact_id
+	 *
+	 * @return string
+	 */
+	function posts( $args, $contact_id = null ) {
+
+		$props = $this->parse_atts( $args );
+
+		$props = wp_parse_args( $props, [
+			'id'                 => '',
+			'layout'             => 'ul',
+			'featured'           => false,
+			'excerpt'            => false,
+			'thumbnail'          => true,
+			'thumbnail_size'     => 'thumbnail',
+			'thumbnail_position' => 'above',
+			'columns'            => 2,
+			'gap'                => 20,
+			'cardStyle'          => [],
+			'headingStyle'       => [],
+			'excerptStyle'       => [],
+		] );
+
+		$query = $this->create_post_query( $props );
 
 		if ( ! $query->have_posts() ) {
 			return '';
