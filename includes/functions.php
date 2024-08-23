@@ -6890,6 +6890,34 @@ function maybe_implode_in_quotes( $items ) {
 }
 
 /**
+ * Explodes a string, but returns an array if the given is an array already
+ *
+ * @param string|array $string
+ * @param string $separator
+ *
+ * @return array
+ */
+function maybe_explode( $string, string $separator = ',' ) {
+
+    if ( is_array( $string ) ){
+        return $string;
+    }
+
+    return explode( $string, $separator );
+}
+
+/**
+ * Trim all elements in an array
+ *
+ * @param array $array
+ *
+ * @return array
+ */
+function array_trim( array $array ){
+    return array_map( 'trim', $array );
+}
+
+/**
  * Get the current visitors IP address
  *
  * @return string

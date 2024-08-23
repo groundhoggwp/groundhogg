@@ -48,12 +48,12 @@ function sanitize_custom_field( $value, $field_id ) {
 			return date( 'Y-m-d H:i:s', strtotime( $value ) );
 		case 'dropdown':
 			if ( isset_not_empty( $field, 'multiple' ) ) {
-				return map_deep( explode( ',', $value ), 'sanitize_text_field' );
+				return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
 			}
 
 			return sanitize_text_field( $value );
 		case 'checkboxes':
-			return map_deep( explode( ',', $value ), 'sanitize_text_field' );
+			return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
 		case 'html':
 			return wp_kses_post( $value );
 	endswitch;
