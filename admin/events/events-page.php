@@ -43,16 +43,13 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	//UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
-
 	}
 
 	public function help() {
 	}
 
 	protected function add_additional_actions() {
-
 	}
-
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
