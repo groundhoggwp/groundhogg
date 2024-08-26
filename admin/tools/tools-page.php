@@ -220,14 +220,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 			],
 		];
 
-		// If old customer updating to new version.
-//		if ( get_option( 'gh_updating_to_2_1' ) ) {
-//			$tabs[] = [
-//				'name' => __( 'Re-install Features' ),
-//				'slug' => 'remote_install'
-//			];
-//		}
-
 		return apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
 	}
 
