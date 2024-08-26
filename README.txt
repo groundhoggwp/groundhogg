@@ -350,11 +350,13 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.5.1.1 (2024-08-23) =
+* ADDED Contact Sub Query filter to the log filters to make it easier to find and modify events for contact segments.
 * IMPROVED The dependencies missing notice for addons to make it more obvious what action to take.
 * FIXED "quotes" in the value of a radio button or dropdown custom field not filterable due to double escaping.
 * FIXED Mapping custom field checkbox values not working if values are already provided as an array.
 * FIXED Clear replacements cache when posts are published.
 * FIXED Remote notices requested on every page load if transient is empty.
+* FIXED The filter views on the email logs table not working.
 
 = 3.5.1 (2024-08-19) =
 * ADDED Opt-in Status Changed benchmark.
