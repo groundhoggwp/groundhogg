@@ -354,6 +354,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED "quotes" in the value of a radio button or dropdown custom field not filterable due to double escaping.
 * FIXED Mapping custom field checkbox values not working if values are already provided as an array.
 * FIXED Clear replacements cache when posts are published.
+* FIXED Remote notices requested on every page load if transient is empty.
 
 = 3.5.1 (2024-08-19) =
 * ADDED Opt-in Status Changed benchmark.

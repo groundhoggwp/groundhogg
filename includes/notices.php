@@ -139,6 +139,7 @@ class Notices {
 	 * @return array|mixed
 	 */
 	function fetch_remote_notices() {
+
 		$response = wp_remote_get( self::REMOTE_NOTICES_URL );
 
 		if ( is_wp_error( $response ) ) {
@@ -175,7 +176,8 @@ class Notices {
 	function count_unread() {
 		$ids = get_transient( 'gh_notification_ids' );
 
-		if ( empty( $ids ) || ! is_array( $ids ) ) {
+        // expired, fetch from remote
+		if ( $ids === false ) {
 			$ids = wp_parse_id_list( wp_list_pluck( $this->fetch_remote_notices(), 'id' ) );
 			set_transient( 'gh_notification_ids', $ids, DAY_IN_SECONDS );
 		}
