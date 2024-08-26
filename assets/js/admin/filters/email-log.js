@@ -37,6 +37,7 @@
         noneSelected: __('Select a recipient...', 'groundhogg'),
         selected: recipients.map(email => ( { id: email, text: email } )),
         multiple: true,
+        tags: true,
         style: {
           flexGrow: 1,
         },
