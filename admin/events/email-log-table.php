@@ -49,10 +49,6 @@ class Email_Log_Table extends Table {
 		return get_db( 'email_log' );
 	}
 
-	protected function view_param() {
-		return 'status';
-	}
-
 	/**
 	 * @inheritDoc
 	 */

@@ -59,17 +59,16 @@ abstract class Table extends \WP_List_Table {
 	 * @param $view
 	 * @param $query
 	 * @param $display
-	 * @param $count
 	 *
 	 * @return string
 	 */
 	protected function create_view( $view, $query, $display ) {
 
-		$params = [
-			$this->view_param() => $view,
-		];
-
 		$count = $this->get_db()->count( $query );
+
+        $params = array_merge( $query, [
+            $this->view_param() => $view
+        ] );
 
 		return html()->e( 'a',
 			[
