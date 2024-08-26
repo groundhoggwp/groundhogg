@@ -1351,22 +1351,28 @@
    */
   const FilterDisplay = ({ filters, filterRegistry }) => {
 
-    let el = Span()
-
-    filterRegistry.preloadFilters(filters).then(r => {
-
-      morphdom(el, Span({}, filters.map(row => {
+    const renderFilters = () => Span({}, filters.map(row => {
 
         return row.map(filter => {
 
-          let result = filterRegistry.displayName(filter)
+            let result = filterRegistry.displayName(filter)
 
-          return Span({}, result).innerHTML
+            return Span({}, result).innerHTML
 
         }).join(' <i>AND</i> ')
 
-      }).join(' <br/><i>OR</i> ')))
+    }).join(' <br/><i>OR</i> '))
 
+    try {
+      return renderFilters()
+    } catch ( err ) {
+      // need to preload
+    }
+
+    let el = Span({}, [ 'Loading...' ] )
+
+    filterRegistry.preloadFilters(filters).then(r => {
+      morphdom(el, renderFilters() )
     })
 
     return el

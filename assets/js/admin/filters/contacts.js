@@ -493,6 +493,11 @@
 
       const ownerName = (ID) => {
         let user = owners.find(owner => owner.ID == ID)
+
+        if ( ! user ){
+          throw new Error( `Owner with ID ${ID} does not exist` )
+        }
+
         return userDisplay(user)
       }
 
@@ -540,7 +545,15 @@
           return 'tags'
         }
 
-        tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
+        tags = tags.map(t => {
+          let tag = TagsStore.get(parseInt(t))
+
+          if ( ! tag ){
+            throw new Error( `Tag of ID ${t} does not exist` )
+          }
+
+          return tag
+        })
 
         const tagNames = tags.map(t => `<b>${ t.data.tag_name }</b>`)
         const func = compare2 === 'any' ? orList : andList
@@ -550,7 +563,7 @@
             'groundhogg') }</b>`, func(tagNames))
       }, edit ({ tags, compare, compare2 }) {
 
-        tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
+        tags = tags.map(t => TagsStore.get(parseInt(t))).filter( Boolean )
 
         // language=html
         return `${ select({

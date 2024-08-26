@@ -2129,7 +2129,11 @@ class Contact_Query extends Table_Query {
 		return $this->get_select_sql();
 	}
 
-	/**
+    public function __toString(): string {
+        return $this->get_sql();
+    }
+
+    /**
 	 * Get the contacts
 	 *
 	 * @param $query_vars

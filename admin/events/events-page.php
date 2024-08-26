@@ -11,6 +11,7 @@ use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\event_queue_db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -103,7 +104,9 @@ class Events_Page extends Tabbed_Admin_Page {
 				break;
 			case 'events':
 
-                $status = get_url_var( 'status' );
+				enqueue_filter_assets();
+
+				$status = get_url_var( 'status' );
 
 				switch ( $status ) {
 					default:
@@ -130,14 +133,14 @@ class Events_Page extends Tabbed_Admin_Page {
 					case 'failed':
 					case 'skipped':
 
-					$errorCodeQuery = new Table_Query( 'events' );
-					$errorCodeQuery
-						->setSelect( 'error_code' )->setGroupby( 'error_code' )
-						->where( 'status', $status );
-					$error_codes = array_filter( wp_list_pluck( $errorCodeQuery->get_results(), 'error_code' ) );
-					$error_codes = array_combine( $error_codes, $error_codes );
+						$errorCodeQuery = new Table_Query( 'events' );
+						$errorCodeQuery
+							->setSelect( 'error_code' )->setGroupby( 'error_code' )
+							->where( 'status', $status );
+						$error_codes = array_filter( wp_list_pluck( $errorCodeQuery->get_results(), 'error_code' ) );
+						$error_codes = array_combine( $error_codes, $error_codes );
 
-					$this->enqueue_table_filters( [
+						$this->enqueue_table_filters( [
 							'stringColumns' => [
 								'error_message' => 'Error message',
 							],
@@ -167,7 +170,7 @@ class Events_Page extends Tabbed_Admin_Page {
 						'date_created' => 'Date created'
 					],
 					'selectColumns' => [
-						'task_type'    => [
+						'task_type' => [
 							'Task Type',
 							[
 								'Import_Contacts'        => __( 'Import contacts', 'groundhogg' ),
@@ -179,7 +182,7 @@ class Events_Page extends Tabbed_Admin_Page {
 								'Complete_Benchmark'     => __( 'Complete benchmark', 'groundhogg' ),
 							]
 						],
-						'user_id' => [ 'User', $users ]
+						'user_id'   => [ 'User', $users ]
 					]
 				] );
 
@@ -453,7 +456,7 @@ class Events_Page extends Tabbed_Admin_Page {
 				'status' => Event::WAITING,
 				'claim'  => '',
 			],
-            'ID' => wp_parse_id_list( $this->get_items() ),
+			'ID'        => wp_parse_id_list( $this->get_items() ),
 		] );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
