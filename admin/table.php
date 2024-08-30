@@ -66,9 +66,9 @@ abstract class Table extends \WP_List_Table {
 
 		$count = $this->get_db()->count( $query );
 
-        $params = array_merge( $query, [
-            $this->view_param() => $view
-        ] );
+		$params = array_merge( $query, [
+			$this->view_param() => $view
+		] );
 
 		return html()->e( 'a',
 			[
@@ -88,7 +88,7 @@ abstract class Table extends \WP_List_Table {
 	 */
 	protected function column_cb( $identity ) {
 
-        printf(
+		printf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			$this->_args['singular'],
 			$identity->get_id()
@@ -157,10 +157,10 @@ abstract class Table extends \WP_List_Table {
 			}
 
 			$action = wp_parse_args( $action, [
-				'display' => '',
-				'class'   => '',
-				'linkClass'   => '',
-				'url'     => '#'
+				'display'   => '',
+				'class'     => '',
+				'linkProps' => [],
+				'url'       => '#'
 			] );
 
 			extract( $action );
@@ -168,7 +168,7 @@ abstract class Table extends \WP_List_Table {
 			if ( empty( $url ) ) {
 				$row_actions[] = html()->e( 'span', [ 'class' => $class ], $display );
 			} else {
-				$row_actions[] = html()->wrap( html()->e( 'a', [ 'href' => $url, 'class' => $linkClass ], $display ), 'span', [ 'class' => $class ] );
+				$row_actions[] = html()->wrap( html()->e( 'a', array_merge( [ 'href' => $url ], $action['linkProps'] ), $display ), 'span', [ 'class' => $class ] );
 			}
 		}
 
@@ -294,22 +294,22 @@ abstract class Table extends \WP_List_Table {
 			'total_pages' => $total_pages,
 		) );
 
-        $json = wp_json_encode([
-	        'total_items'           => $total,
-	        'total_items_formatted' => _nf( $total ),
-	        'items'                 => $this->items,
-	        'per_page'              => $per_page,
-	        'total_pages'           => $total_pages,
-	        'query'                 => $query
-        ]);
+		$json = wp_json_encode( [
+			'total_items'           => $total,
+			'total_items_formatted' => _nf( $total ),
+			'items'                 => $this->items,
+			'per_page'              => $per_page,
+			'total_pages'           => $total_pages,
+			'query'                 => $query
+		] );
 
-        add_action( 'admin_footer', function () use ( $json ) {
-            ?>
+		add_action( 'admin_footer', function () use ( $json ) {
+			?>
             <script>
-                const CurrentTable = <?php echo $json ?>
+              const CurrentTable = <?php echo $json ?>
             </script>
-            <?php
-        } );
+			<?php
+		} );
 	}
 
 	/**
