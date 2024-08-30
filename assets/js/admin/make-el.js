@@ -453,9 +453,24 @@
       modal.remove()
     }
 
-    const morph = () => morphdom( modal.querySelector('.gh-modal-dialog-content'), Div( {}, getContent() ), {
-      childrenOnly: true
-    } )
+    const morph = () => {
+      morphdom( modal.querySelector('.gh-modal-dialog-content'), Div( {}, getContent() ), {
+        childrenOnly: true
+      } )
+
+      let dialog = modal.querySelector('.gh-modal-dialog')
+      let content = dialog.querySelector('.gh-modal-dialog-content')
+      let header =  content.querySelector( '.modal-header' )
+
+      if ( header ){
+
+        let existingHeader = dialog.querySelector( ':scope > .modal-header' )
+        dialog.insertBefore( header, dialog.firstChild )
+        if ( existingHeader ){
+          existingHeader.remove()
+        }
+      }
+    }
 
     const getContent = () => maybeCall(children, { close, modal, morph })
 
@@ -465,13 +480,6 @@
 
     // Run before positioning
     onOpen({ modal, close, morph })
-
-    let header =  modal.querySelector( '.modal-header' )
-    let dialog = modal.querySelector('.gh-modal-dialog')
-
-    if ( header ){
-      dialog.insertBefore( header, dialog.firstChild )
-    }
 
     modal.focus()
 

@@ -350,6 +350,7 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.5.2 (2024-08-30) =
+This release does not have any visible changes, but mostly contains improvements for the use of addons and premium features.
 * OPTIMIZED Refactored a lot of code for better usability.
 * ADDED New JS components for use in addons.
 * ADDED New PHP API methods for use in addons.
