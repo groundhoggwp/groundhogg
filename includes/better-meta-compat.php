@@ -427,7 +427,7 @@ function register_contact_property_table_columns( $columns ) {
 				$custom_field['label'],
 				__NAMESPACE__ . '\display_custom_field_column_callback',
 				"cm.{$custom_field['name']}",
-				( 100 * ( $i + 1 ) ) + absint( get_array_var( $custom_field, 'order', $y ) ),
+				( 1000 * ( $i + 1 ) ) + absint( get_array_var( $custom_field, 'order', $y ) ),
 				'view_contacts',
 				'g-' . $custom_field['group']
 			);
