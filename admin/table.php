@@ -145,7 +145,6 @@ abstract class Table extends \WP_List_Table {
 			return '';
 		}
 
-
 		$row_actions = [];
 
 		$actions = $this->get_row_actions( $item, $column_name, $primary );
@@ -160,33 +159,21 @@ abstract class Table extends \WP_List_Table {
 			$action = wp_parse_args( $action, [
 				'display' => '',
 				'class'   => '',
+				'linkClass'   => '',
 				'url'     => '#'
 			] );
 
-			$row_actions[] = $this->create_row_action( $action['class'], $action['url'], $action['display'] );
+			extract( $action );
 
+			if ( empty( $url ) ) {
+				$row_actions[] = html()->e( 'span', [ 'class' => $class ], $display );
+			} else {
+				$row_actions[] = html()->wrap( html()->e( 'a', [ 'href' => $url, 'class' => $linkClass ], $display ), 'span', [ 'class' => $class ] );
+			}
 		}
 
 		return $this->row_actions( $row_actions );
 
-	}
-
-	/**
-	 * Create a row action.
-	 *
-	 * @param $class
-	 * @param $url
-	 * @param $display
-	 *
-	 * @return string
-	 */
-	protected function create_row_action( $class, $url, $display ) {
-
-		if ( empty( $url ) ) {
-			return html()->e( 'span', [ 'class' => $class ], $display );
-		}
-
-		return html()->wrap( html()->e( 'a', [ 'href' => $url ], $display ), 'span', [ 'class' => $class ] );
 	}
 
 	/**
@@ -306,6 +293,23 @@ abstract class Table extends \WP_List_Table {
 			'per_page'    => $per_page,
 			'total_pages' => $total_pages,
 		) );
+
+        $json = wp_json_encode([
+	        'total_items'           => $total,
+	        'total_items_formatted' => _nf( $total ),
+	        'items'                 => $this->items,
+	        'per_page'              => $per_page,
+	        'total_pages'           => $total_pages,
+	        'query'                 => $query
+        ]);
+
+        add_action( 'admin_footer', function () use ( $json ) {
+            ?>
+            <script>
+                const CurrentTable = <?php echo $json ?>
+            </script>
+            <?php
+        } );
 	}
 
 	/**
