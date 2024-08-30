@@ -209,15 +209,16 @@ function report_link( $content, $params ) {
 /**
  * open the contacts page with specific filters
  *
- * @param $content
- * @param $filters
+ * @param string $text     the link text
+ * @param array  $filters  the filters
+ * @param bool   $showLink whether to show the link, typically you don't want to tlink if there is nothing to linnk to
  *
  * @return string
  */
-function contact_filters_link( $content, $filters, $link = true ) {
+function contact_filters_link( $text, $filters, $showLink = true ) {
 
-	if ( ! $link ) {
-		return $content;
+	if ( ! $showLink ) {
+		return $text;
 	}
 
 	return html()->e( 'a', [
@@ -225,7 +226,7 @@ function contact_filters_link( $content, $filters, $link = true ) {
 		'href'   => admin_page_url( 'gh_contacts', [
 			'filters' => base64_json_encode( array_values( $filters ) )
 		] )
-	], $content );
+	], $text );
 }
 
 /**
@@ -850,15 +851,15 @@ function words_to_key( $words ) {
 /**
  * Calc the percentage change
  *
- * @param $oldValue
- * @param $newValue
+ * @param     $oldValue
+ * @param     $newValue
  * @param int $precision
  *
  * @return float|int
  */
-function percentage_change( $oldValue, $newValue, int $precision = 0 ){
+function percentage_change( $oldValue, $newValue, int $precision = 0 ) {
 	// Ensure the old value is not zero to avoid division by zero error
-	if ($oldValue == 0) {
+	if ( $oldValue == 0 ) {
 		return 0;
 	}
 
@@ -2742,24 +2743,24 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'gdpr_consent':
 			case 'marketing_consent':
 
-                switch ( $value ){
-                    case 'false':
-                    case 'False':
-                    case 'no':
-                    case 'No':
-	                     break;
-	                case 'yes':
-	                case 'Yes':
-	                case 'true':
-	                case 'True':
-	                    $args[ $field ] = true;
-                        break;
-                    default:
-	                    if ( ! empty( $value ) ) {
-		                    $args[ $field ] = true;
-	                    }
-                        break;
-                }
+				switch ( $value ) {
+					case 'false':
+					case 'False':
+					case 'no':
+					case 'No':
+						break;
+					case 'yes':
+					case 'Yes':
+					case 'true':
+					case 'True':
+						$args[ $field ] = true;
+						break;
+					default:
+						if ( ! empty( $value ) ) {
+							$args[ $field ] = true;
+						}
+						break;
+				}
 
 				break;
 			case 'country':
@@ -3138,9 +3139,9 @@ function floating_phil() {
  */
 function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 
-    if ( is_white_labeled() ){
-        return '';
-    }
+	if ( is_white_labeled() ) {
+		return '';
+	}
 
 	switch ( $color ) {
 		default:
@@ -3169,22 +3170,22 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 /**
  * Display the icon as an SVG
  *
- * @param int $width the width of the icon
- * @param bool $echo whether to echo or return the icon
+ * @param int  $width the width of the icon
+ * @param bool $echo  whether to echo or return the icon
  *
  * @return bool|string
  */
-function groundhogg_icon( $width = 40, $echo = true ){
+function groundhogg_icon( $width = 40, $echo = true ) {
 
-    if ( is_white_labeled() ){
-        return false;
-    }
+	if ( is_white_labeled() ) {
+		return false;
+	}
 
-    if ( ! $echo ){
-        ob_start();
-    }
+	if ( ! $echo ) {
+		ob_start();
+	}
 
-    ?>
+	?>
     <svg viewBox="38.053 7.279 310.877 351.102" xmlns="http://www.w3.org/2000/svg" style="width: <?php esc_attr_e( absint( $width ) ); ?>px">
         <path d="M 348.93 258.42 L 348.93 107.24 C 348.927 98.919 344.486 91.231 337.28 87.07 L 206.35 11.47 C 199.144 7.31 190.266 7.31 183.06 11.47 L 52.13 87.08 C 44.926 91.242 40.489 98.93 40.49 107.25 L 40.49 258.43 C 40.491 266.749 44.927 274.437 52.13 278.6 L 183.06 354.2 C 190.268 358.364 199.152 358.364 206.36 354.2 L 337.28 278.6 C 344.486 274.439 348.927 266.751 348.93 258.43 L 348.93 258.42"
               fill="#ff7b01"/>
@@ -3198,13 +3199,13 @@ function groundhogg_icon( $width = 40, $echo = true ){
         <path d="M 348.93 262.44 L 348.93 103.22 C 348.93 97.39 347.28 32.26 342.23 29.34 L 202.88 9.47 C 197.825 6.549 191.595 6.549 186.54 9.47 L 44.92 24.52 C 39.87 27.44 40.49 97.39 40.49 103.22 L 40.49 262.44 C 40.49 268.27 43.6 273.67 48.66 276.59 L 186.54 356.19 C 191.595 359.111 197.825 359.111 202.88 356.19 L 340.76 276.59 C 345.815 273.671 348.93 268.277 348.93 262.44 Z"
               fill="none"/>
     </svg>
-    <?php
+	<?php
 
-    if ( ! $echo ){
-        return ob_get_clean();
-    }
+	if ( ! $echo ) {
+		return ob_get_clean();
+	}
 
-    return true;
+	return true;
 
 }
 
@@ -3725,7 +3726,7 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
-	if ( is_user_logged_in() && current_user_can( 'download_files' ) ) {
+	if ( is_user_logged_in() ) {
 		return action_url( 'download_file', [
 			'page'      => 'gh_tools',
 			'file_path' => ltrim( $path, '/' ),
@@ -6893,17 +6894,17 @@ function maybe_implode_in_quotes( $items ) {
  * Explodes a string, but returns an array if the given is an array already
  *
  * @param string|array $string
- * @param string $separator
+ * @param string       $separator
  *
  * @return array
  */
 function maybe_explode( $string, string $separator = ',' ) {
 
-    if ( is_array( $string ) ){
-        return $string;
-    }
+	if ( is_array( $string ) ) {
+		return $string;
+	}
 
-    return explode( $string, $separator );
+	return explode( $string, $separator );
 }
 
 /**
@@ -6913,8 +6914,8 @@ function maybe_explode( $string, string $separator = ',' ) {
  *
  * @return array
  */
-function array_trim( array $array ){
-    return array_map( 'trim', $array );
+function array_trim( array $array ) {
+	return array_map( 'trim', $array );
 }
 
 /**
@@ -8287,20 +8288,20 @@ function get_unsub_reasons() {
  * Filter a list of users by capabilities
  *
  * @param $users \WP_User[]|int[]
- * @param $cap string|array
+ * @param $cap   string|array
  *
  * @return \WP_User[]|int[]
  */
-function filter_by_cap( $users, $cap ){
-    $caps = wp_parse_list( $cap );
+function filter_by_cap( $users, $cap ) {
+	$caps = wp_parse_list( $cap );
 
-    return array_filter( $users, function ($user) use ( $caps ){
-        foreach ( $caps as $cap ){
-            if ( ! user_can( $user, $cap ) ){
-                return false;
-            }
-        }
+	return array_filter( $users, function ( $user ) use ( $caps ) {
+		foreach ( $caps as $cap ) {
+			if ( ! user_can( $user, $cap ) ) {
+				return false;
+			}
+		}
 
-        return true;
-    } );
+		return true;
+	} );
 }

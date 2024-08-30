@@ -68,7 +68,9 @@ class Table_Query extends Query {
 				case 's':
 				case 'search':
 				case 'term':
-					$this->search( $value, wp_parse_list( $params['search_columns'] ) );
+					if ( ! empty( $value ) ){
+						$this->search( $value, wp_parse_list( $params['search_columns'] ) );
+					}
 					break;
 				case 'filters':
 				case 'include_filters':

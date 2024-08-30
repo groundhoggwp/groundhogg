@@ -98,12 +98,22 @@ class Filters {
 			$filters = base64_json_decode( $filters );
 		}
 
-		if ( ! $filters ) {
+		if ( empty( $filters ) ) {
 			return;
 		}
 
 		$ors = $where->subWhere( 'OR', $negate );
 
+//		// detect first order filters
+//		if ( isset_not_empty( $filters, 'type' ) ){
+//			$filters = [[$filters]];
+//		}
+//
+//		// detect second order filters
+//		if ( isset_not_empty( $filters[0], 'type' ) ){
+//			$filters = [$filters];
+//		}
+//
 		// Or Group
 		foreach ( $filters as $filter_group ) {
 
