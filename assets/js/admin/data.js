@@ -193,7 +193,8 @@
      * @returns {*|*[]}
      */
     getResultsFromCache (query = {}) {
-      let results = this.cache[JSON.stringify(query)] ?? []
+      let [results=[],totalItems=0] = this.cache[JSON.stringify(query)] ?? []
+      this.total_items = totalItems
       return results.map(id => this.get(id))
     },
 
@@ -211,9 +212,10 @@
      *
      * @param query
      * @param results
+     * @param totalItems
      */
-    setInResultsCache (query, results = []) {
-      this.cache[JSON.stringify(query)] = results.map(item => item[this.primaryKey])
+    setInResultsCache (query, results = [], totalItems = 0 ) {
+      this.cache[JSON.stringify(query)] = [results.map(item => item[this.primaryKey]), totalItems]
     },
 
     /**
@@ -333,7 +335,7 @@
         return this.getItemsFromResponse(r)
       }).then(items => {
         this.itemsFetched(items)
-        this.setInResultsCache(params, items)
+        this.setInResultsCache(params, items, this.total_items)
         return items
       })
     },
@@ -580,6 +582,7 @@
           this.itemsFetched([
             item,
           ])
+          this.clearResultsCache()
           return item
         })
     },
@@ -591,6 +594,7 @@
           this.itemsFetched([
             item,
           ])
+          this.clearResultsCache()
           return item
         })
     },
