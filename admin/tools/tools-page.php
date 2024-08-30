@@ -650,15 +650,18 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$files = $this->get_items();
 
 		foreach ( $files as $file_name ) {
-			$filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
+			$filepath = files()->get_csv_imports_dir( $file_name );
+
 			if ( file_exists( $filepath ) ) {
-				unlink( $filepath );
+				if ( ! unlink( $filepath ) ){
+                    return new WP_Error( 'failed', 'Unable to delete imports.' );
+				}
 			}
 		}
 
 		$this->add_notice( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
 
-		return admin_url( 'admin.php?page=gh_tools&action=add&tab=import' );
+		return admin_url( 'admin.php?page=gh_tools&tab=import' );
 	}
 
 	####### EXPORT TAB FUNCTIONS #########
