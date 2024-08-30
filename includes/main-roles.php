@@ -194,7 +194,11 @@ class Main_Roles extends Roles {
 
 				// Compat for WooCommerce usage of download file
 				if ( ! is_string( $file_path ) ) {
-					return $caps;
+					break;
+				}
+
+				if ( is_super_admin( $user_id ) ){
+					break;
 				}
 
 				$caps = [];
@@ -208,7 +212,7 @@ class Main_Roles extends Roles {
 						$caps[] = 'download_contact_files';
 
 						$request        = $args[1];
-						$contact        = get_array_var( $request, 'contact' );
+						$contact        = get_array_var( $request, 'id' );
 						$contact_folder = $path[1];
 
 						$contact = new Contact( $contact );
