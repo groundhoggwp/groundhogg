@@ -1060,7 +1060,7 @@ class Contact_Query extends Table_Query {
 
 			[ 0 => $key, 1 => $compare, 2 => $value ] = $metaFilter;
 
-			if ( ! $key || ! $compare ){
+			if ( ! $key || ! $compare ) {
 				continue;
 			}
 
@@ -1565,6 +1565,11 @@ class Contact_Query extends Table_Query {
 						}
 					}
 					break;
+				case 'email': // Email search
+					if ( $value ) {
+						$where->compare( 'email', $value, get_array_var( $query_vars, 'email_compare', '=' ) );
+					}
+					break;
 				case 'email_like': // Email search
 					if ( $value ) {
 						$where->contains( 'email', $value );
@@ -1578,6 +1583,12 @@ class Contact_Query extends Table_Query {
 				case 'last_name_like': // Last name search
 					if ( $value ) {
 						$where->contains( 'last_name', $value );
+					}
+					break;
+				case 'full_name_like': // Full name search
+					if ( $value ) {
+						$where->query->add_safe_column( 'CONCAT(first_name, " ", last_name)' );
+						$where->contains( 'CONCAT(first_name, " ", last_name)', $value );
 					}
 					break;
 				case 'tags_include':
@@ -1723,22 +1734,29 @@ class Contact_Query extends Table_Query {
 					break;
 				case 'meta_query':
 
-					if ( ! is_array( $value ) || empty( $meta_query ) ) {
+					if ( ! is_iterable( $value ) || empty( $value ) ) {
 						break;
 					}
 
-					foreach ( $value as $meta_query ) {
+					$meta_query = (array) $value;
 
-						$meta_query = swap_array_keys( $meta_query, [
+					$relation = get_array_var( $meta_query, 'relation', 'AND' );
+					unset( $meta_query['relation'] );
+
+					$metaWhere = $where->subWhere( $relation );
+
+					foreach ( $meta_query as $sub_meta_query ) {
+
+						$sub_meta_query = swap_array_keys( $sub_meta_query, [
 							'val'  => 'value',
 							'comp' => 'compare'
 						] );
 
-						[ 'key' => $key, 'value' => $value, 'compare' => $compare ] = $meta_query;
+						[ 'key' => $key, 'value' => $value, 'compare' => $compare ] = $sub_meta_query;
 
-						$alias = $where->query->joinMeta( $key );
+						$alias = $metaWhere->query->joinMeta( $key );
 
-						$where->compare( "$alias.meta_value", $value, $compare );
+						$metaWhere->compare( "$alias.meta_value", $value, $compare );
 					}
 					break;
 				case 'date_query':
@@ -1761,12 +1779,18 @@ class Contact_Query extends Table_Query {
 
 					break;
 				case 'filters':
+				case 'filters1':
+				case 'filters2':
+				case 'filters3':
 				case 'include_filters':
 					if ( ! empty( $value ) ) {
 						self::filters()->parse_filters( $value, $where );
 					}
 					break;
 				case 'exclude_filters':
+				case 'exclude_filters1':
+				case 'exclude_filters2':
+				case 'exclude_filters3':
 
 					if ( ! empty( $value ) ) {
 
@@ -1793,7 +1817,6 @@ class Contact_Query extends Table_Query {
 					break;
 			}
 		}
-
 	}
 
 	/**
@@ -2129,11 +2152,11 @@ class Contact_Query extends Table_Query {
 		return $this->get_select_sql();
 	}
 
-    public function __toString(): string {
-        return $this->get_sql();
-    }
+	public function __toString(): string {
+		return $this->get_sql();
+	}
 
-    /**
+	/**
 	 * Get the contacts
 	 *
 	 * @param $query_vars
