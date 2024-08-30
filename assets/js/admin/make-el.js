@@ -466,6 +466,13 @@
     // Run before positioning
     onOpen({ modal, close, morph })
 
+    let header =  modal.querySelector( '.modal-header' )
+    let dialog = modal.querySelector('.gh-modal-dialog')
+
+    if ( header ){
+      dialog.insertBefore( header, dialog.firstChild )
+    }
+
     modal.focus()
 
     return modal
@@ -1324,8 +1331,11 @@
   const Pg = (props, children) => makeEl( 'p', props, children )
   const An = (props, children) => makeEl( 'a', props, children )
   const Ul = (props, children) => makeEl( 'ul', props, children )
-  const Ol = (props, children) => makeEl( 'Ol', props, children )
+  const Ol = (props, children) => makeEl( 'ol', props, children )
   const Li = (props, children) => makeEl( 'li', props, children )
+  const H1 = (props, children) => makeEl( 'h1', props, children )
+  const H2 = (props, children) => makeEl( 'h2', props, children )
+  const H3 = (props, children) => makeEl( 'h3', props, children )
 
   window.MakeEl = {
     InputGroup,
@@ -1365,6 +1375,9 @@
     Ul,
     Ol,
     Li,
+    H1,
+    H2,
+    H3,
     maybeCall
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })
