@@ -23,7 +23,9 @@ abstract class Task implements \JsonSerializable {
 
 	public function __unserialize( array $data ): void {
 		foreach ( $data as $prop => $value ){
-			$this->$prop = $value;
+			if ( property_exists( $this, $prop ) ){
+				$this->$prop = $value;
+			}
 		}
 	}
 
