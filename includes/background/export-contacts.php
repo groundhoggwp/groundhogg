@@ -10,6 +10,7 @@ use function Groundhogg\file_access_url;
 use function Groundhogg\files;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 use function Groundhogg\percentage;
 use function Groundhogg\white_labeled_name;
@@ -20,7 +21,7 @@ class Export_Contacts extends Task {
 	protected array $columns;
 	protected int $user_id;
 	protected int $batch;
-	protected int $contacts;
+	protected int $items;
 	protected string $filePath;
 
 	/**
@@ -37,12 +38,12 @@ class Export_Contacts extends Task {
 		$this->columns  = $columns;
 		$this->batch    = $batch;
 
-		$query = new Contact_Query( $this->query );
-		$this->contacts = $query->count();
+		$query       = new Contact_Query( $this->query );
+		$this->items = $query->count();
 	}
 
-	public function get_progress(){
-		return percentage( $this->contacts, $this->batch * self::BATCH_LIMIT );
+	public function get_progress() {
+		return percentage( $this->items, $this->batch * self::BATCH_LIMIT );
 	}
 
 	/**
@@ -50,17 +51,17 @@ class Export_Contacts extends Task {
 	 *
 	 * @return string
 	 */
-	public function get_title(){
+	public function get_title() {
 
 		$fileName = bold_it( basename( $this->filePath ) );
 
-		if ( $this->get_progress() >= 100 ){
-			$fileName = html()->e('a', [
+		if ( $this->get_progress() >= 100 ) {
+			$fileName = html()->e( 'a', [
 				'href' => file_access_url( '/exports/' . basename( $this->filePath ), true )
 			], $fileName );
 		}
 
-		return sprintf( 'Export %s contacts to %s', _nf( $this->contacts ), $fileName );
+		return sprintf( 'Export %s contacts to %s', _nf( $this->items ), $fileName );
 	}
 
 	/**
@@ -154,7 +155,7 @@ class Export_Contacts extends Task {
 			'query'    => $this->query,
 			'columns'  => $this->columns,
 			'batch'    => $this->batch,
-			'contacts' => $this->contacts,
+			'items'    => $this->items,
 		];
 	}
 
@@ -162,9 +163,16 @@ class Export_Contacts extends Task {
 		parent::__unserialize( $data );
 
 		// Backup in case contacts was not saved originally
-		if ( ! isset( $data[ 'contacts' ] ) ) {
-			$query = new Contact_Query( $this->query );
-			$this->contacts = $query->count();
+		if ( ! isset( $data['items'] ) ) {
+
+			// Backwards compat for refactoring to items
+			if ( isset( $data['contacts'] ) ){
+				$this->items = absint( $data['contacts']);
+				return;
+			}
+
+			$query       = new Contact_Query( $this->query );
+			$this->items = $query->count();
 		}
 	}
 }
