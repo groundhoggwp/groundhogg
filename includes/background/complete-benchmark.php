@@ -21,17 +21,17 @@ class Complete_Benchmark extends Task {
 
 	/**
 	 * @param int   $step_id
-	 * @param array $query
+	 * @param array $query_args
 	 * @param int   $batch
 	 */
-	public function __construct( int $step_id, array $query, int $batch ) {
+	public function __construct( int $step_id, array $query_args, int $batch ) {
 		$this->step_id = $step_id;
-		$this->query   = $query;
+		$this->query   = $query_args;
 		$this->batch   = $batch;
 		$this->user_id = get_current_user_id();
 
-		$query          = new Contact_Query( $this->query );
-		$this->contacts = $query->count();
+		$query_args     = new Contact_Query( $this->query );
+		$this->contacts = $query_args->count();
 		$this->step     = new Step( $step_id );
 	}
 

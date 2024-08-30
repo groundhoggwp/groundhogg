@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Groundhogg\background\Delete_Objects;
+use Groundhogg\Background_Tasks;
 use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Broadcast;
@@ -604,6 +606,14 @@ abstract class Base_Object_Api extends Base_Api {
 			'found_rows' => false,
 		] );
 
+		// Don't bother to check if there are any matching objects
+		// Just add the background task for deleting them
+		if ( $request->has_param( 'bg' ) ) {
+			unset( $query['bg'] );
+			Background_Tasks::add( new Delete_Objects( $this->get_db_table_name(), $query ) );
+			return self::SUCCESS_RESPONSE();
+		}
+
 		if ( ! empty( $query ) ) {
 			$items = $this->get_db_table()->query( $query );
 		} else {
@@ -992,7 +1002,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 	/**
 	 * Delete many relationships
-	 *
+	 *f
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
