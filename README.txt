@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.1.1
+Stable tag: 3.5.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.5.2 (2024-08-30) =
+* OPTIMIZED Refactored a lot of code for better usability.
+* ADDED New JS components for use in addons.
+* ADDED New PHP API methods for use in addons.
+* ADDED New PHP helper classes for use in addons.
 
 = 3.5.1.1 (2024-08-23) =
 * ADDED Contact Sub Query filter to the log filters to make it easier to find and modify events for contact segments.
