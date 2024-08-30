@@ -891,6 +891,35 @@ ${afterProgress()}`,
     })
   }
 
+  const dangerDeleteModal = ({ name, ...props }) => dangerConfirmationModal({
+    alert: `<p>${sprintf( __('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg'), name )}</p>`,
+    confirmText: __( 'Delete' ),
+    ...props
+  })
+
+  $(document).on('click', 'a.danger-confirm', e => {
+    e.preventDefault()
+
+    dangerConfirmationModal({
+      alert: `<p>${__('Are you sure? This action cannot be undone.', 'groundhogg')}</p>`,
+      onConfirm: () => {
+        window.location.href = e.target.closest('a').href;
+      }
+    })
+  })
+
+  $(document).on('click', 'a.danger-delete', e => {
+    e.preventDefault()
+
+    dangerConfirmationModal({
+      alert: `<p>${__('Are you sure? This action cannot be undone.', 'groundhogg')}</p>`,
+      onConfirm: () => {
+        window.location.href = e.target.closest('a').href;
+      },
+      confirmText: __( 'Delete' )
+    })
+  })
+
   /**
    *
    * @param alert
@@ -2810,6 +2839,7 @@ ${afterProgress()}`,
     savingModal,
     confirmationModal,
     dangerConfirmationModal,
+    dangerDeleteModal,
     uuid,
     modal,
     miniModal,
