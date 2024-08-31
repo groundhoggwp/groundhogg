@@ -106,6 +106,37 @@ class Table_Query extends Query {
 	}
 
 	/**
+	 * Wrapper for setOrderby that handles ordering by a meta field
+	 *
+	 * @param ...$columns
+	 *
+	 * @return Table_Query
+	 */
+	public function setOrderby( ...$columns ) {
+
+		// Handle ordering by meta
+		$columns = array_map( function ( $column ){
+
+			if ( ! is_string( $column ) || ! str_starts_with( $column, 'meta.' ) ){
+				return $column;
+			}
+
+			$meta_key = sanitize_key( substr( $column, strpos( $column, '.' ) + 1 ) );
+
+			try {
+				$alias = $this->joinMeta( $meta_key );
+			} catch ( \Exception $e ){
+				return $column;
+			}
+
+			return "$alias.meta_value";
+
+		}, $columns );
+
+		return parent::setOrderby( ...$columns );
+	}
+
+	/**
 	 * Given filters, modify the query accordingly
 	 *
 	 * @throws FilterException
