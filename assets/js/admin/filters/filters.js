@@ -278,7 +278,11 @@
    */
   const createStringFilter = (
     type, name, group,
-    { edit = () => null, display = () => null, preload = () => {} } = {},
+    {
+      edit = () => null,
+      display = () => null,
+      preload = () => {}
+    } = {},
     defaults = {}) => createFilter(
     type,
     name,

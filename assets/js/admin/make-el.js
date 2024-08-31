@@ -418,6 +418,24 @@
     closeOnOverlayClick = true
   }, children) => {
 
+    const Dialog = ({ header = null, content = null }) => Div({
+      className: `gh-modal-dialog ${ dialogClasses }`,
+      style: {
+        width
+      }
+    }, [
+      header,
+      Div({
+        className: 'gh-modal-dialog-content',
+      }, content ),
+      closeButton && ! header ? Button({
+        className: 'dashicon-button gh-modal-button-close-top gh-modal-button-close',
+        onClick: e => {
+          close()
+        },
+      }, Dashicon('no-alt')) : null,
+    ])
+
     let modal = Div({
       className: 'gh-modal',
       tabindex: 0,
@@ -430,22 +448,10 @@
           }
         },
       }),
-      Div({
-        className: `gh-modal-dialog ${ dialogClasses }`,
-        style: {
-          width
-        }
-      }, [
-        Div({
-          className: 'gh-modal-dialog-content',
-        }),
-        closeButton ? Button({
-          className: 'dashicon-button gh-modal-button-close-top gh-modal-button-close',
-          onClick: e => {
-            close()
-          },
-        }, Dashicon('no-alt')) : null,
-      ]),
+      Dialog({
+        header: null,
+        content: null
+      })
     ])
 
     const close = () => {
@@ -454,22 +460,12 @@
     }
 
     const morph = () => {
-      morphdom( modal.querySelector('.gh-modal-dialog-content'), Div( {}, getContent() ), {
-        childrenOnly: true
-      } )
 
-      let dialog = modal.querySelector('.gh-modal-dialog')
-      let content = dialog.querySelector('.gh-modal-dialog-content')
-      let header =  content.querySelector( '.modal-header' )
+      let content = getContent()
 
-      if ( header ){
+      let header = content.querySelector('.modal-header')
 
-        let existingHeader = dialog.querySelector( ':scope > .modal-header' )
-        dialog.insertBefore( header, dialog.firstChild )
-        if ( existingHeader ){
-          existingHeader.remove()
-        }
-      }
+      morphdom( modal.querySelector('.gh-modal-dialog'), Dialog({header, content}) )
     }
 
     const getContent = () => maybeCall(children, { close, modal, morph })
@@ -799,6 +795,8 @@
 
           input.classList.add('gh-autocomplete', 'has-results')
         }, 500)
+
+        onInput(e)
       },
     })
   }
