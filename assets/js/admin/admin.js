@@ -579,12 +579,23 @@
     return current
   }
 
+  const debounce = (callback, wait) => {
+    let timeoutId = null;
+    return (...args) => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        callback(...args);
+      }, wait);
+    };
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
   gh.functions.jsonCopy = jsonCopy
   gh.functions.setNestedValue = setNestedValue
   gh.functions.getNestedValue = getNestedValue
+  gh.functions.debounce = debounce
 
   var check, timeout
 
