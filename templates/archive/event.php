@@ -36,6 +36,8 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	$event_id   = absint( get_query_var( 'event_id' ) );
 	$event      = new Event( $event_id, 'events', $use_queued ? 'queued_id' : 'ID' );
 
+	$GLOBALS['event'] = $event;
+
 	// Event does not exist, or mismatched contact ID
 	if ( ! $event->exists() || $event->get_contact_id() !== $contact->get_id() ) {
 
@@ -49,6 +51,8 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	$email_id = $event->email_id;
 
 	$email = new Email( $email_id );
+
+	$GLOBALS['email'] = $email;
 
 	if ( ! $email->exists() ) {
 		wp_die( __( 'Could not load email...' ) );

@@ -2,6 +2,14 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+function the_campaign(){
+	return new \Groundhogg\Campaign( get_query_var( 'campaign' ), 'slug' );
+}
+
+function the_broadcast(){
+	return new \Groundhogg\Broadcast( get_query_var( 'broadcast' ) );
+}
+
 /**
  * Loads a part from the parts folder
  *

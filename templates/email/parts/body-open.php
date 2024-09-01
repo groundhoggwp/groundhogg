@@ -12,6 +12,8 @@ global $broadcast;
 global $event;
 global $email;
 
+
+
 // Archive navigation
 if ( is_browser_view() && isset( $campaign ) && isset( $broadcast ) ) {
 	?>
@@ -26,6 +28,7 @@ if ( is_browser_view() && isset( $campaign ) && isset( $broadcast ) ) {
 	<?php
 }
 
+// Event history navigation
 if ( is_browser_view() && isset( $event ) && isset( $email ) ) {
 
     // Exclude the archive link from being tracked

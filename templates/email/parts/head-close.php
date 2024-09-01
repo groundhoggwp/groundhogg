@@ -1,7 +1,6 @@
 <?php
 
 use function Groundhogg\is_browser_view;
-use function Groundhogg\managed_page_url;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

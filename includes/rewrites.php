@@ -236,6 +236,7 @@ class Rewrites {
 				}
 
 				$campaign = new Campaign( $campaign_slug, 'slug' );
+				$GLOBALS['campaign'] = $campaign;
 
 				if ( ! $campaign->exists() || ( ! $campaign->is_public() && ! current_user_can( 'manage_campaigns' ) ) ) {
 
@@ -250,6 +251,7 @@ class Rewrites {
 
 				if ( $broadcast_id ) {
 					$broadcast = new Broadcast( $broadcast_id );
+					$GLOBALS['broadcast'] = $broadcast;
 
 					if ( $broadcast->exists() ) {
 						$template = $template_loader->get_template_part( 'archive/broadcast', '', false );
