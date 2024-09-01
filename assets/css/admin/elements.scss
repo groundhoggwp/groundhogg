@@ -43,6 +43,14 @@ $background-color: #F6F9FB;
     &-30{
       background-color: $primary-dark-30;
     }
+
+    &-15{
+      background-color: $primary-dark-15;
+    }
+
+    &-10{
+      background-color: $primary-dark-10;
+    }
   }
 }
 
@@ -2771,4 +2779,23 @@ p.error,
     }
   }
 
+}
+
+.image-picker {
+
+  .image-input-preview {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border: 1px solid #8c8f94;
+    border-bottom: none;
+  }
+
+  .image-input-preview + .gh-input-group {
+    input{
+      border-top-left-radius: 0 !important;
+    }
+    button{
+      border-top-right-radius: 0 !important;
+    }
+  }
 }

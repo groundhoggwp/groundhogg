@@ -22,12 +22,31 @@
     spinner,
 
   } = Groundhogg.element
-  const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore, emails: EmailsStore } = Groundhogg.stores
-  const { post, routes, postFormData } = Groundhogg.api
+  const {
+    contacts: ContactsStore,
+    tags    : TagsStore,
+    forms   : FormsStore,
+    emails  : EmailsStore,
+  } = Groundhogg.stores
+  const {
+    post,
+    routes,
+    postFormData,
+  } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
   const { userHasCap } = Groundhogg.user
-  const { sprintf, __, _x, _n } = wp.i18n
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
   const { currentUser } = Groundhogg
 
   const selectContactModal = ({
@@ -42,9 +61,9 @@
       return `
           <div id="search-form">
               ${ input({
-                  id: 'contact-search',
-                  value: search,
-                  type: 'search',
+                  id         : 'contact-search',
+                  value      : search,
+                  type       : 'search',
                   placeholder: __('Search by name or email', 'groundhogg'),
               }) }
           </div>
@@ -59,8 +78,11 @@
           </div>`
     }
 
-    const { close, setContent } = modal({
-      content: form(),
+    const {
+      close,
+      setContent,
+    } = modal({
+      content      : form(),
       dialogClasses: 'no-padding',
     })
 
@@ -160,8 +182,8 @@
       return `
           <div class="gh-tags">
               ${ selected.map(tag => `<span class="gh-tag${ removeTags.includes(tag.ID)
-                              ? ' remove'
-                              : '' }">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
+                                                            ? ' remove'
+                                                            : '' }">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
                       join('') }
               ${ addTags.map(id => TagsStore.get(id)).
                       map(tag => `<span class="gh-tag adding">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).
@@ -224,11 +246,11 @@
         let initialOptions = filterTags(TagsStore.getItems())
 
         searchOptionsWidget({
-          target: e.currentTarget,
-          position: 'fixed',
-          noOptions: __('No tags found...', 'groundhogg'),
-          options: initialOptions,
-          filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
+          target       : e.currentTarget,
+          position     : 'fixed',
+          noOptions    : __('No tags found...', 'groundhogg'),
+          options      : initialOptions,
+          filterOption : ({ data }, search) => data.tag_name.match(regexp(search)),
           filterOptions: (opts, search) => {
             if (!search) {
               return opts
@@ -236,7 +258,7 @@
 
             if (userHasCap('add_tags')) {
               opts.unshift({
-                ID: search,
+                ID  : search,
                 data: {
                   tag_name: sprintf(__('Add "%s"', 'groundhogg'), search),
                 },
@@ -245,11 +267,11 @@
 
             return opts
           },
-          renderOption: ({ data }) => data.tag_name,
-          onClose: () => {
+          renderOption : ({ data }) => data.tag_name,
+          onClose      : () => {
             mount()
           },
-          onInput: (search, widget) => {
+          onInput      : (search, widget) => {
 
             if (timeout) {
               clearTimeout(timeout)
@@ -265,7 +287,7 @@
             }, 1500)
 
           },
-          onSelect: (tag) => {
+          onSelect     : (tag) => {
 
             let { ID } = tag
 
@@ -286,7 +308,7 @@
             addTags.push(ID)
             informChanges()
           },
-          onOpen: (widget) => {
+          onOpen       : (widget) => {
 
             if (!initialOptions.length) {
               TagsStore.fetchItems().then(() => {
@@ -344,16 +366,16 @@
                       <div class="gh-col">
                           <label for="${ prefix }-first-name">${ __('First Name', 'groundhogg') }</label>
                           ${ input({
-                              id: `${ prefix }-first-name`,
-                              name: 'first_name',
+                              id   : `${ prefix }-first-name`,
+                              name : 'first_name',
                               value: contact.data.first_name,
                           }) }
                       </div>
                       <div class="gh-col">
                           <label for="${ prefix }-last-name">${ __('Last Name', 'groundhogg') }</label>
                           ${ input({
-                              id: `${ prefix }-last-name`,
-                              name: 'last_name',
+                              id   : `${ prefix }-last-name`,
+                              name : 'last_name',
                               value: contact.data.last_name,
                           }) }
                       </div>
@@ -362,9 +384,9 @@
                       <div class="gh-col">
                           <label for="${ prefix }-email">${ __('Email Address', 'groundhogg') }</label>
                           ${ input({
-                              type: 'email',
-                              name: 'email',
-                              id: `${ prefix }-email`,
+                              type : 'email',
+                              name : 'email',
+                              id   : `${ prefix }-email`,
                               value: contact.data.email,
                           }) }
                       </div>
@@ -373,9 +395,9 @@
                               <div class="gh-col">
                                   <label for="${ prefix }-primary-phone">${ __('Primary Phone', 'groundhogg') }</label>
                                   ${ input({
-                                      type: 'tel',
-                                      id: `${ prefix }-primary-phone`,
-                                      name: 'primary_phone',
+                                      type : 'tel',
+                                      id   : `${ prefix }-primary-phone`,
+                                      name : 'primary_phone',
                                       value: contact.meta.primary_phone,
                                   }) }
                               </div>
@@ -384,9 +406,9 @@
                                           for="${ prefix }-primary-phone-extension">${ _x('Ext.',
                                           'phone number extension', 'groundhogg') }</label>
                                   ${ input({
-                                      type: 'number',
-                                      id: `${ prefix }-primary-phone-extension`,
-                                      name: 'primary_phone_extension',
+                                      type : 'number',
+                                      id   : `${ prefix }-primary-phone-extension`,
+                                      name : 'primary_phone_extension',
                                       value: contact.meta.primary_phone_extension,
                                   }) }
                               </div>
@@ -397,16 +419,16 @@
                       <div class="gh-col">
                           <label for="${ prefix }-email">${ __('Opt-in Status', 'groundhogg') }</label>
                           ${ select({
-                              id: `${ prefix }-optin-status`,
+                              id  : `${ prefix }-optin-status`,
                               name: 'optin_status',
                           }, Groundhogg.filters.optin_status, contact.data.optin_status) }
                       </div>
                       <div class="gh-col">
                           <label for="${ prefix }-mobile-phone">${ __('Mobile Phone', 'groundhogg') }</label>
                           ${ input({
-                              type: 'tel',
-                              id: `${ prefix }-mobile-phone`,
-                              name: 'mobile_phone',
+                              type : 'tel',
+                              id   : `${ prefix }-mobile-phone`,
+                              name : 'mobile_phone',
                               value: contact.meta.mobile_phone,
                           }) }
                       </div>
@@ -416,10 +438,10 @@
                           <label for="${ prefix }-owner">${ __('Owner', 'noun the contact owner',
                                   'groundhogg') }</label>
                           ${ select({
-                              id: `${ prefix }-owner`,
+                              id  : `${ prefix }-owner`,
                               name: 'owner_id',
                           }, Groundhogg.filters.owners.map(u => ( {
-                              text: u.data.user_email,
+                              text : u.data.user_email,
                               value: u.ID,
                           } )), contact.data.owner_id) }
                       </div>
@@ -431,7 +453,10 @@
                           <div id="${ prefix }-tags-here"></div>
                       </div>
                   </div>
-                  ${ additionalFields({ prefix, contact }) }
+                  ${ additionalFields({
+                      prefix,
+                      contact,
+                  }) }
               </div>
               <div class="align-right-space-between" style="margin-top: 20px">
                   <button class="gh-button text danger ${ prefix }-cancel">${ __('Cancel', 'groundhogg') }</button>
@@ -440,15 +465,18 @@
           </div>`
     }
 
-    const quickEditMounted = ({ close, setContent }) => {
+    const quickEditMounted = ({
+      close,
+      setContent,
+    }) => {
 
       let payload
 
       const clearPayload = () => {
         payload = {
-          data: {},
-          meta: {},
-          add_tags: [],
+          data       : {},
+          meta       : {},
+          add_tags   : [],
           remove_tags: [],
         }
       }
@@ -488,18 +516,24 @@
           onEdit(c)
 
           setContent(quickEdit(getContact()))
-          quickEditMounted({ close, setContent })
+          quickEditMounted({
+            close,
+            setContent,
+          })
         }).catch(e => {
 
           stop()
           clearPayload()
           setContent(quickEdit(getContact()))
-          quickEditMounted({ close, setContent })
+          quickEditMounted({
+            close,
+            setContent,
+          })
 
           console.log(e)
 
           dialog({
-            type: 'error',
+            type   : 'error',
             message: e.message,
           })
         })
@@ -513,9 +547,12 @@
 
       betterTagPicker(`#${ prefix }-tags-here`, {
         selected: getContact().tags,
-        onChange: ({ addTags, removeTags }) => {
+        onChange: ({
+          addTags,
+          removeTags,
+        }) => {
           updateContact({
-            add_tags: addTags,
+            add_tags   : addTags,
             remove_tags: removeTags,
           })
         },
@@ -539,13 +576,21 @@
           })
         })
 
-      additionalFieldsOnMount({ prefix, contact, setPayload: updateContact, getPayload: () => payload })
+      additionalFieldsOnMount({
+        prefix,
+        contact,
+        setPayload: updateContact,
+        getPayload: () => payload,
+      })
     }
 
-    const { close, setContent } = modal({
+    const {
+      close,
+      setContent,
+    } = modal({
       // dialogClasses: 'overflow-visible',
       content: quickEdit(getContact()),
-      onOpen: quickEditMounted,
+      onOpen : quickEditMounted,
     })
   }
 
@@ -564,16 +609,16 @@
                   <div class="gh-col">
                       <label for="${ prefix }-first-name">${ __('First Name', 'groundhogg') }</label>
                       ${ input({
-                          id: `${ prefix }-first-name`,
-                          name: 'first_name',
+                          id         : `${ prefix }-first-name`,
+                          name       : 'first_name',
                           placeholder: 'John',
                       }) }
                   </div>
                   <div class="gh-col">
                       <label for="${ prefix }-last-name">${ __('Last Name', 'groundhogg') }</label>
                       ${ input({
-                          id: `${ prefix }-last-name`,
-                          name: 'last_name',
+                          id         : `${ prefix }-last-name`,
+                          name       : 'last_name',
                           placeholder: 'Doe',
                       }) }
                   </div>
@@ -582,10 +627,10 @@
                   <div class="gh-col">
                       <label for="${ prefix }-email">${ __('Email Address', 'groundhogg') }</label>
                       ${ input({
-                          id: `${ prefix }-email`,
-                          name: 'email',
+                          id         : `${ prefix }-email`,
+                          name       : 'email',
                           placeholder: 'john@example.com',
-                          required: true,
+                          required   : true,
                       }) }
                   </div>
                   <div class="gh-col">
@@ -594,7 +639,7 @@
                               <label for="${ prefix }-primary-phone">${ __('Primary Phone', 'groundhogg') }</label>
                               ${ input({
                                   type: 'tel',
-                                  id: `${ prefix }-primary-phone`,
+                                  id  : `${ prefix }-primary-phone`,
                                   name: 'primary_phone',
                               }) }
                           </div>
@@ -604,7 +649,7 @@
                                       'groundhogg') }</label>
                               ${ input({
                                   type: 'number',
-                                  id: `${ prefix }-primary-phone-ext`,
+                                  id  : `${ prefix }-primary-phone-ext`,
                                   name: 'primary_phone_extension',
                               }) }
                           </div>
@@ -615,7 +660,7 @@
                   <div class="gh-col">
                       <label for="${ prefix }-email">${ __('Opt-in Status', 'groundhogg') }</label>
                       ${ select({
-                          id: `${ prefix }-optin-status`,
+                          id  : `${ prefix }-optin-status`,
                           name: 'optin_status',
                       }, Groundhogg.filters.optin_status) }
                   </div>
@@ -623,7 +668,7 @@
                       <label for="${ prefix }-mobile-phone">${ __('Mobile Phone', 'groundhogg') }</label>
                       ${ input({
                           type: 'tel',
-                          id: `${ prefix }-mobile-phone`,
+                          id  : `${ prefix }-mobile-phone`,
                           name: 'mobile_phone',
                       }) }
                   </div>
@@ -632,10 +677,10 @@
                   <div class="gh-col">
                       <label for="${ prefix }-owner">${ __('Owner', 'noun the contact owner', 'groundhogg') }</label>
                       ${ select({
-                          id: `${ prefix }-owner`,
-                          name: 'owner_id',
-                          options: Groundhogg.filters.owners.map(u => ( {
-                              text: `${u.data.display_name} &lt;${u.data.user_email}&gt;`,
+                          id      : `${ prefix }-owner`,
+                          name    : 'owner_id',
+                          options : Groundhogg.filters.owners.map(u => ( {
+                              text : `${ u.data.display_name } &lt;${ u.data.user_email }&gt;`,
                               value: u.ID,
                           } )),
                           selected: Groundhogg.user.getCurrentUser().ID,
@@ -655,9 +700,9 @@
                       <div>
                           <label
                                   for="${ prefix }-terms">${ input({
-                              id: `${ prefix }-terms`,
-                              type: 'checkbox',
-                              name: 'terms_agreement',
+                              id   : `${ prefix }-terms`,
+                              type : 'checkbox',
+                              name : 'terms_agreement',
                               value: 'yes',
                           }) }
                               ${ __('Agreed to the terms and conditions?', 'groundhogg') }</label>
@@ -665,9 +710,9 @@
                       <div>
                           <label
                                   for="${ prefix }-data-consent">${ input({
-                              id: `${ prefix }-data-consent`,
-                              type: 'checkbox',
-                              name: 'data_consent',
+                              id   : `${ prefix }-data-consent`,
+                              type : 'checkbox',
+                              name : 'data_consent',
                               value: 'yes',
                           }) }
                               ${ __('Agreed to data processing and storage? (GDPR)', 'groundhogg') }</label>
@@ -675,9 +720,9 @@
                       <div>
                           <label
                                   for="${ prefix }-marketing-consent">${ input({
-                              id: `${ prefix }-marketing-consent`,
-                              type: 'checkbox',
-                              name: 'marketing_consent',
+                              id   : `${ prefix }-marketing-consent`,
+                              type : 'checkbox',
+                              name : 'marketing_consent',
                               value: 'yes',
                           }) }
                               ${ __('Agreed to receive marketing? (GDPR)', 'groundhogg') }</label>
@@ -778,7 +823,11 @@
       },
     })
 
-    additionalFieldsOnMount({ prefix, setPayload, getPayload })
+    additionalFieldsOnMount({
+      prefix,
+      setPayload,
+      getPayload,
+    })
 
   }
 
@@ -795,7 +844,7 @@
           <div class="gh-header">
               <div class="display-flex gap-20 full-width">
                   ${ select({
-                      id: `select-form`,
+                      id  : `select-form`,
                       name: 'select_form',
                   }) }
                   <button id="cancel" class="gh-button secondary text icon"><span
@@ -809,10 +858,13 @@
     }
 
     return modal({
-      width: 500,
-      content: ui(),
+      width        : 500,
+      content      : ui(),
       dialogClasses: 'internal-form-wrap',
-      onOpen: ({ setContent, close }) => {
+      onOpen       : ({
+        setContent,
+        close,
+      }) => {
 
         const reMount = () => {
           setContent(ui())
@@ -822,26 +874,32 @@
         const onMount = () => {
           $('#cancel').on('click', () => close())
           $(`#select-form`).ghPicker({
-            endpoint: FormsStore.route,
-            width: '100%',
+            endpoint   : FormsStore.route,
+            width      : '100%',
             placeholder: __('Type to select a form...', 'groundhogg'),
-            data: [
-              { id: '', text: '' },
+            data       : [
+              {
+                id  : '',
+                text: '',
+              },
               ...FormsStore.getItems().map(f => ( {
-                id: f.ID,
-                text: f.name,
+                id      : f.ID,
+                text    : f.name,
                 selected: selectedForm && f.ID == selectedForm.ID,
               } )),
             ],
-            getParams: (q) => ( {
+            getParams  : (q) => ( {
               ...q,
-              search: q.term,
-              active: true,
+              search : q.term,
+              active : true,
               contact: contact.ID,
             } ),
-            getResults: ({ items }) => {
+            getResults : ({ items }) => {
               FormsStore.itemsFetched(items)
-              return items.map(f => ( { id: f.ID, text: f.name } ))
+              return items.map(f => ( {
+                id  : f.ID,
+                text: f.name,
+              } ))
             },
           }).on('select2:select', (e) => {
             selectedForm = FormsStore.get(e.params.data.id)
@@ -901,7 +959,7 @@
 
         dialog({
           message: r.additional_errors[0].message,
-          type: 'error',
+          type   : 'error',
         })
 
       })
@@ -914,14 +972,14 @@
       $.ajax({
         method: 'POST',
         // dataType: 'json',
-        url: ajaxurl,
-        data: data,
+        url        : ajaxurl,
+        data       : data,
         processData: false,
         contentType: false,
-        cache: false,
-        timeout: 600000,
-        enctype: 'multipart/form-data',
-        success: (r) => {
+        cache      : false,
+        timeout    : 600000,
+        enctype    : 'multipart/form-data',
+        success    : (r) => {
 
           stop()
           $btn.prop('disabled', false)
@@ -931,7 +989,7 @@
 
             dialog({
               message: r.data[0].message,
-              type: 'error',
+              type   : 'error',
             })
 
           }
@@ -948,10 +1006,10 @@
           }
 
         },
-        error: (e) => {
+        error      : (e) => {
           dialog({
             message: __('Something went wrong...', 'groundhogg'),
-            type: 'error',
+            type   : 'error',
           })
         },
       })
@@ -985,7 +1043,7 @@
                     <div class="gh-col">
                         <label for="${ prefix }-select-form">${ __('Select a form', 'groundhogg') }</label>
                         ${ select({
-                            id: `${ prefix }-select-form`,
+                            id  : `${ prefix }-select-form`,
                             name: 'select_form',
                         }) }
                     </div>
@@ -1004,8 +1062,8 @@
                   <div class="actions align-right-space-between">
                       <button
                               class="gh-button dashicon no-border icon ${ method == 'quick-add'
-                                      ? 'filled'
-                                      : '' } use-quick-add">
+                                                                          ? 'filled'
+                                                                          : '' } use-quick-add">
                           ${ icons.createContact }</span></button>
                       <button class="gh-button dashicon no-border icon ${ method == 'form' ? 'filled' : '' } use-form">
                           ${ icons.form }</span></button>
@@ -1018,11 +1076,17 @@
       `
     }
 
-    const onMount = ({ close, setContent }) => {
+    const onMount = ({
+      close,
+      setContent,
+    }) => {
 
       const reMount = () => {
         setContent(form())
-        onMount({ close, setContent })
+        onMount({
+          close,
+          setContent,
+        })
       }
 
       tooltip('.use-quick-add', {
@@ -1062,25 +1126,31 @@
       }
       else {
         $(`#${ prefix }-select-form`).ghPicker({
-          endpoint: FormsStore.route,
-          width: '100%',
+          endpoint   : FormsStore.route,
+          width      : '100%',
           placeholder: __('Type to search...', 'groundhogg'),
-          data: [
-            { id: '', text: '' },
+          data       : [
+            {
+              id  : '',
+              text: '',
+            },
             ...FormsStore.getItems().map(f => ( {
-              id: f.ID,
-              text: f.name,
+              id      : f.ID,
+              text    : f.name,
               selected: selectedForm && f.ID == selectedForm.ID,
             } )),
           ],
-          getParams: (q) => ( {
+          getParams  : (q) => ( {
             ...q,
             search: q.term,
             active: true,
           } ),
-          getResults: ({ items }) => {
+          getResults : ({ items }) => {
             FormsStore.itemsFetched(items)
-            return items.map(f => ( { id: f.ID, text: f.name } ))
+            return items.map(f => ( {
+              id  : f.ID,
+              text: f.name,
+            } ))
           },
         }).on('select2:select', (e) => {
           selectedForm = FormsStore.get(e.params.data.id)
@@ -1108,7 +1178,7 @@
     return modal({
       // dialogClasses: 'overflow-visible',
       content: form(),
-      onOpen: onMount,
+      onOpen : onMount,
     })
 
   }
@@ -1116,13 +1186,13 @@
   const emailModal = (props) => {
 
     const email = {
-      to: [],
-      from_name: '',
+      to        : [],
+      from_name : '',
       from_email: '',
-      cc: [],
-      bcc: [],
-      subject: '',
-      content: '',
+      cc        : [],
+      bcc       : [],
+      subject   : '',
+      content   : '',
       ...props,
     }
 
@@ -1168,15 +1238,15 @@
                   <div class="gh-col">
                       ${ input({
                           placeholder: __('Subject line...'),
-                          id: 'send-email-subject',
-                          value: email.subject,
+                          id         : 'send-email-subject',
+                          value      : email.subject,
                       }) }
                   </div>
               </div>
               <div class="gh-row">
                   <div class="gh-col">
                       ${ textarea({
-                          id: 'send-email-content',
+                          id   : 'send-email-content',
                           value: email.subject,
                       }) }
                   </div>
@@ -1190,12 +1260,18 @@
           </div>`
     }
 
-    const onMount = ({ close, setContent }) => {
+    const onMount = ({
+      close,
+      setContent,
+    }) => {
 
       const reMount = () => {
         wp.editor.remove('send-email-content')
         setContent(template())
-        onMount({ close, setContent })
+        onMount({
+          close,
+          setContent,
+        })
       }
 
       const selectChange = (e, name) => {
@@ -1203,34 +1279,56 @@
       }
 
       $('#recipients').ghPicker({
-        endpoint: ContactsStore.route,
-        getResults: r => r.items.map(c => ( { text: c.data.email, id: c.data.email } )),
-        getParams: q => ( { ...q, email: q.term, email_compare: 'starts_with' } ),
-        data: email.to.map(i => ( { id: i, text: i, selected: true } )),
-        tags: true,
-        multiple: true,
-        width: '100%',
+        endpoint   : ContactsStore.route,
+        getResults : r => r.items.map(c => ( {
+          text: c.data.email,
+          id  : c.data.email,
+        } )),
+        getParams  : q => ( {
+          ...q,
+          email        : q.term,
+          email_compare: 'starts_with',
+        } ),
+        data       : email.to.map(i => ( {
+          id      : i,
+          text    : i,
+          selected: true,
+        } )),
+        tags       : true,
+        multiple   : true,
+        width      : '100%',
         placeholder: __('Recipients'),
       }).on('change', e => selectChange(e, 'to'))
 
       $('#cc').ghPicker({
-        endpoint: ContactsStore.route,
-        getResults: r => r.items.map(c => ( { text: c.data.email, id: c.data.email } )),
-        getParams: q => ( { ...q, email: q.term, email_compare: 'starts_with' } ),
-        data: email.cc.map(i => ( { id: i, text: i, selected: true } )),
-        tags: true,
-        multiple: true,
-        width: '100%',
+        endpoint   : ContactsStore.route,
+        getResults : r => r.items.map(c => ( {
+          text: c.data.email,
+          id  : c.data.email,
+        } )),
+        getParams  : q => ( {
+          ...q,
+          email        : q.term,
+          email_compare: 'starts_with',
+        } ),
+        data       : email.cc.map(i => ( {
+          id      : i,
+          text    : i,
+          selected: true,
+        } )),
+        tags       : true,
+        multiple   : true,
+        width      : '100%',
         placeholder: __('Cc'),
       }).on('change', e => selectChange(e, 'cc'))
 
       $('#from').select2({
-        data: Groundhogg.filters.owners.map(u => ( {
-          id: u.ID,
-          text: `${ u.data.display_name } <${ u.data.user_email }>`,
+        data       : Groundhogg.filters.owners.map(u => ( {
+          id      : u.ID,
+          text    : `${ u.data.display_name } <${ u.data.user_email }>`,
           selected: u.data.user_email === email.from_email,
         } )),
-        width: '100%',
+        width      : '100%',
         placeholder: __('From'),
       }).on('change', e => {
 
@@ -1241,18 +1339,21 @@
       })
 
       $('#bcc').select2({
-        data: [
+        data       : [
           ...email.bcc.map(i => ( {
-            id: i,
-            text: i,
+            id      : i,
+            text    : i,
             selected: true,
           } )),
           ...Groundhogg.filters.owners.filter(u => !email.bcc.includes(u.data.user_email)).
-            map(u => ( { text: u.data.user_email, id: u.data.user_email } )),
+            map(u => ( {
+              text: u.data.user_email,
+              id: u.data.user_email,
+            } )),
         ],
-        tags: true,
-        multiple: true,
-        width: '100%',
+        tags       : true,
+        multiple   : true,
+        width      : '100%',
         placeholder: __('Bcc'),
       }).on('change', e => selectChange(e, 'bcc'))
 
@@ -1264,7 +1365,7 @@
 
       let editor = tinymceElement('send-email-content', {
         quicktags: false,
-        tinymce: {
+        tinymce  : {
           height: 300,
         },
       }, (content) => {
@@ -1304,7 +1405,7 @@
 
             dialog({
               message: r.message,
-              type: 'error',
+              type   : 'error',
             })
 
             return
@@ -1321,7 +1422,7 @@
 
           dialog({
             message: e.message,
-            type: 'error',
+            type   : 'error',
           })
         })
       })
@@ -1329,14 +1430,14 @@
     }
 
     return modal({
-      content: template(),
-      onOpen: onMount,
-      onClose: () => {
+      content         : template(),
+      onOpen          : onMount,
+      onClose         : () => {
         wp.editor.remove('send-email-content')
       },
-      overlay: false,
-      className: 'send-email',
-      dialogClasses: 'gh-panel',
+      overlay         : false,
+      className       : 'send-email',
+      dialogClasses   : 'gh-panel',
       disableScrolling: false,
     })
 
@@ -1382,13 +1483,13 @@
   }) => {
     return modal({
       // language=HTML
-      width: 600,
+      width        : 600,
       dialogClasses: 'gh-media-uploader',
-      content: `
+      content      : `
 		  ${ input({
-        type: 'file',
-        id: 'upload-file-input',
-        name: 'files' + ( multiple ? '[]' : '' ),
+        type     : 'file',
+        id       : 'upload-file-input',
+        name     : 'files' + ( multiple ? '[]' : '' ),
         className: 'hidden',
         accept,
         multiple,
@@ -1400,7 +1501,7 @@
       <div id="uploading-files"></div>
       <div id="uploaded-files"></div>
       `,
-      onOpen: ({ close }) => {
+      onOpen       : ({ close }) => {
 
         let file = null
         let filesToUpload = []
@@ -1433,16 +1534,16 @@
           setTimeout(() => {
 
             fetch(ajaxurl, {
-              method: 'POST',
+              method     : 'POST',
               credentials: 'same-origin',
-              body: fd,
+              body       : fd,
             }).then(r => {
 
               if (!r.ok) {
 
                 dialog({
                   message: __('Something when wrong...'),
-                  type: 'error',
+                  type   : 'error',
                 })
 
                 return
@@ -1454,7 +1555,7 @@
               if (!r.success) {
                 dialog({
                   message: r.data[0].message,
-                  type: 'error',
+                  type   : 'error',
                 })
 
                 pushFiles()
@@ -1529,6 +1630,8 @@
     makeEl,
     Button,
     Dashicon,
+    Input,
+    InputGroup,
   } = MakeEl
 
   const EmailPreviewModal = async (emailId, {
@@ -1564,7 +1667,7 @@
       },
     }, ({ close }) => Div({
       style: {
-        width: `${ width }px`,
+        width : `${ width }px`,
         height: `${ height }px`,
       },
     }, EmailPreview({
@@ -1593,11 +1696,11 @@
         className: 'from-preview display-flex gap-20 has-box-shadow',
       }, [
         makeEl('img', {
-          src: from_avatar,
+          src      : from_avatar,
           className: 'from-avatar',
-          height: 40,
-          width: 40,
-          style: {
+          height   : 40,
+          width    : 40,
+          style    : {
             borderRadius: '50%',
           },
         }),
@@ -1611,10 +1714,10 @@
         ]),
         close !== false ? Button({
           className: 'gh-button secondary icon text',
-          style: {
+          style    : {
             marginLeft: 'auto',
           },
-          onClick: close,
+          onClick  : close,
         }, Dashicon('no-alt')) : null,
       ]),
       Iframe({
@@ -1631,6 +1734,102 @@
     })
   })
 
+  const ImagePicker = ({
+    multiple = false,
+    title = __('Select a image to upload'),
+    selectText = __('Use this image'),
+    onChange = attachment => {},
+  }) => {
+
+    // Create the media frame.
+    let file_frame = wp.media({
+      title,
+      button: {
+        text: selectText,
+      },
+      multiple,	// Set to true to allow multiple files to be selected
+    })
+
+    // When an image is selected, run a callback.
+    file_frame.on('select', function () {
+      // We set multiple to false so only get one image from the uploader
+      let attachment = file_frame.state().get('selection').first().toJSON()
+      onChange(attachment)
+    })
+
+    file_frame.open()
+  }
+
+  const ImageInput = ({
+    id,
+    name = 'src',
+    onChange,
+    value = '',
+  }) => {
+
+    const handleChange = value => {
+      console.log( value )
+      onChange( value )
+      morphdom( document.getElementById( id ), ImageInput({
+        id,
+        name,
+        onChange,
+        value
+      }) )
+    }
+
+    return Div({
+      id,
+      className: 'image-picker'
+    }, [
+      value ? Div({
+        id: `${id}-preview`,
+        className: 'image-input-preview bg-dark-10',
+        style: {
+          backgroundImage: `url(${value})`,
+          backgroundSize: 'contain',
+          aspectRatio: '16 / 9',
+          backgroundPosition: 'center',
+          backgroundOrigin: 'content-box',
+          backgroundRepeat: 'no-repeat',
+          padding: '30px',
+        },
+        onClick: e => {
+          e.preventDefault()
+          ImagePicker({
+            multiple: false,
+            onChange: attachment => handleChange( attachment.url ),
+          })
+        }
+      }) : null,
+      InputGroup([
+        Input({
+          type     : 'text',
+          id       : `${ id }-src`,
+          value,
+          className: 'control full-width',
+          name,
+          onChange : e => {
+            handleChange(e.target.value)
+          },
+        }),
+        Button({
+            id       : `${ id }-select`,
+            className: 'gh-button secondary icon',
+            onClick  : e => {
+              e.preventDefault()
+              ImagePicker({
+                multiple: false,
+                onChange: attachment => handleChange( attachment.url ),
+              })
+            },
+          },
+          icons.image),
+      ]),
+    ])
+
+  }
+
   Groundhogg.components = {
     addContactModal,
     internalForm,
@@ -1643,6 +1842,8 @@
     fileUploader,
     EmailPreview,
     EmailPreviewModal,
+    ImageInput,
+    ImagePicker
   }
 
 } )(jQuery)

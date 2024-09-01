@@ -11,6 +11,12 @@
 .bg-dark-30 {
   background-color: rgba(16, 38, 64, 0.3);
 }
+.bg-dark-15 {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+.bg-dark-10 {
+  background-color: rgba(16, 38, 64, 0.1);
+}
 
 .overflow-hidden {
   overflow: hidden;
@@ -2527,6 +2533,19 @@ p.error,
 .gh-picker .gh-picker-options .gh-picker-option:hover {
   color: #102640;
   background: rgba(0, 117, 255, 0.07);
+}
+
+.image-picker .image-input-preview {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border: 1px solid #8c8f94;
+  border-bottom: none;
+}
+.image-picker .image-input-preview + .gh-input-group input {
+  border-top-left-radius: 0 !important;
+}
+.image-picker .image-input-preview + .gh-input-group button {
+  border-top-right-radius: 0 !important;
 }
 
 /*# sourceMappingURL=elements.css.map */

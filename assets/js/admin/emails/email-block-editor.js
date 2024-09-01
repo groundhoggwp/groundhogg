@@ -1375,25 +1375,20 @@
               className: 'gh-button secondary icon',
               onClick  : e => {
 
+                e.preventDefault()
+
                 let file_frame
 
-                e.preventDefault()
-                // If the media frame already exists, reopen it.
-                if (file_frame) {
-                  // Open frame
-                  file_frame.open()
-                  return
-                }
                 // Create the media frame.
-                file_frame = wp.media.frames.file_frame = wp.media({
+                file_frame = wp.media({
                   title   : __('Select a image to upload'),
                   button  : {
                     text: __('Use this image'),
 
                   },
-                  multiple: false,	// Set to true to allow multiple files to be selected
-
+                  multiple: false,
                 })
+
                 // When an image is selected, run a callback.
                 file_frame.on('select', function () {
                   // We set multiple to false so only get one image from the uploader
