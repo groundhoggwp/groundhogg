@@ -69,7 +69,7 @@ class Contacts_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'merge' ],
-				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
+				'permission_callback' => [ $this, 'delete_permissions_callback' ]
 			],
 		] );
 
@@ -832,6 +832,11 @@ class Contacts_Api extends Base_Object_Api {
 			: $request->get_json_params();
 
 		foreach ( $others as $other ) {
+
+			if ( ! current_user_can( 'delete_contact', $other ) ){
+				continue;
+			}
+
 			$contact->merge( $other );
 		}
 

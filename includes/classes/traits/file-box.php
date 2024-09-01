@@ -199,4 +199,38 @@ trait File_Box {
 		}
 	}
 
+	/**
+	 * Handles moving files to the new object
+	 *
+	 * @param $other Base_Object
+	 *
+	 * @return bool
+	 */
+	public function merge( $other ) {
+
+		// Dont merge with itself
+		// Dont merge with objects of a different type
+		if ( $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ) {
+			return false;
+		}
+
+		$uploads_dir = $this->get_uploads_folder();
+
+		// Might have to create the directory
+		if ( ! is_dir( $uploads_dir['path'] ) ){
+			wp_mkdir_p( $uploads_dir['path'] );
+		}
+
+		// Move any files to this object's uploads folder.
+		foreach ( $other->get_files() as $file ) {
+
+			$file_path = $file['path'];
+			$file_name = $file['name'];
+
+			rename( $file_path, $uploads_dir['path'] . '/' . $file_name );
+		}
+
+		return parent::merge( $other );
+	}
+
 }

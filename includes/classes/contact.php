@@ -1247,7 +1247,7 @@ class Contact extends Base_Object_With_Meta {
 
 		$this->update_meta( 'alternate_phones', $additional_phones );
 
-		// Update the date
+		// Update the data
 		$this->update( array_merge( array_filter( $other->data ), array_filter( $this->data ) ) );
 
 		// Update the meta

@@ -66,6 +66,7 @@ class Object_Relationships extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete', [ $this, 'object_deleted' ], 10, 4 );
+		add_action( 'groundhogg/object_merged', [ $this, 'object_merged' ], 10, 3 );
 		parent::add_additional_actions();
 	}
 
@@ -88,11 +89,11 @@ class Object_Relationships extends DB {
 	public function swap_relationships( string $which, string $type, int $old, int $new ) {
 
 		$object_id   = $which . '_object_id';
-		$object_type = $which . '_object_id';
+		$object_type = $which . '_object_type';
 
 		$relationships = $this->query( [
 			$object_id   => $old,
-			$object_type => 'contact'
+			$object_type => $type
 		] );
 
 		foreach ( $relationships as $relationship ) {
@@ -102,20 +103,22 @@ class Object_Relationships extends DB {
 	}
 
 	/**
-		$this->delete( [
-			$object_id   => $old,
-			$object_type => 'contact'
-		] );
+	 * $this->delete( [
+	 * $object_id   => $old,
+	 * $object_type => 'contact'
+	 * ] );
 	 * When an object is merged, swap the relationships for it
 	 *
-	 * @param Base_Object $from
 	 * @param Base_Object $to
+	 *
+	 * @param Base_Object $from
+	 * @param string      $type the object type
 	 *
 	 * @return void
 	 */
-	public function object_merged( Base_Object $to, Base_Object $from ){
-		$this->swap_relationships( 'primary', $from->get_object_type, $from->get_id(), $to->get_id() );
-		$this->swap_relationships( 'secondary', $from->get_object_type, $from->get_id(), $to->get_id() );
+	public function object_merged( Base_Object $to, Base_Object $from, $type ) {
+		$this->swap_relationships( 'primary', $type, $from->get_id(), $to->get_id() );
+		$this->swap_relationships( 'secondary', $type, $from->get_id(), $to->get_id() );
 	}
 
 	/**

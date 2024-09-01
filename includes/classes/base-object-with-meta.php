@@ -305,4 +305,47 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 		return $object;
 	}
+
+	/**
+	 * @param $other Base_Object_With_Meta
+	 *
+	 * @return bool
+	 */
+	public function merge( $other ) {
+
+		// Dont merge with itself
+		// Dont merge with objects of a different type
+		if ( $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ) {
+			return false;
+		}
+
+		/**
+		 * Before an object is merged
+		 *
+		 * @param Base_Object $original
+		 * @param Base_Object $other
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/pre_merge", $this, $other );
+		do_action( "groundhogg/object_pre_merge", $this, $other, $this->get_object_type() );
+
+		// Update the data
+		$this->update( array_merge( array_filter( $other->data ), array_filter( $this->data ) ) );
+
+		// Update the meta
+		$this->update_meta( array_merge( array_filter( $other->meta ), array_filter( $this->meta ) ) );
+
+		/**
+		 * When an object is merged
+		 *
+		 * @param Base_Object $original
+		 * @param Base_Object $other
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/merged", $this, $other );
+		do_action( "groundhogg/object_merged", $this, $other, $this->get_object_type() );
+
+		// Delete the other as it is no longer relevant
+		$other->delete();
+
+		return true;
+	}
 }

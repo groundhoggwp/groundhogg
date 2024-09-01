@@ -38,6 +38,7 @@ class Notes extends DB {
 		parent::add_additional_actions();
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 		add_action( "groundhogg/contact/merged", [ $this, 'objects_merged' ], 10, 2 );
+		add_action( "groundhogg/object_merged", [ $this, 'objects_merged' ], 10, 2 );
 	}
 
 	/**
@@ -49,7 +50,7 @@ class Notes extends DB {
 	 */
 	public function objects_merged( $orig, $other ) {
 		$this->update( [
-			'object_type' => $other->get_object_type,
+			'object_type' => $other->_get_object_type(),
 			'object_id'   => $other->get_id()
 		], [
 			'object_id' => $orig->get_id()

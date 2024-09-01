@@ -371,6 +371,14 @@ abstract class Base_Object_Api extends Base_Api {
 				'permission_callback' => [ $this, 'create_permissions_callback' ]
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/merge", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'merge' ],
+				'permission_callback' => [ $this, 'delete_permissions_callback' ]
+			],
+		] );
 	}
 
 	/**
@@ -741,6 +749,43 @@ abstract class Base_Object_Api extends Base_Api {
 		$this->do_object_updated_action( $object );
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
+	}
+
+	/**
+	 * Merge one or more objects
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
+	public function merge( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( "") )
+
+		$others = $request->has_param( 'others' )
+			? wp_parse_list( $request->get_param( 'others' ) )
+			: $request->get_json_params();
+
+		foreach ( $others as $other ) {
+
+			$other = $this->create_new_object( $other );
+
+			// unable to delete this one
+			if ( ! current_user_can( "delete_{$this->get_object_type()}", $object ) ) {
+				continue;
+			}
+
+			$object->merge( $other );
+		}
+
+		return $object;
 	}
 
 	/**

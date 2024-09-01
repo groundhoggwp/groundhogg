@@ -492,6 +492,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		 * @param Base_Object $other
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/pre_merge", $this, $other );
+		do_action( "groundhogg/object_pre_merge", $this, $other, $this->get_object_type() );
 
 		// Update the date
 		$this->update( array_merge( array_filter( $this->data ), array_filter( $other->data ) ) );
@@ -503,6 +504,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		 * @param Base_Object $other
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/merged", $this, $other );
+		do_action( "groundhogg/object_merged", $this, $other, $this->get_object_type() );
 
 		// Delete the other as it is no longer relevant
 		$other->delete();
