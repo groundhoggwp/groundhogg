@@ -2311,7 +2311,8 @@ p.error,
   border-color: #0075ff;
   background: rgba(0, 117, 255, 0.2);
 }
-.gh-media-uploader #uploading-files {
+.gh-media-uploader #uploaded-files:not(:empty),
+.gh-media-uploader #uploading-files:not(:empty) {
   margin-top: 10px;
 }
 
@@ -2540,6 +2541,20 @@ p.error,
   border-top-left-radius: 5px;
   border: 1px solid #8c8f94;
   border-bottom: none;
+  background-color: rgba(16, 38, 64, 0.1);
+  cursor: pointer;
+  transition: 0.4s;
+  background-size: contain;
+  aspect-ratio: 16/9;
+  background-position: center center;
+  background-origin: content-box;
+  background-repeat: no-repeat;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.image-picker .image-input-preview:hover {
+  background-color: rgba(16, 38, 64, 0.05);
+  padding: 24px;
 }
 .image-picker .image-input-preview + .gh-input-group input {
   border-top-left-radius: 0 !important;

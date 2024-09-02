@@ -2510,7 +2510,8 @@ p.error,
     }
   }
 
-  #uploading-files {
+  #uploaded-files:not(:empty),
+  #uploading-files:not(:empty) {
     margin-top: 10px;
   }
 }
@@ -2788,6 +2789,22 @@ p.error,
     border-top-left-radius: 5px;
     border: 1px solid #8c8f94;
     border-bottom: none;
+    background-color: $primary-dark-10;
+    cursor: pointer;
+    transition: 0.4s;
+
+    background-size: contain;
+    aspect-ratio: 16 / 9;
+    background-position: center center;
+    background-origin: content-box;
+    background-repeat: no-repeat;
+    padding: 30px;
+    box-sizing: border-box;
+
+    &:hover {
+      background-color: $primary-dark-5;
+      padding: 24px;
+    }
   }
 
   .image-input-preview + .gh-input-group {
