@@ -4300,13 +4300,14 @@ function maybe_print_menu_styles() {
         .unread-notices::after {
             content: '<?php echo $unread ?>' !important;
         }
-
         <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
             display: flex;
             align-items: center;
             cursor: pointer;
+            /*padding: 3px;*/
+            /*box-sizing: border-box;*/
         }
 
         #adminmenu #toplevel_page_groundhogg a.gh_go_pro .dashicons {
