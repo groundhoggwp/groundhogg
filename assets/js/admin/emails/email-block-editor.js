@@ -76,6 +76,8 @@
     jsonCopy,
   } = Groundhogg.functions
 
+  const { ImageInput, ImagePicker } = Groundhogg.components
+
   improveTinyMCE({})
 
   let fontWeights = [
@@ -1354,68 +1356,36 @@
 
     return Fragment([
       Control({
-          label  : 'Image SRC',
+          label  : 'Image',
           stacked: true,
         },
-        InputGroup([
-          Input({
-            type     : 'text',
-            id       : `${ id }-src`,
-            value    : src,
-            className: 'control full-width',
-            name     : 'src',
-            onChange : e => {
+        ImageInput({
+          value   : src ?? '',
+          id,
+          onChange: ( src, attachment = null ) => {
+            if ( attachment ){
+
+              let {
+                width,
+              } = attachment
+
+              if (maxWidth) {
+                width = Math.min(maxWidth, width)
+              }
+
               onChange({
-                src: e.target.value,
+                src  : attachment.url,
+                alt  : attachment.alt, // title: attachment.title,
+                width,
               })
-            },
-          }),
-          Button({
-              id       : `${ id }-select`,
-              className: 'gh-button secondary icon',
-              onClick  : e => {
-
-                e.preventDefault()
-
-                let file_frame
-
-                // Create the media frame.
-                file_frame = wp.media({
-                  title   : __('Select a image to upload'),
-                  button  : {
-                    text: __('Use this image'),
-
-                  },
-                  multiple: false,
-                })
-
-                // When an image is selected, run a callback.
-                file_frame.on('select', function () {
-                  // We set multiple to false so only get one image from the uploader
-                  let attachment = file_frame.state().get('selection').first().toJSON()
-
-                  let {
-                    height,
-                    width,
-                  } = attachment
-
-                  if (maxWidth) {
-                    width = Math.min(maxWidth, width)
-                  }
-
-                  onChange({
-                    src  : attachment.url,
-                    alt  : attachment.alt, // title: attachment.title,
-                    width: width,
-                  })
-                })
-                // Finally, open the modal
-                file_frame.open()
-              },
-            },
-            icons.image),
-
-        ])),
+            } else {
+              onChange({
+                src  : attachment.url,
+              })
+            }
+          },
+        })
+      ),
       supports.width ? Control({
           label: 'Width',
         },
@@ -4505,6 +4475,7 @@
                   onOpen: ({ modal }) => {
                     modal.querySelector('.gh-modal-dialog').style.width = '500px'
                   },
+                  width: '500px'
                 },
                 ({
                   close,

@@ -1767,9 +1767,8 @@
     value = '',
   }) => {
 
-    const handleChange = value => {
-      console.log( value )
-      onChange( value )
+    const handleChange = ( value, attachment ) => {
+      onChange( value, attachment )
       morphdom( document.getElementById( id ), ImageInput({
         id,
         name,
@@ -1784,21 +1783,15 @@
     }, [
       value ? Div({
         id: `${id}-preview`,
-        className: 'image-input-preview bg-dark-10',
+        className: 'image-input-preview',
         style: {
           backgroundImage: `url(${value})`,
-          backgroundSize: 'contain',
-          aspectRatio: '16 / 9',
-          backgroundPosition: 'center',
-          backgroundOrigin: 'content-box',
-          backgroundRepeat: 'no-repeat',
-          padding: '30px',
         },
         onClick: e => {
           e.preventDefault()
           ImagePicker({
             multiple: false,
-            onChange: attachment => handleChange( attachment.url ),
+            onChange: attachment => handleChange( attachment.url, attachment ),
           })
         }
       }) : null,
@@ -1820,7 +1813,7 @@
               e.preventDefault()
               ImagePicker({
                 multiple: false,
-                onChange: attachment => handleChange( attachment.url ),
+                onChange: attachment => handleChange( attachment.url, attachment ),
               })
             },
           },

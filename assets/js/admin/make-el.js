@@ -1311,7 +1311,10 @@
         morphdom(document.getElementById(id), render())
         onChange(option.id)
       },
-    }, option.text)
+    }, [
+      option.text,
+      option.tooltip ? ToolTip( option.tooltip ) : null
+    ])
 
     return render()
   }
