@@ -351,7 +351,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_full_name() {
-		return sprintf( '%s %s', $this->get_first_name(), $this->get_last_name() );
+		return trim( sprintf( '%s %s', $this->get_first_name(), $this->get_last_name() ) );
 	}
 
 	/**
