@@ -479,6 +479,7 @@
         date_range === 'x_days' || date_range === 'next_x_days' ? Input({
           type: 'number',
           value: days,
+          name: 'days',
           id: 'filter-days',
           onChange: e => updateFilter({
             days: parseInt(e.target.value),
