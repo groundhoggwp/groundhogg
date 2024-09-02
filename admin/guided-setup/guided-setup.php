@@ -13,6 +13,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_user_timezone;
+use function Groundhogg\groundhogg_icon;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
@@ -67,7 +68,7 @@ class Guided_Setup extends Admin_Page {
 
 		?>
         <div id="guided-setup-nag" class="notice notice-success display-flex gap-10 is-dismissible">
-            <?php groundhogg_logo( 25 ) ?>
+            <?php groundhogg_icon( 25 ) ?>
             <p>
 				<?php printf( __('Ready to get started with Groundhogg? Start the <a href="%s">guided setup</a> now!', 'groundhogg' ), admin_page_url( 'gh_guided_setup' ) ) ?>
             </p>

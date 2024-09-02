@@ -213,7 +213,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	}
 
 	public function get_priority() {
-		return 99;
+		return 105;
 	}
 
 	protected function get_title_actions() {

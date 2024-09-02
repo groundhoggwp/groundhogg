@@ -92,7 +92,7 @@ class Settings_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 99;
+		return 110;
 	}
 
 	protected function get_title_actions() {

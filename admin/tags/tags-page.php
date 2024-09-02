@@ -2,8 +2,7 @@
 
 namespace Groundhogg\Admin\Tags;
 
-use Groundhogg\Admin\Tabbed_Admin_Page;
-use Groundhogg\Campaign;
+use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\Tag;
 use function Groundhogg\action_input;
@@ -27,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Admin
  */
-class Tags_Page extends Tabbed_Admin_Page {
+class Tags_Page extends Admin_Page {
 	// UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
 	}
@@ -52,11 +51,11 @@ class Tags_Page extends Tabbed_Admin_Page {
 	}
 
 	public function get_item_type() {
-		return $this->get_current_tab() === 'campaigns' ? 'campaign' : 'tag';
+		return 'tag';
 	}
 
 	public function get_priority() {
-		return 10;
+		return 15;
 	}
 
 	/**

@@ -165,7 +165,7 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 30;
+		return 50;
 	}
 
 	/**

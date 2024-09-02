@@ -4,6 +4,7 @@ namespace Groundhogg\Admin;
 
 use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
 use Groundhogg\Admin\Bulk_Jobs\Bulk_Job_Page;
+use Groundhogg\Admin\Campaigns\Campaigns_Page;
 use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Admin\Emails\Emails_Page;
@@ -120,9 +121,9 @@ class Admin_Menu {
 		$this->tags     = new Tags_Page();
 
 		$this->emails = new Emails_Page();
-
 		$this->broadcasts = new Broadcasts_Page();
 		$this->funnels    = new Funnels_Page();
+		$this->campaigns = new Campaigns_Page();
 
 		$this->events    = new Events_Page();
 		$this->tools     = new Tools_Page();

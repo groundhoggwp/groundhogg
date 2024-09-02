@@ -86,7 +86,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 15;
+		return 60;
 	}
 
 	public function scripts() {

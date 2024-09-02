@@ -108,7 +108,7 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 5;
+		return 10;
 	}
 
 	/**

@@ -77,7 +77,7 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 25;
+		return 55;
 	}
 
 	public function get_slug() {
