@@ -134,6 +134,11 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'        => 'first_initial',
+				'callback'    => [ $this, 'replacement_first_initial' ],
+				'description' => _x( 'The first letter of the contact\'s first name.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'last',
 				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_last_name' ],
@@ -144,6 +149,11 @@ class Replacements implements \JsonSerializable {
 				'code'        => 'last_name',
 				'callback'    => [ $this, 'replacement_last_name' ],
 				'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'last_initial',
+				'callback'    => [ $this, 'replacement_last_initial' ],
+				'description' => _x( 'The first letter of the contact\'s last name.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'full_name',
@@ -1142,6 +1152,20 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+     * The contacts first initial
+     *
+	 * @return false|string
+	 */
+	function replacement_first_initial() {
+		$name = $this->get_current_contact()->get_first_name();
+		if ( empty( $name ) ) {
+			return '';
+		}
+
+		return substr( $name, 0, 1 );
+	}
+
+	/**
 	 * Return back the last name ot the contact.
 	 *
 	 * @param $contact_id int the contact_id
@@ -1150,6 +1174,20 @@ class Replacements implements \JsonSerializable {
 	 */
 	function replacement_last_name( $contact_id ) {
 		return $this->get_current_contact()->get_last_name();
+	}
+
+	/**
+	 * The contacts last initial
+	 *
+	 * @return false|string
+	 */
+	function replacement_last_initial() {
+		$name = $this->get_current_contact()->get_last_name();
+		if ( empty( $name ) ) {
+			return '';
+		}
+
+		return substr( $name, 0, 1 );
 	}
 
 	/**
