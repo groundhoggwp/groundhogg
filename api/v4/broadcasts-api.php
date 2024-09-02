@@ -74,11 +74,17 @@ class Broadcasts_Api extends Base_Object_Api {
 		$date = new \DateTime( $time_string, wp_timezone() );
 
 		/* convert to UTC */
+		$segment_type = $request->get_param( 'segment_type' ) ?: 'fixed' ;
 
 		if ( $request->get_param( 'send_now' ) ) {
 			$meta['send_now'] = true;
 			$date->setTimestamp( time() + 10 );
+
+			// when using Send Now the segment type is fixed anyway
+			$segment_type = 'fixed';
 		}
+
+		$meta['segment_type'] = $segment_type;
 
 		if ( $date->getTimestamp() < time() ) {
 			return self::ERROR_401( 'invalid_date', __( 'Please select a time in the future', 'groundhogg' ) );
@@ -130,16 +136,20 @@ class Broadcasts_Api extends Base_Object_Api {
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
 
-		// Sets up the initial state for the scheduler
-		$items_scheduled = $broadcast->enqueue_batch();
+		// We can jumpstart the process if the segment is fixed
+		if ( $segment_type === 'fixed' ){
 
-		// Something is wrong scheduling the broadcast
-		if ( ! $items_scheduled ){
+			// Sets up the initial state for the scheduler
+			$items_scheduled = $broadcast->enqueue_batch();
 
-			$broadcast->cancel();
-			$broadcast->delete();
+			// Something is wrong scheduling the broadcast
+			if ( ! $items_scheduled ){
 
-			return self::ERROR_500();
+				$broadcast->cancel();
+				$broadcast->delete();
+
+				return self::ERROR_500();
+			}
 		}
 
 		// If the broadcast is still pending, create a background task

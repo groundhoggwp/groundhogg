@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Background\Schedule_Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Broadcast_Meta;
@@ -244,7 +245,11 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
+		if ( $this->get_meta( 'segment_type' ) === 'dynamic' ){
+			$added = Background_Tasks::add( new Schedule_Broadcast( $this->get_id() ), $this->get_send_time() );
+		} else {
+			$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
+		}
 
 		if ( is_wp_error( $added ) ) {
 			return $added;
