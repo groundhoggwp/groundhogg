@@ -1,12 +1,11 @@
 <?php
-namespace Groundhogg\Admin\Tags;
+namespace Groundhogg\Admin\Campaigns;
 
 
 use Groundhogg\Campaign;
 use function Groundhogg\action_input;
 use function Groundhogg\action_url;
 use function Groundhogg\get_request_var;
-use Groundhogg\Plugin;
 use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {

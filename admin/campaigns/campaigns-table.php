@@ -1,12 +1,17 @@
 <?php
 
-namespace Groundhogg\Admin\Tags;
+namespace Groundhogg\Admin\Campaigns;
 
 use Groundhogg\Admin\Table;
 use Groundhogg\Campaign;
+use Groundhogg\DB\Query\Table_Query;
 use WP_List_Table;
 use function Groundhogg\action_url;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_encode;
+use function Groundhogg\base64url_encode;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\managed_page_url;
 
@@ -58,7 +63,7 @@ class Campaigns_Table extends Table {
 			'name'        => _x( 'Name', 'Column label', 'groundhogg' ),
 			'description' => _x( 'Description', 'Column label', 'groundhogg' ),
 			'visibility'  => _x( 'Visibility', 'Column label', 'groundhogg' ),
-//			'contacts' => _x( 'Count', 'Column label', 'groundhogg' ),
+			'assets'      => _x( 'Assets', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg/admin/campaigns/table/get_columns', $columns );
@@ -69,9 +74,9 @@ class Campaigns_Table extends Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'name' => array( 'name', false ),
+			'name'   => array( 'name', false ),
 //			'tag_description' => array( 'tag_description', false ),
-//			'contacts' => array( 'contacts', false ),
+			'assets' => array( 'asset_count', false ),
 		);
 
 		return apply_filters( 'groundhogg/admin/campaigns/table/sortable_columns', $sortable_columns );
