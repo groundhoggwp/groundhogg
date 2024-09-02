@@ -158,7 +158,7 @@
                 }) => MakeEl.Div({
                   id: 'send-email-dialog',
                 }, [
-                  `<h3>${ sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name) }</h3>`,
+                  `<h3>${ sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name.trim() || getContact().data.email ) }</h3>`,
                   MakeEl.ItemPicker({
                     id          : `select-email`,
                     noneSelected: __('Select an email to send...', 'groundhogg'),
