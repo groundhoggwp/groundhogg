@@ -19,6 +19,7 @@ use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_url_var;
 use function Groundhogg\has_premium_features;
@@ -48,6 +49,38 @@ class Admin_Menu {
 		add_action( 'init', [ $this, 'init_admin' ] );
 		add_action( 'admin_bar_menu', [ $this, 'admin_bar' ], 999 );
 		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
+		add_filter( 'groundhogg/admin/menu_priority', [ $this, 'force_priority' ], 10, 2 );
+	}
+
+	/**
+	 * We re-organized the menu, so we'll hack the priority so that everything
+	 * is in the right place without having to update all of the addons
+	 *
+	 * @param            $priority
+	 * @param Admin_Page $page
+	 *
+	 * @return bool|mixed
+	 */
+	function force_priority( $priority, Admin_Page $page ) {
+
+		$slug = $page->get_slug();
+
+		// Known slugs in addons that need to be moved
+		$preset_order = [
+			'gh_appointments' => 25,
+			'gh_pipeline'     => 35,
+			'gh_ls_rules'     => 40,
+			'gh_payments'     => 45,
+			'gh_rsp'          => 45,
+			'gh_sms'          => 65,
+			'gh_superlinks'   => 75,
+			'gh_calendars'    => 80,
+			'gh_replacements' => 120,
+			'gh_aws'          => 125,
+			'gh_extensions'   => 150,
+		];
+
+		return get_array_var( $preset_order, $slug, $priority );
 	}
 
 	public function admin_body_class( $class ) {
@@ -120,10 +153,10 @@ class Admin_Menu {
 		$this->contacts = new Contacts_Page();
 		$this->tags     = new Tags_Page();
 
-		$this->emails = new Emails_Page();
+		$this->emails     = new Emails_Page();
 		$this->broadcasts = new Broadcasts_Page();
 		$this->funnels    = new Funnels_Page();
-		$this->campaigns = new Campaigns_Page();
+		$this->campaigns  = new Campaigns_Page();
 
 		$this->events    = new Events_Page();
 		$this->tools     = new Tools_Page();

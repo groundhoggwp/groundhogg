@@ -42,7 +42,10 @@ abstract class Admin_Page extends Supports_Errors {
 	 * Page constructor.
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', [ $this, 'register' ], $this->get_priority() );
+
+        $priority = apply_filters( 'groundhogg/admin/menu_priority', $this->get_priority(), $this );
+
+        add_action( 'admin_menu', [ $this, 'register' ], $priority );
 
 		if ( wp_doing_ajax() ) {
 			$this->add_ajax_actions();
