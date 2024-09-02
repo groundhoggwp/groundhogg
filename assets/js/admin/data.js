@@ -922,6 +922,11 @@
   }
 
   const createState = (initialState = {}) => new Proxy({
+
+    initial: {
+      ...initialState
+    },
+
     state: {
       ...initialState,
     },
@@ -943,6 +948,15 @@
      */
     clear () {
       this.state = {}
+    },
+
+    /**
+     * Reset the State to it's initial
+     */
+    reset() {
+      this.set({
+        ...this.initial
+      })
     },
 
     /**
