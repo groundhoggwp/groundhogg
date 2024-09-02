@@ -1596,6 +1596,7 @@
         date_range = 'any',
         before,
         after,
+        ...rest
       }) {
 
         let prepend
@@ -1628,6 +1629,7 @@
           date_range,
           before,
           after,
+          ...rest
         })
       },
       edit ({
@@ -1636,6 +1638,7 @@
         date_range,
         before,
         after,
+        ...rest
       }) {
 
         return `
@@ -1658,6 +1661,7 @@
           date_range,
           before,
           after,
+          ...rest
         }) }`
       },
       onMount (filter, updateFilter) {
