@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.5.2
+Stable tag: 3.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,12 +349,17 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.5.2 (2024-08-30) =
-This release does not have any visible changes, but mostly contains improvements for the use of addons and premium features.
-* OPTIMIZED Refactored a lot of code for better usability.
+= 3.6 (2024-09-02) =
+* ADDED Dynamic/Fixed segment choice when scheduling broadcasts.
+* ADDED Asset count and links to related assets in the campaigns table.
 * ADDED New JS components for use in addons.
 * ADDED New PHP API methods for use in addons.
 * ADDED New PHP helper classes for use in addons.
+* IMPROVED Refactored a lot of code for better usability.
+* IMPROVED Better & reusable image picker for the image block.
+* IMPROVED Re-organized the menu to group CRM and Marketing Automation features separately.
+* TWEAKED Seperated Tags from Campaigns into separate screens.
+* FIXED Fatal error in broadcast archives.
 
 = 3.5.1.1 (2024-08-23) =
 * ADDED Contact Sub Query filter to the log filters to make it easier to find and modify events for contact segments.
