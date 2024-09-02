@@ -738,6 +738,22 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		}, $relationships );
 	}
 
+	public function count_parents( $type ) {
+		return $this->get_rel_db()->count( [
+			'primary_object_type'   => $type,
+			'secondary_object_type' => $this->get_object_type(),
+			'secondary_object_id'   => $this->get_id()
+		] );
+	}
+
+	public function count_children( $type ) {
+		return $this->get_rel_db()->count( [
+			'secondary_object_type' => $type,
+			'primary_object_type'   => $this->get_object_type(),
+			'primary_object_id'     => $this->get_id()
+		] );
+	}
+
 	/**
 	 * @param      $other
 	 * @param bool $is_parent

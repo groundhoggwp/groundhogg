@@ -108,6 +108,46 @@ class Campaigns_Table extends Table {
 	}
 
 	/**
+	 * @param $campaign Campaign
+	 *
+	 * @return string
+	 */
+	protected function column_assets( $campaign ) {
+
+		$funnels    = $campaign->count_parents( 'funnel' );
+		$broadcasts = $campaign->count_parents( 'broadcast' );
+		$emails     = $campaign->count_parents( 'email' );
+
+		return html()->e( 'div', [
+			'class' => 'display-flex column'
+		], [
+			html()->e( 'a', [
+				'href' => admin_page_url( 'gh_funnels', [
+					'include_filters' => base64_json_encode( [ [ [ 'type' => 'campaigns', 'campaigns' => [ $campaign->ID ] ] ] ] )
+				] )
+			], sprintf( '%s funnels', number_format_i18n( $funnels ) ) ),
+			html()->e( 'a', [
+				'href' => admin_page_url( 'gh_broadcasts', [
+					'include_filters' => base64_json_encode( [
+						[
+							[
+								'type'      => 'campaigns',
+								'campaigns' => [ $campaign->ID ]
+							]
+						]
+					] )
+				] )
+			], sprintf( '%s broadcasts', number_format_i18n( $broadcasts ) ) ),
+			html()->e( 'a', [
+				'href' => admin_page_url( 'gh_emails', [
+					'include_filters' => base64_json_encode( [ [ [ 'type' => 'campaigns', 'campaigns' => [ $campaign->ID ] ] ] ] )
+				] )
+			], sprintf( '%s emails', number_format_i18n( $emails ) ) ),
+		] );
+
+	}
+
+	/**
 	 * Get default column value.
 	 *
 	 * @param object $tag         A singular item (one full row's worth of data).
@@ -161,6 +201,25 @@ class Campaigns_Table extends Table {
 				'url'     => action_url( 'delete', [ 'campaign' => $item->get_id() ] )
 			]
 		];
+	}
+
+	public function prepare_items() {
+
+		add_action( 'groundhogg/campaign/pre_get_results', function ( Table_Query $query ) {
+
+			if ( get_request_var( 'orderby' ) !== 'asset_count' ) {
+				return;
+			}
+
+			$relQuery = new Table_Query( 'object_relationships' );
+			$relQuery->setSelect( 'secondary_object_id', [ 'COUNT(primary_object_id)', 'asset_count' ] )
+			         ->setGroupby( 'secondary_object_id' )->where( 'secondary_object_type', 'campaign' );
+
+			$query->addJoin( 'LEFT', [ $relQuery, 'relationships' ] )->onColumn( 'secondary_object_id', 'ID' );
+			$query->setOrderby( 'relationships.asset_count' );
+		} );
+
+		parent::prepare_items();
 	}
 
 	protected function get_views_setup() {
