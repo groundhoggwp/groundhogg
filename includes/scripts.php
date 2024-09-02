@@ -388,6 +388,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-email-block-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/emails/email-block-editor' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-element',
+			'groundhogg-admin-components',
 			'groundhogg-make-el',
 			'jquery-ui-sortable',
 			'jquery-ui-draggable',
