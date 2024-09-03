@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GROUNDHOGG_VERSION', '3.6' );
+define( 'GROUNDHOGG_VERSION', '3.6.0.1' );
 define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '3.5.1.1' );
 
 define( 'GROUNDHOGG__FILE__', __FILE__ );
