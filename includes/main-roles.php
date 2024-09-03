@@ -197,7 +197,8 @@ class Main_Roles extends Roles {
 					break;
 				}
 
-				if ( is_super_admin( $user_id ) ){
+				if ( is_super_admin( $user_id ) ) {
+					$caps = [ 'download_files' ];
 					break;
 				}
 

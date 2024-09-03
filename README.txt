@@ -349,6 +349,9 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.6.0.1 (2024-09-03) =
+* FIXED Super admins unable to download files.
+
 = 3.6 (2024-09-02) =
 * ADDED Dynamic/Fixed segment choice when scheduling broadcasts.
 * ADDED Asset count and links to related assets in the campaigns table.
