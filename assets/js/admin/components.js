@@ -1629,8 +1629,14 @@
     Iframe,
     makeEl,
     Button,
+    Modal,
     Dashicon,
     Input,
+    Label,
+    Fragment,
+    Pg,
+    Form,
+    Textarea,
     InputGroup,
   } = MakeEl
 
@@ -1820,8 +1826,91 @@
           icons.image),
       ]),
     ])
+  }
+
+  const FeedbackModal = ({
+    subject = '',
+    message = '',
+    onSubmit = r => {}
+  }) => {
+
+    const State = Groundhogg.createState({
+      subject,
+      message,
+      submitting: false,
+    })
+
+    Modal({
+      width: '400px'
+    }, ({close, morph}) => Form({
+      className: 'display-flex column gap-5',
+      onSubmit: e => {
+        e.preventDefault()
+
+        State.set({
+          submitting: true,
+        })
+
+        morph()
+
+        Groundhogg.api.ajax({
+          action: 'gh_plugin_feedback',
+          subject: State.subject,
+          message: State.message
+        }).then( r => {
+          onSubmit( r )
+          dialog({
+            message: 'Thanks for your feedback!'
+          })
+          close()
+        })
+
+        return false
+      }
+    },[
+
+      Label({
+        for: 'feedback-subject',
+      }, ['What feature are you submitting feedback for?'] ),
+      Input({
+        id: 'feedback-subject',
+        value: State.subject,
+        required: true,
+        onInput: e => State.set({
+          subject: e.target.value
+        })
+      }),
+      Div(),
+      Label({
+        for: 'feedback-message'
+      }, ['What is your feedback? Be as descriptive as possible.'] ),
+      Textarea({
+        id: 'feedback-message',
+        value: State.message,
+        required: true,
+        rows: 4,
+        onInput: e => State.set({
+          message: e.target.value
+        })
+      }),
+      Button({
+        className: 'gh-button primary',
+        type: 'submit',
+        disabled: State.submitting
+      }, 'Send feedback'),
+      Pg({}, 'Your email address will be collected to validate your feedback, but will not be used beyond that.' ),
+    ]))
 
   }
+
+  $(document).on('click', 'a.feedback-modal', e => {
+    e.preventDefault()
+    const { subject = '', message = '' } = e.currentTarget.dataset
+    FeedbackModal({
+      subject,
+      message
+    })
+  } )
 
   Groundhogg.components = {
     addContactModal,
@@ -1836,7 +1925,8 @@
     EmailPreview,
     EmailPreviewModal,
     ImageInput,
-    ImagePicker
+    ImagePicker,
+    FeedbackModal
   }
 
 } )(jQuery)

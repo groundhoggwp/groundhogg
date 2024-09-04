@@ -902,7 +902,7 @@ function format_number_with_percentage( $num, $compare ) {
 		return '-';
 	}
 
-	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ), );
+	return sprintf( '%s%% (%s)', _nf( percentage( $compare, $num ) ), _nf( $num ) );
 }
 
 function sort_by_string_in_array( $key ) {
@@ -4300,6 +4300,7 @@ function maybe_print_menu_styles() {
         .unread-notices::after {
             content: '<?php echo $unread ?>' !important;
         }
+
         <?php endif; ?>
 
         #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
@@ -6538,7 +6539,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 
 	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
 
-    do_action( 'groundhogg/enqueue_email_block_editor_assets' );
+	do_action( 'groundhogg/enqueue_email_block_editor_assets' );
 }
 
 /**
@@ -8308,4 +8309,32 @@ function filter_by_cap( $users, $cap ) {
 
 		return true;
 	} );
+}
+
+add_action( 'wp_ajax_gh_plugin_feedback', __NAMESPACE__ . '\ajax_send_plugin_feedback' );
+
+/**
+ * Send feedback to the Groundhogg API
+ *
+ * @return void
+ */
+function ajax_send_plugin_feedback() {
+
+	if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'view_contacts' ) ) {
+		return;
+	}
+
+	$user   = wp_get_current_user();
+	$result = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/2232-listen-for-product-feedback?token=j5qxFis', [
+		'subject' => sanitize_text_field( get_post_var( 'subject' ) ),
+		'message' => sanitize_textarea_field( get_post_var( 'message' ) ),
+		'email'   => $user->user_email,
+		'name'    => $user->display_name
+	] );
+
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( $result );
+	}
+
+	wp_send_json_success();
 }
