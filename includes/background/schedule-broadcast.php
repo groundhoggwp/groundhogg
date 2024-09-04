@@ -59,6 +59,10 @@ class Schedule_Broadcast extends Task {
 		return $this->broadcast->get_percent_scheduled();
 	}
 
+	public function get_batches_remaining() {
+		return floor( $this->broadcast->get_items_remaining() / Broadcast::BATCH_LIMIT );
+	}
+
 	public function __unserialize( array $data ): void {
 		parent::__unserialize( $data );
 

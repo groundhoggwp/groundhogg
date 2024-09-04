@@ -55,6 +55,10 @@ class Import_Contacts extends Task {
 		return percentage( $this->get_rows(), $this->batch * self::BATCH_LIMIT );
 	}
 
+	public function get_batches_remaining() {
+		return floor( $this->get_rows() / self::BATCH_LIMIT ) - $this->batch;
+	}
+
 	/**
 	 * Title of the task
 	 *

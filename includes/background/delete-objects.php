@@ -28,6 +28,10 @@ class Delete_Objects extends Task {
 		$this->items = $query->count();
 	}
 
+	public function get_batches_remaining() {
+		return floor( $this->count_remaining() / self::BATCH_LIMIT ) ;
+	}
+
 	/**
 	 * Delete the contacts
 	 *
@@ -37,6 +41,12 @@ class Delete_Objects extends Task {
 		return sprintf( 'Delete %s items from %s', bold_it( _nf( $this->items ) ), $this->table );
 	}
 
+	public function count_remaining() {
+		$query = new Table_Query( $this->table );
+		$query->set_query_params( $this->query );
+		return $query->count();
+	}
+
 	/**
 	 * @throws \Groundhogg\DB\Query\FilterException
 	 * @return float|int
@@ -44,9 +54,8 @@ class Delete_Objects extends Task {
 	public function get_progress() {
 		$query = new Table_Query( $this->table );
 		$query->set_query_params( $this->query );
-		$left  = $query->count();
 
-		return percentage( $this->items, $this->items - $left );
+		return percentage( $this->items, $this->items - $this->count_remaining() );
 	}
 
 	/**

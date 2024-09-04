@@ -43,6 +43,10 @@ class Complete_Benchmark extends Task {
 		return percentage( $this->contacts, $this->batch * self::BATCH_LIMIT );
 	}
 
+	public function get_batches_remaining() {
+		return floor( $this->contacts / self::BATCH_LIMIT ) - $this->batch;
+	}
+
 	public function can_run() {
 		return $this->step->is_active();
 	}

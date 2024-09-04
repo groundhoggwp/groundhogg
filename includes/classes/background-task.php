@@ -14,6 +14,10 @@ class Background_Task extends Base_Object {
 	 */
 	protected $task;
 
+	public function get_progress() {
+		return $this->task->get_progress();
+	}
+
 	protected function post_setup() {
 		$this->task    = maybe_unserialize( $this->task );
 		$this->time    = absint( $this->time );
@@ -47,13 +51,22 @@ class Background_Task extends Base_Object {
 	/**
 	 * Process the task
 	 *
+	 * @throws \Exception
 	 * @return bool
 	 */
 	public function process() {
 
+		// If the status is already in progress then this does nothing
+		$this->update( [ 'status' => 'in_progress' ] );
+
+		// This task was not claimed
+		if ( ! $this->claim ){
+			$this->update( [ 'claim' => 'manual' ] );
+		}
+
 		// Can the task be run
 		if ( ! $this->task->can_run() ) {
-			return false;
+			throw new \Exception( 'Task can\'t run.' );
 		}
 
 		Limits::start();
@@ -75,6 +88,11 @@ class Background_Task extends Base_Object {
 
 		if ( $complete === true ) {
 			$data['status'] = 'done';
+		}
+
+		// remove the manual claim
+		if ( $this->claim === 'manual' ){
+			$data['claim'] = '';
 		}
 
 		// Update the table with the new task details
@@ -109,7 +127,7 @@ class Background_Task extends Base_Object {
 		] );
 	}
 
-	public function is_done(){
+	public function is_done() {
 		return $this->status === 'done';
 	}
 

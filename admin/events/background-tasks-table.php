@@ -112,7 +112,7 @@ class Background_Tasks_Table extends Table {
 		}
 
 		if ( $this->get_view() === 'done' ) {
-			unset( $columns[ 'cb' ] );
+			unset( $columns['cb'] );
 		}
 
 
@@ -190,14 +190,18 @@ class Background_Tasks_Table extends Table {
 	protected function column_starts( $task ) {
 		$date = new DateTimeHelper( $task->time );
 
-        if ( $date->isPast() ){
-            $diff = __( 'Now!', 'groundhogg' );
-        } else {
-	        $diff = human_time_diff( time(), $task->time );
-        }
+		if ( $date->isPast() ) {
+			$diff = __( 'Now!', 'groundhogg' );
+		} else {
+			$diff = human_time_diff( time(), $task->time );
+		}
 
-		return "<abbr title='{$date->ymdhis()}'>{$diff}</abbr>";
-	}
+		return html()->e( 'span', [
+			'class'         => 'task-progress',
+			'data-progress' => $task->get_progress(),
+			'data-id'       => $task->ID
+		], "<abbr title='{$date->ymdhis()}'>{$diff}</abbr>" );
+    }
 
 	/**
 	 * @param $task Background_Task
@@ -223,11 +227,13 @@ class Background_Tasks_Table extends Table {
 	 */
 	protected function column_progress( $task ) {
 
-		if ( method_exists( $task->task, 'get_progress' ) ) {
-			return floor( $task->task->get_progress() ) . '%';
-		}
+		$progress = floor( $task->get_progress() );
 
-		return '-';
+		return html()->e( 'span', [
+			'class'         => 'task-progress',
+			'data-progress' => $progress,
+			'data-id'       => $task->ID
+		], $progress . '%' );
 	}
 
 	/**
@@ -277,6 +283,14 @@ class Background_Tasks_Table extends Table {
 				break;
 			default:
 				$actions[] = [ 'class' => 'trash', 'display' => __( 'Cancel' ), 'url' => action_url( 'cancel_task', [ 'task' => $item->ID ] ) ];
+				$actions[] = [
+					'class'     => 'edit',
+					'display'   => __( 'Run now' ),
+					'linkProps' => [
+						'class' => 'do-task',
+					],
+					'url'       => action_url( 'process_task', [ 'task' => $item->ID ] )
+				];
 				break;
 		}
 

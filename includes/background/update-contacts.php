@@ -34,7 +34,8 @@ class Update_Contacts extends Task {
 	}
 
 	public function get_progress(){
-		return percentage( $this->contacts, $this->batch * self::BATCH_LIMIT );
+		$total_batches = floor( $this->contacts / self::BATCH_LIMIT );
+		return percentage( $this->contacts, ( $total_batches - $this->batch ) * self::BATCH_LIMIT );
 	}
 
 	public function can_run() {

@@ -71,7 +71,12 @@ class Background_Tasks {
 
 		while ( ! Limits::limits_exceeded() && ! empty( $tasks ) ) {
 			$task = array_shift( $tasks );
-			$task->process();
+
+			try {
+				$task->process();
+			} catch ( \Exception $exception ){
+				continue;
+			}
 		}
 
 		// Release the claim

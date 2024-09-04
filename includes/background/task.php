@@ -34,4 +34,8 @@ abstract class Task implements \JsonSerializable {
 			'task' => str_replace( '_', ' ', strtolower( substr( get_class( $this ), strrpos( get_class( $this ), '\\' ) + 1 ) ) )
 		], $this->__serialize() );
 	}
+
+	public function get_batches_remaining() {
+		return 10;
+	}
 }

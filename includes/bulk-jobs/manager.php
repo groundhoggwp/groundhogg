@@ -3,8 +3,6 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\get_array_var;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\use_experimental_features;
 
 /**
  * Created by PhpStorm.
@@ -40,6 +38,7 @@ class Manager {
 		$this->update_marketing_consent = new Update_Marketing_Consent();
 		$this->bulk_edit_contacts       = new Edit_Contacts();
 		$this->fix_birthdays            = new Fix_Birthdays();
+		$this->process_bg_task          = new Process_Bg_Task();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}

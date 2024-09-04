@@ -10,6 +10,7 @@ use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
+use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\event_queue_db;
@@ -19,6 +20,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\implode_in_quotes;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,6 +45,31 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	//UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
+		add_action( 'wp_ajax_gh_process_bg_task', [ $this, 'ajax_process_bg_task' ] );
+	}
+
+	public function ajax_process_bg_task() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			$this->wp_die_no_access();
+		}
+
+		$task = new Background_Task( absint( get_post_var( 'task' ) ) );
+
+		if ( ! $task->exists() ) {
+			wp_send_json_error();
+		}
+
+		try {
+			$task->process();
+		} catch ( \Exception $e ) {
+            wp_send_json_error( new \WP_Error( 'error', $e->getMessage() ) );
+		}
+
+		wp_send_json_success( [
+			'done'     => $task->is_done(),
+			'progress' => $task->get_progress()
+		] );
 	}
 
 	public function help() {
@@ -575,6 +602,60 @@ class Events_Page extends Tabbed_Admin_Page {
 			<?php $table->prepare_items(); ?>
 			<?php $table->display(); ?>
         </form>
+        <script>
+          (($)=>{
+
+            const {
+              ProgressBar
+            } = MakeEl
+
+            $(document).on('click', '.do-task', e => {
+
+              e.preventDefault()
+              let row = e.target.closest('tr')
+              let progressEl = row.querySelector('.task-progress')
+              let taskId = progressEl.dataset.id
+              let progress = progressEl.dataset.progress
+              let progressBar = ProgressBar({
+                percent: progress
+              })
+
+              const doTask = () => Groundhogg.api.ajax({
+                action: 'gh_process_bg_task',
+                task: taskId,
+                gh_admin_ajax_nonce: Groundhogg.nonces._adminajax
+              }).then( ({
+                data
+              }) => {
+
+                progress = data.progress
+
+                morphdom(row.querySelector('.gh-progress-bar'), ProgressBar({
+                  percent: progress
+                }))
+
+                if ( data.done ){
+                  window.location.reload()
+                } else {
+                  doTask()
+                }
+
+              } ).catch( err => {
+
+                morphdom(row.querySelector('.gh-progress-bar'), ProgressBar({
+                  percent: progress,
+                  error: true
+                }))
+
+              } )
+
+              morphdom(progressEl, progressBar)
+              doTask()
+
+            })
+
+          })(jQuery)
+        </script>
 		<?php
 	}
 
@@ -998,6 +1079,40 @@ ORDER BY ID" );
 			esc_attr( 'cancelled' ),
 			sprintf( _nx( 'Cancelled %d task', 'Cancelled %d task', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 		);
+	}
+
+	public function process_process_task() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$task = null;
+
+		$timer = new Micro_Time_Tracker();
+
+		foreach ( $this->get_items() as $id ) {
+
+            $task = new Background_Task( $id );
+
+			try {
+				$task->process();
+			} catch ( \Exception $exception ) {
+				return new \WP_Error( 'error', $exception->getMessage() );
+			}
+		}
+
+		$time = $timer->time_elapsed_rounded();
+
+		$this->add_notice( '', "Task processed in $time seconds." );
+
+		if ( $task ) {
+			return admin_page_url( 'gh_events', [
+				'tab'    => 'tasks',
+				'status' => $task->is_done() ? 'done' : 'in_progress',
+				'view'   => $task->is_done() ? 'done' : 'in_progress',
+			] );
+		}
 	}
 
 	public function process_resume_task() {

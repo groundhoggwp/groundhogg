@@ -46,6 +46,10 @@ class Export_Contacts extends Task {
 		return percentage( $this->items, $this->batch * self::BATCH_LIMIT );
 	}
 
+	public function get_batches_remaining() {
+		return floor( $this->items / self::BATCH_LIMIT ) - $this->batch;
+	}
+
 	/**
 	 * Title of the task
 	 *

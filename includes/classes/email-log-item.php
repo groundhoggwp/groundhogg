@@ -73,7 +73,7 @@ class Email_Log_Item extends Base_Object {
 
 		$this->from_avatar = get_avatar_url( $this->from_address );
 
-		$user = get_user_by_email( $this->from_address );
+		$user = get_user_by( 'email', $this->from_address );
 
 		$this->from_name = $user ? $user->display_name : get_bloginfo();
 

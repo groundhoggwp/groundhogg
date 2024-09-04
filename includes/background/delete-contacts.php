@@ -33,12 +33,18 @@ class Delete_Contacts extends Task {
 	}
 
 	public function get_progress() {
-
-		$query = new Contact_Query( $this->query );
-		$left  = $query->count();
-
-		return percentage( $this->contacts, $this->contacts - $left );
+		return percentage( $this->contacts, $this->contacts - $this->count_remaining() );
 	}
+
+	public function get_batches_remaining() {
+		return floor( $this->count_remaining() / self::BATCH_LIMIT ) ;
+	}
+
+	public function count_remaining() {
+		$query = new Contact_Query( $this->query );
+		return $query->count();
+	}
+
 
 	public function can_run() {
 		// Don't run for empty queries maybe?
