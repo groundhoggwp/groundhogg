@@ -55,7 +55,8 @@ class Update_Contacts extends Task {
 
 		// No more contacts to add to update
 		if ( empty( $contacts ) ) {
-			return true;
+			$this->batch--;
+			return false;
 		}
 
 		$data        = get_array_var( $this->data, 'data', [] );
