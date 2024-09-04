@@ -173,6 +173,8 @@
     return el
   }
 
+  const Form = (attributes, content) => makeEl( 'form', attributes, content )
+
   const Input = (attributes) => {
     return makeEl('input', {
       type: 'text',
@@ -1330,7 +1332,7 @@
     }, Div({
       className: 'gh-progress-bar-fill',
       style: {
-        width: `${ percent }%`,
+        width: `${ percent || 1 }%`,
       },
     }, Span({
       className: 'fill-amount',
@@ -1356,6 +1358,7 @@
     InputWithReplacements,
     Textarea,
     Select,
+    Form,
     ToolTip,
     Button,
     Toggle,
