@@ -1322,10 +1322,11 @@
   const ProgressBar = ({
     percent = 100,
     error = false,
+    className = ''
   }) => {
 
     return Div({
-      className: `gh-progress-bar ${ error ? 'error' : '' }`,
+      className: `gh-progress-bar ${ error ? 'error' : '' } ${className}`,
     }, Div({
       className: 'gh-progress-bar-fill',
       style: {
@@ -1337,6 +1338,7 @@
 
   }
 
+  const Img = (props) => makeEl( 'img', props )
   const Pg = (props, children) => makeEl( 'p', props, children )
   const An = (props, children) => makeEl( 'a', props, children )
   const Ul = (props, children) => makeEl( 'ul', props, children )
@@ -1380,6 +1382,7 @@
     Autocomplete,
     ProgressBar,
     Pg,
+    Img,
     An,
     Ul,
     Ol,
