@@ -6537,6 +6537,8 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	], $extra );
 
 	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
+
+    do_action( 'groundhogg/enqueue_email_block_editor_assets' );
 }
 
 /**
@@ -6906,7 +6908,7 @@ function maybe_explode( $string, string $separator = ',' ) {
 		return $string;
 	}
 
-	return explode( $string, $separator );
+	return explode( $separator, $string );
 }
 
 /**
