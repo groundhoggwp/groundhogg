@@ -616,9 +616,14 @@ class Events_Page extends Tabbed_Admin_Page {
               let progressEl = row.querySelector('.task-progress')
               let taskId = progressEl.dataset.id
               let progress = progressEl.dataset.progress
-              let progressBar = ProgressBar({
-                percent: progress
+
+              const SmallProgressBar = ( props = {}) => ProgressBar({
+                percent: progress,
+                className: 'small',
+                ...props
               })
+
+              let progressBar = SmallProgressBar()
 
               const doTask = () => Groundhogg.api.ajax({
                 action: 'gh_process_bg_task',
@@ -630,9 +635,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
                 progress = data.progress
 
-                morphdom(row.querySelector('.gh-progress-bar'), ProgressBar({
-                  percent: progress
-                }))
+                morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar())
 
                 if ( data.done ){
                   window.location.reload()
@@ -642,8 +645,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
               } ).catch( err => {
 
-                morphdom(row.querySelector('.gh-progress-bar'), ProgressBar({
-                  percent: progress,
+                morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar({
                   error: true
                 }))
 
