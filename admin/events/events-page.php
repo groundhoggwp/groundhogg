@@ -56,7 +56,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$task = new Background_Task( absint( get_post_var( 'task' ) ) );
 
-		if ( ! $task->exists() ) {
+		if ( ! $task->exists() || $task->is_claimed() ) {
 			wp_send_json_error();
 		}
 
