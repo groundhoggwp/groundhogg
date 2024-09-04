@@ -4092,25 +4092,6 @@
           },
           breadcrumbs),
         nav,
-        hasActiveBlock() ? Button({
-            id       : 'block-more',
-            className: 'gh-button secondary text small icon block-more',
-            onClick  : e => {
-              moreMenu('#block-more', [
-                {
-                  key     : 'copy',
-                  text    : 'Copy Block',
-                  onSelect: e => copyActiveBlock(),
-                },
-                {
-                  key     : 'paste',
-                  text    : 'Paste Block',
-                  onSelect: e => pasteBlock(),
-                },
-              ])
-            },
-          },
-          icons.verticalDots) : null,
       ])
 
   }
@@ -9456,5 +9437,26 @@
   }
 
   Groundhogg.EmailEditor = initialize
+  Groundhogg.emailEditor = {
+    registerBlock,
+    registerDynamicBlock,
+    getActiveBlock,
+    isActiveBlock,
+    isEditing,
+    isCreating,
+    isBlockEditor,
+    isHTMLEditor,
+    components: {
+      Control,
+      ControlGroup,
+      NumberControl,
+      ImageControls,
+      FontControls,
+      ColorPicker,
+      BorderControlGroup,
+      BorderControls,
+      TopRightBottomLeft,
+    }
+  }
 
 } )(jQuery)
