@@ -1968,6 +1968,14 @@ p.error,
 .gh-progress-bar.complete .gh-progress-bar-fill {
   background-color: #9ece38;
 }
+.gh-progress-bar.small .gh-progress-bar-fill {
+  padding: 4px;
+}
+.gh-progress-bar.small .gh-progress-bar-fill .fill-amount {
+  font-size: 14px;
+  color: #FFFFFF;
+  margin-left: 6px;
+}
 
 .gh-has-tooltip,
 :has(> .gh-tooltip) {

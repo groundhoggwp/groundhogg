@@ -2094,6 +2094,20 @@ p.error,
       background-color: $action-green;
     }
   }
+
+  &.small{
+
+    .gh-progress-bar-fill {
+
+      padding: 4px;
+
+      .fill-amount {
+        font-size: 14px;
+        color: #FFFFFF;
+        margin-left: 6px;
+      }
+    }
+  }
 }
 
 .gh-has-tooltip,
