@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.6.0.2
+Stable tag: 3.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.6.0.2 (2024-09-04) =
+= 3.6.1 (2024-09-04) =
+* ADDED Manually process background task from the tasks log table.
+* ADDED Feedback widget to collect feedback about some features.
+* TWEAKED Expose editor functions for registration of custom blocks.
+* REMOVED The copy/paste menu from the editor block nav, use CTRL+C & CTRL+V instead.
+* FIXED Update contact background task quitting early sometimes if number of contacts was a round number.
 * FIXED issues with mapping checkboxes, again.
 
 = 3.6.0.1 (2024-09-03) =
