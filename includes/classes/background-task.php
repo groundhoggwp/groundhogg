@@ -18,6 +18,10 @@ class Background_Task extends Base_Object {
 		return $this->task->get_progress();
 	}
 
+	public function is_claimed() {
+		return ! empty( $this->claim );
+	}
+
 	protected function post_setup() {
 		$this->task    = maybe_unserialize( $this->task );
 		$this->time    = absint( $this->time );
