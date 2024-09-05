@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
-use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Reports;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
@@ -70,6 +69,7 @@ class Reports_Api extends Base_Api {
 		$report = wp_parse_args( $report, [
 			'filters'         => [],
 			'exclude_filters' => [],
+			'meta_key'        => ''
 		] );
 
 		$query = new Contact_Query( [
