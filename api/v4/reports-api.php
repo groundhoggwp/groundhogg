@@ -69,7 +69,7 @@ class Reports_Api extends Base_Api {
 		$report = wp_parse_args( $report, [
 			'filters'         => [],
 			'exclude_filters' => [],
-			'meta_key'        => ''
+			'field'           => ''
 		] );
 
 		$query = new Contact_Query( [
