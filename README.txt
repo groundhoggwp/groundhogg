@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.5
 Requires PHP: 7.1
-Stable tag: 3.6.1
+Stable tag: 3.6.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.6.1 (2024-09-05) =
+* FIXED PHP Warning causing custom reports not to load.
 
 = 3.6.1 (2024-09-04) =
 * ADDED Manually process background task from the tasks log table.
