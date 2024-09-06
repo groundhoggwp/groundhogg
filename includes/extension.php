@@ -171,9 +171,6 @@ abstract class Extension {
 	 * @return void
 	 */
 	public function dependencies_missing_notice() {
-
-		groundhogg_logo()
-
 		?>
 		<div class="notice notice-warning display-flex gap-20">
 			<?php groundhogg_icon(30 ) ?>
