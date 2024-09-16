@@ -34,11 +34,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Broadcasts_Page extends Admin_Page {
 
-	/**
-	 * @var Broadcast_Scheduler
-	 */
-	public $scheduler;
-
 	protected function add_ajax_actions() {
 	}
 
@@ -46,8 +41,6 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-		$this->scheduler = new Broadcast_Scheduler();
-
 		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ){
 
 			notices()->add( 'dne', __( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
