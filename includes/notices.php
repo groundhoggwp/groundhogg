@@ -274,7 +274,7 @@ class Notices {
 	 */
 	public function ajax_read_notice() {
 
-		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+		if ( ! verify_admin_ajax_nonce() ) {
 			wp_send_json_error();
 		}
 
@@ -290,7 +290,7 @@ class Notices {
 	 */
 	public function ajax_dismiss_notice() {
 
-		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+		if ( ! verify_admin_ajax_nonce() ) {
 			wp_send_json_error();
 		}
 
