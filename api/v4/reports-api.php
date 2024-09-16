@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
 use Groundhogg\Utils\DateTimeHelper;
@@ -346,8 +347,22 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
-		$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
+		if ( $request->has_param( 'range' ) ) {
+
+			$dates = Filters::get_before_and_after_from_date_range( [
+				'date_range' => $request->get_param( 'range' ),
+				'before'     => $request->get_param( 'before' ),
+				'after'      => $request->get_param( 'after' ),
+				'days'       => $request->get_param( 'days' ),
+			] );
+
+			$start = $dates['after'];
+			$end = $dates['before'];
+
+		} else {
+			$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
+			$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
+		}
 
 		$params  = $request->get_param( 'params' );
 		$reports = map_deep( $request->get_param( 'reports' ), 'sanitize_key' );
