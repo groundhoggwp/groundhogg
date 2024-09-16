@@ -3,8 +3,11 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Plugin;
+use Groundhogg\Preferences;
+use Groundhogg\Tag_Mapping;
 use function Groundhogg\action_url;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
 
 ?>
 <p></p>
@@ -18,7 +21,7 @@ use function Groundhogg\html;
             <div class="display-flex gap-10">
 		        <?php echo html()->e( 'a', [
 			        'class' => 'button',
-			        'href'  => Plugin::instance()->bulk_jobs->sync_contacts->get_start_url(),
+			        'href'  => action_url( 'sync_users' ),
 		        ], __( 'Sync Users', 'groundhogg' ) ) ?></p>
 
 	            <?php echo html()->e( 'a', [
@@ -29,6 +32,7 @@ use function Groundhogg\html;
             </div>
         </div>
     </div>
+    <?php if ( Tag_Mapping::enabled() ): ?>
     <div class="gh-panel">
         <div class="gh-panel-header">
             <h2><?php _e( 'Refresh opt-in status tags', 'groundhogg' ); ?></h2>

@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\background\Export_Contacts;
 use Groundhogg\background\Import_Contacts;
+use Groundhogg\background\Sync_Users;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\DB\Query\Table_Query;
@@ -34,7 +35,6 @@ use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
-use function Groundhogg\restore_missing_funnel_events;
 use function Groundhogg\uninstall_gh_cron_file;
 use function Groundhogg\uninstall_groundhogg;
 use function Groundhogg\utils;
@@ -83,27 +83,27 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin-element' );
 
-        if ( $this->get_current_tab() === 'api'){
-	        enqueue_filter_assets();
-	        wp_enqueue_script( 'groundhogg-admin-api-docs' );
-            $routes = [
-                'contacts',
-                'tags',
-                'notes',
-                'tasks',
-                'broadcasts',
-                'emails',
-                'funnels',
-                'relationships',
-                'reports',
-            ];
-            $dot_min = is_option_enabled( 'gh_script_debug' ) ? '' : '.min';
-            foreach ( $routes as $route ){
-                wp_enqueue_script( "groundhogg-admin-api-docs-$route", GROUNDHOGG_ASSETS_URL . "js/admin/api-docs/{$route}{$dot_min}.js", ['groundhogg-admin-api-docs'], GROUNDHOGG_VERSION );
-            }
-	        wp_enqueue_script( 'groundhogg-admin-filter-emails' );
-	        do_action( 'groundhogg/enqueue_api_docs' );
-        }
+		if ( $this->get_current_tab() === 'api' ) {
+			enqueue_filter_assets();
+			wp_enqueue_script( 'groundhogg-admin-api-docs' );
+			$routes  = [
+				'contacts',
+				'tags',
+				'notes',
+				'tasks',
+				'broadcasts',
+				'emails',
+				'funnels',
+				'relationships',
+				'reports',
+			];
+			$dot_min = is_option_enabled( 'gh_script_debug' ) ? '' : '.min';
+			foreach ( $routes as $route ) {
+				wp_enqueue_script( "groundhogg-admin-api-docs-$route", GROUNDHOGG_ASSETS_URL . "js/admin/api-docs/{$route}{$dot_min}.js", [ 'groundhogg-admin-api-docs' ], GROUNDHOGG_VERSION );
+			}
+			wp_enqueue_script( 'groundhogg-admin-filter-emails' );
+			do_action( 'groundhogg/enqueue_api_docs' );
+		}
 	}
 
 	public function help() {
@@ -213,7 +213,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'slug' => 'misc',
 				'cap'  => 'manage_options'
 			],
-            [
+			[
 				'name' => __( 'Rest API Playground', 'groundhogg' ),
 				'slug' => 'api',
 				'cap'  => 'manage_options'
@@ -223,26 +223,27 @@ class Tools_Page extends Tabbed_Admin_Page {
 		return apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
 	}
 
-    public function page() {
+	public function page() {
 
-        if ( $this->get_current_tab() === 'api' ){
-            $this->api_view();
-            return;
-        }
+		if ( $this->get_current_tab() === 'api' ) {
+			$this->api_view();
 
-	    parent::page();
-    }
+			return;
+		}
+
+		parent::page();
+	}
 
 	/**
-     * View API
-     *
+	 * View API
+	 *
 	 * @return void
 	 */
-	public function api_view(){
+	public function api_view() {
 
-        ?>
+		?>
         <div id="api-docs"></div>
-        <?php
+		<?php
 	}
 
 	####### SYSTEM TAB FUNCTIONS #########
@@ -476,11 +477,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function import_add() {
 
-        wp_enqueue_script( 'groundhogg-admin-big-file-upload' );
-        wp_localize_script( 'groundhogg-admin-big-file-upload', 'BigFileUploader', [
-            'location' => 'imports',
-            'selector' => '#import_file'
-        ] );
+		wp_enqueue_script( 'groundhogg-admin-big-file-upload' );
+		wp_localize_script( 'groundhogg-admin-big-file-upload', 'BigFileUploader', [
+			'location' => 'imports',
+			'selector' => '#import_file'
+		] );
 
 		include __DIR__ . '/add-import.php';
 	}
@@ -617,21 +618,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 			'is_confirmed'      => (bool) get_post_var( 'email_is_confirmed' ),
 			'gdpr_consent'      => (bool) get_post_var( 'data_processing_consent_given' ),
 			'marketing_consent' => (bool) get_post_var( 'marketing_consent_given' ),
-			'field_map' => $map,
-			'tags'      => $tags,
+			'field_map'         => $map,
+			'tags'              => $tags,
 		] ) );
 
-        if ( is_wp_error( $result ) ){
-            return $result;
-        }
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
 
-        if ( $result === false ){
-            return new WP_Error( 'oops', 'Something went wrong.' );
-        }
+		if ( $result === false ) {
+			return new WP_Error( 'oops', 'Something went wrong.' );
+		}
 
 		$rows = count_csv_rows( files()->get_csv_imports_dir( $file_name ) );
 
-        $time = human_time_diff( time(), time() + ( ceil( $rows / 1000 ) * MINUTE_IN_SECONDS ) );
+		$time = human_time_diff( time(), time() + ( ceil( $rows / 1000 ) * MINUTE_IN_SECONDS ) );
 
 		$this->add_notice( 'success', sprintf( __( 'Your contacts are being imported in the background! <i>We\'re estimating it will take ~%s.</i> We\'ll let you know when it\'s done!', 'groundhogg' ), $time ) );
 
@@ -653,8 +654,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$filepath = files()->get_csv_imports_dir( $file_name );
 
 			if ( file_exists( $filepath ) ) {
-				if ( ! unlink( $filepath ) ){
-                    return new WP_Error( 'failed', 'Unable to delete imports.' );
+				if ( ! unlink( $filepath ) ) {
+					return new WP_Error( 'failed', 'Unable to delete imports.' );
 				}
 			}
 		}
@@ -720,17 +721,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 
             <h3><?php _e( 'Name your export', 'groundhogg' ) ?></h3>
 
-	        <?php echo html()->input( [
-		        'name'        => 'file_name',
-		        'placeholder' => 'My export...',
-		        'required'    => true,
-		        'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
-	        ] ); ?>
+			<?php echo html()->input( [
+				'name'        => 'file_name',
+				'placeholder' => 'My export...',
+				'required'    => true,
+				'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
+			] ); ?>
 
             <h3><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h3>
 			<?php
 
-            html()->export_columns_table( $default_exportable_fields );
+			html()->export_columns_table( $default_exportable_fields );
 
 			$tabs = Properties::instance()->get_tabs();
 
@@ -743,12 +744,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 				foreach ( $groups as $group ):
 					?><h4><?php esc_html_e( $group['name'] ); ?></h4><?php
 
-                    $columns = [];
-                    $fields = Properties::instance()->get_fields( $group['id'] );
+					$columns = [];
+					$fields  = Properties::instance()->get_fields( $group['id'] );
 
-                    foreach ( $fields as $field ){
-                        $columns[ $field['id']] = $field['label'];
-                    }
+					foreach ( $fields as $field ) {
+						$columns[ $field['id'] ] = $field['label'];
+					}
 
 					html()->export_columns_table( $columns );
 				endforeach;
@@ -764,7 +765,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                 <h3><?php _e( 'Custom Meta Information', 'groundhogg' ) ?></h3>
 				<?php
 
-                html()->export_columns_table( array_combine( $meta_keys, array_map( '\Groundhogg\key_to_words', $meta_keys ) ) );
+				html()->export_columns_table( array_combine( $meta_keys, array_map( '\Groundhogg\key_to_words', $meta_keys ) ) );
 
 			endif;
 			?>
@@ -837,10 +838,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$file_name = wp_unique_filename( files()->get_csv_exports_dir(), $file_name );
 		$file_path = files()->get_csv_exports_dir( $file_name, true );
 
-        // Add headers to the file first
-        $pointer = fopen( $file_path, 'w' );
+		// Add headers to the file first
+		$pointer = fopen( $file_path, 'w' );
 		fputcsv( $pointer, array_values( $headers ) );
-        fclose( $pointer );
+		fclose( $pointer );
 
 		Background_Tasks::add( new Export_Contacts( $query, $file_name, $columns ) );
 
@@ -890,8 +891,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		uninstall_groundhogg();
 
-        // Flush the object cache
-        wp_cache_flush();
+		// Flush the object cache
+		wp_cache_flush();
 
 		do_action( 'groundhogg/reset' );
 
@@ -1127,54 +1128,54 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-     * Download a file from the admin
-     *
+	 * Download a file from the admin
+	 *
 	 * @return void
 	 */
-    public function process_download_file(){
+	public function process_download_file() {
 
-	    $short_path      = get_url_var( 'file_path' );
-	    $groundhogg_path = utils()->files->get_base_uploads_dir();
-	    $file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
+		$short_path      = get_url_var( 'file_path' );
+		$groundhogg_path = utils()->files->get_base_uploads_dir();
+		$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 
-	    if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
-		    wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
-	    }
+		if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
+			wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
+		}
 
-        $request = get_request_query();
+		$request = get_request_query();
 
-        if ( ! current_user_can( 'download_file', $short_path, $request, $file_path ) ) {
-            wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
-        }
+		if ( ! current_user_can( 'download_file', $short_path, $request, $file_path ) ) {
+			wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+		}
 
-	    $mime = wp_check_filetype( $file_path );
-	    $mime = $mime['type'];
+		$mime = wp_check_filetype( $file_path );
+		$mime = $mime['type'];
 
-	    if ( ! $mime ) {
-		    wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
-	    }
+		if ( ! $mime ) {
+			wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+		}
 
-	    $content_type = sprintf( "Content-Type: %s", $mime );
-	    $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
+		$content_type = sprintf( "Content-Type: %s", $mime );
+		$content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
 
-	    header( $content_type );
-	    header( $content_size );
+		header( $content_type );
+		header( $content_size );
 
-	    if ( get_request_var( 'download' ) ) {
-		    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
-	    } else {
-		    $content_disposition = sprintf( "Content-disposition: inline; filename=%s", basename( $file_path ) );
-	    }
+		if ( get_request_var( 'download' ) ) {
+			$content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+		} else {
+			$content_disposition = sprintf( "Content-disposition: inline; filename=%s", basename( $file_path ) );
+		}
 
-	    header( $content_disposition );
+		header( $content_disposition );
 
-	    status_header( 200 );
-	    nocache_headers();
+		status_header( 200 );
+		nocache_headers();
 
-	    readfile( $file_path );
-	    exit();
+		readfile( $file_path );
+		exit();
 
-    }
+	}
 
 	/**
 	 * Misc view
@@ -1184,20 +1185,20 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-     * Re-sync user IDs
-     *
+	 * Re-sync user IDs
+	 *
 	 * @throws \Exception
 	 * @return bool
 	 */
 	public function process_re_sync_user_ids() {
 
-        if ( ! current_user_can( 'edit_users' ) ){
-            $this->wp_die_no_access();
-        }
+		if ( ! current_user_can( 'edit_users' ) ) {
+			$this->wp_die_no_access();
+		}
 
 		$query = new Table_Query( 'contacts' );
 
-        // Set all IDs to 0
+		// Set all IDs to 0
 		$query->update( [
 			'user_id' => 0
 		] );
@@ -1205,20 +1206,36 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$join = $query->addJoin( 'LEFT', $query->db->users );
 		$join->onColumn( 'user_email', 'email' );
 
-        $query->add_safe_column(  "$join->alias.ID" );
+		$query->add_safe_column( "$join->alias.ID" );
 
-        // Update the user_id col from the ID in the table
-        $updated = $query->update( [
-            'user_id' => "$join->alias.ID"
-        ] );
+		// Update the user_id col from the ID in the table
+		$updated = $query->update( [
+			'user_id' => "$join->alias.ID"
+		] );
 
-        if ( $updated ){
-            $this->add_notice( 'success', 'User IDs have been synced.' );
-        } else {
-	        $this->add_notice( 'failed', 'Re-sync failed.', 'error' );
-        }
+		if ( $updated ) {
+			$this->add_notice( 'success', 'User IDs have been synced.' );
+		} else {
+			$this->add_notice( 'failed', 'Re-sync failed.', 'error' );
+		}
 
-        return true;
+		return true;
+	}
+
+	public function process_sync_users() {
+		if ( ! current_user_can( 'edit_users' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$added = Background_Tasks::add( new Sync_Users() );
+
+		if ( $added ) {
+			notices()->add_user_notice( "Users are being synced in the background. It might take a few minutes!" );
+
+			return admin_page_url( 'gh_tools', [ 'tab' => 'misc' ] );
+		}
+
+		return false;
 	}
 
 }
