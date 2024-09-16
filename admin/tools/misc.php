@@ -41,18 +41,7 @@ use function Groundhogg\html;
 				], __( 'Process', 'groundhogg' ) ) ?></p>
         </div>
     </div>
-    <div class="gh-panel">
-        <div class="gh-panel-header">
-            <h2 class="hndle"><?php _e( 'Restore missing funnel events', 'groundhogg' ); ?></h2>
-        </div>
-        <div class="inside">
-            <p><?php _e( 'If funnel events get cancelled or deleted, this tool will restore contacts to their most recent position in any funnels they were active in within the last 30 days.', 'groundhogg' ); ?></p>
-            <p><?php echo html()->e( 'a', [
-					'class' => 'gh-button danger',
-					'href'  => action_url( 'restore_funnel_events' ),
-				], __( 'Restore', 'groundhogg' ) ) ?></p>
-        </div>
-    </div>
+    <?php endif; ?>
 
 	<?php do_action( 'groundhogg/tools/misc' ); ?>
 

@@ -74,7 +74,9 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 					echo html()->input( [
 						'name'        => 'confirm',
 						'type'        => 'text',
+						'class'       => 'full-width',
 						'placeholder' => 'Type "confirm" to delete logs.',
+
 						'required'    => true,
 					] );
 
@@ -125,6 +127,7 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 						'name'        => 'confirm',
 						'type'        => 'text',
 						'placeholder' => 'Type "confirm" to cancel events.',
+						'class'       => 'full-width',
 						'required'    => true,
 					] );
 
@@ -211,6 +214,7 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 							'name'        => 'confirm',
 							'type'        => 'text',
 							'placeholder' => 'Type "confirm" to continue.',
+							'class'       => 'full-width',
 							'required'    => true,
 						] );
 
@@ -285,6 +289,7 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 						'name'        => 'confirm',
 						'type'        => 'text',
 						'placeholder' => 'Type "confirm" to delete logs.',
+						'class'       => 'full-width',
 						'required'    => true,
 					] );
 
@@ -299,5 +304,16 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
             </form>
         </div>
     </div>
-
+    <div class="gh-panel">
+        <div class="gh-panel-header">
+            <h2 class="hndle"><?php _e( 'Restore missing funnel events', 'groundhogg' ); ?></h2>
+        </div>
+        <div class="inside">
+            <p><?php _e( 'If funnel events get cancelled or deleted, this tool will restore contacts to their most recent position in any funnels they were active in within the last 30 days.', 'groundhogg' ); ?></p>
+            <p><?php echo html()->e( 'a', [
+					'class' => 'gh-button danger',
+					'href'  => action_url( 'restore_funnel_events' ),
+				], __( 'Restore', 'groundhogg' ) ) ?></p>
+        </div>
+    </div>
 </div>

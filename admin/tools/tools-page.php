@@ -1127,23 +1127,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-     * Restore missing funnel events
-     *
-	 * @return string
-	 */
-    public function process_restore_funnel_events(){
-	    if ( ! current_user_can( 'cancel_events' ) ) {
-		    $this->wp_die_no_access();
-	    }
-
-        restore_missing_funnel_events();
-
-	    $this->add_notice( 'restored', 'Events restored!' );
-
-        return admin_page_url( 'gh_events' );
-    }
-
-	/**
      * Download a file from the admin
      *
 	 * @return void
