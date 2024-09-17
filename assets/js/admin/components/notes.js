@@ -8,6 +8,7 @@
     addMediaToBasicTinyMCE,
     moreMenu,
     spinner,
+    skeleton,
     tooltip,
     dangerConfirmationModal,
   } = Groundhogg.element
@@ -57,12 +58,12 @@
       return `
           <div class="add-note">
               <textarea id="edit-note-editor">${ note.data.content }</textarea>
-              <div class="actions">
+              <div class="actions space-above-5 display-flex space-between align-bottom">
                   <div>
-                      <label>${ __('Note type', 'groundhogg') }
+                      <label>${ __('Note type', 'groundhogg') }<br>
                           ${ select({ id: 'note-type' }, noteTypes, note.data.type) }</label>
                   </div>
-                  <div style="display: flex">
+                  <div class="display-flex flex-end gap-5">
                       <button class="gh-button danger text cancel">${ __('Cancel') }</button>
                       <button class="gh-button primary save">${ __('Save') }</button>
                   </div>
@@ -74,12 +75,12 @@
       return `
           <div class="add-note">
               <textarea id="add-note-editor"></textarea>
-              <div class="actions">
+              <div class="actions space-above-5 display-flex space-between align-bottom">
                   <div>
-                      <label>${ __('Note type', 'groundhogg') }
+                      <label>${ __('Note type', 'groundhogg') }<br>
                           ${ select({ id: 'note-type' }, noteTypes) }</label>
                   </div>
-                  <div style="display: flex">
+                  <div class="display-flex flex-end gap-5">
                       <button class="gh-button danger text cancel">${ __('Cancel') }</button>
                       <button class="gh-button primary create">${ __('Create') }</button>
                   </div>
@@ -338,7 +339,7 @@
     }
 
     if (!NotesStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
-      $el.html(spinner())
+      $el.html(skeleton())
       NotesStore.fetchItems({
         object_id,
         object_type,
