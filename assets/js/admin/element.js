@@ -883,6 +883,8 @@ ${ afterProgress() }`,
 
   const spinner = (color = 'white') => {
 
+    // return '';
+
     // No color when not white labelled
     if (!Groundhogg.isWhiteLabeled) {
       color = ''
@@ -896,6 +898,22 @@ ${ afterProgress() }`,
                     width="150"
                     height="150"/>
         </div>`
+  }
+
+  const skeleton = () => {
+    if ( typeof MakeEl !== 'undefined' ){
+
+      return MakeEl.Skeleton({
+        style: {
+          padding: '10px'
+        }
+      }, [
+        'full',
+        'full',
+        'full',
+      ]).outerHTML
+    }
+    return ''
   }
 
   const savingModal = () => {
@@ -2941,6 +2959,7 @@ ${ afterProgress() }`,
     isString,
     replacementsWidget,
     escHTML,
+    skeleton
   }
 
 } )(jQuery)

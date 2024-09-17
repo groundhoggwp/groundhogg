@@ -31,6 +31,7 @@
     spinner,
     escHTML,
     dialog,
+    skeleton,
   } = Groundhogg.element
 
   const {
@@ -158,7 +159,7 @@
                 }) => MakeEl.Div({
                   id: 'send-email-dialog',
                 }, [
-                  `<h3>${ sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name.trim() || getContact().data.email ) }</h3>`,
+                  `<h3>${ sprintf(__('Select an email to send to %s', 'groundhogg'), getContact().data.full_name.trim() || getContact().data.email) }</h3>`,
                   MakeEl.ItemPicker({
                     id          : `select-email`,
                     noneSelected: __('Select an email to send...', 'groundhogg'),
@@ -502,7 +503,7 @@
   const ActivityDetails = (details, {
     key = k => k,
     value = v => v,
-    heading = __( 'Details' )
+    heading = __('Details'),
   } = {}) => {
 
     if (Object.keys(details).length === 0) {
@@ -723,7 +724,7 @@
           }
 
           html.push(ActivityDetails(meta, {
-            key: k => `<code>${ k }</code>`
+            key: k => `<code>${ k }</code>`,
           }))
 
           return html.join('')
@@ -787,10 +788,10 @@
                                     href  : funnel.admin + `#${ activity.data.step_id }`,
                                     target: '_blank',
                                 }, bold(funnel.data.title))) }
-                        ${ActivityDetails(activity.meta, {
-                          key: k => `<code>${k}</code>`,
-                          heading: __('Request')
-                        })}
+                        ${ ActivityDetails(activity.meta, {
+                            key    : k => `<code>${ k }</code>`,
+                            heading: __('Request'),
+                        }) }
                     </div>
                     <div class="diff-time">
                         ${ activity.i18n.diff_time }
@@ -1225,7 +1226,7 @@
                   </div>
               </div>
               <div id="activity-here">
-                  ${ spinner() }
+                  ${ skeleton() }
               </div>`
         },
         onMount: () => {
@@ -1427,11 +1428,12 @@
               </div>`
         },
         onMount: () => {
-          Groundhogg.taskEditor('#tasks-here', {
+
+          morphdom(document.getElementById('tasks-here'), Groundhogg.ObjectTasks({
             object_id  : contact.ID,
             object_type: 'contact',
-            title      : '',
-          })
+            title      : false,
+          }))
         },
       },
       {
