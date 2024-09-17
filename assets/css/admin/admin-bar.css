@@ -1,19 +1,6 @@
 .groundhogg-toolbar-quick-search .gh-spinner-wrap {
   color: rgba(16, 38, 64, 0.1);
 }
-.groundhogg-toolbar-quick-search #gh-notifications .gh-button.dismiss {
-  background: transparent;
-  color: #102640;
-  margin: 3px;
-  padding: 4px 4px;
-}
-.groundhogg-toolbar-quick-search #gh-notifications .gh-button.dismiss:hover {
-  background: rgba(16, 38, 64, 0.1);
-}
-.groundhogg-toolbar-quick-search #gh-notifications p.all-dismissed {
-  font-size: 16px;
-  text-align: center;
-}
 .groundhogg-toolbar-quick-search #quick-search-input {
   width: 100%;
 }
@@ -54,6 +41,9 @@
   max-width: 100%;
   width: 100%;
 }
+.groundhogg-toolbar-quick-search .contact-list {
+  margin: 20px -20px -20px -20px;
+}
 .groundhogg-toolbar-quick-search#groundhogg-toolbar-quick-search {
   box-sizing: border-box;
   width: 500px;
@@ -71,71 +61,6 @@
 }
 .groundhogg-toolbar-quick-search-tabs .gh-button {
   position: relative;
-}
-.groundhogg-toolbar-quick-search-results {
-  display: flex;
-  flex-direction: column;
-  max-height: 70vh;
-  margin: 10px -20px 0 -20px;
-}
-.groundhogg-toolbar-quick-search-results:not(:empty) {
-  margin-bottom: -20px;
-}
-.groundhogg-toolbar-quick-search-results p:last-child {
-  text-align: center;
-}
-.groundhogg-toolbar-quick-search-result {
-  cursor: pointer;
-  padding: 10px 10px 10px 20px;
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
-}
-.groundhogg-toolbar-quick-search-result .above {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-.groundhogg-toolbar-quick-search-result .gh-tags {
-  gap: 5px;
-  display: none;
-}
-.groundhogg-toolbar-quick-search-result .gh-tags .gh-tag {
-  font-size: 11px;
-  padding: 2px 7px;
-}
-.groundhogg-toolbar-quick-search-result:last-of-type {
-  border-bottom: 1px solid rgba(16, 38, 64, 0.1);
-}
-.groundhogg-toolbar-quick-search-result .subscribed {
-  color: rgba(16, 38, 64, 0.3);
-}
-.groundhogg-toolbar-quick-search-result .name {
-  font-weight: 500;
-}
-.groundhogg-toolbar-quick-search-result .phones {
-  display: flex;
-  gap: 10px;
-}
-.groundhogg-toolbar-quick-search-result .pill {
-  font-size: 12px;
-  padding: 2px 5px;
-}
-.groundhogg-toolbar-quick-search-result img.avatar {
-  border-radius: 5px;
-  width: 30px;
-  height: 30px;
-}
-.groundhogg-toolbar-quick-search-result .actions {
-  display: flex;
-  justify-content: flex-end;
-  visibility: hidden;
-  margin-left: auto;
-}
-.groundhogg-toolbar-quick-search-result:hover .gh-tags {
-  display: flex;
-}
-.groundhogg-toolbar-quick-search-result:hover .actions {
-  visibility: visible;
 }
 
 /*# sourceMappingURL=admin-bar.css.map */
