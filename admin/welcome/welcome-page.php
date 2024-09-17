@@ -4,17 +4,16 @@ namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\dashicon;
+use function Groundhogg\db;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
-use function Groundhogg\groundhogg_logo;
+use function Groundhogg\gh_cron_installed;
 use function Groundhogg\has_premium_features;
-use function Groundhogg\html;
-use function Groundhogg\is_pro_features_active;
+use function Groundhogg\is_event_queue_processing;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
-use Groundhogg\License_Manager;
-use Groundhogg\Plugin;
-use function Groundhogg\qualifies_for_review_your_funnel;
+use function Groundhogg\remote_post_json;
+use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
 
 
@@ -38,6 +37,207 @@ class Welcome_Page extends Admin_Page {
 	}
 
 	protected function add_ajax_actions() {
+		add_action( 'wp_ajax_gh_get_checklist_items', [ $this, 'ajax_get_checklist_items' ] );
+		add_action( 'wp_ajax_gh_get_recommendation_items', [ $this, 'ajax_get_recommendation_items' ] );
+		add_action( 'wp_ajax_gh_get_news', [ $this, 'ajax_get_news' ] );
+	}
+
+	/**
+	 * Get the news
+	 *
+	 * @return void
+	 */
+	public function ajax_get_news() {
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$json = remote_post_json( 'https://www.groundhogg.io/wp-json/wp/v2/posts', [], 'GET' );
+
+		wp_send_json( $json );
+	}
+
+	public function ajax_get_checklist_items() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$checklist_items = [
+			[
+				'title'       => __( 'Complete the guided setup', 'groundhogg' ),
+				'description' => __( "Configure your initial settings and discover potential opportunities.", 'groundhogg' ),
+				'completed'   => is_option_enabled( 'gh_guided_setup_finished' ),
+				'fix'         => admin_page_url( 'gh_guided_setup' ),
+				'cap'         => is_white_labeled() ? 'do_not_allow' : 'manage_options'
+			],
+			[
+				'title'       => __( 'Sync your users & contacts', 'groundhogg' ),
+				'description' => __( "It looks like you have existing users in your site, let's sync them with your contacts so you can send them email.", 'groundhogg' ),
+				'completed'   => count_users()['total_users'] <= get_db( 'contacts' )->count(),
+				'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'misc' ] ),
+				'cap'         => 'add_users'
+			],
+			[
+				'title'       => __( 'Import your list of contacts', 'groundhogg' ),
+				'description' => __( "Let's bring in all your contacts, upload a CSV and import them into Groundhogg.", 'groundhogg' ),
+				'completed'   => count( files()->get_imports() ) > 0,
+				'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ),
+				'cap'         => 'import_contacts'
+			],
+			[
+				'title'       => __( 'Send a broadcast to your subscribers!', 'groundhogg' ),
+				'description' => __( "Let's make sure your subscribers can hear you. Send them a broadcast email and say hello!", 'groundhogg' ),
+				'completed'   => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ) > 0,
+				'fix'         => admin_page_url( 'gh_broadcasts', [ 'action' => 'add' ] ),
+				'cap'         => 'edit_emails'
+			],
+			[
+				'title'       => __( 'Launch a funnel', 'groundhogg' ),
+				'description' => __( "We're going to launch a funnel that will welcome new subscribers to the list. It will only take a few minutes.", 'groundhogg' ),
+				'completed'   => get_db( 'funnels' )->count( [ 'status' => 'active' ] ) > 0,
+				'fix'         => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
+				'cap'         => 'edit_funnels'
+			],
+			[
+				'title'       => __( 'Configure your cron jobs', 'groundhogg' ),
+				'description' => __( 'This is an optional best practice and will improve the performance of your site.', 'groundhogg' ),
+				'completed'   => gh_cron_installed() && is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
+				'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
+				'cap'         => 'manage_options'
+			],
+		];
+
+		apply_filters( 'groundhogg/admin/checklist_items', $checklist_items );
+
+		$checklist_items = array_filter( $checklist_items, function ( $item ) {
+			return current_user_can( $item['cap'] );
+		} );
+
+		wp_send_json_success( [
+			'items' => $checklist_items,
+		] );
+	}
+
+	public function ajax_get_recommendation_items() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$reports   = get_option( 'gh_custom_reports', [] );
+		$signature = get_user_meta( get_current_user_id(), 'signature', true );
+
+		// MailHawk is installed but not connected -> redirect to the mailhawk connect page
+		if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
+			$smtp_fix_link = admin_page_url( 'mailhawk' );
+
+		// The number of registered services is > 1, means that an integration is installed.
+        elseif ( count( \Groundhogg_Email_Services::get() ) > 1 ):
+			$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
+
+		// No other service is currently in use.
+		else:
+			$smtp_fix_link = admin_page_url( 'gh_guided_setup', [ 'step' => '3' ] );
+
+		endif;
+
+		$checklist_items = [
+			[
+				'title'       => __( 'Get more leads with HollerBox', 'groundhogg' ),
+				'description' => __( "Popups and lead generation made easy with our free HollerBox plugin.", 'groundhogg' ),
+				'completed'   => defined( 'HOLLERBOX_VERSION' ),
+				'fix'         => admin_url( 'plugin-install.php?s=hollerbox&tab=search&type=term' ),
+				'cap'         => is_white_labeled() ? 'do_not_allow' : 'install_plugins'
+			],
+			[
+				'title'       => __( 'Upgrade to premium for powerful features', 'groundhogg' ),
+				'description' => __( 'Get a premium plan and activate more powerful features that will help you grow and scale.', 'groundhogg' ),
+				'completed'   => has_premium_features(),
+				'fix'         => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=checklist&utm_campaign=welcome&utm_content=fix',
+				'cap'         => is_white_labeled() ? 'do_not_allow' : 'manage_options'
+			],
+			[
+				'title'       => __( 'Integrate a verified SMTP service', 'groundhogg' ),
+				'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
+				'completed'   => \Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
+				'fix'         => $smtp_fix_link,
+				'cap'         => 'install_plugins'
+			],
+			[
+				'title'       => __( 'Leverage funnel conversion tracking', 'groundhogg' ),
+				'description' => __( "Know how your funnels are performing by using conversion tracking!", 'groundhogg' ),
+				'completed'   => db()->steps->count( [ 'is_conversion' => 1 ] ) > 0,
+				'fix'         => admin_page_url( 'gh_funnels' ),
+				'cap'         => 'edit_funnels'
+			],
+			[
+				'title'       => __( 'Know more with custom reports', 'groundhogg' ),
+				'description' => __( "Use custom reports to know your subscribers and customers better.", 'groundhogg' ),
+				'completed'   => ! empty( $reports ),
+				'fix'         => admin_page_url( 'gh_reporting', [ 'tab' => 'custom' ] ),
+				'cap'         => 'view_reports'
+			],
+			[
+				'title'       => __( 'Organize your marketing with campaigns', 'groundhogg' ),
+				'description' => __( "Campaigns are an easy way to organize your marketing efforts and make analytics easier.", 'groundhogg' ),
+				'completed'   => ! empty( $reports ),
+				'fix'         => admin_page_url( 'gh_campaigns' ),
+				'cap'         => 'manage_campaigns'
+			],
+			[
+				'title'       => __( 'Add your email signature', 'groundhogg' ),
+				'description' => __( "Adding an email signature to your profile will make it easier for subscribers to know who your are.", 'groundhogg' ),
+				'completed'   => ! empty( $signature ),
+				'fix'         => admin_url( 'profile.php' ) . '#groundhogg-options',
+				'cap'         => 'send_emails'
+			],
+		];
+
+		if ( has_premium_features() ) {
+
+			$checklist_items[] = [
+				'title'       => __( 'Install the Extension Manager', 'groundhogg' ),
+				'description' => __( 'The extension manager makes is easier to install your premium add-ons and integrations.', 'groundhogg' ),
+				'completed'   => defined( 'GROUNDHOGG_HELPER_VERSION' ),
+				'fix'         => 'https://groundhogg.io/account/all-access-downloads/',
+				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins',
+				'more'        => ''
+			];
+
+            if ( defined( 'GROUNDHOGG_HELPER_VERSION' ) ) {
+	            $checklist_items[] = [
+		            'title'       => __( 'Install the Advanced Features add-on', 'groundhogg' ),
+		            'description' => __( 'The Advanced Features addon includes a variety of tools and that improve Groundhogg.', 'groundhogg' ),
+		            'completed'   => defined( 'GROUNDHOGG_PRO_VERSION' ),
+		            'fix'         => admin_page_url( 'gh_extensions' ),
+		            'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins',
+		            'more'        => ''
+	            ];
+            }
+
+
+            if ( defined( 'GROUNDHOGG_PRO_VERSION' ) ){
+	            $checklist_items[] = [
+		            'title'       => __( 'Enable automatic one-click unsubscribe', 'groundhogg' ),
+		            'description' => __( 'Improve deliver ability by allowing subscribers to opt-out from their inbox.', 'groundhogg' ),
+		            'completed'   => is_option_enabled( 'gh_use_unsubscribe_me' ),
+		            'fix'         => admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
+		            'cap'         => 'manage_options',
+		            'more'        => ''
+	            ];
+            }
+		}
+
+		apply_filters( 'groundhogg/admin/recommendation_items', $checklist_items );
+
+		$checklist_items = array_filter( $checklist_items, function ( $item ) {
+			return current_user_can( $item['cap'] );
+		} );
+
+		wp_send_json_success( [
+			'items' => $checklist_items,
+		] );
 	}
 
 	/**
@@ -120,8 +320,8 @@ class Welcome_Page extends Admin_Page {
 
 		$sub_page = add_submenu_page(
 			'groundhogg',
-			_x( 'Welcome', 'page_title', 'groundhogg' ),
-			_x( 'Welcome', 'page_title', 'groundhogg' ),
+			_x( 'Dashboard', 'page_title', 'groundhogg' ),
+			_x( 'Dashboard', 'page_title', 'groundhogg' ),
 			'view_contacts',
 			'groundhogg',
 			array( $this, 'page' )
@@ -139,11 +339,13 @@ class Welcome_Page extends Admin_Page {
 
 	/* Enque JS or CSS */
 	public function scripts() {
+
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-welcome' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
-		wp_enqueue_script( 'groundhogg-admin-data' );
-		wp_enqueue_script( 'groundhogg-admin-element' );
+
+		wp_enqueue_script( 'groundhogg-admin-dashboard' );
+		wp_enqueue_editor();
 	}
 
 	/**
@@ -151,305 +353,15 @@ class Welcome_Page extends Admin_Page {
 	 */
 	public function page() {
 
-		do_action( "groundhogg/admin/{$this->get_slug()}/before" );
-
 		?>
-        <div class="wrap">
-			<?php
-
-			if ( method_exists( $this, $this->get_current_action() ) ) {
-				call_user_func( [ $this, $this->get_current_action() ] );
-			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}" ) ) {
-				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this );
-			} else {
-				call_user_func( [ $this, 'view' ] );
-			}
-
-			?>
-        </div>
+        <div id="dashboard"></div>
 		<?php
-
-		do_action( "groundhogg/admin/{$this->get_slug()}/after" );
 	}
-
-	/**
-     * Shows the add for review your funnel
-     * Only shows if the conditions for viewing are met
-     *
-	 * @return void
-	 */
-    public function promote_review_your_funnel(){
-
-        if ( ! qualifies_for_review_your_funnel() ){
-            return;
-        }
-
-        ?>
-        <a href="<?php echo admin_page_url( 'gh_guided_setup', [], 'funnel-review' ) ?>">
-            <img style="border-radius: 5px" alt="review your funnel offer" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/review-your-funnel.png' ?>">
-        </a>
-        <?php
-
-
-    }
-
 
 	/**
 	 * The main output
 	 */
 	public function view() {
-		?>
 
-        <div id="welcome-page" class="welcome-page">
-            <div id="poststuff">
-                <div class="welcome-header">
-                    <h1><?php echo sprintf( __( 'Welcome to %s', 'groundhogg' ), groundhogg_logo( 'black', 300, false ) ); ?></h1>
-                </div>
-				<?php $this->notices(); ?>
-                <hr class="wp-header-end">
-                <div class="display-flex column gap-20">
-                    <div class="gh-panel" id="ghmenu">
-                        <div class="inside" style="padding: 0;margin: 0">
-                            <ul>
-								<?php
-
-								$links = [
-									[
-										'icon'    => 'admin-site',
-										'display' => __( 'Groundhogg.io' ),
-										'url'     => 'https://www.groundhogg.io'
-									],
-									[
-										'icon'    => 'media-document',
-										'display' => __( 'Documentation' ),
-										'url'     => 'https://help.groundhogg.io'
-									],
-									[
-										'icon'    => 'store',
-										'display' => __( 'Store' ),
-										'url'     => 'https://www.groundhogg.io/downloads/'
-									],
-									[
-										'icon'    => 'welcome-learn-more',
-										'display' => __( 'Courses' ),
-										'url'     => 'https://academy.groundhogg.io/'
-									],
-									[
-										'icon'    => 'sos',
-										'display' => __( 'Support Group' ),
-										'url'     => 'https://www.groundhogg.io/fb/'
-									],
-									[
-										'icon'    => 'admin-users',
-										'display' => __( 'My Account' ),
-										'url'     => 'https://www.groundhogg.io/account/'
-									],
-									[
-										'icon'    => 'location-alt',
-										'display' => __( 'Find a Partner' ),
-										'url'     => 'https://www.groundhogg.io/find-a-partner/'
-									],
-								];
-
-								foreach ( $links as $link ) {
-
-									echo html()->e( 'li', [], [
-										html()->e( 'a', [
-											'href'   => add_query_arg( [
-												'utm_source'   => get_bloginfo(),
-												'utm_medium'   => 'welcome-page',
-												'utm_campaign' => 'admin-links',
-												'utm_content'  => strtolower( $link['display'] ),
-											], $link['url'] ),
-											'target' => '_blank'
-										], [
-											dashicon( $link['icon'] ),
-											'&nbsp;',
-											$link['display']
-										] )
-									] );
-
-								}
-
-								?>
-                            </ul>
-                        </div>
-                    </div>
-	                <?php include __DIR__ . '/checklist.php' ?>
-                    <?php $this->promote_review_your_funnel() ?>
-                    <div class="gh-panel">
-						<?php
-
-						echo html()->e( 'a', [
-							'href'   => add_query_arg( [
-								'utm_source'   => get_bloginfo(),
-								'utm_medium'   => 'welcome-page',
-								'utm_campaign' => 'quickstart',
-								'utm_content'  => 'image',
-							], 'https://academy.groundhogg.io/course/groundhogg-quickstart/' )
-							,
-							'target' => '_blank'
-						], html()->e( 'img', [
-							'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/quickstart-course-welcome-screen.png',
-						] ) );
-
-						echo html()->e( 'a', [
-							'target' => '_blank',
-							'class'  => 'button big-button',
-							'href'   => add_query_arg( [
-								'utm_source'   => get_bloginfo(),
-								'utm_medium'   => 'welcome-page',
-								'utm_campaign' => 'quickstart',
-								'utm_content'  => 'button',
-							], 'https://academy.groundhogg.io/course/groundhogg-quickstart/' ),
-						], __( 'Take The Quickstart Course!', 'groundhogg' ) );
-
-						?>
-                    </div>
-                    <div class="display-flex gap-20">
-                        <div class="display-flex column gap-20">
-
-                            <!-- Import your list -->
-                            <div class="gh-panel">
-								<?php
-
-								echo html()->e( 'img', [
-									'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/import-your-contact-list-with-groundhogg.png',
-                                    'data-yt-src' => 'https://www.youtube.com/embed/BmTmVAoWSb0',
-									'class' => 'show-video'
-								] );
-
-								echo html()->e( 'a', [
-									'class' => 'button big-button',
-									'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] )
-								], __( 'Import your Contact List!', 'groundhogg' ) );
-
-								echo html()->e( 'a', [
-									'class'  => 'guide-link',
-									'href'   => 'https://help.groundhogg.io/article/14-how-do-i-import-my-list',
-									'target' => '_blank'
-								], __( 'Read the full guide', 'groundhogg' ) );
-
-								?>
-                            </div>
-                            <!-- Create a funnel -->
-                            <div class="gh-panel">
-								<?php
-
-                                echo html()->e( 'img', [
-	                                'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png',
-	                                'data-yt-src' => 'https://www.youtube.com/embed/W1dwQrqEPVw',
-	                                'class' => 'show-video'
-                                ] );
-
-								echo html()->e( 'a', [
-									'class' => 'button big-button',
-									'href'  => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] )
-								], __( 'Create your first Funnel!', 'groundhogg' ) );
-
-								echo html()->e( 'a', [
-									'class'  => 'guide-link',
-									'href'   => 'https://help.groundhogg.io/article/112-how-to-setup-a-lead-magnet-download-funnel',
-									'target' => '_blank'
-								], __( 'Read the full guide', 'groundhogg' ) );
-
-								?>
-                            </div>
-                        </div>
-                        <div class="display-flex column gap-20">
-
-                            <!-- Send a Broadcast -->
-                            <div class="gh-panel">
-								<?php
-
-								echo html()->e( 'img', [
-									'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/send-your-first-broadcast-with-groundhogg.png',
-									'data-yt-src' => 'https://www.youtube.com/embed/bwIbcsEG7Kg',
-									'class' => 'show-video'
-								] );
-
-								echo html()->e( 'a', [
-									'class' => 'button big-button',
-									'href'  => admin_page_url( 'gh_emails', [ 'action' => 'add' ] )
-								], __( 'Send your first Broadcast!' ) ) ?>
-
-								<?php echo html()->e( 'a', [
-									'class'  => 'guide-link',
-									'href'   => 'https://help.groundhogg.io/article/86-how-to-schedule-a-broadcast',
-									'target' => '_blank'
-								], __( 'Read the full guide', 'groundhogg' ) ); ?>
-                            </div>
-
-                            <!-- Configure CRON -->
-                            <div class="gh-panel">
-								<?php
-
-								echo html()->e( 'img', [
-									'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png',
-                                    'data-yt-src' => 'https://www.youtube.com/embed/1-csY3W-WP0',
-                                    'class' => 'show-video'
-								] );
-
-								echo html()->e( 'a', [
-									'class' => 'button big-button',
-									'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] )
-								], __( 'Configure WP-Cron!' ) );
-
-								echo html()->e( 'a', [
-									'class'  => 'guide-link',
-									'href'   => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron',
-									'target' => '_blank'
-								], __( 'Read the full guide', 'groundhogg' ) ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-          (($)=>{
-            $('.gh-panel button.toggle-indicator').on('click', e => {
-              let $el = $(e.target).closest('.gh-panel')
-              $el.toggleClass('closed')
-
-              if ( $el.hasClass('closed') ){
-                Groundhogg.stores.options.patch({
-                  gh_hide_groundhogg_quickstart: true
-                })
-              } else {
-                Groundhogg.stores.options.delete([
-                  'gh_hide_groundhogg_quickstart'
-                ])
-              }
-            })
-
-            $('.show-video').on('click', e => {
-              let $img = $(e.currentTarget)
-              Groundhogg.element.modal({
-                content: `<iframe width="800" height="450" src="{$img.data('yt-src')}"
-                                            frameborder="0"
-                                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                            allowfullscreen></iframe>`
-              })
-
-            })
-          })(jQuery)
-        </script>
-		<?php
 	}
-
-	/**
-	 * Hides the quickstart check list
-	 */
-	public function process_hide_checklist() {
-		update_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart', true );
-	}
-
-	/**
-	 * Shows the quickstart check list
-	 */
-	public function process_show_checklist() {
-		delete_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart' );
-	}
-
 }

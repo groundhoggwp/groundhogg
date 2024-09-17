@@ -3,9 +3,6 @@
 namespace Groundhogg\Admin;
 
 use function Groundhogg\get_request_var;
-use function Groundhogg\get_url_var;
-use Groundhogg\Plugin;
-use function Groundhogg\isset_not_empty;
 
 /**
  * Abstract Admin Page
@@ -83,8 +80,8 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		}
 
 		/**
-         * Filter the capability for the current tab
-         *
+		 * Filter the capability for the current tab
+		 *
 		 * @param $cap    string the cap
 		 * @param $tab    string the current tab
 		 * @param $action string the current action
@@ -169,6 +166,29 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 
 		wp_safe_redirect( $base_url );
 		die();
+	}
+
+	public function script_action() {
+		parent::script_action();
+
+		/**
+		 * To enqueue relates scripts for this page and tab
+		 *
+		 * @param $page   Admin_Page the current page
+		 * @param $action string the current action
+		 * @param $tab    string the current tab
+		 */
+		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}/scripts", $this, $this->get_current_action(), $this->get_current_tab() );
+
+		/**
+		 * To enqueue related scripts for this page, tab, and specific action
+		 *
+		 * @param $page   Admin_Page
+		 * @param $action string the current action
+		 * @param $tab    string the current tab
+		 *
+		 */
+		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}/{$this->get_current_action()}/scripts", $this, $this->get_current_action(), $this->get_current_tab() );
 	}
 
 	/**

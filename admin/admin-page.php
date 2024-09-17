@@ -43,9 +43,9 @@ abstract class Admin_Page extends Supports_Errors {
 	 */
 	public function __construct() {
 
-        $priority = apply_filters( 'groundhogg/admin/menu_priority', $this->get_priority(), $this );
+		$priority = apply_filters( 'groundhogg/admin/menu_priority', $this->get_priority(), $this );
 
-        add_action( 'admin_menu', [ $this, 'register' ], $priority );
+		add_action( 'admin_menu', [ $this, 'register' ], $priority );
 
 		if ( wp_doing_ajax() ) {
 			$this->add_ajax_actions();
@@ -56,6 +56,7 @@ abstract class Admin_Page extends Supports_Errors {
 			$this->maybe_redirect_to_guided_setup();
 
 			add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
+			add_action( 'admin_enqueue_scripts', [ $this, 'script_action' ] ); // added for easier addons
 			add_action( 'admin_enqueue_scripts', [ $this, 'register_pointers' ] );
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
 
@@ -197,6 +198,25 @@ abstract class Admin_Page extends Supports_Errors {
 	 * Enqueue any scripts
 	 */
 	abstract public function scripts();
+
+	public function script_action() {
+
+		/**
+		 * To enqueue relates scripts for this page
+		 *
+		 * @param $page   Admin_Page the current page
+		 * @param $action string the current action
+		 */
+		do_action( "groundhogg/admin/{$this->get_slug()}/scripts", $this, $this->get_current_action() );
+
+		/**
+		 * To enqueue related scripts for this page and specific action
+		 *
+		 * @param $page   Admin_Page
+		 * @param $action string the current action
+		 */
+		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/scripts", $this, $this->get_current_action() );
+	}
 
 	/**
 	 * Register the page
@@ -555,18 +575,18 @@ abstract class Admin_Page extends Supports_Errors {
 		$secondary_object_type = get_request_var( 'secondary_object_type' );
 		$secondary_object_id   = absint( get_request_var( 'secondary_object_id' ) );
 
-        $primary_object = create_object_from_type( $primary_object_id, $primary_object_type );
+		$primary_object   = create_object_from_type( $primary_object_id, $primary_object_type );
 		$secondary_object = create_object_from_type( $secondary_object_id, $secondary_object_type );
 
-        if ( ! current_user_can( "edit_$primary_object_type", $primary_object ) ){
-            $this->wp_die_no_access();
-        }
+		if ( ! current_user_can( "edit_$primary_object_type", $primary_object ) ) {
+			$this->wp_die_no_access();
+		}
 
-        $primary_object->delete_relationship( $secondary_object );
+		$primary_object->delete_relationship( $secondary_object );
 
-        $this->add_notice( 'success', __( 'Relationship removed' ) );
+		$this->add_notice( 'success', __( 'Relationship removed' ) );
 
-        return $primary_object->admin_link();
+		return $primary_object->admin_link();
 	}
 
 	/**

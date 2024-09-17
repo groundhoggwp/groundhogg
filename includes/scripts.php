@@ -294,10 +294,21 @@ class Scripts {
 			'jquery',
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-remote-notifications', GROUNDHOGG_ASSETS_URL . 'js/admin/components/notifications' . $dot_min . '.js', [
 			'groundhogg-admin-element',
-			'groundhogg-admin-components',
+			'groundhogg-make-el',
 			'groundhogg-admin-data',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_localize_script( 'groundhogg-admin-remote-notifications', 'GroundhoggNotifications', [
+			'dismissed_notices' => array_values( parse_maybe_numeric_list( Notices::$dismissed_notices ) ),
+			'read_notices'      => array_values( parse_maybe_numeric_list( Notices::$read_notices ) ),
+			'unread'            => notices()->count_unread(),
+		] );
+
+		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
+			'groundhogg-admin-remote-notifications',
+			'groundhogg-admin-components',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
@@ -487,6 +498,12 @@ class Scripts {
 			'groundhogg-admin-element',
 			'wp-i18n',
 			'moment'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/features/dashboard' . $dot_min . '.js', [
+			'groundhogg-make-el',
+			'groundhogg-admin-remote-notifications',
+			'groundhogg-admin-components'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
