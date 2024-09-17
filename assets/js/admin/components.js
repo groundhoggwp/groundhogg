@@ -20,7 +20,8 @@
     loadingModal,
     textarea,
     spinner,
-
+    skeleton,
+    adminPageURL
   } = Groundhogg.element
   const {
     contacts: ContactsStore,
@@ -71,7 +72,7 @@
               <table>
                   <tbody>
                   <tr>
-                      <td>${ spinner() }</td>
+                      <td>${ skeleton() }</td>
                   </tr>
                   </tbody>
               </table>
@@ -1348,7 +1349,7 @@
           ...Groundhogg.filters.owners.filter(u => !email.bcc.includes(u.data.user_email)).
             map(u => ( {
               text: u.data.user_email,
-              id: u.data.user_email,
+              id  : u.data.user_email,
             } )),
         ],
         tags       : true,
@@ -1625,6 +1626,9 @@
 
   const {
     Div,
+    Img,
+    An,
+    Span,
     ModalFrame,
     Iframe,
     makeEl,
@@ -1773,33 +1777,33 @@
     value = '',
   }) => {
 
-    const handleChange = ( value, attachment ) => {
-      onChange( value, attachment )
-      morphdom( document.getElementById( id ), ImageInput({
+    const handleChange = (value, attachment) => {
+      onChange(value, attachment)
+      morphdom(document.getElementById(id), ImageInput({
         id,
         name,
         onChange,
-        value
-      }) )
+        value,
+      }))
     }
 
     return Div({
       id,
-      className: 'image-picker'
+      className: 'image-picker',
     }, [
       value ? Div({
-        id: `${id}-preview`,
+        id       : `${ id }-preview`,
         className: 'image-input-preview',
-        style: {
-          backgroundImage: `url(${value})`,
+        style    : {
+          backgroundImage: `url(${ value })`,
         },
-        onClick: e => {
+        onClick  : e => {
           e.preventDefault()
           ImagePicker({
             multiple: false,
-            onChange: attachment => handleChange( attachment.url, attachment ),
+            onChange: attachment => handleChange(attachment.url, attachment),
           })
-        }
+        },
       }) : null,
       InputGroup([
         Input({
@@ -1819,7 +1823,7 @@
               e.preventDefault()
               ImagePicker({
                 multiple: false,
-                onChange: attachment => handleChange( attachment.url, attachment ),
+                onChange: attachment => handleChange(attachment.url, attachment),
               })
             },
           },
@@ -1831,7 +1835,7 @@
   const FeedbackModal = ({
     subject = '',
     message = '',
-    onSubmit = r => {}
+    onSubmit = r => {},
   }) => {
 
     const State = Groundhogg.createState({
@@ -1841,10 +1845,13 @@
     })
 
     Modal({
-      width: '400px'
-    }, ({close, morph}) => Form({
+      width: '400px',
+    }, ({
+      close,
+      morph,
+    }) => Form({
       className: 'display-flex column gap-5',
-      onSubmit: e => {
+      onSubmit : e => {
         e.preventDefault()
 
         State.set({
@@ -1854,65 +1861,198 @@
         morph()
 
         Groundhogg.api.ajax({
-          action: 'gh_plugin_feedback',
+          action : 'gh_plugin_feedback',
           subject: State.subject,
-          message: State.message
-        }).then( r => {
-          onSubmit( r )
+          message: State.message,
+        }).then(r => {
+          onSubmit(r)
           dialog({
-            message: 'Thanks for your feedback!'
+            message: 'Thanks for your feedback!',
           })
           close()
         })
 
         return false
-      }
-    },[
+      },
+    }, [
 
       Label({
         for: 'feedback-subject',
-      }, ['What feature are you submitting feedback for?'] ),
+      }, ['What feature are you submitting feedback for?']),
       Input({
-        id: 'feedback-subject',
-        value: State.subject,
+        id      : 'feedback-subject',
+        value   : State.subject,
         required: true,
-        onInput: e => State.set({
-          subject: e.target.value
-        })
+        onInput : e => State.set({
+          subject: e.target.value,
+        }),
       }),
       Div(),
       Label({
-        for: 'feedback-message'
-      }, ['What is your feedback? Be as descriptive as possible.'] ),
+        for: 'feedback-message',
+      }, ['What is your feedback? Be as descriptive as possible.']),
       Textarea({
-        id: 'feedback-message',
-        value: State.message,
+        id      : 'feedback-message',
+        value   : State.message,
         required: true,
-        rows: 4,
-        onInput: e => State.set({
-          message: e.target.value
-        })
+        rows    : 4,
+        onInput : e => State.set({
+          message: e.target.value,
+        }),
       }),
       Button({
         className: 'gh-button primary',
-        type: 'submit',
-        disabled: State.submitting
+        type     : 'submit',
+        disabled : State.submitting,
       }, 'Send feedback'),
-      Pg({}, 'Your email address will be collected to validate your feedback, but will not be used beyond that.' ),
+      Pg({}, 'Your email address will be collected to validate your feedback, but will not be used beyond that.'),
     ]))
 
   }
 
   $(document).on('click', 'a.feedback-modal', e => {
     e.preventDefault()
-    const { subject = '', message = '' } = e.currentTarget.dataset
+    const {
+      subject = '',
+      message = '',
+    } = e.currentTarget.dataset
     FeedbackModal({
       subject,
-      message
+      message,
     })
-  } )
+  })
+
+  const ContactListItem = item => {
+
+    let allTags = item.tags
+    let showTags = allTags.splice(0, 10)
+
+    const {
+      ID,
+    } = item
+
+    const {
+      full_name,
+      gravatar,
+      date_created,
+      email,
+    } = item.data
+
+    // top level item container
+    return Div({
+      className: 'contact-list-item',
+      id       : `contact-list-item-${ ID }`,
+      onClick  : e => {
+        window.open(item.admin, '_self')
+      },
+    }, [
+      // Contact info
+      Div({
+        className: 'display-flex gap-10',
+      }, [
+        Img({
+          className: 'avatar',
+          src      : gravatar,
+          alt      : 'avatar',
+        }),
+        Div({ className: 'display-flex column' }, [
+          Div({ className: 'display-flex' }, [
+            makeEl('h4', {
+              style: {
+                margin: 0,
+              },
+            }, full_name),
+            Span({
+              className: 'subscribed',
+            }, `&nbsp;— ${ sprintf(
+              __('Subscribed %s'),
+              `<abbr title="${ formatDateTime(date_created) }">${ sprintf(__('%s ago '),
+                item.i18n.created) }</abbr>`) }`),
+          ]),
+          Div({}, [
+            An({
+              href: `mailto: ${ email }`,
+            }, email),
+            ' — ',
+            Span({
+              className: `gh-text ${ item.is_marketable ? 'green' : 'red' }`,
+            }, Groundhogg.filters.optin_status[item.data.optin_status]),
+          ]),
+        ]),
+      ]),
+      // Tags
+      Div({ className: 'gh-tags' }, [
+        ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
+      ]),
+    ])
+  }
+
+  const ContactList = (contacts) => Div({
+    className: 'contact-list',
+  }, contacts.map(contact => ContactListItem(contact)))
+
+  const QuickSearch = () => {
+
+    const State = Groundhogg.createState({
+      search  : '',
+      searched: false,
+      results : [],
+    })
+
+    return Div({
+      id: 'quick-search-wrap',
+    }, morph => {
+
+      const updateResults = Groundhogg.functions.debounce(async () => {
+
+        let results = await ContactsStore.fetchItems({
+          search : State.search,
+          orderby: 'date_created',
+          order  : 'DESC',
+          limit  : 5,
+        })
+
+        State.set({
+          results,
+          searched: true,
+        })
+
+        morph()
+
+      }, 300)
+
+      return Fragment([
+        Form({
+          action: adminPageURL('gh_contacts'),
+        }, [
+          Input( {
+            type: 'hidden',
+            name: 'page',
+            value: 'gh_contacts'
+          } ),
+          Input({
+            id         : 'quick-search-input',
+            placeholder: __('Search by name or email...', 'groundhogg'),
+            type       : 'search',
+            name       : 's',
+            value      : State.search,
+            onInput    : e => {
+              State.set({
+                search: e.target.value,
+              })
+              updateResults()
+            },
+          }),
+        ]),
+        State.results.length ? ContactList(State.results) : null,
+        State.results.length === 0 && State.searched ? Pg({}, __('No contacts found for the current search', 'groundhogg')) : null,
+      ])
+    })
+
+  }
 
   Groundhogg.components = {
+    QuickSearch,
     addContactModal,
     internalForm,
     betterTagPicker,
@@ -1926,7 +2066,9 @@
     EmailPreviewModal,
     ImageInput,
     ImagePicker,
-    FeedbackModal
+    FeedbackModal,
+    ContactList,
+    ContactListItem,
   }
 
 } )(jQuery)
