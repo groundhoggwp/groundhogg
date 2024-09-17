@@ -1059,6 +1059,10 @@
       return Object.keys(this.items)
     },
 
+    filter( func ) {
+      return this.keys().filter( key => func( this[key], key ) )
+    },
+
     map( func ) {
       return this.keys().map( key => func( this[key], key ) )
     },
