@@ -21,7 +21,7 @@
     textarea,
     spinner,
     skeleton,
-    adminPageURL
+    adminPageURL,
   } = Groundhogg.element
   const {
     contacts: ContactsStore,
@@ -50,118 +50,33 @@
   } = Groundhogg.formatting
   const { currentUser } = Groundhogg
 
+  const { maybeCall } = Groundhogg.functions
+
   const selectContactModal = ({
     onSelect = () => {},
     exclude = [],
   }) => {
 
-    let search, timeout, results
-
-    const form = () => {
-      // language=HTML
-      return `
-          <div id="search-form">
-              ${ input({
-                  id         : 'contact-search',
-                  value      : search,
-                  type       : 'search',
-                  placeholder: __('Search by name or email', 'groundhogg'),
-              }) }
-          </div>
-          <div id="search-results">
-              <table>
-                  <tbody>
-                  <tr>
-                      <td>${ skeleton() }</td>
-                  </tr>
-                  </tbody>
-              </table>
-          </div>`
-    }
-
-    const {
-      close,
-      setContent,
-    } = modal({
-      content      : form(),
-      dialogClasses: 'no-padding',
-    })
-
-    const renderResult = (contact) => {
-      // language=HTML
-      return `
-          <tr data-id="${ contact.ID }">
-              <td><img src="${ contact.data.gravatar }" alt="${ contact.data.full_name }"></td>
-              <td><b>${ contact.data.full_name }</b><br/>${ contact.data.email }</td>
-              <td>
-                  <button class="select-contact gh-button primary text" data-id="${ contact.ID }">${ __('Select') }
-                  </button>
-              </td>
-          </tr>`
-    }
-
-    const noResults = () => {
-      // language=HTML
-      return `
-          <tr>
-              <td colspan="3"><p>${ __('No contacts match that search...', 'groundhogg') }</p></td>
-          </tr>`
-    }
-
-    const onMount = () => {
-
-      const setSearchResults = (results) => {
-
-        if (!results.length) {
-          $('#search-results table tbody').html(noResults())
-          return
-        }
-
-        $('#search-results table tbody').html(results.map(r => renderResult(r)).join(''))
-
-        $('#search-results tr, .select-contact').on('click', (e) => {
-          close()
-          onSelect(ContactsStore.get(parseInt(e.currentTarget.dataset.id)))
-        })
-      }
-
-      const getResults = () => {
-
-        if (timeout) {
-          clearTimeout(timeout)
-        }
-
-        timeout = setTimeout(() => {
-
-          ContactsStore.fetchItems({
-            search,
-            exclude,
-            limit: 10,
-          }).then(items => {
-            results = items
-            setSearchResults(results)
-          })
-
-        }, 1000)
-      }
-
-      $('#contact-search').on('input change', (e) => {
-        search = e.target.value
-        getResults()
-      }).focus()
-
-      let results = ContactsStore.getItems().filter(c => !exclude.includes(c.ID))
-
-      if (results.length) {
-        setSearchResults(results)
-      }
-      else {
-        getResults()
-      }
-
-    }
-
-    onMount()
+    Modal({
+        dialogClasses: 'no-padding',
+        width        : '400px',
+        onOpen       : e => {
+          document.getElementById('quick-search-input').focus()
+        },
+      },
+      ({ close }) => QuickSearch({
+        itemProps     : contact => ( {
+          onClick: e => {
+            onSelect(contact)
+            close()
+          },
+        } ),
+        queryOverrides: {
+          limit: 15,
+          exclude,
+        },
+      }),
+    )
 
   }
 
@@ -1922,7 +1837,20 @@
     })
   })
 
-  const ContactListItem = item => {
+  const ContactPhone = (icon, number, extension = '') => number ? Span({
+    className: 'contact-phone',
+  }, [
+    icon,
+    An({ href: `tel:${ number }` }, number),
+    extension ? Span({
+      className: 'ext',
+    }, ` x${ extension }`) : null,
+  ]) : null
+
+  const ContactListItem = (item, {
+    extra = item => null,
+    ...props
+  }) => {
 
     let allTags = item.tags
     let showTags = allTags.splice(0, 10)
@@ -1938,13 +1866,20 @@
       email,
     } = item.data
 
+    const {
+      primary_phone = '',
+      primary_phone_extension = '',
+      mobile_phone = '',
+      company_phone = '',
+      company_phone_extension = '',
+    } = item.meta
+
     // top level item container
     return Div({
-      className: 'contact-list-item',
+      className: `contact-list-item`,
       id       : `contact-list-item-${ ID }`,
-      onClick  : e => {
-        window.open(item.admin, '_self')
-      },
+      dataId   : ID,
+      ...props,
     }, [
       // Contact info
       Div({
@@ -1980,18 +1915,44 @@
           ]),
         ]),
       ]),
-      // Tags
-      Div({ className: 'gh-tags' }, [
-        ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
+      Div({
+        className: 'show-on-hover',
+      }, [
+        // Phones
+        primary_phone || company_phone || mobile_phone ? Div({
+          className: 'contact-phones',
+        }, [
+          ContactPhone(icons.mobile, mobile_phone),
+          ContactPhone(icons.phone, primary_phone, primary_phone_extension),
+          ContactPhone(icons.phone, company_phone, company_phone_extension),
+        ]) : null,
+        // Tags
+        Div({ className: 'gh-tags' }, [
+          ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
+        ]),
+        extra(item),
       ]),
     ])
   }
 
-  const ContactList = (contacts) => Div({
-    className: 'contact-list',
-  }, contacts.map(contact => ContactListItem(contact)))
+  const ContactList = (contacts = [], {
+    noContacts = () => null,
+    itemProps = {},
+  } = {}) => {
 
-  const QuickSearch = () => {
+    if (!contacts.length) {
+      return noContacts
+    }
+
+    return Div({
+      className: 'contact-list',
+    }, contacts.map(contact => ContactListItem(contact, maybeCall(itemProps, contact))))
+  }
+
+  const QuickSearch = ({
+    itemProps = {},
+    queryOverrides = {},
+  } = {}) => {
 
     const State = Groundhogg.createState({
       search  : '',
@@ -2010,6 +1971,7 @@
           orderby: 'date_created',
           order  : 'DESC',
           limit  : 5,
+          ...queryOverrides,
         })
 
         State.set({
@@ -2025,11 +1987,11 @@
         Form({
           action: adminPageURL('gh_contacts'),
         }, [
-          Input( {
-            type: 'hidden',
-            name: 'page',
-            value: 'gh_contacts'
-          } ),
+          Input({
+            type : 'hidden',
+            name : 'page',
+            value: 'gh_contacts',
+          }),
           Input({
             id         : 'quick-search-input',
             placeholder: __('Search by name or email...', 'groundhogg'),
@@ -2044,8 +2006,20 @@
             },
           }),
         ]),
-        State.results.length ? ContactList(State.results) : null,
-        State.results.length === 0 && State.searched ? Pg({}, __('No contacts found for the current search', 'groundhogg')) : null,
+        State.results.length ? ContactList(State.results, {
+          itemProps: item => ( {
+            className: 'contact-list-item clickable',
+            onClick  : e => {
+              window.open(item.admin, '_self')
+            },
+            ...maybeCall(itemProps, item),
+          } ),
+        }) : null,
+        State.results.length === 0 && State.searched ? Pg({
+          style: {
+            textAlign: 'center',
+          },
+        }, __('No contacts found for the current search', 'groundhogg')) : null,
       ])
     })
 

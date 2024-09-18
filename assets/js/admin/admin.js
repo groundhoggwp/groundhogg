@@ -589,6 +589,14 @@
     };
   }
 
+  const maybeCall = (maybeFunc, ...args) => {
+    if (maybeFunc instanceof Function) {
+      return maybeFunc(...args)
+    }
+
+    return maybeFunc
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
@@ -596,6 +604,7 @@
   gh.functions.setNestedValue = setNestedValue
   gh.functions.getNestedValue = getNestedValue
   gh.functions.debounce = debounce
+  gh.functions.maybeCall = maybeCall
 
   var check, timeout
 
