@@ -76,7 +76,6 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 						'type'        => 'text',
 						'class'       => 'full-width',
 						'placeholder' => 'Type "confirm" to delete logs.',
-
 						'required'    => true,
 					] );
 
