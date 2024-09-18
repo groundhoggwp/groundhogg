@@ -3,11 +3,14 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Event;
+use Groundhogg\Reporting\New_Reports\Traits\Funnel_Conversion_Stats;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\get_db;
 
 class Total_Funnel_Conversions extends Base_Quick_Stat {
+
+	use Funnel_Conversion_Stats;
 
 	public function get_link() {
 
@@ -39,28 +42,7 @@ class Total_Funnel_Conversions extends Base_Quick_Stat {
 	 * @return mixed
 	 */
 	protected function query( $start, $end ) {
-
-		$conversion_steps = $this->get_funnel()->get_conversion_step_ids();
-
-		if ( empty( $conversion_steps ) ) {
-			return 0;
-		}
-
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'funnel_id', 'val' => $this->get_funnel()->get_id(), 'compare' => '=' ],
-			[ 'col' => 'step_id', 'val' => $conversion_steps, 'compare' => 'IN' ],
-			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
-		];
-
-		return get_db( 'events' )->count( [
-			'where'  => $where,
-			'select' => 'DISTINCT contact_id'
-		] );
-
+		return $this->get_funnel_conversions( $this->get_funnel(), $start, $end );
 	}
 
 

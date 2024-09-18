@@ -7,6 +7,7 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
+use Groundhogg\Reporting\New_Reports\Traits\Funnel_Conversion_Stats;
 use function Groundhogg\_nf;
 use function Groundhogg\array_find;
 use function Groundhogg\array_map_to_class;
@@ -23,6 +24,8 @@ use function Groundhogg\report_link;
 use function Groundhogg\Ymd_His;
 
 class Table_All_Funnels_Performance extends Base_Table_Report {
+
+	use Funnel_Conversion_Stats;
 
 	protected $per_page = 20;
 	protected $orderby = 2;
@@ -307,24 +310,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	 * @return int
 	 */
 	protected function count_conversions( $funnel ) {
-
-		$ids = $funnel->get_conversion_step_ids();
-
-		if ( empty( $ids ) ) {
-			return 0;
-		}
-
-		$eventQuery = new Table_Query( 'events' );
-		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
-		           ->where()
-		           ->lessThanEqualTo( 'time', $this->end )
-		           ->greaterThanEqualTo( 'time', $this->start )
-		           ->equals( 'status', Event::COMPLETE )
-		           ->equals( 'event_type', Event::FUNNEL )
-		           ->equals( 'funnel_id', $funnel->ID )
-		           ->in( 'step_id', $ids );
-
-		return $eventQuery->get_var();
+		return $this->get_funnel_conversions( $funnel, $this->start, $this->end );
 	}
 
 

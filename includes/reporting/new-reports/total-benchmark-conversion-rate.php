@@ -2,11 +2,8 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Contact_Query;
-use Groundhogg\Event;
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
 use function Groundhogg\percentage;
 
 class Total_Benchmark_Conversion_Rate extends Base_Quick_Stat {
@@ -26,7 +23,7 @@ class Total_Benchmark_Conversion_Rate extends Base_Quick_Stat {
 
 		$steps = get_db( 'steps' )->query( [
 			'step_group' => 'benchmark',
-			'orderby '   => 'step_order',
+			'orderby'    => 'step_order',
 			'funnel_id'  => $funnel->get_id()
 		] );
 

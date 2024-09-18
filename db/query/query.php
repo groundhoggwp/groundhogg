@@ -28,11 +28,12 @@ class Query {
 	/**
 	 * @param $table string
 	 */
-	public function __construct( string $table, string $alias = '' ) {
+	public function __construct( $table, string $alias = '' ) {
 
 		global $wpdb;
 		$this->db    = $wpdb;
-		$this->table = $table;
+
+		$this->table = is_a( $table, Query::class ) ? "($table)" : $table;
 
 		if ( empty( $alias ) ) {
 			$alias = str_replace( $wpdb->prefix, '', $table );
