@@ -514,6 +514,7 @@
       let overdue = tasks.filter(t => t.is_overdue)
       let complete = tasks.filter(t => t.is_complete)
       let pending = tasks.filter(t => !t.is_complete)
+      let dueToday = tasks.filter(t => t.is_due_today)
 
       tasks = tasks.filter(State.filter)
 
@@ -551,6 +552,11 @@
             id       : 'filter-complete',
             onClick  : e => changeFilter(t => t.is_complete),
           }, sprintf(__('%d complete', 'groundhogg'), complete.length)) : null,
+          dueToday.length ? Span({
+            className: 'pill yellow filter-tasks',
+            id       : 'filter-due-today',
+            onClick  : e => changeFilter(t => t.is_due_today),
+          }, sprintf(__('%d due today', 'groundhogg'), dueToday.length)) : null,
           userHasCap('add_tasks') && object_id && object_type ? Button({
             id       : 'add-tasks',
             className: 'gh-button secondary text icon',

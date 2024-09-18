@@ -72,6 +72,13 @@ class Welcome_Page extends Admin_Page {
 				'cap'         => is_white_labeled() ? 'do_not_allow' : 'manage_options'
 			],
 			[
+				'title'       => __( 'Configure your cron jobs', 'groundhogg' ),
+				'description' => __( 'This is an optional best practice and will improve the performance of your site.', 'groundhogg' ),
+				'completed'   => gh_cron_installed() && is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
+				'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
+				'cap'         => 'manage_options'
+			],
+			[
 				'title'       => __( 'Sync your users & contacts', 'groundhogg' ),
 				'description' => __( "It looks like you have existing users in your site, let's sync them with your contacts so you can send them email.", 'groundhogg' ),
 				'completed'   => count_users()['total_users'] <= get_db( 'contacts' )->count(),
@@ -98,13 +105,6 @@ class Welcome_Page extends Admin_Page {
 				'completed'   => get_db( 'funnels' )->count( [ 'status' => 'active' ] ) > 0,
 				'fix'         => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
 				'cap'         => 'edit_funnels'
-			],
-			[
-				'title'       => __( 'Configure your cron jobs', 'groundhogg' ),
-				'description' => __( 'This is an optional best practice and will improve the performance of your site.', 'groundhogg' ),
-				'completed'   => gh_cron_installed() && is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
-				'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
-				'cap'         => 'manage_options'
 			],
 		];
 

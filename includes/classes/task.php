@@ -177,6 +177,7 @@ class Task extends Note {
 		return array_merge( parent::get_as_array(), [
 			'is_overdue'    => $this->is_overdue(),
 			'is_complete'   => $this->is_complete(),
+			'is_due_today'  => $dueDate->isToday(),
 			'due_timestamp' => $dueDate->getTimestamp(),
 			'i18n'          => [
 				'time_diff'      => human_time_diff( $this->timestamp, time() ),

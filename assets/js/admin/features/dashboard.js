@@ -32,7 +32,7 @@
   const {
     ContactListItem,
     ContactList,
-    FeedbackModal
+    FeedbackModal,
   } = Groundhogg.components
 
   const {
@@ -42,7 +42,7 @@
   } = Groundhogg.element
 
   const {
-    userHasCap
+    userHasCap,
   } = Groundhogg.user
 
   const {
@@ -86,7 +86,6 @@
     localStorage.setItem('gh_collapsed_widgets', JSON.stringify(disabledWidgets))
   }
 
-
   const Widget = ({
     id,
     name = '',
@@ -98,26 +97,31 @@
       return null
     }
 
-    const morph = () => morphdom( document.getElementById(`${id}-widget`), El() )
+    const morph = () => morphdom(document.getElementById(`${ id }-widget`), El())
 
     const El = () => Div({
-      id: `${id}-widget`,
-      className: `gh-panel ${isWidgetCollapsed(id) ? 'closed' : ''}`,
+      id       : `${ id }-widget`,
+      className: `gh-panel ${ isWidgetCollapsed(id) ? 'closed' : '' }`,
     }, [
       Div({ className: `gh-panel-header` }, [
         H2({}, name),
-        feedback ? An({ href: '#', className: 'feedback-modal', dataSubject: `${name} dashboard widget`, style: {
-            padding: '8px'
-          } }, __('Feedback')) : null,
+        feedback && ! Groundhogg.isWhiteLabeled ? An({
+          href       : '#',
+          className  : 'feedback-modal',
+          dataSubject: `${ name } dashboard widget`,
+          style      : {
+            padding: '8px',
+          },
+        }, __('Feedback')) : null,
         Button({
           className: 'toggle-indicator',
-          onClick: e => {
-            collapseWidget( id )
+          onClick  : e => {
+            collapseWidget(id)
             morph()
-          }
-        })
+          },
+        }),
       ]),
-      isWidgetCollapsed( id ) ? null : render(),
+      isWidgetCollapsed(id) ? null : render(),
     ])
 
     return El()
@@ -148,7 +152,7 @@
     className: 'gh-header sticky no-padding display-flex flex-start',
   }, [
     Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
-    H1({}, `👋 Hey ${Groundhogg.currentUser.data.display_name}!`),
+    H1({}, `👋 Hey ${ Groundhogg.currentUser.data.display_name }!`),
     Button({
       className: 'gh-button primary more-nav small',
       id       : 'quick-actions',
@@ -213,15 +217,15 @@
               ]))
             },
           },
-          {
-            key: 'feedback',
-            text: 'Feedback',
+          Groundhogg.isWhiteLabeled ? null : {
+            key     : 'feedback',
+            text    : 'Feedback',
             onSelect: e => {
               FeedbackModal({
-                subject: 'My Dashboard'
+                subject: 'My Dashboard',
               })
-            }
-          }
+            },
+          },
         ])
       },
     }, icons.verticalDots),
@@ -239,7 +243,8 @@
   const Checklist = ({
     id,
     items,
-    buttonText = __('Finish Task')
+    buttonText = __('Finish Task', 'groundhogg'),
+    moreText = __('Instructions', 'groundhogg'),
   }) => {
 
     const State = Groundhogg.createState({})
@@ -250,9 +255,10 @@
       className: 'onboarding-checklist',
     }, morph => Fragment(items.map(({
       title,
-      description,
-      completed,
-      fix,
+      description = '',
+      completed = false,
+      fix = '#',
+      more = false,
     }, i) => Div({
       className: `checklist-item checklist-row ${ completed ? 'complete' : '' }`,
       id       : `checklist-item-${ i + 1 }`,
@@ -292,27 +298,21 @@
           href     : fix,
           className: 'gh-button primary small',
           target   : '_blank',
-        }, buttonText ),
+        }, buttonText),
         ' ',
-        An({
-          href     : '#',
+        more && !Groundhogg.isWhiteLabeled ? An({
+          href     : more,
           className: 'gh-button primary text small',
           target   : '_blank',
           id       : `more-info-${ i + 1 }`,
-          onClick  : e => {
-            e.preventDefault()
-            Modal({}, Div({}, morph => Fragment([
-              __('Some content here'),
-            ])))
-          },
-        }, __('Instructions')),
+        }, moreText) : null,
       ]) : null,
     ]))))
   }
 
   const Widgets = Groundhogg.createRegistry()
 
-  if ( ! Groundhogg.isWhiteLabeled ){
+  if (!Groundhogg.isWhiteLabeled) {
     Widgets.add('links', {
       name  : 'Helpful Links',
       cap   : '',
@@ -443,14 +443,14 @@
       },
     })
 
-    if ( userHasCap( 'install_plugins' ) ){
+    if (userHasCap('install_plugins')) {
       Widgets.add('notifications', {
         name  : 'Notifications',
         cap   : '',
         col   : 3,
         render: () => Div({
-          className: 'inside',
-          style    : {
+          style: {
+            padding  : '10px',
             maxHeight: '500px',
             overflow : 'auto',
           },
@@ -532,11 +532,11 @@
   }
 
   Widgets.add('checklist', {
-    name  : 'Quickstart Checklist',
-    cap   : '',
-    col   : 1,
+    name    : 'Quickstart Checklist',
+    cap     : '',
+    col     : 1,
     feedback: true,
-    render: () => {
+    render  : () => {
 
       const State = Groundhogg.createState({
         loaded: false,
@@ -602,11 +602,11 @@
     },
   })
   Widgets.add('recommendations', {
-    name  : 'Recommendations',
-    cap   : '',
-    col   : 1,
+    name    : 'Recommendations',
+    cap     : '',
+    col     : 1,
     feedback: true,
-    render: () => {
+    render  : () => {
 
       const State = Groundhogg.createState({
         loaded: false,
@@ -663,9 +663,9 @@
             },
           }, __('Click on a recommendation to view additional details.')),
           Checklist({
-            id   : 'recommendation-items',
-            items: State.items,
-            buttonText: __( 'Implement' )
+            id        : 'recommendation-items',
+            items     : State.items,
+            buttonText: __('Implement'),
           }),
         ])
       })
@@ -817,25 +817,39 @@
           ]),
           Div({
             className: 'full',
-          }, ContactList(State.contacts)),
+          }, [
+            Div({
+              style: {
+                padding: '0 0 10px 20px'
+              }
+            }, Bold({}, __( 'Recent subscribers' ) ) ),
+            ContactList(State.contacts, {
+              itemProps: item => ( {
+                className: 'contact-list-item clickable',
+                onClick  : e => {
+                  window.open(item.admin, '_self')
+                },
+              } ),
+            }),
+          ]),
         ])
       })
 
     },
   })
 
-  if ( userHasCap( 'view_tasks' ) ){
+  if (userHasCap('view_tasks')) {
     Widgets.add('tasks', {
-      name  : 'My Tasks',
-      cap   : '',
-      col   : 2,
+      name    : 'My Tasks',
+      cap     : '',
+      col     : 2,
       feedback: true,
-      render: () =>  Groundhogg.ObjectTasks({
+      render  : () => Groundhogg.ObjectTasks({
         title: false,
         style: {
           maxHeight: '500px',
-          overflow: 'auto'
-        }
+          overflow : 'auto',
+        },
       }),
     })
   }

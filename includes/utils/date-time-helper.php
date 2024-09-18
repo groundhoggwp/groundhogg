@@ -52,7 +52,6 @@ class DateTimeHelper extends \DateTime {
 	public function isToday() {
 		return $this->whenIs() === 'today';
 	}
-
 	public function isTomorrow() {
 		return $this->whenIs() === 'tomorrow';
 	}

@@ -2068,6 +2068,7 @@ button:has(.gh-dropdown-menu){
 .gh-tags {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
 
   button.add-tag {

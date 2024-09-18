@@ -50,7 +50,7 @@
   } = Groundhogg.formatting
   const { currentUser } = Groundhogg
 
-  const { maybeCall } = Groundhogg.functions
+  const { maybeCall, debounce, jsonCopy } = Groundhogg.functions
 
   const selectContactModal = ({
     onSelect = () => {},
@@ -1847,12 +1847,20 @@
     }, ` x${ extension }`) : null,
   ]) : null
 
+  /**
+   *
+   * @param item
+   * @param extra
+   * @param props
+   * @returns {*}
+   * @constructor
+   */
   const ContactListItem = (item, {
     extra = item => null,
     ...props
   }) => {
 
-    let allTags = item.tags
+    let allTags = jsonCopy( item.tags )
     let showTags = allTags.splice(0, 10)
 
     const {
@@ -1929,6 +1937,7 @@
         // Tags
         Div({ className: 'gh-tags' }, [
           ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
+          allTags.length ? Span({}, sprintf( 'and %d more...', allTags.length ) ) : null,
         ]),
         extra(item),
       ]),
@@ -1941,7 +1950,7 @@
   } = {}) => {
 
     if (!contacts.length) {
-      return noContacts
+      return maybeCall( noContacts )
     }
 
     return Div({
@@ -1964,7 +1973,7 @@
       id: 'quick-search-wrap',
     }, morph => {
 
-      const updateResults = Groundhogg.functions.debounce(async () => {
+      const updateResults = debounce(async () => {
 
         let results = await ContactsStore.fetchItems({
           search : State.search,
