@@ -82,6 +82,45 @@
           onInput: e => setInRequest(param, e.target.value),
         }),
         description: () => Pg({}, __('The end of the desired reporting range.', 'groundhogg')),
+      },
+      {
+        param: 'params',
+        type: 'object',
+        required: false,
+        subParams: [
+          {
+            param: '<key>',
+            description: () => Fragment([
+              Pg({}, __('Any arbitrary key with any arbitrary value.', 'groundhogg')),
+            ]),
+            type: 'mixed',
+            required: false,
+            control: ({ param, id, name }) => {
+
+              param = param.replace('.<key>', '') // remove <key> from param since we're editing the meta object directly
+
+              let meta = getFromRequest(param, {})
+              let rows = Object.keys(meta).map(key => ( [key, meta[key]] ))
+
+              return InputRepeater({
+                id,
+                rows: rows,
+                cells: [
+                  props => Input(props),
+                  props => Input(props),
+                ],
+                onChange: rows => {
+                  let newMeta = {}
+                  rows.forEach(([key, val]) => newMeta[key] = val)
+                  setInRequest(param.replace('.<key>', ''), newMeta)
+                },
+              })
+            },
+          },
+        ],
+        description: () => Fragment([
+          Pg({}, __('The params can be used to specify a funnel, broadcast, or other asset.', 'groundhogg')),
+        ]),
       }
     ],
     request: {
@@ -135,6 +174,45 @@
           onInput: e => setInRequest(param, e.target.value),
         }),
         description: () => Pg({}, __('The end of the desired reporting range.', 'groundhogg')),
+      },
+      {
+        param: 'params',
+        type: 'object',
+        required: false,
+        subParams: [
+          {
+            param: '<key>',
+            description: () => Fragment([
+              Pg({}, __('Any arbitrary key with any arbitrary value.', 'groundhogg')),
+            ]),
+            type: 'mixed',
+            required: false,
+            control: ({ param, id, name }) => {
+
+              param = param.replace('.<key>', '') // remove <key> from param since we're editing the meta object directly
+
+              let meta = getFromRequest(param, {})
+              let rows = Object.keys(meta).map(key => ( [key, meta[key]] ))
+
+              return InputRepeater({
+                id,
+                rows: rows,
+                cells: [
+                  props => Input(props),
+                  props => Input(props),
+                ],
+                onChange: rows => {
+                  let newMeta = {}
+                  rows.forEach(([key, val]) => newMeta[key] = val)
+                  setInRequest(param.replace('.<key>', ''), newMeta)
+                },
+              })
+            },
+          },
+        ],
+        description: () => Fragment([
+          Pg({}, __('The params can be used to specify a funnel, broadcast, or other asset.', 'groundhogg')),
+        ]),
       }
     ],
     request: {
