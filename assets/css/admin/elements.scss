@@ -580,7 +580,6 @@ h2.nav-tab-wrapper.gh {
     padding-top: 10px;
     //margin-top: 10px;
     display: flex;
-    width: 100%;
     gap: 20px;
     //align-items: center;
 
@@ -590,7 +589,6 @@ h2.nav-tab-wrapper.gh {
     }
 
     .note-header {
-      width: 100%;
       display: flex;
       font-weight: 500;
       color: $primary-dark-30;
@@ -671,9 +669,20 @@ h2.nav-tab-wrapper.gh {
       display: flex;
       align-items: center;
       margin-bottom: 3px;
+
+      &:hover {
+        text-decoration: none;
+        color: $primary-dark;
+        transition: 0.2s;
+      }
+
       img {
         border-radius: 5px;
         width: 18px;
+        margin-right: 5px;
+      }
+
+      span.dashicons  {
         margin-right: 5px;
       }
 
@@ -1742,6 +1751,23 @@ button {
     gap: 10px;
     justify-content: flex-end;
   }
+
+  #quick-search-wrap {
+
+    form {
+      padding: 30px;
+
+      input {
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+
+    .contact-list{
+      height: 500px;
+      overflow: auto;
+    }
+  }
 }
 
 input.ui-autocomplete-input {
@@ -1934,6 +1960,10 @@ p.error,
   }
 }
 
+button:has(.gh-dropdown-menu){
+  position: relative;
+}
+
 .gh-dropdown-menu {
 
   box-sizing: border-box;
@@ -1949,6 +1979,13 @@ p.error,
   padding: 5px;
   gap: 5px;
 
+  &.absolute {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -1959,7 +1996,8 @@ p.error,
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    font-size: 13px;
+    font-weight: 400;
     gap: 10px;
 
     &:hover {
@@ -2984,27 +3022,29 @@ p.error,
 
 
   &-item {
-
-    cursor: pointer;
     padding: 10px 10px 10px 20px;
     border-top: 1px solid $primary-dark-10;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 
-    .above {
-      display: flex;
-      gap: 10px;
-      //border-radius: 5px;
-      align-items: flex-start;
-      margin-bottom: 10px;
+    &.clickable {
+      cursor: pointer;
     }
 
     .gh-tags {
       gap: 5px;
-      display: none;
 
       .gh-tag {
         font-size: 11px;
         padding: 2px 7px;
       }
+    }
+
+    .show-on-hover{
+      display: none;
+      flex-direction: column;
+      gap: 3px;
     }
 
     &:last-of-type {
@@ -3019,9 +3059,20 @@ p.error,
       font-weight: 500;
     }
 
-    .phones {
+    .contact-phones {
       display: flex;
       gap: 10px;
+      align-items: center;
+
+      .contact-phone {
+        >svg {
+          width: 14px;
+        }
+
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
     }
 
     .pill {
@@ -3045,16 +3096,9 @@ p.error,
     }
 
     &:hover {
-
-      .gh-tags {
+      .show-on-hover{
         display: flex;
-        margin-top: 5px;
       }
-
-      .actions {
-        visibility: visible;
-      }
-
     }
   }
 

@@ -388,6 +388,16 @@
          */
         const belongsToMe = () => user_id == Groundhogg.currentUser.ID
 
+        let assocIcon = null
+
+        if ( task.associated.img ){
+          assocIcon = Img({
+            src: task.associated.img
+          })
+        } else if ( task.associated.icon ){
+          assocIcon = Dashicon( task.associated.icon )
+        }
+
         return Div({
           className: `task ${ task.is_complete ? 'complete' : 'pending' } ${ task.is_overdue ? 'overdue' : '' }`,
           id: `task-item-${task.ID}`,
@@ -482,7 +492,7 @@
           State.myTasks ? An({
             className: 'associated-object',
             href: task.associated.link,
-          }, [ Img({ src: task.associated.img }), task.associated.name ] ) : null,
+          }, [ assocIcon, task.associated.name ] ) : null,
           Div({
             className: 'display-flex gap-5 align-center details'
             }, [
@@ -543,7 +553,7 @@
           }, sprintf(__('%d complete', 'groundhogg'), complete.length)) : null,
           userHasCap('add_tasks') && object_id && object_type ? Button({
             id       : 'add-tasks',
-            className: 'gh-button secondary text',
+            className: 'gh-button secondary text icon',
             onClick  : e => {
 
               if (State.editing) {

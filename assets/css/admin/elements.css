@@ -448,7 +448,6 @@ h2.nav-tab-wrapper.gh button .dashicons {
   border-top: 1px solid rgba(16, 38, 64, 0.1);
   padding-top: 10px;
   display: flex;
-  width: 100%;
   gap: 20px;
 }
 .notes-widget .note > .icon {
@@ -456,7 +455,6 @@ h2.nav-tab-wrapper.gh button .dashicons {
   padding-top: 10px;
 }
 .notes-widget .note .note-header {
-  width: 100%;
   display: flex;
   font-weight: 500;
   color: rgba(16, 38, 64, 0.3);
@@ -520,9 +518,17 @@ h2.nav-tab-wrapper.gh button .dashicons {
   align-items: center;
   margin-bottom: 3px;
 }
+.tasks-widget .task a.associated-object:hover {
+  text-decoration: none;
+  color: #102640;
+  transition: 0.2s;
+}
 .tasks-widget .task a.associated-object img {
   border-radius: 5px;
   width: 18px;
+  margin-right: 5px;
+}
+.tasks-widget .task a.associated-object span.dashicons {
   margin-right: 5px;
 }
 .tasks-widget .task .details {
@@ -1632,6 +1638,18 @@ button.gh-submit .gh-spinner {
   gap: 10px;
   justify-content: flex-end;
 }
+.gh-modal #quick-search-wrap form {
+  padding: 30px;
+}
+.gh-modal #quick-search-wrap form input {
+  width: 100%;
+  font-size: 16px;
+}
+.gh-modal #quick-search-wrap .contact-list {
+  height: 500px;
+  overflow: auto;
+}
+
 input.ui-autocomplete-input.focus-visible {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
@@ -1787,6 +1805,10 @@ p.error,
   border-radius: 4px 4px 4px 4px;
 }
 
+button:has(.gh-dropdown-menu) {
+  position: relative;
+}
+
 .gh-dropdown-menu {
   box-sizing: border-box;
   z-index: 10000;
@@ -1801,6 +1823,12 @@ p.error,
   padding: 5px;
   gap: 5px;
 }
+.gh-dropdown-menu.absolute {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translateY(100%);
+}
 .gh-dropdown-menu * {
   box-sizing: border-box;
 }
@@ -1810,6 +1838,8 @@ p.error,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 13px;
+  font-weight: 400;
   gap: 10px;
 }
 .gh-dropdown-menu-item:hover {
@@ -2624,23 +2654,26 @@ p.error,
   text-align: center;
 }
 .contact-list-item {
-  cursor: pointer;
   padding: 10px 10px 10px 20px;
   border-top: 1px solid rgba(16, 38, 64, 0.1);
-}
-.contact-list-item .above {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 3px;
+}
+.contact-list-item.clickable {
+  cursor: pointer;
 }
 .contact-list-item .gh-tags {
   gap: 5px;
-  display: none;
 }
 .contact-list-item .gh-tags .gh-tag {
   font-size: 11px;
   padding: 2px 7px;
+}
+.contact-list-item .show-on-hover {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
 }
 .contact-list-item:last-of-type {
   border-bottom: 1px solid rgba(16, 38, 64, 0.1);
@@ -2651,9 +2684,18 @@ p.error,
 .contact-list-item .name {
   font-weight: 500;
 }
-.contact-list-item .phones {
+.contact-list-item .contact-phones {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+.contact-list-item .contact-phones .contact-phone {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.contact-list-item .contact-phones .contact-phone > svg {
+  width: 14px;
 }
 .contact-list-item .pill {
   font-size: 12px;
@@ -2670,12 +2712,8 @@ p.error,
   visibility: hidden;
   margin-left: auto;
 }
-.contact-list-item:hover .gh-tags {
+.contact-list-item:hover .show-on-hover {
   display: flex;
-  margin-top: 5px;
-}
-.contact-list-item:hover .actions {
-  visibility: visible;
 }
 
 /*# sourceMappingURL=elements.css.map */
