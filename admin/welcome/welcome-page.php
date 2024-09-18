@@ -298,15 +298,9 @@ class Welcome_Page extends Admin_Page {
 	 */
 	public function register() {
 
-		if ( is_white_labeled() ) {
-			$name = white_labeled_name();
-		} else {
-			$name = 'Groundhogg';
-		}
-
 		$page = add_menu_page(
 			'Groundhogg',
-			$name,
+			white_labeled_name(),
 			'view_contacts',
 			'groundhogg',
 			[ $this, 'page' ],
@@ -328,11 +322,6 @@ class Welcome_Page extends Admin_Page {
 		);
 
 		$this->screen_id = $page;
-
-		/* White label compat */
-		if ( is_white_labeled() ) {
-			remove_submenu_page( 'groundhogg', 'groundhogg' );
-		}
 
 		add_action( "load-" . $page, array( $this, 'help' ) );
 	}

@@ -84,6 +84,13 @@ class Admin_Menu {
 		return get_array_var( $preset_order, $slug, $priority );
 	}
 
+	/**
+	 * Add the .groundhogg-admin-page body class to groundhogg pages
+	 *
+	 * @param $class
+	 *
+	 * @return mixed|string
+	 */
 	public function admin_body_class( $class ) {
 
 		$current_page = get_url_var( 'page' );
@@ -100,6 +107,8 @@ class Admin_Menu {
 	}
 
 	/**
+	 * Add the admin bar widget
+	 *
 	 * @param $admin_bar \WP_Admin_Bar
 	 */
 	public function admin_bar( $admin_bar ) {
@@ -138,7 +147,7 @@ class Admin_Menu {
 	}
 
 	/**
-	 * Setup the base DBs for the plugin
+	 * Set up the menu pages for the plugin
 	 */
 	public function init_admin() {
 

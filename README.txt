@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.6
 Requires PHP: 7.1
-Stable tag: 3.6.1.1
+Stable tag: 3.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,24 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.7 (2024-19-18) =
+* ADDED New personalized dashboard experience to replace the welcome page.
+ * New *My Tasks* widget
+ * New *Summary* widget
+ * New *Recommendations* widget
+ * New *News* widget
+ * New *Helpful Links* widget
+ * Optimized quick start checklist
+ * Enable & disable widgets
+ * Supports white-labeling
+* ADDED `params` parameter to the Reports API playground.
+* IMPROVED Quick search is faster and shows more information.
+* TWEAKED My Tasks has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
+* TWEAKED The *Restore Missing Funnel Events* tool has been moved to the *Logs > Manage* tab.
+* TWEAKED The *Sync Users* tool is now a background process instead of a loader.
+* TWEAKED Replaced many usages of the branded loader with skeleton wireframe loaders.
+* TWEAKED Funnels with starting benchmarks also acting as a conversion will calculate the conversion based on the 2nd completed event within the time range.
 
 = 3.6.1.1 (2024-09-06) =
 * FIXED PHP Warnings causing custom reports not to load.
