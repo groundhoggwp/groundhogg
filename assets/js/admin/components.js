@@ -1553,6 +1553,7 @@
     Input,
     Label,
     Fragment,
+    Skeleton,
     Pg,
     Form,
     Textarea,
@@ -1967,29 +1968,36 @@
       search  : '',
       searched: false,
       results : [],
+      loaded: false,
     })
+
+    const fetchResults = async () => {
+      let results = await ContactsStore.fetchItems({
+        search : State.search,
+        orderby: 'date_created',
+        order  : 'DESC',
+        limit  : 5,
+        ...queryOverrides,
+      })
+
+      State.set({
+        results,
+        searched: true,
+        loaded: true
+      })
+    }
 
     return Div({
       id: 'quick-search-wrap',
     }, morph => {
 
+      if ( ! State.loaded ){
+        fetchResults().then( morph )
+      }
+
       const updateResults = debounce(async () => {
-
-        let results = await ContactsStore.fetchItems({
-          search : State.search,
-          orderby: 'date_created',
-          order  : 'DESC',
-          limit  : 5,
-          ...queryOverrides,
-        })
-
-        State.set({
-          results,
-          searched: true,
-        })
-
+        await fetchResults()
         morph()
-
       }, 300)
 
       return Fragment([
@@ -2015,6 +2023,7 @@
             },
           }),
         ]),
+        State.loaded ? null : Skeleton({}, [ 'full','full','full' ]),
         State.results.length ? ContactList(State.results, {
           itemProps: item => ( {
             className: 'contact-list-item clickable',

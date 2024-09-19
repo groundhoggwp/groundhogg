@@ -859,4 +859,8 @@
     morphDashboard()
   })
 
+  Groundhogg.dashboard = {
+    Widgets
+  }
+
 } )(jQuery)
