@@ -20,6 +20,11 @@
     Skeleton,
     Modal,
     makeEl,
+    Table,
+    TBody,
+    Tr,
+    Td,
+    Th,
   } = MakeEl
 
   const {
@@ -49,6 +54,8 @@
     ajax,
     get,
   } = Groundhogg.api
+
+  const { formatNumber } = Groundhogg.formatting
 
   const State = Groundhogg.createState({
     crmTodaysContactsLoaded: false,
@@ -105,7 +112,7 @@
     }, [
       Div({ className: `gh-panel-header` }, [
         H2({}, name),
-        feedback && ! Groundhogg.isWhiteLabeled ? An({
+        feedback && !Groundhogg.isWhiteLabeled ? An({
           href       : '#',
           className  : 'feedback-modal',
           dataSubject: `${ name } dashboard widget`,
@@ -820,9 +827,9 @@
           }, [
             Div({
               style: {
-                padding: '0 0 10px 20px'
-              }
-            }, Bold({}, __( 'Recent subscribers' ) ) ),
+                padding: '0 0 10px 20px',
+              },
+            }, Bold({}, __('Recent subscribers'))),
             ContactList(State.contacts, {
               itemProps: item => ( {
                 className: 'contact-list-item clickable',
@@ -833,6 +840,61 @@
             }),
           ]),
         ])
+      })
+
+    },
+  })
+
+  Widgets.add('searches', {
+    name  : 'Searches',
+    col   : 1,
+    render: () => {
+
+      const State = Groundhogg.createState({
+        loaded: false,
+      })
+
+      return Div({
+        id: 'searches-table',
+      }, morph => {
+
+        if (!State.loaded) {
+
+          Groundhogg.stores.searches.fetchItems({
+            counts: true,
+          }).then(items => {
+            State.set({
+              loaded: true,
+            })
+            morph()
+          })
+
+          return Skeleton({}, [
+            'span-9',
+            'span-3',
+            'span-9',
+            'span-3',
+            'span-9',
+            'span-3',
+          ])
+        }
+
+        return Div({
+          className: 'gh-striped',
+        }, Groundhogg.stores.searches.getItems().map(search => Div({
+          className: 'row space-between',
+          style: {
+            padding: '10px'
+          }
+        }, [
+          Bold({}, search.name),
+          An({
+            href: adminPageURL('gh_contacts', {
+              saved_search: search.id,
+            }),
+          }, `${ formatNumber(search.count) }`),
+        ])))
+
       })
 
     },
@@ -860,7 +922,7 @@
   })
 
   Groundhogg.dashboard = {
-    Widgets
+    Widgets,
   }
 
 } )(jQuery)

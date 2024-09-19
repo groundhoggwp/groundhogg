@@ -2717,4 +2717,8 @@ button:has(.gh-dropdown-menu) {
   display: flex;
 }
 
+.gh-striped .row:nth-child(odd) {
+  background-color: rgba(0, 117, 255, 0.02);
+}
+
 /*# sourceMappingURL=elements.css.map */

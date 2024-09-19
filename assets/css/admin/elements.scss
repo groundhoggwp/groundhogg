@@ -3104,3 +3104,10 @@ button:has(.gh-dropdown-menu){
   }
 
 }
+
+
+.gh-striped{
+  .row:nth-child(odd) {
+    background-color: $primary-blue-2;
+  }
+}

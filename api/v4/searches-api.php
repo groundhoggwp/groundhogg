@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Api\V4;
 
+use Groundhogg\Contact_Query;
 use Groundhogg\Saved_Searches;
 
 class Searches_Api extends Base_Api {
@@ -67,6 +68,19 @@ class Searches_Api extends Base_Api {
 			} );
 		}
 
+		// Include contact counts
+		if ( $request->has_param( 'counts' ) && $request->get_param( 'counts' ) ) {
+			foreach ( $searches as &$search ) {
+				$query = new Contact_Query( $search['query'] );
+				$search['count'] = $query->count();
+			}
+
+			// Sort by count descending
+			usort( $searches, function ( $a, $b ) {
+				return $b['count'] - $a['count'];
+			});
+		}
+
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $searches,
 			'total_items' => count( $searches )
@@ -92,6 +106,20 @@ class Searches_Api extends Base_Api {
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => Saved_Searches::instance()->get( $query_id )
+		] );
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function read_single( \WP_REST_Request $request ) {
+
+		$search_id = $request->get_param( 'id' );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => Saved_Searches::instance()->get( $search_id )
 		] );
 	}
 
