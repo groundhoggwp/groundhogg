@@ -42,8 +42,6 @@
 
   const dueBy = (task) => {
 
-
-
     if (isOverdue(task)) {
       return `<span class="pill red" title="${ task.i18n.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
         task.i18n.due_in) }</span>`
