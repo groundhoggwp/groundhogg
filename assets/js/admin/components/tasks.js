@@ -489,7 +489,7 @@
               }, icons.verticalDots),
             ]),
           ]),
-          State.myTasks ? An({
+          ! object_id ? An({
             className: 'associated-object',
             href: task.associated.link,
           }, [ assocIcon, task.associated.name ] ) : null,
@@ -534,7 +534,8 @@
 
       return Fragment([
         title ? H3({}, title) : null,
-        Div({
+
+        object_id || tasks.length ? Div({
           className: 'tasks-header',
         }, [
           pending.length ? Span({
@@ -557,7 +558,7 @@
             id       : 'filter-due-today',
             onClick  : e => changeFilter(t => t.is_due_today),
           }, sprintf(__('%d due today', 'groundhogg'), dueToday.length)) : null,
-          userHasCap('add_tasks') && object_id && object_type ? Button({
+          userHasCap('add_tasks') && object_id ? Button({
             id       : 'add-tasks',
             className: 'gh-button secondary text icon',
             onClick  : e => {
@@ -576,9 +577,14 @@
             Dashicon('plus-alt2'),
             ToolTip('Add Task', 'left'),
           ]) : null,
-        ]),
+        ]) : null,
         State.adding ? TaskDetails() : null,
         ...tasks.map(task => State.editing == task.ID ? TaskDetails(task) : Task(task)),
+        tasks.length || State.adding ? null : Pg({
+          style: {
+            textAlign: 'center'
+          }
+        }, __( '🎉 No pending tasks!', 'groundhogg' ) )
       ])
     })
 
