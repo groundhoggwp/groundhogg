@@ -856,6 +856,10 @@
 
       return Div({
         id: 'searches-table',
+        style: {
+          maxHeight: '500px',
+          overflow:'auto'
+        }
       }, morph => {
 
         if (!State.loaded) {
@@ -877,6 +881,14 @@
             'span-9',
             'span-3',
           ])
+        }
+
+        if ( ! Groundhogg.stores.searches.hasItems() ){
+          return Pg({
+            style: {
+              textAlign: 'center'
+            }
+          }, __( 'You don\'t have any saved searches.', 'groundhogg' ) )
         }
 
         return Div({
@@ -917,7 +929,7 @@
   }
 
   $(() => {
-    console.log('here')
+    console.log('render dashboard')
     morphDashboard()
   })
 

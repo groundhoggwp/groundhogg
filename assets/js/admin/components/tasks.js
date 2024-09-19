@@ -31,21 +31,38 @@
     task   : __('Task', 'groundhogg'),
     call   : __('Call', 'groundhogg'),
     email  : __('Email', 'groundhogg'),
-    meeting: __('Meeting', 'groundhogg'),
+    meeting: __('Meeting', 'groundhogg')
   }
+
+  const isOverdue = t => t.is_overdue
+  const isComplete = t => t.is_complete
+  const isPending = t => !t.is_complete
+  const isDueToday = t => t.is_due_today
+  const isDueSoon = t => t.days_till_due < 14 && ! t.is_overdue && t.days_till_due > 1
+
   const dueBy = (task) => {
 
-    if (task.is_overdue) {
-      return `<span class="pill orange" title="${ task.i18n.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
+
+
+    if (isOverdue(task)) {
+      return `<span class="pill red" title="${ task.i18n.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
         task.i18n.due_in) }</span>`
     }
 
-    if (task.is_complete) {
+    if ( isComplete(task) ){
       return `<span class="pill green" title="${ task.i18n.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
         task.i18n.completed) }</span>`
     }
 
-    return `<span class="pill" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
+    let color = ''
+
+    if ( isDueToday( task ) ){
+      color = 'orange'
+    } else if ( isDueSoon( task ) ){
+      color = 'yellow'
+    }
+
+    return `<span class="pill ${color}" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
       task.i18n.due_in) }</span>`
   }
 
@@ -111,7 +128,7 @@
     const State = Groundhogg.createState({
       adding      : false,
       editing     : false,
-      filter      : t => !t.is_complete,
+      filter      : isPending,
       tasks       : [],
       loaded      : false,
       edit_summary: '',
@@ -134,7 +151,7 @@
     const fetchTasks = () => {
 
       let query = {
-        limit  :  30,
+        limit  :  99,
         orderby: 'due_date',
         order  : 'ASC',
       }
@@ -511,19 +528,14 @@
 
       tasks = tasks.sort((a, b) => a.due_timestamp - b.due_timestamp)
 
-      let overdue = tasks.filter(t => t.is_overdue)
-      let complete = tasks.filter(t => t.is_complete)
-      let pending = tasks.filter(t => !t.is_complete)
-      let dueToday = tasks.filter(t => t.is_due_today)
-
-      tasks = tasks.filter(State.filter)
+      let filteredTasks = tasks.filter(State.filter)
 
       /**
        * Update the current filter on the tasks
        *
        * @param filter
        */
-      const changeFilter = filter => {
+      const setFilter = filter => {
         State.set({
           filter,
           adding : false,
@@ -532,32 +544,59 @@
         morph()
       }
 
+      const FilterPill = ({
+        text = '',
+        color = '',
+        filter = isPending,
+      }) => {
+
+        let num = tasks.filter( filter ).length
+
+        if ( ! num ){
+          return null
+        }
+
+        return Span({
+          className: `pill ${color} clickable ${State.filter === filter ? 'bold' : '' }`,
+          onClick  : e => setFilter(filter),
+        }, sprintf( text, num ))
+      }
+
       return Fragment([
         title ? H3({}, title) : null,
 
         object_id || tasks.length ? Div({
           className: 'tasks-header',
         }, [
-          pending.length ? Span({
-            className: 'pill filter-tasks',
-            id       : 'filter-pending',
-            onClick  : e => changeFilter(t => !t.is_complete),
-          }, sprintf(__('%d pending', 'groundhogg'), pending.length)) : null,
-          overdue.length ? Span({
-            className: 'pill orange filter-tasks',
-            id       : 'filter-overdue',
-            onClick  : e => changeFilter(t => t.is_overdue),
-          }, sprintf(__('%d overdue', 'groundhogg'), overdue.length)) : null,
-          complete.length ? Span({
-            className: 'pill green filter-tasks',
-            id       : 'filter-complete',
-            onClick  : e => changeFilter(t => t.is_complete),
-          }, sprintf(__('%d complete', 'groundhogg'), complete.length)) : null,
-          dueToday.length ? Span({
-            className: 'pill yellow filter-tasks',
-            id       : 'filter-due-today',
-            onClick  : e => changeFilter(t => t.is_due_today),
-          }, sprintf(__('%d due today', 'groundhogg'), dueToday.length)) : null,
+          FilterPill({
+            text: __('%d overdue', 'groundhogg'),
+            color: 'red',
+            filter: isOverdue
+          }),
+
+          FilterPill({
+            text: __('%d due today', 'groundhogg'),
+            color: 'orange',
+            filter: isDueToday
+          }),
+
+          FilterPill({
+            text: __('%d due soon', 'groundhogg'),
+            color: 'yellow',
+            filter: isDueSoon
+          }),
+
+          FilterPill({
+            text: __('%d pending', 'groundhogg'),
+            filter: isPending
+          }),
+
+          FilterPill({
+            text: __('%d complete', 'groundhogg'),
+            color: 'green',
+            filter: isComplete
+          }),
+
           userHasCap('add_tasks') && object_id ? Button({
             id       : 'add-tasks',
             className: 'gh-button secondary text icon',
@@ -579,7 +618,7 @@
           ]) : null,
         ]) : null,
         State.adding ? TaskDetails() : null,
-        ...tasks.map(task => State.editing == task.ID ? TaskDetails(task) : Task(task)),
+        ...filteredTasks.map(task => State.editing == task.ID ? TaskDetails(task) : Task(task)),
         tasks.length || State.adding ? null : Pg({
           style: {
             textAlign: 'center'

@@ -174,10 +174,14 @@ class Task extends Note {
 
 		$associated = apply_filters( 'groundhogg/task/associated_context', $associated, $object );
 
+		$diff = $dueDate->diff( new DateTimeHelper() );
+
+
 		return array_merge( parent::get_as_array(), [
 			'is_overdue'    => $this->is_overdue(),
 			'is_complete'   => $this->is_complete(),
 			'is_due_today'  => $dueDate->isToday(),
+			'days_till_due' => $diff->days,
 			'due_timestamp' => $dueDate->getTimestamp(),
 			'i18n'          => [
 				'time_diff'      => human_time_diff( $this->timestamp, time() ),

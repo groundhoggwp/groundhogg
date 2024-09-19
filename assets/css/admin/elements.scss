@@ -250,6 +250,7 @@ h3 {
     flex-direction: column;
   }
 
+  &.flex-wrap,
   &.wrap {
     flex-wrap: wrap;
   }
@@ -638,15 +639,6 @@ h2.nav-tab-wrapper.gh {
       margin: 0;
     }
 
-    .pill {
-      font-weight: 500;
-      cursor: pointer;
-
-      &:hover {
-        opacity: 0.8;
-      }
-    }
-
     #add-tasks {
       margin-left: auto;
     }
@@ -924,6 +916,20 @@ a.action-link {
   &.sm {
     font-size: 13px;
   }
+
+  &.bold{
+    font-weight: 500;
+  }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+
 }
 
 svg,

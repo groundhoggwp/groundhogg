@@ -12,6 +12,7 @@ use function Groundhogg\has_premium_features;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\notices;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
@@ -291,6 +292,7 @@ class Welcome_Page extends Admin_Page {
 	 * @return void
 	 */
 	protected function add_additional_actions() {
+		add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 	}
 
 	/**
@@ -335,6 +337,8 @@ class Welcome_Page extends Admin_Page {
 
 		wp_enqueue_script( 'groundhogg-admin-dashboard' );
 		wp_enqueue_editor();
+
+
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Saved_Searches;
+use Groundhogg\Utils\Micro_Time_Tracker;
 
 class Searches_Api extends Base_Api {
 
@@ -71,14 +72,17 @@ class Searches_Api extends Base_Api {
 		// Include contact counts
 		if ( $request->has_param( 'counts' ) && $request->get_param( 'counts' ) ) {
 			foreach ( $searches as &$search ) {
-				$query = new Contact_Query( $search['query'] );
+//				$time            = new Micro_Time_Tracker();
+				$query           = new Contact_Query( $search['query'] );
 				$search['count'] = $query->count();
+//				$search['time']  = $time->time_elapsed_rounded();
 			}
 
 			// Sort by count descending
 			usort( $searches, function ( $a, $b ) {
 				return $b['count'] - $a['count'];
-			});
+//				return $b['time'] - $a['time'];
+			} );
 		}
 
 		return self::SUCCESS_RESPONSE( [

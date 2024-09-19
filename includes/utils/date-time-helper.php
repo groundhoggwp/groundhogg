@@ -30,7 +30,7 @@ class DateTimeHelper extends \DateTime {
 
 	public function whenIs() {
 
-		$compare   = new \DateTime( 'today', $this->getTimezone() );
+		$compare   = new DateTimeHelper( 'today' );
 		$timestamp = $this->getTimestamp();
 		$this->setTime( 0, 0, 0 );
 		$interval = $compare->diff( $this );

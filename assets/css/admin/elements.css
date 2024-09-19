@@ -174,7 +174,7 @@ h3.no-margin-top {
 .display-flex.column {
   flex-direction: column;
 }
-.display-flex.wrap {
+.display-flex.flex-wrap, .display-flex.wrap {
   flex-wrap: wrap;
 }
 
@@ -492,13 +492,6 @@ h2.nav-tab-wrapper.gh button .dashicons {
   font-size: 14px;
   margin: 0;
 }
-.tasks-widget .tasks-header .pill {
-  font-weight: 500;
-  cursor: pointer;
-}
-.tasks-widget .tasks-header .pill:hover {
-  opacity: 0.8;
-}
 .tasks-widget .tasks-header #add-tasks {
   margin-left: auto;
 }
@@ -711,6 +704,15 @@ a.action-link {
 }
 .pill.sm {
   font-size: 13px;
+}
+.pill.bold {
+  font-weight: 500;
+}
+.pill.clickable {
+  cursor: pointer;
+}
+.pill.clickable:hover {
+  opacity: 0.8;
 }
 
 svg.red, svg.danger,
