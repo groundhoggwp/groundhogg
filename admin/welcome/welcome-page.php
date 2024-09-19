@@ -116,7 +116,7 @@ class Welcome_Page extends Admin_Page {
 		} );
 
 		wp_send_json_success( [
-			'items' => $checklist_items,
+			'items' => array_values( $checklist_items ),
 		] );
 	}
 
@@ -163,7 +163,7 @@ class Welcome_Page extends Admin_Page {
 				'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
 				'completed'   => \Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
 				'fix'         => $smtp_fix_link,
-				'cap'         => 'install_plugins'
+				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins'
 			],
 			[
 				'title'       => __( 'Leverage funnel conversion tracking', 'groundhogg' ),
@@ -237,7 +237,7 @@ class Welcome_Page extends Admin_Page {
 		} );
 
 		wp_send_json_success( [
-			'items' => $checklist_items,
+			'items' => array_values( $checklist_items ),
 		] );
 	}
 
