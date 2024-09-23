@@ -283,9 +283,8 @@ code.meta-replacement-code {
   position: relative;
   margin-left: 20px;
 }
-#activity-timeline li.activity-item table td {
+#activity-timeline li.activity-item table td:first-child {
   word-break: normal;
-  overflow: auto;
 }
 #activity-timeline li.activity-item:not(:hover, :active, :focus) .event-more, #activity-timeline li.activity-item:not(:hover, :active, :focus) .event-queue-more {
   display: none;

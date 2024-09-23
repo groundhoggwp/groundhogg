@@ -340,9 +340,8 @@ code.meta-replacement-code {
   li.activity-item {
 
     table{
-      td {
+      td:first-child {
         word-break:normal;
-        overflow: auto;
       }
     }
 

@@ -1000,4 +1000,8 @@ label.gh-switch input:checked ~ span.off {
   margin: 0;
 }
 
+.table-scroll {
+  overflow-x: auto;
+}
+
 /*# sourceMappingURL=admin.css.map */

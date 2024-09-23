@@ -730,6 +730,7 @@
 
           html.push(ActivityDetails(meta, {
             key: k => `<code>${ k }</code>`,
+            value: v => JSON.stringify( v )
           }))
 
           return html.join('')
