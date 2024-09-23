@@ -50,10 +50,15 @@
   } = Groundhogg.formatting
   const { currentUser } = Groundhogg
 
-  const { maybeCall, debounce, jsonCopy } = Groundhogg.functions
+    const {
+    maybeCall,
+    debounce,
+    jsonCopy,
+  } = Groundhogg.functions
 
   const selectContactModal = ({
     onSelect = () => {},
+    onClose = () => {},
     exclude = [],
   }) => {
 
@@ -63,6 +68,7 @@
         onOpen       : e => {
           document.getElementById('quick-search-input').focus()
         },
+
       },
       ({ close }) => QuickSearch({
         itemProps     : contact => ( {
@@ -1541,6 +1547,9 @@
 
   const {
     Div,
+    H2,
+    H4,
+    Toggle,
     Img,
     An,
     Span,
@@ -1550,6 +1559,7 @@
     Button,
     Modal,
     Dashicon,
+    ToolTip,
     Input,
     Label,
     Fragment,
@@ -1859,9 +1869,9 @@
   const ContactListItem = (item, {
     extra = item => null,
     ...props
-  }) => {
+  } = {}) => {
 
-    let allTags = jsonCopy( item.tags )
+    let allTags = jsonCopy(item.tags)
     let showTags = allTags.splice(0, 10)
 
     const {
@@ -1900,7 +1910,7 @@
           alt      : 'avatar',
         }),
         Div({ className: 'display-flex column' }, [
-          Div({ className: 'display-flex' }, [
+          Div({}, [
             makeEl('h4', {
               style: {
                 margin: 0,
@@ -1917,10 +1927,12 @@
             An({
               href: `mailto: ${ email }`,
             }, email),
-            ' — ',
-            Span({
-              className: `gh-text ${ item.is_marketable ? 'green' : 'red' }`,
-            }, Groundhogg.filters.optin_status[item.data.optin_status]),
+            Span({}, [
+              ' — ',
+              Span({
+                className: `gh-text ${ item.is_marketable ? 'green' : 'red' }`,
+              }, Groundhogg.filters.optin_status[item.data.optin_status])
+            ]),
           ]),
         ]),
       ]),
@@ -1938,9 +1950,9 @@
         // Tags
         Div({ className: 'gh-tags' }, [
           ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
-          allTags.length ? Span({}, sprintf( 'and %d more...', allTags.length ) ) : null,
+          allTags.length ? Span({}, sprintf('and %d more...', allTags.length)) : null,
         ]),
-        extra(item),
+        maybeCall(extra,item),
       ]),
     ])
   }
@@ -1951,7 +1963,7 @@
   } = {}) => {
 
     if (!contacts.length) {
-      return maybeCall( noContacts )
+      return maybeCall(noContacts)
     }
 
     return Div({
@@ -1968,7 +1980,7 @@
       search  : '',
       searched: false,
       results : [],
-      loaded: false,
+      loaded  : false,
     })
 
     const fetchResults = async () => {
@@ -1983,7 +1995,7 @@
       State.set({
         results,
         searched: true,
-        loaded: true
+        loaded  : true,
       })
     }
 
@@ -1991,8 +2003,8 @@
       id: 'quick-search-wrap',
     }, morph => {
 
-      if ( ! State.loaded ){
-        fetchResults().then( morph )
+      if (!State.loaded) {
+        fetchResults().then(morph)
       }
 
       const updateResults = debounce(async () => {
@@ -2023,7 +2035,11 @@
             },
           }),
         ]),
-        State.loaded ? null : Skeleton({}, [ 'full','full','full' ]),
+        State.loaded ? null : Skeleton({}, [
+          'full',
+          'full',
+          'full',
+        ]),
         State.results.length ? ContactList(State.results, {
           itemProps: item => ( {
             className: 'contact-list-item clickable',
@@ -2039,6 +2055,228 @@
           },
         }, __('No contacts found for the current search', 'groundhogg')) : null,
       ])
+    })
+  }
+
+  const Panel = ({
+    id,
+    name,
+    collapsed = false,
+    hidden = false,
+    onCollapse = id => {},
+  }, content ) => {
+
+    if (hidden) {
+      return null
+    }
+
+    return Div({
+      id       : `${ id }-panel`,
+      className: `gh-panel ${ collapsed ? 'closed' : '' }`,
+    }, [
+      Div({ className: `gh-panel-header` }, [
+        H2({}, name),
+        Button({
+          className: 'toggle-indicator',
+          onClick  : e => {
+            onCollapse(id)
+          },
+        }),
+      ]),
+      collapsed ? null : maybeCall( content ),
+    ])
+  }
+
+  const Panels = (overrides) => ( {
+    ...Groundhogg.createRegistry({}),
+    storagePrefix: 'gh-panels',
+    collapse (id) {
+      if (!this.isCollapsed(id)) {
+        this.toggleCollapse(id)
+      }
+    },
+    expand (id) {
+      if (this.isCollapsed(id)) {
+        this.toggleCollapse(id)
+      }
+    },
+    hide (id) {
+      if (!this.isHidden(id)) {
+        this.toggleHidden(id)
+      }
+    },
+    show (id) {
+      if (this.isHidden(id)) {
+        this.toggleHidden(id)
+      }
+    },
+
+    togglePanel (id, suffix) {
+      let panels = this.getPanelIds(suffix)
+
+      if (panels.includes(id)) {
+        panels.splice(panels.indexOf(id), 1)
+      }
+      else {
+        panels.push(id)
+      }
+
+      localStorage.setItem(`${ this.storagePrefix }-${ suffix }`, JSON.stringify(panels))
+    },
+
+    toggleHidden (id) {
+      this.togglePanel(id, 'hidden')
+    },
+
+    toggleCollapse (id) {
+      this.togglePanel(id, 'collapsed')
+    },
+
+    getPanelIds (suffix) {
+      return JSON.parse(localStorage.getItem(`${ this.storagePrefix }-${ suffix }`)) || []
+    },
+
+    getHiddenPanelIds () {
+      return this.getPanelIds('hidden')
+    },
+    getCollapsedPanelIds () {
+      return this.getPanelIds('collapsed')
+    },
+    isHidden (id) {
+      return this.getHiddenPanelIds().includes(id)
+    },
+    isCollapsed (id) {
+      return this.getCollapsedPanelIds().includes(id)
+    },
+
+    PanelControls () {
+      return Div({}, [
+        ...this.map((item, id) => Div({
+          className: 'display-flex gap-10',
+          style    : {
+            marginBottom: '10px',
+          },
+        }, [
+          Toggle({
+            checked : !this.isHidden(id),
+            id      : `toggle-${ id }`,
+            onChange: e => {
+              this.toggleHidden(id)
+
+            },
+          }),
+          Label({
+            for: `toggle-${ id }`,
+          }, item.name),
+        ])),
+      ])
+    },
+
+    Panel( id ){
+
+      let { content, ...panel } = this.get(id)
+
+      return Panel({
+        id,
+        ...panel,
+        collapsed : this.isCollapsed(id),
+        hidden    : this.isHidden(id),
+        onCollapse: id => {
+          this.toggleCollapse(id)
+          morphdom( document.getElementById( `${id}-panel` ), this.Panel( id ) )
+        },
+      }, content )
+    },
+
+    Panels () {
+      return Div({
+        className: 'display-flex column gap-20',
+        id: this.storagePrefix,
+      }, this.keys().map( id => this.Panel( id ) ) )
+    },
+
+    ...overrides,
+  } )
+
+
+  const Relationships = ({
+    title = '',
+    id,
+    store,
+    child_type = '',
+    parent_type = '',
+    renderItem = item => {},
+    onAddItem = (r,j) => {}
+  }) => {
+
+    const rel_type_key = child_type ? 'child_type' : 'parent_type'
+    const rel_type = child_type || parent_type
+    const rel_id_key = child_type ? 'child_id' : 'parent_id'
+
+    const State = Groundhogg.createState({
+      loaded: false,
+      items: []
+    })
+
+    const fetchRelationships = () => store.fetchRelationships( id, {
+      [rel_type_key]: rel_type
+    } ).then( items => State.set( { items, loaded: true } ) )
+
+    const deleteRelationship = itemId => store.deleteRelationships( id, {
+      [rel_type_key]: rel_type,
+      [rel_id_key]: itemId,
+    }).then( () => State.set({
+      items: State.items.filter( item => item.ID !== itemId )
+    }))
+
+    const createRelationship = item => store.createRelationships( id, {
+      [rel_type_key]: rel_type,
+      [rel_id_key]: item.ID,
+    }).then(() => State.set({
+      items: [ ...State.items, item ]
+    }))
+
+    return Div({
+      id: `${rel_type_key}-${rel_type}-rel-of-${id}`,
+      className: `display-flex column relationship-editor ${rel_type_key}-${rel_type}`,
+    }, morph => {
+
+      const handleDeleteRelationship = itemId => deleteRelationship( itemId ).then( morph )
+
+      if ( ! State.loaded ){
+
+        fetchRelationships().then( morph )
+
+        return Skeleton({}, [ 'full', 'full', 'full' ] )
+      }
+
+      const AddRelButton = () => Button({
+        id: `add-${rel_type_key}-${rel_type}-rel-for-${id}`,
+        className: 'gh-button secondary text icon',
+        onClick: e => {
+          let promise = new Promise((resolve, reject) => onAddItem(resolve, reject, State ))
+
+          promise.then( item => createRelationship( item ).then( morph ) )
+        }
+      }, [Dashicon('plus-alt2'), ToolTip(__('Add relationship', 'groundhogg'),'left')])
+
+      return Fragment([
+
+        title ? Div({ className: 'space-between' }, [
+          H4({}, title ),
+          AddRelButton()
+        ]) : null,
+
+        ...State.items.map( item => renderItem({
+          ...item,
+          onDelete: handleDeleteRelationship
+        }) ),
+        title ? null : Div({
+          className: 'display-flex flex-end'
+        }, AddRelButton() ),
+
+      ])
+
     })
 
   }
@@ -2061,6 +2299,9 @@
     FeedbackModal,
     ContactList,
     ContactListItem,
+    Panel,
+    Panels,
+    Relationships
   }
 
 } )(jQuery)
