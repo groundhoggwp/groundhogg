@@ -487,6 +487,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
   align-items: center;
   padding-bottom: 10px;
   gap: 5px;
+  flex-wrap: wrap;
 }
 .tasks-widget .tasks-header h3 {
   font-size: 14px;

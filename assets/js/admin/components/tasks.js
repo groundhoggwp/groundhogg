@@ -509,7 +509,7 @@
             href: task.associated.link,
           }, [ assocIcon, task.associated.name ] ) : null,
           Div({
-            className: 'display-flex gap-5 align-center details'
+            className: 'display-flex gap-5 align-center details flex-wrap'
             }, [
             dueBy(task),
             Span({ className: 'added-by' }, addedBy( task ))]
