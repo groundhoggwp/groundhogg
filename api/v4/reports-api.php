@@ -357,7 +357,7 @@ class Reports_Api extends Base_Api {
 			] );
 
 			$start = $dates['after'];
-			$end = $dates['before'];
+			$end   = $dates['before'];
 
 		} else {
 			$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
@@ -380,7 +380,7 @@ class Reports_Api extends Base_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'reports' => $results
+			'reports' => $results,
 		] );
 	}
 
@@ -393,8 +393,22 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read_single( WP_REST_Request $request ) {
 
-		$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
-		$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
+		if ( $request->has_param( 'range' ) ) {
+
+			$dates = Filters::get_before_and_after_from_date_range( [
+				'date_range' => $request->get_param( 'range' ),
+				'before'     => $request->get_param( 'before' ),
+				'after'      => $request->get_param( 'after' ),
+				'days'       => $request->get_param( 'days' ),
+			] );
+
+			$start = $dates['after'];
+			$end   = $dates['before'];
+
+		} else {
+			$start = ( new DateTimeHelper( $request->get_param( 'after' ) ?: '7 days ago' ) )->modify( '00:00:00' );
+			$end   = ( new DateTimeHelper( $request->get_param( 'before' ) ?: 'yesterday' ) )->modify( '23:59:59' );
+		}
 
 		$params    = $request->get_param( 'params' ) ?: [];
 		$report    = sanitize_key( $request->get_param( 'id' ) );
@@ -403,7 +417,7 @@ class Reports_Api extends Base_Api {
 		$results = $reporting->get_data( $report );
 
 		return self::SUCCESS_RESPONSE( [
-			'report' => $results
+			'report' => $results,
 		] );
 	}
 
