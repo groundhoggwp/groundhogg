@@ -64,10 +64,15 @@
     routes,
     ajax,
   } = Groundhogg.api
+
   const {
     selectContactModal,
     betterTagPicker,
     internalForm,
+    EmailLogModal,
+    Relationships,
+    EmailPreviewModal,
+    ContactListItem,
   } = Groundhogg.components
 
   const {
@@ -2368,7 +2373,7 @@
         $(e.target).closest('.gh-panel').toggleClass('closed')
       })
 
-      $(document).on('click', '.gh-panel.outlined button.toggle-indicator', e => {
+      $(document).on('click', '#secondary-tabs .gh-panel.outlined button.toggle-indicator', e => {
         $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
       })
 
@@ -2379,10 +2384,6 @@
   })
 
   const { email_log: LogsStore } = Groundhogg.stores
-  const {
-    EmailLogModal,
-    EmailPreviewModal,
-  } = Groundhogg.components
 
   // Handle log items
   $(document).on('click', 'a.view-event-email-log-item', async e => {
@@ -2502,8 +2503,61 @@
 
   })
 
+  const {
+    Div,
+    An,
+    Bold,
+    Pg,
+  } = MakeEl
+
   $(function () {
     editor.init()
+
+    const ContactRelationships = ({
+      title,
+      rel = ''
+    }) => Relationships({
+      title,
+      id         : ContactEditor.contact_id,
+      [`${rel}_type`]: 'contact',
+      store      : ContactsStore,
+      renderItem : ({  onDelete, ...item }) => ContactListItem(item, {
+        extra: An({
+          className: 'danger',
+          href: '#',
+          onClick: e => {
+            e.preventDefault()
+            onDelete(item.ID)
+          }
+        }, __('Remove'))
+      }),
+      onAddItem  : (res, rej, state) => {
+        selectContactModal({
+          onSelect: item => res(item),
+          exclude: state.items.map(i => i.ID),
+          onClose: rej
+        })
+      },
+    })
+
+    let el = document.getElementById('contact-relationships')
+    if (el) {
+      morphdom(el.parentNode, Div({
+        className: 'inside',
+        style    : {
+          padding: 0,
+        },
+      }, [
+        ContactRelationships({
+          title: __('Parents'),
+          rel: 'parent'
+        }),
+        ContactRelationships({
+          title: __('Children'),
+          rel: 'child'
+        }),
+      ]))
+    }
   })
 
   Groundhogg.ActivityTimeline = ActivityTimeline

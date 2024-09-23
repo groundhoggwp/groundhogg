@@ -70,6 +70,10 @@ class Info_Cards {
 			include __DIR__ . '/cards/page-visits.php';
 		}, 100, 'view_contacts' );
 
+        self::register( 'relationships', __( 'Relationships', 'groundhogg' ), function ( $contact ) {
+            ?><div id="contact-relationships"></div><?php
+        } );
+
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 
 //		self::register_as_metaboxes_for_screen_options();
