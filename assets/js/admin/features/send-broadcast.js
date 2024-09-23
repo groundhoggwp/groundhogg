@@ -30,6 +30,7 @@
   const {
     routes,
     post,
+    ajax,
   } = Groundhogg.api
   const { createFilters } = Groundhogg.filters.functions
   const {
@@ -38,6 +39,9 @@
     formatDate,
     formatDateTime,
   } = Groundhogg.formatting
+  const {
+    debounce,
+  } = Groundhogg.functions
   const {
     sprintf,
     __,
@@ -48,11 +52,14 @@
   const {
     Div,
     Button,
+    Pg,
     Modal,
     Textarea,
+    Select,
     ItemPicker,
     Fragment,
     Input,
+    InputGroup,
     Iframe,
     makeEl,
     ButtonToggle,
@@ -63,18 +70,22 @@
   } = MakeEl
 
   const initialState = {
-    step         : 'object',
-    steps        : [],
-    object       : null,
-    when         : 'later',
-    campaigns    : [],
-    searchMethod : 'filters', // 'filters' or 'search'
-    searchMethods: [],
-    totalContacts: 0,
-    date         : moment().format('YYYY-MM-DD'),
-    time         : moment().add(1, 'hour').format('HH:00:00'),
-    broadcast    : null,
-    segment_type : 'fixed',
+    step                 : 'object',
+    steps                : [],
+    object               : null,
+    when                 : 'later',
+    campaigns            : [],
+    searchMethod         : 'filters', // 'filters' or 'search'
+    searchMethods        : [],
+    totalContacts        : 0,
+    date                 : moment().format('YYYY-MM-DD'),
+    time                 : moment().add(1, 'hour').format('HH:00:00'),
+    broadcast            : null,
+    segment_type         : 'fixed',
+    batching             : false,
+    batch_interval       : 'minutes',
+    batch_interval_length: 30,
+    batch_amount         : 100,
   }
 
   const getSearchMethods = () => {
@@ -151,6 +162,21 @@
       }, morph)
     })
   }
+
+  const updateDurationEstimate = debounce(() => ajax({
+    action               : 'gh_estimate_send_duration',
+    total_contacts       : getState().totalContacts,
+    batch_interval       : getState().batch_interval,
+    batch_interval_length: getState().batch_interval_length,
+    batch_amount         : getState().batch_amount,
+  }).then(r => {
+
+    const { time } = r.data
+
+    setState({
+      duration_estimate: time,
+    })
+  }), 500)
 
   const getState = () => State
   const setState = (newState, morph = true) => {
@@ -356,84 +382,6 @@
             },
             onClick  : e => {
               setState({
-                step: 'schedule',
-              })
-            },
-          }, sprintf('%s &rarr;', __('Schedule', 'groundhogg'))),
-        ])
-      },
-    },
-    'schedule' : {
-      name        : __('Schedule', 'groundhogg'),
-      icon        : Dashicon('calendar'),
-      requirements: () => getObject(),
-      render      : () => {
-
-        return Fragment([
-          Div({
-            className: 'space-between',
-          }, [
-            `<p>${ __('When do you want the broadcast to go out?', 'groundhogg') }</p>`,
-            ButtonToggle({
-              id      : 'send-when',
-              options : [
-                {
-                  id  : 'later',
-                  text: 'Later',
-                },
-                {
-                  id  : 'now',
-                  text: 'Now',
-                },
-              ],
-              selected: getState().when,
-              onChange: when => setState({ when }),
-            }),
-          ]),
-          getState().when === 'later' ? Div({
-            className: 'gh-input-group',
-          }, [
-            Input({
-              type    : 'date',
-              id      : 'send-date',
-              name    : 'date',
-              value   : getState().date || '',
-              min     : moment().format('YYYY-MM-DD'),
-              onChange: e => setState({
-                date: e.target.value,
-              }),
-            }),
-            Input({
-              type    : 'time',
-              id      : 'send-time',
-              name    : 'time',
-              value   : getState().time || '',
-              onChange: e => setState({
-                time: e.target.value,
-              }),
-            }),
-          ]) : null,
-          getState().when === 'later' ? Div({
-            className: 'display-flex gap-10 align-center',
-          }, [
-            `<p>${ __('Send in the contact\'s local time?', 'groundhogg') }</p>`,
-            Toggle({
-              id      : 'send-in-local',
-              checked : getState().send_in_local_time,
-              onChange: e => setState({
-                send_in_local_time: e.target.checked,
-              }),
-            }),
-          ]) : null,
-          Button({
-            id       : 'go-to-contacts',
-            className: 'gh-button primary',
-            disabled : getState().when === 'later' && moment().isAfter(`${ getState().date } ${ getState().time }`),
-            style    : {
-              alignSelf: 'flex-end',
-            },
-            onClick  : e => {
-              setState({
                 step: 'contacts',
               })
             },
@@ -512,43 +460,43 @@
               `<p>Which contacts should be included at the time of sending?</p>`,
               Label({
                 style: {
-                  fontsize: '14px'
-                }
+                  fontsize: '14px',
+                },
               }, [
                 Input({
-                  type: 'radio',
-                  name: 'segment_type',
-                  checked: State.segment_type === 'fixed',
+                  type    : 'radio',
+                  name    : 'segment_type',
+                  checked : State.segment_type === 'fixed',
                   onChange: e => {
-                    if ( e.target.checked ){
+                    if (e.target.checked) {
                       State.set({
-                        segment_type: 'fixed'
+                        segment_type: 'fixed',
                       })
                     }
-                  }
+                  },
 
                 }),
-                '<b>Fixed Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.'
-              ] ),
+                '<b>Fixed Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.',
+              ]),
               Label({
                 style: {
-                  fontsize: '14px'
-                }
+                  fontsize: '14px',
+                },
               }, [
                 Input({
-                  type: 'radio',
-                  name: 'segment_type',
-                  checked: State.segment_type === 'dynamic',
+                  type    : 'radio',
+                  name    : 'segment_type',
+                  checked : State.segment_type === 'dynamic',
                   onChange: e => {
-                    if ( e.target.checked ){
+                    if (e.target.checked) {
                       State.set({
-                        segment_type: 'dynamic'
+                        segment_type: 'dynamic',
                       })
                     }
-                  }
+                  },
                 }),
-                '<b>Dynamic Segment:</b> <i>Contacts within the segment</i> at the time of sending.'
-              ] ),
+                '<b>Dynamic Segment:</b> <i>Contacts within the segment</i> at the time of sending.',
+              ]),
             ]),
           ]) : null,
           // State.when === 'later' ? makeEl('i', {}, [
@@ -558,6 +506,173 @@
             id       : 'go-to-review',
             className: 'gh-button primary',
             disabled : !getState().totalContacts,
+            style    : {
+              alignSelf: 'flex-end',
+            },
+            onClick  : e => {
+              setState({
+                step: 'schedule',
+              })
+            },
+          }, sprintf('%s &rarr;', __('Schedule', 'groundhogg'))),
+        ])
+      },
+    },
+    'schedule' : {
+      name        : __('Schedule', 'groundhogg'),
+      icon        : Dashicon('calendar'),
+      requirements: () => getObject(),
+      render      : () => {
+
+        return Fragment([
+          Div({
+            className: 'space-between',
+          }, [
+            `<p>${ __('When do you want the broadcast to go out?', 'groundhogg') }</p>`,
+            ButtonToggle({
+              id      : 'send-when',
+              options : [
+                {
+                  id  : 'later',
+                  text: 'Later',
+                },
+                {
+                  id  : 'now',
+                  text: 'Now',
+                },
+              ],
+              selected: getState().when,
+              onChange: when => setState({ when }),
+            }),
+          ]),
+          getState().when === 'later' ? Div({
+            className: 'gh-input-group',
+          }, [
+            Input({
+              type    : 'date',
+              id      : 'send-date',
+              name    : 'date',
+              value   : getState().date || '',
+              min     : moment().format('YYYY-MM-DD'),
+              onChange: e => setState({
+                date: e.target.value,
+              }),
+            }),
+            Input({
+              type    : 'time',
+              id      : 'send-time',
+              name    : 'time',
+              value   : getState().time || '',
+              onChange: e => setState({
+                time: e.target.value,
+              }),
+            }),
+          ]) : null,
+          getState().when === 'later' ? Div({
+            className: 'display-flex gap-10 align-center',
+          }, [
+            `<label for="send-in-local"><p>${ __('Send in the contact\'s local time?', 'groundhogg') }</p></label>`,
+            Toggle({
+              id      : 'send-in-local',
+              checked : getState().send_in_local_time,
+              onLabel : __('Yes'),
+              offLabel: __('No'),
+              onChange: e => setState({
+                send_in_local_time: e.target.checked,
+              }),
+            }),
+          ]) : null,
+          '<div><hr></div>',
+          Div({
+            className: 'display-flex gap-10 align-center',
+          }, [
+            `<label for="send-in-batches"><p>${ __('Send in batches?', 'groundhogg') }</p></label>`,
+            Toggle({
+              id      : 'send-in-batches',
+              checked : getState().batching,
+              onLabel : __('Yes'),
+              offLabel: __('No'),
+              onChange: e => {
+                setState({
+                  batching: e.target.checked,
+                })
+                if (getState().batching) {
+                  updateDurationEstimate()
+                }
+              },
+            }),
+          ]),
+          getState().batching ? Fragment([
+            Pg({
+              className: 'display-flex gap-5 align-center',
+            }, [
+              'Send',
+              Input({
+                id       : 'batch-amount',
+                name     : 'batch_amount',
+                step     : getState().batch_amount <= 100 ? 10 : 50,
+                value    : getState().batch_amount,
+                onInput  : e => {
+                  setState({
+                    batch_amount: parseInt(e.target.value),
+                  }, false)
+                  updateDurationEstimate()
+                },
+                type     : 'number',
+                className: 'number',
+                style    : {
+                  width       : '100px',
+                  paddingRight: 0,
+                },
+              }),
+              'emails every',
+              Input({
+                id       : 'batch-interval-length',
+                name     : 'batch_interval_length',
+                step     : getState().batch_interval === 'minutes' ? 5 : 1,
+                value    : getState().batch_interval_length,
+                onInput  : e => {
+                  setState({
+                    batch_interval_length: parseInt(e.target.value),
+                  }, false)
+                  updateDurationEstimate()
+                },
+                type     : 'number',
+                className: 'number',
+                style    : {
+                  width       : '60px',
+                  paddingRight: 0,
+                },
+              }),
+              Select({
+                id      : 'batch-interval',
+                name    : 'batch_interval',
+                selected: getState().batch_interval,
+                onChange: e => {
+                  setState({
+                    batch_interval: e.target.value,
+                  }, false)
+                  updateDurationEstimate()
+                },
+                options : {
+                  minutes: __('Minutes'),
+                  hours  : __('Hours'),
+                  days   : __('Days'),
+                },
+              }),
+            ]),
+            getState().duration_estimate
+            ? Span({
+              className: 'pill yellow',
+            }, sprintf(__('It will take at least %s to send to %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
+              formatNumber(getState().totalContacts)))
+            : Span({}, __('Estimating...', 'groundhogg')),
+          ]) : null,
+          '<div><hr></div>',
+          Button({
+            id       : 'go-to-contacts',
+            className: 'gh-button primary',
+            disabled : getState().when === 'later' && moment().isAfter(`${ getState().date } ${ getState().time }`),
             style    : {
               alignSelf: 'flex-end',
             },
@@ -607,6 +722,10 @@
                 send_in_local_time = false,
                 campaigns = [],
                 segment_type = 'fixed',
+                batching = false,
+                batch_interval,
+                batch_interval_length,
+                batch_amount,
               } = getState()
 
               post(routes.v4.broadcasts, {
@@ -619,6 +738,10 @@
                 send_in_local_time,
                 campaigns  : campaigns.map(({ ID }) => ID),
                 segment_type,
+                batching,
+                batch_interval,
+                batch_interval_length,
+                batch_amount,
               }).then(r => {
 
                 setState({
@@ -709,8 +832,8 @@
     const order = [
       'object',
       'campaigns',
-      'schedule',
       'contacts',
+      'schedule',
       'review',
       'scheduled',
     ]

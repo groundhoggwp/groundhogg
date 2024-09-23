@@ -4,13 +4,15 @@ namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
-use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\enqueue_broadcast_assets;
 use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_sms_plugin_active;
 use function Groundhogg\notices;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,13 +37,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Broadcasts_Page extends Admin_Page {
 
 	protected function add_ajax_actions() {
+		add_action( 'wp_ajax_gh_estimate_send_duration', [ $this, 'ajax_estimate_send_duration' ] );
+	}
+
+	public function ajax_estimate_send_duration() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$total_contacts  = get_post_var( 'total_contacts' );
+		$amount          = get_post_var( 'batch_amount' );
+		$interval        = get_post_var( 'batch_interval' );
+		$interval_length = get_post_var( 'batch_interval_length' );
+
+        $batches = floor( $total_contacts / $amount );
+
+        $dateTime = new DateTimeHelper();
+        $total_interval_length = $batches * $interval_length;
+
+        $dateTime->modify( "+$total_interval_length $interval" );
+
+        wp_send_json_success([
+            'time' => $dateTime->human_time_diff(),
+        ]);
 	}
 
 	public function help() {
 	}
 
 	protected function add_additional_actions() {
-		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ){
+		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ) {
 
 			notices()->add( 'dne', __( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
 
@@ -53,7 +79,7 @@ class Broadcasts_Page extends Admin_Page {
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
-		if ( $action == 'view' && get_db( 'broadcasts' )->is_empty() ){
+		if ( $action == 'view' && get_db( 'broadcasts' )->is_empty() ) {
 			$action = 'add';
 		}
 
@@ -96,11 +122,11 @@ class Broadcasts_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			case 'add':
 
-                $type = get_url_var( 'type', 'email' );
+				$type = get_url_var( 'type', 'email' );
 
-                if ( $type === 'sms' ){
-	                return _x( 'Schedule SMS Broadcast', 'page_title', 'groundhogg' );
-                }
+				if ( $type === 'sms' ) {
+					return _x( 'Schedule SMS Broadcast', 'page_title', 'groundhogg' );
+				}
 
 				return _x( 'Schedule Email Broadcast', 'page_title', 'groundhogg' );
 			default:
@@ -158,7 +184,7 @@ class Broadcasts_Page extends Admin_Page {
 			return [];
 		}
 
-		$actions = [];
+		$actions   = [];
 		$actions[] = [
 			'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
 			'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
@@ -187,11 +213,11 @@ class Broadcasts_Page extends Admin_Page {
 
 		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
 		$broadcasts_table->views(); ?>
-		<form method="post" class="wp-clearfix">
-			<!-- search form -->
+        <form method="post" class="wp-clearfix">
+            <!-- search form -->
 			<?php $broadcasts_table->prepare_items(); ?>
 			<?php $broadcasts_table->display(); ?>
-		</form>
+        </form>
 
 		<?php
 	}

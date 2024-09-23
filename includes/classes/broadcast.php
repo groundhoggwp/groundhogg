@@ -245,7 +245,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_meta( 'segment_type' ) === 'dynamic' ){
+		if ( $this->get_meta( 'segment_type' ) === 'dynamic' ) {
 			$added = Background_Tasks::add( new Schedule_Broadcast( $this->get_id() ), $this->get_send_time() );
 		} else {
 			$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
@@ -269,7 +269,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	public function has_pending_events() {
 
 		$query = new Table_Query( 'event_queue' );
-		$query->setLimit(1)->where()->equals( 'step_id', $this->ID )
+		$query->setLimit( 1 )->where()->equals( 'step_id', $this->ID )
 		      ->equals( 'funnel_id', self::FUNNEL_ID )
 		      ->equals( 'event_type', Event::BROADCAST )
 		      ->equals( 'status', Event::WAITING );
@@ -359,6 +359,11 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$query['offset']     = $offset;
 		$query['found_rows'] = true;
 
+		$batch_interval        = $this->get_meta( 'batch_interval' );
+		$batch_interval_length = absint( $this->get_meta( 'batch_interval_length' ) );
+		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100 ;
+		$batch_delay           = absint( $this->get_meta( 'batch_delay' ) ) ?: 0;
+
 		$c_query  = new Contact_Query( $query );
 		$contacts = $c_query->query( null, true );
 		$total    = $c_query->found_items;
@@ -372,6 +377,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 			$offset ++;
 			$items ++;
+
+			// if the number of scheduled items has reached the batch amount threshold
+			if ( $batch_interval && $offset > 0 && $offset % $batch_amount === 0 ) {
+				// increase the batch delay
+				$batch_delay = strtotime( "+$batch_interval_length $batch_interval", $batch_delay );
+			}
 
 			// Can't be delivered at all
 			if ( ! $contact->is_deliverable() ) {
@@ -393,6 +404,10 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				if ( $local_time < time() ) {
 					$local_time += DAY_IN_SECONDS;
 				}
+			}
+
+			if ( $batch_interval && $batch_delay ){
+				$local_time += $batch_delay;
 			}
 
 			$args = [
@@ -427,6 +442,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$this->update_meta( 'num_scheduled', $offset );
 		$this->update_meta( 'total_contacts', $total );
 		$this->update_meta( 'batch_time_elapsed', number_format( $time_elapsed, 2 ) );
+		$this->update_meta( 'batch_delay', $batch_delay );
 
 		// Finished scheduling
 		if ( $offset >= $total ) {
