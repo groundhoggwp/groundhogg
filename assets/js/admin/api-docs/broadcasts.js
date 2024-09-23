@@ -25,17 +25,6 @@
     endpoint: `${ apiRoot }/broadcasts/`,
     params: [
       {
-        param: 'query',
-        description: () => Fragment([
-          Pg({}, __('The query object is how you select the contacts that will receive the broadcast.', 'groundhogg')),
-        ]),
-        type: 'object',
-        required: true,
-        subParams: [
-          CommonParams.filters('contacts'),
-        ],
-      },
-      {
         param: 'object_type',
         type: 'string',
         required: false,
@@ -54,12 +43,36 @@
         ]),
       },
       {
+        param: 'query',
+        description: () => Fragment([
+          Pg({}, __('The query object is how you select the contacts that will receive the broadcast.', 'groundhogg')),
+        ]),
+        type: 'object',
+        required: true,
+        subParams: [
+          CommonParams.filters('contacts'),
+        ],
+      },
+      {
+        param: 'segment_type',
+        type: 'string',
+        required: false,
+        options: [
+          'fixed',
+          'dynamic',
+        ],
+        default: 'fixed',
+        description: () => Fragment([
+          Pg({}, __('Which type of segment to use.', 'groundhogg')),
+        ]),
+      },
+      {
         param: 'date',
         type: 'string',
         required: true,
         description: () => Fragment([
           Pg({}, __('The date you want to broadcast to be sent. Uses the site timezone.', 'groundhogg')),
-          Pg({}, __('Unneeded if using send_now.', 'groundhogg')),
+          Pg({}, __('Unneeded if using <code>send_now</code>.', 'groundhogg')),
         ]),
         control: ({ param, id }) => Input({
           type: 'date',
@@ -75,7 +88,7 @@
         required: true,
         description: () => Fragment([
           Pg({}, __('The time of day for broadcast to be sent. Uses the site timezone.', 'groundhogg')),
-          Pg({}, __('Unneeded if using send_now.', 'groundhogg')),
+          Pg({}, __('Unneeded if using <code>send_now</code>.', 'groundhogg')),
         ]),
         control: ({ param, id }) => Input({
           type: 'time',
@@ -91,6 +104,51 @@
         required: false,
         description: () => Fragment([
           Pg({}, __('Whether to send the broadcast immediately.', 'groundhogg')),
+        ]),
+      },
+      {
+        param: 'send_in_local_time',
+        type: 'bool',
+        required: false,
+        description: () => Fragment([
+          Pg({}, __('Send based on the contacts\' local time.', 'groundhogg')),
+        ]),
+      },
+      {
+        param: 'batching',
+        type: 'bool',
+        required: false,
+        description: () => Fragment([
+          Pg({}, __('Whether to send the broadcast in batches.', 'groundhogg')),
+        ]),
+      },
+      {
+        param: 'batch_amount',
+        type: 'int',
+        required: false,
+        description: () => Fragment([
+          Pg({}, __('The size of the batches.', 'groundhogg')),
+        ]),
+      },
+      {
+        param: 'batch_interval',
+        type: 'string',
+        required: false,
+        options: [
+          'minutes',
+          'hours',
+          'days',
+        ],
+        description: () => Fragment([
+          Pg({}, __('The batch interval unit.', 'groundhogg')),
+        ]),
+      },
+      {
+        param: 'batch_interval_length',
+        type: 'int',
+        required: false,
+        description: () => Fragment([
+          Pg({}, __('The length of the batch interval.', 'groundhogg')),
         ]),
       },
     ],
