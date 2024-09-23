@@ -42,7 +42,7 @@
   } = Groundhogg.components
 
   const {
-    ReportTable
+    ReportTable,
   } = Groundhogg.reporting
 
   const {
@@ -61,10 +61,6 @@
   } = Groundhogg.api
 
   const { formatNumber } = Groundhogg.formatting
-
-  const State = Groundhogg.createState({
-    crmTodaysContactsLoaded: false,
-  })
 
   const isWidgetDisabled = id => {
     let disabledWidgets = JSON.parse(localStorage.getItem('gh_disabled_widgets')) || []
@@ -322,6 +318,477 @@
     ]))))
   }
 
+  const News = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+      items : [],
+    }, News )
+
+    return Div({
+      id   : 'my-news',
+      style: {
+        maxHeight: '500px',
+        overflow : 'auto',
+      },
+    }, morph => {
+
+      if (!State.loaded) {
+
+        ajax({
+          action: 'gh_get_news',
+        }).then(r => {
+
+          State.set({
+            loaded: true,
+            items : r,
+          })
+
+          morph()
+
+        })
+
+        return Skeleton({
+          style: {
+            padding: '20px',
+          },
+        }, [
+          'full',
+          'full',
+          'full',
+        ])
+      }
+
+      return Fragment(
+        State.items.slice(0, 5).map(item => makeEl('article', {
+          style: {
+            padding: '10px',
+          },
+        }, [
+          An({
+            href  : item.link,
+            target: '_blank',
+          }, Img({ src: item.yoast_head_json.og_image[0].url })),
+          H3({
+            style: {
+              marginTop: 10,
+            },
+          }, An({
+            href  : item.link,
+            target: '_blank',
+          }, item.title.rendered)),
+          item.excerpt.rendered,
+        ])),
+      )
+    })
+
+  }
+  const QuickStart = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+      items : [],
+    }, QuickStart)
+
+    return Div({
+      id: 'my-checklist',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        ajax({
+          action: 'gh_get_checklist_items',
+        }).then(r => {
+
+          State.set({
+            loaded: true,
+            items : r.data.items,
+          })
+
+          morph()
+
+        })
+
+        return Skeleton({
+          style: {
+            padding: '20px',
+          },
+        }, [
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+        ])
+      }
+
+      if (State.items.every(item => item.completed)) {
+        return Pg({
+          style: {
+            textAlign: 'center',
+          },
+        }, __('You\'re all set!'))
+      }
+
+      return Fragment([
+        Pg({
+          style: {
+            padding: '0 20px',
+          },
+        }, __('Click on a task to view additional details.')),
+        Checklist({
+          id   : 'quickstart-items',
+          items: State.items,
+        }),
+      ])
+    })
+
+  }
+  const Recommendations = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+      items : [],
+    }, Recommendations )
+
+    return Div({
+      id: 'my-recommendations',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        ajax({
+          action: 'gh_get_recommendation_items',
+        }).then(r => {
+
+          State.set({
+            loaded: true,
+            items : r.data.items,
+          })
+
+          morph()
+
+        })
+
+        return Skeleton({
+          style: {
+            padding: '20px',
+          },
+        }, [
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+        ])
+      }
+
+      if (State.items.every(item => item.completed)) {
+        return Pg({
+          style: {
+            textAlign: 'center',
+          },
+        }, __('No recommendations!'))
+      }
+
+      return Fragment([
+        Pg({
+          style: {
+            padding: '0 20px',
+          },
+        }, __('Click on a recommendation to view additional details.')),
+        Checklist({
+          id        : 'recommendation-items',
+          items     : State.items,
+          buttonText: __('Implement'),
+        }),
+      ])
+    })
+
+  }
+  const Summary = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+    }, Summary )
+
+    return Div({
+      id: 'contact-reports',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        Promise.all([
+
+          // daily report
+          get(Groundhogg.api.routes.v4.reports, {
+            reports: [
+              'total_new_contacts',
+              'total_confirmed_contacts',
+              'total_engaged_contacts',
+              'total_unsubscribed_contacts',
+            ],
+            range  : 'today',
+          }).then(r => {
+            State.set({
+              today: r.reports,
+            })
+          }),
+
+          // monthly report
+          get(Groundhogg.api.routes.v4.reports, {
+            reports: [
+              'total_new_contacts',
+              'total_confirmed_contacts',
+              'total_engaged_contacts',
+              'total_unsubscribed_contacts',
+            ],
+            range  : 'this_month',
+          }).then(r => {
+            State.set({
+              month: r.reports,
+            })
+          }),
+
+          // recently created contacts
+          Groundhogg.stores.contacts.fetchItems({
+            orderby: 'date_created',
+            order  : 'DESC',
+            limit  : 5,
+          }).then(contacts => {
+            State.set({
+              contacts,
+            })
+          }),
+
+        ]).then(() => {
+          State.set({
+            loaded: true,
+          })
+
+          morph()
+        })
+
+        return Skeleton({
+          style: {
+            padding: '20px',
+          },
+        }, [
+          'half',
+          'half',
+          'full',
+          'full',
+        ])
+      }
+
+      const ReportHead = title => Bold({
+        style: {
+          borderBottom : '1px solid',
+          marginBottom : '5px',
+          paddingBottom: '5px',
+        },
+      }, title)
+      const Stat = (title, report) => {
+
+        let change = Span({
+          className: 'percentage-change',
+          style    : {
+            fontWeight: 500,
+            fontSize  : '12px',
+            padding   : '2px',
+            color     : report.compare.arrow.color === 'green' ? '#99cc00' : '#ff0000',
+          },
+        }, [
+          report.compare.arrow.direction === 'up' ? '&#x25B4;' : '&#x25BE;',
+          report.compare.percent,
+        ])
+
+        if (report.data.current == report.data.compare) {
+          change = ''
+        }
+
+        return Div({
+          className: 'display-flex space-between align-bottom',
+        }, [
+          Span({
+            style: {
+              fontSize: '12px',
+              // fontWeight: 300
+            },
+          }, title),
+          Span({}, [
+            report.number,
+            change,
+          ]),
+        ])
+      }
+
+      return Div({
+        className: 'display-grid',
+      }, [
+        Div({
+          className: 'half inside display-flex column',
+        }, [
+          ReportHead(__('This month')),
+          Stat('New contacts', State.month.total_new_contacts),
+          Stat('Confirmed', State.month.total_confirmed_contacts),
+          Stat('Engaged', State.month.total_engaged_contacts),
+          Stat('Unsubscribed', State.month.total_unsubscribed_contacts),
+        ]),
+        Div({
+          className: 'half inside display-flex column',
+        }, [
+          ReportHead(__('Today')),
+          Stat('New contacts', State.today.total_new_contacts),
+          Stat('Confirmed', State.today.total_confirmed_contacts),
+          Stat('Engaged', State.today.total_engaged_contacts),
+          Stat('Unsubscribed', State.today.total_unsubscribed_contacts),
+        ]),
+        Div({
+          className: 'full',
+        }, [
+          Div({
+            style: {
+              padding: '0 0 10px 20px',
+            },
+          }, Bold({}, __('Recent subscribers'))),
+          ContactList(State.contacts, {
+            itemProps: item => ( {
+              className: 'contact-list-item clickable',
+              onClick  : e => {
+                window.open(item.admin, '_self')
+              },
+            } ),
+          }),
+        ]),
+      ])
+    })
+
+  }
+  const Broadcasts = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+    }, Broadcasts)
+
+    return Div({
+      id: 'broadcasts-report',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        get(Groundhogg.api.routes.v4.reports, {
+          reports: [
+            'table_all_broadcasts_performance',
+          ],
+          range  : 'this_week',
+        }).then(r => {
+          State.set({
+            reports: r.reports,
+            loaded : true,
+          })
+          morph()
+        })
+
+        return Skeleton({}, [
+          'two-thirds',
+          'third',
+          'two-thirds',
+          'third',
+          'two-thirds',
+          'third',
+        ])
+      }
+
+      if (!State.reports.table_all_broadcasts_performance.data.length) {
+
+        return Div({
+          className: 'inside'
+        }, [
+          Pg({}, 'You haven\'t sent any broadcasts this week! 😱'),
+          Pg({}, 'Send one to your subscribers before they forget about you.'),
+          An({
+            className: 'gh-button primary small',
+            href     : adminPageURL('gh_broadcasts', {
+              action: 'add',
+            }),
+          }, __('Send a broadcast!')),
+        ])
+
+      }
+
+      return ReportTable('broadcasts', State.reports.table_all_broadcasts_performance)
+    })
+  }
+  const Searches = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+    }, Searches )
+
+    return Div({
+      id   : 'searches-table',
+      style: {
+        maxHeight: '500px',
+        overflow : 'auto',
+      },
+    }, morph => {
+
+      if (!State.loaded) {
+
+        Groundhogg.stores.searches.fetchItems({
+          counts: true,
+        }).then(items => {
+          State.set({
+            loaded: true,
+          })
+          morph()
+        })
+
+        return Skeleton({}, [
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+          'span-9',
+          'span-3',
+        ])
+      }
+
+      if (!Groundhogg.stores.searches.hasItems()) {
+        return Pg({
+          style: {
+            textAlign: 'center',
+          },
+        }, __('You don\'t have any saved searches.', 'groundhogg'))
+      }
+
+      return Div({
+        className: 'gh-striped',
+      }, Groundhogg.stores.searches.getItems().map(search => Div({
+        className: 'row space-between',
+        style    : {
+          padding: '10px',
+        },
+      }, [
+        Bold({}, search.name),
+        An({
+          href: adminPageURL('gh_contacts', {
+            saved_search: search.id,
+          }),
+        }, `${ formatNumber(search.count) }`),
+      ])))
+
+    })
+
+  }
+
   const Widgets = Groundhogg.createRegistry()
 
   if (!Groundhogg.isWhiteLabeled) {
@@ -474,72 +941,7 @@
       name  : 'News',
       cap   : '',
       col   : 3,
-      render: () => {
-
-        const State = Groundhogg.createState({
-          loaded: false,
-          items : [],
-        })
-
-        return Div({
-          id   : 'my-news',
-          style: {
-            maxHeight: '500px',
-            overflow : 'auto',
-          },
-        }, morph => {
-
-          if (!State.loaded) {
-
-            ajax({
-              action: 'gh_get_news',
-            }).then(r => {
-
-              State.set({
-                loaded: true,
-                items : r,
-              })
-
-              morph()
-
-            })
-
-            return Skeleton({
-              style: {
-                padding: '20px',
-              },
-            }, [
-              'full',
-              'full',
-              'full',
-            ])
-          }
-
-          return Fragment(
-            State.items.slice(0, 5).map(item => makeEl('article', {
-              style: {
-                padding: '10px',
-              },
-            }, [
-              An({
-                href  : item.link,
-                target: '_blank',
-              }, Img({ src: item.yoast_head_json.og_image[0].url })),
-              H3({
-                style: {
-                  marginTop: 10,
-                },
-              }, An({
-                href  : item.link,
-                target: '_blank',
-              }, item.title.rendered)),
-              item.excerpt.rendered,
-            ])),
-          )
-        })
-
-      },
-
+      render: News,
     })
   }
 
@@ -548,435 +950,34 @@
     cap     : '',
     col     : 1,
     feedback: true,
-    render  : () => {
-
-      const State = Groundhogg.createState({
-        loaded: false,
-        items : [],
-      })
-
-      return Div({
-        id: 'my-checklist',
-      }, morph => {
-
-        if (!State.loaded) {
-
-          ajax({
-            action: 'gh_get_checklist_items',
-          }).then(r => {
-
-            State.set({
-              loaded: true,
-              items : r.data.items,
-            })
-
-            morph()
-
-          })
-
-          return Skeleton({
-            style: {
-              padding: '20px',
-            },
-          }, [
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-          ])
-        }
-
-        if (State.items.every(item => item.completed)) {
-          return Pg({
-            style: {
-              textAlign: 'center',
-            },
-          }, __('You\'re all set!'))
-        }
-
-        return Fragment([
-          Pg({
-            style: {
-              padding: '0 20px',
-            },
-          }, __('Click on a task to view additional details.')),
-          Checklist({
-            id   : 'quickstart-items',
-            items: State.items,
-          }),
-        ])
-      })
-
-    },
+    render  : QuickStart,
   })
+
   Widgets.add('recommendations', {
     name    : 'Recommendations',
     cap     : '',
     col     : 1,
     feedback: true,
-    render  : () => {
-
-      const State = Groundhogg.createState({
-        loaded: false,
-        items : [],
-      })
-
-      return Div({
-        id: 'my-recommendations',
-      }, morph => {
-
-        if (!State.loaded) {
-
-          ajax({
-            action: 'gh_get_recommendation_items',
-          }).then(r => {
-
-            State.set({
-              loaded: true,
-              items : r.data.items,
-            })
-
-            morph()
-
-          })
-
-          return Skeleton({
-            style: {
-              padding: '20px',
-            },
-          }, [
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-          ])
-        }
-
-        if (State.items.every(item => item.completed)) {
-          return Pg({
-            style: {
-              textAlign: 'center',
-            },
-          }, __('No recommendations!'))
-        }
-
-        return Fragment([
-          Pg({
-            style: {
-              padding: '0 20px',
-            },
-          }, __('Click on a recommendation to view additional details.')),
-          Checklist({
-            id        : 'recommendation-items',
-            items     : State.items,
-            buttonText: __('Implement'),
-          }),
-        ])
-      })
-
-    },
+    render  : Recommendations,
   })
 
   Widgets.add('summary', {
     name  : 'Summary',
     cap   : '',
     col   : 2,
-    render: () => {
-
-      const State = Groundhogg.createState({
-        loaded: false,
-      })
-
-      return Div({
-        id: 'contact-reports',
-      }, morph => {
-
-        if (!State.loaded) {
-
-          Promise.all([
-
-            // daily report
-            get(Groundhogg.api.routes.v4.reports, {
-              reports: [
-                'total_new_contacts',
-                'total_confirmed_contacts',
-                'total_engaged_contacts',
-                'total_unsubscribed_contacts',
-              ],
-              range  : 'today',
-            }).then(r => {
-              State.set({
-                today: r.reports,
-              })
-            }),
-
-            // monthly report
-            get(Groundhogg.api.routes.v4.reports, {
-              reports: [
-                'total_new_contacts',
-                'total_confirmed_contacts',
-                'total_engaged_contacts',
-                'total_unsubscribed_contacts',
-              ],
-              range  : 'this_month',
-            }).then(r => {
-              State.set({
-                month: r.reports,
-              })
-            }),
-
-            // recently created contacts
-            Groundhogg.stores.contacts.fetchItems({
-              orderby: 'date_created',
-              order  : 'DESC',
-              limit  : 5,
-            }).then(contacts => {
-              State.set({
-                contacts,
-              })
-            }),
-
-          ]).then(() => {
-            State.set({
-              loaded: true,
-            })
-
-            morph()
-          })
-
-          return Skeleton({
-            style: {
-              padding: '20px',
-            },
-          }, [
-            'half',
-            'half',
-            'full',
-            'full',
-          ])
-        }
-
-        const ReportHead = title => Bold({
-          style: {
-            borderBottom : '1px solid',
-            marginBottom : '5px',
-            paddingBottom: '5px',
-          },
-        }, title)
-        const Stat = (title, report) => {
-
-          let change = Span({
-            className: 'percentage-change',
-            style    : {
-              fontWeight: 500,
-              fontSize  : '12px',
-              padding   : '2px',
-              color     : report.compare.arrow.color === 'green' ? '#99cc00' : '#ff0000',
-            },
-          }, [
-            report.compare.arrow.direction === 'up' ? '&#x25B4;' : '&#x25BE;',
-            report.compare.percent,
-          ])
-
-          if (report.data.current == report.data.compare) {
-            change = ''
-          }
-
-          return Div({
-            className: 'display-flex space-between align-bottom',
-          }, [
-            Span({
-              style: {
-                fontSize: '12px',
-                // fontWeight: 300
-              },
-            }, title),
-            Span({}, [
-              report.number,
-              change,
-            ]),
-          ])
-        }
-
-        return Div({
-          className: 'display-grid',
-        }, [
-          Div({
-            className: 'half inside display-flex column',
-          }, [
-            ReportHead(__('This month')),
-            Stat('New contacts', State.month.total_new_contacts),
-            Stat('Confirmed', State.month.total_confirmed_contacts),
-            Stat('Engaged', State.month.total_engaged_contacts),
-            Stat('Unsubscribed', State.month.total_unsubscribed_contacts),
-          ]),
-          Div({
-            className: 'half inside display-flex column',
-          }, [
-            ReportHead(__('Today')),
-            Stat('New contacts', State.today.total_new_contacts),
-            Stat('Confirmed', State.today.total_confirmed_contacts),
-            Stat('Engaged', State.today.total_engaged_contacts),
-            Stat('Unsubscribed', State.today.total_unsubscribed_contacts),
-          ]),
-          Div({
-            className: 'full',
-          }, [
-            Div({
-              style: {
-                padding: '0 0 10px 20px',
-              },
-            }, Bold({}, __('Recent subscribers'))),
-            ContactList(State.contacts, {
-              itemProps: item => ( {
-                className: 'contact-list-item clickable',
-                onClick  : e => {
-                  window.open(item.admin, '_self')
-                },
-              } ),
-            }),
-          ]),
-        ])
-      })
-
-    },
+    render: Summary,
   })
 
   Widgets.add('broadcasts', {
     name  : 'Recent Broadcasts',
     col   : 2,
-    render: () => {
-
-      Groundhogg.createState({
-        loaded: false,
-      })
-
-      return Div({
-        id: 'broadcasts-report',
-      }, morph => {
-
-        if (!State.loaded) {
-
-          get(Groundhogg.api.routes.v4.reports, {
-            reports: [
-              'table_all_broadcasts_performance',
-            ],
-            range  : 'this_week',
-          }).then(r => {
-            State.set({
-              reports: r.reports,
-              loaded: true,
-            })
-            morph()
-          })
-
-          return Skeleton({}, [
-            'two-thirds',
-            'third',
-            'two-thirds',
-            'third',
-            'two-thirds',
-            'third',
-          ])
-        }
-
-        if ( ! State.reports.table_all_broadcasts_performance.data.length ){
-
-          return Div( {
-            style: {
-              padding: '10px'
-            }
-          }, [
-            Pg( {}, "You haven't sent any broadcasts this week!" ),
-            Pg( {}, "Send one to your subscribers before they forget about you." ),
-            An({
-              className: 'gh-button primary small',
-              href: adminPageURL( 'gh_broadcasts', {
-                action: 'add'
-              } )
-            }, __( 'Send a broadcast!' ) )
-          ])
-
-        }
-
-        return ReportTable( 'broadcasts', State.reports.table_all_broadcasts_performance )
-      })
-    },
+    render: Broadcasts,
   })
 
   Widgets.add('searches', {
     name  : 'Searches',
     col   : 1,
-    render: () => {
-
-      const State = Groundhogg.createState({
-        loaded: false,
-      })
-
-      return Div({
-        id   : 'searches-table',
-        style: {
-          maxHeight: '500px',
-          overflow : 'auto',
-        },
-      }, morph => {
-
-        if (!State.loaded) {
-
-          Groundhogg.stores.searches.fetchItems({
-            counts: true,
-          }).then(items => {
-            State.set({
-              loaded: true,
-            })
-            morph()
-          })
-
-          return Skeleton({}, [
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-            'span-9',
-            'span-3',
-          ])
-        }
-
-        if (!Groundhogg.stores.searches.hasItems()) {
-          return Pg({
-            style: {
-              textAlign: 'center',
-            },
-          }, __('You don\'t have any saved searches.', 'groundhogg'))
-        }
-
-        return Div({
-          className: 'gh-striped',
-        }, Groundhogg.stores.searches.getItems().map(search => Div({
-          className: 'row space-between',
-          style    : {
-            padding: '10px',
-          },
-        }, [
-          Bold({}, search.name),
-          An({
-            href: adminPageURL('gh_contacts', {
-              saved_search: search.id,
-            }),
-          }, `${ formatNumber(search.count) }`),
-        ])))
-
-      })
-
-    },
+    render: Searches,
   })
 
   if (userHasCap('view_tasks')) {

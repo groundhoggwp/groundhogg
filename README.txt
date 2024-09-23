@@ -356,9 +356,13 @@ You can purchase a premium plan for access to support and our premium extensions
  * New *Recommendations* widget
  * New *News* widget
  * New *Helpful Links* widget
+ * New Recent broadcasts widget
+ * New saved searches widget
  * Optimized quick start checklist
  * Enable & disable widgets
  * Supports white-labeling
+* ADDED Batch scheduling for broadcasts.
+* ADDED Parent/Child relationships (as info card) for contacts.
 * ADDED `params` parameter to the Reports API playground.
 * IMPROVED Quick search is faster and shows more information.
 * TWEAKED My Tasks has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
