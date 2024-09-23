@@ -21,6 +21,7 @@
     Modal,
     makeEl,
     Table,
+    THead,
     TBody,
     Tr,
     Td,
@@ -135,14 +136,14 @@
   }
 
   const WidgetColumn = (col = 0) => Div({
-    className: 'display-flex column gap-20 full-width',
+    className: 'display-flex column gap-20 full-width span-4',
   }, Widgets.map((item, id) => item.col === col ? Widget({
     id,
     ...item,
   }) : null))
 
   const WidgetsColumns = () => Div({
-    className: 'display-flex gap-20',
+    className: 'display-grid gap-20',
     style    : {
       padding: '20px',
     },
@@ -845,6 +846,226 @@
     },
   })
 
+  const ReportTable = ( id, report ) => {
+
+    let { label, data, no_data = '', per_page = 10, orderby = 0 } = report
+
+    if (!Array.isArray(label)) {
+      label = Object.values(label)
+    }
+
+    let sortable = data.length && data[0].orderby
+
+    const State = Groundhogg.createState({
+      per_page,
+      orderby,
+      orderby2: 0,
+      order: 'DESC',
+      page: 0,
+    })
+    const compareRows = (a, b, k = State.orderby) => {
+
+      if (!sortable || !a.orderby) {
+        return 0
+      }
+
+      let av = a.orderby[k]
+      let bv = b.orderby[k]
+
+      // Avoid deep recursion if already checking orderby2
+      if ( av === bv && k !== State.orderby2 ){
+        return compareRows( a, b, State.orderby2 )
+      }
+
+      if (State.order === 'ASC') {
+        return av - bv
+      }
+
+      return bv - av
+    }
+
+    const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
+
+    const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
+      return Td({ dataColname: k, className: `${cellClasses[i] ?? ''}` }, `${ row[k] }`)
+    }))))
+
+    return Div( {
+      id: `report-${id}`
+    }, morph => Fragment([
+      Div({
+        className: 'table-scroll'
+      }, Table({
+        className: 'groundhogg-report-table',
+      }, [
+        THead({}, Tr({}, label.map((l, i) => Th({
+          id: `order-${ i }`,
+          className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
+          onClick: e => {
+
+            if (!sortable) {
+              return
+            }
+
+            if (State.orderby === i) {
+              State.set({
+                order: State.order === 'ASC' ? 'DESC' : 'ASC',
+              })
+            }
+            else {
+              State.set({
+                orderby: i,
+                orderby2: State.orderby,
+                order: 'DESC',
+              })
+            }
+            morph()
+          },
+        }, Div({
+          className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' )}`,
+        }, [
+          Span({
+            className: 'column-name',
+          }, l),
+          sortable ? Span({}, [
+            Span({
+              className: 'sorting-indicator asc',
+            }),
+            Span({
+              className: 'sorting-indicator desc',
+            }),
+          ]) : null,
+        ]))))),
+        TableBody(),
+      ])),
+      data.length > State.per_page ? Div({
+        style: {
+          padding: '10px',
+        },
+        className: 'display-flex gap-10 flex-end',
+      }, [
+        State.page > 0 ? Button({
+          id: `report-${id}-prev`,
+          className: 'gh-button secondary',
+          onClick: e => {
+            State.set({
+              page: State.page - 1,
+            })
+            morph()
+          },
+        }, 'Prev') : null,
+        ( State.page + 1 ) * State.per_page < data.length ? Button({
+          id: `report-${id}-next`,
+          className: 'gh-button secondary',
+          onClick: e => {
+            State.set({
+              page: State.page + 1,
+            })
+            morph()
+          },
+        }, 'Next') : null,
+      ]) : null,
+    ]))
+  }
+
+  Widgets.add('broadcasts', {
+    name  : 'Recent Broadcasts',
+    col   : 2,
+    render: () => {
+
+      Groundhogg.createState({
+        loaded: false,
+      })
+
+      return Div({
+        id: 'broadcasts-report',
+      }, morph => {
+
+        if (!State.loaded) {
+
+          get(Groundhogg.api.routes.v4.reports, {
+            reports: [
+              'table_all_broadcasts_performance',
+            ],
+            range  : 'this_week',
+          }).then(r => {
+            State.set({
+              reports: r.reports,
+              loaded: true,
+            })
+            morph()
+          })
+
+          return Skeleton({}, [
+            'two-thirds',
+            'third',
+            'two-thirds',
+            'third',
+            'two-thirds',
+            'third',
+          ])
+        }
+
+        if ( ! State.reports.table_all_broadcasts_performance.data.length ){
+
+          return Fragment([
+            Pg( {}, "You haven't sent any broadcasts this week!" ),
+            Pg( {}, "Send one to your subscribers before they forget about you." ),
+            An({
+              className: 'gh-button primary'
+            }, __( 'Send a broadcast!' ) )
+          ])
+
+        }
+
+        return ReportTable( 'broadcasts', State.reports.table_all_broadcasts_performance )
+      })
+    },
+  })
+
+  // Widgets.add('funnels', {
+  //   name  : 'Funnels',
+  //   col   : 2,
+  //   render: () => {
+  //
+  //     Groundhogg.createState({
+  //       loaded: false,
+  //     })
+  //
+  //     return Div({
+  //       id: 'funnels-report',
+  //     }, morph => {
+  //
+  //       if (!State.loaded) {
+  //
+  //         get(Groundhogg.api.routes.v4.reports, {
+  //           reports: [
+  //             'table_all_funnels_performance',
+  //           ],
+  //           range  : '7_days',
+  //         }).then(r => {
+  //           State.set({
+  //             reports: r.reports,
+  //             loaded: true,
+  //           })
+  //           morph()
+  //         })
+  //
+  //         return Skeleton({}, [
+  //           'two-thirds',
+  //           'third',
+  //           'two-thirds',
+  //           'third',
+  //           'two-thirds',
+  //           'third',
+  //         ])
+  //       }
+  //
+  //       return ReportTable( 'broadcasts', State.reports.table_all_funnels_performance )
+  //     })
+  //   },
+  // })
+
   Widgets.add('searches', {
     name  : 'Searches',
     col   : 1,
@@ -855,11 +1076,11 @@
       })
 
       return Div({
-        id: 'searches-table',
+        id   : 'searches-table',
         style: {
           maxHeight: '500px',
-          overflow:'auto'
-        }
+          overflow : 'auto',
+        },
       }, morph => {
 
         if (!State.loaded) {
@@ -883,21 +1104,21 @@
           ])
         }
 
-        if ( ! Groundhogg.stores.searches.hasItems() ){
+        if (!Groundhogg.stores.searches.hasItems()) {
           return Pg({
             style: {
-              textAlign: 'center'
-            }
-          }, __( 'You don\'t have any saved searches.', 'groundhogg' ) )
+              textAlign: 'center',
+            },
+          }, __('You don\'t have any saved searches.', 'groundhogg'))
         }
 
         return Div({
           className: 'gh-striped',
         }, Groundhogg.stores.searches.getItems().map(search => Div({
           className: 'row space-between',
-          style: {
-            padding: '10px'
-          }
+          style    : {
+            padding: '10px',
+          },
         }, [
           Bold({}, search.name),
           An({
