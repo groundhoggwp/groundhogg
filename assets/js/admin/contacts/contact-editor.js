@@ -2373,8 +2373,12 @@
         $(e.target).closest('.gh-panel').toggleClass('closed')
       })
 
-      $(document).on('click', '#secondary-tabs .gh-panel.outlined button.toggle-indicator', e => {
-        $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
+      $(document).on('click', '.gh-panel.outlined.closed button.toggle-indicator', e => {
+        $(e.target).closest('.gh-panel.outlined').removeClass('closed')
+      })
+
+      $(document).on('click', '.gh-panel.outlined:not(.closed) button.toggle-indicator', e => {
+        $(e.target).closest('.gh-panel.outlined').addClass('closed')
       })
 
       if (window.location.href.match(/send_email=true/)) {
