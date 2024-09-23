@@ -3014,99 +3014,97 @@ button:has(.gh-dropdown-menu){
   animation: skeleton-loading 1s linear infinite alternate;
 }
 
+.contact-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &.clickable {
+    cursor: pointer;
+  }
+
+  .gh-tags {
+    gap: 5px;
+
+    .gh-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+    }
+  }
+
+  .show-on-hover{
+    display: none;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &:last-of-type {
+    border-bottom: 1px solid $primary-dark-10;
+  }
+
+  .subscribed {
+    color: $primary-dark-30;
+  }
+
+  .name {
+    font-weight: 500;
+  }
+
+  .contact-phones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .contact-phone {
+      >svg {
+        width: 14px;
+      }
+
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+  }
+
+  .pill {
+    font-size: 12px;
+    padding: 2px 5px;
+  }
+
+  img.avatar {
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .actions {
+    //width: 100%;
+    display: flex;
+    //gap: 5px;
+    justify-content: flex-end;
+    visibility: hidden;
+    margin-left: auto;
+  }
+
+  &:hover {
+    .show-on-hover{
+      display: flex;
+    }
+  }
+}
+
 .contact-list {
   display: flex;
   flex-direction: column;
   max-height: 70vh;
-  //overflow-y: auto;
-  //margin: 10px -20px 0 -20px;
-  //&:not(:empty){
-  //margin-bottom: -20px;
-  //}
+
   p:last-child {
     text-align: center;
   }
 
-
   &-item {
     padding: 10px 10px 10px 20px;
     border-top: 1px solid $primary-dark-10;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-
-    &.clickable {
-      cursor: pointer;
-    }
-
-    .gh-tags {
-      gap: 5px;
-
-      .gh-tag {
-        font-size: 11px;
-        padding: 2px 7px;
-      }
-    }
-
-    .show-on-hover{
-      display: none;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    &:last-of-type {
-      border-bottom: 1px solid $primary-dark-10;
-    }
-
-    .subscribed {
-      color: $primary-dark-30;
-    }
-
-    .name {
-      font-weight: 500;
-    }
-
-    .contact-phones {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-
-      .contact-phone {
-        >svg {
-          width: 14px;
-        }
-
-        display: flex;
-        gap: 5px;
-        align-items: center;
-      }
-    }
-
-    .pill {
-      font-size: 12px;
-      padding: 2px 5px;
-    }
-
-    img.avatar {
-      border-radius: 5px;
-      width: 30px;
-      height: 30px;
-    }
-
-    .actions {
-      //width: 100%;
-      display: flex;
-      //gap: 5px;
-      justify-content: flex-end;
-      visibility: hidden;
-      margin-left: auto;
-    }
-
-    &:hover {
-      .show-on-hover{
-        display: flex;
-      }
-    }
   }
 
 }
@@ -3115,5 +3113,11 @@ button:has(.gh-dropdown-menu){
 .gh-striped{
   .row:nth-child(odd) {
     background-color: $primary-blue-2;
+  }
+}
+
+.relationship-editor{
+  h4 {
+    margin: 0;
   }
 }

@@ -2648,17 +2648,7 @@ button:has(.gh-dropdown-menu) {
   animation: skeleton-loading 1s linear infinite alternate;
 }
 
-.contact-list {
-  display: flex;
-  flex-direction: column;
-  max-height: 70vh;
-}
-.contact-list p:last-child {
-  text-align: center;
-}
 .contact-list-item {
-  padding: 10px 10px 10px 20px;
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -2719,8 +2709,25 @@ button:has(.gh-dropdown-menu) {
   display: flex;
 }
 
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+.contact-list p:last-child {
+  text-align: center;
+}
+.contact-list-item {
+  padding: 10px 10px 10px 20px;
+  border-top: 1px solid rgba(16, 38, 64, 0.1);
+}
+
 .gh-striped .row:nth-child(odd) {
   background-color: rgba(0, 117, 255, 0.02);
+}
+
+.relationship-editor h4 {
+  margin: 0;
 }
 
 /*# sourceMappingURL=elements.css.map */

@@ -283,6 +283,10 @@ code.meta-replacement-code {
   position: relative;
   margin-left: 20px;
 }
+#activity-timeline li.activity-item table td {
+  word-break: normal;
+  overflow: auto;
+}
 #activity-timeline li.activity-item:not(:hover, :active, :focus) .event-more, #activity-timeline li.activity-item:not(:hover, :active, :focus) .event-queue-more {
   display: none;
 }
@@ -426,6 +430,13 @@ code.meta-replacement-code {
 }
 #send-email-dialog iframe {
   height: 300px;
+}
+
+#relationships .contact-list-item {
+  padding: 10px;
+}
+#relationships .space-between:has(h4) {
+  padding: 10px;
 }
 
 /*# sourceMappingURL=contact-editor.css.map */
