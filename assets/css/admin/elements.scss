@@ -3020,6 +3020,10 @@ button:has(.gh-dropdown-menu){
   flex-direction: column;
   gap: 3px;
 
+  h4 {
+    display: inline-block;
+  }
+
   &.clickable {
     cursor: pointer;
   }

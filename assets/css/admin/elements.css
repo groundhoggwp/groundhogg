@@ -2654,6 +2654,9 @@ button:has(.gh-dropdown-menu) {
   flex-direction: column;
   gap: 3px;
 }
+.contact-list-item h4 {
+  display: inline-block;
+}
 .contact-list-item.clickable {
   cursor: pointer;
 }
