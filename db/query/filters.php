@@ -165,19 +165,28 @@ class Filters {
 				$before->modify( 'tomorrow 23:59:59' );
 				break;
 			case 'this_week':
-				$start_of_week = day_of_week( get_option( 'start_of_week' ) );
 
-				if ( $after->format( 'l' ) !== $start_of_week ) {
-					$after->modify( sprintf( 'last %s 00:00:00', $start_of_week ) );
-				}
+				$startEnd = get_weekstartend( $after->ymdhis() );
+				$after->setTimestamp( $startEnd['start'] );
+				$before->setTimestamp( $startEnd['end'] );
 
-				$before = ( clone $after )->modify( '+7 days 23:59:59' );
+				break;
+			case 'last_week':
+
+				$after->modify( '7 days ago' );
+				$startEnd = get_weekstartend( $after->ymdhis() );
+				$after->setTimestamp( $startEnd['start'] );
+				$before->setTimestamp( $startEnd['end'] );
 
 				break;
 
 			case 'this_month':
 				$after->modify( 'first day of this month 00:00:00' );
 				$before->modify( 'last day of this month 23:59:59' );
+				break;
+			case 'last_month':
+				$after->modify( 'first day of last month 00:00:00' );
+				$before->modify( 'last day of last month 23:59:59' );
 				break;
 			case 'this_year':
 				$after->modify( 'first day of January this year 00:00:00' );
