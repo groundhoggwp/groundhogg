@@ -85,12 +85,16 @@ function quick_stat_report( $args = [] ) {
             </h2>
         </div>
         <div class="inside">
-            <div class="groundhogg-quick-stat-number">...</div>
-            <div class="groundhogg-quick-stat-previous green">
-                <span class="groundhogg-quick-stat-arrow up"></span>
-                <span class="groundhogg-quick-stat-prev-percent">0%</span>
+            <div class="display-flex align-center flex-wrap">
+                <div class="groundhogg-quick-stat-number">...</div>
+                <div style="margin-left: auto">
+                    <div class="groundhogg-quick-stat-previous green">
+                        <span class="groundhogg-quick-stat-arrow up"></span>
+                        <span class="groundhogg-quick-stat-prev-percent">0%</span>
+                    </div>
+                    <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
+                </div>
             </div>
-            <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
             <div class="wp-clearfix"></div>
         </div>
 	</div>

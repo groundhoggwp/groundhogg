@@ -869,7 +869,7 @@ span.gh-text.lg {
   margin-top: 0;
   margin-bottom: 0;
 }
-.gh-panel .inside p:first-child {
+.gh-panel .inside > p:first-child {
   margin-top: 0;
 }
 .gh-panel .inside.no-padding {

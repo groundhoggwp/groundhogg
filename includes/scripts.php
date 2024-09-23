@@ -503,7 +503,8 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/features/dashboard' . $dot_min . '.js', [
 			'groundhogg-make-el',
 			'groundhogg-admin-remote-notifications',
-			'groundhogg-admin-components'
+			'groundhogg-admin-components',
+			'groundhogg-admin-reporting'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );

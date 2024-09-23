@@ -1,18 +1,4 @@
-function tool_tip_label (tooltipItem, data) {
-  if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
-    return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label
-  }
-  else {
-    return data.datasets[tooltipItem.datasetIndex].label + ': ' +
-      data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y
-  }
-}
-
-function tool_tip_title () {
-  return ''
-}
-
-( function (reporting, $, nonces) {
+( function ($, nonces) {
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -45,488 +31,498 @@ function tool_tip_title () {
     }), '_blank')
   }
 
-  $.extend(reporting, {
+  const ReportTable = ( id, report ) => {
 
-    data: {},
-    calendar: null,
-    charts: {},
+    let { label, data, no_data = '', per_page = 10, orderby = 0 } = report
 
-    init: function () {
+    if (!Array.isArray(label)) {
+      label = Object.values(label)
+    }
 
-      this.initCalendar()
-      this.initFunnels()
-      this.initCountry()
-      this.initBroadcast()
-      this.initCampaignFilter()
+    let sortable = data.length && data[0].orderby
 
-    },
+    const State = Groundhogg.createState({
+      per_page,
+      orderby,
+      orderby2: 0,
+      order: 'DESC',
+      page: 0,
+    })
+    const compareRows = (a, b, k = State.orderby) => {
 
-    async initCampaignFilter () {
-
-      let el = document.getElementById('report-campaign-filter')
-
-      if (!el) {
-        return
+      if (!sortable || !a.orderby) {
+        return 0
       }
 
-      let campaignId = this.other.campaign
+      let av = a.orderby[k]
+      let bv = b.orderby[k]
 
-      if (campaignId && !CampaignsStore.has(campaignId)) {
-        await CampaignsStore.fetchItem(campaignId)
+      // Avoid deep recursion if already checking orderby2
+      if ( av === bv && k !== State.orderby2 ){
+        return compareRows( a, b, State.orderby2 )
       }
 
-      el.append(ItemPicker({
-        id: 'report-campaign',
-        noneSelected: __('Filter by campaign...', 'groundhogg'),
-        multiple: false,
-        selected: campaignId ? ( ({ ID, data }) => ( { id: ID, text: data.name } ) )(CampaignsStore.get(campaignId)) : [],
-        fetchOptions: async (search) => {
-          let campaigns = await CampaignsStore.fetchItems({
-            search,
-            limit: 20,
-          })
+      if (State.order === 'ASC') {
+        return av - bv
+      }
 
-          return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
-        },
-        onChange: item => {
+      return bv - av
+    }
 
-          if (!item) {
-            this.other.campaign = null
-          }
-          else {
-            this.other.campaign = item.id
-          }
+    const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
 
-          this.refresh(this.calendar)
-        },
-      }))
+    const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
+      return Td({ dataColname: k, className: `${cellClasses[i] ?? ''}` }, `${ row[k] }`)
+    }))))
 
-    },
+    return Div( {
+      id: `report-${id}`
+    }, morph => Fragment([
+      Div({
+        className: 'table-scroll'
+      }, Table({
+        className: 'groundhogg-report-table',
+      }, [
+        THead({}, Tr({}, label.map((l, i) => Th({
+          id: `order-${ i }`,
+          className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
+          onClick: e => {
 
-    initCalendar: function () {
+            if (!sortable) {
+              return
+            }
 
-      var self = this
-
-      this.calendar = new Calendar({
-        element: $('#groundhogg-datepicker'),
-        presets: [
-          {
-            label: 'Last 30 days',
-            start: moment().subtract(29, 'days'),
-            end: moment(),
-          }, {
-            label: 'This month',
-            start: moment().startOf('month'),
-            end: moment().endOf('month'),
-          }, {
-            label: 'Last month',
-            start: moment().subtract(1, 'month').startOf('month'),
-            end: moment().subtract(1, 'month').endOf('month'),
-          }, {
-            label: 'Last 7 days',
-            start: moment().subtract(6, 'days'),
-            end: moment(),
-          }, {
-            label: 'Last 3 months',
-            start: moment().subtract(3, 'month').startOf('month'),
-            end: moment().subtract(1, 'month').endOf('month'),
-          }, {
-            label: 'This year',
-            start: moment().startOf('year'),
-            end: moment().endOf('year'),
+            if (State.orderby === i) {
+              State.set({
+                order: State.order === 'ASC' ? 'DESC' : 'ASC',
+              })
+            }
+            else {
+              State.set({
+                orderby: i,
+                orderby2: State.orderby,
+                order: 'DESC',
+              })
+            }
+            morph()
           },
-        ],
-        format: {
-          preset: GroundhoggReporting.date_format,
-          // preset: 'MMM D, YYYY'
+        }, Div({
+          className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' )}`,
+        }, [
+          Span({
+            className: 'column-name',
+          }, l),
+          sortable ? Span({}, [
+            Span({
+              className: 'sorting-indicator asc',
+            }),
+            Span({
+              className: 'sorting-indicator desc',
+            }),
+          ]) : null,
+        ]))))),
+        TableBody(),
+      ])),
+      data.length > State.per_page ? Div({
+        style: {
+          padding: '10px',
         },
-        earliest_date: 'January 1, 2017',
-        latest_date: moment(),
-        start_date: self.dates.start_date,
-        end_date: self.dates.end_date,
-        callback: function () {
-          self.refresh(this)
-        },
-      })
-
-      // run it with defaults
-      this.calendar.calendarSaveDates()
-    },
-
-    initFunnels: function () {
-
-      var self = this
-
-      $('#funnel-id').change(function () {
-        self.refresh(self.calendar)
-      })
-    },
-
-    initBroadcast: function () {
-
-      var self = this
-
-      $('#broadcast-id').change(function () {
-        self.refresh(self.calendar)
-      })
-    },
-
-    initCountry: function () {
-
-      var self = this
-
-      $('#country').change(function () {
-        self.refresh(self.calendar)
-      })
-    },
-
-    refresh: function (calendar) {
-
-      var self = this
-
-      let { close } = loadingModal()
-
-      var start = calendar.start_date.format('YYYY-MM-DD'),
-        end = calendar.end_date.format('YYYY-MM-DD')
-
-      $.ajax({
-        type: 'post',
-        url: ajaxurl,
-        dataType: 'json',
-        data: {
-          action: 'groundhogg_refresh_dashboard_reports',
-          reports: self.reports,
-          start: start,
-          end: end,
-          data: {
-            ...reporting.other,
+        className: 'display-flex gap-10 flex-end',
+      }, [
+        State.page > 0 ? Button({
+          id: `report-${id}-prev`,
+          className: 'gh-button secondary',
+          onClick: e => {
+            State.set({
+              page: State.page - 1,
+            })
+            morph()
           },
-        },
-        success: function (json) {
+        }, 'Prev') : null,
+        ( State.page + 1 ) * State.per_page < data.length ? Button({
+          id: `report-${id}-next`,
+          className: 'gh-button secondary',
+          onClick: e => {
+            State.set({
+              page: State.page + 1,
+            })
+            morph()
+          },
+        }, 'Next') : null,
+      ]) : null,
+    ]))
+  }
 
-          self.data = json.data.reports
-          self.renderReports()
+  // reporting might be undefined at this point
+  if ( typeof GroundhoggReporting !== 'undefined' ){
+    const reporting = GroundhoggReporting
+    $.extend(reporting || {}, {
 
-          close()
+      data: {},
+      calendar: null,
+      charts: {},
 
-          $('.wrap').removeClass('blurred')
+      init: function () {
 
-          window.dispatchEvent(new Event('resize'))
+        this.initCalendar()
+        this.initFunnels()
+        this.initCountry()
+        this.initBroadcast()
+        this.initCampaignFilter()
 
-        },
-        failure: function (response) {
+      },
 
-          alert('Unable to retrieve data...')
+      async initCampaignFilter () {
 
-        },
-      })
+        let el = document.getElementById('report-campaign-filter')
 
-    },
-
-    get_other_data: function () {
-
-      var self = this
-      var data = {}
-
-      $('.post-data').each(function (i) {
-        var $this = $(this)
-        var name = $this.attr('name')
-
-        // Backwards compat for the funnel area, but also want the form to
-        // work...
-        if (name === 'funnel') {
-          name = 'funnel_id'
+        if (!el) {
+          return
         }
 
-        data[name] = $this.val()
-      })
+        let campaignId = this.other.campaign
 
-      return data
-    },
+        if (campaignId && !CampaignsStore.has(campaignId)) {
+          await CampaignsStore.fetchItem(campaignId)
+        }
 
-    renderReports: function () {
-      for (var i = 0; i < this.reports.length; i++) {
-        var report_id = this.reports[i]
-        var report_data = this.data[report_id]
-        this.renderReport(report_id, report_data)
-      }
+        el.append(ItemPicker({
+          id: 'report-campaign',
+          noneSelected: __('Filter by campaign...', 'groundhogg'),
+          multiple: false,
+          selected: campaignId ? ( ({ ID, data }) => ( { id: ID, text: data.name } ) )(CampaignsStore.get(campaignId)) : [],
+          fetchOptions: async (search) => {
+            let campaigns = await CampaignsStore.fetchItems({
+              search,
+              limit: 20,
+            })
 
-    },
+            return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
+          },
+          onChange: item => {
 
-    renderReport: function (report_id, report_data) {
+            if (!item) {
+              this.other.campaign = null
+            }
+            else {
+              this.other.campaign = item.id
+            }
 
-      var $report = $('#' + report_id)
+            this.refresh(this.calendar)
+          },
+        }))
 
-      if (!$report.length) {
-        return
-      }
+      },
 
-      var type = report_data.type
+      initCalendar: function () {
 
-      switch (type) {
-        case 'quick_stat':
-          this.renderQuickStatReport($report, report_data)
-          break
-        case 'chart':
-          this.renderChartReport($report, report_data.chart, report_id)
-          break
-        case 'table':
-          this.renderTable($report, report_data, report_id)
-          break
-      }
+        var self = this
 
-    },
-
-    renderQuickStatReport: function ($report, report_data) {
-
-      $report.find('.groundhogg-quick-stat-number').html(report_data.number)
-      $report.find('.groundhogg-quick-stat-previous').
-        removeClass('green red').
-        addClass(report_data.compare.arrow.color)
-      $report.find('.groundhogg-quick-stat-compare').
-        html(report_data.compare.text)
-      $report.find('.groundhogg-quick-stat-arrow').
-        removeClass('up down').
-        addClass(report_data.compare.arrow.direction)
-      $report.find('.groundhogg-quick-stat-prev-percent').
-        html(report_data.compare.percent)
-
-    },
-
-    renderChartReport: function ($report, report_data, report_id) {
-
-      if (report_data.data.labels && report_data.data.labels.length === 0) {
-        $report.closest('.gh-donut-chart-wrap').html(report_data.no_data)
-        return;
-      }
-
-      if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
-        var funcName = report_data.options.tooltips.callbacks.label
-        report_data.options.tooltips.callbacks.label = window[funcName]
-      }
-
-      if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
-        var funcName = report_data.options.tooltips.callbacks.title
-        report_data.options.tooltips.callbacks.title = window[funcName]
-      }
-
-      if (this.charts[report_id]) {
-        this.charts[report_id].destroy()
-      }
-
-      var ctx = $report[0].getContext('2d')
-
-      switch (report_id) {
-        case 'chart_unsub_reasons':
-          report_data.options.onClick = (e, arr) => {
-            let index = arr[0]._index
-            let { reason } = report_data.data.rawResults[index]
-
-            openInContactsView([
-              [
-                {
-                  type: 'unsubscribed',
-                  reasons: [reason],
-                  date_range: 'between',
-                  before: this.calendar.end_date.format('YYYY-MM-DD'),
-                  after: this.calendar.start_date.format('YYYY-MM-DD'),
-                },
-              ],
-            ])
-          }
-          break
-      }
-
-      var chart = new Chart(ctx, report_data)
-      this.charts[report_id] = chart
-
-      // draw Hover line in the graph
-      var draw_line = Chart.controllers.line.prototype.draw
-      Chart.helpers.extend(Chart.controllers.line.prototype, {
-        draw: function () {
-          draw_line.apply(this, arguments)
-          if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
-            var ap = this.chart.tooltip._active[0]
-            var ctx = this.chart.ctx
-            var x = ap.tooltipPosition().x
-            var topy = this.chart.scales['y-axis-0'].top
-            var bottomy = this.chart.scales['y-axis-0'].bottom
-
-            ctx.save()
-            ctx.beginPath()
-            ctx.moveTo(x, topy)
-            ctx.lineTo(x, bottomy)
-            ctx.lineWidth = 1
-            ctx.strokeStyle = '#727272'
-            ctx.setLineDash([10, 10])
-            ctx.stroke()
-            ctx.restore()
-          }
-        },
-
-      })
-
-      Chart.plugins.register({
-        afterDraw: function (chart) {
-          if (chart.data.datasets.length === 0) {
-            // No data is present
-            var ctx = chart.chart.ctx
-            var width = chart.chart.width
-            var height = chart.chart.height
-            chart.clear()
-
-            ctx.save()
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.font = '16px normal \'Helvetica Nueue\''
-            ctx.fillText('No data to display', width / 2, height / 2)
-            ctx.restore()
-          }
-        },
-      })
-
-    },
-
-    renderTable: function ($report, report_data, id) {
-
-      let { label, data, no_data = '', per_page = 10, orderby = 0 } = report_data
-
-      if (!Array.isArray(label)) {
-        label = Object.values(label)
-      }
-
-      if (!data.length) {
-        $report.html(no_data)
-        return
-      }
-
-      let sortable = data.length && data[0].orderby
-
-      const ReportTable = () => {
-
-        const State = Groundhogg.createState({
-          per_page,
-          orderby,
-          orderby2: 0,
-          order: 'DESC',
-          page: 0,
+        this.calendar = new Calendar({
+          element: $('#groundhogg-datepicker'),
+          presets: [
+            {
+              label: 'Last 30 days',
+              start: moment().subtract(29, 'days'),
+              end: moment(),
+            }, {
+              label: 'This month',
+              start: moment().startOf('month'),
+              end: moment().endOf('month'),
+            }, {
+              label: 'Last month',
+              start: moment().subtract(1, 'month').startOf('month'),
+              end: moment().subtract(1, 'month').endOf('month'),
+            }, {
+              label: 'Last 7 days',
+              start: moment().subtract(6, 'days'),
+              end: moment(),
+            }, {
+              label: 'Last 3 months',
+              start: moment().subtract(3, 'month').startOf('month'),
+              end: moment().subtract(1, 'month').endOf('month'),
+            }, {
+              label: 'This year',
+              start: moment().startOf('year'),
+              end: moment().endOf('year'),
+            },
+          ],
+          format: {
+            preset: GroundhoggReporting.date_format,
+            // preset: 'MMM D, YYYY'
+          },
+          earliest_date: 'January 1, 2017',
+          latest_date: moment(),
+          start_date: self.dates.start_date,
+          end_date: self.dates.end_date,
+          callback: function () {
+            self.refresh(this)
+          },
         })
 
-        const morph = () => morphdom($report[0], Div({}, Render()), { childrenOnly: true })
+        // run it with defaults
+        this.calendar.calendarSaveDates()
+      },
 
-        const compareRows = (a, b, k = State.orderby) => {
+      initFunnels: function () {
 
-          if (!sortable || !a.orderby) {
-            return 0
+        var self = this
+
+        $('#funnel-id').change(function () {
+          self.refresh(self.calendar)
+        })
+      },
+
+      initBroadcast: function () {
+
+        var self = this
+
+        $('#broadcast-id').change(function () {
+          self.refresh(self.calendar)
+        })
+      },
+
+      initCountry: function () {
+
+        var self = this
+
+        $('#country').change(function () {
+          self.refresh(self.calendar)
+        })
+      },
+
+      refresh: function (calendar) {
+
+        var self = this
+
+        let { close } = loadingModal()
+
+        var start = calendar.start_date.format('YYYY-MM-DD'),
+          end = calendar.end_date.format('YYYY-MM-DD')
+
+        $.ajax({
+          type: 'post',
+          url: ajaxurl,
+          dataType: 'json',
+          data: {
+            action: 'groundhogg_refresh_dashboard_reports',
+            reports: self.reports,
+            start: start,
+            end: end,
+            data: {
+              ...reporting.other,
+            },
+          },
+          success: function (json) {
+
+            self.data = json.data.reports
+            self.renderReports()
+
+            close()
+
+            $('.wrap').removeClass('blurred')
+
+            window.dispatchEvent(new Event('resize'))
+
+          },
+          failure: function (response) {
+
+            alert('Unable to retrieve data...')
+
+          },
+        })
+
+      },
+
+      get_other_data: function () {
+
+        var self = this
+        var data = {}
+
+        $('.post-data').each(function (i) {
+          var $this = $(this)
+          var name = $this.attr('name')
+
+          // Backwards compat for the funnel area, but also want the form to
+          // work...
+          if (name === 'funnel') {
+            name = 'funnel_id'
           }
 
-          let av = a.orderby[k]
-          let bv = b.orderby[k]
+          data[name] = $this.val()
+        })
 
-          // Avoid deep recursion if already checking orderby2
-          if ( av === bv && k !== State.orderby2 ){
-            return compareRows( a, b, State.orderby2 )
-          }
+        return data
+      },
 
-          if (State.order === 'ASC') {
-            return av - bv
-          }
-
-          return bv - av
+      renderReports: function () {
+        for (var i = 0; i < this.reports.length; i++) {
+          var report_id = this.reports[i]
+          var report_data = this.data[report_id]
+          this.renderReport(report_id, report_data)
         }
 
-        const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
+      },
 
-        const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
-          return Td({ dataColname: k, className: `${cellClasses[i] ?? ''}` }, `${ row[k] }`)
-        }))))
+      renderReport: function (report_id, report_data) {
 
-        const Render = () => Fragment([
-          Div({
-            className: 'table-scroll'
-          }, Table({
-            className: 'groundhogg-report-table',
-          }, [
-            THead({}, Tr({}, label.map((l, i) => Th({
-              id: `order-${ i }`,
-              className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
-              onClick: e => {
+        var $report = $('#' + report_id)
 
-                if (!sortable) {
-                  return
-                }
+        if (!$report.length) {
+          return
+        }
 
-                if (State.orderby === i) {
-                  State.set({
-                    order: State.order === 'ASC' ? 'DESC' : 'ASC',
-                  })
-                }
-                else {
-                  State.set({
-                    orderby: i,
-                    orderby2: State.orderby,
-                    order: 'DESC',
-                  })
-                }
-                morph()
-              },
-            }, Div({
-              className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' )}`,
-            }, [
-              Span({
-                className: 'column-name',
-              }, l),
-              sortable ? Span({}, [
-                Span({
-                  className: 'sorting-indicator asc',
-                }),
-                Span({
-                  className: 'sorting-indicator desc',
-                }),
-              ]) : null,
-            ]))))),
-            TableBody(),
-          ])),
-          data.length > State.per_page ? Div({
-            style: {
-              padding: '10px',
-            },
-            className: 'display-flex gap-10 flex-end',
-          }, [
-            State.page > 0 ? Button({
-              id: `${id}-prev`,
-              className: 'gh-button secondary',
-              onClick: e => {
-                State.set({
-                  page: State.page - 1,
-                })
-                morph()
-              },
-            }, 'Prev') : null,
-            ( State.page + 1 ) * State.per_page < data.length ? Button({
-              id: `${id}-next`,
-              className: 'gh-button secondary',
-              onClick: e => {
-                State.set({
-                  page: State.page + 1,
-                })
-                morph()
-              },
-            }, 'Next') : null,
-          ]) : null,
+        var type = report_data.type
 
-        ])
+        switch (type) {
+          case 'quick_stat':
+            this.renderQuickStatReport($report, report_data)
+            break
+          case 'chart':
+            this.renderChartReport($report, report_data.chart, report_id)
+            break
+          case 'table':
+            this.renderTable($report, report_data, report_id)
+            break
+        }
 
-        return Render()
-      }
+      },
 
-      $report.html(ReportTable())
-    },
+      renderQuickStatReport: function ($report, report_data) {
 
-  })
+        $report.find('.groundhogg-quick-stat-number').html(report_data.number)
+        $report.find('.groundhogg-quick-stat-previous').
+          removeClass('green red').
+          addClass(report_data.compare.arrow.color)
+        $report.find('.groundhogg-quick-stat-compare').
+          html(report_data.compare.text)
+        $report.find('.groundhogg-quick-stat-arrow').
+          removeClass('up down').
+          addClass(report_data.compare.arrow.direction)
+        $report.find('.groundhogg-quick-stat-prev-percent').
+          html(report_data.compare.percent)
+
+      },
+
+      renderChartReport: function ($report, report_data, report_id) {
+
+        if (report_data.data.labels && report_data.data.labels.length === 0) {
+          $report.closest('.gh-donut-chart-wrap').html(report_data.no_data)
+          return;
+        }
+
+        if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
+          var funcName = report_data.options.tooltips.callbacks.label
+          report_data.options.tooltips.callbacks.label = window[funcName]
+        }
+
+        if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
+          var funcName = report_data.options.tooltips.callbacks.title
+          report_data.options.tooltips.callbacks.title = window[funcName]
+        }
+
+        if (this.charts[report_id]) {
+          this.charts[report_id].destroy()
+        }
+
+        var ctx = $report[0].getContext('2d')
+
+        switch (report_id) {
+          case 'chart_unsub_reasons':
+            report_data.options.onClick = (e, arr) => {
+              let index = arr[0]._index
+              let { reason } = report_data.data.rawResults[index]
+
+              openInContactsView([
+                [
+                  {
+                    type: 'unsubscribed',
+                    reasons: [reason],
+                    date_range: 'between',
+                    before: this.calendar.end_date.format('YYYY-MM-DD'),
+                    after: this.calendar.start_date.format('YYYY-MM-DD'),
+                  },
+                ],
+              ])
+            }
+            break
+        }
+
+        var chart = new Chart(ctx, report_data)
+        this.charts[report_id] = chart
+
+        // draw Hover line in the graph
+        var draw_line = Chart.controllers.line.prototype.draw
+        Chart.helpers.extend(Chart.controllers.line.prototype, {
+          draw: function () {
+            draw_line.apply(this, arguments)
+            if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+              var ap = this.chart.tooltip._active[0]
+              var ctx = this.chart.ctx
+              var x = ap.tooltipPosition().x
+              var topy = this.chart.scales['y-axis-0'].top
+              var bottomy = this.chart.scales['y-axis-0'].bottom
+
+              ctx.save()
+              ctx.beginPath()
+              ctx.moveTo(x, topy)
+              ctx.lineTo(x, bottomy)
+              ctx.lineWidth = 1
+              ctx.strokeStyle = '#727272'
+              ctx.setLineDash([10, 10])
+              ctx.stroke()
+              ctx.restore()
+            }
+          },
+
+        })
+
+        Chart.plugins.register({
+          afterDraw: function (chart) {
+            if (chart.data.datasets.length === 0) {
+              // No data is present
+              var ctx = chart.chart.ctx
+              var width = chart.chart.width
+              var height = chart.chart.height
+              chart.clear()
+
+              ctx.save()
+              ctx.textAlign = 'center'
+              ctx.textBaseline = 'middle'
+              ctx.font = '16px normal \'Helvetica Nueue\''
+              ctx.fillText('No data to display', width / 2, height / 2)
+              ctx.restore()
+            }
+          },
+        })
+
+      },
+
+      renderTable: function ($report, report_data, id) {
+
+        let { data, no_data = '' } = report_data
+
+        if (!data.length) {
+          $report.html(no_data)
+          return
+        }
+
+        $report.html(ReportTable(id, report_data))
+      },
+
+    })
+  }
 
   $(function () {
-    reporting.init()
+
+    if ( typeof GroundhoggReporting !== 'undefined' ){
+      GroundhoggReporting.init()
+    }
+
   })
 
-} )(GroundhoggReporting, jQuery, groundhogg_nonces)
+  Groundhogg.reporting = {
+    ReportTable
+  }
+
+} )(jQuery, groundhogg_nonces)

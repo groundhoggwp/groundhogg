@@ -1,6 +1,11 @@
 @charset "UTF-8";
-body.gh_reporting .wrap * {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+body.gh_reporting .number-total,
+body.gh_reporting .groundhogg-quick-stat-number {
+  font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+}
+body.gh_reporting .gh-panel .notice {
+  margin: 10px;
+  border-radius: 5px;
 }
 body.gh_reporting .display-grid .gh-panel {
   position: relative;
@@ -57,17 +62,6 @@ body.gh_reporting .nav-tab-wrapper {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
-.groundhogg-report h2.title {
-  padding: 0 20px;
-  font-size: 18px;
-  /*border-bottom: 1px solid #ccd0d4;*/
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: pre;
-  line-height: 1.2;
-  font-weight: bold;
-}
-
 .groundhogg-report .inside {
   padding: 20px;
 }
@@ -99,21 +93,17 @@ body.gh_reporting .nav-tab-wrapper {
 
 .groundhogg-quick-stat .groundhogg-quick-stat-number {
   font-size: 40px;
-  display: inline-block;
-  float: left;
-  margin-top: 10px;
+  line-height: 1;
 }
 .groundhogg-quick-stat .groundhogg-quick-stat-number a {
   text-decoration: none;
-}
-.groundhogg-quick-stat .groundhogg-quick-stat-number h2.title .dashicons, .groundhogg-quick-stat .groundhogg-quick-stat-number h2.title .dashicons-before:before {
-  font-family: dashicons;
+  line-height: 1;
 }
 
 .groundhogg-quick-stat .groundhogg-quick-stat-previous {
   /*margin: 10px 0 0 0;*/
   font-size: 16px;
-  float: right;
+  text-align: right;
 }
 
 .groundhogg-quick-stat .groundhogg-quick-stat-previous.red {
@@ -140,8 +130,7 @@ body.gh_reporting .nav-tab-wrapper {
 }
 
 .groundhogg-quick-stat .groundhogg-quick-stat-compare {
-  clear: right;
-  float: right;
+  text-align: right;
   font-size: 12px;
   color: #acbdc9;
   display: inline-block;
@@ -174,24 +163,6 @@ body.gh_reporting .nav-tab-wrapper {
   margin: 0 !important;
 }
 
-.groundhogg-chart-no-padding h2.title,
-.groundhogg-chart h2.title {
-  margin-top: 15px;
-  margin-bottom: 20px;
-  padding-left: 15px;
-  font-size: 18px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: pre;
-  line-height: 1.2;
-  font-weight: bold;
-}
-
-.groundhogg-chart h2.title {
-  margin-top: 0;
-  padding-left: 0;
-}
-
 .groundhogg-chart-no-padding .notice {
   margin: 10px;
 }
@@ -219,6 +190,11 @@ body.gh_reporting .nav-tab-wrapper {
   color: #99cc00;
 }
 
+.gh-panel h2.title:has(.dashicons) {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
 .gh-panel #table_funnel_stats td:first-child a.step-title {
   font-size: 16px;
   font-weight: normal;
@@ -296,7 +272,7 @@ table.groundhogg-report-table th {
   line-height: 1.2;
   display: table-cell;
   padding: 15px;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 15px;
   vertical-align: top;
 }
@@ -439,19 +415,11 @@ table.groundhogg-report-table td:last-child {
 }
 
 @media only screen and (max-width: 700px) {
-  .groundhogg-quick-stats .groundhogg-report {
-    display: inherit;
-  }
-
   .groundhogg-chart-wrapper {
     display: inline-block;
     margin-bottom: 0px;
     margin-top: 0px;
     width: 100%;
-  }
-
-  .groundhogg-quick-stats .groundhogg-quick-stat {
-    width: 90%;
   }
 
   .groundhogg-chart-no-padding {
@@ -476,10 +444,6 @@ table.groundhogg-report-table td:last-child {
     min-height: 250px;
     padding: 0px;
     float: left;
-  }
-
-  .groundhogg-chart > h2.title {
-    padding-left: 15px;
   }
 
   #groundhogg-datepicker-wrap {

@@ -1093,7 +1093,7 @@ span.gh-text {
     margin-top: 0;
     margin-bottom: 0;
 
-    p:first-child {
+    > p:first-child {
       margin-top: 0;
     }
 
