@@ -25,60 +25,64 @@ $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
-.wrap * {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+body.gh_reporting {
 
-.display-grid {
-  .gh-panel {
-    position: relative;
+  .wrap * {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
-}
 
-.wrap.blurred {
-  filter: blur(3px);
-}
+  .display-grid {
+    .gh-panel {
+      position: relative;
+    }
+  }
 
-.gh-loader-overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: -20px;
-  bottom: 0;
-  background: #FFF;
-  opacity: 0.5;
-  z-index: 9999;
-}
+  .wrap.blurred {
+    filter: blur(3px);
+  }
 
-.gh-tooltip {
-  max-width: 200px;
-}
+  .gh-loader-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: -20px;
+    bottom: 0;
+    background: #FFF;
+    opacity: 0.5;
+    z-index: 9999;
+  }
 
-.gh-loader {
-  top: 50vh;
-  margin: 0 !important;
-  left: 50%;
-  font-size: 40px !important;
-  position: absolute !important;
-  z-index: 99999;
-}
+  .gh-tooltip {
+    max-width: 200px;
+  }
 
-img {
-  max-width: 100%;
+  .gh-loader {
+    top: 50vh;
+    margin: 0 !important;
+    left: 50%;
+    font-size: 40px !important;
+    position: absolute !important;
+    z-index: 99999;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  #screen-meta-links {
+    display: none;
+  }
+
+  .nav-tab-wrapper {
+    margin-bottom: 20px !important;
+  }
+
 }
 
 #groundhogg-datepicker-wrap {
   max-width: 450px;
   float: right;
   margin-top: 25px;
-}
-
-#screen-meta-links {
-  display: none;
-}
-
-.nav-tab-wrapper {
-  margin-bottom: 20px !important;
 }
 
 .big-chart-wrap {
@@ -97,8 +101,6 @@ img {
   padding: 0 20px;
   font-size: 18px;
   /*border-bottom: 1px solid #ccd0d4;*/
-
-
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: pre;
@@ -143,6 +145,12 @@ img {
 
   a {
     text-decoration: none;
+  }
+
+  h2.title {
+    .dashicons, .dashicons-before:before {
+      font-family: dashicons;
+    }
   }
 }
 
@@ -229,12 +237,6 @@ img {
   padding-left: 0;
 }
 
-h2.title {
-  .dashicons, .dashicons-before:before {
-    font-family: dashicons;
-  }
-}
-
 .groundhogg-chart-no-padding .notice {
   margin: 10px;
 }
@@ -254,11 +256,11 @@ h2.title {
   border-radius: 5px;
 }
 
-.percentage-change.bad{
+.percentage-change.bad {
   color: #ff0000;
 }
 
-.percentage-change.good{
+.percentage-change.good {
   color: #99cc00;
 }
 
@@ -300,15 +302,19 @@ h2.title {
         &.great {
           background-color: #d3e6cb;
         }
+
         &.good {
           background-color: #eef7e3;
         }
+
         &.fair {
           background-color: #fef8e3;
         }
+
         &.poor {
           background-color: #ffe6dd;
         }
+
         &.bad {
           background-color: #F4CCCC;
         }
@@ -509,18 +515,19 @@ table.groundhogg-report-table td:last-child {
   box-sizing: border-box;
 }
 
-.broadcast-type{
+.broadcast-type {
   font-size: 10px;
   font-weight: 600;
   margin-right: 10px;
   opacity: 0.7;
 }
 
-#groundhogg-datepicker{
-  .dr-preset-list{
+#groundhogg-datepicker {
+  .dr-preset-list {
     left: 0;
   }
-  .dr-selections{
+
+  .dr-selections {
     right: 0;
   }
 }
@@ -576,8 +583,8 @@ table.groundhogg-report-table td:last-child {
   }
 
 
-  div:not(#table_broadcast_stats){
-    >  table.groundhogg-report-table {
+  div:not(#table_broadcast_stats) {
+    > table.groundhogg-report-table {
 
       tr {
         position: relative;
@@ -619,7 +626,7 @@ table.groundhogg-report-table td:last-child {
   }
 
 
-  #edit-funnel{
+  #edit-funnel {
     display: none;
   }
 

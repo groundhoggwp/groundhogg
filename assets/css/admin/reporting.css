@@ -1,17 +1,14 @@
 @charset "UTF-8";
-.wrap * {
+body.gh_reporting .wrap * {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
-.display-grid .gh-panel {
+body.gh_reporting .display-grid .gh-panel {
   position: relative;
 }
-
-.wrap.blurred {
+body.gh_reporting .wrap.blurred {
   filter: blur(3px);
 }
-
-.gh-loader-overlay {
+body.gh_reporting .gh-loader-overlay {
   position: absolute;
   top: 0;
   right: 0;
@@ -21,12 +18,10 @@
   opacity: 0.5;
   z-index: 9999;
 }
-
-.gh-tooltip {
+body.gh_reporting .gh-tooltip {
   max-width: 200px;
 }
-
-.gh-loader {
+body.gh_reporting .gh-loader {
   top: 50vh;
   margin: 0 !important;
   left: 50%;
@@ -34,23 +29,20 @@
   position: absolute !important;
   z-index: 99999;
 }
-
-img {
+body.gh_reporting img {
   max-width: 100%;
+}
+body.gh_reporting #screen-meta-links {
+  display: none;
+}
+body.gh_reporting .nav-tab-wrapper {
+  margin-bottom: 20px !important;
 }
 
 #groundhogg-datepicker-wrap {
   max-width: 450px;
   float: right;
   margin-top: 25px;
-}
-
-#screen-meta-links {
-  display: none;
-}
-
-.nav-tab-wrapper {
-  margin-bottom: 20px !important;
 }
 
 .big-chart-wrap {
@@ -113,6 +105,9 @@ img {
 }
 .groundhogg-quick-stat .groundhogg-quick-stat-number a {
   text-decoration: none;
+}
+.groundhogg-quick-stat .groundhogg-quick-stat-number h2.title .dashicons, .groundhogg-quick-stat .groundhogg-quick-stat-number h2.title .dashicons-before:before {
+  font-family: dashicons;
 }
 
 .groundhogg-quick-stat .groundhogg-quick-stat-previous {
@@ -195,10 +190,6 @@ img {
 .groundhogg-chart h2.title {
   margin-top: 0;
   padding-left: 0;
-}
-
-h2.title .dashicons, h2.title .dashicons-before:before {
-  font-family: dashicons;
 }
 
 .groundhogg-chart-no-padding .notice {

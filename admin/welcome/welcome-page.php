@@ -334,6 +334,7 @@ class Welcome_Page extends Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-welcome' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
+		wp_enqueue_style( 'groundhogg-admin-reporting' );
 
 		wp_enqueue_script( 'groundhogg-admin-dashboard' );
 		wp_enqueue_editor();
