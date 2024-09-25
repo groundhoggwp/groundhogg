@@ -349,7 +349,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.7 (2024-19-18) =
+= 3.7 (2024-19-24) =
 * ADDED New personalized dashboard experience to replace the welcome page.
  * New *My Tasks* widget
  * New *Summary* widget
@@ -363,13 +363,16 @@ You can purchase a premium plan for access to support and our premium extensions
  * Supports white-labeling
 * ADDED Batch scheduling for broadcasts.
 * ADDED Parent/Child relationships (as info card) for contacts.
+* ADDED *Convert to post* tool for emails. Converts an email into gutenberg blocks.
 * ADDED `params` parameter to the Reports API playground.
+* ADDED "Last week" and "Last month" date ranges for filters.
 * IMPROVED Quick search is faster and shows more information.
 * TWEAKED My Tasks has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
 * TWEAKED The *Restore Missing Funnel Events* tool has been moved to the *Logs > Manage* tab.
 * TWEAKED The *Sync Users* tool is now a background process instead of a loader.
 * TWEAKED Replaced many usages of the branded loader with skeleton wireframe loaders.
 * TWEAKED Funnels with starting benchmarks also acting as a conversion will calculate the conversion based on the 2nd completed event within the time range.
+* FIXED "This week" date range not working.
 
 = 3.6.1.1 (2024-09-06) =
 * FIXED PHP Warnings causing custom reports not to load.
