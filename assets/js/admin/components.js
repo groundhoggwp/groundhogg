@@ -877,6 +877,7 @@
           ])
 
           onSubmit(r.contact)
+          return
         }
 
         dialog({
