@@ -173,6 +173,9 @@
       el.setAttribute(attributeName, attributes[attributeName])
     }
 
+    // set a flag that the element was generated with makeEl
+    el.makeEl = true
+
     return el
   }
 

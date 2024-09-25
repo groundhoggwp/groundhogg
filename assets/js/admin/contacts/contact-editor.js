@@ -2374,12 +2374,14 @@
         $(e.target).closest('.gh-panel').toggleClass('closed')
       })
 
-      $(document).on('click', '.gh-panel.outlined.closed button.toggle-indicator', e => {
-        $(e.target).closest('.gh-panel.outlined').removeClass('closed')
-      })
+      $(document).on('click', '.gh-panel.outlined button.toggle-indicator', e => {
 
-      $(document).on('click', '.gh-panel.outlined:not(.closed) button.toggle-indicator', e => {
-        $(e.target).closest('.gh-panel.outlined').addClass('closed')
+        // do not do for elements made with makeEl on this page
+        if ( e.currentTarget.makeEl === true ){
+          return;
+        }
+
+        $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
       })
 
       if (window.location.href.match(/send_email=true/)) {
