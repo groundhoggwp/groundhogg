@@ -662,7 +662,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$this->add_notice( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
 
-		return admin_url( 'admin.php?page=gh_tools&tab=import' );
+		return false;
 	}
 
 	####### EXPORT TAB FUNCTIONS #########
@@ -870,7 +870,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$this->add_notice( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
 
-		return admin_url( 'admin.php?page=gh_tools&action=add&tab=export' );
+		return false;
 	}
 
 	####### UPDATES TAB FUNCTIONS #########
