@@ -406,7 +406,10 @@ class Scripts {
 			'jquery-ui-resizable',
 			'jquery-ui-autocomplete',
 			'wp-color-picker',
-			'beautify-html'
+			'beautify-html',
+		    'react',
+			'wp-blocks',
+			'wp-edit-post'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/features/setup' . $dot_min . '.js', [
@@ -649,7 +652,7 @@ class Scripts {
 		wp_register_style( 'groundhogg-email-block-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-block-editor.css', [
 			'groundhogg-admin',
 			'groundhogg-admin-element',
-			'jquery-ui'
+			'jquery-ui',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_style( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor.css', [
