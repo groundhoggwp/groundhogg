@@ -1,7 +1,18 @@
 ( ($) => {
 
   const {
+    rawHandler,
+    serialize,
+  } = wp.blocks
+
+  const {
+    initializeEditor,
+  } = wp.editPost
+
+  const {
     Div,
+    An,
+    Pg,
     Fragment,
     Button,
     Input,
@@ -22,6 +33,7 @@
     ItemPicker,
     Iframe,
     makeEl,
+    Img,
     htmlToElements,
     Dashicon,
     ButtonToggle,
@@ -65,6 +77,7 @@
   const {
     get,
     post,
+    patch,
     ajax,
   } = Groundhogg.api
   const {
@@ -76,7 +89,10 @@
     jsonCopy,
   } = Groundhogg.functions
 
-  const { ImageInput, ImagePicker } = Groundhogg.components
+  const {
+    ImageInput,
+    ImagePicker,
+  } = Groundhogg.components
 
   improveTinyMCE({})
 
@@ -1362,8 +1378,8 @@
         ImageInput({
           value   : src ?? '',
           id,
-          onChange: ( src, attachment = null ) => {
-            if ( attachment ){
+          onChange: (src, attachment = null) => {
+            if (attachment) {
 
               let {
                 width,
@@ -1374,17 +1390,18 @@
               }
 
               onChange({
-                src  : attachment.url,
-                alt  : attachment.alt, // title: attachment.title,
+                src: attachment.url,
+                alt: attachment.alt, // title: attachment.title,
                 width,
               })
-            } else {
+            }
+            else {
               onChange({
-                src  : attachment.url,
+                src: attachment.url,
               })
             }
           },
-        })
+        }),
       ),
       supports.width ? Control({
           label: 'Width',
@@ -3932,8 +3949,8 @@
         [
           `<p>Choose up to 8 colors for the color picker.</p>`,
           InputRepeater({
-            id  : 'global-colors',
-            rows: colorPalette.map(color => [
+            id      : 'global-colors',
+            rows    : colorPalette.map(color => [
               '',
               color,
             ]),
@@ -4456,7 +4473,7 @@
                   onOpen: ({ modal }) => {
                     modal.querySelector('.gh-modal-dialog').style.width = '500px'
                   },
-                  width: '500px'
+                  width : '500px',
                 },
                 ({
                   close,
@@ -4748,6 +4765,62 @@
                             'groundhogg') }</p>`,
 
                         ]))
+                  },
+                },
+                {
+                  key     : 'gutenberg',
+                  text    : __('Convert to post', 'groundhogg'),
+                  onSelect: e => {
+
+                    let content = renderBlocksGutenberg(getBlocks())
+
+                    let { post_id = false } = getEmailMeta()
+
+                    // check if we've already generated a post, give option to update it
+                    if (post_id) {
+                      // if yes, update the post content
+
+                      // check to make sure the post exists
+                      confirmationModal({
+                        alert      : `<p>A post was already generated from this email, would you like to overwrite it?</p>`,
+                        confirmText: __('Overwrite'),
+                        onConfirm  : () => {
+
+                          patch(Groundhogg.api.routes.posts + `/${ post_id }`, {
+                            title: getEmailData().title,
+                            content,
+                          }).then(post => {
+                            window.open(`${ Groundhogg.url.admin }post.php?post=${ post_id }&action=edit`, '_blank')
+                          })
+
+                        },
+                      })
+
+                      return
+                    }
+
+                    // create a new post via the API with the title of the email and the gutenberg content
+                    post(Groundhogg.api.routes.posts, {
+                      status: 'draft',
+                      title : getEmailData().title,
+                      content,
+                    }).then(post => {
+
+                      post_id = post.id
+
+                      // save the post ID to the email meta
+                      setEmailMeta({
+                        post_id,
+                      })
+
+                      // save
+                      saveEmail().then(() => {
+                        // redirect to the post edit screen
+                        window.open(`${ Groundhogg.url.admin }post.php?post=${ post_id }&action=edit`, '_blank')
+                      })
+
+                    })
+
                   },
                 },
                 {
@@ -5571,6 +5644,43 @@
     ],
   }
 
+  const getColumnCellsWithAttributesAndLayout = ({
+    layout = 'two_columns',
+    customColumns = [],
+  }) => {
+    let columnCells = columnLayouts[layout]
+    let tableLayout = 'fixed'
+
+    if (layout === 'custom_columns') {
+
+      if (customColumns.every(width => !width)) {
+        tableLayout = 'auto'
+      }
+
+      columnCells = customColumns.map(width => {
+
+        let props = {
+          className: `custom-width-${ width ? 'fixed' : 'auto' }`,
+        }
+
+        if (width) {
+          width = `${ width }%`
+          props.width = width
+          props.style = {
+            width,
+          }
+        }
+
+        return props
+      })
+    }
+
+    return [
+      columnCells,
+      tableLayout,
+    ]
+  }
+
   function adjustArrayToSum100 (arr) {
     // Calculate the initial sum of the array
     let sum = arr.reduce((a, b) => a + b, 0)
@@ -5853,32 +5963,10 @@
       customColumns = [],
     }) => {
 
-      let columnCells = columnLayouts[layout]
-      let tableLayout = 'fixed'
-
-      if (layout === 'custom_columns') {
-
-        if (customColumns.every(width => !width)) {
-          tableLayout = 'auto'
-        }
-
-        columnCells = customColumns.map(width => {
-
-          let props = {
-            className: `custom-width-${ width ? 'fixed' : 'auto' }`,
-          }
-
-          if (width) {
-            width = `${ width }%`
-            props.width = width
-            props.style = {
-              width,
-            }
-          }
-
-          return props
-        })
-      }
+      let [columnCells, tableLayout] = getColumnCellsWithAttributesAndLayout({
+        customColumns,
+        layout,
+      })
 
       return Table({
           className  : `email-columns ${ layout } ${ responsive ? 'responsive' : '' }`,
@@ -5903,6 +5991,35 @@
     },
     plainText: ({ columns }) => {
       return columns.map(column => renderBlocksPlainText(column)).join('\n\n')
+    },
+    gutenberg: ({
+      columns,
+      customColumns,
+      layout,
+    }) => {
+
+      let [columnCells] = getColumnCellsWithAttributesAndLayout({
+        customColumns,
+        layout,
+      })
+
+      return Div({}, [
+        `<!-- wp:columns -->`,
+        Div({
+          className: 'wp-block-columns',
+        }, columnCells.map((cell, i) => Fragment([
+          `<!-- wp:column {"width":"${ cell.width }"} -->`,
+          Div({
+            className: 'wp-block-column',
+            style    : {
+              flexBasis: cell.width,
+            },
+          }, renderBlocksGutenberg(columns[i] || [])),
+          `<!-- /wp:column -->`,
+        ]))),
+        `<!-- /wp:columns -->`,
+      ]).innerHTML
+
     },
     css      : ({
       selector,
@@ -6436,12 +6553,12 @@
     },
   })
 
-  // Register the text vblock
+  // Register the text block
   registerBlock('text', 'Text', {
     attributes: {
       content: el => el.querySelector('.text-content-wrap').innerHTML,
     },
-//language=HTML
+    //language=HTML
     svg: `
         <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
              viewBox="0 0 977.7 977.7">
@@ -6575,15 +6692,23 @@
     html     : ({
       id,
       ...block
-    }) => {
-      let editorId = `text-${ id }`
-      // wp.editor.remove(editorId)
-
-      return textContent(block)
-    },
+    }) => textContent(block),
     plainText: ({ content }) => extractPlainText(content),
+    gutenberg: ({ content }) => {
+      content = convertToGutenbergBlocks(content)
 
-    defaults: {
+      return Div({}, [
+        `<!-- wp:group -->`,
+        Div({
+          className: 'wp-block-group',
+        }, [
+          content,
+        ]),
+        `<!-- /wp:group -->`,
+      ]).innerHTML
+
+    },
+    defaults : {
       content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, condimentum leo.</p>`,
       p      : fontDefaults({
         fontSize: 14,
@@ -6886,11 +7011,29 @@
     gutenberg: ({
       text,
       align,
-      style,
-      size,
       link,
     }) => {
-      return []
+      return Div({}, [
+        `<!-- wp:buttons ${ JSON.stringify({
+          layout: {
+            type          : 'flex',
+            justifyContent: align === 'justify' ? 'center' : align,
+          },
+        }) } -->`,
+        Div({
+          className: 'wp-block-buttons',
+        }, [
+          `<!-- wp:button -->`,
+          Div({
+            className: 'wp-block-button',
+          }, An({
+            className: 'wp-block-button__link wp-element-button',
+            href     : link || '#',
+          }, text)),
+          `<!-- /wp:button -->`,
+        ]),
+        `<!-- /wp:buttons -->`,
+      ]).innerHTML
     },
     defaults : {
       link           : '',
@@ -7071,6 +7214,23 @@
     // edit: () => {},
     plainText: ({ links = [] }) => {
       return links.map(([text, href]) => `[${ text }](${ href })`).join(' | ')
+    },
+    gutenberg: ({
+      links,
+      align,
+      separator,
+    }) => {
+      return Div({}, [
+        `<!-- wp:paragraph -->`,
+        Pg({
+          style: {
+            textAlign: align,
+          },
+        }, [
+          links.map(([text, href]) => An({ href }, text).outerHTML).join(` ${ separator } `),
+        ]),
+        `<!-- /wp:paragraph -->`,
+      ]).innerHTML
     },
     defaults : {
       links    : [
@@ -7274,17 +7434,25 @@
       alt = '',
       align = 'center',
     }) => {
-      return [
-        `<!-- wp:image ${ JSON.stringify({
-          width,
-          align,
-        }) } -->`,
-        `<figure class="wp-block-image align${ align }">`,
-        `<img src="${ src }" alt="${ alt }">`,
-        `</figure>`,
-        `<!-- /wp:image -->`,
 
-      ].join('\n')
+      let image = Img({
+        src,
+        alt,
+      })
+
+      if (link) {
+        image = An({ href: link }, image)
+      }
+
+      return Div({}, [
+        `<!-- wp:image {"sizeSlug":"full","linkDestination":"${ link ? 'custom' : 'none' }","align":"${ align }"} -->`,
+        makeEl('figure', {
+          className: `wp-block-image size-full align${ align }`,
+        }, [
+          image,
+        ]),
+        `<!-- /wp:image -->`,
+      ]).innerHTML
     },
     defaults  : {
       src   : 'http://via.placeholder.com/600x338',
@@ -7300,7 +7468,6 @@
   registerBlock('spacer', 'Spacer', {
     attributes: {
       height: el => parseInt(el.querySelector('td[height]').getAttribute('height')),
-
     },
     svg       : `
         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
@@ -7343,6 +7510,12 @@
             height: `${ height }px`,
           },
         }))),
+    gutenberg : ({ height }) => {
+      // language=HTML
+      return `<!-- wp:spacer ${ JSON.stringify({ height: `${ height }px` }) } -->
+      <div style="height:${ height }px" aria-hidden="true" class="wp-block-spacer"></div>
+      <!-- /wp:spacer -->`
+    },
     defaults  : {
       height: 20,
     },
@@ -7451,6 +7624,15 @@
       },
     }),
     plainText: () => '---',
+    gutenberg: () => {
+      return Div({}, [
+        `<!-- wp:separator -->`,
+        makeEl('hr', {
+          className: 'wp-block-separator has-alpha-channel-opacity',
+        }),
+        `<!-- /wp:separator -->`,
+      ]).innerHTML
+    },
     defaults : {
       height   : 3,
       color    : '#ccc',
@@ -7543,6 +7725,13 @@
       return cleanHTML(content)
     },
     plainText: ({ content }) => extractPlainText(content),
+    gutenberg: ({ content }) => {
+      return Div({}, [
+        `<!-- wp:html -->`,
+        content,
+        `<!-- /wp:html -->`,
+      ]).innerHTML
+    },
     defaults : {
       content: '<p>HTML CODE</p>',
     },
@@ -7586,6 +7775,13 @@
           `<p>Shortcodes will <b>not</b> load any JavaScript or CSS dependencies. You can add style using custom CSS in the advanced tab.</p>`,
         ]),
     ]),
+    gutenberg   : ({ content }) => {
+      return Div({}, [
+        `<!-- wp:shortcode -->`,
+        content,
+        `<!-- /wp:shortcode -->`,
+      ]).innerHTML
+    },
     parseContent: content => cleanHTML(content),
     defaults    : {
       shortcode: '',
@@ -8216,6 +8412,57 @@
           }
       `
     },
+    gutenberg   : ({
+      excerpt = false,
+      number,
+      offset,
+      post_type = 'post',
+      queryId = '',
+      include = [],
+      exclude = [],
+      terms = {},
+    }) => {
+
+      let postQueryProps = {
+        query    : {
+          perPage : number,
+          offset,
+          postType: post_type,
+          exclude,
+          include,
+          taxQuery: terms,
+        },
+        namespace: 'core/posts-list',
+      }
+
+      return Div({}, [
+        `<!-- wp:query ${ JSON.stringify(postQueryProps) } -->`,
+        Div({
+          className: 'wp-block-query',
+        }, [
+          `<!-- wp:post-template -->`,
+          `<!-- wp:post-featured-image /-->`,
+          `<!-- wp:post-title /-->`,
+          `<!-- wp:post-date /-->`,
+          excerpt ? `<!-- wp:post-excerpt /-->` : null,
+          `<!-- /wp:post-template -->`,
+          //language=HTML
+          `<!-- wp:query-pagination -->
+          <!-- wp:query-pagination-previous /-->
+          <!-- wp:query-pagination-numbers /-->
+          <!-- wp:query-pagination-next /-->
+          <!-- /wp:query-pagination -->
+          <!-- wp:query-no-results -->
+          <!-- wp:paragraph -->
+          <p>No posts were found.</p>
+          <!-- /wp:paragraph -->
+          <!-- /wp:query-no-results -->
+          `,
+        ]),
+        `<!-- /wp:query -->`,
+      ]).innerHTML
+
+    },
     defaults    : {
       layout        : 'cards',
       number        : 5,
@@ -8605,6 +8852,36 @@
       size   : 24,
       use    : 'global',
     },
+    gutenberg: ({
+      socials,
+      align,
+      use = 'global',
+    }) => {
+
+      if (use === 'global') {
+        socials = globalSocials
+      }
+
+      if (socials.length === 0) {
+        return ''
+      }
+
+      return Div({}, [
+        `<!-- wp:social-links ${ JSON.stringify({
+          layout: {
+            type          : 'flex',
+            justifyContent: align,
+          },
+        }) } -->`,
+        makeEl('ul', { className: 'wp-block-social-links' }, [
+          ...socials.map(([service, url]) => `<!-- wp:social-link ${ JSON.stringify({
+            url,
+            service,
+          }) } /-->`),
+        ]),
+        `<!-- /wp:social-links -->`,
+      ]).innerHTML
+    },
   })
 
   // Register the footer block
@@ -8978,6 +9255,72 @@
     return html
   }
 
+  const renderAsGutenbergBlock = block => {
+    let content, style
+    try {
+      content = BlockRegistry.get(block.type).gutenberg(block)
+      style = AdvancedStyleControls.getInlineStyle(block)
+    }
+    catch (e) {
+      return ''
+    }
+
+    const {
+      foo,
+    } = block
+
+    const groupProps = {}
+
+    // const style = {
+    //   advancedStyle.
+    // }
+
+    return Div({}, [
+      `<!-- wp:group ${ JSON.stringify(groupProps) } -->`,
+      Div({
+        className: 'wp-block-group',
+        style,
+      }, [
+        content,
+      ])
+        `<!-- /wp:group -->`,
+    ]).innerHTML
+
+  }
+
+  /**
+   * Renders the blocks in their final HTML format
+   *
+   * @param blocks
+   * @return {string}
+   */
+  const renderBlocksGutenberg = (blocks) => {
+    setIsGeneratingHTML(true)
+    let content = blocks.filter(b => b.type).map(block => {
+
+      let text
+
+      let {
+        hide_on_desktop = false,
+      } = block
+
+      if (hide_on_desktop) {
+        return ''
+      }
+
+      try {
+        text = BlockRegistry.get(block.type).gutenberg(block)
+      }
+      catch (e) {
+        text = ''
+      }
+
+      return text
+    }).filter(text => text.length > 0).join('\n\n').replaceAll(/(\n|\r\n|\r){3,}/g, '\n\n')
+    setIsGeneratingHTML(false)
+    return content
+  }
+
   /**
    * Renders the blocks as plain text
    *
@@ -9338,6 +9681,30 @@
     return block
   }
 
+  const convertToGutenbergBlocks = content => {
+
+    if (!getState().gutenbergInitialized) {
+      setState({
+        gutenbergInitialized: true,
+      })
+
+      let gutenbergContainer = Div({
+        id   : 'gutenberg-temp',
+        style: {
+          display: 'none',
+        },
+      })
+
+      document.querySelector('body').append(gutenbergContainer)
+
+      initializeEditor('gutenberg-temp')
+    }
+
+    let blocks = rawHandler({ HTML: content })
+
+    return serialize(blocks)
+  }
+
   // Add the builder style to the document <head>
   $('head').append(`<style id="builder-style" type="text/css"></style>`)
 
@@ -9456,7 +9823,7 @@
       BorderControlGroup,
       BorderControls,
       TopRightBottomLeft,
-    }
+    },
   }
 
 } )(jQuery)
