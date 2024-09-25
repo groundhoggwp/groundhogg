@@ -55,6 +55,7 @@
     moreMenu,
     dialog,
     confirmationModal,
+    loadingModal,
     dangerConfirmationModal,
     adminPageURL,
     isValidEmail,
@@ -4776,51 +4777,65 @@
 
                     let { post_id = false } = getEmailMeta()
 
+                    const createNewPost = () => {
+
+                      const { close } = loadingModal()
+
+                      return post(Groundhogg.api.routes.posts, {
+                        status: 'draft',
+                        title : getEmailData().title,
+                        content,
+                      }).then(post => {
+
+                        post_id = post.id
+
+                        // save the post ID to the email meta
+                        setEmailMeta({
+                          post_id,
+                        })
+
+                        // save
+                        saveEmail().then(() => {
+                          // redirect to the post edit screen
+                          close()
+
+                          window.open(`${ Groundhogg.url.admin }post.php?post=${ post_id }&action=edit`, '_blank')
+                        })
+
+                      })
+                    }
+
                     // check if we've already generated a post, give option to update it
                     if (post_id) {
-                      // if yes, update the post content
 
-                      // check to make sure the post exists
+                      // todo check to make sure the post exists
                       confirmationModal({
                         alert      : `<p>A post was already generated from this email, would you like to overwrite it?</p>`,
                         confirmText: __('Overwrite'),
                         onConfirm  : () => {
 
+                          // if yes, update the post content
+                          const { close } = loadingModal()
+
                           patch(Groundhogg.api.routes.posts + `/${ post_id }`, {
                             title: getEmailData().title,
                             content,
                           }).then(post => {
+                            close()
                             window.open(`${ Groundhogg.url.admin }post.php?post=${ post_id }&action=edit`, '_blank')
                           })
 
                         },
+                        closeText: __( 'No, create a new post' ),
+                        cancelButtonType: 'secondary',
+                        onCancel: () => createNewPost()
                       })
 
                       return
                     }
 
                     // create a new post via the API with the title of the email and the gutenberg content
-                    post(Groundhogg.api.routes.posts, {
-                      status: 'draft',
-                      title : getEmailData().title,
-                      content,
-                    }).then(post => {
-
-                      post_id = post.id
-
-                      // save the post ID to the email meta
-                      setEmailMeta({
-                        post_id,
-                      })
-
-                      // save
-                      saveEmail().then(() => {
-                        // redirect to the post edit screen
-                        window.open(`${ Groundhogg.url.admin }post.php?post=${ post_id }&action=edit`, '_blank')
-                      })
-
-                    })
-
+                    createNewPost()
                   },
                 },
                 {
