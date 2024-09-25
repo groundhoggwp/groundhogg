@@ -9,6 +9,7 @@ class Plugin_Compatibility {
 
 		// Material WP
 		add_action( 'admin_enqueue_scripts', [ $this, 'remove_styles_and_scripts_from_editors' ], 999 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'maybe_dequeue_lifterlms' ], 999 );
 
 		// MailHawk
 		add_action( 'mailhawk/bounced', [ $this, 'mailhawk_bounced' ], 10, 2 );
@@ -28,9 +29,9 @@ class Plugin_Compatibility {
 
 	}
 
-	public function dokan_lite(){
+	public function dokan_lite() {
 
-		if ( ! current_screen_is_gh_page( 'gh_reporting' ) ){
+		if ( ! current_screen_is_gh_page( 'gh_reporting' ) ) {
 			return;
 		}
 
@@ -46,9 +47,9 @@ class Plugin_Compatibility {
 	 *
 	 * @return bool|mixed
 	 */
-	public function cookie_law_info_plugin( $accepted ){
+	public function cookie_law_info_plugin( $accepted ) {
 
-		if ( ! defined( 'CLI_LATEST_VERSION_NUMBER' ) ){
+		if ( ! defined( 'CLI_LATEST_VERSION_NUMBER' ) ) {
 			return $accepted;
 		}
 
@@ -65,17 +66,17 @@ class Plugin_Compatibility {
 	 *
 	 * @return callable
 	 */
-	public function prevent_new_user_from_adding_contacts_to_template_site( $handler ){
+	public function prevent_new_user_from_adding_contacts_to_template_site( $handler ) {
 
-		return function () use ( $handler ){
+		return function () use ( $handler ) {
 
 			// Prevent new contacts from being added to the template sites
 			remove_action( 'user_register', [ Plugin::instance()->user_syncing, 'sync_new_user' ] );
 
 			// Add the new user as a contact to the main site.
-			add_action('wp_ultimo_registration', function ( $site_id, $user_id, $transient, $plan ){
+			add_action( 'wp_ultimo_registration', function ( $site_id, $user_id, $transient, $plan ) {
 
-				if ( is_main_site() ){
+				if ( is_main_site() ) {
 					create_contact_from_user( $user_id );
 				}
 
@@ -96,10 +97,10 @@ class Plugin_Compatibility {
 	 *
 	 * @return false|mixed
 	 */
-	public function prevent_buddyboss_redirect( $redirect ){
+	public function prevent_buddyboss_redirect( $redirect ) {
 
 		// If DOING_CRON is defined, return false and prevent any redirection from BuddyBoss
-		if ( defined( 'DOING_CRON' ) || defined( 'DOING_GH_CRON' ) ){
+		if ( defined( 'DOING_CRON' ) || defined( 'DOING_GH_CRON' ) ) {
 			return false;
 		}
 
@@ -109,13 +110,13 @@ class Plugin_Compatibility {
 	/**
 	 * When a message is marked as bounced, find the contact and mark them as boucned as well.
 	 *
-	 * @param $email string the email address
+	 * @param $email  string the email address
 	 * @param $msg_id string
 	 */
-	public function mailhawk_bounced( $email, $msg_id ){
+	public function mailhawk_bounced( $email, $msg_id ) {
 		$contact = get_contactdata( $email );
 
-		if ( ! $contact ){
+		if ( ! $contact ) {
 			return;
 		}
 
@@ -140,7 +141,7 @@ class Plugin_Compatibility {
 			return true;
 		}
 
-		if ( current_screen_is_gh_page( 'gh_emails' ) && $action === 'edit' && is_option_enabled( 'gh_use_advanced_email_editor' ) ) {
+		if ( current_screen_is_gh_page( 'gh_emails' ) && $action === 'edit' ) {
 			return true;
 		}
 
@@ -155,7 +156,22 @@ class Plugin_Compatibility {
 		// Add actions that need to be removed here.
 	}
 
+	/**
+	 * Dequeue lifterLMS css on all groundhogg admin pages.
+	 *
+	 * @return void
+	 */
+	public function maybe_dequeue_lifterlms() {
+
+		if ( ! is_admin_groundhogg_page() ) {
+			return;
+		}
+
+		wp_dequeue_style( 'llms-admin-styles' );
+	}
+
 	public function remove_styles_and_scripts_from_editors() {
+
 		if ( ! $this->is_editor_page() ) {
 			return;
 		}
