@@ -34,11 +34,11 @@
     meeting: __('Meeting', 'groundhogg')
   }
 
-  const isOverdue = t => t.is_overdue
+  const isOverdue = t => t.is_overdue && ! t.is_complete
   const isComplete = t => t.is_complete
   const isPending = t => !t.is_complete
-  const isDueToday = t => t.is_due_today
-  const isDueSoon = t => t.days_till_due < 14 && ! t.is_overdue && t.days_till_due > 1
+  const isDueToday = t => t.is_due_today && ! t.is_complete
+  const isDueSoon = t => t.days_till_due < 14 && ! t.is_overdue && ! t.is_due_today && ! t.is_complete
 
   const dueBy = (task) => {
 
