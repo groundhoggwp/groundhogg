@@ -362,8 +362,11 @@ You can purchase a premium plan for access to support and our premium extensions
  * Enable & disable widgets
  * Supports white-labeling
 * ADDED Batch scheduling for broadcasts.
-* ADDED Parent/Child relationships (as info card) for contacts.
 * ADDED *Convert to post* tool for emails. Converts an email into gutenberg blocks.
+* ADDED Groundhogg panel to some core Gutenberg blocks.
+ * Native replacement code support without the need for the `[ghr]` shortcode.
+ * Restricted content support when the Restricted Content addon is active.
+* ADDED Parent/Child relationships (as info card) for contacts.
 * ADDED `params` parameter to the Reports API playground.
 * ADDED "Last week" and "Last month" date ranges for filters.
 * IMPROVED Quick search is faster and shows more information.
@@ -372,6 +375,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * TWEAKED The *Sync Users* tool is now a background process instead of a loader.
 * TWEAKED Replaced many usages of the branded loader with skeleton wireframe loaders.
 * TWEAKED Funnels with starting benchmarks also acting as a conversion will calculate the conversion based on the 2nd completed event within the time range.
+* FIXED Replacement codes not working in custom footer for composed emails.
 * FIXED "This week" date range not working.
 
 = 3.6.1.1 (2024-09-06) =
