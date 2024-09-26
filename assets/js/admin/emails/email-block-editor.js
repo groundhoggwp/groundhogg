@@ -613,6 +613,8 @@
               action: 'edit',
               email : email.ID,
             }))
+          // more menu should become visible at this point
+          morphHeader()
         }
 
         setState({
@@ -4768,7 +4770,7 @@
                         ]))
                   },
                 },
-                {
+                isHTMLEditor() ? null : {
                   key     : 'gutenberg',
                   text    : __('Convert to post', 'groundhogg'),
                   onSelect: e => {
@@ -4810,9 +4812,9 @@
 
                       // todo check to make sure the post exists
                       confirmationModal({
-                        alert      : `<p>A post was already generated from this email, would you like to overwrite it?</p>`,
-                        confirmText: __('Overwrite'),
-                        onConfirm  : () => {
+                        alert           : `<p>A post was already generated from this email, would you like to overwrite it?</p>`,
+                        confirmText     : __('Overwrite'),
+                        onConfirm       : () => {
 
                           // if yes, update the post content
                           const { close } = loadingModal()
@@ -4826,9 +4828,9 @@
                           })
 
                         },
-                        closeText: __( 'No, create a new post' ),
+                        closeText       : __('No, create a new post'),
                         cancelButtonType: 'secondary',
-                        onCancel: () => createNewPost()
+                        onCancel        : () => createNewPost(),
                       })
 
                       return
@@ -6713,7 +6715,9 @@
       content = convertToGutenbergBlocks(content)
 
       return Div({}, [
-        `<!-- wp:group -->`,
+        `<!-- wp:group ${ JSON.stringify({
+          ghReplacements: true,
+        }) } -->`,
         Div({
           className: 'wp-block-group',
         }, [
@@ -7030,10 +7034,11 @@
     }) => {
       return Div({}, [
         `<!-- wp:buttons ${ JSON.stringify({
-          layout: {
+          layout        : {
             type          : 'flex',
             justifyContent: align === 'justify' ? 'center' : align,
           },
+          ghReplacements: true,
         }) } -->`,
         Div({
           className: 'wp-block-buttons',
@@ -7236,7 +7241,9 @@
       separator,
     }) => {
       return Div({}, [
-        `<!-- wp:paragraph -->`,
+        `<!-- wp:paragraph ${ JSON.stringify({
+          ghReplacements: true,
+        }) } -->`,
         Pg({
           style: {
             textAlign: align,
@@ -7460,7 +7467,12 @@
       }
 
       return Div({}, [
-        `<!-- wp:image {"sizeSlug":"full","linkDestination":"${ link ? 'custom' : 'none' }","align":"${ align }"} -->`,
+        `<!-- wp:image ${ JSON.stringify({
+          sizeSlug       : 'full',
+          linkDestination: link ? 'custom' : 'none',
+          align,
+          ghReplacements : true,
+        }) } -->`,
         makeEl('figure', {
           className: `wp-block-image size-full align${ align }`,
         }, [
@@ -7742,7 +7754,7 @@
     plainText: ({ content }) => extractPlainText(content),
     gutenberg: ({ content }) => {
       return Div({}, [
-        `<!-- wp:html -->`,
+        `<!-- wp:html ${ JSON.stringify({ ghReplacements: true }) } -->`,
         content,
         `<!-- /wp:html -->`,
       ]).innerHTML
@@ -7792,7 +7804,7 @@
     ]),
     gutenberg   : ({ content }) => {
       return Div({}, [
-        `<!-- wp:shortcode -->`,
+        `<!-- wp:shortcode ${ JSON.stringify({ ghReplacements: true }) } -->`,
         content,
         `<!-- /wp:shortcode -->`,
       ]).innerHTML
@@ -7802,6 +7814,16 @@
       shortcode: '',
     },
   })
+
+  function createIncrementer () {
+    let count = 0
+    return function () {
+      count += 1
+      return count
+    }
+  }
+
+  const getQueryId = createIncrementer()
 
   // Register the post block
   registerDynamicBlock('posts', 'Posts', {
@@ -8439,13 +8461,15 @@
     }) => {
 
       let postQueryProps = {
+        queryId  : getQueryId(),
         query    : {
           perPage : number,
+          pages   : 0,
           offset,
           postType: post_type,
-          exclude,
-          include,
-          taxQuery: terms,
+          // exclude,
+          // include,
+          // taxQuery: terms
         },
         namespace: 'core/posts-list',
       }
@@ -9268,39 +9292,6 @@
         'g'),
       '\'$1\'')
     return html
-  }
-
-  const renderAsGutenbergBlock = block => {
-    let content, style
-    try {
-      content = BlockRegistry.get(block.type).gutenberg(block)
-      style = AdvancedStyleControls.getInlineStyle(block)
-    }
-    catch (e) {
-      return ''
-    }
-
-    const {
-      foo,
-    } = block
-
-    const groupProps = {}
-
-    // const style = {
-    //   advancedStyle.
-    // }
-
-    return Div({}, [
-      `<!-- wp:group ${ JSON.stringify(groupProps) } -->`,
-      Div({
-        className: 'wp-block-group',
-        style,
-      }, [
-        content,
-      ])
-        `<!-- /wp:group -->`,
-    ]).innerHTML
-
   }
 
   /**
