@@ -376,11 +376,6 @@ class Emails_Api extends Base_Object_Api {
 
 		$content = $request->get_param( 'content' );
 
-		// Replacements will be based on the first email address provided
-		if ( $contact && $contact->exists() ) {
-			$content = do_replacements( $content, $contact );
-		}
-
 		if ( apply_filters( 'groundhogg/add_custom_footer_text_to_personal_emails', true ) ) {
 			$content .= wpautop( get_option( 'gh_custom_email_footer_text' ) );
 		}
@@ -388,6 +383,13 @@ class Emails_Api extends Base_Object_Api {
 		$content = email_kses( $content );
 		$subject = sanitize_text_field( $request->get_param( 'subject' ) );
 		$type    = sanitize_text_field( $request->get_param( 'type' ) ?: 'wordpress' );
+
+
+		// Replacements will be based on the first email address provided
+		if ( $contact && $contact->exists() ) {
+			$content = do_replacements( $content, $contact );
+			$subject = do_replacements( $subject, $contact );
+		}
 
 		$headers = [
 			'Content-Type: text/html',
