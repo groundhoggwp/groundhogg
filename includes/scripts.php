@@ -22,6 +22,12 @@ class Scripts {
 		add_action( 'wp_after_admin_bar_render', [ $this, 'toolbar_scripts' ] );
 
 		add_filter( 'wp_refresh_nonces', [ $this, 'refresh_nonces' ], 10, 3 );
+
+		add_action('enqueue_block_editor_assets', [ $this, 'block_editor_scripts'] );
+	}
+
+	public function block_editor_scripts() {
+		wp_enqueue_script( 'groundhogg-gutenberg-filters' );
 	}
 
 	/**
@@ -510,6 +516,15 @@ class Scripts {
 			'groundhogg-admin-reporting'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-gutenberg-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/features/gutenberg' . $dot_min . '.js', [
+			'wp-edit-post',
+			'groundhogg-admin-filter-contacts'
+		] );
+
+		wp_localize_script( 'groundhogg-gutenberg-filters', 'GroundhoggGutenberg', [
+			'isContentRestrictionInstalled' => defined( 'GROUNDHOGG_CONTENT_RESTRICTION_VERSION' ),
+		] );
+
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
@@ -612,6 +627,7 @@ class Scripts {
 				'currentUser'      => wp_get_current_user(),
 				'isMultisite'      => is_multisite(),
 				'isWhiteLabeled'   => is_white_labeled(),
+				'whiteLabelName'   => white_labeled_name(),
 				'isSuperAdmin'     => is_super_admin(),
 				'isWPFusionActive' => is_wp_fusion_active(),
 				'recaptcha'        => [

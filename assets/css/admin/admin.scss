@@ -1152,3 +1152,22 @@ label.gh-switch {
 .table-scroll {
   overflow-x: auto;
 }
+
+.gh-block-edit-restricted-content {
+  outline: 1px solid $secondary-purple;
+  position: relative;
+
+  .filters-enabled {
+    cursor: pointer;
+    background-color: $secondary-purple;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: auto;
+    height: 22px;
+    width: 22px;
+    border-bottom-left-radius: 5px;
+    padding: 2px;
+  }
+}

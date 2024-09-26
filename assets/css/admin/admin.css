@@ -1004,4 +1004,22 @@ label.gh-switch input:checked ~ span.off {
   overflow-x: auto;
 }
 
+.gh-block-edit-restricted-content {
+  outline: 1px solid #6c19ad;
+  position: relative;
+}
+.gh-block-edit-restricted-content .filters-enabled {
+  cursor: pointer;
+  background-color: #6c19ad;
+  color: #fff;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: auto;
+  height: 22px;
+  width: 22px;
+  border-bottom-left-radius: 5px;
+  padding: 2px;
+}
+
 /*# sourceMappingURL=admin.css.map */

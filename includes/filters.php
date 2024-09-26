@@ -5,11 +5,76 @@ namespace Groundhogg;
 use Groundhogg\Utils\DateTimeHelper;
 
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-05-22
- * Time: 9:38 AM
+ * Do replacements on the block content if replacements is enabled for the current post
+ *
+ * @param string $content
+ *
+ * @return string
  */
+function do_replacements_when_rendering_blocks( $content, $parsed_block, \WP_Block $block ) {
+
+	if ( isset_not_empty( $parsed_block['attrs'], 'ghReplacements' ) && ! empty( $content ) ) {
+		$content = do_replacements( $content );
+	}
+
+	return $content;
+}
+
+add_filter( 'render_block', __NAMESPACE__ . '\do_replacements_when_rendering_blocks', 999, 3 );
+
+/**
+ * Maybe hide the block if the current contact can't see them.
+ * Required the Restricted Content addon to be active.
+ *
+ * @param string    $content
+ * @param array     $parsed_block
+ * @param \WP_Block $block
+ *
+ * @return string
+ */
+function handle_conditional_content_block_filters( $content, $parsed_block, \WP_Block $block ) {
+
+	// Content restriction is not enabled for this block
+	if ( ! isset_not_empty( $parsed_block['attrs'], 'ghRestrictContent' )
+	     || ! defined( 'GROUNDHOGG_CONTENT_RESTRICTION_VERSION' )
+	) {
+		return $content;
+	}
+
+	$contact = get_current_contact();
+
+	// must be a contact if the block is restricted
+	if ( ! $contact || ! $contact->exists() ){
+		return '';
+	}
+
+	$include_filters = json_decode( $parsed_block['attrs']['ghIncludeFilters'], true );
+	$exclude_filters = json_decode( $parsed_block['attrs']['ghExcludeFilters'], true );
+
+	// no filters, no query needed.
+	if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
+		return $content;
+	}
+
+	// run the query
+	$contactQuery = new Contact_Query( [
+		'include'         => [ $contact->get_id() ],
+		'filters'         => $include_filters,
+		'exclude_filters' => $exclude_filters,
+	] );
+
+	$count = $contactQuery->count();
+
+	// content is restricted if contact is not in the search
+	if ( $count === 0 ){
+		return '';
+	}
+
+	return $content;
+}
+
+add_filter( 'render_block', __NAMESPACE__ . '\handle_conditional_content_block_filters', 998, 3 );
+
 
 /**
  * Handle the skip if confirmed logic for the email confirmation step

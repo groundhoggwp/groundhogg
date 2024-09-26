@@ -89,12 +89,23 @@ function groundhogg_gutenberg_form_selector_init() { // phpcs:ignore
 			'displayDesc'  => array(
 				'type' => 'boolean',
 			),
+			'ghReplacements' => [
+				'type' => 'boolean',
+			],
+			'ghRestrictContent' => [
+				'type' => 'boolean',
+			],
+			'ghIncludeFilters' => [
+				'type' => 'string',
+			],
+			'ghExcludeFilters' => [
+				'type' => 'string',
+			]
 		),
 
 		'render_callback' => 'groundhogg_get_gutenberg_form_html',
 		'style'           => 'groundhogg-form',
 		'editor_script'   => 'groundhogg-form-block-js',
-
 	) );
 
 
