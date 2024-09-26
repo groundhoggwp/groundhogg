@@ -1361,6 +1361,7 @@
   const H2 = (props, children) => makeEl( 'h2', props, children )
   const H3 = (props, children) => makeEl( 'h3', props, children )
   const H4 = (props, children) => makeEl( 'h4', props, children )
+  const Hr = (props, children) => makeEl( 'hr', props, children )
 
   const Skeleton = ( attributes, pieces ) => Div({
     className: 'display-grid gap-10',
@@ -1418,6 +1419,7 @@
     H2,
     H3,
     H4,
+    Hr,
     Nav,
     maybeCall
   }
