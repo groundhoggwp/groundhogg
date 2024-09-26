@@ -2284,7 +2284,7 @@ button:has(.gh-dropdown-menu){
     }
 
     &.right {
-      left: calc(100% + 5px);
+      left: calc(100% + 4px);
       top: 50%;
       //left: 50%;
       transform: translate(0, -50%);
@@ -2306,7 +2306,7 @@ button:has(.gh-dropdown-menu){
     }
 
     &.left {
-      right: calc(100% + 5px);
+      right: calc(100% + 4px);
       top: 50%;
       //left: 50%;
       transform: translate(0, -50%);
@@ -2328,7 +2328,7 @@ button:has(.gh-dropdown-menu){
     }
 
     &.top {
-      bottom: calc(100% + 5px);
+      bottom: calc(100% + 4px);
       left: 50%;
       transform: translate(-50%, 0);
 
@@ -2348,7 +2348,7 @@ button:has(.gh-dropdown-menu){
     }
 
     &.bottom {
-      top: calc(100% + 5px);
+      top: calc(100% + 4px);
       left: 50%;
       transform: translate(-50%, 0);
 
@@ -2368,7 +2368,7 @@ button:has(.gh-dropdown-menu){
     }
 
     &.bottom-right {
-      top: calc(100% + 5px);
+      top: calc(100% + 4px);
       right: 0;
 
       &:before {

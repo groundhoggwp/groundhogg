@@ -2065,7 +2065,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-has-tooltip .gh-tooltip.right,
 :has(> .gh-tooltip) .gh-tooltip.right {
-  left: calc(100% + 5px);
+  left: calc(100% + 4px);
   top: 50%;
   transform: translate(0, -50%);
 }
@@ -2085,7 +2085,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-has-tooltip .gh-tooltip.left,
 :has(> .gh-tooltip) .gh-tooltip.left {
-  right: calc(100% + 5px);
+  right: calc(100% + 4px);
   top: 50%;
   transform: translate(0, -50%);
 }
@@ -2105,7 +2105,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-has-tooltip .gh-tooltip.top,
 :has(> .gh-tooltip) .gh-tooltip.top {
-  bottom: calc(100% + 5px);
+  bottom: calc(100% + 4px);
   left: 50%;
   transform: translate(-50%, 0);
 }
@@ -2125,7 +2125,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-has-tooltip .gh-tooltip.bottom,
 :has(> .gh-tooltip) .gh-tooltip.bottom {
-  top: calc(100% + 5px);
+  top: calc(100% + 4px);
   left: 50%;
   transform: translate(-50%, 0);
 }
@@ -2145,7 +2145,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-has-tooltip .gh-tooltip.bottom-right,
 :has(> .gh-tooltip) .gh-tooltip.bottom-right {
-  top: calc(100% + 5px);
+  top: calc(100% + 4px);
   right: 0;
 }
 .gh-has-tooltip .gh-tooltip.bottom-right:before,
