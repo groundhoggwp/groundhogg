@@ -44,12 +44,17 @@ function handle_conditional_content_block_filters( $content, $parsed_block, \WP_
 	$contact = get_current_contact();
 
 	// must be a contact if the block is restricted
-	if ( ! $contact || ! $contact->exists() ){
+	if ( ! $contact || ! $contact->exists() ) {
 		return '';
 	}
 
-	$include_filters = json_decode( $parsed_block['attrs']['ghIncludeFilters'], true );
-	$exclude_filters = json_decode( $parsed_block['attrs']['ghExcludeFilters'], true );
+	$attrs = wp_parse_args( $parsed_block['attrs'], [
+		'ghIncludeFilters' => '[]',
+		'ghExcludeFilters' => '[]',
+	] );
+
+	$include_filters = json_decode( $attrs['ghIncludeFilters'], true );
+	$exclude_filters = json_decode( $attrs['ghExcludeFilters'], true );
 
 	// no filters, no query needed.
 	if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
@@ -66,7 +71,7 @@ function handle_conditional_content_block_filters( $content, $parsed_block, \WP_
 	$count = $contactQuery->count();
 
 	// content is restricted if contact is not in the search
-	if ( $count === 0 ){
+	if ( $count === 0 ) {
 		return '';
 	}
 
