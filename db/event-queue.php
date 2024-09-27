@@ -325,7 +325,7 @@ class Event_Queue extends DB {
         priority int unsigned NOT NULL,
         status varchar(20) NOT NULL,
         claim varchar(20) NOT NULL,
-        time_claimed unsigned bigint(20) NOT NULL DEFAULT 0,
+        time_claimed bigint(20) unsigned NOT NULL DEFAULT 0,
         PRIMARY KEY (ID),
         KEY time_idx (time),
         KEY contact_idx (contact_id),

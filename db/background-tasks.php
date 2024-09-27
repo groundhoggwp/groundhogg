@@ -80,7 +80,7 @@ class Background_Tasks extends DB {
         time bigint(12) unsigned NOT NULL,
         status varchar(20) NOT NULL,
         claim varchar(20) NOT NULL,
-        time_claimed unsigned bigint(20) NOT NULL DEFAULT 0,
+        time_claimed bigint(20) unsigned NOT NULL DEFAULT 0,
         date_created datetime NOT NULL,
         PRIMARY KEY (ID)
 		) {$this->get_charset_collate()};";
