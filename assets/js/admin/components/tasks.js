@@ -8,10 +8,13 @@
     moreMenu,
     dangerConfirmationModal,
     dialog,
-    escHTML
+    escHTML,
   } = Groundhogg.element
 
-  const { userHasCap, getCurrentUser } = Groundhogg.user
+  const {
+    userHasCap,
+    getCurrentUser,
+  } = Groundhogg.user
   const {
     formatDateTime,
   } = Groundhogg.formatting
@@ -31,14 +34,14 @@
     task   : __('Task', 'groundhogg'),
     call   : __('Call', 'groundhogg'),
     email  : __('Email', 'groundhogg'),
-    meeting: __('Meeting', 'groundhogg')
+    meeting: __('Meeting', 'groundhogg'),
   }
 
-  const isOverdue = t => t.is_overdue && ! t.is_complete
+  const isOverdue = t => t.is_overdue && !t.is_complete
   const isComplete = t => t.is_complete
   const isPending = t => !t.is_complete
-  const isDueToday = t => t.is_due_today && ! t.is_complete
-  const isDueSoon = t => t.days_till_due < 14 && ! t.is_overdue && ! t.is_due_today && ! t.is_complete
+  const isDueToday = t => t.is_due_today && !t.is_complete
+  const isDueSoon = t => t.days_till_due < 14 && !t.is_overdue && !t.is_due_today && !t.is_complete
 
   const dueBy = (task) => {
 
@@ -47,20 +50,21 @@
         task.i18n.due_in) }</span>`
     }
 
-    if ( isComplete(task) ){
+    if (isComplete(task)) {
       return `<span class="pill green" title="${ task.i18n.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
         task.i18n.completed) }</span>`
     }
 
     let color = ''
 
-    if ( isDueToday( task ) ){
+    if (isDueToday(task)) {
       color = 'orange'
-    } else if ( isDueSoon( task ) ){
+    }
+    else if (isDueSoon(task)) {
       color = 'yellow'
     }
 
-    return `<span class="pill ${color}" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
+    return `<span class="pill ${ color }" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
       task.i18n.due_in) }</span>`
   }
 
@@ -134,7 +138,7 @@
       edit_time   : '',
       edit_content: '',
       edit_type   : 'task',
-      myTasks: ! ( object_id && object_type )
+      myTasks     : !( object_id && object_type ),
     })
 
     const clearEditState = () => State.set({
@@ -149,23 +153,24 @@
     const fetchTasks = () => {
 
       let query = {
-        limit  :  99,
+        limit  : 99,
         orderby: 'due_date',
         order  : 'ASC',
       }
 
       // tasks for anything, but only assigned to the current user
-      if ( ! object_type && ! object_id ){
+      if (!object_type && !object_id) {
         query = {
-          user_id: getCurrentUser().ID,
+          user_id   : getCurrentUser().ID,
           incomplete: true,
-          ...query
+          ...query,
         }
-      } else {
+      }
+      else {
         query = {
           object_id,
           object_type,
-          ...query
+          ...query,
         }
       }
 
@@ -190,7 +195,7 @@
 
       if (!State.loaded) {
 
-        fetchTasks().then( morph )
+        fetchTasks().then(morph)
 
         return Skeleton({}, [
           'full',
@@ -309,7 +314,7 @@
             className: 'quarter',
           }, [
             Label({
-              for  : 'task-type',
+              for: 'task-type',
             }, __('Type')),
             `<br>`,
             Select({
@@ -405,17 +410,18 @@
 
         let assocIcon = null
 
-        if ( task.associated.img ){
+        if (task.associated.img) {
           assocIcon = Img({
-            src: task.associated.img
+            src: task.associated.img,
           })
-        } else if ( task.associated.icon ){
-          assocIcon = Dashicon( task.associated.icon )
+        }
+        else if (task.associated.icon) {
+          assocIcon = Dashicon(task.associated.icon)
         }
 
         return Div({
           className: `task ${ task.is_complete ? 'complete' : 'pending' } ${ task.is_overdue ? 'overdue' : '' }`,
-          id: `task-item-${task.ID}`,
+          id       : `task-item-${ task.ID }`,
           dataId   : task.ID,
         }, [
 
@@ -423,7 +429,7 @@
             className: 'task-header',
           }, [
             typeToIcon[type],
-            summary ? Span({ className: 'summary' }, escHTML( summary ) ) : null,
+            summary ? Span({ className: 'summary' }, escHTML(summary)) : null,
             Div({
               className: 'display-flex',
               style    : {
@@ -443,7 +449,10 @@
                     morph()
                   })
                 },
-              }, [Dashicon('thumbs-up'), ToolTip(__('Mark complete','groundhogg'), 'left')]),
+              }, [
+                Dashicon('thumbs-up'),
+                ToolTip(__('Mark complete', 'groundhogg'), 'left'),
+              ]),
               Button({
                 id       : `task-actions-${ task.ID }`,
                 className: 'gh-button text icon secondary task-more',
@@ -485,14 +494,14 @@
                     },
                   ]
 
-                  if ( isDueSoon( task ) || isDueToday( task ) || isOverdue( task ) ){
+                  if (isDueSoon(task) || isDueToday(task) || isOverdue(task)) {
                     items.unshift({
                       key     : 'incomplete',
                       cap     : belongsToMe() ? 'edit_tasks' : 'edit_others_tasks',
                       text    : __('Snooze'),
                       onSelect: () => {
                         TasksStore.patch(task.ID, {
-                          data: { snooze: 1 }
+                          data: { snooze: 1 },
                         }).then(() => {
                           morph()
                         })
@@ -519,15 +528,22 @@
               }, icons.verticalDots),
             ]),
           ]),
-          ! object_id ? An({
+          !object_id ? An({
             className: 'associated-object',
-            href: task.associated.link,
-          }, [ assocIcon, task.associated.name ] ) : null,
+            href     : task.associated.link,
+            style    : {
+              width: 'fit-content',
+            },
+          }, [
+            assocIcon,
+            task.associated.name,
+          ]) : null,
           Div({
-            className: 'display-flex gap-5 align-center details flex-wrap'
+              className: 'display-flex gap-5 align-center details flex-wrap',
             }, [
-            dueBy(task),
-            Span({ className: 'added-by' }, addedBy( task ))]
+              dueBy(task),
+              Span({ className: 'added-by' }, addedBy(task)),
+            ],
           ),
           Div({
             className: 'task-content space-above-10',
@@ -558,21 +574,23 @@
       }
 
       const FilterPill = ({
+        id = '',
         text = '',
         color = '',
         filter = isPending,
       }) => {
 
-        let num = tasks.filter( filter ).length
+        let num = tasks.filter(filter).length
 
-        if ( ! num ){
+        if (!num) {
           return null
         }
 
         return Span({
-          className: `pill ${color} clickable ${State.filter === filter ? 'bold' : '' }`,
+          id: `filter-${id || color}`,
+          className: `pill ${ color } clickable ${ State.filter === filter ? 'bold' : '' }`,
           onClick  : e => setFilter(filter),
-        }, sprintf( text, num ))
+        }, sprintf(text, num))
       }
 
       return Fragment([
@@ -582,32 +600,37 @@
           className: 'tasks-header',
         }, [
           FilterPill({
-            text: __('%d overdue', 'groundhogg'),
-            color: 'red',
-            filter: isOverdue
+            id: 'overdue',
+            text  : __('%d overdue', 'groundhogg'),
+            color : 'red',
+            filter: isOverdue,
           }),
 
           FilterPill({
-            text: __('%d due today', 'groundhogg'),
-            color: 'orange',
-            filter: isDueToday
+            id: 'due-today',
+            text  : __('%d due today', 'groundhogg'),
+            color : 'orange',
+            filter: isDueToday,
           }),
 
           FilterPill({
-            text: __('%d due soon', 'groundhogg'),
-            color: 'yellow',
-            filter: isDueSoon
+            id: 'due-soon',
+            text  : __('%d due soon', 'groundhogg'),
+            color : 'yellow',
+            filter: isDueSoon,
           }),
 
           FilterPill({
-            text: __('%d pending', 'groundhogg'),
-            filter: isPending
+            id: 'pending',
+            text  : __('%d pending', 'groundhogg'),
+            filter: isPending,
           }),
 
           FilterPill({
-            text: __('%d complete', 'groundhogg'),
-            color: 'green',
-            filter: isComplete
+            id: 'complete',
+            text  : __('%d complete', 'groundhogg'),
+            color : 'green',
+            filter: isComplete,
           }),
 
           userHasCap('add_tasks') && object_id ? Button({
@@ -634,9 +657,9 @@
         ...filteredTasks.map(task => State.editing == task.ID ? TaskDetails(task) : Task(task)),
         tasks.length || State.adding ? null : Pg({
           style: {
-            textAlign: 'center'
-          }
-        }, __( '🎉 No pending tasks!', 'groundhogg' ) )
+            textAlign: 'center',
+          },
+        }, __('🎉 No pending tasks!', 'groundhogg')),
       ])
     })
 
@@ -648,16 +671,16 @@
     title = __('Tasks', 'groundhogg'),
   }) => {
 
-    document.querySelector( selector ).append( BetterObjectTasks({
+    document.querySelector(selector).append(BetterObjectTasks({
       object_type,
       object_id,
-      title
+      title,
     }))
   }
 
   const MyTasks = (selector, props) => {
-    document.querySelector( selector ).append( BetterObjectTasks({
-      title: false
+    document.querySelector(selector).append(BetterObjectTasks({
+      title: false,
     }))
   }
 

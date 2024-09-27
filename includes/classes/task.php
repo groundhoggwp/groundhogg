@@ -126,10 +126,10 @@ class Task extends Note {
 			} else {
 				//
 				$newDueDate = $this->get_due_date();
-				$newDueDate->modify( "+${$snooze} days" );
+				$newDueDate->modify( "+{$snooze} days" );
 			}
 
-			// se the original time of day
+			// set the original time of day
 			$newDueDate->modify( $this->get_due_date()->format( 'H:i:s' ) );
 			// set the new due date in the data
 			$data['due_date'] = $newDueDate->ymdhis();
