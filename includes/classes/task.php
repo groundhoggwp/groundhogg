@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\Ymd_His;
 
 class Task extends Note {
@@ -111,6 +112,30 @@ class Task extends Note {
 	public function update( $data = [] ) {
 
 		$was_complete = $this->is_complete();
+
+		// snooze a task
+		if ( isset_not_empty( $data, 'snooze' ) ) {
+
+			// number of days to snooze
+			$snooze = absint( $data['snooze'] );
+
+			// set to tomorrow if overdue
+			if ( $this->is_overdue() ) {
+				// set the snooze by the number of days
+				$newDueDate = new DateTimeHelper( "+{$snooze} days" );
+			} else {
+				//
+				$newDueDate = $this->get_due_date();
+				$newDueDate->modify( "+${$snooze} days" );
+			}
+
+			// se the original time of day
+			$newDueDate->modify( $this->get_due_date()->format( 'H:i:s' ) );
+			// set the new due date in the data
+			$data['due_date'] = $newDueDate->ymdhis();
+			// Snooze is not a valid key
+			unset( $data['snooze'] );
+		}
 
 		$updated = parent::update( $data );
 

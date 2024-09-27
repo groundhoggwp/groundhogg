@@ -485,6 +485,21 @@
                     },
                   ]
 
+                  if ( isDueSoon( task ) || isDueToday( task ) || isOverdue( task ) ){
+                    items.unshift({
+                      key     : 'incomplete',
+                      cap     : belongsToMe() ? 'edit_tasks' : 'edit_others_tasks',
+                      text    : __('Snooze'),
+                      onSelect: () => {
+                        TasksStore.patch(task.ID, {
+                          data: { snooze: 1 }
+                        }).then(() => {
+                          morph()
+                        })
+                      },
+                    })
+                  }
+
                   if (task.is_complete) {
                     items.unshift({
                       key     : 'incomplete',
