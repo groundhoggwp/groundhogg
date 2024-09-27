@@ -370,8 +370,9 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED `params` parameter to the Reports API playground.
 * ADDED "Last week" and "Last month" date ranges for filters.
 * ADDED New "sending" status to the broadcasts table to separate broadcasts that are fully sent vs. partially sent.
+* ADDED Task "snoozing". Sets the due date to the next day.
 * IMPROVED Quick search is faster and shows more information.
-* TWEAKED My Tasks has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
+* TWEAKED "My Tasks" has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
 * TWEAKED The *Restore Missing Funnel Events* tool has been moved to the *Logs > Manage* tab.
 * TWEAKED The *Sync Users* tool is now a background process instead of a loader.
 * TWEAKED Replaced many usages of the branded loader with skeleton wireframe loaders.
