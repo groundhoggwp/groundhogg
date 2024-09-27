@@ -328,7 +328,8 @@ class Table_Query extends Query {
 			'SET',
 			$fields,
 			$this->_where(),
-			$this->_orderby()
+			$this->_orderby(),
+			$this->_limit()
 		];
 
 		$result = $this->db->query( implode( ' ', $query ) );

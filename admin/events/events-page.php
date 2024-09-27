@@ -631,8 +631,20 @@ class Events_Page extends Tabbed_Admin_Page {
                 task: taskId,
                 gh_admin_ajax_nonce: Groundhogg.nonces._adminajax
               }).then( ({
-                data
+                data,
+                success
               }) => {
+
+                if ( success === false ){
+                  morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar({
+                    error: true
+                  }))
+                  Groundhogg.element.dialog({
+                    type: 'error',
+                    message: data[0].message
+                  })
+                  return
+                }
 
                 progress = data.progress
 

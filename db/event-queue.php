@@ -3,9 +3,6 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Broadcast;
-use Groundhogg\Contact_Query;
-use Groundhogg\DB\Query\Where;
 use Groundhogg\DB\Traits\Event_Log_Filters;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
@@ -29,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Event_Queue extends DB {
 
-    use Event_Log_Filters;
+	use Event_Log_Filters;
 
 	public function __construct() {
 		parent::__construct();
@@ -81,7 +78,7 @@ class Event_Queue extends DB {
 
 	public function count_unprocessed() {
 		return $this->count( [
-			'where'  => [
+			'where' => [
 				'relationship' => 'AND',
 				// Event should have processed over a minute ago
 				[ 'time', '<', time() - MINUTE_IN_SECONDS ],
@@ -160,6 +157,7 @@ class Event_Queue extends DB {
 			'status'         => '%s',
 			'priority'       => '%d',
 			'claim'          => '%s',
+			'time_claimed'   => '%d',
 		);
 	}
 
@@ -185,6 +183,7 @@ class Event_Queue extends DB {
 			'status'         => Event::WAITING,
 			'priority'       => 10,
 			'claim'          => '',
+			'time_claimed'   => 0,
 		);
 	}
 
@@ -287,7 +286,7 @@ class Event_Queue extends DB {
 	 *
 	 * @return void
 	 */
-	public function update_3_4_2(){
+	public function update_3_4_2() {
 
 		$this->drop_indexes( [
 			'time',
@@ -326,6 +325,7 @@ class Event_Queue extends DB {
         priority int unsigned NOT NULL,
         status varchar(20) NOT NULL,
         claim varchar(20) NOT NULL,
+        time_claimed unsigned bigint(20) NOT NULL DEFAULT 0,
         PRIMARY KEY (ID),
         KEY time_idx (time),
         KEY contact_idx (contact_id),

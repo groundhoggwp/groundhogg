@@ -1338,7 +1338,7 @@
   }) => {
 
     return Div({
-      className: `gh-progress-bar ${ error ? 'error' : '' } ${className}`,
+      className: `gh-progress-bar ${ error ? 'gh-error' : '' } ${className}`,
     }, Div({
       className: 'gh-progress-bar-fill',
       style: {

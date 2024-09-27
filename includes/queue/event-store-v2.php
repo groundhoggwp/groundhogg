@@ -2,13 +2,12 @@
 
 namespace Groundhogg\Queue;
 
-use Groundhogg\DB\Events;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\event_queue_db;
 use function Groundhogg\generate_claim;
-use function Groundhogg\get_db;
 
 /**
  * Created by PhpStorm.
@@ -68,7 +67,7 @@ class Event_Store_V2 {
 		$claimed = $this->claim_events( $count );
 
 		// Claim did not claim any events, so no point in doing the select
-		if ( $claimed === false || $claimed === 0 ){
+		if ( $claimed === false || $claimed === 0 ) {
 			return [];
 		}
 
@@ -95,36 +94,33 @@ class Event_Store_V2 {
 	 */
 	public function claim_events( $count ) {
 
-		global $wpdb;
+		$query = new Table_Query( 'event_queue' );
+		$query->setLimit( $count )->setOrderby( [ 'priority', 'ASC' ], [ 'ID', 'ASC' ] )->where()
+		      ->equals( 'status', Event::WAITING )
+		      ->lessThanEqualTo( 'time', time() )
+		      ->empty( 'claim' );
 
-		$clauses = apply_filters( 'groundhogg/queue/event_store/get_queued_event_ids/clauses', [
-			$wpdb->prepare( 'status = %s', Event::WAITING ),
-			$wpdb->prepare( 'time <= %d', time() ),
-			"claim = ''",
+		do_action_ref_array( 'groundhogg/queue/event_store/claim_events', [
+			&$query
 		] );
 
-		$clauses      = implode( ' AND ', $clauses );
-
-		$result = $wpdb->query( "
-	UPDATE {$this->db()->get_table_name()}
-	SET claim = '{$this->claim}'
-	WHERE $clauses
-	ORDER BY priority ASC, ID ASC
-	LIMIT $count" );
+		$result = $query->update( [
+			'claim'        => $this->claim,
+			'time_claimed' => time()
+		] );
 
 		// Deadlock maybe?
 		if ( $result === false ) {
+			global $wpdb;
 			$wpdb->print_error( 'Restarting transaction after deadlock' );
 
 			return $this->claim_events( $count );
 		}
 
 		// No rows affected
-		if ( $result === 0 ){
+		if ( $result === 0 ) {
 			return false;
 		}
-
-		$this->db()->cache_set_last_changed();
 
 		return $result;
 	}
@@ -132,22 +128,18 @@ class Event_Store_V2 {
 	/**
 	 * Release waiting events that have a claim from the event store.
 	 *
-	 * @param $claim
-	 *
 	 * @return bool
 	 */
 	public function release_events() {
 
-		global $wpdb;
+		$query = new Table_Query( 'event_queue' );
+		$query->where()
+		      ->equals( 'claim', $this->claim );
 
-		$result = $wpdb->query( "
-	UPDATE {$this->db()->get_table_name()}
-	SET claim = ''
-	WHERE claim = '{$this->claim}'" );
-
-		$this->db()->cache_set_last_changed();
-
-		return $result;
+		return $query->update( [
+			'claim'        => '',
+			'time_claimed' => 0
+		] );
 	}
 
 

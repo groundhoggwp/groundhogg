@@ -188,7 +188,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 		$this->set_id( is_numeric( $object->$identifier ) ? absint( $object->$identifier ) : $object->$identifier );
 
-		//Lets just make sure we all good here.
+		// Let's just make sure we all good here.
 		$object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
 
 		// Setup the main data
@@ -201,7 +201,18 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		$this->post_setup();
 
 		return true;
+	}
 
+	/**
+	 * Basically resets the object with updated info from the DB if we suspect any changes where made
+	 *
+	 * @return bool
+	 */
+	public function pull() {
+		// clear meta and data
+		$this->meta = [];
+		$this->data = [];
+		return $this->setup_object( $this->get_db()->get( $this->get_id() ) );
 	}
 
 	/**

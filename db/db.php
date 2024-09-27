@@ -603,6 +603,9 @@ abstract class DB {
 		$this->batch_inserts = [];
 
 		if ( ! $wpdb->rows_affected ) {
+
+			$this->last_error = $wpdb->last_error;
+
 			return false;
 		}
 

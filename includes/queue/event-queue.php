@@ -188,6 +188,8 @@ class Event_Queue extends Supports_Errors {
 
 		$this->process();
 
+		do_action( 'groundhogg/event_queue/after_process' );
+
 		$process_time = round( Limits::time_elapsed(), 2 );
 
 		Limits::stop();

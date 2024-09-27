@@ -46,19 +46,12 @@ class Bounce_Checker {
 	const ACTION = 'groundhogg/check_bounces';
 
 	public function __construct() {
-		/* run whenever these jobs are run */
-		add_action( 'init', array( $this, 'setup_cron' ) );
 
-		add_action( self::ACTION, array( $this, 'check' ) );
+		/* run whenever these jobs are run */
+		add_action( 'groundhogg/cleanup', [ $this, 'check' ] );
 
 		if ( is_admin() && get_request_var( 'test_imap_connection' ) ) {
 			add_action( 'init', array( $this, 'do_test_connection' ) );
-		}
-	}
-
-	public function setup_cron() {
-		if ( ! wp_next_scheduled( self::ACTION ) ) {
-			wp_schedule_event( time(), 'hourly', self::ACTION );
 		}
 	}
 
@@ -71,7 +64,6 @@ class Bounce_Checker {
 			   class="button-secondary"><?php _ex( 'Test IMAP Connection', 'action', 'groundhogg' ) ?></a>
 			<?php
 		}
-
 	}
 
 	/**

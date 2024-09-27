@@ -183,6 +183,16 @@ class Main_Updater extends Old_Updater {
 						}
 					}
 				}
+			],
+			'3.7'    => [
+				'automatic'   => true,
+				'description' => __( 'Add time_claimed flag for events and background tasks', 'groundhogg' ),
+				'callback'    => function () {
+					wp_unschedule_hook( 'groundhogg/cleanup' );
+					wp_unschedule_hook( 'groundhogg/check_bounces' );
+					db()->background_tasks->create_table();
+					db()->event_queue->create_table();
+				}
 			]
 		];
 	}

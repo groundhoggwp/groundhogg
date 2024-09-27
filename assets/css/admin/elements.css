@@ -1995,10 +1995,10 @@ button:has(.gh-dropdown-menu) {
   overflow: hidden;
   box-sizing: border-box;
 }
-.gh-progress-bar.error {
+.gh-progress-bar.error, .gh-progress-bar.gh-error {
   background-color: rgba(233, 31, 79, 0.1);
 }
-.gh-progress-bar.error .gh-progress-bar-fill {
+.gh-progress-bar.error .gh-progress-bar-fill, .gh-progress-bar.gh-error .gh-progress-bar-fill {
   background-color: #e91f4f;
 }
 .gh-progress-bar .gh-progress-bar-fill {

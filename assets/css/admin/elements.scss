@@ -2195,7 +2195,8 @@ button:has(.gh-dropdown-menu){
   //height: 25px;
   //box-sizing: content-box;
 
-  &.error {
+  &.error,
+  &.gh-error{
 
     background-color: $error-red-10;
 

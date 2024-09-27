@@ -39,6 +39,13 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	protected $object;
 
 	/**
+	 * Flag for whether the hook was added to check if the broadcast has been fully sent or not.
+	 *
+	 * @var bool
+	 */
+	static $sent_hook_set = false;
+
+	/**
 	 * Whether the object is transactional and thus avoids marketability.
 	 *
 	 * @return bool
@@ -53,8 +60,14 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return false;
 	}
 
+	/**
+	 * If the broadcast has been fully scheduled.
+	 * Not the same as if the status is scheduled, which is mostly for display in the admin
+	 *
+	 * @return bool
+	 */
 	public function is_scheduled() {
-		return $this->get_status() === 'scheduled';
+		return boolval( $this->get_meta( 'is_scheduled' ) );
 	}
 
 	public function is_pending() {
@@ -66,15 +79,30 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function is_sent() {
-		return $this->get_status() === 'sent';
+		return $this->status_is( 'sent' );
 	}
 
+	public function status_is( $status ) {
+		return $this->get_status() === $status;
+	}
+
+	/**
+	 * If the broadcast is in the process of sending
+	 *
+	 * @return bool
+	 */
 	public function is_sending() {
-		return $this->is_sent() && $this->has_pending_events();
+		return $this->status_is( 'sending' );
 	}
 
+	/**
+	 * If the broadcast is sent
+	 * or if there are no pending events remaining
+	 *
+	 * @return bool
+	 */
 	public function is_fully_sent() {
-		return $this->is_sent() && ! $this->has_pending_events();
+		return $this->is_sent() || ! $this->has_pending_events();
 	}
 
 	/**
@@ -239,9 +267,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function schedule_in_background() {
+	public function maybe_schedule_in_background() {
 
-		if ( ! $this->is_pending() ) {
+		if ( ! $this->is_schedulable() ) {
 			return false;
 		}
 
@@ -277,6 +305,18 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		return count( $query->get_results() ) > 0;
 	}
 
+
+	public function count_pending_events() {
+
+		$query = new Table_Query( 'event_queue' );
+		$query->setLimit( 1 )->where()->equals( 'step_id', $this->ID )
+		      ->equals( 'funnel_id', self::FUNNEL_ID )
+		      ->equals( 'event_type', Event::BROADCAST )
+		      ->equals( 'status', Event::WAITING );
+
+		return $query->count();
+	}
+
 	/**
 	 * Cancel the broadcast
 	 *
@@ -290,7 +330,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// if there are no pending events for this broadcast that means it's already fully sent
-		if ( $this->is_fully_sent() ) {
+		if ( $this->is_sent() ) {
 			return false;
 		}
 
@@ -326,6 +366,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * If the broadcast can be scheduled
+	 *
+	 * @return bool
+	 */
+	public function is_schedulable() {
+		return ( $this->status_is( 'pending' )
+		       || $this->status_is( 'sending' ) ) && ! $this->is_scheduled();
+	}
+
+	/**
 	 * Schedules a batch of events!
 	 *
 	 * @return false|float false if failed, a number of percentage complete
@@ -339,8 +389,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return 0;
 		}
 
-		// The broadcast is not pending
-		if ( ! $this->is_pending() ) {
+		// This broadcast has already been scheduled
+		if ( ! $this->is_schedulable() ) {
 			return false;
 		}
 
@@ -361,7 +411,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$batch_interval        = $this->get_meta( 'batch_interval' );
 		$batch_interval_length = absint( $this->get_meta( 'batch_interval_length' ) );
-		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100 ;
+		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100;
 		$batch_delay           = absint( $this->get_meta( 'batch_delay' ) ) ?: 0;
 
 		$c_query  = new Contact_Query( $query );
@@ -406,7 +456,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				}
 			}
 
-			if ( $batch_interval && $batch_delay ){
+			if ( $batch_interval && $batch_delay ) {
 				$local_time += $batch_delay;
 			}
 
@@ -446,13 +496,77 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		// Finished scheduling
 		if ( $offset >= $total ) {
-			$this->update( [ 'status' => 'scheduled' ] );
+			$this->update_meta( 'is_scheduled', true );
+
+			// if the broadcast is still pending, we can update the status to scheduled
+			// the scheduled status is now for display only, use the is_scheduled meta flag
+			if ( $this->is_pending() ) {
+				$this->update( [ 'status' => 'scheduled' ] );
+			}
 		}
 
 		$this->delete_meta( 'schedule_lock' );
 
 		return $items;
 
+	}
+
+	/**
+	 * Add an action for status changes
+	 *
+	 * @param $data
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [] ) {
+
+		$prevStatus = $this->get_status();
+
+		$result = parent::update( $data );
+
+		$newStatus = $this->get_status();
+
+		if ( $prevStatus !== $newStatus ) {
+
+			/**
+			 * When a broadcast's status changes
+			 *
+			 * @param $broadcast Broadcast
+			 */
+			do_action( "groundhogg/broadcast/$newStatus", $this );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Updates the broadcast's status to sent if criteria are met
+	 *
+	 * @return bool
+	 */
+	public function maybe_set_status_to_sent() {
+
+		// pull any changes that might have been made by other events
+		$this->pull();
+
+		// if the broadcast has not finished scheduling, no go.
+		if ( ! $this->is_scheduled() ) {
+			return false;
+		}
+
+		// We're not done sending events yet
+		if ( $this->has_pending_events() ){
+			return false;
+		}
+
+		// We have to at least sent a few emails, right?
+		if ( ! $this->status_is( 'sending' ) ) {
+			return false;
+		}
+
+		$this->update( [ 'status' => 'sent' ] );
+
+		return true;
 	}
 
 	/**
@@ -473,6 +587,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 * @param Event     $event
 		 */
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
+		do_action( "groundhogg/broadcast/before", $this, $contact, $event );
 
 		/**
 		 * Filter the object to send...
@@ -496,10 +611,26 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 * @param Event     $event
 		 */
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
+		do_action( "groundhogg/broadcast/after", $this, $contact, $event );
 
-		// Wait until broadcast is fully scheduled before updating status to sent
-		if ( $this->is_scheduled() && ! $this->is_sent() ) {
-			$this->update( [ 'status' => 'sent' ] );
+		// Set the status to sending while we're sending the broadcast
+		// Regardless of the previous status
+		if ( ! $this->status_is( 'sending' ) ) {
+
+			// directly from pending
+			if ( $this->is_pending() ){
+				// set the status to schedule first to run any hooks temporarily
+				$this->update( [ 'status' => 'scheduled' ] );
+			}
+
+			// immediately then set it to sending
+			$this->update( [ 'status' => 'sending' ] );
+		}
+
+		if ( ! self::$sent_hook_set ){
+			// set a hook after the event queue has finished processing to see if the broadcast is done sending.
+			add_action( 'groundhogg/event_queue/after_process', [ $this, 'maybe_set_status_to_sent' ] );
+			self::$sent_hook_set = true;
 		}
 
 		return $result;
@@ -519,7 +650,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @return array
 	 */
-	public function get_report_data( $email_id = 0 ) {
+	public function get_report_data( $unused = 0 ) {
 
 		if ( ! empty( $this->report_data ) ) {
 			return $this->report_data;
@@ -535,7 +666,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$data['id'] = $this->get_id();
 
-		if ( $this->is_sent() ) {
+		if ( $this->is_sent() || $this->status_is( 'sending' ) ) {
 
 			$data['sent'] = get_db( 'events' )->count( [
 				'step_id'    => $this->get_id(),

@@ -19,8 +19,11 @@ class Background_Tasks {
 
 	protected static array $tasks = [];
 
+	/**
+	 *
+	 */
 	public function __construct() {
-		add_action( self::HOOK, [ $this, 'do_tasks' ] );
+		add_action( self::HOOK, [ $this, 'do_tasks' ], 10 );
 		add_action( 'init', [ $this, 'add_cron' ] );
 	}
 
@@ -29,8 +32,8 @@ class Background_Tasks {
 	 *
 	 * @return void
 	 */
-	public function add_cron(){
-		if ( ! wp_next_scheduled( self::HOOK ) ){
+	public function add_cron() {
+		if ( ! wp_next_scheduled( self::HOOK ) ) {
 			wp_schedule_event( time(), Event_Queue::WP_CRON_INTERVAL, self::HOOK );
 		}
 	}
@@ -46,14 +49,18 @@ class Background_Tasks {
 
 		$taskQuery = new Table_Query( 'background_tasks' );
 		$taskQuery->where->in( 'status', [ 'pending', 'in_progress' ] )
-		          ->empty( 'claim' )
-		          ->lessThan( 'time', time() );
+		                 ->empty( 'claim' )
+		                 ->lessThan( 'time', time() );
 
 		// Claim the tasks
-		$updated = $taskQuery->update( [ 'claim' => $claim, 'status' => 'in_progress' ] );
+		$updated = $taskQuery->update( [
+			'claim'        => $claim,
+			'status'       => 'in_progress',
+			'time_claimed' => time(),
+		] );
 
 		// No tasks were claimed
-		if ( ! $updated ){
+		if ( ! $updated ) {
 			return;
 		}
 
@@ -74,15 +81,16 @@ class Background_Tasks {
 
 			try {
 				$task->process();
-			} catch ( \Exception $exception ){
+			} catch ( \Exception $exception ) {
 				continue;
 			}
 		}
 
 		// Release the claim
 		$claimQuery->update( [
-			'claim' => '',
-			'time'  => time()
+			'claim'        => '',
+			'time'         => time(),
+			'time_claimed' => 0
 		] );
 	}
 
@@ -98,7 +106,7 @@ class Background_Tasks {
 	 */
 	public static function add( Task $task, int $time = 0 ) {
 
-		if ( ! $time ){
+		if ( ! $time ) {
 			$time = time();
 		}
 
@@ -154,7 +162,7 @@ class Background_Tasks {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function update_contacts( $query, $data ){
+	public static function update_contacts( $query, $data ) {
 		return self::add( new Update_Contacts( $query, $data ) );
 	}
 
@@ -166,7 +174,7 @@ class Background_Tasks {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function delete_contacts( $query ){
+	public static function delete_contacts( $query ) {
 		return self::add( new Delete_Contacts( $query ) );
 	}
 

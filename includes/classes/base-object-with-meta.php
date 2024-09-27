@@ -53,8 +53,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		$this->post_setup();
 
 		return true;
-
 	}
+
 
 	/**
 	 * Get an object property

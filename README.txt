@@ -369,14 +369,17 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Parent/Child relationships (as info card) for contacts.
 * ADDED `params` parameter to the Reports API playground.
 * ADDED "Last week" and "Last month" date ranges for filters.
+* ADDED New "sending" status to the broadcasts table to separate broadcasts that are fully sent vs. partially sent.
 * IMPROVED Quick search is faster and shows more information.
 * TWEAKED My Tasks has been removed from the admin bar widget since it now has a dedicated space in the dashboard.
 * TWEAKED The *Restore Missing Funnel Events* tool has been moved to the *Logs > Manage* tab.
 * TWEAKED The *Sync Users* tool is now a background process instead of a loader.
 * TWEAKED Replaced many usages of the branded loader with skeleton wireframe loaders.
 * TWEAKED Funnels with starting benchmarks also acting as a conversion will calculate the conversion based on the 2nd completed event within the time range.
+* TWEAKED Cleanup actions will now be run hourly rather than every 6 hours.
 * FIXED Replacement codes not working in custom footer for composed emails.
 * FIXED "This week" date range not working.
+* FIXED Broadcasts scheduled with "Send Now" *sometimes* not being updated to `sent` when finished.
 
 = 3.6.1.1 (2024-09-06) =
 * FIXED PHP Warnings causing custom reports not to load.

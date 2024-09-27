@@ -21,7 +21,7 @@ class Schedule_Broadcast extends Task {
 	}
 
 	public function can_run() {
-		return $this->broadcast->exists() && $this->broadcast->is_pending();
+		return $this->broadcast->exists() && $this->broadcast->is_schedulable();
 	}
 
 	/**

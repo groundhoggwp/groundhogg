@@ -9,27 +9,12 @@ class Cleanup_Actions {
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'schedule_event' ] );
-		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
 		add_action( 'groundhogg/cleanup', [ $this, 'fix_unprocessed_events' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'fix_unprocessed_tasks' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'delete_expired_permission_keys' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'purge_email_logs' ] );
 	}
-
-	public function add_cron_schedules( $schedules ) {
-		if ( ! is_array( $schedules ) ) {
-			return $schedules;
-		}
-
-		$schedules['every_6_hours'] = array(
-			'interval' => HOUR_IN_SECONDS * 6,
-			'display'  => _x( '4 Times Daily', 'cron_schedule', 'groundhogg' )
-		);
-
-		return $schedules;
-	}
-
 
 	public function schedule_event() {
 		if ( wp_next_scheduled( 'groundhogg/cleanup' ) ) {
@@ -38,9 +23,8 @@ class Cleanup_Actions {
 
 		$date = new DateTimeHelper( 'today' );
 
-		wp_schedule_event( $date->getTimestamp(), 'every_6_hours', 'groundhogg/cleanup' );
+		wp_schedule_event( $date->getTimestamp(), 'hourly', 'groundhogg/cleanup' );
 	}
-
 
 	/**
 	 * Automatically fix events that are not processed
@@ -53,14 +37,15 @@ class Cleanup_Actions {
 		$query->where()
 		      ->in( 'status', [ Event::WAITING, Event::IN_PROGRESS ] ) // Event is waiting or in progress
 		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
-		      ->lessThan( 'time', time() - HOUR_IN_SECONDS ) // older than 1 hour
-		      ->greaterThanEqualTo( 'time', time() - ( 7 * HOUR_IN_SECONDS ) ); // Within the last 7 hours
+			  ->greaterThan( 'time_claimed', 0 )
+		      ->lessThanEqualTo( 'time_claimed', time() - ( 5 * MINUTE_IN_SECONDS ) ); // claimed more than 5 minutes ago
 
+		// release stale claim
 		$query->update( [
-			'status' => Event::WAITING,
-			'claim'  => ''
+			'status'       => Event::WAITING,
+			'claim'        => '',
+			'time_claimed' => 0,
 		] );
-
 	}
 
 	/**
@@ -74,14 +59,14 @@ class Cleanup_Actions {
 		$query->where()
 		      ->in( 'status', [ 'pending', 'in_progress' ] ) // Task is pending or in progress
 		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
-		      ->lessThan( 'time', time() - HOUR_IN_SECONDS ) // older than 1 hour
-		      ->greaterThanEqualTo( 'time', time() - ( 7 * HOUR_IN_SECONDS ) ); // Within the last 7 hours
+			  ->greaterThan( 'time_claimed', 0 )
+			  ->lessThanEqualTo( 'time_claimed', time() - ( 5 * MINUTE_IN_SECONDS ) ); // claimed more than 5 minutes ago
 
 		$query->update( [
 			'status' => Event::WAITING,
-			'claim'  => ''
+			'claim'  => '',
+			'time_claimed' => 0,
 		] );
-
 	}
 
 	/**
