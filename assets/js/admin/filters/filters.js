@@ -2,8 +2,6 @@
 
   const {
     searchOptionsWidget,
-    loadingDots,
-    adminPageURL,
     bold,
     uuid,
     regexp,
@@ -365,7 +363,7 @@
       ]),
       display: ({ compare, value, ...rest }) => {
         return Fragment(
-          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+          ComparisonsTitleGenerators[compare](bold(name), bold(formatNumber(value))))
       },
       preload,
     },
@@ -419,7 +417,7 @@
       ]),
       display: ({ compare, value, ...rest }) => {
         return Fragment(
-          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+          ComparisonsTitleGenerators[compare](bold(name), bold(formatTime(value))))
       },
       preload,
     },
