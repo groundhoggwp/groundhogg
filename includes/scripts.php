@@ -315,7 +315,6 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-remote-notifications',
 			'groundhogg-admin-components',
-			'groundhogg-admin-tasks',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
 
@@ -512,6 +511,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/features/dashboard' . $dot_min . '.js', [
 			'groundhogg-make-el',
 			'groundhogg-admin-remote-notifications',
+			'groundhogg-admin-tasks',
 			'groundhogg-admin-components',
 			'groundhogg-admin-reporting'
 		], GROUNDHOGG_VERSION, true );

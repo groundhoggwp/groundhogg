@@ -137,10 +137,31 @@
 
   const WidgetColumn = (col = 0) => Div({
     className: 'display-flex column gap-20 full-width span-4',
-  }, Widgets.map((item, id) => item.col === col ? Widget({
-    id,
-    ...item,
-  }) : null))
+  }, Widgets.map((item, id) => {
+
+    if (item.col !== col) {
+      return null
+    }
+
+    try {
+      return Widget({
+        id,
+        ...item,
+      })
+    }
+    catch (e) {
+      // error notice for the widget
+      return Widget({
+        id,
+        ...item,
+        render: () => Div({
+          className: 'inside'
+        }, Pg({
+          className: 'gh-text danger red error'
+        }, 'Something went wrong with this widget.'))
+      })
+    }
+  }))
 
   const WidgetsColumns = () => Div({
     className: 'display-grid gap-20',
@@ -323,7 +344,7 @@
     const State = Groundhogg.useState({
       loaded: false,
       items : [],
-    }, News )
+    }, News)
 
     return Div({
       id   : 'my-news',
@@ -452,7 +473,7 @@
     const State = Groundhogg.useState({
       loaded: false,
       items : [],
-    }, Recommendations )
+    }, Recommendations)
 
     return Div({
       id: 'my-recommendations',
@@ -516,7 +537,7 @@
 
     const State = Groundhogg.useState({
       loaded: false,
-    }, Summary )
+    }, Summary)
 
     return Div({
       id: 'contact-reports',
@@ -709,7 +730,7 @@
       if (!State.reports.table_all_broadcasts_performance.data.length) {
 
         return Div({
-          className: 'inside'
+          className: 'inside',
         }, [
           Pg({}, 'You haven\'t sent any broadcasts this week! 😱'),
           Pg({}, 'Send one to your subscribers before they forget about you.'),
@@ -730,7 +751,7 @@
 
     const State = Groundhogg.useState({
       loaded: false,
-    }, Searches )
+    }, Searches)
 
     return Div({
       id   : 'searches-table',
