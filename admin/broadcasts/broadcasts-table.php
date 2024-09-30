@@ -235,7 +235,7 @@ class Broadcasts_Table extends WP_List_Table {
 		}
 
 		$actions['edit'] = html()->e( 'a', [
-			'href' => admin_url( $broadcast->is_email() ? 'gh_emails' : 'gh_sms', [ 'action' => 'edit', $broadcast->get_broadcast_type() => $broadcast->get_object_id() ] )
+			'href' => admin_page_url( $broadcast->is_email() ? 'gh_emails' : 'gh_sms', [ 'action' => 'edit', $broadcast->get_broadcast_type() => $broadcast->get_object_id() ] )
 		], $broadcast->is_email() ? __( 'Edit email', 'groundhogg' ) : __( 'Edit SMS' ) );
 
 		// Add query action
