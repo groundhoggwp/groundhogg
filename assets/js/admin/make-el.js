@@ -25,6 +25,14 @@
     return !isNaN(parseFloat(n)) && isFinite(n)
   }
 
+  const maybeCall = (maybeFunc, ...args) => {
+    if (maybeFunc instanceof Function) {
+      return maybeFunc(...args)
+    }
+
+    return maybeFunc
+  }
+
   const AttributeHandlers = {
     required: (el, value) => {
       el.required = value
@@ -97,6 +105,120 @@
   }
 
   /**
+   * Convert an HTML string into a React Component
+   *
+   * @param string
+   * @param props
+   * @returns array
+   */
+  function htmlToReact (string, props = {}) {
+    let elements = htmlToElements( string )
+    return wp.element.createElement(wp.element.Fragment, null, [...elements].map( el => domElementToReact( el, props ) ))
+  }
+
+  /**
+   * Convert a dom element into a react component
+   * @param element
+   * @param props
+   * @returns {*}
+   */
+  function domElementToReact (element, props = {}) {
+    // Get the tag name
+    let tagName = element.tagName.toLowerCase()
+
+    // Gather attributes (excluding event listeners)
+    let attributes = {}
+    for (let i = 0; i < element.attributes.length; i++) {
+      let attr = element.attributes[i]
+      // Skip event listeners (e.g., onclick, onmouseover)
+      if (!attr.name.startsWith('on')) {
+        attributes[attr.name] = attr.value
+      }
+    }
+
+    // Parse child nodes recursively (text nodes or elements)
+    let children = []
+    for (let j = 0; j < element.childNodes.length; j++) {
+      let child = element.childNodes[j]
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        // Recursively parse child elements
+        children.push(domElementToReact(child))
+      }
+      else if (child.nodeType === Node.TEXT_NODE) {
+        // Add text nodes directly
+        children.push(child.nodeValue)
+      }
+    }
+
+    // Return a React element using createElement
+    return wp.element.createElement(tagName, {
+      ...attributes,
+      ...props,
+    }, children.length > 0 ? children : null)
+  }
+
+  /**
+   * makeEl will essentially switch to offering a wrapper of wp.createElement
+   */
+  const forReact = () => window.makeElForReact = true
+
+  /**
+   * Switch back to standard usage of makeEl
+   */
+  const forDom = () => window.makeElForReact = false
+
+  /**
+   * Wrapper for wp.element.createElement
+   * handles our legacy HTML and morph dom stuff
+   *
+   * @param component
+   * @param attributes
+   * @param children
+   * @returns {*}
+   */
+  const makeElForReact = ( component, attributes, children = null ) => {
+
+    if ( component === 'fragment' ){
+      component = wp.element.Fragment
+    }
+
+    if (children !== null) {
+
+      if (!Array.isArray(children)) {
+        if (children instanceof NodeList) {
+          children = [...children]
+        }
+        else {
+          children = [children]
+        }
+      }
+
+      children = children.map(child => {
+
+        if (!child) {
+          return
+        }
+
+        child = maybeCall( child, () => {} )
+
+        // Template literals
+        if (isString(child)) {
+          child = htmlToReact(child)
+        }
+
+        if ( Array.isArray(child) ) {
+          child = wp.element.createElement( wp.element.Fragment, null, child )
+        }
+
+        return child
+      })
+    }
+
+    return wp.element.createElement( component, attributes, children )
+  }
+
+  /**
+   * Create a DOM element
    *
    * @param tagName
    * @param attributes
@@ -104,6 +226,10 @@
    * @return {*}
    */
   const makeEl = (tagName, attributes, children = null) => {
+
+    if ( window.makeElForReact === true ) {
+      return makeElForReact(tagName, attributes, children)
+    }
 
     let el = tagName === 'fragment' ? document.createDocumentFragment() : document.createElement(tagName)
 
@@ -399,14 +525,6 @@
   const Tr = (atts, children) => makeEl('tr', atts, children)
   const Td = (atts, children) => makeEl('td', atts, children)
   const Th = (atts, children) => makeEl('th', atts, children)
-
-  const maybeCall = (maybeFunc, ...args) => {
-    if (maybeFunc instanceof Function) {
-      return maybeFunc(...args)
-    }
-
-    return maybeFunc
-  }
 
   /**
    * Custom modal appended to the body.
@@ -1376,7 +1494,6 @@
   window.MakeEl = {
     Skeleton,
     InputGroup,
-    makeEl,
     Ellipses,
     Input,
     InputWithReplacements,
@@ -1403,7 +1520,6 @@
     ModalFrame,
     ItemPicker,
     Iframe,
-    htmlToElements,
     Dashicon,
     ButtonToggle,
     Autocomplete,
@@ -1421,6 +1537,17 @@
     H4,
     Hr,
     Nav,
-    maybeCall
+    maybeCall,
+    forDom,
+    forReact,
+    makeEl,
+    makeElForReact,
+    htmlToReact,
+    htmlToElement,
+    htmlToElements,
+    domElementToReact,
+
+
+
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

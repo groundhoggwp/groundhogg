@@ -498,7 +498,7 @@ abstract class Admin_Page extends Supports_Errors {
 		<?php
 	}
 
-	protected function enqueue_table_filters( $columns = [] ) {
+	protected function enqueue_table_filters( $config = [] ) {
 
 		$this->has_table_filters = true;
 
@@ -508,12 +508,14 @@ abstract class Admin_Page extends Supports_Errors {
 		wp_enqueue_style( 'groundhogg-admin-filters' );
 		wp_enqueue_script( 'groundhogg-admin-filters' );
 
-		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( [
-				'id'      => 'table-filters',
-				'name'    => $this->get_name(),
-				'filters' => $filters,
-			], $columns ) ), 'before' );
+		$configDefaults = [
+			'id'      => 'table-filters',
+			'name'    => $this->get_name(),
+			'group'   => 'table',
+			'filters' => $filters,
+		];
 
+		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( $configDefaults, $config ) ), 'before' );
 	}
 
 	/**

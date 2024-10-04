@@ -245,12 +245,11 @@ class Filters {
 			case 'before':
 				$after->setTimestamp( 0 );
 				$before->modify( $filter['before'] );
-
-				// todo maybe set to EOD?
+				$before->modify( '00:00:00' );
 				break;
 			case 'after':
 				$after->modify( $filter['after'] );
-				$after->modify( '00:00:00' );
+				$after->modify( '23:59:59' );
 				$before->modify( '+99 years' );
 				break;
 			case 'day_of':
@@ -379,7 +378,7 @@ class Filters {
 				$where->between( $column, $after, $before );
 				break;
 			case 'before':
-				$where->lessThan( $column, $after );
+				$where->lessThan( $column, $before );
 				break;
 			case 'after':
 				$where->greaterThan( $column, $after );

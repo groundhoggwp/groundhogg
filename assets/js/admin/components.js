@@ -35,7 +35,7 @@
     postFormData,
   } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
-  const { userHasCap } = Groundhogg.user
+  const { userHasCap, getOwner } = Groundhogg.user
   const {
     sprintf,
     __,
@@ -1564,6 +1564,7 @@
     Input,
     Label,
     Fragment,
+    ItemPicker,
     Skeleton,
     Pg,
     Form,
@@ -2282,6 +2283,45 @@
 
   }
 
+  const OwnerPicker = ({
+    id = 'select-owners',
+    selected = [], // list of user ids,
+    onChange = ids => {}, // list of user ids,
+    allow0 = true,
+    ...overrides
+  }) => ItemPicker({
+    id: `select-users`,
+    noneSelected: __('Select a user...', 'groundhogg'),
+    selected: selected.map(user_id => {
+
+      if (user_id == 0 && allow0) {
+        return { id: 0, text: __('The contact owner', 'groundhogg') }
+      }
+
+      return { id: user_id, text: getOwner(user_id).data.user_email }
+    }),
+    multiple: true,
+    style: {
+      flexGrow: 1,
+    },
+    isValidSelection: id => id === 0 || getOwner(id),
+    fetchOptions: (search) => {
+      search = new RegExp(search, 'i')
+
+      let options = Groundhogg.filters.owners.map(u => ( { id: u.ID, text: u.data.display_name } ))
+
+      if ( allow0 ){
+        options.push({ id: 0, text: __('The contact owner', 'groundhogg') })
+      }
+
+      options = options.filter(({ text }) => text.match(search))
+
+      return Promise.resolve(options)
+    },
+    onChange: items => onChange( items.map(({ id }) => id) ),
+    ...overrides
+  })
+
   Groundhogg.components = {
     QuickSearch,
     addContactModal,
@@ -2302,7 +2342,8 @@
     ContactListItem,
     Panel,
     Panels,
-    Relationships
+    Relationships,
+    OwnerPicker
   }
 
 } )(jQuery)

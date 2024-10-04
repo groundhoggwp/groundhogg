@@ -874,6 +874,7 @@
       numberColumns = {},
       dateColumns = {},
       futureDateColumns = {},
+      pastDateColumns = {},
       selectColumns = {},
       name = '',
       group = 'table',
@@ -898,7 +899,7 @@
 
       for (let column in dateColumns) {
         this.registerFilter(
-          createPastDateFilter(column, dateColumns[column], group), {
+          createDateFilter(column, dateColumns[column], group), {
             display: () => bold(name),
           })
       }
@@ -906,6 +907,13 @@
       for (let column in futureDateColumns) {
         this.registerFilter(
           createFutureDateFilter(column, futureDateColumns[column], group), {
+            display: () => bold(name),
+          })
+      }
+
+      for (let column in pastDateColumns) {
+        this.registerFilter(
+          createPastDateFilter(column, pastDateColumns[column], group), {
             display: () => bold(name),
           })
       }
@@ -1416,21 +1424,24 @@
 
     const TableFilterRegistry = FilterRegistry({})
 
-    TableFilterRegistry.registerFromConfig({
-      ...TableFilterConfig,
-      group: 'table',
-    })
+    TableFilterRegistry.registerFromConfig(TableFilterConfig)
 
     GroundhoggTableFilters.FilterRegistry = TableFilterRegistry
 
     $(() => {
-      document.getElementById('table-filters').replaceWith(Filters({
-        id,
-        filterRegistry: TableFilterRegistry,
-        filters,
-        onChange: filters => document.querySelector(
-          'form.search-form input[name="include_filters"]').value = base64_json_encode(filters),
-      }))
+
+      let tableFiltersEl =  document.getElementById('table-filters')
+
+      if ( tableFiltersEl ){
+        tableFiltersEl.replaceWith(Filters({
+          id,
+          filterRegistry: TableFilterRegistry,
+          filters,
+          onChange: filters => document.querySelector(
+            'form.search-form input[name="include_filters"]').value = base64_json_encode(filters),
+        }))
+      }
+
     })
   }
 
