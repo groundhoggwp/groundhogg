@@ -538,7 +538,7 @@ class Location {
 			return false;
 		}
 
-		$purpose = str_replace( [ "name", "\n", "\t", " ", "-", "_" ], null, strtolower( trim( $purpose ) ) );
+		$purpose = str_replace( [ "name", "\n", "\t", " ", "-", "_" ], '', strtolower( trim( $purpose ) ) );
 		$support = [
 			'raw',
 			'cc',
