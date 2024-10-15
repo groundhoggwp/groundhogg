@@ -3726,7 +3726,7 @@ function file_access_url( $path, $download = false ) {
 		$path = str_replace( $base_uploads_url, '', $path );
 	}
 
-	if ( is_user_logged_in() ) {
+	if ( current_user_can( 'download_files' ) && ! is_sending() ) {
 		return action_url( 'download_file', [
 			'page'      => 'gh_tools',
 			'file_path' => ltrim( $path, '/' ),
