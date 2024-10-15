@@ -201,6 +201,10 @@ abstract class Admin_Page extends Supports_Errors {
 
 	public function script_action() {
 
+        // we just gunna start using this everywhere
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_style( 'groundhogg-admin-element' );
+
 		/**
 		 * To enqueue relates scripts for this page
 		 *
