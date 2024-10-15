@@ -23,7 +23,7 @@ class Table_Query extends Query {
 	/**
 	 * @param $table      DB|string
 	 */
-	public function __construct( $table ) {
+	public function __construct( $table, $params = [] ) {
 
 		if ( is_string( $table ) ) {
 			$table = get_db( $table );
@@ -32,6 +32,10 @@ class Table_Query extends Query {
 		$this->db_table = $table;
 
 		parent::__construct( $table->table_name, $table->alias );
+		
+		if ( ! empty( $params ) ) {
+			$this->set_query_params( $params );
+		}
 	}
 
 	/**
