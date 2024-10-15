@@ -15,9 +15,12 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 				$this->emails_sent(),
 				$this->emails_opened(),
 				$this->emails_clicked(),
+				$this->unsubscribes(),
+				$this->soft_bounce(),
+				$this->hard_bounce(),
+				$this->complaints(),
 			]
 		];
-
 	}
 
 
@@ -59,10 +62,15 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 
 //		var_dump( $wpdb->last_error );
 
-		return array_merge( [
-			'label' => __( 'Emails sent', 'groundhogg' ),
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Sent', 'groundhogg' ),
 			'data'  => $data,
-		], $this->get_line_style() );
+
+			"pointBackgroundColor" => 'rgb(0, 117, 255)',
+			"borderColor"          => 'rgb(0, 117, 255)',
+			'backgroundColor'      => 'rgba(0, 117, 255, 0.1)',
+			'spanGaps'             => false,
+		] );
 	}
 
 	protected function emails_opened() {
@@ -78,11 +86,15 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 			'groupby'       => 't'
 		] );
 
-		return array_merge( [
-			'label' => __( 'Emails Opened', 'groundhogg' ),
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Opens', 'groundhogg' ),
 			'data'  => $data,
 
-		], $this->get_line_style() );
+			"pointBackgroundColor" => 'rgb(158, 206, 56)',
+			"borderColor"          => 'rgb(158, 206, 56)',
+			'backgroundColor'      => 'rgba(158, 206, 56, 0.2)',
+			'spanGaps'             => false,
+		]);
 
 	}
 
@@ -99,11 +111,115 @@ class Chart_Email_Activity extends Base_Time_Chart_Report {
 			'groupby'       => 't'
 		] );
 
-		return array_merge( [
-			'label' => __( 'Emails Clicked', 'groundhogg' ),
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Clicks', 'groundhogg' ),
 			'data'  => $data,
 
-		], $this->get_line_style() );
+			"pointBackgroundColor" => 'rgb(0, 117, 255)',
+			"borderColor"          => 'rgb(0, 117, 255)',
+			'backgroundColor'      => 'rgba(0, 117, 255, 0.1)',
+			'spanGaps'             => false,
+		] );
+
+	}
+
+	protected function soft_bounce() {
+		$db = get_db( 'activity' );
+
+		$data = $db->query( [
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
+			'activity_type' => Activity::SOFT_BOUNCE,
+			'before'        => $this->end,
+			'after'         => $this->start,
+			'orderby'       => 't',
+			'order'         => 'asc',
+			'groupby'       => 't'
+		] );
+
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Soft Bounces', 'groundhogg' ),
+			'data'  => $data,
+
+			"pointBackgroundColor" => 'rgb(255, 238, 88)',
+			"borderColor"          => 'rgb(255, 238, 88)',
+			'backgroundColor'      => 'rgba(255, 238, 88, 0.2)',
+			'spanGaps'             => false,
+		] );
+
+	}
+
+	protected function hard_bounce() {
+		$db = get_db( 'activity' );
+
+		$data = $db->query( [
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
+			'activity_type' => Activity::BOUNCE,
+			'before'        => $this->end,
+			'after'         => $this->start,
+			'orderby'       => 't',
+			'order'         => 'asc',
+			'groupby'       => 't'
+		] );
+
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Hard Bounces', 'groundhogg' ),
+			'data'  => $data,
+
+			"pointBackgroundColor" => 'rgb(245, 129, 21)',
+			"borderColor"          => 'rgb(245, 129, 21)',
+			'backgroundColor'      => 'rgba(245, 129, 21, 0.2)',
+			'spanGaps'             => false,
+		] );
+
+	}
+
+	protected function unsubscribes() {
+		$db = get_db( 'activity' );
+
+		$data = $db->query( [
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
+			'activity_type' => Activity::UNSUBSCRIBED,
+			'before'        => $this->end,
+			'after'         => $this->start,
+			'orderby'       => 't',
+			'order'         => 'asc',
+			'groupby'       => 't'
+		] );
+
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Unsubscribes', 'groundhogg' ),
+			'data'  => $data,
+
+			"pointBackgroundColor" => 'rgb(233, 31, 79)',
+			"borderColor"          => 'rgb(233, 31, 79)',
+			'backgroundColor'      => 'rgba(233, 31, 79, 0.2)',
+			'spanGaps'             => false,
+		] );
+
+	}
+
+	protected function complaints() {
+		$db = get_db( 'activity' );
+
+		$data = $db->query( [
+			'select'        => 'COUNT(ID) as y, DATE(FROM_UNIXTIME(timestamp)) as t',
+			'activity_type' => Activity::COMPLAINT,
+			'before'        => $this->end,
+			'after'         => $this->start,
+			'orderby'       => 't',
+			'order'         => 'asc',
+			'groupby'       => 't'
+		] );
+
+		return array_merge( $this->get_line_style(), [
+			'label' => __( 'Complaints', 'groundhogg' ),
+			'data'  => $data,
+
+			"pointBackgroundColor" => 'rgb(108, 25, 173)',
+			"borderColor"          => 'rgb(108, 25, 173)',
+			'backgroundColor'      => 'rgba(108, 25, 173, 0.1)',
+			'spanGaps'             => false,
+		] );
 
 	}
 

@@ -50,7 +50,6 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report {
 		$color = $this->get_random_color();
 
 		return [
-//			"fill"                      => false,
 			'lineTension'               => 0.1,
 			'fillOpacity'               => 0.2,
 			'pointRadius'               => 4,
@@ -61,8 +60,7 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report {
 			'pointHoverRadius'          => 6,
 			"borderColor"               => $color,
 			'backgroundColor'           => $color . '1A',
-			'fill'                      => true
-
+			'fill'                      => true,
 		];
 	}
 }

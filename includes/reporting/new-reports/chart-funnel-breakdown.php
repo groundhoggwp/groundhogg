@@ -24,12 +24,9 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 					'data'            => get_array_var( $data, 'data', [] ),
 					'backgroundColor' => $this->get_random_color()
 				]
-//				$this->get_waiting_activity()
 			]
 		];
-
 	}
-
 
 	protected function get_type() {
 		return 'bar';

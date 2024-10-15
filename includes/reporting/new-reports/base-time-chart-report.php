@@ -20,17 +20,13 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 //			'responsive' => true,
 			'maintainAspectRatio' => false,
 			'tooltips'            => [
-				'callbacks'       => [
-					'label' => 'tool_tip_label',
-					'title' => 'tool_tip_title',
-				],
-				'mode'            => 'index',
+				'mode'            => 'x',
 				'intersect'       => false,
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',
 				'borderColor'     => '#727272',
 				'borderWidth'     => 2,
-
+				'titleFontColor'  => '#000'
 			],
 			'scales'              => [
 				'xAxes' => [
@@ -38,7 +34,7 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 						'type'       => 'time',
 						'time'       => [
 							'parser'        => "YYY-MM-DD HH:mm:ss",
-							'tooltipFormat' => "l HH:mm",
+							'tooltipFormat' => "MMM Do",
 							'unit'          => 'day',
 						],
 						'scaleLabel' => [

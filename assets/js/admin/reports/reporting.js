@@ -411,16 +411,6 @@
           return;
         }
 
-        if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
-          var funcName = report_data.options.tooltips.callbacks.label
-          report_data.options.tooltips.callbacks.label = window[funcName]
-        }
-
-        if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
-          var funcName = report_data.options.tooltips.callbacks.title
-          report_data.options.tooltips.callbacks.title = window[funcName]
-        }
-
         if (this.charts[report_id]) {
           this.charts[report_id].destroy()
         }
