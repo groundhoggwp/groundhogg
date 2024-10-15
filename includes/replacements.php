@@ -105,6 +105,7 @@ class Replacements implements \JsonSerializable {
 			'compliance' => __( 'Compliance', 'groundhogg' ),
 			'email'      => __( 'Email', 'groundhogg' ),
 			'other'      => __( 'Other', 'groundhogg' ),
+			'formatting' => __( 'Formatting', 'groundhogg' ),
 		];
 
 		$replacement_groups = apply_filters( 'groundhogg/replacements/default_groups', $groups );
@@ -526,6 +527,38 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'view_in_browser_link' ],
 				'name'        => __( 'View in browser link', 'groundhogg' ),
 				'description' => _x( 'Link to view the email in the browser', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'andList',
+				'group'        => 'formatting',
+				'default_args' => 'meta_key',
+				'callback'     => [ $this, 'replacement_andList' ],
+				'name'         => __( 'And List', 'groundhogg' ),
+				'description'  => _x( 'Formats a custom field like checkboxes as a grammatically correct list using and.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'orList',
+				'group'        => 'formatting',
+				'default_args' => 'meta_key',
+				'callback'     => [ $this, 'replacement_orList' ],
+				'name'         => __( 'Or List', 'groundhogg' ),
+				'description'  => _x( 'Formats a custom field like checkboxes as a grammatically correct list using or.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'ol',
+				'group'        => 'formatting',
+				'default_args' => 'meta_key',
+				'callback'     => [ $this, 'replacement_ol' ],
+				'name'         => __( 'Ordered List', 'groundhogg' ),
+				'description'  => _x( 'Formats a custom field like checkboxes as an ordered list.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'         => 'ul',
+				'group'        => 'formatting',
+				'default_args' => 'meta_key',
+				'callback'     => [ $this, 'replacement_ol' ],
+				'name'         => __( 'Unordered List', 'groundhogg' ),
+				'description'  => _x( 'Formats a custom field like checkboxes as an unordered list.', 'replacement', 'groundhogg' ),
 			],
 		];
 
@@ -1029,7 +1062,10 @@ class Replacements implements \JsonSerializable {
 				return html()->e( $format, [], array_map( function ( $item ) {
 					return html()->e( 'li', [], $item );
 				}, is_array( $value ) ? $value : array_map( 'trim', explode( ',', $value ) ) ) );
-
+			case 'andList':
+				return is_array( $value ) ? andList( $value ) : $value;
+			case 'orList':
+				return is_array( $value ) ? orList( $value ) : $value;
 		}
 	}
 
@@ -1152,8 +1188,8 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * The contacts first initial
-     *
+	 * The contacts first initial
+	 *
 	 * @return false|string
 	 */
 	function replacement_first_initial() {
@@ -2505,6 +2541,43 @@ class Replacements implements \JsonSerializable {
 		}
 
 		return $email->browser_view_link();
+	}
+
+	/**
+	 * Format a custom field as a grammatically correct list containing And
+	 *
+	 * @return false|string
+	 */
+	public function replacement_andList( $arg, $contact_id ) {
+        return $this->replacement_meta( "$arg|andList", $contact_id );
+	}
+
+
+	/**
+	 * Format a custom field as a grammatically correct list containing Or
+	 *
+	 * @return false|string
+	 */
+	public function replacement_orList( $arg, $contact_id ) {
+		return $this->replacement_meta( "$arg|orList", $contact_id );
+	}
+
+	/**
+	 * Format a custom field as an ordered list <ol>
+	 *
+	 * @return false|string
+	 */
+	public function replacement_ol( $arg, $contact_id ) {
+		return $this->replacement_meta( "$arg|ol", $contact_id );
+	}
+
+	/**
+	 * Format a custom field as an unordered list <ul>
+	 *
+	 * @return false|string
+	 */
+	public function replacement_ul( $arg, $contact_id ) {
+		return $this->replacement_meta( "$arg|ul", $contact_id );
 	}
 
 	/**
