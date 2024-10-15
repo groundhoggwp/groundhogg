@@ -2734,4 +2734,13 @@ button:has(.gh-dropdown-menu) {
   margin: 0;
 }
 
+.has-hover-actions .hover-actions {
+  visibility: hidden;
+  opacity: 0;
+}
+.has-hover-actions:hover .hover-actions {
+  visibility: visible;
+  opacity: 1;
+}
+
 /*# sourceMappingURL=elements.css.map */
