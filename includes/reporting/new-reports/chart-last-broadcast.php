@@ -7,7 +7,6 @@ use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 class Chart_Last_Broadcast extends Base_Doughnut_Chart_Report {
 
 	use Broadcast_Stats;
-
 	protected function get_chart_data() {
 
 		[

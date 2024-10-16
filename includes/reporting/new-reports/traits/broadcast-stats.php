@@ -99,10 +99,8 @@ trait Broadcast_Stats {
 			return false;
 		}
 
-		$last_broadcast     = array_shift( $all_broadcasts );
-		$last_broadcast_id  = absint( $last_broadcast->ID );
-		$this->broadcast_id = $last_broadcast_id;
-		$this->broadcast    = new Broadcast( $this->broadcast_id );
+		$last_broadcast  = array_shift( $all_broadcasts );
+		$this->broadcast = new Broadcast( $last_broadcast );
 
 		return $this->broadcast;
 	}
@@ -115,6 +113,4 @@ trait Broadcast_Stats {
 			html()->e( 'p', [], __( 'Send a broadcast first.', 'groundhogg' ) )
 		] );
 	}
-
-
 }
