@@ -349,7 +349,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.7.0.2 (2024-10-04) =
+= 3.7.0.2 (2024-10-16) =
 * ADDED `{andList}`, `{orList}`, `{ol}`, and `{ul}` formatting replacement codes.
 * ADDED Additional datasets for the New Contacts report and the Email Activity report
 * FIXED Tooltips on charts not working
