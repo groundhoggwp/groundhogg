@@ -592,7 +592,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			</div>
 			<?php do_action( 'groundhogg/steps/sortable/inside', $step, $this ); ?>
 			<?php do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step ); ?>
-			<div class="actions">
+			<div class="actions has-box-shadow">
 				<!-- DUPLICATE -->
 				<button title="Duplicate" type="button" class="gh-button secondary text icon duplicate-step">
 					<span class="dashicons dashicons-admin-page"></span>
@@ -606,10 +606,26 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				<?php if ( $step->has_errors() || $this->has_errors() ): ?>
 					<img class="hndle-icon error"
 					     src="<?php echo $this->get_error_icon(); ?>">
-				<?php else: ?>
-					<img class="hndle-icon"
-					     src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-				<?php endif; ?>
+				<?php else:
+
+                    $icon = $this->get_icon();
+
+                    if ( $icon && str_ends_with( $icon, '.svg' ) ){
+
+                        // get the absolute path of the svg file relative to wp-content
+                        $icon_path = str_replace( home_url( '/wp-content' ), WP_CONTENT_DIR, $icon );
+
+                        echo html()->e( 'div', [
+                                'class' => 'hndle-icon'
+                        ], file_get_contents( $icon_path ) );
+                    } else {
+	                    ?>
+                        <img class="hndle-icon"
+                             src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+	                    <?php
+                    }
+
+                    endif; ?>
 				<div>
 					<?php
 					echo html()->e( 'span', [

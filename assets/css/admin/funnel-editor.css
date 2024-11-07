@@ -441,7 +441,7 @@ button.button.save-button {
   top: 0;
   right: 0;
   left: 0;
-  padding: 0 20px;
+  padding: 0 20px 0 30px;
   box-sizing: border-box;
   position: absolute;
   overflow-y: scroll;
@@ -511,10 +511,19 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #9ece38;
 }
+#step-flow .step.action + .step.action::before {
+  position: absolute;
+  content: "";
+  border-right: 3px dashed #9ece38;
+  z-index: -1;
+  height: 20px;
+  left: 50%;
+  transform: translateY(-100%);
+}
 #step-flow .step {
   border-radius: 5px;
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
-  margin: 10px 0;
+  margin: 20px 0;
   background: white;
   border: 2px solid transparent;
   cursor: pointer;
@@ -524,10 +533,14 @@ button.button.save-button {
 }
 #step-flow .step .actions {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  right: 0;
+  top: 0;
+  transform: translateY(-50%);
   display: flex;
   visibility: hidden;
+  background-color: #ffffff;
+  border-radius: 5px;
+  z-index: 99;
 }
 #step-flow .step .actions button.gh-button {
   padding: 5px;
@@ -543,6 +556,7 @@ button.button.save-button {
   right: 3px;
   bottom: 3px;
   gap: 3px;
+  z-index: 2;
 }
 #step-flow .step .step-labels .step-label {
   font-size: 10px;
@@ -572,51 +586,56 @@ button.button.save-button {
 #step-flow .step.has-errors.active {
   border-color: #ffee58 !important;
 }
-#step-flow .step > .hndle {
-  padding: 10px 55px 10px 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-#step-flow .step > .hndle:has([src*=svg]) {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-}
 #step-flow .step > .hndle .hndle-icon {
+  position: absolute;
   width: 40px;
   height: 40px;
+  transform: translateX(-50%) translateY(-50%);
+  top: 50%;
+  z-index: 2;
 }
-#step-flow .step > .hndle .hndle-icon[src*=svg] {
-  width: 50px;
-  height: 50px;
-}
-#step-flow .step > .hndle > div {
+#step-flow .step > .hndle > div:not(.hndle-icon) {
   display: flex;
   flex-direction: column;
+  margin: 5px;
+  padding: 5px 5px 5px 25px;
+  z-index: 1;
+  position: relative;
+  background: #fff;
 }
-#step-flow .step > .hndle > div span.step-title {
+#step-flow .step > .hndle > div:not(.hndle-icon) span.step-title {
   font-size: 14px;
 }
-#step-flow .step > .hndle > div span.step-title code {
+#step-flow .step > .hndle > div:not(.hndle-icon) span.step-title code {
   border-radius: 4px;
   padding: 1px 3px;
 }
-#step-flow .step > .hndle > div span.step-name {
+#step-flow .step > .hndle > div:not(.hndle-icon) span.step-name {
   /*margin-left:6px;*/
   font-size: 8px;
   font-weight: 500;
   text-transform: uppercase;
 }
-#step-flow .step.benchmark {
-  border-left-color: #f58115;
+#step-flow .step.benchmark .hndle-icon {
+  border-radius: 5px;
+  background-color: white;
+  border: 2px solid #f58115;
+  box-sizing: border-box;
 }
-#step-flow .step.benchmark .hndle-icon,
+#step-flow .step.benchmark .hndle-icon svg {
+  fill: #000;
+}
 #step-flow .step.benchmark span.step-name {
   color: #f58115;
 }
 #step-flow .step.benchmark.active {
   border-color: #f58115;
+}
+#step-flow .step.benchmark.active .hndle-icon {
+  background-color: #f58115;
+}
+#step-flow .step.benchmark.active .hndle-icon svg {
+  fill: #fff;
 }
 #step-flow .step.benchmark .step-labels .step-label {
   background-color: #f58115;
@@ -636,14 +655,34 @@ button.button.save-button {
   transform: translateX(-50%);
   background-color: #f58115;
 }
-#step-flow .step.action {
-  border-left-color: #9ece38;
+#step-flow .step.action .hndle-icon {
+  border-radius: 50px;
+  background-color: white;
+  border: 2px solid #9ece38;
+  box-sizing: border-box;
+}
+#step-flow .step.action .hndle-icon svg {
+  fill: #000;
+}
+#step-flow .step.action.delay_timer, #step-flow .step.action.date_timer, #step-flow .step.action.field_timer, #step-flow .step.action.advanced_timer, #step-flow .step.action.delay_timer {
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 10px;
+}
+#step-flow .step.action.delay_timer .step-title, #step-flow .step.action.date_timer .step-title, #step-flow .step.action.field_timer .step-title, #step-flow .step.action.advanced_timer .step-title, #step-flow .step.action.delay_timer .step-title {
+  font-size: 13px !important;
 }
 #step-flow .step.action span.step-name {
   color: #9ece38;
 }
 #step-flow .step.action.active {
   border-color: #9ece38;
+}
+#step-flow .step.action.active .hndle-icon {
+  background-color: #9ece38;
+}
+#step-flow .step.action.active .hndle-icon svg {
+  fill: #fff;
 }
 
 #step-flow .step.step h2 {

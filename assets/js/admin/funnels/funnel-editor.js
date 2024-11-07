@@ -27,6 +27,14 @@
 
   const funnelId = parseInt(Funnel.id)
 
+  const removePathFromSvgsInStepFlow = () => {
+    document.querySelectorAll( '#step-flow svg path' ).forEach( el => {
+      el.removeAttribute( 'class' )
+      console.log(el)
+    })
+
+  }
+
   const getFunnel = () => FunnelsStore.get(funnelId)
 
   $.extend(funnel, {
@@ -55,6 +63,8 @@
     },
 
     init: async function () {
+
+      // removePathFromSvgsInStepFlow()
 
       var self = this
 
@@ -444,6 +454,8 @@
 
         self.getSettings().html(response.data.settings)
         self.getSteps().html(response.data.sortable)
+
+        // removePathFromSvgsInStepFlow()
 
         $(document).trigger('new-step')
 

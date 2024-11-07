@@ -609,7 +609,7 @@ button.button.save-button {
     top: 0;
     right: 0;
     left: 0;
-    padding: 0 20px;
+    padding: 0 20px 0 30px;
     box-sizing: border-box;
     position: absolute;
     overflow-y: scroll;
@@ -686,10 +686,26 @@ button.button.save-button {
     }
   }
 
+  .step.action + .step.action {
+
+    //margin-top: 40px;
+
+    &::before {
+      position: absolute;
+      content: '';
+      border-right: 3px dashed $action-green;
+      z-index: -1;
+      height: 20px;
+      left: 50%;
+      transform: translateY(-100%);
+      //background-color: $action-green;
+    }
+  }
+
   .step {
     border-radius: 5px;
     box-shadow: $box-shadow;
-    margin: 10px 0;
+    margin: 20px 0;
     background: white;
     border: 2px solid transparent;
     cursor: pointer;
@@ -702,10 +718,16 @@ button.button.save-button {
 
     .actions {
       position: absolute;
-      top: 3px;
-      right: 3px;
+      //top: 3px;
+      right: 0;
+      top: 0;
+      transform: translateY(-50%);
       display: flex;
+      //flex-direction: column;
       visibility: hidden;
+      background-color: #ffffff;
+      border-radius: 5px;
+      z-index: 99;
 
       button.gh-button {
         padding: 5px;
@@ -725,6 +747,7 @@ button.button.save-button {
       right: 3px;
       bottom: 3px;
       gap: 3px;
+      z-index: 2;
 
       .step-label {
         font-size: 10px;
@@ -763,30 +786,28 @@ button.button.save-button {
     }
 
     > .hndle {
-      padding: 10px 55px 10px 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      &:has([src*="svg"]) {
-        padding-top: 5px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-      }
+      //padding: 10px;
+      //display: flex;
+      //align-items: center;
+      //gap: 10px;
 
       .hndle-icon {
+        position: absolute;
         width: 40px;
         height: 40px;
-
-        &[src*="svg"] {
-          width: 50px;
-          height: 50px;
-        }
+        transform: translateX(-50%) translateY(-50%);
+        top: 50%;
+        z-index: 2;
       }
 
-      > div {
+      > div:not(.hndle-icon) {
         display: flex;
         flex-direction: column;
+        margin: 5px;
+        padding: 5px 5px 5px 25px;
+        z-index: 1;
+        position: relative;
+        background: #fff;
 
         span.step-title {
           font-size: 14px;
@@ -808,15 +829,33 @@ button.button.save-button {
     }
 
     &.benchmark {
-      border-left-color: $benchmark-orange;
+      //border-left-color: $benchmark-orange;
 
-      .hndle-icon,
+      .hndle-icon{
+        border-radius: 5px;
+        background-color: white;
+        border: 2px solid $benchmark-orange;
+        box-sizing: border-box;
+
+        svg {
+          fill: #000;
+        }
+      }
+
       span.step-name {
         color: $benchmark-orange;
       }
 
       &.active {
         border-color: $benchmark-orange;
+
+        .hndle-icon{
+          background-color: $benchmark-orange;
+
+          svg {
+            fill: #fff;
+          }
+        }
       }
 
       .step-labels .step-label {
@@ -836,7 +875,32 @@ button.button.save-button {
     }
 
     &.action {
-      border-left-color: $action-green;
+      //border-left-color: $action-green;
+
+      .hndle-icon{
+        border-radius: 50px;
+        background-color: white;
+        border: 2px solid $action-green;
+        box-sizing: border-box;
+
+        svg {
+          fill: #000;
+        }
+      }
+
+      &.delay_timer,
+      &.date_timer,
+      &.field_timer,
+      &.advanced_timer,
+      &.delay_timer{
+        margin-left: 20px;
+        margin-right: 20px;
+        border-radius: 10px;
+
+        .step-title{
+          font-size: 13px !important;
+        }
+      }
 
       span.step-name {
         color: $action-green;
@@ -844,6 +908,14 @@ button.button.save-button {
 
       &.active {
         border-color: $action-green;
+
+        .hndle-icon{
+          background-color: $action-green;
+
+          svg {
+            fill: #fff;
+          }
+        }
       }
     }
   }
