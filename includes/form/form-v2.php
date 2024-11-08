@@ -1009,6 +1009,10 @@ class Form_v2 extends Step {
 				'retrieve' => function ( Submission $submission, $field ) {
 					$value = standard_meta_retrieve( $submission, $field );
 
+					if ( ! is_array( $value ) ) {
+						return $value;
+					}
+
 					return implode( ', ', $value );
 				}
 			],
@@ -1131,7 +1135,7 @@ class Form_v2 extends Step {
 
 					$access_url = file_access_url( '/uploads/' . $submission->get_contact()->get_upload_folder_basename() . '/' . $filename );
 
-					if ( current_user_can( 'view_contact', $submission->get_contact() ) ){
+					if ( current_user_can( 'view_contact', $submission->get_contact() ) ) {
 						$access_url = add_query_arg( 'contact', $submission->get_contact_id(), $access_url );
 					}
 
