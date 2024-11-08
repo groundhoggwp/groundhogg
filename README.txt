@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.6
 Requires PHP: 7.1
-Stable tag: 3.7.0.2
+Stable tag: 3.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.7.1 (2024-11-18) =
+* IMPROVED Funnel step flow UI.
+* ADDED `{substr}` replacement code.
+* ADDED Nested meta key support for meta replacement codes using dot notation. Example `{meta.custom_object.some_key}`.
+* ADDED WPCLI functions for managing licenses.
+* FIXED Small UI issue for tooltips not showing as connected to their arrows.
 
 = 3.7.0.2 (2024-10-16) =
 * ADDED `{andList}`, `{orList}`, `{ol}`, and `{ul}` formatting replacement codes.
