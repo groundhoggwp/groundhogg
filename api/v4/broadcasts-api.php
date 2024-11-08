@@ -2,7 +2,6 @@
 
 namespace Groundhogg\Api\V4;
 
-use Elementor\Tracker;
 use Groundhogg\Broadcast;
 use Groundhogg\Campaign;
 use Groundhogg\Email;
@@ -12,7 +11,6 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use function Groundhogg\create_object_from_type;
-use function Groundhogg\db;
 use function Groundhogg\get_db;
 
 // Exit if accessed directly
@@ -94,7 +92,7 @@ class Broadcasts_Api extends Base_Object_Api {
 			$meta['batch_interval']        = sanitize_text_field( $request->get_param( 'batch_interval' ) );
 			$meta['batch_interval_length'] = absint( $request->get_param( 'batch_interval_length' ) );
 			$meta['batch_amount']          = absint( $request->get_param( 'batch_amount' ) );
-			$meta['batch_delay']          = 0; // initialize batch offset at 0
+			$meta['batch_delay']           = 0; // initialize batch offset at 0
 		}
 
 		if ( $date->getTimestamp() < time() ) {
@@ -165,13 +163,18 @@ class Broadcasts_Api extends Base_Object_Api {
 			$tracker = new Micro_Time_Tracker();
 
 			// schedule 5 seconds worth. Should cover most small broadcasts
-			while ( $broadcast->is_pending() && $tracker->time_elapsed() < 5 ){
+			while ( $broadcast->is_pending() && $tracker->time_elapsed() < 5 ) {
 				$broadcast->enqueue_batch();
 			}
 		}
 
 		// If the broadcast is still pending, create a background task
 		$broadcast->maybe_schedule_in_background();
+
+		wp_send_json( [
+			'status' => 'success',
+			'item'   => $broadcast
+		] );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $broadcast

@@ -14,8 +14,23 @@ class Cleanup_Actions {
 		add_action( 'groundhogg/cleanup', [ $this, 'fix_unprocessed_tasks' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'delete_expired_permission_keys' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'purge_email_logs' ] );
+		add_action( 'groundhogg/cleanup', [ $this, 'handle_sent_broadcasts' ] );
 	}
 
+	/**
+	 * Fix broadcasts that might have their status stuck in 'sending'
+	 *
+	 * @return void
+	 */
+	public function handle_sent_broadcasts() {
+		Broadcast::transition_from_sending_to_sent();
+	}
+
+	/**
+	 * Schedules the cron event for WordPress
+	 *
+	 * @return void
+	 */
 	public function schedule_event() {
 		if ( wp_next_scheduled( 'groundhogg/cleanup' ) ) {
 			return;

@@ -1599,12 +1599,12 @@ class Contact_Query extends Table_Query {
 					break;
 				case 'marketable':
 
-					if ( $value === true || $value === 'yes' ) {
+					if ( $value === true || $value === 'yes' || $value == 1 ) {
 						self::marketable( $where );
 						break;
 					}
 
-					if ( $value === false || $value === 'no' ) {
+					if ( $value === false || $value === 'no' || $value == 0 ) {
 						self::not_marketable( $where );
 						break;
 					}

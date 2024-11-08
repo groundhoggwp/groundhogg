@@ -8,6 +8,7 @@ use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use GroundhoggSMS\Classes\SMS;
 
@@ -273,11 +274,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_meta( 'segment_type' ) === 'dynamic' ) {
-			$added = Background_Tasks::add( new Schedule_Broadcast( $this->get_id() ), $this->get_send_time() );
-		} else {
-			$added = Background_Tasks::schedule_pending_broadcast( $this->get_id() );
-		}
+		$added = Background_Tasks::add(
+			new Schedule_Broadcast( $this->get_id() ),
+			$this->get_meta( 'segment_type' ) === 'dynamic'
+				? $this->get_send_time()
+				: time()
+		);
 
 		if ( is_wp_error( $added ) ) {
 			return $added;
@@ -372,7 +374,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function is_schedulable() {
 		return ( $this->status_is( 'pending' )
-		       || $this->status_is( 'sending' ) ) && ! $this->is_scheduled();
+		         || $this->status_is( 'sending' ) ) && ! $this->is_scheduled();
 	}
 
 	/**
@@ -409,14 +411,15 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$query['offset']     = $offset;
 		$query['found_rows'] = true;
 
+		$c_query = new Contact_Query( $query );
+		$c_query->setOrderby( [ 'ID', 'ASC' ] )->setGroupby( 'ID' );
+		$contacts = $c_query->query( null, true );
+		$total    = $c_query->found_items;
+
 		$batch_interval        = $this->get_meta( 'batch_interval' );
 		$batch_interval_length = absint( $this->get_meta( 'batch_interval_length' ) );
 		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100;
 		$batch_delay           = absint( $this->get_meta( 'batch_delay' ) ) ?: 0;
-
-		$c_query  = new Contact_Query( $query );
-		$contacts = $c_query->query( null, true );
-		$total    = $c_query->found_items;
 
 		// No contacts to send to?
 		if ( $total === 0 ) {
@@ -555,7 +558,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// We're not done sending events yet
-		if ( $this->has_pending_events() ){
+		if ( $this->has_pending_events() ) {
 			return false;
 		}
 
@@ -567,6 +570,28 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$this->update( [ 'status' => 'sent' ] );
 
 		return true;
+	}
+
+	/**
+	 * Transition broadcasts from sending to sent
+	 *
+	 * @throws DB\Query\FilterException
+	 * @return void
+	 */
+	public static function transition_from_sending_to_sent() {
+
+		$sending = db()->broadcasts->query( [
+			'status' => 'sending'
+		] );
+
+		if ( empty( $sending ) ) {
+			return;
+		}
+
+		foreach ( $sending as $broadcast ) {
+			$broadcast = new Broadcast( $broadcast );
+			$broadcast->maybe_set_status_to_sent();
+		}
 	}
 
 	/**
@@ -618,7 +643,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		if ( ! $this->status_is( 'sending' ) ) {
 
 			// directly from pending
-			if ( $this->is_pending() ){
+			if ( $this->is_pending() ) {
 				// set the status to schedule first to run any hooks temporarily
 				$this->update( [ 'status' => 'scheduled' ] );
 			}
@@ -627,9 +652,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			$this->update( [ 'status' => 'sending' ] );
 		}
 
-		if ( ! self::$sent_hook_set ){
-			// set a hook after the event queue has finished processing to see if the broadcast is done sending.
-			add_action( 'groundhogg/event_queue/after_process', [ $this, 'maybe_set_status_to_sent' ] );
+		if ( ! self::$sent_hook_set ) {
+			add_action( 'groundhogg/queue/processed_events', [ __CLASS__, 'transition_from_sending_to_sent' ] );
 			self::$sent_hook_set = true;
 		}
 
@@ -754,9 +778,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 * @return array
 	 */
 	public function get_as_array() {
+
+		$date = new DateTimeHelper( $this->get_send_time() );
+
 		return array_merge( parent::get_as_array(), [
 			'object'           => $this->get_object(),
-			'date_sent_pretty' => format_date( convert_to_local_time( $this->get_send_time() ) )
+			'date_sent_pretty' => $date->wpDateTimeFormat()
 		] );
 	}
 
