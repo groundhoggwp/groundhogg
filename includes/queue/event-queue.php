@@ -182,8 +182,6 @@ class Event_Queue extends Supports_Errors {
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit( apply_filters( 'groundhogg/event_queue/max_time_limit', MINUTE_IN_SECONDS ) );
 
-		$this->store = new Event_Store_V2();
-
 		do_action( 'groundhogg/event_queue/before_process' );
 
 		$this->process();
@@ -216,6 +214,10 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected function process() {
 
+		if ( ! $this->store ){
+			$this->store = new Event_Store_V2();
+		}
+
 		self::set_is_processing( true );
 
 		while ( ! Limits::limits_exceeded() ){
@@ -237,10 +239,6 @@ class Event_Queue extends Supports_Errors {
 				$contact = $event->get_contact();
 
 				if ( ! is_a_contact( $contact ) ) {
-
-					// Delete the event
-//					$event->delete();
-
 					continue;
 				}
 
@@ -262,10 +260,14 @@ class Event_Queue extends Supports_Errors {
 				}
 
 				Limits::processed_action();
-
 			}
 
 			$this->store->release_events();
+
+			/**
+			 * When a batch of events is finished processing
+			 */
+			do_action( 'groundhogg/queue/processed_event_batch' );
 		}
 
 		/**
