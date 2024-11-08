@@ -2,7 +2,9 @@
 
 namespace Groundhogg\Cli;
 
+use Groundhogg\Event;
 use function Groundhogg\_nf;
+use function Groundhogg\db;
 use function Groundhogg\event_queue;
 use function WP_CLI\Utils\make_progress_bar;
 
@@ -34,8 +36,22 @@ class Queue {
 	 */
 	function process(){
 
+		$pending = db()->event_queue->count([
+			'status' => Event::WAITING
+		]);
+
+		if ( ! $pending ){
+			\WP_CLI::success( 'The event queue is empty!' );
+			return;
+		}
+
+		$spinner = new \cli\notify\Spinner( sprintf( 'Processing ~%s events. This might take a while...' , _nf( $pending ) ) );
+
+		add_action( 'groundhogg/event/run/after', [ $spinner, 'tick' ] );
+
 		$completed = event_queue()->run_queue();
 		$failed    = count( event_queue()->get_errors() );
+		$spinner->finish();
 
 		\WP_CLI::success( sprintf( '%s events completed. %s failed.', _nf( $completed ), _nf( $failed ) ) );
 	}
@@ -60,6 +76,7 @@ class Queue {
 	 */
 	function pause( $args, $assoc_args ) {
 		// todo implement
+		\WP_CLI::error( 'This method has not yet been implemented.' );
 	}
 
 	/**
@@ -85,6 +102,7 @@ class Queue {
 	 */
 	function unpause( $args, $assoc_args ) {
 		// todo implement
+		\WP_CLI::error( 'This method has not yet been implemented.' );
 	}
 
 	/**
@@ -107,6 +125,7 @@ class Queue {
 	 */
 	function cancel( $args, $assoc_args ) {
 		// todo implement
+		\WP_CLI::error( 'This method has not yet been implemented.' );
 	}
 
 }
