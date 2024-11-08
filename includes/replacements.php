@@ -556,7 +556,7 @@ class Replacements implements \JsonSerializable {
 				'code'         => 'ul',
 				'group'        => 'formatting',
 				'default_args' => 'meta_key',
-				'callback'     => [ $this, 'replacement_ol' ],
+				'callback'     => [ $this, 'replacement_ul' ],
 				'name'         => __( 'Unordered List', 'groundhogg' ),
 				'description'  => _x( 'Formats a custom field like checkboxes as an unordered list.', 'replacement', 'groundhogg' ),
 			],
