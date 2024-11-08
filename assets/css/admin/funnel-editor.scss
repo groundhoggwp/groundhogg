@@ -24,6 +24,7 @@ $benchmark-orange-5: rgba(245, 129, 21, 0.05);
 $action-green-dark: rgb(90, 131, 3);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
+$action-green-25: rgba(158, 206, 56, 0.25);
 $action-green-5: rgba(158, 206, 56, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(04, 45, 70, 0.05);
 $background-color: #F6F9FB;
@@ -677,12 +678,25 @@ button.button.save-button {
 
   .step.benchmark + .step.action {
 
-    margin-top: 40px;
+    margin-top: 60px;
 
     &::before {
       content: "Then...";
       @include above-text;
       background-color: $action-green;
+      top: -45px;
+    }
+
+    &::after {
+      position: absolute;
+      content: '';
+      //border-right: 3px dashed $action-green;
+      border-right: 2px dashed $action-green;
+      z-index: -1;
+      top: -32px;
+      height: 30px;
+      left: 50%;
+      //background-color: $action-green;
     }
   }
 
@@ -690,14 +704,15 @@ button.button.save-button {
 
     //margin-top: 40px;
 
-    &::before {
+    &::after {
       position: absolute;
       content: '';
-      border-right: 3px dashed $action-green;
+      //border-right: 3px dashed $action-green;
+      border-right: 2px dashed $action-green;
       z-index: -1;
+      top: -32px;
       height: 30px;
       left: 50%;
-      transform: translateY(-100%);
       //background-color: $action-green;
     }
   }
@@ -838,9 +853,21 @@ button.button.save-button {
 
       .hndle-icon{
         border-radius: 5px;
-        background-color: white;
+        background-color: #fff;
         border: 2px solid $benchmark-orange;
         box-sizing: border-box;
+        //position: relative;
+
+        &::after {
+          content: '';
+          background-color: $benchmark-orange-25;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          left: 0;
+          border-radius: 2px;
+        }
 
         svg {
           fill: #000;
@@ -887,6 +914,17 @@ button.button.save-button {
         background-color: white;
         border: 2px solid $action-green;
         box-sizing: border-box;
+
+        &::after {
+          content: '';
+          border-radius: 50px;
+          background-color: $action-green-25;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          left: 0;
+        }
 
         svg {
           fill: #000;

@@ -497,7 +497,7 @@ button.button.save-button {
   background-color: #6c19ad;
 }
 #step-flow .step.benchmark + .step.action {
-  margin-top: 40px;
+  margin-top: 60px;
 }
 #step-flow .step.benchmark + .step.action::before {
   content: "Then...";
@@ -510,15 +510,25 @@ button.button.save-button {
   left: 50%;
   transform: translateX(-50%);
   background-color: #9ece38;
+  top: -45px;
 }
-#step-flow .step.action + .step.action::before {
+#step-flow .step.benchmark + .step.action::after {
   position: absolute;
   content: "";
-  border-right: 3px dashed #9ece38;
+  border-right: 2px dashed #9ece38;
   z-index: -1;
+  top: -32px;
   height: 30px;
   left: 50%;
-  transform: translateY(-100%);
+}
+#step-flow .step.action + .step.action::after {
+  position: absolute;
+  content: "";
+  border-right: 2px dashed #9ece38;
+  z-index: -1;
+  top: -32px;
+  height: 30px;
+  left: 50%;
 }
 #step-flow .step {
   border-radius: 5px;
@@ -622,9 +632,19 @@ button.button.save-button {
 }
 #step-flow .step.benchmark .hndle-icon {
   border-radius: 5px;
-  background-color: white;
+  background-color: #fff;
   border: 2px solid #f58115;
   box-sizing: border-box;
+}
+#step-flow .step.benchmark .hndle-icon::after {
+  content: "";
+  background-color: rgba(245, 129, 21, 0.25);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  border-radius: 2px;
 }
 #step-flow .step.benchmark .hndle-icon svg {
   fill: #000;
@@ -664,6 +684,16 @@ button.button.save-button {
   background-color: white;
   border: 2px solid #9ece38;
   box-sizing: border-box;
+}
+#step-flow .step.action .hndle-icon::after {
+  content: "";
+  border-radius: 50px;
+  background-color: rgba(158, 206, 56, 0.25);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
 #step-flow .step.action .hndle-icon svg {
   fill: #000;
