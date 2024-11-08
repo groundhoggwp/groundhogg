@@ -942,6 +942,11 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+        if ( empty( $this->get_items() ) ){
+
+            return new \WP_Error( 'no_items', 'You must select at least one contact to edit.' );
+        }
+
 		return admin_page_url( 'gh_contacts', [
 			'action'  => 'bulk_edit',
 			'include' => implode( ',', $this->get_items() )
