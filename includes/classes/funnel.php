@@ -375,7 +375,7 @@ class Funnel extends Base_Object_With_Meta {
 	 *
 	 * @return Step[]
 	 */
-	public function get_entry_steps(){
+	public function get_entry_steps() {
 		return array_filter( $this->get_steps(), function ( $step ) {
 			return $step->is_starting() || $step->is_entry();
 		} );
@@ -406,11 +406,11 @@ class Funnel extends Base_Object_With_Meta {
 	 *
 	 * @return Email[]
 	 */
-	public function get_emails(){
-		return array_filter( array_map( function ( Step $step ){
+	public function get_emails() {
+		return array_filter( array_map( function ( Step $step ) {
 
 			$email_id = $step->get_meta( 'email_id' );
-			if ( ! $email_id ){
+			if ( ! $email_id ) {
 				return false;
 			}
 
@@ -428,6 +428,17 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_step_ids( $query = [] ) {
 		return get_object_ids( $this->get_steps( $query ) );
+	}
+
+	/**
+	 * Get the total number of steps in the funnel
+	 *
+	 * @return array|bool|int|object|null
+	 */
+	public function get_num_steps() {
+		return db()->steps->count( [
+			'funnel_id' => $this->get_id(),
+		] );
 	}
 
 	/**

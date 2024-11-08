@@ -175,6 +175,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return (bool) $this->is_entry;
 	}
 
+	public function is_last() {
+		return $this->get_order() === $this->get_funnel()->get_num_steps();
+	}
+
 	/**
 	 * @var Funnel
 	 */
