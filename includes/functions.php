@@ -1869,6 +1869,55 @@ function split_name( $name ) {
 }
 
 /**
+ * Split on the last n occurrences of a delimiter
+ *
+ * @param $string
+ * @param $delimiter
+ *
+ * @return array
+ */
+function split_last($string, $delimiter, $n = 1) {
+	// Initialize an array to store positions of the last N occurrences
+	$positions = array();
+	$offset = 0;
+
+	// Find the positions of the last N occurrences of the delimiter
+	while ($n > 0) {
+		$pos = strrpos($string, $delimiter, $offset);
+
+		// If no more occurrences are found, break out of the loop
+		if ($pos === false) {
+			break;
+		}
+
+		// Store the position and update the offset to continue searching backwards
+		$positions[] = $pos;
+		$offset = $pos - strlen($string) - 1;
+		$n--;
+	}
+
+	// If we found fewer than N delimiters, return the whole string as a single part
+	if (count($positions) === 0) {
+		return array($string);
+	}
+
+	// Split the string based on the found positions
+	$parts = array();
+	$start = 0;
+
+	// Iterate over the positions in reverse order to build parts from left to right
+	foreach (array_reverse($positions) as $pos) {
+		$parts[] = substr($string, $start, $pos - $start);
+		$start = $pos + strlen($delimiter);
+	}
+
+	// Add the remaining part after the last delimiter
+	$parts[] = substr($string, $start);
+
+	return $parts;
+}
+
+/**
  * Detect the CSV delimiter of a CSV file.
  *
  * @param $file_path
