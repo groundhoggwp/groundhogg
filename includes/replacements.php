@@ -560,6 +560,14 @@ class Replacements implements \JsonSerializable {
 				'name'         => __( 'Unordered List', 'groundhogg' ),
 				'description'  => _x( 'Formats a custom field like checkboxes as an unordered list.', 'replacement', 'groundhogg' ),
 			],
+			[
+				'code'         => 'substr',
+				'group'        => 'formatting',
+				'default_args' => '{replacement}',
+				'callback'     => [ $this, 'replacement_substring' ],
+				'name'         => __( 'Sub string', 'groundhogg' ),
+				'description'  => _x( 'Returns a substring of the inner replacement code.', 'replacement', 'groundhogg' ),
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -2579,6 +2587,18 @@ class Replacements implements \JsonSerializable {
 	public function replacement_ul( $arg, $contact_id ) {
 		return $this->replacement_meta( "$arg|ul", $contact_id );
 	}
+
+	/**
+     * Substring format of inner replacement code
+     *
+	 * @param $arg
+	 *
+	 * @return false|string
+	 */
+    public function replacement_substring( $arg ) {
+        $args = split_last( $arg, ',', 2 );
+	    return substr( $args[1], $args[1], $args[2] );
+    }
 
 	/**
 	 * We don't want this to be serialized
