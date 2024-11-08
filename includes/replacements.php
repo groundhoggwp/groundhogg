@@ -1043,6 +1043,11 @@ class Replacements implements \JsonSerializable {
 
 	/**
 	 * Return the contact meta
+     *
+     * usage is {meta.meta_key}
+     * or for serialized date you can do {meta.some_array.key}
+     *
+     * Additionally add a format function like {meta.some_array|ol}
 	 *
 	 * @param $contact_id int
 	 * @param $arg        string the meta key
@@ -1054,11 +1059,19 @@ class Replacements implements \JsonSerializable {
 			return '';
 		}
 
-		$parts    = explode( '|', $arg );
-		$meta_key = get_array_var( $parts, 0 );
-		$format   = get_array_var( $parts, 1 );
+		$parts  = explode( '|', $arg );
+		$format = get_array_var( $parts, 1 );
 
-		$value = $this->get_current_contact()->get_meta( $meta_key );
+		// support for serialized objects
+		$nested_keys = explode( '.', get_array_var( $parts, 0 ) );
+		$root_key    = array_shift( $nested_keys );
+
+		$value = $this->get_current_contact()->get_meta( $root_key );
+
+		while ( ! empty( $nested_keys ) && is_iterable( $value ) ) {
+			$key   = array_shift( $nested_keys );
+			$value = $value[ $key ];
+		}
 
 		switch ( $format ) {
 			default:
