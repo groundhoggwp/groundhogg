@@ -516,14 +516,14 @@ button.button.save-button {
   content: "";
   border-right: 3px dashed #9ece38;
   z-index: -1;
-  height: 20px;
+  height: 30px;
   left: 50%;
   transform: translateY(-100%);
 }
 #step-flow .step {
   border-radius: 5px;
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
-  margin: 20px 0;
+  margin: 30px 0;
   background: white;
   border: 2px solid transparent;
   cursor: pointer;
@@ -593,6 +593,10 @@ button.button.save-button {
   transform: translateX(-50%) translateY(-50%);
   top: 50%;
   z-index: 2;
+}
+#step-flow .step > .hndle .hndle-icon svg {
+  width: 100%;
+  height: 100%;
 }
 #step-flow .step > .hndle > div:not(.hndle-icon) {
   display: flex;
@@ -829,6 +833,7 @@ button.button.save-button {
   justify-content: center;
   position: sticky;
   bottom: 10px;
+  z-index: 10;
 }
 .add-step-bottom-wrap button {
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
