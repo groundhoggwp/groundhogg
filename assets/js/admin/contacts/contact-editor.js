@@ -511,25 +511,53 @@
     heading = __('Details'),
   } = {}) => {
 
-    if (Object.keys(details).length === 0) {
+    // object provided, parse to label => value
+    if (!Array.isArray(details)) {
+
+      let parsed = []
+      Object.keys(details).forEach((k) => {
+        parsed.push(( {
+          label: k,
+          value: details[k],
+        } ))
+      })
+      details = parsed
+
+    }
+
+    if (details.length === 0) {
       return ''
     }
 
-    return `<div class="gh-panel outlined closed activity-details overflow-hidden" style="margin-top: 5px">
-              <div class="gh-panel-header">
-                  <h2>${ heading }</h2>
-                  <button type="button" class="toggle-indicator" aria-expanded="false"></button>
-              </div>
-              <div class="inside" style="padding: 0">
-                  <table class="wp-list-table widefat striped" style="border: none">
-                      <tbody>
-                      ${ Object.keys(details).map(k => {
-      return `<tr><td>${ key(k) }</td><td>${ value(details[k]) }</td></tr>`
-    }).join('') }
-                      </tbody>
-                  </table>
-              </div>
-          </div>`
+    // language=HTML
+    return `
+        <div class="gh-panel outlined closed activity-details overflow-hidden" style="margin-top: 5px">
+            <div class="gh-panel-header">
+                <h2>${ heading }</h2>
+                <button type="button" class="toggle-indicator" aria-expanded="false"></button>
+            </div>
+            <div class="inside" style="padding: 0">
+                <table class="wp-list-table widefat striped" style="border: none">
+                    <tbody>
+                    ${ details.map( ({ label, value: val }) => {
+                        return `<tr><td>${ key(label) }</td><td>${ value(val) }</td></tr>`
+                    }).join('') }
+                    </tbody>
+                </table>
+            </div>
+        </div>`
+  }
+
+  const stepTypeIcon = ( type ) => {
+
+    const { svg, icon, name } = Groundhogg.rawStepTypes[step.data.step_type]
+
+    if ( svg ){
+      return svg;
+    }
+
+    return `<img class="step-icon" src="${ icon }" alt="${ name }"/>`
+
   }
 
   const ActivityTimeline = {
@@ -729,8 +757,8 @@
           }
 
           html.push(ActivityDetails(meta, {
-            key: k => `<code>${ k }</code>`,
-            value: v => JSON.stringify( v )
+            key  : k => `<code>${ k }</code>`,
+            value: v => JSON.stringify(v),
           }))
 
           return html.join('')
@@ -740,70 +768,115 @@
 
     renderActivity (activity) {
 
-      if (activity.type === 'submission' && activity.data.type === 'form') {
+      if (activity.type === 'submission') {
 
-        let funnel = FunnelsStore.get(activity.form.data.funnel_id)
-        // language=HTML
-        return `
-            <li class="activity-item">
-                <div class="activity-icon submission">${ icons.form }</div>
-                <div class="activity-rendered gh-panel">
-                    <div class="activity-info">
-                        ${ sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
-                                bold(activity.form.data.step_title), el('a', {
-                                    href  : funnel.admin + `#${ activity.data.step_id }`,
-                                    target: '_blank',
-                                }, bold(funnel.data.title))) }
-                        <div class="gh-panel outlined closed form-submission-details overflow-hidden" style="margin-top: 5px">
-                            <div class="gh-panel-header">
-                                <h2>${ __('Submission') }</h2>
-                                <button type="button" class="toggle-indicator" aria-expanded="false"></button>
-                            </div>
-                            <div class="inside" style="padding: 0">
-                                <table class="wp-list-table widefat striped" style="border: none">
-                                    <tbody>
-                                    ${ activity.i18n.answers.map(({
-                                        label,
-                                        value,
-                                    }) => {
-                                        return `<tr><th><b>${ label }</b></th><td>${ value }</td></tr>`
-                                    }).join('') }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="diff-time">
-                        ${ activity.i18n.diff_time }
-                    </div>
-                </div>
-            </li>`
-      }
+        const SubmissionActivityItem = ({
+          icon = '',
+          before = '',
+          heading = __('Data'),
+        }) => {
 
-      if (activity.type === 'submission' && activity.data.type === 'webhook') {
+          // language=HTML
+          return `
+              <li class="activity-item">
+                  <div class="activity-icon submission">${ icon }</div>
+                  <div class="activity-rendered gh-panel">
+                      <div class="activity-info">
+                          ${ before }
+                          ${ ActivityDetails(activity.i18n.answers, {
+                              heading,
+                          }) }
+                      </div>
+                      <div class="diff-time">
+                          ${ activity.i18n.diff_time }
+                      </div>
+                  </div>
+              </li>`
 
-        let funnel = FunnelsStore.get(activity.form.data.funnel_id)
-        // language=HTML
-        return `
-            <li class="activity-item">
-                <div class="activity-icon submission">${ icons.webhook }</div>
-                <div class="activity-rendered gh-panel">
-                    <div class="activity-info">
-                        ${ sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
-                                bold(activity.form.data.step_title), el('a', {
-                                    href  : funnel.admin + `#${ activity.data.step_id }`,
-                                    target: '_blank',
-                                }, bold(funnel.data.title))) }
-                        ${ ActivityDetails(activity.meta, {
-                            key    : k => `<code>${ k }</code>`,
-                            heading: __('Request'),
-                        }) }
-                    </div>
-                    <div class="diff-time">
-                        ${ activity.i18n.diff_time }
-                    </div>
-                </div>
-            </li>`
+        }
+
+        let funnel
+
+        if ( activity.form ){
+          funnel = FunnelsStore.get(activity.form.data.funnel_id)
+        }
+
+        switch (activity.data.type) {
+
+          case 'form':
+
+            return SubmissionActivityItem({
+              icon   : icons.form,
+              heading: __('Submission', 'groundhogg'),
+              before: sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
+                bold(activity.form.data.step_title), el('a', {
+                  href  : funnel.admin + `#${ activity.data.step_id }`,
+                  target: '_blank',
+                }, bold(funnel.data.title))),
+            })
+
+          case 'webhook':
+
+            return SubmissionActivityItem({
+              icon   : icons.webhook,
+              heading: __('Request', 'groundhogg'),
+              before: sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
+                bold(activity.form.data.step_title), el('a', {
+                  href  : funnel.admin + `#${ activity.data.step_id }`,
+                  target: '_blank',
+                }, bold(funnel.data.title)))
+            })
+
+          case 'webhook_response':
+
+            return SubmissionActivityItem({
+              icon   : icons.webhook,
+              heading: __('Response', 'groundhogg'),
+              before: sprintf(__('Received response from %s in funnel %s', 'groundhogg'),
+                bold(activity.form.data.step_title), el('a', {
+                  href  : funnel.admin + `#${ activity.data.step_id }`,
+                  target: '_blank',
+                }, bold(funnel.data.title)))
+            })
+
+          case 'api':
+
+            return SubmissionActivityItem({
+              icon   : icons.api,
+              heading: __('Request', 'groundhogg'),
+              before: __( 'Contact updated via REST API.', 'groundhogg' )
+            })
+
+          case 'import':
+
+            return SubmissionActivityItem({
+              icon   : '<span class="dashicons dashicons-upload"></span>',
+              heading: __('Data', 'groundhogg'),
+              before: sprintf( __( 'Contact imported from %s.', 'groundhogg' ), bold( activity.data.name ) )
+            })
+
+          default:
+
+            // support for form integrations
+            if ( activity.form ){
+              return SubmissionActivityItem({
+                icon   : stepTypeIcon( activity.form.data.step_type ),
+                heading: __('Submission', 'groundhogg'),
+                before: sprintf(__('Submitted %s in funnel %s', 'groundhogg'),
+                  bold(activity.data.name), el('a', {
+                    href  : funnel.admin + `#${ activity.data.step_id }`,
+                    target: '_blank',
+                  }, bold(funnel.data.title))),
+              })
+            }
+
+            // language=HTML
+            return SubmissionActivityItem({
+              icon: icons.contact,
+              before: sprintf( __( 'Contact updated by %s', 'groundhogg' ), bold( activity.data.name ) ),
+              heading: __('Data', 'groundhogg'),
+            })
+        }
       }
 
       if (activity.type === 'page_visit') {
@@ -857,7 +930,7 @@
                     <div class="activity-icon ${ step.data.step_group } ${ pending ? 'pending' : '' }">
                         ${ pending
                            ? icons.hourglass
-                           : `<img class="step-icon" src="${ Groundhogg.rawStepTypes[step.data.step_type].icon }" alt="${ Groundhogg.rawStepTypes[step.data.step_type].name }"/>` }
+                           : stepTypeIcon( step.data.step_type ) }
                     </div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
@@ -1360,9 +1433,9 @@
               })
 
             switch (filter) {
+              case 'form':
               case 'submissions':
-                allActivities = allActivities.filter(
-                  a => a.type === 'submission')
+                allActivities = allActivities.filter(a => a.type === 'submission')
                 break
               case 'funnel':
                 allActivities = allActivities.filter(
@@ -2377,8 +2450,8 @@
       $(document).on('click', '.gh-panel.outlined button.toggle-indicator', e => {
 
         // do not do for elements made with makeEl on this page
-        if ( e.currentTarget.makeEl === true ){
-          return;
+        if (e.currentTarget.makeEl === true) {
+          return
         }
 
         $(e.target).closest('.gh-panel.outlined').toggleClass('closed')
@@ -2522,27 +2595,30 @@
 
     const ContactRelationships = ({
       title,
-      rel = ''
+      rel = '',
     }) => Relationships({
       title,
-      id         : ContactEditor.contact_id,
-      [`${rel}_type`]: 'contact',
-      store      : ContactsStore,
-      renderItem : ({  onDelete, ...item }) => ContactListItem(item, {
+      id               : ContactEditor.contact_id,
+      [`${ rel }_type`]: 'contact',
+      store            : ContactsStore,
+      renderItem       : ({
+        onDelete,
+        ...item
+      }) => ContactListItem(item, {
         extra: An({
           className: 'danger',
-          href: '#',
-          onClick: e => {
+          href     : '#',
+          onClick  : e => {
             e.preventDefault()
             onDelete(item.ID)
-          }
-        }, __('Remove'))
+          },
+        }, __('Remove')),
       }),
-      onAddItem  : (res, rej, state) => {
+      onAddItem        : (res, rej, state) => {
         selectContactModal({
           onSelect: item => res(item),
-          exclude: state.items.map(i => i.ID),
-          onClose: rej
+          exclude : state.items.map(i => i.ID),
+          onClose : rej,
         })
       },
     })
@@ -2557,11 +2633,11 @@
       }, [
         ContactRelationships({
           title: __('Parents'),
-          rel: 'parent'
+          rel  : 'parent',
         }),
         ContactRelationships({
           title: __('Children'),
-          rel: 'child'
+          rel  : 'child',
         }),
       ]))
     }
