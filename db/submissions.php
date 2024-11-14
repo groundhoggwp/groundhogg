@@ -92,6 +92,7 @@ class Submissions extends DB {
 			'ID'           => '%d',
 			'step_id'      => '%d',
 			'type'         => '%s',
+			'name'         => '%s',
 			'contact_id'   => '%d',
 			'date_created' => '%s',
 		);
@@ -108,6 +109,7 @@ class Submissions extends DB {
 			'ID'           => 0,
 			'step_id'      => 0,
 			'type'         => 'form',
+			'name'         => '',
 			'contact_id'   => 0,
 			'date_created' => current_time( 'mysql' ),
 		);
@@ -149,6 +151,7 @@ class Submissions extends DB {
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         step_id bigint(20) unsigned NOT NULL,
         type varchar(20) NOT NULL,
+        name text NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         date_created datetime NOT NULL,
         PRIMARY KEY (ID)

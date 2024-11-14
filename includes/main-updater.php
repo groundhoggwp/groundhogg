@@ -193,6 +193,13 @@ class Main_Updater extends Old_Updater {
 					db()->background_tasks->create_table();
 					db()->event_queue->create_table();
 				}
+			],
+			'3.7.2'    => [
+				'automatic'   => true,
+				'description' => __( 'Add names for submissions.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->submissions->create_table(); // add name column
+				}
 			]
 		];
 	}
