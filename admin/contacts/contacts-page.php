@@ -24,7 +24,6 @@ use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\get_url_var;
-use function Groundhogg\isset_not_empty;
 use function Groundhogg\normalize_files;
 use function Groundhogg\set_request_var;
 use function Groundhogg\utils;
@@ -139,21 +138,23 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( $saved_search = get_url_var( 'saved_search' ) ) {
-			$saved_search = Saved_Searches::instance()->get( $saved_search );
 
-			// If the search does not have filters we need to migrate it
-			if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
-				$saved_search['query'] = [
-					'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+			$saved_search = Saved_Searches::instance()->get( $saved_search );
+			$query        = get_array_var( $saved_search, 'query', [] );
+
+			// If the search does not have filters we need to migrate it, legacy search
+			if ( ! isset( $query['filters'] ) && ! isset( $query['exclude_filters'] ) ) {
+				$query = [
+					'filters' => get_filters_from_old_query_vars( $query )
 				];
 			}
 
-			if ( isset( $saved_search['query']['filters'] ) ) {
-				$filter_query['filters'] = $saved_search['query']['filters'];
+			if ( isset( $query['filters'] ) ) {
+				$filter_query['filters'] = $query['filters'];
 			}
 
-			if ( isset( $saved_search['query']['exclude_filters'] ) ) {
-				$filter_query['exclude_filters'] = $saved_search['query']['exclude_filters'];
+			if ( isset( $query['exclude_filters'] ) ) {
+				$filter_query['exclude_filters'] = $query['exclude_filters'];
 			}
 		}
 
@@ -400,8 +401,8 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Excludes these contact meta fields from the meta field editor
-     *
+	 * Excludes these contact meta fields from the meta field editor
+	 *
 	 * @return mixed|null
 	 */
 	public function get_meta_key_exclusions() {
@@ -453,20 +454,20 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Uploads a file to the contact record
-     *
+	 * Uploads a file to the contact record
+	 *
 	 * @return void
 	 */
 	public function ajax_upload_file() {
 
-        if ( ! current_user_can( 'edit_contacts' )  || ! verify_admin_ajax_nonce() ){
-            return;
-        }
+		if ( ! current_user_can( 'edit_contacts' ) || ! verify_admin_ajax_nonce() ) {
+			return;
+		}
 
 		$id      = absint( get_post_var( 'contact' ) );
 		$contact = get_contactdata( $id );
 
-		if ( ! current_user_can( 'edit_contact', $contact ) ){
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			return;
 		}
 
@@ -524,9 +525,9 @@ class Contacts_Page extends Admin_Page {
 	 */
 	public function ajax_edit_contact() {
 
-        if ( ! current_user_can( 'edit_contacts' ) || ! verify_admin_ajax_nonce() ){
-            $this->wp_die_no_access();
-        }
+		if ( ! current_user_can( 'edit_contacts' ) || ! verify_admin_ajax_nonce() ) {
+			$this->wp_die_no_access();
+		}
 
 		$id = absint( get_request_var( 'contact' ) );
 
@@ -662,29 +663,29 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Unlink a user from the contact record but only if they don't match
-     *
+	 * Unlink a user from the contact record but only if they don't match
+	 *
 	 * @return true
 	 */
-    public function process_unlink_user(){
+	public function process_unlink_user() {
 
-	    if ( ! current_user_can( 'edit_users' ) ) {
-		    $this->wp_die_no_access();
-	    }
+		if ( ! current_user_can( 'edit_users' ) ) {
+			$this->wp_die_no_access();
+		}
 
-	    $contact = new Contact( get_url_var( 'contact' ) );
+		$contact = new Contact( get_url_var( 'contact' ) );
 
-        if ( ! $contact->user_id || contact_and_user_match( $contact, $contact->user ) ){
-            return $contact->admin_link();
-        }
+		if ( ! $contact->user_id || contact_and_user_match( $contact, $contact->user ) ) {
+			return $contact->admin_link();
+		}
 
-        // Set the user_id to 0
-        $contact->update( [ 'user_id' => 0 ] );
+		// Set the user_id to 0
+		$contact->update( [ 'user_id' => 0 ] );
 
-        $this->add_notice( 'success', 'User unlinked!' );
+		$this->add_notice( 'success', 'User unlinked!' );
 
-        return $contact->admin_link();
-    }
+		return $contact->admin_link();
+	}
 
 	/**
 	 * Delete a bunch of contacts
@@ -924,9 +925,9 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-        if ( empty( $this->get_items() ) ){
-            return new \WP_Error( 'none-selected', 'You must select at least one contact to export.' );
-        }
+		if ( empty( $this->get_items() ) ) {
+			return new \WP_Error( 'none-selected', 'You must select at least one contact to export.' );
+		}
 
 		return admin_page_url( 'gh_tools', [
 			'tab'    => 'export',
@@ -942,10 +943,10 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-        if ( empty( $this->get_items() ) ){
+		if ( empty( $this->get_items() ) ) {
 
-            return new \WP_Error( 'no_items', 'You must select at least one contact to edit.' );
-        }
+			return new \WP_Error( 'no_items', 'You must select at least one contact to edit.' );
+		}
 
 		return admin_page_url( 'gh_contacts', [
 			'action'  => 'bulk_edit',
