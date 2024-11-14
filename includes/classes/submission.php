@@ -105,21 +105,33 @@ class Submission extends Base_Object_With_Meta {
 	 * Returns an associative array of names to answers
 	 *
 	 * [
-	 *   'field_name' => [ 'label' => 'my field', 'value' => 'Some value' ]
+	 *   0 => [ 'label' => 'my field', 'value' => 'Some value' ]
 	 * ]
 	 *
 	 * @return array[]
 	 */
 	public function get_answers( $include_hidden = false ) {
 
-		// ignore webhooks for now
-		if ( $this->type !== 'form' ) {
-			return [];
+		if ( $this->type === 'form' ) {
+			$form = new Form_v2( $this->get_form_id() );
+
+			return $form->get_submission_answers( $this, $include_hidden );
 		}
 
-		$form = new Form_v2( $this->get_form_id() );
+		$meta    = $this->get_all_meta();
+		$answers = [];
 
-		return $form->get_submission_answers( $this, $include_hidden );
+		foreach ( $meta as $key => $value ) {
+			$label = maybe_get_key_display_name( $key );
+
+			if ( $label === $key ) {
+				$label = code_it( $key );
+			}
+
+			$answers[] = [ 'label' => $label, 'value' => $value ];
+		}
+
+		return $answers;
 	}
 
 	/**
@@ -133,8 +145,12 @@ class Submission extends Base_Object_With_Meta {
 		$date = new DateTimeHelper( $this->get_date_created(), wp_timezone() );
 
 		$array['data']['time'] = $date->getTimestamp();
-		$array['form']         = new Step( $this->get_form_id() );
-		$array['i18n']         = [
+
+		if ( $this->get_step_id() ) {
+			$array['form'] = new Step( $this->get_form_id() );
+		}
+
+		$array['i18n'] = [
 			'diff_time' => ucfirst( $date->i18n() ),
 			'answers'   => $this->get_answers( true )
 		];
