@@ -2161,7 +2161,8 @@ class Form_v2 extends Step {
 		$submission = new Submission();
 		$submission->create( [
 			'step_id'    => $this->get_id(),
-			'contact_id' => $contact->get_id()
+			'contact_id' => $contact->get_id(),
+			'name'       => $this->get_name()
 		] );
 
 		// Add the submission data.
