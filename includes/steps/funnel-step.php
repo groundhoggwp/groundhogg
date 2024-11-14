@@ -99,7 +99,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 			add_action( "admin_enqueue_scripts", [ $this, 'admin_scripts' ] );
 
-            add_action( 'groundhogg/step/duplicated', [ $this, 'after_duplicate' ], 10, 2 );
+			add_action( 'groundhogg/step/duplicated', [ $this, 'after_duplicate' ], 10, 2 );
 		}
 
 		/**
@@ -124,24 +124,24 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-     * Process after duplicate step stuff
-     *
-	 * @param $new Step
+	 * Process after duplicate step stuff
+	 *
+	 * @param $new      Step
 	 * @param $original Step
 	 *
 	 * @return void
 	 */
-    public function after_duplicate( $new, $original ){
+	public function after_duplicate( $new, $original ) {
 
-        // not the right step type, exit out
-        if ( $new->get_type() !== $this->get_type() ){
-            return;
-        }
+		// not the right step type, exit out
+		if ( $new->get_type() !== $this->get_type() ) {
+			return;
+		}
 
-        $this->set_current_step( $new );
+		$this->set_current_step( $new );
 
-        $this->duplicate( $new, $original );
-    }
+		$this->duplicate( $new, $original );
+	}
 
 	protected function add_additional_actions() {
 	}
@@ -201,6 +201,35 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	abstract public function get_icon();
 
 	/**
+	 * If the icon is an SVG return the svg xml content
+	 *
+	 * @return string
+	 */
+	public function get_icon_svg() {
+
+		$icon = $this->get_icon();
+
+		if ( $icon && str_ends_with( $icon, '.svg' ) ) {
+
+			// get the absolute path of the svg file relative to wp-content
+			$icon_path = str_replace( home_url( '/wp-content' ), WP_CONTENT_DIR, $icon );
+
+			return file_get_contents( $icon_path );
+		}
+
+		return false;
+	}
+
+	/**
+	 * If the icon is an svg
+	 *
+	 * @return bool
+	 */
+	public function icon_is_svg() {
+		return $this->get_icon() && str_ends_with( $this->get_icon(), '.svg' );
+	}
+
+	/**
 	 * Enqueue any admin scripts/styles
 	 */
 	public function admin_scripts() {
@@ -221,36 +250,39 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @return int
 	 */
 	public function pre_calc_run_time( int $baseTimestamp, Step $step ): int {
-        $this->set_current_step( $step );
-        return $baseTimestamp;
+		$this->set_current_step( $step );
+
+		return $baseTimestamp;
 	}
 
 	/**
 	 * Replacement for enqueue/get_delay_time
-     * This method should be overridden by child classes.
+	 * This method should be overridden by child classes.
 	 *
 	 * @param int  $baseTimestamp
 	 * @param Step $step
 	 *
 	 * @return int
 	 */
-	public function calc_run_time( int $baseTimestamp, Step $step ) : int{
+	public function calc_run_time( int $baseTimestamp, Step $step ): int {
 
-        // Step is still using the legacy enqueue method
-        if ( method_exists( $this, 'enqueue' ) ){
-	        _deprecated_function( get_called_class() . '::enqueue', '3.4', __CLASS__. '::calc_run_time' );
-            return $this->enqueue( $step );
-        }
+		// Step is still using the legacy enqueue method
+		if ( method_exists( $this, 'enqueue' ) ) {
+			_deprecated_function( get_called_class() . '::enqueue', '3.4', __CLASS__ . '::calc_run_time' );
+
+			return $this->enqueue( $step );
+		}
 
 		// Step is still using the legacy get_delay_time method
-		if ( method_exists( $this, 'get_delay_time' ) ){
-			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__. '::calc_run_time' );
+		if ( method_exists( $this, 'get_delay_time' ) ) {
+			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__ . '::calc_run_time' );
+
 			return $baseTimestamp + $this->get_delay_time( $step );
 		}
 
-        // Run now
-        return $baseTimestamp;
-    }
+		// Run now
+		return $baseTimestamp;
+	}
 
 	/**
 	 * Get the ICON of this action/benchmark
@@ -280,6 +312,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'name'        => $this->get_name(),
 			'description' => $this->get_description(),
 			'icon'        => $this->get_icon(),
+			'svg'         => $this->get_icon_svg(),
 		];
 
 		return $array;
@@ -574,59 +607,53 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
-		<div
-			id="<?php echo $step->get_id(); ?>"
-			data-id="<?php echo $step->get_id(); ?>"
-			data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-			class="step <?php echo implode( ' ', $classes ) ?>">
-			<input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
-			<div class="step-labels display-flex gap-10">
+        <div
+                id="<?php echo $step->get_id(); ?>"
+                data-id="<?php echo $step->get_id(); ?>"
+                data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+                class="step <?php echo implode( ' ', $classes ) ?>">
+            <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+            <div class="step-labels display-flex gap-10">
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_benchmark() && $step->is_entry() ): ?>
-					<div class="step-label">Entry</div>
+                    <div class="step-label">Entry</div>
 				<?php endif; ?>
 				<?php if ( $step->is_benchmark() && $step->is_conversion() ): ?>
-					<div class="step-label">Conversion</div>
+                    <div class="step-label">Conversion</div>
 				<?php endif; ?>
 				<?php do_action( 'groundhogg/steps/sortable/labels', $step, $this ); ?>
-			</div>
+            </div>
 			<?php do_action( 'groundhogg/steps/sortable/inside', $step, $this ); ?>
 			<?php do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step ); ?>
-			<div class="actions has-box-shadow">
-				<!-- DUPLICATE -->
-				<button title="Duplicate" type="button" class="gh-button secondary text icon duplicate-step">
-					<span class="dashicons dashicons-admin-page"></span>
-				</button>
-				<!-- DELETE -->
-				<button title="Delete" type="button" class="gh-button danger text icon delete-step">
-					<span class="dashicons dashicons-trash"></span>
-				</button>
-			</div>
-			<div class="hndle ui-sortable-handle">
+            <div class="actions has-box-shadow">
+                <!-- DUPLICATE -->
+                <button title="Duplicate" type="button" class="gh-button secondary text icon duplicate-step">
+                    <span class="dashicons dashicons-admin-page"></span>
+                </button>
+                <!-- DELETE -->
+                <button title="Delete" type="button" class="gh-button danger text icon delete-step">
+                    <span class="dashicons dashicons-trash"></span>
+                </button>
+            </div>
+            <div class="hndle ui-sortable-handle">
 				<?php if ( $step->has_errors() || $this->has_errors() ): ?>
-					<img class="hndle-icon error"
-					     src="<?php echo $this->get_error_icon(); ?>">
+                    <img class="hndle-icon error"
+                         src="<?php echo $this->get_error_icon(); ?>">
 				<?php else:
 
-                    $icon = $this->get_icon();
-
-                    if ( $icon && str_ends_with( $icon, '.svg' ) ){
-
-                        // get the absolute path of the svg file relative to wp-content
-                        $icon_path = str_replace( home_url( '/wp-content' ), WP_CONTENT_DIR, $icon );
-
-                        echo html()->e( 'div', [
-                                'class' => 'hndle-icon'
-                        ], file_get_contents( $icon_path ) );
-                    } else {
-	                    ?>
+					if ( $this->icon_is_svg() ) {
+						echo html()->e( 'div', [
+							'class' => 'hndle-icon'
+						], $this->get_icon_svg() );
+					} else {
+						?>
                         <img class="hndle-icon"
                              src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-	                    <?php
-                    }
+						<?php
+					}
 
-                    endif; ?>
-				<div>
+				endif; ?>
+                <div>
 					<?php
 					echo html()->e( 'span', [
 						'class' => 'step-title',
@@ -636,9 +663,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 						'class' => 'step-name',
 					], $this->get_name() );
 					?>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 		<?php
 
 	}
@@ -667,9 +694,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		// If custom step names are not enforced and a generated step title is available
 		if ( ! force_custom_step_names() && $this->generate_step_title( $step ) ) {
 			?>
-			<div class="gh-panel-header">
-				<h2><?php printf( '%s Settings', $this->get_name() ) ?></h2>
-			</div>
+            <div class="gh-panel-header">
+                <h2><?php printf( '%s Settings', $this->get_name() ) ?></h2>
+            </div>
 			<?php
 			return;
 		}
@@ -678,10 +705,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$is_svg = preg_match( '/\.svg$/', $icon );
 
 		?>
-		<div class="step-title-wrap">
-			<img class="step-icon <?php echo $is_svg ? 'is-svg' : '' ?>"
-			     src="<?php echo $icon ?>">
-			<div class="step-title-edit hidden">
+        <div class="step-title-wrap">
+            <img class="step-icon <?php echo $is_svg ? 'is-svg' : '' ?>"
+                 src="<?php echo $icon ?>">
+            <div class="step-title-edit hidden">
 				<?php
 				$args = array(
 					'id'      => $this->setting_id_prefix( 'title' ),
@@ -694,11 +721,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 				echo html()->input( $args );
 				?>
-			</div>
-			<div class="step-title-view">
+            </div>
+            <div class="step-title-view">
 				<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
-			</div>
-		</div>
+            </div>
+        </div>
 		<?php
 	}
 
@@ -713,54 +740,54 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function html_v2( $step ) {
 		?>
-		<div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-		     id="settings-<?php echo $step->get_id(); ?>"
-		     class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
+        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+             id="settings-<?php echo $step->get_id(); ?>"
+             class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
 
-			<!-- WARNINGS -->
+            <!-- WARNINGS -->
 			<?php $this->before_step_warnings() ?>
 			<?php if ( $step->has_errors() || $this->has_errors() ): ?>
-				<div class="step-warnings">
+                <div class="step-warnings">
 					<?php foreach ( $step->get_errors() as $error ): ?>
 
-						<div id="<?php $error->get_error_code() ?>"
-						     class="notice notice-warning is-dismissible">
+                        <div id="<?php $error->get_error_code() ?>"
+                             class="notice notice-warning is-dismissible">
 							<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
-						</div>
+                        </div>
 					<?php endforeach; ?>
 					<?php foreach ( $this->get_errors() as $error ): ?>
 
-						<div id="<?php $error->get_error_code() ?>"
-						     class="notice notice-warning is-dismissible">
+                        <div id="<?php $error->get_error_code() ?>"
+                             class="notice notice-warning is-dismissible">
 							<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
-						</div>
+                        </div>
 					<?php endforeach; ?>
-				</div>
+                </div>
 			<?php endif; ?>
 			<?php $this->after_step_warnings() ?>
-			<!-- SETTINGS -->
-			<div class="step-flex">
-				<div class="step-edit panels">
-					<div class="gh-panel">
+            <!-- SETTINGS -->
+            <div class="step-flex">
+                <div class="step-edit panels">
+                    <div class="gh-panel">
 						<?php $this->step_title_edit( $step ); ?>
-						<div class="custom-settings">
+                        <div class="custom-settings">
 							<?php $this->settings( $step ); ?>
-						</div>
-					</div>
+                        </div>
+                    </div>
 
 					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
 					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
 					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
 					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
-				</div>
-				<div class="step-notes">
+                </div>
+                <div class="step-notes">
 					<?php $this->before_step_notes( $step ); ?>
 					<?php if ( $step->is_benchmark() ): ?>
-						<div class="gh-panel benchmark-settings">
-							<div class="gh-panel-header">
-								<h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
-							</div>
-							<div class="inside display-flex gap-20 column">
+                        <div class="gh-panel benchmark-settings">
+                            <div class="gh-panel-header">
+                                <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
+                            </div>
+                            <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):
 
 									echo html()->checkbox( [
@@ -778,8 +805,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 								] );
 
 								?>
-							</div>
-						</div>
+                            </div>
+                        </div>
 					<?php endif; ?>
 					<?php
 					echo html()->textarea( [
@@ -790,9 +817,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 						'class'       => 'step-notes-textarea'
 					] );
 					?>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 		<?php
 	}
 
@@ -908,16 +935,16 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-     * Stuff to do when duplicating a step
-     *
+	 * Stuff to do when duplicating a step
+	 *
 	 * @param $new
 	 * @param $original
 	 *
 	 * @return void
 	 */
-    public function duplicate( $new, $original ){
+	public function duplicate( $new, $original ) {
 
-    }
+	}
 
 	/**
 	 * Cleanup actions after the import of a step
@@ -980,8 +1007,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
+
+
 		return [
 			'icon'    => $this->get_icon(),
+			'svg'     => $this->get_icon_svg(),
 			'name'    => $this->get_name(),
 			'type'    => $this->get_type(),
 			'group'   => $this->get_group(),
