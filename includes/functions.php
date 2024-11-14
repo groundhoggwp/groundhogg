@@ -1876,29 +1876,29 @@ function split_name( $name ) {
  *
  * @return array
  */
-function split_last($string, $delimiter, $n = 1) {
+function split_last( $string, $delimiter, $n = 1 ) {
 	// Initialize an array to store positions of the last N occurrences
 	$positions = array();
-	$offset = 0;
+	$offset    = 0;
 
 	// Find the positions of the last N occurrences of the delimiter
-	while ($n > 0) {
-		$pos = strrpos($string, $delimiter, $offset);
+	while ( $n > 0 ) {
+		$pos = strrpos( $string, $delimiter, $offset );
 
 		// If no more occurrences are found, break out of the loop
-		if ($pos === false) {
+		if ( $pos === false ) {
 			break;
 		}
 
 		// Store the position and update the offset to continue searching backwards
 		$positions[] = $pos;
-		$offset = $pos - strlen($string) - 1;
-		$n--;
+		$offset      = $pos - strlen( $string ) - 1;
+		$n --;
 	}
 
 	// If we found fewer than N delimiters, return the whole string as a single part
-	if (count($positions) === 0) {
-		return array($string);
+	if ( count( $positions ) === 0 ) {
+		return array( $string );
 	}
 
 	// Split the string based on the found positions
@@ -1906,13 +1906,13 @@ function split_last($string, $delimiter, $n = 1) {
 	$start = 0;
 
 	// Iterate over the positions in reverse order to build parts from left to right
-	foreach (array_reverse($positions) as $pos) {
-		$parts[] = substr($string, $start, $pos - $start);
-		$start = $pos + strlen($delimiter);
+	foreach ( array_reverse( $positions ) as $pos ) {
+		$parts[] = substr( $string, $start, $pos - $start );
+		$start   = $pos + strlen( $delimiter );
 	}
 
 	// Add the remaining part after the last delimiter
-	$parts[] = substr($string, $start);
+	$parts[] = substr( $string, $start );
 
 	return $parts;
 }
@@ -2287,7 +2287,32 @@ function get_mappable_fields( $extra = [] ) {
 	$fields = array_merge( $defaults, $extra );
 
 	return apply_filters( 'groundhogg/mappable_fields', $fields );
+}
 
+/**
+ * Given a key, get the display name of that key
+ *
+ * @param string $key the key
+ *
+ * @return string
+ */
+function maybe_get_key_display_name( string $key ) {
+
+    foreach ( get_mappable_fields() as $group ) {
+
+        if ( isset( $group[ $key ] ) ){
+            return $group[ $key ];
+        }
+    }
+
+	$field = Properties::instance()->get_field( $key );
+
+	if ( $field ){
+		return $field['label'];
+	}
+
+    // return the key if not found
+    return apply_filters( 'groundhogg/get_key_display_name', $key );
 }
 
 /**
@@ -2626,12 +2651,13 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
  * @throws \Exception
  *
  * @param $fields array the raw data from the source
- *
  * @param $map    array map of field_ids to contact keys
+ * @param array $submission  settings for the submission
+ * @param null|Contact $contact an existing contact record to modify
  *
  * @return Contact|false
  */
-function generate_contact_with_map( $fields, $map = [] ) {
+function generate_contact_with_map( $fields, $map = [], $submission = [], $contact = null ) {
 
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
@@ -2921,37 +2947,42 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	}
 
-	$contact = false;
+    // try and fetch an existing contact record
+    $contact = $contact ? get_contactdata( $contact ) : null;
 
-	if ( isset_not_empty( $args, 'email' ) ) {
+    // one does not exist yet
+    if ( ! is_a_contact( $contact ) ) {
 
-		// Get given email
-		if ( ! is_email( $args['email'] ) ) {
-			return false;
-		}
+        // an email was provided
+	    if ( isset_not_empty( $args, 'email' ) ) {
 
-		$contact = new Contact( [ 'email' => $args['email'] ] );
+		    // Get given email
+		    if ( ! is_email( $args['email'] ) ) {
+			    return false;
+		    }
 
-	} else {
+            // Either get an existing contact with this email or created a new one
+		    $contact = new Contact( [ 'email' => $args['email'] ] );
 
-		if ( isset_not_empty( $args, 'user_id' ) ) {
+	    } else if ( isset_not_empty( $args, 'user_id' ) ) {
 
-			// Get by given user id
-			$contact = get_contactdata( $args['user_id'], true );
+		    // Get by given user id
+		    $contact = get_contactdata( $args['user_id'], true );
 
-		} else if ( isset_not_empty( $args, 'contact_id' ) ) {
+	    } else if ( isset_not_empty( $args, 'contact_id' ) ) {
 
-			// Get by given contact id
-			$contact = get_contactdata( $args['contact_id'] );
-			unset( $args['contact_id'] );
+		    // Get by given contact id
+		    $contact = get_contactdata( $args['contact_id'] );
+		    unset( $args['contact_id'] );
 
-		} else if ( ! current_user_can( 'view_contacts' ) ) {
+	    } else if ( ! current_user_can( 'view_contacts' ) ) {
 
-			// Is there an active contact record?
-			$contact = get_contactdata();
-		}
-	}
+		    // Is there an active contact record?
+		    $contact = get_contactdata();
+	    }
+    }
 
+    // Check again
 	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 		return false;
 	}
@@ -2976,7 +3007,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		}
 	}
 
-	//	 update meta data
+	// update meta data
 	if ( ! empty( $meta ) ) {
 		$contact->update_meta( $meta );
 	}
@@ -2992,6 +3023,30 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		foreach ( $copy as $url ) {
 			$contact->copy_file( $url );
 		}
+	}
+
+	if ( ! empty( $submission ) ) {
+
+		/**
+		 * Filter the data for the submission,
+		 * for example add a step_id from the webhook
+		 *
+		 * @param array   $data    the data for the submission
+		 * @param Contact $contact the contact record
+		 * @param array   $map     the field map
+		 * @param array   $fields  the fields
+		 */
+		$submission = apply_filters( 'groundhogg/generate_contact_with_map/submission', wp_parse_args( $submission, [
+			'type'       => 'update',
+			'contact_id' => $contact->get_id(),
+		] ), $contact, $map, $fields );
+
+        // Sanitize the payload of fields, but only save mapped data
+		$sanitized_payload = sanitize_payload( array_intersect_key( $fields, $map ) );
+		$submissionObject  = new Submission();
+
+		$submissionObject->create( $submission );
+		$submissionObject->add_posted_data( $sanitized_payload );
 	}
 
 	/**
@@ -5831,6 +5886,40 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 	 * @param mixed  $original_meta_value
 	 */
 	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type, $original_meta_value );
+}
+
+/**
+ * Given an arbitrary payload, do our best to sanitize it
+ *
+ * @param array $payload
+ *
+ * @return array
+ */
+function sanitize_payload( array $payload ): array {
+
+	return map_deep( $payload, function ( $param ) {
+
+		// Might be a float
+		// Might be int
+		if ( is_numeric( $param ) ) {
+
+			// No sanitization needed
+			if ( is_int( $param ) || is_float( $param ) ) {
+				return $param;
+			}
+
+			// Filter to a float, removes training 0s by default
+			return filter_var( $param, FILTER_VALIDATE_FLOAT );
+		}
+
+		// Textarea fields
+		if ( is_string( $param ) && str_contains( $param, PHP_EOL ) ) {
+			return sanitize_textarea_field( $param );
+		}
+
+		// Everything else
+		return sanitize_text_field( $param );
+	} );
 }
 
 /**
