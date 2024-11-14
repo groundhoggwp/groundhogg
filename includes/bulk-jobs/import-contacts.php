@@ -100,7 +100,10 @@ class Import_Contacts extends Bulk_Job {
 				$item['marketing_consent'] = 'yes';
 			}
 
-			$contact = generate_contact_with_map( $item, $this->field_map );
+			$contact = generate_contact_with_map( $item, $this->field_map, [
+				'type' => 'import',
+				'name' => basename( $this->file_path ),
+			] );
 
 			if ( is_a_contact( $contact ) ) {
 

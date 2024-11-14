@@ -213,7 +213,10 @@ class Import_Contacts extends Task {
 			}
 
 			try {
-				$contact = generate_contact_with_map( $item, $map );
+				$contact = generate_contact_with_map( $item, $map, [
+					'type' => 'import',
+					'name' => $this->fileName
+				] );
 			} catch ( \Exception $e ) {
 				continue;
 			}

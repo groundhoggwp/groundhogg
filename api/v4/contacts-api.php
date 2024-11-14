@@ -21,6 +21,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\sanitize_object_meta;
 
 class Contacts_Api extends Base_Object_Api {
@@ -123,6 +124,34 @@ class Contacts_Api extends Base_Object_Api {
 		$added = [];
 
 		foreach ( $items as $item ) {
+
+			if ( isset_not_empty( $item, 'email' ) ) {
+
+				$existed = is_email_address_in_use( $item['email'] );
+
+				try {
+					$contact = generate_contact_with_map( $item, [], [
+						'type' => 'api',
+						'name' => __( 'REST API', 'groundhogg' )
+					] );
+				} catch ( \Exception $e ) {
+					return self::ERROR_500( 'error', $e->getMessage() );
+				}
+
+				if ( ! is_a_contact( $contact ) ) {
+					return self::ERROR_500( 'error', 'Unable to create contact record.' );
+				}
+
+				$added[] = $contact;
+
+				if ( $existed ) {
+					$this->do_object_updated_action( $contact );
+				} else {
+					$this->do_object_created_action( $contact );
+				}
+
+				continue;
+			}
 
 			$data = get_array_var( $item, 'data' );
 			$meta = get_array_var( $item, 'meta' );
@@ -408,7 +437,10 @@ class Contacts_Api extends Base_Object_Api {
 			$existed = is_email_address_in_use( $request->get_param( 'email' ) );
 
 			try {
-				$contact = generate_contact_with_map( $fields );
+				$contact = generate_contact_with_map( $fields, [], [
+					'type' => 'api',
+					'name' => __( 'REST API', 'groundhogg' )
+				] );
 			} catch ( \Exception $e ) {
 				return self::ERROR_500( 'error', $e->getMessage() );
 			}
@@ -833,7 +865,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		foreach ( $others as $other ) {
 
-			if ( ! current_user_can( 'delete_contact', $other ) ){
+			if ( ! current_user_can( 'delete_contact', $other ) ) {
 				continue;
 			}
 

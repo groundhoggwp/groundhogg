@@ -218,7 +218,7 @@ abstract class Form_Integration extends Benchmark {
 	}
 
 	/**
-	 * Genertae a step title based on the name of the form
+	 * Generate a step title based on the name of the form
 	 *
 	 * @param $step
 	 *
@@ -252,10 +252,15 @@ abstract class Form_Integration extends Benchmark {
 			return false;
 		}
 
+		$form_id     = absint( $this->get_setting( 'form_id' ) );
 		$posted_data = $this->get_data( 'posted_data' );
 		$field_map   = $this->get_setting( 'field_map' );
 
-		$contact = generate_contact_with_map( $posted_data, $field_map );
+		$contact = generate_contact_with_map( $posted_data, $field_map, [
+			'type'    => $this->get_type(),
+			'step_id' => $this->get_current_step()->get_id(),
+			'name'    => $this->get_form_name( $form_id )
+		] );
 
 		if ( ! $contact || is_wp_error( $contact ) ) {
 			return false;
