@@ -109,14 +109,14 @@ class Funnels_Page extends Admin_Page {
 	public function get_title() {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				return _ex( 'Add Funnel', 'page_title', 'groundhogg' );
+				return _x( 'Add Funnel', 'page_title', 'groundhogg' );
 				break;
 			case 'edit':
-				return _ex( 'Edit Funnel', 'page_title', 'groundhogg' );
+				return _x( 'Edit Funnel', 'page_title', 'groundhogg' );
 				break;
 			case 'view':
 			default:
-				return _ex( 'Funnels', 'page_title', 'groundhogg' );
+				return _x( 'Funnels', 'page_title', 'groundhogg' );
 		}
 	}
 

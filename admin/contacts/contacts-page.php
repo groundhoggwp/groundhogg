@@ -286,14 +286,14 @@ class Contacts_Page extends Admin_Page {
 	public function get_title() {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				return _ex( 'Add Contact', 'page_title', 'groundhogg' );
+				return _x( 'Add Contact', 'page_title', 'groundhogg' );
 			case 'edit':
 				$contacts = $this->get_items();
 				$contact  = get_contactdata( array_shift( $contacts ) ); //todo check
 				if ( $contact ) {
 					return sprintf( _x( 'Edit Contact: %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
 				} else {
-					return _ex( 'Oops!', 'page_title', 'groundhogg' );
+					return _x( 'Oops!', 'page_title', 'groundhogg' );
 				}
 			case 'form':
 
@@ -303,13 +303,13 @@ class Contacts_Page extends Admin_Page {
 
 					return sprintf( _x( 'Submit Form For %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
 				} else {
-					return _ex( 'Submit Form', 'page_title', 'groundhogg' );
+					return _x( 'Submit Form', 'page_title', 'groundhogg' );
 				}
 			case 'bulk_edit':
 				return __( 'Bulk Edit Contacts', 'groundhogg' );
 			case 'view':
 			default:
-				return _ex( 'Contacts', 'page_title', 'groundhogg' );
+				return _x( 'Contacts', 'page_title', 'groundhogg' );
 		}
 	}
 
