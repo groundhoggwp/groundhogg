@@ -692,6 +692,18 @@ class Query {
 		return "CAST($col as DECIMAL($precision, $scale))";
 	}
 
+	public static function cast2int( string $col ) {
+		return "CAST($col as INT)";
+	}
+
+	public static function cast2signed( string $col ) {
+		return "CAST($col as SIGNED)";
+	}
+
+	public static function cast2unsigned( string $col ) {
+		return "CAST($col as UNSIGNED)";
+	}
+
 	public static function cast2date( string $col ) {
 		return "CAST($col as DATE)";
 	}
