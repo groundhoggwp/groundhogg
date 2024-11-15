@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.6
 Requires PHP: 7.1
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,15 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.7.1 (2024-11-18) =
+= 3.7.2 (2024-11-14) =
+* ADDED Submission records will now be kept for a variety of user and contact initiated updates including...
+ * Form integrations
+ * Webhook responses
+ * Importing contacts
+ * Specific API requests
+* FIXED Saved search uneditable if only exclude filters are defined.
+
+= 3.7.1 (2024-11-08) =
 * IMPROVED Funnel step flow UI.
 * ADDED `{substr}` replacement code.
 * ADDED Nested meta key support for meta replacement codes using dot notation. Example `{meta.custom_object.some_key}`.
