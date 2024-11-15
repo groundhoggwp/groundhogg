@@ -550,7 +550,7 @@
 
   const stepTypeIcon = ( type ) => {
 
-    const { svg, icon, name } = Groundhogg.rawStepTypes[step.data.step_type]
+    const { svg, icon, name } = Groundhogg.rawStepTypes[type]
 
     if ( svg ){
       return svg;
@@ -1183,11 +1183,6 @@
       this.needsRefresh = needsRefresh
 
       const $el = $(selector)
-
-      // Only show supported activities
-      // activities = activities.filter(
-      //   a => ['event', 'page_visit', 'submission'].includes(a.type) ||
-      //     a.data.activity_type in this.types)
 
       if (!activities.length) {
         $el.html(
