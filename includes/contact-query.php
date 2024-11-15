@@ -1375,10 +1375,9 @@ class Contact_Query extends Table_Query {
 			$parts    = explode( '.', $query_vars['orderby'] );
 			$meta_key = $parts[1];
 
-			$join = $this->addJoin( 'LEFT', [ $this->db->usermeta, 'um' ] );
-			$join->onColumn( 'user_id', 'user_id' )->equals( 'meta_key', $meta_key );
+			$alias = $this->joinMeta( sanitize_key( $meta_key ), $this->db->usermeta, 'user_id' );
 
-			$query_vars['orderby'] = "$join->alias.meta_value";
+			$query_vars['orderby'] = "$alias.meta_value";
 		}
 
 		// Make sure meta orderby works
