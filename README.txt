@@ -355,6 +355,7 @@ You can purchase a premium plan for access to support and our premium extensions
  * Webhook responses
  * Importing contacts
  * Specific API requests
+* TWEAKED Funnel activity icons in the timeline now appear as they do in the funnel editor.
 * FIXED Saved search uneditable if only exclude filters are defined.
 
 = 3.7.1 (2024-11-08) =
