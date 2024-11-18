@@ -597,6 +597,11 @@
     return maybeFunc
   }
 
+  const dismissNotice = ( id ) => Groundhogg.api.ajax( {
+    action: 'gh_dismiss_notice',
+    notice: id,
+  } )
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
@@ -605,6 +610,16 @@
   gh.functions.getNestedValue = getNestedValue
   gh.functions.debounce = debounce
   gh.functions.maybeCall = maybeCall
+  gh.functions.dismissNotice = dismissNotice
+
+  $(document).on('click', 'button.hide-panel', e => {
+
+    let btn = e.currentTarget
+    let id =  btn.dataset.id
+    btn.parentElement.remove()
+
+    dismissNotice( id )
+  } )
 
   var check, timeout
 

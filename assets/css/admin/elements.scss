@@ -3141,3 +3141,26 @@ button:has(.gh-dropdown-menu){
     }
   }
 }
+
+div:has( > button.hide-panel){
+  position: relative;
+
+  > button.hide-panel{
+    position: absolute;
+    top: 3px;
+    right: 3px;
+
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+    border-radius: 3px;
+
+    &:hover{
+      background-color: $primary-dark-15;
+    }
+  }
+}
