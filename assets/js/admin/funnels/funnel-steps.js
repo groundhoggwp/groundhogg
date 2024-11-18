@@ -462,7 +462,7 @@
                   <h2>After submit...</h2>
               </div>
               <div class="inside display-flex column gap-10">
-                  <div class="display-flex gap-10">
+                  <div class="display-flex gap-10 align-center">
                       <p>${ __('Stay on page after submitting?', 'groundhogg') }</p>
                       ${ toggle({
                           name: 'enable_ajax',
