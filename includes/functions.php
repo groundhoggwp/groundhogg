@@ -2729,7 +2729,12 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				break;
 			case 'date_created':
 			case 'date_optin_status_changed':
-				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
+
+                try {
+                    $dateTime = new DateTimeHelper( $value );
+	                $args[ $field ] = $dateTime->ymdhis();
+                } catch (\Exception $exception){}
+
 				break;
 			case 'optin_status':
 
