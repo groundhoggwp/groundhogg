@@ -429,7 +429,11 @@ class Event extends Base_Object {
 			return apply_filters( 'groundhogg/event/run/failed_result', $error, $this );
 		}
 
-		$result = $this->get_step()->run( $this->get_contact(), $this );
+		try {
+			$result = $this->get_step()->run( $this->get_contact(), $this );
+		} catch ( \Exception $e ){
+			$result = new WP_Error( 'exception', $e->getMessage() );
+		}
 
 		// Hard fail when WP Error
 		if ( is_wp_error( $result ) ) {
@@ -630,6 +634,4 @@ class Event extends Base_Object {
 				return $array;
 		}
 	}
-
-
 }
