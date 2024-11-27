@@ -355,7 +355,11 @@ You can purchase a premium plan for access to support and our premium extensions
  * Webhook responses
  * Importing contacts
  * Specific API requests
+* ADDED REST API Activity endpoint documentation in the playground.
+* ADDED Support for `range` in DB queries.
+* TWEAKED Outline for conditional content for email blocks as there is for post editor blocks.
 * TWEAKED Funnel activity icons in the timeline now appear as they do in the funnel editor.
+* FIXED UTM Parameters added in the advanced tab not being added to links.
 * FIXED Saved search uneditable if only exclude filters are defined.
 
 = 3.7.1 (2024-11-08) =
