@@ -215,6 +215,9 @@
 #email-block-editor #content #builder-content .builder-block .block-inner-content {
   margin: auto;
 }
+#email-block-editor #content #builder-content .builder-block:has(> div.filters-enabled) {
+  outline: 1px solid #6c19ad;
+}
 #email-block-editor #content #builder-content .builder-block div.filters-enabled {
   background-color: #6c19ad;
   color: #fff;
