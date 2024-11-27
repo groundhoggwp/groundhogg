@@ -823,17 +823,16 @@ class Email extends Base_Object_With_Meta {
 		$url = untrailingslashit( home_url() );
 
 		if ( $context === 'plain' ){
-			return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+			return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
 				$this,
-				'utm_link_callback'
+				'utm_link_callback_plain'
 			], $content );
 		}
 
-		return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
+		return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
 			$this,
-			'utm_link_callback_plain'
+			'utm_link_callback'
 		], $content );
-
 	}
 
 	/**
