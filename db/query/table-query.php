@@ -6,7 +6,9 @@ use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
 use function Groundhogg\array_map_to_class;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 
 class Table_Query extends Query {
 
@@ -32,7 +34,7 @@ class Table_Query extends Query {
 		$this->db_table = $table;
 
 		parent::__construct( $table->table_name, $table->alias );
-		
+
 		if ( ! empty( $params ) ) {
 			$this->set_query_params( $params );
 		}
@@ -98,10 +100,30 @@ class Table_Query extends Query {
 					$this->whereNotIn( $this->db_table->get_primary_key(), $value );
 					break;
 				case 'before':
-					$this->where->lessThanEqualTo( $this->db_table->get_date_key(), $value );
+
+					if ( isset_not_empty( $params, 'range' ) ) {
+						break;
+					}
+
+					$this->where->lessThanEqualTo( $this->db_table->get_date_key(), $this->db_table->maybe_convert_date_format_for_query( $value ) );
 					break;
 				case 'after':
-					$this->where->greaterThanEqualTo( $this->db_table->get_date_key(), $value );
+
+					if ( isset_not_empty( $params, 'range' ) ) {
+						break;
+					}
+
+					$this->where->greaterThanEqualTo( $this->db_table->get_date_key(), $this->db_table->maybe_convert_date_format_for_query( $value ) );
+					break;
+				case 'range':
+
+					Filters::date_filter_handler( $this->db_table->get_date_key(), [
+						'date_range' => $value,
+						'before'     => get_array_var( $params, 'before' ),
+						'after'      => get_array_var( $params, 'after' ),
+						'days'       => get_array_var( $params, 'days' ),
+					], $this->where(), $this->db_table->get_date_key_format() );
+
 					break;
 			}
 		}
