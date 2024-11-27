@@ -819,12 +819,12 @@
         ...readParams,
         CommonParams.include(plural),
         CommonParams.exclude(plural),
-        CommonParams.search(plural, searchableColumns),
+        searchableColumns.length ? CommonParams.search(plural, searchableColumns) : null,
         CommonParams.limit(plural),
         CommonParams.offset(plural),
         CommonParams.order(plural),
         CommonParams.orderby(plural, orderByColumns),
-      ],
+      ].filter( i => i !== null ),
       request: {},
       response: {
         items: [
