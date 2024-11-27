@@ -125,9 +125,9 @@ abstract class DB {
 			$this->update( [
 				'contact_id' => $other->get_id(),
 			],
-			[
-				'contact_id' => $contact->get_id()
-			] );
+				[
+					'contact_id' => $contact->get_id()
+				] );
 		}
 
 	}
@@ -1082,11 +1082,11 @@ abstract class DB {
 				case 'related' :
 
 					$val = swap_array_keys( $val, [
-						'child_id' => 'ID',
-						'child_type' => 'type',
-						'object_id' => 'ID',
+						'child_id'    => 'ID',
+						'child_type'  => 'type',
+						'object_id'   => 'ID',
 						'object_type' => 'type',
-					]);
+					] );
 
 					$relationships = get_db( 'object_relationships' );
 					$where[]       = [
@@ -1099,11 +1099,11 @@ abstract class DB {
 				case 'parent' :
 
 					$val = swap_array_keys( $val, [
-						'parent_id' => 'ID',
+						'parent_id'   => 'ID',
 						'parent_type' => 'type',
-						'object_id' => 'ID',
+						'object_id'   => 'ID',
 						'object_type' => 'type',
-					]);
+					] );
 
 					$relationships = get_db( 'object_relationships' );
 					$where[]       = [
@@ -1194,7 +1194,7 @@ abstract class DB {
 	 *
 	 * @throws FilterException
 	 *
-	 * @param Where $where
+	 * @param Where        $where
 	 * @param array|string $filters
 	 *
 	 * @return void
@@ -1279,6 +1279,29 @@ abstract class DB {
 	 * @var Table_Query
 	 */
 	protected $current_query;
+
+	/**
+	 * Given a date, convert it to the correct format for querying.
+	 * timestamp, time, etc would require UNIX while date_created would require MySQL datetime.
+	 *
+	 * @param $date
+	 *
+	 * @return int|string
+	 */
+	public function maybe_convert_date_format_for_query( $date ) {
+
+		// this covers most date formats
+		$date = new DateTimeHelper( $date );
+
+		switch ( $this->get_date_key() ) {
+			case 'time':
+			case 'timestamp':
+				return $date->getTimestamp();
+			case 'date_created':
+			default:
+				return $date->ymdhis();
+		}
+	}
 
 	/**
 	 * @throws FilterException
@@ -1372,22 +1395,44 @@ abstract class DB {
 				case 'exclude':
 					$query->whereNotIn( $this->get_primary_key(), $val );
 					break;
+				case 'range':
+
+					Filters::date_filter_handler( $this->get_date_key(), [
+						'date_range' => $val,
+						'before'     => get_array_var( $query_vars, 'before' ),
+						'after'      => get_array_var( $query_vars, 'after' ),
+						'days'       => get_array_var( $query_vars, 'days' ),
+					], $query->where(), $this->get_date_key_format() );
+
+					break;
 				case 'before':
-					$query->where()->lessThanEqualTo( $this->get_date_key(), $val );
+
+					// ignore if using range
+					if ( isset_not_empty( $query_vars, 'range' ) ) {
+						break;
+					}
+
+					$query->where()->lessThanEqualTo( $this->get_date_key(), $this->maybe_convert_date_format_for_query( $val ) );
 					break;
 				case 'after':
-					$query->where()->greaterThanEqualTo( $this->get_date_key(), $val );
+
+					// ignore if using range
+					if ( isset_not_empty( $query_vars, 'range' ) ) {
+						break;
+					}
+
+					$query->where()->greaterThanEqualTo( $this->get_date_key(), $this->maybe_convert_date_format_for_query( $val ) );
 					break;
 				case 'child' : // if it has a child
 				case 'related' : // if it has a child
 
 					$val = swap_array_keys( $val, [
-						'ID' => 'id',
-						'child_id' => 'id',
-						'child_type' => 'type',
-						'object_id' => 'id',
+						'ID'          => 'id',
+						'child_id'    => 'id',
+						'child_type'  => 'type',
+						'object_id'   => 'id',
 						'object_type' => 'type',
-					]);
+					] );
 
 					$join = $query->addJoin( 'LEFT', 'object_relationships' );
 					$join->onColumn( 'primary_object_id' );
@@ -1397,19 +1442,19 @@ abstract class DB {
 
 						$subVal = $val['id'];
 						$subVal = swap_array_keys( $subVal, [
-							'ID' => 'id',
-							'child_id' => 'id',
-							'child_type' => 'type',
-							'object_id' => 'id',
+							'ID'          => 'id',
+							'child_id'    => 'id',
+							'child_type'  => 'type',
+							'object_id'   => 'id',
 							'object_type' => 'type',
-						]);
+						] );
 
 						$relQuery = new Table_Query( 'object_relationships' );
 						$relQuery->setSelect( 'secondary_object_id' )
 						         ->where()
 						         ->equals( 'secondary_object_type', $val['type'] )
-						         ->equals( 'primary_object_type', $subVal[ 'type' ] )
-						         ->equals( 'primary_object_id', $subVal[ 'id' ] );
+						         ->equals( 'primary_object_type', $subVal['type'] )
+						         ->equals( 'primary_object_id', $subVal['id'] );
 
 						$val['id'] = $relQuery;
 					}
@@ -1422,12 +1467,12 @@ abstract class DB {
 				case 'parent' : // if it has a parent
 
 					$val = swap_array_keys( $val, [
-						'ID' => 'id',
-						'parent_id' => 'id',
+						'ID'          => 'id',
+						'parent_id'   => 'id',
 						'parent_type' => 'type',
-						'object_id' => 'id',
+						'object_id'   => 'id',
 						'object_type' => 'type',
-					]);
+					] );
 
 					$join = $query->addJoin( 'LEFT', 'object_relationships' );
 					$join->onColumn( 'secondary_object_id' );
@@ -1437,19 +1482,19 @@ abstract class DB {
 
 						$subVal = $val['id'];
 						$subVal = swap_array_keys( $subVal, [
-							'ID' => 'id',
-							'child_id' => 'id',
-							'child_type' => 'type',
-							'object_id' => 'id',
+							'ID'          => 'id',
+							'child_id'    => 'id',
+							'child_type'  => 'type',
+							'object_id'   => 'id',
 							'object_type' => 'type',
-						]);
+						] );
 
 						$relQuery = new Table_Query( 'object_relationships' );
 						$relQuery->setSelect( 'primary_object_id' )
 						         ->where()
 						         ->equals( 'primary_object_type', $val['type'] )
-						         ->equals( 'secondary_object_type', $subVal[ 'type' ] )
-						         ->equals( 'secondary_object_id', $subVal[ 'id' ] );
+						         ->equals( 'secondary_object_type', $subVal['type'] )
+						         ->equals( 'secondary_object_id', $subVal['id'] );
 
 						$val['id'] = $relQuery;
 					}
@@ -2106,10 +2151,28 @@ abstract class DB {
 	}
 
 	/**
+	 * The date key for before/after queries
+	 *
 	 * @return string
 	 */
 	public function get_date_key() {
 		return 'date_created';
+	}
+
+	/**
+	 * Get the format for the date key when doing before/after queries
+	 *
+	 * @return string
+	 */
+	public function get_date_key_format() {
+		switch ( $this->get_date_key() ) {
+			case 'time':
+			case 'timestamp':
+				return 'unix';
+			case 'date_created':
+			default:
+				return 'mysql';
+		}
 	}
 
 	/**
@@ -2205,7 +2268,7 @@ abstract class DB {
 	 * @return void
 	 */
 	public function drop_indexes( array $indexes ) {
-		foreach ( $indexes as $index ){
+		foreach ( $indexes as $index ) {
 			$this->drop_index( $index );
 		}
 	}
@@ -2231,9 +2294,9 @@ abstract class DB {
 	 *
 	 * @return void
 	 */
-	public function create_index( string $name, array $columns ){
+	public function create_index( string $name, array $columns ) {
 		global $wpdb;
-		$wpdb->query( sprintf( "CREATE INDEX $name ON {$this->table_name} (%s);", implode(',', $columns ) ) );
+		$wpdb->query( sprintf( "CREATE INDEX $name ON {$this->table_name} (%s);", implode( ',', $columns ) ) );
 	}
 
 	/**
@@ -2286,7 +2349,7 @@ abstract class DB {
 	 *
 	 * @return bool
 	 */
-	public function column_exists( $column_name ){
+	public function column_exists( $column_name ) {
 		global $wpdb;
 
 		if ( in_array( $column_name, $wpdb->get_col( "DESC $this->table_name", 0 ), true ) ) {
