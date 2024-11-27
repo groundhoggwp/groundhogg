@@ -267,33 +267,17 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_object_id( $broadcast ) {
 
-		switch ( $broadcast->get_status() ) {
-			default:
-			case 'scheduled':
-
-				$html = sprintf( "<strong>%s</strong> &#x2014; <span class='post-state'>(%s)</span>", $broadcast->get_title(), __( 'Scheduled' ) );
-
-				break;
-
-			case 'cancelled':
-
-				$html = sprintf( "<strong>%s</strong> &#x2014; <span class='post-state'>(%s)</span>", $broadcast->get_title(), __( 'Cancelled' ) );
-
-				break;
-
-			case 'sent':
-
-				$edit_url = admin_page_url( 'gh_reporting', [
+		if ( $broadcast->is_sent() ) {
+			return html()->e( 'a', [
+				'class' => 'row-title',
+				'href'  => admin_page_url( 'gh_reporting', [
 					'tab'       => 'broadcasts',
 					'broadcast' => $broadcast->get_id()
-				] );
-
-				$html = sprintf( "<strong><a class='row-title' href='%s'>%s</a></strong>", $edit_url, $broadcast->get_title() );
-
-				break;
+				] )
+			], $broadcast->get_title() );
 		}
 
-		return $html;
+		return html()->e( 'span', [ 'class' => 'row-title' ], $broadcast->get_title() );
 	}
 
 	/**
