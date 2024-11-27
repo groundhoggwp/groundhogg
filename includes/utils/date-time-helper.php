@@ -64,6 +64,14 @@ class DateTimeHelper extends \DateTime {
 		return $this->format( 'Y-m-d H:i:s' );
 	}
 
+	public function mysql() {
+		return $this->ymdhis();
+	}
+
+	public function unix() {
+		return $this->getTimestamp();
+	}
+
 	public function ymd() {
 		return $this->format( 'Y-m-d' );
 	}
