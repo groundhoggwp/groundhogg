@@ -2061,6 +2061,7 @@
               ...props,
             }),
           ],
+          addRow: () => [ '', 'equals', '' ],
           onChange: rows => {
             updateFilter({
               meta_filters: rows,

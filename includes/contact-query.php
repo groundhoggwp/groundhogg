@@ -1065,7 +1065,7 @@ class Contact_Query extends Table_Query {
 			}
 
 			$alias = $activityQuery->joinMeta( $key );
-			$activityQuery->where()->compare( "$alias.meta_key", $value, $compare );
+			$activityQuery->where()->compare( "$alias.meta_value", $value, $compare );
 		}
 	}
 
