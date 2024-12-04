@@ -276,7 +276,7 @@ class Table_Query extends Query {
 		}
 
 		$join = $this->addJoin( 'LEFT', [ $table_name, $meta_table_alias ] );
-		$join->onColumn( $meta_id_col, "$this->alias.$table_id_col" );
+		$join->onColumn( $meta_id_col, $table_id_col );
 		$join->conditions->equals( "$meta_table_alias.meta_key", $meta_key );
 
 		if ( empty( $this->groupby ) ){

@@ -31,7 +31,7 @@ class Query {
 	public function __construct( $table, string $alias = '' ) {
 
 		global $wpdb;
-		$this->db    = $wpdb;
+		$this->db = $wpdb;
 
 		$this->table = is_a( $table, Query::class ) ? "($table)" : $table;
 
@@ -42,6 +42,29 @@ class Query {
 		$this->alias  = $alias;
 		$this->where  = new Where( $this );
 		$this->select = "$this->alias.*";
+	}
+
+	/**
+	 * Adds the DB prefix to a given table name if not present
+	 *
+	 * @param string $table_suffix
+	 *
+	 * @return string
+	 */
+	public static function maybe_prefix( string $table_suffix ) {
+		global $wpdb;
+
+		//  Shared tables in  multisite environment
+		$sharedTables = [
+			'users'    => $wpdb->users,
+			'usermeta' => $wpdb->usermeta,
+		];
+
+		if ( array_key_exists( $table_suffix, $sharedTables ) ) {
+			return $sharedTables[ $table_suffix ];
+		}
+
+		return $wpdb->prefix . $table_suffix;
 	}
 
 	/**
@@ -686,6 +709,10 @@ class Query {
 
 		return $result;
 
+	}
+
+	public static function coalesceZero( string $col ) {
+		return "COALESCE($precision, 0)";
 	}
 
 	public static function cast2decimal( string $col, int $precision, int $scale ) {
