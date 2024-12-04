@@ -99,7 +99,7 @@ class Groundhogg_Email_Services {
 	 */
 	public static function option_update_marketing_callback( $old_val, $new_val ) {
 		if ( $new_val === 'wp_mail' && self::get_wordpress_service() !== 'wp_mail' ) {
-			self::set_service( self::MARKETING, self::get_wordpress_service() );
+			self::set_service_for_type( self::MARKETING, self::get_wordpress_service() );
 		}
 	}
 
@@ -111,7 +111,7 @@ class Groundhogg_Email_Services {
 	 */
 	public static function option_update_transactional_callback( $old_val, $new_val ) {
 		if ( $new_val === 'wp_mail' && self::get_wordpress_service() !== 'wp_mail' ) {
-			self::set_service( self::TRANSACTIONAL, self::get_wordpress_service() );
+			self::set_service_for_type( self::TRANSACTIONAL, self::get_wordpress_service() );
 		}
 	}
 
@@ -125,6 +125,17 @@ class Groundhogg_Email_Services {
 	}
 
 	/**
+	 * Set the current message type
+	 *
+	 * @param $type
+	 *
+	 * @return void
+	 */
+	public static function set_current_message_type( $type ) {
+		self::$current_message_type = $type;
+	}
+
+	/**
 	 * Get the current message type
 	 * If not set assume transactional
 	 *
@@ -132,6 +143,22 @@ class Groundhogg_Email_Services {
 	 */
 	public static function get_current_message_type() {
 		return self::$current_message_type ?: self::WORDPRESS;
+	}
+
+	/**
+	 * Alias for set_service()
+	 *
+	 * @param $service
+	 *
+	 * @return void
+	 */
+	public static function set_current_email_service( $service ) {
+
+        // Only allow registered services to be used
+        if ( array_key_exists( $service, self::$email_services ) ) {
+	        self::$current_email_service = $service;
+        }
+
 	}
 
 	/**
@@ -161,13 +188,31 @@ class Groundhogg_Email_Services {
 	/**
 	 * Get the callback function provided the ID of a registered email service.
 	 *
-	 * @param $id
+	 * @param string $id the ID of the service
 	 *
-	 * @return bool|mixed
+	 * @return callable
 	 */
-	public static function get_callback( $id ) {
+	public static function get_service_callback( $id = false ) {
+
+		if ( ! $id ) {
+			$id = self::get_current_email_service();
+		}
+
 		return get_array_var( get_array_var( self::$email_services, $id ), 'callback' );
 	}
+
+	/**
+	 * Alias for get_service_callback()
+	 *
+	 * @param bool $id the ID of the service
+	 *
+	 * @return callable
+	 * @depreacted since 3.7.3
+	 */
+    public static function get_callback( $id = false ) {
+        _deprecated_function(__METHOD__, '3.7.3', __CLASS__ . '::get_service_callback()' );
+	    return self::get_service_callback( $id );
+    }
 
 	/**
 	 * Get the callback function provided the ID of a registered email service.
@@ -224,18 +269,30 @@ class Groundhogg_Email_Services {
 	}
 
 	/**
+	 * Sets the current service to the given
+	 *
+	 * @return void
+	 * @depreacted 3.7.3
+	 */
+	public static function set_service( $type, $service ) {
+		_deprecated_function( __METHOD__, '3.7.4', __CLASS__ . '::set_service_for_type()' );
+		self::set_service_for_type( $type, $service );
+	}
+
+	/**
 	 * Set the service
 	 *
 	 * @param $type    string
 	 * @param $service string
 	 */
-	public static function set_service( $type, $service ) {
+	public static function set_service_for_type( $type, $service ) {
 		update_option( 'gh_' . $type . '_email_service', $service );
 	}
 
 	/**
-	 * Handler for transactional emails.
+	 * Handler for all emails.
 	 *
+	 * @param string       $service     the service to use to send the email
 	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
 	 * @param string       $subject     Email subject
 	 * @param string       $message     Message contents
@@ -248,9 +305,29 @@ class Groundhogg_Email_Services {
 
 		disable_emojis();
 
-		$callback                    = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
-		self::$current_email_service = $service;
-		self::$message_id            = '';
+		// set the current email service
+		self::set_current_email_service( $service );
+
+		/**
+		 * Allow hooks to swap wap out flags before the email is sent based on the current state of Groundhogg_Email_Services
+		 *
+		 * @param string $service the ID of the service about to be used
+		 * @param mixed  $to      the recipients of the email
+		 * @param string $subject the email subject line
+		 * @param string $message the email message
+		 * @param mixed  $headers the email headers
+		 */
+		do_action( 'groundhogg/email_services/before_send', $service, $to, $subject, $message, $headers, $attachments );
+
+        $callback = self::get_service_callback();
+
+        // fallback to wp_mail() if callback is not available
+        if ( ! is_callable( $callback ) ) {
+            $callback = 'wp_mail';
+        }
+
+        // clear the message id from any previous send
+		self::$message_id = '';
 
 		add_action( 'wp_mail_failed', [ self::class, 'catch_wp_mail_failed' ] );
 
@@ -329,8 +406,8 @@ class Groundhogg_Email_Services {
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_type( $type, $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service                    = self::get_saved_service( $type );
-		self::$current_message_type = $type;
+		self::set_current_message_type( $type );
+		$service = self::get_saved_service( $type );
 
 		return self::send( $service, $to, $subject, $message, $headers, $attachments );
 	}
@@ -347,10 +424,7 @@ class Groundhogg_Email_Services {
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_transactional( $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service                    = self::get_saved_service( self::TRANSACTIONAL );
-		self::$current_message_type = self::TRANSACTIONAL;
-
-		return self::send( $service, $to, $subject, $message, $headers, $attachments );
+		return self::send_type( self::TRANSACTIONAL, $to, $subject, $message, $headers, $attachments );
 	}
 
 	/**
@@ -365,10 +439,7 @@ class Groundhogg_Email_Services {
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_marketing( $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service                    = self::get_saved_service( self::MARKETING );
-		self::$current_message_type = self::MARKETING;
-
-		return self::send( $service, $to, $subject, $message, $headers, $attachments );
+		return self::send_type( self::MARKETING, $to, $subject, $message, $headers, $attachments );
 	}
 
 	/**
@@ -383,48 +454,53 @@ class Groundhogg_Email_Services {
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_wordpress( $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service                    = self::get_saved_service( self::WORDPRESS );
-		self::$current_message_type = self::WORDPRESS;
-
-		return self::send( $service, $to, $subject, $message, $headers, $attachments );
+		return self::send_type( self::WORDPRESS, $to, $subject, $message, $headers, $attachments );
 	}
 }
 
-/**
- * Warning to display if log_only service is in use but the email logs aren't.
- *
- * @return void
- */
-function log_only_logs_not_enabled_notice() {
+if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ){
 
-	?>
-    <div class="notice notice-warning is-dismissible">
-        <p>
-			<?php printf( __( '<b>Attention:</b> The <code>Log Only</code> email service is in use, but email logs are not enabled. <a href="%s">Enable logging!</a>' ), \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ); ?>
-        </p>
-    </div>
-	<?php
+	/**
+	 * Warning to display if log_only service is in use but the email logs aren't.
+	 *
+	 * @return void
+	 */
+	function log_only_logs_not_enabled_notice() {
+
+		?>
+        <div class="notice notice-warning is-dismissible">
+            <p>
+				<?php printf( __( '<b>Attention:</b> The <code>Log Only</code> email service is in use, but email logs are not enabled. <a href="%s">Enable logging!</a>' ), \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ); ?>
+            </p>
+        </div>
+		<?php
+
+	}
 
 }
 
-/**
- * Wraps gh_mail() and uses the Log_Only mailer which does not send any email
- *
- * @param $to
- * @param $subject
- * @param $message
- * @param $headers
- * @param $attachments
- *
- * @return bool
- */
-function log_only( $to, $subject, $message, $headers = '', $attachments = array() ) {
+if ( ! function_exists( 'log_only' ) ){
 
-    static $mailer;
+	/**
+	 * Wraps gh_mail() and uses the Log_Only mailer which does not send any email
+	 *
+	 * @param $to
+	 * @param $subject
+	 * @param $message
+	 * @param $headers
+	 * @param $attachments
+	 *
+	 * @return bool
+	 */
+	function log_only( $to, $subject, $message, $headers = '', $attachments = array() ) {
 
-    if ( ! isset( $mailer ) ){
-        $mailer = new Log_Only( true );
-    }
+		static $mailer;
 
-	return gh_mail( $to, $subject, $message, $headers, $attachments, $mailer );
+		if ( ! isset( $mailer ) ) {
+			$mailer = new Log_Only( true );
+		}
+
+		return gh_mail( $to, $subject, $message, $headers, $attachments, $mailer );
+	}
+
 }
