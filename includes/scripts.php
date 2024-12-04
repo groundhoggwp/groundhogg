@@ -23,7 +23,7 @@ class Scripts {
 
 		add_filter( 'wp_refresh_nonces', [ $this, 'refresh_nonces' ], 10, 3 );
 
-		add_action('enqueue_block_editor_assets', [ $this, 'block_editor_scripts'] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'block_editor_scripts' ] );
 	}
 
 	public function block_editor_scripts() {
@@ -412,7 +412,7 @@ class Scripts {
 			'jquery-ui-autocomplete',
 			'wp-color-picker',
 			'beautify-html',
-		    'react',
+			'react',
 			'wp-blocks',
 			'wp-edit-post'
 		], GROUNDHOGG_VERSION );
@@ -476,7 +476,7 @@ class Scripts {
 			'funnels'
 		];
 
-		foreach ( $filters as $filter ){
+		foreach ( $filters as $filter ) {
 			wp_register_script( "groundhogg-admin-filter-$filter", GROUNDHOGG_ASSETS_URL . "js/admin/filters/{$filter}{$dot_min}.js", [
 				'groundhogg-admin-filters'
 			], GROUNDHOGG_VERSION, true );
@@ -620,8 +620,10 @@ class Scripts {
 					'root' => managed_page_url()
 				],
 				'url'              => [
-					'admin' => admin_url(),
-					'home'  => home_url(),
+					'admin'   => admin_url(),
+					'home'    => home_url(),
+					'content' => WP_CONTENT_URL,
+					'plugins' => WP_PLUGIN_URL,
 				],
 				'rawStepTypes'     => Plugin::instance()->step_manager->get_elements(),
 				'currentUser'      => wp_get_current_user(),

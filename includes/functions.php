@@ -5775,7 +5775,7 @@ function extrapolate_wp_mail_plugin() {
 
 	foreach ( $active_plugins as $active_plugin ) {
 
-		$plugin_dir = 'wp-content/plugins/' . dirname( $active_plugin ) . '/';
+		$plugin_dir = WP_PLUGIN_DIR . '/' . dirname( $active_plugin ) . '/';
 
 		if ( strpos( $defined, $plugin_dir ) !== false ) {
 			return $active_plugin;
@@ -8441,7 +8441,7 @@ function get_unsub_reasons() {
  * @return \WP_User[]|int[]
  */
 function filter_by_cap( $users, $cap ) {
-	$caps = wp_parse_list( $cap );
+	$caps = maybe_explode( $cap );
 
 	return array_filter( $users, function ( $user ) use ( $caps ) {
 		foreach ( $caps as $cap ) {

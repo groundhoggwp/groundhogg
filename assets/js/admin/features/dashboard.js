@@ -907,7 +907,7 @@
           ],
         ].map(([icon, text, href]) => ( [
           Img({
-            src   : `/wp-content/plugins/groundhogg/assets/images/social-icons/brand-boxed/${ icon }.png`,
+            src   : `${ Groundhogg.assets.images }/social-icons/brand-boxed/${ icon }.png`,
             height: '16',
             width : '16',
           }),
