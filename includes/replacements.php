@@ -896,12 +896,14 @@ class Replacements implements \JsonSerializable {
 
 		if ( $property = Properties::instance()->get_field( $field ) ) {
 			$text = display_custom_field( $property, $this->current_contact, false );
-		} else {
+		} else if ( property_exists( $this->get_current_contact(), $field ) ) {
 			$text = $this->get_current_contact()->$field;
+		} else {
+			$text = $this->get_current_contact()->get_meta( $field );
+        }
 
-			if ( is_array( $text ) || is_object( $text ) ) {
-				$text = wp_json_encode( $this->get_current_contact()->$field );
-			}
+		if ( is_array( $text ) || is_object( $text ) ) {
+			$text = wp_json_encode( $text );
 		}
 
 		if ( ! $text ) {
@@ -1042,19 +1044,15 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-	 * Return the contact meta
-     *
-     * usage is {meta.meta_key}
-     * or for serialized date you can do {meta.some_array.key}
-     *
-     * Additionally add a format function like {meta.some_array|ol}
+	 * Generic handler function for arbitrary meta data
 	 *
-	 * @param $contact_id int
-	 * @param $arg        string the meta key
+	 * @param string   $arg               generally the meta key and other specific formatting
+	 * @param callable $get_meta_callback a callback function to retrieve the value from the root key
 	 *
-	 * @return mixed|string
+	 * @return mixed
 	 */
-	function replacement_meta( $arg, $contact_id ) {
+	public static function handle_meta_replacement( $arg, callable $get_meta_callback ) {
+
 		if ( empty( $arg ) ) {
 			return '';
 		}
@@ -1066,7 +1064,7 @@ class Replacements implements \JsonSerializable {
 		$nested_keys = explode( '.', get_array_var( $parts, 0 ) );
 		$root_key    = array_shift( $nested_keys );
 
-		$value = $this->get_current_contact()->get_meta( $root_key );
+		$value = call_user_func( $get_meta_callback, $root_key );
 
 		while ( ! empty( $nested_keys ) && is_iterable( $value ) ) {
 			$key   = array_shift( $nested_keys );
@@ -1088,6 +1086,23 @@ class Replacements implements \JsonSerializable {
 			case 'orList':
 				return is_array( $value ) ? orList( $value ) : $value;
 		}
+	}
+
+	/**
+	 * Return the contact meta
+	 *
+	 * usage is {meta.meta_key}
+	 * or for serialized date you can do {meta.some_array.key}
+	 *
+	 * Additionally add a format function like {meta.some_array|ol}
+	 *
+	 * @param $contact_id int
+	 * @param $arg        string the meta key
+	 *
+	 * @return mixed|string
+	 */
+	function replacement_meta( $arg, $contact_id ) {
+		return self::handle_meta_replacement( $arg, [ $this->get_current_contact(), 'get_meta' ] );
 	}
 
 	/**
@@ -1157,21 +1172,23 @@ class Replacements implements \JsonSerializable {
 	 * @param $contact_id int
 	 * @param $arg        string the meta key
 	 *
-	 * @return mixed|string
+	 * @return mixed
 	 */
 	function replacement_user( $arg, $contact_id ) {
-		if ( empty( $arg ) || ! $this->get_current_contact()->get_user_id() ) {
+		if ( ! $this->get_current_contact()->get_user_id() ) {
 			return '';
 		}
 
-		$rep = $this->get_current_contact()->get_userdata()->$arg;
+		return self::handle_meta_replacement( $arg, function ( $key ) {
+			$rep = $this->get_current_contact()->get_userdata()->$key;
 
-		// Try to get from meta
-		if ( ! $rep ) {
-			$rep = get_user_meta( $this->get_current_contact()->get_user_id(), $arg, true );
-		}
+			// Try to get from meta
+			if ( ! $rep ) {
+				$rep = get_user_meta( $this->get_current_contact()->get_user_id(), $key, true );
+			}
 
-		return print_r( $rep, true );
+			return $rep;
+		} );
 	}
 
 	/**
@@ -2570,7 +2587,7 @@ class Replacements implements \JsonSerializable {
 	 * @return false|string
 	 */
 	public function replacement_andList( $arg, $contact_id ) {
-        return $this->replacement_meta( "$arg|andList", $contact_id );
+		return $this->replacement_meta( "$arg|andList", $contact_id );
 	}
 
 
@@ -2602,16 +2619,17 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * Substring format of inner replacement code
-     *
+	 * Substring format of inner replacement code
+	 *
 	 * @param $arg
 	 *
 	 * @return false|string
 	 */
-    public function replacement_substring( $arg ) {
-        $args = split_last( $arg, ',', 2 );
-	    return substr( $args[1], $args[1], $args[2] );
-    }
+	public function replacement_substring( $arg ) {
+		$args = split_last( $arg, ',', 2 );
+
+		return substr( $args[1], $args[1], $args[2] );
+	}
 
 	/**
 	 * We don't want this to be serialized
