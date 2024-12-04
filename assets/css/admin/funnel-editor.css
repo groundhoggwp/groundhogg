@@ -613,9 +613,6 @@ button.button.save-button {
   flex-direction: column;
   margin: 5px;
   padding: 5px 5px 5px 25px;
-  z-index: 1;
-  position: relative;
-  background: #fff;
 }
 #step-flow .step > .hndle > div:not(.hndle-icon) span.step-title {
   font-size: 14px;
@@ -632,19 +629,9 @@ button.button.save-button {
 }
 #step-flow .step.benchmark .hndle-icon {
   border-radius: 5px;
-  background-color: #fff;
+  background-color: #FCDFC4;
   border: 2px solid #f58115;
   box-sizing: border-box;
-}
-#step-flow .step.benchmark .hndle-icon::after {
-  content: "";
-  background-color: rgba(245, 129, 21, 0.25);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  border-radius: 2px;
 }
 #step-flow .step.benchmark .hndle-icon svg {
   fill: #000;
@@ -681,19 +668,9 @@ button.button.save-button {
 }
 #step-flow .step.action .hndle-icon {
   border-radius: 50px;
-  background-color: white;
+  background-color: #E7F3CD;
   border: 2px solid #9ece38;
   box-sizing: border-box;
-}
-#step-flow .step.action .hndle-icon::after {
-  content: "";
-  border-radius: 50px;
-  background-color: rgba(158, 206, 56, 0.25);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
 }
 #step-flow .step.action .hndle-icon svg {
   fill: #000;

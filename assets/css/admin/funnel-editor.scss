@@ -825,9 +825,9 @@ button.button.save-button {
         flex-direction: column;
         margin: 5px;
         padding: 5px 5px 5px 25px;
-        z-index: 1;
-        position: relative;
-        background: #fff;
+        //z-index: 1;
+        //position: relative;
+        //background: #fff;
 
         span.step-title {
           font-size: 14px;
@@ -853,21 +853,21 @@ button.button.save-button {
 
       .hndle-icon{
         border-radius: 5px;
-        background-color: #fff;
+        background-color: #FCDFC4;
         border: 2px solid $benchmark-orange;
         box-sizing: border-box;
         //position: relative;
 
-        &::after {
-          content: '';
-          background-color: $benchmark-orange-25;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          left: 0;
-          border-radius: 2px;
-        }
+        //&::after {
+        //  content: '';
+        //  background-color: $benchmark-orange-25;
+        //  position: absolute;
+        //  top: 0;
+        //  bottom: 0;
+        //  right: 0;
+        //  left: 0;
+        //  border-radius: 2px;
+        //}
 
         svg {
           fill: #000;
@@ -911,20 +911,20 @@ button.button.save-button {
 
       .hndle-icon{
         border-radius: 50px;
-        background-color: white;
+        background-color: #E7F3CD;
         border: 2px solid $action-green;
         box-sizing: border-box;
 
-        &::after {
-          content: '';
-          border-radius: 50px;
-          background-color: $action-green-25;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          left: 0;
-        }
+        //&::after {
+        //  content: '';
+        //  border-radius: 50px;
+        //  background-color: $action-green-25;
+        //  position: absolute;
+        //  top: 0;
+        //  bottom: 0;
+        //  right: 0;
+        //  left: 0;
+        //}
 
         svg {
           fill: #000;
