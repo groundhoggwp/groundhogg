@@ -44,6 +44,8 @@ class Groundhogg_Email_Services {
 		}
 
 		add_action( 'admin_notices', [ 'Groundhogg_Email_Services', 'hide_conflicts' ], 1 );
+
+		do_action( 'Groundhogg/email_services/init' );
 	}
 
 	public static function hide_conflicts() {
@@ -154,10 +156,10 @@ class Groundhogg_Email_Services {
 	 */
 	public static function set_current_email_service( $service ) {
 
-        // Only allow registered services to be used
-        if ( array_key_exists( $service, self::$email_services ) ) {
-	        self::$current_email_service = $service;
-        }
+		// Only allow registered services to be used
+		if ( array_key_exists( $service, self::$email_services ) ) {
+			self::$current_email_service = $service;
+		}
 
 	}
 
@@ -209,10 +211,11 @@ class Groundhogg_Email_Services {
 	 * @return callable
 	 * @depreacted since 3.7.3
 	 */
-    public static function get_callback( $id = false ) {
-        _deprecated_function(__METHOD__, '3.7.3', __CLASS__ . '::get_service_callback()' );
-	    return self::get_service_callback( $id );
-    }
+	public static function get_callback( $id = false ) {
+		_deprecated_function( __METHOD__, '3.7.3', __CLASS__ . '::get_service_callback()' );
+
+		return self::get_service_callback( $id );
+	}
 
 	/**
 	 * Get the callback function provided the ID of a registered email service.
@@ -292,7 +295,6 @@ class Groundhogg_Email_Services {
 	/**
 	 * Handler for all emails.
 	 *
-	 * @param string       $service     the service to use to send the email
 	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
 	 * @param string       $subject     Email subject
 	 * @param string       $message     Message contents
@@ -301,32 +303,28 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
-	public static function send( $service, $to, $subject, $message, $headers = '', $attachments = array() ) {
+	public static function send( $to, $subject, $message, $headers = '', $attachments = array() ) {
 
 		disable_emojis();
-
-		// set the current email service
-		self::set_current_email_service( $service );
 
 		/**
 		 * Allow hooks to swap wap out flags before the email is sent based on the current state of Groundhogg_Email_Services
 		 *
-		 * @param string $service the ID of the service about to be used
 		 * @param mixed  $to      the recipients of the email
 		 * @param string $subject the email subject line
 		 * @param string $message the email message
 		 * @param mixed  $headers the email headers
 		 */
-		do_action( 'groundhogg/email_services/before_send', $service, $to, $subject, $message, $headers, $attachments );
+		do_action( 'groundhogg/email_services/before_send', $to, $subject, $message, $headers, $attachments );
 
-        $callback = self::get_service_callback();
+		$callback = self::get_service_callback();
 
-        // fallback to wp_mail() if callback is not available
-        if ( ! is_callable( $callback ) ) {
-            $callback = 'wp_mail';
-        }
+		// fallback to wp_mail() if callback is not available
+		if ( ! is_callable( $callback ) ) {
+			$callback = 'wp_mail';
+		}
 
-        // clear the message id from any previous send
+		// clear the message id from any previous send
 		self::$message_id = '';
 
 		add_action( 'wp_mail_failed', [ self::class, 'catch_wp_mail_failed' ] );
@@ -395,8 +393,9 @@ class Groundhogg_Email_Services {
 	}
 
 	/**
-	 * Handler for unknown email type.
+	 * Send an email of a specific type
 	 *
+	 * @param string       $type        The message type we're sending for
 	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
 	 * @param string       $subject     Email subject
 	 * @param string       $message     Message contents
@@ -409,7 +408,25 @@ class Groundhogg_Email_Services {
 		self::set_current_message_type( $type );
 		$service = self::get_saved_service( $type );
 
-		return self::send( $service, $to, $subject, $message, $headers, $attachments );
+		return self::send_with_service( $service, $to, $subject, $message, $headers, $attachments );
+	}
+
+	/**
+	 * Send an email using a specific service
+	 *
+	 * @param string $service     The service to use for sending the email
+	 * @param mixed  $to          where to send the email to
+	 * @param string $subject     the subject line to use
+	 * @param string $message     the message to send
+	 * @param mixed  $headers     any headers
+	 * @param mixed  $attachments any attachments
+	 *
+	 * @return bool
+	 */
+	public static function send_with_service( $service, $to, $subject, $message, $headers = '', $attachments = array() ) {
+		self::set_current_email_service( $service );
+
+		return self::send( $to, $subject, $message, $headers, $attachments );
 	}
 
 	/**
@@ -458,7 +475,7 @@ class Groundhogg_Email_Services {
 	}
 }
 
-if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ){
+if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ) {
 
 	/**
 	 * Warning to display if log_only service is in use but the email logs aren't.
@@ -479,7 +496,7 @@ if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ){
 
 }
 
-if ( ! function_exists( 'log_only' ) ){
+if ( ! function_exists( 'log_only' ) ) {
 
 	/**
 	 * Wraps gh_mail() and uses the Log_Only mailer which does not send any email
