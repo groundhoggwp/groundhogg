@@ -42,14 +42,33 @@ class Email_Log_Item extends Base_Object {
 		$headers = [];
 
 		foreach ( $this->headers as $header ) {
-			$headers[] = sprintf( "%s: %s\n", $header[0], $header[1] );
+			$headers[] = sprintf( "%s: %s", $header[0], $header[1] );
 		}
-
-		$message_type = $this->message_type;
 
 		add_action( 'groundhogg/email_logger/before_create_log', [ $this, 'setup_email_logger_with_this' ] );
 
-		\Groundhogg_Email_Services::send_type( $message_type, $this->recipients, $this->subject, $this->content, $headers );
+		// make sure the altbody is set correctly
+		add_action( 'phpmailer_init', [ $this, 'set_altbody' ] );
+
+		$result = \Groundhogg_Email_Services::send_type( $this->message_type, $this->recipients, $this->subject, $this->content, $headers );
+
+		// make sure we remvoe altbody setting after retry
+		remove_action( 'phpmailer_init', [ $this, 'set_altbody' ] );
+
+		remove_action( 'groundhogg/email_logger/before_create_log', [ $this, 'setup_email_logger_with_this' ] );
+
+		return $result;
+	}
+
+	/**
+	 * Set the altbody if there is one
+	 *
+	 * @param \PHPMailer $phpmailer
+	 *
+	 * @return void
+	 */
+	public function set_altbody( \PHPMailer &$phpmailer ) {
+		$phpmailer->AltBody = $this->altbody;
 	}
 
 	/**

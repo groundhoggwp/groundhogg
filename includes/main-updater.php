@@ -200,6 +200,13 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					db()->submissions->create_table(); // add name column
 				}
+			],
+			'3.7.3'    => [
+				'automatic'   => true,
+				'description' => __( 'Add the <code>altbody</code> column to the logs DB table.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->email_log->create_table(); // add altbody column
+				}
 			]
 		];
 	}

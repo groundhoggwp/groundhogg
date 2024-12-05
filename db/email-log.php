@@ -121,7 +121,7 @@ class Email_Log extends DB {
 	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
 
 		// Don't allow low level people to see sensitive email logs
-		if ( ! is_super_admin() ){
+		if ( ! is_super_admin() ) {
 			$data['is_sensitive'] = 0;
 		}
 
@@ -160,6 +160,7 @@ class Email_Log extends DB {
 			'from_address'    => '%s',
 			'subject'         => '%s',
 			'content'         => '%s',
+			'altbody'         => '%s',
 			'headers'         => '%s',
 			'message_type'    => '%s',
 			'email_service'   => '%s',
@@ -187,6 +188,7 @@ class Email_Log extends DB {
 			'from_address'    => '',
 			'subject'         => '',
 			'content'         => '',
+			'altbody'         => '',
 			'headers'         => '',
 			'message_type'    => '',
 			'queued_event_id' => 0,
@@ -214,11 +216,11 @@ class Email_Log extends DB {
 
 		parent::maybe_register_filters();
 
-		$this->query_filters->register( 'recipients', function ( $filter, $where ){
+		$this->query_filters->register( 'recipients', function ( $filter, $where ) {
 			global $wpdb;
 			$recipients = array_map( 'sanitize_email', $filter['recipients'] );
-			$subWhere = $where->subWhere();
-			foreach ( $recipients as $recipient ){
+			$subWhere   = $where->subWhere();
+			foreach ( $recipients as $recipient ) {
 				$subWhere->like( 'recipients', '%' . $wpdb->esc_like( $recipient ) . '%' );
 			}
 		} );
@@ -238,6 +240,7 @@ class Email_Log extends DB {
 		subject mediumtext NOT NULL,
 		headers mediumtext NOT NULL,
 		content longtext NOT NULL,
+		altbody longtext NOT NULL,
 		message_type varchar(20) NOT NULL,
 		email_service varchar(20) NOT NULL,
 		status varchar(20) NOT NULL,

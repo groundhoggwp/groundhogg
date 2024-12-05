@@ -63,7 +63,7 @@ class Email_Logger {
 	 *
 	 * @return void
 	 */
-	public static function email_is_sensitive(){
+	public static function email_is_sensitive() {
 		self::$is_sensitive = true;
 	}
 
@@ -84,7 +84,7 @@ class Email_Logger {
 	 */
 	public function phpmailer_init_callback( $phpmailer ) {
 
-		if ( ! self::is_enabled() ){
+		if ( ! self::is_enabled() ) {
 			return;
 		}
 
@@ -110,6 +110,7 @@ class Email_Logger {
 			'from_address'    => $phpmailer->From,
 			'subject'         => $phpmailer->Subject,
 			'content'         => $phpmailer->Body,
+			'altbody'         => $phpmailer->AltBody,
 			'headers'         => $headers,
 			'message_type'    => \Groundhogg_Email_Services::get_current_message_type(),
 			'email_service'   => \Groundhogg_Email_Services::get_current_email_service(),
@@ -122,7 +123,7 @@ class Email_Logger {
 
 		$log_data = apply_filters( 'groundhogg/email_logger/before_create_log/log_data', $log_data, $this );
 
-		if ( self::$log_item_id && self::$log_item->exists() ){
+		if ( self::$log_item_id && self::$log_item->exists() ) {
 			self::$log_item->update( $log_data );
 		} else {
 			self::$log_item_id = get_db( 'email_log' )->add( $log_data );
@@ -132,7 +133,7 @@ class Email_Logger {
 		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );
 
 		// Reset $is_sensitive for the next email log
-		if ( self::$is_sensitive ){
+		if ( self::$is_sensitive ) {
 			self::$is_sensitive = false;
 		}
 	}
@@ -144,7 +145,7 @@ class Email_Logger {
 	 */
 	public static function set_msg_id( $msg_id ) {
 
-		if ( ! self::is_enabled() || ! self::$log_item || ! self::$log_item->exists() ){
+		if ( ! self::is_enabled() || ! self::$log_item || ! self::$log_item->exists() ) {
 			return;
 		}
 
