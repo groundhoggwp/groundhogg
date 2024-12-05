@@ -876,6 +876,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Gets the related step element of a step based on the step type
+	 *
+	 * @return Funnel_Step
+	 */
+	public function get_step_element() {
+		return Plugin::instance()->step_manager->get_element( $this->get_type() );
+	}
+
+	/**
 	 * Output the HTML of a step.
 	 */
 	public function html_v2() {

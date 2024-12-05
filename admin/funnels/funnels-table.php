@@ -73,6 +73,7 @@ class Funnels_Table extends Table {
 		$columns = array(
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
+			'steps'           => _x( 'Steps', 'Column label', 'groundhogg' ),
 			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
 			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'author'          => _x( 'Author', 'Column label', 'groundhogg' ),
@@ -222,6 +223,44 @@ class Funnels_Table extends Table {
 		] );
 
 		return "<a href='$queryUrl'>$from_user</a>";
+	}
+
+	protected function column_steps( Funnel $funnel ) {
+
+		$allSteps = $funnel->get_steps();
+        $steps = array_splice( $allSteps, 0, 6 );
+
+		foreach ( $steps as $step ) {
+
+			$step_type = $step->get_step_element();
+
+			?>
+            <div class="step-icon <?php echo $step->get_type() ?> <?php echo $step->get_group() ?> ">
+				<?php if ( $step_type->icon_is_svg() ): ?>
+					<?php echo $step_type->get_icon_svg(); ?>
+				<?php else: ?>
+                    <img src="<?php echo esc_url( $step_type->get_icon() ); ?>">
+				<?php endif; ?>
+                <div class="gh-tooltip top">
+					<?php _e( $step->get_title() ) ?>
+                </div>
+            </div>
+			<?php
+
+		}
+
+        if ( ! empty( $allSteps ) ) {
+	        ?>
+            <div class="step-icon more">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                    <path fill="#000" d="M4 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+                </svg>
+                <div class="gh-tooltip top">
+			        <?php printf( _n( '%d more step...', '%d more steps',  count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ?>
+                </div>
+            </div>
+	        <?php
+        }
 	}
 
 	/**
