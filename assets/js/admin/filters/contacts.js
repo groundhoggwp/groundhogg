@@ -280,6 +280,7 @@
         type     : 'number',
         value    : days,
         id       : 'filter-days',
+        min: 0,
         className: `value ${ [
                                'x_days',
                                'next_x_days',
@@ -334,6 +335,7 @@
                     style       : {
                         width: '100px',
                     },
+                    min:0,
                 }) }
             </div>
             <span class="gh-text">
@@ -1936,6 +1938,7 @@
     onMount = () => {
     },
     defaults = {},
+    ...rest
   }) => {
     registerFilter(id, group, label, {
       view (filter) {
@@ -2008,6 +2011,7 @@
         value        : 0,
         value_compare: 'greater_than_or_equal_to',
       },
+      ...rest
     })
 
   }
@@ -2236,6 +2240,7 @@
         name: 'object_id',
         value: object_id,
         placeholder: 'Parent ID',
+        min: 0,
         onInput: e => {
           updateFilter({
             object_id: e.target.value
@@ -2274,6 +2279,7 @@
         name: 'object_id',
         value: object_id,
         placeholder: 'Child ID',
+        min: 0,
         onInput: e => {
           updateFilter({
             object_id: e.target.value
