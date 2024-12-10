@@ -416,6 +416,23 @@ class HTML {
 		return $html;
 	}
 
+	/**
+     * Helps creating links
+     *
+     * <a href="#baz">foobar</a>
+     *
+	 * @param $href
+	 * @param $text
+	 * @param $attrs
+	 *
+	 * @return string
+	 */
+	public function a( $href = '', $text = '', $attrs = [], $echo = false ) {
+		return $this->e( 'a', wp_parse_args( $attrs, [
+			'href' => $href
+		] ), $text, false, $echo );
+	}
+
 
 	public function end_form_table() {
 		?></tbody></table><?php
@@ -1774,8 +1791,8 @@ class HTML {
 	}
 
 	/**
-     * The percentage change for a thing
-     *
+	 * The percentage change for a thing
+	 *
 	 * @param float $percentage
 	 * @param bool  $down_is_good
 	 *
@@ -1784,23 +1801,23 @@ class HTML {
 	public function percentage_change( float $percentage, bool $down_is_good = false ) {
 
 		// No change
-		if ( $percentage == 0 ){
+		if ( $percentage == 0 ) {
 			return '';
 		}
 
 		$classes = [
-            'percentage-change'
-        ];
+			'percentage-change'
+		];
 
 		if ( $percentage < 0 ) {
 			$classes[] = $down_is_good ? 'good' : 'bad';
 //			$tri       = '&blacktriangledown;';
-			$tri       = '&#x25BE;';
+			$tri = '&#x25BE;';
 //			$tri       = '&#9662;';
 		} else {
 			$classes[] = $down_is_good ? 'bad' : 'good';
 //			$tri       = '&blacktriangle;';
-			$tri       = '&#x25B4;';
+			$tri = '&#x25B4;';
 //			$tri       = '&#9652;';
 		}
 
