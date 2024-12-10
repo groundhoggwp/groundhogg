@@ -349,6 +349,11 @@
      */
     async maybeFetchItems (ids = [], opts = {}) {
 
+      const {
+        param = this.primaryKey,
+        ...otherOpts
+      } = opts
+
       // No items requested, return all present items
       if (( !ids || ids.length === 0 ) && this.hasItems()) {
         return this.items
@@ -368,11 +373,11 @@
       let missingIds = ids.filter(id => !this.hasItem(id))
 
       const params = {
-        [this.primaryKey]: missingIds,
+        [param]: missingIds,
         limit: missingIds.length,
       }
 
-      return this.fetchItems(params, opts)
+      return this.fetchItems(params, otherOpts)
     },
 
     /**
