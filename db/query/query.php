@@ -712,7 +712,7 @@ class Query {
 	}
 
 	public static function coalesceZero( string $col ) {
-		return "COALESCE($precision, 0)";
+		return "COALESCE($col, 0)";
 	}
 
 	public static function cast2decimal( string $col, int $precision, int $scale ) {
