@@ -900,7 +900,7 @@ class Replacements implements \JsonSerializable {
 			$text = $this->get_current_contact()->$field;
 		} else {
 			$text = $this->get_current_contact()->get_meta( $field );
-        }
+		}
 
 		if ( is_array( $text ) || is_object( $text ) ) {
 			$text = wp_json_encode( $text );
@@ -2628,7 +2628,17 @@ class Replacements implements \JsonSerializable {
 	public function replacement_substring( $arg ) {
 		$args = split_last( $arg, ',', 2 );
 
-		return substr( $args[1], $args[1], $args[2] );
+		if ( empty( $args[0] ) ) {
+			return '';
+		}
+
+		$args = wp_parse_args( $args, [
+			0 => '',
+			1 => 0,
+			2 => strlen( $args[0] ),
+		] );
+
+		return substr( $args[0], $args[1], $args[2] );
 	}
 
 	/**
