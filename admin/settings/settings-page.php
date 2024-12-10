@@ -17,6 +17,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_valid_contact_tabs;
+use function Groundhogg\has_constant_support;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -1830,10 +1831,17 @@ class Settings_Page extends Admin_Page {
 
 	public function settings_callback( $field ) {
 
-        $constant_value = maybe_get_option_from_constant( null, $field['id'] ) ;
+        $constant_value = maybe_get_option_from_constant( null, $field['id'] );
 
 		// Check if the option has been defined instead
-		if ( $constant_value !== null ){
+		if ( $constant_value !== null && has_constant_support( $field['id'] ) ){
+
+            // protected option
+            if ( isset( $field['atts'] ) && isset( $field['atts']['type'] ) && $field['atts']['type'] === 'password' ) {
+	            printf( '<p class="description">%s</p>', __( 'This option has been defined elsewhere. Probably in <code>wp-config.php</code>.', 'groundhogg' ) );
+	            return;
+            }
+
 			printf( '<p class="description">%s</p>', sprintf( __( 'This option has been defined elsewhere and is set to <code>%s</code>. Probably in <code>wp-config.php</code>.', 'groundhogg' ), $constant_value ) );
 			return;
 		}

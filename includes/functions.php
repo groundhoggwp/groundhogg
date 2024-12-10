@@ -35,6 +35,20 @@ function add_constant_support( $option_name ) {
 }
 
 /**
+ * If an option has constant support
+ *
+ * @param $option_name string the id of the option
+ *
+ * @return bool|int
+ */
+function has_constant_support( $option_name ) {
+	$hook     = "pre_option_$option_name";
+	$callback = __NAMESPACE__ . '\maybe_get_option_from_constant';
+
+	return has_filter( $hook, $callback );
+}
+
+/**
  * Given an option name, check if it's defined as a constant and if it is, return that value instead
  *
  * @param $value       false|null
