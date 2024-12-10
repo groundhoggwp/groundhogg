@@ -1047,7 +1047,7 @@ class Form_v2 extends Step {
 				'validate' => '__return_true',
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'after'    => function ( $field, $posted_data, $contact ) {
-					if ( $posted_data->isset_not_empty( $field['name'] ) ) {
+					if ( $posted_data->isset_not_empty( $field['name'] ) && ! empty( $field['tags'] ) ) {
 						$contact->apply_tag( $field['tags'] );
 					}
 				},
