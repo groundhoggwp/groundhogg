@@ -1392,7 +1392,7 @@
 
         },
       }, [
-        Dashicon('plus-alt2'),
+        Dashicon(group === 0 && ! filters.length ? 'filter' : 'plus-alt2'),
         ToolTip(__('Add a filter', 'groundhogg'), 'right'),
       ]),
     ])
