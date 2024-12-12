@@ -580,7 +580,7 @@ class Settings_Page extends Admin_Page {
                                         <div id="gh_custom_preference_fields"></div>
                                     </div>
                                     <p class="description" style="margin-top: 20px">
-										<?php _e( 'Show additional preference fields on the email preferences screen.', 'groundhogg' ) ?>
+										<?php _e( 'Show additional fields on the email preferences screen.', 'groundhogg' ) ?>
                                     </p>
                                 </td>
                             </tr>
