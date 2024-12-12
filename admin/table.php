@@ -66,6 +66,10 @@ abstract class Table extends \WP_List_Table {
 
 		$count = $this->get_db()->count( $query );
 
+        if ( $count === 0 ) {
+            return '';
+        }
+
 		$params = array_merge( $query, [
 			$this->view_param() => $view
 		] );
@@ -233,6 +237,8 @@ abstract class Table extends \WP_List_Table {
 
 			$views[] = $this->create_view( $view['view'], $view['query'], $view['display'] );
 		}
+
+        $views = array_filter( $views );
 
 		return apply_filters( "groundhogg/admin/table/{$this->get_table_id()}/get_views", $views );
 	}
