@@ -359,11 +359,15 @@ class Contacts_Table extends WP_List_Table {
                 'count' => 0
 			] );
 
+            if ( $view['count'] === 0 ){
+                continue;
+            }
+
 			$view['query']['view'] = $view['id'];
 
 			$parsed[] = html()->e( 'a', [
 				'href'  => admin_page_url( 'gh_contacts', $view['query'] ),
-				'class' => get_url_var( 'view' ) === $view['id'] ? 'current' : '',
+				'class' => get_url_var( 'view' ) == $view['id'] ? 'current' : '',
 			], sprintf(
 					'%s <span class="count">(%s)</span>',
 					$view['name'],

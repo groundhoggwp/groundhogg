@@ -79,8 +79,7 @@ class Tags_Page extends Admin_Page {
 		$tags_table = new Tags_Table();
 
 		?>
-        <p></p>
-        <div class="display-flex" style="gap: 40px">
+        <div class="display-flex" style="gap: 40px;">
             <div class="left col-wrap">
                 <h2><?php _e( 'Add a new tag', 'groundhogg' ); ?></h2>
                 <form class="display-flex column gap-10 form-wrap" method="post">

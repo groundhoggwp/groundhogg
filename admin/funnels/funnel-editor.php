@@ -10,6 +10,7 @@ use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
 use function Groundhogg\groundhogg_icon;
+use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 
@@ -107,9 +108,9 @@ function render_draggable_step_grid( $steps ) {
 		'value' => $funnel_id
 	);
 	echo Plugin::$instance->utils->html->input( $args ); ?>
-    <div class="funnel-editor-header">
+    <div class="gh-header funnel-editor-header">
 
-		<?php groundhogg_icon( 58 ); ?>
+		<?php header_icon(); ?>
 
         <div class="title-section">
             <div class="title-view">

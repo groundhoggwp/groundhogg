@@ -239,6 +239,7 @@ body:not(.funnel-full-screen) #close {
   display: flex;
   align-items: center;
   padding-right: 10px;
+  padding-left: 0;
 }
 .funnel-editor-header > svg {
   height: 60px;
@@ -265,8 +266,6 @@ body:not(.funnel-full-screen) #close {
 }
 .funnel-editor-header .title-section {
   width: 100%;
-  margin-right: 20px;
-  margin-left: 20px;
   overflow: hidden;
 }
 .funnel-editor-header #close #close-button {

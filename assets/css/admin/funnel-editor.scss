@@ -358,6 +358,7 @@ html {
   align-items: center;
   padding-right: 10px;
   //width: inherit;
+  padding-left: 0;
 
   > svg {
     height: 60px;
@@ -394,8 +395,8 @@ html {
 
   .title-section {
     width: 100%;
-    margin-right: 20px;
-    margin-left: 20px;
+    //margin-right: 20px;
+    //margin-left: 20px;
 
     overflow: hidden;
   }

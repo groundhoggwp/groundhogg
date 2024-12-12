@@ -4658,7 +4658,7 @@
         className: 'gh-header sticky',
       },
       [
-        Groundhogg.isWhiteLabeled ? Span() : icons.groundhogg,
+        Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
         Title(),
         UndoRedo(),
         PreviewButtons(),

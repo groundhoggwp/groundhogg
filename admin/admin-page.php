@@ -12,9 +12,12 @@ use function Groundhogg\create_object_from_type;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\groundhogg_icon;
+use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\white_labeled_name;
 
 /**
  * Abstract Admin Page
@@ -653,9 +656,20 @@ abstract class Admin_Page extends Supports_Errors {
 		do_action( "groundhogg/admin/{$this->get_slug()}/before" );
 
 		?>
+        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
+	        <?php header_icon(); ?>
+            <h1><?php echo $this->get_title(); ?></h1>
+	        <?php $this->do_title_actions(); ?>
+        </div>
+        <script>
+            const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
+            const parent = pageHeader.parentElement; // Get the parent element
+
+            if (parent) {
+              parent.prepend(pageHeader); // Move the element to the first child position
+            }
+        </script>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
-			<?php $this->do_title_actions(); ?>
             <div id="notices">
 				<?php Plugin::instance()->notices->notices(); ?>
             </div>

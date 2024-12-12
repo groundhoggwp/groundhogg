@@ -815,6 +815,21 @@ body {
   position: relative;
   gap: 20px;
 
+  span.white-label-icon{
+    height: 60px;
+    padding: 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    background-color: $primary-dark;
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+    font-weight: bold;
+    letter-spacing: -1px;
+  }
+
   h1 {
     font-size: 20px;
     line-height: 44px;
@@ -1268,7 +1283,12 @@ button {
       padding: 5px 10px;
 
       &.page-title-action {
-        padding: 0 10px;
+        //padding: 0 10px;
+
+        &:has(.dashicons){
+          display: flex;
+          gap: 5px;
+        }
       }
 
       &.text {

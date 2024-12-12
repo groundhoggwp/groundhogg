@@ -3,6 +3,8 @@
 namespace Groundhogg\Admin;
 
 use function Groundhogg\get_request_var;
+use function Groundhogg\groundhogg_icon;
+use function Groundhogg\header_icon;
 
 /**
  * Abstract Admin Page
@@ -200,9 +202,20 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
 
 		?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header tabbed-admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
+			<?php header_icon(); ?>
+            <h1><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
+        </div>
+        <script>
+          const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
+          const parent = pageHeader.parentElement; // Get the parent element
+
+          if (parent) {
+            parent.prepend(pageHeader); // Move the element to the first child position
+          }
+        </script>
+        <div class="wrap">
 			<?php $this->notices(); ?>
             <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>

@@ -13,6 +13,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\contact_and_user_match;
+use function Groundhogg\dashicon;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -291,7 +292,7 @@ class Contacts_Page extends Admin_Page {
 				$contacts = $this->get_items();
 				$contact  = get_contactdata( array_shift( $contacts ) ); //todo check
 				if ( $contact ) {
-					return sprintf( _x( 'Edit Contact: %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
+					return sprintf( _x( 'Editing %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
 				} else {
 					return _x( 'Oops!', 'page_title', 'groundhogg' );
 				}
@@ -324,7 +325,7 @@ class Contacts_Page extends Admin_Page {
 		if ( current_user_can( 'add_contacts' ) ) {
 			$actions[] = [
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-				'action' => __( 'Add New', 'groundhogg' ),
+				'action' => dashicon( 'plus-alt2' ) . __( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'quick-add',
 			];
@@ -333,7 +334,7 @@ class Contacts_Page extends Admin_Page {
 		if ( current_user_can( 'import_contacts' ) ) {
 			$actions[] = [
 				'link'   => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ),
-				'action' => __( 'Import', 'groundhogg' ),
+				'action' => dashicon( 'upload' ) . __( 'Import', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'import_contacts'
 			];

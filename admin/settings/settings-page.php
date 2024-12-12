@@ -18,6 +18,7 @@ use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\has_constant_support;
+use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -1765,6 +1766,39 @@ class Settings_Page extends Admin_Page {
 			} ) ) >= 1;
 	}
 
+	public function page() {
+		do_action( "groundhogg/admin/{$this->get_slug()}/before" );
+
+		?>
+        <div id="" class="gh-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 10px">
+	        <?php header_icon(); ?>
+            <h1><?php echo __( 'Settings' ); ?></h1>
+			<?php echo html()->button( [
+				'text'  => __( 'Save Changes' ),
+				'class' => 'gh-button primary',
+				'id'    => 'save-from-header'
+			] ) ?>
+        </div>
+        <script>document.getElementById('save-from-header').addEventListener('click', e => {
+            document.getElementById('primary-submit').click()
+          })</script>
+        <div class="wrap">
+
+            <div id="notices">
+				<?php Plugin::instance()->notices->notices(); ?>
+            </div>
+            <hr class="wp-header-end">
+			<?php
+
+			$this->view();
+
+			?>
+        </div>
+		<?php
+
+		do_action( "groundhogg/admin/{$this->get_slug()}/after" );
+	}
+
 	/**
 	 * Output the settings content
 	 */
@@ -1817,7 +1851,14 @@ class Settings_Page extends Admin_Page {
 					settings_fields( 'gh_' . $this->active_tab() );
 					do_settings_sections( 'gh_' . $this->active_tab() );
 					do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_settings" );
-					submit_button();
+//					submit_button();
+
+					echo html()->e( 'p', [], html()->button( [
+						'text'  => __( 'Save Changes' ),
+						'class' => 'gh-button primary',
+						'type'  => 'submit',
+                        'id' => 'primary-submit'
+					] ) );
 
 				}
 

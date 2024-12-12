@@ -1215,3 +1215,7 @@ table .column-steps {
     }
   }
 }
+
+#wpbody-content:has(.gh-header.admin-page-header) .wrap {
+  margin-top: 40px;
+}

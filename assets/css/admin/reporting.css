@@ -46,8 +46,6 @@ body.gh_reporting .nav-tab-wrapper {
 
 #groundhogg-datepicker-wrap {
   max-width: 450px;
-  float: right;
-  margin-top: 25px;
 }
 
 .big-chart-wrap {
@@ -444,12 +442,6 @@ table.groundhogg-report-table td:last-child {
     min-height: 250px;
     padding: 0px;
     float: left;
-  }
-
-  #groundhogg-datepicker-wrap {
-    width: 100%;
-    float: unset;
-    margin-top: 0px;
   }
 
   div:not(#table_broadcast_stats) > table.groundhogg-report-table tr {

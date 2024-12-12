@@ -11,7 +11,9 @@ use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\groundhogg_icon;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\header_icon;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\set_cookie;
@@ -404,14 +406,20 @@ class Reports_Page extends Tabbed_Admin_Page {
             <div class="gh-loader-overlay" style="display:none;"></div>
             <div class="gh-loader" style="display: none"></div>
         </div>
+        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
+			<?php header_icon(); ?>
+            <h1><?php echo $this->get_title(); ?></h1>
+	        <?php $this->range_picker(); ?>
+        </div>
+        <script>
+          const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
+          const parent = pageHeader.parentElement; // Get the parent element
+
+          if (parent) {
+            parent.prepend(pageHeader); // Move the element to the first child position
+          }
+        </script>
         <div class="wrap blurred">
-			<?php if ( ! is_white_labeled() ): ?>
-                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
-			<?php else: ?>
-                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
-			<?php endif; ?>
-			<?php $this->do_title_actions(); ?>
-			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
             <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>

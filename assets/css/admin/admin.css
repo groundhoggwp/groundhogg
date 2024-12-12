@@ -1057,4 +1057,8 @@ table .column-steps div.step-icon img {
   height: 100%;
 }
 
+#wpbody-content:has(.gh-header.admin-page-header) .wrap {
+  margin-top: 40px;
+}
+
 /*# sourceMappingURL=admin.css.map */
