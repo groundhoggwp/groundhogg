@@ -2312,21 +2312,21 @@ function get_mappable_fields( $extra = [] ) {
  */
 function maybe_get_key_display_name( string $key ) {
 
-    foreach ( get_mappable_fields() as $group ) {
+	foreach ( get_mappable_fields() as $group ) {
 
-        if ( isset( $group[ $key ] ) ){
-            return $group[ $key ];
-        }
-    }
+		if ( isset( $group[ $key ] ) ) {
+			return $group[ $key ];
+		}
+	}
 
 	$field = Properties::instance()->get_field( $key );
 
-	if ( $field ){
+	if ( $field ) {
 		return $field['label'];
 	}
 
-    // return the key if not found
-    return apply_filters( 'groundhogg/get_key_display_name', $key );
+	// return the key if not found
+	return apply_filters( 'groundhogg/get_key_display_name', $key );
 }
 
 /**
@@ -2380,6 +2380,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 		$value = wp_unslash( $value );
 
 		$field = $map[ $column ];
+
 
 		switch ( $field ) {
 			default:
@@ -2664,10 +2665,10 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
  *
  * @throws \Exception
  *
- * @param $fields array the raw data from the source
- * @param $map    array map of field_ids to contact keys
- * @param array $submission  settings for the submission
- * @param null|Contact $contact an existing contact record to modify
+ * @param              $fields     array the raw data from the source
+ * @param              $map        array map of field_ids to contact keys
+ * @param array        $submission settings for the submission
+ * @param null|Contact $contact    an existing contact record to modify
  *
  * @return Contact|false
  */
@@ -2744,10 +2745,11 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 			case 'date_created':
 			case 'date_optin_status_changed':
 
-                try {
-                    $dateTime = new DateTimeHelper( $value );
-	                $args[ $field ] = $dateTime->ymdhis();
-                } catch (\Exception $exception){}
+				try {
+					$dateTime       = new DateTimeHelper( $value );
+					$args[ $field ] = $dateTime->ymdhis();
+				} catch ( \Exception $exception ) {
+				}
 
 				break;
 			case 'optin_status':
@@ -2966,42 +2968,42 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 
 	}
 
-    // try and fetch an existing contact record
-    $contact = $contact ? get_contactdata( $contact ) : null;
+	// try and fetch an existing contact record
+	$contact = $contact ? get_contactdata( $contact ) : null;
 
-    // one does not exist yet
-    if ( ! is_a_contact( $contact ) ) {
+	// one does not exist yet
+	if ( ! is_a_contact( $contact ) ) {
 
-        // an email was provided
-	    if ( isset_not_empty( $args, 'email' ) ) {
+		// an email was provided
+		if ( isset_not_empty( $args, 'email' ) ) {
 
-		    // Get given email
-		    if ( ! is_email( $args['email'] ) ) {
-			    return false;
-		    }
+			// Get given email
+			if ( ! is_email( $args['email'] ) ) {
+				return false;
+			}
 
-            // Either get an existing contact with this email or created a new one
-		    $contact = new Contact( [ 'email' => $args['email'] ] );
+			// Either get an existing contact with this email or created a new one
+			$contact = new Contact( [ 'email' => $args['email'] ] );
 
-	    } else if ( isset_not_empty( $args, 'user_id' ) ) {
+		} else if ( isset_not_empty( $args, 'user_id' ) ) {
 
-		    // Get by given user id
-		    $contact = get_contactdata( $args['user_id'], true );
+			// Get by given user id
+			$contact = get_contactdata( $args['user_id'], true );
 
-	    } else if ( isset_not_empty( $args, 'contact_id' ) ) {
+		} else if ( isset_not_empty( $args, 'contact_id' ) ) {
 
-		    // Get by given contact id
-		    $contact = get_contactdata( $args['contact_id'] );
-		    unset( $args['contact_id'] );
+			// Get by given contact id
+			$contact = get_contactdata( $args['contact_id'] );
+			unset( $args['contact_id'] );
 
-	    } else if ( ! current_user_can( 'view_contacts' ) ) {
+		} else if ( ! current_user_can( 'view_contacts' ) ) {
 
-		    // Is there an active contact record?
-		    $contact = get_contactdata();
-	    }
-    }
+			// Is there an active contact record?
+			$contact = get_contactdata();
+		}
+	}
 
-    // Check again
+	// Check again
 	if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
 		return false;
 	}
@@ -3060,7 +3062,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 			'contact_id' => $contact->get_id(),
 		] ), $contact, $map, $fields );
 
-        // Sanitize the payload of fields, but only save mapped data
+		// Sanitize the payload of fields, but only save mapped data
 		$sanitized_payload = sanitize_payload( array_intersect_key( $fields, $map ) );
 		$submissionObject  = new Submission();
 
@@ -3288,6 +3290,19 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 	}
 
 	return $img;
+}
+
+/**
+ * Icon that goes in the header
+ *
+ * @return void
+ */
+function header_icon() {
+	if ( is_white_labeled() ): ?>
+		<?php echo html()->e( 'span', [ 'class' => 'white-label-icon' ], white_labeled_name() ) ?>
+	<?php else: ?>
+		<?php groundhogg_icon( 60 ) ?>
+	<?php endif;
 }
 
 /**
