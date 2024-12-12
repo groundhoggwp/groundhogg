@@ -59,7 +59,13 @@ class Settings_Page extends Admin_Page {
 
 		if ( get_url_var( 'tab' ) === 'email' ) {
 			wp_enqueue_script( 'groundhogg-admin-form-fields-editor' );
-			wp_add_inline_script( 'groundhogg-admin-form-fields-editor', "const CustomProfileFields = " . wp_json_encode( get_option( 'gh_custom_profile_fields', [] ) ), 'before' );
+
+			$fields = [
+				'gh_custom_profile_fields'    => get_option( 'gh_custom_profile_fields', [] ),
+				'gh_custom_preference_fields' => get_option( 'gh_custom_preference_fields', [] )
+			];
+
+			wp_add_inline_script( 'groundhogg-admin-form-fields-editor', "const CustomFields = " . wp_json_encode( $fields ), 'before' );
 		}
 	}
 
@@ -546,8 +552,8 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'preferences'           => [
-				'id'       => 'preferences',
+			'preferences_center'           => [
+				'id'       => 'preferences_center',
 				'title'    => _x( 'Preferences Center', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
 				'callback' => function () {
@@ -556,16 +562,29 @@ class Settings_Page extends Admin_Page {
                     <table class="form-table">
                         <tbody>
                         <tr>
-                            <th><?php _e( 'Personal details form', 'groundhogg' ); ?></th>
+                            <th><?php _e( 'Personal Details Form', 'groundhogg' ); ?></th>
                             <td>
                                 <div style="max-width: 400px">
-                                    <div id="fields-editor"></div>
+                                    <div id="gh_custom_profile_fields"></div>
                                 </div>
                                 <p class="description" style="margin-top: 20px">
-		                            <?php _e( 'Show additional profile fields in the preferences center. Delete all fields to show the default form.', 'groundhogg' ) ?>
+									<?php _e( 'Show additional profile fields in the preferences center. Delete all fields to show the default form.', 'groundhogg' ) ?>
                                 </p>
                             </td>
                         </tr>
+						<?php if ( defined( 'GROUNDHOGG_ADVANCED_PREFERENCES_VERSION' ) ): ?>
+                            <tr>
+                                <th><?php _e( 'Preferences Form', 'groundhogg' ); ?></th>
+                                <td>
+                                    <div style="max-width: 400px">
+                                        <div id="gh_custom_preference_fields"></div>
+                                    </div>
+                                    <p class="description" style="margin-top: 20px">
+										<?php _e( 'Show additional preference fields on the email preferences screen.', 'groundhogg' ) ?>
+                                    </p>
+                                </td>
+                            </tr>
+						<?php endif; ?>
                         </tbody>
                     </table>
 					<?php
@@ -1803,7 +1822,7 @@ class Settings_Page extends Admin_Page {
 
 		?>
         <div id="" class="gh-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 10px">
-	        <?php header_icon(); ?>
+			<?php header_icon(); ?>
             <h1><?php echo __( 'Settings' ); ?></h1>
 			<?php echo html()->button( [
 				'text'  => __( 'Save Changes' ),
@@ -1889,7 +1908,7 @@ class Settings_Page extends Admin_Page {
 						'text'  => __( 'Save Changes' ),
 						'class' => 'gh-button primary',
 						'type'  => 'submit',
-                        'id' => 'primary-submit'
+						'id'    => 'primary-submit'
 					] ) );
 
 				}

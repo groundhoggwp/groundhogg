@@ -414,7 +414,9 @@ switch ( $action ):
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_contact_profile' ) ) {
 
 			if ( ! empty( $custom_profile_fields_form ) ) {
-				$contact = generate_contact_with_map( wp_unslash( $_POST ), $custom_profile_fields_map );
+				$contact = generate_contact_with_map( wp_unslash( $_POST ), $custom_profile_fields_map, [
+                    'name' => __( 'Preferences Center', 'groundhogg' ),
+                ], $contact );
 
 				if ( $contact && is_a_contact( $contact ) ) {
 					add_notice( 'notice_profile_updated' );

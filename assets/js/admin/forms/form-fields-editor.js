@@ -155,6 +155,7 @@
   /**
    * The form field editor
    *
+   * @param id
    * @param form
    * @param fields
    * @param fieldGroups
@@ -163,6 +164,7 @@
    * @constructor
    */
   const FormFieldsEditor = ({
+    id = 'form-fields-editor',
     form = [],
     fields = [],
     fieldGroups = {},
@@ -186,7 +188,7 @@
       morph()
     }
 
-    const morph = () => morphdom(document.getElementById('form-fields-editor'), render())
+    const morph = () => morphdom(document.getElementById(id), render())
 
     const handleOnChange = () => {
 
@@ -249,7 +251,7 @@
     const render = () => {
 
       return Div({
-        id: 'form-fields-editor',
+        id,
       }, [
 
         // Fields
@@ -334,12 +336,14 @@
   /**
    * Field editor for contact fields
    *
+   * @param id
    * @param form
    * @param onChange
    * @returns {*}
    * @constructor
    */
   const ContactFormFieldsEditor = ({
+    id = 'contact-form-fields-editor',
     form,
     onChange = form => {},
   }) => {
@@ -470,6 +474,7 @@
     ]
 
     return FormFieldsEditor({
+      id,
       fields,
       fieldGroups,
       form,
@@ -483,17 +488,24 @@
     ContactFormFieldsEditor,
   }
 
-  if (typeof CustomProfileFields !== 'undefined') {
+  const doOptionsForm = (option) => {
 
     const State = Groundhogg.createState({
-      form: Array.isArray( CustomProfileFields ) ? CustomProfileFields : [],
-      submitted: false,
+      form      : CustomFields[option] ?? [],
+      submitted : false,
       hasChanges: false,
     })
 
     window.addEventListener('load', () => {
 
-      morphdom(document.getElementById('fields-editor'), ContactFormFieldsEditor({
+      const el = document.getElementById(option)
+
+      if (!el) {
+        return
+      }
+
+      morphdom(el, ContactFormFieldsEditor({
+        id      : option,
         form    : State.form[0] ?? [],
         onChange: (form) => {
 
@@ -508,24 +520,29 @@
 
       form.addEventListener('submit', async e => {
 
-        if ( State.submitted || ! State.hasChanges ){
+        if (State.submitted || !State.hasChanges) {
           return
         }
 
         e.preventDefault()
 
         await Groundhogg.stores.options.patch({
-          gh_custom_profile_fields: State.form
+          [option]: State.form,
         })
 
         State.set({
-          submitted: true
+          submitted: true,
         })
 
         form.submit()
       })
     })
 
+  }
+
+  if (typeof CustomFields !== 'undefined') {
+    doOptionsForm('gh_custom_profile_fields')
+    doOptionsForm('gh_custom_preference_fields')
   }
 
 } )(jQuery)
