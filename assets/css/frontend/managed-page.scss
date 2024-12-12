@@ -270,6 +270,11 @@ p#credit img {
         transition: 50ms border-color ease-in-out;
     }
 
+    p.form-field-description{
+        margin: 0;
+        font-style: italic;
+    }
+
     div.radio-buttons,
     div.checkboxes {
         display: flex;

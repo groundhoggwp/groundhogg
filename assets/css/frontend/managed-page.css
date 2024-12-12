@@ -215,6 +215,10 @@ p#credit img {
   outline: 0;
   transition: 50ms border-color ease-in-out;
 }
+#main p.form-field-description {
+  margin: 0;
+  font-style: italic;
+}
 #main div.radio-buttons,
 #main div.checkboxes {
   display: flex;

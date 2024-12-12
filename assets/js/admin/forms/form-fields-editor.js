@@ -3,6 +3,7 @@
   const {
     Div,
     Input,
+    Textarea,
     Fragment,
     Toggle,
     Label,
@@ -45,9 +46,9 @@
     label = '',
     stacked = false,
   }, input) => Div({
-    className: 'space-between',
+    className: stacked ? 'display-flex column gap-5' : 'space-between',
   }, [
-    Label({ for: input.id }, label),
+    Label({ for: Div({}, input).querySelector('input,textarea,select')?.id }, label),
     input,
   ])
 
@@ -55,27 +56,48 @@
    * Field settings
    *
    * @param label
+   * @param description
    * @param required
    * @param updateField
    * @returns {*}
    * @constructor
    */
   const FieldSettings = ({
-    label,
+    label = '',
+    description = '',
     required,
     updateField,
   }) => Fragment([
     FieldSetting({
-      label: 'Label',
+      label  : 'Label',
+      stacked: true,
     }, Input({
       value  : label,
+      id     : 'field-label',
+      name   : 'field_label',
       onInput: e => updateField({ label: e.target.value }),
+    })),
+    FieldSetting({
+      stacked: true,
+      label  : 'Description',
+    }, Textarea({
+      style  : {
+        width: '100%',
+      },
+      id     : 'field-description',
+      name   : 'field_description',
+      value  : description,
+      onInput: e => updateField({ description: e.target.value }),
     })),
     FieldSetting({
       label: 'Is required?',
     }, Toggle({
-      checked : required,
-      onChange: e => updateField({ required: e.target.checked }),
+      checked: required,
+      id     : 'field-is-required',
+      // name    : 'field_is_required',
+      onChange: e => {
+        updateField({ required: e.target.checked })
+      },
     })),
   ])
 
@@ -85,17 +107,23 @@
    * Field edit box
    *
    * @param id
+   * @param index
    * @param label
+   * @param description
+   * @param name
    * @param required
    * @param onUpdate
    * @param onDelete
+   * @param isOpen
+   * @param onOpen
    * @returns {*}
    * @constructor
    */
   const Field = ({
     id,
     index,
-    label,
+    label = '',
+    description = '',
     name,
     required,
     onUpdate,
@@ -117,6 +145,7 @@
         className: 'gh-panel-header',
       }, [
         makeEl('h2', {
+          id: `header-${id}`,
           onClick  : onOpen,
           className: 'display-flex gap-10 align-center',
           style    : {
@@ -128,6 +157,7 @@
           ToolTip('Click to edit', 'left'),
         ]),
         Button({
+          id       : `delete-${ id }`,
           type     : 'button',
           className: 'gh-button icon danger text',
           onClick  : onDelete,
@@ -140,15 +170,16 @@
           ToolTip('Delete', 'right'),
         ]),
       ]),
-      Div({
+      isOpen ? Div({
         className: 'inside display-flex gap-10 column',
       }, [
         FieldSettings({
           label,
           required,
+          description,
           updateField: onUpdate,
         }),
-      ]),
+      ]) : null,
     ])
   }
 
@@ -216,6 +247,8 @@
      */
     const updateField = (id, newSettings) => {
 
+      console.log(id, newSettings)
+
       State.set({
         form: State.form.map(field => field.id === id ? { ...field, ...newSettings } : field),
       })
@@ -259,6 +292,7 @@
           className: 'display-flex column',
           onCreate : el => {
             $(el).sortable({
+              handle: '.gh-panel-header',
               start : (e, ui) => {
                 ui.helper.css('cursor', 'grabbing')
               },
@@ -279,7 +313,7 @@
           ...field,
           index,
           isOpen  : field.id === State.currField,
-          onUpdate: settings => updateField(field.id, settings),
+          onUpdate: settings => updateField(State.currField, settings),
           onDelete: () => deleteField(field.id),
           onOpen  : () => openField(field.id),
         }))),

@@ -350,17 +350,23 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.7.3 (2024-12-04) =
+* ADDED Add custom fields to the profile update form in the preferences center.
 * ADDED Step flow preview to the funnels table.
 * ADDED New hooks and methods for `Groundhogg_Sending_Services` for more customization opportunities.
+* ADDED Sticky admin header to all Groundhogg pages.
+* ADDED Name of white labeled CRM to admin headers when white label is enabled.
+* TWEAKED When search filters are empty, show the filter icon instead of the plus icon.
+* TWEAKED Don't show table views for empty statuses.
 * TWEAKED Save the plain text version of emails into the email log so they are sent if emails are retried.
 * FIXED UI clipping when hover over IF conditionals in the funnel editor.
 * FIXED Prevent accidental method call on contact records from replacements.
 * FIXED Email performance reports going to some unauthorized users.
-* FIXED SVG assets no included correctly when not using default `/wp-content/` folder.
+* FIXED SVG assets not included correctly when not using default `/wp-content/` folder.
 * FIXED Prevent secrets from being exposed on the settings page when using `add_constant_support()`.
 * FIXED Constants showing in settings if similarly named even when constant support was not explicitly added.
 * FIXED `{substring}` replacement code not working if 3 arguments were not explicitly defined.
 * FIXED Several PHP notices.
+* FIXED Contact table views not showing as current when selected.
 
 = 3.7.2 (2024-11-14) =
 * ADDED Submission records will now be kept for a variety of user and contact initiated updates including...

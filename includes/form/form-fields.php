@@ -61,6 +61,11 @@ class Form_Fields {
 	 */
 	protected static function field_template( $props, $input ): string {
 
+		$props = wp_parse_args( $props, [
+			'label'       => '',
+			'description' => ''
+		] );
+
 		$label = $props['label'];
 
 		if ( $props['required'] ) {
@@ -70,8 +75,14 @@ class Form_Fields {
 		return html()->e( 'div', [
 			'class' => 'form-field-row'
 		], [
-			html()->e( 'label', [ 'for' => $props['id'] ], $label ),
-			$input
+			html()->e( 'label', [
+				'for' => $props['id'],
+				'class' => 'form-field-label'
+			], $label ),
+			$props['description'] ? html()->e( 'p', [
+				'class' => 'form-field-description'
+			], $props['description'] ) : '',
+			$input,
 		] );
 	}
 
