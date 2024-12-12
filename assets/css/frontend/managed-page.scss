@@ -254,6 +254,8 @@ p#credit img {
     input[type="email"],
     input[type="tel"],
     input[type="search"],
+    input[type="date"],
+    input[type="datetime-local"],
     input[type="text"] {
         background: #fbfbfb;
         border-radius: 4px;
@@ -266,6 +268,13 @@ p#credit img {
         color: #32373c;
         outline: 0;
         transition: 50ms border-color ease-in-out;
+    }
+
+    div.radio-buttons,
+    div.checkboxes {
+        display: flex;
+        flex-direction: column;
+        margin: 2px 6px 16px 0;
     }
 
     #gh-submit,

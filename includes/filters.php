@@ -135,6 +135,7 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 				return map_deep( $value, 'sanitize_text_field' );
 			};
 		case 'gh_contact_custom_properties':
+		case 'gh_custom_profile_fields':
 		case 'gh_custom_reports':
 			// todo implement proper sanitization here
 			return function ( $props ) {

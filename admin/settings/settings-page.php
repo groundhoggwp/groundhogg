@@ -16,6 +16,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\has_constant_support;
 use function Groundhogg\header_icon;
@@ -55,6 +56,11 @@ class Settings_Page extends Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
 //		wp_enqueue_style( 'groundhogg-admin-extensions' );
+
+		if ( get_url_var( 'tab' ) === 'email' ) {
+			wp_enqueue_script( 'groundhogg-admin-form-fields-editor' );
+			wp_add_inline_script( 'groundhogg-admin-form-fields-editor', "const CustomProfileFields = " . wp_json_encode( get_option( 'gh_custom_profile_fields', [] ) ), 'before' );
+		}
 	}
 
 	/**
@@ -144,12 +150,12 @@ class Settings_Page extends Admin_Page {
 		$api_keys_table = new API_Keys_Table();
 		$api_keys_table->prepare_items();
 		?>
-		<h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
+        <h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
 
-		<form id="api-key-generate-form" method="post"
-		      action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
+        <form id="api-key-generate-form" method="post"
+              action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
 			<?php action_input( 'create_api_key', true, true ); ?>
-			<div class="gh-input-group">
+            <div class="gh-input-group">
 				<?php echo html()->dropdown_owners( [
 					'option_none' => __( 'Select a user', 'groundhogg' ),
 					'name'        => 'user_id',
@@ -163,10 +169,10 @@ class Settings_Page extends Admin_Page {
 				] )
 
 				?>
-			</div>
-		</form>
+            </div>
+        </form>
 
-		<div style="max-width: 900px;"><?php
+        <div style="max-width: 900px;"><?php
 		$api_keys_table->display();
 		?></div><?php
 
@@ -181,9 +187,9 @@ class Settings_Page extends Admin_Page {
 					'onfocus'  => 'this.select()'
 				]
 			),
-			html()->description( html()->e('a',[
+			html()->description( html()->e( 'a', [
 				'href' => admin_page_url( 'gh_tools', [ 'tab' => 'api' ] )
-			],__('Test out the API in the new Rest API Playground.', 'groundhogg' ) )),
+			], __( 'Test out the API in the new Rest API Playground.', 'groundhogg' ) ) ),
 		] );
 		html()->end_row();
 		html()->start_row();
@@ -204,7 +210,7 @@ class Settings_Page extends Admin_Page {
 		$extensions = Extension::get_extensions();
 
 		?>
-		<div>
+        <div>
 			<?php wp_nonce_field(); ?>
 			<?php
 
@@ -215,7 +221,7 @@ class Settings_Page extends Admin_Page {
 					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 					?>
-					<p><?php printf( __( 'If your license key has expired, <a href="https://groundhogg.io/account/licenses/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
+                    <p><?php printf( __( 'If your license key has expired, <a href="https://groundhogg.io/account/licenses/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
 
 				else:
@@ -225,7 +231,7 @@ class Settings_Page extends Admin_Page {
 				endif;
 
 				?>
-				<div class="post-box-grid"><?php
+                <div class="post-box-grid"><?php
 
 				foreach ( $extensions as $extension ):
 					echo $extension;
@@ -234,14 +240,14 @@ class Settings_Page extends Admin_Page {
 				?></div><?php
 			else:
 				?>
-				<p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
-						href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
-				</p>
-				<div class="extensions">
+                <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
+                            href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
+                </p>
+                <div class="extensions">
 					<?php include __DIR__ . '/extensions.php'; ?>
-				</div>
+                </div>
 			<?php endif; ?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -535,10 +541,36 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
 			],
-			'unsubscribe' => [
+			'unsubscribe'           => [
 				'id'    => 'unsubscribe',
 				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
+			],
+			'preferences'           => [
+				'id'       => 'preferences',
+				'title'    => _x( 'Preferences Center', 'settings_sections', 'groundhogg' ),
+				'tab'      => 'email',
+				'callback' => function () {
+
+					?>
+                    <table class="form-table">
+                        <tbody>
+                        <tr>
+                            <th><?php _e( 'Personal details form', 'groundhogg' ); ?></th>
+                            <td>
+                                <div style="max-width: 400px">
+                                    <div id="fields-editor"></div>
+                                </div>
+                                <p class="description" style="margin-top: 20px">
+		                            <?php _e( 'Show additional profile fields in the preferences center. Delete all fields to show the default form.', 'groundhogg' ) ?>
+                                </p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+					<?php
+
+				}
 			],
 			'email_logging'         => [
 				'id'       => 'email_logging',
@@ -546,7 +578,7 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => function () {
 					?>
-					<div id="email-logging"></div><?php
+                    <div id="email-logging"></div><?php
 				}
 			],
 			'bounces'               => [
@@ -563,12 +595,12 @@ class Settings_Page extends Admin_Page {
 			],
 		];
 
-        // If SMTP or WP Mail is not in use, hide the bounce settings. We don't need them.
-        if ( ! Groundhogg_Email_Services::service_in_use( 'wp_mail' ) && ! Groundhogg_Email_Services::service_in_use( 'smtp' ) ){
-            unset( $sections['bounces'] );
-        }
+		// If SMTP or WP Mail is not in use, hide the bounce settings. We don't need them.
+		if ( ! Groundhogg_Email_Services::service_in_use( 'wp_mail' ) && ! Groundhogg_Email_Services::service_in_use( 'smtp' ) ) {
+			unset( $sections['bounces'] );
+		}
 
-		if ( ! Tag_Mapping::enabled() ){
+		if ( ! Tag_Mapping::enabled() ) {
 			unset( $sections['optin_status_tags'] );
 		}
 
@@ -1251,7 +1283,7 @@ class Settings_Page extends Admin_Page {
 				'args'    => [ 'sanitize_callback' => 'wp_kses_post' ],
 				'atts'    => [ 'replacements_button' => true ],
 			],
-			'gh_enable_tag_mapping'               => [
+			'gh_enable_tag_mapping'                  => [
 				'id'      => 'gh_enable_tag_mapping',
 				'section' => 'interface',
 				'label'   => _x( 'Enable Legacy Tag Mapping', 'settings', 'groundhogg' ),
@@ -1384,7 +1416,7 @@ class Settings_Page extends Admin_Page {
 					'class' => 'gh-single-tag-picker'
 				),
 			],
-			'gh_open_tracking_delay'   => [
+			'gh_open_tracking_delay'                 => [
 				'section' => 'tracking',
 				'label'   => _x( 'Open Tracking Delay', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Opens that happen within the delay period (in seconds) after an email is sent will be ignored. <br/>Recommended value <code>60</code> seconds. <br/>Set to <code>0</code> or leave empty for no delay.', 'settings', 'groundhogg' ),
@@ -1395,7 +1427,7 @@ class Settings_Page extends Admin_Page {
 					'disabled' => defined( 'GH_OPEN_TRACKING_DELAY' )
 				]
 			],
-			'gh_click_tracking_delay'  => [
+			'gh_click_tracking_delay'                => [
 				'section' => 'tracking',
 				'label'   => _x( 'Click Tracking Delay', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Clicks that are tracked within the delay period (in seconds) after an email is sent will be ignored. <br/>Recommended value <code>90</code> seconds. <br/>Set to <code>0</code> or leave empty for no delay.', 'settings', 'groundhogg' ),
@@ -1406,7 +1438,7 @@ class Settings_Page extends Admin_Page {
 					'disabled' => defined( 'GH_CLICK_TRACKING_DELAY' )
 				]
 			],
-			'gh_disable_open_tracking' => [
+			'gh_disable_open_tracking'               => [
 				'id'      => 'gh_disable_open_tracking',
 				'section' => 'tracking',
 				'label'   => _x( 'Disable Email Open Tracking', 'settings', 'groundhogg' ),
@@ -1514,10 +1546,10 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
-				'desc' => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed instead of having to confirm. This is not recommended because inbox bots could follow the link and unsubscribe contacts accidentally.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed instead of having to confirm. This is not recommended because inbox bots could follow the link and unsubscribe contacts accidentally.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ) . ' <i>('. __( 'Not recommended', 'groundhogg' ) . ')</i>',
+					'label' => __( 'Enable' ) . ' <i>(' . __( 'Not recommended', 'groundhogg' ) . ')</i>',
 					'name'  => 'gh_enable_one_click_unsubscribe',
 					'id'    => 'gh_enable_one_click_unsubscribe',
 					'value' => 'on',
@@ -1583,7 +1615,7 @@ class Settings_Page extends Admin_Page {
 			],
 		);
 
-        // Dependent settings
+		// Dependent settings
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );
 	}
@@ -1805,19 +1837,19 @@ class Settings_Page extends Admin_Page {
 //    public function settings_content()
 	public function view() {
 		?>
-		<style>
+        <style>
             td .select2 {
                 max-width: 300px;
             }
-		</style>
-		<div class="wrap">
+        </style>
+        <div class="wrap">
 			<?php
 			settings_errors();
 			$action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
-			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
+            <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
 
-				<!-- BEGIN TABS -->
-				<h2 class="nav-tab-wrapper">
+                <!-- BEGIN TABS -->
+                <h2 class="nav-tab-wrapper">
 					<?php foreach ( $this->tabs as $id => $tab ):
 
 						// Force API Tab & Licenses Tab
@@ -1838,13 +1870,13 @@ class Settings_Page extends Admin_Page {
 
 						?>
 
-						<a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
-						   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
+                        <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
+                           class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
 					<?php endforeach; ?>
-				</h2>
-				<!-- END TABS -->
+                </h2>
+                <!-- END TABS -->
 
-				<!-- BEGIN SETTINGS -->
+                <!-- BEGIN SETTINGS -->
 				<?php
 				if ( $this->tab_has_settings() && $this->user_can_access_tab() ) {
 
@@ -1864,26 +1896,28 @@ class Settings_Page extends Admin_Page {
 
 				do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_submit" );
 				?>
-				<!-- END SETTINGS -->
-			</form>
+                <!-- END SETTINGS -->
+            </form>
 			<?php do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_form" ); ?>
-		</div> <?php
+        </div> <?php
 	}
 
 	public function settings_callback( $field ) {
 
-        $constant_value = maybe_get_option_from_constant( null, $field['id'] );
+		$constant_value = maybe_get_option_from_constant( null, $field['id'] );
 
 		// Check if the option has been defined instead
-		if ( $constant_value !== null && has_constant_support( $field['id'] ) ){
+		if ( $constant_value !== null && has_constant_support( $field['id'] ) ) {
 
-            // protected option
-            if ( isset( $field['atts'] ) && isset( $field['atts']['type'] ) && $field['atts']['type'] === 'password' ) {
-	            printf( '<p class="description">%s</p>', __( 'This option has been defined elsewhere. Probably in <code>wp-config.php</code>.', 'groundhogg' ) );
-	            return;
-            }
+			// protected option
+			if ( isset( $field['atts'] ) && isset( $field['atts']['type'] ) && $field['atts']['type'] === 'password' ) {
+				printf( '<p class="description">%s</p>', __( 'This option has been defined elsewhere. Probably in <code>wp-config.php</code>.', 'groundhogg' ) );
+
+				return;
+			}
 
 			printf( '<p class="description">%s</p>', sprintf( __( 'This option has been defined elsewhere and is set to <code>%s</code>. Probably in <code>wp-config.php</code>.', 'groundhogg' ), $constant_value ) );
+
 			return;
 		}
 

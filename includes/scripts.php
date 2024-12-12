@@ -490,7 +490,8 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-form-fields-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/forms/form-fields-editor' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-make-el',
-			'wp-i18n'
+			'wp-i18n',
+			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-edit-lock', GROUNDHOGG_ASSETS_URL . 'js/admin/edit-lock' . $dot_min . '.js', [
