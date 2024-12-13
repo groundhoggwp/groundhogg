@@ -33,6 +33,77 @@ class Properties {
 	}
 
 	/**
+	 * Sanitize an object properties setup
+	 *
+	 * @param $all
+	 *
+	 * @return array
+	 */
+	public static function sanitize( $all ) {
+
+		$all = wp_parse_args( $all, [
+			'fields' => [],
+			'groups' => [],
+			'tabs'   => [],
+		] );
+
+		return [
+			'fields' => self::sanitize_properties( $all['fields'] ),
+			'groups' => self::sanitize_groups( $all['groups'] ),
+			'tabs'   => self::sanitize_tabs( $all['tabs'] ),
+		];
+	}
+
+	protected static function sanitize_stuff( $stuff, $callbacks ) {
+
+		return array_map( function ( $thing ) use ( $callbacks ) {
+
+			$thing = array_intersect_key( $thing, $callbacks );
+			$thing = array_apply_callbacks( $thing, $callbacks );
+
+			return $thing;
+		}, $stuff );
+	}
+
+	public static function sanitize_tabs( $tabs ) {
+
+		$callbacks = [
+			'id'   => 'sanitize_key',
+			'name' => 'sanitize_text_field',
+		];
+
+		return self::sanitize_stuff( $tabs, $callbacks );
+	}
+
+	public static function sanitize_groups( $groups ) {
+		$callbacks = [
+			'id'   => 'sanitize_key',
+			'tab'  => 'sanitize_key',
+			'name' => 'sanitize_text_field',
+		];
+
+		return self::sanitize_stuff( $groups, $callbacks );
+	}
+
+	public static function sanitize_properties( $properties ) {
+		$callbacks = [
+			'id'      => 'sanitize_key',
+			'group'   => 'sanitize_key',
+			'label'   => 'sanitize_text_field',
+			'name'    => 'sanitize_key',
+			'type'    => 'sanitize_key',
+			'order'   => 'absint',
+			'width'   => 'absint',
+			'options' => function ( $array ) {
+				return array_map( 'sanitize_text_field', $array );
+			}
+		];
+
+		return self::sanitize_stuff( $properties, $callbacks );
+
+	}
+
+	/**
 	 * Instance.
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.

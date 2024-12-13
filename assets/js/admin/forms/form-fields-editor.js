@@ -214,7 +214,7 @@
      */
     const openField = id => {
       State.set({
-        currField: id,
+        currField: id === State.currField ? null : id,
       })
       morph()
     }

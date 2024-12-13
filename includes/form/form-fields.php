@@ -4,6 +4,9 @@ namespace Groundhogg\Form;
 
 use Groundhogg\Contact;
 use Groundhogg\Properties;
+use function Groundhogg\array_apply_callbacks;
+use function Groundhogg\array_filter_by_keys;
+use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\html;
 use function Groundhogg\maybe_explode;
@@ -40,7 +43,7 @@ class Form_Fields {
 					$field['value'] = $contact->get_meta( $property['name'] );
 				} else if ( property_exists( $contact, $id ) ) {
 					$field['value'] = $contact->$id;
-				} else if ( method_exists( $contact, 'get_' . $id ) ){
+				} else if ( method_exists( $contact, 'get_' . $id ) ) {
 					$field['value'] = call_user_func( [ $contact, 'get_' . $id ] );
 				}
 
@@ -51,6 +54,57 @@ class Form_Fields {
 	}
 
 	protected static array $field_templates = [];
+
+	/**
+	 * Given a form and map array, sanitize it
+	 *
+	 * @param array $form_and_map
+	 *
+	 * @return array
+	 */
+	public static function sanitize_form_and_map( $form_and_map ) {
+
+		$form = $form_and_map[0];
+		$map  = $form_and_map[1];
+
+		$form = array_map( [ __CLASS__, 'sanitize_field' ], $form );
+
+		// Sanitize the map
+		$map = array_map_keys( $map, 'sanitize_key' );
+		$map = array_map( 'sanitize_key', $map );
+
+		$form_and_map[0] = $form;
+		$form_and_map[1] = $map;
+
+		return $form_and_map;
+	}
+
+	/**
+	 * Sanitize an individual field's settings
+	 *
+	 * @param $field
+	 *
+	 * @return array
+	 */
+	protected static function sanitize_field( $field ) {
+
+		/** @var callable[] $callbacks */
+		$callbacks = [
+			'id'          => 'sanitize_key',
+			'name'        => 'sanitize_text_field',
+			'label'       => 'sanitize_text_field',
+			'description' => 'wp_kses_post',
+			'required'    => 'boolval',
+			'type'        => 'sanitize_text_field',
+			'mapFrom'     => 'sanitize_key',
+			'mapTo'       => 'sanitize_key',
+		];
+
+		$field = array_intersect_key( $field, $callbacks );
+		$field = array_apply_callbacks( $field, $callbacks );
+
+		return $field;
+	}
 
 	/**
 	 * Basic field template

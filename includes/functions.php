@@ -6110,6 +6110,45 @@ function array_filter_splice( &$array, $predicate ) {
 }
 
 /**
+ * Filter an array such that we only keep specific keys
+ *
+ * @param array $associative_array
+ * @param array $keys_to_keep
+ *
+ * @return array
+ */
+function array_filter_by_keys( array $associative_array, array $keys_to_keep ) {
+	return array_filter(
+		$associative_array,
+		function ( $key ) use ( $keys_to_keep ) {
+			return in_array( $key, $keys_to_keep, true );
+		},
+		ARRAY_FILTER_USE_KEY
+	);
+}
+
+/**
+ * Given an associative array apply a list of callbacks provided by the callbacks array
+ *
+ * @param array $array
+ * @param callable[]|array $callbacks
+ *
+ * @return array
+ */
+function array_apply_callbacks( array $array, array $callbacks ) {
+
+    foreach ( $array as $key => &$value ){
+        if ( ! isset( $callbacks[$key ] ) ){
+            continue;
+        }
+
+        $value = call_user_func( $callbacks[$key], $value );
+    }
+
+    return $array;
+}
+
+/**
  * Checks if at least one of the elements in the array matches some predicate
  *
  * @param array    $array

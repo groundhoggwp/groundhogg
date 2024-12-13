@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Form\Form_Fields;
 use Groundhogg\Utils\DateTimeHelper;
 
 /**
@@ -135,13 +136,15 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 				return map_deep( $value, 'sanitize_text_field' );
 			};
 		case 'gh_contact_custom_properties':
-		case 'gh_custom_profile_fields':
-		case 'gh_custom_preference_fields':
+			return [ Properties::class, 'sanitize' ];
 		case 'gh_custom_reports':
 			// todo implement proper sanitization here
 			return function ( $props ) {
 				return $props;
 			};
+		case 'gh_custom_profile_fields':
+		case 'gh_custom_preference_fields':
+			return [ Form_Fields::class, 'sanitize_form_and_map' ];
 	}
 
 	return $callback;
