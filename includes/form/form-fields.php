@@ -33,14 +33,15 @@ class Form_Fields {
 		if ( $contact ) {
 			$this->form = array_map( function ( $field ) use ( $contact ) {
 
-				$id = $field['id'];
-
+				$id       = $field['id'];
 				$property = Properties::instance()->get_field( $id );
 
 				if ( $property ) {
 					$field['value'] = $contact->get_meta( $property['name'] );
-				} else {
+				} else if ( property_exists( $contact, $id ) ) {
 					$field['value'] = $contact->$id;
+				} else if ( method_exists( $contact, 'get_' . $id ) ){
+					$field['value'] = call_user_func( [ $contact, 'get_' . $id ] );
 				}
 
 				return $field;
@@ -76,7 +77,7 @@ class Form_Fields {
 			'class' => 'form-field-row'
 		], [
 			html()->e( 'label', [
-				'for' => $props['id'],
+				'for'   => $props['id'],
 				'class' => 'form-field-label'
 			], $label ),
 			$props['description'] ? html()->e( 'p', [
