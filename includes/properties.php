@@ -94,9 +94,10 @@ class Properties {
 			'type'    => 'sanitize_key',
 			'order'   => 'absint',
 			'width'   => 'absint',
+			'multiple' => 'boolval',
 			'options' => function ( $array ) {
 				return array_map( 'sanitize_text_field', $array );
-			}
+			},
 		];
 
 		return self::sanitize_stuff( $properties, $callbacks );

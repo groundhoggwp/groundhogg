@@ -5,7 +5,6 @@ namespace Groundhogg\Form;
 use Groundhogg\Contact;
 use Groundhogg\Properties;
 use function Groundhogg\array_apply_callbacks;
-use function Groundhogg\array_filter_by_keys;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\html;
@@ -235,8 +234,7 @@ class Form_Fields {
 				break;
 			case 'dropdown':
 				$options = $field['options'];
-
-				$input = html()->dropdown( [
+				$input   = html()->dropdown( [
 					'id'       => $id,
 					'name'     => $name,
 					'options'  => array_combine( $options, $options ),
