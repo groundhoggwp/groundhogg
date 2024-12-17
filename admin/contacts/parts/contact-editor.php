@@ -203,7 +203,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 								$date_format = get_option( 'date_format' );
 
-								$year  = html()->dropdown( [
+								$year = html()->dropdown( [
 									'name'        => 'birthday[year]',
 									'id'          => 'birthday_year',
 									'options'     => $years,
@@ -212,7 +212,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'selected'    => get_array_var( $birthday_parts, 0 ),
 								] );
 
-                                $month = html()->dropdown( [
+								$month = html()->dropdown( [
 									'name'        => 'birthday[month]',
 									'id'          => 'birthday_month',
 									'options'     => $months,
@@ -221,7 +221,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'selected'    => get_array_var( $birthday_parts, 1 ),
 								] );
 
-                                $day   = html()->dropdown( [
+								$day = html()->dropdown( [
 									'name'        => 'birthday[day]',
 									'id'          => 'birthday_day',
 									'options'     => $days,
@@ -360,7 +360,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                 <label
                                         for="ip_address"><?php _e( 'Locale', 'groundhogg' ) ?></label>
 								<?php wp_dropdown_languages( [
-									'selected' => $contact->get_locale()
+									'selected'              => $contact->get_locale(),
+									'explicit_option_en_us' => true,
 								] ) ?>
                             </div>
                             <div class="gh-col">

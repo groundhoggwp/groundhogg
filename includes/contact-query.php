@@ -605,7 +605,7 @@ class Contact_Query extends Table_Query {
 	public static function filter_city( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'city' => ''
+			'city' => []
 		] );
 
 		$cities = wp_parse_list( $filter['city'] );
@@ -617,6 +617,58 @@ class Contact_Query extends Table_Query {
 		$alias = $where->query->joinMeta( 'city' );
 
 		$where->in( "$alias.meta_value", $cities );
+	}
+
+	/**
+	 * Filter by the locale
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_locale( $filter, Where $where, Contact_Query $query ) {
+
+		$filter = wp_parse_args( $filter, [
+			'locales' => [ get_locale() ]
+		] );
+
+		$alias   = $where->query->joinMeta( 'locale' );
+		$default = get_locale();
+		$col     = "COALESCE($alias.meta_value,'$default')";
+		$query->add_safe_column( $col );
+
+		$where->in( $col, $filter['locales'] );
+	}
+
+	/**
+	 * Filter by line1 address
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_street_address_1( $filter, Where $where ) {
+
+		Filters::meta_filter( array_merge( $filter, [
+			'meta' => 'street_address_1'
+		] ), $where );
+	}
+
+	/**
+	 * Filter by line2 address
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_street_address_2( $filter, Where $where ) {
+
+		Filters::meta_filter( array_merge( $filter, [
+			'meta' => 'street_address_2'
+		] ), $where );
 	}
 
 	/**

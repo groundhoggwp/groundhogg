@@ -6130,22 +6130,22 @@ function array_filter_by_keys( array $associative_array, array $keys_to_keep ) {
 /**
  * Given an associative array apply a list of callbacks provided by the callbacks array
  *
- * @param array $array
+ * @param array            $array
  * @param callable[]|array $callbacks
  *
  * @return array
  */
 function array_apply_callbacks( array $array, array $callbacks ) {
 
-    foreach ( $array as $key => &$value ){
-        if ( ! isset( $callbacks[$key ] ) ){
-            continue;
-        }
+	foreach ( $array as $key => &$value ) {
+		if ( ! isset( $callbacks[ $key ] ) ) {
+			continue;
+		}
 
-        $value = call_user_func( $callbacks[$key], $value );
-    }
+		$value = call_user_func( $callbacks[ $key ], $value );
+	}
 
-    return $array;
+	return $array;
 }
 
 /**
@@ -6758,8 +6758,19 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
  */
 function enqueue_filter_assets() {
 
+
 	wp_enqueue_script( 'groundhogg-admin-filter-contacts' );
 	wp_enqueue_style( 'groundhogg-admin-filters' );
+
+	$localeDropdown = wp_dropdown_languages( [
+		'name'                  => 'filter_locale',
+		'id'                    => 'filter-locale',
+		'multiple'              => true,
+		'echo'                  => false,
+		'explicit_option_en_us' => true,
+	] );
+
+	wp_add_inline_script( 'groundhogg-admin-filter-contacts', "const GroundhoggLocalDropdown = `$localeDropdown`" );
 
 	do_action( 'groundhogg_enqueue_filter_assets' );
 }

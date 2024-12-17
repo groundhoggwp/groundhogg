@@ -34,16 +34,16 @@
   }
 
   const AttributeHandlers = {
-    required: (el, value) => {
+    required     : (el, value) => {
       el.required = value
     },
-    autofocus: (el, value) => {
+    autofocus    : (el, value) => {
       el.autofocus = value
     },
-    value: (el, value) => {
+    value        : (el, value) => {
       el.value = value
     },
-    className: (el, attribute) => {
+    className    : (el, attribute) => {
       if (isString(attribute)) {
         attribute = attribute.split(' ').map(c => c.trim()).filter(c => c)
       }
@@ -55,11 +55,11 @@
         el.addEventListener(event, events[event])
       }
     },
-    onInput: (el, func) => AttributeHandlers.eventHandlers(el, { input: func }),
-    onChange: (el, func) => AttributeHandlers.eventHandlers(el, { change: func }),
-    onFocus: (el, func) => AttributeHandlers.eventHandlers(el, { focus: func }),
-    onClick: (el, func) => AttributeHandlers.eventHandlers(el, { click: func }),
-    style: (el, style) => {
+    onInput      : (el, func) => AttributeHandlers.eventHandlers(el, { input: func }),
+    onChange     : (el, func) => AttributeHandlers.eventHandlers(el, { change: func }),
+    onFocus      : (el, func) => AttributeHandlers.eventHandlers(el, { focus: func }),
+    onClick      : (el, func) => AttributeHandlers.eventHandlers(el, { click: func }),
+    style        : (el, style) => {
 
       if (isString(style)) {
         el.style = style
@@ -77,7 +77,7 @@
         el.style[attribute] = style[attribute]
       }
     },
-    onCreate: (el, func) => func(el),
+    onCreate     : (el, func) => func(el),
 
   }
 
@@ -112,8 +112,8 @@
    * @returns array
    */
   function htmlToReact (string, props = {}) {
-    let elements = htmlToElements( string )
-    return wp.element.createElement(wp.element.Fragment, null, [...elements].map( el => domElementToReact( el, props ) ))
+    let elements = htmlToElements(string)
+    return wp.element.createElement(wp.element.Fragment, null, [...elements].map(el => domElementToReact(el, props)))
   }
 
   /**
@@ -176,9 +176,9 @@
    * @param children
    * @returns {*}
    */
-  const makeElForReact = ( component, attributes, children = null ) => {
+  const makeElForReact = (component, attributes, children = null) => {
 
-    if ( component === 'fragment' ){
+    if (component === 'fragment') {
       component = wp.element.Fragment
     }
 
@@ -199,22 +199,22 @@
           return
         }
 
-        child = maybeCall( child, () => {} )
+        child = maybeCall(child, () => {})
 
         // Template literals
         if (isString(child)) {
           child = htmlToReact(child)
         }
 
-        if ( Array.isArray(child) ) {
-          child = wp.element.createElement( wp.element.Fragment, null, child )
+        if (Array.isArray(child)) {
+          child = wp.element.createElement(wp.element.Fragment, null, child)
         }
 
         return child
       })
     }
 
-    return wp.element.createElement( component, attributes, children )
+    return wp.element.createElement(component, attributes, children)
   }
 
   /**
@@ -227,15 +227,26 @@
    */
   const makeEl = (tagName, attributes, children = null) => {
 
-    if ( window.makeElForReact === true ) {
+    if (window.makeElForReact === true) {
       return makeElForReact(tagName, attributes, children)
     }
 
-    let el = tagName === 'fragment' ? document.createDocumentFragment() : document.createElement(tagName)
+    let el
+
+    if (typeof tagName === 'string') {
+      el = tagName === 'fragment' ? document.createDocumentFragment() : document.createElement(tagName)
+
+    }
+    else if (tagName instanceof Element || tagName instanceof HTMLElement) {
+      el = tagName
+    }
+    else {
+      throw new Error('Unsupported type passed to MakeEl')
+    }
 
     if (children !== null) {
 
-      const morph = () => morphdom( document.getElementById( el.id ), makeEl( tagName, attributes, children ) )
+      const morph = () => morphdom(document.getElementById(el.id), makeEl(tagName, attributes, children))
 
       if (!Array.isArray(children)) {
         if (children instanceof NodeList) {
@@ -252,7 +263,7 @@
           return
         }
 
-        child = maybeCall( child, morph )
+        child = maybeCall(child, morph)
 
         // Template literals
         if (isString(child)) {
@@ -305,7 +316,7 @@
     return el
   }
 
-  const Form = (attributes, content) => makeEl( 'form', attributes, content )
+  const Form = (attributes, content) => makeEl('form', attributes, content)
 
   const Input = (attributes) => {
     return makeEl('input', {
@@ -330,15 +341,25 @@
     } = attributes
 
     if (!Array.isArray(options)) {
-      options = Object.keys(options).map(key => ( { value: key, text: options[key] } ))
+      options = Object.keys(options).
+        map(key => ( {
+          value: key,
+          text : options[key],
+        } ))
     }
 
     if (!Array.isArray(selected)) {
       selected = [selected]
     }
 
-    options = options.map(opt => typeof opt === 'string' ? { value: opt, text: opt } : opt).
-      map(({ value, text }) => makeEl('option', {
+    options = options.map(opt => typeof opt === 'string' ? {
+        value: opt,
+        text : opt,
+      } : opt).
+      map(({
+        value,
+        text,
+      }) => makeEl('option', {
         value,
         selected: selected.includes(value),
       }, text))
@@ -377,7 +398,8 @@
       //language=HTML
       `<span class="slider round"></span>
       <span class="on">${ onLabel }</span>
-      <span class="off">${ offLabel }</span>`,
+      <span class="off">${ offLabel }</span>
+      `,
     ])
   }
 
@@ -389,10 +411,10 @@
     return makeEl('nav', attributes, children)
   }
 
-  const Dashicon = (icon, children = null ) => {
+  const Dashicon = (icon, children = null) => {
     return makeEl('span', {
       className: `dashicons dashicons-${ icon }`,
-    }, children )
+    }, children)
   }
 
   const Fragment = (children, atts = {}) => {
@@ -439,14 +461,14 @@
 
     const RepeaterRow = (row, rowIndex) => Div({
       className: 'gh-input-repeater-row',
-      dataRow: rowIndex,
+      dataRow  : rowIndex,
     }, [
       // Cells
       ...cells.map((cellCallback, cellIndex) => cellCallback({
-        id: `${ id }-cell-${ rowIndex }-${ cellIndex }`,
-        name: `${ id }[${ rowIndex }][${ cellIndex }]`,
-        value: row[cellIndex] ?? '',
-        dataRow: rowIndex,
+        id      : `${ id }-cell-${ rowIndex }-${ cellIndex }`,
+        name    : `${ id }[${ rowIndex }][${ cellIndex }]`,
+        value   : row[cellIndex] ?? '',
+        dataRow : rowIndex,
         dataCell: cellIndex,
         onChange: e => onCellChange(rowIndex, cellIndex, e.target.value),
         setValue: value => onCellChange(rowIndex, cellIndex, value),
@@ -454,20 +476,20 @@
       // Sortable Handle
       sortable ? makeEl('span', {
         className: 'handle',
-        dataRow: rowIndex,
+        dataRow  : rowIndex,
       }, Dashicon('move')) : null,
       // Remove Row Button
       Button({
         className: 'gh-button dashicon remove-row',
-        dataRow: rowIndex,
-        onClick: e => removeRow(rowIndex),
+        dataRow  : rowIndex,
+        onClick  : e => removeRow(rowIndex),
       }, Dashicon('no-alt')),
     ])
 
     const Repeater = () => Div({
       id,
       className: 'gh-input-repeater',
-      onCreate: el => {
+      onCreate : el => {
 
         if (!sortable) {
           return
@@ -497,9 +519,9 @@
         `<div class="spacer"></div>`,
         // Add Row Button
         Button({
-          id: `${ id }-add-row`,
+          id       : `${ id }-add-row`,
           className: 'add-row gh-button dashicon',
-          onClick: e => addRow(),
+          onClick  : e => addRow(),
         }, Dashicon('plus-alt2')),
       ]) : null,
     ])
@@ -507,7 +529,10 @@
     return Repeater()
   }
 
-  const InputWithReplacements = ({ inputCallback = Input, ...attributes }) => {
+  const InputWithReplacements = ({
+    inputCallback = Input,
+    ...attributes
+  }) => {
     return Div({
       className: 'input-wrap',
     }, [
@@ -545,22 +570,25 @@
     onClose = () => {},
     width,
     closeButton = true,
-    closeOnOverlayClick = true
+    closeOnOverlayClick = true,
   }, children) => {
 
-    const Dialog = ({ header = null, content = null }) => Div({
+    const Dialog = ({
+      header = null,
+      content = null,
+    }) => Div({
       className: `gh-modal-dialog ${ dialogClasses }`,
-      style: {
-        width
-      }
+      style    : {
+        width,
+      },
     }, [
       header,
       Div({
         className: 'gh-modal-dialog-content',
-      }, content ),
-      closeButton && ! header ? Button({
+      }, content),
+      closeButton && !header ? Button({
         className: 'dashicon-button gh-modal-button-close-top gh-modal-button-close',
-        onClick: e => {
+        onClick  : e => {
           close()
         },
       }, Dashicon('no-alt')) : null,
@@ -568,20 +596,20 @@
 
     let modal = Div({
       className: 'gh-modal',
-      tabindex: 0,
+      tabindex : 0,
     }, [
       Div({
         className: 'gh-modal-overlay',
-        onClick: e => {
-          if ( closeOnOverlayClick ){
+        onClick  : e => {
+          if (closeOnOverlayClick) {
             close()
           }
         },
       }),
       Dialog({
-        header: null,
-        content: null
-      })
+        header : null,
+        content: null,
+      }),
     ])
 
     const close = () => {
@@ -595,17 +623,28 @@
 
       let header = content.querySelector('.modal-header')
 
-      morphdom( modal.querySelector('.gh-modal-dialog'), Dialog({header, content}) )
+      morphdom(modal.querySelector('.gh-modal-dialog'), Dialog({
+        header,
+        content,
+      }))
     }
 
-    const getContent = () => maybeCall(children, { close, modal, morph })
+    const getContent = () => maybeCall(children, {
+      close,
+      modal,
+      morph,
+    })
 
     document.body.appendChild(modal)
 
     morph()
 
     // Run before positioning
-    onOpen({ modal, close, morph })
+    onOpen({
+      modal,
+      close,
+      morph,
+    })
 
     modal.focus()
 
@@ -635,7 +674,7 @@
 
     let modal = Div({
       className: 'gh-modal',
-      tabindex: 0,
+      tabindex : 0,
       onKeydown: e => {
         if (closeOnEscape) {
           if (e.key === 'Esc' || e.key === 'Escape') {
@@ -646,7 +685,7 @@
     }, [
       Div({
         className: 'gh-modal-overlay',
-        onClick: e => {
+        onClick  : e => {
           if (closeOnOverlayClick) {
             close()
           }
@@ -698,24 +737,24 @@
   }, children) => {
 
     let modal = Div({
-      className: 'gh-modal mini gh-panel',
-      tabindex: 0,
+      className : 'gh-modal mini gh-panel',
+      tabindex  : 0,
       onFocusout: e => {
         if (closeOnFocusout) {
           if (!e.relatedTarget || !clickedIn(e.relatedTarget, '.gh-modal.mini')) {
 
             // this is a bit of a hack
-            setTimeout( () => {
+            setTimeout(() => {
               // if the focused element is no longer within the modal
-              if ( !clickedIn(document.activeElement, '.gh-modal.mini') ){
+              if (!clickedIn(document.activeElement, '.gh-modal.mini')) {
                 close()
               }
 
-            }, 10 )
+            }, 10)
           }
         }
       },
-      onCreate: el => {
+      onCreate  : el => {
         el.focus()
       },
     }, Div({
@@ -723,7 +762,7 @@
     }, [
       Button({
         className: 'dashicon-button gh-modal-button-close-top gh-modal-button-close',
-        onClick: e => {
+        onClick  : e => {
           close()
         },
       }, Dashicon('no-alt')),
@@ -786,7 +825,7 @@
     const State = {
       pointer: 0,
       results: [],
-      input: null,
+      input  : null,
     }
 
     const setValue = () => {
@@ -828,22 +867,33 @@
 
     const Results = () => {
 
-      const { results, input } = State
+      const {
+        results,
+        input,
+      } = State
 
-      let { height, width, top, left } = input.getBoundingClientRect()
+      let {
+        height,
+        width,
+        top,
+        left,
+      } = input.getBoundingClientRect()
 
       return Div({
         className: 'gh-autocomplete-results',
-        style: {
+        style    : {
           zIndex: 999999,
-          top: `${ top + height }px`,
-          left: `${ left }px`,
-          width: `${ width }px`,
+          top   : `${ top + height }px`,
+          left  : `${ left }px`,
+          width : `${ width }px`,
         },
-      }, results.map(({ id, text }, index) => makeEl('a', {
-        className: `${ index === State.pointer ? 'pointer' : '' }`,
-        href: id,
-        onClick: e => {
+      }, results.map(({
+        id,
+        text,
+      }, index) => makeEl('a', {
+        className   : `${ index === State.pointer ? 'pointer' : '' }`,
+        href        : id,
+        onClick     : e => {
           e.preventDefault()
           setValue()
         },
@@ -866,7 +916,7 @@
 
         closeResults()
       },
-      onKeydown: e => {
+      onKeydown : e => {
         const input = e.target
 
         switch (e.key) {
@@ -906,7 +956,7 @@
 
         updateResults()
       },
-      onInput: e => {
+      onInput   : e => {
 
         if (timeout) {
           clearTimeout(timeout)
@@ -931,7 +981,7 @@
     })
   }
 
-  const Ellipses = ( content, atts = {} ) => Span({
+  const Ellipses = (content, atts = {}) => Span({
     ...atts,
     onCreate: el => {
 
@@ -953,8 +1003,7 @@
       }, 500)
 
     },
-  }, content + '...' )
-
+  }, content + '...')
 
   const ItemPicker = ({
     id = '',
@@ -965,7 +1014,10 @@
     onSelect = () => {},
     onCreate = () => {},
     onUnselect = () => {},
-    createOption = val => Promise.resolve({ id: val, text: val }),
+    createOption = val => Promise.resolve({
+      id  : val,
+      text: val,
+    }),
     tags = false,
     noneSelected = 'Any',
     // Any none empty value
@@ -976,19 +1028,19 @@
   }) => {
 
     const state = Groundhogg.createState({
-      search: '',
+      search   : '',
       searching: false,
-      choosing: false,
-      options: [],
-      focused: false,
-      morphing: false,
-      clicked: false,
+      choosing : false,
+      options  : [],
+      focused  : false,
+      morphing : false,
+      clicked  : false,
     })
 
     const optionsVisible = () => {
       return multiple
-        ? state.focused && ( state.searching || state.options.length || ( tags && isValidSelection(state.search) ) )
-        : state.focused
+             ? state.focused && ( state.searching || state.options.length || ( tags && isValidSelection(state.search) ) )
+             : state.focused
     }
 
     // ensure array
@@ -1052,7 +1104,11 @@
     const focusParent = () => document.getElementById(id)?.parentElement.focus()
 
     const handleCreateOption = (value) => {
-      state.options.unshift({ id: value, text: value, create: true })
+      state.options.unshift({
+        id    : value,
+        text  : value,
+        create: true,
+      })
       handleSelectOption(value)
     }
 
@@ -1087,17 +1143,18 @@
       onSelect(option)
       handleOnChange(selected)
 
-      if ( ! multiple ){
+      if (!multiple) {
         state.set({
-          focused: false
+          focused: false,
         })
       }
 
       morph()
 
-      if ( multiple ){
+      if (multiple) {
         focusSearch()
-      } else {
+      }
+      else {
         focusPicker()
       }
 
@@ -1116,7 +1173,7 @@
       handleOnChange(selected)
       morph()
 
-      if ( multiple ){
+      if (multiple) {
         focusSearch()
       }
     }
@@ -1129,18 +1186,21 @@
      * @param index
      * @returns {*}
      */
-    const itemPickerItem = ({ id, text }, index) => {
+    const itemPickerItem = ({
+      id,
+      text,
+    }, index) => {
       return Div({
         className: `gh-picker-item ${ isValidSelection(id) ? '' : 'is-invalid' }`,
-        id: `item-${ id }-${ index }`,
+        id       : `item-${ id }-${ index }`,
       }, [
         Span({ className: 'gh-picker-item-text' }, text),
         selected.length > 1 || clearable ? Span({
-          id: `delete-${ id }-${ index }`,
+          id       : `delete-${ id }-${ index }`,
           className: 'gh-picker-item-delete',
-          tabindex: '0',
-          dataId: id,
-          onClick: e => {
+          tabindex : '0',
+          dataId   : id,
+          onClick  : e => {
             handleUnselectOption(id)
           },
         }, '&times;') : null,
@@ -1155,13 +1215,16 @@
      * @param index
      * @returns {*}
      */
-    const itemPickerOption = ({ id, text }, index) => {
+    const itemPickerOption = ({
+      id,
+      text,
+    }, index) => {
       return Div({
         className: 'gh-picker-option',
-        dataId: id,
-        tabindex: '0',
-        id: `option-${ index }-${ id }`,
-        onClick: e => {
+        dataId   : id,
+        tabindex : '0',
+        id       : `option-${ index }-${ id }`,
+        onClick  : e => {
           handleSelectOption(id)
         },
       }, text)
@@ -1188,12 +1251,13 @@
 
         let maxHeight = window.innerHeight - bottom - 20
 
-        if ( maxHeight > 100 ){
+        if (maxHeight > 100) {
           style.top = bottom + 'px'
           style.left = left + 'px'
           style.width = width + 'px'
           style.maxHeight = ( maxHeight ) + 'px'
-        } else {
+        }
+        else {
           style.bottom = window.innerHeight - top + 'px'
           style.left = left + 'px'
           style.width = width + 'px'
@@ -1208,7 +1272,11 @@
       if (!state.searching && tags && isValidSelection(state.search)) {
         // Only show create if there is not a similar option already
         if (!state.options.find(opt => opt.id == state.search || opt.text == state.search)) {
-          state.options.unshift({ id: state.search, text: `Add "${ state.search }"`, create: true })
+          state.options.unshift({
+            id    : state.search,
+            text  : `Add "${ state.search }"`,
+            create: true,
+          })
         }
       }
 
@@ -1218,7 +1286,7 @@
       return Div({
         className: 'gh-picker-options',
         style,
-        onCreate: el => {
+        onCreate : el => {
           setTimeout(() => {
 
             let picker = document.getElementById(id)
@@ -1234,13 +1302,14 @@
 
             let maxHeight = window.innerHeight - bottom - 20
 
-            if ( maxHeight > 100 ){
+            if (maxHeight > 100) {
               optionsContainer.style.top = bottom + 'px'
               optionsContainer.style.left = left + 'px'
               optionsContainer.style.width = width + 'px'
               optionsContainer.style.maxHeight = maxHeight + 'px'
 
-            } else {
+            }
+            else {
               optionsContainer.style.bottom = window.innerHeight - top + 'px'
               optionsContainer.style.left = left + 'px'
               optionsContainer.style.width = width + 'px'
@@ -1258,7 +1327,7 @@
         multiple || !selected.length ? null : SearchInput(),
 
         // "Searching..."
-        state.searching ? Div({ className: 'gh-picker-no-options' }, Ellipses( wp.i18n.__('Searching') ) ) : null,
+        state.searching ? Div({ className: 'gh-picker-no-options' }, Ellipses(wp.i18n.__('Searching'))) : null,
 
         // The actual options
         ...options.map((opt, i) => itemPickerOption(opt, i)),
@@ -1307,19 +1376,19 @@
      * @constructor
      */
     const SearchInput = () => Input({
-      className: 'gh-picker-search',
-      value: state.search,
-      name: 'search',
-      type: 'search',
+      className   : 'gh-picker-search',
+      value       : state.search,
+      name        : 'search',
+      type        : 'search',
       autocomplete: 'off',
-      id: `${id}-search-input`,
+      id          : `${ id }-search-input`,
       // autofocus: true,
       placeholder: selected.length ? placeholder : noneSelected,
-      onInput: e => startSearch(e.target.value),
-      onFocus: e => {
+      onInput    : e => startSearch(e.target.value),
+      onFocus    : e => {
         startSearch(e.target.value)
       },
-      onKeydown: e => {
+      onKeydown  : e => {
         if (tags) {
           if (e.key !== 'Enter' && e.key !== ',') {
             return
@@ -1339,34 +1408,34 @@
     const Render = () => Div({
       id,
       className: `gh-picker-container`,
-      tabindex: '0',
+      tabindex : '0',
       ...attributes,
     }, Div({
-      id: `${id}-picker`,
+      id       : `${ id }-picker`,
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
-      tabindex: '0',
-      onCreate: el => {
+      tabindex : '0',
+      onCreate : el => {
         el.addEventListener('focusout', e => {
 
-          setTimeout( () => {
+          setTimeout(() => {
 
-            if ( state.morphing || document.getElementById(id).contains( document.activeElement ) ){
+            if (state.morphing || document.getElementById(id).contains(document.activeElement)) {
               return
             }
 
             setState({
-              search: '',
-              options: [],
+              search   : '',
+              options  : [],
               searching: false,
-              focused: false,
+              focused  : false,
             }, 'picker focusout')
 
-          }, 10 )
+          }, 10)
         })
 
         el.addEventListener('focusin', e => {
 
-          if ( state.focused ){
+          if (state.focused) {
             return
           }
 
@@ -1406,7 +1475,10 @@
    * @returns {*}
    * @constructor
    */
-  const Iframe = ({ onCreate = () => {}, ...attributes }, content = null) => {
+  const Iframe = ({
+    onCreate = () => {},
+    ...attributes
+  }, content = null) => {
 
     let blob = new Blob([content], { type: 'text/html; charset=utf-8' })
     let src = URL.createObjectURL(blob)
@@ -1434,16 +1506,16 @@
     }, options.map(opt => ButtonOption(opt)))
 
     const ButtonOption = option => Button({
-      id: `${ id }-opt-${ option.id }`,
+      id       : `${ id }-opt-${ option.id }`,
       className: `gh-button gh-button small ${ selected === option.id ? 'dark' : 'grey' }`,
-      onClick: e => {
+      onClick  : e => {
         selected = option.id
         morphdom(document.getElementById(id), render())
         onChange(option.id)
       },
     }, [
       option.text,
-      option.tooltip ? ToolTip( option.tooltip ) : null
+      option.tooltip ? ToolTip(option.tooltip) : null,
     ])
 
     return render()
@@ -1452,14 +1524,14 @@
   const ProgressBar = ({
     percent = 100,
     error = false,
-    className = ''
+    className = '',
   }) => {
 
     return Div({
-      className: `gh-progress-bar ${ error ? 'gh-error' : '' } ${className}`,
+      className: `gh-progress-bar ${ error ? 'gh-error' : '' } ${ className }`,
     }, Div({
       className: 'gh-progress-bar-fill',
-      style: {
+      style    : {
         width: `${ percent || 1 }%`,
       },
     }, Span({
@@ -1468,28 +1540,28 @@
 
   }
 
-  const Img = (props) => makeEl( 'img', props )
-  const Pg = (props, children) => makeEl( 'p', props, children )
-  const Bold = (props, children) => makeEl( 'b', props, children )
-  const An = (props, children) => makeEl( 'a', props, children )
-  const Ul = (props, children) => makeEl( 'ul', props, children )
-  const Ol = (props, children) => makeEl( 'ol', props, children )
-  const Li = (props, children) => makeEl( 'li', props, children )
-  const H1 = (props, children) => makeEl( 'h1', props, children )
-  const H2 = (props, children) => makeEl( 'h2', props, children )
-  const H3 = (props, children) => makeEl( 'h3', props, children )
-  const H4 = (props, children) => makeEl( 'h4', props, children )
-  const Hr = (props, children) => makeEl( 'hr', props, children )
+  const Img = (props) => makeEl('img', props)
+  const Pg = (props, children) => makeEl('p', props, children)
+  const Bold = (props, children) => makeEl('b', props, children)
+  const An = (props, children) => makeEl('a', props, children)
+  const Ul = (props, children) => makeEl('ul', props, children)
+  const Ol = (props, children) => makeEl('ol', props, children)
+  const Li = (props, children) => makeEl('li', props, children)
+  const H1 = (props, children) => makeEl('h1', props, children)
+  const H2 = (props, children) => makeEl('h2', props, children)
+  const H3 = (props, children) => makeEl('h3', props, children)
+  const H4 = (props, children) => makeEl('h4', props, children)
+  const Hr = (props, children) => makeEl('hr', props, children)
 
-  const Skeleton = ( attributes, pieces ) => Div({
+  const Skeleton = (attributes, pieces) => Div({
     className: 'display-grid gap-10',
-    ...attributes
-  }, pieces.map( span => Div({
-    className: `${span} skeleton-loading`,
-    style: {
-      height: `40px`
-    }
-  })) )
+    ...attributes,
+  }, pieces.map(span => Div({
+    className: `${ span } skeleton-loading`,
+    style    : {
+      height: `40px`,
+    },
+  })))
 
   window.MakeEl = {
     Skeleton,
@@ -1546,8 +1618,6 @@
     htmlToElement,
     htmlToElements,
     domElementToReact,
-
-
 
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

@@ -50,6 +50,7 @@
     Select,
     Input,
     Div,
+    makeEl
   } = MakeEl
 
   const {
@@ -1094,17 +1095,62 @@
   })
 
   registerFilter('street_address_1', 'location',
-    __('Street Address 1', 'groundhogg'), {
+    __('Line 1', 'groundhogg'), {
       ...BasicTextFilter(__('Street Address 1', 'groundhogg')),
     })
 
   registerFilter('street_address_2', 'location',
-    __('Street Address 2', 'groundhogg'), {
+    __('Line 2', 'groundhogg'), {
       ...BasicTextFilter(__('Street Address 2', 'groundhogg')),
     })
 
   registerFilter('zip_code', 'location', __('Zip/Postal Code', 'groundhogg'), {
     ...BasicTextFilter(__('Zip/Postal Code', 'groundhogg')),
+  })
+
+  registerFilter('locale', 'location', __('Locale', 'groundhogg'), {
+    view ({
+      locales = [],
+    }) {
+
+      if ( ! locales.length ){
+        throw new Error( 'Select a locale' )
+      }
+
+      let dropdown = Div({}, GroundhoggLocalDropdown ).firstElementChild
+
+      locales = locales.map( locale => bold( dropdown.querySelector( `option[value="${locale}"]` ).innerHTML ) )
+
+      return sprintf( '%s is %s', bold( __( 'Locale' ) ), orList( locales ) )
+    },
+    edit ({
+      locales = [],
+    }) {
+      // language=html
+      let dropdown = Div({}, GroundhoggLocalDropdown ).firstElementChild
+      dropdown.multiple = true
+      locales.forEach( locale => {
+        dropdown.querySelector( `option[value="${locale}"]` ).selected = true
+      } )
+      return dropdown
+    },
+    onMount (filter, updateFilter) {
+      // console.log(filter)
+
+      $('#filter-locale').select2({
+        multiple: true,
+      }).on('change', function (e) {
+
+        const $el = $(this)
+
+        updateFilter({
+          locales: $el.val(),
+        })
+      })
+    },
+    defaults: {
+      locales: ['en_US'],
+    },
   })
 
   //filter by Email Opened
