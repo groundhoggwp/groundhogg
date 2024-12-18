@@ -2882,14 +2882,15 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				$tags = array_merge( $tags, $value );
 				break;
 			case 'meta':
-				$meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
+                $key = get_key_from_column_label( $column );
+				$meta[ $key ] = sanitize_object_meta( $value, $key, 'contact' );
 				break;
 			case 'files':
 
 				// passed path as the value
 				if ( file_exists( $value ) ) {
 					$files[ $column ] = $value;
-				} // ZGet from $_FILES
+				} // Get from $_FILES
 				else if ( isset_not_empty( $_FILES, $column ) ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
 				}
@@ -5909,6 +5910,17 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 		$meta_value = sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {
 		$meta_value = sanitize_text_field( $meta_value );
+	} else if ( is_array( $meta_value ) ){
+        $meta_value = sanitize_payload( $meta_value );
+    } else if ( is_numeric( $meta_value ) ) {
+
+		// No sanitization needed
+		if ( is_int( $meta_value ) || is_float( $meta_value ) ) {
+			return $meta_value;
+		}
+
+		// Filter to a float, removes training 0s by default
+		return filter_var( $meta_value, FILTER_VALIDATE_FLOAT );
 	}
 
 	/**
@@ -6758,6 +6770,14 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
  */
 function enqueue_filter_assets() {
 
+    static $called;
+
+    if ( $called ){
+        return;
+    }
+
+    // call only once?
+    $called = true;
 
 	wp_enqueue_script( 'groundhogg-admin-filter-contacts' );
 	wp_enqueue_style( 'groundhogg-admin-filters' );
