@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Api\V4\Base_Api;
+use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -334,8 +335,8 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-filter-contacts',
-			'moment',
-			'groundhogg-make-el'
+			'groundhogg-make-el',
+			'wp-date',
 		] );
 
 		wp_register_script( 'groundhogg-admin-funnel-scheduler', GROUNDHOGG_ASSETS_URL . '/js/admin/funnels/funnel-scheduler' . $dot_min . '.js', [
@@ -344,8 +345,8 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-filter-contacts',
-			'moment',
-			'groundhogg-make-el'
+			'groundhogg-make-el',
+			'wp-date',
 		] );
 
 		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
@@ -633,6 +634,8 @@ class Scripts {
 				'whiteLabelName'   => white_labeled_name(),
 				'isSuperAdmin'     => is_super_admin(),
 				'isWPFusionActive' => is_wp_fusion_active(),
+				'timeZone'         => wp_timezone()->getName(),
+//				'siteTime'         => ( new DateTimeHelper() )->wpDateTimeFormat(),
 				'recaptcha'        => [
 					'enabled' => is_recaptcha_enabled(),
 					'version' => get_option( 'gh_recaptcha_version' )

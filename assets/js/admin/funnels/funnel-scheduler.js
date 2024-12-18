@@ -7,15 +7,28 @@
   } = Groundhogg.element
 
   const {
-    funnels: FunnelsStore,
+    funnels : FunnelsStore,
     searches: SearchesStore,
     contacts: ContactsStore,
   } = Groundhogg.stores
 
-  const { routes, post } = Groundhogg.api
+  const {
+    routes,
+    post,
+  } = Groundhogg.api
   const { createFilters } = Groundhogg.filters.functions
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
-  const { sprintf, __, _x, _n } = wp.i18n
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
 
   const {
     Div,
@@ -29,56 +42,66 @@
     Dashicon,
   } = MakeEl
 
+  const {
+    isInTheFuture,
+    getDate,
+    date,
+  } = wp.date
+
   const initialState = {
-    step: 'funnel',
-    when: 'now',
-    steps:[],
-    campaigns: [],
-    searchMethod: 'filters', // 'filters' or 'search'
+    step         : 'funnel',
+    when         : 'now',
+    steps        : [],
+    campaigns    : [],
+    searchMethod : 'filters', // 'filters' or 'search'
     searchMethods: [],
     totalContacts: 0,
-    date: moment().format('YYYY-MM-DD'),
-    time: moment().add(1, 'hour').format('HH:00:00'),
-    finished: false,
+    date         : date('Y-m-d'),
+    time         : date('H:00:00', getDate().setHours(getDate().getHours() + 1)),
+    finished     : false,
   }
 
   const getSearchMethods = () => {
     return [
       ...getState().searchMethods ?? [],
       {
-        id: 'filters',
-        text: __('Search for contacts using filters.', 'groundhogg'),
+        id   : 'filters',
+        text : __('Search for contacts using filters.', 'groundhogg'),
         query: () => ( {
-          filters: getState().include_filters,
+          filters        : getState().include_filters,
           exclude_filters: getState().exclude_filters,
         } ),
       },
       {
-        id: 'all-contacts',
-        text: __('All contacts.', 'groundhogg'),
+        id   : 'all-contacts',
+        text : __('All contacts.', 'groundhogg'),
         query: () => ( {} ),
       },
       {
-        id: 'all-my-contacts',
-        text: __('All contacts assigned to me.', 'groundhogg'),
+        id   : 'all-my-contacts',
+        text : __('All contacts assigned to me.', 'groundhogg'),
         query: () => ( {
           owner_id: Groundhogg.currentUser.ID,
         } ),
       },
       {
-        id: 'confirmed-contacts',
-        text: __('All confirmed contacts.', 'groundhogg'),
+        id   : 'confirmed-contacts',
+        text : __('All confirmed contacts.', 'groundhogg'),
         query: () => ( {
           optin_status: 2,
         } ),
       },
-      ...SearchesStore.getItems().map(({ id, name }) => ( {
-        id,
-        text: sprintf(__('Saved search %s', 'groundhogg'), bold(name)),
-        query: () => ( {
-          saved_search: id,
-        } ),
-      } )),
+      ...SearchesStore.getItems().
+        map(({
+          id,
+          name,
+        }) => ( {
+          id,
+          text : sprintf(__('Saved search %s', 'groundhogg'), bold(name)),
+          query: () => ( {
+            saved_search: id,
+          } ),
+        } )),
     ]
   }
 
@@ -137,11 +160,11 @@
   const getStep = () => getState().funnelStep
 
   const Steps = {
-    'funnel': {
-      name: __('Funnel', 'groundhogg'),
-      icon: icons.funnel,
+    'funnel'   : {
+      name        : __('Funnel', 'groundhogg'),
+      icon        : icons.funnel,
       requirements: () => true,
-      render: () => {
+      render      : () => {
 
         return Fragment([
           Div({
@@ -149,21 +172,30 @@
           }, [
             `<p>${ __('Select which funnel to start...', 'groundhogg') }</p>`,
             ItemPicker({
-              id: `select-a-funnel`,
+              id          : `select-a-funnel`,
               noneSelected: __('Select a funnel...', 'groundhogg'),
-              selected: getFunnel() ? { id: getFunnel().ID, text: getFunnel().data.title } : [],
-              multiple: false,
-              style: {
+              selected    : getFunnel() ? {
+                id  : getFunnel().ID,
+                text: getFunnel().data.title,
+              } : [],
+              multiple    : false,
+              style       : {
                 flexGrow: 1,
               },
               fetchOptions: (search) => {
                 return FunnelsStore.fetchItems({
-                  search,
-                  status: 'active',
-                }).
-                  then(funnels => funnels.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+                    search,
+                    status: 'active',
+                  }).
+                  then(funnels => funnels.map(({
+                    ID,
+                    data,
+                  }) => ( {
+                    id  : ID,
+                    text: data.title,
+                  } )))
               },
-              onChange: item => {
+              onChange    : item => {
                 if (!item) {
                   setState({
                     funnel: null,
@@ -175,22 +207,33 @@
 
                 setState({
                   funnel,
-                  funnelStep: funnel.steps[0]
+                  funnelStep: funnel.steps[0],
                 })
               },
             }),
             getFunnel() ? ItemPicker({
-              id: `select-a-step`,
+              id          : `select-a-step`,
               noneSelected: __('Select a step...', 'groundhogg'),
-              selected: getStep() ? { id: getStep().ID, text: getStep().data.step_title } : [],
-              multiple: false,
-              style: {
+              selected    : getStep() ? {
+                id  : getStep().ID,
+                text: getStep().data.step_title,
+              } : [],
+              multiple    : false,
+              style       : {
                 flexGrow: 1,
               },
               fetchOptions: (search) => {
-                return Promise.resolve( getFunnel().steps.map( ({ ID, data }) => ( { id: ID, text: data.step_title } ) ) )
+                return Promise.resolve(getFunnel().
+                  steps.
+                  map(({
+                    ID,
+                    data,
+                  }) => ( {
+                    id  : ID,
+                    text: data.step_title,
+                  } )))
               },
-              onChange: item => {
+              onChange    : item => {
                 if (!item) {
                   setState({
                     funnelStep: null,
@@ -198,7 +241,7 @@
                   return
                 }
 
-                let funnelStep = getFunnel().steps.find( step => step.ID === item.id )
+                let funnelStep = getFunnel().steps.find(step => step.ID === item.id)
 
                 setState({
                   funnelStep,
@@ -206,12 +249,12 @@
               },
             }) : null,
             getFunnel() && getStep() ? Button({
-              id: 'go-to-next',
+              id       : 'go-to-next',
               className: 'gh-button primary',
-              style: {
+              style    : {
                 alignSelf: 'flex-end',
               },
-              onClick: e => {
+              onClick  : e => {
                 setState({
                   step: 'schedule',
                 })
@@ -221,11 +264,11 @@
         ])
       },
     },
-    'schedule': {
-      name: __('Schedule', 'groundhogg'),
-      icon: Dashicon('calendar'),
+    'schedule' : {
+      name        : __('Schedule', 'groundhogg'),
+      icon        : Dashicon('calendar'),
       requirements: () => getFunnel(),
-      render: () => {
+      render      : () => {
 
         return Fragment([
           Div({
@@ -233,10 +276,16 @@
           }, [
             `<p>${ __('When do you want the funnel to start?', 'groundhogg') }</p>`,
             ButtonToggle({
-              id: 'send-when',
-              options: [
-                { id: 'later', text: 'Later' },
-                { id: 'now', text: 'Now' },
+              id      : 'send-when',
+              options : [
+                {
+                  id  : 'later',
+                  text: 'Later',
+                },
+                {
+                  id  : 'now',
+                  text: 'Now',
+                },
               ],
               selected: getState().when,
               onChange: when => setState({ when }),
@@ -246,33 +295,33 @@
             className: 'gh-input-group',
           }, [
             Input({
-              type: 'date',
-              id: 'send-date',
-              name: 'date',
-              value: getState().date || '',
-              min: moment().format('YYYY-MM-DD'),
+              type    : 'date',
+              id      : 'send-date',
+              name    : 'date',
+              value   : getState().date || '',
+              min     : date('Y-m-d'),
               onChange: e => setState({
                 date: e.target.value,
               }),
             }),
             Input({
-              type: 'time',
-              id: 'send-time',
-              name: 'time',
-              value: getState().time || '',
+              type    : 'time',
+              id      : 'send-time',
+              name    : 'time',
+              value   : getState().time || '',
               onChange: e => setState({
                 time: e.target.value,
               }),
             }),
           ]) : null,
           Button({
-            id: 'go-to-contacts',
+            id       : 'go-to-contacts',
             className: 'gh-button primary',
-            disabled: getState().when === 'later' && moment().isAfter(`${ getState().date } ${ getState().time }`),
-            style: {
+            disabled : getState().when === 'later' && ! isInTheFuture(`${ getState().date } ${ getState().time }`),
+            style    : {
               alignSelf: 'flex-end',
             },
-            onClick: e => {
+            onClick  : e => {
               setState({
                 step: 'contacts',
               })
@@ -281,22 +330,22 @@
         ])
       },
     },
-    'contacts': {
-      name: __('Contacts', 'groundhogg'),
+    'contacts' : {
+      name        : __('Contacts', 'groundhogg'),
       requirements: () => getFunnel() && getStep() && ( getState().when === 'now' || ( getState().time && getState().date ) ),
-      icon: icons.contact,
-      render: () => {
+      icon        : icons.contact,
+      render      : () => {
 
         return Fragment([
           `<p>${ __('Select contacts to add to the funnel...', 'groundhogg') }</p>`,
           ItemPicker({
-            id: 'select-search-method',
-            multiple: false,
-            selected: getSearchMethods().find(({ id }) => id === getState().searchMethod),
+            id          : 'select-search-method',
+            multiple    : false,
+            selected    : getSearchMethods().find(({ id }) => id === getState().searchMethod),
             fetchOptions: async search => {
               return getSearchMethods().filter(({ text }) => text.match(new RegExp(search, 'i')))
             },
-            onChange: (item) => {
+            onChange    : (item) => {
 
               if (!item) {
                 setState({
@@ -316,7 +365,7 @@
             },
           }),
           getState().searchMethod === 'filters' ? Div({
-            id: 'funnel-include-filters',
+            id      : 'funnel-include-filters',
             onCreate: el => {
               setTimeout(() => {
                 createFilters(
@@ -330,7 +379,7 @@
             },
           }) : null,
           getState().searchMethod === 'filters' ? Div({
-            id: 'funnel-exclude-filters',
+            id      : 'funnel-exclude-filters',
             onCreate: el => {
               setTimeout(() => {
                 createFilters(
@@ -346,13 +395,13 @@
           `<p>${ sprintf(__('%s contacts will be added to the funnel.', 'groundhogg'),
             formatNumber(getState().totalContacts)) }</p>`,
           Button({
-            id: 'go-to-review',
+            id       : 'go-to-review',
             className: 'gh-button primary',
-            disabled: !getState().totalContacts,
-            style: {
+            disabled : !getState().totalContacts,
+            style    : {
               alignSelf: 'flex-end',
             },
-            onClick: e => {
+            onClick  : e => {
               setState({
                 step: 'review',
               })
@@ -361,12 +410,12 @@
         ])
       },
     },
-    'review': {
-      name: 'Review',
-      icon: Dashicon('thumbs-up'),
+    'review'   : {
+      name        : 'Review',
+      icon        : Dashicon('thumbs-up'),
       requirements: () => getFunnel() && getStep() && ( getState().when === 'now' || ( getState().time && getState().date ) ) &&
         getState().totalContacts,
-      render: () => {
+      render      : () => {
 
         let preview
 
@@ -387,9 +436,9 @@
         return Fragment([
           `<p>${ preview }</p>`,
           Button({
-            id: 'confirm-and-schedule',
+            id       : 'confirm-and-schedule',
             className: 'gh-button primary medium',
-            onClick: e => {
+            onClick  : e => {
 
               e.target.innerHTML = `<span class="gh-spinner"></span>`
 
@@ -401,22 +450,22 @@
 
               FunnelsStore.addContacts({
                 funnel_id: getFunnel().ID,
-                step_id: getStep().ID,
-                query: getQuery(),
-                now: when === 'now',
+                step_id  : getStep().ID,
+                query    : getQuery(),
+                now      : when === 'now',
                 date,
                 time,
-              }).then( r => {
+              }).then(r => {
 
                 setState({
-                  step: 'scheduled',
+                  step    : 'scheduled',
                   finished: true,
                 })
 
               }).catch(err => {
                 dialog({
                   message: err.message,
-                  type: 'error',
+                  type   : 'error',
                 })
 
                 console.log(err)
@@ -439,19 +488,19 @@
       },
     },
     'scheduled': {
-      name: __('Scheduled'),
-      icon: Dashicon('yes'),
+      name        : __('Scheduled'),
+      icon        : Dashicon('yes'),
       requirements: () => getState().finished,
-      render: () => {
+      render      : () => {
         return Fragment([
           `<p>${ __('🎉 Your contacts will added to the funnel in the background!', 'groundhogg') }</p>`,
           Button({
-            id: 're-schedule',
+            id       : 're-schedule',
             className: 'gh-button primary',
-            style: {
+            style    : {
               alignSelf: 'flex-start',
             },
-            onClick: e => {
+            onClick  : e => {
               setState({
                 ...initialState,
               })
@@ -491,27 +540,33 @@
 
   const FunnelScheduler = () => {
 
-    const order = ['funnel', 'schedule', 'contacts', 'review', 'scheduled']
+    const order = [
+      'funnel',
+      'schedule',
+      'contacts',
+      'review',
+      'scheduled',
+    ]
 
     return Div({
-      id: 'funnel-scheduler',
+      id       : 'funnel-scheduler',
       className: 'display-flex column gap-10',
-      style: {
-        width: '500px',
+      style    : {
+        width   : '500px',
         maxWidth: '100%',
       },
     }, [
       getState().step !== 'scheduled' ? Div({
         className: 'gh-step-nav',
-        style: {
+        style    : {
           marginBottom: '20px',
         },
       }, [
         ...order.map(step => Button({
-          id: `select-${ step }`,
+          id       : `select-${ step }`,
           className: `gh-button icon ${ getState().step === step ? 'primary' : 'secondary' }`,
-          disabled: !getSteps()[step].requirements(),
-          onClick: e => {
+          disabled : !getSteps()[step].requirements(),
+          onClick  : e => {
             setState({
               step,
             })
@@ -527,7 +582,13 @@
           return steps
         }, []),
       ]) : null,
-      getSteps()[getState().step].render({ getState, getFunnel, getStep, setState, getQuery }),
+      getSteps()[getState().step].render({
+        getState,
+        getFunnel,
+        getStep,
+        setState,
+        getQuery,
+      }),
     ])
   }
 

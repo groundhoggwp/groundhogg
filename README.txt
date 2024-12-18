@@ -351,6 +351,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.7.3.1 (2024-12-17) =
 * ADDED Proper Locale filter for selecting languages.
+* FIXED Broadcast scheduler limiting send time based on browser timezone rather than site timezone.
 * FIXED New sanitization for custom properties not saving multiple selections for dropdowns.
 
 = 3.7.3 (2024-12-04) =

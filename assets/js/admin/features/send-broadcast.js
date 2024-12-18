@@ -1,26 +1,11 @@
 ( function ($) {
 
   const {
-    modal,
-    select,
-    stepNav,
-    stepNavHandler,
-    input,
-    errorDialog,
-    setFrameContent,
-    progressBar,
-    tooltip,
-    loadingDots,
     adminPageURL,
     bold,
-    toggle,
     icons,
     dialog,
   } = Groundhogg.element
-  const {
-    emailPicker,
-    searchesPicker,
-  } = Groundhogg.pickers
   const {
     emails   : EmailsStore,
     searches : SearchesStore,
@@ -35,8 +20,6 @@
   const { createFilters } = Groundhogg.filters.functions
   const {
     formatNumber,
-    formatTime,
-    formatDate,
     formatDateTime,
   } = Groundhogg.formatting
   const {
@@ -48,6 +31,12 @@
     _x,
     _n,
   } = wp.i18n
+
+  const {
+    isInTheFuture,
+    getDate,
+    date,
+  } = wp.date
 
   const {
     Div,
@@ -78,8 +67,8 @@
     searchMethod         : 'filters', // 'filters' or 'search'
     searchMethods        : [],
     totalContacts        : 0,
-    date                 : moment().format('YYYY-MM-DD'),
-    time                 : moment().add(1, 'hour').format('HH:00:00'),
+    date                 : date('Y-m-d'),
+    time                 : date('H:00:00', getDate().setHours(getDate().getHours() + 1)),
     broadcast            : null,
     segment_type         : 'fixed',
     batching             : false,
@@ -553,7 +542,7 @@
               id      : 'send-date',
               name    : 'date',
               value   : getState().date || '',
-              min     : moment().format('YYYY-MM-DD'),
+              min     : date('Y-m-d'),
               onChange: e => setState({
                 date: e.target.value,
               }),
@@ -567,6 +556,10 @@
                 time: e.target.value,
               }),
             }),
+            Button({
+              className: 'gh-button grey small',
+              disabled: true,
+            }, wp.date.getSettings().timezone.abbr )
           ]) : null,
           getState().when === 'later' ? Div({
             className: 'display-flex gap-10 align-center',
@@ -672,7 +665,7 @@
           Button({
             id       : 'go-to-contacts',
             className: 'gh-button primary',
-            disabled : getState().when === 'later' && moment().isAfter(`${ getState().date } ${ getState().time }`),
+            disabled : getState().when === 'later' && !isInTheFuture(`${ getState().date } ${ getState().time }`),
             style    : {
               alignSelf: 'flex-end',
             },
