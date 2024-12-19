@@ -532,14 +532,14 @@ class Email extends Base_Object_With_Meta {
 			return 'html';
 		}
 
-		// Legacy blocks
-		if ( str_contains( $this->content, 'data-block' ) || str_contains( $this->content, 'text_block' ) || str_contains( $this->content, '<div class="row"' ) ) {
-			return 'legacy_blocks';
-		}
-
 		// New blocks
 		if ( $this->get_meta( 'blocks' ) ) {
 			return 'blocks';
+		}
+
+		// Legacy blocks
+		if ( str_contains( $this->content, 'data-block' ) || str_contains( $this->content, 'text_block' ) || str_contains( $this->content, '<div class="row"' ) ) {
+			return 'legacy_blocks';
 		}
 
 		// Legacy plain
@@ -547,7 +547,7 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * If is using the block editor
+	 * If is using the block editorX
 	 *
 	 * @return bool
 	 */
