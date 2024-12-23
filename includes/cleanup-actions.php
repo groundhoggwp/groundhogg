@@ -15,6 +15,7 @@ class Cleanup_Actions {
 		add_action( 'groundhogg/cleanup', [ $this, 'delete_expired_permission_keys' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'purge_email_logs' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'handle_sent_broadcasts' ] );
+		add_action( 'groundhogg/cleanup', [ $this, 'notify_of_failed_events' ] );
 	}
 
 	/**
@@ -42,6 +43,24 @@ class Cleanup_Actions {
 	}
 
 	/**
+	 * If there are new failed events within the last hour, send the event failure report.
+	 *
+	 * @return void
+	 */
+	public function notify_of_failed_events() {
+
+		// only new failed events within the last hour
+		$count_failed = db()->events->count( [ 'status' => 'failed', 'after' => time() - HOUR_IN_SECONDS ] );
+
+		// no failed events
+		if ( $count_failed === 0 ) {
+			return;
+		}
+
+		send_event_failure_notification();
+	}
+
+	/**
 	 * Automatically fix events that are not processed
 	 *
 	 * @return void
@@ -52,7 +71,7 @@ class Cleanup_Actions {
 		$query->where()
 		      ->in( 'status', [ Event::WAITING, Event::IN_PROGRESS ] ) // Event is waiting or in progress
 		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
-			  ->greaterThan( 'time_claimed', 0 )
+		      ->greaterThan( 'time_claimed', 0 )
 		      ->lessThanEqualTo( 'time_claimed', time() - ( 5 * MINUTE_IN_SECONDS ) ); // claimed more than 5 minutes ago
 
 		// release stale claim
@@ -74,12 +93,12 @@ class Cleanup_Actions {
 		$query->where()
 		      ->in( 'status', [ 'pending', 'in_progress' ] ) // Task is pending or in progress
 		      ->notEmpty( 'claim' ) // Claim is not empty, it should either be released or not in the queue anymore
-			  ->greaterThan( 'time_claimed', 0 )
-			  ->lessThanEqualTo( 'time_claimed', time() - ( 5 * MINUTE_IN_SECONDS ) ); // claimed more than 5 minutes ago
+		      ->greaterThan( 'time_claimed', 0 )
+		      ->lessThanEqualTo( 'time_claimed', time() - ( 5 * MINUTE_IN_SECONDS ) ); // claimed more than 5 minutes ago
 
 		$query->update( [
-			'status' => Event::WAITING,
-			'claim'  => '',
+			'status'       => Event::WAITING,
+			'claim'        => '',
 			'time_claimed' => 0,
 		] );
 	}

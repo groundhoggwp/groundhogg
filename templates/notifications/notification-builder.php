@@ -3,11 +3,13 @@
 namespace Groundhogg\Templates\Notifications;
 
 use Groundhogg\Utils\Replacer;
+use function Groundhogg\array_map_with_keys;
+use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 
 class Notification_Builder {
 
-	protected static function get_template_part( $template = '' ) {
+	public static function get_template_part( $template = '' ) {
 		$file = __DIR__ . "/{$template}.html";
 		if ( ! file_exists( $file ) ) {
 			return '';
@@ -17,15 +19,95 @@ class Notification_Builder {
 	}
 
 	/**
+	 * Generate the table for the broadcasts performance
+	 *
+	 * @param array $headers
+	 * @param array $theRows
+	 *
+	 * @return string
+	 */
+	public static function generate_list_table_html( array $headers, array $theRows ) {
+
+		$rows = [];
+
+		foreach ( $theRows as $i => $row ) {
+
+			$cells = [];
+			$k     = 0;
+
+			foreach ( $row as $cellId => $cell ) {
+
+				$classes = [
+					'cell-' . $cellId
+				];
+
+				$style = [
+					'padding' => '8px 8px 8px 12px',
+				];
+
+				if ( $k > 0 ) {
+					$style['text-align'] = 'center';
+				}
+
+				$cells[] = html()->e( 'td', [
+					'style' => $style,
+					'class' => $classes,
+				], $cell );
+
+				$k ++;
+			}
+
+			$rows[] = html()->e( 'tr', [
+				'style' => [
+					'background-color' => $i % 2 === 0 ? '#F6F9FB' : ''
+				]
+			], $cells );
+		}
+
+		if ( empty( $rows ) ) {
+			return '';
+		}
+
+		return html()->e( 'table', [
+			'style' => [
+				'border-collapse' => 'collapse',
+				'width'           => '100%',
+				'table-layout'    => 'auto',
+			],
+			'width' => '100%'
+		], [
+			html()->e( 'thead', [], [
+				html()->e( 'tr', [], array_map_with_keys( $headers, function ( $header, $i ) {
+
+					$style = [
+						'padding' => '8px 8px 8px 12px',
+					];
+
+					if ( $i > 0 ) {
+						$style['text-align'] = 'center';
+					}
+
+					return html()->e( 'th', [
+						'style' => $style
+					], $header );
+				} ) )
+			] ),
+			html()->e( 'tbody', [], $rows )
+		] );
+
+	}
+
+
+	/**
 	 * Get the full template with headers and footers, along with the correct content template
 	 *
 	 * @param string $content_template
 	 *
 	 * @return string
 	 */
-	protected static function get_general_notification_template_html( $content_template = '' ) {
+	public static function get_general_notification_template_html( $content_template = '', $replacements = [] ) {
 
-		$replacer = new Replacer( [
+		$replacer = new Replacer( wp_parse_args( $replacements, [
 			'the_header'  => self::get_template_part( ! is_white_labeled() ? 'branded-header' : 'generic-header' ),
 			'the_content' => self::get_template_part( $content_template ),
 			'the_footer'  => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
@@ -35,7 +117,7 @@ class Notification_Builder {
 			'home_url'    => home_url(),
 			'admin_url'   => admin_url(),
 			'profile_url' => admin_url( 'profile.php' )
-		] );
+		] ) );
 
 		return $replacer->replace( self::get_template_part( 'general-template' ) );
 	}
