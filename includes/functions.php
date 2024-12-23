@@ -1872,6 +1872,7 @@ function send_event_failure_notification() {
 
 	$eventQuery = new Table_Query( 'events' );
 	$eventQuery->setSelect( 'error_code', 'error_message', [ 'count(ID)', 'total' ] )
+               ->setLimit( 20 ) // up to 20 different errors
 	           ->setGroupby( 'error_code', 'error_message' )
 	           ->where( 'status', Event::FAILED )->notEmpty( 'error_code' );
 
