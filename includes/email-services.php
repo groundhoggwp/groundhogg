@@ -271,6 +271,18 @@ class Groundhogg_Email_Services {
 		return self::get_saved_service( self::WORDPRESS );
 	}
 
+    public static function current_message_type_is_marketing() {
+	    return self::get_current_message_type() === self::MARKETING;
+    }
+
+    public static function current_message_type_is_wordpress() {
+	    return self::get_current_message_type() === self::WORDPRESS;
+    }
+
+    public static function current_message_type_is_transactional() {
+	    return self::get_current_message_type() === self::TRANSACTIONAL;
+    }
+
 	/**
 	 * Sets the current service to the given
 	 *
