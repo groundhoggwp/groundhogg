@@ -4,7 +4,7 @@ namespace Groundhogg\Api\V4;
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Saved_Searches;
-use Groundhogg\Utils\Micro_Time_Tracker;
+use function Groundhogg\sanitize_query_url_params;
 
 class Searches_Api extends Base_Api {
 
@@ -105,7 +105,7 @@ class Searches_Api extends Base_Api {
 		Saved_Searches::instance()->add( $query_id, [
 			'name'  => $name,
 			'id'    => $query_id,
-			'query' => $query,
+			'query' => sanitize_query_url_params( $query ),
 		] );
 
 		return self::SUCCESS_RESPONSE( [
@@ -136,9 +136,8 @@ class Searches_Api extends Base_Api {
 
 		$search_id = $request->get_param( 'id' );
 
-
 		Saved_Searches::instance()->update( $search_id, array_filter( [
-			'query' => $request->get_param( 'query' ),
+			'query' => sanitize_query_url_params( $request->get_param( 'query' ) ),
 			'name'  => sanitize_text_field( $request->get_param( 'name' ) )
 		] ) );
 

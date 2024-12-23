@@ -10,6 +10,7 @@ use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\array_find;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\base64_json_decode;
@@ -103,6 +104,11 @@ class Contacts_Table extends WP_List_Table {
 		if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
 			$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
 		}
+
+		$query = array_apply_callbacks( $query, [
+			'filters'         => '\Groundhogg\sanitize_payload',
+			'exclude_filters' => '\Groundhogg\sanitize_payload',
+		] );
 
 		$full_name = split_name( $search );
 
@@ -324,12 +330,14 @@ class Contacts_Table extends WP_List_Table {
 
 		$statusCounts = $statusQuery->get_results();
 
-		$views = [[
-			'id'    => 'all',
-			'name'  => __( 'All', 'groundhogg' ),
-			'query' => [],
-            'count' => array_sum( wp_list_pluck( $statusCounts, 'contacts' ) )
-        ]];
+		$views = [
+			[
+				'id'    => 'all',
+				'name'  => __( 'All', 'groundhogg' ),
+				'query' => [],
+				'count' => array_sum( wp_list_pluck( $statusCounts, 'contacts' ) )
+			]
+		];
 
 		foreach ( Preferences::get_preference_names() as $status => $name ) {
 
@@ -356,12 +364,12 @@ class Contacts_Table extends WP_List_Table {
 				'query' => [],
 				'name'  => '',
 				'id'    => '',
-                'count' => 0
+				'count' => 0
 			] );
 
-            if ( $view['count'] === 0 ){
-                continue;
-            }
+			if ( $view['count'] === 0 ) {
+				continue;
+			}
 
 			$view['query']['view'] = $view['id'];
 

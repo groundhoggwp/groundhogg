@@ -4,9 +4,9 @@ namespace Groundhogg\DB\Query;
 
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\base64_json_decode;
-use function Groundhogg\day_of_week;
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\sanitize_payload;
 
 class FilterException extends \Exception {
 
@@ -23,6 +23,17 @@ class Filters {
 	 * @var array[]
 	 */
 	protected $filters = [];
+
+	/**
+	 * Expects top level filters [[[ filter ]]]
+	 *
+	 * @param array $filters
+	 *
+	 * @return array
+	 */
+	public static function sanitize( array $filters ) {
+		return sanitize_payload( $filters );
+	}
 
 	/**
 	 * Register a filter callback which will modify the current query

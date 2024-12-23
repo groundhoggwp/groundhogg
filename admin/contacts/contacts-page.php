@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Contact;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Properties;
@@ -163,6 +164,9 @@ class Contacts_Page extends Admin_Page {
 			$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
 		}
 
+        $filter_query = Filters::sanitize( $filter_query );
+		$search_query = Filters::sanitize( get_request_query() );
+
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
 		wp_enqueue_script( 'groundhogg-admin-components' );
@@ -175,7 +179,6 @@ class Contacts_Page extends Admin_Page {
 
 				wp_enqueue_script( 'groundhogg-admin-bulk-edit-contacts' );
 
-				$search_query = get_request_query();
 				unset( $search_query['number'] );
 
 				wp_localize_script( 'groundhogg-admin-bulk-edit-contacts', 'BulkEdit', [
@@ -244,10 +247,10 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-contact-search' );
 				wp_localize_script( 'groundhogg-admin-contact-search', 'ContactSearch', [
 					'url'           => admin_page_url( 'gh_contacts' ),
-					'query'         => get_request_query(),
+					'query'         => $search_query,
 					'filter_query'  => $filter_query,
-					'searches'      => array_values( Saved_Searches::instance()->get_all() ),
 					'currentSearch' => $saved_search,
+					'searches'      => array_values( Saved_Searches::instance()->get_all() ),
 					'presets'       => Contact_Table_Columns::get_presets()
 				] );
 				break;

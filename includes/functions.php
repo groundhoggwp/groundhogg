@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -611,7 +612,7 @@ function alias_from_filter( $filter ) {
  * @return array|string
  */
 function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
-	$query = $_GET;
+	$query = wp_unslash( $_GET );
 
 	$ignore = apply_filters( 'groundhogg/get_request_query/ignore', [
 		'page',
@@ -633,7 +634,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	$query = urldecode_deep( $query );
 
 	if ( $search = get_request_var( 's' ) ) {
-		$query['search'] = $search;
+		$query['search'] = sanitize_text_field( $search );
 	}
 
 	$query = array_merge( $query, $force );
@@ -651,19 +652,19 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		$query = $new_query;
 	}
 
-	$query = map_deep( $query, 'sanitize_text_field' );
-
 	if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
-		$query['filters'] = base64_json_decode( $query['filters'] );
+		$query['filters'] = Filters::sanitize( base64_json_decode( $query['filters'] ) );
 	}
 	if ( isset_not_empty( $query, 'include_filters' ) && is_string( $query['include_filters'] ) ) {
-		$query['include_filters'] = base64_json_decode( $query['include_filters'] );
+		$query['include_filters'] = Filters::sanitize( base64_json_decode( $query['include_filters'] ) );
 	}
 	if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
-		$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
+		$query['exclude_filters'] = Filters::sanitize( base64_json_decode( $query['exclude_filters'] ) );
 	}
 
-	return wp_unslash( array_filter( $query ) );
+	$query = sanitize_payload( $query );
+
+	return array_filter( $query );
 }
 
 /**
@@ -5910,9 +5911,9 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 		$meta_value = sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {
 		$meta_value = sanitize_text_field( $meta_value );
-	} else if ( is_array( $meta_value ) ){
-        $meta_value = sanitize_payload( $meta_value );
-    } else if ( is_numeric( $meta_value ) ) {
+	} else if ( is_array( $meta_value ) ) {
+		$meta_value = sanitize_payload( $meta_value );
+	} else if ( is_numeric( $meta_value ) ) {
 
 		// No sanitization needed
 		if ( is_int( $meta_value ) || is_float( $meta_value ) ) {
@@ -5966,6 +5967,32 @@ function sanitize_payload( array $payload ): array {
 		// Everything else
 		return sanitize_text_field( $param );
 	} );
+}
+
+/**
+ * Include only allowed keys in the URL
+ *
+ * @param array $query
+ *
+ * @return array
+ */
+function sanitize_query_url_params( array $query ) {
+
+	$query = array_apply_callbacks( $query, [
+		'include'         => 'wp_parse_id_list',
+		'includes'        => 'wp_parse_id_list',
+		'exclude'         => 'wp_parse_id_list',
+		'excludes'        => 'wp_parse_id_list',
+		'limit'           => 'absint',
+		'offset'          => 'absint',
+		'page'            => 'absint',
+		'paged'           => 'absint',
+		'filters'         => [ Filters::class, 'sanitize' ],
+		'include_filters' => [ Filters::class, 'sanitize' ],
+		'exclude_filters' => [ Filters::class, 'sanitize' ]
+	] );
+
+	return sanitize_payload( $query );
 }
 
 /**
