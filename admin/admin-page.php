@@ -13,12 +13,10 @@ use function Groundhogg\create_object_from_type;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
-use function Groundhogg\groundhogg_icon;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\white_labeled_name;
 
 /**
  * Abstract Admin Page
