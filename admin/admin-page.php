@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin;
 
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\Plugin;
 use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
@@ -510,7 +511,7 @@ abstract class Admin_Page extends Supports_Errors {
 		$this->has_table_filters = true;
 
 		$filters = get_url_var( 'include_filters', base64_json_encode( [] ) );
-		$filters = base64_json_decode( $filters );
+		$filters = Filters::sanitize( base64_json_decode( $filters ) );
 
 		wp_enqueue_style( 'groundhogg-admin-filters' );
 		wp_enqueue_script( 'groundhogg-admin-filters' );

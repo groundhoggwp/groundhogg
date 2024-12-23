@@ -209,6 +209,9 @@ class Broadcasts_Page extends Admin_Page {
 	 */
 	public function view() {
 
+        // fix sending broadcasts
+        Broadcast::transition_from_sending_to_sent();
+
 		$broadcasts_table = new Broadcasts_Table();
 
 		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
