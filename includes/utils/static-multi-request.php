@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Utils;
 
+use WpOrg\Requests\Requests;
+
 trait Static_Multi_Request {
 
 	/**
@@ -81,27 +83,31 @@ trait Static_Multi_Request {
 	 */
 	public static function send_requests() {
 
-		if ( ! self::has_requests() ) {
-			return 0;
+		$sent = 0;
+
+		while ( self::has_requests() ) {
+
+			if ( ( microtime( true ) - self::$time_last_sent ) < 1 ) {
+				// If commands are being sent within a second of each other
+				$requests_to_send = self::$concurrency - self::$sent_last_second;
+			} else {
+				// Otherwise, we can send a full request!
+				$requests_to_send = min( self::$concurrency, count( self::$requests ) );
+			}
+
+			self::$sent_last_second = $requests_to_send;
+
+			if ( $requests_to_send > 0 ) {
+				$requests             = array_splice( self::$requests, 0, $requests_to_send );
+				self::$time_last_sent = microtime( true );
+				Requests::request_multiple( $requests );
+			}
+
+			$sent += $requests_to_send;
+
 		}
 
-		if ( ( microtime( true ) - self::$time_last_sent ) < 1 ) {
-			// If commands are being sent within a second of each other
-			$requests_to_send = self::$concurrency - self::$sent_last_second;
-		} else {
-			// Otherwise, we can send a full request!
-			$requests_to_send = min( self::$concurrency, count( self::$requests ) );
-		}
-
-		self::$sent_last_second = $requests_to_send;
-
-		if ( $requests_to_send > 0 ) {
-			$requests             = array_splice( self::$requests, 0, $requests_to_send );
-			self::$time_last_sent = microtime( true );
-			\Requests::request_multiple( $requests );
-		}
-
-		return $requests_to_send;
+		return $sent;
 	}
 
 }
