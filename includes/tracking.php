@@ -747,6 +747,11 @@ class Tracking {
 			$target_url = '/';
 		}
 
+		// Edge case where there is no target page but there are UTM params or some other query string.
+		if ( str_starts_with( $target_url, '?' ) ){
+			$target_url = '/' . $target_url; // Prepend slash to send to homepage
+		}
+
 		$this->target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		return $this->target_url;
