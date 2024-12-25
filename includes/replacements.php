@@ -2637,8 +2637,8 @@ class Replacements implements \JsonSerializable {
 			1 => 0,
 			2 => strlen( $args[0] ),
 		] );
-
-		return substr( $args[0], $args[1], $args[2] );
+		
+		return substr( $args[3], $args[4], $args[5] );
 	}
 
 	/**
