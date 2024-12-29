@@ -2,18 +2,22 @@
 
 namespace Groundhogg\Reporting;
 
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Event;
 use Groundhogg\Reports;
 use Groundhogg\Templates\Notifications\Notification_Builder;
 use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Replacer;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
+use function Groundhogg\code_it;
 use function Groundhogg\db;
 use function Groundhogg\filter_by_cap;
+use function Groundhogg\get_hostname;
 use function Groundhogg\get_request_var;
 use function Groundhogg\has_premium_features;
 use function Groundhogg\html;
-use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
 use function Groundhogg\percentage_change;
@@ -35,13 +39,14 @@ class Email_Reports extends Notification_Builder {
 		$before = new DateTimeHelper( 'yesterday 23:59:59' );
 
 		self::send_overview_report( $after, $before );
+		self::send_failed_events_report( time() - YEAR_IN_SECONDS );
 	}
 
 	/**
 	 * Send the report via email
 	 *
 	 * @param string $report_type
-	 * @param array $recipients
+	 * @param array  $recipients
 	 * @param string $subject
 	 * @param string $content
 	 *
@@ -363,5 +368,92 @@ class Email_Reports extends Notification_Builder {
 			$subject,
 			$email_content,
 		);
+	}
+
+	/**
+	 * Send a report of recent failed events since a specific time marker.
+	 *
+	 * @param $since
+	 *
+	 * @return bool
+	 */
+	public static function send_failed_events_report( $since = 0 ) {
+
+		if ( ! $since ) {
+			$since = time() - DAY_IN_SECONDS;
+		}
+
+		// ignore some errors
+		$ignore_errors = array_map( function ( $error ) {
+			return sanitize_key( trim( $error, " \n\r\t\v\0," ) );
+		}, explode( PHP_EOL, get_option( 'gh_ignore_event_errors', '' ) ) );
+
+		$newErrorQuery = new Table_Query( 'events' );
+		$newErrorQuery->where()
+		              ->equals( 'status', Event::FAILED )
+		              ->greaterThanEqualTo( 'time', $since );
+
+		if ( ! empty( $ignore_errors ) ) {
+			$newErrorQuery->where()->notIn( 'error_code', $ignore_errors );
+		}
+
+		$new_errors_count = $newErrorQuery->count();
+
+		// no new errors, don't send a notification
+		if ( $new_errors_count === 0 ) {
+			return false;
+		}
+
+		$recipient = get_option( 'gh_event_failure_notification_email' ) ?: get_bloginfo( 'admin_email' );
+
+		if ( ! is_email( $recipient ) ) {
+			return false;
+		}
+
+		$subject = sprintf( _n( '[%s] %s new failed event on %s', '[%s] %s new failed events on %s', $new_errors_count, 'groundhogg' ), white_labeled_name(), _nf( $new_errors_count ), get_hostname() );
+
+		$eventQuery = new Table_Query( 'events' );
+		$eventQuery->setSelect( 'error_code', 'error_message', [ 'count(ID)', 'total' ] )
+		           ->setLimit( 20 ) // up to 20 different errors
+		           ->setGroupby( 'error_code', 'error_message' )
+		           ->where( 'status', Event::FAILED )->notEmpty( 'error_code' )
+		           ->greaterThanEqualTo( 'time', $since );
+
+		if ( ! empty( $ignore_errors ) ) {
+			$eventQuery->where()->notIn( 'error_code', $ignore_errors );
+		}
+
+		$errors = $eventQuery->get_results();
+
+		// format the results
+		foreach ( $errors as &$error ) {
+			$error->total      = html()->a( admin_page_url( 'gh_events', [ 'status' => Event::FAILED, 'error_code' => $error->error_code ] ), _nf( $error->total ) );
+			$error->error_code = code_it( $error->error_code );
+			$error             = (array) $error; // format to array
+		}
+
+		$table = Notification_Builder::generate_list_table_html( [
+			__( 'Error Code' ),
+			__( 'Error Message' ),
+			__( 'Events' ),
+		], $errors );
+
+		$replacer = new Replacer( [
+			'failed_events_count'   => _nf( $new_errors_count ),
+			'errors_table'          => $table,
+			'all_failed_events_url' => admin_page_url( 'gh_events', [ 'status' => Event::FAILED ] )
+		] );
+
+		$email_content = self::get_general_notification_template_html( 'failed-events', [
+			'the_footer'        => self::get_template_part( 'settings-footer' ),
+			'misc_settings_url' => admin_page_url( 'gh_settings', [ 'tab' => 'misc' ] )
+		] );
+
+		$email_content = $replacer->replace( $email_content );
+
+		return \Groundhogg_Email_Services::send_wordpress( $recipient, $subject, $email_content, [
+			'Content-Type: text/html',
+		] );
+
 	}
 }

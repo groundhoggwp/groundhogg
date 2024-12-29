@@ -3,7 +3,10 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Reporting\Email_Reports;
+use Groundhogg\Templates\Notifications\Notification_Builder;
 use Groundhogg\Utils\DateTimeHelper;
+use Groundhogg\Utils\Replacer;
 
 class Cleanup_Actions {
 
@@ -43,21 +46,27 @@ class Cleanup_Actions {
 	}
 
 	/**
-	 * If there are new failed events within the last hour, send the event failure report.
+	 * If there are new failed events since the last report, send the report. Will send at most once each hour.
 	 *
 	 * @return void
 	 */
 	public function notify_of_failed_events() {
 
-		// only new failed events within the last hour
-		$count_failed = db()->events->count( [ 'status' => 'failed', 'after' => time() - HOUR_IN_SECONDS ] );
-
-		// no failed events
-		if ( $count_failed === 0 ) {
+		if ( ! is_option_enabled( 'gh_send_notifications_on_event_failure' ) ) {
 			return;
 		}
 
-		send_event_failure_notification();
+		$last_sent = absint( get_option( 'gh_failed_event_notification_last_sent' ) );
+		if ( ! $last_sent ){
+			$last_sent = time() - DAY_IN_SECONDS;
+		}
+
+		$result = Email_Reports::send_failed_events_report( $last_sent );
+
+		// If the email was sent, update the last sent flag
+		if ( $result === true ){
+			update_option( 'gh_failed_event_notification_last_sent', time() );
+		}
 	}
 
 	/**

@@ -6,6 +6,7 @@ use Groundhogg\Utils\Replacer;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\white_labeled_name;
 
 class Notification_Builder {
 
@@ -108,15 +109,16 @@ class Notification_Builder {
 	public static function get_general_notification_template_html( $content_template = '', $replacements = [] ) {
 
 		$replacer = new Replacer( wp_parse_args( $replacements, [
-			'the_header'  => self::get_template_part( ! is_white_labeled() ? 'branded-header' : 'generic-header' ),
-			'the_content' => self::get_template_part( $content_template ),
-			'the_footer'  => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
-			'assets_url'  => GROUNDHOGG_ASSETS_URL,
-			'site_url'    => home_url(),
-			'site_name'   => get_bloginfo(),
-			'home_url'    => home_url(),
-			'admin_url'   => admin_url(),
-			'profile_url' => admin_url( 'profile.php' )
+			'the_header'         => self::get_template_part( ! is_white_labeled() ? 'branded-header' : 'generic-header' ),
+			'the_content'        => self::get_template_part( $content_template ),
+			'the_footer'         => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
+			'assets_url'         => GROUNDHOGG_ASSETS_URL,
+			'site_url'           => home_url(),
+			'site_name'          => get_bloginfo(),
+			'home_url'           => home_url(),
+			'admin_url'          => admin_url(),
+			'profile_url'        => admin_url( 'profile.php' ),
+			'white_labeled_name' => white_labeled_name()
 		] ) );
 
 		return $replacer->replace( self::get_template_part( 'general-template' ) );

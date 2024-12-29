@@ -7,9 +7,6 @@ use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Replacer;
 
-/**
- * Todo add better white label support for the emails
- */
 class Daily_Actions {
 
 	public function __construct() {

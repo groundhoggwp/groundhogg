@@ -1835,82 +1835,13 @@ function email_is_same_domain( $email ) {
 /**
  * Send event failure notification.
  *
+ * @depreacted 3.7.3.5
+ * @see        Cleanup_Actions::notify_of_failed_events()
+ *
  * @return void
  */
 function send_event_failure_notification() {
-
-	if ( ! is_option_enabled( 'gh_send_notifications_on_event_failure' ) ) {
-		return;
-	}
-
-	// ignore some errors
-	$ignore_errors = array_map( function ( $error ) {
-		return sanitize_key( trim( $error, " \n\r\t\v\0," ) );
-	}, explode( PHP_EOL, get_option( 'gh_ignore_event_errors', '' ) ) );
-
-	$errorQuery = new Table_Query( 'events' );
-	$errorQuery->where()->equals( 'status', Event::FAILED );
-
-	if ( ! empty( $ignore_errors ) ) {
-		$errorQuery->where()->notIn( 'error_code', $ignore_errors );
-	}
-
-	$failed_count = $errorQuery->count();
-
-	// no failed emails
-	if ( $failed_count === 0 ) {
-		return;
-	}
-
-	$recipient = get_option( 'gh_event_failure_notification_email' ) ?: get_bloginfo( 'admin_email' );
-
-	if ( ! is_email( $recipient ) ) {
-		return;
-	}
-
-	$subject = sprintf( '[%s] %s failed events on %s', white_labeled_name(), _nf( $failed_count ), get_hostname() );
-
-	$eventQuery = new Table_Query( 'events' );
-	$eventQuery->setSelect( 'error_code', 'error_message', [ 'count(ID)', 'total' ] )
-               ->setLimit( 20 ) // up to 20 different errors
-	           ->setGroupby( 'error_code', 'error_message' )
-	           ->where( 'status', Event::FAILED )->notEmpty( 'error_code' );
-
-	if ( ! empty( $ignore_errors ) ) {
-		$eventQuery->where()->notIn( 'error_code', $ignore_errors );
-	}
-
-	$errors = $eventQuery->get_results();
-
-	// format the results
-	foreach ( $errors as &$error ) {
-		$error->total      = html()->a( admin_page_url( 'gh_events', [ 'status' => Event::FAILED, 'error_code' => $error->error_code ] ), _nf( $error->total ) );
-		$error->error_code = code_it( $error->error_code );
-		$error             = (array) $error; // format to array
-	}
-
-	$table = Notification_Builder::generate_list_table_html( [
-		__( 'Error Code' ),
-		__( 'Error Message' ),
-		__( 'Events' ),
-	], $errors );
-
-	$replacer = new Replacer( [
-		'failed_events_count'   => _nf( $failed_count ),
-		'errors_table'          => $table,
-		'all_failed_events_url' => admin_page_url( 'gh_events', [ 'status' => Event::FAILED ] )
-	] );
-
-	$email_content = Notification_Builder::get_general_notification_template_html( 'failed-events', [
-		'the_footer'        => Notification_Builder::get_template_part( 'settings-footer' ),
-		'misc_settings_url' => admin_page_url( 'gh_settings', [ 'tab' => 'misc' ] )
-	] );
-
-	$email_content = $replacer->replace( $email_content );
-
-	\Groundhogg_Email_Services::send_wordpress( $recipient, $subject, $email_content, [
-		'Content-Type: text/html',
-	] );
+	_deprecated_function( __FUNCTION__, '3.7.3.5' );
 }
 
 /**
