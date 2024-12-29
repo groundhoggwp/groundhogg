@@ -811,7 +811,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_enable_experimental_features',
 				'section' => 'developer',
 				'label'   => _x( 'Enable experimental features.', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will enabled experimental features in Groundhogg and various extensions.', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'This will enabled experimental features in %s and various extensions.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' ),
@@ -920,7 +920,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_ignore_user_precedence',
 				'section' => 'page_tracking',
 				'label'   => _x( 'Disable logged in user tracking precedence.', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'By default, Groundhogg will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'By default, %s will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Disable' ),
@@ -1522,7 +1522,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_transactional_email_service',
 				'section' => 'outgoing_email_config',
 				'label'   => _x( 'Transactional Email', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Choose which installed service should handle transactional email from Groundhogg. This service will apply to Groundhogg emails which have their <code>message type</code> set to <b>Transactional</b>, admin notifications and other Groundhogg notifications.', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'Choose which installed service should handle transactional email from %1$s. This service will apply to %1$s emails which have their <code>message type</code> set to <b>Transactional</b>, admin notifications and other %1$s notifications.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'dropdown',
 				'atts'    => [
 					'name'        => 'gh_transactional_email_service',
@@ -1535,7 +1535,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_marketing_email_service',
 				'section' => 'outgoing_email_config',
 				'label'   => _x( 'Marketing Email', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Choose which installed service should handle marketing email from Groundhogg. This service will only apply to Groundhogg emails which have their <code>message type</code> set to <b>Marketing</b>.', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'Choose which installed service should handle marketing email from %1$s. This service will only apply to %1$s emails which have their <code>message type</code> set to <b>Marketing</b>.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'dropdown',
 				'atts'    => [
 					'name'        => 'gh_marketing_email_service',
@@ -1548,7 +1548,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_log_emails',
 				'section' => 'email_logging',
 				'label'   => _x( 'Enable Email Logging', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will have Groundhogg save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'This will have %s save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' ),
