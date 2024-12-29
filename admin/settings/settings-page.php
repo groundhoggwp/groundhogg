@@ -623,6 +623,10 @@ class Settings_Page extends Admin_Page {
 			unset( $sections['optin_status_tags'] );
 		}
 
+        if ( is_white_labeled() ){
+            unset( $sections['affiliate'] );
+        }
+
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
 	}
 
