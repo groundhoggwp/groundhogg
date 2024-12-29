@@ -9,9 +9,7 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
-use Groundhogg\Templates\Notifications\Notification_Builder;
 use Groundhogg\Utils\DateTimeHelper;
-use Groundhogg\Utils\Replacer;
 use WP_Error;
 
 
@@ -643,26 +641,26 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	$query = wp_parse_args( $query, $default );
 
 	if ( ! empty( $accepted_keys ) ) {
+		$query = array_filter_by_keys( $query, $accepted_keys );
+	}
 
-		$new_query = [];
-
-		foreach ( $accepted_keys as $key ) {
-			$val               = get_array_var( $query, $key );
-			$new_query[ $key ] = $val;
+	$handle_filters = function ( $maybe_filters ) {
+		if ( is_string( $maybe_filters ) ) {
+			$maybe_filters = base64_json_decode( $maybe_filters );
 		}
 
-		$query = $new_query;
-	}
+		if ( ! is_array( $maybe_filters ) ) {
+			return [];
+		}
 
-	if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
-		$query['filters'] = Filters::sanitize( base64_json_decode( $query['filters'] ) );
-	}
-	if ( isset_not_empty( $query, 'include_filters' ) && is_string( $query['include_filters'] ) ) {
-		$query['include_filters'] = Filters::sanitize( base64_json_decode( $query['include_filters'] ) );
-	}
-	if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
-		$query['exclude_filters'] = Filters::sanitize( base64_json_decode( $query['exclude_filters'] ) );
-	}
+		return Filters::sanitize( $maybe_filters );
+	};
+
+	$query = array_apply_callbacks( $query, [
+		'filters'         => $handle_filters,
+		'include_filters' => $handle_filters,
+		'exclude_filters' => $handle_filters,
+	] );
 
 	$query = sanitize_payload( $query );
 

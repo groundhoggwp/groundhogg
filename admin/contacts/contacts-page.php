@@ -164,8 +164,9 @@ class Contacts_Page extends Admin_Page {
 			$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
 		}
 
-        $filter_query = Filters::sanitize( $filter_query );
-		$search_query = Filters::sanitize( get_request_query() );
+		$filter_query['filters']         = Filters::sanitize( $filter_query['filters'] );
+		$filter_query['exclude_filters'] = Filters::sanitize( $filter_query['exclude_filters'] );
+		$search_query                    = get_request_query();
 
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
