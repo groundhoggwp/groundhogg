@@ -869,7 +869,7 @@ class Form_v2 extends Step {
 					$value = $posted_data[ $field['name'] ];
 
 					// multiple options
-					if ( $field['multiple'] ) {
+					if ( isset_not_empty( $field, 'multiple' ) ) {
 						if ( ! is_array( $value ) ) {
 							return new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 						}
