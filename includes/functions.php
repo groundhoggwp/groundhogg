@@ -6664,6 +6664,11 @@ function create_object_from_type( $object, $object_type ) {
 
 	$table = Plugin::instance()->dbs->get_object_db_by_object_type( $object_type );
 
+    // no table found, could be that an add-on was deactivated.
+    if ( ! $table ){
+        return null;
+    }
+
 	return $table->create_object( $object );
 }
 

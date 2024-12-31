@@ -185,8 +185,8 @@ class Task extends Note {
 
 		$associated = [
 			'link' => '',
-			'name' => '',
-			'type' => '',
+			'name' => $this->object_type . ' #' . $this->object_id,
+			'type' => $this->object_type,
 		];
 
 		// Base functionality for contacts
@@ -200,7 +200,6 @@ class Task extends Note {
 		$associated = apply_filters( 'groundhogg/task/associated_context', $associated, $object );
 
 		$diff = $dueDate->diff( new DateTimeHelper() );
-
 
 		return array_merge( parent::get_as_array(), [
 			'is_overdue'    => $this->is_overdue(),
