@@ -2632,13 +2632,11 @@ class Replacements implements \JsonSerializable {
 			return '';
 		}
 
-		$args = wp_parse_args( $args, [
-			0 => '',
-			1 => 0,
-			2 => strlen( $args[0] ),
-		] );
+		$string = $args[0];
+		$start  = $args[1] ?? 0;
+		$end    = $args[2] ?? strlen( $string );
 
-		return substr( $args[0], $args[1], $args[2] );
+		return substr( $string, $start, $end );
 	}
 
 	/**
