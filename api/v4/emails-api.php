@@ -3,9 +3,9 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Block_Registry;
 use Groundhogg\Campaign;
 use Groundhogg\Contact;
-use Groundhogg\Block_Registry;
 use Groundhogg\Email;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
@@ -89,6 +89,14 @@ class Emails_Api extends Base_Object_Api {
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/blocks/replacements", [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'render_replacements' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/blocks/(?P<block_type>\w+)/", [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -160,8 +168,8 @@ class Emails_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$data      = $request->get_param( 'data' );
-		$meta      = $request->get_param( 'meta' );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
 
 		$object->update( $data );
 
@@ -170,9 +178,9 @@ class Emails_Api extends Base_Object_Api {
 			$object->update_meta( $meta );
 		}
 
-		if ( $request->has_param( 'campaigns' ) ){
+		if ( $request->has_param( 'campaigns' ) ) {
 
-			$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
+			$campaigns        = wp_parse_id_list( $request->get_param( 'campaigns' ) );
 			$has_campaigns    = get_object_ids( $object->get_related_objects( 'campaign' ) );
 			$add_campaigns    = array_diff( $campaigns, $has_campaigns );
 			$remove_campaigns = array_diff( $has_campaigns, $campaigns );
@@ -211,6 +219,25 @@ class Emails_Api extends Base_Object_Api {
 
 		return self::SUCCESS_RESPONSE( [
 			'content' => $html
+		] );
+	}
+
+	/**
+	 * Render a dynamic block
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function render_replacements( \WP_REST_Request $request ) {
+
+		$props = base64_json_decode( $request->get_param( 'props' ) );
+		foreach ( $props as $prop => &$value ) {
+			$value = do_replacements( $value );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'props' => $props
 		] );
 	}
 
@@ -469,36 +496,36 @@ class Emails_Api extends Base_Object_Api {
 
 		update_user_meta( get_current_user_id(), 'gh_test_emails', $to );
 
-		if ( $test_type === 'functional' ){
+		if ( $test_type === 'functional' ) {
 
-			if ( ! $email->exists() ){
+			if ( ! $email->exists() ) {
 				return self::ERROR_401( 'error', 'The email must be saved before it can be functionally tested.' );
 			}
 
-			add_action( 'groundhogg/test_email/before_send', function ( Email $email ) use ( $to, $request ){
+			add_action( 'groundhogg/test_email/before_send', function ( Email $email ) use ( $to, $request ) {
 
 				if ( $request->has_param( 'data' ) && $request->has_param( 'meta' ) ) {
 					$email->set_preview_data( $request->get_param( 'data' ), $request->get_param( 'meta' ) );
 				}
 
 				// Force ready status to bypass checks
-				$email->status  = 'ready';
+				$email->status = 'ready';
 
 			} );
 
 			add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
-			foreach ( $to as $email_address ){
+			foreach ( $to as $email_address ) {
 
 				$contact = new Contact( [ 'email' => $email_address ] );
 
-				enqueue_event([
+				enqueue_event( [
 					'email_id'   => $email->get_id(),
 					'contact_id' => $contact->get_id(),
 					'event_type' => Event::TEST_EMAIL,
 					'priority'   => 1,
 					'status'     => Event::WAITING,
-				]);
+				] );
 
 				$result = process_events( $contact );
 
@@ -534,7 +561,7 @@ class Emails_Api extends Base_Object_Api {
 		} );
 
 		// Prefix subject line with [TEST]
-		add_filter( 'groundhogg/email/subject', function ( $subject ){
+		add_filter( 'groundhogg/email/subject', function ( $subject ) {
 			return sprintf( __( '[TEST] %s', 'groundhogg' ), $subject );
 		} );
 

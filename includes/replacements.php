@@ -748,7 +748,7 @@ class Replacements implements \JsonSerializable {
 		return $this->tackle_replacements( $content );
 	}
 
-	const PATTERN = '/{([A-Za-z_][^{}\n]+)}/';
+	const PATTERN = '/{([A-Za-z_0-9][^{}\n]+)}/';
 
 	/**
 	 * Recursive function to tackle nested replacement codes until no more replacements are found.

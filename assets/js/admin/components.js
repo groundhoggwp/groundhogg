@@ -1705,7 +1705,7 @@
     value = '',
   }) => {
 
-    const handleChange = (value, attachment) => {
+    const handleChange = (value, attachment = null) => {
       onChange(value, attachment)
       morphdom(document.getElementById(id), ImageInput({
         id,
@@ -1741,7 +1741,7 @@
           className: 'control full-width',
           name,
           onChange : e => {
-            handleChange(e.target.value)
+            handleChange(e.target.value, null)
           },
         }),
         Button({

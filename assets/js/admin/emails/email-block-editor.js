@@ -1400,7 +1400,7 @@
             }
             else {
               onChange({
-                src: attachment.url,
+                src,
               })
             }
           },
@@ -2097,7 +2097,10 @@
     },
 
     html (block, editing) {
-      return this.get(block.type).html({
+
+      let blockType = this.get(block.type)
+
+      return blockType.html({
           ...this.defaults(block),
           ...block,
         },
@@ -2118,6 +2121,66 @@
     blocks: {},
   }
 
+  const fetchPropsWithDynamicReplacements = Groundhogg.functions.debounce( ( block, cacheKey, render ) => {
+    get(`${ EmailsStore.route }/blocks/replacements?props=${ cacheKey }`).then(r => {
+      dynamicContentCache.set(cacheKey, r.props)
+      morph(`#dynamic-replacements-${ block.id }`, render({
+        ...block,
+        ...r.props,
+      }), false )
+    })
+  }, 1000 )
+
+  /**
+   * Wrapper to enable showing dynamic replacements in the editor
+   *
+   * @param render
+   * @param supportedProps
+   * @returns {(function(*): (*))|*}
+   */
+  const withDynamicReplacements = ( render, supportedProps = [] ) => {
+
+    if ( ! supportedProps || ! supportedProps.length ){
+      return render
+    }
+
+    return (block) => {
+
+      // Generating, do not dynamically replace content
+      if (isGeneratingHTML()) {
+        return render(block)
+      }
+
+      let props = {}
+
+      // get props that support dynamic replacement code content
+      supportedProps.forEach(prop => {
+        // only do replacements if the prop contains at least one
+        if (block[prop] && block[prop].match(/{([A-Za-z_0-9][^{}\n]+)}/)) {
+          props[prop] = block[prop]
+        }
+      })
+
+      // No props contain replacement codes
+      if (!Object.keys(props).length) {
+        return render(block)
+      }
+
+      let cacheKey = base64_json_encode(props)
+
+      if (dynamicContentCache.has(cacheKey)) {
+        return render({
+          ...block,
+          ...dynamicContentCache.get(cacheKey),
+        })
+      }
+
+      fetchPropsWithDynamicReplacements( block, cacheKey, render )
+
+      return Div({ id: `dynamic-replacements-${ block.id }` }, Div({ className: 'dynamic-content-loader' }, render(block)))
+    }
+  }
+
   /**
    * Register a new block
    *
@@ -2126,12 +2189,14 @@
    * @param edit function
    * @param html function
    * @param attributes
+   * @param replacementsSupport
    * @param block
    */
   const registerBlock = (type, name, {
     edit = false,
     html = false,
     attributes = {},
+    replacementsSupport = {}, // { src: { edit: true, html: false } }
     ...block
   }) => {
 
@@ -2140,13 +2205,23 @@
       edit = html
     }
 
+    let supportedProps = Object.keys( replacementsSupport )
+
+    // dynamically fetch replacements for the supported properties
+    if (supportedProps.length) {
+      html = withDynamicReplacements( html, supportedProps.filter( prop => replacementsSupport[prop].html ) )
+      edit = withDynamicReplacements( edit, supportedProps.filter( prop => replacementsSupport[prop].edit ) )
+    }
+
     BlockRegistry.blocks[type] = {
       type,
       name,
       collection: 'core',
       edit,
       html,
-      attributes, ...block,
+      attributes,
+      replacementsSupport,
+      ...block,
     }
   }
 
@@ -4658,7 +4733,7 @@
         className: 'gh-header sticky',
       },
       [
-        Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
+        Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon' }, Groundhogg.whiteLabelName) : icons.groundhogg,
         Title(),
         UndoRedo(),
         PreviewButtons(),
@@ -7282,8 +7357,8 @@
 
   // Register the image block
   registerBlock('image', 'Image', {
-    attributes: {
-      src        : el => el.querySelector('img').src,
+    attributes         : {
+      src        : el => el.querySelector('img').getAttribute('src'),
       height     : el => parseInt(el.querySelector('img').height),
       width      : el => parseInt(el.querySelector('img').width),
       alt        : el => el.querySelector('img').alt,
@@ -7291,8 +7366,14 @@
       borderStyle: el => parseBorderStyle(el.querySelector('img').style),
       align      : el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
     },
-    svg       : icons.image,
-    controls  : ({
+    replacementsSupport: {
+      src: {
+        edit: true,
+        html: true,
+      },
+    },
+    svg                : icons.image,
+    controls           : ({
       id,
       src,
       link = '',
@@ -7359,7 +7440,7 @@
         }),
       ])
     },
-    edit      : ({
+    edit               : ({
       src,
       width,
       height,
@@ -7405,7 +7486,7 @@
           },
         }))
     },
-    html      : ({
+    html               : ({
       src,
       width,
       height,
@@ -7416,7 +7497,7 @@
     }) => {
 
       let img = makeEl('img', {
-        src,
+        src   : src,
         alt, // title,
         width,
         height: 'auto',
@@ -7442,14 +7523,14 @@
         },
       }, img)
     },
-    plainText : ({
+    plainText          : ({
       src = '',
       alt = '',
       link = '',
     }) => {
       return `${ link ? '[' : '' }![${ alt || 'image' }](${ src })${ link ? `](${ link })` : '' }`
     },
-    gutenberg : ({
+    gutenberg          : ({
       src,
       width,
       link = '',
@@ -7481,7 +7562,7 @@
         `<!-- /wp:image -->`,
       ]).innerHTML
     },
-    defaults  : {
+    defaults           : {
       src   : 'http://via.placeholder.com/600x338',
       alt   : 'placeholder image',
       title : 'placeholder image',
@@ -7705,6 +7786,12 @@
   registerBlock('html', 'HTML', {
     attributes: {
       content: el => el.innerHTML,
+    },
+    replacementsSupport: {
+      content: {
+        edit: true,
+        html: true,
+      }
     },
 // language=HTML
     svg      : `
@@ -9273,6 +9360,26 @@
   }
 
   /**
+   * Add replacement protocol to trick wp_kses
+   *
+   * @returns {*|string}
+   * @param el
+   * @param tag
+   * @param attr
+   */
+  const maybeAddReplacementProtocols = (el, tag, attr) => {
+    el.querySelectorAll(tag).forEach(el => {
+
+      let value = el.getAttribute(attr)
+      if (!value || !value.startsWith('{')) {
+        return
+      }
+
+      el.setAttribute(attr, `replacement:${ value }`)
+    })
+  }
+
+  /**
    * Renders the blocks in their final HTML format
    *
    * @param blocks
@@ -9280,13 +9387,18 @@
    */
   const renderBlocksHTML = (blocks) => {
     setIsGeneratingHTML(true)
-    let html = Table({
+    let htmlEl = Table({
         cellpadding: '0',
         cellspacing: '0',
         width      : '100%',
         role       : 'presentation',
       },
-      blocks.filter(b => b.type).map(block => BlockHTML(block))).outerHTML
+      blocks.filter(b => b.type).map(block => BlockHTML(block)))
+
+    maybeAddReplacementProtocols(htmlEl, 'img', 'src')
+    maybeAddReplacementProtocols(htmlEl, 'a', 'href')
+
+    let html = htmlEl.outerHTML
     setIsGeneratingHTML(false)
     html = html.replaceAll(new RegExp(`&quot;(${ subFontsWithSpaces.join('') })&quot;`,
         'g'),

@@ -118,7 +118,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return void
 	 */
 	public function set_preview_data( $data, $meta ) {
-		$this->data = $data;
+		$this->data = $this->sanitize_columns( $data );
 		$this->meta = $meta;
 
 		$this->post_setup();
@@ -627,6 +627,13 @@ class Email extends Base_Object_With_Meta {
 				continue;
 			}
 
+			// No contact
+			if ( ! is_a_contact( $this->contact ) ){
+				// Remove the block
+				$content = str_replace( $match, '', $content );
+				continue;
+			}
+
 			$query = new Contact_Query( [
 				'filters'         => get_array_var( $block, 'include_filters', [] ),
 				'exclude_filters' => get_array_var( $block, 'exclude_filters', [] ),
@@ -652,11 +659,11 @@ class Email extends Base_Object_With_Meta {
 	 * Return email content
 	 * This is called by a filter rather than directly
 	 *
-	 * @param $content
+	 * @param string $deprecated unused in 3.0+
 	 *
 	 * @return string
 	 */
-	public function get_merged_content( $content = '' ) {
+	public function get_merged_content( $deprecated = '' ) {
 
 		$content = $this->get_content();
 
@@ -699,10 +706,13 @@ class Email extends Base_Object_With_Meta {
 				break;
 		}
 
-		$content = do_replacements(
-			$content,
-			$this->get_contact()
-		);
+		// No contact? Ignore replacements.
+		if ( is_a_contact( $this->contact ) ){
+			$content = do_replacements(
+				$content,
+				$this->get_contact()
+			);
+		}
 
 		/* filter out double http based on bug where links have http:// prepended */
 		$schema  = is_ssl() ? 'https://' : 'http://';
@@ -879,7 +889,7 @@ class Email extends Base_Object_With_Meta {
 		$url = managed_page_url( 'preferences/manage' );
 
 		// only add permissions key if this is a real email being sent.
-		if ( ! $this->is_testing() ) {
+		if ( ! $this->is_testing() && is_a_contact( $this->contact ) ) {
 			$url = unsubscribe_url( $this->get_contact() );
 		}
 

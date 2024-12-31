@@ -501,6 +501,7 @@ function email_kses( $content ) {
 		'{auto_login_link.{confirmation_link_raw.http',
 		'{auto_login_link.https',
 		'{auto_login_link.http',
+		'replacement', // hacky trick to allow replacements in URI elements
 	];
 
 	include_once __DIR__ . '/kses.php';
@@ -509,6 +510,13 @@ function email_kses( $content ) {
 
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
 	remove_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
+
+	// remove replacement protocols, we know they're safe(ish).
+	$content = preg_replace(
+		'/(src|href)=("|\')replacement:(.*?)\2/i',
+		'$1=$2$3$2',
+		$content
+	);
 
 	return $content;
 }
