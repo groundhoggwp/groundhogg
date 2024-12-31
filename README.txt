@@ -357,6 +357,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Missing white label name replacements in the settings.
 * FIXED Fatal error when bulk editing contacts and no filters are defined.
 * FIXED Reports link in header of email reports not working.
+* FIXED `{substr}` replacement not working.
 
 = 3.7.3.4 (2024-12-23) =
 * ADDED Option to ignore specific error codes from the failed events report.
