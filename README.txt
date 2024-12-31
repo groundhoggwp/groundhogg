@@ -351,7 +351,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 = 3.7.3.5 (2024-12-29) =
 * ADDED White label header for email reports.
-* ADDED Support for full replacment code usage in the image block SRC.
+* ADDED Support for full replacement code usage in the image block SRC.
 * ADDED Dynamic replacement code preview for HTML block and image block in the email editor.
 * REMOVED Affiliate Misc settings when white labeled.
 * FIXED Missing white label name replacements in the settings.
