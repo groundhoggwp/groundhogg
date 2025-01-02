@@ -203,10 +203,17 @@ function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tag
  * @return void
  */
 function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$tags ) {
-	$selections             = map_deep( $posted_data[ $field['name'] ], 'sanitize_text_field' );
-	$meta[ $field['name'] ] = $selections;
 
-	$options = $field['options'];
+	$selections = get_array_var( $posted_data, $field['name'], [] );
+
+	if ( ! is_array( $selections ) ) {
+		return;
+	}
+
+	$selections = map_deep( array_filter( $selections ), 'sanitize_text_field' );
+
+	$meta[ $field['name'] ] = $selections;
+	$options                = $field['options'];
 
 	// Find associated tags and apply
 	foreach ( $selections as $selection ) {
