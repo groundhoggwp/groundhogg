@@ -355,7 +355,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Dynamic replacement code preview for HTML block and image block in the email editor.
 * FIXED Missing white label name replacements in the settings.
 * FIXED Fatal ere defined.
-* FIXED Reports link in header of email reports not working.ror when bulk editing contacts and no filters ar
+* FIXED Reports link in header of email reports not working.
+* FIXED Error when bulk editing contacts and no filters are defined.
 * FIXED `{substr}` replacement bug.
 * REMOVED Affiliate Misc settings when white labeled.
 

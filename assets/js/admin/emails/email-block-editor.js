@@ -7149,7 +7149,7 @@
     attributes: {
       links    : el => {
         return [...el.querySelectorAll('a')].map(a => ( [
-          a.innerText,
+          a.innerHTML,
           a.getAttribute('href'),
         ] ))
       },
