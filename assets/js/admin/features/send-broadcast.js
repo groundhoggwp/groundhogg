@@ -75,6 +75,7 @@
     batch_interval       : 'minutes',
     batch_interval_length: 30,
     batch_amount         : 100,
+    send_in_local_time   : false,
   }
 
   const getSearchMethods = () => {
@@ -558,8 +559,8 @@
             }),
             Button({
               className: 'gh-button grey small',
-              disabled: true,
-            }, wp.date.getSettings().timezone.abbr || wp.date.getSettings().timezone.string || `UTC${wp.date.getSettings().timezone.offsetFormatted}` )
+              disabled : true,
+            }, wp.date.getSettings().timezone.abbr || wp.date.getSettings().timezone.string || `UTC${ wp.date.getSettings().timezone.offsetFormatted }`),
           ]) : null,
           getState().when === 'later' ? Div({
             className: 'display-flex gap-10 align-center',
