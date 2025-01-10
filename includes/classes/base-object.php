@@ -738,6 +738,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			'order'                                                      => 'DESC',
 		] );
 
+		// empty array if no relationships found.
+		if ( empty( $relationships ) ){
+			return [];
+		}
+
 		return array_map( function ( $rel ) use ( $is_parent ) {
 
 			if ( $is_parent ) {
