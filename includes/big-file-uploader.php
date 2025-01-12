@@ -98,7 +98,7 @@ class Big_File_Uploader {
 	public function pre_ajax_upload() {
 		// Nonce check
 		// Logged in, permissions check
-		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'upload_files' ) ) {
+		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'big_uploads' ) ) {
 			wp_send_json_error();
 		}
 
@@ -123,7 +123,7 @@ class Big_File_Uploader {
 	public function ajax_upload_file() {
 		// Nonce check
 		// Logged in, permissions check
-		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'upload_files' ) ) {
+		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'big_uploads' ) ) {
 			wp_send_json_error();
 		}
 
@@ -146,7 +146,7 @@ class Big_File_Uploader {
 	public function ajax_upload_success() {
 		// Nonce check
 		// Logged in, permissions check
-		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'upload_files' ) ) {
+		if ( ! wp_verify_nonce( get_post_var( 'nonce' ), 'admin_ajax' ) || ! current_user_can( 'big_uploads' ) ) {
 			wp_send_json_error();
 		}
 

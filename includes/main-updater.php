@@ -61,7 +61,7 @@ class Main_Updater extends Old_Updater {
 					delete_option( 'gh_use_advanced_email_editor' );
 				}
 			],
-			'3.1'    => [
+			'3.1'      => [
 				'automatic'   => true,
 				'description' => __( 'Enable tag mapping.', 'groundhogg' ),
 				'callback'    => function () {
@@ -76,12 +76,12 @@ class Main_Updater extends Old_Updater {
 					wp_clear_scheduled_hook( 'gh_purge_page_visits' );
 				}
 			],
-			'3.2.3.1'    => [
+			'3.2.3.1'  => [
 				'automatic'   => true,
 				'description' => __( 'Re-sync funnel step statuses.', 'groundhogg' ),
 				'callback'    => function () {
 
-					$query = new Table_Query( 'funnels' );
+					$query   = new Table_Query( 'funnels' );
 					$funnels = $query->get_objects( Funnel::class );
 
 					foreach ( $funnels as $funnel ) {
@@ -89,7 +89,7 @@ class Main_Updater extends Old_Updater {
 					}
 				}
 			],
-			'3.3'    => [
+			'3.3'      => [
 				'automatic'   => true,
 				'description' => __( 'List-Unsubscribe header is now required.', 'groundhogg' ),
 				'callback'    => function () {
@@ -112,7 +112,7 @@ class Main_Updater extends Old_Updater {
 					wp_clear_scheduled_hook( 'groundhogg/purge_expired_permissions_keys' );
 				}
 			],
-			'3.4'    => [
+			'3.4'      => [
 				'automatic'   => true,
 				'description' => __( 'Update permalinks, submissions table, and the campaigns table.', 'groundhogg' ),
 				'callback'    => function () {
@@ -141,7 +141,7 @@ class Main_Updater extends Old_Updater {
 					db()->form_impressions->update_3_4_2();
 				}
 			],
-			'3.4.2.1'    => [
+			'3.4.2.1'  => [
 				'automatic'   => true,
 				'description' => __( 'Fix IP Address column not renamed correctly.', 'groundhogg' ),
 				'callback'    => function () {
@@ -150,15 +150,15 @@ class Main_Updater extends Old_Updater {
 					db()->form_impressions->maybe_fix_ip_column();
 				}
 			],
-			'3.5'    => [
+			'3.5'      => [
 				'automatic'   => true,
 				'description' => __( 'Subscribe admins that can view reports to the new email performance reports.', 'groundhogg' ),
 				'callback'    => function () {
 					$owners = filter_by_cap( get_owners(), 'view_reports' );
-					foreach ( $owners as $owner ){
+					foreach ( $owners as $owner ) {
 
 						// Ignore super admin and admins that do not have an email the belongs to the current site. For example agency users
-						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ){
+						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ) {
 							continue;
 						}
 
@@ -175,16 +175,16 @@ class Main_Updater extends Old_Updater {
 				'description' => __( 'Unsubscribe super admins, support, and unrelated emails from email reports.', 'groundhogg' ),
 				'callback'    => function () {
 					$owners = filter_by_cap( get_owners(), 'view_reports' );
-					foreach ( $owners as $owner ){
+					foreach ( $owners as $owner ) {
 						// Unsubscribe super admin and admins that do not have an email the belongs to the current site. For example agency users
-						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ){
+						if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ) {
 							delete_user_meta( $owner->ID, 'gh_broadcast_results' );
 							delete_user_meta( $owner->ID, 'gh_weekly_overview' );
 						}
 					}
 				}
 			],
-			'3.7'    => [
+			'3.7'      => [
 				'automatic'   => true,
 				'description' => __( 'Add time_claimed flag for events and background tasks', 'groundhogg' ),
 				'callback'    => function () {
@@ -207,7 +207,17 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					db()->email_log->create_table(); // add altbody column
 				}
-			]
+			],
+			'3.7.3.6'  => [
+				'automatic'   => true,
+				'description' => sprintf( __( 'Add <code>big_uploads</code> capability to %s roles.', 'groundhogg' ), white_labeled_name() ),
+				'callback'    => function () {
+					foreach ( Main_Roles::$owner_roles as $owner_role ) {
+						$role = get_role( $owner_role );
+						$role->add_cap( 'big_uploads' );
+					}
+				}
+			],
 		];
 	}
 

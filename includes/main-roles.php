@@ -289,6 +289,9 @@ class Main_Roles extends Roles {
 			'send_emails',
 			'view_events',
 			'manage_tags',
+
+			// files
+			'big_uploads', // for large uploads
 			'download_contact_files',
 
 			// notes
@@ -334,6 +337,7 @@ class Main_Roles extends Roles {
 			// tags
 			'manage_tags',
 			// files
+			'big_uploads', // for large uploads
 			'download_contact_files',
 			// notes
 			'view_others_notes',
@@ -555,6 +559,7 @@ class Main_Roles extends Roles {
 			'view_previous_imports',
 			'view_previous_exports',
 			'download_contact_files',
+			'big_uploads'
 		];
 	}
 
