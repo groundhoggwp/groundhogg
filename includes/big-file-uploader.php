@@ -55,7 +55,7 @@ class Big_File_Uploader {
 			return false;
 		}
 
-		$file_name = $validate['proper_filename'];
+		$file_name = $validate['proper_filename'] ?? $file_name;
 
 		switch ( $location ) {
 			case 'imports':
