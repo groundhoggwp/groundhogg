@@ -42,17 +42,23 @@ class Big_File_Uploader {
 		$location  = get_post_var( 'location', '' );
 		$file_name = sanitize_file_name( get_post_var( 'file_name' ) );
 
+		$allowed_types = [
+			'csv' => 'text/csv'
+		];
+
+		$allowed_types = apply_filters( 'groundhogg/big_file_upload/allowed_types', $allowed_types, $location );
+		$validate      = wp_check_filetype( $file_name, $allowed_types );
+
+		if ( $validate['type'] === false ) {
+			wp_send_json_error( new \WP_Error( 'invalid_file_type', 'File type is not allowed.' ) );
+
+			return false;
+		}
+
+		$file_name = $validate['proper_filename'];
+
 		switch ( $location ) {
 			case 'imports':
-
-				$validate = wp_check_filetype( $file_name, [ 'csv' => 'text/csv' ] );
-
-				if ( $validate['ext'] !== 'csv' || $validate['type'] !== 'text/csv' ) {
-					wp_send_json_error( new \WP_Error( 'invalid_file_type', 'Invalid import file type' ) );
-
-					return false;
-				}
-
 				$file_path = files()->get_csv_imports_dir( $file_name, true );
 				break;
 			default:
@@ -60,7 +66,7 @@ class Big_File_Uploader {
 				break;
 		}
 
-		return $file_path;
+		return apply_filters( 'groundhogg/big_file_upload/file_path', $file_path, $location );
 	}
 
 	/**
