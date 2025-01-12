@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Email_Log;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class Email_Log_Item extends Base_Object {
 
@@ -63,11 +64,11 @@ class Email_Log_Item extends Base_Object {
 	/**
 	 * Set the altbody if there is one
 	 *
-	 * @param \PHPMailer $phpmailer
+	 * @param PHPMailer $phpmailer
 	 *
 	 * @return void
 	 */
-	public function set_altbody( \PHPMailer &$phpmailer ) {
+	public function set_altbody( &$phpmailer ) {
 		$phpmailer->AltBody = $this->altbody;
 	}
 
