@@ -725,7 +725,7 @@
           },
         }, [
           // Edit
-          Button({
+          ! userHasCap( 'edit_tasks' ) ? null : Button({
             className: `gh-button ${ State.bulk_edit ? 'primary' : 'secondary' } small`,
             onClick  : e => {
               State.set({
@@ -742,7 +742,7 @@
             },
           }, __('Edit')),
           // Snooze
-          Button({
+          ! userHasCap( 'edit_tasks' ) ? null : Button({
             className: 'gh-button secondary small',
             disabled : State.bulk_edit,
             onClick  : e => {
@@ -762,7 +762,7 @@
             },
           }, __('Snooze')),
           // Delete
-          Button({
+          ! userHasCap( 'delete_tasks' ) ? null : Button({
             className: 'gh-button danger small',
             disabled : State.bulk_edit,
             onClick  : e => {
@@ -787,7 +787,7 @@
             },
           }, __('Delete')),
           // Mark complete
-          Button({
+          ! userHasCap( 'edit_tasks' ) ? null : Button({
             className: 'gh-button primary small',
             disabled : State.bulk_edit,
             onClick  : e => {
@@ -804,9 +804,9 @@
               })
             },
           }, __('Mark Complete')),
-          // Mark complete
+          // Deselect all
           Button({
-            className: 'gh-button danger text small',
+            className: 'gh-button secondary text small',
             onClick  : e => {
               State.set({
                 bulk_edit: false,
@@ -814,7 +814,7 @@
               })
               morph()
             },
-          }, __('Cancel')),
+          }, __('Clear Selection')),
         ]) : null,
         // Bulk Edit
         State.bulk_edit ? Div({
