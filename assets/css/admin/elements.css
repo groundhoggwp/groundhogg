@@ -556,6 +556,21 @@ h2.nav-tab-wrapper.gh button .dashicons {
 .tasks-widget .task .task-header .summary {
   color: #102640;
 }
+.tasks-widget .task .task-header input.select-task {
+  display: none;
+}
+.tasks-widget .task .task-header input.select-task:checked {
+  display: block;
+}
+.tasks-widget .task .task-header:has(input.select-task:checked) > svg {
+  display: none;
+}
+.tasks-widget .task .task-header:hover input.select-task {
+  display: block;
+}
+.tasks-widget .task .task-header:hover > svg {
+  display: none;
+}
 .tasks-widget .task .task-content {
   overflow: auto;
 }

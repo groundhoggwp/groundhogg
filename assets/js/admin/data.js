@@ -899,6 +899,14 @@
             return item
           })
       },
+      completeMany (ids) {
+        return apiPatch(`${ this.route }/complete`, ids ).
+          then(r => this.getItemsFromResponse(r)).
+          then(items => {
+            this.itemsFetched(items)
+            return items
+          })
+      },
       incomplete (id) {
         return apiPatch(`${ this.route }/${ id }/incomplete`).
           then(r => this.getItemFromResponse(r)).

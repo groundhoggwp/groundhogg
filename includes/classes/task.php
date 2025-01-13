@@ -137,6 +137,18 @@ class Task extends Note {
 			unset( $data['snooze'] );
 		}
 
+		// Complete flag, but only if not previously completed
+		if ( isset_not_empty( $data, 'complete' ) && ! $was_complete ) {
+			$data['date_completed'] = Ymd_His();
+			unset( $data['complete'] );
+		}
+
+		// Incomplete flag, but only if previously completed
+		if ( isset_not_empty( $data, 'incomplete' ) && $was_complete ) {
+			$data['date_completed'] = '';
+			unset( $data['incomplete'] );
+		}
+
 		$updated = parent::update( $data );
 
 		// If the task was not complete but was just completed following the update

@@ -142,6 +142,16 @@ class Create_Task extends Action {
 			]
 		] );
 
+		echo html()->e( 'p', [], __( 'Assign the task to...', 'groundhogg' ) );
+
+		echo html()->dropdown_owners( [
+			'class'       => 'gh-select2',
+			'selected'    => absint( $this->get_setting( 'assign_to' ) ),
+			'name'        => $this->setting_name_prefix( 'assign_to' ),
+			'id'          => $this->setting_id_prefix( 'assign_to' ),
+			'option_none' => __( 'The contact owner', 'groundhogg' )
+		] );
+
 		?><p></p><?php
 	}
 
@@ -151,11 +161,12 @@ class Create_Task extends Action {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-        $this->save_setting( 'summary', sanitize_text_field( $this->get_posted_data( 'summary' ) ) );
+		$this->save_setting( 'summary', sanitize_text_field( $this->get_posted_data( 'summary' ) ) );
 		$this->save_setting( 'task_type', sanitize_text_field( $this->get_posted_data( 'task_type' ) ) );
 		$this->save_setting( 'time', sanitize_text_field( $this->get_posted_data( 'time', '17:00:00' ) ) );
 		$this->save_setting( 'delay_unit', sanitize_text_field( $this->get_posted_data( 'delay_unit', '17:00:00' ) ) );
 		$this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount', 7 ) ) );
+		$this->save_setting( 'assign_to', absint( $this->get_posted_data( 'assign_to', 0 ) ) );
 	}
 
 	public function generate_step_title( $step ) {
@@ -184,26 +195,30 @@ class Create_Task extends Action {
 		$content = $this->get_setting( 'content' );
 		$content = do_replacements( $content, $contact );
 
-		$amount = $this->get_setting( 'delay_amount', 7 );
-		$unit   = $this->get_setting( 'delay_unit', 'days' );
-		$time   = $this->get_setting( 'time', '17:00:00' );
-		$type   = $this->get_setting( 'task_type', 'task' );
+		$amount    = $this->get_setting( 'delay_amount', 7 );
+		$unit      = $this->get_setting( 'delay_unit', 'days' );
+		$time      = $this->get_setting( 'time', '17:00:00' );
+		$type      = $this->get_setting( 'task_type', 'task' );
+		$assign_to = absint( $this->get_setting( 'assign_to' ) );
+		if ( ! $assign_to ) {
+			$assign_to = $contact->get_owner_id();
+		}
 
 		$dueDate = new DateTimeHelper( $event->get_time() );
 
 		$dueDate->modify( "+$amount $unit $time" );
 
 		$task = new Task( [
-			'due_date'    => $dueDate->format( 'Y-m-d H:i:s' ),
-			'summary'     => $summary,
-			'content'     => wp_kses_post( $content ),
-			'step_id'     => $event->get_step_id(),
-			'funnel_id'   => $event->get_funnel_id(),
-			'object_id'   => $contact->get_id(),
-			'object_type' => 'contact',
-			'context'     => 'funnel',
-			'user_id'     => $contact->get_owner_id(),
-			'type'        => $type,
+			'due_date'     => $dueDate->format( 'Y-m-d H:i:s' ),
+			'summary'      => $summary,
+			'content'      => wp_kses_post( $content ),
+			'step_id'      => $event->get_step_id(),
+			'funnel_id'    => $event->get_funnel_id(),
+			'object_id'    => $contact->get_id(),
+			'object_type'  => 'contact',
+			'context'      => 'funnel',
+			'user_id'      => $assign_to,
+			'type'         => $type,
 			'timestamp'    => $event->get_time(),
 			'date_created' => Ymd_His( $event->get_time() )
 		] );

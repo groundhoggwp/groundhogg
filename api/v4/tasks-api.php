@@ -2,7 +2,11 @@
 
 namespace Groundhogg\Api\V4;
 
+use Groundhogg\Base_Object;
+use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Classes\Task;
+use function Groundhogg\array_map_to_class;
+use function Groundhogg\get_array_var;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,10 +44,18 @@ class Tasks_Api extends Notes_Api {
 		$route = $this->get_route();
 		$key = $this->get_primary_key();
 
-		register_rest_route( self::NAME_SPACE, "/$route/(?P<{$key}>\d+)/complete", [
+		register_rest_route( self::NAME_SPACE, "/$route/complete", [
 			[
 				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'complete' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/$route/(?P<{$key}>\d+)/complete", [
+			[
+				'methods'             => \WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'complete_single' ],
 				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
 		] );
@@ -58,13 +70,71 @@ class Tasks_Api extends Notes_Api {
 	}
 
 	/**
+	 * Updates an object given an query and new data/meta
+	 * Or updates given an array of objects
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function complete( \WP_REST_Request $request ) {
+
+		$query = $request->get_param( 'query' ) ?: [];
+
+		// assume updating in other format
+		if ( empty( $query ) ) {
+
+			$items = $request->get_json_params();
+
+			if ( empty( $items ) ) {
+				return self::ERROR_422();
+			}
+
+			$updated = [];
+
+			foreach ( $items as $item ) {
+
+				$task = new Task( $item );
+
+				if ( ! $task->exists() ) {
+					continue;
+				}
+
+				$task->complete();
+
+				$updated[] = $task;
+			}
+
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => count( $updated ),
+				'items'       => $updated,
+			] );
+		}
+
+		$items = $this->get_db_table()->query( $query );
+		$items = array_map_to_class( $items, Task::class );
+
+		/**
+		 * @var $object Task
+		 */
+		foreach ( $items as $task ) {
+			$task->complete();
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => count( $items ),
+			'items'       => $items,
+		] );
+	}
+
+	/**
 	 * Mark a task as complete
 	 *
 	 * @param \WP_REST_Request $request
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function complete( \WP_REST_Request $request ){
+	public function complete_single( \WP_REST_Request $request ){
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
 		$object = $this->create_new_object( $primary_key );

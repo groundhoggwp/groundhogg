@@ -718,6 +718,29 @@ h2.nav-tab-wrapper.gh {
       .summary {
         color: $primary-dark;
       }
+
+      input.select-task {
+        display: none;
+      }
+
+      input.select-task:checked {
+        display: block;
+      }
+
+      &:has(input.select-task:checked){
+        > svg {
+          display: none;
+        }
+      }
+
+      &:hover {
+        input.select-task {
+          display: block;
+        }
+        > svg {
+          display: none;
+        }
+      }
     }
 
     .task-content {

@@ -10,7 +10,9 @@
     dialog,
     escHTML,
   } = Groundhogg.element
-
+  const {
+    getOwner,
+  } = Groundhogg.user
   const {
     userHasCap,
     getCurrentUser,
@@ -118,6 +120,7 @@
     Input,
     Textarea,
     Pg,
+    ItemPicker,
   } = MakeEl
 
   const BetterObjectTasks = ({
@@ -130,13 +133,16 @@
     const State = Groundhogg.createState({
       adding      : false,
       editing     : false,
+      bulk_edit   : false,
       filter      : isPending,
       tasks       : [],
+      selected    : [],
       loaded      : false,
       edit_summary: '',
       edit_date   : '',
       edit_time   : '',
       edit_content: '',
+      assigned_to : 0,
       edit_type   : 'task',
       myTasks     : !( object_id && object_type ),
     })
@@ -146,6 +152,7 @@
       edit_date   : '',
       edit_time   : '',
       edit_content: '',
+      assigned_to : 0,
       edit_type   : 'task',
       editing     : false,
     })
@@ -226,6 +233,7 @@
                   object_type,
                   summary : State.edit_summary,
                   content : State.edit_content,
+                  user_id : State.assigned_to,
                   type    : State.edit_type,
                   due_date: `${ State.edit_date } ${ State.edit_time }`,
                 },
@@ -252,6 +260,7 @@
                   summary : State.edit_summary,
                   content : State.edit_content,
                   type    : State.edit_type,
+                  user_id : State.assigned_to,
                   due_date: `${ State.edit_date } ${ State.edit_time }`,
                 },
               }).then(() => {
@@ -266,24 +275,45 @@
           },
         }, [
           Div({
-            className: 'full',
+            className: 'full display-flex gap-10',
           }, [
-            Label({
-              for: 'task-summary',
-            }, __('Task summary')),
-            Input({
+            Div({
               className: 'full-width',
-              id       : 'task-summary',
-              name     : 'summary',
-              required : true,
-              value    : State.edit_summary,
-              onChange : e => State.set({
-                edit_summary: e.target.value,
+            }, [
+              Label({
+                for: 'task-summary',
+              }, __('Task summary')),
+              Input({
+                className: 'full-width',
+                id       : 'task-summary',
+                name     : 'summary',
+                required : true,
+                value    : State.edit_summary,
+                onChange : e => State.set({
+                  edit_summary: e.target.value,
+                }),
               }),
-            }),
+            ]),
+
+            Div({
+              className: '',
+            }, [
+              Label({
+                for: 'task-type',
+              }, __('Type')),
+              `<br>`,
+              Select({
+                id      : 'task-type',
+                options : taskTypes,
+                selected: State.edit_type,
+                onChange: e => State.set({
+                  edit_type: e.target.value,
+                }),
+              }),
+            ]),
           ]),
           Div({
-            className: 'three-quarters',
+            className: 'half',
           }, [
             Label({
               for: 'task-date',
@@ -311,19 +341,36 @@
             ]),
           ]),
           Div({
-            className: 'quarter',
+            className: 'half',
           }, [
             Label({
-              for: 'task-type',
-            }, __('Type')),
+              for: 'task-assigned-to',
+            }, __('Assigned To')),
             `<br>`,
-            Select({
-              id      : 'task-type',
-              options : taskTypes,
-              selected: State.edit_type,
-              onChange: e => State.set({
-                edit_type: e.target.value,
-              }),
+            ItemPicker({
+              id          : `task-assigned-to`,
+              noneSelected: __('Select a user...', 'groundhogg'),
+              selected    : State.assigned_to ? {
+                id  : State.assigned_to,
+                text: getOwner(State.assigned_to).data.display_name,
+              } : [],
+              multiple    : false,
+              style       : {
+                flexGrow: 1,
+              },
+              fetchOptions: (search) => {
+                search = new RegExp(search, 'i')
+                let options = Groundhogg.filters.owners.map(u => ( {
+                  id  : u.ID,
+                  text: u.data.display_name,
+                } )).filter(({ text }) => text.match(search))
+                return Promise.resolve(options)
+              },
+              onChange    : item => {
+                State.set({
+                  assigned_to: item.id,
+                })
+              },
             }),
           ]),
           Div({
@@ -429,6 +476,23 @@
             className: 'task-header',
           }, [
             typeToIcon[type],
+            Input({
+              type     : 'checkbox',
+              name     : 'tasks[]',
+              className: 'select-task',
+              checked  : State.selected.includes(task.ID),
+              onChange : e => {
+                if (e.target.checked) {
+                  State.selected.push(task.ID)
+                }
+                else {
+                  State.set({
+                    selected: State.selected.filter(id => id !== task.ID),
+                  })
+                }
+                morph()
+              },
+            }),
             summary ? Span({ className: 'summary' }, escHTML(summary)) : null,
             Div({
               className: 'display-flex',
@@ -471,6 +535,7 @@
                           edit_time   : due_date.split(' ')[1],
                           edit_content: content,
                           edit_type   : type,
+                          assigned_to : user_id,
                         })
                         morph()
                       },
@@ -587,7 +652,7 @@
         }
 
         return Span({
-          id: `filter-${id || color}`,
+          id       : `filter-${ id || color }`,
           className: `pill ${ color } clickable ${ State.filter === filter ? 'bold' : '' }`,
           onClick  : e => setFilter(filter),
         }, sprintf(text, num))
@@ -600,34 +665,34 @@
           className: 'tasks-header',
         }, [
           FilterPill({
-            id: 'overdue',
+            id    : 'overdue',
             text  : __('%d overdue', 'groundhogg'),
             color : 'red',
             filter: isOverdue,
           }),
 
           FilterPill({
-            id: 'due-today',
+            id    : 'due-today',
             text  : __('%d due today', 'groundhogg'),
             color : 'orange',
             filter: isDueToday,
           }),
 
           FilterPill({
-            id: 'due-soon',
+            id    : 'due-soon',
             text  : __('%d due soon', 'groundhogg'),
             color : 'yellow',
             filter: isDueSoon,
           }),
 
           FilterPill({
-            id: 'pending',
+            id    : 'pending',
             text  : __('%d pending', 'groundhogg'),
             filter: isPending,
           }),
 
           FilterPill({
-            id: 'complete',
+            id    : 'complete',
             text  : __('%d complete', 'groundhogg'),
             color : 'green',
             filter: isComplete,
@@ -653,6 +718,225 @@
             ToolTip('Add Task', 'left'),
           ]) : null,
         ]) : null,
+        State.selected.length ? Div({
+          className: 'display-flex gap-5',
+          style    : {
+            padding: '0 0 10px 10px',
+          },
+        }, [
+          // Edit
+          Button({
+            className: `gh-button ${ State.bulk_edit ? 'primary' : 'secondary' } small`,
+            onClick  : e => {
+              State.set({
+                bulk_edit: !State.bulk_edit,
+              })
+
+              if ( State.bulk_edit ){
+                clearEditState()
+                State.set({
+                  edit_type: '', // no default type
+                })
+              }
+              morph()
+            },
+          }, __('Edit')),
+          // Snooze
+          Button({
+            className: 'gh-button secondary small',
+            disabled : State.bulk_edit,
+            onClick  : e => {
+
+              TasksStore.patchMany({
+                query: {
+                  include: State.selected,
+                },
+                data : { snooze: 1 },
+              }).then(() => {
+                dialog({
+                  message: sprintf('%d tasks snoozed!', State.selected.length),
+                })
+                morph()
+              })
+
+            },
+          }, __('Snooze')),
+          // Delete
+          Button({
+            className: 'gh-button danger small',
+            disabled : State.bulk_edit,
+            onClick  : e => {
+              dangerConfirmationModal({
+                alert    : `<p>${ sprintf(__('Are you sure you want to delete these %d tasks?', 'groundhogg'), State.selected.length) }</p>`,
+                onConfirm: () => {
+                  TasksStore.deleteMany({
+                    include: State.selected,
+                  }).then(() => {
+                    dialog({
+                      message: sprintf('%d tasks deleted!', State.selected.length),
+                    })
+                    // also remove from state
+                    State.set({
+                      tasks   : State.tasks.filter(task => !State.selected.includes(task)),
+                      selected: [],
+                    })
+                    morph()
+                  })
+                },
+              })
+            },
+          }, __('Delete')),
+          // Mark complete
+          Button({
+            className: 'gh-button primary small',
+            disabled : State.bulk_edit,
+            onClick  : e => {
+              TasksStore.patchMany({
+                query: {
+                  include: State.selected,
+                },
+                data : { complete: 1 },
+              }).then(() => {
+                dialog({
+                  message: sprintf('%d tasks snoozed!', State.selected.length),
+                })
+                morph()
+              })
+            },
+          }, __('Mark Complete')),
+          // Mark complete
+          Button({
+            className: 'gh-button danger text small',
+            onClick  : e => {
+              State.set({
+                bulk_edit: false,
+                selected : [],
+              })
+              morph()
+            },
+          }, __('Cancel')),
+        ]) : null,
+        // Bulk Edit
+        State.bulk_edit ? Div({
+          className: 'display-flex gap-10 align-bottom flex-wrap',
+          style    : {
+            padding: '0 10px 10px 10px',
+          },
+        }, [
+
+          Div({}, [
+            Label({
+              for: 'task-type',
+            }, __('Type')),
+            `<br>`,
+            Select({
+              id      : 'task-type',
+              options : {
+                '' : 'No change',
+                ...taskTypes
+              },
+              selected: State.edit_type,
+              onChange: e => State.set({
+                edit_type: e.target.value,
+              }),
+            }),
+          ]),
+
+          Div({}, [
+            Label({
+              for: 'task-date',
+            }, __('Due Date')),
+            InputGroup([
+              Input({
+                type     : 'date',
+                id       : 'task-date',
+                className: 'full-width',
+                value    : State.edit_date,
+                onChange : e => State.set({
+                  edit_date: e.target.value,
+                }),
+              }),
+              Input({
+                type     : 'time',
+                id       : 'task-time',
+                name     : 'time',
+                className: 'full-width',
+                value    : State.edit_time,
+                onChange : e => State.set({
+                  edit_time: e.target.value,
+                }),
+              }),
+            ]),
+          ]),
+
+          Div({}, [
+            Label({
+              for: 'task-assigned-to',
+            }, __('Assigned To')),
+            `<br>`,
+            ItemPicker({
+              id          : `task-assigned-to`,
+              noneSelected: __('Assign to a new user...', 'groundhogg'),
+              selected    : State.assigned_to ? {
+                id  : State.assigned_to,
+                text: getOwner(State.assigned_to).data.display_name,
+              } : [],
+              multiple    : false,
+              style       : {
+                flexGrow: 1,
+              },
+              fetchOptions: (search) => {
+                search = new RegExp(search, 'i')
+                let options = Groundhogg.filters.owners.map(u => ( {
+                  id  : u.ID,
+                  text: u.data.display_name,
+                } )).filter(({ text }) => text.match(search))
+                return Promise.resolve(options)
+              },
+              onChange    : item => {
+                State.set({
+                  assigned_to: item.id,
+                })
+              },
+            }),
+          ]),
+          Button({
+            className: 'gh-button primary',
+            onClick  : e => {
+
+              let data = {}
+
+              if (State.edit_date && State.edit_time) {
+                data.due_date = `${ State.edit_date } ${ State.edit_time }`
+              }
+
+              if (State.assigned_to) {
+                data.user_id = State.assigned_to
+              }
+
+              if (State.edit_type) {
+                data.type = State.edit_type
+              }
+
+              TasksStore.patchMany({
+                query: {
+                  include: State.selected,
+                },
+                data,
+              }).then(() => {
+                clearEditState()
+                State.set({
+                  bulk_edit: false,
+                })
+                dialog({
+                  message: sprintf('%d tasks updated!', State.selected.length),
+                })
+                morph()
+              })
+            },
+          }, __('Update')),
+        ]) : null,
+        // Add Task Form
         State.adding ? TaskDetails() : null,
         ...filteredTasks.map(task => State.editing == task.ID ? TaskDetails(task) : Task(task)),
         tasks.length || State.adding ? null : Pg({
