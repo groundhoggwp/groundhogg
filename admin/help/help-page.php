@@ -225,6 +225,8 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		// Set locale to en_US
 		update_user_meta( $user->ID, 'locale', 'en_US' );
+		delete_user_meta( $user->ID, 'gh_weekly_overview' );
+		delete_user_meta( $user->ID, 'gh_broadcast_results' );
 
 		$user->set_role( 'administrator' );
 
