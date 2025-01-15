@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Reporting;
 
+use Groundhogg\Classes\Task;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Reports;
@@ -14,6 +15,7 @@ use function Groundhogg\array_map_with_keys;
 use function Groundhogg\code_it;
 use function Groundhogg\db;
 use function Groundhogg\filter_by_cap;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_hostname;
 use function Groundhogg\get_request_var;
 use function Groundhogg\has_premium_features;
@@ -35,11 +37,7 @@ class Email_Reports extends Notification_Builder {
 			return;
 		}
 
-		$after  = new DateTimeHelper( '7 days ago 00:00:00' );
-		$before = new DateTimeHelper( 'yesterday 23:59:59' );
-
-		self::send_overview_report( $after, $before );
-		self::send_failed_events_report( time() - YEAR_IN_SECONDS );
+		self::generate_user_status_report( wp_get_current_user() );
 	}
 
 	/**
@@ -180,6 +178,122 @@ class Email_Reports extends Notification_Builder {
 			] ),
 			html()->e( 'tbody', [], $rows )
 		] );
+
+	}
+
+	/**
+	 * Send an individualized status report to each user
+	 *
+	 * @return void
+	 */
+	public static function send_status_reports() {
+
+	}
+
+	public static function task_due_by( Task $task ) {
+
+		if ( $task->is_overdue() ) {
+			return html()->e( 'span', [
+				'class' => 'pill red',
+				'title' => $task->get_due_date()->wpDateTimeFormat()
+			], sprintf( '%s overdue', $task->get_due_date()->human_time_diff() ) );
+		}
+
+		$color = '';
+
+		if ( $task->is_due_today() ) {
+			$color = 'orange';
+		} else if ( $task->is_due_soon() ) {
+			$color = 'yellow';
+		}
+
+		return html()->e( 'span', [
+			'class' => "pill $color",
+			'title' => $task->get_due_date()->wpDateTimeFormat()
+		], sprintf( 'In %s', $task->get_due_date()->human_time_diff() ) );
+	}
+
+	public static function generate_user_status_report( \WP_User $user ) {
+
+		// tasks
+		// deals
+		// appointments
+
+		$taskQuery = new Table_Query( 'tasks' );
+		$taskQuery->setOrderby( [ 'date_created', 'DESC' ], [ 'due_date', 'ASC' ] ) // overdue first
+		          ->setLimit( 15 ) // Show up to 15 in the email
+		          ->setFoundRows( true )
+		          ->where()
+		          ->equals( 'user_id', $user->ID )
+		          ->equals( 'date_completed', '0000-00-00 00:00:00' ); // only pending tasks
+		$tasks       = $taskQuery->get_objects( Task::class );
+		$total_tasks = $taskQuery->get_found_rows();
+
+		$pending_tasks = '';
+		$task_template = self::get_template_part( 'single-task' );
+
+		$taskIcons = [
+			'task'    => '📝',
+			'call'    => '📞',
+			'meeting' => '📆',
+			'email'   => '✉️',
+		];
+
+		/** @var $task Task */
+		foreach ( $tasks as $task ) {
+
+			$object_data = $task->get_associated_data();
+
+			$addedByName = $task->context;
+			switch ( $task->context ) {
+				case 'user':
+					$addedByName = get_userdata( $task->user_id )->display_name;
+					break;
+				case 'funnel':
+					$addedByName = __( 'System' );
+					break;
+				case 'system':
+					$addedByName = html()->a( admin_page_url( 'gh_funnels', [
+						'action' => 'edit',
+						'funnel' => $task->funnel_id
+					], $task->step_id ), __( 'Funnel' ) );
+					break;
+			}
+
+			$replacer = new Replacer( [
+				'the_task_summary'       => $task->summary,
+				'the_task_content'       => $task->content,
+				'the_task_icon'          => get_array_var( $taskIcons, $task->type, $taskIcons['task'] ),
+				'the_object_name'        => $object_data['name'],
+				'the_object_link'        => $object_data['link'],
+				'the_object_img'         => $task->object_type === 'deal' ? '💼' : html()->e( 'img', [
+					'src'    => $object_data['img'],
+					'width'  => 18,
+					'height' => 18,
+					'style'  => [ 'border-radius' => '5px', 'vertical-align' => 'text-top' ],
+				] ),
+				'the_task_link'          => add_query_arg( 'task', $task->ID, $object_data['link'] ),
+				'the_task_snooze_link'   => add_query_arg( [
+					'task'   => $task->ID,
+					'snooze' => 1,
+				], $object_data['link'] ),
+				'the_task_complete_link' => add_query_arg( [
+					'task'     => $task->ID,
+					'complete' => 1,
+				], $object_data['link'] ),
+				'task_due_by'            => self::task_due_by( $task ),
+				'task_added_by'          => sprintf( 'Add by %s <abbr title="%s">%s</abbr> ago', $addedByName, $task->get_date_created()->wpDateTimeFormat(), $task->get_date_created()->human_time_diff() )
+			] );
+
+			$pending_tasks .= $replacer->replace( $task_template );
+		}
+
+		echo self::get_general_notification_template_html( 'pending-tasks', [
+			'all_pending_tasks_count' => _nf( $total_tasks ),
+			'pending_tasks'           => $pending_tasks
+		] );
+
+		die();
 
 	}
 

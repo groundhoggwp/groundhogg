@@ -79,6 +79,53 @@
             font-size: 14px;
         }
 
+        .pill {
+            background: rgba(0, 117, 255, 0.07);
+            border-radius: 5px;
+            display: inline-block;
+            padding: 3px 8px;
+            color: #102640;
+        }
+        .pill.attention, .pill.yellow {
+            background: rgba(255, 238, 88, 0.5);
+            color: #3f3800;
+        }
+        .pill.warning, .pill.orange {
+            background: rgba(245, 129, 21, 0.25);
+            color: #542a04;
+        }
+        .pill.notice, .pill.blue {
+            background: rgba(0, 117, 255, 0.5);
+        }
+        .pill.success, .pill.green {
+            background: rgba(158, 206, 56, 0.5);
+            color: #334310;
+        }
+        .pill.danger, .pill.red {
+            background: rgba(233, 31, 79, 0.25);
+            color: #4e0818;
+        }
+        .pill.dark {
+            background-color: #102640;
+            color: #fff;
+        }
+        .pill.semi-dark {
+            background-color: rgba(16, 38, 64, 0.75);
+            color: #fff;
+        }
+        .pill.sm {
+            font-size: 13px;
+        }
+        .pill.bold {
+            font-weight: 500;
+        }
+        .pill.clickable {
+            cursor: pointer;
+        }
+        .pill.clickable:hover {
+            opacity: 0.8;
+        }
+
     </style>
 </head>
 <body class="email responsive template-boxed" style="background-color: #f6f9fb">

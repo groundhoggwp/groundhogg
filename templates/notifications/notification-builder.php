@@ -3,6 +3,7 @@
 namespace Groundhogg\Templates\Notifications;
 
 use Groundhogg\Utils\Replacer;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
@@ -118,7 +119,8 @@ class Notification_Builder {
 			'home_url'           => home_url(),
 			'admin_url'          => admin_url(),
 			'profile_url'        => admin_url( 'profile.php' ),
-			'white_labeled_name' => white_labeled_name()
+			'white_labeled_name' => white_labeled_name(),
+			'dashboard_url'      => admin_page_url( 'groundhogg' )
 		] ) );
 
 		return $replacer->replace( self::get_template_part( 'general-template' ) );
