@@ -3,8 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use function Groundhogg\generate_referer_hash;
-use function Groundhogg\isset_not_empty;
+use Groundhogg\Base_Object;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,6 +55,38 @@ class Other_Activity extends DB {
 	 * to keep the DB small.
 	 */
 	protected function add_additional_actions() {
+		add_action( 'groundhogg/db/post_delete', [ $this, 'object_deleted' ], 10, 4 );
+		add_action( 'groundhogg/object_merged', [ $this, 'object_merged' ], 10, 3 );
+		parent::add_additional_actions();
+	}
+
+	public function object_deleted( $object_type, $id_or_where, $formats, $table ) {
+		if ( is_int( $id_or_where ) ) {
+			$this->delete( [
+				'object_type' => $object_type,
+				'object_id'   => $id_or_where
+			] );
+		}
+	}
+
+	/**
+	 * When an object is merged, swap the relationships for it
+	 *
+	 * @param Base_Object $to
+	 *
+	 * @param Base_Object $from
+	 * @param string      $type the object type
+	 *
+	 * @return void
+	 */
+	public function object_merged( Base_Object $to, Base_Object $from, $type ) {
+		$this->update( [
+			'object_type' => $type,
+			'object_id'   => $from->ID,
+		], [
+			'object_type' => $type,
+			'object_id'   => $to->ID,
+		] );
 	}
 
 	/**
@@ -78,7 +109,7 @@ class Other_Activity extends DB {
 			'ID'            => '%d',
 			'timestamp'     => '%d',
 			'object_id'     => '%d',
-			'object_type'   => '%d',
+			'object_type'   => '%s',
 			'activity_type' => '%s',
 		];
 	}
@@ -92,7 +123,7 @@ class Other_Activity extends DB {
 	public function get_column_defaults() {
 		return array(
 			'ID'            => 0,
-			'timestamp'     => 0,
+			'timestamp'     => time(),
 			'object_id'     => 0,
 			'object_type'   => '',
 			'activity_type' => '',
