@@ -129,6 +129,7 @@ add_filter( 'groundhogg/steps/enqueue', __NAMESPACE__ . '\handle_skip_if_confirm
 function filter_option_sanitize_callback( $callback, $option, $value ) {
 
 	switch ( $option ) {
+		case 'gh_task_outcomes':
 		case 'gh_email_editor_color_palette':
 		case 'gh_email_editor_global_social_accounts':
 		case 'gh_email_editor_global_fonts':

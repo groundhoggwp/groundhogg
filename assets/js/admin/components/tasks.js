@@ -70,6 +70,8 @@
       task.i18n.due_in) }</span>`
   }
 
+  const userDisplayName = user => user.ID === getCurrentUser().ID ? __('Me') : user.data.display_name
+
   const addedBy = (task) => {
 
     const {
@@ -101,6 +103,203 @@
     }
   }
 
+  const openActivityForm = (type, taskId, onComplete = () => {}) => setTimeout(() => {
+    AddTaskActivity({
+      onSubmit: ({
+        note,
+        outcome,
+      }) => {
+        return TasksStore.patch(taskId, {
+          data: {
+            activity: 1,
+            type,
+            note,
+            outcome,
+          },
+        }).then(onComplete)
+      },
+    })
+  }, 100)
+
+  const EmailCTA = (task, {
+    onComplete = () => {},
+  } = {}) => {
+
+    return Fragment([
+      An({
+        className: 'gh-button secondary text icon',
+        href     : '#',
+        onClick  : async e => {
+          e.preventDefault()
+
+          const {
+            object_id,
+            object_type,
+          } = task.data
+
+          let to = []
+          let contactIds = []
+
+          if (object_type === 'contact') {
+            let contact = await Groundhogg.stores.contacts.maybeFetchItem(object_id)
+            to.push(contact.data.email)
+            contactIds.push(object_id)
+          }
+
+          if (task.object_type === 'deal') {
+
+          }
+
+          moreMenu(e.target, [
+            {
+              key     : 'compose',
+              text    : 'Compose an email',
+              onSelect: k => {
+                if (to.length) {
+                  Groundhogg.components.emailModal({
+                    to,
+                    from_email: getCurrentUser().data.user_email,
+                    from_name : getCurrentUser().data.display_name,
+                  }, r => {
+
+                    const {
+                      email = {},
+                      log_id = '',
+                      subject = '',
+                    } = r
+
+                    TasksStore.patch(task.ID, {
+                      data: {
+                        activity: 1,
+                        type    : 'email',
+                        note    : `<p>Sent a composed email <a href="#" class="view-email-log" data-log-id="${ log_id }" >${ subject }.</a></p>`,
+                      },
+                    }).then(onComplete)
+                  })
+                }
+              },
+            },
+            {
+              key     : 'template',
+              text    : 'Send an email template',
+              onSelect: k => {
+                if (contactIds.length) {
+                  Groundhogg.components.EmailTemplateModal(contactIds.length > 1 ? contactIds : contactIds[0], r => {
+                    TasksStore.patch(task.ID, {
+                      data: {
+                        activity: 1,
+                        type    : 'email',
+                        note    : '',
+                      },
+                    }).then(onComplete)
+                  })
+                }
+              },
+            },
+            {
+              key     : 'activity',
+              text    : 'Record email activity',
+              onSelect: key => openActivityForm('email', task.ID, onComplete),
+            },
+          ])
+        },
+      }, [
+        icons.email,
+        ToolTip('Send a email!', 'left'),
+      ]),
+    ])
+
+  }
+
+  const CallCTA = (task, {
+    onComplete = () => {},
+  } = {}) => {
+
+    return Fragment([
+      An({
+        className: 'gh-button secondary text icon',
+        href     : '#',
+        onClick  : async e => {
+          e.preventDefault()
+          const {
+            object_id,
+            object_type,
+          } = task.data
+
+          let phones = []
+
+          if (object_type === 'contact') {
+            let contact = await Groundhogg.stores.contacts.maybeFetchItem(object_id)
+            console.log(contact)
+            const {
+              primary_phone = '',
+              mobile_phone = '',
+              company_phone = '',
+            } = contact.meta
+
+            if (primary_phone) {
+              phones.push([
+                __('Primary Phone'),
+                primary_phone,
+              ])
+            }
+
+            if (mobile_phone) {
+              phones.push([
+                __('Mobile Phone'),
+                mobile_phone,
+              ])
+            }
+
+            if (company_phone) {
+              phones.push([
+                __('Business Phone'),
+                company_phone,
+              ])
+            }
+          }
+
+          if (task.object_type === 'deal') {
+
+          }
+
+          moreMenu(e.target, [
+            ...phones.map(([text, phone]) => ( {
+              key     : phone,
+              text,
+              onSelect: k => {
+                An({
+                  href   : `tel:${ phone }`,
+                  onClick: e => openActivityForm('call', task.ID, onComplete),
+                }).click()
+              },
+            } )),
+            {
+              key     : 'activity',
+              text    : 'Record call activity',
+              onSelect: key => openActivityForm('call', task.ID, onComplete),
+            },
+          ])
+        },
+      }, [
+        icons.phone,
+        ToolTip('Call now!', 'left'),
+      ]),
+    ])
+  }
+
+  const TaskCTACallbacks = {
+    call   : CallCTA,
+    email  : EmailCTA,
+    meeting: () => null,
+    task   : () => null,
+  }
+
+  const TaskCTA = (task, ...args) => {
+    // console.log( task.data.type)
+    return TaskCTACallbacks[task.data.type](task, ...args)
+  }
+
   const {
     Div,
     Form,
@@ -120,8 +319,208 @@
     Input,
     Textarea,
     Pg,
+    Modal,
     ItemPicker,
+    MiniModal,
+    InputRepeater,
   } = MakeEl
+
+  const TimeLine = (activity) => {
+
+    if (!activity || !activity.length) {
+      return null
+    }
+
+    const Activity = activity => {
+
+      const {
+        note = '',
+        outcome = '',
+      } = activity.meta
+
+      const {
+        activity_type = '',
+      } = activity.data
+
+      const {
+        diff_time = '',
+        wp_date = '',
+      } = activity.i18n
+
+      return Div({
+        className: `task-activity-item ${ activity_type }`,
+      }, [
+        Div({
+          className: 'display-flex gap-5 align-center',
+        }, [
+          Span({ className: 'timeline-dot' }, [
+            ToolTip(diff_time, 'right'),
+          ]),
+          // Span({ className: 'task-activity-type' }, activity_type),
+          outcome ? Span({ className: 'task-activity-outcome pill semi-dark' }, outcome) : null,
+          note ? Div({ className: 'task-activity-note' }, note) : null,
+        ]),
+      ])
+    }
+
+    return Div({
+      className: 'task-activity-timeline display-flex column gap-10 align-top',
+    }, [
+      ...activity.map(Activity),
+    ])
+  }
+
+  const AddTaskActivity = async ({
+    addButtonText = 'Add Activity',
+    onSubmit = () => {},
+  }) => {
+
+    // load task outcomes
+    if (!Groundhogg.stores.options.get('gh_task_outcomes')) {
+      await Groundhogg.stores.options.fetch(['gh_task_outcomes'])
+    }
+
+    const State = Groundhogg.createState({
+      note      : '',
+      outcome   : '',
+      submitting: false,
+    })
+
+    return Modal({
+      width: '400px',
+    }, ({
+      morph,
+      close,
+    }) => Div({}, [
+
+      Div({}, [
+        Label({
+          for: 'activity-outcome',
+        }, __('What happened?')),
+        `<br>`,
+        Div({
+          className: 'display-flex gap-5 align-center',
+        }, [
+          Select({
+            id      : 'activity-outcome',
+            name    : 'activity_outcome',
+            options : [
+              {
+                value: '',
+                text : 'Select an outcome',
+              },
+              ...Groundhogg.stores.options.get('gh_task_outcomes', []).map(item => ( {
+                value: item,
+                text : item,
+              } )),
+            ],
+            onChange: e => {
+              State.set({
+                outcome: e.target.value,
+              })
+            },
+          }),
+          userHasCap( 'manage_options' ) ? An({
+            href   : '#',
+            id     : 'manage-task-outcomes',
+            onClick: e => {
+
+              let OutcomeState = Groundhogg.createState({
+                outcomes: Groundhogg.stores.options.get('gh_task_outcomes', []),
+              })
+
+              MiniModal({
+                selector       : '#manage-task-outcomes',
+                closeOnFocusout: false,
+              }, ({
+                close,
+              }) => Div({}, [
+                InputRepeater({
+                  id      : 'task-outcomes',
+                  rows    : OutcomeState.outcomes.map(v => [v]),
+                  cells   : [
+                    Input,
+                  ],
+                  onChange: rows => {
+                    OutcomeState.set({
+                      outcomes: rows.map(([v]) => v),
+                    })
+                  },
+                }),
+                Button({
+                  className: 'gh-button primary',
+                  onClick  : e => {
+                    Groundhogg.stores.options.patch({
+                      gh_task_outcomes: OutcomeState.outcomes,
+                    }).then(() => {
+                      State.set({
+                        outcomes: OutcomeState.outcomes,
+                      })
+                      close()
+                      morph()
+                    })
+                  },
+                }, 'Save Changes'),
+              ]))
+            },
+          }, __('Manage outcomes')) : null,
+        ]),
+      ]),
+      Pg({}, __('Want to add any additional context?')),
+      Textarea({
+        id       : 'activity-note',
+        name     : 'activity_note',
+        className: 'full-width',
+        value    : State.note,
+        onCreate : el => {
+          try {
+            wp.editor.remove('activity-note')
+          }
+          catch (err) {}
+
+          setTimeout(() => {
+            addMediaToBasicTinyMCE()
+            tinymceElement('activity-note', {
+              quicktags: false,
+            }, content => {
+              State.set({
+                note: content,
+              })
+            })
+          }, 10)
+        },
+      }),
+      Div({
+        className: 'display-flex gap-5 flex-end space-above-10',
+      }, [
+        Button({
+          className: 'gh-button danger text',
+          disabled : State.submitting,
+          onClick  : e => close(),
+        }, __('Cancel')),
+        Button({
+          className: 'gh-button primary',
+          id       : 'add-activity',
+          disabled : State.submitting,
+          onClick  : e => {
+
+            State.set({
+              submitting: true,
+            })
+
+            morph()
+
+            onSubmit({
+              note   : State.note,
+              outcome: State.outcome,
+            }).then(close).catch(err => close)
+
+          },
+        }, addButtonText),
+      ]),
+    ]))
+
+  }
 
   const BetterObjectTasks = ({
     object_type = '',
@@ -352,7 +751,7 @@
               noneSelected: __('Select a user...', 'groundhogg'),
               selected    : State.assigned_to ? {
                 id  : State.assigned_to,
-                text: getOwner(State.assigned_to).data.display_name,
+                text: userDisplayName(getOwner(State.assigned_to)),
               } : [],
               multiple    : false,
               style       : {
@@ -362,7 +761,7 @@
                 search = new RegExp(search, 'i')
                 let options = Groundhogg.filters.owners.map(u => ( {
                   id  : u.ID,
-                  text: u.data.display_name,
+                  text: userDisplayName(u),
                 } )).filter(({ text }) => text.match(search))
                 return Promise.resolve(options)
               },
@@ -448,6 +847,10 @@
           summary,
         } = task.data
 
+        const TaskState = Groundhogg.createState({
+          showTimeline: false,
+        })
+
         /**
          * If the task belongs to the current user
          *
@@ -470,7 +873,7 @@
           className: `task ${ task.is_complete ? 'complete' : 'pending' } ${ task.is_overdue ? 'overdue' : '' }`,
           id       : `task-item-${ task.ID }`,
           dataId   : task.ID,
-        }, [
+        }, taskMorph => Fragment([
 
           Div({
             className: 'task-header',
@@ -500,17 +903,34 @@
                 marginLeft: 'auto',
               },
             }, [
+              TaskCTA(task, {
+                onComplete: morph,
+              }),
               task.is_complete ? null : Button({
                 id       : `task-mark-complete-${ task.ID }`,
                 className: 'gh-button text icon primary mark-complete',
                 onClick  : e => {
-                  document.getElementById(`task-item-${ task.ID }`).classList.add('completing')
-                  TasksStore.complete(task.ID).then(task => {
-                    dialog({
-                      message: __('Task completed!'),
-                    })
+                  AddTaskActivity({
+                    addButtonText: __('Mark complete', 'groundhogg'),
+                    onSubmit     : ({
+                      note,
+                      outcome,
+                    }) => {
+                      document.getElementById(`task-item-${ task.ID }`).classList.add('completing')
+                      return TasksStore.patch(task.ID, {
+                        data: {
+                          complete: 1,
+                          note,
+                          outcome,
+                        },
+                      }).then(task => {
+                        dialog({
+                          message: __('Task completed!'),
+                        })
 
-                    morph()
+                        morph()
+                      })
+                    },
                   })
                 },
               }, [
@@ -538,6 +958,34 @@
                           assigned_to : user_id,
                         })
                         morph()
+                      },
+                    },
+                    {
+                      key     : 'record-activity',
+                      cap     : 'edit_tasks',
+                      text    : __('Record activity'),
+                      onSelect: () => {
+                        AddTaskActivity({
+                          onSubmit     : ({
+                            note,
+                            outcome,
+                          }) => {
+                            return TasksStore.patch(task.ID, {
+                              data: {
+                                activity: 1,
+                                type: task.data.type,
+                                note,
+                                outcome,
+                              },
+                            }).then(task => {
+                              dialog({
+                                message: __('Activity recorded!'),
+                              })
+
+                              morph()
+                            })
+                          },
+                        })
                       },
                     },
                     {
@@ -613,9 +1061,19 @@
           Div({
             className: 'task-content space-above-10',
           }, content),
-
-        ])
-
+          task.activity.length ? An({
+            href   : '#',
+            className: 'toggle-activity',
+            onClick: e => {
+              e.preventDefault()
+              TaskState.set({
+                showTimeline: ! TaskState.showTimeline,
+              })
+              taskMorph()
+            },
+          }, TaskState.showTimeline ? 'Hide timeline &uarr;' : 'Show timeline &darr;') : null,
+          TaskState.showTimeline ? TimeLine(task.activity) : null,
+        ]))
       }
 
       let tasks = State.tasks.map(id => TasksStore.get(id))
@@ -708,7 +1166,8 @@
               }
 
               State.set({
-                adding: true,
+                adding     : true,
+                assigned_to: getCurrentUser().ID,
               })
 
               morph()
@@ -725,14 +1184,14 @@
           },
         }, [
           // Edit
-          ! userHasCap( 'edit_tasks' ) ? null : Button({
+          !userHasCap('edit_tasks') ? null : Button({
             className: `gh-button ${ State.bulk_edit ? 'primary' : 'secondary' } small`,
             onClick  : e => {
               State.set({
                 bulk_edit: !State.bulk_edit,
               })
 
-              if ( State.bulk_edit ){
+              if (State.bulk_edit) {
                 clearEditState()
                 State.set({
                   edit_type: '', // no default type
@@ -742,7 +1201,7 @@
             },
           }, __('Edit')),
           // Snooze
-          ! userHasCap( 'edit_tasks' ) ? null : Button({
+          !userHasCap('edit_tasks') ? null : Button({
             className: 'gh-button secondary small',
             disabled : State.bulk_edit,
             onClick  : e => {
@@ -762,7 +1221,7 @@
             },
           }, __('Snooze')),
           // Delete
-          ! userHasCap( 'delete_tasks' ) ? null : Button({
+          !userHasCap('delete_tasks') ? null : Button({
             className: 'gh-button danger small',
             disabled : State.bulk_edit,
             onClick  : e => {
@@ -787,20 +1246,38 @@
             },
           }, __('Delete')),
           // Mark complete
-          ! userHasCap( 'edit_tasks' ) ? null : Button({
+          !userHasCap('edit_tasks') ? null : Button({
             className: 'gh-button primary small',
             disabled : State.bulk_edit,
             onClick  : e => {
-              TasksStore.patchMany({
-                query: {
-                  include: State.selected,
+
+              AddTaskActivity({
+                addButtonText: __('Mark complete', 'groundhogg'),
+                onSubmit     : ({
+                  note,
+                  outcome,
+                }) => {
+
+                  State.selected.forEach(id => {
+                    document.getElementById(`task-item-${ id }`).classList.add('completing')
+                  })
+
+                  return TasksStore.patchMany({
+                    query: {
+                      include: State.selected,
+                    },
+                    data : {
+                      complete: 1,
+                      note,
+                      outcome,
+                    },
+                  }).then(() => {
+                    dialog({
+                      message: sprintf('%d tasks completed!', State.selected.length),
+                    })
+                    morph()
+                  })
                 },
-                data : { complete: 1 },
-              }).then(() => {
-                dialog({
-                  message: sprintf('%d tasks snoozed!', State.selected.length),
-                })
-                morph()
               })
             },
           }, __('Mark Complete')),
@@ -832,8 +1309,8 @@
             Select({
               id      : 'task-type',
               options : {
-                '' : 'No change',
-                ...taskTypes
+                '': 'No change',
+                ...taskTypes,
               },
               selected: State.edit_type,
               onChange: e => State.set({
@@ -879,7 +1356,7 @@
               noneSelected: __('Assign to a new user...', 'groundhogg'),
               selected    : State.assigned_to ? {
                 id  : State.assigned_to,
-                text: getOwner(State.assigned_to).data.display_name,
+                text: userDisplayName(getOwner(State.assigned_to)),
               } : [],
               multiple    : false,
               style       : {
@@ -889,7 +1366,7 @@
                 search = new RegExp(search, 'i')
                 let options = Groundhogg.filters.owners.map(u => ( {
                   id  : u.ID,
-                  text: u.data.display_name,
+                  text: userDisplayName(u),
                 } )).filter(({ text }) => text.match(search))
                 return Promise.resolve(options)
               },

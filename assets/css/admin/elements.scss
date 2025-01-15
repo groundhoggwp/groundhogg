@@ -656,6 +656,56 @@ h2.nav-tab-wrapper.gh {
     border-top: 1px solid $primary-dark-10;
     padding-top: 10px;
 
+    &:has( .task-activity-timeline, .toggle-activity ){
+      padding-bottom: 10px;
+    }
+
+    &.hide-timeline {
+      .task-activity-timeline{
+        display: none;
+      }
+    }
+
+    .task-activity-timeline {
+      padding-left: 10px;
+      border-left: 2px solid $primary-dark;
+
+      .task-activity-item {
+        position: relative;
+
+        .timeline-dot {
+          position: absolute;
+          left: -16px;
+          background-color: $primary-dark;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 10px;
+          height: 10px;
+          border-radius: 5px;
+        }
+
+        .task-activity-note {
+
+          padding: 5px 8px;
+          background-color: $primary-dark-5;
+          //border: 1px solid $primary-dark-15;
+          //box-shadow: $box-shadow;
+          border-radius: 4px;
+
+          > *{
+            line-height: 1.1;
+          }
+          > *:first-child {
+            margin-top: 0;
+          }
+          > *:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+      }
+    }
+
     a.associated-object {
       font-size: 12px !important;
       display: flex;
@@ -949,6 +999,16 @@ a.action-link {
   &.red {
     background: $error-red-25;
     color: darken($error-red, 35)
+  }
+
+  &.dark {
+    background-color: $primary-dark;
+    color: #fff;
+  }
+
+  &.semi-dark {
+    background-color: $primary-dark-75;
+    color: #fff;
   }
 
   &.sm {

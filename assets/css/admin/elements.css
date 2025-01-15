@@ -506,6 +506,43 @@ h2.nav-tab-wrapper.gh button .dashicons {
   border-top: 1px solid rgba(16, 38, 64, 0.1);
   padding-top: 10px;
 }
+.tasks-widget .task:has(.task-activity-timeline, .toggle-activity) {
+  padding-bottom: 10px;
+}
+.tasks-widget .task.hide-timeline .task-activity-timeline {
+  display: none;
+}
+.tasks-widget .task .task-activity-timeline {
+  padding-left: 10px;
+  border-left: 2px solid #102640;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item {
+  position: relative;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item .timeline-dot {
+  position: absolute;
+  left: -16px;
+  background-color: #102640;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note {
+  padding: 5px 8px;
+  background-color: rgba(16, 38, 64, 0.05);
+  border-radius: 4px;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note > * {
+  line-height: 1.1;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note > *:first-child {
+  margin-top: 0;
+}
+.tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note > *:last-child {
+  margin-bottom: 0;
+}
 .tasks-widget .task a.associated-object {
   font-size: 12px !important;
   display: flex;
@@ -731,6 +768,14 @@ a.action-link {
 .pill.danger, .pill.red {
   background: rgba(233, 31, 79, 0.25);
   color: #4e0818;
+}
+.pill.dark {
+  background-color: #102640;
+  color: #fff;
+}
+.pill.semi-dark {
+  background-color: rgba(16, 38, 64, 0.75);
+  color: #fff;
 }
 .pill.sm {
   font-size: 13px;

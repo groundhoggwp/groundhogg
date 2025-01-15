@@ -3,7 +3,9 @@
 namespace Groundhogg\Classes;
 
 use Groundhogg\Contact;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
@@ -61,12 +63,40 @@ class Task extends Note {
 	}
 
 	/**
+	 * @throws \Exception
+	 * @return DateTimeHelper
+	 */
+	public function get_date_created() {
+		return new DateTimeHelper( strtotime( $this->date_created ) );
+	}
+
+	/**
 	 * If the task is overdue
 	 *
 	 * @return bool
 	 */
 	public function is_overdue() {
 		return $this->get_due_date()->isPast() && ! $this->is_complete();
+	}
+
+	public function is_due_today() {
+		return $this->get_due_date()->isToday() && ! $this->is_complete();
+	}
+
+	public function days_till_due() {
+		$dueDate = $this->get_due_date();
+
+		if ( $dueDate->isPast() || $dueDate->isToday() ) {
+			return 0;
+		}
+
+		$diff = $dueDate->diff( new DateTimeHelper() );
+
+		return $diff->days;
+	}
+
+	public function is_due_soon() {
+		return $this->days_till_due() < 14;
 	}
 
 	/**
@@ -100,6 +130,28 @@ class Task extends Note {
 		}
 
 		return $data;
+	}
+
+	protected function add_task_activity( $type = '', $outcome = '', $note = '' ) {
+
+		$activity = new Other_Activity;
+		$activity->create( [
+			'object_type'   => 'task',
+			'object_id'     => $this->get_id(),
+			'activity_type' => $type,
+		] );
+
+		$activity->add_meta( 'outcome', $outcome );
+		$activity->add_meta( 'note', $note );
+	}
+
+	protected function get_task_activity() {
+		$query = new Table_Query( 'other_activity' );
+		$query->setOrderby( [ 'timestamp', 'DESC' ] )->where()
+		      ->equals( 'object_id', $this->get_id() )
+		      ->equals( 'object_type', 'task' );
+
+		return $query->get_objects( Other_Activity::class );
 	}
 
 	/**
@@ -149,6 +201,37 @@ class Task extends Note {
 			unset( $data['incomplete'] );
 		}
 
+		// handle completion activity if available
+		if ( isset_not_empty( $data, 'date_completed' ) && ! $was_complete ) {
+
+			$note    = wp_kses_post( get_array_var( $data, 'note' ) );
+			$outcome = sanitize_text_field( get_array_var( $data, 'outcome' ) );
+
+			if ( $note || $outcome ) {
+				$this->add_task_activity( 'task_complete', $outcome, $note );
+			}
+
+			unset( $data['note'] );
+			unset( $data['outcome'] );
+		}
+
+		// handle custom activity if available
+		if ( isset_not_empty( $data, 'activity' ) ) {
+
+			$type    = sanitize_key( get_array_var( $data, 'type' ) );
+			$note    = wp_kses_post( get_array_var( $data, 'note' ) );
+			$outcome = sanitize_text_field( get_array_var( $data, 'outcome' ) );
+
+			if ( $note || $outcome ) {
+				$this->add_task_activity( $type, $outcome, $note );
+			}
+
+			unset( $data['activity'] );
+			unset( $data['type'] );
+			unset( $data['note'] );
+			unset( $data['outcome'] );
+		}
+
 		$updated = parent::update( $data );
 
 		// If the task was not complete but was just completed following the update
@@ -190,10 +273,8 @@ class Task extends Note {
 		return $updated;
 	}
 
-	public function get_as_array() {
-
-		$dueDate = $this->get_due_date();
-		$object  = $this->get_associated_object();
+	public function get_associated_data() {
+		$object = $this->get_associated_object();
 
 		$associated = [
 			'link' => '',
@@ -209,15 +290,18 @@ class Task extends Note {
 			$associated['img']  = $object->get_profile_picture( 40 );
 		}
 
-		$associated = apply_filters( 'groundhogg/task/associated_context', $associated, $object );
+		return apply_filters( 'groundhogg/task/associated_context', $associated, $object );
+	}
 
-		$diff = $dueDate->diff( new DateTimeHelper() );
+	public function get_as_array() {
+
+		$dueDate = $this->get_due_date();
 
 		return array_merge( parent::get_as_array(), [
 			'is_overdue'    => $this->is_overdue(),
 			'is_complete'   => $this->is_complete(),
-			'is_due_today'  => $dueDate->isToday(),
-			'days_till_due' => $diff->days,
+			'is_due_today'  => $this->is_due_today(),
+			'days_till_due' => $this->days_till_due(),
 			'due_timestamp' => $dueDate->getTimestamp(),
 			'i18n'          => [
 				'time_diff'      => human_time_diff( $this->timestamp, time() ),
@@ -226,7 +310,8 @@ class Task extends Note {
 				'due_date'       => $dueDate->format( get_date_time_format() ),
 				'completed_date' => $this->is_complete() ? $this->get_date_completed()->format( get_date_time_format() ) : '',
 			],
-			'associated'    => $associated
+			'associated'    => $this->get_associated_data(),
+			'activity'      => $this->get_task_activity()
 		] );
 	}
 }
