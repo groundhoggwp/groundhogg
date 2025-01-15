@@ -35,7 +35,10 @@
     postFormData,
   } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
-  const { userHasCap, getOwner } = Groundhogg.user
+  const {
+    userHasCap,
+    getOwner,
+  } = Groundhogg.user
   const {
     sprintf,
     __,
@@ -50,7 +53,7 @@
   } = Groundhogg.formatting
   const { currentUser } = Groundhogg
 
-    const {
+  const {
     maybeCall,
     debounce,
     jsonCopy,
@@ -1106,7 +1109,7 @@
 
   }
 
-  const emailModal = (props) => {
+  const emailModal = (props, onSend = () => {}) => {
 
     const email = {
       to        : [],
@@ -1317,10 +1320,7 @@
           $(target).text(__('Send', 'groundhogg')).prop('disabled', false)
         }
 
-        post(`${ routes.v4.emails }/send`, {
-          ...email,
-          content: editor.getContent({ format: 'raw' }),
-        }).then((r) => {
+        post(`${ routes.v4.emails }/send`, email).then((r) => {
 
           release()
 
@@ -1336,6 +1336,11 @@
 
           dialog({
             message: __('Message sent!', 'groundhogg'),
+          })
+
+          onSend({
+            ...r,
+            email
           })
 
           close()
@@ -1364,6 +1369,120 @@
       disableScrolling: false,
     })
 
+  }
+
+  const EmailTemplateModal = async (contactId, onSend = () => {}) => {
+
+    let contactIds, title
+
+    // array of contacts provided
+    if (Array.isArray(contactId)) {
+      contactIds = contactId
+      title = sprintf(__('Select an email to send to %s contacts', 'groundhogg'), contactIds.length)
+    }
+    else if (typeof contactId === 'object') { // contact object provide
+      let contact = contactId
+      contactIds = [contact.ID]
+      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
+    }
+    else { // contact ID provided
+      let contact = await Groundhogg.stores.contacts.maybeFetchItem(contactId)
+      contactIds = [contact.ID]
+      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
+    }
+
+    const State = Groundhogg.createState({
+      email: null,
+    })
+
+    MakeEl.Modal({}, ({
+      morph,
+      close,
+    }) => MakeEl.Div({
+      id: 'send-email-dialog',
+    }, [
+      `<h3>${ title }</h3>`,
+      MakeEl.ItemPicker({
+        id          : `select-email`,
+        noneSelected: __('Select an email to send...', 'groundhogg'),
+        selected    : State.email ? {
+          id  : State.email.ID,
+          text: State.email.data.title,
+        } : [],
+        multiple    : false,
+        style       : {
+          flexGrow: 1,
+        },
+        fetchOptions: (search) => {
+          return EmailsStore.fetchItems({
+              search,
+              status: 'ready',
+            }).
+            then(emails => emails.map(({
+              ID,
+              data,
+            }) => ( {
+              id  : ID,
+              text: data.title,
+            } )))
+        },
+        onChange    : item => {
+          if (!item) {
+            State.set({
+              email: null,
+            })
+          }
+          else {
+            let email = EmailsStore.get(item.id)
+
+            State.set({
+              email,
+            })
+          }
+
+          morph()
+        },
+      }),
+
+      State.email ? MakeEl.Div({
+          className: 'gh-panel outlined',
+        },
+        Groundhogg.components.EmailPreview({
+          ...State.email.context,
+          content: State.email.context.built,
+        }),
+      ) : null,
+
+      State.email ? MakeEl.Button({
+        id       : 'send-email',
+        className: 'gh-button primary medium',
+        onClick  : e => {
+
+          e.currentTarget.disabled = true
+          e.currentTarget.innerHTML = `<span class="gh-spinner"></span>`
+
+          EmailsStore.send(State.email.ID, {
+            to: contactIds,
+          }).then(r => {
+
+            dialog({
+              message: __('Email sent!'),
+            })
+
+            close()
+            onSend(r)
+
+          }).catch(e => {
+            dialog({
+              type   : 'error',
+              message: e.message,
+            })
+            morph()
+          })
+
+        },
+      }, __('Send email now!', 'groundhogg')) : null,
+    ]))
   }
 
   const makeInput = (selector, {
@@ -1933,7 +2052,7 @@
               ' — ',
               Span({
                 className: `gh-text ${ item.is_marketable ? 'green' : 'red' }`,
-              }, Groundhogg.filters.optin_status[item.data.optin_status])
+              }, Groundhogg.filters.optin_status[item.data.optin_status]),
             ]),
           ]),
         ]),
@@ -1954,7 +2073,7 @@
           ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
           allTags.length ? Span({}, sprintf('and %d more...', allTags.length)) : null,
         ]),
-        maybeCall(extra,item),
+        maybeCall(extra, item),
       ]),
     ])
   }
@@ -2066,7 +2185,7 @@
     collapsed = false,
     hidden = false,
     onCollapse = id => {},
-  }, content ) => {
+  }, content) => {
 
     if (hidden) {
       return null
@@ -2085,7 +2204,7 @@
           },
         }),
       ]),
-      collapsed ? null : maybeCall( content ),
+      collapsed ? null : maybeCall(content),
     ])
   }
 
@@ -2174,9 +2293,12 @@
       ])
     },
 
-    Panel( id ){
+    Panel (id) {
 
-      let { content, ...panel } = this.get(id)
+      let {
+        content,
+        ...panel
+      } = this.get(id)
 
       return Panel({
         id,
@@ -2185,21 +2307,20 @@
         hidden    : this.isHidden(id),
         onCollapse: id => {
           this.toggleCollapse(id)
-          morphdom( document.getElementById( `${id}-panel` ), this.Panel( id ) )
+          morphdom(document.getElementById(`${ id }-panel`), this.Panel(id))
         },
-      }, content )
+      }, content)
     },
 
     Panels () {
       return Div({
         className: 'display-flex column gap-20',
-        id: this.storagePrefix,
-      }, this.keys().map( id => this.Panel( id ) ) )
+        id       : this.storagePrefix,
+      }, this.keys().map(id => this.Panel(id)))
     },
 
     ...overrides,
   } )
-
 
   const Relationships = ({
     title = '',
@@ -2208,7 +2329,7 @@
     child_type = '',
     parent_type = '',
     renderItem = item => {},
-    onAddItem = (r,j) => {}
+    onAddItem = (r, j) => {},
   }) => {
 
     const rel_type_key = child_type ? 'child_type' : 'parent_type'
@@ -2217,65 +2338,79 @@
 
     const State = Groundhogg.createState({
       loaded: false,
-      items: []
+      items : [],
     })
 
-    const fetchRelationships = () => store.fetchRelationships( id, {
-      [rel_type_key]: rel_type
-    } ).then( items => State.set( { items, loaded: true } ) )
+    const fetchRelationships = () => store.fetchRelationships(id, {
+        [rel_type_key]: rel_type,
+      }).
+      then(items => State.set({
+        items,
+        loaded: true,
+      }))
 
-    const deleteRelationship = itemId => store.deleteRelationships( id, {
+    const deleteRelationship = itemId => store.deleteRelationships(id, {
       [rel_type_key]: rel_type,
-      [rel_id_key]: itemId,
-    }).then( () => State.set({
-      items: State.items.filter( item => item.ID !== itemId )
+      [rel_id_key]  : itemId,
+    }).then(() => State.set({
+      items: State.items.filter(item => item.ID !== itemId),
     }))
 
-    const createRelationship = item => store.createRelationships( id, {
+    const createRelationship = item => store.createRelationships(id, {
       [rel_type_key]: rel_type,
-      [rel_id_key]: item.ID,
+      [rel_id_key]  : item.ID,
     }).then(() => State.set({
-      items: [ ...State.items, item ]
+      items: [
+        ...State.items,
+        item,
+      ],
     }))
 
     return Div({
-      id: `${rel_type_key}-${rel_type}-rel-of-${id}`,
-      className: `display-flex column relationship-editor ${rel_type_key}-${rel_type}`,
+      id       : `${ rel_type_key }-${ rel_type }-rel-of-${ id }`,
+      className: `display-flex column relationship-editor ${ rel_type_key }-${ rel_type }`,
     }, morph => {
 
-      const handleDeleteRelationship = itemId => deleteRelationship( itemId ).then( morph )
+      const handleDeleteRelationship = itemId => deleteRelationship(itemId).then(morph)
 
-      if ( ! State.loaded ){
+      if (!State.loaded) {
 
-        fetchRelationships().then( morph )
+        fetchRelationships().then(morph)
 
-        return Skeleton({}, [ 'full', 'full', 'full' ] )
+        return Skeleton({}, [
+          'full',
+          'full',
+          'full',
+        ])
       }
 
       const AddRelButton = () => Button({
-        id: `add-${rel_type_key}-${rel_type}-rel-for-${id}`,
+        id       : `add-${ rel_type_key }-${ rel_type }-rel-for-${ id }`,
         className: 'gh-button secondary text icon',
-        onClick: e => {
-          let promise = new Promise((resolve, reject) => onAddItem(resolve, reject, State ))
+        onClick  : e => {
+          let promise = new Promise((resolve, reject) => onAddItem(resolve, reject, State))
 
-          promise.then( item => createRelationship( item ).then( morph ) )
-        }
-      }, [Dashicon('plus-alt2'), ToolTip(__('Add relationship', 'groundhogg'),'left')])
+          promise.then(item => createRelationship(item).then(morph))
+        },
+      }, [
+        Dashicon('plus-alt2'),
+        ToolTip(__('Add relationship', 'groundhogg'), 'left'),
+      ])
 
       return Fragment([
 
         title ? Div({ className: 'space-between' }, [
-          H4({}, title ),
-          AddRelButton()
+          H4({}, title),
+          AddRelButton(),
         ]) : null,
 
-        ...State.items.map( item => renderItem({
+        ...State.items.map(item => renderItem({
           ...item,
-          onDelete: handleDeleteRelationship
-        }) ),
+          onDelete: handleDeleteRelationship,
+        })),
         title ? null : Div({
-          className: 'display-flex flex-end'
-        }, AddRelButton() ),
+          className: 'display-flex flex-end',
+        }, AddRelButton()),
 
       ])
 
@@ -2290,36 +2425,48 @@
     allow0 = true,
     ...overrides
   }) => ItemPicker({
-    id: `select-users`,
-    noneSelected: __('Select a user...', 'groundhogg'),
-    selected: selected.map(user_id => {
+    id              : `select-users`,
+    noneSelected    : __('Select a user...', 'groundhogg'),
+    selected        : selected.map(user_id => {
 
       if (user_id == 0 && allow0) {
-        return { id: 0, text: __('The contact owner', 'groundhogg') }
+        return {
+          id  : 0,
+          text: __('The contact owner', 'groundhogg'),
+        }
       }
 
-      return { id: user_id, text: getOwner(user_id).data.user_email }
+      return {
+        id  : user_id,
+        text: getOwner(user_id).data.user_email,
+      }
     }),
-    multiple: true,
-    style: {
+    multiple        : true,
+    style           : {
       flexGrow: 1,
     },
     isValidSelection: id => id === 0 || getOwner(id),
-    fetchOptions: (search) => {
+    fetchOptions    : (search) => {
       search = new RegExp(search, 'i')
 
-      let options = Groundhogg.filters.owners.map(u => ( { id: u.ID, text: u.data.display_name } ))
+      let options = Groundhogg.filters.owners.map(u => ( {
+        id  : u.ID,
+        text: u.data.display_name,
+      } ))
 
-      if ( allow0 ){
-        options.push({ id: 0, text: __('The contact owner', 'groundhogg') })
+      if (allow0) {
+        options.push({
+          id  : 0,
+          text: __('The contact owner', 'groundhogg'),
+        })
       }
 
       options = options.filter(({ text }) => text.match(search))
 
       return Promise.resolve(options)
     },
-    onChange: items => onChange( items.map(({ id }) => id) ),
-    ...overrides
+    onChange        : items => onChange(items.map(({ id }) => id)),
+    ...overrides,
   })
 
   Groundhogg.components = {
@@ -2332,6 +2479,7 @@
     quickEditContactModal,
     makeInput,
     emailModal,
+    EmailTemplateModal,
     fileUploader,
     EmailPreview,
     EmailPreviewModal,
@@ -2343,7 +2491,7 @@
     Panel,
     Panels,
     Relationships,
-    OwnerPicker
+    OwnerPicker,
   }
 
 } )(jQuery)

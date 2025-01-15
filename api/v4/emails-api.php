@@ -334,7 +334,47 @@ class Emails_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$to      = $request->get_param( 'to' );
+		$to = $request->get_param( 'to' );
+
+		if ( empty( $to ) ) {
+			return self::ERROR_422();
+		}
+
+		if ( is_array( $to ) && count( $to ) !== 1 ) { // sending to multiple contacts
+
+			array_map_to_contacts( $to );
+
+			$results = [];
+
+			foreach ( $to as $contact ) {
+
+				$status = send_email_notification( $email, $contact, $request->get_param( 'when' ) );
+
+				add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
+
+				$result = process_events( $contact );
+
+				remove_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
+
+				if ( $result === true ) {
+					continue;
+				}
+
+				if ( ! $status ) {
+					$results[] = self::ERROR_UNKNOWN();
+					continue;
+				}
+
+				if ( $this->has_errors() ) {
+					$results[] = $this->get_last_error();
+				}
+			}
+
+			return self::SUCCESS_RESPONSE( $results );
+		} else if ( is_array( $to ) && count( $to ) == 1 ) { // sending to 1 contact, but still in array form
+			$to = $to[0];
+		}
+
 		$contact = get_contactdata( $to );
 
 		if ( ! $contact ) {
@@ -460,7 +500,16 @@ class Emails_Api extends Base_Object_Api {
 			] );
 		}
 
-		return self::SUCCESS_RESPONSE();
+		$result = [
+			'from'    => $from_email,
+			'subject' => $subject,
+		];
+
+		if ( Email_Logger::is_enabled() ) {
+			$result['log_id'] = Email_Logger::get_last_log_id();
+		}
+
+		return self::SUCCESS_RESPONSE( $result );
 	}
 
 	/**
