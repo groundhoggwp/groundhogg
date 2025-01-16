@@ -482,6 +482,7 @@
             addMediaToBasicTinyMCE()
             tinymceElement('activity-note', {
               quicktags: false,
+              taskTemplates: true,
             }, content => {
               State.set({
                 note: content,
@@ -794,6 +795,7 @@
                   addMediaToBasicTinyMCE()
                   tinymceElement('edit-task-content', {
                     quicktags: false,
+                    taskTemplates: true,
                   }, content => {
                     State.set({
                       edit_content: content,

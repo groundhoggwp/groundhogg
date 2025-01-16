@@ -218,6 +218,13 @@ class Main_Updater extends Old_Updater {
 					}
 				}
 			],
+			'3.7.4'  => [
+				'automatic'   => true,
+				'description' => __( 'Add <code>summary</code> column to notes table.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->notes->create_table();
+				}
+			],
 		];
 	}
 

@@ -1,3 +1,23 @@
+@charset "UTF-8";
+.mce-ico.mce-i-gh_replacements {
+  font-family: "dashicons";
+}
+.mce-ico.mce-i-gh_replacements::before {
+  content: "";
+}
+.mce-ico.mce-i-gh_saved_replies {
+  font-family: "dashicons";
+}
+.mce-ico.mce-i-gh_saved_replies::before {
+  content: "";
+}
+.mce-ico.mce-i-gh_task_templates, .mce-ico.mce-i-gh_note_templates {
+  font-family: "dashicons";
+}
+.mce-ico.mce-i-gh_task_templates::before, .mce-ico.mce-i-gh_note_templates::before {
+  content: "";
+}
+
 ul.styled {
   list-style: disc;
   padding-left: 20px;

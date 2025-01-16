@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 3.7.3.6
+Stable tag: 3.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -348,6 +348,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 3.7.4 (2025-01-15) =
+* ADDED Task re-assignment. Tasks can now be assigned to users that are not the contact owner. Tasks can also be re-assigned.
+* ADDED Task bulk editing. Bulk complete, delete, re-assign, and reschedule tasks from within the tasks widget.
+* ADDED Task activity. Track outcomes, emails, call attempts, and more!
+* ADDED Task templates. Pre-written content for manually created tasks.
+* ADDED Saved replies. Pre-written replies for manually composed emails.
+* ADDED Note templates. Pre-written content for manually created notes.
 
 = 3.7.3.6 (2025-01-12) =
 * SECURITY Added additional file checks for large file uploads. Credit @wcraft and WordFence.

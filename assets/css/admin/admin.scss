@@ -26,6 +26,33 @@ $action-green-25: rgba(158, 206, 56, 0.25);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
+.mce-ico {
+  &.mce-i-gh_replacements {
+    font-family: 'dashicons';
+
+    &::before {
+      content: "\f110";
+    }
+  }
+
+  &.mce-i-gh_saved_replies {
+    font-family: 'dashicons';
+
+    &::before {
+      content: "\f473";
+    }
+  }
+
+  &.mce-i-gh_task_templates,
+  &.mce-i-gh_note_templates {
+    font-family: 'dashicons';
+
+    &::before {
+      content: "\f121";
+    }
+  }
+}
+
 ul.styled {
   list-style: disc;
   padding-left: 20px;

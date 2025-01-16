@@ -1,11 +1,3 @@
-@charset "UTF-8";
-.mce-ico.mce-i-gh_replacements {
-  font-family: "dashicons";
-}
-.mce-ico.mce-i-gh_replacements::before {
-  content: "";
-}
-
 @keyframes skeleton-loading {
   0% {
     background-color: rgba(16, 38, 64, 0.05);

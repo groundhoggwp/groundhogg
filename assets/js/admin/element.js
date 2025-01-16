@@ -744,9 +744,183 @@
     }
   }
 
+  const addReplacementsToolbarTinyMCE = (event, editor) => {
+    editor.settings.toolbar1 += ',gh_replacements'
+
+    editor.addButton('gh_replacements', {
+      title  : 'Replacements',
+      image  : '',
+      onclick: e => {
+        InsertAtCursor.to_mce = true
+        Groundhogg.element.replacementsWidget({
+          target: e.target,
+        }).mount()
+      },
+    })
+  }
+
+  const addSavedRepliesToolbarTinyMCE = (event, editor) => {
+    editor.settings.toolbar1 += ',gh_saved_replies'
+
+    editor.addButton('gh_saved_replies', {
+      title  : 'Saved Replies',
+      image  : '',
+      onclick: async e => {
+
+        let replies = await Groundhogg.stores.notes.fetchItems({
+          type: 'saved_reply'
+        })
+
+        return searchOptionsWidget( {
+          position: 'fixed',
+          target  : e.target,
+          // filter out hidden codes
+          options     : [
+            {
+              manage: 1,
+              data: {
+                summary: '📝 Manage saved replies',
+              }
+            },
+            ...replies
+          ],
+          filterOption: ({
+            data,
+          }, search) => data.summary.match(regexp(search)),
+          renderOption: (option) => option.data.summary,
+          onSelect    : (option) => {
+
+            if ( option.manage === 1 ){
+              Groundhogg.SavedRepliesModal()
+              return
+            }
+
+            editor.execCommand('mceInsertContent', false, option.data.content )
+          },
+        }).mount()
+      },
+    })
+  }
+
+  const addNoteTemplatesToolbarTinyMCE = (event, editor) => {
+    editor.settings.toolbar1 += ',gh_note_templates'
+
+    editor.addButton('gh_note_templates', {
+      title  : 'Note Templates',
+      image  : '',
+      onclick: async e => {
+
+        let replies = await Groundhogg.stores.notes.fetchItems({
+          type: 'note_template'
+        })
+
+        return searchOptionsWidget( {
+          position: 'fixed',
+          target  : e.target,
+          // filter out hidden codes
+          options     : [
+            {
+              manage: 1,
+              data: {
+                summary: '📝 Manage note templates',
+              }
+            },
+            ...replies
+          ],
+          filterOption: ({
+            data,
+          }, search) => data.summary.match(regexp(search)),
+          renderOption: (option) => option.data.summary,
+          onSelect    : (option) => {
+
+            if ( option.manage === 1 ){
+              Groundhogg.SavedRepliesModal({
+                single: 'Note Template',
+                plural: 'Note Templates',
+                note_type: 'note_template'
+              })
+              return
+            }
+
+            editor.execCommand('mceInsertContent', false, option.data.content )
+          },
+        }).mount()
+      },
+    })
+  }
+
+  const addTaskTemplatesToolbarTinyMCE = (event, editor) => {
+    editor.settings.toolbar1 += ',gh_task_templates'
+
+    editor.addButton('gh_task_templates', {
+      title  : 'Task Templates',
+      image  : '',
+      onclick: async e => {
+
+        let replies = await Groundhogg.stores.notes.fetchItems({
+          type: 'task_template'
+        })
+
+        return searchOptionsWidget( {
+          position: 'fixed',
+          target  : e.target,
+          // filter out hidden codes
+          options     : [
+            {
+              manage: 1,
+              data: {
+                summary: '📝 Manage task templates',
+              }
+            },
+            ...replies
+          ],
+          filterOption: ({
+            data,
+          }, search) => data.summary.match(regexp(search)),
+          renderOption: (option) => option.data.summary,
+          onSelect    : (option) => {
+
+            if ( option.manage === 1 ){
+              Groundhogg.SavedRepliesModal({
+                single: 'Task Template',
+                plural: 'Task Templates',
+                note_type: 'task_template'
+              })
+              return
+            }
+
+            editor.execCommand('mceInsertContent', false, option.data.content )
+          },
+        }).mount()
+      },
+    })
+  }
+
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
   }) => {
+
+    // if replacements are enabled
+    if (config.replacements === true) {
+      $(document).on('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
+      delete config.replacements
+    }
+
+    if (config.savedReplies === true) {
+      $(document).on('tinymce-editor-setup', addSavedRepliesToolbarTinyMCE)
+      delete config.savedReplies
+    }
+
+    if (config.taskTemplates === true) {
+      $(document).on('tinymce-editor-setup', addTaskTemplatesToolbarTinyMCE)
+      delete config.taskTemplates
+    }
+
+    if (config.noteTemplates === true) {
+      $(document).on('tinymce-editor-setup', addNoteTemplatesToolbarTinyMCE)
+      delete config.noteTemplates
+    }
+
     wp.editor.initialize(
       editor_id,
       {
@@ -755,6 +929,15 @@
         ...config,
       },
     )
+
+    // disable replacements button before next tiny mce cn be initialized
+    $(document).off('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
+    // disable saved replies if enabled
+    $(document).off('tinymce-editor-setup', addSavedRepliesToolbarTinyMCE)
+    // disable task templates
+    $(document).off('tinymce-editor-setup', addTaskTemplatesToolbarTinyMCE)
+    // disable note templates
+    $(document).off('tinymce-editor-setup', addNoteTemplatesToolbarTinyMCE)
 
     let editor = tinyMCE.get(editor_id)
 
@@ -901,12 +1084,12 @@ ${ afterProgress() }`,
   }
 
   const skeleton = () => {
-    if ( typeof MakeEl !== 'undefined' ){
+    if (typeof MakeEl !== 'undefined') {
 
       return MakeEl.Skeleton({
         style: {
-          padding: '10px'
-        }
+          padding: '10px',
+        },
       }, [
         'full',
         'full',
@@ -959,8 +1142,8 @@ ${ afterProgress() }`,
 
     let msg = __('Are you sure? This action cannot be undone.', 'groundhogg')
 
-    if ( e.currentTarget.dataset.name ){
-      msg = sprintf( __('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg' ), bold( e.currentTarget.dataset.name ) )
+    if (e.currentTarget.dataset.name) {
+      msg = sprintf(__('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg'), bold(e.currentTarget.dataset.name))
     }
 
     dangerModalLink(e, msg, {
@@ -2225,7 +2408,7 @@ ${ afterProgress() }`,
 
     const $el = $(selector)
 
-    $el.append( $menu )
+    $el.append($menu)
     $menu.focus()
   }
 
@@ -2936,7 +3119,7 @@ ${ afterProgress() }`,
     webhook    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -5 1034 1034">
   <path fill="currentColor" d="M482 226h-1l-10 2q-33 4-64.5 18.5T351 285q-41 37-57 91-9 30-8 63t12 63q17 45 52 78l13 12-83 135q-26-1-45 7-30 13-45 40-7 15-9 31t2 32q8 30 33 48 15 10 33 14.5t36 2 34.5-12.5 27.5-25q12-17 14.5-39t-5.5-41q-1-5-7-14l-3-6 118-192q6-9 8-14l-10-3q-9-2-13-4-23-10-41.5-27.5T379 484q-17-36-9-75 4-23 17-43t31-34q37-27 82-27 27-1 52.5 9.5T597 345q17 16 26.5 38.5T634 429q0 17-6 42l70 19 8 1q14-43 7-86-4-33-19.5-63.5T654 288q-42-42-103-56-6-2-18-4l-14-2h-37zm18 124q-17 0-34 7t-30.5 20.5T416 409q-8 20-4 44 3 18 14 34t28 25q24 15 56 13 3 4 5 8l112 191q3 6 6 9 27-26 58.5-35.5t65-3.5 58.5 26q32 25 43.5 61.5t.5 73.5q-8 28-28.5 50T782 938q-31 13-66.5 8.5T652 922q-4-3-13-10l-5-6q-4 3-11 10l-47 46q23 23 52 38.5t61 21.5l22 4h39l28-5q64-13 110-60 22-22 36.5-50.5T944 851q5-36-2-71.5T917 715t-44-51-57-35q-34-14-70.5-16t-71.5 7l-17 5-81-137q13-19 16-37 5-32-13-60-16-25-44-35-17-6-35-6zM218 614q-58 13-100 53-47 44-61 105l-4 24v37l2 11q2 13 4 20 7 31 24.5 59t42.5 49q50 41 115 49 38 4 76-4.5t70-28.5q53-34 78-91 7-17 14-45 6-1 18 0l125 2q14 0 20 1 11 20 25 31t31.5 16 35.5 4q28-3 50-20 27-21 32-54 2-17-1.5-33T801 769q-16-22-41-32-17-7-35.5-6.5T689 738q-28 12-43 37l-3 6q-14 0-42-1l-113-1q-15-1-43-1l-50-1 3 17q8 43-13 81-14 27-40 45t-57 22q-35 6-70-7.5T161 892q-28-35-27-79 1-37 23-69 13-19 32-32t41-19l9-3z"/>
 </svg>`,
-    api: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    api        : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <path fill-rule="evenodd" fill="currentColor" d="M20 6H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2ZM9.29 14.8 9 13.73H7.16l-.29 1.07h-1.7L7 9.07h2.09L11 14.8Zm6.34-3.14a1.7 1.7 0 0 1-.36.64 1.82 1.82 0 0 1-.67.44 2.75 2.75 0 0 1-1 .17h-.44v1.89H11.6V9.09h2a2.43 2.43 0 0 1 1.62.47 1.67 1.67 0 0 1 .55 1.35 2.36 2.36 0 0 1-.14.75Zm2.58 3.14h-1.55V9.09h1.55Zm-9.76-3.27.24.93H7.48l.24-.93c0-.13.08-.28.12-.47s.09-.38.13-.57a4.63 4.63 0 0 0 .1-.48c0 .13.07.29.11.5l.15.58Zm5.59-1a.57.57 0 0 1 .16.43.75.75 0 0 1-.11.42.59.59 0 0 1-.27.22.9.9 0 0 1-.37.07h-.31v-1.33h.4a.63.63 0 0 1 .46.17Z"/>
 </svg>`,
     bounce     : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -3019,7 +3202,7 @@ ${ afterProgress() }`,
     isString,
     replacementsWidget,
     escHTML,
-    skeleton
+    skeleton,
   }
 
 } )(jQuery)

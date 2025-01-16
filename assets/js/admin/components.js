@@ -1290,8 +1290,10 @@
       addMediaToBasicTinyMCE()
 
       let editor = tinymceElement('send-email-content', {
-        quicktags: false,
-        tinymce  : {
+        replacements: true,
+        savedReplies: true,
+        quicktags   : false,
+        tinymce     : {
           height: 300,
         },
       }, (content) => {
@@ -1340,7 +1342,7 @@
 
           onSend({
             ...r,
-            email
+            email,
           })
 
           close()

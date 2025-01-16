@@ -619,6 +619,18 @@ h2.nav-tab-wrapper.gh {
   }
 }
 
+.saved-replies-widget {
+
+  > :first-child{
+    margin-bottom: 20px;
+  }
+
+  .reply {
+    padding: 10px 30px;
+    border-top: 1px solid $primary-dark-15;
+  }
+}
+
 .tasks-widget {
   overflow: auto;
 
@@ -1710,6 +1722,10 @@ button {
     display: none;
   }
 
+  .saved-replies-widget .reply{
+    margin: 0 -30px;
+  }
+
   &.send-email {
     bottom: 0;
     top: auto;
@@ -1906,6 +1922,7 @@ input.ui-autocomplete-input {
   input, select, textarea {
     //flex-grow: 1;
     margin: 0;
+    min-width: 0;
 
     &.bigger {
       flex-grow: 2;

@@ -476,6 +476,14 @@ h2.nav-tab-wrapper.gh button .dashicons {
   margin-left: 2em;
 }
 
+.saved-replies-widget > :first-child {
+  margin-bottom: 20px;
+}
+.saved-replies-widget .reply {
+  padding: 10px 30px;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+
 .tasks-widget {
   overflow: auto;
 }
@@ -1605,6 +1613,9 @@ button.gh-submit .gh-spinner {
 .gh-modal.hidden {
   display: none;
 }
+.gh-modal .saved-replies-widget .reply {
+  margin: 0 -30px;
+}
 .gh-modal.send-email {
   bottom: 0;
   top: auto;
@@ -1752,6 +1763,7 @@ input.ui-autocomplete-input.focus-visible {
 .input-wrap select,
 .input-wrap textarea {
   margin: 0;
+  min-width: 0;
 }
 .gh-input-group input.bigger, .gh-input-group select.bigger, .gh-input-group textarea.bigger,
 .input-wrap input.bigger,

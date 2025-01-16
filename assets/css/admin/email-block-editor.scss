@@ -23,17 +23,6 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
-.mce-ico {
-  &.mce-i-gh_replacements {
-
-    font-family: 'dashicons';
-
-    &::before {
-      content: "\f110";
-    }
-  }
-}
-
 @keyframes skeleton-loading {
   0% {
     background-color: $primary-dark-5;

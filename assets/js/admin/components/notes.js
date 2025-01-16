@@ -12,22 +12,38 @@
     tooltip,
     dangerConfirmationModal,
   } = Groundhogg.element
-  const { post, get, patch, routes, ajax } = Groundhogg.api
+  const {
+    post,
+    get,
+    patch,
+    routes,
+    ajax,
+  } = Groundhogg.api
   const { userHasCap } = Groundhogg.user
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
-  const { sprintf, __, _x, _n } = wp.i18n
+  const {
+    formatNumber,
+    formatTime,
+    formatDate,
+    formatDateTime,
+  } = Groundhogg.formatting
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
 
   const typeToIcon = {
-    call: icons.phone,
-    note: icons.note,
-    email: icons.email,
+    call   : icons.phone,
+    note   : icons.note,
+    email  : icons.email,
     meeting: icons.contact,
   }
 
   const noteTypes = {
-    note: __('Note', 'groundhogg'),
-    call: __('Call', 'groundhogg'),
-    email: __('Email', 'groundhogg'),
+    note   : __('Note', 'groundhogg'),
+    call   : __('Call', 'groundhogg'),
+    email  : __('Email', 'groundhogg'),
     meeting: __('Meeting', 'groundhogg'),
   }
 
@@ -70,7 +86,7 @@
               </div>
           </div>`
     },
-    addNote: () => {
+    addNote : () => {
       // language=HTML
       return `
           <div class="add-note">
@@ -90,11 +106,18 @@
 
     note: (note) => {
 
-      const { content, type, context, user_id, date_created, timestamp } = note.data
+      const {
+        content,
+        type,
+        context,
+        user_id,
+        date_created,
+        timestamp,
+      } = note.data
 
       const addedBy = () => {
 
-        let date_created = `<abbr title="${ formatDateTime( note.data.date_created ) }">${ note.i18n.time_diff }</abbr>`
+        let date_created = `<abbr title="${ formatDateTime(note.data.date_created) }">${ note.i18n.time_diff }</abbr>`
 
         switch (context) {
           case 'user':
@@ -150,7 +173,7 @@
   }) => {
 
     let state = {
-      adding: false,
+      adding : false,
       editing: false,
     }
 
@@ -161,7 +184,8 @@
       try {
         wp.editor.remove('edit-note-editor')
         wp.editor.remove('add-note-editor')
-      } catch (e) {
+      }
+      catch (e) {
 
       }
 
@@ -215,7 +239,7 @@
       }
 
       tooltip(`${ selector } .note-add`, {
-        content: __('Add Note', 'groundhogg'),
+        content : __('Add Note', 'groundhogg'),
         position: 'left',
       })
 
@@ -225,13 +249,14 @@
           object_id,
           object_type,
           content: '',
-          type: 'note',
+          type   : 'note',
         }
 
         addMediaToBasicTinyMCE()
 
         let editor = tinymceElement('add-note-editor', {
-          quicktags: false,
+          quicktags    : false,
+          noteTemplates: true,
         }, (content) => {
           newNote.content = content
         })
@@ -265,7 +290,7 @@
 
         const updateNote = {
           content: editedNote.data.content,
-          type: editedNote.data.type,
+          type   : editedNote.data.type,
         }
 
         let editor = tinymceElement('edit-note-editor', {
@@ -305,15 +330,15 @@
         const belongsToMe = () => note().data.user_id == Groundhogg.currentUser.ID
 
         moreMenu(e.currentTarget, {
-          items: [
+          items   : [
             {
-              key: 'edit',
-              cap: belongsToMe() ? 'edit_notes' : 'edit_others_notes',
+              key : 'edit',
+              cap : belongsToMe() ? 'edit_notes' : 'edit_others_notes',
               text: __('Edit'),
             },
             {
-              key: 'delete',
-              cap: belongsToMe() ? 'delete_notes' : 'delete_others_notes',
+              key : 'delete',
+              cap : belongsToMe() ? 'delete_notes' : 'delete_others_notes',
               text: `<span class="gh-text danger">${ __('Delete') }</span>`,
             },
           ].filter(i => userHasCap(i.cap)),
@@ -325,7 +350,7 @@
               case 'delete':
 
                 dangerConfirmationModal({
-                  alert: `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
+                  alert    : `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
                   onConfirm: () => {
                     NotesStore.delete(curNote).then(() => render())
                   },

@@ -287,7 +287,7 @@ class Scripts {
 			'jquery',
 			'moment',
 			'jquery-ui-sortable',
-			'groundhogg-admin-notes',
+			'groundhogg-admin-saved-replies',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-components',
 			'groundhogg-admin-properties',
@@ -322,6 +322,10 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-notes', GROUNDHOGG_ASSETS_URL . 'js/admin/components/notes' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-saved-replies', GROUNDHOGG_ASSETS_URL . 'js/admin/components/replies' . $dot_min . '.js', [
+			'groundhogg-admin-notes',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-tasks', GROUNDHOGG_ASSETS_URL . 'js/admin/components/tasks' . $dot_min . '.js', [

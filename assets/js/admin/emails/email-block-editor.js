@@ -2121,15 +2121,15 @@
     blocks: {},
   }
 
-  const fetchPropsWithDynamicReplacements = Groundhogg.functions.debounce( ( block, cacheKey, render ) => {
+  const fetchPropsWithDynamicReplacements = Groundhogg.functions.debounce((block, cacheKey, render) => {
     get(`${ EmailsStore.route }/blocks/replacements?props=${ cacheKey }`).then(r => {
       dynamicContentCache.set(cacheKey, r.props)
       morph(`#dynamic-replacements-${ block.id }`, render({
         ...block,
         ...r.props,
-      }), false )
+      }), false)
     })
-  }, 1000 )
+  }, 1000)
 
   /**
    * Wrapper to enable showing dynamic replacements in the editor
@@ -2138,9 +2138,9 @@
    * @param supportedProps
    * @returns {(function(*): (*))|*}
    */
-  const withDynamicReplacements = ( render, supportedProps = [] ) => {
+  const withDynamicReplacements = (render, supportedProps = []) => {
 
-    if ( ! supportedProps || ! supportedProps.length ){
+    if (!supportedProps || !supportedProps.length) {
       return render
     }
 
@@ -2175,7 +2175,7 @@
         })
       }
 
-      fetchPropsWithDynamicReplacements( block, cacheKey, render )
+      fetchPropsWithDynamicReplacements(block, cacheKey, render)
 
       return Div({ id: `dynamic-replacements-${ block.id }` }, Div({ className: 'dynamic-content-loader' }, render(block)))
     }
@@ -2205,12 +2205,12 @@
       edit = html
     }
 
-    let supportedProps = Object.keys( replacementsSupport )
+    let supportedProps = Object.keys(replacementsSupport)
 
     // dynamically fetch replacements for the supported properties
     if (supportedProps.length) {
-      html = withDynamicReplacements( html, supportedProps.filter( prop => replacementsSupport[prop].html ) )
-      edit = withDynamicReplacements( edit, supportedProps.filter( prop => replacementsSupport[prop].edit ) )
+      html = withDynamicReplacements(html, supportedProps.filter(prop => replacementsSupport[prop].html))
+      edit = withDynamicReplacements(edit, supportedProps.filter(prop => replacementsSupport[prop].edit))
     }
 
     BlockRegistry.blocks[type] = {
@@ -6611,21 +6611,6 @@
       doc.body.childNodes)
   }
 
-  // add the groundhogg replacements button to tinyMCE
-  $(document).on('tinymce-editor-setup', function (event, editor) {
-    editor.settings.toolbar1 += ',gh_replacements'
-
-    editor.addButton('gh_replacements', {
-      title  : 'Replacements',
-      image  : '',
-      onclick: e => {
-        Groundhogg.element.replacementsWidget({
-          target: e.target,
-        }).mount()
-      },
-    })
-  })
-
   const LinkPicker = props => Autocomplete({
     ...props,
     fetchResults: async search => {
@@ -6751,11 +6736,12 @@
             onCreate: el => {
               setTimeout(() => {
                 tinymceElement(editorId, {
-                    tinymce  : {
+                    replacements: true,
+                    tinymce     : {
                       content_style: tinyMceCSS(),
                       height, // inline: true,
                     },
-                    quicktags: true,
+                    quicktags   : true,
                   },
                   (newContent) => {
                     content = newContent
@@ -7784,14 +7770,14 @@
 
   // Register the html block
   registerBlock('html', 'HTML', {
-    attributes: {
+    attributes         : {
       content: el => el.innerHTML,
     },
     replacementsSupport: {
       content: {
         edit: true,
         html: true,
-      }
+      },
     },
 // language=HTML
     svg      : `
