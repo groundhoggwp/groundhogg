@@ -35,7 +35,7 @@ $background-color: #F6F9FB;
     }
   }
 
-  &.mce-i-gh_saved_replies {
+  &.mce-i-gh_saved_reply {
     font-family: 'dashicons';
 
     &::before {
@@ -43,8 +43,8 @@ $background-color: #F6F9FB;
     }
   }
 
-  &.mce-i-gh_task_templates,
-  &.mce-i-gh_note_templates {
+  &.mce-i-gh_task_template,
+  &.mce-i-gh_note_template {
     font-family: 'dashicons';
 
     &::before {

@@ -510,7 +510,7 @@ h2.nav-tab-wrapper.gh {
 #tasks-here {
   .notes-widget,
   .tasks-widget {
-    margin: auto -20px;
+    //margin: auto -20px;
 
     .notes-header,
     .tasks-header {
@@ -545,10 +545,18 @@ h2.nav-tab-wrapper.gh {
 .notes-widget {
   overflow: auto;
 
+  form {
+    padding-bottom: 10px;
+  }
+
   .notes-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    #add-notes {
+      margin-left: auto;
+    }
 
     h3 {
       font-size: 14px;
@@ -569,18 +577,12 @@ h2.nav-tab-wrapper.gh {
     width: fit-content;
   }
 
-  .add-note {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-top: 1px solid $primary-dark-10;
-  }
-
   .note {
     border-top: 1px solid $primary-dark-10;
     padding-top: 10px;
     //margin-top: 10px;
-    display: flex;
-    gap: 20px;
+    //display: flex;
+    //gap: 20px;
     //align-items: center;
 
     > .icon {
@@ -590,13 +592,46 @@ h2.nav-tab-wrapper.gh {
 
     .note-header {
       display: flex;
-      font-weight: 500;
-      color: $primary-dark-30;
+      gap: 10px;
       align-items: center;
       justify-content: space-between;
 
+      > svg {
+        width: 18px;
+        height: 18px;
+        color: $primary-dark-30;
+      }
+
+      .added-by{
+        font-size: 12px;
+      }
+
       .summary {
         color: $primary-dark;
+      }
+
+      input.select-note {
+        display: none;
+      }
+
+      input.select-note:checked {
+        display: block;
+      }
+
+      &:has(input.select-note:checked) {
+        > svg {
+          display: none;
+        }
+      }
+
+      &:hover {
+        input.select-note {
+          display: block;
+        }
+
+        > svg {
+          display: none;
+        }
       }
     }
 
@@ -621,7 +656,7 @@ h2.nav-tab-wrapper.gh {
 
 .saved-replies-widget {
 
-  > :first-child{
+  > :first-child {
     margin-bottom: 20px;
   }
 
@@ -668,12 +703,12 @@ h2.nav-tab-wrapper.gh {
     border-top: 1px solid $primary-dark-10;
     padding-top: 10px;
 
-    &:has( .task-activity-timeline, .toggle-activity ){
+    &:has( .task-activity-timeline, .toggle-activity ) {
       padding-bottom: 10px;
     }
 
     &.hide-timeline {
-      .task-activity-timeline{
+      .task-activity-timeline {
         display: none;
       }
     }
@@ -704,12 +739,14 @@ h2.nav-tab-wrapper.gh {
           //box-shadow: $box-shadow;
           border-radius: 4px;
 
-          > *{
+          > * {
             line-height: 1.1;
           }
+
           > *:first-child {
             margin-top: 0;
           }
+
           > *:last-child {
             margin-bottom: 0;
           }
@@ -736,7 +773,7 @@ h2.nav-tab-wrapper.gh {
         margin-right: 5px;
       }
 
-      span.dashicons  {
+      span.dashicons {
         margin-right: 5px;
       }
 
@@ -768,12 +805,12 @@ h2.nav-tab-wrapper.gh {
       width: 100%;
       display: flex;
       font-weight: 500;
-      color: $primary-dark-30;
       align-items: center;
       gap: 10px;
 
       > svg {
         width: 18px;
+        color: $primary-dark-30;
       }
 
       .summary {
@@ -788,7 +825,7 @@ h2.nav-tab-wrapper.gh {
         display: block;
       }
 
-      &:has(input.select-task:checked){
+      &:has(input.select-task:checked) {
         > svg {
           display: none;
         }
@@ -798,6 +835,7 @@ h2.nav-tab-wrapper.gh {
         input.select-task {
           display: block;
         }
+
         > svg {
           display: none;
         }
@@ -826,10 +864,16 @@ h2.nav-tab-wrapper.gh {
 }
 
 .gh-panel {
+  > #notes-here > .notes-widget {
+    .notes-header {
+      padding: 10px;
+      margin-bottom: 0;
+    }
+  }
+
   > .tasks-widget {
     .tasks-header {
       padding: 10px;
-
     }
 
     .task {
@@ -899,7 +943,7 @@ body {
   position: relative;
   gap: 20px;
 
-  span.white-label-icon{
+  span.white-label-icon {
     height: 60px;
     padding: 10px;
     box-sizing: border-box;
@@ -1027,7 +1071,7 @@ a.action-link {
     font-size: 13px;
   }
 
-  &.bold{
+  &.bold {
     font-weight: 500;
   }
 
@@ -1379,7 +1423,7 @@ button {
       &.page-title-action {
         //padding: 0 10px;
 
-        &:has(.dashicons){
+        &:has(.dashicons) {
           display: flex;
           gap: 5px;
         }
@@ -1722,7 +1766,7 @@ button {
     display: none;
   }
 
-  .saved-replies-widget .reply{
+  .saved-replies-widget .reply {
     margin: 0 -30px;
   }
 
@@ -1888,7 +1932,7 @@ button {
       }
     }
 
-    .contact-list{
+    .contact-list {
       height: 500px;
       overflow: auto;
     }
@@ -2086,7 +2130,7 @@ p.error,
   }
 }
 
-button:has(.gh-dropdown-menu){
+button:has(.gh-dropdown-menu) {
   position: relative;
 }
 
@@ -2315,7 +2359,7 @@ button:has(.gh-dropdown-menu){
   //box-sizing: content-box;
 
   &.error,
-  &.gh-error{
+  &.gh-error {
 
     background-color: $error-red-10;
 
@@ -3157,7 +3201,7 @@ button:has(.gh-dropdown-menu){
     }
   }
 
-  .show-on-hover{
+  .show-on-hover {
     display: none;
     flex-direction: column;
     gap: 3px;
@@ -3181,7 +3225,7 @@ button:has(.gh-dropdown-menu){
     align-items: center;
 
     .contact-phone {
-      >svg {
+      > svg {
         width: 14px;
       }
 
@@ -3212,7 +3256,7 @@ button:has(.gh-dropdown-menu){
   }
 
   &:hover {
-    .show-on-hover{
+    .show-on-hover {
       display: flex;
     }
   }
@@ -3235,36 +3279,36 @@ button:has(.gh-dropdown-menu){
 }
 
 
-.gh-striped{
+.gh-striped {
   .row:nth-child(odd) {
     background-color: $primary-blue-2;
   }
 }
 
-.relationship-editor{
+.relationship-editor {
   h4 {
     margin: 0;
   }
 }
 
 .has-hover-actions {
-  .hover-actions{
+  .hover-actions {
     visibility: hidden;
     opacity: 0;
   }
 
   &:hover {
-    .hover-actions{
+    .hover-actions {
       visibility: visible;
       opacity: 1;
     }
   }
 }
 
-div:has( > button.hide-panel){
+div:has( > button.hide-panel) {
   position: relative;
 
-  > button.hide-panel{
+  > button.hide-panel {
     position: absolute;
     top: 3px;
     right: 3px;
@@ -3278,7 +3322,7 @@ div:has( > button.hide-panel){
     background-color: transparent;
     border-radius: 3px;
 
-    &:hover{
+    &:hover {
       background-color: $primary-dark-15;
     }
   }

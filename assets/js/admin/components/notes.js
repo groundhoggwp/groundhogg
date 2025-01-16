@@ -3,39 +3,33 @@
   const { notes: NotesStore } = Groundhogg.stores
   const {
     icons,
-    select,
     tinymceElement,
     addMediaToBasicTinyMCE,
     moreMenu,
-    spinner,
-    skeleton,
-    tooltip,
     dangerConfirmationModal,
+    adminPageURL,
+    dialog,
+    escHTML,
   } = Groundhogg.element
   const {
-    post,
-    get,
-    patch,
-    routes,
-    ajax,
-  } = Groundhogg.api
-  const { userHasCap } = Groundhogg.user
+    getOwner,
+  } = Groundhogg.user
   const {
-    formatNumber,
-    formatTime,
-    formatDate,
+    userHasCap,
+    getCurrentUser,
+  } = Groundhogg.user
+  const {
     formatDateTime,
   } = Groundhogg.formatting
   const {
     sprintf,
     __,
-    _x,
-    _n,
   } = wp.i18n
 
   const typeToIcon = {
-    call   : icons.phone,
     note   : icons.note,
+    task   : icons.tasks,
+    call   : icons.phone,
     email  : icons.email,
     meeting: icons.contact,
   }
@@ -47,337 +41,585 @@
     meeting: __('Meeting', 'groundhogg'),
   }
 
-  const templates = {
+  const addedBy = (note) => {
 
-    notes: (notes, adding = false, editing = false, title) => {
+    const {
+      context,
+      user_id,
+    } = note.data
 
-      // language=HTML
-      return `
-          <div class="notes-widget">
-              <div class="notes-header">
-                  <h3>${ title }</h3>
-                  <button class="gh-button text icon secondary note-add">
-                      <span class="dashicons dashicons-plus-alt2"></span>
-                  </button>
-              </div>
-              <div class="notes">
-                  ${ adding ? templates.addNote() : `` }
-                  ${ notes.sort((a, b) => b.data.timestamp - a.data.timestamp).
-                          map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).
-                          join('') }
-              </div>
-          </div>`
-    },
+    let date_created = `<abbr title="${ formatDateTime(note.data.date_created) }">${ note.i18n.time_diff }</abbr>`
 
-    editNote: (note) => {
-      // language=HTML
-      return `
-          <div class="add-note">
-              <textarea id="edit-note-editor">${ note.data.content }</textarea>
-              <div class="actions space-above-5 display-flex space-between align-bottom">
-                  <div>
-                      <label>${ __('Note type', 'groundhogg') }<br>
-                          ${ select({ id: 'note-type' }, noteTypes, note.data.type) }</label>
-                  </div>
-                  <div class="display-flex flex-end gap-5">
-                      <button class="gh-button danger text cancel">${ __('Cancel') }</button>
-                      <button class="gh-button primary save">${ __('Save') }</button>
-                  </div>
-              </div>
-          </div>`
-    },
-    addNote : () => {
-      // language=HTML
-      return `
-          <div class="add-note">
-              <textarea id="add-note-editor"></textarea>
-              <div class="actions space-above-5 display-flex space-between align-bottom">
-                  <div>
-                      <label>${ __('Note type', 'groundhogg') }<br>
-                          ${ select({ id: 'note-type' }, noteTypes) }</label>
-                  </div>
-                  <div class="display-flex flex-end gap-5">
-                      <button class="gh-button danger text cancel">${ __('Cancel') }</button>
-                      <button class="gh-button primary create">${ __('Create') }</button>
-                  </div>
-              </div>
-          </div>`
-    },
+    let name
 
-    note: (note) => {
+    switch (context) {
+      case 'user':
+        let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
 
-      const {
-        content,
-        type,
-        context,
-        user_id,
-        date_created,
-        timestamp,
-      } = note.data
-
-      const addedBy = () => {
-
-        let date_created = `<abbr title="${ formatDateTime(note.data.date_created) }">${ note.i18n.time_diff }</abbr>`
-
-        switch (context) {
-          case 'user':
-            let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
-            let username
-
-            if (!user) {
-              username = __('Unknown')
-            }
-            else {
-              username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
-            }
-
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, date_created)
-
-          default:
-          case 'system':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), date_created)
-          case 'funnel':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), date_created)
+        if (!user) {
+          name = __('Unknown')
         }
-      }
+        else {
+          name = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
+        }
 
-      // language=HTML
-      return `
-          <div class="note">
-              <div class="icon">
-                  ${ typeToIcon[type] }
-              </div>
-              <div style="width: 100%">
-                  <div class="note-header">
-                      <span class="added-by">${ addedBy() }</span>
-                      <div class="actions">
-                          <button class="gh-button text icon secondary note-more" data-id="${ note.ID }">
-                              ${ icons.verticalDots }
-                          </button>
-                      </div>
-                  </div>
-                  <div class="note-content">
-                      ${ content }
-                  </div>
-              </div>
+        break
+      default:
+      case 'system':
+        name = __('System')
+        break
+      case 'funnel':
+        name = __('Funnel')
+        break
+    }
 
-          </div>`
-    },
-
+    return sprintf(__('Added by %s %s ago', 'groundhogg'), name, date_created)
   }
 
-  const Notes = (selector, {
+  const {
+    Div,
+    Form,
+    Span,
+    H3,
+    Button,
+    Dashicon,
+    ToolTip,
+    Fragment,
+    Skeleton,
+    Label,
+    Select,
+    Input,
+    Textarea,
+    Pg,
+  } = MakeEl
+
+  const TimeLine = (activity) => {
+
+    if (!activity || !activity.length) {
+      return null
+    }
+
+    const Activity = activity => {
+
+      const {
+        note = '',
+        outcome = '',
+      } = activity.meta
+
+      const {
+        activity_type = '',
+      } = activity.data
+
+      const {
+        diff_time = '',
+        wp_date = '',
+      } = activity.i18n
+
+      return Div({
+        className: `note-activity-item ${ activity_type }`,
+      }, [
+        Div({
+          className: 'display-flex gap-5 align-center',
+        }, [
+          Span({ className: 'timeline-dot' }, [
+            ToolTip(diff_time, 'right'),
+          ]),
+          // Span({ className: 'note-activity-type' }, activity_type),
+          outcome ? Span({ className: 'note-activity-outcome pill semi-dark' }, outcome) : null,
+          note ? Div({ className: 'note-activity-note' }, note) : null,
+        ]),
+      ])
+    }
+
+    return Div({
+      className: 'note-activity-timeline display-flex column gap-10 align-top',
+    }, [
+      ...activity.map(Activity),
+    ])
+  }
+
+  const BetterObjectNotes = ({
     object_type = '',
     object_id = 0,
     title = __('Notes', 'groundhogg'),
-  }) => {
+    ...props
+  } = {}) => {
 
-    let state = {
-      adding : false,
-      editing: false,
-    }
+    const State = Groundhogg.createState({
+      adding      : false,
+      editing     : false,
+      bulk_edit   : false,
+      notes       : [],
+      selected    : [],
+      loaded      : false,
+      edit_content: '',
+      edit_type   : 'note',
+      myNotes     : !( object_id && object_type ),
+    })
 
-    const $el = $(selector)
+    const clearEditState = () => State.set({
+      edit_summary: '',
+      edit_content: '',
+      edit_type   : 'note',
+      editing     : false,
+      adding      : false,
+    })
 
-    const render = () => {
+    const fetchNotes = () => {
 
-      try {
-        wp.editor.remove('edit-note-editor')
-        wp.editor.remove('add-note-editor')
+      let query = {
+        limit  : 99,
+        orderby: 'date_created',
+        order  : 'DESC',
       }
-      catch (e) {
 
-      }
-
-      const notes = NotesStore.filter(({ data }) => data.object_type == object_type && data.object_id == object_id).
-        sort((a, b) => b.data.timestamp - a.data.timestamp)
-
-      $el.html(templates.notes(notes, state.adding, state.editing, title))
-      onMount()
-    }
-
-    const onMount = () => {
-
-      const addNote = () => {
-        if (state.editing) {
-          wp.editor.remove('edit-note-editor')
-          state.editing = false
+      // notes for anything, but only assigned to the current user
+      if (!object_type && !object_id) {
+        query = {
+          user_id   : getCurrentUser().ID,
+          incomplete: true,
+          ...query,
         }
-
-        state.adding = true
-
-        render()
       }
-
-      const editNote = (id) => {
-
-        if (state.adding) {
-          wp.editor.remove('add-note-editor')
-          state.adding = false
-        }
-
-        if (state.editing) {
-          wp.editor.remove('edit-note-editor')
-        }
-
-        state.editing = id
-
-        render()
-      }
-
-      $(`${ selector } .note-add`).on('click', () => {
-
-        if (this.adding) {
-          return
-        }
-
-        addNote()
-      })
-
-      if (!userHasCap('add_notes')) {
-        $('.note-add').remove()
-      }
-
-      tooltip(`${ selector } .note-add`, {
-        content : __('Add Note', 'groundhogg'),
-        position: 'left',
-      })
-
-      if (state.adding) {
-
-        const newNote = {
+      else {
+        query = {
           object_id,
           object_type,
-          content: '',
-          type   : 'note',
+          ...query,
         }
-
-        addMediaToBasicTinyMCE()
-
-        let editor = tinymceElement('add-note-editor', {
-          quicktags    : false,
-          noteTemplates: true,
-        }, (content) => {
-          newNote.content = content
-        })
-
-        $(`${ selector } #note-type`).on('change', (e) => {
-          newNote.type = e.target.value
-        })
-
-        $(`${ selector } .cancel`).on('click', () => {
-          state.adding = false
-          render()
-        })
-
-        $(`${ selector } .create`).on('click', () => {
-          state.adding = false
-          state.editing = false
-
-          NotesStore.post({
-            data: {
-              ...newNote,
-              content: editor.getContent({ format: 'raw' }),
-            },
-          }).then(() => {
-            render()
-          })
-        })
-      }
-      else if (state.editing) {
-
-        const editedNote = NotesStore.get(state.editing)
-
-        const updateNote = {
-          content: editedNote.data.content,
-          type   : editedNote.data.type,
-        }
-
-        let editor = tinymceElement('edit-note-editor', {
-          quicktags: false,
-        }, (content) => {
-          updateNote.content = content
-        })
-
-        $(`${ selector } #note-type`).on('change', (e) => {
-          updateNote.type = e.target.value
-        })
-
-        $(`${ selector } .cancel`).on('click', () => {
-          state.editing = false
-          render()
-        })
-
-        $(`${ selector } .save`).on('click', () => {
-          state.adding = false
-
-          NotesStore.patch(state.editing, {
-            data: {
-              ...updateNote,
-              content: editor.getContent({ format: 'raw' }),
-            },
-          }).then(() => {
-            state.editing = false
-            render()
-          })
-        })
       }
 
-      $(`${ selector } .note-more`).on('click', (e) => {
+      return NotesStore.fetchItems(query).then(notes => {
 
-        const curNote = parseInt(e.currentTarget.dataset.id)
-        const note = () => NotesStore.get(curNote)
-        const belongsToMe = () => note().data.user_id == Groundhogg.currentUser.ID
+        State.set({
+          loaded: true,
+          notes : notes.map(({ ID }) => ID),
+        })
 
-        moreMenu(e.currentTarget, {
-          items   : [
-            {
-              key : 'edit',
-              cap : belongsToMe() ? 'edit_notes' : 'edit_others_notes',
-              text: __('Edit'),
-            },
-            {
-              key : 'delete',
-              cap : belongsToMe() ? 'delete_notes' : 'delete_others_notes',
-              text: `<span class="gh-text danger">${ __('Delete') }</span>`,
-            },
-          ].filter(i => userHasCap(i.cap)),
-          onSelect: (k) => {
-            switch (k) {
-              case 'edit':
-                editNote(curNote)
-                break
-              case 'delete':
+        return notes
 
-                dangerConfirmationModal({
-                  alert    : `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
-                  onConfirm: () => {
-                    NotesStore.delete(curNote).then(() => render())
-                  },
+      })
+    }
+
+    return Div({
+      ...props,
+
+      id       : 'my-notes',
+      className: 'notes-widget',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        fetchNotes().then(morph)
+
+        return Skeleton({}, [
+          'full',
+          'full',
+          'full',
+        ])
+
+      }
+
+      /**
+       * The form for adding/editing the note details
+       *
+       * @returns {*}
+       * @constructor
+       */
+      const NoteDetails = () => {
+
+        return Form({
+          className: 'note display-grid gap-10',
+          onSubmit : e => {
+            e.preventDefault()
+
+            if (State.adding) {
+
+              NotesStore.post({
+                force: 1,
+                data: {
+                  object_id,
+                  object_type,
+                  content: State.edit_content,
+                  user_id: getCurrentUser().ID,
+                  type   : State.edit_type,
+                },
+              }).then(note => {
+
+                State.set({
+                  adding: false,
+                  notes : [
+                    note.ID,
+                    ...State.notes,
+                  ], // add the new note ID
                 })
 
-                break
-            }
-          },
-        })
-      })
-    }
+                clearEditState()
 
-    if (!NotesStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
-      $el.html(skeleton())
-      NotesStore.fetchItems({
-        object_id,
-        object_type,
-        limit: 9999,
-      }).then(() => {
-        render()
-      })
-    }
-    else {
-      render()
-    }
+                morph()
+              })
+
+            }
+            else {
+
+              NotesStore.patch(State.editing, {
+                data: {
+                  content: State.edit_content,
+                  type   : State.edit_type,
+                },
+              }).then(() => {
+
+                clearEditState()
+
+                morph()
+
+              })
+            }
+
+          },
+        }, [
+          Div({
+            className: 'full',
+          }, [
+            Label({
+              for: 'edit-note-content',
+            }, __('Details')),
+            Textarea({
+              id       : 'edit-note-content',
+              className: 'full-width',
+              value    : State.edit_content,
+              onCreate : el => {
+                try {
+                  wp.editor.remove('edit-note-content')
+                }
+                catch (err) {
+
+                }
+
+                setTimeout(() => {
+                  addMediaToBasicTinyMCE()
+                  tinymceElement('edit-note-content', {
+                    quicktags    : false,
+                    noteTemplates: true,
+                  }, content => {
+                    State.set({
+                      edit_content: content,
+                    })
+                  })
+                }, 10)
+              },
+            }),
+          ]),
+          Div({
+            className: 'full display-flex flex-end gap-5 align-bottom',
+          }, [
+            Div({
+              className: '',
+            }, [
+              Label({
+                for: 'note-type',
+              }, __('Type')),
+              `<br>`,
+              Select({
+                id      : 'note-type',
+                options : noteTypes,
+                selected: State.edit_type,
+                onChange: e => State.set({
+                  edit_type: e.target.value,
+                }),
+              }),
+            ]),
+            Button({
+              className: 'gh-button danger text',
+              id       : 'cancel-note-changes',
+              type     : 'button',
+              style    : {
+                marginLeft: 'auto',
+              },
+              onClick  : e => {
+                clearEditState()
+                State.set({
+                  adding : false,
+                  editing: false,
+                })
+
+                morph()
+              },
+            }, 'Cancel'),
+            Button({
+              className: 'gh-button primary',
+              id       : 'update-note',
+              type     : 'submit',
+            }, State.adding ? 'Create Note' : 'Update Note'),
+          ]),
+        ])
+      }
+
+      /**
+       * The note itself
+       *
+       * @param note
+       * @returns {*}
+       * @constructor
+       */
+      const Note = note => {
+
+        const {
+          content,
+          type,
+          user_id,
+        } = note.data
+
+        /**
+         * If the note belongs to the current user
+         *
+         * @returns {boolean}
+         */
+        const belongsToMe = () => user_id == Groundhogg.currentUser.ID
+
+        return Div({
+          className: `note ${type}`,
+          id       : `note-item-${ note.ID }`,
+          dataId   : note.ID,
+        }, noteMorph => Fragment([
+
+          Div({
+            className: 'note-header',
+          }, [
+            typeToIcon[type],
+            Input({
+              type     : 'checkbox',
+              name     : 'notes[]',
+              className: 'select-note',
+              checked  : State.selected.includes(note.ID),
+              onChange : e => {
+                if (e.target.checked) {
+                  State.selected.push(note.ID)
+                }
+                else {
+                  State.set({
+                    selected: State.selected.filter(id => id !== note.ID),
+                  })
+                }
+                morph()
+              },
+            }),
+            Span({ className: 'added-by' }, addedBy(note)),
+            Div({
+              className: 'display-flex',
+              style    : {
+                marginLeft: 'auto',
+              },
+            }, [
+              Button({
+                id       : `note-actions-${ note.ID }`,
+                className: 'gh-button text icon secondary note-more',
+                onClick  : e => {
+
+                  let items = [
+                    {
+                      key     : 'edit',
+                      cap     : belongsToMe() ? 'edit_notes' : 'edit_others_notes',
+                      text    : __('Edit'),
+                      onSelect: () => {
+                        clearEditState()
+                        State.set({
+                          editing     : note.ID,
+                          edit_content: content,
+                          edit_type   : type,
+                        })
+                        morph()
+                      },
+                    },
+                    {
+                      key     : 'delete',
+                      cap     : belongsToMe() ? 'delete_notes' : 'delete_others_notes',
+                      text    : `<span class="gh-text danger">${ __('Delete') }</span>`,
+                      onSelect: () => {
+                        dangerConfirmationModal({
+                          alert    : `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
+                          onConfirm: () => {
+                            NotesStore.delete(note.ID).then(() => {
+                              // also remove from state
+                              State.notes.splice(State.notes.indexOf(note.ID), 1)
+                              morph()
+                            })
+                          },
+                        })
+                      },
+                    },
+                  ]
+
+                  moreMenu(e.currentTarget, items.filter(i => userHasCap(i.cap)))
+
+                },
+              }, icons.verticalDots),
+            ]),
+          ]),
+          Div({
+            className: 'note-content space-above-10',
+          }, content),
+        ]))
+      }
+
+      let notes = State.notes.map(id => NotesStore.get(id))
+
+      return Fragment([
+        title ? H3({}, title) : null,
+
+        object_id || notes.length ? Div({
+          className: 'notes-header',
+        }, [
+          userHasCap('add_notes') && object_id ? Button({
+            id       : 'add-notes',
+            className: 'gh-button secondary text icon',
+            onClick  : e => {
+
+              if (State.editing) {
+                clearEditState()
+              }
+
+              State.set({
+                adding: true,
+              })
+
+              morph()
+            },
+          }, [
+            Dashicon('plus-alt2'),
+            ToolTip('Add Note', 'left'),
+          ]) : null,
+        ]) : null,
+        State.selected.length ? Div({
+          className: 'display-flex gap-5',
+          style    : {
+            padding: '0 0 10px 10px',
+          },
+        }, [
+          // Edit
+          !userHasCap('edit_notes') ? null : Button({
+            className: `gh-button ${ State.bulk_edit ? 'primary' : 'secondary' } small`,
+            onClick  : e => {
+              State.set({
+                bulk_edit: !State.bulk_edit,
+              })
+
+              if (State.bulk_edit) {
+                clearEditState()
+                State.set({
+                  edit_type: '', // no default type
+                })
+              }
+              morph()
+            },
+          }, __('Edit')),
+          // Delete
+          !userHasCap('delete_notes') ? null : Button({
+            className: 'gh-button danger small',
+            disabled : State.bulk_edit,
+            onClick  : e => {
+              dangerConfirmationModal({
+                alert    : `<p>${ sprintf(__('Are you sure you want to delete these %d notes?', 'groundhogg'), State.selected.length) }</p>`,
+                onConfirm: () => {
+                  NotesStore.deleteMany({
+                    include: State.selected,
+                  }).then(() => {
+                    dialog({
+                      message: sprintf('%d notes deleted!', State.selected.length),
+                    })
+                    // also remove from state
+                    State.set({
+                      notes   : State.notes.filter(note => !State.selected.includes(note)),
+                      selected: [],
+                    })
+                    morph()
+                  })
+                },
+              })
+            },
+          }, __('Delete')),
+          // Deselect all
+          Button({
+            className: 'gh-button secondary text small',
+            onClick  : e => {
+              State.set({
+                bulk_edit: false,
+                selected : [],
+              })
+              morph()
+            },
+          }, __('Clear Selection')),
+        ]) : null,
+        // Bulk Edit
+        State.bulk_edit ? Div({
+          className: 'display-flex gap-10 align-bottom flex-wrap',
+          style    : {
+            padding: '0 10px 10px 10px',
+          },
+        }, [
+
+          Div({}, [
+            Label({
+              for: 'note-type',
+            }, __('Type')),
+            `<br>`,
+            Select({
+              id      : 'note-type',
+              options : {
+                '': 'No change',
+                ...noteTypes,
+              },
+              selected: State.edit_type,
+              onChange: e => State.set({
+                edit_type: e.target.value,
+              }),
+            }),
+          ]),
+          Button({
+            className: 'gh-button primary',
+            onClick  : e => {
+
+              let data = {}
+
+              if (State.edit_type) {
+                data.type = State.edit_type
+              }
+
+              NotesStore.patchMany({
+                query: {
+                  include: State.selected,
+                },
+                data,
+              }).then(() => {
+                clearEditState()
+                State.set({
+                  bulk_edit: false,
+                })
+                dialog({
+                  message: sprintf('%d notes updated!', State.selected.length),
+                })
+                morph()
+              })
+            },
+          }, __('Update')),
+        ]) : null,
+        // Add Note Form
+        State.adding ? NoteDetails() : null,
+        ...notes.map(note => State.editing == note.ID ? NoteDetails(note) : Note(note)),
+        notes.length || State.adding ? null : Pg({
+          style: {
+            textAlign: 'center',
+          },
+        }, __('No notes yet.', 'groundhogg')),
+      ])
+    })
   }
 
-  Groundhogg.noteEditor = Notes
+  Groundhogg.noteEditor = (selector, props = {}) => {
+    let el = document.querySelector(selector)
+    el.append(BetterObjectNotes(props))
+  }
+
+  Groundhogg.ObjectNotes = BetterObjectNotes
 
 } )(jQuery)

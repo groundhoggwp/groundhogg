@@ -5,16 +5,16 @@
 .mce-ico.mce-i-gh_replacements::before {
   content: "";
 }
-.mce-ico.mce-i-gh_saved_replies {
+.mce-ico.mce-i-gh_saved_reply {
   font-family: "dashicons";
 }
-.mce-ico.mce-i-gh_saved_replies::before {
+.mce-ico.mce-i-gh_saved_reply::before {
   content: "";
 }
-.mce-ico.mce-i-gh_task_templates, .mce-ico.mce-i-gh_note_templates {
+.mce-ico.mce-i-gh_task_template, .mce-ico.mce-i-gh_note_template {
   font-family: "dashicons";
 }
-.mce-ico.mce-i-gh_task_templates::before, .mce-ico.mce-i-gh_note_templates::before {
+.mce-ico.mce-i-gh_task_template::before, .mce-ico.mce-i-gh_note_template::before {
   content: "";
 }
 

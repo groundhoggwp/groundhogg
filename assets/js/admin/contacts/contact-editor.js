@@ -1388,7 +1388,7 @@
           // language=HTML
           return `
               <div class="gh-panel top-left-square">
-                  <div class="inside" id="notes-here"></div>
+                  <div id="notes-here"></div>
               </div>`
         },
         onMount: () => {
@@ -1406,7 +1406,7 @@
           // language=HTML
           return `
               <div class="gh-panel top-left-square">
-                  <div class="inside" id="tasks-here"></div>
+                  <div id="tasks-here"></div>
               </div>`
         },
         onMount: () => {

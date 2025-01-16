@@ -759,16 +759,24 @@
     })
   }
 
-  const addSavedRepliesToolbarTinyMCE = (event, editor) => {
-    editor.settings.toolbar1 += ',gh_saved_replies'
+  const addTemplateButtonTinyMCE = ( event, editor, config ) => {
 
-    editor.addButton('gh_saved_replies', {
-      title  : 'Saved Replies',
+    const {
+      note_type = '',
+      plural,
+    } = config
+
+    const buttonId = `gh_${note_type}`
+
+    editor.settings.toolbar1 += ',' + buttonId
+
+    editor.addButton(buttonId, {
+      title  : plural,
       image  : '',
       onclick: async e => {
 
         let replies = await Groundhogg.stores.notes.fetchItems({
-          type: 'saved_reply'
+          type: note_type
         })
 
         return searchOptionsWidget( {
@@ -779,7 +787,7 @@
             {
               manage: 1,
               data: {
-                summary: '📝 Manage saved replies',
+                summary: `📝 Manage ${plural.toLowerCase()}`,
               }
             },
             ...replies
@@ -791,7 +799,7 @@
           onSelect    : (option) => {
 
             if ( option.manage === 1 ){
-              Groundhogg.SavedRepliesModal()
+              Groundhogg.SavedRepliesModal(config )
               return
             }
 
@@ -800,101 +808,26 @@
         }).mount()
       },
     })
+
   }
 
-  const addNoteTemplatesToolbarTinyMCE = (event, editor) => {
-    editor.settings.toolbar1 += ',gh_note_templates'
+  const addSavedRepliesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
+    single: 'Saved Reply',
+    plural: 'Saved Replies',
+    note_type: 'saved_reply'
+  })
 
-    editor.addButton('gh_note_templates', {
-      title  : 'Note Templates',
-      image  : '',
-      onclick: async e => {
+  const addNoteTemplatesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
+    single: 'Note Template',
+    plural: 'Note Templates',
+    note_type: 'note_template'
+  })
 
-        let replies = await Groundhogg.stores.notes.fetchItems({
-          type: 'note_template'
-        })
-
-        return searchOptionsWidget( {
-          position: 'fixed',
-          target  : e.target,
-          // filter out hidden codes
-          options     : [
-            {
-              manage: 1,
-              data: {
-                summary: '📝 Manage note templates',
-              }
-            },
-            ...replies
-          ],
-          filterOption: ({
-            data,
-          }, search) => data.summary.match(regexp(search)),
-          renderOption: (option) => option.data.summary,
-          onSelect    : (option) => {
-
-            if ( option.manage === 1 ){
-              Groundhogg.SavedRepliesModal({
-                single: 'Note Template',
-                plural: 'Note Templates',
-                note_type: 'note_template'
-              })
-              return
-            }
-
-            editor.execCommand('mceInsertContent', false, option.data.content )
-          },
-        }).mount()
-      },
-    })
-  }
-
-  const addTaskTemplatesToolbarTinyMCE = (event, editor) => {
-    editor.settings.toolbar1 += ',gh_task_templates'
-
-    editor.addButton('gh_task_templates', {
-      title  : 'Task Templates',
-      image  : '',
-      onclick: async e => {
-
-        let replies = await Groundhogg.stores.notes.fetchItems({
-          type: 'task_template'
-        })
-
-        return searchOptionsWidget( {
-          position: 'fixed',
-          target  : e.target,
-          // filter out hidden codes
-          options     : [
-            {
-              manage: 1,
-              data: {
-                summary: '📝 Manage task templates',
-              }
-            },
-            ...replies
-          ],
-          filterOption: ({
-            data,
-          }, search) => data.summary.match(regexp(search)),
-          renderOption: (option) => option.data.summary,
-          onSelect    : (option) => {
-
-            if ( option.manage === 1 ){
-              Groundhogg.SavedRepliesModal({
-                single: 'Task Template',
-                plural: 'Task Templates',
-                note_type: 'task_template'
-              })
-              return
-            }
-
-            editor.execCommand('mceInsertContent', false, option.data.content )
-          },
-        }).mount()
-      },
-    })
-  }
+  const addTaskTemplatesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
+    single: 'Task Template',
+    plural: 'Task Templates',
+    note_type: 'task_template'
+  })
 
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)

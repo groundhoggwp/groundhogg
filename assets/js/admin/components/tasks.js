@@ -81,26 +81,30 @@
 
     let date_created = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.i18n.time_diff }</abbr>`
 
+    let name = '';
+
     switch (context) {
       case 'user':
         let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
-        let username
 
         if (!user) {
-          username = __('Unknown')
+          name = __('Unknown')
         }
         else {
-          username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
+          name = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
         }
 
-        return sprintf(__('Added by %s %s ago', 'groundhogg'), username, date_created)
-
+        break
       default:
       case 'system':
-        return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), date_created)
+        name = __( 'System' )
+        break
       case 'funnel':
-        return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), date_created)
+        name = __( 'Funnel' )
+        break
     }
+
+    return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), date_created)
   }
 
   const openActivityForm = (type, taskId, onComplete = () => {}) => setTimeout(() => {
