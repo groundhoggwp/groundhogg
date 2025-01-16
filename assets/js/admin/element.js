@@ -799,7 +799,7 @@
           onSelect    : (option) => {
 
             if ( option.manage === 1 ){
-              Groundhogg.SavedRepliesModal(config )
+              Groundhogg.SavedRepliesModal(config)
               return
             }
 

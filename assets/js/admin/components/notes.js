@@ -7,9 +7,7 @@
     addMediaToBasicTinyMCE,
     moreMenu,
     dangerConfirmationModal,
-    adminPageURL,
     dialog,
-    escHTML,
   } = Groundhogg.element
   const {
     getOwner,
@@ -92,51 +90,6 @@
     Textarea,
     Pg,
   } = MakeEl
-
-  const TimeLine = (activity) => {
-
-    if (!activity || !activity.length) {
-      return null
-    }
-
-    const Activity = activity => {
-
-      const {
-        note = '',
-        outcome = '',
-      } = activity.meta
-
-      const {
-        activity_type = '',
-      } = activity.data
-
-      const {
-        diff_time = '',
-        wp_date = '',
-      } = activity.i18n
-
-      return Div({
-        className: `note-activity-item ${ activity_type }`,
-      }, [
-        Div({
-          className: 'display-flex gap-5 align-center',
-        }, [
-          Span({ className: 'timeline-dot' }, [
-            ToolTip(diff_time, 'right'),
-          ]),
-          // Span({ className: 'note-activity-type' }, activity_type),
-          outcome ? Span({ className: 'note-activity-outcome pill semi-dark' }, outcome) : null,
-          note ? Div({ className: 'note-activity-note' }, note) : null,
-        ]),
-      ])
-    }
-
-    return Div({
-      className: 'note-activity-timeline display-flex column gap-10 align-top',
-    }, [
-      ...activity.map(Activity),
-    ])
-  }
 
   const BetterObjectNotes = ({
     object_type = '',

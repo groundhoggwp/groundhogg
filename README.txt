@@ -356,6 +356,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Task templates. Pre-written content for manually created tasks.
 * ADDED Saved replies. Pre-written replies for manually composed emails.
 * ADDED Note templates. Pre-written content for manually created notes.
+* ADDED Note bulk actions. Bulk edit and delete.
 
 = 3.7.3.6 (2025-01-12) =
 * SECURITY Added additional file checks for large file uploads. Credit @wcraft and WordFence.
