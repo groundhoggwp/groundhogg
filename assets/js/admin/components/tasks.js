@@ -81,7 +81,7 @@
 
     let date_created = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.i18n.time_diff }</abbr>`
 
-    let name = '';
+    let name = ''
 
     switch (context) {
       case 'user':
@@ -97,10 +97,10 @@
         break
       default:
       case 'system':
-        name = __( 'System' )
+        name = __('System')
         break
       case 'funnel':
-        name = __( 'Funnel' )
+        name = __('Funnel')
         break
     }
 
@@ -151,7 +151,17 @@
           }
 
           if (task.object_type === 'deal') {
+            let deal = await Groundhogg.stores.deals.maybeFetchItem(object_id)
+            deal.related.contacts.foreach(contact => to.push(contact.data.email))
+          }
 
+          if (task.object_type === 'company') {
+            let company = await Groundhogg.stores.companies.maybeFetchItem(object_id)
+            if ( company.data.primary_contact_id ){
+              let contact = await Groundhogg.stores.contacts.maybeFetchItem(company.data.primary_contact_id)
+              to.push(contact.data.email)
+              contactIds.push(contact.ID)
+            }
           }
 
           moreMenu(e.target, [
@@ -232,39 +242,53 @@
 
           let phones = []
 
-          if (object_type === 'contact') {
-            let contact = await Groundhogg.stores.contacts.maybeFetchItem(object_id)
-            console.log(contact)
+          const pushContactPhones = (contact) => {
             const {
               primary_phone = '',
               mobile_phone = '',
               company_phone = '',
             } = contact.meta
 
+            const { full_name } = contact.data
+
             if (primary_phone) {
               phones.push([
-                __('Primary Phone'),
+                sprintf(__('%s\'s Primary Phone'), full_name),
                 primary_phone,
               ])
             }
 
             if (mobile_phone) {
               phones.push([
-                __('Mobile Phone'),
+                sprintf(__('%s\'s Mobile Phone'), full_name),
                 mobile_phone,
               ])
             }
 
             if (company_phone) {
               phones.push([
-                __('Business Phone'),
+                sprintf(__('%s\'s Business Phone'), full_name),
                 company_phone,
               ])
             }
           }
 
-          if (task.object_type === 'deal') {
+          if (object_type === 'contact') {
+            let contact = await Groundhogg.stores.contacts.maybeFetchItem(object_id)
+            pushContactPhones(contact)
+          }
 
+          if (task.object_type === 'deal') {
+            let deal = await Groundhogg.stores.deals.maybeFetchItem(object_id)
+            deal.related.contacts.foreach(contact => pushContactPhones(contact))
+          }
+
+          if (task.object_type === 'company') {
+            let company = await Groundhogg.stores.companies.maybeFetchItem(object_id)
+            phones.push([
+              __('Company Phone'),
+              company.meta.phone,
+            ])
           }
 
           moreMenu(e.target, [
@@ -424,7 +448,7 @@
               })
             },
           }),
-          userHasCap( 'manage_options' ) ? An({
+          userHasCap('manage_options') ? An({
             href   : '#',
             id     : 'manage-task-outcomes',
             onClick: e => {
@@ -485,7 +509,7 @@
           setTimeout(() => {
             addMediaToBasicTinyMCE()
             tinymceElement('activity-note', {
-              quicktags: false,
+              quicktags    : false,
               taskTemplates: true,
             }, content => {
               State.set({
@@ -798,7 +822,7 @@
                 setTimeout(() => {
                   addMediaToBasicTinyMCE()
                   tinymceElement('edit-task-content', {
-                    quicktags: false,
+                    quicktags    : false,
                     taskTemplates: true,
                   }, content => {
                     State.set({
@@ -972,14 +996,14 @@
                       text    : __('Record activity'),
                       onSelect: () => {
                         AddTaskActivity({
-                          onSubmit     : ({
+                          onSubmit: ({
                             note,
                             outcome,
                           }) => {
                             return TasksStore.patch(task.ID, {
                               data: {
                                 activity: 1,
-                                type: task.data.type,
+                                type    : task.data.type,
                                 note,
                                 outcome,
                               },
@@ -1068,12 +1092,12 @@
             className: 'task-content space-above-10',
           }, content),
           task.activity.length ? An({
-            href   : '#',
+            href     : '#',
             className: 'toggle-activity',
-            onClick: e => {
+            onClick  : e => {
               e.preventDefault()
               TaskState.set({
-                showTimeline: ! TaskState.showTimeline,
+                showTimeline: !TaskState.showTimeline,
               })
               taskMorph()
             },
