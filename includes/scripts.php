@@ -288,11 +288,12 @@ class Scripts {
 			'moment',
 			'jquery-ui-sortable',
 			'groundhogg-admin-tasks',
+			'groundhogg-admin-notes',
 			'groundhogg-admin-components',
 			'groundhogg-admin-properties',
 			'groundhogg-admin',
 			'groundhogg-admin-data',
-			'groundhogg-make-el'
+			'groundhogg-make-el',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/contacts/info-cards' . $dot_min . '.js', [
