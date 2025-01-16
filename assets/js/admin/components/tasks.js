@@ -150,12 +150,15 @@
             contactIds.push(object_id)
           }
 
-          if (task.object_type === 'deal') {
+          if (object_type === 'deal') {
             let deal = await Groundhogg.stores.deals.maybeFetchItem(object_id)
-            deal.related.contacts.foreach(contact => to.push(contact.data.email))
+            deal.related.contacts.forEach(contact => {
+              to.push(contact.data.email)
+              contactIds.push(contact.ID)
+            })
           }
 
-          if (task.object_type === 'company') {
+          if (object_type === 'company') {
             let company = await Groundhogg.stores.companies.maybeFetchItem(object_id)
             if ( company.data.primary_contact_id ){
               let contact = await Groundhogg.stores.contacts.maybeFetchItem(company.data.primary_contact_id)
@@ -278,12 +281,12 @@
             pushContactPhones(contact)
           }
 
-          if (task.object_type === 'deal') {
+          if (object_type === 'deal') {
             let deal = await Groundhogg.stores.deals.maybeFetchItem(object_id)
-            deal.related.contacts.foreach(contact => pushContactPhones(contact))
+            deal.related.contacts.forEach(contact => pushContactPhones(contact))
           }
 
-          if (task.object_type === 'company') {
+          if (object_type === 'company') {
             let company = await Groundhogg.stores.companies.maybeFetchItem(object_id)
             phones.push([
               __('Company Phone'),

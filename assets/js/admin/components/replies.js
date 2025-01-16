@@ -1,25 +1,14 @@
 ( ($) => {
 
-  const { notes: NotesStore } = Groundhogg.stores
+  const { replies: RepliesStore } = Groundhogg.stores
   const {
-    icons,
     tinymceElement,
     addMediaToBasicTinyMCE,
-    moreMenu,
-    dangerConfirmationModal,
-    dialog,
     escHTML,
   } = Groundhogg.element
   const {
-    getOwner,
-  } = Groundhogg.user
-  const {
     userHasCap,
-    getCurrentUser,
   } = Groundhogg.user
-  const {
-    formatDateTime,
-  } = Groundhogg.formatting
   const {
     sprintf,
     __,
@@ -64,7 +53,7 @@
       adding      : false,
     })
 
-    const fetchNotes = () => NotesStore.fetchItems({
+    const fetchNotes = () => RepliesStore.fetchItems({
       type: note_type,
     }).then(notes => {
 
@@ -108,7 +97,7 @@
 
             if (State.adding) {
 
-              NotesStore.post({
+              RepliesStore.post({
                 data: {
                   summary: State.edit_summary,
                   content: State.edit_content,
@@ -132,7 +121,7 @@
             }
             else {
 
-              NotesStore.patch(State.editing, {
+              RepliesStore.patch(State.editing, {
                 data: {
                   summary: State.edit_summary,
                   content: State.edit_content,
@@ -282,7 +271,7 @@
         ]))
       }
 
-      let notes = State.notes.map(id => NotesStore.get(id))
+      let notes = State.notes.map(id => RepliesStore.get(id))
 
       return Fragment([
 

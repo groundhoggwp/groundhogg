@@ -775,7 +775,7 @@
       image  : '',
       onclick: async e => {
 
-        let replies = await Groundhogg.stores.notes.fetchItems({
+        let replies = await Groundhogg.stores.replies.fetchItems({
           type: note_type
         })
 
