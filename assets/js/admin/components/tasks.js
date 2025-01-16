@@ -635,7 +635,11 @@
 
         fetchTasks().then(morph)
 
-        return Skeleton({}, [
+        return Skeleton({
+          style: {
+            padding: '10px'
+          }
+        }, [
           'full',
           'full',
           'full',
