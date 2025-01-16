@@ -412,6 +412,7 @@ class Scripts {
 			'groundhogg-admin',
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
+			'groundhogg-admin-saved-replies',
 			'groundhogg-make-el',
 			'jquery-ui-sortable',
 			'jquery-ui-draggable',

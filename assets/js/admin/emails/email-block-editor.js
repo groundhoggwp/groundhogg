@@ -6737,6 +6737,7 @@
               setTimeout(() => {
                 tinymceElement(editorId, {
                     replacements: true,
+                    savedReplies: true,
                     tinymce     : {
                       content_style: tinyMceCSS(),
                       height, // inline: true,
