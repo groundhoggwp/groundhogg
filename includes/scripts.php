@@ -292,7 +292,6 @@ class Scripts {
 			'groundhogg-admin-properties',
 			'groundhogg-admin',
 			'groundhogg-admin-data',
-			'groundhogg-admin-email-log',
 			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
@@ -333,6 +332,7 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
 			'groundhogg-admin-saved-replies',
+			'groundhogg-admin-email-log',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/features/send-broadcast' . $dot_min . '.js', [

@@ -104,7 +104,7 @@
         break
     }
 
-    return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), date_created)
+    return sprintf(__('Added by %s %s ago', 'groundhogg'), name, date_created)
   }
 
   const openActivityForm = (type, taskId, onComplete = () => {}) => setTimeout(() => {
