@@ -757,9 +757,15 @@
         }).mount()
       },
     })
+
+
+    // disable replacements button before next tiny mce cn be initialized
+    $(document).off('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
   }
 
   const addTemplateButtonTinyMCE = ( event, editor, config ) => {
+
+    console.log( event, editor )
 
     const {
       note_type = '',
@@ -811,23 +817,32 @@
 
   }
 
-  const addSavedRepliesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
-    single: 'Saved Reply',
-    plural: 'Saved Replies',
-    note_type: 'saved_reply'
-  })
+  const addSavedRepliesToolbarTinyMCE = (event, editor) => {
+    addTemplateButtonTinyMCE( event, editor, {
+      single: 'Saved Reply',
+      plural: 'Saved Replies',
+      note_type: 'saved_reply'
+    })
+    $(document).off('tinymce-editor-setup', addSavedRepliesToolbarTinyMCE)
+  }
 
-  const addNoteTemplatesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
-    single: 'Note Template',
-    plural: 'Note Templates',
-    note_type: 'note_template'
-  })
+  const addNoteTemplatesToolbarTinyMCE = (event, editor) => {
+    addTemplateButtonTinyMCE( event, editor, {
+      single: 'Note Template',
+      plural: 'Note Templates',
+      note_type: 'note_template'
+    })
+    $(document).off('tinymce-editor-setup', addNoteTemplatesToolbarTinyMCE)
+  }
 
-  const addTaskTemplatesToolbarTinyMCE = (event, editor) => addTemplateButtonTinyMCE( event, editor, {
-    single: 'Task Template',
-    plural: 'Task Templates',
-    note_type: 'task_template'
-  })
+  const addTaskTemplatesToolbarTinyMCE = (event, editor) => {
+    addTemplateButtonTinyMCE( event, editor, {
+      single: 'Task Template',
+      plural: 'Task Templates',
+      note_type: 'task_template'
+    })
+    $(document).off('tinymce-editor-setup', addTaskTemplatesToolbarTinyMCE)
+  }
 
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
@@ -862,15 +877,6 @@
         ...config,
       },
     )
-
-    // disable replacements button before next tiny mce cn be initialized
-    $(document).off('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
-    // disable saved replies if enabled
-    $(document).off('tinymce-editor-setup', addSavedRepliesToolbarTinyMCE)
-    // disable task templates
-    $(document).off('tinymce-editor-setup', addTaskTemplatesToolbarTinyMCE)
-    // disable note templates
-    $(document).off('tinymce-editor-setup', addNoteTemplatesToolbarTinyMCE)
 
     let editor = tinyMCE.get(editor_id)
 
