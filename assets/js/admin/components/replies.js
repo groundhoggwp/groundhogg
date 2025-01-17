@@ -5,6 +5,7 @@
     tinymceElement,
     addMediaToBasicTinyMCE,
     escHTML,
+    dangerConfirmationModal
   } = Groundhogg.element
   const {
     userHasCap,
@@ -261,8 +262,22 @@
               Dashicon('edit'),
               ToolTip('Edit'),
             ]),
-            userHasCap( 'delete_notes' ) ? Button({
+            userHasCap( 'delete_others_notes' ) ? Button({
               className: 'gh-button danger icon text',
+              onClick: e => {
+                dangerConfirmationModal({
+                  alert: `<p>${sprintf(__('Are you sure you want to delete this %s?'), single)}</p>`,
+                  confirmText: __( 'Delete' ),
+                  onConfirm: () => {
+                    RepliesStore.delete(note.ID).then(() => {
+                      State.set({
+                        notes: State.notes.filter(id => id !== note.ID),
+                      });
+                      morph();
+                    });
+                  }
+                })
+              }
             }, [
               Dashicon('trash'),
               ToolTip('Delete'),
@@ -308,7 +323,7 @@
   Groundhogg.SavedRepliesModal = (props) => {
     Modal({
       width        : '600px',
-      dialogClasses: 'overflow-visible',
+      // dialogClasses: 'overflow-visible',
     }, Fragment([
       SavedReplies({
         single: __('Saved Reply'),

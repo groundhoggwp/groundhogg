@@ -62,7 +62,7 @@ class Contact extends Base_Object_With_Meta {
 		// ID given
 		if ( is_numeric( $_id_or_email_or_args ) ) {
 			$by_user_id = is_bool( $by_user_id ) ? $by_user_id : false;
-			$field = $by_user_id ? 'user_id' : 'ID';
+			$field      = $by_user_id ? 'user_id' : 'ID';
 
 			parent::__construct( $_id_or_email_or_args, $field );
 
@@ -342,7 +342,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_last_name() {
-		return ucwords($this->last_name);
+		return ucwords( $this->last_name );
 	}
 
 	/**
@@ -653,8 +653,8 @@ class Contact extends Base_Object_With_Meta {
 
 		// If opt-in status is set at this point, it's a new status
 		if ( isset_not_empty( $data, 'optin_status' ) ) {
-			$old_preference     = $this->get_optin_status();
-			$new_preference     = $data['optin_status'];
+			$old_preference = $this->get_optin_status();
+			$new_preference = $data['optin_status'];
 
 			if ( ! isset( $data['date_optin_status_changed'] ) ) {
 				$data['date_optin_status_changed'] = current_time( 'mysql' );
@@ -678,7 +678,7 @@ class Contact extends Base_Object_With_Meta {
 		$updated = parent::update( $data );
 
 		// failed to update, no point in going further
-		if ( ! $updated ){
+		if ( ! $updated ) {
 			return $updated;
 		}
 
@@ -1122,7 +1122,7 @@ class Contact extends Base_Object_With_Meta {
 		return md5( encrypt( $this->get_email() ) );
 	}
 
-	public function get_uploads_folder_subdir(){
+	public function get_uploads_folder_subdir() {
 		return 'uploads';
 	}
 
@@ -1171,7 +1171,7 @@ class Contact extends Base_Object_With_Meta {
 				'admin'          => $this->admin_link(),
 				'is_marketable'  => $this->is_marketable(),
 				'is_deliverable' => $this->is_deliverable(),
-				'i18n'         => [
+				'i18n'           => [
 					'created' => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() )
 				]
 			]
@@ -1256,7 +1256,7 @@ class Contact extends Base_Object_With_Meta {
 		$uploads_dir = $this->get_uploads_folder();
 
 		// Might have to create the directory
-		if ( ! is_dir( $uploads_dir['path'] ) ){
+		if ( ! is_dir( $uploads_dir['path'] ) ) {
 			wp_mkdir_p( $uploads_dir['path'] );
 		}
 
@@ -1423,5 +1423,11 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		return parent::update_meta( $key, $value );
+	}
+
+	public function add_note( $note, $context = 'system', $user_id = false, $overrides = [] ) {
+		$note = do_replacements( $note, $this );
+
+		return parent::add_note( $note, $context, $user_id, $overrides );
 	}
 }
