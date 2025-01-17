@@ -258,6 +258,7 @@
                   tinymceElement('edit-note-content', {
                     quicktags    : false,
                     noteTemplates: true,
+                    replacements: true,
                   }, content => {
                     State.set({
                       edit_content: content,

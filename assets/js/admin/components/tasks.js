@@ -160,7 +160,7 @@
 
           if (object_type === 'company') {
             let company = await Groundhogg.stores.companies.maybeFetchItem(object_id)
-            if ( company.data.primary_contact_id ){
+            if (company.data.primary_contact_id) {
               let contact = await Groundhogg.stores.contacts.maybeFetchItem(company.data.primary_contact_id)
               to.push(contact.data.email)
               contactIds.push(contact.ID)
@@ -637,8 +637,8 @@
 
         return Skeleton({
           style: {
-            padding: '10px'
-          }
+            padding: '10px',
+          },
         }, [
           'full',
           'full',
@@ -831,6 +831,7 @@
                   tinymceElement('edit-task-content', {
                     quicktags    : false,
                     taskTemplates: true,
+                    replacements : true,
                   }, content => {
                     State.set({
                       edit_content: content,
