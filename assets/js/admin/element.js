@@ -765,8 +765,6 @@
 
   const addTemplateButtonTinyMCE = ( event, editor, config ) => {
 
-    console.log( event, editor )
-
     const {
       note_type = '',
       plural,
