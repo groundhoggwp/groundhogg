@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 3.7.4
+Stable tag: 3.7.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.7.4 (2025-01-15) =
+= 3.7.4.1 (2025-01-21) =
+* HOT FIX Update script not working if one of the Groundhogg's custom roles was deleted.
+
+= 3.7.4 (2025-01-20) =
 * ADDED Task re-assignment. Tasks can now be assigned to users that are not the contact owner. Tasks can also be re-assigned.
 * ADDED Task bulk editing. Bulk complete, delete, re-assign, and reschedule tasks from within the tasks widget.
 * ADDED Task activity. Track outcomes, emails, call attempts, and more!

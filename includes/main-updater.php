@@ -214,11 +214,14 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					foreach ( Main_Roles::$owner_roles as $owner_role ) {
 						$role = get_role( $owner_role );
-						$role->add_cap( 'big_uploads' );
+
+						if ( $role && method_exists( $role, 'add_cap' ) ) {
+							$role->add_cap( 'big_uploads' );
+						}
 					}
 				}
 			],
-			'3.7.4'  => [
+			'3.7.4'    => [
 				'automatic'   => true,
 				'description' => __( 'Add <code>summary</code> column to notes table.', 'groundhogg' ),
 				'callback'    => function () {
