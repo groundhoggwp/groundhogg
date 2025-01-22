@@ -403,24 +403,50 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * If a benchmark is marked as passthru, it means it will not impede the execution of proceeding steps.
+	 *
+	 * @return true
+	 */
+	public function can_passthru() {
+		if ( $this->is_benchmark() ){
+			return boolval( $this->can_passthru ) && $this->get_prev_step()->is_action();
+		}
+
+		return true; // all actions are passthru
+	}
+
+	/**
 	 * Get the next step in the order
 	 *
 	 * @return Step|false
 	 */
 	public function get_next_action() {
 
-		$query = new Table_Query( 'steps' );
+		if ( $this->is_benchmark() ){
 
-		$query->setOrderby( [ 'step_order', 'ASC' ] )
-		      ->setLimit( 1 )
-		      ->where()
-		      ->equals( 'step_group', self::ACTION )
-		      ->equals( 'funnel_id', $this->get_funnel_id() )
-		      ->compare( 'step_order', $this->get_order() + 1, $this->is_action() ? '=' : '>=' );
+			$query = new Table_Query( 'steps' );
+			$query->setOrderby( [ 'step_order', 'ASC' ] )
+			      ->setLimit( 1 )
+			      ->where()
+			      ->equals( 'funnel_id', $this->get_funnel_id() )
+			      ->equals( 'step_group', self::ACTION )
+			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1  );
 
-		$next = $query->get_objects( Step::class );
+			$next = $query->get_objects( Step::class );
 
-		$next = ! empty( $next ) ? $next[0] : false;
+			$next = ! empty( $next ) ? $next[0] : false; // any proceeding action
+
+		} else {
+
+			$next = $this->get_next_step();
+
+			// if the first proceeding step is a benchmark, we can check to see if it's a passthru.
+			if ( $next && $next->is_benchmark() ) {
+				// if it is a passthru, the next action will be the one proceeding it.
+				$next = $next->can_passthru() ? $next->get_next_action() : false;
+				// if it ISN'T passthru, then the next action is false
+			}
+		}
 
 		/**
 		 * Filters the next action
@@ -454,10 +480,64 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		/**
 		 * Filters the next action
 		 *
-		 * @param $next    Step|null
+		 * @param $next    Step|false
 		 * @param $current Step
 		 */
 		return apply_filters( 'groundhogg/step/prev_action', $next, $this );
+	}
+
+	/**
+	 * Get the next step of the funnel
+	 *
+	 * @return Step|false
+	 */
+	public function get_next_step() {
+		$query = new Table_Query( 'steps' );
+
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
+		      ->setLimit( 1 )
+		      ->where()
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->equals( 'step_order', $this->get_order() + 1 );
+
+		$next = $query->get_objects( Step::class );
+
+		$next = ! empty( $next ) ? $next[0] : false;
+
+		/**
+		 * Filters the next step
+		 *
+		 * @param $next    Step|false
+		 * @param $current Step
+		 */
+		return apply_filters( 'groundhogg/step/next_step', $next, $this );
+	}
+
+	/**
+	 * Get the prev step of the funnel
+	 *
+	 * @return Step|false
+	 */
+	public function get_prev_step() {
+		$query = new Table_Query( 'steps' );
+
+		$query->setOrderby( [ 'step_order', 'DESC' ] )
+		      ->setLimit( 1 )
+		      ->where()
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->equals( 'step_order', $this->get_order() - 1 );
+
+		$prev = $query->get_objects( Step::class );
+
+		$prev = ! empty( $prev ) ? $prev[0] : false;
+
+		/**
+		 * Filters the prev step
+		 *
+		 * @param $prev    Step|false
+		 * @param $current Step
+		 */
+		return apply_filters( 'groundhogg/step/prev_step', $prev, $this );
 	}
 
 	/**

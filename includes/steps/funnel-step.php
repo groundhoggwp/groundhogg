@@ -618,6 +618,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				<?php if ( $step->is_benchmark() && $step->is_entry() ): ?>
                     <div class="step-label">Entry</div>
 				<?php endif; ?>
+				<?php if ( $step->is_benchmark() && $step->can_passthru() ): ?>
+                    <div class="step-label">Pass-through</div>
+				<?php endif; ?>
 				<?php if ( $step->is_benchmark() && $step->is_conversion() ): ?>
                     <div class="step-label">Conversion</div>
 				<?php endif; ?>
@@ -796,6 +799,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 										'checked' => $step->is_entry()
 									] );
 
+									if ( $step->get_prev_step()->is_action() ) {
+										echo html()->checkbox( [
+											'label'   => 'Allow contacts to pass through this benchmark when',
+											'name'    => $this->setting_name_prefix( 'can_passthru' ),
+											'checked' => $step->can_passthru()
+										] );
+									}
+
 								endif;
 
 								echo html()->checkbox( [
@@ -844,6 +855,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'step_order'    => $this->get_posted_order(),
 			'is_conversion' => (bool) $this->get_posted_data( 'is_conversion', false ),
 			'is_entry'      => (bool) $this->get_posted_data( 'is_entry', false ),
+			'can_passthru'  => (bool) $this->get_posted_data( 'can_passthru', false ),
 		] );
 
 		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );

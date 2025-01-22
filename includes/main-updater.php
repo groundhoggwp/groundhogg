@@ -228,6 +228,13 @@ class Main_Updater extends Old_Updater {
 					db()->notes->create_table();
 				}
 			],
+zzzzzzzzz			'3.7.5'    => [
+				'automatic'   => true,
+				'description' => __( 'Add <code>can_passthru</code> column to steps table.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->steps->create_table();
+				}
+			],
 		];
 	}
 

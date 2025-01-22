@@ -89,6 +89,7 @@ class Steps extends DB {
 			'step_slug'     => '%s',
 			'is_entry'      => '%d',
 			'is_conversion' => '%d',
+			'can_passthru'  => '%d',
 		);
 	}
 
@@ -110,6 +111,7 @@ class Steps extends DB {
 			'step_order'    => 0,
 			'is_entry'      => 0,
 			'is_conversion' => 0,
+			'can_passthru'  => 0,
 		);
 	}
 
@@ -269,6 +271,7 @@ class Steps extends DB {
 		step_order int unsigned NOT NULL,
 		is_entry TINYINT(1) NOT NULL,
 		is_conversion TINYINT(1) NOT NULL,
+		can_passthru TINYINT(1) NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 
