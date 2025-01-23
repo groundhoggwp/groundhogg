@@ -607,6 +607,23 @@ class Replacements implements \JsonSerializable {
 		}
 
 		if ( is_callable( $callback ) ) {
+
+			// If the plain callback is not callable
+			// Set it to a version that parses as markdown
+			if ( ! is_callable( $plain_callback ) ) {
+				$plain_callback = function ( ...$args ) use ( $callback ) {
+
+					$content = $callback( ...$args );
+
+					// contains HTML
+					if ( wp_strip_all_tags( $content ) !== $content ) {
+						$content = html2markdown( $content );
+					}
+
+					return $content;
+				};
+			}
+
 			$this->replacement_codes[ $code ] = [
 				'code'           => $code,
 				'callback'       => $callback,
@@ -834,7 +851,7 @@ class Replacements implements \JsonSerializable {
 
 			$cache_key = implode( ':', [
 				// if there is no defined plain callback we should reference the html version
-				is_callable( $plain_callback ) ? $this->get_context() : 'html',
+				$this->get_context(),
 				$this->contact_id ?: 'anon',
 				md5serialize( $parts ),
 				cache_get_last_changed( 'groundhogg/replacements' )
@@ -844,21 +861,6 @@ class Replacements implements \JsonSerializable {
 
 			if ( $found ) {
 				return $cache_value;
-			}
-
-			// If the plain callback is not callable
-			// Set it to a version that parses as markdown
-			if ( ! is_callable( $plain_callback ) ) {
-				$plain_callback = function ( ...$args ) use ( $html_callback ) {
-
-					$content = $html_callback( ...$args );
-
-					if ( wp_strip_all_tags( $content ) !== $content ) {
-						return html2markdown( $content );
-					}
-
-					return $content;
-				};
 			}
 
 			$callback = $this->context_is_html() ? $html_callback : $plain_callback;
