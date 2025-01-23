@@ -801,7 +801,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 									if ( $step->get_prev_step()->is_action() ) {
 										echo html()->checkbox( [
-											'label'   => 'Allow contacts to pass through this benchmark when',
+											'label'   => 'Allow contacts to pass through this benchmark',
 											'name'    => $this->setting_name_prefix( 'can_passthru' ),
 											'checked' => $step->can_passthru()
 										] );
