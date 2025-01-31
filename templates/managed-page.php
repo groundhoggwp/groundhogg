@@ -98,7 +98,7 @@ function managed_page_head( $title = '', $action = '' ) {
 	$mp_title = apply_filters( 'managed_page_title', $mp_title, $title );
 
 	$classes = [ $action ];
-	$classes = apply_filters( 'managed_page_title', $classes, $action );
+	$classes = apply_filters( 'managed_page_classes', $classes, $action );
 
 
 	if ( is_multisite() ) {
