@@ -1058,6 +1058,19 @@
     return stateMap.get(caller);
   }
 
+  function bindState( state, caller ){
+    if ( ! caller ){
+      // Get the current function that is calling useState
+      caller = useState.caller;
+    }
+
+    // Check if this function already has state in the map
+    if (!stateMap.has(caller)) {
+      // If not, initialize the state and store it in the WeakMap
+      stateMap.set(caller, state);
+    }
+  }
+
   /**
    * Create a registry that contacts items based on IDs
    *
@@ -1153,6 +1166,7 @@
 
   Groundhogg.createState = createState
   Groundhogg.useState = useState
+  Groundhogg.bindState = bindState
   Groundhogg.createRegistry = createRegistry
 
 } )(jQuery)

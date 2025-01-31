@@ -86,6 +86,14 @@ h3.no-margin-top {
   align-items: flex-start;
 }
 
+.striked-completed::before {
+  content: "✅";
+  margin-right: 5px;
+}
+.striked-completed span {
+  text-decoration: line-through;
+}
+
 .display-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -2496,6 +2504,33 @@ button:has(.gh-dropdown-menu) {
   gap: 20px;
 }
 
+/* Using the ::after pseudo-element for dots */
+.loading-dots::after {
+  content: "";
+  /* Start with no dots */
+  display: inline-block;
+  animation: dots 2s steps(4, end) infinite;
+  /* Steps animation controls dots */
+}
+
+/* Keyframes for the dots */
+@keyframes dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
 .spinning {
   -webkit-animation: spinning 4s linear infinite;
   -moz-animation: spinning 4s linear infinite;
@@ -2867,6 +2902,35 @@ div:has(> button.hide-panel) > button.hide-panel {
 }
 div:has(> button.hide-panel) > button.hide-panel:hover {
   background-color: rgba(16, 38, 64, 0.15);
+}
+
+.gh-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.gh-accordion-item {
+  background-color: #fff;
+  border-radius: 3px;
+  padding: 10px;
+  padding-left: 12px;
+}
+.gh-accordion-item.outlined {
+  border: 1px solid rgba(16, 38, 64, 0.15);
+}
+.gh-accordion-item.expanded .gh-accordion-item-title {
+  font-weight: 500;
+}
+.gh-accordion-item-title {
+  font-weight: 400;
+  font-size: 14px;
+  margin: 0;
+  flex-grow: 1;
+  cursor: pointer;
+}
+.gh-accordion-item .dashicons-arrow-up-alt2,
+.gh-accordion-item .dashicons-arrow-down-alt2 {
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=elements.css.map */

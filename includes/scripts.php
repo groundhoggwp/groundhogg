@@ -535,6 +535,19 @@ class Scripts {
 			'isContentRestrictionInstalled' => defined( 'GROUNDHOGG_CONTENT_RESTRICTION_VERSION' ),
 		] );
 
+		wp_register_script( 'groundhogg-admin-youtube', GROUNDHOGG_ASSETS_URL . 'js/admin/features/youtube' . $dot_min . '.js', [
+			'groundhogg-make-el'
+		], GROUNDHOGG_VERSION );
+
+		if ( get_url_var( 'ghvid' ) ){
+			wp_enqueue_script( 'groundhogg-admin-youtube' );
+		}
+
+		wp_register_script( 'groundhogg-admin-cron-jobs', GROUNDHOGG_ASSETS_URL . 'js/admin/features/cron-jobs' . $dot_min . '.js', [
+			'groundhogg-make-el',
+			'groundhogg-admin-element',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [

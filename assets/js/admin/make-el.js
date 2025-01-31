@@ -34,6 +34,9 @@
   }
 
   const AttributeHandlers = {
+    State     : (el, value) => {
+      el.State = value
+    },
     required     : (el, value) => {
       el.required = value
     },
@@ -1563,6 +1566,68 @@
     },
   })))
 
+  const useState = ( initialState, id ) => {
+    const el = document.getElementById(id)
+    if ( el && el.State ){
+      return el.State
+    }
+    return Groundhogg.createState(initialState)
+  }
+
+  const Accordion = ({
+    id,
+    items,
+    outlined = false,
+    multiple = false, // whether multiple items can be expanded at the same time
+  }) => {
+
+    const State = useState({
+      expanded: null,
+    }, id )
+
+    const isExpanded = index => multiple ? State.get(`expand${ index + 1 }`) : State.expanded === index
+
+    const toggleExpand = index => {
+      if (multiple) {
+        State.set({
+          [`expand${ index + 1 }`]: !isExpanded(index),
+        })
+      }
+      else {
+        State.set({
+          expanded: index,
+        })
+      }
+    }
+
+    return Div({
+      id,
+      className: 'gh-accordion',
+      State
+    }, morph => Fragment(items.map(({
+      title,
+      content,
+    }, i) => Div({
+      className: `gh-accordion-item gh-accordion-row ${ isExpanded(i) ? 'expanded' : 'collapsed' } ${ outlined ? 'outlined' : 'has-box-shadow' }`,
+      id       : `${ id }-item-${ i + 1 }`,
+    }, [
+      Div({
+        id       : `${ id }-item-toggle-${ i + 1 }`,
+        className: 'display-flex gap-10 align-center',
+        onClick  : e => {
+          toggleExpand(i)
+          morph()
+        },
+      }, [
+        Pg({
+          className: 'gh-accordion-item-title',
+        }, title),
+        isExpanded(i) ? Dashicon('arrow-up-alt2') : Dashicon('arrow-down-alt2'),
+      ]),
+      isExpanded(i) ? content : null,
+    ]))))
+  }
+
   window.MakeEl = {
     Skeleton,
     InputGroup,
@@ -1596,6 +1661,7 @@
     ButtonToggle,
     Autocomplete,
     ProgressBar,
+    Accordion,
     Pg,
     Bold,
     Img,
@@ -1618,6 +1684,6 @@
     htmlToElement,
     htmlToElements,
     domElementToReact,
-
+    useState,
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

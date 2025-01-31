@@ -137,6 +137,16 @@ h3 {
   }
 }
 
+.striked-completed {
+  &::before{
+    content: '✅';
+    margin-right: 5px;
+  }
+  span{
+    text-decoration: line-through;
+  }
+}
+
 .display-grid {
   display: grid;
   grid-template-columns: repeat( 12, 1fr );
@@ -2849,6 +2859,32 @@ button:has(.gh-dropdown-menu) {
 
 }
 
+/* Using the ::after pseudo-element for dots */
+.loading-dots::after {
+  content: ''; /* Start with no dots */
+  display: inline-block;
+  animation: dots 2s steps(4, end) infinite; /* Steps animation controls dots */
+}
+
+/* Keyframes for the dots */
+@keyframes dots {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+  100% {
+    content: '';
+  }
+}
+
 .spinning {
   -webkit-animation: spinning 4s linear infinite;
   -moz-animation: spinning 4s linear infinite;
@@ -3325,5 +3361,45 @@ div:has( > button.hide-panel) {
     &:hover {
       background-color: $primary-dark-15;
     }
+  }
+}
+
+.gh-accordion{
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &-item {
+    background-color: #fff;
+    border-radius: 3px;
+    padding: 10px;
+    padding-left: 12px;
+    //box-shadow: $box-shadow;
+
+    &.outlined {
+      border: 1px solid $primary-dark-15;
+    }
+
+    &.expanded {
+      .gh-accordion-item-title {
+        font-weight: 500;
+      }
+    }
+
+    &-title {
+      font-weight: 400;
+      font-size: 14px;
+      margin: 0;
+      flex-grow: 1;
+      cursor: pointer;
+    }
+
+    .dashicons-arrow-up-alt2,
+    .dashicons-arrow-down-alt2 {
+      cursor: pointer;
+    }
+
+
   }
 }

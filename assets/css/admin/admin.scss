@@ -1246,3 +1246,83 @@ table .column-steps {
 #wpbody-content:has(.gh-header.admin-page-header) .wrap {
   margin-top: 40px;
 }
+
+.gh-site {
+
+  /* Darks */
+  --color-dark-800: #212121;
+  --color-dark-900: #0f181e;
+
+  /* Gray */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #e0e0e0;
+
+  /* Browns */
+  --color-brown-50: #fffcf1;
+  --color-brown-75: #fffcf1;
+  --color-brown-100: #fff5da;
+  --color-brown-200: #ffefb0;
+  --color-brown-300: #f7dd96;
+  --color-brown-400: #cfa756;
+  --color-brown-500: #9e743e;
+
+  /* Oranges */
+  --color-orange-700: #ff9431;
+  --color-orange-900: #ff7b01;
+
+  /* Reds */
+  --color-red-200: #f2c3c6;
+  --color-red-700: #DD2A37;
+  --color-red-900: #CA2000;
+
+  /* Various */
+  --color-footer: #1F1A22;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-yellow: #ffca00;
+  --color-green-100: #dce9d5;
+  --color-green-400: #9FCA8F;
+  --color-green-500: #80BA6D;
+  --color-green-600: #61AA4A;
+  --color-green-900: #248B04;
+  --color-slate: #455A64;
+
+  h3 {
+    font-size: 20px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+
+  a {
+    color: var(--color-orange-900);
+    text-decoration: none;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .gh-primary-card {
+    //padding: 1.25rem;
+    border-radius: 0.75rem;
+    background-color: var(--color-brown-200);
+    border-style: solid;
+    border-width: 1px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-color: var(--color-dark-800);
+  }
+
+  .gh-secondary-card {
+    //padding: 1.25rem;
+    border-radius: 0.75rem;
+    background-color: var(--color-brown-50);
+    border-style: solid;
+    border-width: 1px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-color: var(--color-dark-800);
+  }
+}
