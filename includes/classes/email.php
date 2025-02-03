@@ -98,6 +98,14 @@ class Email extends Base_Object_With_Meta {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
 
+		$title = $this->title;
+		$subject = $this->subject;
+
+		// polyfill title as the subject if empty
+		if ( empty( $title ) && ! empty( $subject ) ) {
+			$this->title = $subject;
+		}
+
 		$this->set_from_select();
 
 		// Maybe update from the meta message type
@@ -138,7 +146,7 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	public function get_title() {
-		return $this->title ?: $this->get_subject_line();
+		return $this->title; // defaults to subject in post_setup
 	}
 
 	public function get_pre_header() {
