@@ -765,7 +765,7 @@ abstract class Admin_Page extends Supports_Errors {
 			$data = (array) $data;
 		}
 
-		ob_start();
+//		ob_start();
 
 		wp_send_json_success( $data );
 	}

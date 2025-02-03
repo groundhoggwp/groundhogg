@@ -178,9 +178,9 @@ class Funnels_Page extends Admin_Page {
 
 				$funnel = new Funnel( get_url_var( 'funnel' ) );
 
-                if ( ! $funnel->exists() ){
-                    return;
-                }
+				if ( ! $funnel->exists() ) {
+					return;
+				}
 
 				wp_enqueue_editor();
 
@@ -218,7 +218,7 @@ class Funnels_Page extends Admin_Page {
 
 				enqueue_email_block_editor_assets();
 
-                use_edit_lock( $funnel );
+				use_edit_lock( $funnel );
 
 				do_action( 'groundhogg/admin/funnels/editor_scripts' );
 
@@ -226,25 +226,25 @@ class Funnels_Page extends Admin_Page {
 			case 'add':
 				wp_enqueue_style( 'groundhogg-admin-element' );
 				break;
-            case 'view':
-	            $this->enqueue_table_filters( [
-		            'stringColumns' => [
-			            'title' => 'Title',
-		            ],
-		            'dateColumns'   => [
-			            'date_created' => 'Date Created',
-			            'last_updated' => 'Last Updated',
-		            ],
-	            ] );
+			case 'view':
+				$this->enqueue_table_filters( [
+					'stringColumns' => [
+						'title' => 'Title',
+					],
+					'dateColumns'   => [
+						'date_created' => 'Date Created',
+						'last_updated' => 'Last Updated',
+					],
+				] );
 
-	            $query = new Table_Query( 'funnels' );
-                $query->setSelect( 'DISTINCT author' );
-                $results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
+				$query = new Table_Query( 'funnels' );
+				$query->setSelect( 'DISTINCT author' );
+				$results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
 
-                wp_enqueue_script( 'groundhogg-admin-filter-funnels' );
-                wp_add_inline_script( 'groundhogg-admin-filter-funnels', "Groundhogg.authors = " . wp_json_encode( $results ) );
+				wp_enqueue_script( 'groundhogg-admin-filter-funnels' );
+				wp_add_inline_script( 'groundhogg-admin-filter-funnels', "Groundhogg.authors = " . wp_json_encode( $results ) );
 
-                break;
+				break;
 		}
 
 		wp_enqueue_style( 'groundhogg-admin' );
@@ -613,17 +613,21 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
+		$response = [];
+
 		if ( is_wp_error( $result ) ) {
-			$this->add_notice( $result );
+			$response['err'] = $result->get_error_messages();
 		}
 
-		$result = [];
+		if ( $this->has_errors() ) {
+			$response['err'] = $this->get_last_error()->get_error_message();
+		}
 
-		$result['settings'] = $this->get_step_html();
-		$result['sortable'] = $this->get_step_sortable();
-		$result['steps']    = $this->get_current_funnel()->get_steps();
+		$response['settings'] = $this->get_step_html();
+		$response['sortable'] = $this->get_step_sortable();
+		$response['funnel']   = $this->get_current_funnel();
 
-		$this->send_ajax_response( $result );
+		$this->send_ajax_response( $response );
 
 	}
 
@@ -695,21 +699,6 @@ class Funnels_Page extends Admin_Page {
 			return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
 		}
 
-		$title         = sanitize_text_field( get_request_var( 'funnel_title' ) );
-		$args['title'] = $title;
-
-		$status = sanitize_text_field( get_request_var( 'funnel_status', 'inactive' ) );
-
-		//do not update the status to inactive if it's not confirmed
-		if ( $status === 'inactive' || $status === 'active' ) {
-			$args['status'] = $status;
-		}
-
-		$args['last_updated']    = current_time( 'mysql' );
-		$args['conversion_step'] = absint( get_request_var( 'conversion-step' ) );
-
-		$funnel->update( $args );
-
 		//get all the steps in the funnel.
 		$step_ids = wp_parse_id_list( get_request_var( 'step_ids' ) );
 
@@ -723,6 +712,24 @@ class Funnels_Page extends Admin_Page {
 
 			$step->save();
 		}
+
+		$status = sanitize_text_field( get_request_var( 'funnel_status', 'inactive' ) );
+
+		// do not update the status to inactive if it's not confirmed
+		if ( $status === 'inactive' || $status === 'active' ) {
+			$args['status'] = $status;
+		}
+
+		// if the funnel does not have any entry steps, it cannot be active.
+		if ( count( $funnel->get_entry_steps() ) === 0 ) {
+			$args['status'] = 'inactive';
+			$this->add_error( new \WP_Error( 'err', 'You must have at least one entry benchmark before activating a funnel.' ) );
+		}
+
+		$args['title']        = sanitize_text_field( get_request_var( 'funnel_title' ) );
+		$args['last_updated'] = current_time( 'mysql' );
+
+		$funnel->update( $args );
 
 		/**
 		 * Runs after the funnel as been updated.
@@ -754,7 +761,7 @@ class Funnels_Page extends Admin_Page {
 			$step_order = $after_step->get_order() + 1;
 			$funnel_id  = $after_step->get_funnel_id();
 		} else {
-			$funnel_id = absint( get_post_var( 'funnel_id' ) );
+			$funnel_id  = absint( get_post_var( 'funnel_id' ) );
 			$step_order = 1;
 		}
 
@@ -772,11 +779,11 @@ class Funnels_Page extends Admin_Page {
 		$step = new Step();
 
 		$step_id = $step->create( [
-			'funnel_id'  => $funnel_id,
-			'step_title' => $title,
-			'step_type'  => $step_type,
-			'step_group' => $step_group,
-			'step_order' => $step_order,
+			'funnel_id'   => $funnel_id,
+			'step_title'  => $title,
+			'step_type'   => $step_type,
+			'step_group'  => $step_group,
+			'step_order'  => $step_order,
 			'step_status' => $funnel->is_active() ? 'active' : 'inactive'
 		] );
 
@@ -868,7 +875,7 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table->views();
 
 		$this->table_filters();
-        $this->search_form();
+		$this->search_form();
 
 		?>
         <form method="post" class="wp-clearfix">

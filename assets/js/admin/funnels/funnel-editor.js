@@ -446,8 +446,11 @@
 
       // Do regular form update
       adminAjaxRequest(fd, (response) => {
-        // handleNotices(response.data.notices)
-        this.steps = response.data.steps
+
+        this.steps = response.data.funnel.steps
+
+        // match the status of the funnel with the one from the response
+        $('#status-toggle').prop('checked', response.data.funnel.status === 'active' )
 
         $saveButton.removeClass('spin')
         $saveButton.html(self.save_text)
@@ -455,12 +458,18 @@
         self.getSettings().html(response.data.settings)
         self.getSteps().html(response.data.sortable)
 
-        // removePathFromSvgsInStepFlow()
-
         $(document).trigger('new-step')
 
         $('body').removeClass('saving')
         self.makeActive(self.currentlyActive)
+
+        if ( response.data.err ){
+          dialog({
+            message: response.data.err,
+            type: 'error',
+          })
+          return
+        }
 
         dialog({
           message: __('Funnel saved!', 'groundhogg'),
