@@ -967,7 +967,7 @@ label.gh-switch input:checked ~ span.off {
   display: none;
 }
 #api-docs #docs-ui {
-  height: calc( 100% - 60px );
+  height: calc(100% - 60px);
 }
 #api-docs #endpoint-display {
   padding: 20px;
@@ -1077,8 +1077,14 @@ table .column-steps div.step-icon img {
   height: 100%;
 }
 
-#wpbody-content:has(.gh-header.admin-page-header) .wrap {
+#wpbody-content:has(.gh-header.admin-page-header):has(#show-settings-link) .wrap {
   margin-top: 40px;
+}
+
+.groundhogg-admin-page .gh-header + h2.gh-nav {
+  margin: 0 0 0 -20px !important;
+  padding: 10px 0 0 20px !important;
+  background-color: #fff;
 }
 
 .gh-site {

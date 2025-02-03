@@ -1049,13 +1049,13 @@ label.gh-switch {
 
     }
 
-    &.post,&.patch{
+    &.post, &.patch {
       background-color: $primary-blue;
       color: #fff;
 
     }
 
-    &.delete{
+    &.delete {
       background-color: $error-red;
       color: #fff;
 
@@ -1105,8 +1105,8 @@ label.gh-switch {
     }
   }
 
-  #docs-ui{
-    height: calc( 100% - 60px );
+  #docs-ui {
+    height: calc(100% - 60px);
   }
 
   #endpoint-display {
@@ -1129,11 +1129,11 @@ label.gh-switch {
     }
 
     .gh-panel.outlined {
-      .parameter:first-of-type{
+      .parameter:first-of-type {
         border-top: none;
       }
 
-      .parameter{
+      .parameter {
         padding-left: 20px;
         padding-right: 20px;
       }
@@ -1145,9 +1145,10 @@ label.gh-switch {
     margin: 0;
     overflow: auto;
 
-    &:not(.light){
+    &:not(.light) {
       color: #fff;
       background-color: $primary-dark;
+
       a {
         color: #fff;
       }
@@ -1212,7 +1213,7 @@ table .column-steps {
     height: 27px;
     vertical-align: top;
 
-    &:not(:first-child){
+    &:not(:first-child) {
       margin-left: -10px;
     }
 
@@ -1229,7 +1230,7 @@ table .column-steps {
       border-radius: 20px;
     }
 
-    &.benchmark{
+    &.benchmark {
       border: 2px solid $benchmark-orange;
       background-color: #FCDFC4;
       border-radius: 3px;
@@ -1243,8 +1244,16 @@ table .column-steps {
   }
 }
 
-#wpbody-content:has(.gh-header.admin-page-header) .wrap {
-  margin-top: 40px;
+#wpbody-content:has(.gh-header.admin-page-header):has(#show-settings-link) {
+  .wrap {
+    margin-top: 40px;
+  }
+}
+
+.groundhogg-admin-page .gh-header + h2.gh-nav {
+  margin: 0 0 0 -20px !important;
+  padding: 10px 0 0 20px !important;
+  background-color: #fff;
 }
 
 .gh-site {

@@ -92,25 +92,6 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	}
 
 	/**
-	 * Output HTML for the page tabs
-	 */
-	protected function do_page_tabs() {
-
-		?>
-        <!-- BEGIN TABS -->
-        <h2 class="nav-tab-wrapper">
-			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
-				<?php if ( ! current_user_can( $tab['cap'] ) ) {
-					continue;
-				} ?>
-                <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
-                   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
-			<?php endforeach; ?>
-        </h2>
-		<?php
-	}
-
-	/**
 	 * Process the given action
 	 */
 	public function process_action() {
@@ -194,6 +175,25 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	}
 
 	/**
+	 * Output HTML for the page tabs
+	 */
+	protected function do_page_tabs() {
+
+		?>
+        <!-- BEGIN TABS -->
+        <h2 class="nav-tab-wrapper gh-nav">
+			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
+				<?php if ( ! current_user_can( $tab['cap'] ) ) {
+					continue;
+				} ?>
+                <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
+                   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
+			<?php endforeach; ?>
+        </h2>
+		<?php
+	}
+
+	/**
 	 * Modified Admin page to support tabbing.
 	 */
 	public function page() {
@@ -207,18 +207,20 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
             <h1><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
         </div>
+		<?php $this->do_page_tabs(); ?>
         <script>
           const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
           const parent = pageHeader.parentElement; // Get the parent element
+          const navTabs = document.querySelector('h2.gh-nav')
 
           if (parent) {
+            parent.prepend(navTabs);
             parent.prepend(pageHeader); // Move the element to the first child position
           }
         </script>
         <div class="wrap">
 			<?php $this->notices(); ?>
             <hr class="wp-header-end">
-			<?php $this->do_page_tabs(); ?>
 			<?php
 
 			if ( current_user_can( $this->get_current_tab_cap() ) ) {

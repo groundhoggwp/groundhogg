@@ -1841,7 +1841,33 @@ class Settings_Page extends Admin_Page {
 				'id'    => 'save-from-header'
 			] ) ?>
         </div>
-        <script>document.getElementById('save-from-header').addEventListener('click', e => {
+        <h2 class="gh-nav nav-tab-wrapper">
+			<?php foreach ( $this->tabs as $id => $tab ):
+
+				// Force API Tab & Licenses Tab
+				if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab['id'], [
+						'extensions',
+						'api_tab'
+					] ) ) {
+					continue;
+				}
+
+				// Check for cap restriction on the tab...
+				$cap = get_array_var( $tab, 'cap' );
+
+				// ignore if there is no cap, but if there is one check if the user has required privileges...
+				if ( $cap && ! current_user_can( $cap ) ) {
+					continue;
+				}
+
+				?>
+
+                <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
+                   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
+			<?php endforeach; ?>
+        </h2>
+        <script>
+          document.getElementById('save-from-header').addEventListener('click', e => {
             document.getElementById('primary-submit').click()
           })</script>
         <div class="wrap">
@@ -1877,34 +1903,6 @@ class Settings_Page extends Admin_Page {
 			settings_errors();
 			$action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
             <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
-
-                <!-- BEGIN TABS -->
-                <h2 class="nav-tab-wrapper">
-					<?php foreach ( $this->tabs as $id => $tab ):
-
-						// Force API Tab & Licenses Tab
-						if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab['id'], [
-								'extensions',
-								'api_tab'
-							] ) ) {
-							continue;
-						}
-
-						// Check for cap restriction on the tab...
-						$cap = get_array_var( $tab, 'cap' );
-
-						// ignore if there is no cap, but if there is one check if the user has required privileges...
-						if ( $cap && ! current_user_can( $cap ) ) {
-							continue;
-						}
-
-						?>
-
-                        <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
-                           class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
-					<?php endforeach; ?>
-                </h2>
-                <!-- END TABS -->
 
                 <!-- BEGIN SETTINGS -->
 				<?php
