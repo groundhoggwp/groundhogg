@@ -5824,7 +5824,9 @@ add_action( 'wp_loaded', __NAMESPACE__ . '\track_wp_cron_ping' );
  * Tracks the pings of the gh-cron.php.
  */
 function track_gh_cron_ping() {
-	update_option( 'gh_cron_last_ping', time() );
+	if ( gh_doing_cron() ) {
+		update_option( 'gh_cron_last_ping', time() );
+	}
 }
 
 add_action( 'groundhogg/event_queue/before_process', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
