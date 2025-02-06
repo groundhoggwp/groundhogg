@@ -55,7 +55,7 @@ class Replacements implements \JsonSerializable {
 
 		add_action( 'init', [ $this, 'setup_defaults' ] );
 
-		if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET['page'], 'gh_' ) !== false ) {
+		if ( is_admin_groundhogg_page() ) {
 			add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
 		}
 

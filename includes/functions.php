@@ -3660,14 +3660,14 @@ function is_replacement_code_format( string $code, $exact = true ) {
 }
 
 /**
- * Whather the current admin page is a groundhogg page.
+ * Whether the current admin page is a groundhogg page.
  *
  * @return bool
  */
 function is_admin_groundhogg_page() {
 	$page = get_request_var( 'page' );
 
-	return is_admin() && $page && ( preg_match( '/^gh_/', $page ) || $page === 'groundhogg' );
+	return is_admin() && $page && is_string( $page ) && ( preg_match( '/^gh_/', $page ) || $page === 'groundhogg' );
 }
 
 
@@ -5929,7 +5929,8 @@ function sanitize_payload( array $payload ): array {
 
 		// Might be a float
 		// Might be int
-		if ( is_numeric( $param ) ) {
+        // if first digit is 0, treat as string
+		if ( is_numeric( $param ) && ! str_starts_with( "$param", '0' ) ) {
 
 			// No sanitization needed
 			if ( is_int( $param ) || is_float( $param ) ) {
@@ -6666,10 +6667,10 @@ function create_object_from_type( $object, $object_type ) {
 
 	$table = Plugin::instance()->dbs->get_object_db_by_object_type( $object_type );
 
-    // no table found, could be that an add-on was deactivated.
-    if ( ! $table ){
-        return null;
-    }
+	// no table found, could be that an add-on was deactivated.
+	if ( ! $table ) {
+		return null;
+	}
 
 	return $table->create_object( $object );
 }
@@ -6783,14 +6784,14 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
  */
 function enqueue_filter_assets() {
 
-    static $called;
+	static $called;
 
-    if ( $called ){
-        return;
-    }
+	if ( $called ) {
+		return;
+	}
 
-    // call only once?
-    $called = true;
+	// call only once?
+	$called = true;
 
 	wp_enqueue_script( 'groundhogg-admin-filter-contacts' );
 	wp_enqueue_style( 'groundhogg-admin-filters' );
@@ -8594,4 +8595,51 @@ function ajax_send_plugin_feedback() {
 	}
 
 	wp_send_json_success();
+}
+
+/**
+ * Add a filter that removes itself after being called once
+ *
+ * @param string   $filter
+ * @param callable $callback
+ * @param int      $priority
+ * @param int      $args
+ *
+ * @return bool
+ */
+function add_self_removing_filter( string $filter, callable $callback, int $priority = 10, int $args = 1 ) {
+
+	$callbackWrapper = function ( ...$args ) use ( &$callbackWrapper, $filter, $callback, $priority ) {
+		$result = call_user_func_array( $callback, $args );
+		remove_filter( $filter, $callbackWrapper, $priority );
+
+		return $result;
+	};
+
+	return add_filter( $filter, $callbackWrapper, $priority, $args );
+}
+
+/**
+ * Allows the adding of event arguments before an event is added to the event queue
+ *
+ * @param $args
+ *
+ * @return bool
+ */
+function add_event_args( $args = [] ) {
+	return add_filter( 'groundhogg/step/enqueue/event', function ( $data ) use ( $args ) {
+
+		// get any existing args from the event, if none are set an empty array will be used
+		$_args = get_array_var( $data, 'args', [] );
+
+		// We're expecting data to be an array, if at some point args were set, but it wasn't an array, we'll leave it be
+		if ( ! is_array( $_args ) ) {
+			return $data;
+		}
+
+		// set the args to whatever was there before, with the new args. Overrides existing keys.
+		$data['args'] = array_merge( $_args, $args );
+
+		return $data;
+	} );
 }
