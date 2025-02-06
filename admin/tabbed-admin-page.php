@@ -155,7 +155,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		parent::script_action();
 
 		/**
-		 * To enqueue relates scripts for this page and tab
+		 * To enqueue related scripts for this page and tab
 		 *
 		 * @param $page   Admin_Page the current page
 		 * @param $action string the current action
