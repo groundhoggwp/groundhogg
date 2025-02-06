@@ -2,10 +2,13 @@
 
 namespace Groundhogg\Form;
 
-use Groundhogg\Properties;
+use Groundhogg\Contact;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+use Groundhogg\Submission;
+use Groundhogg\Supports_Errors;
 use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\blacklist_check;
-use Groundhogg\Contact;
 use function Groundhogg\contact_and_user_match;
 use function Groundhogg\decrypt;
 use function Groundhogg\do_replacements;
@@ -16,12 +19,8 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
-use Groundhogg\Plugin;
 use function Groundhogg\process_events;
 use function Groundhogg\split_name;
-use Groundhogg\Step;
-use Groundhogg\Submission;
-use Groundhogg\Supports_Errors;
 use function Groundhogg\Ymd;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,11 +32,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Process a from submission if a form submission is in progress.
  *
- * @package     Includes
+ * @since       File available since Release 0.9
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Includes
  */
 class Submission_Handler extends Supports_Errors {
 
@@ -395,7 +394,10 @@ class Submission_Handler extends Supports_Errors {
 			 */
 			do_action( 'groundhogg/form/submission_handler/after', $submission, $contact, $this );
 
-			if ( $this->step->benchmark_enqueue( $contact ) ) {
+			if ( $this->step->benchmark_enqueue( $contact, [
+				'submission_id' => $submission->get_id(),
+				'form_id'       => $this->form_id,
+			] ) ) {
 				process_events( $contact );
 			}
 
