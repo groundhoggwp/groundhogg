@@ -7,6 +7,7 @@ use Groundhogg\DB\Traits\Event_Log_Filters;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -115,6 +116,7 @@ class Event_Queue extends DB {
 			'error_message'  => 'error_message',
 			'priority'       => 'priority',
 			'status'         => 'status',
+			'args'           => 'args',
 		];
 
 		$history_columns = implode( ',', array_values( $column_map ) );
@@ -158,6 +160,7 @@ class Event_Queue extends DB {
 			'priority'       => '%d',
 			'claim'          => '%s',
 			'time_claimed'   => '%d',
+			'args'           => '%s',
 		);
 	}
 
@@ -184,6 +187,7 @@ class Event_Queue extends DB {
 			'priority'       => 10,
 			'claim'          => '',
 			'time_claimed'   => 0,
+			'args'           => '',
 		);
 	}
 
@@ -202,6 +206,10 @@ class Event_Queue extends DB {
 
 		if ( empty( $args['time'] ) ) {
 			return false;
+		}
+
+		if ( isset_not_empty( $data, 'args' ) ) {
+			$data['args'] = maybe_serialize( $data['args'] );
 		}
 
 		return $this->insert( $args );
@@ -326,6 +334,7 @@ class Event_Queue extends DB {
         status varchar(20) NOT NULL,
         claim varchar(20) NOT NULL,
         time_claimed bigint(20) unsigned NOT NULL DEFAULT 0,
+        args text NOT NULL,
         PRIMARY KEY (ID),
         KEY time_idx (time),
         KEY contact_idx (contact_id),

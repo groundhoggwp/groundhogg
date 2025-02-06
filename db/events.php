@@ -3,13 +3,11 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\Broadcast;
-use Groundhogg\Contact_Query;
-use Groundhogg\DB\Query\Where;
 use Groundhogg\DB\Traits\Event_Log_Filters;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -107,6 +105,7 @@ class Events extends DB {
 			'status'         => '%s',
 			'priority'       => '%d',
 			'queued_id'      => '%d',
+			'args'           => '%s',
 		);
 	}
 
@@ -132,6 +131,7 @@ class Events extends DB {
 			'status'         => 'waiting',
 			'priority'       => 10,
 			'queued_id'      => 0,
+			'args'           => '',
 		);
 	}
 
@@ -150,6 +150,10 @@ class Events extends DB {
 
 		if ( empty( $args['time'] ) ) {
 			return false;
+		}
+
+		if ( isset_not_empty( $data, 'args' ) ) {
+			$data['args'] = maybe_serialize( $data['args'] );
 		}
 
 		return $this->insert( $args );
@@ -180,6 +184,7 @@ class Events extends DB {
 			'event_type'     => 'event_type',
 			'priority'       => 'priority',
 			'status'         => 'status',
+			'args'           => 'args',
 		] );
 
 		$history_columns = array_values( $column_map );
@@ -224,7 +229,7 @@ class Events extends DB {
 	 *
 	 * @access  public
 	 *
-	 * @since 2.1
+	 * @since   2.1
 	 *
 	 * @param $row_id
 	 *
@@ -234,7 +239,7 @@ class Events extends DB {
 	 */
 	public function get_by( $column, $row_id ) {
 
-		if ( $column === $this->primary_key ){
+		if ( $column === $this->primary_key ) {
 			return parent::get_by( $column, $row_id );
 		}
 
@@ -339,7 +344,7 @@ class Events extends DB {
 	 *
 	 * @return void
 	 */
-	public function update_3_4_2(){
+	public function update_3_4_2() {
 
 		$this->drop_indexes( [
 			'time',
@@ -378,6 +383,7 @@ class Events extends DB {
         error_message tinytext NOT NULL, 
         priority int unsigned NOT NULL,
         status varchar(20) NOT NULL,
+        args text NOT NULL,
         PRIMARY KEY (ID),
         KEY queued_idx (queued_id),
         KEY contact_idx (contact_id),
