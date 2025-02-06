@@ -635,16 +635,31 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * Enqueue if and only if the step can complete
 	 *
 	 * @param $contact Contact
+	 * @param $args    array optional args for the event
 	 *
 	 * @return bool
 	 */
-	public function benchmark_enqueue( $contact ) {
+	public function benchmark_enqueue( $contact, $args = [] ) {
 
 		if ( ! $this->can_complete( $contact ) ) {
 			return false;
 		}
 
-		$this->enqueue( $contact );
+		// If this is an inner benchmark we want to persist any args from previously enqueued or completed steps
+		// we don't need to check if the order is less because that would have been verified in Step::can_complete()
+		if ( $this->is_inner() ) {
+
+			// ideally the result from this would have been cached since Step::get_current_funnel_step_order()
+			$event = $this->get_previous_event( $contact );
+
+			// Event has args
+			if ( ! empty( $event->args ) ){
+				// merge the previous event args with any given
+				$args = is_array( $event->args ) ? array_merge( $event->args, $args ) : $event->args;
+			}
+		}
+
+		$this->enqueue( $contact, true, $args );
 
 		return true;
 	}
@@ -654,17 +669,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @param Contact $contact
 	 * @param bool    $skip_enqueued whether to skip any other enqueued steps
+	 * @param array   $args          option arguments to store with the event
 	 *
 	 * @return bool
 	 */
-	public function enqueue( $contact, $skip_enqueued = true ) {
+	public function enqueue( $contact, $skip_enqueued = true, $args = [] ) {
 
 		$this->enqueued_contact = $contact;
 
 		/**
-		 * @param bool $enqueue whether the step can be enqueued or not...
-		 * @param Contact Contact
-		 * @param Step Step the step being enqueued
+		 * @param bool    $enqueue whether the step can be enqueued or not...
+		 * @param Contact $contact Contact
+		 * @param Step    $step    Step the step being enqueued
 		 *
 		 * @return bool whether the step can be enqueued or not...
 		 */
@@ -690,7 +706,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 					'status'     => Event::WAITING,
 				]
 			);
-
 		}
 
 		// Set up the new event args
@@ -703,6 +718,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'priority'   => 10,
 		];
 
+		if ( ! empty( $args ) ) {
+			$event['args'] = $args;
+		}
+
+		/**
+		 * Filter the event data before it is enqueued.
+		 *
+		 * This filter allows modifying the event properties before it is added to the database queue.
+		 *
+		 * @param array   $event   The event data to be enqueued.
+		 * @param Contact $contact The contact associated with the event.
+		 * @param Step    $this    The current step object.
+		 *
+		 * @return array The modified event data.
+		 */
+		$event = apply_filters( 'groundhogg/step/enqueue/event', $event, $contact, $this );
+
 		// Special handling for email events
 		if ( $this->get_type() === Send_Email::TYPE ) {
 			$event['email_id'] = absint( $this->get_meta( 'email_id' ) );
@@ -712,15 +744,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the current step order of the contact in the same funnel
-	 * as this step.
+	 * Retrieves the currently enqueued event from the event queue
+	 * or if there isn't one, the most recently completed event from the event history table
 	 *
-	 * @param $contact Contact
+	 * @param $contact
 	 *
-	 * @return bool|int
+	 * @return false|Base_Object|object|null
 	 */
-	public function get_current_funnel_step_order( $contact ) {
-
+	public function get_previous_event( $contact ) {
 		$eventQuery = new Table_Query( 'event_queue' );
 		$eventQuery->setLimit( 1 )
 		           ->where()
@@ -729,14 +760,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		           ->equals( 'funnel_id', $this->get_funnel_id() )
 		           ->equals( 'status', Event::WAITING );
 
-		$events = $eventQuery->get_objects();
+		$events = $eventQuery->get_objects( Event_Queue_Item::class );
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
 
 			// Double check step exists...
-			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+			if ( $event->exists() ) {
+				return $event;
 			}
 		}
 
@@ -749,19 +780,38 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		           ->equals( 'funnel_id', $this->get_funnel_id() )
 		           ->equals( 'status', Event::COMPLETE );
 
-		$events = $eventQuery->get_objects();
+		$events = $eventQuery->get_objects( Event::class );
 
 		if ( ! empty( $events ) ) {
 			// get top element.
 			$event = array_shift( $events );
 
 			// Double check step exists...
-			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+			if ( $event->exists() ) {
+				return $event;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the current step order of the contact in the same funnel
+	 * as this step.
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return bool|int
+	 */
+	public function get_current_funnel_step_order( $contact ) {
+
+		$event = $this->get_previous_event( $contact );
+
+		if ( ! $event || ! $event->get_step() || ! $event->get_step()->exists() ) {
+			return false;
+		}
+
+		return $event->get_step()->get_order();
 	}
 
 	/**
@@ -902,8 +952,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Enqueue the next action if one exists
 	 *
-	 * @param $contact
-	 * @param $event
+	 * @param Contact          $contact
+	 * @param Event_Queue_Item $event
 	 *
 	 * @return void
 	 */
@@ -914,7 +964,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( $next && is_a( $next, Step::class ) ) {
 
 			// No need to do update to skip previous at this point
-			$next->enqueue( $contact, false );
+			$next->enqueue( $contact, false, $event->args ); // persist args to next event
 		}
 
 	}

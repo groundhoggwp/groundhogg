@@ -352,7 +352,25 @@ class Event extends Base_Object {
 
 		$this->step = call_user_func( $callback, $this );
 
+		$this->args = maybe_unserialize( $this->args );
+
 		do_action( 'groundhogg/event/post_setup', $this );
+	}
+
+	/**
+	 * Sanitize columns
+	 *
+	 * @param $data
+	 *
+	 * @return array
+	 */
+	protected function sanitize_columns( $data = [] ) {
+
+		if ( isset_not_empty( $data, 'args' ) ){
+			$data['args'] = maybe_serialize( $data['args'] );
+		}
+
+		return parent::sanitize_columns( $data );
 	}
 
 	/**
@@ -373,7 +391,6 @@ class Event extends Base_Object {
 	public function is_broadcast_event() {
 		return $this->get_event_type() === self::BROADCAST;
 	}
-
 
 	/**
 	 * @return string
