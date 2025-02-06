@@ -408,7 +408,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return true
 	 */
 	public function can_passthru() {
-		if ( $this->is_benchmark() ){
+		if ( $this->is_benchmark() ) {
 			return boolval( $this->can_passthru ) && $this->get_prev_step()->is_action();
 		}
 
@@ -422,7 +422,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_next_action() {
 
-		if ( $this->is_benchmark() ){
+		if ( $this->is_benchmark() ) {
 
 			$query = new Table_Query( 'steps' );
 			$query->setOrderby( [ 'step_order', 'ASC' ] )
@@ -430,7 +430,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			      ->where()
 			      ->equals( 'funnel_id', $this->get_funnel_id() )
 			      ->equals( 'step_group', self::ACTION )
-			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1  );
+			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
 
 			$next = $query->get_objects( Step::class );
 

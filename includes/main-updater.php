@@ -230,9 +230,9 @@ class Main_Updater extends Old_Updater {
 			],
 			'3.7.5'    => [
 				'automatic'   => true,
-				'description' => __( 'Add <code>can_passthru</code> column to steps table.', 'groundhogg' ),
+				'description' => __( 'Add <code>can_passthru</code> column to steps table. Add arguments for funnel events.', 'groundhogg' ),
 				'callback'    => function () {
-					db()->steps->create_table();
+					db()->steps->create_table(); // add pass_thru
 					db()->events->create_table(); // add args
 					db()->event_queue->create_table(); // add args
 				}
