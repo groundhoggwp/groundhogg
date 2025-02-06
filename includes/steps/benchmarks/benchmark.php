@@ -134,9 +134,18 @@ abstract class Benchmark extends Funnel_Step {
 
 				$this->set_current_contact( $contact );
 
-				if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
-					$step->enqueue( $this->get_current_contact() );
+				$args = [];
 
+				foreach ( $this->data as $key => $value ) {
+					if ( is_object( $value ) ) {
+						continue;
+					}
+
+					$args[ $key ] = $value;
+				}
+
+				if ( $this->can_complete_step() ) {
+					$step->benchmark_enqueue( $this->get_current_contact(), $args );
 				}
 			}
 

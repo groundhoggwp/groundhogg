@@ -8643,3 +8643,22 @@ function add_event_args( $args = [] ) {
 		return $data;
 	} );
 }
+
+/**
+ * Get an argument from the event args
+ *
+ * @param string $arg the argument to retrieve
+ * @param mixed $default what to return if not found or empty
+ *
+ * @return bool|mixed false if the event queue is not running, otherwise the found arg or the given default
+ */
+function get_event_arg( string $arg, $default = false ) {
+
+    if ( \Groundhogg\event_queue()::is_processing() ){
+        return false;
+    }
+
+    $event = \Groundhogg\event_queue()->get_current_event();
+
+    return get_array_var( $event->args, $arg, $default );
+}

@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -434,7 +435,7 @@ class Replacements implements \JsonSerializable {
 			[
 				'code'         => 'form_submission',
 				'group'        => 'activity',
-				'default_args' => 'layout="stacked" fields="all" form="recent"',
+				'default_args' => 'layout="stacked" fields="all"',
 				'callback'     => [ $this, 'replacement_form_submission' ],
 				'name'         => __( 'Form Submission', 'groundhogg' ),
 				'description'  => _x( 'All the responses from the most recent form submission.', 'replacement', 'groundhogg' ),
@@ -2497,40 +2498,46 @@ class Replacements implements \JsonSerializable {
 
 		$props = $this->parse_atts( $args, [
 			'layout' => 'stacked',
-			'form'   => 'newest',
+			'form'   => '',
 			'fields' => 'all',
 			'hidden' => false
 		] );
 
-		$query = new Table_Query( 'submissions' );
-		$query->setLimit( 1 )
-		      ->setOrderby( [ 'date_created', 'DESC' ] )
-		      ->where()
-		      ->equals( 'contact_id', $this->get_current_contact()->get_id() )
-		      ->equals( 'type', 'form' );
+		if ( get_event_arg( 'submission_id' ) && empty( $props['form'] ) ) {
+	        // If there is a submission for the current event
+	        $submission = new Submission( absint( get_event_arg( 'submission_id' ) ) );
+        } else {
+            // do a query instead
+	        $query = new Table_Query( 'submissions' );
+	        $query->setLimit( 1 )
+	              ->setOrderby( [ 'date_created', 'DESC' ] )
+	              ->where()
+	              ->equals( 'contact_id', $this->get_current_contact()->get_id() )
+	              ->equals( 'type', 'form' );
 
-		if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) ) {
+	        if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) || empty( $props['form'] ) ) {
 
-			// get the most recent form submission
+		        // get the most recent form submission
 
-		} else if ( in_array( $props['form'], [ 'first', 'oldest' ] ) ) {
+	        } else if ( in_array( $props['form'], [ 'first', 'oldest' ] ) ) {
 
-			// get the first form submission
-			$query->setOrderby( [ 'date_created', 'ASC' ] );
+		        // get the first form submission
+		        $query->setOrderby( [ 'date_created', 'ASC' ] );
 
-		} else if ( absint( $props['form'] ) > 0 ) {
+	        } else if ( absint( $props['form'] ) > 0 ) {
 
-			// get the most recent submission for a specific form
-			$query->where()->equals( 'form_id', absint( $props['form'] ) );
-		}
+		        // get the most recent submission for a specific form
+		        $query->where()->equals( 'form_id', absint( $props['form'] ) );
+	        }
 
-		$submissions = $query->get_objects();
+            $submissions = $query->get_objects();
 
-		if ( empty( $submissions ) ) {
-			return '';
-		}
+	        if ( empty( $submissions ) ) {
+		        return '';
+	        }
 
-		$submission = $submissions[0];
+	        $submission = $submissions[0];
+        }
 
 		$answers = $submission->get_answers( $props['hidden'] );
 
