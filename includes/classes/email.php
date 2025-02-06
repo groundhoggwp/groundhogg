@@ -1208,6 +1208,10 @@ class Email extends Base_Object_With_Meta {
 		add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		add_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
 
+		// even though we set the from header, plugins will try to overwrite the from email and name
+		add_filter( 'wp_mail_from_name', [ $this, 'get_from_name' ] );
+		add_filter( 'wp_mail_from', [ $this, 'get_from_email' ] );
+
 		$content = $this->build();
 		$to      = $this->get_to_address();
 		$subject = $this->get_merged_subject_line();
@@ -1229,6 +1233,8 @@ class Email extends Base_Object_With_Meta {
 		remove_action( 'phpmailer_init', [ $this, 'set_plaintext_body' ] );
 		remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		remove_filter( 'wp_mail_content_type', [ $this, 'send_in_html' ] );
+		remove_filter( 'wp_mail_from', [ $this, 'get_from_email' ] );
+		remove_filter( 'wp_mail_from_name', [ $this, 'get_from_name' ] );
 
 		if ( ! $sent ) {
 			do_action( 'groundhogg/email/send_failed', $this );
