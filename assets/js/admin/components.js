@@ -23,34 +23,64 @@
     skeleton,
     adminPageURL,
   } = Groundhogg.element
+
+  const {
+    Div,
+    H2,
+    H4,
+    Toggle,
+    Img,
+    An,
+    Span,
+    ModalFrame,
+    Iframe,
+    makeEl,
+    Button,
+    Modal,
+    Dashicon,
+    ToolTip,
+    Input,
+    TinyMCE,
+    Label,
+    Fragment,
+    ItemPicker,
+    Skeleton,
+    Pg,
+    Form,
+    Textarea,
+    InputGroup,
+  } = MakeEl
+
   const {
     contacts: ContactsStore,
     tags    : TagsStore,
     forms   : FormsStore,
     emails  : EmailsStore,
   } = Groundhogg.stores
+
   const {
     post,
     routes,
     postFormData,
   } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
+
   const {
     userHasCap,
     getOwner,
   } = Groundhogg.user
+
   const {
     sprintf,
     __,
     _x,
     _n,
   } = wp.i18n
+
   const {
-    formatNumber,
-    formatTime,
-    formatDate,
     formatDateTime,
   } = Groundhogg.formatting
+
   const { currentUser } = Groundhogg
 
   const {
@@ -86,7 +116,6 @@
         },
       }),
     )
-
   }
 
   const betterTagPicker = (el, {
@@ -1663,33 +1692,6 @@
       },
     })
   }
-
-  const {
-    Div,
-    H2,
-    H4,
-    Toggle,
-    Img,
-    An,
-    Span,
-    ModalFrame,
-    Iframe,
-    makeEl,
-    Button,
-    Modal,
-    Dashicon,
-    ToolTip,
-    Input,
-    TinyMCE,
-    Label,
-    Fragment,
-    ItemPicker,
-    Skeleton,
-    Pg,
-    Form,
-    Textarea,
-    InputGroup,
-  } = MakeEl
 
   const EmailPreviewModal = async (emailId, {
     height = window.innerHeight * 0.85,
