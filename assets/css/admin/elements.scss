@@ -3027,6 +3027,10 @@ button:has(.gh-dropdown-menu) {
   border: 1px solid #8c8f94;
   border-radius: 5px;
 
+  .gh-picker-label{
+    padding: 3px;
+  }
+
   .gh-picker-selected {
     padding: 3px;
 
@@ -3034,13 +3038,15 @@ button:has(.gh-dropdown-menu) {
       .gh-picker-item {
         background: none;
         font-size: 14px;
-        width: 100%;
+        flex-grow: 1;
+        //width: 100%;
         justify-content: space-between;
 
         .gh-picker-item-text {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          margin-right: auto;
         }
       }
     }

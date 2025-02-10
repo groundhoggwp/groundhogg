@@ -842,6 +842,11 @@
     $(document).off('tinymce-editor-setup', addTaskTemplatesToolbarTinyMCE)
   }
 
+  const addMediaButtonToTinyMCE = ( event, editor ) => {
+    editor.settings.toolbar1 += ',wp_add_media'
+    $(document).off('tinymce-editor-setup', addMediaButtonToTinyMCE)
+  }
+
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
   }) => {
@@ -850,6 +855,11 @@
     if (config.replacements === true) {
       $(document).on('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
       delete config.replacements
+    }
+
+    if ( config.media === true ){
+      $(document).on('tinymce-editor-setup', addMediaButtonToTinyMCE )
+      delete config.media
     }
 
     if (config.savedReplies === true) {

@@ -2646,6 +2646,9 @@ button:has(.gh-dropdown-menu) {
 .gh-picker.options-visible .gh-picker-options {
   display: block;
 }
+.gh-picker .gh-picker-label {
+  padding: 3px;
+}
 .gh-picker .gh-picker-selected {
   padding: 3px;
   display: flex;
@@ -2656,13 +2659,14 @@ button:has(.gh-dropdown-menu) {
 .gh-picker .gh-picker-selected.single .gh-picker-item {
   background: none;
   font-size: 14px;
-  width: 100%;
+  flex-grow: 1;
   justify-content: space-between;
 }
 .gh-picker .gh-picker-selected.single .gh-picker-item .gh-picker-item-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-right: auto;
 }
 .gh-picker .gh-picker-selected > .gh-picker-search {
   flex-grow: 1;
