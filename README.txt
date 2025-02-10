@@ -349,6 +349,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 3.7.5 (2025-02-10) =
+* FIXED Adding steps to the beginning of a funnel not working.
+* FIXED Composed email message contact wiped after enabling CC or BCC.
+
 = 3.7.4.1 (2025-01-21) =
 * HOT FIX Update script not working if one of the Groundhogg's custom roles was deleted.
 

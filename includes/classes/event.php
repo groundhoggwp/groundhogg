@@ -334,6 +334,7 @@ class Event extends Base_Object {
 	 */
 	protected function post_setup() {
 
+		$this->args = maybe_unserialize( $this->args );
 		$this->contact = new Contact( $this->get_contact_id() );
 
 		self::maybe_register_step_setup_callbacks();
@@ -349,8 +350,6 @@ class Event extends Base_Object {
 		} );
 
 		$this->step = call_user_func( $callback, $this );
-
-		$this->args = maybe_unserialize( $this->args );
 
 		do_action( 'groundhogg/event/post_setup', $this );
 	}
@@ -595,6 +594,18 @@ class Event extends Base_Object {
 		return $this->update( [
 			'status' => self::PAUSED
 		] );
+	}
+
+	/**
+	 * Get an arg from the args array
+	 *
+	 * @param string $arg
+	 * @param        $default
+	 *
+	 * @return bool|mixed
+	 */
+	public function get_arg( string $arg, $default = false ) {
+		return get_array_var( $this->args, $arg, $default );
 	}
 
 	/**

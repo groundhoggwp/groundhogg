@@ -31,6 +31,24 @@ abstract class Benchmark extends Funnel_Step {
 	protected $data = [];
 
 	/**
+	 * List of arguments to be passed later to benchmark enqueue
+	 *
+	 * @var array
+	 */
+	protected $args = [];
+
+	/**
+	 * Set any arguments for later
+	 *
+	 * @param array $args
+	 *
+	 * @return void
+	 */
+	protected function set_args( array $args ) {
+		$this->args = array_merge( $this->args, $args );
+	}
+
+	/**
 	 * Add arbitrary data
 	 *
 	 * @param string $key
@@ -134,21 +152,10 @@ abstract class Benchmark extends Funnel_Step {
 
 				$this->set_current_contact( $contact );
 
-				$args = [];
-
-				foreach ( $this->data as $key => $value ) {
-					if ( is_object( $value ) ) {
-						continue;
-					}
-
-					$args[ $key ] = $value;
-				}
-
 				if ( $this->can_complete_step() ) {
-					$step->benchmark_enqueue( $this->get_current_contact(), $args );
+					$step->benchmark_enqueue( $this->get_current_contact(), $this->args );
 				}
 			}
-
 		}
 
 		// Only process events if flag to complete is true

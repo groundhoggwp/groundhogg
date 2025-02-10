@@ -45,7 +45,8 @@ class Event_Store_V2 {
 				'contact_id',
 				'event_type',
 				'status',
-				'claim'
+				'claim',
+				'args'
 			],
 			'claim'   => $this->claim,
 			'orderby' => 'ID',
