@@ -8660,5 +8660,5 @@ function get_event_arg( string $arg, $default = false ) {
 
     $event = \Groundhogg\event_queue()->get_current_event();
 
-    return get_array_var( $event->args, $arg, $default );
+    return $event->get_arg( $arg, $default );
 }
