@@ -2,13 +2,13 @@
 
 namespace Groundhogg\DB;
 
-// Exit if accessed directly
+use Groundhogg\DB\Traits\Event_Log;
 use Groundhogg\DB\Traits\Event_Log_Filters;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
 use function Groundhogg\get_db;
-use function Groundhogg\isset_not_empty;
 
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -27,6 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Event_Queue extends DB {
 
+	use Event_Log;
 	use Event_Log_Filters;
 
 	public function __construct() {
@@ -70,11 +71,8 @@ class Event_Queue extends DB {
 		return 'event_queue_item';
 	}
 
-	/**
-	 * @return string
-	 */
-	public function get_date_key() {
-		return 'time';
+	public function create_object( $object ) {
+		return new Event_Queue_Item( $object );
 	}
 
 	public function count_unprocessed() {
@@ -136,7 +134,6 @@ class Event_Queue extends DB {
 		$this->cache_set_last_changed();
 	}
 
-
 	/**
 	 * Get columns and formats
 	 *
@@ -192,104 +189,6 @@ class Event_Queue extends DB {
 	}
 
 	/**
-	 * Add a activity
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function add( $data = array() ) {
-
-		$args = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
-		if ( empty( $args['time'] ) ) {
-			return false;
-		}
-
-		if ( isset_not_empty( $data, 'args' ) ) {
-			$data['args'] = maybe_serialize( $data['args'] );
-		}
-
-		return $this->insert( $args );
-	}
-
-	/**
-	 * Get all the queued events
-	 */
-	public function get_queued_event_ids() {
-		global $wpdb;
-
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $this->table_name WHERE time <= %d AND status = %s"
-				, time(), 'waiting' )
-		);
-
-		return wp_parse_id_list( wp_list_pluck( $results, 'ID' ) );
-	}
-
-
-	/**
-	 * Clean up DB events when this happens.
-	 */
-	protected function add_additional_actions() {
-		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
-		add_action( 'groundhogg/db/post_delete/funnel', [ $this, 'funnel_deleted' ] );
-		add_action( 'groundhogg/db/post_delete/step', [ $this, 'step_deleted' ] );
-		parent::add_additional_actions();
-	}
-
-	/**
-	 * Delete events for a contact that was just deleted...
-	 *
-	 * @param $id
-	 *
-	 * @return false|int
-	 */
-	public function contact_deleted( $id ) {
-
-		if ( ! is_numeric( $id ) ) {
-			return false;
-		}
-
-		return $this->bulk_delete( [ 'contact_id' => $id ] );
-	}
-
-	/**
-	 * Delete events for a funnel that was just deleted...
-	 *
-	 * @param $id
-	 *
-	 * @return false|int
-	 */
-	public function funnel_deleted( $id ) {
-
-		if ( ! is_numeric( $id ) ) {
-			return false;
-		}
-
-		return $this->bulk_delete( [ 'funnel_id' => $id ] );
-	}
-
-	/**
-	 * Delete events for a step that was just deleted...
-	 *
-	 * @param $id
-	 *
-	 * @return false|int
-	 */
-	public function step_deleted( $id ) {
-
-		if ( ! is_numeric( $id ) ) {
-			return false;
-		}
-
-		return $this->bulk_delete( [ 'step_id' => $id ] );
-	}
-
-	/**
 	 * Drop and recreate indexes
 	 *
 	 * @return void
@@ -342,9 +241,5 @@ class Event_Queue extends DB {
         KEY step_idx (step_id),
         KEY claim_idx (claim)
 		) {$this->get_charset_collate()};";
-	}
-
-	public function create_object( $object ) {
-		return new Event_Queue_Item( $object );
 	}
 }
