@@ -396,7 +396,7 @@ class Submission_Handler extends Supports_Errors {
 
 			if ( $this->step->benchmark_enqueue( $contact, [
 				'submission_id' => $submission->get_id(),
-				'form_id'       => $this->form_id,
+//				'form_id'       => $this->form_id,
 			] ) ) {
 				process_events( $contact );
 			}

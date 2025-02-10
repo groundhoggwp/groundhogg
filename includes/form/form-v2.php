@@ -2187,7 +2187,7 @@ class Form_v2 extends Step {
 
 		if ( $this->benchmark_enqueue( $contact, [
 			'submission_id' => $submission->get_id(),
-			'form_id'       => $this->get_id()
+//			'form_id'       => $this->get_id()
 		] ) ) {
 			process_events( [ $contact ] );
 		}
