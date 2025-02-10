@@ -153,7 +153,7 @@
                 sendEmail()
                 break
               case 'template':
-                Groundhogg.components.EmailTemplateModal( getContact().ID )
+                Groundhogg.components.EmailTemplateModal(getContact().ID)
                 break
 
             }
@@ -447,7 +447,10 @@
             <div class="inside" style="padding: 0">
                 <table class="wp-list-table widefat striped" style="border: none">
                     <tbody>
-                    ${ details.map( ({ label, value: val }) => {
+                    ${ details.map(({
+                        label,
+                        value: val,
+                    }) => {
                         return `<tr><td>${ key(label) }</td><td>${ value(val) }</td></tr>`
                     }).join('') }
                     </tbody>
@@ -456,12 +459,16 @@
         </div>`
   }
 
-  const stepTypeIcon = ( type ) => {
+  const stepTypeIcon = (type) => {
 
-    const { svg, icon, name } = Groundhogg.rawStepTypes[type]
+    const {
+      svg,
+      icon,
+      name,
+    } = Groundhogg.rawStepTypes[type]
 
-    if ( svg ){
-      return svg;
+    if (svg) {
+      return svg
     }
 
     return `<img class="step-icon" src="${ icon }" alt="${ name }"/>`
@@ -705,7 +712,7 @@
 
         let funnel
 
-        if ( activity.form ){
+        if (activity.form) {
           funnel = FunnelsStore.get(activity.form.data.funnel_id)
         }
 
@@ -716,7 +723,7 @@
             return SubmissionActivityItem({
               icon   : icons.form,
               heading: __('Submission', 'groundhogg'),
-              before: sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
@@ -728,11 +735,11 @@
             return SubmissionActivityItem({
               icon   : icons.webhook,
               heading: __('Request', 'groundhogg'),
-              before: sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
-                }, bold(funnel.data.title)))
+                }, bold(funnel.data.title))),
             })
 
           case 'webhook_response':
@@ -740,11 +747,11 @@
             return SubmissionActivityItem({
               icon   : icons.webhook,
               heading: __('Response', 'groundhogg'),
-              before: sprintf(__('Received response from %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Received response from %s in funnel %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
-                }, bold(funnel.data.title)))
+                }, bold(funnel.data.title))),
             })
 
           case 'api':
@@ -752,7 +759,7 @@
             return SubmissionActivityItem({
               icon   : icons.api,
               heading: __('Request', 'groundhogg'),
-              before: __( 'Contact updated via REST API.', 'groundhogg' )
+              before : __('Contact updated via REST API.', 'groundhogg'),
             })
 
           case 'import':
@@ -760,17 +767,17 @@
             return SubmissionActivityItem({
               icon   : '<span class="dashicons dashicons-upload"></span>',
               heading: __('Data', 'groundhogg'),
-              before: sprintf( __( 'Contact imported from %s.', 'groundhogg' ), bold( activity.data.name ) )
+              before : sprintf(__('Contact imported from %s.', 'groundhogg'), bold(activity.data.name)),
             })
 
           default:
 
             // support for form integrations
-            if ( activity.form ){
+            if (activity.form) {
               return SubmissionActivityItem({
-                icon   : stepTypeIcon( activity.form.data.step_type ),
+                icon   : stepTypeIcon(activity.form.data.step_type),
                 heading: __('Submission', 'groundhogg'),
-                before: sprintf(__('Submitted %s in funnel %s', 'groundhogg'),
+                before : sprintf(__('Submitted %s in funnel %s', 'groundhogg'),
                   bold(activity.data.name), el('a', {
                     href  : funnel.admin + `#${ activity.data.step_id }`,
                     target: '_blank',
@@ -780,8 +787,8 @@
 
             // language=HTML
             return SubmissionActivityItem({
-              icon: icons.contact,
-              before: sprintf( __( 'Contact updated by %s', 'groundhogg' ), bold( activity.data.name ) ),
+              icon   : icons.contact,
+              before : sprintf(__('Contact updated by %s', 'groundhogg'), bold(activity.data.name)),
               heading: __('Data', 'groundhogg'),
             })
         }
@@ -838,7 +845,7 @@
                     <div class="activity-icon ${ step.data.step_group } ${ pending ? 'pending' : '' }">
                         ${ pending
                            ? icons.hourglass
-                           : stepTypeIcon( step.data.step_type ) }
+                           : stepTypeIcon(step.data.step_type) }
                     </div>
                     <div class="activity-rendered gh-panel space-between">
                         <div>
@@ -2489,6 +2496,8 @@
   const {
     Div,
     An,
+    Span,
+    Fragment,
     Bold,
     Pg,
   } = MakeEl
@@ -2508,14 +2517,21 @@
         onDelete,
         ...item
       }) => ContactListItem(item, {
-        extra: An({
-          className: 'danger',
-          href     : '#',
-          onClick  : e => {
-            e.preventDefault()
-            onDelete(item.ID)
-          },
-        }, __('Remove')),
+        extra: Div( { className: 'display-flex gap-5' },[
+          An({
+            onClick  : e => {
+              window.open( item.admin )
+            },
+          }, __('View')),
+          Span({},'|'),
+          An({
+            className: 'danger',
+            onClick  : e => {
+              e.preventDefault()
+              onDelete(item.ID)
+            },
+          }, __('Remove')),
+        ]),
       }),
       onAddItem        : (res, rej, state) => {
         selectContactModal({
