@@ -489,11 +489,16 @@
         connectWith: '.ui-sortable',
         receive: (e, ui) => {
 
+          let prev = ui.helper.prev().prop('id')
+          if (typeof prev === 'undefined') {
+            prev = 0
+          }
+
           var data = {
             action: 'wpgh_get_step_html',
             step_type: ui.item.prop('id'),
             step_group: ui.item.data('group'),
-            after_step: ui.helper.prev().prop('id'),
+            after_step: prev,
             funnel_id: this.id,
             version: 2,
           }
@@ -635,7 +640,7 @@
         $(`#${ self.insertAfterStep }`).after(response.data.sortable)
       }
       else {
-        $steps.append(response.data.sortable)
+        $steps.prepend(response.data.sortable)
       }
 
       $settings.append(response.data.settings)
