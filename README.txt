@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 3.7.4.1
+Stable tag: 3.7.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,6 +350,14 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.7.5 (2025-02-10) =
+* ADDED New event arguments API which will enable unique arguments to be associated with individual funnel (and other) events. This is VERY COOL! It paves the way for better handling of automation for related objects like orders, deals, and companies.
+* ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
+* IMPROVED The Cron Job Setup page with additional instructions and a new layout.
+* IMPROVED Styling of tabbed admin pages.
+* TWEAKED Funnels can't be activated unless there is at least one starting benchmark.
+* FIXED Fatal error if `page` query param is present but not a string in non-admin pages.
+* FIXED Incorrect filter for managed page body classes.
+* FIXED Incorrect cached results for plain-text replacements.
 * FIXED Adding steps to the beginning of a funnel not working.
 * FIXED Composed email message contact wiped after enabling CC or BCC.
 
