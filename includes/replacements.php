@@ -1364,8 +1364,21 @@ class Replacements implements \JsonSerializable {
 		return $this->get_current_contact()->get_meta( 'country' );
 	}
 
+	/**
+     * Full country name if country is set,
+     * otherwise the empty string
+     *
+	 * @return string
+	 */
 	function replacement_country() {
-		return utils()->location->get_countries_list( $this->get_current_contact()->get_meta( 'country' ) );
+
+        $country_code = $this->get_current_contact()->get_meta( 'country' );
+
+        if ( empty( $country_code ) ){
+            return '';
+        }
+
+		return utils()->location->get_countries_list( $country_code );
 	}
 
 	function replacement_ip_address() {
@@ -1387,9 +1400,7 @@ class Replacements implements \JsonSerializable {
 		$address = implode( ', ', $this->get_current_contact()->get_address() );
 
 		return $address;
-
 	}
-
 
 	/**
 	 * Get the contact notes
@@ -1411,7 +1422,6 @@ class Replacements implements \JsonSerializable {
 
 		return $return;
 	}
-
 
 	/**
 	 * Return back the email address of the contact owner.
@@ -1825,9 +1835,9 @@ class Replacements implements \JsonSerializable {
 		$quotes[] = "I'm a god, I'm not the God. I don't think.";
 		$quotes[] = "Don't drive angry! Don't drive angry!";
 		$quotes[] = "I'm betting he's going to swerve first.";
-		$quotes[] = "You want a prediction about the weather? You're asking the wrong Phil. I'm going to give you a prediction about this winter? It's going to be cold, it's going to be dark and it's going to last you for the rest of your lives!";
+		$quotes[] = "You want a prediction about the weather? You're asking the wrong Phil. I'm going to give you a prediction about this winter. It's going to be cold, it's going to be dark, and it's going to last you for the rest of your lives!";
 		$quotes[] = "We mustn't keep our audience waiting.";
-		$quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
+		$quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...it's cold out there every day.";
 		$quotes[] = "I peg you as a glass half empty kinda guy.";
 		$quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
 		$quotes[] = "Did he actually refer to himself as \"the talent\"?";
