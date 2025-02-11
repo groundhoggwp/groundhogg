@@ -450,7 +450,7 @@
         this.steps = response.data.funnel.steps
 
         // match the status of the funnel with the one from the response
-        $('#status-toggle').prop('checked', response.data.funnel.status === 'active' )
+        $('#status-toggle').prop('checked', response.data.funnel.data.status === 'active' )
 
         $saveButton.removeClass('spin')
         $saveButton.html(self.save_text)
