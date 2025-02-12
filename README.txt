@@ -352,14 +352,17 @@ You can purchase a premium plan for access to support and our premium extensions
 = 3.7.5 (2025-02-10) =
 * ADDED New event arguments API which will enable unique arguments to be associated with individual funnel (and other) events. This is VERY COOL! It paves the way for better handling of automation for related objects like orders, deals, and companies.
 * ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
+* ADDED Additional bulk actions in the event logs tables.
 * IMPROVED The Cron Job Setup page with additional instructions and a new layout.
 * IMPROVED Styling of tabbed admin pages.
+* TWEAKED Object ID can be omitted from relationship filters for more generic usage.
 * TWEAKED Funnels can't be activated unless there is at least one starting benchmark.
 * FIXED Fatal error if `page` query param is present but not a string in non-admin pages.
 * FIXED Incorrect filter for managed page body classes.
 * FIXED Incorrect cached results for plain-text replacements.
 * FIXED Adding steps to the beginning of a funnel not working.
 * FIXED Composed email message contact wiped after enabling CC or BCC.
+* FIXED Broadcasts report not filtering by campaign when date range changes.
 
 = 3.7.4.1 (2025-01-21) =
 * HOT FIX Update script not working if one of the Groundhogg's custom roles was deleted.
