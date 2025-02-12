@@ -2267,7 +2267,7 @@
     },
   }, {}))
 
-  ContactFilterRegistry.registerFilter(createFilter('secondary_related', 'Child relationship', 'query', {
+  ContactFilterRegistry.registerFilter(createFilter('secondary_related', 'Is Child Of', 'query', {
     edit   : ({object_type= '', object_id = '', updateFilter }) => Fragment([
       Input({
         id: 'object-type',
@@ -2298,15 +2298,21 @@
       object_type,
       object_id,
     }) => {
-      if ( ! object_type || ! object_id ){
-        throw new Error( 'Type and ID must both be defined' )
+      if ( ! object_type ){
+        throw new Error( 'Type be defined' )
+      }
+
+      if ( ! object_id ){
+        return `Is a child of ${ object_type }`
       }
 
       return `Is a child of ${ object_type } with ID ${ object_id }`
     }
-  }, {}))
+  }, {
+    object_type: 'contact'
+  }))
 
-  ContactFilterRegistry.registerFilter(createFilter('primary_related', 'Parent relationship', 'query', {
+  ContactFilterRegistry.registerFilter(createFilter('primary_related', 'Is Parent Of', 'query', {
     edit   : ({object_type= '', object_id = '', updateFilter }) => Fragment([
       Input({
         id: 'object-type',
@@ -2337,13 +2343,19 @@
       object_type,
       object_id,
     }) => {
-      if ( ! object_type || ! object_id ){
-        throw new Error( 'Type and ID must both be defined' )
+      if ( ! object_type ){
+        throw new Error( 'Type must be defined' )
+      }
+
+      if ( ! object_id ){
+        return `Is a parent of ${ object_type }`
       }
 
       return `Is a parent of ${ object_type } with ID ${ object_id }`
     }
-  }, {}))
+  }, {
+    object_type: 'contact'
+  }))
 
 
   if (!Groundhogg.filters) {

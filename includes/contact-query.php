@@ -398,6 +398,7 @@ class Contact_Query extends Table_Query {
 
 	/**
 	 * Filter by primary object relationships
+	 * "Is Parent Of"
 	 *
 	 * @param       $filter
 	 * @param Where $where
@@ -406,13 +407,21 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_primary_related( $filter, Where $where ) {
 
+		$filter = wp_parse_args( $filter, [
+			'object_type' => 'contact',
+			'object_id'   => 0
+		] );
+
 		if ( $where->hasCondition( 'object_relationships' ) ) {
 			$query = new Table_Query( 'object_relationships' );
 			$query->setSelect( 'primary_object_id' )
 			      ->where()
 			      ->equals( 'primary_object_type', 'contact' )
-			      ->equals( 'secondary_object_type', $filter['object_type'] )
-			      ->equals( 'secondary_object_id', $filter['object_id'] );
+			      ->equals( 'secondary_object_type', $filter['object_type'] );
+
+			if ( $filter['object_id'] ) {
+				$query->where()->equals( 'secondary_object_id', $filter['object_id'] );
+			}
 
 			$where->in( 'ID', $query );
 
@@ -422,12 +431,15 @@ class Contact_Query extends Table_Query {
 		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
 		$join->onColumn( 'primary_object_id', 'ID' )->equals( 'primary_object_type', 'contact' );
 
-		$where->equals( "$join->alias.secondary_object_id", $filter['object_id'] );
 		$where->equals( "$join->alias.secondary_object_type", $filter['object_type'] );
+		if ( $filter['object_id'] ) {
+			$where->equals( "$join->alias.secondary_object_id", $filter['object_id'] );
+		}
 	}
 
 	/**
 	 * Filter by secondary object relationships
+	 * "Is Child Of"
 	 *
 	 * @param       $filter
 	 * @param Where $where
@@ -436,13 +448,21 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_secondary_related( $filter, Where $where ) {
 
+		$filter = wp_parse_args( $filter, [
+			'object_type' => 'contact',
+			'object_id'   => 0
+		] );
+
 		if ( $where->hasCondition( 'object_relationships' ) ) {
 			$query = new Table_Query( 'object_relationships' );
 			$query->setSelect( 'secondary_object_id' )
 			      ->where()
 			      ->equals( 'secondary_object_type', 'contact' )
-			      ->equals( 'primary_object_type', $filter['object_type'] )
-			      ->equals( 'primary_object_id', $filter['object_id'] );
+			      ->equals( 'primary_object_type', $filter['object_type'] );
+
+			if ( $filter['object_id'] ) {
+				$query->where()->equals( 'primary_object_id', $filter['object_id'] );
+			}
 
 			$where->in( 'ID', $query );
 
@@ -452,8 +472,10 @@ class Contact_Query extends Table_Query {
 		$join = $where->query->addJoin( 'LEFT', 'object_relationships' );
 		$join->onColumn( 'secondary_object_id', 'ID' )->equals( 'secondary_object_type', 'contact' );
 
-		$where->equals( "$join->alias.primary_object_id", $filter['object_id'] );
 		$where->equals( "$join->alias.primary_object_type", $filter['object_type'] );
+		if ( $filter['object_id'] ) {
+			$where->equals( "$join->alias.primary_object_id", $filter['object_id'] );
+		}
 	}
 
 	/**
