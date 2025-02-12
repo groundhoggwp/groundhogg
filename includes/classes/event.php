@@ -334,7 +334,7 @@ class Event extends Base_Object {
 	 */
 	protected function post_setup() {
 
-		$this->args = maybe_unserialize( $this->args );
+		$this->args    = maybe_unserialize( $this->args );
 		$this->contact = new Contact( $this->get_contact_id() );
 
 		self::maybe_register_step_setup_callbacks();
@@ -531,8 +531,8 @@ class Event extends Base_Object {
 		do_action( 'groundhogg/event/cancelled', $this );
 
 		return $this->update( [
-			'status' => self::CANCELLED,
-			'time'   => time(),
+			'status'         => self::CANCELLED,
+			'time_scheduled' => time(),
 		] );
 
 	}
@@ -569,8 +569,8 @@ class Event extends Base_Object {
 		do_action( 'groundhogg/event/skipped', $this );
 
 		return $this->update( wp_parse_args( $args, [
-			'status' => self::SKIPPED,
-			'time'   => time(),
+			'status'         => self::SKIPPED,
+			'time_scheduled' => time(),
 		] ) );
 	}
 

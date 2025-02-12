@@ -95,7 +95,8 @@ class Funnel extends Base_Object_With_Meta {
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::WAITING,
 		], [
-			'status' => Event::PAUSED
+			'status'         => Event::PAUSED,
+			'time_scheduled' => time()
 		] );
 	}
 
@@ -108,7 +109,8 @@ class Funnel extends Base_Object_With_Meta {
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::PAUSED,
 		], [
-			'status' => Event::WAITING
+			'status'         => Event::WAITING,
+			'time_scheduled' => time()
 		] );
 	}
 
@@ -117,13 +119,16 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function cancel_events() {
 
+		$time = time();
+
 		// Cancel waiting events
 		event_queue_db()->update( [
 			'funnel_id'  => $this->get_id(),
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::WAITING,
 		], [
-			'status' => Event::CANCELLED
+			'status' => Event::CANCELLED,
+			'time_scheduled' => $time
 		] );
 
 		// Cancel paused events
@@ -132,7 +137,8 @@ class Funnel extends Base_Object_With_Meta {
 			'event_type' => Event::FUNNEL,
 			'status'     => Event::PAUSED,
 		], [
-			'status' => Event::CANCELLED
+			'status' => Event::CANCELLED,
+			'time_scheduled' => $time
 		] );
 
 		// Move to history

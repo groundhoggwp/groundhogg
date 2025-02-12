@@ -11,15 +11,17 @@ use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\Micro_Time_Tracker;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\db;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\event_queue_db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-use function Groundhogg\implode_in_quotes;
 use function Groundhogg\restore_missing_funnel_events;
 use function Groundhogg\verify_admin_ajax_nonce;
 
@@ -64,7 +66,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		try {
 			$task->process();
 		} catch ( \Exception $e ) {
-            wp_send_json_error( new \WP_Error( 'error', $e->getMessage() ) );
+			wp_send_json_error( new \WP_Error( 'error', $e->getMessage() ) );
 		}
 
 		wp_send_json_success( [
@@ -269,68 +271,45 @@ class Events_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-	 * Cancel some events
+	 * Pause some events
 	 *
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
-	public function process_cancel() {
+	public function process_pause() {
 
 		if ( ! current_user_can( 'cancel_events' ) ) {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
+		$query_params = get_request_query();
+		$items        = $this->get_items();
 
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$event_ids   = implode( ',', $this->get_items() );
-		$cancelled   = Event::CANCELLED;
-
-		// Update the time
-		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `ID` in ({$event_ids})" );
-
-		// Move the items over...
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
-
-		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
-
-		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		if ( ! empty( $items ) ) {
+			$query_params['include'] = $items;
 		}
 
-		//false return users to the main page
-		return false;
-	}
+		$query = new Table_Query( 'event_queue' );
+		$query->set_query_params( $query_params );
+		$query->where()->equals( 'status', Event::WAITING );
 
-	/**
-	 * Cancel all waiting events
-	 *
-	 * @return bool
-	 */
-	public function process_cancel_all() {
-
-		if ( ! current_user_can( 'cancel_events' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		get_db( 'event_queue' )->update( [
-			'status' => Event::WAITING
-		], [
-			'status' => Event::CANCELLED
+		$result = $query->update( [
+			'status'         => Event::PAUSED,
+			'time_scheduled' => time(),
 		] );
 
-		// Move the items over...
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
+		if ( ! $result ) {
+			return new \WP_Error( 'error', 'Something went wrong' );
+		}
 
-		$this->add_notice( 'cancelled', __( 'Cancelled all waiting events.', 'groundhogg' ) );
+		$this->add_notice( 'paused', sprintf( _nx( '%d event paused', '%d events paused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
-		//false return users to the main page
 		return false;
 	}
 
 	/**
 	 * Unpause some events
 	 *
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
 	public function process_unpause() {
 
@@ -338,65 +317,136 @@ class Events_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		global $wpdb;
+		$query_params = get_request_query();
+		$items        = $this->get_items();
 
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$event_ids   = implode( ',', $this->get_items() );
-		$waiting     = Event::WAITING;
-
-		// Update the time
-		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$waiting' WHERE `ID` in ({$event_ids})" );
-		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events unpaused', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
-
-		//false return users to the main page
-		return false;
-	}
-
-
-	/**
-	 * Unpause all paused events
-	 *
-	 * @return bool
-	 */
-	public function process_unpause_all() {
-
-		if ( ! current_user_can( 'execute_events' ) ) {
-			$this->wp_die_no_access();
+		if ( ! empty( $items ) ) {
+			$query_params['include'] = $items;
 		}
 
-		get_db( 'event_queue' )->update( [
-			'status' => Event::PAUSED
-		], [
-			'status' => Event::WAITING
+		$query = new Table_Query( 'event_queue' );
+		$query->set_query_params( $query_params );
+		$query->where()->equals( 'status', Event::PAUSED );
+
+		$result = $query->update( [
+			'status'         => Event::WAITING,
+			'time_scheduled' => time(),
 		] );
 
-		$this->add_notice( 'cancelled', __( 'All events unpaused.', 'groundhogg' ) );
+		if ( ! $result ) {
+			return new \WP_Error( 'error', 'Something went wrong' );
+		}
 
-		//false return users to the main page
+		$this->add_notice( 'paused', sprintf( _nx( '%d event unpaused', '%d events unpaused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+
 		return false;
 	}
 
 	/**
-	 * Cancel all paused events
+	 * Cancel some events
 	 *
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
-	public function process_cancel_all_paused() {
+	public function process_cancel() {
 
 		if ( ! current_user_can( 'cancel_events' ) ) {
 			$this->wp_die_no_access();
 		}
 
-		get_db( 'event_queue' )->update( [
-			'status' => Event::PAUSED
-		], [
-			'status' => Event::CANCELLED
+		$query_params = get_request_query();
+		$items        = $this->get_items();
+
+		if ( ! empty( $items ) ) {
+			$query_params['include'] = $items;
+		}
+
+		$query = new Table_Query( 'event_queue' );
+		$query->set_query_params( $query_params );
+
+		$result = $query->update( [
+			'status'         => Event::CANCELLED,
+			'time_scheduled' => time(), // use time scheduled as time_cancelled
 		] );
 
-		// Move the items over...
-		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
+		if ( ! $result ) {
+			return new \WP_Error( 'error', 'Something went wrong' );
+		}
 
-		$this->add_notice( 'cancelled', __( 'Cancelled all paused events.', 'groundhogg' ) );
+		// Move the items over...
+		db()->event_queue->move_events_to_history( [ 'status' => Event::CANCELLED ] );
+
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+
+		//false return users to the main page
+		return false;
+	}
+
+	/**
+	 * Uncancels any cancelled events...
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function process_uncancel() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$query_params = get_request_query();
+		$items        = $this->get_items();
+
+		if ( ! empty( $items ) ) {
+			$query_params['include'] = $items;
+		}
+
+		$query = new Table_Query( 'events' );
+		$query->set_query_params( $query_params );
+
+		$result = $query->update( [
+			'status'         => Event::WAITING,
+			'time_scheduled' => time(),
+		] );
+
+		if ( ! $result ) {
+			return new \WP_Error( 'db_error', __( 'There was an error updating the database.', 'groundhogg' ) );
+		}
+
+		// Move the events over...
+		get_db( 'events' )->move_events_to_queue( [ 'status' => Event::WAITING ], true );
+
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event uncancelled', '%d events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+
+		return false;
+	}
+
+	/**
+	 * Delete any failed or cancelled events.
+	 */
+	public function process_purge() {
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$status           = get_url_var( 'status' );
+		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
+
+		if ( empty( $status ) || ! in_array( $status, $purgeable_events ) ) {
+			return new \WP_Error( 'invalid_status', __( 'Invalid status.', 'groundhogg' ) );
+		}
+
+		$query_params = get_request_query();
+		$items        = $this->get_items();
+
+		if ( ! empty( $items ) ) {
+			$query_params['include'] = $items;
+		}
+
+		$query = new Table_Query( 'events' );
+		$query->set_query_params( $query_params );
+		$result = $query->delete();
+
+		if ( $result !== false ) {
+			$this->add_notice( 'events_purged', sprintf( __( 'Purged %s events!' ), _nf( $result ) ) );
+		}
 
 		return false;
 	}
@@ -428,38 +478,6 @@ class Events_Page extends Tabbed_Admin_Page {
 		], true );
 
 		return false;
-	}
-
-	/**
-	 * Delete any failed or cancelled events.
-	 */
-	public function process_purge() {
-		if ( ! current_user_can( 'cancel_events' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		global $wpdb;
-
-		$events = get_db( 'events' );
-
-		$status           = get_url_var( 'status' );
-		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
-
-		if ( ! empty( $status ) ) {
-
-			// don't accidentally delete important data
-			if ( ! in_array( $status, $purgeable_events ) ) {
-				return false;
-			}
-
-			$result = $wpdb->query( $wpdb->prepare( "DELETE FROM {$events->get_table_name()} WHERE `status` = %s", get_url_var( 'status' ) ) );
-		} else {
-			$result = $wpdb->query( sprintf( "DELETE FROM {$events->get_table_name()} WHERE `status` IN ( %s )", implode_in_quotes( $purgeable_events ) ) );
-		}
-
-		if ( $result !== false ) {
-			$this->add_notice( 'events_purged', sprintf( __( 'Purged %s events!' ), number_format_i18n( $result ) ) );
-		}
 	}
 
 	/**
@@ -506,26 +524,6 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
-
-		return false;
-	}
-
-	/**
-	 * Uncancels any cancelled events...
-	 *
-	 * @return bool
-	 */
-	public function process_uncancel() {
-		if ( ! current_user_can( 'execute_events' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		// Move the events over...
-		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items() ], true, [
-			'status' => Event::WAITING
-		] );
-
-		$this->add_notice( 'scheduled', sprintf( _nx( '%d event uncancelled', '%d events uncancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
 		return false;
 	}
@@ -604,10 +602,10 @@ class Events_Page extends Tabbed_Admin_Page {
 			<?php $table->display(); ?>
         </form>
         <script>
-          (($)=>{
+          ( ($) => {
 
             const {
-              ProgressBar
+              ProgressBar,
             } = MakeEl
 
             $(document).on('click', '.do-task', e => {
@@ -618,30 +616,30 @@ class Events_Page extends Tabbed_Admin_Page {
               let taskId = progressEl.dataset.id
               let progress = progressEl.dataset.progress
 
-              const SmallProgressBar = ( props = {}) => ProgressBar({
-                percent: progress,
+              const SmallProgressBar = (props = {}) => ProgressBar({
+                percent  : progress,
                 className: 'small',
-                ...props
+                ...props,
               })
 
               let progressBar = SmallProgressBar()
 
               const doTask = () => Groundhogg.api.ajax({
-                action: 'gh_process_bg_task',
-                task: taskId,
-                gh_admin_ajax_nonce: Groundhogg.nonces._adminajax
-              }).then( ({
+                action             : 'gh_process_bg_task',
+                task               : taskId,
+                gh_admin_ajax_nonce: Groundhogg.nonces._adminajax,
+              }).then(({
                 data,
-                success
+                success,
               }) => {
 
-                if ( success === false ){
+                if (success === false) {
                   morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar({
-                    error: true
+                    error: true,
                   }))
                   Groundhogg.element.dialog({
-                    type: 'error',
-                    message: data[0].message
+                    type   : 'error',
+                    message: data[0].message,
                   })
                   return
                 }
@@ -650,26 +648,27 @@ class Events_Page extends Tabbed_Admin_Page {
 
                 morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar())
 
-                if ( data.done ){
+                if (data.done) {
                   window.location.reload()
-                } else {
+                }
+                else {
                   doTask()
                 }
 
-              } ).catch( err => {
+              }).catch(err => {
 
                 morphdom(row.querySelector('.gh-progress-bar'), SmallProgressBar({
-                  error: true
+                  error: true,
                 }))
 
-              } )
+              })
 
               morphdom(progressEl, progressBar)
               doTask()
 
             })
 
-          })(jQuery)
+          } )(jQuery)
         </script>
 		<?php
 	}
@@ -1040,7 +1039,7 @@ ORDER BY ID" );
 	 *
 	 * @return string
 	 */
-	public function process_restore_funnel_events(){
+	public function process_restore_funnel_events() {
 		if ( ! current_user_can( 'cancel_events' ) ) {
 			$this->wp_die_no_access();
 		}
@@ -1125,7 +1124,7 @@ ORDER BY ID" );
 
 		foreach ( $this->get_items() as $id ) {
 
-            $task = new Background_Task( $id );
+			$task = new Background_Task( $id );
 
 			try {
 				$task->process();

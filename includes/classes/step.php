@@ -653,7 +653,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$event = $this->get_previous_event( $contact );
 
 			// Event has args
-			if ( ! empty( $event->args ) ){
+			if ( ! empty( $event->args ) ) {
 				// merge the previous event args with any given
 				$args = is_array( $event->args ) ? array_merge( $event->args, $args ) : $event->args;
 			}
@@ -695,9 +695,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			// Update any events to skipped...
 			$this->get_event_queue_db()->mass_update(
 				[
-					'status'        => Event::SKIPPED,
-					'error_code'    => 'skipped_by_step',
-					'error_message' => sprintf( 'Step %d [%s] enqueued', $this->get_id(), sanitize_text_field( $this->get_step_title() ) )
+					'status'         => Event::SKIPPED,
+					'error_code'     => 'skipped_by_step',
+					'error_message'  => sprintf( 'Step %d [%s] enqueued', $this->get_id(), sanitize_text_field( $this->get_step_title() ) ),
+					'time_scheduled' => time(), // time to say when it skipped
 				],
 				[
 					'funnel_id'  => $this->get_funnel_id(),
