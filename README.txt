@@ -363,6 +363,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Adding steps to the beginning of a funnel not working.
 * FIXED Composed email message contact wiped after enabling CC or BCC.
 * FIXED Broadcasts report not filtering by campaign when date range changes.
+* FIXED `Array` showing in emails when using the `{country}` replacement instead of nothing or the default value when no country is defined.
 
 = 3.7.4.1 (2025-01-21) =
 * HOT FIX Update script not working if one of the Groundhogg's custom roles was deleted.
