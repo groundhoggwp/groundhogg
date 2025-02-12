@@ -210,6 +210,7 @@
             }
           },[
             Button({
+              id: 'dismiss-cron-ad',
               className: 'gh-button secondary icon text',
               style: {
                 position: 'absolute',
@@ -237,6 +238,7 @@
             'groundhogg')),
           Button({
             className: 'gh-button primary',
+            id: 'disable-internal-cron',
             disabled : State.gh_disable_wp_cron || State.DISABLE_WP_CRON,
             onClick  : e => {
               ajax({
@@ -271,6 +273,7 @@
               'groundhogg'),
             Groundhogg.whiteLabelName)),
           State.cron_file_error ? null : Button({
+            id: 'install-cron-file',
             className: 'gh-button primary',
             disabled : State.gh_cron_installed,
             onClick  : e => {
