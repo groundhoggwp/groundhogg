@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\Campaign;
 use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
@@ -206,6 +207,10 @@ abstract class Base_Report {
 
 	protected function get_campaign_id() {
 		return absint( $this->get_other_report_params( 'campaign' ) );
+	}
+
+	protected function get_campaign() {
+		return new Campaign( $this->get_campaign_id() );
 	}
 
 	protected function get_other_report_params( $key, $default = false ) {

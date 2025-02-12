@@ -411,18 +411,20 @@ class Reports_Page extends Tabbed_Admin_Page {
             <h1><?php echo $this->get_title(); ?></h1>
 	        <?php $this->range_picker(); ?>
         </div>
+		<?php $this->do_page_tabs(); ?>
         <script>
           const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
           const parent = pageHeader.parentElement; // Get the parent element
+          const tabs = pageHeader.nextElementSibling; // Get the parent element
 
           if (parent) {
+            parent.prepend(tabs); // Move the element to the first child position
             parent.prepend(pageHeader); // Move the element to the first child position
           }
         </script>
         <div class="wrap blurred">
 			<?php $this->notices(); ?>
             <hr class="wp-header-end">
-			<?php $this->do_page_tabs(); ?>
 			<?php
 
 			$method        = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );

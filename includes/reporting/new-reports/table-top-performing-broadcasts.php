@@ -43,6 +43,25 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 		              ->greaterThanEqualTo( 'timestamp', $this->start )
 		              ->equals( 'funnel_id', Broadcast::FUNNEL_ID );
 
+		// filter results by campaign
+		if ( $this->get_campaign_id() ) {
+			// Events
+			$join = $sentQuery->addJoin( 'LEFT', 'object_relationships' );
+			$join->onColumn( 'primary_object_id', 'step_id' )
+			     ->equals( $join->alias . '.primary_object_type', 'broadcast' );
+
+			$sentQuery->where()->equals( 'secondary_object_id', $this->get_campaign_id() )
+			          ->equals( 'secondary_object_type', 'campaign' );
+
+			// Activity
+			$join = $activityQuery->addJoin( 'LEFT', 'object_relationships' );
+			$join->onColumn( 'primary_object_id', 'step_id' )
+			     ->equals( $join->alias . '.primary_object_type', 'broadcast' );
+
+			$activityQuery->where()->equals( 'secondary_object_id', $this->get_campaign_id() )
+			              ->equals( 'secondary_object_type', 'campaign' );
+		}
+
 		$sentResults     = $sentQuery->get_results();
 		$activityResults = $activityQuery->get_results();
 
@@ -59,6 +78,11 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 			if ( ! $email->exists() || ! $broadcast->exists() ) {
 				continue;
 			}
+
+			// Skip broadcasts that are not part of the selected campaign
+//			if ( $this->get_campaign_id() && ! $broadcast->is_related( $this->get_campaign() ) ) {
+//				continue;
+//			}
 
 			$sent = absint( $sentResult->sent );
 
@@ -106,8 +130,8 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 				'opened'       => $broadcast->is_sms() ? 'N/A' : contact_filters_link( format_number_with_percentage( $opened, $sent ), [
 					[
 						[
-							'type'         => 'broadcast_opened',
-							'broadcast_id' => $broadcast_id,
+							'type'          => 'broadcast_opened',
+							'broadcast_id'  => $broadcast_id,
 							'count'         => 1,
 							'count_compare' => 'greater_than_or_equal_to',
 						]
@@ -116,8 +140,8 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 				'clicked'      => contact_filters_link( format_number_with_percentage( $clicked, $broadcast->is_email() ? $opened : $sent ), [
 					[
 						[
-							'type'         => 'broadcast_link_clicked',
-							'broadcast_id' => $broadcast_id,
+							'type'          => 'broadcast_link_clicked',
+							'broadcast_id'  => $broadcast_id,
 							'count'         => 1,
 							'count_compare' => 'greater_than_or_equal_to',
 						]
