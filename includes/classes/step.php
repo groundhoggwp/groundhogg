@@ -1008,11 +1008,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->get_step_element()->after_save( $this );
 	}
 
+	/**
+	 * We are going to pass any added meta through the step element's settings schema validation first
+	 *
+	 * @param string|array $key
+	 * @param mixed $value
+	 *
+	 * @return bool|mixed
+	 */
 	public function update_meta( $key, $value = false ) {
 
 		// single value provided and it's in the step element schema
 		if ( is_string( $key ) && $this->get_step_element()->in_settings_schema( $key ) ){
-			$this->get_step_element();
 			// we need to sanitize it based on the schema settings
 			$value = $this->get_step_element()->sanitize_setting( $key, $value );
 		}
