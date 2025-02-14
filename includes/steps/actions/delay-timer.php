@@ -6,9 +6,8 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
-use function Groundhogg\force_custom_step_names;
-use function Groundhogg\get_date_time_format;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -104,9 +103,9 @@ class Delay_Timer extends Action {
 		return 'delay_timer';
 	}
 
-    public function get_sub_group() {
-	    return 'delay';
-    }
+	public function get_sub_group() {
+		return 'delay';
+	}
 
 	/**
 	 * Get the description
@@ -142,8 +141,8 @@ class Delay_Timer extends Action {
 	}
 
 	/**
-     * Show a preview of the run time
-     *
+	 * Show a preview of the run time
+	 *
 	 * @param Step $step
 	 *
 	 * @return void
@@ -175,17 +174,99 @@ class Delay_Timer extends Action {
 		<?php
 	}
 
-    public function save( $step ) {
-        // silence is golden
-    }
-
 	public function generate_step_title( $step ) {
-	    return $step->get_meta( 'delay_preview' );
-    }
+		return $step->get_meta( 'delay_preview' );
+	}
+
+	public function get_settings_schema() {
+		return [
+			'delay_amount'      => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			],
+			'delay_type'        => [
+				'default'  => 'days',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'minutes', 'hours', 'days', 'weeks', 'months', 'years' ] );
+				}
+			],
+			'run_on_type'       => [
+				'default'  => 'any',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'any', 'weekday', 'weekend', 'day_of_month', 'day_of_week' ] );
+				}
+			],
+			'run_when'          => [
+				'default'  => 'now',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'now', 'later' ] );
+				}
+			],
+			'run_time'          => [
+				'default'  => '09:00:00',
+				'sanitize' => function ( $value ) {
+					return ( new DateTimeHelper( $value ) )->format( 'H:i:s' );
+				}
+			],
+			'run_time_to'       => [
+				'default'  => '17:00:00',
+				'sanitize' => function ( $value ) {
+					return ( new DateTimeHelper( $value ) )->format( 'H:i:s' );
+				}
+			],
+			'send_in_timezone'  => [
+				'default'  => false,
+				'sanitize' => 'boolval'
+			],
+			'run_on_dow_type'   => [
+				'default'  => 'any',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'any', 'first', 'second', 'third', 'fourth', 'last' ] );
+				}
+			],
+			'run_on_dow'        => [
+				'default'  => [],
+				'sanitize' => function ( $value ) {
+					return array_intersect( $value, [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ] );
+				}
+			],
+			'run_on_month_type' => [
+				'default'  => 'any',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'any', 'specific' ] );
+				}
+			],
+			'run_on_months'     => [
+				'default'  => [],
+				'sanitize' => function ( $value ) {
+					return array_intersect( $value, [
+						'january',
+						'february',
+						'march',
+						'april',
+						'may',
+						'june',
+						'july',
+						'august',
+						'september',
+						'october',
+						'november',
+						'december',
+					] );
+				}
+			],
+			'run_on_dom'        => [
+				'default'  => [],
+				'sanitize' => function ( $value ) {
+					return array_intersect( array_map( 'absint', $value ), range( 1, 31 ) );
+				}
+			],
+		];
+	}
 
 	/**
-     * Replaces the get_enqueue_time() method and utilizes a base timestamp
-     *
+	 * Replaces the get_enqueue_time() method and utilizes a base timestamp
+	 *
 	 * @throws \Exception
 	 *
 	 * @param Step $step

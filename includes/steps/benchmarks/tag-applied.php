@@ -9,6 +9,7 @@ use function Groundhogg\andList;
 use function Groundhogg\array_bold;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 use function Groundhogg\orList;
 use function Groundhogg\parse_tag_list;
 
@@ -111,14 +112,21 @@ class Tag_Applied extends Benchmark {
 		$this->tag_settings();
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$condition = sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) );
-		$this->save_setting( 'condition', $condition );
+	public function get_settings_schema() {
+		return [
+			'tags' => [
+				'default' => [],
+				'sanitize' => function ( $tags ) {
+					return parse_tag_list( $tags );
+				}
+			],
+			'condition' => [
+				'default' => 'any',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'any', 'all' ] );
+				}
+			]
+		];
 	}
 
 	public function generate_step_title( $step ) {
@@ -202,7 +210,7 @@ class Tag_Applied extends Benchmark {
 	/**
 	 * get the hook for which the benchmark will run
 	 *
-	 * @return string[]
+	 * @return array[]
 	 */
 	protected function get_complete_hooks() {
 		return [

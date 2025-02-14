@@ -106,16 +106,17 @@ class Send_Email extends Action {
 		}
 	}
 
-	/**
-	 * Save the settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
-
-		$reply_in_thread = $this->get_posted_data( 'reply_in_thread', false );
-		$this->save_setting( 'reply_in_thread', absint( $reply_in_thread ) );
+	public function get_settings_schema() {
+		return [
+			'skip_if_confirmed' => [
+				'default'  => false,
+				'sanitize' => 'boolval'
+			],
+            'reply_in_thread' => [
+                'default'  => false,
+                'sanitize' => 'absint'
+            ]
+		];
 	}
 
 	/**
@@ -235,7 +236,7 @@ class Send_Email extends Action {
 
 		$sent = $email->send( $contact, $event );
 
-        // Thread stuff only if email was sent successfully
+		// Thread stuff only if email was sent successfully
 		if ( $sent === true ) {
 
 			$subject = $email->get_merged_subject_line();

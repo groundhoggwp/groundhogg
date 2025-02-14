@@ -77,47 +77,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		add_filter( "groundhogg/steps/{$this->get_group()}s", [ $this, 'register' ] );
 
 		if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
-
-			/**
-			 * New filters/actions for better usability and extendability
-			 *
-			 * @since 1.1
-			 */
-
-			add_action( "groundhogg/steps/{$this->get_type()}/sortable", [ $this, 'pre_html' ], 1 );
-			add_action( "groundhogg/steps/{$this->get_type()}/sortable", [ $this, 'sortable_item' ] );
-
-			add_action( "groundhogg/steps/{$this->get_type()}/html", [ $this, 'pre_html' ], 1 );
-			add_action( "groundhogg/steps/{$this->get_type()}/html", [ $this, 'html' ] );
-
-			add_action( "groundhogg/steps/{$this->get_type()}/html_v2", [ $this, 'pre_html' ], 1 );
-			add_action( "groundhogg/steps/{$this->get_type()}/html_v2", [ $this, 'html_v2' ] );
-
-			add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'pre_save' ], 1 );
-			add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'save' ], 11 );
-			add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'after_save' ], 99 );
-
 			add_action( "admin_enqueue_scripts", [ $this, 'admin_scripts' ] );
-
 			add_action( 'groundhogg/step/duplicated', [ $this, 'after_duplicate' ], 10, 2 );
 		}
 
-		/**
-		 * New filters/actions for better usability and extendability
-		 *
-		 * @since 1.1
-		 */
-		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'pre_import' ], 1, 2 );
-		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'import' ], 10, 2 );
-		add_action( "groundhogg/steps/{$this->get_type()}/post_import", [ $this, '__post_import' ], 10, 1 );
-
-		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'pre_calc_run_time' ], 1, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run_time", [ $this, 'calc_run_time' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
-		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();
@@ -239,20 +202,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Enqueue any frontend scripts/styles
 	 */
 	public function frontend_scripts() {
-	}
-
-	/**
-	 * Replacement for enqueue/get_delay_time
-	 *
-	 * @param int  $baseTimestamp
-	 * @param Step $step
-	 *
-	 * @return int
-	 */
-	public function pre_calc_run_time( int $baseTimestamp, Step $step ): int {
-		$this->set_current_step( $step );
-
-		return $baseTimestamp;
 	}
 
 	/**
@@ -835,6 +784,16 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+     * A schema to define the various different settings and their relevant sanitization functions and defaults
+     * This is an alternative to explicitly defining the save functions in the ::save() method
+     *
+	 * @return array
+	 */
+	public function get_settings_schema() {
+		return [];
+	}
+
+	/**
 	 * Initialize the posted settings array
 	 *
 	 * @param $step Step
@@ -861,14 +820,65 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
 
 		$step->delete_meta( 'has_errors' );
+
+        // Loop through the schema and do any obvious work ahead of time.
+		foreach ( $this->get_settings_schema() as $setting => $schema ) {
+
+			// setting was not defined in the payload, skip because it may have been updated elsewhere
+			if ( ! isset( $this->posted_settings[ $setting ] ) ) {
+				continue;
+			}
+
+            // we don't need to sanitize first because the Step::update_meta() method will handle it.
+			$this->save_setting( $setting, $this->posted_settings[$setting] );
+		}
+
 	}
+
+	/**
+     * Whether a setting is in the settings schema
+     *
+	 * @param $key
+	 *
+	 * @return bool
+	 */
+    public function in_settings_schema( $key ) {
+	    return isset_not_empty( $this->get_settings_schema(), $key );
+    }
+
+	/**
+     * Given a setting and a value, find it in the schema then apply sanitization
+     *
+	 * @param string $setting
+	 * @param mixed  $value
+	 *
+	 * @return false|mixed
+	 */
+    public function sanitize_setting( string $setting, $value ) {
+	    $schema = $this->get_settings_schema();
+
+        if ( ! isset( $schema[ $setting ] ) ) {
+            return false;
+        }
+
+	    $schema = wp_parse_args( $schema[$setting], [
+		    'sanitize' => '\Groundhogg\sanitize_payload',
+		    'default'  => false
+	    ] );
+
+	    if ( empty( $value ) ) {
+		    $value = $schema['default'];
+	    }
+
+        return call_user_func( $schema['sanitize'], $value );
+    }
 
 	/**
 	 * Save the step based on the given ID
 	 *
 	 * @param $step Step
 	 */
-	abstract public function save( $step );
+	public function save( $step ){}
 
 	/**
 	 * @param $step Step
@@ -932,42 +942,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * @param $step
-	 */
-	public function pre_import( $args, $step ) {
-		$this->set_current_step( $step );
-	}
-
-	/**
 	 * @param $args array of args
 	 * @param $step Step
 	 */
 	public function import( $args, $step ) {
 		//silence is golden
-	}
-
-	/**
-	 * Stuff to do when duplicating a step
-	 *
-	 * @param $new
-	 * @param $original
-	 *
-	 * @return void
-	 */
-	public function duplicate( $new, $original ) {
-
-	}
-
-	/**
-	 * Cleanup actions after the import of a step
-	 *
-	 * @param $step
-	 *
-	 * @return void
-	 */
-	public function __post_import( $step ) {
-		$this->set_current_step( $step );
-		$this->post_import( $step );
 	}
 
 	/**
@@ -982,15 +961,15 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * @param $args
-	 * @param $step
+	 * Stuff to do when duplicating a step
 	 *
-	 * @return array
+	 * @param $new
+	 * @param $original
+	 *
+	 * @return void
 	 */
-	public function pre_export( $args, $step ) {
-		$this->set_current_step( $step );
+	public function duplicate( $new, $original ) {
 
-		return $args;
 	}
 
 	/**

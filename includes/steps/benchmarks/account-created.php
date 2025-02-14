@@ -98,6 +98,17 @@ class Account_Created extends Benchmark {
 		$this->end_controls_section();
 	}
 
+	public function get_settings_schema() {
+		return [
+			'role' => [
+				'default' => [ 'subscriber' ],
+				'sanitize' => function ( $roles ) {
+					return array_filter( $roles, [ wp_roles(), 'is_role' ] );
+				}
+			]
+		];
+	}
+
 	/**
 	 * Save the step settings
 	 *

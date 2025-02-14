@@ -87,13 +87,13 @@ class Apply_Note extends Action {
 
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-//		$this->save_setting( 'note_text', wp_kses_post( $this->get_posted_data( 'note_text', "" ) ) );
+	public function get_settings_schema() {
+		return [
+			'note_text' => [
+				'default'  => '',
+				'sanitize' => 'wp_kses_post'
+			]
+		];
 	}
 
 	/**

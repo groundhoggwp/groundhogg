@@ -15,6 +15,7 @@ use function Groundhogg\get_default_from_name;
 use function Groundhogg\get_owners;
 use function Groundhogg\html;
 use function Groundhogg\is_replacement_code_format;
+use function Groundhogg\one_of;
 
 /**
  * Admin Notification
@@ -87,8 +88,6 @@ class Admin_Notification extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/notification.svg';
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.png';
 		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.svg';
 	}
 
@@ -232,44 +231,52 @@ class Admin_Notification extends Action {
 		}
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
+	public function get_settings_schema() {
+		return [
+			'send_to' => [
+				'default'  => [],
+				'sanitize' => function ( $emails ) {
+					return array_map( function ( $email ) {
+						if ( is_replacement_code_format( $email ) ) {
+							return $email;
+						}
 
-		$send_to = $this->get_posted_data( 'send_to', [] );
-
-		if ( $send_to ) {
-
-			$send_to = array_map( function ( $email ) {
-				if ( is_replacement_code_format( $email ) ) {
-					return $email;
+						return sanitize_email( $email );
+                    }, $emails );
 				}
+			],
+            'reply_to_type' => [
+                'default'  => '',
+                'sanitize'  => function ( $value ) {
+	                return one_of( $value, ['contact', 'owner', 'custom' ] );
+                },
+            ],
+            'reply_to' => [
+                'default'  => '',
+                'sanitize'  => function ( $value ) {
+	                if ( is_replacement_code_format( $value ) ) {
+                        return $value;
+                    }
 
-				return sanitize_email( $email );
-			}, $send_to );
-
-			$this->save_setting( 'send_to', array_filter( $send_to ) );
-		}
-
-		$reply_to_type = $this->get_posted_data( 'reply_to_type' );
-		$reply_to      = $this->get_posted_data( 'reply_to' );
-
-		if ( $reply_to ) {
-			if ( is_replacement_code_format( $reply_to ) || is_email( $reply_to ) ) {
-				$this->save_setting( 'reply_to_type', $reply_to );
-			} else {
-				$this->save_setting( 'reply_to_type', '' );
-			}
-		}
-
-		$this->save_setting( 'reply_to_type', sanitize_text_field( $reply_to_type ) );
-		$this->save_setting( 'hide_admin_links', boolval( $this->get_posted_data( 'hide_admin_links' ) ) );
-		$this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
+                    return sanitize_email( $value );
+                },
+            ],
+            'hide_admin_links' => [
+                'default'  => false,
+                'sanitize'  => 'boolval',
+            ],
+            'subject' => [
+                'default'  => '',
+                'sanitize'  => 'sanitize_text_field',
+            ],
+			'note_text' => [
+				'default'  => '',
+				'sanitize'  => function ( $text ) {
+					return email_kses( $text );
+				},
+			],
+		];
 	}
-
 
 	public function generate_step_title( $step ) {
 		$send_to = wp_parse_list( $this->get_setting( 'send_to', [] ) );

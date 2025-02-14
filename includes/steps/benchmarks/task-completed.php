@@ -9,7 +9,9 @@ use function Groundhogg\array_bold;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\array_map_to_method;
 use function Groundhogg\get_db;
+use function Groundhogg\get_object_ids;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 use function Groundhogg\orList;
 
 class Task_Completed extends Benchmark {
@@ -107,18 +109,18 @@ class Task_Completed extends Benchmark {
 		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/task-completed.svg';
 	}
 
-    protected function get_preceding_task_steps( $step ){
-	    return array_filter( $step->get_preceding_actions(), function ( $step ) {
-		    return $step->step_type === 'create_task';
-	    } );
-    }
+	protected function get_preceding_task_steps( $step ) {
+		return array_filter( $step->get_preceding_actions(), function ( $step ) {
+			return $step->step_type === 'create_task';
+		} );
+	}
 
-    public function validate_settings( Step $step ) {
-        $tasks = $this->get_preceding_task_steps( $step );
-        if ( empty( $tasks ) ){
-            $this->add_error( 'no_tasks', 'There must be at least one preceding <b>Create Task</b> action.' );
-        }
-    }
+	public function validate_settings( Step $step ) {
+		$tasks = $this->get_preceding_task_steps( $step );
+		if ( empty( $tasks ) ) {
+			$this->add_error( 'no_tasks', 'There must be at least one preceding <b>Create Task</b> action.' );
+		}
+	}
 
 	/**
 	 * @param $step
@@ -165,20 +167,37 @@ class Task_Completed extends Benchmark {
 	}
 
 	/**
-	 * @param $step
+     * Ensure the included tasks steps are only the ones that appear before this benchmark
+     *
+	 * @param $step_ids
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function save( $step ) {
+	public function validate_task_step_ids( $step_ids ) {
+		$step = $this->get_current_step();
 
-        $tasks = wp_parse_id_list( $this->get_posted_data( 'tasks' ) );
-        $tasks = array_map_to_class( $tasks, Step::class );
-        $tasks = array_filter( $tasks, function ( $task_step ) use ( $step ){
-            return $task_step->is_before( $step );
-        } );
+		$step_ids = wp_parse_id_list( $step_ids );
+		$task_steps    = array_map_to_class( $step_ids, Step::class );
+		$task_steps    = array_filter( $task_steps, function ( $task_step ) use ( $step ) {
+			return $task_step->is_before( $step );
+		} );
 
-		$this->save_setting( 'tasks', array_map_to_method( $tasks, 'get_id' ) );
-		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
+		return get_object_ids( $task_steps );
+	}
+
+	public function get_settings_schema() {
+		return [
+			'tasks' => [
+				'default'  => [],
+				'sanitize' => [ $this, 'validate_task_step_ids' ]
+			],
+            'condition' => [
+                'default' => 'any',
+                'sanitize' => function ( $value ) {
+	                return one_of( $value, [ 'any', 'all' ] );
+                }
+            ]
+		];
 	}
 
 	public function generate_step_title( $step ) {
@@ -193,9 +212,9 @@ class Task_Completed extends Benchmark {
 			return $step->get_meta( 'summary' ) ?: 'New Task';
 		}, $tasks ) );
 
-        if ( count( $tasks ) === 1 ){
-	        return sprintf( 'When %s is completed', orList( $tasks ) );
-        }
+		if ( count( $tasks ) === 1 ) {
+			return sprintf( 'When %s is completed', orList( $tasks ) );
+		}
 
 		switch ( $this->get_setting( 'condition', 'any' ) ) {
 			default:

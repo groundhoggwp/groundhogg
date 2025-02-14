@@ -5929,7 +5929,7 @@ function sanitize_payload( array $payload ): array {
 
 		// Might be a float
 		// Might be int
-        // if first digit is 0, treat as string
+		// if first digit is 0, treat as string
 		if ( is_numeric( $param ) && ! str_starts_with( "$param", '0' ) ) {
 
 			// No sanitization needed
@@ -6151,12 +6151,17 @@ function array_filter_by_keys( array $associative_array, array $keys_to_keep ) {
 /**
  * Given an associative array apply a list of callbacks provided by the callbacks array
  *
- * @param array      $array
- * @param callable[] $callbacks
+ * @param array      $array     the items
+ * @param callable[] $callbacks callbacks to apply to the items
+ * @param bool       $strict    whether to remove items that are not in the callbacks set
  *
  * @return array
  */
-function array_apply_callbacks( array $array, array $callbacks ) {
+function array_apply_callbacks( array $array, array $callbacks, bool $strict = false ) {
+
+    if ( $strict ){
+        $array = array_intersect_key( $array, $callbacks );
+    }
 
 	foreach ( $array as $key => &$value ) {
 		if ( ! isset( $callbacks[ $key ] ) ) {
@@ -8647,18 +8652,41 @@ function add_event_args( $args = [] ) {
 /**
  * Get an argument from the event args
  *
- * @param string $arg the argument to retrieve
- * @param mixed $default what to return if not found or empty
+ * @param string $arg     the argument to retrieve
+ * @param mixed  $default what to return if not found or empty
  *
  * @return bool|mixed false if the event queue is not running, otherwise the found arg or the given default
  */
 function get_event_arg( string $arg, $default = false ) {
 
-    if ( \Groundhogg\event_queue()::is_processing() ){
-        return false;
-    }
+	if ( \Groundhogg\event_queue()::is_processing() ) {
+		return false;
+	}
 
-    $event = \Groundhogg\event_queue()->get_current_event();
+	$event = \Groundhogg\event_queue()->get_current_event();
 
-    return $event->get_arg( $arg, $default );
+	return $event->get_arg( $arg, $default );
+}
+
+/**
+ * Ensures the given value is in a set of pre-defined options
+ * Otherwise, return the first option of the set as the default.
+ * If the set is empty, return false.,mn
+ *
+ * @param       $value
+ * @param array $options
+ *
+ * @return false|mixed
+ */
+function one_of( $value, array $options ) {
+
+	if ( empty( $options ) ) {
+		return false;
+	}
+
+	if ( ! in_array( $value, $options ) ) {
+		return $options[0];
+	}
+
+	return $value;
 }

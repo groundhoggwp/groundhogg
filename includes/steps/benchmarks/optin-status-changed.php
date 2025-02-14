@@ -105,15 +105,21 @@ class Optin_Status_Changed extends Benchmark {
 		?><p></p><?php
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-
-		$this->save_setting( 'status', wp_parse_id_list( $this->get_posted_data( 'status' ) ) );
-		$this->save_setting( 'from_status', wp_parse_id_list( $this->get_posted_data( 'from_status' ) ) );
+	public function get_settings_schema() {
+		return [
+			'from_status' => [
+				'default'  => [],
+				'sanitize' => function ( $statuses ) {
+					return array_intersect( wp_parse_id_list( $statuses ), array_values( Preferences::get_preference_names() ) );
+				}
+			],
+			'status' => [
+				'default'  => [],
+				'sanitize' => function ( $statuses ) {
+					return array_intersect( wp_parse_id_list( $statuses ), array_values( Preferences::get_preference_names() ) );
+				}
+			]
+		];
 	}
 
 	public function generate_step_title( $step ) {
@@ -182,16 +188,16 @@ class Optin_Status_Changed extends Benchmark {
 		$from_status_setting = $this->get_setting( 'from_status', [] );
 		$to_status_setting   = $this->get_setting( 'status', [] );
 
-        // from status is not empty and given from is not present
-        if ( ! empty( $from_status_setting ) && ! in_array( $from, $from_status_setting ) ){
-            return false;
-        }
-
-		// to status is not empty and given to is not present
-		if ( ! empty( $to_status_setting ) && ! in_array( $to, $to_status_setting ) ){
+		// from status is not empty and given from is not present
+		if ( ! empty( $from_status_setting ) && ! in_array( $from, $from_status_setting ) ) {
 			return false;
 		}
 
-        return true;
+		// to status is not empty and given to is not present
+		if ( ! empty( $to_status_setting ) && ! in_array( $to, $to_status_setting ) ) {
+			return false;
+		}
+
+		return true;
 	}
 }

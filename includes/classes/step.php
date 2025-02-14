@@ -586,7 +586,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$baseTimestamp = time();
 		}
 
-		return apply_filters( "groundhogg/steps/{$this->get_type()}/run_time", $baseTimestamp, $this );
+		return $this->get_step_element()->calc_run_time( $baseTimestamp, $this );
 	}
 
 	/**
@@ -890,18 +890,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the controller/element for doing the actios and stuff
-	 *
-	 * @return Funnel_Step
-	 */
-	public function get_step_type_controller() {
-		$controller = Plugin::instance()->step_manager->get_element( $this->get_type() );
-		$controller->set_current_step( $this );
-
-		return $controller;
-	}
-
-	/**
 	 * Do the event when being processed from the event queue...
 	 *
 	 * @param $contact Contact
@@ -923,11 +911,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( $do_step ) {
 			do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this );
 
-			if ( has_filter( "groundhogg/steps/{$this->get_type()}/run" ) ) {
-				$result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
-			} else {
-				$result = apply_filters( "groundhogg/steps/error/run", $contact, $event, $this );
-			}
+			$this->get_step_element()->pre_run( $contact, $event );
+			$this->get_step_element()->run( $contact, $event );
 
 			do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this );
 		}
@@ -971,70 +956,68 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Output the HTML of a step.
+	 * Gets the related step element of a step based on the step type
+	 * Also sets the elements' current step to this step
+	 *
+	 * @return Funnel_Step
 	 */
-	public function sortable_item() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
-		} else {
-			do_action( "groundhogg/steps/error/sortable", $this );
-		}
+	public function get_step_element() {
+		$element = Plugin::instance()->step_manager->get_element( $this->get_type() );
+		$element->set_current_step( $this );
+		return $element;
 	}
 
 	/**
 	 * Output the HTML of a step.
 	 */
-	public function html() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html", $this );
-		}
+	public function sortable_item() {
+		$this->get_step_element()->pre_html( $this );
+		$this->get_step_element()->sortable_item( $this );
 	}
 
 	/**
 	 * Output icon html
 	 */
 	public function icon() {
-
-		$icon = false;
-
-		if ( has_filter( "groundhogg/steps/{$this->get_type()}/icon" ) ) {
-			$icon = apply_filters( "groundhogg/steps/{$this->get_type()}/icon", $this );
-		}
+		$icon = $this->get_step_element()->get_icon();
 
 		return $icon ?: GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 	}
 
 	/**
-	 * Gets the related step element of a step based on the step type
-	 *
-	 * @return Funnel_Step
+	 * Output the HTML of a step.
 	 */
-	public function get_step_element() {
-		return Plugin::instance()->step_manager->get_element( $this->get_type() );
+	public function html() {
+		$this->html_v2();
 	}
 
 	/**
 	 * Output the HTML of a step.
 	 */
 	public function html_v2() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html_v2", $this );
-		}
+		$this->get_step_element()->pre_html( $this );
+		$this->get_step_element()->html_v2( $this );
 	}
 
 	/**
 	 * Save the step
 	 */
 	public function save() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/save" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/save", $this );
-		} else {
-			do_action( "groundhogg/steps/error/save", $this );
+		$this->get_step_element()->pre_save( $this );
+		$this->get_step_element()->save( $this );
+		$this->get_step_element()->after_save( $this );
+	}
+
+	public function update_meta( $key, $value = false ) {
+
+		// single value provided and it's in the step element schema
+		if ( is_string( $key ) && $this->get_step_element()->in_settings_schema( $key ) ){
+			$this->get_step_element();
+			// we need to sanitize it based on the schema settings
+			$value = $this->get_step_element()->sanitize_setting( $key, $value );
 		}
+
+		return parent::update_meta( $key, $value );
 	}
 
 	/**
@@ -1043,21 +1026,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return array
 	 */
 	public function export() {
-		return apply_filters( "groundhogg/steps/{$this->get_type()}/export", [], $this );
-	}
-
-	public function get_as_array() {
-
-		$data = $this->data;
-		// remove HTML formatting
-		$data['step_title'] = sanitize_text_field( $this->step_title );
-
-		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'     => $this->get_id(),
-			'data'   => $data,
-			'meta'   => $this->meta,
-			'export' => $this->export(),
-		] );
+		return $this->get_step_element()->export( [], $this );
 	}
 
 	/**
@@ -1066,14 +1035,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @param array $import_args
 	 */
 	public function import( $import_args = [] ) {
-		do_action( "groundhogg/steps/{$this->get_type()}/import", $import_args, $this );
+		$this->get_step_element()->import( $import_args, $this );
 	}
 
 	/**
 	 * Post import cleanup actions any contextual args from the given template
 	 */
 	public function post_import() {
-		do_action( "groundhogg/steps/{$this->get_type()}/post_import", $this );
+		$this->get_step_element()->post_import( $this );
 		do_action( "groundhogg/steps/post_import", $this );
 	}
 
@@ -1099,6 +1068,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return false;
 	}
 
+	public function get_as_array() {
+
+		$data = $this->data;
+		// remove HTML formatting
+		$data['step_title'] = sanitize_text_field( $this->step_title );
+
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'     => $this->get_id(),
+			'data'   => $data,
+			'meta'   => $this->meta,
+			'export' => $this->export(),
+		] );
+	}
+
 	/**
 	 * Get the HTML of the step and return it.
 	 *
@@ -1107,7 +1090,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function __toString() {
 		ob_start();
 
-		$this->html();
+		$this->html_v2();
 
 		return ob_get_clean();
 	}

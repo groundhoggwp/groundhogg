@@ -10,6 +10,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\bold_it;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -155,18 +156,43 @@ class Create_Task extends Action {
 		?><p></p><?php
 	}
 
-	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'summary', sanitize_text_field( $this->get_posted_data( 'summary' ) ) );
-		$this->save_setting( 'task_type', sanitize_text_field( $this->get_posted_data( 'task_type' ) ) );
-		$this->save_setting( 'time', sanitize_text_field( $this->get_posted_data( 'time', '17:00:00' ) ) );
-		$this->save_setting( 'delay_unit', sanitize_text_field( $this->get_posted_data( 'delay_unit', '17:00:00' ) ) );
-		$this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount', 7 ) ) );
-		$this->save_setting( 'assign_to', absint( $this->get_posted_data( 'assign_to', 0 ) ) );
+	public function get_settings_schema() {
+		return [
+			'summary'      => [
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field'
+			],
+			'content'    => [
+				'default'  => '',
+				'sanitize' => 'wp_kses_post'
+			],
+			'task_type'    => [
+				'default'  => '',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'task', 'email', 'call', 'meeting' ] );
+				}
+			],
+			'time'         => [
+				'default'  => '17:00:00',
+				'sanitize' => function ( $value ) {
+					return ( new DateTimeHelper( $value ) )->format( 'H:i:s' );
+				}
+			],
+			'delay_unit'   => [
+				'default'  => '',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'days', 'weeks', 'months' ] );
+				}
+			],
+			'delay_amount' => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			],
+			'assign_to'    => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			],
+		];
 	}
 
 	public function generate_step_title( $step ) {
