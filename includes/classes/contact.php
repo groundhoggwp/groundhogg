@@ -1407,19 +1407,55 @@ class Contact extends Base_Object_With_Meta {
 		return false;
 	}
 
+	/**
+	 * Add additional checks and sanitization for custom fields and special meta keys like gdpr_consent
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return bool|mixed
+	 */
 	public function add_meta( $key, $value = false ) {
 
-		if ( $this->handle_special_meta_keys( $key, $value ) ) {
-			return true;
+		if ( is_string( $key ) ){
+
+			if ( $this->handle_special_meta_keys( $key, $value ) ){
+				return true;
+			}
+
+			// handle custom fields (properties)
+			try {
+				$value = sanitize_custom_field( $value, $key );
+			} catch ( PropertyException $e ){
+				// this means that the property does not exist... so do nothing.
+			}
 		}
 
 		return parent::add_meta( $key, $value );
 	}
 
+	/**
+	 * Add additional checks and sanitization for custom fields and special meta keys like gdpr_consent
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return bool|mixed
+	 */
 	public function update_meta( $key, $value = false ) {
 
-		if ( $this->handle_special_meta_keys( $key, $value ) ) {
-			return true;
+		if ( is_string( $key ) ) {
+
+			if (  $this->handle_special_meta_keys( $key, $value ) ){
+				return true;
+			}
+
+			// handle custom fields (properties)
+			try {
+				$value = sanitize_custom_field( $value, $key );
+			} catch ( PropertyException $e ){
+				// this means that the property does not exist... so do nothing.
+			}
 		}
 
 		return parent::update_meta( $key, $value );

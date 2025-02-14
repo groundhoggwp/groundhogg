@@ -5,11 +5,13 @@ namespace Groundhogg;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Utils\DateTimeHelper;
 
+class PropertyException extends \Exception {}
+
 /**
  * Sanitize user input based on a field configuration
  *
  * @param $value    mixed
- * @param $field_id string
+ * @param $field_id string|array either the field ID or the field object itself
  *
  * @return mixed sanitized...
  */
@@ -22,8 +24,24 @@ function sanitize_custom_field( $value, $field_id ) {
 		$field = Properties::instance()->get_field( $field_id );
 	}
 
-	if ( ! $field || empty( $value ) ) {
-		return '';
+	if ( ! $field ) {
+		throw new PropertyException( 'Field ' . $field_id . ' does not exist' );
+	}
+
+	// empty value? just return the default expected value...
+	if ( empty( $value ) ) {
+		switch ( $field['type'] ) {
+			default:
+				return '';
+			case 'dropdown':
+				// Multiple options can be selected
+				if ( isset_not_empty( $field, 'multiple' ) ) {
+					return [];
+				}
+				return '';
+			case 'checkboxes':
+				return [];
+		}
 	}
 
 	switch ( $field['type'] ):
@@ -49,11 +67,14 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'dropdown':
 			// Multiple options can be selected
 			if ( isset_not_empty( $field, 'multiple' ) ) {
-				return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
+				return array_intersect( array_trim( maybe_explode( $value ) ), $field['options'] );
 			}
-			return sanitize_text_field( $value );
+
+			array_unshift( $field['options'], '' );
+
+			return one_of( $value, $field['options'] );
 		case 'checkboxes':
-			return map_deep( array_trim( maybe_explode( $value ) ), 'sanitize_text_field' );
+			return array_intersect( array_trim( maybe_explode( $value ) ), $field['options'] );
 		case 'html':
 			return wp_kses_post( $value );
 	endswitch;
@@ -296,7 +317,11 @@ function map_custom_fields_to_meta( $field_id, $value, &$args, &$meta, &$tags, &
 	}
 
 	// Sanitize and add to the meta data...
-	$meta[ $field['name'] ] = sanitize_custom_field( $value, $field_id );
+	try {
+		$meta[ $field['name'] ] = sanitize_custom_field( $value, $field );
+	} catch ( PropertyException $e ) {
+		// do nothing
+	}
 
 }
 

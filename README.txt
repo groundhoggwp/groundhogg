@@ -350,7 +350,6 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 3.7.5 (2025-02-10) =
-* ADDED New event arguments API which will enable unique arguments to be associated with individual funnel (and other) events. This is VERY COOL! It paves the way for better handling of automation for related objects like orders, deals, and companies.
 * ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
 * ADDED Additional bulk actions in the event logs tables.
 * IMPROVED The Cron Job Setup page with additional instructions and a new layout.
@@ -364,6 +363,9 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Composed email message contact wiped after enabling CC or BCC.
 * FIXED Broadcasts report not filtering by campaign when date range changes.
 * FIXED `Array` showing in emails when using the `{country}` replacement instead of nothing or the default value when no country is defined.
+* FIXED Added missing sanitization of form field labels.
+* DEV New event arguments API which will enable unique arguments to be associated with individual funnel (and other) events. This is VERY COOL! It paves the way for better handling of automation for related objects like orders, deals, and companies.
+* DEV New settings schema for funnel steps.
 
 = 3.7.4.1 (2025-01-21) =
 * HOT FIX Update script not working if one of the Groundhogg's custom roles was deleted.
@@ -551,7 +553,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Automated weekly and monthly emailed overview reports to admins.
 * ADDED Automated next day reports for broadcast emails.
 * ADDED Comparison growth indicators to the funnel performance table.
-* ADDED New Menu block to the email editor
+* ADDED New Menu block to the email editor.
 * IMPROVED Comparison date calculations for all reports.
 * TWEAKED Term relationship toggle in the posts block will now always show, instead of being shown conditionally.
 * TWEAKED Block copy/paste is now done with HTML rather than the block JSON. The HTML is parsed into the appropriate block(s).
