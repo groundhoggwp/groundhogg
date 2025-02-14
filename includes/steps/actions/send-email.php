@@ -115,6 +115,10 @@ class Send_Email extends Action {
             'reply_in_thread' => [
                 'default'  => false,
                 'sanitize' => 'absint'
+            ],
+            'email_id' => [
+                'default' => 0,
+                'sanitize' => 'absint'
             ]
 		];
 	}
