@@ -6086,7 +6086,7 @@ function array_unique_cb( $array, $callback ) {
 
 	$seen = [];
 
-	return array_filter( $array, function ( $item ) use ( $seen, $callback ) {
+	return array_filter( $array, function ( $item ) use ( &$seen, $callback ) {
 
 		$__item = call_user_func( $callback, $item );
 
