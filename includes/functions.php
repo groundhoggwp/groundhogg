@@ -4452,7 +4452,7 @@ function maybe_print_menu_styles() {
         }
 
         #adminmenu #toplevel_page_groundhogg li.gh_funnels:before,
-        #adminmenu #toplevel_page_groundhogg li.gh_tools:before,
+        #adminmenu #toplevel_page_groundhogg li.gh_events:before,
         #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before,
         #adminmenu #toplevel_page_groundhogg li.gh_contacts:before {
             background: #b4b9be;

@@ -75,7 +75,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * @return int
 	 */
 	public function get_priority() {
-		return 100;
+		return 105;
 	}
 
 	// Unused functions.
