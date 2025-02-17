@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Query\Table_Query;
-use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -277,6 +276,13 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'replacement_birthday' ],
 				'name'        => __( 'Birthday', 'groundhogg' ),
 				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
+			],
+			[
+				'code'        => 'website',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_website' ],
+				'name'        => __( 'Website', 'groundhogg' ),
+				'description' => _x( 'The contact\'s website as parsed from their email address.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'tag_names',
@@ -1047,6 +1053,22 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+     * The contact's website
+     *
+	 * @return string
+	 */
+	function replacement_website() {
+
+        $contact = $this->get_current_contact();
+
+        if ( is_free_email_provider( $contact->get_email() ) ){
+            return '';
+        }
+
+		return 'https://' . get_email_address_hostname( $this->get_current_contact()->get_email() );
+	}
+
+	/**
 	 * Generic handler function for arbitrary meta data
 	 *
 	 * @param string   $arg               generally the meta key and other specific formatting
@@ -1365,18 +1387,18 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * Full country name if country is set,
-     * otherwise the empty string
-     *
+	 * Full country name if country is set,
+	 * otherwise the empty string
+	 *
 	 * @return string
 	 */
 	function replacement_country() {
 
-        $country_code = $this->get_current_contact()->get_meta( 'country' );
+		$country_code = $this->get_current_contact()->get_meta( 'country' );
 
-        if ( empty( $country_code ) ){
-            return '';
-        }
+		if ( empty( $country_code ) ) {
+			return '';
+		}
 
 		return utils()->location->get_countries_list( $country_code );
 	}
@@ -2514,40 +2536,40 @@ class Replacements implements \JsonSerializable {
 		] );
 
 		if ( get_event_arg( 'submission_id' ) && empty( $props['form'] ) ) {
-	        // If there is a submission for the current event
-	        $submission = new Submission( absint( get_event_arg( 'submission_id' ) ) );
-        } else {
-            // do a query instead
-	        $query = new Table_Query( 'submissions' );
-	        $query->setLimit( 1 )
-	              ->setOrderby( [ 'date_created', 'DESC' ] )
-	              ->where()
-	              ->equals( 'contact_id', $this->get_current_contact()->get_id() )
-	              ->equals( 'type', 'form' );
+			// If there is a submission for the current event
+			$submission = new Submission( absint( get_event_arg( 'submission_id' ) ) );
+		} else {
+			// do a query instead
+			$query = new Table_Query( 'submissions' );
+			$query->setLimit( 1 )
+			      ->setOrderby( [ 'date_created', 'DESC' ] )
+			      ->where()
+			      ->equals( 'contact_id', $this->get_current_contact()->get_id() )
+			      ->equals( 'type', 'form' );
 
-	        if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) || empty( $props['form'] ) ) {
+			if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) || empty( $props['form'] ) ) {
 
-		        // get the most recent form submission
+				// get the most recent form submission
 
-	        } else if ( in_array( $props['form'], [ 'first', 'oldest' ] ) ) {
+			} else if ( in_array( $props['form'], [ 'first', 'oldest' ] ) ) {
 
-		        // get the first form submission
-		        $query->setOrderby( [ 'date_created', 'ASC' ] );
+				// get the first form submission
+				$query->setOrderby( [ 'date_created', 'ASC' ] );
 
-	        } else if ( absint( $props['form'] ) > 0 ) {
+			} else if ( absint( $props['form'] ) > 0 ) {
 
-		        // get the most recent submission for a specific form
-		        $query->where()->equals( 'form_id', absint( $props['form'] ) );
-	        }
+				// get the most recent submission for a specific form
+				$query->where()->equals( 'form_id', absint( $props['form'] ) );
+			}
 
-            $submissions = $query->get_objects();
+			$submissions = $query->get_objects();
 
-	        if ( empty( $submissions ) ) {
-		        return '';
-	        }
+			if ( empty( $submissions ) ) {
+				return '';
+			}
 
-	        $submission = $submissions[0];
-        }
+			$submission = $submissions[0];
+		}
 
 		$answers = $submission->get_answers( $props['hidden'] );
 
