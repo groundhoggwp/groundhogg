@@ -86,7 +86,6 @@ class Contacts extends DB {
 	 * Update contact record when user profile updated.
 	 */
 	protected function add_additional_actions() {
-		add_action( 'profile_update', [ $this, 'update_contact_on_user_update' ], 10, 2 );
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 		add_action( 'delete_user', [ $this, 'user_deleted' ], 10, 1 );
 		parent::add_additional_actions();
@@ -276,6 +275,11 @@ class Contacts extends DB {
 			}
 		}
 
+		// prevent setting email to empty
+		if ( isset( $data['email'] ) && empty( $data['email'] ) ) {
+			unset( $data['email'] );
+		}
+
 		$result = parent::update( $row_id, $data, $where );
 
 		if ( $result ) {
@@ -293,48 +297,6 @@ class Contacts extends DB {
 	 */
 	public function exists( $value = '', $field = 'email' ) {
 		return parent::exists( $value, $field );
-	}
-
-	/**
-	 * Updates the email address of a contact record when the email on a user is updated
-	 *
-	 * @access  public
-	 * @since   2.4
-	 */
-	public function update_contact_on_user_update( $user_id = 0, $old_user_data = '' ) {
-
-		$user = get_userdata( $user_id );
-
-		if ( ! $user ) {
-			return false;
-		}
-
-		$contact = $this->get_contact_by( 'user_id', $user_id );
-
-		if ( ! $contact ) {
-
-			// get by email if UID fails.
-			$contact = $this->get_contact_by( 'email', $user->user_email );
-			if ( ! $contact ) {
-				return false;
-			}
-
-		}
-
-		$args = [
-			'first_name' => $user->first_name,
-			'last_name'  => $user->last_name,
-			'email'      => $user->user_email,
-			'user_id'    => $user_id
-		];
-
-		$args = $this->sanitize_columns( $args );
-
-		if ( $this->update( $contact->ID, $args ) ) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -371,21 +333,6 @@ class Contacts extends DB {
 		$query = new Contact_Query();
 
 		return $query->query( $data );
-	}
-
-	/**
-	 * Retrieve contacts from the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_contacts( $args = array() ) {
-		$args          = $this->prepare_contact_query_args( $args );
-		$args['count'] = false;
-
-		$query = new Contact_Query( '', $this );
-
-		return $query->query( $args );
 	}
 
 	/**
