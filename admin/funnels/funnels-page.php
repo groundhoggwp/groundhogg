@@ -74,9 +74,9 @@ class Funnels_Page extends Admin_Page {
 	 */
 	function update_user_full_screen_preference() {
 
-        if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_funnels' ) ){
-            $this->wp_die_no_access();
-        }
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
 
 		$is_full_screen = filter_var( get_post_var( 'full_screen', false ), FILTER_VALIDATE_BOOLEAN );
 		update_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', $is_full_screen );
@@ -613,7 +613,10 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
-		$response = [];
+		$response = [
+			'sortable' => '',
+			'settings' => ''
+		];
 
 		if ( is_wp_error( $result ) ) {
 			$response['err'] = $result->get_error_messages();
@@ -623,29 +626,21 @@ class Funnels_Page extends Admin_Page {
 			$response['err'] = $this->get_last_error()->get_error_message();
 		}
 
-		$response['settings'] = $this->get_step_html();
-		$response['sortable'] = $this->get_step_sortable();
-		$response['funnel']   = $this->get_current_funnel();
-
-		$this->send_ajax_response( $response );
-
-	}
-
-	public function get_step_html() {
 		$funnel = $this->get_current_funnel();
 		$steps  = $funnel->get_steps();
 
-		$html = "";
-
 		foreach ( $steps as $step ) {
+			// this will show errors in the event of a settings issue
+			$step->get_step_element()->validate_settings( $step );
 
-			ob_start();
-			$step->html_v2();
-			$html .= ob_get_clean();
-
+			$response['sortable'] .= $step->sortable_item( false );
+			$response['settings'] .= $step->html( false );
 		}
 
-		return $html;
+		$response['funnel'] = $this->get_current_funnel();
+
+		$this->send_ajax_response( $response );
+
 	}
 
 	/**
@@ -653,21 +648,6 @@ class Funnels_Page extends Admin_Page {
 	 */
 	public function get_current_funnel() {
 		return new Funnel( absint( get_request_var( 'funnel' ) ) );
-	}
-
-	public function get_step_sortable() {
-		$funnel = $this->get_current_funnel();
-		$steps  = $funnel->get_steps();
-
-		$html = "";
-
-		foreach ( $steps as $step ) {
-			ob_start();
-			$step->sortable_item();
-			$html .= ob_get_clean();
-		}
-
-		return $html;
 	}
 
 	/**
@@ -791,15 +771,11 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-		ob_start();
-		$step->sortable_item();
-		$sortable = ob_get_clean();
-		ob_start();
-		$step->html_v2();
-		$settings = ob_get_clean();
+        $step->get_step_element()->validate_settings( $step );
+
 		$this->send_ajax_response( [
-			'sortable'   => $sortable,
-			'settings'   => $settings,
+			'sortable'   => $step->sortable_item( false ),
+			'settings'   => $step->html( false ),
 			'id'         => $step->get_id(),
 			'after_step' => $after_step,
 			'json'       => $step
@@ -833,15 +809,11 @@ class Funnels_Page extends Admin_Page {
 
 		$new_step = $step->duplicate();
 
-		ob_start();
-		$new_step->sortable_item();
-		$sortable = ob_get_clean();
-		ob_start();
-		$new_step->html_v2();
-		$settings = ob_get_clean();
+		$new_step->get_step_element()->validate_settings( $new_step );
+
 		$this->send_ajax_response( [
-			'sortable' => $sortable,
-			'settings' => $settings,
+			'sortable' => $new_step->sortable_item( false ),
+			'settings' => $new_step->html( false ),
 			'id'       => $new_step->get_id(),
 			'json'     => $new_step
 		] );

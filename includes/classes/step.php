@@ -970,9 +970,37 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Output the HTML of a step.
 	 */
-	public function sortable_item() {
-		$this->get_step_element()->pre_html( $this );
+	public function sortable_item( $echo = true ) {
+
+		if ( ! $echo ){
+			ob_start();
+		}
+
 		$this->get_step_element()->sortable_item( $this );
+
+		if ( ! $echo ){
+			return ob_get_clean();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Output the HTML of a step.
+	 */
+	public function html_v2( $echo = true ) {
+
+		if ( ! $echo ){
+			ob_start();
+		}
+
+		$this->get_step_element()->html_v2( $this );
+
+		if ( ! $echo ){
+			return ob_get_clean();
+		}
+
+		return false;
 	}
 
 	/**
@@ -987,16 +1015,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Output the HTML of a step.
 	 */
-	public function html() {
-		$this->html_v2();
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function html_v2() {
-		$this->get_step_element()->pre_html( $this );
-		$this->get_step_element()->html_v2( $this );
+	public function html( $echo = true ) {
+		return $this->html_v2( $echo );
 	}
 
 	/**

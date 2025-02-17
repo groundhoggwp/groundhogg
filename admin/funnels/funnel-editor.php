@@ -9,7 +9,6 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
-use function Groundhogg\groundhogg_icon;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
@@ -93,9 +92,13 @@ function render_draggable_step_grid( $steps ) {
 		endforeach;
 
 		?></div><?php
-
 	}
+}
 
+$steps = $funnel->get_steps();
+
+foreach ( $steps as $step ) {
+    $step->get_step_element()->validate_settings( $step );
 }
 
 ?>
@@ -107,7 +110,7 @@ function render_draggable_step_grid( $steps ) {
 		'id'    => 'funnel',
 		'value' => $funnel_id
 	);
-	echo Plugin::$instance->utils->html->input( $args ); ?>
+	echo html()->input( $args ); ?>
     <div class="gh-header funnel-editor-header">
 
 		<?php header_icon(); ?>
@@ -153,7 +156,6 @@ function render_draggable_step_grid( $steps ) {
 			echo html()->bigToggle( [
 				'name'    => 'funnel_status',
 				'id'      => 'status-toggle',
-//					'class'   => 'big-toggle',
 				'value'   => 'active',
 				'checked' => $funnel->is_active(),
 				'on'      => 'Active',
@@ -184,8 +186,11 @@ function render_draggable_step_grid( $steps ) {
     <div id="funnel-builder">
         <div id="step-flow" class="sidebar">
             <div class="fixed-inside">
-                <div id="step-sortable"
-                     class="ui-sortable"><?php foreach ( $funnel->get_steps() as $step ): ?><?php $step->sortable_item(); ?><?php endforeach; ?></div>
+                <div id="step-sortable" class="ui-sortable">
+					<?php foreach ( $steps as $step ):
+						$step->sortable_item();
+					endforeach; ?>
+                </div>
                 <div class="add-step-bottom-wrap">
                     <button class="gh-button secondary medium icon" type="button">
 						<?php dashicon_e( 'plus-alt2' ); ?>
@@ -217,7 +222,7 @@ function render_draggable_step_grid( $steps ) {
                     </div>
                 </div>
                 <div class="step-settings hidden">
-					<?php foreach ( $funnel->get_steps() as $step ):
+					<?php foreach ( $steps as $step ):
 						$step->html_v2();
 					endforeach; ?>
                 </div>
