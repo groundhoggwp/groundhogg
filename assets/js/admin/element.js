@@ -1083,6 +1083,15 @@ ${ afterProgress() }`,
     })
   }
 
+  $(document).on('submit', 'form.danger-permanent', e => {
+    e.preventDefault()
+    dangerModalLink(e, __('Are you sure? This action cannot be undone.', 'groundhogg'), {
+      onConfirm: () => {
+        e.currentTarget.submit()
+      },
+    } )
+  } )
+
   $(document).on('click', 'a.danger-confirm', e => dangerModalLink(e, __('Are you sure?', 'groundhogg')))
   $(document).on('click', 'a.danger-permanent', e => dangerModalLink(e, __('Are you sure? This action cannot be undone.', 'groundhogg')))
   $(document).on('click', 'a.danger-delete', e => {

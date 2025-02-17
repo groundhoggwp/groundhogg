@@ -442,6 +442,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                     </div>
                 </div>
 			<?php endif; ?>
+            <?php if ( is_super_admin() ): ?>
             <div class="gh-panel">
                 <div class="gh-panel-header">
                     <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
@@ -449,17 +450,17 @@ class Tools_Page extends Tabbed_Admin_Page {
                 <div class="inside">
                     <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
                     <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
-                    <form method="post">
+                    <form method="post" class="danger-permanent">
 						<?php wp_nonce_field( 'reset' ) ?>
 						<?php action_input( 'reset' ) ?>
                         <div class="gh-input-group">
-							<?php echo html()->input( [
+
+                            <?php echo html()->input( [
 								'class'       => 'input',
 								'name'        => 'reset_confirmation',
-								'placeholder' => 'reset',
+								'placeholder' => 'Type "reset" to confirm.',
 								'required'    => true,
 							] );
-
 
 							echo html()->submit( [
 								'class' => 'gh-button danger',
@@ -471,6 +472,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                     <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
                 </div>
             </div>
+            <?php endif; ?>
 			<?php do_action( 'groundhogg/admin/tools/system_status/after' ); ?>
         </div>
 		<?php
@@ -925,7 +927,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Reset Groundhogg to when first installed.
 	 */
 	public function process_system_reset() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+
+		if ( ! is_super_admin() ) {
 			$this->wp_die_no_access();
 		} else if ( get_post_var( 'reset_confirmation' ) !== 'reset' ) {
 			return new WP_Error( 'error', __( 'You must confirm the reset by typing <code>reset</code> into the text field.', 'groundhogg' ) );
@@ -941,8 +944,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 		wp_cache_flush();
 
 		do_action( 'groundhogg/reset' );
-
-		die();
 
 		return admin_page_url( 'gh_guided_setup' );
 	}
