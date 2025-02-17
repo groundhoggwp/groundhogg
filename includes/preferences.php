@@ -215,7 +215,7 @@ class Preferences {
 			return self::UNCONFIRMED;
 		}
 
-		$string_map = array_merge( [
+		$string_map = [
 			'pending'      => self::UNCONFIRMED,
 			'unconfirm'    => self::UNCONFIRMED,
 			'unconfirmed'  => self::UNCONFIRMED,
@@ -237,7 +237,7 @@ class Preferences {
 			'spam'         => self::SPAM,
 			'spammed'      => self::SPAM,
 			'fake'         => self::SPAM,
-		] );
+		];
 
 		// Add translated names as well!
 		$pretty_names = array_map( 'strtolower', self::get_preference_names() );
