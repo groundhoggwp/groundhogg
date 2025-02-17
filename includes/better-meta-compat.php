@@ -5,7 +5,8 @@ namespace Groundhogg;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Utils\DateTimeHelper;
 
-class PropertyException extends \Exception {}
+class PropertyException extends \Exception {
+}
 
 /**
  * Sanitize user input based on a field configuration
@@ -38,6 +39,7 @@ function sanitize_custom_field( $value, $field_id ) {
 				if ( isset_not_empty( $field, 'multiple' ) ) {
 					return [];
 				}
+
 				return '';
 			case 'checkboxes':
 				return [];
@@ -110,48 +112,43 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	$data = $contact->get_meta( $field['name'] );
 
 	try {
-
-		if ( ! empty( $data ) ) {
-			switch ( $field['type'] ):
-				default:
-				case 'text':
-				case 'custom_email':
-				case 'email':
-				case 'url':
-				case 'tel':
-				case 'radio':
-				case 'textarea':
-					$data = esc_html( $data );
-					break;
-				case 'datetime':
-					$date = new DateTimeHelper( $data );
-					$data = $date->ymdhis();
-					break;
-				case 'time':
-					$date = new DateTimeHelper( $data );
-					$data = $date->format( 'H:i:s' );
-					break;
-				case 'date':
-					$date = new DateTimeHelper( $data );
-					$data = $date->ymd();
-					break;
-				case 'number':
-					$data = floatval( $data );
-					$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
-					break;
-				case 'dropdown':
-				case 'checkboxes':
-					if ( is_array( $data ) ) {
-						$data = esc_html( implode( ', ', $data ) );
-					} else {
-						$data = esc_html( $data );
-					}
-					break;
-				case 'html':
-					// output with no change as already HTML
-					break;
-			endswitch;
-		}
+		switch ( $field['type'] ):
+			default:
+			case 'text':
+			case 'custom_email':
+			case 'email':
+			case 'url':
+			case 'tel':
+			case 'radio':
+			case 'textarea':
+				$data = esc_html( $data );
+				break;
+			case 'datetime':
+				$date = new DateTimeHelper( $data );
+				$data = $date->ymdhis();
+				break;
+			case 'time':
+				$date = new DateTimeHelper( $data );
+				$data = $date->format( 'H:i:s' );
+				break;
+			case 'date':
+				$date = new DateTimeHelper( $data );
+				$data = $date->ymd();
+				break;
+			case 'number':
+				$data = floatval( $data );
+				$data = number_format_i18n( $data, floor( $data ) != $data ? 2 : 0 );
+				break;
+			case 'dropdown':
+				$data = esc_html( is_array( $data ) ? implode( ', ', $data ) : $data );
+				break;
+			case 'checkboxes':
+				$data = is_array( $data ) ? esc_html( implode( ', ', $data ) ) : '';
+				break;
+			case 'html':
+				// output with no change as already HTML
+				break;
+		endswitch;
 
 	} catch ( \Exception $e ) {
 		return '';
