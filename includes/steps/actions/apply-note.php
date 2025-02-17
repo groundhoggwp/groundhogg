@@ -116,6 +116,10 @@ class Apply_Note extends Action {
 			'date_created' => Ymd_His( $event->get_time() )
 		] );
 
+		$event->set_args( [
+			'task_id' => $note->ID
+		] );
+
 		return true;
 
 	}

@@ -189,21 +189,24 @@ abstract class Form_Integration extends Benchmark {
 
 	}
 
-	/**
-	 * Save the given step
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'form_id', absint( $this->get_posted_data( 'form_id' ) ) );
+	public function get_settings_schema() {
+		return [
+			'form_id' => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			],
+			'field_map' => [
+				'default'  => [],
+				'sanitize' => function ( $value ) {
 
-		$field_map = map_deep( $this->get_posted_data( 'field_map', [] ), 'sanitize_key' );
+					if ( ! is_array( $value ) ) {
+						return [];
+					}
 
-		if ( ! array_filter( $field_map ) ) {
-			$this->add_error( 'invalid_field_map', __( 'Your form map configuration is invalid.', 'groundhogg' ) );
-		}
-
-		$this->save_setting( 'field_map', $field_map );
+					return array_filter( map_deep( $value, 'sanitize_key' ) );
+				}
+			]
+		];
 	}
 
 	/**

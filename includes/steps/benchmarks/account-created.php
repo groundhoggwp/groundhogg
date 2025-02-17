@@ -110,15 +110,6 @@ class Account_Created extends Benchmark {
 	}
 
 	/**
-	 * Save the step settings
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', [ 'subscriber' ] ) ) );
-	}
-
-	/**
 	 * get the hook for which the benchmark will run
 	 *
 	 * @return int[]

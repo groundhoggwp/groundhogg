@@ -449,18 +449,4 @@ class Delay_Timer extends Action {
 
 		return $date->getTimestamp();
 	}
-
-	/**
-	 * Delay timers don't do anything, they just have the delay and enqueue the next step.
-	 *
-	 * @param $contact Contact
-	 * @param $event   Event
-	 *
-	 * @return true
-	 */
-	public function run( $contact, $event ) {
-		//do nothing
-		return true;
-	}
-
 }

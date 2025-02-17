@@ -375,7 +375,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	protected function get_setting( $key = '', $default = false ) {
 		$val = $this->get_current_step()->get_meta( $key );
 
-		return $val ? $val : $default;
+		return $val ?: $default;
 	}
 
 	/**
@@ -861,16 +861,16 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             return false;
         }
 
-	    $schema = wp_parse_args( $schema[$setting], [
+	    $setting_schema = wp_parse_args( $schema[$setting], [
+		    'default'  => false,
 		    'sanitize' => '\Groundhogg\sanitize_payload',
-		    'default'  => false
 	    ] );
 
 	    if ( empty( $value ) ) {
 		    $value = $schema['default'];
 	    }
 
-        return call_user_func( $schema['sanitize'], $value );
+        return call_user_func( $setting_schema['sanitize'], $value );
     }
 
 	/**

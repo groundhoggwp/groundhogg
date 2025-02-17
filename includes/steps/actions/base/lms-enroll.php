@@ -6,6 +6,7 @@ use Groundhogg\Step;
 use Groundhogg\Steps\Actions\Action;
 use function Groundhogg\create_user_from_contact;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 
 abstract class LMS_Enroll extends Action {
 
@@ -105,14 +106,19 @@ abstract class LMS_Enroll extends Action {
 		html()->end_form_table();
 	}
 
-	/**
-	 * Save the step based on the given ID
-	 *
-	 * @param $step Step
-	 */
-	public function save( $step ) {
-		$this->save_setting( 'course', absint( $this->get_posted_data( 'course' ) ) );
-		$this->save_setting( 'action', sanitize_key( $this->get_posted_data( 'action' ) ) );
+	public function get_settings_schema() {
+		return [
+			'course' => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			],
+			'action' => [
+				'default'  => 0,
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'enroll', 'unenroll' ] );
+				}
+			],
+		];
 	}
 
 	/**

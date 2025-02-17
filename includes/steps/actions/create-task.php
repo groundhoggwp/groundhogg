@@ -96,7 +96,7 @@ class Create_Task extends Action {
 
 		echo html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'task_content' ),
-			'name'  => $this->setting_name_prefix( 'content' ),
+			'name'  => 'task_content',
 			'value' => $this->get_setting( 'content' )
 		] );
 
@@ -226,7 +226,8 @@ class Create_Task extends Action {
 		$time      = $this->get_setting( 'time', '17:00:00' );
 		$type      = $this->get_setting( 'task_type', 'task' );
 		$assign_to = absint( $this->get_setting( 'assign_to' ) );
-		if ( ! $assign_to ) {
+
+        if ( ! $assign_to ) {
 			$assign_to = $contact->get_owner_id();
 		}
 
@@ -248,6 +249,10 @@ class Create_Task extends Action {
 			'timestamp'    => $event->get_time(),
 			'date_created' => Ymd_His( $event->get_time() )
 		] );
+
+        $event->set_args( [
+            'task_id' => $task->ID
+        ] );
 
 		return true;
 	}
