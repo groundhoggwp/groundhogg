@@ -677,6 +677,7 @@
       wp.editor.remove(id)
       tinymceElement(id, {
         replacements: true,
+        noteTemplates: true,
         quicktags: false,
       }, (content) => {
         Funnel.updateStepMeta({
@@ -691,6 +692,7 @@
       wp.editor.remove(id)
       tinymceElement(id, {
         replacements: true,
+        taskTemplates: true,
         quicktags: false,
       }, (content) => {
         Funnel.updateStepMeta({
