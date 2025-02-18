@@ -658,6 +658,7 @@ label.gh-switch input:checked ~ span.off {
   gap: 20px;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
   max-width: 1200px;
+  margin: 0 auto;
 }
 .report-grid .report-placeholder {
   background-color: rgba(16, 38, 64, 0.15);
