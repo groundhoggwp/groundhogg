@@ -729,6 +729,7 @@ label.gh-switch {
   display: grid;
   gap: 20px;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  max-width: 1200px;
 
   .report-placeholder {
 
