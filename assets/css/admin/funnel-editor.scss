@@ -602,7 +602,8 @@ button.button.save-button {
 
 #step-flow {
 
-  width: 340px;
+  min-width: 340px;
+  width: 25%;
   flex-shrink: 0;
   position: relative;
 
@@ -618,6 +619,11 @@ button.button.save-button {
 
     background-image: radial-gradient(circle at 1px 1px, $primary-dark-10 1px, transparent 0);
     background-size: 20px 20px;
+
+    #step-sortable {
+      margin: auto;
+      width: min( 100%, 360px );
+    }
   }
 
   .wpgh-element {

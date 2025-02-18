@@ -431,7 +431,8 @@ button.button.save-button {
 }
 
 #step-flow {
-  width: 340px;
+  min-width: 340px;
+  width: 25%;
   flex-shrink: 0;
   position: relative;
 }
@@ -446,6 +447,10 @@ button.button.save-button {
   overflow-y: scroll;
   background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
   background-size: 20px 20px;
+}
+#step-flow .fixed-inside #step-sortable {
+  margin: auto;
+  width: min(100%, 360px);
 }
 #step-flow .wpgh-element {
   /*height: 112px;*/
