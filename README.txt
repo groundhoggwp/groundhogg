@@ -353,7 +353,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
 * ADDED Additional bulk actions in the event logs tables.
 * IMPROVED The Cron Job Setup page with additional instructions and a new layout.
-* IMPROVED Styling of tabbed admin pages.
+* IMPROVED Various admin UI improvements like tabs, reporting page width constraint, and responsive funnel step flow for large screens.
 * TWEAKED Object ID can be omitted from relationship filters for more generic usage.
 * TWEAKED Funnels can't be activated unless there is at least one starting benchmark.
 * FIXED Fatal error if `page` query param is present but not a string in non-admin pages.

@@ -649,7 +649,11 @@
         Groundhogg.nonces[nonce] = newNonces[nonce]
       })
     }
+  })
 
+  $(document).on('click', '[data-gh-href]', e => {
+    console.log('clicked!', e.currentTarget.dataset)
+    window.open( e.currentTarget.dataset.ghHref, '_self' )
   })
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

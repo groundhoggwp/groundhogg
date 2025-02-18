@@ -1155,4 +1155,8 @@ table .column-steps div.step-icon img {
   border-color: var(--color-dark-800);
 }
 
+[data-gh-href] {
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=admin.css.map */

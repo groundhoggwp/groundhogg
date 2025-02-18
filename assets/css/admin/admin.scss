@@ -1337,3 +1337,7 @@ table .column-steps {
     border-color: var(--color-dark-800);
   }
 }
+
+[data-gh-href]{
+  cursor: pointer;
+}
