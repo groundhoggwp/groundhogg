@@ -40,6 +40,10 @@ body.gh_reporting {
   }
 
   .display-grid {
+
+    max-width: 1200px;
+    margin: 0 auto;
+
     .gh-panel {
       position: relative;
     }

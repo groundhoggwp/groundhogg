@@ -7,6 +7,10 @@ body.gh_reporting .gh-panel .notice {
   margin: 10px;
   border-radius: 5px;
 }
+body.gh_reporting .display-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 body.gh_reporting .display-grid .gh-panel {
   position: relative;
 }
