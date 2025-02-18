@@ -1033,8 +1033,9 @@ class Form_v2 extends Step {
 						'name'      => '',
 						'className' => '',
 						'required'  => false,
-						'value'     => '',
+						'value'     => '1',
 						'label'     => '',
+						'checked'   => false,
 					] );
 
 					if ( $field['required'] ) {
@@ -1047,12 +1048,15 @@ class Form_v2 extends Step {
 						'name'     => $field['name'],
 						'class'    => trim( 'gh-checkbox-input ' . $field['className'] ),
 						'required' => $field['required'],
-						'checked'  => $contact && $contact->get_meta( $field['name'] ) == ( $field['value'] ?: 1 ),
+						'checked'  => $contact && $contact->get_meta( $field['name'] ) == ( $field['value'] ?: 1 ) || $field['checked'],
 						'value'    => $field['value'] ?: '1',
 					] );
 				},
 				'validate' => '__return_true',
-				'before'   => __NAMESPACE__ . '\standard_meta_callback',
+				'before'   => function (  $field, $posted_data, &$data, &$meta ) {
+					// if the field is not set, it should be set to ''
+					$meta[ $field['name'] ] = isset( $posted_data[ $field['name'] ] ) ? sanitize_text_field( $posted_data[ $field['name'] ] ) : '';
+				},
 				'after'    => function ( $field, $posted_data, $contact ) {
 					if ( $posted_data->isset_not_empty( $field['name'] ) && ! empty( $field['tags'] ) ) {
 						$contact->apply_tag( $field['tags'] );
