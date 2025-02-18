@@ -86,7 +86,7 @@ class Optin_Status_Changed extends Benchmark {
 			'id'          => $this->setting_id_prefix( 'from_status' ),
 			'name'        => $this->setting_name_prefix( 'from_status' ) . '[]',
 			'data'        => Preferences::get_preference_names(),
-			'selected'    => $this->get_setting( 'from_status' ),
+			'selected'    => $this->get_setting( 'from_status', [] ),
 			'multiple'    => true,
 			'placeholder' => __( 'Any status', 'groundhogg' )
 		] );
@@ -97,7 +97,7 @@ class Optin_Status_Changed extends Benchmark {
 			'id'          => $this->setting_id_prefix( 'status' ),
 			'name'        => $this->setting_name_prefix( 'status' ) . '[]',
 			'data'        => Preferences::get_preference_names(),
-			'selected'    => $this->get_setting( 'status' ),
+			'selected'    => $this->get_setting( 'status', [] ),
 			'multiple'    => true,
 			'placeholder' => __( 'Any status', 'groundhogg' )
 		] );
@@ -110,13 +110,13 @@ class Optin_Status_Changed extends Benchmark {
 			'from_status' => [
 				'default'  => [],
 				'sanitize' => function ( $statuses ) {
-					return array_intersect( wp_parse_id_list( $statuses ), array_values( Preferences::get_preference_names() ) );
+					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
 				}
 			],
 			'status' => [
 				'default'  => [],
 				'sanitize' => function ( $statuses ) {
-					return array_intersect( wp_parse_id_list( $statuses ), array_values( Preferences::get_preference_names() ) );
+					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
 				}
 			]
 		];
