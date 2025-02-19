@@ -1,7 +1,7 @@
 (function (gh) {
 
   const {
-
+    disable_page_tracking = false,
     unnecessary_cookies_disabled,
     has_accepted_cookies,
     settings,
@@ -210,6 +210,10 @@
 
     pageView () {
 
+      if ( disable_page_tracking ){
+        return;
+      }
+
       const apiPageView = (ref) => {
         let func = this.isLoggedIn ? apiPost : unauthenticatedApiPost
 
@@ -229,6 +233,11 @@
     },
 
     logFormImpressions () {
+
+      if ( disable_page_tracking ){
+        return;
+      }
+
       let self = this
       let forms = document.querySelectorAll('.gh-form')
       forms.forEach(function (form, i) {
@@ -289,7 +298,7 @@
 
     doTracking () {
 
-      if (this.initFlag) {
+      if (this.initFlag || disable_page_tracking ) {
         return
       }
 

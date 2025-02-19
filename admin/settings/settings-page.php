@@ -919,13 +919,24 @@ class Settings_Page extends Admin_Page {
 			'gh_ignore_user_precedence'              => [
 				'id'      => 'gh_ignore_user_precedence',
 				'section' => 'page_tracking',
-				'label'   => _x( 'Disable logged in user tracking precedence.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Disable logged in user tracking precedence', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'By default, %s will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_ignore_user_precedence',
 					'id'    => 'gh_ignore_user_precedence',
+					'value' => 'on',
+				],
+			],
+			'gh_disable_page_tracking'              => [
+				'id'      => 'gh_disable_page_tracking',
+				'section' => 'page_tracking',
+				'label'   => _x( 'Disable frontend page tracking', 'settings', 'groundhogg' ),
+				'desc'    => 'The journey of your contacts on the frontend of your site, and form impressions, will no longer be tracked.',
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable' ),
 					'value' => 'on',
 				],
 			],
@@ -1618,7 +1629,7 @@ class Settings_Page extends Admin_Page {
 			'gh_purge_page_visits'                   => [
 				'id'      => 'gh_purge_page_visits',
 				'section' => 'page_tracking',
-				'label'   => _x( 'Delete Old Page Visit Logs (recommended)', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Delete old page visit logs (recommended)', 'settings', 'groundhogg' ),
 				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
@@ -1631,7 +1642,7 @@ class Settings_Page extends Admin_Page {
 			'gh_page_visits_log_retention'           => [
 				'id'      => 'gh_page_visits_log_retention',
 				'section' => 'page_tracking',
-				'label'   => _x( 'Log Retention', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Log retention', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'The number of days to retain logged page visits. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_page_visits_log_retention' ) ?: 90 ),
 				'type'    => 'input',
 				'atts'    => [

@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\Api\V4\Base_Api;
-use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -159,7 +158,8 @@ class Scripts {
 			// Cookies can be disabled form via the settings
 			'unnecessary_cookies_disabled' => is_option_enabled( 'gh_disable_unnecessary_cookies' ),
 			'has_accepted_cookies'         => has_accepted_cookies(),
-
+			// page tracking
+			'disable_page_tracking'        => is_option_enabled( 'gh_disable_open_tracking' ),
 			//deprecated
 			'ajaxurl'                      => admin_url( 'admin-ajax.php' ),
 			'_wpnonce'                     => wp_create_nonce( 'wp_rest' ),
@@ -539,7 +539,7 @@ class Scripts {
 			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION );
 
-		if ( get_url_var( 'ghvid' ) ){
+		if ( get_url_var( 'ghvid' ) ) {
 			wp_enqueue_script( 'groundhogg-admin-youtube' );
 		}
 
