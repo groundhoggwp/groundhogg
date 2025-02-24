@@ -235,6 +235,8 @@ class Main_Updater extends Old_Updater {
 					db()->steps->create_table(); // add pass_thru
 					db()->events->create_table(); // add args
 					db()->event_queue->create_table(); // add args
+					db()->steps->create_table();
+					db()->steps->update( [ 'branch' => '' ], [ 'branch' => 'main' ] );
 				}
 			],
 		];

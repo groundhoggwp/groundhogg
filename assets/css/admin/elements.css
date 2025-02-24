@@ -808,6 +808,10 @@ a.action-link {
   background-color: #102640;
   color: #fff;
 }
+.pill.purple {
+  background-color: #6c19ad;
+  color: #fff;
+}
 .pill.semi-dark {
   background-color: rgba(16, 38, 64, 0.75);
   color: #fff;

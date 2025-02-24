@@ -10,6 +10,8 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_apply_callbacks;
+use function Groundhogg\array_map_keys;
 use function Groundhogg\check_lock;
 use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
@@ -22,7 +24,9 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
+use function Groundhogg\one_of;
 use function Groundhogg\use_edit_lock;
 use function Groundhogg\verify_admin_ajax_nonce;
 
@@ -57,9 +61,7 @@ class Funnels_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
 
-		add_action( 'wp_ajax_wpgh_get_step_html', [ $this, 'add_step' ] );
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
-		add_action( 'wp_ajax_wpgh_duplicate_funnel_step', [ $this, 'duplicate_step' ] );
 
 		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
 			$this,
@@ -195,7 +197,7 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-					'steps'      => $funnel->get_steps(),
+					'steps'      => $funnel->get_steps_for_editor(),
 					'id'         => absint( get_request_var( 'funnel' ) ),
 					'save_text'  => __( 'Update', 'groundhogg' ),
 					'export_url' => $funnel->export_url(),
@@ -627,7 +629,10 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		$funnel = $this->get_current_funnel();
-		$steps  = $funnel->get_steps();
+		$steps  = $funnel->get_steps_for_editor();
+		$steps  = array_filter( $steps, function ( Step $step ) {
+			return $step->is_main_branch();
+		} );
 
 		foreach ( $steps as $step ) {
 			// this will show errors in the event of a settings issue
@@ -659,9 +664,9 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		if ( get_request_var( '_delete_step' ) ) {
+		if ( get_post_var( '_delete_step' ) ) {
 
-			$step_id = absint( get_request_var( '_delete_step' ) );
+			$step_id = absint( get_post_var( '_delete_step' ) );
 			$step    = new Step( $step_id );
 
 			if ( ! $step->exists() ) {
@@ -680,36 +685,106 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		//get all the steps in the funnel.
-		$step_ids = wp_parse_id_list( get_request_var( 'step_ids' ) );
+		$step_ids = get_request_var( 'step_ids' );
 
 		if ( empty( $step_ids ) ) {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
 		}
 
+		$metaUpdates = get_post_var( 'metaUpdates' );
+		$metaUpdates = json_decode( $metaUpdates, true ) ?: [];
+		$metaUpdates = array_map_keys( $metaUpdates, 'absint' );
+
+		$step = null;
+
 		foreach ( $step_ids as $order => $stepId ) {
 
-			$step = new Step( $stepId );
+			// maybe creating a step
+			if ( ! is_numeric( $stepId ) ) {
+
+				if ( $stepId === 'duplicate' ) {
+
+//	                if ( get_post_var( '_duplicate_step' ) ) {
+//                        $extra = json_decode( get_post_var( '_duplicate_step' ), true );
+//	                }
+
+					// duplicate the previous step
+					$step->duplicate( [
+						'step_status' => 'inactive', // must be inactive to start,
+						'step_order'  => $step->get_order() + 1
+					] );
+
+					continue;
+				}
+
+				$step_data = json_decode( $stepId, true );
+
+				if ( ! $step_data ) {
+					continue;
+				}
+
+				$step_data = array_apply_callbacks( $step_data, [
+					'step_type' => function ( $value ) {
+						return one_of( $value, Plugin::instance()->step_manager->get_types() );
+					},
+					'branch'    => 'sanitize_key',
+				] );
+
+				if ( $step && $step->exists() ) {
+					$step_order = $step->get_order() + 1;
+				} else {
+					$step_order = 1;
+				}
+
+				$element = Plugin::instance()->step_manager->get_element( $step_data['step_type'] );
+
+				$step = new Step();
+
+				$step->create( [
+					'funnel_id'   => $funnel_id,
+					'step_title'  => $element->get_name(),
+					'step_type'   => $element->get_type(),
+					'step_group'  => $element->get_group(),
+					'step_order'  => $step_order,
+					'step_status' => 'inactive', // all steps added are by default inactive
+					'branch'      => $step_data['branch']
+				] );
+
+				continue;
+			}
+
+			$stepId = absint( $stepId );
+			$step   = new Step( $stepId );
+
+			if ( isset_not_empty( $metaUpdates, $stepId ) ) {
+				$step->update_meta( $metaUpdates[ $stepId ] );
+			}
 
 			$step->save();
 		}
 
-		$status = sanitize_text_field( get_request_var( 'funnel_status', 'inactive' ) );
+        if ( get_post_var( '_activate' ) ){
+            $args['status'] = 'active';
+        }
 
-		// do not update the status to inactive if it's not confirmed
-		if ( $status === 'inactive' || $status === 'active' ) {
-			$args['status'] = $status;
+		if ( get_post_var( '_deactivate' ) ){
+			$args['status'] = 'inactive';
 		}
 
 		// if the funnel does not have any entry steps, it cannot be active.
 		if ( count( $funnel->get_entry_steps() ) === 0 ) {
 			$args['status'] = 'inactive';
-			$this->add_error( new \WP_Error( 'err', 'You must have at least one entry benchmark before activating a funnel.' ) );
+			$funnel->add_error( new \WP_Error( 'err', 'You must have at least one entry benchmark before activating a funnel.' ) );
 		}
 
 		$args['title']        = sanitize_text_field( get_request_var( 'funnel_title' ) );
 		$args['last_updated'] = current_time( 'mysql' );
 
 		$funnel->update( $args );
+
+		if ( get_post_var( '_commit' ) && $funnel->is_active() ) {
+			$funnel->commit();
+		}
 
 		/**
 		 * Runs after the funnel as been updated.
@@ -718,107 +793,6 @@ class Funnels_Page extends Admin_Page {
 
 		return true;
 
-	}
-
-	/**
-	 * Add new step via admin ajax
-	 */
-	public function add_step() {
-		if ( ! current_user_can( 'edit_funnels' ) || ! $this->verify_action() ) {
-			$this->wp_die_no_access();
-		}
-
-		/* exit out if not doing ajax */
-		if ( ! wp_doing_ajax() ) {
-			return;
-		}
-
-		$step_type = get_request_var( 'step_type' );
-
-		$after_step = new Step( absint( get_request_var( 'after_step' ) ) );
-
-		if ( $after_step->exists() ) {
-			$step_order = $after_step->get_order() + 1;
-			$funnel_id  = $after_step->get_funnel_id();
-		} else {
-			$funnel_id  = absint( get_post_var( 'funnel_id' ) );
-			$step_order = 1;
-		}
-
-		$funnel = new Funnel( $funnel_id );
-
-		if ( ! $funnel->exists() ) {
-			wp_send_json_error();
-		}
-
-		$elements = Plugin::$instance->step_manager->get_elements();
-
-		$title      = $elements[ $step_type ]->get_name();
-		$step_group = $elements[ $step_type ]->get_group();
-
-		$step = new Step();
-
-		$step_id = $step->create( [
-			'funnel_id'   => $funnel_id,
-			'step_title'  => $title,
-			'step_type'   => $step_type,
-			'step_group'  => $step_group,
-			'step_order'  => $step_order,
-			'step_status' => $funnel->is_active() ? 'active' : 'inactive'
-		] );
-
-		if ( ! $step_id || ! $step->exists() ) {
-			wp_send_json_error();
-		}
-
-        $step->get_step_element()->validate_settings( $step );
-
-		$this->send_ajax_response( [
-			'sortable'   => $step->sortable_item( false ),
-			'settings'   => $step->html( false ),
-			'id'         => $step->get_id(),
-			'after_step' => $after_step,
-			'json'       => $step
-		] );
-
-		wp_send_json_error();
-	}
-
-	public function duplicate_step() {
-
-		if ( ! current_user_can( 'edit_funnels' ) || ! $this->verify_action() ) {
-			$this->wp_die_no_access();
-		}
-
-		/* exit out if not doing ajax */
-		if ( ! wp_doing_ajax() ) {
-			return;
-		}
-
-		if ( ! isset( $_POST['step_id'] ) ) {
-			wp_send_json_error();
-		}
-
-		$step_id = absint( intval( $_POST['step_id'] ) );
-
-		$step = new Step( $step_id );
-
-		if ( ! $step->exists() ) {
-			wp_send_json_error();
-		}
-
-		$new_step = $step->duplicate();
-
-		$new_step->get_step_element()->validate_settings( $new_step );
-
-		$this->send_ajax_response( [
-			'sortable' => $new_step->sortable_item( false ),
-			'settings' => $new_step->html( false ),
-			'id'       => $new_step->get_id(),
-			'json'     => $new_step
-		] );
-
-		wp_send_json_error();
 	}
 
 	public function edit() {

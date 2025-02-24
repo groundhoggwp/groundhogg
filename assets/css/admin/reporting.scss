@@ -37,13 +37,15 @@ body.gh_reporting {
       margin: 10px;
       border-radius: 5px;
     }
+
+    h2.title:has(.dashicons) {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
   }
 
   .display-grid {
-
-    max-width: 1200px;
-    margin: 0 auto;
-
     .gh-panel {
       position: relative;
     }
@@ -245,12 +247,6 @@ body.gh_reporting {
 }
 
 .gh-panel {
-
-  h2.title:has(.dashicons) {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
 
   #table_funnel_stats {
     td:first-child {

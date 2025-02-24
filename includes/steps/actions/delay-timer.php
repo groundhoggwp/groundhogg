@@ -175,7 +175,7 @@ class Delay_Timer extends Action {
 	}
 
 	public function generate_step_title( $step ) {
-		return $step->get_meta( 'delay_preview' );
+		return $step->get_meta( 'delay_preview' ) ?: 'Wait 3 days';
 	}
 
 	public function get_settings_schema() {

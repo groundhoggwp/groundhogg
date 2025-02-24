@@ -48,8 +48,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		parent::__construct( $identifier_or_args, $field );
 	}
 
+	const MAIN_BRANCH = 'main';
 	const BENCHMARK = 'benchmark';
 	const ACTION = 'action';
+	const LOGIC = 'logic';
 
 	/**
 	 * This is only used when the step is enqueuing itself...
@@ -113,6 +115,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	protected function post_setup() {
 		$this->step_order = absint( $this->step_order );
 		$this->funnel_id  = absint( $this->funnel_id );
+		$this->changes    = maybe_unserialize( $this->changes );
+
+		// force to array plz
+		if ( ! is_array( $this->changes ) ) {
+			$this->changes = [];
+		}
 
 		do_action( 'groundhogg/step/post_setup', $this );
 	}
@@ -260,6 +268,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $prepped;
 	}
 
+	public function is_logic() {
+		return $this->get_group() === self::LOGIC;
+	}
 
 	/**
 	 * @return bool whether the step is a benchmark
@@ -281,6 +292,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @param string $type
 	 *
 	 * @return Step|false
+	 * @todo this does not work with branching ATM
+	 *
 	 */
 	public function get_next_of_type( $type = '' ) {
 
@@ -341,11 +354,32 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$query->setOrderby( [ 'step_order', 'ASC' ] )
 		      ->where()
+		      ->in( 'branch', $this->get_nested_branches_array() )
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
 		      ->lessThan( 'step_order', $this->get_order() );
 
 		return $query->get_objects( Step::class );
+	}
+
+	/**
+	 * Returns an ordered array from the current branch to main
+	 *
+	 * @return array
+	 */
+	public function get_nested_branches_array() {
+
+		$branches = [ $this->branch ];
+
+		$parent = $this->get_parent_step();
+
+		while ( $parent ) {
+			$branches[] = $parent->branch;
+			$parent     = $parent->get_parent_step();
+		}
+
+		return $branches;
+
 	}
 
 	/**
@@ -361,7 +395,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
 		      ->equals( 'step_type', $type )
-		      ->lessThan( 'step_order', $this->get_order() );
+		      ->lessThan( 'step_order', $this->get_order() )
+		      ->in( 'branch', $this->get_nested_branches_array() );
 
 		return $query->get_objects( Step::class );
 	}
@@ -409,18 +444,27 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function can_passthru() {
 		if ( $this->is_benchmark() ) {
-			return boolval( $this->can_passthru ) && $this->get_prev_step()->is_action();
+			return boolval( $this->can_passthru );
 		}
 
-		return true; // all actions are passthru
+		return true; // anything that's not a benchmark is passthru
 	}
 
 	/**
 	 * Get the next step in the order
 	 *
+	 * Not so easy with branching AHAHAHA
+	 *
+	 * Rules:
+	 * - If the current step is a benchmark, next will be the first available action or logic within the same branch
+	 * - if logic, do the logic function to get the correct child action, if there is not one available reconnect with main branch
+	 * - if the current steps is an action, get the next step of any type and handle accordingly.
+	 *
+	 * @param Event $event
+	 *
 	 * @return Step|false
 	 */
-	public function get_next_action() {
+	public function get_next_action( Event $event ) {
 
 		if ( $this->is_benchmark() ) {
 
@@ -429,36 +473,50 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			      ->setLimit( 1 )
 			      ->where()
 			      ->equals( 'funnel_id', $this->get_funnel_id() )
-			      ->equals( 'step_group', self::ACTION )
+			      ->equals( 'branch', $this->branch ) // must be of same branch
+			      ->equals( 'step_group', [ self::ACTION, self::LOGIC ] )
 			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
 
 			$next = $query->get_objects( Step::class );
 
 			$next = ! empty( $next ) ? $next[0] : false; // any proceeding action
 
+		} else if ( $this->is_logic() ) {
+
+			// must do logic things to get the next action within a branch
+			$next = $this->get_step_element()->get_branch_action( $event->get_contact() );
+
+			// no steps in the branch (the branch was empty)
+			// thus, we continue on in the current branch
+			if ( $next === false ) {
+				$next = $this->get_next_step();
+			}
+
 		} else {
 
+			// just get the next step
 			$next = $this->get_next_step();
-
-			// if the first proceeding step is a benchmark, we can check to see if it's a passthru.
-			if ( $next && $next->is_benchmark() ) {
-				// if it is a passthru, the next action will be the one proceeding it.
-				$next = $next->can_passthru() ? $next->get_next_action() : false;
-				// if it ISN'T passthru, then the next action is false
-			}
 		}
 
-		/**
-		 * Filters the next action
-		 *
-		 * @param $next    Step|null
-		 * @param $current Step
-		 */
-		return apply_filters( 'groundhogg/step/next_action', $next, $this );
+		// exit condition
+		if ( $next === false || $next->is_action() ) {
+			return $next;
+		}
+
+		// if the next step we get is a benchmark, if it's not passthru exit
+		if ( $next->is_benchmark() && ! $next->can_passthru() ) {
+			return false;
+		}
+
+		// recursive, kind of.
+		// if we get here, either a logic or a benchmark with passthru enabled
+		return $next->get_next_action( $event );
 	}
 
 	/**
 	 * Get the next step in the order
+	 *
+	 * Todo, this no longer works correctly with branching
 	 *
 	 * @return Step|false
 	 */
@@ -487,34 +545,27 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the next step of the funnel
+	 * If the current step is part of a branch, this will return the logic step from the parent branch
 	 *
-	 * @return Step|false
+	 * @return false|Step
 	 */
-	public function get_next_step() {
-		$query = new Table_Query( 'steps' );
+	public function get_parent_step() {
 
-		$query->setOrderby( [ 'step_order', 'ASC' ] )
-		      ->setLimit( 1 )
-		      ->where()
-		      ->equals( 'funnel_id', $this->get_funnel_id() )
-		      ->equals( 'step_order', $this->get_order() + 1 );
+		// main branch, no parents
+		if ( $this->is_main_branch() ) {
+			return false;
+		}
 
-		$next = $query->get_objects( Step::class );
+		$parts     = explode( '-', $this->branch );
+		$parent_id = absint( $parts[0] );
 
-		$next = ! empty( $next ) ? $next[0] : false;
-
-		/**
-		 * Filters the next step
-		 *
-		 * @param $next    Step|false
-		 * @param $current Step
-		 */
-		return apply_filters( 'groundhogg/step/next_step', $next, $this );
+		return new Step( $parent_id );
 	}
 
 	/**
 	 * Get the prev step of the funnel
+	 *
+	 * Todo, this no longer works correctly with branching
 	 *
 	 * @return Step|false
 	 */
@@ -541,6 +592,44 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Get the next step of the funnel
+	 *
+	 * THIS WILL ONLY RETURN THE NEXT AVAILABLE STEP FROM WITHIN THE CURRENT BRANCH OR PARENT BRANCH
+	 * IT WILL NOT RETURN A STEP FROM WITHIN A CHILD/LOGIC BRANCH. IF YOU WANT TO GET THE CORRECT CHILD ACTION
+	 * THEN YOU MUST USE Step::get_next_action() AND SUPPLY AN EVENT
+	 *
+	 * YOU HAVE BEEN WARNED!
+	 *
+	 * Rules with branching:
+	 * - next would only occur within the same branch
+	 * - OR, if this is the last step of the branch, the first step within any parent branch (up to main)
+	 *
+	 * @return Step|false
+	 */
+	public function get_next_step() {
+		$query = new Table_Query( 'steps' );
+
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
+		      ->setLimit( 1 )
+		      ->where()
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->in( 'branch', $this->get_nested_branches_array() )
+		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
+
+		$next = $query->get_objects( Step::class );
+
+		$next = ! empty( $next ) ? $next[0] : false;
+
+		/**
+		 * Filters the next step
+		 *
+		 * @param $next    Step|false
+		 * @param $current Step
+		 */
+		return apply_filters( 'groundhogg/step/next_step', $next, $this );
+	}
+
+	/**
 	 * Check if the funnel of this step is the same as the given one
 	 *
 	 * @param Step $step
@@ -554,23 +643,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Check to see if this step is before the given one
 	 *
-	 * @param Step $step
+	 * @param Step $other
 	 *
 	 * @return bool
 	 */
-	public function is_before( Step $step ) {
-		return $this->is_same_funnel( $step ) && $this->get_order() < $step->get_order();
+	public function is_before( Step $other ) {
+		return $this->is_same_funnel( $other ) && $this->get_order() < $other->get_order() && ! $this->is_parallel_branch( $other );
 	}
 
 	/**
 	 * Check to see if this step is after the given one
 	 *
-	 * @param Step $step
+	 * @param Step $other
 	 *
 	 * @return bool
 	 */
-	public function is_after( Step $step ) {
-		return $this->is_same_funnel( $step ) && $this->get_order() > $step->get_order();
+	public function is_after( Step $other ) {
+		return $this->is_same_funnel( $other ) && $this->get_order() > $other->get_order() && ! $this->is_parallel_branch( $other );
 	}
 
 	/**
@@ -591,7 +680,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Use get_run_time instead
-	 *
+	 * @depreacted use Step::get_run_time()
 	 * @return int
 	 */
 	public function get_delay_time() {
@@ -601,29 +690,97 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Whether this step is part of the main branch
+	 *
+	 * @return bool
+	 */
+	public function is_main_branch() {
+		return $this->branch === self::MAIN_BRANCH;
+	}
+
+	/**
+	 * Tests to see if a given step is in the same branch to this one
+	 *
+	 * @param Step $other
+	 *
+	 * @return bool
+	 */
+	public function is_same_branch( Step $other ) {
+		return $this->branch === $other->branch;
+	}
+
+	/**
+	 * Tests to see if a given step is in a parallel branch to this one
+	 *
+	 * @param Step $other
+	 *
+	 * @return bool
+	 */
+	public function is_parallel_branch( Step $other ) {
+		// if the branch is not the same, but they share the same parent, must be parallel
+		return $this->branch !== $other->branch && $this->get_parent_step()->ID === $other->get_parent_step()->ID;
+	}
+
+	/**
+	 * Ensures that the contact can travel through the branch conditions necessary to get to the current step
+	 *
+	 * @param Contact $contact
+	 *
+	 * @return bool
+	 */
+	public function can_travel( Contact $contact ) {
+
+		// exit condition
+		if ( $this->is_main_branch() ) {
+			return true;
+		}
+
+		$branch = $this->branch;
+		$parent = $this->get_parent_step();
+
+		// If the contact does not match the branch conditions to travel to the current step in the branch
+		if ( ! $parent || ! $parent->get_step_element()->matches_branch_conditions( $branch, $contact ) ) {
+			return false;
+		}
+
+		return $parent->can_travel( $contact );
+	}
+
+	/**
 	 * Whether this step can actually be completed
+	 *
+	 * Todo needs to be modified to work with branches!!!!
+	 *
+	 * Rules with branching:
+	 * - if in the main branch, can always complete so long as the order is greater
+	 * - if in a branch, must match the parent step criteria
+	 * - cannot be in an adjacent parallel path (current position must be less that order of parent logic step)
 	 *
 	 * @param $contact Contact
 	 *
 	 * @return bool
 	 */
 	public function can_complete( $contact = null ) {
+
 		// Actions cannot be completed.
-		if ( $this->is_action() || ! $this->is_active() ) {
+		if ( ! $this->is_benchmark() || ! $this->is_active() ) {
 			return false;
 		}
 
 		// Check if starting
 		if ( $this->is_starting() || $this->is_entry() ) {
 			return true;
-		} // If inner step, check if contact is at a step before this one.
-		else if ( $this->is_inner() ) {
+		}
 
-			// get the current funnel step
-			$current_order = $this->get_current_funnel_step_order( $contact );
+		// If inner step, check if contact is at a step before this one.
+		if ( $this->is_inner() ) {
 
-			// If the step order is < than this one, return true.
-			if ( $current_order && $current_order < $this->get_order() ) {
+			// get the current funnel step position of the contact in the funnel
+			$current_step = $this->get_current_funnel_step( $contact );
+
+			// We must be in the funnel and the current order MUST BE LESS than this one
+			// also ensure we're not in a parallel branch
+			if ( $current_step && $this->is_after( $current_step ) && $this->can_travel( $contact ) ) {
 				return true;
 			}
 		}
@@ -802,9 +959,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @param $contact Contact
 	 *
-	 * @return bool|int
+	 * @return bool|Step
 	 */
-	public function get_current_funnel_step_order( $contact ) {
+	public function get_current_funnel_step( $contact ) {
 
 		$event = $this->get_previous_event( $contact );
 
@@ -812,7 +969,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		return $event->get_step()->get_order();
+		return $event->get_step();
 	}
 
 	/**
@@ -945,7 +1102,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function run_after( $contact, $event ) {
 
-		$next = $this->get_next_action();
+		$next = $this->get_next_action( $event );
 
 		if ( $next && is_a( $next, Step::class ) ) {
 
@@ -964,6 +1121,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function get_step_element() {
 		$element = Plugin::instance()->step_manager->get_element( $this->get_type() );
 		$element->set_current_step( $this );
+
 		return $element;
 	}
 
@@ -972,13 +1130,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function sortable_item( $echo = true ) {
 
-		if ( ! $echo ){
+		if ( ! $echo ) {
 			ob_start();
 		}
 
 		$this->get_step_element()->sortable_item( $this );
 
-		if ( ! $echo ){
+		if ( ! $echo ) {
 			return ob_get_clean();
 		}
 
@@ -990,13 +1148,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function html_v2( $echo = true ) {
 
-		if ( ! $echo ){
+		if ( ! $echo ) {
 			ob_start();
 		}
 
 		$this->get_step_element()->html_v2( $this );
 
-		if ( ! $echo ){
+		if ( ! $echo ) {
 			return ob_get_clean();
 		}
 
@@ -1023,25 +1181,210 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * Save the step
 	 */
 	public function save() {
+
+		$this->merge_changes(); // make sure changes are merged first as that will be relevant for some functions...
+
 		$this->get_step_element()->pre_save( $this );
 		$this->get_step_element()->save( $this );
 		$this->get_step_element()->after_save( $this );
 	}
 
 	/**
+	 * @param $data
+	 *
+	 * @return array
+	 */
+	public function sanitize_columns( $data = [] ) {
+
+		return array_apply_callbacks( $data, [
+			'funnel_id'     => 'absint',
+			'step_title'    => 'sanitize_text_field',
+			'step_status'   => function ( $value ) {
+				return one_of( $value, [ 'active', 'inactive', 'archived' ] );
+			},
+			'step_type'     => 'sanitize_key',
+			'step_group'    => function ( $value ) {
+				return one_of( $value, [ self::ACTION, self::BENCHMARK, self::LOGIC ] );
+			},
+			'step_slug'     => 'sanitize_text_field',
+			'step_order'    => 'absint',
+			'is_entry'      => 'boolval',
+			'is_conversion' => 'boolval',
+			'can_passthru'  => 'boolval',
+			'branch'        => 'sanitize_key',
+			'changes'       => 'maybe_serialize',
+		] );
+	}
+
+	/**
+	 * Also call the delete method from the step element in the event there is cleanup
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		// active steps can't be deleted for safety! :) Problem solved.
+		if ( $this->is_active() ) {
+			return false;
+		}
+
+		$this->get_step_element()->delete( $this );
+
+		return parent::delete();
+	}
+
+	/**
+	 * Whether this step has changes
+	 *
+	 * @return bool
+	 */
+	public function has_changes() {
+		$changes = $this->changes;
+
+		return ! empty( $changes );
+	}
+
+	/**
+	 * Merge the changes with the actual data and meta
+	 *
+	 * @return void
+	 */
+	public function merge_changes() {
+
+		if ( ! $this->has_changes() ) {
+			return;
+		}
+
+		$changes      = $this->changes;
+		$columns      = $this->get_db()->get_columns();
+		$data_changes = array_intersect_key( $changes, $columns ); // stuff that goes into main DB
+		$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
+
+		$this->data = array_merge( $this->data, $data_changes );
+		$this->meta = array_merge( $this->meta, $meta_changes );
+	}
+
+	/**
+	 * Add changes while waiting for commit()
+	 *
+	 * @param $changes array the changes to save
+	 *
+	 * @return bool
+	 */
+	public function add_changes( $changes ) {
+
+		// Invalid data for update
+		if ( ! is_array( $changes ) ) {
+			return false;
+		}
+
+		$combined_data_meta = array_merge( $this->meta, $this->data );
+		$changes            = $this->sanitize_columns( $changes );
+		$changes            = array_udiff_assoc( $changes, $combined_data_meta, function ( $a, $b ) {
+
+			$a = maybe_serialize( $a );
+			$b = maybe_serialize( $b );
+
+			return $a <=> $b;
+		} );
+
+		// no nested changed plz
+		unset( $changes['changes'] );
+
+		$changes = array_merge( $this->changes, $changes );
+		ksort( $changes );
+
+		return parent::update( [
+			'changes' => $changes,
+		] );
+
+	}
+
+	/**
+	 * Pushes the changes to the actual meta and data and resets the changes
+	 *
+	 * @return bool
+	 */
+	public function commit() {
+
+		$data_changes = [];
+		$meta_changes = [];
+
+		if ( $this->has_changes() ) {
+			$changes      = $this->changes;
+			$columns      = $this->get_db()->get_columns();
+			$data_changes = array_intersect_key( $changes, $columns ); // stuff that goes into main DB
+			$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
+		}
+
+		// we have to "turn off" the step so that update requests aren't blocked, kinda hacky...
+		parent::update( [ 'step_status' => 'inactive' ] );
+
+		$data_changes['changes'] = []; // clear the changes
+//		$data_changes['date_active'] = ( new DateTimeHelper() )->ymdhis();
+		$data_changes['step_status'] = 'active';
+
+		if ( ! empty( $meta_changes ) ) {
+			$this->update_meta( $meta_changes );
+		}
+
+		return $this->update( $data_changes );
+	}
+
+	/**
+	 *
+	 * Instead of actually updating the step, we might be adding the data to the changes
+	 *
+	 * @param $data
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [] ) {
+
+		// if the step is currently active, all changes should be saved as changes
+		// the commit method will instead be used to push the changes live...
+		if ( $this->is_active() ) {
+			return $this->add_changes( $data );
+		}
+
+		return parent::update( $data );
+	}
+
+	public function sanitize_meta( $key, $value ) {
+
+		if ( $this->get_step_element()->in_settings_schema( $key ) ) {
+			return $this->get_step_element()->sanitize_setting( $key, $value );
+		}
+
+		switch ( $key ) {
+			case 'step_notes':
+				return sanitize_textarea_field( $value );
+		}
+
+		return $value;
+	}
+
+	/**
 	 * We are going to pass any added meta through the step element's settings schema validation first
 	 *
 	 * @param string|array $key
-	 * @param mixed $value
+	 * @param mixed        $value
 	 *
 	 * @return bool|mixed
 	 */
 	public function add_meta( $key, $value = false ) {
 
 		// single value provided and it's in the step element schema
-		if ( is_string( $key ) && $this->get_step_element()->in_settings_schema( $key ) ){
+		if ( is_string( $key ) ) {
 			// we need to sanitize it based on the schema settings
-			$value = $this->get_step_element()->sanitize_setting( $key, $value );
+			$value = $this->sanitize_meta( $key, $value );
+		}
+
+		// maybe add to changes instead?
+		if ( is_string( $key ) && $this->is_active() ) {
+			return $this->add_changes( [
+				$key => $value
+			] );
 		}
 
 		return parent::add_meta( $key, $value );
@@ -1051,16 +1394,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * We are going to pass any added meta through the step element's settings schema validation first
 	 *
 	 * @param string|array $key
-	 * @param mixed $value
+	 * @param mixed        $value
 	 *
 	 * @return bool|mixed
 	 */
 	public function update_meta( $key, $value = false ) {
 
 		// single value provided and it's in the step element schema
-		if ( is_string( $key ) && $this->get_step_element()->in_settings_schema( $key ) ){
+		if ( is_string( $key ) ) {
+
 			// we need to sanitize it based on the schema settings
-			$value = $this->get_step_element()->sanitize_setting( $key, $value );
+			$value = $this->sanitize_meta( $key, $value );
+		}
+
+		// maybe add to changes instead?
+		if ( is_string( $key ) && $this->is_active() ) {
+			return $this->add_changes( [
+				$key => $value
+			] );
 		}
 
 		return parent::update_meta( $key, $value );
@@ -1115,6 +1466,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function get_as_array() {
+
+		// coming from funnel editor
+		if ( $this->get_funnel()->is_editing() ) {
+			$this->merge_changes();
+		}
 
 		$data = $this->data;
 		// remove HTML formatting

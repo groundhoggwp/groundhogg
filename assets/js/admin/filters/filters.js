@@ -1342,7 +1342,7 @@
      * @constructor
      */
     const FilterGroup = (filters, group) => Div({
-      id       : `group-${ group }`,
+      id       : `group-${id}-${ group }`,
       className: 'group',
     }, [
       ...filters.map((filter, index) => {
@@ -1359,7 +1359,7 @@
       }),
       Button({
         type     : 'button',
-        id       : `add-filter-to-${ group }`,
+        id       : `add-filter-to-${id}-${ group }`,
         className: 'add-filter gh-has-tooltip',
         onClick  : e => {
 
@@ -1473,7 +1473,7 @@
      * @constructor
      */
     const GroupSeparator = (after) => Div({
-      id       : `after-${ after }`,
+      id       : `after-${id}-${ after }`,
       className: 'or-separator',
     }, Span({
       className: 'or-circle',

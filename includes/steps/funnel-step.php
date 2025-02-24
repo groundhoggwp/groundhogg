@@ -63,6 +63,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	const ACTION = 'action';
 	const BENCHMARK = 'benchmark';
+	const LOGIC = 'logic';
 
 	public function is_legacy() {
 		return false;
@@ -242,7 +243,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 	}
 
-	private function get_error_icon() {
+	protected function get_error_icon() {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/warning.svg';
 	}
 
@@ -372,8 +373,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @return mixed
 	 */
-	protected function get_setting( $key = '', $default = false ) {
+	protected function get_setting( $key = '', $default = null ) {
 		$val = $this->get_current_step()->get_meta( $key );
+
+		// get the default from the schema
+		if ( $default === null && $this->in_settings_schema( $key ) ) {
+			$schema = $this->get_setting_schema( $key );
+
+			if ( $schema && isset( $schema['default'] ) ) {
+				$default = $schema['default'];
+			}
+		}
 
 		return $val ?: $default;
 	}
@@ -530,11 +540,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	/**
 	 * Retrieve the step title
 	 *
-	 * @param $step
+	 * @param Step $step
 	 *
 	 * @return mixed
 	 */
 	public function get_title( $step = null ) {
+
+		$generated = $this->generate_step_title( $step );
+		if ( ! force_custom_step_names() && $generated ) {
+            return $generated;
+		}
+
 		// mDefaults to the saved title
 		return $step->get_title_formatted();
 	}
@@ -546,22 +562,28 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$classes = [
 			$step->get_group(),
-			$step->get_type()
+			$step->get_type(),
+			$step->step_status,
 		];
 
 		if ( $step->has_errors() || $this->has_errors() ) {
 			$classes[] = 'has-errors';
 		}
 
+		if ( $step->has_changes() ) {
+			$classes[] = 'has-changes';
+		}
+
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
         <div
-                id="<?php echo $step->get_id(); ?>"
+                id="step-<?php echo $step->get_id(); ?>"
                 data-id="<?php echo $step->get_id(); ?>"
                 data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-                class="step <?php echo implode( ' ', $classes ) ?>">
+                class="step sortable-item <?php echo implode( ' ', $classes ) ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+            <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_benchmark() && $step->is_entry() ): ?>
@@ -581,13 +603,15 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                 <!-- DUPLICATE -->
                 <button title="Duplicate" type="button" class="gh-button secondary text icon duplicate-step">
                     <span class="dashicons dashicons-admin-page"></span>
+                    <div class="gh-tooltip top">Duplicate</div>
                 </button>
                 <!-- DELETE -->
                 <button title="Delete" type="button" class="gh-button danger text icon delete-step">
                     <span class="dashicons dashicons-trash"></span>
+                    <div class="gh-tooltip top">Delete</div>
                 </button>
             </div>
-            <div class="hndle ui-sortable-handle">
+            <div class="hndle">
 				<?php if ( $step->has_errors() || $this->has_errors() ): ?>
                     <img class="hndle-icon error"
                          src="<?php echo $this->get_error_icon(); ?>">
@@ -617,6 +641,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					?>
                 </div>
             </div>
+            <?php if ( $step->is_benchmark() ): ?>
+            <div class="benchmark logic-line"></div>
+            <?php endif; ?>
         </div>
 		<?php
 
@@ -687,6 +714,13 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function after_step_warnings() {
 	}
 
+	protected function before_settings( Step $step ) {
+
+	}
+
+	protected function after_settings( Step $step ) {
+	}
+
 	/**
 	 * @param $step Step
 	 */
@@ -720,12 +754,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <!-- SETTINGS -->
             <div class="step-flex">
                 <div class="step-edit panels">
+
+					<?php $this->before_settings( $step ); ?>
+
                     <div class="gh-panel">
 						<?php $this->step_title_edit( $step ); ?>
                         <div class="custom-settings">
 							<?php $this->settings( $step ); ?>
                         </div>
                     </div>
+
+					<?php $this->after_settings( $step ); ?>
 
 					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
 					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
@@ -748,13 +787,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 										'checked' => $step->is_entry()
 									] );
 
-									if ( $step->get_prev_step()->is_action() ) {
-										echo html()->checkbox( [
-											'label'   => 'Allow contacts to pass through this benchmark',
-											'name'    => $this->setting_name_prefix( 'can_passthru' ),
-											'checked' => $step->can_passthru()
-										] );
-									}
+									echo html()->checkbox( [
+										'label'   => 'Allow contacts to pass through this benchmark',
+										'name'    => $this->setting_name_prefix( 'can_passthru' ),
+										'checked' => $step->can_passthru()
+									] );
 
 								endif;
 
@@ -771,7 +808,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php
 					echo html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
-						'name'        => $this->setting_name_prefix( 'step_notes' ),
+						'name'        => 'step_notes',
 						'value'       => $step->get_step_notes(),
 						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
 						'class'       => 'step-notes-textarea'
@@ -784,13 +821,24 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-     * A schema to define the various different settings and their relevant sanitization functions and defaults
-     * This is an alternative to explicitly defining the save functions in the ::save() method
-     *
+	 * A schema to define the various different settings and their relevant sanitization functions and defaults
+	 * This is an alternative to explicitly defining the save functions in the ::save() method
+	 *
 	 * @return array
 	 */
 	public function get_settings_schema() {
 		return [];
+	}
+
+	/**
+	 * Get the schema for a singular setting
+	 *
+	 * @param string $setting the setting
+	 *
+	 * @return array|bool if not found
+	 */
+	public function get_setting_schema( $setting ) {
+		return $this->in_settings_schema( $setting ) ? $this->get_settings_schema()[ $setting ] : false;
 	}
 
 	/**
@@ -809,19 +857,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
-		$step->update( [
-			'step_title'    => sanitize_text_field( $this->get_posted_data( 'title', $step->get_title() ) ),
-			'step_order'    => $this->get_posted_order(),
-			'is_conversion' => (bool) $this->get_posted_data( 'is_conversion', false ),
-			'is_entry'      => (bool) $this->get_posted_data( 'is_entry', false ),
-			'can_passthru'  => (bool) $this->get_posted_data( 'can_passthru', false ),
-		] );
-
-		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
 
 		$step->delete_meta( 'has_errors' );
 
-        // Loop through the schema and do any obvious work ahead of time.
+		// Loop through the schema and do any obvious work ahead of time.
 		foreach ( $this->get_settings_schema() as $setting => $schema ) {
 
 			// setting was not defined in the payload, skip because it may have been updated elsewhere
@@ -829,56 +868,77 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				continue;
 			}
 
-            // we don't need to sanitize first because the Step::update_meta() method will handle it.
-			$this->save_setting( $setting, $this->posted_settings[$setting] );
+			// we don't need to sanitize first because the Step::update_meta() method will handle it.
+			$this->save_setting( $setting, $this->posted_settings[ $setting ] );
 		}
+
+		$data = [
+			'branch'     => sanitize_key( $this->get_posted_data( 'branch', 'main' ) ),
+			'step_order' => $this->get_posted_order()
+		];
+
+		if ( $this->get_posted_data( 'title' ) ) {
+			$data['title'] = sanitize_text_field( $this->get_posted_data( 'title' ) );
+		}
+
+		if ( $step->is_benchmark() ) {
+			$data = array_merge( $data, [
+				'is_conversion' => (bool) $this->get_posted_data( 'is_conversion', false ),
+				'is_entry'      => (bool) $this->get_posted_data( 'is_entry', false ),
+				'can_passthru'  => (bool) $this->get_posted_data( 'can_passthru', false ),
+			] );
+		}
+
+		$step->update( $data );
 
 	}
 
 	/**
-     * Whether a setting is in the settings schema
-     *
+	 * Whether a setting is in the settings schema
+	 *
 	 * @param $key
 	 *
 	 * @return bool
 	 */
-    public function in_settings_schema( $key ) {
-	    return isset_not_empty( $this->get_settings_schema(), $key );
-    }
+	public function in_settings_schema( $key ) {
+		return isset_not_empty( $this->get_settings_schema(), $key );
+	}
 
 	/**
-     * Given a setting and a value, find it in the schema then apply sanitization
-     *
+	 * Given a setting and a value, find it in the schema then apply sanitization
+	 *
 	 * @param string $setting
 	 * @param mixed  $value
+	 * @param mixed  $old_value the old value if available
 	 *
 	 * @return false|mixed
 	 */
-    public function sanitize_setting( string $setting, $value ) {
-	    $schema = $this->get_settings_schema();
+	public function sanitize_setting( string $setting, $value ) {
+		$schema = $this->get_settings_schema();
 
-        if ( ! isset( $schema[ $setting ] ) ) {
-            return false;
-        }
+		if ( ! isset( $schema[ $setting ] ) ) {
+			return false;
+		}
 
-	    $setting_schema = wp_parse_args( $schema[$setting], [
-		    'default'  => false,
-		    'sanitize' => '\Groundhogg\sanitize_payload',
-	    ] );
+		$setting_schema = wp_parse_args( $schema[ $setting ], [
+			'default'  => false,
+			'sanitize' => '\Groundhogg\sanitize_payload',
+		] );
 
-	    if ( empty( $value ) ) {
-		    $value = $schema['default'];
-	    }
+		if ( empty( $value ) ) {
+			$value = $schema['default'];
+		}
 
-        return call_user_func( $setting_schema['sanitize'], $value );
-    }
+		return call_user_func( $setting_schema['sanitize'], $value );
+	}
 
 	/**
 	 * Save the step based on the given ID
 	 *
 	 * @param $step Step
 	 */
-	public function save( $step ){}
+	public function save( $step ) {
+	}
 
 	/**
 	 * @param $step Step
@@ -939,6 +999,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function run( $contact, $event ) {
 		return true;
+	}
+
+	/**
+	 * When the step is deleted
+	 *
+	 * @param Step $step
+	 *
+	 * @return void
+	 */
+	public function delete( Step $step ) {
+
 	}
 
 	/**

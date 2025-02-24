@@ -15,6 +15,8 @@ $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgb(108, 25, 173);
+$secondary-purple-25: rgba(108, 25, 173, 0.25);
+$secondary-purple-5: rgba(108, 25, 173, 0.05);
 $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
@@ -30,6 +32,19 @@ $box-shadow: 5px 5px 30px 0 rgba(04, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
 body {
+
+  &.saving {
+    .funnel-editor-header button > .button-text {
+      display: none;
+    }
+  }
+
+  &:not(.saving){
+    .funnel-editor-header button > .gh-spinner {
+      display: none;
+    }
+  }
+
   &.folded {
     #funnel-form {
       left: 36px;
@@ -70,33 +85,29 @@ body {
   flex-direction: column;
 
   #funnel-builder {
+    position: relative;
     display: flex;
     align-items: stretch;
     margin: 0;
     flex-grow: 1;
   }
-}
 
-#poststuff #post-body.columns-2 {
-  margin-left: 400px;
-  margin-right: 0 !important;
-  border-left: 1px solid #ccd0d4;
-}
+  &[data-status='active'] {
+    .funnel-editor-header button#funnel-activate {
+      display: none;
+    }
+  }
 
-/* Full Screen */
-#adminmenumain,
-#wpfooter,
-#wpadminbar {
-  //display: none !important;
+  &[data-status='inactive'] {
+    .funnel-editor-header button#funnel-update,
+    .funnel-editor-header button#funnel-deactivate {
+      display: none;
+    }
+  }
 }
 
 #wpfooter {
   display: none !important;
-}
-
-
-html {
-  //padding: 0 !important;
 }
 
 /* END Full Screen */
@@ -152,195 +163,354 @@ html {
 #step-settings-container {
   /*padding: 10px 20px;*/
   box-sizing: border-box;
-  flex-grow: 1;
-  overflow-y: auto;
+  //overflow-y: auto;
   position: relative;
+  width: clamp(800px, 60%, 1000px);
+  transition: width 0.3s ease-out, opacity 0.3s ease-out;
 
-  .sub-header {
-    background: white;
-    border-bottom: 0;
-    box-shadow: $box-shadow;
-    left: 340px;
+  &.slide-out {
+    //transform: translateX(100vw); /* Move out to the right */
+    opacity: 0; /* Optional fade-out effect */
+    width: 0;
+  }
+
+  > #collapse-settings {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-radius: 10px 0 0 10px;
+    border-color: $primary-dark-15;
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
+    transform: translate(-100%, -50%);
+    z-index: 12;
     display: flex;
-    padding: 5px;
-    position: static;
-    z-index: 99;
-
-    .toolbar-buttons {
-      margin-left: auto;
-      display: flex;
-      justify-content: flex-end;
-      margin-right: 10px;
-
-      .gh-button {
-        gap: 5px;
-      }
-
-      .dashicons {
-        font-size: 16px;
-        height: 16px;
-        width: 16px;
-      }
-    }
-  }
-}
-
-/*.saving #poststuff{*/
-/*    opacity: 0.5;*/
-/*}*/
-
-.step-settings {
-  padding: 30px;
-}
-
-#step-settings-inner {
-
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: auto;
-
-  .benchmark-settings {
-    //.gh-checkbox-label {
-    //  display: flex;
-    //  gap: 5px;
-    //}
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    background-color: $background-color;
   }
 
-  .notice {
-    margin: 0;
-    border-radius: 5px;
-    /*border-width: 2px;*/
-    border-width: 0 0 0 5px;
-  }
+  //top: 0;
+  //right: 0;
+  //bottom: 0;
+  //z-index: 10;
+  background-color: $background-color;
+  box-shadow: $box-shadow;
 
-  .step:not(.active) {
-    display: none;
-  }
+  #step-settings-inner {
 
-  .step.active {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
 
-    .step-title-wrap ~ .custom-settings {
-      border-top: 1px solid $primary-dark-15;
-    }
+    #add-steps {
 
-    .custom-settings {
+      padding: 30px;
 
-      .gh-rows-and-columns {
-        label {
-          font-weight: 500;
+      #actions {
+        .select-step:hover {
+          .step-icon {
+            background-color: $action-green-50;
+          }
         }
       }
-    }
 
-    &.action.apply_note {
-      .step-flex .step-edit .custom-settings {
-        padding: 0;
-
-        .mce-panel {
-          box-shadow: none;
-          border-top: none;
+      #benchmarks {
+        .select-step:hover {
+          .step-icon {
+            background-color: $benchmark-orange-25;
+          }
         }
       }
-    }
 
-    .step-warnings {
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-      margin-bottom: 20px;
-    }
+      #logic {
+        .select-step:hover {
+          .step-icon {
+            background-color: $secondary-purple-25;
+          }
+        }
+      }
 
-    .step-flex {
-      display: flex;
-      gap: 30px;
+      .steps-select {
 
-      .step-notes {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-
-        width: 240px;
-        flex-shrink: 0;
-
-        .step-notes-textarea {
+        #step-search {
           width: 100%;
-          background: $primary-dark-5;
-          border-radius: 5px;
-          font-weight: 400;
-          border: none;
-          padding: 12px;
+          font-size: 14px;
+          padding: 4px 12px;
+        }
 
+        .steps-grid {
+          position: relative;
+          //padding: 20px;
+          display: flex;
+          //flex-direction: column;
+          gap: 20px;
+          flex-wrap: wrap;
+          margin-top: 20px;
+          //padding: 30px 20px 20px 20px;
+          //border: 1px solid;
+          border-radius: 10px;
+
+          &:not(:has(.visible)) {
+            display: none;
+          }
+        }
+
+        .description {
+          padding: 10px;
+        }
+
+        .nav-tab-wrapper {
+          text-align: center;
+          margin-top: 0 !important;
+          padding: 20px 0 0 0 !important;
+        }
+
+        .steps-grid .sub-group {
+          position: relative;
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          border-radius: 5px;
+          border: 1px solid $primary-dark-15;
+          padding: 20px;
+
+          &:has([data-group="benchmark"]) {
+            border-color: $benchmark-orange;
+
+            > .sub-group-label {
+              background-color: $benchmark-orange;
+            }
+          }
+
+          &:has([data-group="logic"]) {
+            border-color: $secondary-purple;
+
+            > .sub-group-label {
+              background-color: $secondary-purple;
+            }
+          }
+
+          &:has([data-group="action"]) {
+            border-color: $action-green;
+
+            > .sub-group-label {
+              background-color: $action-green;
+            }
+          }
+
+          &:not(:has(.visible)) {
+            display: none;
+          }
+
+          > .sub-group-label {
+            position: absolute;
+            top: -12px;
+            //font-weight: bold;
+            left: 20px;
+            color: white;
+            border-radius: 5px;
+            padding: 3px 8px;
+            border: 1px solid $primary-dark-15;
+          }
+        }
+
+        .select-step {
+          width: 80px;
+          border-radius: 5px;
+          //padding: 5px;
+          cursor: grab;
+
+          &:not(.visible) {
+            display: none;
+          }
+
+          .step-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+            border-radius: 5px;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            background: #FFFFFF;
+          }
+
+          p {
+            font-size: 13px;
+            margin: 10px 0 0 0;
+            line-height: 1.2;
+          }
+
+          > .ui-draggable-dragging {
+            width: 80px;
+            height: 80px;
+            cursor: grabbing;
+
+            p {
+              display: none;
+            }
+          }
         }
       }
+    }
 
+    &:has(.step.editing) {
+      #add-steps {
+        display: none;
+      }
+    }
 
-      .step-edit {
-        width: 100%;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
+    input,
+    select,
+    textarea {
+      max-width: 100% !important;
+    }
+
+    .notice {
+      margin: 0;
+      border-radius: 5px;
+      /*border-width: 2px;*/
+      border-width: 0 0 0 5px;
+    }
+
+    .step-settings {
+
+      padding: 30px;
+
+      &:not(:has(.step.editing)) {
+        display: none;
+      }
+
+      .step:not(.editing) {
+        display: none;
+      }
+
+      .step.editing {
+
+        .step-title-wrap ~ .custom-settings {
+          border-top: 1px solid $primary-dark-15;
+        }
 
         .custom-settings {
-          padding: 0 20px 10px 20px;
 
-          hr {
-            border: 0;
-            border-top: 1px solid $primary-dark-15;
-            border-bottom: none;
-            margin: 0 -20px;
+          .gh-rows-and-columns {
+            label {
+              font-weight: 500;
+            }
           }
         }
 
-        table.wp-list-table {
-          border-radius: 5px;
-          overflow: hidden;
+        &.action.apply_note {
+          .step-flex .step-edit .custom-settings {
+            padding: 0;
 
-          &.striped > tbody > :nth-child(odd) {
-            //background-color: $primary-dark-5;
-          }
-
-          &:not(:last-child) {
-            margin-bottom: 10px;
-          }
-
-          &:first-child {
-            margin-top: 20px;
-          }
-
-          &.has-actions {
-
-            th:last-child {
-              width: 70px;
+            .mce-panel {
+              box-shadow: none;
+              border-top: none;
             }
+          }
+        }
 
-            td:last-child {
-              > div {
-                display: none;
+        .step-warnings {
+          display: flex;
+          gap: 10px;
+          flex-direction: column;
+          margin-bottom: 20px;
+        }
+
+        .step-flex {
+          display: flex;
+          gap: 30px;
+
+          .step-notes {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            width: 240px;
+            flex-shrink: 0;
+
+            .step-notes-textarea {
+              width: 100%;
+              background: $primary-dark-5;
+              border-radius: 5px;
+              font-weight: 400;
+              border: none;
+              padding: 12px;
+
+            }
+          }
+
+
+          .step-edit {
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            .custom-settings {
+              padding: 0 20px 10px 20px;
+
+              hr {
+                border: 0;
+                border-top: 1px solid $primary-dark-15;
+                border-bottom: none;
+                margin: 0 -20px;
               }
             }
 
-            tbody tr:hover {
-              td:last-child {
-                > div {
-                  display: flex;
+            table.wp-list-table {
+              border-radius: 5px;
+              overflow: hidden;
+
+              &.striped > tbody > :nth-child(odd) {
+                //background-color: $primary-dark-5;
+              }
+
+
+              &:not(:last-child) {
+                margin-bottom: 10px;
+              }
+
+              &:first-child {
+                margin-top: 20px;
+              }
+
+              &.has-actions {
+
+                th:last-child {
+                  width: 70px;
+                }
+
+                td:last-child {
+                  > div {
+                    display: none;
+                  }
+                }
+
+                tbody tr:hover {
+                  td:last-child {
+                    > div {
+                      display: flex;
+                    }
+                  }
                 }
               }
             }
           }
         }
+
       }
     }
-
   }
-}
-
-.step {
-  margin: 0;
-  position: relative;
 }
 
 #wpcontent {
@@ -553,59 +723,22 @@ button.button.save-button {
   z-index: 100100;
 }
 
-#actions table,
-#benchmarks table {
-  box-sizing: border-box;
-  width: 100%;
-  border-spacing: 7px;
-}
-
-#actions table td,
-#benchmarks table td {
-  text-align: center;
-}
-
-.sortable-placeholder {
-  box-sizing: border-box;
-  border-radius: 5px;
-  background-color: $primary-dark-15;
-  border: none;
-  margin: 10px 0;
-  height: 60px;
-}
-
 @mixin above-text {
   position: absolute;
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
   width: max-content;
-  top: -34px;
+  top: -70px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-#step-sortable {
-  &:empty {
-    &::after {
-      margin: 10px 0;
-      height: 60px;
-      background-color: $primary-dark-15;
-      content: 'Drag a step into the flow';
-      display: flex;
-      border-radius: 5px;
-      justify-content: center;
-      align-items: center;
-    }
-  }
-}
-
 #step-flow {
-
-  min-width: 340px;
-  width: 25%;
-  flex-shrink: 0;
+  //width: 100%;
+  //flex-shrink: 0;
   position: relative;
+  flex-grow: 1;
 
   .fixed-inside {
     bottom: 0;
@@ -615,14 +748,206 @@ button.button.save-button {
     padding: 0 20px 0 30px;
     box-sizing: border-box;
     position: absolute;
-    overflow-y: scroll;
+    overflow: auto;
 
     background-image: radial-gradient(circle at 1px 1px, $primary-dark-10 1px, transparent 0);
     background-size: 20px 20px;
 
-    #step-sortable {
+    .logic-line {
+      border-style: dashed;
+      position: absolute;
+      z-index: 1;
+    }
+
+    .step.if_else + .step-branches {
+
+      position: relative;
+
+      &::after {
+        position: absolute;
+        left: calc(50% + 1px);
+        bottom: -42px;
+        content: "";
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border-style: solid;
+        border-width: 7px;
+        border-color: $error-red $error-red $action-green $action-green;
+        transform: translate(-50%, -50%) rotate(45deg);
+        z-index: 3;
+      }
+
+      > .split-branch:first-child {
+
+        > .logic-line {
+          border-color: $action-green;
+
+          > .path-indicator {
+            background-color: $action-green;
+          }
+        }
+      }
+
+      > .split-branch:last-child {
+        > .logic-line {
+          border-color: $error-red;
+
+          > .path-indicator {
+            background-color: $error-red;
+          }
+        }
+      }
+    }
+
+    .step-branches {
+      gap: 40px;
+      margin: 30px 0;
+
+      &:has(> :nth-child(odd):last-child) {
+        margin-top: 80px;
+      }
+
+      .split-branch {
+        position: relative;
+
+        > .logic-line {
+          border-color: $secondary-purple;
+
+          &.line-below {
+            border-color: $action-green;
+          }
+
+          > span.path-indicator {
+            font-size: 10px;
+            color: #fff;
+            background-color: $secondary-purple;
+            padding: 0 5px;
+            border-radius: 3px;
+            position: absolute;
+            top: calc(40% - 1px);
+            transform: translateX(-50%) translateY(-50%);
+            white-space: nowrap;
+            text-transform: uppercase;
+          }
+
+          &.middle,
+          &.left {
+            > span.path-indicator {
+              left: 0;
+            }
+          }
+
+          &.right {
+            > span.path-indicator {
+              left: 100%;
+            }
+          }
+        }
+      }
+    }
+
+    .step-branch {
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
       margin: auto;
-      width: min( 100%, 360px );
+      min-width: 300px;
+      width: min-content;
+
+      &.benchmarks {
+        flex-direction: row;
+        justify-content: center;
+        gap: 30px;
+        position: relative;
+        padding-bottom: 30px;
+
+        .benchmark.logic-line {
+          border-color: $benchmark-orange;
+        }
+
+        &::after {
+          position: absolute;
+          left: calc(50% + 1px);
+          bottom: -14px;
+          content: "";
+          height: 10px;
+          width: 10px;
+          border-radius: 50%;
+          box-sizing: border-box;
+          border-style: solid;
+          border-width: 7px;
+          border-color: $benchmark-orange $benchmark-orange $action-green $action-green;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          z-index: 3;
+        }
+      }
+
+      .sortable-placeholder {
+        width: 300px;
+        height: 3px;
+        border-radius: 3px;
+        background-color: $primary-blue;
+        border: none;
+        margin: 20px 0;
+      }
+
+      &#step-sortable {
+        padding-top: 20px;
+        padding-bottom: 40px;
+
+        > .step-branch.benchmarks:first-child {
+          margin-top: 100px;
+
+          &::before {
+            content: "Start the funnel when...";
+            @include above-text;
+            background-color: $benchmark-orange;
+          }
+        }
+      }
+
+      &:not(:has(.step)) {
+        height: 60px;
+      }
+
+      &:not(:has(div)) {
+        &::after {
+          width: 100%;
+          height: 60px;
+          background-color: $primary-dark-15;
+          content: 'Drag a step into the flow';
+          display: flex;
+          border-radius: 5px;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+
+    }
+  }
+
+  button.add-step-button-flow {
+    position: absolute;
+    right: 36px;
+    bottom: 36px;
+    box-shadow: $box-shadow;
+    background-color: $primary-blue;
+    color: white;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    z-index: 99;
+
+    &:hover {
+      background-color: $primary-blue-50;
     }
   }
 
@@ -643,70 +968,38 @@ button.button.save-button {
       background-color: $benchmark-orange-25;
     }
 
+    &[data-group=logic] {
+      background-color: $secondary-purple-25;
+    }
+
     p {
       display: none;
     }
   }
 
-  .step.action + .step.benchmark {
+  .sortable-item.logic + .step-branch.benchmarks,
+  .step.action + .step-branch.benchmarks {
 
     margin-top: 40px;
 
     &::before {
-      content: "Until...";
+      content: "Jump/Continue when...";
       @include above-text;
       background-color: $benchmark-orange;
     }
   }
 
-  .step.benchmark + .step.benchmark {
-
-    margin-top: 40px;
-
-    &::before {
-      content: "Or...";
-      @include above-text;
-      background-color: $secondary-purple;
-    }
+  .benchmark-or {
+    padding: 3px 8px;
+    color: white;
+    border-radius: 5px;
+    width: max-content;
+    background-color: $secondary-purple;
   }
 
-  //.step.action + .step.action {
-  //
-  //  &::before {
-  //    content: '';
-  //    height: 10px;
-  //    position: absolute;
-  //    left: calc( 50% - 1px );
-  //    top: -12px;
-  //    width: 2px;
-  //    background: $primary-dark;
-  //  }
-  //}
-
-  .step.benchmark + .step.action {
-
-    margin-top: 60px;
-
-    &::before {
-      content: "Then...";
-      @include above-text;
-      background-color: $action-green;
-      top: -45px;
-    }
-
-    &::after {
-      position: absolute;
-      content: '';
-      //border-right: 3px dashed $action-green;
-      border-right: 2px dashed $action-green;
-      z-index: -1;
-      top: -32px;
-      height: 30px;
-      left: 50%;
-      //background-color: $action-green;
-    }
-  }
-
+  .step-branch.benchmarks + .step.action,
+  .sortable-item.logic + .sortable-item.logic > .step.logic,
+  .step.action + .logic > .step.logic,
   .step.action + .step.action {
 
     //margin-top: 40px;
@@ -717,20 +1010,108 @@ button.button.save-button {
       //border-right: 3px dashed $action-green;
       border-right: 2px dashed $action-green;
       z-index: -1;
-      top: -32px;
+      top: -50px;
       height: 30px;
       left: 50%;
       //background-color: $action-green;
     }
   }
 
+  .logic + .step.action {
+
+    //margin-top: 40px;
+
+    &::after {
+      position: absolute;
+      content: '';
+      //border-right: 3px dashed $action-green;
+      border-right: 2px dashed $action-green;
+      z-index: -1;
+      top: -50px;
+      height: 30px;
+      left: 50%;
+      //background-color: $action-green;
+    }
+  }
+
+  .sortable-item.logic.editing {
+
+    > .step {
+      outline-color: $secondary-purple;
+
+      .hndle-icon {
+        background-color: $secondary-purple;
+
+        svg {
+          fill: #fff !important;
+        }
+      }
+    }
+  }
+
   .step {
     border-radius: 5px;
     box-shadow: $box-shadow;
-    margin: 30px 0;
+    //margin: 30px 0;
     background: white;
-    border: 2px solid transparent;
+    outline: 2px solid transparent;
     cursor: pointer;
+    max-width: 320px;
+    min-width: 200px;
+    width: fit-content;
+    z-index: 2;
+    position: relative;
+    //margin: auto;\\
+
+    &:has(.step-label) {
+      padding-bottom: 14px;
+    }
+
+    &.has-changes {
+      outline: 2px dashed $alert-yellow;
+    }
+
+    &.active {
+      background-color: #fff;
+
+      &.logic {
+        background-image: repeating-linear-gradient(
+                        -45deg, /* Adjust angle for slant */
+                        $secondary-purple-5, /* Line color */
+                        $secondary-purple-5 10px, /* Line thickness */
+                        #fff 10px, /* Space between lines */
+                        #fff 20px /* Repeat pattern */
+        );
+      }
+
+      &.benchmark {
+        background-image: repeating-linear-gradient(
+                        -45deg, /* Adjust angle for slant */
+                        $benchmark-orange-5, /* Line color */
+                        $benchmark-orange-5 10px, /* Line thickness */
+                        #fff 10px, /* Space between lines */
+                        #fff 20px /* Repeat pattern */
+        );
+      }
+
+      &.action {
+        background-image: repeating-linear-gradient(
+                        -45deg, /* Adjust angle for slant */
+                        $action-green-5, /* Line color */
+                        $action-green-5 10px, /* Line thickness */
+                        #fff 10px, /* Space between lines */
+                        #fff 20px /* Repeat pattern */
+        );
+      }
+
+      .delete-step {
+        display: none;
+      }
+    }
+
+    &.logic {
+      margin: auto;
+    }
 
     &:hover {
       .actions {
@@ -795,15 +1176,15 @@ button.button.save-button {
 
     &.step-placeholder {
       justify-content: center;
-      padding: 20px;
-      margin: 10px 0;
+      padding: 20px 40px;
+      width: min-content;
     }
 
     &.has-errors {
-      border-left-color: $alert-yellow !important;
+      //border-left-color: $alert-yellow !important;
 
-      &.active {
-        border-color: $alert-yellow !important;
+      &.editing {
+        outline-color: $alert-yellow !important;
       }
     }
 
@@ -817,8 +1198,9 @@ button.button.save-button {
         position: absolute;
         width: 40px;
         height: 40px;
-        transform: translateX(-50%) translateY(-50%);
-        top: 50%;
+        transform: translateX(-50%) translateY(-55%);
+        left: 50%;
+        top: 0;
         z-index: 2;
 
         svg {
@@ -830,14 +1212,11 @@ button.button.save-button {
       > div:not(.hndle-icon) {
         display: flex;
         flex-direction: column;
-        margin: 5px;
-        padding: 5px 5px 5px 25px;
-        //z-index: 1;
-        //position: relative;
-        //background: #fff;
+        padding: 20px 10px 10px 10px;
 
         span.step-title {
           font-size: 14px;
+          text-align: center;
 
           code {
             border-radius: 4px;
@@ -850,6 +1229,7 @@ button.button.save-button {
           font-size: 8px;
           font-weight: 500;
           text-transform: uppercase;
+          text-align: center;
         }
 
       }
@@ -858,7 +1238,7 @@ button.button.save-button {
     &.benchmark {
       //border-left-color: $benchmark-orange;
 
-      .hndle-icon{
+      .hndle-icon {
         border-radius: 5px;
         background-color: #FCDFC4;
         border: 2px solid $benchmark-orange;
@@ -885,10 +1265,10 @@ button.button.save-button {
         color: $benchmark-orange;
       }
 
-      &.active {
-        border-color: $benchmark-orange;
+      &.editing {
+        outline-color: $benchmark-orange;
 
-        .hndle-icon{
+        .hndle-icon {
           background-color: $benchmark-orange;
 
           svg {
@@ -900,23 +1280,12 @@ button.button.save-button {
       .step-labels .step-label {
         background-color: $benchmark-orange;
       }
-
-      &:first-child {
-
-        margin-top: 40px;
-
-        &::before {
-          content: "Start the funnel when...";
-          @include above-text;
-          background-color: $benchmark-orange;
-        }
-      }
     }
 
     &.action {
       //border-left-color: $action-green;
 
-      .hndle-icon{
+      .hndle-icon {
         border-radius: 50px;
         background-color: #E7F3CD;
         border: 2px solid $action-green;
@@ -942,12 +1311,11 @@ button.button.save-button {
       &.date_timer,
       &.field_timer,
       &.advanced_timer,
-      &.delay_timer{
-        margin-left: 20px;
-        margin-right: 20px;
+      &.delay_timer {
+        max-width: 280px;
         border-radius: 10px;
 
-        .step-title{
+        .step-title {
           font-size: 13px !important;
         }
       }
@@ -956,10 +1324,10 @@ button.button.save-button {
         color: $action-green;
       }
 
-      &.active {
-        border-color: $action-green;
+      &.editing {
+        outline-color: $action-green;
 
-        .hndle-icon{
+        .hndle-icon {
           background-color: $action-green;
 
           svg {
@@ -968,38 +1336,30 @@ button.button.save-button {
         }
       }
     }
+
+    &.logic {
+      //border-left-color: $action-green;
+      padding-top: 10px;
+
+      .hndle-icon {
+        border-radius: 2px;
+        border: 2px solid $secondary-purple;
+        background-color: #e3c4fc;
+        box-sizing: border-box;
+        transform-origin: center;
+        transform: translateX(-50%) translateY(-55%) rotate(45deg);
+
+        svg {
+          fill: #000;
+          transform: rotate(-45deg);
+        }
+      }
+
+      span.step-name {
+        color: $secondary-purple;
+      }
+    }
   }
-}
-
-
-#step-flow .step.step h2 {
-  cursor: pointer !important;
-}
-
-.step .inside select {
-  vertical-align: top;
-}
-
-#benchmarks .help-icon,
-#actions .help-icon {
-  float: right;
-}
-
-#step-flow .step .add-step {
-  display: none;
-  padding: 0 5px 1px;
-}
-
-#step-flow .step:hover .add-step {
-  display: inline-block;
-  position: absolute;
-  left: 45%;
-  bottom: -10px;
-  z-index: 9999999999999;
-}
-
-#step-flow .step .add-step .dashicons {
-  vertical-align: middle;
 }
 
 #funnel-chart {
@@ -1007,169 +1367,6 @@ button.button.save-button {
   padding: 20px;
   border-bottom: 1px solid #e5e5e5;
   box-sizing: border-box;
-}
-
-#add-steps {
-
-  padding: 30px;
-
-  h2 {
-    font-size: 24px;
-    margin: 30px 0 0 0;
-    border-top: 3px solid;
-    padding: 20px 0 20px 0;
-
-    &.benchmarks-header {
-      border-color: $benchmark-orange;
-      margin-top: 0;
-    }
-
-    &.actions-header {
-      border-color: $action-green;
-    }
-  }
-
-  #step-toggle {
-    [data-group=benchmarks] {
-      color: $benchmark-orange;
-      border-color: $benchmark-orange;
-
-      &.active {
-        background-color: $benchmark-orange;
-        color: white;
-      }
-    }
-
-    [data-group=actions] {
-      color: $action-green-dark;
-      border-color: $action-green;
-
-      &.active {
-        background-color: $action-green;
-        color: white;
-      }
-    }
-  }
-
-  #actions {
-    .step-icon {
-      //border-color: $action-green;
-      //background-color: $action-green-5;
-    }
-
-    .select-step:hover {
-      .step-icon {
-        background-color: $action-green-50;
-      }
-    }
-  }
-
-  #benchmarks {
-    .step-icon {
-      //border-color: $benchmark-orange;
-      //background-color: $benchmark-orange-5;
-    }
-
-    .select-step:hover {
-      .step-icon {
-        background-color: $benchmark-orange-25;
-      }
-    }
-  }
-
-  .steps-select {
-
-    .steps-grid:not(.hidden) {
-      //padding: 20px;
-      display: flex;
-      //flex-direction: column;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .description {
-      padding: 10px;
-    }
-
-    .nav-tab-wrapper {
-      text-align: center;
-      margin-top: 0 !important;
-      padding: 20px 0 0 0 !important;
-    }
-
-    .steps-grid .sub-group {
-      position: relative;
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      border-radius: 5px;
-      border: 1px solid $primary-dark-15;
-      padding: 20px;
-
-      > .sub-group-label {
-        position: absolute;
-        top: -12px;
-        //font-weight: bold;
-        left: 20px;
-        background: #F6F9FB;
-        border-radius: 5px;
-        padding: 3px 8px;
-        border: 1px solid $primary-dark-15;
-      }
-
-      > .select-step {
-        width: 80px;
-        border-radius: 5px;
-        //padding: 5px;
-        cursor: grab;
-
-        > .ui-draggable-dragging {
-          width: 80px;
-          height: 80px;
-          cursor: grabbing;
-
-          p {
-            display: none;
-          }
-        }
-      }
-    }
-
-    .steps-grid .sub-group > .select-step p {
-      font-size: 14px;
-      margin: 10px 0 0 0;
-      //color: white;
-    }
-
-    .steps-grid .sub-group > .select-step .step-icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 80px;
-      border-radius: 5px;
-      margin: 0;
-      overflow: hidden;
-      position: relative;
-      background: #FFFFFF;
-    }
-
-  }
-}
-
-.add-step-bottom-wrap {
-  margin-top: 20px;
-  box-sizing: border-box;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  position: sticky;
-  bottom: 10px;
-  z-index: 10;
-
-  button {
-    box-shadow: $box-shadow;
-  }
 }
 
 .hndle input {
@@ -1258,14 +1455,6 @@ table.embed-options td {
 
 .form-table th {
   width: 160px;
-}
-
-#step-settings-inner {
-  input,
-  select,
-  textarea {
-    max-width: 100% !important;
-  }
 }
 
 #add-step-bottom {
@@ -1470,7 +1659,7 @@ table.embed-options td {
             background: #f9f9f9;
             cursor: pointer;
 
-            &.active {
+            &.editing {
               font-weight: 500;
               border-bottom: 1px solid #fff;
               margin-bottom: -1px;

@@ -212,6 +212,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		// clear meta and data
 		$this->meta = [];
 		$this->data = [];
+
 		return $this->setup_object( $this->get_db()->get( $this->get_id() ) );
 	}
 
@@ -355,17 +356,21 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			return false;
 		}
 
-		// Only update different data from the current.
-		$data = $this->sanitize_columns( $data );
 
-		// array_diff_assoc only handles 1 dimensional arrays, so we have to serialize stuff that might be serialized later.
-		$data = array_udiff_assoc( $data, $this->data, function ( $a, $b ) {
+		$data = array_intersect_key( $this->sanitize_columns( $data ), $this->data );
 
-			$a = maybe_serialize( $a );
-			$b = maybe_serialize( $b );
+		$needs_update = [];
 
-			return $a <=> $b;
-		} );
+		foreach ( $data as $key => $value ) {
+			$a =  is_serialized( $value ) ? $value : maybe_serialize( $value );
+			$b =  is_serialized( $this->data[ $key ] ) ? $this->data[ $key ] : maybe_serialize( $this->data[ $key ] );
+
+			if ( $a !== $b ) {
+				$needs_update[ $key ] = $value;
+			}
+		}
+
+		$data = $needs_update;
 
 		// updating with existing data
 		if ( empty( $data ) ) {
@@ -398,7 +403,6 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			 * @param mixed[]     $old_data  the current data
 			 */
 			do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this, $old_data );
-
 		}
 
 		return $updated;
@@ -739,7 +743,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		] );
 
 		// empty array if no relationships found.
-		if ( empty( $relationships ) ){
+		if ( empty( $relationships ) ) {
 			return [];
 		}
 

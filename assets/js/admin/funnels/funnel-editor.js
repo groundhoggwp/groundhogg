@@ -1,8 +1,15 @@
 ( function ($, funnel) {
 
-  const { patch, routes, ajax } = Groundhogg.api
+  const {
+    patch,
+    routes,
+    ajax,
+  } = Groundhogg.api
 
-  const { funnels: FunnelsStore, campaigns: CampaignsStore } = Groundhogg.stores
+  const {
+    funnels  : FunnelsStore,
+    campaigns: CampaignsStore,
+  } = Groundhogg.stores
 
   const {
     Div,
@@ -10,26 +17,34 @@
     Modal,
     Textarea,
     ItemPicker,
+    Input,
   } = MakeEl
 
   const {
-    icons, uuid,
+    icons,
+    uuid,
     moreMenu,
     tooltip,
     dialog,
     dangerConfirmationModal,
+    confirmationModal,
     adminPageURL,
     loadingModal,
     modal,
   } = Groundhogg.element
 
-  const { sprintf, __, _x, _n } = wp.i18n
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
 
   const funnelId = parseInt(Funnel.id)
 
   const removePathFromSvgsInStepFlow = () => {
-    document.querySelectorAll( '#step-flow svg path' ).forEach( el => {
-      el.removeAttribute( 'class' )
+    document.querySelectorAll('#step-flow svg path').forEach(el => {
+      el.removeAttribute('class')
       console.log(el)
     })
 
@@ -39,9 +54,10 @@
 
   $.extend(funnel, {
 
-    sortables: null,
+    sortables      : null,
+    insertInBranch : 'main',
     insertAfterStep: false,
-    currentlyActive: false,
+    editing        : false,
 
     getSteps: function () {
       return $('#step-sortable')
@@ -54,7 +70,7 @@
     stepCallbacks: {},
 
     /**
-     * Register various step callbacks
+     * Register letious step callbacks
      *
      * @param type
      */
@@ -66,12 +82,10 @@
 
       // removePathFromSvgsInStepFlow()
 
-      var self = this
+      let self = this
 
-      var $document = $(document)
-      var $form = $('#funnel-form')
-      var $steps = self.getSteps()
-      var $settings = self.getSettings()
+      let $document = $(document)
+      let $form = $('#funnel-form')
 
       let preloaders = [
         FunnelsStore.maybeFetchItem(funnelId),
@@ -87,7 +101,12 @@
 
       // Preload tags
       let tags = this.steps.filter(
-          ({ data: { step_type } }) => ['apply_tag', 'remove_tag', 'tag_applied', 'tag_removed'].includes(step_type)).
+          ({ data: { step_type } }) => [
+            'apply_tag',
+            'remove_tag',
+            'tag_applied',
+            'tag_removed',
+          ].includes(step_type)).
         reduce((allTags, { meta: { tags } }) => {
 
           if (!Array.isArray(tags)) {
@@ -114,9 +133,9 @@
       }
 
       $document.on('change input', '.step-title-large', function () {
-        var $title = $(this)
-        var id = $title.attr('data-id')
-        var $step = $('#' + id)
+        let $title = $(this)
+        let id = $title.attr('data-id')
+        let $step = $('#' + id)
         $step.find('.step-title').text($title.val())
       })
 
@@ -124,10 +143,15 @@
         $(document.body).toggleClass('funnel-full-screen')
 
         ajax({
-          action: 'gh_funnel_editor_full_screen_preference',
+          action     : 'gh_funnel_editor_full_screen_preference',
           full_screen: $(document.body).hasClass('funnel-full-screen') ? 1 : 0,
         })
 
+      })
+
+      $document.on('click', '#collapse-settings', e => {
+        this.startEditing(null)
+        this.hideSettings()
       })
 
       $document.on('click', '#step-flow .step:not(.step-placeholder)', function (e) {
@@ -136,36 +160,32 @@
           return
         }
 
-        self.makeActive(this.id, true)
+        self.startEditing(this.dataset.id, true)
+        self.showSettings()
       })
 
-      $document.on('click', '.add-step-bottom-wrap button', e => {
+      $('#step-search').on('input', e => {
+        let search = e.target.value
+        $(`.select-step`).addClass('visible')
+        if (search) {
+          $(`.select-step:not([data-name*="${ search }" i])`).removeClass('visible')
+        }
+      })
+
+      $document.on('click', 'button#add-new-step', e => {
         this.showAddStep()
       })
 
-      $document.on('click', '#step-toggle button', e => {
-
-        let group = e.currentTarget.dataset.group
-
-        $(`.steps-grid`).addClass('hidden')
-        $(`#${ group }`).removeClass('hidden')
-
-        $('#step-toggle button').removeClass('active')
-        $(e.currentTarget).addClass('active')
-
-      })
-
       /* Bind Delete */
-      $document.on('click', 'button.delete-step', function (e) {
-        self.deleteStep(this.parentNode.parentNode.id)
+      $document.on('click', 'button.delete-step', e => {
+        let stepId = e.currentTarget.parentNode.parentNode.dataset.id
+        this.deleteStep(stepId)
       })
 
       /* Bind Duplicate */
-      $document.on('click', 'button.duplicate-step', function (e) {
-
-        let stepId = this.parentNode.parentNode.id
-
-        self.duplicateStep(stepId)
+      $document.on('click', 'button.duplicate-step', e => {
+        let stepId = e.currentTarget.parentNode.parentNode.dataset.id
+        this.duplicateStep(stepId)
       })
 
       /* Activate Spinner */
@@ -174,20 +194,27 @@
         return false
       })
 
-      $document.on('click', '#update', function (e) {
-        self.save($form)
+      /* Auto save */
+      $document.on('change', '.auto-save', e => {
+        e.preventDefault()
+        this.saveQuietly()
       })
 
       /* Auto save */
-      $document.on('change', '.auto-save', function (e) {
+      $document.on('auto-save', e => {
         e.preventDefault()
-        self.save($form)
+        this.saveQuietly()
       })
 
-      /* Auto save */
-      $document.on('auto-save', function (e) {
-        e.preventDefault()
-        self.save($form)
+      $form.on('change', e => {
+        if (e.target.matches('textarea[name=step_notes]')) {
+          this.updateStepMeta({
+            step_notes: e.target.value,
+          })
+          return
+        }
+
+        this.saveQuietly()
       })
 
       // Funnel Title
@@ -199,34 +226,51 @@
 
       $document.on('blur change', '#title', function (e) {
 
-        var title = $(this).val()
+        let title = $(this).val()
 
         $('.title-view').find('.title').text(title)
         $('.title-view').show()
         $('.title-edit').hide()
       })
 
-      $('#status-toggle').on('change', e => {
+      $('#funnel-deactivate').on('click', e => {
+        dangerConfirmationModal({
+          alert      : `<p><b>Are you sure you want to deactivate the funnel?</b></p><p>Any pending events will be paused. They will be resumed immediately when the funnel is reactivated.</p>`,
+          confirmText: __('Deactivate'),
+          onConfirm  : () => {
+            this.save({
+              moreData: formData => formData.append('_deactivate', true),
+            })
+          },
+        })
+      })
 
-        if (!e.target.checked && Funnel.is_active) {
-          dangerConfirmationModal({
-            alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p><p>Any pending events will be paused. They will be resumed immediately when the funnel is reactivated.</p>`,
-            confirmText: __('Deactivate'),
-            onConfirm: () => {
-              setTimeout(() => this.save(), 100)
-            },
-            onCancel: () => {
-              $('#status-toggle').prop('checked', true)
-            },
-          })
-        }
+      $('#funnel-update').on('click', e => {
+        confirmationModal({
+          alert    : `<p><b>Are you sure you want to publish your changes?</b></p>`,
+          onConfirm: () => {
+            this.save({
+              moreData: formData => formData.append('_commit', true),
+            })
+          },
+        })
+      })
 
+      $('#funnel-activate').on('click', e => {
+        confirmationModal({
+          alert    : `<p><b>Are you sure you want to activate you funnel?</b></p>`,
+          onConfirm: () => {
+            this.save({
+              moreData: formData => formData.append('_activate', true),
+            })
+          },
+        })
       })
 
       // Step Title
       $document.on('click', '.step-title-view .title', function (e) {
 
-        var $step = $(this).closest('.step')
+        let $step = $(this).closest('.step')
 
         $step.find('.step-title-view').hide()
         $step.find('.step-title-edit').show().removeClass('hidden')
@@ -235,9 +279,9 @@
 
       $document.on('blur change', '.edit-title', function (e) {
 
-        var $step = $(this).closest('.step')
+        let $step = $(this).closest('.step')
 
-        var title = $(this).val()
+        let title = $(this).val()
 
         $step.find('.step-title-view').find('.title').text(title)
         $step.find('.step-title-view').show()
@@ -255,53 +299,64 @@
       const dealWithHash = () => {
         let hash = window.location.hash.substring(1)
 
-        if ( hash === 'add' ){
+        if (hash === 'add') {
           this.showAddStep()
-        } else {
-          this.makeActive(parseInt(window.location.hash.substring(1)))
         }
+        else {
+          this.startEditing(parseInt(window.location.hash.substring(1)))
+        }
+
+        this.showSettings()
       }
 
       if (window.location.hash) {
         dealWithHash()
       }
 
-      window.addEventListener('hashchange', dealWithHash )
+      window.addEventListener('hashchange', dealWithHash)
 
       let header = document.querySelector('.funnel-editor-header > .actions')
 
       header.append(Button({
-        id: 'funnel-more',
+        id       : 'funnel-more',
         className: 'gh-button secondary text icon',
-        onClick: e => {
+        onClick  : e => {
           moreMenu('#funnel-more', [
             {
-              key: 'export', text: 'Export', onSelect: e => {
+              key     : 'export',
+              text    : 'Export',
+              onSelect: e => {
                 window.open(Funnel.export_url, '_blank')
               },
             },
             {
-              key: 'share', text: 'Share', onSelect: e => {
+              key     : 'share',
+              text    : 'Share',
+              onSelect: e => {
                 prompt('Copy this link to share', Funnel.export_url)
               },
             },
             {
-              key: 'reports', text: 'Reports', onSelect: e => {
+              key     : 'reports',
+              text    : 'Reports',
+              onSelect: e => {
                 window.open(adminPageURL('gh_reporting', {
-                  tab: 'funnels',
+                  tab   : 'funnels',
                   funnel: Funnel.id,
                 }), '_blank')
               },
             },
             {
-              key: 'contacts', text: 'Add Contacts', onSelect: e => {
+              key     : 'contacts',
+              text    : 'Add Contacts',
+              onSelect: e => {
                 modal({
                   //language=HTML
                   content: `<h2>${ __('Add contacts to this funnel', 'groundhogg') }</h2>
                   <div id="gh-add-to-funnel" style="width: 500px"></div>`,
-                  onOpen: () => {
+                  onOpen : () => {
                     document.getElementById('gh-add-to-funnel').append(Groundhogg.FunnelScheduler({
-                      funnel: getFunnel(),
+                      funnel    : getFunnel(),
                       funnelStep: getFunnel().steps[0],
                     }))
                   },
@@ -339,17 +394,29 @@
             `<h2>Funnel Settings</h2>`,
             `<p>Use <b>campaigns</b> to organize your funnels. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
             ItemPicker({
-              id: 'pick-campaigns',
+              id          : 'pick-campaigns',
               noneSelected: 'Add a campaign...',
-              selected: campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } )),
-              tags: true,
+              selected    : campaigns.map(({
+                ID,
+                data,
+              }) => ( {
+                id  : ID,
+                text: data.name,
+              } )),
+              tags        : true,
               fetchOptions: async (search) => {
                 let campaigns = await CampaignsStore.fetchItems({
                   search,
                   limit: 20,
                 })
 
-                return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
+                return campaigns.map(({
+                  ID,
+                  data,
+                }) => ( {
+                  id  : ID,
+                  text: data.name,
+                } ))
               },
               createOption: async value => {
                 let campaign = await CampaignsStore.create({
@@ -358,31 +425,34 @@
                   },
                 })
 
-                return { id: campaign.ID, text: campaign.data.name }
+                return {
+                  id  : campaign.ID,
+                  text: campaign.data.name,
+                }
               },
-              onChange: items => campaignIds = items.map(item => item.id),
+              onChange    : items => campaignIds = items.map(item => item.id),
             }),
             `<p>Add a simple funnel description.</p>`,
             Textarea({
-              id: 'funnel-description',
+              id       : 'funnel-description',
               className: 'full-width',
-              onInput: e => {
+              onInput  : e => {
                 description = e.target.value
               },
-              value: description,
+              value    : description,
             }),
             Div({
               className: 'display-flex flex-end',
             }, Button({
-              id: 'save-settings',
+              id       : 'save-settings',
               className: 'gh-button primary',
-              onClick: async e => {
+              onClick  : async e => {
 
                 close()
 
                 await FunnelsStore.patch(funnelId, {
                   campaigns: campaignIds,
-                  meta: {
+                  meta     : {
                     description,
                   },
                 })
@@ -394,130 +464,205 @@
             }, 'Save')),
           ])
         })
-
       })
 
+      if (!this.steps.length) {
+        this.showAddStep()
+      }
     },
 
-    async save ($form) {
+    async save (args = {}) {
 
-      if (typeof $form === 'undefined') {
-        $form = $('#funnel-form')
+      let quiet
+
+      if (args === true) {
+        quiet = true
+      }
+      else {
+        quiet = args.quiet ?? false
       }
 
-      var self = this
+      if (quiet && this.saving) {
+        return
+      }
 
-      var $saveButton = $('.save-button')
+      this.saving = true
 
-      $('body').addClass('saving')
+      let formData = new FormData(document.getElementById('funnel-form'))
 
-      $saveButton.html(`<span class="gh-spinner"></span>`)
+      // these are in the form but are not actually used when posted
+      formData.delete('step_notes')
+      formData.delete('note_text')
 
-      var fd = $form.serialize()
-      fd += '&action=gh_save_funnel_via_ajax&version=2'
+      formData.append('action', 'gh_save_funnel_via_ajax')
 
-      if (this._delete_step) {
-        fd += '&_delete_step=' + this._delete_step
+      if (!quiet) {
+        $('body').addClass('saving')
       }
 
       // Update the JS meta changes first
       if (Object.keys(this.metaUpdates).length) {
-
-        let changes = Object.keys(this.metaUpdates).map(ID => ( {
-          ID,
-          meta: {
-            ...this.metaUpdates[ID],
-          },
-        } ))
-
-        try {
-          let response = await patch(routes.v4.steps, changes)
-        }
-        catch (e) {
-          dialog({
-            message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
-            type: 'error',
-          })
-          throw e
-        }
-        // reset
-        this.metaUpdates = {}
+        formData.append('metaUpdates', JSON.stringify(this.metaUpdates))
+        this.metaUpdates = [] // clear the meta updates
       }
 
-      // Do regular form update
-      adminAjaxRequest(fd, (response) => {
+      // add additional data to the formData if required
+      if (args.moreData) {
+        args.moreData(formData)
+      }
+
+      return await ajax(formData, {
+        url: `${ ajaxurl }?${ quiet ? 'auto-save' : 'explicit-save' }=1`,
+      }).then(response => {
+
+        // make sure the status is available to the parent funnel form element
+        document.getElementById('funnel-form').dataset.status = response.data.funnel.data.status
 
         this.steps = response.data.funnel.steps
 
-        // match the status of the funnel with the one from the response
-        $('#status-toggle').prop('checked', response.data.funnel.data.status === 'active' )
+        if (!this.dragging) {
+          morphdom(document.getElementById('step-sortable'), Div({}, response.data.sortable), {
+            childrenOnly     : true,
+            onBeforeElUpdated: function (fromEl, toEl) {
 
-        $saveButton.removeClass('spin')
-        $saveButton.html(self.save_text)
+              // preserve the editing class
+              if (fromEl.classList.contains('editing')) {
+                toEl.classList.add('editing')
+              }
 
-        self.getSettings().html(response.data.settings)
-        self.getSteps().html(response.data.sortable)
+              if (fromEl.matches('.editing .step-edit.panels')) {
+                return false // don't morph the currently edited step to avoid glitchiness
+              }
+              return true
+            },
+          })
+
+          this.makeSortable()
+        }
+
+        morphdom(document.querySelector('.step-settings'), Div({}, response.data.settings), {
+          childrenOnly     : true,
+          onBeforeElUpdated: function (fromEl, toEl) {
+
+            // preserve the editing class
+            if (fromEl.classList.contains('editing')) {
+              toEl.classList.add('editing')
+            }
+
+            if (fromEl.matches('.editing .step-edit.panels')) {
+              return false // don't morph the currently edited step to avoid glitchiness
+            }
+
+            return true
+          },
+        })
+
+        // self.makeSortable()
+        drawLogicLines()
+
+        this.saving = false
+
+        // quietly!
+        if (quiet) {
+          return response
+        }
 
         $(document).trigger('new-step')
 
         $('body').removeClass('saving')
-        self.makeActive(self.currentlyActive)
 
-        if ( response.data.err ){
+        if (response.data.err) {
           dialog({
             message: response.data.err,
-            type: 'error',
+            type   : 'error',
           })
-          return
+          return response
         }
 
         dialog({
           message: __('Funnel saved!', 'groundhogg'),
         })
-      }, err => {
+      }).catch(err => {
         dialog({
           message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
-          type: 'error',
+          type   : 'error',
         })
         throw err
       })
     },
 
+    saveQuietly: Groundhogg.functions.debounce(() => funnel.save(true), 500),
+
     makeSortable () {
-      this.sortables = $('.ui-sortable').sortable({
+      this.sortables = $('.step-branch').sortable({
         placeholder: 'sortable-placeholder',
-        connectWith: '.ui-sortable',
-        receive: (e, ui) => {
+        connectWith: '.step-branch',
+        // handle: '.step',
+        // tolerance: 'pointer',
+        distance: 100,
+        cursorAt: {
+          left: 5,
+          top : 5,
+        },
+        helper  : (e, $el) => {
 
-          let prev = ui.helper.prev().prop('id')
-          if (typeof prev === 'undefined') {
-            prev = 0
+          let icon = $el.find('.hndle-icon')[0]
+
+          // language=HTML
+          return `
+              <div class="wpgh-element" data-group="action">
+                  <div class="step-icon">
+                      ${ icon.outerHTML }
+                  </div>
+              </div>`
+        },
+        change  : drawLogicLines,
+        stop    : () => {
+          drawLogicLines()
+
+          // update the branch hidden fields to be correct with their parent
+          $('input[name*="[branch]"][type="hidden"]').each(function (el) {
+            $(this).val($(this).closest('.step-branch').data('branch'))
+          })
+
+          this.dragging = false
+          this.saveQuietly()
+        },
+        start   : (e, ui) => {
+          ui.helper.width(60)
+          ui.helper.height(60)
+          drawLogicLines()
+          this.dragging = true
+        },
+        receive : (e, ui) => {
+
+          drawLogicLines()
+
+          // receiving from another sortable?
+          if (typeof ui.helper === 'undefined' || !ui.helper) {
+            return
           }
 
-          var data = {
-            action: 'wpgh_get_step_html',
+          let branch = ui.helper.closest('.step-branch').data('branch')
+
+          let data = {
             step_type: ui.item.prop('id'),
-            step_group: ui.item.data('group'),
-            after_step: prev,
-            funnel_id: this.id,
-            version: 2,
+            branch   : branch,
           }
-
-          this.insertAfterStep = data.after_step
-
-          let id = uuid()
 
           // language=HTML
           ui.helper.replaceWith(`
-              <div class="step step-placeholder ${ data.step_group }" id="${ id }">
+              <div class="step step-placeholder ${ data.step_group }">
                   Loading...
+                  ${ Input({
+                      type : 'hidden',
+                      name : 'step_ids[]',
+                      value: JSON.stringify(data),
+                  }).outerHTML }
               </div>`)
 
-          showSpinner()
-
-          this.getStepHtml(data).then(r => {
-            hideSpinner()
-            $(`#${ id }`).remove()
+          this.save({
+            quiet: true,
           })
         },
       })
@@ -525,17 +670,22 @@
       this.sortables.disableSelection()
 
       $('.wpgh-element.ui-draggable').draggable({
-        connectToSortable: '#step-sortable.ui-sortable',
-        helper: 'clone',
+        connectToSortable: '.ui-sortable',
+        helper           : 'clone',
       })
     },
 
-    showAddStep () {
-      $('#add-steps').removeClass('hidden')
-      $('.step-settings').addClass('hidden')
-      $('#step-sortable .step').removeClass('active')
+    hideSettings () {
+      $('#step-settings-container').addClass('slide-out')
+    },
 
-      this.currentlyActive = false
+    showSettings () {
+      $('#step-settings-container').removeClass('slide-out')
+    },
+
+    showAddStep () {
+      this.showSettings()
+      this.startEditing(null)
 
       history.pushState(null, null, '#add')
     },
@@ -547,31 +697,25 @@
      */
     deleteStep: function (id) {
 
-      var self = this
-
-      var $step = $('#' + id)
-      var result = confirm(
+      let $step = $('#step-' + id)
+      let result = confirm(
         'Are you sure you want to delete this step? Any pending events for this step will be removed.')
 
       if (result) {
 
-        self._delete_step = id
+        if (this.isEditing(id)) {
+          this.startEditing(null)
+        }
 
         $step.fadeOut(400, () => {
           $step.remove()
-
-          let sid = '#settings-' + id
-          let $step_settings = $(sid)
-
-          $step_settings.remove()
-
-          self.save()
-
-          if (this.currentlyActive === id) {
-            self.showAddStep()
-          }
-
-          self._delete_step = false
+          drawLogicLines()
+          this.save({
+            quiet   : true,
+            moreData: formData => {
+              formData.append('_delete_step', id)
+            },
+          })
         })
       }
     },
@@ -590,10 +734,7 @@
         return
       }
 
-      this.insertAfterStep = id
-
       const type = step.data.step_type
-
       let extra = {}
 
       if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onDuplicate')) {
@@ -605,49 +746,22 @@
         }
       }
 
-      var data = {
-        action: 'wpgh_duplicate_funnel_step',
-        step_id: id,
-        version: 2,
-        ...extra,
-      }
+      document.getElementById(`step-${ id }`).querySelector(`input[name='step_ids[]'][type='hidden']`).insertAdjacentElement('afterend', Input({
+        type : 'hidden',
+        name : 'step_ids[]',
+        value: 'duplicate',
+      }))
 
-      const { close } = loadingModal()
+      return await this.save({
+        quiet   : true,
+        moreData: formData => {
+          formData.append('_duplicate_step', JSON.stringify({
+            id,
+            ...extra,
+          }))
+        },
+      })
 
-      await this.getStepHtml(data)
-
-      close()
-    },
-
-    /**
-     * Performs an ajax call and replaces
-     *
-     * @param obj
-     */
-    getStepHtml: async function (obj) {
-      let self = this
-      let $steps = self.getSteps()
-      let $settings = self.getSettings()
-
-      // Make sure the nonce is there
-      obj._wpnonce = Groundhogg.nonces._wpnonce
-
-      let response = await ajax(obj)
-
-      this.steps.push(response.data.json)
-
-      if (self.insertAfterStep) {
-        $(`#${ self.insertAfterStep }`).after(response.data.sortable)
-      }
-      else {
-        $steps.prepend(response.data.sortable)
-      }
-
-      $settings.append(response.data.settings)
-
-      $(document).trigger('new-step')
-
-      return response
     },
 
     /**
@@ -656,7 +770,7 @@
      * @returns {unknown}
      */
     getActiveStep () {
-      return this.steps.find(s => s.ID == this.currentlyActive)
+      return this.steps.find(s => s.ID == this.editing)
     },
 
     metaUpdates: {},
@@ -682,82 +796,76 @@
         ..._meta,
       }
 
+      this.saveQuietly()
+
       return step
+    },
+
+    isEditing (id) {
+      return this.editing == id
     },
 
     /**
      * Make the given step active.
      *
      * @param id string
-     * @param e object
+     * @param hps bool what to do with the browser history
      */
-    makeActive (id, hps = false) {
-      var self = this
+    startEditing (id, hps = false) {
 
-      if (!id) {
-        this.showAddStep()
+      // trying to make the current step active
+      if (this.editing === id) {
         return
       }
 
-      this.currentlyActive = id
-
-      var $steps = self.getSteps()
-      var $settings = self.getSettings()
-      var $html = $('html')
-
-      var $step = $('#' + id)
-
-      // If the click step was already active...
-      var was_active = $step.hasClass('active')
-
-      // In some cases we do not want to allow deselecting a step...
-      if (was_active) {
+      // this step is not in the funnel
+      if (id && !this.steps.find(s => s.ID == id)) {
         return
       }
 
-      $('#add-steps').addClass('hidden')
-      $('.step-settings').removeClass('hidden')
-
-      $settings.find('.step').addClass('hidden')
-      $settings.find('.step').removeClass('active')
-      $steps.find('.step').removeClass('active')
-      $html.removeClass('active-step')
-
-      // Make the clicked step active
-      $step.addClass('active')
-
-      var sid = '#settings-' + $step.attr('id')
-      var $step_settings = $(sid)
-
-      $step_settings.removeClass('hidden')
-      $step_settings.addClass('active')
-      $html.addClass('active-step')
-
-      const step = this.getActiveStep()
-
-      if (!step) {
-        return
+      // deactivate the current step
+      if (this.editing) {
+        document.getElementById(`step-${ this.editing }`).classList.remove('editing')
+        document.getElementById(`settings-${ this.editing }`).classList.remove('editing')
       }
 
-      const type = step.data.step_type
+      this.editing = id
 
-      if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onActive')) {
-        this.stepCallbacks[type].onActive({ ...step, updateStep: meta => this.updateStepMeta(meta, step.ID) })
+      // we are indeed making a different step active
+      if (this.editing) {
+
+        document.getElementById(`step-${ this.editing }`).classList.add('editing')
+        document.getElementById(`settings-${ this.editing }`).classList.add('editing')
+
+        const step = this.getActiveStep()
+
+        if (!step) {
+          return
+        }
+
+        const type = step.data.step_type
+
+        if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onActive')) {
+          this.stepCallbacks[type].onActive({
+            ...step,
+            updateStep: meta => this.updateStepMeta(meta, step.ID),
+          })
+        }
+
+        $(document).trigger('step-active')
+
+        if (hps) {
+          history.pushState(null, null, `#${ step.ID }`)
+        }
+        else {
+          history.replaceState(null, null, `#${ step.ID }`)
+        }
       }
-
-      $(document).trigger('step-active')
-
-      if (hps) {
-        history.pushState(null, null, `#${ step.ID }`)
-      }
-      else {
-        history.replaceState(null, null, `#${ step.ID }`)
-      }
-
     },
   })
 
   $(function () {
+    drawLogicLines()
     funnel.init()
   })
 
@@ -772,5 +880,192 @@
 
     return null
   })
+
+  function areNumbersClose (num1, num2, tolerancePercent) {
+    const average = ( Math.abs(num1) + Math.abs(num2) ) / 2
+    const tolerance = ( tolerancePercent / 100 ) * average
+    return Math.abs(num1 - num2) <= tolerance
+  }
+
+  function drawLogicLines () {
+
+    const borderRadius = '20px'
+    const borderPixels = 2
+    const borderWidth = `${ borderPixels }px`
+
+    // loops
+    document.querySelectorAll('.step-branch .step.loop').forEach(el => {
+
+      // the step-branch.benchmarks container
+      let stepPos = el.getBoundingClientRect()
+      let targetStepId = Funnel.steps.find(s => s.ID == el.dataset.id).meta.next
+
+      if (!targetStepId) {
+        return
+      }
+
+      let targetStep = document.getElementById(`step-${ targetStepId }`).getBoundingClientRect()
+
+      // let stepCenter = stepPos.top + stepPos.height / 2
+      // let targetCenter = targetStep.top + targetStep.height / 2
+
+      let lineHeight = stepPos.bottom - targetStep.bottom
+
+      let line = el.querySelector('div.logic-line')
+
+      if (!line) {
+        line = Div({ className: 'logic-line' })
+        el.append(line)
+      }
+
+      let width = Math.max(stepPos.right, targetStep.right) - Math.min(stepPos.right, targetStep.right) + 15
+
+      line.style.bottom = '50%'
+      line.style.width = `${ width }px`
+      line.style.right = `-${ width }px`
+      line.style.height = `${ lineHeight }px`
+      line.style.borderWidth = `${ borderWidth } ${ borderWidth } ${ borderWidth } 0`
+      line.style.borderBottomRightRadius = borderRadius
+      line.style.borderTopRightRadius = borderRadius
+
+    })
+
+    // Benchmarks
+    document.querySelectorAll('.logic-line.benchmark').forEach(el => {
+
+      // the step-branch.benchmarks container
+      let containerPos = el.closest('.step-branch').getBoundingClientRect()
+
+      // the benchmark itself
+      let branchPos = el.closest('.step.benchmark').getBoundingClientRect()
+
+      let stepCenter = containerPos.left + containerPos.width / 2
+      let branchCenter = branchPos.left + branchPos.width / 2
+
+      let lineHeight = containerPos.bottom - branchPos.bottom
+
+      // center
+      if (areNumbersClose(stepCenter, branchCenter, 1)) {
+        el.style.left = '50%'
+        el.style.bottom = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 0 0 ${ borderWidth }`
+      }
+      // left side
+      else if (branchCenter < stepCenter) {
+        el.style.left = '50%'
+        el.style.width = `${ stepCenter - branchCenter }px`
+        el.style.bottom = `-${ lineHeight + borderPixels }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+        el.style.borderBottomLeftRadius = borderRadius
+      }
+      // right side
+      else {
+        el.style.right = '50%'
+        el.style.width = `${ branchCenter - stepCenter }px`
+        el.style.bottom = `-${ lineHeight + borderPixels }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+        el.style.borderBottomRightRadius = borderRadius
+      }
+
+    })
+
+    // Above
+    document.querySelectorAll('.logic-line.line-above').forEach(el => {
+      let branchPos = el.parentElement.getBoundingClientRect()
+      let stepPos = el.closest('.step-branches').previousElementSibling.getBoundingClientRect()
+
+      let stepCenter = stepPos.left + stepPos.width / 2
+      let branchCenter = branchPos.left + branchPos.width / 2
+
+      let stepHeightCenter = stepPos.top + stepPos.height / 2
+      let lineHeight = branchPos.top - stepHeightCenter
+
+      // center
+      if (areNumbersClose(stepCenter, branchCenter, 1)) {
+
+        el.classList.remove('left', 'right')
+        el.classList.add('middle')
+
+        lineHeight = branchPos.top - stepPos.bottom
+
+        el.style.left = '50%'
+        el.style.top = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 0 0 ${ borderWidth }`
+      }
+      // left side
+      else if (branchCenter < stepCenter) {
+
+        el.classList.remove('middle', 'right')
+        el.classList.add('left')
+
+        el.style.left = '50%'
+        el.style.width = `${ stepPos.left - branchCenter }px`
+        el.style.top = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+        el.style.borderTopLeftRadius = borderRadius
+      }
+      // right side
+      else {
+
+        el.classList.remove('middle', 'left')
+        el.classList.add('right')
+
+        el.style.right = '50%'
+        el.style.width = `${ branchCenter - stepPos.right }px`
+        el.style.top = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+        el.style.borderTopRightRadius = borderRadius
+      }
+
+    })
+
+    // Below
+    document.querySelectorAll('.logic-line.line-below').forEach(el => {
+
+      let branchPos = el.parentElement.getBoundingClientRect()
+      let containerPos = el.closest('.sortable-item').getBoundingClientRect()
+
+      let stepCenter = containerPos.left + containerPos.width / 2
+      let branchCenter = branchPos.left + branchPos.width / 2
+
+      let lineHeight = containerPos.bottom - branchPos.bottom
+
+      // center
+      if (areNumbersClose(stepCenter, branchCenter, 1)) {
+        el.style.left = '50%'
+        el.style.bottom = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 0 0 ${ borderWidth }`
+      }
+      // left side
+      else if (branchCenter < stepCenter) {
+        el.style.left = '50%'
+        el.style.width = `${ stepCenter - branchCenter }px`
+        el.style.bottom = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+        el.style.borderBottomLeftRadius = borderRadius
+      }
+      // right side
+      else {
+        el.style.right = '50%'
+        el.style.width = `${ branchCenter - stepCenter }px`
+        el.style.bottom = `-${ lineHeight }px`
+        el.style.height = `${ lineHeight }px`
+        el.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+        el.style.borderBottomRightRadius = borderRadius
+      }
+
+    })
+
+    $(document).trigger('draw-logic-lines')
+
+  }
 
 } )(jQuery, Funnel)

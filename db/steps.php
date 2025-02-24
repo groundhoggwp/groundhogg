@@ -90,6 +90,8 @@ class Steps extends DB {
 			'is_entry'      => '%d',
 			'is_conversion' => '%d',
 			'can_passthru'  => '%d',
+			'branch'        => '%s',
+			'changes'       => '%s',
 		);
 	}
 
@@ -112,6 +114,8 @@ class Steps extends DB {
 			'is_entry'      => 0,
 			'is_conversion' => 0,
 			'can_passthru'  => 0,
+			'branch'        => 'main',
+			'changes'       => '',
 		);
 	}
 
@@ -272,7 +276,12 @@ class Steps extends DB {
 		is_entry TINYINT(1) NOT NULL,
 		is_conversion TINYINT(1) NOT NULL,
 		can_passthru TINYINT(1) NOT NULL,
-		PRIMARY KEY  (ID)
+		branch varchar(40) NOT NULL,
+		changes mediumtext NOT NULL,
+		PRIMARY KEY  (ID),
+		KEY branch (branch),
+		KEY funnel (funnel_id),
+		KEY funnel_order_branch (funnel_id,step_order,branch)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );

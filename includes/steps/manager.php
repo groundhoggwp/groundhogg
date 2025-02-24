@@ -31,6 +31,11 @@ use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
 use Groundhogg\Steps\Benchmarks\Task_Completed;
 use Groundhogg\Steps\Benchmarks\Web_Form;
+use Groundhogg\Steps\Logic\If_Else;
+use Groundhogg\Steps\Logic\Logic;
+use Groundhogg\steps\logic\Split_Path;
+use Groundhogg\steps\logic\Split_Test;
+use Groundhogg\steps\logic\Weighted_Distribution;
 use function Groundhogg\get_array_var;
 
 /**
@@ -85,6 +90,7 @@ class Manager {
 		$this->register_sub_group( 'lms', __( 'LMS' ) );
 		$this->register_sub_group( 'other', __( 'Other' ) );
 		$this->register_sub_group( 'developer', __( 'Developer' ) );
+		$this->register_sub_group( 'logic', __( 'Logic' ) );
 
 		/* actions */
 		$this->add_step( new Send_Email() );
@@ -109,6 +115,12 @@ class Manager {
 
 		/* Other */
 		$this->add_step( new Error() );
+
+		/* Logic */
+		$this->add_step( new If_Else() );
+		$this->add_step( new Split_Path() );
+		$this->add_step( new Split_Test() );
+		$this->add_step( new Weighted_Distribution() );
 
 		do_action( 'groundhogg/steps/init', $this );
 
@@ -159,6 +171,18 @@ class Manager {
 	public function get_actions() {
 		return array_filter( $this->elements, function ( $element ) {
 			return $element->get_group() === Funnel_Step::ACTION;
+		} );
+	}
+
+
+	/**
+	 * Return an array of actions
+	 *
+	 * @return Logic[]
+	 */
+	public function get_logic() {
+		return array_filter( $this->elements, function ( $element ) {
+			return $element->get_group() === Funnel_Step::LOGIC;
 		} );
 	}
 
@@ -222,5 +246,9 @@ class Manager {
 
 		return get_array_var( $this->elements, $get_type );
 
+	}
+
+	public function get_types() {
+		return array_keys( $this->elements );
 	}
 }

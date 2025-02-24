@@ -1072,6 +1072,11 @@ a.action-link {
     color: #fff;
   }
 
+  &.purple {
+    background-color: $secondary-purple;
+    color: #fff;
+  }
+
   &.semi-dark {
     background-color: $primary-dark-75;
     color: #fff;

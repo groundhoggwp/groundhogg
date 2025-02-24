@@ -4,7 +4,10 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
+use function Groundhogg\array_find;
+use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\process_events;
@@ -183,6 +186,40 @@ abstract class Benchmark extends Funnel_Step {
 		//do nothing...
 
 		return true;
+	}
+
+	/**
+	 * @param Step $step
+	 *
+	 * @return void
+	 */
+	public function sortable_item( $step ) {
+
+		$steps = $step->get_funnel()->get_steps_for_editor();
+
+		$prev = array_find( $steps, function ( Step $maybePrev ) use ( $step ) {
+			return $maybePrev->get_order() === $step->get_order() - 1 && $step->is_same_branch( $maybePrev );
+		} );
+
+		$next = array_find( $steps, function ( Step $maybePrev ) use ( $step ) {
+			return $maybePrev->get_order() === $step->get_order() + 1 && $step->is_same_branch( $maybePrev );
+		} );
+
+		// if the previous step was not a benchmark, we should open the horizontal benchmark group
+		if ( ! $prev || ! $prev->is_benchmark() ) {
+			?>
+            <div class="step-branch benchmarks" data-branch="<?php _e( $step->branch ) ?>">
+            <?php
+		} else {
+            ?><span class="benchmark-or">OR</span><?php
+		}
+
+		parent::sortable_item( $step );
+
+		// if the next step is not a benchmark, close the benchmark group
+		if ( ! $next || ! $next->is_benchmark() ) {
+			?></div><?php
+		}
 	}
 
 }

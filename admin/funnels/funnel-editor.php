@@ -48,7 +48,7 @@ if ( ! $funnel->exists() ) {
  *
  * @return void
  */
-function render_draggable_step_grid( $steps ) {
+function render_draggable_step_grid( $steps, $groups = true ) {
 
 	$sub_groups = Plugin::instance()->step_manager->sub_groups;
 
@@ -62,11 +62,13 @@ function render_draggable_step_grid( $steps ) {
 			continue;
 		}
 
-		?>
-        <div class="sub-group">
-        <span class="sub-group-label">
-		<?php _e( $name ) ?>
-        </span><?php
+		if ( $groups ):
+			?>
+            <div class="sub-group">
+            <span class="sub-group-label">
+			<?php _e( $name ) ?>
+            </span><?php
+		endif;
 
 		foreach ( $_steps as $step ):
 
@@ -75,7 +77,7 @@ function render_draggable_step_grid( $steps ) {
 			}
 
 			?>
-            <div class="select-step">
+        <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-name="<?php esc_attr_e( $step->get_name() ); ?>">
             <div id='<?php echo $step->get_type(); ?>'
                  data-group="<?php echo $step->get_group(); ?>"
                  title="<?php esc_attr_e( $step->get_description() ); ?>"
@@ -91,18 +93,27 @@ function render_draggable_step_grid( $steps ) {
             </div><?php
 		endforeach;
 
-		?></div><?php
+		if ( $groups ):
+			?></div><?php
+		endif;
 	}
 }
 
-$steps = $funnel->get_steps();
+// get all steps an initialize the merged changes
+$funnel_editor_steps = $funnel->get_steps_for_editor();
 
-foreach ( $steps as $step ) {
-    $step->get_step_element()->validate_settings( $step );
+// validate the settings so errors appear
+foreach ( $funnel_editor_steps as $step ) {
+	$step->get_step_element()->validate_settings( $step );
 }
 
+// filter by the main branch
+$main_branch_steps = array_filter( $funnel_editor_steps, function ( $step ) {
+    return $step->is_main_branch();
+} );
+
 ?>
-<form method="post" id="funnel-form" class="gh-fixed-ui">
+<form method="post" id="funnel-form" class="gh-fixed-ui" data-status="<?php _e( $funnel->get_status() ) ?>">
 	<?php wp_nonce_field(); ?>
 	<?php $args = array(
 		'type'  => 'hidden',
@@ -151,25 +162,16 @@ foreach ( $steps as $step ) {
 				'class' => 'gh-button secondary text icon',
 				'id'    => 'funnel-settings',
 				'type'  => 'button',
-			], dashicon( 'admin-settings' ) );
-
-			echo html()->bigToggle( [
-				'name'    => 'funnel_status',
-				'id'      => 'status-toggle',
-				'value'   => 'active',
-				'checked' => $funnel->is_active(),
-				'on'      => 'Active',
-				'off'     => 'Inactive',
-			] );
-			echo html()->button( [
-				'type'  => 'submit',
-				'text'  => html()->wrap( __( 'Update' ), 'span', [ 'class' => 'save-text' ] ),
-				'name'  => 'update',
-				'id'    => 'update',
-				'class' => 'gh-button primary save-button',
-				'value' => 'save',
-			] );
-			?>
+			], dashicon( 'admin-settings' ) ); ?>
+            <button type="button" id="funnel-deactivate" class="gh-button danger text">Deactivate</button>
+            <button type="button" id="funnel-update" class="gh-button primary">
+                <span class="button-text">Update</span>
+                <span class="gh-spinner"></span>
+            </button>
+            <button type="button" id="funnel-activate" class="gh-button action">
+                <span class="button-text">Activate</span>
+                <span class="gh-spinner"></span>
+            </button>
         </div>
         <div id="close">
 			<?php
@@ -184,47 +186,42 @@ foreach ( $steps as $step ) {
         </div>
     </div>
     <div id="funnel-builder">
-        <div id="step-flow" class="sidebar">
+        <div id="step-flow">
             <div class="fixed-inside">
-                <div id="step-sortable" class="ui-sortable">
-					<?php foreach ( $steps as $step ):
-						$step->sortable_item();
-					endforeach; ?>
-                </div>
-                <div class="add-step-bottom-wrap">
-                    <button class="gh-button secondary medium icon" type="button">
-						<?php dashicon_e( 'plus-alt2' ); ?>
-						<?php _e( 'Add Step' ) ?>
-                    </button>
-                </div>
+                <div id="step-sortable"
+                     class="step-branch"
+                     data-branch="main"
+                ><?php foreach ( $main_branch_steps as $step ):$step->sortable_item();endforeach; ?></div>
             </div>
+            <button class="add-step-button-flow" type="button" id="add-new-step">
+				<?php dashicon_e( 'plus-alt2' ); ?>
+                <div class="gh-tooltip left">Add a step</div>
+            </button>
         </div>
-        <div id="step-settings-container" class="postbox-container">
+        <div id="step-settings-container" class="slide-out">
+            <button id="collapse-settings"><?php dashicon_e( 'arrow-right-alt2' ); ?></button>
             <div id="step-settings-inner">
                 <div id="add-steps">
                     <div class="steps-select">
-                        <div id="step-toggle" class="gh-button-group">
-                            <button class="gh-button secondary change-step-type" type="button"
-                                    data-group="benchmarks"><?php _e( 'Benchmarks' ) ?></button>
-                            <button class="gh-button secondary change-step-type active" type="button"
-                                    data-group="actions"><?php _e( 'Actions' ) ?></button>
-                        </div>
-                        <div id='benchmarks' class="hidden steps-grid">
-							<?php
-							render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
-							?>
-                        </div>
-                        <div id='actions' class="steps-grid">
-							<?php
-							render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
-							?>
+                        <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
+                        <div class="steps-grid">
+	                        <?php
+	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
+
+	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
+
+	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
+	                        ?>
                         </div>
                     </div>
                 </div>
-                <div class="step-settings hidden">
-					<?php foreach ( $steps as $step ):
-						$step->html_v2();
-					endforeach; ?>
+                <div class="step-settings">
+				    <?php foreach ( $main_branch_steps as $step ):
+					    $step->html_v2();
+				    endforeach; ?>
+                </div>
+                <div id="funnel-health-check">
+
                 </div>
             </div>
         </div>

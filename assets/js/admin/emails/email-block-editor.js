@@ -7550,7 +7550,7 @@
       ]).innerHTML
     },
     defaults           : {
-      src   : 'http://via.placeholder.com/600x338',
+      src   : 'https://placehold.co/600x338?text=Image',
       alt   : 'placeholder image',
       title : 'placeholder image',
       width : 600,

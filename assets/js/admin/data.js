@@ -141,7 +141,7 @@
    * @param opts
    * @returns {Promise<any>}
    */
-  async function adminAjax (data = {}, opts = {}) {
+  async function adminAjax (data = {}, opts = {} ) {
 
     if (!( data instanceof FormData )) {
       const fData = new FormData()
@@ -155,9 +155,12 @@
       data = fData
     }
 
+    let ajaxUrl = opts.url ?? ajaxurl
+    delete opts.url
+
     data.append('gh_admin_ajax_nonce', Groundhogg.nonces._adminajax)
 
-    const response = await fetch(ajaxurl, {
+    const response = await fetch(ajaxUrl, {
       method: 'POST',
       credentials: 'same-origin',
       body: data,

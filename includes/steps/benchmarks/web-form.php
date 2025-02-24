@@ -134,13 +134,11 @@ class Web_Form extends Benchmark {
 										'checked' => $step->is_entry()
 									] );
 
-									if ( $step->get_prev_step()->is_action() ) {
-										echo html()->checkbox( [
-											'label'   => 'Allow contacts to pass through this benchmark',
-											'name'    => $this->setting_name_prefix( 'can_passthru' ),
-											'checked' => $step->can_passthru()
-										] );
-									}
+                                    echo html()->checkbox( [
+                                        'label'   => 'Allow contacts to pass through this benchmark',
+                                        'name'    => $this->setting_name_prefix( 'can_passthru' ),
+                                        'checked' => $step->can_passthru()
+                                    ] );
 
 								endif;
 
@@ -312,6 +310,9 @@ class Web_Form extends Benchmark {
 	 * @return array
 	 */
 	public function sanitize_form( $form ) {
+
+        // let's just make sure it's the format we expect
+        $form = json_decode( wp_json_encode( $form ), true );
 
 		$form['button'] = $this->sanitize_form_field( $form['button'] );
 		$form['fields'] = array_map( [ $this, 'sanitize_form_field' ], $form['fields'] );

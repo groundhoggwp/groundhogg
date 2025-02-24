@@ -14,25 +14,43 @@
     setFrameContent,
     icons,
     moreMenu,
+    dangerConfirmationModal
   } = Groundhogg.element
+
+  const { createFilters } = Groundhogg.filters.functions
+  const {
+    ContactFilterDisplay,
+    ContactFilters,
+  } = Groundhogg.filters
 
   const {
     linkPicker,
   } = Groundhogg.pickers
 
-  const { emails: EmailsStore, tags: TagsStore } = Groundhogg.stores
+  const {
+    emails: EmailsStore,
+    tags  : TagsStore,
+  } = Groundhogg.stores
 
   const {
     Div,
+    H2,
+    Fragment,
     Button,
     ModalFrame,
     ItemPicker,
     Iframe,
     makeEl,
     Dashicon,
+    Input,
   } = MakeEl
 
-  const { sprintf, __, _x, _n } = wp.i18n
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
 
   improveTinyMCE()
 
@@ -53,60 +71,60 @@
   }
 
   const delayTimerDefaults = {
-    delay_amount: 3,
-    delay_type: 'days',
-    run_on_type: 'any',
-    run_when: 'now',
-    run_time: '09:00:00',
-    send_in_timezone: false,
-    run_time_to: '17:00:00',
-    run_on_dow_type: 'any', // Run on days of week type
-    run_on_dow: [], // Run on days of week
+    delay_amount     : 3,
+    delay_type       : 'days',
+    run_on_type      : 'any',
+    run_when         : 'now',
+    run_time         : '09:00:00',
+    send_in_timezone : false,
+    run_time_to      : '17:00:00',
+    run_on_dow_type  : 'any', // Run on days of week type
+    run_on_dow       : [], // Run on days of week
     run_on_month_type: 'any', // Run on month type
-    run_on_months: [], // Run on months
-    run_on_dom: [], // Run on days of month
+    run_on_months    : [], // Run on months
+    run_on_dom       : [], // Run on days of month
   }
 
   const delay_timer_i18n = {
-    delay_duration_types: {
+    delay_duration_types   : {
       minutes: __('Minutes'),
-      hours: __('Hours'),
-      days: __('Days'),
-      weeks: __('Weeks'),
-      months: __('Months'),
-      years: __('Years'),
-      none: __('No delay', 'groundhogg'),
+      hours  : __('Hours'),
+      days   : __('Days'),
+      weeks  : __('Weeks'),
+      months : __('Months'),
+      years  : __('Years'),
+      none   : __('No delay', 'groundhogg'),
     },
     day_of_week_determiners: {
-      any: __('Any'),
-      first: __('First'),
+      any   : __('Any'),
+      first : __('First'),
       second: __('Second'),
-      third: __('Third'),
+      third : __('Third'),
       fourth: __('Fourth'),
-      last: __('Last'),
+      last  : __('Last'),
     },
-    days_of_week: {
-      monday: __('Monday'),
-      tuesday: __('Tuesday'),
+    days_of_week           : {
+      monday   : __('Monday'),
+      tuesday  : __('Tuesday'),
       wednesday: __('Wednesday'),
-      thursday: __('Thursday'),
-      friday: __('Friday'),
-      saturday: __('Saturday'),
-      sunday: __('Sunday'),
+      thursday : __('Thursday'),
+      friday   : __('Friday'),
+      saturday : __('Saturday'),
+      sunday   : __('Sunday'),
     },
-    months: {
-      january: __('January'),
-      february: __('February'),
-      march: __('March'),
-      april: __('April'),
-      may: __('May'),
-      june: __('June'),
-      july: __('July'),
-      august: __('August'),
+    months                 : {
+      january  : __('January'),
+      february : __('February'),
+      march    : __('March'),
+      april    : __('April'),
+      may      : __('May'),
+      june     : __('June'),
+      july     : __('July'),
+      august   : __('August'),
       september: __('September'),
-      october: __('October'),
-      november: __('November'),
-      december: __('December'),
+      october  : __('October'),
+      november : __('November'),
+      december : __('December'),
     },
   }
 
@@ -166,8 +184,8 @@
       case 'day_of_week':
         let dowList = orList(run_on_dow.map((i) => `<b>${ delay_timer_i18n.days_of_week[i] }</b>`))
         days = run_on_dow_type === 'any'
-          ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList)
-          : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
+               ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList)
+               : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
             delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
         months = run_on_month_type === 'specific' ? orList(
           run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
@@ -178,9 +196,9 @@
         break
       case 'day_of_month':
         days = run_on_dom.length > 0
-          ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(
+               ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(
             run_on_dom.map((i) => `<b>${ i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i) }</b>`)))
-          : `<b>${ __('any day', 'groundhogg') }</b>`
+               : `<b>${ __('any day', 'groundhogg') }</b>`
         months = run_on_month_type === 'specific' ? orList(
           run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
           'groundhogg') }</b>`
@@ -196,11 +214,11 @@
 
       const delayTypes = {
         minutes: _n('minute', 'minutes', delay_amount),
-        hours: _n('hour', 'hours', delay_amount),
-        days: _n('day', 'days', delay_amount),
-        weeks: _n('week', 'weeks', delay_amount),
-        months: _n('month', 'months', delay_amount),
-        years: _n('year', 'years', delay_amount),
+        hours  : _n('hour', 'hours', delay_amount),
+        days   : _n('day', 'days', delay_amount),
+        weeks  : _n('week', 'weeks', delay_amount),
+        months : _n('month', 'months', delay_amount),
+        years  : _n('year', 'years', delay_amount),
       }
 
       preview.unshift(
@@ -212,9 +230,16 @@
     return capitalize(preview.join(' '))
   }
 
+
+
+
   const DelayTimer = {
 
-    edit ({ ID, data, meta }) {
+    edit ({
+      ID,
+      data,
+      meta,
+    }) {
       const {
         delay_amount,
         delay_type,
@@ -228,25 +253,30 @@
         run_on_month_type, // Run on month type
         run_on_months, // Run on months
         run_on_dom, // Run on days of month
+        delay_preview = ''
       } = {
         ...delayTimerDefaults,
         ...meta,
       }
 
       const runOnTypes = {
-        any: 'Any day',
-        weekday: 'Weekday',
-        weekend: 'Weekend',
-        day_of_week: 'Day of week',
+        any         : 'Any day',
+        weekday     : 'Weekday',
+        weekend     : 'Weekend',
+        day_of_week : 'Day of week',
         day_of_month: 'Day of month',
       }
 
       const runWhenTypes = {
-        now: __('Any time', 'groundhogg'),
+        now  : __('Any time', 'groundhogg'),
         later: __('Specific time', 'groundhogg'),
       }
 
-      if (['minutes', 'hours', 'none'].includes(delay_type)) {
+      if ([
+        'minutes',
+        'hours',
+        'none',
+      ].includes(delay_type)) {
         runWhenTypes.between = __('Between', 'groundhogg')
       }
 
@@ -259,7 +289,7 @@
       runOnDaysOfMonth.last = 'last'
 
       const runOnMonthTypes = {
-        any: 'Of any month',
+        any     : 'Of any month',
         specific: 'Of specific month(s)',
       }
 
@@ -267,12 +297,12 @@
       const runOnMonthOptions = `
           <div class="gh-input-group">${ select({
               className: 'delay-input re-render',
-              name: 'run_on_month_type',
+              name     : 'run_on_month_type',
           }, runOnMonthTypes, run_on_month_type) }
               ${ run_on_month_type === 'specific' ? select({
                   className: 'delay-input select2__picker',
-                  name: 'run_on_months',
-                  multiple: true,
+                  name     : 'run_on_months',
+                  multiple : true,
               }, delay_timer_i18n.months, run_on_months) : '' }
           </div>`
 
@@ -280,12 +310,12 @@
       const daysOfWeekOptions = `
           <div class="gh-input-group">${ select({
               className: 'delay-input',
-              name: 'run_on_dow_type',
+              name     : 'run_on_dow_type',
           }, delay_timer_i18n.day_of_week_determiners, run_on_dow_type) }
               ${ select({
                   className: 'select2__picker',
-                  name: 'run_on_dow',
-                  multiple: true,
+                  name     : 'run_on_dow',
+                  multiple : true,
               }, delay_timer_i18n.days_of_week, run_on_dow) }
           </div>
           ${ runOnMonthOptions }`
@@ -295,8 +325,8 @@
           <div>
               ${ select({
                   className: 'select2__picker',
-                  name: 'run_on_dom',
-                  multiple: true,
+                  name     : 'run_on_dom',
+                  multiple : true,
               }, runOnDaysOfMonth, run_on_dom) }
           </div>
           ${ runOnMonthOptions }`
@@ -304,21 +334,21 @@
       //language=HTML
       return `
           <div class="display-flex column gap-10">
-              <h3 class="delay-preview" style="font-weight: normal"></h3>
+              <h3 class="delay-preview" style="font-weight: normal">${delay_preview}</h3>
               <div class="row display-flex column gap-10">
                   <label class="row-label">${ __('Wait at least...', 'groundhogg') }</label>
                   <div class="gh-input-group">
                       ${ input({
-                          className: 'delay-input',
-                          type: 'number',
-                          name: 'delay_amount',
-                          value: delay_amount,
+                          className  : 'delay-input',
+                          type       : 'number',
+                          name       : 'delay_amount',
+                          value      : delay_amount,
                           placeholder: 3,
-                          disabled: delay_type === 'none',
+                          disabled   : delay_type === 'none',
                       }) }
                       ${ select({
                           className: 'delay-input re-render',
-                          name: 'delay_type',
+                          name     : 'delay_type',
                       }, delay_timer_i18n.delay_duration_types, delay_type) }
                   </div>
               </div>
@@ -329,7 +359,7 @@
                   <div class="display-flex gap-10">
                       ${ select({
                           className: 'delay-input re-render',
-                          name: 'run_on_type',
+                          name     : 'run_on_type',
                       }, runOnTypes, run_on_type) }
                   </div>
                   ${ run_on_type === 'day_of_week' ? daysOfWeekOptions : '' }
@@ -341,49 +371,52 @@
                   <div class="gh-input-group">
                       ${ select({
                           className: 'delay-input re-render',
-                          name: 'run_when',
-                          options: runWhenTypes,
-                          selected: run_when,
+                          name     : 'run_when',
+                          options  : runWhenTypes,
+                          selected : run_when,
                       }) }
                       ${ run_when === 'later'
-                              ? input({
+                         ? input({
                                   className: 'delay-input',
-                                  type: 'time',
-                                  name: 'run_time',
-                                  value: run_time,
+                                  type     : 'time',
+                                  name     : 'run_time',
+                                  value    : run_time,
                               }) : '' }
                       ${ run_when === 'between'
-                              ? [
-                                  input({
-                                      className: 'delay-input',
-                                      type: 'time',
-                                      name: 'run_time',
-                                      value: run_time,
-                                  }),
-                                  input({
-                                      className: 'delay-input',
-                                      type: 'time',
-                                      name: 'run_time_to',
-                                      value: run_time_to,
-                                  }),
-                              ].join('')
-                              : '' }
+                         ? [
+                             input({
+                                 className: 'delay-input',
+                                 type     : 'time',
+                                 name     : 'run_time',
+                                 value    : run_time,
+                             }),
+                             input({
+                                 className: 'delay-input',
+                                 type     : 'time',
+                                 name     : 'run_time_to',
+                                 value    : run_time_to,
+                             }),
+                         ].join('')
+                         : '' }
                   </div>
               </div>
               <div class="display-flex align-center gap-10">
                   <p>${ __('Run in the contact\'s timezone?', 'groundhogg') }</p>
                   ${ toggle({
-                      onLabel: 'Yes',
+                      onLabel : 'Yes',
                       offLabel: 'No',
-                      id: `${ ID }_send_in_timezone`,
-                      name: 'send_in_timezone',
-                      checked: Boolean(send_in_timezone),
+                      id      : `${ ID }_send_in_timezone`,
+                      name    : 'send_in_timezone',
+                      checked : Boolean(send_in_timezone),
                   }) }
               </div>
           </div>`
     },
 
-    onMount ({ ID, meta }, updateStepMeta, updateStepData, getCurrentState) {
+    onMount ({
+      ID,
+      meta,
+    }, updateStepMeta, updateStepData, getCurrentState) {
       const updatePreview = () => {
 
         let preview = delayTimerName({
@@ -428,11 +461,9 @@
         else {
           updatePreview()
         }
-      }).on('input', function (e) {
+      }).on('input change', function (e) {
         updatePreview()
       })
-
-      updatePreview()
     },
   }
 
@@ -441,17 +472,17 @@
       // language=html
       const redirectToURL = `<label class="row-label">${ __('Redirect to this URL...', 'groundhogg') }</label>
       ${ inputWithReplacements({
-          name: 'success_page',
+          name     : 'success_page',
           className: 'full-width',
-          value: meta.success_page || '',
+          value    : meta.success_page || '',
       }) }`
 
       // language=html
       const stayOnPage = `<label class="row-label">${ __('Show this message...', 'groundhogg') }</label>
       ${ textAreaWithReplacements({
-          name: 'success_message',
+          name     : 'success_message',
           className: 'full-width',
-          value: meta.success_message || '',
+          value    : meta.success_message || '',
       }) }`
 
       //language=HTML
@@ -465,9 +496,9 @@
                   <div class="display-flex gap-10 align-center">
                       <p>${ __('Stay on page after submitting?', 'groundhogg') }</p>
                       ${ toggle({
-                          name: 'enable_ajax',
-                          checked: Boolean(meta.enable_ajax),
-                          onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+                          name    : 'enable_ajax',
+                          checked : Boolean(meta.enable_ajax),
+                          onLabel : _x('YES', 'toggle switch', 'groundhogg'),
                           offLabel: _x('NO', 'toggle switch', 'groundhogg'),
                       }) }
                   </div>
@@ -487,12 +518,12 @@
                   <div class="display-flex column gap-10">
                       <label for="form-theme">${ __('Theme') }</label>
                       ${ select({
-                          id: 'form-theme',
-                          name: 'form_theme',
-                          options: {
+                          id      : 'form-theme',
+                          name    : 'form_theme',
+                          options : {
                               default: _x('Theme Default', 'form theme', 'groundhogg'),
-                              simple: _x('Simple', 'form theme', 'groundhogg'),
-                              modern: _x('Modern', 'form theme', 'groundhogg'),
+                              simple : _x('Simple', 'form theme', 'groundhogg'),
+                              modern : _x('Modern', 'form theme', 'groundhogg'),
                               classic: _x('Classic', 'form theme', 'groundhogg'),
                           },
                           selected: meta.theme ?? 'default',
@@ -501,18 +532,21 @@
                   <div class="display-flex column gap-10">
                       <label for="form-accent-color">${ __('Accent Color') }</label>
                       ${ input({
-                          id: 'form-accent',
-                          name: 'form_accent_color',
-                          type: 'color',
+                          id       : 'form-accent',
+                          name     : 'form_accent_color',
+                          type     : 'color',
                           className: 'color-picker',
-                          value: meta.accent_color,
+                          value    : meta.accent_color,
                       }) }
                   </div>
               </div>
           </div>
       `
     },
-    onMount ({ ID, meta }, updateStepMeta) {
+    onMount ({
+      ID,
+      meta,
+    }, updateStepMeta) {
 
       const parent = `#settings-${ ID }`
 
@@ -612,10 +646,10 @@
       $btn.on('click', e => {
 
         confirmationModal({
-          alert: `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.',
+          alert      : `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.',
             'groundhogg') }</p>`,
           confirmText: __('Upgrade Form', 'groundhogg'),
-          onConfirm: () => {
+          onConfirm  : () => {
 
             $(`#step_${ ID }_upgrade_form_confirm`).val('confirm')
             Funnel.save()
@@ -676,9 +710,9 @@
 
       wp.editor.remove(id)
       tinymceElement(id, {
-        replacements: true,
+        replacements : true,
         noteTemplates: true,
-        quicktags: false,
+        quicktags    : false,
       }, (content) => {
         Funnel.updateStepMeta({
           note_text: content,
@@ -691,9 +725,9 @@
 
       wp.editor.remove(id)
       tinymceElement(id, {
-        replacements: true,
+        replacements : true,
         taskTemplates: true,
-        quicktags: false,
+        quicktags    : false,
       }, (content) => {
         Funnel.updateStepMeta({
           content,
@@ -734,8 +768,8 @@
     return ItemPicker({
       id,
       noneSelected: 'Select tags...',
-      tags: true,
-      selected: tagIds.filter(id => TagsStore.has(id)).map(id => {
+      tags        : true,
+      selected    : tagIds.filter(id => TagsStore.has(id)).map(id => {
         let tag = TagsStore.get(id)
         return {
           id,
@@ -748,7 +782,13 @@
           limit: 30,
         })
 
-        return tags.map(({ ID, data }) => ( { id: ID, text: data.tag_name } ))
+        return tags.map(({
+          ID,
+          data,
+        }) => ( {
+          id  : ID,
+          text: data.tag_name,
+        } ))
       },
       createOption: async (id) => {
         let tag = await TagsStore.create({
@@ -757,13 +797,20 @@
           },
         })
 
-        return { id: tag.ID, text: tag.data.tag_name }
+        return {
+          id  : tag.ID,
+          text: tag.data.tag_name,
+        }
       },
-      onChange: items => onChange(items.map(({ id }) => id)),
+      onChange    : items => onChange(items.map(({ id }) => id)),
     })
   }
 
-  const tagPickerCallback = async ({ ID, meta, data }) => {
+  const tagPickerCallback = async ({
+    ID,
+    meta,
+    data,
+  }) => {
 
     let picker = document.getElementById(`step_${ ID }_tags`)
 
@@ -781,8 +828,8 @@
       }
 
       picker.replaceWith(TagPicker({
-        id: `step-tags-${ ID }`,
-        tagIds: tags,
+        id      : `step-tags-${ ID }`,
+        tagIds  : tags,
         onChange: tags => Funnel.updateStepMeta({
           tags,
         }),
@@ -806,8 +853,333 @@
     onActive: tagPickerCallback,
   })
 
+  Funnel.registerStepCallbacks('if_else', {
+    onActive: ({
+      ID,
+      meta,
+    }) => {
+
+      const {
+        include_filters = [],
+        exclude_filters = [],
+      } = meta
+
+      morphdom(document.getElementById(`step_${ ID }_include_filters`), ContactFilters(`step_${ ID }_include_filters`, include_filters, filters => {
+        Funnel.updateStepMeta({
+          include_filters: filters,
+          include_display: ContactFilterDisplay(filters).innerHTML,
+        })
+      }))
+
+      morphdom(document.getElementById(`step_${ ID }_exclude_filters`), ContactFilters(`step_${ ID }_exclude_filters`, exclude_filters, filters => {
+        Funnel.updateStepMeta({
+          exclude_filters: filters,
+          exclude_display: ContactFilterDisplay(filters).innerHTML,
+        })
+      }))
+    },
+  })
+
+  function generateBranchKey () {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    let result = ''
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return result
+  }
+
+  Funnel.registerStepCallbacks('split_path', {
+    onActive: ({
+      ID,
+      meta,
+    }) => {
+
+      let {
+        branches = {},
+      } = meta
+
+      if (typeof branches !== 'object' || Array.isArray(branches)) {
+        branches = {}
+      }
+
+      const updateBranch = (key, args) => {
+        branches[key] = {
+          ...branches[key] ?? {},
+          ...args,
+        }
+        Funnel.updateStepMeta({
+          branches,
+        })
+      }
+
+      const Branch = (
+        key, {
+          include_filters = [],
+          exclude_filters = [],
+          name = '',
+        }, morph, i) => Div({
+        id        : `path-${ key }`,
+        dataBranch: key,
+        className : 'gh-panel outlined closed',
+      }, [
+        Div({ className: 'gh-panel-header' }, [
+          H2({}, [name ? name : `Path ${ i + 1 }`]),
+          Button({
+            className: 'toggle-indicator',
+            onClick  : e => {
+              e.currentTarget.closest('.gh-panel').classList.toggle('closed')
+            },
+          }),
+        ]),
+        Div({ className: 'inside' }, [
+          Input({
+            id         : `path-${ key }-name`,
+            name       : 'path_name',
+            value      : name,
+            placeholder: `Path ${ i + 1 }`,
+            onInput    : e => updateBranch(key, { name: e.target.value }),
+          }),
+          Div({
+            className: 'include-search-filters',
+          }, [
+            ContactFilters(`path-${ key }-include`, include_filters, include_filters => {
+              updateBranch(key, {
+                include_filters,
+              })
+            }),
+          ]),
+          Div({
+            className: 'exclude-search-filters',
+          }, [
+            ContactFilters(`path-${ key }-exclude`, exclude_filters, exclude_filters => {
+              updateBranch(key, {
+                exclude_filters,
+              })
+            }),
+          ]),
+          Button({
+            className: 'gh-button danger',
+            id       : `delete-${ key }`,
+            onClick  : e => {
+              dangerConfirmationModal({
+                alert: '<p>Are you sure you want to delete this branch? Any steps in the branch will also be deleted.</p>',
+                onConfirm: () => {
+                  delete branches[key]
+
+                  Funnel.updateStepMeta({
+                    branches,
+                  })
+
+                  Funnel.save()
+                }
+              })
+            },
+          }, 'Delete'),
+        ]),
+      ])
+
+      const BranchEditor = () => Div({
+        id: `step_${ ID }_branches`,
+      }, morph => Div({
+        className: 'branch-contain',
+      }, [
+
+        Div({
+          className: 'branch-sortable',
+          onCreate : el => {
+            setTimeout(() => {
+
+              $(el).sortable({
+                update: (e, ui) => {
+
+                  let newOrder = {}
+
+                  el.querySelectorAll('[data-branch]').forEach(el => {
+                    newOrder[el.dataset.branch] = branches[el.dataset.branch]
+                  })
+
+                  branches = newOrder
+
+                  Funnel.updateStepMeta({
+                    branches,
+                  })
+
+                  morph()
+
+                },
+              })
+
+            }, 10)
+          },
+        }, [
+          ...Object.keys(branches).map(( (key, i) => Branch(key, branches[key], morph, i) )),
+        ]),
+
+        Button({
+          className: 'gh-button secondary',
+          onClick  : e => {
+
+            let key = generateBranchKey()
+
+            updateBranch(key, {
+              include_filters: [],
+              exclude_filters: [],
+            })
+
+            morph()
+
+            document.getElementById(`path-${ key }`).classList.toggle('closed')
+
+          },
+        }, 'New Branch'),
+
+      ]))
+
+      morphdom(document.getElementById(`step_${ ID }_branches`), BranchEditor())
+
+    },
+  })
+
+  Funnel.registerStepCallbacks('weighted_distribution', {
+    onActive: ({
+      ID,
+      meta,
+    }) => {
+
+      let {
+        branches = {},
+      } = meta
+
+      if (typeof branches !== 'object' || Array.isArray(branches)) {
+        branches = {}
+      }
+
+      const updateBranch = (key, args) => {
+        branches[key] = {
+          ...branches[key] ?? {},
+          ...args,
+        }
+        Funnel.updateStepMeta({
+          branches,
+        })
+      }
+
+      const Branch = (
+        key, {
+          weight = 0,
+        }, morph, i) => Div({
+        id        : `path-${ key }`,
+        dataBranch: key,
+        className : 'gh-panel outlined closed',
+      }, [
+        Div({ className: 'gh-panel-header' }, [
+          H2({}, [weight ? `Weight ${ weight }` : `Path ${ i + 1 }`]),
+          Button({
+            className: 'toggle-indicator',
+            onClick  : e => {
+              e.currentTarget.closest('.gh-panel').classList.toggle('closed')
+            },
+          }),
+        ]),
+        Div({ className: 'inside' }, [
+          Input({
+            type       : 'number',
+            id         : `path-${ key }-wight`,
+            name       : 'path_weight',
+            value      : weight,
+            placeholder: `Path ${ i + 1 }`,
+            onInput    : e => updateBranch(key, { weight: e.target.value }),
+          }),
+          Button({
+            className: 'gh-button danger',
+            id       : `delete-${ key }`,
+            onClick  : e => {
+
+              dangerConfirmationModal({
+                alert: '<p>Are you sure you want to delete this branch? Any steps in the branch will also be deleted.</p>',
+                onConfirm: () => {
+                  delete branches[key]
+
+                  Funnel.updateStepMeta({
+                    branches,
+                  })
+
+                  Funnel.save()
+                }
+              })
+            },
+          }, 'Delete'),
+        ]),
+      ])
+
+      const BranchEditor = () => Div({
+        id: `step_${ ID }_branches`,
+      }, morph => Div({
+        className: 'branch-contain',
+      }, [
+
+        Div({
+          className: 'branch-sortable',
+          onCreate : el => {
+            setTimeout(() => {
+
+              $(el).sortable({
+                update: (e, ui) => {
+
+                  let newOrder = {}
+
+                  el.querySelectorAll('[data-branch]').forEach(el => {
+                    newOrder[el.dataset.branch] = branches[el.dataset.branch]
+                  })
+
+                  branches = newOrder
+
+                  Funnel.updateStepMeta({
+                    branches,
+                  })
+
+                  morph()
+
+                },
+              })
+
+            }, 10)
+          },
+        }, [
+          ...Object.keys(branches).map(( (key, i) => Branch(key, branches[key], morph, i) )),
+        ]),
+
+        Button({
+          className: 'gh-button secondary',
+          onClick  : e => {
+
+            let key = generateBranchKey()
+
+            updateBranch(key, {
+              weight: 0,
+            })
+
+            morph()
+
+            document.getElementById(`path-${ key }`).classList.toggle('closed')
+
+          },
+        }, 'New Branch'),
+
+      ]))
+
+      morphdom(document.getElementById(`step_${ ID }_branches`), BranchEditor())
+
+    },
+  })
+
   Funnel.registerStepCallbacks('send_email', {
-    onActive: async ({ ID, meta, data }) => {
+    onActive   : async ({
+      ID,
+      meta,
+      data,
+    }) => {
 
       let id = `step_${ ID }_send_email`
       let { email_id } = meta
@@ -816,8 +1188,8 @@
         changing: false,
       }
 
-      if ( email_id ){
-        await EmailsStore.maybeFetchItem( email_id )
+      if (email_id) {
+        await EmailsStore.maybeFetchItem(email_id)
       }
 
       const morphPreview = () => {
@@ -831,14 +1203,13 @@
       const openEmailEditor = email => {
         ModalFrame({
           closeOnOverlayClick: false,
-          onOpen: ({ close }) => {
+          onOpen             : ({ close }) => {
             Groundhogg.EmailEditor({
               email,
-              onSave: email => {
+              onSave : email => {
                 Funnel.updateStepMeta({
                   email_id: email.ID,
                 })
-                Funnel.save()
               },
               onClose: close,
             })
@@ -847,15 +1218,24 @@
       }
 
       const EmailPicker = ItemPicker({
-        id: `step-${ ID }-email-picker`,
+        id          : `step-${ ID }-email-picker`,
         noneSelected: 'Search for an email...',
-        selected: email_id ? { id: email_id, text: getEmail().data.title } : [],
-        multiple: false,
+        selected    : email_id ? {
+          id  : email_id,
+          text: getEmail().data.title,
+        } : [],
+        multiple    : false,
         fetchOptions: (search) => {
           return EmailsStore.fetchItems({ search }).
-            then(emails => emails.map(({ ID, data }) => ( { id: ID, text: data.title } )))
+            then(emails => emails.map(({
+              ID,
+              data,
+            }) => ( {
+              id  : ID,
+              text: data.title,
+            } )))
         },
-        onChange: item => {
+        onChange    : item => {
 
           email_id = item ? item.id : false
 
@@ -863,30 +1243,30 @@
             email_id,
           })
 
-          setTimeout( morphPreview, 100 )
+          setTimeout(morphPreview, 100)
 
           // morphPreview()
 
         },
-        style: {
+        style       : {
           minWidth: '50%',
         },
       })
 
       const Preview = () => Div({
-          id: `step-${ ID }-email-preview-panel`,
+          id       : `step-${ ID }-email-preview-panel`,
           className: 'gh-panel email-preview',
-          style: {
+          style    : {
             backgroundColor: '#fff',
-            overflow: 'hidden',
+            overflow       : 'hidden',
           },
         }, [
           Div({
             className: 'space-between has-box-shadow',
-            style: {
-              paddingLeft: '20px',
+            style    : {
+              paddingLeft : '20px',
               paddingRight: '10px',
-              minHeight: '62px',
+              minHeight   : '62px',
             },
           }, [
             email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker,
@@ -895,9 +1275,9 @@
             }, [
 
               !hasEmail() ? null : Button({
-                id: `step_${ ID }_edit_email`,
+                id       : `step_${ ID }_edit_email`,
                 className: 'gh-button primary text gap-10 display-flex',
-                onClick: e => {
+                onClick  : e => {
                   openEmailEditor(getEmail())
                 },
               }, [
@@ -905,9 +1285,9 @@
                 __('Edit'),
               ]),
               email_id ? null : Button({
-                id: `step_${ ID }_create_email`,
+                id       : `step_${ ID }_create_email`,
                 className: 'gh-button primary text gap-10 display-flex',
-                onClick: e => {
+                onClick  : e => {
                   openEmailEditor({})
                 },
               }, [
@@ -915,18 +1295,18 @@
                 __('Create new email'),
               ]),
               !hasEmail() ? null : Button({
-                id: `step_${ ID }_email_more`,
+                id       : `step_${ ID }_email_more`,
                 className: 'gh-button secondary text icon',
-                onClick: e => {
+                onClick  : e => {
                   moreMenu(`#step_${ ID }_email_more`, [
                     {
-                      key: 'edit',
-                      text: __('Edit'),
+                      key     : 'edit',
+                      text    : __('Edit'),
                       onSelect: () => openEmailEditor(getEmail()),
                     },
                     {
-                      key: 'add',
-                      text: __('Create New Email'),
+                      key     : 'add',
+                      text    : __('Create New Email'),
                       onSelect: () => {
                         openEmailEditor({})
                       },
@@ -941,18 +1321,18 @@
           }, [
             // Profile pick
             getEmail() ? makeEl('img', {
-              src: getEmail().context.from_avatar,
+              src      : getEmail().context.from_avatar,
               className: 'from-avatar',
-              height: 40,
-              width: 40,
-              style: {
+              height   : 40,
+              width    : 40,
+              style    : {
                 borderRadius: '50%',
               },
             }) : Div({
               className: 'skeleton-loading',
-              style: {
-                width: '40px',
-                height: '40px',
+              style    : {
+                width       : '40px',
+                height      : '40px',
                 borderRadius: '50%',
               },
             }),
@@ -966,24 +1346,24 @@
               // From Email
             ]) : Div({
               className: 'skeleton-loading',
-              style: {
-                width: 'auto',
+              style    : {
+                width   : 'auto',
                 flexGrow: '1',
-                height: '40px',
+                height  : '40px',
                 // borderRadius: '50%',
               },
             }),
           ]),
           !email_id ? null : ( getEmail() ? Iframe({
-            id: `step-${ ID }-preview-${ email_id }`,
+            id    : `step-${ ID }-preview-${ email_id }`,
             height: 500,
-            style: {
-              width: '100%',
+            style : {
+              width : '100%',
               height: '500px',
             },
           }, getEmail().context.built) : Div({
             className: 'skeleton-loading',
-            style: {
+            style    : {
               height: '460px',
               margin: '20px',
             },
@@ -1017,7 +1397,11 @@
         }
       }
     },
-    onDuplicate: ({ ID, data, meta }, res, rej) => {
+    onDuplicate: ({
+      ID,
+      data,
+      meta,
+    }, res, rej) => {
 
       // Email id was not set
       if (!meta.email_id) {
@@ -1025,15 +1409,15 @@
       }
 
       confirmationModal({
-        alert: `<p>${ __('Do you also want to make a new copy of the email template?', 'groundhogg') }</p>`,
+        alert      : `<p>${ __('Do you also want to make a new copy of the email template?', 'groundhogg') }</p>`,
         confirmText: __('Yes, make a copy!', 'groundhogg'),
-        closeText: __('No, use the original.', 'groundhogg'),
-        onConfirm: e => {
+        closeText  : __('No, use the original.', 'groundhogg'),
+        onConfirm  : e => {
           res({
             duplicate_email: true,
           })
         },
-        onCancel: e => {
+        onCancel   : e => {
           res({})
         },
       })
