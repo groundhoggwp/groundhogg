@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 3.7.5
+Stable tag: 4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,7 +349,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 3.7.5 (2025-02-10) =
+= 4.0 (2025-02-10) =
+* ADDED Funnel branching and new logic steps
+ * Yes/No logic
+ * Multi-branch logic
+ * Weight distribution
+ * Split-testing
 * ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
 * ADDED Additional bulk actions in the event logs tables.
 * ADDED Setting to disable page tracking.
