@@ -336,7 +336,7 @@ class Scripts {
 			'groundhogg-admin-email-log',
 		], GROUNDHOGG_VERSION );
 
-		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/features/send-broadcast' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . 'js/admin/features/send-broadcast' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
@@ -346,7 +346,7 @@ class Scripts {
 			'wp-date',
 		] );
 
-		wp_register_script( 'groundhogg-admin-funnel-scheduler', GROUNDHOGG_ASSETS_URL . '/js/admin/funnels/funnel-scheduler' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-funnel-scheduler', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-scheduler' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
@@ -356,7 +356,7 @@ class Scripts {
 			'wp-date',
 		] );
 
-		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
+		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . 'js/admin/formatting' . $dot_min . '.js' );
 
 		wp_register_script( 'groundhogg-admin-color', GROUNDHOGG_ASSETS_URL . 'js/admin/color-picker' . $dot_min . '.js', [
 			'jquery',

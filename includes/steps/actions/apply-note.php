@@ -61,7 +61,7 @@ class Apply_Note extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Add a note to the notes section of a contact.', 'step_description', 'groundhogg' );
+		return _x( 'Add a note to the contact.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -70,8 +70,8 @@ class Apply_Note extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/apply-note.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/add-note.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/apply-note.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/add-note.svg';
 	}
 
 	/**

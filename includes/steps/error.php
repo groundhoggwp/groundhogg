@@ -3,8 +3,6 @@
 namespace Groundhogg\Steps;
 
 use Groundhogg\Step;
-use function Groundhogg\html;
-use function Groundhogg\key_to_words;
 
 class Error extends Funnel_Step {
 
@@ -25,7 +23,7 @@ class Error extends Funnel_Step {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/no-icon.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 	}
 
 	/**

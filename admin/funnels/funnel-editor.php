@@ -12,6 +12,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_pro_features_active;
 
 /**
  * Edit Funnel
@@ -76,12 +77,22 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				continue;
 			}
 
+            $classes = [
+                'step-element step-draggable'
+            ];
+
+            if ( $step->is_premium() && ! is_pro_features_active() ){
+                $classes[] = 'premium';
+            }
+
 			?>
         <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-name="<?php esc_attr_e( $step->get_name() ); ?>">
+            <div class="gh-tooltip top"><?php echo $step->get_description(); ?></div>
             <div id='<?php echo $step->get_type(); ?>'
-                 data-group="<?php echo $step->get_group(); ?>"
-                 title="<?php esc_attr_e( $step->get_description() ); ?>"
-                 class="wpgh-element ui-draggable">
+                 data-type="<?php esc_attr_e( $step->get_type() ); ?>"
+                 data-name="<?php esc_attr_e( $step->get_name() ); ?>"
+                 data-group="<?php esc_attr_e( $step->get_group() ); ?>"
+                 class="<?php echo implode( ' ', $classes ) ?>">
                 <div class="step-icon">
 					<?php if ( $step->icon_is_svg() ): ?>
 						<?php echo $step->get_icon_svg(); ?>
@@ -98,19 +109,6 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 		endif;
 	}
 }
-
-// get all steps an initialize the merged changes
-$funnel_editor_steps = $funnel->get_steps_for_editor();
-
-// validate the settings so errors appear
-foreach ( $funnel_editor_steps as $step ) {
-	$step->get_step_element()->validate_settings( $step );
-}
-
-// filter by the main branch
-$main_branch_steps = array_filter( $funnel_editor_steps, function ( $step ) {
-    return $step->is_main_branch();
-} );
 
 ?>
 <form method="post" id="funnel-form" class="gh-fixed-ui" data-status="<?php _e( $funnel->get_status() ) ?>">
@@ -191,7 +189,7 @@ $main_branch_steps = array_filter( $funnel_editor_steps, function ( $step ) {
                 <div id="step-sortable"
                      class="step-branch"
                      data-branch="main"
-                ><?php foreach ( $main_branch_steps as $step ):$step->sortable_item();endforeach; ?></div>
+                ><?php $funnel->step_flow(); ?></div>
             </div>
             <button class="add-step-button-flow" type="button" id="add-new-step">
 				<?php dashicon_e( 'plus-alt2' ); ?>
@@ -216,12 +214,7 @@ $main_branch_steps = array_filter( $funnel_editor_steps, function ( $step ) {
                     </div>
                 </div>
                 <div class="step-settings">
-				    <?php foreach ( $main_branch_steps as $step ):
-					    $step->html_v2();
-				    endforeach; ?>
-                </div>
-                <div id="funnel-health-check">
-
+				    <?php $funnel->step_settings() ?>
                 </div>
             </div>
         </div>

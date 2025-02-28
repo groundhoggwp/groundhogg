@@ -19,6 +19,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_field_label;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_recaptcha_enabled;
@@ -1609,6 +1610,10 @@ class Form_v2 extends Step {
 
 		// Init step as normal
 		parent::__construct( $id );
+
+		if ( get_url_var( 'preview' ) && current_user_can( 'edit_funnels' ) ) {
+			$this->merge_changes();
+		}
 	}
 
 	/**

@@ -4,39 +4,30 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Steps\Actions\Action;
 use Groundhogg\Steps\Actions\Admin_Notification;
-use Groundhogg\Steps\Actions\Advanced_Timer;
 use Groundhogg\Steps\Actions\Apply_Note;
-use Groundhogg\Steps\Actions\Apply_Owner;
 use Groundhogg\Steps\Actions\Apply_Tag;
 use Groundhogg\Steps\Actions\Create_Task;
-use Groundhogg\Steps\Actions\Create_User;
-use Groundhogg\Steps\Actions\Date_Timer;
 use Groundhogg\Steps\Actions\Delay_Timer;
-use Groundhogg\Steps\Actions\Edit_Meta;
-use Groundhogg\Steps\Actions\Field_Timer;
-use Groundhogg\Steps\Actions\HTTP_Post;
 use Groundhogg\Steps\Actions\Remove_Tag;
 use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Steps\Benchmarks\Account_Created;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
+use Groundhogg\Steps\Benchmarks\Email_Opened;
 use Groundhogg\Steps\Benchmarks\Form_Filled;
 use Groundhogg\Steps\Benchmarks\Link_Clicked;
-use Groundhogg\Steps\Benchmarks\Login_Status;
 use Groundhogg\steps\benchmarks\Optin_Status_Changed;
-use Groundhogg\Steps\Benchmarks\Page_Visited;
-use Groundhogg\Steps\Benchmarks\Plugin_Api;
-use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
 use Groundhogg\Steps\Benchmarks\Task_Completed;
 use Groundhogg\Steps\Benchmarks\Web_Form;
 use Groundhogg\Steps\Logic\If_Else;
 use Groundhogg\Steps\Logic\Logic;
-use Groundhogg\steps\logic\Split_Path;
-use Groundhogg\steps\logic\Split_Test;
-use Groundhogg\steps\logic\Weighted_Distribution;
+use Groundhogg\Steps\Premium\Logic\Split_Path;
+use Groundhogg\Steps\Premium\Logic\Split_Test;
+use Groundhogg\Steps\Premium\Logic\Weighted_Distribution;
 use function Groundhogg\get_array_var;
+use function Groundhogg\is_pro_features_active;
 
 /**
  * Created by PhpStorm.
@@ -112,19 +103,48 @@ class Manager {
 		$this->add_step( new Optin_Status_Changed() );
 		$this->add_step( new Form_Filled() );
 		$this->add_step( new Task_Completed() );
+		$this->add_step( new Email_Opened() );
 
 		/* Other */
 		$this->add_step( new Error() );
 
 		/* Logic */
 		$this->add_step( new If_Else() );
-		$this->add_step( new Split_Path() );
-		$this->add_step( new Split_Test() );
-		$this->add_step( new Weighted_Distribution() );
+
+		// Premium steps
+		if ( ! is_pro_features_active() ) {
+			// actions
+			$this->add_step( new Premium\Actions\Apply_Owner() );
+			$this->add_step( new Premium\Actions\Create_User() );
+			$this->add_step( new Premium\Actions\Edit_Meta() );
+			$this->add_step( new Premium\Actions\Date_Timer() );
+			$this->add_step( new Premium\Actions\Field_Timer() );
+			$this->add_step( new Premium\Actions\Advanced_Timer() );
+			$this->add_step( new Premium\Actions\HTTP_Post() );
+			$this->add_step( new Premium\Actions\Loop() );
+			$this->add_step( new Premium\Actions\New_Activity() );
+			$this->add_step( new Premium\Actions\Plugin_Action() );
+			$this->add_step( new Premium\Actions\Skip() );
+
+			// benchmarks
+			$this->add_step( new Premium\Benchmarks\Custom_Activity() );
+			$this->add_step( new Premium\Benchmarks\Field_Changed() );
+			$this->add_step( new Premium\Benchmarks\Login_Status() );
+			$this->add_step( new Premium\Benchmarks\Page_Visited() );
+			$this->add_step( new Premium\Benchmarks\Plugin_Api() );
+			$this->add_step( new Premium\Benchmarks\Post_Published() );
+			$this->add_step( new Premium\Benchmarks\Role_Changed() );
+			$this->add_step( new Premium\Benchmarks\Webhook_Listener() );
+
+			// logic
+			$this->add_step( new Split_Path() );
+			$this->add_step( new Split_Test() );
+			$this->add_step( new Weighted_Distribution() );
+			$this->add_step( new Premium\Logic\Logic_Loop() );
+
+		}
 
 		do_action( 'groundhogg/steps/init', $this );
-
-		// Order by subgroup
 	}
 
 	public function __set( $name, $value ) {
@@ -140,13 +160,13 @@ class Manager {
 		$this->elements[ $step->get_type() ] = $step;
 	}
 
-	function filter_by_group( $group ){
+	function filter_by_group( $group ) {
 		return array_filter( $this->elements, function ( $element ) use ( $group ) {
 			return $element->get_group() === $group;
 		} );
 	}
 
-	function filter_by_sub_group( $group ){
+	function filter_by_sub_group( $group ) {
 		return array_filter( $this->elements, function ( $element ) use ( $group ) {
 			return $element->get_sub_group() === $group;
 		} );

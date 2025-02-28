@@ -1238,6 +1238,20 @@ table .column-steps {
       border-radius: 3px;
     }
 
+    &.logic {
+      border: 2px solid $secondary-purple;
+      background-color: #e3c4fc;
+      border-radius: 3px;
+      transform: rotate(45deg);
+
+      width: 23px;
+      height: 23px;
+
+      svg {
+        transform: rotate(-45deg);
+      }
+    }
+
     svg,
     img {
       width: 100%;
@@ -1326,6 +1340,21 @@ table .column-steps {
     border-color: var(--color-dark-800);
   }
 
+  .gh-site-button {
+    border-radius: 0.75rem;
+    border-style: solid;
+    border-width: 1px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-color: var(--color-dark-800);
+    text-transform: uppercase;
+    padding: 0.625rem 1.25rem;
+
+    &.primary {
+      background-color: var(--color-yellow);
+    }
+  }
+
   .gh-secondary-card {
     //padding: 1.25rem;
     border-radius: 0.75rem;
@@ -1336,6 +1365,7 @@ table .column-steps {
     border-bottom-width: 3px;
     border-color: var(--color-dark-800);
   }
+
 }
 
 [data-gh-href]{

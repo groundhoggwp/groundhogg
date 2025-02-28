@@ -5,9 +5,10 @@ namespace Groundhogg\Steps\Logic;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\Step;
 use function Groundhogg\html;
 
-class If_Else extends Split_Path {
+class If_Else extends Branch_Logic {
 
 	public function get_name() {
 		return 'Yes/No';
@@ -18,11 +19,11 @@ class If_Else extends Split_Path {
 	}
 
 	public function get_description() {
-		// TODO: Implement get_description() method.
+		return 'Segment contacts down the Yes branch if they meet specific criteria.';
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/remove-tag.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/yes-no.svg';
 	}
 
 	public function settings( $step ) {
@@ -33,6 +34,21 @@ class If_Else extends Split_Path {
 		echo html()->e( 'div', [ 'class' => 'exclude-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'exclude_filters' ) ] ) ] );
 
 		?><p></p><?php
+	}
+
+	/**
+	 * @param Step $step
+	 *
+	 * @return void
+	 */
+	public function validate_settings( Step $step ) {
+
+		$include_filters = $this->get_setting( 'include_filters' );
+		$exclude_filters = $this->get_setting( 'exclude_filters' );
+
+		if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
+			$step->add_error( new \WP_Error( 'empty_filters', 'No filters have been configured, so all contacts will travel the yes branch by default.' ) );
+		}
 	}
 
 	public function get_settings_schema() {
@@ -75,8 +91,8 @@ class If_Else extends Split_Path {
 	}
 
 	/**
-     * Yes/No only has yes, no branches
-     *
+	 * Yes/No only has yes, no branches
+	 *
 	 * @return string[]
 	 */
 	public function get_branches() {
@@ -87,19 +103,19 @@ class If_Else extends Split_Path {
 	}
 
 	/**
-     * Returns YES or NO
-     *
+	 * Returns YES or NO
+	 *
 	 * @param string $branch
 	 *
 	 * @return string YES/NO
 	 */
-    protected function get_branch_name( $branch ) {
-	    return strtoupper( explode( '-', $branch )[1] );
-    }
+	protected function get_branch_name( $branch ) {
+		return strtoupper( explode( '-', $branch )[1] );
+	}
 
 	/**
-     * Which path?
-     *
+	 * Which path?
+	 *
 	 * @throws \Groundhogg\DB\Query\FilterException
 	 *
 	 * @param Contact $contact
@@ -112,7 +128,7 @@ class If_Else extends Split_Path {
 		$path = explode( '-', $branch );
 		$path = $path[1]; // this is the key within $branches
 
-        // ideally this query will be cached in the event it gets run more than once.
+		// ideally this query will be cached in the event it gets run more than once.
 		$contactQuery = new Contact_Query();
 		$contactQuery->set_query_params( [
 			'limit'           => 1,
@@ -123,19 +139,19 @@ class If_Else extends Split_Path {
 
 		$count = $contactQuery->count();
 
-        switch ( $path ) {
-            case 'yes':
-                return $count === 1;
-            case 'no':
-                return $count === 0;
-        }
+		switch ( $path ) {
+			case 'yes':
+				return $count === 1;
+			case 'no':
+				return $count === 0;
+		}
 
-        return false;
+		return false;
 	}
 
 	/**
-     * Step title
-     *
+	 * Step title
+	 *
 	 * @param $step
 	 *
 	 * @return false|string

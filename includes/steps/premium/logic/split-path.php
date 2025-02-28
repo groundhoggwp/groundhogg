@@ -1,18 +1,22 @@
 <?php
 
-namespace Groundhogg\steps\logic;
+namespace Groundhogg\Steps\Premium\Logic;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\steps\logic\Branch_Logic;
+use Groundhogg\Steps\Premium\Trait_Premium_Step;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\get_array_var;
-use function Groundhogg\html;
+use function Groundhogg\int_to_letters;
 
-class Split_Path extends Logic {
+class Split_Path extends Branch_Logic {
+
+	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Split Path';
+		return 'Multi Branch';
 	}
 
 	public function get_type() {
@@ -20,24 +24,11 @@ class Split_Path extends Logic {
 	}
 
 	public function get_description() {
-		// TODO: Implement get_description() method.
-	}
-
-	public function get_sub_group() {
-		return 'logic';
+		return 'Similar to the Yes/No step, but you can add additional branches.';
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/remove-tag.svg';
-	}
-
-	public function settings( $step ) {
-
-		echo html()->e( 'p', [], __( 'You can specify as many paths as you would like. The contact will travel down the first path they match with, from left to right (top to bottom).' ) );
-
-		echo html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'branches' ) ] );
-
-		?><p></p><?php
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/split-path.svg';
 	}
 
 	/**
@@ -206,12 +197,12 @@ class Split_Path extends Logic {
 			return 'Else';
 		}
 
-		$i = 1;
+		$i = 0;
 
 		foreach ( $branches as $branch_key => $branch_value ) {
 
 			if ( $branch_key === $path ) {
-				return get_array_var( get_array_var( $branches, $path ), 'name', 'Path ' . $i );
+				return get_array_var( get_array_var( $branches, $path ), 'name', int_to_letters( $i ) );
 			}
 
 			$i ++;

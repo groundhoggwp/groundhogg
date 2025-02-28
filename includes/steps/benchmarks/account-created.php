@@ -3,9 +3,11 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\array_bold;
+use function Groundhogg\html;
+use function Groundhogg\orList;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -65,7 +67,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'step_description', 'groundhogg' );
+		return _x( 'Runs whenever a WordPress account with the specified role(s) is created.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -74,37 +76,58 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/account-created.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/user-created.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/account-created.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/user-created.svg';
 	}
 
 	/**
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		$this->start_controls_section();
 
-		$this->add_control( 'role', [
-			'label'       => __( 'User Role(s):', 'groundhogg' ),
-			'type'        => HTML::SELECT2,
-			'default'     => 'subscriber',
-			'description' => __( 'New users with these roles will trigger this benchmark.', 'groundhogg' ),
-			'field'       => [
-				'multiple' => true,
-				'data'     => Plugin::$instance->roles->get_roles_for_select(),
-			],
+		echo html()->e( 'p', [], 'Run when a user account with any of the following roles is created...' );
+
+		echo html()->select2( [
+			'name'        => $this->setting_name_prefix( 'role' ) . '[]',
+			'multiple'    => true,
+			'placeholder' => 'Any role...',
+			'selected'    => $this->get_setting( 'role' ),
+			'options'     => Plugin::$instance->roles->get_roles_for_select()
 		] );
 
-		$this->end_controls_section();
+
+		?><p></p><?php
+	}
+
+	public function generate_step_title( $step ) {
+
+		$roles = $this->get_setting( 'role' );
+		$roles = array_map( function ( $role ) {
+
+			if ( ! wp_roles()->is_role( $role ) ) {
+				return '';
+			}
+
+			return translate_user_role( wp_roles()->roles[ $role ]['name'] );
+		}, $roles );
+
+        $role = ! empty( $roles) ? orList( array_bold( $roles ) ) : 'user';
+
+		return 'When a ' . $role . ' is created';
 	}
 
 	public function get_settings_schema() {
 		return [
 			'role' => [
-				'default' => [ 'subscriber' ],
+				'default'  => [],
+				'if_undefined' => [],
 				'sanitize' => function ( $roles ) {
+					if ( ! is_array( $roles ) ) {
+						return [];
+					}
+
 					return array_filter( $roles, [ wp_roles(), 'is_role' ] );
-				}
+				},
 			]
 		];
 	}

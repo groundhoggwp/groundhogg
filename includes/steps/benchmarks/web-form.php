@@ -8,6 +8,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Properties;
 use Groundhogg\Step;
 use function Groundhogg\array_apply_callbacks;
+use function Groundhogg\bold_it;
 use function Groundhogg\encrypt;
 use function Groundhogg\html;
 use function Groundhogg\managed_page_url;
@@ -92,66 +93,63 @@ class Web_Form extends Benchmark {
              class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
 
             <!-- WARNINGS -->
-			<?php $this->before_step_warnings() ?>
-			<?php if ( $step->has_errors() ): ?>
-                <div class="step-warnings">
-					<?php foreach ( $step->get_errors() as $error ): ?>
-
-                        <div id="<?php $error->get_error_code() ?>"
-                             class="notice notice-warning is-dismissible">
-							<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
-                        </div>
-					<?php endforeach; ?>
-                </div>
-			<?php endif; ?>
+			<?php $this->__step_warnings( $step ); ?>
             <!-- SETTINGS -->
             <div class="step-flex">
                 <div class="step-edit panels">
-                    <div class="gh-panel">
-						<?php $this->step_title_edit( $step ); ?>
-                    </div>
+					<?php
 
-					<?php $this->settings( $step ); ?>
+					echo html()->input( [
+						'id'          => $this->setting_id_prefix( 'form_name' ),
+						'name'        => $this->setting_name_prefix( 'form_name' ),
+						'value'       => $this->get_setting( 'form_name', $step->step_title ),
+						'class'       => 'full-width',
+						'style'       => [
+							'font-size' => '18px'
+						],
+						'placeholder' => 'Form name...'
+					] );
 
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+					$this->settings( $step );
+					do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );
+					do_action( 'groundhogg/steps/settings/before', $this );
+					do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step );
+					do_action( 'groundhogg/steps/settings/after', $this );
+
+					?>
                 </div>
                 <div class="step-notes">
 					<?php $this->before_step_notes( $step ); ?>
-					<?php if ( $step->is_benchmark() ): ?>
-                        <div class="gh-panel benchmark-settings">
-                            <div class="gh-panel-header">
-                                <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
-                            </div>
-                            <div class="inside display-flex gap-20 column">
-								<?php if ( ! $step->is_starting() ):
-
-									echo html()->checkbox( [
-										'label'   => 'Allow contacts to enter the funnel at this step',
-										'name'    => $this->setting_name_prefix( 'is_entry' ),
-										'checked' => $step->is_entry()
-									] );
-
-                                    echo html()->checkbox( [
-                                        'label'   => 'Allow contacts to pass through this benchmark',
-                                        'name'    => $this->setting_name_prefix( 'can_passthru' ),
-                                        'checked' => $step->can_passthru()
-                                    ] );
-
-								endif;
+                    <div class="gh-panel benchmark-settings">
+                        <div class="gh-panel-header">
+                            <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
+                        </div>
+                        <div class="inside display-flex gap-20 column">
+							<?php if ( ! $step->is_starting() ):
 
 								echo html()->checkbox( [
-									'label'   => 'Track conversion when completed',
-									'name'    => $this->setting_name_prefix( 'is_conversion' ),
-									'checked' => $step->is_conversion()
+									'label'   => 'Allow contacts to enter the funnel at this step',
+									'name'    => $this->setting_name_prefix( 'is_entry' ),
+									'checked' => $step->is_entry()
 								] );
 
-								?>
-                            </div>
+								echo html()->checkbox( [
+									'label'   => 'Allow contacts to pass through this benchmark',
+									'name'    => $this->setting_name_prefix( 'can_passthru' ),
+									'checked' => $step->can_passthru()
+								] );
+
+							endif;
+
+							echo html()->checkbox( [
+								'label'   => 'Track conversion when completed',
+								'name'    => $this->setting_name_prefix( 'is_conversion' ),
+								'checked' => $step->is_conversion()
+							] );
+
+							?>
                         </div>
-					<?php endif; ?>
+                    </div>
 					<?php
 					echo html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
@@ -170,7 +168,7 @@ class Web_Form extends Benchmark {
 	protected function before_step_notes( Step $step ) {
 
 		$form     = new Form\Form_v2( [ 'id' => $step->get_id() ] );
-		$form_url = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
+		$form_url = add_query_arg( 'preview', '1', managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) ) );
 
 		?>
         <div class="gh-panel">
@@ -311,8 +309,8 @@ class Web_Form extends Benchmark {
 	 */
 	public function sanitize_form( $form ) {
 
-        // let's just make sure it's the format we expect
-        $form = json_decode( wp_json_encode( $form ), true );
+		// let's just make sure it's the format we expect
+		$form = json_decode( wp_json_encode( $form ), true );
 
 		$form['button'] = $this->sanitize_form_field( $form['button'] );
 		$form['fields'] = array_map( [ $this, 'sanitize_form_field' ], $form['fields'] );
@@ -337,6 +335,10 @@ class Web_Form extends Benchmark {
 				'default'  => [],
 				'sanitize' => [ $this, 'sanitize_form' ],
 			],
+			'form_name'       => [
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field',
+			],
 			'enable_ajax'     => [
 				'default'  => false,
 				'sanitize' => 'boolval'
@@ -358,6 +360,10 @@ class Web_Form extends Benchmark {
 				'sanitize' => 'sanitize_text_field',
 			]
 		];
+	}
+
+	public function generate_step_title( $step ) {
+		return sprintf( __( 'Submits %s' ), bold_it( $this->get_setting( 'form_name' ) ) );
 	}
 
 	protected function get_the_contact() {

@@ -204,7 +204,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'total_contacts_added_to_funnel',
 				'total_contacts_in_funnel',
 				'table_form_activity',
-				'table_funnel_stats',
+//				'table_funnel_stats',
 				'table_all_funnel_emails_performance',
 				'total_emails_sent',
 				'email_open_rate',

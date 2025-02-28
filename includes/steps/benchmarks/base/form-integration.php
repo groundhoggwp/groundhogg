@@ -186,12 +186,11 @@ abstract class Form_Integration extends Benchmark {
 		if ( $field_map && ! in_array( 'email', $field_map ) ) {
 			$step->add_error( 'missing_email_field', __( 'There is no email address field mapped, submissions may not be captured correctly.', 'groundhogg' ) );
 		}
-
 	}
 
 	public function get_settings_schema() {
 		return [
-			'form_id' => [
+			'form_id'   => [
 				'default'  => 0,
 				'sanitize' => 'absint'
 			],

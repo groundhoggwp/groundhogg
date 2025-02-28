@@ -70,8 +70,8 @@ class Optin_Status_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/optin-status-changed.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-applied.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/optin-status-changed.svg';
 	}
 
 
@@ -113,7 +113,7 @@ class Optin_Status_Changed extends Benchmark {
 					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
 				}
 			],
-			'status' => [
+			'status'      => [
 				'default'  => [],
 				'sanitize' => function ( $statuses ) {
 					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );

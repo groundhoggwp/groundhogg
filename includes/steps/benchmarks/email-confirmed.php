@@ -35,7 +35,7 @@ class Email_Confirmed extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Email Confirmed', 'step_name', 'groundhogg' );
+		return _x( 'Opt-in Status Confirmed', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -47,9 +47,9 @@ class Email_Confirmed extends Benchmark {
 		return 'email_confirmed';
 	}
 
-    public function get_sub_group() {
-	    return 'crm';
-    }
+	public function get_sub_group() {
+		return 'crm';
+	}
 
 	/**
 	 * Get the description
@@ -57,7 +57,11 @@ class Email_Confirmed extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever a contact confirms their email.', 'step_description', 'groundhogg' );
+		return _x( 'Runs whenever a contact confirms their email address, changing their opt-in status to confirmed.', 'step_description', 'groundhogg' );
+	}
+
+	public function generate_step_title( $step ) {
+		return 'Opt-in status is <b>Confirmed</b>';
 	}
 
 	/**
@@ -66,8 +70,8 @@ class Email_Confirmed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/email-confirmed.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/email-confirmed.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/email-confirmed.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/email-confirmed.svg';
 	}
 
 	/**
@@ -79,7 +83,7 @@ class Email_Confirmed extends Benchmark {
             <tbody>
             <tr>
                 <td>
-                    <p class="description"><?php _e( 'Runs whenever an email is confirmed while in this funnel', 'groundhogg' ); ?></p>
+                    <p class="description"><?php _e( 'Runs when a contact confirms their email address, changing their opt-in status <b>Confirmed</b>.', 'groundhogg' ); ?></p>
                 </td>
             </tr>
             </tbody>

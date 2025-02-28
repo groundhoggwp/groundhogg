@@ -15,23 +15,58 @@ $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgb(108, 25, 173);
-$secondary-purple-25: rgba(108, 25, 173, 0.25);
-$secondary-purple-5: rgba(108, 25, 173, 0.05);
+$secondary-purple-25: rgba($secondary-purple, 0.25);
+$secondary-purple-10: rgba($secondary-purple, 0.10);
+$secondary-purple-5: rgba($secondary-purple, 0.05);
 $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
-$benchmark-orange-50: rgba(245, 129, 21, 0.50);
-$benchmark-orange-25: rgba(245, 129, 21, 0.25);
-$benchmark-orange-5: rgba(245, 129, 21, 0.05);
+$benchmark-orange-50: rgba($benchmark-orange, 0.50);
+$benchmark-orange-25: rgba($benchmark-orange, 0.25);
+$benchmark-orange-10: rgba($benchmark-orange, 0.10);
+$benchmark-orange-5: rgba($benchmark-orange, 0.05);
 $action-green-dark: rgb(90, 131, 3);
 $action-green: rgb(158, 206, 56);
-$action-green-50: rgba(158, 206, 56, 0.5);
-$action-green-25: rgba(158, 206, 56, 0.25);
-$action-green-5: rgba(158, 206, 56, 0.05);
+$action-green-50: rgba($action-green, 0.5);
+$action-green-25: rgba($action-green, 0.25);
+$action-green-10: rgba($action-green, 0.10);
+$action-green-5: rgba($action-green, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(04, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
-body {
+@mixin above-text {
+  position: absolute;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+body:has(#funnel-form) {
+
+  #wpfooter {
+    display: none !important;
+  }
+
+  #screen-meta-links {
+    display: none;
+  }
+
+  /* NEW STUFF */
+  #wpbody-content {
+    /*height: 100vh;*/
+    padding-bottom: 0;
+  }
+
+  #wpcontent {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    box-sizing: border-box;
+  }
 
   &.saving {
     .funnel-editor-header button > .button-text {
@@ -39,7 +74,7 @@ body {
     }
   }
 
-  &:not(.saving){
+  &:not(.saving) {
     .funnel-editor-header button > .gh-spinner {
       display: none;
     }
@@ -69,7 +104,6 @@ body {
     #wpadminbar {
       display: none !important;
     }
-
   }
 
   &:not(.funnel-full-screen) {
@@ -106,22 +140,6 @@ body {
   }
 }
 
-#wpfooter {
-  display: none !important;
-}
-
-/* END Full Screen */
-
-#screen-meta-links {
-  display: none;
-}
-
-/* NEW STUFF */
-#wpbody-content {
-  /*height: 100vh;*/
-  padding-bottom: 0;
-}
-
 .trigger-popup {
   font-weight: normal;
 }
@@ -136,16 +154,6 @@ body {
   margin: 2px !important;
 }
 
-#wpcontent {
-  padding-left: 0 !important;
-  box-sizing: border-box;
-}
-
-#poststuff {
-  padding-top: 0px;
-  margin-top: 107px;
-}
-
 .replacements-button,
 .add-contacts-link {
   display: inline-block;
@@ -154,10 +162,6 @@ body {
 
 .header-wrap {
   width: 100%;
-}
-
-#change_reporting {
-  margin: 1px 2px;
 }
 
 #step-settings-container {
@@ -212,28 +216,8 @@ body {
 
       padding: 30px;
 
-      #actions {
-        .select-step:hover {
-          .step-icon {
-            background-color: $action-green-50;
-          }
-        }
-      }
-
-      #benchmarks {
-        .select-step:hover {
-          .step-icon {
-            background-color: $benchmark-orange-25;
-          }
-        }
-      }
-
-      #logic {
-        .select-step:hover {
-          .step-icon {
-            background-color: $secondary-purple-25;
-          }
-        }
+      .gh-tooltip {
+        max-width: 140px;
       }
 
       .steps-select {
@@ -277,31 +261,29 @@ body {
           gap: 20px;
           flex-wrap: wrap;
           border-radius: 5px;
-          border: 1px solid $primary-dark-15;
+          border: 1px solid var(--color);
           padding: 20px;
 
           &:has([data-group="benchmark"]) {
-            border-color: $benchmark-orange;
-
-            > .sub-group-label {
-              background-color: $benchmark-orange;
-            }
+            --color: #{$benchmark-orange};
+            --color-25: #{$benchmark-orange-25};
+            --color-5: #{$benchmark-orange-5};
           }
 
           &:has([data-group="logic"]) {
-            border-color: $secondary-purple;
-
-            > .sub-group-label {
-              background-color: $secondary-purple;
-            }
+            --color: #{$secondary-purple};
+            --color-25: #{$secondary-purple-25};
+            --color-5: #{$secondary-purple-5};
           }
 
           &:has([data-group="action"]) {
-            border-color: $action-green;
+            --color: #{$action-green};
+            --color-25: #{$action-green-25};
+            --color-5: #{$action-green-5};
+          }
 
-            > .sub-group-label {
-              background-color: $action-green;
-            }
+          svg {
+            fill: var(--color);
           }
 
           &:not(:has(.visible)) {
@@ -316,15 +298,48 @@ body {
             color: white;
             border-radius: 5px;
             padding: 3px 8px;
-            border: 1px solid $primary-dark-15;
+            background-color: var(--color);
+
           }
         }
 
+        --icon-size: 60px;
+
         .select-step {
-          width: 80px;
+          width: var(--icon-size);
           border-radius: 5px;
           //padding: 5px;
           cursor: grab;
+
+          .step-element{
+            &.premium {
+
+              .step-icon {
+                position: relative;
+                &::after {
+                  @include above-text;
+                  content: 'PRO';
+                  top: auto;
+                  left: auto;
+                  bottom: -1px;
+                  right: -1px;
+                  transform: none;
+                  background-color: var(--color);
+                  font-size: 8px;
+                  border-radius: 3px 0 0 0;
+                  line-height: 1.1;
+                  padding: 2px 4px;
+                }
+              }
+
+            }
+          }
+
+          &:hover {
+            .step-icon {
+              background-color: var(--color-25);
+            }
+          }
 
           &:not(.visible) {
             display: none;
@@ -334,18 +349,22 @@ body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 80px;
+            height: var(--icon-size);
             border-radius: 5px;
             margin: 0;
             overflow: hidden;
             position: relative;
             background: #FFFFFF;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--color);
           }
 
           p {
             font-size: 13px;
             margin: 10px 0 0 0;
             line-height: 1.2;
+            text-align: center;
           }
 
           > .ui-draggable-dragging {
@@ -392,6 +411,34 @@ body {
         display: none;
       }
 
+      .step-locked {
+        display: none;
+      }
+
+      .step.settings.locked {
+        position: relative;
+
+        .step-locked {
+          z-index: 99;
+          display: flex;
+          background-color: $primary-dark-15;
+          position: absolute;
+          top: 0;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          justify-content: center;
+          align-items: center;
+          border-radius: 5px;
+
+          .dashicons {
+            height: 40px;
+            width: 40px;
+            font-size: 40px;
+          }
+        }
+      }
+
       .step.editing {
 
         .step-title-wrap ~ .custom-settings {
@@ -403,6 +450,20 @@ body {
           .gh-rows-and-columns {
             label {
               font-weight: 500;
+            }
+          }
+
+          .branch-container {
+            button.add-branch {
+              margin-top: 10px;
+              margin-left: auto;
+              display: block;
+            }
+
+            button.gh-button.danger {
+              margin-top: 10px;
+              margin-left: auto;
+              display: block;
             }
           }
         }
@@ -423,6 +484,10 @@ body {
           gap: 10px;
           flex-direction: column;
           margin-bottom: 20px;
+
+          &:not(:has(.notice)) {
+            display: none;
+          }
         }
 
         .step-flex {
@@ -513,8 +578,58 @@ body {
   }
 }
 
-#wpcontent {
-  margin-left: 0 !important;
+.sortable-helper-icon {
+
+  &.action {
+    --color: #{$action-green};
+    --color-25: #{$action-green-25};
+    --color-10: #{$action-green-10};
+    --color-5: #{$action-green-5};
+  }
+
+  &.benchmark {
+    --color: #{$benchmark-orange};
+    --color-25: #{$benchmark-orange-25};
+    --color-10: #{$benchmark-orange-10};
+    --color-5: #{$benchmark-orange-5};
+
+    .step-icon {
+      border-radius: 50%;
+    }
+  }
+
+  &.logic {
+    --color: #{$secondary-purple};
+    --color-25: #{$secondary-purple-25};
+    --color-10: #{$secondary-purple-10};
+    --color-5: #{$secondary-purple-5};
+
+    .step-icon {
+      transform: rotate(45deg);
+
+      > svg {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  > .step-icon {
+
+    width: 60px;
+    height: 60px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 3px solid var(--color);
+    border-radius: 5px;
+    background-color: #fff;
+    background-image: linear-gradient(var(--color-5), var(--color-10));
+
+    svg {
+      fill: var(--color);
+      width: 100%;
+      height: 100%;
+    }
+  }
 }
 
 .funnel-editor-header {
@@ -687,11 +802,6 @@ button.button.save-button {
   width: 100%;
 }
 
-.wpgh-element {
-  /*height: 112px;*/
-  text-align: center;
-}
-
 .step-icon img {
   margin: 0 auto 0 auto;
   width: 80%;
@@ -705,47 +815,25 @@ button.button.save-button {
   margin: 0 10px 0 0;
 }
 
-.step-reporting .chart {
-  background: #FFF;
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #e5e5e5;
-  margin-bottom: 20px;
-}
-
-.step-reporting .chart .inside {
-  padding: 20px;
-  box-sizing: border-box;
-  width: 100%;
-}
-
 .ui-front.ui-autocomplete {
   z-index: 100100;
 }
 
-@mixin above-text {
-  position: absolute;
-  padding: 3px 8px;
-  color: white;
-  border-radius: 5px;
-  width: max-content;
-  top: -70px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 #step-flow {
+
+  --logic-line-style: solid;
   //width: 100%;
   //flex-shrink: 0;
   position: relative;
   flex-grow: 1;
+  background-color: $background-color;
 
   .fixed-inside {
     bottom: 0;
     top: 0;
     right: 0;
     left: 0;
-    padding: 0 20px 0 30px;
+    padding: 20px;
     box-sizing: border-box;
     position: absolute;
     overflow: auto;
@@ -754,30 +842,45 @@ button.button.save-button {
     background-size: 20px 20px;
 
     .logic-line {
-      border-style: dashed;
+      border-style: var(--logic-line-style);
       position: absolute;
       z-index: 1;
+
+      &.loop-line {
+        border-color: $secondary-purple;
+      }
+
+      > .line-arrow {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-color: $secondary-purple;
+        border-style: solid;
+        border-width: 2px 2px 0 0;
+
+        &.top {
+          transform: translate(-50%, -50%) rotate(45deg);
+          left: 50%;
+          top: 0;
+        }
+
+        &.bottom {
+          transform: translate(-50%, 50%) rotate(-135deg);
+          left: 50%;
+          bottom: 0;
+        }
+
+        &.left {
+          transform: translate(-50%, -50%) rotate(-45deg);
+          left: 0;
+          top: 50%;
+        }
+      }
     }
 
     .step.if_else + .step-branches {
 
       position: relative;
-
-      &::after {
-        position: absolute;
-        left: calc(50% + 1px);
-        bottom: -42px;
-        content: "";
-        height: 10px;
-        width: 10px;
-        border-radius: 50%;
-        box-sizing: border-box;
-        border-style: solid;
-        border-width: 7px;
-        border-color: $error-red $error-red $action-green $action-green;
-        transform: translate(-50%, -50%) rotate(45deg);
-        z-index: 3;
-      }
 
       > .split-branch:first-child {
 
@@ -791,7 +894,7 @@ button.button.save-button {
       }
 
       > .split-branch:last-child {
-        > .logic-line {
+        > .logic-line.line-above {
           border-color: $error-red;
 
           > .path-indicator {
@@ -803,7 +906,7 @@ button.button.save-button {
 
     .step-branches {
       gap: 40px;
-      margin: 30px 0;
+      margin: 60px 0;
 
       &:has(> :nth-child(odd):last-child) {
         margin-top: 80px;
@@ -815,6 +918,11 @@ button.button.save-button {
         > .logic-line {
           border-color: $secondary-purple;
 
+          .logic-line{
+            border-color: $secondary-purple;
+          }
+
+          &.line-below-after,
           &.line-below {
             border-color: $action-green;
           }
@@ -835,13 +943,13 @@ button.button.save-button {
           &.middle,
           &.left {
             > span.path-indicator {
-              left: 0;
+              left: 20%;
             }
           }
 
           &.right {
             > span.path-indicator {
-              left: 100%;
+              left: 80%;
             }
           }
         }
@@ -857,32 +965,17 @@ button.button.save-button {
       margin: auto;
       min-width: 300px;
       width: min-content;
+      position: relative;
 
       &.benchmarks {
         flex-direction: row;
         justify-content: center;
         gap: 30px;
         position: relative;
-        padding-bottom: 30px;
+        padding-bottom: 60px;
 
-        .benchmark.logic-line {
+        .benchmark-line.logic-line {
           border-color: $benchmark-orange;
-        }
-
-        &::after {
-          position: absolute;
-          left: calc(50% + 1px);
-          bottom: -14px;
-          content: "";
-          height: 10px;
-          width: 10px;
-          border-radius: 50%;
-          box-sizing: border-box;
-          border-style: solid;
-          border-width: 7px;
-          border-color: $benchmark-orange $benchmark-orange $action-green $action-green;
-          transform: translate(-50%, -50%) rotate(-45deg);
-          z-index: 3;
         }
       }
 
@@ -896,17 +989,22 @@ button.button.save-button {
       }
 
       &#step-sortable {
-        padding-top: 20px;
+        padding-top: 40px;
         padding-bottom: 40px;
 
         > .step-branch.benchmarks:first-child {
-          margin-top: 100px;
 
           &::before {
             content: "Start the funnel when...";
-            @include above-text;
-            background-color: $benchmark-orange;
           }
+        }
+
+        &::after {
+          content: "End";
+          @include above-text;
+          background-color: $error-red;
+          top: auto;
+          bottom: 0;
         }
       }
 
@@ -951,41 +1049,16 @@ button.button.save-button {
     }
   }
 
-  .wpgh-element {
-    /*height: 112px;*/
-    text-align: center;
-    width: 60px;
-    height: 60px;
-    background-color: white;
-    border-radius: 5px;
-    cursor: grabbing;
 
-    &[data-group=action] {
-      background-color: $action-green-50;
-    }
+  .step-branch.benchmarks {
 
-    &[data-group=benchmark] {
-      background-color: $benchmark-orange-25;
-    }
-
-    &[data-group=logic] {
-      background-color: $secondary-purple-25;
-    }
-
-    p {
-      display: none;
-    }
-  }
-
-  .sortable-item.logic + .step-branch.benchmarks,
-  .step.action + .step-branch.benchmarks {
-
-    margin-top: 40px;
+    padding-top: 70px;
 
     &::before {
       content: "Jump/Continue when...";
       @include above-text;
       background-color: $benchmark-orange;
+      top: 0;
     }
   }
 
@@ -997,54 +1070,22 @@ button.button.save-button {
     background-color: $secondary-purple;
   }
 
-  .step-branch.benchmarks + .step.action,
-  .sortable-item.logic + .sortable-item.logic > .step.logic,
-  .step.action + .logic > .step.logic,
-  .step.action + .step.action {
+  .sortable-item,
+  .step-branch.benchmarks {
 
-    //margin-top: 40px;
+    + .step-branch.benchmarks,
+    + .sortable-item {
 
-    &::after {
-      position: absolute;
-      content: '';
-      //border-right: 3px dashed $action-green;
-      border-right: 2px dashed $action-green;
-      z-index: -1;
-      top: -50px;
-      height: 30px;
-      left: 50%;
-      //background-color: $action-green;
-    }
-  }
+      position: relative;
 
-  .logic + .step.action {
-
-    //margin-top: 40px;
-
-    &::after {
-      position: absolute;
-      content: '';
-      //border-right: 3px dashed $action-green;
-      border-right: 2px dashed $action-green;
-      z-index: -1;
-      top: -50px;
-      height: 30px;
-      left: 50%;
-      //background-color: $action-green;
-    }
-  }
-
-  .sortable-item.logic.editing {
-
-    > .step {
-      outline-color: $secondary-purple;
-
-      .hndle-icon {
-        background-color: $secondary-purple;
-
-        svg {
-          fill: #fff !important;
-        }
+      &::after {
+        position: absolute;
+        content: '';
+        border-right: 2px var(--logic-line-style) $action-green;
+        z-index: 1;
+        top: -51px;
+        height: 52px;
+        left: 50%;
       }
     }
   }
@@ -1056,15 +1097,105 @@ button.button.save-button {
     background: white;
     outline: 2px solid transparent;
     cursor: pointer;
-    max-width: 320px;
+    max-width: 300px;
     min-width: 200px;
-    width: fit-content;
+    width: max-content;
     z-index: 2;
     position: relative;
     //margin: auto;\\
+    border: 1px solid var(--color);
+
+    &.action {
+      --color: #{$action-green};
+      --color-25: #{$action-green-25};
+      --color-10: #{$action-green-10};
+      --color-5: #{$action-green-5};
+
+      .hndle-icon {
+        border-radius: 5px;
+      }
+
+      &.delay_timer,
+      &.date_timer,
+      &.field_timer,
+      &.advanced_timer,
+      &.delay_timer {
+        max-width: 280px;
+        border-radius: 20px / 100%;
+
+
+        .hndle-icon {
+          //clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+          border-radius: 20px / 100%;
+        }
+
+        .step-title {
+          font-size: 13px !important;
+        }
+      }
+    }
+
+    &.benchmark {
+      --color: #{$benchmark-orange};
+      --color-25: #{$benchmark-orange-25};
+      --color-10: #{$benchmark-orange-10};
+      --color-5: #{$benchmark-orange-5};
+
+      border-radius: 50px;
+
+      .hndle-icon {
+        border-radius: 50px;
+      }
+
+      .step-labels {
+        right: 30px;
+      }
+    }
+
+    &.logic {
+      --color: #{$secondary-purple};
+      --color-25: #{$secondary-purple-25};
+      --color-10: #{$secondary-purple-10};
+      --color-5: #{$secondary-purple-5};
+
+      padding-top: 10px;
+      max-width: 240px;
+      margin: auto;
+      border-radius: 50%;
+
+
+      &.if_else {
+        .step-title {
+          font-size: 11px !important;
+        }
+      }
+
+      > .hndle > .hndle-icon {
+        border-radius: 2px;
+        box-sizing: border-box;
+        transform-origin: center;
+        transform: translateX(-50%) translateY(-50%) rotate(45deg);
+
+        > svg {
+          transform: rotate(-45deg);
+        }
+      }
+    }
 
     &:has(.step-label) {
       padding-bottom: 14px;
+    }
+
+    &.editing {
+      outline-color: var(--color);
+
+      > .hndle > .hndle-icon {
+        background-color: var(--color);
+
+        > svg {
+          fill: #fff;
+        }
+      }
     }
 
     &.has-changes {
@@ -1073,44 +1204,17 @@ button.button.save-button {
 
     &.active {
       background-color: #fff;
-
-      &.logic {
-        background-image: repeating-linear-gradient(
-                        -45deg, /* Adjust angle for slant */
-                        $secondary-purple-5, /* Line color */
-                        $secondary-purple-5 10px, /* Line thickness */
-                        #fff 10px, /* Space between lines */
-                        #fff 20px /* Repeat pattern */
-        );
-      }
-
-      &.benchmark {
-        background-image: repeating-linear-gradient(
-                        -45deg, /* Adjust angle for slant */
-                        $benchmark-orange-5, /* Line color */
-                        $benchmark-orange-5 10px, /* Line thickness */
-                        #fff 10px, /* Space between lines */
-                        #fff 20px /* Repeat pattern */
-        );
-      }
-
-      &.action {
-        background-image: repeating-linear-gradient(
-                        -45deg, /* Adjust angle for slant */
-                        $action-green-5, /* Line color */
-                        $action-green-5 10px, /* Line thickness */
-                        #fff 10px, /* Space between lines */
-                        #fff 20px /* Repeat pattern */
-        );
-      }
+      background-image: repeating-linear-gradient(
+                      -45deg, /* Adjust angle for slant */
+                      var(--color-5), /* Line color */
+                      var(--color-5) 10px, /* Line thickness */
+                      #fff 10px, /* Space between lines */
+                      #fff 20px /* Repeat pattern */
+      );
 
       .delete-step {
         display: none;
       }
-    }
-
-    &.logic {
-      margin: auto;
     }
 
     &:hover {
@@ -1158,7 +1262,7 @@ button.button.save-button {
         color: white;
         border-radius: 3px;
         width: max-content;
-        background-color: $primary-dark;
+        background-color: var(--color);
 
         &.logic-tag {
           background-color: $secondary-purple !important;
@@ -1186,6 +1290,42 @@ button.button.save-button {
       &.editing {
         outline-color: $alert-yellow !important;
       }
+
+      &.logic {
+        .hndle-icon::after {
+          transform: rotate(-45deg) translate(50%, -50%);
+        }
+      }
+
+      .hndle-icon {
+        position: relative;
+
+        &::after {
+          position: absolute;
+          content: '⚠️';
+          top: 0;
+          right: 0;
+          font-size: 20px;
+          transform: translate(50%, -50%);
+        }
+      }
+    }
+
+    &.locked {
+
+      .lock-step {
+        display: none;
+      }
+
+      .delete-step {
+        display: none;
+      }
+    }
+
+    &:not(.locked) {
+      .unlock-step {
+        display: none;
+      }
     }
 
     > .hndle {
@@ -1202,20 +1342,29 @@ button.button.save-button {
         left: 50%;
         top: 0;
         z-index: 2;
+        background-color: #fff;
+        background-image: linear-gradient(var(--color-5), var(--color-10));
+        border: 2px solid var(--color);
+        box-sizing: border-box;
 
-        svg {
+        &:has(svg) {
+          padding: 8px;
+        }
+
+        > svg {
           width: 100%;
           height: 100%;
+          fill: var(--color);
         }
       }
 
       > div:not(.hndle-icon) {
         display: flex;
         flex-direction: column;
-        padding: 20px 10px 10px 10px;
+        padding: 20px 16px 10px 16px;
 
         span.step-title {
-          font-size: 14px;
+          font-size: 13px;
           text-align: center;
 
           code {
@@ -1226,147 +1375,15 @@ button.button.save-button {
 
         span.step-name {
           /*margin-left:6px;*/
+          color: var(--color);
           font-size: 8px;
           font-weight: 500;
           text-transform: uppercase;
           text-align: center;
         }
-
-      }
-    }
-
-    &.benchmark {
-      //border-left-color: $benchmark-orange;
-
-      .hndle-icon {
-        border-radius: 5px;
-        background-color: #FCDFC4;
-        border: 2px solid $benchmark-orange;
-        box-sizing: border-box;
-        //position: relative;
-
-        //&::after {
-        //  content: '';
-        //  background-color: $benchmark-orange-25;
-        //  position: absolute;
-        //  top: 0;
-        //  bottom: 0;
-        //  right: 0;
-        //  left: 0;
-        //  border-radius: 2px;
-        //}
-
-        svg {
-          fill: #000;
-        }
-      }
-
-      span.step-name {
-        color: $benchmark-orange;
-      }
-
-      &.editing {
-        outline-color: $benchmark-orange;
-
-        .hndle-icon {
-          background-color: $benchmark-orange;
-
-          svg {
-            fill: #fff;
-          }
-        }
-      }
-
-      .step-labels .step-label {
-        background-color: $benchmark-orange;
-      }
-    }
-
-    &.action {
-      //border-left-color: $action-green;
-
-      .hndle-icon {
-        border-radius: 50px;
-        background-color: #E7F3CD;
-        border: 2px solid $action-green;
-        box-sizing: border-box;
-
-        //&::after {
-        //  content: '';
-        //  border-radius: 50px;
-        //  background-color: $action-green-25;
-        //  position: absolute;
-        //  top: 0;
-        //  bottom: 0;
-        //  right: 0;
-        //  left: 0;
-        //}
-
-        svg {
-          fill: #000;
-        }
-      }
-
-      &.delay_timer,
-      &.date_timer,
-      &.field_timer,
-      &.advanced_timer,
-      &.delay_timer {
-        max-width: 280px;
-        border-radius: 10px;
-
-        .step-title {
-          font-size: 13px !important;
-        }
-      }
-
-      span.step-name {
-        color: $action-green;
-      }
-
-      &.editing {
-        outline-color: $action-green;
-
-        .hndle-icon {
-          background-color: $action-green;
-
-          svg {
-            fill: #fff;
-          }
-        }
-      }
-    }
-
-    &.logic {
-      //border-left-color: $action-green;
-      padding-top: 10px;
-
-      .hndle-icon {
-        border-radius: 2px;
-        border: 2px solid $secondary-purple;
-        background-color: #e3c4fc;
-        box-sizing: border-box;
-        transform-origin: center;
-        transform: translateX(-50%) translateY(-55%) rotate(45deg);
-
-        svg {
-          fill: #000;
-          transform: rotate(-45deg);
-        }
-      }
-
-      span.step-name {
-        color: $secondary-purple;
       }
     }
   }
-}
-
-#funnel-chart {
-  background: #FFF;
-  padding: 20px;
-  border-bottom: 1px solid #e5e5e5;
-  box-sizing: border-box;
 }
 
 .hndle input {
@@ -1380,47 +1397,6 @@ button.button.save-button {
 table.embed-options td {
   padding: 0 !important;
 }
-
-.step-title-wrap {
-  padding: 8px 10px 8px 70px;
-  height: 60px;
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  //justify-content: stretch;
-
-  .step-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 60px;
-    vertical-align: middle;
-    border-right: 1px solid $primary-dark-15;
-    box-sizing: border-box;
-  }
-
-  .step-title-edit {
-    width: 100%;
-  }
-
-  .step-title-large {
-    //height: 100%;
-    font-size: 20px;
-    box-shadow: none;
-    font-weight: 600;
-  }
-}
-
-.back-to-admin {
-  position: fixed;
-  display: inline-block;
-  left: 5px;
-  bottom: 5px;
-}
-
 
 .step .handlediv {
   float: right;
@@ -1444,31 +1420,8 @@ table.embed-options td {
   text-decoration: none;
 }
 
-.add-contact-form {
-  width: 100%;
-  margin-top: 30px;
-}
-
-.add-contact-form td {
-  padding-bottom: 30px;
-}
-
 .form-table th {
   width: 160px;
-}
-
-#add-step-bottom {
-  font-size: 16px;
-  height: auto;
-  margin: 0 0 6px;
-  padding: 8px 14px;
-}
-
-#add-step-bottom .dashicons {
-  /*vertical-align: middle;*/
-  font-size: 22px;
-  vertical-align: middle;
-  margin-right: 10px;
 }
 
 #groundhogg-notices {
@@ -1486,34 +1439,6 @@ table.embed-options td {
   border-radius: 5px;
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
-}
-
-.step-error {
-  font-size: 24px;
-}
-
-.demo-video {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  margin: 40px auto;
-  /*margin-top: 250px;*/
-  max-width: 722px;
-  display: block;
-}
-
-.demo-video img {
-  vertical-align: middle;
-}
-
-.actions-links-arrow {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.select-a-step-arrow {
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 .benchmark.web_form {

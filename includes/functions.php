@@ -768,6 +768,43 @@ function array_find( array $array, callable $predicate ) {
 	return false;
 }
 
+function should_serialize( $value ) {
+	return is_array( $value ) || is_object( $value );
+}
+
+/**
+ * Provides a diff of values that are different when they have the same key
+ *
+ * @param array $array1
+ * @param array $array2
+ * @param bool  $strict
+ *
+ * @return array
+ */
+function keep_the_diff( array $array1, array $array2, bool $strict = false ) {
+
+	$different = [];
+
+	foreach ( $array1 as $key => $v1 ) {
+
+        if ( ! isset( $array2[ $key ] ) ) {
+            $different[ $key ] = $v1;
+            continue;
+        }
+
+        $v2 = $array2[ $key ];
+
+		$a =  should_serialize( $v1 ) ? serialize( $v1 ) : $v1;
+		$b =  should_serialize( $v2 ) ? serialize( $v2 ) : $v2;
+
+		if ( ( $strict && $a !== $b ) || ( ! $strict && $a != $b ) ) {
+			$different[ $key ] = $v1;
+		}
+	}
+
+	return $different;
+}
+
 function find_object( array $array, array $args ) {
 	return array_find( $array, function ( object $object ) use ( $args ) {
 
@@ -8632,21 +8669,13 @@ function add_self_removing_filter( string $filter, callable $callback, int $prio
  * @return bool
  */
 function add_event_args( $args = [] ) {
-	return add_filter( 'groundhogg/step/enqueue/event', function ( $data ) use ( $args ) {
+	if ( \Groundhogg\event_queue()::is_processing() ) {
+		return false;
+	}
 
-		// get any existing args from the event, if none are set an empty array will be used
-		$_args = get_array_var( $data, 'args', [] );
+	$event = \Groundhogg\event_queue()->get_current_event();
 
-		// We're expecting data to be an array, if at some point args were set, but it wasn't an array, we'll leave it be
-		if ( ! is_array( $_args ) ) {
-			return $data;
-		}
-
-		// set the args to whatever was there before, with the new args. Overrides existing keys.
-		$data['args'] = array_merge( $_args, $args );
-
-		return $data;
-	} );
+	return $event->set_args( $args );
 }
 
 /**
@@ -8689,4 +8718,14 @@ function one_of( $value, array $options ) {
 	}
 
 	return $value;
+}
+
+function int_to_letters($num) {
+	$result = '';
+	while ($num >= 0) {
+		$remainder = $num % 26;
+		$result = chr(65 + $remainder) . $result;
+		$num = intval($num / 26) - 1;
+	}
+	return $result;
 }

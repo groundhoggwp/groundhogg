@@ -27,6 +27,12 @@ $background-color: #F6F9FB;
 
 body.gh_reporting {
 
+  .wrap {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .number-total,
   .groundhogg-quick-stat-number, {
     font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
@@ -587,9 +593,7 @@ table.groundhogg-report-table td:last-child {
 
   }
 
-
   #edit-funnel {
     display: none;
   }
-
 }

@@ -4,7 +4,6 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Email;
-use Groundhogg\HTML;
 use Groundhogg\Step;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_hostname;
@@ -49,7 +48,7 @@ class Link_Clicked extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever a special link is clicked and redirects the user to another page.', 'step_description', 'groundhogg' );
+		return _x( 'Runs whenever the special tracking link is clicked and redirects the user to the target page.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -58,8 +57,8 @@ class Link_Clicked extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/link-clicked.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/link-clicked.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/link-clicked.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/link-click.svg';
 	}
 
 	/**
@@ -89,9 +88,9 @@ class Link_Clicked extends Benchmark {
 				'value'       => $this->get_setting( 'redirect_to' )
 			] ),
 			html()->e( 'a', [
-				'href' => $redirect_url,
+				'href'   => $redirect_url,
 				'target' => '_blank',
-				'class' => 'gh-button secondary icon'
+				'class'  => 'gh-button secondary icon'
 			], dashicon( 'external' ) )
 		] );
 
@@ -99,8 +98,8 @@ class Link_Clicked extends Benchmark {
 	}
 
 	/**
-     * added __ to disable
-     *
+	 * added __ to disable
+	 *
 	 * @param $step
 	 *
 	 * @return string
@@ -113,20 +112,20 @@ class Link_Clicked extends Benchmark {
 
 		$file = wp_check_filetype( $basename );
 
-		if ( $file && $file['type'] ){
+		if ( $file && $file['type'] ) {
 			return 'Downloads <b>' . $basename . '</b>';
 		}
 
 		$hostname = get_hostname( $redirect_url );
-		$path = wp_parse_url( $redirect_url, PHP_URL_PATH );
+		$path     = wp_parse_url( $redirect_url, PHP_URL_PATH );
 
-		if ( $hostname === get_hostname() && ! empty( $path ) ){
+		if ( $hostname === get_hostname() && ! empty( $path ) ) {
 			$path = '<code>' . $path . '</code>';
 		} else {
 			$path = '<b>' . $hostname . '</b>';
 		}
 
-		return 'Clicks to ' . $path;
+		return 'Track click to ' . $path;
 	}
 
 	/**
@@ -225,7 +224,6 @@ class Link_Clicked extends Benchmark {
 	 * @return void
 	 */
 	public function post_import( $step ) {
-
 
 		// get all send-email steps in the funnel
 		// loop through all the emails

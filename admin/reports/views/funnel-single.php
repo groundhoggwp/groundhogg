@@ -98,7 +98,25 @@ if ( ! $funnel->exists() ) {
         <div class="gh-panel-header">
             <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
         </div>
-        <div id="table_funnel_stats"></div>
+        <?php
+
+        wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
+        wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+
+        include __DIR__ . '/../../funnels/funnel-flow-preview.php'
+        ?>
+        <script>
+          ($=>{
+
+            //$(()=> Groundhogg.drawLogicLines())
+            //$('.step[data-id]').click( e => {
+            //  window.open( Groundhogg.element.adminPageURL( 'gh_funnels', {
+            //    action: 'edit',
+            //    funnel: <?php //echo $funnel->ID ?>
+            //  }, e.currentTarget.dataset.id ), '_self' )
+            //})
+          })(jQuery)
+        </script>
     </div>
 </div>
 

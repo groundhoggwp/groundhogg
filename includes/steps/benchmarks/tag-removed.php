@@ -66,8 +66,8 @@ class Tag_Removed extends Tag_Applied {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-removed.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-removed.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-removed.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-removed.svg';
 	}
 
 	/**

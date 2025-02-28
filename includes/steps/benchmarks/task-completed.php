@@ -7,7 +7,6 @@ use Groundhogg\Step;
 use function Groundhogg\andList;
 use function Groundhogg\array_bold;
 use function Groundhogg\array_map_to_class;
-use function Groundhogg\array_map_to_method;
 use function Groundhogg\get_db;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\html;
@@ -106,7 +105,7 @@ class Task_Completed extends Benchmark {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/task-completed.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/task-completed.svg';
 	}
 
 	protected function get_preceding_task_steps( $step ) {
@@ -118,7 +117,7 @@ class Task_Completed extends Benchmark {
 	public function validate_settings( Step $step ) {
 		$tasks = $this->get_preceding_task_steps( $step );
 		if ( empty( $tasks ) ) {
-			$this->add_error( 'no_tasks', 'There must be at least one preceding <b>Create Task</b> action.' );
+			$step->add_error( 'no_tasks', 'There must be at least one preceding <b>Create Task</b> action.' );
 		}
 	}
 
@@ -167,8 +166,8 @@ class Task_Completed extends Benchmark {
 	}
 
 	/**
-     * Ensure the included tasks steps are only the ones that appear before this benchmark
-     *
+	 * Ensure the included tasks steps are only the ones that appear before this benchmark
+	 *
 	 * @param $step_ids
 	 *
 	 * @return array
@@ -176,9 +175,9 @@ class Task_Completed extends Benchmark {
 	public function validate_task_step_ids( $step_ids ) {
 		$step = $this->get_current_step();
 
-		$step_ids = wp_parse_id_list( $step_ids );
-		$task_steps    = array_map_to_class( $step_ids, Step::class );
-		$task_steps    = array_filter( $task_steps, function ( $task_step ) use ( $step ) {
+		$step_ids   = wp_parse_id_list( $step_ids );
+		$task_steps = array_map_to_class( $step_ids, Step::class );
+		$task_steps = array_filter( $task_steps, function ( $task_step ) use ( $step ) {
 			return $task_step->is_before( $step );
 		} );
 
@@ -187,16 +186,16 @@ class Task_Completed extends Benchmark {
 
 	public function get_settings_schema() {
 		return [
-			'tasks' => [
+			'tasks'     => [
 				'default'  => [],
 				'sanitize' => [ $this, 'validate_task_step_ids' ]
 			],
-            'condition' => [
-                'default' => 'any',
-                'sanitize' => function ( $value ) {
-	                return one_of( $value, [ 'any', 'all' ] );
-                }
-            ]
+			'condition' => [
+				'default'  => 'any',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'any', 'all' ] );
+				}
+			]
 		];
 	}
 

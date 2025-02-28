@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
 use Groundhogg\DB\Steps;
+use Groundhogg\Utils\DateTimeHelper;
 
 class Funnel extends Base_Object_With_Meta {
 
@@ -30,6 +31,42 @@ class Funnel extends Base_Object_With_Meta {
 		$this->data        = (array) $data->data;
 		$this->meta        = (array) $data->meta;
 		$this->steps       = (array) $data->steps;
+	}
+
+	public function step_flow( $echo = true ) {
+
+		$steps = $this->get_steps();
+
+		$steps = array_filter( $steps, function ( Step $step ) {
+			return $step->is_main_branch();
+		} );
+
+		$html = '';
+
+		foreach ( $steps as $step ) {
+			$step->get_step_element()->validate_settings( $step );
+			$html .= $step->sortable_item( $echo );
+		}
+
+		return $html;
+	}
+
+	public function step_settings( $echo = true ) {
+
+		$steps = $this->get_steps();
+
+		usort( $steps, function ( $a, $b ) {
+			return $a->ID - $b->ID; // sort by ID because when using morphdom that won't change dom pos
+		} );
+
+		$html = '';
+
+		foreach ( $steps as $step ) {
+			$step->get_step_element()->validate_settings( $step );
+			$html .= $step->html_v2( $echo );
+		}
+
+		return $html;
 	}
 
 	/**
@@ -155,10 +192,22 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function update_step_status() {
+
+		// update inactive steps to active
+		if ( $this->is_active() ) {
+			return db()->steps->update( [
+				'funnel_id'   => $this->get_id(),
+				'step_status' => 'inactive'
+			], [
+				'step_status'    => 'active',
+				'date_activated' => ( new DateTimeHelper() )->ymdhis()
+			] );
+		}
+
 		return get_db( 'steps' )->update( [
 			'funnel_id' => $this->get_id()
 		], [
-			'step_status' => $this->is_active() ? 'active' : 'inactive'
+			'step_status' => 'inactive'
 		] );
 	}
 
@@ -182,20 +231,13 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Commit all the changes from the previous update.
-	 *
-	 * - Pause all active events for this funnel
-	 * - Commit all the edited steps
-	 * - Delete any steps which are not in the last commit
-	 * - Update the state of "edited"
-	 * - Resume any remaining paused events
-	 * - Update the funnel to active
+	 * Merge step changes into the real data and meta
 	 */
 	public function commit() {
 
 		// can't commit if not active...
-		if ( ! $this->is_active() ){
-			return false;
+		if ( ! $this->is_active() ) {
+			return;
 		}
 
 		$steps = $this->get_steps();
@@ -203,6 +245,33 @@ class Funnel extends Base_Object_With_Meta {
 		// commit all the step changes
 		foreach ( $steps as $step ) {
 			$step->commit();
+		}
+	}
+
+	/**
+	 * Clear any changes and delete inactive steps that may have been added
+	 */
+	public function uncommit() {
+
+		// can't uncommit if not active...
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
+		$steps = $this->get_steps();
+
+		// commit all the step changes
+		foreach ( $steps as $step ) {
+
+			$step->pull();
+
+			// delete any inactive steps
+			if ( ! $step->is_active() ) {
+				$step->delete();
+				continue;
+			}
+
+			$step->clear_changes();
 		}
 	}
 
@@ -381,21 +450,25 @@ class Funnel extends Base_Object_With_Meta {
 			'order'     => 'ASC',
 		] );
 
-		$steps = $this->get_steps_db()->query( $query );
-
-		return array_map_to_step( $steps );
-	}
-
-	public function get_steps_for_editor() {
-		$steps = $this->get_steps();
-
-		foreach ( $steps as $step ) {
-			$step->merge_changes();
+		// if not editing, only active steps should be included...
+		if ( ! $this->is_editing() ) {
+			$query['step_status'] = 'active';
 		}
 
-		usort( $steps, function ( Step $a, Step $b ) {
-			return $a->get_order() - $b->get_order();
-		} );
+		$steps = $this->get_steps_db()->query( $query );
+
+		$steps = array_map_to_step( $steps );
+
+		if ( $this->is_editing() ) {
+
+			foreach ( $steps as $step ) {
+				$step->merge_changes();
+			}
+
+			usort( $steps, function ( Step $a, Step $b ) {
+				return $a->get_order() - $b->get_order();
+			} );
+		}
 
 		return $steps;
 	}
@@ -434,15 +507,20 @@ class Funnel extends Base_Object_With_Meta {
 	public function is_editing() {
 
 		if ( wp_doing_ajax() || wp_is_serving_rest_request() ) {
-			wp_parse_str( wp_parse_url( wp_get_referer() , PHP_URL_QUERY ), $params );
-			if ( get_array_var( $params, 'page' ) === 'gh_funnels' && get_array_var( $params, 'action' ) === 'edit' && isset_not_empty( $params, 'funnel' ) ){
+			wp_parse_str( wp_parse_url( wp_get_referer(), PHP_URL_QUERY ), $params );
+
+			if ( get_array_var( $params, 'page' ) === 'gh_funnels'
+			     && get_array_var( $params, 'action' ) === 'edit'
+			     && isset_not_empty( $params, 'funnel' )
+			     && absint( $params['funnel'] ) === $this->get_id()
+			) {
 				return true;
 			}
 		}
 
 		return get_url_var( 'page' ) === 'gh_funnels'
 		       && get_url_var( 'action' ) === 'edit'
-		       && absint( get_url_var( 'funnel' ) ) === $this->ID;
+		       && absint( get_url_var( 'funnel' ) ) === $this->get_id();
 	}
 
 	/**
@@ -452,11 +530,7 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_as_array() {
 
-		if ( $this->is_editing() ){
-			$steps = $this->get_steps_for_editor();
-		} else {
-			$steps = $this->get_steps();
-		}
+		$steps = $this->get_steps();
 
 		return array_merge( parent::get_as_array(), [
 			'steps'     => $steps,

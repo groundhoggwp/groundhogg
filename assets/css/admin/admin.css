@@ -1073,6 +1073,17 @@ table .column-steps div.step-icon.benchmark {
   background-color: #FCDFC4;
   border-radius: 3px;
 }
+table .column-steps div.step-icon.logic {
+  border: 2px solid #6c19ad;
+  background-color: #e3c4fc;
+  border-radius: 3px;
+  transform: rotate(45deg);
+  width: 23px;
+  height: 23px;
+}
+table .column-steps div.step-icon.logic svg {
+  transform: rotate(-45deg);
+}
 table .column-steps div.step-icon svg,
 table .column-steps div.step-icon img {
   width: 100%;
@@ -1144,6 +1155,19 @@ table .column-steps div.step-icon img {
   border-right-width: 3px;
   border-bottom-width: 3px;
   border-color: var(--color-dark-800);
+}
+.gh-site .gh-site-button {
+  border-radius: 0.75rem;
+  border-style: solid;
+  border-width: 1px;
+  border-right-width: 3px;
+  border-bottom-width: 3px;
+  border-color: var(--color-dark-800);
+  text-transform: uppercase;
+  padding: 0.625rem 1.25rem;
+}
+.gh-site .gh-site-button.primary {
+  background-color: var(--color-yellow);
 }
 .gh-site .gh-secondary-card {
   border-radius: 0.75rem;

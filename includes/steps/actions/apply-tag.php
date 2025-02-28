@@ -73,7 +73,7 @@ class Apply_Tag extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/apply-tag.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/apply-tag.svg';
 	}
 
 	/**
@@ -99,6 +99,13 @@ class Apply_Tag extends Action {
 				}
 			],
 		];
+	}
+
+	public function validate_settings( Step $step ) {
+		$tags = $this->get_setting( 'tags' );
+		if ( empty( $tags ) ) {
+			$step->add_error( 'no_tags', 'No tags have been selected.' );
+		}
 	}
 
 	public function generate_step_title( $step ) {

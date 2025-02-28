@@ -358,19 +358,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 
 		$data = array_intersect_key( $this->sanitize_columns( $data ), $this->data );
-
-		$needs_update = [];
-
-		foreach ( $data as $key => $value ) {
-			$a =  is_serialized( $value ) ? $value : maybe_serialize( $value );
-			$b =  is_serialized( $this->data[ $key ] ) ? $this->data[ $key ] : maybe_serialize( $this->data[ $key ] );
-
-			if ( $a !== $b ) {
-				$needs_update[ $key ] = $value;
-			}
-		}
-
-		$data = $needs_update;
+		$data = keep_the_diff( $data, $this->data );
 
 		// updating with existing data
 		if ( empty( $data ) ) {

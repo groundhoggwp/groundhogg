@@ -1,13 +1,15 @@
 <?php
 
-namespace Groundhogg\steps\logic;
+namespace Groundhogg\Steps\Premium\Logic;
 
 use Groundhogg\Contact;
+use Groundhogg\Steps\Premium\Trait_Premium_Step;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\get_array_var;
-use function Groundhogg\html;
 
 class Weighted_Distribution extends Split_Path {
+
+	use Trait_Premium_Step;
 
 	public function get_name() {
 		return 'Weighted Distribution';
@@ -18,20 +20,11 @@ class Weighted_Distribution extends Split_Path {
 	}
 
 	public function get_description() {
-		// TODO: Implement get_description() method.
+		return 'Randomly send contacts down different branches with some bias.';
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/remove-tag.svg';
-	}
-
-	public function settings( $step ) {
-
-		echo html()->e( 'p', [], __( 'Add as many branches as you want and assign each a "weight". The total weight does not necessarily need to equal 100, but it\'s a good idea for simplicity.' ) );
-
-		echo html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'branches' ) ] );
-
-		?><p></p><?php
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/weighted-distribution.svg';
 	}
 
 	/**
@@ -68,7 +61,7 @@ class Weighted_Distribution extends Split_Path {
 	 *
 	 * @return false|\Groundhogg\Step
 	 */
-	public function get_branch_action( Contact $contact ) {
+	public function get_logic_action( Contact $contact ) {
 
 		$branches = $this->get_setting( 'branches' );
 
@@ -119,7 +112,7 @@ class Weighted_Distribution extends Split_Path {
 			if ( $branch_key === $path ) {
 				$name = get_array_var( get_array_var( $branches, $path ), 'weight' );
 
-				return $total_weight <= 100 ? $name . '%' : $name;
+				return $total_weight === 100 ? $name . '%' : $name;
 			}
 		}
 

@@ -1,4 +1,9 @@
 @charset "UTF-8";
+body.gh_reporting .wrap {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+}
 body.gh_reporting .number-total,
 body.gh_reporting .groundhogg-quick-stat-number {
   font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;

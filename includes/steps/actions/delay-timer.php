@@ -2,8 +2,6 @@
 
 namespace Groundhogg\Steps\Actions;
 
-use Groundhogg\Contact;
-use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\html;
@@ -122,8 +120,8 @@ class Delay_Timer extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/delay-timer.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/delay-timer.svg';
 	}
 
 	public function admin_scripts() {
@@ -175,11 +173,17 @@ class Delay_Timer extends Action {
 	}
 
 	public function generate_step_title( $step ) {
-		return $step->get_meta( 'delay_preview' ) ?: 'Wait 3 days';
+		return $this->get_setting( 'delay_preview' ) ?: 'Wait 3 days';
 	}
 
 	public function get_settings_schema() {
 		return [
+			'delay_preview'     => [
+				'default'  => '',
+				'sanitize' => function ( $value ) {
+					return wp_kses( $value, 'data' );
+				}
+			],
 			'delay_amount'      => [
 				'default'  => 0,
 				'sanitize' => 'absint'

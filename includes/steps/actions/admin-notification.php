@@ -79,7 +79,7 @@ class Admin_Notification extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Send an email or SMS notification to any email or list of emails.', 'step_description', 'groundhogg' );
+		return _x( 'Send a custom email notification to a user or list of users.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Admin_Notification extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/email-admin-notification.svg';
 	}
 
 	/**
@@ -233,45 +233,56 @@ class Admin_Notification extends Action {
 
 	public function get_settings_schema() {
 		return [
-			'send_to' => [
+			'send_to'          => [
 				'default'  => [],
 				'sanitize' => function ( $emails ) {
+
+					if ( empty( $emails ) ) {
+						return [];
+					}
+
 					return array_map( function ( $email ) {
+
 						if ( is_replacement_code_format( $email ) ) {
 							return $email;
 						}
 
 						return sanitize_email( $email );
-                    }, $emails );
+					}, array_filter( $emails, 'is_string' ) );
 				}
 			],
-            'reply_to_type' => [
-                'default'  => '',
-                'sanitize'  => function ( $value ) {
-	                return one_of( $value, ['contact', 'owner', 'custom' ] );
-                },
-            ],
-            'reply_to' => [
-                'default'  => '',
-                'sanitize'  => function ( $value ) {
-	                if ( is_replacement_code_format( $value ) ) {
-                        return $value;
-                    }
-
-                    return sanitize_email( $value );
-                },
-            ],
-            'hide_admin_links' => [
-                'default'  => false,
-                'sanitize'  => 'boolval',
-            ],
-            'subject' => [
-                'default'  => '',
-                'sanitize'  => 'sanitize_text_field',
-            ],
-			'note_text' => [
+			'reply_to_type'    => [
 				'default'  => '',
-				'sanitize'  => function ( $text ) {
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'contact', 'owner', 'custom' ] );
+				},
+			],
+			'reply_to'         => [
+				'default'  => '',
+				'sanitize' => function ( $value ) {
+
+					if ( ! is_string( $value ) ) {
+						return '';
+					}
+
+					if ( is_replacement_code_format( $value ) ) {
+						return $value;
+					}
+
+					return sanitize_email( $value );
+				},
+			],
+			'hide_admin_links' => [
+				'default'  => false,
+				'sanitize' => 'boolval',
+			],
+			'subject'          => [
+				'default'  => '',
+				'sanitize' => 'sanitize_text_field',
+			],
+			'note_text'        => [
+				'default'  => '',
+				'sanitize' => function ( $text ) {
 					return email_kses( $text );
 				},
 			],

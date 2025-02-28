@@ -66,7 +66,7 @@ class Sleep extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/create-user.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/create-user.png';
 	}
 
 	/**

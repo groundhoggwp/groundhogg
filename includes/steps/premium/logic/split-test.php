@@ -1,19 +1,20 @@
 <?php
 
-namespace Groundhogg\steps\logic;
+namespace Groundhogg\Steps\Premium\Logic;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use Groundhogg\Queue\Event_Queue;
+use Groundhogg\Steps\Premium\Trait_Premium_Step;
 use Groundhogg\Utils\DateTimeHelper;
-use function Groundhogg\_nf;
 use function Groundhogg\get_object_ids;
-use function Groundhogg\html;
 use function Groundhogg\one_of;
 
 class Split_Test extends Split_Path {
+
+	use Trait_Premium_Step;
 
 	public function get_name() {
 		return 'Split (A/B) Test';
@@ -24,15 +25,11 @@ class Split_Test extends Split_Path {
 	}
 
 	public function get_description() {
-		// TODO: Implement get_description() method.
-	}
-
-	public function get_sub_group() {
-		return 'logic';
+		return 'Test how different steps affect conversions and other funnel metrics.';
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/split-test.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/split-test.svg';
 	}
 
 	/**
@@ -102,7 +99,7 @@ class Split_Test extends Split_Path {
 		$current_step = $this->get_current_step();
 		$funnel       = $current_step->get_funnel();
 
-		$start_date = $this->get_setting( 'start_date' );
+		$start_date = $current_step->date_activated;
 		$start_time = ( new DateTimeHelper( $start_date ) )->getTimestamp();
 
 		$first_step = $this->get_first_of_branch( $branch );
@@ -116,8 +113,7 @@ class Split_Test extends Split_Path {
 				'funnel_id'  => $funnel->get_id(),
 				'status'     => Event::COMPLETE,
 				'event_type' => Event::FUNNEL,
-			] )->where()
-			                  ->contains( 'args', $branch ); // this will be hella slow, but reasonably safe;
+			] )->where()->contains( 'args', $branch ); // this will be hella slow, but reasonably safe;
 
 			return $contactCountQuery->count();
 
@@ -146,7 +142,7 @@ class Split_Test extends Split_Path {
 
 		$branches = $this->get_branches();
 
-		$report   = [];
+		$report = [];
 
 		foreach ( $branches as $branch ) {
 
@@ -163,100 +159,6 @@ class Split_Test extends Split_Path {
 		} );
 
 		return $report;
-	}
-
-
-	protected function before_settings( \Groundhogg\Step $step ) {
-
-		$report = $this->get_split_test_report();
-
-		wp_enqueue_style( 'groundhogg-admin-reporting' );
-
-		?>
-        <div class="display-flex gap-20 align-center">
-
-            <div class="gh-panel full-width">
-                <div class="gh-panel-header">
-                    <h2>Results</h2>
-                </div>
-                <table class="groundhogg-report-table">
-                    <thead>
-                        <th>Branch</th>
-                        <th>Contacts</th>
-                        <th>Results</th>
-                    </thead>
-                    <tbody>
-                    <?php foreach ( $report as $branch => $cells ): ?>
-                        <tr>
-                            <td><?php _e( $this->get_branch_name( $branch ) ); ?></td>
-                            <td><?php _e( _nf( $cells['contacts'] ) ); ?></td>
-                            <td><?php _e( _nf( $cells['outcomes'] ) ); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-		<?php
-
-	}
-
-	public function settings( $step ) {
-
-		echo html()->e( 'p', [], __( 'Describe your test...' ) );
-
-		echo html()->input( [
-			'placeholder' => 'A/B Test',
-			'value'       => $this->get_setting( 'test_name' ),
-			'name'        => $this->setting_name_prefix( 'test_name' ),
-		] );
-
-		echo html()->e( 'p', [], __( 'Contacts will be randomly sent down either branch <span class="pill purple">A</span> or branch <span class="pill purple">B</span>.' ) );
-		echo html()->e( 'p', [], __( 'How should traffic be split between <span class="pill purple">A</span> / <span class="pill purple">B</span>?' ) );
-
-		echo html()->e( 'div', [
-			'class' => 'gh-input-group'
-		], [
-			html()->dropdown( [
-				'selected' => absint( $this->get_setting( 'weight' ) ),
-				'name'     => $this->setting_name_prefix( 'weight' ),
-				'class'    => 'small',
-				'options'  => [
-					10 => '10% / 90%',
-					20 => '20% / 80%',
-					30 => '30% / 70%',
-					40 => '40% / 60%',
-					50 => '50% / 50%',
-					60 => '60% / 40%',
-					70 => '70% / 30%',
-					80 => '80% / 20%',
-					90 => '90% / 10%',
-				],
-				'readonly' => (bool) $this->get_setting( 'start_date' )
-			] ),
-		] );
-
-		echo html()->e( 'p', [], __( 'Define the win condition.' ) );
-
-		echo html()->dropdown( [
-			'placeholder' => 'Path A weight',
-			'selected'    => $this->get_setting( 'win_condition' ),
-			'name'        => $this->setting_name_prefix( 'win_condition' ),
-			'options'     => [
-				'conversions' => 'Funnel conversions',
-				'clicks'      => 'Email link clicks',
-			],
-			'readonly'    => (bool) $this->get_setting( 'start_date' )
-		] );
-
-		echo html()->e( 'p', [], __( 'When your branches have been completely configured, start the test!' ) );
-
-		echo html()->button( [
-			'class' => 'gh-button primary',
-			'text'  => 'Start Test!'
-		] );
-
-		?><p></p><?php
 	}
 
 	public function get_settings_schema() {
@@ -279,13 +181,6 @@ class Split_Test extends Split_Path {
 			],
 			// threshold to declare a winner
 			'win_threshold' => [],
-			// when the test was started
-			'start_date'    => [
-				'default'  => '',
-				'sanitize' => function ( $value ) {
-					return ( new DateTimeHelper( $value ) )->ymdhis();
-				}
-			],
 			// when the test should automatically end
 			'end_date'      => [
 				'default'  => '',
@@ -312,17 +207,6 @@ class Split_Test extends Split_Path {
 		];
 	}
 
-	/**
-	 * Step title
-	 *
-	 * @param $step
-	 *
-	 * @return false|string
-	 */
-	public function generate_step_title( $step ) {
-		return $this->get_setting( 'test_name' );
-	}
-
 	protected function get_branch_name( $branch ) {
 		$branch = strtoupper( explode( '-', $branch )[1] );
 
@@ -335,6 +219,10 @@ class Split_Test extends Split_Path {
 		return "$branch ($weight%)";
 	}
 
+	public function matches_branch_conditions( string $branch, Contact $contact ) {
+		return true;
+	}
+
 	/**
 	 * Cleverly distribute contacts among the branches based on weighted distribution
 	 *
@@ -342,7 +230,7 @@ class Split_Test extends Split_Path {
 	 *
 	 * @return false|\Groundhogg\Step
 	 */
-	public function get_branch_action( Contact $contact ) {
+	public function get_logic_action( Contact $contact ) {
 
 		$path_a_weight = absint( $this->get_setting( 'weight' ) );
 		$path_b_weight = 100 - $path_a_weight;
@@ -372,8 +260,5 @@ class Split_Test extends Split_Path {
 		}
 
 		return false;
-	}
-
-	protected function after_settings( \Groundhogg\Step $step ) {
 	}
 }

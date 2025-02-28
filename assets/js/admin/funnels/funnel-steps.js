@@ -34,14 +34,15 @@
 
   const {
     Div,
-    H2,
-    Fragment,
     Button,
     ModalFrame,
     ItemPicker,
     Iframe,
     makeEl,
     Dashicon,
+    H2,
+    Pg,
+    Fragment,
     Input,
   } = MakeEl
 
@@ -230,9 +231,6 @@
     return capitalize(preview.join(' '))
   }
 
-
-
-
   const DelayTimer = {
 
     edit ({
@@ -334,7 +332,10 @@
       //language=HTML
       return `
           <div class="display-flex column gap-10">
-              <h3 class="delay-preview" style="font-weight: normal">${delay_preview}</h3>
+              <h3 class="delay-preview" style="font-weight: normal">${delayTimerName({
+                  ...delayTimerDefaults,
+                  ...meta
+              })}</h3>
               <div class="row display-flex column gap-10">
                   <label class="row-label">${ __('Wait at least...', 'groundhogg') }</label>
                   <div class="gh-input-group">
@@ -877,300 +878,6 @@
           exclude_display: ContactFilterDisplay(filters).innerHTML,
         })
       }))
-    },
-  })
-
-  function generateBranchKey () {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    let result = ''
-    for (let i = 0; i < 8; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return result
-  }
-
-  Funnel.registerStepCallbacks('split_path', {
-    onActive: ({
-      ID,
-      meta,
-    }) => {
-
-      let {
-        branches = {},
-      } = meta
-
-      if (typeof branches !== 'object' || Array.isArray(branches)) {
-        branches = {}
-      }
-
-      const updateBranch = (key, args) => {
-        branches[key] = {
-          ...branches[key] ?? {},
-          ...args,
-        }
-        Funnel.updateStepMeta({
-          branches,
-        })
-      }
-
-      const Branch = (
-        key, {
-          include_filters = [],
-          exclude_filters = [],
-          name = '',
-        }, morph, i) => Div({
-        id        : `path-${ key }`,
-        dataBranch: key,
-        className : 'gh-panel outlined closed',
-      }, [
-        Div({ className: 'gh-panel-header' }, [
-          H2({}, [name ? name : `Path ${ i + 1 }`]),
-          Button({
-            className: 'toggle-indicator',
-            onClick  : e => {
-              e.currentTarget.closest('.gh-panel').classList.toggle('closed')
-            },
-          }),
-        ]),
-        Div({ className: 'inside' }, [
-          Input({
-            id         : `path-${ key }-name`,
-            name       : 'path_name',
-            value      : name,
-            placeholder: `Path ${ i + 1 }`,
-            onInput    : e => updateBranch(key, { name: e.target.value }),
-          }),
-          Div({
-            className: 'include-search-filters',
-          }, [
-            ContactFilters(`path-${ key }-include`, include_filters, include_filters => {
-              updateBranch(key, {
-                include_filters,
-              })
-            }),
-          ]),
-          Div({
-            className: 'exclude-search-filters',
-          }, [
-            ContactFilters(`path-${ key }-exclude`, exclude_filters, exclude_filters => {
-              updateBranch(key, {
-                exclude_filters,
-              })
-            }),
-          ]),
-          Button({
-            className: 'gh-button danger',
-            id       : `delete-${ key }`,
-            onClick  : e => {
-              dangerConfirmationModal({
-                alert: '<p>Are you sure you want to delete this branch? Any steps in the branch will also be deleted.</p>',
-                onConfirm: () => {
-                  delete branches[key]
-
-                  Funnel.updateStepMeta({
-                    branches,
-                  })
-
-                  Funnel.save()
-                }
-              })
-            },
-          }, 'Delete'),
-        ]),
-      ])
-
-      const BranchEditor = () => Div({
-        id: `step_${ ID }_branches`,
-      }, morph => Div({
-        className: 'branch-contain',
-      }, [
-
-        Div({
-          className: 'branch-sortable',
-          onCreate : el => {
-            setTimeout(() => {
-
-              $(el).sortable({
-                update: (e, ui) => {
-
-                  let newOrder = {}
-
-                  el.querySelectorAll('[data-branch]').forEach(el => {
-                    newOrder[el.dataset.branch] = branches[el.dataset.branch]
-                  })
-
-                  branches = newOrder
-
-                  Funnel.updateStepMeta({
-                    branches,
-                  })
-
-                  morph()
-
-                },
-              })
-
-            }, 10)
-          },
-        }, [
-          ...Object.keys(branches).map(( (key, i) => Branch(key, branches[key], morph, i) )),
-        ]),
-
-        Button({
-          className: 'gh-button secondary',
-          onClick  : e => {
-
-            let key = generateBranchKey()
-
-            updateBranch(key, {
-              include_filters: [],
-              exclude_filters: [],
-            })
-
-            morph()
-
-            document.getElementById(`path-${ key }`).classList.toggle('closed')
-
-          },
-        }, 'New Branch'),
-
-      ]))
-
-      morphdom(document.getElementById(`step_${ ID }_branches`), BranchEditor())
-
-    },
-  })
-
-  Funnel.registerStepCallbacks('weighted_distribution', {
-    onActive: ({
-      ID,
-      meta,
-    }) => {
-
-      let {
-        branches = {},
-      } = meta
-
-      if (typeof branches !== 'object' || Array.isArray(branches)) {
-        branches = {}
-      }
-
-      const updateBranch = (key, args) => {
-        branches[key] = {
-          ...branches[key] ?? {},
-          ...args,
-        }
-        Funnel.updateStepMeta({
-          branches,
-        })
-      }
-
-      const Branch = (
-        key, {
-          weight = 0,
-        }, morph, i) => Div({
-        id        : `path-${ key }`,
-        dataBranch: key,
-        className : 'gh-panel outlined closed',
-      }, [
-        Div({ className: 'gh-panel-header' }, [
-          H2({}, [weight ? `Weight ${ weight }` : `Path ${ i + 1 }`]),
-          Button({
-            className: 'toggle-indicator',
-            onClick  : e => {
-              e.currentTarget.closest('.gh-panel').classList.toggle('closed')
-            },
-          }),
-        ]),
-        Div({ className: 'inside' }, [
-          Input({
-            type       : 'number',
-            id         : `path-${ key }-wight`,
-            name       : 'path_weight',
-            value      : weight,
-            placeholder: `Path ${ i + 1 }`,
-            onInput    : e => updateBranch(key, { weight: e.target.value }),
-          }),
-          Button({
-            className: 'gh-button danger',
-            id       : `delete-${ key }`,
-            onClick  : e => {
-
-              dangerConfirmationModal({
-                alert: '<p>Are you sure you want to delete this branch? Any steps in the branch will also be deleted.</p>',
-                onConfirm: () => {
-                  delete branches[key]
-
-                  Funnel.updateStepMeta({
-                    branches,
-                  })
-
-                  Funnel.save()
-                }
-              })
-            },
-          }, 'Delete'),
-        ]),
-      ])
-
-      const BranchEditor = () => Div({
-        id: `step_${ ID }_branches`,
-      }, morph => Div({
-        className: 'branch-contain',
-      }, [
-
-        Div({
-          className: 'branch-sortable',
-          onCreate : el => {
-            setTimeout(() => {
-
-              $(el).sortable({
-                update: (e, ui) => {
-
-                  let newOrder = {}
-
-                  el.querySelectorAll('[data-branch]').forEach(el => {
-                    newOrder[el.dataset.branch] = branches[el.dataset.branch]
-                  })
-
-                  branches = newOrder
-
-                  Funnel.updateStepMeta({
-                    branches,
-                  })
-
-                  morph()
-
-                },
-              })
-
-            }, 10)
-          },
-        }, [
-          ...Object.keys(branches).map(( (key, i) => Branch(key, branches[key], morph, i) )),
-        ]),
-
-        Button({
-          className: 'gh-button secondary',
-          onClick  : e => {
-
-            let key = generateBranchKey()
-
-            updateBranch(key, {
-              weight: 0,
-            })
-
-            morph()
-
-            document.getElementById(`path-${ key }`).classList.toggle('closed')
-
-          },
-        }, 'New Branch'),
-
-      ]))
-
-      morphdom(document.getElementById(`step_${ ID }_branches`), BranchEditor())
-
     },
   })
 

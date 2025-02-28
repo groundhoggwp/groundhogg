@@ -194,14 +194,14 @@ abstract class LMS_Integration extends Benchmark {
 					] );
 				}
 			],
-            'course' => [
-                'default'  => [],
-                'sanitize' => 'wp_parse_id_list'
-            ],
-            'lesson' => [
-                'default'  => [],
-                'sanitize' => 'wp_parse_id_list'
-            ]
+			'course' => [
+				'default'  => [],
+				'sanitize' => 'wp_parse_id_list'
+			],
+			'lesson' => [
+				'default'  => [],
+				'sanitize' => 'wp_parse_id_list'
+			]
 		];
 	}
 

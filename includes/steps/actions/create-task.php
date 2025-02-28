@@ -66,7 +66,7 @@ class Create_Task extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Create a new task', 'step_description', 'groundhogg' );
+		return _x( 'Create a new task and assign it to a user.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Create_Task extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/create-task.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/create-task.svg';
 	}
 
 	/**
@@ -162,7 +162,7 @@ class Create_Task extends Action {
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field'
 			],
-			'content'    => [
+			'content'      => [
 				'default'  => '',
 				'sanitize' => 'wp_kses_post'
 			],
@@ -227,7 +227,7 @@ class Create_Task extends Action {
 		$type      = $this->get_setting( 'task_type', 'task' );
 		$assign_to = absint( $this->get_setting( 'assign_to' ) );
 
-        if ( ! $assign_to ) {
+		if ( ! $assign_to ) {
 			$assign_to = $contact->get_owner_id();
 		}
 
@@ -250,9 +250,9 @@ class Create_Task extends Action {
 			'date_created' => Ymd_His( $event->get_time() )
 		] );
 
-        $event->set_args( [
-            'task_id' => $task->ID
-        ] );
+		$event->set_args( [
+			'task_id' => $task->ID
+		] );
 
 		return true;
 	}

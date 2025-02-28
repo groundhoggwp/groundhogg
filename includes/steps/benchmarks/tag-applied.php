@@ -75,11 +75,11 @@ class Tag_Applied extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.png';
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.svg';
+//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-applied.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-applied.svg';
 	}
 
-	public function tag_settings(){
+	public function tag_settings() {
 		echo html()->e( 'div', [
 			'class' => 'display-flex gap-10 align-top'
 		], [
@@ -114,19 +114,26 @@ class Tag_Applied extends Benchmark {
 
 	public function get_settings_schema() {
 		return [
-			'tags' => [
-				'default' => [],
+			'tags'      => [
+				'default'  => [],
 				'sanitize' => function ( $tags ) {
 					return parse_tag_list( $tags );
 				}
 			],
 			'condition' => [
-				'default' => 'any',
+				'default'  => 'any',
 				'sanitize' => function ( $value ) {
 					return one_of( $value, [ 'any', 'all' ] );
 				}
 			]
 		];
+	}
+
+	public function validate_settings( Step $step ) {
+		$tags = $this->get_setting( 'tags' );
+		if ( empty( $tags ) ) {
+			$step->add_error( 'no_tags', 'No tags have been selected.' );
+		}
 	}
 
 	public function generate_step_title( $step ) {

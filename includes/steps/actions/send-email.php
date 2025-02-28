@@ -79,7 +79,7 @@ class Send_Email extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/send-email.svg';
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Send_Email extends Action {
 			$step->add_error( 'email_dne', __( 'You have not selected an email!', 'groundhogg' ) );
 		}
 
-		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
+		if ( $email->exists() && $email->is_draft() ) {
 			$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop.' ) );
 		}
 	}
@@ -109,17 +109,18 @@ class Send_Email extends Action {
 	public function get_settings_schema() {
 		return [
 			'skip_if_confirmed' => [
-				'default'  => false,
-				'sanitize' => 'boolval'
+				'default'      => false,
+				'sanitize'     => 'boolval',
+				'if_undefined' => false
 			],
-            'reply_in_thread' => [
-                'default'  => false,
-                'sanitize' => 'absint'
-            ],
-            'email_id' => [
-                'default' => 0,
-                'sanitize' => 'absint'
-            ]
+			'reply_in_thread'   => [
+				'default'  => false,
+				'sanitize' => 'absint'
+			],
+			'email_id'          => [
+				'default'  => 0,
+				'sanitize' => 'absint'
+			]
 		];
 	}
 

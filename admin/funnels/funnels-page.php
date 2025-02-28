@@ -13,6 +13,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\check_lock;
+use function Groundhogg\db;
 use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
@@ -197,15 +198,17 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-					'steps'      => $funnel->get_steps_for_editor(),
+					'steps'      => $funnel->get_steps(),
 					'id'         => absint( get_request_var( 'funnel' ) ),
 					'save_text'  => __( 'Update', 'groundhogg' ),
 					'export_url' => $funnel->export_url(),
-					'is_active'  => $funnel->is_active()
+					'is_active'  => $funnel->is_active(),
+                    'themeStyle' => get_stylesheet_uri()
 				] );
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
+				wp_enqueue_style( 'groundhogg-admin-reporting' );
 
 				add_filter( 'admin_body_class', function ( $class ) {
 
@@ -243,6 +246,9 @@ class Funnels_Page extends Admin_Page {
 				$query->setSelect( 'DISTINCT author' );
 				$results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
 
+				// todo add script to preview funnels like in the email editor
+//				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
+//				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-filter-funnels' );
 				wp_add_inline_script( 'groundhogg-admin-filter-funnels', "Groundhogg.authors = " . wp_json_encode( $results ) );
 
@@ -615,9 +621,11 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
+		$funnel   = $this->get_current_funnel();
 		$response = [
-			'sortable' => '',
-			'settings' => ''
+			'sortable' => $funnel->step_flow( false ),
+			'settings' => $funnel->step_settings( false ),
+			'funnel'   => $funnel
 		];
 
 		if ( is_wp_error( $result ) ) {
@@ -627,22 +635,6 @@ class Funnels_Page extends Admin_Page {
 		if ( $this->has_errors() ) {
 			$response['err'] = $this->get_last_error()->get_error_message();
 		}
-
-		$funnel = $this->get_current_funnel();
-		$steps  = $funnel->get_steps_for_editor();
-		$steps  = array_filter( $steps, function ( Step $step ) {
-			return $step->is_main_branch();
-		} );
-
-		foreach ( $steps as $step ) {
-			// this will show errors in the event of a settings issue
-			$step->get_step_element()->validate_settings( $step );
-
-			$response['sortable'] .= $step->sortable_item( false );
-			$response['settings'] .= $step->html( false );
-		}
-
-		$response['funnel'] = $this->get_current_funnel();
 
 		$this->send_ajax_response( $response );
 
@@ -676,6 +668,18 @@ class Funnels_Page extends Admin_Page {
 			$step->delete();
 		}
 
+		if ( get_post_var( '_lock_step' ) ) {
+			$step_id = absint( get_post_var( '_lock_step' ) );
+			// update directly to avoid the changes/commit feature
+			db()->steps->update( $step_id, [ 'is_locked' => 1 ] );
+		}
+
+		if ( get_post_var( '_unlock_step' ) ) {
+			$step_id = absint( get_post_var( '_unlock_step' ) );
+            // update directly to avoid the changes/commit feature
+			db()->steps->update( $step_id, [ 'is_locked' => 0 ] );
+		}
+
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
 
@@ -703,10 +707,6 @@ class Funnels_Page extends Admin_Page {
 			if ( ! is_numeric( $stepId ) ) {
 
 				if ( $stepId === 'duplicate' ) {
-
-//	                if ( get_post_var( '_duplicate_step' ) ) {
-//                        $extra = json_decode( get_post_var( '_duplicate_step' ), true );
-//	                }
 
 					// duplicate the previous step
 					$step->duplicate( [
@@ -763,12 +763,20 @@ class Funnels_Page extends Admin_Page {
 			$step->save();
 		}
 
-        if ( get_post_var( '_activate' ) ){
-            $args['status'] = 'active';
-        }
+		if ( get_post_var( '_activate' ) ) {
+			$args['status']       = 'active';
+			$args['last_updated'] = current_time( 'mysql' );
+		}
 
-		if ( get_post_var( '_deactivate' ) ){
-			$args['status'] = 'inactive';
+		if ( get_post_var( '_deactivate' ) ) {
+
+			// changes were not committed, so let's delete them
+			if ( ! get_post_var( '_commit' ) ) {
+				$funnel->uncommit();
+			}
+
+			$args['status']       = 'inactive';
+			$args['last_updated'] = current_time( 'mysql' );
 		}
 
 		// if the funnel does not have any entry steps, it cannot be active.
@@ -777,14 +785,14 @@ class Funnels_Page extends Admin_Page {
 			$funnel->add_error( new \WP_Error( 'err', 'You must have at least one entry benchmark before activating a funnel.' ) );
 		}
 
-		$args['title']        = sanitize_text_field( get_request_var( 'funnel_title' ) );
-		$args['last_updated'] = current_time( 'mysql' );
-
-		$funnel->update( $args );
-
 		if ( get_post_var( '_commit' ) && $funnel->is_active() ) {
+			$args['last_updated'] = current_time( 'mysql' );
 			$funnel->commit();
 		}
+
+		$args['title'] = sanitize_text_field( get_post_var( 'funnel_title' ) );
+
+		$funnel->update( $args );
 
 		/**
 		 * Runs after the funnel as been updated.
