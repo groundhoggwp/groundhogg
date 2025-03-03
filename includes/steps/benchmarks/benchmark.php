@@ -77,6 +77,7 @@ abstract class Benchmark extends Funnel_Step {
 	}
 
 	public function __construct() {
+        
 		// Setup the main complete function
 		// Accepts no arguments, but requires that child implementations setup the data ahead of time.
 		foreach ( $this->get_complete_hooks() as $hook => $args ) {

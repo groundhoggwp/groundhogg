@@ -435,6 +435,20 @@ class Funnel extends Base_Object_With_Meta {
 		] );
 	}
 
+	public function has_errors() {
+
+		$has_errors = array_any( $this->get_steps(), function ( Step $step ) {
+			$step->get_step_element()->validate_settings( $step );
+			return $step->has_errors() || $step->get_step_element()->has_errors();
+		} );
+
+		if ( $has_errors ){
+			return true;
+		}
+
+		return parent::has_errors();
+	}
+
 	/**
 	 * Get a bunch of steps
 	 *
@@ -451,7 +465,7 @@ class Funnel extends Base_Object_With_Meta {
 		] );
 
 		// if not editing, only active steps should be included...
-		if ( ! $this->is_editing() ) {
+		if ( ! $this->is_editing() && $this->is_active() ) {
 			$query['step_status'] = 'active';
 		}
 
@@ -529,11 +543,8 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-
-		$steps = $this->get_steps();
-
 		return array_merge( parent::get_as_array(), [
-			'steps'     => $steps,
+			'steps'     => $this->get_steps(),
 			'campaigns' => $this->get_related_objects( 'campaign' ),
 			'links'     => [
 				'export' => $this->export_url(),
@@ -552,6 +563,10 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function export() {
+
+		$steps = $this->get_steps();
+
+
 		return $this->get_as_array();
 	}
 
@@ -607,7 +622,7 @@ class Funnel extends Base_Object_With_Meta {
 			$step->update_meta( (array) $_step->meta );
 			$step->import( (array) $_step->export );
 
-			// Save the original ID from the donor site
+			// Save the original ID from the donor funnel
 			$step->update_meta( 'imported_step_id', $_step->ID );
 
 			$steps[ $i ] = $step;

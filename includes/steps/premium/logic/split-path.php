@@ -24,7 +24,7 @@ class Split_Path extends Branch_Logic {
 	}
 
 	public function get_description() {
-		return 'Similar to the Yes/No step, but you can add additional branches.';
+		return 'Similar to Yes/No logic, but each branch has its own conditions.';
 	}
 
 	public function get_icon() {

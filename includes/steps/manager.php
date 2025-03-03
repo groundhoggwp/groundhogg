@@ -23,11 +23,9 @@ use Groundhogg\Steps\Benchmarks\Task_Completed;
 use Groundhogg\Steps\Benchmarks\Web_Form;
 use Groundhogg\Steps\Logic\If_Else;
 use Groundhogg\Steps\Logic\Logic;
-use Groundhogg\Steps\Premium\Logic\Split_Path;
-use Groundhogg\Steps\Premium\Logic\Split_Test;
-use Groundhogg\Steps\Premium\Logic\Weighted_Distribution;
 use function Groundhogg\get_array_var;
 use function Groundhogg\is_pro_features_active;
+use function Groundhogg\is_white_labeled;
 
 /**
  * Created by PhpStorm.
@@ -111,8 +109,8 @@ class Manager {
 		/* Logic */
 		$this->add_step( new If_Else() );
 
-		// Premium steps
-		if ( ! is_pro_features_active() ) {
+		// Premium steps, don't include if white labeled
+		if ( ! is_pro_features_active() && ! is_white_labeled() ) {
 			// actions
 			$this->add_step( new Premium\Actions\Apply_Owner() );
 			$this->add_step( new Premium\Actions\Create_User() );
@@ -137,10 +135,11 @@ class Manager {
 			$this->add_step( new Premium\Benchmarks\Webhook_Listener() );
 
 			// logic
-			$this->add_step( new Split_Path() );
-			$this->add_step( new Split_Test() );
-			$this->add_step( new Weighted_Distribution() );
+			$this->add_step( new Premium\Logic\Split_Path() );
+			$this->add_step( new Premium\Logic\Split_Test() );
+			$this->add_step( new Premium\Logic\Weighted_Distribution() );
 			$this->add_step( new Premium\Logic\Logic_Loop() );
+			$this->add_step( new Premium\Logic\Logic_Skip() );
 
 		}
 

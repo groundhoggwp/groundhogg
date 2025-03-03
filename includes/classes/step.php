@@ -7,7 +7,9 @@ use Groundhogg\DB\Events;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
+use Groundhogg\Steps\Actions\Polyfill_Action;
 use Groundhogg\Steps\Actions\Send_Email;
+use Groundhogg\steps\benchmarks\Polyfill_Benchmark;
 use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\Utils\DateTimeHelper;
 
@@ -157,7 +159,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function get_type_name() {
-		return Plugin::instance()->step_manager->get_element( $this->get_type() )->get_name();
+		return $this->get_step_element()->get_name();
 	}
 
 	public function get_group() {
@@ -1166,7 +1168,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Funnel_Step
 	 */
 	public function get_step_element() {
-		$element = Plugin::instance()->step_manager->get_element( $this->get_type() );
+
+		$type = $this->get_type();
+
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ){
+			if ( $this->is_benchmark() ){
+				return new Polyfill_Benchmark( $this );
+			}
+
+			if ( $this->is_action() ){
+				return new Polyfill_Action( $this );
+			}
+
+			$type = 'error';
+		}
+
+		$element = Plugin::instance()->step_manager->get_element( $type );
 		$element->set_current_step( $this );
 
 		return $element;

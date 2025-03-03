@@ -8,10 +8,12 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
+use Groundhogg\Step;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_any;
 use function Groundhogg\check_lock;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\get_db;
@@ -112,33 +114,24 @@ class Funnels_Table extends Table {
 
 	protected function column_title( $funnel ) {
 
-		$subject = ( ! $funnel->title ) ? '(' . __( 'no title' ) . ')' : $funnel->title;
+		$subject = $funnel->get_title();
+		$editUrl = $funnel->admin_link();
 
-		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
-
-//		if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
-//			$editUrl = add_query_arg( [
-//				'version' => 1
-//			], $editUrl );
-//		}
-
-		if ( $this->get_view() === 'archived' ) {
-			$html = "<strong class='row-title'>{$subject}</strong>";
-		} else {
-
-			row_item_locked_text( $funnel );
-
-			$html = "<strong>";
-
-			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
-
-			if ( $funnel->status === 'inactive' ) {
-				$html .= " &#x2014; " . "<span class='post-state'>" . _x( 'Inactive', 'status', 'groundhogg' ) . "</span>";
-			}
-
-			$html .= "</strong>";
+		if ( $this->get_view() === 'trash' ) {
+			return "<strong class='row-title'>{$subject}</strong>";
 		}
 
+		row_item_locked_text( $funnel );
+
+		$html = "<strong>";
+
+        if ( $funnel->has_errors() ){
+            $html .= '<span>⚠️<div class="gh-tooltip top">Steps in this funnel might have issues.</div></span>';
+        }
+
+		$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+		$html .= "</strong>";
 
 		return $html;
 	}
@@ -228,8 +221,8 @@ class Funnels_Table extends Table {
 	protected function column_steps( Funnel $funnel ) {
 
 		$allSteps = $funnel->get_steps();
-        $steps = array_splice( $allSteps, 0, 6 );
-        $edit_url = $funnel->admin_link();
+		$steps    = array_splice( $allSteps, 0, 6 );
+		$edit_url = $funnel->admin_link();
 
 		foreach ( $steps as $step ) {
 
@@ -250,18 +243,18 @@ class Funnels_Table extends Table {
 
 		}
 
-        if ( ! empty( $allSteps ) ) {
-	        ?>
+		if ( ! empty( $allSteps ) ) {
+			?>
             <div data-gh-href="<?php echo $edit_url ?>" class="step-icon more">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
                     <path fill="#000" d="M4 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
                 </svg>
                 <div class="gh-tooltip top">
-			        <?php printf( _n( '%d more step...', '%d more steps',  count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ?>
+					<?php printf( _n( '%d more step...', '%d more steps', count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ?>
                 </div>
             </div>
-	        <?php
-        }
+			<?php
+		}
 	}
 
 	/**
@@ -361,7 +354,7 @@ class Funnels_Table extends Table {
 					'url'     => $item->export_url()
 				];
 
-				if ( ! check_lock($item) ){
+				if ( ! check_lock( $item ) ) {
 					$actions[] = [
 						'class'   => 'trash',
 						'display' => __( 'Deactivate' ),
@@ -383,7 +376,7 @@ class Funnels_Table extends Table {
 					'url'     => $item->export_url()
 				];
 
-				if ( ! check_lock($item) ){
+				if ( ! check_lock( $item ) ) {
 					$actions[] = [
 						'class'   => 'trash',
 						'display' => __( 'Archive' ),

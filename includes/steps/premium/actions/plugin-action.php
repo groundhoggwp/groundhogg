@@ -46,6 +46,6 @@ class Plugin_Action extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/plugin-action.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/plugin-api-action.svg';
 	}
 }

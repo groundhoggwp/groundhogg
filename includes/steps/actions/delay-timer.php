@@ -301,7 +301,7 @@ class Delay_Timer extends Action {
 		$date->setTimezone( $tz );
 
 		// The base amount of time which we need to wait for
-		if ( $settings['delay_type'] !== 'none' ) {
+		if ( $settings['delay_type'] !== 'none' && $settings['delay_amount'] ) {
 			$date->modify( sprintf( '+%d %s', $settings['delay_amount'], $settings['delay_type'] ) );
 		}
 
@@ -450,6 +450,12 @@ class Delay_Timer extends Action {
 
 				break;
 		}
+
+        // if the calculated time is now, lets advanced the base time by a minute...
+        // this cleverly prevents an infinite loop
+        if ( $date->isNow() ){
+            return $this->calc_run_time( time() + MINUTE_IN_SECONDS , $step );
+        }
 
 		return $date->getTimestamp();
 	}

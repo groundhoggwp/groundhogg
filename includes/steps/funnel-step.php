@@ -574,13 +574,18 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'sortable-item';
 		}
 
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) || $this->get_type() === 'error' ) {
+			$classes[] = 'invalid';
+		}
+
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
         <div
                 id="step-<?php echo $step->get_id(); ?>"
                 data-id="<?php echo $step->get_id(); ?>"
-                data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+                data-type="<?php esc_attr_e( $step->get_type() ); ?>"
+                data-group="<?php esc_attr_e( $step->get_group() ); ?>"
                 class="step <?php echo implode( ' ', $classes ) ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">

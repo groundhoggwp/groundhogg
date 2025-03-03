@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Step;
 use function Groundhogg\array_filter_splice;
+use function Groundhogg\db;
 use function Groundhogg\maybe_explode;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,7 +102,7 @@ abstract class Branch_Logic extends Logic {
 		$this->set_current_step( $step );
 
 		?>
-        <div class="sortable-item logic">
+        <div class="sortable-item logic" data-type="<?php esc_attr_e( $step->get_type()); ?>" data-group="<?php esc_attr_e( $step->get_group()); ?>">
 			<?php parent::sortable_item( $step ); ?>
             <div class="display-flex align-center step-branches">
 				<?php foreach ( $this->get_branches() as $branch_id ):
@@ -167,5 +168,33 @@ abstract class Branch_Logic extends Logic {
 		// reset to the current step
 		$this->set_current_step( $step );
 	}
+
+	/**
+	 * @param Step $step
+	 *
+	 * @return void
+	 */
+    public function post_import( $step ) {
+
+        $oldId = $step->get_meta( 'imported_step_id' );
+
+        // we have to update all the branches
+
+        $branches = $this->get_branches();
+
+        foreach ( $branches as $branch ) {
+
+            $parts = explode( '-', $branch );
+            $oldbranch = $oldId . '-' . $parts[1];
+
+            db()->steps->update( [
+                'branch' => $oldbranch, // old branch
+            ], [
+	            'branch' => $branch, // new branch
+            ] );
+
+        }
+
+    }
 
 }
