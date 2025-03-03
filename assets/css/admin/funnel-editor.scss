@@ -13,7 +13,9 @@ $primary-dark-10: rgba(16, 38, 64, 0.10);
 $primary-dark-5: rgba(16, 38, 64, 0.05);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
-$error-red-10: rgba(233, 31, 79, 0.10);
+$error-red-25: rgba($error-red, 0.25);
+$error-red-10: rgba($error-red, 0.10);
+$error-red-5: rgba($error-red, 0.05);
 $secondary-purple: rgb(108, 25, 173);
 $secondary-purple-25: rgba($secondary-purple, 0.25);
 $secondary-purple-10: rgba($secondary-purple, 0.10);
@@ -86,27 +88,17 @@ body:has(#funnel-form) {
     }
   }
 
-  &.funnel-full-screen {
+  &.gh-full-screen {
     #funnel-form {
-      top: 0;
-      left: 0;
-
       #full-screen {
         .dashicons::before {
           content: "\f189";
         }
       }
     }
-
-    /* Full Screen */
-    #adminmenumain,
-    #wpfooter,
-    #wpadminbar {
-      display: none !important;
-    }
   }
 
-  &:not(.funnel-full-screen) {
+  &:not(.gh-full-screen) {
     #close {
       display: none;
     }
@@ -311,11 +303,12 @@ body:has(#funnel-form) {
           //padding: 5px;
           cursor: grab;
 
-          .step-element{
+          .step-element {
             &.premium {
 
               .step-icon {
                 position: relative;
+
                 &::after {
                   @include above-text;
                   content: 'PRO';
@@ -464,17 +457,6 @@ body:has(#funnel-form) {
               margin-top: 10px;
               margin-left: auto;
               display: block;
-            }
-          }
-        }
-
-        &.action.apply_note {
-          .step-flex .step-edit .custom-settings {
-            padding: 0;
-
-            .mce-panel {
-              box-shadow: none;
-              border-top: none;
             }
           }
         }
@@ -846,8 +828,22 @@ button.button.save-button {
       position: absolute;
       z-index: 1;
 
+      &.skip-line,
       &.loop-line {
         border-color: $secondary-purple;
+      }
+
+      &.loop-line {
+        > .line-arrow {
+          &.top {
+            left: 60%;
+          }
+
+          &.bottom {
+            left: 60%;
+          }
+        }
+
       }
 
       > .line-arrow {
@@ -860,19 +856,25 @@ button.button.save-button {
 
         &.top {
           transform: translate(-50%, -50%) rotate(45deg);
-          left: 50%;
+          left: 40%;
           top: 0;
         }
 
         &.bottom {
           transform: translate(-50%, 50%) rotate(-135deg);
-          left: 50%;
+          left: 40%;
           bottom: 0;
         }
 
         &.left {
           transform: translate(-50%, -50%) rotate(-45deg);
           left: 0;
+          top: 50%;
+        }
+
+        &.right {
+          transform: translate(50%, -50%) rotate(135deg);
+          right: 0;
           top: 50%;
         }
       }
@@ -918,7 +920,7 @@ button.button.save-button {
         > .logic-line {
           border-color: $secondary-purple;
 
-          .logic-line{
+          .logic-line {
             border-color: $secondary-purple;
           }
 
@@ -1180,6 +1182,13 @@ button.button.save-button {
           transform: rotate(-45deg);
         }
       }
+    }
+
+    &.invalid {
+      --color: #{$error-red};
+      --color-25: #{$error-red-25};
+      --color-10: #{$error-red-10};
+      --color-5: #{$error-red-5};
     }
 
     &:has(.step-label) {

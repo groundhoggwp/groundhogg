@@ -129,11 +129,11 @@
         }
 
         $document.on('click', '#full-screen', () => {
-          $(document.body).toggleClass('funnel-full-screen')
+          $(document.body).toggleClass('gh-full-screen')
 
           ajax({
             action     : 'gh_funnel_editor_full_screen_preference',
-            full_screen: $(document.body).hasClass('funnel-full-screen') ? 1 : 0,
+            full_screen: $(document.body).hasClass('gh-full-screen') ? 1 : 0,
           })
 
         })
@@ -1019,8 +1019,6 @@
 
   function drawLogicLines () {
 
-    console.log( 'draw' )
-
     // const borderRadius = '50px'
     const borderRadius = '100%'
     const borderPixels = 2
@@ -1046,6 +1044,7 @@
         let targetPos = targetStep.getBoundingClientRect()
 
         let lineHeight = stepPos.bottom - targetPos.bottom
+        let minWidth = Math.min( stepPos.width, targetPos.width )
 
         let branch = el.closest('.step-branch')
         let branchPos = branch.getBoundingClientRect()
@@ -1063,11 +1062,11 @@
 
         clearLineStyle(line)
 
-        let width = widestEl ? ( widestEl.getBoundingClientRect().width / 2 ) + 100 : ( branchPos.width / 2 ) + 50
+        let width = (( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ))/2
 
         line.style.bottom = `${ branchPos.bottom - stepPos.bottom + ( stepPos.height / 2 ) }px`
         line.style.width = `${ width }px`
-        line.style.right = '50%'
+        line.style.right = `calc(50% + ${minWidth/2}px)`
         line.style.height = `${ lineHeight }px`
         line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
         line.style.borderBottomLeftRadius = borderRadius
@@ -1075,6 +1074,55 @@
 
       })
     } catch (e) {}
+
+    // skips
+    try {
+      document.querySelectorAll('.step-branch .step.skip, .step-branch .step.logic_skip').forEach(step => {
+
+        // the step-branch.benchmarks container
+        let stepPos = step.getBoundingClientRect()
+        let stepId = step.dataset.id
+        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
+
+        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
+          return
+        }
+
+        let targetStep = document.getElementById(`step-${ targetStepId }`)
+        let widestEl = findWidestElementBetween(step, targetStep)
+        let targetPos = targetStep.getBoundingClientRect()
+
+        let lineHeight = Math.abs( stepPos.bottom - targetPos.bottom )
+        let minWidth = Math.min( stepPos.width, targetPos.width )
+
+        let branch = step.closest('.step-branch')
+        let branchPos = branch.getBoundingClientRect()
+
+        let line = branch.querySelector(`div.logic-line.skip-${ stepId }-to-${ targetStepId }`)
+
+        if (!line) {
+          line = Div({ className: `logic-line skip-line skip-${ stepId }-to-${ targetStepId }` }, [
+            Div({ className: 'line-arrow top' }),
+            Div({ className: 'line-arrow right' }),
+            Div({ className: 'line-arrow bottom' }),
+          ])
+          branch.append(line)
+        }
+
+        clearLineStyle(line)
+
+        let width = (( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ))/2
+
+        line.style.top = `${ stepPos.top - branchPos.top + ( stepPos.height / 2 ) }px`
+        line.style.width = `${ width }px`
+        line.style.left = `calc(50% + ${minWidth/2}px)`
+        line.style.height = `${ lineHeight }px`
+        line.style.borderWidth = `${ borderWidth } ${ borderWidth } ${ borderWidth } 0`
+        line.style.borderTopRightRadius = borderRadius
+        line.style.borderBottomRightRadius = borderRadius
+
+      })
+    } catch (e) { console.log( e ) }
 
     // Benchmarks
     try {
@@ -1179,12 +1227,12 @@
         // middle but curvy
         else if ( stepPos.left < branchCenter && branchCenter < stepPos.right ) {
 
-          lineHeight = branchPos.top - stepPos.bottom
+          lineHeight = Math.abs( branchPos.top - stepPos.bottom )
 
           let line1 = line
           let line2 = line1.querySelector( '.logic-line' )
           if ( ! line2 ){
-            line2 = Div({ className: `logic-line line-above` })
+            line2 = Div({ className: `logic-line line-inside` })
             line1.append(line2)
           }
 
@@ -1195,10 +1243,10 @@
           line1.style.left = `${stepCenter - branchPos.left}px`
           line1.style.top = `-${lineHeight}px`
           line1.style.height = `${lineHeight/2}px`
-          line2.style.height = `${lineHeight/2}px`
-
           line1.style.width = `${lineWidth}px`
+
           line2.style.width = `${lineWidth}px`
+          line2.style.height = `${lineHeight/2}px`
           line2.style.top = '100%'
 
           // right
@@ -1311,6 +1359,8 @@
     $(document).trigger('draw-logic-lines')
 
   }
+
+  window.addEventListener('resize', drawLogicLines)
 
   Groundhogg.drawLogicLines = drawLogicLines
 

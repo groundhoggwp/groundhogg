@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
+use function Groundhogg\one_of;
 use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -79,16 +80,38 @@ class Apply_Note extends Action {
 	 */
 	public function settings( $step ) {
 
+		echo html()->e( 'p', [], 'What type of note is being added?' );
+
+		echo html()->dropdown( [
+			'name'    => $this->setting_name_prefix( 'note_type' ),
+			'options' => [
+				'note'    => 'Note',
+				'call'    => 'Call',
+				'email'   => 'Email',
+				'meeting' => 'Meeting',
+			],
+            'selected' => $this->get_setting( 'note_type' ),
+		] );
+
+		echo html()->e( 'p', [], 'Add the note content...' );
+
 		echo html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'note_text' ),
 			'name'  => 'note_text',
 			'value' => $this->get_setting( 'note_text' )
 		] );
 
+		?><p></p><?php
 	}
 
 	public function get_settings_schema() {
 		return [
+			'note_type' => [
+				'default'  => 'note',
+				'sanitize' => function ( $value ) {
+					return one_of( $value, [ 'note', 'call', 'email', 'meeting' ] );
+				}
+			],
 			'note_text' => [
 				'default'  => '',
 				'sanitize' => 'wp_kses_post'

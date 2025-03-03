@@ -900,6 +900,21 @@ label.gh-switch input:checked ~ span.off {
   left: 36px !important;
 }
 
+body.gh-full-screen {
+  /* Full Screen */
+}
+body.gh-full-screen .gh-fixed-ui {
+  height: auto;
+  max-height: 100%;
+  left: 0 !important;
+  top: 0 !important;
+}
+body.gh-full-screen #adminmenumain,
+body.gh-full-screen #wpfooter,
+body.gh-full-screen #wpadminbar {
+  display: none !important;
+}
+
 #api-docs {
   background-color: #F6F9FB;
 }
@@ -1044,46 +1059,69 @@ label.gh-switch input:checked ~ span.off {
   padding: 2px;
 }
 
+.funnel-preview,
 table .column-steps {
   width: 160px;
 }
+.funnel-preview div.step-icon,
 table .column-steps div.step-icon {
   display: inline-block;
   white-space: nowrap;
   width: 27px;
   height: 27px;
   vertical-align: top;
+  background-color: #fff;
+  background-image: linear-gradient(var(--color-5), var(--color-5));
+  border: 2px solid var(--color);
+  padding: 3px;
 }
+.funnel-preview div.step-icon svg,
+table .column-steps div.step-icon svg {
+  fill: var(--color);
+  width: 100%;
+  height: 100%;
+}
+.funnel-preview div.step-icon:not(:first-child),
 table .column-steps div.step-icon:not(:first-child) {
   margin-left: -10px;
 }
+.funnel-preview div.step-icon.more,
 table .column-steps div.step-icon.more {
   background-color: #fff;
   border-radius: 20px;
   padding: 4px;
   border: 2px solid #102640;
 }
+.funnel-preview div.step-icon.action,
 table .column-steps div.step-icon.action {
-  border: 2px solid #9ece38;
-  background-color: #E7F3CD;
-  border-radius: 20px;
+  --color: #9ece38;
+  --color-25: rgba(158, 206, 56, 0.25);
+  --color-5: rgba(158, 206, 56, 0.05);
+  border-radius: 5px;
 }
+.funnel-preview div.step-icon.benchmark,
 table .column-steps div.step-icon.benchmark {
-  border: 2px solid #f58115;
-  background-color: #FCDFC4;
-  border-radius: 3px;
+  --color: #f58115;
+  --color-25: rgba(245, 129, 21, 0.25);
+  --color-5: rgba(245, 129, 21, 0.05);
+  border-radius: 50%;
 }
+.funnel-preview div.step-icon.logic,
 table .column-steps div.step-icon.logic {
-  border: 2px solid #6c19ad;
-  background-color: #e3c4fc;
+  --color: #6c19ad;
+  --color-25: rgba(108, 25, 173, 0.25);
+  --color-5: rgba(108, 25, 173, 0.05);
   border-radius: 3px;
   transform: rotate(45deg);
   width: 23px;
   height: 23px;
 }
+.funnel-preview div.step-icon.logic svg,
 table .column-steps div.step-icon.logic svg {
   transform: rotate(-45deg);
 }
+.funnel-preview div.step-icon svg,
+.funnel-preview div.step-icon img,
 table .column-steps div.step-icon svg,
 table .column-steps div.step-icon img {
   width: 100%;

@@ -15,14 +15,22 @@ $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgb(108, 25, 173);
+$secondary-purple-25: rgba($secondary-purple, 0.25);
+$secondary-purple-10: rgba($secondary-purple, 0.10);
+$secondary-purple-5: rgba($secondary-purple, 0.05);
 $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
-$benchmark-orange-50: rgba(245, 129, 21, 0.50);
-$benchmark-orange-25: rgba(245, 129, 21, 0.25);
+$benchmark-orange-50: rgba($benchmark-orange, 0.50);
+$benchmark-orange-25: rgba($benchmark-orange, 0.25);
+$benchmark-orange-10: rgba($benchmark-orange, 0.10);
+$benchmark-orange-5: rgba($benchmark-orange, 0.05);
+$action-green-dark: rgb(90, 131, 3);
 $action-green: rgb(158, 206, 56);
-$action-green-50: rgba(158, 206, 56, 0.5);
-$action-green-25: rgba(158, 206, 56, 0.25);
+$action-green-50: rgba($action-green, 0.5);
+$action-green-25: rgba($action-green, 0.25);
+$action-green-10: rgba($action-green, 0.10);
+$action-green-5: rgba($action-green, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
@@ -1018,6 +1026,22 @@ label.gh-switch {
   left: 36px !important;
 }
 
+body.gh-full-screen {
+  .gh-fixed-ui {
+    height: auto;
+    max-height: 100%;
+    left: 0 !important;
+    top: 0 !important;
+  }
+
+  /* Full Screen */
+  #adminmenumain,
+  #wpfooter,
+  #wpadminbar {
+    display: none !important;
+  }
+}
+
 #api-docs {
 
   background-color: $background-color;
@@ -1203,6 +1227,7 @@ label.gh-switch {
   }
 }
 
+.funnel-preview,
 table .column-steps {
 
   width: 160px;
@@ -1214,6 +1239,16 @@ table .column-steps {
     width: 27px;
     height: 27px;
     vertical-align: top;
+    background-color: #fff;
+    background-image: linear-gradient(var(--color-5), var(--color-5));
+    border: 2px solid var(--color);
+    padding: 3px;
+
+    svg {
+      fill: var(--color);
+      width: 100%;
+      height: 100%;
+    }
 
     &:not(:first-child) {
       margin-left: -10px;
@@ -1227,20 +1262,24 @@ table .column-steps {
     }
 
     &.action {
-      border: 2px solid $action-green;
-      background-color: #E7F3CD;
-      border-radius: 20px;
+      --color: #{$action-green};
+      --color-25: #{$action-green-25};
+      --color-5: #{$action-green-5};
+      border-radius: 5px;
     }
 
     &.benchmark {
-      border: 2px solid $benchmark-orange;
-      background-color: #FCDFC4;
-      border-radius: 3px;
+      --color: #{$benchmark-orange};
+      --color-25: #{$benchmark-orange-25};
+      --color-5: #{$benchmark-orange-5};
+      border-radius: 50%;
     }
 
     &.logic {
-      border: 2px solid $secondary-purple;
-      background-color: #e3c4fc;
+      --color: #{$secondary-purple};
+      --color-25: #{$secondary-purple-25};
+      --color-5: #{$secondary-purple-5};
+
       border-radius: 3px;
       transform: rotate(45deg);
 

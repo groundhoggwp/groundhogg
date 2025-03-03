@@ -369,6 +369,36 @@ class Send_Email extends Action {
 	}
 
 	/**
+	 * We have to fix email threading
+	 *
+	 * @param Step $step
+	 */
+	public function post_import( $step ) {
+
+		// This will be the donor step ID
+		$reply_to = $step->get_meta( 'reply_in_thread' );
+
+		// Not threading...
+		if ( ! $reply_to ) {
+			return;
+		}
+
+		// Get the new ID
+		$meta = get_db( 'stepmeta' )->query( [
+			'meta_key'   => 'imported_step_id',
+			'meta_value' => $reply_to,
+			'limit'      => 1,
+			'orderby'    => 'step_id',
+			'order'      => 'desc'
+		] );
+
+		$step_id = $meta[0]->step_id;
+
+		$step->update_meta( 'reply_in_thread', $step_id );
+	}
+
+
+	/**
 	 * Create a new email and set the step email_id to the ID of the new email.
 	 *
 	 * @param $step Step
@@ -398,7 +428,6 @@ class Send_Email extends Action {
 		}
 	}
 
-
 	/**
 	 * Export all tag related steps
 	 *
@@ -416,38 +445,9 @@ class Send_Email extends Action {
 			return $args;
 		}
 
-		$args['email'] = $email;
+		$args['email'] = $email->export();
 
 		return $args;
-	}
-
-	/**
-	 * We have to fix email threading
-	 *
-	 * @param Step $step
-	 */
-	public function post_import( $step ) {
-
-		// This will be the donor step ID
-		$reply_to = $step->get_meta( 'reply_in_thread' );
-
-		// Not threading...
-		if ( ! $reply_to ) {
-			return;
-		}
-
-		// Get the new ID
-		$meta = get_db( 'stepmeta' )->query( [
-			'meta_key'   => 'imported_step_id',
-			'meta_value' => $reply_to,
-			'limit'      => 1,
-			'orderby'    => 'step_id',
-			'order'      => 'desc'
-		] );
-
-		$step_id = $meta[0]->step_id;
-
-		$step->update_meta( 'reply_in_thread', $step_id );
 	}
 
 	/**

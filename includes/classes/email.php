@@ -1434,6 +1434,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Context data is not needed for exporting
+	 *
+	 * @return array
+	 */
+	public function export() {
+		return parent::get_as_array();
+	}
+
+	/**
 	 * @return array
 	 */
 	public function get_as_array() {
@@ -1504,7 +1513,7 @@ class Email extends Base_Object_With_Meta {
 				'from_name'   => $this->get_from_name(),
 				'from_email'  => $this->get_from_email(),
 				'subject'     => $this->get_merged_subject_line(),
-				'from_user'   => $this->get_from_user(),
+//				'from_user'   => $this->get_from_user(),
 				'built'       => $live_preview,
 				'plain'       => $this->get_merged_alt_body(),
 			]

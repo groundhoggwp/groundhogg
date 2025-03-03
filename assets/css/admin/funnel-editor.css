@@ -26,22 +26,10 @@ body:has(#funnel-form):not(.saving) .funnel-editor-header button > .gh-spinner {
 body:has(#funnel-form).folded #funnel-form {
   left: 36px;
 }
-body:has(#funnel-form).funnel-full-screen {
-  /* Full Screen */
-}
-body:has(#funnel-form).funnel-full-screen #funnel-form {
-  top: 0;
-  left: 0;
-}
-body:has(#funnel-form).funnel-full-screen #funnel-form #full-screen .dashicons::before {
+body:has(#funnel-form).gh-full-screen #funnel-form #full-screen .dashicons::before {
   content: "";
 }
-body:has(#funnel-form).funnel-full-screen #adminmenumain,
-body:has(#funnel-form).funnel-full-screen #wpfooter,
-body:has(#funnel-form).funnel-full-screen #wpadminbar {
-  display: none !important;
-}
-body:has(#funnel-form):not(.funnel-full-screen) #close {
+body:has(#funnel-form):not(.gh-full-screen) #close {
   display: none;
 }
 
@@ -326,13 +314,6 @@ body:has(#funnel-form):not(.funnel-full-screen) #close {
   margin-left: auto;
   display: block;
 }
-#step-settings-container #step-settings-inner .step-settings .step.editing.action.apply_note .step-flex .step-edit .custom-settings {
-  padding: 0;
-}
-#step-settings-container #step-settings-inner .step-settings .step.editing.action.apply_note .step-flex .step-edit .custom-settings .mce-panel {
-  box-shadow: none;
-  border-top: none;
-}
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-warnings {
   display: flex;
   gap: 10px;
@@ -611,8 +592,14 @@ button.button.save-button {
   position: absolute;
   z-index: 1;
 }
-#step-flow .fixed-inside .logic-line.loop-line {
+#step-flow .fixed-inside .logic-line.skip-line, #step-flow .fixed-inside .logic-line.loop-line {
   border-color: #6c19ad;
+}
+#step-flow .fixed-inside .logic-line.loop-line > .line-arrow.top {
+  left: 60%;
+}
+#step-flow .fixed-inside .logic-line.loop-line > .line-arrow.bottom {
+  left: 60%;
 }
 #step-flow .fixed-inside .logic-line > .line-arrow {
   position: absolute;
@@ -624,17 +611,22 @@ button.button.save-button {
 }
 #step-flow .fixed-inside .logic-line > .line-arrow.top {
   transform: translate(-50%, -50%) rotate(45deg);
-  left: 50%;
+  left: 40%;
   top: 0;
 }
 #step-flow .fixed-inside .logic-line > .line-arrow.bottom {
   transform: translate(-50%, 50%) rotate(-135deg);
-  left: 50%;
+  left: 40%;
   bottom: 0;
 }
 #step-flow .fixed-inside .logic-line > .line-arrow.left {
   transform: translate(-50%, -50%) rotate(-45deg);
   left: 0;
+  top: 50%;
+}
+#step-flow .fixed-inside .logic-line > .line-arrow.right {
+  transform: translate(50%, -50%) rotate(135deg);
+  right: 0;
   top: 50%;
 }
 #step-flow .fixed-inside .step.if_else + .step-branches {
@@ -879,6 +871,12 @@ button.button.save-button {
 }
 #step-flow .step.logic > .hndle > .hndle-icon > svg {
   transform: rotate(-45deg);
+}
+#step-flow .step.invalid {
+  --color: #e91f4f;
+  --color-25: rgba(233, 31, 79, 0.25);
+  --color-10: rgba(233, 31, 79, 0.1);
+  --color-5: rgba(233, 31, 79, 0.05);
 }
 #step-flow .step:has(.step-label) {
   padding-bottom: 14px;
