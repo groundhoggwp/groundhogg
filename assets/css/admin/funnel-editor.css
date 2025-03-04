@@ -856,7 +856,7 @@ button.button.save-button {
   --color-25: rgba(245, 129, 21, 0.25);
   --color-10: rgba(245, 129, 21, 0.1);
   --color-5: rgba(245, 129, 21, 0.05);
-  border-radius: 50px;
+  border-radius: 100px;
 }
 #step-flow .step.benchmark .hndle-icon {
   border-radius: 50px;

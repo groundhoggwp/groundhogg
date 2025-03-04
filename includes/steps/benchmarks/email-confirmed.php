@@ -79,16 +79,7 @@ class Email_Confirmed extends Benchmark {
 	 */
 	public function settings( $step ) {
 		?>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <td>
-                    <p class="description"><?php _e( 'Runs when a contact confirms their email address, changing their opt-in status <b>Confirmed</b>.', 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
+        <p><?php _e( 'Runs when a contact confirms their email address, changing their opt-in status <b>Confirmed</b>.', 'groundhogg' ); ?></p>
 		<?php
 	}
 
