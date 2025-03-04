@@ -14,7 +14,7 @@
     setFrameContent,
     icons,
     moreMenu,
-    dangerConfirmationModal
+    dangerConfirmationModal,
   } = Groundhogg.element
 
   const { createFilters } = Groundhogg.filters.functions
@@ -251,7 +251,7 @@
         run_on_month_type, // Run on month type
         run_on_months, // Run on months
         run_on_dom, // Run on days of month
-        delay_preview = ''
+        delay_preview = '',
       } = {
         ...delayTimerDefaults,
         ...meta,
@@ -332,10 +332,10 @@
       //language=HTML
       return `
           <div class="display-flex column gap-10">
-              <h3 class="delay-preview" style="font-weight: normal">${delayTimerName({
+              <h3 class="delay-preview" style="font-weight: normal">${ delayTimerName({
                   ...delayTimerDefaults,
-                  ...meta
-              })}</h3>
+                  ...meta,
+              }) }</h3>
               <div class="row display-flex column gap-10">
                   <label class="row-label">${ __('Wait at least...', 'groundhogg') }</label>
                   <div class="gh-input-group">
@@ -685,28 +685,11 @@
     },
 
     adminNotification (step) {
-
-      let $customEmail = $('.active .custom-settings input.custom-email')
-      let $replyType = $('.active .custom-settings select.reply-to-type')
-
-      $replyType.on('change', e => {
-
-        switch ($replyType.val()) {
-          case 'contact':
-          case 'owner':
-            $customEmail.addClass('hidden')
-            break
-          case 'custom':
-            $customEmail.removeClass('hidden')
-            break
-        }
-
-      })
-
       this.applyNote(step)
     },
 
     applyNote (step) {
+
       let id = `step_${ step.ID }_note_text`
 
       wp.editor.remove(id)
@@ -823,6 +806,8 @@
 
     if (picker) {
 
+      picker.closest('.gh-panel').classList.add('ignore-morph')
+
       // Might have to preload
       if (tags.length) {
         await TagsStore.maybeFetchItems(tags)
@@ -891,16 +876,12 @@
       let id = `step_${ ID }_send_email`
       let { email_id } = meta
 
-      let state = {
-        changing: false,
-      }
-
       if (email_id) {
         await EmailsStore.maybeFetchItem(email_id)
       }
 
       const morphPreview = () => {
-        let previewPanel = document.getElementById(`step-${ ID }-email-preview-panel`)
+        let previewPanel = document.getElementById(id)
         morphdom(previewPanel, Preview())
       }
 
@@ -961,8 +942,8 @@
       })
 
       const Preview = () => Div({
-          id       : `step-${ ID }-email-preview-panel`,
-          className: 'gh-panel email-preview',
+          id,
+          className: 'gh-panel email-preview ignore-morph',
           style    : {
             backgroundColor: '#fff',
             overflow       : 'hidden',
@@ -1078,31 +1059,7 @@
         ],
       )
 
-      let panelInner = document.getElementById(id)
-
-      if (panelInner) {
-        // The top level panel
-        let panel = panelInner.closest('.gh-panel')
-
-        // Custom step titles
-        if (panel.querySelector('.step-title-edit input.edit-title')) {
-          panel.querySelector('.custom-settings').remove()
-          panel.insertAdjacentElement('afterend', Div({ id }))
-          panel = document.getElementById(id)
-        }
-
-        const render = () => panel.replaceWith(Preview())
-
-        if (email_id) {
-          EmailsStore.maybeFetchItem(email_id).catch(err => {
-            email_id = false
-          }).finally(() => morphPreview())
-          render()
-        }
-        else {
-          render()
-        }
-      }
+      morphPreview()
     },
     onDuplicate: ({
       ID,

@@ -742,6 +742,14 @@ class Funnels_Page extends Admin_Page {
 					'branch'      => $step_data['branch']
 				] );
 
+                $schema = $element->get_settings_schema();
+
+                foreach ( $schema as $setting => $setting_schema ) {
+                    if ( isset( $setting_schema['initial'] ) ){
+	                    $step->update_meta( $setting, $setting_schema['initial'] );
+                    }
+                }
+
 				continue;
 			}
 

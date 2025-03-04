@@ -578,6 +578,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'invalid';
 		}
 
+        if ( $step->is_benchmark() && $step->can_passthru() && ! $step->is_starting() ){
+	        $classes[] = 'passthru';
+        }
+
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
@@ -593,9 +597,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
                     <div class="step-label">Entry</div>
-				<?php endif; ?>
-				<?php if ( $step->is_benchmark() && $step->can_passthru() ): ?>
-                    <div class="step-label">Pass-through</div>
 				<?php endif; ?>
 				<?php if ( $step->is_conversion() ): ?>
                     <div class="step-label">Conversion</div>
@@ -706,6 +707,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->after_step_warnings();
 	}
 
+    protected function settings_should_ignore_morph() {
+	    return true;
+    }
+
 	/**
 	 * @param $step Step
 	 */
@@ -731,7 +736,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php $this->__step_warnings( $step ); ?>
             <!-- SETTINGS -->
             <div class="step-flex">
-                <div class="step-edit panels">
+                <div class="step-edit panels <?php echo $this->settings_should_ignore_morph() ? 'ignore-morph' : '' ?>">
 
 					<?php $this->before_settings( $step ); ?>
 

@@ -105,19 +105,25 @@ class Optin_Status_Changed extends Benchmark {
 		?><p></p><?php
 	}
 
+	public function sanitize_statuses( $statuses ) {
+		if ( ! is_array( $statuses ) || empty( $statuses ) ) {
+			return [];
+		}
+
+		return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
+	}
+
 	public function get_settings_schema() {
 		return [
 			'from_status' => [
-				'default'  => [],
-				'sanitize' => function ( $statuses ) {
-					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
-				}
+				'default'      => [],
+				'if_undefined' => [],
+				'sanitize'     => [ $this, 'sanitize_statuses' ]
 			],
 			'status'      => [
-				'default'  => [],
-				'sanitize' => function ( $statuses ) {
-					return array_intersect( wp_parse_id_list( $statuses ), array_keys( Preferences::get_preference_names() ) );
-				}
+				'default'      => [],
+				'if_undefined' => [],
+				'sanitize'     => [ $this, 'sanitize_statuses' ]
 			]
 		];
 	}

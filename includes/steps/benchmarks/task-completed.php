@@ -139,7 +139,7 @@ class Task_Completed extends Benchmark {
 		echo html()->e( 'p', [], __( 'Run when these preceding tasks are completed...', 'groundhogg' ) );
 
 		echo html()->e( 'div', [
-			'class' => 'gh-input-group'
+			'class' => 'display-flex gap-5'
 		], [
 			html()->dropdown( [
 				'name'        => $this->setting_name_prefix( 'condition' ),

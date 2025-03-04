@@ -95,11 +95,11 @@ class Apply_Note extends Action {
 
 		echo html()->e( 'p', [], 'Add the note content...' );
 
-		echo html()->textarea( [
+		echo html()->e('div', [ 'class' => 'ignore-morph' ], html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'note_text' ),
 			'name'  => 'note_text',
 			'value' => $this->get_setting( 'note_text' )
-		] );
+		] ) );
 
 		?><p></p><?php
 	}

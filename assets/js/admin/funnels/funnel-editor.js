@@ -14,6 +14,7 @@
   const {
     Div,
     Pg,
+    Span,
     H3,
     Img,
     An,
@@ -542,7 +543,7 @@
         // Update the JS meta changes first
         if (Object.keys(this.metaUpdates).length) {
           formData.append('metaUpdates', JSON.stringify(this.metaUpdates))
-          this.metaUpdates = {} // clear the meta updates
+          this.metaUpdates = {} // clear the meta updates only after update was confirmed...
         }
 
         // add additional data to the formData if required
@@ -585,12 +586,13 @@
                 toEl.classList.add('editing')
               }
 
-              if (quiet && fromEl.matches('.editing .step-edit.panels')) {
+              if (quiet && fromEl.matches('.editing .ignore-morph')) {
                 return false // don't morph the currently edited step to avoid glitchiness
               }
 
               return true
             },
+
           })
 
           // self.makeSortable()
@@ -601,12 +603,13 @@
           // quietly!
           if (quiet) {
             $(document).trigger('auto-save')
-            $(document).trigger('gh-init-pickers')
+            $(document).trigger('gh-init-pickers') // re-init pickers that would have been removed
             return response
           }
 
+          $(document).trigger('saved')
+
           this.stepSettingsCallbacks()
-          $(document).trigger('new-step')
 
           $('body').removeClass('saving')
 
@@ -938,6 +941,10 @@
 
           this.stepSettingsCallbacks()
 
+          setTimeout(()=>{
+            scrollIntoViewIfNeeded( document.getElementById(`step-${ this.editing }`), document.querySelector(`.fixed-inside`) )
+          }, 300)
+
           const step = this.getActiveStep()
 
           if (!step) {
@@ -969,6 +976,7 @@
           })
         }
 
+        $(document).trigger('gh-init-pickers')
         $(document).trigger('step-active')
       },
     })
@@ -1015,6 +1023,29 @@
     }
 
     return el
+  }
+
+  function scrollIntoViewIfNeeded(element, container) {
+    if (!container) container = element.parentElement; // Default to parent if no container is provided
+
+    const elementRect = element.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const isVisibleVertically =
+      elementRect.top >= containerRect.top &&
+      elementRect.bottom <= containerRect.bottom;
+
+    const isVisibleHorizontally =
+      elementRect.left >= containerRect.left &&
+      elementRect.right <= containerRect.right;
+
+    if (!isVisibleVertically || !isVisibleHorizontally) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: isVisibleVertically ? "nearest" : "center",
+        inline: isVisibleHorizontally ? "nearest" : "center"
+      });
+    }
   }
 
   function drawLogicLines () {
@@ -1194,6 +1225,74 @@
           line2.style.left = `${ stepCenter - rowPos.left - (lineWidth*2) }px`
           line2.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
           line2.style.borderRadius = `${borderRadius} 0 0 0`
+        }
+
+        // we also need to draw the above lines for passthru benchmarks
+        if ( step.classList.contains('passthru')){
+
+          let lineHeight = Math.abs( rowPos.top - stepPos.top ) / 2
+
+          let line4 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-4` })
+          let line3 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-3` }, [
+            Span({className:'path-indicator'}, 'Pass-through' ),
+            line4
+          ])
+
+          step.parentElement.append(line3)
+
+          if ( step.style.display === 'none' ){
+            line3.remove()
+            return
+          }
+
+          clearLineStyle(line3)
+          clearLineStyle(line4)
+
+          line3.style.top = `${Math.abs(stepPos.top-rowPos.top) - lineHeight}px`
+          line3.style.width = `${ lineWidth }px`
+          line3.style.height = `${ lineHeight }px`
+
+          line4.style.top = `-${lineHeight + borderPixels}px`
+          line4.style.width = `${ lineWidth }px`
+          line4.style.height = `${ lineHeight }px`
+
+          // center
+          if (areNumbersClose(stepCenter, rowCenter, 1)) {
+            line3.style.left = '50%'
+            line3.style.width = 0
+            line3.style.top = 0
+            line3.style.height = `${ lineHeight * 2 }px`
+            line3.style.borderWidth = `0 0 0 ${ borderWidth }`
+            line4.style.display = 'none'
+
+            line3.firstElementChild.style.top = '50%'
+            line3.firstElementChild.style.transform = 'translate(-50%,-50%)'
+          }
+          // left side
+          else if (stepCenter < rowCenter) {
+            line3.style.left = `${ stepCenter - rowPos.left - borderPixels }px`
+            line3.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+            line3.style.borderRadius = `${borderRadius} 0 0 0`
+            line3.firstElementChild.style.right = 0
+            line3.firstElementChild.style.transform = 'translate(50%,-50%)'
+
+            line4.style.left = `${lineWidth}px`
+            line4.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+            line4.style.borderRadius = `0 0 ${borderRadius} 0`
+          }
+          // right side
+          else {
+            line3.style.left = `${ stepCenter - rowPos.left - lineWidth }px`
+            line3.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+            line3.style.borderRadius = `0 ${borderRadius} 0 0`
+            line3.firstElementChild.style.left = 0
+            line3.firstElementChild.style.transform = 'translate(-50%,-50%)'
+
+            line4.style.left = `-${lineWidth}px`
+            line4.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+            line4.style.borderRadius = `0 0 0 ${borderRadius}`
+          }
+
         }
 
       })

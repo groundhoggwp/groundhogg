@@ -172,7 +172,11 @@ class Split_Path extends Branch_Logic {
 		return [
 			'branches' => [
 				'default'  => [],
-				'sanitize' => [ $this, 'sanitize_branches' ]
+				'sanitize' => [ $this, 'sanitize_branches' ],
+				'initial'  => [
+					'a' => [ 'name' => 'A', 'include_filters' => [], 'exclude_filters' => [] ],
+					'b' => [ 'name' => 'B', 'include_filters' => [], 'exclude_filters' => [] ],
+				]
 			]
 		];
 	}

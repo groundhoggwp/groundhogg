@@ -382,7 +382,11 @@ body:has(#funnel-form) {
     input,
     select,
     textarea {
-      max-width: 100% !important;
+      //max-width: 100% !important;
+    }
+
+    select.gh-select2 {
+      width: 100%;
     }
 
     .notice {
@@ -978,6 +982,23 @@ button.button.save-button {
 
         .benchmark-line.logic-line {
           border-color: $benchmark-orange;
+
+          &.passthru {
+            border-style: dashed;
+          }
+
+          > span.path-indicator {
+            font-size: 10px;
+            color: #fff;
+            background-color: $benchmark-orange;
+            padding: 0 5px;
+            border-radius: 3px;
+            position: absolute;
+            top: 0;
+            white-space: nowrap;
+            text-transform: uppercase;
+            z-index: 2;
+          }
         }
       }
 
@@ -1061,6 +1082,7 @@ button.button.save-button {
       @include above-text;
       background-color: $benchmark-orange;
       top: 0;
+      transform: translate(-50%, -90%);
     }
   }
 
@@ -1150,7 +1172,7 @@ button.button.save-button {
       }
 
       .step-labels {
-        right: 30px;
+        //right: 30px;
       }
     }
 
@@ -1192,7 +1214,7 @@ button.button.save-button {
     }
 
     &:has(.step-label) {
-      padding-bottom: 14px;
+      //padding-bottom: 14px;
     }
 
     &.editing {
@@ -1261,7 +1283,7 @@ button.button.save-button {
 
       position: absolute;
       right: 3px;
-      bottom: 3px;
+      bottom: -11px;
       gap: 3px;
       z-index: 2;
 

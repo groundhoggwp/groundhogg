@@ -5956,11 +5956,11 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 /**
  * Given an arbitrary payload, do our best to sanitize it
  *
- * @param array $payload
+ * @param mixed $payload
  *
- * @return array
+ * @return mixed
  */
-function sanitize_payload( array $payload ): array {
+function sanitize_payload( $payload ) {
 
 	return map_deep( $payload, function ( $param ) {
 

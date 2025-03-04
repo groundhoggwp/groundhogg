@@ -82,17 +82,13 @@ class Send_Email extends Action {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/send-email.svg';
 	}
 
-	/**
-	 * Display the settings
-	 *
-	 * @param $step Step
-	 */
 	public function settings( $step ) {
-
-		echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email' ], '', false )
-
-		?><p></p><?php
+		// TODO: Implement settings() method.
 	}
+
+	protected function after_settings( Step $step ) {
+	    echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], '', false );
+    }
 
 	public function validate_settings( Step $step ) {
 		$email = new Email( $this->get_setting( 'email_id' ) );
@@ -167,9 +163,9 @@ class Send_Email extends Action {
 	public function set_thread_subject( $subject ) {
 		return sprintf( __( 'Re: %s', 'groundhogg' ), $this->subject );
 	}
-
 	protected $message_id;
 	protected $subject;
+
 	protected $from;
 
 	/**
@@ -368,6 +364,7 @@ class Send_Email extends Action {
 		$step->update_meta( 'email_id', $email->get_id() );
 	}
 
+
 	/**
 	 * We have to fix email threading
 	 *
@@ -396,7 +393,6 @@ class Send_Email extends Action {
 
 		$step->update_meta( 'reply_in_thread', $step_id );
 	}
-
 
 	/**
 	 * Create a new email and set the step email_id to the ID of the new email.

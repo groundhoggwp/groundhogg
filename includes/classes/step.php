@@ -374,6 +374,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return Step[]
 	 */
+	public function get_preceding_steps() {
+
+		$steps = $this->get_funnel()->get_steps();
+
+		return array_filter( $steps, function ( Step $step ) {
+			return $step->is_before( $this );
+		} );
+	}
+
+	/**
+	 * Returns all the actions that come before this one
+	 *
+	 * @return Step[]
+	 */
 	public function get_preceding_actions() {
 
 		$steps = $this->get_funnel()->get_steps();
@@ -698,6 +712,27 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * check if a step is between 2 other steps
+	 *
+	 * @param Step $other1
+	 * @param Step $other2
+	 *
+	 * @return bool
+	 */
+	public function is_between( Step $other1, Step $other2 ) {
+
+		if ( $other1->is_before( $other2 ) ) {
+			return $other1->is_before( $this ) && $this->is_before( $other2 );
+		}
+
+		if ( $other1->is_after( $other2 ) ) {
+			return $other1->is_after( $this ) && $this->is_after( $other2 );
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get the run time for when this step should run
 	 *
 	 * Previously get_delay_time
@@ -746,6 +781,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Tests to see if a given step is in a parallel branch to this one
+	 * Note, sequential benchmarks will be considered parallel
 	 *
 	 * @param Step $other
 	 *
@@ -1064,7 +1100,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_starting() {
-		if ( $this->is_action() ) {
+
+		if ( ! $this->is_benchmark() ) {
 			return false;
 		}
 
@@ -1072,10 +1109,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return true;
 		}
 
-		// if has preceding actions, than also not starting
-		$preceding = $this->get_preceding_actions();
-
-		if ( empty( $preceding ) ) {
+		if ( array_all( $this->get_preceding_steps(), function ( Step $step ){
+			return $step->is_benchmark();
+		} ) ){
 			return true;
 		}
 

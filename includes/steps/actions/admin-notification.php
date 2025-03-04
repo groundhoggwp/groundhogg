@@ -91,6 +91,10 @@ class Admin_Notification extends Action {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/email-admin-notification.svg';
 	}
 
+	protected function settings_should_ignore_morph() {
+		return false;
+	}
+
 	/**
 	 * @param $step Step
 	 */
@@ -100,7 +104,7 @@ class Admin_Notification extends Action {
         <p></p>
         <div class="gh-rows-and-columns">
             <div class="gh-row">
-                <div class="gh-col">
+                <div class="gh-col ignore-morph">
                     <label><?php _e( 'Send to...' ); ?></label>
                     <div class="">
 						<?php
@@ -190,7 +194,7 @@ class Admin_Notification extends Action {
 					?>
                 </div>
             </div>
-            <div class="gh-row">
+            <div class="gh-row ignore-morph">
                 <div class="gh-col">
 					<?php
 

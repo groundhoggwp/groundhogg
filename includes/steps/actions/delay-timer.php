@@ -133,7 +133,8 @@ class Delay_Timer extends Action {
 	 */
 	public function settings( $step ) {
 		echo html()->e( 'div', [
-			'id' => "step_{$step->ID}_delay_timer_settings"
+			'id'    => "step_{$step->ID}_delay_timer_settings",
+			'class' => 'ignore-morph'
 		], 'Delay Timer' );
 
 	}
@@ -451,11 +452,11 @@ class Delay_Timer extends Action {
 				break;
 		}
 
-        // if the calculated time is now, lets advanced the base time by a minute...
-        // this cleverly prevents an infinite loop
-        if ( $date->isNow() ){
-            return $this->calc_run_time( time() + MINUTE_IN_SECONDS , $step );
-        }
+		// if the calculated time is now, lets advanced the base time by a minute...
+		// this cleverly prevents an infinite loop
+		if ( $date->isNow() ) {
+			return $this->calc_run_time( time() + MINUTE_IN_SECONDS, $step );
+		}
 
 		return $date->getTimestamp();
 	}

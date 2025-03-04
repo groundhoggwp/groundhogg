@@ -991,7 +991,7 @@ class HTML {
 		$a = wp_parse_args( $args, array(
 			'name'              => '',
 			'id'                => '',
-			'class'             => 'gh-select2',
+			'class'             => 'gh-select-2-picker',
 			'data'              => [],
 			'options'           => [],
 			'selected'          => [],
@@ -1002,6 +1002,10 @@ class HTML {
 			'tags'              => false,
 			'style'             => []
 		) );
+
+        if ( empty( $a['id'] ) ){
+            $a['id'] = sanitize_title( $args['name'] );
+        }
 
 		if ( isset_not_empty( $a, 'data' ) ) {
 			$a['options'] = $a['data'];

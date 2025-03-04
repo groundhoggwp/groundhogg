@@ -96,7 +96,7 @@ class Web_Form extends Benchmark {
 			<?php $this->__step_warnings( $step ); ?>
             <!-- SETTINGS -->
             <div class="step-flex">
-                <div class="step-edit panels">
+                <div class="step-edit panels ignore-morph">
 					<?php
 
 					echo html()->input( [
@@ -110,7 +110,10 @@ class Web_Form extends Benchmark {
 						'placeholder' => 'Form name...'
 					] );
 
-					$this->settings( $step );
+					echo html()->e( 'div', [
+						'id' => "step_{$step->ID}_web_form_builder"
+					], 'Form Builder' );
+
 					do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );
 					do_action( 'groundhogg/steps/settings/before', $this );
 					do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step );
@@ -181,21 +184,21 @@ class Web_Form extends Benchmark {
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="full-width code"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Iframe' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="full-width code"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="full-width code"
                             value="<?php echo esc_attr( $form->get_submission_url() ); ?>"
                             readonly>
                 </div>

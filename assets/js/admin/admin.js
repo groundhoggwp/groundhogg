@@ -1,15 +1,18 @@
 ( function ($, nonces, endpoints, gh) {
 
-  const { currentUser, isSuperAdmin } = Groundhogg
+  const {
+    currentUser,
+    isSuperAdmin,
+  } = Groundhogg
 
   Groundhogg.user = {
-    getCurrentUser: () => {
+    getCurrentUser     : () => {
       return currentUser
     },
-    userHasCap: (cap) => {
+    userHasCap         : (cap) => {
       return currentUser.allcaps[cap] || currentUser.caps[cap] || isSuperAdmin
     },
-    getOwner: (id) => {
+    getOwner           : (id) => {
       return Groundhogg.filters.owners.find(u => u.ID == id)
     },
     getOwnerDisplayName: (id) => {
@@ -51,14 +54,18 @@
   }) {
 
     this.select2({
-      tokenSeparators: ['/', ',', ';'],
-      delay: 100,
-      ajax: {
+      tokenSeparators: [
+        '/',
+        ',',
+        ';',
+      ],
+      delay          : 100,
+      ajax           : {
         url: endpoint,
         // delay: 250,
-        dataType: 'json',
-        data: getParams,
-        beforeSend: function (xhr) {
+        dataType      : 'json',
+        data          : getParams,
+        beforeSend    : function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
@@ -99,16 +106,20 @@
   ) {
 
     return $(selector).select2({
-      tags: tags,
-      multiple: multiple,
-      tokenSeparators: ['/', ',', ';'],
-      delay: 100,
-      ajax: {
+      tags           : tags,
+      multiple       : multiple,
+      tokenSeparators: [
+        '/',
+        ',',
+        ';',
+      ],
+      delay          : 100,
+      ajax           : {
         url: endpoint,
         // delay: 250,
-        dataType: 'json',
-        data: getParams,
-        beforeSend: function (xhr) {
+        dataType      : 'json',
+        data          : getParams,
+        beforeSend    : function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce)
         },
         processResults: function (data, page) {
@@ -125,17 +136,17 @@
     let $input = $(selector)
 
     return $input.autocomplete({
-      source: function (request, response) {
+      source   : function (request, response) {
         $.ajax({
-          url: ajaxurl,
-          method: 'post',
+          url     : ajaxurl,
+          method  : 'post',
           dataType: 'json',
-          data: {
-            action: 'wp-link-ajax',
+          data    : {
+            action             : 'wp-link-ajax',
             _ajax_linking_nonce: nonces._ajax_linking_nonce,
-            term: request.term,
+            term               : request.term,
           },
-          success: function (data) {
+          success : function (data) {
             var $return = []
             for (var item in data) {
               if (data.hasOwnProperty(item)) {
@@ -148,7 +159,7 @@
             }
             response($return)
           },
-          select: (e, ui) => {
+          select  : (e, ui) => {
             $input.value(ui.item.value).trigger('change')
           },
 
@@ -162,21 +173,21 @@
     let $input = $(selector)
 
     return $input.autocomplete({
-      source: function (request, response) {
+      source   : function (request, response) {
         $.ajax({
-          url: ajaxurl,
-          method: 'post',
+          url     : ajaxurl,
+          method  : 'post',
           dataType: 'json',
-          data: {
+          data    : {
             action: 'user_meta_picker',
-            nonce: nonces._meta_nonce,
-            term: request.term,
+            nonce : nonces._meta_nonce,
+            term  : request.term,
           },
-          success: function (data) {
+          success : function (data) {
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
           },
-          select: (e, ui) => {
+          select  : (e, ui) => {
             $input.value(ui.item.value).trigger('change')
           },
         })
@@ -189,21 +200,21 @@
     let $input = $(selector)
 
     return $input.autocomplete({
-      source: function (request, response) {
+      source   : function (request, response) {
         $.ajax({
-          url: ajaxurl,
-          method: 'post',
+          url     : ajaxurl,
+          method  : 'post',
           dataType: 'json',
-          data: {
+          data    : {
             action: 'gh_meta_picker',
-            nonce: nonces._meta_nonce,
-            term: request.term,
+            nonce : nonces._meta_nonce,
+            term  : request.term,
           },
-          success: function (data) {
+          success : function (data) {
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
           },
-          select: (e, ui) => {
+          select  : (e, ui) => {
             $input.value(ui.item.value).trigger('change')
           },
         })
@@ -217,22 +228,22 @@
     let $input = $(selector)
 
     return $input.autocomplete({
-      source: function (request, response) {
+      source   : function (request, response) {
         $.ajax({
-          url: ajaxurl,
-          method: 'post',
+          url     : ajaxurl,
+          method  : 'post',
           dataType: 'json',
-          data: {
+          data    : {
             action: 'gh_meta_value_picker',
-            nonce: nonces._meta_nonce,
-            term: request.term,
+            nonce : nonces._meta_nonce,
+            term  : request.term,
             meta_key,
           },
-          success: function (data) {
+          success : function (data) {
             response(data)
             $(selector).removeClass('ui-autocomplete-loading')
           },
-          select: (e, ui) => {
+          select  : (e, ui) => {
             $input.value(ui.item.value).trigger('change')
           },
         })
@@ -256,14 +267,14 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.data.tag_name }`,
         } ))
       },
       (query) => {
         return {
           search: query.term,
-          limit: 50,
+          limit : 50,
         }
       }, ...opts)
   }
@@ -282,14 +293,14 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.data.first_name } ${ item.data.last_name } (${ item.data.email })`,
         } ))
       },
       (query) => {
         return {
           search: query.term,
-          limit: 50,
+          limit : 50,
         }
       }, ...opts)
   }
@@ -309,7 +320,7 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.data.name }`,
         } ))
       },
@@ -335,7 +346,7 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.data.title } (${ item.data.status })`,
         } ))
       },
@@ -362,7 +373,7 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.data.title }`,
         } ))
       },
@@ -389,7 +400,7 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.ID,
+          id  : item.ID,
           text: `${ item.object.data.title } (${ item.date_sent_pretty })`,
         } ))
       },
@@ -415,7 +426,7 @@
         onReceiveItems(data.items)
 
         return data.items.map(item => ( {
-          id: item.id,
+          id  : item.id,
           text: item.name,
         } ))
       },
@@ -425,6 +436,68 @@
           ...queryOpts,
         }
       }, ...opts)
+  }
+
+  const Select2Picker = (selectEl) => {
+
+    let pickerId = `${ selectEl.id }-picker`
+
+    // don't double init a picker
+    if (selectEl.previousElementSibling && selectEl.previousElementSibling.id === pickerId) {
+      return
+    }
+
+    const convertOpt = selector => [...selectEl.querySelectorAll(selector)].map(opt => ( {
+      id  : opt.value,
+      text: opt.innerHTML,
+    } ))
+
+    let picker = MakeEl.ItemPicker({
+      id          : pickerId,
+      fetchOptions: async (search) => {
+
+        let opts = convertOpt('option[value]:not(:empty)')
+
+        if (search) {
+          opts = opts.filter(item => item.id.match(search) || item.text.match(search))
+        }
+
+        return opts
+      },
+      selected    : convertOpt('option[selected]'),
+      multiple    : selectEl.multiple,
+      tags        : selectEl.dataset.tags,
+      placeholder : selectEl.dataset.placeholder ?? 'Type to search...',
+      onCreate    : async opt => {
+        selectEl.appendChild(MakeEl.makeEl('options', {
+          value   : opt,
+          selected: true,
+        }, opt))
+        return {
+          id  : opt,
+          text: opt,
+        }
+      },
+      onChange    : items => {
+
+        if (!selectEl.multiple) {
+          items = [items]
+        }
+
+        let selected = items.map(item => item.id)
+
+        for (let option of selectEl.options) {
+          option.selected = selected.includes(option.value)
+        }
+
+        $(selectEl).trigger('change') // must use jQuery for backwards compatibility
+
+      },
+    })
+
+    selectEl.classList.add('hidden', 'picker-initialized')
+    selectEl.pickerInitialized = true
+    selectEl.insertAdjacentElement('beforebegin', picker)
   }
 
   function buildPickers () {
@@ -442,13 +515,15 @@
     apiPicker('.gh-metakey-picker', endpoints.metakeys, false, false)
     linkPicker('.gh-link-picker')
     metaPicker('.gh-meta-picker')
+
+    document.querySelectorAll('select.gh-select-2-picker').forEach(select => Select2Picker(select))
   }
 
   $(function () {
     buildPickers()
   })
 
-  $(document).on('new-step gh-init-pickers', function () {
+  $(document).on('gh-init-pickers', function () {
     buildPickers()
   })
 
@@ -535,7 +610,10 @@
   const assoc2array = (obj, a = 'id', b = 'text') => {
     let array = []
     Object.keys(obj).forEach(key => {
-      array.push({ [a]: key, [b]: obj[key] })
+      array.push({
+        [a]: key,
+        [b]: obj[key],
+      })
     })
 
     return array
@@ -580,13 +658,13 @@
   }
 
   const debounce = (callback, wait) => {
-    let timeoutId = null;
+    let timeoutId = null
     return (...args) => {
-      window.clearTimeout(timeoutId);
+      window.clearTimeout(timeoutId)
       timeoutId = window.setTimeout(() => {
-        callback(...args);
-      }, wait);
-    };
+        callback(...args)
+      }, wait)
+    }
   }
 
   const maybeCall = (maybeFunc, ...args) => {
@@ -597,10 +675,10 @@
     return maybeFunc
   }
 
-  const dismissNotice = ( id ) => Groundhogg.api.ajax( {
+  const dismissNotice = (id) => Groundhogg.api.ajax({
     action: 'gh_dismiss_notice',
     notice: id,
-  } )
+  })
 
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
@@ -615,11 +693,11 @@
   $(document).on('click', 'button.hide-panel', e => {
 
     let btn = e.currentTarget
-    let id =  btn.dataset.id
+    let id = btn.dataset.id
     btn.parentElement.remove()
 
-    dismissNotice( id )
-  } )
+    dismissNotice(id)
+  })
 
   var check, timeout
 
@@ -653,7 +731,7 @@
 
   $(document).on('click', '[data-gh-href]', e => {
     console.log('clicked!', e.currentTarget.dataset)
-    window.open( e.currentTarget.dataset.ghHref, '_self' )
+    window.open(e.currentTarget.dataset.ghHref, '_self')
   })
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

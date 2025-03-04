@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\get_array_var;
+use function Groundhogg\int_to_letters;
 
 class Weighted_Distribution extends Split_Path {
 
@@ -89,6 +90,20 @@ class Weighted_Distribution extends Split_Path {
 		], true );
 	}
 
+	public function get_settings_schema() {
+		return [
+			'branches' => [
+				'default'  => [],
+				'sanitize' => [ $this, 'sanitize_branches' ],
+				'initial'  => [
+					'aa' => [ 'weight' => 33 ],
+					'bb' => [ 'weight' => 33 ],
+					'cc' => [ 'weight' => 33 ],
+				]
+			]
+		];
+	}
+
 	public function generate_step_title( $step ) {
 		return 'Weighted Distribution';
 	}
@@ -107,13 +122,18 @@ class Weighted_Distribution extends Split_Path {
 
 		$total_weight = array_sum( wp_list_pluck( $branches, 'weight' ) );
 
+		$i = 0;
+
 		foreach ( $branches as $branch_key => $branch_value ) {
 
 			if ( $branch_key === $path ) {
 				$name = get_array_var( get_array_var( $branches, $path ), 'weight' );
+				$name = int_to_letters($i) . " ($name)";
 
 				return $total_weight === 100 ? $name . '%' : $name;
 			}
+
+			$i++;
 		}
 
 		return '?';
