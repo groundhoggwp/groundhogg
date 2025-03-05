@@ -2156,7 +2156,7 @@
                           'array',
                           'object',
                         ].includes(typeof value)
-                        ? 'SERIALIZED DATA'
+                        ? JSON.stringify(value)
                         : value,
               readonly: [
                 'array',

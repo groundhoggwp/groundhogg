@@ -17,11 +17,16 @@ $error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgb(108, 25, 173);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
-$benchmark-orange-50: rgba(245, 129, 21, 0.50);
-$benchmark-orange-25: rgba(245, 129, 21, 0.25);
+$benchmark-orange-50: rgba($benchmark-orange, 0.50);
+$benchmark-orange-25: rgba($benchmark-orange, 0.25);
+$benchmark-orange-10: rgba($benchmark-orange, 0.10);
+$benchmark-orange-5: rgba($benchmark-orange, 0.05);
+$action-green-dark: rgb(90, 131, 3);
 $action-green: rgb(158, 206, 56);
-$action-green-50: rgba(158, 206, 56, 0.5);
-$action-green-25: rgba(158, 206, 56, 0.25);
+$action-green-50: rgba($action-green, 0.5);
+$action-green-25: rgba($action-green, 0.25);
+$action-green-10: rgba($action-green, 0.10);
+$action-green-5: rgba($action-green, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .wp-heading-inline, .page-title-action, #screen-meta-links {
@@ -399,10 +404,10 @@ code.meta-replacement-code {
 
     .activity-icon.no-frame {
       position: absolute;
-      left: -34px;
-
-      height: 25px;
-      width: 25px;
+      left: -22px;
+      transform: translateX(-50%);
+      height: 30px;
+      width: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -443,57 +448,46 @@ code.meta-replacement-code {
       }
 
       &.benchmark {
-        border: 2px solid $benchmark-orange;
-        background-color: #fff;
+        --color: #{$benchmark-orange};
+        --color-5: #{$benchmark-orange-5};
+        --color-10: #{$benchmark-orange-10};
 
-        &::after {
-          content: '';
-          position: absolute;
-          background-color: $benchmark-orange-25;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
+        border: 2px solid var(--color);
+        background-color: #fff;
+        background-image: linear-gradient(var(--color-5),var(--color-10));
+        border-radius: 50px;
 
         &.pending{
           border: none;
-          background-color: $benchmark-orange;
+          background-color: var(--color);
         }
 
         &:not(.pending){
           svg {
-            width: 100%;
-            height: 100%;
+            fill: var(--color) !important;
           }
         }
       }
 
       &.action {
-        border: 2px solid $action-green;
-        background-color: #fff;
-        border-radius: 25px;
+        --color: #{$action-green};
+        --color-5: #{$action-green-5};
+        --color-10: #{$action-green-10};
 
-        &::after {
-          content: '';
-          position: absolute;
-          border-radius: 25px;
-          background-color: $action-green-25;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
+        border: 2px solid var(--color);
+        background-color: #fff;
+        background-image: linear-gradient(var(--color-5),var(--color-10));
 
         &.pending{
           border: none;
-          background-color: $action-green;
+          background-color: var(--color);
         }
 
         &:not(.pending){
           svg {
             width: 100%;
             height: 100%;
+            fill: var(--color) !important;
           }
         }
       }

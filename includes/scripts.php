@@ -436,12 +436,6 @@ class Scripts {
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-funnel-form-integration', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/form-integration' . $dot_min . '.js', [
-			'jquery',
-			'groundhogg-admin',
-			'groundhogg-admin-modal'
-		], GROUNDHOGG_VERSION, true );
-
 		wp_register_script( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'js/admin/reports/reporting' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-chart-js',

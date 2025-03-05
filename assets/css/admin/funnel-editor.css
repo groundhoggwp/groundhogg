@@ -254,6 +254,33 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 #step-settings-container #step-settings-inner:has(.step.editing) #add-steps {
   display: none;
 }
+#step-settings-container #step-settings-inner code {
+  border-radius: 5px;
+  background-color: rgba(16, 38, 64, 0.05);
+}
+#step-settings-container #step-settings-inner .field-map-wrapper {
+  max-height: 500px;
+  overflow: auto;
+  border: 1px solid #c3c4c7;
+  border-radius: 5px 0 0 5px;
+}
+#step-settings-container #step-settings-inner .field-map-wrapper table {
+  width: 100%;
+  margin-top: 0 !important;
+  border: none !important;
+}
+#step-settings-container #step-settings-inner .field-map-wrapper table th {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+}
+#step-settings-container #step-settings-inner .field-map-wrapper table td:last-child {
+  width: 200px;
+}
+#step-settings-container #step-settings-inner .field-map-wrapper table pre {
+  margin: 0;
+  white-space: normal;
+}
 #step-settings-container #step-settings-inner select.gh-select2 {
   width: 100%;
 }
@@ -265,6 +292,10 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 }
 #step-settings-container #step-settings-inner .step-settings {
   padding: 30px;
+}
+#step-settings-container #step-settings-inner .step-settings.generated-step-names .step.web_form .main-step-settings-panel,
+#step-settings-container #step-settings-inner .step-settings.generated-step-names .step.send_email .main-step-settings-panel {
+  display: none;
 }
 #step-settings-container #step-settings-inner .step-settings:not(:has(.step.editing)) {
   display: none;
@@ -358,7 +389,6 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-edit table.wp-list-table {
   border-radius: 5px;
-  overflow: hidden;
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-edit table.wp-list-table:not(:last-child) {
   margin-bottom: 10px;
@@ -583,6 +613,7 @@ button.button.save-button {
   position: absolute;
   overflow: auto;
   background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
+  background-position: center center;
   background-size: 20px 20px;
 }
 #step-flow .fixed-inside .logic-line {
@@ -832,6 +863,33 @@ button.button.save-button {
   position: relative;
   border: 1px solid var(--color);
 }
+#step-flow .step .step-reporting {
+  display: flex;
+  justify-content: center;
+  gap: 67px;
+  position: absolute;
+  top: 0;
+  /* left: 50%; */
+  width: 100%;
+  transform: translateY(-50%);
+}
+#step-flow .step .step-reporting div.stat-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid var(--color);
+  background: #fff;
+  border-radius: 3px;
+  padding: 3px 8px;
+}
+#step-flow .step .step-reporting div.stat-wrap.invisible {
+  visibility: hidden;
+}
+#step-flow .step .step-reporting div.stat-wrap .dashicons {
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+}
 #step-flow .step.action {
   --color: #9ece38;
   --color-25: rgba(158, 206, 56, 0.25);
@@ -904,9 +962,6 @@ button.button.save-button {
 #step-flow .step.active {
   background-color: #fff;
   background-image: repeating-linear-gradient(-45deg, var(--color-5), var(--color-5) 10px, #fff 10px, #fff 20px);
-}
-#step-flow .step.active .delete-step {
-  display: none;
 }
 #step-flow .step:hover .actions {
   visibility: visible;
@@ -1199,7 +1254,7 @@ table.embed-options td {
   background: #f9f9f9;
   cursor: pointer;
 }
-.form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab.editing, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab.editing {
+.form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab.active, .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab.active {
   font-weight: 500;
   border-bottom: 1px solid #fff;
   margin-bottom: -1px;

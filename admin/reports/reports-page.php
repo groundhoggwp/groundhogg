@@ -204,7 +204,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'total_contacts_added_to_funnel',
 				'total_contacts_in_funnel',
 				'table_form_activity',
-//				'table_funnel_stats',
+				'table_funnel_stats',
 				'table_all_funnel_emails_performance',
 				'total_emails_sent',
 				'email_open_rate',
@@ -406,7 +406,7 @@ class Reports_Page extends Tabbed_Admin_Page {
             <div class="gh-loader-overlay" style="display:none;"></div>
             <div class="gh-loader" style="display: none"></div>
         </div>
-        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
+        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo $this->get_title(); ?></h1>
 	        <?php $this->range_picker(); ?>

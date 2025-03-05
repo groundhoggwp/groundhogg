@@ -193,6 +193,7 @@ class Faker {
 		$contacts = $query->query( null, true );
 
 		if ( doing_cli() ) {
+			\WP_CLI::log( sprintf( 'Generating funnel activity for %s contacts', _nf( count( $contacts ) ) ) );
 			$progress = make_progress_bar( 'Generating activity and events', count( $contacts ) );
 		}
 

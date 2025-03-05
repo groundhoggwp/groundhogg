@@ -8,6 +8,7 @@ use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
+use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_request_var;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
@@ -213,7 +214,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                         </div>
                     </div>
                 </div>
-                <div class="step-settings">
+                <div class="step-settings <?php echo force_custom_step_names() ? 'custom-step-names' : 'generated-step-names' ?>">
 				    <?php $funnel->step_settings() ?>
                 </div>
             </div>

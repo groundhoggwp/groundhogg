@@ -6,12 +6,10 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use function Groundhogg\_nf;
-use function Groundhogg\admin_page_url;
 use function Groundhogg\array_find;
 use function Groundhogg\contact_filters_link;
-use function Groundhogg\html;
 
-class Table_Funnel_Stats extends Base_Table_Report {
+class Table_Funnel_Stats extends Base_Report {
 
 	protected $per_page = 99;
 
@@ -26,7 +24,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 	/**
 	 * @return array|mixed
 	 */
-	protected function get_table_data() {
+	public function get_data() {
 		//get list of benchmark
 		$funnel = $this->get_funnel();
 
@@ -70,28 +68,9 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$count_waiting = $waiting_result ? absint( $waiting_result->total ) : 0;
 
-			$img = html()->e( 'img', [
-				'src'   => $step->icon(),
-				'class' => implode( ' ', [
-					'step-icon',
-					$step->get_group()
-				] )
-			] );
-
-			$edit = html()->e( 'a', [
-				'class'  => 'step-title',
-				'href'   => admin_page_url( 'gh_funnels', [
-					'action' => 'edit',
-					'funnel' => $step->get_funnel_id()
-				], $step->ID ),
-				'target' => '_blank'
-			], $step->get_title() );
-
-			$title = sprintf( '%s%s<br/><span class="step-type pill %s">%s</span>', $img, $edit, $step->get_group(), $step->get_type_name() );
-
 			$data[] = [
-				'step'      => $title,
-				'completed' => contact_filters_link( _nf( $count_completed ), [
+				'step'      => $step->ID,
+				'complete' => contact_filters_link( _nf( $count_completed ), [
 					// Group
 					[
 						// Filter
@@ -118,16 +97,16 @@ class Table_Funnel_Stats extends Base_Table_Report {
 					]
 				], $count_waiting )
 			];
-
 		}
 
-
-		return $data;
+		return [
+			'type'     => 'funnel',
+			'stepData' => $data
+		];
 
 	}
 
 	protected function normalize_datum( $item_key, $item_data ) {
 		// TODO: Implement normalize_datum() method.
 	}
-
 }

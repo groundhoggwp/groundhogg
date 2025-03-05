@@ -10,6 +10,7 @@ use Groundhogg\Step;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\array_map_to_class;
+use function Groundhogg\current_screen_is_gh_page;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
 use function Groundhogg\force_custom_step_names;
@@ -653,6 +654,20 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					?>
                 </div>
             </div>
+            <?php if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
+                <div class="step-reporting">
+                    <div class="stat-wrap">
+                        <div class="gh-tooltip top">Pending</div>
+                        <?php dashicon_e( 'hourglass' ); ?>
+                        <div class="waiting"></div>
+                    </div>
+                    <div class="stat-wrap">
+                        <div class="gh-tooltip top">Completed</div>
+	                    <?php dashicon_e( 'admin-users' ); ?>
+                        <div class="complete"></div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 		<?php
 
@@ -740,7 +755,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 					<?php $this->before_settings( $step ); ?>
 
-                    <div class="gh-panel">
+                    <div class="gh-panel main-step-settings-panel">
                         <div class="gh-panel-header">
                             <h2><?php printf( '%s Settings', $this->get_name() ) ?></h2>
                         </div>
@@ -921,12 +936,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		}
 
 		$setting_schema = wp_parse_args( $schema[ $setting ], [
-			'default'  => false,
 			'sanitize' => '\Groundhogg\sanitize_payload',
 		] );
 
-		if ( empty( $value ) ) {
-			$value = $schema['default'];
+		if ( empty( $value ) && isset( $setting_schema['default'] ) ) {
+			$value = $setting_schema['default'];
 		}
 
 		return call_user_func( $setting_schema['sanitize'], $value );

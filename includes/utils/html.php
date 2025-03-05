@@ -417,10 +417,10 @@ class HTML {
 	}
 
 	/**
-     * Helps creating links
-     *
-     * <a href="#baz">foobar</a>
-     *
+	 * Helps creating links
+	 *
+	 * <a href="#baz">foobar</a>
+	 *
 	 * @param $href
 	 * @param $text
 	 * @param $attrs
@@ -672,6 +672,31 @@ class HTML {
 			'preventSave'        => 'true',
 			'class'              => 'dashicons dashicons-editor-help help-icon'
 		] );
+	}
+
+	/**
+	 * Generate a link that activates the Groundhogg modal
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function new_modal_link( $args = [] ) {
+
+		$atts = wp_parse_args( $args, array(
+			'text'  => __( 'Open Modal', 'groundhogg' ),
+			'class' => 'button button-secondary',
+			'id'    => '',
+			'href'  => '#target',
+            'modal' => []
+		) );
+
+		return $this->e( 'a', [
+			'id'               => $atts['id'],
+			'class'            => $atts['class'] . ' gh-open-modal',
+			'href'             => $atts['href'],
+			'data-modal-props' => wp_json_encode( $atts['modal'] )
+		], $atts['text'] );
 	}
 
 	/**
@@ -1003,9 +1028,9 @@ class HTML {
 			'style'             => []
 		) );
 
-        if ( empty( $a['id'] ) ){
-            $a['id'] = sanitize_title( $args['name'] );
-        }
+		if ( empty( $a['id'] ) ) {
+			$a['id'] = sanitize_title( $args['name'] );
+		}
 
 		if ( isset_not_empty( $a, 'data' ) ) {
 			$a['options'] = $a['data'];

@@ -28,7 +28,7 @@ class If_Else extends Branch_Logic {
 
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'If the contact matches the conditions they will go down the <span class="pill green">YES</span> path, otherwise the <span class="pill red">NO</span> path.' ) );
+		echo html()->e( 'p', [], __( 'If the contact matches the conditions they will go down the <span class="pill green">YES</span> branch, otherwise the <span class="pill red">NO</span> branch.' ) );
 
 		echo html()->e( 'div', [ 'class' => 'include-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'include_filters' ) ] ) ] );
 		echo html()->e( 'div', [ 'class' => 'exclude-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'exclude_filters' ) ] ) ] );
@@ -129,8 +129,7 @@ class If_Else extends Branch_Logic {
 		$path = $path[1]; // this is the key within $branches
 
 		// ideally this query will be cached in the event it gets run more than once.
-		$contactQuery = new Contact_Query();
-		$contactQuery->set_query_params( [
+		$contactQuery = new Contact_Query( [
 			'limit'           => 1,
 			'include_filters' => $this->get_setting( 'include_filters', [] ),
 			'exclude_filters' => $this->get_setting( 'exclude_filters', [] ),

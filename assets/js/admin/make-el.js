@@ -618,7 +618,7 @@
     ])
 
     const close = () => {
-      onClose()
+      onClose( modal )
       modal.remove()
     }
 

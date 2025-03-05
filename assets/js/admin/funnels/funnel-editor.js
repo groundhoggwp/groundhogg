@@ -54,17 +54,7 @@
     $.extend(Funnel, {
 
       sortables      : null,
-      insertInBranch : 'main',
-      insertAfterStep: false,
       editing        : false,
-
-      getSteps: function () {
-        return $('#step-sortable')
-      },
-
-      getSettings: function () {
-        return $('.step-settings')
-      },
 
       stepCallbacks: {},
 
@@ -250,6 +240,10 @@
           this.saveQuietly()
         })
 
+        $('#gh-legacy-modal-save-changes').on('click', () => {
+          this.saveQuietly()
+        })
+
         // Funnel Title
         $document.on('click', '.title-view .title', function (e) {
           $('.title-view').hide()
@@ -362,6 +356,22 @@
           className: 'gh-button secondary text icon',
           onClick  : e => {
             moreMenu('#funnel-more', [
+              {
+                key     : 'uncommit',
+                text    : '<span class="gh-text danger">Revert Changes</span>',
+                onSelect: e => {
+                  dangerConfirmationModal({
+                    alert: '<p>Are you sure you want to revert your changes?</p><p>Your funnel will be restored to the most recent save point.</p>',
+                    onConfirm: () => {
+                      this.save({
+                        moreData: formData => {
+                          formData.append('_uncommit', 1)
+                        },
+                      })
+                    }
+                  })
+                },
+              },
               {
                 key     : 'export',
                 text    : 'Export',
@@ -580,6 +590,10 @@
           morphdom(document.querySelector('.step-settings'), Div({}, response.data.settings), {
             childrenOnly     : true,
             onBeforeElUpdated: function (fromEl, toEl) {
+
+              if ( fromEl.tagName === 'TEXTAREA' && toEl.tagName === 'TEXTAREA' ) {
+                toEl.style.height = fromEl.style.height
+              }
 
               // preserve the editing class
               if (fromEl.classList.contains('editing')) {
@@ -866,13 +880,17 @@
 
       },
 
+      getStep ( id ) {
+        return this.steps.find(s => s.ID == id)
+      },
+
       /**
        * The step that is currently being edited.
        *
        * @returns {unknown}
        */
       getActiveStep () {
-        return this.steps.find(s => s.ID == this.editing)
+        return this.getStep( this.editing )
       },
 
       metaUpdates: {},
@@ -1458,6 +1476,39 @@
     $(document).trigger('draw-logic-lines')
 
   }
+
+  function selectText(node) {
+
+    if (document.body.createTextRange) {
+      const range = document.body.createTextRange();
+      range.moveToElementText(node);
+      range.select();
+    } else if (window.getSelection) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+      console.warn("Could not select text in node: Unsupported browser.");
+    }
+  }
+
+  $(document).on('dblclick', '.step.settings table code,.step.settings table pre', e => {
+    selectText(e.currentTarget)
+    navigator.clipboard.writeText(e.currentTarget.innerText)
+    dialog({
+      message: 'Copied to clipboard!',
+    })
+  })
+
+  $(document).on('click', '.step.settings input.copy-text,.step.settings textarea.copy-text', e => {
+    e.currentTarget.select()
+    navigator.clipboard.writeText(e.currentTarget.value)
+    dialog({
+      message: 'Copied to clipboard!',
+    })
+  })
 
   window.addEventListener('resize', drawLogicLines)
 

@@ -385,6 +385,39 @@ body:has(#funnel-form) {
       //max-width: 100% !important;
     }
 
+    code {
+      border-radius: 5px;
+      background-color: $primary-dark-5;
+    }
+
+    .field-map-wrapper{
+      max-height: 500px;
+      overflow: auto;
+      border: 1px solid #c3c4c7;
+      border-radius: 5px 0 0 5px;
+      table {
+        width: 100%;
+        margin-top: 0 !important;
+        border: none !important;
+        //table-layout: auto;
+
+        th {
+          position: sticky;
+          top: 0;
+          background-color: #fff;
+        }
+
+        td:last-child {
+          width: 200px;
+        }
+
+        pre {
+          margin: 0;
+          white-space: normal;
+        }
+      }
+    }
+
     select.gh-select2 {
       width: 100%;
     }
@@ -399,6 +432,17 @@ body:has(#funnel-form) {
     .step-settings {
 
       padding: 30px;
+
+      // when custom step names are disabled
+      &.generated-step-names {
+        // disable the main settings panel here...
+        .step.web_form,
+        .step.send_email {
+          .main-step-settings-panel {
+            display: none;
+          }
+        }
+      }
 
       &:not(:has(.step.editing)) {
         display: none;
@@ -520,7 +564,7 @@ body:has(#funnel-form) {
 
             table.wp-list-table {
               border-radius: 5px;
-              overflow: hidden;
+              //overflow: hidden;
 
               &.striped > tbody > :nth-child(odd) {
                 //background-color: $primary-dark-5;
@@ -825,6 +869,7 @@ button.button.save-button {
     overflow: auto;
 
     background-image: radial-gradient(circle at 1px 1px, $primary-dark-10 1px, transparent 0);
+    background-position: center center;
     background-size: 20px 20px;
 
     .logic-line {
@@ -1129,6 +1174,37 @@ button.button.save-button {
     //margin: auto;\\
     border: 1px solid var(--color);
 
+    .step-reporting{
+      display: flex;
+      justify-content: center;
+      gap: 67px;
+      position: absolute;
+      top: 0;
+      /* left: 50%; */
+      width: 100%;
+      transform: translateY(-50%);
+
+      div.stat-wrap {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        border: 1px solid var(--color);
+        background: #fff;
+        border-radius: 3px;
+        padding: 3px 8px;
+
+        &.invisible {
+          visibility: hidden;
+        }
+
+        .dashicons {
+          font-size: 14px;
+          height: 14px;
+          width: 14px;
+        }
+      }
+    }
+
     &.action {
       --color: #{$action-green};
       --color-25: #{$action-green-25};
@@ -1242,10 +1318,6 @@ button.button.save-button {
                       #fff 10px, /* Space between lines */
                       #fff 20px /* Repeat pattern */
       );
-
-      .delete-step {
-        display: none;
-      }
     }
 
     &:hover {
@@ -1615,7 +1687,7 @@ table.embed-options td {
             background: #f9f9f9;
             cursor: pointer;
 
-            &.editing {
+            &.active {
               font-weight: 500;
               border-bottom: 1px solid #fff;
               margin-bottom: -1px;

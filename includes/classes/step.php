@@ -678,6 +678,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return apply_filters( 'groundhogg/step/next_step', $next, $this );
 	}
 
+	public function is_same_parent( Step $prev_step ) {
+		$parent = $this->get_parent_step();
+		$parent2 = $prev_step->get_parent_step();
+
+		if ( ! is_a( $parent, Step::class ) || ! is_a( $parent2, Step::class ) ) {
+			return $parent === $parent2; // both must be false then
+		}
+
+		// Ids must be same
+		return $parent->ID === $parent2->ID;
+	}
+
 	/**
 	 * Check if the funnel of this step is the same as the given one
 	 *
@@ -1323,12 +1335,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function delete() {
 
-		// active steps can't be deleted for safety! :) Problem solved.
-		if ( $this->is_active() ) {
-			return false;
-		}
-
+		// This will handle any complimentary delete handlers, such as those for branch logic steps
 		$this->get_step_element()->delete( $this );
+
+		// If an active step is deleted, what we'll do is add a change that it was deleted,
+		// and when we do get_steps() we'll filter out steps that have that flag
+		if ( $this->should_add_as_changes() ) {
+			return $this->add_changes( [ 'is_deleted' => true ] );
+		}
 
 		return parent::delete();
 	}
@@ -1373,6 +1387,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return parent::pull();
 	}
 
+	public function maybe_pull() {
+		if ( $this->is_temp_merged ){
+			return $this->pull();
+		}
+		return false;
+	}
+
 	/**
 	 * Add changes while waiting for commit()
 	 *
@@ -1395,7 +1416,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$was_merged = true;
 		}
 
-
 		$changes = $this->sanitize_columns( $changes );
 		$changes = array_merge( $this->changes, $changes );
 		unset( $changes['changes'] );
@@ -1417,7 +1437,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function clear_changes() {
-		$this->pull();
+		$this->maybe_pull();
 
 		parent::update( [
 			'changes' => [] // clear the changes with an empty array
@@ -1437,13 +1457,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function commit() {
 
-		$this->pull(); // resets the object in case we merged changes...
+		$this->maybe_pull();
+
+		$this->is_committing = true;
 
 		$data_changes = [];
 		$meta_changes = [];
 
 		if ( $this->has_changes() ) {
 			$changes      = $this->changes;
+
+			// delete the step if it was "deleted"
+			if ( isset_not_empty( $changes, 'is_deleted' ) ){
+				// using parent avoids having to work around is_active()
+				return parent::delete(); // todo maybe we do special handling with $this->delete() instead?
+			}
+
 			$columns      = $this->get_db()->get_columns();
 			$data_changes = array_intersect_key( $changes, $columns ); // stuff that goes into main DB
 			$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
@@ -1451,8 +1480,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$data_changes['changes'] = []; // clear the changes
 		$data_changes['date_committed'] = ( new DateTimeHelper() )->ymdhis();
-
-		$this->is_committing = true;
 
 		if ( ! empty( $meta_changes ) ) {
 			$this->update_meta( $meta_changes );

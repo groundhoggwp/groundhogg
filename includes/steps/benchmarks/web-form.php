@@ -86,87 +86,22 @@ class Web_Form extends Benchmark {
 		return [];
 	}
 
-	public function html_v2( $step ) {
-		?>
-        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
-             title="<?php echo $step->get_title() ?>" id="settings-<?php echo $step->get_id(); ?>"
-             class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
+    protected function after_settings( Step $step ) {
+	    echo html()->input( [
+		    'id'          => $this->setting_id_prefix( 'form_name' ),
+		    'name'        => $this->setting_name_prefix( 'form_name' ),
+		    'value'       => $this->get_setting( 'form_name', $step->step_title ),
+		    'class'       => 'full-width',
+		    'style'       => [
+			    'font-size' => '18px'
+		    ],
+		    'placeholder' => 'Form name...'
+	    ] );
 
-            <!-- WARNINGS -->
-			<?php $this->__step_warnings( $step ); ?>
-            <!-- SETTINGS -->
-            <div class="step-flex">
-                <div class="step-edit panels ignore-morph">
-					<?php
-
-					echo html()->input( [
-						'id'          => $this->setting_id_prefix( 'form_name' ),
-						'name'        => $this->setting_name_prefix( 'form_name' ),
-						'value'       => $this->get_setting( 'form_name', $step->step_title ),
-						'class'       => 'full-width',
-						'style'       => [
-							'font-size' => '18px'
-						],
-						'placeholder' => 'Form name...'
-					] );
-
-					echo html()->e( 'div', [
-						'id' => "step_{$step->ID}_web_form_builder"
-					], 'Form Builder' );
-
-					do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );
-					do_action( 'groundhogg/steps/settings/before', $this );
-					do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step );
-					do_action( 'groundhogg/steps/settings/after', $this );
-
-					?>
-                </div>
-                <div class="step-notes">
-					<?php $this->before_step_notes( $step ); ?>
-                    <div class="gh-panel benchmark-settings">
-                        <div class="gh-panel-header">
-                            <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
-                        </div>
-                        <div class="inside display-flex gap-20 column">
-							<?php if ( ! $step->is_starting() ):
-
-								echo html()->checkbox( [
-									'label'   => 'Allow contacts to enter the funnel at this step',
-									'name'    => $this->setting_name_prefix( 'is_entry' ),
-									'checked' => $step->is_entry()
-								] );
-
-								echo html()->checkbox( [
-									'label'   => 'Allow contacts to pass through this benchmark',
-									'name'    => $this->setting_name_prefix( 'can_passthru' ),
-									'checked' => $step->can_passthru()
-								] );
-
-							endif;
-
-							echo html()->checkbox( [
-								'label'   => 'Track conversion when completed',
-								'name'    => $this->setting_name_prefix( 'is_conversion' ),
-								'checked' => $step->is_conversion()
-							] );
-
-							?>
-                        </div>
-                    </div>
-					<?php
-					echo html()->textarea( [
-						'id'          => $this->setting_id_prefix( 'step-notes' ),
-						'name'        => $this->setting_name_prefix( 'step_notes' ),
-						'value'       => $step->get_step_notes(),
-						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
-						'class'       => 'step-notes-textarea'
-					] );
-					?>
-                </div>
-            </div>
-        </div>
-		<?php
-	}
+	    echo html()->e( 'div', [
+		    'id' => "step_{$step->ID}_web_form_builder"
+	    ], 'Form Builder' );
+    }
 
 	protected function before_step_notes( Step $step ) {
 
@@ -228,9 +163,6 @@ class Web_Form extends Benchmark {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		echo html()->e( 'div', [
-			'id' => "step_{$step->ID}_web_form_builder"
-		], 'Form Builder' );
 	}
 
 	/**

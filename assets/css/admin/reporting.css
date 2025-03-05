@@ -4,6 +4,9 @@ body.gh_reporting .wrap {
   margin-left: auto;
   margin-right: auto;
 }
+body.gh_reporting .gh-header + h2.gh-nav {
+  margin-left: 0 !important;
+}
 body.gh_reporting .number-total,
 body.gh_reporting .groundhogg-quick-stat-number {
   font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
@@ -227,19 +230,6 @@ body.gh_reporting .nav-tab-wrapper {
 .gh-panel table.groundhogg-report-table tr th.bad, .gh-panel table.groundhogg-report-table tr td.bad {
   background-color: #F4CCCC;
 }
-.gh-panel table.groundhogg-report-table tr th .step-type, .gh-panel table.groundhogg-report-table tr td .step-type {
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 9px;
-  background-color: #102640;
-  color: #FFFFFF;
-}
-.gh-panel table.groundhogg-report-table tr th .step-type.benchmark, .gh-panel table.groundhogg-report-table tr td .step-type.benchmark {
-  background-color: #f58115;
-}
-.gh-panel table.groundhogg-report-table tr th .step-type.action, .gh-panel table.groundhogg-report-table tr td .step-type.action {
-  background-color: #9ece38;
-}
 .gh-panel table.groundhogg-report-table tr th .step-icon, .gh-panel table.groundhogg-report-table tr td .step-icon {
   position: absolute;
   width: 46px;
@@ -415,6 +405,63 @@ table.groundhogg-report-table td:last-child {
 }
 #groundhogg-datepicker .dr-selections {
   right: 0;
+}
+
+#chart_funnel_breakdown {
+  display: flex;
+  padding: 0 25px;
+  align-items: stretch;
+  --spacer-height: 20px;
+  --stage-height: 60px;
+}
+#chart_funnel_breakdown div.funnel-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+#chart_funnel_breakdown div.funnel-labels div.funnel-stage-label {
+  height: var(--stage-height);
+  display: flex;
+  align-items: center;
+}
+#chart_funnel_breakdown div.funnel-stages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+}
+#chart_funnel_breakdown div.funnel-stages .stage-percentage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #102640;
+  color: #fff;
+  height: var(--spacer-height);
+}
+#chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer {
+  position: relative;
+  height: var(--stage-height);
+  background: rgba(245, 129, 21, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  color: #000;
+}
+#chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer a {
+  color: #000;
+}
+#chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer:hover {
+  color: #fff;
+  background-color: #f58115;
+}
+#chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer:hover a {
+  color: #fff;
 }
 
 @media only screen and (max-width: 700px) {

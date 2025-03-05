@@ -763,11 +763,13 @@ class Funnels_Page extends Admin_Page {
 			$step->save();
 		}
 
+        // activate the funnel
 		if ( get_post_var( '_activate' ) ) {
 			$args['status']       = 'active';
 			$args['last_updated'] = current_time( 'mysql' );
 		}
 
+        // deactivate the funnel
 		if ( get_post_var( '_deactivate' ) ) {
 
 			// changes were not committed, so let's delete them
@@ -777,6 +779,11 @@ class Funnels_Page extends Admin_Page {
 
 			$args['status']       = 'inactive';
 			$args['last_updated'] = current_time( 'mysql' );
+		}
+
+        // deleted uncommited changes
+		if ( get_post_var( '_uncommit' ) ) {
+            $funnel->uncommit();
 		}
 
 		// if the funnel does not have any entry steps, it cannot be active.

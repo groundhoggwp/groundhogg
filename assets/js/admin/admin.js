@@ -467,7 +467,7 @@
       selected    : convertOpt('option[selected]'),
       multiple    : selectEl.multiple,
       tags        : selectEl.dataset.tags,
-      noneSelected : selectEl.dataset.placeholder ?? 'Any...',
+      noneSelected: selectEl.dataset.placeholder ?? 'Any...',
       onCreate    : async opt => {
         selectEl.appendChild(MakeEl.makeEl('options', {
           value   : opt,
@@ -537,6 +537,46 @@
     var $overlay = $(this)
     $overlay.next().toggleClass('show')
     $overlay.remove()
+  })
+
+  function moveChildren(source, target) {
+    while (source.firstChild) {
+      target.appendChild(source.firstChild);
+    }
+  }
+
+  $(document).on('click', '.gh-open-modal', e => {
+
+    e.preventDefault()
+
+    let a = e.currentTarget
+    let source = document.querySelector(a.getAttribute('href'))
+    let modalProps = JSON.parse(a.dataset.modalProps)
+    // let modalProps = {}
+    const {
+      title = 'Modal',
+
+      ...restModalProps
+    } = modalProps
+
+    MakeEl.Modal({
+      ...restModalProps,
+      onOpen: ({modal}) => {
+        let target =  modal.querySelector( '.source-content' )
+        moveChildren( source, target )
+      },
+      onClose: modal => {
+        let target = modal.querySelector( '.source-content' )
+        moveChildren( target, source )
+      }
+    }, ({close}) => MakeEl.Fragment( [
+      MakeEl.Div({ className: 'gh-header modal-header' }, [
+        MakeEl.H3({}, 'Modal header' ),
+        MakeEl.Button({ className: 'gh-button icon secondary text', onClick: close }, MakeEl.Dashicon( 'no-alt' ) )
+      ] ),
+      MakeEl.Div({ className: 'source-content' } ),
+    ] ) )
+
   })
 
   gh.pickers = {

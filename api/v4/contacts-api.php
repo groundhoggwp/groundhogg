@@ -290,9 +290,11 @@ class Contacts_Api extends Base_Object_Api {
 				$id            = get_array_var( $item, 'ID' );
 				$data          = get_array_var( $item, 'data', [] );
 				$meta          = get_array_var( $item, 'meta', [] );
-				$add_tags      = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
-				$remove_tags   = get_array_var( $item, 'remove_tags', [] );
 				$email_address = get_array_var( $data, 'email' );
+				$remove_tags   = get_array_var( $item, 'remove_tags', [] );
+				$add_tags      = array_reduce( [ 'tags', 'add_tags', 'apply_tags' ], function ( $tags, $key ) use ( $item ) {
+					return array_merge( $tags, get_array_var( $item, $key, [] ) );
+				}, [] );
 
 				if ( ! $id && ! $email_address ) {
 					continue;

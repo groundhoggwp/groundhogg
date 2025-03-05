@@ -1,9 +1,14 @@
 ( function ($, nonces) {
 
-  const { sprintf, __, _x, _n } = wp.i18n
+  const {
+    sprintf,
+    __,
+    _x,
+    _n,
+  } = wp.i18n
 
   const {
-    emails: EmailsStore,
+    emails   : EmailsStore,
     campaigns: CampaignsStore,
   } = Groundhogg.stores
 
@@ -21,7 +26,10 @@
     Span,
   } = MakeEl
 
-  const { loadingModal, adminPageURL } = Groundhogg.element
+  const {
+    loadingModal,
+    adminPageURL,
+  } = Groundhogg.element
 
   const { base64_json_encode } = Groundhogg.functions
 
@@ -31,9 +39,15 @@
     }), '_blank')
   }
 
-  const ReportTable = ( id, report ) => {
+  const ReportTable = (id, report) => {
 
-    let { label, data, no_data = '', per_page = 10, orderby = 0 } = report
+    let {
+      label,
+      data,
+      no_data = '',
+      per_page = 10,
+      orderby = 0,
+    } = report
 
     if (!Array.isArray(label)) {
       label = Object.values(label)
@@ -45,8 +59,8 @@
       per_page,
       orderby,
       orderby2: 0,
-      order: 'DESC',
-      page: 0,
+      order   : 'DESC',
+      page    : 0,
     })
     const compareRows = (a, b, k = State.orderby) => {
 
@@ -58,8 +72,8 @@
       let bv = b.orderby[k]
 
       // Avoid deep recursion if already checking orderby2
-      if ( av === bv && k !== State.orderby2 ){
-        return compareRows( a, b, State.orderby2 )
+      if (av === bv && k !== State.orderby2) {
+        return compareRows(a, b, State.orderby2)
       }
 
       if (State.order === 'ASC') {
@@ -71,22 +85,30 @@
 
     const getData = () => data.sort(compareRows).slice(State.per_page * State.page, ( State.per_page * State.page ) + State.per_page)
 
-    const TableBody = () => TBody({}, getData().map(({ orderby = {}, cellClasses = [], ...row }) => Tr({}, Object.keys(row).map((k,i) => {
-      return Td({ dataColname: k, className: `${cellClasses[i] ?? ''}` }, `${ row[k] }`)
-    }))))
+    const TableBody = () => TBody({}, getData().
+      map(({
+        orderby = {},
+        cellClasses = [],
+        ...row
+      }) => Tr({}, Object.keys(row).map((k, i) => {
+        return Td({
+          dataColname: k,
+          className  : `${ cellClasses[i] ?? '' }`,
+        }, `${ row[k] }`)
+      }))))
 
-    return Div( {
-      id: `report-${id}`
+    return Div({
+      id: `report-${ id }`,
     }, morph => Fragment([
       Div({
-        className: 'table-scroll'
+        className: 'table-scroll',
       }, Table({
         className: 'groundhogg-report-table',
       }, [
         THead({}, Tr({}, label.map((l, i) => Th({
-          id: `order-${ i }`,
+          id       : `order-${ i }`,
           className: `${ State.orderby === i || State.orderby2 === i ? 'sorted' : '' } ${ State.order === 'ASC' ? 'asc' : 'desc' }`,
-          onClick: e => {
+          onClick  : e => {
 
             if (!sortable) {
               return
@@ -99,15 +121,15 @@
             }
             else {
               State.set({
-                orderby: i,
+                orderby : i,
                 orderby2: State.orderby,
-                order: 'DESC',
+                order   : 'DESC',
               })
             }
             morph()
           },
         }, Div({
-          className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' )}`,
+          className: `display-flex ${ i === 0 ? 'flex-start' : ( i === label.length - 1 ? 'flex-end' : 'center' ) }`,
         }, [
           Span({
             className: 'column-name',
@@ -124,15 +146,15 @@
         TableBody(),
       ])),
       data.length > State.per_page ? Div({
-        style: {
+        style    : {
           padding: '10px',
         },
         className: 'display-flex gap-10 flex-end',
       }, [
         State.page > 0 ? Button({
-          id: `report-${id}-prev`,
+          id       : `report-${ id }-prev`,
           className: 'gh-button secondary',
-          onClick: e => {
+          onClick  : e => {
             State.set({
               page: State.page - 1,
             })
@@ -140,9 +162,9 @@
           },
         }, 'Prev') : null,
         ( State.page + 1 ) * State.per_page < data.length ? Button({
-          id: `report-${id}-next`,
+          id       : `report-${ id }-next`,
           className: 'gh-button secondary',
-          onClick: e => {
+          onClick  : e => {
             State.set({
               page: State.page + 1,
             })
@@ -154,13 +176,13 @@
   }
 
   // reporting might be undefined at this point
-  if ( typeof GroundhoggReporting !== 'undefined' ){
+  if (typeof GroundhoggReporting !== 'undefined') {
     const reporting = GroundhoggReporting
     $.extend(reporting || {}, {
 
-      data: {},
+      data    : {},
       calendar: null,
-      charts: {},
+      charts  : {},
 
       init: function () {
 
@@ -187,19 +209,31 @@
         }
 
         el.append(ItemPicker({
-          id: 'report-campaign',
+          id          : 'report-campaign',
           noneSelected: __('Filter by campaign...', 'groundhogg'),
-          multiple: false,
-          selected: campaignId ? ( ({ ID, data }) => ( { id: ID, text: data.name } ) )(CampaignsStore.get(campaignId)) : [],
+          multiple    : false,
+          selected    : campaignId ? ( ({
+            ID,
+            data,
+          }) => ( {
+            id  : ID,
+            text: data.name,
+          } ) )(CampaignsStore.get(campaignId)) : [],
           fetchOptions: async (search) => {
             let campaigns = await CampaignsStore.fetchItems({
               search,
               limit: 20,
             })
 
-            return campaigns.map(({ ID, data }) => ( { id: ID, text: data.name } ))
+            return campaigns.map(({
+              ID,
+              data,
+            }) => ( {
+              id  : ID,
+              text: data.name,
+            } ))
           },
-          onChange: item => {
+          onChange    : item => {
 
             if (!item) {
               this.other.campaign = null
@@ -219,43 +253,48 @@
         var self = this
 
         this.calendar = new Calendar({
-          element: $('#groundhogg-datepicker'),
-          presets: [
+          element      : $('#groundhogg-datepicker'),
+          presets      : [
             {
               label: 'Last 30 days',
               start: moment().subtract(29, 'days'),
-              end: moment(),
-            }, {
+              end  : moment(),
+            },
+            {
               label: 'This month',
               start: moment().startOf('month'),
-              end: moment().endOf('month'),
-            }, {
+              end  : moment().endOf('month'),
+            },
+            {
               label: 'Last month',
               start: moment().subtract(1, 'month').startOf('month'),
-              end: moment().subtract(1, 'month').endOf('month'),
-            }, {
+              end  : moment().subtract(1, 'month').endOf('month'),
+            },
+            {
               label: 'Last 7 days',
               start: moment().subtract(6, 'days'),
-              end: moment(),
-            }, {
+              end  : moment(),
+            },
+            {
               label: 'Last 3 months',
               start: moment().subtract(3, 'month').startOf('month'),
-              end: moment().subtract(1, 'month').endOf('month'),
-            }, {
+              end  : moment().subtract(1, 'month').endOf('month'),
+            },
+            {
               label: 'This year',
               start: moment().startOf('year'),
-              end: moment().endOf('year'),
+              end  : moment().endOf('year'),
             },
           ],
-          format: {
+          format       : {
             preset: GroundhoggReporting.date_format,
             // preset: 'MMM D, YYYY'
           },
           earliest_date: 'January 1, 2017',
-          latest_date: moment(),
-          start_date: self.dates.start_date,
-          end_date: self.dates.end_date,
-          callback: function () {
+          latest_date  : moment(),
+          start_date   : self.dates.start_date,
+          end_date     : self.dates.end_date,
+          callback     : function () {
             self.refresh(this)
           },
         })
@@ -301,19 +340,19 @@
           end = calendar.end_date.format('YYYY-MM-DD')
 
         $.ajax({
-          type: 'post',
-          url: ajaxurl,
+          type    : 'post',
+          url     : ajaxurl,
           dataType: 'json',
-          data: {
-            action: 'groundhogg_refresh_dashboard_reports',
+          data    : {
+            action : 'groundhogg_refresh_dashboard_reports',
             reports: self.reports,
-            start: start,
-            end: end,
-            data: {
+            start  : start,
+            end    : end,
+            data   : {
               ...reporting.other,
             },
           },
-          success: function (json) {
+          success : function (json) {
 
             self.data = json.data.reports
             self.renderReports()
@@ -325,7 +364,7 @@
             window.dispatchEvent(new Event('resize'))
 
           },
-          failure: function (response) {
+          failure : function (response) {
 
             alert('Unable to retrieve data...')
 
@@ -384,7 +423,124 @@
           case 'table':
             this.renderTable($report, report_data, report_id)
             break
+          case 'funnel':
+            this.renderFunnelFlowReport(report_data)
+            break
+          case 'funnel_breakdown':
+            this.renderFunnelBreakdownReport($report, report_data)
+            break
         }
+
+      },
+
+      renderFunnelBreakdownReport ($report, report_data) {
+        const { report } = report_data
+
+        $report.html('') // clear existing report data
+        let reportEl = $report[0]
+
+        let labelsEl = MakeEl.Div({
+          className: 'funnel-labels',
+        }, [
+          ...report.map(({
+            link,
+            labels,
+            percentage = null,
+          }) => {
+
+            return MakeEl.Fragment([
+              MakeEl.Div({
+                className: 'funnel-stage-label',
+              },
+                MakeEl.Span({},Groundhogg.element.orList(labels)),
+              ),
+            ])
+          }),
+        ])
+
+        let minWidth = 10
+
+        let funnelEl = MakeEl.Div({
+          className: 'funnel-stages',
+        }, [
+          ...report.map(({
+            link,
+            width,
+            complete,
+            percentage = null,
+          }) => {
+
+            let percentEl = null
+
+            if (percentage !== null) {
+              percentEl = MakeEl.Div({
+                className: 'stage-percentage',
+                style    : {
+                  width: `${ Math.max(width, minWidth) }%`,
+                },
+              }, percentage == width ? `${ percentage }%` : `${ percentage }% (${ width}%)` )
+            }
+
+            return MakeEl.Fragment([
+              percentEl,
+              MakeEl.Div({
+                className: 'funnel-stage-layer',
+                style    : {
+                  width: `${ Math.max(width, minWidth) }%`,
+                },
+                onClick: e => {
+                  let a = e.currentTarget.querySelector( 'a' )
+                  if ( a ) {
+                    a.click()
+                  }
+                }
+              }, [
+                link,
+              ]),
+            ])
+          }),
+        ])
+
+        reportEl.append(labelsEl)
+        reportEl.append(funnelEl)
+
+        applyClipPath(funnelEl)
+
+      },
+
+      renderFunnelFlowReport (report_data) {
+
+        const { stepData = [] } = report_data
+
+        stepData.forEach(({
+          step = 0,
+          complete = '',
+          waiting = '',
+        }) => {
+
+          step = document.getElementById(`step-${ step }`)
+
+          if (!step) {
+            return
+          }
+
+          let completeEl = step.querySelector('.complete')
+          let waitingEl = step.querySelector('.waiting')
+
+          if (completeEl) {
+            completeEl.innerHTML = complete
+          }
+
+          if (waitingEl) {
+            waitingEl.innerHTML = waiting
+            if (waiting === '0') {
+              waitingEl.closest('.stat-wrap').classList.add('invisible')
+            }
+            else {
+              waitingEl.closest('.stat-wrap').classList.remove('invisible')
+            }
+          }
+        })
 
       },
 
@@ -408,7 +564,7 @@
 
         if (report_data.data.labels && report_data.data.labels.length === 0) {
           $report.closest('.gh-donut-chart-wrap').html(report_data.no_data)
-          return;
+          return
         }
 
         if (this.charts[report_id]) {
@@ -426,11 +582,11 @@
               openInContactsView([
                 [
                   {
-                    type: 'unsubscribed',
-                    reasons: [reason],
+                    type      : 'unsubscribed',
+                    reasons   : [reason],
                     date_range: 'between',
-                    before: this.calendar.end_date.format('YYYY-MM-DD'),
-                    after: this.calendar.start_date.format('YYYY-MM-DD'),
+                    before    : this.calendar.end_date.format('YYYY-MM-DD'),
+                    after     : this.calendar.start_date.format('YYYY-MM-DD'),
                   },
                 ],
               ])
@@ -459,7 +615,10 @@
               ctx.lineTo(x, bottomy)
               ctx.lineWidth = 1
               ctx.strokeStyle = '#727272'
-              ctx.setLineDash([10, 10])
+              ctx.setLineDash([
+                10,
+                10,
+              ])
               ctx.stroke()
               ctx.restore()
             }
@@ -490,7 +649,10 @@
 
       renderTable: function ($report, report_data, id) {
 
-        let { data, no_data = '' } = report_data
+        let {
+          data,
+          no_data = '',
+        } = report_data
 
         if (!data.length) {
           $report.html(no_data)
@@ -503,16 +665,39 @@
     })
   }
 
+  function applyClipPath (element) {
+    const boxes = element.children
+
+    for (let i = 0; i < boxes.length - 1; i++) {
+      const current = boxes[i]
+      const next = boxes[i + 1]
+
+      const currentWidth = current.offsetWidth
+      const nextWidth = next.offsetWidth
+
+      const leftDiff = ( currentWidth - nextWidth ) / 2
+      const rightDiff = ( currentWidth - nextWidth ) / 2
+
+      current.style.clipPath = `polygon(
+                    0% 0%, 
+                    100% 0%, 
+                    100% 0%, 
+                    ${ 100 - ( rightDiff / currentWidth ) * 100 }% 100%, 
+                    ${ ( leftDiff / currentWidth ) * 100 }% 100%
+                )`
+    }
+  }
+
   $(function () {
 
-    if ( typeof GroundhoggReporting !== 'undefined' ){
+    if (typeof GroundhoggReporting !== 'undefined') {
       GroundhoggReporting.init()
     }
 
   })
 
   Groundhogg.reporting = {
-    ReportTable
+    ReportTable,
   }
 
 } )(jQuery, groundhogg_nonces)

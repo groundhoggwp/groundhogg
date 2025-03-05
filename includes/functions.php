@@ -6,6 +6,7 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Form\Posted_Data;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Queue\Process_Contact_Events;
@@ -454,6 +455,11 @@ function event_queue_db() {
  * @return bool
  */
 function isset_not_empty( $array, $key = '' ) {
+
+    if ( is_a( $array, Posted_Data::class ) ){
+        throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data');
+    }
+
 	if ( is_object( $array ) ) {
 		return isset( $array->$key ) && ! empty( $array->$key );
 	} else if ( is_array( $array ) ) {
@@ -828,6 +834,11 @@ function find_object( array $array, array $args ) {
  * @return mixed
  */
 function get_array_var( $array, $key = '', $default = false ) {
+
+	if ( is_a( $array, Posted_Data::class ) ){
+		throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data');
+	}
+
 	if ( isset_not_empty( $array, $key ) ) {
 		if ( is_object( $array ) ) {
 			return $array->$key;
@@ -8688,11 +8699,16 @@ function add_event_args( $args = [] ) {
  */
 function get_event_arg( string $arg, $default = false ) {
 
-	if ( \Groundhogg\event_queue()::is_processing() ) {
+	if ( ! \Groundhogg\event_queue()::is_processing() ) {
 		return false;
 	}
 
 	$event = \Groundhogg\event_queue()->get_current_event();
+
+    // make sure the event exists...
+    if ( ! $event || ! $event->exists() ){
+        return $default;
+    }
 
 	return $event->get_arg( $arg, $default );
 }

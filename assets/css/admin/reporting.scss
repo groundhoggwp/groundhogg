@@ -33,6 +33,10 @@ body.gh_reporting {
     margin-right: auto;
   }
 
+  .gh-header + h2.gh-nav {
+    margin-left: 0 !important;
+  }
+
   .number-total,
   .groundhogg-quick-stat-number, {
     font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
@@ -299,22 +303,6 @@ body.gh_reporting {
           background-color: #F4CCCC;
         }
 
-        .step-type {
-          font-weight: bold;
-          text-transform: uppercase;
-          font-size: 9px;
-          background-color: $primary-dark;
-          color: #FFFFFF;
-
-          &.benchmark {
-            background-color: $benchmark-orange;
-          }
-
-          &.action {
-            background-color: $action-green;
-          }
-        }
-
         .step-icon {
           position: absolute;
           width: 46px;
@@ -509,6 +497,79 @@ table.groundhogg-report-table td:last-child {
 
   .dr-selections {
     right: 0;
+  }
+}
+
+#chart_funnel_breakdown{
+  display: flex;
+  padding: 0 25px;
+  align-items: stretch;
+
+  --spacer-height: 20px;
+  --stage-height: 60px;
+
+  div.funnel-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    //.spacer {
+    //  height: var(--spacer-height);
+    //}
+
+    div.funnel-stage-label{
+      height: var(--stage-height);
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  div.funnel-stages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    //gap: 10px;
+    flex-grow: 1;
+    font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+
+    .stage-percentage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: $primary-dark;
+      color: #fff;
+      height: var(--spacer-height);
+    }
+
+    div.funnel-stage-layer {
+      position: relative;
+      height: var(--stage-height);
+      background: $benchmark-orange-50;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      //clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+
+      font-size: 22px;
+      font-weight: bold;
+      color: #000;
+
+      a {
+        color: #000;
+      }
+
+      &:hover {
+        color: #fff;
+        background-color: $benchmark-orange;
+
+        a {
+          color: #fff;
+        }
+      }
+    }
   }
 }
 

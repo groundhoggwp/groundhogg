@@ -240,12 +240,14 @@ class Funnel extends Base_Object_With_Meta {
 			return;
 		}
 
-		$steps = $this->get_steps();
+		$steps = $this->get_real_steps(); // use instead of ::get_steps() to avoid merged changes
 
 		// commit all the step changes
 		foreach ( $steps as $step ) {
 			$step->commit();
 		}
+
+		$this->update_step_status();
 	}
 
 	/**
@@ -258,12 +260,10 @@ class Funnel extends Base_Object_With_Meta {
 			return;
 		}
 
-		$steps = $this->get_steps();
+		$steps = $this->get_real_steps();
 
 		// commit all the step changes
 		foreach ( $steps as $step ) {
-
-			$step->pull();
 
 			// delete any inactive steps
 			if ( ! $step->is_active() ) {
@@ -475,6 +475,11 @@ class Funnel extends Base_Object_With_Meta {
 
 		if ( $this->is_editing() ) {
 
+			// filter out "deleted" steps with the is_deleted flag in their changes
+			$steps = array_filter( $steps, function ( $step ) {
+				return ! isset_not_empty( $step->changes, 'is_deleted' ) ;
+			});
+
 			foreach ( $steps as $step ) {
 				$step->merge_changes();
 			}
@@ -483,6 +488,24 @@ class Funnel extends Base_Object_With_Meta {
 				return $a->get_order() - $b->get_order();
 			} );
 		}
+
+		return $steps;
+	}
+
+	/**
+	 * Same as get_steps, but without the is_editing() BS
+	 * @return Step[]
+	 */
+	public function get_real_steps( $query = [] ) {
+
+		$query = wp_parse_args( $query, [
+			'funnel_id' => $this->get_id(),
+			'orderby'   => 'step_order',
+			'order'     => 'ASC',
+		] );
+
+		$steps = $this->get_steps_db()->query( $query );
+		$steps = array_map_to_step( $steps );
 
 		return $steps;
 	}

@@ -84,8 +84,7 @@ class Split_Path extends Branch_Logic {
 			return false;
 		}
 
-		$contactQuery = new Contact_Query();
-		$contactQuery->set_query_params( [
+		$contactQuery = new Contact_Query( [
 			'limit'           => 1,
 			'include_filters' => get_array_var( $branch, 'include_filters', [] ),
 			'exclude_filters' => get_array_var( $branch, 'exclude_filters', [] ),

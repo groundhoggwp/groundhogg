@@ -205,21 +205,23 @@ function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tag
  */
 function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$tags ) {
 
-	$selections = get_array_var( $posted_data, $field['name'], [] );
+	$selections = $posted_data[$field['name']];
 
 	if ( ! is_array( $selections ) ) {
 		return;
 	}
 
-	$selections = map_deep( array_filter( $selections ), 'sanitize_text_field' );
+	$options = array_map( function ( $option ) {
+		return is_array( $option ) ? $option[0] : $option;
+	}, $field['options'] );
 
+	$selections             = map_deep( array_intersect( $selections, $options ), 'sanitize_text_field' );
 	$meta[ $field['name'] ] = $selections;
-	$options                = $field['options'];
 
 	// Find associated tags and apply
 	foreach ( $selections as $selection ) {
 
-		$_selected = array_find( $options, function ( $option ) use ( $selection ) {
+		$_selected = array_find( $field['options'], function ( $option ) use ( $selection ) {
 			return is_array( $option ) && $option[0] === $selection;
 		} );
 
@@ -1054,7 +1056,7 @@ class Form_v2 extends Step {
 					] );
 				},
 				'validate' => '__return_true',
-				'before'   => function (  $field, $posted_data, &$data, &$meta ) {
+				'before'   => function ( $field, $posted_data, &$data, &$meta ) {
 					// if the field is not set, it should be set to ''
 					$meta[ $field['name'] ] = isset( $posted_data[ $field['name'] ] ) ? sanitize_text_field( $posted_data[ $field['name'] ] ) : '';
 				},
@@ -2071,6 +2073,10 @@ class Form_v2 extends Step {
 	 */
 	public function get_fields() {
 		$config = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
+
+		if ( ! is_array( $config ) || ! isset( $config['fields'] ) ) {
+			return [];
+		}
 
 		return $config['fields'];
 	}

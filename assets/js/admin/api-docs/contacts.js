@@ -297,7 +297,9 @@
           Pg({}, __('The ID is normally required unless the email address is provided within the data object.', 'groundhogg')),
         ]),
       },
-      ...ApiRegistry.contacts.endpoints.create.params,
+      ...ApiRegistry.contacts.endpoints.create.params.filter( param => param.param !== 'tags' ),
+      CommonParams.tags('add_tags'),
+      CommonParams.tags('remove_tags')
     ],
     repeater: true,
     request: [
@@ -324,9 +326,10 @@
         'meta': {
           'custom_field': '123',
         },
-        'tags': [
+        'add_tags': [
           25,
         ],
+        'remove_tags': []
       },
     ],
     response: {
