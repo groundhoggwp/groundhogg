@@ -835,24 +835,26 @@ button.button.save-button {
 .funnel-end {
   display: flex;
   justify-content: center;
+  position: relative;
+  margin: auto;
+  width: 300px;
+
+  &::after {
+    position: absolute;
+    content: '';
+    border-right: 2px solid $error-red;
+    z-index: 1;
+    bottom: 100%;
+    height: 50px;
+    left: 50%;
+  }
 
   .the-end {
-    position: relative;
     padding: 3px 8px;
     color: white;
     border-radius: 5px;
     width: max-content;
     background-color: $error-red;
-
-    &::after {
-      position: absolute;
-      content: '';
-      border-right: 2px solid $error-red;
-      z-index: 1;
-      bottom: 100%;
-      height: 50px;
-      left: 50%;
-    }
   }
 }
 

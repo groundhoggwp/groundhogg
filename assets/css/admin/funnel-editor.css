@@ -584,16 +584,11 @@ button.button.save-button {
 .funnel-end {
   display: flex;
   justify-content: center;
-}
-.funnel-end .the-end {
   position: relative;
-  padding: 3px 8px;
-  color: white;
-  border-radius: 5px;
-  width: max-content;
-  background-color: #e91f4f;
+  margin: auto;
+  width: 300px;
 }
-.funnel-end .the-end::after {
+.funnel-end::after {
   position: absolute;
   content: "";
   border-right: 2px solid #e91f4f;
@@ -601,6 +596,13 @@ button.button.save-button {
   bottom: 100%;
   height: 50px;
   left: 50%;
+}
+.funnel-end .the-end {
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
+  background-color: #e91f4f;
 }
 
 .step-icon img {
