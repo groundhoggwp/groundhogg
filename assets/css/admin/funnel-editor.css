@@ -581,6 +581,28 @@ button.button.save-button {
   width: 100%;
 }
 
+.funnel-end {
+  display: flex;
+  justify-content: center;
+}
+.funnel-end .the-end {
+  position: relative;
+  padding: 3px 8px;
+  color: white;
+  border-radius: 5px;
+  width: max-content;
+  background-color: #e91f4f;
+}
+.funnel-end .the-end::after {
+  position: absolute;
+  content: "";
+  border-right: 2px solid #e91f4f;
+  z-index: 1;
+  bottom: 100%;
+  height: 50px;
+  left: 50%;
+}
+
 .step-icon img {
   margin: 0 auto 0 auto;
   width: 80%;
@@ -755,25 +777,10 @@ button.button.save-button {
 }
 #step-flow .fixed-inside .step-branch#step-sortable {
   padding-top: 40px;
-  padding-bottom: 40px;
+  padding-bottom: 24px;
 }
 #step-flow .fixed-inside .step-branch#step-sortable > .step-branch.benchmarks:first-child::before {
   content: "Start the funnel when...";
-}
-#step-flow .fixed-inside .step-branch#step-sortable::after {
-  content: "End";
-  position: absolute;
-  padding: 3px 8px;
-  color: white;
-  border-radius: 5px;
-  width: max-content;
-  top: -70px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  background-color: #e91f4f;
-  top: auto;
-  bottom: 0;
 }
 #step-flow .fixed-inside .step-branch:not(:has(.step)) {
   height: 60px;
@@ -895,6 +902,9 @@ button.button.save-button {
   --color-25: rgba(158, 206, 56, 0.25);
   --color-10: rgba(158, 206, 56, 0.1);
   --color-5: rgba(158, 206, 56, 0.05);
+}
+#step-flow .step.action.is-last {
+  margin-bottom: 16px;
 }
 #step-flow .step.action .hndle-icon {
   border-radius: 5px;

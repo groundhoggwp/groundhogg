@@ -832,6 +832,30 @@ button.button.save-button {
   width: 100%;
 }
 
+.funnel-end {
+  display: flex;
+  justify-content: center;
+
+  .the-end {
+    position: relative;
+    padding: 3px 8px;
+    color: white;
+    border-radius: 5px;
+    width: max-content;
+    background-color: $error-red;
+
+    &::after {
+      position: absolute;
+      content: '';
+      border-right: 2px solid $error-red;
+      z-index: 1;
+      bottom: 100%;
+      height: 50px;
+      left: 50%;
+    }
+  }
+}
+
 .step-icon img {
   margin: 0 auto 0 auto;
   width: 80%;
@@ -1058,7 +1082,7 @@ button.button.save-button {
 
       &#step-sortable {
         padding-top: 40px;
-        padding-bottom: 40px;
+        padding-bottom: 24px;
 
         > .step-branch.benchmarks:first-child {
 
@@ -1067,13 +1091,13 @@ button.button.save-button {
           }
         }
 
-        &::after {
-          content: "End";
-          @include above-text;
-          background-color: $error-red;
-          top: auto;
-          bottom: 0;
-        }
+        //&::after {
+        //  content: "End";
+        //  @include above-text;
+        //  background-color: $error-red;
+        //  top: auto;
+        //  bottom: 0;
+        //}
       }
 
       &:not(:has(.step)) {
@@ -1210,6 +1234,10 @@ button.button.save-button {
       --color-25: #{$action-green-25};
       --color-10: #{$action-green-10};
       --color-5: #{$action-green-5};
+
+      &.is-last {
+        margin-bottom: 16px;
+      }
 
       .hndle-icon {
         border-radius: 5px;

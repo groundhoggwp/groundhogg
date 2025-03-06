@@ -430,6 +430,11 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool|int|object|null
 	 */
 	public function get_num_steps() {
+
+		if ( $this->is_editing() ){
+			return count( $this->get_steps() );
+		}
+
 		return db()->steps->count( [
 			'funnel_id' => $this->get_id(),
 		] );
@@ -457,6 +462,12 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return Step[]
 	 */
 	public function get_steps( $query = [] ) {
+
+//		static $steps;
+//
+//		if ( $steps ){
+//			return $steps;
+//		}
 
 		$query = wp_parse_args( $query, [
 			'funnel_id' => $this->get_id(),

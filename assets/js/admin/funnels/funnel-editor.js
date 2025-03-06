@@ -1075,6 +1075,16 @@
 
     const clearLineStyle = line => line.removeAttribute("style");
 
+    // let end = `<div class="funnel-end"><span class="danger the-end">End</span></div>`
+    let main = document.querySelector( `.step-branch[data-branch='main']` )
+    let end = main.querySelector( 'div.funnel-end' )
+
+    if ( ! end ){
+      end = Div({className: 'funnel-end'}, Span({ className: 'the-end'}, 'End'))
+    }
+
+    main.insertAdjacentElement( 'beforeend', end )
+
     // loops
     try {
       document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop').forEach(el => {

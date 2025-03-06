@@ -7896,7 +7896,7 @@ function get_gh_page_screen_id( $page = '' ) {
  * @return bool
  */
 function current_screen_is_gh_page( $page = '' ) {
-	return get_gh_page_screen_id( $page ) === get_current_screen()->id;
+	return get_current_screen() && get_gh_page_screen_id( $page ) === get_current_screen()->id;
 }
 
 /**
@@ -8534,11 +8534,10 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
  * @param int  $good
  * @param int  $fair
  * @param int  $poor
- * @param bool $inverse
  *
  * @return string good|fair|poor|bad
  */
-function is_good_fair_or_poor( int $number, int $great, int $good, int $fair, int $poor ) {
+function is_good_fair_or_poor( $number, $great, $good, $fair, $poor ) {
 
 	if ( $number >= $great ) {
 		return 'great';

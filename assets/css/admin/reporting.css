@@ -427,6 +427,10 @@ table.groundhogg-report-table td:last-child {
   height: var(--stage-height);
   display: flex;
   align-items: center;
+  font-size: 14px;
+}
+#chart_funnel_breakdown div.funnel-labels div.funnel-stage-label a {
+  color: #f58115;
 }
 #chart_funnel_breakdown div.funnel-stages {
   display: flex;
@@ -443,6 +447,7 @@ table.groundhogg-report-table td:last-child {
   background-color: #102640;
   color: #fff;
   height: var(--spacer-height);
+  line-height: 0;
 }
 #chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer {
   position: relative;

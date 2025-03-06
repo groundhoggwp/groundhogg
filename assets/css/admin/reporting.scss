@@ -526,6 +526,11 @@ table.groundhogg-report-table td:last-child {
       height: var(--stage-height);
       display: flex;
       align-items: center;
+      font-size: 14px;
+
+      a {
+        color: $benchmark-orange;
+      }
     }
   }
 
@@ -545,6 +550,7 @@ table.groundhogg-report-table td:last-child {
       background-color: $primary-dark;
       color: #fff;
       height: var(--spacer-height);
+      line-height: 0;
     }
 
     div.funnel-stage-layer {
