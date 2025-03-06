@@ -27,6 +27,10 @@ $background-color: #F6F9FB;
 
 body.gh_reporting {
 
+  #wpcontent{
+    padding: 0;
+  }
+
   .wrap {
     max-width: 1240px;
     margin-left: auto;

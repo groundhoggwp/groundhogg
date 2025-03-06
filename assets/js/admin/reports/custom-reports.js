@@ -1,4 +1,4 @@
-(($) => {
+( ($) => {
 
   const {
     moreMenu,
@@ -31,7 +31,7 @@
 
   function adjust (color, amount) {
     return '#' + color.replace(/^#/, '').
-    replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2))
+      replace(/../g, color => ( '0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16) ).substr(-2))
   }
 
   const { base64_json_encode } = Groundhogg.functions
@@ -39,19 +39,19 @@
   const ReportTypes = {
 
     pie_chart: {
-      name: __('Pie Chart', 'groundhogg'),
+      name    : __('Pie Chart', 'groundhogg'),
       settings: ({ field = '' }) => {
         // language=HTML
         return `
-			<div class="row">
-				<div class="col">
-					<label for="value">${__('Custom Field')}</label>
-					${input({
-						id: 'field',
-						value: field,
-					})}
-				</div>
-			</div>`
+            <div class="row">
+                <div class="col">
+                    <label for="value">${ __('Custom Field') }</label>
+                    ${ input({
+                        id   : 'field',
+                        value: field,
+                    }) }
+                </div>
+            </div>`
       },
 
       settingsOnMount: (filter, updateReport) => {
@@ -62,20 +62,29 @@
         })
       },
 
-      render: ({ id, data }) => {
+      render : ({
+        id,
+        data,
+      }) => {
 
         // language=HTML
         return `
-			<div class="inside">
-				<canvas class="pie-chart" data-id="${id}"></canvas>
-			</div>
+            <div class="inside">
+                <canvas class="pie-chart" data-id="${ id }"></canvas>
+            </div>
         `
       },
-      onMount: ({ id, field, data, filters = [], exclude_filters = [] }) => {
+      onMount: ({
+        id,
+        field,
+        data,
+        filters = [],
+        exclude_filters = [],
+      }) => {
 
         let cuttoff = 11
 
-        let ctx = $(`.pie-chart[data-id=${id}]`)[0].getContext('2d')
+        let ctx = $(`.pie-chart[data-id=${ id }]`)[0].getContext('2d')
 
         let _data = data
 
@@ -86,41 +95,46 @@
             return carr + parseInt(i.count)
           }, 0)
 
-          _data.push({ count: _rest, value: __('Other') })
+          _data.push({
+            count: _rest,
+            value: __('Other'),
+          })
         }
 
         const openInContactsView = (e, arr) => {
 
           if (arr.length && arr[0]._view) {
             window.open(adminPageURL('gh_contacts', {
-              filters: base64_json_encode( [[
-                {
-                  type: 'sub_query',
-                  include_filters: filters,
-                  exclude_filters,
-                },
-                {
-                  type: 'meta',
-                  meta: field,
-                  value: arr[0]._view.label,
-                  compare: 'equals'
-                }
-              ]] ),
+              filters: base64_json_encode([
+                [
+                  {
+                    type           : 'sub_query',
+                    include_filters: filters,
+                    exclude_filters,
+                  },
+                  {
+                    type   : 'meta',
+                    meta   : field,
+                    value  : arr[0]._view.label,
+                    compare: 'equals',
+                  },
+                ],
+              ]),
             }), '_blank')
           }
 
         }
 
         let chart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
+          type   : 'doughnut',
+          data   : {
             datasets: [
               {
-                data: _data.map(({ count }) => count),
-                backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30))),
+                data           : _data.map(({ count }) => count),
+                backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
               },
             ],
-            labels: _data.map(({ value }) => value),
+            labels  : _data.map(({ value }) => value),
           },
           options: {
             onClick: (e, arr) => {
@@ -130,28 +144,28 @@
                 let _data = data.slice(cuttoff)
 
                 modal({
-                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${id}"></canvas>`,
-                  onOpen: () => {
+                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${ id }"></canvas>`,
+                  onOpen : () => {
 
-                    let ctx = $(`.pie-chart-large[data-id=${id}]`)[0].getContext('2d')
+                    let ctx = $(`.pie-chart-large[data-id=${ id }]`)[0].getContext('2d')
 
                     let chart = new Chart(ctx, {
-                      type: 'doughnut',
-                      data: {
+                      type   : 'doughnut',
+                      data   : {
                         datasets: [
                           {
-                            data: _data.map(({ count }) => count),
-                            backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -(i * 30))),
+                            data           : _data.map(({ count }) => count),
+                            backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
                           },
                         ],
-                        labels: _data.map(({ value }) => value),
+                        labels  : _data.map(({ value }) => value),
                       },
                       options: {
 
                         maintainAspectRatio: false,
-                        aspectRatio: 1,
-                        onClick: openInContactsView,
-                        legend: {
+                        aspectRatio        : 1,
+                        onClick            : openInContactsView,
+                        legend             : {
                           position: 'bottom',
                         },
                       },
@@ -165,7 +179,7 @@
               openInContactsView(e, arr)
 
             },
-            legend: {
+            legend : {
               position: 'right',
             },
           },
@@ -173,20 +187,20 @@
 
       },
     },
-    table: {
-      name: __('Table', 'groundhogg'),
+    table    : {
+      name    : __('Table', 'groundhogg'),
       settings: ({ field = '' }) => {
         // language=HTML
         return `
-			<div class="row">
-				<div class="col">
-					<label for="value">${__('Custom Field')}</label>
-					${input({
-						id: 'field',
-						value: field,
-					})}
-				</div>
-			</div>`
+            <div class="row">
+                <div class="col">
+                    <label for="value">${ __('Custom Field') }</label>
+                    ${ input({
+                        id   : 'field',
+                        value: field,
+                    }) }
+                </div>
+            </div>`
       },
 
       settingsOnMount: (filter, updateReport) => {
@@ -197,74 +211,97 @@
         })
       },
 
-      render: ({ id, data, num = 10 }) => {
+      render : ({
+        id,
+        data,
+        num = 10,
+      }) => {
 
         // language=HTML
         return `
-			<table class="groundhogg-report-table">
-				<tbody>
-				</tbody>
-			</table>
-			${data.length > 10 ?
-				`<div class="inside">
+            <table class="groundhogg-report-table">
+                <tbody>
+                </tbody>
+            </table>
+            ${ data.length > 10 ?
+               `<div class="inside">
                 <div class="display-flex flex-end gap-10 align-center">
-                    <label>${__('Number of records')}</label>
+                    <label>${ __('Number of records') }</label>
                     <div class="gh-input-group">
                     </div>
                 </div>
-            </div>` : ''}`
+            </div>` : '' }`
       },
-      onMount: ({ id, data, field, filters = [], exclude_filters = [] }) => {
+      onMount: ({
+        id,
+        data,
+        field,
+        filters = [],
+        exclude_filters = [],
+      }) => {
 
         let num = 10
 
         const setData = () => {
-          $(`#${id} tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
-          $(`#${id} .gh-input-group`).
-          html([10, 25, 50].filter(i => i < data.length).map(_num => `<button class="gh-button ${num === _num
-            ? 'primary'
-            : 'secondary'} num-records" data-num="${_num}">${_num}</button>`))
+          $(`#${ id } tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
+          $(`#${ id } .gh-input-group`).
+            html([
+              10,
+              25,
+              50,
+            ].filter(i => i < data.length).map(_num => `<button class="gh-button ${ num === _num
+                                                                                    ? 'primary'
+                                                                                    : 'secondary' } num-records" data-num="${ _num }">${ _num }</button>`))
 
-          $(`#${id} .num-records`).on('click', e => {
+          $(`#${ id } .num-records`).on('click', e => {
             num = parseInt(e.target.dataset.num)
             setData()
           })
 
-          $(`.number-total[data-id=${id}]`).on('click', e => {
+          $(`.number-total[data-id=${ id }]`).on('click', e => {
             window.open(adminPageURL('gh_contacts', {
-              filters: base64_json_encode( [[
-                {
-                  type: 'sub_query',
-                  include_filters: filters,
-                  exclude_filters,
-                },
-                {
-                  type: 'meta',
-                  meta: field,
-                  value: e.target.dataset.value,
-                  compare: 'equals'
-                }
-              ]] ),
+              filters: base64_json_encode([
+                [
+                  {
+                    type           : 'sub_query',
+                    include_filters: filters,
+                    exclude_filters,
+                  },
+                  {
+                    type   : 'meta',
+                    meta   : field,
+                    value  : e.target.dataset.value,
+                    compare: 'equals',
+                  },
+                ],
+              ]),
             }), '_blank')
           })
         }
 
-        const dataRow = ({ value, count }) => {
+        const dataRow = ({
+          value,
+          count,
+        }) => {
           // language=HTML
           return `
-			  <tr>
-				  <td>${value}</td>
-				  <td class="number-total" data-id="${id}" data-value="${value}">${count}</td>
-			  </tr>`
+              <tr>
+                  <td>${ value }</td>
+                  <td class="number-total" data-id="${ id }" data-value="${ value }">${ count }</td>
+              </tr>`
         }
 
         setData()
 
       },
     },
-    number: {
-      name: __('Number', 'groundhogg'),
-      settings: ({ value = 'contacts', field = '', activity = '' }) => {
+    number   : {
+      name           : __('Number', 'groundhogg'),
+      settings       : ({
+        value = 'contacts',
+        field = '',
+        activity = '',
+      }) => {
 
         //  total number of contacts
         //  SUM of a custom field
@@ -280,51 +317,51 @@
             case 'distinct':
               // language=HTML
               return `
-				  <div class="row">
-					  <div class="col">
-						  <label for="value">${__('Custom Field')}</label>
-						  ${input({
-							  id: 'field',
-							  value: field,
-						  })}
-					  </div>
-				  </div>`
+                  <div class="row">
+                      <div class="col">
+                          <label for="value">${ __('Custom Field') }</label>
+                          ${ input({
+                              id   : 'field',
+                              value: field,
+                          }) }
+                      </div>
+                  </div>`
             case 'activity':
             case 'activity_sum_value':
             case 'activity_avg_value':
               // language=HTML
               return `
-				  <div class="row">
-					  <div class="col">
-						  <label for="value">${__('Activity Type')}</label>
-						  ${input({
-							  id: 'activity',
-							  value: activity,
-						  })}
-					  </div>
-				  </div>`
+                  <div class="row">
+                      <div class="col">
+                          <label for="value">${ __('Activity Type') }</label>
+                          ${ input({
+                              id   : 'activity',
+                              value: activity,
+                          }) }
+                      </div>
+                  </div>`
           }
         }
 
         // language=HTML
         return `
-			<div class="row">
-				<div class="col display-flex column">
-					<label for="value">${__('Report Value')}</label>
-					${select({
-						id: 'value',
-					}, {
-						contacts: __('Total number of contacts', 'groundhogg'),
-						sum: __('Sum of a custom field', 'groundhogg'),
-						average: __('Average of a custom field', 'groundhogg'),
-						distinct: __('Number of distinct custom field values', 'groundhogg'),
-						activity: __('Count of activities'),
-						activity_sum_value: __('Sum value of activities'),
-						activity_avg_value: __('Average value of activities'),
-					}, value)}
-				</div>
-			</div>
-			${maybeExtra()}`
+            <div class="row">
+                <div class="col display-flex column">
+                    <label for="value">${ __('Report Value') }</label>
+                    ${ select({
+                        id: 'value',
+                    }, {
+                        contacts          : __('Total number of contacts', 'groundhogg'),
+                        sum               : __('Sum of a custom field', 'groundhogg'),
+                        average           : __('Average of a custom field', 'groundhogg'),
+                        distinct          : __('Number of distinct custom field values', 'groundhogg'),
+                        activity          : __('Count of activities'),
+                        activity_sum_value: __('Sum value of activities'),
+                        activity_avg_value: __('Average value of activities'),
+                    }, value) }
+                </div>
+            </div>
+            ${ maybeExtra() }`
       },
       settingsOnMount: (filter, updateReport) => {
         $('#value').on('change', e => {
@@ -346,20 +383,27 @@
           })
         })
       },
-      render: ({ id, data }) => {
+      render         : ({
+        id,
+        data,
+      }) => {
 
         // language=HTML
         return `
-			<div class="inside">
-				<div data-id="${id}" class="big-number display-flex center">
-					${data}
-				</div>
-			</div>`
+            <div class="inside">
+                <div data-id="${ id }" class="big-number display-flex center">
+                    ${ data }
+                </div>
+            </div>`
       },
-      onMount: ({ id, filters = [], exclude_filters = [] }) => {
-        $(`.big-number[data-id=${id}]`).on('click', e => {
+      onMount        : ({
+        id,
+        filters = [],
+        exclude_filters = [],
+      }) => {
+        $(`.big-number[data-id=${ id }]`).on('click', e => {
           window.open(adminPageURL('gh_contacts', {
-            filters: base64_json_encode(filters),
+            filters        : base64_json_encode(filters),
             exclude_filters: base64_json_encode(exclude_filters),
           }), '_blank')
         })
@@ -372,44 +416,48 @@
     if (report.type === 'header') {
       // language=HTML
       return `
-		  <div id="${report.id}" class="gh-report-header report ${report.type}" data-id="${report.id}">
-			  <h2>${report.name}</h2>
-			  <button class="report-more gh-button secondary text icon" data-id="${report.id}">${icons.verticalDots}
-			  </button>
-		  </div>`
+          ${ report.order > 0 ? `<button class="add-new-report">
+              <span class="dashicons dashicons-plus-alt2"></span>
+          </button>` : '' }
+          <div id="${ report.id }" class="gh-report-header report ${ report.type }" data-id="${ report.id }">
+              <h2>${ report.name }</h2>
+              <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
+              </button>
+          </div>`
     }
 
     try {
       // language=HTML
       return `
-		  <div id="${report.id}" class="gh-panel report ${report.type}" data-id="${report.id}">
-			  <div class="gh-panel-header">
-				  <h2>${report.name}</h2>
-				  <button class="report-more gh-button secondary text icon" data-id="${report.id}">${icons.verticalDots}
-				  </button>
-			  </div>
-			  ${ReportTypes[report.type].render(report)}
-		  </div>`
-    } catch (e) {
+          <div id="${ report.id }" class="gh-panel report ${ report.type }" data-id="${ report.id }">
+              <div class="gh-panel-header">
+                  <h2>${ report.name }</h2>
+                  <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
+                  </button>
+              </div>
+              ${ ReportTypes[report.type].render(report) }
+          </div>`
+    }
+    catch (e) {
       // language=HTML
       return `
-		  <div id="${report.id}" class="gh-panel report ${report.type}" data-id="${report.id}">
-			  <div class="gh-panel-header">
-				  <h2>${report.name}</h2>
-				  <button class="report-more gh-button secondary text icon" data-id="${report.id}">${icons.verticalDots}
-				  </button>
-			  </div>
-			  <div class="inside">
-				  <p>${__('Something went wrong...')}</p>
-			  </div>
-		  </div>`
+          <div id="${ report.id }" class="gh-panel report ${ report.type }" data-id="${ report.id }">
+              <div class="gh-panel-header">
+                  <h2>${ report.name }</h2>
+                  <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
+                  </button>
+              </div>
+              <div class="inside">
+                  <p>${ __('Something went wrong...') }</p>
+              </div>
+          </div>`
     }
   }
 
   let reports = []
 
   const loadReports = () => {
-    return get(`${routes.v4.root}/custom-reports`).then(r => {
+    return get(`${ routes.v4.root }/custom-reports`).then(r => {
       reports = r.items ?? []
       mount()
     })
@@ -417,15 +465,50 @@
   }
 
   const loadReport = (id) => {
-    return get(`${routes.v4.root}/custom-reports/${id}`).then(r => {
+    return get(`${ routes.v4.root }/custom-reports/${ id }`).then(r => {
       reports = reports.map(report => report.id === id ? r.item : report)
       mount()
     })
   }
 
   const mount = () => {
-    $('#custom-reports').
-    html(reports.sort(({ order: a }, { order: b }) => a - b).map(report => renderReport(report)).join(''))
+
+    let $container = $('#custom-reports')
+
+    // no reports yet
+    if (!reports.length > 0) {
+      //language=HTML
+      $container.html(`
+          <div class="full display-flex column center align-center">
+              <p>Use custom reports to keep track of the numbers that matter most!</p>
+              <button id="create-first-report" class="gh-button primary medium">Create your first report!</button>
+          </div>`)
+      $('#create-first-report').on('click', e => {
+
+        let newReport = {
+          type           : 'number',
+          name           : __('New Report'),
+          id             : uuid(),
+          filters        : [],
+          exclude_filters: [],
+          order          : reports.length,
+        }
+
+        editReport(newReport)
+      })
+      return
+    }
+
+    $container.
+      html([
+        ...reports.sort(({ order: a }, { order: b }) => a - b).map(report => renderReport(report)),
+        //language=HTML
+        `
+            <button class="add-new-report">
+                <span class="dashicons dashicons-plus-alt2"></span>
+            </button>
+        `,
+      ].join(''))
     onMount()
     window.dispatchEvent(new Event('resize'))
   }
@@ -434,66 +517,60 @@
 
     // language=HTML
     return `
-		<h2>${__('Create Report')}</h2>
-		<div class="gh-rows-and-columns">
-			<div class="row">
-				<div class="col">
-					<label for="name">${__('Name', 'groundhogg')}</label>
-					${input({
-						id: 'name',
-						value: report.name,
-					})}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col display-flex column">
-					<label for="report-type">${__('Report Type', 'groundhogg')}</label>
-					${select({
-						id: 'report-type',
-					}, Object.keys(ReportTypes).map(type => ({
-						value: type,
-						text: ReportTypes[type].name,
-					})), report.type)}
-				</div>
-			</div>
-			${ReportTypes[report.type].settings(report)}
-			<div class="row">
-				<div class="col">
-					<label>${__('Filter Contacts', 'groundhogg')}</label>
-					<div id="filters-here"></div>
-					<div id="exclude-filters-here"></div>
-				</div>
-			</div>
-		</div>
-		<div class="space-between align-right" style="margin-top: 20px">
-			<button class="gh-button primary" id="save">${__('Save Report', 'groundhogg')}</button>
-		</div>`
+        <h2>${ __('Create Report') }</h2>
+        <div class="gh-rows-and-columns">
+            <div class="row">
+                <div class="col">
+                    <label for="name">${ __('Name', 'groundhogg') }</label>
+                    ${ input({
+                        id   : 'name',
+                        value: report.name,
+                    }) }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col display-flex column">
+                    <label for="report-type">${ __('Report Type', 'groundhogg') }</label>
+                    ${ select({
+                        id: 'report-type',
+                    }, Object.keys(ReportTypes).map(type => ( {
+                        value: type,
+                        text : ReportTypes[type].name,
+                    } )), report.type) }
+                </div>
+            </div>
+            ${ ReportTypes[report.type].settings(report) }
+            <div class="row">
+                <div class="col">
+                    <label>${ __('Filter Contacts', 'groundhogg') }</label>
+                    <div id="filters-here"></div>
+                    <div id="exclude-filters-here"></div>
+                </div>
+            </div>
+        </div>
+        <div class="space-between align-right" style="margin-top: 20px">
+            <button class="gh-button primary" id="save">${ __('Save Report', 'groundhogg') }</button>
+        </div>`
   }
 
   let commitTimeout
 
   $('#custom-reports').sortable({
-    handle: 'h2',
-    tolerance: 'pointer',
+    handle     : 'h2',
+    tolerance  : 'pointer',
     placeholder: 'report-placeholder',
-    start: (e, ui) => {
+    start      : (e, ui) => {
       ui.placeholder.addClass(reports.find(r => r.id === ui.item.data('id')).type)
       ui.placeholder.height(ui.item.height())
     },
-    update: () => {
+    update     : () => {
 
       $('.report').each((i, el) => {
         let $report = $(el)
         reports.find(r => r.id == $report.data('id')).order = $report.index()
       })
-
-      if (commitTimeout) {
-        clearTimeout(commitTimeout)
-      }
-
-      commitTimeout = setTimeout(() => {
-        commitReports()
-      })
+      mount()
+      debouncedCommit()
 
     },
   })
@@ -506,9 +583,14 @@
   const commitReports = () => {
     return OptionsStore.patch({
       // filter out data
-      gh_custom_reports: reports.map(({ data, ...report }) => report),
+      gh_custom_reports: reports.map(({
+        data,
+        ...report
+      }) => report),
     })
   }
+
+  const debouncedCommit = Groundhogg.functions.debounce(commitReports, 500)
 
   const scrollTo = id => {
 
@@ -523,9 +605,12 @@
     modal({
       width: 600,
       // language=HTML
-      content: renderReportEdit(report),
+      content      : renderReportEdit(report),
       dialogClasses: 'overflow-auto',
-      onOpen: ({ close, setContent }) => {
+      onOpen       : ({
+        close,
+        setContent,
+      }) => {
 
         const updateReport = (props, reload = false) => {
 
@@ -574,7 +659,16 @@
             // if the report already exists
             if (reports.find(r => r.id === report.id)) {
               reports = reports.map(r => r.id === report.id ? report : r)
-            } else {
+            }
+            else {
+
+              // tackle order collision
+              reports.forEach(r => {
+                if (r.order >= report.order) {
+                  r.order += 1
+                }
+              })
+
               reports.push(report)
             }
 
@@ -602,16 +696,19 @@
       width: 400,
       // language=HTML
       content: `
-		  <h2>${__('Edit Header')}</h2>
-		  <div class="gh-input-group">
-			  ${input({
-				  name: 'name',
-				  id: 'name',
-				  value: report.name,
-			  })}
-			  <button class="gh-button primary" id="save">${__('Save')}</button>
-		  </div>`,
-      onOpen: ({ close, setContent }) => {
+          <h2>${ __('Edit Header') }</h2>
+          <div class="gh-input-group">
+              ${ input({
+                  name : 'name',
+                  id   : 'name',
+                  value: report.name,
+              }) }
+              <button class="gh-button primary" id="save">${ __('Save') }</button>
+          </div>`,
+      onOpen : ({
+        close,
+        setContent,
+      }) => {
 
         const updateReport = (props) => {
 
@@ -634,7 +731,8 @@
             // if the report already exists
             if (reports.find(r => r.id === report.id)) {
               reports = reports.map(r => r.id === report.id ? report : r)
-            } else {
+            }
+            else {
               reports.push(report)
             }
 
@@ -666,7 +764,8 @@
 
       try {
         ReportTypes[report.type].onMount(report)
-      } catch (e) {
+      }
+      catch (e) {
 
       }
     })
@@ -677,14 +776,14 @@
       let report = reports.find(r => r.id === reportId)
 
       moreMenu(e.currentTarget, {
-        items: [
+        items   : [
           {
-            key: 'edit',
+            key : 'edit',
             text: __('Edit'),
           },
           {
-            key: 'delete',
-            text: `<span class="gh-text danger">${__('Delete')}</span>`,
+            key : 'delete',
+            text: `<span class="gh-text danger">${ __('Delete') }</span>`,
           },
         ],
         onSelect: k => {
@@ -701,9 +800,9 @@
             case 'delete':
 
               dangerConfirmationModal({
-                alert: `<p>${__('Are you sure you want to delete this report?', 'groundhogg')}</p>`,
+                alert      : `<p>${ __('Are you sure you want to delete this report?', 'groundhogg') }</p>`,
                 confirmText: __('Delete'),
-                onConfirm: () => {
+                onConfirm  : () => {
                   reports = reports.filter(r => r.id !== report.id)
                   commitReports().then(() => {
                     dialog({
@@ -721,41 +820,42 @@
     })
   }
 
-  $('.nav-tab-wrapper').
-  append(
-    //language=HTML
-    `
-		<div class="display-flex alignright gap-10">
-			<button id="add-report" class="gh-button primary">${__('Create New Report', 'groundhogg')}</button>
-			<button id="add-header" class="gh-button secondary">${__('Add Header', 'groundhogg')}</button>
-		</div>
-    `,
-  )
+  function getElementIndex (element) {
+    return Array.prototype.indexOf.call(element.parentNode.children, element)
+  }
 
-  $('#add-report').on('click', e => {
+  $(document).on('click', 'button.add-new-report', e => {
 
-    let newReport = {
-      type: 'number',
-      name: __('New Report'),
-      id: uuid(),
-      filters: [],
-      exclude_filters: [],
-      order: reports.length,
-    }
+    let order = getElementIndex(e.currentTarget)
 
-    editReport(newReport)
-  })
-
-  $('#add-header').on('click', e => {
-
-    let newReport = {
-      type: 'header',
-      name: __('New Header'),
-      id: uuid(),
-      order: reports.length,
-    }
-
-    editHeader(newReport)
+    Groundhogg.element.moreMenu(e.currentTarget.querySelector('span'), [
+      {
+        key     : 'report',
+        text    : 'Report',
+        onSelect: () => {
+          editReport({
+            type           : 'number',
+            name           : __('New Report'),
+            id             : uuid(),
+            filters        : [],
+            exclude_filters: [],
+            order          : order,
+          })
+        },
+      },
+      {
+        key     : 'header',
+        text    : 'Header',
+        onSelect: () => {
+          editHeader({
+            type : 'header',
+            name : __('New Header'),
+            id   : uuid(),
+            order: order,
+          })
+        },
+      },
+    ])
   })
 
   const { close } = loadingModal()
@@ -767,4 +867,4 @@
     })
   })
 
-})(jQuery)
+} )(jQuery)

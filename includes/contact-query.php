@@ -1374,6 +1374,18 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Set the query params
+	 *
+	 * @param array $params
+	 *
+	 * @return $this|Table_Query
+	 */
+	public function set_query_params( array $params ) {
+		$this->query_vars = $params;
+		return $this;
+	}
+
+	/**
 	 * Parse the query vars
 	 *
 	 * @param $query_vars

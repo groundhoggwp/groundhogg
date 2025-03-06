@@ -660,6 +660,24 @@ label.gh-switch input:checked ~ span.off {
   max-width: 1200px;
   margin: 0 auto;
 }
+.report-grid .full {
+  grid-column: span 4;
+}
+.report-grid .full p {
+  font-size: 18px;
+}
+.report-grid .add-new-report {
+  background-color: rgba(16, 38, 64, 0.05);
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+.report-grid .add-new-report:hover {
+  background-color: rgba(16, 38, 64, 0.15);
+}
 .report-grid .report-placeholder {
   background-color: rgba(16, 38, 64, 0.15);
   border-radius: 5px;

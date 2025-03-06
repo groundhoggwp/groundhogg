@@ -740,6 +740,28 @@ label.gh-switch {
   max-width: 1200px;
   margin: 0 auto;
 
+  .full {
+    grid-column: span 4;
+
+    p{
+      font-size: 18px;
+    }
+  }
+
+  .add-new-report{
+    background-color: $primary-dark-5;
+    border: none;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+
+    &:hover{
+      background-color: $primary-dark-15;
+    }
+  }
+
   .report-placeholder {
 
     &.header {

@@ -1,4 +1,7 @@
 @charset "UTF-8";
+body.gh_reporting #wpcontent {
+  padding: 0;
+}
 body.gh_reporting .wrap {
   max-width: 1240px;
   margin-left: auto;
