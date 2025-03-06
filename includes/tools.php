@@ -1,14 +1,10 @@
 <?php
 
 use Groundhogg\Queue\Event_Queue;
-use function Groundhogg\admin_page_url;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\gh_cron_installed;
-use function Groundhogg\html;
-use function Groundhogg\is_option_enabled;
-use function Groundhogg\nonce_url_no_amp;
-use function Groundhogg\white_labeled_name;
 
 /**
  * Get system info
@@ -120,7 +116,11 @@ function groundhogg_tools_sysinfo_get() {
 	// Groundhogg configuration
 	$return .= "\n" . '-- Plugin Configuration' . "\n\n";
 	$return .= 'Version:                  ' . GROUNDHOGG_VERSION . "\n";
-	$return .= 'Safe Mode:                ' . ( is_option_enabled( 'gh_safe_mode_enabled' ) ? "Enabled\n" : "Disabled\n" );
+	maybe_install_safe_mode_plugin();// for safe mode
+	$return .= 'Safe Mode:                ' . ( groundhogg_is_safe_mode_enabled() ? "Enabled\n" : "Disabled\n" );
+	$last_used = get_option( 'gh_safe_mode_last_used' );
+	$last_used = $last_used ? (new DateTimeHelper($last_used))->human_time_diff() : 'Never';
+	$return .= 'Safe Mode Last Used:      ' . $last_used . ' ago';
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_plugin_config', $return );
 
@@ -398,92 +398,33 @@ function groundhogg_tools_sysinfo_download() {
 add_action( 'admin_init', 'groundhogg_tools_sysinfo_download' );
 
 /**
- * Enable safe mode which disables all active plugins
- *
- * @return bool
- */
-function groundhogg_enable_safe_mode() {
-	if ( ! current_user_can( 'deactivate_plugins' ) || is_option_enabled( 'gh_safe_mode_enabled' ) ) {
-		return false;
-	}
-
-	$active_plugins = (array) get_option( 'active_plugins', array() );
-	$keep_plugins   = [];
-
-	// Find Groundhogg only plugins
-	foreach ( $active_plugins as $plugin ) {
-		if ( preg_match( '/groundhogg/', $plugin ) ) {
-			$keep_plugins[] = $plugin;
-		}
-	}
-
-	// Save new plugins
-	update_option( 'active_plugins', $keep_plugins );
-
-	// Store old plugins
-	update_option( 'gh_safe_mode_restore_plugins', $active_plugins );
-
-	// Enabled safe mode
-	update_option( 'gh_safe_mode_enabled', 1 );
-
-	do_action( 'groundhogg/safe_mode_enabled' );
-
-	// Do a test to see if safe mode could be enabled
-	$response = wp_remote_get( home_url() );
-
-	// Some kind of 500 level error
-	if ( wp_remote_retrieve_response_code( $response )  >= 500 ){
-		groundhogg_disable_safe_mode();
-
-		return false;
-	}
-
-	return true;
-}
-
-/**
- * Restore WP from safe mode
- *
- * @return bool
- */
-function groundhogg_disable_safe_mode() {
-	if ( ! current_user_can( 'activate_plugins' ) || ! is_option_enabled( 'gh_safe_mode_enabled' ) ) {
-		return false;
-	}
-
-	// Restore old plugins
-	$active_plugins = (array) get_option( 'gh_safe_mode_restore_plugins', array() );
-	update_option( 'active_plugins', $active_plugins );
-
-	// Delete options
-	delete_option( 'gh_safe_mode_enabled' );
-	delete_option( 'gh_safe_mode_restore_plugins' );
-
-	do_action( 'groundhogg/safe_mode_disabled' );
-
-	return true;
-}
-
-/**
- * Groundhogg admin notice for minimum WordPress version.
- *
- * Warning when the site doesn't have the minimum required WordPress version.
- *
- * @since 2.0
+ * Make sure that the safe mode plugin is installed
  *
  * @return void
  */
-function groundhogg_safe_mode_enabled_notice() {
+function maybe_install_safe_mode_plugin() {
 
-	if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) || ! current_user_can( 'activate_plugins' ) ) {
+	// safe mode plugin is installed in the mu plugins dir
+	if ( defined( 'GROUNDHOGG_SAFE_MODE_INSTALLED' ) ) {
 		return;
 	}
 
-	$disable_safe_mode_url = nonce_url_no_amp( admin_page_url( 'gh_tools', [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' );
+	$mu_plugins_dir = WPMU_PLUGIN_DIR;
 
-	$message      = sprintf( esc_html__( '%s safe mode is currently enabled. All other plugins are inactive. %s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => $disable_safe_mode_url ], __( 'Disable Safe Mode', 'groundhogg' ) ) );
-	$html_message = sprintf( '<div class="notice notice-warning">%s</div>', wpautop( $message ) );
-	echo wp_kses_post( $html_message );
+	// Ensure the mu-plugins directory exists
+	if ( ! is_dir( $mu_plugins_dir ) ) {
+		mkdir( $mu_plugins_dir, 0755, true );
+	}
+
+	$source      = __DIR__ . '/../mu-plugins/safe-mode.php';
+	$destination = $mu_plugins_dir . '/groundhogg-safe-mode.php';
+
+	if ( file_exists( $source ) ) {
+		copy( $source, $destination );
+	}
+
+	// set the cookie secret
+	\Groundhogg\search_and_replace_in_file( $destination, 'REPLACEWITHKEY', wp_generate_password( 20 ) );
+
+	include_once $destination;
 }
-
-add_action( 'admin_notices', 'groundhogg_safe_mode_enabled_notice' );

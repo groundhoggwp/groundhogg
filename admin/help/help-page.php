@@ -84,7 +84,7 @@ class Help_Page extends Tabbed_Admin_Page {
 			return;
 		}
 
-		if ( groundhogg_enable_safe_mode() ) {
+		if ( groundhogg_enable_safe_mode() ) { // todo
 			wp_send_json_success();
 		}
 

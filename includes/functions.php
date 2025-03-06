@@ -4489,6 +4489,7 @@ function maybe_print_menu_styles() {
             display: inline-block;
             width: calc(100% - 44px);
             background: #dc741b;
+            border-radius: 3px;
         }
 
         #adminmenu #toplevel_page_groundhogg a.gh_go_pro:hover {
@@ -8743,4 +8744,28 @@ function int_to_letters($num) {
 		$num = intval($num / 26) - 1;
 	}
 	return $result;
+}
+
+/**
+ * Do a search and replace in a file
+ *
+ * @param $file_path
+ * @param $search
+ * @param $replace
+ *
+ * @return bool
+ */
+function search_and_replace_in_file($file_path, $search, $replace) {
+	if (!file_exists($file_path)) {
+		return false; // File not found
+	}
+
+	// Read file content
+	$content = file_get_contents($file_path);
+
+	// Replace occurrences
+	$updated_content = str_replace($search, $replace, $content);
+
+	// Write back to file
+	return file_put_contents($file_path, $updated_content) !== false;
 }

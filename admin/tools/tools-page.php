@@ -351,14 +351,16 @@ class Tools_Page extends Tabbed_Admin_Page {
                     <h2 class="hndle"><?php _e( 'Safe Mode', 'groundhogg' ); ?></h2>
                 </div>
                 <div class="inside">
-                    <p><?php printf( __( 'Safe mode will disable any non %s related plugins for debugging purposes.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <p><?php printf( __( 'Safe mode will temporarily disable any non %s related plugins for debugging purposes for your account only. Other users will not be impacted.', 'groundhogg' ), white_labeled_name() ); ?></p>
 					<?php
 
-					if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) ):
+                    maybe_install_safe_mode_plugin();
+
+					if ( ! groundhogg_is_safe_mode_enabled() ):
 
 						echo html()->e( 'a', [
 							'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'enable_safe_mode' ] ), 'enable_safe_mode' ),
-							'class' => [ 'gh-button secondary' ]
+							'class' => 'gh-button danger text danger-confirm',
 						], __( 'Enable Safe Mode' ) );
 
 					else:
@@ -482,6 +484,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Enable safe mode
 	 */
 	public function process_enable_safe_mode() {
+
+        maybe_install_safe_mode_plugin();
+
 		if ( groundhogg_enable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_enabled', __( 'Safe mode has been enabled.' ) );
 		} else {
@@ -490,6 +495,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	public function process_disable_safe_mode() {
+
+        maybe_install_safe_mode_plugin();
+
 		if ( groundhogg_disable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' ) );
 		}
