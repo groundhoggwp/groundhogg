@@ -8,7 +8,6 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Steps\Benchmarks\Benchmark;
-use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\current_screen_is_gh_page;
@@ -171,7 +170,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function get_icon() {
 
-		$file_name = sanitize_file_name( $this->get_type() ) . '.svg';
+		$file_name = str_replace( '_', '-', $this->get_type() ) . '.svg';
 
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/' . $file_name;
 	}
@@ -549,19 +548,19 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return $step->get_title_formatted();
 	}
 
-    public function add_step_button() {
+	public function add_step_button() {
 
-        if ( ! $this->get_current_step()->get_funnel()->is_editing() ){
-            return;
-        }
+		if ( ! $this->get_current_step()->get_funnel()->is_editing() ) {
+			return;
+		}
 
-        ?>
+		?>
         <button class="add-step">
-            <?php dashicon_e( 'plus-alt2' ); ?>
+			<?php dashicon_e( 'plus-alt2' ); ?>
             <div class="gh-tooltip top">Add step</div>
         </button>
-        <?php
-    }
+		<?php
+	}
 
 	/**
 	 * @param $step Step
@@ -594,9 +593,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'invalid';
 		}
 
-        if ( $step->is_benchmark() && $step->can_passthru() && ! $step->is_starting() ){
-	        $classes[] = 'passthru';
-        }
+		if ( $step->is_benchmark() && $step->can_passthru() && ! $step->is_starting() ) {
+			$classes[] = 'passthru';
+		}
 
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
@@ -669,24 +668,24 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					?>
                 </div>
             </div>
-            <?php if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
+			<?php if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
                 <div class="step-reporting">
                     <div class="display-flex flex-end full-width">
                         <div class="stat-wrap">
                             <div class="gh-tooltip top">Pending</div>
-		                    <?php dashicon_e( 'hourglass' ); ?>
+							<?php dashicon_e( 'hourglass' ); ?>
                             <div class="waiting"></div>
                         </div>
                     </div>
                     <div class="display-flex flex-start full-width">
                         <div class="stat-wrap">
                             <div class="gh-tooltip top">Completed</div>
-		                    <?php dashicon_e( 'admin-users' ); ?>
+							<?php dashicon_e( 'admin-users' ); ?>
                             <div class="complete"></div>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+			<?php endif; ?>
         </div>
 		<?php
 
@@ -741,9 +740,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->after_step_warnings();
 	}
 
-    protected function settings_should_ignore_morph() {
-	    return true;
-    }
+	protected function settings_should_ignore_morph() {
+		return true;
+	}
 
 	/**
 	 * @param $step Step
