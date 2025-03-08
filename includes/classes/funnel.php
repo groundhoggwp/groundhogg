@@ -41,11 +41,22 @@ class Funnel extends Base_Object_With_Meta {
 			return $step->is_main_branch();
 		} );
 
+		if ( empty( $steps ) ) {
+			return false;
+		}
+
 		$html = '';
 
 		foreach ( $steps as $step ) {
 			$step->get_step_element()->validate_settings( $step );
-			$html .= $step->sortable_item( $echo );
+			$step_output = $step->sortable_item( $echo );
+			if ( ! $echo ){
+				$html .= $step_output;
+			}
+		}
+
+		if ( $echo ){
+			return true;
 		}
 
 		return $html;
@@ -646,12 +657,12 @@ class Funnel extends Base_Object_With_Meta {
 
 			$_step = (object) $_step;
 
+
 			$data              = (array) $_step->data;
 			$data['funnel_id'] = $this->get_id();
-			$step              = new Step();
-
 			$data['step_status'] = 'inactive'; // force status to inactive
 
+			$step              = new Step();
 			$step->create( $data );
 			$step->update_meta( (array) $_step->meta );
 			$step->import( (array) $_step->export );

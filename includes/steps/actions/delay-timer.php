@@ -192,7 +192,7 @@ class Delay_Timer extends Action {
 			'delay_type'        => [
 				'default'  => 'days',
 				'sanitize' => function ( $value ) {
-					return one_of( $value, [ 'minutes', 'hours', 'days', 'weeks', 'months', 'years' ] );
+					return one_of( $value, [ 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'none' ] );
 				}
 			],
 			'run_on_type'       => [

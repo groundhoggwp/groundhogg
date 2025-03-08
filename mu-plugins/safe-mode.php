@@ -142,6 +142,10 @@ function groundhogg_validate_safe_mode_cookie() {
 	$user = new WP_User();
 	$user->init( $userdata );
 
+    if ( ! $user->has_cap( 'activate_plugins' ) ) {
+        return false;
+    }
+
 	$stored_hash = get_user_meta( $user->ID, 'gh_safe_mode_enabled', true );
 
 	return groundhogg_pass_hasher()->CheckPassword( $key, $stored_hash );
@@ -308,8 +312,8 @@ function groundhogg_safe_mode_admin_bar_warning( $admin_bar ) {
 		] );
 	}
 
-    add_action( 'wp_footer', 'groundhogg_safe_mode_admin_bar_menu_styles' );
-    add_action( 'admin_footer', 'groundhogg_safe_mode_admin_bar_menu_styles' );
+    add_action( is_admin() ? 'admin_footer' : 'wp_footer', 'groundhogg_safe_mode_admin_bar_menu_styles' );
+
 }
 
 add_action( 'admin_bar_menu', 'groundhogg_safe_mode_admin_bar_warning', 999 );

@@ -43,8 +43,7 @@ class Split_Test extends Split_Path {
 		$current_step = $this->get_current_step();
 		$funnel       = $current_step->get_funnel();
 
-		$start_date = $this->get_setting( 'start_date' );
-		$start_time = ( new DateTimeHelper( $start_date ) )->getTimestamp();
+		$start_time = ( new DateTimeHelper( $current_step->date_activated ) )->getTimestamp();
 
 		switch ( $this->get_setting( 'win_condition' ) ) {
 			default:
@@ -99,8 +98,7 @@ class Split_Test extends Split_Path {
 		$current_step = $this->get_current_step();
 		$funnel       = $current_step->get_funnel();
 
-		$start_date = $current_step->date_activated;
-		$start_time = ( new DateTimeHelper( $start_date ) )->getTimestamp();
+		$start_time = ( new DateTimeHelper( $current_step->date_activated ) )->getTimestamp();
 
 		$first_step = $this->get_first_of_branch( $branch );
 
@@ -161,6 +159,13 @@ class Split_Test extends Split_Path {
 		return $report;
 	}
 
+	public function is_test_active() {
+		$winner = $this->get_setting( 'winner' );
+
+		// for the test to be active the step must be active with no winner declared
+		return $this->get_current_step()->is_active() && ! $winner;
+	}
+
 	public function get_settings_schema() {
 		return [
 			// weight to send to the A path
@@ -191,6 +196,16 @@ class Split_Test extends Split_Path {
 			'test_name'     => [
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
+			],
+			'winner'        => [
+				'sanitize' => function ( $branch ) {
+					if ( empty( $branch ) ) {
+						return '';
+					}
+
+					return one_of( $branch, $this->get_branches() );
+				},
+				'default'  => ''
 			]
 		];
 	}
@@ -207,7 +222,21 @@ class Split_Test extends Split_Path {
 		];
 	}
 
+	/**
+	 * Get the name of a branch
+	 *
+	 * @param $branch string
+	 *
+	 * @return string
+	 */
 	protected function get_branch_name( $branch ) {
+
+		$winner = $this->get_setting( 'winner' );
+
+		if ( $winner ){
+			return $branch === $winner ? 'Winner (100%)' : 'Loser (0%)';
+		}
+
 		$branch = strtoupper( explode( '-', $branch )[1] );
 
 		$weight = $this->get_setting( 'weight' );
@@ -219,7 +248,40 @@ class Split_Test extends Split_Path {
 		return "$branch ($weight%)";
 	}
 
+	/**
+	 * Show branch as winner
+	 *
+	 * @param $branch_id
+	 *
+	 * @return string
+	 */
+	protected function get_branch_classes( $branch_id ): string {
+		$winner = $this->get_setting( 'winner' );
+
+		if ( $winner ){
+			return $branch_id === $winner ? 'green' : 'red';
+		}
+
+		return '';
+	}
+
+	/**
+	 * Take the winner into account
+	 *
+	 * @param string  $branch
+	 * @param Contact $contact
+	 *
+	 * @return bool
+	 */
 	public function matches_branch_conditions( string $branch, Contact $contact ) {
+
+		$winner = $this->get_setting( 'winner' );
+
+		// can't travel to steps in the losing branch
+		if ( $winner && $branch !== $winner ) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -231,6 +293,13 @@ class Split_Test extends Split_Path {
 	 * @return false|\Groundhogg\Step
 	 */
 	public function get_logic_action( Contact $contact ) {
+
+		$winner = $this->get_setting( 'winner' );
+
+		// only use winning branch
+		if ( $winner ){
+			return $this->get_first_of_branch( $winner );
+		}
 
 		$path_a_weight = absint( $this->get_setting( 'weight' ) );
 		$path_b_weight = 100 - $path_a_weight;

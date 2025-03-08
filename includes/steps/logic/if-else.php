@@ -113,6 +113,10 @@ class If_Else extends Branch_Logic {
 		return strtoupper( explode( '-', $branch )[1] );
 	}
 
+    protected function get_branch_classes( $branch_id ): string {
+	    return str_ends_with( $branch_id, '-no' ) ? 'red' : 'green';
+    }
+
 	/**
 	 * Which path?
 	 *

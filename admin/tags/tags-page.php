@@ -74,6 +74,21 @@ class Tags_Page extends Admin_Page {
 		}
 	}
 
+    protected function get_title_actions() {
+
+        if ( $this->get_current_action() === 'view' ) {
+            return [];
+        }
+
+	    return [
+		    [
+			    'link'   => $this->admin_url( [ 'action' => 'view' ] ),
+			    'action' => __( 'Add New', 'groundhogg' ),
+			    'target' => '_self',
+		    ]
+	    ];
+    }
+
 	public function view() {
 
 		$tags_table = new Tags_Table();

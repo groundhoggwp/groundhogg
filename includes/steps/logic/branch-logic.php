@@ -3,7 +3,6 @@
 namespace Groundhogg\steps\logic;
 
 use Groundhogg\Contact;
-use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Step;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\db;
@@ -22,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Branch_Logic extends Logic {
 
 	abstract public function get_branches();
+
+    abstract protected function get_branch_name( $branch );
 
 	/**
 	 * Whether the contact matches the conditions for the current branch
@@ -72,21 +73,12 @@ abstract class Branch_Logic extends Logic {
 	 *
 	 * @return Step|false
 	 */
-	public function get_first_of_branch( $branch ) {
+	public function get_first_of_branch( string $branch ) {
 
-		$current_step = $this->get_current_step();
-		$branch       = $this->maybe_prefix_branch( $branch );
+		$branch = $this->maybe_prefix_branch( $branch );
+		$steps  = $this->get_sub_steps( $branch );
 
-		$query = new Table_Query( 'steps' );
-		$query->setOrderby( [ 'step_order', 'ASC' ] )
-		      ->setLimit( 1 )
-		      ->where()
-		      ->equals( 'funnel_id', $current_step->get_funnel_id() )
-		      ->equals( 'branch', $branch );
-
-		$next = $query->get_objects( Step::class );
-
-		return ! empty( $next ) ? $next[0] : false; // any proceeding action
+		return ! empty( $steps ) ? $steps[0] : false; // any proceeding action
 	}
 
 	public function sortable_item( $step ) {
@@ -101,24 +93,33 @@ abstract class Branch_Logic extends Logic {
 		// reset the current step to the current one
 		$this->set_current_step( $step );
 
+		$this->add_step_button();
+
 		?>
-        <div class="sortable-item logic" data-type="<?php esc_attr_e( $step->get_type()); ?>" data-group="<?php esc_attr_e( $step->get_group()); ?>">
+        <div class="flow-line"></div>
+        <div class="sortable-item logic branch-logic" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
 			<?php parent::sortable_item( $step ); ?>
-            <div class="display-flex align-center step-branches">
+            <div class="display-flex align-top step-branches">
 				<?php foreach ( $this->get_branches() as $branch_id ):
 
 					$steps = array_filter_splice( $branch_steps, function ( $step ) use ( $branch_id ) {
 						return $step->branch === $branch_id;
 					} );
 
+                    $classes = $this->get_branch_classes( $branch_id );
+
 					?>
-                    <div class="split-branch">
+                    <div class="split-branch <?php echo $classes ?>">
                         <div class="logic-line line-above">
                             <span class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
                         <div class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
 								$branch_step->sortable_item();
-							} ?></div>
+							}
+
+                            $this->add_step_button();
+
+                            ?></div>
                         <div class="logic-line line-below"></div>
                         <div class="logic-line line-below-after"></div>
                     </div>
@@ -128,14 +129,24 @@ abstract class Branch_Logic extends Logic {
 		<?php
 	}
 
+	/**
+	 * Get steps within a specific branch
+	 *
+	 * @param string|array $branch
+	 *
+	 * @return array
+	 */
 	public function get_sub_steps( $branch = false ) {
 
 		$steps    = $this->get_current_step()->get_funnel()->get_steps();
 		$branches = ! empty( $branch ) ? maybe_explode( $branch ) : $this->get_branches();
 
-		return array_filter( $steps, function ( Step $step ) use ( $branches ) {
+		$branches = array_map( [ $this, 'maybe_prefix_branch' ], $branches );
+
+        // use array_values to reindex the array
+		return array_values( array_filter( $steps, function ( Step $step ) use ( $branches ) {
 			return in_array( $step->branch, $branches );
-		} );
+		} ) );
 	}
 
 	/**
@@ -150,18 +161,6 @@ abstract class Branch_Logic extends Logic {
 		$branch_steps = $this->get_sub_steps();
 
 		foreach ( $branch_steps as $branch_step ) {
-
-			// we can delete active steps, so we move the step to the parent branch
-			if ( $branch_step->is_active() ) {
-
-				// if the step being deleted is active, move it back to the parent branch
-				$branch_step->add_changes( [
-					'branch' => $step->branch
-				] );
-
-				continue;
-			}
-
 			$branch_step->delete(); // this might change the current step
 		}
 
@@ -174,27 +173,31 @@ abstract class Branch_Logic extends Logic {
 	 *
 	 * @return void
 	 */
-    public function post_import( $step ) {
+	public function post_import( $step ) {
 
-        $oldId = $step->get_meta( 'imported_step_id' );
+		$oldId = $step->get_meta( 'imported_step_id' );
 
-        // we have to update all the branches
+		// we have to update all the branches
 
-        $branches = $this->get_branches();
+		$branches = $this->get_branches();
 
-        foreach ( $branches as $branch ) {
+		foreach ( $branches as $branch ) {
 
-            $parts = explode( '-', $branch );
-            $oldbranch = $oldId . '-' . $parts[1];
+			$parts     = explode( '-', $branch );
+			$oldbranch = $oldId . '-' . $parts[1];
 
-            db()->steps->update( [
-                'branch' => $oldbranch, // old branch
-            ], [
-	            'branch' => $branch, // new branch
-            ] );
+			db()->steps->update( [
+				'branch' => $oldbranch, // old branch
+			], [
+				'branch' => $branch, // new branch
+			] );
 
-        }
+		}
 
-    }
+	}
+
+	protected function get_branch_classes( $branch_id ): string {
+        return '';
+	}
 
 }

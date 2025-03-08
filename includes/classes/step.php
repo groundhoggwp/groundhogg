@@ -83,6 +83,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return get_db( 'steps' );
 	}
 
+
 	/**
 	 * Return a META DB instance associated with items of this type.
 	 *
@@ -191,14 +192,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_order() === $this->get_funnel()->get_num_steps();
 	}
 
-	/**
-	 * Check if the step is locked.
-	 * A step is considered locked if the parent step is also locked
-	 *
-	 * @return bool
-	 */
-	public function is_locked() {
-
+	public function _is_locked() {
 		if ( $this->is_locked ){
 			return true;
 		}
@@ -210,6 +204,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the step is locked.
+	 * A step is considered locked if the parent step is also locked
+	 *
+	 * @return bool
+	 */
+	public function is_locked() {
+		/**
+		 * Filter the locking
+		 *
+		 * @param $locked bool whether the step is locked
+		 * @param $step Step the step
+		 */
+		return apply_filters( 'groundhogg/step/is_locked', $this->_is_locked(), $this );
 	}
 
 	/**
@@ -745,6 +755,21 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * if this step is a typical timer
+	 *
+	 * @return bool
+	 */
+	public function is_timer() {
+		/**
+		 * Filter whether this step is considered a "timer"
+		 *
+		 * @param $is_timer bool whether the step is a timer
+		 * @param $step Step the current step
+		 */
+		return apply_filters( 'groundhogg/step/is_timer', in_array( $this->get_type(), [ 'delay_timer', 'date_timer', 'advanced_timer', 'field_timer' ] ), $this );
+	}
+
+	/**
 	 * Get the run time for when this step should run
 	 *
 	 * Previously get_delay_time
@@ -771,13 +796,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_run_time( time() );
 	}
 
+	public function branch_is( $branch ) {
+		return $this->branch === $branch;
+	}
+
 	/**
 	 * Whether this step is part of the main branch
 	 *
 	 * @return bool
 	 */
 	public function is_main_branch() {
-		return $this->branch === self::MAIN_BRANCH;
+		return $this->branch_is( 'main' );
 	}
 
 	/**
@@ -1166,7 +1195,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this );
 
 			$this->get_step_element()->pre_run( $contact, $event );
-			$this->get_step_element()->run( $contact, $event );
+			$result = $this->get_step_element()->run( $contact, $event );
 
 			do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this );
 		}
@@ -1252,7 +1281,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return ob_get_clean();
 		}
 
-		return false;
+		return true;
 	}
 
 	/**

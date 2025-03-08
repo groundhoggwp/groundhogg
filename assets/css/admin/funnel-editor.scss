@@ -215,9 +215,39 @@ body:has(#funnel-form) {
       .steps-select {
 
         #step-search {
-          width: 100%;
+          //width: 100%;
           font-size: 14px;
-          padding: 4px 12px;
+          //padding: 4px 12px;
+        }
+
+        .gh-button.step-filter {
+
+          color: var(--color);
+          border: 1px solid var(--color);
+          background: var(--color-5);
+
+          &.current,
+          &:hover {
+            color: #fff;
+            background-color: var(--color);
+          }
+
+          &[data-group="all"]{
+            --color: #{$primary-dark};
+            --color-5: #{$primary-dark-5};
+          }
+          &[data-group="benchmark"]{
+            --color: #{$benchmark-orange};
+            --color-5: #{$benchmark-orange-5};
+          }
+          &[data-group="logic"]{
+            --color: #{$secondary-purple};
+            --color-5: #{$secondary-purple-5};
+          }
+          &[data-group="action"]{
+            --color: #{$action-green};
+            --color-5: #{$action-green-5};
+          }
         }
 
         .steps-grid {
@@ -390,11 +420,12 @@ body:has(#funnel-form) {
       background-color: $primary-dark-5;
     }
 
-    .field-map-wrapper{
+    .field-map-wrapper {
       max-height: 500px;
       overflow: auto;
       border: 1px solid #c3c4c7;
       border-radius: 5px 0 0 5px;
+
       table {
         width: 100%;
         margin-top: 0 !important;
@@ -839,15 +870,15 @@ button.button.save-button {
   margin: auto;
   width: 300px;
 
-  &::after {
-    position: absolute;
-    content: '';
-    border-right: 2px solid $error-red;
-    z-index: 1;
-    bottom: 100%;
-    height: 50px;
-    left: 50%;
-  }
+  //&::after {
+  //  position: absolute;
+  //  content: '';
+  //  border-right: 2px solid $error-red;
+  //  z-index: 1;
+  //  bottom: 100%;
+  //  height: 50px;
+  //  left: 50%;
+  //}
 
   .the-end {
     padding: 3px 8px;
@@ -902,6 +933,11 @@ button.button.save-button {
       border-style: var(--logic-line-style);
       position: absolute;
       z-index: 1;
+      //transform: translateX(-1px); // account for border width
+
+      &.right {
+        //transform: translateX(1px); // account for border width
+      }
 
       &.skip-line,
       &.loop-line {
@@ -955,29 +991,13 @@ button.button.save-button {
       }
     }
 
-    .step.if_else + .step-branches {
-
-      position: relative;
-
-      > .split-branch:first-child {
-
-        > .logic-line {
-          border-color: $action-green;
-
-          > .path-indicator {
-            background-color: $action-green;
-          }
-        }
-      }
-
-      > .split-branch:last-child {
-        > .logic-line.line-above {
-          border-color: $error-red;
-
-          > .path-indicator {
-            background-color: $error-red;
-          }
-        }
+    .logic[data-type="evergreen_sequence"] {
+      .step-branches {
+        //margin-bottom: 0;
+        //.logic-line.line-below,
+        //.logic-line.line-below-after {
+        //  display: none;
+        //}
       }
     }
 
@@ -991,6 +1011,27 @@ button.button.save-button {
 
       .split-branch {
         position: relative;
+
+        &.green {
+
+          > .logic-line {
+            border-color: $action-green;
+
+            > .path-indicator {
+              background-color: $action-green;
+            }
+          }
+        }
+
+        &.red {
+          > .logic-line.line-above {
+            border-color: $error-red;
+
+            > .path-indicator {
+              background-color: $error-red;
+            }
+          }
+        }
 
         > .logic-line {
           border-color: $secondary-purple;
@@ -1038,11 +1079,33 @@ button.button.save-button {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 50px;
+      //gap: 50px;
       margin: auto;
       min-width: 300px;
       width: min-content;
       position: relative;
+
+      button.add-step {
+        height: 25px;
+        width: 25px;
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: $primary-dark-50;
+        border-color: $primary-dark-50;
+        background-color: #fff;
+        border-width: 2px;
+        box-sizing: border-box;
+        border-style: solid;
+        z-index: 5;
+
+        &.here {
+          color: #fff;
+          background-color: $primary-dark;
+          border-color: $primary-dark;
+        }
+      }
 
       &.benchmarks {
         flex-direction: row;
@@ -1102,22 +1165,18 @@ button.button.save-button {
         //}
       }
 
-      &:not(:has(.step)) {
-        height: 60px;
-      }
-
-      &:not(:has(div)) {
-        &::after {
-          width: 100%;
-          height: 60px;
-          background-color: $primary-dark-15;
-          content: 'Drag a step into the flow';
-          display: flex;
-          border-radius: 5px;
-          justify-content: center;
-          align-items: center;
-        }
-      }
+      //&:not(:has(.step, .sortable-helper-icon, .sortable-placeholder)) {
+      //  &::before {
+      //    width: 100%;
+      //    height: 60px;
+      //    background-color: $primary-dark-15;
+      //    content: 'Drag a step into the flow';
+      //    display: flex;
+      //    border-radius: 5px;
+      //    justify-content: center;
+      //    align-items: center;
+      //  }
+      //}
 
     }
   }
@@ -1165,25 +1224,57 @@ button.button.save-button {
     background-color: $secondary-purple;
   }
 
-  .sortable-item,
-  .step-branch.benchmarks {
+  .sortable-item.logic,
+  .sortable-item.action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    + .step-branch.benchmarks,
-    + .sortable-item {
-
-      position: relative;
-
-      &::after {
-        position: absolute;
-        content: '';
-        border-right: 2px var(--logic-line-style) $action-green;
-        z-index: 1;
-        top: -51px;
-        height: 52px;
-        left: 50%;
-      }
+  .sortable-item:first-child {
+    > .flow-line:first-child {
+      display: none;
     }
   }
+
+  .sortable-item:last-child {
+    > .flow-line:last-child {
+      display: none;
+    }
+  }
+
+  .flow-line {
+    border-right: 2px var(--logic-line-style) $action-green;
+    //z-index: 1;
+    //top: -51px;
+    //height: 52px;
+    //left: 50%;
+    height: 40px;
+  }
+
+  .step.action + .flow-line {
+    height: 20px;
+  }
+
+  //.sortable-item,
+  //.step-branch.benchmarks {
+  //
+  //  + .step-branch.benchmarks,
+  //  + .sortable-item {
+  //
+  //    position: relative;
+  //
+  //    &::after {
+  //      position: absolute;
+  //      content: '';
+  //      border-right: 2px var(--logic-line-style) $action-green;
+  //      z-index: 1;
+  //      top: -51px;
+  //      height: 52px;
+  //      left: 50%;
+  //    }
+  //  }
+  //}
 
   .step {
     border-radius: 5px;
@@ -1200,7 +1291,7 @@ button.button.save-button {
     //margin: auto;\\
     border: 1px solid var(--color);
 
-    .step-reporting{
+    .step-reporting {
       display: flex;
       justify-content: center;
       gap: 67px;
@@ -1414,7 +1505,7 @@ button.button.save-button {
     &.step-placeholder {
       justify-content: center;
       padding: 20px 40px;
-      width: min-content;
+      width: 200px !important;
     }
 
     &.has-errors {

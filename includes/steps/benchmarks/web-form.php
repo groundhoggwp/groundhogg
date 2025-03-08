@@ -119,21 +119,21 @@ class Web_Form extends Benchmark {
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="full-width code"
+                            class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Iframe' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="full-width code"
+                            class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="full-width code"
+                            class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_submission_url() ); ?>"
                             readonly>
                 </div>

@@ -1865,6 +1865,10 @@ class Form_v2 extends Step {
 		$theme        = $this->get_meta( 'theme' );
 		$accent_color = $this->get_meta( 'accent_color' );
 
+		if ( ! $accent_color ){
+			$accent_color = '#000000'; // default to black
+		}
+
 		if ( $theme && $theme !== 'default' ) {
 			$attrs['class'] .= ' ' . $theme;
 			$attrs['style'] = [ '--gh-accent-color' => $accent_color ];

@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\array_map_to_class;
@@ -548,6 +549,20 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return $step->get_title_formatted();
 	}
 
+    public function add_step_button() {
+
+        if ( ! $this->get_current_step()->get_funnel()->is_editing() ){
+            return;
+        }
+
+        ?>
+        <button class="add-step">
+            <?php dashicon_e( 'plus-alt2' ); ?>
+            <div class="gh-tooltip top">Add step</div>
+        </button>
+        <?php
+    }
+
 	/**
 	 * @param $step Step
 	 */
@@ -571,7 +586,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'locked';
 		}
 
-		if ( ! is_a( $this, Branch_Logic::class ) ) {
+		if ( is_a( $this, Benchmark::class ) ) {
 			$classes[] = 'sortable-item';
 		}
 
@@ -985,7 +1000,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function pre_run( $contact, $event ) {
 		$this->set_current_event( $event );
-		$this->set_current_step( $event->get_step() );
 		$this->set_current_contact( $contact );
 
 		return $contact;
@@ -997,7 +1011,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @param $contact Contact
 	 * @param $event   Event
 	 *
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
 	public function run( $contact, $event ) {
 		return true;

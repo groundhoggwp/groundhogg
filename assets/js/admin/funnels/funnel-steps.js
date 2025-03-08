@@ -57,6 +57,10 @@
 
   function ordinal_suffix_of (i) {
 
+    if (i === 'last') {
+      return 'Last'
+    }
+
     var j = i % 10,
       k = i % 100
     if (j == 1 && k != 11) {
@@ -131,6 +135,27 @@
 
   const capitalize = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
+  const runOnTypes = {
+    any         : 'Any day',
+    weekday     : 'Weekday',
+    weekend     : 'Weekend',
+    day_of_week : 'Day of week',
+    day_of_month: 'Day of month',
+  }
+
+  const runOnDaysOfMonth = {}
+
+  for (let i = 1; i < 32; i++) {
+    runOnDaysOfMonth[i] = i
+  }
+
+  runOnDaysOfMonth.last = 'last'
+
+  const runOnMonthTypes = {
+    any     : 'Of any month',
+    specific: 'Of specific month(s)',
   }
 
   const delayTimerName = ({
@@ -255,40 +280,7 @@
       } = {
         ...delayTimerDefaults,
         ...meta,
-      }
-
-      const runOnTypes = {
-        any         : 'Any day',
-        weekday     : 'Weekday',
-        weekend     : 'Weekend',
-        day_of_week : 'Day of week',
-        day_of_month: 'Day of month',
-      }
-
-      const runWhenTypes = {
-        now  : __('Any time', 'groundhogg'),
-        later: __('Specific time', 'groundhogg'),
-      }
-
-      if ([
-        'minutes',
-        'hours',
-        'none',
-      ].includes(delay_type)) {
-        runWhenTypes.between = __('Between', 'groundhogg')
-      }
-
-      const runOnDaysOfMonth = {}
-
-      for (let i = 1; i < 32; i++) {
-        runOnDaysOfMonth[i] = i
-      }
-
-      runOnDaysOfMonth.last = 'last'
-
-      const runOnMonthTypes = {
-        any     : 'Of any month',
-        specific: 'Of specific month(s)',
+        ...Funnel.getActiveStep().meta,
       }
 
       //language=HTML
@@ -620,9 +612,9 @@
           case 'admin_notification':
             this.adminNotification(active)
             break
-          case 'delay_timer':
-            this.delayTimer(active)
-            break
+          // case 'delay_timer':
+          //   this.delayTimer(active)
+          //   break
           case 'web_form':
             this.webForm(active)
             break
@@ -823,6 +815,258 @@
     }
   }
 
+  function sortByOrder (order, items) {
+    // Create a lookup map for quick index access
+    const orderMap = new Map(order.map((id, index) => [
+      id,
+      index,
+    ]))
+
+    return items.sort((a, b) => ( orderMap.get(a.id) ?? Infinity ) - ( orderMap.get(b.id) ?? Infinity ))
+  }
+
+  Funnel.registerStepCallbacks('delay_timer', {
+    onActive: async ({
+      ID,
+      meta,
+      data,
+    }) => {
+
+      let id = `step_${ ID }_delay_timer_settings`
+
+      const DelayTimerSettings = (updateMeta) => {
+
+        const timerSettings = {
+          ...delayTimerDefaults,
+          ...meta,
+        }
+
+        const {
+          delay_amount,
+          delay_type,
+          run_on_type,
+          run_when,
+          run_time,
+          send_in_timezone,
+          run_time_to,
+          run_on_dow_type, // Run on days of week type
+          run_on_dow, // Run on days of week
+          run_on_month_type, // Run on month type
+          run_on_months, // Run on months
+          run_on_dom, // Run on days of month
+          delay_preview = '',
+        } = timerSettings
+
+        const runWhenTypes = {
+          now  : __('Any time', 'groundhogg'),
+          later: __('Specific time', 'groundhogg'),
+        }
+
+        if ([
+          'minutes',
+          'hours',
+          'none',
+        ].includes(delay_type)) {
+          runWhenTypes.between = __('Between', 'groundhogg')
+        }
+
+        const runOnMonthOptions = () => MakeEl.InputGroup([
+          MakeEl.Select({
+            id      : `run-on-month-type-${ ID }`,
+            name    : 'run_on_month_type',
+            options : runOnMonthTypes,
+            selected: run_on_month_type,
+            onChange: e => updateMeta({
+              run_on_month_type: e.target.value,
+            }),
+          }),
+          run_on_month_type === 'specific' ? ItemPicker({
+            id          : `run-on-months-${ ID }`,
+            selected    : sortByOrder(Object.keys(delay_timer_i18n.months), run_on_months.map(m => ( {
+              id  : m,
+              text: delay_timer_i18n.months[m],
+            } ))),
+            fetchOptions: async (search) => {
+              return Groundhogg.functions.assoc2array(delay_timer_i18n.months).filter(item => item.text.match(search))
+            },
+            onChange    : months => {
+              updateMeta({
+                run_on_months: months.map(m => m.id),
+              })
+            },
+          }) : null,
+        ])
+
+        const daysOfWeekOptions = () => MakeEl.InputGroup([
+          MakeEl.Select({
+            id      : `run-on-dow-type-${ ID }`,
+            name    : 'run_on_dow_type',
+            options : delay_timer_i18n.day_of_week_determiners,
+            selected: run_on_dow_type,
+            onChange: e => updateMeta({
+              run_on_dow_type: e.target.value,
+            }),
+          }),
+          ItemPicker({
+            id          : `run-on-dow-${ ID }`,
+            selected    : sortByOrder(Object.keys(delay_timer_i18n.days_of_week), run_on_dow.map(dow => ( {
+              id  : dow,
+              text: delay_timer_i18n.days_of_week[dow],
+            } ))),
+            fetchOptions: async (search) => {
+              return Groundhogg.functions.assoc2array(delay_timer_i18n.days_of_week).filter(item => item.text.match(search))
+            },
+            onChange    : dow => {
+              updateMeta({
+                run_on_dow: dow.map(d => d.id),
+              })
+            },
+          }),
+        ])
+
+        const daysOfMonthOptions = () => ItemPicker({
+          id          : `run-on-dom-${ ID }`,
+          selected    : sortByOrder(Object.keys(runOnDaysOfMonth), run_on_dom.map(dom => ( {
+            id  : `${ dom }`,
+            text: ordinal_suffix_of(dom),
+          } ))),
+          fetchOptions: async (search) => {
+            return Groundhogg.functions.assoc2array(runOnDaysOfMonth).map(dom => ( {
+              id  : `${ dom.id }`,
+              text: ordinal_suffix_of(dom.text),
+            } )).filter(item => item.text.match(search))
+          },
+          onChange    : dom => {
+            updateMeta({
+              run_on_dom: dom.map(d => d.id),
+            })
+          },
+        })
+
+        return Div({
+          className: 'display-flex column gap-10',
+        }, [
+          MakeEl.H3({
+            className: 'delay-preview',
+            style    : {
+              fontWeight: 'normal',
+            },
+          }, delayTimerName(timerSettings)),
+          // Delay amount
+          Div({ className: 'row display-flex gap-10 column' }, [
+            MakeEl.Label({ className: 'row-label' }, __('Wait at least...', 'groundhogg')),
+            MakeEl.InputGroup([
+              Input({
+                value   : delay_amount,
+                name    : 'delay_amount',
+                type    : 'number',
+                min     : 0,
+                disabled: delay_type === 'none',
+                onChange: e => updateMeta({
+                  delay_amount: e.target.value,
+                }),
+              }),
+              MakeEl.Select({
+                name    : 'delay_type',
+                options : delay_timer_i18n.delay_duration_types,
+                selected: delay_type,
+                onChange: e => updateMeta({
+                  delay_type: e.target.value,
+                }),
+              }),
+            ]),
+          ]),
+          Div({ className: 'row display-flex gap-10 column' }, [
+            MakeEl.Label({ className: 'row-label' }, _x('Then run on...', 'meaning to run a process on a certain date', 'groundhogg')),
+            Div({ className: 'display-flex gap-10' }, [
+              MakeEl.Select({
+                name    : 'run_on_type',
+                options : runOnTypes,
+                selected: run_on_type,
+                onChange: e => updateMeta({
+                  run_on_type: e.target.value,
+                }),
+              }),
+              run_on_type === 'day_of_week' ? daysOfWeekOptions() : null,
+              run_on_type === 'day_of_month' ? daysOfMonthOptions() : null,
+            ]),
+            run_on_type === 'day_of_week' || run_on_type === 'day_of_month' ? runOnMonthOptions() : null,
+          ]),
+          Div({ className: 'row display-flex gap-10 column' }, [
+            MakeEl.Label({ className: 'row-label' }, _x('Then run at...', 'meaning to run a process at a certain time', 'groundhogg')),
+            MakeEl.InputGroup([
+              MakeEl.Select({
+                name    : 'run_when',
+                options : runWhenTypes,
+                selected: run_when,
+                onChange: e => updateMeta({
+                  run_when: e.target.value,
+                }),
+              }),
+              run_when === 'later' ? Input({
+                className: 'delay-input',
+                type     : 'time',
+                name     : 'run_time',
+                value    : run_time,
+                onChange : e => updateMeta({ run_time: e.target.value }),
+              }) : null,
+              run_when === 'between' ? MakeEl.Fragment([
+                Input({
+                  className: 'delay-input',
+                  type     : 'time',
+                  name     : 'run_time',
+                  value    : run_time,
+                  onChange : e => updateMeta({ run_time: e.target.value }),
+                }),
+                Input({
+                  className: 'delay-input',
+                  type     : 'time',
+                  name     : 'run_time_to',
+                  value    : run_time_to,
+                  onChange : e => updateMeta({ run_time_to: e.target.value }),
+                })
+              ]) : null,
+            ]),
+          ]),
+          Div({ className: 'display-flex align-center gap-10' }, [
+            Pg({},  __('Run in the contact\'s timezone?', 'groundhogg') ),
+            MakeEl.Toggle({
+              onLabel : 'Yes',
+              offLabel: 'No',
+              id      : `${ ID }_send_in_timezone`,
+              name    : 'send_in_timezone',
+              checked : Boolean(send_in_timezone),
+              onChange: e => updateMeta({
+                send_in_timezone: e.target.checked
+              })
+            })
+          ])
+        ])
+      }
+
+      morphdom(document.getElementById(id), Div({ id }, morph => {
+        const updateMeta = (newMeta) => {
+          meta = {
+            ...meta,
+            ...newMeta,
+          }
+
+          Funnel.updateStepMeta({
+            ...newMeta,
+            delay_preview: delayTimerName({
+              ...delayTimerDefaults,
+              ...meta,
+            }),
+          })
+          morph()
+        }
+
+        return DelayTimerSettings(updateMeta)
+      }))
+
+    },
+  })
+
   Funnel.registerStepCallbacks('apply_tag', {
     onActive: tagPickerCallback,
   })
@@ -941,123 +1185,125 @@
         },
       })
 
-      const Preview = () => Div({
-          id,
-          className: 'gh-panel email-preview ignore-morph',
-          style    : {
-            backgroundColor: '#fff',
-            overflow       : 'hidden',
-          },
-        }, [
-          Div({
-            className: 'space-between has-box-shadow',
+      const Preview = () => {
+        return Div({
+            id,
+            className: 'gh-panel email-preview ignore-morph',
             style    : {
-              paddingLeft : '20px',
-              paddingRight: '10px',
-              minHeight   : '62px',
+              backgroundColor: '#fff',
+              overflow       : 'hidden',
             },
           }, [
-            email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker,
             Div({
-              className: 'display-flex',
+              className: 'space-between has-box-shadow',
+              style    : {
+                paddingLeft : '20px',
+                paddingRight: '10px',
+                minHeight   : '62px',
+              },
             }, [
+              email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker,
+              Div({
+                className: 'display-flex',
+              }, [
 
-              !hasEmail() ? null : Button({
-                id       : `step_${ ID }_edit_email`,
-                className: 'gh-button primary text gap-10 display-flex',
-                onClick  : e => {
-                  openEmailEditor(getEmail())
-                },
-              }, [
-                Dashicon('edit'),
-                __('Edit'),
-              ]),
-              email_id ? null : Button({
-                id       : `step_${ ID }_create_email`,
-                className: 'gh-button primary text gap-10 display-flex',
-                onClick  : e => {
-                  openEmailEditor({})
-                },
-              }, [
-                Dashicon('plus-alt2'),
-                __('Create new email'),
-              ]),
-              !hasEmail() ? null : Button({
-                id       : `step_${ ID }_email_more`,
-                className: 'gh-button secondary text icon',
-                onClick  : e => {
-                  moreMenu(`#step_${ ID }_email_more`, [
-                    {
-                      key     : 'edit',
-                      text    : __('Edit'),
-                      onSelect: () => openEmailEditor(getEmail()),
-                    },
-                    {
-                      key     : 'add',
-                      text    : __('Create New Email'),
-                      onSelect: () => {
-                        openEmailEditor({})
+                !hasEmail() ? null : Button({
+                  id       : `step_${ ID }_edit_email`,
+                  className: 'gh-button primary text gap-10 display-flex',
+                  onClick  : e => {
+                    openEmailEditor(getEmail())
+                  },
+                }, [
+                  Dashicon('edit'),
+                  __('Edit'),
+                ]),
+                email_id ? null : Button({
+                  id       : `step_${ ID }_create_email`,
+                  className: 'gh-button primary text gap-10 display-flex',
+                  onClick  : e => {
+                    openEmailEditor({})
+                  },
+                }, [
+                  Dashicon('plus-alt2'),
+                  __('Create new email'),
+                ]),
+                !hasEmail() ? null : Button({
+                  id       : `step_${ ID }_email_more`,
+                  className: 'gh-button secondary text icon',
+                  onClick  : e => {
+                    moreMenu(`#step_${ ID }_email_more`, [
+                      {
+                        key     : 'edit',
+                        text    : __('Edit'),
+                        onSelect: () => openEmailEditor(getEmail()),
                       },
-                    },
-                  ])
-                },
-              }, icons.verticalDots),
+                      {
+                        key     : 'add',
+                        text    : __('Create New Email'),
+                        onSelect: () => {
+                          openEmailEditor({})
+                        },
+                      },
+                    ])
+                  },
+                }, icons.verticalDots),
+              ]),
             ]),
-          ]),
-          !email_id ? null : Div({
-            className: 'from-preview display-flex gap-20 has-box-shadow',
-          }, [
-            // Profile pick
-            getEmail() ? makeEl('img', {
-              src      : getEmail().context.from_avatar,
-              className: 'from-avatar',
-              height   : 40,
-              width    : 40,
-              style    : {
-                borderRadius: '50%',
-              },
-            }) : Div({
-              className: 'skeleton-loading',
-              style    : {
-                width       : '40px',
-                height      : '40px',
-                borderRadius: '50%',
-              },
-            }),
-            getEmail() ? Div({
-              className: 'subject-and-from',
+            !email_id ? null : Div({
+              className: 'from-preview display-flex gap-20 has-box-shadow',
             }, [
-              // Subject Line
-              `<h2>${ getEmail().data.subject }</h2>`,
-              // From Name & Email
-              `<span class="from-name">${ getEmail().context.from_name }</span> <span class="from-email">&lt;${ getEmail().context.from_email }&gt;</span>`,
-              // From Email
-            ]) : Div({
+              // Profile pick
+              getEmail() ? makeEl('img', {
+                src      : getEmail().context.from_avatar,
+                className: 'from-avatar',
+                height   : 40,
+                width    : 40,
+                style    : {
+                  borderRadius: '50%',
+                },
+              }) : Div({
+                className: 'skeleton-loading',
+                style    : {
+                  width       : '40px',
+                  height      : '40px',
+                  borderRadius: '50%',
+                },
+              }),
+              getEmail() ? Div({
+                className: 'subject-and-from',
+              }, [
+                // Subject Line
+                `<h2>${ getEmail().data.subject }</h2>`,
+                // From Name & Email
+                `<span class="from-name">${ getEmail().context.from_name }</span> <span class="from-email">&lt;${ getEmail().context.from_email }&gt;</span>`,
+                // From Email
+              ]) : Div({
+                className: 'skeleton-loading',
+                style    : {
+                  width   : 'auto',
+                  flexGrow: '1',
+                  height  : '40px',
+                  // borderRadius: '50%',
+                },
+              }),
+            ]),
+            !email_id ? null : ( getEmail() ? Iframe({
+              id    : `step-${ ID }-preview-${ email_id }`,
+              height: 500,
+              style : {
+                width : '100%',
+                height: '500px',
+              },
+            }, getEmail().context.built) : Div({
               className: 'skeleton-loading',
               style    : {
-                width   : 'auto',
-                flexGrow: '1',
-                height  : '40px',
-                // borderRadius: '50%',
+                height: '460px',
+                margin: '20px',
               },
-            }),
-          ]),
-          !email_id ? null : ( getEmail() ? Iframe({
-            id    : `step-${ ID }-preview-${ email_id }`,
-            height: 500,
-            style : {
-              width : '100%',
-              height: '500px',
-            },
-          }, getEmail().context.built) : Div({
-            className: 'skeleton-loading',
-            style    : {
-              height: '460px',
-              margin: '20px',
-            },
-          }) ),
-        ],
-      )
+            }) ),
+          ],
+        )
+      }
 
       morphPreview()
     },

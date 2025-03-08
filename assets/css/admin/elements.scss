@@ -1038,6 +1038,13 @@ a.action-link {
   padding: 3px 8px;
   color: $primary-dark;
 
+  &.tag {
+    background-color: #f2f2f2;
+    &:is(a):hover{
+      background-color: $primary-dark-15;
+    }
+  }
+
   &.attention,
   &.yellow {
     background: $alert-yellow-50;
@@ -2013,6 +2020,23 @@ input.ui-autocomplete-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+
+  > .gh-picker-container{
+    &:not(:first-child){
+      > .gh-picker {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+      }
+    }
+
+    &:not(:last-child){
+      > .gh-picker {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  }
 }
 
 p.error,
@@ -2275,6 +2299,7 @@ button:has(.gh-dropdown-menu) {
     cursor: pointer;
   }
 
+  a.gh-tag,
   span.gh-tag {
     background: #f2f2f2;
     padding: 3px 9px;
@@ -2283,6 +2308,7 @@ button:has(.gh-dropdown-menu) {
     font-size: 12px;
     display: flex;
     align-items: center;
+    color: $primary-dark;
 
     &.remove {
       background: $error-red-50;

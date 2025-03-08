@@ -76,8 +76,53 @@ abstract class Benchmark extends Funnel_Step {
 		return $default;
 	}
 
+	/**
+	 * Convert the data to args friendly data, if present
+	 *
+	 * @return array
+	 */
+	protected function data_as_args() {
+
+		$args = [];
+
+		foreach ( $this->data as $key => $value ) {
+
+			// ignore these
+			if ( in_array( $key, [ 'contact', 'contacts' ] ) ) {
+				continue;
+			}
+
+			// if it's a simple value we can keep it
+			if ( is_numeric( $value ) || is_string( $value ) ) {
+				$args[ $key ] = $value;
+				continue;
+			}
+
+			if ( is_object( $value ) ) {
+
+				if ( property_exists( $value, 'ID' ) ) {
+					$args[ $key ] = $value->ID;
+					continue;
+				}
+
+				if ( property_exists( $value, 'id' ) ) {
+					$args[ $key ] = $value->id;
+					continue;
+				}
+
+				if ( method_exists( $value, 'get_id' ) ) {
+					$args[ $key ] = $value->get_id();
+					continue;
+				}
+
+			}
+		}
+
+		return $args;
+	}
+
 	public function __construct() {
-        
+
 		// Setup the main complete function
 		// Accepts no arguments, but requires that child implementations setup the data ahead of time.
 		foreach ( $this->get_complete_hooks() as $hook => $args ) {
@@ -156,6 +201,9 @@ abstract class Benchmark extends Funnel_Step {
 				$this->set_current_contact( $contact );
 
 				if ( $this->can_complete_step() ) {
+
+					$this->args = array_merge( $this->data_as_args(), $this->args );
+
 					$step->benchmark_enqueue( $this->get_current_contact(), $this->args );
 				}
 			}
@@ -207,6 +255,13 @@ abstract class Benchmark extends Funnel_Step {
 
 		// if the previous step was not a benchmark, we should open the horizontal benchmark group
 		if ( ! $prev || ! $prev->is_benchmark() ) {
+
+			if ( ! $step->is_starting() ) {
+				$this->add_step_button();
+				?>
+                <div class="flow-line"></div><?php
+			}
+
 			?>
             <div class="step-branch benchmarks" data-branch="<?php _e( $step->branch ) ?>">
 			<?php
@@ -218,6 +273,7 @@ abstract class Benchmark extends Funnel_Step {
 
 		// if the next step is not a benchmark, close the benchmark group
 		if ( ! $next || ! $next->is_benchmark() ) {
+			$this->add_step_button();
 			?></div><?php
 		}
 	}

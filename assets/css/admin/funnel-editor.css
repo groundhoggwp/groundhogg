@@ -125,9 +125,32 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   --icon-size: 60px;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select #step-search {
-  width: 100%;
   font-size: 14px;
-  padding: 4px 12px;
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter {
+  color: var(--color);
+  border: 1px solid var(--color);
+  background: var(--color-5);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter.current, #step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter:hover {
+  color: #fff;
+  background-color: var(--color);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group=all] {
+  --color: #102640;
+  --color-5: rgba(16, 38, 64, 0.05);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group=benchmark] {
+  --color: #f58115;
+  --color-5: rgba(245, 129, 21, 0.05);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group=logic] {
+  --color: #6c19ad;
+  --color-5: rgba(108, 25, 173, 0.05);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group=action] {
+  --color: #9ece38;
+  --color-5: rgba(158, 206, 56, 0.05);
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid {
   position: relative;
@@ -588,15 +611,6 @@ button.button.save-button {
   margin: auto;
   width: 300px;
 }
-.funnel-end::after {
-  position: absolute;
-  content: "";
-  border-right: 2px solid #e91f4f;
-  z-index: 1;
-  bottom: 100%;
-  height: 50px;
-  left: 50%;
-}
 .funnel-end .the-end {
   padding: 3px 8px;
   color: white;
@@ -682,21 +696,6 @@ button.button.save-button {
   right: 0;
   top: 50%;
 }
-#step-flow .fixed-inside .step.if_else + .step-branches {
-  position: relative;
-}
-#step-flow .fixed-inside .step.if_else + .step-branches > .split-branch:first-child > .logic-line {
-  border-color: #9ece38;
-}
-#step-flow .fixed-inside .step.if_else + .step-branches > .split-branch:first-child > .logic-line > .path-indicator {
-  background-color: #9ece38;
-}
-#step-flow .fixed-inside .step.if_else + .step-branches > .split-branch:last-child > .logic-line.line-above {
-  border-color: #e91f4f;
-}
-#step-flow .fixed-inside .step.if_else + .step-branches > .split-branch:last-child > .logic-line.line-above > .path-indicator {
-  background-color: #e91f4f;
-}
 #step-flow .fixed-inside .step-branches {
   gap: 40px;
   margin: 60px 0;
@@ -706,6 +705,18 @@ button.button.save-button {
 }
 #step-flow .fixed-inside .step-branches .split-branch {
   position: relative;
+}
+#step-flow .fixed-inside .step-branches .split-branch.green > .logic-line {
+  border-color: #9ece38;
+}
+#step-flow .fixed-inside .step-branches .split-branch.green > .logic-line > .path-indicator {
+  background-color: #9ece38;
+}
+#step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above {
+  border-color: #e91f4f;
+}
+#step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above > .path-indicator {
+  background-color: #e91f4f;
 }
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line {
   border-color: #6c19ad;
@@ -738,11 +749,30 @@ button.button.save-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 50px;
   margin: auto;
   min-width: 300px;
   width: min-content;
   position: relative;
+}
+#step-flow .fixed-inside .step-branch button.add-step {
+  height: 25px;
+  width: 25px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(16, 38, 64, 0.5);
+  border-color: rgba(16, 38, 64, 0.5);
+  background-color: #fff;
+  border-width: 2px;
+  box-sizing: border-box;
+  border-style: solid;
+  z-index: 5;
+}
+#step-flow .fixed-inside .step-branch button.add-step.here {
+  color: #fff;
+  background-color: #102640;
+  border-color: #102640;
 }
 #step-flow .fixed-inside .step-branch.benchmarks {
   flex-direction: row;
@@ -783,19 +813,6 @@ button.button.save-button {
 }
 #step-flow .fixed-inside .step-branch#step-sortable > .step-branch.benchmarks:first-child::before {
   content: "Start the funnel when...";
-}
-#step-flow .fixed-inside .step-branch:not(:has(.step)) {
-  height: 60px;
-}
-#step-flow .fixed-inside .step-branch:not(:has(div))::after {
-  width: 100%;
-  height: 60px;
-  background-color: rgba(16, 38, 64, 0.15);
-  content: "Drag a step into the flow";
-  display: flex;
-  border-radius: 5px;
-  justify-content: center;
-  align-items: center;
 }
 #step-flow button.add-step-button-flow {
   position: absolute;
@@ -841,23 +858,24 @@ button.button.save-button {
   width: max-content;
   background-color: #6c19ad;
 }
-#step-flow .sortable-item + .step-branch.benchmarks,
-#step-flow .sortable-item + .sortable-item,
-#step-flow .step-branch.benchmarks + .step-branch.benchmarks,
-#step-flow .step-branch.benchmarks + .sortable-item {
-  position: relative;
+#step-flow .sortable-item.logic,
+#step-flow .sortable-item.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-#step-flow .sortable-item + .step-branch.benchmarks::after,
-#step-flow .sortable-item + .sortable-item::after,
-#step-flow .step-branch.benchmarks + .step-branch.benchmarks::after,
-#step-flow .step-branch.benchmarks + .sortable-item::after {
-  position: absolute;
-  content: "";
+#step-flow .sortable-item:first-child > .flow-line:first-child {
+  display: none;
+}
+#step-flow .sortable-item:last-child > .flow-line:last-child {
+  display: none;
+}
+#step-flow .flow-line {
   border-right: 2px var(--logic-line-style) #9ece38;
-  z-index: 1;
-  top: -51px;
-  height: 52px;
-  left: 50%;
+  height: 40px;
+}
+#step-flow .step.action + .flow-line {
+  height: 20px;
 }
 #step-flow .step {
   border-radius: 5px;
@@ -1025,7 +1043,7 @@ button.button.save-button {
 #step-flow .step.step-placeholder {
   justify-content: center;
   padding: 20px 40px;
-  width: min-content;
+  width: 200px !important;
 }
 #step-flow .step.has-errors.editing {
   outline-color: #ffee58 !important;

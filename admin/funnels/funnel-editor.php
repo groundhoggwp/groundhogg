@@ -78,13 +78,13 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				continue;
 			}
 
-            $classes = [
-                'step-element step-draggable'
-            ];
+			$classes = [
+				'step-element step-draggable'
+			];
 
-            if ( $step->is_premium() && ! is_pro_features_active() ){
-                $classes[] = 'premium';
-            }
+			if ( $step->is_premium() && ! is_pro_features_active() ) {
+				$classes[] = 'premium';
+			}
 
 			?>
         <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-name="<?php esc_attr_e( $step->get_name() ); ?>">
@@ -202,20 +202,30 @@ function render_draggable_step_grid( $steps, $groups = true ) {
             <div id="step-settings-inner">
                 <div id="add-steps">
                     <div class="steps-select">
-                        <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
+                        <div class="display-flex gap-10 stretch space-below-10">
+                            <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
+                            <div class="gh-input-group full-width" style="background-color: #fff;">
+                                <button class="gh-button step-filter full-width current" data-group="all">All</button>
+                                <button class="gh-button step-filter full-width" data-group="benchmark">Benchmarks</button>
+                                <button class="gh-button step-filter full-width" data-group="logic">Logic</button>
+                                <button class="gh-button step-filter full-width" data-group="action">Actions</button>
+                            </div>
+                        </div>
+
                         <div class="steps-grid">
-	                        <?php
-	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
+							<?php
 
-	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
+							render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
 
-	                        render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
-	                        ?>
+							render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
+
+							render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
+							?>
                         </div>
                     </div>
                 </div>
                 <div class="step-settings <?php echo force_custom_step_names() ? 'custom-step-names' : 'generated-step-names' ?>">
-				    <?php $funnel->step_settings() ?>
+					<?php $funnel->step_settings() ?>
                 </div>
             </div>
         </div>

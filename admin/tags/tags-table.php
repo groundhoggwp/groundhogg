@@ -85,7 +85,7 @@ class Tags_Table extends Table {
 	 */
 	protected function column_tag_name( $tag ) {
 		$editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() );
-		$html    = "<a class='row-title' href='$editUrl'>" . esc_html( $tag->get_name() ) . "</a>";
+		$html    = "<a class='pill tag' href='$editUrl'>" . esc_html( $tag->get_name() ) . "</a>";
 
 		return $html;
 	}

@@ -140,7 +140,7 @@ class Apply_Note extends Action {
 		] );
 
 		$event->set_args( [
-			'task_id' => $note->ID
+			'note' => $note->ID
 		] );
 
 		return true;

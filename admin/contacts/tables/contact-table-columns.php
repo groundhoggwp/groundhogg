@@ -9,6 +9,7 @@ use Groundhogg\Preferences;
 use Groundhogg\Tag;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\contact_filters_link;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_gh_page_screen_id;
@@ -406,13 +407,13 @@ class Contact_Table_Columns {
 	protected static function column_tags( Contact $contact ) {
 
 		?>
-        <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
+        <div class="gh-tags" style="gap: 5px" title="<?php esc_attr_e( 'Tags' ); ?>">
 			<?php
 			$tags = $contact->get_tags();
 
 			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
-				$tag = new Tag( $tag ) ?><span
-                    class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+				$tag = new Tag( $tag ) ?><a
+                    class="gh-tag" href="<?php echo admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->tag_id ] ) ?>"><?php esc_html_e( $tag->get_name() ); ?></a><?php endforeach; ?>
 			<?php if ( count( $tags ) > 0 ): ?>
 				<?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
 			<?php endif; ?>

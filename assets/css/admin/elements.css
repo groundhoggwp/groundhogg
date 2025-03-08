@@ -785,6 +785,12 @@ a.action-link {
   padding: 3px 8px;
   color: #102640;
 }
+.pill.tag {
+  background-color: #f2f2f2;
+}
+.pill.tag:is(a):hover {
+  background-color: rgba(16, 38, 64, 0.15);
+}
 .pill.attention, .pill.yellow {
   background: rgba(255, 238, 88, 0.5);
   color: #3f3800;
@@ -1825,6 +1831,17 @@ input.ui-autocomplete-input.focus-visible {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+.gh-input-group > .gh-picker-container:not(:first-child) > .gh-picker,
+.input-wrap > .gh-picker-container:not(:first-child) > .gh-picker {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+}
+.gh-input-group > .gh-picker-container:not(:last-child) > .gh-picker,
+.input-wrap > .gh-picker-container:not(:last-child) > .gh-picker {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
 
 p.error,
 .commit-errors {
@@ -2034,6 +2051,7 @@ button:has(.gh-dropdown-menu) {
 .gh-tags button.add-tag .dashicons {
   margin: 0;
 }
+.gh-tags a.gh-tag,
 .gh-tags span.gh-tag {
   background: #f2f2f2;
   padding: 3px 9px;
@@ -2042,20 +2060,25 @@ button:has(.gh-dropdown-menu) {
   font-size: 12px;
   display: flex;
   align-items: center;
+  color: #102640;
 }
+.gh-tags a.gh-tag.remove,
 .gh-tags span.gh-tag.remove {
   background: rgba(233, 31, 79, 0.5);
   color: #4e0818;
 }
+.gh-tags a.gh-tag.adding,
 .gh-tags span.gh-tag.adding {
   background: rgba(158, 206, 56, 0.5);
   color: #334310;
 }
+.gh-tags a.gh-tag .dashicons,
 .gh-tags span.gh-tag .dashicons {
   margin-right: -6px;
   cursor: pointer;
   border-radius: 3px;
 }
+.gh-tags a.gh-tag .dashicons:hover,
 .gh-tags span.gh-tag .dashicons:hover {
   background-color: rgba(16, 38, 64, 0.05);
 }

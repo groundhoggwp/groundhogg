@@ -427,58 +427,48 @@ class Event extends Base_Object {
 			return new WP_Error( 'not_waiting', 'This event\'s status is not waiting' );
 		}
 
+		$step = $this->get_step();
+
 		do_action( 'groundhogg/event/run/before', $this );
 
 		$this->in_progress();
 
 		// No step or not contact?
-		if ( ! $this->get_step() || ! $this->get_contact() || ! $this->get_contact()->exists() ) {
-
-			$error = new \WP_Error( 'missing', 'Could not locate contact or step record.' );
-
-			$this->add_error( $error );
-
-			$this->fail();
-
-			return apply_filters( 'groundhogg/event/run/failed_result', $error, $this );
+		if ( ! $step || ! $this->get_contact() || ! $this->get_contact()->exists() ) {
+			$result = new WP_Error( 'missing', 'Could not locate contact or step record.' );
+		} else {
+			try {
+				$result = $step->run( $this->get_contact(), $this );
+			} catch ( \Exception $e ) {
+				$result = new WP_Error( 'exception', $e->getMessage() );
+			}
 		}
 
-		try {
-			$result = $this->get_step()->run( $this->get_contact(), $this );
-		} catch ( \Exception $e ) {
-			$result = new WP_Error( 'exception', $e->getMessage() );
-		}
-
-		// Hard fail when WP Error
-		if ( is_wp_error( $result ) ) {
-			/* handle event failure */
-			$this->add_error( $result );
-
-			$this->fail();
-
-			return apply_filters( 'groundhogg/event/run/failed_result', $result, $this );
-		}
-
-		// Falsy value from the run() method
-		if ( $result === false ) {
+		// skipped
+		if ( $result === false ){
 
 			// Update the error code details with the reason this event was skipped
 			$this->skip( [
 				'error_code'    => 'soft_fail',
 				'error_message' => 'Falsy value returned from Step::run() method'
 			] );
+		}
+		// error
+		elseif ( is_wp_error( $result ) ){
 
-			/**
-			 * We have decided that a "Soft Fail" (Falsy value from the run() method) will allow funnel events to proceed to the next step
-			 * instead of stopping the funnel.
-			 */
-			$result = apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
+			/* handle event failure */
+			$this->add_error( $result );
+
+			$this->fail();
+		}
+		// Everything else is good
+		else {
+
+			$this->complete();
 		}
 
-		$this->complete();
-
-		if ( method_exists( $this->get_step(), 'run_after' ) ) {
-			call_user_func( [ $this->get_step(), 'run_after' ], $this->get_contact(), $this );
+		if ( ! is_wp_error( $result ) && method_exists( $step, 'run_after' ) ) {
+			call_user_func( [ $step, 'run_after' ], $this->get_contact(), $this );
 		}
 
 		do_action( 'groundhogg/event/run/after', $this );
@@ -568,10 +558,10 @@ class Event extends Base_Object {
 	public function skip( $args = [] ) {
 		do_action( 'groundhogg/event/skipped', $this );
 
-		return $this->update( wp_parse_args( $args, [
+		return $this->update( array_merge( [
 			'status'         => self::SKIPPED,
 			'time_scheduled' => time(),
-		] ) );
+		], $args ) );
 	}
 
 	/**

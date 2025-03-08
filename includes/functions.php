@@ -8680,7 +8680,7 @@ function add_self_removing_filter( string $filter, callable $callback, int $prio
  * @return bool
  */
 function add_event_args( $args = [] ) {
-	if ( \Groundhogg\event_queue()::is_processing() ) {
+	if ( ! \Groundhogg\event_queue()::is_processing() ) {
 		return false;
 	}
 

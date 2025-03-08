@@ -138,8 +138,10 @@ class Manager {
 			$this->add_step( new Premium\Logic\Split_Path() );
 			$this->add_step( new Premium\Logic\Split_Test() );
 			$this->add_step( new Premium\Logic\Weighted_Distribution() );
+			$this->add_step( new Premium\Logic\Evergreen_Sequence() );
 			$this->add_step( new Premium\Logic\Logic_Loop() );
 			$this->add_step( new Premium\Logic\Logic_Skip() );
+//			$this->add_step( new Premium\Logic\Timer_Skip() );
 
 		}
 
