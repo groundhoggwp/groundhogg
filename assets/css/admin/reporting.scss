@@ -509,6 +509,7 @@ table.groundhogg-report-table td:last-child {
   display: flex;
   padding: 0 25px;
   align-items: stretch;
+  justify-content: space-evenly;
 
   --spacer-height: 20px;
   --stage-height: 60px;
@@ -540,8 +541,9 @@ table.groundhogg-report-table td:last-child {
     align-items: center;
     justify-content: center;
     //gap: 10px;
-    flex-grow: 1;
+    //flex-grow: 1;
     font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+    width: 50%;
 
     .stage-percentage {
       display: flex;

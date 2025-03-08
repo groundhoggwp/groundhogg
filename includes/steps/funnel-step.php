@@ -671,15 +671,19 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             </div>
             <?php if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
                 <div class="step-reporting">
-                    <div class="stat-wrap">
-                        <div class="gh-tooltip top">Pending</div>
-                        <?php dashicon_e( 'hourglass' ); ?>
-                        <div class="waiting"></div>
+                    <div class="display-flex flex-end full-width">
+                        <div class="stat-wrap">
+                            <div class="gh-tooltip top">Pending</div>
+		                    <?php dashicon_e( 'hourglass' ); ?>
+                            <div class="waiting"></div>
+                        </div>
                     </div>
-                    <div class="stat-wrap">
-                        <div class="gh-tooltip top">Completed</div>
-	                    <?php dashicon_e( 'admin-users' ); ?>
-                        <div class="complete"></div>
+                    <div class="display-flex flex-start full-width">
+                        <div class="stat-wrap">
+                            <div class="gh-tooltip top">Completed</div>
+		                    <?php dashicon_e( 'admin-users' ); ?>
+                            <div class="complete"></div>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>

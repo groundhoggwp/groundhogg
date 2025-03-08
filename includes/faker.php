@@ -271,7 +271,7 @@ class Faker {
 			$event = new Event();
 			$event->create( $event_args );
 
-			$next = $step->get_next_action( $event );
+			$next = $step->get_next_action( $contact );
 
 			switch ( $step->get_type() ) {
 				case 'send_email':

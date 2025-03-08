@@ -1293,13 +1293,21 @@ button.button.save-button {
 
     .step-reporting {
       display: flex;
-      justify-content: center;
-      gap: 67px;
+      //justify-content: center;
+      //gap: 67px;
       position: absolute;
       top: 0;
       /* left: 50%; */
       width: 100%;
       transform: translateY(-50%);
+
+      .flex-start {
+        padding-left: 30px;
+      }
+
+      .flex-end {
+        padding-right: 30px;
+      }
 
       div.stat-wrap {
         display: flex;

@@ -193,7 +193,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function _is_locked() {
-		if ( $this->is_locked ){
+		if ( $this->is_locked ) {
 			return true;
 		}
 
@@ -217,7 +217,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 * Filter the locking
 		 *
 		 * @param $locked bool whether the step is locked
-		 * @param $step Step the step
+		 * @param $step   Step the step
 		 */
 		return apply_filters( 'groundhogg/step/is_locked', $this->_is_locked(), $this );
 	}
@@ -438,7 +438,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return array_filter( $steps, function ( Step $step ) use ( $type ) {
 			return $step->is_before( $this ) && $step->type_is( $type ) && $step->is_action();
-		});
+		} );
 	}
 
 	/**
@@ -500,11 +500,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * - if logic, do the logic function to get the correct child action, if there is not one available reconnect with main branch
 	 * - if the current steps is an action, get the next step of any type and handle accordingly.
 	 *
-	 * @param Event $event
+	 * @param Contact $contact
 	 *
 	 * @return Step|false
 	 */
-	public function get_next_action( Event $event ) {
+	public function get_next_action( Contact $contact ) {
+		return apply_filters( 'groundhogg/step/next_action', $this->__get_next_action( $contact ), $this );
+	}
+
+	public function __get_next_action( $contact ) {
 
 		if ( $this->is_benchmark() ) { // benchmarks
 
@@ -520,12 +524,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 			$next = $query->get_objects( Step::class );
 
-			$next = ! empty( $next ) ? $next[0] : false; // any proceeding action
+			$next = ! empty( $next ) ? $next[0] : false; // first proceeding action
 
 		} else if ( $this->is_logic() ) { // logic
 
 			// must do logic things to get the next action within a branch
-			$next = $this->get_step_element()->get_logic_action( $event->get_contact() );
+			$next = $this->get_step_element()->get_logic_action( $contact );
 
 			// no steps in the branch (the branch was empty)
 			// thus, we continue on in the current branch
@@ -539,25 +543,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$next = $this->get_next_step();
 		}
 
-		// exit condition
-		if ( $next === false || $next->is_action() ) {
-			/**
-			 * Filter the next action, used by loop and other steps...
-			 *
-			 * @param Step $next the next step top be enqueued
-			 * @param Step $current the current step being processed
-			 */
-			return apply_filters( 'groundhogg/step/next_action', $next, $this );
+		// not step found
+		if ( $next === false ) {
+			return false;
 		}
 
-		// if the next step we get is a benchmark, if it's not passthru exit
+		// benchmark but can't pass thru
 		if ( ! $next->can_passthru() ) {
 			return false;
 		}
 
+		// actions are always valid
+		if ( $next->is_action() ) {
+			return $next;
+		}
+
 		// recursive, kind of.
 		// if we get here, either a logic or a benchmark with passthru enabled
-		return $next->get_next_action( $event );
+		return $next->__get_next_action( $contact );
 	}
 
 	/**
@@ -606,7 +609,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$parts     = explode( '-', $this->branch );
 		$parent_id = absint( $parts[0] );
 
-		if ( ! $parent_id ){
+		if ( ! $parent_id ) {
 			return false;
 		}
 
@@ -689,7 +692,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function is_same_parent( Step $prev_step ) {
-		$parent = $this->get_parent_step();
+		$parent  = $this->get_parent_step();
 		$parent2 = $prev_step->get_parent_step();
 
 		if ( ! is_a( $parent, Step::class ) || ! is_a( $parent2, Step::class ) ) {
@@ -764,7 +767,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 * Filter whether this step is considered a "timer"
 		 *
 		 * @param $is_timer bool whether the step is a timer
-		 * @param $step Step the current step
+		 * @param $step     Step the current step
 		 */
 		return apply_filters( 'groundhogg/step/is_timer', in_array( $this->get_type(), [ 'delay_timer', 'date_timer', 'advanced_timer', 'field_timer' ] ), $this );
 	}
@@ -833,7 +836,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$pa = $this->get_parent_step();
 		$pb = $other->get_parent_step();
 
-		if ( ! $pa || ! $pb ){
+		if ( ! $pa || ! $pb ) {
 			// can't be in parallel cus guess want, it's the main branch lol!
 			return false;
 		}
@@ -957,6 +960,16 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function enqueue( $contact, $skip_enqueued = true, $args = [] ) {
+
+		// logic steps can't be enqueued, only their children or what they point to can be enqueued...
+		if ( $this->is_logic() ) {
+			$next = $this->get_next_action( $contact );
+			if ( $next === false ) {
+				return false;
+			}
+
+			return $next->enqueue( $contact, $skip_enqueued, $args );
+		}
 
 		$this->enqueued_contact = $contact;
 
@@ -1150,9 +1163,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return true;
 		}
 
-		if ( array_all( $this->get_preceding_steps(), function ( Step $step ){
+		if ( array_all( $this->get_preceding_steps(), function ( Step $step ) {
 			return $step->is_benchmark();
-		} ) ){
+		} ) ) {
 			return true;
 		}
 
@@ -1228,7 +1241,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function run_after( $contact, $event ) {
 
-		$next = $this->get_next_action( $event );
+		$next = $this->get_next_action( $contact );
 
 		if ( $next && is_a( $next, Step::class ) ) {
 
@@ -1248,12 +1261,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$type = $this->get_type();
 
-		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ){
-			if ( $this->is_benchmark() ){
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ) {
+			if ( $this->is_benchmark() ) {
 				return new Polyfill_Benchmark( $this );
 			}
 
-			if ( $this->is_action() ){
+			if ( $this->is_action() ) {
 				return new Polyfill_Action( $this );
 			}
 
@@ -1413,13 +1426,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function pull() {
 		$this->is_temp_merged = false;
+
 		return parent::pull();
 	}
 
 	public function maybe_pull() {
-		if ( $this->is_temp_merged ){
+		if ( $this->is_temp_merged ) {
 			return $this->pull();
 		}
+
 		return false;
 	}
 
@@ -1440,7 +1455,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$was_merged = false;
 
 		// pull first if changes were previously merged
-		if ( $this->is_temp_merged ){
+		if ( $this->is_temp_merged ) {
 			$this->pull();
 			$was_merged = true;
 		}
@@ -1458,7 +1473,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'changes' => $changes,
 		] );
 
-		if ( $was_merged ){
+		if ( $was_merged ) {
 			$this->merge_changes();
 		}
 
@@ -1494,10 +1509,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$meta_changes = [];
 
 		if ( $this->has_changes() ) {
-			$changes      = $this->changes;
+			$changes = $this->changes;
 
 			// delete the step if it was "deleted"
-			if ( isset_not_empty( $changes, 'is_deleted' ) ){
+			if ( isset_not_empty( $changes, 'is_deleted' ) ) {
 				// using parent avoids having to work around is_active()
 				return parent::delete(); // todo maybe we do special handling with $this->delete() instead?
 			}
@@ -1507,7 +1522,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
 		}
 
-		$data_changes['changes'] = []; // clear the changes
+		$data_changes['changes']        = []; // clear the changes
 		$data_changes['date_committed'] = ( new DateTimeHelper() )->ymdhis();
 
 		if ( ! empty( $meta_changes ) ) {

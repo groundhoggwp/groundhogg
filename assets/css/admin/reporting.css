@@ -415,6 +415,7 @@ table.groundhogg-report-table td:last-child {
   display: flex;
   padding: 0 25px;
   align-items: stretch;
+  justify-content: space-evenly;
   --spacer-height: 20px;
   --stage-height: 60px;
 }
@@ -437,8 +438,8 @@ table.groundhogg-report-table td:last-child {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-grow: 1;
   font-family: "Helvetica Neue", Helvetica, Arial, Lucida Grande, sans-serif;
+  width: 50%;
 }
 #chart_funnel_breakdown div.funnel-stages .stage-percentage {
   display: flex;

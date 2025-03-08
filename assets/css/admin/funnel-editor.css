@@ -892,13 +892,17 @@ button.button.save-button {
 }
 #step-flow .step .step-reporting {
   display: flex;
-  justify-content: center;
-  gap: 67px;
   position: absolute;
   top: 0;
   /* left: 50%; */
   width: 100%;
   transform: translateY(-50%);
+}
+#step-flow .step .step-reporting .flex-start {
+  padding-left: 30px;
+}
+#step-flow .step .step-reporting .flex-end {
+  padding-right: 30px;
 }
 #step-flow .step .step-reporting div.stat-wrap {
   display: flex;
