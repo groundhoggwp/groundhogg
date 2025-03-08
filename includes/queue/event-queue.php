@@ -249,12 +249,7 @@ class Event_Queue extends Supports_Errors {
 					switch_to_locale( $contact->get_locale() );
 				}
 
-				error_log( "Running event $event->ID" );
-
-				$result = $event->run();
-
-				// todo remove this
-				error_log( "Running event $event->ID and result is " . print_r( $result, true ) );
+				$event->run();
 
 				if ( $event->has_errors() ) {
 					$this->add_error( $event->get_last_error() );
