@@ -12,6 +12,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\sanitize_field_map;
 
 /**
  * Created by PhpStorm.
@@ -163,7 +164,7 @@ abstract class Form_Integration extends Benchmark {
 						return [];
 					}
 
-					return array_filter( map_deep( $value, 'sanitize_key' ) );
+					return sanitize_field_map( $value );
 				}
 			]
 		];

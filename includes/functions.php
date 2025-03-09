@@ -2332,6 +2332,36 @@ function get_mappable_fields( $extra = [] ) {
 }
 
 /**
+ * Given an array that would be used for mapping fields, properly sanitize it
+ *
+ * @param $field_map
+ *
+ * @return array
+ */
+function sanitize_field_map( $field_map ){
+
+    // get mappable fields without the groups
+    $mappable_fields = array_reduce( get_mappable_fields(), function( $fields, $group ){
+        return array_merge( $fields, $group );
+    }, [] );
+
+    $new_map = [];
+
+    foreach ( $field_map as $from => $to ){
+
+        // trying to map to a field that is not registered
+        if ( ! key_exists( $to, $mappable_fields ) ){
+            continue;
+        }
+
+        $new_map[sanitize_text_field($from)] = $to;
+
+    }
+
+    return $new_map;
+}
+
+/**
  * Given a key, get the display name of that key
  *
  * @param string $key the key

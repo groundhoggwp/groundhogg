@@ -4,10 +4,16 @@ namespace Groundhogg\Steps\Premium;
 
 use Groundhogg\Contact;
 use function Groundhogg\html;
+use function Groundhogg\is_pro_features_active;
 
 trait Trait_Premium_Step {
 
 	public function run( $contact, $event ) {
+
+		if ( is_pro_features_active() ) {
+			return true;
+		}
+
 		//do nothing
 		return new \WP_Error( 'premium', 'This step requires a premium license.' );
 	}

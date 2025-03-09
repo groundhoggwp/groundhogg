@@ -1139,9 +1139,11 @@
             Groundhogg.EmailEditor({
               email,
               onSave : email => {
+                email_id = email.ID
                 Funnel.updateStepMeta({
-                  email_id: email.ID,
+                  email_id,
                 })
+                setTimeout(morphPreview, 100)
               },
               onClose: close,
             })
