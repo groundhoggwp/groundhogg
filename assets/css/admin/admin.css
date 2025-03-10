@@ -1235,6 +1235,61 @@ table .column-steps div.step-icon img {
   border-color: var(--color-dark-800);
 }
 
+.tour-prompt {
+  background: #fff;
+  border-radius: 10px;
+  z-index: 1000;
+  border: 1px solid #102640;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.tour-prompt button.dismiss {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  border: none;
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+}
+.tour-prompt .gh-text {
+  font-weight: 500;
+}
+.tour-prompt.right {
+  border-top-left-radius: 0;
+}
+.tour-prompt.left {
+  border-top-right-radius: 0;
+}
+.tour-prompt.above {
+  border-bottom-left-radius: 0;
+}
+.tour-prompt.below {
+  border-top-left-radius: 0;
+}
+.tour-prompt.below-left {
+  border-top-right-radius: 0;
+}
+
+.tour-highlighted {
+  z-index: 99 !important;
+  position: relative;
+  --gap: -10px;
+}
+.tour-highlighted::after {
+  content: "";
+  position: absolute;
+  top: var(--gap);
+  left: var(--gap);
+  right: var(--gap);
+  bottom: var(--gap);
+  background: transparent;
+  box-shadow: 0 0 200px 100px #102640 !important;
+  border-radius: 10px;
+}
+
 [data-gh-href] {
   cursor: pointer;
 }

@@ -1217,18 +1217,18 @@
               content,
             } = State
 
-            if ( ! content ){
+            if (!content) {
               errorDialog({
-                message: 'Please add a message.'
+                message: 'Please add a message.',
               })
-              return false;
+              return false
             }
 
-            if ( ! to.length ){
+            if (!to.length) {
               errorDialog({
-                message: 'Please add a least one recipient.'
+                message: 'Please add a least one recipient.',
               })
-              return false;
+              return false
             }
 
             State.set({ sending: true })
@@ -2472,6 +2472,176 @@
     ...overrides,
   })
 
+  function getClosestRelativeAncestor (element) {
+    let parent = element.parentElement
+
+    while (parent) {
+      if (window.getComputedStyle(parent).position === 'relative') {
+        return parent // Found the closest relative ancestor
+      }
+      parent = parent.parentElement // Move up the tree
+    }
+
+    return null // No relative ancestor found
+  }
+
+  const Tour = (steps, {
+    onFinish = () => {},
+    onDismiss = () => {},
+  }) => {
+
+    const State = Groundhogg.createState({
+      current  : 0,
+      currentEl: null,
+    })
+
+    const currentStep = () => steps[State.current]
+    const removeSteps = () => {
+      document.querySelectorAll('.tour-prompt').forEach(el => el.remove())
+      document.querySelectorAll('.tour-highlighted').forEach(el => el.classList.remove('tour-highlighted'))
+    }
+
+    const dismiss = () => {
+      removeSteps()
+      onDismiss()
+    }
+
+    const next = () => {
+
+      const { onNext = () => {} } = currentStep()
+      onNext()
+
+      if (State.current + 1 >= steps.length) {
+        removeSteps()
+        onFinish(true)
+        return
+      }
+
+      State.current++
+      showStep()
+    }
+
+    const prev = () => {
+
+      const { onPrev = () => {} } = currentStep()
+      onPrev()
+
+      if (State.current <= 0) {
+        // can't go back
+        return
+      }
+
+      State.current--
+      showStep()
+    }
+
+    const showStep = () => {
+      removeSteps() // remove other prompts
+      // create a new prompt
+      positionStep()
+    }
+
+    function positionStep () {
+
+      let stepEl = TourStep()
+      let {
+        target,
+        position,
+        onInit = () => {},
+        onBefore = () => {}
+      } = currentStep()
+
+      target = document.querySelector(target)
+
+      if ( ! target ){
+        next()
+        return;
+      }
+
+      let relative = getClosestRelativeAncestor(target)
+      relative.append(stepEl)
+
+      onBefore({
+        next,
+        prev,
+        target,
+        relative,
+        step: stepEl,
+        currentStep
+      })
+
+      stepEl.style.position = 'absolute'
+      // stepEl.style.zIndex = '100'
+      target.classList.add( 'tour-highlighted' )
+
+      const targetPos = target.getBoundingClientRect()
+      const relativePos = relative.getBoundingClientRect()
+      const stepPos = stepEl.getBoundingClientRect()
+
+      switch (position) {
+        case 'right':
+          stepEl.style.left = `${ targetPos.right - relativePos.left + 10 }px`
+          stepEl.style.top = `${ targetPos.top - relativePos.top }px`
+          break
+        case 'left':
+          stepEl.style.left = `${ targetPos.left - relativePos.left - stepPos.width - 10 }px`
+          stepEl.style.top = `${ targetPos.top - relativePos.top }px`
+          break
+        case 'above':
+          stepEl.style.left = `${ targetPos.left - relativePos.left }px`
+          stepEl.style.top = `${ targetPos.top - relativePos.top - stepPos.height - 10 }px`
+          break
+        case 'below':
+          stepEl.style.left = `${ targetPos.left - relativePos.left }px`
+          stepEl.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          break
+        case 'below-left':
+          stepEl.style.left = `${ targetPos.right - relativePos.left - stepPos.width }px`
+          stepEl.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          break
+      }
+
+      onInit({
+        next,
+        prev,
+        target,
+        relative,
+        step: stepEl,
+        currentStep
+      })
+
+      stepEl.querySelector('#tour-next').focus()
+    }
+
+    const TourStep = () => MakeEl.Div({
+      className: `tour-prompt ${currentStep().position}`,
+      style    : {
+        padding: '10px',
+        width  : '200px',
+      },
+    }, [
+      MakeEl.Button({
+        className: 'dismiss',
+        onClick: e => dismiss()
+      }, MakeEl.Dashicon('no-alt')),
+      MakeEl.Div({}, currentStep().prompt),
+      MakeEl.Div({ className: 'display-flex flex-end gap-5 space-above-10' }, [
+        State.current > 0 ? MakeEl.Button({
+          id: 'tour-prev',
+          className: 'gh-button small secondary text prev-step',
+          onClick  : () => prev(),
+        }, 'Prev') : null,
+        currentStep().showNext === false ? null : MakeEl.Button({
+          id: 'tour-next',
+          className: 'gh-button small secondary next-step',
+          onClick  : () => next(),
+        }, State.current < steps.length - 1 ? 'Next' : 'finish'),
+      ]),
+    ])
+
+    positionStep()
+  }
+
   Groundhogg.components = {
     QuickSearch,
     addContactModal,
@@ -2495,6 +2665,7 @@
     Panels,
     Relationships,
     OwnerPicker,
+    Tour,
   }
 
 } )(jQuery)

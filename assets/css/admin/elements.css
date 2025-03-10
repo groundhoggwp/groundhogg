@@ -862,6 +862,12 @@ span.gh-text.orange,
 span.gh-text.warning {
   color: #f58115;
 }
+svg.purple,
+p.gh-text.purple,
+pre.gh-text.purple,
+span.gh-text.purple {
+  color: #6c19ad;
+}
 svg.green,
 p.gh-text.green,
 pre.gh-text.green,

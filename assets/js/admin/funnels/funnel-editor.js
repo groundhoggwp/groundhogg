@@ -84,8 +84,11 @@
 
     $.extend(Funnel, {
 
-      sortables: null,
-      editing  : false,
+      sortables      : null,
+      editing        : false,
+      addCurrentGroup: 'all',
+      addSearch      : '',
+      addEl          : null,
 
       stepCallbacks: {},
 
@@ -175,8 +178,9 @@
           self.showSettings()
         })
 
-        $document.on('click', '.step-branch', e => {
+        $document.on('click', '#step-flow', e => {
           if (!Groundhogg.element.clickedIn(e, '.step,.add-step')) {
+            this.clearAddEl()
             this.startEditing(null)
             this.hideSettings()
           }
@@ -186,7 +190,7 @@
           $(`.select-step`).addClass('visible')
 
           // filter by addGroup
-          if ( this.addCurrentGroup !== 'all' ){
+          if (this.addCurrentGroup !== 'all') {
             $(`.select-step:not(:has([data-group="${ this.addCurrentGroup }" i]))`).removeClass('visible')
           }
 
@@ -195,10 +199,16 @@
           }
         }
 
-        $('button.step-filter').on('click', e => {
+        const setCurrentGroupButtonToCurrent = () => {
           $('button.step-filter').removeClass('current')
-          e.currentTarget.classList.add('current')
+          $(`button.step-filter[data-group="${ this.addCurrentGroup }"]`).addClass('current')
+        }
+
+        $document.on('click', 'button.step-filter:not(.current)', e => {
           this.addCurrentGroup = e.currentTarget.dataset.group
+          setCurrentGroupButtonToCurrent()
+          this.addSearch = ''
+          $('#step-search').val('')
           filterStepTypes()
         })
 
@@ -253,6 +263,18 @@
           this.addEl.classList.add('here')
           this.showAddStep()
 
+          if (this.addEl.matches('.add-benchmark')) {
+            this.addCurrentGroup = 'benchmark'
+            setCurrentGroupButtonToCurrent()
+            filterStepTypes()
+          }
+
+          if (this.addEl.matches('.add-action')) {
+            this.addCurrentGroup = 'action'
+            setCurrentGroupButtonToCurrent()
+            filterStepTypes()
+          }
+
           setTimeout(() => {
             scrollIntoViewIfNeeded(this.addEl, document.querySelector(`.fixed-inside`))
           }, 300)
@@ -277,16 +299,15 @@
 
           let placeholder = createPlaceholderEl(data)
 
-          this.addEl.replaceWith(placeholder)
-
-          this.addEl = null
+          this.addEl.insertAdjacentElement('beforebegin', placeholder)
 
           drawLogicLines()
 
-          // return;
-
           this.save(true).then(() => {
-            // this.startEditing(null)
+            if (this.addEl) {
+              this.addEl = document.getElementById(this.addEl.id)
+              this.addEl.classList.add('here')
+            }
           })
         })
 
@@ -609,9 +630,9 @@
           })
         })
 
-        if (!this.steps.length) {
-          this.showAddStep()
-        }
+        setTimeout(() => {
+
+        }, 100)
       },
 
       async save (args = {}) {
@@ -889,7 +910,7 @@
         }
 
         // deleting the branch will delete inner steps
-        if ($sortable.is('.branch-logic') && $sortable.find( '.step-branch .step' ).length > 0) {
+        if ($sortable.is('.branch-logic') && $sortable.find('.step-branch .step').length > 0) {
           dangerConfirmationModal({
             alert    : '<p>Are you sure you want to delete this step? Any steps in branches will also be deleted.</p>',
             onConfirm: () => deleteStep(),
@@ -1017,7 +1038,7 @@
         return this.editing == id
       },
 
-      clearAddEl(){
+      clearAddEl () {
         if (this.addEl) {
           this.addEl.classList.remove('here')
         }
@@ -1098,11 +1119,290 @@
         $(document).trigger('gh-init-pickers')
         $(document).trigger('step-active')
       },
+
+      startTour () {
+
+        // the funnel tour was dismissed already
+        if ( this.funnelTourDismissed ){
+          // return;
+        }
+
+        Groundhogg.components.Tour([
+          {
+            prompt  : `This is step flow. Your funnels are made up of a series of steps. Steps can be <span class="gh-text orange">benchmarks</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
+            position: 'right',
+            target  : '#step-sortable',
+            onInit  : ({
+              target,
+            }) => {
+              target.click()
+            },
+          },
+          {
+            prompt  : '👈 Click on any ➕ icon to start adding new steps to a funnel. Once clicked the icon will become highlighted and new steps can be added at that position.',
+            position: 'right',
+            target  : 'button.add-step',
+            onInit  : ({
+              target,
+            }) => {
+              target.click()
+            },
+          },
+          {
+            prompt  : 'Filter the various types by using the group filters.',
+            position: 'below',
+            target  : '.steps-select .gh-input-group.full-width',
+          },
+          {
+            prompt  : `<span class="gh-text orange">Benchmarks</span> (Goals/Triggers) are used to start funnels and move contacts through funnels when they meet the configured criteria.`,
+            position: 'below',
+            target  : 'button.step-filter[data-group="benchmark"]',
+            onBefore: ({ target }) => target.click(),
+          },
+          {
+            prompt  : `<span class="gh-text green">Actions</span> are used to communicate with the contact and provide your customer experience.`,
+            position: 'below',
+            target  : 'button.step-filter[data-group="action"]',
+            onBefore: ({ target }) => target.click(),
+          },
+          {
+            prompt  : `<span class="gh-text purple">Logic</span> steps are used to provide a different experience to contacts based on their attributes and history.`,
+            position: 'below',
+            target  : 'button.step-filter[data-group="logic"]',
+            onBefore: ({ target }) => target.click(),
+          },
+          {
+            prompt  : 'You can also search for steps using keywords.',
+            position: 'left',
+            target  : '.step-search-wrap',
+          },
+          {
+            prompt  : 'Click on a type to add it to the funnel at the highlighted position 👇',
+            position: 'above',
+            target  : '.steps-grid',
+            onBefore: () => {
+              document.querySelector('button.step-filter[data-group="benchmark"]').click()
+            },
+          },
+          {
+            prompt  : `Let's add a <span class="gh-text orange">Tag Applied</span> benchmark to the flow now by clicking on the icon.`,
+            position: 'right',
+            target  : '#tag_applied',
+            onBefore: ({ target }) => {
+              document.querySelector('button.step-filter[data-group="benchmark"]').click()
+              target.click()
+            },
+          },
+          {
+            prompt  : '👈 Click on a step in the flow to show its settings.',
+            position: 'right',
+            target  : '#step-flow .step',
+            onInit  : ({ target }) => {
+              target.click()
+            },
+          },
+          {
+            prompt  : '👆 You will configure the step settings from here.',
+            position: 'below',
+            target  : '.settings.editing .main-step-settings-panel',
+          },
+          {
+            prompt  : 'Some context specific settings will appear here, as well as the notes area for your personal usage.',
+            position: 'left',
+            target  : '.settings.editing .step-notes',
+          },
+          {
+            prompt  : 'You can collapse the settings panel to see the funnel using the full width of your screen.',
+            position: 'right',
+            target  : '#collapse-settings',
+          },
+          {
+            prompt  : `You can start a funnel with more than one <span class="gh-text orange">benchmark</span> by adding a new benchmark adjacent to an existing one.`,
+            position: 'left',
+            target  : '.add-step.add-benchmark',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's add a new <span class="gh-text orange">User Created</span> benchmark.`,
+            position: 'right',
+            target  : '#account_created',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Now the funnel will start when a tag is applied <span class="gh-text purple">or</span> when a user is created!`,
+            position: 'right',
+            target  : '.step-branch.benchmarks',
+            onBefore: () => this.hideSettings(),
+          },
+          {
+            prompt  : `<span class="gh-text orange">Benchmarks</span> have their own sub-flows that are not part of the main funnel. Only contacts that completed the <span class="gh-text orange">benchmark</span> can run through these steps.`,
+            position: 'left',
+            target  : '.step.benchmark + .step-branch',
+            onBefore: ({}) => {
+              this.hideSettings()
+            },
+          },
+          {
+            prompt  : `Click on the ➕ icon to add an action to the sub-flow.`,
+            position: 'right',
+            target  : '.step.benchmark + .step-branch .add-step',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's add a new <span class="gh-text green">Delay Timer</span> action to the sub flow.`,
+            position: 'right',
+            target  : '#delay_timer',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Now, only contacts that completed the <span class="gh-text orange">Tag Applied</span> benchmark will wait at the <span class="gh-text green">Delay Timer</span>.`,
+            position: 'right',
+            target  : '.step-branch.benchmarks .step.delay_timer',
+            onInit  : ({ target }) => this.hideSettings(),
+          },
+          {
+            prompt  : 'Click here to add a new step to the main funnel. Steps here will run for anyone in the funnel, regardless of where they entered.',
+            position: 'below',
+            target  : '.add-step#end-funnel',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's add a new <span class="gh-text purple">Logic</span> step to send different emails based on a contact's tags.`,
+            position: 'right',
+            target  : '#if_else',
+            onBefore: ({ target }) => {
+              document.querySelector('button.step-filter[data-group="logic"]').click()
+              target.click()
+            },
+          },
+          {
+            prompt  : `Click on the ➕ icon within a logic branch to add steps to it.`,
+            position: 'right',
+            target  : '#step-flow .branch-logic .split-branch.green .step-branch .add-step',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's add a new <span class="gh-text green">Send Email</span> action to the <span class="gh-text green">Yes</span> branch.`,
+            position: 'left',
+            target  : '#send_email',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `We want to send a different email if the contact does not meet our conditions, so click on the ➕ in the No branch.`,
+            position: 'right',
+            target  : '#step-flow .branch-logic .split-branch.red .step-branch .add-step',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's add a new <span class="gh-text green">Send Email</span> action to the <span class="gh-text red">No</span> branch as well.`,
+            position: 'left',
+            target  : '#send_email',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Let's configure the logic condition so that the right contacts get the right email`,
+            position: 'right',
+            target  : '#step-flow .step.if_else',
+            onInit  : ({ target }) => {
+              target.click()
+              setTimeout(() => {
+                target.scrollIntoView({
+                  behavior: 'smooth',
+                  block   : 'center',
+                  inline  : 'center',
+                })
+              }, 250)
+            },
+          },
+          {
+            prompt  : `Use powerful <span class="gh-text purple">filters</span> to send contacts down the different branches. Contacts that match the filters will go down the <span class="gh-text green">Yes</span> branch, otherwise the <span class="gh-text red">No</span> branch.`,
+            position: 'below',
+            target  : '.settings.editing .custom-settings',
+          },
+          {
+            prompt  : `Let's add another <span class="gh-text orange">benchmark</span> that will end the funnel.`,
+            position: 'above',
+            target  : '.add-step#end-funnel',
+            onInit  : ({ target }) => {
+              target.click()
+              document.querySelector('button.step-filter[data-group="benchmark"]').click()
+            },
+          },
+          {
+            prompt  : `Let's end the funnel with a <span class="gh-text orange">Tag Removed</span> benchmark.`,
+            position: 'right',
+            target  : '#tag_removed',
+            onInit  : ({ target }) => target.click(),
+          },
+          {
+            prompt  : `Now if a tag is removed from the contact at any time, they will jump here, ending the funnel.`,
+            position: 'above',
+            target  : '#step-flow .step.tag_removed',
+            onBefore: ({ target }) => {
+              setTimeout(() => {
+                target.focus().scrollIntoView({
+                  behavior: 'smooth',
+                  block   : 'center',
+                  inline  : 'center',
+                })
+              }, 250)
+            },
+            onInit  : () => {
+              this.hideSettings()
+            },
+          },
+          {
+            prompt  : `When you've configured all the steps in your funnel, turn it on by clicking <span class="gh-text green">Activate</span>!`,
+            position: 'below-left',
+            target  : '#funnel-activate',
+          },
+        ], {
+          onFinish: () => {
+            return ajax({
+              action: 'gh_dismiss_notice',
+              notice: 'funnel-tour',
+            })
+          },
+          onDismiss: () => {
+            confirmationModal( {
+              alert: `<p>Are you sure you want to exit the tour?</p>`,
+              onConfirm: () => {
+                return ajax({
+                  action: 'gh_dismiss_notice',
+                  notice: 'funnel-tour',
+                })
+              }
+            } )
+          },
+        })
+      },
     })
 
     $(function () {
       drawLogicLines()
-      Funnel.init()
+      Funnel.init().then(() => {
+
+        // if tour is dismissed, do nothing
+        if ( Funnel.funnelTourDismissed ){
+          return;
+        }
+
+        if ( Funnel.steps.length > 0 ){
+          confirmationModal({
+            alert: `<p>👋 Funnels have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
+            confirmText: 'Start tour!',
+            closeText: 'No thanks',
+            onConfirm: () => {
+              // open a new scratch funnel to start the tour
+              window.open( this.scratchFunnelURL, '_self' )
+            }
+          })
+          return
+        }
+
+        // this is a scratch funnel, let the tour begin!
+        Funnel.startTour()
+      })
     })
 
     window.addEventListener('beforeunload', e => {
@@ -1156,9 +1456,32 @@
     return el
   }
 
+  function getClosestScrollingAncestor (element) {
+    let parent = element.parentElement
+
+    while (parent) {
+      const style = window.getComputedStyle(parent)
+      const overflowY = style.overflowY
+      const isScrollable = ( overflowY === 'auto' || overflowY === 'scroll' ) && parent.scrollHeight > parent.clientHeight
+
+      if (isScrollable) {
+        return parent // Found the closest scrollable ancestor
+      }
+
+      parent = parent.parentElement
+    }
+
+    return document.documentElement // Defaults to <html> if no scrollable ancestor is found
+  }
+
   function scrollIntoViewIfNeeded (element, container) {
+
+    if (!element) {
+      return
+    }
+
     if (!container) {
-      container = element.parentElement
+      container = getClosestScrollingAncestor(element)
     } // Default to parent if no container is provided
 
     const elementRect = element.getBoundingClientRect()
@@ -1196,7 +1519,10 @@
 
     if (!end) {
       end = MakeEl.Fragment([
-        document.body.classList.contains( 'gh_funnels' ) ? Button({ className: 'add-step' }, MakeEl.Dashicon('plus-alt2')) : null,
+        document.body.classList.contains('gh_funnels') ? Button({
+          className: 'add-step',
+          id       : 'end-funnel',
+        }, MakeEl.Dashicon('plus-alt2')) : null,
         Div({ className: 'flow-line' }),
         Div({ className: 'funnel-end' }, Span({ className: 'the-end' }, 'End')),
       ])
@@ -1343,7 +1669,7 @@
     try {
 
       document.querySelectorAll('.logic-line.benchmark-line').forEach(el => el.remove())
-      document.querySelectorAll('.step-branch .step.benchmark').forEach(el => {
+      document.querySelectorAll('.step-branch.benchmarks > .sortable-item').forEach(el => {
 
         // the step-branch.benchmarks container
         let rowPos = el.parentElement.getBoundingClientRect()

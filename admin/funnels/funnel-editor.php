@@ -203,15 +203,16 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                 <div id="add-steps">
                     <div class="steps-select">
                         <div class="display-flex gap-10 stretch space-below-10">
-                            <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
                             <div class="gh-input-group full-width" style="background-color: #fff;">
-                                <button class="gh-button step-filter full-width current" data-group="all">All</button>
+                                <button class="gh-button step-filter full-width" data-group="action">Actions</button>
                                 <button class="gh-button step-filter full-width" data-group="benchmark">Benchmarks</button>
                                 <button class="gh-button step-filter full-width" data-group="logic">Logic</button>
-                                <button class="gh-button step-filter full-width" data-group="action">Actions</button>
+                                <button class="gh-button step-filter full-width current" data-group="all">All</button>
+                            </div>
+                            <div class="step-search-wrap">
+                                <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
                             </div>
                         </div>
-
                         <div class="steps-grid">
 							<?php
 

@@ -225,7 +225,9 @@ class Funnels_Page extends Admin_Page {
 					'save_text'  => __( 'Update', 'groundhogg' ),
 					'export_url' => $funnel->export_url(),
 					'is_active'  => $funnel->is_active(),
-                    'themeStyle' => get_stylesheet_uri()
+                    'themeStyle' => get_stylesheet_uri(),
+                    'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
+                    'scratchFunnelURL' => action_url( 'start_from_scratch' ),
 				] );
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );

@@ -125,6 +125,8 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   --icon-size: 60px;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select #step-search {
+  height: 100%;
+  width: 100%;
   font-size: 14px;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter {
@@ -213,7 +215,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step {
   width: var(--icon-size);
   border-radius: 5px;
-  cursor: grab;
+  cursor: pointer;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step .step-element.premium .step-icon {
   position: relative;
@@ -506,19 +508,16 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   font-weight: 500;
 }
 .funnel-editor-header .title-section {
-  width: 100%;
-  overflow: hidden;
+  margin-right: auto;
 }
 .funnel-editor-header #close #close-button {
   padding: 12px;
 }
-.step-title-view,
 .title-view {
   line-height: 44px;
   font-size: 20px;
   font-weight: 400;
   white-space: nowrap;
-  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -529,11 +528,6 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   line-height: 1em;
   cursor: pointer;
   white-space: nowrap;
-}
-
-.funnel-editor-header div {
-  display: inline-block;
-  vertical-align: top;
 }
 
 .funnel-editor-header div.hidden {
@@ -650,6 +644,9 @@ button.button.save-button {
   box-sizing: border-box;
   position: absolute;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
   background-position: center center;
   background-size: 20px 20px;
@@ -706,6 +703,9 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branches .split-branch {
   position: relative;
 }
+#step-flow .fixed-inside .step-branches .split-branch .step-branch {
+  min-width: 200px;
+}
 #step-flow .fixed-inside .step-branches .split-branch.green > .logic-line {
   border-color: #9ece38;
 }
@@ -749,8 +749,6 @@ button.button.save-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto;
-  min-width: 300px;
   width: min-content;
   position: relative;
 }
@@ -780,12 +778,17 @@ button.button.save-button {
   gap: 30px;
   position: relative;
   padding-bottom: 60px;
+  align-items: flex-start;
+}
+#step-flow .fixed-inside .step-branch.benchmarks > button.add-step {
+  margin-top: 20px;
 }
 #step-flow .fixed-inside .step-branch.benchmarks .benchmark-line.logic-line {
-  border-color: #f58115;
+  border-color: #9ece38;
 }
 #step-flow .fixed-inside .step-branch.benchmarks .benchmark-line.logic-line.passthru {
   border-style: dashed;
+  border-color: #f58115;
 }
 #step-flow .fixed-inside .step-branch.benchmarks .benchmark-line.logic-line > span.path-indicator {
   font-size: 10px;
@@ -857,9 +860,9 @@ button.button.save-button {
   border-radius: 5px;
   width: max-content;
   background-color: #6c19ad;
+  margin-top: 20px;
 }
-#step-flow .sortable-item.logic,
-#step-flow .sortable-item.action {
+#step-flow .sortable-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -995,7 +998,7 @@ button.button.save-button {
 }
 #step-flow .step.active {
   background-color: #fff;
-  background-image: repeating-linear-gradient(-45deg, var(--color-5), var(--color-5) 10px, #fff 10px, #fff 20px);
+  background-image: repeating-linear-gradient(-45deg, var(--color-10), var(--color-10) 10px, #fff 10px, #fff 20px);
 }
 #step-flow .step:hover .actions {
   visibility: visible;
