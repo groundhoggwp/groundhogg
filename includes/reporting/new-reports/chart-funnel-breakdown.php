@@ -34,10 +34,14 @@ class Chart_Funnel_Breakdown extends Base_Report {
 				continue;
 			}
 
+			/**
+			 * @var $prev_step Step
+			 */
+
 			$prev_step = end( $current_group );
 
 			// Check if adjacent or have the same parent
-			if ( $prev_step->get_order() + 1 === $step->get_order() ||
+			if ( $step->is_adjacent_sibling( $prev_step ) ||
 			     ( $step->get_parent_step() !== false && $step->is_same_parent( $prev_step ) ) ) {
 				$current_group[] = $step;
 			} else {

@@ -774,6 +774,26 @@ function array_find( array $array, callable $predicate ) {
 	return false;
 }
 
+/**
+ * Find an item's index in an array based on a predicate
+ *
+ * @param $array     array
+ * @param $predicate callable
+ *
+ * @return mixed|false if item is not found return false
+ */
+function index_of( array $array, callable $predicate ) {
+
+	foreach ( $array as $key => $item ) {
+		if ( call_user_func( $predicate, $item ) ) {
+			return $key;
+		}
+	}
+
+	return false;
+}
+
+
 function should_serialize( $value ) {
 	return is_array( $value ) || is_object( $value );
 }
