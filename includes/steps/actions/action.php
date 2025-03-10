@@ -32,24 +32,4 @@ abstract class Action extends Funnel_Step {
 	final public function get_group() {
 		return self::ACTION;
 	}
-
-	public function sortable_item( $step ) {
-
-		?><div class="sortable-item action"><?php
-
-		if ( $step->get_funnel()->is_editing() ) {
-			$this->add_step_button();
-		}
-
-		?>
-        <div class="flow-line"></div><?php
-
-		parent::sortable_item( $step );
-
-		?>
-        <div class="flow-line"></div><?php
-
-		?></div><?php
-	}
-
 }

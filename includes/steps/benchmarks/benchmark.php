@@ -6,7 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
-use function Groundhogg\array_find;
+use function Groundhogg\index_of;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\process_events;
@@ -243,21 +243,20 @@ abstract class Benchmark extends Funnel_Step {
 	 */
 	public function sortable_item( $step ) {
 
-		$steps = $step->get_funnel()->get_steps();
+		$siblings = $step->get_siblings();
 
-		$prev = array_find( $steps, function ( Step $maybePrev ) use ( $step ) {
-			return $maybePrev->get_order() === $step->get_order() - 1 && $step->is_same_branch( $maybePrev );
+		$index = index_of( $siblings, function ( Step $_step ) use ( $step ) {
+			return $_step->ID === $step->ID;
 		} );
 
-		$next = array_find( $steps, function ( Step $maybePrev ) use ( $step ) {
-			return $maybePrev->get_order() === $step->get_order() + 1 && $step->is_same_branch( $maybePrev );
-		} );
+		$prev = $index > 0 ? $siblings[ $index - 1 ] : null;
+		$next = $index < count( $siblings ) - 1 ? $siblings[ $index + 1 ] : null;
 
 		// if the previous step was not a benchmark, we should open the horizontal benchmark group
 		if ( ! $prev || ! $prev->is_benchmark() ) {
 
 			if ( ! $step->is_starting() ) {
-				$this->add_step_button();
+				$this->add_step_button( 'before-group-' . $step->ID );
 				?>
                 <div class="flow-line"></div><?php
 			}
@@ -269,11 +268,50 @@ abstract class Benchmark extends Funnel_Step {
 			?><span class="benchmark-or">OR</span><?php
 		}
 
-		parent::sortable_item( $step );
+		$sortable_classes = [ 'sortable-item benchmark' ];
+		if ( $step->can_passthru() ) {
+			$sortable_classes[] = 'passthru';
+		}
+
+		?>
+        <div class="<?php echo implode( ' ', $sortable_classes ) ?>" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
+			<?php $this->__sortable_item( $step ); ?>
+            <div class="step-branch" data-branch="<?php esc_attr_e( $step->ID ); ?>">
+				<?php
+
+				$steps = $step->get_funnel()->get_steps();
+
+				$sub_steps = array_filter( $steps, function ( Step $sub ) use ( $step ) {
+					return $sub->branch_is( $step->ID );
+				} );
+
+				if ( ! empty( $sub_steps ) ) {
+					?>
+                    <div class="flow-line"></div><?php
+				}
+
+				foreach ( $sub_steps as $sub_step ) {
+					$sub_step->get_step_element()->validate_settings( $sub_step );
+					$sub_step->sortable_item();
+				}
+
+				$this->set_current_step( $step );
+
+				if ( empty( $sub_steps ) ) {
+					?>
+                    <div class="flow-line"></div><?php
+				}
+
+				$this->add_step_button( 'end-inside-' . $step->ID );
+
+				?>
+            </div>
+        </div>
+		<?php
 
 		// if the next step is not a benchmark, close the benchmark group
 		if ( ! $next || ! $next->is_benchmark() ) {
-			$this->add_step_button();
+			$this->add_step_button( [ 'id' => 'add-to-group-after-' . $step->ID, 'tooltip' => 'Add benchmark', 'class' => 'add-benchmark' ] );
 			?></div><?php
 		}
 	}

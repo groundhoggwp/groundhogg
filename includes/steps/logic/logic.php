@@ -40,28 +40,4 @@ abstract class Logic extends Funnel_Step {
 	 */
 	abstract public function get_logic_action( Contact $contact );
 
-	public function sortable_item( $step ) {
-
-		if ( ! is_a( $this, Branch_Logic::class ) ) {
-
-			?><div class="sortable-item logic"><?php
-
-			if ( $step->get_funnel()->is_editing() ) {
-				$this->add_step_button();
-			}
-
-			?>
-            <div class="flow-line"></div><?php
-		}
-
-		parent::sortable_item( $step );
-
-		if ( ! is_a( $this, Branch_Logic::class ) ) {
-			?>
-            <div class="flow-line"></div>
-            </div><?php
-		}
-
-	}
-
 }

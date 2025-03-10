@@ -83,7 +83,6 @@ abstract class Branch_Logic extends Logic {
 
 	public function sortable_item( $step ) {
 
-
 		$branch_steps = $this->get_sub_steps();
 
 		foreach ( $branch_steps as $branch_step ) {
@@ -93,12 +92,11 @@ abstract class Branch_Logic extends Logic {
 		// reset the current step to the current one
 		$this->set_current_step( $step );
 
-		$this->add_step_button();
-
 		?>
-        <div class="flow-line"></div>
         <div class="sortable-item logic branch-logic" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
-			<?php parent::sortable_item( $step ); ?>
+            <?php $this->add_step_button( 'before-' . $step->ID ); ?>
+            <div class="flow-line"></div>
+            <?php $this->__sortable_item( $step ); ?>
             <div class="display-flex align-top step-branches">
 				<?php foreach ( $this->get_branches() as $branch_id ):
 
@@ -117,7 +115,7 @@ abstract class Branch_Logic extends Logic {
 								$branch_step->sortable_item();
 							}
 
-                            $this->add_step_button();
+                            $this->add_step_button( 'in-branch-' . $branch_id );
 
                             ?></div>
                         <div class="logic-line line-below"></div>

@@ -7,10 +7,10 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
-use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\current_screen_is_gh_page;
+use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
 use function Groundhogg\force_custom_step_names;
@@ -548,24 +548,32 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		return $step->get_title_formatted();
 	}
 
-	public function add_step_button() {
+	public function add_step_button( $atts = [] ) {
 
 		if ( ! $this->get_current_step()->get_funnel()->is_editing() ) {
 			return;
 		}
 
-		?>
-        <button class="add-step">
-			<?php dashicon_e( 'plus-alt2' ); ?>
-            <div class="gh-tooltip top">Add step</div>
-        </button>
-		<?php
+		if ( is_string( $atts ) ) {
+			$atts = [
+				'id' => $atts
+			];
+		}
+
+		$atts = wp_parse_args( $atts, [
+			'id'      => '',
+			'tooltip' => 'Add action',
+			'class'   => 'add-action',
+		] );
+
+		echo html()->button( [
+			'class' => 'add-step ' . $atts['class'],
+			'id'    => $atts['id'],
+			'text'  => dashicon( 'plus-alt2' ) . html()->e( 'div', [ 'class' => 'gh-tooltip top' ], $atts['tooltip'] ),
+		] );
 	}
 
-	/**
-	 * @param $step Step
-	 */
-	public function sortable_item( $step ) {
+	protected function __sortable_item( Step $step ) {
 
 		$classes = [
 			$step->get_group(),
@@ -583,10 +591,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		if ( $step->is_locked() ) {
 			$classes[] = 'locked';
-		}
-
-		if ( is_a( $this, Benchmark::class ) ) {
-			$classes[] = 'sortable-item';
 		}
 
 		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) || $this->get_type() === 'error' ) {
@@ -688,7 +692,29 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php endif; ?>
         </div>
 		<?php
+	}
 
+	/**
+	 * @param $step Step
+	 */
+	public function sortable_item( $step ) {
+
+		?>
+        <div class="sortable-item action"><?php
+
+		if ( $step->get_funnel()->is_editing() ) {
+			$this->add_step_button( 'before-' . $step->ID );
+		}
+
+		?>
+        <div class="flow-line"></div><?php
+
+		$this->__sortable_item( $step );
+
+		?>
+        <div class="flow-line"></div><?php
+
+		?></div><?php
 	}
 
 	protected function before_step_notes( Step $step ) {
