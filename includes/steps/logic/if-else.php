@@ -132,6 +132,13 @@ class If_Else extends Branch_Logic {
 		$path = explode( '-', $branch );
 		$path = $path[1]; // this is the key within $branches
 
+		$include_filters = $this->get_setting( 'include_filters', [] );
+		$exclude_filters = $this->get_setting( 'exclude_filters', [] );
+
+		if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
+			return $path === 'yes';
+		}
+
 		// ideally this query will be cached in the event it gets run more than once.
 		$contactQuery = new Contact_Query( [
 			'limit'           => 1,
@@ -151,6 +158,27 @@ class If_Else extends Branch_Logic {
 
 		return false;
 	}
+
+    public function get_logic_action( Contact $contact ) {
+
+        $include_filters = $this->get_setting( 'include_filters', [] );
+        $exclude_filters = $this->get_setting( 'exclude_filters', [] );
+
+        if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
+            return $this->get_first_of_branch( 'yes' );
+        }
+
+	    $contactQuery = new Contact_Query( [
+		    'limit'           => 1,
+		    'include_filters' => $this->get_setting( 'include_filters', [] ),
+		    'exclude_filters' => $this->get_setting( 'exclude_filters', [] ),
+		    'include'         => [ $contact->ID ]
+	    ] );
+
+	    $count = $contactQuery->count();
+
+        return $this->get_first_of_branch( $count === 0 ? 'no' : 'yes' );
+    }
 
 	/**
 	 * Step title

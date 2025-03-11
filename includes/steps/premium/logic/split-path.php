@@ -135,9 +135,7 @@ class Split_Path extends Branch_Logic {
 		// we have to delete steps associated with deleted branches
 		if ( is_array( $old_branches ) && ! empty( $old_branches ) ) {
 
-			$current_step = $this->get_current_step();
-			$step_id      = $current_step->ID;
-
+			$current_step    = $this->get_current_step();
 			$delete_branches = array_keys( array_diff_key( $old_branches, $branches ) );
 
 			// maybe delete steps in unused branches
@@ -181,7 +179,7 @@ class Split_Path extends Branch_Logic {
 	}
 
 	public function generate_step_title( $step ) {
-		return 'Split Path';
+		return 'Multi-Branch';
 	}
 
 	/**

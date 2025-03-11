@@ -21,6 +21,10 @@ class Evergreen_Sequence extends Branch_Logic {
 		];
 	}
 
+	public function get_sub_group() {
+		return 'special';
+	}
+
 	protected function get_branch_name( $branch ) {
 		return 'Sequence';
 	}
@@ -66,6 +70,10 @@ class Evergreen_Sequence extends Branch_Logic {
 				'if_undefined' => []
 			]
 		];
+	}
+
+	protected function get_branch_classes( $branch_id ): string {
+		return 'evergreen';
 	}
 
 	/**

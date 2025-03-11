@@ -255,6 +255,9 @@ abstract class Benchmark extends Funnel_Step {
 		// if the previous step was not a benchmark, we should open the horizontal benchmark group
 		if ( ! $prev || ! $prev->is_benchmark() ) {
 
+			?>
+            <div class="sortable-item benchmarks <?php echo $step->is_starting() ? 'starting' : ''?>"><?php
+
 			if ( ! $step->is_starting() ) {
 				$this->add_step_button( 'before-group-' . $step->ID );
 				?>
@@ -312,7 +315,7 @@ abstract class Benchmark extends Funnel_Step {
 		// if the next step is not a benchmark, close the benchmark group
 		if ( ! $next || ! $next->is_benchmark() ) {
 			$this->add_step_button( [ 'id' => 'add-to-group-after-' . $step->ID, 'tooltip' => 'Add benchmark', 'class' => 'add-benchmark' ] );
-			?></div><?php
+            ?></div></div><?php
 		}
 	}
 

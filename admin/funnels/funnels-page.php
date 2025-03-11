@@ -683,7 +683,7 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		//get all the steps in the funnel.
-		$step_ids = get_request_var( 'step_ids' );
+		$step_ids = get_post_var( 'step_ids' );
 
 		if ( empty( $step_ids ) ) {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
@@ -764,6 +764,8 @@ class Funnels_Page extends Admin_Page {
 
 			$step->save();
 		}
+
+		$funnel->set_step_levels();
 
         // activate the funnel
 		if ( get_post_var( '_activate' ) ) {

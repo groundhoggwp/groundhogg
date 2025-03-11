@@ -15,6 +15,7 @@ use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -609,10 +610,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                 data-id="<?php echo $step->get_id(); ?>"
                 data-type="<?php esc_attr_e( $step->get_type() ); ?>"
                 data-group="<?php esc_attr_e( $step->get_group() ); ?>"
+                data-level="<?php esc_attr_e( $step->step_level ); ?>"
                 class="step <?php echo implode( ' ', $classes ) ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
+                <div class="step-label"><?php esc_attr_e( $step->step_level ); ?></div>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
                     <div class="step-label">Entry</div>

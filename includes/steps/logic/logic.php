@@ -27,7 +27,7 @@ abstract class Logic extends Funnel_Step {
 		return self::LOGIC;
 	}
 
-	final public function get_sub_group() {
+	public function get_sub_group() {
 		return self::LOGIC;
 	}
 

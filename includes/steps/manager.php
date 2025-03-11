@@ -79,7 +79,9 @@ class Manager {
 		$this->register_sub_group( 'lms', __( 'LMS' ) );
 		$this->register_sub_group( 'other', __( 'Other' ) );
 		$this->register_sub_group( 'developer', __( 'Developer' ) );
+		$this->register_sub_group( 'branching', __( 'Branching' ) );
 		$this->register_sub_group( 'logic', __( 'Logic' ) );
+		$this->register_sub_group( 'special', __( 'Special' ) );
 
 		/* actions */
 		$this->add_step( new Send_Email() );
@@ -141,6 +143,7 @@ class Manager {
 			$this->add_step( new Premium\Logic\Evergreen_Sequence() );
 			$this->add_step( new Premium\Logic\Logic_Loop() );
 			$this->add_step( new Premium\Logic\Logic_Skip() );
+			$this->add_step( new Premium\Logic\Logic_Stop() );
 //			$this->add_step( new Premium\Logic\Timer_Skip() );
 
 		}

@@ -50,12 +50,12 @@ class Funnel extends Base_Object_With_Meta {
 		foreach ( $steps as $step ) {
 			$step->get_step_element()->validate_settings( $step );
 			$step_output = $step->sortable_item( $echo );
-			if ( ! $echo ){
+			if ( ! $echo ) {
 				$html .= $step_output;
 			}
 		}
 
-		if ( $echo ){
+		if ( $echo ) {
 			return true;
 		}
 
@@ -239,6 +239,58 @@ class Funnel extends Base_Object_With_Meta {
 				$this->cancel_events();
 				break;
 		}
+	}
+
+	/**
+	 * Initialize the levels for the steps
+	 *
+	 * @param $branch
+	 * @param $level
+	 *
+	 * @return mixed
+	 */
+	public function set_step_levels( $branch = 'main', $level = 1 ) {
+
+		$steps = $this->get_steps();
+
+		$branch_steps = array_filter( $steps, function ( Step $step ) use ( $branch ) {
+			return $step->branch_is( $branch );
+		} );
+
+		$prev     = null;
+		$maxDepth = $level;
+
+		foreach ( $branch_steps as $i => $step ) {
+
+			if ( $step->is_benchmark() ) {
+				$step->update( [ 'step_level' => $level ] );
+				$maxDepth = max( $maxDepth, $this->set_step_levels( "$step->ID", $level + 1 ) );
+				$prev     = $step;
+				continue;
+			}
+
+			if ( $prev && $prev->is_benchmark() ) {
+				$level = $maxDepth;
+			}
+
+			$step->update( [ 'step_level' => $level ] );
+
+			$level ++;
+
+			if ( $step->is_logic() ) {
+				$sub_steps = $step->get_sub_steps();
+				$branches  = array_unique( wp_list_pluck( $sub_steps, 'branch' ) );
+				$maxDepth = $level;
+				foreach ( $branches as $branch ) {
+					$maxDepth = max( $maxDepth, $this->set_step_levels( $branch, $level ) );
+				}
+				$level = $maxDepth;
+			}
+
+			$prev = $step;
+		}
+
+		return max( $level, $maxDepth );
 	}
 
 	/**
@@ -442,7 +494,7 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_num_steps() {
 
-		if ( $this->is_editing() ){
+		if ( $this->is_editing() ) {
 			return count( $this->get_steps() );
 		}
 
@@ -455,10 +507,11 @@ class Funnel extends Base_Object_With_Meta {
 
 		$has_errors = array_any( $this->get_steps(), function ( Step $step ) {
 			$step->get_step_element()->validate_settings( $step );
+
 			return $step->has_errors() || $step->get_step_element()->has_errors();
 		} );
 
-		if ( $has_errors ){
+		if ( $has_errors ) {
 			return true;
 		}
 
@@ -499,8 +552,8 @@ class Funnel extends Base_Object_With_Meta {
 
 			// filter out "deleted" steps with the is_deleted flag in their changes
 			$steps = array_filter( $steps, function ( $step ) {
-				return ! isset_not_empty( $step->changes, 'is_deleted' ) ;
-			});
+				return ! isset_not_empty( $step->changes, 'is_deleted' );
+			} );
 
 			foreach ( $steps as $step ) {
 				$step->merge_changes();
@@ -658,11 +711,11 @@ class Funnel extends Base_Object_With_Meta {
 			$_step = (object) $_step;
 
 
-			$data              = (array) $_step->data;
-			$data['funnel_id'] = $this->get_id();
+			$data                = (array) $_step->data;
+			$data['funnel_id']   = $this->get_id();
 			$data['step_status'] = 'inactive'; // force status to inactive
 
-			$step              = new Step();
+			$step = new Step();
 			$step->create( $data );
 			$step->update_meta( (array) $_step->meta );
 			$step->import( (array) $_step->export );

@@ -22,6 +22,10 @@ abstract class Branch_Logic extends Logic {
 
 	abstract public function get_branches();
 
+	public function get_sub_group() {
+		return 'branching';
+	}
+
     abstract protected function get_branch_name( $branch );
 
 	/**
@@ -111,7 +115,7 @@ abstract class Branch_Logic extends Logic {
                         <div class="logic-line line-above">
                             <span class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
-                        <div class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
+                        <div id="<?php esc_attr_e( 'branch-' . $branch_id );?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
 								$branch_step->sortable_item();
 							}
 

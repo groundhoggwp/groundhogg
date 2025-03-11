@@ -652,6 +652,9 @@
 
         this.saving = true
 
+        // let's make sure all the branch info is correct!
+        this.updateBranches()
+
         let formData = new FormData(document.getElementById('funnel-form'))
 
         // these are in the form but are not actually used when posted
@@ -763,6 +766,12 @@
 
       saveQuietly: Groundhogg.functions.debounce(() => Funnel.save(true), 500),
 
+      updateBranches () {
+        document.querySelectorAll(`input[name*="[branch]"][type="hidden"]`).forEach(input => {
+          input.value = input.closest('.step-branch').dataset.branch
+        })
+      },
+
       makeSortable () {
         this.sortables = $('.step-branch').sortable({
           placeholder: 'sortable-placeholder',
@@ -793,10 +802,6 @@
           stop   : () => {
 
             // update the branch hidden fields to be correct with their parent
-            $('input[name*="[branch]"][type="hidden"]').each(function (el) {
-              $(this).val($(this).closest('.step-branch').data('branch'))
-            })
-
             this.dragging = false
             this.saveQuietly()
             drawLogicLines()
@@ -848,6 +853,7 @@
         $('.step-element.step-draggable').draggable({
           connectToSortable: '.step-branch',
           cancel           : '.premium',
+          distance         : 100,
           stop             : () => {
             drawLogicLines()
           },
@@ -1123,7 +1129,7 @@
       startTour () {
 
         // the funnel tour was dismissed already
-        if ( this.funnelTourDismissed ){
+        if (this.funnelTourDismissed) {
           // return;
         }
 
@@ -1357,22 +1363,22 @@
             target  : '#funnel-activate',
           },
         ], {
-          onFinish: () => {
+          onFinish : () => {
             return ajax({
               action: 'gh_dismiss_notice',
               notice: 'funnel-tour',
             })
           },
           onDismiss: () => {
-            confirmationModal( {
-              alert: `<p>Are you sure you want to exit the tour?</p>`,
+            confirmationModal({
+              alert    : `<p>Are you sure you want to exit the tour?</p>`,
               onConfirm: () => {
                 return ajax({
                   action: 'gh_dismiss_notice',
                   notice: 'funnel-tour',
                 })
-              }
-            } )
+              },
+            })
           },
         })
       },
@@ -1383,19 +1389,19 @@
       Funnel.init().then(() => {
 
         // if tour is dismissed, do nothing
-        if ( Funnel.funnelTourDismissed ){
-          return;
+        if (Funnel.funnelTourDismissed) {
+          return
         }
 
-        if ( Funnel.steps.length > 0 ){
+        if (Funnel.steps.length > 0) {
           confirmationModal({
-            alert: `<p>👋 Funnels have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
+            alert      : `<p>👋 Funnels have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
             confirmText: 'Start tour!',
-            closeText: 'No thanks',
-            onConfirm: () => {
+            closeText  : 'No thanks',
+            onConfirm  : () => {
               // open a new scratch funnel to start the tour
-              window.open( this.scratchFunnelURL, '_self' )
-            }
+              window.open(this.scratchFunnelURL, '_self')
+            },
           })
           return
         }
@@ -1416,6 +1422,52 @@
 
       return null
     })
+  }
+
+  function getNodeLevels2 (root, map, level = 0) {
+
+    let nodes = Array.from(root.querySelectorAll('& > .sortable-item,& >.step-branch'))
+
+    nodes.forEach(node => {
+
+      if (node.matches('.step-branch')) { // benchmark special case
+
+        let childNodes = Array.from(node.querySelectorAll('&>.sortable-item'))
+
+        let maxDepth = level
+
+        childNodes.forEach(child => {
+
+          map.set(child.querySelector('&>.step'), level)
+
+          maxDepth = Math.max(getNodeLevels2(child.querySelector('.step-branch'), map, level + 1), maxDepth)
+        })
+
+        level = maxDepth
+        return
+      }
+
+      map.set(node.querySelector('&>.step'), level)
+
+      level++
+
+      if (node.matches('.branch-logic')) {
+
+        let branches = node.querySelectorAll('& > .step-branches > .split-branch > .step-branch')
+
+        let maxDepth = level
+
+        branches.forEach(branch => {
+          maxDepth = Math.max(getNodeLevels2(branch, map, level + 1), maxDepth)
+        })
+
+        level = maxDepth
+
+      }
+
+    })
+
+    return level
   }
 
   function areNumbersClose (num1, num2, tolerancePercent) {
@@ -1520,7 +1572,7 @@
     if (!end) {
       end = MakeEl.Fragment([
         document.body.classList.contains('gh_funnels') ? Button({
-          className: 'add-step',
+          className: `add-step ${ Funnel.steps.length ? 'add-action' : 'add-benchmark' }`,
           id       : 'end-funnel',
         }, MakeEl.Dashicon('plus-alt2')) : null,
         Div({ className: 'flow-line' }),
@@ -1634,6 +1686,28 @@
         let targetStep = document.getElementById(`step-${ targetStepId }`)
 
         skipLine(step, targetStep)
+      })
+    }
+    catch (e) {}
+
+    // stops
+    try {
+      document.querySelectorAll('.step-branch .step.logic_stop').forEach(step => {
+
+        // the step-branch.benchmarks container
+        let stepId = step.dataset.id
+        let stepPos = step.getBoundingClientRect()
+        let sortablePos = step.parentElement.getBoundingClientRect()
+
+        let line = step.parentElement.querySelector('.logic-line.line-end')
+        clearLineStyle(line)
+
+        line.style.top = `${ stepPos.bottom - sortablePos.top }px`
+        line.style.height = '30px'
+        line.style.width = `${ stepPos.width / 2 }px`
+        line.style.left = 'calc(50% - 1px)'
+        line.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+        line.style.borderRadius = `0 0 0 ${ borderRadius }`
       })
     }
     catch (e) {}

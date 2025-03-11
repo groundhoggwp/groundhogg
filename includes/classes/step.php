@@ -155,6 +155,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return absint( $this->step_order );
 	}
 
+	public function get_level() {
+		return absint( $this->step_level );
+	}
+
 	public function get_type() {
 		return $this->step_type;
 	}
@@ -239,6 +243,16 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->funnel = new Funnel( $this->get_funnel_id() );
 
 		return $this->funnel;
+	}
+
+	public function get_sub_steps() {
+
+		$steps = $this->get_funnel()->get_steps();
+
+		return array_filter( $steps, function ( Step $step ) {
+			return str_starts_with( $step->branch, "$this->ID" );
+		} );
+
 	}
 
 	public function set_slug() {
@@ -545,7 +559,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			      ->equals( 'funnel_id', $this->get_funnel_id() )
 			      ->in( 'branch', $branches )
 			      ->in( 'step_group', [ self::ACTION, self::LOGIC ] )
-			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
+			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 )
+			      ->greaterThanEqualTo( 'step_level', $this->get_level() + 1 );
 
 			$next = $query->get_objects( Step::class );
 
@@ -553,8 +568,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		} else if ( $this->is_logic() ) { // logic
 
-			// must do logic things to get the next action within a branch
-			$next = $this->get_step_element()->get_logic_action( $contact );
+			$next = false;
+
+			if ( method_exists( $this->get_step_element(), 'get_logic_action' ) ) {
+				// must do logic things to get the next action within a branch
+				$next = $this->get_step_element()->get_logic_action( $contact );
+			}
 
 			// no steps in the branch (the branch was empty)
 			// thus, we continue on in the current branch
@@ -569,7 +588,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// if next is false, then we can't continue. If it's an action then we're good
-		if ( $next === false || $next->is_action() ) {
+		if ( $next === null || $next === false || $next->is_action() ) {
 			return $next;
 		}
 
@@ -696,11 +715,26 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->equals( 'step_status', 'active' )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
 		      ->in( 'branch', $this->get_nested_branches_array() )
-		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
+		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 )
+		      ->greaterThanEqualTo( 'step_level', $this->get_level() + 1 );
 
 		$next = $query->get_objects( Step::class );
 
 		$next = ! empty( $next ) ? $next[0] : false;
+
+		// special handling for passthru, can't be starting from a benchmark
+		if ( ! $this->is_benchmark() && $next && $next->is_benchmark() && ! $next->can_passthru() ) {
+
+			$siblings = $next->get_siblings_of_same_level();
+			$passthru = array_find( $siblings, function (Step $step){
+				return $step->is_benchmark() && $step->can_passthru();
+			});
+
+			if ( $passthru ){
+				$next = $passthru;
+			}
+
+		}
 
 		/**
 		 * Filters the next step
@@ -709,6 +743,29 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 * @param $current Step
 		 */
 		return apply_filters( 'groundhogg/step/next_step', $next, $this );
+	}
+
+	/**
+	 * Return the next adjacent sibling step
+	 *
+	 * @return mixed|null
+	 */
+	public function get_next_sibling() {
+		$query = new Table_Query( 'steps' );
+
+		$query->setOrderby( [ 'step_order', 'ASC' ] )
+		      ->setLimit( 1 )
+		      ->where()
+		      ->equals( 'step_status', 'active' )
+		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->in( 'branch', $this->branch )
+		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 );
+
+		$next = $query->get_objects( Step::class );
+
+		$next = ! empty( $next ) ? $next[0] : false;
+
+		return apply_filters( 'groundhogg/step/next_sibling', $next, $this );
 	}
 
 	public function is_same_parent( Step $prev_step ) {
@@ -721,6 +778,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Ids must be same
 		return $parent->ID === $parent2->ID;
+	}
+
+	public function is_same_level( Step $other ) {
+		return $this->get_level() === $other->get_level();
 	}
 
 	/**
@@ -742,7 +803,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_before( Step $other ) {
-		return $this->is_same_funnel( $other ) && $this->get_order() < $other->get_order() && ! $this->is_parallel_branch( $other );
+		return $this->is_same_funnel( $other ) && $this->get_order() < $other->get_order() && $this->get_level() < $other->get_level() && ! $this->is_parallel_branch( $other );
 	}
 
 	/**
@@ -753,7 +814,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_after( Step $other ) {
-		return $this->is_same_funnel( $other ) && $this->get_order() > $other->get_order() && ! $this->is_parallel_branch( $other );
+		return $this->is_same_funnel( $other ) && $this->get_order() > $other->get_order() && $this->get_level() > $other->get_level() && ! $this->is_parallel_branch( $other );
 	}
 
 	/**
@@ -764,20 +825,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_adjacent_sibling( Step $other ) {
-		$siblings = $this->get_siblings();
-		$it       = index_of( $siblings, function ( Step $step ) {
-			return $step->ID == $this->ID;
-		} );
-		$io       = index_of( $siblings, function ( Step $step ) use ( $other ) {
-			return $step->ID == $other->ID;
-		} );
-
-		return $this->is_same_funnel( $other ) && $this->is_same_branch( $other ) && $it !== false && $io !== false && abs( $it - $io ) === 1;
+		return $this->is_same_funnel( $other ) && $this->is_same_branch( $other ) && $other->get_level() === $this->get_level();
 	}
 
 	public function get_siblings() {
-		return array_values( array_filter( $this->get_funnel()->get_steps(), function ( $step ) {
+		return array_values( array_filter( $this->get_funnel()->get_steps(), function ( Step $step ) {
 			return $step->is_same_branch( $this );
+		} ) );
+	}
+
+	/**
+	 * Get siblings that are the same level as this one in the same branch
+	 *
+	 * @return array
+	 */
+	public function get_siblings_of_same_level() {
+		return array_values( array_filter( $this->get_siblings(), function ( Step $step ) {
+			return $step->is_same_level( $this );
 		} ) );
 	}
 
@@ -878,7 +942,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function is_parallel_branch( Step $other ) {
 
-		// we're in the same branch
+		// we're in the same branch, can't be parallel
 		if ( $this->is_same_branch( $other ) ) {
 			return false;
 		}

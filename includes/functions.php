@@ -8819,3 +8819,14 @@ function search_and_replace_in_file($file_path, $search, $replace) {
 	// Write back to file
 	return file_put_contents($file_path, $updated_content) !== false;
 }
+
+/**
+ * Count the number of lines in a peric of text
+ *
+ * @param $text
+ *
+ * @return int
+ */
+function count_newlines ( $text ) {
+    return count( explode( "\n", $text ) );
+}

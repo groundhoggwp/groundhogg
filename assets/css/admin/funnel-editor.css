@@ -646,7 +646,7 @@ button.button.save-button {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
   background-position: center center;
   background-size: 20px 20px;
@@ -655,6 +655,27 @@ button.button.save-button {
   border-style: var(--logic-line-style);
   position: absolute;
   z-index: 1;
+}
+#step-flow .fixed-inside .logic-line > span.path-indicator {
+  font-size: 10px;
+  color: #fff;
+  background-color: #6c19ad;
+  padding: 0 5px;
+  border-radius: 3px;
+  position: absolute;
+  top: calc(40% - 1px);
+  transform: translateX(-50%) translateY(-50%);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+#step-flow .fixed-inside .logic-line.line-end {
+  border-color: #e91f4f;
+}
+#step-flow .fixed-inside .logic-line.line-end > span.path-indicator {
+  background-color: #e91f4f;
+  transform: translateX(-50%) translateY(50%);
+  bottom: 0;
+  left: 100%;
 }
 #step-flow .fixed-inside .logic-line.skip-line, #step-flow .fixed-inside .logic-line.loop-line {
   border-color: #6c19ad;
@@ -700,6 +721,9 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branches:has(> :nth-child(odd):last-child) {
   margin-top: 80px;
 }
+#step-flow .fixed-inside .step-branches:has(> .split-branch.evergreen)::before {
+  content: "";
+}
 #step-flow .fixed-inside .step-branches .split-branch {
   position: relative;
 }
@@ -726,18 +750,6 @@ button.button.save-button {
 }
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line.line-below-after, #step-flow .fixed-inside .step-branches .split-branch > .logic-line.line-below {
   border-color: #9ece38;
-}
-#step-flow .fixed-inside .step-branches .split-branch > .logic-line > span.path-indicator {
-  font-size: 10px;
-  color: #fff;
-  background-color: #6c19ad;
-  padding: 0 5px;
-  border-radius: 3px;
-  position: absolute;
-  top: calc(40% - 1px);
-  transform: translateX(-50%) translateY(-50%);
-  white-space: nowrap;
-  text-transform: uppercase;
 }
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line.middle > span.path-indicator, #step-flow .fixed-inside .step-branches .split-branch > .logic-line.left > span.path-indicator {
   left: 20%;
@@ -813,8 +825,9 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branch#step-sortable {
   padding-top: 40px;
   padding-bottom: 24px;
+  margin: 0 auto;
 }
-#step-flow .fixed-inside .step-branch#step-sortable > .step-branch.benchmarks:first-child::before {
+#step-flow .fixed-inside .step-branch#step-sortable .sortable-item.benchmarks.starting > .step-branch.benchmarks:first-child::before {
   content: "Start the funnel when...";
 }
 #step-flow button.add-step-button-flow {
@@ -866,6 +879,7 @@ button.button.save-button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 #step-flow .sortable-item:first-child > .flow-line:first-child {
   display: none;
