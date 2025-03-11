@@ -232,7 +232,6 @@ class Main_Updater extends Old_Updater {
 				'automatic'   => true,
 				'description' => __( 'Database table upgrades for 4.0.', 'groundhogg' ),
 				'callback'    => function () {
-					db()->steps->create_table(); // add pass_thru
 					db()->events->create_table(); // add args
 					db()->event_queue->create_table(); // add args
 					db()->steps->create_table();

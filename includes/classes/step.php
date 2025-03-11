@@ -155,8 +155,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return absint( $this->step_order );
 	}
 
+	/**
+	 * Get the step level
+	 *
+	 * @return int
+	 */
 	public function get_level() {
-		return absint( $this->step_level );
+		$level = absint( $this->step_level );
+
+		// level has not been initialized yet, maybe the upgrade script didn't run?
+		if ( ! $level ){
+			$this->get_funnel()->set_step_levels();
+			$this->pull();
+			$level = absint( $this->step_level );
+		}
+
+		return $level;
 	}
 
 	public function get_type() {
@@ -726,11 +740,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( ! $this->is_benchmark() && $next && $next->is_benchmark() && ! $next->can_passthru() ) {
 
 			$siblings = $next->get_siblings_of_same_level();
-			$passthru = array_find( $siblings, function (Step $step){
+			$passthru = array_find( $siblings, function ( Step $step ) {
 				return $step->is_benchmark() && $step->can_passthru();
-			});
+			} );
 
-			if ( $passthru ){
+			if ( $passthru ) {
 				$next = $passthru;
 			}
 
@@ -1283,13 +1297,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_order() === 1 ) {
+		if ( $this->get_level() === 1 ) {
 			return true;
 		}
 
-		if ( array_all( $this->get_preceding_siblings(), function ( Step $step ) {
-			return $step->is_benchmark();
-		} ) ) {
+		if ( $this->get_order() === 1 ) {
 			return true;
 		}
 
