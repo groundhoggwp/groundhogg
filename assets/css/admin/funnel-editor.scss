@@ -163,6 +163,7 @@ body:has(#funnel-form) {
   position: relative;
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
+  border-left: 1px solid $primary-dark-15;
 
   &.slide-out {
     //transform: translateX(100vw); /* Move out to the right */
@@ -173,7 +174,7 @@ body:has(#funnel-form) {
   > #collapse-settings {
     position: absolute;
     top: 50%;
-    left: 0;
+    left: 1px;
     border-radius: 10px 0 0 10px;
     border-color: $primary-dark-15;
     border-style: solid;
@@ -233,19 +234,22 @@ body:has(#funnel-form) {
             background-color: var(--color);
           }
 
-          &[data-group="all"]{
+          &[data-group="all"] {
             --color: #{$primary-dark};
             --color-5: #{$primary-dark-5};
           }
-          &[data-group="benchmark"]{
+
+          &[data-group="benchmark"] {
             --color: #{$benchmark-orange};
             --color-5: #{$benchmark-orange-5};
           }
-          &[data-group="logic"]{
+
+          &[data-group="logic"] {
             --color: #{$secondary-purple};
             --color-5: #{$secondary-purple-5};
           }
-          &[data-group="action"]{
+
+          &[data-group="action"] {
             --color: #{$action-green};
             --color-5: #{$action-green-5};
           }
@@ -948,10 +952,6 @@ button.button.save-button {
         text-transform: uppercase;
       }
 
-      &.right {
-        //transform: translateX(1px); // account for border width
-      }
-
       &.line-end {
         border-color: $error-red;
 
@@ -1033,7 +1033,7 @@ button.button.save-button {
         margin-top: 80px;
       }
 
-      &:has(>.split-branch.evergreen){
+      &:has(>.split-branch.evergreen) {
         //margin-top: 40px;
         &::before {
           content: ''; // forces jiggly
@@ -1052,6 +1052,10 @@ button.button.save-button {
           > .logic-line {
             border-color: $action-green;
 
+            > .logic-line {
+              border-color: $action-green;
+            }
+
             > .path-indicator {
               background-color: $action-green;
             }
@@ -1061,6 +1065,10 @@ button.button.save-button {
         &.red {
           > .logic-line.line-above {
             border-color: $error-red;
+
+            > .logic-line {
+              border-color: $error-red;
+            }
 
             > .path-indicator {
               background-color: $error-red;
@@ -1085,11 +1093,33 @@ button.button.save-button {
             > span.path-indicator {
               left: 20%;
             }
+
+            &:has(.logic-line) {
+              > span.path-indicator {
+                transform: translate(-50%, 50%);
+                bottom: 0;
+                left: 0;
+                right: auto;
+                top: auto;
+                z-index: 3;
+              }
+            }
           }
 
           &.right {
             > span.path-indicator {
               left: 80%;
+            }
+
+            &:has(.logic-line) {
+              > span.path-indicator {
+                transform: translate(50%, 50%);
+                bottom: 0;
+                left: auto;
+                right: 0;
+                top: auto;
+                z-index: 3;
+              }
             }
           }
         }
@@ -1137,7 +1167,7 @@ button.button.save-button {
         padding-bottom: 60px;
         align-items: flex-start;
 
-        > button.add-step{
+        > button.add-step {
           margin-top: 20px;
         }
 
@@ -1150,16 +1180,19 @@ button.button.save-button {
           }
 
           > span.path-indicator {
-            font-size: 10px;
-            color: #fff;
             background-color: $benchmark-orange;
-            padding: 0 5px;
-            border-radius: 3px;
-            position: absolute;
-            top: 0;
-            white-space: nowrap;
-            text-transform: uppercase;
+            top: auto;
+            bottom: 0;
+            transform: translate(-50%, 50%);
             z-index: 2;
+          }
+
+          &.right {
+            > span.path-indicator {
+              left: auto;
+              right: 0;
+              transform: translate(50%, 50%);
+            }
           }
         }
       }

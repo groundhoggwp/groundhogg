@@ -1326,7 +1326,7 @@
         closeText  : __('No, use the original.', 'groundhogg'),
         onConfirm  : e => {
           res({
-            duplicate_email: true,
+            __duplicate_email: true,
           })
         },
         onCancel   : e => {

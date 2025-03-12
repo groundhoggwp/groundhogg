@@ -185,8 +185,7 @@ abstract class Branch_Logic extends Logic {
 
 		foreach ( $branches as $branch ) {
 
-			$parts     = explode( '-', $branch );
-			$oldbranch = $oldId . '-' . $parts[1];
+			$oldbranch = str_replace( "$step->ID", "$oldId", $branch );
 
 			db()->steps->update( [
 				'branch' => $oldbranch, // old branch

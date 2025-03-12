@@ -192,10 +192,6 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                      data-branch="main"
                 ><?php $funnel->step_flow(); ?></div>
             </div>
-            <button class="add-step-button-flow" type="button" id="add-new-step">
-				<?php dashicon_e( 'plus-alt2' ); ?>
-                <div class="gh-tooltip left">Add a step</div>
-            </button>
         </div>
         <div id="step-settings-container" class="slide-out">
             <button id="collapse-settings"><?php dashicon_e( 'arrow-right-alt2' ); ?></button>

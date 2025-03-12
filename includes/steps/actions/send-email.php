@@ -98,7 +98,7 @@ class Send_Email extends Action {
 		}
 
 		if ( $email->exists() && $email->is_draft() ) {
-			$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop.' ) );
+			$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
 		}
 	}
 
@@ -456,7 +456,7 @@ class Send_Email extends Action {
 	 */
 	public function duplicate( $new, $original ) {
 
-		if ( ! get_post_var( 'duplicate_email' ) ) {
+		if ( ! get_post_var( '__duplicate_email' ) ) {
 			return;
 		}
 

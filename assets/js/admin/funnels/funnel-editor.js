@@ -311,10 +311,6 @@
           })
         })
 
-        $document.on('click', 'button#add-new-step', e => {
-          this.showAddStep()
-        })
-
         /* Bind Delete */
         $document.on('click', 'button.delete-step', e => {
           let stepId = e.currentTarget.parentNode.parentNode.dataset.id
@@ -990,10 +986,11 @@
         return await this.save({
           quiet   : true,
           moreData: formData => {
-            formData.append('_duplicate_step', JSON.stringify({
-              id,
-              ...extra,
-            }))
+
+            Object.keys( extra ).forEach( key => {
+              formData.append(key, extra[key])
+            })
+
           },
         })
 
@@ -1400,7 +1397,7 @@
             closeText  : 'No thanks',
             onConfirm  : () => {
               // open a new scratch funnel to start the tour
-              window.open(this.scratchFunnelURL, '_self')
+              window.open(Funnel.scratchFunnelURL, '_self')
             },
           })
           return
@@ -1422,52 +1419,6 @@
 
       return null
     })
-  }
-
-  function getNodeLevels2 (root, map, level = 0) {
-
-    let nodes = Array.from(root.querySelectorAll('& > .sortable-item,& >.step-branch'))
-
-    nodes.forEach(node => {
-
-      if (node.matches('.step-branch')) { // benchmark special case
-
-        let childNodes = Array.from(node.querySelectorAll('&>.sortable-item'))
-
-        let maxDepth = level
-
-        childNodes.forEach(child => {
-
-          map.set(child.querySelector('&>.step'), level)
-
-          maxDepth = Math.max(getNodeLevels2(child.querySelector('.step-branch'), map, level + 1), maxDepth)
-        })
-
-        level = maxDepth
-        return
-      }
-
-      map.set(node.querySelector('&>.step'), level)
-
-      level++
-
-      if (node.matches('.branch-logic')) {
-
-        let branches = node.querySelectorAll('& > .step-branches > .split-branch > .step-branch')
-
-        let maxDepth = level
-
-        branches.forEach(branch => {
-          maxDepth = Math.max(getNodeLevels2(branch, map, level + 1), maxDepth)
-        })
-
-        level = maxDepth
-
-      }
-
-    })
-
-    return level
   }
 
   function areNumbersClose (num1, num2, tolerancePercent) {
@@ -1584,7 +1535,7 @@
 
     // loops
     try {
-      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop').forEach(el => {
+      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop:not(.loop_broken)').forEach(el => {
 
         // the step-branch.benchmarks container
         let stepPos = el.getBoundingClientRect()
@@ -1673,7 +1624,7 @@
 
     // skips
     try {
-      document.querySelectorAll('.step-branch .step.skip, .step-branch .step.logic_skip').forEach(step => {
+      document.querySelectorAll('.step-branch .step.skip, .step-branch .step.logic_skip:not(.loop_broken)').forEach(step => {
 
         // the step-branch.benchmarks container
         let stepId = step.dataset.id
@@ -1831,12 +1782,14 @@
 
           clearLineStyle(line3)
           clearLineStyle(line4)
+          line3.classList.remove('left', 'right', 'middle')
 
-          line3.style.top = `${ Math.abs(stepPos.top - rowPos.top) - lineHeight }px`
+
+          line3.style.top = `0`
           line3.style.width = `${ lineWidth }px`
           line3.style.height = `${ lineHeight }px`
 
-          line4.style.top = `-${ lineHeight + borderPixels }px`
+          line4.style.top = `100%`
           line4.style.width = `${ lineWidth }px`
           line4.style.height = `${ lineHeight }px`
 
@@ -1848,33 +1801,27 @@
             line3.style.height = `${ lineHeight * 2 }px`
             line3.style.borderWidth = `0 0 0 ${ borderWidth }`
             line4.style.display = 'none'
-
-            line3.firstElementChild.style.top = '50%'
-            line3.firstElementChild.style.transform = 'translate(-50%,-50%)'
+            line3.classList.add( 'middle' )
           }
           // left side
           else if (stepCenter < rowCenter) {
-            line3.style.left = `${ stepCenter - rowPos.left - borderPixels }px`
-            line3.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
-            line3.style.borderRadius = `${ borderRadius } 0 0 0`
-            line3.firstElementChild.style.right = 0
-            line3.firstElementChild.style.transform = 'translate(50%,-50%)'
-
-            line4.style.left = `${ lineWidth }px`
-            line4.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
-            line4.style.borderRadius = `0 0 ${ borderRadius } 0`
+            line3.style.left = `${ stepCenter - rowPos.left + lineWidth - 1}px`
+            line3.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+            line3.style.borderRadius = `0 0 ${ borderRadius } 0`
+            line3.classList.add( 'left' )
+            line4.style.right = `${ lineWidth }px`
+            line4.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+            line4.style.borderRadius = `${ borderRadius } 0 0 0`
           }
           // right side
           else {
-            line3.style.left = `${ stepCenter - rowPos.left - lineWidth }px`
-            line3.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
-            line3.style.borderRadius = `0 ${ borderRadius } 0 0`
-            line3.firstElementChild.style.left = 0
-            line3.firstElementChild.style.transform = 'translate(-50%,-50%)'
-
-            line4.style.left = `-${ lineWidth }px`
-            line4.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
-            line4.style.borderRadius = `0 0 0 ${ borderRadius }`
+            line3.style.left = `${ rowCenter - rowPos.left }px`
+            line3.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+            line3.style.borderRadius = `0 0 0 ${ borderRadius } `
+            line3.classList.add( 'right' )
+            line4.style.left = `${ lineWidth }px`
+            line4.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+            line4.style.borderRadius = `0 ${ borderRadius } 0 0`
           }
 
         }
@@ -1899,6 +1846,10 @@
         clearLineStyle(line)
         line.classList.remove('left', 'right', 'middle')
 
+        if ( ! ( stepPos.left < branchCenter && branchCenter < stepPos.right ) ){
+          line.querySelectorAll( '.line-inside' ).forEach( el => el.remove() )
+        }
+
         // center
         if (areNumbersClose(branchCenter, stepCenter, 1)) {
           line.classList.add('middle')
@@ -1914,7 +1865,7 @@
           lineHeight = Math.abs(branchPos.top - stepPos.bottom)
 
           let line1 = line
-          let line2 = line1.querySelector('.logic-line')
+          let line2 = line1.querySelector('.line-inside')
           if (!line2) {
             line2 = Div({ className: `logic-line line-inside` })
             line1.append(line2)
@@ -1924,7 +1875,6 @@
 
           let lineWidth = Math.abs(branchCenter - stepCenter) / 2
 
-          line1.style.left = `${ stepCenter - branchPos.left }px`
           line1.style.top = `-${ lineHeight }px`
           line1.style.height = `${ lineHeight / 2 }px`
           line1.style.width = `${ lineWidth }px`
@@ -1935,6 +1885,9 @@
 
           // right
           if (branchCenter > stepCenter) {
+            line.classList.add('right')
+
+            line1.style.right = `calc(50% - 1px + ${lineWidth}px)`
             line1.style.borderBottomLeftRadius = borderRadius
             line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
             line2.style.left = '100%'
@@ -1942,6 +1895,9 @@
             line2.style.borderTopRightRadius = borderRadius
           }
           else {
+            line.classList.add('left')
+
+            line1.style.left = `calc(50% - 1px + ${lineWidth}px)`
             line1.style.borderBottomRightRadius = borderRadius
             line1.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
             line2.style.right = '100%'

@@ -710,15 +710,14 @@ class Funnel extends Base_Object_With_Meta {
 
 			$_step = (object) $_step;
 
-
 			$data                = (array) $_step->data;
 			$data['funnel_id']   = $this->get_id();
 			$data['step_status'] = 'inactive'; // force status to inactive
 
 			$step = new Step();
 			$step->create( $data );
-			$step->update_meta( (array) $_step->meta );
-			$step->import( (array) $_step->export );
+			$step->update_meta( json_decode( json_encode( $_step->meta ), true ) );
+			$step->import( json_decode( json_encode( $_step->export ), true ) );
 
 			// Save the original ID from the donor funnel
 			$step->update_meta( 'imported_step_id', $_step->ID );
@@ -848,6 +847,10 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function delete() {
+
+		$this->update( [ 'status' => 'archived' ] );
+		$this->update_step_status();
+		$this->cancel_events();
 
 		$steps = $this->get_steps();
 

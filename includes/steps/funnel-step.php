@@ -584,6 +584,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		if ( $step->has_errors() || $this->has_errors() ) {
 			$classes[] = 'has-errors';
+
+			$errors = $step->get_errors();
+			foreach ( $errors as $error ) {
+				$classes[] = $error->get_error_code();
+			}
 		}
 
 		if ( $step->has_changes() && $step->get_funnel()->is_editing() ) {
@@ -701,8 +706,13 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function sortable_item( $step ) {
 
+        $sortable_classes = [
+            'sortable-item',
+            $step->get_group(),
+        ];
+
 		?>
-        <div class="sortable-item action"><?php
+        <div class="<?php echo implode( ' ', $sortable_classes ); ?>"><?php
 
 		if ( $step->get_funnel()->is_editing() ) {
 			$this->add_step_button( 'before-' . $step->ID );

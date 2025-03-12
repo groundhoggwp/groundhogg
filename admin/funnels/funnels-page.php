@@ -703,10 +703,17 @@ class Funnels_Page extends Admin_Page {
 				if ( $stepId === 'duplicate' ) {
 
 					// duplicate the previous step
-					$step->duplicate( [
+					$new = $step->duplicate( [
 						'step_status' => 'inactive', // must be inactive to start,
-						'step_order'  => $step->get_order() + 1
+						'step_order'  => $step->get_order() + 1,
 					] );
+
+                    $duplicate_args = get_post_var( '_duplicate_step' );
+
+                    if ( ! empty( $duplicate_args ) ) {
+                        $duplicate_args = json_decode( $duplicate_args, true ) ?: [];
+                        $step->get_step_element()->duplicate( $new, $step );
+                    }
 
 					continue;
 				}

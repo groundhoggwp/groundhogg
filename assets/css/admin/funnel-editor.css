@@ -82,6 +82,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   position: relative;
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
+  border-left: 1px solid rgba(16, 38, 64, 0.15);
   background-color: #F6F9FB;
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
 }
@@ -93,7 +94,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 #step-settings-container > #collapse-settings {
   position: absolute;
   top: 50%;
-  left: 0;
+  left: 1px;
   border-radius: 10px 0 0 10px;
   border-color: rgba(16, 38, 64, 0.15);
   border-style: solid;
@@ -733,10 +734,16 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branches .split-branch.green > .logic-line {
   border-color: #9ece38;
 }
+#step-flow .fixed-inside .step-branches .split-branch.green > .logic-line > .logic-line {
+  border-color: #9ece38;
+}
 #step-flow .fixed-inside .step-branches .split-branch.green > .logic-line > .path-indicator {
   background-color: #9ece38;
 }
 #step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above {
+  border-color: #e91f4f;
+}
+#step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above > .logic-line {
   border-color: #e91f4f;
 }
 #step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above > .path-indicator {
@@ -754,8 +761,24 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line.middle > span.path-indicator, #step-flow .fixed-inside .step-branches .split-branch > .logic-line.left > span.path-indicator {
   left: 20%;
 }
+#step-flow .fixed-inside .step-branches .split-branch > .logic-line.middle:has(.logic-line) > span.path-indicator, #step-flow .fixed-inside .step-branches .split-branch > .logic-line.left:has(.logic-line) > span.path-indicator {
+  transform: translate(-50%, 50%);
+  bottom: 0;
+  left: 0;
+  right: auto;
+  top: auto;
+  z-index: 3;
+}
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line.right > span.path-indicator {
   left: 80%;
+}
+#step-flow .fixed-inside .step-branches .split-branch > .logic-line.right:has(.logic-line) > span.path-indicator {
+  transform: translate(50%, 50%);
+  bottom: 0;
+  left: auto;
+  right: 0;
+  top: auto;
+  z-index: 3;
 }
 #step-flow .fixed-inside .step-branch {
   display: flex;
@@ -803,16 +826,16 @@ button.button.save-button {
   border-color: #f58115;
 }
 #step-flow .fixed-inside .step-branch.benchmarks .benchmark-line.logic-line > span.path-indicator {
-  font-size: 10px;
-  color: #fff;
   background-color: #f58115;
-  padding: 0 5px;
-  border-radius: 3px;
-  position: absolute;
-  top: 0;
-  white-space: nowrap;
-  text-transform: uppercase;
+  top: auto;
+  bottom: 0;
+  transform: translate(-50%, 50%);
   z-index: 2;
+}
+#step-flow .fixed-inside .step-branch.benchmarks .benchmark-line.logic-line.right > span.path-indicator {
+  left: auto;
+  right: 0;
+  transform: translate(50%, 50%);
 }
 #step-flow .fixed-inside .step-branch .sortable-placeholder {
   width: 300px;

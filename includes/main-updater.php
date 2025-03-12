@@ -241,6 +241,7 @@ class Main_Updater extends Old_Updater {
 					$funnels = $funnelQuery->get_objects( Funnel::class );
 					foreach ( $funnels as $funnel ) {
 						$funnel->set_step_levels(); // set the initial step levels
+						$funnel->commit();
 					}
 				}
 			],
