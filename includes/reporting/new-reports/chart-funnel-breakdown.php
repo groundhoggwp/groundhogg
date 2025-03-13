@@ -41,8 +41,7 @@ class Chart_Funnel_Breakdown extends Base_Report {
 			$prev_step = end( $current_group );
 
 			// Check if adjacent or have the same parent
-			if ( $step->is_adjacent_sibling( $prev_step ) ||
-			     ( $step->get_parent_step() !== false && $step->is_same_parent( $prev_step ) ) ) {
+			if ( $step->is_adjacent_sibling( $prev_step ) || $step->get_lowest_common_ancestor_id( $prev_step ) ) {
 				$current_group[] = $step;
 			} else {
 				$groups[]      = $current_group;

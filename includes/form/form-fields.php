@@ -44,6 +44,11 @@ class Form_Fields {
 					$field['value'] = $contact->$id;
 				} else if ( method_exists( $contact, 'get_' . $id ) ) {
 					$field['value'] = call_user_func( [ $contact, 'get_' . $id ] );
+				} else {
+					$value = $contact->$id;
+					if ( $value ){
+						$field['value'] = $contact->$id;
+					}
 				}
 
 				return $field;

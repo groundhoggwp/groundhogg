@@ -6,7 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
-use function Groundhogg\index_of;
+use function Groundhogg\array_all;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\process_events;
@@ -243,20 +243,25 @@ abstract class Benchmark extends Funnel_Step {
 	 */
 	public function sortable_item( $step ) {
 
-		$siblings = $step->get_siblings();
+		$siblings = $step->get_siblings_of_same_level();
 
-		$index = index_of( $siblings, function ( Step $_step ) use ( $step ) {
-			return $_step->ID === $step->ID;
-		} );
-
-		$prev = $index > 0 ? $siblings[ $index - 1 ] : null;
-		$next = $index < count( $siblings ) - 1 ? $siblings[ $index + 1 ] : null;
+		if ( empty( $siblings ) ) {
+			$is_first = true;
+			$is_last  = true;
+		} else {
+			$is_first = array_all( $siblings, function ( Step $sibling ) use ( $step ) {
+				return $step->get_order() < $sibling->get_order();
+			} );
+			$is_last  = array_all( $siblings, function ( Step $sibling ) use ( $step ) {
+				return $step->get_order() > $sibling->get_order();
+			} );
+		}
 
 		// if the previous step was not a benchmark, we should open the horizontal benchmark group
-		if ( ! $prev || ! $prev->is_benchmark() ) {
+		if ( $is_first ) {
 
 			?>
-            <div class="sortable-item benchmarks <?php echo $step->is_starting() ? 'starting' : ''?>"><?php
+            <div class="sortable-item benchmarks <?php echo $step->is_starting() ? 'starting' : '' ?>"><?php
 
 			if ( ! $step->is_starting() ) {
 				$this->add_step_button( 'before-group-' . $step->ID );
@@ -313,10 +318,22 @@ abstract class Benchmark extends Funnel_Step {
 		<?php
 
 		// if the next step is not a benchmark, close the benchmark group
-		if ( ! $next || ! $next->is_benchmark() ) {
+		if ( $is_last ) {
 			$this->add_step_button( [ 'id' => 'add-to-group-after-' . $step->ID, 'tooltip' => 'Add benchmark', 'class' => 'add-benchmark' ] );
-            ?></div></div><?php
+			?></div></div><?php
 		}
+	}
+
+	public function delete( Step $step ) {
+
+		$branch_steps = $step->get_sub_steps();
+
+		foreach ( $branch_steps as $branch_step ) {
+			$branch_step->delete(); // this might change the current step
+		}
+
+		// reset to the current step
+		$this->set_current_step( $step );
 	}
 
 }

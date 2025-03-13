@@ -165,7 +165,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$level = absint( $this->step_level );
 
 		// level has not been initialized yet, maybe the upgrade script didn't run?
-		if ( $level < 1 ){
+		if ( $level < 1 ) {
 			$this->get_funnel()->set_step_levels();
 			$this->pull();
 			$level = absint( $this->step_level );
@@ -448,6 +448,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		} );
 	}
 
+
+	public function get_parent_ids() {
+
+		$parents = [];
+		$parent  = $this->get_parent_step();
+
+		while ( $parent ) {
+			$parents[] = $parent->ID;
+			$parent    = $parent->get_parent_step();
+		}
+
+		return $parents;
+	}
+
 	/**
 	 * Returns an ordered array from the current branch to main
 	 *
@@ -546,7 +560,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Step|false
 	 */
 	public function get_next_action( Contact $contact ) {
-		$next = $this->__get_next_action( $contact );
+		$next = $this->_get_next_action( $contact );
 
 		/**
 		 * Allow plugins to filter the next step
@@ -557,12 +571,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return apply_filters( 'groundhogg/step/next_action', $next, $this );
 	}
 
-	public function __get_next_action( $contact ) {
+	/**
+	 * Helper "recursive" function for get_next_action
+	 *
+	 * @param $contact
+	 *
+	 * @return false|Base_Object|Step|object
+	 */
+	protected function _get_next_action( $contact ) {
 
 		if ( $this->is_benchmark() ) { // benchmarks
 
 			// Can return any closest action from the current branch, or any parent branch
-			$branches = $this->get_nested_branches_array();
+			$branches = explode( '|', $this->branch_path );
 			// but also the first step of the branch related to the benchmark, if one.
 			$branches[] = $this->ID;
 
@@ -614,7 +635,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// recursive, kind of.
 		// if we get here, either a logic or a benchmark with passthru enabled
-		return $next->__get_next_action( $contact );
+		return $next->_get_next_action( $contact );
 	}
 
 	/**
@@ -729,7 +750,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->where()
 		      ->equals( 'step_status', 'active' )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
-		      ->in( 'branch', $this->get_nested_branches_array() )
+		      ->in( 'branch', explode( '|', $this->branch_path ) )
 		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 )
 		      ->greaterThanEqualTo( 'step_level', $this->get_level() + 1 );
 
@@ -818,7 +839,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_before( Step $other ) {
-		return $this->is_same_funnel( $other ) && $this->get_order() < $other->get_order() && $this->get_level() < $other->get_level() && ! $this->is_parallel_branch( $other );
+		return $this->is_same_funnel( $other )
+		       && $this->get_order() < $other->get_order()
+		       && $this->get_level() < $other->get_level()
+		       && ! $this->is_parallel( $other );
 	}
 
 	/**
@@ -829,7 +853,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function is_after( Step $other ) {
-		return $this->is_same_funnel( $other ) && $this->get_order() > $other->get_order() && $this->get_level() > $other->get_level() && ! $this->is_parallel_branch( $other );
+		return $this->is_same_funnel( $other )
+		       && $this->get_order() > $other->get_order()
+		       && $this->get_level() > $other->get_level()
+		       && ! $this->is_parallel( $other );
 	}
 
 	/**
@@ -845,7 +872,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function get_siblings() {
 		return array_values( array_filter( $this->get_funnel()->get_steps(), function ( Step $step ) {
-			return $step->is_same_branch( $this );
+			return $step->is_same_branch( $this ) && $step->ID !== $this->ID;
 		} ) );
 	}
 
@@ -947,38 +974,135 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->branch === $other->branch;
 	}
 
+	public function update_branch_path_in_db() {
+		$branches = $this->get_nested_branches_array();
+		$this->update( [
+			'branch_path' => implode( '|', $branches ),
+			'ancestors'   => implode( '|', $this->get_parent_ids() )
+		] );
+	}
+
+	/**
+	 * Retrieve the lowest common ancestor of two steps
+	 *
+	 * @param Step $other
+	 *
+	 * @return array|string|false
+	 */
+	public function get_lowest_common_ancestor_id( Step $other ) {
+
+		$a_ancestors = explode( '|', $this->ancestors );
+		$b_ancestors = explode( '|', $other->ancestors );
+
+		$common = array_intersect( $a_ancestors, $b_ancestors );
+
+		if ( empty( $common ) ) {
+			return false;
+		}
+
+		return array_shift( $common );
+	}
+
+	/**
+	 * Retrieve the lowest common ancestor of two steps
+	 *
+	 * @param Step $other
+	 *
+	 * @return string
+	 */
+	public function get_lowest_common_ancestor_branch( Step $other ) {
+
+		$a_branches = explode( '|', $this->branch_path );
+		$b_branches = explode( '|', $other->branch_path );
+
+		$common = array_intersect( $a_branches, $b_branches );
+
+		if ( empty( $common ) ) {
+			return false;
+		}
+
+		return array_shift( $common );
+	}
+
 	/**
 	 * Tests to see if a given step is in a parallel branch to this one
-	 * Note, sequential benchmarks will be considered parallel
+	 * Note, adjacent benchmarks will be considered parallel
 	 *
 	 * @param Step $other
 	 *
 	 * @return bool
 	 */
-	public function is_parallel_branch( Step $other ) {
+	public function is_parallel( Step $other ) {
 
-		// we're in the same branch, can't be parallel
+		if ( $this->ID === $other->ID ) {
+			return false;
+		}
+
 		if ( $this->is_same_branch( $other ) ) {
-			return false;
+			return $this->is_same_level( $other );
 		}
 
-		// we're not in the same branch, so we have to check the parents
-		$pt = $this->get_parent_step();
-		$po = $other->get_parent_step();
-
-		// if either parent is false, at least one of the steps is in the main branch
-		if ( ! $pt || ! $po ) {
-			return false;
-		}
-
-		// if the IDs of the parents are the same, then we're in a parallel logic branch
-		if ( $pt->ID === $po->ID ) {
+		// special handling for benchmarks
+		if ( $this->_in_parallel_benchmark_branch( $other ) ) {
 			return true;
 		}
 
-		// if both parents are adjacent benchmarks, also parallel
-		if ( $po->is_benchmark() && $pt->is_benchmark() && $pt->is_adjacent_sibling( $po ) ) {
-			return true;
+		$common_ancestor_branch = $this->get_lowest_common_ancestor_branch( $other ); // will always be at least main
+		$common_ancestor_id     = $this->get_lowest_common_ancestor_id( $other ); // might be false
+
+		// no common ancestor
+		if ( ! $common_ancestor_id ) {
+			return false;
+		}
+
+		// if the common branch is after the common ancestor (meaning the branch belongs to the ancestor), then not parallel
+		// but, if the common ancestor is within the common branch, that means parallel
+		$branch_parent_id = explode( '-', $common_ancestor_branch )[0];
+
+		return $branch_parent_id !== $common_ancestor_id;
+	}
+
+	/**
+	 * Checks if the step is in a parallel benchmark branch
+	 *
+	 * @param Step $other
+	 *
+	 * @return bool
+	 */
+	protected function _in_parallel_benchmark_branch( Step $other ) {
+
+		// would start at main and go down
+		$a_branches  = array_reverse( explode( '|', $this->branch_path ) ); // first is always main
+		$a_ancestors = array_reverse( explode( '|', $this->ancestors ) );
+		$b_branches  = array_reverse( explode( '|', $other->branch_path ) ); // first is always main
+		$b_ancestors = array_reverse( explode( '|', $other->ancestors ) );
+
+		array_shift( $a_branches ); // get rid of 'main'
+		array_shift( $b_branches ); // get rid of 'main'
+
+		// need a parent to be parallel, duh!
+		if ( empty( $b_branches ) || empty( $a_branches ) || empty( $a_ancestors ) || empty( $b_ancestors ) ) {
+			return false;
+		}
+
+		// first would be main
+		foreach ( $a_branches as $i => $a_branch ) {
+
+			if ( ! isset( $b_branches[ $i ] ) || ! isset( $b_ancestors[ $i ] ) ) {
+				break; // no more comparisons
+			}
+
+			$b_branch = $b_branches[ $i ];
+
+			if ( $a_branch === $b_branch ) {
+				continue;
+			}
+
+			$a_ancestor = $a_ancestors[ $i ];
+			$b_ancestor = $b_ancestors[ $i ];
+
+			// we have found adjacent benchmarks, therefor the steps are parallel
+			return $a_ancestor === $a_branch && $b_ancestor === $b_branch;
 		}
 
 		return false;
@@ -987,37 +1111,44 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Ensures that the contact can travel through the branch conditions necessary to get to the current step
 	 *
+	 * @param Step    $from where contact currently is in the funnel
 	 * @param Contact $contact
 	 *
 	 * @return bool
 	 */
-	public function can_travel( Contact $contact ) {
+	public function can_travel( Step $from, $contact = null ) {
 
-		// exit condition, we can always travel in the main branch
-		if ( $this->is_main_branch() ) {
-			return true;
-		}
-
-		$branch = $this->branch; // the branch of the step (benchmark)
-		$parent = $this->get_parent_step(); // this SHOULD be a logic step as we already checked if we're in the main branch
-
-		if ( ! $parent ) {
-			// todo something horrible went wrong
-		}
-
-		// If the contact does not match the branch conditions to travel to the current step in the branch
-		if ( $parent->get_step_element()->matches_branch_conditions( $branch, $contact ) ) {
+		// the step to travel to must be after the step we're coming from
+		if ( ! $this->is_after( $from ) ) {
 			return false;
 		}
 
-		// we also have to check that we can travel to the parent step's branch
-		return $parent->can_travel( $contact );
+		$curr = $this;
+
+		while ( ! $curr->is_same_branch( $from ) ) {
+
+			$curr = $curr->get_parent_step();
+
+			if ( ! $curr ) {
+				break; // we reached main, and we can always travel to the main branch from anywhere
+			}
+
+			// If the contact does not match the branch conditions to travel to the current step in the branch
+			if ( $curr->is_logic() && is_a_contact( $contact ) && ! $curr->get_step_element()->matches_branch_conditions( $curr->branch, $contact ) ) {
+				return false;
+			}
+
+			// If the benchmark is not passthru
+			if ( $curr->is_benchmark() && ! $curr->can_passthru() ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
 	 * Whether this step can actually be completed
-	 *
-	 * Todo needs to be modified to work with branches!!!!
 	 *
 	 * Rules with branching:
 	 * - if in the main branch, can always complete so long as the order is greater
@@ -1048,7 +1179,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 			// We must be in the funnel and the current order MUST BE LESS than this one
 			// also ensure we're not in a parallel branch
-			if ( $current_step && $this->is_after( $current_step ) && $this->can_travel( $contact ) ) {
+			if ( $current_step && $this->can_travel( $current_step, $contact ) ) {
 				return true;
 			}
 		}
@@ -1298,11 +1429,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_level() === 1 ) {
-			return true;
-		}
-
-		if ( $this->get_order() === 1 ) {
+		if ( $this->get_level() === 1 || $this->get_order() === 1 ) {
 			return true;
 		}
 

@@ -261,7 +261,7 @@ class Funnel extends Base_Object_With_Meta {
 		$maxDepth = $level;
 
 		foreach ( $branch_steps as $i => $step ) {
-
+			$step->update_branch_path_in_db();// do this while we're here
 			if ( $step->is_benchmark() ) {
 				$step->update( [ 'step_level' => $level ] );
 				$maxDepth = max( $maxDepth, $this->set_step_levels( "$step->ID", $level + 1 ) );

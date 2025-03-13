@@ -1633,7 +1633,7 @@ function get_form_list() {
 	foreach ( $forms as $form ) {
 		$step = new Step( $form->ID );
 		if ( $step->is_active() ) {
-			$form_options[ $form->ID ] = $step->get_meta( 'form_name' );
+			$form_options[ $form->ID ] = $step->get_meta( 'form_name' ) ?: $step->get_step_title();
 		}
 	}
 

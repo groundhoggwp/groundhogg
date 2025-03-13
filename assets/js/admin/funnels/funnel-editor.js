@@ -869,10 +869,16 @@
 
       hideSettings () {
         $('#step-settings-container').addClass('slide-out')
+        setTimeout(() => {
+          document.dispatchEvent(new Event('resize'))
+        }, 400 )
       },
 
       showSettings () {
         $('#step-settings-container').removeClass('slide-out')
+        setTimeout(() => {
+          document.dispatchEvent(new Event('resize'))
+        }, 400 )
       },
 
       showAddStep () {
@@ -1125,11 +1131,6 @@
 
       startTour () {
 
-        // the funnel tour was dismissed already
-        if (this.funnelTourDismissed) {
-          // return;
-        }
-
         Groundhogg.components.Tour([
           {
             prompt  : `This is step flow. Your funnels are made up of a series of steps. Steps can be <span class="gh-text orange">benchmarks</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
@@ -1360,6 +1361,7 @@
             target  : '#funnel-activate',
           },
         ], {
+          fixed: true,
           onFinish : () => {
             return ajax({
               action: 'gh_dismiss_notice',

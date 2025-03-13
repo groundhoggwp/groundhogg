@@ -2488,11 +2488,14 @@
   const Tour = (steps, {
     onFinish = () => {},
     onDismiss = () => {},
+    fixed = false
   }) => {
 
     const State = Groundhogg.createState({
       current  : 0,
-      currentEl: null,
+      step: null,
+      target: null,
+      relative: null,
     })
 
     const currentStep = () => steps[State.current]
@@ -2503,6 +2506,8 @@
 
     const dismiss = () => {
       removeSteps()
+      document.removeEventListener( 'resize', rePositionStep )
+      document.removeEventListener( 'scroll', rePositionStep )
       onDismiss()
     }
 
@@ -2513,6 +2518,8 @@
 
       if (State.current + 1 >= steps.length) {
         removeSteps()
+        document.removeEventListener( 'resize', rePositionStep )
+        document.removeEventListener( 'scroll', rePositionStep )
         onFinish(true)
         return
       }
@@ -2541,12 +2548,80 @@
       positionStep()
     }
 
+    function rePositionStep () {
+
+      let {
+        position,
+      } = currentStep()
+
+      let {
+        target,
+        relative,
+        step
+      } = State
+
+      const targetPos = target.getBoundingClientRect()
+      const relativePos = relative.getBoundingClientRect()
+      const stepPos = step.getBoundingClientRect()
+
+      if ( fixed ){
+
+        switch (position) {
+          case 'right':
+            step.style.left = `${ targetPos.x + targetPos.width + 10 }px`
+            step.style.top = `${ targetPos.y }px`
+            break
+          case 'left':
+            step.style.left = `${ targetPos.x - stepPos.width - 10 }px`
+            step.style.top = `${ targetPos.y }px`
+            break
+          case 'above':
+            step.style.left = `${ targetPos.x }px`
+            step.style.top = `${ targetPos.y - stepPos.height - 10 }px`
+            break
+          case 'below':
+            step.style.left = `${ targetPos.x }px`
+            step.style.top = `${ targetPos.y + targetPos.height + 10 }px`
+            break
+          case 'below-left':
+            step.style.left = `${ targetPos.x + targetPos.width - stepPos.width }px`
+            step.style.top = `${ targetPos.y + targetPos.height + 10 }px`
+            break
+        }
+
+        return
+      }
+
+      switch (position) {
+        case 'right':
+          step.style.left = `${ targetPos.right - relativePos.left + 10 }px`
+          step.style.top = `${ targetPos.top - relativePos.top }px`
+          break
+        case 'left':
+          step.style.left = `${ targetPos.left - relativePos.left - stepPos.width - 10 }px`
+          step.style.top = `${ targetPos.top - relativePos.top }px`
+          break
+        case 'above':
+          step.style.left = `${ targetPos.left - relativePos.left }px`
+          step.style.top = `${ targetPos.top - relativePos.top - stepPos.height - 10 }px`
+          break
+        case 'below':
+          step.style.left = `${ targetPos.left - relativePos.left }px`
+          step.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          break
+        case 'below-left':
+          step.style.left = `${ targetPos.right - relativePos.left - stepPos.width }px`
+          step.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          break
+      }
+    }
+
     function positionStep () {
 
       let stepEl = TourStep()
       let {
         target,
-        position,
+        relative,
         onInit = () => {},
         onBefore = () => {}
       } = currentStep()
@@ -2558,7 +2633,14 @@
         return;
       }
 
-      let relative = getClosestRelativeAncestor(target)
+      if ( fixed ){
+        relative = document.body
+      } else if ( relative ){
+        relative = target.closest( relative )
+      } else {
+        relative = getClosestRelativeAncestor(target)
+      }
+
       relative.append(stepEl)
 
       onBefore({
@@ -2570,36 +2652,17 @@
         currentStep
       })
 
-      stepEl.style.position = 'absolute'
+      stepEl.style.position = fixed ? 'fixed' : 'absolute'
       // stepEl.style.zIndex = '100'
       target.classList.add( 'tour-highlighted' )
 
-      const targetPos = target.getBoundingClientRect()
-      const relativePos = relative.getBoundingClientRect()
-      const stepPos = stepEl.getBoundingClientRect()
+      State.set({
+        step: stepEl,
+        target,
+        relative
+      })
 
-      switch (position) {
-        case 'right':
-          stepEl.style.left = `${ targetPos.right - relativePos.left + 10 }px`
-          stepEl.style.top = `${ targetPos.top - relativePos.top }px`
-          break
-        case 'left':
-          stepEl.style.left = `${ targetPos.left - relativePos.left - stepPos.width - 10 }px`
-          stepEl.style.top = `${ targetPos.top - relativePos.top }px`
-          break
-        case 'above':
-          stepEl.style.left = `${ targetPos.left - relativePos.left }px`
-          stepEl.style.top = `${ targetPos.top - relativePos.top - stepPos.height - 10 }px`
-          break
-        case 'below':
-          stepEl.style.left = `${ targetPos.left - relativePos.left }px`
-          stepEl.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
-          break
-        case 'below-left':
-          stepEl.style.left = `${ targetPos.right - relativePos.left - stepPos.width }px`
-          stepEl.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
-          break
-      }
+      rePositionStep()
 
       onInit({
         next,
@@ -2638,6 +2701,9 @@
         }, State.current < steps.length - 1 ? 'Next' : 'finish'),
       ]),
     ])
+
+    document.addEventListener( 'resize', rePositionStep )
+    document.addEventListener( 'scroll', rePositionStep )
 
     positionStep()
   }

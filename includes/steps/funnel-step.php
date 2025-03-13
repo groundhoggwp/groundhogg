@@ -8,6 +8,7 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\array_all;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\current_screen_is_gh_page;
 use function Groundhogg\dashicon;
@@ -19,6 +20,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -620,6 +622,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
+                <?php if ( WP_DEBUG ): ?>
+                    <div class="step-label">ID: <?php echo $step->ID; ?></div>
+                    <div class="step-label">LVL: <?php echo $step->get_level(); ?></div>
+                <?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
                     <div class="step-label">Entry</div>
@@ -856,11 +862,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 										'checked' => $step->is_entry()
 									] );
 
-									echo html()->checkbox( [
-										'label'   => 'Allow contacts to pass through this benchmark',
-										'name'    => $this->setting_name_prefix( 'can_passthru' ),
-										'checked' => $step->can_passthru()
-									] );
+                                    echo html()->checkbox( [
+                                        'label'   => 'Allow contacts to pass through this benchmark',
+                                        'name'    => $this->setting_name_prefix( 'can_passthru' ),
+                                        'checked' => $step->can_passthru()
+                                    ] );
 
 								endif;
 
