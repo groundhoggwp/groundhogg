@@ -157,6 +157,7 @@ body:has(#funnel-form) {
 }
 
 #step-settings-container {
+  --bg-color: #f0f3f5;
   /*padding: 10px 20px;*/
   box-sizing: border-box;
   //overflow-y: auto;
@@ -164,11 +165,31 @@ body:has(#funnel-form) {
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
   border-left: 1px solid $primary-dark-15;
+  background-color: var(--bg-color);;
+  box-shadow: $box-shadow;
 
   &.slide-out {
     //transform: translateX(100vw); /* Move out to the right */
-    opacity: 0; /* Optional fade-out effect */
+    //opacity: 0;
     width: 0;
+
+    #step-settings-inner{
+      opacity: 0;
+    }
+
+    > #collapse-settings{
+      .dashicons-arrow-right-alt2 {
+        display: none;
+      }
+    }
+  }
+
+  &:not(.slide-out) {
+    > #collapse-settings{
+      .dashicons-arrow-left-alt2 {
+        display: none;
+      }
+    }
   }
 
   > #collapse-settings {
@@ -186,15 +207,8 @@ body:has(#funnel-form) {
     align-items: center;
     justify-content: center;
     height: 100px;
-    background-color: $background-color;
+    background-color: var(--bg-color);
   }
-
-  //top: 0;
-  //right: 0;
-  //bottom: 0;
-  //z-index: 10;
-  background-color: $background-color;
-  box-shadow: $box-shadow;
 
   #step-settings-inner {
 
@@ -204,6 +218,7 @@ body:has(#funnel-form) {
     left: 0;
     right: 0;
     overflow: auto;
+    transition: 0.4s;
 
     #add-steps {
 
@@ -290,6 +305,7 @@ body:has(#funnel-form) {
           border-radius: 5px;
           border: 1px solid var(--color);
           padding: 20px;
+          background-color: $background-color;
 
           &:has([data-group="benchmark"]) {
             --color: #{$benchmark-orange};

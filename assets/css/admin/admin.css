@@ -1273,6 +1273,24 @@ table .column-steps div.step-icon img {
   border-top-right-radius: 0;
 }
 
+.tour-window {
+  z-index: 98 !important;
+  position: fixed;
+  border-style: solid;
+  border-color: rgba(16, 38, 64, 0.15);
+  border-radius: 10px;
+  background: transparent;
+  top: 0;
+  left: 0;
+}
+.tour-window .tour-window-shadow {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 0 200px 100px #102640 !important;
+  background: transparent;
+}
+
 .tour-highlighted {
   z-index: 99 !important;
   position: relative;

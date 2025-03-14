@@ -77,19 +77,27 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 }
 
 #step-settings-container {
+  --bg-color: #f0f3f5;
   /*padding: 10px 20px;*/
   box-sizing: border-box;
   position: relative;
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
   border-left: 1px solid rgba(16, 38, 64, 0.15);
-  background-color: #F6F9FB;
+  background-color: var(--bg-color);
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
 }
 #step-settings-container.slide-out {
-  opacity: 0;
-  /* Optional fade-out effect */
   width: 0;
+}
+#step-settings-container.slide-out #step-settings-inner {
+  opacity: 0;
+}
+#step-settings-container.slide-out > #collapse-settings .dashicons-arrow-right-alt2 {
+  display: none;
+}
+#step-settings-container:not(.slide-out) > #collapse-settings .dashicons-arrow-left-alt2 {
+  display: none;
 }
 #step-settings-container > #collapse-settings {
   position: absolute;
@@ -106,7 +114,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   align-items: center;
   justify-content: center;
   height: 100px;
-  background-color: #F6F9FB;
+  background-color: var(--bg-color);
 }
 #step-settings-container #step-settings-inner {
   position: absolute;
@@ -115,6 +123,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   left: 0;
   right: 0;
   overflow: auto;
+  transition: 0.4s;
 }
 #step-settings-container #step-settings-inner #add-steps {
   padding: 30px;
@@ -182,6 +191,7 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   border-radius: 5px;
   border: 1px solid var(--color);
   padding: 20px;
+  background-color: #F6F9FB;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group:has([data-group=benchmark]) {
   --color: #f58115;

@@ -624,7 +624,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <div class="step-labels display-flex gap-10">
                 <?php if ( WP_DEBUG ): ?>
                     <div class="step-label">ID: <?php echo $step->ID; ?></div>
-                    <div class="step-label">LVL: <?php echo $step->get_level(); ?></div>
+                    <div class="step-label">Lvl: <?php echo $step->get_level(); ?></div>
                 <?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>

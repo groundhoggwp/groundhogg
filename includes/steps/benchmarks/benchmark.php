@@ -281,17 +281,14 @@ abstract class Benchmark extends Funnel_Step {
 			$sortable_classes[] = 'passthru';
 		}
 
+		$sub_steps = $step->get_sub_steps();
+
 		?>
         <div class="<?php echo implode( ' ', $sortable_classes ) ?>" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
 			<?php $this->__sortable_item( $step ); ?>
+            <?php if ( ! empty( $sub_steps ) || ! $is_last || ! $is_first ): ?>
             <div class="step-branch" data-branch="<?php esc_attr_e( $step->ID ); ?>">
 				<?php
-
-				$steps = $step->get_funnel()->get_steps();
-
-				$sub_steps = array_filter( $steps, function ( Step $sub ) use ( $step ) {
-					return $sub->branch_is( $step->ID );
-				} );
 
 				if ( ! empty( $sub_steps ) ) {
 					?>
@@ -314,6 +311,7 @@ abstract class Benchmark extends Funnel_Step {
 
 				?>
             </div>
+            <?php endif; ?>
         </div>
 		<?php
 

@@ -3074,7 +3074,7 @@ button:has(.gh-dropdown-menu) {
         background: none;
         font-size: 14px;
         flex-grow: 1;
-        //width: 100%;
+        max-width: 100%;
         justify-content: space-between;
 
         .gh-picker-item-text {

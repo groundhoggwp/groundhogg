@@ -86,8 +86,13 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				$classes[] = 'premium';
 			}
 
+            $keywords = [
+                $step->get_name(),
+	            $name,
+            ];
+
 			?>
-        <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-name="<?php esc_attr_e( $step->get_name() ); ?>">
+        <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-keywords="<?php esc_attr_e( implode( ',', $keywords ) ); ?>">
             <div class="gh-tooltip top"><?php echo $step->get_description(); ?></div>
             <div id='<?php echo $step->get_type(); ?>'
                  data-type="<?php esc_attr_e( $step->get_type() ); ?>"
@@ -194,7 +199,10 @@ function render_draggable_step_grid( $steps, $groups = true ) {
             </div>
         </div>
         <div id="step-settings-container" class="slide-out">
-            <button id="collapse-settings"><?php dashicon_e( 'arrow-right-alt2' ); ?></button>
+            <button id="collapse-settings">
+                <?php dashicon_e( 'arrow-right-alt2' ); ?>
+                <?php dashicon_e( 'arrow-left-alt2' ); ?>
+            </button>
             <div id="step-settings-inner">
                 <div id="add-steps">
                     <div class="steps-select">

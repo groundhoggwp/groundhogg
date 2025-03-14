@@ -1475,7 +1475,26 @@ table .column-steps {
   }
 }
 
+.tour-window {
+  z-index: 98 !important;
+  position: fixed;
+  border-style: solid;
+  border-color: $primary-dark-15;
+  border-radius: 10px;
+  background: transparent;
+  top: 0;
+  //right: 0;
+  left: 0;
+  //bottom: 0;
 
+  .tour-window-shadow {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 200px 100px $primary-dark !important;
+    background: transparent;
+  }
+}
 
 .tour-highlighted {
   z-index: 99 !important;

@@ -2488,26 +2488,27 @@
   const Tour = (steps, {
     onFinish = () => {},
     onDismiss = () => {},
-    fixed = false
+    fixed = false,
   }) => {
 
     const State = Groundhogg.createState({
-      current  : 0,
-      step: null,
-      target: null,
+      current : 0,
+      step    : null,
+      target  : null,
       relative: null,
     })
 
     const currentStep = () => steps[State.current]
     const removeSteps = () => {
+      document.querySelectorAll('.tour-prompt-container').forEach(el => el.remove())
       document.querySelectorAll('.tour-prompt').forEach(el => el.remove())
       document.querySelectorAll('.tour-highlighted').forEach(el => el.classList.remove('tour-highlighted'))
     }
 
     const dismiss = () => {
       removeSteps()
-      document.removeEventListener( 'resize', rePositionStep )
-      document.removeEventListener( 'scroll', rePositionStep )
+      document.removeEventListener('resize', rePositionStep)
+      document.removeEventListener('scroll', rePositionStep)
       onDismiss()
     }
 
@@ -2518,8 +2519,8 @@
 
       if (State.current + 1 >= steps.length) {
         removeSteps()
-        document.removeEventListener( 'resize', rePositionStep )
-        document.removeEventListener( 'scroll', rePositionStep )
+        document.removeEventListener('resize', rePositionStep)
+        document.removeEventListener('scroll', rePositionStep)
         onFinish(true)
         return
       }
@@ -2543,7 +2544,9 @@
     }
 
     const showStep = () => {
+
       removeSteps() // remove other prompts
+
       // create a new prompt
       positionStep()
     }
@@ -2557,35 +2560,43 @@
       let {
         target,
         relative,
-        step
+        step,
+        windowEl
       } = State
 
       const targetPos = target.getBoundingClientRect()
       const relativePos = relative.getBoundingClientRect()
       const stepPos = step.getBoundingClientRect()
 
-      if ( fixed ){
+      const gap = 20;
+
+      if (fixed) {
+
+        windowEl.style.height = `${ targetPos.height + gap*2 }px`
+        windowEl.style.width = `${ targetPos.width + gap*2 }px`
+        windowEl.style.borderWidth = `${ Math.round(targetPos.y) - gap }px ${ Math.round(window.innerWidth - targetPos.x) - gap }px ${ Math.round(
+          window.innerHeight - targetPos.y) - gap }px ${ Math.round(targetPos.x) - gap }px`
 
         switch (position) {
           case 'right':
-            step.style.left = `${ targetPos.x + targetPos.width + 10 }px`
+            step.style.left = `${ targetPos.x + targetPos.width + gap }px`
             step.style.top = `${ targetPos.y }px`
             break
           case 'left':
-            step.style.left = `${ targetPos.x - stepPos.width - 10 }px`
+            step.style.left = `${ targetPos.x - stepPos.width - gap }px`
             step.style.top = `${ targetPos.y }px`
             break
           case 'above':
             step.style.left = `${ targetPos.x }px`
-            step.style.top = `${ targetPos.y - stepPos.height - 10 }px`
+            step.style.top = `${ targetPos.y - stepPos.height - gap }px`
             break
           case 'below':
             step.style.left = `${ targetPos.x }px`
-            step.style.top = `${ targetPos.y + targetPos.height + 10 }px`
+            step.style.top = `${ targetPos.y + targetPos.height + gap }px`
             break
           case 'below-left':
             step.style.left = `${ targetPos.x + targetPos.width - stepPos.width }px`
-            step.style.top = `${ targetPos.y + targetPos.height + 10 }px`
+            step.style.top = `${ targetPos.y + targetPos.height + gap }px`
             break
         }
 
@@ -2594,54 +2605,71 @@
 
       switch (position) {
         case 'right':
-          step.style.left = `${ targetPos.right - relativePos.left + 10 }px`
+          step.style.left = `${ targetPos.right - relativePos.left + gap }px`
           step.style.top = `${ targetPos.top - relativePos.top }px`
           break
         case 'left':
-          step.style.left = `${ targetPos.left - relativePos.left - stepPos.width - 10 }px`
+          step.style.left = `${ targetPos.left - relativePos.left - stepPos.width - gap }px`
           step.style.top = `${ targetPos.top - relativePos.top }px`
           break
         case 'above':
           step.style.left = `${ targetPos.left - relativePos.left }px`
-          step.style.top = `${ targetPos.top - relativePos.top - stepPos.height - 10 }px`
+          step.style.top = `${ targetPos.top - relativePos.top - stepPos.height - gap }px`
           break
         case 'below':
           step.style.left = `${ targetPos.left - relativePos.left }px`
-          step.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          step.style.top = `${ targetPos.bottom - relativePos.top + gap }px`
           break
         case 'below-left':
           step.style.left = `${ targetPos.right - relativePos.left - stepPos.width }px`
-          step.style.top = `${ targetPos.bottom - relativePos.top + 10 }px`
+          step.style.top = `${ targetPos.bottom - relativePos.top + gap }px`
           break
       }
     }
 
     function positionStep () {
 
-      let stepEl = TourStep()
+      let tourEl = TourStep()
+      let windowEl = tourEl.querySelector('.tour-window')
+      let stepEl = tourEl.querySelector('.tour-prompt')
       let {
         target,
         relative,
         onInit = () => {},
-        onBefore = () => {}
+        onBefore = () => {},
       } = currentStep()
 
       target = document.querySelector(target)
 
-      if ( ! target ){
+      if (!target) {
         next()
-        return;
+        return
       }
 
-      if ( fixed ){
+      if (fixed) {
         relative = document.body
-      } else if ( relative ){
-        relative = target.closest( relative )
-      } else {
+      }
+      else if (relative) {
+        relative = target.closest(relative)
+      }
+      else {
         relative = getClosestRelativeAncestor(target)
       }
 
-      relative.append(stepEl)
+      stepEl.style.position = fixed ? 'fixed' : 'absolute'
+
+      if ( fixed ){
+        relative.append(tourEl)
+      } else {
+        target.classList.add('tour-highlighted')
+        relative.append(stepEl)
+      }
+
+      target.scrollIntoView({
+        behavior: 'instant',
+        block   : 'center',
+        inline  : 'center',
+      })
 
       onBefore({
         next,
@@ -2649,17 +2677,15 @@
         target,
         relative,
         step: stepEl,
-        currentStep
+        windowEl,
+        currentStep,
       })
-
-      stepEl.style.position = fixed ? 'fixed' : 'absolute'
-      // stepEl.style.zIndex = '100'
-      target.classList.add( 'tour-highlighted' )
 
       State.set({
         step: stepEl,
+        windowEl,
         target,
-        relative
+        relative,
       })
 
       rePositionStep()
@@ -2670,40 +2696,53 @@
         target,
         relative,
         step: stepEl,
-        currentStep
+        windowEl,
+        currentStep,
       })
 
       stepEl.querySelector('#tour-next').focus()
     }
 
     const TourStep = () => MakeEl.Div({
-      className: `tour-prompt ${currentStep().position}`,
-      style    : {
-        padding: '10px',
-        width  : '200px',
-      },
+      className: 'tour-prompt-container',
     }, [
-      MakeEl.Button({
-        className: 'dismiss',
-        onClick: e => dismiss()
-      }, MakeEl.Dashicon('no-alt')),
-      MakeEl.Div({}, currentStep().prompt),
-      MakeEl.Div({ className: 'display-flex flex-end gap-5 space-above-10' }, [
-        State.current > 0 ? MakeEl.Button({
-          id: 'tour-prev',
-          className: 'gh-button small secondary text prev-step',
-          onClick  : () => prev(),
-        }, 'Prev') : null,
-        currentStep().showNext === false ? null : MakeEl.Button({
-          id: 'tour-next',
-          className: 'gh-button small secondary next-step',
-          onClick  : () => next(),
-        }, State.current < steps.length - 1 ? 'Next' : 'finish'),
+      fixed ? MakeEl.Div({
+        className: 'tour-window',
+      }, [
+        MakeEl.Div({
+          className: 'tour-window-shadow',
+          onClick: next
+        })
+      ]) : null,
+      MakeEl.Div({
+        className: `tour-prompt ${ currentStep().position }`,
+        style    : {
+          padding: '10px',
+          width  : '200px',
+        },
+      }, [
+        MakeEl.Button({
+          className: 'dismiss',
+          onClick  : e => dismiss(),
+        }, MakeEl.Dashicon('no-alt')),
+        MakeEl.Div({}, currentStep().prompt),
+        MakeEl.Div({ className: 'display-flex flex-end gap-5 space-above-10' }, [
+          State.current > 0 ? MakeEl.Button({
+            id       : 'tour-prev',
+            className: 'gh-button small secondary text prev-step',
+            onClick  : () => prev(),
+          }, 'Prev') : null,
+          currentStep().showNext === false ? null : MakeEl.Button({
+            id       : 'tour-next',
+            className: `gh-button small ${State.current < steps.length - 1 ? 'secondary' : 'primary'} next-step`,
+            onClick  : () => next(),
+          }, State.current < steps.length - 1 ? 'Next' : 'Finish'),
+        ]),
       ]),
     ])
 
-    document.addEventListener( 'resize', rePositionStep )
-    document.addEventListener( 'scroll', rePositionStep )
+    document.addEventListener('resize', rePositionStep)
+    document.addEventListener('scroll', rePositionStep)
 
     positionStep()
   }

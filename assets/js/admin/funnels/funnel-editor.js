@@ -163,9 +163,16 @@
 
         })
 
+        const settingsHidden = () => $( '#step-settings-container' ).hasClass('slide-out')
+
         $document.on('click', '#collapse-settings', e => {
-          this.startEditing(null)
-          this.hideSettings()
+
+          if ( settingsHidden() ){
+            this.showSettings()
+          } else {
+            this.startEditing(null)
+            this.hideSettings()
+          }
         })
 
         $document.on('click', '#step-flow .step:not(.step-placeholder)', function (e) {
@@ -195,7 +202,7 @@
           }
 
           if (this.addSearch) {
-            $(`.select-step:not([data-name*="${ this.addSearch }" i])`).removeClass('visible')
+            $(`.select-step:not([data-keywords*="${ this.addSearch }" i])`).removeClass('visible')
           }
         }
 
@@ -306,7 +313,9 @@
           this.save(true).then(() => {
             if (this.addEl) {
               this.addEl = document.getElementById(this.addEl.id)
-              this.addEl.classList.add('here')
+              if ( this.addEl ){
+                this.addEl.classList.add('here')
+              }
             }
           })
         })
@@ -1200,7 +1209,7 @@
           {
             prompt  : '👈 Click on a step in the flow to show its settings.',
             position: 'right',
-            target  : '#step-flow .step',
+            target  : '#step-flow .step.apply_tag',
             onInit  : ({ target }) => {
               target.click()
             },
@@ -1309,13 +1318,6 @@
             target  : '#step-flow .step.if_else',
             onInit  : ({ target }) => {
               target.click()
-              setTimeout(() => {
-                target.scrollIntoView({
-                  behavior: 'smooth',
-                  block   : 'center',
-                  inline  : 'center',
-                })
-              }, 250)
             },
           },
           {
@@ -1363,6 +1365,9 @@
         ], {
           fixed: true,
           onFinish : () => {
+            dialog({
+              message: '🎉 Tour complete!'
+            })
             return ajax({
               action: 'gh_dismiss_notice',
               notice: 'funnel-tour',
@@ -1386,6 +1391,8 @@
     $(function () {
       drawLogicLines()
       Funnel.init().then(() => {
+
+        Funnel.startTour()
 
         // if tour is dismissed, do nothing
         if (Funnel.funnelTourDismissed) {
