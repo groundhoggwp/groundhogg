@@ -1392,8 +1392,6 @@
       drawLogicLines()
       Funnel.init().then(() => {
 
-        Funnel.startTour()
-
         // if tour is dismissed, do nothing
         if (Funnel.funnelTourDismissed) {
           return
@@ -1408,6 +1406,12 @@
               // open a new scratch funnel to start the tour
               window.open(Funnel.scratchFunnelURL, '_self')
             },
+            onCancel: () => {
+              return ajax({
+                action: 'gh_dismiss_notice',
+                notice: 'funnel-tour',
+              })
+            }
           })
           return
         }
