@@ -983,12 +983,30 @@
         const type = step.data.step_type
         let extra = {}
 
+        // it's a benchmark that might have inner steps
+        if ( step.data.step_group === 'benchmark' && document.querySelector( `#step-flow .step-branch[data-branch="${step.ID}"]:has(.step)`) ){
+
+          extra = await new Promise((res, rej) => {
+
+            confirmationModal({
+              alert      : `<p>${ __('Do you also want to duplicate steps in the branch?', 'groundhogg') }</p>`,
+              confirmText: __('Yes, duplicate them!', 'groundhogg'),
+              closeText  : __('No, just the benchmark.', 'groundhogg'),
+              onConfirm  : e => res({
+                __duplicate_inner: true,
+              }),
+              onCancel   : rej
+            })
+
+          })
+
+        }
+
         if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onDuplicate')) {
-          try {
-            extra = await new Promise((res, rej) => this.stepCallbacks[type].onDuplicate(step, res, rej))
-          }
-          catch (e) {
-            throw e
+          let _extra = await new Promise((res, rej) => this.stepCallbacks[type].onDuplicate(step, res, rej))
+          extra = {
+            ...extra,
+            ..._extra,
           }
         }
 

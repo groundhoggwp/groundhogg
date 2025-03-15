@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Step;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\maybe_explode;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,7 +27,7 @@ abstract class Branch_Logic extends Logic {
 		return 'branching';
 	}
 
-    abstract protected function get_branch_name( $branch );
+	abstract protected function get_branch_name( $branch );
 
 	/**
 	 * Whether the contact matches the conditions for the current branch
@@ -98,9 +99,9 @@ abstract class Branch_Logic extends Logic {
 
 		?>
         <div class="sortable-item logic branch-logic" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
-            <?php $this->add_step_button( 'before-' . $step->ID ); ?>
+			<?php $this->add_step_button( 'before-' . $step->ID ); ?>
             <div class="flow-line"></div>
-            <?php $this->__sortable_item( $step ); ?>
+			<?php $this->__sortable_item( $step ); ?>
             <div class="display-flex align-top step-branches">
 				<?php foreach ( $this->get_branches() as $branch_id ):
 
@@ -108,20 +109,20 @@ abstract class Branch_Logic extends Logic {
 						return $step->branch === $branch_id;
 					} );
 
-                    $classes = $this->get_branch_classes( $branch_id );
+					$classes = $this->get_branch_classes( $branch_id );
 
 					?>
                     <div class="split-branch <?php echo $classes ?>">
                         <div class="logic-line line-above">
                             <span class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
-                        <div id="<?php esc_attr_e( 'branch-' . $branch_id );?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
+                        <div id="<?php esc_attr_e( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
 								$branch_step->sortable_item();
 							}
 
-                            $this->add_step_button( 'in-branch-' . $branch_id );
+							$this->add_step_button( 'in-branch-' . $branch_id );
 
-                            ?></div>
+							?></div>
                         <div class="logic-line line-below"></div>
                         <div class="logic-line line-below-after"></div>
                     </div>
@@ -136,7 +137,7 @@ abstract class Branch_Logic extends Logic {
 	 *
 	 * @param string|array $branch
 	 *
-	 * @return array
+	 * @return Step[]
 	 */
 	public function get_sub_steps( $branch = false ) {
 
@@ -145,7 +146,7 @@ abstract class Branch_Logic extends Logic {
 
 		$branches = array_map( [ $this, 'maybe_prefix_branch' ], $branches );
 
-        // use array_values to reindex the array
+		// use array_values to reindex the array
 		return array_values( array_filter( $steps, function ( Step $step ) use ( $branches ) {
 			return in_array( $step->branch, $branches );
 		} ) );
@@ -169,6 +170,36 @@ abstract class Branch_Logic extends Logic {
 		// reset to the current step
 		$this->set_current_step( $step );
 	}
+
+	/**
+	 * Duplicate the steps in the branches
+	 *
+	 * @param Step $new
+	 * @param Step $original
+	 *
+	 * @return void
+	 */
+	public function duplicate( $new, $original ) {
+
+        // don't duplicate sub steps
+        if ( ! get_post_var( '__duplicate_inner' ) ){
+            return;
+        }
+
+		// get the OG sub steps
+		$og_sub_steps = $original->get_step_element()->get_sub_steps();
+
+		foreach ( $og_sub_steps as $sub_step ) {
+			// duplicate the previous step
+			$new_sub_step = $sub_step->duplicate( [
+				'step_status' => 'inactive', // must be inactive to start,
+//				'step_order'  => self::get_step_order(),
+                'branch' => str_replace( "$original->ID", "$new->ID", $sub_step->branch )
+			] );
+        }
+
+		$this->set_current_step( $original );
+    }
 
 	/**
 	 * @param Step $step
@@ -198,7 +229,7 @@ abstract class Branch_Logic extends Logic {
 	}
 
 	protected function get_branch_classes( $branch_id ): string {
-        return '';
+		return '';
 	}
 
 }

@@ -86,22 +86,22 @@ class Web_Form extends Benchmark {
 		return [];
 	}
 
-    protected function after_settings( Step $step ) {
-	    echo html()->input( [
-		    'id'          => $this->setting_id_prefix( 'form_name' ),
-		    'name'        => $this->setting_name_prefix( 'form_name' ),
-		    'value'       => $this->get_setting( 'form_name', $step->step_title ),
-		    'class'       => 'full-width',
-		    'style'       => [
-			    'font-size' => '18px'
-		    ],
-		    'placeholder' => 'Form name...'
-	    ] );
+	protected function after_settings( Step $step ) {
+		echo html()->input( [
+			'id'          => $this->setting_id_prefix( 'form_name' ),
+			'name'        => $this->setting_name_prefix( 'form_name' ),
+			'value'       => $this->get_setting( 'form_name', $step->step_title ),
+			'class'       => 'full-width',
+			'style'       => [
+				'font-size' => '18px'
+			],
+			'placeholder' => 'Form name...'
+		] );
 
-	    echo html()->e( 'div', [
-		    'id' => "step_{$step->ID}_web_form_builder"
-	    ], 'Form Builder' );
-    }
+		echo html()->e( 'div', [
+			'id' => "step_{$step->ID}_web_form_builder"
+		], 'Form Builder' );
+	}
 
 	protected function before_step_notes( Step $step ) {
 
@@ -273,6 +273,7 @@ class Web_Form extends Benchmark {
 			'form_name'       => [
 				'default'  => '',
 				'sanitize' => 'sanitize_text_field',
+				'initial'  => 'Web Form'
 			],
 			'enable_ajax'     => [
 				'default'  => false,

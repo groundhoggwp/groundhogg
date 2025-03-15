@@ -88,32 +88,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
 			add_action( "admin_enqueue_scripts", [ $this, 'admin_scripts' ] );
-			add_action( 'groundhogg/step/duplicated', [ $this, 'after_duplicate' ], 10, 2 );
 		}
 
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();
-	}
-
-	/**
-	 * Process after duplicate step stuff
-	 *
-	 * @param $new      Step
-	 * @param $original Step
-	 *
-	 * @return void
-	 */
-	public function after_duplicate( $new, $original ) {
-
-		// not the right step type, exit out
-		if ( $new->get_type() !== $this->get_type() ) {
-			return;
-		}
-
-		$this->set_current_step( $new );
-
-		$this->duplicate( $new, $original );
 	}
 
 	protected function add_additional_actions() {
@@ -473,15 +452,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	protected function get_current_event() {
 		return $this->current_event;
-	}
-
-	/**
-	 * Gets the step order
-	 *
-	 * @return false|int|string
-	 */
-	private function get_posted_order() {
-		return array_search( $this->get_current_step()->get_id(), wp_parse_id_list( $_POST['step_ids'] ) ) + 1;
 	}
 
 	/**
@@ -917,6 +887,25 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+     * Get the step order
+     *
+	 * @param $from
+	 *
+	 * @return int
+	 */
+    public static function get_step_order( $from = null ) {
+	    static $order = 0;
+
+        if ( is_int( $from ) ) {
+            $order = $from;
+            return $order;
+        }
+
+        $order++;
+        return $order;
+    }
+
+	/**
 	 * Initialize the posted settings array
 	 *
 	 * @param $step Step
@@ -951,7 +940,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$data = [
 			'branch'     => sanitize_key( $this->get_posted_data( 'branch', 'main' ) ),
-			'step_order' => $this->get_posted_order()
+			'step_order' => self::get_step_order()
 		];
 
 		if ( $this->get_posted_data( 'step_title' ) ) {

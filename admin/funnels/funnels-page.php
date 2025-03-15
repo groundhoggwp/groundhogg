@@ -8,6 +8,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\action_url;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
@@ -684,6 +685,7 @@ class Funnels_Page extends Admin_Page {
 
 		//get all the steps in the funnel.
 		$step_ids = get_post_var( 'step_ids' );
+        Funnel_Step::get_step_order( 0 );
 
 		if ( empty( $step_ids ) ) {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
@@ -703,17 +705,10 @@ class Funnels_Page extends Admin_Page {
 				if ( $stepId === 'duplicate' ) {
 
 					// duplicate the previous step
-					$new = $step->duplicate( [
+					$step->duplicate( [
 						'step_status' => 'inactive', // must be inactive to start,
-						'step_order'  => $step->get_order() + 1,
+						'step_order'  => Funnel_Step::get_step_order(),
 					] );
-
-                    $duplicate_args = get_post_var( '_duplicate_step' );
-
-                    if ( ! empty( $duplicate_args ) ) {
-                        $duplicate_args = json_decode( $duplicate_args, true ) ?: [];
-                        $step->get_step_element()->duplicate( $new, $step );
-                    }
 
 					continue;
 				}
@@ -731,12 +726,6 @@ class Funnels_Page extends Admin_Page {
 					'branch'    => 'sanitize_key',
 				] );
 
-				if ( $step && $step->exists() ) {
-					$step_order = $step->get_order() + 1;
-				} else {
-					$step_order = 1;
-				}
-
 				$element = Plugin::instance()->step_manager->get_element( $step_data['step_type'] );
 
 				$step = new Step();
@@ -746,7 +735,7 @@ class Funnels_Page extends Admin_Page {
 					'step_title'  => $element->get_name(),
 					'step_type'   => $element->get_type(),
 					'step_group'  => $element->get_group(),
-					'step_order'  => $step_order,
+					'step_order'  => Funnel_Step::get_step_order(),
 					'step_status' => 'inactive', // all steps added are by default inactive
 					'branch'      => $step_data['branch']
 				] );

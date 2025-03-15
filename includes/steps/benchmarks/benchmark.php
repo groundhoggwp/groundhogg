@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\array_all;
+use function Groundhogg\get_post_var;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\process_events;
@@ -333,5 +334,27 @@ abstract class Benchmark extends Funnel_Step {
 		// reset to the current step
 		$this->set_current_step( $step );
 	}
+
+    public function duplicate( $new, $original ) {
+
+        // don't duplicate sub steps
+	    if ( ! get_post_var( '__duplicate_inner' ) ){
+		    return;
+	    }
+
+	    // get the OG sub steps
+	    $og_sub_steps = $original->get_sub_steps();
+
+	    foreach ( $og_sub_steps as $sub_step ) {
+		    // duplicate the previous step
+		    $new_sub_step = $sub_step->duplicate( [
+			    'step_status' => 'inactive', // must be inactive to start,
+//				'step_order'  => self::get_step_order(),
+			    'branch' => $new->ID
+		    ] );
+	    }
+
+	    $this->set_current_step( $original );
+    }
 
 }

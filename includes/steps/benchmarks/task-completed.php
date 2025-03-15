@@ -133,7 +133,7 @@ class Task_Completed extends Benchmark {
 		$options = [];
 
 		foreach ( $create_task_steps as $available_step ) {
-			$options[ $available_step->get_id() ] = sprintf( "%d. %s", $available_step->get_order(), $available_step->get_title() );
+			$options[ $available_step->get_id() ] = sprintf( "%d. %s", $available_step->get_order(), $available_step->get_meta( 'summary' ) );
 		}
 
 		echo html()->e( 'p', [], __( 'Run when these preceding tasks are completed...', 'groundhogg' ) );
@@ -177,8 +177,8 @@ class Task_Completed extends Benchmark {
 
 		$step_ids   = wp_parse_id_list( $step_ids );
 		$task_steps = array_map_to_class( $step_ids, Step::class );
-		$task_steps = array_filter( $task_steps, function ( $task_step ) use ( $step ) {
-			return $task_step->is_before( $step );
+		$task_steps = array_filter( $task_steps, function ( Step $task_step ) use ( $step ) {
+			return $task_step->exists() && $task_step->is_before( $step );
 		} );
 
 		return get_object_ids( $task_steps );

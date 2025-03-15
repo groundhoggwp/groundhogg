@@ -1652,6 +1652,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Duplicate a step and call the duplicate method from the step element
+	 *
+	 * @param $overrides
+	 * @param $meta_overrides
+	 *
+	 * @return Base_Object|Base_Object_With_Meta
+	 */
+	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+		$new = parent::duplicate( $overrides, $meta_overrides );
+		$this->get_step_element()->duplicate( $new, $this );
+		return $new;
+	}
+
+	/**
 	 * Whether this step has changes
 	 *
 	 * @return bool
