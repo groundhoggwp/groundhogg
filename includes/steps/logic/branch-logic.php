@@ -200,7 +200,8 @@ abstract class Branch_Logic extends Logic {
 			$new_sub_step = $sub_step->duplicate( [
 				'step_status' => 'inactive', // must be inactive to start,
 //				'step_order'  => self::get_step_order(),
-				'branch'      => str_replace( "$original->ID", "$new->ID", $sub_step->branch )
+				'branch'      => str_replace( "$original->ID", "$new->ID", $sub_step->branch ),
+				'funnel_id'   => $new->funnel_id
 			] );
 		}
 

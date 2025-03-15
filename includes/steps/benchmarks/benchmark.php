@@ -287,32 +287,32 @@ abstract class Benchmark extends Funnel_Step {
 		?>
         <div class="<?php echo implode( ' ', $sortable_classes ) ?>" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
 			<?php $this->__sortable_item( $step ); ?>
-            <?php if ( ! empty( $sub_steps ) || ! $is_last || ! $is_first ): ?>
-            <div class="step-branch" data-branch="<?php esc_attr_e( $step->ID ); ?>">
-				<?php
+			<?php if ( ! empty( $sub_steps ) || ! $is_last || ! $is_first ): ?>
+                <div class="step-branch" data-branch="<?php esc_attr_e( $step->ID ); ?>">
+					<?php
 
-				if ( ! empty( $sub_steps ) ) {
+					if ( ! empty( $sub_steps ) ) {
+						?>
+                        <div class="flow-line"></div><?php
+					}
+
+					foreach ( $sub_steps as $sub_step ) {
+						$sub_step->get_step_element()->validate_settings( $sub_step );
+						$sub_step->sortable_item();
+					}
+
+					$this->set_current_step( $step );
+
+					if ( empty( $sub_steps ) ) {
+						?>
+                        <div class="flow-line"></div><?php
+					}
+
+					$this->add_step_button( 'end-inside-' . $step->ID );
+
 					?>
-                    <div class="flow-line"></div><?php
-				}
-
-				foreach ( $sub_steps as $sub_step ) {
-					$sub_step->get_step_element()->validate_settings( $sub_step );
-					$sub_step->sortable_item();
-				}
-
-				$this->set_current_step( $step );
-
-				if ( empty( $sub_steps ) ) {
-					?>
-                    <div class="flow-line"></div><?php
-				}
-
-				$this->add_step_button( 'end-inside-' . $step->ID );
-
-				?>
-            </div>
-            <?php endif; ?>
+                </div>
+			<?php endif; ?>
         </div>
 		<?php
 
@@ -335,26 +335,27 @@ abstract class Benchmark extends Funnel_Step {
 		$this->set_current_step( $step );
 	}
 
-    public function duplicate( $new, $original ) {
+	public function duplicate( $new, $original ) {
 
-        // don't duplicate sub steps
-	    if ( ! get_post_var( '__duplicate_inner' ) ){
-		    return;
-	    }
+		// don't duplicate sub steps
+		if ( ! get_post_var( '__duplicate_inner' ) ) {
+			return;
+		}
 
-	    // get the OG sub steps
-	    $og_sub_steps = $original->get_sub_steps();
+		// get the OG sub steps
+		$og_sub_steps = $original->get_sub_steps();
 
-	    foreach ( $og_sub_steps as $sub_step ) {
-		    // duplicate the previous step
-		    $new_sub_step = $sub_step->duplicate( [
-			    'step_status' => 'inactive', // must be inactive to start,
+		foreach ( $og_sub_steps as $sub_step ) {
+			// duplicate the previous step
+			$new_sub_step = $sub_step->duplicate( [
+				'step_status' => 'inactive', // must be inactive to start,
 //				'step_order'  => self::get_step_order(),
-			    'branch' => $new->ID
-		    ] );
-	    }
+				'branch'      => $new->ID,
+				'funnel_id'   => $new->funnel_id,
+			] );
+		}
 
-	    $this->set_current_step( $original );
-    }
+		$this->set_current_step( $original );
+	}
 
 }

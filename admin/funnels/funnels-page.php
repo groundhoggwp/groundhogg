@@ -729,9 +729,10 @@ class Funnels_Page extends Admin_Page {
 					}
 
 					$new = $step_to_copy->duplicate( [
+						'funnel_id'   => $funnel_id,
 						'step_status' => 'inactive', // must be inactive to start,
 						'step_order'  => Funnel_Step::get_step_order(),
-						'funnel_id'   => $funnel_id
+						'branch'      => sanitize_key( $step_data['branch'] ),
 					] );
 
 					continue;
