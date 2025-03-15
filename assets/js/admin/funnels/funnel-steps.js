@@ -923,12 +923,12 @@
         confirmText: __('Yes, duplicate them!', 'groundhogg'),
         closeText  : __('No, just the logic step.', 'groundhogg'),
         onConfirm  : e => {
-          res({
-            __duplicate_inner: true,
-          })
+          res({})
         },
         onCancel   : e => {
-          rej()
+          res({
+            __ignore_inner: true,
+          })
         },
       })
 
@@ -1155,7 +1155,7 @@
           })
         },
         onCancel   : e => {
-          rej()
+          res({})
         },
       })
 

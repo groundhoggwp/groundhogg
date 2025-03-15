@@ -125,26 +125,26 @@ class Funnels_Page extends Admin_Page {
 		}
 	}
 
-    protected function get_title_actions() {
+	protected function get_title_actions() {
 
-        if ( $this->get_current_action() === 'add' ){
-	        return [
-		        [
-			        'link'   => action_url( 'start_from_scratch' ),
-			        'action' => __( 'Start from scratch', 'groundhogg' ),
-			        'target' => '_self',
-		        ]
-	        ];
-        }
+		if ( $this->get_current_action() === 'add' ) {
+			return [
+				[
+					'link'   => action_url( 'start_from_scratch' ),
+					'action' => __( 'Start from scratch', 'groundhogg' ),
+					'target' => '_self',
+				]
+			];
+		}
 
-	    return [
-		    [
-			    'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-			    'action' => __( 'Add New', 'groundhogg' ),
-			    'target' => '_self',
-		    ]
-	    ];
-    }
+		return [
+			[
+				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
+				'action' => __( 'Add New', 'groundhogg' ),
+				'target' => '_self',
+			]
+		];
+	}
 
 	/**
 	 * Redirect to the add screen if no funnels are present.
@@ -221,14 +221,14 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-					'steps'      => $funnel->get_steps(),
-					'id'         => absint( get_request_var( 'funnel' ) ),
-					'save_text'  => __( 'Update', 'groundhogg' ),
-					'export_url' => $funnel->export_url(),
-					'is_active'  => $funnel->is_active(),
-                    'themeStyle' => get_stylesheet_uri(),
-                    'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
-                    'scratchFunnelURL' => action_url( 'start_from_scratch' ),
+					'steps'               => $funnel->get_steps(),
+					'id'                  => absint( get_request_var( 'funnel' ) ),
+					'save_text'           => __( 'Update', 'groundhogg' ),
+					'export_url'          => $funnel->export_url(),
+					'is_active'           => $funnel->is_active(),
+					'themeStyle'          => get_stylesheet_uri(),
+					'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
+					'scratchFunnelURL'    => action_url( 'start_from_scratch' ),
 				] );
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
@@ -671,7 +671,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( get_post_var( '_unlock_step' ) ) {
 			$step_id = absint( get_post_var( '_unlock_step' ) );
-            // update directly to avoid the changes/commit feature
+			// update directly to avoid the changes/commit feature
 			db()->steps->update( $step_id, [ 'is_locked' => 0 ] );
 		}
 
@@ -685,7 +685,7 @@ class Funnels_Page extends Admin_Page {
 
 		//get all the steps in the funnel.
 		$step_ids = get_post_var( 'step_ids' );
-        Funnel_Step::get_step_order( 0 );
+		Funnel_Step::get_step_order( 0 );
 
 		if ( empty( $step_ids ) ) {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
@@ -719,6 +719,24 @@ class Funnels_Page extends Admin_Page {
 					continue;
 				}
 
+				// we're copying another step
+				if ( isset( $step_data['copy'] ) ) {
+
+					$step_to_copy = new Step( absint( $step_data['copy'] ) );
+
+					if ( ! $step_to_copy->exists() ) {
+						continue;
+					}
+
+					$new = $step_to_copy->duplicate( [
+						'step_status' => 'inactive', // must be inactive to start,
+						'step_order'  => Funnel_Step::get_step_order(),
+						'funnel_id'   => $funnel_id
+					] );
+
+					continue;
+				}
+
 				$step_data = array_apply_callbacks( $step_data, [
 					'step_type' => function ( $value ) {
 						return one_of( $value, Plugin::instance()->step_manager->get_types() );
@@ -740,13 +758,13 @@ class Funnels_Page extends Admin_Page {
 					'branch'      => $step_data['branch']
 				] );
 
-                $schema = $element->get_settings_schema();
+				$schema = $element->get_settings_schema();
 
-                foreach ( $schema as $setting => $setting_schema ) {
-                    if ( isset( $setting_schema['initial'] ) ){
-	                    $step->update_meta( $setting, $setting_schema['initial'] );
-                    }
-                }
+				foreach ( $schema as $setting => $setting_schema ) {
+					if ( isset( $setting_schema['initial'] ) ) {
+						$step->update_meta( $setting, $setting_schema['initial'] );
+					}
+				}
 
 				continue;
 			}
@@ -763,13 +781,13 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel->set_step_levels();
 
-        // activate the funnel
+		// activate the funnel
 		if ( get_post_var( '_activate' ) ) {
 			$args['status']       = 'active';
 			$args['last_updated'] = current_time( 'mysql' );
 		}
 
-        // deactivate the funnel
+		// deactivate the funnel
 		if ( get_post_var( '_deactivate' ) ) {
 
 			// changes were not committed, so let's delete them
@@ -781,9 +799,9 @@ class Funnels_Page extends Admin_Page {
 			$args['last_updated'] = current_time( 'mysql' );
 		}
 
-        // deleted uncommited changes
+		// deleted uncommited changes
 		if ( get_post_var( '_uncommit' ) ) {
-            $funnel->uncommit();
+			$funnel->uncommit();
 		}
 
 		// if the funnel does not have any entry steps, it cannot be active.

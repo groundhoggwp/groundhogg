@@ -585,7 +585,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                 data-type="<?php esc_attr_e( $step->get_type() ); ?>"
                 data-group="<?php esc_attr_e( $step->get_group() ); ?>"
                 data-level="<?php esc_attr_e( $step->get_level() ); ?>"
-                class="step <?php echo implode( ' ', $classes ) ?>">
+                class="step <?php echo implode( ' ', $classes ) ?>" tabindex="0">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">

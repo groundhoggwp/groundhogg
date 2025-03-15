@@ -89,6 +89,8 @@
       addCurrentGroup: 'all',
       addSearch      : '',
       addEl          : null,
+      targetStep     : null,
+      targetAdd      : null,
 
       stepCallbacks: {},
 
@@ -160,7 +162,83 @@
             action     : 'gh_funnel_editor_full_screen_preference',
             full_screen: $(document.body).hasClass('gh-full-screen') ? 1 : 0,
           })
+        })
 
+        // handle focused step for copying
+        $document.on('click', e => {
+          if (Groundhogg.element.clickedIn(e, '#step-flow .step')) {
+            this.targetStep = e.target.closest('.step')
+          }
+          else {
+            this.targetStep = null
+          }
+
+          if (Groundhogg.element.clickedIn(e, '#step-flow button.add-step')) {
+            this.targetAdd = e.target.closest('button.add-step')
+          }
+          else {
+            this.targetAdd = null
+          }
+        })
+
+        // handle ctrl v, ctrl c
+        $document.on('keydown', async e => {
+          if (e.key === 'c' && e.ctrlKey && this.editing && this.targetStep) {
+            navigator.clipboard.writeText(JSON.stringify({
+              copy: this.editing,
+              group: this.targetStep.dataset.group,
+              type: this.targetStep.dataset.type,
+            }))
+            dialog({
+              message: 'Step copied!',
+            })
+          }
+          if (e.key === 'v' && e.ctrlKey && this.targetAdd && this.addEl) {
+
+            let text = await navigator.clipboard.readText()
+
+            let json
+
+            try {
+              json = JSON.parse(text)
+              if (!json) {
+                throw new Error( 'invalid step' )
+              }
+
+            }
+            catch (err) {
+              dialog({
+                message: err.message,
+                type: 'error'
+              })
+              return
+            }
+
+            let branch = this.targetAdd.closest('.step-branch').dataset.branch
+            let data = {
+              copy: json.copy,
+              step_group: json.group,
+              step_type: json.type,
+              branch: branch,
+            }
+
+            let placeholder = createPlaceholderEl(data)
+
+            this.targetAdd.insertAdjacentElement('beforebegin', placeholder)
+
+            drawLogicLines()
+
+            this.save(true).then(() => {
+              this.targetAdd = null
+              if (this.addEl) {
+                this.addEl = document.getElementById(this.addEl.id)
+                if (this.addEl) {
+                  this.addEl.classList.add('here')
+                }
+              }
+            })
+
+          }
         })
 
         const settingsHidden = () => $('#step-settings-container').hasClass('slide-out')
@@ -227,13 +305,6 @@
 
         $document.on('mousedown', '.step-element.premium', e => {
 
-          const {
-            name = '',
-            type = '',
-            group = '',
-          } = e.currentTarget.dataset
-
-          console.log('prem step')
           ModalFrame({},
             ({ close }) => Div({
               style: {
@@ -1105,7 +1176,8 @@
           try {
             document.getElementById(`step-${ this.editing }`).classList.remove('editing')
             document.getElementById(`settings-${ this.editing }`).classList.remove('editing')
-          } catch (err) {
+          }
+          catch (err) {
 
           }
         }
@@ -1917,7 +1989,7 @@
 
         let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
 
-        line.style.bottom = `${ Math.abs(sortablePos.bottom - stepPos.bottom) + (stepPos.height/2)}px`
+        line.style.bottom = `${ Math.abs(sortablePos.bottom - stepPos.bottom) + ( stepPos.height / 2 ) }px`
         line.style.width = `${ width }px`
         line.style.right = `calc(50% + ${ minWidth / 2 }px)`
         line.style.height = `${ lineHeight }px`

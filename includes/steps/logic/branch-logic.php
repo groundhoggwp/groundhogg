@@ -188,7 +188,7 @@ abstract class Branch_Logic extends Logic {
 	public function duplicate( $new, $original ) {
 
 		// don't duplicate sub steps
-		if ( ! get_post_var( '__duplicate_inner' ) ) {
+		if ( get_post_var( '__ignore_inner' ) ) {
 			return;
 		}
 
