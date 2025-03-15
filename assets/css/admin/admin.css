@@ -1241,7 +1241,7 @@ table .column-steps div.step-icon img {
   z-index: 1000;
   border: 1px solid #102640;
   box-sizing: border-box;
-  font-size: 14px;
+  font-size: 16px;
 }
 .tour-prompt button.dismiss {
   position: absolute;

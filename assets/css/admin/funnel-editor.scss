@@ -1370,6 +1370,24 @@ button.button.save-button {
     //margin: auto;\\
     border: 1px solid var(--color);
 
+    .step-notes {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      padding: 2px 8px;
+      top: 0;
+      right: -5px;
+      border-radius: 5px;
+      transform: translateX(100%);
+      max-width: 150px;
+    }
+
+    &:hover {
+      .step-notes {
+        display: block;
+      }
+    }
+
     .step-reporting {
       display: flex;
       //justify-content: center;

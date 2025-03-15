@@ -120,7 +120,13 @@ abstract class Branch_Logic extends Logic {
 								$branch_step->sortable_item();
 							}
 
-							$this->add_step_button( 'in-branch-' . $branch_id );
+							$add_button_id = 'in-branch-' . $branch_id;
+
+							$this->add_step_button( [
+								'id'      => $add_button_id,
+								'tooltip' => sprintf( 'Add step in %s', $this->get_branch_name( $branch_id ) ),
+								'class'   => 'add-action',
+							] );
 
 							?></div>
                         <div class="logic-line line-below"></div>
@@ -181,10 +187,10 @@ abstract class Branch_Logic extends Logic {
 	 */
 	public function duplicate( $new, $original ) {
 
-        // don't duplicate sub steps
-        if ( ! get_post_var( '__duplicate_inner' ) ){
-            return;
-        }
+		// don't duplicate sub steps
+		if ( ! get_post_var( '__duplicate_inner' ) ) {
+			return;
+		}
 
 		// get the OG sub steps
 		$og_sub_steps = $original->get_step_element()->get_sub_steps();
@@ -194,12 +200,12 @@ abstract class Branch_Logic extends Logic {
 			$new_sub_step = $sub_step->duplicate( [
 				'step_status' => 'inactive', // must be inactive to start,
 //				'step_order'  => self::get_step_order(),
-                'branch' => str_replace( "$original->ID", "$new->ID", $sub_step->branch )
+				'branch'      => str_replace( "$original->ID", "$new->ID", $sub_step->branch )
 			] );
-        }
+		}
 
 		$this->set_current_step( $original );
-    }
+	}
 
 	/**
 	 * @param Step $step

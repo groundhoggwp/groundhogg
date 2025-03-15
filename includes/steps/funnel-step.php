@@ -8,7 +8,6 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
-use function Groundhogg\array_all;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\current_screen_is_gh_page;
 use function Groundhogg\dashicon;
@@ -16,11 +15,9 @@ use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -592,10 +589,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
-                <?php if ( WP_DEBUG ): ?>
+				<?php if ( WP_DEBUG ): ?>
                     <div class="step-label">ID: <?php echo $step->ID; ?></div>
                     <div class="step-label">Lvl: <?php echo $step->get_level(); ?></div>
-                <?php endif; ?>
+				<?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
                     <div class="step-label">Entry</div>
@@ -655,7 +652,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					?>
                 </div>
             </div>
-			<?php if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
+			<?php
+
+			if ( current_screen_is_gh_page( 'gh_reporting' ) && ! $step->is_logic() ): ?>
                 <div class="step-reporting">
                     <div class="display-flex flex-end full-width">
                         <div class="stat-wrap">
@@ -682,10 +681,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function sortable_item( $step ) {
 
-        $sortable_classes = [
-            'sortable-item',
-            $step->get_group(),
-        ];
+		$sortable_classes = [
+			'sortable-item',
+			$step->get_group(),
+		];
 
 		?>
         <div class="<?php echo implode( ' ', $sortable_classes ); ?>"><?php
@@ -832,11 +831,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 										'checked' => $step->is_entry()
 									] );
 
-                                    echo html()->checkbox( [
-                                        'label'   => 'Allow contacts to pass through this benchmark',
-                                        'name'    => $this->setting_name_prefix( 'can_passthru' ),
-                                        'checked' => $step->can_passthru()
-                                    ] );
+									echo html()->checkbox( [
+										'label'   => 'Allow contacts to pass through this benchmark',
+										'name'    => $this->setting_name_prefix( 'can_passthru' ),
+										'checked' => $step->can_passthru()
+									] );
 
 								endif;
 
@@ -887,23 +886,25 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-     * Get the step order
-     *
+	 * Get the step order
+	 *
 	 * @param $from
 	 *
 	 * @return int
 	 */
-    public static function get_step_order( $from = null ) {
-	    static $order = 0;
+	public static function get_step_order( $from = null ) {
+		static $order = 0;
 
-        if ( is_int( $from ) ) {
-            $order = $from;
-            return $order;
-        }
+		if ( is_int( $from ) ) {
+			$order = $from;
 
-        $order++;
-        return $order;
-    }
+			return $order;
+		}
+
+		$order ++;
+
+		return $order;
+	}
 
 	/**
 	 * Initialize the posted settings array

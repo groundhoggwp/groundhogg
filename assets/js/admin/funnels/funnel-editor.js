@@ -163,13 +163,14 @@
 
         })
 
-        const settingsHidden = () => $( '#step-settings-container' ).hasClass('slide-out')
+        const settingsHidden = () => $('#step-settings-container').hasClass('slide-out')
 
         $document.on('click', '#collapse-settings', e => {
 
-          if ( settingsHidden() ){
+          if (settingsHidden()) {
             this.showSettings()
-          } else {
+          }
+          else {
             this.startEditing(null)
             this.hideSettings()
           }
@@ -313,7 +314,7 @@
           this.save(true).then(() => {
             if (this.addEl) {
               this.addEl = document.getElementById(this.addEl.id)
-              if ( this.addEl ){
+              if (this.addEl) {
                 this.addEl.classList.add('here')
               }
             }
@@ -880,14 +881,14 @@
         $('#step-settings-container').addClass('slide-out')
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
-        }, 400 )
+        }, 400)
       },
 
       showSettings () {
         $('#step-settings-container').removeClass('slide-out')
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
-        }, 400 )
+        }, 400)
       },
 
       showAddStep () {
@@ -984,7 +985,7 @@
         let extra = {}
 
         // it's a benchmark that might have inner steps
-        if ( step.data.step_group === 'benchmark' && document.querySelector( `#step-flow .step-branch[data-branch="${step.ID}"]:has(.step)`) ){
+        if (step.data.step_group === 'benchmark' && document.querySelector(`#step-flow .step-branch[data-branch="${ step.ID }"]:has(.step)`)) {
 
           extra = await new Promise((res, rej) => {
 
@@ -995,7 +996,7 @@
               onConfirm  : e => res({
                 __duplicate_inner: true,
               }),
-              onCancel   : rej
+              onCancel   : rej,
             })
 
           })
@@ -1020,7 +1021,7 @@
           quiet   : true,
           moreData: formData => {
 
-            Object.keys( extra ).forEach( key => {
+            Object.keys(extra).forEach(key => {
               formData.append(key, extra[key])
             })
 
@@ -1101,8 +1102,12 @@
 
         // deactivate the current step
         if (this.editing) {
-          document.getElementById(`step-${ this.editing }`).classList.remove('editing')
-          document.getElementById(`settings-${ this.editing }`).classList.remove('editing')
+          try {
+            document.getElementById(`step-${ this.editing }`).classList.remove('editing')
+            document.getElementById(`settings-${ this.editing }`).classList.remove('editing')
+          } catch (err) {
+            
+          }
         }
 
         this.editing = id
@@ -1293,7 +1298,7 @@
           },
           {
             prompt  : 'Click here to add a new step to the main funnel. Steps here will run for anyone in the funnel, regardless of where they entered.',
-            position: 'below',
+            position: 'above',
             target  : '.add-step#end-funnel',
             onInit  : ({ target }) => target.click(),
           },
@@ -1381,10 +1386,10 @@
             target  : '#funnel-activate',
           },
         ], {
-          fixed: true,
+          fixed    : true,
           onFinish : () => {
             dialog({
-              message: '🎉 Tour complete!'
+              message: '🎉 Tour complete!',
             })
             return ajax({
               action: 'gh_dismiss_notice',
@@ -1410,6 +1415,8 @@
       drawLogicLines()
       Funnel.init().then(() => {
 
+        // Funnel.startTour()
+
         // if tour is dismissed, do nothing
         if (Funnel.funnelTourDismissed) {
           return
@@ -1424,12 +1431,12 @@
               // open a new scratch funnel to start the tour
               window.open(Funnel.scratchFunnelURL, '_self')
             },
-            onCancel: () => {
+            onCancel   : () => {
               return ajax({
                 action: 'gh_dismiss_notice',
                 notice: 'funnel-tour',
               })
-            }
+            },
           })
           return
         }
@@ -1793,70 +1800,69 @@
           line2.style.borderRadius = `${ borderRadius } 0 0 0`
         }
 
-        // we also need to draw the above lines for passthru benchmarks
-        if (step.classList.contains('passthru')) {
-
-          let lineHeight = Math.abs(rowPos.top - stepPos.top) / 2
-
-          let line4 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-4` })
-          let line3 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-3` }, [
-            Span({ className: 'path-indicator' }, 'Pass-through'),
-            line4,
-          ])
-
-          step.parentElement.append(line3)
-
-          if (step.style.display === 'none') {
-            line3.remove()
-            return
-          }
-
-          clearLineStyle(line3)
-          clearLineStyle(line4)
-          line3.classList.remove('left', 'right', 'middle')
-
-
-          line3.style.top = `0`
-          line3.style.width = `${ lineWidth }px`
-          line3.style.height = `${ lineHeight }px`
-
-          line4.style.top = `100%`
-          line4.style.width = `${ lineWidth }px`
-          line4.style.height = `${ lineHeight }px`
-
-          // center
-          if (areNumbersClose(stepCenter, rowCenter, 1)) {
-            line3.style.left = 'calc(50% - 1px)'
-            line3.style.width = 0
-            line3.style.top = 0
-            line3.style.height = `${ lineHeight * 2 }px`
-            line3.style.borderWidth = `0 0 0 ${ borderWidth }`
-            line4.style.display = 'none'
-            line3.classList.add( 'middle' )
-          }
-          // left side
-          else if (stepCenter < rowCenter) {
-            line3.style.left = `${ stepCenter - rowPos.left + lineWidth - 1}px`
-            line3.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
-            line3.style.borderRadius = `0 0 ${ borderRadius } 0`
-            line3.classList.add( 'left' )
-            line4.style.right = `${ lineWidth }px`
-            line4.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
-            line4.style.borderRadius = `${ borderRadius } 0 0 0`
-          }
-          // right side
-          else {
-            line3.style.left = `${ rowCenter - rowPos.left }px`
-            line3.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
-            line3.style.borderRadius = `0 0 0 ${ borderRadius } `
-            line3.classList.add( 'right' )
-            line4.style.left = `${ lineWidth }px`
-            line4.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
-            line4.style.borderRadius = `0 ${ borderRadius } 0 0`
-          }
-
+        // no above lines for starting group
+        if (step.closest('.sortable-item.benchmarks').matches('.starting')) {
+          return
         }
 
+        // above
+        lineHeight = Math.abs(rowPos.top - stepPos.top) / 2
+
+        let line4 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-4` })
+        let line3 = Div({ className: `logic-line benchmark-line passthru line-${ step.id }-3` }, [
+          step.classList.contains('passthru') ? Span({ className: 'path-indicator' }, 'Pass-through') : null,
+          line4,
+        ])
+
+        step.parentElement.append(line3)
+
+        if (step.style.display === 'none') {
+          line3.remove()
+          return
+        }
+
+        clearLineStyle(line3)
+        clearLineStyle(line4)
+        line3.classList.remove('left', 'right', 'middle')
+
+        line3.style.top = `0`
+        line3.style.width = `${ lineWidth }px`
+        line3.style.height = `${ lineHeight }px`
+
+        line4.style.top = `100%`
+        line4.style.width = `${ lineWidth }px`
+        line4.style.height = `${ lineHeight }px`
+
+        // center
+        if (areNumbersClose(stepCenter, rowCenter, 1)) {
+          line3.style.left = 'calc(50% - 1px)'
+          line3.style.width = 0
+          line3.style.top = 0
+          line3.style.height = `${ lineHeight * 2 }px`
+          line3.style.borderWidth = `0 0 0 ${ borderWidth }`
+          line4.style.display = 'none'
+          line3.classList.add('middle')
+        }
+        // left side
+        else if (stepCenter < rowCenter) {
+          line3.style.left = `${ stepCenter - rowPos.left + lineWidth - 1 }px`
+          line3.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+          line3.style.borderRadius = `0 0 ${ borderRadius } 0`
+          line3.classList.add('left')
+          line4.style.right = `${ lineWidth }px`
+          line4.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+          line4.style.borderRadius = `${ borderRadius } 0 0 0`
+        }
+        // right side
+        else {
+          line3.style.left = `${ rowCenter - rowPos.left }px`
+          line3.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+          line3.style.borderRadius = `0 0 0 ${ borderRadius } `
+          line3.classList.add('right')
+          line4.style.left = `${ lineWidth }px`
+          line4.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+          line4.style.borderRadius = `0 ${ borderRadius } 0 0`
+        }
       })
     }
     catch (e) {}
@@ -1877,8 +1883,8 @@
         clearLineStyle(line)
         line.classList.remove('left', 'right', 'middle')
 
-        if ( ! ( stepPos.left < branchCenter && branchCenter < stepPos.right ) ){
-          line.querySelectorAll( '.line-inside' ).forEach( el => el.remove() )
+        if (!( stepPos.left < branchCenter && branchCenter < stepPos.right )) {
+          line.querySelectorAll('.line-inside').forEach(el => el.remove())
         }
 
         // center
@@ -1918,7 +1924,7 @@
           if (branchCenter > stepCenter) {
             line.classList.add('right')
 
-            line1.style.right = `calc(50% - 1px + ${lineWidth}px)`
+            line1.style.right = `calc(50% - 1px + ${ lineWidth }px)`
             line1.style.borderBottomLeftRadius = borderRadius
             line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
             line2.style.left = '100%'
@@ -1928,7 +1934,7 @@
           else {
             line.classList.add('left')
 
-            line1.style.left = `calc(50% - 1px + ${lineWidth}px)`
+            line1.style.left = `calc(50% - 1px + ${ lineWidth }px)`
             line1.style.borderBottomRightRadius = borderRadius
             line1.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
             line2.style.right = '100%'

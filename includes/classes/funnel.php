@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
 use Groundhogg\DB\Steps;
+use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\Utils\DateTimeHelper;
 
 class Funnel extends Base_Object_With_Meta {
@@ -246,19 +247,13 @@ class Funnel extends Base_Object_With_Meta {
 	 *
 	 * @param string        $branch
 	 * @param int           $level
-	 * @param callable|null $order_counter
 	 *
 	 * @return mixed
 	 */
-	public function set_step_levels( string $branch = 'main', int $level = 1, ?callable $order_counter = null ) {
+	public function set_step_levels( string $branch = 'main', int $level = 1 ) {
 
-		if ( $order_counter === null ){
-			// use a closure so every time we call set_step_levels starts from zero
-			$order_counter = function () {
-				static $order = 0;
-				$order++;
-				return $order;
-			};
+		if ( $branch === 'main' && $level === 1 ){
+			Funnel_Step::get_step_order( 0 );
 		}
 
 		$steps = $this->get_steps();
@@ -272,13 +267,14 @@ class Funnel extends Base_Object_With_Meta {
 
 		foreach ( $branch_steps as $step ) {
 
-			$step->update_branch_path_in_db();// do this while we're here
+			$step->update_branch_path_in_db(); // do this while we're here
+
 			if ( $step->is_benchmark() ) {
 				$step->update( [
 					'step_level' => $level,
-					'step_order' => $order_counter()
+					'step_order' => Funnel_Step::get_step_order()
 				] );
-				$maxDepth = max( $maxDepth, $this->set_step_levels( "$step->ID", $level + 1, $order_counter ) );
+				$maxDepth = max( $maxDepth, $this->set_step_levels( "$step->ID", $level + 1 ) );
 				$prev     = $step;
 				continue;
 			}
@@ -289,7 +285,7 @@ class Funnel extends Base_Object_With_Meta {
 
 			$step->update( [
 				'step_level' => $level,
-				'step_order' => $order_counter()
+				'step_order' => Funnel_Step::get_step_order()
 			] );
 
 			$level ++;
@@ -299,7 +295,7 @@ class Funnel extends Base_Object_With_Meta {
 				$branches  = array_unique( wp_list_pluck( $sub_steps, 'branch' ) );
 				$maxDepth = $level;
 				foreach ( $branches as $branch ) {
-					$maxDepth = max( $maxDepth, $this->set_step_levels( $branch, $level, $order_counter ) );
+					$maxDepth = max( $maxDepth, $this->set_step_levels( $branch, $level ) );
 				}
 				$level = $maxDepth;
 			}
