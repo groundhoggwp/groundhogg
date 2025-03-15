@@ -1106,7 +1106,7 @@
             document.getElementById(`step-${ this.editing }`).classList.remove('editing')
             document.getElementById(`settings-${ this.editing }`).classList.remove('editing')
           } catch (err) {
-            
+
           }
         }
 
@@ -1554,7 +1554,6 @@
 
     const clearLineStyle = line => line.removeAttribute('style')
 
-    // let end = `<div class="funnel-end"><span class="danger the-end">End</span></div>`
     let main = document.querySelector(`.step-branch[data-branch='main']`)
     let end = main.querySelector('div.funnel-end')
 
@@ -1570,163 +1569,6 @@
     }
 
     main.append(end)
-
-    // loops
-    try {
-      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop:not(.loop_broken)').forEach(el => {
-
-        // the step-branch.benchmarks container
-        let stepPos = el.getBoundingClientRect()
-        let stepId = el.dataset.id
-        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
-
-        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
-          return
-        }
-
-        let targetStep = document.getElementById(`step-${ targetStepId }`)
-        let widestEl = findWidestElementBetween(targetStep, el)
-        let targetPos = targetStep.getBoundingClientRect()
-
-        let lineHeight = Math.abs(( stepPos.bottom - ( stepPos.height / 2 ) ) - ( targetPos.bottom - ( targetPos.height / 2 ) ))
-        let minWidth = Math.min(stepPos.width, targetPos.width)
-
-        let branch = el.closest('.step-branch')
-        let branchPos = branch.getBoundingClientRect()
-
-        let line = branch.querySelector(`div.logic-line.loop-${ stepId }-to-${ targetStepId }`)
-
-        if (!line) {
-          line = Div({ className: `logic-line loop-line loop-${ stepId }-to-${ targetStepId }` }, [
-            Div({ className: 'line-arrow top' }),
-            Div({ className: 'line-arrow left' }),
-            Div({ className: 'line-arrow bottom' }),
-          ])
-          branch.append(line)
-        }
-
-        clearLineStyle(line)
-
-        let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
-
-        line.style.bottom = `${ branchPos.bottom - stepPos.bottom + ( stepPos.height / 2 ) }px`
-        line.style.width = `${ width }px`
-        line.style.right = `calc(50% + ${ minWidth / 2 }px)`
-        line.style.height = `${ lineHeight }px`
-        line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
-        line.style.borderBottomLeftRadius = borderRadius
-        line.style.borderTopLeftRadius = borderRadius
-
-      })
-    }
-    catch (e) {}
-
-    const skipLine = (from, to, offset = 0) => {
-
-      // the step-branch.benchmarks container
-      let widestEl = findWidestElementBetween(from, to)
-
-      let fromPos = from.getBoundingClientRect()
-      let toPos = to.getBoundingClientRect()
-
-      let lineHeight = Math.abs(( ( fromPos.bottom - ( fromPos.height / 2 ) ) ) - ( toPos.bottom - ( toPos.height / 2 ) ) + 1)
-      let minWidth = Math.min(fromPos.width, toPos.width)
-
-      let branch = from.closest('.step-branch')
-      let branchPos = branch.getBoundingClientRect()
-
-      let line = branch.querySelector(`div.logic-line.skip-${ from.dataset.id }-to-${ to.dataset.id }`)
-
-      if (!line) {
-        line = Div({ className: `logic-line skip-line skip-${ from.dataset.id }-to-${ to.dataset.id }` }, [
-          Div({ className: 'line-arrow top' }),
-          Div({ className: 'line-arrow right' }),
-          Div({ className: 'line-arrow bottom' }),
-        ])
-        branch.append(line)
-      }
-
-      clearLineStyle(line)
-
-      let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
-
-      line.style.top = `${ fromPos.top - branchPos.top + ( fromPos.height / 2 ) }px`
-      line.style.width = `${ width + offset }px`
-      line.style.left = `calc(50% + ${ minWidth / 2 }px)`
-      line.style.height = `${ lineHeight }px`
-      line.style.borderWidth = `${ borderWidth } ${ borderWidth } ${ borderWidth } 0`
-      line.style.borderTopRightRadius = borderRadius
-      line.style.borderBottomRightRadius = borderRadius
-
-    }
-
-    // skips
-    try {
-      document.querySelectorAll('.step-branch .step.skip, .step-branch .step.logic_skip:not(.loop_broken)').forEach(step => {
-
-        // the step-branch.benchmarks container
-        let stepId = step.dataset.id
-        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
-
-        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
-          return
-        }
-
-        let targetStep = document.getElementById(`step-${ targetStepId }`)
-
-        skipLine(step, targetStep)
-      })
-    }
-    catch (e) {}
-
-    // stops
-    try {
-      document.querySelectorAll('.step-branch .step.logic_stop').forEach(step => {
-
-        // the step-branch.benchmarks container
-        let stepId = step.dataset.id
-        let stepPos = step.getBoundingClientRect()
-        let sortablePos = step.parentElement.getBoundingClientRect()
-
-        let line = step.parentElement.querySelector('.logic-line.line-end')
-        clearLineStyle(line)
-
-        line.style.top = `${ stepPos.bottom - sortablePos.top }px`
-        line.style.height = '30px'
-        line.style.width = `${ stepPos.width / 2 }px`
-        line.style.left = 'calc(50% - 1px)'
-        line.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
-        line.style.borderRadius = `0 0 0 ${ borderRadius }`
-      })
-    }
-    catch (e) {}
-
-    // timer skips
-    try {
-      document.querySelectorAll('.step-branch .step.timer_skip').forEach(step => {
-
-        let stepId = step.dataset.id
-
-        let timers = Funnel.steps.find(s => s.ID == stepId).meta.timers
-
-        if (!timers || !timers.length) {
-          return
-        }
-
-        timers.forEach((targetStepId, i) => {
-
-          if (!targetStepId || typeof targetStepId == 'undefined') {
-            return
-          }
-
-          let targetStep = document.getElementById(`step-${ targetStepId }`)
-
-          skipLine(step, targetStep, 20 * i)
-        })
-
-      })
-    }
-    catch (e) { console.log(e) }
 
     // Benchmarks
     try {
@@ -2035,6 +1877,167 @@
       })
     }
     catch (e) {}
+
+    // loops
+    try {
+      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop:not(.loop_broken)').forEach(el => {
+
+        // the step-branch.benchmarks container
+        let stepPos = el.getBoundingClientRect()
+        let stepId = el.dataset.id
+        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
+
+        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
+          return
+        }
+
+        let targetStep = document.getElementById(`step-${ targetStepId }`)
+        let widestEl = findWidestElementBetween(targetStep, el)
+        let targetPos = targetStep.getBoundingClientRect()
+
+        let lineHeight = Math.abs(( stepPos.bottom - ( stepPos.height / 2 ) ) - ( targetPos.bottom - ( targetPos.height / 2 ) ))
+        let minWidth = Math.min(stepPos.width, targetPos.width)
+
+        let branchPos = el.closest('.step-branch').getBoundingClientRect()
+        let sortable = el.closest('.sortable-item')
+        let sortablePos = sortable.getBoundingClientRect()
+
+        let line = sortable.querySelector(`div.logic-line.loop-${ stepId }-to-${ targetStepId }`)
+
+        if (!line) {
+          line = Div({ className: `logic-line loop-line loop-${ stepId }-to-${ targetStepId }` }, [
+            Div({ className: 'line-arrow top' }),
+            Div({ className: 'line-arrow left' }),
+            Div({ className: 'line-arrow bottom' }),
+          ])
+          sortable.append(line)
+        }
+
+        clearLineStyle(line)
+
+        let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
+
+        line.style.bottom = `${ Math.abs(sortablePos.bottom - stepPos.bottom) + (stepPos.height/2)}px`
+        line.style.width = `${ width }px`
+        line.style.right = `calc(50% + ${ minWidth / 2 }px)`
+        line.style.height = `${ lineHeight }px`
+        line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
+        line.style.borderBottomLeftRadius = borderRadius
+        line.style.borderTopLeftRadius = borderRadius
+
+      })
+    }
+    catch (e) {}
+
+    const skipLine = (from, to, offset = 0) => {
+
+      // the step-branch.benchmarks container
+      let widestEl = findWidestElementBetween(from, to)
+
+      let fromPos = from.getBoundingClientRect()
+      let toPos = to.getBoundingClientRect()
+
+      let lineHeight = Math.abs(( ( fromPos.bottom - ( fromPos.height / 2 ) ) ) - ( toPos.bottom - ( toPos.height / 2 ) ) + 1)
+      let minWidth = Math.min(fromPos.width, toPos.width)
+
+      let branch = from.closest('.step-branch')
+      let branchPos = branch.getBoundingClientRect()
+
+      let sortable = from.closest('.sortable-item')
+      let sortablePos = sortable.getBoundingClientRect()
+
+      let line = sortable.querySelector(`div.logic-line.skip-${ from.dataset.id }-to-${ to.dataset.id }`)
+
+      if (!line) {
+        line = Div({ className: `logic-line skip-line skip-${ from.dataset.id }-to-${ to.dataset.id }` }, [
+          Div({ className: 'line-arrow top' }),
+          Div({ className: 'line-arrow right' }),
+          Div({ className: 'line-arrow bottom' }),
+        ])
+        sortable.append(line)
+      }
+
+      clearLineStyle(line)
+
+      let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
+
+      line.style.top = `${ fromPos.top - sortablePos.top + ( fromPos.height / 2 ) }px`
+      line.style.width = `${ width + offset }px`
+      line.style.left = `calc(50% + ${ minWidth / 2 }px)`
+      line.style.height = `${ lineHeight }px`
+      line.style.borderWidth = `${ borderWidth } ${ borderWidth } ${ borderWidth } 0`
+      line.style.borderTopRightRadius = borderRadius
+      line.style.borderBottomRightRadius = borderRadius
+
+    }
+
+    // skips
+    try {
+      document.querySelectorAll('.step-branch .step.skip, .step-branch .step.logic_skip:not(.loop_broken)').forEach(step => {
+
+        // the step-branch.benchmarks container
+        let stepId = step.dataset.id
+        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
+
+        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
+          return
+        }
+
+        let targetStep = document.getElementById(`step-${ targetStepId }`)
+
+        skipLine(step, targetStep)
+      })
+    }
+    catch (e) {}
+
+    // stops
+    try {
+      document.querySelectorAll('.step-branch .step.logic_stop').forEach(step => {
+
+        // the step-branch.benchmarks container
+        let stepId = step.dataset.id
+        let stepPos = step.getBoundingClientRect()
+        let sortablePos = step.parentElement.getBoundingClientRect()
+
+        let line = step.parentElement.querySelector('.logic-line.line-end')
+        clearLineStyle(line)
+
+        line.style.top = `${ stepPos.bottom - sortablePos.top }px`
+        line.style.height = '30px'
+        line.style.width = `${ stepPos.width / 2 }px`
+        line.style.left = 'calc(50% - 1px)'
+        line.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+        line.style.borderRadius = `0 0 0 ${ borderRadius }`
+      })
+    }
+    catch (e) {}
+
+    // timer skips
+    try {
+      document.querySelectorAll('.step-branch .step.timer_skip').forEach(step => {
+
+        let stepId = step.dataset.id
+
+        let timers = Funnel.steps.find(s => s.ID == stepId).meta.timers
+
+        if (!timers || !timers.length) {
+          return
+        }
+
+        timers.forEach((targetStepId, i) => {
+
+          if (!targetStepId || typeof targetStepId == 'undefined') {
+            return
+          }
+
+          let targetStep = document.getElementById(`step-${ targetStepId }`)
+
+          skipLine(step, targetStep, 20 * i)
+        })
+
+      })
+    }
+    catch (e) { console.log(e) }
 
     $(document).trigger('draw-logic-lines')
 

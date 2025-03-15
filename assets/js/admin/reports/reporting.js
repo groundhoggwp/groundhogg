@@ -542,6 +542,7 @@
           }
         })
 
+        Groundhogg.drawLogicLines()
       },
 
       renderQuickStatReport: function ($report, report_data) {
