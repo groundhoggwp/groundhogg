@@ -1342,6 +1342,98 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Filter's whether the current time in `Y-m-d H:i:s` matches the filter conditions
+	 *
+	 * @param array $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_current_datetime( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'compare'       => 'before', // before, after, between, etc...
+			'before'        => '', // a date in `Y-m-d H:i:s` format
+			'after'         => '', // a date in `Y-m-d H:i:s` format
+		] );
+
+		try {
+			$now = new DateTimeHelper();
+			$before = new DateTimeHelper( $filter['before'] );
+			$after = new DateTimeHelper( $filter['after'] );
+		} catch ( \Exception $exception ){
+			$where->addCondition( '1=0' ); // short circuit false
+			return;
+		}
+
+		$true = false;
+
+		switch ( $filter['compare'] ) {
+			case 'before':
+				$true = $now->isBefore( $before );
+				break;
+			case 'after':
+				$true = $now->isAfter( $after );
+				break;
+			case 'between':
+				$true = $now->isBetween( $after, $before );
+				break;
+		}
+
+		if ( $true ){
+			$where->addCondition( '1=1' ); // always true
+		} else {
+			$where->addCondition( '1=0' ); // short circuit false
+		}
+	}
+
+	/**
+	 * Filter's whether the current time in `Y-m-d` matches the filter conditions
+	 *
+	 * @param array $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_current_date( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'compare'       => 'before', // before, after, between, etc...
+			'before'        => '', // a date in `Y-m-d` format
+			'after'         => '', // a date in `Y-m-d` format
+		] );
+
+		$filter['after'] = "{$filter['after']} 00:00:00";
+		$filter['before'] = "{$filter['before']} 23:59:59";
+
+		self::filter_current_datetime( $filter, $where );
+	}
+
+	/**
+	 * Filter's whether the current time in `H:i:s` matches the filter conditions
+	 *
+	 * @param array $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_current_time( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'compare'       => 'before', // before, after, between, etc...
+			'before'        => '', // a date in `H:i:s` format
+			'after'         => '', // a date in `H:i:s` format
+		] );
+
+		$today = Ymd( 'now', true );
+
+		$filter['after'] = "$today {$filter['after']}";
+		$filter['before'] = "$today {$filter['before']}";
+
+		self::filter_current_datetime( $filter, $where );
+	}
+
+	/**
 	 * Registers the standard filters
 	 *
 	 * @return void
@@ -1382,6 +1474,7 @@ class Contact_Query extends Table_Query {
 	 */
 	public function set_query_params( array $params ) {
 		$this->query_vars = $params;
+
 		return $this;
 	}
 

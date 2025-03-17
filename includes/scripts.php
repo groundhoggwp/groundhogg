@@ -356,7 +356,9 @@ class Scripts {
 			'wp-date',
 		] );
 
-		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . 'js/admin/formatting' . $dot_min . '.js' );
+		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . 'js/admin/formatting' . $dot_min . '.js', [
+			'wp-date',
+		] );
 
 		wp_register_script( 'groundhogg-admin-color', GROUNDHOGG_ASSETS_URL . 'js/admin/color-picker' . $dot_min . '.js', [
 			'jquery',

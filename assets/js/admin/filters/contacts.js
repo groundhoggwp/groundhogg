@@ -42,6 +42,7 @@
   const {
     formatDate,
     formatDateTime,
+    formatTime,
   } = Groundhogg.formatting
 
   const {
@@ -2357,6 +2358,81 @@
     object_type: 'contact'
   }))
 
+  registerFilterGroup( 'date', 'Date' )
+
+  const CurrentDateCompareFilterFactory = ( id, name, type, formatter ) => createFilter(id, name, 'date', {
+    edit   : ({compare= '', after = '', before = '', updateFilter }) => Fragment([
+      Select({
+        id: 'select-compare',
+        selected:  compare,
+        options: {
+          after: 'After',
+          before: 'Before',
+          between: 'Between'
+        },
+        onChange: e => {
+          updateFilter({
+            compare: e.target.value
+          })
+        }
+      }),
+      compare === 'before' ? null : Input({
+        type,
+        id: 'after-date',
+        name: 'after_date',
+        value: after,
+        placeholder: 'After...',
+        onChange: e => {
+          updateFilter({
+            after: e.target.value
+          })
+        }
+      }),
+      compare === 'after' ? null : Input({
+        type,
+        id: 'before-date',
+        name: 'before_date',
+        value: before,
+        placeholder: 'Before...',
+        min: 0,
+        onInput: e => {
+          updateFilter({
+            before: e.target.value
+          })
+        }
+      })
+    ]),
+    display: ({
+      compare = '',
+      after,
+      before,
+    }) => {
+
+      let prefix = `<b>${name}</b>`
+
+      switch (compare) {
+        case 'between':
+          return ComparisonsTitleGenerators.between(prefix,
+            formatter(after), formatter(before))
+        case 'after':
+          return ComparisonsTitleGenerators.after(prefix,
+            formatter(after))
+        case 'before':
+          return ComparisonsTitleGenerators.before(prefix,
+            formatter(before))
+        default:
+          throw new Error( 'Invalid date comparison.' )
+      }
+    },
+  }, {
+    compare: 'between',
+    before: '',
+    after: '',
+  })
+
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_datetime', 'Current Date & Time', 'datetime-local', formatDateTime ))
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_date', 'Current Date', 'date', formatDate ))
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_time', 'Current Time', 'time', ( time ) => formatTime(`2000-01-01T${time}`) ))
 
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}
