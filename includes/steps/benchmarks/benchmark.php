@@ -7,6 +7,7 @@ use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\array_all;
+use function Groundhogg\db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
@@ -356,5 +357,4 @@ abstract class Benchmark extends Funnel_Step {
 
 		$this->set_current_step( $original );
 	}
-
 }

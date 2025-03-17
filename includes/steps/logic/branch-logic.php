@@ -207,33 +207,6 @@ abstract class Branch_Logic extends Logic {
 		$this->set_current_step( $original );
 	}
 
-	/**
-	 * @param Step $step
-	 *
-	 * @return void
-	 */
-	public function post_import( $step ) {
-
-		$oldId = $step->get_meta( 'imported_step_id' );
-
-		// we have to update all the branches
-
-		$branches = $this->get_branches();
-
-		foreach ( $branches as $branch ) {
-
-			$oldbranch = str_replace( "$step->ID", "$oldId", $branch );
-
-			db()->steps->update( [
-				'branch' => $oldbranch, // old branch
-			], [
-				'branch' => $branch, // new branch
-			] );
-
-		}
-
-	}
-
 	protected function get_branch_classes( $branch_id ): string {
 		return '';
 	}

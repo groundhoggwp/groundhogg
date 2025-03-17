@@ -11,6 +11,7 @@ use Groundhogg\Steps\Actions\Polyfill_Action;
 use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\steps\benchmarks\Polyfill_Benchmark;
 use Groundhogg\Steps\Funnel_Step;
+use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1662,6 +1663,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function duplicate( $overrides = [], $meta_overrides = [] ) {
 		$new = parent::duplicate( $overrides, $meta_overrides );
 		$this->get_step_element()->duplicate( $new, $this );
+
 		return $new;
 	}
 
@@ -1916,11 +1918,52 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->get_step_element()->import( $import_args, $this );
 	}
 
+	public function has_branches() {
+		return $this->is_benchmark() || $this->is_branch_logic();
+	}
+
+	public function is_branch_logic() {
+		return is_a( $this->get_step_element(), Branch_Logic::class );
+	}
+
 	/**
 	 * Post import cleanup actions any contextual args from the given template
 	 */
 	public function post_import() {
+
 		$this->get_step_element()->post_import( $this );
+		$oldId = $this->get_meta( 'imported_step_id' );
+
+		// handle updating benchmark branches
+		if ( $this->is_benchmark() ) {
+			db()->steps->update( [
+				'branch'    => $oldId, // old branch,
+				'funnel_id' => $this->funnel_id // ensure we only update steps that belong to the current funnel
+			], [
+				'branch' => $this->ID, // new branch
+			] );
+		}
+
+		if ( $this->is_branch_logic() ){
+
+			// we have to update all the branches
+
+			$branches = $this->get_step_element()->get_branches();
+
+			foreach ( $branches as $branch ) {
+
+				$oldbranch = str_replace( "$this->ID", "$oldId", $branch );
+
+				db()->steps->update( [
+					'branch'    => $oldbranch, // old branch,
+					'funnel_id' => $this->funnel_id // ensure we only update steps that belong to the current funnel
+				], [
+					'branch' => $branch, // new branch
+				] );
+
+			}
+		}
+
 		do_action( "groundhogg/steps/post_import", $this );
 	}
 
