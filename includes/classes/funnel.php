@@ -4,7 +4,6 @@ namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
 use Groundhogg\DB\Steps;
-use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\Utils\DateTimeHelper;
 
 class Funnel extends Base_Object_With_Meta {
@@ -245,15 +244,15 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * Initialize the levels for the steps
 	 *
-	 * @param string        $branch
-	 * @param int           $level
+	 * @param string $branch
+	 * @param int    $level
 	 *
 	 * @return mixed
 	 */
 	public function set_step_levels( string $branch = 'main', int $level = 1 ) {
 
-		if ( $branch === 'main' && $level === 1 ){
-			Funnel_Step::get_step_order( 0 );
+		if ( $branch === 'main' && $level === 1 ) {
+			Step::increment_step_order( 0 );
 		}
 
 		$steps = $this->get_steps();
@@ -272,7 +271,7 @@ class Funnel extends Base_Object_With_Meta {
 			if ( $step->is_benchmark() ) {
 				$step->update( [
 					'step_level' => $level,
-					'step_order' => Funnel_Step::get_step_order()
+					'step_order' => Step::increment_step_order()
 				] );
 				$maxDepth = max( $maxDepth, $this->set_step_levels( "$step->ID", $level + 1 ) );
 				$prev     = $step;
@@ -285,7 +284,7 @@ class Funnel extends Base_Object_With_Meta {
 
 			$step->update( [
 				'step_level' => $level,
-				'step_order' => Funnel_Step::get_step_order()
+				'step_order' => Step::increment_step_order()
 			] );
 
 			$level ++;
@@ -293,7 +292,7 @@ class Funnel extends Base_Object_With_Meta {
 			if ( $step->is_logic() ) {
 				$sub_steps = $step->get_sub_steps();
 				$branches  = array_unique( wp_list_pluck( $sub_steps, 'branch' ) );
-				$maxDepth = $level;
+				$maxDepth  = $level;
 				foreach ( $branches as $branch ) {
 					$maxDepth = max( $maxDepth, $this->set_step_levels( $branch, $level ) );
 				}

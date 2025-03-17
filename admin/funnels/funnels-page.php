@@ -685,7 +685,7 @@ class Funnels_Page extends Admin_Page {
 
 		//get all the steps in the funnel.
 		$step_ids = get_post_var( 'step_ids' );
-		Funnel_Step::get_step_order( 0 );
+		Step::increment_step_order( 0 );
 
 		if ( empty( $step_ids ) ) {
 			return new \WP_Error( 'no_steps', 'Please add automation first.' );
@@ -702,20 +702,26 @@ class Funnels_Page extends Admin_Page {
 			// maybe creating a step
 			if ( ! is_numeric( $stepId ) ) {
 
-				if ( $stepId === 'duplicate' ) {
-
-					// duplicate the previous step
-					$step->duplicate( [
-						'step_status' => 'inactive', // must be inactive to start,
-						'step_order'  => Funnel_Step::get_step_order(),
-					] );
-
-					continue;
-				}
-
 				$step_data = json_decode( $stepId, true );
 
 				if ( ! $step_data ) {
+					continue;
+				}
+
+				// we're copying another step
+				if ( isset( $step_data['duplicate'] ) ) {
+
+					$step_to_copy = new Step( absint( $step_data['duplicate'] ) );
+
+					if ( ! $step_to_copy->exists() ) {
+						continue;
+					}
+
+					$new = $step_to_copy->duplicate( [
+						'step_status' => 'inactive', // must be inactive to start,
+						'step_order'  => Step::increment_step_order(),
+					] );
+
 					continue;
 				}
 
@@ -731,7 +737,7 @@ class Funnels_Page extends Admin_Page {
 					$new = $step_to_copy->duplicate( [
 						'funnel_id'   => $funnel_id,
 						'step_status' => 'inactive', // must be inactive to start,
-						'step_order'  => Funnel_Step::get_step_order(),
+						'step_order'  => Step::increment_step_order(),
 						'branch'      => sanitize_key( $step_data['branch'] ),
 					] );
 
@@ -754,7 +760,7 @@ class Funnels_Page extends Admin_Page {
 					'step_title'  => $element->get_name(),
 					'step_type'   => $element->get_type(),
 					'step_group'  => $element->get_group(),
-					'step_order'  => Funnel_Step::get_step_order(),
+					'step_order'  => Step::increment_step_order(),
 					'step_status' => 'inactive', // all steps added are by default inactive
 					'branch'      => $step_data['branch']
 				] );

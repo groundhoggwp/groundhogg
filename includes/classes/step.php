@@ -1997,4 +1997,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'funnel' => $this->get_funnel_id()
 		], $this->get_id() );
 	}
+
+	public static function increment_step_order( $from = null ) {
+		static $order = 0;
+
+		if ( is_int( $from ) ) {
+			$order = $from;
+
+			return $order;
+		}
+
+		$order ++;
+
+		return $order;
+	}
 }

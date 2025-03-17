@@ -591,7 +591,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <div class="step-labels display-flex gap-10">
 				<?php if ( WP_DEBUG ): ?>
                     <div class="step-label">ID: <?php echo $step->ID; ?></div>
-                    <div class="step-label">Lvl: <?php echo $step->get_level(); ?></div>
+                    <div class="step-label">Pos: <?php echo $step->get_order(); ?>,<?php echo $step->get_level(); ?></div>
 				<?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
@@ -886,27 +886,6 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * Get the step order
-	 *
-	 * @param $from
-	 *
-	 * @return int
-	 */
-	public static function get_step_order( $from = null ) {
-		static $order = 0;
-
-		if ( is_int( $from ) ) {
-			$order = $from;
-
-			return $order;
-		}
-
-		$order ++;
-
-		return $order;
-	}
-
-	/**
 	 * Initialize the posted settings array
 	 *
 	 * @param $step Step
@@ -941,7 +920,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$data = [
 			'branch'     => sanitize_key( $this->get_posted_data( 'branch', 'main' ) ),
-			'step_order' => self::get_step_order()
+			'step_order' => Step::increment_step_order()
 		];
 
 		if ( $this->get_posted_data( 'step_title' ) ) {
