@@ -1155,6 +1155,10 @@
         })
       }
 
+      setState({
+        search: ''
+      })
+
       morph()
 
       if (multiple) {
@@ -1420,6 +1424,15 @@
       id       : `${ id }-picker`,
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
       tabindex : '0',
+      onKeydown: e => {
+        if ( e.key === 'Escape' ){
+          setState({
+            searching: false,
+            focused: false
+          })
+          morph()
+        }
+      },
       onCreate : el => {
         el.addEventListener('focusout', e => {
 
