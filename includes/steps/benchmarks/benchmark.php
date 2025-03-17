@@ -338,7 +338,7 @@ abstract class Benchmark extends Funnel_Step {
 	public function duplicate( $new, $original ) {
 
 		// don't duplicate sub steps
-		if ( ! get_post_var( '__duplicate_inner' ) ) {
+		if ( get_post_var( '__ignore_inner' ) ) {
 			return;
 		}
 
@@ -349,7 +349,6 @@ abstract class Benchmark extends Funnel_Step {
 			// duplicate the previous step
 			$new_sub_step = $sub_step->duplicate( [
 				'step_status' => 'inactive', // must be inactive to start,
-//				'step_order'  => self::get_step_order(),
 				'branch'      => $new->ID,
 				'funnel_id'   => $new->funnel_id,
 			] );

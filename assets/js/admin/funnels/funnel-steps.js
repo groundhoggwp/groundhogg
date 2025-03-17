@@ -912,27 +912,6 @@
         })
       }))
     },
-    onDuplicate: ({
-      ID,
-      data,
-      meta,
-    }, res, rej) => {
-
-      confirmationModal({
-        alert      : `<p>${ __('Do you also want to duplicate steps in the branches?', 'groundhogg') }</p>`,
-        confirmText: __('Yes, duplicate them!', 'groundhogg'),
-        closeText  : __('No, just the logic step.', 'groundhogg'),
-        onConfirm  : e => {
-          res({})
-        },
-        onCancel   : e => {
-          res({
-            __ignore_inner: true,
-          })
-        },
-      })
-
-    },
   })
 
   Funnel.registerStepCallbacks('send_email', {

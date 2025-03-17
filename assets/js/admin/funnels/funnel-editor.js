@@ -1007,6 +1007,15 @@
           return
         }
 
+        // deleting the benchmark will also delete inner steps
+        if ($sortable.is('.benchmark') && $sortable.find('.step-branch .step').length > 0) {
+          dangerConfirmationModal({
+            alert    : '<p>Are you sure you want to delete this benchmark? Any sub steps will also be deleted.</p>',
+            onConfirm: () => deleteStep(),
+          })
+          return
+        }
+
         deleteStep()
       },
 
@@ -1055,19 +1064,22 @@
         const type = step.data.step_type
         let extra = {}
 
+        let stepEl = document.getElementById( `step-${step.ID}` )
+        let sortable = stepEl.closest('.sortable-item')
+
         // it's a benchmark that might have inner steps
-        if (step.data.step_group === 'benchmark' && document.querySelector(`#step-flow .step-branch[data-branch="${ step.ID }"]:has(.step)`)) {
+        if (sortable.querySelector(`.step-branch:has(.step)`)) {
 
           extra = await new Promise((res, rej) => {
 
             confirmationModal({
-              alert      : `<p>${ __('Do you also want to duplicate steps in the branch?', 'groundhogg') }</p>`,
-              confirmText: __('Yes, duplicate them!', 'groundhogg'),
-              closeText  : __('No, just the benchmark.', 'groundhogg'),
-              onConfirm  : e => res({
-                __duplicate_inner: true,
+              alert      : `<p>${ __('Do you also want to duplicate the sub steps as well?', 'groundhogg') }</p>`,
+              confirmText: __('Yes, duplicate all sub steps!', 'groundhogg'),
+              closeText  : __('No, just this step.', 'groundhogg'),
+              onConfirm  : () => res({}),
+              onCancel   : () => res({
+                __ignore_inner: true,
               }),
-              onCancel   : rej,
             })
 
           })
@@ -1082,11 +1094,13 @@
           }
         }
 
-        document.getElementById(`step-${ id }`).querySelector(`input[name='step_ids[]'][type='hidden']`).insertAdjacentElement('afterend', Input({
-          type : 'hidden',
-          name : 'step_ids[]',
-          value: 'duplicate',
-        }))
+        sortable.insertAdjacentElement('afterend', createPlaceholderEl({
+          duplicate: step.ID,
+          step_type: step.data.step_type,
+          step_group: step.data.step_group
+        }) )
+
+        drawLogicLines()
 
         return await this.save({
           quiet   : true,
