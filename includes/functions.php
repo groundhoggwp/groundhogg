@@ -456,9 +456,9 @@ function event_queue_db() {
  */
 function isset_not_empty( $array, $key = '' ) {
 
-    if ( is_a( $array, Posted_Data::class ) ){
-        throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data');
-    }
+	if ( is_a( $array, Posted_Data::class ) ) {
+		throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data' );
+	}
 
 	if ( is_object( $array ) ) {
 		return isset( $array->$key ) && ! empty( $array->$key );
@@ -813,15 +813,15 @@ function keep_the_diff( array $array1, array $array2, bool $strict = false ) {
 
 	foreach ( $array1 as $key => $v1 ) {
 
-        if ( ! isset( $array2[ $key ] ) ) {
-            $different[ $key ] = $v1;
-            continue;
-        }
+		if ( ! isset( $array2[ $key ] ) ) {
+			$different[ $key ] = $v1;
+			continue;
+		}
 
-        $v2 = $array2[ $key ];
+		$v2 = $array2[ $key ];
 
-		$a =  should_serialize( $v1 ) ? serialize( $v1 ) : $v1;
-		$b =  should_serialize( $v2 ) ? serialize( $v2 ) : $v2;
+		$a = should_serialize( $v1 ) ? serialize( $v1 ) : $v1;
+		$b = should_serialize( $v2 ) ? serialize( $v2 ) : $v2;
 
 		if ( ( $strict && $a !== $b ) || ( ! $strict && $a != $b ) ) {
 			$different[ $key ] = $v1;
@@ -855,8 +855,8 @@ function find_object( array $array, array $args ) {
  */
 function get_array_var( $array, $key = '', $default = false ) {
 
-	if ( is_a( $array, Posted_Data::class ) ){
-		throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data');
+	if ( is_a( $array, Posted_Data::class ) ) {
+		throw new \Exception( 'Don\'t use isset_not_empty with Posted_Data' );
 	}
 
 	if ( isset_not_empty( $array, $key ) ) {
@@ -2358,27 +2358,27 @@ function get_mappable_fields( $extra = [] ) {
  *
  * @return array
  */
-function sanitize_field_map( $field_map ){
+function sanitize_field_map( $field_map ) {
 
-    // get mappable fields without the groups
-    $mappable_fields = array_reduce( get_mappable_fields(), function( $fields, $group ){
-        return array_merge( $fields, $group );
-    }, [] );
+	// get mappable fields without the groups
+	$mappable_fields = array_reduce( get_mappable_fields(), function ( $fields, $group ) {
+		return array_merge( $fields, $group );
+	}, [] );
 
-    $new_map = [];
+	$new_map = [];
 
-    foreach ( $field_map as $from => $to ){
+	foreach ( $field_map as $from => $to ) {
 
-        // trying to map to a field that is not registered
-        if ( ! key_exists( $to, $mappable_fields ) ){
-            continue;
-        }
+		// trying to map to a field that is not registered
+		if ( ! key_exists( $to, $mappable_fields ) ) {
+			continue;
+		}
 
-        $new_map[sanitize_text_field($from)] = $to;
+		$new_map[ sanitize_text_field( $from ) ] = $to;
 
-    }
+	}
 
-    return $new_map;
+	return $new_map;
 }
 
 /**
@@ -6258,9 +6258,9 @@ function array_filter_by_keys( array $associative_array, array $keys_to_keep ) {
  */
 function array_apply_callbacks( array $array, array $callbacks, bool $strict = false ) {
 
-    if ( $strict ){
-        $array = array_intersect_key( $array, $callbacks );
-    }
+	if ( $strict ) {
+		$array = array_intersect_key( $array, $callbacks );
+	}
 
 	foreach ( $array as $key => &$value ) {
 		if ( ! isset( $callbacks[ $key ] ) ) {
@@ -6830,11 +6830,11 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	$tel            = get_option( 'gh_phone' );
 	$terms          = get_option( 'gh_terms' );
 	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
-	$links          = implode( ' | ', array_filter( [
-		$tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
-		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy' ) ) : false,
-		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
-	] ) );
+	$links          = [
+		'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
+		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy' ) ) : false,
+		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
+	];
 	$unsubscribe    = sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 		'href' => '#unsubscribe_link#'
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
@@ -8580,11 +8580,11 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 /**
  * Returns a string representing Good Fiar or Poor given specific thresholds
  *
- * @param int  $number
- * @param int  $great
- * @param int  $good
- * @param int  $fair
- * @param int  $poor
+ * @param int $number
+ * @param int $great
+ * @param int $good
+ * @param int $fair
+ * @param int $poor
  *
  * @return string good|fair|poor|bad
  */
@@ -8755,10 +8755,10 @@ function get_event_arg( string $arg, $default = false ) {
 
 	$event = \Groundhogg\event_queue()->get_current_event();
 
-    // make sure the event exists...
-    if ( ! $event || ! $event->exists() ){
-        return $default;
-    }
+	// make sure the event exists...
+	if ( ! $event || ! $event->exists() ) {
+		return $default;
+	}
 
 	return $event->get_arg( $arg, $default );
 }
@@ -8786,13 +8786,14 @@ function one_of( $value, array $options ) {
 	return $value;
 }
 
-function int_to_letters($num) {
+function int_to_letters( $num ) {
 	$result = '';
-	while ($num >= 0) {
+	while ( $num >= 0 ) {
 		$remainder = $num % 26;
-		$result = chr(65 + $remainder) . $result;
-		$num = intval($num / 26) - 1;
+		$result    = chr( 65 + $remainder ) . $result;
+		$num       = intval( $num / 26 ) - 1;
 	}
+
 	return $result;
 }
 
@@ -8805,19 +8806,19 @@ function int_to_letters($num) {
  *
  * @return bool
  */
-function search_and_replace_in_file($file_path, $search, $replace) {
-	if (!file_exists($file_path)) {
+function search_and_replace_in_file( $file_path, $search, $replace ) {
+	if ( ! file_exists( $file_path ) ) {
 		return false; // File not found
 	}
 
 	// Read file content
-	$content = file_get_contents($file_path);
+	$content = file_get_contents( $file_path );
 
 	// Replace occurrences
-	$updated_content = str_replace($search, $replace, $content);
+	$updated_content = str_replace( $search, $replace, $content );
 
 	// Write back to file
-	return file_put_contents($file_path, $updated_content) !== false;
+	return file_put_contents( $file_path, $updated_content ) !== false;
 }
 
 /**
@@ -8827,6 +8828,6 @@ function search_and_replace_in_file($file_path, $search, $replace) {
  *
  * @return int
  */
-function count_newlines ( $text ) {
-    return count( explode( "\n", $text ) );
+function count_newlines( $text ) {
+	return count( explode( "\n", $text ) );
 }

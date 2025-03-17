@@ -9012,6 +9012,9 @@
       style = {},
       linkStyle = {},
       alignment = 'left',
+      privacyPolicy = true,
+      terms = true,
+      tel = true,
       updateBlock,
     }) => {
       return Fragment([
@@ -9025,9 +9028,31 @@
                   alignment,
                   morphControls: true,
                 }),
-
               })),
-
+            Control({ label: 'Phone Number' },
+              Toggle({
+                id      : 'include-tel',
+                checked: tel,
+                onChange: e => updateBlock({
+                  tel: e.target.checked
+                }),
+              })),
+            Control({ label: 'Privacy Policy' },
+              Toggle({
+                id      : 'include-privacy-policy',
+                checked: privacyPolicy,
+                onChange: e => updateBlock({
+                  privacyPolicy: e.target.checked
+                }),
+              })),
+            Control({ label: 'Terms' },
+              Toggle({
+                id      : 'include-terms',
+                checked: terms,
+                onChange: e => updateBlock({
+                  terms: e.target.checked
+                }),
+              })),
           ]),
         TagFontControlGroup('Font Style', 'style', style, updateBlock),
         TagFontControlGroup(__('Link Style'),
@@ -9042,6 +9067,9 @@
       style = {},
       linkStyle = {},
       alignment = 'left',
+      tel = true,
+      terms = true,
+      privacyPolicy = true
     }) => {
 
       const footerLine = (content) => makeEl('p', {
@@ -9060,6 +9088,20 @@
         unsubscribe,
       } = _BlockEditor.footer
 
+      let useLinks = [];
+
+      if ( links.tel && tel ){
+        useLinks.push( links.tel )
+      }
+
+      if ( links.privacy && privacyPolicy ){
+        useLinks.push( links.privacy )
+      }
+
+      if ( links.terms && terms ){
+        useLinks.push( links.terms )
+      }
+
       let footer = Div({
           id       : 'footer',
           className: 'footer',
@@ -9069,7 +9111,7 @@
 
           footerLine(address),
 
-          footerLine(links),
+          footerLine(useLinks.join(' | ')),
 
           getEmailData().message_type !== 'transactional' ? footerLine(unsubscribe) : null,
         ])
@@ -9086,7 +9128,11 @@
 
       return footer
     },
-    plainText: ({}) => {
+    plainText: ({
+      tel = true,
+      terms = true,
+      privacyPolicy = true
+    }) => {
 
       let {
         business_name,
@@ -9095,10 +9141,24 @@
         unsubscribe,
       } = _BlockEditor.footer
 
+      let useLinks = [];
+
+      if ( links.tel && tel ){
+        useLinks.push( links.tel )
+      }
+
+      if ( links.privacy && privacyPolicy ){
+        useLinks.push( links.privacy )
+      }
+
+      if ( links.terms && terms ){
+        useLinks.push( links.terms )
+      }
+
       return [
         `Copyright ${ business_name }`,
         address,
-        extractPlainText(links),
+        extractPlainText(useLinks.join(' | ')),
         extractPlainText(unsubscribe),
 
       ].join('  \n')
@@ -9112,6 +9172,9 @@
       linkStyle: {
         color: '#488aff',
       },
+      tel: true,
+      terms: true,
+      privacyPolicy: true
     },
   })
 
