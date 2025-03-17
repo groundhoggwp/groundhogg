@@ -751,6 +751,11 @@ class Funnels_Page extends Admin_Page {
 					'branch'    => 'sanitize_key',
 				] );
 
+                // type is not registered
+                if ( ! Plugin::instance()->step_manager->type_is_registered( $step['step_type' ] ) ){
+                    continue;
+                }
+
 				$element = Plugin::instance()->step_manager->get_element( $step_data['step_type'] );
 
 				$step = new Step();

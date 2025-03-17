@@ -12,6 +12,7 @@ use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\steps\benchmarks\Polyfill_Benchmark;
 use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\steps\logic\Branch_Logic;
+use Groundhogg\steps\logic\Polyfill_Logic;
 use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1515,6 +1516,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * The associated step element
+	 *
+	 * @var Funnel_Step
+	 */
+	protected $stepElement;
+
+	/**
 	 * Gets the related step element of a step based on the step type
 	 * Also sets the elements' current step to this step
 	 *
@@ -1522,24 +1530,31 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_step_element() {
 
-		$type = $this->get_type();
-
-		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ) {
-			if ( $this->is_benchmark() ) {
-				return new Polyfill_Benchmark( $this );
-			}
-
-			if ( $this->is_action() ) {
-				return new Polyfill_Action( $this );
-			}
-
-			$type = 'error';
+		if ( $this->stepElement ){
+			$this->stepElement->set_current_step( $this );
+			return $this->stepElement;
 		}
 
-		$element = Plugin::instance()->step_manager->get_element( $type );
-		$element->set_current_step( $this );
+		$type = $this->get_type();
 
-		return $element;
+		// setup a polyfill to avoid rendering errors
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ) {
+
+			if ( $this->is_benchmark() ) {
+				$this->stepElement = new Polyfill_Benchmark( $this );
+			} else if ( $this->is_action() ) {
+				$this->stepElement = new Polyfill_Action( $this );
+			} else if ( $this->is_logic() ) {
+				$this->stepElement = new Polyfill_Logic( $this );
+			}
+
+			return $this->stepElement;
+		}
+
+		$this->stepElement = Plugin::instance()->step_manager->get_element( $type );
+		$this->stepElement->set_current_step( $this );
+
+		return $this->stepElement;
 	}
 
 	/**
@@ -1923,7 +1938,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function is_branch_logic() {
-		return is_a( $this->get_step_element(), Branch_Logic::class );
+		return $this->is_logic() && is_a( $this->get_step_element(), Branch_Logic::class );
 	}
 
 	/**
@@ -1932,6 +1947,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function post_import() {
 
 		$this->get_step_element()->post_import( $this );
+
 		$oldId = $this->get_meta( 'imported_step_id' );
 
 		// handle updating benchmark branches

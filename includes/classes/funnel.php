@@ -289,7 +289,7 @@ class Funnel extends Base_Object_With_Meta {
 
 			$level ++;
 
-			if ( $step->is_logic() ) {
+			if ( $step->is_branch_logic() ) {
 				$sub_steps = $step->get_sub_steps();
 				$branches  = array_unique( wp_list_pluck( $sub_steps, 'branch' ) );
 				$maxDepth  = $level;

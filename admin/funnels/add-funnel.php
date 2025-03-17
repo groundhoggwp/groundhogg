@@ -75,6 +75,7 @@ if ( get_url_var( 'flush' ) ) {
 		foreach ( $funnel->steps as $step ) {
 			$step = (object) $step;
 
+            // don't show funnels with unregistered types
 			if ( ! Plugin::instance()->step_manager->type_is_registered( $step->data->step_type ) ) {
 				return false;
 			}
@@ -115,6 +116,7 @@ if ( get_url_var( 'flush' ) ) {
 
                                 foreach ( $steps as $step ) {
 
+                                    // if we're here, the step type is registered
 	                                $step_type = Plugin::instance()->step_manager->get_element( $step->data->step_type );
 
 	                                ?>
