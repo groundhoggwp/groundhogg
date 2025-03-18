@@ -128,7 +128,7 @@ abstract class LMS_Integration extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/lms-enrolled.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/lms-event.svg';
 	}
 
 	/**
@@ -146,7 +146,6 @@ abstract class LMS_Integration extends Benchmark {
 		echo html()->select2( [
 			'id'       => $this->setting_id_prefix( 'action' ),
 			'name'     => $this->setting_name_prefix( 'action' ) . '[]',
-			'class'    => 'gh-select2',
 			'options'  => [
 				'course_enrolled'  => __( 'Enrolls in a course', 'groundhogg' ),
 				'course_completed' => __( 'Completes a course', 'groundhogg' ),
@@ -163,7 +162,6 @@ abstract class LMS_Integration extends Benchmark {
 			'name'        => $this->setting_name_prefix( 'course' ) . '[]',
 			'data'        => $this->get_courses_for_select(),
 			'selected'    => $course_ids,
-			'class'       => 'gh-select2',
 			'multiple'    => true,
 			'placeholder' => 'Any course'
 		] );

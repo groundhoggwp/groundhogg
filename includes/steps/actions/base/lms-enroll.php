@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Actions\Base;
 
 use Groundhogg\Step;
 use Groundhogg\Steps\Actions\Action;
+use function Groundhogg\bold_it;
 use function Groundhogg\create_user_from_contact;
 use function Groundhogg\html;
 use function Groundhogg\one_of;
@@ -38,7 +39,7 @@ abstract class LMS_Enroll extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/lms-action.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/lms-enroll.svg';
 	}
 
 	/**
@@ -56,54 +57,49 @@ abstract class LMS_Enroll extends Action {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		html()->start_form_table();
 
-		// ACTION
-		html()->start_row();
+		echo html()->e('p', [], 'Select an action to take...' );
 
-		html()->th( [
-			__( 'Action', 'groundhogg' )
-		] );
-
-		html()->td( [
-			html()->dropdown( [
-				'name'        => $this->setting_name_prefix( 'action' ),
-				'id'          => $this->setting_id_prefix( 'action' ),
-				'class'       => 'auto-save',
-				'options'     => [
-					'enroll'   => __( 'Enroll Student', 'groundhogg' ),
-					'unenroll' => __( 'Unenroll Student', 'groundhogg' ),
-				],
-				'selected'    => $this->get_setting( 'action' ),
-				'multiple'    => false,
-				'option_none' => false,
-			] )
-		] );
-
-		html()->end_row();
-
-		// COURSE
-		html()->start_row();
-
-		html()->th( [
-			__( 'Course', 'groundhogg' )
+		echo html()->dropdown( [
+			'name'        => $this->setting_name_prefix( 'action' ),
+			'id'          => $this->setting_id_prefix( 'action' ),
+			'options'     => [
+				'enroll'   => __( 'Enroll Student', 'groundhogg' ),
+				'unenroll' => __( 'Un-enroll Student', 'groundhogg' ),
+			],
+			'selected'    => $this->get_setting( 'action' ),
+			'multiple'    => false,
+			'option_none' => false,
 		] );
 
 		$course_id = absint( $this->get_setting( 'course' ) );
 
-		html()->td( [
-			html()->select2( [
-				'id'       => $this->setting_id_prefix( 'course' ),
-				'name'     => $this->setting_name_prefix( 'course' ),
-				'data'     => $this->get_courses_for_select(),
-				'selected' => [ $course_id ],
-				'class'    => 'gh-select2'
-			] )
+		echo html()->e('p', [], 'In which course?' );
+
+		echo html()->select2( [
+			'id'       => $this->setting_id_prefix( 'course' ),
+			'name'     => $this->setting_name_prefix( 'course' ),
+			'data'     => $this->get_courses_for_select(),
+			'selected' => [ $course_id ],
 		] );
 
-		html()->end_row();
+		?><p></p><?php
+	}
 
-		html()->end_form_table();
+	public function generate_step_title( $step ) {
+
+		$action = $this->get_setting( 'action', 'enroll' );
+		$course_id = absint( $this->get_setting( 'course' ) );
+
+		if ( ! $course_id ){
+			return 'Select a course';
+		}
+
+		if ( $action === 'enroll' ) {
+			return sprintf( '<b>Enroll</b> in %s', bold_it( get_the_title( $course_id ) ) );
+		}
+
+		return sprintf( '<b>Un-enroll</b> from %s', bold_it( get_the_title( $course_id ) ) );
 	}
 
 	public function get_settings_schema() {

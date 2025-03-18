@@ -105,6 +105,54 @@ body:has(#funnel-form) {
   }
 }
 
+body.gh-screenshot-mode {
+
+  #step-settings-container {
+    display: none;
+  }
+
+  #funnel-form #step-flow {
+
+    --logic-line-width: 3px;
+
+    .fixed-inside {
+      background-image: none;
+      background-color: #fff;
+    }
+
+    button.add-step {
+      display: none;
+    }
+
+    .sortable-item:first-child {
+      button.add-step + .flow-line {
+        display: none;
+      }
+    }
+
+    .step-branch {
+      .step {
+        border-width: var(--logic-line-width);
+        background-image: linear-gradient(var(--color-10),var(--color-10));
+        background-color: #fff;
+        box-shadow: none;
+
+        .hndle-icon {
+          background-color: var(--color);
+          svg {
+            fill: #FFF;
+          }
+        }
+
+        + .flow-line {
+          display: none;
+        }
+      }
+    }
+  }
+
+}
+
 #funnel-form {
 
   display: flex;
@@ -327,6 +375,8 @@ body:has(#funnel-form) {
 
           svg {
             fill: var(--color);
+            width: 100%;
+            height: 100%;
           }
 
           &:not(:has(.visible)) {
@@ -926,6 +976,8 @@ button.button.save-button {
 #step-flow {
 
   --logic-line-style: solid;
+  --logic-line-width: 2px;
+  --logic-line-radius: 100%;
   //width: 100%;
   //flex-shrink: 0;
   position: relative;
@@ -1003,7 +1055,7 @@ button.button.save-button {
         height: 10px;
         border-color: $secondary-purple;
         border-style: solid;
-        border-width: 2px 2px 0 0;
+        border-width: var(--logic-line-width) var(--logic-line-width) 0 0;
 
         &.top {
           transform: translate(-50%, -50%) rotate(45deg);
@@ -1163,7 +1215,7 @@ button.button.save-button {
         color: $primary-dark-50;
         border-color: $primary-dark-50;
         background-color: #fff;
-        border-width: 2px;
+        border-width: var(--logic-line-width);
         box-sizing: border-box;
         border-style: solid;
         z-index: 5;
@@ -1323,7 +1375,7 @@ button.button.save-button {
   }
 
   .flow-line {
-    border-right: 2px var(--logic-line-style) $action-green;
+    border-right: var(--logic-line-width) var(--logic-line-style) $action-green;
     //z-index: 1;
     //top: -51px;
     //height: 52px;
@@ -1360,7 +1412,7 @@ button.button.save-button {
     box-shadow: $box-shadow;
     //margin: 30px 0;
     background: white;
-    outline: 2px solid transparent;
+    outline: var(--logic-line-width) solid transparent;
     cursor: pointer;
     max-width: 300px;
     min-width: 200px;
@@ -1368,7 +1420,7 @@ button.button.save-button {
     z-index: 2;
     position: relative;
     //margin: auto;\\
-    border: 1px solid var(--color);
+    border: calc(var(--logic-line-width) - 1px) solid var(--color);
 
     .step-notes {
       display: none;
@@ -1673,7 +1725,7 @@ button.button.save-button {
         z-index: 2;
         background-color: #fff;
         background-image: linear-gradient(var(--color-5), var(--color-10));
-        border: 2px solid var(--color);
+        border: var(--logic-line-width) solid var(--color);
         box-sizing: border-box;
 
         &:has(svg) {

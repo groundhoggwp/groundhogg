@@ -166,7 +166,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		if ( $icon && str_ends_with( $icon, '.svg' ) ) {
 
 			// get the absolute path of the svg file relative to wp-content
-			$icon_path = str_replace( WP_PLUGIN_URL, WP_PLUGIN_DIR, $icon );
+			$icon_path = preg_replace( '@https://.*/wp-content/plugins/@', WP_PLUGIN_DIR . '/', $icon );
 
 			return @file_get_contents( $icon_path );
 		}

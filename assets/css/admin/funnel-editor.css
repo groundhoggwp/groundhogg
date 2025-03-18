@@ -33,6 +33,38 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
   display: none;
 }
 
+body.gh-screenshot-mode #step-settings-container {
+  display: none;
+}
+body.gh-screenshot-mode #funnel-form #step-flow {
+  --logic-line-width: 3px;
+}
+body.gh-screenshot-mode #funnel-form #step-flow .fixed-inside {
+  background-image: none;
+  background-color: #fff;
+}
+body.gh-screenshot-mode #funnel-form #step-flow button.add-step {
+  display: none;
+}
+body.gh-screenshot-mode #funnel-form #step-flow .sortable-item:first-child button.add-step + .flow-line {
+  display: none;
+}
+body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step {
+  border-width: var(--logic-line-width);
+  background-image: linear-gradient(var(--color-10), var(--color-10));
+  background-color: #fff;
+  box-shadow: none;
+}
+body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step .hndle-icon {
+  background-color: var(--color);
+}
+body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step .hndle-icon svg {
+  fill: #FFF;
+}
+body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line {
+  display: none;
+}
+
 #funnel-form {
   display: flex;
   flex-direction: column;
@@ -210,6 +242,8 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group svg {
   fill: var(--color);
+  width: 100%;
+  height: 100%;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group:not(:has(.visible)) {
   display: none;
@@ -642,6 +676,8 @@ button.button.save-button {
 
 #step-flow {
   --logic-line-style: solid;
+  --logic-line-width: 2px;
+  --logic-line-radius: 100%;
   position: relative;
   flex-grow: 1;
   background-color: #F6F9FB;
@@ -703,7 +739,7 @@ button.button.save-button {
   height: 10px;
   border-color: #6c19ad;
   border-style: solid;
-  border-width: 2px 2px 0 0;
+  border-width: var(--logic-line-width) var(--logic-line-width) 0 0;
 }
 #step-flow .fixed-inside .logic-line > .line-arrow.top {
   transform: translate(-50%, -50%) rotate(45deg);
@@ -807,7 +843,7 @@ button.button.save-button {
   color: rgba(16, 38, 64, 0.5);
   border-color: rgba(16, 38, 64, 0.5);
   background-color: #fff;
-  border-width: 2px;
+  border-width: var(--logic-line-width);
   box-sizing: border-box;
   border-style: solid;
   z-index: 5;
@@ -921,7 +957,7 @@ button.button.save-button {
   display: none;
 }
 #step-flow .flow-line {
-  border-right: 2px var(--logic-line-style) #9ece38;
+  border-right: var(--logic-line-width) var(--logic-line-style) #9ece38;
   height: 40px;
 }
 #step-flow .step.action + .flow-line {
@@ -931,14 +967,14 @@ button.button.save-button {
   border-radius: 5px;
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
   background: white;
-  outline: 2px solid transparent;
+  outline: var(--logic-line-width) solid transparent;
   cursor: pointer;
   max-width: 300px;
   min-width: 200px;
   width: max-content;
   z-index: 2;
   position: relative;
-  border: 1px solid var(--color);
+  border: calc(var(--logic-line-width) - 1px) solid var(--color);
 }
 #step-flow .step .step-notes {
   display: none;
@@ -1149,7 +1185,7 @@ button.button.save-button {
   z-index: 2;
   background-color: #fff;
   background-image: linear-gradient(var(--color-5), var(--color-10));
-  border: 2px solid var(--color);
+  border: var(--logic-line-width) solid var(--color);
   box-sizing: border-box;
 }
 #step-flow .step > .hndle .hndle-icon:has(svg) {

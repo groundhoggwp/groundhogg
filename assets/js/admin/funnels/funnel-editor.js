@@ -604,6 +604,14 @@
                   })
                 },
               },
+              {
+                key     : 'screenshot-mode',
+                text    : 'Screenshot Mode',
+                onSelect: e => {
+                  document.body.classList.toggle( 'gh-screenshot-mode' )
+                  drawLogicLines()
+                },
+              },
             ])
           },
         }, icons.verticalDots))
@@ -707,9 +715,15 @@
           })
         })
 
-        setTimeout(() => {
+        $('#step-settings-container').resizable({
+          handles: "w",
+          animateDuration: "fast",
+          resize: function(event, ui) {
+            ui.element.css('left', ''); // Remove the 'left' style to keep the div in place
+            localStorage.setItem( 'gh-funnel-settings-panel-width', ui.size.width )
+          }
+        });
 
-        }, 100)
       },
 
       async save (args = {}) {
@@ -949,14 +963,14 @@
       },
 
       hideSettings () {
-        $('#step-settings-container').addClass('slide-out')
+        $('#step-settings-container').removeAttr("style").addClass('slide-out');
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
         }, 400)
       },
 
       showSettings () {
-        $('#step-settings-container').removeClass('slide-out')
+        $('#step-settings-container').css( 'width', localStorage.getItem( 'gh-funnel-settings-panel-width' ) ).removeClass('slide-out')
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
         }, 400)
@@ -1634,9 +1648,10 @@
   function drawLogicLines () {
 
     // const borderRadius = '50px'
-    const borderRadius = '100%'
-    const borderPixels = 2
-    const borderWidth = `${ borderPixels }px`
+    const borderRadius = 'var(--logic-line-radius)'
+    const borderWidth = `var(--logic-line-width)`
+
+    let offset = parseInt(window.getComputedStyle( document.getElementById( 'step-flow' ) ).getPropertyValue('--logic-line-width'))/2;
 
     const clearLineStyle = line => line.removeAttribute('style')
 
@@ -1700,7 +1715,7 @@
 
         // center
         if (areNumbersClose(stepCenter, rowCenter, 1)) {
-          line1.style.left = 'calc(50% - 1px)'
+          line1.style.left = `calc(50% - ${offset}px)`
           line1.style.width = 0
           line1.style.bottom = 0
           line1.style.height = `${ lineHeight * 2 }px`
@@ -1709,21 +1724,21 @@
         }
         // left side
         else if (stepCenter < rowCenter) {
-          line1.style.left = `${ stepCenter - rowPos.left - 1 }px`
+          line1.style.left = `${ stepCenter - rowPos.left - offset }px`
           line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
           line1.style.borderRadius = `0 0 0 ${ borderRadius }`
 
-          line2.style.left = `${ stepCenter - rowPos.left + lineWidth - 1 }px`
+          line2.style.left = `${ stepCenter - rowPos.left + lineWidth - offset }px`
           line2.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
           line2.style.borderRadius = `0 ${ borderRadius } 0 0`
         }
         // right side
         else {
-          line1.style.left = `${ stepCenter - rowPos.left - lineWidth - 1 }px`
+          line1.style.left = `${ stepCenter - rowPos.left - lineWidth - offset }px`
           line1.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
           line1.style.borderRadius = `0 0 ${ borderRadius } 0`
 
-          line2.style.left = `${ stepCenter - rowPos.left - ( lineWidth * 2 ) - 1 }px`
+          line2.style.left = `${ stepCenter - rowPos.left - ( lineWidth * 2 ) - offset }px`
           line2.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
           line2.style.borderRadius = `${ borderRadius } 0 0 0`
         }
@@ -1763,7 +1778,7 @@
 
         // center
         if (areNumbersClose(stepCenter, rowCenter, 1)) {
-          line3.style.left = 'calc(50% - 1px)'
+          line3.style.left = `calc(50% - ${offset}px)`
           line3.style.width = 0
           line3.style.top = 0
           line3.style.height = `${ lineHeight * 2 }px`
@@ -1773,7 +1788,7 @@
         }
         // left side
         else if (stepCenter < rowCenter) {
-          line3.style.left = `${ stepCenter - rowPos.left + lineWidth - 1 }px`
+          line3.style.left = `${ stepCenter - rowPos.left + lineWidth - offset }px`
           line3.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
           line3.style.borderRadius = `0 0 ${ borderRadius } 0`
           line3.classList.add('left')
@@ -2023,7 +2038,7 @@
       let fromPos = from.getBoundingClientRect()
       let toPos = to.getBoundingClientRect()
 
-      let lineHeight = Math.abs(( ( fromPos.bottom - ( fromPos.height / 2 ) ) ) - ( toPos.bottom - ( toPos.height / 2 ) ) + 1)
+      let lineHeight = Math.abs(( ( fromPos.bottom - ( fromPos.height / 2 ) ) ) - ( toPos.bottom - ( toPos.height / 2 ) ) + offset)
       let minWidth = Math.min(fromPos.width, toPos.width)
 
       let branch = from.closest('.step-branch')
