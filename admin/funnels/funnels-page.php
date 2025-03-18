@@ -752,7 +752,7 @@ class Funnels_Page extends Admin_Page {
 				] );
 
                 // type is not registered
-                if ( ! Plugin::instance()->step_manager->type_is_registered( $step['step_type' ] ) ){
+                if ( ! Plugin::instance()->step_manager->type_is_registered( $step_data['step_type' ] ) ){
                     continue;
                 }
 

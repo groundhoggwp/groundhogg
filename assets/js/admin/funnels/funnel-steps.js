@@ -1122,6 +1122,7 @@
       // Email id was not set
       if (!meta.email_id) {
         res({})
+        return
       }
 
       confirmationModal({

@@ -355,9 +355,12 @@ You can purchase a premium plan for access to support and our premium extensions
  * Multi-branch logic
  * Weight distribution
  * Split-testing
+ * Loop, Skip, Stop
+ * Evergreen Sequence
 * ADDED The **Pass-through** setting for benchmarks to allow contacts to pass through them even without matching conditions.
 * ADDED Additional bulk actions in the event logs tables.
 * ADDED Setting to disable page tracking.
+* ADDED Option to footer block to disable phone, terms, and policy links.
 * IMPROVED The Cron Job Setup page with additional instructions and a new layout.
 * IMPROVED Various admin UI improvements like tabs, reporting page width constraint, and responsive funnel step flow for large screens.
 * TWEAKED Object ID can be omitted from relationship filters for more generic usage.
