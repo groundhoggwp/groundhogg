@@ -615,7 +615,12 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
-		$funnel   = $this->get_current_funnel();
+		$funnel = $this->get_current_funnel();
+
+        if ( ! $funnel->exists() ){
+	        wp_send_json_error();
+        }
+
 		$response = [
 			'sortable' => $funnel->step_flow( false ),
 			'settings' => $funnel->step_settings( false ),
@@ -650,9 +655,12 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
+
+        if ( ! $funnel->exists() ){
+            wp_send_json_error();
+        }
 
 		// restore the prev state of the steps...
 		if ( get_post_var( '_restore' ) ) {
@@ -845,12 +853,6 @@ class Funnels_Page extends Admin_Page {
 		// deleted uncommited changes
 		if ( get_post_var( '_uncommit' ) ) {
 			$funnel->uncommit();
-		}
-
-		// if the funnel does not have any entry steps, it cannot be active.
-		if ( count( $funnel->get_entry_steps() ) === 0 ) {
-			$args['status'] = 'inactive';
-			$funnel->add_error( new \WP_Error( 'err', 'You must have at least one entry benchmark before activating a funnel.' ) );
 		}
 
 		if ( get_post_var( '_commit' ) && $funnel->is_active() ) {
