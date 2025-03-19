@@ -20,6 +20,7 @@
     An,
     Button,
     Dashicon,
+    ToolTip,
     Modal,
     ModalFrame,
     Textarea,
@@ -93,7 +94,7 @@
 
       timeout: null,
 
-      morph(){
+      morph () {
         let el = document.getElementById('undo-and-redo')
         if (el) {
           morphdom(el, UndoRedo())
@@ -148,7 +149,7 @@
         Funnel.save({
           quiet  : true,
           restore: state,
-        }).then( () => this.morph() )
+        }).then(() => this.morph())
       },
 
       undo () {
@@ -191,7 +192,7 @@
               UndoRedoManager.undo()
             },
           },
-          Dashicon('undo')),
+          [Dashicon('undo'), ToolTip( 'Undo', 'bottom' )]),
         Button({
             id       : 'editor-redo',
             className: 'gh-button secondary text',
@@ -200,7 +201,7 @@
               UndoRedoManager.redo()
             },
           },
-          Dashicon('redo')),
+          [Dashicon('redo'), ToolTip('Redo', 'bottom')]),
       ])
 
     $.extend(Funnel, {
@@ -728,7 +729,7 @@
               },
               {
                 key     : 'screenshot-mode',
-                text    : 'Screenshot Mode',
+                text    :  document.body.classList.contains('gh-screenshot-mode') ? 'Editing Mode' : 'Screenshot Mode',
                 onSelect: e => {
                   document.body.classList.toggle('gh-screenshot-mode')
                   drawLogicLines()
@@ -852,7 +853,7 @@
         this.addCurrentStepsToUndoRedoHistory()
       },
 
-      addCurrentStepsToUndoRedoHistory(){
+      addCurrentStepsToUndoRedoHistory () {
         // only minimum data, don't need export stuff
         UndoRedoManager.addChange(JSON.stringify(this.steps.map(({
           ID,
@@ -925,7 +926,18 @@
         }
 
         if (restore) {
-          formData.append('_restore', restore)
+          let restoreFormData = new FormData()
+          restoreFormData.append('_restore', restore)
+          let inputs = [
+            'funnel',
+            'action',
+            '_wpnonce',
+            '_wp_http_referer',
+          ]
+          inputs.forEach(input => {
+            restoreFormData.append(input, formData.get(input))
+          })
+          formData = restoreFormData
         }
 
         return await ajax(formData, {
@@ -971,7 +983,7 @@
                 toEl.classList.add('editing')
               }
 
-              if ( quiet && ! restore && fromEl.matches('.editing .ignore-morph')) {
+              if (quiet && !restore && fromEl.matches('.editing .ignore-morph')) {
                 return false // don't morph the currently edited step to avoid glitchiness
               }
 
@@ -994,7 +1006,7 @@
             $(document).trigger('gh-init-pickers') // re-init pickers that would have been removed
             $('body').removeClass('auto-saving')
 
-            if ( restore ){
+            if (restore) {
               this.stepSettingsCallbacks()
             }
 
