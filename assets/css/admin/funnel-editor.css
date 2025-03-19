@@ -128,6 +128,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   border-left: 1px solid rgba(16, 38, 64, 0.15);
   background-color: var(--bg-color);
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
+  container-type: inline-size;
 }
 #step-settings-container.slide-out {
   width: 0;
@@ -486,6 +487,14 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   display: flex;
 }
 
+@container (max-width: 900px) {
+  .step-flex {
+    flex-direction: column;
+  }
+  .step-flex .step-notes {
+    width: auto !important;
+  }
+}
 .sortable-helper-icon.action {
   --color: #9ece38;
   --color-25: rgba(158, 206, 56, 0.25);
@@ -1105,11 +1114,11 @@ button.button.save-button {
 #step-flow .step.editing > .hndle > .hndle-icon > svg {
   fill: #fff;
 }
-#step-flow .step.has-changes {
-  outline: 2px dashed #ffee58;
-}
 #step-flow .step.active {
   background-color: #fff;
+  background-image: linear-gradient(var(--color-5), var(--color-5));
+}
+#step-flow .step.has-changes {
   background-image: repeating-linear-gradient(-45deg, var(--color-10), var(--color-10) 10px, #fff 10px, #fff 20px);
 }
 #step-flow .step:hover .actions {

@@ -232,6 +232,7 @@ body.gh-screenshot-mode {
   border-left: 1px solid $primary-dark-15;
   background-color: var(--bg-color);;
   box-shadow: $box-shadow;
+  container-type: inline-size;
 
   &.slide-out {
     //transform: translateX(100vw); /* Move out to the right */
@@ -723,6 +724,16 @@ body.gh-screenshot-mode {
         }
 
       }
+    }
+  }
+}
+
+@container (max-width: 900px) {
+  .step-flex {
+    flex-direction: column;
+
+    .step-notes {
+      width: auto !important;
     }
   }
 }
@@ -1606,12 +1617,12 @@ button.button.save-button {
       }
     }
 
-    &.has-changes {
-      outline: 2px dashed $alert-yellow;
-    }
-
     &.active {
       background-color: #fff;
+      background-image: linear-gradient(var(--color-5),var(--color-5));
+    }
+
+    &.has-changes {
       background-image: repeating-linear-gradient(
                       -45deg, /* Adjust angle for slant */
                       var(--color-10), /* Line color */
