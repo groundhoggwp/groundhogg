@@ -8,7 +8,6 @@ use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
-use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\action_url;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
@@ -620,7 +619,7 @@ class Funnels_Page extends Admin_Page {
 		$response = [
 			'sortable' => $funnel->step_flow( false ),
 			'settings' => $funnel->step_settings( false ),
-			'funnel'   => $funnel
+			'funnel'   => $funnel,
 		];
 
 		if ( is_wp_error( $result ) ) {
@@ -651,6 +650,41 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+
+		$funnel_id = absint( get_request_var( 'funnel' ) );
+		$funnel    = new Funnel( $funnel_id );
+
+		// restore the prev state of the steps...
+		if ( get_post_var( '_restore' ) ) {
+
+			$prev_step_states = json_decode( get_post_var( '_restore' ), true );
+			$keep_step_ids    = wp_parse_id_list( wp_list_pluck( $prev_step_states, 'ID' ) );
+
+			// delete steps that were added that aren't in the previous step state
+			$curr_steps = $funnel->get_steps();
+			foreach ( $curr_steps as $curr_step ) {
+				if ( ! in_array( $curr_step->ID, $keep_step_ids ) ) {
+					$curr_step->delete();
+				}
+			}
+
+			// update current steps with data from prev states
+			foreach ( $prev_step_states as $prev_step_state ) {
+
+				$step = new Step( absint( $prev_step_state['ID'] ) );
+				if ( $step->exists() ) {
+					$step->update( $prev_step_state['data'] );
+				} else {
+					$step->create( $prev_step_state['data'] );
+				}
+
+				$step->update_meta( $prev_step_state['meta'] );
+
+			}
+
+			return true;
+		}
+
 		if ( get_post_var( '_delete_step' ) ) {
 
 			$step_id = absint( get_post_var( '_delete_step' ) );
@@ -674,9 +708,6 @@ class Funnels_Page extends Admin_Page {
 			// update directly to avoid the changes/commit feature
 			db()->steps->update( $step_id, [ 'is_locked' => 0 ] );
 		}
-
-		$funnel_id = absint( get_request_var( 'funnel' ) );
-		$funnel    = new Funnel( $funnel_id );
 
 		/* check if funnel is too big... */
 		if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ) {
@@ -751,10 +782,10 @@ class Funnels_Page extends Admin_Page {
 					'branch'    => 'sanitize_key',
 				] );
 
-                // type is not registered
-                if ( ! Plugin::instance()->step_manager->type_is_registered( $step_data['step_type' ] ) ){
-                    continue;
-                }
+				// type is not registered
+				if ( ! Plugin::instance()->step_manager->type_is_registered( $step_data['step_type'] ) ) {
+					continue;
+				}
 
 				$element = Plugin::instance()->step_manager->get_element( $step_data['step_type'] );
 

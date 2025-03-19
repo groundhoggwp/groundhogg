@@ -82,6 +82,127 @@
 
     }
 
+    const UndoRedoManager = {
+
+      // The size of the stack to maintain
+      stackSize: 50,
+      // Where we are in the history
+      pointer: 0,
+      // The changes we've made
+      changes: [],
+
+      timeout: null,
+
+      morph(){
+        let el = document.getElementById('undo-and-redo')
+        if (el) {
+          morphdom(el, UndoRedo())
+        }
+      },
+
+      // Add a state to the history
+      addChange (state) {
+
+        // use a timeout to avoid creating too many states from onInput events
+        if (this.timeout) {
+          clearTimeout(this.timeout)
+        }
+
+        this.timeout = setTimeout(() => {
+
+          // remove elements past the current pointer
+          this.changes = this.changes.slice(0, this.pointer + 1)
+
+          // Add the new state
+          this.changes.push(state)
+
+          // Maintain size of 50 for memory reasons
+          if (this.changes.length > this.stackSize) {
+            this.changes.shift()
+          }
+
+          // Set the pointer to the end of the changelist
+          this.pointer = this.changes.length - 1
+
+          this.morph()
+        }, 100)
+      },
+      hasChanges () {
+        return this.changes.length > 0
+      },
+
+      getState (index) {
+        return this.changes[index]
+      },
+
+      canUndo () {
+        return this.changes.length && this.pointer > 0
+      },
+
+      canRedo () {
+        return this.pointer < this.changes.length - 1
+      },
+
+      restoreState () {
+        let state = this.getState(this.pointer)
+        Funnel.save({
+          quiet  : true,
+          restore: state,
+        }).then( () => this.morph() )
+      },
+
+      undo () {
+
+        if (!this.canUndo()) {
+          return
+        }
+
+        this.pointer--
+        this.restoreState()
+      },
+
+      redo () {
+
+        if (!this.canRedo()) {
+          return
+        }
+
+        this.pointer++
+        this.restoreState()
+      },
+
+      clear () {
+        this.pointer = 0
+        this.changes = []
+      },
+
+    }
+
+    const UndoRedo = () => Div({
+        className: 'gh-input-group',
+        id       : 'undo-and-redo',
+      },
+      [
+        Button({
+            id       : 'editor-undo',
+            className: 'gh-button secondary text',
+            disabled : !UndoRedoManager.canUndo(),
+            onClick  : e => {
+              UndoRedoManager.undo()
+            },
+          },
+          Dashicon('undo')),
+        Button({
+            id       : 'editor-redo',
+            className: 'gh-button secondary text',
+            disabled : !UndoRedoManager.canRedo(),
+            onClick  : e => {
+              UndoRedoManager.redo()
+            },
+          },
+          Dashicon('redo')),
+      ])
+
     $.extend(Funnel, {
 
       sortables      : null,
@@ -91,6 +212,7 @@
       addEl          : null,
       targetStep     : null,
       targetAdd      : null,
+      lastSaved      : null,
 
       stepCallbacks: {},
 
@@ -185,9 +307,9 @@
         $document.on('keydown', async e => {
           if (e.key === 'c' && e.ctrlKey && this.editing && this.targetStep) {
             navigator.clipboard.writeText(JSON.stringify({
-              copy: this.editing,
+              copy : this.editing,
               group: this.targetStep.dataset.group,
-              type: this.targetStep.dataset.type,
+              type : this.targetStep.dataset.type,
             }))
             dialog({
               message: 'Step copied!',
@@ -202,24 +324,24 @@
             try {
               json = JSON.parse(text)
               if (!json) {
-                throw new Error( 'invalid step' )
+                throw new Error('invalid step')
               }
 
             }
             catch (err) {
               dialog({
                 message: err.message,
-                type: 'error'
+                type   : 'error',
               })
               return
             }
 
             let branch = this.targetAdd.closest('.step-branch').dataset.branch
             let data = {
-              copy: json.copy,
+              copy      : json.copy,
               step_group: json.group,
-              step_type: json.type,
-              branch: branch,
+              step_type : json.type,
+              branch    : branch,
             }
 
             let placeholder = createPlaceholderEl(data)
@@ -608,7 +730,7 @@
                 key     : 'screenshot-mode',
                 text    : 'Screenshot Mode',
                 onSelect: e => {
-                  document.body.classList.toggle( 'gh-screenshot-mode' )
+                  document.body.classList.toggle('gh-screenshot-mode')
                   drawLogicLines()
                 },
               },
@@ -716,26 +838,55 @@
         })
 
         $('#step-settings-container').resizable({
-          handles: "w",
-          animateDuration: "fast",
-          resize: function(event, ui) {
-            ui.element.css('left', ''); // Remove the 'left' style to keep the div in place
-            localStorage.setItem( 'gh-funnel-settings-panel-width', ui.size.width )
-          }
-        });
+          handles        : 'w',
+          animateDuration: 'fast',
+          resize         : function (event, ui) {
+            ui.element.css('left', '') // Remove the 'left' style to keep the div in place
+            localStorage.setItem('gh-funnel-settings-panel-width', ui.size.width)
+          },
+        })
 
+        setInterval(() => this.updateLastSaved(), 10 * 1000)
+
+        // add initial state to history
+        this.addCurrentStepsToUndoRedoHistory()
+      },
+
+      addCurrentStepsToUndoRedoHistory(){
+        // only minimum data, don't need export stuff
+        UndoRedoManager.addChange(JSON.stringify(this.steps.map(({
+          ID,
+          data,
+          meta,
+        }) => ( {
+          ID,
+          data,
+          meta,
+        } ))))
+      },
+
+      updateLastSaved () {
+
+        if (this.lastSaved === null) {
+          return
+        }
+
+        document.getElementById('last-saved-text').innerHTML = `Changes saved ${ wp.date.humanTimeDiff(this.lastSaved, new Date()) }.`
       },
 
       async save (args = {}) {
 
-        let quiet
-
         if (args === true) {
-          quiet = true
+          args = {
+            quiet: true,
+          }
         }
-        else {
-          quiet = args.quiet ?? false
-        }
+
+        let {
+          quiet = false,
+          moreData = () => {},
+          restore = '',
+        } = args
 
         if (quiet && this.saving) {
           return
@@ -756,6 +907,10 @@
 
         if (!quiet) {
           $('body').addClass('saving')
+          UndoRedoManager.clear() // reset undo states
+        }
+        else {
+          $('body').addClass('auto-saving')
         }
 
         // Update the JS meta changes first
@@ -765,8 +920,12 @@
         }
 
         // add additional data to the formData if required
-        if (args.moreData) {
-          args.moreData(formData)
+        if (moreData) {
+          moreData(formData)
+        }
+
+        if (restore) {
+          formData.append('_restore', restore)
         }
 
         return await ajax(formData, {
@@ -777,6 +936,10 @@
           document.getElementById('funnel-form').dataset.status = response.data.funnel.data.status
 
           this.steps = response.data.funnel.steps
+
+          if (!restore) {
+            this.addCurrentStepsToUndoRedoHistory()
+          }
 
           if (!this.dragging) {
             morphdom(document.getElementById('step-sortable'), Div({}, response.data.sortable), {
@@ -808,7 +971,7 @@
                 toEl.classList.add('editing')
               }
 
-              if (quiet && fromEl.matches('.editing .ignore-morph')) {
+              if ( quiet && ! restore && fromEl.matches('.editing .ignore-morph')) {
                 return false // don't morph the currently edited step to avoid glitchiness
               }
 
@@ -822,10 +985,19 @@
 
           this.saving = false
 
+          this.lastSaved = new Date()
+          this.updateLastSaved()
+
           // quietly!
           if (quiet) {
             $(document).trigger('auto-save')
             $(document).trigger('gh-init-pickers') // re-init pickers that would have been removed
+            $('body').removeClass('auto-saving')
+
+            if ( restore ){
+              this.stepSettingsCallbacks()
+            }
+
             return response
           }
 
@@ -963,14 +1135,14 @@
       },
 
       hideSettings () {
-        $('#step-settings-container').removeAttr("style").addClass('slide-out');
+        $('#step-settings-container').removeAttr('style').addClass('slide-out')
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
         }, 400)
       },
 
       showSettings () {
-        $('#step-settings-container').css( 'width', localStorage.getItem( 'gh-funnel-settings-panel-width' ) ).removeClass('slide-out')
+        $('#step-settings-container').css('width', localStorage.getItem('gh-funnel-settings-panel-width')).removeClass('slide-out')
         setTimeout(() => {
           document.dispatchEvent(new Event('resize'))
         }, 400)
@@ -1078,7 +1250,7 @@
         const type = step.data.step_type
         let extra = {}
 
-        let stepEl = document.getElementById( `step-${step.ID}` )
+        let stepEl = document.getElementById(`step-${ step.ID }`)
         let sortable = stepEl.closest('.sortable-item')
 
         // it's a benchmark that might have inner steps
@@ -1109,10 +1281,10 @@
         }
 
         sortable.insertAdjacentElement('afterend', createPlaceholderEl({
-          duplicate: step.ID,
-          step_type: step.data.step_type,
-          step_group: step.data.step_group
-        }) )
+          duplicate : step.ID,
+          step_type : step.data.step_type,
+          step_group: step.data.step_group,
+        }))
 
         drawLogicLines()
 
@@ -1346,11 +1518,6 @@
             prompt  : 'Some context specific settings will appear here, as well as the notes area for your personal usage.',
             position: 'left',
             target  : '.settings.editing .step-notes',
-          },
-          {
-            prompt  : 'You can collapse the settings panel to see the funnel using the full width of your screen.',
-            position: 'right',
-            target  : '#collapse-settings',
           },
           {
             prompt  : `You can start a funnel with more than one <span class="gh-text orange">benchmark</span> by adding a new benchmark adjacent to an existing one.`,
@@ -1651,7 +1818,7 @@
     const borderRadius = 'var(--logic-line-radius)'
     const borderWidth = `var(--logic-line-width)`
 
-    let offset = parseInt(window.getComputedStyle( document.getElementById( 'step-flow' ) ).getPropertyValue('--logic-line-width'))/2;
+    let offset = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width')) / 2
 
     const clearLineStyle = line => line.removeAttribute('style')
 
@@ -1715,7 +1882,7 @@
 
         // center
         if (areNumbersClose(stepCenter, rowCenter, 1)) {
-          line1.style.left = `calc(50% - ${offset}px)`
+          line1.style.left = `calc(50% - ${ offset }px)`
           line1.style.width = 0
           line1.style.bottom = 0
           line1.style.height = `${ lineHeight * 2 }px`
@@ -1778,7 +1945,7 @@
 
         // center
         if (areNumbersClose(stepCenter, rowCenter, 1)) {
-          line3.style.left = `calc(50% - ${offset}px)`
+          line3.style.left = `calc(50% - ${ offset }px)`
           line3.style.width = 0
           line3.style.top = 0
           line3.style.height = `${ lineHeight * 2 }px`

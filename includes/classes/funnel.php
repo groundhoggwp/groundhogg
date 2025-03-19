@@ -342,12 +342,33 @@ class Funnel extends Base_Object_With_Meta {
 
 			// delete any inactive steps
 			if ( ! $step->is_active() ) {
-				$step->delete();
+				$step->delete_and_commit();
 				continue;
 			}
 
 			$step->clear_changes();
 		}
+	}
+
+	/**
+	 * Handler to also delete steps
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		$this->update( [ 'status' => 'archived' ] );
+		$this->update_step_status();
+		$this->cancel_events();
+
+		$steps = $this->get_steps();
+
+		// delete all the steps in the funnel as well
+		foreach ( $steps as $step ) {
+			$step->delete_and_commit();
+		}
+
+		return parent::delete();
 	}
 
 	/**
@@ -562,14 +583,14 @@ class Funnel extends Base_Object_With_Meta {
 
 		if ( $this->is_editing() ) {
 
-			// filter out "deleted" steps with the is_deleted flag in their changes
-			$steps = array_filter( $steps, function ( $step ) {
-				return ! isset_not_empty( $step->changes, 'is_deleted' );
-			} );
-
 			foreach ( $steps as $step ) {
 				$step->merge_changes();
 			}
+
+			// filter out "deleted" steps with the status as deleted in their changes
+			$steps = array_filter( $steps, function ( $step ) {
+				return $step->step_status !== 'deleted';
+			} );
 
 			usort( $steps, function ( Step $a, Step $b ) {
 				return $a->get_order() - $b->get_order();
@@ -851,26 +872,5 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		return $step;
-	}
-
-	/**
-	 * Handler to also delete steps
-	 *
-	 * @return bool
-	 */
-	public function delete() {
-
-		$this->update( [ 'status' => 'archived' ] );
-		$this->update_step_status();
-		$this->cancel_events();
-
-		$steps = $this->get_steps();
-
-		// delete all the steps in the funnel as well
-		foreach ( $steps as $step ) {
-			$step->delete();
-		}
-
-		return parent::delete();
 	}
 }

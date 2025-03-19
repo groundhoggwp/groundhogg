@@ -141,8 +141,12 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                        spellcheck="true" autocomplete="off">
             </div>
         </div>
-
+        <div class="last-saved">
+            <span class="is-saving loading-dots">Saving</span>
+            <span id="last-saved-text"></span>
+        </div>
         <div class="actions">
+            <div id="undo-and-redo"></div>
 			<?php
 
 			echo html()->e( 'button', [
@@ -169,7 +173,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 			], dashicon( 'admin-settings' ) ); ?>
             <button type="button" id="funnel-deactivate" class="gh-button danger text">Deactivate</button>
             <button type="button" id="funnel-update" class="gh-button primary">
-                <span class="button-text">Update</span>
+                <span class="button-text">Publish Changes</span>
                 <span class="gh-spinner"></span>
             </button>
             <button type="button" id="funnel-activate" class="gh-button action">

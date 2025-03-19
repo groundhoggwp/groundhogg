@@ -70,6 +70,23 @@ body:has(#funnel-form) {
     box-sizing: border-box;
   }
 
+  &.auto-saving {
+    .is-saving {
+      display: inline-block;
+      width: 100px;
+    }
+
+    #last-saved-text{
+      display: none;
+    }
+  }
+
+  &:not(.auto-saving) {
+    .is-saving {
+      display: none;
+    }
+  }
+
   &.saving {
     .funnel-editor-header button > .button-text {
       display: none;
@@ -777,6 +794,11 @@ body.gh-screenshot-mode {
   //width: inherit;
   padding-left: 0;
 
+  .last-saved{
+    font-style: italic;
+    opacity: 0.8;
+  }
+
   > svg {
     height: 60px;
     padding: 10px;
@@ -812,6 +834,7 @@ body.gh-screenshot-mode {
 
   .title-section {
     margin-right: auto;
+    flex-grow: 1;
     //margin-right: 20px;
     //margin-left: 20px;
   }

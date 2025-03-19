@@ -1530,8 +1530,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_step_element() {
 
-		if ( $this->stepElement ){
+		if ( $this->stepElement ) {
 			$this->stepElement->set_current_step( $this );
+
 			return $this->stepElement;
 		}
 
@@ -1632,7 +1633,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'funnel_id'     => 'absint',
 			'step_title'    => 'sanitize_text_field',
 			'step_status'   => function ( $value ) {
-				return one_of( $value, [ 'active', 'inactive', 'archived' ] );
+				return one_of( $value, [ 'active', 'inactive', 'archived', 'deleted' ] );
 			},
 			'step_type'     => 'sanitize_key',
 			'step_group'    => function ( $value ) {
@@ -1660,11 +1661,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// If an active step is deleted, what we'll do is add a change that it was deleted,
 		// and when we do get_steps() we'll filter out steps that have that flag
-		if ( $this->should_add_as_changes() ) {
-			return $this->add_changes( [ 'is_deleted' => true ] );
+		if ( $this->is_committing ) {
+			return parent::delete();
 		}
 
-		return parent::delete();
+		return $this->update( [ 'step_status' => 'deleted' ] );
+	}
+
+	public function delete_and_commit() {
+		return $this->delete() && $this->commit();
 	}
 
 	/**
@@ -1773,6 +1778,48 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $result;
 	}
 
+	/**
+	 * Add changes while waiting for commit()
+	 *
+	 * @param $changes array the changes to save
+	 *
+	 * @return bool
+	 */
+	public function remove_changes( $changes ) {
+
+		// Invalid data for update
+		if ( ! is_array( $changes ) ) {
+			return false;
+		}
+
+		$was_merged = false;
+
+		// pull first if changes were previously merged
+		if ( $this->is_temp_merged ) {
+			$this->pull();
+			$was_merged = true;
+		}
+
+		$changes = $this->sanitize_columns( $changes );
+		$changes = array_merge( $this->changes, $changes );
+		unset( $changes['changes'] );
+
+		$changes = keep_the_diff( $changes, array_merge( $this->data, $this->meta ) );
+
+		ksort( $changes );
+		// no nested changed plz
+
+		$result = parent::update( [
+			'changes' => $changes,
+		] );
+
+		if ( $was_merged ) {
+			$this->merge_changes();
+		}
+
+		return $result;
+	}
+
 	public function clear_changes() {
 		$this->maybe_pull();
 
@@ -1803,13 +1850,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( $this->has_changes() ) {
 			$changes = $this->changes;
-
-			// delete the step if it was "deleted"
-			if ( isset_not_empty( $changes, 'is_deleted' ) ) {
-				// using parent avoids having to work around is_active()
-				return parent::delete(); // todo maybe we do special handling with $this->delete() instead?
-			}
-
 			$columns      = $this->get_db()->get_columns();
 			$data_changes = array_intersect_key( $changes, $columns ); // stuff that goes into main DB
 			$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
@@ -1823,6 +1863,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		$result = $this->update( $data_changes );
+
+		// delete the step if it was "deleted"
+		if ( $this->step_status === 'deleted' ) {
+			// using parent avoids having to work around is_active()
+			return $this->delete();
+		}
 
 		$this->is_committing = false;
 
@@ -1960,7 +2006,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			] );
 		}
 
-		if ( $this->is_branch_logic() ){
+		if ( $this->is_branch_logic() ) {
 
 			// we have to update all the branches
 

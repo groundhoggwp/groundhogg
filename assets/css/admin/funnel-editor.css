@@ -17,6 +17,16 @@ body:has(#funnel-form) #wpcontent {
   padding-left: 0 !important;
   box-sizing: border-box;
 }
+body:has(#funnel-form).auto-saving .is-saving {
+  display: inline-block;
+  width: 100px;
+}
+body:has(#funnel-form).auto-saving #last-saved-text {
+  display: none;
+}
+body:has(#funnel-form):not(.auto-saving) .is-saving {
+  display: none;
+}
 body:has(#funnel-form).saving .funnel-editor-header button > .button-text {
   display: none;
 }
@@ -529,6 +539,10 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   padding-right: 10px;
   padding-left: 0;
 }
+.funnel-editor-header .last-saved {
+  font-style: italic;
+  opacity: 0.8;
+}
 .funnel-editor-header > svg {
   height: 60px;
   padding: 10px;
@@ -554,6 +568,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 }
 .funnel-editor-header .title-section {
   margin-right: auto;
+  flex-grow: 1;
 }
 .funnel-editor-header #close #close-button {
   padding: 12px;
