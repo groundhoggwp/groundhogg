@@ -121,6 +121,24 @@ class DateTimeHelper extends \DateTime {
 
 	}
 
+	/**
+	 * Sets the year to the current year
+	 *
+	 * @return DateTimeHelper
+	 */
+	public function setToCurrentYear() {
+		$now = new DateTimeHelper();
+
+		// already current year
+		if ( $now->format('Y') === $this->format('Y') ) {
+			return $this;
+		}
+
+		$this->setDate( (int) $now->format( 'Y' ), (int) $this->format( 'm' ), (int) $this->format( 'd' ) );
+
+		return $this;
+	}
+
 	public function isPast() {
 		return $this->getTimestamp() < time();
 	}

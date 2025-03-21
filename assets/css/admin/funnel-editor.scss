@@ -1371,6 +1371,7 @@ button.button.save-button {
     width: 30px;
     border-top: var(--logic-line-width) solid $action-green;
     height: 5px;
+    border-radius: var(--logic-line-width) var(--logic-line-width) 0 0;
   }
 
   .benchmark-pill {

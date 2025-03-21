@@ -829,26 +829,26 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                             <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):
 
-									echo html()->checkbox( [
-//										'class'   => 'gh-checkbox-toggle',
+									echo html()->toggleYesNo( [
 										'label'   => 'Allow contacts to enter the funnel at this step?',
 										'name'    => $this->setting_name_prefix( 'is_entry' ),
+										'id'      => $this->setting_id_prefix( 'is_entry' ),
 										'checked' => $step->is_entry()
 									] );
 
-									echo html()->checkbox( [
-//										'class'   => 'gh-checkbox-toggle',
+									echo html()->toggleYesNo( [
 										'label'   => 'Allow contacts to pass through this benchmark',
 										'name'    => $this->setting_name_prefix( 'can_passthru' ),
+										'id'      => $this->setting_id_prefix( 'can_passthru' ),
 										'checked' => $step->can_passthru()
 									] );
 
 								endif;
 
-								echo html()->checkbox( [
-//									'class'   => 'gh-checkbox-toggle',
+								echo html()->toggle( [
 									'label'   => 'Track conversion when completed',
 									'name'    => $this->setting_name_prefix( 'is_conversion' ),
+									'id'      => $this->setting_id_prefix( 'is_conversion' ),
 									'checked' => $step->is_conversion()
 								] );
 

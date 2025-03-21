@@ -1120,7 +1120,7 @@ function search_and_replace_domain( $string ) {
  * @return string
  */
 function array_to_atts( $atts ) {
-	$tag = '';
+	$attributes = [];
 
 	if ( ! is_array( $atts ) ) {
 		return '';
@@ -1173,10 +1173,16 @@ function array_to_atts( $atts ) {
 
 		}
 
-		$tag .= sanitize_key( $key ) . '="' . $value . '" ';
+        $key = sanitize_key( $key );
+        if ( in_array( $key, [ 'required', 'disabled', 'checked', 'readonly' ] ) ) {
+	        $attributes[] = $key;
+        } else {
+	        $attributes[] = $key . '="' . $value . '"';
+        }
+
 	}
 
-	return $tag;
+	return implode( ' ', $attributes );
 }
 
 /**

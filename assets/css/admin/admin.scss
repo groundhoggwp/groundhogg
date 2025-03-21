@@ -628,6 +628,7 @@ label.gh-switch {
   width: 50px;
   height: 20px;
   padding: 0 !important;
+  flex-shrink: 0;
 
   input {
     opacity: 0;

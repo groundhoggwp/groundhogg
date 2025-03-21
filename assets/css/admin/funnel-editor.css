@@ -943,6 +943,7 @@ button.button.save-button {
   width: 30px;
   border-top: var(--logic-line-width) solid #9ece38;
   height: 5px;
+  border-radius: var(--logic-line-width) var(--logic-line-width) 0 0;
 }
 #step-flow .benchmark-pill {
   padding: 3px 8px;

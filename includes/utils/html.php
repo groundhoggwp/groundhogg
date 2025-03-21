@@ -688,7 +688,7 @@ class HTML {
 			'class' => 'button button-secondary',
 			'id'    => '',
 			'href'  => '#target',
-            'modal' => []
+			'modal' => []
 		) );
 
 		return $this->e( 'a', [
@@ -1606,11 +1606,11 @@ class HTML {
 			'offLabel' => __( 'Off' ),
 			'checked'  => false,
 			'name'     => '',
+			'id'       => '',
 			'value'    => 1,
-			'id'
 		] );
 
-		return html()->e( 'label', [
+		$switch = html()->e( 'label', [
 			'class' => 'gh-switch'
 		], [
 			html()->input( [
@@ -1624,6 +1624,24 @@ class HTML {
 			html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
 			html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
 		] );
+
+		if ( isset( $args['label'] ) ) {
+			$switch = html()->e( 'div', [
+				'class' => 'display-flex align-center gap-5'
+			], [
+				html()->e( 'label', [ 'for' => $args['id'] ], $args['label'] ),
+				$switch,
+			] );
+		}
+
+		return $switch;
+	}
+
+	public function toggleYesNo( $args = [] ) {
+		$args['onLabel']  = __( 'Yes' );
+		$args['offLabel'] = __( 'No' );
+
+		return $this->toggle( $args );
 	}
 
 	/**

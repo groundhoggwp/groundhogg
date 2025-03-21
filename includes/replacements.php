@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -276,6 +277,13 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'replacement_birthday' ],
 				'name'        => __( 'Birthday', 'groundhogg' ),
 				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
+			],
+            [
+				'code'        => 'upcoming_birthday',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_upcoming_birthday' ],
+				'name'        => __( 'Upcoming Birthday', 'groundhogg' ),
+				'description' => _x( 'The contact\'s next birthday.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'website',
@@ -1049,8 +1057,50 @@ class Replacements implements \JsonSerializable {
 	}
 
 	function replacement_birthday() {
-		return $this->get_current_contact()->get_meta( 'birthday' );
+
+		$birthday = $this->get_current_contact()->get_meta( 'birthday' );
+
+		if ( ! $birthday ){
+			return '';
+		}
+
+		try {
+			$birthday = new DateTimeHelper( $birthday );
+		}catch (\Exception $exception){
+			return '';
+		}
+
+		return $birthday->ymd();
 	}
+
+	/**
+     * The upcoming birthday of the contact
+     *
+	 * @return string
+	 */
+	function replacement_upcoming_birthday() {
+
+        $birthday = $this->get_current_contact()->get_meta( 'birthday' );
+
+        if ( ! $birthday ){
+            return '';
+        }
+
+        try {
+	        $birthday = new DateTimeHelper( $birthday );
+        }catch (\Exception $exception){
+            return '';
+        }
+
+		$birthday->setToCurrentYear();
+
+        if ( $birthday->isPast() ){
+            $birthday->modify( '+1 year' );
+        }
+
+        return $birthday->ymd();
+	}
+
 
 	/**
      * The contact's website
