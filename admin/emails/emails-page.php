@@ -239,6 +239,10 @@ class Emails_Page extends Admin_Page {
 
 		$new = $email->duplicate();
 
+        if ( ! $new->exists() ){
+	        return new \WP_Error( 'error', 'Failed to duplicate email' );
+        }
+
 		return $new->admin_link();
 	}
 

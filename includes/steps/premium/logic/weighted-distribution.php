@@ -13,7 +13,7 @@ class Weighted_Distribution extends Split_Path {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Weighted Distribution';
+		return 'Random Distribution';
 	}
 
 	public function get_type() {

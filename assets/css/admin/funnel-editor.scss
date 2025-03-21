@@ -76,7 +76,7 @@ body:has(#funnel-form) {
       width: 100px;
     }
 
-    #last-saved-text{
+    #last-saved-text {
       display: none;
     }
   }
@@ -150,12 +150,13 @@ body.gh-screenshot-mode {
     .step-branch {
       .step {
         border-width: var(--logic-line-width);
-        background-image: linear-gradient(var(--color-10),var(--color-10));
+        background-image: linear-gradient(var(--color-10), var(--color-10));
         background-color: #fff;
         box-shadow: none;
 
         .hndle-icon {
           background-color: var(--color);
+
           svg {
             fill: #FFF;
           }
@@ -239,11 +240,11 @@ body.gh-screenshot-mode {
     //opacity: 0;
     width: 0;
 
-    #step-settings-inner{
+    #step-settings-inner {
       opacity: 0;
     }
 
-    > #collapse-settings{
+    > #collapse-settings {
       .dashicons-arrow-right-alt2 {
         display: none;
       }
@@ -251,7 +252,7 @@ body.gh-screenshot-mode {
   }
 
   &:not(.slide-out) {
-    > #collapse-settings{
+    > #collapse-settings {
       .dashicons-arrow-left-alt2 {
         display: none;
       }
@@ -728,7 +729,7 @@ body.gh-screenshot-mode {
   }
 }
 
-@container (max-width: 900px) {
+@container (max-width: 850px) {
   .step-flex {
     flex-direction: column;
 
@@ -805,7 +806,7 @@ body.gh-screenshot-mode {
   //width: inherit;
   padding-left: 0;
 
-  .last-saved{
+  .last-saved {
     font-style: italic;
     opacity: 0.8;
   }
@@ -1315,9 +1316,9 @@ button.button.save-button {
 
         .sortable-item.benchmarks.starting > .step-branch.benchmarks:first-child {
 
-          &::before {
-            content: "Start the funnel when...";
-          }
+          //&::before {
+          //  //content: "Start the funnel when...";
+          //}
         }
 
         //&::after {
@@ -1366,18 +1367,28 @@ button.button.save-button {
     }
   }
 
+  .flow-stop {
+    width: 30px;
+    border-top: var(--logic-line-width) solid $action-green;
+    height: 5px;
+  }
+
+  .benchmark-pill {
+    padding: 3px 8px;
+    color: white;
+    border-radius: 5px;
+    width: max-content;
+    z-index: 2;
+    background-color: $benchmark-orange;
+    font-size: 15px;
+
+    .gh-tooltip {
+      max-width: 200px;
+    }
+  }
 
   .step-branch.benchmarks {
-
     padding-top: 70px;
-
-    &::before {
-      content: "Jump/Continue when...";
-      @include above-text;
-      background-color: $benchmark-orange;
-      top: 0;
-      transform: translate(-50%, -90%);
-    }
   }
 
   .benchmark-or {
@@ -1619,7 +1630,7 @@ button.button.save-button {
 
     &.active {
       background-color: #fff;
-      background-image: linear-gradient(var(--color-5),var(--color-5));
+      background-image: linear-gradient(var(--color-5), var(--color-5));
     }
 
     &.has-changes {
@@ -1640,6 +1651,7 @@ button.button.save-button {
 
     .actions {
       position: absolute;
+      //top: 3px;
       //top: 3px;
       right: 0;
       top: 0;
@@ -1670,6 +1682,13 @@ button.button.save-button {
       bottom: -11px;
       gap: 3px;
       z-index: 2;
+
+      .dashicons {
+        color: $primary-dark;
+        //color: #FFF;
+        //background-color: var(--color);
+        border-radius: 3px;
+      }
 
       .step-label {
         font-size: 10px;

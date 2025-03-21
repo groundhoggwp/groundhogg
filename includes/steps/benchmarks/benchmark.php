@@ -268,7 +268,8 @@ abstract class Benchmark extends Funnel_Step {
 			if ( ! $step->is_starting() ) {
 				$this->add_step_button( 'before-group-' . $step->ID );
 				?>
-                <div class="flow-line"></div><?php
+                <div class="flow-line"></div>
+                <?php
 			}
 
 			?>

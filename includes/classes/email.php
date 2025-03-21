@@ -1425,10 +1425,10 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function duplicate( $overrides = [], $meta_overrides = [] ) {
 
-		$overrides = wp_parse_args( $overrides, [
+		$overrides = array_merge( [
 			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
 			'status' => 'draft'
-		] );
+		], $overrides );
 
 		return parent::duplicate( $overrides, $meta_overrides );
 	}

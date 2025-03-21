@@ -1273,6 +1273,10 @@ table .column-steps div.step-icon img {
   border-top-right-radius: 0;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .tour-window {
   z-index: 98 !important;
   position: fixed;
@@ -1310,6 +1314,13 @@ table .column-steps div.step-icon img {
 
 [data-gh-href] {
   cursor: pointer;
+}
+
+.gh-checkbox-label:has(input.gh-checkbox-toggle) {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /*# sourceMappingURL=admin.css.map */

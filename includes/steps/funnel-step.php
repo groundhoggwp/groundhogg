@@ -576,6 +576,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'passthru';
 		}
 
+		if ( $step->is_benchmark() && $step->is_entry() && ! $step->is_starting() ) {
+			$classes[] = 'entry';
+		}
+
 		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
 
 		?>
@@ -595,10 +599,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				<?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
-                    <div class="step-label">Entry</div>
+					<?php dashicon_e( 'migrate' ); ?>
 				<?php endif; ?>
 				<?php if ( $step->is_conversion() ): ?>
-                    <div class="step-label">Conversion</div>
+					<?php dashicon_e( 'flag' ); ?>
 				<?php endif; ?>
 				<?php if ( $step->is_locked() ): ?>
 					<?php dashicon_e( 'lock' ); ?>
@@ -820,18 +824,20 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php if ( $step->is_benchmark() ): ?>
                         <div class="gh-panel benchmark-settings">
                             <div class="gh-panel-header">
-                                <h2><?php _e( 'Settings', 'groundhogg' ); ?></h2>
+                                <h2><?php _e( 'Benchmark Settings', 'groundhogg' ); ?></h2>
                             </div>
                             <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):
 
 									echo html()->checkbox( [
-										'label'   => 'Allow contacts to enter the funnel at this step',
+//										'class'   => 'gh-checkbox-toggle',
+										'label'   => 'Allow contacts to enter the funnel at this step?',
 										'name'    => $this->setting_name_prefix( 'is_entry' ),
 										'checked' => $step->is_entry()
 									] );
 
 									echo html()->checkbox( [
+//										'class'   => 'gh-checkbox-toggle',
 										'label'   => 'Allow contacts to pass through this benchmark',
 										'name'    => $this->setting_name_prefix( 'can_passthru' ),
 										'checked' => $step->can_passthru()
@@ -840,6 +846,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 								endif;
 
 								echo html()->checkbox( [
+//									'class'   => 'gh-checkbox-toggle',
 									'label'   => 'Track conversion when completed',
 									'name'    => $this->setting_name_prefix( 'is_conversion' ),
 									'checked' => $step->is_conversion()

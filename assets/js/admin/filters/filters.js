@@ -1504,7 +1504,7 @@
       if (!State.get('preloaded')) {
 
         filterRegistry.preloadFilters(filters).
-          then(() => setState({ preloaded: true }))
+          finally(() => setState({ preloaded: true }))
 
         return FiltersLoading()
       }
@@ -1562,7 +1562,7 @@
 
     let el = Span({}, ['Loading...'])
 
-    filterRegistry.preloadFilters(filters).then(r => {
+    filterRegistry.preloadFilters(filters).finally(r => {
       morphdom(el, renderFilters())
     })
 

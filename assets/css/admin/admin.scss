@@ -1475,6 +1475,10 @@ table .column-steps {
   }
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .tour-window {
   z-index: 98 !important;
   position: fixed;
@@ -1518,4 +1522,13 @@ table .column-steps {
 
 [data-gh-href]{
   cursor: pointer;
+}
+
+.gh-checkbox-label:has(input.gh-checkbox-toggle) {
+
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+
 }

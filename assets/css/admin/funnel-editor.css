@@ -487,7 +487,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   display: flex;
 }
 
-@container (max-width: 900px) {
+@container (max-width: 850px) {
   .step-flex {
     flex-direction: column;
   }
@@ -920,9 +920,6 @@ button.button.save-button {
   padding-bottom: 24px;
   margin: 0 auto;
 }
-#step-flow .fixed-inside .step-branch#step-sortable .sortable-item.benchmarks.starting > .step-branch.benchmarks:first-child::before {
-  content: "Start the funnel when...";
-}
 #step-flow button.add-step-button-flow {
   position: absolute;
   right: 36px;
@@ -942,23 +939,25 @@ button.button.save-button {
 #step-flow button.add-step-button-flow:hover {
   background-color: rgba(0, 117, 255, 0.5);
 }
-#step-flow .step-branch.benchmarks {
-  padding-top: 70px;
+#step-flow .flow-stop {
+  width: 30px;
+  border-top: var(--logic-line-width) solid #9ece38;
+  height: 5px;
 }
-#step-flow .step-branch.benchmarks::before {
-  content: "Jump/Continue when...";
-  position: absolute;
+#step-flow .benchmark-pill {
   padding: 3px 8px;
   color: white;
   border-radius: 5px;
   width: max-content;
-  top: -70px;
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 2;
   background-color: #f58115;
-  top: 0;
-  transform: translate(-50%, -90%);
+  font-size: 15px;
+}
+#step-flow .benchmark-pill .gh-tooltip {
+  max-width: 200px;
+}
+#step-flow .step-branch.benchmarks {
+  padding-top: 70px;
 }
 #step-flow .benchmark-or {
   padding: 3px 8px;
@@ -1150,6 +1149,10 @@ button.button.save-button {
   bottom: -11px;
   gap: 3px;
   z-index: 2;
+}
+#step-flow .step .step-labels .dashicons {
+  color: #102640;
+  border-radius: 3px;
 }
 #step-flow .step .step-labels .step-label {
   font-size: 10px;

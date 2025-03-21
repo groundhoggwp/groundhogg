@@ -1145,6 +1145,10 @@ span.gh-text {
   &.lg {
     font-size: 18px;
   }
+
+  &.bold {
+    font-weight: 500;
+  }
 }
 
 .avatars {
@@ -1982,6 +1986,10 @@ input.ui-autocomplete-input {
 .gh-radio-group {
   display: flex;
   gap: 20px;
+}
+
+.gh-picker-container{
+  flex-grow: 1;
 }
 
 .gh-input-group,

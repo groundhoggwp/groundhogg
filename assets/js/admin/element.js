@@ -3088,6 +3088,9 @@ ${ afterProgress() }`,
   <path fill="none" d="M0 0h24v24H0z"/>
   <path fill="currentColor" d="M17 2H7L2 7v10l5 5h10l5-5V7l-5-5zm-4 15h-2v-2h2v2zm0-4h-2l-.5-6h3l-.5 6z"/>
 </svg>`,
+    magnet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <path fill="currentColor" d="M200 40h-40a16.018 16.018 0 0 0-16 16v88a16 16 0 0 1-32 0V56a16.018 16.018 0 0 0-16-16H56a16.018 16.018 0 0 0-16 16v88a88 88 0 0 0 87.995 88l.671-.002c48.156-.357 87.334-40.283 87.334-89.002V56a16.018 16.018 0 0 0-16-16ZM96 96H56V56h40Zm104 0h-40V56h40Z"/>
+</svg>`
   }
 
   const bold = (text) => {

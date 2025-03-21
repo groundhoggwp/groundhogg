@@ -450,13 +450,14 @@
     const convertOpt = selector => [...selectEl.querySelectorAll(selector)].map(opt => ( {
       id  : opt.value,
       text: opt.innerHTML,
-    } ))
+    } )).filter( opt => opt.id && opt.text )
 
     let picker = MakeEl.ItemPicker({
       id          : pickerId,
       fetchOptions: async (search) => {
 
         let opts = convertOpt('option[value]:not(:empty)')
+
 
         if (search) {
           opts = opts.filter(item => item.id.match(search) || item.text.match(search))
@@ -467,6 +468,7 @@
       selected    : convertOpt('option[selected]'),
       multiple    : selectEl.multiple,
       tags        : selectEl.dataset.tags,
+      clearable   : false,
       noneSelected: selectEl.dataset.placeholder ?? 'Any...',
       onCreate    : async opt => {
         selectEl.appendChild(MakeEl.makeEl('options', {
@@ -539,9 +541,9 @@
     $overlay.remove()
   })
 
-  function moveChildren(source, target) {
+  function moveChildren (source, target) {
     while (source.firstChild) {
-      target.appendChild(source.firstChild);
+      target.appendChild(source.firstChild)
     }
   }
 
@@ -561,21 +563,24 @@
 
     MakeEl.Modal({
       ...restModalProps,
-      onOpen: ({modal}) => {
-        let target =  modal.querySelector( '.source-content' )
-        moveChildren( source, target )
+      onOpen : ({ modal }) => {
+        let target = modal.querySelector('.source-content')
+        moveChildren(source, target)
       },
       onClose: modal => {
-        let target = modal.querySelector( '.source-content' )
-        moveChildren( target, source )
-      }
-    }, ({close}) => MakeEl.Fragment( [
+        let target = modal.querySelector('.source-content')
+        moveChildren(target, source)
+      },
+    }, ({ close }) => MakeEl.Fragment([
       MakeEl.Div({ className: 'gh-header modal-header' }, [
-        MakeEl.H3({}, 'Modal header' ),
-        MakeEl.Button({ className: 'gh-button icon secondary text', onClick: close }, MakeEl.Dashicon( 'no-alt' ) )
-      ] ),
-      MakeEl.Div({ className: 'source-content' } ),
-    ] ) )
+        MakeEl.H3({}, 'Modal header'),
+        MakeEl.Button({
+          className: 'gh-button icon secondary text',
+          onClick  : close,
+        }, MakeEl.Dashicon('no-alt')),
+      ]),
+      MakeEl.Div({ className: 'source-content' }),
+    ]))
 
   })
 

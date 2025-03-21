@@ -192,7 +192,10 @@
               UndoRedoManager.undo()
             },
           },
-          [Dashicon('undo'), ToolTip( 'Undo', 'bottom' )]),
+          [
+            Dashicon('undo'),
+            ToolTip('Undo', 'bottom'),
+          ]),
         Button({
             id       : 'editor-redo',
             className: 'gh-button secondary text',
@@ -201,7 +204,10 @@
               UndoRedoManager.redo()
             },
           },
-          [Dashicon('redo'), ToolTip('Redo', 'bottom')]),
+          [
+            Dashicon('redo'),
+            ToolTip('Redo', 'bottom'),
+          ]),
       ])
 
     $.extend(Funnel, {
@@ -472,9 +478,11 @@
           }
 
           if (this.addEl.matches('.add-action')) {
-            this.addCurrentGroup = 'action'
-            setCurrentGroupButtonToCurrent()
-            filterStepTypes()
+            if (this.addCurrentGroup === 'benchmark') {
+              this.addCurrentGroup = 'action'
+              setCurrentGroupButtonToCurrent()
+              filterStepTypes()
+            }
           }
 
           setTimeout(() => {
@@ -485,7 +493,16 @@
         $document.on('click', '.step-element.step-draggable:not(.premium)', e => {
 
           if (!this.addEl) {
+            dialog({
+              message: 'Click on a + icon in the funnel first.',
+              type: 'info'
+            })
             return
+          }
+
+          // might be doing something else already
+          if ( this.saving ){
+            return;
           }
 
           let branch = this.addEl.closest('.step-branch').dataset.branch
@@ -729,7 +746,7 @@
               },
               {
                 key     : 'screenshot-mode',
-                text    :  document.body.classList.contains('gh-screenshot-mode') ? 'Editing Mode' : 'Screenshot Mode',
+                text    : document.body.classList.contains('gh-screenshot-mode') ? 'Editing Mode' : 'Screenshot Mode',
                 onSelect: e => {
                   document.body.classList.toggle('gh-screenshot-mode')
                   drawLogicLines()
@@ -1849,6 +1866,39 @@
     }
 
     main.append(end)
+
+    // Benchmark Groups
+    try {
+      document.querySelectorAll('.step-branch.benchmarks').forEach(el => {
+
+        // already there
+        if (el.previousElementSibling && el.previousElementSibling.matches('.benchmark-pill')) {
+          return
+        }
+
+        let insert
+
+        if (el.parentElement.matches('.starting')) {
+          insert = Div({ className: 'benchmark-pill ' }, [
+            'Start the funnel when...',
+          ])
+        }
+        else {
+          insert = Div({ className: 'benchmark-pill' }, [
+              'Until...',
+              ToolTip('Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">benchmark</span> is completed.',
+                'right'),
+          ])
+
+          el.insertAdjacentElement('beforebegin', Div({ className: 'flow-stop' }) )
+        }
+        el.insertAdjacentElement('beforebegin', insert)
+      })
+
+    }
+    catch (err) {
+
+    }
 
     // Benchmarks
     try {
