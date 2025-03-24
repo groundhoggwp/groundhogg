@@ -368,9 +368,9 @@
             })
 
           }
-          if (e.key === 'm' && e.ctrlKey && this.editing ) {
+          if (e.key === 'm' && e.ctrlKey && this.editing) {
             // cancel
-            if ( this.moving ) {
+            if (this.moving) {
               document.body.classList.remove('gh-moving-step')
               this.moving = null
               drawLogicLines()
@@ -378,7 +378,7 @@
             }
 
             this.hideSettings()
-            this.moving = document.getElementById( `step-${this.editing}` ).closest('.sortable-item')
+            this.moving = document.getElementById(`step-${ this.editing }`).closest('.sortable-item')
             document.body.classList.add('gh-moving-step')
             drawLogicLines()
           }
@@ -404,10 +404,10 @@
             return
           }
 
-          if ( this.moving ){
+          if (this.moving) {
             dialog({
               message: 'Click on any add icon to move the steps.',
-              type: 'info'
+              type   : 'info',
             })
             return
           }
@@ -492,15 +492,15 @@
           this.addEl = e.currentTarget
           this.addEl.classList.add('here')
 
-          if ( this.moving ){
+          if (this.moving) {
 
             // if parent is a branch
-            if ( this.addEl.parentElement.matches( '.step-branch' ) ){
-              this.addEl.insertAdjacentElement( 'beforebegin', this.moving )
+            if (this.addEl.parentElement.matches('.step-branch')) {
+              this.addEl.insertAdjacentElement('beforebegin', this.moving)
             }
             // if parent is a sortable-item
-            else if ( this.addEl.parentElement.matches( '.sortable-item' ) ){
-              this.addEl.parentElement.insertAdjacentElement( 'beforebegin', this.moving )
+            else if (this.addEl.parentElement.matches('.sortable-item')) {
+              this.addEl.parentElement.insertAdjacentElement('beforebegin', this.moving)
             }
 
             document.body.classList.remove('gh-moving-step')
@@ -511,7 +511,7 @@
               quiet: true,
             })
 
-            return;
+            return
           }
 
           this.showAddStep()
@@ -540,14 +540,14 @@
           if (!this.addEl) {
             dialog({
               message: 'Click on a + icon in the funnel first.',
-              type: 'info'
+              type   : 'info',
             })
             return
           }
 
           // might be doing something else already
-          if ( this.saving ){
-            return;
+          if (this.saving) {
+            return
           }
 
           let branch = this.addEl.closest('.step-branch').dataset.branch
@@ -795,6 +795,36 @@
                 onSelect: e => {
                   document.body.classList.toggle('gh-screenshot-mode')
                   drawLogicLines()
+                },
+              },
+              {
+                key     : 'shortcuts',
+                text    : 'Keyboard Shortcuts',
+                onSelect: e => {
+
+                  const shortcuts = [
+                    [ 'Copy a step', [ 'CTRL', 'C' ] ],
+                    [ 'Paste a copied step', [ 'CTRL', 'V' ] ],
+                    [ 'Move a step', [ 'CTRL', 'M' ] ],
+                    [ 'Undo', [ 'CTRL', 'Z' ] ],
+                    [ 'Redo', [ 'CTRL', 'Shift', 'Z' ] ],
+                  ]
+
+                  Modal({
+                    width: '500px'
+                  }, ({close}) => Div({}, [
+
+                    Div({
+                      className: 'gh-header modal-header',
+                    }, [
+                      MakeEl.H3({}, 'Keyboard Shortcuts'),
+                      MakeEl.Button({
+                        className: 'gh-button icon secondary text',
+                        onClick  : close,
+                      }, MakeEl.Dashicon('no-alt')),
+                    ]),
+                    Div({ className: 'display-flex column'}, shortcuts.map( ([ desc, keys ]) => Div({ className: 'space-between' }, [ MakeEl.Pg({}, desc), MakeEl.Pg({}, keys.map( key => `<code>${key}</code>` ).join( ' + ' ) ) ] ) ) )
+                  ]) )
                 },
               },
             ])
@@ -1930,12 +1960,12 @@
         }
         else {
           insert = Div({ className: 'benchmark-pill' }, [
-              'Until...',
-              ToolTip('Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">benchmark</span> is completed.',
-                'right'),
+            'Until...',
+            ToolTip('Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">benchmark</span> is completed.',
+              'right'),
           ])
 
-          el.insertAdjacentElement('beforebegin', Div({ className: 'flow-stop' }) )
+          el.insertAdjacentElement('beforebegin', Div({ className: 'flow-stop' }))
         }
         el.insertAdjacentElement('beforebegin', insert)
       })

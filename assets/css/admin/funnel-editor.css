@@ -59,12 +59,15 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
     box-shadow: 0 0 0 0 rgba(16, 38, 64, 0.5);
   }
 }
-body.gh-moving-step button.add-step {
+body.gh-moving-step #step-flow button.add-step {
   box-shadow: 0 0 0 rgba(16, 38, 64, 0.5);
   animation: pulseBoxShadow 2s infinite;
 }
-body.gh-moving-step .sortable-item:has(> .step.editing) {
+body.gh-moving-step #step-flow .sortable-item:has(> .step.editing) {
   display: none !important;
+}
+body.gh-moving-step #step-flow .step .actions {
+  display: none;
 }
 
 body.gh-screenshot-mode #step-settings-container {

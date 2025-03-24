@@ -141,15 +141,23 @@ body:has(#funnel-form) {
 
 body.gh-moving-step {
 
-  button.add-step {
-    box-shadow: 0 0 0 $primary-dark-50;
-    animation: pulseBoxShadow 2s infinite;
-  }
+  #step-flow {
 
-  .sortable-item:has(>.step.editing){
-    display: none !important;
-  }
+    button.add-step {
+      box-shadow: 0 0 0 $primary-dark-50;
+      animation: pulseBoxShadow 2s infinite;
+    }
 
+    .sortable-item:has(>.step.editing){
+      display: none !important;
+    }
+
+    .step{
+      .actions {
+        display: none;
+      }
+    }
+  }
 }
 
 body.gh-screenshot-mode {
