@@ -368,6 +368,21 @@
             })
 
           }
+          if (e.key === 'm' && e.ctrlKey && this.editing ) {
+            // cancel
+            if ( this.moving ) {
+              document.body.classList.remove('gh-moving-step')
+              this.moving = null
+              drawLogicLines()
+              return
+            }
+
+            this.hideSettings()
+            this.moving = document.getElementById( `step-${this.editing}` ).closest('.sortable-item')
+            document.body.classList.add('gh-moving-step')
+            drawLogicLines()
+          }
+
         })
 
         const settingsHidden = () => $('#step-settings-container').hasClass('slide-out')
@@ -383,14 +398,22 @@
           }
         })
 
-        $document.on('click', '#step-flow .step:not(.step-placeholder)', function (e) {
+        $document.on('click', '#step-flow .step:not(.step-placeholder)', e => {
 
           if ($(e.target).is('.dashicons, button')) {
             return
           }
 
-          self.startEditing(this.dataset.id, true)
-          self.showSettings()
+          if ( this.moving ){
+            dialog({
+              message: 'Click on any add icon to move the steps.',
+              type: 'info'
+            })
+            return
+          }
+
+          this.startEditing(e.currentTarget.dataset.id, true)
+          this.showSettings()
         })
 
         $document.on('click', '#step-flow', e => {
@@ -466,9 +489,31 @@
         $document.on('click', 'button.add-step', e => {
 
           this.clearAddEl()
-
           this.addEl = e.currentTarget
           this.addEl.classList.add('here')
+
+          if ( this.moving ){
+
+            // if parent is a branch
+            if ( this.addEl.parentElement.matches( '.step-branch' ) ){
+              this.addEl.insertAdjacentElement( 'beforebegin', this.moving )
+            }
+            // if parent is a sortable-item
+            else if ( this.addEl.parentElement.matches( '.sortable-item' ) ){
+              this.addEl.parentElement.insertAdjacentElement( 'beforebegin', this.moving )
+            }
+
+            document.body.classList.remove('gh-moving-step')
+
+            drawLogicLines()
+            this.moving = null
+            this.save({
+              quiet: true,
+            })
+
+            return;
+          }
+
           this.showAddStep()
 
           if (this.addEl.matches('.add-benchmark')) {

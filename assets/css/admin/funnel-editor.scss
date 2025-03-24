@@ -122,6 +122,36 @@ body:has(#funnel-form) {
   }
 }
 
+.pulse-shadow {
+  box-shadow: 0 0 0 $primary-dark-50;
+  animation: pulseBoxShadow 2s infinite;
+}
+
+@keyframes pulseBoxShadow {
+  0% {
+    box-shadow: 0 0 0 0 $primary-dark-50;
+  }
+  70% {
+    box-shadow: 0 0 20px 0 $primary-dark-50;
+  }
+  100% {
+    box-shadow: 0 0 0 0 $primary-dark-50;
+  }
+}
+
+body.gh-moving-step {
+
+  button.add-step {
+    box-shadow: 0 0 0 $primary-dark-50;
+    animation: pulseBoxShadow 2s infinite;
+  }
+
+  .sortable-item:has(>.step.editing){
+    display: none !important;
+  }
+
+}
+
 body.gh-screenshot-mode {
 
   #step-settings-container {
