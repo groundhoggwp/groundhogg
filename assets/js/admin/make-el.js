@@ -656,6 +656,19 @@
     return modal
   }
 
+  const ModalWithHeader = ( { header = '', ...args }, children ) => Modal(args, methods => Div({}, [
+    Div({
+      className: 'gh-header modal-header',
+    }, [
+      MakeEl.H3({}, header ),
+      MakeEl.Button({
+        className: 'gh-button icon secondary text',
+        onClick  : methods.close,
+      }, MakeEl.Dashicon('no-alt')),
+    ]),
+    maybeCall( children, methods )
+  ]) )
+
   /**
    * Custom modal appended to the body.
    *
@@ -1715,6 +1728,7 @@
     Td,
     Th,
     Modal,
+    ModalWithHeader,
     MiniModal,
     ModalFrame,
     ItemPicker,

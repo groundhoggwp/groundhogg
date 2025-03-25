@@ -806,25 +806,19 @@
                     [ 'Copy a step', [ 'CTRL', 'C' ] ],
                     [ 'Paste a copied step', [ 'CTRL', 'V' ] ],
                     [ 'Move a step', [ 'CTRL', 'M' ] ],
-                    [ 'Undo', [ 'CTRL', 'Z' ] ],
-                    [ 'Redo', [ 'CTRL', 'Shift', 'Z' ] ],
+                    // [ 'Undo', [ 'CTRL', 'Z' ] ],
+                    // [ 'Redo', [ 'CTRL', 'Shift', 'Z' ] ],
                   ]
 
-                  Modal({
-                    width: '500px'
-                  }, ({close}) => Div({}, [
-
-                    Div({
-                      className: 'gh-header modal-header',
-                    }, [
-                      MakeEl.H3({}, 'Keyboard Shortcuts'),
-                      MakeEl.Button({
-                        className: 'gh-button icon secondary text',
-                        onClick  : close,
-                      }, MakeEl.Dashicon('no-alt')),
-                    ]),
-                    Div({ className: 'display-flex column'}, shortcuts.map( ([ desc, keys ]) => Div({ className: 'space-between' }, [ MakeEl.Pg({}, desc), MakeEl.Pg({}, keys.map( key => `<code>${key}</code>` ).join( ' + ' ) ) ] ) ) )
-                  ]) )
+                  MakeEl.ModalWithHeader({
+                      width: '500px',
+                      header: 'Keyboard Shortcuts'
+                    },
+                    Div({ className: 'display-flex column' }, shortcuts.map(([desc, keys]) => Div({ className: 'space-between' }, [
+                      MakeEl.Pg({}, desc),
+                      MakeEl.Pg({}, keys.map(key => `<code>${ key }</code>`).join(' + ')),
+                    ]))),
+                  )
                 },
               },
             ])
@@ -1916,13 +1910,140 @@
     }
   }
 
+  let lineWidth
+  let leaderLines = []
+
+  function drawLeaderLine( from, to, opts) {
+
+    if ( ! lineWidth ){
+      lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
+    }
+
+    let line = new LeaderLine( from, to, {
+      size: lineWidth,
+      path: 'fluid',
+      color: '',
+      startSocket: 'bottom',
+      endSocket: 'top',
+      endPlug: 'arrow3',
+      ...opts
+    } )
+
+    leaderLines.push( line )
+
+    return line;
+  }
+
+  function drawLeaderLines () {
+    // clear existing leader lines and re-draw
+    leaderLines.forEach(line => line.remove())
+
+    document.querySelectorAll('.step-branch.benchmarks > .sortable-item').forEach(el => {
+      drawLeaderLine(el, el.parentElement)
+    })
+
+  }
+
+  const drawLogicLine = ( from, to, opts = {} ) => {
+
+    let {
+      fromSocket = 'bottom', // top, right, bottom, left
+      toSocket = 'top', // top, right, bottom, left
+    } = opts
+
+    // const borderRadius = '50px'
+    const borderRadius = 'var(--logic-line-radius)'
+    const borderWidth = `var(--logic-line-width)`
+
+    if ( ! lineWidth ){
+      lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
+    }
+
+    let fromPos = from.getBoundingClientRect()
+    let toPos = to.getBoundingClientRect()
+
+    let fromX, fromY
+
+    switch ( toSocket ) {
+      case 'top':
+        fromX = fromPos.left + fromPos.width/2
+        fromY = fromPos.top
+        break;
+      case 'right':
+        fromX = fromPos.right
+        fromY = fromPos.top + fromPos.height/2
+        break;
+      case 'bottom':
+        fromX = fromPos.left + fromPos.width/2
+        fromY = toPos.bottom
+        break;
+      case 'left':
+        fromX = fromPos.left
+        fromY = fromPos.top + fromPos.height/2
+        break;
+    }
+
+    let toX, toY
+
+    switch ( toSocket ) {
+      case 'top':
+        toX = toPos.left + toPos.width/2
+        toY = toPos.top
+        break;
+      case 'right':
+        toX = toPos.right
+        toY = toPos.top + toPos.height/2
+        break;
+      case 'bottom':
+        toX = toPos.left + toPos.width/2
+        toY = toPos.bottom
+        break;
+      case 'left':
+        toX = toPos.left
+        toY = toPos.top + toPos.height/2
+        break;
+    }
+
+    let boxHeight = Math.abs( fromY - toY )
+    let boxWidth = Math.abs( fromX - toX )
+
+    let LineContainer = Div({
+      className: 'logic-line-container',
+      style: {
+        height: `${boxHeight}px`,
+        width: `${boxWidth}px`,
+      }
+    }, [
+      Div({ className: 'logic-line', style: { width: '50%', height: '50%' } }),
+      Div({ className: 'logic-line', style: { width: '50%', height: '50%' } })
+    ])
+
+    // leading right
+    if ( fromX < toX ){
+
+    }
+    // leading left
+    else if ( fromX > toX ){
+
+    }
+    // leading straight
+    else {
+
+    }
+
+    return LineContainer
+  }
+
   function drawLogicLines () {
 
     // const borderRadius = '50px'
     const borderRadius = 'var(--logic-line-radius)'
     const borderWidth = `var(--logic-line-width)`
 
-    let offset = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width')) / 2
+    if ( ! lineWidth ){
+      lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
+    }
+    let offset = lineWidth/2
 
     const clearLineStyle = line => line.removeAttribute('style')
 
