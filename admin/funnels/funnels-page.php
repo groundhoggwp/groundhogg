@@ -53,7 +53,7 @@ class Funnels_Page extends Admin_Page {
 	protected function get_current_action() {
 		$action = parent::get_current_action();
 
-		if ( $action === 'view' && get_db( 'funnels' )->is_empty() ) {
+		if ( $action === 'view' && db()->funnels->is_empty() ) {
 			$action = 'add';
 		}
 
@@ -61,8 +61,6 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	protected function add_ajax_actions() {
-		add_action( 'wp_ajax_gh_get_templates', [ $this, 'get_funnel_templates_ajax' ] );
-
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
 
 		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
@@ -113,14 +111,14 @@ class Funnels_Page extends Admin_Page {
 	public function get_title() {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				return _x( 'Add Funnel', 'page_title', 'groundhogg' );
+				return _x( 'Add Flow', 'page_title', 'groundhogg' );
 				break;
 			case 'edit':
-				return _x( 'Edit Funnel', 'page_title', 'groundhogg' );
+				return _x( 'Edit Flow', 'page_title', 'groundhogg' );
 				break;
 			case 'view':
 			default:
-				return _x( 'Funnels', 'page_title', 'groundhogg' );
+				return _x( 'Flows', 'page_title', 'groundhogg' );
 		}
 	}
 
@@ -166,9 +164,9 @@ class Funnels_Page extends Admin_Page {
 
 		add_action( "groundhogg/admin/gh_funnels/before", function () {
 			if ( get_db( 'funnels' )->exists( [ 'status' => 'inactive' ] ) && ! get_db( 'funnels' )->exists( [ 'status' => 'active' ] ) ) {
-				notices()->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active funnels.' ), html()->e( 'a', [
+				notices()->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active flows.' ), html()->e( 'a', [
 					'href' => admin_url( 'admin.php?page=gh_funnels&status=inactive' ),
-				], __( 'Activate a funnel!' ) ) ), 'warning' );
+				], __( 'Activate a flow!' ) ) ), 'warning' );
 			}
 		} );
 	}
@@ -178,7 +176,7 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function get_name() {
-		return _x( 'Funnels', 'page_title', 'groundhogg' );
+		return _x( 'Flows', 'page_title', 'groundhogg' );
 	}
 
 	public function get_cap() {
@@ -302,7 +300,7 @@ class Funnels_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
-			sprintf( _nx( 'Deleted %d funnel', 'Deleted %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			sprintf( _nx( 'Deleted %d flow', 'Deleted %d flows', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
 
@@ -351,7 +349,7 @@ class Funnels_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'restored' ),
-			sprintf( _nx( 'Restored %d funnel', 'Restored %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			sprintf( _nx( 'Restored %d flow', 'Restored %d flow', $updated, 'notice', 'groundhogg' ), $updated ),
 			'success'
 		);
 	}
@@ -366,7 +364,7 @@ class Funnels_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'archived' ),
-			sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			sprintf( _nx( 'Archived %d flow', 'Archived %d flows', $updated, 'notice', 'groundhogg' ), $updated ),
 			'success'
 		);
 	}
@@ -381,7 +379,7 @@ class Funnels_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'deactivated' ),
-			sprintf( _nx( 'Deactivated %d funnel', 'Deactivated %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			sprintf( _nx( 'Deactivated %d flow', 'Deactivated %d flows', $updated, 'notice', 'groundhogg' ), $updated ),
 			'success'
 		);
 	}
@@ -396,7 +394,7 @@ class Funnels_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'activated' ),
-			sprintf( _nx( 'Activated %d funnel', 'Activated %d funnels', $updated, 'notice', 'groundhogg' ), $updated ),
+			sprintf( _nx( 'Activated %d flow', 'Activated %d flows', $updated, 'notice', 'groundhogg' ), $updated ),
 			'success'
 		);
 	}
@@ -468,7 +466,7 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel = new Funnel();
 		$funnel->create( [
-			'title'  => 'My new funnel',
+			'title'  => 'My new flow',
 			'author' => get_current_user_id(),
 			'status' => 'inactive',
 		] );
@@ -521,7 +519,7 @@ class Funnels_Page extends Admin_Page {
 			] );
 
 			if ( ! in_array( $validate['ext'], [ 'json', 'funnel' ] ) ) {
-				return new \WP_Error( 'invalid_template', __( 'Please upload a valid funnel template.', 'groundhogg' ) );
+				return new \WP_Error( 'invalid_template', __( 'Please upload a valid flow template.', 'groundhogg' ) );
 			}
 
 			$json = file_get_contents( $file['tmp_name'] );
@@ -538,7 +536,7 @@ class Funnels_Page extends Admin_Page {
 					$this->import_funnel( $funnel );
 				}
 
-				$this->add_notice( 'imported', sprintf( __( 'Imported %d funnels', 'groundhogg' ), count( $json ) ) );
+				$this->add_notice( 'imported', sprintf( __( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
 
 				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
 			}
@@ -560,7 +558,7 @@ class Funnels_Page extends Admin_Page {
 					$this->import_funnel( $funnel );
 				}
 
-				$this->add_notice( 'imported', sprintf( __( 'Imported %d funnels', 'groundhogg' ), count( $json ) ) );
+				$this->add_notice( 'imported', sprintf( __( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
 
 				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
 			}
@@ -573,7 +571,7 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		if ( empty( $funnel_id ) ) {
-			return new \WP_Error( 'error', __( 'Could not create funnel.', 'groundhogg' ) );
+			return new \WP_Error( 'error', __( 'Could not create flow.', 'groundhogg' ) );
 		}
 
 		return admin_page_url( 'gh_funnels', [
@@ -925,88 +923,5 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		parent::page();
-	}
-
-	/**
-	 * Get template HTML via ajax
-	 */
-	public function get_funnel_templates_ajax() {
-		ob_start();
-
-		$this->display_funnel_templates();
-		$html = ob_get_clean();
-
-		$response = array(
-			'html' => $html
-		);
-
-		wp_send_json( $response );
-
-	}
-
-	public function display_funnel_templates( $args = array() ) {
-		$page         = isset( $_REQUEST['p'] ) ? intval( $_REQUEST['p'] ) : '1';
-		$args['page'] = $page;
-
-		if ( isset( $_REQUEST['tag'] ) ) {
-			$args['tag'] = urlencode( $_REQUEST['tag'] );
-		}
-
-		if ( isset( $_REQUEST['s'] ) ) {
-			$args['s'] = urlencode( $_REQUEST['s'] );
-		}
-
-		$args['category'] = 'templates';
-
-
-		$products = get_store_products( $args );
-
-		if ( is_object( $products ) && count( $products->products ) > 0 ) {
-
-			foreach ( $products->products as $product ):
-				?>
-                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-                    <div class="">
-                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
-                    </div>
-                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
-                    <div class="inside">
-                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
-
-						<?php $pricing = (array) $product->pricing;
-						if ( count( $pricing ) > 1 ) {
-
-							$price1 = min( $pricing );
-							$price2 = max( $pricing );
-
-							?>
-                            <a class="button-primary" target="_blank"
-                               href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
-							<?php
-						} else {
-
-							$price = array_pop( $pricing );
-
-							if ( $price > 0.00 ) {
-								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
-								<?php
-							} else {
-								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
-								<?php
-							}
-						}
-
-						?>
-                    </div>
-                </div>
-			<?php endforeach;
-		} else {
-			?>
-            <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
-		}
 	}
 }

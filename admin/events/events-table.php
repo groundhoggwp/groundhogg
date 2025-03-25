@@ -70,7 +70,7 @@ class Events_Table extends WP_List_Table {
 		$columns = [
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'contact'        => _x( 'Contact', 'Column label', 'groundhogg' ),
-			'funnel'         => _x( 'Funnel', 'Column label', 'groundhogg' ),
+			'funnel'         => _x( 'Flow', 'Column label', 'groundhogg' ),
 			'step'           => _x( 'Step', 'Column label', 'groundhogg' ),
 			'time'           => _x( 'Run Date', 'Column label', 'groundhogg' ),
 			'time_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
@@ -165,7 +165,7 @@ class Events_Table extends WP_List_Table {
 		$funnel_title = $event->get_funnel_title();
 
 		if ( ! $funnel_title ) {
-			return sprintf( "<strong>(%s)</strong>", _x( 'funnel deleted', 'status', 'groundhogg' ) );
+			return sprintf( "<strong>(%s)</strong>", _x( 'flow deleted', 'status', 'groundhogg' ) );
 		}
 
 		return sprintf( "<a href='%s'>%s</a>",
@@ -463,8 +463,8 @@ class Events_Table extends WP_List_Table {
 				$actions['edit'] = html()->a( admin_page_url( 'gh_funnels', [
 					'action'    => 'edit',
 					'funnel' => $event->get_funnel_id()
-				] ), _x( 'Edit Funnel', 'action', 'groundhogg' ), [
-					'aria-label' => _x( 'Edit Funnel', 'action', 'groundhogg' ),
+				] ), _x( 'Edit Flow', 'action', 'groundhogg' ), [
+					'aria-label' => _x( 'Edit Flow', 'action', 'groundhogg' ),
 //					'title'      => _x( 'Edit Funnel', 'action', 'groundhogg' ),
 				] );
 

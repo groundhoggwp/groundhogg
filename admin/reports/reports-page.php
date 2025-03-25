@@ -362,7 +362,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'slug' => 'email'
 			],
 			[
-				'name' => __( 'Funnels', 'groundhogg' ),
+				'name' => __( 'Flows', 'groundhogg' ),
 				'slug' => 'funnels'
 			],
 			[

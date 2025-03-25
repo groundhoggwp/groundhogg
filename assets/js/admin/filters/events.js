@@ -102,21 +102,21 @@
     },
   }))
 
-  FilterRegistry.registerFilter(createFilter('funnel', 'Funnel', 'table', {
+  FilterRegistry.registerFilter(createFilter('funnel', 'Flow', 'table', {
     display: ({
       funnel_id = false,
       step_id = false,
     }) => {
 
       if (!funnel_id) {
-        return 'Any funnel'
+        return 'Any flow'
       }
 
       if (funnel_id && !step_id) {
-        return sprintf('Funnel is %s', FunnelsStore.get(funnel_id).data.title)
+        return sprintf('Flow is %s', FunnelsStore.get(funnel_id).data.title)
       }
 
-      return sprintf('Funnel is %s and step is %s', bold(FunnelsStore.get(funnel_id).data.title),
+      return sprintf('Flow is %s and step is %s', bold(FunnelsStore.get(funnel_id).data.title),
         bold(FunnelsStore.get(funnel_id).steps.find(s => s.ID == step_id).data.step_title))
     },
     edit   : ({
@@ -126,7 +126,7 @@
     }) => Fragment([
       ItemPicker({
         id          : `select-a-funnel`,
-        noneSelected: __('Select a funnel...', 'groundhogg'),
+        noneSelected: __('Select a flow...', 'groundhogg'),
         selected    : funnel_id ? {
           id  : funnel_id,
           text: FunnelsStore.get(funnel_id).data.title,

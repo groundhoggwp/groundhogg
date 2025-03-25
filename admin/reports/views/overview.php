@@ -52,14 +52,14 @@ namespace Groundhogg\Admin\Reports\Views;
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Top Converting Funnels', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php _e( 'Top Converting Flows', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_top_converting_funnels" class="inner"></div>
     </div>
 
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Top Performing Funnel Emails', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php _e( 'Top Performing Flow Emails', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_top_performing_emails" class="inner emails-list"></div>
     </div>

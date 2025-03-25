@@ -101,8 +101,8 @@ class Welcome_Page extends Admin_Page {
 				'cap'         => 'edit_emails'
 			],
 			[
-				'title'       => __( 'Launch a funnel', 'groundhogg' ),
-				'description' => __( "We're going to launch a funnel that will welcome new subscribers to the list. It will only take a few minutes.", 'groundhogg' ),
+				'title'       => __( 'Create a flow', 'groundhogg' ),
+				'description' => __( "We're going to create a flow that will welcome new subscribers to the list. It will only take a few minutes.", 'groundhogg' ),
 				'completed'   => get_db( 'funnels' )->count( [ 'status' => 'active' ] ) > 0,
 				'fix'         => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
 				'cap'         => 'edit_funnels'
@@ -166,8 +166,8 @@ class Welcome_Page extends Admin_Page {
 				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins'
 			],
 			[
-				'title'       => __( 'Leverage funnel conversion tracking', 'groundhogg' ),
-				'description' => __( "Know how your funnels are performing by using conversion tracking!", 'groundhogg' ),
+				'title'       => __( 'Leverage flow conversion tracking', 'groundhogg' ),
+				'description' => __( "Know how your flows are performing by using conversion tracking!", 'groundhogg' ),
 				'completed'   => db()->steps->count( [ 'is_conversion' => 1 ] ) > 0,
 				'fix'         => admin_page_url( 'gh_funnels' ),
 				'cap'         => 'edit_funnels'

@@ -206,7 +206,7 @@ class Events_Page extends Tabbed_Admin_Page {
 								'Update_Contacts'        => __( 'Update contacts', 'groundhogg' ),
 								'Delete_Contacts'        => __( 'Delete contacts', 'groundhogg' ),
 								'Add_Contacts_To_Funnel' => __( 'Add contacts to funnel', 'groundhogg' ),
-								'Complete_Benchmark'     => __( 'Complete benchmark', 'groundhogg' ),
+								'Complete_Benchmark'     => __( 'Trigger Flow', 'groundhogg' ),
 							]
 						],
 						'user_id'   => [ 'User', $users ]

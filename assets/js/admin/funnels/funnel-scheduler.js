@@ -161,7 +161,7 @@
 
   const Steps = {
     'funnel'   : {
-      name        : __('Funnel', 'groundhogg'),
+      name        : __('Flow', 'groundhogg'),
       icon        : icons.funnel,
       requirements: () => true,
       render      : () => {
@@ -170,10 +170,10 @@
           Div({
             className: 'display-flex column gap-10',
           }, [
-            `<p>${ __('Select which funnel to start...', 'groundhogg') }</p>`,
+            `<p>${ __('Select which flow to start...', 'groundhogg') }</p>`,
             ItemPicker({
               id          : `select-a-funnel`,
-              noneSelected: __('Select a funnel...', 'groundhogg'),
+              noneSelected: __('Select a flow...', 'groundhogg'),
               selected    : getFunnel() ? {
                 id  : getFunnel().ID,
                 text: getFunnel().data.title,
@@ -274,7 +274,7 @@
           Div({
             className: 'space-between',
           }, [
-            `<p>${ __('When do you want the funnel to start?', 'groundhogg') }</p>`,
+            `<p>${ __('When do you want the flow to start?', 'groundhogg') }</p>`,
             ButtonToggle({
               id      : 'send-when',
               options : [
@@ -337,7 +337,7 @@
       render      : () => {
 
         return Fragment([
-          `<p>${ __('Select contacts to add to the funnel...', 'groundhogg') }</p>`,
+          `<p>${ __('Select contacts to add to the flow...', 'groundhogg') }</p>`,
           ItemPicker({
             id          : 'select-search-method',
             multiple    : false,
@@ -392,7 +392,7 @@
               })
             },
           }) : null,
-          `<p>${ sprintf(__('%s contacts will be added to the funnel.', 'groundhogg'),
+          `<p>${ sprintf(__('%s contacts will be added to the flow.', 'groundhogg'),
             formatNumber(getState().totalContacts)) }</p>`,
           Button({
             id       : 'go-to-review',
@@ -493,7 +493,7 @@
       requirements: () => getState().finished,
       render      : () => {
         return Fragment([
-          `<p>${ __('🎉 Your contacts will added to the funnel in the background!', 'groundhogg') }</p>`,
+          `<p>${ __('🎉 Your contacts will added to the flow in the background!', 'groundhogg') }</p>`,
           Button({
             id       : 're-schedule',
             className: 'gh-button primary',

@@ -97,15 +97,15 @@
       display: ({ funnel_id = false }) => {
 
         if (!funnel_id) {
-          return 'Any funnel'
+          return 'Any flow'
         }
 
-        return sprintf('In funnel %s', bold( FunnelsStore.get(funnel_id).data.title ) )
+        return sprintf('In flow %s', bold( FunnelsStore.get(funnel_id).data.title ) )
       },
       edit: ({ funnel_id = false, updateFilter }) => Fragment([
         ItemPicker({
           id: `select-a-funnel`,
-          noneSelected: __('Select a funnel...', 'groundhogg'),
+          noneSelected: __('Select a flow...', 'groundhogg'),
           selected: funnel_id ? { id: funnel_id, text: FunnelsStore.get(funnel_id).data.title } : [],
           multiple: false,
           style: {

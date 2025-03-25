@@ -1634,10 +1634,10 @@
 // Tags
 
   registerFilterGroup('funnels',
-    _x('Funnel', 'noun meaning automation', 'groundhogg'))
+    _x('Flows', 'noun meaning automation', 'groundhogg'))
 
   registerFilter('funnel_history', 'funnels',
-    __('Funnel History', 'groundhogg'), {
+    __('Flow History', 'groundhogg'), {
       view ({
         status = 'complete',
         funnel_id = 0,
@@ -1671,7 +1671,7 @@
 
         }
         else {
-          prepend = __('Completed any step in any funnel', 'groundhogg')
+          prepend = __('Completed any step in any flow', 'groundhogg')
         }
 
         return standardActivityDateTitle(prepend, {
@@ -1717,7 +1717,7 @@
         funnelPicker('#filter-funnel', false, (items) => {
           FunnelsStore.itemsFetched(items)
         }, {}, {
-          placeholder: __('Select a funnel', 'groundhogg'),
+          placeholder: __('Select a flow', 'groundhogg'),
         }).on('select2:select', ({ target }) => {
           updateFilter({
             funnel_id: parseInt($(target).val()),

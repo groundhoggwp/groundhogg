@@ -130,7 +130,7 @@ class Campaigns_Table extends Table {
 				'href' => admin_page_url( 'gh_funnels', [
 					'include_filters' => base64_json_encode( [ [ [ 'type' => 'campaigns', 'campaigns' => [ $campaign->ID ] ] ] ] )
 				] )
-			], sprintf( '%s funnels', number_format_i18n( $funnels ) ) ),
+			], sprintf( '%s flows', number_format_i18n( $funnels ) ) ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_broadcasts', [
 					'include_filters' => base64_json_encode( [

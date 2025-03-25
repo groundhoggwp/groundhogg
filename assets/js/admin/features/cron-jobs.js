@@ -342,7 +342,7 @@
         State.gh_cron_installed ? Div({ className: 'gh-panel half' }, Div({ className: 'inside' }, [
           H3({ className: `no-margin-top ${ ghCronOnTime() ? 'striked-completed' : '' }` },
             Span({}, sprintf(__('Configuring %s Cron', 'groundhogg'), Groundhogg.whiteLabelName))),
-          Pg({}, sprintf(__('The %s cron is responsible for sending scheduled emails and doing funnel automation.', 'groundhogg'), Groundhogg.whiteLabelName)),
+          Pg({}, sprintf(__('The %s cron is responsible for sending scheduled emails and doing flow automation.', 'groundhogg'), Groundhogg.whiteLabelName)),
           !ghCronOnTime()
           ? Div({ className: 'pill attention loading-dots'}, [ sprintf(__('⚠️ The %s cron is not running on time and was last run %s', 'groundhogg'), Groundhogg.whiteLabelName, State.gh_last_ping_i18n ) ] )
           : Div({ className: 'pill success'}, sprintf(__('The %s cron is running on time and was last run %s.', 'groundhogg'), Groundhogg.whiteLabelName, State.gh_last_ping_i18n )),

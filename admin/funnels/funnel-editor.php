@@ -39,7 +39,7 @@ $funnel = new Funnel( $funnel_id );
 if ( ! $funnel->exists() ) {
 
 	?>
-    <p>This funnel does not exist. It may have been deleted.</p>
+    <p>This flow does not exist. It may have been deleted.</p>
 	<?php
 
 	return;
@@ -212,7 +212,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                     <div class="steps-select">
                         <div class="display-flex gap-10 stretch space-below-10">
                             <div class="gh-input-group full-width" style="background-color: #fff;">
-                                <button class="gh-button step-filter full-width" data-group="benchmark">Benchmarks</button>
+                                <button class="gh-button step-filter full-width" data-group="benchmark">Triggers</button>
                                 <button class="gh-button step-filter full-width" data-group="action">Actions</button>
                                 <button class="gh-button step-filter full-width" data-group="logic">Logic</button>
                                 <button class="gh-button step-filter full-width current" data-group="all">All</button>

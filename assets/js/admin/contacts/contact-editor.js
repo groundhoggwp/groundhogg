@@ -182,7 +182,7 @@
     {
       id     : 'add-to-funnel',
       icon   : icons.funnel,
-      tooltip: __('Add to a funnel', 'groundhogg'),
+      tooltip: __('Add to a flow', 'groundhogg'),
       show   : contact => true,
       onClick: e => {
 
@@ -195,10 +195,10 @@
           id       : 'add-to-funnel-dialog',
           className: 'display-flex gap-10 column',
         }, [
-          `<h3 style="margin: 0">${ sprintf(__('Add %s to a funnel', 'groundhogg'), getContact().data.full_name) }</h3>`,
+          `<h3 style="margin: 0">${ sprintf(__('Add %s to a flow', 'groundhogg'), getContact().data.full_name) }</h3>`,
           MakeEl.ItemPicker({
             id          : `select-a-funnel`,
-            noneSelected: __('Select a funnel...', 'groundhogg'),
+            noneSelected: __('Select a flow...', 'groundhogg'),
             selected    : State.funnel_id ? {
               id  : State.funnel_id,
               text: FunnelsStore.get(State.funnel_id).data.title,
@@ -274,7 +274,7 @@
               }).then(() => {
 
                 dialog({
-                  message: sprintf(__('%s added to funnel!', 'groundhogg'),
+                  message: sprintf(__('%s added to flow!', 'groundhogg'),
                     getContact().data.full_name),
                 })
 
@@ -723,7 +723,7 @@
             return SubmissionActivityItem({
               icon   : icons.form,
               heading: __('Submission', 'groundhogg'),
-              before : sprintf(__('Submitted form %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Submitted form %s in flow %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
@@ -735,7 +735,7 @@
             return SubmissionActivityItem({
               icon   : icons.webhook,
               heading: __('Request', 'groundhogg'),
-              before : sprintf(__('Received request to %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Received request to %s in flow %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
@@ -747,7 +747,7 @@
             return SubmissionActivityItem({
               icon   : icons.webhook,
               heading: __('Response', 'groundhogg'),
-              before : sprintf(__('Received response from %s in funnel %s', 'groundhogg'),
+              before : sprintf(__('Received response from %s in flow %s', 'groundhogg'),
                 bold(activity.form.data.step_title), el('a', {
                   href  : funnel.admin + `#${ activity.data.step_id }`,
                   target: '_blank',
@@ -777,7 +777,7 @@
               return SubmissionActivityItem({
                 icon   : stepTypeIcon(activity.form.data.step_type),
                 heading: __('Submission', 'groundhogg'),
-                before : sprintf(__('Submitted %s in funnel %s', 'groundhogg'),
+                before : sprintf(__('Submitted %s in flow %s', 'groundhogg'),
                   bold(activity.data.name), el('a', {
                     href  : funnel.admin + `#${ activity.data.step_id }`,
                     target: '_blank',
@@ -858,7 +858,7 @@
                                         stepTitleDisplay) }</span>
                             </div>
                             <div class="event-extra">
-                                ${ sprintf(__('%s in funnel %s', 'groundhogg'),
+                                ${ sprintf(__('%s in flow %s', 'groundhogg'),
                                         el('span', {
                                                     className: [
                                                         'step-type',
@@ -1197,7 +1197,7 @@
                                   name: 'filter',
                               }, {
                                   all   : __('All Activity', 'groundhogg'),
-                                  funnel: __('Funnel Activity', 'groundhogg'),
+                                  funnel: __('Flow Activity', 'groundhogg'),
                                   email : __('Email Activity', 'groundhogg'),
                                   web   : __('Web Activity', 'groundhogg'),
                                   form  : __('Form Submissions', 'groundhogg'),

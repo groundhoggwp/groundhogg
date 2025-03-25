@@ -196,7 +196,7 @@
           },
           {
             key     : 'funnel',
-            text    : __('Create a funnel'),
+            text    : __('Create a flow'),
             onSelect: () => {
               window.open(adminPageURL('gh_funnels', { action: 'add' }), '_self')
             },

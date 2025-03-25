@@ -23,7 +23,7 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 				'class' => 'gh-button secondary small'
 			], 'Purge cancelled, skipped, and failed event logs' ) ?>
             <p><b><?php _e( 'Completed Events' ) ?></b></p>
-            <p><?php _e( 'Purging completed event logs will free up space, but will adversely affect reporting and may impact funnel automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
+            <p><?php _e( 'Purging completed event logs will free up space, but will adversely affect reporting and may impact flow automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
             <p><?php _e( 'Delete completed event logs older than...', 'groundhogg' ) ?></p>
             <form class="display-flex column gap-10" method="post">
 				<?php
@@ -61,8 +61,8 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 						'name'        => 'what_to_delete',
 						'options'     => [
 							'all'       => __( 'Everything' ),
-							'funnel'    => __( 'Broadcast events' ),
-							'broadcast' => __( 'Funnel events' ),
+							'funnel'    => __( 'Flow events' ),
+							'broadcast' => __( 'broadcast events' ),
 							'other'     => __( 'Other events' ),
 						],
 						'option_none' => false,
@@ -113,8 +113,8 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 							'all'       => __( 'Everything' ),
 							'waiting'   => __( 'All waiting events' ),
 							'paused'    => __( 'All paused events' ),
-							'funnel'    => __( 'All broadcast events' ),
-							'broadcast' => __( 'All funnel events' ),
+							'broadcast' => __( 'All broadcast events' ),
+							'funnel'    => __( 'All flow events' ),
 						],
 						'option_none' => false,
 					] ) ?>
@@ -236,7 +236,7 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
             <h2><?php _e( 'Purge historical activity logs', 'groundhogg' ) ?></h2>
         </div>
         <div class="inside">
-            <p><?php _e( 'Purging activity logs will free up space, but will adversely affect reporting and may impact funnel automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
+            <p><?php _e( 'Purging activity logs will free up space, but will adversely affect reporting and may impact flow automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ?></p>
             <p><?php _e( 'Delete activity event logs older than...', 'groundhogg' ) ?></p>
             <form class="display-flex column gap-10" method="post">
 				<?php
@@ -305,10 +305,10 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
     </div>
     <div class="gh-panel">
         <div class="gh-panel-header">
-            <h2 class="hndle"><?php _e( 'Restore missing funnel events', 'groundhogg' ); ?></h2>
+            <h2 class="hndle"><?php _e( 'Restore missing flow events', 'groundhogg' ); ?></h2>
         </div>
         <div class="inside">
-            <p><?php _e( 'If funnel events get cancelled or deleted, this tool will restore contacts to their most recent position in any funnels they were active in within the last 30 days.', 'groundhogg' ); ?></p>
+            <p><?php _e( 'If flow events get cancelled or deleted, this tool will restore contacts to their most recent position in any flows they were active in within the last 30 days.', 'groundhogg' ); ?></p>
             <p><?php echo html()->e( 'a', [
 					'class' => 'gh-button danger',
 					'href'  => action_url( 'restore_funnel_events' ),

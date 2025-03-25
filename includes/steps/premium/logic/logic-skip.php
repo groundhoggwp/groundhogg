@@ -18,7 +18,7 @@ class Logic_Skip extends Logic {
 	}
 
 	public function get_description() {
-		return 'Skip to a proceeding step within the funnel.';
+		return 'Skip to a proceeding step within the flow.';
 	}
 
 	public function get_icon() {
