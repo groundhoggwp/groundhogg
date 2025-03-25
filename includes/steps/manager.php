@@ -242,7 +242,7 @@ class Manager {
 	 * @return Funnel_Step[]
 	 */
 	public function get_elements() {
-		return array_merge( $this->get_actions(), $this->get_benchmarks() );
+		return array_merge( $this->get_actions(), $this->get_benchmarks(), $this->get_logic() );
 	}
 
 	/**
