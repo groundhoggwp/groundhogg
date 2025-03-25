@@ -539,7 +539,7 @@
 
           if (!this.addEl) {
             dialog({
-              message: 'Click on a + icon in the funnel first.',
+              message: 'Click on a + icon in the flow first.',
               type   : 'info',
             })
             return
@@ -638,9 +638,9 @@
 
         $('#funnel-deactivate').on('click', e => {
           dangerConfirmationModal({
-            alert      : `<p><b>Are you sure you want to deactivate the funnel?</b></p>
-<p>Any pending events will be paused. They will be resumed immediately when the funnel is reactivated.</p>
-<p>Unsaved changes will be discarded. To preserve any changes, update the funnel first, then deactivate.</p>`,
+            alert      : `<p><b>Are you sure you want to deactivate the flow?</b></p>
+<p>Any pending events will be paused. They will be resumed immediately when the flow is reactivated.</p>
+<p>Unsaved changes will be discarded. To preserve any changes, update the flow first, then deactivate.</p>`,
             confirmText: __('Deactivate'),
             onConfirm  : () => {
               this.save({
@@ -737,7 +737,7 @@
                 text    : '<span class="gh-text danger">Revert Changes</span>',
                 onSelect: e => {
                   dangerConfirmationModal({
-                    alert    : '<p>Are you sure you want to revert your changes?</p><p>Your funnel will be restored to the most recent save point.</p>',
+                    alert    : '<p>Are you sure you want to revert your changes?</p><p>Your flow will be restored to the most recent save point.</p>',
                     onConfirm: () => {
                       this.save({
                         moreData: formData => {
@@ -778,7 +778,7 @@
                 onSelect: e => {
                   modal({
                     //language=HTML
-                    content: `<h2>${ __('Add contacts to this funnel', 'groundhogg') }</h2>
+                    content: `<h2>${ __('Add contacts to this flow', 'groundhogg') }</h2>
                     <div id="gh-add-to-funnel" style="width: 500px"></div>`,
                     onOpen : () => {
                       document.getElementById('gh-add-to-funnel').append(Groundhogg.FunnelScheduler({
@@ -834,7 +834,7 @@
         })
 
         tooltip('#funnel-settings', {
-          content: 'Funnel settings',
+          content: 'Flow settings',
         })
 
         document.getElementById('funnel-settings').addEventListener('click', e => {
@@ -850,7 +850,7 @@
 
             return Div({}, [
               `<h2>Funnel Settings</h2>`,
-              `<p>Use <b>campaigns</b> to organize your funnels. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
+              `<p>Use <b>campaigns</b> to organize your flows. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
               ItemPicker({
                 id          : 'pick-campaigns',
                 noneSelected: 'Add a campaign...',
@@ -890,7 +890,7 @@
                 },
                 onChange    : items => campaignIds = items.map(item => item.id),
               }),
-              `<p>Add a simple funnel description.</p>`,
+              `<p>Add a simple description.</p>`,
               Textarea({
                 id       : 'funnel-description',
                 className: 'full-width',
@@ -1114,11 +1114,11 @@
           }
 
           dialog({
-            message: __('Funnel saved!', 'groundhogg'),
+            message: __('Flow saved!', 'groundhogg'),
           })
         }).catch(err => {
           dialog({
-            message: __('Something went wrong updating the funnel. Your changes could not be saved.', 'groundhogg'),
+            message: __('Something went wrong updating the flow. Your changes could not be saved.', 'groundhogg'),
             type   : 'error',
           })
           throw err
@@ -1294,7 +1294,7 @@
         // deleting the benchmark will also delete inner steps
         if ($sortable.is('.benchmark') && $sortable.find('.step-branch .step').length > 0) {
           dangerConfirmationModal({
-            alert    : '<p>Are you sure you want to delete this benchmark? Any sub steps will also be deleted.</p>',
+            alert    : '<p>Are you sure you want to delete this trigger? Any sub steps will also be deleted.</p>',
             onConfirm: () => deleteStep(),
           })
           return
@@ -1535,7 +1535,7 @@
 
         Groundhogg.components.Tour([
           {
-            prompt  : `This is step flow. Your funnels are made up of a series of steps. Steps can be <span class="gh-text orange">benchmarks</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
+            prompt  : `This is step flow. Your flows are made up of a series of steps. Steps can be <span class="gh-text orange">triggers</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
             position: 'right',
             target  : '#step-sortable',
             onInit  : ({
@@ -1545,7 +1545,7 @@
             },
           },
           {
-            prompt  : '👈 Click on any ➕ icon to start adding new steps to a funnel. Once clicked the icon will become highlighted and new steps can be added at that position.',
+            prompt  : '👈 Click on any ➕ icon to start adding new steps to a flow. Once clicked the icon will become highlighted and new steps can be added at that position.',
             position: 'right',
             target  : 'button.add-step',
             onInit  : ({
@@ -1560,7 +1560,7 @@
             target  : '.steps-select .gh-input-group.full-width',
           },
           {
-            prompt  : `<span class="gh-text orange">Benchmarks</span> (Goals/Triggers) are used to start funnels and move contacts through funnels when they meet the configured criteria.`,
+            prompt  : `<span class="gh-text orange">Triggers</span> (Goals/Benchmarks) are used to start flows and move contacts through flows when they meet the configured criteria.`,
             position: 'below',
             target  : 'button.step-filter[data-group="benchmark"]',
             onBefore: ({ target }) => target.click(),
@@ -1583,7 +1583,7 @@
             target  : '.step-search-wrap',
           },
           {
-            prompt  : 'Click on a type to add it to the funnel at the highlighted position 👇',
+            prompt  : 'Click on a type to add it to the flow at the highlighted position 👇',
             position: 'above',
             target  : '.steps-grid',
             onBefore: () => {
@@ -1591,7 +1591,7 @@
             },
           },
           {
-            prompt  : `Let's add a <span class="gh-text orange">Tag Applied</span> benchmark to the flow now by clicking on the icon.`,
+            prompt  : `Let's add a <span class="gh-text orange">Tag Applied</span> trigger to the flow now by clicking on the icon.`,
             position: 'right',
             target  : '#tag_applied',
             onBefore: ({ target }) => {
@@ -1618,25 +1618,25 @@
             target  : '.settings.editing .step-notes',
           },
           {
-            prompt  : `You can start a funnel with more than one <span class="gh-text orange">benchmark</span> by adding a new benchmark adjacent to an existing one.`,
+            prompt  : `You can start a flow with more than one <span class="gh-text orange">trigger</span> by adding a new trigger adjacent to an existing one.`,
             position: 'left',
             target  : '.add-step.add-benchmark',
             onInit  : ({ target }) => target.click(),
           },
           {
-            prompt  : `Let's add a new <span class="gh-text orange">User Created</span> benchmark.`,
+            prompt  : `Let's add a new <span class="gh-text orange">User Created</span> trigger.`,
             position: 'right',
             target  : '#account_created',
             onInit  : ({ target }) => target.click(),
           },
           {
-            prompt  : `Now the funnel will start when a tag is applied <span class="gh-text purple">or</span> when a user is created!`,
+            prompt  : `Now the flow will start when a tag is applied <span class="gh-text purple">or</span> when a user is created!`,
             position: 'right',
             target  : '.step-branch.benchmarks',
             onBefore: () => this.hideSettings(),
           },
           {
-            prompt  : `<span class="gh-text orange">Benchmarks</span> have their own sub-flows that are not part of the main funnel. Only contacts that completed the <span class="gh-text orange">benchmark</span> can run through these steps.`,
+            prompt  : `<span class="gh-text orange">Triggers</span> have their own sub-flows that are not part of the main flow. Only contacts that completed the <span class="gh-text orange">trigger</span> can run through these steps.`,
             position: 'left',
             target  : '.step.benchmark + .step-branch',
             onBefore: ({}) => {
@@ -1656,13 +1656,13 @@
             onInit  : ({ target }) => target.click(),
           },
           {
-            prompt  : `Now, only contacts that completed the <span class="gh-text orange">Tag Applied</span> benchmark will wait at the <span class="gh-text green">Delay Timer</span>.`,
+            prompt  : `Now, only contacts that completed the <span class="gh-text orange">Tag Applied</span> trigger will wait at the <span class="gh-text green">Delay Timer</span>.`,
             position: 'right',
             target  : '.step-branch.benchmarks .step.delay_timer',
             onInit  : ({ target }) => this.hideSettings(),
           },
           {
-            prompt  : 'Click here to add a new step to the main funnel. Steps here will run for anyone in the funnel, regardless of where they entered.',
+            prompt  : 'Click here to add a new step to the main flow. Steps here will run for anyone in the flow, regardless of where they entered.',
             position: 'above',
             target  : '.add-step#end-funnel',
             onInit  : ({ target }) => target.click(),
@@ -1714,7 +1714,7 @@
             target  : '.settings.editing .custom-settings',
           },
           {
-            prompt  : `Let's add another <span class="gh-text orange">benchmark</span> that will end the funnel.`,
+            prompt  : `Let's add another <span class="gh-text orange">trigger</span> that will end the flow.`,
             position: 'above',
             target  : '.add-step#end-funnel',
             onInit  : ({ target }) => {
@@ -1723,13 +1723,13 @@
             },
           },
           {
-            prompt  : `Let's end the funnel with a <span class="gh-text orange">Tag Removed</span> benchmark.`,
+            prompt  : `Let's end the flow with a <span class="gh-text orange">Tag Removed</span> trigger.`,
             position: 'right',
             target  : '#tag_removed',
             onInit  : ({ target }) => target.click(),
           },
           {
-            prompt  : `Now if a tag is removed from the contact at any time, they will jump here, ending the funnel.`,
+            prompt  : `Now if a tag is removed from the contact at any time, they will jump here, ending the flow.`,
             position: 'above',
             target  : '#step-flow .step.tag_removed',
             onBefore: ({ target }) => {
@@ -1746,7 +1746,7 @@
             },
           },
           {
-            prompt  : `When you've configured all the steps in your funnel, turn it on by clicking <span class="gh-text green">Activate</span>!`,
+            prompt  : `When you've configured all the steps in your flow, turn it on by clicking <span class="gh-text green">Activate</span>!`,
             position: 'below-left',
             target  : '#funnel-activate',
           },
@@ -1789,7 +1789,7 @@
 
         if (Funnel.steps.length > 0) {
           confirmationModal({
-            alert      : `<p>👋 Funnels have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
+            alert      : `<p>👋 Funnels are now <b>Flows</b> and have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
             confirmText: 'Start tour!',
             closeText  : 'No thanks',
             onConfirm  : () => {
@@ -2076,13 +2076,13 @@
 
         if (el.parentElement.matches('.starting')) {
           insert = Div({ className: 'benchmark-pill ' }, [
-            'Start the funnel when...',
+            'Start the flow when...',
           ])
         }
         else {
           insert = Div({ className: 'benchmark-pill' }, [
             'Until...',
-            ToolTip('Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">benchmark</span> is completed.',
+            ToolTip('Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">trigger</span> is completed.',
               'right'),
           ])
 

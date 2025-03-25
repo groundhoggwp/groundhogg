@@ -320,7 +320,7 @@ abstract class Benchmark extends Funnel_Step {
 
 		// if the next step is not a benchmark, close the benchmark group
 		if ( $is_last ) {
-			$this->add_step_button( [ 'id' => 'add-to-group-after-' . $step->ID, 'tooltip' => 'Add benchmark', 'class' => 'add-benchmark' ] );
+			$this->add_step_button( [ 'id' => 'add-to-group-after-' . $step->ID, 'tooltip' => 'Add trigger', 'class' => 'add-benchmark' ] );
 			?></div></div><?php
 		}
 	}
