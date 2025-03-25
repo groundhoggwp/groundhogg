@@ -196,6 +196,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $dot_min . '.js', [ 'jquery' ] );
 
 		// Integrations
+		wp_register_script( 'groundhogg-leader-line', GROUNDHOGG_ASSETS_URL . 'lib/leader-line/leader-line.min.js' );
 
 		// Beautify JS
 		wp_register_script( 'beautify-js', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify.min.js' );
@@ -378,6 +379,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-editor' . $dot_min . '.js', [
 			'jquery',
+//			'groundhogg-leader-line',
 			'groundhogg-admin',
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
