@@ -537,17 +537,15 @@
   }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Z' && e.ctrlKey && e.shiftKey) {
+    if (e.key === 'Z' && ( e.ctrlKey || e.metaKey ) && e.shiftKey) {
       History.redo()
     }
 
-    if (e.key === 'z' && e.ctrlKey && !e.shiftKey) {
+    if (e.key === 'z' && ( e.ctrlKey || e.metaKey ) && !e.shiftKey) {
       History.undo()
     }
-  })
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'y' && e.ctrlKey) {
+    if (e.key === 'y' && ( e.ctrlKey || e.metaKey ) ) {
       History.redo()
     }
   })

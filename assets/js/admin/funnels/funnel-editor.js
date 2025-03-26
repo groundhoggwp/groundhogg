@@ -312,7 +312,7 @@
 
         // handle ctrl v, ctrl c
         $document.on('keydown', async e => {
-          if (e.key === 'c' && e.ctrlKey && this.editing && this.targetStep) {
+          if (e.key === 'c' && ( e.ctrlKey || e.metaKey ) && this.editing && this.targetStep) {
             navigator.clipboard.writeText(JSON.stringify({
               copy : this.editing,
               group: this.targetStep.dataset.group,
@@ -322,7 +322,7 @@
               message: 'Step copied!',
             })
           }
-          if (e.key === 'v' && e.ctrlKey && this.targetAdd && this.addEl) {
+          if (e.key === 'v' && ( e.ctrlKey || e.metaKey ) && this.targetAdd && this.addEl) {
 
             let text = await navigator.clipboard.readText()
 
@@ -368,7 +368,7 @@
             })
 
           }
-          if (e.key === 'm' && e.ctrlKey && this.editing) {
+          if (e.key === 'm' && ( e.ctrlKey || e.metaKey ) && this.editing) {
             // cancel
             if (this.moving) {
               document.body.classList.remove('gh-moving-step')
