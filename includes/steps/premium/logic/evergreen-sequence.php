@@ -34,7 +34,7 @@ class Evergreen_Sequence extends Branch_Logic {
 	}
 
 	public function get_name() {
-		return 'Evergreen Sequence';
+		return 'Smart Date Sequence';
 	}
 
 	public function get_type() {

@@ -803,16 +803,34 @@
                 onSelect: e => {
 
                   const shortcuts = [
-                    [ 'Copy a step', [ 'CTRL', 'C' ] ],
-                    [ 'Paste a copied step', [ 'CTRL', 'V' ] ],
-                    [ 'Move a step', [ 'CTRL', 'M' ] ],
+                    [
+                      'Copy a step',
+                      [
+                        'CTRL',
+                        'C',
+                      ],
+                    ],
+                    [
+                      'Paste a copied step',
+                      [
+                        'CTRL',
+                        'V',
+                      ],
+                    ],
+                    [
+                      'Move a step',
+                      [
+                        'CTRL',
+                        'M',
+                      ],
+                    ],
                     // [ 'Undo', [ 'CTRL', 'Z' ] ],
                     // [ 'Redo', [ 'CTRL', 'Shift', 'Z' ] ],
                   ]
 
                   MakeEl.ModalWithHeader({
-                      width: '500px',
-                      header: 'Keyboard Shortcuts'
+                      width : '500px',
+                      header: 'Keyboard Shortcuts',
                     },
                     Div({ className: 'display-flex column' }, shortcuts.map(([desc, keys]) => Div({ className: 'space-between' }, [
                       MakeEl.Pg({}, desc),
@@ -1686,7 +1704,12 @@
             prompt  : `Let's add a new <span class="gh-text green">Send Email</span> action to the <span class="gh-text green">Yes</span> branch.`,
             position: 'left',
             target  : '#send_email',
-            onInit  : ({ target }) => target.click(),
+            onBefore: () => {
+              document.querySelector('button.step-filter[data-group="action"]').click()
+            },
+            onInit  : ({ target }) => {
+              target.click()
+            },
           },
           {
             prompt  : `We want to send a different email if the contact does not meet our conditions, so click on the ➕ in the No branch.`,
@@ -1698,7 +1721,12 @@
             prompt  : `Let's add a new <span class="gh-text green">Send Email</span> action to the <span class="gh-text red">No</span> branch as well.`,
             position: 'left',
             target  : '#send_email',
-            onInit  : ({ target }) => target.click(),
+            onBefore: () => {
+              document.querySelector('button.step-filter[data-group="action"]').click()
+            },
+            onInit  : ({ target }) => {
+              target.click()
+            },
           },
           {
             prompt  : `Let's configure the logic condition so that the right contacts get the right email`,
@@ -1913,25 +1941,25 @@
   let lineWidth
   let leaderLines = []
 
-  function drawLeaderLine( from, to, opts) {
+  function drawLeaderLine (from, to, opts) {
 
-    if ( ! lineWidth ){
+    if (!lineWidth) {
       lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
     }
 
-    let line = new LeaderLine( from, to, {
-      size: lineWidth,
-      path: 'fluid',
-      color: '',
+    let line = new LeaderLine(from, to, {
+      size       : lineWidth,
+      path       : 'fluid',
+      color      : '',
       startSocket: 'bottom',
-      endSocket: 'top',
-      endPlug: 'arrow3',
-      ...opts
-    } )
+      endSocket  : 'top',
+      endPlug    : 'arrow3',
+      ...opts,
+    })
 
-    leaderLines.push( line )
+    leaderLines.push(line)
 
-    return line;
+    return line
   }
 
   function drawLeaderLines () {
@@ -1944,7 +1972,7 @@
 
   }
 
-  const drawLogicLine = ( from, to, opts = {} ) => {
+  const drawLogicLine = (from, to, opts = {}) => {
 
     let {
       fromSocket = 'bottom', // top, right, bottom, left
@@ -1955,7 +1983,7 @@
     const borderRadius = 'var(--logic-line-radius)'
     const borderWidth = `var(--logic-line-width)`
 
-    if ( ! lineWidth ){
+    if (!lineWidth) {
       lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
     }
 
@@ -1964,66 +1992,78 @@
 
     let fromX, fromY
 
-    switch ( toSocket ) {
+    switch (toSocket) {
       case 'top':
-        fromX = fromPos.left + fromPos.width/2
+        fromX = fromPos.left + fromPos.width / 2
         fromY = fromPos.top
-        break;
+        break
       case 'right':
         fromX = fromPos.right
-        fromY = fromPos.top + fromPos.height/2
-        break;
+        fromY = fromPos.top + fromPos.height / 2
+        break
       case 'bottom':
-        fromX = fromPos.left + fromPos.width/2
+        fromX = fromPos.left + fromPos.width / 2
         fromY = toPos.bottom
-        break;
+        break
       case 'left':
         fromX = fromPos.left
-        fromY = fromPos.top + fromPos.height/2
-        break;
+        fromY = fromPos.top + fromPos.height / 2
+        break
     }
 
     let toX, toY
 
-    switch ( toSocket ) {
+    switch (toSocket) {
       case 'top':
-        toX = toPos.left + toPos.width/2
+        toX = toPos.left + toPos.width / 2
         toY = toPos.top
-        break;
+        break
       case 'right':
         toX = toPos.right
-        toY = toPos.top + toPos.height/2
-        break;
+        toY = toPos.top + toPos.height / 2
+        break
       case 'bottom':
-        toX = toPos.left + toPos.width/2
+        toX = toPos.left + toPos.width / 2
         toY = toPos.bottom
-        break;
+        break
       case 'left':
         toX = toPos.left
-        toY = toPos.top + toPos.height/2
-        break;
+        toY = toPos.top + toPos.height / 2
+        break
     }
 
-    let boxHeight = Math.abs( fromY - toY )
-    let boxWidth = Math.abs( fromX - toX )
+    let boxHeight = Math.abs(fromY - toY)
+    let boxWidth = Math.abs(fromX - toX)
 
     let LineContainer = Div({
       className: 'logic-line-container',
-      style: {
-        height: `${boxHeight}px`,
-        width: `${boxWidth}px`,
-      }
+      style    : {
+        height: `${ boxHeight }px`,
+        width : `${ boxWidth }px`,
+      },
     }, [
-      Div({ className: 'logic-line', style: { width: '50%', height: '50%' } }),
-      Div({ className: 'logic-line', style: { width: '50%', height: '50%' } })
+      Div({
+        className: 'logic-line',
+        style    : {
+          width : '50%',
+          height: '50%',
+        },
+      }),
+      Div({
+        className: 'logic-line',
+        style    : {
+          width : '50%',
+          height: '50%',
+        },
+      }),
     ])
 
     // leading right
-    if ( fromX < toX ){
+    if (fromX < toX) {
 
     }
     // leading left
-    else if ( fromX > toX ){
+    else if (fromX > toX) {
 
     }
     // leading straight
@@ -2040,10 +2080,10 @@
     const borderRadius = 'var(--logic-line-radius)'
     const borderWidth = `var(--logic-line-width)`
 
-    if ( ! lineWidth ){
+    if (!lineWidth) {
       lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
     }
-    let offset = lineWidth/2
+    let offset = lineWidth / 2
 
     const clearLineStyle = line => line.removeAttribute('style')
 

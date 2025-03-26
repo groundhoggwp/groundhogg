@@ -861,7 +861,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_send_notifications_on_event_failure',
 				'section' => 'event_notices',
 				'label'   => _x( 'Event Failure Notifications', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will let you know if something goes wrong in a funnel so you can fix it.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will let you know if something goes wrong in a flow so you can fix it.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' ),
@@ -982,8 +982,8 @@ class Settings_Page extends Admin_Page {
 			'gh_show_legacy_steps'                   => [
 				'id'      => 'gh_show_legacy_steps',
 				'section' => 'interface',
-				'label'   => _x( 'Enable Legacy Funnel Steps', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will allow supported legacy funnels steps to be added in the funnel editor.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Enable Legacy Flow Steps', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will allow supported legacy steps to be added in the flow editor.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Show', 'groundhogg' ),

@@ -468,7 +468,7 @@
       selected    : convertOpt('option[selected]'),
       multiple    : selectEl.multiple,
       tags        : selectEl.dataset.tags,
-      clearable   : false,
+      clearable   : selectEl.multiple,
       noneSelected: selectEl.dataset.placeholder ?? 'Any...',
       onCreate    : async opt => {
         selectEl.appendChild(MakeEl.makeEl('options', {

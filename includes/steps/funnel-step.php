@@ -824,20 +824,20 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php if ( $step->is_benchmark() ): ?>
                         <div class="gh-panel benchmark-settings">
                             <div class="gh-panel-header">
-                                <h2><?php _e( 'Benchmark Settings', 'groundhogg' ); ?></h2>
+                                <h2><?php _e( 'Trigger Settings', 'groundhogg' ); ?></h2>
                             </div>
                             <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):
 
 									echo html()->toggleYesNo( [
-										'label'   => 'Allow contacts to enter the funnel at this step?',
+										'label'   => 'Allow contacts to enter the flow at this step?',
 										'name'    => $this->setting_name_prefix( 'is_entry' ),
 										'id'      => $this->setting_id_prefix( 'is_entry' ),
 										'checked' => $step->is_entry()
 									] );
 
 									echo html()->toggleYesNo( [
-										'label'   => 'Allow contacts to pass through this benchmark',
+										'label'   => 'Allow contacts to pass through this trigger',
 										'name'    => $this->setting_name_prefix( 'can_passthru' ),
 										'id'      => $this->setting_id_prefix( 'can_passthru' ),
 										'checked' => $step->can_passthru()
@@ -846,7 +846,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 								endif;
 
 								echo html()->toggle( [
-									'label'   => 'Track conversion when completed',
+									'label'   => 'Track conversion when triggered',
 									'name'    => $this->setting_name_prefix( 'is_conversion' ),
 									'id'      => $this->setting_id_prefix( 'is_conversion' ),
 									'checked' => $step->is_conversion()

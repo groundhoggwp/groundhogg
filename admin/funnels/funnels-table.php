@@ -8,12 +8,10 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use Groundhogg\Plugin;
-use Groundhogg\Step;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_any;
 use function Groundhogg\check_lock;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\get_db;
@@ -75,7 +73,7 @@ class Funnels_Table extends Table {
 		$columns = array(
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
-			'steps'           => _x( 'Steps', 'Column label', 'groundhogg' ),
+			'steps'           => _x( 'Preview', 'Column label', 'groundhogg' ),
 			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
 			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'author'          => _x( 'Author', 'Column label', 'groundhogg' ),
@@ -125,9 +123,9 @@ class Funnels_Table extends Table {
 
 		$html = "<strong>";
 
-        if ( $funnel->has_errors() ){
-            $html .= '<span>⚠️<div class="gh-tooltip top">Steps in this funnel might have issues.</div></span>';
-        }
+		if ( $funnel->has_errors() ) {
+			$html .= '<span>⚠️<div class="gh-tooltip top">Steps in this funnel might have issues.</div></span>';
+		}
 
 		$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
