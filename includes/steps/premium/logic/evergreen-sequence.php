@@ -46,7 +46,7 @@ class Evergreen_Sequence extends Branch_Logic {
 	}
 
 	public function get_description() {
-		return 'A special sequence that will automatically add contacts to the flow at the closest timer relative to the time added.';
+		return 'Contacts will jump to the timer closest to the current date.';
 	}
 
 	public function get_sub_timer_steps() {
