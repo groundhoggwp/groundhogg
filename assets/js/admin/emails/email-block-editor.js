@@ -957,6 +957,10 @@
 
   const setBlocks = (blocks = [], hasChanges = true) => {
 
+    if ( isHTMLEditor() ){
+      return;
+    }
+
     let css = renderBlocksCSS(blocks)
     let content = renderBlocksHTML(blocks)
     let plain_text = renderBlocksPlainText(blocks)
@@ -3823,9 +3827,11 @@
                 setEmailData({
                   message_type: e.target.value,
                 })
-                // This may update the footer block
-                setBlocks(getBlocks())
-                morphBlocks()
+                if ( isBlockEditor() ){
+                  // This may update the footer block
+                  setBlocks(getBlocks())
+                  morphBlocks()
+                }
               },
             })),
           isBlockEditor() ? Control({
@@ -9532,7 +9538,13 @@
 
   // These functions help render various UI components
 
-  const morphBlocks = () => morph('#builder-content', BlockEditorContent())
+  const morphBlocks = () => {
+    if ( isHTMLEditor() ){
+      return
+    }
+
+    morph('#builder-content', BlockEditorContent())
+  }
   const removeControls = () => morph('#controls-panel', Div())
   const morphControls = () => morph('#controls-panel', ControlsPanel())
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
