@@ -36,6 +36,39 @@
 
   const { base64_json_encode } = Groundhogg.functions
 
+  const openReportInContactsView = (report, filters = null ) => {
+
+    const {
+      filters: include_filters = [],
+      exclude_filters = []
+    } = report
+
+    // no other filters provided
+    if ( filters === null ){
+
+      window.open(adminPageURL('gh_contacts', {
+        filters: base64_json_encode(include_filters),
+        exclude_filters: base64_json_encode(exclude_filters),
+      }), '_blank')
+
+      return;
+    }
+
+    if ( include_filters.length || exclude_filters.length ) {
+      filters.forEach( or => {
+        or.push({
+          type           : 'sub_query',
+          include_filters,
+          exclude_filters,
+        })
+      })
+    }
+
+    window.open(adminPageURL('gh_contacts', {
+      filters: base64_json_encode(filters),
+    }), '_blank')
+  }
+
   const ReportTypes = {
 
     pie_chart: {
@@ -53,7 +86,6 @@
                 </div>
             </div>`
       },
-
       settingsOnMount: (filter, updateReport) => {
         metaPicker('#field').on('change', e => {
           updateReport({
@@ -61,7 +93,6 @@
           })
         })
       },
-
       render : ({
         id,
         data,
@@ -78,8 +109,7 @@
         id,
         field,
         data,
-        filters = [],
-        exclude_filters = [],
+        ...report
       }) => {
 
         let cuttoff = 11
@@ -104,23 +134,15 @@
         const openInContactsView = (e, arr) => {
 
           if (arr.length && arr[0]._view) {
-            window.open(adminPageURL('gh_contacts', {
-              filters: base64_json_encode([
-                [
-                  {
-                    type           : 'sub_query',
-                    include_filters: filters,
-                    exclude_filters,
-                  },
-                  {
-                    type   : 'meta',
-                    meta   : field,
-                    value  : arr[0]._view.label,
-                    compare: 'equals',
-                  },
-                ],
-              ]),
-            }), '_blank')
+
+            let filters = [[{
+              type   : 'meta',
+              meta   : field,
+              value  : arr[0]._view.label,
+              compare: 'equals',
+            }]]
+
+            openReportInContactsView( report, filters )
           }
 
         }
@@ -202,7 +224,6 @@
                 </div>
             </div>`
       },
-
       settingsOnMount: (filter, updateReport) => {
         metaPicker('#field').on('change', e => {
           updateReport({
@@ -210,7 +231,6 @@
           })
         })
       },
-
       render : ({
         id,
         data,
@@ -236,8 +256,7 @@
         id,
         data,
         field,
-        filters = [],
-        exclude_filters = [],
+        ...report
       }) => {
 
         let num = 10
@@ -259,23 +278,14 @@
           })
 
           $(`.number-total[data-id=${ id }]`).on('click', e => {
-            window.open(adminPageURL('gh_contacts', {
-              filters: base64_json_encode([
-                [
-                  {
-                    type           : 'sub_query',
-                    include_filters: filters,
-                    exclude_filters,
-                  },
-                  {
-                    type   : 'meta',
-                    meta   : field,
-                    value  : e.target.dataset.value,
-                    compare: 'equals',
-                  },
-                ],
-              ]),
-            }), '_blank')
+            openReportInContactsView(report, [[
+              {
+                type   : 'meta',
+                meta   : field,
+                value  : e.target.dataset.value,
+                compare: 'equals',
+              },
+            ]])
           })
         }
 
@@ -398,14 +408,10 @@
       },
       onMount        : ({
         id,
-        filters = [],
-        exclude_filters = [],
+        ...report
       }) => {
         $(`.big-number[data-id=${ id }]`).on('click', e => {
-          window.open(adminPageURL('gh_contacts', {
-            filters        : base64_json_encode(filters),
-            exclude_filters: base64_json_encode(exclude_filters),
-          }), '_blank')
+          openReportInContactsView( report )
         })
       },
     },
