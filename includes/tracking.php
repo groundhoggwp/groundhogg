@@ -257,29 +257,29 @@ class Tracking {
 	 *
 	 * @return void
 	 */
-	public function handle_failsafe_tracking(){
+	public function handle_failsafe_tracking() {
 
 		// `identity` is the email address or id encrypted with the secret
-		if ( $identity = get_url_var( 'gi' ) ){
+		if ( $identity = get_url_var( 'gi' ) ) {
 			$id_or_email = decrypt( base64url_decode( $identity ) );
 
-			if ( ! $id_or_email ){
+			if ( ! $id_or_email ) {
 				return;
 			}
 
 			$contact = get_contactdata( $id_or_email );
 
-			if ( is_a_contact( $contact ) ){
+			if ( is_a_contact( $contact ) ) {
 				$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
 
 				// `id` is the event ID in hexadecimal
-				if ( $event_id = get_url_var( 'ge' ) ){
+				if ( $event_id = get_url_var( 'ge' ) ) {
 					$event_id = absint( hexdec( $event_id ) );
 
 					$event = get_event_by_queued_id( $event_id );
 
 					// Make sure the event matches the identity
-					if ( $event && $event->exists() && $event->get_contact_id() === $contact->get_id() ){
+					if ( $event && $event->exists() && $event->get_contact_id() === $contact->get_id() ) {
 						$this->add_tracking_cookie_param( 'event_id', $event->get_id() );
 					}
 				}
@@ -748,7 +748,7 @@ class Tracking {
 		}
 
 		// Edge case where there is no target page but there are UTM params or some other query string.
-		if ( str_starts_with( $target_url, '?' ) ){
+		if ( str_starts_with( $target_url, '?' ) ) {
 			$target_url = '/' . $target_url; // Prepend slash to send to homepage
 		}
 
@@ -763,6 +763,21 @@ class Tracking {
 	protected function redirect_to_target() {
 		wp_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
 		die();
+	}
+
+	/**
+	 * Clears cached report data when a new click or open happens.
+	 *
+	 * @param Event $event
+	 *
+	 * @return bool|mixed
+	 */
+	public function maybe_clear_cached_broadcast_report_data( Event $event ) {
+		if ( ! $event->is_broadcast_event() ) {
+			return false;
+		}
+
+		return $event->get_step()->clear_cached_report_data();
 	}
 
 	/**
@@ -790,12 +805,13 @@ class Tracking {
 
 		// We've already tracked an open for this event
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
+
 			$activity = track_event_activity( $event, Activity::EMAIL_OPENED, [], [
 				'ip_address' => get_current_ip_address(),
 				'user_agent' => get_current_user_agent_id()
 			] );
 
-			if ( $activity ){
+			if ( $activity ) {
 
 				/**
 				 * When an email is opened and the tracking image is loaded
@@ -803,7 +819,7 @@ class Tracking {
 				 * @param Tracking $tracking
 				 * @param Activity $activity
 				 */
-				do_action( 'groundhogg/tracking/email/opened', $this, $activity );
+				do_action( 'groundhogg/tracking/email/opened', $this, $activity, $event );
 			}
 
 		}
@@ -851,6 +867,7 @@ class Tracking {
 		// if diff between current time and sent time is suspicious we should assume bot?
 		if ( $click_delay && $event->is_broadcast_event() && time() - $event->get_time() < $click_delay ) {
 			$this->bail();
+
 			return;
 		}
 
@@ -876,7 +893,7 @@ class Tracking {
 		 * @param Tracking $tracking
 		 * @param Activity $activity
 		 */
-		do_action( 'groundhogg/tracking/email/click', $this, $activity );
+		do_action( 'groundhogg/tracking/email/click', $this, $activity, $event );
 
 		$this->redirect_to_target();
 	}

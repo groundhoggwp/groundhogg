@@ -18,7 +18,7 @@ class Logic_Stop extends Logic {
 	}
 
 	public function get_description() {
-		return 'Prevent a contact from continuing in a funnel.';
+		return 'Prevent a contact from continuing in a flow based on filters.';
 	}
 
 	public function get_icon() {

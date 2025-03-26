@@ -676,7 +676,14 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_report_data( $unused = 0 ) {
 
+		// let's maybe cache the report date
 		if ( ! empty( $this->report_data ) ) {
+			return $this->report_data;
+		}
+
+		$cached_report_data = $this->get_meta( 'cached_report_data' );
+		if ( ! empty( $cached_report_data ) ){
+			$this->report_data = $cached_report_data;
 			return $this->report_data;
 		}
 
@@ -766,12 +773,18 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				// Speed = total sent / ( time_end - time_start )
 				$data['speed'] = round( $total / $count, 2 );
 			}
-
 		}
+
+		// lets cached the broadcasts results
+		$this->update_meta( 'cached_report_data', $data );
 
 		$this->report_data = $data;
 
 		return $data;
+	}
+
+	public function clear_cached_report_data() {
+		return $this->delete_meta( 'cached_report_data' );
 	}
 
 	/**

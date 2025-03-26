@@ -5670,6 +5670,11 @@ function track_event_activity( Event $event, string $type = '', array $details =
 		'email_id'  => $event->email_id,
 	] );
 
+    // clear cached broadcast stats whenever new activity is tracked
+    if ( $event->is_broadcast_event() ){
+        $event->get_step()->clear_cached_report_data();
+    }
+
 	return track_activity( $contact, $type, $args, $details );
 }
 
