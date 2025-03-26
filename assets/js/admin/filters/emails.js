@@ -93,7 +93,7 @@
       ]),
     }))
 
-    Registry.registerFilter(createFilter('funnel', 'Funnel', group, {
+    Registry.registerFilter(createFilter('funnel', 'Flow', group, {
       display: ({ funnel_id = false }) => {
 
         if (!funnel_id) {

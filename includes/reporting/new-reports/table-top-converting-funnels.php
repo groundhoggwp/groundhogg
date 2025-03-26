@@ -22,7 +22,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Funnel', 'groundhogg' ),
+			__( 'Flow', 'groundhogg' ),
 			__( 'Conversions', 'groundhogg' )
 		];
 	}

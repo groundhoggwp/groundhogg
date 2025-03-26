@@ -29,7 +29,7 @@ class Table_All_Funnels_Performance_Without_Email extends Table_All_Funnels_Perf
 
 	public function get_label() {
 		return [
-			__( 'Funnel', 'groundhogg' ),
+			__( 'Flow', 'groundhogg' ),
 			__( 'Added', 'groundhogg' ),
 			__( 'Active', 'groundhogg' ),
 			__( 'Conversions', 'groundhogg' ),

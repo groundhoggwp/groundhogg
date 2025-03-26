@@ -256,7 +256,7 @@ class Email_Reports extends Notification_Builder {
 					$addedByName = html()->a( admin_page_url( 'gh_funnels', [
 						'action' => 'edit',
 						'funnel' => $task->funnel_id
-					], $task->step_id ), __( 'Funnel' ) );
+					], $task->step_id ), __( 'Flow' ) );
 					break;
 			}
 

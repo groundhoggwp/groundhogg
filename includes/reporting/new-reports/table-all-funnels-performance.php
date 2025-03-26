@@ -9,7 +9,6 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Reporting\New_Reports\Traits\Funnel_Conversion_Stats;
 use function Groundhogg\_nf;
-use function Groundhogg\array_find;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\find_object;
@@ -32,7 +31,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Funnel', 'groundhogg' ),
+			__( 'Flow', 'groundhogg' ),
 			__( 'Added', 'groundhogg' ),
 			__( 'Active', 'groundhogg' ),
 			__( 'Conversions', 'groundhogg' ),

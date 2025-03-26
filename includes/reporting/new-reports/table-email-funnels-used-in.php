@@ -21,7 +21,7 @@ class Table_Email_Funnels_Used_In extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Funnel', 'groundhogg' ),
+			__( 'Flow', 'groundhogg' ),
 			__( 'Step', 'groundhogg' ),
 			__( 'Sent', 'groundhogg' ),
 			__( 'Open Rate', 'groundhogg' ),
