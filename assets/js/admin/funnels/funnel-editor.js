@@ -60,14 +60,23 @@
       } = data
 
       let placeholder = Div({
-        className: `step step-placeholder ${ step_group }`,
+        className: `step step-placeholder ${ step_group } ${step_type}`,
       }, [
-        Span({ className: 'step-title' }, 'Loading...'),
         Input({
           type : 'hidden',
           name : 'step_ids[]',
           value: JSON.stringify(data),
         }),
+        Div({ className: 'hndle' }, [
+          // icon
+          Div({ className: 'hndle-icon' }, Groundhogg.rawStepTypes[step_type].svg ),
+          Div({}, [
+            // title,
+            Span({className:'step-title loading-dots'}, 'Loading' ),
+            // name
+            Span({className:'step-name'}, Groundhogg.rawStepTypes[step_type].name )
+          ])
+        ]),
       ])
 
       if (step_group !== 'benchmark') {
