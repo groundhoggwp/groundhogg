@@ -83,19 +83,19 @@ class Apply_Note extends Action {
 		echo html()->e( 'p', [], 'What type of note is being added?' );
 
 		echo html()->dropdown( [
-			'name'    => $this->setting_name_prefix( 'note_type' ),
-			'options' => [
+			'name'     => $this->setting_name_prefix( 'note_type' ),
+			'options'  => [
 				'note'    => 'Note',
 				'call'    => 'Call',
 				'email'   => 'Email',
 				'meeting' => 'Meeting',
 			],
-            'selected' => $this->get_setting( 'note_type' ),
+			'selected' => $this->get_setting( 'note_type' ),
 		] );
 
 		echo html()->e( 'p', [], 'Add the note content...' );
 
-		echo html()->e('div', [ 'class' => 'ignore-morph' ], html()->textarea( [
+		echo html()->e( 'div', [ 'class' => 'ignore-morph' ], html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'note_text' ),
 			'name'  => 'note_text',
 			'value' => $this->get_setting( 'note_text' )
@@ -130,13 +130,13 @@ class Apply_Note extends Action {
 	public function run( $contact, $event ) {
 
 		$note = $this->get_setting( 'note_text' );
-
+		$type = $this->get_setting( 'note_type', 'note' );
 		$finished_note = do_replacements( $note, $contact );
-
 		// Add funnel context
 		$note = $contact->add_note( $finished_note, 'funnel', $event->get_funnel_id(), [
 			'timestamp'    => $event->get_time(),
-			'date_created' => Ymd_His( $event->get_time() )
+			'date_created' => Ymd_His( $event->get_time() ),
+			'type'         => $type,
 		] );
 
 		$event->set_args( [
