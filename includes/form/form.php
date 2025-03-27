@@ -284,6 +284,7 @@ class Form implements \JsonSerializable {
 		return $this->shortcode();
 	}
 
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
 			'ID'            => $this->get_id(),
