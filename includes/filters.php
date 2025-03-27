@@ -362,23 +362,22 @@ function _responsive_tag_compat_callback( $matches ) {
 }
 
 /**
- * Add a link to the FB group in the admin footer.
+ * Add a link to the review Groundhogg in footer.
  *
  * @param $text
  *
  * @return string|string[]|null
  */
-function add_bug_report_prompt( $text ) {
-	if ( ! is_white_labeled() ) {
-		if ( is_admin_groundhogg_page() && apply_filters( 'groundhogg/footer/show_text', true ) ) {
-			return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>' ), __( 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ) ), $text );
-		}
+function add_review_link_in_footer( $text ) {
+
+	if ( ! is_string( $text ) || is_white_labeled() || ! is_admin_groundhogg_page() || ! apply_filters( 'groundhogg/footer/show_text', true ) ){
+		return $text;
 	}
 
-	return $text;
+	return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>' ), __( 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ) ), $text );
 }
 
-add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt' );
+add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_review_link_in_footer' );
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
