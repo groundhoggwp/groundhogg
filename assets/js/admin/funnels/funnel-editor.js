@@ -50,7 +50,7 @@
 
   const getFunnel = () => FunnelsStore.get(Funnel.id)
 
-  if (typeof Funnel !== 'undefined' && !Funnel.data) {
+  if (typeof Funnel !== 'undefined' && Funnel.is_editor) {
 
     const createPlaceholderEl = (data) => {
 
@@ -60,7 +60,7 @@
       } = data
 
       let placeholder = Div({
-        className: `step step-placeholder ${ step_group } ${step_type}`,
+        className: `step step-placeholder ${ step_group } ${ step_type }`,
       }, [
         Input({
           type : 'hidden',
@@ -69,13 +69,13 @@
         }),
         Div({ className: 'hndle' }, [
           // icon
-          Div({ className: 'hndle-icon' }, Groundhogg.rawStepTypes[step_type].svg ),
+          Div({ className: 'hndle-icon' }, Groundhogg.rawStepTypes[step_type].svg),
           Div({}, [
             // title,
-            Span({className:'step-title loading-dots'}, 'Loading' ),
+            Span({ className: 'step-title loading-dots' }, 'Loading'),
             // name
-            Span({className:'step-name'}, Groundhogg.rawStepTypes[step_type].name )
-          ])
+            Span({ className: 'step-name' }, Groundhogg.rawStepTypes[step_type].name),
+          ]),
         ]),
       ])
 
@@ -1788,8 +1788,8 @@
             target  : '#funnel-activate',
           },
         ], {
-          fixed    : true,
-          onFinish : () => {
+          fixed        : true,
+          onFinish     : () => {
             dialog({
               message: '🎉 Tour complete!',
             })
@@ -1798,14 +1798,15 @@
               notice: 'funnel-tour',
             })
           },
-          onDismiss: () => {
+          beforeDismiss: ({dismiss}) => {
             confirmationModal({
               alert    : `<p>Are you sure you want to exit the tour?</p>`,
               onConfirm: () => {
+                dismiss()
                 return ajax({
                   action: 'gh_dismiss_notice',
                   notice: 'funnel-tour',
-                })
+                }).then(() => true)
               },
             })
           },
@@ -1817,19 +1818,68 @@
       drawLogicLines()
       Funnel.init().then(() => {
 
-        // Funnel.startTour()
-
-        // if tour is dismissed, do nothing
+        // if tour is dismissed, do regular stuff
         if (Funnel.funnelTourDismissed) {
+
+          const url = new URL(window.location);
+
+          // do title prompt if prompted...
+          const hasFromAdd = url.searchParams.get("from") === 'add';
+
+          if ( hasFromAdd ){
+
+            // remove from url so reloads don't re-prompt
+            url.searchParams.delete("from");
+            window.history.replaceState({}, "", url);
+
+            // Prompt to rename the funnel
+            MakeEl.ModalWithHeader({
+              header:  'Name your flow',
+              onOpen: () => {
+                let input = document.getElementById( 'prompt-funnel-title' )
+                input.focus()
+                input.select()
+              }
+            }, ({close}) => MakeEl.Form({
+              onSubmit: e => {
+                e.preventDefault()
+                let fd = new FormData(e.currentTarget)
+                let title = fd.get( 'funnel_title' )
+
+                $('.title-view').find('.title').text(title)
+                $('#title').val(title)
+                Funnel.saveQuietly()
+                close()
+              },
+            }, [
+              Div({
+                className: 'display-flex gap-5'
+              }, [
+                Input({
+                  id: 'prompt-funnel-title',
+                  name: 'funnel_title',
+                  value: Funnel.data.title,
+                }),
+                Button({
+                  className: 'gh-button primary',
+                  type: 'submit'
+                }, 'Save')
+              ])
+            ]))
+
+          }
+
           return
         }
 
         if (Funnel.steps.length > 0) {
+          // existing funnel, ask if they want the new tour
           confirmationModal({
             alert      : `<p>👋 Funnels are now <b>Flows</b> and have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
             confirmText: 'Start tour!',
             closeText  : 'No thanks',
             onConfirm  : () => {
+              localStorage.setItem( 'gh-force-tour', 'yes' )
               // open a new scratch funnel to start the tour
               window.open(Funnel.scratchFunnelURL, '_self')
             },
@@ -1843,8 +1893,28 @@
           return
         }
 
-        // this is a scratch funnel, let the tour begin!
-        Funnel.startTour()
+        // tour is forced
+        if ( localStorage.getItem( 'gh-force-tour' ) === 'yes' ){
+          localStorage.removeItem( 'gh-force-tour' ) // clear from local storage
+          Funnel.startTour()
+          return
+        }
+
+        // this is a scratch funnel, lets ask if they want to tour
+        confirmationModal({
+          alert      : `<p>👋 Flows allow you to automate the customer journey. Would you like a tour?</p>`,
+          confirmText: 'Start tour!',
+          closeText  : 'No thanks',
+          onConfirm  : () => {
+            Funnel.startTour()
+          },
+          onCancel   : () => {
+            return ajax({
+              action: 'gh_dismiss_notice',
+              notice: 'funnel-tour',
+            })
+          },
+        })
       })
     })
 
@@ -1948,140 +2018,6 @@
   }
 
   let lineWidth
-  let leaderLines = []
-
-  function drawLeaderLine (from, to, opts) {
-
-    if (!lineWidth) {
-      lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
-    }
-
-    let line = new LeaderLine(from, to, {
-      size       : lineWidth,
-      path       : 'fluid',
-      color      : '',
-      startSocket: 'bottom',
-      endSocket  : 'top',
-      endPlug    : 'arrow3',
-      ...opts,
-    })
-
-    leaderLines.push(line)
-
-    return line
-  }
-
-  function drawLeaderLines () {
-    // clear existing leader lines and re-draw
-    leaderLines.forEach(line => line.remove())
-
-    document.querySelectorAll('.step-branch.benchmarks > .sortable-item').forEach(el => {
-      drawLeaderLine(el, el.parentElement)
-    })
-
-  }
-
-  const drawLogicLine = (from, to, opts = {}) => {
-
-    let {
-      fromSocket = 'bottom', // top, right, bottom, left
-      toSocket = 'top', // top, right, bottom, left
-    } = opts
-
-    // const borderRadius = '50px'
-    const borderRadius = 'var(--logic-line-radius)'
-    const borderWidth = `var(--logic-line-width)`
-
-    if (!lineWidth) {
-      lineWidth = parseInt(window.getComputedStyle(document.getElementById('step-flow')).getPropertyValue('--logic-line-width'))
-    }
-
-    let fromPos = from.getBoundingClientRect()
-    let toPos = to.getBoundingClientRect()
-
-    let fromX, fromY
-
-    switch (toSocket) {
-      case 'top':
-        fromX = fromPos.left + fromPos.width / 2
-        fromY = fromPos.top
-        break
-      case 'right':
-        fromX = fromPos.right
-        fromY = fromPos.top + fromPos.height / 2
-        break
-      case 'bottom':
-        fromX = fromPos.left + fromPos.width / 2
-        fromY = toPos.bottom
-        break
-      case 'left':
-        fromX = fromPos.left
-        fromY = fromPos.top + fromPos.height / 2
-        break
-    }
-
-    let toX, toY
-
-    switch (toSocket) {
-      case 'top':
-        toX = toPos.left + toPos.width / 2
-        toY = toPos.top
-        break
-      case 'right':
-        toX = toPos.right
-        toY = toPos.top + toPos.height / 2
-        break
-      case 'bottom':
-        toX = toPos.left + toPos.width / 2
-        toY = toPos.bottom
-        break
-      case 'left':
-        toX = toPos.left
-        toY = toPos.top + toPos.height / 2
-        break
-    }
-
-    let boxHeight = Math.abs(fromY - toY)
-    let boxWidth = Math.abs(fromX - toX)
-
-    let LineContainer = Div({
-      className: 'logic-line-container',
-      style    : {
-        height: `${ boxHeight }px`,
-        width : `${ boxWidth }px`,
-      },
-    }, [
-      Div({
-        className: 'logic-line',
-        style    : {
-          width : '50%',
-          height: '50%',
-        },
-      }),
-      Div({
-        className: 'logic-line',
-        style    : {
-          width : '50%',
-          height: '50%',
-        },
-      }),
-    ])
-
-    // leading right
-    if (fromX < toX) {
-
-    }
-    // leading left
-    else if (fromX > toX) {
-
-    }
-    // leading straight
-    else {
-
-    }
-
-    return LineContainer
-  }
 
   function drawLogicLines () {
 

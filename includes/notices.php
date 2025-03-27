@@ -37,6 +37,7 @@ class Notices {
 
 		add_action( 'admin_init', [ $this, 'dismiss_notices' ] );
 		add_action( 'wp_ajax_gh_dismiss_notice', [ $this, 'ajax_dismiss_notice' ] );
+		add_action( 'wp_ajax_gh_undismiss_notice', [ $this, 'ajax_undismiss_notice' ] );
 		add_action( 'wp_ajax_gh_read_notice', [ $this, 'ajax_read_notice' ] );
 		add_action( 'wp_ajax_gh_remote_notifications', [ $this, 'ajax_fetch_remote_notices' ] );
 	}
@@ -298,6 +299,23 @@ class Notices {
 
 		wp_send_json_success();
 	}
+
+	/**
+	 * Dismiss a notice with Ajax
+	 *
+	 * @return void
+	 */
+	public function ajax_undismiss_notice() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$this->undismiss_notice( get_post_var( 'notice' ) );
+
+		wp_send_json_success();
+	}
+
 
 	/**
 	 * Dismiss a notice via the URL permanently.

@@ -22,7 +22,6 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
-use function Groundhogg\get_store_products;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -217,16 +216,18 @@ class Funnels_Page extends Admin_Page {
 
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
-				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-					'steps'               => $funnel->get_steps(),
+
+				$data = array_merge( $funnel->get_as_array(), [
 					'id'                  => absint( get_request_var( 'funnel' ) ),
 					'save_text'           => __( 'Update', 'groundhogg' ),
 					'export_url'          => $funnel->export_url(),
 					'is_active'           => $funnel->is_active(),
-					'themeStyle'          => get_stylesheet_uri(),
 					'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
 					'scratchFunnelURL'    => action_url( 'start_from_scratch' ),
+					'is_editor'           => true,
 				] );
+
+				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
 
 				wp_enqueue_script( 'groundhogg-admin-replacements' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
@@ -427,7 +428,7 @@ class Funnels_Page extends Admin_Page {
 				'title' => sprintf( __( 'Copy of %s', 'groundhogg' ), $funnel->get_title() ),
 			] );
 
-			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
+			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id, 'from' => 'add' ] );
 		}
 
 		return false;
@@ -471,7 +472,7 @@ class Funnels_Page extends Admin_Page {
 			'status' => 'inactive',
 		] );
 
-		return $funnel->admin_link();
+		return add_query_arg( 'from', 'add', $funnel->admin_link() );
 	}
 
 	/**
@@ -576,7 +577,8 @@ class Funnels_Page extends Admin_Page {
 
 		return admin_page_url( 'gh_funnels', [
 			'action' => 'edit',
-			'funnel' => $funnel_id
+			'funnel' => $funnel_id,
+			'from'   => 'add'
 		] );
 
 	}
@@ -615,9 +617,9 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel = $this->get_current_funnel();
 
-        if ( ! $funnel->exists() ){
-	        wp_send_json_error();
-        }
+		if ( ! $funnel->exists() ) {
+			wp_send_json_error();
+		}
 
 		$response = [
 			'sortable' => $funnel->step_flow( false ),
@@ -656,9 +658,9 @@ class Funnels_Page extends Admin_Page {
 		$funnel_id = absint( get_request_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
 
-        if ( ! $funnel->exists() ){
-            wp_send_json_error();
-        }
+		if ( ! $funnel->exists() ) {
+			wp_send_json_error();
+		}
 
 		// restore the prev state of the steps...
 		if ( get_post_var( '_restore' ) ) {

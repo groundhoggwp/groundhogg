@@ -2487,6 +2487,7 @@
 
   const Tour = (steps, {
     onFinish = () => {},
+    beforeDismiss = ({dismiss}) => dismiss(),
     onDismiss = () => {},
     fixed = false,
   }) => {
@@ -2505,10 +2506,14 @@
       document.querySelectorAll('.tour-highlighted').forEach(el => el.classList.remove('tour-highlighted'))
     }
 
-    const dismiss = () => {
+    const remove = () => {
       removeSteps()
       document.removeEventListener('resize', rePositionStep)
       document.removeEventListener('scroll', rePositionStep)
+    }
+
+    const dismiss = async () => {
+      remove()
       onDismiss()
     }
 
@@ -2518,9 +2523,7 @@
       onNext()
 
       if (State.current + 1 >= steps.length) {
-        removeSteps()
-        document.removeEventListener('resize', rePositionStep)
-        document.removeEventListener('scroll', rePositionStep)
+        remove()
         onFinish(true)
         return
       }
@@ -2723,7 +2726,9 @@
       }, [
         MakeEl.Button({
           className: 'dismiss',
-          onClick  : e => dismiss(),
+          onClick  : e => {
+            beforeDismiss({ dismiss, State })
+          },
         }, MakeEl.Dashicon('no-alt')),
         MakeEl.Div({}, currentStep().prompt),
         MakeEl.Div({ className: 'display-flex flex-end gap-5 space-above-10' }, [

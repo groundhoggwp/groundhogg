@@ -618,7 +618,7 @@
     ])
 
     const close = () => {
-      onClose( modal )
+      onClose(modal)
       modal.remove()
     }
 
@@ -651,23 +651,28 @@
       morph,
     })
 
-    modal.focus()
+    if (!modal.contains(document.activeElement)) {
+      modal.focus()
+    }
 
     return modal
   }
 
-  const ModalWithHeader = ( { header = '', ...args }, children ) => Modal(args, methods => Div({}, [
+  const ModalWithHeader = ({
+    header = '',
+    ...args
+  }, children) => Modal(args, methods => Div({}, [
     Div({
       className: 'gh-header modal-header',
     }, [
-      MakeEl.H3({}, header ),
+      MakeEl.H3({}, header),
       MakeEl.Button({
         className: 'gh-button icon secondary text',
         onClick  : methods.close,
       }, MakeEl.Dashicon('no-alt')),
     ]),
-    maybeCall( children, methods )
-  ]) )
+    maybeCall(children, methods),
+  ]))
 
   /**
    * Custom modal appended to the body.
@@ -1169,7 +1174,7 @@
       }
 
       setState({
-        search: ''
+        search: '',
       })
 
       morph()
@@ -1438,10 +1443,10 @@
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
       tabindex : '0',
       onKeydown: e => {
-        if ( e.key === 'Escape' ){
+        if (e.key === 'Escape') {
           setState({
             searching: false,
-            focused: false
+            focused  : false,
           })
           morph()
         }
