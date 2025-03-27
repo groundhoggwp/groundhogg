@@ -100,7 +100,7 @@
         name = __('System')
         break
       case 'funnel':
-        name = __('Floow')
+        name = __('Flow')
         break
     }
 

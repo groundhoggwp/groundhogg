@@ -526,7 +526,7 @@
         {
           key: 'funnel',
           cap: 'view_funnels',
-          text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'),
+          text: sprintf(__('Add %s contacts to a flow', 'groundhogg'),
             totalContactsFormatted),
         },
         {
@@ -570,7 +570,7 @@
 
               modal({
                 //language=HTML
-                content: `<h2>${ __('Add contacts to a funnel', 'groundhogg') }</h2>
+                content: `<h2>${ __('Add contacts to a flow', 'groundhogg') }</h2>
                 <div id="gh-add-to-funnel" style="width: 500px"></div>`,
                 onOpen: () => {
                   document.getElementById('gh-add-to-funnel').append(Groundhogg.FunnelScheduler({

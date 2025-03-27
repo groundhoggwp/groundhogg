@@ -205,7 +205,7 @@ class Events_Page extends Tabbed_Admin_Page {
 								'Schedule_Broadcast'     => __( 'Schedule broadcast', 'groundhogg' ),
 								'Update_Contacts'        => __( 'Update contacts', 'groundhogg' ),
 								'Delete_Contacts'        => __( 'Delete contacts', 'groundhogg' ),
-								'Add_Contacts_To_Funnel' => __( 'Add contacts to funnel', 'groundhogg' ),
+								'Add_Contacts_To_Funnel' => __( 'Add contacts to flow', 'groundhogg' ),
 								'Complete_Benchmark'     => __( 'Trigger Flow', 'groundhogg' ),
 							]
 						],

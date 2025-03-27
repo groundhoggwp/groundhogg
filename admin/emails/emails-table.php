@@ -74,7 +74,7 @@ class Emails_Table extends Table {
 			'subject'      => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'from_user'    => _x( 'From User', 'Column label', 'groundhogg' ),
 			'campaigns'    => _x( 'Campaigns', 'Column label', 'groundhogg' ),
-			'funnels'      => _x( 'Funnels', 'Column label', 'groundhogg' ),
+			'funnels'      => _x( 'Flows', 'Column label', 'groundhogg' ),
 			'author'       => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 		];
