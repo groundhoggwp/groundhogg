@@ -50,6 +50,6 @@ class Post_Published extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/post-published.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/wordpress/post-published.svg';
 	}
 }

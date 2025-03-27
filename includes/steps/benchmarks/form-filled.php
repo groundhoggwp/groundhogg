@@ -85,7 +85,7 @@ class Form_Filled extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/web-form.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/forms/web-form.svg';
 	}
 
 
@@ -470,28 +470,28 @@ class Form_Filled extends Benchmark {
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="code"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Iframe' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="code"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'HTML' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="code"
                             value="<?php echo esc_attr( $form_embed_code ); ?>"
                             readonly>
                     <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
-                            class="regular-text code"
+                            class="code"
                             value="<?php echo esc_attr( $form->get_submission_url() ); ?>"
                             readonly>
                 </div>

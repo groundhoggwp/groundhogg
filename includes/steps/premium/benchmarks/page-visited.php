@@ -54,7 +54,6 @@ class Page_Visited extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/page-visited.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/page-visited.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/activity/page-visited.svg';
 	}
 }

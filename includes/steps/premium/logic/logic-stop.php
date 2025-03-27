@@ -22,6 +22,6 @@ class Logic_Stop extends Logic {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic-end.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/logic-end.svg';
 	}
 }

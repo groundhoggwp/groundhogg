@@ -77,7 +77,7 @@ class Account_Created extends Benchmark {
 	 */
 	public function get_icon() {
 //		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/account-created.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/user-created.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/wordpress/user-created.svg';
 	}
 
 	/**

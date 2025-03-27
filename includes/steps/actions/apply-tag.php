@@ -73,7 +73,7 @@ class Apply_Tag extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/apply-tag.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/crm/apply-tag.svg';
 	}
 
 	/**

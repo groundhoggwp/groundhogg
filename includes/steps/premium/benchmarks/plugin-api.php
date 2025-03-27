@@ -15,7 +15,7 @@ class Plugin_Api extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Plugin API Benchmark', 'groundhogg-pro' );
+		return __( 'Plugin API Trigger', 'groundhogg-pro' );
 	}
 
 	/**
@@ -46,7 +46,6 @@ class Plugin_Api extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/plugin-api.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/plugin-api-benchmark.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/developer/plugin-api-benchmark.svg';
 	}
 }

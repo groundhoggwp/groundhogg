@@ -23,7 +23,7 @@ class If_Else extends Branch_Logic {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/yes-no.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/yes-no.svg';
 	}
 
 	public function settings( $step ) {

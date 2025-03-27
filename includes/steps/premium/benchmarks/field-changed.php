@@ -26,7 +26,6 @@ class Field_Changed extends Benchmark {
 	}
 
 	public function get_icon() {
-//		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/field-changed.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/field-changed.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/crm/field-changed.svg';
 	}
 }

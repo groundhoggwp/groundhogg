@@ -50,6 +50,6 @@ class Role_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/user-role-changed.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/wordpress/user-role-changed.svg';
 	}
 }

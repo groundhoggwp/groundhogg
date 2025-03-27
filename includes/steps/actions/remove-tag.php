@@ -69,7 +69,7 @@ class Remove_Tag extends Apply_Tag {
 	 */
 	public function get_icon() {
 //		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/remove-tag.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/remove-tag.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/crm/remove-tag.svg';
 	}
 
 	/**

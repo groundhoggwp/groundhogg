@@ -22,6 +22,6 @@ class Logic_Loop extends Logic {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic-loop.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/logic-loop.svg';
 	}
 }

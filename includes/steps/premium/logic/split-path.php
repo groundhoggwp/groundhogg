@@ -28,7 +28,7 @@ class Split_Path extends Branch_Logic {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/split-path.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/split-path.svg';
 	}
 
 	/**

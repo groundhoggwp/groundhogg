@@ -21,6 +21,6 @@ class Skip extends Loop {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic-skip.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/logic-skip.svg';
 	}
 }

@@ -28,6 +28,6 @@ class Webhook_Listener extends Benchmark {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/webhook-listener.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/developer/webhook-listener.svg';
 	}
 }

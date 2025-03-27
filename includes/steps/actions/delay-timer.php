@@ -121,7 +121,7 @@ class Delay_Timer extends Action {
 	 */
 	public function get_icon() {
 //		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/delay-timer.png';
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/delay-timer.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/delay/delay-timer.svg';
 	}
 
 	public function admin_scripts() {

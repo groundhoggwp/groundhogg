@@ -57,6 +57,6 @@ class Create_User extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/create-user.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/wordpress/create-user.svg';
 	}
 }

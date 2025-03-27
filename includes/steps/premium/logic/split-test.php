@@ -29,7 +29,7 @@ class Split_Test extends Split_Path {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/split-test.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/split-test.svg';
 	}
 
 	/**

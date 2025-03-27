@@ -22,7 +22,7 @@ class Loop extends Action {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic-loop.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/logic-loop.svg';
 	}
 
 	public function get_sub_group() {

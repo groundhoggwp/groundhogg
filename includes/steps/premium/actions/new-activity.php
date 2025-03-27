@@ -55,6 +55,6 @@ class New_Activity extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/new-custom-activity.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/developer/new-custom-activity.svg';
 	}
 }

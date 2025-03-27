@@ -105,7 +105,7 @@ class Task_Completed extends Benchmark {
 	}
 
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/task-completed.svg';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/crm/task-completed.svg';
 	}
 
 	protected function get_preceding_task_steps( $step ) {
