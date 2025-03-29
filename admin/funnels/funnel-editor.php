@@ -86,10 +86,10 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				$classes[] = 'premium';
 			}
 
-            $keywords = [
-                $step->get_name(),
-	            $name,
-            ];
+			$keywords = [
+				$step->get_name(),
+				$name,
+			];
 
 			?>
         <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-keywords="<?php esc_attr_e( implode( ',', $keywords ) ); ?>">
@@ -170,16 +170,37 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				'class' => 'gh-button secondary text icon',
 				'id'    => 'funnel-settings',
 				'type'  => 'button',
-			], dashicon( 'admin-settings' ) ); ?>
-            <button type="button" id="funnel-deactivate" class="gh-button danger text">Deactivate</button>
-            <button type="button" id="funnel-update" class="gh-button primary">
-                <span class="button-text">Publish Changes</span>
-                <span class="gh-spinner"></span>
-            </button>
-            <button type="button" id="funnel-activate" class="gh-button action">
-                <span class="button-text">Activate</span>
-                <span class="gh-spinner"></span>
-            </button>
+			], dashicon( 'admin-settings' ) );
+
+			echo html()->button( [
+				'type'     => 'button',
+				'class'    => 'gh-button danger text',
+				'id'       => 'funnel-deactivate',
+				'text'     => 'Deactivate',
+			] );
+
+			echo html()->button( [
+				'type'     => 'button',
+				'class'    => 'gh-button primary',
+				'disabled' => ! $funnel->has_changes(),
+				'id'       => 'funnel-update',
+				'text'     => html()->frag( [
+					html()->e( 'span', [ 'class' => 'button-text' ], 'Publish Changes' ),
+					html()->e( 'span', [ 'class' => 'gh-spinner' ] )
+				] ),
+			] );
+
+			echo html()->button( [
+				'type'  => 'button',
+				'class' => 'gh-button action',
+				'id'    => 'funnel-activate',
+				'text'  => html()->frag( [
+					html()->e( 'span', [ 'class' => 'button-text' ], 'Activate' ),
+					html()->e( 'span', [ 'class' => 'gh-spinner' ] )
+				] ),
+			] );
+
+			?>
         </div>
         <div id="close">
 			<?php
@@ -204,8 +225,8 @@ function render_draggable_step_grid( $steps, $groups = true ) {
         </div>
         <div id="step-settings-container" class="slide-out">
             <button id="collapse-settings">
-                <?php dashicon_e( 'arrow-right-alt2' ); ?>
-                <?php dashicon_e( 'arrow-left-alt2' ); ?>
+				<?php dashicon_e( 'arrow-right-alt2' ); ?>
+				<?php dashicon_e( 'arrow-left-alt2' ); ?>
             </button>
             <div id="step-settings-inner">
                 <div id="add-steps">
@@ -228,7 +249,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 
 							render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
 
-                            render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
+							render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
 							?>
                         </div>
                     </div>

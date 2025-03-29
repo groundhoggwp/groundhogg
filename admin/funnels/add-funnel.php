@@ -38,9 +38,9 @@ if ( get_url_var( 'flush' ) ) {
 	<?php $active_tab = sanitize_key( get_request_var( 'tab', 'templates' ) ); ?>
     <h2 class="nav-tab-wrapper gh-nav">
         <a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates"
-           class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Funnel Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
+           class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Flow Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
         <a id="funnel-import" href="?page=gh_funnels&action=add&tab=import"
-           class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Funnel', 'add_funnel_tab', 'groundhogg' ); ?></a>
+           class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Flow', 'add_funnel_tab', 'groundhogg' ); ?></a>
     </h2>
     <script>
       (() => {
@@ -166,14 +166,14 @@ if ( get_url_var( 'flush' ) ) {
 
 <?php else: ?>
     <div class="gh-tools-wrap">
-        <p class="tools-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
+        <p class="tools-help"><?php _e( 'If you have a flow import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
         <form method="post" enctype="multipart/form-data" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
             <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
             <hr/>
             <input type="file" name="funnel_template" id="funnel_template" accept=".funnel,.json">
             <button style="float: right" class="gh-button primary" name="funnel_import"
-                    value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
+                    value="import"><?php _ex( 'Import Flow', 'action', 'groundhogg' ); ?></button>
             <div class="wp-clearfix"></div>
         </form>
         <form method="post" class="gh-tools-box gh-panel">
@@ -183,7 +183,7 @@ if ( get_url_var( 'flush' ) ) {
             <textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json"
                       placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ); ?>"></textarea>
             <button style="float: right" class="gh-button primary" name="funnel_import"
-                    value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
+                    value="import"><?php _ex( 'Import Flow', 'action', 'groundhogg' ); ?></button>
             <div class="wp-clearfix"></div>
         </form>
     </div>
