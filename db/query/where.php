@@ -582,4 +582,23 @@ class Where {
 		$this->prefix_condition_with_not = true;
 		return $this;
 	}
+
+	/**
+	 * Use the not exists function
+	 *
+	 * @throws \Exception
+	 *
+	 * @param $query
+	 *
+	 * @return $this
+	 */
+	public function notExists( $query ) {
+
+		if ( ! is_a( $query, Query::class ) || ! is_string( $query ) ) {
+			throw new \Exception( 'Must use string or Query' );
+		}
+
+		$this->addCondition( "NOT EXISTS ($query)" );
+		return $this;
+	}
 }

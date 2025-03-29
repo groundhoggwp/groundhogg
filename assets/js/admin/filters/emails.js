@@ -176,6 +176,17 @@
         }
       },
     }))
+
+    Registry.registerFilter(Groundhogg.filters.createPastDateFilter('sent', 'Sent', group, {
+      display: () => 'Sent at least once',
+    } ) )
+
+    Registry.registerFilter(createFilter('unused', 'Unused', group, {
+      display: () => 'Unused in any flows, broadcasts, and has not been sent in the last 6 months',
+      edit: () => Fragment([
+        'This filter has no settings.'
+      ])
+    } ) )
   }
 
   if ( window.GroundhoggTableFilters ){

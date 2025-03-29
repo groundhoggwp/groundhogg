@@ -1538,6 +1538,9 @@ abstract class DB {
 					$query->setGroupby( $val );
 					break;
 				case 'filters':
+				case 'filters1':
+				case 'filters2':
+				case 'filters3':
 				case 'include_filters':
 
 					$this->parse_filters( $val, $query->where() );

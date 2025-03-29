@@ -3,10 +3,13 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use Groundhogg\DB\Query\Query;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\Email;
+use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\db;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -74,6 +77,38 @@ class Emails extends DB {
 	protected function maybe_register_filters() {
 		parent::maybe_register_filters();
 
+		$this->query_filters->register( 'sent', function ( $filter, Where $where, Table_Query $query ) {
+
+			// not sent recently
+			$eventJoin = $query->addJoin( 'LEFT', 'events' );
+			$eventJoin->onColumn( 'email_id', 'emails.ID' );
+			Filters::timestamp( 'events.time', $filter, $eventJoin->conditions );
+			$where->isNotNull( "$eventJoin->alias.ID" );
+
+			$query->setGroupby( 'ID' );
+		} );
+
+
+		$this->query_filters->register( 'unused', function ( $filter, Where $where, Table_Query $query ) {
+
+			// not used in a funnel
+			$stepJoin = $query->addJoin( 'LEFT', 'stepmeta' );
+			$stepJoin->onColumn( 'meta_value', 'emails.ID' )->equals( 'meta_key', 'email_id' );
+			$where->isNull( "$stepJoin->alias.step_id" );
+
+			// not used by a broadcast
+			$broadcastJoin = $query->addJoin( 'LEFT', 'broadcasts' );
+			$broadcastJoin->onColumn( 'object_id', 'emails.ID' )->equals( 'object_type', 'email' );
+			$where->isNull( "$broadcastJoin->alias.ID" );
+
+			// not sent recently
+			$eventJoin = $query->addJoin( 'LEFT', 'events' );
+			$eventJoin->onColumn( 'email_id', 'emails.ID' )->greaterThan( 'events.time', (new DateTimeHelper('6 months ago'))->getTimestamp() );
+			$where->isNull( "$eventJoin->alias.ID" );
+
+			$query->setGroupby( 'ID' );
+		} );
+
 		// From user filter
 		$this->query_filters->register( 'from_user', function ( $filter, Where $where ) {
 			$filter = wp_parse_args( $filter, [
@@ -110,7 +145,7 @@ class Emails extends DB {
 			$join = $where->query->addJoin( 'LEFT', [ $stepQuery, $alias ] );
 			$join->onColumn( "email_id" );
 
-			if ( $funnel_id ){
+			if ( $funnel_id ) {
 				$where->equals( "$alias.funnel_id", $funnel_id );
 			} else {
 				$where->isNotNull( "$alias.funnel_id" );
@@ -137,6 +172,17 @@ class Emails extends DB {
 	protected function add_additional_actions() {
 		parent::add_additional_actions();
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
+	}
+
+	public function query( $query_vars = [], $ORDER_BY = '', $from_cache = true ) {
+
+		if ( isset_not_empty( $query_vars, 'unused' ) ){
+			$query_vars['filters1'] = [[[
+				'type' => 'unused'
+			]]];
+		}
+
+		return parent::query( $query_vars, $ORDER_BY, $from_cache );
 	}
 
 	public function owner_deleted( $prev, $new ) {

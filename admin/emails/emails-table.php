@@ -10,7 +10,6 @@ use Groundhogg\Plugin;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\check_lock;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
@@ -125,14 +124,14 @@ class Emails_Table extends Table {
 	 */
 	protected function column_title( $email ) {
 
-        $subject = $email->get_title();
+		$subject = $email->get_title();
 		$editUrl = $email->admin_link();
 
 		if ( $this->get_view() === 'trash' ) {
 			return "<strong class='row-title'>{$subject}</strong>";
 		}
 
-        row_item_locked_text( $email );
+		row_item_locked_text( $email );
 
 		$html = "<strong>";
 
@@ -413,6 +412,13 @@ class Emails_Table extends Table {
 						]
 					],
 					'status'     => [ 'ready', 'draft' ]
+				],
+			],
+			[
+				'view'    => 'unused',
+				'display' => __( 'Unused', 'groundhogg' ),
+				'query'   => [
+					'unused' => true
 				],
 			],
 			[

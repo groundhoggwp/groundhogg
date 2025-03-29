@@ -3847,7 +3847,7 @@
               },
             })) : null,
           Control({
-              label: 'Show in my templates',
+              label: 'Show in templates when creating new emails',
             },
             Toggle({
               id      : 'save-as-template',
@@ -9340,37 +9340,14 @@
       }
 
       blocks = [
-        createBlock('text'),
-
-        createBlock('spacer'),
-
-        createBlock('button'),
-
-        createBlock('spacer'),
-
-        createBlock('text'),
-
-        createBlock('spacer'),
-
-        createBlock('social', {
-          socials: [
-            'facebook',
-            'twitter',
-            'instagram',
-            'linkedin',
-            'youtube',
-          ].map(i => [
-            i,
-            `https://${ i }.com`,
-          ]),
-
-          align: 'left',
+        createBlock('text', {
+          //language=HTML
+          content: `<p>Hi {first::there},</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna.</p>
+          <p>Regards,</p>
+          <p>{owner_signature}</p>`
         }),
-
-        createBlock('spacer'),
-
         createBlock('footer'),
-
       ]
 
       page = 'templates'
