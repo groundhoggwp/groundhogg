@@ -560,12 +560,6 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_steps( $query = [] ) {
 
-//		static $steps;
-//
-//		if ( $steps ){
-//			return $steps;
-//		}
-
 		$query = wp_parse_args( $query, [
 			'funnel_id' => $this->get_id(),
 			'orderby'   => 'step_order',
@@ -689,16 +683,28 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * A funnel has changes if any of its steps have changes, the step is inactive or deleted
+	 *
+	 * @return bool
+	 */
+	public function has_changes() {
+		return array_any( $this->get_steps(), function ( Step $step ) {
+			return $step->has_changes() || in_array( $step->step_status, [ 'inactive', 'deleted' ] );
+		});
+	}
+
+	/**
 	 * Return wrapper function.
 	 *
 	 * @return array|bool
 	 */
 	public function export() {
+		// only export real steps
+		$json = $this->get_as_array();
 
-		$steps = $this->get_steps();
-
-
-		return $this->get_as_array();
+		return array_merge( $json, [
+			'steps' => $this->get_real_steps()
+		] );
 	}
 
 	/**

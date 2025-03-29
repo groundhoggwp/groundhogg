@@ -1873,4 +1873,15 @@ class HTML {
 		], $tri . number_format( abs( $percentage ) ) . '%' );
 	}
 
+	/**
+     * Kinda like a JS doc fragumeent
+     *
+	 * @param $stuff
+	 *
+	 * @return string
+	 */
+	public function frag( $stuff ) {
+        return is_array( $stuff ) ? implode( '', $stuff ) : "$stuff";
+	}
+
 }

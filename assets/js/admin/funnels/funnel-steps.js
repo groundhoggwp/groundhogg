@@ -1142,4 +1142,6 @@
     },
   })
 
+  Groundhogg.components.TagPicker = TagPicker
+
 } )(jQuery)

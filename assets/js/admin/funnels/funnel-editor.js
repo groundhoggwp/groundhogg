@@ -653,6 +653,7 @@
             confirmText: __('Deactivate'),
             onConfirm  : () => {
               this.save({
+                quiet: false,
                 moreData: formData => formData.append('_deactivate', true),
               })
             },
@@ -662,6 +663,7 @@
         $('#funnel-update').on('click', e => {
 
           const update = () => this.save({
+            quiet: false,
             moreData: formData => formData.append('_commit', true),
           })
 
@@ -686,6 +688,7 @@
         $('#funnel-activate').on('click', e => {
 
           const activate = () => this.save({
+            quiet: false,
             moreData: formData => formData.append('_activate', true),
           })
 
@@ -997,7 +1000,7 @@
         }
 
         let {
-          quiet = false,
+          quiet = true,
           moreData = () => {},
           restore = '',
         } = args
@@ -1123,8 +1126,14 @@
               this.stepSettingsCallbacks()
             }
 
+            // re-enable publish button
+            document.getElementById( 'funnel-update' ).disabled = false
+
             return response
           }
+
+          // disable publish button, changes are published
+          document.getElementById( 'funnel-update' ).disabled = true
 
           $(document).trigger('saved')
 
