@@ -137,7 +137,7 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 		<?php
 
 		$contact_methods = [
-			html()->e( 'a', [ 'href' => 'mailto: ' . get_default_from_email() ], get_default_from_email() ),
+			html()->e( 'a', [ 'href' => 'mailto:' . get_default_from_email() ], get_default_from_email() ),
 		];
 
 		$phone = get_option( 'gh_business_phone' );
