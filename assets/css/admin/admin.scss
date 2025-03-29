@@ -1526,10 +1526,25 @@ table .column-steps {
 }
 
 .gh-checkbox-label:has(input.gh-checkbox-toggle) {
-
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
+}
 
+.number-of {
+  position: absolute;
+  transform: translate(50%,-50%);
+  top: 0;
+  right: 0;
+  font-size: 11px;
+  aspect-ratio: 1/1;
+  line-height: 1;
+  background-color: $primary-dark;
+  color: #FFF;
+  border-radius: 50%;
+  width: 16px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
