@@ -17,7 +17,7 @@
     sanitizeKey,
     isString,
   } = Groundhogg.element
-  const { sprintf, __, _x } = wp.i18n
+  const { sprintf, __, _x, _n } = wp.i18n
   const { tags: TagsStore } = Groundhogg.stores
   const {
     metaPicker,
@@ -201,38 +201,22 @@
       type: 'tags',
       edit () {
         //language=HTML
-        return `<label for="type">${ __('Apply Tags') }</label>
-        <div class="setting">
-            ${ select({
-                id: 'apply-tags',
-                name: 'apply-tags',
-            }) }
-        </div>`
+        return `<label>${ __('Apply Tags') }</label>
+        <div class="setting skeleton-loading" id="apply-tags"></div>`
       },
-      onMount ({ tags = [] }, updateField) {
+      async onMount ({ tags = [] }, updateField) {
 
-        const renderTagPicker = () => {
-          tagPicker('#apply-tags', true, (items) => TagsStore.itemsFetched(items), {
-            data: tags.filter( t => TagsStore.has(t) ).map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
-          }).on('change', e => {
-            let tags = $(e.target).val().map(id => parseInt(id))
-            updateField({
-              tags,
-            })
+        if ( tags.length ){
+          await TagsStore.maybeFetchItems( tags )
+        }
+
+        morphdom( document.getElementById( 'apply-tags' ), Groundhogg.components.TagPicker({
+          id: 'apply-tags',
+          tagIds: tags,
+          onChange: tags => updateField({
+            tags
           })
-        }
-
-        if (tags && !TagsStore.hasItems(tags)) {
-          TagsStore.fetchItems({
-            id: tags,
-          }).then(() => {
-            renderTagPicker()
-          })
-        }
-        else {
-          renderTagPicker()
-        }
-
+        }) )
       },
     },
     name: {
@@ -661,19 +645,12 @@
                 <div class="select-options"></div>
             </div>`
       },
-      onMount ({ options = [['', '']] }, updateField, currentField) {
+      async onMount ({ options = [['', '']] }, updateField, currentField) {
 
-        try {
-          let allTags = options.map(opt => opt[1]).reduce((carry, current) => [...carry, ...current.split(',')], [])
-          if (!TagsStore.hasItems(allTags)) {
-            TagsStore.fetchItems({
-              tag_id: allTags,
-            })
-          }
-        }
-        catch (e) {
-          // Just preload some options
-          TagsStore.fetchItems()
+        let allTags = options.map(opt => opt[1]).reduce((carry, current) => [...carry, ...current.split(',')], [])
+
+        if ( allTags.length ){
+          await TagsStore.maybeFetchItems( allTags )
         }
 
         inputRepeater('.select-options', {
@@ -685,10 +662,14 @@
               ...props,
             }),
             ({ value, ...props }) => {
+
+              let tagCount = value.split(',').length
+
               // language=HTML
               return `
-                  <div class="inline-tag-picker">
+                  <div class="inline-tag-picker" style="position: relative">
                       ${ icons.tag }
+                      ${ value.length ? `<span class="number-of">${tagCount}</span><div class="gh-tooltip top">${sprintf( _n( 'Apply %d tag', 'Apply %d tags', tagCount, 'groundhogg' ), tagCount ) }</div>` : '' }
                       ${ input({
                           className: 'input hidden tags-input',
                           value: isString(value) ? value : '',
@@ -708,21 +689,20 @@
               }
 
               modal = miniModal(el, {
-                content: select({
-                  id: 'gh-option-tags',
-                }),
+                content: `<div id="option-tags"></div>`,
                 onOpen: () => {
 
                   let $input = $($(el).find('input'))
                   let selected = $input.val().split(',').map(t => parseInt(t)).filter(id => TagsStore.has(id))
 
-                  tagPicker('#gh-option-tags', true, (items) => TagsStore.itemsFetched(items), {
-                    data: selected.filter( t => TagsStore.has(t) ).map(id => ( { id, text: TagsStore.get(id).data.tag_name, selected: true } )),
-                    placeholder: __( 'Select tags...', 'groundhogg' )
-                  }).on('change', e => {
-                    let tagIds = $(e.target).val().map(id => parseInt(id))
-                    $input.val(tagIds.join(',')).trigger('change')
-                  })
+                  morphdom( document.getElementById( 'option-tags' ), Groundhogg.components.TagPicker({
+                    id: 'option-tags',
+                    tagIds: selected,
+                    onChange: tags => {
+                      let tagIds = tags.map(id => parseInt(id))
+                      $input.val(tagIds.join(',')).trigger('change')
+                    }
+                  }))
                 },
                 closeOnFocusout: false,
               })
@@ -732,10 +712,6 @@
             $('.inline-tag-picker').on('click', e => {
               let el = e.currentTarget
               openModal(el)
-            })
-
-            tooltip('.inline-tag-picker', {
-              content: __('Apply a tag'),
             })
           },
           onChange: (rows) => {
