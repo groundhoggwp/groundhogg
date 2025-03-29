@@ -2048,7 +2048,7 @@
           ]),
           Div({}, [
             An({
-              href: `mailto: ${ email }`,
+              href: `mailto:${ email }`,
             }, email),
             Span({}, [
               ' — ',
