@@ -851,6 +851,15 @@
                   )
                 },
               },
+              {
+                key     : 'feedback',
+                text    : 'Feedback',
+                onSelect: e => {
+                  Groundhogg.components.FeedbackModal({
+                    subject: 'Flow editor'
+                  })
+                },
+              },
             ])
           },
         }, icons.verticalDots))

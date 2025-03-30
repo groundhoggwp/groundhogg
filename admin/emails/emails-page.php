@@ -74,7 +74,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function get_name() {
-		return _x( 'Email Templates', 'page_title', 'groundhogg' );
+		return _x( 'Emails', 'page_title', 'groundhogg' );
 	}
 
 	public function get_cap() {

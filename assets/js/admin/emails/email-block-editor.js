@@ -5236,6 +5236,7 @@
                                       false)
                                     renderEditor()
                                     close()
+                                    TitlePrompt()
                                   }
 
                                   reader.readAsText(file)
@@ -5257,6 +5258,7 @@
                           page: 'editor',
                         })
                         morphEmailEditor()
+                        TitlePrompt()
                       },
                     },
                     'Start from scratch'),
@@ -5296,6 +5298,40 @@
       ])
   }
 
+  const TitlePrompt = () => MakeEl.ModalWithHeader({
+    header:  'Name this email',
+    onOpen: () => {
+      let input = document.getElementById( 'prompt-email-title' )
+      input.focus()
+      input.select()
+    }
+  }, ({close}) => MakeEl.Form({
+    onSubmit: e => {
+      e.preventDefault()
+      let fd = new FormData(e.currentTarget)
+      let title = fd.get( 'email_title' )
+      setEmailData({
+        title
+      })
+      morphHeader()
+      close()
+    },
+  }, [
+    Div({
+      className: 'display-flex gap-5'
+    }, [
+      Input({
+        id: 'prompt-email-title',
+        name: 'email_title',
+        value: getEmailData().title,
+      }),
+      Button({
+        className: 'gh-button primary',
+        type: 'submit'
+      }, 'Save')
+    ])
+  ]))
+
   const Template = ({
     ID,
     data,
@@ -5330,6 +5366,7 @@
             setBlocks(parseBlocksFromContent(data.content))
             setState({ page: 'editor' })
             renderEditor()
+            TitlePrompt()
           },
           onMouseenter: e => {
             const iframe = document.getElementById(`preview-${ ID }`)

@@ -37,6 +37,7 @@
     makeEl,
     Button,
     Modal,
+    ModalWithHeader,
     Dashicon,
     ToolTip,
     Input,
@@ -1893,8 +1894,9 @@
       submitting: false,
     })
 
-    Modal({
+    ModalWithHeader({
       width: '400px',
+      header: 'Send Feedback'
     }, ({
       close,
       morph,
