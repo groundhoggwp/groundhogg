@@ -414,13 +414,13 @@ class Emails_Table extends Table {
 					'status'     => [ 'ready', 'draft' ]
 				],
 			],
-			[
-				'view'    => 'unused',
-				'display' => __( 'Unused', 'groundhogg' ),
-				'query'   => [
-					'unused' => true
-				],
-			],
+//			[
+//				'view'    => 'unused',
+//				'display' => __( 'Unused', 'groundhogg' ),
+//				'query'   => [
+//					'unused' => true
+//				],
+//			],
 			[
 				'view'    => 'trash',
 				'display' => __( 'Trash', 'groundhogg' ),
