@@ -3880,14 +3880,14 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		$cached_file = files()->get_uploads_dir( 'requests', $cache_key . '.json' );
 
         // exists!
-		if ( file_exists( $cached_file ) ) {
+		if ( @file_exists( $cached_file ) ) {
 
             // positive integers will be treated as the cache time to live
             if ( $cache_ttl > 0 ) {
 	            $time = filectime( $cached_file );
 	            // check the time the file was created, if within our ttl, return the contents
 	            if ( $time && $time > time() - $cache_ttl ) {
-		            $json = json_decode( file_get_contents( $cached_file ), $as_array );
+		            $json = json_decode( @file_get_contents( $cached_file ), $as_array );
 		            if ( ! empty( $json ) ) {
 			            return $json;
 		            }
@@ -3939,7 +3939,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
     // We don't cache errors...
     if ( $cache_ttl !== 0 && $cache_key ){
-        file_put_contents( files()->get_uploads_dir( 'requests', $cache_key . '.json', true ), json_encode( $json ) );
+        @file_put_contents( files()->get_uploads_dir( 'requests', $cache_key . '.json', true ), json_encode( $json ) );
     }
 
 	return $json;
