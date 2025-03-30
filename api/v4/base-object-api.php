@@ -490,13 +490,9 @@ abstract class Base_Object_Api extends Base_Api {
 		$query = $request->get_params();
 
 		$query = wp_parse_args( $query, [
-			'select'     => '*',
-			'orderby'    => $this->get_primary_key(),
-			'order'      => 'DESC',
 			'limit'      => 25,
 			'found_rows' => true,
 		] );
-
 
 		if ( isset_not_empty( $query, 'count' ) ) {
 			$total = $this->get_db_table()->count( $query );
@@ -507,7 +503,7 @@ abstract class Base_Object_Api extends Base_Api {
 		}
 
 		$items = $this->get_db_table()->query( $query );
-		$total = $this->get_db_table()->found_rows();
+		$total = $query['found_rows'] ? $this->get_db_table()->found_rows() : count( $items );
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
@@ -619,6 +615,7 @@ abstract class Base_Object_Api extends Base_Api {
 		if ( $request->has_param( 'bg' ) ) {
 			unset( $query['bg'] );
 			Background_Tasks::add( new Delete_Objects( $this->get_db_table_name(), $query ) );
+
 			return self::SUCCESS_RESPONSE();
 		}
 
@@ -662,7 +659,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function create_single( WP_REST_Request $request ) {
 
-		$this->maybe_group_into_data_and_meta($request);
+		$this->maybe_group_into_data_and_meta( $request );
 
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
@@ -767,11 +764,11 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( "") )
-
-		$others = $request->has_param( 'others' )
-			? wp_parse_list( $request->get_param( 'others' ) )
-			: $request->get_json_params();
+		if ( ! current_user_can( "" ) ) {
+			$others = $request->has_param( 'others' )
+				? wp_parse_list( $request->get_param( 'others' ) )
+				: $request->get_json_params();
+		}
 
 		foreach ( $others as $other ) {
 
@@ -1031,10 +1028,10 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$child_type = $request->get_param( 'child_type' ) ?: $request->get_param( 'other_type' );
+		$child_type  = $request->get_param( 'child_type' ) ?: $request->get_param( 'other_type' );
 		$parent_type = $request->get_param( 'parent_type' );
 
-		if ( $parent_type ){
+		if ( $parent_type ) {
 			$items = $object->get_related_objects( $parent_type, false );
 		} else {
 			$items = $object->get_related_objects( $child_type );
@@ -1048,6 +1045,7 @@ abstract class Base_Object_Api extends Base_Api {
 	/**
 	 * Delete many relationships
 	 *f
+	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response

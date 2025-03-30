@@ -1250,74 +1250,77 @@ body.gh-full-screen {
   }
 }
 
-.funnel-preview,
-table .column-steps {
+.funnel-preview{
 
-  width: 160px;
+  display: inline-flex;
+  align-items: center;
 
-  div.step-icon {
-    //padding: 3px;
-    display: inline-block;
+  div.step-preview {
     white-space: nowrap;
-    width: 27px;
-    height: 27px;
-    vertical-align: top;
-    background-color: #fff;
-    background-image: linear-gradient(var(--color-5), var(--color-5));
-    border: 2px solid var(--color);
-    padding: 3px;
-
-    svg {
-      fill: var(--color);
-      width: 100%;
-      height: 100%;
-    }
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
 
     &:not(:first-child) {
       margin-left: -10px;
     }
 
-    &.more {
+    div.step-icon {
       background-color: #fff;
-      border-radius: 20px;
-      padding: 4px;
-      border: 2px solid $primary-dark;
-    }
-
-    &.action {
-      --color: #{$action-green};
-      --color-25: #{$action-green-25};
-      --color-5: #{$action-green-5};
-      border-radius: 5px;
-    }
-
-    &.benchmark {
-      --color: #{$benchmark-orange};
-      --color-25: #{$benchmark-orange-25};
-      --color-5: #{$benchmark-orange-5};
-      border-radius: 50%;
-    }
-
-    &.logic {
-      --color: #{$secondary-purple};
-      --color-25: #{$secondary-purple-25};
-      --color-5: #{$secondary-purple-5};
-
-      border-radius: 3px;
-      transform: rotate(45deg);
-
-      width: 23px;
-      height: 23px;
+      background-image: linear-gradient(var(--color-5), var(--color-5));
+      border: 2px solid var(--color);
+      padding: 3px;
+      aspect-ratio: 1 / 1;
 
       svg {
-        transform: rotate(-45deg);
+        fill: var(--color);
+        width: 100%;
+        height: 100%;
       }
-    }
 
-    svg,
-    img {
-      width: 100%;
-      height: 100%;
+      &.more {
+        background-color: #fff;
+        border-radius: 20px;
+        padding: 4px;
+        border: 2px solid $primary-dark;
+      }
+
+      &.action {
+        --color: #{$action-green};
+        --color-25: #{$action-green-25};
+        --color-5: #{$action-green-5};
+        border-radius: 5px;
+      }
+
+      &.benchmark {
+        --color: #{$benchmark-orange};
+        --color-25: #{$benchmark-orange-25};
+        --color-5: #{$benchmark-orange-5};
+        border-radius: 50%;
+      }
+
+      &.logic {
+        --color: #{$secondary-purple};
+        --color-25: #{$secondary-purple-25};
+        --color-5: #{$secondary-purple-5};
+
+        border-radius: 3px;
+        transform: rotate(45deg) scale(0.8);
+
+        .gh-tooltip,
+        svg {
+          transform: rotate(-45deg);
+        }
+      }
+
+      svg,
+      img {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }

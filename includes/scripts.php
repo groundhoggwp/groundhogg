@@ -235,23 +235,24 @@ class Scripts {
 			'jquery',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-morphdom', GROUNDHOGG_ASSETS_URL . 'js/admin/morphdom' . $dot_min . '.js', [], GROUNDHOGG_VERSION );
+		wp_register_script( 'groundhogg-make-el', GROUNDHOGG_ASSETS_URL . 'js/admin/make-el' . $dot_min . '.js', [
+			'groundhogg-morphdom'
+		], GROUNDHOGG_VERSION );
+
 		// Basic Admin Scripts
 		wp_register_script( 'groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-select2',
 			'jquery-ui-autocomplete',
 			'groundhogg-admin-functions',
+			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin',
 			'wp-api-request' // needed for wpApiSettigns.nonce
-		], GROUNDHOGG_VERSION );
-
-		wp_register_script( 'groundhogg-morphdom', GROUNDHOGG_ASSETS_URL . 'js/admin/morphdom' . $dot_min . '.js', [], GROUNDHOGG_VERSION );
-		wp_register_script( 'groundhogg-make-el', GROUNDHOGG_ASSETS_URL . 'js/admin/make-el' . $dot_min . '.js', [
-			'groundhogg-morphdom'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [

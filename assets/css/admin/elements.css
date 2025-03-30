@@ -2678,6 +2678,7 @@ button:has(.gh-dropdown-menu) {
 
 .gh-picker {
   min-height: 31px;
+  background-color: #fff;
   position: relative;
   border: 1px solid #8c8f94;
   border-radius: 5px;

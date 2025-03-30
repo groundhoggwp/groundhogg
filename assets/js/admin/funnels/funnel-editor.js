@@ -879,7 +879,7 @@
             let campaignIds = campaigns.map(c => c.ID)
 
             return Div({}, [
-              `<h2>Funnel Settings</h2>`,
+              `<h2>Flow Settings</h2>`,
               `<p>Use <b>campaigns</b> to organize your flows. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
               ItemPicker({
                 id          : 'pick-campaigns',

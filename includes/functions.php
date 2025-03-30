@@ -582,7 +582,12 @@ function base64_json_decode( string $string ) {
  *
  * @return string
  */
-function md5serialize( $stuff ) {
+function md5serialize( ...$stuff ) {
+
+    if ( count( $stuff ) === 1 ){
+        $stuff = array_pop( $stuff );
+    }
+
 	return md5( maybe_serialize( $stuff ) );
 }
 
@@ -1173,12 +1178,12 @@ function array_to_atts( $atts ) {
 
 		}
 
-        $key = sanitize_key( $key );
-        if ( in_array( $key, [ 'required', 'disabled', 'checked', 'readonly' ] ) ) {
-	        $attributes[] = $key;
-        } else {
-	        $attributes[] = $key . '="' . $value . '"';
-        }
+		$key = sanitize_key( $key );
+		if ( in_array( $key, [ 'required', 'disabled', 'checked', 'readonly' ] ) ) {
+			$attributes[] = $key;
+		} else {
+			$attributes[] = $key . '="' . $value . '"';
+		}
 
 	}
 
@@ -3829,15 +3834,17 @@ function is_main_blog() {
  * Remote post json content
  * Glorified wp_remote_post wrapper
  *
- * @param string $url
- * @param array  $body
- * @param string $method
- * @param array  $headers
- * @param bool   $as_array
+ * @param string $url       Where are we going?
+ * @param array  $body      The body of the request, as an array
+ * @param string $method    POST, PATCH, DELETE, ETC...
+ * @param array  $headers   headers to send with the request
+ * @param bool   $as_array  whether to decode JSON into an array instead of an object
+ * @param int $cache_ttl if > 0, will cache the request in /wp-content/uploads/groundhogg/requests/.
+ *                       If < 0 will force request and reset the cached request
  *
  * @return array|bool|WP_Error|object
  */
-function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], $as_array = false ) {
+function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], bool $as_array = false, int $cache_ttl = 0 ) {
 	$method = strtoupper( $method );
 
 	if ( ! isset_not_empty( $headers, 'Content-type' ) ) {
@@ -3863,8 +3870,40 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
 	];
 
+	$cache_key = md5serialize( $url, $args );
+
+	// if the ttl is greater than 0, we might want to cache this request
+	// if there is no valid cache, then we'll clear any cached file, and proceed with the request
+	if ( $cache_ttl !== 0 && $cache_key ) {
+
+        // path to cache file
+		$cached_file = files()->get_uploads_dir( 'requests', $cache_key . '.json' );
+
+        // exists!
+		if ( file_exists( $cached_file ) ) {
+
+            // positive integers will be treated as the cache time to live
+            if ( $cache_ttl > 0 ) {
+	            $time = filectime( $cached_file );
+	            // check the time the file was created, if within our ttl, return the contents
+	            if ( $time && $time > time() - $cache_ttl ) {
+		            $json = json_decode( file_get_contents( $cached_file ), $as_array );
+		            if ( ! empty( $json ) ) {
+			            return $json;
+		            }
+	            }
+            }
+
+            // delete the file, either invalid contents or expired ttl, or force expiration with negative ttl
+            unlink( $cached_file );
+		}
+	}
+
 	if ( $method === 'GET' ) {
-		$response = wp_remote_get( $url, $args );
+        $params = $args['body'];
+        unset( $args['body'] ); // unneeded
+        unset( $args['data_format'] ); // unneeded
+		$response = wp_remote_get( add_query_arg( $params, $url ), $args );
 	} else {
 		$response = wp_remote_post( $url, $args );
 	}
@@ -3897,6 +3936,11 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
 		return $error;
 	}
+
+    // We don't cache errors...
+    if ( $cache_ttl !== 0 && $cache_key ){
+        file_put_contents( files()->get_uploads_dir( 'requests', $cache_key . '.json', true ), json_encode( $json ) );
+    }
 
 	return $json;
 }
@@ -5670,10 +5714,10 @@ function track_event_activity( Event $event, string $type = '', array $details =
 		'email_id'  => $event->email_id,
 	] );
 
-    // clear cached broadcast stats whenever new activity is tracked
-    if ( $event->is_broadcast_event() ){
-        $event->get_step()->clear_cached_report_data();
-    }
+	// clear cached broadcast stats whenever new activity is tracked
+	if ( $event->is_broadcast_event() ) {
+		$event->get_step()->clear_cached_report_data();
+	}
 
 	return track_activity( $contact, $type, $args, $details );
 }

@@ -532,7 +532,7 @@ class Replacements implements \JsonSerializable {
 			[
 				'code'     => 'post_url',
 				'group'    => 'post',
-				'callback' => [ $this, 'post_link' ],
+				'callback' => [ $this, 'post_url' ],
 //				'name'        => __( 'Post URL', 'groundhogg' ),
 //				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],

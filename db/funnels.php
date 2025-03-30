@@ -6,6 +6,7 @@ namespace Groundhogg\DB;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Where;
 use function Groundhogg\get_db;
+use function Groundhogg\md5serialize;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -96,11 +97,10 @@ class Funnels extends DB {
 				'types' => [],
 			] );
 
-			$join = $where->query->addJoin( 'LEFT', [ get_db( 'steps' )->table_name, 'steps_' . md5( serialize( $filter ) ) ] );
-			$join->onColumn( 'funnel_id' )
-			     ->in( "$join->alias.step_type", $filter['types'] );
+			$join = $where->query->addJoin( 'LEFT', [ get_db( 'steps' )->table_name, 'steps_' . md5serialize( $filter ) ] );
+			$join->onColumn( 'funnel_id' )->in( "$join->alias.step_type", $filter['types'] );
 
-			$where->in( "$join->alias.step_type", $filter['types'] );
+			$where->isNotNull( "$join->alias.ID" );
 
 			$where->query->setGroupby( 'ID' );
 		} );

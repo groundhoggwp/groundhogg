@@ -616,9 +616,17 @@ class Contact extends Base_Object_With_Meta {
 
 		$created = parent::create( $data );
 
-		$this->handle_consents_in_data( $data );
+		if ( $created ){
+			$this->handle_consents_in_data( $data );
+			$this->set_locale();
 
-		$this->set_locale();
+			/**
+			 * When a new contact is created with the Contact::create() method
+			 *
+			 * @param
+			 */
+			do_action( 'groundhogg/contact/created', $this );
+		}
 
 		return $created;
 	}

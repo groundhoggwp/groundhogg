@@ -468,7 +468,7 @@
       selected    : convertOpt('option[selected]'),
       multiple    : selectEl.multiple,
       tags        : selectEl.dataset.tags,
-      clearable   : selectEl.multiple,
+      clearable   : selectEl.multiple || selectEl.dataset.clearable,
       noneSelected: selectEl.dataset.placeholder ?? 'Any...',
       onCreate    : async opt => {
         selectEl.appendChild(MakeEl.makeEl('options', {
@@ -486,13 +486,14 @@
           items = [items]
         }
 
-        let selected = items.map(item => item.id)
+        let selected = items.filter( item => item ).map(item => item.id)
 
         for (let option of selectEl.options) {
           option.selected = selected.includes(option.value)
         }
 
         $(selectEl).trigger('change') // must use jQuery for backwards compatibility
+        selectEl.dispatchEvent(new Event('change'))
 
       },
     })

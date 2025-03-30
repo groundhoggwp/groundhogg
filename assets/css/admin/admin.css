@@ -1078,71 +1078,65 @@ body.gh-full-screen #wpadminbar {
   padding: 2px;
 }
 
-.funnel-preview,
-table .column-steps {
-  width: 160px;
+.funnel-preview {
+  display: inline-flex;
+  align-items: center;
 }
-.funnel-preview div.step-icon,
-table .column-steps div.step-icon {
-  display: inline-block;
+.funnel-preview div.step-preview {
   white-space: nowrap;
-  width: 27px;
-  height: 27px;
-  vertical-align: top;
+  width: 30px;
+  height: 30px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+}
+.funnel-preview div.step-preview:not(:first-child) {
+  margin-left: -10px;
+}
+.funnel-preview div.step-preview div.step-icon {
   background-color: #fff;
   background-image: linear-gradient(var(--color-5), var(--color-5));
   border: 2px solid var(--color);
   padding: 3px;
+  aspect-ratio: 1/1;
 }
-.funnel-preview div.step-icon svg,
-table .column-steps div.step-icon svg {
+.funnel-preview div.step-preview div.step-icon svg {
   fill: var(--color);
   width: 100%;
   height: 100%;
 }
-.funnel-preview div.step-icon:not(:first-child),
-table .column-steps div.step-icon:not(:first-child) {
-  margin-left: -10px;
-}
-.funnel-preview div.step-icon.more,
-table .column-steps div.step-icon.more {
+.funnel-preview div.step-preview div.step-icon.more {
   background-color: #fff;
   border-radius: 20px;
   padding: 4px;
   border: 2px solid #102640;
 }
-.funnel-preview div.step-icon.action,
-table .column-steps div.step-icon.action {
+.funnel-preview div.step-preview div.step-icon.action {
   --color: #9ece38;
   --color-25: rgba(158, 206, 56, 0.25);
   --color-5: rgba(158, 206, 56, 0.05);
   border-radius: 5px;
 }
-.funnel-preview div.step-icon.benchmark,
-table .column-steps div.step-icon.benchmark {
+.funnel-preview div.step-preview div.step-icon.benchmark {
   --color: #f58115;
   --color-25: rgba(245, 129, 21, 0.25);
   --color-5: rgba(245, 129, 21, 0.05);
   border-radius: 50%;
 }
-.funnel-preview div.step-icon.logic,
-table .column-steps div.step-icon.logic {
+.funnel-preview div.step-preview div.step-icon.logic {
   --color: #6c19ad;
   --color-25: rgba(108, 25, 173, 0.25);
   --color-5: rgba(108, 25, 173, 0.05);
   border-radius: 3px;
-  transform: rotate(45deg);
-  width: 23px;
-  height: 23px;
+  transform: rotate(45deg) scale(0.8);
 }
-.funnel-preview div.step-icon.logic svg,
-table .column-steps div.step-icon.logic svg {
+.funnel-preview div.step-preview div.step-icon.logic .gh-tooltip,
+.funnel-preview div.step-preview div.step-icon.logic svg {
   transform: rotate(-45deg);
 }
-.funnel-preview div.step-icon svg,
-.funnel-preview div.step-icon img,
-table .column-steps div.step-icon svg,
-table .column-steps div.step-icon img {
+.funnel-preview div.step-preview div.step-icon svg,
+.funnel-preview div.step-preview div.step-icon img {
   width: 100%;
   height: 100%;
 }

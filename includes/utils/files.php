@@ -121,9 +121,7 @@ class Files {
 	 * @return string
 	 */
 	public function get_uploads_url( $subdir = 'uploads', $file_path = '' ) {
-		$path = untrailingslashit( sprintf( "%s/%s/%s", $this->get_base_uploads_url(), $subdir, $file_path ) );
-
-		return $path;
+		return untrailingslashit( sprintf( "%s/%s/%s", $this->get_base_uploads_url(), $subdir, $file_path ) );
 	}
 
 	/**

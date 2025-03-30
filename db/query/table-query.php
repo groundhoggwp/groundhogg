@@ -35,6 +35,10 @@ class Table_Query extends Query {
 
 		parent::__construct( $table->table_name, $table->alias );
 
+		// Set default select to the columns of the table
+		// the select will get overwritten if doing anything special
+		$this->setSelect( ...array_keys( $this->db_table->get_columns() ) );
+
 		if ( ! empty( $params ) ) {
 			$this->set_query_params( $params );
 		}

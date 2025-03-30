@@ -675,7 +675,7 @@ class Query {
 	 * @return false|mixed|string|null
 	 */
 	public function count() {
-		$this->setSelect( "COUNT($this->select)" );
+		$this->setSelect( "COUNT(*)" );
 		$this->setFoundRows( false );
 
 		return absint( $this->get_var() );

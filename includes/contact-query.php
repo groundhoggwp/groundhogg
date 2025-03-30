@@ -1352,17 +1352,18 @@ class Contact_Query extends Table_Query {
 	public static function filter_current_datetime( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'compare'       => 'before', // before, after, between, etc...
-			'before'        => '', // a date in `Y-m-d H:i:s` format
-			'after'         => '', // a date in `Y-m-d H:i:s` format
+			'compare' => 'before', // before, after, between, etc...
+			'before'  => '', // a date in `Y-m-d H:i:s` format
+			'after'   => '', // a date in `Y-m-d H:i:s` format
 		] );
 
 		try {
-			$now = new DateTimeHelper();
+			$now    = new DateTimeHelper();
 			$before = new DateTimeHelper( $filter['before'] );
-			$after = new DateTimeHelper( $filter['after'] );
-		} catch ( \Exception $exception ){
+			$after  = new DateTimeHelper( $filter['after'] );
+		} catch ( \Exception $exception ) {
 			$where->addCondition( '1=0' ); // short circuit false
+
 			return;
 		}
 
@@ -1380,7 +1381,7 @@ class Contact_Query extends Table_Query {
 				break;
 		}
 
-		if ( $true ){
+		if ( $true ) {
 			$where->addCondition( '1=1' ); // always true
 		} else {
 			$where->addCondition( '1=0' ); // short circuit false
@@ -1398,12 +1399,12 @@ class Contact_Query extends Table_Query {
 	public static function filter_current_date( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'compare'       => 'before', // before, after, between, etc...
-			'before'        => '', // a date in `Y-m-d` format
-			'after'         => '', // a date in `Y-m-d` format
+			'compare' => 'before', // before, after, between, etc...
+			'before'  => '', // a date in `Y-m-d` format
+			'after'   => '', // a date in `Y-m-d` format
 		] );
 
-		$filter['after'] = "{$filter['after']} 00:00:00";
+		$filter['after']  = "{$filter['after']} 00:00:00";
 		$filter['before'] = "{$filter['before']} 23:59:59";
 
 		self::filter_current_datetime( $filter, $where );
@@ -1420,14 +1421,14 @@ class Contact_Query extends Table_Query {
 	public static function filter_current_time( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'compare'       => 'before', // before, after, between, etc...
-			'before'        => '', // a date in `H:i:s` format
-			'after'         => '', // a date in `H:i:s` format
+			'compare' => 'before', // before, after, between, etc...
+			'before'  => '', // a date in `H:i:s` format
+			'after'   => '', // a date in `H:i:s` format
 		] );
 
 		$today = Ymd( 'now', true );
 
-		$filter['after'] = "$today {$filter['after']}";
+		$filter['after']  = "$today {$filter['after']}";
 		$filter['before'] = "$today {$filter['before']}";
 
 		self::filter_current_datetime( $filter, $where );
@@ -1494,7 +1495,8 @@ class Contact_Query extends Table_Query {
 
 		// Parse default query vars
 		$query_vars = wp_parse_args( $query_vars, [
-			'date_key' => $this->date_key
+			'date_key' => $this->date_key,
+			'select'   => array_keys( $this->db_table->get_columns() ) // set select to just contact columns
 		] );
 
 		// Merge saved search query filters. They take priority and override anything previously set

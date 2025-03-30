@@ -4,15 +4,9 @@ namespace Groundhogg;
 
 class Library extends Supports_Errors {
 
-	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
-
-	/**
-	 * Flush cache templates
-	 */
-	public function flush() {
-		delete_transient( 'groundhogg_funnel_templates' );
-		delete_transient( 'groundhogg_email_templates' );
-	}
+	// todo revert this change
+//	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
+	const LIBRARY_URL = 'https://app-667e6062c1ac1837ccd93f5b.closte.com/wp-json/gh/v4/';
 
 	/**
 	 * Get the library url
@@ -42,7 +36,7 @@ class Library extends Supports_Errors {
 
 		$url = $this->get_library_url() . $endpoint;
 
-		$result = remote_post_json( $url, $body, $method, $headers );
+		$result = remote_post_json( $url, $body, $method, $headers, false, DAY_IN_SECONDS );
 
 		if ( is_wp_error( $result ) ) {
 			notices()->add( $result );
@@ -57,26 +51,27 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_funnel_templates() {
-		$funnels = get_transient( 'groundhogg_funnel_templates' );
-
-		if ( ! empty( $funnels ) ) {
-			return $funnels;
-		}
 
 		$step_steps = array_keys( Plugin::instance()->step_manager->elements );
 
+		$filters = [
+			[
+				// filter by registered step types
+				[
+					'type'  => 'step_type',
+					'types' => $step_steps
+				],
+			]
+		];
+
 		$response = $this->request( 'funnels/', [
-			'step_types' => $step_steps,
-			'status'     => 'active',
-			'orderby'    => 'title',
-			'order'      => 'asc',
+			'filters' => base64_json_encode( $filters ),
+			'status'  => 'active',
+			'orderby' => 'title',
+			'order'   => 'asc',
 		], 'GET' );
 
-		$funnels = get_array_var( $response, 'items', [] );
-
-		set_transient( 'groundhogg_funnel_templates', $funnels, DAY_IN_SECONDS );
-
-		return $funnels;
+		return get_array_var( $response, 'items', [] );
 	}
 
 	/**
@@ -98,22 +93,12 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_email_templates() {
-		$emails = get_transient( 'groundhogg_email_templates' );
-
-		if ( ! empty( $emails ) ) {
-			return $emails;
-		}
-
 		$response = $this->request( 'emails', [
 			'is_template' => 1,
 			'status'      => 'ready'
 		] );
 
-		$emails = get_array_var( $response, 'items', [] );
-
-		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
-
-		return $emails;
+		return get_array_var( $response, 'items', [] );
 	}
 
 	/**

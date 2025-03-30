@@ -31,6 +31,7 @@ class Funnel extends Base_Object_With_Meta {
 		$this->data        = (array) $data->data;
 		$this->meta        = (array) $data->meta;
 		$this->steps       = (array) $data->steps;
+		$this->campaigns   = (array) $data->campaigns;
 	}
 
 	public function step_flow( $echo = true ) {
@@ -78,6 +79,57 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		return $html;
+	}
+
+	public function flow_preview( $show = 15 ) {
+
+		$allSteps = ! empty( $this->steps ) ? $this->steps : $this->get_steps();
+
+		?>
+        <div class="funnel-preview"><?php
+
+		$steps    = array_splice( $allSteps, 0, $show );
+
+		foreach ( $steps as $step ) {
+
+			// if we're here, the step type is registered
+			$step_type = Plugin::instance()->step_manager->get_element( get_array_var( $step->data, 'step_type' ) );
+
+			?>
+            <div class="step-preview">
+                <div class="step-icon <?php echo $step_type->get_type() ?> <?php echo $step_type->get_group() ?>">
+					<?php if ( $step_type->icon_is_svg() ): ?>
+						<?php echo $step_type->get_icon_svg(); ?>
+					<?php else: ?>
+                        <img src="<?php echo esc_url( $step_type->get_icon() ); ?>">
+					<?php endif; ?>
+                </div>
+                <div class="gh-tooltip top">
+					<?php _e( get_array_var( $step->data, 'step_title' ) ) ?>
+                </div>
+            </div>
+			<?php
+
+		}
+
+		if ( ! empty( $allSteps ) ) {
+			?>
+            <div class="step-preview">
+                <div class="step-icon more">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                        <path fill="#000" d="M4 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+                    </svg>
+                    <div class="gh-tooltip top">
+						<?php printf( _n( '%d more step...', '%d more steps', count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ?>
+                    </div>
+                </div>
+            </div>
+			<?php
+		}
+
+		?>
+        </div><?php
+
 	}
 
 	/**
@@ -690,7 +742,7 @@ class Funnel extends Base_Object_With_Meta {
 	public function has_changes() {
 		return array_any( $this->get_steps(), function ( Step $step ) {
 			return $step->has_changes() || in_array( $step->step_status, [ 'inactive', 'deleted' ] );
-		});
+		} );
 	}
 
 	/**
