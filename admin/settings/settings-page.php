@@ -13,6 +13,7 @@ use Groundhogg\Tag_Mapping;
 use Groundhogg_Email_Services;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_any;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -373,6 +374,13 @@ class Settings_Page extends Admin_Page {
 
 		foreach ( $this->sections as $id => $section ) {
 
+            // filter out sections with no settings.
+            if ( ! array_any( $this->settings, function ( $setting ) use ( $id ) {
+                return get_array_var( $setting, 'section' ) === $id;
+            } ) ){
+                continue;
+            }
+
 			$callback = array();
 
 			if ( key_exists( 'callback', $section ) ) {
@@ -505,14 +513,29 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Danger Zone', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
-			'compliance'            => [
-				'id'    => 'compliance',
-				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
+			'double_optin'            => [
+				'id'    => 'double_optin',
+				'title' => _x( 'Double Opt-in', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			],
+			'gdpr'            => [
+				'id'    => 'gdpr',
+				'title' => _x( 'GDPR', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			],
+			'policies'            => [
+				'id'    => 'policies',
+				'title' => _x( 'Policies', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			],
 			'cookies'               => [
 				'id'    => 'cookies',
 				'title' => _x( 'Cookies', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			],
+			'compliance'            => [
+				'id'    => 'compliance',
+				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			],
 //			'sendwp'            => [
@@ -1007,7 +1030,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_privacy_policy'                      => [
 				'id'      => 'gh_privacy_policy',
-				'section' => 'compliance',
+				'section' => 'policies',
 				'label'   => __( 'Privacy Policy' ),
 				'desc'    => _x( 'Link to your privacy policy.', 'settings', 'groundhogg' ),
 				'type'    => 'link_picker',
@@ -1018,7 +1041,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_terms'                               => [
 				'id'      => 'gh_terms',
-				'section' => 'compliance',
+				'section' => 'policies',
 				'label'   => _x( 'Terms & Conditions (Terms of Service)', 'settings', 'groundogg' ),
 				'desc'    => _x( 'Link to your terms & conditions.', 'settings', 'groundhogg' ),
 				'type'    => 'link_picker',
@@ -1029,7 +1052,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_strict_confirmation'                 => [
 				'id'      => 'gh_strict_confirmation',
-				'section' => 'compliance',
+				'section' => 'double_optin',
 				'label'   => _x( 'Only send to confirmed emails.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will stop emails being sent to contacts who do not have confirmed emails outside of the below grace period.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -1043,7 +1066,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_confirmation_grace_period'           => [
 				'id'      => 'gh_confirmation_grace_period',
-				'section' => 'compliance',
+				'section' => 'double_optin',
 				'label'   => _x( 'Email confirmation grace period', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The number of days for which you can send an email to a contact after they are created but their email has not been confirmed. The default is 14 days.', 'settings', 'groundhogg' ),
 				'type'    => 'number',
@@ -1056,7 +1079,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_enable_gdpr'                         => [
 				'id'      => 'gh_enable_gdpr',
-				'section' => 'compliance',
+				'section' => 'gdpr',
 				'label'   => _x( 'Enable GDPR features', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -1070,7 +1093,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_strict_gdpr'                         => [
 				'id'      => 'gh_strict_gdpr',
-				'section' => 'compliance',
+				'section' => 'gdpr',
 				'label'   => _x( 'Do not send email without consent', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
