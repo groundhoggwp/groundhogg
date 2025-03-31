@@ -22,4 +22,5 @@ webpack.config.js
 babel.config.js
 wp-cli.phar
 wp-cli.yml
+README.md
 
