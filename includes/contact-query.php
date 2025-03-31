@@ -1496,7 +1496,7 @@ class Contact_Query extends Table_Query {
 		// Parse default query vars
 		$query_vars = wp_parse_args( $query_vars, [
 			'date_key' => $this->date_key,
-			'select'   => array_keys( $this->db_table->get_columns() ) // set select to just contact columns
+//			'select'   => array_keys( $this->db_table->get_columns() ) // set select to just contact columns
 		] );
 
 		// Merge saved search query filters. They take priority and override anything previously set
