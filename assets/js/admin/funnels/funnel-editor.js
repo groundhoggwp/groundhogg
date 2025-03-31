@@ -653,7 +653,7 @@
             confirmText: __('Deactivate'),
             onConfirm  : () => {
               this.save({
-                quiet: false,
+                quiet   : false,
                 moreData: formData => formData.append('_deactivate', true),
               })
             },
@@ -663,7 +663,7 @@
         $('#funnel-update').on('click', e => {
 
           const update = () => this.save({
-            quiet: false,
+            quiet   : false,
             moreData: formData => formData.append('_commit', true),
           })
 
@@ -688,7 +688,7 @@
         $('#funnel-activate').on('click', e => {
 
           const activate = () => this.save({
-            quiet: false,
+            quiet   : false,
             moreData: formData => formData.append('_activate', true),
           })
 
@@ -856,7 +856,7 @@
                 text    : 'Feedback',
                 onSelect: e => {
                   Groundhogg.components.FeedbackModal({
-                    subject: 'Flow editor'
+                    subject: 'Flow editor',
                   })
                 },
               },
@@ -1015,6 +1015,7 @@
         } = args
 
         if (quiet && this.saving) {
+          this.saveQuietly( args ) // this will debounce until it works
           return
         }
 
@@ -1136,13 +1137,13 @@
             }
 
             // re-enable publish button
-            document.getElementById( 'funnel-update' ).disabled = false
+            document.getElementById('funnel-update').disabled = false
 
             return response
           }
 
           // disable publish button, changes are published
-          document.getElementById( 'funnel-update' ).disabled = true
+          document.getElementById('funnel-update').disabled = true
 
           $(document).trigger('saved')
 
@@ -1170,7 +1171,7 @@
         })
       },
 
-      saveQuietly: Groundhogg.functions.debounce(() => Funnel.save(true), 500),
+      saveQuietly: Groundhogg.functions.debounce(( args = {} ) => Funnel.save({ quiet: true, ...args }), 750),
 
       updateBranches () {
         document.querySelectorAll(`input[name*="[branch]"][type="hidden"]`).forEach(input => {
@@ -1816,7 +1817,7 @@
               notice: 'funnel-tour',
             })
           },
-          beforeDismiss: ({dismiss}) => {
+          beforeDismiss: ({ dismiss }) => {
             confirmationModal({
               alert    : `<p>Are you sure you want to exit the tour?</p>`,
               onConfirm: () => {
@@ -1839,30 +1840,30 @@
         // if tour is dismissed, do regular stuff
         if (Funnel.funnelTourDismissed) {
 
-          const url = new URL(window.location);
+          const url = new URL(window.location)
 
           // do title prompt if prompted...
-          const hasFromAdd = url.searchParams.get("from") === 'add';
+          const hasFromAdd = url.searchParams.get('from') === 'add'
 
-          if ( hasFromAdd ){
+          if (hasFromAdd) {
 
             // remove from url so reloads don't re-prompt
-            url.searchParams.delete("from");
-            window.history.replaceState({}, "", url);
+            url.searchParams.delete('from')
+            window.history.replaceState({}, '', url)
 
             // Prompt to rename the funnel
             MakeEl.ModalWithHeader({
-              header:  'Name your flow',
+              header: 'Name your flow',
               onOpen: () => {
-                let input = document.getElementById( 'prompt-funnel-title' )
+                let input = document.getElementById('prompt-funnel-title')
                 input.focus()
                 input.select()
-              }
-            }, ({close}) => MakeEl.Form({
+              },
+            }, ({ close }) => MakeEl.Form({
               onSubmit: e => {
                 e.preventDefault()
                 let fd = new FormData(e.currentTarget)
-                let title = fd.get( 'funnel_title' )
+                let title = fd.get('funnel_title')
 
                 $('.title-view').find('.title').text(title)
                 $('#title').val(title)
@@ -1871,18 +1872,18 @@
               },
             }, [
               Div({
-                className: 'display-flex gap-5'
+                className: 'display-flex gap-5',
               }, [
                 Input({
-                  id: 'prompt-funnel-title',
-                  name: 'funnel_title',
+                  id   : 'prompt-funnel-title',
+                  name : 'funnel_title',
                   value: Funnel.data.title,
                 }),
                 Button({
                   className: 'gh-button primary',
-                  type: 'submit'
-                }, 'Save')
-              ])
+                  type     : 'submit',
+                }, 'Save'),
+              ]),
             ]))
 
           }
@@ -1897,7 +1898,7 @@
             confirmText: 'Start tour!',
             closeText  : 'No thanks',
             onConfirm  : () => {
-              localStorage.setItem( 'gh-force-tour', 'yes' )
+              localStorage.setItem('gh-force-tour', 'yes')
               // open a new scratch funnel to start the tour
               window.open(Funnel.scratchFunnelURL, '_self')
             },
@@ -1912,8 +1913,8 @@
         }
 
         // tour is forced
-        if ( localStorage.getItem( 'gh-force-tour' ) === 'yes' ){
-          localStorage.removeItem( 'gh-force-tour' ) // clear from local storage
+        if (localStorage.getItem('gh-force-tour') === 'yes') {
+          localStorage.removeItem('gh-force-tour') // clear from local storage
           Funnel.startTour()
           return
         }

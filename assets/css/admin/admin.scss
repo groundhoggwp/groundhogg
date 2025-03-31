@@ -435,8 +435,17 @@ a.danger:hover {
   width: 50%;
 }
 
-table.wp-list-table.funnels th#title {
-  width: 400px;
+.table-view-list.funnels{
+
+  th#title {
+    //width: 300px;
+  }
+
+  th#steps,
+  td.steps.column-steps{
+    //overflow: hidden;
+    //width: 200px;
+  }
 }
 
 table.wp-list-table.funnels th.column-active_contacts,
@@ -1254,6 +1263,8 @@ body.gh-full-screen {
 
   display: inline-flex;
   align-items: center;
+  //flex-wrap: wrap;
+  //row-gap: 2px;
 
   div.step-preview {
     white-space: nowrap;

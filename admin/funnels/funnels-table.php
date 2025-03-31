@@ -74,7 +74,7 @@ class Funnels_Table extends Table {
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
 			'steps'           => _x( 'Preview', 'Column label', 'groundhogg' ),
-			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
+			'active_contacts' => _x( 'Contacts', 'Column label', 'groundhogg' ),
 			'campaigns'       => _x( 'Campaigns', 'Column label', 'groundhogg' ),
 			'author'          => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),

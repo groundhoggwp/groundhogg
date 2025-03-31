@@ -10,17 +10,17 @@ Stable tag: 4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-Groundhogg is the best WordPress CRM & Marketing Automation plugin. Create funnels, email campaigns, and have a CRM all within your WordPress site.
+Groundhogg is the best WordPress CRM & Marketing Automation plugin. Create flows, email campaigns, and have a CRM all within your WordPress site.
 
 == Description ==
 
-## Groundhogg 3.0 is here!
+## Groundhogg 4.0 is here!
 
-Groundhogg 3.0 introduces a new powerful email editor that rivals even the priciest SaaS CRM and email marketing platforms.
+Groundhogg 4.0 introduces the **Flow Editor** which makes Groundhogg the most powerful marketing automation tool currently available for WordPress. Seriously, no other WordPress CRM comes close, we checked.
 
-Create beautiful email templates to send as broadcasts, or to use in funnels and automations.
+Create beautiful flows that convert leads into customers! Your customers will thank you.
 
-[youtube https://youtu.be/vVRbKys1Uc4]
+[https://youtu.be/HID8m2vRi-A?si=hmXNF5uJccJiIwCG]
 
 Do your business a favor and switch to Groundhogg.
 
@@ -38,9 +38,9 @@ Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
-Our award winning WordPress CRM is the very best alternative to [Infusionsoft](https://groundhogg.io/comparison/groundhogg-vs-infusionsoft/), [ActiveCampaign](https://groundhogg.io/comparison/groundhogg-vs-activecampaign/), [Convertkit](https://www.groundhogg.io/comparison/convertkit/), [HubSpot](https://groundhogg.io/comparison/groundhogg-vs-hubspot/), [MailChimp](https://www.groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://www.groundhogg.io/comparison/).
+Our award winning WordPress CRM is the very best alternative to [Keap](https://www.groundhogg.io/comparison/keap-infusionsoft/), [ActiveCampaign](https://www.groundhogg.io/comparison/activecampaign/), [HighLevel](https://www.groundhogg.io/comparison/gohighlevel/), [HubSpot](https://www.groundhogg.io/comparison/hubspot/), [MailChimp](https://www.groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://www.groundhogg.io/crm-type/saas/).
 
-You don’t have to sacrifice CRM features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://www.groundhogg.io/comparison/)** and have the added benefit of owning all your information.
+You don’t have to sacrifice CRM features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://www.groundhogg.io/compare/)** and have the added benefit of owning all your information.
 
 If you are an agency, WaaS, WordPress developer, LMS/Course Creator, WordPress freelancer, or CRM implementation service provider then the Groundhogg CRM and Marketing Automation suite is for you.
 
@@ -55,10 +55,10 @@ When using the Groundhogg CRM & Marketing Automation suite free or with any of o
 ### 🚫 There are *no limits* on:
 
 * Number of contacts
-* Number of funnels or automations
+* Number of flows (automations)
 * Number of emails sent
 
-When using Groundhogg CRM & Marketing Automation you will **never** be limited on the amount of **anything**! Unlike [other SaaS platforms](https://www.groundhogg.io/comparison/).
+When using Groundhogg CRM & Marketing Automation you will **never** be limited on the amount of **anything**! Unlike [other SaaS platforms](https://www.groundhogg.io/compare/).
 
 Businesses [save $1,000s a year](https://groundhogg.io/pricing/) after switching to Groundhogg.
 
@@ -115,7 +115,7 @@ Here are some of the more common use cases:
 
 ## 💡 Made by people who know CRM & Marketing Automation!
 
-Our team is based in Toronto, Canada! We've been helping small businesses implement CRM and Marketing Automation since 2014 working with tools like Infusionsoft, ActiveCampaign and HubSpot.
+Our team is based in Niagara Falls, Canada! We've been helping small businesses implement CRM and Marketing Automation since 2014 working with tools like Keap, ActiveCampaign, and HubSpot.
 
 After some time, it became apparent that there was a desperate need in the WordPress ecosystem for a capable CRM and Marketing Automation tool for WordPress site owners.
 
@@ -123,13 +123,13 @@ One that could match SaaS platforms on features and reliability did not yet exis
 
 Starting in 2018, Adrian Tobey (founder) and his team took their combined 20+ years of experience in the CRM and Marketing Automation industry to create a better option for WordPress based businesses.
 
-We know funnels, CRM, and marketing automation like the back of our hands!
+We know flows, CRM, and marketing automation like the back of our hands!
 
-You can trust us to not only provide you with stellar software and support, but also provide you guidance on the kinds of funnels and automation you should be building to get maximum value from our products.
+You can trust us to not only provide you with stellar software and support, but also provide you guidance on the kinds of flows and automation you should be building to get maximum value from our products.
 
 ## ❤️ Businesses Love Groundhogg CRM & Marketing Automation!
 
-3,000+ businesses in 35+ countries are using Groundhogg CRM & Marketing Automation to launch their funnels, grow their lists and scale their businesses.
+3,000+ businesses in 35+ countries are using Groundhogg CRM & Marketing Automation to launch their flows, grow their lists and scale their businesses.
 
 Here's what a few of them had to say about our products and support!
 
@@ -140,7 +140,7 @@ From 👨  **[Chris Badget](https://wordpress.org/support/topic/best-crm-and-mar
 
 From 👨‍🦱 **[Francisco Opazo](https://www.groundhogg.io/best-buddyboss-crm/)**, _Marketing Manager at [BuddyBoss](https://www.groundhogg.io/best-buddyboss-crm/)_
 
-> Groundhogg CRM & Marketing Automation is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, funnels, and enables you to scale your marketing efforts more efficiently.
+> Groundhogg CRM & Marketing Automation is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, flows, and enables you to scale your marketing efforts more efficiently.
 
 From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of [WP-Tonic Agency](https://www.groundhogg.io/best-crm-for-agencies/)_
 
@@ -177,14 +177,14 @@ Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocomme
 
 [youtube https://youtu.be/TI0WV62dSU0]
 
-### ⚙️ Funnels & Marketing Automation Features
+### ⚙️ Flows & Marketing Automation Features
 
 * Create highly effective customer journeys with our easy to learn funnel builder.
 * Over 30+ integrations available to connect the CRM with your favorite WordPress plugins.
-* Create simple funnels or complex ones!
-* Measure the effectiveness of your funnels with easy to read metrics.
-* Start funnels from forms, payments, new users, and more!
-* Open API to add your own benchmarks & actions.
+* Create simple flows or complex ones!
+* Measure the effectiveness of your flows with easy to read metrics.
+* Start flows from forms, payments, new users, and more!
+* Open API to add your own triggers & actions.
 
 [youtube https://youtu.be/uWZ8pNgBysg]
 
@@ -201,10 +201,10 @@ Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocomme
 * We track EVERYTHING in the CRM!
 * Granular details of how your site is performing.
 * See open rates, click through rates and conversions at a glance.
-* Detailed results from your funnels and broadcast emails.
+* Detailed results from your flows and broadcast emails.
 * Integrate with Ecommerce to see revenue from your marketing.
 * Learn more about your audience with demographic reporting.
-* See which funnels/emails are under-performing.
+* See which flows/emails are under-performing.
 
 **Use campaigns to make comparing reporting results easier**
 
@@ -274,15 +274,16 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
-1. Create funnels in the CRM quickly using our drag & drop builder with dozens of triggers and actions.
-2. Start with pre-written templates base don real CRM use cases.
-3. Quickly write, preview, test and send personalized emails from the CRM.
-4. Upgrade to the drag and drop email editor to create emails with HTML and blocks.
-5. Groundhogg's CRM reports give you the most data visibility of any small business CRM and Marketing Automation suite.
-6. Create your personalized CRM report dashboard to monitor your most important metrics.
-7. The Groundhogg CRM pulls data from all your integrations to show all activity and data on a single screen.
-8. Filter contacts in the CRM using dozens of search filters to segment based on tags, custom fields, activity, purchase history, and more!
-9. Send out mass emails to your list and view details reports of your subscribers' engagement.
+1. Create flows in the CRM quickly using our drag & drop editor.
+2. Use dozens of triggers, actions, and logic steps to create your flow.
+3. Start with pre-written templates based on real CRM use cases.
+4. Quickly write, preview, test and send personalized emails from the CRM.
+5. Start from beautiful templates, or import HTML from a 3rd party.
+6. Groundhogg's CRM reports give you the most data visibility of any small business CRM and Marketing Automation suite.
+7. Create your personalized CRM report dashboard to monitor your most important metrics.
+8. The Groundhogg CRM pulls data from all your integrations to show all activity and data on a single screen.
+9. Filter contacts in the CRM using dozens of search filters to segment based on tags, custom fields, activity, purchase history, and more!
+10. Send out mass emails to your list and view details reports of your subscribers' engagement.
 
 == Installation ==
 = Plugin Repo =
