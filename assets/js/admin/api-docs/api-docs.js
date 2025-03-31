@@ -1050,7 +1050,7 @@
       Pg({}, __(
         'If you are using the API from a front-end application, such as in the WordPress admin dashboard, you can use a <b>nonce</b> so that application passwords and API keys are not exposed.',
         'groundhogg')),
-      Pg({}, __('', 'groundhogg')),
+      Pg({}),
       makeEl('pre', {}, escHTML([
         `curl -X GET ${ apiRoot }/<endpoint>`,
         `  -H "X-WP-Nonce: <nonce>"`,
