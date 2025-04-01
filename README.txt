@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 4.0
+Stable tag: 4.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -20,7 +20,7 @@ Groundhogg 4.0 introduces the **Flow Editor** which makes Groundhogg the most po
 
 Create beautiful flows that convert leads into customers! Your customers will thank you.
 
-[https://youtu.be/HID8m2vRi-A?si=hmXNF5uJccJiIwCG]
+[youtube https://youtu.be/HID8m2vRi-A]
 
 Do your business a favor and switch to Groundhogg.
 
@@ -349,6 +349,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 4.0.1 (2025-04-01) =
+* FIXED Missing YouTube video in readme.
+* FIXED Multi-Branch not always returning the correct branch.
+* FIXED error notices above flows table if steps that are not registered are used in the flow preview
 
 = 4.0 (2025-03-31) =
 * RENAMED Funnels → Flows, and Benchmarks → Triggers
