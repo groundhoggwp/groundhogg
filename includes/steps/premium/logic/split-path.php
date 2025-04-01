@@ -7,6 +7,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
+use mysql_xdevapi\Exception;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\get_array_var;
 use function Groundhogg\int_to_letters;
@@ -49,9 +50,29 @@ class Split_Path extends Branch_Logic {
 	}
 
 	/**
-	 * Whether the contact matches a given branch
+	 * Returns the branch the contact should travel
 	 *
-	 * @throws \Groundhogg\DB\Query\FilterException
+	 * @param Contact $contact
+	 *
+	 * @return false|\Groundhogg\Step|string
+	 */
+	public function get_logic_branch( Contact $contact ) {
+
+		$branches = $this->get_setting( 'branches', [] );
+
+		foreach ( $branches as $branch_key => $branch_settings ) {
+			$branch = $this->maybe_prefix_branch( $branch_key );
+			if ( $this->matches_branch_conditions( $branch, $contact ) ) {
+				return $branch;
+			}
+		}
+
+		return 'else';
+
+	}
+
+	/**
+	 * Whether the contact matches a given branch
 	 *
 	 * @param Contact $contact
 	 * @param string  $branch
@@ -59,17 +80,20 @@ class Split_Path extends Branch_Logic {
 	 * @return bool
 	 */
 	public function matches_branch_conditions( string $branch, Contact $contact ) {
-		$path = explode( '-', $branch );
-		$path = $path[1]; // this is the key within $branches
 
-		$branches = $this->get_setting( 'branches' );
+		if ( str_starts_with( $branch, $this->get_current_step()->ID . '-' ) ) {
+			$parts = explode( '-', $branch );
+			$branch = $parts[1]; // this is the key within $branches
+		}
+
+		$branches = $this->get_setting( 'branches', [] );
 
 		// can't match any of the previous branches
-		if ( $path === 'else' ) {
+		if ( $branch === 'else' ) {
 
 			// loop through branches to check and see if we match any
 			foreach ( $branches as $branch_key => $branch_value ) {
-				if ( $this->matches_branch_conditions( $branch_key, $contact ) ) {
+				if ( $this->matches_branch_conditions( $this->maybe_prefix_branch( $branch_key ), $contact ) ) {
 					return false;
 				}
 			}
@@ -77,21 +101,26 @@ class Split_Path extends Branch_Logic {
 			return true;
 		}
 
-		$branch = get_array_var( $branches, $path, [] );
+		try {
+			$branch = get_array_var( $branches, $branch, [] );
 
-		// branch does not exist
-		if ( ! $branch ) {
+			// branch does not exist
+			if ( ! $branch ) {
+				return false;
+			}
+
+			$contactQuery = new Contact_Query( [
+				'limit'           => 1,
+				'include_filters' => get_array_var( $branch, 'include_filters', [] ),
+				'exclude_filters' => get_array_var( $branch, 'exclude_filters', [] ),
+				'include'         => [ $contact->ID ]
+			] );
+
+			$count = $contactQuery->count();
+
+		} catch ( \Exception $exception ){
 			return false;
 		}
-
-		$contactQuery = new Contact_Query( [
-			'limit'           => 1,
-			'include_filters' => get_array_var( $branch, 'include_filters', [] ),
-			'exclude_filters' => get_array_var( $branch, 'exclude_filters', [] ),
-			'include'         => [ $contact->ID ]
-		] );
-
-		$count = $contactQuery->count();
 
 		return $count === 1;
 	}

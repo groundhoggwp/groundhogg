@@ -48,18 +48,42 @@ abstract class Branch_Logic extends Logic {
 	 */
 	public function get_logic_action( Contact $contact ) {
 
-		$branches = $this->get_branches();
+        $branch = $this->get_logic_branch( $contact );
 
-		foreach ( $branches as $branch ) {
-			if ( $this->matches_branch_conditions( $branch, $contact ) ) {
-				return $this->get_first_of_branch( $branch );
-			}
-		}
+        if ( ! $branch ){
+            return false;
+        }
 
-		return false;
+        return $this->get_first_of_branch( $this->maybe_prefix_branch( $branch ) );
 	}
 
-	public function maybe_prefix_branch( $branch ) {
+	/**
+     * Get the branch to send contacts down
+     *
+	 * @param Contact $contact
+	 *
+	 * @return false|Step
+	 */
+    public function get_logic_branch( Contact $contact ) {
+	    $branches = $this->get_branches();
+
+	    foreach ( $branches as $branch ) {
+		    if ( $this->matches_branch_conditions( $branch, $contact ) ) {
+			    return $branch;
+		    }
+	    }
+
+	    return false;
+    }
+
+	/**
+     * Maybe prefix the step ID to a branch
+     *
+	 * @param string $branch
+	 *
+	 * @return string
+	 */
+	public function maybe_prefix_branch( string $branch ) {
 		$current_step = $this->get_current_step();
 		$step_prefix  = $current_step->ID . '-';
 

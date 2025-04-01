@@ -3,6 +3,7 @@
 namespace Groundhogg\Cli;
 
 use Groundhogg\Step;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function WP_CLI\Utils\make_progress_bar;
 
@@ -34,7 +35,7 @@ class Tests {
 	 *
 	 * @when after_wp_load
 	 */
-	function step( $args ){
+	function stepcmp( $args ){
 		$method = $args[0];
 		$stepA = $args[1];
 		$stepB = $args[2];
@@ -58,107 +59,75 @@ class Tests {
 	}
 
 	/**
-	 * Create a table
+	 * Test step branch conditionals
 	 *
 	 * ## OPTIONS
 	 *
-	 * <table>...
-	 * : internal table name(s)
+	 * <step>
+	 * : the step to test
+	 *
+	 * <branch>
+	 * : The branch to test
+	 *
+	 * <contact>
+	 * : The contact to test
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp groundhogg-table create events
+	 *     wp groundhogg-tests branchtest 123 foo 456
 	 *
 	 * @when after_wp_load
 	 */
-	function create( $args ){
-		$created = 0;
+	function branchtest( $args ) {
 
-		foreach ( $args as $table_id ){
-			$table = get_db( $table_id );
+		$stepId = $args[0];
+		$branch = $args[1];
+		$contact = $args[2];
 
-			if ( ! $table ){
-				\WP_CLI::error( sprintf( 'Table %s is not registered.', $args[0] ) );
-			}
+		$step = new Step( $stepId );
+		$contact = get_contactdata( $contact );
 
-			$table->create_table();
-
-			\WP_CLI::log( sprintf( 'Created `%s`', $table->table_name ) );
-
-			$created++;
+		if ( ! $step->is_branch_logic() ) {
+			\WP_CLI::error( 'Not a branch logic step' );
 		}
 
-		\WP_CLI::success( sprintf( 'Created %d tables', $created ) );
+		if ( $step->get_step_element()->matches_branch_conditions( $branch, $contact ) ) {
+			\WP_CLI::success( 'True' );
+		} else {
+			\WP_CLI::error( 'False' );
+		}
 	}
 
 	/**
-	 * Reset a table. Drops, then re-creates
+	 * Test step branch conditionals
 	 *
 	 * ## OPTIONS
 	 *
-	 * <table>...
-	 * : internal table name(s)
+	 * <step>
+	 * : the step to test
+	 *
+	 * <contact>
+	 * : The contact to test
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp groundhogg-table reset events
+	 *     wp groundhogg-tests logicbranch 123 456
 	 *
 	 * @when after_wp_load
 	 */
-	function reset( $args ){
-		$reset = 0;
+	function logicbranch( $args ) {
 
-		foreach ( $args as $table_id ){
-			$table = get_db( $table_id );
+		$stepId = $args[0];
+		$contact = $args[1];
 
-			if ( ! $table ){
-				\WP_CLI::error( sprintf( 'Table %s is not registered.', $args[0] ) );
-			}
+		$step = new Step( $stepId );
+		$contact = get_contactdata( $contact );
 
-			$table->drop();
-			$table->create_table();
-
-			\WP_CLI::log( sprintf( 'Reset `%s`', $table->table_name ) );
-
-			$reset++;
+		if ( ! $step->is_branch_logic() ) {
+			\WP_CLI::error( 'Not a branch logic step' );
 		}
 
-		\WP_CLI::success( sprintf( 'Reset %d tables', $reset ) );
-	}
-
-	/**
-	 * Truncates a table
-	 *
-	 * ## OPTIONS
-	 *
-	 * <table>...
-	 * : internal table name(s)
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     wp groundhogg-table truncate events
-	 *
-	 * @when after_wp_load
-	 */
-	function truncate( $args ){
-
-		$truncated = 0;
-
-		foreach ( $args as $table_id ){
-			$table = get_db( $table_id );
-
-			if ( ! $table ){
-				\WP_CLI::error( sprintf( 'Table %s is not registered.', $args[0] ) );
-			}
-
-			$table->truncate();
-
-			\WP_CLI::log( sprintf( 'Truncated `%s`', $table->table_name ) );
-
-			$truncated++;
-		}
-
-		\WP_CLI::success( sprintf( 'Truncated %d tables', $truncated ) );
+		\WP_CLI::success( $step->get_step_element()->get_logic_branch( $contact ) );
 	}
 
 }
