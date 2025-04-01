@@ -1259,9 +1259,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( doing_cli() ){
-			\WP_CLI::log( $this->get_title() );
-		}
+//		if ( doing_cli() ){
+//			\WP_CLI::log( $this->get_title() );
+//		}
 
 		if ( $skip_enqueued ) {
 
