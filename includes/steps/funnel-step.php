@@ -92,6 +92,10 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->add_additional_actions();
 	}
 
+    public function is_registered() {
+	    return Plugin::instance()->step_manager->type_is_registered( $this->get_type() );
+    }
+
 	protected function add_additional_actions() {
 	}
 

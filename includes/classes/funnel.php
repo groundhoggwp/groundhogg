@@ -92,8 +92,28 @@ class Funnel extends Base_Object_With_Meta {
 
 		foreach ( $steps as $step ) {
 
-			// if we're here, the step type is registered
-			$step_type = Plugin::instance()->step_manager->get_element( get_array_var( $step->data, 'step_type' ) );
+            // from actual funnel
+            if ( is_a( $step, Step::class ) ) {
+                $step_type = $step->get_step_element();
+
+                // skip unregistered steps, might be polyfill
+                if ( ! $step_type->is_registered() ){
+                    continue;
+                }
+            }
+
+            // from template
+            else {
+
+                $step_type = get_array_var( $step->data, 'step_type' );
+
+	            if ( ! Plugin::instance()->step_manager->type_is_registered( $step_type ) ){
+		            continue;
+	            }
+
+	            $step_type = Plugin::instance()->step_manager->get_element( $step_type );
+
+            }
 
 			?>
             <div class="step-preview">

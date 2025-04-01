@@ -1530,7 +1530,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_step_element() {
 
-		if ( $this->stepElement ) {
+		if ( is_a( $this->stepElement, Funnel_Step::class ) ) {
 			$this->stepElement->set_current_step( $this );
 
 			return $this->stepElement;
@@ -1539,14 +1539,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$type = $this->get_type();
 
 		// setup a polyfill to avoid rendering errors
-		if ( ! Plugin::instance()->step_manager->type_is_registered( $this->get_type() ) ) {
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) ) {
 
 			if ( $this->is_benchmark() ) {
 				$this->stepElement = new Polyfill_Benchmark( $this );
-			} else if ( $this->is_action() ) {
-				$this->stepElement = new Polyfill_Action( $this );
 			} else if ( $this->is_logic() ) {
 				$this->stepElement = new Polyfill_Logic( $this );
+			} else {
+				$this->stepElement = new Polyfill_Action( $this );
 			}
 
 			return $this->stepElement;
@@ -1849,7 +1849,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$meta_changes = [];
 
 		if ( $this->has_changes() ) {
-			$changes = $this->changes;
+			$changes      = $this->changes;
 			$columns      = $this->get_db()->get_columns();
 			$data_changes = array_intersect_key( $changes, $columns ); // stuff that goes into main DB
 			$meta_changes = array_diff_key( $changes, $columns ); // stuff that goes into meta
