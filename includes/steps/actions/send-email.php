@@ -87,7 +87,18 @@ class Send_Email extends Action {
 	}
 
 	protected function after_settings( Step $step ) {
-	    echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], '', false );
+	    echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], [
+		    html()->e( 'div', [
+			    'class' => 'inside',
+		    ], [
+			    html()->e('div', [
+				    'class' => 'skeleton-loading',
+				    'style' => [
+					    'height' => 30
+				    ]
+			    ])
+		    ] ),
+        ], false );
     }
 
 	public function validate_settings( Step $step ) {
