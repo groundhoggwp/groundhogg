@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.7
 Requires PHP: 7.1
-Stable tag: 4.0.1
+Stable tag: 4.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,9 +350,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 4.0.2 (2025-04-01) =
+* FIXED Multi-Branch not always returning the correct branch.
+
 = 4.0.1 (2025-04-01) =
 * FIXED Missing YouTube video in readme.
-* FIXED Multi-Branch not always returning the correct branch.
 * FIXED error notices above flows table if steps that are not registered are used in the flow preview
 
 = 4.0 (2025-03-31) =

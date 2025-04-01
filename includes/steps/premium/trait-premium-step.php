@@ -2,7 +2,6 @@
 
 namespace Groundhogg\Steps\Premium;
 
-use Groundhogg\Contact;
 use function Groundhogg\html;
 use function Groundhogg\is_pro_features_active;
 
@@ -50,9 +49,4 @@ trait Trait_Premium_Step {
 	public function generate_step_title( $step ) {
 		return $this->get_name();
 	}
-
-	public function get_logic_action( Contact $contact ) {
-		return false;
-	}
-
 }

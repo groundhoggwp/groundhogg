@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps\Logic;
 
 use Groundhogg\Contact;
+use Groundhogg\Step;
 use Groundhogg\Steps\Funnel_Step;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,7 +37,7 @@ abstract class Logic extends Funnel_Step {
 	 *
 	 * @param Contact $contact
 	 *
-	 * @return mixed
+	 * @return false|Step
 	 */
 	abstract public function get_logic_action( Contact $contact );
 

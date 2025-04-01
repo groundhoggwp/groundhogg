@@ -2,6 +2,8 @@
 
 namespace Groundhogg\steps\premium\logic;
 
+use Groundhogg\Contact;
+use Groundhogg\Step;
 use Groundhogg\Steps\Logic\Logic;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
 
@@ -23,5 +25,9 @@ class Logic_Stop extends Logic {
 
 	public function get_icon() {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/logic/logic-end.svg';
+	}
+
+	public function get_logic_action( Contact $contact ) {
+		return false;
 	}
 }

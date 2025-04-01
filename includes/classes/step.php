@@ -14,6 +14,7 @@ use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\steps\logic\Polyfill_Logic;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\Cli\doing_cli;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -1256,6 +1257,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( ! $can_enqueue ) {
 			return false;
+		}
+
+		if ( doing_cli() ){
+			\WP_CLI::log( $this->get_title() );
 		}
 
 		if ( $skip_enqueued ) {

@@ -7,7 +7,6 @@ use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
-use mysql_xdevapi\Exception;
 use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\get_array_var;
 use function Groundhogg\int_to_letters;
@@ -54,7 +53,7 @@ class Split_Path extends Branch_Logic {
 	 *
 	 * @param Contact $contact
 	 *
-	 * @return false|\Groundhogg\Step|string
+	 * @return string
 	 */
 	public function get_logic_branch( Contact $contact ) {
 
@@ -82,7 +81,7 @@ class Split_Path extends Branch_Logic {
 	public function matches_branch_conditions( string $branch, Contact $contact ) {
 
 		if ( str_starts_with( $branch, $this->get_current_step()->ID . '-' ) ) {
-			$parts = explode( '-', $branch );
+			$parts  = explode( '-', $branch );
 			$branch = $parts[1]; // this is the key within $branches
 		}
 
@@ -118,7 +117,7 @@ class Split_Path extends Branch_Logic {
 
 			$count = $contactQuery->count();
 
-		} catch ( \Exception $exception ){
+		} catch ( \Exception $exception ) {
 			return false;
 		}
 
