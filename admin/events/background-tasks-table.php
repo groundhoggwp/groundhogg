@@ -210,14 +210,14 @@ class Background_Tasks_Table extends Table {
 	 */
 	protected function column_task( $task ) {
 
-		if ( method_exists( $task->task, 'get_title' ) ) {
-			echo $task->task->get_title();
+		if ( method_exists( $task->theTask, 'get_title' ) ) {
+			echo $task->theTask->get_title();
 
 			return;
 		}
 
 		?>
-        <pre style="margin:0"><?php echo wp_json_encode( $task->task, JSON_PRETTY_PRINT ) ?></pre><?php
+        <pre style="margin:0"><?php echo wp_json_encode( $task->theTask, JSON_PRETTY_PRINT ) ?></pre><?php
 	}
 
 	/**

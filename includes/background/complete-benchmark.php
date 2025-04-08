@@ -16,6 +16,10 @@ class Complete_Benchmark extends Task {
 	protected int $batch;
 	protected int $contacts = 0;
 	protected Step $step;
+	/**
+	 * @var array
+	 */
+	protected $args;
 
 	const BATCH_LIMIT = 100;
 
@@ -24,11 +28,12 @@ class Complete_Benchmark extends Task {
 	 * @param array $query_args
 	 * @param int   $batch
 	 */
-	public function __construct( int $step_id, array $query_args, int $batch ) {
+	public function __construct( int $step_id, array $query_args, int $batch, array $args = [] ) {
 		$this->step_id = $step_id;
 		$this->query   = $query_args;
 		$this->batch   = $batch;
 		$this->user_id = get_current_user_id();
+		$this->args    = $args;
 
 		$query_args     = new Contact_Query( $this->query );
 		$this->contacts = $query_args->count();
@@ -62,6 +67,7 @@ class Complete_Benchmark extends Task {
 		] ) );
 
 		$contacts = $query->query( null, true );
+		$args     = is_array( $this->args ) ? $this->args : [];
 
 		// No more contacts to add to the funnel
 		if ( empty( $contacts ) ) {
@@ -69,7 +75,7 @@ class Complete_Benchmark extends Task {
 		}
 
 		foreach ( $contacts as $contact ) {
-			$this->step->benchmark_enqueue( $contact );
+			$this->step->benchmark_enqueue( $contact, $args );
 		}
 
 		$this->batch ++;
@@ -79,16 +85,20 @@ class Complete_Benchmark extends Task {
 
 	public function __serialize(): array {
 		return [
-			'step_id' => $this->step_id,
-			'query'   => $this->query,
-			'batch'   => $this->batch,
-			'user_id' => $this->user_id,
+			'step_id'  => $this->step_id,
+			'query'    => $this->query,
+			'batch'    => $this->batch,
+			'user_id'  => $this->user_id,
 			'contacts' => $this->contacts,
+			'args'     => $this->args
 		];
 	}
 
 	public function __unserialize( array $data ): void {
 		parent::__unserialize( $data );
+		if ( ! isset( $this->args ) ) {
+			$this->args = [];
+		}
 
 		$this->step = new Step( $this->step_id );
 	}

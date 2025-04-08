@@ -9,21 +9,26 @@ use function Groundhogg\get_db;
 
 class Background_Task extends Base_Object {
 
-	/**
-	 * @var Task
-	 */
-	protected $task;
-
 	public function get_progress() {
-		return $this->task->get_progress();
+		return $this->theTask->get_progress();
 	}
 
 	public function is_claimed() {
 		return ! empty( $this->claim );
 	}
 
+	public function getTask() {
+		return $this->theTask;
+	}
+
+	/**
+	 * @var Task
+	 */
+	public $theTask;
+
 	protected function post_setup() {
-		$this->task    = maybe_unserialize( $this->task );
+		// use $theTask because using $task would prevent the row from updating because of keep_the_diff
+		$this->theTask = maybe_unserialize( $this->task );
 		$this->time    = absint( $this->time );
 		$this->user_id = absint( $this->user_id );
 	}
@@ -64,12 +69,12 @@ class Background_Task extends Base_Object {
 		$this->update( [ 'status' => 'in_progress' ] );
 
 		// This task was not claimed
-		if ( ! $this->claim ){
+		if ( ! $this->claim ) {
 			$this->update( [ 'claim' => 'manual' ] );
 		}
 
 		// Can the task be run
-		if ( ! $this->task->can_run() ) {
+		if ( ! $this->theTask->can_run() ) {
 			throw new \Exception( 'Task can\'t run.' );
 		}
 
@@ -79,15 +84,21 @@ class Background_Task extends Base_Object {
 
 		// While there is still more of the task to do
 		while ( ! Limits::limits_exceeded() && $complete === false ) {
-			$complete = $this->task->process();
+			$complete = $this->theTask->process();
+
+			// update the task as it's being processed
+			$this->update( [
+				'task' => $this->theTask
+			] );
+
 			Limits::processed_action();
 		}
 
 		// Cleanup
-		$this->task->stop();
+		$this->theTask->stop();
 
 		$data = [
-			'task' => $this->task
+			'task' => $this->theTask
 		];
 
 		if ( $complete === true ) {
@@ -95,7 +106,7 @@ class Background_Task extends Base_Object {
 		}
 
 		// remove the manual claim
-		if ( $this->claim === 'manual' ){
+		if ( $this->claim === 'manual' ) {
 			$data['claim'] = '';
 		}
 

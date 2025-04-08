@@ -45,7 +45,7 @@ class Process_Bg_Task extends Bulk_Job {
 
 		$task = new Background_Task( absint( get_request_var( 'task' ) ) );
 
-		return array_fill( 0, $task->task->get_batches_remaining(), $task->get_id() );
+		return array_fill( 0, $task->theTask->get_batches_remaining(), $task->get_id() );
 	}
 
 	/**

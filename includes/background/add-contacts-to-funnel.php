@@ -3,15 +3,13 @@
 namespace Groundhogg\Background;
 
 use Groundhogg\Contact_Query;
-use Groundhogg\Funnel;
-use Groundhogg\Step;
 use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
 use function Groundhogg\notices;
 
 class Add_Contacts_To_Funnel extends Complete_Benchmark {
 
-	public function get_title(){
+	public function get_title() {
 		return sprintf( 'Adding %s contacts to %s in %s', bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
 	}
 
@@ -37,8 +35,10 @@ class Add_Contacts_To_Funnel extends Complete_Benchmark {
 			return true;
 		}
 
+		$args = is_array( $this->args ) ? $this->args : [];
+
 		foreach ( $contacts as $contact ) {
-			$this->step->enqueue( $contact );
+			$this->step->enqueue( $contact, true, $args );
 		}
 
 		$this->batch ++;
