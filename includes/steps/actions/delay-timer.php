@@ -342,7 +342,7 @@ class Delay_Timer extends Action {
 
 		$date->setMin();
 
-		$next_year = date( 'Y', strtotime( '+1 year' ) );
+		$next_year = date( 'Y', strtotime( '+1 year', $baseTimestamp ) );
 		$time      = $date->format( 'H:i:s' );
 
 		// The date to run on
@@ -455,7 +455,7 @@ class Delay_Timer extends Action {
 		// if the calculated time is now, lets advanced the base time by a minute...
 		// this cleverly prevents an infinite loop
 		if ( $date->isNow() ) {
-			return $this->calc_run_time( time() + MINUTE_IN_SECONDS, $step );
+			return $this->calc_run_time( $date->getTimestamp() + MINUTE_IN_SECONDS, $step );
 		}
 
 		return $date->getTimestamp();
