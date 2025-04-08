@@ -534,6 +534,12 @@ class Contact extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function is_marketable() {
+		/**
+		 * Filter whether the contact is currently marketable
+		 *
+		 * @param bool $is_marketable
+		 * @param Contact $contact
+		 */
 		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this ), $this );
 	}
 
@@ -543,11 +549,17 @@ class Contact extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function is_deliverable() {
-		return ! in_array( $this->get_optin_status(), [
+		/**
+		 * Filter whether the contact is currently deliverable
+		 *
+		 * @param bool $is_deliverable
+		 * @param Contact $contact
+		 */
+		return apply_filters( 'groundhogg/contact/is_deliverable', ! in_array( $this->get_optin_status(), [
 			Preferences::HARD_BOUNCE,
 			Preferences::COMPLAINED,
 			Preferences::SPAM
-		] );
+		] ), $this );
 	}
 
 	/**

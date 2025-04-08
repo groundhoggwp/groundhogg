@@ -1619,6 +1619,15 @@ class Form_v2 extends Step {
 	}
 
 	/**
+	 * Are we working with an existing contact record here?
+	 *
+	 * @return bool
+	 */
+	public function has_contact() {
+		return is_a_contact( $this->contact );
+	}
+
+	/**
 	 * Get the form uuid
 	 *
 	 * @return string
@@ -2153,7 +2162,8 @@ class Form_v2 extends Step {
 			$posted_data,
 			&$data,
 			&$meta,
-			&$tags
+			&$tags,
+			$this
 		] );
 
 		$email = get_array_var( $data, 'email' );

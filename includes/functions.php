@@ -2773,10 +2773,10 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 		&$map
 	] );
 
+	$data  = [];
 	$meta  = [];
 	$tags  = [];
 	$notes = [];
-	$args  = [];
 	$files = [];
 	$copy  = [];
 
@@ -2799,7 +2799,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				 *
 				 * @param $field  string the field in question
 				 * @param $value  mixed the value to store
-				 * @param &$args  array general contact information
+				 * @param &$data  array general contact information
 				 * @param &$meta  array list of contact data
 				 * @param &$tags  array list of tags to add to the contact
 				 * @param &$notes array add notes to the contact
@@ -2808,7 +2808,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				do_action_ref_array( 'groundhogg/generate_contact_with_map/default', [
 					$field,
 					$value,
-					&$args,
+					&$data,
 					&$meta,
 					&$tags,
 					&$notes,
@@ -2817,26 +2817,26 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 
 				break;
 			case 'contact_id':
-				$args[ $field ] = absint( $value );
+				$data[ $field ] = absint( $value );
 				break;
 			case 'full_name':
 				$parts              = split_name( $value );
-				$args['first_name'] = sanitize_text_field( $parts[0] );
-				$args['last_name']  = sanitize_text_field( $parts[1] );
+				$data['first_name'] = sanitize_text_field( $parts[0] );
+				$data['last_name']  = sanitize_text_field( $parts[1] );
 				break;
 			case 'first_name':
 			case 'last_name':
-				$args[ $field ] = sanitize_text_field( $value );
+				$data[ $field ] = sanitize_text_field( $value );
 				break;
 			case 'email':
-				$args[ $field ] = sanitize_email( $value );
+				$data[ $field ] = sanitize_email( $value );
 				break;
 			case 'date_created':
 			case 'date_optin_status_changed':
 
 				try {
 					$dateTime       = new DateTimeHelper( $value );
-					$args[ $field ] = $dateTime->ymdhis();
+					$data[ $field ] = $dateTime->ymdhis();
 				} catch ( \Exception $exception ) {
 				}
 
@@ -2848,7 +2848,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 					$value = Preferences::string_to_preference( $value );
 				}
 
-				$args[ $field ] = absint( $value );
+				$data[ $field ] = absint( $value );
 				break;
 			case 'user_email':
 			case 'owner_email':
@@ -2871,7 +2871,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 
 				// Check the mapped owner can actually own contacts.
 				if ( $field !== 'owner_email' || user_can( $user, 'edit_contacts' ) ) {
-					$args[ $swap[ $field ] ] = $user->ID;
+					$data[ $swap[ $field ] ] = $user->ID;
 				}
 
 				break;
@@ -2896,7 +2896,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				if ( $user ) {
 					// Check the mapped owner can actually own contacts.
 					if ( $field !== 'owner_id' || user_can( $user, 'edit_contacts' ) ) {
-						$args[ $field ] = $user->ID;
+						$data[ $field ] = $user->ID;
 					}
 				}
 
@@ -2938,11 +2938,11 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 					case 'Yes':
 					case 'true':
 					case 'True':
-						$args[ $field ] = true;
+						$data[ $field ] = true;
 						break;
 					default:
 						if ( ! empty( $value ) ) {
-							$args[ $field ] = true;
+							$data[ $field ] = true;
 						}
 						break;
 				}
@@ -3055,36 +3055,54 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 
 				break;
 		}
-
 	}
 
 	// try and fetch an existing contact record
 	$contact = $contact ? get_contactdata( $contact ) : null;
 
+	/**
+	 * Last chance to modify args, tags, meta, and other data before generating a contact record
+	 *
+	 * @param $contact Contact|null|false an existing contact record, if available
+	 * @param &$data  array general contact information
+	 * @param &$meta  array list of contact data
+	 * @param &$tags  array list of tags to add to the contact
+	 * @param &$notes array add notes to the contact
+	 * @param &$files array files to upload to the contact record
+	 */
+	do_action_ref_array( 'groundhogg/generate_contact_with_map/args', [
+		$contact,
+		&$data,
+		&$meta,
+		&$tags,
+		&$notes,
+		&$files,
+	] );
+
 	// one does not exist yet
 	if ( ! is_a_contact( $contact ) ) {
 
 		// an email was provided
-		if ( isset_not_empty( $args, 'email' ) ) {
+		if ( isset_not_empty( $data, 'email' ) ) {
 
 			// Get given email
-			if ( ! is_email( $args['email'] ) ) {
+			if ( ! is_email( $data['email'] ) ) {
 				return false;
 			}
 
 			// Either get an existing contact with this email or created a new one
-			$contact = new Contact( [ 'email' => $args['email'] ] );
+			$contact = new Contact( [ 'email' => $data['email'] ] );
 
-		} else if ( isset_not_empty( $args, 'user_id' ) ) {
+		} else if ( isset_not_empty( $data, 'user_id' ) ) {
 
 			// Get by given user id
-			$contact = get_contactdata( $args['user_id'], true );
+			$contact = get_contactdata( $data['user_id'], true );
 
-		} else if ( isset_not_empty( $args, 'contact_id' ) ) {
+		} else if ( isset_not_empty( $data, 'contact_id' ) ) {
 
 			// Get by given contact id
-			$contact = get_contactdata( $args['contact_id'] );
-			unset( $args['contact_id'] );
+			$contact = get_contactdata( $data['contact_id'] );
+			unset( $data['contact_id'] );
 
 		} else if ( ! current_user_can( 'view_contacts' ) ) {
 
@@ -3104,7 +3122,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 	}
 
 	// Update contact info
-	$contact->update( $args );
+	$contact->update( $data );
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
