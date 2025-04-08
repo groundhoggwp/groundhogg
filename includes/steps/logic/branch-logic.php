@@ -29,6 +29,10 @@ abstract class Branch_Logic extends Logic {
 
 	abstract protected function get_branch_name( $branch );
 
+    public function _get_branch_name( $branch ) {
+	    return $this->get_branch_name( $branch );
+    }
+
 	/**
 	 * Whether the contact matches the conditions for the current branch
 	 *
@@ -129,8 +133,8 @@ abstract class Branch_Logic extends Logic {
             <div class="display-flex align-top step-branches">
 				<?php foreach ( $this->get_branches() as $branch_id ):
 
-					$steps = array_filter_splice( $branch_steps, function ( $step ) use ( $branch_id ) {
-						return $step->branch === $branch_id;
+					$steps = array_filter_splice( $branch_steps, function ( Step $step ) use ( $branch_id ) {
+						return $step->branch_is( $branch_id );
 					} );
 
 					$classes = $this->get_branch_classes( $branch_id );
@@ -138,11 +142,15 @@ abstract class Branch_Logic extends Logic {
 					?>
                     <div class="split-branch <?php echo $classes ?>">
                         <div class="logic-line line-above">
-                            <span class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
+                            <span id="<?php _e( 'branch-name-indicator-' . $branch_id ) ?>" class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
-                        <div id="<?php esc_attr_e( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>"><?php foreach ( $steps as $branch_step ) {
+                        <div id="<?php esc_attr_e( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>">
+                            <?php foreach ( $steps as $branch_step ) {
 								$branch_step->sortable_item();
 							}
+
+                            // reset the current step to the current one
+	                        $this->set_current_step( $step );
 
 							$add_button_id = 'in-branch-' . $branch_id;
 

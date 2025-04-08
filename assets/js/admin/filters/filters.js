@@ -1113,6 +1113,11 @@
     onChange = (filters) => {},
   }) => {
 
+    // make sure array...
+    if ( ! filters ){
+      filters = []
+    }
+
     // parse the filters to make sure they have ids...
     filters.forEach(filterGroup => filterGroup.forEach(filter => {
       if (!filter.id) {

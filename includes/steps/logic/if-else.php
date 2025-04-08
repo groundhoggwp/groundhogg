@@ -55,6 +55,7 @@ class If_Else extends Branch_Logic {
 		return [
 			'include_filters' => [
 				'default'  => [],
+				'initial'  => [],
 				'sanitize' => function ( $filters ) {
 
 					if ( empty( $filters ) ) {
@@ -72,6 +73,7 @@ class If_Else extends Branch_Logic {
 			],
 			'exclude_filters' => [
 				'default'  => [],
+				'initial'  => [],
 				'sanitize' => function ( $filters ) {
 
 					if ( empty( $filters ) ) {
@@ -113,9 +115,9 @@ class If_Else extends Branch_Logic {
 		return strtoupper( explode( '-', $branch )[1] );
 	}
 
-    protected function get_branch_classes( $branch_id ): string {
-	    return str_ends_with( $branch_id, '-no' ) ? 'red' : 'green';
-    }
+	protected function get_branch_classes( $branch_id ): string {
+		return str_ends_with( $branch_id, '-no' ) ? 'red' : 'green';
+	}
 
 	/**
 	 * Which path?
@@ -159,26 +161,26 @@ class If_Else extends Branch_Logic {
 		return false;
 	}
 
-    public function get_logic_action( Contact $contact ) {
+	public function get_logic_action( Contact $contact ) {
 
-        $include_filters = $this->get_setting( 'include_filters', [] );
-        $exclude_filters = $this->get_setting( 'exclude_filters', [] );
+		$include_filters = $this->get_setting( 'include_filters', [] );
+		$exclude_filters = $this->get_setting( 'exclude_filters', [] );
 
-        if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
-            return $this->get_first_of_branch( 'yes' );
-        }
+		if ( empty( $include_filters ) && empty( $exclude_filters ) ) {
+			return $this->get_first_of_branch( 'yes' );
+		}
 
-	    $contactQuery = new Contact_Query( [
-		    'limit'           => 1,
-		    'include_filters' => $this->get_setting( 'include_filters', [] ),
-		    'exclude_filters' => $this->get_setting( 'exclude_filters', [] ),
-		    'include'         => [ $contact->ID ]
-	    ] );
+		$contactQuery = new Contact_Query( [
+			'limit'           => 1,
+			'include_filters' => $this->get_setting( 'include_filters', [] ),
+			'exclude_filters' => $this->get_setting( 'exclude_filters', [] ),
+			'include'         => [ $contact->ID ]
+		] );
 
-	    $count = $contactQuery->count();
+		$count = $contactQuery->count();
 
-        return $this->get_first_of_branch( $count === 0 ? 'no' : 'yes' );
-    }
+		return $this->get_first_of_branch( $count === 0 ? 'no' : 'yes' );
+	}
 
 	/**
 	 * Step title
