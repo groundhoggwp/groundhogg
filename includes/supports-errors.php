@@ -25,7 +25,7 @@ abstract class Supports_Errors {
 
 		$error = is_wp_error( $code ) ? $code : new \WP_Error( $code, $message, $data );
 
-		if ( is_wp_error( $error ) ) {
+		if ( is_wp_error( $error ) && ! $this->has_error( $error->get_error_code()) ) {
 			$this->errors[] = $error;
 		}
 
