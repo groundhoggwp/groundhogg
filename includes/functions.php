@@ -2052,7 +2052,7 @@ function count_csv_rows( $file_path ) {
 
 	$file = null;
 
-	return $rows - 2; // -1 to account for the header row
+	return $rows - 1; // -1 to account for the header row
 }
 
 /**
