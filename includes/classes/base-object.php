@@ -357,7 +357,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		}
 
 		// only keep data from registered columns
-		$data = array_intersect_key( $data, $this->db->get_columns() );
+		$data = array_intersect_key( $data, $this->get_db()->get_columns() );
 		// sanitize given data
 		$data = $this->sanitize_columns( $data );
 		// only keep data that's new to avoid unnecessary DB updates

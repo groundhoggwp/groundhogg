@@ -87,9 +87,9 @@ class Background_Task extends Base_Object {
 			$complete = $this->theTask->process();
 
 			// update the task as it's being processed
-			$this->update( [
-				'task' => $this->theTask
-			] );
+//			$this->update( [
+//				'task' => $this->theTask
+//			] );
 
 			Limits::processed_action();
 		}

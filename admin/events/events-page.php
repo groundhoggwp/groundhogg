@@ -614,7 +614,7 @@ class Events_Page extends Tabbed_Admin_Page {
               let row = e.target.closest('tr')
               let progressEl = row.querySelector('.task-progress')
               let taskId = progressEl.dataset.id
-              let progress = progressEl.dataset.progress
+              let progress = progressEl.dataset.progress ?? 0
 
               const SmallProgressBar = (props = {}) => ProgressBar({
                 percent  : progress,
