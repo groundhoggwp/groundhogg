@@ -122,12 +122,21 @@ class DateTimeHelper extends \DateTime {
 	}
 
 	/**
-	 * Sets the year to the current year
+	 * Sets the year to the current year based on either a base timestamp or the current time
+	 *
+	 * @throws \DateMalformedStringException
+	 *
+	 * @param int $baseTimestamp the base timestamp to use
 	 *
 	 * @return DateTimeHelper
 	 */
-	public function setToCurrentYear() {
-		$now = new DateTimeHelper();
+	public function setToCurrentYear( $baseTimestamp = 0 ) {
+
+		if ( $baseTimestamp === 0 ) {
+			$baseTimestamp = time();
+		}
+
+		$now = new DateTimeHelper( $baseTimestamp );
 
 		// already current year
 		if ( $now->format('Y') === $this->format('Y') ) {
