@@ -187,8 +187,8 @@ class Background_Tasks {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0 ) {
-		return self::add( new Add_Contacts_To_Funnel( $step_id, $query, $batch ) );
+	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0, $args = [] ) {
+		return self::add( new Add_Contacts_To_Funnel( $step_id, $query, $batch, $args ) );
 	}
 
 	/**
@@ -200,8 +200,8 @@ class Background_Tasks {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function complete_benchmark( $step_id, $query, $batch = 0 ) {
-		return self::add( new Complete_Benchmark( $step_id, $query, $batch ) );
+	public static function complete_benchmark( $step_id, $query, $batch = 0, $args = []) {
+		return self::add( new Complete_Benchmark( $step_id, $query, $batch, $args ) );
 	}
 
 	/**
