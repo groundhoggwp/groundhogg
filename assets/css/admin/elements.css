@@ -1804,6 +1804,7 @@ input.ui-autocomplete-input.focus-visible {
 
 .gh-picker-container {
   flex-grow: 1;
+  min-width: 0;
 }
 
 .gh-input-group,
@@ -2732,6 +2733,7 @@ button:has(.gh-dropdown-menu) {
   display: flex;
   gap: 5px;
   align-items: center;
+  min-width: 0;
 }
 .gh-picker .gh-picker-selected > .gh-picker-item.is-invalid {
   background: rgba(233, 31, 79, 0.1);

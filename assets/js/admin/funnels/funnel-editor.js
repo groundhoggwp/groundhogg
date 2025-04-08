@@ -293,15 +293,6 @@
           close()
         }
 
-        $document.on('click', '#full-screen', () => {
-          $(document.body).toggleClass('gh-full-screen')
-
-          ajax({
-            action     : 'gh_funnel_editor_full_screen_preference',
-            full_screen: $(document.body).hasClass('gh-full-screen') ? 1 : 0,
-          })
-        })
-
         // handle focused step for copying
         $document.on('click', e => {
           if (Groundhogg.element.clickedIn(e, '#step-flow .step')) {
@@ -712,8 +703,8 @@
           activate()
         })
 
-        $document.on('click', '#enter-full-screen', function (e) {
-          $('html').toggleClass('full-screen')
+        $('#funnel-simulate').on('click', e => {
+          this.showSimulator()
         })
 
         if (window.innerWidth > 600) {
@@ -725,6 +716,9 @@
 
           if (hash === 'add') {
             this.showAddStep()
+          }
+          else if (hash === 'simulator') {
+            this.showSimulator()
           }
           else {
             this.startEditing(parseInt(window.location.hash.substring(1)))
@@ -747,18 +741,91 @@
           onClick  : e => {
             moreMenu('#funnel-more', [
               {
-                key     : 'uncommit',
-                text    : '<span class="gh-text danger">Revert Changes</span>',
+                key     : 'settings',
+                text    : 'Settings',
                 onSelect: e => {
-                  dangerConfirmationModal({
-                    alert    : '<p>Are you sure you want to revert your changes?</p><p>Your flow will be restored to the most recent save point.</p>',
-                    onConfirm: () => {
-                      this.save({
-                        moreData: formData => {
-                          formData.append('_uncommit', 1)
+                  Modal({}, ({ close }) => {
+
+                    let funnel = FunnelsStore.get(this.id)
+
+                    let { description = '' } = funnel.meta
+                    let { campaigns = [] } = funnel
+
+                    let campaignIds = campaigns.map(c => c.ID)
+
+                    return Div({}, [
+                      `<h2>Flow Settings</h2>`,
+                      `<p>Use <b>campaigns</b> to organize your flows. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
+                      ItemPicker({
+                        id          : 'pick-campaigns',
+                        noneSelected: 'Add a campaign...',
+                        selected    : campaigns.map(({
+                          ID,
+                          data,
+                        }) => ( {
+                          id  : ID,
+                          text: data.name,
+                        } )),
+                        tags        : true,
+                        fetchOptions: async (search) => {
+                          let campaigns = await CampaignsStore.fetchItems({
+                            search,
+                            limit: 20,
+                          })
+
+                          return campaigns.map(({
+                            ID,
+                            data,
+                          }) => ( {
+                            id  : ID,
+                            text: data.name,
+                          } ))
                         },
-                      })
-                    },
+                        createOption: async value => {
+                          let campaign = await CampaignsStore.create({
+                            data: {
+                              name: value,
+                            },
+                          })
+
+                          return {
+                            id  : campaign.ID,
+                            text: campaign.data.name,
+                          }
+                        },
+                        onChange    : items => campaignIds = items.map(item => item.id),
+                      }),
+                      `<p>Add a simple description.</p>`,
+                      Textarea({
+                        id       : 'funnel-description',
+                        className: 'full-width',
+                        onInput  : e => {
+                          description = e.target.value
+                        },
+                        value    : description,
+                      }),
+                      Div({
+                        className: 'display-flex flex-end',
+                      }, Button({
+                        id       : 'save-settings',
+                        className: 'gh-button primary',
+                        onClick  : async e => {
+
+                          close()
+
+                          await FunnelsStore.patch(this.id, {
+                            campaigns: campaignIds,
+                            meta     : {
+                              description,
+                            },
+                          })
+
+                          dialog({
+                            message: 'Changes saved!',
+                          })
+                        },
+                      }, 'Save')),
+                    ])
                   })
                 },
               },
@@ -812,6 +879,17 @@
                 },
               },
               {
+                key     : 'fullscreen',
+                text    : document.body.classList.contains('gh-full-screen') ? 'Exit Fullscreen' : 'Fullscreen',
+                onSelect: e => {
+                  document.body.classList.toggle('gh-full-screen')
+                  ajax({
+                    action     : 'gh_funnel_editor_full_screen_preference',
+                    full_screen: document.body.classList.contains('gh-full-screen') ? 1 : 0,
+                  })
+                },
+              },
+              {
                 key     : 'shortcuts',
                 text    : 'Keyboard Shortcuts',
                 onSelect: e => {
@@ -862,108 +940,25 @@
                   })
                 },
               },
+              {
+                key     : 'uncommit',
+                text    : '<span class="gh-text danger">Revert Changes</span>',
+                onSelect: e => {
+                  dangerConfirmationModal({
+                    alert    : '<p>Are you sure you want to revert your changes?</p><p>Your flow will be restored to the most recent save point.</p>',
+                    onConfirm: () => {
+                      this.save({
+                        moreData: formData => {
+                          formData.append('_uncommit', 1)
+                        },
+                      })
+                    },
+                  })
+                },
+              },
             ])
           },
         }, icons.verticalDots))
-
-        tooltip('#full-screen', {
-          content: 'Toggle full Screen',
-        })
-
-        tooltip('#replacements', {
-          content: 'Replacement codes',
-        })
-
-        tooltip('#funnel-settings', {
-          content: 'Flow settings',
-        })
-
-        document.getElementById('funnel-settings').addEventListener('click', e => {
-
-          Modal({}, ({ close }) => {
-
-            let funnel = FunnelsStore.get(this.id)
-
-            let { description = '' } = funnel.meta
-            let { campaigns = [] } = funnel
-
-            let campaignIds = campaigns.map(c => c.ID)
-
-            return Div({}, [
-              `<h2>Flow Settings</h2>`,
-              `<p>Use <b>campaigns</b> to organize your flows. Use terms like <code>Black Friday</code> or <code>Sales</code>.</p>`,
-              ItemPicker({
-                id          : 'pick-campaigns',
-                noneSelected: 'Add a campaign...',
-                selected    : campaigns.map(({
-                  ID,
-                  data,
-                }) => ( {
-                  id  : ID,
-                  text: data.name,
-                } )),
-                tags        : true,
-                fetchOptions: async (search) => {
-                  let campaigns = await CampaignsStore.fetchItems({
-                    search,
-                    limit: 20,
-                  })
-
-                  return campaigns.map(({
-                    ID,
-                    data,
-                  }) => ( {
-                    id  : ID,
-                    text: data.name,
-                  } ))
-                },
-                createOption: async value => {
-                  let campaign = await CampaignsStore.create({
-                    data: {
-                      name: value,
-                    },
-                  })
-
-                  return {
-                    id  : campaign.ID,
-                    text: campaign.data.name,
-                  }
-                },
-                onChange    : items => campaignIds = items.map(item => item.id),
-              }),
-              `<p>Add a simple description.</p>`,
-              Textarea({
-                id       : 'funnel-description',
-                className: 'full-width',
-                onInput  : e => {
-                  description = e.target.value
-                },
-                value    : description,
-              }),
-              Div({
-                className: 'display-flex flex-end',
-              }, Button({
-                id       : 'save-settings',
-                className: 'gh-button primary',
-                onClick  : async e => {
-
-                  close()
-
-                  await FunnelsStore.patch(this.id, {
-                    campaigns: campaignIds,
-                    meta     : {
-                      description,
-                    },
-                  })
-
-                  dialog({
-                    message: 'Changes saved!',
-                  })
-                },
-              }, 'Save')),
-            ])
-          })
-        })
 
         $('#step-settings-container').resizable({
           handles        : 'w',
@@ -1300,9 +1295,31 @@
       showAddStep () {
         this.showSettings()
         this.startEditing(null)
+        document.getElementById( 'step-settings-inner' ).dataset.show = 'add'
 
         history.pushState(null, null, '#add')
       },
+
+      showSimulator() {
+
+        if ( ! this.steps.length ){
+          Groundhogg.element.errorDialog({
+            message: 'You must add steps to the flow first.'
+          })
+          return
+        }
+
+        this.showSettings()
+        Groundhogg.simulator.state.set({
+          current: this.editing ? parseInt( this.editing ) : this.steps[0].ID
+        })
+        this.startEditing(null)
+        document.getElementById( 'step-settings-inner' ).dataset.show = 'simulator'
+        Groundhogg.simulator.morph()
+
+        history.pushState(null, null, '#simulator')
+      },
+
 
       /**
        * Given an element delete it
@@ -1540,6 +1557,7 @@
 
           document.getElementById(`step-${ this.editing }`).classList.add('editing')
           document.getElementById(`settings-${ this.editing }`).classList.add('editing')
+          document.getElementById( 'step-settings-inner' ).dataset.show = 'edit'
 
           this.stepSettingsCallbacks()
 

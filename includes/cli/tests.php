@@ -2,9 +2,13 @@
 
 namespace Groundhogg\Cli;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Step;
+use function cli\prompt;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
-use function Groundhogg\process_events;
+use function Groundhogg\get_post_var;
+use function WP_CLI\Utils\format_items;
 use function WP_CLI\Utils\make_progress_bar;
 
 /**
@@ -14,6 +18,41 @@ use function WP_CLI\Utils\make_progress_bar;
  *
  */
 class Tests {
+
+	/**
+	 * Test step conditionals
+	 *
+	 * ## OPTIONS
+	 *
+	 * <step>
+	 * : id of the step to test
+	 *
+	 * <contact>
+	 * : id of the contact to test
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp groundhogg-tests testnext 123 456
+	 *
+	 * @when after_wp_load
+	 */
+	function testnext( $args ) {
+		$stepId  = $args[0];
+		$step    = new Step( $stepId );
+		$contact = get_contactdata( $args[1] );
+
+		if ( ! $step->exists() ) {
+			\WP_CLI::error( 'The given steps dont exist.' );
+		}
+
+		while ( $step ) {
+			\WP_CLI::log( $step->get_title() );
+			$step = $step->get_next_action( $contact );
+		}
+
+		\WP_CLI::success( 'Fin.' );
+
+	}
 
 	/**
 	 * Test step conditionals
@@ -141,26 +180,26 @@ class Tests {
 	 * <contact>
 	 * : The contact to test
 	 *
+	 * [--dry=<true|false>]
+	 * : If true, no actions will be run
+	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp groundhogg-tests simulate 123 456
+	 *     wp groundhogg-tests simulate 123 456 --dry=false
 	 *
 	 * @when after_wp_load
 	 */
-	function simulate( $args ) {
+	function simulate( $args, $assoc_args ) {
 
 		$stepId  = $args[0];
 		$contact = $args[1];
 
-		$step    = new Step( $stepId );
+		$dry = filter_var( get_array_var( $assoc_args, 'dry', true ), FILTER_VALIDATE_BOOLEAN );
+
+		$current = new Step( $stepId );
 		$contact = get_contactdata( $contact );
 
-		$step->enqueue( $contact );
-
-		process_events( $contact );
-
-		\WP_CLI::success( 'Simulated' );
-
+		Simulator::simulate( $current, $contact, $dry );
 	}
 
 	/**

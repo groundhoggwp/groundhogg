@@ -260,6 +260,29 @@ body.gh-screenshot-mode {
   width: 100%;
 }
 
+.action {
+  --color: #{$action-green};
+  --color-25: #{$action-green-25};
+  --color-10: #{$action-green-10};
+  --color-5: #{$action-green-5};
+}
+
+.benchmark {
+  --color: #{$benchmark-orange};
+  --color-25: #{$benchmark-orange-25};
+  --color-10: #{$benchmark-orange-10};
+  --color-5: #{$benchmark-orange-5};
+
+  border-radius: 30px;
+}
+
+.logic {
+  --color: #{$secondary-purple};
+  --color-25: #{$secondary-purple-25};
+  --color-10: #{$secondary-purple-10};
+  --color-5: #{$secondary-purple-5};
+}
+
 #step-settings-container {
   --bg-color: #f0f3f5;
   /*padding: 10px 20px;*/
@@ -324,6 +347,61 @@ body.gh-screenshot-mode {
     right: 0;
     overflow: auto;
     transition: 0.4s;
+
+
+    #flow-simulator{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .contact-list-item {
+        border: none !important;
+      }
+
+      .start-from {
+        padding: 30px;
+      }
+
+      #flow-simulator-log {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex-grow: 1;
+        padding: 20px 30px 30px 30px;
+        overflow-y: auto;
+        border-top: 1px solid $primary-dark-15;
+
+        .flow-continue-item {
+          flex-grow: 1;
+          cursor: pointer;
+        }
+
+        p.flow-log-item{
+          margin: 0;
+          padding-left: 20px;
+        }
+        div.flow-log-item {
+          padding: 10px;
+          background-color: #fff;
+          border-radius: 5px;
+          box-shadow: $box-shadow;
+
+          .step-name {
+            color: var(--color);
+            font-size: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            //text-align: center;
+          }
+
+          svg {
+            fill: var(--color);
+            width: 30px;
+            height: 30px;
+          }
+        }
+      }
+    }
 
     #add-steps {
 
@@ -531,7 +609,20 @@ body.gh-screenshot-mode {
       }
     }
 
+    &:not([data-show="add"]){
+      #add-steps {
+        display: none;
+      }
+    }
+
+    &:not([data-show="simulator"]){
+      #flow-simulator{
+        display: none;
+      }
+    }
+
     &:has(.step.editing) {
+      #flow-simulator,
       #add-steps {
         display: none;
       }

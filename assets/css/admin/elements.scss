@@ -1990,6 +1990,7 @@ input.ui-autocomplete-input {
 
 .gh-picker-container{
   flex-grow: 1;
+  min-width: 0;
 }
 
 .gh-input-group,
@@ -3121,6 +3122,7 @@ button:has(.gh-dropdown-menu) {
       display: flex;
       gap: 5px;
       align-items: center;
+      min-width: 0;
 
       &.is-invalid {
         background: $error-red-10;

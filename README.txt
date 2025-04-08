@@ -350,6 +350,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 4.1 (2025-04-08) =
+* ADDED Flow Simulation tool to simulate a contact moving through a flow. Makes testing flows way easier.
+ * You can also run simulations via the WP CLI.
+* FIXED Filters in logic steps sometimes not appearing.
+* FIXED Background task progress for large tasks not updating, causing them to never complete.
+* FIXED Branch names for multi-branch logic incorrect if nested inside another multi-branch.
+
 = 4.0.2 (2025-04-01) =
 * FIXED Multi-Branch not always returning the correct branch.
 

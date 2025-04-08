@@ -19,6 +19,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\sanitize_payload;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -92,9 +93,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->add_additional_actions();
 	}
 
-    public function is_registered() {
-	    return Plugin::instance()->step_manager->type_is_registered( $this->get_type() );
-    }
+	public function is_registered() {
+		return Plugin::instance()->step_manager->type_is_registered( $this->get_type() );
+	}
 
 	protected function add_additional_actions() {
 	}
@@ -966,11 +967,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 *
 	 * @param string $setting
 	 * @param mixed  $value
-	 * @param mixed  $old_value the old value if available
+	 * @param string $callback 'sanitize' or 'import'
 	 *
 	 * @return false|mixed
 	 */
-	public function sanitize_setting( string $setting, $value ) {
+	public function sanitize_setting( string $setting, $value, string $callback = 'sanitize' ) {
 		$schema = $this->get_settings_schema();
 
 		if ( ! isset( $schema[ $setting ] ) ) {
@@ -981,11 +982,24 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'sanitize' => '\Groundhogg\sanitize_payload',
 		] );
 
+		$sanitize_func = $setting_schema['sanitize'];
+
+		// just in case...
+		if ( ! is_callable( $sanitize_func ) ) {
+			return sanitize_payload( $value );
+		}
+
+		// use default value if empty
 		if ( empty( $value ) && isset( $setting_schema['default'] ) ) {
 			$value = $setting_schema['default'];
 		}
 
-		return call_user_func( $setting_schema['sanitize'], $value );
+		// use loose import sanitization if available...
+		if ( $callback === 'import' && isset( $setting_schema['import'] ) && is_callable( $setting_schema['import'] ) ) {
+			$sanitize_func = $setting_schema['import'];
+		}
+
+		return call_user_func( $sanitize_func, $value );
 	}
 
 	/**

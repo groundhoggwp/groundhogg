@@ -88,32 +88,30 @@ class Funnel extends Base_Object_With_Meta {
 		?>
         <div class="funnel-preview"><?php
 
-		$steps    = array_splice( $allSteps, 0, $show );
+		$steps = array_splice( $allSteps, 0, $show );
 
 		foreach ( $steps as $step ) {
 
-            // from actual funnel
-            if ( is_a( $step, Step::class ) ) {
-                $step_type = $step->get_step_element();
+			// from actual funnel
+			if ( is_a( $step, Step::class ) ) {
+				$step_type = $step->get_step_element();
 
-                // skip unregistered steps, might be polyfill
-                if ( ! $step_type->is_registered() ){
-                    continue;
-                }
-            }
+				// skip unregistered steps, might be polyfill
+				if ( ! $step_type->is_registered() ) {
+					continue;
+				}
+			} // from template
+			else {
 
-            // from template
-            else {
+				$step_type = get_array_var( $step->data, 'step_type' );
 
-                $step_type = get_array_var( $step->data, 'step_type' );
+				if ( ! Plugin::instance()->step_manager->type_is_registered( $step_type ) ) {
+					continue;
+				}
 
-	            if ( ! Plugin::instance()->step_manager->type_is_registered( $step_type ) ){
-		            continue;
-	            }
+				$step_type = Plugin::instance()->step_manager->get_element( $step_type );
 
-	            $step_type = Plugin::instance()->step_manager->get_element( $step_type );
-
-            }
+			}
 
 			?>
             <div class="step-preview">
@@ -632,6 +630,13 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_steps( $query = [] ) {
 
+		$last_changed = db()->steps->cache_get_last_changed();
+		$cache_key    = "$this->ID:steps:$last_changed";
+		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
+		if ( $found ) {
+			return $steps;
+		}
+
 		$query = wp_parse_args( $query, [
 			'funnel_id' => $this->get_id(),
 			'orderby'   => 'step_order',
@@ -654,14 +659,17 @@ class Funnel extends Base_Object_With_Meta {
 			}
 
 			// filter out "deleted" steps with the status as deleted in their changes
-			$steps = array_filter( $steps, function ( $step ) {
+			$steps = array_filter( $steps, function ( Step $step ) {
 				return $step->step_status !== 'deleted';
 			} );
 
+			// resort because of changes
 			usort( $steps, function ( Step $a, Step $b ) {
 				return $a->get_order() - $b->get_order();
 			} );
 		}
+
+		wp_cache_set( $cache_key, $steps, db()->steps->get_cache_group(), MINUTE_IN_SECONDS );
 
 		return $steps;
 	}
@@ -800,6 +808,13 @@ class Funnel extends Base_Object_With_Meta {
 			return $this->legacy_import( json_decode( json_encode( $data ), true ) );
 		}
 
+		/**
+		 * Relly just here as a flag for importing, but theoretically you can modify the data directly
+         *
+         * @param array $data the import JSON
+		 */
+		do_action_ref_array( 'groundhogg/funnel/import/before', [&$data] );
+
 		$this->setup_template_data( $data );
 
 		$this->create( [
@@ -827,8 +842,12 @@ class Funnel extends Base_Object_With_Meta {
 
 			$step = new Step();
 			$step->create( $data );
-			$step->update_meta( json_decode( json_encode( $_step->meta ), true ) );
-			$step->import( json_decode( json_encode( $_step->export ), true ) );
+
+			$metadata   = json_decode( json_encode( $_step->meta ), true );
+			$importdata = json_decode( json_encode( $_step->export ), true );
+
+			$step->update_meta( $metadata );
+			$step->import( $importdata );
 
 			// Save the original ID from the donor funnel
 			$step->update_meta( 'imported_step_id', $_step->ID );
@@ -845,6 +864,8 @@ class Funnel extends Base_Object_With_Meta {
 		get_db( 'stepmeta' )->delete( [
 			'meta_key' => 'imported_step_id'
 		] );
+
+		do_action( 'groundhogg/funnel/import/after', $this, $data );
 
 		return $this->get_id();
 	}

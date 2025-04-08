@@ -378,6 +378,8 @@ class Scripts {
 			'groundhogg-admin-properties'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-flow-simulator', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/simulator' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-editor' . $dot_min . '.js', [
 			'jquery',
 //			'groundhogg-leader-line',
@@ -386,6 +388,7 @@ class Scripts {
 			'groundhogg-admin-functions',
 			'groundhogg-admin-form-builder-v2',
 			'groundhogg-email-block-editor',
+			'groundhogg-admin-flow-simulator',
 			'groundhogg-admin-funnel-scheduler',
 		], GROUNDHOGG_VERSION, true );
 

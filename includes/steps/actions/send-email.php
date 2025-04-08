@@ -2,11 +2,13 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Event;
 use Groundhogg\Step;
+use function Groundhogg\bold_it;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -208,6 +210,10 @@ class Send_Email extends Action {
 			return new \WP_Error( 'email_dne', 'Invalid email ID provided.' );
 		}
 
+		if ( ! $email->is_ready() ) {
+			return new \WP_Error( 'email_not_ready', 'The email is not ready for sending.' );
+		}
+
 		$reply_in_thread = $this->get_setting( 'reply_in_thread' );
 
 		// replying to a thread
@@ -247,6 +253,10 @@ class Send_Email extends Action {
 		}
 
 		$sent = $email->send( $contact, $event );
+
+        if ( $sent === true ){
+            Simulator::log( sprintf( '📨 Sent %s', bold_it( $email->get_title() ) ) );
+        }
 
 		// Thread stuff only if email was sent successfully
 		if ( $sent === true ) {

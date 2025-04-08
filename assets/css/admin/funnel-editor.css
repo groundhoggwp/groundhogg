@@ -145,6 +145,28 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   width: 100%;
 }
 
+.action {
+  --color: #9ece38;
+  --color-25: rgba(158, 206, 56, 0.25);
+  --color-10: rgba(158, 206, 56, 0.1);
+  --color-5: rgba(158, 206, 56, 0.05);
+}
+
+.benchmark {
+  --color: #f58115;
+  --color-25: rgba(245, 129, 21, 0.25);
+  --color-10: rgba(245, 129, 21, 0.1);
+  --color-5: rgba(245, 129, 21, 0.05);
+  border-radius: 30px;
+}
+
+.logic {
+  --color: #6c19ad;
+  --color-25: rgba(108, 25, 173, 0.25);
+  --color-10: rgba(108, 25, 173, 0.1);
+  --color-5: rgba(108, 25, 173, 0.05);
+}
+
 #step-settings-container {
   --bg-color: #f0f3f5;
   /*padding: 10px 20px;*/
@@ -194,6 +216,51 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   right: 0;
   overflow: auto;
   transition: 0.4s;
+}
+#step-settings-container #step-settings-inner #flow-simulator {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+#step-settings-container #step-settings-inner #flow-simulator .contact-list-item {
+  border: none !important;
+}
+#step-settings-container #step-settings-inner #flow-simulator .start-from {
+  padding: 30px;
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-grow: 1;
+  padding: 20px 30px 30px 30px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log .flow-continue-item {
+  flex-grow: 1;
+  cursor: pointer;
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log p.flow-log-item {
+  margin: 0;
+  padding-left: 20px;
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item {
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item .step-name {
+  color: var(--color);
+  font-size: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+#step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item svg {
+  fill: var(--color);
+  width: 30px;
+  height: 30px;
 }
 #step-settings-container #step-settings-inner #add-steps {
   padding: 30px;
@@ -359,6 +426,13 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step > .ui-draggable-dragging p {
   display: none;
 }
+#step-settings-container #step-settings-inner:not([data-show=add]) #add-steps {
+  display: none;
+}
+#step-settings-container #step-settings-inner:not([data-show=simulator]) #flow-simulator {
+  display: none;
+}
+#step-settings-container #step-settings-inner:has(.step.editing) #flow-simulator,
 #step-settings-container #step-settings-inner:has(.step.editing) #add-steps {
   display: none;
 }

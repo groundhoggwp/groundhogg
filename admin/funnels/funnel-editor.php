@@ -151,32 +151,20 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 
 			echo html()->e( 'button', [
 				'class' => 'gh-button secondary text icon',
-				'id'    => 'full-screen',
+				'id'    => 'funnel-simulate',
 				'type'  => 'button',
-			], dashicon( 'fullscreen-alt' ) );
-
-			echo html()->modal_link( array(
-				'title'              => __( 'Replacements', 'groundhogg' ),
-				'text'               => dashicon( 'admin-users' ),
-				'footer_button_text' => __( 'Insert' ),
-				'id'                 => 'replacements',
-				'class'              => 'no-padding replacements replacements-button gh-button secondary text icon',
-				'source'             => 'footer-replacement-codes',
-				'height'             => 900,
-				'width'              => 700,
-			) );
-
-			echo html()->e( 'button', [
-				'class' => 'gh-button secondary text icon',
-				'id'    => 'funnel-settings',
-				'type'  => 'button',
-			], dashicon( 'admin-settings' ) );
+			], [
+				dashicon( 'controls-play' ),
+				html()->e( 'div', [
+					'class' => 'gh-tooltip bottom'
+				], 'Simulate' )
+			] );
 
 			echo html()->button( [
-				'type'     => 'button',
-				'class'    => 'gh-button danger text',
-				'id'       => 'funnel-deactivate',
-				'text'     => 'Deactivate',
+				'type'  => 'button',
+				'class' => 'gh-button danger text',
+				'id'    => 'funnel-deactivate',
+				'text'  => 'Deactivate',
 			] );
 
 			echo html()->button( [
@@ -256,6 +244,9 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                 </div>
                 <div class="step-settings <?php echo force_custom_step_names() ? 'custom-step-names' : 'generated-step-names' ?>">
 					<?php $funnel->step_settings() ?>
+                </div>
+                <div id="flow-simulator">
+                    Simulator here!
                 </div>
             </div>
         </div>

@@ -14,7 +14,6 @@ use Groundhogg\Steps\Funnel_Step;
 use Groundhogg\steps\logic\Branch_Logic;
 use Groundhogg\steps\logic\Polyfill_Logic;
 use Groundhogg\Utils\DateTimeHelper;
-use function Groundhogg\Cli\doing_cli;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -132,6 +131,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		do_action( 'groundhogg/step/post_setup', $this );
+	}
+
+	/**
+	 * The branches
+	 *
+	 * @return string[]
+	 */
+	public function get_branch_path_ids() {
+		return array_filter( explode( '|', $this->branch_path ) );
+	}
+
+	/**
+	 * The ancestors
+	 *
+	 * @return string[]
+	 */
+	public function get_ancestor_ids() {
+		return array_filter( explode( '|', $this->ancestors ) );
 	}
 
 	/**
@@ -570,8 +587,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 *
 		 * @param $next    Step
 		 * @param $current Step
+		 * @param $contact Contact
 		 */
-		return apply_filters( 'groundhogg/step/next_action', $next, $this );
+		return apply_filters( 'groundhogg/step/next_action', $next, $this, $contact );
 	}
 
 	/**
@@ -583,29 +601,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	protected function _get_next_action( $contact ) {
 
-		if ( $this->is_benchmark() ) { // benchmarks
+		// benchmarks
+		if ( $this->is_benchmark() ) {
 
-			// Can return any closest action from the current branch, or any parent branch
-			$branches = explode( '|', $this->branch_path );
-			// but also the first step of the branch related to the benchmark, if one.
-			$branches[] = $this->ID;
-
-			$query = new Table_Query( 'steps' );
-			$query->setOrderby( [ 'step_order', 'ASC' ] )
-			      ->setLimit( 1 )
-			      ->where()
-			      ->equals( 'step_status', 'active' )
-			      ->equals( 'funnel_id', $this->get_funnel_id() )
-			      ->in( 'branch', $branches )
-			      ->in( 'step_group', [ self::ACTION, self::LOGIC ] )
-			      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 )
-			      ->greaterThanEqualTo( 'step_level', $this->get_level() + 1 );
-
-			$next = $query->get_objects( Step::class );
-
-			$next = ! empty( $next ) ? $next[0] : false; // first proceeding action
-
-		} else if ( $this->is_logic() ) { // logic
+			// simply get the first step that comes after this one, no mater what it is
+			$next = array_find( $this->get_funnel()->get_steps(), function ( Step $step ) {
+				return $step->is_after( $this );
+			} );
+		} // logic
+		else if ( $this->is_logic() ) { // logic
 
 			$next = false;
 
@@ -620,9 +624,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 				$next = $this->get_next_step();
 			}
 
-		} else { // actions
-
-			// just get the next step
+		} // actions
+		else {
+			// just get the next step that comes after
 			$next = $this->get_next_step();
 		}
 
@@ -730,6 +734,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * If the funnel is being simulated
+	 *
+	 * @return false
+	 */
+	static public function is_simulating() {
+		return false; // todo change this
+	}
+
+	/**
 	 * Get the next step of the funnel
 	 *
 	 * THIS WILL ONLY RETURN THE NEXT AVAILABLE STEP FROM WITHIN THE CURRENT BRANCH OR PARENT BRANCH
@@ -746,20 +759,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_next_step() {
 
-		$query = new Table_Query( 'steps' );
-
-		$query->setOrderby( [ 'step_order', 'ASC' ] )
-		      ->setLimit( 1 )
-		      ->where()
-		      ->equals( 'step_status', 'active' )
-		      ->equals( 'funnel_id', $this->get_funnel_id() )
-		      ->in( 'branch', explode( '|', $this->branch_path ) )
-		      ->greaterThanEqualTo( 'step_order', $this->get_order() + 1 )
-		      ->greaterThanEqualTo( 'step_level', $this->get_level() + 1 );
-
-		$next = $query->get_objects( Step::class );
-
-		$next = ! empty( $next ) ? $next[0] : false;
+		// since Funnel::get_steps() returns steps in order, this should theoretically return the first viable step
+		$next = array_find( array_filter( $this->get_funnel()->get_steps(), function ( Step $step ) {
+			return in_array( $step->branch, $this->get_branch_path_ids() );
+		} ), function ( Step $step ) {
+			return $step->is_after( $this );
+		} );
 
 		// special handling for passthru, can't be starting from a benchmark
 		if ( ! $this->is_benchmark() && $next && $next->is_benchmark() && ! $next->can_passthru() ) {
@@ -993,11 +998,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return array|string|false
 	 */
 	public function get_lowest_common_ancestor_id( Step $other ) {
-
-		$a_ancestors = explode( '|', $this->ancestors );
-		$b_ancestors = explode( '|', $other->ancestors );
-
-		$common = array_intersect( $a_ancestors, $b_ancestors );
+		$common = array_intersect( $this->get_ancestor_ids(), $other->get_ancestor_ids() );
 
 		if ( empty( $common ) ) {
 			return false;
@@ -1015,10 +1016,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_lowest_common_ancestor_branch( Step $other ) {
 
-		$a_branches = explode( '|', $this->branch_path );
-		$b_branches = explode( '|', $other->branch_path );
-
-		$common = array_intersect( $a_branches, $b_branches );
+		$common = array_intersect( $this->get_branch_path_ids(), $other->get_branch_path_ids() );
 
 		if ( empty( $common ) ) {
 			return false;
@@ -1067,6 +1065,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Checks if the step is in a parallel benchmark branch
+	 * This only works for steps within the branches themselves, and not the parent benchmarks
 	 *
 	 * @param Step $other
 	 *
@@ -1075,13 +1074,25 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	protected function _in_parallel_benchmark_branch( Step $other ) {
 
 		// would start at main and go down
-		$a_branches  = array_reverse( explode( '|', $this->branch_path ) ); // first is always main
-		$a_ancestors = array_reverse( explode( '|', $this->ancestors ) );
-		$b_branches  = array_reverse( explode( '|', $other->branch_path ) ); // first is always main
-		$b_ancestors = array_reverse( explode( '|', $other->ancestors ) );
+		$a_branches  = array_reverse( $this->get_branch_path_ids() ); // first is always main
+		$a_ancestors = array_reverse( $this->get_ancestor_ids() );
+		$b_branches  = array_reverse( $other->get_branch_path_ids() ); // first is always main
+		$b_ancestors = array_reverse( $other->get_ancestor_ids() );
 
 		array_shift( $a_branches ); // get rid of 'main'
 		array_shift( $b_branches ); // get rid of 'main'
+
+		// sneaky benchmark hack
+		if ( $this->is_benchmark() ) {
+			$a_branches[]  = "$this->ID";
+			$a_ancestors[] = "$this->ID";
+		}
+
+		// sneaky benchmark hack
+		if ( $other->is_benchmark() ) {
+			$b_branches[]  = "$other->ID";
+			$b_ancestors[] = "$other->ID";
+		}
 
 		// need a parent to be parallel, duh!
 		if ( empty( $b_branches ) || empty( $a_branches ) || empty( $a_ancestors ) || empty( $b_ancestors ) ) {
@@ -1104,8 +1115,21 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$a_ancestor = $a_ancestors[ $i ];
 			$b_ancestor = $b_ancestors[ $i ];
 
-			// we have found adjacent benchmarks, therefor the steps are parallel
-			return $a_ancestor === $a_branch && $b_ancestor === $b_branch;
+			// we have found benchmarks at the same level, check if those benchmarks are actually adjacent.
+			if ( $a_ancestor === $a_branch && $b_ancestor === $b_branch ) {
+
+				$steps = $this->get_funnel()->get_steps();
+
+				$a = array_find( $steps, function ( Step $step ) use ( $a_ancestor ) {
+					return $step->ID == $a_ancestor;
+				} );
+
+				$b = array_find( $steps, function ( Step $step ) use ( $b_ancestor ) {
+					return $step->ID == $b_ancestor;
+				} );
+
+				return $a->is_same_level( $b );
+			}
 		}
 
 		return false;
@@ -1224,57 +1248,94 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Create an event and add it to the queue
+	 * Maybe swap out the step being enqueued with another step...
 	 *
+	 * @param Step    $step
 	 * @param Contact $contact
-	 * @param bool    $skip_enqueued whether to skip any other enqueued steps
-	 * @param array   $args          option arguments to store with the event
+	 * @param array   $args
 	 *
-	 * @return bool
+	 * @return Step|mixed
 	 */
-	public function enqueue( $contact, $skip_enqueued = true, $args = [] ) {
+	public static function _maybe_filter_step_before_enqueuing( Step $step, Contact $contact, array $args = [] ) {
 
-		// logic steps can't be enqueued, only their children or what they point to can be enqueued...
-		if ( $this->is_logic() ) {
-			$next = $this->get_next_action( $contact );
-			if ( $next === false ) {
-				return false;
-			}
-
-			return $next->enqueue( $contact, $skip_enqueued, $args );
-		}
-
-		$this->enqueued_contact = $contact;
+		$prev = $step;
 
 		/**
+		 * Filter the step directly before enqueuing a step.
+		 * Allows logic to filter the step to be enqueued.
+		 *
+		 * @param Step    $step    Step the step being enqueued
+		 * @param Contact $contact Contact
+		 * @param array   $args    The event arguments
+		 *
+		 * @return bool whether the step can be enqueued or not...
+		 */
+		$step = apply_filters_ref_array( 'groundhogg/step/enqueue', [ $prev, $contact, &$args ] );
+
+		if ( ! is_a( $step, Step::class ) ) {
+			return $step;
+		}
+
+		// got the same step back which is our exit condition
+		if ( $prev->ID === $step->ID ) {
+			return $step;
+		}
+
+		// continue to filter the step...
+		return self::_maybe_filter_step_before_enqueuing( $step, $contact, $args );
+	}
+
+	/**
+	 * use a static function so we can use filters
+	 *
+	 * @param Step    $step
+	 * @param Contact $contact
+	 * @param array   $args
+	 * @param bool    $skip_enqueued
+	 *
+	 * @return bool|int
+	 */
+	public static function _enqueue( Step $step, Contact $contact, array $args = [], bool $skip_enqueued = true ) {
+
+		// logic steps can't be enqueued, only their children or what they point to can be enqueued...
+		if ( $step->is_logic() ) {
+			$step = $step->get_next_action( $contact );
+		}
+
+		$step = self::_maybe_filter_step_before_enqueuing( $step, $contact, $args );
+
+		// exit out, not a step
+		if ( ! is_a( $step, Step::class ) ) {
+			return $step;
+		}
+
+		/**
+		 * Whether the step can be enqueued
+		 *
 		 * @param bool    $enqueue whether the step can be enqueued or not...
 		 * @param Contact $contact Contact
 		 * @param Step    $step    Step the step being enqueued
 		 *
 		 * @return bool whether the step can be enqueued or not...
 		 */
-		$can_enqueue = apply_filters( 'groundhogg/steps/enqueue', true, $contact, $this );
+		$can_enqueue = apply_filters_deprecated( 'groundhogg/steps/enqueue', [ true, $contact, $step ], '4.1', 'groundhogg/step/enqueue' );
 
 		if ( ! $can_enqueue ) {
 			return false;
 		}
 
-//		if ( doing_cli() ){
-//			\WP_CLI::log( $this->get_title() );
-//		}
-
 		if ( $skip_enqueued ) {
 
 			// Update any events to skipped...
-			$this->get_event_queue_db()->mass_update(
+			db()->event_queue->mass_update(
 				[
 					'status'         => Event::SKIPPED,
 					'error_code'     => 'skipped_by_step',
-					'error_message'  => sprintf( 'Step %d [%s] enqueued', $this->get_id(), sanitize_text_field( $this->get_step_title() ) ),
+					'error_message'  => sprintf( 'Step %d [%s] enqueued', $step->get_id(), sanitize_text_field( $step->get_step_title() ) ),
 					'time_scheduled' => time(), // time to say when it skipped
 				],
 				[
-					'funnel_id'  => $this->get_funnel_id(),
+					'funnel_id'  => $step->get_funnel_id(),
 					'contact_id' => $contact->get_id(),
 					'event_type' => Event::FUNNEL,
 					'status'     => Event::WAITING,
@@ -1284,9 +1345,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Set up the new event args
 		$event = [
-			'time'       => $this->get_run_time(),
-			'funnel_id'  => $this->get_funnel_id(),
-			'step_id'    => $this->get_id(),
+			'time'       => $step->get_run_time(),
+			'funnel_id'  => $step->get_funnel_id(),
+			'step_id'    => $step->get_id(),
 			'contact_id' => $contact->get_id(),
 			'event_type' => Event::FUNNEL,
 			'priority'   => 10,
@@ -1307,14 +1368,29 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 *
 		 * @return array The modified event data.
 		 */
-		$event = apply_filters( 'groundhogg/step/enqueue/event', $event, $contact, $this );
+		$event = apply_filters( 'groundhogg/step/enqueue/event', $event, $contact, $step );
 
 		// Special handling for email events
-		if ( $this->get_type() === Send_Email::TYPE ) {
-			$event['email_id'] = absint( $this->get_meta( 'email_id' ) );
+		if ( $step->get_type() === Send_Email::TYPE ) {
+			$event['email_id'] = absint( $step->get_meta( 'email_id' ) );
 		}
 
-		return $this->get_event_queue_db()->add( $event );
+		return db()->event_queue->add( $event );
+	}
+
+	/**
+	 * Create an event and add it to the queue
+	 *
+	 * @param Contact $contact
+	 * @param bool    $skip_enqueued whether to skip any other enqueued steps
+	 * @param array   $args          option arguments to store with the event
+	 *
+	 * @return bool
+	 */
+	public function enqueue( $contact, $skip_enqueued = true, $args = [] ) {
+		$this->enqueued_contact = $contact;
+
+		return self::_enqueue( $this, $contact, $args, $skip_enqueued );
 	}
 
 	/**
@@ -1724,6 +1800,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->data = array_merge( $this->data, $data_changes );
 		$this->meta = array_merge( $this->meta, $meta_changes );
 
+		$this->post_setup();
+
 		$this->is_temp_merged = true;
 	}
 
@@ -1881,7 +1959,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 *
 	 * Instead of actually updating the step, we might be adding the data to the changes
 	 *
 	 * @param $data
@@ -1899,10 +1976,30 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return parent::update( $data );
 	}
 
+	/**
+	 * If the steps are currently being imported...
+	 *
+	 * @return int|null
+	 */
+	public static function is_importing() {
+		return did_action( 'groundhogg/funnel/import/before' );
+	}
+
+	/**
+	 * Sanitize meta data
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return false|mixed|string
+	 */
 	public function sanitize_meta( $key, $value ) {
 
 		if ( $this->get_step_element()->in_settings_schema( $key ) ) {
-			return $this->get_step_element()->sanitize_setting( $key, $value );
+
+			$callback = self::is_importing() ? 'import' : 'sanitize';
+
+			return $this->get_step_element()->sanitize_setting( $key, $value, $callback );
 		}
 
 		switch ( $key ) {

@@ -19,6 +19,7 @@ use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -61,11 +62,27 @@ class Funnels_Page extends Admin_Page {
 
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
+		add_action( 'wp_ajax_gh_flow_simulate', [ $this, 'ajax_simulate' ] );
 
 		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
 			$this,
 			'update_user_full_screen_preference'
 		] );
+	}
+
+	public function ajax_simulate() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_funnels' ) ) {
+			wp_send_json_error();
+		}
+
+		$step_id    = absint( get_post_var( 'from' ) );
+		$contact_id = absint( get_post_var( 'contact' ) );
+		$dry        = filter_var( get_post_var( 'dry' ), FILTER_VALIDATE_BOOLEAN );
+		$contact    = get_contactdata( $contact_id ?: false );
+		$step       = new Step( $step_id );
+
+		Simulator::simulate( $step, $contact, $dry );
 	}
 
 	/**

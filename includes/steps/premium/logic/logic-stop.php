@@ -3,7 +3,6 @@
 namespace Groundhogg\steps\premium\logic;
 
 use Groundhogg\Contact;
-use Groundhogg\Step;
 use Groundhogg\Steps\Logic\Logic;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
 
