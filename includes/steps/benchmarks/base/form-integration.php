@@ -10,7 +10,6 @@ use function Groundhogg\code_it;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
-use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\sanitize_field_map;
 
@@ -112,6 +111,7 @@ abstract class Form_Integration extends Benchmark {
 				$row['label'],
 				html()->dropdown( [
 					'option_none' => '-----',
+					'class'       => 'no-morph',
 					'options'     => get_mappable_fields(),
 					'selected'    => get_array_var( $field_map, $row['id'] ),
 					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row['id'] ),

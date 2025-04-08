@@ -622,7 +622,9 @@
             return
           }
 
-          this.saveQuietly()
+          this.saveQuietly({
+            shouldMorphSettings: ! e.target.matches( '.no-morph' )
+          })
         })
 
         $('#gh-legacy-modal-save-changes').on('click', () => {
@@ -1012,6 +1014,7 @@
           quiet = true,
           moreData = () => {},
           restore = '',
+          shouldMorphSettings = true
         } = args
 
         if (quiet && this.saving) {
@@ -1096,27 +1099,29 @@
             this.makeSortable()
           }
 
-          morphdom(document.querySelector('.step-settings'), Div({}, response.data.settings), {
-            childrenOnly     : true,
-            onBeforeElUpdated: function (fromEl, toEl) {
+          if ( shouldMorphSettings ){
+            morphdom(document.querySelector('.step-settings'), Div({}, response.data.settings), {
+              childrenOnly     : true,
+              onBeforeElUpdated: function (fromEl, toEl) {
 
-              if (fromEl.tagName === 'TEXTAREA' && toEl.tagName === 'TEXTAREA') {
-                toEl.style.height = fromEl.style.height
-              }
+                if (fromEl.tagName === 'TEXTAREA' && toEl.tagName === 'TEXTAREA') {
+                  toEl.style.height = fromEl.style.height
+                }
 
-              // preserve the editing class
-              if (fromEl.classList.contains('editing')) {
-                toEl.classList.add('editing')
-              }
+                // preserve the editing class
+                if (fromEl.classList.contains('editing')) {
+                  toEl.classList.add('editing')
+                }
 
-              if (quiet && !restore && fromEl.matches('.editing .ignore-morph')) {
-                return false // don't morph the currently edited step to avoid glitchiness
-              }
+                if (quiet && !restore && fromEl.matches('.editing .ignore-morph')) {
+                  return false // don't morph the currently edited step to avoid glitchiness
+                }
 
-              return true
-            },
+                return true
+              },
 
-          })
+            })
+          }
 
           // self.makeSortable()
           drawLogicLines()
