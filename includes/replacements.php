@@ -28,21 +28,21 @@ class Replacements implements \JsonSerializable {
 	 *
 	 * @var array
 	 */
-	var $replacement_codes = [];
+	public $replacement_codes = [];
 
 	/**
 	 * Groups to which codes can be assigned
 	 *
 	 * @var array
 	 */
-	var $replacement_code_groups = [];
+	public $replacement_code_groups = [];
 
 	/**
 	 * The contact ID
 	 *
 	 * @var int
 	 */
-	var $contact_id;
+	protected $contact_id;
 
 	/**
 	 * @var Contact
@@ -278,7 +278,7 @@ class Replacements implements \JsonSerializable {
 				'name'        => __( 'Birthday', 'groundhogg' ),
 				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
 			],
-            [
+			[
 				'code'        => 'upcoming_birthday',
 				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_upcoming_birthday' ],
@@ -795,12 +795,10 @@ class Replacements implements \JsonSerializable {
 			return $content;
 		}
 
-		$content = preg_replace_callback( self::PATTERN . 's', [
+		return preg_replace_callback( self::PATTERN . 's', [
 			$this,
 			'do_replacement'
 		], $content );
-
-		return $this->tackle_replacements( $content );
 	}
 
 	/**
@@ -841,6 +839,47 @@ class Replacements implements \JsonSerializable {
 		];
 	}
 
+	private $code_stack = [];
+
+	/**
+	 * If we did a code
+	 *
+	 * @param $code
+	 *
+	 * @return bool
+	 */
+	private function did_code( $code ) {
+		if ( isset( $this->code_stack[ $code ] ) && $this->code_stack[ $code ] ) {
+			return true;
+		}
+
+		$this->add_code_to_stack( $code );
+
+		return false;
+	}
+
+	/**
+	 * Add a code to the stack to prevent recursive replacements
+	 *
+	 * @param $code
+	 *
+	 * @return void
+	 */
+	private function add_code_to_stack( $code ) {
+		$this->code_stack[ $code ] = true;
+	}
+
+	/**
+	 * Remove the code from the stack when finished.
+	 *
+	 * @param $code
+	 *
+	 * @return void
+	 */
+	private function remove_code_to_stack( $code ) {
+		unset( $this->code_stack[ $code ] );
+	}
+
 	/**
 	 * Process the given replacement code
 	 *
@@ -857,6 +896,14 @@ class Replacements implements \JsonSerializable {
 		$arg     = $parts['arg'];
 		$code    = $parts['code'];
 		$default = $parts['default'];
+
+        $code_key = md5serialize( $code, $arg, $default );
+
+		// Did we already do this code during the current process?
+        // if we didn't it'll get added to the stack within Replacements::did_code().
+		if ( $this->did_code( $code_key ) ) {
+			return '';
+		}
 
 		// The code exists and is set
 		if ( $this->has_replacement( $code ) ) {
@@ -890,9 +937,19 @@ class Replacements implements \JsonSerializable {
 				$text = $default;
 			}
 
+			// tackle inner replacements within the returned text
+			$text = $this->tackle_replacements( $text );
+
+			/**
+			 * Filter the return value of a given replacement code
+			 *
+			 * @param string $text the return value of the replacement code
+			 */
 			$value = apply_filters( "groundhogg/replacements/{$code}", $text );
 
 			wp_cache_set( $cache_key, $value, 'groundhogg/replacements' );
+
+			$this->remove_code_to_stack( $code_key );
 
 			return $value;
 		}
@@ -927,7 +984,12 @@ class Replacements implements \JsonSerializable {
 			$text = $default;
 		}
 
+		// tackle inner replacements within the returned text
+		$text = $this->tackle_replacements( $text );
+
 		wp_cache_set( $cache_key, $text, 'groundhogg/replacements' );
+
+		$this->remove_code_to_stack( $code_key );
 
 		return $text;
 	}
@@ -1060,13 +1122,13 @@ class Replacements implements \JsonSerializable {
 
 		$birthday = $this->get_current_contact()->get_meta( 'birthday' );
 
-		if ( ! $birthday ){
+		if ( ! $birthday ) {
 			return '';
 		}
 
 		try {
 			$birthday = new DateTimeHelper( $birthday );
-		}catch (\Exception $exception){
+		} catch ( \Exception $exception ) {
 			return '';
 		}
 
@@ -1074,46 +1136,46 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-     * The upcoming birthday of the contact
-     *
+	 * The upcoming birthday of the contact
+	 *
 	 * @return string
 	 */
 	function replacement_upcoming_birthday() {
 
-        $birthday = $this->get_current_contact()->get_meta( 'birthday' );
+		$birthday = $this->get_current_contact()->get_meta( 'birthday' );
 
-        if ( ! $birthday ){
-            return '';
-        }
+		if ( ! $birthday ) {
+			return '';
+		}
 
-        try {
-	        $birthday = new DateTimeHelper( $birthday );
-        }catch (\Exception $exception){
-            return '';
-        }
+		try {
+			$birthday = new DateTimeHelper( $birthday );
+		} catch ( \Exception $exception ) {
+			return '';
+		}
 
 		$birthday->setToCurrentYear();
 
-        if ( $birthday->isPast() ){
-            $birthday->modify( '+1 year' );
-        }
+		if ( $birthday->isPast() ) {
+			$birthday->modify( '+1 year' );
+		}
 
-        return $birthday->ymd();
+		return $birthday->ymd();
 	}
 
 
 	/**
-     * The contact's website
-     *
+	 * The contact's website
+	 *
 	 * @return string
 	 */
 	function replacement_website() {
 
-        $contact = $this->get_current_contact();
+		$contact = $this->get_current_contact();
 
-        if ( is_free_email_provider( $contact->get_email() ) ){
-            return '';
-        }
+		if ( is_free_email_provider( $contact->get_email() ) ) {
+			return '';
+		}
 
 		return 'https://' . get_email_address_hostname( $this->get_current_contact()->get_email() );
 	}

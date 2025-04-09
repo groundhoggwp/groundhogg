@@ -19,8 +19,19 @@ class Simulator {
 	protected static $steps = [];
 	protected static $is_dry_run = true;
 
+	/**
+	 * Whether the simulator is running or not
+	 *
+	 * @var bool
+	 */
+	protected static bool $is_simulating = false;
+
 	public static function is_dry_run(){
 		return self::$is_dry_run;
+	}
+
+	public static function is_simulating(){
+		return self::$is_simulating;
 	}
 
 	/**
@@ -66,6 +77,11 @@ class Simulator {
 	 * @return void
 	 */
 	public static function log( $item ) {
+
+		// not simulating, bail
+		if ( ! self::is_simulating() ){
+			return;
+		}
 
 		self::$flow[] = $item;
 
@@ -144,6 +160,8 @@ class Simulator {
 			wp_send_json_error();
 		}
 
+		self::$is_simulating = true;
+
 		$funnel      = $step->get_funnel();
 		self::$steps = $funnel->get_steps();
 		$step        = self::asFromSteps( $step );
@@ -156,6 +174,8 @@ class Simulator {
 		$prev    = new Step();
 		$next    = false;
 		$time    = time();
+
+		self::log( '🟩 Starting simulation...' );
 
 		while ( $current ) {
 
@@ -271,6 +291,8 @@ class Simulator {
 		}
 
 		self::log( '🏁 Simulation complete!' );
+
+		self::$is_simulating = false;
 
 		self::respond();
 	}

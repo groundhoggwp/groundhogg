@@ -1390,6 +1390,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function enqueue( $contact, $skip_enqueued = true, $args = [] ) {
 		$this->enqueued_contact = $contact;
 
+		// ensure args is an array
+		if ( ! is_array( $args ) ){
+			$args = [];
+		}
+
 		return self::_enqueue( $this, $contact, $args, $skip_enqueued );
 	}
 

@@ -335,6 +335,9 @@ class Event extends Base_Object {
 	protected function post_setup() {
 
 		$this->args    = maybe_unserialize( $this->args );
+		if ( empty( $this->args ) && ! is_array( $this->args ) ) {
+			$this->args = []; // default to using an array if empty
+		}
 		$this->contact = new Contact( $this->get_contact_id() );
 
 		self::maybe_register_step_setup_callbacks();
