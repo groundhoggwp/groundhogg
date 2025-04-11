@@ -2366,7 +2366,7 @@ class Replacements implements \JsonSerializable {
 				$rows = [];
 
 				$columnTable = sprintf( '<table class="email-columns %s responsive" role="presentation" width="100%%" style="width: 100%%; table-layout: fixed" cellpadding="0" cellspacing="0">', $props['layout'] );
-				$columnGap   = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], str_repeat( '&nbsp;', 3 ) );
+				$columnGap   = sprintf( '<td class="email-columns-cell gap" style="width: %1$dpx;height: %1$dpx;line-height: 1;font-size: %1$dpx;" width="%1$d" height="%1$d">%2$s</td>', $props['gap'], str_repeat( '&nbsp;', 3 ) );
 
 				$thumbnail = function ( $thumbnail_size ) {
 

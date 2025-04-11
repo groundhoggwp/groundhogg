@@ -264,6 +264,9 @@ class Email extends Base_Object_With_Meta {
 
 		// Block editor replacements
 		if ( $this->is_block_editor() ) {
+			$content = Block_Registry::instance()->parse_blocks( $content, 'plain' );
+
+			// this is maintained for backwards compatibility, for new emails is won't do anything...
 			$content = $this->maybe_hide_blocks( $content, 'plain' );
 			$content = Block_Registry::instance()->replace_dynamic_content( $content, 'plain' );
 		}
@@ -591,6 +594,8 @@ class Email extends Base_Object_With_Meta {
 	 * Hide blocks that have conditional visibility enabled
 	 * Also ends up removing HTML comments which is an added bonus
 	 *
+	 * @since 4.1.1 this will only ever be used in the 'plain' context for backwards compatibility, as Block_Registry::parse_blocks() handles this for HTML
+	 *
 	 * @param string $content
 	 * @param string $context
 	 *
@@ -678,8 +683,10 @@ class Email extends Base_Object_With_Meta {
 		switch ( $this->get_editor_type() ) {
 			// Block Editor
 			case 'blocks':
-				$content = $this->maybe_hide_blocks( $content );
-				$content = Block_Registry::instance()->replace_dynamic_content( $content );
+				$content = Block_Registry::instance()->parse_blocks( $content, 'html' );
+
+				// this is now handled by Block_Registry::parse_blocks()
+//				$content = $this->maybe_hide_blocks( $content );
 
 				// Special handling for footer unsub link
 				if ( $this->has_footer_block() ) {
@@ -1389,7 +1396,7 @@ class Email extends Base_Object_With_Meta {
 					$value = absint( $value );
 					break;
 				case 'plain_text':
-					$value = sanitize_textarea_field( $value );
+					$value = email_kses( $value );
 					break;
 				case 'subject':
 				case 'title':

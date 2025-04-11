@@ -270,13 +270,13 @@
 #email-block-editor #content #builder-content .builder-block[data-type=html] .maybe-edit-html {
   min-height: 30px;
 }
-#email-block-editor #content #builder-content .builder-block:not([data-type=columns]) > .block-toolbar .move-block {
+#email-block-editor #content #builder-content .builder-block:not(:has(.builder-block)) > .block-toolbar .move-block {
   right: 0;
   left: initial;
   transform: translate(50%, -50%);
   border-radius: 50%;
 }
-#email-block-editor #content #builder-content .builder-block:not([data-type=columns]) > .block-toolbar span.block-type {
+#email-block-editor #content #builder-content .builder-block:not(:has(.builder-block)) > .block-toolbar span.block-type {
   top: initial;
   bottom: 0;
   transform: translateY(100%);
@@ -300,12 +300,16 @@
 #email-block-editor #content #builder-content .builder-block img {
   display: inline-block;
 }
+#email-block-editor #content #builder-content .builder-block .children.empty,
 #email-block-editor #content #builder-content .builder-block .column.empty {
   background-color: rgba(16, 38, 64, 0.05);
   border-radius: 5px;
   height: 40px;
   margin: 5px;
   min-width: 40px;
+}
+#email-block-editor #content #builder-content .builder-block .children {
+  outline: 2px dashed rgba(16, 38, 64, 0.15);
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar {
   display: none;
@@ -347,10 +351,10 @@
   height: 20px;
   width: 20px;
 }
-#email-block-editor #content #builder-content .builder-block.inspector-hover, #email-block-editor #content #builder-content .builder-block:hover:not(:has(td .builder-block:hover)) {
+#email-block-editor #content #builder-content .builder-block.inspector-hover, #email-block-editor #content #builder-content .builder-block:hover:not(:has(.builder-block:hover)) {
   outline: 2px solid #66ACFF;
 }
-#email-block-editor #content #builder-content .builder-block.inspector-hover > .block-toolbar, #email-block-editor #content #builder-content .builder-block:hover:not(:has(td .builder-block:hover)) > .block-toolbar {
+#email-block-editor #content #builder-content .builder-block.inspector-hover > .block-toolbar, #email-block-editor #content #builder-content .builder-block:hover:not(:has(.builder-block:hover)) > .block-toolbar {
   display: block;
   background-color: #66ACFF;
 }
@@ -365,7 +369,7 @@
   overflow: visible;
   z-index: 9;
 }
-#email-block-editor #content #builder-content .builder-block.is-editing:not([data-type=columns]) > .block-toolbar .block-buttons {
+#email-block-editor #content #builder-content .builder-block.is-editing:not(:has(.builder-block)) > .block-toolbar .block-buttons {
   top: initial;
   bottom: -4px;
   right: -2px;

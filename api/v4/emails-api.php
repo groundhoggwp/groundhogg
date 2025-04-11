@@ -97,6 +97,14 @@ class Emails_Api extends Base_Object_Api {
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/block-preview/", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'parse_blocks' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/blocks/(?P<block_type>\w+)/", [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -212,10 +220,27 @@ class Emails_Api extends Base_Object_Api {
 	 */
 	public function render_block( \WP_REST_Request $request ) {
 
-		$block = $request->get_param( 'block_type' );
 		$props = base64_json_decode( $request->get_param( 'props' ) );
+		$html  = Block_Registry::instance()->render_block( $props, '' );
 
-		$html = Block_Registry::instance()->render_block( $block, $props );
+		return self::SUCCESS_RESPONSE( [
+			'content' => $html
+		] );
+	}
+
+	/**
+	 * Render a dynamic block
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function parse_blocks( \WP_REST_Request $request ) {
+
+		define( 'GH_DOING_BLOCK_PREVIEW', true );
+
+		$content = email_kses( $request->get_param( 'html' ) );
+		$html    = Block_Registry::instance()->parse_blocks( $content );
 
 		return self::SUCCESS_RESPONSE( [
 			'content' => $html

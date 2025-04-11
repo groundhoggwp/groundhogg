@@ -3,6 +3,7 @@
 namespace Groundhogg\Cli;
 
 use Groundhogg\Admin\Funnels\Simulator;
+use Groundhogg\Block_Registry;
 use Groundhogg\Step;
 use function cli\prompt;
 use function Groundhogg\get_array_var;
@@ -18,6 +19,21 @@ use function WP_CLI\Utils\make_progress_bar;
  *
  */
 class Tests {
+
+	/**
+	 * Get the block pattern
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp groundhogg-tests blockpattern
+	 *
+	 * @when after_wp_load
+	 */
+	function blockpattern( $args ) {
+
+		$pattern = Block_Registry::instance()->get_block_regex_pattern();
+		\WP_CLI::success( $pattern );
+	}
 
 	/**
 	 * Test step conditionals

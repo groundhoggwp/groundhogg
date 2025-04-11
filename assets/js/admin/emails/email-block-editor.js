@@ -245,7 +245,7 @@
     })
   }
 
-  const InspectorColumn = (parent, blocks, depth = 1) => Div({
+  const InspectorColumn = (parent, blocks, depth = 1, label = 'Column') => Div({
       className: 'inspector-column',
     },
     [
@@ -256,7 +256,7 @@
 
           },
         },
-        'Column'),
+        label),
       Div({
           className : 'inspector-column-sortable',
           dataParent: parent,
@@ -267,6 +267,18 @@
     ])
 
   const InspectorBlockWrapper = (block, depth = 1) => {
+
+    if (block.children && Array.isArray(block.children)) {
+      return Div({
+          id       : `inspector-${ block.id }-parent`,
+          className: 'inspector-parent',
+          dataId   : block.id,
+        },
+        [
+          InspectorBlock(block, depth),
+          InspectorColumn(block.id, block.children, depth + 1, 'Children'),
+        ])
+    }
 
     if (block.type === 'columns' && block.columns && Array.isArray(block.columns)) {
       return Div({
@@ -545,7 +557,7 @@
       History.undo()
     }
 
-    if (e.key === 'y' && ( e.ctrlKey || e.metaKey ) ) {
+    if (e.key === 'y' && ( e.ctrlKey || e.metaKey )) {
       History.redo()
     }
   })
@@ -752,7 +764,9 @@
     let input = document.createElement('input')
     input.classList.add('hidden')
 
+    setIsGeneratingHTML(true)
     input.value = renderBlocksHTML([block])
+    setIsGeneratingHTML(false)
     document.body.append(input)
     input.select()
     navigator.clipboard.writeText(input.value)
@@ -957,13 +971,15 @@
 
   const setBlocks = (blocks = [], hasChanges = true) => {
 
-    if ( isHTMLEditor() ){
-      return;
+    if (isHTMLEditor()) {
+      return
     }
 
+    setIsGeneratingHTML(true)
     let css = renderBlocksCSS(blocks)
     let content = renderBlocksHTML(blocks)
     let plain_text = renderBlocksPlainText(blocks)
+    setIsGeneratingHTML(false)
 
     setState({
       blocks,
@@ -2254,14 +2270,14 @@
    * @param block
    */
   const registerDynamicBlock = (type, name, {
-    attributes = [],
     ignoreForRefresh = [],
     parseContent = content => content,
+    html = () => '',
+    edit = () => '',
     ...block
   }) => {
 
     let prevContent = null
-    let timeout
 
     /**
      * Extracts attributes from the block given a key list
@@ -2279,21 +2295,13 @@
     }
 
     /**
-     * Extracts attributes from the block
-     *
-     * @param block
-     * @return {{}}
-     */
-    const extractAttributes = (block) => extractFromBlock(block, attributes)
-
-    /**
      * Generates a unique key based on the block attributes
      *
      * @param block
      * @return {string}
      */
     const generateCacheKey = (block) => {
-      return base64_json_encode(extractFromBlock(block, attributes.filter(a => !ignoreForRefresh.includes(a))))
+      return base64_json_encode(extractFromBlock(block, Object.keys(block).filter(a => !ignoreForRefresh.includes(a))))
     }
 
     /**
@@ -2301,35 +2309,31 @@
      *
      * @param block
      */
-    const fetchDynamicContent = (block) => {
+    const fetchDynamicContent = Groundhogg.functions.debounce(async (block) => {
+      setIsGeneratingHTML(true)
+      let blockContent = renderBlocksHTML([block])
+      setIsGeneratingHTML(false)
 
-      if (timeout) {
-        clearTimeout(timeout)
-      }
+      let { content = '' } = await post(`${ EmailsStore.route }/block-preview/`, {
+        html: blockContent,
+      })
 
-      timeout = setTimeout(async () => {
-          let { content = '' } = await get(`${ EmailsStore.route }/blocks/${ block.type }?props=${ base64_json_encode(block) }`)
-          content = parseContent(content, block)
-          dynamicContentCache.set(generateCacheKey(block),
-            content)
-          prevContent = content
-          morphBlocks()
-        },
-        1000)
-    }
+      // extract rendered content from within wrapper <td>.
+      content = Div({}, content).querySelector(`td#b-${ block.id }`).innerHTML
+      content = parseContent(content, block)
+      dynamicContentCache.set(generateCacheKey(block),
+        content)
+      prevContent = content
+      morphBlocks()
+    }, 1000)
 
     /**
      * Shows the preview of the dynamic content in the editor, or a placeholder animation
      *
-     * @param updateBlock
      * @param block
      * @return {*}
      */
-    const renderHtml = ({
-      updateBlock = () => {
-      },
-      ...block
-    }) => {
+    const DynamicContent = (block) => {
 
       let cacheKey = generateCacheKey(block)
 
@@ -2350,53 +2354,16 @@
           prevContent))
     }
 
-    const attributeGetters = {}
-
-    attributes.forEach(attr => {
-      attributeGetters[attr] = (el) => {
-
-        if (attributesCache.has(el.id)) {
-          return attributesCache.get(el.id)[attr]
-        }
-
-        let commentData = el.innerText.trim()
-
-        if (!commentData) {
-          return
-        }
-
-        let matches = commentData.match(/^\[([a-z]+):([a-zA-Z0-9\-]+):dynamicContent ({.*})\/\]$/)
-
-        if (!matches) {
-          return
-        }
-
-        let [unused, type, id, json] = matches
-        let attrs = JSON.parse(json)
-
-        attributesCache.set(el.id, attrs)
-
-        return attrs[attr]
-      }
-    })
-
-    /**
-     * Special string for dynamic content that works in both plain text and HTML
-     *
-     * @param block
-     * @return {`[${string}:${string}:dynamicContent ${string}]`}
-     * @constructor
-     */
-    const DynamicContentString = (block) => `[${ block.type }:${ block.id }:dynamicContent ${ JSON.stringify(extractAttributes(block)) }/]`
-
     registerBlock(type, name, {
       ...block,
-      attributes: attributeGetters,
-      edit      : renderHtml,
-      html      : (block) => isGeneratingHTML() ? DynamicContentString(block) : renderHtml(block),
-
-      plainText: (block) => DynamicContentString(block),
-
+      edit: (block) => edit({
+        ...block,
+        DynamicContent: () => DynamicContent(block),
+      }),
+      html: (block) => html({
+        ...block,
+        DynamicContent: () => DynamicContent(block),
+      }),
     })
   }
 
@@ -2849,6 +2816,14 @@
       }
     }
 
+    let parentBlocks = blocks.filter(b => b.children && Array.isArray(b.children))
+
+    for (let parentBlock of parentBlocks) {
+      if (__findParent(blockId, parentBlock.children, parentBlock)) {
+        return parentBlock
+      }
+    }
+
     return false
   }
 
@@ -2865,6 +2840,13 @@
     for (let block of blocks) {
       if (block.id === blockId) {
         return block
+      }
+
+      if (block.children && Array.isArray(block.children)) {
+        let found = __findBlock(blockId, block.children)
+        if (found) {
+          return found
+        }
       }
 
       if (block.columns && Array.isArray(block.columns)) {
@@ -2906,8 +2888,20 @@
     }
 
     for (let block of blocks) {
+
+      if (block.id === parent && block.children && Array.isArray(block.children)) {
+        return __insertBlock(newBlock, index, block.children)
+      }
+
       if (block.id === parent && block.columns && Array.isArray(block.columns)) {
         return __insertBlock(newBlock, index, block.columns[column])
+      }
+
+      if (block.children && Array.isArray(block.children)) {
+        let inserted = __insertBlock(newBlock, index, block.children, parent, column)
+        if (inserted) {
+          return true
+        }
       }
 
       if (block.columns && Array.isArray(block.columns)) {
@@ -2941,6 +2935,12 @@
         return true
       }
 
+      if (block.children && Array.isArray(block.children)) {
+        if (__insertAfter(newBlock, blockId, block.children)) {
+          return true
+        }
+      }
+
       if (block.columns && Array.isArray(block.columns)) {
         for (let column of block.columns) {
           if (__insertAfter(newBlock, blockId, column)) {
@@ -2970,6 +2970,12 @@
         return true
       }
 
+      if (block.children && Array.isArray(block.children)) {
+        if (__deleteBlock(blockId, block.children)) {
+          return true
+        }
+      }
+
       if (block.columns && Array.isArray(block.columns)) {
         for (let column of block.columns) {
           if (__deleteBlock(blockId, column)) {
@@ -2995,6 +3001,10 @@
       block.columns = block.columns.map(column => column.map(_block => __replaceId(_block)))
     }
 
+    if (block.children && Array.isArray(block.children)) {
+      block.children = block.children.map(_block => __replaceId(_block))
+    }
+
     return {
       ...block,
       id: uuid(),
@@ -3014,6 +3024,10 @@
 
       if (block.type === 'columns' && Array.isArray(block.columns)) {
         block.columns = block.columns.map(column => __updateBlocks(column, edited))
+      }
+
+      if (block.children && Array.isArray(block.children)) {
+        block.children = __updateBlocks(block.children, edited)
       }
 
       return block
@@ -3195,8 +3209,13 @@
         let $sortable = $(e.target)
 
         // moving block
-        let parent = $sortable.is('.column') ? $sortable.closest('.builder-block').data('id') : false
+        let parent = $sortable.is('.column,.children') ? $sortable.closest('.builder-block').data('id') : false
         let column = parseInt(e.target.dataset.col)
+
+        console.log({
+          parent,
+          column,
+        })
 
         // adding block
         if (ui.item.is('.new-block')) {
@@ -3228,7 +3247,7 @@
         }
 
         // moving block
-        let parent = $sortable.is('.column') ? $sortable.closest('.builder-block').data('id') : false
+        let parent = $sortable.is('.column,.children') ? $sortable.closest('.builder-block').data('id') : false
         let column = parseInt(e.target.dataset.col)
 
         if (blockId) {
@@ -3827,7 +3846,7 @@
                 setEmailData({
                   message_type: e.target.value,
                 })
-                if ( isBlockEditor() ){
+                if (isBlockEditor()) {
                   // This may update the footer block
                   setBlocks(getBlocks())
                   morphBlocks()
@@ -5299,37 +5318,37 @@
   }
 
   const TitlePrompt = () => MakeEl.ModalWithHeader({
-    header:  'Name this email',
+    header: 'Name this email',
     onOpen: () => {
-      let input = document.getElementById( 'prompt-email-title' )
+      let input = document.getElementById('prompt-email-title')
       input.focus()
       input.select()
-    }
-  }, ({close}) => MakeEl.Form({
+    },
+  }, ({ close }) => MakeEl.Form({
     onSubmit: e => {
       e.preventDefault()
       let fd = new FormData(e.currentTarget)
-      let title = fd.get( 'email_title' )
+      let title = fd.get('email_title')
       setEmailData({
-        title
+        title,
       })
       morphHeader()
       close()
     },
   }, [
     Div({
-      className: 'display-flex gap-5'
+      className: 'display-flex gap-5',
     }, [
       Input({
-        id: 'prompt-email-title',
-        name: 'email_title',
+        id   : 'prompt-email-title',
+        name : 'email_title',
         value: getEmailData().title,
       }),
       Button({
         className: 'gh-button primary',
-        type: 'submit'
-      }, 'Save')
-    ])
+        type     : 'submit',
+      }, 'Save'),
+    ]),
   ]))
 
   const Template = ({
@@ -7940,28 +7959,269 @@
 
   const getQueryId = createIncrementer()
 
+  const QueryControls = ({
+    number,
+    offset,
+    post_type = 'post',
+    queryId = '',
+    include = [],
+    includedPosts = [],
+    exclude = [],
+    excludedPosts = [],
+    terms = {},
+  }) => {
+
+    const postTypeOptions = {}
+
+    for (let type in _BlockEditor.post_types) {
+      postTypeOptions[type] = _BlockEditor.post_types[type].labels.name
+    }
+
+    const currentPostType = _BlockEditor.post_types[post_type]
+
+    const termControls = []
+
+    for (let tax in currentPostType.taxonomies) {
+      const taxonomy = currentPostType.taxonomies[tax]
+
+      if (!taxonomy.public || !taxonomy.show_in_rest) {
+        continue
+      }
+
+      let selected = terms[tax] ?? []
+      let selectedCache = terms[`${ tax }_cache`] ?? []
+      let tax_rel = terms[`${ tax }_rel`] ?? 'any'
+
+      termControls.push(...[
+        `<hr>`,
+
+        // Terms
+        Control({
+            label  : taxonomy.label,
+            stacked: true,
+          },
+          ItemPicker({
+            id          : `select-${ tax }`,
+            selected    : selectedCache,
+            tags        : false,
+            fetchOptions: async (search) => {
+              let terms = await get(`${ Groundhogg.api.routes.wp.v2 }/${ taxonomy.rest_base || tax }/`,
+                {
+                  search,
+                  per_page: 20,
+                  orderby : 'count',
+                  order   : 'desc',
+                })
+              terms = terms.map(({
+                id,
+                name,
+              }) => ( {
+                id,
+                text: name,
+              } ))
+              return terms
+            },
+            onChange    : selected => {
+
+              terms = {
+                ...terms,
+                [`${ tax }_cache`]: selected,
+                [tax]             : selected.map(opt => opt.id),
+              }
+
+              updateBlock({
+                terms,
+              })
+
+              if (terms.length > 1) {
+
+              }
+              else {
+
+              }
+            },
+          })),
+
+        // Terms Any || All
+        Control({
+            label  : 'Relationship',
+            tooltip: 'If the post should have at least one, or all of the terms.',
+          },
+          ButtonToggle({
+            id: `${ tax }-rel`,
+
+            selected: tax_rel,
+            options : [
+              {
+                id  : 'any',
+                text: 'Any',
+              },
+              {
+                id  : 'all',
+                text: 'All',
+              },
+            ],
+            onChange: rel => {
+              terms = {
+                ...terms,
+                [`${ tax }_rel`]: rel,
+              }
+
+              updateBlock({
+                terms,
+                morphControls: true,
+              })
+            },
+          })),
+      ])
+    }
+
+    return ControlGroup({
+        name: 'Query',
+      },
+      [
+
+        // Post type
+        Control({
+            label: 'Post Type',
+          },
+          Select({
+            id      : 'post-type',
+            selected: post_type,
+            options : postTypeOptions,
+            onChange: e => updateBlock({
+              post_type    : e.target.value,
+              morphControls: true,
+
+              // Clear these when changing the post type
+              include      : [],
+              includedPosts: [],
+              exclude      : [],
+              excludedPosts: [],
+            }),
+          })),
+
+        // Number of posts
+        Control({
+            label: 'Number of posts',
+          },
+          Input({
+            type     : 'number',
+            id       : 'number-of-posts',
+            className: 'control-input',
+            value    : number,
+            onChange : e => updateBlock({ number: e.target.value }),
+          })),
+
+        // Query offset
+        Control({
+            label  : 'Offset',
+            tooltip: 'The number of posts to skip',
+          },
+          Input({
+            type     : 'number',
+            id       : 'posts-offset',
+            className: 'control-input',
+            value    : offset,
+            onChange : e => updateBlock({ offset: e.target.value }),
+          })),
+
+        // Term controls
+        ...termControls,
+
+        // Include Ids
+        `<hr/>`,
+        Control({
+            label  : `Include these ${ currentPostType.labels.name.toLowerCase() }`,
+            stacked: true,
+          },
+          ItemPicker({
+            id          : `${ post_type }-includes`,
+            selected    : includedPosts,
+            tags        : false,
+            fetchOptions: async (search) => {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`,
+                {
+                  search,
+                  per_page: 20,
+                  orderby : search ? 'relevance' : 'modified',
+                  order   : 'desc',
+                })
+              posts = posts.map(({
+                id,
+                title,
+              }) => ( {
+                id,
+                text: title.rendered,
+              } ))
+              return posts
+            },
+            onChange    : selected => {
+              updateBlock({
+                includedPosts: selected,
+                include      : selected.map(opt => opt.id),
+              })
+            },
+          })),
+        `<p>Limit result set to specific IDs.</p>`,
+
+        // Exclude Ids
+        `<hr/>`,
+        Control({
+            label  : `Exclude these ${ currentPostType.labels.name.toLowerCase() }`,
+            stacked: true,
+          },
+          ItemPicker({
+            id: `${ post_type }-excludes`,
+
+            selected    : excludedPosts,
+            tags        : false,
+            fetchOptions: async (search) => {
+              let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`,
+                {
+                  search,
+                  per_page: 20,
+                  orderby : 'relevance',
+                  order   : 'desc',
+                })
+              posts = posts.map(({
+                id,
+                title,
+              }) => ( {
+                id,
+                text: title.rendered,
+              } ))
+              return posts
+            },
+            onChange    : selected => {
+              updateBlock({
+                excludedPosts: selected,
+                exclude      : selected.map(opt => opt.id),
+              })
+            },
+          })),
+        `<p>Ensure result set excludes specific IDs.</p>`,
+
+        // Query ID
+        `<hr/>`,
+        Control({
+            label  : 'Query ID',
+            stacked: true,
+          },
+          Input({
+            id      : 'query-id',
+            name    : 'query_id',
+            value   : queryId,
+            onChange: e => updateBlock({ queryId: e.target.value }),
+          })),
+        `<p>This allows you to filter this specific query with additional parameters.</p>`,
+
+      ])
+
+  }
+
   // Register the post block
   registerDynamicBlock('posts', 'Posts', {
-    attributes      : [
-      'number',
-      'layout',
-      'offset',
-      'featured',
-      'columns',
-      'post_type',
-      'excerpt',
-      'gap',
-      'queryId',
-      'thumbnail_size',
-      'thumbnail_position',
-      'thumbnail',
-      'include',
-      'exclude',
-      'terms',
-      'headingStyle',
-      'cardStyle',
-      'excerptStyle',
-    ],
     ignoreForRefresh: [
       'headingStyle',
       'cardStyle',
@@ -7981,19 +8241,11 @@
       thumbnail_size = '',
       thumbnail_position = 'above',
       gap = 20,
-      number,
-      offset,
-      post_type = 'post',
       excerptStyle = {},
       headingStyle = {},
       updateBlock,
-      queryId = '',
-      include = [],
-      includedPosts = [],
-      exclude = [],
-      excludedPosts = [],
-      terms = {},
       cardStyle = {},
+      ...query
     }) => {
 
       const Supports = {
@@ -8038,111 +8290,6 @@
           'h4',
           'h5',
         ].includes(layout),
-      }
-
-      const postTypeOptions = {}
-
-      for (let type in _BlockEditor.post_types) {
-        postTypeOptions[type] = _BlockEditor.post_types[type].labels.name
-      }
-
-      const currentPostType = _BlockEditor.post_types[post_type]
-
-      const termControls = []
-
-      for (let tax in currentPostType.taxonomies) {
-        const taxonomy = currentPostType.taxonomies[tax]
-
-        if (!taxonomy.public || !taxonomy.show_in_rest) {
-          continue
-        }
-
-        let selected = terms[tax] ?? []
-        let selectedCache = terms[`${ tax }_cache`] ?? []
-        let tax_rel = terms[`${ tax }_rel`] ?? 'any'
-
-        termControls.push(...[
-          `<hr>`,
-
-          // Terms
-          Control({
-              label  : taxonomy.label,
-              stacked: true,
-            },
-            ItemPicker({
-              id          : `select-${ tax }`,
-              selected    : selectedCache,
-              tags        : false,
-              fetchOptions: async (search) => {
-                let terms = await get(`${ Groundhogg.api.routes.wp.v2 }/${ taxonomy.rest_base || tax }/`,
-                  {
-                    search,
-                    per_page: 20,
-                    orderby : 'count',
-                    order   : 'desc',
-                  })
-                terms = terms.map(({
-                  id,
-                  name,
-                }) => ( {
-                  id,
-                  text: name,
-                } ))
-                return terms
-              },
-              onChange    : selected => {
-
-                terms = {
-                  ...terms,
-                  [`${ tax }_cache`]: selected,
-                  [tax]             : selected.map(opt => opt.id),
-                }
-
-                updateBlock({
-                  terms,
-                })
-
-                if (terms.length > 1) {
-
-                }
-                else {
-
-                }
-              },
-            })),
-
-          // Terms Any || All
-          Control({
-              label  : 'Relationship',
-              tooltip: 'If the post should have at least one, or all of the terms.',
-            },
-            ButtonToggle({
-              id: `${ tax }-rel`,
-
-              selected: tax_rel,
-              options : [
-                {
-                  id  : 'any',
-                  text: 'Any',
-                },
-                {
-                  id  : 'all',
-                  text: 'All',
-                },
-              ],
-              onChange: rel => {
-                terms = {
-                  ...terms,
-                  [`${ tax }_rel`]: rel,
-                }
-
-                updateBlock({
-                  terms,
-                  morphControls: true,
-                })
-              },
-            })),
-        ])
       }
 
       return Fragment([
@@ -8331,148 +8478,7 @@
           ]) : null,
 
         // Query
-        ControlGroup({
-            name: 'Query',
-          },
-          [
-
-            // Post type
-            Control({
-                label: 'Post Type',
-              },
-              Select({
-                id      : 'post-type',
-                selected: post_type,
-                options : postTypeOptions,
-                onChange: e => updateBlock({
-                  post_type    : e.target.value,
-                  morphControls: true,
-
-                  // Clear these when changing the post type
-                  include      : [],
-                  includedPosts: [],
-                  exclude      : [],
-                  excludedPosts: [],
-                }),
-              })),
-
-            // Number of posts
-            Control({
-                label: 'Number of posts',
-              },
-              Input({
-                type     : 'number',
-                id       : 'number-of-posts',
-                className: 'control-input',
-                value    : number,
-                onChange : e => updateBlock({ number: e.target.value }),
-              })),
-
-            // Query offset
-            Control({
-                label  : 'Offset',
-                tooltip: 'The number of posts to skip',
-              },
-              Input({
-                type     : 'number',
-                id       : 'posts-offset',
-                className: 'control-input',
-                value    : offset,
-                onChange : e => updateBlock({ offset: e.target.value }),
-              })),
-
-            // Term controls
-            ...termControls,
-
-            // Include Ids
-            `<hr/>`,
-            Control({
-                label  : `Include these ${ currentPostType.labels.name.toLowerCase() }`,
-                stacked: true,
-              },
-              ItemPicker({
-                id          : `${ post_type }-includes`,
-                selected    : includedPosts,
-                tags        : false,
-                fetchOptions: async (search) => {
-                  let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`,
-                    {
-                      search,
-                      per_page: 20,
-                      orderby : search ? 'relevance' : 'modified',
-                      order   : 'desc',
-                    })
-                  posts = posts.map(({
-                    id,
-                    title,
-                  }) => ( {
-                    id,
-                    text: title.rendered,
-                  } ))
-                  return posts
-                },
-                onChange    : selected => {
-                  updateBlock({
-                    includedPosts: selected,
-                    include      : selected.map(opt => opt.id),
-                  })
-                },
-              })),
-            `<p>Limit result set to specific IDs.</p>`,
-
-            // Exclude Ids
-            `<hr/>`,
-            Control({
-                label  : `Exclude these ${ currentPostType.labels.name.toLowerCase() }`,
-                stacked: true,
-              },
-              ItemPicker({
-                id: `${ post_type }-excludes`,
-
-                selected    : excludedPosts,
-                tags        : false,
-                fetchOptions: async (search) => {
-                  let posts = await get(`${ Groundhogg.api.routes.wp.v2 }/${ currentPostType.rest_base || post_type }`,
-                    {
-                      search,
-                      per_page: 20,
-                      orderby : 'relevance',
-                      order   : 'desc',
-                    })
-                  posts = posts.map(({
-                    id,
-                    title,
-                  }) => ( {
-                    id,
-                    text: title.rendered,
-                  } ))
-                  return posts
-                },
-                onChange    : selected => {
-                  updateBlock({
-                    excludedPosts: selected,
-                    exclude      : selected.map(opt => opt.id),
-                  })
-                },
-              })),
-            `<p>Ensure result set excludes specific IDs.</p>`,
-
-            // Query ID
-            `<hr/>`,
-            Control({
-                label  : 'Query ID',
-                stacked: true,
-              },
-              Input({
-                id      : 'query-id',
-                name    : 'query_id',
-                value   : queryId,
-                onChange: e => updateBlock({ queryId: e.target.value }),
-              })),
-            `<p>This allows you to filter this specific query with additional parameters.</p>`,
-
-          ]),
-
+        QueryControls(query),
       ])
     },
     parseContent: (content, {
@@ -8564,6 +8570,9 @@
           }
       `
     },
+    html        : ({ DynamicContent }) => isGeneratingHTML() ? '' : DynamicContent(),
+    edit        : ({ DynamicContent }) => DynamicContent(),
+    plainText   : () => '',
     gutenberg   : ({
       excerpt = false,
       number,
@@ -8619,25 +8628,182 @@
     },
     defaults    : {
       layout        : 'cards',
-      number        : 5,
-      offset        : 0,
       featured      : true,
       excerpt       : false,
       thumbnail     : true,
       thumbnail_size: 'thumbnail',
-      post_type     : 'post',
       columns       : 2,
       gap           : 20,
+      cardStyle     : {},
       headingStyle  : fontDefaults({
         fontSize: 24,
       }),
-
-      excerptStyle: fontDefaults({
+      excerptStyle  : fontDefaults({
         fontSize: 16,
       }),
-      queryId     : '',
-      cardStyle   : {},
+      queryId       : '',
+      post_type     : 'post',
+      number        : 5,
+      offset        : 0,
     },
+  })
+
+  const ChildBlocks = ({ children }) => Div({
+    className: `children sortable-blocks ${ children.length ? '' : 'empty' }`,
+    onCreate : el => {
+      makeSortable(el)
+    },
+  }, [
+    ...children.map(b => EditBlockWrapper(b)),
+  ])
+
+  const QueryLoopContent = ({
+    DynamicContent,
+    ...block
+  }) => {
+
+    let dynamicContent = Div({}, DynamicContent())
+    let childBlockPlace = dynamicContent.querySelector('.replace-with-child-blocks')
+
+    if (!childBlockPlace) {
+      return dynamicContent.firstElementChild
+    }
+
+    childBlockPlace.replaceWith(ChildBlocks(block))
+
+    return Fragment([
+      dynamicContent.firstElementChild,
+    ])
+  }
+
+  registerDynamicBlock('queryloop', 'Query Loop', {
+    svg       : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M18 7a7.669 7.669 0 0 0-6 3.19A7.669 7.669 0 0 0 6 7c-3.687 0-5 2.583-5 5 0 3.687 2.583 5 5 5a7.669 7.669 0 0 0 6-3.19A7.669 7.669 0 0 0 18 17c2.417 0 5-1.313 5-5 0-2.417-1.313-5-5-5ZM6 15a2.689 2.689 0 0 1-3-3 2.689 2.689 0 0 1 3-3c2.579 0 4.225 2.065 4.837 3-.612.935-2.258 3-4.837 3Zm12 0c-2.579 0-4.225-2.065-4.837-3 .612-.935 2.258-3 4.837-3a2.689 2.689 0 0 1 3 3 2.689 2.689 0 0 1-3 3Z"/>
+</svg>`,
+    attributes: {
+      children: (el) => {
+        return parseBlocksFromTable(el.firstElementChild)
+      },
+    },
+    controls  : ({
+      gap = 10,
+      columns = 2,
+      ...query
+    }) => {
+
+      let reference = [
+        {
+          tag : 'the_title',
+          desc: 'The post title',
+        },
+        {
+          tag : 'the_excerpt',
+          desc: 'The post excerpt',
+        },
+        {
+          tag : 'the_url',
+          desc: 'The link to the post',
+        },
+        {
+          tag : 'the_thumbnail',
+          desc: 'The thumbnail image',
+        },
+        {
+          tag : 'the_thumbnail_url',
+          desc: 'The thumbnail image URL',
+        },
+        {
+          tag : 'the_content',
+          desc: 'The post content',
+        },
+        {
+          tag : 'the_id',
+          desc: 'The post ID',
+        },
+        {
+          tag : 'the_date',
+          desc: 'The post publish date',
+        },
+        {
+          tag : 'the_author',
+          desc: 'The post author',
+        },
+        {
+          tag : 'read_more',
+          desc: 'A "Read more" link to the post',
+        },
+      ]
+
+      return Fragment([
+        ControlGroup({
+          id  : 'queryloop-layout',
+          name: 'Layout',
+        }, [
+          Control({
+              label: 'Columns',
+            },
+            NumberControl({
+              id       : 'columns',
+              className: 'control-input',
+              value    : columns,
+              step     : 1,
+              onInput  : e => updateBlock({ columns: e.target.value }),
+            })),
+          Control({
+              label: 'Gap',
+            },
+            NumberControl({
+              id       : 'column-gap',
+              className: 'control-input',
+              value    : gap,
+              step     : 5,
+              unit     : 'px',
+              onInput  : e => updateBlock({ gap: e.target.value }),
+            })),
+        ]),
+        QueryControls(query),
+        ControlGroup({
+          id  : 'queryloop-reference',
+          name: 'Reference',
+        }, [
+          Pg({}, 'Use the below merge tags to merge post data within the query loop.'),
+          ...reference.map(tag => Div({ className: 'display-flex space-between' }, [
+            makeEl('code', {
+              className: 'copy-text',
+            }, `#${ tag.tag }#`),
+            Span({ className: 'tag-desc' }, tag.desc),
+          ])),
+        ]),
+      ])
+    },
+    edit      : QueryLoopContent,
+    html      : ({
+      DynamicContent,
+      ...block
+    }) => {
+
+      if (isGeneratingHTML()) {
+        return renderBlocksHTML(block.children)
+      }
+
+      return QueryLoopContent({ DynamicContent, ...block })
+    },
+    plainText : ({ children = [] }) => renderBlocksPlainText(children),
+    defaults  : {
+      children: [
+        createBlock('text', {
+          content: `<h2>#the_title#</h2>\n<p>#the_excerpt#</p>\n<p>#read_more#</p>`,
+        }),
+      ],
+      columns : 2,
+      layout  : 'grid', // grid or list
+      // query defaults
+      queryId  : '',
+      post_type: 'post',
+      number   : 6,
+      offset   : 0,
+    },
+
   })
 
   const socialIcons = {
@@ -9073,25 +9239,25 @@
             Control({ label: 'Phone Number' },
               Toggle({
                 id      : 'include-tel',
-                checked: tel,
+                checked : tel,
                 onChange: e => updateBlock({
-                  tel: e.target.checked
+                  tel: e.target.checked,
                 }),
               })),
             Control({ label: 'Privacy Policy' },
               Toggle({
                 id      : 'include-privacy-policy',
-                checked: privacyPolicy,
+                checked : privacyPolicy,
                 onChange: e => updateBlock({
-                  privacyPolicy: e.target.checked
+                  privacyPolicy: e.target.checked,
                 }),
               })),
             Control({ label: 'Terms' },
               Toggle({
                 id      : 'include-terms',
-                checked: terms,
+                checked : terms,
                 onChange: e => updateBlock({
-                  terms: e.target.checked
+                  terms: e.target.checked,
                 }),
               })),
           ]),
@@ -9110,7 +9276,7 @@
       alignment = 'left',
       tel = true,
       terms = true,
-      privacyPolicy = true
+      privacyPolicy = true,
     }) => {
 
       const footerLine = (content) => makeEl('p', {
@@ -9129,18 +9295,18 @@
         unsubscribe,
       } = _BlockEditor.footer
 
-      let useLinks = [];
+      let useLinks = []
 
-      if ( links.tel && tel ){
-        useLinks.push( links.tel )
+      if (links.tel && tel) {
+        useLinks.push(links.tel)
       }
 
-      if ( links.privacy && privacyPolicy ){
-        useLinks.push( links.privacy )
+      if (links.privacy && privacyPolicy) {
+        useLinks.push(links.privacy)
       }
 
-      if ( links.terms && terms ){
-        useLinks.push( links.terms )
+      if (links.terms && terms) {
+        useLinks.push(links.terms)
       }
 
       let footer = Div({
@@ -9172,7 +9338,7 @@
     plainText: ({
       tel = true,
       terms = true,
-      privacyPolicy = true
+      privacyPolicy = true,
     }) => {
 
       let {
@@ -9182,18 +9348,18 @@
         unsubscribe,
       } = _BlockEditor.footer
 
-      let useLinks = [];
+      let useLinks = []
 
-      if ( links.tel && tel ){
-        useLinks.push( links.tel )
+      if (links.tel && tel) {
+        useLinks.push(links.tel)
       }
 
-      if ( links.privacy && privacyPolicy ){
-        useLinks.push( links.privacy )
+      if (links.privacy && privacyPolicy) {
+        useLinks.push(links.privacy)
       }
 
-      if ( links.terms && terms ){
-        useLinks.push( links.terms )
+      if (links.terms && terms) {
+        useLinks.push(links.terms)
       }
 
       return [
@@ -9205,17 +9371,17 @@
       ].join('  \n')
     },
     defaults : {
-      style    : fontDefaults({
+      style        : fontDefaults({
         fontSize  : 13,
         color     : '#999',
         lineHeight: 1,
       }),
-      linkStyle: {
+      linkStyle    : {
         color: '#488aff',
       },
-      tel: true,
-      terms: true,
-      privacyPolicy: true
+      tel          : true,
+      terms        : true,
+      privacyPolicy: true,
     },
   })
 
@@ -9380,9 +9546,10 @@
         createBlock('text', {
           //language=HTML
           content: `<p>Hi {first::there},</p>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas dolor non nulla varius, id fermentum ante euismod. Ut a sodales nisl, at
+              maximus felis. Suspendisse potenti. Etiam fermentum magna nec diam lacinia, ut volutpat mauris accumsan. Nunc id convallis magna.</p>
           <p>Regards,</p>
-          <p>{owner_signature}</p>`
+          <p>{owner_signature}</p>`,
         }),
         createBlock('footer'),
       ]
@@ -9454,7 +9621,6 @@
    * @return {string}
    */
   const renderBlocksHTML = (blocks) => {
-    setIsGeneratingHTML(true)
     let htmlEl = Table({
         cellpadding: '0',
         cellspacing: '0',
@@ -9467,7 +9633,6 @@
     maybeAddReplacementProtocols(htmlEl, 'a', 'href')
 
     let html = htmlEl.outerHTML
-    setIsGeneratingHTML(false)
     html = html.replaceAll(new RegExp(`&quot;(${ subFontsWithSpaces.join('') })&quot;`,
         'g'),
       '\'$1\'')
@@ -9481,8 +9646,7 @@
    * @return {string}
    */
   const renderBlocksGutenberg = (blocks) => {
-    setIsGeneratingHTML(true)
-    let content = blocks.filter(b => b.type).map(block => {
+    return blocks.filter(b => b.type).map(block => {
 
       let text
 
@@ -9503,8 +9667,6 @@
 
       return text
     }).filter(text => text.length > 0).join('\n\n').replaceAll(/(\n|\r\n|\r){3,}/g, '\n\n')
-    setIsGeneratingHTML(false)
-    return content
   }
 
   /**
@@ -9514,15 +9676,11 @@
    * @return {string}
    */
   const renderBlocksPlainText = (blocks) => {
-    setIsGeneratingHTML(true)
-    let plain = blocks.filter(b => b.type).map(block => {
+    return blocks.filter(b => b.type).map(block => {
 
       let text
 
       let {
-        filters_enabled = false,
-        include_filters = [],
-        exclude_filters = [],
         hide_on_desktop = false,
       } = block
 
@@ -9532,28 +9690,22 @@
 
       try {
         text = BlockRegistry.get(block.type).plainText(block)
+        return [
+          BlockStartComment(block),
+          text,
+          BlockEndComment(block),
+        ].join('')
       }
       catch (e) {
-        text = ''
+        return ''
       }
-
-      if (filters_enabled && text) {
-        text = `[filters:${ block.id } ${ JSON.stringify({
-          include_filters,
-          exclude_filters,
-        }) }]${ text }[/filters:${ block.id }]`
-      }
-
-      return text
     }).filter(text => text.length > 0).join('\n\n').replaceAll(/(\n|\r\n|\r){3,}/g, '\n\n')
-    setIsGeneratingHTML(false)
-    return plain
   }
 
   // These functions help render various UI components
 
   const morphBlocks = () => {
-    if ( isHTMLEditor() ){
+    if (isHTMLEditor()) {
       return
     }
 
@@ -9865,6 +10017,18 @@
       }
     }
 
+    // backwards compatibility for old dynamic block format
+    let matches = el.innerText.trim().match(/^\[([a-z]+):([a-zA-Z0-9\-]+):dynamicContent ({.*})\/\]$/)
+    if (matches && matches.length) {
+      let compatDynamicAttrs = JSON.parse(matches[3])
+      if ( compatDynamicAttrs ){
+        block = {
+          ...block,
+          ...compatDynamicAttrs,
+        }
+      }
+    }
+
     block.advancedStyle = AdvancedStyleControls.parse(el)
     block.hide_on_mobile = el.classList.contains('hide-on-mobile')
     block.hide_on_desktop = el.classList.contains('hide-on-desktop')
@@ -9994,6 +10158,33 @@
       })
     }
   }
+
+  function selectText (node) {
+
+    if (document.body.createTextRange) {
+      const range = document.body.createTextRange()
+      range.moveToElementText(node)
+      range.select()
+    }
+    else if (window.getSelection) {
+      const selection = window.getSelection()
+      const range = document.createRange()
+      range.selectNodeContents(node)
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+    else {
+      console.warn('Could not select text in node: Unsupported browser.')
+    }
+  }
+
+  $(document).on('click', 'code.copy-text', e => {
+    selectText(e.currentTarget)
+    navigator.clipboard.writeText(e.currentTarget.innerText)
+    dialog({
+      message: 'Copied to clipboard!',
+    })
+  })
 
   Groundhogg.EmailEditor = initialize
   Groundhogg.emailEditor = {
