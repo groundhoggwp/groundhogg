@@ -897,14 +897,6 @@ class Replacements implements \JsonSerializable {
 		$code    = $parts['code'];
 		$default = $parts['default'];
 
-        $code_key = md5serialize( $code, $arg, $default );
-
-		// Did we already do this code during the current process?
-        // if we didn't it'll get added to the stack within Replacements::did_code().
-		if ( $this->did_code( $code_key ) ) {
-			return '';
-		}
-
 		// The code exists and is set
 		if ( $this->has_replacement( $code ) ) {
 
@@ -937,6 +929,12 @@ class Replacements implements \JsonSerializable {
 				$text = $default;
 			}
 
+			// Did we already do this code during the current process?
+			// if we didn't it'll get added to the stack within Replacements::did_code().
+			if ( $this->did_code( $cache_key ) ) {
+				return '';
+			}
+
 			// tackle inner replacements within the returned text
 			$text = $this->tackle_replacements( $text );
 
@@ -949,7 +947,7 @@ class Replacements implements \JsonSerializable {
 
 			wp_cache_set( $cache_key, $value, 'groundhogg/replacements' );
 
-			$this->remove_code_to_stack( $code_key );
+			$this->remove_code_to_stack( $cache_key );
 
 			return $value;
 		}
@@ -984,12 +982,19 @@ class Replacements implements \JsonSerializable {
 			$text = $default;
 		}
 
+
+		// Did we already do this code during the current process?
+		// if we didn't it'll get added to the stack within Replacements::did_code().
+		if ( $this->did_code( $cache_key ) ) {
+			return '';
+		}
+
 		// tackle inner replacements within the returned text
 		$text = $this->tackle_replacements( $text );
 
 		wp_cache_set( $cache_key, $text, 'groundhogg/replacements' );
 
-		$this->remove_code_to_stack( $code_key );
+		$this->remove_code_to_stack( $cache_key );
 
 		return $text;
 	}

@@ -136,10 +136,17 @@ class Searches_Api extends Base_Api {
 
 		$search_id = $request->get_param( 'id' );
 
-		Saved_Searches::instance()->update( $search_id, array_filter( [
-			'query' => sanitize_query_url_params( $request->get_param( 'query' ) ),
-			'name'  => sanitize_text_field( $request->get_param( 'name' ) )
-		] ) );
+		$update = [];
+
+		if ( $request->has_param( 'query' ) ){
+			$update['query'] = sanitize_query_url_params( $request->get_param( 'query' ) ?: [] );
+		}
+
+		if ( $request->has_param( 'name' ) ){
+			$update['name'] = sanitize_text_field( $request->get_param( 'name' ) );
+		}
+
+		Saved_Searches::instance()->update( $search_id, $update );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => Saved_Searches::instance()->get( $search_id )

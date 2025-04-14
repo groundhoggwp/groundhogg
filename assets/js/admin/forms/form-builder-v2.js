@@ -93,6 +93,33 @@
   }
 
   const getCustomProperties = () => Object.values(Groundhogg.filters.gh_contact_custom_properties.fields)
+  const getCustomPropertiesAsOptGroups = ( selected ) => {
+
+    const {
+      groups = [],
+      fields = [],
+      tabs = []
+    } = Groundhogg.filters.gh_contact_custom_properties
+
+    let optGroups = []
+
+    groups.forEach(group => {
+
+      let tab = tabs.find( t => t.id === group.tab )
+      let subFields = fields.filter( f => f.group === group.id )
+
+      optGroups.push({
+        name: `${tab.name}: ${group.name}`,
+        options: subFields,
+      })
+    })
+
+    return optGroups.map(({
+      name,
+      options
+    }) => `<optgroup label="${ name }">${ options.map(
+      field => `<option value="${ field.id }" ${ field.id === selected ? 'selected' : '' }>${ field.label }</option>`).join('') }</optgroup>`).join('')
+  }
 
   const Settings = {
 
@@ -173,15 +200,9 @@
         //language=HTML
         return `<label for="type">${ __('Custom Field') }</label>
         <div class="setting">
-            ${ select({
-                id: 'property',
-                name: 'property',
-                options: [
-                    { value: '', text: __('Please select one') },
-                    ...getCustomProperties().map(field => ( { value: field.id, text: field.label } )),
-                ],
-                selected: property,
-            }) }
+            <select id="property" name="property">
+                ${getCustomPropertiesAsOptGroups( property )}
+            </select>
         </div>`
       },
       onMount (field, updateField) {
@@ -189,7 +210,6 @@
 
           let property = e.target.value
           let label = getCustomProperties().find(f => f.id === property).label
-
           updateField({
             property,
             label,

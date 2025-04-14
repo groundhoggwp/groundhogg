@@ -4,7 +4,6 @@ namespace Groundhogg;
 
 use Groundhogg\Form\Form;
 use Groundhogg\Form\Form_v2;
-use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,11 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Shortcodes
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Shortcodes {
 
@@ -52,15 +51,17 @@ class Shortcodes {
 	public function custom_form_shortcode( $atts ) {
 
 		$atts = shortcode_atts( [
-			'class' => '',
-			'id'    => 0
+			'class'   => '',
+			'id'      => 0,
+			'fill'    => false,
+			'contact' => null
 		], $atts );
 
-		$step   = new Step( $atts['id'] );
+		$step = new Step( $atts['id'] );
 
-		if ( $step->type_is( 'form_fill' )){
+		if ( $step->type_is( 'form_fill' ) ) {
 			$form = new Form( $atts );
-		} else if ( $step->type_is( 'web_form' )){
+		} else if ( $step->type_is( 'web_form' ) ) {
 			$form = new Form_v2( $atts );
 		} else {
 			return '';
@@ -80,15 +81,15 @@ class Shortcodes {
 	public function email_shortcode( $atts ) {
 
 		$atts = shortcode_atts( [
-			'id'    => 0,
+			'id'     => 0,
 			'iframe' => true,
 		], $atts );
 
 		$email = new Email( $atts['id'] );
 
-		if ( ! $email->exists() ){
+		if ( ! $email->exists() ) {
 
-			if ( current_user_can( 'edit_emails' ) ){
+			if ( current_user_can( 'edit_emails' ) ) {
 				return __( 'The requested email does not exist.', 'groundhogg' );
 			}
 
@@ -97,12 +98,12 @@ class Shortcodes {
 
 		$email->set_contact( get_contactdata() );
 
-		if ( ! defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) ){
+		if ( ! defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) ) {
 			define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 		}
 
 		// output the raw message
-		if ( ! filter_var( $atts['iframe'], FILTER_VALIDATE_BOOLEAN ) ){
+		if ( ! filter_var( $atts['iframe'], FILTER_VALIDATE_BOOLEAN ) ) {
 			return html()->e( 'div', [
 				'class' => 'gh-email-preview-wrapper no-iframe'
 			], $email->get_merged_content() );
@@ -111,11 +112,11 @@ class Shortcodes {
 		ob_start();
 
 		?>
-		<div class="gh-email-preview-wrapper has-iframe">
-			<iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php esc_attr_e( $atts['id']); ?>"></iframe>
-			<script>
+        <div class="gh-email-preview-wrapper has-iframe">
+            <iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php esc_attr_e( $atts['id'] ); ?>"></iframe>
+            <script>
 
-              let iframe = document.getElementById('gh-email-preview-<?php esc_attr_e( $atts['id']); ?>')
+              let iframe = document.getElementById('gh-email-preview-<?php esc_attr_e( $atts['id'] ); ?>')
 
               let email = <?php echo wp_json_encode( $email ); ?>;
 
@@ -126,8 +127,8 @@ class Shortcodes {
               }
 
               iframe.src = URL.createObjectURL(blob)
-			</script>
-		</div>
+            </script>
+        </div>
 		<?php
 
 
