@@ -795,10 +795,13 @@ class Replacements implements \JsonSerializable {
 			return $content;
 		}
 
-		return preg_replace_callback( self::PATTERN . 's', [
+		$content = preg_replace_callback( self::PATTERN . 's', [
 			$this,
 			'do_replacement'
 		], $content );
+
+        // keep doing passes until no more to do
+        return $this->tackle_replacements( $content );
 	}
 
 	/**
