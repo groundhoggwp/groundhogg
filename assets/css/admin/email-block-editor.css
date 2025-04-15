@@ -95,6 +95,9 @@
   grid-auto-rows: auto;
   gap: 10px;
 }
+#email-block-editor #add-queryloop .block-name {
+  font-size: 11px;
+}
 #email-block-editor .block-wrap .block-name {
   text-align: center;
   font-weight: 300;

@@ -2257,7 +2257,6 @@
   } )
 
   const dynamicContentCache = createCache()
-  const attributesCache = createCache()
 
   /**
    * Register a dynamic block
@@ -2276,8 +2275,6 @@
     edit = () => '',
     ...block
   }) => {
-
-    let prevContent = null
 
     /**
      * Extracts attributes from the block given a key list
@@ -2310,6 +2307,14 @@
      * @param block
      */
     const fetchDynamicContent = Groundhogg.functions.debounce(async (block) => {
+
+      let cacheKey = generateCacheKey(block)
+
+      // don't if already has data in the cache
+      if ( dynamicContentCache.has(cacheKey) ) {
+        return;
+      }
+
       setIsGeneratingHTML(true)
       let blockContent = renderBlocksHTML([block])
       setIsGeneratingHTML(false)
@@ -2321,9 +2326,8 @@
       // extract rendered content from within wrapper <td>.
       content = Div({}, content).querySelector(`td#b-${ block.id }`).innerHTML
       content = parseContent(content, block)
-      dynamicContentCache.set(generateCacheKey(block),
-        content)
-      prevContent = content
+      dynamicContentCache.set(block.id, content)
+      dynamicContentCache.set(cacheKey, content)
       morphBlocks()
     }, 1000)
 
@@ -2338,20 +2342,16 @@
       let cacheKey = generateCacheKey(block)
 
       if (dynamicContentCache.has(cacheKey)) {
-        return parseContent(dynamicContentCache.get(cacheKey),
-          block)
+        return parseContent(dynamicContentCache.get(cacheKey), block)
       }
 
+      // fetch the dynamic content
+      fetchDynamicContent(block)
+
+      // use most recent cached value instead
       return Div({
-          id      : `dynamic-content-${ block.id }`,
-          onCreate: el => {
-            fetchDynamicContent(block)
-          },
-        },
-        Div({
-            className: 'dynamic-content-loader',
-          },
-          prevContent))
+        className: 'dynamic-content-loader',
+      }, dynamicContentCache.get(block.id, null))
     }
 
     registerBlock(type, name, {
@@ -10021,7 +10021,7 @@
     let matches = el.innerText.trim().match(/^\[([a-z]+):([a-zA-Z0-9\-]+):dynamicContent ({.*})\/\]$/)
     if (matches && matches.length) {
       let compatDynamicAttrs = JSON.parse(matches[3])
-      if ( compatDynamicAttrs ){
+      if (compatDynamicAttrs) {
         block = {
           ...block,
           ...compatDynamicAttrs,

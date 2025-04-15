@@ -267,7 +267,7 @@ class Block_Registry {
 		while ( $query->have_posts() ):
 			$query->the_post();
 
-			$template = self::do_post_merge_tags( $content );
+			$template = self::do_post_merge_tags( $content, $props );
 			$cells[]  = $this->parse_blocks( $template, $context );
 		endwhile;
 
@@ -325,7 +325,7 @@ class Block_Registry {
 	 *
 	 * @return array|string|string[]
 	 */
-	public static function do_post_merge_tags( $content ) {
+	public static function do_post_merge_tags( $content, $props = [] ) {
 
 		$merge_tags = [
 			'the_title'     => get_the_title(),
@@ -339,7 +339,13 @@ class Block_Registry {
 			'read_more'     => html()->a( get_the_permalink(), __( 'Read More »', 'groundhogg' ) ),
 		];
 
-		$merge_tags = apply_filters( 'groundhogg/post_merge_tags', $merge_tags );
+		/**
+		 * Filter list of available merge tags, maybe add new ones?
+		 *
+		 * @param array $merge_tags merge tags to replace in the content
+		 * @param array $props the current blocks properties
+		 */
+		$merge_tags = apply_filters( 'groundhogg/post_merge_tags', $merge_tags, $props );
 
 		// add wrapping #tag#
 		$merge_tags = array_map_keys( $merge_tags, function ( $key ) {
@@ -528,8 +534,8 @@ class Block_Registry {
 			}
 
 			$query = new Contact_Query( [
-				'filters'         => $block['include_filters'],
-				'exclude_filters' => $block['exclude_filters'],
+				'filters'         => $block['include_filters'] ?? [],
+				'exclude_filters' => $block['exclude_filters'] ?? [],
 				'include'         => $contact->get_id()
 			] );
 
