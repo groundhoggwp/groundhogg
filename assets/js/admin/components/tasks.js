@@ -401,14 +401,20 @@
     ])
   }
 
+  let taskOutcomes = null
+
   const AddTaskActivity = async ({
     addButtonText = 'Add Activity',
     onSubmit = () => {},
   }) => {
 
     // load task outcomes
-    if (!Groundhogg.stores.options.get('gh_task_outcomes')) {
-      await Groundhogg.stores.options.fetch(['gh_task_outcomes'])
+    if (taskOutcomes === null) {
+      try {
+        taskOutcomes = await Groundhogg.api.get( `${TasksStore.route}/outcomes` ).then( r => r.outcomes ) ?? []
+      } catch (e) {
+        taskOutcomes = []
+      }
     }
 
     const State = Groundhogg.createState({
@@ -440,7 +446,7 @@
                 value: '',
                 text : 'Select an outcome',
               },
-              ...Groundhogg.stores.options.get('gh_task_outcomes', []).map(item => ( {
+              ...taskOutcomes.map(item => ( {
                 value: item,
                 text : item,
               } )),
@@ -457,7 +463,7 @@
             onClick: e => {
 
               let OutcomeState = Groundhogg.createState({
-                outcomes: Groundhogg.stores.options.get('gh_task_outcomes', []),
+                outcomes: [ ...taskOutcomes],
               })
 
               MiniModal({
@@ -481,12 +487,12 @@
                 Button({
                   className: 'gh-button primary',
                   onClick  : e => {
-                    Groundhogg.stores.options.patch({
-                      gh_task_outcomes: OutcomeState.outcomes,
-                    }).then(() => {
-                      State.set({
-                        outcomes: OutcomeState.outcomes,
-                      })
+
+                    Groundhogg.api.patch( `${TasksStore.route}/outcomes`, {
+                      outcomes: OutcomeState.outcomes
+                    } ).then(r => {
+
+                      taskOutcomes = r.outcomes
                       close()
                       morph()
                     })
@@ -539,8 +545,6 @@
             State.set({
               submitting: true,
             })
-
-            morph()
 
             onSubmit({
               note   : State.note,

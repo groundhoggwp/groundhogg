@@ -2,11 +2,8 @@
 
 namespace Groundhogg\Api\V4;
 
-use Groundhogg\Base_Object;
-use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Classes\Task;
 use function Groundhogg\array_map_to_class;
-use function Groundhogg\get_array_var;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -42,7 +39,7 @@ class Tasks_Api extends Notes_Api {
 		parent::register_routes();
 
 		$route = $this->get_route();
-		$key = $this->get_primary_key();
+		$key   = $this->get_primary_key();
 
 		register_rest_route( self::NAME_SPACE, "/$route/complete", [
 			[
@@ -66,6 +63,55 @@ class Tasks_Api extends Notes_Api {
 				'callback'            => [ $this, 'incomplete' ],
 				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/$route/outcomes", [
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_outcomes' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
+			],
+			[
+				'methods'             => \WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'update_outcomes' ],
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				}
+			],
+		] );
+	}
+
+	/**
+	 * Get the task outcomes
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function read_outcomes( \WP_REST_Request $request ) {
+
+		$outcomes = get_option( 'gh_task_outcomes', [] );
+
+		return self::SUCCESS_RESPONSE( [
+			'outcomes' => $outcomes
+		] );
+	}
+
+	/**
+	 * Get the task outcomes
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function update_outcomes( \WP_REST_Request $request ) {
+
+		$outcomes = $request->get_param( 'outcomes' );
+		$outcomes = map_deep( $outcomes, 'sanitize_text_field' );
+		update_option( 'gh_task_outcomes', $outcomes );
+
+		return self::SUCCESS_RESPONSE( [
+			'outcomes' => $outcomes
 		] );
 	}
 
@@ -134,10 +180,10 @@ class Tasks_Api extends Notes_Api {
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function complete_single( \WP_REST_Request $request ){
+	public function complete_single( \WP_REST_Request $request ) {
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
-		$object = $this->create_new_object( $primary_key );
+		$object      = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
@@ -156,10 +202,10 @@ class Tasks_Api extends Notes_Api {
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function incomplete( \WP_REST_Request $request ){
+	public function incomplete( \WP_REST_Request $request ) {
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
-		$object = $this->create_new_object( $primary_key );
+		$object      = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
@@ -204,10 +250,10 @@ class Tasks_Api extends Notes_Api {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function single_cap_check( \WP_REST_Request $request, $cap ){
+	public function single_cap_check( \WP_REST_Request $request, $cap ) {
 		$task = $this->get_object_from_request( $request );
 
-		if ( ! $task->exists() ){
+		if ( ! $task->exists() ) {
 			return self::ERROR_404();
 		}
 
