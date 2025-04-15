@@ -4,9 +4,9 @@ Contributors: trainingbusinesspros, Groundhogg
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.0.1
+Stable tag: 4.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,6 +349,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 4.1.1 (2025-04-15) =
+* ADDED Query Loop block in the email editor for more control over displaying posts in emails.
+* FIXED Multi-select custom fields not displaying correctly in `{form_submission}` replacement code.
+* FIXED Not all steps appearing in the flow preview in reports.
+* FIXED Non-admins unable to complete tasks due to invalid permissions for fetching options from API.
+* FIXED Unable to update the names of saved searches.
+* FIXED Previous fix to avoid recursive replacements preventing nested replacements from working.
+* FIXED Fatal Error if background task is loaded with an undefined task handler class.
 
 = 4.1.0.1 (2025-04-09) =
 * FIXED Prevent recursive replacement codes.
