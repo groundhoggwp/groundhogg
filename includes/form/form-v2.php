@@ -14,6 +14,7 @@ use function Groundhogg\array_to_atts;
 use function Groundhogg\current_contact_and_logged_in_user_match;
 use function Groundhogg\do_replacements;
 use function Groundhogg\file_access_url;
+use function Groundhogg\format_custom_field;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
@@ -205,7 +206,7 @@ function standard_dropdown_callback( $field, $posted_data, &$data, &$meta, &$tag
  */
 function standard_multiselect_callback( $field, $posted_data, &$data, &$meta, &$tags ) {
 
-	$selections = $posted_data[$field['name']];
+	$selections = $posted_data[ $field['name'] ];
 
 	if ( ! is_array( $selections ) ) {
 		return;
@@ -1386,7 +1387,7 @@ class Form_v2 extends Step {
 
 					$name = $property['name'];
 
-					return $submission->$name;
+					return format_custom_field( $property, $submission->$name );
 				}
 			],
 
@@ -1874,7 +1875,7 @@ class Form_v2 extends Step {
 		$theme        = $this->get_meta( 'theme' );
 		$accent_color = $this->get_meta( 'accent_color' );
 
-		if ( ! $accent_color ){
+		if ( ! $accent_color ) {
 			$accent_color = '#000000'; // default to black
 		}
 

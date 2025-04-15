@@ -82,16 +82,7 @@ function sanitize_custom_field( $value, $field_id ) {
 	endswitch;
 }
 
-/**
- * Display a field
- *
- * @param      $field_id string|array
- * @param      $contact  Contact|int
- * @param bool $echo
- *
- * @return array|false|int|mixed|string
- */
-function display_custom_field( $id_or_name, $contact, $echo = true ) {
+function format_custom_field( $id_or_name, $data ) {
 
 	// Field object was passed...
 	if ( is_array( $id_or_name ) && isset( $id_or_name['type'] ) ) {
@@ -99,17 +90,6 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	} else {
 		$field = Properties::instance()->get_field( $id_or_name );
 	}
-
-	// Change from int to Contact
-	if ( is_int( $contact ) ) {
-		$contact = get_contactdata( $contact );
-	}
-
-	if ( ! $field || ! is_a_contact( $contact ) ) {
-		return '';
-	}
-
-	$data = $contact->get_meta( $field['name'] );
 
 	try {
 		switch ( $field['type'] ):
@@ -153,6 +133,39 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	} catch ( \Exception $e ) {
 		return '';
 	}
+
+	return $data;
+}
+
+/**
+ * Display a field
+ *
+ * @param      $field_id string|array
+ * @param      $contact  Contact|int
+ * @param bool $echo
+ *
+ * @return array|false|int|mixed|string
+ */
+function display_custom_field( $id_or_name, $contact, $echo = true ) {
+
+	// Field object was passed...
+	if ( is_array( $id_or_name ) && isset( $id_or_name['type'] ) ) {
+		$field = $id_or_name;
+	} else {
+		$field = Properties::instance()->get_field( $id_or_name );
+	}
+
+	// Change from int to Contact
+	if ( is_int( $contact ) ) {
+		$contact = get_contactdata( $contact );
+	}
+
+	if ( ! $field || ! is_a_contact( $contact ) ) {
+		return '';
+	}
+
+	$data = $contact->get_meta( $field['name'] );
+	$data = format_custom_field( $field, $data );
 
 	/**
 	 * Filter the display value of a custom field
