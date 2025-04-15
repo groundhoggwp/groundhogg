@@ -2072,6 +2072,37 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Update meta, but bypass changes by setting the committing flag
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return bool|mixed
+	 */
+	public function update_meta_bypass_changes( $key, $value = false ) {
+		$this->set_is_committing( true );
+		$result = $this->update_meta( $key, $value );
+		$this->set_is_committing( false );
+		return $result;
+	}
+
+	/**
+	 * Add meta, but bypass changes by setting the committing flag
+	 *
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return bool|mixed
+	 */
+	public function add_meta_bypass_changes( $key, $value = false ) {
+		$this->set_is_committing( true );
+		$result = $this->add_meta( $key, $value );
+		$this->set_is_committing( false );
+		return $result;
+	}
+
+
+	/**
 	 * Oh Boy....
 	 *
 	 * @return array
