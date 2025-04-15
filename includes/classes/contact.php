@@ -537,7 +537,7 @@ class Contact extends Base_Object_With_Meta {
 		/**
 		 * Filter whether the contact is currently marketable
 		 *
-		 * @param bool $is_marketable
+		 * @param bool    $is_marketable
 		 * @param Contact $contact
 		 */
 		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this ), $this );
@@ -552,7 +552,7 @@ class Contact extends Base_Object_With_Meta {
 		/**
 		 * Filter whether the contact is currently deliverable
 		 *
-		 * @param bool $is_deliverable
+		 * @param bool    $is_deliverable
 		 * @param Contact $contact
 		 */
 		return apply_filters( 'groundhogg/contact/is_deliverable', ! in_array( $this->get_optin_status(), [
@@ -595,7 +595,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return void
 	 */
-	protected function handle_consents_in_data( $data ) {
+	protected function handle_consents_in_data( &$data ) {
 
 		// Handle consent
 		$consents = [
@@ -605,15 +605,23 @@ class Contact extends Base_Object_With_Meta {
 		];
 
 		foreach ( $consents as $consent => $callback ) {
-			if ( ! isset_not_empty( $data, $consent ) ) {
+
+			// consent value was not provided, skip
+			if ( ! isset( $data[ $consent ] ) ) {
 				continue;
 			}
 
-			if ( $data[ $consent ] ) {
+			// consent value was provided
+			$consent_value = maybe_string_to_bool( $data[ $consent ] );
+
+			if ( $consent_value ) {
 				call_user_func( $callback );
 			} else {
 				$this->delete_compliance_and_date_meta( $consent );
 			}
+
+			// remove from the data
+			unset( $data[ $consent ] );
 		}
 	}
 
@@ -628,7 +636,7 @@ class Contact extends Base_Object_With_Meta {
 
 		$created = parent::create( $data );
 
-		if ( $created ){
+		if ( $created ) {
 			$this->handle_consents_in_data( $data );
 			$this->set_locale();
 
@@ -692,7 +700,7 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		// prevent email being removed...
-		if ( isset( $data['email'] ) && empty( $data['email'] ) ){
+		if ( isset( $data['email'] ) && empty( $data['email'] ) ) {
 			unset( $data['email'] );
 		}
 
@@ -1442,16 +1450,16 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function add_meta( $key, $value = false ) {
 
-		if ( is_string( $key ) ){
+		if ( is_string( $key ) ) {
 
-			if ( $this->handle_special_meta_keys( $key, $value ) ){
+			if ( $this->handle_special_meta_keys( $key, $value ) ) {
 				return true;
 			}
 
 			// handle custom fields (properties)
 			try {
 				$value = sanitize_custom_field( $value, $key );
-			} catch ( PropertyException $e ){
+			} catch ( PropertyException $e ) {
 				// this means that the property does not exist... so do nothing.
 			}
 		}
@@ -1471,14 +1479,14 @@ class Contact extends Base_Object_With_Meta {
 
 		if ( is_string( $key ) ) {
 
-			if (  $this->handle_special_meta_keys( $key, $value ) ){
+			if ( $this->handle_special_meta_keys( $key, $value ) ) {
 				return true;
 			}
 
 			// handle custom fields (properties)
 			try {
 				$value = sanitize_custom_field( $value, $key );
-			} catch ( PropertyException $e ){
+			} catch ( PropertyException $e ) {
 				// this means that the property does not exist... so do nothing.
 			}
 		}

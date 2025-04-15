@@ -2419,6 +2419,40 @@ function maybe_get_key_display_name( string $key ) {
 }
 
 /**
+ * If a string is provided, maybe map it to the appropriate boolean value
+ *
+ * @param $bool_or_string
+ *
+ * @return bool
+ */
+function maybe_string_to_bool( $bool_or_string ) {
+
+    // bool already
+	if ( is_bool( $bool_or_string ) ) {
+        return $bool_or_string;
+	}
+
+    // not a string, check based on emptiness
+    if ( ! is_string( $bool_or_string ) ) {
+        return ! empty( $bool_or_string );
+    }
+
+    // empty string
+    if ( empty( $bool_or_string ) ) {
+        return false;
+    }
+
+    // lowercase it
+    $string = strtolower( $bool_or_string );
+
+    if ( in_array( $string, [ 'false', 'no' ] ) ) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Update an existing contact with mapped data
  *
  * @param $contact Contact
@@ -2446,11 +2480,11 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 		$map  = array_combine( $keys, $keys );
 	}
 
+	$data        = [];
 	$meta        = [];
 	$tags        = [];
 	$remove_tags = [];
 	$notes       = [];
-	$args        = [];
 	$files       = [];
 	$copy        = [];
 
@@ -2479,7 +2513,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				 *
 				 * @param $field  string the field in question
 				 * @param $value  mixed the value to store
-				 * @param &$args  array general contact information
+				 * @param &$data  array general contact information
 				 * @param &$meta  array list of contact data
 				 * @param &$tags  array list of tags to add to the contact
 				 * @param &$notes array add notes to the contact
@@ -2488,7 +2522,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				do_action_ref_array( 'groundhogg/update_contact_with_map/default', [
 					$field,
 					$value,
-					&$args,
+					&$data,
 					&$meta,
 					&$tags,
 					&$notes,
@@ -2498,19 +2532,19 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				break;
 			case 'full_name':
 				$parts              = split_name( $value );
-				$args['first_name'] = sanitize_text_field( $parts[0] );
-				$args['last_name']  = sanitize_text_field( $parts[1] );
+				$data['first_name'] = sanitize_text_field( $parts[0] );
+				$data['last_name']  = sanitize_text_field( $parts[1] );
 				break;
 			case 'first_name':
 			case 'last_name':
-				$args[ $field ] = sanitize_text_field( $value );
+				$data[ $field ] = sanitize_text_field( $value );
 				break;
 			case 'email':
-				$args[ $field ] = sanitize_email( $value );
+				$data[ $field ] = sanitize_email( $value );
 				break;
 			case 'date_created':
 			case 'date_optin_status_changed':
-				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
+				$data[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
 
@@ -2519,7 +2553,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 					$value = Preferences::string_to_preference( $value );
 				}
 
-				$args[ $field ] = absint( $value );
+				$data[ $field ] = absint( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2542,7 +2576,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				if ( $user ) {
 					// Check the mapped owner can actually own contacts.
 					if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
-						$args[ $field ] = $user->ID;
+						$data[ $field ] = $user->ID;
 					}
 				}
 
@@ -2571,22 +2605,10 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'utm_source':
 				$meta[ $field ] = sanitize_text_field( $value );
 				break;
-			// Only checks whether value is not empty.
 			case 'terms_agreement':
-				if ( ! empty( $value ) ) {
-					$terms_agreement = true;
-				}
-				break;
-			// Only checks whether value is not empty.
 			case 'gdpr_consent':
-				if ( ! empty( $value ) ) {
-					$gdpr_consent = true;
-				}
-				break;
 			case 'marketing_consent':
-				if ( ! empty( $value ) ) {
-					$marketing_consent = true;
-				}
+                $data[ $field ] = maybe_string_to_bool( $value );
 				break;
 			case 'country':
 				if ( strlen( $value ) !== 2 ) {
@@ -2688,19 +2710,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 
 	}
 
-	$contact->update( $args );
-
-	if ( $gdpr_consent ) {
-		$contact->set_gdpr_consent();
-	}
-
-	if ( $marketing_consent ) {
-		$contact->set_marketing_consent();
-	}
-
-	if ( $terms_agreement ) {
-		$contact->set_terms_agreement();
-	}
+	$contact->update( $data );
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
@@ -2927,26 +2937,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 			case 'terms_agreement':
 			case 'gdpr_consent':
 			case 'marketing_consent':
-
-				switch ( $value ) {
-					case 'false':
-					case 'False':
-					case 'no':
-					case 'No':
-						break;
-					case 'yes':
-					case 'Yes':
-					case 'true':
-					case 'True':
-						$data[ $field ] = true;
-						break;
-					default:
-						if ( ! empty( $value ) ) {
-							$data[ $field ] = true;
-						}
-						break;
-				}
-
+			    $data[ $field ] = maybe_string_to_bool( $value );
 				break;
 			case 'country':
 				if ( strlen( $value ) !== 2 ) {
