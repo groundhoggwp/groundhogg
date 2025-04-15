@@ -320,4 +320,13 @@ class Background_Tasks_Table extends Table {
 
 		return apply_filters( 'groundhogg/log/bulk_actions', $actions );
 	}
+
+    public function prepare_items() {
+	    parent::prepare_items();
+
+        // todo there is probably a better way to handle this
+        $this->items = array_filter( $this->items, function ( Background_Task $item ) {
+            return ! $item->is_incomplete_class();
+        } );
+    }
 }

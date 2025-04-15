@@ -34,6 +34,15 @@ class Background_Task extends Base_Object {
 		$this->user_id = absint( $this->user_id );
 	}
 
+	/**
+	 * If the class for theTask is incomplete.
+	 *
+	 * @return bool
+	 */
+	public function is_incomplete_class() {
+		return is_a( $this->theTask, \__PHP_Incomplete_Class::class, true );
+	}
+
 	protected function get_db() {
 		return get_db( 'background_tasks' );
 	}
@@ -66,6 +75,12 @@ class Background_Task extends Base_Object {
 	 */
 	public function process( $max_time = 60 ) {
 
+		// class is incomplete, meaning theTask handler class is undefined
+		if ( $this->is_incomplete_class() ) {
+			$this->update( [ 'status' => 'failed' ] );
+			throw new \Exception( 'Task handler is undefined.' );
+		}
+
 		// If the status is already in progress then this does nothing
 		$this->update( [ 'status' => 'in_progress' ] );
 
@@ -76,6 +91,7 @@ class Background_Task extends Base_Object {
 
 		// Can the task be run
 		if ( ! $this->theTask->can_run() ) {
+			$this->update( [ 'status' => 'failed' ] );
 			throw new \Exception( 'Task can\'t run.' );
 		}
 
