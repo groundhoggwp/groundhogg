@@ -94,7 +94,15 @@ class Background_Tasks {
 		] );
 	}
 
+	/**
+	 * @var int
+	 */
 	protected static int $last_added_task_id = 0;
+
+	/**
+	 * @var Background_Task
+	 */
+	protected static $last_added_task;
 
 	/**
 	 * Schedules the background task wp-cron event
@@ -124,6 +132,7 @@ class Background_Tasks {
 		}
 
 		self::$last_added_task_id = $bg_task->ID;
+		self::$last_added_task    = $bg_task;
 
 		return true;
 	}
@@ -135,6 +144,15 @@ class Background_Tasks {
 	 */
 	public static function get_last_added_task_id(): int {
 		return self::$last_added_task_id;
+	}
+
+	/**
+	 * Return the ID of the most recently added task
+	 *
+	 * @return null|Background_Task
+	 */
+	public static function get_last_added_task() {
+		return self::$last_added_task;
 	}
 
 	/**
@@ -200,7 +218,7 @@ class Background_Tasks {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public static function complete_benchmark( $step_id, $query, $batch = 0, $args = []) {
+	public static function complete_benchmark( $step_id, $query, $batch = 0, $args = [] ) {
 		return self::add( new Complete_Benchmark( $step_id, $query, $batch, $args ) );
 	}
 
