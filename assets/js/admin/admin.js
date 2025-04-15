@@ -450,14 +450,13 @@
     const convertOpt = selector => [...selectEl.querySelectorAll(selector)].map(opt => ( {
       id  : opt.value,
       text: opt.innerHTML,
-    } )).filter( opt => opt.id && opt.text )
+    } )).filter(opt => opt.id && opt.text)
 
     let picker = MakeEl.ItemPicker({
       id          : pickerId,
       fetchOptions: async (search) => {
 
         let opts = convertOpt('option[value]:not(:empty)')
-
 
         if (search) {
           opts = opts.filter(item => item.id.match(search) || item.text.match(search))
@@ -470,8 +469,8 @@
       tags        : selectEl.dataset.tags,
       clearable   : selectEl.multiple || selectEl.dataset.clearable,
       noneSelected: selectEl.dataset.placeholder ?? 'Any...',
-      onCreate    : async opt => {
-        selectEl.appendChild(MakeEl.makeEl('options', {
+      createOption: async opt => {
+        selectEl.appendChild(MakeEl.makeEl('option', {
           value   : opt,
           selected: true,
         }, opt))
@@ -486,13 +485,13 @@
           items = [items]
         }
 
-        let selected = items.filter( item => item ).map(item => item.id)
+        let selected = items.filter(item => item).map(item => item.id)
 
         for (let option of selectEl.options) {
           option.selected = selected.includes(option.value)
         }
 
-        $(selectEl).trigger('change') // must use jQuery for backwards compatibility
+        $(selectEl).trigger('change') // must also use jQuery for backwards compatibility
         selectEl.dispatchEvent(new Event('change'))
 
       },
