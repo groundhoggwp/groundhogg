@@ -1920,6 +1920,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->is_active() && ! $this->is_committing;
 	}
 
+	public function set_is_committing( bool $committing ) {
+		$this->is_committing = $committing;
+	}
+
 	protected $is_committing = false;
 
 	/**
@@ -1931,7 +1935,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$this->maybe_pull();
 
-		$this->is_committing = true;
+		$this->set_is_committing( true );
 
 		$data_changes = [];
 		$meta_changes = [];
@@ -1958,7 +1962,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return $this->delete();
 		}
 
-		$this->is_committing = false;
+		$this->set_is_committing( false );
 
 		return $result;
 	}
@@ -2053,7 +2057,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// single value provided and it's in the step element schema
 		if ( is_string( $key ) ) {
-
 			// we need to sanitize it based on the schema settings
 			$value = $this->sanitize_meta( $key, $value );
 		}

@@ -116,6 +116,7 @@ abstract class Branch_Logic extends Logic {
 
 	public function sortable_item( $step ) {
 
+        $this->set_current_step( $step );
 		$branch_steps = $this->get_sub_steps();
 
 		foreach ( $branch_steps as $branch_step ) {

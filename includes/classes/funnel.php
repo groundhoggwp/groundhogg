@@ -631,8 +631,9 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_steps( $query = [] ) {
 
 		$last_changed = db()->steps->cache_get_last_changed();
-		$cache_key    = "$this->ID:steps:$last_changed";
+		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
 		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
+
 		if ( $found ) {
 			return $steps;
 		}
@@ -810,10 +811,10 @@ class Funnel extends Base_Object_With_Meta {
 
 		/**
 		 * Relly just here as a flag for importing, but theoretically you can modify the data directly
-         *
-         * @param array $data the import JSON
+		 *
+		 * @param array $data the import JSON
 		 */
-		do_action_ref_array( 'groundhogg/funnel/import/before', [&$data] );
+		do_action_ref_array( 'groundhogg/funnel/import/before', [ &$data ] );
 
 		$this->setup_template_data( $data );
 
