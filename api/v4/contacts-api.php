@@ -345,6 +345,15 @@ class Contacts_Api extends Base_Object_Api {
 				'remove_tags' => $remove_tags,
 			] );
 
+			$task = Background_Tasks::get_last_added_task();
+			if ( $task ){
+				try {
+					$task->process( 3 );
+				} catch ( \Exception $e ) {
+
+				}
+			}
+
 			return self::SUCCESS_RESPONSE();
 		}
 
