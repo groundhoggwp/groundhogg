@@ -15,6 +15,8 @@ trait Event_Log {
 	 */
 	public function add( $data = array() ) {
 
+		// not sure why this is strictly required, as time always defaults to time() anyway
+		// better not touch it and just set time manually within enqueue_event()
 		if ( empty( $data['time'] ) ) {
 			return false;
 		}

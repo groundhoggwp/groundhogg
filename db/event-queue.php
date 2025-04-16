@@ -184,7 +184,7 @@ class Event_Queue extends DB {
 			'priority'       => 10,
 			'claim'          => '',
 			'time_claimed'   => 0,
-			'args'           => '',
+			'args'           => serialize( [] ),
 		);
 	}
 

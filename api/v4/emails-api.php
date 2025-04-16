@@ -14,6 +14,7 @@ use Groundhogg\Plugin;
 use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\array_map_to_contacts;
+use function Groundhogg\array_trim;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
@@ -25,6 +26,7 @@ use function Groundhogg\get_object_ids;
 use function Groundhogg\is_sending;
 use function Groundhogg\is_template_site;
 use function Groundhogg\map_to_class;
+use function Groundhogg\maybe_explode;
 use function Groundhogg\process_events;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\track_activity;
@@ -562,7 +564,7 @@ class Emails_Api extends Base_Object_Api {
 
 		$test_type = $request->get_param( 'type' ) ?: 'design';
 
-		$to = array_filter( array_map( 'sanitize_email', wp_parse_list( $request->get_param( 'to' ) ) ) );
+		$to = array_filter( array_map( 'sanitize_email', array_trim( maybe_explode( $request->get_param( 'to' ) ) ) ) );
 
 		if ( empty( $to ) ) {
 			return self::ERROR_401( 'error', 'Invalid email address provided' );
@@ -593,13 +595,19 @@ class Emails_Api extends Base_Object_Api {
 
 				$contact = new Contact( [ 'email' => $email_address ] );
 
-				enqueue_event( [
+				$event = enqueue_event( [
 					'email_id'   => $email->get_id(),
 					'contact_id' => $contact->get_id(),
 					'event_type' => Event::TEST_EMAIL,
 					'priority'   => 1,
 					'status'     => Event::WAITING,
 				] );
+
+				if ( ! $event ) {
+					return self::ERROR_401( 'error', 'Failed to enqueue test email event.', [
+						'email' => $email_address,
+					] );
+				}
 
 				$result = process_events( $contact );
 

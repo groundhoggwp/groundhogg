@@ -495,12 +495,12 @@ abstract class DB {
 	 */
 	public function add( $data = array() ) {
 
-		$args = wp_parse_args(
+		$data = wp_parse_args(
 			$data,
 			$this->get_column_defaults()
 		);
 
-		return $this->insert( $args );
+		return $this->insert( $data );
 	}
 
 	/**
@@ -1455,6 +1455,7 @@ abstract class DB {
 					$query->where()->in( "$join->alias.secondary_object_id", $val['id'] );
 					$query->where( "$join->alias.secondary_object_type", $val['type'] );
 					$query->where( "$join->alias.primary_object_type", $this->get_object_type() );
+					$query->setGroupby( 'ID' );
 
 					break;
 				case 'parent' : // if it has a parent
@@ -1495,10 +1496,9 @@ abstract class DB {
 					$query->where()->in( "$join->alias.primary_object_id", $val['id'] );
 					$query->where( "$join->alias.primary_object_type", $val['type'] );
 					$query->where( "$join->alias.secondary_object_type", $this->get_object_type() );
+					$query->setGroupby( 'ID' );
 
 					break;
-
-
 				case 'count':
 					$operation = 'COUNT';
 					break;
