@@ -358,6 +358,8 @@ You can purchase a premium plan for access to support and our premium extensions
 * FIXED Unable to update the names of saved searches.
 * FIXED Previous fix to avoid recursive replacements preventing nested replacements from working.
 * FIXED Fatal Error if background task is loaded with an undefined task handler class.
+* FIXED Functional email test not sending despite showing as successful.
+* FIXED Suggested documentation not loading in troubleshooter.
 
 = 4.1.0.1 (2025-04-09) =
 * FIXED Prevent recursive replacement codes.
