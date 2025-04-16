@@ -77,6 +77,16 @@ function basic_field_with_label( $field, $input ) {
  */
 function basic_input( $field, $contact, $tag = 'input' ) {
 
+	$field = wp_parse_args( $field, [
+		'id'          => '',
+		'type'        => 'text',
+		'name'        => '',
+		'placeholder' => '',
+		'className'   => '',
+		'required'    => false,
+		'value'       => '',
+	] );
+
 	$property = $field['name'];
 
 	return call_user_func( [ html(), $tag ], [
@@ -951,6 +961,12 @@ class Form_v2 extends Step {
 						return is_array( $opt ) ? $opt[0] : $opt;
 					}, $field['options'] );
 
+
+					// no options given
+					if ( ! isset( $posted_data[ $field['name'] ] ) ){
+						return true;
+					}
+
 					return empty( $posted_data[ $field['name'] ] ) || in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
@@ -1008,11 +1024,17 @@ class Form_v2 extends Step {
 						}, $field['options'] ) );
 				},
 				'validate' => function ( $field, $posted_data ) {
+
 					$options = array_map( function ( $opt ) {
 						return is_array( $opt ) ? $opt[0] : $opt;
 					}, $field['options'] );
 
-					$selections = $posted_data[ $field['name'] ] ?: [];
+					// no options given
+					if ( ! isset( $posted_data[ $field['name'] ] ) ){
+						return true;
+					}
+
+					$selections = $posted_data[ $field['name'] ];
 
 					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new \WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
 				},
@@ -1357,7 +1379,7 @@ class Form_v2 extends Step {
 						return;
 					}
 
-					return Form_v2::before_create_contact( array_merge( $property, [
+					Form_v2::before_create_contact( array_merge( $property, [
 						'value'     => $field['value'],
 						'id'        => $field['id'],
 						'className' => $field['className'],
