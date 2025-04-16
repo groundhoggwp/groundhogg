@@ -92,7 +92,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     font-size: 16px;
   }
 
-  ul:not(.select2-selection__rendered) {
+  ul:not(.select2-selection__rendered,#doc-results) {
     list-style: disc;
     padding-left: 20px;
   }

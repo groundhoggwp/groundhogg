@@ -3856,7 +3856,7 @@ function is_main_blog() {
 function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], bool $as_array = false, int $cache_ttl = 0 ) {
 	$method = strtoupper( $method );
 
-	if ( ! isset_not_empty( $headers, 'Content-type' ) ) {
+	if ( $method !== 'GET' && ! isset_not_empty( $headers, 'Content-type' ) ) {
 		$headers['Content-type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
 	}
 

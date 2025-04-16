@@ -1494,7 +1494,7 @@
             }).then((r) => {
 
               $('#doc-results').
-                html(`${ r.articles.results.map(a => `<li><a href="${ a.url }" target="_blank">${ a.name }</a></li>`).
+                html(`${ r.articles.results.map(a => `<li><a href="${ a.url }" target="_blank">📄 ${ a.name }</a></li>`).
                   join('') }
                 <div class="space-between align-center"
                      style="margin-top: 40px">

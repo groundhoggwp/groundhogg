@@ -50,8 +50,8 @@
 #guided-setup li {
   font-size: 16px;
 }
-#troubleshooter ul:not(.select2-selection__rendered),
-#guided-setup ul:not(.select2-selection__rendered) {
+#troubleshooter ul:not(.select2-selection__rendered, #doc-results),
+#guided-setup ul:not(.select2-selection__rendered, #doc-results) {
   list-style: disc;
   padding-left: 20px;
 }
