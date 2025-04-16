@@ -638,7 +638,7 @@ class Block_Registry {
 			$props = json_decode( $json, true );
 
 			// couldn't decode? Replace with empty string
-			if ( ! $props ) {
+			if ( $props === false ) {
 				return [];
 			}
 
@@ -680,7 +680,7 @@ class Block_Registry {
 			$props = json_decode( $json, true );
 
 			// couldn't decode? Replace with empty string
-			if ( ! $props ) {
+			if ( $props === false ) {
 				$content = str_replace( $match, '', $content );
 				continue;
 			}
