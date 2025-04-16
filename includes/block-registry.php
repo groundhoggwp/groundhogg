@@ -515,7 +515,8 @@ class Block_Registry {
 			$id            = $matches['id'];
 			$block         = json_decode( $matches['attributes'], true );
 
-			if ( ! $block ) {
+			// don't just do empty check because props could be an empty object
+			if ( $block === false ) {
 				// could not decode json
 				// todo leave as is?
 				return $block_content;
