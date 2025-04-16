@@ -51,6 +51,14 @@ $background-color: #F6F9FB;
     }
   }
 
+  &.mce-i-gh_post_merge_tags {
+    font-family: 'dashicons';
+
+    &::before {
+      content: "\f109";
+    }
+  }
+
   &.mce-i-gh_task_template,
   &.mce-i-gh_note_template {
     font-family: 'dashicons';

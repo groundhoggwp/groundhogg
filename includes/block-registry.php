@@ -327,11 +327,26 @@ class Block_Registry {
 	 */
 	public static function do_post_merge_tags( $content, $props = [] ) {
 
+		$props = wp_parse_args( $props, [
+			'thumbnail_size' => 'post-thumbnail'
+		] );
+
+		$alt = '';
+
+		if ( has_post_thumbnail() ){
+			$post_thumbnail_id = get_post_thumbnail_id();
+			$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+		}
+
 		$merge_tags = [
 			'the_title'         => get_the_title(),
 			'the_excerpt'       => get_the_excerpt(),
-			'the_thumbnail'     => get_the_post_thumbnail(),
-			'the_thumbnail_url' => get_the_post_thumbnail_url(),
+			'the_thumbnail'     => has_post_thumbnail() ? html()->e( 'img', [
+				'src'   => get_the_post_thumbnail_url( null, $props['thumbnail_size'] ),
+				'alt'   => $alt,
+				'class' => 'post-thumbnail size-' . esc_attr( $props['thumbnail_size'] )
+			] ) : '',
+			'the_thumbnail_url' => has_post_thumbnail() ? get_the_post_thumbnail_url( null, $props['thumbnail_size'] ) : '#',
 			'the_content'       => get_the_content(),
 			'the_id'            => get_the_ID(),
 			'the_date'          => get_the_date(),

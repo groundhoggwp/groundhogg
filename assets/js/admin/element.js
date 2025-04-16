@@ -847,6 +847,33 @@
     $(document).off('tinymce-editor-setup', addMediaButtonToTinyMCE)
   }
 
+  const addPostMergeTagsToTinyMCE = ( event, editor ) => {
+    editor.settings.toolbar1 += ',gh_post_merge_tags'
+
+    editor.addButton('gh_post_merge_tags', {
+      title  : 'Post Merge Tags',
+      image  : '',
+      onclick: async e => {
+
+        return searchOptionsWidget( {
+          position: 'fixed',
+          target  : e.target,
+          // filter out hidden codes
+          options     : Groundhogg.emailEditor.PostTagReference,
+          filterOption: ({
+            desc,
+          }, search) => desc.match(regexp(search)),
+          renderOption: (option) => option.desc,
+          onSelect    : (option) => {
+            editor.execCommand('mceInsertContent', false, `#${option.tag}#` )
+          },
+        }).mount()
+      },
+    })
+
+    $(document).off('tinymce-editor-setup', addPostMergeTagsToTinyMCE)
+  }
+
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
   }) => {
@@ -855,6 +882,11 @@
     if (config.replacements === true) {
       $(document).on('tinymce-editor-setup', addReplacementsToolbarTinyMCE)
       delete config.replacements
+    }
+
+    if (config.posttags === true) {
+      $(document).on('tinymce-editor-setup', addPostMergeTagsToTinyMCE)
+      delete config.posttags
     }
 
     if ( config.media === true ){

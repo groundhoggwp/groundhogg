@@ -11,6 +11,12 @@
 .mce-ico.mce-i-gh_saved_reply::before {
   content: "";
 }
+.mce-ico.mce-i-gh_post_merge_tags {
+  font-family: "dashicons";
+}
+.mce-ico.mce-i-gh_post_merge_tags::before {
+  content: "";
+}
 .mce-ico.mce-i-gh_task_template, .mce-ico.mce-i-gh_note_template {
   font-family: "dashicons";
 }

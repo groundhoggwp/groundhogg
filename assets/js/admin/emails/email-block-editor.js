@@ -2311,8 +2311,8 @@
       let cacheKey = generateCacheKey(block)
 
       // don't if already has data in the cache
-      if ( dynamicContentCache.has(cacheKey) ) {
-        return;
+      if (dynamicContentCache.has(cacheKey)) {
+        return
       }
 
       setIsGeneratingHTML(true)
@@ -6798,6 +6798,7 @@
                 tinymceElement(editorId, {
                     replacements: true,
                     savedReplies: true,
+                    posttags: blockEl.closest( '[data-type="queryloop"]' ) && true,
                     tinymce     : {
                       content_style: tinyMceCSS(),
                       height, // inline: true,
@@ -8676,6 +8677,49 @@
     ])
   }
 
+  const PostTagReference = [
+    {
+      tag : 'the_title',
+      desc: 'The post title',
+    },
+    {
+      tag : 'the_excerpt',
+      desc: 'The post excerpt',
+    },
+    {
+      tag : 'the_url',
+      desc: 'The link to the post',
+    },
+    {
+      tag : 'the_thumbnail',
+      desc: 'The thumbnail image',
+    },
+    {
+      tag : 'the_thumbnail_url',
+      desc: 'The thumbnail image URL',
+    },
+    {
+      tag : 'the_content',
+      desc: 'The post content',
+    },
+    {
+      tag : 'the_id',
+      desc: 'The post ID',
+    },
+    {
+      tag : 'the_date',
+      desc: 'The post publish date',
+    },
+    {
+      tag : 'the_author',
+      desc: 'The post author',
+    },
+    {
+      tag : 'read_more',
+      desc: 'A "Read more" link to the post',
+    },
+  ]
+
   registerDynamicBlock('queryloop', 'Query Loop', {
     svg       : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <path fill="currentColor" d="M18 7a7.669 7.669 0 0 0-6 3.19A7.669 7.669 0 0 0 6 7c-3.687 0-5 2.583-5 5 0 3.687 2.583 5 5 5a7.669 7.669 0 0 0 6-3.19A7.669 7.669 0 0 0 18 17c2.417 0 5-1.313 5-5 0-2.417-1.313-5-5-5ZM6 15a2.689 2.689 0 0 1-3-3 2.689 2.689 0 0 1 3-3c2.579 0 4.225 2.065 4.837 3-.612.935-2.258 3-4.837 3Zm12 0c-2.579 0-4.225-2.065-4.837-3 .612-.935 2.258-3 4.837-3a2.689 2.689 0 0 1 3 3 2.689 2.689 0 0 1-3 3Z"/>
@@ -8688,51 +8732,9 @@
     controls  : ({
       gap = 10,
       columns = 2,
+      thumbnail_size = 'post-thumbnail',
       ...query
     }) => {
-
-      let reference = [
-        {
-          tag : 'the_title',
-          desc: 'The post title',
-        },
-        {
-          tag : 'the_excerpt',
-          desc: 'The post excerpt',
-        },
-        {
-          tag : 'the_url',
-          desc: 'The link to the post',
-        },
-        {
-          tag : 'the_thumbnail',
-          desc: 'The thumbnail image',
-        },
-        {
-          tag : 'the_thumbnail_url',
-          desc: 'The thumbnail image URL',
-        },
-        {
-          tag : 'the_content',
-          desc: 'The post content',
-        },
-        {
-          tag : 'the_id',
-          desc: 'The post ID',
-        },
-        {
-          tag : 'the_date',
-          desc: 'The post publish date',
-        },
-        {
-          tag : 'the_author',
-          desc: 'The post author',
-        },
-        {
-          tag : 'read_more',
-          desc: 'A "Read more" link to the post',
-        },
-      ]
 
       return Fragment([
         ControlGroup({
@@ -8760,6 +8762,23 @@
               unit     : 'px',
               onInput  : e => updateBlock({ gap: e.target.value }),
             })),
+          Control({
+              label: 'Thumbnail Size',
+            },
+            Select({
+              id      : 'thumbnail-size',
+              style   : {
+                width: '115px',
+              },
+              selected: thumbnail_size,
+              options : imageSizes.map(size => ( {
+                value: size,
+                text : size,
+              } )),
+
+              onChange: e => updateBlock({ thumbnail_size: e.target.value }),
+
+            })),
         ]),
         QueryControls(query),
         ControlGroup({
@@ -8767,7 +8786,7 @@
           name: 'Reference',
         }, [
           Pg({}, 'Use the below merge tags to merge post data within the query loop.'),
-          ...reference.map(tag => Div({ className: 'display-flex space-between' }, [
+          ...PostTagReference.map(tag => Div({ className: 'display-flex space-between' }, [
             makeEl('code', {
               className: 'copy-text',
             }, `#${ tag.tag }#`),
@@ -8792,16 +8811,17 @@
     defaults  : {
       children: [
         createBlock('text', {
-          content: `<h2>#the_title#</h2>\n<p>#the_excerpt#</p>\n<p>#read_more#</p>`,
+          content: `<p>#the_thumbnail#</p>\n<h2>#the_title#</h2>\n<p>#the_excerpt#</p>\n<p>#read_more#</p>`,
         }),
       ],
       columns : 2,
       layout  : 'grid', // grid or list
       // query defaults
-      queryId  : '',
-      post_type: 'post',
-      number   : 6,
-      offset   : 0,
+      queryId       : '',
+      post_type     : 'post',
+      number        : 6,
+      offset        : 0,
+      thumbnail_size: 'post-thumbnail',
     },
 
   })
@@ -10188,6 +10208,7 @@
 
   Groundhogg.EmailEditor = initialize
   Groundhogg.emailEditor = {
+    PostTagReference,
     registerBlock,
     registerDynamicBlock,
     getActiveBlock,
