@@ -328,22 +328,23 @@ class Block_Registry {
 	public static function do_post_merge_tags( $content, $props = [] ) {
 
 		$merge_tags = [
-			'the_title'     => get_the_title(),
-			'the_excerpt'   => get_the_excerpt(),
-			'the_thumbnail' => get_the_post_thumbnail(),
-			'the_content'   => get_the_content(),
-			'the_id'        => get_the_ID(),
-			'the_date'      => get_the_date(),
-			'the_author'    => get_the_author(),
-			'the_url'       => get_the_permalink(),
-			'read_more'     => html()->a( get_the_permalink(), __( 'Read More »', 'groundhogg' ) ),
+			'the_title'         => get_the_title(),
+			'the_excerpt'       => get_the_excerpt(),
+			'the_thumbnail'     => get_the_post_thumbnail(),
+			'the_thumbnail_url' => get_the_post_thumbnail_url(),
+			'the_content'       => get_the_content(),
+			'the_id'            => get_the_ID(),
+			'the_date'          => get_the_date(),
+			'the_author'        => get_the_author(),
+			'the_url'           => get_the_permalink(),
+			'read_more'         => html()->a( get_the_permalink(), __( 'Read More »', 'groundhogg' ) ),
 		];
 
 		/**
 		 * Filter list of available merge tags, maybe add new ones?
 		 *
 		 * @param array $merge_tags merge tags to replace in the content
-		 * @param array $props the current blocks properties
+		 * @param array $props      the current blocks properties
 		 */
 		$merge_tags = apply_filters( 'groundhogg/post_merge_tags', $merge_tags, $props );
 
@@ -366,7 +367,7 @@ class Block_Registry {
 	public function posts( array $props, string $content ) {
 
 		// if the content is not empty
-		if ( ! empty( $content ) ){
+		if ( ! empty( $content ) ) {
 			$props = array_merge( $props, $this->pull_attributes_from_old_dynamic_content_string( $content ) );
 		}
 
@@ -439,7 +440,7 @@ class Block_Registry {
 		] );
 
 		// if the content is not empty
-		if ( ! empty( $content ) ){
+		if ( ! empty( $content ) ) {
 			$props = array_merge( $props, $this->pull_attributes_from_old_dynamic_content_string( $content ) );
 		}
 
@@ -610,7 +611,7 @@ class Block_Registry {
 		$dynamic_block_regex = '/' . $json_regex . '\\[(?\'type\'' . $dynamic_blocks . '):(?\'id\'[A-Za-z0-9-]+):dynamicContent (?\'attributes\'(?&json))\\/\\]/s';
 		$found               = preg_match_all( $dynamic_block_regex, $content, $matches );
 
-		if ( ! $found ){
+		if ( ! $found ) {
 			return [];
 		}
 
@@ -621,7 +622,7 @@ class Block_Registry {
 			$props = json_decode( $json, true );
 
 			// couldn't decode? Replace with empty string
-			if ( ! $props ){
+			if ( ! $props ) {
 				return [];
 			}
 
@@ -663,7 +664,7 @@ class Block_Registry {
 			$props = json_decode( $json, true );
 
 			// couldn't decode? Replace with empty string
-			if ( ! $props ){
+			if ( ! $props ) {
 				$content = str_replace( $match, '', $content );
 				continue;
 			}
