@@ -5129,7 +5129,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 	get_db( 'permissions_keys' )->add( [
 		'contact_id'       => $contact->get_id(),
 		'usage_type'       => sanitize_key( $usage ),
-		'permissions_key'  => wp_hash_password( $key ),
+		'permissions_key'  => groundhogg_pass_hasher()->HashPassword( $key ),
 		'delete_after_use' => $delete_after_use,
 		'expiration_date'  => Ymd_His( time() + $expiration )
 	] );
@@ -5219,13 +5219,8 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 		return false;
 	}
 
-	if ( empty( $wp_hasher ) ) {
-		require_once ABSPATH . WPINC . '/class-phpass.php';
-		$wp_hasher = new \PasswordHash( 8, true );
-	}
-
 	foreach ( $keys as $permissions_key ) {
-		if ( $wp_hasher->CheckPassword( $key, $permissions_key->permissions_key ) ) {
+		if ( groundhogg_pass_hasher()->CheckPassword( $key, $permissions_key->permissions_key ) ) {
 
 			// Maybe delete after
 			if ( $permissions_key->delete_after_use ) {
