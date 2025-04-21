@@ -5094,6 +5094,26 @@ function is_a_user( $user ): bool {
 }
 
 /**
+ * Standardize the hasher
+ *
+ * @return mixed|PasswordHash
+ */
+function pass_hasher() {
+	static $hasher;
+	if ( $hasher ) {
+		return $hasher;
+	}
+
+	if ( ! class_exists( '\PasswordHash' ) ) {
+		require_once ABSPATH . WPINC . '/class-phpass.php';
+	}
+
+	$hasher = new \PasswordHash( 8, true );
+
+	return $hasher;
+}
+
+/**
  * Generate a key which can be used to perform high level operations that requires a level of authentication
  * For example change email preferences or auto-login.
  *
@@ -5129,7 +5149,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 	get_db( 'permissions_keys' )->add( [
 		'contact_id'       => $contact->get_id(),
 		'usage_type'       => sanitize_key( $usage ),
-		'permissions_key'  => groundhogg_pass_hasher()->HashPassword( $key ),
+		'permissions_key'  => pass_hasher()->HashPassword( $key ),
 		'delete_after_use' => $delete_after_use,
 		'expiration_date'  => Ymd_His( time() + $expiration )
 	] );
@@ -5158,9 +5178,7 @@ function invalidate_contact_permissions_keys( Contact $contact, string $usage = 
 		$query['usage_type'] = $usage;
 	}
 
-	$deleted = get_db( 'permissions_keys' )->delete( $query );
-
-	return $deleted;
+	return get_db( 'permissions_keys' )->delete( $query );
 }
 
 /**
@@ -5220,7 +5238,7 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 	}
 
 	foreach ( $keys as $permissions_key ) {
-		if ( groundhogg_pass_hasher()->CheckPassword( $key, $permissions_key->permissions_key ) ) {
+		if ( pass_hasher()->CheckPassword( $key, $permissions_key->permissions_key ) ) {
 
 			// Maybe delete after
 			if ( $permissions_key->delete_after_use ) {
