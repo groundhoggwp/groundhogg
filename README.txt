@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.1.1
+Stable tag: 4.1.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,7 +350,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 4.1.1.1 (2025-04-19) =
+= 4.1.1.2 (2025-04-21) =
 * FIXED Confirmation links not working in WordPress 6.8 due to password hashing changes.
 
 = 4.1.1 (2025-04-15) =
