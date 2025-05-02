@@ -955,7 +955,7 @@
         }, Div({ id: 'email-editor' }))
       }
 
-      const EmailPicker = ItemPicker({
+      const EmailPicker = () => ItemPicker({
         id          : `step-${ ID }-email-picker`,
         noneSelected: 'Search for an email...',
         selected    : email_id ? {
@@ -1008,7 +1008,7 @@
                 minHeight   : '62px',
               },
             }, [
-              email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker,
+              email_id && !getEmail() ? '<h2>Loading...</h2>' : EmailPicker(),
               Div({
                 className: 'display-flex',
               }, [
