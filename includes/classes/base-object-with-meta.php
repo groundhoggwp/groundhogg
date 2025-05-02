@@ -142,32 +142,40 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	}
 
 	/**
+	 * Sanitize a meta value
+	 * This should be overridden in child classes as a fallback handler for sanitization.
+	 *
+	 * @param string $key the key of the meta
+	 * @param mixed $value the value of the meta
+	 *
+	 * @return mixed
+	 */
+	protected function sanitize_meta( $key, $value ) {
+		return $value;
+	}
+
+	/**
 	 * Same as update_meta, but only sets the value if one does not already exist
 	 *
-	 * @param $key
-	 * @param $value
+	 * @param string|array $key
+	 * @param mixed $value
 	 *
 	 * @return bool
 	 */
 	public function update_meta_if_empty( $key, $value = false ) {
 
+		// if is array, just do the actual update_meta()
 		if ( is_array( $key ) && ! $value ) {
-
-			$updated = true;
-
-			foreach ( $key as $meta_key => $meta_value ) {
-				$updated = $this->update_meta( $meta_key, $meta_value ) && $updated;
-			}
-
-			return $updated;
-
-		} else if ( ! $this->get_meta( $key ) && $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
-			$this->meta[ $key ] = $value;
-
-			return true;
+			return $this->update_meta( $key, $value );
 		}
 
-		return false;
+		// not empty, the false
+		if ( $this->get_meta( $key ) ){
+			return false;
+		}
+
+		// actual update_meta method
+		return $this->update_meta( $key, $value );
 	}
 
 	/**
@@ -193,6 +201,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		if ( ! isset( $key, $this->meta ) ){
 			return $this->add_meta( $key, $value );
 		}
+
+		$value = $this->sanitize_meta( $key, $value );
 
 		if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value, $this->meta[$key] ?? '' ) ) {
 			$this->meta[ $key ] = $value;
@@ -224,6 +234,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			return $added;
 
 		}
+
+		$value = $this->sanitize_meta( $key, $value );
 
 		if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;

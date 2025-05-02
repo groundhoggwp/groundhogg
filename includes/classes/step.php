@@ -2029,14 +2029,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function add_meta( $key, $value = false ) {
 
-		// single value provided and it's in the step element schema
-		if ( is_string( $key ) ) {
-			// we need to sanitize it based on the schema settings
-			$value = $this->sanitize_meta( $key, $value );
-		}
-
 		// maybe add to changes instead?
 		if ( is_string( $key ) && $this->should_add_as_changes() ) {
+			$value = $this->sanitize_meta( $key, $value );
 			return $this->add_changes( [
 				$key => $value
 			] );
@@ -2055,14 +2050,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function update_meta( $key, $value = false ) {
 
-		// single value provided and it's in the step element schema
-		if ( is_string( $key ) ) {
-			// we need to sanitize it based on the schema settings
-			$value = $this->sanitize_meta( $key, $value );
-		}
-
 		// maybe add to changes instead?
 		if ( is_string( $key ) && $this->should_add_as_changes() ) {
+			$value = $this->sanitize_meta( $key, $value );
 			return $this->add_changes( [
 				$key => $value
 			] );
