@@ -354,7 +354,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                     <p><?php printf( __( 'Safe mode will temporarily disable any non %s related plugins for debugging purposes for your account only. Other users will not be impacted.', 'groundhogg' ), white_labeled_name() ); ?></p>
 					<?php
 
-                    maybe_install_safe_mode_plugin();
+					maybe_install_safe_mode_plugin();
 
 					if ( ! groundhogg_is_safe_mode_enabled() ):
 
@@ -444,37 +444,37 @@ class Tools_Page extends Tabbed_Admin_Page {
                     </div>
                 </div>
 			<?php endif; ?>
-            <?php if ( is_super_admin() ): ?>
-            <div class="gh-panel">
-                <div class="gh-panel-header">
-                    <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
-                </div>
-                <div class="inside">
-                    <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                    <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
-                    <form method="post" class="danger-permanent">
-						<?php wp_nonce_field( 'reset' ) ?>
-						<?php action_input( 'reset' ) ?>
-                        <div class="gh-input-group">
+			<?php if ( is_super_admin() ): ?>
+                <div class="gh-panel">
+                    <div class="gh-panel-header">
+                        <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
+                    </div>
+                    <div class="inside">
+                        <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                        <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
+                        <form method="post" class="danger-permanent">
+							<?php wp_nonce_field( 'reset' ) ?>
+							<?php action_input( 'reset' ) ?>
+                            <div class="gh-input-group">
 
-                            <?php echo html()->input( [
-								'class'       => 'input',
-								'name'        => 'reset_confirmation',
-								'placeholder' => 'Type "reset" to confirm.',
-								'required'    => true,
-							] );
+								<?php echo html()->input( [
+									'class'       => 'input',
+									'name'        => 'reset_confirmation',
+									'placeholder' => 'Type "reset" to confirm.',
+									'required'    => true,
+								] );
 
-							echo html()->submit( [
-								'class' => 'gh-button danger',
-								'text'  => __( '⚠️ Reset', 'groundhogg' )
-							] )
-							?>
-                        </div>
-                    </form>
-                    <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
+								echo html()->submit( [
+									'class' => 'gh-button danger',
+									'text'  => __( '⚠️ Reset', 'groundhogg' )
+								] )
+								?>
+                            </div>
+                        </form>
+                        <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
+                    </div>
                 </div>
-            </div>
-            <?php endif; ?>
+			<?php endif; ?>
 			<?php do_action( 'groundhogg/admin/tools/system_status/after' ); ?>
         </div>
 		<?php
@@ -485,7 +485,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_enable_safe_mode() {
 
-        maybe_install_safe_mode_plugin();
+		maybe_install_safe_mode_plugin();
 
 		if ( groundhogg_enable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_enabled', __( 'Safe mode has been enabled.' ) );
@@ -496,7 +496,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	public function process_disable_safe_mode() {
 
-        maybe_install_safe_mode_plugin();
+		maybe_install_safe_mode_plugin();
 
 		if ( groundhogg_disable_safe_mode() ) {
 			$this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' ) );
@@ -707,7 +707,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$files = $this->get_items();
 
 		foreach ( $files as $file_name ) {
-			$filepath = files()->get_csv_imports_dir( $file_name );
+			$filepath = files()->get_csv_imports_dir( sanitize_file_name( $file_name ) );
 
 			if ( file_exists( $filepath ) ) {
 				if ( ! unlink( $filepath ) ) {
@@ -918,9 +918,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$files = $this->get_items();
 
 		foreach ( $files as $file_name ) {
-			$filepath = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name );
+			$filepath = files()->get_csv_exports_dir( sanitize_file_name( $file_name ) );
 			if ( file_exists( $filepath ) ) {
-				unlink( $filepath );
+				if ( ! unlink( $filepath ) ) {
+					return new WP_Error( 'failed', 'Unable to delete exports.' );
+				}
 			}
 		}
 
