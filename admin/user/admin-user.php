@@ -29,9 +29,9 @@ class Admin_User {
 			return;
 		}
 
-		add_filter( 'mce_css', function ( $mce_css ) {
-			return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
-		} );
+//		add_filter( 'mce_css', function ( $mce_css ) {
+//			return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
+//		} );
 
 		?>
         <h2 id="groundhogg-options"><?php _e( white_labeled_name() ); ?></h2>
