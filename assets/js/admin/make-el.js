@@ -485,6 +485,7 @@
       Button({
         className: 'gh-button dashicon remove-row',
         dataRow  : rowIndex,
+        type     : 'button',
         onClick  : e => removeRow(rowIndex),
       }, Dashicon('no-alt')),
     ])
@@ -525,6 +526,7 @@
           id       : `${ id }-add-row`,
           className: 'add-row gh-button dashicon',
           onClick  : e => addRow(),
+          type     : 'button',
         }, Dashicon('plus-alt2')),
       ]) : null,
     ])
