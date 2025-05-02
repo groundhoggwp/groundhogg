@@ -1423,6 +1423,46 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Sanitize stuff
+	 *
+	 * @param string $key
+	 * @param        $value
+	 *
+	 * @return array|mixed
+	 */
+	protected function sanitize_meta( $key, $value ) {
+
+		switch ( $key ){
+			case 'custom_headers':
+				$value = array_map_keys( $value, 'sanitize_key' );
+				$value = array_map( 'sanitize_text_field', $value );
+				break;
+			case 'replacements':
+				$value = array_map_keys( $value, 'sanitize_key' );
+				$value = array_map( '\Groundhogg\email_kses', $value );
+				break;
+			case 'blocks':
+			case 'use_default_from':
+			case 'browser_view':
+				$value = boolval( $value );
+				break;
+			case 'reply_to_override':
+				$value = sanitize_email( $value );
+				break;
+			case 'type':
+			case 'utm_content':
+			case 'utm_campaign':
+			case 'utm_medium':
+			case 'utm_source':
+			case 'utm_term':
+				$value = sanitize_text_field( $value );
+				break;
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Override title and status when duplicating
 	 *
 	 * @param $overrides

@@ -11,6 +11,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_event_queue_processing;
+use function Groundhogg\the_event;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -234,6 +235,7 @@ class Event_Queue extends Supports_Errors {
 					break;
 				}
 
+				the_event( $event );
 				$this->set_current_event( $event );
 
 				$contact = $event->get_contact();

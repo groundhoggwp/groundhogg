@@ -630,14 +630,6 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_steps( $query = [] ) {
 
-		$last_changed = db()->steps->cache_get_last_changed();
-		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
-		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
-
-		if ( $found ) {
-			return $steps;
-		}
-
 		$query = wp_parse_args( $query, [
 			'funnel_id' => $this->get_id(),
 			'orderby'   => 'step_order',
@@ -649,8 +641,15 @@ class Funnel extends Base_Object_With_Meta {
 			$query['step_status'] = 'active';
 		}
 
-		$steps = $this->get_steps_db()->query( $query );
+		$last_changed = db()->steps->cache_get_last_changed();
+		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
+		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
 
+		if ( $found ) {
+			return $steps;
+		}
+
+		$steps = $this->get_steps_db()->query( $query );
 		$steps = array_map_to_step( $steps );
 
 		if ( $this->is_editing() ) {
@@ -772,6 +771,20 @@ class Funnel extends Base_Object_With_Meta {
 		return array_any( $this->get_steps(), function ( Step $step ) {
 			return $step->has_changes() || in_array( $step->step_status, [ 'inactive', 'deleted' ] );
 		} );
+	}
+
+	protected function sanitize_meta( $key, $value ) {
+		switch ( $key ) {
+			case 'description':
+				$value = sanitize_textarea_field( $value );
+				break;
+			case 'replacements':
+				$value = array_map_keys( $value, 'sanitize_key' );
+				$value = array_map( '\Groundhogg\email_kses', $value );
+				break;
+		}
+
+		return $value;
 	}
 
 	/**

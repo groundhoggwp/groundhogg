@@ -262,6 +262,9 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   width: 30px;
   height: 30px;
 }
+#step-settings-container #step-settings-inner #flow-settings {
+  padding: 30px;
+}
 #step-settings-container #step-settings-inner #add-steps {
   padding: 30px;
 }
@@ -426,14 +429,13 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step > .ui-draggable-dragging p {
   display: none;
 }
-#step-settings-container #step-settings-inner:not([data-show=add]) #add-steps {
+#step-settings-container #step-settings-inner:not([data-view^=add]) #add-steps {
   display: none;
 }
-#step-settings-container #step-settings-inner:not([data-show=simulator]) #flow-simulator {
+#step-settings-container #step-settings-inner:not([data-view=settings]) #flow-settings {
   display: none;
 }
-#step-settings-container #step-settings-inner:has(.step.editing) #flow-simulator,
-#step-settings-container #step-settings-inner:has(.step.editing) #add-steps {
+#step-settings-container #step-settings-inner:not([data-view=simulator]) #flow-simulator {
   display: none;
 }
 #step-settings-container #step-settings-inner code {

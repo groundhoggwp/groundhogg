@@ -583,6 +583,14 @@ class Replacements implements \JsonSerializable {
 				'name'         => __( 'Sub string', 'groundhogg' ),
 				'description'  => _x( 'Returns a substring of the inner replacement code.', 'replacement', 'groundhogg' ),
 			],
+			[
+				'code'         => 'this_email',
+				'callback'     => [ $this, 'replacement_this_email' ],
+			],
+			[
+				'code'         => 'this_flow',
+				'callback'     => [ $this, 'replacement_this_flow' ],
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -2798,6 +2806,55 @@ class Replacements implements \JsonSerializable {
 		$end    = $args[2] ?? strlen( $string );
 
 		return substr( $string, $start, $end );
+	}
+
+	/**
+     * Get the replacement for the current email
+     *
+	 * @throws \Exception
+	 *
+	 * @param $key
+	 *
+	 * @return bool|mixed|string
+	 */
+    public function replacement_this_email( $key = '' ) {
+
+        if ( empty( $key ) || ! is_string( $key ) ) {
+            return '';
+        }
+
+        $email = the_email();
+        if ( ! $email || ! $email->exists() ) {
+            return '';
+        }
+
+        $replacements = $email->get_meta( 'replacements' );
+        return get_array_var( $replacements, $key, '' );
+    }
+
+	/**
+	 * Get the replacement for the current email
+	 *
+	 * @throws \Exception
+	 *
+	 * @param $key
+	 *
+	 * @return bool|mixed|string
+	 */
+	public function replacement_this_flow( $key = '' ) {
+
+		if ( empty( $key ) || ! is_string( $key ) ) {
+			return '';
+		}
+
+		$flow = the_funnel();
+
+		if ( ! $flow || ! $flow->exists() ) {
+			return '';
+		}
+
+		$replacements = $flow->get_meta( 'replacements' );
+		return get_array_var( $replacements, $key, '' );
 	}
 
 	/**

@@ -403,6 +403,10 @@ body.gh-screenshot-mode {
       }
     }
 
+    #flow-settings{
+      padding: 30px;
+    }
+
     #add-steps {
 
       padding: 30px;
@@ -609,23 +613,26 @@ body.gh-screenshot-mode {
       }
     }
 
-    &:not([data-show="add"]){
+    &:not([data-view^="add"]){
       #add-steps {
         display: none;
       }
     }
 
-    &:not([data-show="simulator"]){
+    &:not([data-view="settings"]){
+      #flow-settings{
+        display: none;
+      }
+    }
+
+    &:not([data-view="simulator"]){
       #flow-simulator{
         display: none;
       }
     }
 
     &:has(.step.editing) {
-      #flow-simulator,
-      #add-steps {
-        display: none;
-      }
+
     }
 
     input,

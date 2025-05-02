@@ -52,6 +52,33 @@
 
   if (typeof Funnel !== 'undefined' && Funnel.is_editor) {
 
+    const syncReplacementCodes = () => {
+      let flowReplacements = getFunnel().meta.replacements || {}
+
+      // remove all replacements under this_flow from the replacements object
+      // re-add replacements direct from meta
+
+      // Filter out keys in Groundhogg.replacements that start with "this_flow"
+      Groundhogg.replacements.codes = Object.entries(Groundhogg.replacements.codes).reduce((acc, [key, value]) => {
+        if (value.group !== 'this_flow') {
+          acc[key] = value
+        }
+        return acc
+      }, {})
+
+      Groundhogg.replacements.groups.this_flow = 'This Flow'
+
+      for (const [key, value] of Object.entries(flowReplacements)) {
+        Groundhogg.replacements.codes[`__this_flow_${ key }`] = {
+          code  : `this_flow.${ key }`,
+          desc  : '',
+          name  : key,
+          group : 'this_flow',
+          insert: `{this_flow.${ key }}`,
+        }
+      }
+    }
+
     const createPlaceholderEl = (data) => {
 
       let {

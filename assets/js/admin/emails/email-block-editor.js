@@ -3490,21 +3490,49 @@
     return Fragment([controls])
   }
 
+  const syncReplacementCodes = () => {
+    let emailReplacements = getEmailMeta().replacements || {}
+
+    // remove all replacements under this_email from the replacements object
+    // re-add replacements direct from meta
+
+    // Filter out keys in Groundhogg.replacements that start with "this_email"
+    Groundhogg.replacements.codes = Object.entries(Groundhogg.replacements.codes).reduce((acc, [key, value]) => {
+      if (value.group !== 'this_email') {
+        acc[key] = value
+      }
+      return acc
+    }, {})
+
+    Groundhogg.replacements.groups.this_email = 'This Email'
+
+    for (const [key, value] of Object.entries(emailReplacements)) {
+      Groundhogg.replacements.codes[`__this_email_${key}`] = {
+        code: `this_email.${key}`,
+        desc: '',
+        name: key,
+        group: 'this_email',
+        insert: `{this_email.${key}}`,
+      }
+    }
+  }
+
   const AdvancedEmailControls = () => {
 
     let customHeaders = getEmailMeta().custom_headers || {}
+    let emailReplacements = getEmailMeta().replacements || {}
 
     return Fragment([
       ControlGroup({
-          name: 'Custom Headers',
+          name: 'Email Replacements',
         },
         [
           InputRepeater({
-            id  : 'custom-headers-editor',
-            rows: Object.keys(customHeaders).
+            id  : 'email-replacements-editor',
+            rows: Object.keys(emailReplacements).
               map(k => ( [
                 k,
-                customHeaders[k],
+                emailReplacements[k],
               ] )),
 
             cells   : [
@@ -3520,21 +3548,20 @@
             ],
             onChange: rows => {
 
-              customHeaders = {}
+              emailReplacements = {}
 
-              rows.forEach(([key, val]) => customHeaders[key] = val)
+              rows.forEach(([key, val]) => emailReplacements[key] = val)
 
               setEmailMeta({
-                custom_headers: customHeaders,
+                replacements: emailReplacements,
               })
+
+              syncReplacementCodes()
             },
           }),
-
-          `<p>${ __('You can define custom email headers and override existing ones.') }</p>`,
-
-          `<p>${ __('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>') }</p>`,
-
+          `<p>${ __('Define custom replacements that are only used in the context of this email. Usage is <code>{this_email.replacement_key}</code>.') }</p>`,
         ]),
+
       ControlGroup({
           id  : 'utm',
           name: 'UTM Parameters',
@@ -3601,7 +3628,46 @@
             })),
 
         ]),
+      ControlGroup({
+          name: 'Custom Headers',
+        },
+        [
+          InputRepeater({
+            id  : 'custom-headers-editor',
+            rows: Object.keys(customHeaders).
+              map(k => ( [
+                k,
+                customHeaders[k],
+              ] )),
 
+            cells   : [
+              props => Input({
+                ...props,
+                placeholder: 'Key',
+              }),
+              props => Input({
+                ...props,
+                placeholder: 'Value',
+              }),
+
+            ],
+            onChange: rows => {
+
+              customHeaders = {}
+
+              rows.forEach(([key, val]) => customHeaders[key] = val)
+
+              setEmailMeta({
+                custom_headers: customHeaders,
+              })
+            },
+          }),
+
+          `<p>${ __('You can define custom email headers and override existing ones.') }</p>`,
+
+          `<p>${ __('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>') }</p>`,
+
+        ]),
     ])
   }
 
@@ -6798,7 +6864,7 @@
                 tinymceElement(editorId, {
                     replacements: true,
                     savedReplies: true,
-                    posttags: blockEl.closest( '[data-type="queryloop"]' ) && true,
+                    posttags    : blockEl.closest('[data-type="queryloop"]') && true,
                     tinymce     : {
                       content_style: tinyMceCSS(),
                       height, // inline: true,
@@ -6833,6 +6899,39 @@
       id,
       ...block
     }) => textContent(block),
+    css: ({
+      p,
+      h1,
+      h2,
+      h3,
+      a,
+      selector = ''
+    }) => {
+
+        //language=CSS
+        return `
+          ${ selector } h1 {
+              ${ fontStyle(h1) }
+          }
+
+          ${ selector } h2 {
+              ${ fontStyle(h2) }
+          }
+
+          ${ selector } h3 {
+              ${ fontStyle(h3) }
+          }
+
+          ${ selector } li,
+          ${ selector } p {
+              ${ fontStyle(p) }
+          }
+
+          ${ selector } a {
+              ${ fontStyle(a) }
+          }
+      `
+      },
     plainText: ({ content }) => extractPlainText(content),
     gutenberg: ({ content }) => {
       content = convertToGutenbergBlocks(content)
@@ -9538,6 +9637,8 @@
 
           renderEditor()
 
+          syncReplacementCodes()
+
           return
       }
 
@@ -9600,6 +9701,8 @@
     })
 
     setBlocks(blocks, false)
+
+    syncReplacementCodes()
 
     renderEditor()
   }

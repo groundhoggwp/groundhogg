@@ -9,6 +9,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\array_find;
 use function Groundhogg\Cli\doing_cli;
 use function Groundhogg\get_object_ids;
+use function Groundhogg\the_funnel;
 use function WP_CLI\Utils\format_items;
 use function cli\prompt;
 
@@ -153,6 +154,8 @@ class Simulator {
 	}
 
 	public static function simulate( Step $step, Contact $contact, bool $dryRun = true ) {
+
+		the_funnel( $step->get_funnel() );
 
 		self::$is_dry_run = $dryRun;
 

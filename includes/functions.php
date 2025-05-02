@@ -8322,20 +8322,101 @@ function day_of_week( $number = 0 ) {
 }
 
 /**
+ * Set or get a thing...
+ *
+ * @param $key
+ * @param $set_thing
+ *
+ * @return mixed|null
+ */
+function the_thing( $key, $set_thing = null ) {
+	static $things = [];
+
+	if ( $set_thing ) {
+		$things[ $key ] = $set_thing;
+	}
+
+	return $things[ $key ] ?? null;
+}
+
+/**
+ * Check referrers and maybe setup things during rest API and ajax requests from the referrer
+ *
+ * @return void
+ */
+function maybe_init_things_from_referrer() {
+
+    if ( ! doing_rest() && ! wp_doing_ajax() ){
+        return;
+    }
+
+	$params = [];
+	wp_parse_str( wp_parse_url( wp_get_referer(), PHP_URL_QUERY ), $params );
+
+	$page   = $params['page'] ?? null;
+	$action = $params['action'] ?? null;
+
+    // if the action isn't edit we don't have to do anything
+    if ( $action !== 'edit' ){
+        return;
+    }
+
+    if ( $page === 'gh_funnels' && isset( $params['funnel'] ) ) {
+        $funnel = new Funnel( $params['funnel'] );
+        if ( $funnel->exists() && current_user_can( 'edit_funnel', $funnel ) ) {
+            the_funnel( $funnel );
+        }
+    }
+
+	if ( $page === 'gh_emails' && isset( $params['email'] ) ) {
+		$email = new Email( $params['email'] );
+		if ( $email->exists() && current_user_can( 'edit_email', $email ) ){
+			the_email( $email );
+		}
+	}
+
+	if ( $page === 'gh_contacts' && isset( $params['contact'] ) ) {
+		$contact = get_contactdata( $params['contact'] );
+		if ( $contact && current_user_can( 'view_contact', $contact ) ){
+			the_thing( 'contact', $contact );
+		}
+	}
+}
+
+add_action( 'admin_init', __NAMESPACE__ . '\maybe_init_things_from_referrer' );
+add_action( 'rest_api_init', __NAMESPACE__ . '\maybe_init_things_from_referrer' );
+
+/**
  * Sets/gets the email, for use with email templates
  *
  * @param null|Email $set_email
  *
- * @return Email
+ * @return Email|null
  */
 function the_email( $set_email = null ) {
-	static $email;
+	return the_thing( 'email', $set_email );
+}
 
-	if ( $set_email ) {
-		$email = $set_email;
-	}
+/**
+ * Sets/gets the event to use
+ *
+ * @param Event|null $set_event
+ *
+ * @return Event|null
+ */
+function the_event( $set_event = null ) {
+	return the_thing( 'event', $set_event );
+}
 
-	return $email;
+/**
+ * Sets/gets the flow
+ *
+ * @param Funnel|null $set_flow
+ *
+ * @return Funnel|null
+ */
+function the_funnel( $set_flow = null ) {
+	return the_thing( 'funnel', $set_flow );
 }
 
 /**

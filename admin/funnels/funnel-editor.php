@@ -248,6 +248,9 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                 <div id="flow-simulator">
                     Simulator here!
                 </div>
+                <div id="flow-settings">
+                    Settings here!
+                </div>
             </div>
         </div>
     </div>
