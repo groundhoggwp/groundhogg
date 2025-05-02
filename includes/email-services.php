@@ -22,31 +22,34 @@ class Groundhogg_Email_Services {
 	}
 
 	public static function init() {
-		self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
-		self::register( 'log_only', __( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
-
-		if ( function_exists( 'mailhawk_mail' ) ) {
-			self::register( 'mailhawk', __( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
-		}
 
 		foreach ( [ self::TRANSACTIONAL, self::MARKETING ] as $channel ) {
-
 			add_action( sprintf( 'update_option_gh_%s_email_service', $channel ), [
-				'Groundhogg_Email_Services',
+				__CLASS__,
 				sprintf( 'option_update_%s_callback', $channel )
 			], 10, 2 );
 
 			add_filter( sprintf( "option_gh_%s_email_service", $channel ), [
-				'Groundhogg_Email_Services',
+				__CLASS__,
 				sprintf( 'option_%s', $channel )
 			] );
-
 		}
 
-		add_action( 'admin_notices', [ 'Groundhogg_Email_Services', 'hide_conflicts' ], 1 );
+        add_action( 'init', [__CLASS__, 'register_core_services' ] );
+        add_action( 'admin_notices', [ __CLASS__, 'hide_conflicts' ], 1 );
+    }
 
-		do_action( 'Groundhogg/email_services/init' );
-	}
+    public static function register_core_services() {
+	    self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
+	    self::register( 'log_only', __( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
+
+	    if ( function_exists( 'mailhawk_mail' ) ) {
+		    self::register( 'mailhawk', __( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
+	    }
+
+	    do_action( 'Groundhogg/email_services/init' );
+
+    }
 
 	public static function hide_conflicts() {
 		if ( function_exists( 'mailhawk_mail' ) ) {
