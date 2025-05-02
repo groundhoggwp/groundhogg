@@ -24,10 +24,19 @@ class Scripts {
 		add_filter( 'wp_refresh_nonces', [ $this, 'refresh_nonces' ], 10, 3 );
 
 		add_action( 'enqueue_block_editor_assets', [ $this, 'block_editor_scripts' ] );
+		add_action( 'enqueue_block_assets', [ $this, 'block_assets' ] );
 	}
 
 	public function block_editor_scripts() {
 		wp_enqueue_script( 'groundhogg-gutenberg-filters' );
+		wp_enqueue_style( 'groundhogg-admin-filters' );
+	}
+
+	public function block_assets() {
+		if ( is_admin() ){
+			$this->register_admin_styles();
+			wp_enqueue_style( 'groundhogg-admin-filters' );
+		}
 	}
 
 	/**
