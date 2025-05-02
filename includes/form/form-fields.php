@@ -8,6 +8,7 @@ use function Groundhogg\array_apply_callbacks;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\html;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\maybe_explode;
 use function Groundhogg\utils;
 
@@ -15,13 +16,6 @@ use function Groundhogg\utils;
  * Outputs a form that when submitted the values can be passed directly to generate_contact_with_map()
  */
 class Form_Fields {
-
-	/**
-	 * Provide a contact to prefill info
-	 *
-	 * @var mixed|null
-	 */
-	protected $contact = null;
 
 	/**
 	 *
@@ -32,7 +26,7 @@ class Form_Fields {
 	public function __construct( array $form = [], $contact = null ) {
 		$this->form = $form;
 
-		if ( $contact ) {
+		if ( is_a_contact( $contact ) ) {
 			$this->form = array_map( function ( $field ) use ( $contact ) {
 
 				$id       = $field['id'];
