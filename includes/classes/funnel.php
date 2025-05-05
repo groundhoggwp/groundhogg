@@ -645,7 +645,11 @@ class Funnel extends Base_Object_With_Meta {
 		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
 		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
 
-		if ( $found ) {
+        // make sure all items in array are also steps
+		if ( $found && is_array( $steps ) && array_all( $steps, function ( $step ) {
+				return is_a( $step, Step::class );
+			} ) ) {
+
 			return $steps;
 		}
 
