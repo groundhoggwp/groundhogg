@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.1.2
+Stable tag: 4.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,7 +350,7 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 4.1.2 (2025-05-05) =
+= 4.1.2 (2025-05-06) =
 * ADDED Custom replacements for Emails and Flows.
 * TWEAKED Moved flow settings to the editor panel instead of modal.
 * FIXED Email picker in flow not showing selected template after creating a new email (display issue only).
