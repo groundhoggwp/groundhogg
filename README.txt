@@ -350,6 +350,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 4.1.2 (2025-05-05) =
+* ADDED Custom replacements for Emails and Flows.
+* TWEAKED Moved flow settings to the editor panel instead of modal.
+* FIXED Email picker in flow not showing selected template after creating a new email (display issue only).
+* FIXED Make sure file name is sanitized when deleting exports/imports. Credit to WordFence & Phat Do.
+
 = 4.1.1.2 (2025-04-21) =
 * FIXED Confirmation links not working in WordPress 6.8 due to password hashing changes.
 

@@ -160,6 +160,17 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				], 'Simulate' )
 			] );
 
+			echo html()->e( 'button', [
+				'class' => 'gh-button secondary text icon',
+				'id'    => 'funnel-settings',
+				'type'  => 'button',
+			], [
+				dashicon( 'admin-generic' ),
+				html()->e( 'div', [
+					'class' => 'gh-tooltip bottom'
+				], 'Settings' )
+			] );
+
 			echo html()->button( [
 				'type'  => 'button',
 				'class' => 'gh-button danger text',
@@ -216,7 +227,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				<?php dashicon_e( 'arrow-right-alt2' ); ?>
 				<?php dashicon_e( 'arrow-left-alt2' ); ?>
             </button>
-            <div id="step-settings-inner">
+            <div id="step-settings-inner" data-view="settings">
                 <div id="add-steps">
                     <div class="steps-select">
                         <div class="display-flex gap-10 stretch space-below-10">

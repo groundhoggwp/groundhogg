@@ -420,6 +420,8 @@
       })
     }
 
+    const morphSettings = () => morphdom(document.getElementById('flow-settings'), FlowSettings())
+
     $.extend(Funnel, {
 
       sortables      : null,
@@ -481,7 +483,7 @@
           handler: function (id) {
             this.showSettings()
             this.startEditing(null)
-            morphdom(document.getElementById('flow-settings'), FlowSettings())
+            morphSettings()
           },
         },
         {
@@ -508,7 +510,7 @@
         for (const view of this.views) {
           const result = view.match.exec(hash)
           if (result) {
-            document.getElementById('step-settings-inner').dataset.view = hash
+            document.getElementById('step-settings-inner').dataset.view = hash || 'settings'
             view.handler.apply(this, [result])
             return
           }
@@ -976,9 +978,15 @@
           window.location.hash = 'simulator'
         })
 
+        $('#funnel-settings').on('click', e => {
+          window.location.hash = 'settings'
+        })
+
         if (window.innerWidth > 600) {
           this.makeSortable()
         }
+
+        morphSettings()
 
         this.handleHashChange = this.handleHashChange.bind(this)
         window.addEventListener('hashchange', this.handleHashChange)
