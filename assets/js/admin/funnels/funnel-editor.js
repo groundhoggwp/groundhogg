@@ -52,7 +52,10 @@
 
   if (typeof Funnel !== 'undefined' && Funnel.is_editor) {
 
+    FunnelsStore.itemsFetched([Funnel])
+
     const syncReplacementCodes = () => {
+
       let flowReplacements = getFunnel().meta.replacements || {}
 
       // remove all replacements under this_flow from the replacements object
@@ -593,8 +596,6 @@
           await Promise.all(preloaders)
           close()
         }
-
-        syncReplacementCodes()
 
         // handle focused step for copying
         $document.on('click', e => {
@@ -1150,6 +1151,8 @@
 
         // add initial state to history
         this.addCurrentStepsToUndoRedoHistory()
+
+        syncReplacementCodes()
       },
 
       addCurrentStepsToUndoRedoHistory () {
