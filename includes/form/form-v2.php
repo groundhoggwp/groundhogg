@@ -1800,6 +1800,10 @@ class Form_v2 extends Step {
 			return '';
 		}
 
+		if ( isset_not_empty( $field, 'value') ){
+			$field['value'] = do_replacements( $field['value'], $this->contact );
+		}
+
 		$inner_html = self::render_input( $field, $this->contact );
 
 		$map = [
