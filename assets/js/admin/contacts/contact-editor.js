@@ -1152,12 +1152,9 @@
         : null,
       ]
 
-      Promise.all(promises).then(() => {
+      Promise.all(promises).catch(err => {}).finally(() => {
         $el.html(this.render(activities))
         this.onMount()
-      }).catch(e => {
-        // Something went wrong
-        console.log(e)
       })
 
     },

@@ -26,7 +26,6 @@
     let json = await response.json()
 
     if (!response.ok) {
-      console.log(json)
       throw new ApiError(json.message, json.code)
     }
 

@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.2
+Stable tag: 4.1.2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,6 +349,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 4.1.2.1 (2025-05-14) =
+* TWEAKED Changed "Fixed Segment" to "Static Segment".
+* FIXED Contact activity timeline not loading in some cases if related resource was deleted.
+* FIXED The same flow step appearing in multiple different trigger branches if the trigger IDs start with the same number.
 
 = 4.1.2 (2025-05-06) =
 * ADDED Custom replacements for Emails and Flows.
