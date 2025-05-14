@@ -466,7 +466,7 @@
                   },
 
                 }),
-                '<b>Fixed Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.',
+                '<b>Static Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.',
               ]),
               Label({
                 style: {

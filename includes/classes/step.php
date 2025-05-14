@@ -285,7 +285,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$steps = $this->get_funnel()->get_steps();
 
 		return array_filter( $steps, function ( Step $step ) {
-			return str_starts_with( $step->branch, "$this->ID" );
+
+			if ( $this->is_benchmark() ){
+				return $step->branch === "$this->ID";
+			}
+
+			return str_starts_with( $step->branch, "$this->ID-" );
 		} );
 
 	}
