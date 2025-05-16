@@ -114,6 +114,8 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_401( 'error', __( 'No contacts match the given filters.', 'groundhogg' ) );
 		}
 
+		$meta['total_contacts'] = $num_contacts;
+
 		$broadcast = new Broadcast();
 
 		$broadcast->create( [

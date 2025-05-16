@@ -15,7 +15,11 @@ trait Broadcast_Stats {
 
 	public function get_broadcast_stats() {
 
-		$broadcast = $this->get_broadcast();
+		if ( is_a( $this, Broadcast::class ) ) {
+			$broadcast = $this;
+		} else {
+			$broadcast = $this->get_broadcast();
+		}
 
 		if ( ! $broadcast ) {
 			return [
@@ -38,8 +42,10 @@ trait Broadcast_Stats {
 		$activityQuery = new Table_Query( 'activity' );
 		$activityQuery->setGroupby( 'activity_type' );
 
+		$activityQuery->add_safe_column('COUNT(DISTINCT(contact_id))');
+
 		if ( $broadcast->is_sms() ) {
-			$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
+			$activityQuery->setSelect( 'activity_type', [ 'COUNT(DISTINCT(contact_id))', 'total' ] )
 			              ->where()
 			              ->in( 'activity_type', [ Activity::SMS_CLICKED, Activity::UNSUBSCRIBED ] )
 			              ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
@@ -48,7 +54,7 @@ trait Broadcast_Stats {
 			$results = $activityQuery->get_results();
 			$clicked = get_array_var( find_object( $results, [ 'activity_type' => Activity::SMS_CLICKED ] ), 'total', 0 );
 		} else {
-			$activityQuery->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )
+			$activityQuery->setSelect( 'activity_type', [ 'COUNT(DISTINCT(contact_id))', 'total' ] )
 			              ->where()
 			              ->in( 'activity_type', [ Activity::EMAIL_OPENED, Activity::EMAIL_CLICKED, Activity::UNSUBSCRIBED ] )
 			              ->equals( 'funnel_id', Broadcast::FUNNEL_ID )

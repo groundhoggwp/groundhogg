@@ -30,7 +30,8 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 		          ->equals( 'funnel_id', Broadcast::FUNNEL_ID );
 
 		$activityQuery = new Table_Query( 'activity' );
-		$activityQuery->setSelect( 'email_id', 'step_id', 'activity_type', [ 'COUNT(ID)', 'total' ] )
+		$activityQuery->add_safe_column( 'COUNT(DISTINCT(contact_id))' );
+		$activityQuery->setSelect( 'email_id', 'step_id', 'activity_type', [ 'COUNT(DISTINCT(contact_id))', 'total' ] )
 		              ->setGroupby( 'email_id', 'step_id', 'activity_type' )
 		              ->setOrderby( 'total' )
 		              ->whereIn( 'activity_type', [

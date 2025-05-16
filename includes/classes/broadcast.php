@@ -3,11 +3,11 @@
 namespace Groundhogg;
 
 use Groundhogg\Background\Schedule_Broadcast;
-use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use GroundhoggSMS\Classes\SMS;
@@ -671,6 +671,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	protected $report_data = [];
 
+	use Broadcast_Stats;
+
 	/**
 	 * @return array
 	 */
@@ -682,8 +684,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		$cached_report_data = $this->get_meta( 'cached_report_data' );
-		if ( ! empty( $cached_report_data ) ){
+		if ( ! empty( $cached_report_data ) ) {
 			$this->report_data = $cached_report_data;
+
 			return $this->report_data;
 		}
 
@@ -699,80 +702,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		if ( $this->is_sent() || $this->status_is( 'sending' ) ) {
 
-			$data['sent'] = get_db( 'events' )->count( [
-				'step_id'    => $this->get_id(),
-				'event_type' => Event::BROADCAST,
-				'status'     => Event::COMPLETE,
-			] );
-
-			if ( $this->is_sms() ) {
-				$data['sms_id']     = $this->get_object_id();
-				$data['clicked']    = get_db( 'activity' )->count( [
-					'select'        => 'DISTINCT contact_id',
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::SMS_CLICKED
-				] );
-				$data['all_clicks'] = get_db( 'activity' )->count( [
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::SMS_CLICKED
-				] );
-
-				$data['click_through_rate'] = percentage( $data['sent'], $data['clicked'] );
-
-			} else {
-				$data['email_id']           = $this->get_object_id();
-				$data['opened']             = get_db( 'activity' )->count( [
-					'select'        => 'DISTINCT contact_id',
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::EMAIL_OPENED
-				] );
-				$data['open_rate']          = percentage( $data['sent'], $data['opened'] );
-				$data['clicked']            = get_db( 'activity' )->count( [
-					'select'        => 'DISTINCT contact_id',
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::EMAIL_CLICKED
-				] );
-				$data['all_clicks']         = get_db( 'activity' )->count( [
-					'funnel_id'     => $this->get_funnel_id(),
-					'step_id'       => $this->get_id(),
-					'activity_type' => Activity::EMAIL_CLICKED
-				] );
-				$data['click_through_rate'] = percentage( $data['opened'], $data['clicked'] );
-				$data['unopened']           = $data['sent'] - $data['opened'];
-				$data['opened_not_clicked'] = $data['opened'] - $data['clicked'];
-			}
-
-			$data['unsubscribed'] = get_db( 'activity' )->count( [
-				'funnel_id'     => $this->get_funnel_id(),
-				'step_id'       => $this->get_id(),
-				'activity_type' => Activity::UNSUBSCRIBED
-			] );
-
-			// only if broadcast was actually sent and experimental is enabled.
-			if ( use_experimental_features() && $data['sent'] > 0 ) {
-
-				$events = get_db( 'events' )->query( [
-					'select'     => 'COUNT(ID) as total',
-					'step_id'    => $this->get_id(),
-					'event_type' => Event::BROADCAST,
-					'status'     => Event::COMPLETE,
-					'groupby'    => 'time',
-					'orderby'    => false,
-					'order'      => false,
-				] );
-
-				$counts = wp_list_pluck( $events, 'total' );
-
-				$total = array_sum( $counts );
-				$count = count( $counts );
-
-				// Speed = total sent / ( time_end - time_start )
-				$data['speed'] = round( $total / $count, 2 );
-			}
+			$stats_data = $this->get_broadcast_stats();
+			$data       = array_merge( $data, $stats_data );
 		}
 
 		// lets cached the broadcasts results
@@ -808,7 +739,14 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 * @return array|false|mixed
 	 */
 	public function get_items_remaining() {
-		$total     = $this->get_meta( 'total_contacts' );
+		$total = $this->get_meta( 'total_contacts' );
+
+		// fallback for total contacts
+		if ( ! $total ) {
+			$total = get_db()->contacts->count( $this->get_query() );
+			$this->update_meta( 'total_contacts', $total );
+		}
+
 		$scheduled = $this->get_meta( 'num_scheduled' );
 
 		if ( ! $total || ! $scheduled ) {
