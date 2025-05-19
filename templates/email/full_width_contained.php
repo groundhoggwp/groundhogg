@@ -26,6 +26,7 @@ $bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';
 $bgPosition = $email->get_meta( 'backgroundPosition' ) ?: 'center center';
 $bgRepeat   = $email->get_meta( 'backgroundRepeat' ) ?: 'no-repeat';
 $bgSize     = $email->get_meta( 'backgroundSize' ) ?: 'auto';
+$direction  = $email->get_meta( 'direction' ) ?: 'ltr';
 $alignment  = $email->get_alignment(); // 'left' or 'center'
 
 $bodyStyle = [
@@ -63,7 +64,7 @@ if ( $bgImage ) {
 	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
-<body class="email template-full-width-contained">
+<body class="email template-full-width-contained" dir="<?php esc_attr_e( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>
 		<td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"

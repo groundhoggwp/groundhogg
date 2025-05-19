@@ -25,6 +25,7 @@ $bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';
 $bgPosition = $email->get_meta( 'backgroundPosition' ) ?: 'center center';
 $bgRepeat   = $email->get_meta( 'backgroundRepeat' ) ?: 'no-repeat';
 $bgSize     = $email->get_meta( 'backgroundSize' ) ?: 'auto';
+$direction  = $email->get_meta( 'direction' ) ?: 'ltr'; // 'ltr' or 'rtl'
 $alignment  = $email->get_alignment(); // 'left' or 'center'
 
 $bodyStyle = [
@@ -64,7 +65,7 @@ $bodyStyle = array_filter( $bodyStyle );
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 	<?php load_part( 'head-close' ) ?>
 </head>
-<body class="email responsive template-boxed" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
+<body class="email responsive template-boxed" dir="<?php esc_attr_e( $direction ); ?>" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
 <?php load_part( 'body-open' ); ?>
 <?php load_part( 'preview-text' ); ?>
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
@@ -78,7 +79,7 @@ $bodyStyle = array_filter( $bodyStyle );
 
 						<?php load_part( 'browser-view' ); ?>
 
-						<div class="body-content" style="text-align: left;">
+						<div class="body-content">
 							<?php do_action( 'groundhogg/templates/email/boxed/content/before' ); ?>
 							<?php echo $email->get_merged_content(); ?>
 							<?php do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>

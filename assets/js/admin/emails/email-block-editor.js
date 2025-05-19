@@ -324,6 +324,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
+          direction = 'ltr'
         } = getEmailMeta()
 
         let style = {
@@ -343,6 +344,7 @@
           },
           Div({
               className: `template-boxed ${ alignment }`,
+              dir: direction,
               style    : {
                 maxWidth: `${ width || 640 }px`,
 
@@ -361,6 +363,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
+          direction = 'ltr'
         } = getEmailMeta()
 
         let style = {
@@ -376,6 +379,7 @@
 
         return Div({
             className: `template-full-width-contained`,
+            dir: direction,
             style,
           },
           blocks)
@@ -391,6 +395,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
+          direction = 'ltr'
         } = getEmailMeta()
 
         let style = {
@@ -406,6 +411,7 @@
 
         return Div({
             className: `template-full-width`,
+            dir: direction,
             style,
           },
           blocks)
@@ -3507,12 +3513,12 @@
     Groundhogg.replacements.groups.this_email = 'This Email'
 
     for (const [key, value] of Object.entries(emailReplacements)) {
-      Groundhogg.replacements.codes[`__this_email_${key}`] = {
-        code: `this_email.${key}`,
-        desc: '',
-        name: key,
-        group: 'this_email',
-        insert: `{this_email.${key}}`,
+      Groundhogg.replacements.codes[`__this_email_${ key }`] = {
+        code  : `this_email.${ key }`,
+        desc  : '',
+        name  : key,
+        group : 'this_email',
+        insert: `{this_email.${ key }}`,
       }
     }
   }
@@ -3675,6 +3681,7 @@
 
     let {
       alignment = 'left',
+      direction = 'ltr',
       width = 600,
       backgroundColor = 'transparent',
       backgroundImage = '',
@@ -3725,7 +3732,7 @@
             },
           })),
         templateIs(BOXED) ? Control({
-            label: 'Alignment',
+            label: 'Body Alignment',
           },
           AlignmentButtons({
             id        : 'template-align',
@@ -3739,6 +3746,23 @@
               'center',
             ],
           })) : null,
+        Control({
+            label: 'Text Direction',
+          },
+          AlignmentButtons({
+            id        : 'text-direction',
+            alignment : direction === 'ltr' ? 'left' : 'right',
+            onChange  : direction => {
+              updateSettings({
+                reRender : true,
+                direction: direction === 'right' ? 'rtl' : 'ltr',
+              })
+            },
+            directions: [
+              'left',
+              'right',
+            ],
+          })),
         `<hr/>`,
         Control({
             label: 'Background Color',
@@ -6868,6 +6892,7 @@
                     tinymce     : {
                       content_style: tinyMceCSS(),
                       height, // inline: true,
+                      directionality: getEmailMeta().direction ?? 'ltr'
                     },
                     quicktags   : true,
                   },
@@ -6899,17 +6924,17 @@
       id,
       ...block
     }) => textContent(block),
-    css: ({
+    css      : ({
       p,
       h1,
       h2,
       h3,
       a,
-      selector = ''
+      selector = '',
     }) => {
 
-        //language=CSS
-        return `
+      //language=CSS
+      return `
           ${ selector } h1 {
               ${ fontStyle(h1) }
           }
@@ -6931,7 +6956,7 @@
               ${ fontStyle(a) }
           }
       `
-      },
+    },
     plainText: ({ content }) => extractPlainText(content),
     gutenberg: ({ content }) => {
       content = convertToGutenbergBlocks(content)

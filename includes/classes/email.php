@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\Api\V4\Unsubscribe_Api;
-use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
 use WP_Error;
@@ -98,7 +97,7 @@ class Email extends Base_Object_With_Meta {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
 
-		$title = $this->title;
+		$title   = $this->title;
 		$subject = $this->subject;
 
 		// polyfill title as the subject if empty
@@ -399,7 +398,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function browser_view_link() {
 
-		if ( $this->event && $this->event->exists() ){
+		if ( $this->event && $this->event->exists() ) {
 			return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
 		}
 
@@ -641,7 +640,7 @@ class Email extends Base_Object_With_Meta {
 			}
 
 			// No contact
-			if ( ! is_a_contact( $this->contact ) ){
+			if ( ! is_a_contact( $this->contact ) ) {
 				// Remove the block
 				$content = str_replace( $match, '', $content );
 				continue;
@@ -722,7 +721,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// No contact? Ignore replacements.
-		if ( is_a_contact( $this->contact ) ){
+		if ( is_a_contact( $this->contact ) ) {
 			$content = do_replacements(
 				$content,
 				$this->get_contact()
@@ -764,7 +763,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function convert_to_tracking_links( $content, $context = 'html' ) {
-		if ( $context === 'plain' ){
+		if ( $context === 'plain' ) {
 			return preg_replace_callback( '@\((https?://[^)]+)\)@i', [
 				$this,
 				'tracking_link_callback_plain'
@@ -784,7 +783,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	public function tracking_link_callback_plain( $matches ){
+	public function tracking_link_callback_plain( $matches ) {
 		return $this->tracking_link_callback( $matches, '(%s)' );
 	}
 
@@ -831,23 +830,23 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return array|string|string[]|null
 	 */
-	public function maybe_add_utm_to_links( $content, $context = 'html' ){
+	public function maybe_add_utm_to_links( $content, $context = 'html' ) {
 
 		$utm_params = array_filter( [
-			'utm_source' => $this->utm_source,
+			'utm_source'   => $this->utm_source,
 			'utm_campaign' => $this->utm_campaign,
-			'utm_content' => $this->utm_content,
-			'utm_term' => $this->utm_term,
-			'utm_medium' => $this->utm_medium,
+			'utm_content'  => $this->utm_content,
+			'utm_term'     => $this->utm_term,
+			'utm_medium'   => $this->utm_medium,
 		] );
 
-		if ( empty( $utm_params ) ){
+		if ( empty( $utm_params ) ) {
 			return $content;
 		}
 
 		$url = untrailingslashit( home_url() );
 
-		if ( $context === 'plain' ){
+		if ( $context === 'plain' ) {
 			return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
 				$this,
 				'utm_link_callback_plain'
@@ -867,7 +866,7 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	protected function utm_link_callback_plain( $matches ){
+	protected function utm_link_callback_plain( $matches ) {
 		return $this->utm_link_callback( $matches, '(%s)' );
 	}
 
@@ -878,16 +877,16 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return string
 	 */
-	protected function utm_link_callback( $matches, $format='href="%s"' ){
+	protected function utm_link_callback( $matches, $format = 'href="%s"' ) {
 
 		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
 
 		$utm_params = urlencode_deep( array_filter( [
-			'utm_source' => $this->utm_source,
+			'utm_source'   => $this->utm_source,
 			'utm_campaign' => $this->utm_campaign,
-			'utm_content' => $this->utm_content,
-			'utm_term' => $this->utm_term,
-			'utm_medium' => $this->utm_medium,
+			'utm_content'  => $this->utm_content,
+			'utm_term'     => $this->utm_term,
+			'utm_medium'   => $this->utm_medium,
 		] ) );
 
 		return sprintf( $format, add_query_arg( $utm_params, $clean_url ) );
@@ -1096,7 +1095,7 @@ class Email extends Base_Object_With_Meta {
 			 *
 			 * @param string $list_unsub_header
 			 * @param string $one_click
-			 * @param Email $email
+			 * @param Email  $email
 			 */
 			$list_unsub_header = apply_filters( 'groundhogg/list_unsubscribe_header', $list_unsub_header, $this, $unsub_pk, $event_id );
 
@@ -1191,7 +1190,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		// We're not testing
-		if ( ! $this->is_testing() ){
+		if ( ! $this->is_testing() ) {
 
 			// If email isn't set to ready
 			if ( ! $this->is_ready() ) {
@@ -1199,7 +1198,7 @@ class Email extends Base_Object_With_Meta {
 			}
 
 			// Contact is undeliverable
-			if ( ! $contact->is_deliverable()) {
+			if ( ! $contact->is_deliverable() ) {
 				return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.', 'groundhogg' ) );
 			}
 
@@ -1432,7 +1431,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	protected function sanitize_meta( $key, $value ) {
 
-		switch ( $key ){
+		switch ( $key ) {
 			case 'custom_headers':
 				$value = array_map_keys( $value, 'sanitize_key' );
 				$value = array_map( 'sanitize_text_field', $value );
@@ -1455,7 +1454,23 @@ class Email extends Base_Object_With_Meta {
 			case 'utm_medium':
 			case 'utm_source':
 			case 'utm_term':
+			case 'backgroundImage':
+			case 'backgroundPosition':
+			case 'backgroundSize':
+			case 'backgroundRepeat':
 				$value = sanitize_text_field( $value );
+				break;
+			case 'direction':
+				$value = one_of( $value, [ 'ltr', 'rtl' ] );
+				break;
+			case 'alignment':
+				$value = one_of( $value, [ 'left', 'center' ] );
+				break;
+			case 'backgroundColor':
+				$value = sanitize_hex_color( $value );
+				break;
+			case 'width':
+				$value = absint( $value );
 				break;
 		}
 
@@ -1512,7 +1527,7 @@ class Email extends Base_Object_With_Meta {
 		if ( current_user_can( 'edit_emails' )
 		     && get_array_var( $params, 'page' ) === 'gh_emails'
 		     && get_array_var( 'action' ) === 'edit'
-		){
+		) {
 			// Enable test mode for previews from the edit screen
 			$this->enable_test_mode();
 		}

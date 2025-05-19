@@ -1,9 +1,10 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Groundhogg\Email;
-use function Groundhogg\get_default_email_width;
 use function Groundhogg\the_email;
 
 include_once __DIR__ . '/template-functions.php';
@@ -25,6 +26,7 @@ $bgPosition = $email->get_meta( 'backgroundPosition' ) ?: 'center center';
 $bgRepeat   = $email->get_meta( 'backgroundRepeat' ) ?: 'no-repeat';
 $bgSize     = $email->get_meta( 'backgroundSize' ) ?: 'auto';
 $alignment  = $email->get_alignment(); // 'left' or 'center'
+$direction  = $email->get_meta( 'direction' ) ?: 'ltr'; // 'ltr' or 'rtl'
 
 $bodyStyle = [
 	'background-color' => $bgColor
@@ -50,29 +52,29 @@ if ( $bgImage ) {
     <title><?php echo $email_title; ?></title>
     <base target="_blank">
     <style id="global-style">
-	    <?php load_css( 'email' ); ?>
-	    <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
+        <?php load_css( 'email' ); ?>
+        <?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
     </style>
-	<style id="responsive">
-		<?php load_css( 'responsive' ); ?>
-	</style>
-	<style id="block-styles">
-		<?php echo $email->get_css() ?>
-	</style>
+    <style id="responsive">
+        <?php load_css( 'responsive' ); ?>
+    </style>
+    <style id="block-styles">
+        <?php echo $email->get_css() ?>
+    </style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
-<body class="email template-full-width">
+<body class="email template-full-width" dir="<?php esc_attr_e( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
-	<tr>
-		<td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
+    <tr>
+        <td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
 			<?php echo $email->get_merged_content(); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
 			<?php load_part( 'footer' ); ?>
-		</td>
-	</tr>
+        </td>
+    </tr>
 </table>
 <?php load_part( 'open-tracking' ); ?>
 </body>
