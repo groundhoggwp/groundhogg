@@ -1053,7 +1053,7 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
-	 * IF they opened the email
+	 * Correctly alias function name
 	 *
 	 * @param       $filter
 	 * @param Where $where
@@ -1061,6 +1061,18 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function filter_email_link_clicked( $filter, Where $where ) {
+		self::filter_link_clicked( $filter, $where );
+	}
+
+	/**
+	 * IF they opened the email
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_link_clicked( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'email_id'      => 0,
