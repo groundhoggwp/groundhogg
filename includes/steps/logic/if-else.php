@@ -151,6 +151,10 @@ class If_Else extends Branch_Logic {
 
 		$count = $contactQuery->count();
 
+        if ( ! is_int( $count ) ){
+            return false;
+        }
+
 		switch ( $path ) {
 			case 'yes':
 				return $count === 1;
@@ -178,6 +182,10 @@ class If_Else extends Branch_Logic {
 		] );
 
 		$count = $contactQuery->count();
+
+		if ( ! is_int( $count ) ){
+			return $this->get_first_of_branch( 'no' );
+		}
 
 		return $this->get_first_of_branch( $count === 0 ? 'no' : 'yes' );
 	}

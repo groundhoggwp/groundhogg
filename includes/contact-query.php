@@ -1060,7 +1060,7 @@ class Contact_Query extends Table_Query {
 	 *
 	 * @return void
 	 */
-	public static function filter_link_clicked( $filter, Where $where ) {
+	public static function filter_email_link_clicked( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
 			'email_id'      => 0,
