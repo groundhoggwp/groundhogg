@@ -22,6 +22,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\maybe_explode;
 use function Groundhogg\sanitize_object_meta;
 
 class Contacts_Api extends Base_Object_Api {
@@ -293,7 +294,7 @@ class Contacts_Api extends Base_Object_Api {
 				$email_address = get_array_var( $data, 'email' );
 				$remove_tags   = get_array_var( $item, 'remove_tags', [] );
 				$add_tags      = array_reduce( [ 'tags', 'add_tags', 'apply_tags' ], function ( $tags, $key ) use ( $item ) {
-					return array_merge( $tags, get_array_var( $item, $key, [] ) );
+					return array_merge( $tags, maybe_explode( get_array_var( $item, $key, [] ) ) );
 				}, [] );
 
 				if ( ! $id && ! $email_address ) {
@@ -310,12 +311,14 @@ class Contacts_Api extends Base_Object_Api {
 					continue;
 				}
 
-				// skip if the email address is not being used
-				if ( is_email_address_in_use( $email_address, $contact ) ) {
+				// skip if the email address is being used
+				if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
 					continue;
 				}
 
-				$contact->update( $data );
+				if ( ! empty( $data ) ){
+					$contact->update( $data );
+				}
 
 				// If the current object supports meta data...
 				if ( ! empty( $meta ) && is_array( $meta ) ) {
