@@ -87,7 +87,7 @@ class Contacts extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
-		add_action( 'delete_user', [ $this, 'user_deleted' ], 10, 1 );
+//		add_action( 'delete_user', [ $this, 'user_deleted' ], 10, 1 );
 		parent::add_additional_actions();
 	}
 
