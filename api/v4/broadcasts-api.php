@@ -247,7 +247,7 @@ class Broadcasts_Api extends Base_Object_Api {
 	 * @inheritDoc
 	 */
 	public function update_permissions_callback() {
-		return current_user_can( 'edit_broadcasts' );
+		return current_user_can( 'cancel_broadcasts' );
 	}
 
 	/**
@@ -261,6 +261,6 @@ class Broadcasts_Api extends Base_Object_Api {
 	 * @inheritDoc
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can( 'delete_broadcasts' );
+		return current_user_can( 'cancel_broadcasts' );
 	}
 }
