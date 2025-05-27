@@ -370,7 +370,7 @@ function _responsive_tag_compat_callback( $matches ) {
  */
 function add_review_link_in_footer( $text ) {
 
-	if ( ! is_string( $text ) || is_white_labeled() || ! is_admin_groundhogg_page() || ! apply_filters( 'groundhogg/footer/show_text', true ) ){
+	if ( ! is_string( $text ) || is_white_labeled() || ! is_admin_groundhogg_page() || ! apply_filters( 'groundhogg/footer/show_text', true ) ) {
 		return $text;
 	}
 
@@ -420,6 +420,7 @@ function more_allowed_css( $attr ) {
 	$attr[] = 'outline';
 	$attr[] = 'table-layout';
 	$attr[] = 'background-repeat';
+	$attr[] = 'background';
 
 	return $attr;
 }
@@ -451,7 +452,20 @@ function more_allowed_tags( $tags ) {
 	$tags['xml'] = [];
 	$tags['w']   = [];
 	$tags['o']   = [];
-	$tags['v']   = [ 'xmlns:v' => true, 'xmlns:w' => true, 'esdevVmlButton' => true, 'arcsize' => true, 'stroke' => true, 'fillcolor' => true, ];
+	$tags['v']   = [
+		'xmlns:v'        => true,
+		'xmlns:w'        => true,
+		'esdevVmlButton' => true,
+		'arcsize'        => true,
+		'stroke'         => true,
+		'fillcolor'      => true,
+		'inset'          => true,
+		'style'          => true,
+		'fill'           => true,
+		'type'           => true,
+		'src'            => true,
+		'color'          => true,
+	];
 
 	// Common unsupported tags
 	unset( $tags['script'] );
