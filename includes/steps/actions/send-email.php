@@ -89,19 +89,19 @@ class Send_Email extends Action {
 	}
 
 	protected function after_settings( Step $step ) {
-	    echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], [
-		    html()->e( 'div', [
-			    'class' => 'inside',
-		    ], [
-			    html()->e('div', [
-				    'class' => 'skeleton-loading',
-				    'style' => [
-					    'height' => 30
-				    ]
-			    ])
-		    ] ),
-        ], false );
-    }
+		echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], [
+			html()->e( 'div', [
+				'class' => 'inside',
+			], [
+				html()->e( 'div', [
+					'class' => 'skeleton-loading',
+					'style' => [
+						'height' => 30
+					]
+				] )
+			] ),
+		], false );
+	}
 
 	public function validate_settings( Step $step ) {
 		$email = new Email( $this->get_setting( 'email_id' ) );
@@ -110,8 +110,14 @@ class Send_Email extends Action {
 			$step->add_error( 'email_dne', __( 'You have not selected an email!', 'groundhogg' ) );
 		}
 
-		if ( $email->exists() && $email->is_draft() ) {
-			$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
+		if ( $email->exists() ) {
+			if ( $email->is_draft() ) {
+				$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
+			} else if ( $email->get_status() === 'trash' ) {
+				$step->add_error( 'email_in_trashed', __( 'The selected email is currently in the <b>trash</b>. <b>Restore and publish it</b> to solve the problem.' ) );
+			} else if ( ! $email->is_ready() ) {
+				$step->add_error( 'email_not_ready', __( 'The selected email is not ready! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
+			}
 		}
 	}
 
@@ -176,6 +182,7 @@ class Send_Email extends Action {
 	public function set_thread_subject( $subject ) {
 		return sprintf( __( 'Re: %s', 'groundhogg' ), $this->subject );
 	}
+
 	protected $message_id;
 	protected $subject;
 
@@ -254,9 +261,9 @@ class Send_Email extends Action {
 
 		$sent = $email->send( $contact, $event );
 
-        if ( $sent === true ){
-            Simulator::log( sprintf( '📨 Sent %s', bold_it( $email->get_title() ) ) );
-        }
+		if ( $sent === true ) {
+			Simulator::log( sprintf( '📨 Sent %s', bold_it( $email->get_title() ) ) );
+		}
 
 		// Thread stuff only if email was sent successfully
 		if ( $sent === true ) {
