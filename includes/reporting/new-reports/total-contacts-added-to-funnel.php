@@ -39,11 +39,16 @@ class Total_Contacts_Added_To_Funnel extends Base_Quick_Stat {
 	 */
 	protected function query( $start, $end ) {
 
+		$entry_steps = $this->get_funnel()->get_entry_step_ids();
+
+		if ( empty( $entry_steps ) ) {
+			return 0;
+		}
 
 		$where_events = [
 			'relationship' => "AND",
 			[ 'col' => 'funnel_id', 'val' => $this->get_funnel()->get_id(), 'compare' => '=' ],
-			[ 'col' => 'step_id', 'val' => $this->get_funnel()->get_entry_step_ids(), 'compare' => 'IN' ],
+			[ 'col' => 'step_id', 'val' => $entry_steps, 'compare' => 'IN' ],
 			[ 'col' => 'event_type', 'val' => Event::FUNNEL, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],

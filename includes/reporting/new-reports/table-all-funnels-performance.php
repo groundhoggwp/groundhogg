@@ -267,6 +267,12 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 	 */
 	protected function count_added_contacts( $funnel ) {
 
+		$entry_steps = $funnel->get_entry_step_ids();
+
+		if ( empty( $entry_steps ) ) {
+			return 0;
+		}
+
 		$eventQuery = new Table_Query( 'events' );
 		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
 		           ->where()
@@ -275,7 +281,7 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 		           ->equals( 'status', Event::COMPLETE )
 		           ->equals( 'event_type', Event::FUNNEL )
 		           ->equals( 'funnel_id', $funnel->ID )
-		           ->in( 'step_id', $funnel->get_entry_step_ids() );
+		           ->in( 'step_id', $entry_steps );
 
 		return $eventQuery->get_var();
 	}

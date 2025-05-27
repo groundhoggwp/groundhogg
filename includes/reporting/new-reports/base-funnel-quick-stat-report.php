@@ -25,6 +25,10 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 		$start = $start ?: $this->start;
 		$end   = $end ?: $this->end;
 
+		if ( empty( $step_id ) ){
+			return 0;
+		}
+
 		return get_db( 'events' )->count( [
 			'where'  => [
 				'relationship' => "AND",
