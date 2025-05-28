@@ -35,7 +35,7 @@ class Groundhogg_Email_Services {
 			] );
 		}
 
-		add_action( 'init', [ __CLASS__, 'register_core_services' ] );
+		add_action( 'init', [ __CLASS__, 'register_core_services' ], 1 );
 		add_action( 'admin_notices', [ __CLASS__, 'hide_conflicts' ], 1 );
 	}
 
