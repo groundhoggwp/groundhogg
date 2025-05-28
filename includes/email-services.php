@@ -35,21 +35,21 @@ class Groundhogg_Email_Services {
 			] );
 		}
 
-        add_action( 'init', [__CLASS__, 'register_core_services' ] );
-        add_action( 'admin_notices', [ __CLASS__, 'hide_conflicts' ], 1 );
-    }
+		add_action( 'init', [ __CLASS__, 'register_core_services' ] );
+		add_action( 'admin_notices', [ __CLASS__, 'hide_conflicts' ], 1 );
+	}
 
-    public static function register_core_services() {
-	    self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
-	    self::register( 'log_only', __( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
+	public static function register_core_services() {
+		self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
+		self::register( 'log_only', __( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
 
-	    if ( function_exists( 'mailhawk_mail' ) ) {
-		    self::register( 'mailhawk', __( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
-	    }
+		if ( function_exists( 'mailhawk_mail' ) ) {
+			self::register( 'mailhawk', __( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
+		}
 
-	    do_action( 'Groundhogg/email_services/init' );
+		do_action( 'Groundhogg/email_services/init' );
 
-    }
+	}
 
 	public static function hide_conflicts() {
 		if ( function_exists( 'mailhawk_mail' ) ) {
@@ -274,17 +274,17 @@ class Groundhogg_Email_Services {
 		return self::get_saved_service( self::WORDPRESS );
 	}
 
-    public static function current_message_type_is_marketing() {
-	    return self::get_current_message_type() === self::MARKETING;
-    }
+	public static function current_message_type_is_marketing() {
+		return self::get_current_message_type() === self::MARKETING;
+	}
 
-    public static function current_message_type_is_wordpress() {
-	    return self::get_current_message_type() === self::WORDPRESS;
-    }
+	public static function current_message_type_is_wordpress() {
+		return self::get_current_message_type() === self::WORDPRESS;
+	}
 
-    public static function current_message_type_is_transactional() {
-	    return self::get_current_message_type() === self::TRANSACTIONAL;
-    }
+	public static function current_message_type_is_transactional() {
+		return self::get_current_message_type() === self::TRANSACTIONAL;
+	}
 
 	/**
 	 * Sets the current service to the given
@@ -320,6 +320,11 @@ class Groundhogg_Email_Services {
 	 */
 	public static function send( $to, $subject, $message, $headers = '', $attachments = array() ) {
 
+        // last second attempt to register core services in case they are missing, or wp_mail was used before the init hook.
+		if ( empty( self::$email_services ) ) {
+			self::register_core_services();
+		}
+
 		disable_emojis();
 
 		/**
@@ -334,9 +339,9 @@ class Groundhogg_Email_Services {
 
 		$callback = self::get_service_callback();
 
-		// fallback to wp_mail() if callback is not available
-		if ( ! is_callable( $callback ) ) {
-			$callback = 'wp_mail';
+		// fallback to the default mailer if service callback is not available, or we somehow got wp_mail
+		if ( $callback === 'wp_mail' || ! is_callable( $callback ) ) {
+			$callback = __NAMESPACE__ . '\wordpress_default_mail';
 		}
 
 		// clear the message id from any previous send
@@ -509,6 +514,30 @@ if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ) {
 
 	}
 
+}
+
+/**
+ * The WordPress default mailer
+ *
+ * @throws \PHPMailer\PHPMailer\Exception
+ *
+ * @param $subject
+ * @param $message
+ * @param $headers
+ * @param $attachments
+ * @param $to
+ *
+ * @return bool
+ */
+function wordpress_default_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
+
+	static $mailer;
+
+	if ( ! isset( $mailer ) ) {
+		$mailer = new PHPMailer\PHPMailer\PHPMailer();
+	}
+
+	return gh_mail( $to, $subject, $message, $headers, $attachments, $mailer );
 }
 
 if ( ! function_exists( 'log_only' ) ) {
