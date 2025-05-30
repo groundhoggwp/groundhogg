@@ -277,8 +277,9 @@ class Admin_Notification extends Action {
 				},
 			],
 			'hide_admin_links' => [
-				'default'  => false,
-				'sanitize' => 'boolval',
+				'default'      => false,
+				'sanitize'     => 'boolval',
+				'if_undefined' => false,
 			],
 			'subject'          => [
 				'default'  => '',

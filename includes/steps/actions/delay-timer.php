@@ -25,7 +25,9 @@ class DelayDateTime extends DateTimeHelper {
 	}
 
 	public function useMax() {
-		$this->setTimestamp( $this->max );
+        if ( $this->max ){
+	        $this->setTimestamp( $this->max );
+        }
 	}
 
 	/**

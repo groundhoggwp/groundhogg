@@ -147,6 +147,10 @@ class Email_Opened extends Benchmark {
 		$email_steps = $this->get_setting( 'email_steps' );
 		array_map_to_class( $email_steps, Step::class );
 
+        if ( empty( $email_steps ) ){
+            return 'Email opened';
+        }
+
 		$email_titles = array_map( function ( $step ) {
 			$email_id = absint( $step->get_meta( 'email_id' ) );
 
