@@ -92,7 +92,7 @@
           case 'failed_to_submit':
             message = `
                   <p>${ r.message }</p>
-                  <ul>${ r.additional_errors.map(err => `<li><b>${ err.data }:</b> ${ err.message }</li>`).
+                  <ul>${ r.additional_errors.map(err => `<li><b>${ err.data ?? 'Error' }:</b> ${ err.message }</li>`).
               join('') }</ul>`
             break
           default:
