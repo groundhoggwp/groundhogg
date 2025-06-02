@@ -1133,7 +1133,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 					return $step->ID == $b_ancestor;
 				} );
 
-				return $a->is_same_level( $b );
+				return $a && $b && $a->is_same_level( $b );
 			}
 		}
 
@@ -1801,7 +1801,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function merge_changes() {
 
-		if ( ! $this->has_changes() ) {
+		if ( ! $this->has_changes() || $this->is_temp_merged ) {
 			return;
 		}
 
