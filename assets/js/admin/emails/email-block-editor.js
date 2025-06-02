@@ -975,30 +975,29 @@
       return
     }
 
-    setIsGeneratingHTML(true)
-    let css = renderBlocksCSS(blocks)
-    let content = renderBlocksHTML(blocks)
-    let plain_text = renderBlocksPlainText(blocks)
-    setIsGeneratingHTML(false)
-
     setState({
       blocks,
     })
 
-    setEmailData({
+    if (hasChanges) {
+
+      setIsGeneratingHTML(true)
+      let css = renderBlocksCSS(blocks)
+      let content = renderBlocksHTML(blocks)
+      let plain_text = renderBlocksPlainText(blocks)
+      setIsGeneratingHTML(false)
+
+      setEmailData({
         content,
         plain_text,
-      },
-      hasChanges)
+      }, hasChanges)
 
-    setEmailMeta({
-        css,
-        blocks: true,
-        type  : 'blocks',
-      },
-      hasChanges)
+      setEmailMeta({
+          css,
+          blocks: true,
+          type  : 'blocks',
+        }, hasChanges)
 
-    if (hasChanges) {
       updatePreview()
     }
 
@@ -1931,6 +1930,8 @@
 
       }
 
+      // console.log( style )
+
       return style
 
     },
@@ -2633,6 +2634,40 @@
       classes.push('hide-in-browser')
     }
 
+    // MSO bg image compat
+    if (backgroundImage) {
+
+      let el = document.getElementById(`b-${ block.id }`)
+
+      if (el) {
+        let computed = getComputedStyle( el )
+        let vmlWidth = computed.width // contains px
+        let vmlHeight = computed.height // contains px
+
+        html = Fragment([
+          `<!--[if gte mso 9]>
+      <v:rect
+        xmlns:v="urn:schemas-microsoft-com:vml"
+        fill="true"
+        stroke="false"
+        style="width:${ vmlWidth }; height:${ vmlHeight };"
+      >
+        <v:fill
+          type="frame"
+          src="${ backgroundImage }"
+          color="${ backgroundColor }"
+        />
+        <v:textbox inset="0,0,0,0">
+      <![endif]-->`,
+          html,
+          `<!--[if gte mso 9]>
+        </v:textbox>
+      </v:rect>
+      <![endif]-->`,
+        ])
+      }
+    }
+
     return Tr({},
       [
         BlockStartComment(block),
@@ -2647,6 +2682,7 @@
             background: backgroundImage,
             valign    : 'top',
           },
+
           html),
         BlockEndComment(block),
 
