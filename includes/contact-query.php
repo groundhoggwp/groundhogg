@@ -2266,6 +2266,7 @@ class Contact_Query extends Table_Query {
 			Preferences::UNSUBSCRIBED,
 			Preferences::SPAM,
 			Preferences::HARD_BOUNCE,
+			Preferences::BLOCKED,
 		] );
 
 		if ( Plugin::instance()->preferences->is_confirmation_strict() ) {

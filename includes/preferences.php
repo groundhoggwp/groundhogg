@@ -14,6 +14,7 @@ class Preferences {
 	const HARD_BOUNCE = 6;
 	const SPAM = 7;
 	const COMPLAINED = 8;
+	const BLOCKED = 9;
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
@@ -181,6 +182,9 @@ class Preferences {
 			case self::COMPLAINED:
 				return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status', 'groundhogg' );
 				break;
+			case self::BLOCKED:
+				return _x( 'This contact was blocked. They will not receive marketing.', 'optin_status', 'groundhogg' );
+				break;
 		}
 	}
 
@@ -199,6 +203,7 @@ class Preferences {
 			self::HARD_BOUNCE  => _x( 'Bounced', 'optin_status', 'groundhogg' ),
 			self::SPAM         => _x( 'Spam', 'optin_status', 'groundhogg' ),
 			self::COMPLAINED   => _x( 'Complained', 'optin_status', 'groundhogg' ),
+			self::BLOCKED      => _x( 'Blocked', 'optin_status', 'groundhogg' ),
 		];
 	}
 
@@ -237,6 +242,8 @@ class Preferences {
 			'spam'         => self::SPAM,
 			'spammed'      => self::SPAM,
 			'fake'         => self::SPAM,
+			'block'        => self::BLOCKED,
+			'blocked'      => self::BLOCKED,
 		];
 
 		// Add translated names as well!
@@ -319,6 +326,7 @@ class Preferences {
 			case self::COMPLAINED;
 			case self::HARD_BOUNCE;
 			case self::UNSUBSCRIBED:
+			case self::BLOCKED:
 				return false;
 				break;
 			case self::WEEKLY:
@@ -422,7 +430,7 @@ class Preferences {
 	 * Same as bounce, but complained
 	 *
 	 * @param Contact $contact the contact that complained
-	 * @param array   $info additional info to display in the activity timeline
+	 * @param array   $info    additional info to display in the activity timeline
 	 *
 	 * @return False|Activity
 	 */
@@ -436,7 +444,7 @@ class Preferences {
 	 * Track a bounce
 	 *
 	 * @param Contact $contact the contact that bounced
-	 * @param array   $info additional info to display in the activity timeline
+	 * @param array   $info    additional info to display in the activity timeline
 	 *
 	 * @return Activity|False
 	 */
@@ -454,7 +462,7 @@ class Preferences {
 	 * that means we should mark as perma bounce.
 	 *
 	 * @param Contact $contact the contact that soft bounced
-	 * @param array   $info additional info to display in the activity timeline
+	 * @param array   $info    additional info to display in the activity timeline
 	 *
 	 * @return Activity|False
 	 */
@@ -477,7 +485,7 @@ class Preferences {
 			return track_activity( $contact, Activity::SOFT_BOUNCE, [], $info );
 		}
 
-		$info[ 'Reason' ] = 'Soft bounce limit exceeded.';
+		$info['Reason'] = 'Soft bounce limit exceeded.';
 
 		return self::bounced( $contact, $info );
 	}

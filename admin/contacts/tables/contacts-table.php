@@ -439,7 +439,10 @@ class Contacts_Table extends WP_List_Table {
 			case Preferences::COMPLAINED:
 			case Preferences::SPAM:
 			case Preferences::HARD_BOUNCE:
-				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+                $status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+                break;
+			case Preferences::BLOCKED:
+			    $status_actions[ Preferences::UNCONFIRMED ] = __( 'Unblock', 'groundhogg' );
 				break;
 		}
 

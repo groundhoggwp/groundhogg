@@ -558,7 +558,8 @@ class Contact extends Base_Object_With_Meta {
 		return apply_filters( 'groundhogg/contact/is_deliverable', ! in_array( $this->get_optin_status(), [
 			Preferences::HARD_BOUNCE,
 			Preferences::COMPLAINED,
-			Preferences::SPAM
+			Preferences::SPAM,
+			Preferences::BLOCKED,
 		] ), $this );
 	}
 
@@ -673,8 +674,11 @@ class Contact extends Base_Object_With_Meta {
 		$data = $this->sanitize_columns( $data );
 		$data = array_diff_assoc( $data, $this->data );
 
-		// if the contact is marked as spam, only an admin that can edit the contact can change the opt-in status.
-		if ( isset( $data[ 'optin_status' ] ) && $this->optin_status_is( Preferences::SPAM ) && ! current_user_can( 'edit_contact', $this ) ){
+		// if the contact is marked as spam or blocked, only an admin that can edit the contact can change the opt-in status.
+		if ( isset( $data[ 'optin_status' ] )
+		     && $this->optin_status_is( [ Preferences::SPAM, Preferences::BLOCKED ] )
+		     && ! current_user_can( 'edit_contact', $this )
+		){
 			unset( $data[ 'optin_status' ] );
 		}
 
