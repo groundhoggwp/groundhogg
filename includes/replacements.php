@@ -2660,7 +2660,8 @@ class Replacements implements \JsonSerializable {
 			'layout' => 'stacked',
 			'form'   => '',
 			'fields' => 'all',
-			'hidden' => false
+			'hidden' => false,
+			'type'   => 'form',
 		] );
 
 		if ( get_event_arg( 'submission_id' ) && empty( $props['form'] ) ) {
@@ -2673,7 +2674,7 @@ class Replacements implements \JsonSerializable {
 			      ->setOrderby( [ 'date_created', 'DESC' ] )
 			      ->where()
 			      ->equals( 'contact_id', $this->get_current_contact()->get_id() )
-			      ->equals( 'type', 'form' );
+			      ->equals( 'type', $props['type'] );
 
 			if ( in_array( $props['form'], [ 'last', 'newest', 'recent' ] ) || empty( $props['form'] ) ) {
 
