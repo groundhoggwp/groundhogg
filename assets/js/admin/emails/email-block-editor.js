@@ -324,7 +324,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
-          direction = 'ltr'
+          direction = 'ltr',
         } = getEmailMeta()
 
         let style = {
@@ -332,10 +332,8 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${ backgroundImage })`
-          style.backgroundSize = backgroundSize
-          style.backgroundRepeat = backgroundRepeat
-          style.backgroundPosition = backgroundPosition
+          delete style.backgroundColor
+          style.background = `url('${ backgroundImage }') ${ backgroundPosition } / ${ backgroundSize } ${ backgroundRepeat } ${ backgroundColor }`
         }
 
         return Div({
@@ -344,7 +342,7 @@
           },
           Div({
               className: `template-boxed ${ alignment }`,
-              dir: direction,
+              dir      : direction,
               style    : {
                 maxWidth: `${ width || 640 }px`,
 
@@ -363,7 +361,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
-          direction = 'ltr'
+          direction = 'ltr',
         } = getEmailMeta()
 
         let style = {
@@ -371,15 +369,13 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${ backgroundImage })`
-          style.backgroundSize = backgroundSize
-          style.backgroundRepeat = backgroundRepeat
-          style.backgroundPosition = backgroundPosition
+          delete style.backgroundColor
+          style.background = `url('${ backgroundImage }') ${ backgroundPosition } / ${ backgroundSize } ${ backgroundRepeat } ${ backgroundColor }`
         }
 
         return Div({
             className: `template-full-width-contained`,
-            dir: direction,
+            dir      : direction,
             style,
           },
           blocks)
@@ -395,7 +391,7 @@
           backgroundPosition = '',
           backgroundSize = '',
           backgroundRepeat = '',
-          direction = 'ltr'
+          direction = 'ltr',
         } = getEmailMeta()
 
         let style = {
@@ -403,15 +399,13 @@
         }
 
         if (backgroundImage) {
-          style.backgroundImage = `url(${ backgroundImage })`
-          style.backgroundSize = backgroundSize
-          style.backgroundRepeat = backgroundRepeat
-          style.backgroundPosition = backgroundPosition
+          delete style.backgroundColor
+          style.background = `url('${ backgroundImage }') ${ backgroundPosition } / ${ backgroundSize } ${ backgroundRepeat } ${ backgroundColor }`
         }
 
         return Div({
             className: `template-full-width`,
-            dir: direction,
+            dir      : direction,
             style,
           },
           blocks)
@@ -1891,10 +1885,8 @@
       }
 
       if (backgroundImage) {
-        style.backgroundImage = `url(${ backgroundImage })`
-        style.backgroundSize = backgroundSize
-        style.backgroundRepeat = backgroundRepeat
-        style.backgroundPosition = backgroundPosition
+        delete style.backgroundColor
+        style.background = `url(${ backgroundImage }) ${ backgroundPosition } / ${ backgroundSize } ${ backgroundRepeat } ${ backgroundColor }`
       }
 
       return style
@@ -3807,6 +3799,7 @@
     let {
       from_select = 0,
       message_type = 'marketing',
+      is_template = 0,
     } = getEmailData()
 
     let fromOptions = [
@@ -3960,7 +3953,7 @@
             },
             Toggle({
               id      : 'save-as-template',
-              checked : Boolean(parseInt(getEmailData().is_template)),
+              checked : Boolean(is_template),
               onChange: e => {
                 setEmailData({
                   is_template: e.target.checked,
@@ -6890,9 +6883,9 @@
                     savedReplies: true,
                     posttags    : blockEl.closest('[data-type="queryloop"]') && true,
                     tinymce     : {
-                      content_style: tinyMceCSS(),
+                      content_style : tinyMceCSS(),
                       height, // inline: true,
-                      directionality: getEmailMeta().direction ?? 'ltr'
+                      directionality: getEmailMeta().direction ?? 'ltr',
                     },
                     quicktags   : true,
                   },
@@ -9762,6 +9755,16 @@
     })
   }
 
+  function fixStyleQuotes (htmlString) {
+    return htmlString.replace(
+      // capture style="…"
+      /(\bstyle\s*=\s*")([^"]*)(")/gi,
+      (_, prefix, contents, suffix) =>
+        // replace inside only the contents
+        prefix + contents.replace(/&quot;/g, '\'') + suffix,
+    )
+  }
+
   /**
    * Renders the blocks in their final HTML format
    *
@@ -9784,6 +9787,9 @@
     html = html.replaceAll(new RegExp(`&quot;(${ subFontsWithSpaces.join('') })&quot;`,
         'g'),
       '\'$1\'')
+
+    html = fixStyleQuotes(html)
+
     return html
   }
 
