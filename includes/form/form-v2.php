@@ -11,6 +11,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\array_find;
 use function Groundhogg\array_to_atts;
+use function Groundhogg\blacklist_check;
 use function Groundhogg\current_contact_and_logged_in_user_match;
 use function Groundhogg\do_replacements;
 use function Groundhogg\file_access_url;
@@ -2197,6 +2198,12 @@ class Form_v2 extends Step {
 			$this
 		] );
 
+		// let's check if this is probably spam first
+		if ( $this->spam_check( $posted_data ) ){
+			$this->add_error( 'spam', __( 'Unable to process submission.', 'groundhogg' ) );
+			return false;
+		}
+
 		$email = get_array_var( $data, 'email' );
 
 		if ( ! $email ) {
@@ -2253,6 +2260,40 @@ class Form_v2 extends Step {
 		}
 
 		return $contact;
+	}
+
+	/**
+	 * Perform a series of basic spam checks.
+	 *
+	 * @return bool
+	 */
+	public function spam_check( Posted_Data $posted_data ) {
+		if ( is_user_logged_in() ) {
+			return false;
+		}
+
+		if ( ! class_exists( '\Browser' ) ) {
+			require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
+		}
+
+		$browser = new \Browser();
+
+		$white_list_keys = [
+			'g-recaptcha-response',
+		];
+
+		foreach ( $white_list_keys as $key ) {
+			unset( $posted_data[ $key ] );
+		}
+
+		$checks = [
+			$browser->isRobot(),
+			$browser->isAol(),
+			blacklist_check( utils()->location->get_real_ip() ),
+			blacklist_check( $posted_data ),
+		];
+
+		return apply_filters( 'groundhogg/form/submission_handler/is_spam', in_array( true, $checks ) );
 	}
 
 	/**
