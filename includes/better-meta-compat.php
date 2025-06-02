@@ -104,14 +104,28 @@ function format_custom_field( $id_or_name, $data ) {
 				$data = esc_html( $data );
 				break;
 			case 'datetime':
+				if ( empty( $data ) ) {
+					return '';
+				}
+
 				$date = new DateTimeHelper( $data );
 				$data = $date->ymdhis();
 				break;
 			case 'time':
+
+				if ( empty( $data ) ) {
+					return '';
+				}
+
 				$date = new DateTimeHelper( $data );
 				$data = $date->format( 'H:i:s' );
 				break;
 			case 'date':
+
+				if ( empty( $data ) ) {
+					return '';
+				}
+
 				$date = new DateTimeHelper( $data );
 				$data = $date->ymd();
 				break;
