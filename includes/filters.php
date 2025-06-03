@@ -6,6 +6,55 @@ use Groundhogg\Form\Form_Fields;
 use Groundhogg\Utils\DateTimeHelper;
 
 /**
+ * Hijack WP-Cron to prioritize Groundhogg's cron jobs and have them run before everyone else,
+ * because other devs are bad and they always break cron for some reason.
+ *
+ * @param array|null $jobs
+ *
+ * @return array
+ */
+function groundhogg_cron_jobs_go_first( $crons ) {
+
+	if ( $crons === null ) {
+		$crons = _get_cron_array();
+	}
+
+	// get the regular cron array to run
+	$gmt_time    = microtime( true );
+	$gh_first = [];
+	$others   = [];
+
+	foreach ( $crons as $timestamp => $cronhooks ) {
+		if ( $timestamp > $gmt_time ) {
+			break;
+		}
+
+		$gh_hooks     = [];
+		$non_gh_hooks = [];
+
+		foreach ( $cronhooks as $hook => $data ) {
+			if ( str_starts_with( $hook, 'groundhogg/' ) || str_starts_with( $hook, 'gh_' ) ) {
+				$gh_hooks[ $hook ] = $data;
+			} else {
+				$non_gh_hooks[ $hook ] = $data;
+			}
+		}
+
+		$merged = $gh_hooks + $non_gh_hooks;
+
+		if ( ! empty( $gh_hooks ) ) {
+			$gh_first[ $timestamp ] = $merged;
+		} else {
+			$others[ $timestamp ] = $merged;
+		}
+	}
+
+	return $gh_first + $others;
+}
+
+add_filter( 'pre_get_ready_cron_jobs', __NAMESPACE__ . '\groundhogg_cron_jobs_go_first' );
+
+/**
  * Do replacements on the block content if replacements is enabled for the current post
  *
  * @param string $content
