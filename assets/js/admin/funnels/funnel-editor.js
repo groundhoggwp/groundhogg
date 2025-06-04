@@ -483,7 +483,7 @@
         },
         {
           match  : /^settings$/,
-          handler: function (id) {
+          handler: function () {
             this.showSettings()
             this.startEditing(null)
             morphSettings()
@@ -497,8 +497,9 @@
         },
         {
           match  : /^$/, // no hash
-          handler: function (id) {
+          handler: function () {
             this.hideSettings()
+            this.startEditing(null)
           },
         },
       ],
@@ -694,11 +695,10 @@
         $document.on('click', '#collapse-settings', e => {
 
           if (settingsHidden()) {
-            this.showSettings()
+            window.location.hash = 'settings'
           }
           else {
-            this.startEditing(null)
-            this.hideSettings()
+            window.location.hash = ''
           }
         })
 
