@@ -430,6 +430,20 @@ class Emails_Table extends Table {
 	}
 
 	function get_default_query() {
-		return [];
+		return [
+			'select' => [
+				'ID',
+				'subject',
+				'title',
+				'pre_header',
+				'message_type',
+				'author',
+				'from_user',
+				'status',
+				'is_template',
+				'last_updated',
+				'date_created',
+			]
+		];
 	}
 }
