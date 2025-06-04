@@ -3,11 +3,14 @@
 namespace Groundhogg;
 
 use Groundhogg\background\Add_Contacts_To_Funnel;
+use Groundhogg\background\Add_Contacts_To_Funnel_Last_Id;
 use Groundhogg\Background\Complete_Benchmark;
+use Groundhogg\background\Complete_Benchmark_Last_Id;
 use Groundhogg\background\Delete_Contacts;
 use Groundhogg\Background\Schedule_Broadcast;
 use Groundhogg\Background\Task;
 use Groundhogg\Background\Update_Contacts;
+use Groundhogg\background\Update_Contacts_Last_Id;
 use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Queue\Event_Queue;
@@ -181,7 +184,7 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function update_contacts( $query, $data ) {
-		return self::add( new Update_Contacts( $query, $data ) );
+		return self::add( new Update_Contacts_Last_Id( $query, $data ) );
 	}
 
 	/**
@@ -206,7 +209,7 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function add_contacts_to_funnel( $step_id, $query, $batch = 0, $args = [] ) {
-		return self::add( new Add_Contacts_To_Funnel( $step_id, $query, $batch, $args ) );
+		return self::add( new Add_Contacts_To_Funnel_Last_Id( $step_id, $query, $batch, $args ) );
 	}
 
 	/**
@@ -219,7 +222,7 @@ class Background_Tasks {
 	 * @return bool|\WP_Error
 	 */
 	public static function complete_benchmark( $step_id, $query, $batch = 0, $args = [] ) {
-		return self::add( new Complete_Benchmark( $step_id, $query, $batch, $args ) );
+		return self::add( new Complete_Benchmark_Last_Id( $step_id, $query, $batch, $args ) );
 	}
 
 	/**

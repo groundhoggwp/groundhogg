@@ -3,9 +3,9 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
-use Groundhogg\background\Export_Contacts;
+use Groundhogg\background\Export_Contacts_Last_Id;
 use Groundhogg\background\Import_Contacts;
-use Groundhogg\background\Sync_Users;
+use Groundhogg\background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\DB\Query\Table_Query;
@@ -899,7 +899,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		fputcsv( $pointer, array_values( $headers ) );
 		fclose( $pointer );
 
-		Background_Tasks::add( new Export_Contacts( $query, $file_name, $columns ) );
+		Background_Tasks::add( new Export_Contacts_Last_Id( $query, $file_name, $columns ) );
 
 		notices()->add_user_notice( __( 'We\'re exporting your contacts in the background. We\'ll let you know when it\'s ready for download.', 'groundhogg' ) );
 
@@ -1319,7 +1319,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$added = Background_Tasks::add( new Sync_Users() );
+		$added = Background_Tasks::add( new Sync_Users_Last_Id() );
 
 		if ( $added ) {
 			notices()->add_user_notice( "Users are being synced in the background. It might take a few minutes!" );
