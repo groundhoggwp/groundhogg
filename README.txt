@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.2.1
+Stable tag: 4.1.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,6 +349,22 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 4.1.3 (2025-06-04) =
+* ADDED Explicit Right-to-Left language support in the email editor as a template option.
+* ADDED Notice to the send-email step in flows if an email is trashed.
+* ADDED New **Blocked** opt-in status.
+* OPTIMIZED Email log query so it loads faster.
+* OPTIMIZED Background task queries are faster.
+* RESTORED Form submissions through Groundhogg will check the **disallowed comment keys** setting for keywords to prevent submissions.
+* TWEAKED If a contact's opt-in status is changed to spam or blocked, their opt-in status can only be changed by an admin.
+* FIXED Block background images not showing properly in some email clients.
+* FIXED The broadcast report showed all clicks rather than unique in some areas.
+* FIXED Potential infinite recursion if `wp_mail()` is called before the `init` hook.
+* FIXED PHP notice if a flow has no entry triggers.
+* FIXED The email link clicked filter was using the legacy contact query instead of the new one.
+* FIXED The delay timer's run when option was not saving when set to `between`.
+* FIXED PHP warnings when delay timer step is not fully configured.
 
 = 4.1.2.1 (2025-05-14) =
 * TWEAKED Changed "Fixed Segment" to "Static Segment".
