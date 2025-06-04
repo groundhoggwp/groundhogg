@@ -378,11 +378,173 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Whether to use the legacy schedule function, which will be the case if there is no last_id but events were previously scheduled
+	 *
+	 * @return bool
+	 */
+	public function use_legacy_schedule() {
+		$num_scheduled = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
+		$last_id       = absint( $this->get_meta( 'last_id' ) ) ?: 0;
+
+		return $num_scheduled > 0 && ! $last_id;
+	}
+
+	/**
+	 * Enqueue a batch of broadcast events
+	 *
+	 * @return bool|int
+	 */
+	public function enqueue_batch() {
+
+		// might need to use the legacy function for any broadcasts that are being scheduled already
+		if ( $this->use_legacy_schedule() ) {
+			return $this->enqueue_batch_legacy();
+		}
+
+		$lock = absint( $this->get_meta( 'schedule_lock' ) );
+
+		// This broadcast is already being scheduled
+		if ( $lock > 1 && time() - $lock < MINUTE_IN_SECONDS ) {
+			return 0;
+		}
+
+		// This broadcast has already been scheduled
+		if ( ! $this->is_schedulable() ) {
+			return false;
+		}
+
+		// Lock scheduling
+		$this->update_meta( 'schedule_lock', time() );
+
+		// timer
+		$timer = new Micro_Time_Tracker();
+
+		// keep track of the number of scheduled items in this batch
+		$items         = 0;
+		$query         = $this->get_query();
+		$in_lt         = (bool) $this->get_meta( 'send_in_local_time' );
+		$send_now      = (bool) $this->get_meta( 'send_now' );
+		$num_scheduled = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;
+		$last_id       = absint( $this->get_meta( 'last_id' ) ) ?: 0;
+
+		$c_query = new Contact_Query( $query );
+		$c_query->setOrderby( [ 'ID', 'ASC' ] )
+		        ->setGroupby( 'ID' )
+		        ->setLimit( self::BATCH_LIMIT );
+
+		if ( $last_id > 0 ) {
+			$c_query->where()->greaterThan( 'ID', $last_id );
+		}
+
+		$contacts = $c_query->query( null, true );
+
+		// no more contacts to schedule
+		if ( empty( $contacts ) ) {
+			$this->update_meta( 'is_scheduled', true );
+
+			// if the broadcast is still pending, we can update the status to scheduled
+			// the scheduled status is now for display only, use the is_scheduled meta flag
+			if ( $this->is_pending() ) {
+				$this->update( [ 'status' => 'scheduled' ] );
+			}
+
+			$this->delete_meta( 'schedule_lock' );
+
+			return true;
+		}
+
+		$batch_interval        = $this->get_meta( 'batch_interval' );
+		$batch_interval_length = absint( $this->get_meta( 'batch_interval_length' ) );
+		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100;
+		$batch_delay           = absint( $this->get_meta( 'batch_delay' ) ) ?: 0;
+
+		foreach ( $contacts as $contact ) {
+
+			$last_id = $contact->ID;
+			$num_scheduled ++;
+			$items ++;
+
+			// if the number of scheduled items has reached the batch amount threshold
+			if ( $batch_interval && $num_scheduled > 0 && $num_scheduled % $batch_amount === 0 ) {
+				// increase the batch delay
+				$batch_delay = strtotime( "+$batch_interval_length $batch_interval", $batch_delay );
+			}
+
+			// Can't be delivered at all
+			if ( ! $contact->is_deliverable() ) {
+				continue;
+			}
+
+			// No point in scheduling an email to a contact that is not marketable.
+			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
+				continue;
+			}
+
+			$local_time = $this->get_send_time();
+
+			// Send in the local time, maybe
+			if ( $in_lt && ! $send_now ) {
+
+				$local_time = $contact->get_local_time_in_utc_0( $local_time );
+
+				if ( $local_time < time() ) {
+					$local_time += DAY_IN_SECONDS;
+				}
+			}
+
+			if ( $batch_interval && $batch_delay ) {
+				$local_time += $batch_delay;
+			}
+
+			$args = [
+				'time'       => $local_time,
+				'contact_id' => $contact->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::WAITING,
+				'priority'   => 100,
+			];
+
+			if ( $this->is_email() ) {
+				$args['email_id'] = $this->get_object_id();
+			}
+
+			event_queue_db()->batch_insert( $args );
+		}
+
+		$inserted = event_queue_db()->commit_batch_insert();
+
+		// Failed to add an events, but there are contacts to enqueue
+		if ( ! $inserted ) {
+			// Reset the lock
+			$this->delete_meta( 'schedule_lock' );
+
+			return 0;
+		}
+
+		$time_elapsed = $timer->time_elapsed();
+
+		$this->update_meta( 'num_scheduled', $num_scheduled );
+		$this->update_meta( 'batch_time_elapsed', number_format( $time_elapsed, 2 ) );
+		$this->update_meta( 'batch_delay', $batch_delay );
+		$this->update_meta( 'last_id', $last_id );
+
+		// we're going to let the scheduler do an additional query that will return no contacts,
+		// and that's how we'll know we're done scheduling.
+
+		$this->delete_meta( 'schedule_lock' );
+
+		return $items;
+
+	}
+
+	/**
 	 * Schedules a batch of events!
 	 *
 	 * @return false|float false if failed, a number of percentage complete
 	 */
-	public function enqueue_batch() {
+	public function enqueue_batch_legacy() {
 
 		$lock = absint( $this->get_meta( 'schedule_lock' ) );
 

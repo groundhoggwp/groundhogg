@@ -8,7 +8,6 @@ use Groundhogg\Step;
 use function cli\prompt;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
-use function Groundhogg\get_post_var;
 use function WP_CLI\Utils\format_items;
 use function WP_CLI\Utils\make_progress_bar;
 

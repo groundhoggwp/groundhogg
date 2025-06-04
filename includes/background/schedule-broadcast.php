@@ -3,7 +3,6 @@
 namespace Groundhogg\Background;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Plugin;
 use function Groundhogg\bold_it;
 use function Groundhogg\notices;
 
@@ -16,7 +15,7 @@ class Schedule_Broadcast extends Task {
 		$this->broadcast_id = $broadcast_id;
 	}
 
-	public function get_title(){
+	public function get_title() {
 		return sprintf( 'Schedule broadcast %s', bold_it( $this->broadcast->get_title() ) );
 	}
 
@@ -32,7 +31,7 @@ class Schedule_Broadcast extends Task {
 		$items_scheduled = $this->broadcast->enqueue_batch();
 
 		// If items scheduled is false, there was an error scheduling the broadcast
-		if ( $items_scheduled === false ){
+		if ( $items_scheduled === false ) {
 
 			$message = sprintf( __( 'There was a problem scheduling your broadcast %s', 'groundhogg' ), bold_it( $this->broadcast->get_title() ) );
 			notices()->add_user_notice( $message, 'warning', true, $this->broadcast->get_scheduled_by_id() );
@@ -40,22 +39,21 @@ class Schedule_Broadcast extends Task {
 			return true;
 		}
 
-		if ( $items_scheduled === 0 ){
-			return null; // This will exit the process while loop.
-		}
-
-		if ( $this->broadcast->is_scheduled() ) {
-
+		if ( $items_scheduled === true || $this->broadcast->is_scheduled() ) {
 			$message = sprintf( __( 'Your broadcast %s has been fully scheduled!', 'groundhogg' ), bold_it( $this->broadcast->get_title() ) );
 			notices()->add_user_notice( $message, 'success', true, $this->broadcast->get_scheduled_by_id() );
 
 			return true;
 		}
 
+		if ( $items_scheduled === 0 ) {
+			return null; // This will exit the process while loop.
+		}
+
 		return false;
 	}
 
-	public function get_progress(){
+	public function get_progress() {
 		return $this->broadcast->get_percent_scheduled();
 	}
 
