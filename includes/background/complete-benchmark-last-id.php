@@ -15,6 +15,10 @@ class Complete_Benchmark_Last_Id extends Complete_Benchmark {
 	 */
 	public function __construct( int $step_id, array $query_args, int $batch, array $args = [] ) {
 		$this->last_id = 0;
+
+		unset( $query_args['order'] );
+		unset( $query_args['orderby'] );
+
 		parent::__construct( $step_id, $query_args, $batch, $args );
 	}
 

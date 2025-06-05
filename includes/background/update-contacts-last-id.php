@@ -13,6 +13,10 @@ class Update_Contacts_Last_Id extends Update_Contacts {
 	protected int $last_id;
 
 	public function __construct( array $query, array $data ) {
+
+		unset( $query['order'] );
+		unset( $query['orderby'] );
+
 		$this->last_id = 0;
 		parent::__construct( $query, $data );
 	}
@@ -29,7 +33,8 @@ class Update_Contacts_Last_Id extends Update_Contacts {
 
 		// No more contacts to add to update
 		if ( empty( $contacts ) ) {
-			$this->batch--;
+			$this->batch --;
+
 			return false;
 		}
 

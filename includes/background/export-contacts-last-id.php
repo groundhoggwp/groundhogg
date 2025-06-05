@@ -24,6 +24,9 @@ class Export_Contacts_Last_Id extends Export_Contacts {
 	const BATCH_LIMIT = 100;
 
 	public function __construct( array $query, string $fileName, array $columns, int $batch = 0 ) {
+		unset( $query['order'] );
+		unset( $query['orderby'] );
+
 		$this->last_id = 0;
 		parent::__construct( $query, $fileName, $columns, $batch );
 	}
