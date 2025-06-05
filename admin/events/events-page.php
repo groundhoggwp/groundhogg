@@ -375,7 +375,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		// Move the items over...
 		db()->event_queue->move_events_to_history( [ 'status' => Event::CANCELLED ] );
 
-		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+		$this->add_notice( 'cancelled', sprintf( _nx( '%s event cancelled', '%d events cancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		//false return users to the main page
 		return false;
@@ -413,7 +413,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		// Move the events over...
 		get_db( 'events' )->move_events_to_queue( [ 'status' => Event::WAITING ], true );
 
-		$this->add_notice( 'scheduled', sprintf( _nx( '%d event uncancelled', '%d events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+		$this->add_notice( 'scheduled', sprintf( _nx( '%s event uncancelled', '%s events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		return false;
 	}
@@ -502,7 +502,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			'ID'        => wp_parse_id_list( $this->get_items() ),
 		] );
 
-		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
+		$this->add_notice( 'scheduled', sprintf( _nx( '%s event rescheduled', '%s events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
 
 		return false;
 	}
