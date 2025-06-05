@@ -2,6 +2,10 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Api\V3\Base;
+use Groundhogg\Api\V4\Base_Api;
+use Groundhogg\Api\V4\Contacts_Api;
+
 class Plugin_Compatibility {
 
 	public function __construct() {
@@ -16,6 +20,8 @@ class Plugin_Compatibility {
 
 		// BuddyBoss
 		add_filter( 'bp_core_wpsignup_redirect', [ $this, 'prevent_buddyboss_redirect' ], 99 );
+		add_filter( 'bp_enable_private_network_public_content', [ $this, 'buddyboss_public_content' ] );
+		add_filter( 'bb_enable_private_rest_apis_public_content', [ $this, 'buddyboss_public_api_content' ] );
 
 		// WPUltimo
 		add_filter( 'wu_signup_step_handler_create-account', [ $this, 'prevent_new_user_from_adding_contacts_to_template_site' ], 9 );
@@ -27,8 +33,26 @@ class Plugin_Compatibility {
 		add_action( 'dokan_enqueue_admin_dashboard_script', [ $this, 'dokan_lite' ] );
 		add_action( 'dokan_enqueue_admin_scripts', [ $this, 'dokan_lite' ] );
 
+		// Query Monitor
+		add_action( 'wp_ajax_gh_process_bg_task', [ $this, 'kill_qm'] );
+		add_action( 'groundhogg/background_tasks', [ $this, 'kill_qm'] );
+		add_action( 'groundhogg/event_queue/before_process', [ $this, 'kill_qm'] );
 	}
 
+	/**
+	 * Kill query monitor during intensive processes...
+	 *
+	 * @return void
+	 */
+	public function kill_qm() {
+		do_action( 'qm/cease' );
+	}
+
+	/**
+	 * Silly Dokan
+	 *
+	 * @return void
+	 */
 	public function dokan_lite() {
 
 		if ( ! current_screen_is_gh_page( 'gh_reporting' ) ) {
@@ -105,6 +129,47 @@ class Plugin_Compatibility {
 		}
 
 		return $redirect;
+	}
+
+	/**
+	 * Add the managed page to the list of BuddyBoss private content exclusion list
+	 *
+	 * @param $excludes
+	 *
+	 * @return string
+	 */
+	public function buddyboss_public_content( $excludes = '' ) {
+
+		$managed_page_fragment = '/' . trim( get_managed_page_name(), '/' ) . '/';
+
+		if ( ! str_contains( $excludes, $managed_page_fragment ) ){
+			$excludes .= "\n$managed_page_fragment";
+		}
+
+		return $excludes;
+	}
+
+	/**
+	 * BuddyBoss should not control Groundhogg endpoints, we're capable of that ourselves.
+	 *
+	 * @param $excludes
+	 *
+	 * @return string
+	 */
+	public function buddyboss_public_api_content( $excludes = '' ) {
+
+		$v3_api_fragment = 'wp-json/' .  Base::NAME_SPACE;
+		$v4_api_fragment = 'wp-json/' .  Base_Api::NAME_SPACE;
+
+		if ( ! str_contains( $excludes, $v3_api_fragment ) ){
+			$excludes .= "\n$v3_api_fragment";
+		}
+
+		if ( ! str_contains( $excludes, $v4_api_fragment ) ){
+			$excludes .= "\n$v4_api_fragment";
+		}
+
+		return $excludes;
 	}
 
 	/**
