@@ -2,14 +2,11 @@
 
 namespace Groundhogg;
 
-use Groundhogg\background\Add_Contacts_To_Funnel;
 use Groundhogg\background\Add_Contacts_To_Funnel_Last_Id;
-use Groundhogg\Background\Complete_Benchmark;
 use Groundhogg\background\Complete_Benchmark_Last_Id;
 use Groundhogg\background\Delete_Contacts;
 use Groundhogg\Background\Schedule_Broadcast;
 use Groundhogg\Background\Task;
-use Groundhogg\Background\Update_Contacts;
 use Groundhogg\background\Update_Contacts_Last_Id;
 use Groundhogg\Classes\Background_Task;
 use Groundhogg\DB\Query\Table_Query;
