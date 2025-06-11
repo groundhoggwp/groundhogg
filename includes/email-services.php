@@ -340,7 +340,7 @@ class Groundhogg_Email_Services {
 		$callback = self::get_service_callback();
 
 		// fallback to the default mailer if service callback is not available, or we somehow got wp_mail
-		if ( $callback === 'wp_mail' || ! is_callable( $callback ) ) {
+		if ( ! is_callable( $callback ) ) {
 			$callback = __NAMESPACE__ . '\wordpress_default_mail';
 		}
 
