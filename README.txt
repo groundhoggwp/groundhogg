@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.3
+Stable tag: 4.1.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,7 +350,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 4.1.3 (2025-06-04) =
+= 4.1.3.1 (2025-06-11) =
+* HOT FIX 3rd party SMTP plugins not working if the email service is set to WordPress Default.
+* HOT FIX Broadcast scheduler sending extra emails if orderby is specified in the contact query.
+
+= 4.1.3 (2025-06-09) =
 * ADDED Explicit Right-to-Left language support in the email editor as a template option.
 * ADDED Notice to the send-email step in flows if an email is trashed.
 * ADDED New **Blocked** opt-in status.
