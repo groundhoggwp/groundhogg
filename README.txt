@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.3.1
+Stable tag: 4.1.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -349,6 +349,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 4.1.3.2 (2025-06-11) =
+* OPTIMIZED Overall email HTML and CSS size reduced.
 
 = 4.1.3.1 (2025-06-11) =
 * HOT FIX 3rd party SMTP plugins not working if the email service is set to WordPress Default.
