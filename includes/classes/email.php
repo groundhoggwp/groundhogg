@@ -893,6 +893,26 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Compresses the block Ids of the email content
+	 *
+	 * @param string $content
+	 *
+	 * @return string
+	 */
+	public function compress_block_ids( string $content ) {
+		preg_match_all( '/b-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i', $content, $matches );
+
+		$unique = array_unique( $matches[0] );
+		$map    = [];
+
+		foreach ( $unique as $index => $full ) {
+			$map[ $full ] = 'b-' . ( $index + 1 );
+		}
+
+		return str_replace( array_keys( $map ), array_values( $map ), $content );
+	}
+
+	/**
 	 * Get the unsub link
 	 *
 	 * @param $url
@@ -944,6 +964,8 @@ class Email extends Base_Object_With_Meta {
 				$templates->get_template_part( 'email/' . $this->get_template() );
 
 				$content = ob_get_clean();
+				// compress block Ids to reduce overall email size, and css block size.
+				$content = $this->compress_block_ids( $content );
 				break;
 		}
 
@@ -968,18 +990,14 @@ class Email extends Base_Object_With_Meta {
 		switch ( $this->from_type ) {
 
 			case 'owner':
-
 				if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
 					return $this->get_contact()->get_ownerdata()->display_name;
 				}
-
 				break;
 			case 'user':
-
 				if ( $this->get_from_user() ) {
 					return $this->get_from_user()->display_name;
 				}
-
 				break;
 		}
 

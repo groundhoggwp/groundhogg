@@ -993,10 +993,10 @@
       }, hasChanges)
 
       setEmailMeta({
-          css,
-          blocks: true,
-          type  : 'blocks',
-        }, hasChanges)
+        css,
+        blocks: true,
+        type  : 'blocks',
+      }, hasChanges)
 
       updatePreview()
     }
@@ -2640,7 +2640,7 @@
       let el = document.getElementById(`b-${ block.id }`)
 
       if (el) {
-        let computed = getComputedStyle( el )
+        let computed = getComputedStyle(el)
         let vmlWidth = computed.width // contains px
         let vmlHeight = computed.height // contains px
 
@@ -6954,37 +6954,39 @@
       ...block
     }) => textContent(block),
     css      : ({
-      p,
-      h1,
-      h2,
-      h3,
-      a,
       selector = '',
+      content,
+      ...props
     }) => {
 
-      //language=CSS
-      return `
-          ${ selector } h1 {
-              ${ fontStyle(h1) }
-          }
+      let rules = []
 
-          ${ selector } h2 {
-              ${ fontStyle(h2) }
-          }
+      const tagBlock = (tag, style) => {
 
-          ${ selector } h3 {
-              ${ fontStyle(h3) }
-          }
+        // separate support for li
+        if ( tag === 'p' ){
+          return `${ selector } p, ${ selector } li{${ fontStyle(style) }}`
+        }
 
-          ${ selector } li,
-          ${ selector } p {
-              ${ fontStyle(p) }
-          }
+        return `${ selector } ${ tag }{${ fontStyle(style) }}`
+      }
 
-          ${ selector } a {
-              ${ fontStyle(a) }
-          }
-      `
+      let tags = [
+        'h1',
+        'h2',
+        'h3',
+        'p',
+        'a',
+      ]
+
+      tags.forEach(tag => {
+        // only include the CSS if the tag is actually present
+        if (content.match(new RegExp(`<${tag} [^>]*>`))) {
+          rules.push(tagBlock(tag, props[tag] ?? {}))
+        }
+      })
+
+      return rules.join(' ')
     },
     plainText: ({ content }) => extractPlainText(content),
     gutenberg: ({ content }) => {
@@ -9761,6 +9763,36 @@
     renderEditor()
   }
 
+  function optimizeCSS (css) {
+    const ruleMap = {}
+
+    // Basic rule splitting
+    css.replace(/\/\*[\s\S]*?\*\//g, '') // Remove comments
+      .split('}').forEach(rule => {
+      const [selectors, declarations] = rule.split('{')
+      if (!selectors || !declarations) {
+        return
+      }
+
+      const cleaned = declarations.trim().replace(/\s+/g, ' ').replace(/;$/, '')
+      if (!cleaned) {
+        return
+      }
+
+      const key = cleaned
+      ruleMap[key] = ruleMap[key] || []
+      ruleMap[key].push(selectors.trim())
+    })
+
+    // Rebuild optimized CSS
+    let optimized = ''
+    for (const [declarations, selectors] of Object.entries(ruleMap)) {
+      optimized += `${ selectors.join(',') }{${ declarations }}`
+    }
+
+    return optimized
+  }
+
   /**
    * Compiles the CSS rules for each of the blocks
    *
@@ -9768,7 +9800,9 @@
    * @return {*}
    */
   const renderBlocksCSS = (blocks) => {
-    return blocks.map(b => BlockRegistry.css(b)).join('\n').replaceAll(/(\s*\n|\s*\r\n|\s*\r){1,}/g, '\n')
+    let css = blocks.map(b => BlockRegistry.css(b)).join('\n').replaceAll(/(\s*\n|\s*\r\n|\s*\r){1,}/g, '\n')
+    css = optimizeCSS(css)
+    return css
   }
 
   /**
@@ -10387,6 +10421,9 @@
     isCreating,
     isBlockEditor,
     isHTMLEditor,
+    functions : {
+      optimizeCSS,
+    },
     components: {
       Control,
       ControlGroup,
