@@ -422,6 +422,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		// keep track of the number of scheduled items in this batch
 		$items         = 0;
 		$query         = $this->get_query();
+		// remove ordering from the query so as to not conflict with required ID ordering.
+		unset( $query['order'] );
+		unset( $query['orderby'] );
+		unset( $query['limit'] );
+		unset( $query['number'] );
+
 		$in_lt         = (bool) $this->get_meta( 'send_in_local_time' );
 		$send_now      = (bool) $this->get_meta( 'send_now' );
 		$num_scheduled = absint( $this->get_meta( 'num_scheduled' ) ) ?: 0;

@@ -3779,7 +3779,7 @@
           },
           AlignmentButtons({
             id        : 'text-direction',
-            alignment : direction === 'ltr' ? 'left' : 'right',
+            alignment : direction === 'rtl' ? 'right' : 'left',
             onChange  : direction => {
               updateSettings({
                 reRender : true,

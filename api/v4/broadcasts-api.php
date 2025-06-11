@@ -100,6 +100,10 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		$query = map_deep( $request->get_param( 'query' ), 'sanitize_text_field' ) ?: [];
+		unset( $query['order'] );
+		unset( $query['orderby'] );
+		unset( $query['limit'] );
+		unset( $query['number'] );
 
 		$is_transactional         = method_exists( $object, 'is_transactional' ) ? $object->is_transactional() : false;
 		$meta['is_transactional'] = $is_transactional;
