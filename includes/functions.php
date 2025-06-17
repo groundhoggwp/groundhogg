@@ -8283,10 +8283,13 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
 
 		if ( function_exists( 'iconv' ) ) {
-			@$dom->loadHTML( htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $markdown, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES ) );
-		} else {
-			@$dom->loadHTML( $markdown );
+            $decoded = htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $markdown, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES );
+            if ( ! empty( $decoded ) ) {
+                $markdown = $decoded;
+            }
 		}
+
+		@$dom->loadHTML( $markdown );
 
 		$markdown = $dom->saveHTML();
 		// preg_match() IS NOT SO NICE, BUT WORKS FOR ME
