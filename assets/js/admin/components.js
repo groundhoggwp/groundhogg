@@ -2428,6 +2428,7 @@
     onChange = ids => {}, // list of user ids,
     allow0 = true,
     itemDisplay = user => user.data.display_name,
+    multiple = true,
     ...overrides
   }) => ItemPicker({
     id              : `select-users`,
@@ -2446,7 +2447,7 @@
         text: itemDisplay(getOwner(user_id)),
       }
     }),
-    multiple        : true,
+    multiple,
     style           : {
       flexGrow: 1,
     },
@@ -2470,7 +2471,17 @@
 
       return Promise.resolve(options)
     },
-    onChange        : items => onChange(items.map(({ id }) => id)),
+    onChange        : items => {
+
+      // if multiple return list of Ids.
+      if ( multiple ){
+        onChange(items.map(({ id }) => id))
+        return
+      }
+
+      // if single items will be a single item
+      onChange( items )
+    },
     ...overrides,
   })
 
