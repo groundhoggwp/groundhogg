@@ -1496,6 +1496,10 @@ class Email extends Base_Object_With_Meta {
 			case 'width':
 				$value = absint( $value );
 				break;
+			case 'css':
+			case 'template_css':
+				$value = email_kses( $value ); // todo sanitize_css()?
+				break;
 		}
 
 		return $value;
