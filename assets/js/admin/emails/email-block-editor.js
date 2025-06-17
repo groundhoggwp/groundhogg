@@ -3702,6 +3702,42 @@
           `<p>${ __('For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>') }</p>`,
 
         ]),
+      ControlGroup({
+          name: 'Custom CSS',
+        },
+        [
+          Textarea({
+            id      : 'code-css-editor',
+            value   : getEmailMeta().template_css || '',
+            onCreate: el => {
+
+              // Wait for add to dom
+              setTimeout(() => {
+
+                  let editor = wp.codeEditor.initialize('code-css-editor', {
+                    ...wp.codeEditor.defaultSettings,
+                    codemirror: {
+                      ...wp.codeEditor.defaultSettings.codemirror,
+                      mode   : 'text/css',
+                      gutters: ['CodeMirror-lint-markers'],
+                    },
+                  }).codemirror
+
+                  editor.on('change', instance => {
+                    setEmailMeta({
+                      template_css: instance.getValue(),
+                    })
+                    updateStylesDebounced()
+                  })
+
+                  editor.setSize(null, 400)
+                },
+                100)
+            },
+          }),
+
+          `<p>CSS entered here may not be universally supported by email clients. Check your <a href="https://www.campaignmonitor.com/css/" target="_blank">CSS compatibility</a>.</p>`,
+        ]),
     ])
   }
 
@@ -9945,8 +9981,10 @@
   }
   const morphHeader = () => morph('#email-header', Header())
   const updateStyles = () => {
-    $('#builder-style').text(`#block-editor-content-wrap{ \n\n${ renderBlocksCSS(getBlocks()) }\n\n }`)
+    $('#builder-style').text(`#block-editor-content-wrap{ \n\n${ renderBlocksCSS(getBlocks()) }\n\n${ getEmailMeta().template_css ?? '' }\n\n }`)
   }
+
+  const updateStylesDebounced = Groundhogg.functions.debounce(updateStyles, 300)
 
   const renderEditor = () => {
     morphEmailEditor()

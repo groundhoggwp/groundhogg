@@ -460,7 +460,13 @@ class Email extends Base_Object_With_Meta {
 	 * @return array|mixed
 	 */
 	public function get_css() {
-		return $this->get_meta( 'css' );
+
+		$parts = [
+			$this->get_meta( 'css' ),
+			$this->get_meta( 'template_css' ),
+		];
+
+		return implode( PHP_EOL, $parts );
 	}
 
 	/**
