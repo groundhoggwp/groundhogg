@@ -38,7 +38,14 @@
       el.State = value
     },
     required     : (el, value) => {
-      el.required = value
+      if ( value ){
+        el.required = true
+      }
+    },
+    checked     : (el, value) => {
+      if ( value ){
+        el.checked = true
+      }
     },
     autofocus    : (el, value) => {
       el.autofocus = value

@@ -95,6 +95,14 @@
     ImagePicker,
   } = Groundhogg.components
 
+  let {
+    colorPalette = [],
+    globalFonts = [],
+    globalSocials = [],
+    blockDefaults = {},
+    imageSizes = [],
+  } = _BlockEditor
+
   improveTinyMCE({})
 
   let fontWeights = [
@@ -563,27 +571,44 @@
   })
 
   let State = {
-    email           : {},
-    changes         : {},
-    activeBlock     : null,
-    openPanels      : {},
-    blockControlsTab: 'block',
-    emailControlsTab: 'email',
-    isGeneratingHTML: false,
-    hasChanges      : false,
-    preview         : '',
-    page            : 'editor',
-    templateSearch  : '',
-    responsiveDevice: 'desktop',
-    testType        : 'design',
-    blocks          : [],
-    blockInspector  : false,
+    email               : {},
+    changes             : {},
+    activeBlock         : null,
+    openPanels          : {},
+    blockControlsTab    : 'block',
+    emailControlsTab    : 'email',
+    isGeneratingHTML    : false,
+    hasChanges          : false,
+    preview             : '',
+    page                : 'editor',
+    templateSearch      : '',
+    responsiveDevice    : 'desktop',
+    testType            : 'design',
+    blocks              : [],
+    blockInspector      : false,
+    editDefaults        : false,
+    savingEditorSettings: false,
   }
 
   const setState = newState => {
+
+    const {
+      editDefaults        : wasEditingDefaults,
+      savingEditorSettings: wasSavingEditorSettings,
+    } = State
+
     State = {
       ...State, ...newState,
       id: uuid(),
+    }
+
+    if (wasSavingEditorSettings !== State.savingEditorSettings) {
+      morphControls()
+    }
+
+    // was editing defaults, but now we're not
+    if (wasEditingDefaults && !State.editDefaults) {
+      morphEmailEditor()
     }
   }
 
@@ -595,6 +620,25 @@
   let onClose = () => {
   }
 
+  const saveEditorSettings = () => {
+
+    setState({
+      savingEditorSettings: true,
+    })
+
+    return Groundhogg.stores.options.patch({
+      gh_email_editor_color_palette         : colorPalette,
+      gh_email_editor_global_fonts          : GlobalFonts.fonts,
+      gh_email_editor_global_social_accounts: globalSocials,
+      gh_email_editor_block_defaults        : blockDefaults,
+    }).finally(() => {
+
+      setState({
+        savingEditorSettings: false,
+      })
+    })
+  }
+
   /**
    * Saves the email
    *
@@ -603,11 +647,7 @@
   const saveEmail = () => {
 
     // Save editor settings
-    Groundhogg.stores.options.patch({
-      gh_email_editor_color_palette         : colorPalette,
-      gh_email_editor_global_fonts          : GlobalFonts.fonts,
-      gh_email_editor_global_social_accounts: globalSocials,
-    })
+    saveEditorSettings()
 
     // No ID, creating the email
     if (isCreating()) {
@@ -734,7 +774,8 @@
     }
 
     setState({
-      activeBlock: idOrNull,
+      activeBlock : idOrNull,
+      editDefaults: false,
     })
     morphBlocks()
     // Completely remove controls before changing to new block
@@ -824,11 +865,24 @@
    */
   const isActiveBlock = (id) => State.activeBlock === id
   const hasActiveBlock = () => State.activeBlock !== null
-  const getActiveBlock = () => __findBlock(State.activeBlock, getBlocks())
+  const getActiveBlock = () => {
+
+    if (State.editDefaults) {
+      return getDefaultBlock()
+    }
+
+    return __findBlock(State.activeBlock, getBlocks())
+  }
   const getBlockControlsTab = () => State.blockControlsTab
   const getEmailControlsTab = () => State.emailControlsTab
-  const setBlockControlsTab = (tab) => State.blockControlsTab = tab
-  const setEmailControlsTab = (tab) => State.emailControlsTab = tab
+  const setBlockControlsTab = (tab) => setState({
+    blockControlsTab: tab,
+    editDefaults    : false,
+  })
+  const setEmailControlsTab = (tab) => setState({
+    emailControlsTab: tab,
+    editDefaults    : false,
+  })
   const getBlocks = () => State.blocks
   const getBlocksCopy = () => JSON.parse(JSON.stringify(State.blocks))
   const isEditing = () => Boolean(getEmailId())
@@ -837,7 +891,7 @@
   const getEmailId = () => State.email.ID
   const getEmailData = () => State.email.data
   const getEmailMeta = () => State.email.meta
-  const getEmailWidth = () => getEmailMeta().width || 600
+  const getEmailWidth = () => getEmailMeta().width || 640
   const templateIs = template => getEmailMeta().template === template
   const getParentBlocks = () => {
   }
@@ -2110,7 +2164,10 @@
     },
 
     defaults ({ type }) {
-      return this.get(type).defaults
+      return copyObject({
+        ...this.get(type).defaults,
+        ...blockDefaults[type] ?? {},
+      })
     },
 
     html (block, editing) {
@@ -2327,7 +2384,7 @@
       content = parseContent(content, block)
       dynamicContentCache.set(block.id, content)
       dynamicContentCache.set(cacheKey, content)
-      morphBlocks()
+      morphContent()
     }, 1000)
 
     /**
@@ -2415,12 +2472,21 @@
     let panel = ''
     let panelId = id ? id : name.toLowerCase().replaceAll(' ', '-')
 
+    let blockType
+
     if (hasActiveBlock()) {
-      panel = `${ getActiveBlock().type }-${ getBlockControlsTab() }-${ panelId }`
+      blockType = getActiveBlock().type
+    }
+    else if (State.editDefaults) {
+      blockType = State.editDefaults
+    }
+
+    if (blockType) {
+      panel = `${ blockType }-${ getBlockControlsTab() }-${ panelId }`
 
       // Check to see if the block has no open panels
       if (!Object.keys(getState().openPanels).
-        some(panelId => panelId.startsWith(`${ getActiveBlock().type }-${ getBlockControlsTab() }`) && State.openPanels[panelId])) {
+        some(panelId => panelId.startsWith(`${ blockType }-${ getBlockControlsTab() }`) && State.openPanels[panelId])) {
         // Open this one by default
         openPanel(panel)
       }
@@ -2748,6 +2814,12 @@
         onClick  : e => {
           e.preventDefault()
 
+          // do nothing
+          if (State.editDefaults) {
+            e.stopPropagation()
+            return
+          }
+
           // Using the toolbar
           if (clickedIn(e, '.delete-block, .duplicate-block')) {
             return
@@ -2799,7 +2871,8 @@
             className: 'filters-enabled',
           },
           icons.eye) : null,
-        BlockToolbar({
+        // don't show toolbar if editing the block defaults
+        State.editDefaults ? null : BlockToolbar({
           block,
           duplicateBlock,
           deleteBlock,
@@ -2822,7 +2895,7 @@
       id           : uuid(),
       type,
       advancedStyle: {},
-      ...copyObject(BlockRegistry.blocks[type].defaults),
+      ...BlockRegistry.defaults({ type }),
       ...props,
     }
   }
@@ -3497,7 +3570,10 @@
     ])
   }
 
-  const BlockControls = () => {
+  const BlockControls = ({
+    updateBlock = () => {},
+    getActiveBlock = () => {},
+  }) => {
     let controls
     switch (getBlockControlsTab()) {
       case 'block':
@@ -4243,7 +4319,48 @@
           }),
 
         ]),
+      ControlGroup({
+          id  : 'block-defaults',
+          name: 'Block Defaults',
+        },
+        [
+          `<p>Change the default appearance of your blocks.</p>`,
+          ...Object.keys(BlockRegistry.blocks).map(type => {
 
+            const Block = BlockRegistry.get(type)
+
+            return An({
+              href   : '#',
+              id     : `edit-defaults-${ type }`,
+              onClick: e => {
+                e.preventDefault()
+                setState({
+                  editDefaults    : type,
+                  blockControlsTab: 'block',
+                })
+                morphBlockEditor()
+              },
+            }, Block.name)
+
+          }),
+        ]),
+      Button({
+        id       : 'save-editor-settings',
+        className: `gh-button primary ${ State.savingEditorSettings ? 'loading-dots' : '' }`,
+        disabled : State.savingEditorSettings,
+        style    : {
+          margin: '30px auto',
+        },
+        onClick  : e => {
+
+          saveEditorSettings().then(r => {
+            dialog({
+              message: 'Settings saved!',
+            })
+          })
+
+        },
+      }, State.savingEditorSettings ? 'Saving' : 'Save Editor Settings'),
     ])
   }
 
@@ -4339,9 +4456,7 @@
     const breadcrumbs = [
       Span({
           onClick: e => {
-            if (hasActiveBlock()) {
-              setActiveBlock(null)
-            }
+            setActiveBlock(null)
           },
         },
         'Email'),
@@ -4369,11 +4484,123 @@
 
   }
 
+  // todo working here
+  const getDefaultBlock = () => {
+
+    let type = State.editDefaults
+
+    let block = {
+      id: 'the-default-block',
+      type,
+      ...BlockRegistry.defaults({ type }),
+    }
+
+    switch (block.type) {
+      case 'text':
+        //language=HTML
+        block.content = `<h1>Lorem ipsum dolor sit amet</h1>
+        <h2>Consectetur adipiscing elit.</h2>
+        <h3>Proin egestas dolor non nulla varius</h3>
+        <p>Id fermentum ante euismod. Ut a sodales nisl, at maximus felis. Suspendisse potenti. Etiam fermentum <a href="#">magna nec diam lacinia</a>, ut
+            volutpat mauris accumsan.</p>
+        <p>Nunc id convallis magna. Ut eleifend sem aliquet, volutpat sapien quis, <a href="#">condimentum leo.</a></p>`
+        break
+      case 'columns':
+
+        let spacerProps = {
+          height       : 40,
+          advancedStyle: {
+            backgroundColor: '#e5e5e5',
+          },
+        }
+
+        block.columns = [
+          [createBlock('spacer', spacerProps)],
+          [createBlock('spacer', spacerProps)],
+          [createBlock('spacer', spacerProps)],
+          [createBlock('spacer', spacerProps)],
+          [createBlock('spacer', spacerProps)],
+          [createBlock('spacer', spacerProps)],
+        ]
+        break
+    }
+
+    return block
+
+  }
+
+  function isObject (val) {
+    return val && typeof val === 'object' && !Array.isArray(val)
+  }
+
+  function deepMerge (target, source) {
+    const output = { ...target }
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach(key => {
+        const srcVal = source[key]
+        const tgtVal = target[key]
+        if (isObject(srcVal) && isObject(tgtVal)) {
+          output[key] = deepMerge(tgtVal, srcVal)
+        }
+        else {
+          output[key] = srcVal
+        }
+      })
+    }
+    return output
+  }
+
+  const updateBlockDefaults = ({
+    morphBlocks  : _morphBlocks = true,
+    morphControls: _morphControls = false,
+    ...newSettings
+  }) => {
+
+    const type = State.editDefaults
+
+    blockDefaults[type] = deepMerge(BlockRegistry.defaults(( { type } )), newSettings)
+
+    morphContent()
+
+    if (_morphControls) {
+      morphControls()
+    }
+  }
+
   const ControlsPanel = () => {
 
     let controls
-    if (hasActiveBlock()) {
-      controls = BlockControls()
+
+    if (State.editDefaults) {
+      controls = Fragment([
+        BlockControls({
+          getActiveBlock: getDefaultBlock,
+          updateBlock   : updateBlockDefaults,
+        }),
+        Button({
+          id       : 'save-block-defaults',
+          className: `gh-button primary ${ State.savingEditorSettings ? 'loading-dots' : '' }`,
+          disabled : State.savingEditorSettings,
+          style    : {
+            margin: '30px auto',
+          },
+          onClick  : e => {
+
+            saveEditorSettings().then(r => {
+              dialog({
+                message: 'Block defaults saved!',
+              })
+            })
+
+          },
+        }, State.savingEditorSettings ? 'Saving' : `Save ${ BlockRegistry.get(State.editDefaults).name } Defaults`),
+      ])
+    }
+    else if (hasActiveBlock()) {
+      controls = BlockControls({
+        getActiveBlock,
+        updateBlock,
+      })
     }
     else {
       controls = EmailControls()
@@ -4391,10 +4618,38 @@
 
   const ContentEditor = () => {
 
+    if (State.editDefaults) {
+
+      return Div({
+          id: 'content',
+          // className: 'gh-panel',
+        },
+        [
+          Div({
+            id       : 'block-editor-content-wrap',
+            className: 'gh-panel',
+            style    : {
+              padding: '30px',
+            },
+          }, Div({
+            style: {
+              maxWidth: '600px',
+              width   : '100%',
+            },
+          }, EditBlockWrapper(getDefaultBlock()))),
+
+        ])
+    }
+
     return Div({
-        id       : 'content',
-        className: 'gh-panel',
-        onClick  : e => {
+        id: 'content',
+        // className: 'gh-panel',
+        onClick: e => {
+
+          if (State.editDefaults) {
+            return
+          }
+
           if (!clickedIn(e, '#builder-content') && !clickedIn(e, '.block-toolbar')) {
             setActiveBlock(null)
           }
@@ -4404,52 +4659,61 @@
         BlockEditorToolbar(),
         // Subject & Preview
         Div({
-            className: 'inside',
-          },
-          [
-            Div({
-                className: 'inline-label',
-              },
-              [
-                `<label for="subject">${ __('Subject:', 'groundhogg') }</label>`,
-                InputWithReplacements({
-                  id         : 'subject-line',
-                  placeholder: 'Subject line...',
-                  value      : getEmailData().subject,
-                  onChange   : e => {
-                    setEmailData({
-                      subject: e.target.value,
-                    })
-                  },
-                }),
+          className: 'gh-panel',
+        }, [
+          Div({
+              className: 'inside',
+            },
+            [
+              Div({
+                  className: 'inline-label',
+                },
+                [
+                  `<label for="subject">${ __('Subject:', 'groundhogg') }</label>`,
+                  InputWithReplacements({
+                    id         : 'subject-line',
+                    placeholder: 'Subject line...',
+                    value      : getEmailData().subject,
+                    onChange   : e => {
+                      setEmailData({
+                        subject: e.target.value,
+                      })
+                    },
+                  }),
 
-              ]),
-            Div({
-                className: 'inline-label',
-              },
-              [
-                `<label for="preview-text">${ __('Preview:', 'groundhogg') }</label>`,
-                InputWithReplacements({
-                  id         : 'preview-text',
-                  name       : 'pre_header',
-                  placeholder: 'Preview text...',
-                  value      : getEmailData().pre_header,
-                  onChange   : e => {
-                    setEmailData({
-                      pre_header: e.target.value,
-                    })
-                  },
-                }),
+                ]),
+              Div({
+                  className: 'inline-label',
+                },
+                [
+                  `<label for="preview-text">${ __('Preview:', 'groundhogg') }</label>`,
+                  InputWithReplacements({
+                    id         : 'preview-text',
+                    name       : 'pre_header',
+                    placeholder: 'Preview text...',
+                    value      : getEmailData().pre_header,
+                    onChange   : e => {
+                      setEmailData({
+                        pre_header: e.target.value,
+                      })
+                    },
+                  }),
 
-              ]),
+                ]),
 
-          ]),
-        // Block Editor
-        Div({
-            id       : 'block-editor-content-wrap',
-            className: getState().responsiveDevice,
-          },
-          getTemplate().html(BlockEditorContent())),
+            ]),
+          // Block Editor
+          Div({
+              id       : 'block-editor-content-wrap',
+              className: getState().responsiveDevice,
+            },
+            [
+              getTemplate().html(BlockEditorContent()),
+            ]),
+          Div({
+            className: 'wp-clearfix',
+          }),
+        ]),
 
       ])
   }
@@ -5698,6 +5962,17 @@
    */
   const BlockEditor = () => {
 
+    if (State.editDefaults) {
+      return Div({
+          id: 'email-block-editor',
+        },
+        [
+          // Content
+          ContentEditor(),
+          ControlsPanel(),
+        ])
+    }
+
     return Div({
         id: 'email-block-editor',
       },
@@ -6897,12 +7172,15 @@
           ...settings,
           morphBlocks: false,
         })
-        // Update the content style...
-        tinyMCE.activeEditor.iframeElement.contentDocument.getElementsByTagName('style')[1].innerHTML = tinyMceCSS()
-        // Replace the content after formatting
-        tinyMCE.activeEditor.setContent(textContent({
-          ...getActiveBlock(),
-        }).innerHTML)
+
+        if (tinyMCE.activeEditor) {
+          // Update the content style...
+          tinyMCE.activeEditor.iframeElement.contentDocument.getElementsByTagName('style')[1].innerHTML = tinyMceCSS()
+          // Replace the content after formatting
+          tinyMCE.activeEditor.setContent(textContent({
+            ...getActiveBlock(),
+          }).innerHTML)
+        }
       }
 
       return Fragment([
@@ -7000,7 +7278,7 @@
       const tagBlock = (tag, style) => {
 
         // separate support for li
-        if ( tag === 'p' ){
+        if (tag === 'p') {
           return `${ selector } p, ${ selector } li{${ fontStyle(style) }}`
         }
 
@@ -7096,7 +7374,7 @@
     }) => {
       return [
         ControlGroup({
-            name: 'Content',
+            name: 'Button',
           },
           [
             Control({
@@ -7407,6 +7685,7 @@
       fontStyle = {},
       gap = 10,
       separator = '',
+      updateBlock
     }) => {
       return [
         ControlGroup({
@@ -7624,6 +7903,9 @@
       borderStyle = {},
     }) => {
 
+      let imgBlockEl = document.getElementById(`b-${ id }`)
+      let maxWidth = imgBlockEl ? imgBlockEl.getBoundingClientRect().width : getEmailWidth()
+
       return Fragment([
         ControlGroup({
             name: 'Image',
@@ -7634,7 +7916,7 @@
               src,
               alt,
               width,
-              maxWidth: document.getElementById(`b-${ id }`).getBoundingClientRect().width,
+              maxWidth,
               onChange: image => {
                 updateBlock({
                   ...image,
@@ -8161,6 +8443,7 @@
     exclude = [],
     excludedPosts = [],
     terms = {},
+    updateBlock,
   }) => {
 
     const postTypeOptions = {}
@@ -8670,7 +8953,10 @@
           ]) : null,
 
         // Query
-        QueryControls(query),
+        QueryControls({
+          updateBlock,
+          ...query,
+        }),
       ])
     },
     parseContent: (content, {
@@ -8924,6 +9210,7 @@
       gap = 10,
       columns = 2,
       thumbnail_size = 'post-thumbnail',
+      updateBlock,
       ...query
     }) => {
 
@@ -8971,7 +9258,10 @@
 
             })),
         ]),
-        QueryControls(query),
+        QueryControls({
+          updateBlock,
+          ...query,
+        }),
         ControlGroup({
           id  : 'queryloop-reference',
           name: 'Reference',
@@ -9074,7 +9364,7 @@
   /**
    * A Social icon theme component
    */
-  const SocialIconTheme = (theme, selected) => {
+  const SocialIconTheme = (theme, selected, updateBlock) => {
 
     let themeIcons = [
       'facebook',
@@ -9204,6 +9494,7 @@
       theme = 'brand-circle',
       align = 'center',
       use = 'global',
+      updateBlock = () => {},
     }) => {
 
       if (socials.length === 0) {
@@ -9222,7 +9513,7 @@
               Div({
                   className: 'social-icon-themes-grid',
                 },
-                [...Object.keys(socialIconThemes).map(t => SocialIconTheme(t, theme))])),
+                [...Object.keys(socialIconThemes).map(t => SocialIconTheme(t, theme, updateBlock))])),
             Control({ label: 'Social Accounts' },
               ButtonToggle({
                 id      : 'socials-use',
@@ -9435,6 +9726,7 @@
       tel = true,
       updateBlock,
     }) => {
+
       return Fragment([
         ControlGroup({ name: 'Footer' },
           [
@@ -9973,6 +10265,7 @@
   }
   const removeControls = () => morph('#controls-panel', Div())
   const morphControls = () => morph('#controls-panel', ControlsPanel())
+  const morphContent = () => morph('#content', ContentEditor())
   const morphBlockEditor = () => morph('#email-block-editor', BlockEditor())
   const morphEmailEditor = () => {
     morph('#email-editor', EmailEditor(),
@@ -10340,14 +10633,6 @@
       return null
     })
   }
-
-  let {
-    colorPalette = [],
-    globalFonts = [],
-    globalSocials = [],
-    blockDefaults = {},
-    imageSizes = [],
-  } = _BlockEditor
 
   // Fill global fonts if none defined
   if (!globalFonts || !Array.isArray(globalFonts) || !globalFonts.length) {
