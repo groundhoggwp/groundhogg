@@ -5,6 +5,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\gh_cron_installed;
+use function Groundhogg\managed_page_url;
 
 /**
  * Get system info
@@ -125,6 +126,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return = apply_filters( 'groundhogg_sysinfo_after_plugin_config', $return );
 
 	$return .= "\n" . '-- Compliance Configuration' . "\n\n";
+	$return .= 'Preferences Center:       ' . managed_page_url();
 	$return .= 'Confirmation Required:    ' . ( $plugin->preferences->is_confirmation_strict() ? "Enabled\n" : "Disabled\n" );
 	$return .= 'Grace Period:             ' . $plugin->preferences->get_grace_period() . "\n";
 	$return .= 'GDPR Enabled:             ' . ( ( $plugin->preferences->is_gdpr_enabled() ) ? "Enabled\n" : "Disabled\n" );

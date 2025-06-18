@@ -24,6 +24,7 @@ use function Groundhogg\header_icon;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\managed_page_url;
 use function Groundhogg\maybe_get_option_from_constant;
 use function Groundhogg\white_labeled_name;
 
@@ -591,7 +592,7 @@ class Settings_Page extends Admin_Page {
                                     <div id="gh_custom_profile_fields"></div>
                                 </div>
                                 <p class="description" style="margin-top: 20px">
-									<?php _e( 'Show additional profile fields in the preferences center. Delete all fields to show the default form.', 'groundhogg' ) ?>
+									<?php printf( __( 'Show additional profile fields in the <a href="%s" target="_blank">preferences center</a>. Delete all fields to show the default form.', 'groundhogg' ), managed_page_url( '/profile/' ) ) ?>
                                 </p>
                             </td>
                         </tr>
