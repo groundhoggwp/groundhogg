@@ -1495,6 +1495,9 @@ class Email extends Base_Object_With_Meta {
 				break;
 			case 'width':
 				$value = absint( $value );
+				if ( ! $value ){
+					$value = 640; // set value to default 640 if unset
+				}
 				break;
 			case 'css':
 			case 'template_css':
