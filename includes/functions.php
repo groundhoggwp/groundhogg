@@ -6661,11 +6661,19 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 
 	}, get_post_types( [ 'public' => true ], false ) );
 
+    $block_defaults = get_option( 'gh_email_editor_block_defaults' );
+    if ( ! is_array( $block_defaults ) ) {
+        $block_defaults = [
+            'version' => '1.0'
+        ];
+    }
+
 	$localized = array_merge( [
 		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
 		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),
+		'blockDefaults' => $block_defaults,
 		'imageSizes'    => array_values( get_intermediate_image_sizes() ),
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
