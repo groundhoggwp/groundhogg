@@ -24,11 +24,11 @@
 
 .template-full-width,
 .template-full-width-contained {
-  padding: 0 20px 20px 20px;
+  padding: 0 20px;
 }
 
 .template-boxed {
-  margin: 0 20px 20px 20px;
+  margin: 0 20px;
 }
 .template-boxed.center {
   margin-left: auto;
@@ -79,7 +79,7 @@
 
 #email-block-editor {
   display: flex;
-  max-height: calc(100vh - 92px);
+  height: calc(100vh - 92px);
 }
 #email-block-editor * {
   box-sizing: border-box;
@@ -126,9 +126,8 @@
 }
 #email-block-editor #content {
   width: 100%;
-  background: #FFFFFF;
   overflow: auto;
-  margin: 20px 20px 0 20px;
+  margin: 20px;
   position: relative;
 }
 #email-block-editor #content #block-editor-toolbar {
@@ -149,7 +148,8 @@
   border-radius: 3px 0 0 3px;
 }
 #email-block-editor #content #block-editor-content-wrap.mobile {
-  width: 400px;
+  width: 390px;
+  min-height: 667px;
   margin: auto;
   transition: 0.4s;
   outline: 5px solid #102640;
@@ -451,18 +451,22 @@
   gap: 3px;
 }
 #controls-panel .controls-nav .gh-button-nav button.tab {
-  border-radius: 0 0;
   border: 1px solid rgba(16, 38, 64, 0.15);
   border-bottom-width: 0;
   background: rgba(16, 38, 64, 0.05);
   font-size: 14px;
   padding: 6px 12px;
+  border-radius: 2px 2px 0 0;
 }
 #controls-panel .controls-nav .gh-button-nav button.tab.active {
   font-weight: 500;
   background: #fff;
   box-shadow: 0 2px 0 -1px #fff;
   z-index: 1;
+}
+#controls-panel .controls-nav .gh-button-nav .active .dashicons-admin-settings {
+  outline: 2px solid rgba(16, 38, 64, 0.5);
+  border-radius: 4px;
 }
 #controls-panel .control-group:not(.closed) .controls {
   display: flex;
@@ -801,6 +805,10 @@ body iframe#preview.desktop {
 .cards .post-card img {
   display: block;
   vertical-align: bottom;
+}
+
+.post-thumbnail {
+  max-width: 100%;
 }
 
 #template-grid {

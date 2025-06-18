@@ -52,13 +52,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .template-full-width,
 .template-full-width-contained {
-  padding: 0 20px 20px 20px;
+  padding: 0 20px;
 
 }
 
 .template-boxed {
 
-  margin: 0 20px 20px 20px;
+  margin: 0 20px;
 
   &.center {
     margin-left: auto;
@@ -119,7 +119,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   display: flex;
   //gap: 20px;
   //padding: 0 20px;
-  max-height: calc(100vh - 92px);
+  height: calc(100vh - 92px);
 
   * {
     box-sizing: border-box;
@@ -183,10 +183,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   #content {
     width: 100%;
-    background: #FFFFFF;
+    //background: #FFFFFF;
     overflow: auto;
     //padding-top: 20px;
-    margin: 20px 20px 0 20px;
+    margin: 20px;
     position: relative;
 
     #block-editor-toolbar {
@@ -210,8 +210,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
 
     #block-editor-content-wrap {
+
       &.mobile {
-        width: 400px;
+        width: 390px;
+        min-height: 667px;
         margin: auto;
         transition: 0.4s;
         outline: 5px solid $primary-dark;
@@ -622,12 +624,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
       button.tab {
 
-        border-radius: 0 0;
+        //border-radius: 0 0;
         border: 1px solid $primary-dark-15;
         border-bottom-width: 0;
         background: $primary-dark-5;
         font-size: 14px;
         padding: 6px 12px;
+        border-radius: 2px 2px 0 0;
 
         &.active {
           font-weight: 500;
@@ -635,6 +638,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           box-shadow: 0 2px 0 -1px #fff;
           z-index: 1;
         }
+      }
+
+      .active .dashicons-admin-settings{
+        outline: 2px solid $primary-dark-50;
+        border-radius: 4px;
       }
     }
   }
@@ -1075,6 +1083,10 @@ body {
 .cards .post-card img {
   display: block;
   vertical-align: bottom;
+}
+
+.post-thumbnail {
+  max-width: 100%;
 }
 
 #template-grid {
