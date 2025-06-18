@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.1.3.2
+Stable tag: 4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -350,8 +350,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 4.1.3.2 (2025-06-11) =
+= 4.2 (2025-06-11) =
+* ADDED Alter default appearance of emails blocks in the email editor settings.
+* ADDED Explicit save button for email editor settings.
+* ADDED Email Custom CSS (for the whole email, not just a single block) in the advanced tab.
 * OPTIMIZED Overall email HTML and CSS size reduced.
+* FIXED Unable to change from address when composing an email.
+* FIXED Email width set to 0 when a template is imported with no set width.
 
 = 4.1.3.1 (2025-06-11) =
 * HOT FIX 3rd party SMTP plugins not working if the email service is set to WordPress Default.
