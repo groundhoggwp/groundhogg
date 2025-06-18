@@ -185,13 +185,11 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 			return function ( $value ) {
 				return map_deep( $value, 'sanitize_text_field' );
 			};
+		case 'gh_custom_reports':
+		case 'gh_email_editor_block_defaults':
+			return __NAMESPACE__ . '\sanitize_payload';
 		case 'gh_contact_custom_properties':
 			return [ Properties::class, 'sanitize' ];
-		case 'gh_custom_reports':
-			// todo implement proper sanitization here
-			return function ( $props ) {
-				return $props;
-			};
 		case 'gh_custom_profile_fields':
 		case 'gh_custom_preference_fields':
 			return [ Form_Fields::class, 'sanitize_form_and_map' ];

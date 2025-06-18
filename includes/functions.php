@@ -5816,6 +5816,11 @@ function sanitize_payload( $payload ) {
 
 	return map_deep( $payload, function ( $param ) {
 
+		// booleans
+		if ( is_bool( $param ) ){
+			return $param;
+		}
+
 		// Might be a float
 		// Might be int
 		// if first digit is 0, treat as string
