@@ -425,6 +425,12 @@
 #controls-panel h3 {
   padding-left: 10px;
 }
+#controls-panel a {
+  text-decoration: none;
+}
+#controls-panel a:hover {
+  text-decoration: underline;
+}
 #controls-panel .controls-nav {
   display: flex;
   background: #fff;

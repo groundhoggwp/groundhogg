@@ -4330,7 +4330,6 @@
             const Block = BlockRegistry.get(type)
 
             return An({
-              href   : '#',
               id     : `edit-defaults-${ type }`,
               onClick: e => {
                 e.preventDefault()
@@ -4582,7 +4581,7 @@
           className: `gh-button primary ${ State.savingEditorSettings ? 'loading-dots' : '' }`,
           disabled : State.savingEditorSettings,
           style    : {
-            margin: '30px auto',
+            margin: '30px auto 10px auto',
           },
           onClick  : e => {
 
@@ -4594,6 +4593,17 @@
 
           },
         }, State.savingEditorSettings ? 'Saving' : `Save ${ BlockRegistry.get(State.editDefaults).name } Defaults`),
+        An({
+          style: {
+            textAlign: 'center',
+          },
+          onClick  : e => {
+            e.preventDefault()
+            setState({
+              editDefaults: false,
+            })
+          }
+        }, '&larr; Back to email')
       ])
     }
     else if (hasActiveBlock()) {

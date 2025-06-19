@@ -593,6 +593,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     padding-left: 10px;
   }
 
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   border-left: 1px solid $primary-dark-15;
 
   .controls-nav {
