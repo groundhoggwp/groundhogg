@@ -298,7 +298,7 @@ class Legacy_Contact_Query {
 		 *
 		 * @param $query_var_defaults array
 		 */
-		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
+		$this->query_var_defaults = apply_filters_deprecated( 'groundhogg/contact_query/query_var_defaults', [ $defaults ], '3.2', '', 'Please refactor for the Contact_Query class' );
 
 		if ( ! empty( $query ) ) {
 			$this->query_vars = $query;
@@ -557,8 +557,8 @@ class Legacy_Contact_Query {
 		 * @since 2.8
 		 *
 		 */
-		do_action_ref_array( 'gh_parse_contact_query', [ &$this ] );
-		do_action_ref_array( 'groundhogg/contact_query/parse_query', [ &$this ] );
+		do_action_deprecated( 'gh_parse_contact_query', [ &$this ], '3.2', '', 'Please refactor for the Contact_Query class'  );
+		do_action_deprecated( 'groundhogg/contact_query/parse_query', [ &$this ], '3.2', '', 'Please refactor for the Contact_Query class' );
 
 	}
 
@@ -583,7 +583,7 @@ class Legacy_Contact_Query {
 		 * @deprecated
 		 *
 		 */
-		do_action_ref_array( 'gh_pre_get_contacts', [ &$this ] );
+		do_action_deprecated( 'gh_pre_get_contacts', [ &$this ], '3.2', '', 'Please refactor for the Contact_Query class' );
 //		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
 
 		// $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
@@ -679,7 +679,7 @@ class Legacy_Contact_Query {
 		 * @param $query_vars  array
 		 * @param $query       Contact_Query
 		 */
-		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
+		$this->sql_clauses = apply_filters_deprecated( 'groundhogg/contact_query/query_items/sql_clauses', [ $this->sql_clauses, $this->query_vars, $this ], '3.2', '', 'Please refactor for the Contact_Query class' );
 
 		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$this->sql_clauses['where']} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
 	}
@@ -1048,7 +1048,7 @@ class Legacy_Contact_Query {
 		 * @param $where array
 		 * @param $query Contact_Query
 		 */
-		return apply_filters( 'groundhogg/contact_query/where_clauses', $where, $this );
+		return apply_filters_deprecated( 'groundhogg/contact_query/where_clauses', [ $where, $this ], '3.2', '', 'Please refactor for the Contact_Query class' );
 	}
 
 	/**
@@ -1123,6 +1123,7 @@ class Legacy_Contact_Query {
 		     || ! empty( $this->query_vars['report'] )
 		     || ! empty( $this->query_vars['activity'] )
 		     || ( ! empty( $this->query_vars['email'] ) && ! is_array( $this->query_vars['email'] ) )
+
 		) {
 			return "$this->table_name.$this->primary_key";
 		}
@@ -1297,7 +1298,7 @@ class Legacy_Contact_Query {
 		self::setup_default_filters();
 		$this->setup_custom_field_filters();
 
-		do_action( 'groundhogg/contact_query/register_filters', $this );
+		do_action_deprecated( 'groundhogg/contact_query/register_filters', [ $this ], '3.2', 'groundhogg/contact_query/filters/register', 'Please refactor your filters to operate with the new Contact_Query class.' );
 	}
 
 	/**
@@ -1512,6 +1513,7 @@ class Legacy_Contact_Query {
 	 * @return bool
 	 */
 	public static function register_filter( string $type, callable $filter_callback ): bool {
+
 		if ( ! $type || ! is_callable( $filter_callback ) ) {
 			return false;
 		}
