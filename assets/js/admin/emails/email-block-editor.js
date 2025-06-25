@@ -4594,16 +4594,16 @@
           },
         }, State.savingEditorSettings ? 'Saving' : `Save ${ BlockRegistry.get(State.editDefaults).name } Defaults`),
         An({
-          style: {
+          style  : {
             textAlign: 'center',
           },
-          onClick  : e => {
+          onClick: e => {
             e.preventDefault()
             setState({
               editDefaults: false,
             })
-          }
-        }, '&larr; Back to email')
+          },
+        }, '&larr; Back to email'),
       ])
     }
     else if (hasActiveBlock()) {
@@ -5677,6 +5677,8 @@
                                       subject     : data.subject,
                                       preview_text: data.preview_text,
                                       message_type: data.message_type,
+                                      content     : data.content,
+                                      plain_text  : data.plain_text,
                                     })
                                     setEmailMeta(meta)
                                     setState({ page: 'editor' })
@@ -7695,7 +7697,7 @@
       fontStyle = {},
       gap = 10,
       separator = '',
-      updateBlock
+      updateBlock,
     }) => {
       return [
         ControlGroup({
