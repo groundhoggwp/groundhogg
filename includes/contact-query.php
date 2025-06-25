@@ -2293,7 +2293,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public function set_date_key( string $string ) {
-		_deprecated_function( 'Contact_Query::set_date_key()', '3.2' );
+		_deprecated_function( __METHOD__, '3.2' );
 
 		$this->date_key = $string;
 		$this->legacy_query->set_date_key( $string );
@@ -2309,7 +2309,7 @@ class Contact_Query extends Table_Query {
 	 * @return void
 	 */
 	public static function register_filter( ...$args ) {
-		_deprecated_function( 'Contact_Query::register_filter()', '3.2', 'Contact_Query::filters()->register()' );
+		_deprecated_function( __METHOD__, '3.2', 'Contact_Query::filters()->register()' );
 		Legacy_Contact_Query::register_filter( ...$args );
 	}
 
