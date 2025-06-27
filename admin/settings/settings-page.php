@@ -375,8 +375,10 @@ class Settings_Page extends Admin_Page {
 
 		foreach ( $this->sections as $id => $section ) {
 
-            // filter out sections with no settings.
-            if ( ! array_any( $this->settings, function ( $setting ) use ( $id ) {
+            $has_callback = isset( $section['callback'] ) && is_callable( $section['callback'] );
+
+            // filter out sections with no settings or callback.
+            if ( ! $has_callback && ! array_any( $this->settings, function ( $setting ) use ( $id ) {
                 return get_array_var( $setting, 'section' ) === $id;
             } ) ){
                 continue;
@@ -384,7 +386,7 @@ class Settings_Page extends Admin_Page {
 
 			$callback = array();
 
-			if ( key_exists( 'callback', $section ) ) {
+			if ( $has_callback ) {
 				$callback = $section['callback'];
 			}
 
@@ -592,7 +594,7 @@ class Settings_Page extends Admin_Page {
                                     <div id="gh_custom_profile_fields"></div>
                                 </div>
                                 <p class="description" style="margin-top: 20px">
-									<?php printf( __( 'Show additional profile fields in the <a href="%s" target="_blank">preferences center</a>. Delete all fields to show the default form.', 'groundhogg' ), managed_page_url( '/profile/' ) ) ?>
+									<?php printf( __( 'Show additional profile fields in the <a href="%s" target="_blank">preferences center</a>. Delete all fields to show the default form.', 'groundhogg' ), managed_page_url( '/preferences/profile/' ) ) ?>
                                 </p>
                             </td>
                         </tr>
@@ -604,7 +606,7 @@ class Settings_Page extends Admin_Page {
                                         <div id="gh_custom_preference_fields"></div>
                                     </div>
                                     <p class="description" style="margin-top: 20px">
-										<?php _e( 'Show additional fields on the email preferences screen.', 'groundhogg' ) ?>
+	                                    <?php printf( __( 'Show additional fields on the <a href="%s" target="_blank">email preferences screen</a>.', 'groundhogg' ), managed_page_url( '/preferences/manage/' ) ) ?>
                                     </p>
                                 </td>
                             </tr>
