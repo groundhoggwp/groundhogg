@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Api\V4\Base_Api;
+use Groundhogg\Utils\Safe_WP_User;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,7 +34,7 @@ class Scripts {
 	}
 
 	public function block_assets() {
-		if ( is_admin() ){
+		if ( is_admin() ) {
 			$this->register_admin_styles();
 			wp_enqueue_style( 'groundhogg-admin-filters' );
 		}
@@ -643,7 +644,7 @@ class Scripts {
 				],
 				'filters'          => [
 					'optin_status'                 => Preferences::get_preference_names(),
-					'owners'                       => array_values( get_owners() ),
+					'owners'                       => array_map( fn( $user ) => new Safe_WP_User( $user ), array_values( get_owners() ) ),
 					'current'                      => get_request_var( 'filters', [] ),
 					'roles'                        => get_editable_roles(),
 					'countries'                    => utils()->location->get_countries_list(),
@@ -660,7 +661,7 @@ class Scripts {
 					'plugins' => WP_PLUGIN_URL,
 				],
 				'rawStepTypes'     => Plugin::instance()->step_manager->get_elements(),
-				'currentUser'      => wp_get_current_user(),
+				'currentUser'      => new Safe_WP_User( wp_get_current_user() ),
 				'isMultisite'      => is_multisite(),
 				'isWhiteLabeled'   => is_white_labeled(),
 				'whiteLabelName'   => white_labeled_name(),
