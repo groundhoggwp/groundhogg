@@ -10,6 +10,7 @@ use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Tag_Relationships;
 use Groundhogg\DB\Tags;
 use Groundhogg\Utils\DateTimeHelper;
+use Groundhogg\Utils\Safe_WP_User;
 use WP_User;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1208,7 +1209,7 @@ class Contact extends Base_Object_With_Meta {
 				'meta'           => $this->get_meta(),
 				'tags'           => array_values( $this->get_tags( true ) ),
 //				'files' => $this->get_files(),
-				'user'           => $this->user,
+				'user'           => new Safe_WP_User( $this->user ),
 //				'notes' => $this->get_notes(),
 				'admin'          => $this->admin_link(),
 				'is_marketable'  => $this->is_marketable(),
