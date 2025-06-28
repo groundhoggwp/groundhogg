@@ -8777,7 +8777,7 @@ function safe_user_id_sync( int $user_id = 0, int $contact_id = 0 ) {
 	$query->where()->clear();
 
 	$join = $query->addJoin( 'LEFT', $query->db->users );
-	$join->onColumn( "LOWER($join->alias.user_email)", "LOWER($query->alias.email)" );
+	$join->onColumn( "$join->alias.user_email", "$query->alias.email" );
 
 	// this is so we can update from the value of the ID column in the wp_users table
 	$query->add_safe_column( "$join->alias.ID" );
