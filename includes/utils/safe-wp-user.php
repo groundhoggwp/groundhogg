@@ -4,6 +4,7 @@ namespace Groundhogg\Utils;
 
 class Safe_WP_User extends \WP_User implements \JsonSerializable {
 
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
 			'ID' => $this->ID,

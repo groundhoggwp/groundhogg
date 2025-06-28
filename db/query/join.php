@@ -67,11 +67,15 @@ class Join {
 			$mainCol = "{$this->query->alias}.{$this->query->db_table->primary_key}";
 		}
 
-		if ( ! Query::isAliased( $mainCol ) ) {
-			$mainCol = "{$this->query->alias}.$mainCol";
+		$mainCol = $this->query->maybe_sanitize_aggregate_column( $mainCol );
+
+		if ( ! str_contains( $joinCol, "$this->alias.") ){
+			$joinCol = "$this->alias.$joinCol";
 		}
 
-		$this->conditions->addCondition( "$this->alias.$joinCol = $mainCol" );
+		$joinCol = $this->query->maybe_sanitize_aggregate_column( $joinCol );
+
+		$this->conditions->addCondition( "$joinCol = $mainCol" );
 
 		return $this->conditions;
 	}

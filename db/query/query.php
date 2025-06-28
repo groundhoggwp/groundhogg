@@ -200,7 +200,7 @@ class Query {
 			return $maybe_column;
 		}
 
-		if ( ! preg_match( "/(COALESCE|COUNT|CAST|SUM|AVG|DATE|DISTINCT)\(/i", $maybe_column ) ) {
+		if ( ! preg_match( "/(COALESCE|COUNT|CAST|SUM|AVG|DATE|DISTINCT|LOWER|UPPER)\(/i", $maybe_column ) ) {
 			return $this->sanitize_column( $maybe_column );
 		}
 
@@ -230,6 +230,12 @@ class Query {
 			},
 			"/^MAX\($column_regex\)/i"                                                               => function ( $matches ) {
 				return sprintf( "MAX(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/^LOWER\($column_regex\)/i"                                                             => function ( $matches ) {
+				return sprintf( "LOWER(%s)", $this->sanitize_column( $matches[1] ) );
+			},
+			"/^UPPER\($column_regex\)/i"                                                             => function ( $matches ) {
+				return sprintf( "UPPER(%s)", $this->sanitize_column( $matches[1] ) );
 			},
 			"/^COALESCE\($column_regex,\s*(?:'|\")?(\w*)(?:'|\")?\)/i"                               => function ( $matches ) {
 				$column = $this->sanitize_column( $matches[1] );
