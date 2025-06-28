@@ -151,13 +151,13 @@ class Activity extends DB {
 	}
 
 	/**
-	 * @param int   $row_id
+	 * @param int   $row_id_or_where
 	 * @param array $data
 	 * @param array $where
 	 *
 	 * @return bool
 	 */
-	public function update( $row_id = 0, $data = [], $where = [] ) {
+	public function update( $row_id_or_where = 0, $data = [], $where = [] ) {
 
 		if ( isset_not_empty( $data, 'referer' ) ) {
 			$data['referer_hash'] = generate_referer_hash( $data['referer'] );
@@ -165,15 +165,15 @@ class Activity extends DB {
 
 		$this->packIP( $data );
 
-		if ( is_array( $row_id ) && ! empty( $row_id ) ){
-			$this->packIP( $row_id );
+		if ( is_array( $row_id_or_where ) && ! empty( $row_id_or_where ) ){
+			$this->packIP( $row_id_or_where );
 		}
 
 		if ( ! empty( $where ) ){
 			$this->packIP( $where );
 		}
 
-		return parent::update( $row_id, $data, $where );
+		return parent::update( $row_id_or_where, $data, $where );
 	}
 
 	public function get_date_key() {

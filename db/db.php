@@ -44,43 +44,48 @@ abstract class DB {
 	 * @var array Store results about a query temporarily.
 	 */
 	protected static $cache = [];
-	/**
-	 * The name of our database table
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public $db_suffix;
-	/**
-	 * The name of our database table
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public $table_name;
 
 	/**
-	 * @var The easy query alias
+	 * The name of our database table
+	 *
+	 * @access  public
+	 * @since   2.1
 	 */
-	public $alias;
+	protected $db_suffix;
+
+	/**
+	 * The name of our database table
+	 *
+	 * @access  public
+	 * @since   2.1
+	 */
+	protected $table_name;
+
+	/**
+	 * @var string The easy query alias
+	 */
+	protected $alias;
+
 	/**
 	 * The version of our database table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public $version;
+	protected $version;
+
 	/**
 	 * The name of the primary column
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
-	public $primary_key;
+	protected $primary_key;
+
 	/**
 	 * @var string
 	 */
-	public $charset;
+	protected $charset;
 
 	/**
 	 * Get things started
@@ -113,6 +118,24 @@ abstract class DB {
 	}
 
 	/**
+	 * Readonly properties
+	 *
+	 * @param $name
+	 *
+	 * @return void
+	 */
+	public function __get( $name ) {
+		switch ( $name ){
+			case 'table_name':
+			case 'alias':
+			case 'version':
+			case 'charset':
+			case 'primary_key':
+				return $this->$name;
+		}
+	}
+
+	/**
 	 * When a contact is merged handle this by default
 	 *
 	 * @param $contact Contact
@@ -137,15 +160,8 @@ abstract class DB {
 	 */
 	public function render_table_name() {
 		global $wpdb;
-		$table_name = $wpdb->prefix . $this->db_suffix;
-
-		/**
-		 * Filter the table name...
-		 *
-		 * @param string $table_name
-		 * @param DB     $db
-		 */
-		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
+		$table_name       = $wpdb->prefix . $this->db_suffix;
+		$this->table_name = $table_name;
 		$this->alias      = $this->get_object_type() . 's';
 	}
 

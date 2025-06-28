@@ -37,6 +37,7 @@ use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
+use function Groundhogg\safe_user_id_sync;
 use function Groundhogg\uninstall_gh_cron_file;
 use function Groundhogg\uninstall_groundhogg;
 use function Groundhogg\utils;
@@ -1288,22 +1289,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$query = new Table_Query( 'contacts' );
-
-		// Set all IDs to 0
-		$query->update( [
-			'user_id' => 0
-		] );
-
-		$join = $query->addJoin( 'LEFT', $query->db->users );
-		$join->onColumn( 'user_email', 'email' );
-
-		$query->add_safe_column( "$join->alias.ID" );
-
-		// Update the user_id col from the ID in the table
-		$updated = $query->update( [
-			'user_id' => "$join->alias.ID"
-		] );
+		$updated = safe_user_id_sync();
 
 		if ( $updated ) {
 			$this->add_notice( 'success', 'User IDs have been synced.' );

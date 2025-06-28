@@ -8610,6 +8610,30 @@ function add_self_removing_filter( string $filter, callable $callback, int $prio
 }
 
 /**
+ * Adds an action, and then removes itself after being used once.
+ *
+ * @param string   $hook_name
+ * @param callable $callback
+ * @param int      $priority
+ * @param int      $accepted_args
+ *
+ * @return void
+ */
+function add_action_use_once( string $hook_name, callable $callback, int $priority = 10, int $accepted_args = 1 ): void {
+	$wrapper = null;
+
+	$wrapper = function ( ...$args ) use ( &$wrapper, $hook_name, $callback, $priority, $accepted_args ) {
+		// Remove itself
+		remove_action( $hook_name, $wrapper, $priority );
+
+		// Call original callback
+		return call_user_func_array( $callback, $args );
+	};
+
+	add_action( $hook_name, $wrapper, $priority, $accepted_args );
+}
+
+/**
  * Allows the adding of event arguments before an event is added to the event queue
  *
  * @param $args
@@ -8717,4 +8741,62 @@ function search_and_replace_in_file( $file_path, $search, $replace ) {
  */
 function count_newlines( $text ) {
 	return count( explode( "\n", $text ) );
+}
+
+/**
+ * Safely syncs user IDs based on email address equality
+ *
+ * @throws \Exception
+ *
+ * @param $user_id int sync based on a specific user ID
+ * @param $contact_id int sync based on a specific contact ID
+ *
+ * @return bool|int|\mysqli_result|null
+ */
+function safe_user_id_sync( int $user_id = 0, int $contact_id = 0 ) {
+
+	$query = new Table_Query( 'contacts' );
+
+	if ( $user_id || $contact_id ) {
+		$subWhere = $query->where()->subWhere();
+
+		if ( $contact_id ) {
+			$subWhere->equals( 'ID', $contact_id );
+		}
+
+		if ( $user_id ) {
+			$subWhere->equals( 'user_id', $user_id );
+		}
+	}
+
+	// Set all IDs to 0
+	$query->update( [
+		'user_id' => 0
+	] );
+
+	$query->where()->clear();
+
+	$join = $query->addJoin( 'LEFT', $query->db->users );
+	$join->onColumn( "LOWER($join->alias.user_email)", "LOWER($query->alias.email)" );
+
+	// this is so we can update from the value of the ID column in the wp_users table
+	$query->add_safe_column( "$join->alias.ID" );
+
+	if ( $user_id || $contact_id ) {
+		$subWhere = $query->where()->subWhere();
+		if ( $user_id ) {
+			$subWhere->equals( "$join->alias.ID", $user_id );
+		}
+
+		if ( $contact_id ) {
+			$subWhere->equals( "$query->alias.ID", $contact_id );
+		}
+	}
+
+	// Update the user_id col from the ID in the table
+	$updated = $query->update( [
+		'user_id' => "$join->alias.ID"
+	] );
+
+	return $updated;
 }

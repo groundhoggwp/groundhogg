@@ -285,11 +285,7 @@ class Where {
 			$format = $this->getColumnFormat( $column, $value );
 		}
 
-//		var_dump( $column, $compare, $format, $value );
-
 		$condition = $this->prepare( "$column $compare $format", $value );
-
-//		var_dump( $condition );
 
 		return $this->addCondition( $condition );
 	}
@@ -600,5 +596,9 @@ class Where {
 
 		$this->addCondition( "NOT EXISTS ($query)" );
 		return $this;
+	}
+
+	public function clear() {
+		$this->conditions = [];
 	}
 }

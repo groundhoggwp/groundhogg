@@ -5,9 +5,11 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
+use function Groundhogg\add_action_use_once;
 use function Groundhogg\get_primary_owner_id;
-use function Groundhogg\isset_not_empty;
+use function Groundhogg\safe_user_id_sync;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -262,31 +264,57 @@ class Contacts extends DB {
 	 * @since   2.1
 	 * @return  bool
 	 */
-	public function update( $row_id = 0, $data = [], $where = [] ) {
+	public function update( $row_id_or_where = 0, $data = [], $where = [] ) {
 
 		$data = $this->sanitize_columns( $data );
 
-		// Check for duplicate email.
-		if ( isset_not_empty( $data, 'email' ) && $this->exists( $data['email'], 'email' ) ) {
-			$a_row_id = absint( $this->get_contact_by( 'email', $data['email'] )->ID );
-			if ( $a_row_id !== $row_id ) {
-				// unset instead of return false;
+		// where based, not ID based
+		if ( is_array( $row_id_or_where ) || ! empty( $where ) ) {
+
+			// don't allow bulk updating some columns
+			unset( $data['ID'] );
+			unset( $data['email'] );
+
+			// don't allow bulk updating with the same user_id unless it's 0
+			if ( ! empty( $data['user_id'] ) ) {
+				unset( $data['user_id'] );
+			}
+
+			return parent::update( $row_id_or_where, $data, $where );
+		}
+
+		if ( isset( $data['email'] ) ) {
+
+			// prevent empty email addresses
+			if ( empty( $data['email'] ) ) {
+				unset( $data['email'] );
+			}
+
+			// check to see if this email address is already in use
+			$query = new Table_Query( $this );
+			$query->where()->notEquals( 'ID', $row_id_or_where )->equals( 'email', $data['email'] );
+			if ( $query->count() > 0 ) {
 				unset( $data['email'] );
 			}
 		}
 
-		// prevent setting email to empty
-		if ( isset( $data['email'] ) && empty( $data['email'] ) ) {
-			unset( $data['email'] );
+		if ( ! empty( $data['user_id'] ) ) {
+
+			// check to see if this user_id is being used by another contact
+			$query = new Table_Query( $this );
+			$query->where()->notEquals( 'ID', $row_id_or_where )->equals( 'user_id', $data['user_id'] );
+			// it is being used by another contact :/
+			if ( $query->count() > 0 ) {
+				unset( $data['user_id'] );
+				// let's safely resync the IDs after this update is complete.
+				$user_id    = absint( $data['user_id'] );
+				$contact_id = absint( $row_id_or_where );
+
+				add_action_use_once( 'groundhogg/db/post_update/contact', fn() => safe_user_id_sync( $user_id, $contact_id ) );
+			}
 		}
 
-		$result = parent::update( $row_id, $data, $where );
-
-		if ( $result ) {
-			$this->cache_set_last_changed();
-		}
-
-		return $result;
+		return parent::update( $row_id_or_where, $data, $where );
 	}
 
 	/**
