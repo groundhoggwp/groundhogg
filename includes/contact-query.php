@@ -1156,6 +1156,51 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Filter by the custom activity
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_form_submissions( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'step_id'      => '',
+			'type'         => '',
+			'name'         => '',
+			'meta_filters' => []
+		] );
+
+		$submissionQuery = new Table_Query( 'submissions' );
+		$submissionQuery->setSelect( 'contact_id' );
+
+		if ( ! empty( $filter['step_id'] ) ) {
+			$submissionQuery->where->equals( 'step_id', $filter['step_id'] );
+		}
+
+		if ( ! empty( $filter['type'] ) ) {
+			$submissionQuery->where->equals( 'type', $filter['type'] );
+		}
+
+		Filters::mysqlDateTime( 'date_created', $filter, $submissionQuery->where() );
+
+		foreach ( $filter['meta_filters'] as $metaFilter ) {
+
+			[ 0 => $key, 1 => $compare, 2 => $value ] = $metaFilter;
+
+			if ( ! $key || ! $compare ) {
+				continue;
+			}
+
+			$alias = $submissionQuery->joinMeta( $key );
+			$submissionQuery->where()->compare( "$alias.meta_value", $value, $compare );
+		}
+
+		$where->in( 'ID', $submissionQuery );
+	}
+
+	/**
 	 * @throws \Exception
 	 *
 	 * @param array        $filter
