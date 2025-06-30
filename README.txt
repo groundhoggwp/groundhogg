@@ -348,6 +348,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 = Where can I upgrade to premium? =
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
+
 == Changelog ==
 
 = 4.2 (2025-06-11) =

@@ -255,4 +255,8 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 * 🏅 Best Software Innovation 2020 finalist _(Canadian Search Awards)_.
 * 🏅 Canadian Small Business Awards 2021 finalist _(Canadian Search Awards)_.
 
+## How can I report security bugs?
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
+
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
