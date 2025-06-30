@@ -1167,7 +1167,7 @@ class Contact_Query extends Table_Query {
 
 		$filter = wp_parse_args( $filter, [
 			'step_id'      => '',
-			'type'         => '',
+			'form_type'    => '',
 			'name'         => '',
 			'meta_filters' => []
 		] );
@@ -1179,8 +1179,8 @@ class Contact_Query extends Table_Query {
 			$submissionQuery->where->equals( 'step_id', $filter['step_id'] );
 		}
 
-		if ( ! empty( $filter['type'] ) ) {
-			$submissionQuery->where->equals( 'type', $filter['type'] );
+		if ( ! empty( $filter['form_type'] ) ) {
+			$submissionQuery->where->equals( 'type', $filter['form_type'] );
 		}
 
 		Filters::mysqlDateTime( 'date_created', $filter, $submissionQuery->where() );

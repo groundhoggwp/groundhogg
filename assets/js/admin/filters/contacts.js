@@ -2435,12 +2435,12 @@
   ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_date', 'Current Date', 'date', formatDate ))
   ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_time', 'Current Time', 'time', ( time ) => formatTime(`2000-01-01T${time}`) ))
 
-  ContactFilterRegistry.registerFilterGroup( 'submissions', 'Submissions' )
+  registerFilterGroup( 'submissions', 'Submissions' )
 
   ContactFilterRegistry.registerFilter( createPastDateFilter( 'form_submissions', 'Form Submissions', 'submissions', {
     edit: ({
       form_id = '',
-      type = '',
+      form_type = '',
       meta_filters = [],
       updateFilter = () => {}
     }) => {
@@ -2461,9 +2461,9 @@
           placeholder: 'Type',
           id: 'type',
           name: 'type',
-          value: type,
+          value: form_type,
           onChange: e => updateFilter({
-            type: e.target.value
+            form_type: e.target.value
           })
         }),
 
