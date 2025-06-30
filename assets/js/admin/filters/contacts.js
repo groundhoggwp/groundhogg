@@ -2473,7 +2473,20 @@
           rows: meta_filters,
           cells: [
             props => Input({...props, placeholder: 'Key'}),
+            ({
+              value,
+              ...props
+            }) => Select({
+              selected: value,
+              options : AllComparisons,
+              ...props,
+            }),
             props => Input({...props, placeholder: 'Value'}),
+          ],
+          fillRow: () => [
+            '',
+            'equals',
+            ''
           ],
           onChange: rows => {
             updateFilter({
