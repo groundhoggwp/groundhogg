@@ -269,7 +269,7 @@ class Contacts extends DB {
 		$data = $this->sanitize_columns( $data );
 
 		// where based, not ID based
-		if ( is_array( $row_id_or_where ) || ! empty( $where ) ) {
+		if ( is_array( $row_id_or_where ) || ( ! empty( $where ) && is_array( $where ) ) ) {
 
 			// don't allow bulk updating some columns
 			unset( $data['ID'] );
@@ -283,6 +283,8 @@ class Contacts extends DB {
 			return parent::update( $row_id_or_where, $data, $where );
 		}
 
+		$column = ! empty( $where ) && is_string( $where ) ? $where : $this->primary_key;
+
 		if ( isset( $data['email'] ) ) {
 
 			// prevent empty email addresses
@@ -292,7 +294,7 @@ class Contacts extends DB {
 
 			// check to see if this email address is already in use
 			$query = new Table_Query( $this );
-			$query->where()->notEquals( 'ID', $row_id_or_where )->equals( 'email', $data['email'] );
+			$query->where()->notEquals( $column, $row_id_or_where )->equals( 'email', $data['email'] );
 			if ( $query->count() > 0 ) {
 				unset( $data['email'] );
 			}
@@ -302,7 +304,9 @@ class Contacts extends DB {
 
 			// check to see if this user_id is being used by another contact
 			$query = new Table_Query( $this );
-			$query->where()->notEquals( 'ID', $row_id_or_where )->equals( 'user_id', $data['user_id'] );
+
+			$query->where()->notEquals( $column, $row_id_or_where )->equals( 'user_id', $data['user_id'] );
+
 			// it is being used by another contact :/
 			if ( $query->count() > 0 ) {
 				unset( $data['user_id'] );
@@ -499,6 +503,8 @@ class Contacts extends DB {
 					$cols[ $key ] = strtolower( sanitize_email( $val ) );
 					break;
 				case 'optin_status':
+					$cols[ $key ] = Preferences::sanitize( $val );
+					break;
 				case 'owner_id':
 				case 'user_id':
 					$cols[ $key ] = absint( $val );

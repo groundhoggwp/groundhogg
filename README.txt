@@ -354,6 +354,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.2.2 (2025-07-03) =
+* FIXED User ID not updating.
+* FIXED Arbitrary file upload vulnerability. Credit to Patchstack for practicing responsible disclosure.
+
 = 4.2.1 (2025-06-30) =
 * HARDENED User ID syncing so that the correct user is always linked with the correct contact
 * HARDENED Sanitization for Query::addJoin()

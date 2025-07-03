@@ -19,11 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @var $contact Contact
  */
 
-//var_dump( $contact );
-
-/* Auto link the account before we see the create account form. */
-$contact->auto_link_account();
-
 $tabs = [
 	'general' => _x( 'General', 'contact_record_tab', 'groundhogg' ),
 ];

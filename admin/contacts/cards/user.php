@@ -10,6 +10,9 @@
  * @var $contact \Groundhogg\Contact
  */
 
+/* Auto link the account before we see the create account form. */
+$contact->auto_link_account();
+
 if ( $contact->get_userdata() ):
 
 	?>
