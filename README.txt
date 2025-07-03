@@ -355,7 +355,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.2.2 (2025-07-03) =
-* FIXED User ID not updating.
+* FIXED User ID not syncing.
 * FIXED Arbitrary file upload vulnerability. Credit to Patchstack for practicing responsible disclosure.
 
 = 4.2.1 (2025-06-30) =
