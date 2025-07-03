@@ -37,11 +37,11 @@ class Files_Api extends Base_Api {
 		] );
 
 		register_rest_route( self::NAME_SPACE, "/files/exports", [
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_exports' ],
-				'permission_callback' => [ $this, 'create_exports_permissions_callback' ]
-			],
+//			[
+//				'methods'             => WP_REST_Server::CREATABLE,
+//				'callback'            => [ $this, 'create_exports' ],
+//				'permission_callback' => [ $this, 'create_exports_permissions_callback' ]
+//			],
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_exports' ],
@@ -70,18 +70,9 @@ class Files_Api extends Base_Api {
 
 		foreach ( $_FILES as $FILE ) {
 
-			$validate = wp_check_filetype( $FILE['name'], [ 'csv' => 'text/csv' ] );
-
-			if ( $validate['ext'] !== 'csv' || $validate['text/csv'] ) {
-				return self::ERROR_500( 'invalid_csv', sprintf( 'Please upload a valid CSV. Expected mime type of <i>text/csv</i> but got <i>%s</i>', esc_html( $FILE['type'] ) ) );
-			}
-
-			$file_name = str_replace( '.csv', '', $FILE['name'] );
-			$file_name .= '-' . current_time( 'mysql', true ) . '.csv';
-
-			$FILE['name'] = sanitize_file_name( $file_name );
-
-			$result = files()->upload( $FILE, 'imports' );
+			$result = files()->safe_file_upload( $FILE, [
+				'csv' => 'text/csv'
+			], 'imports' );
 
 			if ( is_wp_error( $result ) ) {
 				return $result;

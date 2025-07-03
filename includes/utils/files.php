@@ -98,7 +98,7 @@ class Files {
 	 *
 	 * @param string $subdir
 	 * @param string $file_path
-	 * @param bool $create_folders
+	 * @param bool   $create_folders
 	 *
 	 * @return string
 	 */
@@ -198,35 +198,97 @@ class Files {
 		return $data;
 	}
 
-	/**
-	 * @var array
-	 */
-	protected $uploads_path = [];
+	function is_allowed_stream( $file ) {
 
-	/**
-	 * Change the default upload directory
-	 *
-	 * @param $param
-	 *
-	 * @return mixed
-	 */
-	public function files_upload_dir( $param ) {
-		$param['path']   = $this->uploads_path['path'];
-		$param['url']    = $this->uploads_path['url'];
-		$param['subdir'] = $this->uploads_path['subdir'];
+		$allowed_streams = [
+			'https:',
+			'http:',
+		];
 
-		return $param;
 	}
 
 	/**
-	 * Initialize the base upload path
+	 * Sideload a file
 	 *
-	 * @param string $where
+	 * @param $file               array from constructed to resemble something from $_FILES
+	 * @param $allowed_mime_types array list of allowed mime types for this upload
+	 * @param $folder             string the folder to upload to within the /wp-content/uploads/groundhogg directory
+	 *
+	 * @return array|string[]|WP_Error
+	 *
+	 * @see wp_check_filetype_and_ext()
+	 * @see get_allowed_mime_types()
 	 */
-	private function set_uploads_path( $where='imports' ) {
-		$this->uploads_path['subdir'] = Plugin::$instance->utils->files->get_base_uploads_dir();
-		$this->uploads_path['path']   = Plugin::$instance->utils->files->get_uploads_dir( $where, '', true );
-		$this->uploads_path['url']    = Plugin::$instance->utils->files->get_uploads_dir( $where, '', true );
+	function safe_file_sideload( &$file, $allowed_mime_types, $folder ) {
+
+		$uploads_dir = wp_get_upload_dir();
+
+		// given local path to a file, only allow sideloading within the uploads directory
+		// protects against ../../ traversal attack
+		if ( file_exists( $file['tmp_name'] ) && ! self::is_file_within_directory( $file['tmp_name'], $uploads_dir['basedir'] ) ) {
+			return new WP_Error( 'nope', 'File upload not allowed.' );
+		}
+
+		return $this->safe_file_upload( $file, $allowed_mime_types, $folder, true );
+	}
+
+	/**
+	 * Upload a file safely
+	 *
+	 * @param $file               array from $_FILES
+	 * @param $allowed_mime_types array list of allowed mime types for this upload
+	 * @param $folder             string the folder to upload to within the /wp-content/uploads/groundhogg directory
+	 *
+	 * @return array|string[]|WP_Error
+	 *
+	 * @see wp_check_filetype_and_ext()
+	 * @see get_allowed_mime_types()
+	 */
+	function safe_file_upload( &$file, $allowed_mime_types, $folder, $sideload = false ) {
+
+		if ( ! function_exists( '_wp_handle_upload' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		}
+
+		// do some basic checks on the file content to test for malicious content
+		if ( self::is_malicious( $file['tmp_name'], $file['name'] ) ) {
+			return new WP_Error( 'file_upload_malicious', 'Potentially malicious upload detected.' );
+		}
+
+		$upload_overrides = [
+			'test_form' => false,
+			'test_size' => true,
+			'test_type' => true,
+			'mimes'     => $allowed_mime_types,
+		];
+
+		$path = $this->get_uploads_dir( $folder );
+		$url  = $this->get_uploads_url( $folder );
+
+		$change_upload_dir = fn( $uploads ) => array_merge( $uploads, [
+			'path'    => $path,
+			'url'     => $url,
+			'subdir'  => basename( $path ),
+			'basedir' => dirname( $path ),
+			'baseurl' => dirname( $url ),
+		] );
+
+		add_filter( 'upload_dir', $change_upload_dir );
+
+		$result = _wp_handle_upload(
+			$file,
+			$upload_overrides,
+			null,
+			$sideload ? 'wp_handle_sideload' : 'wp_handle_upload'
+		);
+
+		remove_filter( 'upload_dir', $change_upload_dir );
+
+		if ( isset( $result['error'] ) ) {
+			return new WP_Error( 'file_upload_failed', $result['error'] );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -237,29 +299,86 @@ class Files {
 	 *
 	 * @return array|bool|WP_Error
 	 */
-	function upload( &$file, $where='imports' ) {
-		$upload_overrides = array( 'test_form' => false );
+	function upload( &$file, $where = 'imports' ) {
+		return $this->safe_file_upload( $file, get_allowed_mime_types(), $where );
+	}
 
-		if ( ! function_exists( 'wp_handle_upload' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+	/**
+	 * Check if a file path is strictly inside a base directory.
+	 *
+	 * @param string $file_path Absolute path to the file.
+	 * @param string $base_dir  Absolute base directory to restrict access to.
+	 *
+	 * @return bool True if the file is inside the base directory, false otherwise.
+	 */
+	static public function is_file_within_directory( string $file_path, string $base_dir ): bool {
+		$file_path_real = realpath( $file_path );
+		$base_dir_real  = realpath( $base_dir );
+
+		if ( ! $file_path_real || ! $base_dir_real ) {
+			return false;
 		}
 
-		$this->set_uploads_path( $where );
+		$file_path_real = wp_normalize_path( $file_path_real );
+		$base_dir_real  = wp_normalize_path( rtrim( $base_dir_real, '/' ) );
 
-		add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
-		$mfile = wp_handle_upload( $file, $upload_overrides );
-		remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
+		return str_starts_with( $file_path_real, $base_dir_real . '/' );
+	}
 
-		if ( isset( $mfile['error'] ) ) {
+	/**
+	 * Basic check for potentially malicious file content.
+	 *
+	 * @param string $filepath Path to the file on disk.
+	 *
+	 * @return bool True if the file appears malicious, false otherwise.
+	 */
+	static public function is_malicious( string $filepath, string $filename ): bool {
 
-			if ( empty( $mfile['error'] ) ) {
-				$mfile['error'] = _x( 'Could not upload file.', 'error', 'groundhogg' );
+		// Fail safe: unreadable or missing file
+		if ( ! file_exists( $filepath ) || ! is_readable( $filepath ) ) {
+			return true;
+		}
+
+		// Block known dangerous filenames
+		$basename          = strtolower( basename( $filename ) );
+		$blocked_filenames = [
+			'.htaccess',
+			'.user.ini',
+			'php.ini',
+			'web.config',
+			'.env',
+		];
+
+		if ( in_array( $basename, $blocked_filenames, true ) ) {
+			return true;
+		}
+
+		// Read the first part of the file
+		$bytes = file_get_contents( $filepath, false, null, 0, 2048 );
+		if ( $bytes === false ) {
+			return true;
+		}
+
+		$bytes = strtolower( $bytes );
+
+		// Look for dangerous patterns
+		$danger_signatures = [
+			'<?php',               // Executable PHP
+			'__halt_compiler()',  // PHAR stub
+			'phar://',            // PHAR stream reference
+			'base64_decode',      // Obfuscation
+			'eval(',              // Dynamic execution
+			'shell_exec',         // Command execution
+			'passthru',           // Another dangerous system function
+		];
+
+		foreach ( $danger_signatures as $needle ) {
+			if ( strpos( $bytes, $needle ) !== false ) {
+				return true;
 			}
-
-			return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
 		}
 
-		return $mfile;
+		return false;
 	}
 
 }

@@ -370,14 +370,14 @@ class Rewrites {
 				fclose( $file );
 				exit();
 				break;
-
 			case 'files':
 
 				$short_path      = get_query_var( 'file_path' );
 				$groundhogg_path = utils()->files->get_base_uploads_dir();
 				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 
-				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
+				// guard against ../../ traversal attack
+				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) || ! Files::is_file_within_directory( $file_path, $groundhogg_path ) ) {
 					wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
 				}
 

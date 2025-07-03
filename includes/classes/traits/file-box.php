@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Classes\Traits;
 
+use WP_Error;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\encrypt;
 use function Groundhogg\file_access_url;
@@ -31,6 +32,18 @@ trait File_Box {
 	}
 
 	/**
+	 * Return the list of allowed mimes for this object
+	 *
+	 * @return array
+	 */
+	public function get_allowed_mime_types() {
+
+		$allowed_mimes = get_allowed_mime_types();
+
+		return apply_filters( "groundhogg/{$this->get_object_type()}/allowed_mimes", $allowed_mimes );
+	}
+
+	/**
 	 * Upload a file
 	 *
 	 * Usage: $contact->upload_file( $_FILES[ 'file_name' ] )
@@ -41,85 +54,46 @@ trait File_Box {
 	 */
 	public function upload_file( &$file ) {
 
-		if ( ! isset_not_empty( $file, 'name' ) ) {
-			return new \WP_Error( 'invalid_file_name', __( 'Invalid file name.', 'groundhogg' ) );
-		}
+		$folder = $this->get_uploads_folder_subdir() . DIRECTORY_SEPARATOR . $this->get_upload_folder_basename();
+		$result = files()->safe_file_upload( $file, $this->get_allowed_mime_types(), $folder );
 
-		$file['name'] = sanitize_file_name( $file['name'] );
-
-		$upload_overrides = array( 'test_form' => false );
-
-		if ( ! function_exists( 'wp_handle_upload' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
-		}
-
-		$this->get_uploads_folder();
-		add_filter( 'upload_dir', [ $this, 'map_upload' ] );
-		$mfile = wp_handle_upload( $file, $upload_overrides );
-		remove_filter( 'upload_dir', [ $this, 'map_upload' ] );
-
-		if ( isset_not_empty( $mfile, 'error' ) ) {
-			return new \WP_Error( 'bad_upload', __( 'Unable to upload file.', 'groundhogg' ) );
-		}
-
-		return $mfile;
+		return $result;
 	}
 
 	/**
 	 * Copy a file given an uploaded URL
 	 *
-	 * @param string $url        url of the file to copy
-	 * @param bool   $delete_tmp whether to delete the tgemp file after
+	 * @param string $url_or_path path or url of asset to upload
+	 * @param bool $delete_tmp whether to delete the temp file after
 	 *
-	 * @return bool
+	 * @return array|string[]|\WP_Error
 	 */
 	public function copy_file( $url_or_path, $delete_tmp = true ) {
 
 		if ( ! function_exists( 'download_url' ) ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
+			require_once( ABSPATH . '/wp-admin/includes/file.php' );
 		}
 
-		// File cannot be copied
 		if ( ! is_copyable_file( $url_or_path ) ) {
-			return false;
+			return new WP_Error( 'not_copyable', 'This file can\'t be uploaded.' );
 		}
 
-		// path given
-		if ( file_exists( $url_or_path ) ) {
-			$tmp_file = $url_or_path;
-			// if using path, force false
-			$delete_tmp = false;
-		} else {
+		$file = [
+			'name'     => wp_basename( $url_or_path ),
+			// Original filename on the user's system
+			'tmp_name' => file_exists( $url_or_path ) ? $url_or_path : download_url( $url_or_path ),
+			// Temporary filename on the server
+		];
 
-			// We should only be doing this for files which are already uploaded to the server,
-			// We should reject urls for sites that aren't this one
-			if ( get_hostname( $url_or_path ) !== get_hostname() ) {
-				return false;
-			}
+		$folder = $this->get_uploads_folder_subdir() . DIRECTORY_SEPARATOR . $this->get_upload_folder_basename();
 
-			add_filter( 'https_local_ssl_verify', '__return_false' );
-			add_filter( 'https_ssl_verify', '__return_false' );
+		$result = files()->safe_file_sideload( $file, $this->get_allowed_mime_types(), $folder );
 
-			$tmp_file = download_url( $url_or_path, 300, false );
-
-			if ( is_wp_error( $tmp_file ) ) {
-				return false;
-			}
+		if ( is_wp_error( $result ) ) {
+			@unlink( $file['tmp_name'] );
 		}
 
-		if ( ! is_dir( $this->get_uploads_folder() ['path'] ) ) {
-			mkdir( $this->get_uploads_folder() ['path'] );
-		}
-		try {
-			copy( $tmp_file, $this->get_uploads_folder()['path'] . '/' . basename( $url_or_path ) );
-		} catch ( \Exception $e ) {
-		}
-
-		if ( $delete_tmp ) {
-			@unlink( $tmp_file );
-		}
-
-		return true;
+		return $result;
 	}
 
 
@@ -132,7 +106,7 @@ trait File_Box {
 		return md5( encrypt( $this->get_id() ) );
 	}
 
-	public function get_uploads_folder_subdir(){
+	public function get_uploads_folder_subdir() {
 		return $this->get_object_type() . 's';
 	}
 
@@ -217,7 +191,7 @@ trait File_Box {
 		$uploads_dir = $this->get_uploads_folder();
 
 		// Might have to create the directory
-		if ( ! is_dir( $uploads_dir['path'] ) ){
+		if ( ! is_dir( $uploads_dir['path'] ) ) {
 			wp_mkdir_p( $uploads_dir['path'] );
 		}
 

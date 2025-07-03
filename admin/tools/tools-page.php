@@ -10,6 +10,7 @@ use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Extension_Upgrader;
+use Groundhogg\Files;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
@@ -52,8 +53,6 @@ use function Groundhogg\white_labeled_name;
  * Time: 3:19 PM
  */
 class Tools_Page extends Tabbed_Admin_Page {
-
-	protected $uploads_path = [];
 
 	/**
 	 * @var \Groundhogg\Bulk_Jobs\Import_Contacts
@@ -561,90 +560,22 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$file = get_array_var( $_FILES, 'import_file' );
+		$file = $_FILES['import_file'];
 
-		$validate = wp_check_filetype( $file['name'], [ 'csv' => 'text/csv' ] );
-
-		if ( $validate['ext'] !== 'csv' || $validate['type'] !== 'text/csv' ) {
-			return new WP_Error( 'invalid_csv', sprintf( 'Please upload a valid CSV. Expected mime type of <i>text/csv</i> but got <i>%s</i>', esc_html( $file['type'] ) ) );
-		}
-
-		$file['name'] = wp_unique_filename( files()->get_csv_imports_dir(), $file['name'] );
-
-		$result = $this->handle_file_upload( $file );
+		$result = files()->safe_file_upload( $file, [
+			'csv' => 'text/csv',
+		], 'imports' );
 
 		if ( is_wp_error( $result ) ) {
-
-			if ( is_multisite() ) {
-				return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this subsite. Please add CSV to the list of allowed file types in the network settings.' );
-			}
-
 			return $result;
 		}
 
 		return wp_redirect( $this->admin_url( [
 			'action' => 'map',
 			'tab'    => 'import',
-			'import' => urlencode( basename( $result['file'] ) ),
+			'import' => urlencode( basename( $result['path'] ) ),
 		] ) );
 
-	}
-
-	/**
-	 * Upload a file to the Groundhogg file directory
-	 *
-	 * @param $file array
-	 * @param $config
-	 *
-	 * @return array|bool|WP_Error
-	 */
-	private function handle_file_upload( $file ) {
-		$upload_overrides = array( 'test_form' => false );
-
-		if ( ! function_exists( 'wp_handle_upload' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
-		}
-
-		$this->set_uploads_path();
-
-		add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
-		$mfile = wp_handle_upload( $file, $upload_overrides );
-		remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
-
-		if ( isset( $mfile['error'] ) ) {
-
-			if ( empty( $mfile['error'] ) ) {
-				$mfile['error'] = _x( 'Could not upload file.', 'error', 'groundhogg' );
-			}
-
-			return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
-		}
-
-		return $mfile;
-	}
-
-	/**
-	 * Change the default upload directory
-	 *
-	 * @param $param
-	 *
-	 * @return mixed
-	 */
-	public function files_upload_dir( $param ) {
-		$param['path']   = $this->uploads_path['path'];
-		$param['url']    = $this->uploads_path['url'];
-		$param['subdir'] = $this->uploads_path['subdir'];
-
-		return $param;
-	}
-
-	/**
-	 * Initialize the base upload path
-	 */
-	private function set_uploads_path() {
-		$this->uploads_path['subdir'] = Plugin::$instance->utils->files->get_base_uploads_dir();
-		$this->uploads_path['path']   = Plugin::$instance->utils->files->get_csv_imports_dir();
-		$this->uploads_path['url']    = Plugin::$instance->utils->files->get_csv_imports_url();
 	}
 
 	/**
@@ -1231,7 +1162,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$groundhogg_path = utils()->files->get_base_uploads_dir();
 		$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $short_path );
 
-		if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
+		// guard against ../../ traversal attack
+		if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) || ! Files::is_file_within_directory( $file_path, $groundhogg_path ) ) {
 			wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
 		}
 
