@@ -2677,7 +2677,7 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 
 				// passed path as the value
 				if ( file_exists( $value ) ) {
-					$files[ $column ] = $value;
+					$copy[] = $value;
 				} // Get from $_FILES
 				else if ( isset_not_empty( $_FILES, $column ) ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
@@ -7484,7 +7484,15 @@ function is_recaptcha_enabled() {
  * @return bool
  */
 function is_copyable_file( $file ) {
-	return file_exists( $file ) || get_hostname( $file ) === get_hostname();
+
+	// the file exists on the server
+	if ( file_exists( $file ) ) {
+		// no streams allowed here, only absolute paths
+		return ! str_contains( $file, '://' );
+	}
+
+	// if a url was provided using https:// check that the file is hosted locally first
+	return get_hostname( $file ) === get_hostname();
 }
 
 /**
@@ -8588,7 +8596,7 @@ function ajax_send_plugin_feedback() {
 }
 
 /**
- * Add a filter that removes itself after being called once
+ * Alias for add_filter_use_once
  *
  * @param string   $filter
  * @param callable $callback
@@ -8598,6 +8606,21 @@ function ajax_send_plugin_feedback() {
  * @return bool
  */
 function add_self_removing_filter( string $filter, callable $callback, int $priority = 10, int $args = 1 ) {
+	_deprecated_function( __FUNCTION__, '4.2', __NAMESPACE__ . '\add_filter_use_once' );
+	return add_filter_use_once( $filter, $callback, $priority, $args );
+}
+
+/**
+ * Add a filter that removes itself after being called once
+ *
+ * @param string   $filter
+ * @param callable $callback
+ * @param int      $priority
+ * @param int      $args
+ *
+ * @return bool
+ */
+function add_filter_use_once( string $filter, callable $callback, int $priority = 10, int $args = 1 ) {
 
 	$callbackWrapper = function ( ...$args ) use ( &$callbackWrapper, $filter, $callback, $priority ) {
 		$result = call_user_func_array( $callback, $args );
