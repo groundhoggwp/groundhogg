@@ -41,7 +41,7 @@ $selected = absint( get_url_var( 'preview_item' ) );
 
 $items       = get_items_from_csv( $file_path, 1, $selected );
 $sample_item = $items[0];
-$total_items = count_csv_rows( $file_path ) - 1;
+$total_items = count_csv_rows( $file_path );
 
 function guess_column_map_to( $column ) {
 

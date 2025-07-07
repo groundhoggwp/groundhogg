@@ -7,6 +7,7 @@ use \WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\file_access_url;
+use function Groundhogg\files;
 
 /**
  * Contacts Table Class
@@ -177,9 +178,9 @@ class Exports_Table extends WP_List_Table {
 
 		$data = [];
 
-		if ( file_exists( Plugin::$instance->utils->files->get_csv_exports_dir() ) ) {
+		if ( file_exists( files()->get_csv_exports_dir() ) ) {
 
-			$scanned_directory = array_diff( scandir( Plugin::$instance->utils->files->get_csv_exports_dir() ), [
+			$scanned_directory = array_diff( scandir( files()->get_csv_exports_dir() ), [
 				'..',
 				'.'
 			] );
@@ -187,14 +188,14 @@ class Exports_Table extends WP_List_Table {
 
 			foreach ( $scanned_directory as $filename ) {
 
-				$filepath = Plugin::$instance->utils->files->get_csv_exports_dir( $filename );
+				$filepath = files()->get_csv_exports_dir( $filename );
 
 				$file = [
 					'file'      => $filename,
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/exports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count_csv_rows( $filepath ) - 1,
+					'rows'      => count_csv_rows( $filepath ),
 				];
 
 				$data[] = $file;

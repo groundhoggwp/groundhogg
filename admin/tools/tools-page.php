@@ -573,7 +573,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		return wp_redirect( $this->admin_url( [
 			'action' => 'map',
 			'tab'    => 'import',
-			'import' => urlencode( basename( $result['path'] ) ),
+			'import' => urlencode( basename( $result['file'] ) ),
 		] ) );
 
 	}
@@ -628,7 +628,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-	 * @return int delete the files
+	 * @return int|WP_Error
 	 */
 	public function process_import_delete() {
 
@@ -641,10 +641,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 		foreach ( $files as $file_name ) {
 			$filepath = files()->get_csv_imports_dir( sanitize_file_name( $file_name ) );
 
-			if ( file_exists( $filepath ) ) {
-				if ( ! unlink( $filepath ) ) {
-					return new WP_Error( 'failed', 'Unable to delete imports.' );
-				}
+			if ( ! file_exists( $filepath ) || ! unlink( $filepath ) ) {
+                return new WP_Error( 'failed', 'Unable to delete file.' );
 			}
 		}
 
@@ -839,7 +837,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-	 * @return int delete the files
+	 * @return int|WP_Error
 	 */
 	public function process_export_delete() {
 
@@ -851,10 +849,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		foreach ( $files as $file_name ) {
 			$filepath = files()->get_csv_exports_dir( sanitize_file_name( $file_name ) );
-			if ( file_exists( $filepath ) ) {
-				if ( ! unlink( $filepath ) ) {
-					return new WP_Error( 'failed', 'Unable to delete exports.' );
-				}
+			if ( ! file_exists( $filepath ) || ! unlink( $filepath ) ) {
+				return new WP_Error( 'failed', 'Unable to delete file.' );
 			}
 		}
 

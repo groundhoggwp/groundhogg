@@ -193,7 +193,7 @@ class Imports_Table extends WP_List_Table {
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/imports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count_csv_rows( $filepath ) - 1,
+					'rows'      => count_csv_rows( $filepath ),
 				];
 
 				$data[] = $file;

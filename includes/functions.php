@@ -2029,7 +2029,6 @@ function get_csv_delimiter( $file_path ) {
 
 /**
  * Return the number of rows in a CSV file
- * todo this seems to be over-counting the total rows by 2
  *
  * @param $file_path
  *
@@ -2046,8 +2045,10 @@ function count_csv_rows( $file_path ) {
 	$rows = 0;
 
 	while ( ! $file->eof() ) {
-		$file->fgets();
-		$rows ++;
+		$line = $file->fgets();
+        if ( ! empty( $line ) ) {
+	        $rows ++;
+        }
 	}
 
 	$file = null;

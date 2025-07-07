@@ -53,7 +53,7 @@ class Import_Contacts extends Bulk_Job {
 		set_transient( 'gh_import_file_path', $file_path, DAY_IN_SECONDS );
 
 		// -1 because headers
-		$num_rows     = count_csv_rows( $file_path ) - 1;
+		$num_rows     = count_csv_rows( $file_path );
 		$num_requests = floor( $num_rows / self::LIMIT );
 
 		return range( 0, $num_requests );
