@@ -56,26 +56,27 @@ class Join {
 	 * Adds an a.column = b.column condition
 	 *
 	 * @param string $joinCol
-	 * @param string $mainCol
+	 * @param string $tableCol
 	 *
 	 * @return Where
 	 */
-	public function onColumn( string $joinCol, string $mainCol = '' ): Where {
+	public function onColumn( string $joinCol, string $tableCol = '' ): Where {
 
 		// Assume primary key for simplicity
-		if ( empty( $mainCol ) ) {
-			$mainCol = "{$this->query->alias}.{$this->query->db_table->primary_key}";
+		if ( empty( $tableCol ) ) {
+			$tableCol = $this->query->db_table->primary_key;
 		}
 
-		$mainCol = $this->query->maybe_sanitize_aggregate_column( $mainCol );
+		$tableCol = $this->query->maybePrefixAlias( $tableCol ); // add an alias like "contacts." to the column
+		$tableCol = $this->query->maybe_sanitize_aggregate_column( $tableCol ); // make sure the column is properly sanitized
 
-		if ( ! str_contains( $joinCol, "$this->alias.") ){
+		if ( ! str_contains( $joinCol, "$this->alias.") ){ // if the join column is not aliased correctly
 			$joinCol = "$this->alias.$joinCol";
 		}
 
-		$joinCol = $this->query->maybe_sanitize_aggregate_column( $joinCol );
+		$joinCol = $this->query->maybe_sanitize_aggregate_column( $joinCol ); // make sure join col is sanitized
 
-		$this->conditions->addCondition( "$joinCol = $mainCol" );
+		$this->conditions->addCondition( "$joinCol = $tableCol" );
 
 		return $this->conditions;
 	}

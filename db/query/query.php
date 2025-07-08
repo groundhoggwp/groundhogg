@@ -448,12 +448,36 @@ class Query {
 	/**
 	 * Check if the column has been aliased already
 	 *
-	 * @param $column
+	 * @param string $column the column
+	 * @param Query $query the associated query
 	 *
 	 * @return bool
 	 */
-	public static function isAliased( $column ) {
-		return str_contains( $column, '.' );
+	public static function isAliased( $column, $query = null ) {
+
+		$aliasPrefix = '.';
+
+		if ( $query instanceof Query ) {
+			$aliasPrefix = $query->alias . $aliasPrefix;
+		}
+
+		return str_contains( $column, $aliasPrefix );
+	}
+
+	/**
+	 * If a column is already aliased, return the column
+	 * Otherwise add the alias
+	 *
+	 * @param $column string
+	 *
+	 * @return string
+	 */
+	public function maybePrefixAlias( $column ) {
+		if ( self::isAliased( $column, $this ) ) {
+			return $column;
+		}
+
+		return "$this->alias.$column";
 	}
 
 	protected function _alias() {
