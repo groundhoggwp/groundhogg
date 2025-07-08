@@ -70,10 +70,7 @@ class Join {
 		$tableCol = $this->query->maybePrefixAlias( $tableCol ); // add an alias like "contacts." to the column
 		$tableCol = $this->query->maybe_sanitize_aggregate_column( $tableCol ); // make sure the column is properly sanitized
 
-		if ( ! str_contains( $joinCol, "$this->alias.") ){ // if the join column is not aliased correctly
-			$joinCol = "$this->alias.$joinCol";
-		}
-
+		$joinCol = Query::_maybePrefixAlias( $joinCol, $this );
 		$joinCol = $this->query->maybe_sanitize_aggregate_column( $joinCol ); // make sure join col is sanitized
 
 		$this->conditions->addCondition( "$joinCol = $tableCol" );

@@ -446,10 +446,23 @@ class Query {
 	}
 
 	/**
+	 * Tests if a provided column is "simple," meaning no transformations, functions, or alias
+	 * simple:     order_id
+	 * not simple: MAX(orders.order_id)
+	 *
+	 * @param $column
+	 *
+	 * @return bool
+	 */
+	protected static function isSimpleColumn( $column ) {
+		return preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/', $column );
+	}
+
+	/**
 	 * Check if the column has been aliased already
 	 *
-	 * @param string $column the column
-	 * @param Query $query the associated query
+	 * @param string     $column the column
+	 * @param Query|Join $query  the associated query
 	 *
 	 * @return bool
 	 */
@@ -457,7 +470,7 @@ class Query {
 
 		$aliasPrefix = '.';
 
-		if ( $query instanceof Query ) {
+		if ( is_object( $query ) && property_exists( $query, 'alias' ) ) {
 			$aliasPrefix = $query->alias . $aliasPrefix;
 		}
 
@@ -465,19 +478,35 @@ class Query {
 	}
 
 	/**
-	 * If a column is already aliased, return the column
-	 * Otherwise add the alias
+	 * Adds a prefix to the column alias
+	 *
+	 * @param string     $column the column
+	 * @param Query|Join $query  the associated query
+	 *
+	 * @return string
+	 */
+	public static function _maybePrefixAlias( $column, $query = null ) {
+		// if it's nto a simple column, we can't simply add the alias to the column
+		if ( ! self::isSimpleColumn( $column ) ) {
+			return $column;
+		}
+
+		if ( self::isAliased( $column, $query ) ) {
+			return $column;
+		}
+
+		return "$query->alias.$column";
+	}
+
+	/**
+	 * If a column is already aliased, return the column. Otherwise, add the alias.
 	 *
 	 * @param $column string
 	 *
 	 * @return string
 	 */
 	public function maybePrefixAlias( $column ) {
-		if ( self::isAliased( $column, $this ) ) {
-			return $column;
-		}
-
-		return "$this->alias.$column";
+		return self::_maybePrefixAlias( $column, $this );
 	}
 
 	protected function _alias() {
