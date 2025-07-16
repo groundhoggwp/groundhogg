@@ -235,6 +235,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 	protected function get_tabs() {
 		$tabs = [
 			[
+				'name' => __( 'Tools', 'groundhogg' ),
+				'slug' => 'misc',
+				'cap'  => 'manage_options'
+			],
+			[
 				'name' => __( 'System Info & Debug' ),
 				'slug' => 'system',
 				'cap'  => 'manage_options'
@@ -252,11 +257,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Cron Setup', 'groundhogg' ),
 				'slug' => 'cron',
-				'cap'  => 'manage_options'
-			],
-			[
-				'name' => __( 'Misc', 'groundhogg' ),
-				'slug' => 'misc',
 				'cap'  => 'manage_options'
 			],
 			[
