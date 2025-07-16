@@ -818,7 +818,7 @@ class HTML {
 			'option_none_value' => '',
 		) );
 
-		$selected = wp_parse_list( $a['selected'] );
+		$selected = maybe_explode( $a['selected'] );
 
 		$optionHTML = [];
 

@@ -580,7 +580,7 @@ class Contact_Query extends Table_Query {
 			'country' => ''
 		] );
 
-		$countries = wp_parse_list( $filter['country'] );
+		$countries = maybe_explode( $filter['country'] );
 
 		if ( empty( $countries ) ) {
 			return;
@@ -605,7 +605,7 @@ class Contact_Query extends Table_Query {
 			'region' => ''
 		] );
 
-		$regions = wp_parse_list( $filter['region'] );
+		$regions = maybe_explode( $filter['region'] );
 
 		if ( empty( $regions ) ) {
 			return;
@@ -630,7 +630,7 @@ class Contact_Query extends Table_Query {
 			'city' => []
 		] );
 
-		$cities = wp_parse_list( $filter['city'] );
+		$cities = maybe_explode( $filter['city'] );
 
 		if ( empty( $cities ) ) {
 			return;

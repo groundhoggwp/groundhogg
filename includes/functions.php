@@ -7225,7 +7225,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 	} else if ( is_string( $maybe_tags ) ) {
 		// it's a comma separated list
 		if ( str_contains( $maybe_tags, ',' ) ) {
-			$tags = parse_tag_list( wp_parse_list( $maybe_tags ), 'tags' );
+			$tags = parse_tag_list( maybe_explode( $maybe_tags ), 'tags' );
 		} else {
 
 			// if create is true, use the query and create method, otherwise use the slug
