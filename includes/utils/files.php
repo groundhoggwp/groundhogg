@@ -246,6 +246,10 @@ class Files {
 	 */
 	function safe_file_upload( &$file, $allowed_mime_types, $folder, $sideload = false ) {
 
+		if ( empty( $file ) ) {
+			return new WP_Error( 'empty_file', 'No file was provided.' );
+		}
+
 		if ( ! function_exists( '_wp_handle_upload' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/file.php' );
 		}
