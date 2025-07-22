@@ -8,6 +8,7 @@ use Groundhogg\Properties;
 use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\add_redaction;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\array_find;
 use function Groundhogg\array_to_atts;
@@ -1337,7 +1338,11 @@ class Form_v2 extends Step {
 				},
 				'retrieve' => function ( Submission $submission, $field ) {
 					$value    = standard_meta_retrieve( $submission, $field );
-					$dateTime = new DateTimeHelper( $value );
+					try {
+						$dateTime = new DateTimeHelper( $value );
+					} catch (\Throwable $e){
+						return '';
+					}
 
 					return $dateTime->wpDateFormat();
 				}
@@ -2343,9 +2348,17 @@ class Form_v2 extends Step {
 				continue;
 			}
 
+			$label = isset_not_empty( $field, 'label' ) ? $field['label'] : ( $field['name'] ?? $field['type'] );
+			$value = $this->retrieve_field_submission_answer( $submission, $field );
+
+			// maybe redact the value from email logs
+			if ( isset_not_empty( $field, 'redact' ) ){
+				add_redaction( $value );
+			}
+
 			$answers[] = [
-				'label' => isset_not_empty( $field, 'label' ) ? $field['label'] : ( $field['name'] ?? $field['type'] ),
-				'value' => $this->retrieve_field_submission_answer( $submission, $field )
+				'label' => $label,
+				'value' => $value,
 			];
 		}
 
