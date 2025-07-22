@@ -321,10 +321,7 @@ class Guided_Setup extends Admin_Page {
 	 * The main output
 	 */
 	public function page() {
-		?>
-        <div id="guided-setup">
-
-        </div><?php
+		?><div id="guided-setup"></div><?php
 	}
 
 	/**
@@ -354,9 +351,9 @@ class Guided_Setup extends Admin_Page {
 		];
 
 		$integrations = License_Manager::get_store_products( [ 'category' => 'integrations' ] )->products;
-		$integrations = array_values( array_filter( $integrations, function ( $integration ) use ( $integrations_installed ) {
+		$integrations = is_array( $integrations ) ? array_values( array_filter( $integrations, function ( $integration ) use ( $integrations_installed ) {
 			return get_array_var( $integrations_installed, $integration->info->id ) && ! Extension::installed( $integration->info->id );
-		} ) );
+		} ) ) : [];
 
 		$smtp_services = License_Manager::get_store_products( [ 'tag' => 'sending-service' ] )->products;
 
@@ -367,8 +364,8 @@ class Guided_Setup extends Admin_Page {
 		wp_enqueue_editor();
 
 		$setup = [
-			'smtpProducts'                 => $smtp_services,
-			'integrations'                 => $integrations,
+			'smtpProducts'                 => $smtp_services ?: [],
+			'integrations'                 => $integrations ?: [],
 			'mailhawkInstalled'            => defined( 'MAILHAWK_VERSION' ),
 			'install_mailhawk_nonce'       => wp_create_nonce( 'install_mailhawk' ),
 			'install_plugins_nonce'        => wp_create_nonce( 'install_plugins' ),

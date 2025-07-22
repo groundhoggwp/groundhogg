@@ -564,7 +564,8 @@ class License_Manager {
 	 * @return bool
 	 */
 	public static function get_version( $item_id, $license ) {
-		$api_params = array(
+
+        $api_params = array(
 			'edd_action' => 'get_version',
 			'license'    => $license,
 			'item_id'    => $item_id,
@@ -599,11 +600,6 @@ class License_Manager {
 	 * @return array|mixed|object
 	 */
 	public static function get_store_products( $args = array() ) {
-		$key = md5( serialize( $args ) );
-
-		if ( get_transient( "gh_store_products_{$key}" ) ) {
-			return get_transient( "gh_store_products_{$key}" );
-		}
 
 		$args = wp_parse_args( $args, array(
 			//'category' => 'templates',
@@ -616,17 +612,7 @@ class License_Manager {
 
 		$url = 'https://www.groundhogg.io/edd-api/v2/products/';
 
-		$response = wp_remote_get( add_query_arg( $args, $url ) );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$products = json_decode( wp_remote_retrieve_body( $response ) );
-
-		set_transient( "gh_store_products_{$key}", $products, WEEK_IN_SECONDS );
-
-		return $products;
+		return remote_post_json( add_query_arg( $args, $url ), null, 'GET', [], false, DAY_IN_SECONDS );
 	}
 
 	/**
