@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.2.2
+Stable tag: 4.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -354,8 +354,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.2.2 (2025-07-08) =
+= 4.2.3 (2025-07-08) =
+* ADDED The new `{redact}` replacement code that will redact details from email logs. You can also use the function `Groundhogg\add_redaction( "my text" );` to add redactions programmatically.
+* TWEAKED Re-ordered the tools page tabs so that sync tools appear first.
 * FIXED Some search filters requiring joins with 3rd party tables not working if join column is not correctly aliased.
+* FIXED Dropdown fields not showing as pre-filled if the current value in the contact record contained a space.
 
 = 4.2.2.1 (2025-07-07) =
 * FIXED Fatal error when uploading new contact CSV import.
