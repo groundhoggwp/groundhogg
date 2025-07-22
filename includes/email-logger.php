@@ -108,9 +108,9 @@ class Email_Logger {
 		$log_data = [
 			'recipients'      => $recipients,
 			'from_address'    => $phpmailer->From,
-			'subject'         => $phpmailer->Subject,
-			'content'         => $phpmailer->Body,
-			'altbody'         => $phpmailer->AltBody,
+			'subject'         => redact( $phpmailer->Subject ?? '' ),
+			'content'         => redact( $phpmailer->Body ?? '' ),
+			'altbody'         => redact( $phpmailer->AltBody ?? ''),
 			'headers'         => $headers,
 			'message_type'    => \Groundhogg_Email_Services::get_current_message_type(),
 			'email_service'   => \Groundhogg_Email_Services::get_current_email_service(),

@@ -591,6 +591,14 @@ class Replacements implements \JsonSerializable {
 				'code'         => 'this_flow',
 				'callback'     => [ $this, 'replacement_this_flow' ],
 			],
+			[
+				'group'        => 'formatting',
+				'default_args' => 'text',
+				'name'         => __( 'Redact Text', 'groundhogg' ),
+				'description'  => _x( 'Redacts included text from any logging.', 'replacement', 'groundhogg' ),
+				'code'         => 'redact',
+				'callback'     => [ $this, 'replacement_redact' ],
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -2857,6 +2865,24 @@ class Replacements implements \JsonSerializable {
 		$replacements = $flow->get_meta( 'replacements' );
 		return get_array_var( $replacements, $key, '' );
 	}
+
+	/**
+     * Accepts text and adds that text to the current redactor
+     *
+	 * @param $text
+	 *
+	 * @return string
+	 */
+	public function replacement_redact( $text = '') {
+
+        if ( ! is_string( $text ) ){
+            return '';
+        }
+
+        add_redaction( $text );
+
+        return $text;
+    }
 
 	/**
 	 * We don't want this to be serialized

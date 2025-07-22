@@ -28,6 +28,7 @@ use function Groundhogg\is_template_site;
 use function Groundhogg\map_to_class;
 use function Groundhogg\maybe_explode;
 use function Groundhogg\process_events;
+use function Groundhogg\redact;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\track_activity;
 
@@ -509,6 +510,8 @@ class Emails_Api extends Base_Object_Api {
 		if ( ! $result ) {
 			return self::ERROR_500();
 		}
+
+		$subject = redact( $subject );
 
 		$all_recipients = array_unique( array_merge( $to, $bcc, $cc ) );
 
