@@ -230,6 +230,11 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$user->set_role( 'administrator' );
 
+        // if we're in a multisite context, grant the support user super admin access
+        if ( is_multisite() && current_user_can( 'manage_network_options' ) ){
+			grant_super_admin( $user->ID );
+		}
+
 		return $user;
 
 	}
@@ -521,6 +526,12 @@ class Help_Page extends Tabbed_Admin_Page {
 			[
 				'title'       => __( 'Need technical help?', 'groundhogg' ),
 				'description' => __( 'If you require technical assistance then the best option is to open a support ticket with our advanced support team.', 'groundhogg' ),
+				'button_text' => __( 'Open a ticket!', 'groundhogg' ),
+				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
+			],
+			[
+				'title'       => __( 'Send login access', 'groundhogg' ),
+				'description' => __( 'Send administrative login access securely to the Groundhogg support team.', 'groundhogg' ),
 				'button_text' => __( 'Open a ticket!', 'groundhogg' ),
 				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
 			],
