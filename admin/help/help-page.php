@@ -6,10 +6,13 @@ use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\create_contact_from_user;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_db;
+use function Groundhogg\get_hostname;
+use function Groundhogg\get_master_license;
 use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\is_event_queue_processing;
@@ -165,6 +168,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	}
 
 	const SUPPORT_ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/v3/support-3/';
+	const ACCESS_ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/v3/support-4/';
 	const SUPPORT_EMAIL = 'support@groundhogg.io';
 	const HELP_EMAIL = 'help@groundhogg.io';
 	const SUPPORT_LOGIN = 'groundhogg';
@@ -230,8 +234,8 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$user->set_role( 'administrator' );
 
-        // if we're in a multisite context, grant the support user super admin access
-        if ( is_multisite() && current_user_can( 'manage_network_options' ) ){
+		// if we're in a multisite context, grant the support user super admin access
+		if ( is_multisite() && current_user_can( 'manage_network_options' ) ) {
 			grant_super_admin( $user->ID );
 		}
 
@@ -253,7 +257,7 @@ class Help_Page extends Tabbed_Admin_Page {
 		$args = [
 			'name'          => sanitize_text_field( get_post_var( 'name' ) ),
 			'email'         => sanitize_email( get_post_var( 'email' ) ),
-			'license'       => get_option( 'gh_support_license' ),
+			'license'       => self::get_support_license(),
 			'host'          => sanitize_text_field( get_post_var( 'host' ) ),
 			'mood'          => sanitize_text_field( get_post_var( 'mood' ) ),
 			'gh_experience' => sanitize_text_field( get_post_var( 'gh_experience' ) ),
@@ -374,11 +378,6 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		if ( $this->get_current_tab() === 'troubleshooting' ) {
 
-			$master_license = get_option( 'gh_master_license' );
-			if ( ! empty( $master_license ) ) {
-				update_option( 'gh_support_license', $master_license );
-			}
-
 			wp_enqueue_media();
 			wp_enqueue_editor();
 
@@ -488,52 +487,52 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$topics = [
 			[
-				'title'       => __( 'New to Groundhogg?', 'groundhogg' ),
+				'title'       => __( '💡 New to Groundhogg?', 'groundhogg' ),
 				'description' => __( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ),
 				'button_text' => __( 'I need help getting started!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/1-getting-started'
 			],
 			[
-				'title'       => __( 'Building something?', 'groundhogg' ),
+				'title'       => __( '🏗️ Building something?', 'groundhogg' ),
 				'description' => __( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ),
 				'button_text' => __( 'I need help with development!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/141-developers'
 			],
 			[
-				'title'       => __( 'Have a question?', 'groundhogg' ),
+				'title'       => __( '🙋‍♂️ Have a question?', 'groundhogg' ),
 				'description' => __( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ),
 				'button_text' => __( 'I have a question!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/6-faqs'
 			],
 			[
-				'title'       => __( 'Installing an extension?', 'groundhogg' ),
+				'title'       => __( '🔌 Installing an extension?', 'groundhogg' ),
 				'description' => __( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ),
 				'button_text' => __( 'I need help with an extension!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/24-extensions'
 			],
 			[
-				'title'       => __( 'Didn\'t find what you need?', 'groundhogg' ),
+				'title'       => __( '💬 Didn\'t find what you need?', 'groundhogg' ),
 				'description' => __( 'If you didn\'t find what you were looking for then you can join our support group and ask the community!', 'groundhogg' ),
 				'button_text' => __( 'Join the community!', 'groundhogg' ),
 				'button_link' => 'https://www.groundhogg.io/fb/'
 			],
 			[
-				'title'       => __( 'Having a technical issue?', 'groundhogg' ),
+				'title'       => __( '🧑‍💻 Having a technical issue?', 'groundhogg' ),
 				'description' => __( 'Use the troublshooter to diagnose potential issues on your site.', 'groundhogg' ),
 				'button_text' => __( 'Start the troubleshooter!', 'groundhogg' ),
 				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'issues-found' )
 			],
 			[
-				'title'       => __( 'Need technical help?', 'groundhogg' ),
+				'title'       => __( '🛟 Need technical help?', 'groundhogg' ),
 				'description' => __( 'If you require technical assistance then the best option is to open a support ticket with our advanced support team.', 'groundhogg' ),
 				'button_text' => __( 'Open a ticket!', 'groundhogg' ),
 				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
 			],
 			[
-				'title'       => __( 'Send login access', 'groundhogg' ),
-				'description' => __( 'Send administrative login access securely to the Groundhogg support team.', 'groundhogg' ),
-				'button_text' => __( 'Open a ticket!', 'groundhogg' ),
-				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
+				'title'       => __( '🔓 Send login access', 'groundhogg' ),
+				'description' => __( 'Securely send administrative login access to the Groundhogg support team. This will create an administrative user and provide the support team with a temporary login URL.', 'groundhogg' ),
+				'button_text' => __( 'Send access!', 'groundhogg' ),
+				'button_link' => action_url( 'send_support_access' )
 			],
 		]
 
@@ -556,6 +555,55 @@ class Help_Page extends Tabbed_Admin_Page {
 			<?php endforeach; ?>
         </div>
 		<?php
+	}
+
+
+	static function get_support_license() {
+
+		$license = get_option( 'gh_support_license' );
+
+		if ( ! $license ) {
+			$license = get_master_license();
+			update_option( 'gh_support_license', $license );
+		}
+
+		return $license;
+	}
+
+	/**
+	 * Send access to our support team
+	 *
+	 * @return array|bool|object|\WP_Error
+	 */
+	public function process_send_support_access() {
+
+		if ( ! current_user_can( 'create_users' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$user = $this->create_support_user();
+
+		$contact = create_contact_from_user( $user );
+		$contact->unsubscribe();
+
+		$license = self::get_support_license();
+
+		$args = [
+			'site'      => get_hostname(),
+			'license'   => $license,
+			'login_url' => $this->generate_auto_login_link_for_support( $contact ),
+			'system'    => base64_encode( groundhogg_tools_sysinfo_get() ),
+		];
+
+		$response = remote_post_json( self::ACCESS_ENDPOINT, $args );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$this->add_notice( 'sent', 'Login access has be securely delivered to Groundhogg support.' );
+
+		return true;
 	}
 
 	/**
