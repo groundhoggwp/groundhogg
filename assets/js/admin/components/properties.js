@@ -523,6 +523,17 @@
     properties = copyObject(properties)
     values = copyObject(values)
 
+    /**
+     * Ensure that a field name is not being used by another field
+     *
+     * @param name
+     * @param fieldId
+     * @returns {boolean}
+     */
+    function isInternalNameInUse (name, fieldId) {
+      return properties.fields.some(field => field.name === name && field.id !== fieldId)
+    }
+
     const removeGroup = (id) => {
 
       const { fields = [], groups = [] } = properties
@@ -660,6 +671,8 @@
 
     const addOrEditField = (newField, onDone) => {
 
+      let origField = Groundhogg.functions.jsonCopy(newField)
+
       const onAddFieldMount = () => {
 
         const sanitizeKey = (label) => {
@@ -679,13 +692,22 @@
 
         $('#property-field-label').on('input change', (e) => {
           let label = e.target.value
-          let name = sanitizeKey(label)
 
-          updateField({
-            label, name,
-          })
+          if (onDone === addField) {
+            let name = sanitizeKey(label)
 
-          $('#property-field-name').val(name)
+            updateField({
+              label,
+              name,
+            })
+
+            $('#property-field-name').val(name)
+          }
+          else {
+            updateField({
+              label,
+            })
+          }
         })
 
         $('#property-field-name').on('input change', (e) => {
@@ -712,7 +734,43 @@
           $('#property-field-type').focus()
         })
 
+        // save the data
         $('#create-property-field').on('click', (e) => {
+
+          // make sure the name isn't already in use though
+          if (isInternalNameInUse(newField.name, newField.id)) {
+            Groundhogg.element.errorDialog({
+              message: `The internal name <code>${ newField.name }</code> is already in use.`,
+            })
+            return
+          }
+
+          // if the name is changed from a previously created field,
+          // we might want to update the keys in the meta table as well
+          if (onDone !== addField && newField.name !== origField.name) {
+
+            // warning for now
+            dangerConfirmationModal({
+              // language=HTML
+              alert    : `<p>Changing the internal name of a custom field might break replacement code references and other uses.</p>
+              <p>Are you sure you want to continue?</p>`,
+              confirmText: 'Continue',
+              onConfirm: () => {
+                onDone(newField)
+                close()
+              },
+              onCancel: () => {
+                updateField({
+                  name: origField.name
+                })
+                $('#property-field-name').val( origField.name )
+              }
+            })
+
+            return
+
+          }
+
           onDone(newField)
           close()
         })
