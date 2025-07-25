@@ -1156,19 +1156,18 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
-	 * Filter by the custom activity
+	 * handler to filter by submissions
 	 *
 	 * @param       $filter
 	 * @param Where $where
 	 *
 	 * @return void
 	 */
-	public static function filter_form_submissions( $filter, Where $where ) {
+	public static function _filter_submissions( $filter, Where $where ) {
 
 		$filter = wp_parse_args( $filter, [
-			'step_id'      => '',
-			'form_type'    => '',
-			'name'         => '',
+			'step_id'      => [],
+			'type'         => '',
 			'meta_filters' => []
 		] );
 
@@ -1176,11 +1175,11 @@ class Contact_Query extends Table_Query {
 		$submissionQuery->setSelect( 'contact_id' );
 
 		if ( ! empty( $filter['step_id'] ) ) {
-			$submissionQuery->where->equals( 'step_id', $filter['step_id'] );
+			$submissionQuery->where->in( 'step_id', wp_parse_id_list( $filter['step_id'] ) );
 		}
 
-		if ( ! empty( $filter['form_type'] ) ) {
-			$submissionQuery->where->equals( 'type', $filter['form_type'] );
+		if ( ! empty( $filter['type'] ) ) {
+			$submissionQuery->where->equals( 'type', $filter['type'] );
 		}
 
 		Filters::mysqlDateTime( 'date_created', $filter, $submissionQuery->where() );
@@ -1198,6 +1197,53 @@ class Contact_Query extends Table_Query {
 		}
 
 		$where->in( 'ID', $submissionQuery );
+	}
+
+	/**
+	 * Filter by form submissions
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_form_submissions( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'form_id' => [],
+		] );
+
+		$filter['type']    = 'form';
+		$filter['step_id'] = wp_parse_id_list( $filter['form_id'] );
+		unset( $filter['form_id'] );
+
+		self::_filter_submissions( $filter, $where );
+	}
+
+	/**
+	 * Filter by submissions related to responses received from outgoing webhooks
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_webhook_response( $filter, Where $where ) {
+		$filter['type'] = 'webhook_response';
+		self::_filter_submissions( $filter, $where );
+	}
+
+	/**
+	 * Filter by submissions related to requests to webhook listeners
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_webhook_request( $filter, Where $where ) {
+		$filter['type'] = 'webhook';
+		self::_filter_submissions( $filter, $where );
 	}
 
 	/**
