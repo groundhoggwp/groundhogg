@@ -1058,6 +1058,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Get the outgoing email service that will be used by this email
+	 *
+	 * @return string
+	 */
+	public function get_outgoing_email_service() {
+		return $this->is_transactional() ? \Groundhogg_Email_Services::get_transactional_service() : \Groundhogg_Email_Services::get_marketing_service();
+	}
+
+	/**
 	 * Get the headers to send
 	 *
 	 * @return array
@@ -1081,11 +1090,17 @@ class Email extends Base_Object_With_Meta {
 		$defaults = [
 			'From'                     => $this->get_from_header(),
 			'Reply-To'                 => $this->get_reply_to_address(),
-			'Return-Path'              => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
 			'Content-Type'             => 'text/html; charset=UTF-8',
 			'Precedence'               => 'bulk',
 			'X-Auto-Response-Suppress' => 'AutoReply'
 		];
+
+		$outgoing_service = $this->get_outgoing_email_service();
+
+		// if we're using any of our API integrations, do not set the return path, it might cause issues, or even cause emails not to send at all.
+		if ( $outgoing_service === 'wp_mail' || $outgoing_service === 'smtp' ) {
+			$defaults['Return-Path'] = is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email();
+		}
 
 		// Do not add this header to transactional. Only add the header if we can tie it to an event
 		if ( ! $this->is_transactional() && $this->event && $this->event->exists() ) {
