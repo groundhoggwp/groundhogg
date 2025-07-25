@@ -276,7 +276,8 @@ class Web_Form extends Benchmark {
 			],
 			'enable_ajax'     => [
 				'default'  => false,
-				'sanitize' => 'boolval'
+				'sanitize' => 'boolval',
+				'initial'  => true
 			],
 			'accent_color'    => [
 				'default'  => '',
@@ -289,6 +290,7 @@ class Web_Form extends Benchmark {
 			'success_message' => [
 				'default'  => '',
 				'sanitize' => 'wp_kses_post',
+                'initial'  => __( 'Thanks! Check your inbox for further details.', 'groundhogg' )
 			],
 			'success_page'    => [
 				'default'  => '',
