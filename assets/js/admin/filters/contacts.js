@@ -2437,66 +2437,195 @@
 
   registerFilterGroup( 'submissions', 'Submissions' )
 
-  ContactFilterRegistry.registerFilter( createPastDateFilter( 'form_submissions', 'Form Submissions', 'submissions', {
-    edit: ({
-      form_id = '',
-      form_type = '',
+  const SubmissionMetaFilters = (meta_filters, updateFilter) => InputRepeater({
+    id      : 'submission-meta-filters',
+    rows    : meta_filters,
+    cells   : [
+      props => Input({
+        ...props,
+        placeholder: 'Field Name',
+      }),
+      ({
+        value,
+        ...props
+      }) => Select({
+        selected: value,
+        options : AllComparisons,
+        ...props,
+      }),
+      props => Input({
+        ...props,
+        placeholder: 'Value',
+      }),
+    ],
+    fillRow : () => [
+      '',
+      'equals',
+      '',
+    ],
+    onChange: rows => {
+      updateFilter({
+        meta_filters: rows,
+      })
+    },
+  })
+
+  ContactFilterRegistry.registerFilter(createPastDateFilter('form_submissions', 'Form Submissions', 'submissions', {
+    display: ({ form_id = [] }) => {
+
+      if (!form_id.length) {
+        return 'Submitted any form'
+      }
+
+      return `Submitted ${ orList(form_id.map(id => bold(Groundhogg.stores.forms.get(id).name))) }`
+    },
+    preload: ({
+      form_id = [],
+    }) => {
+      if (form_id.length) {
+        return Groundhogg.stores.forms.maybeFetchItems(form_id)
+      }
+    },
+    edit   : ({
+      form_id = [],
       meta_filters = [],
-      updateFilter = () => {}
+      updateFilter = () => {},
     }) => {
 
       return Fragment([
 
-        Input({
-          placeholder: 'ID',
-          id: 'form_id',
-          name: 'form_id',
-          value: form_id,
-          onChange: e => updateFilter({
-            form_id: e.target.value
-          })
-        }),
-
-        Input({
-          placeholder: 'Type',
-          id: 'type',
-          name: 'type',
-          value: form_type,
-          onChange: e => updateFilter({
-            form_type: e.target.value
-          })
-        }),
-
-        `<label>${ __('Filter by submission meta', 'groundhogg') }</label>`,
-        InputRepeater({
-          id: 'submission-meta-filters',
-          rows: meta_filters,
-          cells: [
-            props => Input({...props, placeholder: 'Key'}),
-            ({
-              value,
-              ...props
-            }) => Select({
-              selected: value,
-              options : AllComparisons,
-              ...props,
-            }),
-            props => Input({...props, placeholder: 'Value'}),
-          ],
-          fillRow: () => [
-            '',
-            'equals',
-            ''
-          ],
-          onChange: rows => {
-            updateFilter({
-              meta_filters: rows
+        ItemPicker({
+          id: 'select-form',
+          // label: '',
+          noneSelected: 'Any form',
+          fetchOptions: async search => {
+            let forms = await Groundhogg.stores.forms.fetchItems({
+              search,
             })
-          }
-        })
+
+            return forms.map(item => ( {
+              id  : item.ID,
+              text: item.name,
+            } ))
+          },
+          selected    : form_id.map(id => ( {
+            id,
+            text: Groundhogg.stores.forms.get(id).name,
+          } )),
+          onChange    : (items) => {
+            updateFilter({
+              form_id: items.map(item => item.id),
+            })
+          },
+        }),
+
+        `<label>${ __('Filter by fields', 'groundhogg') }</label>`,
+        SubmissionMetaFilters(meta_filters, updateFilter),
       ])
-    }
-  } ) )
+    },
+  }, {
+    form_id     : [],
+    meta_filters: [],
+  }))
+
+  const StepPicker = (type, step_id, updateFilter) => ItemPicker({
+    id: 'select-webhook',
+    // label: '',
+    noneSelected: 'Any webhook',
+    fetchOptions: async search => {
+      let steps = await Groundhogg.stores.steps.fetchItems({
+        search,
+        step_type: type,
+        status   : 'active',
+      })
+
+      return steps.map(item => ( {
+        id  : item.ID,
+        text: item.data.step_title,
+      } ))
+    },
+    selected    : step_id.map(id => ( {
+      id,
+      text: Groundhogg.stores.steps.get(id).data.step_title,
+    } )),
+    onChange    : (items) => {
+      updateFilter({
+        step_id: items.map(item => item.id),
+      })
+    },
+  })
+
+  if (typeof Groundhogg.rawStepTypes.http_post !== 'undefined') {
+    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_response', 'Webhook Response', 'submissions', {
+      display: ({ step_id = [] }) => {
+
+        if (!step_id.length) {
+          return 'Any webhook response'
+        }
+
+        return `Webhook response from ${ orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))) }`
+      },
+      preload: ({
+        step_id = [],
+      }) => {
+        if (step_id.length) {
+          return Groundhogg.stores.steps.maybeFetchItems(step_id)
+        }
+      },
+      edit   : ({
+        step_id = [],
+        meta_filters = [],
+        updateFilter = () => {},
+      }) => {
+
+        return Fragment([
+
+          StepPicker('http_post', step_id, updateFilter),
+
+          `<label>${ __('Filter by fields', 'groundhogg') }</label>`,
+          SubmissionMetaFilters(meta_filters, updateFilter),
+        ])
+      },
+    }, {
+      step_id     : [],
+      meta_filters: [],
+    }))
+  }
+
+  if (typeof Groundhogg.rawStepTypes.webhook_listener !== 'undefined') {
+    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_request', 'Webhook Request', 'submissions', {
+      display: ({ step_id = [] }) => {
+
+        if (!step_id.length) {
+          return 'Any webhook request'
+        }
+
+        return `Webhook request to ${ orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))) }`
+      },
+      preload: ({
+        step_id = [],
+      }) => {
+        if (step_id.length) {
+          return Groundhogg.stores.steps.maybeFetchItems(step_id)
+        }
+      },
+      edit   : ({
+        step_id = [],
+        meta_filters = [],
+        updateFilter = () => {},
+      }) => {
+
+        return Fragment([
+          StepPicker('webhook_listener', step_id, updateFilter),
+          `<label>${ __('Filter by fields', 'groundhogg') }</label>`,
+          SubmissionMetaFilters(meta_filters, updateFilter),
+        ])
+      },
+    }, {
+      step_id     : [],
+      meta_filters: [],
+    }))
+  }
 
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}
