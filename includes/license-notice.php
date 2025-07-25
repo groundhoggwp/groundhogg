@@ -83,14 +83,21 @@ class License_Notice {
 //		$license_page_url = in_array( self::HELPER_PLUGIN_ID, $installed ) ? admin_page_url( 'gh_extensions' ) : admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
 		$license_page_url = admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
 
+        $master_license = get_master_license();
+
 		?>
         <div class="notice notice-warning is-dismissible">
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
                  src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
             <p><?php printf( __( "<b>License your extensions!</b> Some of your premium extensions are missing a license key. Remember to add your license key to receive critical updates and support.", 'groundhogg' ) ); ?></p>
             <p>
-                <a class="gh-button primary small"
-                   href="<?php echo esc_url( $license_page_url ); ?>"><?php _e( "Set my license key!", 'groundhogg' ); ?></a>
+                <?php if ( $master_license ):?>
+                    <a class="gh-button primary small"
+                       href="<?php echo esc_url( action_url( 'activate_using_master_license', [ 'page' => 'gh_settings', 'tab' => 'extensions' ] ) ); ?>"><?php _e( "Activate using my license!", 'groundhogg' ); ?></a>
+	            <?php else: ?>
+                    <a class="gh-button primary small"
+                       href="<?php echo esc_url( $license_page_url ); ?>"><?php _e( "Set my license key!", 'groundhogg' ); ?></a>
+                <?php endif; ?>
                 <a class="gh-button primary text small" target="_blank"
                    href="<?php echo esc_url( 'https://groundhogg.io/pricing/' ); ?>"><?php _e( "Purchase a new license.", 'groundhogg' ); ?></a>
             </p>

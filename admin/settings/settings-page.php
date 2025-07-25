@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Api\V3\Base;
 use Groundhogg\Api\V4\Base_Api;
 use Groundhogg\Extension;
+use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
 use Groundhogg\Mailhawk;
 use Groundhogg\Plugin;
@@ -15,6 +16,7 @@ use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_any;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_master_license;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
@@ -26,6 +28,7 @@ use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\maybe_get_option_from_constant;
+use function Groundhogg\notices;
 use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -264,6 +267,10 @@ class Settings_Page extends Admin_Page {
 	 */
 	public function process_view() {
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
 		if ( get_request_var( 'activate_license' ) ) {
 
 			$licenses = get_request_var( 'license', [] );
@@ -274,6 +281,37 @@ class Settings_Page extends Admin_Page {
 
 			}
 		}
+	}
+
+	/**
+     * When the license notices is being annoying try an activate using the master license instead of requiring the user to add them manually.
+     *
+	 * @return bool|\WP_Error
+	 */
+	public function process_activate_using_master_license() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$master_license = get_master_license();
+		$licensed       = array_intersect( array_keys( License_Manager::get_extension_licenses() ), Extension_Upgrader::get_extension_ids() );
+		$installed      = array_intersect( array_values( Extension::$extension_ids ), Extension_Upgrader::get_extension_ids() );
+		$unlicensed     = array_unique( array_diff( $installed, $licensed ) );
+
+		$error = null;
+
+		foreach ( $unlicensed as $item_id ) {
+
+			$result = License_Manager::activate_license_quietly( $master_license, $item_id );
+
+			if ( is_wp_error( $result ) ) {
+				$error = $result;
+				notices()->add_user_notice( $result->get_error_message() );
+			}
+		}
+
+		return $error ?? true;
 	}
 
 	/**
@@ -375,14 +413,14 @@ class Settings_Page extends Admin_Page {
 
 		foreach ( $this->sections as $id => $section ) {
 
-            $has_callback = isset( $section['callback'] ) && is_callable( $section['callback'] );
+			$has_callback = isset( $section['callback'] ) && is_callable( $section['callback'] );
 
-            // filter out sections with no settings or callback.
-            if ( ! $has_callback && ! array_any( $this->settings, function ( $setting ) use ( $id ) {
-                return get_array_var( $setting, 'section' ) === $id;
-            } ) ){
-                continue;
-            }
+			// filter out sections with no settings or callback.
+			if ( ! $has_callback && ! array_any( $this->settings, function ( $setting ) use ( $id ) {
+					return get_array_var( $setting, 'section' ) === $id;
+				} ) ) {
+				continue;
+			}
 
 			$callback = array();
 
@@ -516,17 +554,17 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Danger Zone', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
-			'double_optin'            => [
+			'double_optin'          => [
 				'id'    => 'double_optin',
 				'title' => _x( 'Double Opt-in', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			],
-			'gdpr'            => [
+			'gdpr'                  => [
 				'id'    => 'gdpr',
 				'title' => _x( 'GDPR', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			],
-			'policies'            => [
+			'policies'              => [
 				'id'    => 'policies',
 				'title' => _x( 'Policies', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
@@ -578,7 +616,7 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'preferences_center'           => [
+			'preferences_center'    => [
 				'id'       => 'preferences_center',
 				'title'    => _x( 'Preferences Center', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
@@ -606,7 +644,7 @@ class Settings_Page extends Admin_Page {
                                         <div id="gh_custom_preference_fields"></div>
                                     </div>
                                     <p class="description" style="margin-top: 20px">
-	                                    <?php printf( __( 'Show additional fields on the <a href="%s" target="_blank">email preferences screen</a>.', 'groundhogg' ), managed_page_url( '/preferences/manage/' ) ) ?>
+										<?php printf( __( 'Show additional fields on the <a href="%s" target="_blank">email preferences screen</a>.', 'groundhogg' ), managed_page_url( '/preferences/manage/' ) ) ?>
                                     </p>
                                 </td>
                             </tr>
@@ -649,9 +687,9 @@ class Settings_Page extends Admin_Page {
 			unset( $sections['optin_status_tags'] );
 		}
 
-        if ( is_white_labeled() ){
-            unset( $sections['affiliate'] );
-        }
+		if ( is_white_labeled() ) {
+			unset( $sections['affiliate'] );
+		}
 
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
 	}
@@ -909,7 +947,7 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => get_option( 'admin_email' )
 				],
 			],
-			'gh_ignore_event_errors'    => [
+			'gh_ignore_event_errors'                 => [
 				'id'      => 'gh_ignore_event_errors',
 				'section' => 'event_notices',
 				'label'   => _x( 'Ignore Failed Events', 'settings', 'groundhogg' ),
@@ -955,7 +993,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				],
 			],
-			'gh_disable_page_tracking'              => [
+			'gh_disable_page_tracking'               => [
 				'id'      => 'gh_disable_page_tracking',
 				'section' => 'page_tracking',
 				'label'   => _x( 'Disable frontend page tracking', 'settings', 'groundhogg' ),
