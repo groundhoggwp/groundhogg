@@ -1474,7 +1474,6 @@ table.embed-options td {
   flex-basis: 150px;
 }
 .form-builder-main .fields-editor .form-fields .form-field .settings .row > .setting, .form-builder-main .fields-editor .special-fields .form-field .settings .row > .setting {
-  width: 100%;
   display: flex;
   justify-content: flex-end;
 }
