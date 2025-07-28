@@ -8926,15 +8926,33 @@ function redact_meta_table( $table ) {
 
     $time = time();
 
-	// do redactions
-	$sql = <<<SQL
-        UPDATE {$table_name} AS meta
-        JOIN {$table_name} AS expires
-          ON meta.$id_col = expires.$id_col
-          AND expires.meta_key = CONCAT('_redact_', meta.meta_key)
-        SET meta.meta_value = REGEXP_REPLACE(meta.meta_value, '[^[:space:]]', '█')
-        WHERE expires.meta_value < {$time}
-    SQL;
+
+	global $wpdb;
+
+	$mysql_version = $wpdb->db_version(); // e.g., "5.7.42" or "8.0.36"
+
+	if ( version_compare( $mysql_version, '8.0.4', '>=' ) ) {
+		// Use REGEXP_REPLACE
+		// do redactions
+		$sql = <<<SQL
+            UPDATE {$table_name} AS meta
+            JOIN {$table_name} AS expires
+              ON meta.$id_col = expires.$id_col
+              AND expires.meta_key = CONCAT('_redact_', meta.meta_key)
+            SET meta.meta_value = REGEXP_REPLACE(meta.meta_value, '[^[:space:]]', '█')
+            WHERE expires.meta_value < {$time}
+        SQL;
+	} else {
+		// Use REPEAT(█, CHAR_LENGTH(...))
+		$sql = <<<SQL
+            UPDATE {$table_name} AS meta
+            JOIN {$table_name} AS expires
+              ON meta.$id_col = expires.$id_col
+              AND expires.meta_key = CONCAT('_redact_', meta.meta_key)
+            SET meta.meta_value = REPEAT('█', CHAR_LENGTH(meta.meta_value))
+            WHERE expires.meta_value < {$time}
+        SQL;
+	}
 
 	$wpdb->query( $sql );
 

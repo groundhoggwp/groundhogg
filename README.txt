@@ -356,7 +356,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.2.3 (2025-07-08) =
 * ADDED The new `{redact}` replacement code that will redact details from email logs. You can also use the function `Groundhogg\add_redaction( "my text" );` to add redactions programmatically.
+* ADDED Form Submission, Webhook Request, and Webhook Response search filters to filter by historical submission data.
+* ADDED Redaction option for form fields in the advanced tab. Will automatically redact sensitive information from submissions and contact meta after desired time period.
 * TWEAKED Re-ordered the tools page tabs so that sync tools appear first.
+* TWEAKED Changing the label while editing an existing custom field does automatically edit the internal name.
+* TWEAKED When changing the internal name of an existing custom field a warning is shown.
 * FIXED Some search filters requiring joins with 3rd party tables not working if join column is not correctly aliased.
 * FIXED Dropdown fields not showing as pre-filled if the current value in the contact record contained a space.
 

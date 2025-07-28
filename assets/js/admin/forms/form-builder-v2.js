@@ -425,7 +425,7 @@
       onMount (field, updateField) {
         $('#should-redact').on('change', (e) => {
           updateField({
-            redact: e.target.checked,
+            redact: e.target.value,
           })
         })
       },

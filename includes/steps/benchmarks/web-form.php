@@ -196,6 +196,11 @@ class Web_Form extends Benchmark {
 			'checked'       => 'boolval',
 			'multiple'      => 'boolval',
 			'enabled'       => 'boolval',
+			'redact' => function ( $value ) {
+				$value = absint( $value );
+
+				return one_of( $value, [ 0, 1, 6, 12, 24 ] );
+			},
 			'file_types'    => function ( $value ) {
 				return array_map( 'sanitize_text_field', $value );
 			},
