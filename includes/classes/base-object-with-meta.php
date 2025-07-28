@@ -270,6 +270,18 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	}
 
 	/**
+	 * Schedule a meta key for redaction
+	 *
+	 * @param string $key
+	 * @param int    $ttl
+	 *
+	 * @return int
+	 */
+	public function schedule_meta_redaction( string $key, int $ttl ) {
+		return schedule_meta_redaction( $this->get_meta_db(), $this->get_id(), $key, $ttl );
+	}
+
+	/**
 	 * @return array
 	 */
 	public function get_as_array() {

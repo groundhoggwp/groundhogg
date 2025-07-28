@@ -404,16 +404,21 @@
     },
     redact   : {
       type: 'redact',
-      edit ({ redact = false }) {
+      edit ({ redact = 0 }) {
         //language=HTML
-        return `<label for="hide-label">Redact this field from submission records</label>
-        <div class="setting">${ toggle({
+        return `<label for="hide-label">Redact this field?</label>
+        <div class="setting">${ select({
             id       : 'should-redact',
             name     : 'should_redact',
             className: 'should-redact',
-            onLabel  : 'Yes',
-            offLabel : 'No',
-            checked  : redact,
+            options : {
+                0 : 'Don\'t redact',
+                1 : 'After 1 hour',
+                6 : 'After 6 hours',
+                12: 'After 12 hours',
+                24: 'After 1 day',
+            },
+            selected: redact,
         }) }
         </div>`
       },

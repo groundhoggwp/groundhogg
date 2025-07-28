@@ -19,6 +19,26 @@ class Cleanup_Actions {
 		add_action( 'groundhogg/cleanup', [ $this, 'purge_email_logs' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'handle_sent_broadcasts' ] );
 		add_action( 'groundhogg/cleanup', [ $this, 'notify_of_failed_events' ] );
+		add_action( 'groundhogg/cleanup', [ $this, 'redact_meta_tables' ] );
+	}
+
+	/**
+	 * Perform redactions on any meta tables that might have redactable data
+	 *
+	 * @return void
+	 */
+	public function redact_meta_tables() {
+
+		// do the redactions from the contacts meta table, and the submissions table
+		$tables = [
+			'contactmeta',
+			'submissionmeta',
+		];
+
+		foreach ( $tables as $table ) {
+			redact_meta_table( $table );
+		}
+
 	}
 
 	/**

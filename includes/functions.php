@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
+use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Form\Posted_Data;
@@ -4223,7 +4224,7 @@ function is_pro_features_active() {
 /**
  * Fetches the master license, if one is available
  *
- * @return void
+ * @return string
  */
 function get_master_license() {
 	return get_option( 'gh_master_license' );
@@ -8761,7 +8762,7 @@ function search_and_replace_in_file( $file_path, $search, $replace ) {
 }
 
 /**
- * Count the number of lines in a peric of text
+ * Count the number of lines in a piece of text
  *
  * @param $text
  *
@@ -8822,11 +8823,9 @@ function safe_user_id_sync( int $user_id = 0, int $contact_id = 0 ) {
 	}
 
 	// Update the user_id col from the ID in the table
-	$updated = $query->update( [
+	return $query->update( [
 		'user_id' => "$join->alias.ID"
 	] );
-
-	return $updated;
 }
 
 /**
@@ -8852,14 +8851,25 @@ add_action( 'groundhogg/event/run/before', fn() => redactor( true ) );
 add_action( 'retrieve_password_key', fn( $user_login, $key ) => add_redaction( $key ), 10, 2 );
 
 /**
+ * Returns the replacement for redaction of the provided value in any format
  *
+ * @param mixed $value
+ *
+ * @return mixed
+ */
+function get_redaction_replacement( $value ) {
+	return map_deep( $value, fn( $item ) => preg_replace( '/[^\s]/u', '█', $value ) );
+}
+
+/**
+ * Adds a redaction to the redactor so when redact() is used, it's redacted
  *
  * @param string $text
  *
  * @return void
  */
 function add_redaction( string $text ) {
-	redactor()->add( $text, str_repeat( '█', strlen( $text ) ) );
+	redactor()->add( $text, get_redaction_replacement( $text ) );
 }
 
 /**
@@ -8871,4 +8881,69 @@ function add_redaction( string $text ) {
  */
 function redact( string $text ) {
 	return redactor()->replace( $text );
+}
+
+/**
+ * Creates the redaction record for the meta in question
+ *
+ * @param Meta_DB $table
+ * @param int     $object_id
+ * @param string  $meta_key
+ * @param int     $ttl
+ *
+ * @return int the row ID of the newly created meta record
+ */
+function schedule_meta_redaction( Meta_DB $table, int $object_id, string $meta_key, int $ttl ) {
+
+	// delete any already schedule redactions for this key value pair
+	$table->delete( [
+		'meta_key'                  => "_redact_$meta_key",
+		$table->get_object_id_col() => $object_id,
+	] );
+
+	return $table->insert( [
+		'meta_key'                  => "_redact_$meta_key",
+		'meta_value'                => time() + $ttl,
+		$table->get_object_id_col() => $object_id,
+	] );
+}
+
+/**
+ * Given a table, update the various entries to be redacted based on the _redact_ timestamp
+ * It will also delete the _redact_ keys
+ *
+ * @param $table
+ *
+ * @return void
+ */
+function redact_meta_table( $table ) {
+
+	global $wpdb;
+
+	$table      = db()->get_db( $table );
+	$table_name = $table->table_name;
+	$id_col     = $table->get_object_id_col();
+
+    $time = time();
+
+	// do redactions
+	$sql = <<<SQL
+        UPDATE {$table_name} AS meta
+        JOIN {$table_name} AS expires
+          ON meta.$id_col = expires.$id_col
+          AND expires.meta_key = CONCAT('_redact_', meta.meta_key)
+        SET meta.meta_value = REGEXP_REPLACE(meta.meta_value, '[^[:space:]]', '█')
+        WHERE expires.meta_value < {$time}
+    SQL;
+
+	$wpdb->query( $sql );
+
+	// delete leftover _redact_ entries
+	$wpdb->query( "
+        DELETE FROM {$table_name}
+        WHERE meta_key LIKE '_redact_%'
+          AND meta_value < {$time}
+    " );
+
+	$table->cache_set_last_changed();
 }

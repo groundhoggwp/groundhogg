@@ -2248,6 +2248,31 @@ class Form_v2 extends Step {
 		$submission_data = array_merge( $data, $meta, $submission_additional );
 		$submission->add_posted_data( $submission_data );
 
+		// handle redactions
+		$redacted_fields = array_filter( $fields, fn( $field ) => isset_not_empty( $field, 'redact' ) );
+		foreach ( $redacted_fields as $field ) {
+
+			// identify the internal name used in the submission
+			if ( isset_not_empty( $field, 'name' ) ) {
+				$key = $field['name'];
+			} else if ( $field['type'] === 'custom_field' ) {
+				$property = Properties::instance()->get_field( $field['property'] );
+				if ( ! $property ) {
+					continue;
+				}
+				$key = $property['name'];
+			} else {
+				continue;
+			}
+
+			// ttl is provided in hours from the form settings
+			$ttl = absint( get_array_var( $field, 'redact', 1 ) ) * HOUR_IN_SECONDS;
+
+			// schedule redaction in both the contact and in the submission
+			$submission->schedule_meta_redaction( $key, $ttl );
+			$contact->schedule_meta_redaction( $key, $ttl );
+		}
+
 		/**
 		 * Trigger any benchmarks from here
 		 *
