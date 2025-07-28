@@ -354,7 +354,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.3 (2025-07-08) =
+= 4.2.3 (2025-07-28) =
 * ADDED The new `{redact}` replacement code that will redact details from email logs. You can also use the function `Groundhogg\add_redaction( "my text" );` to add redactions programmatically.
 * ADDED Form Submission, Webhook Request, and Webhook Response search filters to filter by historical submission data.
 * ADDED Redaction option for form fields in the advanced tab. Will automatically redact sensitive information from submissions and contact meta after desired time period.
