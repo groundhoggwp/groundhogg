@@ -115,6 +115,7 @@ class Block_Registry {
 			'offset'       => 0,
 			'include'      => [],
 			'exclude'      => [],
+			'queryId' => ''
 		] );
 
 		[
@@ -133,9 +134,7 @@ class Block_Registry {
 			$query->set( $args['tag_rel'] === 'all' ? 'tag__and' : 'tag__in', wp_parse_id_list( $args['tag'] ) );
 		}
 
-		$tax_query = [
-			'relation' => 'AND'
-		];
+		$tax_query = [];
 
 		$taxonomies = get_object_taxonomies( $post_type );
 
@@ -167,7 +166,10 @@ class Block_Registry {
 			}
 		}
 
-		$query->set( 'tax_query', $tax_query );
+		if ( ! empty( $tax_query ) ) {
+			$tax_query['relation'] = 'AND';
+			$query->set( 'tax_query', $tax_query );
+		}
 
 		if ( ! empty( $args['include'] ) ) {
 			$query->set( 'post__in', wp_parse_id_list( $args['include'] ) );
@@ -178,6 +180,25 @@ class Block_Registry {
 		}
 
 		$query->set( 'offset', absint( $args['offset'] ) );
+
+		// do query action so that the query can be modified
+		if ( $args['queryId'] ) {
+			$queryId = $args['queryId'];
+
+			/**
+			 * Allow filtering the query for the block content
+			 *
+			 * if you need to get the current contact within the hook, you can use the get_current_contact() function
+			 *
+			 * @param WP_Query $query the current query based on the ID
+			 * @param array    $block the current block attributes
+			 */
+			do_action_ref_array( "groundhogg/block_query/{$queryId}", [
+				&$query,
+				$this->cur_block
+			] );
+		}
+
 	}
 
 	/**
