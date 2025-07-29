@@ -357,6 +357,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 4.2.3.1 (2025-07-29) =
 * FIXED Missing developer action to filter the WP_Query associated with the query loop block.
 * FIXED Filter sanitization not correctly treating "0" as an integer.
+* FIXED Redaction for multi-line textarea not working.
 
 = 4.2.3 (2025-07-28) =
 * ADDED The new `{redact}` replacement code that will redact details from email logs. You can also use the function `Groundhogg\add_redaction( "my text" );` to add redactions programmatically.
