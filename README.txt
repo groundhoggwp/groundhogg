@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.3
+Stable tag: 4.2.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -353,6 +353,10 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.3.1 (2025-07-29) =
+* FIXED Missing developer action to filter the WP_Query associated with the query loop block.
+* FIXED Filter sanitization not correctly treating "0" as an integer.
 
 = 4.2.3 (2025-07-28) =
 * ADDED The new `{redact}` replacement code that will redact details from email logs. You can also use the function `Groundhogg\add_redaction( "my text" );` to add redactions programmatically.
