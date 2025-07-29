@@ -5828,8 +5828,8 @@ function sanitize_payload( $payload ) {
 
 		// Might be a float
 		// Might be int
-		// if first digit is 0, treat as string
-		if ( is_numeric( $param ) && ! str_starts_with( "$param", '0' ) ) {
+		// if first digit is 0, treat as string, but only if it's several digits
+		if ( is_numeric( $param ) && ! ( strlen( $param ) > 1 && str_starts_with( $param, '0' ) ) ) {
 
 			// No sanitization needed
 			if ( is_int( $param ) || is_float( $param ) ) {
@@ -8869,7 +8869,13 @@ function get_redaction_replacement( $value ) {
  * @return void
  */
 function add_redaction( string $text ) {
-	redactor()->add( $text, get_redaction_replacement( $text ) );
+
+	// we also need to cleverly handle newlines, because "\n" can become <br/> or <p>...</p> and that will cause the exact match to not work :/
+    // I think a cleaver way to handle this would be to split the newlines, and simply redact each single line separately
+    $lines = array_trim( explode( PHP_EOL, $text ) );
+    foreach ( $lines as $line ){
+	    redactor()->add( $line, get_redaction_replacement( $line ) );
+    }
 }
 
 /**
