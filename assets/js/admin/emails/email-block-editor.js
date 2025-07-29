@@ -8701,10 +8701,8 @@
             value   : queryId,
             onChange: e => updateBlock({ queryId: e.target.value }),
           })),
-        `<p>This allows you to filter this specific query with additional parameters.</p>`,
-
+        `<p>This allows you to filter this specific query with additional parameters. <a href="https://www.groundhogg.io/doc/custom-queries-for-the-posts-and-query-loop-blocks/" target="_blank">More info.</a></p>`,
       ])
-
   }
 
   // Register the post block
