@@ -5,6 +5,10 @@ namespace Groundhogg\DB\Traits;
 use Groundhogg\Event;
 use function Groundhogg\isset_not_empty;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 trait Event_Log {
 
 	/**

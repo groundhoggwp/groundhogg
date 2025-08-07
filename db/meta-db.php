@@ -151,7 +151,7 @@ abstract class Meta_DB extends DB {
 	public function delete_associated_meta( $where, $formats, $object_table ) {
 
 		// Same table problem for meta tables with same object type
-		if ( $object_table->table_name === $this->table_name ){
+		if ( $object_table->table_name === $this->table_name ) {
 			return false;
 		}
 

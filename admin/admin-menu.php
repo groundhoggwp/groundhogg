@@ -19,7 +19,7 @@ use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
-use function Groundhogg\admin_page_url;
+use WP_Admin_Bar;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_url_var;
@@ -28,8 +28,11 @@ use function Groundhogg\has_premium_features;
 use function Groundhogg\is_admin_bar_widget_disabled;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\white_labeled_name;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 /**
  * Admin Manager to manage databases in Groundhogg
@@ -111,7 +114,7 @@ class Admin_Menu {
 	/**
 	 * Add the admin bar widget
 	 *
-	 * @param $admin_bar \WP_Admin_Bar
+	 * @param $admin_bar WP_Admin_Bar
 	 */
 	public function admin_bar( $admin_bar ) {
 

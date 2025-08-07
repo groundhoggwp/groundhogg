@@ -9,7 +9,6 @@ use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\base64url_encode;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;

@@ -165,11 +165,11 @@ class Activity extends DB {
 
 		$this->packIP( $data );
 
-		if ( is_array( $row_id_or_where ) && ! empty( $row_id_or_where ) ){
+		if ( is_array( $row_id_or_where ) && ! empty( $row_id_or_where ) ) {
 			$this->packIP( $row_id_or_where );
 		}
 
-		if ( ! empty( $where ) ){
+		if ( ! empty( $where ) ) {
 			$this->packIP( $where );
 		}
 
@@ -226,7 +226,7 @@ class Activity extends DB {
 	 *
 	 * @return void
 	 */
-	public function update_3_4_2(){
+	public function update_3_4_2() {
 		$this->drop_indexes( [
 			'timestamp',
 			'funnel_id',

@@ -1,4 +1,8 @@
-<div class="gh-form-wrapper-beaver-builder">
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+?><div class="gh-form-wrapper-beaver-builder">
 	<?php
 	$form_id = intval( $settings->groundhogg_form_id );
 	if ( $form_id ) {

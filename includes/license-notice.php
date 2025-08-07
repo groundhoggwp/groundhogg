@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class License_Notice {
 
 	const CHECKOUT_URL = 'https://www.groundhogg.io/secure/checkout/';

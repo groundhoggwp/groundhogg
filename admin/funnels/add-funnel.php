@@ -105,7 +105,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <script>
       ( () => {
 
-        document.querySelector( 'a.page-title-action' ).insertAdjacentElement( 'beforebegin', document.getElementById( 'template-filters' ) )
+        document.querySelector('a.page-title-action').insertAdjacentElement('beforebegin', document.getElementById('template-filters'))
 
         let selected = '', search = ''
 
@@ -143,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="post-box-grid">
 			<?php foreach ( $funnel_templates as $template ):
 
-                /* @var $template Funnel */
+				/* @var $template Funnel */
 
 				$campaigns = array_map( function ( $campaign ) {
 					return $campaign->data->slug;
@@ -168,7 +168,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <span class="gh-tag"><?php esc_html_e( $campaign->data->name ); ?></span>
 							<?php endforeach; ?>
                         </div>
-                        <?php $template->flow_preview() ?>
+						<?php $template->flow_preview() ?>
                         <p><?php echo $template->get_meta( 'description' ); ?></p>
 						<?php if ( $template->is_premium ): ?>
                             <a style="margin-top: auto" class="gh-button primary text" href="https://groundhogg.io/pricing/" target="_blank"><?php _ex( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>

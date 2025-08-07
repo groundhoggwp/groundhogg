@@ -9,6 +9,8 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\Utils\DateTimeHelper;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Contact_Query extends Table_Query {
 
 	/**

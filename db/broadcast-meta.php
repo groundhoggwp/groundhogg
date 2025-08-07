@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Allows for the use of metadata api usage
  *
- * @package     Includes
+ * @since       File available since Release 2.2.17
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 2.2.17
+ * @package     Includes
  */
 class Broadcast_Meta extends Meta_DB {
 

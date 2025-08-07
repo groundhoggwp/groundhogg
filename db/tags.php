@@ -2,7 +2,6 @@
 
 namespace Groundhogg\DB;
 
-use function Groundhogg\isset_not_empty;
 use function Groundhogg\swap_array_keys;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -157,7 +156,7 @@ class Tags extends DB {
 				} else {
 
 					// Only add if the current user is allowed to do so.
-					if ( current_user_can( 'add_tags' ) ){
+					if ( current_user_can( 'add_tags' ) ) {
 						$tags[] = $this->add( array( 'tag_name' => sanitize_text_field( $tag_id_or_string ) ) );
 					}
 				}
@@ -214,12 +213,13 @@ class Tags extends DB {
 	 *
 	 * @access public
 	 *
-	 * @param string $field id or email
-	 * @param mixed $value The Customer ID or email to search
-	 *
-	 * @return mixed          Upon success, an object of the tag. Upon failure, NULL
 	 * @since  2.3
 	 *
+	 * @param mixed  $value The Customer ID or email to search
+	 *
+	 * @param string $field id or email
+	 *
+	 * @return mixed          Upon success, an object of the tag. Upon failure, NULL
 	 */
 	public function get_tag_by( $field = 'tag_id', $value = 0 ) {
 		if ( empty( $field ) || empty( $value ) ) {

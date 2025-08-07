@@ -25,6 +25,8 @@ use function Groundhogg\html;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\white_labeled_name;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 define( 'GROUNDHOGG_SAFE_MODE_INSTALLED', true );
 define( 'GROUNDHOGG_SAFE_MODE_COOKIE', 'gh-safe-mode' );
 

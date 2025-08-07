@@ -5,6 +5,10 @@ namespace Groundhogg\Admin\Reports\Views;
 use Groundhogg\Step;
 use function Groundhogg\get_url_var;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $step = new Step( get_url_var( 'step' ) );
 
 ?>

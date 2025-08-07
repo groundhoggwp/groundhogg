@@ -1,7 +1,10 @@
 <?php
 
 use Groundhogg\Contact;
-use function Groundhogg\html;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 /**
  * @var $contact Contact

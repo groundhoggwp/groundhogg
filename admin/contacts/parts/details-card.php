@@ -1,14 +1,20 @@
 <?php
 
+use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_email_address_hostname;
 use function Groundhogg\html;
 use function Groundhogg\is_free_email_provider;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 /**
- * @var $contact \Groundhogg\Contact
+ * @var $contact Contact
  */
 ?>
 
@@ -100,8 +106,8 @@ use function Groundhogg\is_free_email_provider;
                  title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
 				<?php dashicon_e( 'clock' ); ?><?php
 
-				$today   = new \Groundhogg\Utils\DateTimeHelper();
-				$local   = new \Groundhogg\Utils\DateTimeHelper( 'now', $contact->get_time_zone( false ) );
+				$today   = new DateTimeHelper();
+				$local   = new DateTimeHelper( 'now', $contact->get_time_zone( false ) );
 				$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->time_i18n() : $local->i18n();
 
 				?><span><?php
@@ -124,7 +130,7 @@ use function Groundhogg\is_free_email_provider;
 
 				$age = $contact->get_age();
 				$age1         = $age + 1;
-				$birthday     = new \Groundhogg\Utils\DateTimeHelper( $contact->get_meta( 'birthday' ) );
+				$birthday     = new DateTimeHelper( $contact->get_meta( 'birthday' ) );
 				$nextBirthday = ( clone $birthday )->modify( "+$age1 years" );
 
 				?>

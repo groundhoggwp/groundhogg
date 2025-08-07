@@ -2,18 +2,25 @@
 
 namespace Groundhogg\DB\Query;
 
+use Exception;
 use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use mysqli_result;
+use wpdb;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class Table_Query extends Query {
 
 	/**
-	 * @var \wpdb
+	 * @var wpdb
 	 */
 	protected $db;
 
@@ -59,13 +66,13 @@ class Table_Query extends Query {
 			'search_columns' => $this->db_table->get_searchable_columns(),
 		] );
 
-		foreach ( $params as $param => $value ){
+		foreach ( $params as $param => $value ) {
 			$param = strtolower( $param );
 
 			// handle column
-			if ( $this->db_table->has_column( $param ) ){
+			if ( $this->db_table->has_column( $param ) ) {
 
-				if ( is_array( $value ) ){
+				if ( is_array( $value ) ) {
 					$this->where->in( $param, $value );
 				} else {
 					$this->where->equals( $param, $value );
@@ -74,11 +81,11 @@ class Table_Query extends Query {
 				continue;
 			}
 
-			switch ( $param ){
+			switch ( $param ) {
 				case 's':
 				case 'search':
 				case 'term':
-					if ( ! empty( $value ) ){
+					if ( ! empty( $value ) ) {
 						$this->search( $value, wp_parse_list( $params['search_columns'] ) );
 					}
 					break;
@@ -145,9 +152,9 @@ class Table_Query extends Query {
 	public function setOrderby( ...$columns ) {
 
 		// Handle ordering by meta
-		$columns = array_map( function ( $column ){
+		$columns = array_map( function ( $column ) {
 
-			if ( ! is_string( $column ) || ! str_starts_with( $column, 'meta.' ) ){
+			if ( ! is_string( $column ) || ! str_starts_with( $column, 'meta.' ) ) {
 				return $column;
 			}
 
@@ -155,7 +162,7 @@ class Table_Query extends Query {
 
 			try {
 				$alias = $this->joinMeta( $meta_key );
-			} catch ( \Exception $e ){
+			} catch ( Exception $e ) {
 				return $column;
 			}
 
@@ -230,7 +237,7 @@ class Table_Query extends Query {
 
 	/**
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @param bool         $table
 	 * @param string|array $on
@@ -283,7 +290,7 @@ class Table_Query extends Query {
 		$join->onColumn( $meta_id_col, $table_id_col );
 		$join->conditions->equals( "$meta_table_alias.meta_key", $meta_key );
 
-		if ( empty( $this->groupby ) ){
+		if ( empty( $this->groupby ) ) {
 			$this->setGroupby( 'ID' );
 		}
 
@@ -294,7 +301,7 @@ class Table_Query extends Query {
 	/**
 	 * Delete using the current query
 	 *
-	 * @return bool|int|\mysqli_result|null
+	 * @return bool|int|mysqli_result|null
 	 */
 	public function delete() {
 
@@ -321,7 +328,7 @@ class Table_Query extends Query {
 	 *
 	 * @param $data
 	 *
-	 * @return bool|int|\mysqli_result|null
+	 * @return bool|int|mysqli_result|null
 	 */
 	public function update( $data ) {
 
@@ -342,8 +349,8 @@ class Table_Query extends Query {
 
 		foreach ( $data as $column => $value ) {
 
-			if ( $this->column_is_safe( $value ) ){
-				$fields[] ="`$column` = $value";
+			if ( $this->column_is_safe( $value ) ) {
+				$fields[] = "`$column` = $value";
 			} else {
 				$fields[] = $this->db->prepare( "`$column` = {$column_formats[$column]}", $value );
 			}
@@ -448,7 +455,7 @@ class Table_Query extends Query {
 	 *
 	 * @return int
 	 */
-	public function get_found_rows(){
+	public function get_found_rows() {
 
 		$cache_key   = $this->create_cache_key( __METHOD__ );
 		$cache_value = $this->db_table->cache_get( $cache_key, $found );
@@ -477,7 +484,7 @@ class Table_Query extends Query {
 		$items = $this->get_results();
 
 		// We should do this here because subsequent queries during object creation might impact
-		if ( $this->found_rows ){
+		if ( $this->found_rows ) {
 			$this->get_found_rows();
 		}
 

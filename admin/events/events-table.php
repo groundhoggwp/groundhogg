@@ -461,7 +461,7 @@ class Events_Table extends WP_List_Table {
 			if ( $event->is_funnel_event() ) {
 
 				$actions['edit'] = html()->a( admin_page_url( 'gh_funnels', [
-					'action'    => 'edit',
+					'action' => 'edit',
 					'funnel' => $event->get_funnel_id()
 				] ), _x( 'Edit Flow', 'action', 'groundhogg' ), [
 					'aria-label' => _x( 'Edit Flow', 'action', 'groundhogg' ),

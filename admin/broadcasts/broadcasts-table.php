@@ -178,8 +178,8 @@ class Broadcasts_Table extends WP_List_Table {
 		foreach ( $count as $c => $num ) {
 
 			if ( $num === 0 ) {
-        		continue;
-        	}
+				continue;
+			}
 
 			$view_content = $titles[ $c ];
 			$view_content .= " <span class='count'>(" . _nf( $num ) . ")</span>";

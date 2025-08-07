@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Contact;
 use Groundhogg\DB\Traits\Insert_Ignore;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -124,8 +125,8 @@ class Object_Relationships extends DB {
 	/**
 	 * update the secondary and primary based on non-existing relationships
 	 *
-	 * @param \Groundhogg\Contact $contact
-	 * @param \Groundhogg\Contact $other
+	 * @param Contact $contact
+	 * @param Contact $other
 	 */
 	public function contact_merged( $contact, $other ) {
 		$this->swap_relationships( 'primary', 'contact', $other->ID, $contact->ID );

@@ -5,6 +5,8 @@ namespace Groundhogg\Admin\Emails;
 use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Email;
+use Groundhogg_Email_Services;
+use WP_Error;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
@@ -47,7 +49,7 @@ class Emails_Page extends Admin_Page {
 		if ( $this->is_current_page() && in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 		}
-    }
+	}
 
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
@@ -95,7 +97,7 @@ class Emails_Page extends Admin_Page {
 
 			$email_id = absint( Groundhogg\get_request_var( 'email' ) );
 			$email    = new Email( $email_id );
-            $email->enable_test_mode();
+			$email->enable_test_mode();
 
 			if ( ! $email->exists() ) {
 				$email->title = 'My new email';
@@ -106,7 +108,7 @@ class Emails_Page extends Admin_Page {
 				'email'    => $email
 			] );
 
-            Groundhogg\use_edit_lock( $email );
+			Groundhogg\use_edit_lock( $email );
 		}
 
 		if ( $this->current_action_is( 'view' ) ) {
@@ -122,8 +124,8 @@ class Emails_Page extends Admin_Page {
 					'message_type' => [
 						'Message Type',
 						[
-							\Groundhogg_Email_Services::MARKETING     => 'Marketing',
-							\Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+							Groundhogg_Email_Services::MARKETING     => 'Marketing',
+							Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
 						]
 					]
 				]
@@ -222,7 +224,7 @@ class Emails_Page extends Admin_Page {
 	/**
 	 * Duplicate an email
 	 *
-	 * @return string|\WP_Error
+	 * @return string|WP_Error
 	 */
 	public function process_duplicate() {
 		if ( ! current_user_can( 'add_emails' ) ) {
@@ -234,14 +236,14 @@ class Emails_Page extends Admin_Page {
 		$email = new Email( $email_id );
 
 		if ( ! $email->exists() ) {
-			return new \WP_Error( 'error', 'Email does not exist.' );
+			return new WP_Error( 'error', 'Email does not exist.' );
 		}
 
 		$new = $email->duplicate();
 
-        if ( ! $new->exists() ){
-	        return new \WP_Error( 'error', 'Failed to duplicate email' );
-        }
+		if ( ! $new->exists() ) {
+			return new WP_Error( 'error', 'Failed to duplicate email' );
+		}
 
 		return $new->admin_link();
 	}
@@ -281,7 +283,7 @@ class Emails_Page extends Admin_Page {
 	/**
 	 * Delete an email
 	 *
-	 * @return false|\WP_Error
+	 * @return false|WP_Error
 	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_emails' ) ) {
@@ -345,7 +347,7 @@ class Emails_Page extends Admin_Page {
 		$email = new Email( absint( get_url_var( 'email' ) ) );
 
 		if ( ! $email->exists() ) {
-			return new \WP_Error( 'error', 'Email could not be exported.' );
+			return new WP_Error( 'error', 'Email could not be exported.' );
 		}
 
 		Groundhogg\download_json( $email, $email->get_title() );
@@ -357,12 +359,12 @@ class Emails_Page extends Admin_Page {
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
 
-	        <?php if ( ! get_url_var( 'include_filters' ) ):
-		        echo html()->input( [
-			        'type' => 'hidden',
-			        'name' => 'include_filters'
-		        ] );
-	        endif; ?>
+			<?php if ( ! get_url_var( 'include_filters' ) ):
+				echo html()->input( [
+					'type' => 'hidden',
+					'name' => 'include_filters'
+				] );
+			endif; ?>
 
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
 

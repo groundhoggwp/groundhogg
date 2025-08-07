@@ -4,6 +4,10 @@ namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Contact;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 /**
  * Created by PhpStorm.
  * User: adria

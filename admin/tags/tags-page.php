@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Tags;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\Tag;
+use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -74,20 +75,20 @@ class Tags_Page extends Admin_Page {
 		}
 	}
 
-    protected function get_title_actions() {
+	protected function get_title_actions() {
 
-        if ( $this->get_current_action() === 'view' ) {
-            return [];
-        }
+		if ( $this->get_current_action() === 'view' ) {
+			return [];
+		}
 
-	    return [
-		    [
-			    'link'   => $this->admin_url( [ 'action' => 'view' ] ),
-			    'action' => __( 'Add New', 'groundhogg' ),
-			    'target' => '_self',
-		    ]
-	    ];
-    }
+		return [
+			[
+				'link'   => $this->admin_url( [ 'action' => 'view' ] ),
+				'action' => __( 'Add New', 'groundhogg' ),
+				'target' => '_self',
+			]
+		];
+	}
 
 	public function view() {
 
@@ -185,7 +186,7 @@ class Tags_Page extends Admin_Page {
 	/**
 	 * Add Tag Process
 	 *
-	 * @return \WP_Error|true|false
+	 * @return WP_Error|true|false
 	 */
 	public function process_add() {
 
@@ -210,7 +211,7 @@ class Tags_Page extends Admin_Page {
 			}
 
 			if ( empty( $ids ) ) {
-				return new \WP_Error( 'unable_to_add_tags', "Something went wrong adding the tags." );
+				return new WP_Error( 'unable_to_add_tags', "Something went wrong adding the tags." );
 			}
 
 			$this->add_notice( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
@@ -220,7 +221,7 @@ class Tags_Page extends Admin_Page {
 			$tag_name = trim( sanitize_text_field( get_post_var( 'tag_name' ) ) );
 
 			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-				return new \WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
+				return new WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
 			}
 
 			$tag_desc = sanitize_textarea_field( get_post_var( 'tag_description' ) );
@@ -231,7 +232,7 @@ class Tags_Page extends Admin_Page {
 			] );
 
 			if ( ! $id ) {
-				return new \WP_Error( 'unable_to_add_tag', "Something went wrong adding the tag." );
+				return new WP_Error( 'unable_to_add_tag', "Something went wrong adding the tag." );
 			}
 
 			do_action( 'groundhogg/admin/tags/add', $id );
@@ -244,7 +245,7 @@ class Tags_Page extends Admin_Page {
 	}
 
 	/**
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_edit() {
 
@@ -257,7 +258,7 @@ class Tags_Page extends Admin_Page {
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
 		if ( strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-			return new \WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
+			return new WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
 		}
 		$args = array(
 			'tag_name'        => $tag_name,
@@ -278,7 +279,7 @@ class Tags_Page extends Admin_Page {
 	/**
 	 * Delete tags from the admin
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_tags' ) ) {
@@ -290,7 +291,7 @@ class Tags_Page extends Admin_Page {
 			$tag = new Tag( $id );
 
 			if ( ! $tag->delete() ) {
-				return new \WP_Error( 'unable_to_delete_tag', "Something went wrong deleting the tag." );
+				return new WP_Error( 'unable_to_delete_tag', "Something went wrong deleting the tag." );
 			}
 		}
 

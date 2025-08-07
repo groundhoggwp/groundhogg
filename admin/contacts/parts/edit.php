@@ -2,13 +2,8 @@
 namespace Groundhogg\Admin\Contacts;
 
 // Exit if accessed directly
-use Groundhogg\Plugin;
-use function Groundhogg\current_user_is;
-use function Groundhogg\dashicon_e;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
-use function Groundhogg\html;
-use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <script>
-  (($) => {
+  ( ($) => {
 
     $('#quick-add').on('click', (e) => {
       e.preventDefault()
@@ -24,10 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
       Groundhogg.components.addContactModal({
         onCreate: (c) => {
           window.location.href = c.admin
-        }
+        },
       })
     })
-  })(jQuery)
+  } )(jQuery)
 </script>
 <?php
 
@@ -46,10 +41,10 @@ if ( ! current_user_can( 'view_contact', $contact ) ) {
 
 ?>
 <div class="contact-record">
-	<div class="contact-editor-wrap">
+    <div class="contact-editor-wrap">
 		<?php include __DIR__ . '/contact-editor.php'; ?>
-	</div>
-	<div class="contact-info-cards">
+    </div>
+    <div class="contact-info-cards">
 		<?php Info_Cards::display( $contact ); ?>
-	</div>
+    </div>
 </div>

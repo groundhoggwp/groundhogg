@@ -4,6 +4,8 @@ namespace Groundhogg;
 
 use Groundhogg\Bulk_Jobs\Bulk_Job;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Tag_Mapping extends Bulk_Job {
 
 	const MARKETABLE = 'marketable';

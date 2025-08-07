@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Reports;
 
+use DateTime;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Reports;
 use Groundhogg\Utils\DateTimeHelper;
@@ -11,13 +12,13 @@ use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
-use function Groundhogg\groundhogg_icon;
-use function Groundhogg\groundhogg_logo;
 use function Groundhogg\header_icon;
-use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\set_cookie;
-use function Groundhogg\white_labeled_name;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Reports_Page extends Tabbed_Admin_Page {
 
@@ -409,17 +410,17 @@ class Reports_Page extends Tabbed_Admin_Page {
         <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo $this->get_title(); ?></h1>
-	        <?php $this->range_picker(); ?>
+			<?php $this->range_picker(); ?>
         </div>
 		<?php $this->do_page_tabs(); ?>
         <script>
-          const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
-          const parent = pageHeader.parentElement; // Get the parent element
-          const tabs = pageHeader.nextElementSibling; // Get the parent element
+          const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+          const parent = pageHeader.parentElement // Get the parent element
+          const tabs = pageHeader.nextElementSibling // Get the parent element
 
           if (parent) {
-            parent.prepend(tabs); // Move the element to the first child position
-            parent.prepend(pageHeader); // Move the element to the first child position
+            parent.prepend(tabs) // Move the element to the first child position
+            parent.prepend(pageHeader) // Move the element to the first child position
           }
         </script>
         <div class="wrap blurred">
@@ -532,8 +533,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$start = new \DateTime( get_post_var( 'start' ) . ' 00:00:00', wp_timezone() );
-		$end   = new \DateTime( get_post_var( 'end' ) . ' 23:59:59', wp_timezone() );
+		$start = new DateTime( get_post_var( 'start' ) . ' 00:00:00', wp_timezone() );
+		$end   = new DateTime( get_post_var( 'end' ) . ' 23:59:59', wp_timezone() );
 
 		$saved = [
 			'start_date' => $start->format( 'Y-m-d' ),

@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class User_Syncing {
 
 	public function __construct() {

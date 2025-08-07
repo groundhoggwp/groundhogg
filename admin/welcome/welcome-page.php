@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg_Email_Services;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\db;
 use function Groundhogg\files;
@@ -12,7 +13,6 @@ use function Groundhogg\has_premium_features;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
-use function Groundhogg\notices;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
@@ -134,7 +134,7 @@ class Welcome_Page extends Admin_Page {
 			$smtp_fix_link = admin_page_url( 'mailhawk' );
 
 		// The number of registered services is > 1, means that an integration is installed.
-        elseif ( count( \Groundhogg_Email_Services::get() ) > 1 ):
+        elseif ( count( Groundhogg_Email_Services::get() ) > 1 ):
 			$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
 
 		// No other service is currently in use.
@@ -161,7 +161,7 @@ class Welcome_Page extends Admin_Page {
 			[
 				'title'       => __( 'Integrate a verified SMTP service', 'groundhogg' ),
 				'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
-				'completed'   => \Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
+				'completed'   => Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
 				'fix'         => $smtp_fix_link,
 				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins'
 			],
@@ -206,28 +206,28 @@ class Welcome_Page extends Admin_Page {
 				'more'        => ''
 			];
 
-            if ( defined( 'GROUNDHOGG_HELPER_VERSION' ) ) {
-	            $checklist_items[] = [
-		            'title'       => __( 'Install the Advanced Features add-on', 'groundhogg' ),
-		            'description' => __( 'The Advanced Features addon includes a variety of tools and that improve Groundhogg.', 'groundhogg' ),
-		            'completed'   => defined( 'GROUNDHOGG_PRO_VERSION' ),
-		            'fix'         => admin_page_url( 'gh_extensions' ),
-		            'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins',
-		            'more'        => ''
-	            ];
-            }
+			if ( defined( 'GROUNDHOGG_HELPER_VERSION' ) ) {
+				$checklist_items[] = [
+					'title'       => __( 'Install the Advanced Features add-on', 'groundhogg' ),
+					'description' => __( 'The Advanced Features addon includes a variety of tools and that improve Groundhogg.', 'groundhogg' ),
+					'completed'   => defined( 'GROUNDHOGG_PRO_VERSION' ),
+					'fix'         => admin_page_url( 'gh_extensions' ),
+					'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins',
+					'more'        => ''
+				];
+			}
 
 
-            if ( defined( 'GROUNDHOGG_PRO_VERSION' ) ){
-	            $checklist_items[] = [
-		            'title'       => __( 'Enable automatic one-click unsubscribe', 'groundhogg' ),
-		            'description' => __( 'Improve deliver ability by allowing subscribers to opt-out from their inbox.', 'groundhogg' ),
-		            'completed'   => is_option_enabled( 'gh_use_unsubscribe_me' ),
-		            'fix'         => admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
-		            'cap'         => 'manage_options',
-		            'more'        => ''
-	            ];
-            }
+			if ( defined( 'GROUNDHOGG_PRO_VERSION' ) ) {
+				$checklist_items[] = [
+					'title'       => __( 'Enable automatic one-click unsubscribe', 'groundhogg' ),
+					'description' => __( 'Improve deliver ability by allowing subscribers to opt-out from their inbox.', 'groundhogg' ),
+					'completed'   => is_option_enabled( 'gh_use_unsubscribe_me' ),
+					'fix'         => admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
+					'cap'         => 'manage_options',
+					'more'        => ''
+				];
+			}
 		}
 
 		apply_filters( 'groundhogg/admin/recommendation_items', $checklist_items );

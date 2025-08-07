@@ -5,6 +5,8 @@ namespace Groundhogg;
 use Groundhogg\Form\Form_Fields;
 use Groundhogg\Utils\DateTimeHelper;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Hijack WP-Cron to prioritize Groundhogg's cron jobs and have them run before everyone else,
  * because other devs are bad and they always break cron for some reason.

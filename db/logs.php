@@ -4,6 +4,10 @@ namespace Groundhogg\DB;
 
 use function Groundhogg\Ymd_His;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class Logs extends DB {
 
 

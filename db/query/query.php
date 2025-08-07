@@ -2,12 +2,18 @@
 
 namespace Groundhogg\DB\Query;
 
+use Exception;
+use wpdb;
 use function Groundhogg\md5serialize;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Query {
 
 	/**
-	 * @var \wpdb
+	 * @var wpdb
 	 */
 	protected $db;
 
@@ -617,7 +623,7 @@ class Query {
 	/**
 	 * Add a join
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @param $table
 	 * @param $direction

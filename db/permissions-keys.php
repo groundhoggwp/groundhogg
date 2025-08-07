@@ -2,8 +2,9 @@
 
 namespace Groundhogg\DB;
 
-use Groundhogg\Contact;
-use function Groundhogg\gh_cron_installed;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Permissions_Keys extends DB {
 

@@ -7,6 +7,10 @@ use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\maybe_change_space_to_plus_in_email;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 ?>
 <div class="wp-clearfix"></div>
 <?php
@@ -35,8 +39,8 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 				] );
 
 				echo html()->submit( [
-					'text' => __( 'Search' ),
-                    'class' => 'gh-button primary small'
+					'text'  => __( 'Search' ),
+					'class' => 'gh-button primary small'
 				] );
 
 				?>

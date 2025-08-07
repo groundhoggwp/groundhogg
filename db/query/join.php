@@ -2,8 +2,13 @@
 
 namespace Groundhogg\DB\Query;
 
+use Exception;
 use Groundhogg\DB\DB;
 use function Groundhogg\get_db;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Join {
 	// Left or Right
@@ -16,7 +21,7 @@ class Join {
 	/**
 	 * Create a new JOIN
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @param array|string|DB $maybe_table
 	 * @param Query           $query
@@ -42,7 +47,7 @@ class Join {
 			$table = $maybe_table;
 			$alias = uniqid( 'join_' );
 		} else {
-			throw new \Exception( 'Invalid table specified for join clause' );
+			throw new Exception( 'Invalid table specified for join clause' );
 		}
 
 		$this->direction  = $direction;

@@ -94,16 +94,16 @@ class Notes extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'             => '%d',
-			'object_id'      => '%d',
-			'object_type'    => '%s',
-			'timestamp'      => '%d',
-			'context'        => '%s',
-			'user_id'        => '%d',
-			'summary'        => '%s',
-			'content'        => '%s',
-			'date_created'   => '%s',
-			'type'           => '%s',
+			'ID'           => '%d',
+			'object_id'    => '%d',
+			'object_type'  => '%s',
+			'timestamp'    => '%d',
+			'context'      => '%s',
+			'user_id'      => '%d',
+			'summary'      => '%s',
+			'content'      => '%s',
+			'date_created' => '%s',
+			'type'         => '%s',
 		);
 	}
 
@@ -116,16 +116,16 @@ class Notes extends DB {
 	public function get_column_defaults() {
 
 		return array(
-			'ID'             => 0,
-			'object_id'      => 0,
-			'timestamp'      => time(),
-			'object_type'    => '',
-			'context'        => 'user',
-			'user_id'        => get_current_user_id(),
-			'summary'        => '',
-			'content'        => '',
-			'type'           => 'note',
-			'date_created'   => current_time( 'mysql', true ),
+			'ID'           => 0,
+			'object_id'    => 0,
+			'timestamp'    => time(),
+			'object_type'  => '',
+			'context'      => 'user',
+			'user_id'      => get_current_user_id(),
+			'summary'      => '',
+			'content'      => '',
+			'type'         => 'note',
+			'date_created' => current_time( 'mysql', true ),
 		);
 	}
 

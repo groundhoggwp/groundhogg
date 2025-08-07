@@ -11,6 +11,8 @@
 
 use Groundhogg\Step;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 $form_id = get_query_var( 'slug' );
 
 $step = new Step( $form_id );

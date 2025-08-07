@@ -3,8 +3,10 @@
 namespace Groundhogg\Admin\Events;
 
 // Exit if accessed directly
+use DateTime;
 use Groundhogg\Admin\Table;
 use Groundhogg\Email_Log_Item;
+use Groundhogg_Email_Services;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
@@ -79,17 +81,17 @@ class Email_Log_Table extends Table {
 			[
 				'view'    => 'wordpress',
 				'display' => __( 'WordPress', 'groundhogg' ),
-				'query'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
+				'query'   => [ 'message_type' => Groundhogg_Email_Services::WORDPRESS ],
 			],
 			[
 				'view'    => 'transactional',
 				'display' => __( 'Transactional', 'groundhogg' ),
-				'query'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
+				'query'   => [ 'message_type' => Groundhogg_Email_Services::TRANSACTIONAL ],
 			],
 			[
 				'view'    => 'marketing',
 				'display' => __( 'Marketing', 'groundhogg' ),
-				'query'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
+				'query'   => [ 'message_type' => Groundhogg_Email_Services::MARKETING ],
 			]
 		];
 	}
@@ -369,7 +371,7 @@ class Email_Log_Table extends Table {
 		$cur_time  = time();
 		$time_diff = $lu_time - $cur_time;
 
-		$date = new \DateTime();
+		$date = new DateTime();
 		$date->setTimestamp( $lu_time );
 		$date->setTimezone( wp_timezone() );
 

@@ -6,6 +6,10 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\event_queue_db;
 use function Groundhogg\html;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $count_unprocessed = event_queue_db()->count_unprocessed();
 
 ?>

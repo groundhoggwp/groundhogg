@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 

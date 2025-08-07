@@ -7,7 +7,6 @@
 // Sent a broadcast email
 // Launched a funnel
 
-use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
@@ -16,7 +15,10 @@ use function Groundhogg\has_premium_features;
 use function Groundhogg\html;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\is_option_enabled;
-use function Groundhogg\modal_link_url;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 // MailHawk is installed but not connected -> redirect to the mailhawk connect page
 if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
@@ -98,50 +100,50 @@ $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 $hidden = is_option_enabled( 'gh_hide_groundhogg_quickstart' );
 
 ?>
-	<div id="checklist" class="gh-panel onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : '' ); ?>">
-		<div class="gh-panel-header">
-			<h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
-            <button type="button" class="toggle-indicator" aria-expanded="true"></button>
-        </div>
-        <div class="inside no-padding">
-	        <?php
+<div id="checklist" class="gh-panel onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : '' ); ?>">
+    <div class="gh-panel-header">
+        <h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
+        <button type="button" class="toggle-indicator" aria-expanded="true"></button>
+    </div>
+    <div class="inside no-padding">
+		<?php
 
-	        if ( $all_completed ):
-		        ?>
-                <div class="inside checklist-complete">
-			        <?php
-			        html()->e( 'img', [
-				        'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
-			        ], false, true, true )
-			        ?>
-                    <p>
-                        🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
-                </div>
-	        <?php
-	        else :
+		if ( $all_completed ):
+			?>
+            <div class="inside checklist-complete">
+				<?php
+				html()->e( 'img', [
+					'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
+				], false, true, true )
+				?>
+                <p>
+                    🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
+            </div>
+		<?php
+		else :
 
-		        foreach ( $checklist_items as $item ):
+			foreach ( $checklist_items as $item ):
 
-			        if ( ! current_user_can( $item['cap'] ) ) {
-				        continue;
-			        } ?>
-                    <div class="checklist-row">
-                        <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
-					        <?php if ( $item['completed'] ): ?>
-                                ✅
-					        <?php else: ?>
-                                ❌
-					        <?php endif; ?>
-                        </div>
-                        <div class="details">
-                            <h3 class="item-title"><?php echo $item['title']; ?></h3>
-                            <p class="description"><?php echo $item['description']; ?></p>
-                        </div>
-				        <?php if ( ! $item['completed'] ): ?>
-                            <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'], 'class' => 'gh-button primary' ], __( 'Fix', 'groundhogg' ) ); ?></span>
-				        <?php endif; ?>
+				if ( ! current_user_can( $item['cap'] ) ) {
+					continue;
+				} ?>
+                <div class="checklist-row">
+                    <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
+						<?php if ( $item['completed'] ): ?>
+                            ✅
+						<?php else: ?>
+                            ❌
+						<?php endif; ?>
                     </div>
-		        <?php endforeach;
-	        endif; ?>
-        </div>
-	</div>
+                    <div class="details">
+                        <h3 class="item-title"><?php echo $item['title']; ?></h3>
+                        <p class="description"><?php echo $item['description']; ?></p>
+                    </div>
+					<?php if ( ! $item['completed'] ): ?>
+                        <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'], 'class' => 'gh-button primary' ], __( 'Fix', 'groundhogg' ) ); ?></span>
+					<?php endif; ?>
+                </div>
+			<?php endforeach;
+		endif; ?>
+    </div>
+</div>

@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Helper functions for handling edit locking among any base_object UI.
  * based on the edit lock system in WP core post.php wp_set_edit_lock()

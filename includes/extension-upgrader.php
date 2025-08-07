@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * Class Extension_Updater

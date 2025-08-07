@@ -5,6 +5,10 @@ namespace Groundhogg\Admin\Reports\Views;
 use Groundhogg\Broadcast;
 use function Groundhogg\get_url_var;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
 
 

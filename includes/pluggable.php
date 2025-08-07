@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * If the transactional email system in Groundhogg is set to something other than the WordPress default, load the email service.
  *

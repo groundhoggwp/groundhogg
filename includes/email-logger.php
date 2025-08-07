@@ -4,6 +4,8 @@ namespace Groundhogg;
 
 use Groundhogg\Queue\Event_Queue;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Email_Logger {
 
 	/**

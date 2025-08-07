@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Groundhogg\DB;
 
 use Groundhogg\Classes\Background_Task;

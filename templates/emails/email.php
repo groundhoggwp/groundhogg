@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 
 $email_id = absint( get_query_var( 'email_id' ) );

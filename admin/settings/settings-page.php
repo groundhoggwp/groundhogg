@@ -12,6 +12,7 @@ use Groundhogg\Mailhawk;
 use Groundhogg\Plugin;
 use Groundhogg\Tag_Mapping;
 use Groundhogg_Email_Services;
+use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_any;
@@ -284,9 +285,9 @@ class Settings_Page extends Admin_Page {
 	}
 
 	/**
-     * When the license notices is being annoying try an activate using the master license instead of requiring the user to add them manually.
-     *
-	 * @return bool|\WP_Error
+	 * When the license notices is being annoying try an activate using the master license instead of requiring the user to add them manually.
+	 *
+	 * @return bool|WP_Error
 	 */
 	public function process_activate_using_master_license() {
 
@@ -329,7 +330,7 @@ class Settings_Page extends Admin_Page {
 		$has_key = get_user_meta( $user_id, 'wpgh_user_secret_key', true );
 
 		if ( ! empty( $has_key ) ) {
-			return new \WP_Error( 'error', 'An API key has already been issued for this user.' );
+			return new WP_Error( 'error', 'An API key has already been issued for this user.' );
 		}
 
 		if ( API_Keys_Table::generate_api_key( $user_id ) ) {
@@ -338,7 +339,7 @@ class Settings_Page extends Admin_Page {
 			return true;
 		}
 
-		return new \WP_Error( 'error', 'Unable to generate API key.' );
+		return new WP_Error( 'error', 'Unable to generate API key.' );
 	}
 
 	/**
@@ -359,7 +360,7 @@ class Settings_Page extends Admin_Page {
 			return true;
 		}
 
-		return new \WP_Error( 'error', 'Unable to generate new API key.' );
+		return new WP_Error( 'error', 'Unable to generate new API key.' );
 	}
 
 	/**

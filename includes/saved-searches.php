@@ -4,6 +4,8 @@ namespace Groundhogg;
 
 use \WP_Error;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Saved_Searches {
 
 	/**

@@ -2,10 +2,10 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Library extends Supports_Errors {
 
 	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
-//	const LIBRARY_URL = 'https://app-667e6062c1ac1837ccd93f5b.closte.com/wp-json/gh/v4/';
 
 	/**
 	 * Get the library url

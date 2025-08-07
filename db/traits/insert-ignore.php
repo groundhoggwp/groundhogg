@@ -2,6 +2,10 @@
 
 namespace Groundhogg\DB\Traits;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 trait Insert_Ignore {
 
 	/**
@@ -29,6 +33,7 @@ trait Insert_Ignore {
 		add_filter( 'query', [ $this, '_insert_ignore' ] );
 		$result = parent::commit_batch_insert();
 		remove_filter( 'query', [ $this, '_insert_ignore' ] );
+
 		return $result;
 	}
 

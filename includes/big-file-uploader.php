@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Big_File_Uploader {
 
 	public function __construct() {

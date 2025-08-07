@@ -2,13 +2,14 @@
 
 namespace Groundhogg\Admin\Tools;
 
+use Exception;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\background\Export_Contacts_Last_Id;
 use Groundhogg\background\Import_Contacts;
 use Groundhogg\background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
-use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Bulk_Jobs\Export_Contacts;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\Files;
 use Groundhogg\License_Manager;
@@ -23,7 +24,6 @@ use function Groundhogg\count_csv_rows;
 use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\files;
-use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
 use function Groundhogg\get_post_var;
@@ -46,6 +46,10 @@ use function Groundhogg\validate_tags;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -60,7 +64,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public $importer;
 
 	/**
-	 * @var \Groundhogg\Bulk_Jobs\Export_Contacts
+	 * @var Export_Contacts
 	 */
 	public $exporter;
 
@@ -642,7 +646,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$filepath = files()->get_csv_imports_dir( sanitize_file_name( $file_name ) );
 
 			if ( ! file_exists( $filepath ) || ! unlink( $filepath ) ) {
-                return new WP_Error( 'failed', 'Unable to delete file.' );
+				return new WP_Error( 'failed', 'Unable to delete file.' );
 			}
 		}
 
@@ -930,7 +934,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	/**
 	 * Install the gh-cron.php file
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_cron_install_gh_cron() {
 
@@ -939,7 +943,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		}
 
 		if ( ! install_gh_cron_file() ) {
-			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
+			return new WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
 		}
@@ -950,7 +954,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	/**
 	 * Uninstall the gh-cron.php file
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_cron_uninstall_gh_cron() {
 
@@ -959,7 +963,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		}
 
 		if ( ! uninstall_gh_cron_file() ) {
-			return new \WP_Error( 'error', __( 'Unable to uninstall gh-cron.php file. Please delete it manually via FTP.', 'groundhogg' ) );
+			return new WP_Error( 'error', __( 'Unable to uninstall gh-cron.php file. Please delete it manually via FTP.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Uninstalled gh-cron.php successfully!', 'groundhogg' ) );
 		}
@@ -992,7 +996,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_cron_unschedule_gh_cron() {
 		if ( wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
-			return new \WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
+			return new WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Unhooked Groundhogg from WP Cron.', 'groundhogg' ) );
 		}
@@ -1208,7 +1212,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	/**
 	 * Re-sync user IDs
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 * @return bool
 	 */
 	public function process_re_sync_user_ids() {

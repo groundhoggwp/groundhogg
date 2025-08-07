@@ -13,12 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Store automation events
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Submissions extends DB {
 

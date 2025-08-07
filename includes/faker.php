@@ -7,6 +7,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\Cli\doing_cli;
 use function WP_CLI\Utils\make_progress_bar;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Faker {
 
 	/**

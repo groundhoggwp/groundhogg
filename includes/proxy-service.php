@@ -2,6 +2,10 @@
 
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class Proxy_Service extends Supports_Errors
 {
     const PROXY_URL = 'https://proxy.groundhogg.io/wp-json/proxy/';

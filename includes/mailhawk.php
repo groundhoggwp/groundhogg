@@ -2,22 +2,8 @@
 
 namespace Groundhogg;
 
-/**
- * SendWP Connect.
- *
- * @package  Groundhogg
- *
- * @since 3.36.1
- * @version 3.36.1
- */
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-defined( 'ABSPATH' ) || exit;
-
-/**
- * LLMS_SendWP class..
- *
- * @since 3.36.1
- */
 class Mailhawk {
 
 	const PARTNER_ID = 1;

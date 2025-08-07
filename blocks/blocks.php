@@ -6,6 +6,8 @@ use Groundhogg\Blocks\Elementor\Form_Widget;
 use function Groundhogg\get_form_list;
 use function Groundhogg\white_labeled_name;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly\
+
 class Blocks {
 
 	public function __construct() {

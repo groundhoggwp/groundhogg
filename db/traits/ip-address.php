@@ -2,7 +2,12 @@
 
 namespace Groundhogg\DB\Traits;
 
+use Groundhogg\DB\Query\FilterException;
 use function Groundhogg\isset_not_empty;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 trait IP_Address {
 
@@ -30,12 +35,12 @@ trait IP_Address {
 	 *
 	 * @return void
 	 */
-	public function maybe_fix_ip_column(){
+	public function maybe_fix_ip_column() {
 
 		global $wpdb;
 
 		// ip_binary does not exist, so we're good
-		if ( ! $this->column_exists( 'ip_binary' ) ){
+		if ( ! $this->column_exists( 'ip_binary' ) ) {
 			return;
 		}
 
@@ -109,7 +114,7 @@ trait IP_Address {
 	/**
 	 * When performing queries, query IP address in binary format
 	 *
-	 * @throws \Groundhogg\DB\Query\FilterException
+	 * @throws FilterException
 	 *
 	 * @param $ORDER_BY
 	 * @param $from_cache

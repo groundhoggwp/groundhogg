@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Properties;
 use Groundhogg\Saved_Searches;
+use WP_Error;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
@@ -209,7 +210,7 @@ class Contacts_Page extends Admin_Page {
 				$contact = get_contactdata( get_url_var( 'contact' ) );
 
 				if ( ! $contact ) {
-					$this->add_notice( new \WP_Error( 'error', sprintf( __( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
+					$this->add_notice( new WP_Error( 'error', sprintf( __( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
 					?>
                     <script>window.open('<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
 					<?php
@@ -360,7 +361,7 @@ class Contacts_Page extends Admin_Page {
 		$_POST = wp_unslash( $_POST );
 
 		if ( ! get_request_var( 'email' ) ) {
-			return new \WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+			return new WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
 		$args['first_name'] = sanitize_text_field( get_post_var( 'first_name' ) );
@@ -372,17 +373,17 @@ class Contacts_Page extends Admin_Page {
 		if ( ! get_db( 'contacts' )->exists( $email ) ) {
 			$args['email'] = $email;
 		} else {
-			return new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), $email ) );
+			return new WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), $email ) );
 		}
 
 		if ( ! is_email( $email ) ) {
-			return new \WP_Error( 'invalid_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+			return new WP_Error( 'invalid_email', __( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
 		$contact = new Contact( $args );
 
 		if ( ! $contact->exists() ) {
-			return new \WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
+			return new WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
 		}
 
 		$contact->update_meta( 'mobile_phone', sanitize_text_field( get_post_var( 'mobile_phone' ) ) );
@@ -494,14 +495,14 @@ class Contacts_Page extends Admin_Page {
 	/**
 	 * Process a file upload
 	 *
-	 * @return array|bool|\WP_Error
+	 * @return array|bool|WP_Error
 	 */
 	public function process_upload_file() {
 
 		$id = absint( get_request_var( 'contact' ) );
 
 		if ( ! $id ) {
-			return new \WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
+			return new WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
 		}
 
 		$contact = get_contactdata( $id );
@@ -560,7 +561,7 @@ class Contacts_Page extends Admin_Page {
 		$id = absint( get_request_var( 'contact' ) );
 
 		if ( ! $id ) {
-			return new \WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
+			return new WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
 		}
 
 		$contact = get_contactdata( $id );
@@ -578,7 +579,7 @@ class Contacts_Page extends Admin_Page {
 			if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
 				$args['email'] = $email;
 			} else {
-				$this->add_notice( new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ) ) );
+				$this->add_notice( new WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ) ) );
 			}
 		}
 
@@ -642,7 +643,7 @@ class Contacts_Page extends Admin_Page {
 
 				$contact->update_meta( 'birthday', $birthday );
 			} else {
-				$this->add_notice( new \WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );
+				$this->add_notice( new WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );
 			}
 		}
 
@@ -695,7 +696,7 @@ class Contacts_Page extends Admin_Page {
 	/**
 	 * Delete a bunch of contacts
 	 *
-	 * @return false|\WP_Error
+	 * @return false|WP_Error
 	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_contacts' ) ) {
@@ -709,7 +710,7 @@ class Contacts_Page extends Admin_Page {
 			}
 
 			if ( ! get_db( 'contacts' )->delete( $id ) ) {
-				return new \WP_Error( 'unable_to_delete_contact', "Something went wrong while deleting the contact." );
+				return new WP_Error( 'unable_to_delete_contact', "Something went wrong while deleting the contact." );
 			}
 		}
 
@@ -869,7 +870,7 @@ class Contacts_Page extends Admin_Page {
 		$contact = get_contactdata( absint( get_url_var( 'contact' ) ) );
 
 		if ( ! $contact ) {
-			return new \WP_Error( 'error', 'The given contact does not exist.' );
+			return new WP_Error( 'error', 'The given contact does not exist.' );
 		}
 
 		$folders = $contact->get_uploads_folder();
@@ -878,7 +879,7 @@ class Contacts_Page extends Admin_Page {
 		$file_path = wp_normalize_path( $path . DIRECTORY_SEPARATOR . $file_name );
 
 		if ( ! file_exists( $file_path ) ) {
-			return new \WP_Error( 'error', 'The requested file does not exist.' );
+			return new WP_Error( 'error', 'The requested file does not exist.' );
 		}
 
 		unlink( $file_path );
@@ -931,7 +932,7 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( empty( $this->get_items() ) ) {
-			return new \WP_Error( 'none-selected', 'You must select at least one contact to export.' );
+			return new WP_Error( 'none-selected', 'You must select at least one contact to export.' );
 		}
 
 		return admin_page_url( 'gh_tools', [
@@ -950,7 +951,7 @@ class Contacts_Page extends Admin_Page {
 
 		if ( empty( $this->get_items() ) ) {
 
-			return new \WP_Error( 'no_items', 'You must select at least one contact to edit.' );
+			return new WP_Error( 'no_items', 'You must select at least one contact to edit.' );
 		}
 
 		return admin_page_url( 'gh_contacts', [

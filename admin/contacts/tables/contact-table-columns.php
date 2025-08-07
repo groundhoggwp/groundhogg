@@ -9,13 +9,16 @@ use Groundhogg\Preferences;
 use Groundhogg\Tag;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\contact_filters_link;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\html;
 use function Groundhogg\scheduled_time_column;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Contact_Table_Columns {
 
@@ -33,22 +36,22 @@ class Contact_Table_Columns {
 	}
 
 	/**
-     * Add defined orderby keys as allowed keys in Contact_Query
-     *
+	 * Add defined orderby keys as allowed keys in Contact_Query
+	 *
 	 * @param $keys
 	 *
 	 * @return array
 	 */
-    public function add_orderby_keys( $keys ){
+	public function add_orderby_keys( $keys ) {
 
-        $orderby_keys = array_filter( wp_list_pluck( self::$columns, 'orderby' ) );
+		$orderby_keys = array_filter( wp_list_pluck( self::$columns, 'orderby' ) );
 
-        return array_unique( array_merge( $keys, $orderby_keys ) );
-    }
+		return array_unique( array_merge( $keys, $orderby_keys ) );
+	}
 
 	/**
-     * Sort the columns based on priority
-     *
+	 * Sort the columns based on priority
+	 *
 	 * @return void
 	 */
 	public function sort_columns() {
@@ -152,8 +155,8 @@ class Contact_Table_Columns {
 	}
 
 	/**
-     * Get list of visible presets
-     *
+	 * Get list of visible presets
+	 *
 	 * @return array
 	 */
 	public static function get_presets() {
@@ -162,20 +165,20 @@ class Contact_Table_Columns {
 
 		foreach ( self::$presets as $id => $name ) {
 
-			$columns = array_map( function ( $column ){
-                return $column['id'];
-            }, array_filter( self::$columns, function ( $column ) use ( $id ) {
+			$columns = array_map( function ( $column ) {
+				return $column['id'];
+			}, array_filter( self::$columns, function ( $column ) use ( $id ) {
 
 				if ( ! current_user_can( $column['capability'] ) ) {
 					return false;
 				}
 
 				return is_array( $column['preset'] ) ? in_array( $id, $column['preset'] ) : $column['preset'] === $id;
-            } ) );
+			} ) );
 
-            if ( empty( $columns ) ){
-                continue;
-            }
+			if ( empty( $columns ) ) {
+				continue;
+			}
 
 			$presets[] = [
 				'id'      => $id,
@@ -214,7 +217,7 @@ class Contact_Table_Columns {
 			'preset'     => $preset,
 		];
 
-        // If order by is defined, make sure that it's a registered key for the contact query
+		// If order by is defined, make sure that it's a registered key for the contact query
 		if ( $orderby ) {
 			add_filter( 'groundhogg/contact_query/allowed_orderby_keys', function ( $keys ) use ( $orderby ) {
 				$keys[] = $orderby;
@@ -250,8 +253,8 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
-        self::register_preset( 'defaults', __( 'Defaults', 'groundhogg' ) );
-        self::register_preset( 'minimal', __( 'Minimal', 'groundhogg' ) );
+		self::register_preset( 'defaults', __( 'Defaults', 'groundhogg' ) );
+		self::register_preset( 'minimal', __( 'Minimal', 'groundhogg' ) );
 
 		self::register( 'status', __( 'Status', 'groundhogg' ), [
 			self::class,
@@ -285,35 +288,35 @@ class Contact_Table_Columns {
 		self::register_preset( 'unsub', __( 'Unsubscribe', 'groundhogg' ) );
 
 		self::register( 'date_unsubscribed', __( 'Unsubscribed', 'groundhogg' ), function ( Contact $contact ) {
-            if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
-                return '';
-            }
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
+				return '';
+			}
 
-            $activity = new Activity([
-               'activity_type' => Activity::UNSUBSCRIBED,
-               'contact_id' => $contact->ID
-            ]);
+			$activity = new Activity( [
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'contact_id'    => $contact->ID
+			] );
 
-            if ( ! $activity->exists() ){
-                $date = new DateTimeHelper( $contact->date_optin_status_changed );
-            } else {
-                $date = new DateTimeHelper( $activity->get_timestamp() );
-            }
+			if ( ! $activity->exists() ) {
+				$date = new DateTimeHelper( $contact->date_optin_status_changed );
+			} else {
+				$date = new DateTimeHelper( $activity->get_timestamp() );
+			}
 
 			return $date->wpDateTimeFormat();
 		}, 'date_optin_status_changed', 90, 'view_contacts', 'unsub' );
 
 		self::register( 'unsub_reason', __( 'Unsub Reason', 'groundhogg' ), function ( Contact $contact ) {
-			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
 				return '';
 			}
 
-			$activity = new Activity([
+			$activity = new Activity( [
 				'activity_type' => Activity::UNSUBSCRIBED,
-				'contact_id' => $contact->ID
-			]);
+				'contact_id'    => $contact->ID
+			] );
 
-			if ( ! $activity->exists() ){
+			if ( ! $activity->exists() ) {
 				return '';
 			}
 
@@ -321,16 +324,16 @@ class Contact_Table_Columns {
 		}, false, 91, 'view_contacts', 'unsub' );
 
 		self::register( 'unsub_feedback', __( 'Unsub Feedback', 'groundhogg' ), function ( Contact $contact ) {
-			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ){
+			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
 				return '';
 			}
 
-			$activity = new Activity([
+			$activity = new Activity( [
 				'activity_type' => Activity::UNSUBSCRIBED,
-				'contact_id' => $contact->ID
-			]);
+				'contact_id'    => $contact->ID
+			] );
 
-			if ( ! $activity->exists() ){
+			if ( ! $activity->exists() ) {
 				return '';
 			}
 
@@ -347,7 +350,8 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_optin_status( $contact ) {
 		?>
-        <span class="pill sm gh-has-tooltip <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?><span class="gh-tooltip right"><?php _e( Plugin::instance()->preferences->get_optin_status_text( $contact ) ) ?></span></span>
+        <span class="pill sm gh-has-tooltip <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?><span
+                    class="gh-tooltip right"><?php _e( Plugin::instance()->preferences->get_optin_status_text( $contact ) ) ?></span></span>
 		<?php
 	}
 
@@ -413,7 +417,7 @@ class Contact_Table_Columns {
 
 			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
 				$tag = new Tag( $tag ) ?><a
-                    class="gh-tag" href="<?php echo admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->tag_id ] ) ?>"><?php esc_html_e( $tag->get_name() ); ?></a><?php endforeach; ?>
+                class="gh-tag" href="<?php echo admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->tag_id ] ) ?>"><?php esc_html_e( $tag->get_name() ); ?></a><?php endforeach; ?>
 			<?php if ( count( $tags ) > 0 ): ?>
 				<?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
 			<?php endif; ?>

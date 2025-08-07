@@ -5,6 +5,7 @@ namespace Groundhogg;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Steps\Actions\Send_Email;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Main_Updater extends Old_Updater {
 
 	/**

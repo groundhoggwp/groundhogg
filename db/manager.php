@@ -4,6 +4,10 @@ namespace Groundhogg\DB;
 
 use function Groundhogg\isset_not_empty;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 /**
  * DB Manager to manage databases in Groundhogg
  *

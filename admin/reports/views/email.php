@@ -2,6 +2,10 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 ?>
 <div class="display-grid gap-20">
     <div class="gh-panel span-12">

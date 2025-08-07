@@ -203,9 +203,9 @@ abstract class Admin_Page extends Supports_Errors {
 
 	public function script_action() {
 
-        // we just gunna start using this everywhere
-        wp_enqueue_style( 'groundhogg-admin' );
-        wp_enqueue_style( 'groundhogg-admin-element' );
+		// we just gunna start using this everywhere
+		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-element' );
 
 		/**
 		 * To enqueue relates scripts for this page
@@ -656,17 +656,17 @@ abstract class Admin_Page extends Supports_Errors {
 
 		?>
         <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
-	        <?php header_icon(); ?>
+			<?php header_icon(); ?>
             <h1><?php echo $this->get_title(); ?></h1>
-	        <?php $this->do_title_actions(); ?>
+			<?php $this->do_title_actions(); ?>
         </div>
         <script>
-            const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
-            const parent = pageHeader.parentElement; // Get the parent element
+          const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+          const parent = pageHeader.parentElement // Get the parent element
 
-            if (parent) {
-              parent.prepend(pageHeader); // Move the element to the first child position
-            }
+          if (parent) {
+            parent.prepend(pageHeader) // Move the element to the first child position
+          }
         </script>
         <div class="wrap">
             <div id="notices">

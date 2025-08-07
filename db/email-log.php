@@ -5,6 +5,10 @@ namespace Groundhogg\DB;
 use Groundhogg\Email_Log_Item;
 use function Groundhogg\Ymd_His;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class Email_Log extends DB {
 
 

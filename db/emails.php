@@ -8,7 +8,6 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\Email;
 use Groundhogg\Utils\DateTimeHelper;
-use function Groundhogg\db;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -103,7 +102,7 @@ class Emails extends DB {
 
 			// not sent recently
 			$eventJoin = $query->addJoin( 'LEFT', 'events' );
-			$eventJoin->onColumn( 'email_id', 'emails.ID' )->greaterThan( 'events.time', (new DateTimeHelper('6 months ago'))->getTimestamp() );
+			$eventJoin->onColumn( 'email_id', 'emails.ID' )->greaterThan( 'events.time', ( new DateTimeHelper( '6 months ago' ) )->getTimestamp() );
 			$where->isNull( "$eventJoin->alias.ID" );
 
 			$query->setGroupby( 'ID' );
@@ -176,10 +175,14 @@ class Emails extends DB {
 
 	public function query( $query_vars = [], $ORDER_BY = '', $from_cache = true ) {
 
-		if ( isset_not_empty( $query_vars, 'unused' ) ){
-			$query_vars['filters1'] = [[[
-				'type' => 'unused'
-			]]];
+		if ( isset_not_empty( $query_vars, 'unused' ) ) {
+			$query_vars['filters1'] = [
+				[
+					[
+						'type' => 'unused'
+					]
+				]
+			];
 		}
 
 		return parent::query( $query_vars, $ORDER_BY, $from_cache );

@@ -2,6 +2,9 @@
 
 namespace Groundhogg\DB\Query;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 class Comparisons {
 	public const EQUALS = 'equals';
 	public const NOT_EQUALS = 'not_equals';

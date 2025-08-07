@@ -2,6 +2,10 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 function get_img_url( $img ) {
 	echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/reports/' . $img );
 }
@@ -20,10 +24,10 @@ function table_chart_report( $args = [] ) {
 	] );
 
 	?>
-	<div class="groundhogg-chart-no-padding <?php esc_attr_e( $args['class'] ); ?>">
-		<h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
-		<div id="<?php esc_attr_e( $args['id'] ); ?>"></div>
-	</div>
+    <div class="groundhogg-chart-no-padding <?php esc_attr_e( $args['class'] ); ?>">
+        <h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
+        <div id="<?php esc_attr_e( $args['id'] ); ?>"></div>
+    </div>
 	<?php
 }
 
@@ -40,17 +44,17 @@ function donut_chart_report( $args = [] ) {
 	] );
 
 	?>
-	<div class="groundhogg-chart">
-		<h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
-		<div style="width: 100%; padding: ">
-			<div class="float-left donut-chart-left">
-				<canvas id="<?php esc_attr_e( $args['id'] ); ?>"></canvas>
-			</div>
-			<div class="float-left donut-chart-right">
-				<div id="<?php esc_attr_e( $args['id'] ); ?>_legend" class="chart-legend"></div>
-			</div>
-		</div>
-	</div>
+    <div class="groundhogg-chart">
+        <h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
+        <div style="width: 100%; padding: ">
+            <div class="float-left donut-chart-left">
+                <canvas id="<?php esc_attr_e( $args['id'] ); ?>"></canvas>
+            </div>
+            <div class="float-left donut-chart-right">
+                <div id="<?php esc_attr_e( $args['id'] ); ?>_legend" class="chart-legend"></div>
+            </div>
+        </div>
+    </div>
 	<?php
 }
 
@@ -64,24 +68,24 @@ function quick_stat_report( $args = [] ) {
 	$args = wp_parse_args( $args, [
 		'id'    => uniqid( 'groundhogg_' ),
 		'title' => 'Report',
-        'class' => 'span-3',
+		'class' => 'span-3',
 		'style' => [],
 		'info'  => '',
 	] );
 
 	?>
 
-	<div class="groundhogg-quick-stat gh-panel <?php esc_attr_e( $args[ 'class' ] ); ?>" id="<?php esc_attr_e( $args['id'] ); ?>">
+    <div class="groundhogg-quick-stat gh-panel <?php esc_attr_e( $args['class'] ); ?>" id="<?php esc_attr_e( $args['id'] ); ?>">
         <div class="gh-panel-header">
             <h2 class="title">
-		        <?php esc_html_e( $args['title'] ) ?>
-		        <?php if ( $args['info'] ): ?>
+				<?php esc_html_e( $args['title'] ) ?>
+				<?php if ( $args['info'] ): ?>
                     <span class="gh-has-tooltip dashicons dashicons-info">
                         <span class="gh-tooltip top">
                             <?php _e( $args['info'] ); ?>
                         </span>
                     </span>
-		        <?php endif; ?>
+				<?php endif; ?>
             </h2>
         </div>
         <div class="inside">
@@ -97,6 +101,6 @@ function quick_stat_report( $args = [] ) {
             </div>
             <div class="wp-clearfix"></div>
         </div>
-	</div>
+    </div>
 	<?php
 }

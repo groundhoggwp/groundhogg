@@ -1,6 +1,9 @@
 <?php
 
 namespace Groundhogg;
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * How to Use:
  * Pointers are defined in an associative array and passed to the class upon instantiation.

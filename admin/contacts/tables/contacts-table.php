@@ -7,6 +7,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
 use WP_List_Table;
+use wpdb;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
@@ -78,7 +79,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Prepares the list of items for displaying.
 	 *
-	 * @global $wpdb \wpdb
+	 * @global $wpdb wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()
@@ -439,10 +440,10 @@ class Contacts_Table extends WP_List_Table {
 			case Preferences::COMPLAINED:
 			case Preferences::SPAM:
 			case Preferences::HARD_BOUNCE:
-                $status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
-                break;
+				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+				break;
 			case Preferences::BLOCKED:
-			    $status_actions[ Preferences::UNCONFIRMED ] = __( 'Unblock', 'groundhogg' );
+				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Unblock', 'groundhogg' );
 				break;
 		}
 

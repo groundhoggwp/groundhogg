@@ -177,10 +177,6 @@ abstract class Installer {
 	 */
 	public function activation_hook( $network_wide = false ) {
 		$this->activation_wrapper();
-
-		if ( ob_get_contents() ) {
-			file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors.txt', ob_get_contents() );
-		}
 	}
 
 	/**

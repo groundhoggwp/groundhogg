@@ -4,12 +4,16 @@ namespace Groundhogg\Admin\Campaigns;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Campaign;
+use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 class Campaigns_Page extends Admin_Page {
 
 	public function get_slug() {
@@ -45,11 +49,11 @@ class Campaigns_Page extends Admin_Page {
 		$table = new Campaigns_Table();
 
 		?>
-		<p></p>
-		<div class="display-flex" style="gap: 40px">
-			<div class="left col-wrap">
-				<h2><?php _e( 'Add a new Campaign', 'groundhogg' ); ?></h2>
-				<form method="post" class="display-flex column gap-10 form-wrap">
+        <p></p>
+        <div class="display-flex" style="gap: 40px">
+            <div class="left col-wrap">
+                <h2><?php _e( 'Add a new Campaign', 'groundhogg' ); ?></h2>
+                <form method="post" class="display-flex column gap-10 form-wrap">
 					<?php
 
 					action_input( 'add', true, true );
@@ -77,13 +81,13 @@ class Campaigns_Page extends Admin_Page {
 					] );
 
 					?>
-					<script>
+                    <script>
                       ( ($) => {
                         $('#campaign-name').on('input', e => {
                           $('#campaign-slug').val(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-'))
                         })
                       } )(jQuery)
-					</script>
+                    </script>
 					<?php
 
 					echo html()->e( 'div', [
@@ -120,21 +124,21 @@ class Campaigns_Page extends Admin_Page {
 
 					?>
 
-				</form>
-			</div>
-			<div>
+                </form>
+            </div>
+            <div>
 				<?php
 				$this->search_form( __( 'Search Campaigns', 'groundhogg' ) );
 				?>
 
-				<form id="posts-filter" method="post">
+                <form id="posts-filter" method="post">
 					<?php
 					$table->prepare_items();
 					$table->display();
 					?>
-				</form>
-			</div>
-		</div>
+                </form>
+            </div>
+        </div>
 		<?php
 	}
 
@@ -148,7 +152,7 @@ class Campaigns_Page extends Admin_Page {
 		$slug        = sanitize_title( get_post_var( 'slug' ) );
 
 		if ( empty( $name ) ) {
-			return new \WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
+			return new WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
 		}
 
 		if ( empty( $slug ) ) {
@@ -156,7 +160,7 @@ class Campaigns_Page extends Admin_Page {
 		}
 
 		if ( get_db( 'campaigns' )->exists( [ 'slug' => $slug ] ) ) {
-			return new \WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
+			return new WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
 		}
 
 		$campaign = new Campaign( [
@@ -167,7 +171,7 @@ class Campaigns_Page extends Admin_Page {
 		] );
 
 		if ( ! $campaign->exists() ) {
-			return new \WP_Error( 'oops', __( 'Something went wrong.' ) );
+			return new WP_Error( 'oops', __( 'Something went wrong.' ) );
 		}
 
 		$this->add_notice( 'new-campaign', __( 'Campaign created!', 'groundhogg' ) );
@@ -176,7 +180,7 @@ class Campaigns_Page extends Admin_Page {
 	}
 
 	/**
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_edit() {
 
@@ -194,7 +198,7 @@ class Campaigns_Page extends Admin_Page {
 		$slug        = sanitize_title( get_post_var( 'slug' ) );
 
 		if ( empty( $name ) ) {
-			return new \WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
+			return new WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
 		}
 
 		if ( empty( $slug ) ) {
@@ -206,12 +210,12 @@ class Campaigns_Page extends Admin_Page {
 
 			// Make sure it's not too long
 			if ( strlen( $slug ) > get_db( 'campaigns' )->get_max_index_length() ) {
-				return new \WP_Error( 'too_long', __( sprintf( "Maximum length for a campaign name is %d characters.", get_db( 'campaigns' )->get_max_index_length() ), 'groundhogg' ) );
+				return new WP_Error( 'too_long', __( sprintf( "Maximum length for a campaign name is %d characters.", get_db( 'campaigns' )->get_max_index_length() ), 'groundhogg' ) );
 			}
 
 			// Check if the slug is in use
 			if ( get_db( 'campaigns' )->exists( [ 'slug' => $slug ] ) ) {
-				return new \WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
+				return new WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
 			}
 		}
 
@@ -233,7 +237,7 @@ class Campaigns_Page extends Admin_Page {
 	/**
 	 * Delete campaigns from the admin
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'manage_campaigns' ) ) {
@@ -245,7 +249,7 @@ class Campaigns_Page extends Admin_Page {
 			$campaign = new Campaign( $id );
 
 			if ( ! $campaign->delete() ) {
-				return new \WP_Error( 'unable_to_delete', "Something went wrong deleting the campaign." );
+				return new WP_Error( 'unable_to_delete', "Something went wrong deleting the campaign." );
 			}
 		}
 

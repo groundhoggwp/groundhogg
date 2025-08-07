@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use Exception;
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
@@ -69,7 +70,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				/**
 				 * Contact Info
 				 *
-				 * @throws \Exception
+				 * @throws Exception
 				 *
 				 * @param $contact Contact
 				 *
@@ -415,7 +416,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				foreach ( $tabs as $tab => $tab_name ):
 					?>
                     <div class="tab-content-wrapper gh-panel top-left-square"
-                         data-tab-content="<?php esc_attr_e( $tab ); ?>">
+                         data-tab-content="<?php echo esc_attr( $tab ); ?>">
                         <div class="inside">
 							<?php
 

@@ -8,6 +8,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use WP_Error;
 use function Groundhogg\action_url;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
@@ -495,7 +496,7 @@ class Funnels_Page extends Admin_Page {
 	/**
 	 * Process add action for the funnel.
 	 *
-	 * @return string|\WP_Error
+	 * @return string|WP_Error
 	 */
 	public function process_add() {
 
@@ -537,14 +538,14 @@ class Funnels_Page extends Admin_Page {
 			] );
 
 			if ( ! in_array( $validate['ext'], [ 'json', 'funnel' ] ) ) {
-				return new \WP_Error( 'invalid_template', __( 'Please upload a valid flow template.', 'groundhogg' ) );
+				return new WP_Error( 'invalid_template', __( 'Please upload a valid flow template.', 'groundhogg' ) );
 			}
 
 			$json = file_get_contents( $file['tmp_name'] );
 			$json = json_decode( $json );
 
 			if ( ! $json ) {
-				return new \WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
+				return new WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
 			}
 
 			// Importing multiple funnels
@@ -566,7 +567,7 @@ class Funnels_Page extends Admin_Page {
 			$json = json_decode( $json );
 
 			if ( ! $json ) {
-				return new \WP_Error( 'invalid_json', 'Invalid JSON provided.' );
+				return new WP_Error( 'invalid_json', 'Invalid JSON provided.' );
 			}
 
 			// Importing multiple funnels
@@ -589,7 +590,7 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		if ( empty( $funnel_id ) ) {
-			return new \WP_Error( 'error', __( 'Could not create flow.', 'groundhogg' ) );
+			return new WP_Error( 'error', __( 'Could not create flow.', 'groundhogg' ) );
 		}
 
 		return admin_page_url( 'gh_funnels', [
@@ -736,7 +737,7 @@ class Funnels_Page extends Admin_Page {
 
 		/* check if funnel is too big... */
 		if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ) {
-			return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
+			return new WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
 		}
 
 		//get all the steps in the funnel.
@@ -744,7 +745,7 @@ class Funnels_Page extends Admin_Page {
 		Step::increment_step_order( 0 );
 
 		if ( empty( $step_ids ) ) {
-			return new \WP_Error( 'no_steps', 'Please add automation first.' );
+			return new WP_Error( 'no_steps', 'Please add automation first.' );
 		}
 
 		$metaUpdates = get_post_var( 'metaUpdates' );

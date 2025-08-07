@@ -2,7 +2,7 @@
 
 namespace Groundhogg;
 
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Reviews {
 
 	public function __construct() {

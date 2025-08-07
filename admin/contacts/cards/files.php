@@ -1,15 +1,16 @@
 <?php
 
 use Groundhogg\Contact;
-use function Groundhogg\action_input;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\html;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 /**
  * @var $contact Contact
  */
 ?>
-<button class="gh-button secondary" id="upload-file"><?php _e('Upload files'); ?></button>
+<button class="gh-button secondary" id="upload-file"><?php _e( 'Upload files' ); ?></button>
 <div id="files-here">
 
 </div>

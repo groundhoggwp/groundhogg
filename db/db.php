@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use DateTimeInterface;
+use Exception;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
@@ -12,6 +14,7 @@ use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\DateTimeHelper;
+use WP_Meta_Query;
 use function Groundhogg\Cli\doing_cli;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -125,7 +128,7 @@ abstract class DB {
 	 * @return void
 	 */
 	public function __get( $name ) {
-		switch ( $name ){
+		switch ( $name ) {
 			case 'table_name':
 			case 'alias':
 			case 'version':
@@ -1804,7 +1807,7 @@ abstract class DB {
 
 //			var_dump( $query_vars['meta_query']);
 
-			$meta_query = new \WP_Meta_Query( $query_vars['meta_query'] );
+			$meta_query = new WP_Meta_Query( $query_vars['meta_query'] );
 
 			$meta_table = $this->get_meta_table();
 			$meta_table->maybe_resolve_table_conflict();
@@ -2246,9 +2249,9 @@ abstract class DB {
 	/**
 	 * Retrieve the date created via an SQL query
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
-	 * @return \DateTimeInterface
+	 * @return DateTimeInterface
 	 */
 	public function get_date_created() {
 

@@ -4,6 +4,8 @@ namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Preferences {
 	// Optin Statuses
 	const UNCONFIRMED = 1;

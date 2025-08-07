@@ -2,10 +2,15 @@
 
 namespace Groundhogg\Admin\User;
 
+use WP_User;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\html;
 use function Groundhogg\white_labeled_name;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Admin_User {
 
@@ -20,7 +25,7 @@ class Admin_User {
 	/**
 	 * Show signature area
 	 *
-	 * @param $profile_user \WP_User
+	 * @param $profile_user WP_User
 	 */
 	public function show_fields( $profile_user ) {
 
@@ -97,8 +102,8 @@ class Admin_User {
 	}
 
 	/**
-     * Save the Groundhogg user fields...
-     *
+	 * Save the Groundhogg user fields...
+	 *
 	 * @param $user_id
 	 */
 	public function save_fields( $user_id ) {

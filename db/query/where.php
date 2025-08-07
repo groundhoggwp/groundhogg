@@ -2,9 +2,14 @@
 
 namespace Groundhogg\DB\Query;
 
+use Exception;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_array_var;
 use function Groundhogg\maybe_implode_in_quotes;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Where {
 
@@ -60,8 +65,8 @@ class Where {
 	 * @param $relation
 	 */
 	public function __construct( $query, $relation = 'AND' ) {
-		$this->relation       = $relation;
-		$this->query          = $query;
+		$this->relation = $relation;
+		$this->query    = $query;
 	}
 
 	public function __serialize(): array {
@@ -155,8 +160,8 @@ class Where {
 			return $this;
 		}
 
-		if ( $this->prefix_condition_with_not && is_string( $condition ) ){
-			$condition = "NOT $condition";
+		if ( $this->prefix_condition_with_not && is_string( $condition ) ) {
+			$condition                       = "NOT $condition";
 			$this->prefix_condition_with_not = false;
 		}
 
@@ -252,7 +257,7 @@ class Where {
 	/**
 	 * Generic comparison wrapper for most statements
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @param $value
 	 * @param $compare
@@ -267,7 +272,7 @@ class Where {
 		$compare = $this->symbolize_comparison( $compare );
 
 		if ( ! in_array( $compare, $this->get_allowed_comparisons() ) ) {
-			throw new \Exception( "$compare is not an allowed comparison symbol" );
+			throw new Exception( "$compare is not an allowed comparison symbol" );
 		}
 
 		switch ( strtoupper( $compare ) ) {
@@ -459,15 +464,15 @@ class Where {
 		return $this->contains( $column, $string );
 	}
 
-	public function contains( $column, $string  ){
+	public function contains( $column, $string ) {
 		return $this->like( $column, '%' . $this->esc_like( $string ) . '%' );
 	}
 
-	public function startsWith( $column, $string  ){
+	public function startsWith( $column, $string ) {
 		return $this->like( $column, $this->esc_like( $string ) . '%' );
 	}
 
-	public function endsWith( $column, $string  ){
+	public function endsWith( $column, $string ) {
 		return $this->like( $column, '%' . $this->esc_like( $string ) );
 	}
 
@@ -525,11 +530,13 @@ class Where {
 
 	public function isNotNull( $column ) {
 		$column = $this->sanitize_column( $column );
+
 		return $this->addCondition( "$column IS NOT NULL" );
 	}
 
 	public function isNull( $column ) {
 		$column = $this->sanitize_column( $column );
+
 		return $this->addCondition( "$column IS NULL" );
 	}
 
@@ -547,14 +554,15 @@ class Where {
 	public function subWhere( string $relation = 'OR' ) {
 		$where = new Where( $this->query, $relation );
 		$this->addCondition( $where );
+
 		return $where;
 	}
 
-	public function subOr(){
+	public function subOr() {
 		return $this->subWhere( 'OR' );
 	}
 
-	public function subAnd(){
+	public function subAnd() {
 		return $this->subWhere( 'AND' );
 	}
 
@@ -576,13 +584,14 @@ class Where {
 	 */
 	public function not() {
 		$this->prefix_condition_with_not = true;
+
 		return $this;
 	}
 
 	/**
 	 * Use the not exists function
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 *
 	 * @param $query
 	 *
@@ -591,10 +600,11 @@ class Where {
 	public function notExists( $query ) {
 
 		if ( ! is_a( $query, Query::class ) || ! is_string( $query ) ) {
-			throw new \Exception( 'Must use string or Query' );
+			throw new Exception( 'Must use string or Query' );
 		}
 
 		$this->addCondition( "NOT EXISTS ($query)" );
+
 		return $this;
 	}
 

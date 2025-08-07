@@ -7,6 +7,10 @@ use Groundhogg\Funnel;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $funnel = new Funnel( get_url_var( 'funnel' ) );
 
 if ( ! $funnel->exists() ) {
@@ -107,9 +111,9 @@ if ( ! $funnel->exists() ) {
           ( $ => {
 
             $('.step .stat-wrap').click(e => {
-              let a = e.currentTarget.querySelector('a');
+              let a = e.currentTarget.querySelector('a')
 
-              if ( a ){
+              if (a) {
                 a.click()
               }
             })

@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Notices;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Redirect the contact and add a notice.
  *

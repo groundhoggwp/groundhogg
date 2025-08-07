@@ -91,17 +91,17 @@ class Tasks extends Notes {
 			$data['user_id'] = get_current_user_id();
 		}
 
-		if ( isset_not_empty( $data, 'incomplete' ) ){
+		if ( isset_not_empty( $data, 'incomplete' ) ) {
 			$data['date_completed'] = '0000-00-00 00:00:00';
 			unset( $data['incomplete'] );
 		}
 
-		if ( isset_not_empty( $data, 'complete' ) ){
+		if ( isset_not_empty( $data, 'complete' ) ) {
 			$data['date_completed'] = [ '!=', '0000-00-00 00:00:00' ];
 			unset( $data['complete'] );
 		}
 
-		if ( isset_not_empty( $data, 'mine' ) ){
+		if ( isset_not_empty( $data, 'mine' ) ) {
 			$data['user_id'] = get_current_user_id();
 			unset( $data['mine'] );
 		}

@@ -5,6 +5,8 @@ namespace Groundhogg;
 use Groundhogg\Form\Submission_Handler;
 use function Groundhogg\Admin\Reports\Views\get_funnel_id;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * handles various site activities and tracks them
  *

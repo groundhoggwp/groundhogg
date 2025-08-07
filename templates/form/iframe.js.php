@@ -9,6 +9,8 @@
  * @since       File available since Release 1.0.20
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use function Groundhogg\managed_page_url;status_header( 200 );
 nocache_headers();
 

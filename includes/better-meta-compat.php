@@ -5,6 +5,8 @@ namespace Groundhogg;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Utils\DateTimeHelper;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class PropertyException extends \Exception {
 }
 

@@ -63,9 +63,9 @@ function guess_column_map_to( $column ) {
 		'email_address' => 'email',
 	];
 
-    if ( key_exists( $column, $guesses ) ){
-        return $guesses[$column];
-    }
+	if ( key_exists( $column, $guesses ) ) {
+		return $guesses[ $column ];
+	}
 
 	return $column;
 }
@@ -114,7 +114,7 @@ function guess_column_map_to( $column ) {
 			?>
         </div>
         <div class="tablenav-pages one-page">
-			<span class="displaying-num"><?php printf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), number_format_i18n( $total_items ) ); ?></span>
+            <span class="displaying-num"><?php printf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), number_format_i18n( $total_items ) ); ?></span>
         </div>
     </div>
 	<?php

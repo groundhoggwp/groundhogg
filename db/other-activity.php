@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Base_Object;
+use Groundhogg\Contact;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -14,12 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Stores information about a contact's site activity.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Other_Activity extends DB {
 
@@ -131,18 +132,18 @@ class Other_Activity extends DB {
 	}
 
 	/**
-	 * @param \Groundhogg\Contact $contact
-	 * @param \Groundhogg\Contact $other
+	 * @param Contact $contact
+	 * @param Contact $other
 	 */
 	public function contact_merged( $contact, $other ) {
 
-		$this->update([
-			'object_id' => $other->get_id(),
+		$this->update( [
+			'object_id'   => $other->get_id(),
 			'object_type' => 'contact',
 		], [
-			'object_id' => $contact->get_id(),
+			'object_id'   => $contact->get_id(),
 			'object_type' => 'contact',
-		]);
+		] );
 
 	}
 

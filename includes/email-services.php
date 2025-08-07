@@ -5,6 +5,8 @@ use Groundhogg\Mailer\Log_Only;
 use function Groundhogg\disable_emojis;
 use function Groundhogg\get_array_var;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Groundhogg_Email_Services {
 
 	const TRANSACTIONAL = 'transactional';

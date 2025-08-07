@@ -6262,10 +6262,6 @@ function uninstall_groundhogg() {
 	uninstall_gh_cron_file();
 
 	do_action( 'groundhogg/uninstall' );
-
-	if ( ob_get_contents() ) {
-		file_put_contents( __DIR__ . '/../groundhogg-uninstall-errors.txt', ob_get_contents() );
-	}
 }
 
 /**

@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Utils\DateTimeHelper;
+use WP_Error;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\enqueue_broadcast_assets;
 use function Groundhogg\get_db;
@@ -51,16 +52,16 @@ class Broadcasts_Page extends Admin_Page {
 		$interval        = get_post_var( 'batch_interval' );
 		$interval_length = get_post_var( 'batch_interval_length' );
 
-        $batches = floor( $total_contacts / $amount );
+		$batches = floor( $total_contacts / $amount );
 
-        $dateTime = new DateTimeHelper();
-        $total_interval_length = $batches * $interval_length;
+		$dateTime              = new DateTimeHelper();
+		$total_interval_length = $batches * $interval_length;
 
-        $dateTime->modify( "+$total_interval_length $interval" );
+		$dateTime->modify( "+$total_interval_length $interval" );
 
-        wp_send_json_success([
-            'time' => $dateTime->human_time_diff(),
-        ]);
+		wp_send_json_success( [
+			'time' => $dateTime->human_time_diff(),
+		] );
 	}
 
 	public function help() {
@@ -153,7 +154,7 @@ class Broadcasts_Page extends Admin_Page {
 	/**
 	 * Delete
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
@@ -162,7 +163,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		foreach ( $this->get_items() as $id ) {
 			if ( ! get_db( 'broadcasts' )->delete( $id ) ) {
-				return new \WP_Error( 'unable_to_delete_broadcast', "Something went wrong while deleting the broadcast.", 'groundhogg' );
+				return new WP_Error( 'unable_to_delete_broadcast', "Something went wrong while deleting the broadcast.", 'groundhogg' );
 			}
 		}
 
@@ -209,8 +210,8 @@ class Broadcasts_Page extends Admin_Page {
 	 */
 	public function view() {
 
-        // fix sending broadcasts
-        Broadcast::transition_from_sending_to_sent();
+		// fix sending broadcasts
+		Broadcast::transition_from_sending_to_sent();
 
 		$broadcasts_table = new Broadcasts_Table();
 

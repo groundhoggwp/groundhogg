@@ -2,14 +2,17 @@
 
 namespace Groundhogg\Admin\Bulk_Jobs;
 
+use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
-use Groundhogg\Plugin;
-use Groundhogg\Admin\Admin_Page;
-use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\use_experimental_features;
 use function Groundhogg\white_labeled_name;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Bulk_Job_Page extends Admin_Page {
 
@@ -114,31 +117,31 @@ class Bulk_Job_Page extends Admin_Page {
 		$this->add_notice( 'do_not_leave', __( 'Do not leave the page till the process is complete!', 'groundhogg' ), 'warning' );
 
 		?>
-		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
-			<div id="notices">
+            <div id="notices">
 				<?php Plugin::instance()->notices->notices(); ?>
-			</div>
-			<hr class="wp-header-end">
+            </div>
+            <hr class="wp-header-end">
 			<?php
 
 			$this->view();
 
 			?>
-		</div>
+        </div>
 		<?php
 	}
 
-    public function process_action() {
-	    return;
-    }
+	public function process_action() {
+		return;
+	}
 
 	public function view() {
 
-        if ( ! $this->verify_action() || ! current_user_can( 'perform_bulk_actions' ) ){
-            $this->wp_die_no_access();
-        }
+		if ( ! $this->verify_action() || ! current_user_can( 'perform_bulk_actions' ) ) {
+			$this->wp_die_no_access();
+		}
 
 		$items     = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/query", [] );
 		$max_items = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/max_items", 25, $items );
@@ -157,13 +160,13 @@ class Bulk_Job_Page extends Admin_Page {
 		$bp_args = apply_filters( 'groundhogg/admin/bulk_processor_args', $bp_args );
 
 		?>
-		<p>
+        <p>
 			<?php _e( 'Total Complete: ' ); ?><b><span id="total-complete">0</span></b>
-		</p>
-		<p>
+        </p>
+        <p>
 			<?php _e( 'Total Remaining: ' ); ?><b><span id="total-remaining">0</span></b>
-		</p>
-		<p>
+        </p>
+        <p>
 			<?php echo html()->textarea( [
 				'name'        => '',
 				'id'          => 'bulk-log',
@@ -175,34 +178,34 @@ class Bulk_Job_Page extends Admin_Page {
 				'style'       => [ 'width' => '100%' ],
 				'placeholder' => 'Log...',
 			] ); ?>
-		</p>
-		<div id="job-complete" class="hidden">
-			<p><?php _e( "The process is now complete.", 'groundhogg' ); ?></p>
-			<p class="submit">
-				<a class="button button-primary"
-				   href="<?php echo admin_url( 'index.php' ); ?>">&larr;&nbsp;<?php _e( 'Return to dashboard.', 'groundhogg' ) ?></a>
-			</p>
-		</div>
+        </p>
+        <div id="job-complete" class="hidden">
+            <p><?php _e( "The process is now complete.", 'groundhogg' ); ?></p>
+            <p class="submit">
+                <a class="button button-primary"
+                   href="<?php echo admin_url( 'index.php' ); ?>">&larr;&nbsp;<?php _e( 'Return to dashboard.', 'groundhogg' ) ?></a>
+            </p>
+        </div>
 
-		<script>
+        <script>
           var BulkProcessor = <?php echo wp_json_encode( $bp_args ); ?>;
 
-          (function ($, bp, items) {
+          ( function ($, bp, items) {
 
             Object.assign(bp, {
 
-              items: 0,
-              complete: 0,
-              all: 0,
-              size: <?php echo $max_items; ?>,
+              items            : 0,
+              complete         : 0,
+              all              : 0,
+              size             : <?php echo $max_items; ?>,
               bulk_action_nonce: '<?php echo wp_create_nonce( $this->get_current_action() ); ?>',
-              bulk_action: '<?php echo $this->get_current_action(); ?>',
-              bar: null,
-              total: null,
-              title: '',
-              log: null,
-              current_request: {},
-              retries: 0,
+              bulk_action      : '<?php echo $this->get_current_action(); ?>',
+              bar              : null,
+              total            : null,
+              title            : '',
+              log              : null,
+              current_request  : {},
+              retries          : 0,
 
               init: function () {
 
@@ -217,7 +220,8 @@ class Bulk_Job_Page extends Admin_Page {
 
                 if (typeof this.experimental_features != 'undefined') {
                   this.experimental()
-                } else {
+                }
+                else {
                   this.send()
                 }
 
@@ -249,7 +253,7 @@ class Bulk_Job_Page extends Admin_Page {
 
               updateProgress: function () {
 
-                var p = (this.complete / this.all) * 100
+                var p = ( this.complete / this.all ) * 100
 
                 p = p.toFixed(2)
 
@@ -313,11 +317,11 @@ class Bulk_Job_Page extends Admin_Page {
                 var self = this
 
                 $.ajax({
-                  type: 'post',
-                  url: ajaxurl,
+                  type    : 'post',
+                  url     : ajaxurl,
                   dataType: 'json',
-                  data: self.current_request,
-                  success: function (response) {
+                  data    : self.current_request,
+                  success : function (response) {
 
                     console.log(response)
 
@@ -325,7 +329,7 @@ class Bulk_Job_Page extends Admin_Page {
                       self.complete += response.complete
                       self.updateProgress()
 
-                      self.log.val( response.message + '\n' + self.log.val() )
+                      self.log.val(response.message + '\n' + self.log.val())
 
                       if (self.items.length > 0) {
                         self.send()
@@ -338,14 +342,15 @@ class Bulk_Job_Page extends Admin_Page {
                         }, 1000)
                       }
 
-                    } else {
+                    }
+                    else {
                       self.error(response)
                     }
 
                   },
-                  error: function (response) {
+                  error   : function (response) {
                     self.error(response)
-                  }
+                  },
                 })
               },
 
@@ -354,11 +359,11 @@ class Bulk_Job_Page extends Admin_Page {
                 var self = this
 
                 self.current_request = {
-                  action: 'bulk_action_listener',
-                  bulk_action: self.bulk_action,
+                  action           : 'bulk_action_listener',
+                  bulk_action      : self.bulk_action,
                   bulk_action_nonce: self.bulk_action_nonce,
-                  items: this.getItems(),
-                  the_end: this.isLastOfThem()
+                  items            : this.getItems(),
+                  the_end          : this.isLastOfThem(),
                 }
 
                 // Reset the number ofn allow retires
@@ -366,7 +371,7 @@ class Bulk_Job_Page extends Admin_Page {
 
                 this.send_ajax()
 
-              }
+              },
 
             })
 
@@ -374,8 +379,8 @@ class Bulk_Job_Page extends Admin_Page {
               bp.init()
             })
 
-          })(jQuery, BulkProcessor, <?php echo wp_json_encode( $items ); ?> )
-		</script>
+          } )(jQuery, BulkProcessor, <?php echo wp_json_encode( $items ); ?> )
+        </script>
 		<?php
 	}
 }

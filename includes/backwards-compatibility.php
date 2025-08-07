@@ -2,8 +2,7 @@
 
 namespace Groundhogg;
 
-
-use Groundhogg\Utils\Abstract_Rewrites;
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  *

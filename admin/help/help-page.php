@@ -2,10 +2,15 @@
 
 namespace Groundhogg\Admin\Help;
 
+use DateTime;
+use DateTimeZone;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
+use Groundhogg_Email_Services;
+use WP_Error;
+use WP_User;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\create_contact_from_user;
@@ -23,6 +28,10 @@ use function Groundhogg\permissions_key_url;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\utils;
 use function Groundhogg\verify_admin_ajax_nonce;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Help_Page extends Tabbed_Admin_Page {
 
@@ -200,7 +209,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	/**
 	 * Create a support user
 	 *
-	 * @return false|\WP_User
+	 * @return false|WP_User
 	 */
 	public function create_support_user() {
 
@@ -392,10 +401,10 @@ class Help_Page extends Tabbed_Admin_Page {
 				$user_tz = 'UTC';
 			}
 
-			$user_tz   = new \DateTimeZone( $user_tz );
+			$user_tz   = new DateTimeZone( $user_tz );
 			$wp_tz     = wp_timezone();
-			$user_date = new \DateTime( 'now', $user_tz );
-			$wp_date   = new \DateTime( 'now', $wp_tz );
+			$user_date = new DateTime( 'now', $user_tz );
+			$wp_date   = new DateTime( 'now', $wp_tz );
 
 			$dbs            = Plugin::instance()->dbs->get_dbs();
 			$missing_tables = [];
@@ -426,9 +435,9 @@ class Help_Page extends Tabbed_Admin_Page {
 				'missing_db_tables'    => $missing_tables,
 				'helper_installed'     => defined( 'GROUNDHOGG_HELPER_VERSION' ),
 				'smtp'                 => [
-					'wordpress'             => \Groundhogg_Email_Services::get_wordpress_service(),
-					'transactional'         => \Groundhogg_Email_Services::get_transactional_service(),
-					'marketing'             => \Groundhogg_Email_Services::get_marketing_service(),
+					'wordpress'             => Groundhogg_Email_Services::get_wordpress_service(),
+					'transactional'         => Groundhogg_Email_Services::get_transactional_service(),
+					'marketing'             => Groundhogg_Email_Services::get_marketing_service(),
 					'any_service_installed' => defined( 'MAILHAWK_VERSION' ) ||
 					                           defined( 'GROUNDHOGG_SMTP_VERSION' ) ||
 					                           defined( 'GROUNDHOGG_SENDGRID_VERSION' ) ||
@@ -573,7 +582,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	/**
 	 * Send access to our support team
 	 *
-	 * @return array|bool|object|\WP_Error
+	 * @return array|bool|object|WP_Error
 	 */
 	public function process_send_support_access() {
 

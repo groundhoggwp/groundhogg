@@ -1,9 +1,11 @@
 <?php
 
-use Groundhogg\Extension;
 use Groundhogg\License_Manager;
-use function Groundhogg\action_input;
 use function Groundhogg\html;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 // Only show extensions we have access too.
 $access = get_option( 'gh_master_license_access', [] );
@@ -45,10 +47,10 @@ usort( $downloads, function ( $a, $b ) {
 		}
 
 		?>
-		<div class="gh-panel">
+        <div class="gh-panel">
             <div class="gh-panel-header">
                 <h2>
-                    <?php esc_html_e( $download->info->title ); ?>
+					<?php esc_html_e( $download->info->title ); ?>
                 </h2>
             </div>
             <div class="inside">
@@ -58,50 +60,50 @@ usort( $downloads, function ( $a, $b ) {
                              alt="<?php esc_attr_e( $extension->info->title ); ?>">
                     </div>
                     <div style="width: 100%">
-                        <?php echo wpautop( $extension->info->excerpt ); ?>
+						<?php echo wpautop( $extension->info->excerpt ); ?>
                     </div>
                 </div>
                 <p></p>
                 <div class="display-flex space-between">
-	                <?php if ( $extension->info->link ): ?>
-		                <?php
-		                $pricing = (array) $extension->pricing;
+					<?php if ( $extension->info->link ): ?>
+						<?php
+						$pricing = (array) $extension->pricing;
 
-		                if ( count( $pricing ) > 1 ) {
+						if ( count( $pricing ) > 1 ) {
 
-			                $price1 = min( $pricing );
-			                $price2 = max( $pricing );
+							$price1 = min( $pricing );
+							$price2 = max( $pricing );
 
-			                ?>
+							?>
                             <a class="gh-button secondary" target="_blank"
                                href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
-			                <?php
-		                } else {
+							<?php
+						} else {
 
-			                $price = array_pop( $pricing );
+							$price = array_pop( $pricing );
 
-			                if ( $price > 0.00 ) {
-				                ?>
+							if ( $price > 0.00 ) {
+								?>
                                 <a class="gh-button secondary" target="_blank"
                                    href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
-				                <?php
-			                } else {
-				                ?>
+								<?php
+							} else {
+								?>
                                 <a class="gh-button secondary" target="_blank"
                                    href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
-				                <?php
-			                }
-		                }
-	                endif; ?>
+								<?php
+							}
+						}
+					endif; ?>
 
-	                <?php echo html()->e( 'a', [
-		                'href'   => $extension->info->link,
-		                'target' => '_blank',
-		                'class'  => 'more-details',
-	                ], __( 'More details' ) ); ?>
+					<?php echo html()->e( 'a', [
+						'href'   => $extension->info->link,
+						'target' => '_blank',
+						'class'  => 'more-details',
+					], __( 'More details' ) ); ?>
                 </div>
             </div>
-		</div>
+        </div>
 
 	<?php
 	endforeach;

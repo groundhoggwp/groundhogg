@@ -4,8 +4,8 @@ namespace Groundhogg;
 
 use Groundhogg\Api\V3\Base;
 use Groundhogg\Api\V4\Base_Api;
-use Groundhogg\Api\V4\Contacts_Api;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Plugin_Compatibility {
 
 	public function __construct() {

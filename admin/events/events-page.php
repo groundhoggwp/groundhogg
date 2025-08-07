@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Events;
 
+use Exception;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Background_Task;
@@ -11,6 +12,9 @@ use Groundhogg\Email_Logger;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\Micro_Time_Tracker;
+use Groundhogg_Email_Services;
+use WP_Error;
+use WP_User;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\db;
@@ -65,8 +69,8 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		try {
 			$task->process();
-		} catch ( \Exception $e ) {
-			wp_send_json_error( new \WP_Error( 'error', $e->getMessage() ) );
+		} catch ( Exception $e ) {
+			wp_send_json_error( new WP_Error( 'error', $e->getMessage() ) );
 		}
 
 		wp_send_json_success( [
@@ -95,13 +99,13 @@ class Events_Page extends Tabbed_Admin_Page {
 
 				$this->enqueue_table_filters( [
 					'selectColumns' => [
-						'email_service' => [ 'Email service', \Groundhogg_Email_Services::dropdown() ],
+						'email_service' => [ 'Email service', Groundhogg_Email_Services::dropdown() ],
 						'message_type'  => [
 							'Message Type',
 							[
-								\Groundhogg_Email_Services::MARKETING     => 'Marketing',
-								\Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
-								\Groundhogg_Email_Services::WORDPRESS     => 'WordPress'
+								Groundhogg_Email_Services::MARKETING     => 'Marketing',
+								Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+								Groundhogg_Email_Services::WORDPRESS     => 'WordPress'
 							],
 						],
 						'status'        => [
@@ -189,7 +193,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
 				$user_ids = array_filter( get_db( 'background_tasks' )->get_unique_column_values( 'user_id' ) );
 				$users    = array_combine( $user_ids, array_map( function ( $user_id ) {
-					return ( new \WP_User( $user_id ) )->display_name;
+					return ( new WP_User( $user_id ) )->display_name;
 				}, $user_ids ) );
 
 				$this->enqueue_table_filters( [
@@ -273,7 +277,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	/**
 	 * Pause some events
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_pause() {
 
@@ -298,7 +302,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		if ( ! $result ) {
-			return new \WP_Error( 'error', 'Something went wrong' );
+			return new WP_Error( 'error', 'Something went wrong' );
 		}
 
 		$this->add_notice( 'paused', sprintf( _nx( '%d event paused', '%d events paused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
@@ -309,7 +313,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	/**
 	 * Unpause some events
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_unpause() {
 
@@ -334,7 +338,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		if ( ! $result ) {
-			return new \WP_Error( 'error', 'Something went wrong' );
+			return new WP_Error( 'error', 'Something went wrong' );
 		}
 
 		$this->add_notice( 'paused', sprintf( _nx( '%d event unpaused', '%d events unpaused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
@@ -345,7 +349,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	/**
 	 * Cancel some events
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_cancel() {
 
@@ -369,7 +373,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		if ( ! $result ) {
-			return new \WP_Error( 'error', 'Something went wrong' );
+			return new WP_Error( 'error', 'Something went wrong' );
 		}
 
 		// Move the items over...
@@ -384,7 +388,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	/**
 	 * Uncancels any cancelled events...
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function process_uncancel() {
 		if ( ! current_user_can( 'execute_events' ) ) {
@@ -407,7 +411,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		if ( ! $result ) {
-			return new \WP_Error( 'db_error', __( 'There was an error updating the database.', 'groundhogg' ) );
+			return new WP_Error( 'db_error', __( 'There was an error updating the database.', 'groundhogg' ) );
 		}
 
 		// Move the events over...
@@ -430,7 +434,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
 
 		if ( empty( $status ) || ! in_array( $status, $purgeable_events ) ) {
-			return new \WP_Error( 'invalid_status', __( 'Invalid status.', 'groundhogg' ) );
+			return new WP_Error( 'invalid_status', __( 'Invalid status.', 'groundhogg' ) );
 		}
 
 		$query_params = get_request_query();
@@ -787,13 +791,13 @@ class Events_Page extends Tabbed_Admin_Page {
 		$events         = get_db( 'events' );
 
 		if ( $confirm !== 'confirm' ) {
-			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+			return new WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
 		}
 
 		$time = strtotime( "$time_range $time_unit ago" );
 
 		if ( ! $time ) {
-			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+			return new WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
 		}
 
 		switch ( $what_to_delete ) {
@@ -844,13 +848,13 @@ ORDER BY ID" );
 		$activity       = get_db( 'activity' );
 
 		if ( $confirm !== 'confirm' ) {
-			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+			return new WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
 		}
 
 		$time = strtotime( "$time_range $time_unit ago" );
 
 		if ( ! $time ) {
-			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+			return new WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
 		}
 
 		switch ( $what_to_delete ) {
@@ -885,7 +889,7 @@ ORDER BY ID" );
 	/**
 	 * Admin tool to cancel waiting events
 	 *
-	 * @return false|\WP_Error
+	 * @return false|WP_Error
 	 */
 	public function process_cancel_events_tool() {
 
@@ -900,7 +904,7 @@ ORDER BY ID" );
 		$confirm        = get_post_var( 'confirm' );
 
 		if ( $confirm !== 'confirm' ) {
-			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+			return new WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
 		}
 
 		switch ( $what_to_cancel ) {
@@ -965,7 +969,7 @@ ORDER BY ID" );
 	/**
 	 * Tool to fix unprocessed events by rescheduling them or cancelling them
 	 *
-	 * @return false|\WP_Error
+	 * @return false|WP_Error
 	 */
 	public function process_fix_unprocessed() {
 
@@ -984,13 +988,13 @@ ORDER BY ID" );
 		$confirm          = get_post_var( 'confirm' );
 
 		if ( $confirm !== 'confirm' ) {
-			return new \WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
+			return new WP_Error( 'confirmation', 'Please type "confirm" in all lowercase to confirm the action.' );
 		}
 
 		$time = strtotime( "$time_range $time_unit ago" );
 
 		if ( ! $time ) {
-			return new \WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
+			return new WP_Error( 'invalid', 'Invalid time range supplied, no action was taken.' );
 		}
 
 		$compare = $older_or_younger == 'older' ? '<' : '>';
@@ -1128,8 +1132,8 @@ ORDER BY ID" );
 
 			try {
 				$task->process();
-			} catch ( \Exception $exception ) {
-				return new \WP_Error( 'error', $exception->getMessage() );
+			} catch ( Exception $exception ) {
+				return new WP_Error( 'error', $exception->getMessage() );
 			}
 		}
 

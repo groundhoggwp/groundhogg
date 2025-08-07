@@ -3,7 +3,6 @@
 namespace Groundhogg\Admin;
 
 use function Groundhogg\get_request_var;
-use function Groundhogg\groundhogg_icon;
 use function Groundhogg\header_icon;
 
 /**
@@ -209,16 +208,16 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
         </div>
 		<?php $this->do_page_tabs(); ?>
         <script>
-          (()=>{
-            const pageHeader = document.getElementById( '<?php esc_attr_e( $this->get_slug() . '-header' ) ?>' )
-            const parent = pageHeader.parentElement; // Get the parent element
+          ( () => {
+            const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+            const parent = pageHeader.parentElement // Get the parent element
             const navTabs = document.querySelector('h2.gh-nav')
 
             if (parent) {
-              parent.prepend(navTabs);
-              parent.prepend(pageHeader); // Move the element to the first child position
+              parent.prepend(navTabs)
+              parent.prepend(pageHeader) // Move the element to the first child position
             }
-          })()
+          } )()
 
         </script>
         <div class="wrap">

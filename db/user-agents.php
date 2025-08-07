@@ -4,6 +4,10 @@ namespace Groundhogg\DB;
 
 use Groundhogg\DB\Traits\Insert_Ignore;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class User_Agents extends DB {
 
 	use Insert_Ignore;
@@ -34,13 +38,13 @@ class User_Agents extends DB {
 	public function add( $data = array() ) {
 
 		// UA passed as string directly
-		if ( is_string( $data ) ){
+		if ( is_string( $data ) ) {
 			$data = [
 				'user_agent' => $data
 			];
 		}
 
-		if ( empty( $data[ 'user_agent' ] ) ){
+		if ( empty( $data['user_agent'] ) ) {
 			return false;
 		}
 

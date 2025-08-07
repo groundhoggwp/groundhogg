@@ -14,7 +14,6 @@ use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_user_timezone;
 use function Groundhogg\groundhogg_icon;
-use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
@@ -55,11 +54,11 @@ class Guided_Setup extends Admin_Page {
 	function maybe_show_guided_setup_nag() {
 
 		if ( $this->is_current_page()
-             || ! current_user_can( 'manage_options' )
-             || is_option_enabled( 'gh_guided_setup_finished' )
-             || notices()->is_dismissed( 'guided_setup_nag' )
-             || is_white_labeled()
-        ) {
+		     || ! current_user_can( 'manage_options' )
+		     || is_option_enabled( 'gh_guided_setup_finished' )
+		     || notices()->is_dismissed( 'guided_setup_nag' )
+		     || is_white_labeled()
+		) {
 			return;
 		}
 
@@ -68,16 +67,16 @@ class Guided_Setup extends Admin_Page {
 
 		?>
         <div id="guided-setup-nag" class="notice notice-success display-flex gap-10 is-dismissible">
-            <?php groundhogg_icon( 25 ) ?>
+			<?php groundhogg_icon( 25 ) ?>
             <p>
-				<?php printf( __('Ready to get started with Groundhogg? Start the <a href="%s">guided setup</a> now!', 'groundhogg' ), admin_page_url( 'gh_guided_setup' ) ) ?>
+				<?php printf( __( 'Ready to get started with Groundhogg? Start the <a href="%s">guided setup</a> now!', 'groundhogg' ), admin_page_url( 'gh_guided_setup' ) ) ?>
             </p>
             <script>( ($) => {
                 $('#guided-setup-nag').on('click', 'button.notice-dismiss', e => {
                   Groundhogg.api.ajax({
-                    action: 'gh_dismiss_notice',
-                    notice: 'guided_setup_nag',
-                    _wpnonce: Groundhogg.nonces._wpnonce
+                    action  : 'gh_dismiss_notice',
+                    notice  : 'guided_setup_nag',
+                    _wpnonce: Groundhogg.nonces._wpnonce,
                   })
                 })
               } )(jQuery)</script>
@@ -321,7 +320,8 @@ class Guided_Setup extends Admin_Page {
 	 * The main output
 	 */
 	public function page() {
-		?><div id="guided-setup"></div><?php
+		?>
+        <div id="guided-setup"></div><?php
 	}
 
 	/**

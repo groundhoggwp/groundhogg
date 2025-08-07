@@ -2,22 +2,22 @@
 
 namespace Groundhogg\Admin\Tools;
 
-use \WP_List_Table;
 use Groundhogg\Plugin;
+use WP_List_Table;
+use wpdb;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\file_access_url;
-use function Groundhogg\get_items_from_csv;
 
 /**
  * Contacts Table Class
  *
  * This class shows the data table for accessing information about a customer.
  *
- * @package     groundhogg
+ * @since       0.1
  * @subpackage  Modules/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     groundhogg
  */
 
 // Exit if accessed directly
@@ -48,8 +48,8 @@ class Imports_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -157,7 +157,7 @@ class Imports_Table extends WP_List_Table {
 	/**
 	 * Prepares the list of items for displaying.
 	 *
-	 * @global $wpdb \wpdb
+	 * @global $wpdb wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()

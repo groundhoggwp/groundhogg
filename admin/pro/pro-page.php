@@ -5,6 +5,10 @@ namespace Groundhogg\Admin\Pro;
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\dashicon;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 class Pro_Page extends Admin_Page {
 
 	/**

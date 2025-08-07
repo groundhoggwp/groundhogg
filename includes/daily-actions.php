@@ -2,10 +2,10 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Utils\DateTimeHelper;
-use Groundhogg\Utils\Replacer;
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Daily_Actions {
 

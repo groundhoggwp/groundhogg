@@ -7,6 +7,10 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $has_active_funnels = get_db( 'funnels' )->exists( [ 'status' => 'active' ] );
 
 if ( ! $has_active_funnels ): ?>

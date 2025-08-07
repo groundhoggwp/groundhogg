@@ -1,10 +1,16 @@
 <?php
 /**
- * @var $funnel \Groundhogg\Funnel
+ * @var $funnel Funnel
  */
 
+use Groundhogg\Funnel;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 $steps = $funnel->get_steps( [
-    'branch' => 'main'
+	'branch' => 'main'
 ] );
 
 ?>

@@ -2,7 +2,6 @@
 
 namespace Groundhogg\DB;
 
-use Groundhogg\Base_Object;
 use Groundhogg\Contact;
 use Groundhogg\DB\Traits\Insert_Ignore;
 use function Groundhogg\get_db;
@@ -16,12 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Store the relationships between tags and contacts
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Tag_Relationships extends DB {
 
@@ -143,7 +142,7 @@ class Tag_Relationships extends DB {
 	 * not already have that relationship to avoid collisions
 	 *
 	 * @param $contact Contact
-	 * @param $other Contact
+	 * @param $other   Contact
 	 */
 	public function contact_merged( $contact, $other ) {
 
@@ -151,7 +150,7 @@ class Tag_Relationships extends DB {
 
 		$tag_ids = implode( ',', $contact->get_tag_ids() );
 
-		if ( empty( $tag_ids ) ){
+		if ( empty( $tag_ids ) ) {
 			return;
 		}
 

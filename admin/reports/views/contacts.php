@@ -2,6 +2,10 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 // Overview
 
 ?>
@@ -28,7 +32,7 @@ namespace Groundhogg\Admin\Reports\Views;
 	<?php quick_stat_report( [
 		'id'    => 'total_engaged_contacts',
 		'title' => __( 'Engaged Contacts', 'groundhogg' ),
-		'info' => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
+		'info'  => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
 	] ); ?>
 
 	<?php quick_stat_report( [

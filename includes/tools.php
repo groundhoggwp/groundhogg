@@ -7,6 +7,8 @@ use function Groundhogg\get_default_from_name;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\managed_page_url;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Get system info
  *

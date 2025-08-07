@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Base_Object;
 use Groundhogg\Campaign;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,7 +60,7 @@ class Campaigns extends DB {
 	}
 
 	/**
-	 * @param \Groundhogg\Base_Object $object
+	 * @param Base_Object $object
 	 *
 	 * @return Campaign
 	 */
@@ -120,7 +121,7 @@ class Campaigns extends DB {
 		}
 
 		$args['slug'] = sanitize_title( $args['name'] );
-		if ( $this->exists( [ 'slug' => $args['slug'] ]  ) ) {
+		if ( $this->exists( [ 'slug' => $args['slug'] ] ) ) {
 			$campaign = $this->get_by( 'slug', $args['slug'] );
 
 			return $campaign->ID;

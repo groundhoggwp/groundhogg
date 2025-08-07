@@ -6,12 +6,17 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
+use WP_CLI;
+use function cli\prompt;
 use function Groundhogg\array_find;
 use function Groundhogg\Cli\doing_cli;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\the_funnel;
 use function WP_CLI\Utils\format_items;
-use function cli\prompt;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Simulator {
 
@@ -27,11 +32,11 @@ class Simulator {
 	 */
 	protected static bool $is_simulating = false;
 
-	public static function is_dry_run(){
+	public static function is_dry_run() {
 		return self::$is_dry_run;
 	}
 
-	public static function is_simulating(){
+	public static function is_simulating() {
 		return self::$is_simulating;
 	}
 
@@ -80,7 +85,7 @@ class Simulator {
 	public static function log( $item ) {
 
 		// not simulating, bail
-		if ( ! self::is_simulating() ){
+		if ( ! self::is_simulating() ) {
 			return;
 		}
 
@@ -91,7 +96,7 @@ class Simulator {
 				$step = self::asFromSteps( $item );
 				$item = $step->get_title();
 			}
-			\WP_CLI::log( sanitize_text_field( $item ) );
+			WP_CLI::log( sanitize_text_field( $item ) );
 		}
 	}
 
@@ -109,7 +114,7 @@ class Simulator {
 			] );
 		}
 
-		\WP_CLI::success( 'Simulation complete!' );
+		WP_CLI::success( 'Simulation complete!' );
 	}
 
 	/**
@@ -132,7 +137,7 @@ class Simulator {
 			];
 		}, $steps );
 
-		\WP_CLI::log( "\nSelect a trigger to continue..." );
+		WP_CLI::log( "\nSelect a trigger to continue..." );
 
 		format_items( 'table', $options, array( 'ID', 'title' ) );
 
@@ -187,7 +192,7 @@ class Simulator {
 			// process step-based and timer logic...
 			$current = Step::_maybe_filter_step_before_enqueuing( $current, $contact );
 
-			if ( ! is_a( $current, Step::class ) ){
+			if ( ! is_a( $current, Step::class ) ) {
 				continue;
 			}
 
@@ -223,7 +228,7 @@ class Simulator {
 							self::log( "➰ Simulation loop limit exceeded, moving on..." );
 						} else {
 
-							if ( $next->is_after( $current ) ){
+							if ( $next->is_after( $current ) ) {
 								self::log( "⏩ Travelling to target..." );
 							} else {
 								self::log( "⏪ Travelling to target..." );
@@ -251,7 +256,7 @@ class Simulator {
 					// run the step, but use a simulated event
 					$current->get_step_element()->pre_run( $contact, $event );
 					$result = $current->get_step_element()->run( $contact, $event );
-					if ( is_wp_error( $result ) ){
+					if ( is_wp_error( $result ) ) {
 						self::log( sprintf( "⚠️ %s", $result->get_error_message() ) );
 					}
 				}

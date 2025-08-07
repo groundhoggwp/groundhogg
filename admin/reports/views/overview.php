@@ -2,6 +2,10 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
+
 // Overview
 ?>
 <div class="display-grid gap-20">
@@ -27,7 +31,7 @@ namespace Groundhogg\Admin\Reports\Views;
 		'id'    => 'total_engaged_contacts',
 		'title' => __( 'Engaged Contacts', 'groundhogg' ),
 		'class' => 'span-3',
-		'info' => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
+		'info'  => __( 'An engaged contact is anyone who has any activity within the time range.', 'groundhogg' )
 	] );
 	quick_stat_report( [
 		'id'    => 'total_unsubscribed_contacts',

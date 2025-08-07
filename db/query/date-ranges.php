@@ -2,6 +2,9 @@
 
 namespace Groundhogg\DB\Query;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 class Date_Ranges {
 	public const ANY = 'any';
 	public const TODAY = 'today';

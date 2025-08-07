@@ -2,7 +2,6 @@
 
 namespace Groundhogg\Admin\Contacts;
 
-
 use Groundhogg\Contact;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_post_var;
@@ -10,6 +9,10 @@ use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\verify_admin_ajax_nonce;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 class Info_Cards {
 
@@ -54,7 +57,7 @@ class Info_Cards {
 
 		update_user_meta( get_current_user_id(), 'groundhogg_info_card_order', $card_order );
 
-        wp_send_json_success();
+		wp_send_json_success();
 	}
 
 	/**
@@ -70,9 +73,10 @@ class Info_Cards {
 			include __DIR__ . '/cards/page-visits.php';
 		}, 100, 'view_contacts' );
 
-        self::register( 'relationships', __( 'Relationships', 'groundhogg' ), function ( $contact ) {
-            ?><div id="contact-relationships"></div><?php
-        } );
+		self::register( 'relationships', __( 'Relationships', 'groundhogg' ), function ( $contact ) {
+			?>
+            <div id="contact-relationships"></div><?php
+		} );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 

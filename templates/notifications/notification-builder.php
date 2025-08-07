@@ -9,6 +9,8 @@ use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\white_labeled_name;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 class Notification_Builder {
 
 	public static function get_template_part( $template = '' ) {

@@ -217,7 +217,7 @@ class Funnels_Table extends Table {
 	}
 
 	protected function column_steps( Funnel $funnel ) {
-        $funnel->flow_preview( 10 );
+		$funnel->flow_preview( 10 );
 	}
 
 	/**

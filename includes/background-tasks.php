@@ -13,6 +13,7 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Utils\Limits;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Background_Tasks {
 
 	const HOOK = 'groundhogg/background_tasks';
