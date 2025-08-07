@@ -10,6 +10,11 @@
  * @package Spyc
  */
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! function_exists( 'spyc_load' ) ) {
 	/**
 	 * Parses YAML to array.
@@ -1408,5 +1413,5 @@ do {
 		break;
 	}
 	$file = $argv[1];
-	echo json_encode( spyc_load_file( $file ) );
+	echo wp_json_encode( spyc_load_file( $file ) );
 } while ( 0 );
