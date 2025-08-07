@@ -14,12 +14,12 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
 
 ?>
 <div class="display-flex gap-20 align-center">
-    <h1 class="report-title"><?php _e( $broadcast->get_title() ) ?></h1>
+    <h1 class="report-title"><?php echo esc_html( $broadcast->get_title() ) ?></h1>
 </div>
 <div class="display-grid gap-20">
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Broadcast Stats', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Broadcast Stats', 'groundhogg' ); ?></h2>
         </div>
         <div class="inside">
             <canvas id="chart_last_broadcast"></canvas>
@@ -27,7 +27,7 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
     </div>
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Results', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Results', 'groundhogg' )); ?></h2>
         </div>
         <div id="table_broadcast_stats"></div>
     </div>
@@ -36,7 +36,7 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Broadcast Link Clicked', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Broadcast Link Clicked', 'groundhogg' )); ?></h2>
         </div>
         <div id="table_broadcast_link_clicked"></div>
     </div

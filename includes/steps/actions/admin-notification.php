@@ -105,7 +105,7 @@ class Admin_Notification extends Action {
         <div class="gh-rows-and-columns">
             <div class="gh-row">
                 <div class="gh-col ignore-morph">
-                    <label><?php _e( 'Send to...' ); ?></label>
+                    <label><?php echo esc_html( __( 'Send to...', 'groundhogg' ) ); ?></label>
                     <div class="">
 						<?php
 
@@ -116,8 +116,8 @@ class Admin_Notification extends Action {
 						}
 
 						$options = [
-							'{owner_email}' => __( 'Contact Owner' ),
-							'{email}'       => __( 'The Contact' ),
+							'{owner_email}' => esc_html__( 'Contact Owner', 'groundhogg' ),
+							'{email}'       => esc_html__( 'The Contact', 'groundhogg' ),
 						];
 
 						foreach ( get_owners() as $owner ) {
@@ -143,7 +143,7 @@ class Admin_Notification extends Action {
                     </div>
                 </div>
                 <div class="gh-col">
-                    <label><?php _e( 'Reply to...' ) ?></label>
+                    <label><?php echo esc_html( __( 'Reply to...', 'groundhogg' ) ) ?></label>
                     <div class="gh-input-group">
 						<?php
 
@@ -152,9 +152,9 @@ class Admin_Notification extends Action {
 						echo html()->dropdown( [
 							'name'        => $this->setting_name_prefix( 'reply_to_type' ),
 							'options'     => [
-								'contact' => __( 'Contact\'s email' ),
-								'owner'   => __( 'Contact owner\'s email' ),
-								'custom'  => __( 'Custom email' ),
+								'contact' => esc_html__( 'Contact\'s email', 'groundhogg' ),
+								'owner'   => esc_html__( 'Contact owner\'s email', 'groundhogg' ),
+								'custom'  => esc_html__( 'Custom email', 'groundhogg' ),
 							],
 							'selected'    => $reply_to_type,
 							'option_none' => false,
@@ -182,7 +182,7 @@ class Admin_Notification extends Action {
             </div>
             <div class="gh-row">
                 <div class="gh-col">
-                    <label><?php _e( 'Subject line' ) ?></label>
+                    <label><?php echo esc_html( __( 'Subject line', 'groundhogg' ) ) ?></label>
 					<?php
 
 					echo html()->input( [
@@ -212,7 +212,7 @@ class Admin_Notification extends Action {
 					<?php
 
 					echo html()->checkbox( [
-						'label'   => __( 'Don\'t show admin links to the contact record in the notification.' ),
+						'label'   => esc_html__( 'Don\'t show admin links to the contact record in the notification.' ),
 						'name'    => $this->setting_name_prefix( 'hide_admin_links' ),
 						'checked' => $this->get_setting( 'hide_admin_links' )
 					] );
@@ -330,7 +330,7 @@ class Admin_Notification extends Action {
 		if ( ! $hide_admin_links ) {
 			$body .= sprintf( "<p><a href='%s'>%s</a></p>",
 				$contact->admin_link(),
-				__( 'Manage Contact', 'groundhogg' )
+				esc_html__( 'Manage Contact', 'groundhogg' )
 			);
 		}
 

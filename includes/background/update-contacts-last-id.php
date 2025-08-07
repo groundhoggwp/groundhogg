@@ -72,7 +72,7 @@ class Update_Contacts_Last_Id extends Update_Contacts {
 
 		if ( $this->batch === 0 ) {
 
-			$message = sprintf( __( '%s contacts have been updated!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ) );
+			$message = sprintf( esc_html__( '%s contacts have been updated!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
 			return true;

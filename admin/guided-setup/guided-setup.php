@@ -16,6 +16,7 @@ use function Groundhogg\get_user_timezone;
 use function Groundhogg\groundhogg_icon;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\kses_e;
 use function Groundhogg\notices;
 use function Groundhogg\qualifies_for_review_your_funnel;
 use function Groundhogg\remote_post_json;
@@ -69,7 +70,7 @@ class Guided_Setup extends Admin_Page {
         <div id="guided-setup-nag" class="notice notice-success display-flex gap-10 is-dismissible">
 			<?php groundhogg_icon( 25 ) ?>
             <p>
-				<?php printf( __( 'Ready to get started with Groundhogg? Start the <a href="%s">guided setup</a> now!', 'groundhogg' ), admin_page_url( 'gh_guided_setup' ) ) ?>
+				<?php printf( esc_html__( 'Ready to get started with Groundhogg? Start the %1$sguided setup%2$s now!', 'groundhogg' ), "<a href=\"" . admin_page_url( 'gh_guided_setup' ) . "\">", "</a>" ) ?>
             </p>
             <script>( ($) => {
                 $('#guided-setup-nag').on('click', 'button.notice-dismiss', e => {
@@ -258,7 +259,7 @@ class Guided_Setup extends Admin_Page {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Guided Setup', 'groundhogg' );
+		return esc_html__( 'Guided Setup', 'groundhogg' );
 	}
 
 	/**
@@ -285,7 +286,7 @@ class Guided_Setup extends Admin_Page {
 	 * @return void
 	 */
 	public function view() {
-		_e( 'Look away!' );
+		// silence is golden
 	}
 
 	/**

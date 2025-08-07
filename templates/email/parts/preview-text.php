@@ -13,7 +13,7 @@ do_action( 'groundhogg/templates/email/preview-text/before' );
 if ( $email->get_pre_header() ):
 	?>
 	<div style="display: none; max-height: 0px; overflow: hidden;">
-		<?php echo $email->get_merged_pre_header() ?>
+		<?php echo esc_html( $email->get_merged_pre_header() ) ?>
 	</div>
 	<div style="display: none; max-height: 0px; overflow: hidden;">
 		<?php echo str_repeat( '&#847; &zwnj; &nbsp; &#8199; &shy;', 5 ); ?>

@@ -133,7 +133,7 @@ class Contacts_Api extends Base_Object_Api {
 				try {
 					$contact = generate_contact_with_map( $item, [], [
 						'type' => 'api',
-						'name' => __( 'REST API', 'groundhogg' )
+						'name' => esc_html__( 'REST API', 'groundhogg' )
 					] );
 				} catch ( \Exception $e ) {
 					return self::ERROR_500( 'error', $e->getMessage() );
@@ -453,7 +453,7 @@ class Contacts_Api extends Base_Object_Api {
 			try {
 				$contact = generate_contact_with_map( $fields, [], [
 					'type' => 'api',
-					'name' => __( 'REST API', 'groundhogg' )
+					'name' => esc_html__( 'REST API', 'groundhogg' )
 				] );
 			} catch ( \Exception $e ) {
 				return self::ERROR_500( 'error', $e->getMessage() );

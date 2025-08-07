@@ -106,7 +106,7 @@ abstract class Table extends WP_List_Table {
 				<span class="screen-reader-text">
 				<?php
 				/* translators: %s: Post title. */
-				printf( __( 'Select %s' ), $identity->get_title() );
+				printf( esc_html__( 'Select %s' ), esc_html( $identity->get_title() ) );
 				?>
 				</span>
             </label>
@@ -117,7 +117,7 @@ abstract class Table extends WP_List_Table {
 				printf(
 				/* translators: Hidden accessibility text. %s: Post title. */
 					__( '&#8220;%s&#8221; is locked' ),
-					$identity->get_title()
+					esc_html( $identity->get_title() )
 				);
 				?>
 				</span>

@@ -13,7 +13,7 @@ class Email extends Input {
 	public function get_default_args() {
 		return [
 			'type'        => 'email',
-			'label'       => _x( 'Email *', 'form_default', 'groundhogg' ),
+			'label'       => esc_html_x( 'Email *', 'form_default', 'groundhogg' ),
 			'name'        => 'email',
 			'id'          => 'email',
 			'class'       => 'gh-email',

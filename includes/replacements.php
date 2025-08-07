@@ -1045,13 +1045,13 @@ class Replacements implements \JsonSerializable {
 			} );
 
 			?>
-            <h3 class="replacements-group"><?php _e( $name ) ?></h3>
+            <h3 class="replacements-group"><?php echo esc_html( $name ) ?></h3>
             <table class="wp-list-table widefat fixed striped replacements-table">
                 <thead>
                 <tr>
-                    <th><?php _e( 'Name' ); ?></th>
-                    <th><?php _e( 'Code' ); ?></th>
-                    <th><?php _e( 'Description' ); ?></th>
+                    <th><?php esc_html_e( 'Name' ); ?></th>
+                    <th><?php esc_html_e( 'Code' ); ?></th>
+                    <th><?php esc_html_e( 'Description' ); ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -1064,13 +1064,13 @@ class Replacements implements \JsonSerializable {
 
 					?>
                     <tr>
-                        <td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+                        <td><?php echo esc_html( get_array_var( $replacement, 'name' ) ); ?></td>
                         <td>
                             <input class="replacement-selector code"
                                    type="text"
                                    style="border: none;outline: none;background: transparent;width: 100%;"
                                    onfocus="this.select();"
-                                   value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+                                   value="<?php echo esc_attr( get_array_var( $replacement, 'insert', '{' . $code . '}' ) ) ?>"
                                    readonly>
                         </td>
                         <td>
@@ -1088,11 +1088,11 @@ class Replacements implements \JsonSerializable {
 		wp_enqueue_script( 'groundhogg-admin-replacements' );
 
 		echo Plugin::$instance->utils->html->modal_link( array(
-			'title'              => __( 'Replacements', 'groundhogg' ),
+			'title'              => esc_html__( 'Replacements', 'groundhogg' ),
 			'text'               => $short
 				? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
 				: '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
-			'footer_button_text' => __( 'Insert' ),
+			'footer_button_text' => esc_html__( 'Insert' ),
 			'id'                 => 'replacements',
 			'class'              => 'button button-secondary no-padding replacements replacements-button',
 			'source'             => 'footer-replacement-codes',

@@ -204,13 +204,13 @@ class Events_Page extends Tabbed_Admin_Page {
 						'task_type' => [
 							'Task Type',
 							[
-								'Import_Contacts'        => __( 'Import contacts', 'groundhogg' ),
-								'Export_Contacts'        => __( 'Export contacts', 'groundhogg' ),
-								'Schedule_Broadcast'     => __( 'Schedule broadcast', 'groundhogg' ),
-								'Update_Contacts'        => __( 'Update contacts', 'groundhogg' ),
-								'Delete_Contacts'        => __( 'Delete contacts', 'groundhogg' ),
-								'Add_Contacts_To_Funnel' => __( 'Add contacts to flow', 'groundhogg' ),
-								'Complete_Benchmark'     => __( 'Trigger Flow', 'groundhogg' ),
+								'Import_Contacts'        => esc_html__( 'Import contacts', 'groundhogg' ),
+								'Export_Contacts'        => esc_html__( 'Export contacts', 'groundhogg' ),
+								'Schedule_Broadcast'     => esc_html__( 'Schedule broadcast', 'groundhogg' ),
+								'Update_Contacts'        => esc_html__( 'Update contacts', 'groundhogg' ),
+								'Delete_Contacts'        => esc_html__( 'Delete contacts', 'groundhogg' ),
+								'Add_Contacts_To_Funnel' => esc_html__( 'Add contacts to flow', 'groundhogg' ),
+								'Complete_Benchmark'     => esc_html__( 'Trigger Flow', 'groundhogg' ),
 							]
 						],
 						'user_id'   => [ 'User', $users ]
@@ -259,7 +259,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		return [
 			[
 				'link'   => admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ),
-				'action' => __( 'Settings', 'groundhogg' ),
+				'action' => esc_html__( 'Settings', 'groundhogg' ),
 				'target' => '_self',
 			]
 		];
@@ -411,7 +411,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		] );
 
 		if ( ! $result ) {
-			return new WP_Error( 'db_error', __( 'There was an error updating the database.', 'groundhogg' ) );
+			return new WP_Error( 'db_error', esc_html__( 'There was an error updating the database.', 'groundhogg' ) );
 		}
 
 		// Move the events over...
@@ -434,7 +434,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
 
 		if ( empty( $status ) || ! in_array( $status, $purgeable_events ) ) {
-			return new WP_Error( 'invalid_status', __( 'Invalid status.', 'groundhogg' ) );
+			return new WP_Error( 'invalid_status', esc_html__( 'Invalid status.', 'groundhogg' ) );
 		}
 
 		$query_params = get_request_query();
@@ -449,7 +449,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		$result = $query->delete();
 
 		if ( $result !== false ) {
-			$this->add_notice( 'events_purged', sprintf( __( 'Purged %s events!' ), _nf( $result ) ) );
+			$this->add_notice( 'events_purged', sprintf( esc_html__( 'Purged %s events!' ), _nf( $result ) ) );
 		}
 
 		return false;
@@ -683,23 +683,23 @@ class Events_Page extends Tabbed_Admin_Page {
 	protected function get_tabs() {
 		return [
 			[
-				'name' => __( 'Events', 'groundhogg' ),
+				'name' => esc_html__( 'Events', 'groundhogg' ),
 				'slug' => 'events',
 				'cap'  => 'view_events'
 			],
 			[
-				'name' => __( 'Emails', 'groundhogg' ),
+				'name' => esc_html__( 'Emails', 'groundhogg' ),
 				'slug' => 'emails',
 				'cap'  => 'view_logs'
 
 			],
 			[
-				'name' => __( 'Background Tasks', 'groundhogg' ),
+				'name' => esc_html__( 'Background Tasks', 'groundhogg' ),
 				'slug' => 'tasks',
 				'cap'  => 'manage_options'
 			],
 			[
-				'name' => __( 'Manage', 'groundhogg' ),
+				'name' => esc_html__( 'Manage', 'groundhogg' ),
 				'slug' => 'manage',
 				'cap'  => 'view_events'
 			],
@@ -721,8 +721,8 @@ class Events_Page extends Tabbed_Admin_Page {
 		?>
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
-            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
-            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
+            <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search' ); ?>:</label>
 
 			<?php if ( ! get_url_var( 'include_filters' ) ):
 				echo html()->input( [
@@ -733,17 +733,17 @@ class Events_Page extends Tabbed_Admin_Page {
 
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"
-                       value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
+                       value="<?php echo esc_attr( get_request_var( 's' ) ); ?>">
 				<?php
 
 				echo html()->dropdown( [
 					'options'           => [
-						'subject'    => __( 'Subject', 'groundhogg' ),
-						'content'    => __( 'Body', 'groundhogg' ),
-						'recipients' => __( 'Recipients', 'groundhogg' ),
-						'headers'    => __( 'Headers', 'groundhogg' )
+						'subject'    => esc_html__( 'Subject', 'groundhogg' ),
+						'content'    => esc_html__( 'Body', 'groundhogg' ),
+						'recipients' => esc_html__( 'Recipients', 'groundhogg' ),
+						'headers'    => esc_html__( 'Headers', 'groundhogg' )
 					],
-					'option_none'       => __( 'Everywhere', 'groundhogg' ),
+					'option_none'       => esc_html__( 'Everywhere', 'groundhogg' ),
 					'option_none_value' => '',
 					'name'              => 'search_columns',
 					'selected'          => get_request_var( 'search_columns' )
@@ -751,7 +751,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
 				?>
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
             </div>
         </form>
         <form method="post" class="search-form wp-clearfix">
@@ -1170,7 +1170,7 @@ ORDER BY ID" );
 	public function page() {
 
 		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::is_enabled() ) {
-			$this->add_notice( 'inactive', sprintf( __( "Email logging is currently disabled. You can enable email logging in the <a href='%s'>email settings</a>.", 'groundhogg' ), admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) ), 'warning' );
+			$this->add_notice( 'inactive', sprintf( esc_html__( 'Email logging is currently disabled. You can enable email logging in the %1$semail settings%2$s.', 'groundhogg' ), "<a href=\"" . admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) . "\">", "</a>" ), 'warning' );
 		}
 
 		parent::page();

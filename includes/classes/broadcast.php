@@ -168,9 +168,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_funnel_title() {
 		if ( $this->is_email() ) {
-			return __( 'Broadcast Email', 'groundhogg' );
+			return esc_html__( 'Broadcast Email', 'groundhogg' );
 		} else {
-			return __( 'Broadcast SMS', 'groundhogg' );
+			return esc_html__( 'Broadcast SMS', 'groundhogg' );
 		}
 	}
 
@@ -257,7 +257,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	public function get_title() {
 
 		if ( ! $this->get_object() || ! $this->get_object()->exists() ) {
-			return __( '(The associated Email or SMS was deleted.)', 'groundhogg' );
+			return esc_html__( '(The associated Email or SMS was deleted.)', 'groundhogg' );
 		}
 
 		return $this->get_object()->get_title();

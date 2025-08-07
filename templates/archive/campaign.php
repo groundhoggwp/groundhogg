@@ -70,7 +70,7 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 ?>
     <div class="box">
         <p>
-            <a href="<?php echo esc_url( managed_page_url( 'campaigns' ) ); ?>">&larr; <?php _e( 'All campaign archives', 'groundhogg' ) ?></a>
+            <a href="<?php echo esc_url( managed_page_url( 'campaigns' ) ); ?>">&larr; <?php esc_html_e( 'All campaign archives', 'groundhogg' ); ?></a>
         </p>
         <h1 class="no-margin-top"><?php printf( __( '%s Archive', 'groundhogg' ), $campaign->get_name() ); ?></h1>
 		<?php

@@ -65,17 +65,17 @@ $bodyStyle = array_filter( $bodyStyle );
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 	<?php load_part( 'head-close' ) ?>
 </head>
-<body class="email responsive template-boxed" dir="<?php esc_attr_e( $direction ); ?>" style="background-color: <?php esc_attr_e( $bgColor ); ?>">
+<body class="email responsive template-boxed" dir="<?php echo esc_attr( $direction ); ?>" style="background-color: <?php echo esc_attr( $bgColor ); ?>">
 <?php load_part( 'body-open' ); ?>
 <?php load_part( 'preview-text' ); ?>
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
-		<td align="<?php esc_attr_e( $alignment ); ?>" bgcolor="<?php esc_attr_e( $bgColor ); ?>"
+		<td align="<?php echo esc_attr( $alignment ); ?>" bgcolor="<?php echo esc_attr( $bgColor ); ?>"
 		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle )?>">
 			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse" role="presentation">
 				<tr>
-					<td width="<?php esc_attr_e( $email->get_width() ); ?>"
-					    style="width: <?php esc_attr_e( $email->get_width() ); ?>px">
+					<td width="<?php echo esc_attr( $email->get_width() ); ?>"
+					    style="width: <?php echo esc_attr( $email->get_width() ); ?>px">
 
 						<?php load_part( 'browser-view' ); ?>
 

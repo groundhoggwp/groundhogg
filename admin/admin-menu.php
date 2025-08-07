@@ -139,7 +139,7 @@ class Admin_Menu {
 				array(
 					'parent' => 'user-actions',
 					'id'     => 'contact-info',
-					'title'  => __( 'Contact Record', 'groundhogg' ),
+					'title'  =>esc_html__( 'Contact Record', 'groundhogg' ),
 					'href'   => $admin_contact->admin_link(),
 					'meta'   => array(
 						'tabindex' => - 1,

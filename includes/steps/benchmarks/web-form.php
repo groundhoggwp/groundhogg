@@ -110,7 +110,7 @@ class Web_Form extends Benchmark {
 		?>
         <div class="gh-panel">
             <div class="gh-panel-header">
-                <h2><?php _e( 'Embed options' ) ?></h2>
+                <h2><?php esc_html_e( 'Embed options' ); ?></h2>
             </div>
             <div class="inside">
                 <div class="display-flex column gap-10">

@@ -121,7 +121,7 @@ abstract class Updater {
 
 		?>
 		<h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3>
-		<p><?php _e( 'Click on a version to run the update process for that version.', 'groundhogg' ); ?></p>
+		<p><?php esc_html_e( 'Click on a version to run the update process for that version.', 'groundhogg' );; ?></p>
 		<?php
 
 		$updates = $this->_get_all_updates();
@@ -147,7 +147,7 @@ abstract class Updater {
 							'confirm'       => 'yes',
 						], $_SERVER['REQUEST_URI'] )
 					], $update ),
-					$_this->get_update_description( $update )
+					kses( $_this->get_update_description( $update ), 'simple' )
 				];
 			} )
 		);
@@ -160,7 +160,7 @@ abstract class Updater {
 		$action_url = Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
 
 		?>
-		<h3><?php echo $this->get_display_name(); ?></h3>
+		<h3><?php echo esc_html( $this->get_display_name() ); ?></h3>
 		<p><?php
 
 		echo html()->e( 'a', [
@@ -472,7 +472,7 @@ abstract class Updater {
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
 			'class' => 'gh-button secondary small'
-		], __( 'Update Now!', 'groundhogg' ) );
+		], esc_html__( 'Update Now!', 'groundhogg' ) );
 
 ?><div class="notice notice-info">
     <p><?php printf( __( "%s (%s) requires an update. Consider backing up your site before updating.", 'groundhogg' ), bold_it( $this->get_display_name() ), white_labeled_name() ); ?></p>
@@ -481,7 +481,7 @@ abstract class Updater {
 
             $description = $this->get_update_description( $missing_update );
 
-            ?><li style="margin-left: 10px"><?php _e( $missing_update ); if ($description) _e( ' - ' . $description ); ?></li><?php
+            ?><li style="margin-left: 10px"><?php echo esc_html( $missing_update ); if ($description) kses_e( ' - ' . $description, 'simple' ); ?></li><?php
         endforeach; ?>
     </ul>
         <p><?php echo $update_button; ?></p>

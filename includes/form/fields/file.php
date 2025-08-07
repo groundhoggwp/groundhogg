@@ -23,7 +23,7 @@ class File extends Input {
 	public function get_default_args() {
 		return [
 			'type'          => 'file',
-			'label'         => _x( 'File *', 'form_default', 'groundhogg' ),
+			'label'         => esc_html_x( 'File *', 'form_default', 'groundhogg' ),
 			'name'          => '',
 			'id'            => '',
 			'class'         => 'gh-file-uploader',

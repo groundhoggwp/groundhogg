@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="contact-picture">
 		<?php echo html()->e( 'img', [
 			'class'  => 'profile-picture has-box-shadow',
-			'title'  => __( 'Profile Picture' ),
+			'title'  => esc_html__( 'Profile Picture' ),
 			'width'  => 100,
 			'height' => 100,
 			'src'    => $contact->get_profile_picture()
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
     <!-- FIRST -->
     <h1 id="contact-full-name">
-		<?php esc_html_e( trim( $contact->get_full_name() ) ?: $contact->get_email() ); ?></span>
+		<?php echo esc_html( trim( $contact->get_full_name() ) ?: $contact->get_email() ); ?></span>
     </h1>
     <div class="gh-panel">
         <div id="contact-more-actions" class="display-flex gap-5" style="padding: 20px 20px 20px 0"></div>
@@ -74,10 +74,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php if ( $contact->get_phone_number() ): ?>
                         <div class="phone align-left-space-between">
 							<?php dashicon_e( 'phone' ); ?>
-							<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+							<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], esc_html( $contact->get_phone_number() ) ) ?>
 							<?php if ( $contact->get_phone_extension() ): ?>
                                 <span class="extension">
-                                <?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?>
+                                <?php echo esc_html( sprintf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ) ?>
                             </span>
 							<?php endif; ?>
                         </div>
@@ -85,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php if ( $contact->get_mobile_number() ): ?>
                         <div class="mobile align-left-space-between">
 							<?php dashicon_e( 'smartphone' ); ?>
-							<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+							<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], esc_html( $contact->get_mobile_number() ) ) ?>
                         </div>
 					<?php endif; ?>
                 </div>
@@ -111,14 +111,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->time_i18n() : $local->i18n();
 
 				?><span><?php
-					printf( __( 'Local time is %s', 'groundhogg' ), html()->e( 'abbr', [
+					printf( esc_html__( 'Local time is %s', 'groundhogg' ), html()->e( 'abbr', [
 						'title' => $local->wpDateTimeFormat()
 					], $display ) );
 					?></span>
             </div>
             <div id="contact-date-created" class="date-created align-left-space-between"
                  title="<?php esc_attr_e( 'Date created', 'groundhogg' ); ?>">
-				<?php dashicon_e( 'calendar-alt' ); ?><span><?php printf( __( 'Subscribed since %s', 'groundhogg' ), html()->e( 'abbr', [
+				<?php dashicon_e( 'calendar-alt' ); ?><span><?php printf( esc_html__( 'Subscribed since %s', 'groundhogg' ), html()->e( 'abbr', [
 						'title' => $contact->get_date_created( true )->wi18n()
 					], $contact->get_date_created( true )->wpDateFormat() ) ); ?></span>
             </div>
@@ -139,7 +139,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php dashicon_e( 'buddicons-community' ); ?><span>
                     <?php
 
-                    printf( __( 'Birthday in %s, currently %s years old.', 'groundhogg' ),
+                    printf( esc_html__( 'Birthday in %s, currently %s years old.', 'groundhogg' ),
 	                    html()->e( 'abbr', [
 		                    'title' => $nextBirthday->wpDateFormat()
 	                    ], $nextBirthday->human_time_diff() ),

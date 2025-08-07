@@ -253,41 +253,41 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
-		self::register_preset( 'defaults', __( 'Defaults', 'groundhogg' ) );
-		self::register_preset( 'minimal', __( 'Minimal', 'groundhogg' ) );
+		self::register_preset( 'defaults', esc_html__( 'Defaults', 'groundhogg' ) );
+		self::register_preset( 'minimal', esc_html__( 'Minimal', 'groundhogg' ) );
 
-		self::register( 'status', __( 'Status', 'groundhogg' ), [
+		self::register( 'status', esc_html__( 'Status', 'groundhogg' ), [
 			self::class,
 			'column_optin_status'
 		], 'optin_status', 1, 'view_contacts', [ 'defaults', 'minimal' ] );
 
 		// Core columns
-		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
+		self::register( 'first_name', esc_html__( 'First Name', 'groundhogg' ), [
 			self::class,
 			'column_first_name'
 		], 'first_name', 2, 'view_contacts', [ 'defaults', 'minimal' ] );
-		self::register( 'last_name', __( 'Last Name', 'groundhogg' ), [
+		self::register( 'last_name', esc_html__( 'Last Name', 'groundhogg' ), [
 			self::class,
 			'column_last_name'
 		], 'last_name', 3, 'view_contacts', [ 'defaults', 'minimal' ] );
-		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10, 'list_users', 'defaults' );
-		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10, 'view_contacts', 'defaults' );
-		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10, 'view_contacts', 'defaults' );
-		self::register( 'date_created', __( 'Date Created', 'groundhogg' ), [
+		self::register( 'user_id', esc_html__( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10, 'list_users', 'defaults' );
+		self::register( 'owner_id', esc_html__( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10, 'view_contacts', 'defaults' );
+		self::register( 'tel_numbers', esc_html__( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10, 'view_contacts', 'defaults' );
+		self::register( 'date_created', esc_html__( 'Date Created', 'groundhogg' ), [
 			self::class,
 			'column_date_created'
 		], 'date_created', 10, 'view_contacts', 'defaults' );
 
 		// Other Columns
-		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], 'tc.tag_count', 11, 'view_contacts', [ 'defaults', 'minimal' ] );
-		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false, 11, 'view_contacts', 'defaults' );
-		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11, 'view_contacts', 'defaults' );
+		self::register( 'tags_col', esc_html__( 'Tags' ), [ self::class, 'column_tags' ], 'tc.tag_count', 11, 'view_contacts', [ 'defaults', 'minimal' ] );
+		self::register( 'address', esc_html__( 'Location' ), [ self::class, 'column_location' ], false, 11, 'view_contacts', 'defaults' );
+		self::register( 'birthday', esc_html__( 'Birthday' ), [ self::class, 'column_birthday' ], 'cm.birthday', 11, 'view_contacts', 'defaults' );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
 
-		self::register_preset( 'unsub', __( 'Unsubscribe', 'groundhogg' ) );
+		self::register_preset( 'unsub', esc_html__( 'Unsubscribe', 'groundhogg' ) );
 
-		self::register( 'date_unsubscribed', __( 'Unsubscribed', 'groundhogg' ), function ( Contact $contact ) {
+		self::register( 'date_unsubscribed', esc_html__( 'Unsubscribed', 'groundhogg' ), function ( Contact $contact ) {
 			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
 				return '';
 			}
@@ -306,7 +306,7 @@ class Contact_Table_Columns {
 			return $date->wpDateTimeFormat();
 		}, 'date_optin_status_changed', 90, 'view_contacts', 'unsub' );
 
-		self::register( 'unsub_reason', __( 'Unsub Reason', 'groundhogg' ), function ( Contact $contact ) {
+		self::register( 'unsub_reason', esc_html__( 'Unsub Reason', 'groundhogg' ), function ( Contact $contact ) {
 			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
 				return '';
 			}
@@ -323,7 +323,7 @@ class Contact_Table_Columns {
 			return esc_html( get_array_var( get_unsub_reasons(), $activity->get_meta( 'reason' ) ) );
 		}, false, 91, 'view_contacts', 'unsub' );
 
-		self::register( 'unsub_feedback', __( 'Unsub Feedback', 'groundhogg' ), function ( Contact $contact ) {
+		self::register( 'unsub_feedback', esc_html__( 'Unsub Feedback', 'groundhogg' ), function ( Contact $contact ) {
 			if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ) {
 				return '';
 			}
@@ -350,8 +350,8 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_optin_status( $contact ) {
 		?>
-        <span class="pill sm gh-has-tooltip <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ?><span
-                    class="gh-tooltip right"><?php _e( Plugin::instance()->preferences->get_optin_status_text( $contact ) ) ?></span></span>
+        <span class="pill sm gh-has-tooltip <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo esc_html( Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ) ?><span
+                    class="gh-tooltip right"><?php echo esc_html( Plugin::instance()->preferences->get_optin_status_text( $contact ) ) ?></span></span>
 		<?php
 	}
 
@@ -361,7 +361,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_first_name( $contact ) {
-		echo $contact->get_first_name() ? $contact->get_first_name() : '&#x2014;';
+		echo $contact->get_first_name() ? esc_html( $contact->get_first_name() ) : '&#x2014;';
 	}
 
 	/**
@@ -370,7 +370,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_last_name( $contact ) {
-		echo $contact->get_last_name() ? $contact->get_last_name() : '&#x2014;';
+		echo $contact->get_last_name() ? esc_html( $contact->get_last_name() ) : '&#x2014;';
 	}
 
 	/**
@@ -379,7 +379,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_user_id( $contact ) {
-		echo $contact->get_userdata() ? '<a href="' . admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) . '">' . $contact->get_userdata()->display_name . '</a>' : '&#x2014;';
+		echo $contact->get_userdata() ? '<a href="' . esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) ). '">' . esc_html( $contact->get_userdata()->display_name ) . '</a>' : '&#x2014;';
 	}
 
 	/**
@@ -388,7 +388,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_owner_id( $contact ) {
-		echo $contact->owner_id ? '<a href="' . admin_page_url( 'gh_contacts', [ 'owner' => $contact->owner_id ] ) . '">' . $contact->get_ownerdata()->display_name . '</a>' : '&#x2014;';
+		echo $contact->owner_id ? '<a href="' . esc_url( admin_page_url( 'gh_contacts', [ 'owner' => $contact->owner_id ] ) ) . '">' . esc_html( $contact->get_ownerdata()->display_name ) . '</a>' : '&#x2014;';
 	}
 
 	/**
@@ -417,9 +417,9 @@ class Contact_Table_Columns {
 
 			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
 				$tag = new Tag( $tag ) ?><a
-                class="gh-tag" href="<?php echo admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->tag_id ] ) ?>"><?php esc_html_e( $tag->get_name() ); ?></a><?php endforeach; ?>
+                class="gh-tag" href="<?php echo admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->tag_id ] ) ?>"><?php echo esc_html( $tag->get_name() ); ?></a><?php endforeach; ?>
 			<?php if ( count( $tags ) > 0 ): ?>
-				<?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
+				<?php printf( esc_html__( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
 			<?php endif; ?>
         </div>
 		<?php
@@ -439,7 +439,7 @@ class Contact_Table_Columns {
 		$date = date_i18n( get_option( 'date_format' ), strtotime( $contact->birthday ) );
 		$age  = $contact->get_age();
 
-		printf( __( 'Born <abbr title="Age">%s</abbr> | %s years old', 'groundhogg' ), $date, $age );
+		printf( esc_html__( 'Born %s | %s years old', 'groundhogg' ), "<abbr title=\"" . esc_attr( __( 'Date of birth', 'groundhogg' ) ) . "\">" . $date . "</abbr>", $age );
 	}
 
 	/**
@@ -450,16 +450,16 @@ class Contact_Table_Columns {
 	protected static function column_tel_numbers( Contact $contact ) {
 		if ( $contact->get_phone_number() ): ?>
             <div class="phone"
-                 title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+                 title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], esc_html( $contact->get_phone_number() ) ) ?>
 				<?php if ( $contact->get_phone_extension() ): ?>
                     <span
-                            class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+                            class="extension"><?php echo esc_html( sprintf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ) ?></span>
 				<?php endif; ?>
             </div>
 		<?php endif;
 		if ( $contact->get_mobile_number() ): ?>
             <div class="phone"
-                 title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+                 title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], esc_html( $contact->get_mobile_number() ) ) ?>
             </div>
 		<?php endif;
 	}

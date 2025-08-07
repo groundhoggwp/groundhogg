@@ -127,7 +127,7 @@ abstract class Branch_Logic extends Logic {
 		$this->set_current_step( $step );
 
 		?>
-        <div class="sortable-item logic branch-logic" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
+        <div class="sortable-item logic branch-logic" data-type="<?php echo esc_attr( $step->get_type() ); ?>" data-group="<?php echo esc_attr( $step->get_group() ); ?>">
 			<?php $this->add_step_button( 'before-' . $step->ID ); ?>
             <div class="flow-line"></div>
 			<?php $this->__sortable_item( $step ); ?>
@@ -143,9 +143,9 @@ abstract class Branch_Logic extends Logic {
 					?>
                     <div class="split-branch <?php echo $classes ?>">
                         <div class="logic-line line-above">
-                            <span id="<?php _e( 'branch-name-indicator-' . $branch_id ) ?>" class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
+                            <span id="<?php echo esc_attr( 'branch-name-indicator-' . $branch_id ) ?>" class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
-                        <div id="<?php esc_attr_e( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php esc_attr_e( $branch_id ); ?>">
+                        <div id="<?php echo esc_attr( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php echo esc_attr( $branch_id ); ?>">
                             <?php foreach ( $steps as $branch_step ) {
 								$branch_step->sortable_item();
 							}

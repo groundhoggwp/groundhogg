@@ -884,7 +884,7 @@ class Tracking {
 
 		if ( ! $activity ) {
 			// Tracking not available.
-			wp_die( __( 'Oops... This link is currently unavailable.', 'groundhogg' ) );
+			wp_die( esc_html__( 'Oops... This link is currently unavailable.', 'groundhogg' ) );
 		}
 
 		/**

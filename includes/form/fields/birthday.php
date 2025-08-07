@@ -21,7 +21,7 @@ class Birthday extends Input {
 
 	public function get_default_args() {
 		return [
-			'label'    => _x( 'Birthday *', 'form_default', 'groundhogg' ),
+			'label'    => esc_html_x( 'Birthday *', 'form_default', 'groundhogg' ),
 			'class'    => 'birthday',
 			'required' => false,
 		];

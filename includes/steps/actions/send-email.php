@@ -332,10 +332,10 @@ class Send_Email extends Action {
 		?>
         <div class="gh-panel">
             <div class="gh-panel-header">
-                <h2><?php _e( 'Email Settings' ) ?></h2>
+                <h2><?php esc_html_e( 'Email Settings', 'groundhogg' ) ?></h2>
             </div>
             <div class="inside display-flex column gap-10">
-                <label for=""><?php _e( 'Email threading' ) ?></label>
+                <label for=""><?php esc_html_e( 'Email threading', 'groundhogg' ); ?></label>
 				<?php echo html()->dropdown( [
 					'name'        => $this->setting_name_prefix( 'reply_in_thread' ),
 					'option_none' => 'No threading',
@@ -344,7 +344,7 @@ class Send_Email extends Action {
 				] ); ?>
 				<?php if ( $has_confirmation ): ?>
 					<?php echo html()->checkbox( [
-						'label'   => __( 'Skip this email if the contact is already confirmed', 'groundhogg' ),
+						'label'   => esc_html__( 'Skip this email if the contact is already confirmed', 'groundhogg' ),
 						'name'    => $this->setting_name_prefix( 'skip_if_confirmed' ),
 						'checked' => $this->get_setting( 'skip_if_confirmed' )
 					] ); ?>
@@ -357,7 +357,7 @@ class Send_Email extends Action {
 	protected function labels() {
 
 		if ( $this->get_setting( 'reply_in_thread' ) ):?>
-            <div class="step-label green"><?php _e( 'Reply', 'groundhogg' ); ?></div>
+            <div class="step-label green"><?php esc_html_e( 'Reply', 'groundhogg' ); ?></div>
 		<?php
 		endif;
 	}

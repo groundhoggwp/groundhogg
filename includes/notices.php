@@ -97,7 +97,7 @@ class Notices {
 
 		foreach ( $show as $notice ) {
 			?>
-            <div class="notice notice-<?php esc_attr_e( $notice['type'] ); ?> is-dismissible">
+            <div class="notice notice-<?php echo esc_attr( $notice['type'] ); ?> is-dismissible">
                 <div class="display-flex gap-10">
 					<?php groundhogg_icon( 24 ); ?>
                     <div class="notice-message">
@@ -505,7 +505,7 @@ class Notices {
 	 */
 	public function print_notice( $notice ) {
 		?>
-        <div id="<?php esc_attr_e( $notice['code'] ); ?>" class="notice notice-<?php esc_attr_e( $notice['type'] ); ?> is-dismissible">
+        <div id="<?php echo esc_attr( $notice['code'] ); ?>" class="notice notice-<?php echo esc_attr( $notice['type'] ); ?> is-dismissible">
 			<?php echo wp_kses_post( wpautop( $notice['message'] ) ); ?>
 			<?php if ( $notice['type'] === 'error' && ! empty( $notice['data'] ) ): ?>
                 <p>

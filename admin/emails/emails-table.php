@@ -108,7 +108,7 @@ class Emails_Table extends Table {
 		?>
         <div class="alignleft gh-actions">
             <a class="button danger"
-               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php esc_html_e( 'Empty Trash', 'groundhogg' ); ?></a>
         </div>
 		<?php
 	}
@@ -138,11 +138,11 @@ class Emails_Table extends Table {
 		$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
 		if ( $email->is_draft() && ! $this->view_is( 'draft' ) ) {
-			$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Draft' ) . "</span>";
+			$html .= " &#x2014; " . "<span class='post-state'>" . esc_html__( 'Draft' ) . "</span>";
 		}
 
 		if ( $email->is_template() && ! $this->view_is( 'template' ) ) {
-			$html .= " &#x2014; " . "<span class='post-state'>" . __( 'Template', 'groundhogg' ) . "</span>";
+			$html .= " &#x2014; " . "<span class='post-state'>" . esc_html__( 'Template', 'groundhogg' ) . "</span>";
 		}
 
 		$html .= "</strong>";
@@ -167,7 +167,7 @@ class Emails_Table extends Table {
 	protected function column_from_user( $email ) {
 
 		if ( $email->get_from_user_id() == 0 && ! $email->get_meta( 'use_default_from' ) ) {
-			return __( 'The contact\'s owner', 'groundhogg' );
+			return esc_html__( 'The contact\'s owner', 'groundhogg' );
 		}
 
 		if ( $email->get_from_user() ) {
@@ -189,7 +189,7 @@ class Emails_Table extends Table {
 	protected function column_author( $email ) {
 		$user = get_userdata( intval( ( $email->get_author_id() ) ) );
 		if ( ! $user ) {
-			return __( 'Unknown', 'groundhogg' );
+			return esc_html__( 'Unknown', 'groundhogg' );
 		}
 		$from_user = esc_html( $user->display_name );
 		$queryUrl  = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $email->get_author_id() );
@@ -324,28 +324,28 @@ class Emails_Table extends Table {
 
 		switch ( $this->get_view() ) {
 			default:
-				$actions[] = [ 'class' => 'gh-email-preview', 'display' => __( 'Preview' ), 'url' => '#' ];
-				$actions[] = [ 'class' => 'edit', 'display' => __( 'Edit' ), 'url' => $item->admin_link() ];
+				$actions[] = [ 'class' => 'gh-email-preview', 'display' => esc_html__( 'Preview' ), 'url' => '#' ];
+				$actions[] = [ 'class' => 'edit', 'display' => esc_html__( 'Edit' ), 'url' => $item->admin_link() ];
 				$actions[] = [
 					'class'   => 'duplicate',
-					'display' => __( 'Duplicate' ),
+					'display' => esc_html__( 'Duplicate' ),
 					'url'     => action_url( 'duplicate', [ 'email' => $item->get_id() ] )
 				];
 				$actions[] = [
 					'class'   => 'trash',
-					'display' => __( 'Trash' ),
+					'display' => esc_html__( 'Trash' ),
 					'url'     => action_url( 'trash', [ 'email' => $item->get_id() ] )
 				];
 				break;
 			case 'trash':
 				$actions[] = [
 					'class'   => 'restore',
-					'display' => __( 'Restore' ),
+					'display' => esc_html__( 'Restore' ),
 					'url'     => action_url( 'restore', [ 'email' => $item->get_id() ] )
 				];
 				$actions[] = [
 					'class'   => 'trash',
-					'display' => __( 'Delete' ),
+					'display' => esc_html__( 'Delete' ),
 					'url'     => action_url( 'delete', [ 'email' => $item->get_id() ] )
 				];
 				break;
@@ -358,37 +358,37 @@ class Emails_Table extends Table {
 		return [
 			[
 				'view'    => '',
-				'display' => __( 'All' ),
+				'display' => esc_html__( 'All' ),
 				'query'   => [ 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'ready',
-				'display' => __( 'Ready', 'groundhogg' ),
+				'display' => esc_html__( 'Ready', 'groundhogg' ),
 				'query'   => [ 'status' => 'ready' ],
 			],
 			[
 				'view'    => 'template',
-				'display' => __( 'Templates', 'groundhogg' ),
+				'display' => esc_html__( 'Templates', 'groundhogg' ),
 				'query'   => [ 'is_template' => 1, 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'draft',
-				'display' => __( 'Drafts' ),
+				'display' => esc_html__( 'Drafts' ),
 				'query'   => [ 'status' => 'draft' ],
 			],
 			[
 				'view'    => 'marketing',
-				'display' => __( 'Marketing', 'groundhogg' ),
+				'display' => esc_html__( 'Marketing', 'groundhogg' ),
 				'query'   => [ 'message_type' => 'marketing', 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'transactional',
-				'display' => __( 'Transactional', 'groundhogg' ),
+				'display' => esc_html__( 'Transactional', 'groundhogg' ),
 				'query'   => [ 'message_type' => 'transactional', 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'blocks',
-				'display' => __( 'Block Editor', 'groundhogg' ),
+				'display' => esc_html__( 'Block Editor', 'groundhogg' ),
 				'query'   => [
 					'meta_query' => [
 						[
@@ -402,7 +402,7 @@ class Emails_Table extends Table {
 			],
 			[
 				'view'    => 'html',
-				'display' => __( 'HTML', 'groundhogg' ),
+				'display' => esc_html__( 'HTML', 'groundhogg' ),
 				'query'   => [
 					'meta_query' => [
 						[
@@ -416,14 +416,14 @@ class Emails_Table extends Table {
 			],
 //			[
 //				'view'    => 'unused',
-//				'display' => __( 'Unused', 'groundhogg' ),
+//				'display' => esc_html__( 'Unused', 'groundhogg' ),
 //				'query'   => [
 //					'unused' => true
 //				],
 //			],
 			[
 				'view'    => 'trash',
-				'display' => __( 'Trash', 'groundhogg' ),
+				'display' => esc_html__( 'Trash', 'groundhogg' ),
 				'query'   => [ 'status' => 'trash' ],
 			]
 		];

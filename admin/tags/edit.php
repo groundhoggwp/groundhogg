@@ -34,18 +34,18 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
     <table class="form-table">
         <tbody>
         <tr class="form-field form-required term-name-wrap">
-            <th scope="row"><label for="name"><?php _e( 'Name' ) ?></label></th>
-            <td><input name="name" id="name" type="text" value="<?php esc_attr_e( $tag->tag_name ); ?>" size="40"
+            <th scope="row"><label for="name"><?php echo esc_html( _x( 'Name', 'tag name', 'groundhogg' ) ); ?></label></th>
+            <td><input name="name" id="name" type="text" value="<?php echo esc_attr( $tag->tag_name ); ?>" size="40"
                        aria-required="true">
-                <p class="description"><?php _e( 'A descriptive name of the tag so you remember what it means', 'groundhogg' ) ?>
+                <p class="description"><?php esc_html_e( 'A descriptive name of the tag so you remember what it means', 'groundhogg' ) ?>
                     .</p>
             </td>
         </tr>
         <tr class="form-field term-description-wrap">
-            <th scope="row"><label for="description"><?php _e( 'Description' ); ?></label></th>
+            <th scope="row"><label for="description"><?php echo esc_html( _x( 'Description', 'tag description', 'groundhogg' ) ); ?></label></th>
             <td><textarea name="description" id="description" rows="5" cols="50"
                           class="large-text"><?php echo $tag->tag_description; ?></textarea>
-                <p class="description"><?php _e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ) ?>
+                <p class="description"><?php esc_html_e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ) ?>
                     .</p>
             </td>
         </tr>
@@ -53,8 +53,10 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
 		<?php do_action( 'groundhogg/admin/tags/edit/form', $id ); ?>
     </table>
     <div class="edit-tag-actions">
-		<?php submit_button( __( 'Update' ), 'primary', 'update', false ); ?>
-        <span id="delete-link"><a class="delete"
-                                  href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag=' . $id ), 'delete' ) ?>"><?php _e( 'Delete' ); ?></a></span>
+		<?php submit_button( esc_html__( 'Update' ), 'primary', 'update', false ); ?>
+        <span id="delete-link">
+            <a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag=' . $id ), 'delete' ) ?>">
+                <?php esc_html_e( 'Delete' ); ?>
+            </a></span>
     </div>
 </form>

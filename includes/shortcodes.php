@@ -113,10 +113,10 @@ class Shortcodes {
 
 		?>
         <div class="gh-email-preview-wrapper has-iframe">
-            <iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php esc_attr_e( $atts['id'] ); ?>"></iframe>
+            <iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php echo esc_attr( $atts['id'] ); ?>"></iframe>
             <script>
 
-              let iframe = document.getElementById('gh-email-preview-<?php esc_attr_e( $atts['id'] ); ?>')
+              let iframe = document.getElementById('gh-email-preview-<?php echo esc_attr( $atts['id'] ); ?>')
 
               let email = <?php echo wp_json_encode( $email ); ?>;
 

@@ -153,7 +153,7 @@ class Delay_Timer extends Action {
 		?>
         <div class="gh-panel">
             <div class="gh-panel-header">
-                <h2><?php _e( 'Delay Preview' ) ?></h2>
+                <h2><?php esc_html_e( 'Delay Preview', 'groundhogg' ) ?></h2>
             </div>
             <div class="inside">
 				<?php
@@ -165,7 +165,7 @@ class Delay_Timer extends Action {
 				echo html()->e( 'div', [
 					'class' => "display-flex gap-10 column"
 				], [
-					'<b>' . __( 'Runs on...' ) . '</b>',
+					'<b>' . esc_html__( 'Runs on...', 'groundhogg' ) . '</b>',
 					'<span>' . $date->wpDateTimeFormat() . '</span>'
 				] );
 

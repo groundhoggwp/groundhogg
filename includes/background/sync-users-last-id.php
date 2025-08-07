@@ -48,7 +48,7 @@ class Sync_Users_Last_Id extends Sync_Users {
 		remove_filter( 'pre_user_query', [ $this, 'filter_last_id' ]  );
 
 		if ( empty( $users ) ) {
-			$message = sprintf( __( '%s users have been synced!', 'groundhogg' ), bold_it( _nf( $this->users ) ) );
+			$message = sprintf( esc_html__( '%s users have been synced!', 'groundhogg' ), bold_it( _nf( $this->users ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
 			return true;

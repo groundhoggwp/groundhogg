@@ -123,7 +123,7 @@ class Funnel extends Base_Object_With_Meta {
 					<?php endif; ?>
                 </div>
                 <div class="gh-tooltip top">
-					<?php _e( get_array_var( $step->data, 'step_title' ) ) ?>
+					<?php echo esc_html( get_array_var( $step->data, 'step_title' ) ) ?>
                 </div>
             </div>
 			<?php

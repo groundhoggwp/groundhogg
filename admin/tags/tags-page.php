@@ -84,7 +84,7 @@ class Tags_Page extends Admin_Page {
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'view' ] ),
-				'action' => __( 'Add New', 'groundhogg' ),
+				'action' => esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 			]
 		];
@@ -97,7 +97,7 @@ class Tags_Page extends Admin_Page {
 		?>
         <div class="display-flex" style="gap: 40px;">
             <div class="left col-wrap">
-                <h2><?php _e( 'Add a new tag', 'groundhogg' ); ?></h2>
+                <h2><?php esc_html_e( 'Add a new tag', 'groundhogg' ); ?></h2>
                 <form class="display-flex column gap-10 form-wrap" method="post">
 					<?php
 
@@ -106,24 +106,24 @@ class Tags_Page extends Admin_Page {
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'tag-name' ], __( 'Name' ) ),
+						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Name' ) ),
 						html()->input( [
 							'id'   => 'tag-name',
 							'name' => 'tag_name'
 						] ),
-						html()->description( __( 'Name a tag something simple so you do not forget it.', 'groundhogg' ) )
+						html()->description( esc_html__( 'Name a tag something simple so you do not forget it.', 'groundhogg' ) )
 					] );
 
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'tag-name' ], __( 'Description' ) ),
+						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Description' ) ),
 						html()->textarea( [
 							'id'   => 'tag-description',
 							'name' => 'tag_description',
 							'rows' => 3
 						] ),
-						html()->description( __( 'What the tag signifies when applied to a contact.', 'groundhogg' ) )
+						html()->description( esc_html__( 'What the tag signifies when applied to a contact.', 'groundhogg' ) )
 					] );
 
 					do_action( 'groundhogg/admin/tags/add/form' );
@@ -131,14 +131,14 @@ class Tags_Page extends Admin_Page {
 					echo html()->e( 'div', [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
-						'text'  => __( 'Add Tag', 'groundhogg' )
+						'text'  => esc_html__( 'Add Tag', 'groundhogg' )
 					] ) );
 
 					?>
 
                 </form>
                 <div class="spacer" style="height: 40px"></div>
-                <h2><?php _e( 'Add multiple tags', 'groundhogg' ); ?></h2>
+                <h2><?php esc_html_e( 'Add multiple tags', 'groundhogg' ); ?></h2>
                 <form class="display-flex column gap-10 form-wrap" method="post">
 					<?php
 
@@ -147,19 +147,19 @@ class Tags_Page extends Admin_Page {
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'bulk-tags' ], __( 'Tag names', 'groundhogg' ) ),
+						html()->e( 'label', [ 'for' => 'bulk-tags' ], esc_html__( 'Tag names', 'groundhogg' ) ),
 						html()->textarea( [
 							'id'   => 'bulk-tags',
 							'name' => 'bulk_tags',
 							'rows' => 5
 						] ),
-						html()->description( __( 'Enter 1 tag name per line.', 'groundhogg' ) )
+						html()->description( esc_html__( 'Enter 1 tag name per line.', 'groundhogg' ) )
 					] );
 
 					echo html()->e( 'div', [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
-						'text'  => __( 'Add Tags', 'groundhogg' )
+						'text'  => esc_html__( 'Add Tags', 'groundhogg' )
 					] ) );
 
 					?>
@@ -169,7 +169,7 @@ class Tags_Page extends Admin_Page {
             </div>
             <div>
 				<?php
-				$this->search_form( __( 'Search Tags', 'groundhogg' ) );
+				$this->search_form( esc_html__( 'Search Tags', 'groundhogg' ) );
 				?>
 
                 <form id="posts-filter" method="post">
@@ -221,7 +221,7 @@ class Tags_Page extends Admin_Page {
 			$tag_name = trim( sanitize_text_field( get_post_var( 'tag_name' ) ) );
 
 			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-				return new WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
+				return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), get_db( 'tags' )->get_max_index_length() ) );
 			}
 
 			$tag_desc = sanitize_textarea_field( get_post_var( 'tag_description' ) );
@@ -258,7 +258,7 @@ class Tags_Page extends Admin_Page {
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
 		if ( strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-			return new WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
+			return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), get_db( 'tags' )->get_max_index_length() ) );
 		}
 		$args = array(
 			'tag_name'        => $tag_name,

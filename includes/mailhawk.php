@@ -232,11 +232,11 @@ class Mailhawk {
         <table class="form-table">
             <tbody>
             <tr>
-                <th><?php _e( 'A better way to send email.', 'groundhogg' ); ?></th>
+                <th><?php esc_html_e( 'A better way to send email.', 'groundhogg' ); ?></th>
                 <td><?php $this->output_connect_button(); ?>
 
 					<?php if ( ! function_exists( '\MailHawk\mailhawk_is_connected' ) || ! \MailHawk\mailhawk_is_connected() ) : ?>
-                        <p class="description"><?php _e( 'Never worry about sending email again! <a href="https://mailhawk.io/" target="_blank">MailHawk</a> takes care of everything for you for starting at <b>$14.97/month!</b>', 'groundhogg' ); ?></p>
+                        <p class="description"><?php printf( esc_html__( 'Never worry about sending email again! %s takes care of everything for you for starting at $1/month!', 'groundhogg' ), '<a href="https://mailhawk.io/" target="_blank">MailHawk</a>' ); ?></p>
 					<?php endif; ?>
                 </td>
             </tr>

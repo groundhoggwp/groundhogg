@@ -82,7 +82,7 @@ class Bulk_Job_Page extends Admin_Page {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Processing...', 'groundhogg' );
+		return esc_html__( 'Processing...', 'groundhogg' );
 	}
 
 	public function admin_title( $admin_title, $title ) {
@@ -114,7 +114,7 @@ class Bulk_Job_Page extends Admin_Page {
 	 */
 	public function page() {
 
-		$this->add_notice( 'do_not_leave', __( 'Do not leave the page till the process is complete!', 'groundhogg' ), 'warning' );
+		$this->add_notice( 'do_not_leave', esc_html__( 'Do not leave the page till the process is complete!', 'groundhogg' ), 'warning' );
 
 		?>
         <div class="wrap">
@@ -150,7 +150,7 @@ class Bulk_Job_Page extends Admin_Page {
 
 		$bp_args = [
 			'num_retries'   => 3,
-			'error_message' => sprintf( __( 'Something went wrong. Please contact %s support.', 'groundhogg' ), white_labeled_name() ),
+			'error_message' => sprintf( esc_html__( 'Something went wrong. Please contact %s support.', 'groundhogg' ), white_labeled_name() ),
 		];
 
 		if ( use_experimental_features() ) {
@@ -161,17 +161,17 @@ class Bulk_Job_Page extends Admin_Page {
 
 		?>
         <p>
-			<?php _e( 'Total Complete: ' ); ?><b><span id="total-complete">0</span></b>
+			<?php esc_html_e( 'Total Complete: ', 'groundhogg' ); ?><b><span id="total-complete">0</span></b>
         </p>
         <p>
-			<?php _e( 'Total Remaining: ' ); ?><b><span id="total-remaining">0</span></b>
+			<?php esc_html_e( 'Total Remaining: ', 'groundhogg' ); ?><b><span id="total-remaining">0</span></b>
         </p>
         <p>
 			<?php echo html()->textarea( [
 				'name'        => '',
 				'id'          => 'bulk-log',
 				'class'       => '',
-				'value'       => __( '### LOG ###', 'groundhogg' ),
+				'value'       => esc_html__( '### LOG ###', 'groundhogg' ),
 				'cols'        => '',
 				'rows'        => '10',
 				'readonly'    => true,
@@ -180,10 +180,10 @@ class Bulk_Job_Page extends Admin_Page {
 			] ); ?>
         </p>
         <div id="job-complete" class="hidden">
-            <p><?php _e( "The process is now complete.", 'groundhogg' ); ?></p>
+            <p><?php esc_html_e( "The process is now complete.", 'groundhogg' ); ?></p>
             <p class="submit">
                 <a class="button button-primary"
-                   href="<?php echo admin_url( 'index.php' ); ?>">&larr;&nbsp;<?php _e( 'Return to dashboard.', 'groundhogg' ) ?></a>
+                   href="<?php echo admin_url( 'index.php' ); ?>">&larr;&nbsp;<?php esc_html_e( 'Return to dashboard.', 'groundhogg' ) ?></a>
             </p>
         </div>
 

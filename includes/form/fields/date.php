@@ -23,7 +23,7 @@ class Date extends Input {
 	public function get_default_args() {
 		return [
 			'type'        => 'text',
-			'label'       => _x( 'Date *', 'form_default', 'groundhogg' ),
+			'label'       => esc_html_x( 'Date *', 'form_default', 'groundhogg' ),
 			'name'        => '',
 			'id'          => '',
 			'class'       => '',

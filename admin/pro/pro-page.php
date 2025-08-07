@@ -62,7 +62,7 @@ class Pro_Page extends Admin_Page {
 	 * @return string
 	 */
 	public function get_name() {
-		return dashicon( 'star-filled' ) . __( 'Go Pro', 'groundhogg' );
+		return dashicon( 'star-filled' ) . esc_html__( 'Go Pro', 'groundhogg' );
 	}
 
 	/**

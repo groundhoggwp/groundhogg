@@ -21,7 +21,7 @@ class Reviews {
 			esc_html__( 'Is Groundhogg working for you? Show your appreciation by leaving a %1$s review! %2$s | %3$s | %4$s', 'groundhogg' ),
 
             // Stars
-			'&#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;',
+			str_repeat( '&#x2B50;', 5 ),
 
             // Leave a review
 			html()->e( 'a', [
@@ -29,21 +29,21 @@ class Reviews {
 				'style' => [ 'color' => 'green' ],
 				'href' => 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post',
 				'target' => '_blank'
-			], __( 'I\'ll leave a review!', 'groundhogg' ) ),
+			], esc_html__( 'I\'ll leave a review!', 'groundhogg' ) ),
 
             // Don't want to leave a review
 			html()->e( 'a', [
 				'class' => 'notice-dismiss-link',
 				'style' => [ 'color' => '#a00' ],
 				'href'  => '#'
-			], __( 'I don\'t want to', 'groundhogg' ) ),
+			], esc_html__( 'I don\'t want to', 'groundhogg' ) ),
 
             // already reviewed
             html()->e( 'a', [
 				'class' => 'notice-dismiss-link permanent',
 				'style' => [ 'color' => '' ],
 				'href'  => '#'
-			], __( 'I already did', 'groundhogg' ) )
+			], esc_html__( 'I already did', 'groundhogg' ) )
 		);
 
 		$html_message = sprintf( '<div class="review-request notice notice-info is-dismissible">%s</div>', wpautop( $message ) );

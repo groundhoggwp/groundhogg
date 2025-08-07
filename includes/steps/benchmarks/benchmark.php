@@ -273,7 +273,7 @@ abstract class Benchmark extends Funnel_Step {
 			}
 
 			?>
-            <div class="step-branch benchmarks" data-branch="<?php _e( $step->branch ) ?>">
+            <div class="step-branch benchmarks" data-branch="<?php echo esc_attr( $step->branch ); ?>">
 			<?php
 		} else {
 			?><span class="benchmark-or">OR</span><?php
@@ -287,10 +287,10 @@ abstract class Benchmark extends Funnel_Step {
 		$sub_steps = $step->get_sub_steps();
 
 		?>
-        <div class="<?php echo implode( ' ', $sortable_classes ) ?>" data-type="<?php esc_attr_e( $step->get_type() ); ?>" data-group="<?php esc_attr_e( $step->get_group() ); ?>">
+        <div class="<?php echo implode( ' ', $sortable_classes ) ?>" data-type="<?php echo esc_attr( $step->get_type() ); ?>" data-group="<?php echo esc_attr( $step->get_group() ); ?>">
 			<?php $this->__sortable_item( $step ); ?>
 			<?php if ( ! empty( $sub_steps ) || ! $is_last || ! $is_first ): ?>
-                <div class="step-branch" data-branch="<?php esc_attr_e( $step->ID ); ?>">
+                <div class="step-branch" data-branch="<?php echo esc_attr( $step->ID ); ?>">
 					<?php
 
 					if ( ! empty( $sub_steps ) ) {

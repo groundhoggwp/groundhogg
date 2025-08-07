@@ -16,7 +16,7 @@ if ( ! is_browser_view() && the_email()->browser_view_enabled() ):
 					<tr>
 						<td style="background-color: #F6F9FB; padding: 6px 12px; border-radius: 5px; text-align: center; width: min-content;">
 							<a style="text-decoration: none; display: inline-block;" href="<?php echo esc_url_raw(  the_email()->browser_view_link() ); ?>">
-								<?php _e( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View this email in your browser.', 'groundhogg' ) ), 'groundhogg' ); ?>
+								<?php echo esc_html( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View this email in your browser.', 'groundhogg' ) ), 'groundhogg' ); ?>
 							</a>
 						</td>
 					</tr>

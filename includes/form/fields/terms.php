@@ -3,6 +3,7 @@
 namespace Groundhogg\Form\Fields;
 
 use function Groundhogg\html;
+use function Groundhogg\kses;
 
 /**
  * Created by PhpStorm.
@@ -11,15 +12,16 @@ use function Groundhogg\html;
  * Time: 4:25 PM
  */
 class Terms extends Checkbox {
+
 	public function get_default_args() {
 		return [
-			'label'    => _x( 'I agree to the <i>terms of service</i>.', 'form_default', 'groundhogg' ),
+			'label'    => kses( _x( 'I agree to the <i>terms of service</i>.', 'form_default', 'groundhogg' ), 'simple' ),
 			'name'     => 'agree_terms',
 			'id'       => 'agree_terms',
 			'class'    => 'gh-terms',
 			'value'    => 'yes',
 			'tag'      => 0,
-			'title'    => _x( 'Please agree to the terms of service.', 'form_default', 'groundhogg' ),
+			'title'    => esc_html_x( 'Please agree to the terms of service.', 'form_default', 'groundhogg' ),
 			'required' => true,
 		];
 	}

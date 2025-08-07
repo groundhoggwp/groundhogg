@@ -351,31 +351,31 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 		$tabs = [
 			[
-				'name' => __( 'Overview', 'groundhogg' ),
+				'name' => esc_html__( 'Overview', 'groundhogg' ),
 				'slug' => 'overview'
 			],
 			[
-				'name' => __( 'Contacts', 'groundhogg' ),
+				'name' => esc_html__( 'Contacts', 'groundhogg' ),
 				'slug' => 'contacts'
 			],
 			[
-				'name' => __( 'Email', 'groundhogg' ),
+				'name' => esc_html__( 'Email', 'groundhogg' ),
 				'slug' => 'email'
 			],
 			[
-				'name' => __( 'Flows', 'groundhogg' ),
+				'name' => esc_html__( 'Flows', 'groundhogg' ),
 				'slug' => 'funnels'
 			],
 			[
-				'name' => __( 'Broadcasts', 'groundhogg' ),
+				'name' => esc_html__( 'Broadcasts', 'groundhogg' ),
 				'slug' => 'broadcasts'
 			],
 			[
-				'name' => __( 'Forms', 'groundhogg' ),
+				'name' => esc_html__( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
 			],
 			[
-				'name' => __( 'Custom', 'groundhogg' ),
+				'name' => esc_html__( 'Custom', 'groundhogg' ),
 				'slug' => 'custom'
 			],
 		];
@@ -407,14 +407,14 @@ class Reports_Page extends Tabbed_Admin_Page {
             <div class="gh-loader-overlay" style="display:none;"></div>
             <div class="gh-loader" style="display: none"></div>
         </div>
-        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="padding-right: 20px">
+        <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo $this->get_title(); ?></h1>
 			<?php $this->range_picker(); ?>
         </div>
 		<?php $this->do_page_tabs(); ?>
         <script>
-          const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+          const pageHeader = document.getElementById('<?php echo esc_attr( $this->get_slug() . '-header' ) ?>')
           const parent = pageHeader.parentElement // Get the parent element
           const tabs = pageHeader.nextElementSibling // Get the parent element
 

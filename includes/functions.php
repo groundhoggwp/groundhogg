@@ -269,7 +269,7 @@ function modal_link_url( $args ) {
 
 	$atts = wp_parse_args( $args, array(
 		'title'              => 'Modal',
-		'footer_button_text' => __( 'Save Changes' ),
+		'footer_button_text' => esc_html__( 'Save Changes' ),
 		'source'             => '',
 		'height'             => 500,
 		'width'              => 500,
@@ -2944,7 +2944,7 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 		}
 
 	} else {
-		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
+		$format = $time_diff <= 0 ? esc_html_x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
 		$time   = sprintf( $format, human_time_diff( $p_time, $cur_time ) );
 	}
 
@@ -3126,7 +3126,7 @@ function groundhogg_icon( $width = 40, $echo = true ) {
 	}
 
 	?>
-    <svg viewBox="38.053 7.279 310.877 351.102" xmlns="http://www.w3.org/2000/svg" style="width: <?php esc_attr_e( absint( $width ) ); ?>px">
+    <svg viewBox="38.053 7.279 310.877 351.102" xmlns="http://www.w3.org/2000/svg" style="width: <?php echo esc_attr( absint( $width ) ); ?>px">
         <path d="M 348.93 258.42 L 348.93 107.24 C 348.927 98.919 344.486 91.231 337.28 87.07 L 206.35 11.47 C 199.144 7.31 190.266 7.31 183.06 11.47 L 52.13 87.08 C 44.926 91.242 40.489 98.93 40.49 107.25 L 40.49 258.43 C 40.491 266.749 44.927 274.437 52.13 278.6 L 183.06 354.2 C 190.268 358.364 199.152 358.364 206.36 354.2 L 337.28 278.6 C 344.486 274.439 348.927 266.751 348.93 258.43 L 348.93 258.42"
               fill="#ff7b01"/>
         <path d="M 88.07 257.31 C 87.492 255.966 86.753 254.696 85.87 253.53 C 85.87 253.53 75.79 259.83 66.65 246.29 C 57.52 232.74 60.35 188.96 60.35 188.96 C 60.35 188.96 42.72 188.33 38.62 171.01 C 34.52 153.69 53.74 137.94 60.98 134.16 C 62.88 118.41 65.71 111.17 65.71 111.17 C 65.71 111.17 45.87 101.72 50.28 73.06 C 54.68 44.4 86.81 29.28 108.54 45.66 C 154.84 11.64 214.37 9.44 257.52 35.58 C 271.38 26.13 290.9 23.93 307.28 42.2 C 323.66 60.46 312.32 83.45 305.71 89.12 C 311.06 97 314.21 107.39 314.21 107.39 C 314.21 107.39 332.47 116.84 337.83 131.96 C 343.18 147.08 327.75 155.26 327.75 155.26 C 327.75 155.26 337.02 180.22 335.94 201.56 C 334.68 226.45 325.54 235.26 317.67 234.32 C 314.71 244.389 309.668 253.724 302.87 261.72 C 309.867 269.053 316.315 280.873 320.091 288.526 L 206.36 354.2 C 199.152 358.364 190.268 358.364 183.06 354.2 L 57.495 281.698 C 65.004 274.649 79.541 261.535 88.07 257.31 Z"
@@ -3302,20 +3302,20 @@ function preferences_center_shortcode() {
 	ob_start();
 
 	?>
-    <p><b><?php _e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
-    <p><?php _e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
-    <p><?php _e( 'Here are some things you can try:', 'groundhogg' ) ?></p>
+    <p><b><?php esc_html_e( 'This message is only shown to administrators!', 'groundhogg' ); ?></b></p>
+    <p><?php esc_html_e( 'Something is preventing the template for the preferences center to be displayed.', 'groundhogg' ); ?></p>
+    <p><?php esc_html_e( 'Here are some things you can try:', 'groundhogg' ); ?></p>
     <ul>
         <li>
-            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php _e( 'Re-save your permalinks.', 'groundhogg' ) ?></a>
+            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php esc_html_e( 'Re-save your permalinks.', 'groundhogg' ); ?></a>
         </li>
         <li>
-            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php _e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ) ?></a>
+            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php esc_html_e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ); ?></a>
         </li>
-        <li><?php _e( 'Try viewing this page in an incognito window.', 'groundhogg' ) ?></li>
-        <li><?php _e( 'Clearing your cookies.', 'groundhogg' ) ?></li>
+        <li><?php esc_html_e( 'Try viewing this page in an incognito window.', 'groundhogg' ); ?></li>
+        <li><?php esc_html_e( 'Clearing your cookies.', 'groundhogg' ); ?></li>
     </ul>
-    <p><?php _e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
+    <p><?php esc_html_e( 'If none of those options work, contact customer support.', 'groundhogg' ) ?></p>
 	<?php
 
 	return ob_get_clean();
@@ -7355,7 +7355,7 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 		?>
         <fieldset>
             <p>
-                <legend><?php _e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
+                <legend><?php esc_html_e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
             </p>
             <p><?php echo html()->checkbox( [
 					'label' => sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ),

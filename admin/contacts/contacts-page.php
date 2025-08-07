@@ -96,7 +96,7 @@ class Contacts_Page extends Admin_Page {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Contacts', 'page_title', 'groundhogg' );
+		return esc_html_x( 'Contacts', 'page_title', 'groundhogg' );
 	}
 
 	/**
@@ -210,7 +210,7 @@ class Contacts_Page extends Admin_Page {
 				$contact = get_contactdata( get_url_var( 'contact' ) );
 
 				if ( ! $contact ) {
-					$this->add_notice( new WP_Error( 'error', sprintf( __( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
+					$this->add_notice( new WP_Error( 'error', sprintf( esc_html__( 'Contact with ID %d does not exist' ), get_url_var( 'contact' ) ) ) );
 					?>
                     <script>window.open('<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
 					<?php
@@ -233,7 +233,7 @@ class Contacts_Page extends Admin_Page {
 					'marketable'                   => $contact->is_marketable(),
 					'unsubReasons'                 => get_unsub_reasons(),
 					'i18n'                         => [
-						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
+						'marketable_reason' => esc_html( Plugin::instance()->preferences->get_optin_status_text( $contact ) )
 					],
 				] );
 
@@ -263,7 +263,7 @@ class Contacts_Page extends Admin_Page {
 
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				$admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s", esc_html__( 'Add' ), $admin_title );
 				break;
 			case 'edit':
 				$contact_id = get_request_var( 'contact' );
@@ -271,7 +271,7 @@ class Contacts_Page extends Admin_Page {
 
 				if ( $contact ) {
 					$prefix      = $contact->get_first_name() ? $contact->get_full_name() : $contact->get_email();
-					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $prefix, __( 'Edit' ), $admin_title );
+					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $prefix ), esc_html__( 'Edit' ), $admin_title );
 				}
 
 				break;
@@ -312,7 +312,7 @@ class Contacts_Page extends Admin_Page {
 					return _x( 'Submit Form', 'page_title', 'groundhogg' );
 				}
 			case 'bulk_edit':
-				return __( 'Bulk Edit Contacts', 'groundhogg' );
+				return esc_html__( 'Bulk Edit Contacts', 'groundhogg' );
 			case 'view':
 			default:
 				return _x( 'Contacts', 'page_title', 'groundhogg' );
@@ -330,7 +330,7 @@ class Contacts_Page extends Admin_Page {
 		if ( current_user_can( 'add_contacts' ) ) {
 			$actions[] = [
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-				'action' => dashicon( 'plus-alt2' ) . __( 'Add New', 'groundhogg' ),
+				'action' => dashicon( 'plus-alt2' ) . esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'quick-add',
 			];
@@ -339,7 +339,7 @@ class Contacts_Page extends Admin_Page {
 		if ( current_user_can( 'import_contacts' ) ) {
 			$actions[] = [
 				'link'   => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ),
-				'action' => dashicon( 'upload' ) . __( 'Import', 'groundhogg' ),
+				'action' => dashicon( 'upload' ) . esc_html__( 'Import', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'import_contacts'
 			];
@@ -361,7 +361,7 @@ class Contacts_Page extends Admin_Page {
 		$_POST = wp_unslash( $_POST );
 
 		if ( ! get_request_var( 'email' ) ) {
-			return new WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+			return new WP_Error( 'no_email', esc_html__( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
 		$args['first_name'] = sanitize_text_field( get_post_var( 'first_name' ) );
@@ -377,13 +377,13 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( ! is_email( $email ) ) {
-			return new WP_Error( 'invalid_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+			return new WP_Error( 'invalid_email', esc_html__( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
 		$contact = new Contact( $args );
 
 		if ( ! $contact->exists() ) {
-			return new WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
+			return new WP_Error( 'db_error', esc_html__( 'Could not add contact.', 'groundhogg' ) );
 		}
 
 		$contact->update_meta( 'mobile_phone', sanitize_text_field( get_post_var( 'mobile_phone' ) ) );
@@ -502,7 +502,7 @@ class Contacts_Page extends Admin_Page {
 		$id = absint( get_request_var( 'contact' ) );
 
 		if ( ! $id ) {
-			return new WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
+			return new WP_Error( 'no_contact_id', esc_html__( 'Contact id not found.', 'groundhogg' ) );
 		}
 
 		$contact = get_contactdata( $id );
@@ -561,7 +561,7 @@ class Contacts_Page extends Admin_Page {
 		$id = absint( get_request_var( 'contact' ) );
 
 		if ( ! $id ) {
-			return new WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
+			return new WP_Error( 'no_contact_id', esc_html__( 'Contact id not found.', 'groundhogg' ) );
 		}
 
 		$contact = get_contactdata( $id );
@@ -643,7 +643,7 @@ class Contacts_Page extends Admin_Page {
 
 				$contact->update_meta( 'birthday', $birthday );
 			} else {
-				$this->add_notice( new WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );
+				$this->add_notice( new WP_Error( 'invalid_date', esc_html__( 'The birthday date provided is not a valid date.' ) ) );
 			}
 		}
 
@@ -884,7 +884,7 @@ class Contacts_Page extends Admin_Page {
 
 		unlink( $file_path );
 
-		$this->add_notice( 'success', __( 'File deleted.', 'groundhogg' ) );
+		$this->add_notice( 'success', esc_html__( 'File deleted.', 'groundhogg' ) );
 
 		// Return to contact edit screen.
 		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );

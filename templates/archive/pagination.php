@@ -9,7 +9,7 @@ if ( $total_pages > 1 ):
     <div class="pagination">
         <!-- Previous button -->
 		<?php if ( $current_page > 1 ) { ?>
-            <a href="?_page=<?php echo( $current_page - 1 ); ?>">&laquo; <?php _e( 'Previous' ) ?></a>
+            <a href="?_page=<?php echo( $current_page - 1 ); ?>">&laquo; <?php esc_html_e( 'Previous' ); ?></a>
 		<?php } ?>
 
         <!-- Page numbers -->
@@ -45,7 +45,7 @@ if ( $total_pages > 1 ):
 
         <!-- Next button -->
 		<?php if ( $current_page < $total_pages ) { ?>
-            <a href="?_page=<?php echo( $current_page + 1 ); ?>"><?php _e( 'Next' ) ?> &raquo;</a>
+            <a href="?_page=<?php echo( $current_page + 1 ); ?>"><?php esc_html_e( 'Next' ); ?> &raquo;</a>
 		<?php } ?>
     </div>
 <?php
@@ -54,5 +54,5 @@ endif;
 
 ?>
 <p>
-    <i><?php _e( 'Archived content may not reflect its original form as when initially sent. Not all emails are available in the archives. We do not guarantee the retention of any content for any amount of time.', 'groundhogg' ) ?></i>
+    <i><?php esc_html_e( 'Archived content may not reflect its original form as when initially sent. Not all emails are available in the archives. We do not guarantee the retention of any content for any amount of time.', 'groundhogg' ); ?></i>
 </p>

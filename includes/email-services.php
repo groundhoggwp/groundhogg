@@ -42,11 +42,11 @@ class Groundhogg_Email_Services {
 	}
 
 	public static function register_core_services() {
-		self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
-		self::register( 'log_only', __( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
+		self::register( 'wp_mail', esc_html__( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
+		self::register( 'log_only', esc_html__( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
 
 		if ( function_exists( 'mailhawk_mail' ) ) {
-			self::register( 'mailhawk', __( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
+			self::register( 'mailhawk', esc_html__( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
 		}
 
 		do_action( 'Groundhogg/email_services/init' );
@@ -509,7 +509,7 @@ if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ) {
 		?>
         <div class="notice notice-warning is-dismissible">
             <p>
-				<?php printf( __( '<b>Attention:</b> The <code>Log Only</code> email service is in use, but email logs are not enabled. <a href="%s">Enable logging!</a>' ), \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ); ?>
+				<?php printf( wp_kses_post( __( '<b>Attention:</b> The <code>Log Only</code> email service is in use, but email logs are not enabled. <a href="%s">Enable logging!</a>' ) ), \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ); ?>
             </p>
         </div>
 		<?php

@@ -23,7 +23,7 @@ class GDPR extends Checkbox {
 			'class'    => 'gh-gdpr',
 			'value'    => 'yes',
 			'tag'      => 0,
-			'title'    => _x( 'I Consent', 'form_default', 'groundhogg' ),
+			'title'    => esc_html_x( 'I Consent', 'form_default', 'groundhogg' ),
 			'required' => true,
 		];
 	}

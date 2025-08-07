@@ -10,6 +10,8 @@ use function Groundhogg\get_key_from_column_label;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\kses;
+use function Groundhogg\kses_e;
 
 /**
  * Map Import
@@ -78,8 +80,8 @@ function guess_column_map_to( $column ) {
 		'name'  => 'import',
 		'value' => $file_name
 	] ); ?>
-    <h2><?php _e( 'Map Contact Fields', 'groundhogg' ); ?></h2>
-    <p class="description"><?php _e( 'Map your CSV columns to the contact records fields below.', 'groundhogg' ); ?></p>
+    <h2><?php esc_html_e( 'Map Contact Fields', 'groundhogg' ); ?></h2>
+    <p class="description"><?php esc_html_e( 'Map your CSV columns to the contact records fields below.', 'groundhogg' ); ?></p>
     <style>
         select {
             vertical-align: top !important;
@@ -100,7 +102,7 @@ function guess_column_map_to( $column ) {
 				echo html()->e( 'a', [
 					'href'  => add_query_arg( 'preview_item', $selected - 1, $base_admin_url ),
 					'class' => 'button'
-				], __( '&larr; Prev' ) );
+				], '&larr; ' . esc_html__( 'Prev' ) );
 				echo '&nbsp;';
 			}
 
@@ -108,7 +110,7 @@ function guess_column_map_to( $column ) {
 				echo html()->e( 'a', [
 					'href'  => add_query_arg( 'preview_item', $selected + 1, $base_admin_url ),
 					'class' => 'button'
-				], __( 'Next &rarr;' ) );
+				], esc_html__( 'Next' ) . ' &rarr;' );
 			}
 
 			?>
@@ -148,15 +150,15 @@ function guess_column_map_to( $column ) {
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php _e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
+            <th><?php esc_html_e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
             <td>
                 <div style="max-width: 500px"><?php echo html()->tag_picker( [] ); ?></div>
             </td>
         </tr>
         <tr>
-            <th><?php _e( 'These contacts have previously confirmed their email address.', 'groundhogg' ) ?></th>
+            <th><?php esc_html_e( 'These contacts have previously confirmed their email address.', 'groundhogg' ) ?></th>
             <td><?php echo html()->checkbox( [
-					'label'   => __( 'Yes, these contacts have confirmed their email address.', 'groundhogg' ),
+					'label'   => esc_html__( 'Yes, these contacts have confirmed their email address.', 'groundhogg' ),
 					'name'    => 'email_is_confirmed',
 					'id'      => 'email_is_confirmed',
 					'class'   => '',
@@ -165,15 +167,15 @@ function guess_column_map_to( $column ) {
 					'title'   => 'I have confirmed.',
 				] );
 
-				echo html()->description( __( "If you are importing the <b>opt-in status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+				echo html()->description( kses( __( "If you are importing the <b>opt-in status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 				?></td>
         </tr>
 		<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
             <tr>
-                <th><?php _e( 'These contacts have previously given data processing consent.', 'groundhogg' ) ?></th>
+                <th><?php esc_html_e( 'These contacts have previously given data processing consent.', 'groundhogg' ) ?></th>
                 <td><?php echo html()->checkbox( [
-						'label'   => __( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
+						'label'   => esc_html__( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'data_processing_consent_given',
 						'id'      => 'data_processing_consent_given',
 						'class'   => '',
@@ -182,14 +184,14 @@ function guess_column_map_to( $column ) {
 						'title'   => 'Consent Given.',
 					] );
 
-					echo html()->description( __( "If you are importing <b>data processing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+					echo html()->description( kses( __( "If you are importing <b>data processing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 					?></td>
             </tr>
             <tr>
-                <th><?php _e( 'These contacts have previously given marketing consent.', 'groundhogg' ) ?></th>
+                <th><?php esc_html_e( 'These contacts have previously given marketing consent.', 'groundhogg' ) ?></th>
                 <td><?php echo html()->checkbox( [
-						'label'   => __( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
+						'label'   => esc_html__( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'marketing_consent_given',
 						'id'      => 'marketing_consent_given',
 						'class'   => '',
@@ -198,12 +200,12 @@ function guess_column_map_to( $column ) {
 						'title'   => 'Consent Given.',
 					] );
 
-					echo html()->description( __( "If you are importing <b>marketing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+					echo html()->description( kses( __( "If you are importing <b>marketing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 					?></td>
             </tr>
 		<?php endif; ?>
         </tbody>
     </table>
-	<?php submit_button( __( 'Import Contacts', 'groundhogg' ) ) ?>
+	<?php submit_button( esc_html__( 'Import Contacts', 'groundhogg' ) ) ?>
 </form>

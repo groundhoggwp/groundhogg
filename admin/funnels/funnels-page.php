@@ -106,14 +106,14 @@ class Funnels_Page extends Admin_Page {
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				$admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s", esc_html__( 'Add' ), $admin_title );
 				break;
 			case 'edit':
 				$funnel_id = get_request_var( 'funnel' );
 				$funnel    = new Funnel( absint( $funnel_id ) );
 
 				if ( $funnel->exists() ) {
-					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $funnel->get_title(), __( 'Edit' ), $admin_title );
+					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $funnel->get_title() ), esc_html__( 'Edit' ), $admin_title );
 				}
 
 				break;
@@ -145,7 +145,7 @@ class Funnels_Page extends Admin_Page {
 			return [
 				[
 					'link'   => action_url( 'start_from_scratch' ),
-					'action' => __( 'Start from scratch', 'groundhogg' ),
+					'action' => esc_html__( 'Start from scratch', 'groundhogg' ),
 					'target' => '_self',
 				]
 			];
@@ -154,7 +154,7 @@ class Funnels_Page extends Admin_Page {
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-				'action' => __( 'Add New', 'groundhogg' ),
+				'action' => esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 			]
 		];
@@ -181,9 +181,9 @@ class Funnels_Page extends Admin_Page {
 
 		add_action( "groundhogg/admin/gh_funnels/before", function () {
 			if ( get_db( 'funnels' )->exists( [ 'status' => 'inactive' ] ) && ! get_db( 'funnels' )->exists( [ 'status' => 'active' ] ) ) {
-				notices()->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active flows.' ), html()->e( 'a', [
+				notices()->add( 'no_active_funnels', sprintf( '%s %s', esc_html__( 'You have no active flows.', 'groundhogg' ), html()->e( 'a', [
 					'href' => admin_url( 'admin.php?page=gh_funnels&status=inactive' ),
-				], __( 'Activate a flow!' ) ) ), 'warning' );
+				], esc_html__( 'Activate a flow!', 'groundhogg' ) ) ), 'warning' );
 			}
 		} );
 	}
@@ -237,7 +237,7 @@ class Funnels_Page extends Admin_Page {
 
 				$data = array_merge( $funnel->get_as_array(), [
 					'id'                  => absint( get_request_var( 'funnel' ) ),
-					'save_text'           => __( 'Update', 'groundhogg' ),
+					'save_text'           => esc_html__( 'Update', 'groundhogg' ),
 					'export_url'          => $funnel->export_url(),
 					'is_active'           => $funnel->is_active(),
 					'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
@@ -443,7 +443,7 @@ class Funnels_Page extends Admin_Page {
 			$id         = $new_funnel->import( $json );
 
 			$new_funnel->update( [
-				'title' => sprintf( __( 'Copy of %s', 'groundhogg' ), $funnel->get_title() ),
+				'title' => sprintf( esc_html__( 'Copy of %s', 'groundhogg' ), $funnel->get_title() ),
 			] );
 
 			return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id, 'from' => 'add' ] );
@@ -538,7 +538,7 @@ class Funnels_Page extends Admin_Page {
 			] );
 
 			if ( ! in_array( $validate['ext'], [ 'json', 'funnel' ] ) ) {
-				return new WP_Error( 'invalid_template', __( 'Please upload a valid flow template.', 'groundhogg' ) );
+				return new WP_Error( 'invalid_template', esc_html__( 'Please upload a valid flow template.', 'groundhogg' ) );
 			}
 
 			$json = file_get_contents( $file['tmp_name'] );
@@ -555,7 +555,7 @@ class Funnels_Page extends Admin_Page {
 					$this->import_funnel( $funnel );
 				}
 
-				$this->add_notice( 'imported', sprintf( __( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
+				$this->add_notice( 'imported', sprintf( esc_html__( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
 
 				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
 			}
@@ -577,7 +577,7 @@ class Funnels_Page extends Admin_Page {
 					$this->import_funnel( $funnel );
 				}
 
-				$this->add_notice( 'imported', sprintf( __( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
+				$this->add_notice( 'imported', sprintf( esc_html__( 'Imported %d flows', 'groundhogg' ), count( $json ) ) );
 
 				return admin_page_url( 'gh_funnels', [ 'view' => 'inactive' ] );
 			}
@@ -590,7 +590,7 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		if ( empty( $funnel_id ) ) {
-			return new WP_Error( 'error', __( 'Could not create flow.', 'groundhogg' ) );
+			return new WP_Error( 'error', esc_html__( 'Could not create flow.', 'groundhogg' ) );
 		}
 
 		return admin_page_url( 'gh_funnels', [

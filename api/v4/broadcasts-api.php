@@ -63,7 +63,7 @@ class Broadcasts_Api extends Base_Object_Api {
 			$email = new Email( $object_id );
 
 			if ( $email->is_draft() ) {
-				return self::ERROR_401( 'email_in_draft_mode', __( 'You cannot schedule an email while it is in draft mode.', 'groundhogg' ) );
+				return self::ERROR_401( 'email_in_draft_mode', esc_html__( 'You cannot schedule an email while it is in draft mode.', 'groundhogg' ) );
 			}
 		}
 
@@ -96,7 +96,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		if ( $date->getTimestamp() < time() ) {
-			return self::ERROR_401( 'invalid_date', __( 'Please select a time in the future', 'groundhogg' ) );
+			return self::ERROR_401( 'invalid_date', esc_html__( 'Please select a time in the future', 'groundhogg' ) );
 		}
 
 		$query = map_deep( $request->get_param( 'query' ), 'sanitize_text_field' ) ?: [];
@@ -115,7 +115,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		$num_contacts = get_db()->contacts->count( $query );
 
 		if ( $num_contacts === 0 ) {
-			return self::ERROR_401( 'error', __( 'No contacts match the given filters.', 'groundhogg' ) );
+			return self::ERROR_401( 'error', esc_html__( 'No contacts match the given filters.', 'groundhogg' ) );
 		}
 
 		$meta['total_contacts'] = $num_contacts;

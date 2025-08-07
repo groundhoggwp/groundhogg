@@ -68,7 +68,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 			?>
             <div class="sub-group">
             <span class="sub-group-label">
-			<?php _e( $name ) ?>
+			<?php echo esc_html( $name ); ?>
             </span><?php
 		endif;
 
@@ -92,13 +92,13 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 			];
 
 			?>
-        <div class="select-step visible" data-id="<?php esc_attr_e( $step->get_type() ); ?>" data-keywords="<?php esc_attr_e( implode( ',', $keywords ) ); ?>">
-            <div class="gh-tooltip top"><?php echo $step->get_description(); ?></div>
+        <div class="select-step visible" data-id="<?php echo esc_attr( $step->get_type() ); ?>" data-keywords="<?php echo esc_attr( implode( ',', $keywords ) ); ?>">
+            <div class="gh-tooltip top"><?php echo esc_html( $step->get_description() ); ?></div>
             <div id='<?php echo $step->get_type(); ?>'
-                 data-type="<?php esc_attr_e( $step->get_type() ); ?>"
-                 data-name="<?php esc_attr_e( $step->get_name() ); ?>"
-                 data-group="<?php esc_attr_e( $step->get_group() ); ?>"
-                 class="<?php echo implode( ' ', $classes ) ?>">
+                 data-type="<?php echo esc_attr( $step->get_type() ); ?>"
+                 data-name="<?php echo esc_attr( $step->get_name() ); ?>"
+                 data-group="<?php echo esc_attr( $step->get_group() ); ?>"
+                 class="<?php echo esc_attr( implode( ' ', $classes ) ) ?>">
                 <div class="step-icon">
 					<?php if ( $step->icon_is_svg() ): ?>
 						<?php echo $step->get_icon_svg(); ?>
@@ -106,7 +106,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                         <img src="<?php echo esc_url( $step->get_icon() ); ?>">
 					<?php endif; ?>
                 </div>
-                <p><?php echo $step->get_name() ?></p></div>
+                <p><?php echo esc_html( $step->get_name() ) ?></p></div>
             </div><?php
 		endforeach;
 
@@ -117,7 +117,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 }
 
 ?>
-<form method="post" id="funnel-form" class="gh-fixed-ui" data-status="<?php _e( $funnel->get_status() ) ?>">
+<form method="post" id="funnel-form" class="gh-fixed-ui" data-status="<?php echo esc_attr( $funnel->get_status() ) ?>">
 	<?php wp_nonce_field(); ?>
 	<?php $args = array(
 		'type'  => 'hidden',
@@ -132,12 +132,12 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 
         <div class="title-section">
             <div class="title-view">
-				<?php printf( __( 'Now editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $funnel->get_title() ) ); ?>
+				<?php printf( esc_html__( 'Now editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $funnel->get_title() ) ); ?>
             </div>
             <div class="title-edit hidden">
-                <input class="title" placeholder="<?php echo __( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
+                <input class="title" placeholder="<?php esc_html_e( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
                        type="text"
-                       name="funnel_title" size="30" value="<?php esc_attr_e( $funnel->get_title() ); ?>" id="title"
+                       name="funnel_title" size="30" value="<?php echo esc_attr( $funnel->get_title() ); ?>" id="title"
                        spellcheck="true" autocomplete="off">
             </div>
         </div>

@@ -57,7 +57,7 @@ class Main_Roles extends Roles {
 		return apply_filters( 'groundhogg/roles/get_roles', [
 			[
 				'role' => 'marketer',
-				'name' => _x( 'Marketer', 'role', 'groundhogg' ),
+				'name' => esc_html_x( 'Marketer', 'role', 'groundhogg' ),
 				'caps' => [
 					'read'                   => true,
 					'edit_posts'             => true,
@@ -93,7 +93,7 @@ class Main_Roles extends Roles {
 			],
 			[
 				'role' => 'sales_manager',
-				'name' => _x( 'Sales Manager', 'role', 'groundhogg' ),
+				'name' => esc_html_x( 'Sales Manager', 'role', 'groundhogg' ),
 				'caps' => [
 					'view_admin_dashboard' => true,
 					'read'                 => true,
@@ -104,7 +104,7 @@ class Main_Roles extends Roles {
 			],
 			[
 				'role' => 'sales_rep',
-				'name' => _x( 'Sales Representative', 'role', 'groundhogg' ),
+				'name' => esc_html_x( 'Sales Representative', 'role', 'groundhogg' ),
 				'caps' => [
 					'view_admin_dashboard' => true,
 					'read'                 => true,

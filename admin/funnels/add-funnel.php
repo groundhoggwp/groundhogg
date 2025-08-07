@@ -32,13 +32,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php $active_tab = sanitize_key( get_request_var( 'tab', 'templates' ) ); ?>
     <h2 class="nav-tab-wrapper gh-nav">
         <a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates"
-           class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Flow Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
+           class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php echo esc_html_x( 'Flow Templates', 'add_funnel_tab', 'groundhogg' ); ?></a>
         <a id="funnel-import" href="?page=gh_funnels&action=add&tab=import"
-           class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Flow', 'add_funnel_tab', 'groundhogg' ); ?></a>
+           class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php echo esc_html_x( 'Import Flow', 'add_funnel_tab', 'groundhogg' ); ?></a>
     </h2>
     <script>
       ( () => {
-        const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+        const pageHeader = document.getElementById('<?php echo esc_attr( $this->get_slug() . '-header' ) ?>')
         const navTabs = document.querySelector('h2.gh-nav')
 
         if (pageHeader) {
@@ -150,8 +150,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				}, $template->campaigns );
 
 				?>
-                <div class="gh-panel funnel-template <?php echo $template->is_premium ? 'premium' : ''; ?> display-flex column" data-campaigns="<?php esc_attr_e( implode( ',', $campaigns ) ); ?>"
-                     data-title="<?php esc_attr_e( $template->title ); ?>">
+                <div class="gh-panel funnel-template <?php echo $template->is_premium ? 'premium' : ''; ?> display-flex column" data-campaigns="<?php echo esc_attr( implode( ',', $campaigns ) ); ?>"
+                     data-title="<?php echo esc_attr( $template->title ); ?>">
                     <div class="gh-panel-header">
                         <h2><?php echo $template->get_title(); ?></h2>
 						<?php if ( $template->is_premium ): ?>
@@ -165,16 +165,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="inside display-flex column align-top" style="flex-grow: 1">
                         <div class="gh-tags space-below-20">
 							<?php foreach ( $template->campaigns as $campaign ): ?>
-                                <span class="gh-tag"><?php esc_html_e( $campaign->data->name ); ?></span>
+                                <span class="gh-tag"><?php echo esc_html( $campaign->data->name ); ?></span>
 							<?php endforeach; ?>
                         </div>
 						<?php $template->flow_preview() ?>
                         <p><?php echo $template->get_meta( 'description' ); ?></p>
 						<?php if ( $template->is_premium ): ?>
-                            <a style="margin-top: auto" class="gh-button primary text" href="https://groundhogg.io/pricing/" target="_blank"><?php _ex( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>
+                            <a style="margin-top: auto" class="gh-button primary text" href="https://groundhogg.io/pricing/" target="_blank"><?php echo esc_html_x( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>
 						<?php else: ?>
                             <button style="margin-top: auto" class="gh-button primary" name="funnel_template"
-                                    value="<?php echo $template->ID ?>"><?php _ex( 'Use Template', 'action', 'groundhogg' ); ?></button>
+                                    value="<?php echo $template->ID ?>"><?php echo esc_html_x( 'Use Template', 'action', 'groundhogg' ); ?></button>
 						<?php endif; ?>
                     </div>
                 </div>
@@ -183,24 +183,24 @@ if ( ! defined( 'ABSPATH' ) ) {
     </form>
 <?php else: ?>
     <div class="gh-tools-wrap">
-        <p class="tools-help"><?php _e( 'If you have a flow import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
+        <p class="tools-help"><?php esc_html_e( 'If you have a flow import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
         <form method="post" enctype="multipart/form-data" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
-            <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
+            <p class="description"><?php esc_html_e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
             <hr/>
             <input type="file" name="funnel_template" id="funnel_template" accept=".funnel,.json">
             <button style="float: right" class="gh-button primary" name="funnel_import"
-                    value="import"><?php _ex( 'Import Flow', 'action', 'groundhogg' ); ?></button>
+                    value="import"><?php echo esc_html_x( 'Import Flow', 'action', 'groundhogg' ); ?></button>
             <div class="wp-clearfix"></div>
         </form>
         <form method="post" class="gh-tools-box gh-panel">
 			<?php wp_nonce_field(); ?>
-            <p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
+            <p class="description"><?php esc_html_e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
             <hr/>
             <textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json"
                       placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ); ?>"></textarea>
             <button style="float: right" class="gh-button primary" name="funnel_import"
-                    value="import"><?php _ex( 'Import Flow', 'action', 'groundhogg' ); ?></button>
+                    value="import"><?php echo esc_html_x( 'Import Flow', 'action', 'groundhogg' ); ?></button>
             <div class="wp-clearfix"></div>
         </form>
     </div>

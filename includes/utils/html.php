@@ -237,7 +237,7 @@ class HTML {
 		}
 
 		?>
-        <h2 class="<?php esc_attr_e( $class ); ?>">
+        <h2 class="<?php echo esc_attr( $class ); ?>">
 			<?php foreach ( $tabs as $id => $tab ):
 
 				echo html()->e( 'a', [
@@ -266,7 +266,7 @@ class HTML {
 			?><h3><?php echo $args['title']; ?></h3><?php
 		}
 		?>
-        <table class="form-table <?php esc_attr_e( $args['class'] ) ?>">
+        <table class="form-table <?php echo esc_attr( $args['class'] ) ?>">
         <tbody>
 		<?php
 	}
@@ -1621,8 +1621,8 @@ class HTML {
 				'checked' => $args['checked'],
 			] ),
 			html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
-			html()->e( 'span', [ 'class' => 'on' ], $args['onLabel'] ),
-			html()->e( 'span', [ 'class' => 'off' ], $args['offLabel'] ),
+			html()->e( 'span', [ 'class' => 'on' ], esc_html( $args['onLabel'] ) ),
+			html()->e( 'span', [ 'class' => 'off' ], esc_html( $args['offLabel'] ) ),
 		] );
 
 		if ( isset( $args['label'] ) ) {

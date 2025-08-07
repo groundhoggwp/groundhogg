@@ -5,6 +5,7 @@ namespace Groundhogg\Steps\Benchmarks;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
+use function Groundhogg\bold_it;
 use function Groundhogg\get_contactdata;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -78,7 +79,7 @@ class Email_Confirmed extends Benchmark {
 	 */
 	public function settings( $step ) {
 		?>
-        <p><?php _e( 'Runs when a contact confirms their email address, changing their opt-in status <b>Confirmed</b>.', 'groundhogg' ); ?></p>
+        <p><?php printf( esc_html__( 'Runs when a contact confirms their email address, changing their opt-in status to %s.', 'groundhogg' ), bold_it( Preferences::get_preference_pretty_name( Preferences::CONFIRMED ) ) ); ?></p>
 		<?php
 	}
 

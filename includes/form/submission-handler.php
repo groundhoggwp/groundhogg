@@ -425,7 +425,7 @@ class Submission_Handler extends Supports_Errors {
 
 				do_action( 'groundhogg/form/submission_handler/admin_submission', $submission, $contact, $this );
 
-				Plugin::$instance->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
+				Plugin::$instance->notices->add( 'form_filled', esc_html_x( 'Form submitted', 'notice', 'groundhogg' ) );
 
 				$admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $contact->get_id() ) );
 

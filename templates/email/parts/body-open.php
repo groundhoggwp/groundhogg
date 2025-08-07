@@ -18,10 +18,10 @@ global $email;
 if ( is_browser_view() && isset( $campaign ) && isset( $broadcast ) ) {
 	?>
     <div class="archive-header">
-        <a target="_self" href="<?php echo esc_url( managed_page_url( sprintf( 'campaigns/%s/', $campaign->get_slug() ) ) ) ?>"><?php _e( '&larr; Back to archive', 'groundhogg' ) ?></a>
+        <a target="_self" href="<?php echo esc_url( managed_page_url( sprintf( 'campaigns/%s/', $campaign->get_slug() ) ) ) ?>">&larr; <?php esc_html_e( 'Back to archive', 'groundhogg' ); ?></a>
 	    <div class="subject-and-preview">
-		    <h1><?php esc_html_e( $broadcast->get_object()->get_merged_subject_line() ); ?></h1>
-		    <p><?php esc_html_e( $broadcast->get_object()->get_merged_pre_header() ); ?></p>
+		    <h1><?php echo esc_html( $broadcast->get_object()->get_merged_subject_line() ); ?></h1>
+		    <p><?php echo esc_html( $broadcast->get_object()->get_merged_pre_header() ); ?></p>
 	    </div>
 	    <div></div>
     </div>
@@ -42,10 +42,10 @@ if ( is_browser_view() && isset( $event ) && isset( $email ) ) {
 
 	?>
     <div class="archive-header">
-        <a target="_self" href="<?php echo esc_url( managed_page_url( 'archive' ) ); ?>"><?php _e( '&larr; Back to archive', 'groundhogg' ) ?></a>
+        <a target="_self" href="<?php echo esc_url( managed_page_url( 'archive' ) ); ?>">&larr; <?php esc_html_e( 'Back to archive', 'groundhogg' ); ?></a>
         <div class="subject-and-preview">
-            <h1><?php esc_html_e( $email->get_merged_subject_line() ); ?></h1>
-            <p><?php esc_html_e( $email->get_merged_pre_header() ); ?></p>
+            <h1><?php echo esc_html( $email->get_merged_subject_line() ); ?></h1>
+            <p><?php echo esc_html( $email->get_merged_pre_header() ); ?></p>
         </div>
         <div></div>
     </div>

@@ -1111,7 +1111,7 @@ class Email extends Base_Object_With_Meta {
 			$one_click = rest_url( sprintf( '%s/unsubscribe/%s/%s', Unsubscribe_Api::NAME_SPACE, $event_id, $unsub_pk ) );
 			$mail_to   = sprintf( '%s?subject=%s',
 				get_option( 'gh_unsubscribe_email' ) ?: get_bloginfo( 'admin_email' ),
-				sprintf( __( 'Unsubscribe %s from %s', 'groundhogg' ), $this->contact->get_email(), get_bloginfo() ) );
+				sprintf( esc_html__( 'Unsubscribe %s from %s', 'groundhogg' ), $this->contact->get_email(), get_bloginfo() ) );
 
 			/**
 			 * Filter the email address the unsubscribe notification is sent to
@@ -1218,7 +1218,7 @@ class Email extends Base_Object_With_Meta {
 		$contact = get_contactdata( $contact_id_or_email );
 
 		if ( ! is_a_contact( $contact ) ) {
-			return new WP_Error( 'no_recipient', __( 'No valid recipient was provided.' ) );
+			return new WP_Error( 'no_recipient', esc_html__( 'No valid recipient was provided.' ) );
 		}
 
 		$this->set_contact( $contact );
@@ -1233,17 +1233,17 @@ class Email extends Base_Object_With_Meta {
 
 			// If email isn't set to ready
 			if ( ! $this->is_ready() ) {
-				return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
+				return new WP_Error( 'email_not_ready', sprintf( esc_html__( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
 			}
 
 			// Contact is undeliverable
 			if ( ! $contact->is_deliverable() ) {
-				return new WP_Error( 'undeliverable', __( 'The email address is marked as undeliverable.', 'groundhogg' ) );
+				return new WP_Error( 'undeliverable', esc_html__( 'The email address is marked as undeliverable.', 'groundhogg' ) );
 			}
 
 			// Ignore if testing or the message is transactional
 			if ( ! $this->is_transactional() && ! $contact->is_marketable() ) {
-				return new WP_Error( 'non_marketable', __( 'Contact is not marketable.', 'groundhogg' ) );
+				return new WP_Error( 'non_marketable', esc_html__( 'Contact is not marketable.', 'groundhogg' ) );
 			}
 		}
 
@@ -1534,7 +1534,7 @@ class Email extends Base_Object_With_Meta {
 	public function duplicate( $overrides = [], $meta_overrides = [] ) {
 
 		$overrides = array_merge( [
-			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
+			'title'  => sprintf( esc_html__( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
 			'status' => 'draft'
 		], $overrides );
 

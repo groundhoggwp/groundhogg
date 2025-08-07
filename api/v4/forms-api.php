@@ -91,7 +91,7 @@ class Forms_Api extends Base_Api {
 
 		if ( $form->has_errors() ) {
 
-			$error = new WP_Error( 'failed_to_submit', __( 'Your submission has errors.', 'groundhogg' ), [
+			$error = new WP_Error( 'failed_to_submit', esc_html__( 'Your submission has errors.', 'groundhogg' ), [
 				'status' => 400
 			] );
 
@@ -166,7 +166,7 @@ class Forms_Api extends Base_Api {
 
 		if ( $form->has_errors() ) {
 
-			$error = new WP_Error( 'failed_to_submit', __( 'Your submission has errors.', 'groundhogg' ), [
+			$error = new WP_Error( 'failed_to_submit', esc_html__( 'Your submission has errors.', 'groundhogg' ), [
 				'status' => 400
 			] );
 

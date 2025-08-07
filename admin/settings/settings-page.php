@@ -101,7 +101,7 @@ class Settings_Page extends Admin_Page {
 	}
 
 	public function get_title() {
-		return sprintf( __( "%s Settings", 'groundhogg' ), white_labeled_name() );
+		return sprintf( esc_html__( "%s Settings", 'groundhogg' ), white_labeled_name() );
 	}
 
 	public function get_cap() {
@@ -163,21 +163,21 @@ class Settings_Page extends Admin_Page {
 		$api_keys_table = new API_Keys_Table();
 		$api_keys_table->prepare_items();
 		?>
-        <h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
+        <h3><?php esc_html_e( 'API Keys', 'groundhogg' ); ?></h3>
 
         <form id="api-key-generate-form" method="post"
               action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
 			<?php action_input( 'create_api_key', true, true ); ?>
             <div class="gh-input-group">
 				<?php echo html()->dropdown_owners( [
-					'option_none' => __( 'Select a user', 'groundhogg' ),
+					'option_none' => esc_html__( 'Select a user', 'groundhogg' ),
 					'name'        => 'user_id',
 					'id'          => 'user_id'
 				] );
 
 				echo html()->button( [
 					'class' => 'gh-button primary',
-					'text'  => __( 'Generate new API key' ),
+					'text'  => esc_html__( 'Generate new API key' ),
 					'type'  => 'submit',
 				] )
 
@@ -191,7 +191,7 @@ class Settings_Page extends Admin_Page {
 
 		html()->start_form_table();
 		html()->start_row();
-		html()->th( __( 'API v4 Route', 'groundhogg' ) );
+		html()->th( esc_html__( 'API v4 Route', 'groundhogg' ) );
 		html()->td( [
 			html()->input( [
 					'class'    => 'code input regular-text',
@@ -202,11 +202,11 @@ class Settings_Page extends Admin_Page {
 			),
 			html()->description( html()->e( 'a', [
 				'href' => admin_page_url( 'gh_tools', [ 'tab' => 'api' ] )
-			], __( 'Test out the API in the new Rest API Playground.', 'groundhogg' ) ) ),
+			], esc_html__( 'Test out the API in the new Rest API Playground.', 'groundhogg' ) ) ),
 		] );
 		html()->end_row();
 		html()->start_row();
-		html()->th( __( 'API v3 Route', 'groundhogg' ) );
+		html()->th( esc_html__( 'API v3 Route', 'groundhogg' ) );
 		html()->td( html()->input( [
 				'class'    => 'code input regular-text',
 				'readonly' => true,
@@ -253,8 +253,8 @@ class Settings_Page extends Admin_Page {
 				?></div><?php
 			else:
 				?>
-                <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
-                            href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
+                <p><?php esc_html_e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
+                            href="https://groundhogg.io/pricing/"><?php esc_html_e( 'Get your first extension!', 'groundhogg' ) ?></a>
                 </p>
                 <div class="extensions">
 					<?php include __DIR__ . '/extensions.php'; ?>
@@ -628,7 +628,7 @@ class Settings_Page extends Admin_Page {
                     <table class="form-table">
                         <tbody>
                         <tr>
-                            <th><?php _e( 'Personal Details Form', 'groundhogg' ); ?></th>
+                            <th><?php esc_html_e( 'Personal Details Form', 'groundhogg' ); ?></th>
                             <td>
                                 <div style="max-width: 400px">
                                     <div id="gh_custom_profile_fields"></div>
@@ -640,7 +640,7 @@ class Settings_Page extends Admin_Page {
                         </tr>
 						<?php if ( defined( 'GROUNDHOGG_ADVANCED_PREFERENCES_VERSION' ) ): ?>
                             <tr>
-                                <th><?php _e( 'Preferences Form', 'groundhogg' ); ?></th>
+                                <th><?php esc_html_e( 'Preferences Form', 'groundhogg' ); ?></th>
                                 <td>
                                     <div style="max-width: 400px">
                                         <div id="gh_custom_preference_fields"></div>
@@ -1911,7 +1911,7 @@ class Settings_Page extends Admin_Page {
 		?>
         <div id="" class="gh-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 10px">
 			<?php header_icon(); ?>
-            <h1><?php echo __( 'Settings' ); ?></h1>
+            <h1><?php esc_html_e( 'Settings' ); ?></h1>
 			<?php echo html()->button( [
 				'text'  => __( 'Save Changes' ),
 				'class' => 'gh-button primary',
@@ -1940,7 +1940,7 @@ class Settings_Page extends Admin_Page {
 				?>
 
                 <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
-                   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
+                   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $tab['title'] ); ?></a>
 			<?php endforeach; ?>
         </h2>
         <script>

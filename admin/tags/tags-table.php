@@ -156,12 +156,12 @@ class Tags_Table extends Table {
 			],
 			[
 				'class'   => 'edit',
-				'display' => __( 'Edit' ),
+				'display' => esc_html__( 'Edit' ),
 				'url'     => $item->admin_link()
 			],
 			[
 				'class'   => 'trash',
-				'display' => __( 'Delete' ),
+				'display' => esc_html__( 'Delete' ),
 				'url'     => action_url( 'delete', [ 'tag' => $item->get_id() ] )
 			]
 		];

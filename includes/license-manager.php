@@ -298,7 +298,7 @@ class License_Manager {
 			$licenses = map_deep( get_request_var( 'licenses' ), 'sanitize_text_field' );
 
 			if ( ! is_array( $licenses ) ) {
-				wp_die( _x( 'Invalid license format', 'notice', 'groundhogg' ) );
+				wp_die( esc_html_x( 'Invalid license format', 'notice', 'groundhogg' ) );
 			}
 
 			foreach ( $licenses as $item_id => $license ) {
@@ -325,35 +325,35 @@ class License_Manager {
 		switch ( $error ) {
 			case 'expired' :
 				$message = sprintf(
-					_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
+					esc_html_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
 					date_i18n( get_option( 'date_format' ), strtotime( $expiry, current_time( 'timestamp' ) ) )
 				);
 				break;
 			case 'invalid' :
 			case 'disabled' :
-				$message = _x( 'Your license key has been disabled.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'Your license key has been disabled.', 'notice', 'groundhogg' );
 				break;
 			case 'site_inactive' :
-				$message = _x( 'Your license is not active for this URL.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'Your license is not active for this URL.', 'notice', 'groundhogg' );
 				break;
 			case 'key_mismatch' :
 			case 'invalid_item_id' :
 			case 'item_name_mismatch' :
-				$message = sprintf( _x( 'The extension you are licensing is unrecognized.', 'notice', 'groundhogg' ) );
+				$message = esc_html_x( 'The extension you are licensing is unrecognized.', 'notice', 'groundhogg' );
 				break;
 			case 'missing_url' :
 			case 'missing' :
-				$message = sprintf( _x( 'This appears to be an invalid license key.', 'notice', 'groundhogg' ) );
+				$message = esc_html_x( 'This appears to be an invalid license key.', 'notice', 'groundhogg' );
 				break;
 			case 'no_activations_left':
-				$message = _x( 'Your license key has reached its activation limit.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'Your license key has reached its activation limit.', 'notice', 'groundhogg' );
 				break;
 			default :
-				$message = _x( 'An error occurred, please try again.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'An error occurred, please try again.', 'notice', 'groundhogg' );
 				break;
 		}
 
-		return $message . ' (' . $error . ')';
+		return esc_html( $message . ' (' . esc_html( $error ) . ')' );
 	}
 
 	/**
@@ -395,7 +395,7 @@ class License_Manager {
 		$response = wp_remote_post( static::$storeUrl, $request );
 		// make sure the response came back okay
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			$message = ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : __( 'An error occurred, please try again.' );
+			$message = ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : esc_html__( 'An error occurred, please try again.' );
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( false === $license_data->success ) {
@@ -473,16 +473,16 @@ class License_Manager {
 
 		if ( is_wp_error( $response ) ) {
 			$success = false;
-			$message = _x( 'Something went wrong.', 'notice', 'groundhogg' );
+			$message = esc_html_x( 'Something went wrong.', 'notice', 'groundhogg' );
 		} else {
 			$response = json_decode( wp_remote_retrieve_body( $response ) );
 
 			if ( $response->success === false ) {
 				$success = false;
-				$message = _x( 'Something went wrong.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'Something went wrong.', 'notice', 'groundhogg' );
 			} else {
 				$success = true;
-				$message = _x( 'License deactivated.', 'notice', 'groundhogg' );
+				$message = esc_html_x( 'License deactivated.', 'notice', 'groundhogg' );
 			}
 		}
 
@@ -683,20 +683,20 @@ class License_Manager {
 		?>
 		<div class="postbox">
 			<?php if ( $extension->info->title ): ?>
-				<h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
+				<h2 class="hndle"><b><?php echo esc_html( $extension->info->title ); ?></b></h2>
 			<?php endif; ?>
 			<div class="inside" style="padding: 0;margin: 0">
 				<?php if ( $extension->info->thumbnail ): ?>
 					<div class="img-container">
-						<a href="<?php echo $extension->info->link; ?>" target="_blank">
-							<img src="<?php echo $extension->info->thumbnail; ?>"
+						<a href="<?php echo esc_url( $extension->info->link ); ?>" target="_blank">
+							<img src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
 							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
 						</a>
 					</div>
 				<?php endif; ?>
 				<?php if ( $extension->info->excerpt ): ?>
 					<div class="article-description" style="padding: 10px;">
-						<?php echo $extension->info->excerpt; ?>
+						<?php kses_e( $extension->info->excerpt, 'simple' ); ?>
 					</div>
 					<hr/>
 				<?php endif; ?>
@@ -710,7 +710,7 @@ class License_Manager {
 
 							?>
 							<a class="button-secondary" target="_blank"
-							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+							   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
 							<?php
 						} else {
 
@@ -719,12 +719,12 @@ class License_Manager {
 							if ( $price > 0.00 ) {
 								?>
 								<a class="button-secondary" target="_blank"
-								   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
 								<?php
 							} else {
 								?>
 								<a class="button-secondary" target="_blank"
-								   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html_x( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}

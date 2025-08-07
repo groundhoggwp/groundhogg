@@ -338,9 +338,9 @@ class Events_Table extends WP_List_Table {
 		$results = $eventQuery->get_results();
 
 		$views = [
-			Event::WAITING     => __( 'Waiting', 'groundhogg' ),
-			Event::PAUSED      => __( 'Paused', 'groundhogg' ),
-			Event::IN_PROGRESS => __( 'In Progress', 'groundhogg' ),
+			Event::WAITING     => esc_html__( 'Waiting', 'groundhogg' ),
+			Event::PAUSED      => esc_html__( 'Paused', 'groundhogg' ),
+			Event::IN_PROGRESS => esc_html__( 'In Progress', 'groundhogg' ),
 		];
 
 		$views = array_map_with_keys( $views, function ( $text, $status ) use ( $view, $results ) {
@@ -362,10 +362,10 @@ class Events_Table extends WP_List_Table {
 		} );
 
 		$more_views = [
-			Event::COMPLETE  => __( 'Complete', 'groundhogg' ),
-			Event::SKIPPED   => __( 'Skipped', 'groundhogg' ),
-			Event::CANCELLED => __( 'Cancelled', 'groundhogg' ),
-			Event::FAILED    => __( 'Failed', 'groundhogg' ),
+			Event::COMPLETE  => esc_html__( 'Complete', 'groundhogg' ),
+			Event::SKIPPED   => esc_html__( 'Skipped', 'groundhogg' ),
+			Event::CANCELLED => esc_html__( 'Cancelled', 'groundhogg' ),
+			Event::FAILED    => esc_html__( 'Failed', 'groundhogg' ),
 		];
 
 		$eventQuery = new Table_Query( 'events' );
@@ -416,26 +416,26 @@ class Events_Table extends WP_List_Table {
 				case 'waiting':
 					$actions['execute_now'] = html()->e( 'a', [
 						'href' => action_url( 'execute_now', [ 'event' => $event->get_id() ] ),
-					], __( 'Run Now', 'groundhogg' ) );
+					], esc_html__( 'Run Now', 'groundhogg' ) );
 					$actions['pause']       = html()->e( 'a', [
 						'href' => action_url( 'pause', [ 'event' => $event->get_id() ] ),
-					], __( 'Pause', 'groundhogg' ) );
+					], esc_html__( 'Pause', 'groundhogg' ) );
 					$actions['trash']       = html()->e( 'a', [
 						'href' => action_url( 'cancel', [ 'event' => $event->get_id() ] ),
-					], __( 'Cancel', 'groundhogg' ) );
+					], esc_html__( 'Cancel', 'groundhogg' ) );
 					break;
 				case 'paused':
 					$actions['unpause'] = html()->e( 'a', [
 						'href' => action_url( 'unpause', [ 'event' => $event->get_id() ] ),
-					], __( 'Unpause', 'groundhogg' ) );
+					], esc_html__( 'Unpause', 'groundhogg' ) );
 					$actions['trash']   = html()->e( 'a', [
 						'href' => action_url( 'cancel', [ 'event' => $event->get_id() ] ),
-					], __( 'Cancel', 'groundhogg' ) );
+					], esc_html__( 'Cancel', 'groundhogg' ) );
 					break;
 				case 'cancelled':
 					$actions['uncancel'] = html()->e( 'a', [
 						'href' => action_url( 'uncancel', [ 'event' => $event->get_id() ] ),
-					], __( 'Uncancel', 'groundhogg' ) );
+					], esc_html__( 'Uncancel', 'groundhogg' ) );
 					break;
 				case 'complete':
 				case 'skipped':
@@ -445,13 +445,13 @@ class Events_Table extends WP_List_Table {
 							'event'  => $event->get_id(),
 							'status' => $this->get_view()
 						] ),
-					], __( 'Run Again', 'groundhogg' ) );
+					], esc_html__( 'Run Again', 'groundhogg' ) );
 					break;
 			}
 
 
 			if ( $event->get_contact() && $event->get_contact()->exists() ) {
-				$actions['view'] = html()->a( $event->get_contact()->admin_link(), __( 'Contact', 'groundhogg' ), [
+				$actions['view'] = html()->a( $event->get_contact()->admin_link(), esc_html__( 'Contact', 'groundhogg' ), [
 					'aria-label' => _x( 'View Contact', 'action', 'groundhogg' ),
 					'title'      => _x( 'View Contact', 'action', 'groundhogg' ),
 				] );
@@ -497,7 +497,7 @@ class Events_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
 			<?php if ( $this->get_view() === Event::WAITING ): ?>
                 <a class="gh-button primary small"
-                   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+                   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php echo esc_html_x( 'Process Events', 'action', 'groundhogg' ); ?></a>
                 <a class="gh-button secondary small"
                    href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'pause' ], $_SERVER['REQUEST_URI'] ), 'pause' ) ); ?>"><?php printf( _x( 'Pause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
                 <a class="gh-button danger small danger-confirm"

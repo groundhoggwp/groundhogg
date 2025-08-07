@@ -41,11 +41,11 @@ class Blocks {
 					'title'    => __( 'Select a form', 'groundhogg' ),
 					'sections' => [
 						'groundhogg-forms' => [
-							'title'  => sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() ),
+							'title'  => sprintf( esc_html__( '%s Forms', 'groundhogg' ), white_labeled_name() ),
 							'fields' => [
 								'groundhogg_form_id' => [
 									'type'    => 'select',
-									'label'   => __( 'Select a form', 'groundhogg' ),
+									'label'   => esc_html__( 'Select a form', 'groundhogg' ),
 									'options' => get_form_list()
 								],
 							]

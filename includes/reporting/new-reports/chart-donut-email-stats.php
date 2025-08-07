@@ -28,9 +28,9 @@ class Chart_Donut_Email_Stats extends Base_Doughnut_Chart_Report {
 
 		return [
 			'label' => [
-				_x( 'Clicked', 'stats', 'groundhogg' ),
-				_x( 'Opened', 'stats', 'groundhogg' ),
-				_x( 'Unopened', 'stats', 'groundhogg' ),
+				esc_html_x( 'Clicked', 'stats', 'groundhogg' ),
+				esc_html_x( 'Opened', 'stats', 'groundhogg' ),
+				esc_html_x( 'Unopened', 'stats', 'groundhogg' ),
 			],
 			'data'  => [
 				$clicked,

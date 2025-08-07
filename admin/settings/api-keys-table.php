@@ -57,8 +57,8 @@ class API_Keys_Table extends WP_List_Table {
 
 		// Set parent defaults
 		parent::__construct( array(
-			'singular' => __( 'API Key', 'groundhogg' ),
-			'plural'   => __( 'API Keys', 'groundhogg' ),
+			'singular' => esc_html__( 'API Key', 'groundhogg' ),
+			'plural'   => esc_html__( 'API Keys', 'groundhogg' ),
 			'ajax'     => false,
 		) );
 

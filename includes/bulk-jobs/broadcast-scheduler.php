@@ -133,6 +133,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return string|null
 	 */
 	protected function get_finished_notice() {
-		return _x( 'Broadcast scheduled!', 'notice', 'groundhogg' );
+		return esc_html_x( 'Broadcast scheduled!', 'notice', 'groundhogg' );
 	}
 }

@@ -15,7 +15,7 @@ class Address extends Input {
 
 	public function get_default_args() {
 		return [
-			'label'    => _x( 'Address *', 'form_default', 'groundhogg' ),
+			'label'    => esc_html_x( 'Address *', 'form_default', 'groundhogg' ),
 			'class'    => 'gh-address',
 			'enabled'  => 'all',
 			'required' => false,

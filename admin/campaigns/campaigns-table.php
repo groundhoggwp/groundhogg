@@ -108,7 +108,7 @@ class Campaigns_Table extends Table {
 	 * @return string
 	 */
 	protected function column_visibility( $campaign ) {
-		return $campaign->is_public() ? __( 'Public' ) : __( 'Hidden' );
+		return $campaign->is_public() ? esc_html__( 'Public' ) : esc_html__( 'Hidden' );
 	}
 
 	/**
@@ -191,17 +191,17 @@ class Campaigns_Table extends Table {
 			],
 			[
 				'class'   => 'edit',
-				'display' => __( 'Edit' ),
+				'display' => esc_html__( 'Edit' ),
 				'url'     => $item->admin_link()
 			],
 			[
 				'class'   => 'view',
-				'display' => __( 'View Archive' ),
+				'display' => esc_html__( 'View Archive' ),
 				'url'     => managed_page_url( sprintf( '/campaigns/%s', $item->get_slug() ) )
 			],
 			[
 				'class'   => 'trash',
-				'display' => __( 'Delete' ),
+				'display' => esc_html__( 'Delete' ),
 				'url'     => action_url( 'delete', [ 'campaign' => $item->get_id() ] )
 			]
 		];

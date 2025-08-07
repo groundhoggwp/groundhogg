@@ -57,7 +57,7 @@ usort( $downloads, function ( $a, $b ) {
                 <div class="display-flex gap-20">
                     <div style="width: 100%">
                         <img width="100%" height="auto" style="border-radius: 5px" class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
-                             alt="<?php esc_attr_e( $extension->info->title ); ?>">
+                             alt="<?php echo esc_attr( $extension->info->title ); ?>">
                     </div>
                     <div style="width: 100%">
 						<?php echo wpautop( $extension->info->excerpt ); ?>
@@ -90,7 +90,7 @@ usort( $downloads, function ( $a, $b ) {
 							} else {
 								?>
                                 <a class="gh-button secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+                                   href="<?php echo $extension->info->link; ?>"> <?php echo esc_html_x( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
@@ -100,7 +100,7 @@ usort( $downloads, function ( $a, $b ) {
 						'href'   => $extension->info->link,
 						'target' => '_blank',
 						'class'  => 'more-details',
-					], __( 'More details' ) ); ?>
+					], esc_html__( 'More details' ) ); ?>
                 </div>
             </div>
         </div>

@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-WPHeader: groundhogg.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"echo esc_attr;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
 "_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Loco-Version: 2.6.6; wp-6.3.1\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -33,7 +33,7 @@ msgstr ""
 " | Gefällt dir Groundhogg? <a target=\"_blank\" href=\"%s\">Dann hinterlasse "
 "doch eine Bewertung</a>!</span>"
 
-#: includes/reporting/new-reports/table-benchmark-conversion-rate.php:23 
+#: includes/reporting/new-reports/table-benchmark-conversion-rate.php:23
 #: includes/reporting/new-reports/table-benchmark-conversion-rate.php:25
 #| msgid "Contacts"
 msgid "# Contacts"
@@ -314,7 +314,7 @@ msgctxt "%s is an email"
 msgid "Received %s"
 msgstr "Erhalten %s"
 
-#: includes/steps/benchmarks/tag-applied.php:136 
+#: includes/steps/benchmarks/tag-applied.php:136
 #: includes/steps/benchmarks/tag-applied.php:152
 #, php-format
 msgid "%s is applied"
@@ -325,7 +325,7 @@ msgstr "%s wird angewendet"
 msgid "%s is missing required plugins to be active: %s"
 msgstr "%s fehlen erforderliche Plugins, um aktiv zu sein: %s"
 
-#: includes/steps/benchmarks/tag-removed.php:120 
+#: includes/steps/benchmarks/tag-removed.php:120
 #: includes/steps/benchmarks/tag-removed.php:136
 #, php-format
 msgid "%s is removed"
@@ -439,7 +439,7 @@ msgstr "+1 (555) 555-555"
 msgid "+1 (555) 555-5555"
 msgstr "+1 (555) 555-555"
 
-#: includes/reporting/new-reports/base-quick-stat-percent.php:59 
+#: includes/reporting/new-reports/base-quick-stat-percent.php:59
 #: includes/reporting/new-reports/base-quick-stat.php:79
 #, php-format
 #| msgid "Previous Updates"
@@ -454,7 +454,7 @@ msgstr "1. Deaktiviere den integrierten WP-Cron."
 msgid "10"
 msgstr "10"
 
-#: admin/contacts/parts/bulk-edit.php:60 
+#: admin/contacts/parts/bulk-edit.php:60
 #: admin/contacts/parts/contact-editor.php:173
 msgid "1234"
 msgstr "1234"
@@ -527,7 +527,7 @@ msgstr ""
 "Erweiterungen haben keine Lizenzschlüssel. Denken Sie daran, Ihren "
 "Lizenzschlüssel hinzuzufügen, um wichtige Updates und Support zu erhalten."
 
-#: includes/form/submission-handler.php:174 
+#: includes/form/submission-handler.php:174
 #: includes/form/submission-handler.php:184
 #, php-format
 msgid "<b>Missing a required field:</b> %s"
@@ -708,14 +708,14 @@ msgctxt "action"
 msgid "Add Option"
 msgstr "Option hinzufügen"
 
-#: admin/funnels/funnels-page.php:1027 admin/settings/extensions.php:77 
+#: admin/funnels/funnels-page.php:1027 admin/settings/extensions.php:77
 #: includes/license-manager.php:730
 #, php-format
 msgctxt "action"
 msgid "Buy Now ($%s - $%s)"
 msgstr "Jetzt kaufen ($%s - $%s)"
 
-#: admin/funnels/funnels-page.php:1036 admin/settings/extensions.php:86 
+#: admin/funnels/funnels-page.php:1036 admin/settings/extensions.php:86
 #: includes/license-manager.php:739
 #, php-format
 msgctxt "action"
@@ -744,7 +744,7 @@ msgctxt "action"
 msgid "Delete Permanently"
 msgstr "Permanent löschen"
 
-#: admin/funnels/funnels-page.php:1041 admin/settings/extensions.php:91 
+#: admin/funnels/funnels-page.php:1041 admin/settings/extensions.php:91
 #: includes/license-manager.php:744
 msgctxt "action"
 msgid "Download"
@@ -755,14 +755,14 @@ msgctxt "action"
 msgid "Duplicate"
 msgstr "Doppelt"
 
-#: admin/broadcasts/broadcasts-table.php:217 
+#: admin/broadcasts/broadcasts-table.php:217
 #: includes/steps/actions/send-email.php:118
 msgctxt "action"
 msgid "Edit Email"
 msgstr "Mail editieren"
 
-#: admin/contacts/deprecated/contact-events-table.php:130 
-#: admin/contacts/deprecated/contact-events-table.php:131 
+#: admin/contacts/deprecated/contact-events-table.php:130
+#: admin/contacts/deprecated/contact-events-table.php:131
 #: admin/events/events-table.php:388 admin/events/events-table.php:389
 msgctxt "action"
 msgid "Edit Funnel"
@@ -773,8 +773,8 @@ msgctxt "action"
 msgid "Edit SMS"
 msgstr "SMS editieren"
 
-#: admin/contacts/deprecated/contact-events-table.php:139 
-#: admin/contacts/deprecated/contact-events-table.php:140 
+#: admin/contacts/deprecated/contact-events-table.php:139
+#: admin/contacts/deprecated/contact-events-table.php:140
 #: admin/events/events-table.php:399 admin/events/events-table.php:400
 msgctxt "action"
 msgid "Edit Step"
@@ -808,7 +808,7 @@ msgctxt "action"
 msgid "Import Funnel"
 msgstr "Funnel importieren"
 
-#: admin/contacts/deprecated/contact-events-table.php:105 
+#: admin/contacts/deprecated/contact-events-table.php:105
 #: admin/events/events-table.php:413
 msgctxt "action"
 msgid "Process Events"
@@ -905,7 +905,7 @@ msgstr ""
 "wird, wird einfach die nächste Aktion geladen. Das heißt, wenn Sie es ändern "
 "müssen, können Sie es!"
 
-#: assets/js/admin/setup.js:519 assets/js/admin/troubleshooter.js:1979 
+#: assets/js/admin/setup.js:519 assets/js/admin/troubleshooter.js:1979
 #: assets/js/admin/troubleshooter.js:2085 includes/extension.php:608
 msgid "Activate"
 msgstr "Aktivieren"
@@ -918,21 +918,21 @@ msgstr "Den Funnel aktivieren!"
 msgid "Activate your funnel!"
 msgstr "Aktiviere deinen Trichter!"
 
-#: admin/reports/views/funnel-single.php:36 
+#: admin/reports/views/funnel-single.php:36
 #: includes/reporting/new-reports/table-all-funnels-performance.php:28
 #| msgctxt "Column label"
 #| msgid "Active Contacts"
 msgid "Active Contacts"
 msgstr "Aktive Kontakte"
 
-#: admin/reports/views/funnel-single.php:91 
+#: admin/reports/views/funnel-single.php:91
 #: assets/js/admin/contact-editor.js:893 includes/steps/manager.php:77
 #| msgctxt "contact_record_tab"
 #| msgid "Activity"
 msgid "Activity"
 msgstr "Aktivität"
 
-#: admin/contacts/contacts-page.php:267 admin/emails/emails-page.php:48 
+#: admin/contacts/contacts-page.php:267 admin/emails/emails-page.php:48
 #: admin/funnels/funnels-page.php:78
 msgid "Add"
 msgstr "Hinzufügen"
@@ -1083,7 +1083,7 @@ msgstr ""
 msgid "Add missing index on `claim` column."
 msgstr "Füge einen fehlenden Index auf der Spalte 'claim' hinzu."
 
-#: admin/admin-page.php:438 admin/admin-page.php:454 
+#: admin/admin-page.php:438 admin/admin-page.php:454
 #: admin/contacts/contacts-page.php:334 admin/emails/emails-page.php:156
 msgid "Add New"
 msgstr "Neues hinzufügen"
@@ -1109,9 +1109,9 @@ msgstr ""
 msgid "Add New Tag"
 msgstr "Neuen Tag hinzufügen"
 
-#: includes/steps/actions/apply-tag.php:96 
-#: includes/steps/actions/remove-tag.php:96 
-#: includes/steps/benchmarks/tag-applied.php:113 
+#: includes/steps/actions/apply-tag.php:96
+#: includes/steps/actions/remove-tag.php:96
+#: includes/steps/benchmarks/tag-applied.php:113
 #: includes/steps/benchmarks/tag-removed.php:109
 msgid "Add new tags by hitting [enter] or by typing a [comma]."
 msgstr "Neue Tags durch [Enter] hinzufügen oder ein Komma [,] eingeben"
@@ -1198,7 +1198,7 @@ msgstr "Hinzugefügt"
 msgid "Added Broadcast meta table."
 msgstr "Die Broadcast-Metadatentabelle wurde hinzugefügt."
 
-#: assets/js/admin/notes.js:107 assets/js/admin/notes.js:111 
+#: assets/js/admin/notes.js:107 assets/js/admin/notes.js:111
 #: assets/js/admin/notes.js:113
 #, javascript-format
 msgid "Added by %s %s ago"
@@ -1232,7 +1232,7 @@ msgstr "Zusätzliche Informationen"
 msgid "Additional options"
 msgstr "Zusätzliche Optionen"
 
-#: assets/js/admin/form-builder-v2.js:48 includes/replacements.php:220 
+#: assets/js/admin/form-builder-v2.js:48 includes/replacements.php:220
 #: includes/steps/benchmarks/form-filled.php:565 templates/preferences.php:70
 msgid "Address"
 msgstr "Adresse"
@@ -1259,18 +1259,18 @@ msgstr "Erweiterte Funnel Schritte"
 msgid "AffiliateWP"
 msgstr "AffiliateWP"
 
-#: admin/events/email-log-table.php:165 assets/js/admin/search-filters.js:629 
+#: admin/events/email-log-table.php:165 assets/js/admin/search-filters.js:629
 #: assets/js/admin/search-filters.js:643
 msgid "After"
 msgstr "nach"
 
-#: assets/js/admin/troubleshooter.js:1236 
+#: assets/js/admin/troubleshooter.js:1236
 #: assets/js/admin/troubleshooter.js:1353
 msgid "Aggressive host level caching"
 msgstr "Aggressiver Caching auf Hostebene"
 
-#: admin/contacts/parts/contact-editor.php:392 
-#: admin/contacts/parts/contact-editor.php:397 
+#: admin/contacts/parts/contact-editor.php:392
+#: admin/contacts/parts/contact-editor.php:397
 #: admin/contacts/parts/contact-editor.php:401
 msgid "Agreed"
 msgstr "Bestätigt"
@@ -1293,13 +1293,13 @@ msgstr "Den Allgemeinen Geschäftsbedingungen zugestimmt?"
 msgid "Alignment"
 msgstr "Ausrichtung"
 
-#: admin/broadcasts/add.php:112 admin/broadcasts/add.php:135 
-#: admin/contacts/deprecated/advanced-search.php:272 
-#: admin/contacts/deprecated/advanced-search.php:301 
-#: admin/contacts/tables/contacts-table.php:446 
-#: admin/emails/emails-table.php:125 admin/events/email-log-table.php:76 
-#: assets/js/admin/search-filters.js:1089 
-#: includes/steps/benchmarks/tag-applied.php:103 
+#: admin/broadcasts/add.php:112 admin/broadcasts/add.php:135
+#: admin/contacts/deprecated/advanced-search.php:272
+#: admin/contacts/deprecated/advanced-search.php:301
+#: admin/contacts/tables/contacts-table.php:446
+#: admin/emails/emails-table.php:125 admin/events/email-log-table.php:76
+#: assets/js/admin/search-filters.js:1089
+#: includes/steps/benchmarks/tag-applied.php:103
 #: includes/steps/benchmarks/tag-removed.php:99
 msgid "All"
 msgstr "Alle"
@@ -1386,7 +1386,7 @@ msgstr "Alt Tag"
 msgid "Alternate Plain Text Version"
 msgstr "Alternative Klartextversion"
 
-#: assets/js/admin/troubleshooter.js:1997 
+#: assets/js/admin/troubleshooter.js:1997
 #: assets/js/admin/troubleshooter.js:2088
 msgid "Alternative options for receiving technical support"
 msgstr "Alternative Möglichkeiten, technischen Support zu erhalten"
@@ -1464,11 +1464,11 @@ msgstr ""
 "Das Beantworten dieser Fragen wird uns helfen, Ihr Problem schneller zu "
 "lösen und unsere Antwort besser auf Ihre Bedürfnisse abzustimmen."
 
-#: admin/broadcasts/add.php:111 admin/broadcasts/add.php:134 
-#: admin/contacts/deprecated/advanced-search.php:271 
-#: admin/contacts/deprecated/advanced-search.php:300 
-#: assets/js/admin/funnel-steps.js:67 assets/js/admin/search-filters.js:1088 
-#: includes/steps/benchmarks/tag-applied.php:102 
+#: admin/broadcasts/add.php:111 admin/broadcasts/add.php:134
+#: admin/contacts/deprecated/advanced-search.php:271
+#: admin/contacts/deprecated/advanced-search.php:300
+#: assets/js/admin/funnel-steps.js:67 assets/js/admin/search-filters.js:1088
+#: includes/steps/benchmarks/tag-applied.php:102
 #: includes/steps/benchmarks/tag-removed.php:98
 #| msgid "And"
 msgid "Any"
@@ -1530,8 +1530,8 @@ msgctxt "api"
 msgid "Any search parameters."
 msgstr "Beliebige Suchparameter."
 
-#: api/v3/contacts-api.php:143 api/v3/contacts-api.php:162 
-#: api/v3/contacts-api.php:184 api/v3/contacts-api.php:206 
+#: api/v3/contacts-api.php:143 api/v3/contacts-api.php:162
+#: api/v3/contacts-api.php:184 api/v3/contacts-api.php:206
 #: api/v3/tags-api.php:107 api/v3/tags-api.php:129
 msgctxt "api"
 msgid "Array of tag names or tag ids."
@@ -1645,11 +1645,11 @@ msgctxt "api"
 msgid "Search string for tag name."
 msgstr "Suchstring für Tagname."
 
-#: api/v3/contacts-api.php:61 api/v3/contacts-api.php:87 
-#: api/v3/contacts-api.php:106 api/v3/contacts-api.php:124 
-#: api/v3/contacts-api.php:139 api/v3/contacts-api.php:158 
-#: api/v3/contacts-api.php:180 api/v3/contacts-api.php:202 
-#: api/v3/contacts-api.php:224 api/v3/contacts-api.php:239 
+#: api/v3/contacts-api.php:61 api/v3/contacts-api.php:87
+#: api/v3/contacts-api.php:106 api/v3/contacts-api.php:124
+#: api/v3/contacts-api.php:139 api/v3/contacts-api.php:158
+#: api/v3/contacts-api.php:180 api/v3/contacts-api.php:202
+#: api/v3/contacts-api.php:224 api/v3/contacts-api.php:239
 #: api/v3/email-api.php:65 api/v3/tags-api.php:103 api/v3/tags-api.php:125
 msgctxt "api"
 msgid "Search using the user ID."
@@ -1665,8 +1665,8 @@ msgctxt "api"
 msgid "The ID of the tag to delete."
 msgstr "Die ID des zu löschenden Tags."
 
-#: api/v3/contacts-api.php:120 api/v3/contacts-api.php:135 
-#: api/v3/contacts-api.php:176 api/v3/contacts-api.php:220 
+#: api/v3/contacts-api.php:120 api/v3/contacts-api.php:135
+#: api/v3/contacts-api.php:176 api/v3/contacts-api.php:220
 #: api/v3/contacts-api.php:235 api/v3/tags-api.php:99
 msgctxt "api"
 msgid "The ID or email of the contact you want to apply tags to."
@@ -1685,7 +1685,7 @@ msgctxt "api"
 msgid "The ID or email of the contact you want to get."
 msgstr "Die ID oder E-Mail des Kontakts, den Sie abrufen möchten."
 
-#: api/v3/contacts-api.php:154 api/v3/contacts-api.php:198 
+#: api/v3/contacts-api.php:154 api/v3/contacts-api.php:198
 #: api/v3/tags-api.php:121
 msgctxt "api"
 msgid "The ID or email of the contact you want to remove tags from."
@@ -1785,7 +1785,7 @@ msgstr "Einen Tag anwenden"
 msgid "Apply all of the following tags..."
 msgstr "Wenden Sie alle folgenden Tags an..."
 
-#: assets/js/admin/bulk-edit-contacts.js:195 
+#: assets/js/admin/bulk-edit-contacts.js:195
 #: assets/js/admin/form-builder-v2.js:202
 #| msgctxt "List table bulk action"
 #| msgid "Apply Tag"
@@ -1812,7 +1812,7 @@ msgstr "April"
 msgid "Archive"
 msgstr "Archiv"
 
-#: assets/js/admin/troubleshooter.js:1247 
+#: assets/js/admin/troubleshooter.js:1247
 #: assets/js/admin/troubleshooter.js:1364
 msgid ""
 "Are known to have aggressive host level caching systems. This can have a "
@@ -1846,8 +1846,8 @@ msgstr ""
 "Sind Sie sicher, dass Sie %s Kontakte löschen möchten? Dies kann nicht "
 "rückgängig gemacht werden. Erwägen Sie, zuerst zu <i>exportieren</i>!"
 
-#: assets/js/admin/contact-editor.js:468 
-#: assets/js/admin/contact-editor.js:1250 
+#: assets/js/admin/contact-editor.js:468
+#: assets/js/admin/contact-editor.js:1250
 #: assets/js/admin/contact-editor.js:1602 assets/js/admin/contact-search.js:825
 #, javascript-format
 msgid "Are you sure you want to delete %s?"
@@ -1976,7 +1976,7 @@ msgstr "Bcc"
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: admin/events/email-log-table.php:164 assets/js/admin/search-filters.js:628 
+#: admin/events/email-log-table.php:164 assets/js/admin/search-filters.js:628
 #: assets/js/admin/search-filters.js:642
 msgid "Before"
 msgstr "vor"
@@ -2010,15 +2010,15 @@ msgstr "Vorteile des lizenzierten Supports"
 msgid "Better deliverability!"
 msgstr "Bessere Zustellbarkeit!"
 
-#: admin/events/email-log-table.php:166 assets/js/admin/funnel-steps.js:236 
+#: admin/events/email-log-table.php:166 assets/js/admin/funnel-steps.js:236
 #: assets/js/admin/search-filters.js:630 assets/js/admin/search-filters.js:644
 msgid "Between"
 msgstr "zwischen"
 
-#: admin/contacts/parts/contact-editor.php:198 
-#: admin/contacts/tables/contact-table-columns.php:191 
-#: assets/js/admin/search-filters.js:888 includes/functions.php:2138 
-#: includes/functions.php:2243 includes/replacements.php:168 
+#: admin/contacts/parts/contact-editor.php:198
+#: admin/contacts/tables/contact-table-columns.php:191
+#: assets/js/admin/search-filters.js:888 includes/functions.php:2138
+#: includes/functions.php:2243 includes/replacements.php:168
 #: includes/steps/benchmarks/form-filled.php:569
 msgid "Birthday"
 msgstr "Geburtstag"
@@ -2032,9 +2032,9 @@ msgstr "Buchungskalender"
 msgid "Born <abbr title=\"Age\">%s</abbr> | %s years old"
 msgstr "Geboren <abbr title='Alter'>%s</abbr> | %s Jahre alt"
 
-#: admin/contacts/deprecated/advanced-search.php:130 
-#: admin/contacts/tables/contacts-table.php:481 
-#: admin/dashboard/widgets/optin-status-widget.php:73 
+#: admin/contacts/deprecated/advanced-search.php:130
+#: admin/contacts/tables/contacts-table.php:481
+#: admin/dashboard/widgets/optin-status-widget.php:73
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:60
 msgid "Bounced"
 msgstr "Zurückgekommene"
@@ -2048,7 +2048,7 @@ msgstr "Rückläufer "
 msgid "Briefly describe your issue..."
 msgstr "Beschreiben Sie kurz Ihr Problem..."
 
-#: admin/emails/emails-page.php:161 
+#: admin/emails/emails-page.php:161
 #: includes/reporting/new-reports/table-all-broadcasts-performance.php:18
 msgid "Broadcast"
 msgstr "Newsletter"
@@ -2061,7 +2061,7 @@ msgstr "Newsletter Mail"
 msgid "Broadcast events"
 msgstr "Übertragungsereignisse"
 
-#: admin/reports/views/broadcast-single.php:35 
+#: admin/reports/views/broadcast-single.php:35
 #: assets/js/admin/search-filters.js:2009
 #| msgctxt "stats"
 #| msgid "Links Clicked"
@@ -2091,7 +2091,7 @@ msgstr "Statistiken der Rundmail"
 msgid "Broadcasts"
 msgstr "Sendungen"
 
-#: assets/js/admin/troubleshooter.js:1276 
+#: assets/js/admin/troubleshooter.js:1276
 #: assets/js/admin/troubleshooter.js:1393
 msgid "Broken permalinks"
 msgstr "Defekte Permalinks"
@@ -2126,7 +2126,7 @@ msgstr "Massenlöschung von Dateien"
 msgid "Bulk Edit Contacts"
 msgstr "Massenbearbeitung von Kontakten"
 
-#: admin/contacts/parts/bulk-edit.php:105 
+#: admin/contacts/parts/bulk-edit.php:105
 #: admin/contacts/parts/bulk-edit.php:118
 #| msgctxt "contact_record"
 #| msgid "Add new tags by hitting [Enter] or by typing a [,]."
@@ -2271,14 +2271,14 @@ msgstr ""
 msgid "Canada"
 msgstr "Kanada"
 
-#: admin/contacts/deprecated/contact-events-table.php:174 
-#: admin/contacts/tables/contacts-table.php:340 
-#: admin/events/events-table.php:356 admin/events/manage.php:133 
-#: admin/funnels/funnels-page.php:205 assets/js/admin/components.js:426 
-#: assets/js/admin/contact-editor.js:764 
-#: assets/js/admin/contact-editor.js:1559 
-#: assets/js/admin/contact-editor.js:1742 
-#: assets/js/admin/contact-editor.js:1928 assets/js/admin/element.js:845 
+#: admin/contacts/deprecated/contact-events-table.php:174
+#: admin/contacts/tables/contacts-table.php:340
+#: admin/events/events-table.php:356 admin/events/manage.php:133
+#: admin/funnels/funnels-page.php:205 assets/js/admin/components.js:426
+#: assets/js/admin/contact-editor.js:764
+#: assets/js/admin/contact-editor.js:1559
+#: assets/js/admin/contact-editor.js:1742
+#: assets/js/admin/contact-editor.js:1928 assets/js/admin/element.js:845
 #: assets/js/admin/notes.js:65 assets/js/admin/notes.js:82
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -2329,14 +2329,14 @@ msgstr "Cc"
 msgid "Cc:"
 msgstr "Cc:"
 
-#: assets/js/admin/troubleshooter.js:1252 
-#: assets/js/admin/troubleshooter.js:1268 
-#: assets/js/admin/troubleshooter.js:1369 
+#: assets/js/admin/troubleshooter.js:1252
+#: assets/js/admin/troubleshooter.js:1268
+#: assets/js/admin/troubleshooter.js:1369
 #: assets/js/admin/troubleshooter.js:1385
 msgid "CDN Caching"
 msgstr "CDN-Caching"
 
-#: admin/emails/add.php:124 admin/emails/email-editor.php:150 
+#: admin/emails/add.php:124 admin/emails/email-editor.php:150
 #: admin/settings/settings-page.php:1142
 msgid "Center"
 msgstr "Center"
@@ -2371,9 +2371,9 @@ msgstr ""
 msgid "Change your <b>WordPress Default</b> email service"
 msgstr "Ändern Sie Ihren <b>WordPress-Standard</b> E-Maildienst"
 
-#: assets/js/admin/contact-editor.js:1399 
-#: assets/js/admin/contact-editor.js:1445 
-#: assets/js/admin/contact-editor.js:1468 
+#: assets/js/admin/contact-editor.js:1399
+#: assets/js/admin/contact-editor.js:1445
+#: assets/js/admin/contact-editor.js:1468
 #: assets/js/admin/contact-editor.js:1967
 #| msgid "Preferences saved!"
 msgid "Changes saved!"
@@ -2384,7 +2384,7 @@ msgstr "Änderungen gespeichert!"
 msgid "Check"
 msgstr "Überprüfen"
 
-#: assets/js/admin/form-builder-v2.js:1367 
+#: assets/js/admin/form-builder-v2.js:1367
 #: includes/steps/benchmarks/form-filled.php:605
 msgid "Checkbox"
 msgstr "Checkbox"
@@ -2433,13 +2433,13 @@ msgstr ""
 "der Suche entsprechen. <a href='https://help.groundhogg.io/article/405-saved-"
 "searches' target='_blank'>Erfahren Sie mehr über gespeicherte Suchen!</a>"
 
-#: admin/contacts/parts/contact-editor.php:293 
-#: admin/guided-setup/steps/business-info.php:48 
-#: admin/settings/settings-page.php:518 
-#: assets/js/admin/bulk-edit-contacts.js:122 
-#: assets/js/admin/form-builder-v2.js:973 
-#: assets/js/admin/search-filters.js:1392 assets/js/admin/setup.js:223 
-#: includes/form/fields/address.php:73 includes/functions.php:2144 
+#: admin/contacts/parts/contact-editor.php:293
+#: admin/guided-setup/steps/business-info.php:48
+#: admin/settings/settings-page.php:518
+#: assets/js/admin/bulk-edit-contacts.js:122
+#: assets/js/admin/form-builder-v2.js:973
+#: assets/js/admin/search-filters.js:1392 assets/js/admin/setup.js:223
+#: includes/form/fields/address.php:73 includes/functions.php:2144
 #: includes/functions.php:2249 includes/steps/benchmarks/form-filled.php:250
 msgid "City"
 msgstr "Stadt"
@@ -2503,14 +2503,14 @@ msgstr ""
 msgid "Click send!"
 msgstr "Klicken Sie auf Senden!"
 
-#: admin/reports/views/email-step.php:44 admin/reports/views/email.php:30 
-#: admin/reports/views/overview.php:48 
-#: includes/reporting/new-reports/base-email-performance-table-report.php:27 
-#: includes/reporting/new-reports/table-all-broadcasts-performance.php:23 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:20 
-#: includes/reporting/new-reports/table-all-funnels-performance.php:33 
-#: includes/reporting/new-reports/table-broadcast-stats.php:129 
-#: includes/reporting/new-reports/table-email-funnels-used-in.php:28 
+#: admin/reports/views/email-step.php:44 admin/reports/views/email.php:30
+#: admin/reports/views/overview.php:48
+#: includes/reporting/new-reports/base-email-performance-table-report.php:27
+#: includes/reporting/new-reports/table-all-broadcasts-performance.php:23
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:20
+#: includes/reporting/new-reports/table-all-funnels-performance.php:33
+#: includes/reporting/new-reports/table-broadcast-stats.php:129
+#: includes/reporting/new-reports/table-email-funnels-used-in.php:28
 #: includes/reporting/new-reports/table-email-stats.php:97
 #| msgctxt "stats"
 #| msgid "Click Through Rate"
@@ -2556,9 +2556,9 @@ msgstr "Irgendeinen Link in %2$s angeklickt"
 msgid "Clicked any link in any broadcast"
 msgstr "Irgendeinen Link in irgendeiner Übertragung angeklickt"
 
-#: includes/reporting/new-reports/table-all-broadcasts-performance.php:22 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:19 
-#: includes/reporting/new-reports/table-broadcast-link-clicked.php:25 
+#: includes/reporting/new-reports/table-all-broadcasts-performance.php:22
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:19
+#: includes/reporting/new-reports/table-broadcast-link-clicked.php:25
 #: includes/reporting/new-reports/table-email-links-clicked.php:24
 #| msgctxt "stats"
 #| msgid "Clicks"
@@ -2569,10 +2569,10 @@ msgstr "Klicks"
 msgid "Clicks (C.T.R)"
 msgstr "Clicks (C.T.R)"
 
-#: admin/contacts/info-cards.php:300 admin/funnels/funnel-editor.php:203 
-#: admin/welcome/checklist.php:60 admin/welcome/checklist.php:76 
-#: includes/modal.php:53 includes/scripts.php:317 
-#: includes/steps/benchmarks/form-filled.php:502 
+#: admin/contacts/info-cards.php:300 admin/funnels/funnel-editor.php:203
+#: admin/welcome/checklist.php:60 admin/welcome/checklist.php:76
+#: includes/modal.php:53 includes/scripts.php:317
+#: includes/steps/benchmarks/form-filled.php:502
 #: includes/steps/benchmarks/web-form.php:197 includes/utils/html.php:583
 msgid "Close"
 msgstr "Schließen"
@@ -2653,7 +2653,7 @@ msgctxt "Column label"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: admin/contacts/deprecated/contact-activity-table.php:68 
+#: admin/contacts/deprecated/contact-activity-table.php:68
 #: admin/contacts/tables/contacts-table.php:199
 msgctxt "Column label"
 msgid "Email"
@@ -2695,7 +2695,7 @@ msgctxt "Column label"
 msgid "From User"
 msgstr "Vom Benutzer"
 
-#: admin/contacts/deprecated/contact-events-table.php:75 
+#: admin/contacts/deprecated/contact-events-table.php:75
 #: admin/events/events-table.php:69
 msgctxt "Column label"
 msgid "Funnel"
@@ -2749,7 +2749,7 @@ msgctxt "Column label"
 msgid "Sending To"
 msgstr "Senden an"
 
-#: admin/contacts/deprecated/contact-activity-table.php:71 
+#: admin/contacts/deprecated/contact-activity-table.php:71
 #: admin/events/email-log-table.php:216
 #| msgid "Sent"
 msgctxt "Column label"
@@ -2767,7 +2767,7 @@ msgctxt "Column label"
 msgid "Status"
 msgstr "Status"
 
-#: admin/contacts/deprecated/contact-events-table.php:76 
+#: admin/contacts/deprecated/contact-events-table.php:76
 #: admin/events/events-table.php:70
 msgctxt "Column label"
 msgid "Step"
@@ -2778,7 +2778,7 @@ msgctxt "Column label"
 msgid "Subject"
 msgstr "Gegenstand"
 
-#: admin/contacts/deprecated/contact-events-table.php:77 
+#: admin/contacts/deprecated/contact-events-table.php:77
 #: admin/events/events-table.php:71
 msgctxt "Column label"
 msgid "Time"
@@ -2858,7 +2858,7 @@ msgstr "Gemeinsame Gründe, warum Kontakte sich nicht abmelden können"
 msgid "Communications"
 msgstr "Kommunikation"
 
-#: assets/js/admin/search-filters.js:844 
+#: assets/js/admin/search-filters.js:844
 #: includes/steps/benchmarks/form-filled.php:1063
 #| msgid "Company Name"
 msgid "Company Phone"
@@ -2911,7 +2911,7 @@ msgctxt "comparison"
 msgid "Ends with"
 msgstr "Endet mit"
 
-#: assets/js/admin/search-filters.js:135 assets/js/admin/search-filters.js:152 
+#: assets/js/admin/search-filters.js:135 assets/js/admin/search-filters.js:152
 #: assets/js/admin/search-filters.js:165
 #| msgid "Equals"
 msgctxt "comparison"
@@ -2955,15 +2955,15 @@ msgctxt "comparison"
 msgid "Is not empty"
 msgstr "Nicht leer"
 
-#: assets/js/admin/search-filters.js:940 
-#: assets/js/admin/search-filters.js:1024 
-#: assets/js/admin/search-filters.js:2273 
+#: assets/js/admin/search-filters.js:940
+#: assets/js/admin/search-filters.js:1024
+#: assets/js/admin/search-filters.js:2273
 #: assets/js/admin/search-filters.js:2318
 msgctxt "comparison"
 msgid "Is not one of"
 msgstr "Ist nicht eine von"
 
-#: assets/js/admin/search-filters.js:143 assets/js/admin/search-filters.js:167 
+#: assets/js/admin/search-filters.js:143 assets/js/admin/search-filters.js:167
 #: assets/js/admin/search-filters.js:746
 msgctxt "comparison"
 msgid "Less than"
@@ -2984,7 +2984,7 @@ msgctxt "comparison"
 msgid "No"
 msgstr "Nein"
 
-#: assets/js/admin/search-filters.js:136 assets/js/admin/search-filters.js:153 
+#: assets/js/admin/search-filters.js:136 assets/js/admin/search-filters.js:153
 #: assets/js/admin/search-filters.js:166
 #| msgid "Not Equals"
 msgctxt "comparison"
@@ -2997,9 +2997,9 @@ msgctxt "comparison"
 msgid "Starts with"
 msgstr "Beginnt mit"
 
-#: assets/js/admin/search-filters.js:939 
-#: assets/js/admin/search-filters.js:1023 
-#: assets/js/admin/search-filters.js:2272 
+#: assets/js/admin/search-filters.js:939
+#: assets/js/admin/search-filters.js:1023
+#: assets/js/admin/search-filters.js:2272
 #: assets/js/admin/search-filters.js:2317
 msgctxt "comparison, groundhogg"
 msgid "Is one of"
@@ -3011,7 +3011,7 @@ msgctxt "comparison, groundhogg"
 msgid "Yes"
 msgstr "Ja"
 
-#: admin/contacts/deprecated/advanced-search.php:132 
+#: admin/contacts/deprecated/advanced-search.php:132
 #: admin/contacts/tables/contacts-table.php:486
 #| msgctxt "optin_status"
 #| msgid "Complained"
@@ -3024,7 +3024,7 @@ msgstr "Beschwert"
 msgid "Complaints"
 msgstr "Beschwerden"
 
-#: admin/dashboard/widgets/funnel-breakdown.php:148 
+#: admin/dashboard/widgets/funnel-breakdown.php:148
 #: admin/events/events-table.php:307 includes/steps/funnel-step.php:581
 msgid "Complete"
 msgstr "Komplett"
@@ -3040,8 +3040,8 @@ msgstr ""
 "Schließen Sie den MailHawk-Setup-Prozess ab, damit Sie bessere E-Mails "
 "versenden können!"
 
-#: includes/reporting/new-reports/chart-funnel-breakdown.php:25 
-#: includes/reporting/new-reports/table-funnel-stats.php:27 
+#: includes/reporting/new-reports/chart-funnel-breakdown.php:25
+#: includes/reporting/new-reports/table-funnel-stats.php:27
 #: includes/utils/updater.php:105
 #| msgctxt "view"
 #| msgid "Completed"
@@ -3079,12 +3079,12 @@ msgstr "Abgeschlossene Ereignisse"
 msgid "Completed:"
 msgstr "Abgeschlossen:"
 
-#: includes/steps/benchmarks/base/lms-integration.php:153 
+#: includes/steps/benchmarks/base/lms-integration.php:153
 #: includes/steps/benchmarks/base/lms-integration.php:230
 msgid "Completes a course"
 msgstr "Schließt einen Kurs ab"
 
-#: includes/steps/benchmarks/base/lms-integration.php:154 
+#: includes/steps/benchmarks/base/lms-integration.php:154
 #: includes/steps/benchmarks/base/lms-integration.php:231
 msgid "Completes a lesson"
 msgstr "Schließt eine Lektion ab"
@@ -3141,10 +3141,10 @@ msgstr "Bestätige deine E-Mail."
 msgid "Confirmation Link"
 msgstr "Bestätigungslink"
 
-#: admin/contacts/deprecated/advanced-search.php:126 
-#: admin/contacts/tables/contacts-table.php:456 
-#: admin/dashboard/widgets/optin-status-widget.php:70 
-#: includes/reporting/new-reports/chart-contacts-by-optin-status.php:57 
+#: admin/contacts/deprecated/advanced-search.php:126
+#: admin/contacts/tables/contacts-table.php:456
+#: admin/dashboard/widgets/optin-status-widget.php:70
+#: includes/reporting/new-reports/chart-contacts-by-optin-status.php:57
 #: templates/preferences.php:568
 msgid "Confirmed"
 msgstr "Bestätigt"
@@ -3155,7 +3155,7 @@ msgstr "Bestätigt"
 msgid "Confirmed Contacts"
 msgstr "Bestätigte Kontakte"
 
-#: assets/js/admin/search-filters.js:1618 
+#: assets/js/admin/search-filters.js:1618
 #: assets/js/admin/search-filters.js:1620
 #| msgid "Confirm Email Address"
 msgid "Confirmed Email Address"
@@ -3179,7 +3179,7 @@ msgstr "MailHawk verbinden"
 msgid "Connect SendWP"
 msgstr "Verbinden Sie SendWP"
 
-#: assets/js/admin/troubleshooter.js:645 assets/js/admin/troubleshooter.js:719 
+#: assets/js/admin/troubleshooter.js:645 assets/js/admin/troubleshooter.js:719
 #: assets/js/admin/troubleshooter.js:793
 msgid ""
 "Consult your hosting support to find our if their are limitations on your "
@@ -3200,8 +3200,8 @@ msgstr "Kontakt"
 msgid "Contact created!"
 msgstr "Kontakt erstellt!"
 
-#: assets/js/admin/search-filters.js:1186 
-#: assets/js/admin/search-filters.js:1188 includes/functions.php:2128 
+#: assets/js/admin/search-filters.js:1186
+#: assets/js/admin/search-filters.js:1188 includes/functions.php:2128
 #: includes/replacements.php:88
 #| msgctxt "Column label"
 #| msgid "Contact"
@@ -3242,8 +3242,8 @@ msgstr ""
 "Kontaktnotizen wurden aktualisiert und müssen migriert werden. Erwägen Sie, "
 "Ihr Website-Backup vor der Migration zu erstellen.</p><p>%s"
 
-#: admin/contacts/parts/contact-editor.php:193 
-#: assets/js/admin/search-filters.js:1011 includes/replacements.php:70 
+#: admin/contacts/parts/contact-editor.php:193
+#: assets/js/admin/search-filters.js:1011 includes/replacements.php:70
 #: includes/steps/actions/admin-notification.php:116
 #| msgid "The Contact's Owner"
 msgid "Contact Owner"
@@ -3291,7 +3291,7 @@ msgctxt "contact_record"
 msgid "Compliance"
 msgstr "Beachtung"
 
-#: admin/contacts/parts/add-contact.php:125 
+#: admin/contacts/parts/add-contact.php:125
 #: admin/contacts/parts/bulk-edit.php:88
 #| msgid "The Contact's Owner"
 msgctxt "contact_record"
@@ -3309,7 +3309,7 @@ msgctxt "contact_record"
 msgid "First Name"
 msgstr "Vorname"
 
-#: admin/contacts/parts/add-contact.php:151 
+#: admin/contacts/parts/add-contact.php:151
 #: admin/contacts/parts/form-admin-submit.php:40
 msgctxt "contact_record"
 msgid "Internal Form"
@@ -3326,14 +3326,14 @@ msgctxt "contact_record"
 msgid "Location"
 msgstr "Ort"
 
-#: admin/contacts/parts/add-contact.php:112 
+#: admin/contacts/parts/add-contact.php:112
 #: admin/contacts/parts/bulk-edit.php:67
 #| msgid "Mobile Preview"
 msgctxt "contact_record"
 msgid "Mobile Phone"
 msgstr "Mobiltelefon"
 
-#: admin/contacts/parts/add-contact.php:90 
+#: admin/contacts/parts/add-contact.php:90
 #: admin/contacts/parts/bulk-edit.php:45
 msgctxt "contact_record"
 msgid "Primary Phone"
@@ -3367,20 +3367,20 @@ msgctxt "contact_record_tab"
 msgid "General"
 msgstr "Allgemein"
 
-#: admin/dashboard/widgets/table-widget.php:24 
-#: admin/reports/reports-page.php:281 assets/js/admin/send-broadcast.js:313 
-#: includes/reporting/new-reports/chart-new-contacts.php:25 
-#: includes/reporting/new-reports/chart-new-contacts.php:31 
-#: includes/reporting/new-reports/table-contacts-by-country.php:17 
-#: includes/reporting/new-reports/table-contacts-by-lead-source.php:25 
-#: includes/reporting/new-reports/table-contacts-by-search-engines.php:21 
-#: includes/reporting/new-reports/table-contacts-by-social-media.php:17 
-#: includes/reporting/new-reports/table-contacts-by-source-pages.php:20 
+#: admin/dashboard/widgets/table-widget.php:24
+#: admin/reports/reports-page.php:281 assets/js/admin/send-broadcast.js:313
+#: includes/reporting/new-reports/chart-new-contacts.php:25
+#: includes/reporting/new-reports/chart-new-contacts.php:31
+#: includes/reporting/new-reports/table-contacts-by-country.php:17
+#: includes/reporting/new-reports/table-contacts-by-lead-source.php:25
+#: includes/reporting/new-reports/table-contacts-by-search-engines.php:21
+#: includes/reporting/new-reports/table-contacts-by-social-media.php:17
+#: includes/reporting/new-reports/table-contacts-by-source-pages.php:20
 #: includes/reporting/new-reports/table-list-engagement.php:26
 msgid "Contacts"
 msgstr "Kontakte"
 
-#: admin/reports/views/contacts.php:54 
+#: admin/reports/views/contacts.php:54
 #: includes/reporting/reports/contacts-by-country.php:24
 msgid "Contacts By Country"
 msgstr "Kontakte nach Land"
@@ -3393,7 +3393,7 @@ msgstr "Kontakte nach Lead-Quelle"
 msgid "Contacts By Optin Status"
 msgstr "Kontakte nach Anmeldestatus"
 
-#: admin/reports/views/contacts.php:63 
+#: admin/reports/views/contacts.php:63
 #: includes/reporting/reports/contacts-by-region.php:40
 msgid "Contacts By Region"
 msgstr "Kontakte nach Region"
@@ -3426,7 +3426,7 @@ msgstr "Kontakte können sich nicht abmelden"
 msgid "Contacts updated!"
 msgstr "Kontakte aktualisiert!"
 
-#: admin/contacts/deprecated/advanced-search.php:15 
+#: admin/contacts/deprecated/advanced-search.php:15
 #: admin/contacts/deprecated/advanced-search.php:187
 msgid "Contains"
 msgstr "Enthält"
@@ -3443,10 +3443,10 @@ msgstr ""
 "Content Delivery Networks (CDNs) sind bekannt dafür, potenzielle Probleme zu "
 "verursachen, wenn sie nicht optimal eingestellt sind."
 
-#: admin/reports/views/funnel-single.php:49 
-#: includes/reporting/new-reports/table-all-funnels-performance.php:30 
-#: includes/reporting/new-reports/table-benchmark-conversion-rate.php:26 
-#: includes/reporting/new-reports/table-form-activity.php:29 
+#: admin/reports/views/funnel-single.php:49
+#: includes/reporting/new-reports/table-all-funnels-performance.php:30
+#: includes/reporting/new-reports/table-benchmark-conversion-rate.php:26
+#: includes/reporting/new-reports/table-form-activity.php:29
 #: includes/reporting/new-reports/table-top-converting-funnels.php:24
 msgid "Conversion Rate"
 msgstr "Konversions Rate"
@@ -3455,7 +3455,7 @@ msgstr "Konversions Rate"
 msgid "Conversion Rate (%)"
 msgstr "Konversions Rate (%)"
 
-#: admin/reports/views/funnel-single.php:42 
+#: admin/reports/views/funnel-single.php:42
 #: includes/reporting/new-reports/table-all-funnels-performance.php:29
 msgid "Conversions"
 msgstr "Konversionen"
@@ -3504,16 +3504,16 @@ msgstr "Diese E-Mail konnte nicht geladen werden"
 msgid "Count"
 msgstr "Zählen"
 
-#: admin/contacts/parts/contact-editor.php:319 
-#: admin/dashboard/widgets/country-widget.php:37 
-#: admin/guided-setup/steps/business-info.php:60 
-#: admin/settings/settings-page.php:554 
-#: assets/js/admin/bulk-edit-contacts.js:149 
-#: assets/js/admin/form-builder-v2.js:1006 
-#: assets/js/admin/search-filters.js:1338 assets/js/admin/setup.js:243 
-#: includes/form/fields/address.php:97 includes/functions.php:2147 
-#: includes/functions.php:2252 
-#: includes/reporting/new-reports/table-contacts-by-country.php:16 
+#: admin/contacts/parts/contact-editor.php:319
+#: admin/dashboard/widgets/country-widget.php:37
+#: admin/guided-setup/steps/business-info.php:60
+#: admin/settings/settings-page.php:554
+#: assets/js/admin/bulk-edit-contacts.js:149
+#: assets/js/admin/form-builder-v2.js:1006
+#: assets/js/admin/search-filters.js:1338 assets/js/admin/setup.js:243
+#: includes/form/fields/address.php:97 includes/functions.php:2147
+#: includes/functions.php:2252
+#: includes/reporting/new-reports/table-contacts-by-country.php:16
 #: includes/steps/benchmarks/form-filled.php:286
 msgid "Country"
 msgstr "Land"
@@ -3548,7 +3548,7 @@ msgstr ""
 msgid "CPanel cron jobs not working?"
 msgstr "Funktionieren CPanel-Cron-Jobs nicht?"
 
-#: admin/emails/add.php:80 assets/js/admin/contact-editor.js:1868 
+#: admin/emails/add.php:80 assets/js/admin/contact-editor.js:1868
 #: assets/js/admin/notes.js:83
 msgid "Create"
 msgstr "Erstellen"
@@ -3681,7 +3681,7 @@ msgstr ""
 "Cron-job.org ist eine großartige Lösung für viele, hat jedoch in den "
 "folgenden Situationen bekannte Probleme."
 
-#: assets/js/admin/troubleshooter.js:619 assets/js/admin/troubleshooter.js:693 
+#: assets/js/admin/troubleshooter.js:619 assets/js/admin/troubleshooter.js:693
 #: assets/js/admin/troubleshooter.js:767
 msgid ""
 "Cron-Job.org is free, and incredibly reliable. If your host allows it, cron-"
@@ -3726,10 +3726,10 @@ msgstr "Benutzerdefinierte Aktivität"
 msgid "Custom email"
 msgstr "Benutzerdefinierte E-Mail"
 
-#: assets/js/admin/custom-reports.js:57 assets/js/admin/custom-reports.js:184 
-#: assets/js/admin/custom-reports.js:274 
-#: assets/js/admin/form-builder-v2.js:172 
-#: includes/steps/benchmarks/form-filled.php:581 
+#: assets/js/admin/custom-reports.js:57 assets/js/admin/custom-reports.js:184
+#: assets/js/admin/custom-reports.js:274
+#: assets/js/admin/form-builder-v2.js:172
+#: includes/steps/benchmarks/form-filled.php:581
 #: includes/steps/benchmarks/form-filled.php:852
 #| msgctxt "contact_record"
 #| msgid "Custom Meta"
@@ -3766,7 +3766,7 @@ msgstr "Benutzerdefinierte Metainformationen"
 msgid "Custom tabs"
 msgstr "Benutzerdefinierte Registerkarten"
 
-#: admin/contacts/parts/contact-editor.php:396 includes/functions.php:2160 
+#: admin/contacts/parts/contact-editor.php:396 includes/functions.php:2160
 #: includes/functions.php:2265
 msgid "Data Processing Consent"
 msgstr "Einwilligung zur Datenverarbeitung"
@@ -3775,7 +3775,7 @@ msgstr "Einwilligung zur Datenverarbeitung"
 msgid "Data Processing Consent Data"
 msgstr "Daten zur Einwilligung zur Datenverarbeitung"
 
-#: assets/js/admin/properties.js:128 includes/replacements.php:305 
+#: assets/js/admin/properties.js:128 includes/replacements.php:305
 #: includes/steps/benchmarks/form-filled.php:609
 msgid "Date"
 msgstr "Datum"
@@ -3784,8 +3784,8 @@ msgstr "Datum"
 msgid "Date & Time"
 msgstr "Datum & Uhrzeit"
 
-#: admin/contacts/tables/contact-table-columns.php:183 
-#: assets/js/admin/search-filters.js:905 includes/functions.php:2136 
+#: admin/contacts/tables/contact-table-columns.php:183
+#: assets/js/admin/search-filters.js:905 includes/functions.php:2136
 #: includes/functions.php:2241
 msgid "Date Created"
 msgstr "Datum erstellt"
@@ -3796,8 +3796,8 @@ msgstr "Datum erstellt"
 msgid "Date Optin Status Changed"
 msgstr "Datum, an dem der Opt-in-Status geändert wurde"
 
-#: admin/contacts/parts/bulk-edit.php:161 
-#: admin/contacts/parts/contact-editor.php:252 
+#: admin/contacts/parts/bulk-edit.php:161
+#: admin/contacts/parts/contact-editor.php:252
 #: includes/form/fields/birthday.php:126 includes/form/form-v2.php:1043
 msgid "Day"
 msgstr "Tag"
@@ -3808,7 +3808,7 @@ msgid_plural "days"
 msgstr[0] "Tag"
 msgstr[1] "Tage"
 
-#: admin/events/manage.php:51 admin/events/manage.php:202 
+#: admin/events/manage.php:51 admin/events/manage.php:202
 #: admin/events/manage.php:261 assets/js/admin/funnel-steps.js:60
 msgid "Days"
 msgstr "Tage"
@@ -3855,20 +3855,20 @@ msgstr "Verzögerung"
 msgid "Delay Preview"
 msgstr "Verzögerungsvorschau"
 
-#: admin/contacts/deprecated/note.php:57 admin/contacts/deprecated/note.php:59 
-#: admin/contacts/tables/contacts-table.php:590 
-#: admin/events/email-log-table.php:422 admin/events/manage.php:83 
-#: admin/events/manage.php:293 admin/tags/edit.php:58 
-#: admin/tags/tags-table.php:257 assets/js/admin/contact-editor.js:422 
-#: assets/js/admin/contact-editor.js:466 
-#: assets/js/admin/contact-editor.js:1150 
-#: assets/js/admin/contact-editor.js:1236 
-#: assets/js/admin/contact-editor.js:1248 
-#: assets/js/admin/contact-editor.js:1590 
-#: assets/js/admin/contact-editor.js:1600 
-#: assets/js/admin/contact-search.js:244 assets/js/admin/contact-search.js:823 
-#: assets/js/admin/custom-reports.js:546 assets/js/admin/custom-reports.js:558 
-#: assets/js/admin/notes.js:309 assets/js/admin/properties.js:756 
+#: admin/contacts/deprecated/note.php:57 admin/contacts/deprecated/note.php:59
+#: admin/contacts/tables/contacts-table.php:590
+#: admin/events/email-log-table.php:422 admin/events/manage.php:83
+#: admin/events/manage.php:293 admin/tags/edit.php:58
+#: admin/tags/tags-table.php:257 assets/js/admin/contact-editor.js:422
+#: assets/js/admin/contact-editor.js:466
+#: assets/js/admin/contact-editor.js:1150
+#: assets/js/admin/contact-editor.js:1236
+#: assets/js/admin/contact-editor.js:1248
+#: assets/js/admin/contact-editor.js:1590
+#: assets/js/admin/contact-editor.js:1600
+#: assets/js/admin/contact-search.js:244 assets/js/admin/contact-search.js:823
+#: assets/js/admin/custom-reports.js:546 assets/js/admin/custom-reports.js:558
+#: assets/js/admin/notes.js:309 assets/js/admin/properties.js:756
 #: assets/js/admin/properties.js:821
 msgid "Delete"
 msgstr "Löschen"
@@ -3930,7 +3930,7 @@ msgstr "Suche löschen"
 msgid "Deleted"
 msgstr "Gelöscht"
 
-#: assets/js/admin/troubleshooter.js:627 assets/js/admin/troubleshooter.js:701 
+#: assets/js/admin/troubleshooter.js:627 assets/js/admin/troubleshooter.js:701
 #: assets/js/admin/troubleshooter.js:775
 msgid ""
 "Depending on the host, the path to your cron files may be different from "
@@ -3939,7 +3939,7 @@ msgstr ""
 "Je nach Host kann der Pfad zu Ihren Cron-Dateien von dem abweichen, was Sie "
 "in der Dokumentation gelesen haben."
 
-#: assets/js/admin/troubleshooter.js:643 assets/js/admin/troubleshooter.js:717 
+#: assets/js/admin/troubleshooter.js:643 assets/js/admin/troubleshooter.js:717
 #: assets/js/admin/troubleshooter.js:791
 msgid ""
 "Depending on who you host with, and the level of hosting you pay for, there "
@@ -3953,8 +3953,8 @@ msgstr ""
 msgid "Describe your issue in a few words..."
 msgstr "Beschreiben Sie Ihr Problem in wenigen Worten..."
 
-#: admin/funnels/funnel-settings.php:20 admin/tags/edit.php:45 
-#: admin/tags/tags-page.php:238 includes/replacements.php:653 
+#: admin/funnels/funnel-settings.php:20 admin/tags/edit.php:45
+#: admin/tags/tags-page.php:238 includes/replacements.php:653
 #: includes/utils/updater.php:107
 msgid "Description"
 msgstr "Beschreibung"
@@ -3985,8 +3985,8 @@ msgstr "Haben Sie Ihre Cron-Jobs eingerichtet?"
 msgid "Didn't find what you need?"
 msgstr "Haben Sie nicht gefunden, was Sie brauchen?"
 
-#: admin/settings/settings-page.php:755 admin/settings/settings-page.php:918 
-#: admin/settings/settings-page.php:1296 admin/settings/settings-page.php:1310 
+#: admin/settings/settings-page.php:755 admin/settings/settings-page.php:918
+#: admin/settings/settings-page.php:1296 admin/settings/settings-page.php:1310
 #: admin/settings/settings-page.php:1416 admin/settings/settings-page.php:1431
 msgid "Disable"
 msgstr "Deaktivieren"
@@ -4109,7 +4109,7 @@ msgstr ""
 "Entferne die nicht benötigte <code>claim</code>-Spalte aus der <code>"
 "wp_gh_events</code>-Tabelle."
 
-#: assets/js/admin/properties.js:232 
+#: assets/js/admin/properties.js:232
 #: includes/steps/benchmarks/form-filled.php:597
 msgid "Dropdown"
 msgstr "Auswahl Liste"
@@ -4118,18 +4118,18 @@ msgstr "Auswahl Liste"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
-#: admin/contacts/contacts-page.php:275 admin/contacts/deprecated/note.php:52 
-#: admin/contacts/deprecated/note.php:54 
-#: admin/contacts/tables/contacts-table.php:552 
-#: admin/contacts/tables/contacts-table.php:553 
-#: admin/emails/emails-page.php:58 admin/emails/emails-table.php:173 
-#: admin/funnels/funnels-page.php:85 admin/tags/tags-table.php:248 
-#: admin/tags/tags-table.php:249 assets/js/admin/custom-reports.js:542 
+#: admin/contacts/contacts-page.php:275 admin/contacts/deprecated/note.php:52
+#: admin/contacts/deprecated/note.php:54
+#: admin/contacts/tables/contacts-table.php:552
+#: admin/contacts/tables/contacts-table.php:553
+#: admin/emails/emails-page.php:58 admin/emails/emails-table.php:173
+#: admin/funnels/funnels-page.php:85 admin/tags/tags-table.php:248
+#: admin/tags/tags-table.php:249 assets/js/admin/custom-reports.js:542
 #: assets/js/admin/notes.js:304
 msgid "Edit"
 msgstr "Editieren"
 
-#: admin/contacts/parts/bulk-edit.php:265 
+#: admin/contacts/parts/bulk-edit.php:265
 #: assets/js/admin/bulk-edit-contacts.js:385
 #, php-format
 #| msgctxt "action"
@@ -4199,24 +4199,24 @@ msgstr "Bearbeitung"
 msgid "Elementor integration"
 msgstr "Elementor Page Builder Integration"
 
-#: admin/broadcasts/preview.php:41 admin/contacts/parts/add-contact.php:77 
-#: admin/contacts/tables/contacts-table.php:260 
-#: admin/reports/reports-page.php:285 assets/js/admin/notes.js:28 
-#: assets/js/admin/send-broadcast.js:311 includes/replacements.php:248 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:15 
+#: admin/broadcasts/preview.php:41 admin/contacts/parts/add-contact.php:77
+#: admin/contacts/tables/contacts-table.php:260
+#: admin/reports/reports-page.php:285 assets/js/admin/notes.js:28
+#: assets/js/admin/send-broadcast.js:311 includes/replacements.php:248
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:15
 #: includes/steps/benchmarks/form-filled.php:557 templates/preferences.php:67
 msgid "Email"
 msgstr "Email"
 
-#: admin/dashboard/widgets/email-activity.php:25 
+#: admin/dashboard/widgets/email-activity.php:25
 #: admin/reports/views/email.php:9 assets/js/admin/contact-editor.js:919
 msgid "Email Activity"
 msgstr "E-Mail-Aktivität"
 
-#: admin/contacts/parts/contact-editor.php:129 
-#: assets/js/admin/components.js:352 assets/js/admin/components.js:572 
-#: assets/js/admin/properties.js:121 assets/js/admin/search-filters.js:838 
-#: includes/functions.php:2132 includes/functions.php:2237 
+#: admin/contacts/parts/contact-editor.php:129
+#: assets/js/admin/components.js:352 assets/js/admin/components.js:572
+#: assets/js/admin/properties.js:121 assets/js/admin/search-filters.js:838
+#: includes/functions.php:2132 includes/functions.php:2237
 #: includes/replacements.php:133
 msgid "Email Address"
 msgstr "E-Mail-Addresse"
@@ -4308,8 +4308,8 @@ msgstr "E-Mail-Statistiken"
 msgid "Email Updated."
 msgstr "E-Mail aktualisiert"
 
-#: admin/emails/emails-page.php:181 admin/emails/emails-page.php:205 
-#: admin/emails/emails-page.php:246 admin/events/events-page.php:478 
+#: admin/emails/emails-page.php:181 admin/emails/emails-page.php:205
+#: admin/emails/emails-page.php:246 admin/events/events-page.php:478
 #: includes/reporting/new-reports/base-email-performance-table-report.php:24
 msgid "Emails"
 msgstr "E-Mails"
@@ -4330,7 +4330,7 @@ msgstr "E-Mails können nicht im %s Modus gesendet werden."
 msgid "Emails cannot be sent while in DRAFT mode."
 msgstr "E-Mails können im ENTWURF-Modus nicht gesendet werden."
 
-#: includes/reporting/new-reports/chart-email-activity.php:100 
+#: includes/reporting/new-reports/chart-email-activity.php:100
 #: includes/reporting/reports/emails-clicked.php:37
 msgid "Emails Clicked"
 msgstr "E-Mail angeklickt"
@@ -4339,13 +4339,13 @@ msgstr "E-Mail angeklickt"
 msgid "Emails Needing Improvement"
 msgstr "E-Mails, die verbessert werden müssen"
 
-#: includes/reporting/new-reports/chart-email-activity.php:81 
+#: includes/reporting/new-reports/chart-email-activity.php:81
 #: includes/reporting/reports/emails-opened.php:37
 msgid "Emails Opened"
 msgstr "E-Mails geöffnet"
 
-#: admin/reports/views/email.php:18 admin/reports/views/overview.php:38 
-#: includes/reporting/new-reports/table-all-funnels-performance.php:31 
+#: admin/reports/views/email.php:18 admin/reports/views/overview.php:38
+#: includes/reporting/new-reports/table-all-funnels-performance.php:31
 #: includes/reporting/reports/emails-sent.php:36
 msgid "Emails Sent"
 msgstr "E-Mails gesendet"
@@ -4359,7 +4359,7 @@ msgstr "E-Mails gesendet"
 msgid "Embed any forms on your landing pages..."
 msgstr "Betten Sie beliebige Formulare auf Ihren Landing Pages ein..."
 
-#: includes/steps/benchmarks/form-filled.php:465 
+#: includes/steps/benchmarks/form-filled.php:465
 #: includes/steps/benchmarks/web-form.php:167
 msgid "Embed options"
 msgstr "Einbettungsoptionen"
@@ -4373,14 +4373,14 @@ msgstr "Leer"
 msgid "Empty Trash"
 msgstr "Papierkorb leeren"
 
-#: admin/settings/settings-page.php:594 admin/settings/settings-page.php:608 
-#: admin/settings/settings-page.php:622 admin/settings/settings-page.php:650 
-#: admin/settings/settings-page.php:664 admin/settings/settings-page.php:690 
-#: admin/settings/settings-page.php:703 admin/settings/settings-page.php:729 
-#: admin/settings/settings-page.php:742 admin/settings/settings-page.php:827 
-#: admin/settings/settings-page.php:863 admin/settings/settings-page.php:890 
-#: admin/settings/settings-page.php:904 admin/settings/settings-page.php:1374 
-#: admin/settings/settings-page.php:1403 admin/settings/settings-page.php:1446 
+#: admin/settings/settings-page.php:594 admin/settings/settings-page.php:608
+#: admin/settings/settings-page.php:622 admin/settings/settings-page.php:650
+#: admin/settings/settings-page.php:664 admin/settings/settings-page.php:690
+#: admin/settings/settings-page.php:703 admin/settings/settings-page.php:729
+#: admin/settings/settings-page.php:742 admin/settings/settings-page.php:827
+#: admin/settings/settings-page.php:863 admin/settings/settings-page.php:890
+#: admin/settings/settings-page.php:904 admin/settings/settings-page.php:1374
+#: admin/settings/settings-page.php:1403 admin/settings/settings-page.php:1446
 #: includes/steps/benchmarks/form-filled.php:680
 msgid "Enable"
 msgstr "Aktivieren"
@@ -4439,7 +4439,7 @@ msgstr ""
 "Schreiben Sie Studierende in einen Kurs ein oder schreiben Sie Studierende "
 "aus einem Kurs aus."
 
-#: includes/steps/benchmarks/base/lms-integration.php:152 
+#: includes/steps/benchmarks/base/lms-integration.php:152
 #: includes/steps/benchmarks/base/lms-integration.php:229
 msgid "Enrolls in a course"
 msgstr "Schreibt sich in einen Kurs ein"
@@ -4452,7 +4452,7 @@ msgstr "1 \"tag\" pro Zeile"
 msgid "Enter Funnel Name Here"
 msgstr "Funnel Name angeben"
 
-#: admin/contacts/deprecated/advanced-search.php:14 
+#: admin/contacts/deprecated/advanced-search.php:14
 #: admin/contacts/deprecated/advanced-search.php:181
 msgid "Equals"
 msgstr "Gleich"
@@ -4478,8 +4478,8 @@ msgstr ""
 "Wenn Sie Ihr Profil löschen, werden Sie keine wichtigen Updates und "
 "Mitteilungen mehr von uns erhalten."
 
-#: assets/js/admin/troubleshooter.js:329 
-#: includes/lib/edd/GH_EDD_SL_Plugin_Updater.php:494 
+#: assets/js/admin/troubleshooter.js:329
+#: includes/lib/edd/GH_EDD_SL_Plugin_Updater.php:494
 #: includes/steps/error.php:12
 msgid "Error"
 msgstr "Fehler"
@@ -4543,7 +4543,7 @@ msgstr "alle 1 minute"
 msgid "every 15 minutes"
 msgstr "alle 15 minute"
 
-#: admin/events/manage.php:63 admin/events/manage.php:112 
+#: admin/events/manage.php:63 admin/events/manage.php:112
 #: admin/events/manage.php:273
 msgid "Everything"
 msgstr "alles"
@@ -4553,7 +4553,7 @@ msgstr "alles"
 msgid "example@mydomain.com"
 msgstr "example@mydomain.com"
 
-#: assets/js/admin/bulk-edit-contacts.js:324 
+#: assets/js/admin/bulk-edit-contacts.js:324
 #: assets/js/admin/contact-search.js:213
 msgid "Exclude"
 msgstr "ausschließen"
@@ -4580,7 +4580,7 @@ msgstr "Erwarten Sie in Kürze Info-Karten für die folgenden Integrationen..."
 msgid "expires on <abbr title=\"%1$s\">%1$s</abbr>"
 msgstr "Läuft am <abbr title=\"%1$s\">%1$s</abbr> ab."
 
-#: admin/funnels/funnel-editor.php:222 admin/funnels/funnel-editor.php:223 
+#: admin/funnels/funnel-editor.php:222 admin/funnels/funnel-editor.php:223
 #: admin/tools/exports-table.php:265 admin/tools/tools-page.php:179
 msgid "Export"
 msgstr "Exportieren"
@@ -4605,12 +4605,12 @@ msgstr "Exporte gelöscht."
 msgid "Ext."
 msgstr "Ext."
 
-#: admin/contacts/parts/add-contact.php:100 
+#: admin/contacts/parts/add-contact.php:100
 #: admin/contacts/tables/contacts-table.php:309
 msgid "ext."
 msgstr "ext."
 
-#: admin/contacts/parts/details-card.php:52 
+#: admin/contacts/parts/details-card.php:52
 #: admin/contacts/tables/contact-table-columns.php:307
 #, php-format
 msgid "ext. %s"
@@ -4621,7 +4621,7 @@ msgstr "ext. %s"
 msgid "Extension"
 msgstr "Durchwahl"
 
-#: admin/events/email-log-table.php:86 admin/events/email-log-table.php:351 
+#: admin/events/email-log-table.php:86 admin/events/email-log-table.php:351
 #: admin/events/events-table.php:310
 #| msgctxt "status"
 #| msgid "Failed"
@@ -4636,8 +4636,8 @@ msgstr "Februar"
 msgid "Field"
 msgstr "Felder"
 
-#: admin/tools/tools-page.php:669 admin/tools/tools-page.php:706 
-#: admin/tools/tools-page.php:744 
+#: admin/tools/tools-page.php:669 admin/tools/tools-page.php:706
+#: admin/tools/tools-page.php:744
 #: includes/steps/benchmarks/base/form-integration.php:168
 msgid "Field ID"
 msgstr "Feld ID"
@@ -4647,7 +4647,7 @@ msgstr "Feld ID"
 msgid "Field IDs"
 msgstr "Feld-IDs"
 
-#: assets/js/admin/properties.js:397 
+#: assets/js/admin/properties.js:397
 #: includes/steps/benchmarks/base/form-integration.php:169
 msgid "Field Label"
 msgstr "Feldbezeichnung"
@@ -4798,7 +4798,7 @@ msgstr "Planung abschließen"
 msgid "Finish! 🎉"
 msgstr "Fertig! 🎉"
 
-#: assets/js/admin/funnel-steps.js:68 
+#: assets/js/admin/funnel-steps.js:68
 #: includes/steps/benchmarks/form-filled.php:549
 msgid "First"
 msgstr "Vorname"
@@ -4811,16 +4811,16 @@ msgstr "Vor- und Nachname dürfen nicht identisch sein."
 msgid "First and last name cannot be the same."
 msgstr "Vor- und Nachname dürfen nicht identisch sein."
 
-#: admin/contacts/parts/add-contact.php:57 
-#: admin/contacts/parts/bulk-edit.php:26 admin/contacts/parts/bulk-edit.php:28 
-#: admin/contacts/parts/contact-editor.php:103 
-#: admin/contacts/parts/contact-editor.php:107 
-#: admin/contacts/parts/contact-editor.php:110 
-#: admin/contacts/tables/contact-table-columns.php:172 
-#: admin/contacts/tables/contacts-table.php:265 
-#: assets/js/admin/components.js:334 assets/js/admin/components.js:554 
-#: assets/js/admin/search-filters.js:830 includes/functions.php:2130 
-#: includes/functions.php:2235 includes/replacements.php:95 
+#: admin/contacts/parts/add-contact.php:57
+#: admin/contacts/parts/bulk-edit.php:26 admin/contacts/parts/bulk-edit.php:28
+#: admin/contacts/parts/contact-editor.php:103
+#: admin/contacts/parts/contact-editor.php:107
+#: admin/contacts/parts/contact-editor.php:110
+#: admin/contacts/tables/contact-table-columns.php:172
+#: admin/contacts/tables/contacts-table.php:265
+#: assets/js/admin/components.js:334 assets/js/admin/components.js:554
+#: assets/js/admin/search-filters.js:830 includes/functions.php:2130
+#: includes/functions.php:2235 includes/replacements.php:95
 #: includes/replacements.php:234
 msgid "First Name"
 msgstr "Vorname"
@@ -4941,7 +4941,7 @@ msgstr ""
 msgid "Form"
 msgstr "Formular"
 
-#: blocks/gutenberg/dist/blocks.build.js:149 
+#: blocks/gutenberg/dist/blocks.build.js:149
 #: blocks/gutenberg/src/form/index.js:27
 msgid "form"
 msgstr "form"
@@ -5048,7 +5048,7 @@ msgctxt "form_default"
 msgid "I agree to the <i>terms of service</i>."
 msgstr "Ich stimme den <i> Nutzungsbedingungen </i> zu."
 
-#: includes/form/fields/gdpr.php:26 templates/preferences.php:400 
+#: includes/form/fields/gdpr.php:26 templates/preferences.php:400
 #: templates/preferences.php:411
 msgctxt "form_default"
 msgid "I Consent"
@@ -5094,8 +5094,8 @@ msgctxt "form_default"
 msgid "Time *"
 msgstr "Zeit *"
 
-#: admin/reports/reports-page.php:297 admin/reports/views/forms.php:9 
-#: admin/reports/views/funnel-single.php:79 
+#: admin/reports/reports-page.php:297 admin/reports/views/forms.php:9
+#: admin/reports/views/funnel-single.php:79
 #: blocks/beaver-builder/form-widget.php:16 includes/steps/manager.php:76
 msgid "Forms"
 msgstr "Furmulare"
@@ -5122,8 +5122,8 @@ msgstr "Viertel"
 msgid "Friday"
 msgstr "Freitag"
 
-#: admin/emails/add.php:100 admin/emails/email-editor.php:120 
-#: assets/js/admin/components.js:1219 
+#: admin/emails/add.php:100 admin/emails/email-editor.php:120
+#: assets/js/admin/components.js:1219
 #: includes/reporting/new-reports/table-benchmark-conversion-rate.php:22
 msgid "From"
 msgstr "Von"
@@ -5138,7 +5138,7 @@ msgstr "Absenderadresse"
 msgid "From Name"
 msgstr "Absendername"
 
-#: admin/contacts/cards/email.php:33 admin/events/log-preview.php:39 
+#: admin/contacts/cards/email.php:33 admin/events/log-preview.php:39
 #: assets/js/admin/components.js:1127
 msgid "From:"
 msgstr "Von:"
@@ -5158,7 +5158,7 @@ msgstr "Vollständig"
 msgid "Full Address"
 msgstr "Vollständige Adresse"
 
-#: includes/functions.php:2129 includes/functions.php:2234 
+#: includes/functions.php:2129 includes/functions.php:2234
 #: includes/replacements.php:119
 msgid "Full Name"
 msgstr "Kompletter Name"
@@ -5167,9 +5167,9 @@ msgstr "Kompletter Name"
 msgid "Full Screen"
 msgstr "Vollbild"
 
-#: admin/contacts/deprecated/note.php:28 assets/js/admin/notes.js:113 
-#: includes/reporting/new-reports/table-all-funnels-performance.php:27 
-#: includes/reporting/new-reports/table-email-funnels-used-in.php:24 
+#: admin/contacts/deprecated/note.php:28 assets/js/admin/notes.js:113
+#: includes/reporting/new-reports/table-all-funnels-performance.php:27
+#: includes/reporting/new-reports/table-email-funnels-used-in.php:24
 #: includes/reporting/new-reports/table-top-converting-funnels.php:23
 #| msgctxt "Column label"
 #| msgid "Funnel"
@@ -5181,7 +5181,7 @@ msgstr "Trichter"
 msgid "Funnel Activity"
 msgstr "Trichter-Aktivität"
 
-#: admin/dashboard/widgets/funnel-breakdown.php:38 
+#: admin/dashboard/widgets/funnel-breakdown.php:38
 #: admin/reports/views/funnel-single.php:57
 msgid "Funnel Breakdown"
 msgstr "Funnel Ausfall"
@@ -5244,7 +5244,7 @@ msgstr "GDPR (DSGVO)"
 msgid "GDPR Consent"
 msgstr "GDPR-Einwilligung"
 
-#: admin/contacts/parts/bulk-edit.php:16 
+#: admin/contacts/parts/bulk-edit.php:16
 #: assets/js/admin/bulk-edit-contacts.js:53
 #| msgctxt "settings_tabs"
 #| msgid "General"
@@ -5359,11 +5359,11 @@ msgctxt "groundhogg"
 msgid "Restrict file types"
 msgstr "Dateitypen einschränken"
 
-#: assets/js/admin/troubleshooter.js:554 assets/js/admin/troubleshooter.js:563 
-#: assets/js/admin/troubleshooter.js:829 assets/js/admin/troubleshooter.js:838 
-#: assets/js/admin/troubleshooter.js:1257 
-#: assets/js/admin/troubleshooter.js:1273 
-#: assets/js/admin/troubleshooter.js:1374 
+#: assets/js/admin/troubleshooter.js:554 assets/js/admin/troubleshooter.js:563
+#: assets/js/admin/troubleshooter.js:829 assets/js/admin/troubleshooter.js:838
+#: assets/js/admin/troubleshooter.js:1257
+#: assets/js/admin/troubleshooter.js:1273
+#: assets/js/admin/troubleshooter.js:1374
 #: assets/js/admin/troubleshooter.js:1390
 #| msgctxt "page_title"
 #| msgid "Groundhogg Settings"
@@ -5712,7 +5712,7 @@ msgstr "Haben Sie eine Frage?"
 msgid "Have you tried Safe Mode?"
 msgstr "Haben Sie den Sicherheitsmodus ausprobiert?"
 
-#: assets/js/admin/troubleshooter.js:616 assets/js/admin/troubleshooter.js:690 
+#: assets/js/admin/troubleshooter.js:616 assets/js/admin/troubleshooter.js:690
 #: assets/js/admin/troubleshooter.js:764
 msgid "Have you tried using Cron-Job.org?"
 msgstr "Haben Sie versucht, Cron-Job.org zu verwenden?"
@@ -5826,7 +5826,7 @@ msgstr ""
 msgid "Home"
 msgstr "Startseite"
 
-#: assets/js/admin/troubleshooter.js:640 assets/js/admin/troubleshooter.js:714 
+#: assets/js/admin/troubleshooter.js:640 assets/js/admin/troubleshooter.js:714
 #: assets/js/admin/troubleshooter.js:788
 msgid "Host limitations"
 msgstr "Host-Einschränkungen"
@@ -5835,7 +5835,7 @@ msgstr "Host-Einschränkungen"
 msgid "Host panel cron jobs not working?"
 msgstr "Funktionieren die Cron-Jobs im Host-Panel nicht?"
 
-#: includes/steps/benchmarks/form-filled.php:490 
+#: includes/steps/benchmarks/form-filled.php:490
 #: includes/steps/benchmarks/web-form.php:185
 msgid "Hosted"
 msgstr "Gehostet"
@@ -5969,8 +5969,8 @@ msgstr "Ich brauche Hilfe mit einer Erweiterung!"
 msgid "I need help with development!"
 msgstr "Ich benötige Hilfe bei der Entwicklung!"
 
-#: assets/js/admin/troubleshooter.js:1168 
-#: assets/js/admin/troubleshooter.js:1287 
+#: assets/js/admin/troubleshooter.js:1168
+#: assets/js/admin/troubleshooter.js:1287
 #: assets/js/admin/troubleshooter.js:1404
 msgid "I still need help"
 msgstr "Ich brauche immer noch Hilfe."
@@ -6094,7 +6094,7 @@ msgstr ""
 "email-not-being-confirmed'>deaktiviere die Vorrangigkeit von angemeldeten "
 "Benutzern in den Einstellungen</a>."
 
-#: assets/js/admin/troubleshooter.js:637 assets/js/admin/troubleshooter.js:711 
+#: assets/js/admin/troubleshooter.js:637 assets/js/admin/troubleshooter.js:711
 #: assets/js/admin/troubleshooter.js:785
 msgid ""
 "If you are unsure of what the correct command to use is, ask your host and "
@@ -6104,7 +6104,7 @@ msgstr ""
 "Anbieter, sie werden dir weiterhelfen, oder konsultiere die Cron-Job-"
 "Dokumentation deines Hosts."
 
-#: assets/js/admin/troubleshooter.js:629 assets/js/admin/troubleshooter.js:703 
+#: assets/js/admin/troubleshooter.js:629 assets/js/admin/troubleshooter.js:703
 #: assets/js/admin/troubleshooter.js:777
 msgid ""
 "If you are unsure of what the correct file path is, ask your host and they "
@@ -6126,7 +6126,7 @@ msgstr ""
 "io/account/licenses/' target='_blank'>Groundhogg.io</a> gehen und uns über "
 "den Live-Chat kontaktieren!"
 
-#: assets/js/admin/troubleshooter.js:635 assets/js/admin/troubleshooter.js:709 
+#: assets/js/admin/troubleshooter.js:635 assets/js/admin/troubleshooter.js:709
 #: assets/js/admin/troubleshooter.js:783
 msgid ""
 "If you are using a command such as <code>wget</code> or <code>php</code>, "
@@ -6241,13 +6241,13 @@ msgstr ""
 "deine Lizenz verlängert hast, <a href=\"%s\">klicke hier, um sie erneut zu "
 "überprüfen</a>."
 
-#: includes/steps/benchmarks/form-filled.php:476 
+#: includes/steps/benchmarks/form-filled.php:476
 #: includes/steps/benchmarks/web-form.php:178
 msgid "Iframe"
 msgstr "Iframe"
 
-#: admin/contacts/contacts-page.php:343 admin/tools/imports-table.php:265 
-#: admin/tools/imports-table.php:275 admin/tools/tools-page.php:174 
+#: admin/contacts/contacts-page.php:343 admin/tools/imports-table.php:265
+#: admin/tools/imports-table.php:275 admin/tools/tools-page.php:174
 #: admin/tools/tools-page.php:562
 msgid "Import"
 msgstr "Importieren"
@@ -6373,7 +6373,7 @@ msgstr ""
 msgid "Inbox"
 msgstr "Posteingang"
 
-#: assets/js/admin/bulk-edit-contacts.js:318 
+#: assets/js/admin/bulk-edit-contacts.js:318
 #: assets/js/admin/contact-search.js:208
 msgid "Include"
 msgstr "Einbeziehen"
@@ -6391,7 +6391,7 @@ msgstr ""
 msgid "Includes contacts with"
 msgstr "Beinhaltet Kontakte mit"
 
-#: assets/js/admin/troubleshooter.js:624 assets/js/admin/troubleshooter.js:698 
+#: assets/js/admin/troubleshooter.js:624 assets/js/admin/troubleshooter.js:698
 #: assets/js/admin/troubleshooter.js:772
 msgid "Incorrect path to cron file"
 msgstr "Falscher Pfad zur Cron-Datei"
@@ -6562,7 +6562,7 @@ msgstr "ungültig"
 msgid "Invalid country selected"
 msgstr "Ungültiges Land ausgewählt"
 
-#: assets/js/admin/troubleshooter.js:632 assets/js/admin/troubleshooter.js:706 
+#: assets/js/admin/troubleshooter.js:632 assets/js/admin/troubleshooter.js:706
 #: assets/js/admin/troubleshooter.js:780
 #| msgctxt "notice"
 #| msgid "Invalid license format"
@@ -6591,7 +6591,7 @@ msgstr "Ungültige Nummer."
 msgid "Invalid permissions."
 msgstr "Ungültige Berechtigungen."
 
-#: includes/form/form-v2.php:747 includes/form/form-v2.php:751 
+#: includes/form/form-v2.php:747 includes/form/form-v2.php:751
 #: includes/form/form-v2.php:754 includes/form/form-v2.php:809
 msgid "Invalid selection"
 msgstr "Ungültige Auswahl"
@@ -6608,7 +6608,7 @@ msgstr "Ungültige Uhrzeit"
 msgid "Invalid URL"
 msgstr "Ungültige URL"
 
-#: admin/contacts/parts/contact-editor.php:333 includes/functions.php:2156 
+#: admin/contacts/parts/contact-editor.php:333 includes/functions.php:2156
 #: includes/functions.php:2261 templates/preferences.php:71
 msgid "IP Address"
 msgstr "IP Addresse"
@@ -6669,7 +6669,7 @@ msgstr "Problem mit deinem Funnel?"
 msgid "It integrates with Groundhogg!"
 msgstr "Es integriert sich mit Groundhogg!"
 
-#: assets/js/admin/troubleshooter.js:1239 
+#: assets/js/admin/troubleshooter.js:1239
 #: assets/js/admin/troubleshooter.js:1356
 msgid ""
 "It is pretty common these days for hosts to implement aggressive caching at "
@@ -6748,7 +6748,7 @@ msgstr "john@example.com"
 msgid "Join"
 msgstr "Beitreten"
 
-#: assets/js/admin/troubleshooter.js:2000 
+#: assets/js/admin/troubleshooter.js:2000
 #: assets/js/admin/troubleshooter.js:2091
 msgid "Join our Facebook User Group."
 msgstr "Tritt unserer Facebook-Benutzergruppe bei."
@@ -6806,12 +6806,12 @@ msgctxt "label for dropdown options"
 msgid "Options"
 msgstr "Optionen"
 
-#: assets/js/admin/funnel-steps.js:72 
+#: assets/js/admin/funnel-steps.js:72
 #: includes/steps/benchmarks/form-filled.php:553
 msgid "Last"
 msgstr "Letzte"
 
-#: admin/reports/views/email.php:54 
+#: admin/reports/views/email.php:54
 #: includes/reporting/reports/last-broadcast.php:35
 msgid "Last Broadcast"
 msgstr "Letzte Mitteilung"
@@ -6826,16 +6826,16 @@ msgstr "Letzter Tag"
 msgid "Last edited"
 msgstr "Zuletzt aktualisiert"
 
-#: admin/contacts/parts/add-contact.php:67 
-#: admin/contacts/parts/bulk-edit.php:37 admin/contacts/parts/bulk-edit.php:39 
-#: admin/contacts/parts/contact-editor.php:115 
-#: admin/contacts/parts/contact-editor.php:119 
-#: admin/contacts/parts/contact-editor.php:122 
-#: admin/contacts/tables/contact-table-columns.php:176 
-#: admin/contacts/tables/contacts-table.php:270 
-#: assets/js/admin/components.js:342 assets/js/admin/components.js:562 
-#: assets/js/admin/search-filters.js:834 includes/functions.php:2131 
-#: includes/functions.php:2236 includes/replacements.php:107 
+#: admin/contacts/parts/add-contact.php:67
+#: admin/contacts/parts/bulk-edit.php:37 admin/contacts/parts/bulk-edit.php:39
+#: admin/contacts/parts/contact-editor.php:115
+#: admin/contacts/parts/contact-editor.php:119
+#: admin/contacts/parts/contact-editor.php:122
+#: admin/contacts/tables/contact-table-columns.php:176
+#: admin/contacts/tables/contacts-table.php:270
+#: assets/js/admin/components.js:342 assets/js/admin/components.js:562
+#: assets/js/admin/search-filters.js:834 includes/functions.php:2131
+#: includes/functions.php:2236 includes/replacements.php:107
 #: includes/replacements.php:241
 msgid "Last Name"
 msgstr "Nachname"
@@ -6868,9 +6868,9 @@ msgstr "Starte deinen ersten Trichter!"
 msgid "Lead Score"
 msgstr "Lead-Score"
 
-#: admin/contacts/parts/contact-editor.php:377 
-#: admin/dashboard/widgets/lead-sources.php:51 includes/functions.php:2157 
-#: includes/functions.php:2262 
+#: admin/contacts/parts/contact-editor.php:377
+#: admin/dashboard/widgets/lead-sources.php:51 includes/functions.php:2157
+#: includes/functions.php:2262
 #: includes/reporting/new-reports/table-contacts-by-lead-source.php:24
 msgid "Lead Source"
 msgstr "Lead Quelle"
@@ -6879,7 +6879,7 @@ msgstr "Lead Quelle"
 msgid "LearnDash"
 msgstr "LearnDash"
 
-#: admin/emails/add.php:123 admin/emails/email-editor.php:147 
+#: admin/emails/add.php:123 admin/emails/email-editor.php:147
 #: admin/settings/settings-page.php:1141
 msgid "Left"
 msgstr "Links"
@@ -6951,7 +6951,7 @@ msgstr "Lizenz aktiviert!"
 msgid "License Key:"
 msgstr "Lizenz Schlüssel:"
 
-#: assets/js/admin/setup.js:561 assets/js/admin/troubleshooter.js:2047 
+#: assets/js/admin/setup.js:561 assets/js/admin/troubleshooter.js:2047
 #: assets/js/admin/troubleshooter.js:2144
 #| msgctxt "notice"
 #| msgid "License activated"
@@ -6962,21 +6962,21 @@ msgstr "Lizenz überprüft"
 msgid "LifterLMS"
 msgstr "LifterLMS"
 
-#: admin/contacts/parts/contact-editor.php:274 
-#: assets/js/admin/bulk-edit-contacts.js:102 
-#: assets/js/admin/form-builder-v2.js:951 assets/js/admin/setup.js:203 
+#: admin/contacts/parts/contact-editor.php:274
+#: assets/js/admin/bulk-edit-contacts.js:102
+#: assets/js/admin/form-builder-v2.js:951 assets/js/admin/setup.js:203
 #: includes/steps/benchmarks/form-filled.php:226
 msgid "Line 1"
 msgstr "Zeile 1"
 
-#: admin/contacts/parts/contact-editor.php:283 
-#: assets/js/admin/bulk-edit-contacts.js:111 
-#: assets/js/admin/form-builder-v2.js:962 assets/js/admin/setup.js:212 
+#: admin/contacts/parts/contact-editor.php:283
+#: assets/js/admin/bulk-edit-contacts.js:111
+#: assets/js/admin/form-builder-v2.js:962 assets/js/admin/setup.js:212
 #: includes/steps/benchmarks/form-filled.php:238
 msgid "Line 2"
 msgstr "Zeile 2"
 
-#: includes/reporting/new-reports/table-broadcast-link-clicked.php:23 
+#: includes/reporting/new-reports/table-broadcast-link-clicked.php:23
 #: includes/reporting/new-reports/table-email-links-clicked.php:22
 #| msgctxt "column_label"
 #| msgid "Link"
@@ -7021,8 +7021,8 @@ msgctxt "List table bulk action"
 msgid "Deactivate"
 msgstr "Deaktivieren"
 
-#: admin/broadcasts/broadcasts-table.php:512 
-#: admin/contacts/tables/contacts-table.php:424 admin/tags/tags-table.php:170 
+#: admin/broadcasts/broadcasts-table.php:512
+#: admin/contacts/tables/contacts-table.php:424 admin/tags/tags-table.php:170
 #: admin/tools/exports-table.php:149 admin/tools/imports-table.php:149
 msgctxt "List table bulk action"
 msgid "Delete"
@@ -7133,15 +7133,15 @@ msgstr "Ortszeit"
 msgid "local time"
 msgstr "Ortszeit"
 
-#: admin/contacts/parts/contact-editor.php:355 
+#: admin/contacts/parts/contact-editor.php:355
 #: assets/js/admin/bulk-edit-contacts.js:175
 #| msgctxt "groundhogg"
 #| msgid "Local Time:"
 msgid "Locale"
 msgstr "Standort"
 
-#: admin/contacts/parts/details-card.php:66 
-#: admin/contacts/tables/contact-table-columns.php:190 
+#: admin/contacts/parts/details-card.php:66
+#: admin/contacts/tables/contact-table-columns.php:190
 #: assets/js/admin/bulk-edit-contacts.js:96
 #| msgctxt "contact_record"
 #| msgid "Location"
@@ -7229,7 +7229,7 @@ msgstr ""
 msgid "Map Contact Fields"
 msgstr "Kontaktfelder zuordnen"
 
-#: includes/steps/benchmarks/base/form-integration.php:76 
+#: includes/steps/benchmarks/base/form-integration.php:76
 #: includes/steps/benchmarks/base/form-integration.php:77
 msgid "Map Fields"
 msgstr "Felder zuordnen"
@@ -7255,21 +7255,21 @@ msgstr "Ordnen Sie Ihre Formularfelder zu, um Einreichungen zu erfassen."
 msgid "March"
 msgstr "März"
 
-#: assets/js/admin/search-filters.js:968 
+#: assets/js/admin/search-filters.js:968
 #: includes/reporting/new-reports/table-list-engagement.php:91
 #| msgctxt "settings"
 #| msgid "Marketable Tag"
 msgid "Marketable"
 msgstr "Marktfähig"
 
-#: admin/emails/add.php:133 admin/emails/email-editor.php:160 
+#: admin/emails/add.php:133 admin/emails/email-editor.php:160
 #: admin/events/email-log-table.php:103
 #| msgctxt "role"
 #| msgid "Marketer"
 msgid "Marketing"
 msgstr "Marketing"
 
-#: admin/contacts/parts/contact-editor.php:400 includes/functions.php:2162 
+#: admin/contacts/parts/contact-editor.php:400 includes/functions.php:2162
 #: includes/functions.php:2266
 #| msgctxt "form_default"
 #| msgid "I Consent"
@@ -7422,15 +7422,15 @@ msgstr "Fehlende Datenbanktabellen"
 msgid "Missing required updates"
 msgstr "Fehlende erforderliche Aktualisierungen"
 
-#: admin/contacts/tables/contacts-table.php:318 
+#: admin/contacts/tables/contacts-table.php:318
 #: assets/js/admin/contact-editor.js:1760 templates/preferences.php:69
 #| msgid "Mobile Preview"
 msgid "Mobile"
 msgstr "Mobil"
 
-#: admin/contacts/parts/contact-editor.php:180 
-#: assets/js/admin/components.js:394 assets/js/admin/components.js:612 
-#: assets/js/admin/search-filters.js:843 includes/replacements.php:154 
+#: admin/contacts/parts/contact-editor.php:180
+#: assets/js/admin/components.js:394 assets/js/admin/components.js:612
+#: assets/js/admin/search-filters.js:843 includes/replacements.php:154
 #: includes/steps/benchmarks/form-filled.php:1062
 #| msgid "Mobile Preview"
 msgid "Mobile Phone"
@@ -7459,8 +7459,8 @@ msgstr "Mobile Vorschau"
 msgid "Monday"
 msgstr "Montag"
 
-#: admin/contacts/parts/bulk-edit.php:154 
-#: admin/contacts/parts/contact-editor.php:244 
+#: admin/contacts/parts/bulk-edit.php:154
+#: admin/contacts/parts/contact-editor.php:244
 #: includes/form/fields/birthday.php:114 includes/form/form-v2.php:1033
 msgid "Month"
 msgstr "Monat"
@@ -7471,14 +7471,14 @@ msgid_plural "months"
 msgstr[0] "monat"
 msgstr[1] "monate"
 
-#: admin/contacts/deprecated/advanced-search.php:129 
+#: admin/contacts/deprecated/advanced-search.php:129
 #: admin/contacts/tables/contacts-table.php:466
 #| msgctxt "view"
 #| msgid "Monthly"
 msgid "Monthly"
 msgstr "Monatlich"
 
-#: admin/events/manage.php:49 admin/events/manage.php:200 
+#: admin/events/manage.php:49 admin/events/manage.php:200
 #: admin/events/manage.php:259 assets/js/admin/funnel-steps.js:62
 msgid "Months"
 msgstr "Monate"
@@ -7487,14 +7487,14 @@ msgstr "Monate"
 msgid "More"
 msgstr "Mehr"
 
-#: admin/contacts/deprecated/contact-table-actions.php:93 
+#: admin/contacts/deprecated/contact-table-actions.php:93
 #: assets/js/admin/contact-search.js:506
 #| msgid "Actions"
 msgid "More Actions"
 msgstr "Weitere Aktionen"
 
-#: admin/guided-setup/steps/email.php:73 
-#: admin/guided-setup/steps/email.php:121 admin/settings/extensions.php:101 
+#: admin/guided-setup/steps/email.php:73
+#: admin/guided-setup/steps/email.php:121 admin/settings/extensions.php:101
 #: assets/js/admin/setup.js:52
 msgid "More details"
 msgstr "Weitere Einzelheiten"
@@ -7549,10 +7549,10 @@ msgstr "Meine gespeicherte Suche..."
 msgid "My search name..."
 msgstr "Mein Suchname..."
 
-#: admin/dashboard/widgets/last-broadcast-widget.php:42 admin/tags/edit.php:37 
-#: assets/js/admin/custom-reports.js:386 includes/replacements.php:206 
-#: includes/replacements.php:651 
-#: includes/reporting/new-reports/table-form-activity.php:25 
+#: admin/dashboard/widgets/last-broadcast-widget.php:42 admin/tags/edit.php:37
+#: assets/js/admin/custom-reports.js:386 includes/replacements.php:206
+#: includes/replacements.php:651
+#: includes/reporting/new-reports/table-form-activity.php:25
 #: templates/preferences.php:66
 msgid "Name"
 msgstr "Name"
@@ -7570,7 +7570,7 @@ msgstr "Name oder E-Mail"
 msgid "Name your search..."
 msgstr "Geben Sie Ihrer Suche einen Namen..."
 
-#: includes/form/fields/first.php:40 includes/form/fields/last.php:49 
+#: includes/form/fields/first.php:40 includes/form/fields/last.php:49
 #: includes/form/form-v2.php:240 includes/form/form-v2.php:276
 msgid "Names should not contain numbers or special symbols."
 msgstr "Namen dürfen keine Zahlen oder Sonderzeichen enthalten."
@@ -7623,10 +7623,10 @@ msgstr ""
 "//sendwp.com/\" target=\"_blank\">SendWP</a>kümmert sich nur um alles für "
 "Sie für <b>$9 im Monat!</b>"
 
-#: admin/dashboard/widgets/new-contacts.php:23 
-#: admin/dashboard/widgets/new-contacts.php:48 
-#: admin/reports/views/contacts.php:14 admin/reports/views/contacts.php:23 
-#: admin/reports/views/overview.php:10 admin/reports/views/overview.php:18 
+#: admin/dashboard/widgets/new-contacts.php:23
+#: admin/dashboard/widgets/new-contacts.php:48
+#: admin/reports/views/contacts.php:14 admin/reports/views/contacts.php:23
+#: admin/reports/views/overview.php:10 admin/reports/views/overview.php:18
 #: includes/reporting/reports/new-contacts.php:36
 msgid "New Contacts"
 msgstr "Neue Kontakte"
@@ -7666,8 +7666,8 @@ msgstr "Neue Benutzer mit diesen Rollen lösen diesen Benchmark aus."
 msgid "Newest first"
 msgstr "Neueste zuerst"
 
-#: admin/guided-setup/steps/step.php:91 assets/js/admin/send-broadcast.js:100 
-#: assets/js/admin/send-broadcast.js:178 assets/js/admin/send-broadcast.js:204 
+#: admin/guided-setup/steps/step.php:91 assets/js/admin/send-broadcast.js:100
+#: assets/js/admin/send-broadcast.js:178 assets/js/admin/send-broadcast.js:204
 #: includes/pointers.php:53
 msgid "Next"
 msgstr "Nächstes"
@@ -7681,12 +7681,12 @@ msgstr "Nächstes &rarr;"
 msgid "Next Steps..."
 msgstr "Próximos pasos..."
 
-#: assets/js/admin/setup.js:262 assets/js/admin/setup.js:370 
-#: assets/js/admin/setup.js:488 assets/js/admin/setup.js:1194 
-#: assets/js/admin/troubleshooter.js:978 
-#: assets/js/admin/troubleshooter.js:1062 
-#: assets/js/admin/troubleshooter.js:1658 
-#: assets/js/admin/troubleshooter.js:1740 
+#: assets/js/admin/setup.js:262 assets/js/admin/setup.js:370
+#: assets/js/admin/setup.js:488 assets/js/admin/setup.js:1194
+#: assets/js/admin/troubleshooter.js:978
+#: assets/js/admin/troubleshooter.js:1062
+#: assets/js/admin/troubleshooter.js:1658
+#: assets/js/admin/troubleshooter.js:1740
 #: assets/js/admin/troubleshooter.js:1832
 #| msgid "Next"
 msgid "Next 👉"
@@ -7701,7 +7701,7 @@ msgstr "Nein"
 msgid "No activity found."
 msgstr "No se encontraron actividades."
 
-#: assets/js/admin/bulk-edit-contacts.js:65 
+#: assets/js/admin/bulk-edit-contacts.js:65
 #: assets/js/admin/bulk-edit-contacts.js:76
 msgid "No change"
 msgstr "Keine Änderung"
@@ -7718,8 +7718,8 @@ msgstr "Keine Kontakte entsprechen dieser Suche..."
 msgid "No contacts match the given filters."
 msgstr "Es gibt keine Kontakte, die den angegebenen Filtern entsprechen."
 
-#: admin/dashboard/widgets/circle-graph.php:108 
-#: admin/dashboard/widgets/line-graph.php:204 
+#: admin/dashboard/widgets/circle-graph.php:108
+#: admin/dashboard/widgets/line-graph.php:204
 #: admin/dashboard/widgets/table-widget.php:76 includes/utils/graph.php:205
 msgid "No data to show yet."
 msgstr "Keine Daten zum Anzeigen."
@@ -7740,7 +7740,7 @@ msgstr "Keine Datei gefunden"
 msgid "No hidden fees!"
 msgstr "Keine versteckten Gebühren!"
 
-#: includes/reporting/new-reports/base-chart-report.php:48 
+#: includes/reporting/new-reports/base-chart-report.php:48
 #: includes/reporting/new-reports/base-table-report.php:37
 msgid "No information available."
 msgstr "Keine Informationen verfügbar."
@@ -7845,7 +7845,7 @@ msgstr "Nota"
 msgid "Note type"
 msgstr "Notentyp"
 
-#: assets/js/admin/contact-editor.js:1094 assets/js/admin/notes.js:145 
+#: assets/js/admin/contact-editor.js:1094 assets/js/admin/notes.js:145
 #: includes/functions.php:2164
 msgid "Notes"
 msgstr "Notiz"
@@ -8207,7 +8207,7 @@ msgctxt "noun referring to a persons past activities"
 msgid "Activity"
 msgstr "Aktivität"
 
-#: assets/js/admin/search-filters.js:1055 
+#: assets/js/admin/search-filters.js:1055
 #: assets/js/admin/search-filters.js:1069
 #| msgid "Tags"
 msgctxt "noun referring to contact segments"
@@ -8228,7 +8228,7 @@ msgstr "Ahora"
 msgid "Now editing %s"
 msgstr "Jetzt wird %s bearbeitet"
 
-#: assets/js/admin/custom-reports.js:256 assets/js/admin/properties.js:77 
+#: assets/js/admin/custom-reports.js:256 assets/js/admin/properties.js:77
 #: includes/steps/benchmarks/form-filled.php:593
 msgid "Number"
 msgstr "Nummer"
@@ -8246,9 +8246,9 @@ msgstr "Anzahl der im Laufe der Zeit gesendeten E-Mails"
 msgid "Number of records"
 msgstr "Anzahl der Datensätze"
 
-#: assets/js/admin/troubleshooter.js:1251 
-#: assets/js/admin/troubleshooter.js:1267 
-#: assets/js/admin/troubleshooter.js:1368 
+#: assets/js/admin/troubleshooter.js:1251
+#: assets/js/admin/troubleshooter.js:1267
+#: assets/js/admin/troubleshooter.js:1368
 #: assets/js/admin/troubleshooter.js:1384
 msgid "Object Caching"
 msgstr "Objektcaching"
@@ -8349,12 +8349,12 @@ msgstr "Eröffnen Sie ein Support-Ticket!"
 msgid "Open Modal"
 msgstr "Modal öffnen"
 
-#: admin/reports/views/email-step.php:38 admin/reports/views/email.php:24 
-#: admin/reports/views/overview.php:43 
-#: includes/reporting/new-reports/base-email-performance-table-report.php:26 
-#: includes/reporting/new-reports/table-all-broadcasts-performance.php:21 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:18 
-#: includes/reporting/new-reports/table-all-funnels-performance.php:32 
+#: admin/reports/views/email-step.php:38 admin/reports/views/email.php:24
+#: admin/reports/views/overview.php:43
+#: includes/reporting/new-reports/base-email-performance-table-report.php:26
+#: includes/reporting/new-reports/table-all-broadcasts-performance.php:21
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:18
+#: includes/reporting/new-reports/table-all-funnels-performance.php:32
 #: includes/reporting/new-reports/table-email-funnels-used-in.php:27
 #| msgid "Opened"
 msgid "Open Rate"
@@ -8384,9 +8384,9 @@ msgstr "Irgendeine Sendung geöffnet"
 msgid "Opened Broadcast"
 msgstr "Geöffnete Rundmail"
 
-#: includes/reporting/new-reports/table-all-broadcasts-performance.php:20 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:17 
-#: includes/reporting/new-reports/table-broadcast-stats.php:91 
+#: includes/reporting/new-reports/table-all-broadcasts-performance.php:20
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:17
+#: includes/reporting/new-reports/table-broadcast-stats.php:91
 #: includes/reporting/new-reports/table-email-stats.php:57
 #| msgctxt "stats"
 #| msgid "Opens"
@@ -8402,15 +8402,15 @@ msgstr "Öffnet (O.R)"
 msgid "Opt-in Status"
 msgstr "Opt-in-Status"
 
-#: blocks/gutenberg/dist/blocks.build.js:149 
+#: blocks/gutenberg/dist/blocks.build.js:149
 #: blocks/gutenberg/src/form/index.js:27
 msgid "optin"
 msgstr "anmelden"
 
-#: admin/contacts/parts/contact-editor.php:138 
-#: assets/js/admin/bulk-edit-contacts.js:59 assets/js/admin/components.js:387 
-#: assets/js/admin/components.js:605 assets/js/admin/search-filters.js:924 
-#: assets/js/admin/search-filters.js:927 includes/functions.php:2133 
+#: admin/contacts/parts/contact-editor.php:138
+#: assets/js/admin/bulk-edit-contacts.js:59 assets/js/admin/components.js:387
+#: assets/js/admin/components.js:605 assets/js/admin/search-filters.js:924
+#: assets/js/admin/search-filters.js:927 includes/functions.php:2133
 #: includes/functions.php:2238
 msgid "Optin Status"
 msgstr "Anmeldestatus"
@@ -8523,8 +8523,8 @@ msgstr "Abgemeldet. Sie erhalten kein Marketing."
 msgid "Option"
 msgstr "Option"
 
-#: assets/js/admin/properties.js:184 assets/js/admin/properties.js:218 
-#: assets/js/admin/properties.js:269 
+#: assets/js/admin/properties.js:184 assets/js/admin/properties.js:218
+#: assets/js/admin/properties.js:269
 #: includes/steps/benchmarks/form-filled.php:916
 msgid "Options"
 msgstr "Optionen"
@@ -8547,9 +8547,9 @@ msgstr "Bestellung"
 msgid "Order by"
 msgstr "Sortieren nach"
 
-#: admin/dashboard/widgets/circle-graph.php:154 
-#: admin/dashboard/widgets/table-widget.php:125 
-#: assets/js/admin/custom-reports.js:98 assets/js/admin/custom-reports.js:115 
+#: admin/dashboard/widgets/circle-graph.php:154
+#: admin/dashboard/widgets/table-widget.php:125
+#: assets/js/admin/custom-reports.js:98 assets/js/admin/custom-reports.js:115
 #: includes/replacements.php:74 includes/steps/manager.php:83
 msgid "Other"
 msgstr "Andere"
@@ -8593,9 +8593,9 @@ msgstr ""
 msgid "Overview"
 msgstr "Übersicht"
 
-#: admin/contacts/tables/contact-table-columns.php:181 
-#: admin/contacts/tables/contacts-table.php:275 
-#: assets/js/admin/bulk-edit-contacts.js:70 assets/js/admin/components.js:405 
+#: admin/contacts/tables/contact-table-columns.php:181
+#: admin/contacts/tables/contacts-table.php:275
+#: assets/js/admin/bulk-edit-contacts.js:70 assets/js/admin/components.js:405
 #: assets/js/admin/components.js:622 assets/js/admin/search-filters.js:1002
 msgid "Owner"
 msgstr "Besitzer"
@@ -8609,9 +8609,9 @@ msgstr "Eigentümerdaten"
 msgid "Owner Id"
 msgstr "Besitzer ID"
 
-#: assets/js/admin/troubleshooter.js:1253 
-#: assets/js/admin/troubleshooter.js:1269 
-#: assets/js/admin/troubleshooter.js:1370 
+#: assets/js/admin/troubleshooter.js:1253
+#: assets/js/admin/troubleshooter.js:1269
+#: assets/js/admin/troubleshooter.js:1370
 #: assets/js/admin/troubleshooter.js:1386
 msgid "Page Caching *"
 msgstr "Seitenzwischenspeicherung *"
@@ -8640,7 +8640,7 @@ msgctxt "page_title"
 msgid "Add Funnel"
 msgstr "Funnel hinzufügen"
 
-#: admin/broadcasts/broadcasts-page.php:78 
+#: admin/broadcasts/broadcasts-page.php:78
 #: admin/broadcasts/broadcasts-page.php:98
 msgctxt "page_title"
 msgid "Broadcasts"
@@ -8759,13 +8759,13 @@ msgstr "Ausstehend %s"
 msgid "Per page"
 msgstr "Pro Seite"
 
-#: admin/dashboard/widgets/country-widget.php:39 
-#: admin/dashboard/widgets/optin-status-widget.php:47 
+#: admin/dashboard/widgets/country-widget.php:39
+#: admin/dashboard/widgets/optin-status-widget.php:47
 #: admin/dashboard/widgets/region-widget.php:42
 msgid "Percentage (%)"
 msgstr "Prozentsatz (%)"
 
-#: assets/js/admin/troubleshooter.js:1304 
+#: assets/js/admin/troubleshooter.js:1304
 #: assets/js/admin/troubleshooter.js:1421
 #| msgid "Preferences saved!"
 msgid "Permalinks re-saved!"
@@ -8775,14 +8775,14 @@ msgstr "Permalinks erneut gespeichert!"
 msgid "Personal Info"
 msgstr "Persönliche Information"
 
-#: admin/contacts/tables/contact-table-columns.php:182 
-#: admin/settings/settings-page.php:566 includes/filters.php:456 
-#: includes/replacements.php:213 includes/replacements.php:255 
+#: admin/contacts/tables/contact-table-columns.php:182
+#: admin/settings/settings-page.php:566 includes/filters.php:456
+#: includes/replacements.php:213 includes/replacements.php:255
 #: includes/steps/benchmarks/form-filled.php:561 templates/preferences.php:68
 msgid "Phone"
 msgstr "Telefon"
 
-#: admin/guided-setup/steps/business-info.php:36 
+#: admin/guided-setup/steps/business-info.php:36
 #: assets/js/admin/properties.js:114 assets/js/admin/search-filters.js:848
 msgid "Phone Number"
 msgstr "Telefon Nummer"
@@ -8874,7 +8874,7 @@ msgstr ""
 msgid "Please select a contact"
 msgstr "Bitte wählen Sie einen Kontakt aus"
 
-#: admin/contacts/parts/add-contact.php:169 
+#: admin/contacts/parts/add-contact.php:169
 #: admin/contacts/parts/form-admin-submit.php:55
 msgid "Please select a form"
 msgstr "Bitte wählen Sie ein Formular aus"
@@ -8908,8 +8908,8 @@ msgstr "Bitte wählen Sie eine gültige Option."
 msgid "Please select an email"
 msgstr "Bitte wählen Sie eine E-Mail"
 
-#: assets/js/admin/search-filters.js:1463 
-#: assets/js/admin/search-filters.js:1518 
+#: assets/js/admin/search-filters.js:1463
+#: assets/js/admin/search-filters.js:1518
 #: assets/js/admin/search-filters.js:1588
 #| msgid "Please select an email or SMS to send."
 msgid "Please select an email or leave blank for any email"
@@ -8931,8 +8931,8 @@ msgstr "Bitte wählen Sie einen Eigentümer aus"
 msgid "Please select an SMS"
 msgstr "Bitte wählen Sie eine SMS aus"
 
-#: assets/js/admin/form-builder-v2.js:178 
-#: includes/form/fields/custom-field.php:198 includes/utils/html.php:709 
+#: assets/js/admin/form-builder-v2.js:178
+#: includes/form/fields/custom-field.php:198 includes/utils/html.php:709
 #: includes/utils/html.php:915
 #| msgctxt "form_default"
 #| msgid "Please select one"
@@ -8983,7 +8983,7 @@ msgstr "Beitragstitel"
 msgid "Postal/Zip"
 msgstr "Postleitzahl"
 
-#: admin/contacts/parts/contact-editor.php:301 
+#: admin/contacts/parts/contact-editor.php:301
 #: assets/js/admin/bulk-edit-contacts.js:130
 msgid "Postal/Zip Code"
 msgstr "Postleitzahl"
@@ -8997,7 +8997,7 @@ msgstr "Postleitzahl"
 msgid "Powered by %s"
 msgstr "Erstellt von %s"
 
-#: admin/emails/add-new.php:75 admin/emails/add-new.php:131 
+#: admin/emails/add-new.php:75 admin/emails/add-new.php:131
 #: admin/emails/emails-page.php:496
 msgid "Pre-Header: "
 msgstr "Pre-Header:"
@@ -9028,7 +9028,7 @@ msgctxt "preferences"
 msgid "Unsubscribe me and delete any personal information about me."
 msgstr "Melde mich ab und lösche alle persönlichen Informationen über mich."
 
-#: admin/tools/tools-page.php:668 admin/tools/tools-page.php:705 
+#: admin/tools/tools-page.php:668 admin/tools/tools-page.php:705
 #: admin/tools/tools-page.php:743
 #| msgid "First Name"
 msgid "Pretty Name"
@@ -9039,9 +9039,9 @@ msgstr "Schöner Name"
 msgid "Pretty Names"
 msgstr "Schöne Namen"
 
-#: includes/steps/benchmarks/form-filled.php:500 
-#: includes/steps/benchmarks/form-filled.php:501 
-#: includes/steps/benchmarks/web-form.php:195 
+#: includes/steps/benchmarks/form-filled.php:500
+#: includes/steps/benchmarks/form-filled.php:501
+#: includes/steps/benchmarks/web-form.php:195
 #: includes/steps/benchmarks/web-form.php:196
 msgid "Preview"
 msgstr "Vorschau"
@@ -9066,8 +9066,8 @@ msgstr "Vorherige Updates"
 msgid "Primary"
 msgstr "Primär"
 
-#: assets/js/admin/components.js:363 assets/js/admin/components.js:583 
-#: assets/js/admin/search-filters.js:842 includes/replacements.php:140 
+#: assets/js/admin/components.js:363 assets/js/admin/components.js:583
+#: assets/js/admin/search-filters.js:842 includes/replacements.php:140
 #: includes/steps/benchmarks/form-filled.php:1061
 msgid "Primary Phone"
 msgstr "Haupt Telefon"
@@ -9102,7 +9102,7 @@ msgstr "Haupttelefonnummer mit Durchwahl"
 msgid "Privacy & Compliance"
 msgstr "Datenschutz und Einhaltung von Vorschriften"
 
-#: admin/settings/settings-page.php:837 includes/classes/email.php:522 
+#: admin/settings/settings-page.php:837 includes/classes/email.php:522
 #: templates/managed-page.php:160
 msgid "Privacy Policy"
 msgstr "Datenschutz-Bestimmungen"
@@ -9290,7 +9290,7 @@ msgstr ""
 msgid "Re-installed successful!"
 msgstr "Re Installation war erfolgreich!"
 
-#: assets/js/admin/troubleshooter.js:1282 
+#: assets/js/admin/troubleshooter.js:1282
 #: assets/js/admin/troubleshooter.js:1399
 msgid "Re-save permalinks"
 msgstr "Permalinks erneut speichern"
@@ -9304,9 +9304,9 @@ msgstr "Speichern Sie Ihre Permalinks erneut."
 msgid "Re-subscribe"
 msgstr "Erneut abonnieren"
 
-#: assets/js/admin/troubleshooter.js:1255 
-#: assets/js/admin/troubleshooter.js:1271 
-#: assets/js/admin/troubleshooter.js:1372 
+#: assets/js/admin/troubleshooter.js:1255
+#: assets/js/admin/troubleshooter.js:1271
+#: assets/js/admin/troubleshooter.js:1372
 #: assets/js/admin/troubleshooter.js:1388
 msgid ""
 "Read our docs on the subject to configure your caching for the best results:"
@@ -9318,7 +9318,7 @@ msgstr ""
 "\n"
 "\n"
 
-#: admin/welcome/welcome-page.php:306 admin/welcome/welcome-page.php:329 
+#: admin/welcome/welcome-page.php:306 admin/welcome/welcome-page.php:329
 #: admin/welcome/welcome-page.php:355 admin/welcome/welcome-page.php:377
 msgid "Read the full guide"
 msgstr "Lesen Sie den vollständigen Leitfaden"
@@ -9424,7 +9424,7 @@ msgstr ""
 msgid "Reformat all tables."
 msgstr "Alle Tabellen neu formatieren"
 
-#: admin/dashboard/widgets/time-range-picker.php:36 
+#: admin/dashboard/widgets/time-range-picker.php:36
 #: assets/js/admin/contact-editor.js:953
 msgid "Refresh"
 msgstr "Aktualisierung"
@@ -9465,7 +9465,7 @@ msgstr "Entfernen Sie %s-Tags"
 msgid "Remove all of the following tags..."
 msgstr "Entfernen Sie alle folgenden Tags..."
 
-#: admin/contacts/parts/bulk-edit.php:107 
+#: admin/contacts/parts/bulk-edit.php:107
 #: assets/js/admin/bulk-edit-contacts.js:211
 #| msgctxt "List table bulk action"
 #| msgid "Remove Tag"
@@ -9739,7 +9739,7 @@ msgctxt "replacement"
 msgid "The site url."
 msgstr "Die Seiten URL"
 
-#: admin/funnels/funnel-editor.php:207 admin/funnels/funnel-editor.php:208 
+#: admin/funnels/funnel-editor.php:207 admin/funnels/funnel-editor.php:208
 #: includes/replacements.php:690
 msgid "Replacements"
 msgstr "Ersatzcode"
@@ -9897,7 +9897,7 @@ msgstr ""
 "Geburtstage von Kontakten mit den Daten 1970-01-01 und 1999-11-30 "
 "zurücksetzen aufgrund eines Importfehlers."
 
-#: assets/js/admin/troubleshooter.js:1951 
+#: assets/js/admin/troubleshooter.js:1951
 #: assets/js/admin/troubleshooter.js:2102
 msgid "Restart troubleshooter"
 msgstr "Troubleshooter neu starten"
@@ -9962,7 +9962,7 @@ msgstr "Außendienstmitarbeiter"
 msgid "Row"
 msgstr "Reihe"
 
-#: admin/contacts/deprecated/contact-events-table.php:183 
+#: admin/contacts/deprecated/contact-events-table.php:183
 #: admin/events/events-table.php:371 assets/js/admin/contact-editor.js:806
 #| msgctxt "action"
 #| msgid "Run Again"
@@ -9988,7 +9988,7 @@ msgstr "Netzwerk-Upgrade durchführen"
 msgid "Run Now"
 msgstr "Jetzt ausführen"
 
-#: admin/contacts/deprecated/contact-events-table.php:167 
+#: admin/contacts/deprecated/contact-events-table.php:167
 #: admin/events/events-table.php:353
 #| msgctxt "action"
 #| msgid "Run Now"
@@ -10078,10 +10078,10 @@ msgstr "Verkaufstrichter"
 msgid "Saturday"
 msgstr "Samstag"
 
-#: admin/contacts/deprecated/note.php:67 admin/emails/add.php:73 
-#: admin/funnels/funnel-editor.php:143 admin/funnels/funnels-page.php:199 
-#: assets/js/admin/contact-editor.js:1639 
-#: assets/js/admin/contact-editor.js:1931 
+#: admin/contacts/deprecated/note.php:67 admin/emails/add.php:73
+#: admin/funnels/funnel-editor.php:143 admin/funnels/funnels-page.php:199
+#: assets/js/admin/contact-editor.js:1639
+#: assets/js/admin/contact-editor.js:1931
 #: assets/js/admin/contact-search.js:447 assets/js/admin/notes.js:66
 msgid "Save"
 msgstr "Speichern"
@@ -10094,10 +10094,10 @@ msgstr "Speichern und Vorschau"
 msgid "Save as template"
 msgstr "Als Template abspeichern"
 
-#: admin/contacts/parts/contact-editor.php:407 
-#: assets/js/admin/components.js:427 assets/js/admin/contact-editor.js:1556 
-#: assets/js/admin/contact-editor.js:1739 includes/functions.php:189 
-#: includes/steps/benchmarks/base/form-integration.php:78 
+#: admin/contacts/parts/contact-editor.php:407
+#: assets/js/admin/components.js:427 assets/js/admin/contact-editor.js:1556
+#: assets/js/admin/contact-editor.js:1739 includes/functions.php:189
+#: includes/steps/benchmarks/base/form-integration.php:78
 #: includes/utils/html.php:605 templates/preferences.php:378
 msgid "Save Changes"
 msgstr "Änderungen speichern"
@@ -10178,7 +10178,7 @@ msgstr ""
 "Die Planung einer Übertragung ist einfach! Lassen Sie Ihre Übertragung in "
 "nur wenigen Schritten planen."
 
-#: admin/admin-page.php:371 admin/contacts/deprecated/advanced-search.php:322 
+#: admin/admin-page.php:371 admin/contacts/deprecated/advanced-search.php:322
 #: admin/events/email-log-table.php:188 assets/js/admin/contact-search.js:228
 #| msgid "Search Tags"
 msgid "Search"
@@ -10203,8 +10203,8 @@ msgstr "Suche nach Namen oder E-Mail-Adresse..."
 msgid "Search Emails"
 msgstr "E-Mails suchen"
 
-#: admin/dashboard/widgets/search-engines.php:56 
-#: includes/reporting/new-reports/table-contacts-by-search-engines.php:20 
+#: admin/dashboard/widgets/search-engines.php:56
+#: includes/reporting/new-reports/table-contacts-by-search-engines.php:20
 #: includes/reporting/new-reports/table-contacts-by-social-media.php:16
 msgid "Search Engines"
 msgstr "Suchmaschinen"
@@ -10233,7 +10233,7 @@ msgstr "Funnel suchen"
 msgid "Search Logs"
 msgstr "Suchprotokolle"
 
-#: assets/js/admin/troubleshooter.js:2001 
+#: assets/js/admin/troubleshooter.js:2001
 #: assets/js/admin/troubleshooter.js:2092
 #| msgid "Documentation"
 msgid "Search our documentation."
@@ -10292,7 +10292,7 @@ msgstr "Überprüfe, welche E-Mails fehlschlagen"
 msgid "Select"
 msgstr "Auswählen"
 
-#: assets/js/admin/search-filters.js:1947 
+#: assets/js/admin/search-filters.js:1947
 #: assets/js/admin/search-filters.js:1992
 #| msgctxt "action"
 #| msgid "Schedule Broadcast"
@@ -10342,7 +10342,7 @@ msgstr ""
 msgid "Select a funnel first!"
 msgstr "Wählen Sie zuerst einen Funnel aus!"
 
-#: assets/js/admin/contact-editor.js:314 assets/js/admin/contact-search.js:644 
+#: assets/js/admin/contact-editor.js:314 assets/js/admin/contact-search.js:644
 #: assets/js/admin/troubleshooter.js:1005
 #| msgctxt "notice"
 #| msgid "Deleted %d funnel"
@@ -10625,14 +10625,14 @@ msgstr "E-Mail senden"
 msgid "SendWP Plugin not found. Please try again."
 msgstr "SendWP Plugin nicht gefunden. Bitte versuche es erneut."
 
-#: admin/broadcasts/broadcasts-table.php:432 
-#: admin/dashboard/widgets/email-activity.php:46 
-#: admin/events/email-log-table.php:81 admin/events/email-log-table.php:342 
-#: admin/reports/views/email-step.php:32 
-#: includes/reporting/new-reports/base-email-performance-table-report.php:25 
-#: includes/reporting/new-reports/table-all-broadcasts-performance.php:19 
-#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:16 
-#: includes/reporting/new-reports/table-broadcast-stats.php:71 
+#: admin/broadcasts/broadcasts-table.php:432
+#: admin/dashboard/widgets/email-activity.php:46
+#: admin/events/email-log-table.php:81 admin/events/email-log-table.php:342
+#: admin/reports/views/email-step.php:32
+#: includes/reporting/new-reports/base-email-performance-table-report.php:25
+#: includes/reporting/new-reports/table-all-broadcasts-performance.php:19
+#: includes/reporting/new-reports/table-all-funnel-emails-performance.php:16
+#: includes/reporting/new-reports/table-broadcast-stats.php:71
 #: includes/reporting/new-reports/table-email-funnels-used-in.php:26
 msgid "Sent"
 msgstr "Geschickt"
@@ -10697,9 +10697,9 @@ msgctxt "setting_label"
 msgid "Terms & Conditions"
 msgstr "Geschäftsbedingungen"
 
-#: admin/events/events-page.php:143 admin/funnels/funnel-editor.php:193 
-#: admin/funnels/funnel-editor.php:194 
-#: includes/steps/benchmarks/web-form.php:121 
+#: admin/events/events-page.php:143 admin/funnels/funnel-editor.php:193
+#: admin/funnels/funnel-editor.php:194
+#: includes/steps/benchmarks/web-form.php:121
 #: includes/steps/funnel-step.php:850
 #| msgctxt "page_title"
 #| msgid "Settings"
@@ -10780,8 +10780,8 @@ msgctxt "settings"
 msgid "Allow unrestricted access to contact file uploads."
 msgstr "Erlaube uneingeschränkten Zugriff auf Kontaktdatei-Uploads."
 
-#: admin/settings/settings-page.php:495 admin/settings/settings-page.php:519 
-#: admin/settings/settings-page.php:531 admin/settings/settings-page.php:543 
+#: admin/settings/settings-page.php:495 admin/settings/settings-page.php:519
+#: admin/settings/settings-page.php:531 admin/settings/settings-page.php:543
 #: admin/settings/settings-page.php:555 admin/settings/settings-page.php:567
 msgctxt "settings"
 msgid "As it should appear in your email footer."
@@ -11776,7 +11776,7 @@ msgstr "Richte meine Cron-Jobs ein"
 msgid "Share"
 msgstr "Teilen"
 
-#: includes/steps/benchmarks/form-filled.php:469 
+#: includes/steps/benchmarks/form-filled.php:469
 #: includes/steps/benchmarks/web-form.php:171
 msgid "Shortcode"
 msgstr "Shortcode"
@@ -11878,7 +11878,7 @@ msgstr ""
 msgid "Size"
 msgstr "Größe"
 
-#: assets/js/admin/setup.js:259 assets/js/admin/setup.js:367 
+#: assets/js/admin/setup.js:259 assets/js/admin/setup.js:367
 #: assets/js/admin/setup.js:485
 msgid "Skip"
 msgstr "Überspringen"
@@ -11970,8 +11970,8 @@ msgstr ""
 msgid "Something went wrong while adding the broadcast."
 msgstr "Beim Hinzufügen der Sendung ist ein Fehler aufgetreten."
 
-#: admin/tools/tools-page.php:952 includes/mailhawk.php:380 
-#: includes/mailhawk.php:393 includes/plugin.php:220 includes/plugin.php:233 
+#: admin/tools/tools-page.php:952 includes/mailhawk.php:380
+#: includes/mailhawk.php:393 includes/plugin.php:220 includes/plugin.php:233
 #: includes/send-wp.php:379 includes/send-wp.php:392
 msgid "Something went wrong."
 msgstr "Etwas ist schief gelaufen."
@@ -11982,7 +11982,7 @@ msgstr "Etwas ist schief gelaufen."
 msgid "Something went wrong. Please contact %s support."
 msgstr "Etwas ist schiefgelaufen. Bitte kontaktieren Sie den Support von %s."
 
-#: assets/js/admin/components.js:938 assets/js/admin/send-broadcast.js:500 
+#: assets/js/admin/components.js:938 assets/js/admin/send-broadcast.js:500
 #: assets/js/admin/send-broadcast.js:508
 #| msgid "Something went wrong."
 msgid "Something went wrong..."
@@ -11993,7 +11993,7 @@ msgstr "Etwas ist schiefgegangen..."
 msgid "Something when wrong..."
 msgstr "Etwas ist schiefgelaufen..."
 
-#: assets/js/admin/troubleshooter.js:1279 
+#: assets/js/admin/troubleshooter.js:1279
 #: assets/js/admin/troubleshooter.js:1396
 msgid ""
 "Sometimes a rogue plugin or settings change can break the WordPress "
@@ -12003,8 +12003,8 @@ msgstr ""
 "WordPress-Permalinks unterbrechen. Sie erneut zu speichern, kann eine "
 "einfache Möglichkeit sein, sie wiederherzustellen!"
 
-#: assets/js/admin/troubleshooter.js:560 assets/js/admin/troubleshooter.js:835 
-#: assets/js/admin/troubleshooter.js:1263 
+#: assets/js/admin/troubleshooter.js:560 assets/js/admin/troubleshooter.js:835
+#: assets/js/admin/troubleshooter.js:1263
 #: assets/js/admin/troubleshooter.js:1380
 msgid ""
 "Sometimes caching plugins can be overly aggressive in what they choose to "
@@ -12037,18 +12037,18 @@ msgstr ""
 "können unserem Support-Team die Autorisierung erteilen, diese Änderungen in "
 "Ihrem Auftrag vorzunehmen."
 
-#: admin/contacts/parts/contact-editor.php:369 
-#: admin/dashboard/widgets/source-pages.php:51 includes/functions.php:2158 
-#: includes/functions.php:2263 
+#: admin/contacts/parts/contact-editor.php:369
+#: admin/dashboard/widgets/source-pages.php:51 includes/functions.php:2158
+#: includes/functions.php:2263
 #: includes/reporting/new-reports/table-contacts-by-source-pages.php:19
 msgid "Source Page"
 msgstr "Quellseite"
 
-#: admin/contacts/deprecated/advanced-search.php:131 
-#: admin/contacts/tables/contacts-table.php:476 
-#: admin/contacts/tables/contacts-table.php:563 
-#: admin/dashboard/widgets/optin-status-widget.php:76 
-#: admin/reports/views/email.php:39 
+#: admin/contacts/deprecated/advanced-search.php:131
+#: admin/contacts/tables/contacts-table.php:476
+#: admin/contacts/tables/contacts-table.php:563
+#: admin/dashboard/widgets/optin-status-widget.php:76
+#: admin/reports/views/email.php:39
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:63
 msgid "Spam"
 msgstr "Spam"
@@ -12065,8 +12065,8 @@ msgstr ""
 "Insbesondere können diese Caching-Systeme verhindern, dass die Abmelde-Seite "
 "funktioniert, wenn sie nicht korrekt konfiguriert sind."
 
-#: assets/js/admin/troubleshooter.js:1249 
-#: assets/js/admin/troubleshooter.js:1366 
+#: assets/js/admin/troubleshooter.js:1249
+#: assets/js/admin/troubleshooter.js:1366
 #: assets/js/admin/troubleshooter.js:1382
 msgid ""
 "Specifically, these caching systems can prevent tracking links from working "
@@ -12100,8 +12100,8 @@ msgstr "Starte den Problembehandlungsmodus!"
 msgid "Start typing to select a city"
 msgstr "Beginnen Sie mit der Eingabe, um eine Stadt auszuwählen."
 
-#: assets/js/admin/search-filters.js:1577 
-#: assets/js/admin/search-filters.js:1711 
+#: assets/js/admin/search-filters.js:1577
+#: assets/js/admin/search-filters.js:1711
 #: assets/js/admin/search-filters.js:2048
 msgid "Start typing to select a link or leave blank for any link"
 msgstr ""
@@ -12121,7 +12121,7 @@ msgid "Start with a funnel template for what you want to achieve."
 msgstr ""
 "Beginnen Sie mit einer Trichtervorlage für das, was Sie erreichen möchten."
 
-#: admin/emails/add-new.php:80 admin/emails/add-new.php:137 
+#: admin/emails/add-new.php:80 admin/emails/add-new.php:137
 #: admin/emails/emails-page.php:500
 msgid "Start Writing"
 msgstr "Beginnen Sie mit dem Schreiben"
@@ -12131,9 +12131,9 @@ msgstr "Beginnen Sie mit dem Schreiben"
 msgid "Starts with"
 msgstr "Beginnt mit"
 
-#: admin/contacts/parts/contact-editor.php:311 
-#: assets/js/admin/bulk-edit-contacts.js:141 
-#: assets/js/admin/form-builder-v2.js:984 assets/js/admin/setup.js:232 
+#: admin/contacts/parts/contact-editor.php:311
+#: assets/js/admin/bulk-edit-contacts.js:141
+#: assets/js/admin/form-builder-v2.js:984 assets/js/admin/setup.js:232
 #: includes/steps/benchmarks/form-filled.php:262
 #| msgid "Stats"
 msgid "State"
@@ -12166,11 +12166,11 @@ msgctxt "stats"
 msgid "Click Through Rate"
 msgstr "Klickrate"
 
-#: admin/broadcasts/broadcasts-table.php:389 
-#: admin/broadcasts/broadcasts-table.php:406 admin/broadcasts/report.php:118 
-#: admin/dashboard/widgets/last-broadcast-widget.php:87 
-#: includes/reporting/new-reports/chart-donut-email-stats.php:67 
-#: includes/reporting/new-reports/chart-last-broadcast.php:144 
+#: admin/broadcasts/broadcasts-table.php:389
+#: admin/broadcasts/broadcasts-table.php:406 admin/broadcasts/report.php:118
+#: admin/dashboard/widgets/last-broadcast-widget.php:87
+#: includes/reporting/new-reports/chart-donut-email-stats.php:67
+#: includes/reporting/new-reports/chart-last-broadcast.php:144
 #: includes/reporting/new-reports/chart-last-broadcast.php:181
 msgctxt "stats"
 msgid "Clicked"
@@ -12186,9 +12186,9 @@ msgctxt "stats"
 msgid "Links Clicked"
 msgstr "Links wurden geklickt"
 
-#: admin/broadcasts/broadcasts-table.php:373 admin/broadcasts/report.php:109 
-#: admin/dashboard/widgets/last-broadcast-widget.php:78 
-#: includes/reporting/new-reports/chart-donut-email-stats.php:50 
+#: admin/broadcasts/broadcasts-table.php:373 admin/broadcasts/report.php:109
+#: admin/dashboard/widgets/last-broadcast-widget.php:78
+#: includes/reporting/new-reports/chart-donut-email-stats.php:50
 #: includes/reporting/new-reports/chart-last-broadcast.php:165
 msgctxt "stats"
 msgid "Opened"
@@ -12199,7 +12199,7 @@ msgctxt "stats"
 msgid "Opens"
 msgstr "Öffnet"
 
-#: admin/broadcasts/broadcasts-table.php:355 
+#: admin/broadcasts/broadcasts-table.php:355
 #: includes/reporting/new-reports/chart-last-broadcast.php:128
 msgctxt "stats"
 msgid "Sent"
@@ -12210,18 +12210,18 @@ msgctxt "stats"
 msgid "Total Delivered"
 msgstr "Total versendet"
 
-#: admin/broadcasts/report.php:97 admin/broadcasts/report.php:127 
-#: admin/dashboard/widgets/last-broadcast-widget.php:96 
-#: includes/reporting/new-reports/chart-donut-email-stats.php:84 
+#: admin/broadcasts/report.php:97 admin/broadcasts/report.php:127
+#: admin/dashboard/widgets/last-broadcast-widget.php:96
+#: includes/reporting/new-reports/chart-donut-email-stats.php:84
 #: includes/reporting/new-reports/chart-last-broadcast.php:197
 msgctxt "stats"
 msgid "Unopened"
 msgstr "Ungeöffnet"
 
-#: admin/contacts/tables/contact-table-columns.php:166 
-#: admin/contacts/tables/contacts-table.php:286 
-#: admin/dashboard/widgets/optin-status-widget.php:45 admin/emails/add.php:89 
-#: admin/emails/email-editor.php:109 
+#: admin/contacts/tables/contact-table-columns.php:166
+#: admin/contacts/tables/contacts-table.php:286
+#: admin/dashboard/widgets/optin-status-widget.php:45 admin/emails/add.php:89
+#: admin/emails/email-editor.php:109
 #: includes/reporting/new-reports/table-list-engagement.php:25
 msgid "Status"
 msgstr "Status"
@@ -12296,7 +12296,7 @@ msgstr ""
 "Verbesserungen, Kurse, Artikel, Angebote und Aktionen, die der Groundhogg-"
 "Community zur Verfügung stehen, indem Sie abonnieren!"
 
-#: admin/dashboard/widgets/funnel-breakdown.php:147 
+#: admin/dashboard/widgets/funnel-breakdown.php:147
 #: includes/reporting/new-reports/table-email-funnels-used-in.php:25
 msgid "Step"
 msgstr "Schritt"
@@ -12379,7 +12379,7 @@ msgctxt "step_description"
 msgid "Sleep for 1 second"
 msgstr "Schlaf für 1 Sekunde"
 
-#: includes/steps/benchmarks/form-filled.php:79 
+#: includes/steps/benchmarks/form-filled.php:79
 #: includes/steps/benchmarks/web-form.php:60
 msgctxt "step_description"
 msgid ""
@@ -12467,8 +12467,8 @@ msgstr "Webformular (Legacy)"
 msgid "Steps"
 msgstr "Schritte"
 
-#: assets/js/admin/troubleshooter.js:396 assets/js/admin/troubleshooter.js:581 
-#: assets/js/admin/troubleshooter.js:650 assets/js/admin/troubleshooter.js:724 
+#: assets/js/admin/troubleshooter.js:396 assets/js/admin/troubleshooter.js:581
+#: assets/js/admin/troubleshooter.js:650 assets/js/admin/troubleshooter.js:724
 #: assets/js/admin/troubleshooter.js:856 assets/js/admin/troubleshooter.js:1502
 msgid "Still need help? Contact support!"
 msgstr "Brauchen Sie immer noch Hilfe? Kontaktieren Sie den Support!"
@@ -12477,21 +12477,21 @@ msgstr "Brauchen Sie immer noch Hilfe? Kontaktieren Sie den Support!"
 msgid "Store"
 msgstr "Geschäft"
 
-#: admin/guided-setup/steps/business-info.php:40 
-#: assets/js/admin/search-filters.js:1420 
-#: assets/js/admin/search-filters.js:1421 includes/form/fields/address.php:57 
+#: admin/guided-setup/steps/business-info.php:40
+#: assets/js/admin/search-filters.js:1420
+#: assets/js/admin/search-filters.js:1421 includes/form/fields/address.php:57
 #: includes/functions.php:2142 includes/functions.php:2247
 msgid "Street Address 1"
 msgstr "Straßen Adresse 1"
 
-#: admin/guided-setup/steps/business-info.php:44 
-#: assets/js/admin/search-filters.js:1424 
-#: assets/js/admin/search-filters.js:1425 includes/form/fields/address.php:65 
+#: admin/guided-setup/steps/business-info.php:44
+#: assets/js/admin/search-filters.js:1424
+#: assets/js/admin/search-filters.js:1425 includes/form/fields/address.php:65
 #: includes/functions.php:2143 includes/functions.php:2248
 msgid "Street Address 2"
 msgstr "Straßen Adresse 2"
 
-#: includes/reporting/new-reports/table-broadcast-stats.php:61 
+#: includes/reporting/new-reports/table-broadcast-stats.php:61
 #: includes/reporting/new-reports/table-email-stats.php:31
 #| msgctxt "Column label"
 #| msgid "Subject"
@@ -12524,12 +12524,12 @@ msgstr "[%s] Verwalte deine Einstellungen"
 msgid "Subject line..."
 msgstr "Betreffzeile..."
 
-#: admin/contacts/cards/email.php:24 admin/emails/add.php:184 
+#: admin/contacts/cards/email.php:24 admin/emails/add.php:184
 #: admin/emails/email-editor.php:213 admin/events/log-preview.php:35
 msgid "Subject:"
 msgstr "Gegenstand:"
 
-#: admin/emails/add-new.php:74 admin/emails/add-new.php:130 
+#: admin/emails/add-new.php:74 admin/emails/add-new.php:130
 #: admin/emails/emails-page.php:495
 msgid "Subject: "
 msgstr "Gegenstand:"
@@ -12546,12 +12546,12 @@ msgid "Failed reCAPTCHA verification. You are probably a robot."
 msgstr ""
 "ReCAPTCHA-Verifizierung fehlgeschlagen. Sie sind wahrscheinlich ein Roboter."
 
-#: admin/dashboard/widgets/form-activity.php:46 
+#: admin/dashboard/widgets/form-activity.php:46
 #: includes/reporting/new-reports/table-form-activity.php:28
 msgid "Submissions"
 msgstr "Einreichungen"
 
-#: admin/events/manage.php:219 includes/form/fields/submit.php:14 
+#: admin/events/manage.php:219 includes/form/fields/submit.php:14
 #: includes/steps/benchmarks/form-filled.php:625 templates/preferences.php:278
 msgid "Submit"
 msgstr "Abschicken"
@@ -12580,7 +12580,7 @@ msgstr "Formular %s im Trichter %s eingereicht"
 msgid "Submitting"
 msgstr "Einreichen"
 
-#: assets/js/admin/setup.js:1074 assets/js/admin/setup.js:1086 
+#: assets/js/admin/setup.js:1074 assets/js/admin/setup.js:1086
 #: assets/js/admin/setup.js:1188
 #| msgid "Unsubscribe"
 msgid "Subscribe"
@@ -12590,7 +12590,7 @@ msgstr "Abonnieren"
 msgid "Subscribe to our YouTube channel"
 msgstr "Abonniere unseren YouTube-Kanal"
 
-#: assets/js/admin/troubleshooter.js:2006 
+#: assets/js/admin/troubleshooter.js:2006
 #: assets/js/admin/troubleshooter.js:2097
 msgid "Subscribe to our YouTube channel!"
 msgstr "Abonniere unseren YouTube-Kanal!"
@@ -12627,7 +12627,7 @@ msgstr ""
 msgid "Support Group"
 msgstr "Support Gruppe"
 
-#: admin/contacts/parts/add-contact.php:172 
+#: admin/contacts/parts/add-contact.php:172
 #: admin/contacts/parts/form-admin-submit.php:58
 msgid "Switch Form"
 msgstr "Formular wechseln"
@@ -12678,7 +12678,7 @@ msgctxt "tab"
 msgid "Quick Add"
 msgstr "Schnell hinzufügen"
 
-#: assets/js/admin/contact-editor.js:1635 
+#: assets/js/admin/contact-editor.js:1635
 #: assets/js/admin/contact-editor.js:1865
 msgid "Tab name"
 msgstr "Tab-Name"
@@ -12797,12 +12797,12 @@ msgstr "Tag Name"
 msgid "Tag Names"
 msgstr "Tag-Namen"
 
-#: admin/contacts/parts/add-contact.php:130 
-#: admin/contacts/parts/contact-editor.php:58 
-#: admin/contacts/tables/contact-table-columns.php:189 
-#: admin/contacts/tables/contact-table-columns.php:265 
-#: admin/contacts/tables/contacts-table.php:329 
-#: assets/js/admin/components.js:419 assets/js/admin/components.js:635 
+#: admin/contacts/parts/add-contact.php:130
+#: admin/contacts/parts/contact-editor.php:58
+#: admin/contacts/tables/contact-table-columns.php:189
+#: admin/contacts/tables/contact-table-columns.php:265
+#: admin/contacts/tables/contacts-table.php:329
+#: assets/js/admin/components.js:419 assets/js/admin/components.js:635
 #: includes/functions.php:2165 templates/preferences.php:73
 msgid "Tags"
 msgstr "Tags"
@@ -12815,7 +12815,7 @@ msgstr "Tags wurden zurückgesetzt!"
 msgid "Tailored onboarding experience."
 msgstr "Maßgeschneiderte Einführungs-Erfahrung."
 
-#: assets/js/admin/troubleshooter.js:2004 
+#: assets/js/admin/troubleshooter.js:2004
 #: assets/js/admin/troubleshooter.js:2095
 msgid "Take a course on Groundhogg Academy."
 msgstr "Nehmen Sie einen Kurs auf Groundhogg Academy."
@@ -12841,13 +12841,13 @@ msgstr "Nutzungsbedingungen"
 msgid "Test message sent successfully to %s!"
 msgstr "Testnachricht erfolgreich an %s gesendet!"
 
-#: assets/js/admin/properties.js:63 
-#: includes/steps/benchmarks/form-filled.php:585 
+#: assets/js/admin/properties.js:63
+#: includes/steps/benchmarks/form-filled.php:585
 #: includes/steps/benchmarks/form-filled.php:821
 msgid "Text"
 msgstr "Text"
 
-#: assets/js/admin/properties.js:70 
+#: assets/js/admin/properties.js:70
 #: includes/steps/benchmarks/form-filled.php:589
 msgid "Textarea"
 msgstr "Textbereich"
@@ -13117,7 +13117,7 @@ msgstr ""
 "Es ist kein E-Mail-Adressfeld zugeordnet, daher werden möglicherweise "
 "eingereichte Daten nicht korrekt erfasst."
 
-#: includes/bulk-jobs/bulk-job.php:158 
+#: includes/bulk-jobs/bulk-job.php:158
 #: includes/bulk-jobs/process-events.php:100
 msgid ""
 "There was an error performing this process. This is most likely due to the "
@@ -13217,7 +13217,7 @@ msgstr ""
 "\n"
 "\n"
 
-#: includes/form/submission-handler.php:113 
+#: includes/form/submission-handler.php:113
 #: includes/form/submission-handler.php:122
 msgid "This form does not exist."
 msgstr "Dieses Formular existiert nicht."
@@ -13281,7 +13281,7 @@ msgstr "Donnerstag"
 msgid "Ticket sent!"
 msgstr "Ticket gesendet!"
 
-#: assets/js/admin/properties.js:135 
+#: assets/js/admin/properties.js:135
 #: includes/steps/benchmarks/form-filled.php:613
 msgid "Time"
 msgstr "Zeit"
@@ -13290,8 +13290,8 @@ msgstr "Zeit"
 msgid "Time Range"
 msgstr "Zeitspanne"
 
-#: admin/contacts/parts/contact-editor.php:342 
-#: assets/js/admin/bulk-edit-contacts.js:163 includes/functions.php:2155 
+#: admin/contacts/parts/contact-editor.php:342
+#: assets/js/admin/bulk-edit-contacts.js:163 includes/functions.php:2155
 #: includes/functions.php:2260
 msgid "Time Zone"
 msgstr "Zeitzone"
@@ -13452,13 +13452,13 @@ msgstr "Top-Quellseiten"
 msgid "Toronto"
 msgstr "Toronto"
 
-#: admin/dashboard/widgets/country-widget.php:38 
-#: admin/dashboard/widgets/optin-status-widget.php:46 
+#: admin/dashboard/widgets/country-widget.php:38
+#: admin/dashboard/widgets/optin-status-widget.php:46
 #: admin/dashboard/widgets/region-widget.php:41
 msgid "Total"
 msgstr "Total"
 
-#: includes/reporting/new-reports/table-broadcast-stats.php:107 
+#: includes/reporting/new-reports/table-broadcast-stats.php:107
 #: includes/reporting/new-reports/table-email-stats.php:74
 #| msgid "Total Contacts"
 msgid "Total Clicks"
@@ -13473,7 +13473,7 @@ msgstr "Insgesamt abgeschlossen:"
 msgid "Total Contacts"
 msgstr "Totale Kontakte"
 
-#: includes/reporting/new-reports/table-broadcast-stats.php:75 
+#: includes/reporting/new-reports/table-broadcast-stats.php:75
 #: includes/reporting/new-reports/table-email-stats.php:39
 #| msgctxt "stats"
 #| msgid "Total Delivered"
@@ -13485,7 +13485,7 @@ msgstr "Insgesamt zugestellt"
 msgid "Total Impressions"
 msgstr "Gesamteindrücke"
 
-#: assets/js/admin/custom-reports.js:293 assets/js/admin/setup.js:598 
+#: assets/js/admin/custom-reports.js:293 assets/js/admin/setup.js:598
 #: assets/js/admin/setup.js:674
 #| msgid "Total Contacts"
 msgid "Total number of contacts"
@@ -13518,7 +13518,7 @@ msgstr "Tracking-Daten, die mit Ihrem Profil verknüpft sind."
 msgid "Tracking links in emails do not work"
 msgstr "Tracking-Links in E-Mails funktionieren nicht"
 
-#: admin/emails/add.php:134 admin/emails/email-editor.php:161 
+#: admin/emails/add.php:134 admin/emails/email-editor.php:161
 #: admin/events/email-log-table.php:97
 msgid "Transactional"
 msgstr "Transaktions"
@@ -13602,7 +13602,7 @@ msgid "Un-Marketable"
 msgstr ""
 "Nicht vermarktungsfähi\n"
 
-#: includes/form/form-v2.php:1889 includes/form/submission-handler.php:313 
+#: includes/form/form-v2.php:1889 includes/form/submission-handler.php:313
 #: includes/form/submission-handler.php:318
 msgid "Unable to create contact record."
 msgstr "Kontaktdatensatz konnte nicht erstellt werden."
@@ -13633,9 +13633,9 @@ msgstr "Hochladen der Datei nicht möglich."
 msgid "Uncancel"
 msgstr "Wiederherstellen"
 
-#: admin/contacts/deprecated/advanced-search.php:125 
-#: admin/contacts/tables/contacts-table.php:451 
-#: admin/dashboard/widgets/optin-status-widget.php:67 
+#: admin/contacts/deprecated/advanced-search.php:125
+#: admin/contacts/tables/contacts-table.php:451
+#: admin/dashboard/widgets/optin-status-widget.php:67
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:54
 msgid "Unconfirmed"
 msgstr "Unbestätigt"
@@ -13666,7 +13666,7 @@ msgstr "Deinstallieren"
 msgid "Uninstalled gh-cron.php successfully!"
 msgstr "Erfolgreich gh-cron.php deinstalliert!"
 
-#: includes/reporting/new-reports/table-broadcast-stats.php:113 
+#: includes/reporting/new-reports/table-broadcast-stats.php:113
 #: includes/reporting/new-reports/table-email-stats.php:80
 #| msgctxt "stats"
 #| msgid "Clicks"
@@ -13678,7 +13678,7 @@ msgstr "Eindeutige Klicks"
 msgid "Unique Impressions"
 msgstr "Eindeutige Eindrücke"
 
-#: includes/reporting/new-reports/table-broadcast-link-clicked.php:24 
+#: includes/reporting/new-reports/table-broadcast-link-clicked.php:24
 #: includes/reporting/new-reports/table-email-links-clicked.php:23
 msgid "Uniques"
 msgstr "Einzigartige"
@@ -13687,11 +13687,11 @@ msgstr "Einzigartige"
 msgid "Unit 42"
 msgstr "Unit 42"
 
-#: admin/dashboard/widgets/country-widget.php:67 
-#: admin/emails/emails-table.php:244 assets/js/admin/notes.js:101 
-#: includes/classes/event.php:345 includes/classes/event.php:356 
-#: includes/reporting/new-reports/chart-contacts-by-country.php:37 
-#: includes/reporting/new-reports/chart-contacts-by-region.php:72 
+#: admin/dashboard/widgets/country-widget.php:67
+#: admin/emails/emails-table.php:244 assets/js/admin/notes.js:101
+#: includes/classes/event.php:345 includes/classes/event.php:356
+#: includes/reporting/new-reports/chart-contacts-by-country.php:37
+#: includes/reporting/new-reports/chart-contacts-by-region.php:72
 #: includes/reporting/new-reports/table-contacts-by-country.php:62
 msgid "Unknown"
 msgstr "Unbekannte"
@@ -13732,14 +13732,14 @@ msgstr "Jederzeit abmelden."
 msgid "Unsubscribe Link"
 msgstr "Abmelde-Link"
 
-#: admin/contacts/deprecated/advanced-search.php:127 
-#: admin/contacts/tables/contacts-table.php:471 
-#: admin/dashboard/widgets/optin-status-widget.php:79 
-#: assets/js/admin/search-filters.js:1633 
-#: assets/js/admin/search-filters.js:1635 
-#: includes/reporting/new-reports/chart-contacts-by-optin-status.php:66 
-#: includes/reporting/new-reports/table-broadcast-stats.php:137 
-#: includes/reporting/new-reports/table-email-stats.php:101 
+#: admin/contacts/deprecated/advanced-search.php:127
+#: admin/contacts/tables/contacts-table.php:471
+#: admin/dashboard/widgets/optin-status-widget.php:79
+#: assets/js/admin/search-filters.js:1633
+#: assets/js/admin/search-filters.js:1635
+#: includes/reporting/new-reports/chart-contacts-by-optin-status.php:66
+#: includes/reporting/new-reports/table-broadcast-stats.php:137
+#: includes/reporting/new-reports/table-email-stats.php:101
 #: templates/preferences.php:542
 msgid "Unsubscribed"
 msgstr "Abgemeldet"
@@ -13755,8 +13755,8 @@ msgstr "Abgemeldete Kontakte"
 msgid "Unsubscribes"
 msgstr "Abmeldungen"
 
-#: admin/contacts/tables/contacts-table.php:343 
-#: admin/dashboard/widgets/funnel-breakdown.php:74 
+#: admin/contacts/tables/contacts-table.php:343
+#: admin/dashboard/widgets/funnel-breakdown.php:74
 #: admin/dashboard/widgets/region-widget.php:82 admin/tags/edit.php:56
 msgid "Update"
 msgstr "Aktualisiere"
@@ -13856,7 +13856,7 @@ msgstr "Aktualisierung"
 msgid "Updating Contacts..."
 msgstr "Aktualisiere Kontakte..."
 
-#: assets/js/admin/funnel-steps.js:554 
+#: assets/js/admin/funnel-steps.js:554
 #: includes/steps/benchmarks/form-filled.php:452
 msgid "Upgrade Form"
 msgstr "Upgrade-Formular"
@@ -13903,7 +13903,7 @@ msgstr "URL"
 msgid "Use a Saved Search"
 msgstr "Verwenden Sie eine gespeicherte Suche"
 
-#: assets/js/admin/setup.js:777 assets/js/admin/setup.js:941 
+#: assets/js/admin/setup.js:777 assets/js/admin/setup.js:941
 #: assets/js/admin/setup.js:1265 assets/js/admin/setup.js:1280
 #, javascript-format
 msgid "Use code <b>IFOUND15OFF</b> to save 15% off your first year!"
@@ -13919,7 +13919,7 @@ msgstr "Verwenden Sie cPanel"
 msgid "Use Cron-Job.org"
 msgstr "Verwenden Sie Cron-Job.org."
 
-#: assets/js/admin/troubleshooter.js:621 assets/js/admin/troubleshooter.js:695 
+#: assets/js/admin/troubleshooter.js:621 assets/js/admin/troubleshooter.js:695
 #: assets/js/admin/troubleshooter.js:769
 msgid "Use Cron-Job.org instead!"
 msgstr "Verwenden Sie stattdessen Cron-Job.org!"
@@ -13997,7 +13997,7 @@ msgstr ""
 msgid "Use TINYINT(1) instead of BIT(1)"
 msgstr "Verwenden Sie TINYINT(1) anstelle von BIT(1)"
 
-#: includes/steps/benchmarks/form-filled.php:1151 
+#: includes/steps/benchmarks/form-filled.php:1151
 #: includes/steps/benchmarks/form-filled.php:1160
 msgid "Use to apply CSS."
 msgstr "Verwenden Sie diese Option, um CSS anzuwenden."
@@ -14012,7 +14012,7 @@ msgstr "Verwendet, um die Aufmerksamkeit des Lesers zu gewinnen."
 msgid "Useful Integrations"
 msgstr "Nützliche Integrationen"
 
-#: admin/contacts/deprecated/note.php:16 assets/js/admin/search-filters.js:826 
+#: admin/contacts/deprecated/note.php:16 assets/js/admin/search-filters.js:826
 #: includes/steps/manager.php:81
 #| msgid "User Id"
 msgid "User"
@@ -14023,7 +14023,7 @@ msgstr "Benutzer"
 msgid "User Data"
 msgstr "Benutzerdaten"
 
-#: admin/contacts/cards/user.php:18 assets/js/admin/search-filters.js:1305 
+#: admin/contacts/cards/user.php:18 assets/js/admin/search-filters.js:1305
 #: assets/js/admin/search-filters.js:1307
 #| msgid "User Id"
 msgid "User ID"
@@ -14058,13 +14058,13 @@ msgstr "Benutzerrolle ist %s"
 msgid "User Role(s):"
 msgstr "Benutzer Rolle(n):"
 
-#: admin/contacts/cards/user.php:24 
+#: admin/contacts/cards/user.php:24
 #: admin/contacts/tables/contact-table-columns.php:180
 msgid "Username"
 msgstr "Benutzername"
 
-#: assets/js/admin/troubleshooter.js:557 assets/js/admin/troubleshooter.js:832 
-#: assets/js/admin/troubleshooter.js:1260 
+#: assets/js/admin/troubleshooter.js:557 assets/js/admin/troubleshooter.js:832
+#: assets/js/admin/troubleshooter.js:1260
 #: assets/js/admin/troubleshooter.js:1377
 msgid "Using a caching plugin?"
 msgstr "Verwenden Sie ein Caching-Plugin?"
@@ -14078,7 +14078,7 @@ msgstr "Verwenden Sie Cloudflare oder ein anderes CDN?"
 msgid "UTC %s%s"
 msgstr "UTC %s%s"
 
-#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:2166 
+#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:2166
 #: includes/functions.php:2271
 msgid "UTM Campaign"
 msgstr "UTM Kampagne"
@@ -14103,8 +14103,8 @@ msgstr "UTM Term"
 msgid "valid"
 msgstr "gültig"
 
-#: admin/contacts/deprecated/advanced-search.php:204 
-#: assets/js/admin/email-editor-plain.js:43 
+#: admin/contacts/deprecated/advanced-search.php:204
+#: assets/js/admin/email-editor-plain.js:43
 #: includes/steps/benchmarks/form-filled.php:892
 msgid "Value"
 msgstr "Wert"
@@ -14248,9 +14248,9 @@ msgctxt "wait for a duration"
 msgid "Wait at least %s and then"
 msgstr "Warten Sie mindestens %s und dann"
 
-#: admin/dashboard/widgets/funnel-breakdown.php:149 
-#: admin/events/events-table.php:287 
-#: includes/reporting/new-reports/table-funnel-stats.php:28 
+#: admin/dashboard/widgets/funnel-breakdown.php:149
+#: admin/events/events-table.php:287
+#: includes/reporting/new-reports/table-funnel-stats.php:28
 #: includes/steps/funnel-step.php:555
 msgid "Waiting"
 msgstr "Warten"
@@ -14411,14 +14411,14 @@ msgid_plural "weeks"
 msgstr[0] "Woche"
 msgstr[1] "Wochen"
 
-#: admin/contacts/deprecated/advanced-search.php:128 
+#: admin/contacts/deprecated/advanced-search.php:128
 #: admin/contacts/tables/contacts-table.php:461
 #| msgctxt "view"
 #| msgid "Weekly"
 msgid "Weekly"
 msgstr "Wöchentlich"
 
-#: admin/events/manage.php:50 admin/events/manage.php:201 
+#: admin/events/manage.php:50 admin/events/manage.php:201
 #: admin/events/manage.php:260 assets/js/admin/funnel-steps.js:61
 msgid "Weeks"
 msgstr "Wochen"
@@ -14622,7 +14622,7 @@ msgstr "Warum HollerBox verwenden?"
 msgid "Why use MailHawk?"
 msgstr "Warum MailHawk verwenden?"
 
-#: assets/js/admin/properties.js:443 
+#: assets/js/admin/properties.js:443
 #: includes/steps/benchmarks/form-filled.php:974
 msgid "Width"
 msgstr "Breite"
@@ -14648,7 +14648,7 @@ msgstr "Wird jeden Schritt in %1$s abschließen"
 msgid "Will receive %1$s on %2$s"
 msgstr "Wird %1$s am %2$s erhalten"
 
-#: assets/js/admin/search-filters.js:1929 
+#: assets/js/admin/search-filters.js:1929
 #: assets/js/admin/search-filters.js:1975
 msgid "Will receive a broadcast"
 msgstr "Wird eine Übertragung erhalten"
@@ -14749,8 +14749,8 @@ msgstr ""
 "Juhu! Sie haben Ihre Cron-Jobs erfolgreich konfiguriert! Das war doch gar "
 "nicht so schwer, oder?"
 
-#: admin/contacts/parts/bulk-edit.php:147 
-#: admin/contacts/parts/contact-editor.php:236 
+#: admin/contacts/parts/bulk-edit.php:147
+#: admin/contacts/parts/contact-editor.php:236
 #: includes/form/fields/birthday.php:102 includes/form/form-v2.php:1023
 msgid "Year"
 msgstr "Jahr"
@@ -14761,15 +14761,15 @@ msgid_plural "years"
 msgstr[0] "Jahr"
 msgstr[1] "jahre"
 
-#: admin/events/manage.php:48 admin/events/manage.php:199 
+#: admin/events/manage.php:48 admin/events/manage.php:199
 #: admin/events/manage.php:258 assets/js/admin/funnel-steps.js:63
 msgid "Years"
 msgstr "Jahre"
 
-#: assets/js/admin/send-broadcast.js:136 assets/js/admin/setup.js:359 
-#: includes/steps/actions/send-email.php:143 
-#: includes/steps/benchmarks/form-filled.php:806 
-#: includes/steps/benchmarks/form-filled.php:954 
+#: assets/js/admin/send-broadcast.js:136 assets/js/admin/setup.js:359
+#: includes/steps/actions/send-email.php:143
+#: includes/steps/benchmarks/form-filled.php:806
+#: includes/steps/benchmarks/form-filled.php:954
 #: includes/steps/benchmarks/form-filled.php:1077
 msgid "Yes"
 msgstr "Ja"
@@ -14970,7 +14970,7 @@ msgstr ""
 "Sie können all diese SMTP-Dienste freischalten, indem Sie sich für unseren "
 "<b>Pro-Plan</b> anmelden."
 
-#: includes/steps/benchmarks/web-form.php:149 
+#: includes/steps/benchmarks/web-form.php:149
 #: includes/steps/funnel-step.php:878
 msgid "You can use this area to store custom notes about the step."
 msgstr ""
@@ -15197,7 +15197,7 @@ msgstr "Ihre Lizenz ist <b>%s</b> und %s"
 msgid "Your license is invalid."
 msgstr "Ihre Lizenz ist ungültig"
 
-#: assets/js/admin/setup.js:514 assets/js/admin/troubleshooter.js:1974 
+#: assets/js/admin/setup.js:514 assets/js/admin/troubleshooter.js:1974
 #: assets/js/admin/troubleshooter.js:2080
 #| msgid "Get a license key"
 msgid "Your license key"
@@ -15294,12 +15294,12 @@ msgstr ""
 "Ihr Benutzerkonto. <i>Um Ihr Benutzerkonto zu löschen, kontaktieren Sie uns "
 "bitte.</i>"
 
-#: assets/js/admin/form-builder-v2.js:995 
+#: assets/js/admin/form-builder-v2.js:995
 #: includes/steps/benchmarks/form-filled.php:274
 msgid "Zip Code"
 msgstr "Postleitzahl"
 
-#: assets/js/admin/search-filters.js:1428 
+#: assets/js/admin/search-filters.js:1428
 #: assets/js/admin/search-filters.js:1429 includes/form/fields/address.php:89
 msgid "Zip/Postal Code"
 msgstr "Postleitzahl"

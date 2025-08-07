@@ -50,7 +50,7 @@ class Modal {
                 </div>
                 <div class="gh-modal-dialog-content"></div>
                 <div class="gh-modal-footer">
-                    <button class="legacy-modal-close gh-button secondary" type="button" id="gh-legacy-modal-save-changes"><?php _e( 'Close' ); ?></button>
+                    <button class="legacy-modal-close gh-button secondary" type="button" id="gh-legacy-modal-save-changes"><?php esc_html_e( 'Close' ); ?></button>
                 </div>
             </div>
         </div>

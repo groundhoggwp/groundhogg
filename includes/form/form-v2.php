@@ -1501,7 +1501,7 @@ class Form_v2 extends Step {
 					$verifyResponse = wp_remote_get( $file_name );
 					$responseData   = json_decode( wp_remote_retrieve_body( $verifyResponse ) );
 
-					$bot_error = new \WP_Error( 'captcha_verification_failed', _x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
+					$bot_error = new \WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
 
 					if ( $responseData->success == false ) {
 						return $bot_error;

@@ -18,7 +18,7 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 	$saved_search = Saved_Searches::instance()->get( $saved_search );
 
 	?>
-    <h2 id="current-search"><?php printf( __( '<span style="font-weight: 400">Current search</span>: <span id="search-name">%s</span>' ), $saved_search['name'] ); ?></h2>
+    <h2 id="current-search"><span style="font-weight: 400"><?php esc_html_e( 'Current search:', 'groundhogg' ); ?></span> <span id="search-name"><?php echo esc_html( $saved_search['name'] ); ?></span></h2>
 <?php endif; ?>
 <div id="search-panel">
     <div class="filters"></div>
@@ -33,13 +33,13 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 				<?php
 				echo html()->input( [
 					'name'        => 's',
-					'placeholder' => __( 'Name or Email', 'groundhogg' ),
+					'placeholder' => esc_html__( 'Name or Email', 'groundhogg' ),
 					'class'       => 'input',
 					'value'       => maybe_change_space_to_plus_in_email( sanitize_text_field( get_url_var( 's' ) ) )
 				] );
 
 				echo html()->submit( [
-					'text'  => __( 'Search' ),
+					'text'  => esc_html__( 'Search' ),
 					'class' => 'gh-button primary small'
 				] );
 

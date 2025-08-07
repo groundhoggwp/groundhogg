@@ -254,8 +254,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		self::$step_properties[ $this->get_type() ] = [
 			'type'        => $this->get_type(),
-			'name'        => $this->get_name(),
-			'description' => $this->get_description(),
+			'name'        => esc_html( $this->get_name() ),
+			'description' => esc_html( $this->get_description() ),
 			'icon'        => $this->get_icon(),
 			'svg'         => $this->get_icon_svg(),
 		];
@@ -591,12 +591,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
         <div
                 id="step-<?php echo $step->get_id(); ?>"
                 data-id="<?php echo $step->get_id(); ?>"
-                data-type="<?php esc_attr_e( $step->get_type() ); ?>"
-                data-group="<?php esc_attr_e( $step->get_group() ); ?>"
-                data-level="<?php esc_attr_e( $step->get_level() ); ?>"
+                data-type="<?php echo esc_attr( $step->get_type() ); ?>"
+                data-group="<?php echo esc_attr( $step->get_group() ); ?>"
+                data-level="<?php echo esc_attr( $step->get_level() ); ?>"
                 class="step <?php echo implode( ' ', $classes ) ?>" tabindex="0">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
-            <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php esc_attr_e( $step->branch ); ?>">
+            <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php echo esc_attr( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
 				<?php if ( WP_DEBUG ): ?>
                     <div class="step-label">ID: <?php echo $step->ID; ?></div>
@@ -782,7 +782,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		}
 
 		?>
-        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
+        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php echo esc_attr( $this->get_type() ); ?>"
              id="settings-<?php echo $step->get_id(); ?>"
              class="step <?php echo implode( ' ', $classes ) ?>">
             <div class="step-locked"><?php dashicon_e( 'lock' ); ?></div>
@@ -829,7 +829,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 					<?php if ( $step->is_benchmark() ): ?>
                         <div class="gh-panel benchmark-settings">
                             <div class="gh-panel-header">
-                                <h2><?php _e( 'Trigger Settings', 'groundhogg' ); ?></h2>
+                                <h2><?php esc_html_e( 'Trigger Settings', 'groundhogg' ); ?></h2>
                             </div>
                             <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):

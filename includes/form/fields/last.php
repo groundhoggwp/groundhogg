@@ -13,14 +13,14 @@ class Last extends Input {
 	public function get_default_args() {
 		return [
 			'type'        => 'text',
-			'label'       => _x( 'Last Name *', 'form_default', 'groundhogg' ),
+			'label'       => esc_html_x( 'Last Name *', 'form_default', 'groundhogg' ),
 			'name'        => 'last_name',
 			'id'          => 'last_name',
 			'class'       => 'gh-last-name',
 			'value'       => '',
 			'placeholder' => 'Doe',
 			'pattern'     => '',
-			'title'       => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
+			'title'       => esc_html_x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
 			'required'    => false,
 		];
 	}

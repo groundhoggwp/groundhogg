@@ -15,7 +15,7 @@ class Phone extends Input {
 	public function get_default_args() {
 		return [
 			'type'        => 'tel',
-			'label'       => _x( 'Phone *', 'form_default', 'groundhogg' ),
+			'label'       => esc_html_x( 'Phone *', 'form_default', 'groundhogg' ),
 			'name'        => 'primary_phone',
 			'id'          => 'primary_phone',
 			'class'       => 'gh-tel gh-input',

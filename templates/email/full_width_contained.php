@@ -19,7 +19,7 @@ $email = the_email();
 $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_line(), $email_title );
+$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), esc_html( $email->get_merged_subject_line() ), esc_html( $email_title ) );
 
 $bgColor    = $email->get_meta( 'backgroundColor' ) ?: '';
 $bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';
@@ -64,10 +64,10 @@ if ( $bgImage ) {
 	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
-<body class="email template-full-width-contained" dir="<?php esc_attr_e( $direction ); ?>">
+<body class="email template-full-width-contained" dir="<?php echo esc_attr( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>
-		<td bgcolor="<?php esc_attr_e( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"
+		<td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"
 		    style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
@@ -77,7 +77,7 @@ if ( $bgImage ) {
 			<?php if ( ! $email->has_footer_block() ): ?>
 			<table cellspacing="0" cellpadding="0" role="presentation" align="center">
 				<tr>
-					<td width="<?php esc_attr_e( $email->get_width() ) ?>" style="width: <?php esc_attr_e( $email->get_width() ) ?>px">
+					<td width="<?php echo esc_attr( $email->get_width() ) ?>" style="width: <?php echo esc_attr( $email->get_width() ) ?>px">
 						<?php load_part( 'footer' ); ?>
 					</td>
 				</tr>

@@ -75,8 +75,8 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 
 ?>
     <div class="box">
-        <h1 class="no-margin-top"><?php _e( 'Email Archive', 'groundhogg' ); ?></h1>
-        <p><?php _e( 'Below is a list of all the emails you\'ve received in the past. Use the pagination to browse. Emails are ordered by date starting with the most recently received.', 'groundhogg' ); ?></p>
+        <h1 class="no-margin-top"><?php esc_html_e( 'Email Archive', 'groundhogg' );; ?></h1>
+        <p><?php esc_html_e( 'Below is a list of all the emails you\'ve received in the past. Use the pagination to browse. Emails are ordered by date starting with the most recently received.', 'groundhogg' );; ?></p>
 
 		<?php
 

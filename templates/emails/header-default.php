@@ -95,7 +95,7 @@ $apple_link = array_to_css( $apple_link );
 $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), apply_filters( 'groundhogg/email_template/title', 'Email' ), $email_title );
+$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), esc_html( apply_filters( 'groundhogg/email_template/title', 'Email' ) ), esc_html( $email_title ) );
 $email_title = apply_filters( 'groundhogg/email_template/title', $email_title );
 
 $is_showing_in_iframe = \Groundhogg\is_managed_page() && get_query_var( 'subpage' ) === 'emails';
@@ -190,7 +190,7 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 								<div class="header" style="text-align: center;margin-bottom: 25px;">
                                     <span class="apple-link" style="<?php echo $apple_link; ?>">
                                         <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/browser_view_link', home_url() ) ); ?>">
-                                            <?php _e( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
+                                            <?php echo esc_html( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                                         </a>
                                     </span>
 								</div>

@@ -20,7 +20,7 @@ class Time extends Input {
 	public function get_default_args() {
 		return [
 			'type'       => 'time',
-			'label'      => _x( 'Time *', 'form_default', 'groundhogg' ),
+			'label'      => esc_html_x( 'Time *', 'form_default', 'groundhogg' ),
 			'name'       => '',
 			'id'         => '',
 			'class'      => '',

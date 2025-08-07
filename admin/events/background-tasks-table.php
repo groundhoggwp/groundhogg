@@ -63,22 +63,22 @@ class Background_Tasks_Table extends Table {
 		return [
 			[
 				'view'    => 'pending',
-				'display' => __( 'Pending', 'groundhogg' ),
+				'display' => esc_html__( 'Pending', 'groundhogg' ),
 				'query'   => [ 'status' => 'pending' ],
 			],
 			[
 				'view'    => 'in_progress',
-				'display' => __( 'In Progress', 'groundhogg' ),
+				'display' => esc_html__( 'In Progress', 'groundhogg' ),
 				'query'   => [ 'status' => 'in_progress' ],
 			],
 			[
 				'view'    => 'done',
-				'display' => __( 'Done', 'groundhogg' ),
+				'display' => esc_html__( 'Done', 'groundhogg' ),
 				'query'   => [ 'status' => 'done' ],
 			],
 			[
 				'view'    => 'cancelled',
-				'display' => __( 'Cancelled', 'groundhogg' ),
+				'display' => esc_html__( 'Cancelled', 'groundhogg' ),
 				'query'   => [ 'status' => 'cancelled' ],
 			],
 		];
@@ -164,7 +164,7 @@ class Background_Tasks_Table extends Table {
 
 		return html()->e( 'a', [
 			'href' => $url,
-		], $user ? $user->display_name : __( 'System', 'groundhogg' ) );
+		], $user ? $user->display_name : esc_html__( 'System', 'groundhogg' ) );
 	}
 
 
@@ -192,7 +192,7 @@ class Background_Tasks_Table extends Table {
 		$date = new DateTimeHelper( $task->time );
 
 		if ( $date->isPast() ) {
-			$diff = __( 'Now!', 'groundhogg' );
+			$diff = esc_html__( 'Now!', 'groundhogg' );
 		} else {
 			$diff = human_time_diff( time(), $task->time );
 		}
@@ -280,13 +280,13 @@ class Background_Tasks_Table extends Table {
 			case 'done':
 				break;
 			case 'cancelled':
-				$actions[] = [ 'class' => 'edit', 'display' => __( 'Resume' ), 'url' => action_url( 'resume_task', [ 'task' => $item->ID ] ) ];
+				$actions[] = [ 'class' => 'edit', 'display' => esc_html__( 'Resume' ), 'url' => action_url( 'resume_task', [ 'task' => $item->ID ] ) ];
 				break;
 			default:
-				$actions[] = [ 'class' => 'trash', 'display' => __( 'Cancel' ), 'url' => action_url( 'cancel_task', [ 'task' => $item->ID ] ) ];
+				$actions[] = [ 'class' => 'trash', 'display' => esc_html__( 'Cancel' ), 'url' => action_url( 'cancel_task', [ 'task' => $item->ID ] ) ];
 				$actions[] = [
 					'class'     => 'edit',
-					'display'   => __( 'Run now' ),
+					'display'   => esc_html__( 'Run now' ),
 					'linkProps' => [
 						'class' => 'do-task',
 					],
@@ -310,10 +310,10 @@ class Background_Tasks_Table extends Table {
 
 		switch ( $this->get_view() ) {
 			default:
-				$actions['cancel_task'] = __( 'Cancel', 'groundhogg' );
+				$actions['cancel_task'] = esc_html__( 'Cancel', 'groundhogg' );
 				break;
 			case 'cancelled':
-				$actions['resume_task'] = __( 'Resume', 'groundhogg' );
+				$actions['resume_task'] = esc_html__( 'Resume', 'groundhogg' );
 				break;
 			case 'done':
 				break;

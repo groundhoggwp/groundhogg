@@ -20,7 +20,7 @@ class Number extends Input {
 	public function get_default_args() {
 		return [
 			'type'        => 'number',
-			'label'       => _x( 'Number *', 'form_default', 'groundhogg' ),
+			'label'       => esc_html_x( 'Number *', 'form_default', 'groundhogg' ),
 			'name'        => '',
 			'id'          => '',
 			'class'       => '',

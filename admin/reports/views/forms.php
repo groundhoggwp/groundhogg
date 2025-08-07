@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="gh-panel">
     <div class="gh-panel-header">
-        <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
+        <h2 class="title"><?php esc_html_e( 'Forms', 'groundhogg' ); ?></h2>
     </div>
     <div id="table_form_activity"></div>
 </div

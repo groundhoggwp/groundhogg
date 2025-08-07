@@ -20,38 +20,38 @@ if ( ! $funnel->exists() ) {
 ?>
 
 <div class="display-flex gap-20 align-center">
-    <h1 class="report-title"><?php _e( $funnel->get_title() ) ?></h1>
+    <h1 class="report-title"><?php echo esc_html( $funnel->get_title() ); ?></h1>
 	<?php echo html()->e( 'a', [
 		'target' => '_blank',
 		'id'     => 'edit-funnel',
 		'href'   => $funnel->admin_link(),
 		'class'  => 'gh-button secondary'
-	], __( 'Edit Flow' ) ) ?>
+	], esc_html__( 'Edit Flow', 'groundhogg' ) ) ?>
 </div>
 <div class="display-grid gap-20">
 
 	<?php quick_stat_report( [
 		'id'    => 'total_contacts_added_to_funnel',
-		'title' => __( 'Contacts Added', 'groundhogg' ),
+		'title' => esc_html__( 'Contacts Added', 'groundhogg' ),
 		'class' => 'span-3',
 	] ); ?>
 
 	<?php quick_stat_report( [
 		'id'    => 'total_contacts_in_funnel',
-		'title' => __( 'Active Contacts', 'groundhogg' ),
+		'title' => esc_html__( 'Active Contacts', 'groundhogg' ),
 		'class' => 'span-3',
 	] ); ?>
 
 	<?php quick_stat_report( [
 		'id'    => 'total_funnel_conversions',
-		'title' => __( 'Conversions', 'groundhogg' ),
+		'title' => esc_html__( 'Conversions', 'groundhogg' ),
 		'class' => 'span-3',
 	] );
 	?>
 
 	<?php quick_stat_report( [
 		'id'    => 'total_funnel_conversion_rate',
-		'title' => __( 'Conversion Rate', 'groundhogg' ),
+		'title' => esc_html__( 'Conversion Rate', 'groundhogg' ),
 		'class' => 'span-3',
 	] ); ?>
 
@@ -59,7 +59,7 @@ if ( ! $funnel->exists() ) {
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Flow Breakdown', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Flow Breakdown', 'groundhogg' ); ?></h2>
         </div>
         <div id="chart_funnel_breakdown"></div>
     </div>
@@ -68,37 +68,37 @@ if ( ! $funnel->exists() ) {
 
 	quick_stat_report( [
 		'id'    => 'total_emails_sent',
-		'title' => __( 'Emails Sent', 'groundhogg' ),
+		'title' => esc_html__( 'Emails Sent', 'groundhogg' ),
 		'class' => 'span-4'
 	] );
 	quick_stat_report( [
 		'id'    => 'email_open_rate',
-		'title' => __( 'Open Rate', 'groundhogg' ),
+		'title' => esc_html__( 'Open Rate', 'groundhogg' ),
 		'class' => 'span-4'
 	] );
 	quick_stat_report( [
 		'id'    => 'email_click_rate',
-		'title' => __( 'Click Thru Rate', 'groundhogg' ),
+		'title' => esc_html__( 'Click Thru Rate', 'groundhogg' ),
 		'class' => 'span-4'
 	] ); ?>
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Email Performance', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Email Performance', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_all_funnel_emails_performance"></div>
     </div>
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Forms', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_form_activity"></div>
     </div>
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Activity', 'groundhogg' ); ?></h2>
         </div>
 		<?php
 

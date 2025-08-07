@@ -52,7 +52,7 @@ class Campaigns_Page extends Admin_Page {
         <p></p>
         <div class="display-flex" style="gap: 40px">
             <div class="left col-wrap">
-                <h2><?php _e( 'Add a new Campaign', 'groundhogg' ); ?></h2>
+                <h2><?php esc_html_e( 'Add a new Campaign', 'groundhogg' ); ?></h2>
                 <form method="post" class="display-flex column gap-10 form-wrap">
 					<?php
 
@@ -61,23 +61,23 @@ class Campaigns_Page extends Admin_Page {
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-name' ], __( 'Name' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html__( 'Name' ) ),
 						html()->input( [
 							'id'   => 'campaign-name',
 							'name' => 'name'
 						] ),
-						html()->description( __( 'A recognizable name for the campaign.', 'groundhogg' ) )
+						html()->description( esc_html__( 'A recognizable name for the campaign.', 'groundhogg' ) )
 					] );
 
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-slug' ], __( 'Slug' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-slug' ], esc_html__( 'Slug' ) ),
 						html()->input( [
 							'id'   => 'campaign-slug',
 							'name' => 'slug'
 						] ),
-						html()->description( __( 'The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens' ) )
+						html()->description( esc_html__( 'The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens' ) )
 					] );
 
 					?>
@@ -93,13 +93,13 @@ class Campaigns_Page extends Admin_Page {
 					echo html()->e( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-name' ], __( 'Description' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html__( 'Description' ) ),
 						html()->textarea( [
 							'id'   => 'campaign-description',
 							'name' => 'description',
 							'rows' => 3
 						] ),
-						html()->description( __( 'A description of the assets that will be assigned to this campaign.', 'groundhogg' ) )
+						html()->description( esc_html__( 'A description of the assets that will be assigned to this campaign.', 'groundhogg' ) )
 					] );
 
 					echo html()->e( 'div', [
@@ -107,7 +107,7 @@ class Campaigns_Page extends Admin_Page {
 					], [
 						html()->e( 'label', [
 							'for' => 'is-public'
-						], __( 'Make this campaign publicly available?', 'groundhogg' ), false ),
+						], esc_html__( 'Make this campaign publicly available?', 'groundhogg' ), false ),
 						html()->toggle( [
 							'id'       => 'is-public',
 							'name'     => 'public',
@@ -119,7 +119,7 @@ class Campaigns_Page extends Admin_Page {
 					echo html()->e( 'div', [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
-						'text'  => __( 'Add Campaign', 'groundhogg' )
+						'text'  => esc_html__( 'Add Campaign', 'groundhogg' )
 					] ) );
 
 					?>
@@ -128,7 +128,7 @@ class Campaigns_Page extends Admin_Page {
             </div>
             <div>
 				<?php
-				$this->search_form( __( 'Search Campaigns', 'groundhogg' ) );
+				$this->search_form( esc_html__( 'Search Campaigns', 'groundhogg' ) );
 				?>
 
                 <form id="posts-filter" method="post">
@@ -152,7 +152,7 @@ class Campaigns_Page extends Admin_Page {
 		$slug        = sanitize_title( get_post_var( 'slug' ) );
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
+			return new WP_Error( 'invalid', esc_html__( 'Name can\'t be empty', 'groundhogg' ) );
 		}
 
 		if ( empty( $slug ) ) {
@@ -160,7 +160,7 @@ class Campaigns_Page extends Admin_Page {
 		}
 
 		if ( get_db( 'campaigns' )->exists( [ 'slug' => $slug ] ) ) {
-			return new WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
+			return new WP_Error( 'in_use', esc_html__( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
 		}
 
 		$campaign = new Campaign( [
@@ -171,10 +171,10 @@ class Campaigns_Page extends Admin_Page {
 		] );
 
 		if ( ! $campaign->exists() ) {
-			return new WP_Error( 'oops', __( 'Something went wrong.' ) );
+			return new WP_Error( 'oops', esc_html__( 'Something went wrong.' ) );
 		}
 
-		$this->add_notice( 'new-campaign', __( 'Campaign created!', 'groundhogg' ) );
+		$this->add_notice( 'new-campaign', esc_html__( 'Campaign created!', 'groundhogg' ) );
 
 		return false;
 	}
@@ -198,7 +198,7 @@ class Campaigns_Page extends Admin_Page {
 		$slug        = sanitize_title( get_post_var( 'slug' ) );
 
 		if ( empty( $name ) ) {
-			return new WP_Error( 'invalid', __( 'Name can\'t be empty', 'groundhogg' ) );
+			return new WP_Error( 'invalid', esc_html__( 'Name can\'t be empty', 'groundhogg' ) );
 		}
 
 		if ( empty( $slug ) ) {
@@ -210,12 +210,12 @@ class Campaigns_Page extends Admin_Page {
 
 			// Make sure it's not too long
 			if ( strlen( $slug ) > get_db( 'campaigns' )->get_max_index_length() ) {
-				return new WP_Error( 'too_long', __( sprintf( "Maximum length for a campaign name is %d characters.", get_db( 'campaigns' )->get_max_index_length() ), 'groundhogg' ) );
+				return new WP_Error( 'too_long', sprintf( esc_html__( "Maximum length for a campaign name is %d characters.", 'groundhogg' ), get_db( 'campaigns' )->get_max_index_length() ) );
 			}
 
 			// Check if the slug is in use
 			if ( get_db( 'campaigns' )->exists( [ 'slug' => $slug ] ) ) {
-				return new WP_Error( 'in_use', __( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
+				return new WP_Error( 'in_use', esc_html__( 'The given slug is already in use by another campaign.', 'groundhogg' ) );
 			}
 		}
 

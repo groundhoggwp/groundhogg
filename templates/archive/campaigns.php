@@ -31,7 +31,7 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 
 ?>
     <div class="box">
-        <h1 class="no-margin-top"><?php _e( 'Campaigns Archive', 'groundhogg' ); ?></h1>
+        <h1 class="no-margin-top"><?php esc_html_e( 'Campaigns Archive', 'groundhogg' );; ?></h1>
 		<?php
 
 		$per_page     = 10;
@@ -87,7 +87,7 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 		}, $items );
 
 		?>
-        <p><?php _e( 'Missed an email from us? Browse the campaign archives!', 'groundhogg' ) ?></p>
+        <p><?php esc_html_e( 'Missed an email from us? Browse the campaign archives!', 'groundhogg' ); ?></p>
 		<?php
 
 		include __DIR__ . '/search.php';

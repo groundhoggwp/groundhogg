@@ -100,7 +100,7 @@ if ( $custom_text ): ?>
                                             <tr>
                                                 <td style="padding: 20px" style="<?php echo $footer_css; ?>">
                                                     <p style="<?php echo $apple_link; ?>">
-                                                        <?php _e("This email was sent with" , 'groundhogg'); ?>
+                                                        <?php esc_html_e("This email was sent with" , 'groundhogg');; ?>
                                                         <a href="<?php echo add_query_arg( [
                                                             'utm_source'    => 'email',
                                                             'utm_medium'    => 'footer-link',

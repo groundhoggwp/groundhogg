@@ -8,7 +8,8 @@ namespace Groundhogg\Admin;
  *
  * @package Groundhogg\Admin
  */
-abstract class Admin_Page_Extension {
+abstract class Admin_Page_Extension
+{
 
 	/**
 	 * Page_Extension constructor.

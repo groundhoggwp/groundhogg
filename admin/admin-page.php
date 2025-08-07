@@ -250,7 +250,7 @@ abstract class Admin_Page extends Supports_Errors {
 	public function screen_options() {
 
 		$args = array(
-			'label'   => __( 'Per page', 'groundhogg' ),
+			'label'   => esc_html__( 'Per page', 'groundhogg' ),
 			'default' => 20,
 			'option'  => $this->get_slug() . '_per_page'
 		);
@@ -422,10 +422,10 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function wp_die_no_access() {
 
 		if ( wp_doing_ajax() ) {
-			wp_send_json_error( __( "Invalid permissions.", 'groundhogg' ) );
+			wp_send_json_error( esc_html__( "Invalid permissions.", 'groundhogg' ) );
 		}
 
-		wp_die( __( "Invalid permissions.", 'groundhogg' ), 'No Access!' );
+		wp_die( esc_html__( "Invalid permissions.", 'groundhogg' ), 'No Access!' );
 	}
 
 	/**
@@ -437,7 +437,7 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function search_form( $title = false, $name = 's' ) {
 
 		if ( $title === false ) {
-			$title = sprintf( __( 'Search %s', 'groundhogg' ), $this->get_name() );
+			$title = sprintf( esc_html__( 'Search %s', 'groundhogg' ), $this->get_name() );
 		}
 
 		if ( method_exists( $this, 'get_current_tab' ) ) {
@@ -460,9 +460,9 @@ abstract class Admin_Page extends Supports_Errors {
 
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="<?php echo $name ?>"
-                       value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
+                       value="<?php echo esc_attr( get_request_var( $name ) ); ?>">
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php echo esc_attr( 'Search' ); ?></button>
             </div>
         </form>
 		<?php
@@ -478,10 +478,10 @@ abstract class Admin_Page extends Supports_Errors {
 					'name' => 'include_filters'
 				] );
 			endif; ?>
-            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
             <div style="float: right" class="gh-input-group">
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
             </div>
         </form>
 		<?php
@@ -592,7 +592,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		$primary_object->delete_relationship( $secondary_object );
 
-		$this->add_notice( 'success', __( 'Relationship removed' ) );
+		$this->add_notice( 'success', esc_html__( 'Relationship removed' ) );
 
 		return $primary_object->admin_link();
 	}
@@ -606,7 +606,7 @@ abstract class Admin_Page extends Supports_Errors {
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-				'action' => __( 'Add New', 'groundhogg' ),
+				'action' => esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 			]
 		];
@@ -622,7 +622,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 			$action = wp_parse_args( $action, [
 				'link'    => admin_url(),
-				'action'  => __( 'Add New', 'groundhogg' ),
+				'action'  => esc_html__( 'Add New', 'groundhogg' ),
 				'target'  => '_self',
 				'id'      => '',
 				'classes' => '',
@@ -655,13 +655,13 @@ abstract class Admin_Page extends Supports_Errors {
 		do_action( "groundhogg/admin/{$this->get_slug()}/before" );
 
 		?>
-        <div id="<?php esc_attr_e( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
+        <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
         </div>
         <script>
-          const pageHeader = document.getElementById('<?php esc_attr_e( $this->get_slug() . '-header' ) ?>')
+          const pageHeader = document.getElementById('<?php echo esc_attr( $this->get_slug() . '-header' ) ?>')
           const parent = pageHeader.parentElement // Get the parent element
 
           if (parent) {

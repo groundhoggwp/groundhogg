@@ -41,7 +41,7 @@ class Remove_Tag extends Apply_Tag {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Remove Tag', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Remove Tag', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Remove_Tag extends Apply_Tag {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Remove a tag from a contact.', 'step_description', 'groundhogg' );
+		return esc_html_x( 'Remove a tag from a contact.', 'step_description', 'groundhogg' );
 	}
 
 	/**

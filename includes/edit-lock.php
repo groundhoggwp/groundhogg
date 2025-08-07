@@ -65,7 +65,7 @@ function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 		$error = [
 			'name'          => $user->display_name,
 			/* translators: %s: User's display name. */
-			'text'          => sprintf( __( '%s is currently editing.' ), $user->display_name ),
+			'text'          => esc_html( sprintf( __( '%s is currently editing.' ), $user->display_name ) ),
 			'avatar_src'    => get_avatar_url( $user->ID, array( 'size' => 64 ) ),
 			'avatar_src_2x' => get_avatar_url( $user->ID, array( 'size' => 128 ) ),
 		];
@@ -191,7 +191,7 @@ function maybe_refresh_lock( array $response, array $data, $screen_id ) {
 		$error = [
 			'name'          => $user->display_name,
 			/* translators: %s: User's display name. */
-			'text'          => sprintf( __( '%s is currently editing.' ), $user->display_name ),
+			'text'          => esc_html( sprintf( __( '%s is currently editing.' ), $user->display_name ) ),
 			'avatar_src'    => get_avatar_url( $user->ID, array( 'size' => 64 ) ),
 			'avatar_src_2x' => get_avatar_url( $user->ID, array( 'size' => 128 ) ),
 		];

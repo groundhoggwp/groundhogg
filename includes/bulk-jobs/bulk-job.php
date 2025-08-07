@@ -299,7 +299,7 @@ abstract class Bulk_Job {
 	 * @return string
 	 */
 	protected function get_finished_notice() {
-		return _x( 'Job finished!', 'notice', 'groundhogg' );
+		return esc_html_x( 'Job finished!', 'notice', 'groundhogg' );
 	}
 
 	/**

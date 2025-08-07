@@ -36,7 +36,7 @@ class Settings_Api extends Base_Api {
 			self::NAME_SPACE, '/settings/(?P<group_id>[\w-]+)', array(
 				'args'   => array(
 					'group' => array(
-						'description' => __( 'Settings group ID.', 'groundhogg' ),
+						'description' => esc_html__( 'Settings group ID.', 'groundhogg' ),
 						'type'        => 'string',
 					),
 				),

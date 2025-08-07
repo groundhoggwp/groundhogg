@@ -13,14 +13,14 @@ class Dropdown extends Input {
 
 	public function get_default_args() {
 		return [
-			'label'      => _x( 'Select *', 'form_default', 'groundhogg' ),
+			'label'      => esc_html_x( 'Select *', 'form_default', 'groundhogg' ),
 			'name'       => '',
 			'id'         => '',
 			'class'      => '',
 			'options'    => '',
 			'attributes' => '',
 			'title'      => '',
-			'default'    => _x( 'Please select one', 'form_default', 'groundhogg' ),
+			'default'    => esc_html_x( 'Please select one', 'form_default', 'groundhogg' ),
 			'multiple'   => false,
 			'required'   => false,
 		];

@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+use function Groundhogg\kses_e;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
@@ -24,9 +26,9 @@ function table_chart_report( $args = [] ) {
 	] );
 
 	?>
-    <div class="groundhogg-chart-no-padding <?php esc_attr_e( $args['class'] ); ?>">
-        <h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
-        <div id="<?php esc_attr_e( $args['id'] ); ?>"></div>
+    <div class="groundhogg-chart-no-padding <?php echo esc_attr( $args['class'] ); ?>">
+        <h2 class="title"><?php echo esc_html( $args['title'] ); ?></h2>
+        <div id="<?php echo esc_attr( $args['id'] ); ?>"></div>
     </div>
 	<?php
 }
@@ -45,13 +47,13 @@ function donut_chart_report( $args = [] ) {
 
 	?>
     <div class="groundhogg-chart">
-        <h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
+        <h2 class="title"><?php echo esc_html( $args['title'] ); ?></h2>
         <div style="width: 100%; padding: ">
             <div class="float-left donut-chart-left">
-                <canvas id="<?php esc_attr_e( $args['id'] ); ?>"></canvas>
+                <canvas id="<?php echo esc_attr( $args['id'] ); ?>"></canvas>
             </div>
             <div class="float-left donut-chart-right">
-                <div id="<?php esc_attr_e( $args['id'] ); ?>_legend" class="chart-legend"></div>
+                <div id="<?php echo esc_attr( $args['id'] ); ?>_legend" class="chart-legend"></div>
             </div>
         </div>
     </div>
@@ -75,14 +77,14 @@ function quick_stat_report( $args = [] ) {
 
 	?>
 
-    <div class="groundhogg-quick-stat gh-panel <?php esc_attr_e( $args['class'] ); ?>" id="<?php esc_attr_e( $args['id'] ); ?>">
+    <div class="groundhogg-quick-stat gh-panel <?php echo esc_attr( $args['class'] ); ?>" id="<?php echo esc_attr( $args['id'] ); ?>">
         <div class="gh-panel-header">
             <h2 class="title">
-				<?php esc_html_e( $args['title'] ) ?>
+				<?php echo esc_html( $args['title'] ) ?>
 				<?php if ( $args['info'] ): ?>
                     <span class="gh-has-tooltip dashicons dashicons-info">
                         <span class="gh-tooltip top">
-                            <?php _e( $args['info'] ); ?>
+                            <?php kses_e( $args['info'] ); ?>
                         </span>
                     </span>
 				<?php endif; ?>

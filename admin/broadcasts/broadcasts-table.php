@@ -240,7 +240,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$actions['edit'] = html()->e( 'a', [
 			'href' => admin_page_url( $broadcast->is_email() ? 'gh_emails' : 'gh_sms', [ 'action' => 'edit', $broadcast->get_broadcast_type() => $broadcast->get_object_id() ] )
-		], $broadcast->is_email() ? __( 'Edit email', 'groundhogg' ) : __( 'Edit SMS' ) );
+		], $broadcast->is_email() ? esc_html__( 'Edit email', 'groundhogg' ) : esc_html__( 'Edit SMS' ) );
 
 		// Add query action
 		$query = $broadcast->get_query();
@@ -250,7 +250,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 			$actions['query'] = html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', $query )
-			], __( 'Recipients', 'groundhogg' ) );
+			], esc_html__( 'Recipients', 'groundhogg' ) );
 		}
 
 		if ( ! $broadcast->is_sent() ) {
@@ -258,7 +258,7 @@ class Broadcasts_Table extends WP_List_Table {
 				'href' => action_url( 'cancel', [
 					'broadcast' => $broadcast->get_id(),
 				] ),
-			], __( 'Cancel', 'groundhogg' ) );
+			], esc_html__( 'Cancel', 'groundhogg' ) );
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg/admin/broadcasts/table/handle_row_actions', $actions, $broadcast, $column_name ) );
@@ -389,7 +389,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_send_time( $broadcast ) {
 
-		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ) : __( 'Sending', 'groundhogg' );
+		$prefix = $broadcast->is_sent() ? esc_html__( 'Sent', 'groundhogg' ) : esc_html__( 'Sending', 'groundhogg' );
 
 		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
 	}
@@ -406,12 +406,12 @@ class Broadcasts_Table extends WP_List_Table {
 		$time_remaining = $broadcast->get_estimated_scheduling_time_remaining();
 
 		if ( $time_remaining === false ) {
-			return __( 'Estimating...', 'groundhogg' );
+			return esc_html__( 'Estimating...', 'groundhogg' );
 		}
 
 		$complete = $broadcast->get_percent_scheduled();
 
-		return sprintf( __( '%d%% scheduled with %s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
+		return sprintf( esc_html__( '%d%% scheduled with %s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
 	}
 
 	/**
@@ -439,7 +439,7 @@ class Broadcasts_Table extends WP_List_Table {
 		return html()->e( 'a', [
 			'href'  => $confirm_link,
 			'class' => 'button'
-		], __( 'Finish Scheduling' ) );
+		], esc_html__( 'Finish Scheduling' ) );
 	}
 
 	/**

@@ -334,7 +334,7 @@ class Contacts_Table extends WP_List_Table {
 		$views = [
 			[
 				'id'    => 'all',
-				'name'  => __( 'All', 'groundhogg' ),
+				'name'  => esc_html__( 'All', 'groundhogg' ),
 				'query' => [],
 				'count' => array_sum( wp_list_pluck( $statusCounts, 'contacts' ) )
 			]
@@ -411,8 +411,8 @@ class Contacts_Table extends WP_List_Table {
 				'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
 				/* translators: %s: title */
 				esc_attr( $contact->get_id() ),
-				esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
-				__( 'Quick&nbsp;Edit' )
+				esc_attr( sprintf( __( 'Quick edit "%s" inline' ), $title ) ),
+				esc_html__( 'Quick Edit' )
 			);
 		}
 
@@ -424,7 +424,7 @@ class Contacts_Table extends WP_List_Table {
 				/* translators: %s: title */
 				$editUrl,
 				esc_attr( __( 'Edit' ) ),
-				__( 'Edit' )
+				esc_html__( 'Edit' )
 			);
 		}
 
@@ -434,16 +434,16 @@ class Contacts_Table extends WP_List_Table {
 			default:
 			case Preferences::CONFIRMED:
 			case Preferences::UNCONFIRMED:
-				$status_actions[ Preferences::SPAM ] = __( 'Spam', 'groundhogg' );
+				$status_actions[ Preferences::SPAM ] = esc_html__( 'Spam', 'groundhogg' );
 				break;
 			case Preferences::UNSUBSCRIBED:
 			case Preferences::COMPLAINED:
 			case Preferences::SPAM:
 			case Preferences::HARD_BOUNCE:
-				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+				$status_actions[ Preferences::UNCONFIRMED ] = esc_html__( 'Re-subscribe', 'groundhogg' );
 				break;
 			case Preferences::BLOCKED:
-				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Unblock', 'groundhogg' );
+				$status_actions[ Preferences::UNCONFIRMED ] = esc_html__( 'Unblock', 'groundhogg' );
 				break;
 		}
 
@@ -464,7 +464,7 @@ class Contacts_Table extends WP_List_Table {
 				'data-id' => $contact->get_id(),
 				'class'   => 'delete-contact',
 				'href'    => action_url( 'delete', [ 'contact' => $contact->get_id() ] )
-			], __( 'Delete' ) );
+			], esc_html__( 'Delete' ) );
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );

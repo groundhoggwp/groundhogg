@@ -70,7 +70,7 @@ class Broadcasts_Page extends Admin_Page {
 	protected function add_additional_actions() {
 		if ( get_db( 'broadcasts' )->is_empty() && ! get_db( 'emails' )->exists( [ 'status' => 'ready' ] ) ) {
 
-			notices()->add( 'dne', __( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
+			notices()->add( 'dne', esc_html__( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
 
 			wp_redirect( admin_page_url( 'gh_emails', [ 'action' => 'add' ] ) );
 			die();
@@ -188,7 +188,7 @@ class Broadcasts_Page extends Admin_Page {
 		$actions   = [];
 		$actions[] = [
 			'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
-			'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
+			'action' => esc_html__( 'Schedule Email Broadcast', 'groundhogg' ),
 			'target' => '_self',
 			'id'     => 'gh-schedule-broadcast'
 		];
@@ -196,7 +196,7 @@ class Broadcasts_Page extends Admin_Page {
 		if ( is_sms_plugin_active() ) {
 			$actions[] = [
 				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
-				'action' => __( 'Schedule SMS Broadcast', 'groundhogg' ),
+				'action' => esc_html__( 'Schedule SMS Broadcast', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'gh-schedule-sms-broadcast'
 			];
@@ -215,7 +215,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		$broadcasts_table = new Broadcasts_Table();
 
-		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
+		$this->search_form( esc_html__( 'Search Broadcasts', 'groundhogg' ) );
 		$broadcasts_table->views(); ?>
         <form method="post" class="wp-clearfix">
             <!-- search form -->

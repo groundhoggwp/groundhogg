@@ -12,7 +12,7 @@ class Radio extends Dropdown {
 
 	public function get_default_args() {
 		return [
-			'label'    => _x( 'Radio *', 'form_default', 'groundhogg' ),
+			'label'    => esc_html_x( 'Radio *', 'form_default', 'groundhogg' ),
 			'name'     => '',
 			'id'       => '',
 			'class'    => '',

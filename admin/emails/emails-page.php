@@ -54,7 +54,7 @@ class Emails_Page extends Admin_Page {
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				$admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s", esc_html__( 'Add' ), $admin_title );
 				break;
 			case 'edit':
 				$email_id = Groundhogg\get_request_var( 'email' );
@@ -64,7 +64,7 @@ class Emails_Page extends Admin_Page {
 				}
 
 				$email       = new Email( absint( $email_id ) );
-				$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $email->get_title(), __( 'Edit' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $email->get_title() ), esc_html__( 'Edit' ), $admin_title );
 				break;
 		}
 
@@ -181,12 +181,12 @@ class Emails_Page extends Admin_Page {
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
-				'action' => __( 'Add New', 'groundhogg' ),
+				'action' => esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 			],
 			[
 				'link'   => Groundhogg\admin_page_url( 'gh_broadcasts', $broadcast_args ),
-				'action' => __( 'Broadcast', 'groundhogg' ),
+				'action' => esc_html__( 'Broadcast', 'groundhogg' ),
 				'target' => '_self',
 			],
 		];
@@ -366,20 +366,20 @@ class Emails_Page extends Admin_Page {
 				] );
 			endif; ?>
 
-            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_attr_e( 'Search' ); ?>:</label>
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search' ); ?>:</label>
 
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"
-                       value="<?php esc_attr_e( get_request_var( 's' ) ); ?>">
+                       value="<?php echo esc_attr( get_request_var( 's' ) ); ?>">
 				<?php
 
 				echo html()->dropdown( [
 					'options'           => [
-						'title'   => __( 'Title', 'groundhogg' ),
-						'subject' => __( 'Subject', 'groundhogg' ),
-						'content' => __( 'Content', 'groundhogg' ),
+						'title'   => esc_html__( 'Title', 'groundhogg' ),
+						'subject' => esc_html__( 'Subject', 'groundhogg' ),
+						'content' => esc_html__( 'Content', 'groundhogg' ),
 					],
-					'option_none'       => __( 'Everywhere', 'groundhogg' ),
+					'option_none'       => esc_html__( 'Everywhere', 'groundhogg' ),
 					'option_none_value' => '',
 					'name'              => 'search_columns',
 					'selected'          => get_request_var( 'search_columns' )
@@ -387,7 +387,7 @@ class Emails_Page extends Admin_Page {
 
 				?>
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_attr_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
             </div>
         </form>
 		<?php
