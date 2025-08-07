@@ -4,6 +4,7 @@ namespace Groundhogg\Utils;
 
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_time_format;
+use function Groundhogg\site_locale_is_english;
 
 class DateTimeHelper extends \DateTime {
 
@@ -88,6 +89,48 @@ class DateTimeHelper extends \DateTime {
 		return $this->format( get_option( 'time_format' ) );
 	}
 
+	/**
+	 * The date in internationalized format
+	 *
+	 * @return string
+	 */
+	public function i18n( $format = null ) {
+		if ( is_null( $format ) ) {
+			$format = get_date_time_format();
+		}
+
+		return date_i18n( $format, $this->getTimestamp() );
+	}
+
+	public function time_i18n() {
+		return $this->i18n( get_option( 'time_format' ) );
+	}
+
+	public function date_i18n() {
+		return $this->i18n( get_option( 'date_format' ) );
+	}
+
+	/**
+	 * Display the localized date
+	 *
+	 * @return string
+	 */
+	public function wi18n() {
+
+		if ( site_locale_is_english() ){
+			switch ( $this->whenIs() ) {
+				case 'today':
+					return sprintf( __( 'today at %s', 'groundhogg' ), $this->format( get_time_format() ) );
+				case 'tomorrow':
+					return sprintf( __( 'tomorrow at %s', 'groundhogg' ), $this->format( get_time_format() ) );
+				case 'yesterday':
+					return sprintf( __( 'yesterday at %s', 'groundhogg' ), $this->format( get_time_format() ) );
+			}
+		}
+
+		return $this->i18n();
+	}
+
 	public function human_time_diff( $time = 0 ) {
 
 		if ( ! is_int( $time ) && is_object( $time ) && method_exists( $time, 'getTimestamp' ) ) {
@@ -104,21 +147,6 @@ class DateTimeHelper extends \DateTime {
 	 */
 	public function isLeapYear() {
 		return absint( $this->format( 'L' ) ) === 1;
-	}
-
-	public function i18n() {
-
-		switch ( $this->whenIs() ) {
-			case 'today':
-				return sprintf( __( 'today at %s', 'groundhogg' ), $this->format( get_time_format() ) );
-			case 'tomorrow':
-				return sprintf( __( 'tomorrow at %s', 'groundhogg' ), $this->format( get_time_format() ) );
-			case 'yesterday':
-				return sprintf( __( 'yesterday at %s', 'groundhogg' ), $this->format( get_time_format() ) );
-			default:
-				return $this->wpDateTimeFormat();
-		}
-
 	}
 
 	/**

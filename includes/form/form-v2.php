@@ -761,7 +761,7 @@ class Form_v2 extends Step {
 					$value    = standard_meta_retrieve( $submission, $field );
 					$dateTime = new DateTimeHelper( $value );
 
-					return $dateTime->wpDateFormat();
+					return $dateTime->date_i18n();
 				}
 			],
 
@@ -780,7 +780,7 @@ class Form_v2 extends Step {
 					$value    = standard_meta_retrieve( $submission, $field );
 					$dateTime = new DateTimeHelper( $value );
 
-					return $dateTime->wpDateTimeFormat();
+					return $dateTime->i18n();
 				}
 			],
 
@@ -801,7 +801,7 @@ class Form_v2 extends Step {
 					$value    = standard_meta_retrieve( $submission, $field );
 					$dateTime = new DateTimeHelper( $value );
 
-					return $dateTime->wpTimeFormat();
+					return $dateTime->time_i18n();
 				}
 			],
 

@@ -88,7 +88,7 @@ class Activity extends Base_Object_With_Meta {
 		$date = new DateTimeHelper( $this->get_timestamp() );
 
 		$i18n = [
-			'diff_time' => $date->i18n()
+			'diff_time' => $date->wi18n()
 		];
 
 		switch ( $this->activity_type ) {

@@ -644,7 +644,7 @@ class Event extends Base_Object {
 		if ( $this->is_waiting() && $this->get_time() <= time() ) {
 			$diff_time = __( 'Running now...', 'groundhogg' );
 		} else {
-			$diff_time = sprintf( $this->is_waiting() ? __( 'Runs %s', 'groundhogg' ) : __( 'Ran %s', 'groundhogg' ), $date->i18n() );
+			$diff_time = sprintf( $this->is_waiting() ? __( 'Runs %s', 'groundhogg' ) : __( 'Ran %s', 'groundhogg' ), $date->wi18n() );
 		}
 
 		$array['i18n'] = [

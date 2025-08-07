@@ -63,6 +63,10 @@ add_filter( 'pre_get_ready_cron_jobs', __NAMESPACE__ . '\groundhogg_cron_jobs_go
  */
 function do_replacements_when_rendering_blocks( $content, $parsed_block, \WP_Block $block ) {
 
+	if ( ! isset( $parsed_block['attrs'] ) ) {
+		return $content;
+	}
+
 	if ( isset_not_empty( $parsed_block['attrs'], 'ghReplacements' ) && ! empty( $content ) ) {
 		$content = do_replacements( $content );
 	}
@@ -83,6 +87,10 @@ add_filter( 'render_block', __NAMESPACE__ . '\do_replacements_when_rendering_blo
  * @return string
  */
 function handle_conditional_content_block_filters( $content, $parsed_block, \WP_Block $block ) {
+
+	if ( ! isset( $parsed_block['attrs'] ) ) {
+		return $content;
+	}
 
 	// Content restriction is not enabled for this block
 	if ( ! isset_not_empty( $parsed_block['attrs'], 'ghRestrictContent' )
@@ -763,7 +771,7 @@ function maybe_refresh_local_time( array $response, array $data, $screen_id ) {
 
 	$today   = new DateTimeHelper();
 	$local   = new DateTimeHelper( 'now', $contact->get_time_zone( false ) );
-	$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->wpTimeFormat() : $local->wpDateTimeFormat();
+	$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->time_i18n() : $local->wpDateTimeFormat();
 
 	$display = html()->e( 'abbr', [ 'title' => $local->wpDateTimeFormat() ], $display );
 

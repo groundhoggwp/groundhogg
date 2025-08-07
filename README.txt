@@ -1,4 +1,4 @@
-=== WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
+=== Groundhogg — CRM, Newsletters, and Marketing Automation ===
 
 Contributors: trainingbusinesspros, Groundhogg
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.3.1
+Stable tag: 4.2.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -353,6 +353,9 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.3.2 (2025-08-04) =
+* UPDATED Repository plugin name
 
 = 4.2.3.1 (2025-07-29) =
 * FIXED Missing developer action to filter the WP_Query associated with the query loop block.

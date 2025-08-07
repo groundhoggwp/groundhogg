@@ -102,7 +102,7 @@ use function Groundhogg\is_free_email_provider;
 
 				$today   = new \Groundhogg\Utils\DateTimeHelper();
 				$local   = new \Groundhogg\Utils\DateTimeHelper( 'now', $contact->get_time_zone( false ) );
-				$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->wpTimeFormat() : $local->wpDateTimeFormat();
+				$display = $today->wpDateFormat() === $local->wpDateFormat() ? $local->time_i18n() : $local->i18n();
 
 				?><span><?php
 					printf( __( 'Local time is %s', 'groundhogg' ), html()->e( 'abbr', [
@@ -113,7 +113,7 @@ use function Groundhogg\is_free_email_provider;
             <div id="contact-date-created" class="date-created align-left-space-between"
                  title="<?php esc_attr_e( 'Date created', 'groundhogg' ); ?>">
 				<?php dashicon_e( 'calendar-alt' ); ?><span><?php printf( __( 'Subscribed since %s', 'groundhogg' ), html()->e( 'abbr', [
-						'title' => $contact->get_date_created( true )->wpDateTimeFormat()
+						'title' => $contact->get_date_created( true )->wi18n()
 					], $contact->get_date_created( true )->wpDateFormat() ) ); ?></span>
             </div>
 			<?php

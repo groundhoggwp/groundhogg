@@ -79,7 +79,7 @@ class Page_Visit extends Base_Object {
 		$date = new DateTimeHelper( $this->get_timestamp() );
 
 		$array['i18n'] = [
-			'diff_time' => $date->i18n()
+			'diff_time' => $date->wi18n()
 		];
 
 		return $array;

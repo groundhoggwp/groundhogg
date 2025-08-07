@@ -2661,16 +2661,8 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				$meta[ $field ] = $value;
 				break;
 			case 'tags':
-
-				if ( is_string( $value ) ) {
-					$value = explode( ',', $value );
-				}
-
-				if ( ! is_array( $value ) ) {
-					$value = [ $value ];
-				}
-
-				$tags = array_merge( $tags, $value );
+				$new_tags = array_trim( maybe_explode( $value ) );
+				$tags     = array_merge( $tags, array_values( $new_tags ) );
 				break;
 			case 'meta':
 				$key          = get_key_from_column_label( $column );
@@ -4856,7 +4848,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 
 	$key = wp_generate_password( 20, false );
 
-    add_redaction( $key ) ;
+	add_redaction( $key );
 
 	// Generate the permissions_key
 	get_db( 'permissions_keys' )->add( [
@@ -5782,7 +5774,11 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 
 	$original_meta_value = $meta_value;
 
-	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
+    $property = Properties::instance()->get_field( $meta_key );
+
+    if ( $property ){
+        $meta_value = sanitize_custom_field( $meta_value, $property );
+    } else if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
 		$meta_value = sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {
 		$meta_value = sanitize_text_field( $meta_value );
@@ -8871,11 +8867,11 @@ function get_redaction_replacement( $value ) {
 function add_redaction( string $text ) {
 
 	// we also need to cleverly handle newlines, because "\n" can become <br/> or <p>...</p> and that will cause the exact match to not work :/
-    // I think a cleaver way to handle this would be to split the newlines, and simply redact each single line separately
-    $lines = array_trim( explode( PHP_EOL, $text ) );
-    foreach ( $lines as $line ){
-	    redactor()->add( $line, get_redaction_replacement( $line ) );
-    }
+	// I think a cleaver way to handle this would be to split the newlines, and simply redact each single line separately
+	$lines = array_trim( explode( PHP_EOL, $text ) );
+	foreach ( $lines as $line ) {
+		redactor()->add( $line, get_redaction_replacement( $line ) );
+	}
 }
 
 /**
@@ -8930,7 +8926,7 @@ function redact_meta_table( $table ) {
 	$table_name = $table->table_name;
 	$id_col     = $table->get_object_id_col();
 
-    $time = time();
+	$time = time();
 
 
 	global $wpdb;

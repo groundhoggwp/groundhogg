@@ -289,6 +289,7 @@ class Block_Registry {
 			$query->the_post();
 
 			$template = self::do_post_merge_tags( $content, $props );
+			$template = do_shortcode( $template );
 			$cells[]  = $this->parse_blocks( $template, $context );
 		endwhile;
 
