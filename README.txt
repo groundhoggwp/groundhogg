@@ -355,7 +355,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.2.3.2 (2025-08-04) =
-* UPDATED Repository plugin name
+* UPDATED Repository plugin name.
+* IMPROVED i18n for date and time.
 
 = 4.2.3.1 (2025-07-29) =
 * FIXED Missing developer action to filter the WP_Query associated with the query loop block.
