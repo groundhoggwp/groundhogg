@@ -71,10 +71,10 @@ function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 		];
 
 		if ( $can_take_over ) {
-			$error['take_over'] = add_query_arg( [
+			$error['take_over'] = esc_url_raw( add_query_arg( [
 				'take-over' => 1,
 				'_wpnonce'  => wp_create_nonce( 'take-over' )
-			], $_SERVER['REQUEST_URI'] );
+			], $_SERVER['REQUEST_URI'] ) );
 		}
 
 		// Send the lock error

@@ -17,6 +17,7 @@ use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_any;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_hostname;
 use function Groundhogg\get_master_license;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -1247,7 +1248,7 @@ class Settings_Page extends Admin_Page {
 					'type'        => 'email',
 					'name'        => 'gh_imap_inbox_address',
 					'id'          => 'gh_imap_inbox_address',
-					'placeholder' => 'replies@' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+					'placeholder' => 'replies@' . get_hostname(),
 				],
 			],
 			'gh_imap_inbox_password'                 => [
@@ -1272,7 +1273,7 @@ class Settings_Page extends Admin_Page {
 					'type'        => 'text',
 					'name'        => 'gh_imap_inbox_host',
 					'id'          => 'gh_imap_inbox_host',
-					'placeholder' => 'mail.' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+					'placeholder' => 'mail.' . get_hostname(),
 				],
 			],
 			'gh_imap_inbox_port'                     => [
@@ -1298,7 +1299,7 @@ class Settings_Page extends Admin_Page {
 					'type'        => 'email',
 					'name'        => 'gh_bounce_inbox',
 					'id'          => 'gh_bounce_inbox',
-					'placeholder' => 'bounce@' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+					'placeholder' => 'bounce@' . get_hostname(),
 				],
 			],
 			'gh_bounce_inbox_password'               => [
@@ -1323,7 +1324,7 @@ class Settings_Page extends Admin_Page {
 					'type'        => 'text',
 					'name'        => 'gh_bounce_inbox_host',
 					'id'          => 'gh_bounce_inbox_host',
-					'placeholder' => 'mail.' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+					'placeholder' => 'mail.' . get_hostname(),
 				],
 			],
 			'gh_bounce_inbox_port'                   => [

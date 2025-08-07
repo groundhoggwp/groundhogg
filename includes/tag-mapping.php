@@ -129,7 +129,7 @@ class Tag_Mapping extends Bulk_Job {
         }
 
 		?>
-        <a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
+        <a href="<?php echo esc_url( wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ) ); ?>"
            class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
 		<?php
 	}

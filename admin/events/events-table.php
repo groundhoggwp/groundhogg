@@ -499,32 +499,32 @@ class Events_Table extends WP_List_Table {
                 <a class="gh-button primary small"
                    href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
                 <a class="gh-button secondary small"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'pause' ], $_SERVER['REQUEST_URI'] ), 'pause' ); ?>"><?php printf( _x( 'Pause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'pause' ], $_SERVER['REQUEST_URI'] ), 'pause' ) ); ?>"><?php printf( _x( 'Pause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
                 <a class="gh-button danger small danger-confirm"
-                   href="<?php echo wp_nonce_url( add_query_arg( [
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
 					   'action' => 'cancel',
 					   'status' => Event::WAITING
-				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ) ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
 			<?php endif; ?>
 			<?php if ( $this->get_view() === Event::PAUSED ): ?>
                 <a class="gh-button secondary small"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'unpause' ], $_SERVER['REQUEST_URI'] ), 'unpause' ); ?>"><?php printf( _x( 'Unpause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'unpause' ], $_SERVER['REQUEST_URI'] ), 'unpause' ) ); ?>"><?php printf( _x( 'Unpause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
                 <a class="gh-button danger small danger-confirm"
-                   href="<?php echo wp_nonce_url( add_query_arg( [
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
 					   'action' => 'cancel',
 					   'status' => Event::PAUSED
-				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ) ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
 			<?php endif; ?>
 			<?php if ( $this->get_view() === Event::CANCELLED ): ?>
                 <a class="gh-button secondary small"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], $_SERVER['REQUEST_URI'] ), 'uncancel' ); ?>"><?php printf( _x( 'Uncancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], $_SERVER['REQUEST_URI'] ), 'uncancel' ) ); ?>"><?php printf( _x( 'Uncancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
 			<?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
                 <a class="gh-button danger danger-permanent small"
-                   href="<?php echo wp_nonce_url( add_query_arg( [
+                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
 					   'action' => 'purge',
 					   'status' => $this->get_view()
-				   ], $_SERVER['REQUEST_URI'] ), 'purge' ); ?>"><?php printf( _x( 'Purge %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
+				   ], $_SERVER['REQUEST_URI'] ), 'purge' ) ); ?>"><?php printf( _x( 'Purge %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
 			<?php endif; ?>
         </div>
 		<?php

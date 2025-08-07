@@ -37,7 +37,7 @@ class Imap_Inbox {
 
 		if ( $this->inbox && $this->password ) {
 			?>
-			<a href="<?php echo wp_nonce_url( add_query_arg( 'test_imap_connection', '1', $_SERVER['REQUEST_URI'] ) ); ?>"
+			<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'test_imap_connection', '1', $_SERVER['REQUEST_URI'] ) ) ); ?>"
 			   class="button-secondary"><?php _ex( 'Test IMAP Connection', 'action', 'groundhogg' ) ?></a>
 			<?php
 		}

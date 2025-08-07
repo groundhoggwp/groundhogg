@@ -176,7 +176,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= "\n" . '-- Webserver Configuration' . "\n\n";
 	$return .= 'PHP Version:              ' . PHP_VERSION . "\n";
 	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
-	$return .= 'Webserver Info:           ' . $_SERVER['SERVER_SOFTWARE'] . "\n";
+	$return .= 'Webserver Info:           ' . esc_html( $_SERVER['SERVER_SOFTWARE'] ) . "\n";
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
 
@@ -321,7 +321,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function groundhogg_get_ns_records() {
-	$ns = @dns_get_record( str_replace( 'www.', '', $_SERVER['hostname'] ), DNS_NS );
+	$ns = @dns_get_record( \Groundhogg\get_hostname(), DNS_NS );
 
 	return wp_list_pluck( $ns, 'target' );
 }
@@ -364,7 +364,7 @@ function groundhogg_get_host() {
 		$host = 'Closte';
 	} else {
 		// Adding a general fallback for data gathering
-		$host = 'DBH: ' . DB_HOST . ', SRV: ' . $_SERVER['SERVER_NAME'];
+		$host = 'DBH: ' . DB_HOST . ', SRV: ' . sanitize_text_field( $_SERVER['SERVER_NAME'] );
 	}
 
 	return $host;

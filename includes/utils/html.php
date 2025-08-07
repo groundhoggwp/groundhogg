@@ -241,7 +241,7 @@ class HTML {
 			<?php foreach ( $tabs as $id => $tab ):
 
 				echo html()->e( 'a', [
-					'href'  => esc_url( add_query_arg( [ 'tab' => $id ], $_SERVER['REQUEST_URI'] ) ),
+					'href'  => add_query_arg( [ 'tab' => $id ], $_SERVER['REQUEST_URI'] ),
 					'class' => 'nav-tab' . ( $active_tab == $id ? ' nav-tab-active' : '' ),
 //					'id'    => $id,
 				], $tab );
