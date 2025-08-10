@@ -65,6 +65,7 @@ if ( ! $campaign->exists() ) {
 
 include_once __DIR__ . '/../managed-page.php';
 
+/* translators: 1: campaign name */
 managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_name() ), 'archive' );
 
 ?>
@@ -72,7 +73,10 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
         <p>
             <a href="<?php echo esc_url( managed_page_url( 'campaigns' ) ); ?>">&larr; <?php esc_html_e( 'All campaign archives', 'groundhogg' ); ?></a>
         </p>
-        <h1 class="no-margin-top"><?php printf( __( '%s Archive', 'groundhogg' ), $campaign->get_name() ); ?></h1>
+        <h1 class="no-margin-top"><?php
+            /* translators: 1: campaign name */
+		    echo esc_html( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_name() ) );
+            ?></h1>
 		<?php
 
 		$per_page     = 10;
@@ -152,11 +156,13 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 
 		if ( $search ):
 			?>
-            <p><?php printf( _n(  'We found %s email in this archive matching %s.', 'We found %s emails in this archive matching %s.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) ) ); ?></p>
+            <p><?php /* translators: 1: number of emails found, 2: search term */
+				printf( esc_html( _n( 'We found %$1s email in this archive matching %2$s.', 'We found %1$s emails in this archive matching %2$s.', $total_items, 'groundhogg' ) ), bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) ) ); ?></p>
 		    <?php
 		else:
 			?>
-            <p><?php printf( _n( 'There is %s email in this archive.', 'There are %s emails in this archive.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ) ); ?></p>
+            <p><?php /* translators: 1: number of emails in the archive */
+				printf( esc_html( _n( 'There is %s email in this archive.', 'There are %s emails in this archive.', $total_items, 'groundhogg' ) ), bold_it( number_format_i18n( $total_items ) ) ); ?></p>
 		    <?php
 		endif;
 

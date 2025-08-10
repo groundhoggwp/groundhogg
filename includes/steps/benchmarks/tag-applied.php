@@ -90,8 +90,8 @@ class Tag_Applied extends Benchmark {
 				'style'       => [ 'vertical-align' => 'middle' ],
 				'options'     =>
 					[
-						'any' => __( 'Any of...' ),
-						'all' => __( 'All of...' ),
+						'any' => __( 'Any of...', 'groundhogg' ),
+						'all' => __( 'All of...', 'groundhogg' ),
 					]
 			] ),
 			html()->dropdown( [

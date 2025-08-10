@@ -2,17 +2,13 @@
 
 namespace Groundhogg\Form;
 
-use Groundhogg\Form\Fields\Birthday;
-use Groundhogg\Form\Fields\Custom_Field;
-use Groundhogg\Step;
-use function Groundhogg\admin_page_url;
-use function Groundhogg\array_to_atts;
-use function Groundhogg\do_replacements;
-use function Groundhogg\encrypt;
 use Groundhogg\Form\Fields\Address;
+use Groundhogg\Form\Fields\Birthday;
 use Groundhogg\Form\Fields\Checkbox;
 use Groundhogg\Form\Fields\Column;
+use Groundhogg\Form\Fields\Custom_Field;
 use Groundhogg\Form\Fields\Date;
+use Groundhogg\Form\Fields\Dropdown;
 use Groundhogg\Form\Fields\Email;
 use Groundhogg\Form\Fields\Field;
 use Groundhogg\Form\Fields\File;
@@ -24,18 +20,20 @@ use Groundhogg\Form\Fields\Phone;
 use Groundhogg\Form\Fields\Radio;
 use Groundhogg\Form\Fields\Recaptcha;
 use Groundhogg\Form\Fields\Row;
-use Groundhogg\Form\Fields\Dropdown;
 use Groundhogg\Form\Fields\Submit;
 use Groundhogg\Form\Fields\Terms;
 use Groundhogg\Form\Fields\Text;
 use Groundhogg\Form\Fields\Textarea;
 use Groundhogg\Form\Fields\Time;
+use Groundhogg\Step;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\array_to_atts;
+use function Groundhogg\do_replacements;
+use function Groundhogg\encrypt;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
-use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\Plugin;
 use function Groundhogg\managed_page_url;
 
 /**
@@ -154,7 +152,7 @@ class Form implements \JsonSerializable {
 	public function get_iframe_embed_code() {
 		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', $this->step->get_slug() ) );
 
-		return sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
+		return '<script id="groundhogg_form_' . esc_attr( $this->get_id() ) . '" type="text/javascript" src="' . esc_url( $form_iframe_url ) . '"></script>';
 	}
 
 	public function get_submission_url() {
@@ -191,7 +189,7 @@ class Form implements \JsonSerializable {
 			'name'    => $this->step->get_step_title()
 		];
 
-		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		$form .= "<form " . array_to_atts( $atts ) . ">";
 
 		if ( ! empty( $this->attributes['id'] ) ) {
 			$form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
@@ -250,7 +248,7 @@ class Form implements \JsonSerializable {
 			$atts['action'] = $this->get_submission_url();
 		}
 
-		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		$form .= '<form ' . array_to_atts( $atts ) . '>';
 
 		if ( ! empty( $this->attributes['id'] ) ) {
 			$form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
@@ -264,10 +262,10 @@ class Form implements \JsonSerializable {
 		$form .= '</form>';
 
 		if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ) {
-			$form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_page_url( 'gh_funnels', [
-				'action' => 'edit',
-				'funnel' => $this->step->get_funnel_id(),
-			], $this->step->get_id() ), __( 'Edit Form' ) );
+			$form .= "<div class='gh-form-edit-link'><a href='" . esc_url( admin_page_url( 'gh_funnels', [
+					'action' => 'edit',
+					'funnel' => $this->step->get_funnel_id(),
+				], $this->step->get_id() ) ) . "'>" . esc_html__( 'Edit Form', 'groundhogg' ) . "</a></div>";
 		}
 
 		$form .= '</div>';

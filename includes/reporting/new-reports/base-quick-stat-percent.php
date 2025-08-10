@@ -59,6 +59,7 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 					'color'     => $arrow['color'],
 				],
 				'percent' => absint( $percentage ) . '%',
+				/* translators: %s: the previous time range, like "30 days" */
 				'text'    => sprintf( __( '.vs prev %s', 'groundhogg' ), $this->get_human_time_diff() )
 			],
 			'data'    => [

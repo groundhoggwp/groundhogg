@@ -84,6 +84,7 @@ class Delete_Objects extends Task {
 
 		// No more contacts to delete
 		if ( empty( $items ) ) {
+			/* translators: %s: the number of items deleted */
 			$message = sprintf( __( '%s items have been deleted!', 'groundhogg' ), bold_it( _nf( $this->items ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 			return true;

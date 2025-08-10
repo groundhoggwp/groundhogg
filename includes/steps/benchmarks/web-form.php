@@ -114,21 +114,21 @@ class Web_Form extends Benchmark {
             </div>
             <div class="inside">
                 <div class="display-flex column gap-10">
-                    <label><?php printf( '%s:', __( 'Shortcode' ) ); ?></label>
+                    <label><?php printf( '%s:', __( 'Shortcode', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Iframe' ) ); ?></label>
+                    <label><?php printf( '%s:', __( 'Iframe', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
+                    <label><?php printf( '%s:', __( 'Hosted', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
@@ -138,9 +138,9 @@ class Web_Form extends Benchmark {
                 </div>
                 <p>
 					<?php echo Plugin::$instance->utils->html->modal_link( array(
-						'title'              => __( 'Preview' ),
-						'text'               => __( 'Preview' ),
-						'footer_button_text' => __( 'Close' ),
+						'title'              => __( 'Preview', 'groundhogg' ),
+						'text'               => __( 'Preview', 'groundhogg' ),
+						'footer_button_text' => __( 'Close', 'groundhogg' ),
 						'id'                 => '',
 						'class'              => 'gh-button secondary',
 						'source'             => $form_url,
@@ -305,7 +305,7 @@ class Web_Form extends Benchmark {
 	}
 
 	public function generate_step_title( $step ) {
-		return sprintf( __( 'Submits %s' ), bold_it( $this->get_setting( 'form_name' ) ) );
+		return sprintf( __( 'Submits %s', 'groundhogg' ), bold_it( $this->get_setting( 'form_name' ) ) );
 	}
 
 	protected function get_the_contact() {

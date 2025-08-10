@@ -53,7 +53,7 @@ class Pointers {
 						'content'  => sprintf( '<h3> %s </h3><p> %s </p>%s',
 							__( $ptr['title'], 'plugindomain' ),
 							__( $ptr['content'], 'plugindomain' ),
-							! $ptr['show_next'] ? '' : html()->wrap( html()->wrap( __( 'Next' ), 'a', [
+							! $ptr['show_next'] ? '' : html()->wrap( html()->wrap( esc_html__( 'Next', 'groundhogg' ), 'a', [
 								'href'  => 'javascript:void(0)',
 								'class' => 'pointer-next button button-primary',
 								'style' => [ 'float' => 'right' ]

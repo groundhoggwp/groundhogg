@@ -353,7 +353,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	 * @return string
 	 */
 	public function get_name() {
-		return esc_html__( 'Help' );
+		return esc_html__( 'Help', 'groundhogg' );
 	}
 
 	/**
@@ -496,51 +496,51 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$topics = [
 			[
-				'title'       => esc_html__( '💡 New to Groundhogg?', 'groundhogg' ),
-				'description' => esc_html__( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ),
-				'button_text' => esc_html__( 'I need help getting started!', 'groundhogg' ),
+				'title'       => __( '💡 New to Groundhogg?', 'groundhogg' ),
+				'description' => __( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ),
+				'button_text' => __( 'I need help getting started!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/1-getting-started'
 			],
 			[
-				'title'       => esc_html__( '🏗️ Building something?', 'groundhogg' ),
-				'description' => esc_html__( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ),
-				'button_text' => esc_html__( 'I need help with development!', 'groundhogg' ),
+				'title'       => __( '🏗️ Building something?', 'groundhogg' ),
+				'description' => __( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ),
+				'button_text' => __( 'I need help with development!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/141-developers'
 			],
 			[
-				'title'       => esc_html__( '🙋‍♂️ Have a question?', 'groundhogg' ),
-				'description' => esc_html__( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ),
-				'button_text' => esc_html__( 'I have a question!', 'groundhogg' ),
+				'title'       =>__( '🙋‍♂️ Have a question?', 'groundhogg' ),
+				'description' =>__( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ),
+				'button_text' =>__( 'I have a question!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/6-faqs'
 			],
 			[
-				'title'       => esc_html__( '🔌 Installing an extension?', 'groundhogg' ),
-				'description' => esc_html__( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ),
-				'button_text' => esc_html__( 'I need help with an extension!', 'groundhogg' ),
+				'title'       => __( '🔌 Installing an extension?', 'groundhogg' ),
+				'description' => __( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ),
+				'button_text' => __( 'I need help with an extension!', 'groundhogg' ),
 				'button_link' => 'https://help.groundhogg.io/collection/24-extensions'
 			],
 			[
-				'title'       => esc_html__( '💬 Didn\'t find what you need?', 'groundhogg' ),
-				'description' => esc_html__( 'If you didn\'t find what you were looking for then you can join our support group and ask the community!', 'groundhogg' ),
-				'button_text' => esc_html__( 'Join the community!', 'groundhogg' ),
+				'title'       => __( '💬 Didn\'t find what you need?', 'groundhogg' ),
+				'description' => __( 'If you didn\'t find what you were looking for then you can join our support group and ask the community!', 'groundhogg' ),
+				'button_text' => __( 'Join the community!', 'groundhogg' ),
 				'button_link' => 'https://www.groundhogg.io/fb/'
 			],
 			[
-				'title'       => esc_html__( '🧑‍💻 Having a technical issue?', 'groundhogg' ),
-				'description' => esc_html__( 'Use the troublshooter to diagnose potential issues on your site.', 'groundhogg' ),
-				'button_text' => esc_html__( 'Start the troubleshooter!', 'groundhogg' ),
+				'title'       => __( '🧑‍💻 Having a technical issue?', 'groundhogg' ),
+				'description' => __( 'Use the troublshooter to diagnose potential issues on your site.', 'groundhogg' ),
+				'button_text' => __( 'Start the troubleshooter!', 'groundhogg' ),
 				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'issues-found' )
 			],
 			[
-				'title'       => esc_html__( '🛟 Need technical help?', 'groundhogg' ),
-				'description' => esc_html__( 'If you require technical assistance then the best option is to open a support ticket with our advanced support team.', 'groundhogg' ),
-				'button_text' => esc_html__( 'Open a ticket!', 'groundhogg' ),
+				'title'       => __( '🛟 Need technical help?', 'groundhogg' ),
+				'description' => __( 'If you require technical assistance then the best option is to open a support ticket with our advanced support team.', 'groundhogg' ),
+				'button_text' => __( 'Open a ticket!', 'groundhogg' ),
 				'button_link' => admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ], 'ticket' )
 			],
 			[
-				'title'       => esc_html__( '🔓 Send login access', 'groundhogg' ),
-				'description' => esc_html__( 'Securely send administrative login access to the Groundhogg support team. This will create an administrative user and provide the support team with a temporary login URL.', 'groundhogg' ),
-				'button_text' => esc_html__( 'Send access!', 'groundhogg' ),
+				'title'       => __( '🔓 Send login access', 'groundhogg' ),
+				'description' => __( 'Securely send administrative login access to the Groundhogg support team. This will create an administrative user and provide the support team with a temporary login URL.', 'groundhogg' ),
+				'button_text' => __( 'Send access!', 'groundhogg' ),
 				'button_link' => action_url( 'send_support_access' )
 			],
 		]
@@ -551,14 +551,14 @@ class Help_Page extends Tabbed_Admin_Page {
 			<?php foreach ( $topics as $topic ): ?>
                 <div class="gh-panel">
                     <div class="gh-panel-header">
-                        <h2><?php echo $topic['title'] ?></h2>
+                        <h2><?php echo esc_html( $topic['title'] ) ?></h2>
                     </div>
                     <div class="inside">
-                        <p><?php echo $topic['description'] ?></p>
-						<?php echo html()->e( 'a', [
+                        <p><?php echo esc_html( $topic['description'] ); ?></p>
+	                    <?php html( 'a', [
 							'class' => 'gh-button secondary',
 							'href'  => $topic['button_link']
-						], $topic['button_text'] ) ?>
+	                    ], esc_html( $topic['button_text'] ) ) ?>
                     </div>
                 </div>
 			<?php endforeach; ?>
@@ -610,7 +610,7 @@ class Help_Page extends Tabbed_Admin_Page {
 			return $response;
 		}
 
-		$this->add_notice( 'sent', 'Login access has be securely delivered to Groundhogg support.' );
+		$this->add_notice( 'sent', esc_html__( 'Login access has be securely delivered to Groundhogg support.', 'groundhogg' ) );
 
 		return true;
 	}

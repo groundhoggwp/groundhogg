@@ -33,7 +33,7 @@ class Plugin_Api extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Use a custom PHP script to add/move the contact within the funnel.' );
+		return __( 'Use a custom PHP script to add/move the contact within the funnel.', 'groundhogg' );
 	}
 
 	public function get_sub_group() {

@@ -92,21 +92,21 @@ abstract class Table extends WP_List_Table {
 	 *
 	 * @return void
 	 */
-	protected function column_cb( $identity ) {
+	protected function column_cb( $item ) {
 
 		printf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],
-			$identity->get_id()
+			esc_attr( $this->_args['singular'] ),
+			esc_attr( $item->get_id() )
 		);
 
-		if ( method_exists( $identity, 'get_title' ) ):
+		if ( method_exists( $item, 'get_title' ) ):
 			?>
-            <label for="cb-select-<?php echo $identity->ID; ?>">
+            <label for="cb-select-<?php echo esc_attr( item->ID ); ?>">
 				<span class="screen-reader-text">
 				<?php
 				/* translators: %s: Post title. */
-				printf( esc_html__( 'Select %s' ), esc_html( $identity->get_title() ) );
+				printf( esc_html__( 'Select %s', 'groundhogg' ), esc_html( $item->get_title() ) );
 				?>
 				</span>
             </label>
@@ -116,8 +116,8 @@ abstract class Table extends WP_List_Table {
 				<?php
 				printf(
 				/* translators: Hidden accessibility text. %s: Post title. */
-					__( '&#8220;%s&#8221; is locked' ),
-					esc_html( $identity->get_title() )
+					esc_html__( '"%s" is locked', 'groundhogg' ),
+					esc_html( $item->get_title() )
 				);
 				?>
 				</span>
@@ -302,19 +302,19 @@ abstract class Table extends WP_List_Table {
 			'total_pages' => $total_pages,
 		) );
 
-		$json = wp_json_encode( [
+		$json = [
 			'total_items'           => $total,
 			'total_items_formatted' => _nf( $total ),
 			'items'                 => $this->items,
 			'per_page'              => $per_page,
 			'total_pages'           => $total_pages,
 			'query'                 => $query
-		] );
+		];
 
 		add_action( 'admin_footer', function () use ( $json ) {
 			?>
             <script>
-              const CurrentTable = <?php echo $json ?>
+              const CurrentTable = <?php echo wp_json_encode( $json ) ?>
             </script>
 			<?php
 		} );
@@ -393,9 +393,10 @@ abstract class Table extends WP_List_Table {
 
 		$classes = implode( ' ', $classes );
 
-		echo "<tr id=\"$item->ID\" class=\"$classes\">";
+		?>
+        <tr id="<?php echo esc_attr( $item->ID ); ?>" class="<?php esc_attr( $classes ); ?>"><?php
 		$this->single_row_columns( $item );
-		echo '</tr>';
+		?></tr><?php
 	}
 
 }

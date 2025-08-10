@@ -20,10 +20,10 @@ class Table_Form_Activity extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Name', 'groundhogg' ),
-			__( 'Views', 'groundhogg' ),
-			__( 'Impressions', 'groundhogg' ),
-			__( 'Submissions', 'groundhogg' ),
+			esc_html__( 'Name', 'groundhogg' ),
+			esc_html_x( 'Views', 'stats', 'groundhogg' ),
+			esc_html_x( 'Impressions', 'stats', 'groundhogg' ),
+			esc_html_x( 'Submissions', 'stats', 'groundhogg' ),
 		];
 	}
 

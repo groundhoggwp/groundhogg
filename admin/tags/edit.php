@@ -44,7 +44,7 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
         <tr class="form-field term-description-wrap">
             <th scope="row"><label for="description"><?php echo esc_html( _x( 'Description', 'tag description', 'groundhogg' ) ); ?></label></th>
             <td><textarea name="description" id="description" rows="5" cols="50"
-                          class="large-text"><?php echo $tag->tag_description; ?></textarea>
+                          class="large-text"><?php echo esc_html( $tag->tag_description ); ?></textarea>
                 <p class="description"><?php esc_html_e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ) ?>
                     .</p>
             </td>
@@ -53,10 +53,11 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
 		<?php do_action( 'groundhogg/admin/tags/edit/form', $id ); ?>
     </table>
     <div class="edit-tag-actions">
-		<?php submit_button( esc_html__( 'Update' ), 'primary', 'update', false ); ?>
+		<?php submit_button( esc_html__( 'Update' , 'groundhogg' ), 'primary', 'update', false ); ?>
         <span id="delete-link">
-            <a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag=' . $id ), 'delete' ) ?>">
-                <?php esc_html_e( 'Delete' ); ?>
-            </a></span>
+            <a class="delete" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag=' . $id ), 'delete' ) ) ?>">
+                <?php esc_html_e( 'Delete', 'groundhogg' ); ?>
+            </a>
+        </span>
     </div>
 </form>

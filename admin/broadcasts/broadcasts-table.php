@@ -13,6 +13,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_request_uri;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -240,7 +241,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$actions['edit'] = html()->e( 'a', [
 			'href' => admin_page_url( $broadcast->is_email() ? 'gh_emails' : 'gh_sms', [ 'action' => 'edit', $broadcast->get_broadcast_type() => $broadcast->get_object_id() ] )
-		], $broadcast->is_email() ? esc_html__( 'Edit email', 'groundhogg' ) : esc_html__( 'Edit SMS' ) );
+		], $broadcast->is_email() ? esc_html__( 'Edit email', 'groundhogg' ) : esc_html__( 'Edit SMS' , 'groundhogg' ) );
 
 		// Add query action
 		$query = $broadcast->get_query();
@@ -337,7 +338,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$html .= sprintf(
 			"%s: <strong>%s</strong><br/>",
-			_x( "Sent", 'stats', 'groundhogg' ),
+			esc_html_x( "Sent", 'stats', 'groundhogg' ),
 			contact_filters_link( _nf( $stats['sent'] ), [
 				[
 					[
@@ -353,7 +354,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 			$html .= sprintf(
 				"%s: <strong>%s</strong><br/>",
-				_x( "Opened", 'stats', 'groundhogg' ),
+				esc_html_x( "Opened", 'stats', 'groundhogg' ),
 				contact_filters_link( _nf( $stats['opened'] ), [
 					[
 						[
@@ -367,7 +368,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$html .= sprintf(
 			"%s: <strong>%s</strong><br/>",
-			_x( "Clicked", 'stats', 'groundhogg' ),
+			esc_html_x( "Clicked", 'stats', 'groundhogg' ),
 			contact_filters_link( _nf( $stats['clicked'] ), [
 				[
 					[
@@ -411,7 +412,8 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$complete = $broadcast->get_percent_scheduled();
 
-		return sprintf( esc_html__( '%d%% scheduled with %s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
+		/* translators: 1: the percentage scheduled 2: the time remaining */
+		return sprintf( esc_html__( '%1$d%% scheduled with %2$s remaining', 'groundhogg' ), $complete, human_time_diff( time(), time() + $time_remaining ) );
 	}
 
 	/**
@@ -439,7 +441,7 @@ class Broadcasts_Table extends WP_List_Table {
 		return html()->e( 'a', [
 			'href'  => $confirm_link,
 			'class' => 'button'
-		], esc_html__( 'Finish Scheduling' ) );
+		], esc_html__( 'Finish Scheduling' , 'groundhogg' ) );
 	}
 
 	/**
@@ -452,8 +454,9 @@ class Broadcasts_Table extends WP_List_Table {
 			return html()->e( 'a', [
 				'href' => add_query_arg( [
 					'related' => [ 'ID' => $campaign->ID, 'type' => 'campaign' ]
-				], $_SERVER['REQUEST_URI'] ),
-			], $campaign->get_name() );
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				], get_request_uri() ),
+			], esc_html( $campaign->get_name() ) );
 		}, $campaigns ) );
 	}
 

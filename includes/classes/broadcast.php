@@ -257,10 +257,10 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	public function get_title() {
 
 		if ( ! $this->get_object() || ! $this->get_object()->exists() ) {
-			return esc_html__( '(The associated Email or SMS was deleted.)', 'groundhogg' );
+			return esc_html__( 'The associated object was deleted.', 'groundhogg' );
 		}
 
-		return $this->get_object()->get_title();
+		return esc_html( $this->get_object()->get_title() );
 	}
 
 	/**

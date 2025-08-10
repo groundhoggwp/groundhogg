@@ -37,7 +37,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         </div>
         <div class="gh-panel tags-panel">
             <div class="gh-panel-header">
-                <h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php esc_html_e( 'Tags' ); ?></h2>
+                <h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php esc_html_e( 'Tags', 'groundhogg' ); ?></h2>
                 <button type="button" class="toggle-indicator" aria-expanded="true"></button>
             </div>
             <div class="inside">
@@ -84,45 +84,54 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             <div class="gh-col">
                                 <label for="first_name"><?php esc_html_e( 'First Name', 'groundhogg' ) ?></label>
 								<?php
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo html()->input( [
 									'name'        => 'first_name',
-									'title'       => esc_html__( 'First Name' ),
+									'title'       => esc_html__( 'First Name', 'groundhogg' ),
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'value'       => $contact->get_first_name(),
 									'class'       => 'auto-copy regular-text',
-									'placeholder' => esc_html__( 'First Name' )
+									'placeholder' => esc_html__( 'First Name', 'groundhogg' )
 								] );
 								?>
                             </div>
                             <div class="gh-col">
                                 <label for="last_name"><?php esc_html_e( 'Last Name', 'groundhogg' ) ?></label>
 								<?php
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo html()->input( [
 									'name'        => 'last_name',
-									'title'       => esc_html__( 'Last Name' ),
+									'title'       => esc_html__( 'Last Name', 'groundhogg' ),
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'value'       => $contact->get_last_name(),
 									'class'       => 'auto-copy regular-text',
-									'placeholder' => esc_html__( 'Last Name' )
+									'placeholder' => esc_html__( 'Last Name', 'groundhogg' )
 								] );
 								?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
-                                <label for="email"><?php esc_html_e( 'Email Address', 'groundhogg' ) ?></label> <?php
+                                <label for="email"><?php esc_html_e( 'Email Address', 'groundhogg' ) ?></label><?php
+	                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo html()->input( [
 									'type'  => 'email',
 									'id'    => 'email',
 									'name'  => 'email',
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'value' => $contact->get_email(),
 								] ); ?>
                             </div>
                             <div class="gh-col">
                                 <label for="optin_status"><?php esc_html_e( 'Opt-in Status', 'groundhogg' ) ?></label>
 								<?php
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo html()->dropdown( [
 									'name'     => 'optin_status',
 									'title'    => esc_html__( 'Opt-in Status', 'groundhogg' ),
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'selected' => $contact->get_optin_status(),
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'options'  => Preferences::get_preference_names()
 								] );
 								?>
@@ -141,7 +150,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 												'id'          => 'primary_phone',
 												'name'        => 'primary_phone',
 												'value'       => $contact->get_meta( 'primary_phone' ),
-												'placeholder' => esc_html__( '+1 (555) 555-5555', 'groundhogg' )
+												'placeholder' => esc_html_x( '+1 (555) 555-5555', 'phone number', 'groundhogg' )
 
 											] ); ?>
 											<?php echo html()->input( [
@@ -152,7 +161,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 												'style'       => [
 													'width' => '60px'
 												],
-												'placeholder' => esc_html__( '1234', 'groundhogg' )
+												'placeholder' => esc_html_x( '1234', 'phone extension', 'groundhogg' )
 											] ); ?>
                                         </div>
                                     </div>
@@ -392,16 +401,16 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <tbody>
                         <tr>
                             <th><?php echo esc_html_x( 'Agreed To Terms', 'contact_record', 'groundhogg' ); ?></th>
-                            <td><?php echo ( $contact->get_meta( 'terms_agreement' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'terms_agreement_date' ) ) ): '&#x2014;'; ?></td>
+                            <td><?php echo ( $contact->get_meta( 'terms_agreement' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' , 'groundhogg' ), $contact->get_meta( 'terms_agreement_date' ) ) ): '&#x2014;'; ?></td>
                         </tr>
 						<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
                             <tr>
                                 <th><?php esc_html_e( 'Data Processing Consent' ); ?></th>
-                                <td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'gdpr_consent_date' ) ) ): '&#x2014;'; ?></td>
+                                <td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' , 'groundhogg' ), $contact->get_meta( 'gdpr_consent_date' ) ) ): '&#x2014;'; ?></td>
                             </tr>
                             <tr>
                                 <th><?php esc_html_e( 'Marketing Consent' ); ?></th>
-                                <td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'marketing_consent_date' ) ) ): '&#x2014;'; ?></td>
+                                <td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' , 'groundhogg' ), $contact->get_meta( 'marketing_consent_date' ) ) ): '&#x2014;'; ?></td>
                             </tr>
 						<?php endif; ?>
                         </tbody>

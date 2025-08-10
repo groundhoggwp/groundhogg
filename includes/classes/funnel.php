@@ -115,11 +115,13 @@ class Funnel extends Base_Object_With_Meta {
 
 			?>
             <div class="step-preview">
-                <div class="step-icon <?php echo $step_type->get_type() ?> <?php echo $step_type->get_group() ?>">
+                <div class="step-icon <?php echo esc_attr( $step_type->get_type() ); ?> <?php echo esc_attr( $step_type->get_group() ) ?>">
 					<?php if ( $step_type->icon_is_svg() ): ?>
-						<?php echo $step_type->get_icon_svg(); ?>
+						<?php
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated SVG
+                        echo $step_type->get_icon_svg(); ?>
 					<?php else: ?>
-                        <img src="<?php echo esc_url( $step_type->get_icon() ); ?>">
+                        <img src="<?php echo esc_url( $step_type->get_icon() ); ?>" alt="<?php echo esc_attr( $step_type->get_name() ); ?>">
 					<?php endif; ?>
                 </div>
                 <div class="gh-tooltip top">
@@ -130,22 +132,20 @@ class Funnel extends Base_Object_With_Meta {
 
 		}
 
-		if ( ! empty( $allSteps ) ) {
-			?>
+		if ( ! empty( $allSteps ) ) : ?>
             <div class="step-preview">
                 <div class="step-icon more">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
                         <path fill="#000" d="M4 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
                     </svg>
                     <div class="gh-tooltip top">
-						<?php printf( _n( '%d more step...', '%d more steps', count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ?>
+						<?php
+                        /* translators: %d: the number of steps remaining */
+                        echo esc_html( sprintf( _n( '%d more step...', '%d more steps', count( $allSteps ), 'groundhogg' ), count( $allSteps ) ) ) ?>
                     </div>
                 </div>
             </div>
-			<?php
-		}
-
-		?>
+			<?php endif; ?>
         </div><?php
 
 	}

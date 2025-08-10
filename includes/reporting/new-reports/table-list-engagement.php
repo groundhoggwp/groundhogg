@@ -2,28 +2,19 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
-use Groundhogg\Event;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Preferences;
-use Groundhogg\Tag_Mapping;
 use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
-use function Groundhogg\get_db;
 use function Groundhogg\html;
-use function Groundhogg\key_to_words;
 use function Groundhogg\Ymd;
-use function Groundhogg\Ymd_His;
 
 class Table_List_Engagement extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Status', 'groundhogg' ),
-			__( 'Contacts', 'groundhogg' ),
+			esc_html__( 'Status', 'groundhogg' ),
+			esc_html__( 'Contacts', 'groundhogg' ),
 		];
 	}
 
@@ -50,7 +41,7 @@ class Table_List_Engagement extends Base_Table_Report {
 		$rows = [];
 
 		$rows[] = [
-			__( 'Engaged' ),
+			__( 'Engaged', 'groundhogg' ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $engaged_filters )
@@ -63,7 +54,7 @@ class Table_List_Engagement extends Base_Table_Report {
 		] );
 
 		$rows[] = [
-			__( 'Unengaged' ),
+			__( 'Unengaged', 'groundhogg' ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', [
 					'exclude_filters' => base64_json_encode( $engaged_filters )
@@ -85,7 +76,7 @@ class Table_List_Engagement extends Base_Table_Report {
 		] );
 
 		$rows[] = [
-			__( 'Marketable' ),
+			__( 'Marketable', 'groundhogg' ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $marketable_filters )
@@ -107,7 +98,7 @@ class Table_List_Engagement extends Base_Table_Report {
 		] );
 
 		$rows[] = [
-			__( 'Un-Marketable' ),
+			__( 'Un-Marketable', 'groundhogg' ),
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', [
 					'filters' => base64_json_encode( $unmarketable_filters )

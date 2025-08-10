@@ -212,7 +212,7 @@ class Admin_Notification extends Action {
 					<?php
 
 					echo html()->checkbox( [
-						'label'   => esc_html__( 'Don\'t show admin links to the contact record in the notification.' ),
+						'label' => esc_html__( 'Don\'t show admin links to the contact record in the notification.', 'groundhogg' ),
 						'name'    => $this->setting_name_prefix( 'hide_admin_links' ),
 						'checked' => $this->get_setting( 'hide_admin_links' )
 					] );

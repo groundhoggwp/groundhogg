@@ -3,7 +3,6 @@
 namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Properties;
-use function Groundhogg\display_custom_field;
 use function Groundhogg\ensure_array;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
@@ -195,7 +194,7 @@ class Custom_Field extends Input {
 					'multiple'    => $is_multiple,
 					'options'     => $options,
 					'selected'    => $this->get_value(),
-					'option_none' => $is_multiple ? false : __( 'Please select one' ),
+					'option_none' => $is_multiple ? false : __( 'Please select one', 'groundhogg' ),
 				] );
 
 		endswitch;

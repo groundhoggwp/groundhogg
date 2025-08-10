@@ -409,7 +409,7 @@ class Reports_Page extends Tabbed_Admin_Page {
         </div>
         <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="padding-right: 20px">
 			<?php header_icon(); ?>
-            <h1><?php echo $this->get_title(); ?></h1>
+            <h1><?php echo esc_html( $this->get_title() ); ?></h1>
 			<?php $this->range_picker(); ?>
         </div>
 		<?php $this->do_page_tabs(); ?>

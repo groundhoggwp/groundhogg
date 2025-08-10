@@ -1092,7 +1092,7 @@ class Replacements implements \JsonSerializable {
 			'text'               => $short
 				? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
 				: '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
-			'footer_button_text' => esc_html__( 'Insert' ),
+			'footer_button_text' => esc_html__( 'Insert', 'groundhogg' ),
 			'id'                 => 'replacements',
 			'class'              => 'button button-secondary no-padding replacements replacements-button',
 			'source'             => 'footer-replacement-codes',
@@ -2171,7 +2171,7 @@ class Replacements implements \JsonSerializable {
 	 * @return string
 	 */
 	function post_featured_image_plain_text( $args, $contact_id = null ) {
-		return sprintf( '[![%1$s](%2$s)](%3$s)', __( 'Post Featured Image' ), $this->single_post( $args, 'featured_image_url' ), $this->single_post( $args, 'url' ) );
+		return sprintf( '[![%1$s](%2$s)](%3$s)', __( 'Post Featured Image', 'groundhogg' ), $this->single_post( $args, 'featured_image_url' ), $this->single_post( $args, 'url' ) );
 	}
 
 	/**

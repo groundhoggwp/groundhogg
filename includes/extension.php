@@ -185,7 +185,7 @@ abstract class Extension {
                 <p class="display-flex gap-10">
                     <a class="" href="<?php echo esc_url( admin_url('plugins.php') ); ?>"><?php esc_html_e( 'Manage plugins', 'groundhogg' ); ?></a>
                     |
-                    <a class="gh-text danger" href="<?php echo esc_url( $this->deactivate_url() ) ?>"><?php echo esc_html( sprintf( __( 'Deactivate %s' ), $this->get_display_name() ) ); ?></a>
+                    <a class="gh-text danger" href="<?php echo esc_url( $this->deactivate_url() ) ?>"><?php echo esc_html( sprintf( __( 'Deactivate %s', 'groundhogg' ), $this->get_display_name() ) ); ?></a>
                 </p>
 			</div>
 		</div><?php
@@ -609,9 +609,12 @@ abstract class Extension {
 	public function license_status() {
 		$status  = get_array_var( $this->get_extension_details(), 'status' );
 		$status  = html()->e( 'span', [ 'class' => 'status-' . $status ], esc_html( $status === 'valid' ? __( 'valid', 'groundhogg' ) : __( 'invalid', 'groundhogg' ) ) );
+		/* translators: 1: expiry date */
 		$expires = $this->get_expiry() ? sprintf( __( 'expires on %1$s', 'groundhogg' ), html()->e('abbr', [ 'title' => $this->get_expiry() ], $this->get_expiry() ) ) : esc_html__( 'never expires', 'groundhogg' );
 
-		return sprintf( esc_html__( "Your license is %s and %s.", 'groundhogg' ), bold_it( $status ), $expires );
+		/* translators: 1: license status (valid/invalid), 2: expiry string */
+
+		return sprintf( esc_html__( 'Your license is %1$s and %2$s.', 'groundhogg' ), bold_it( $status ), $expires );
 	}
 
 	/**

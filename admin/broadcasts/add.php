@@ -6,6 +6,7 @@ use Groundhogg\Email;
 use GroundhoggSMS\Classes\SMS;
 use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\one_of;
 
 /**
  * This is the page which allows the user to schedule a broadcast.
@@ -26,13 +27,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
+$type = one_of( get_url_var( 'type', 'email' ), [ 'email', 'sms' ] );
 
 if ( $type === 'email' ): ?>
 
     <script>
       const GroundhoggNewBroadcast = <?php echo wp_json_encode( [
-		  'email' => isset_not_empty( $_GET, 'email' ) ? new Email( get_url_var( 'email' ) ) : false,
+		  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		  'email' => isset_not_empty( $_GET, 'email' ) ? new Email( absint( get_url_var( 'email' ) ) ) : false,
 	  ] ); ?>
     </script>
     <div class="gh-panel" style="width: 500px; margin: 20px 0;">
@@ -43,7 +45,8 @@ if ( $type === 'email' ): ?>
 
     <script>
       const GroundhoggNewSmsBroadcast = <?php echo wp_json_encode( [
-		  'sms' => isset_not_empty( $_GET, 'sms' ) ? new SMS( get_url_var( 'sms' ) ) : false,
+	      // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		  'sms' => isset_not_empty( $_GET, 'sms' ) ? new SMS( absint( get_url_var( 'sms' ) ) ) : false,
 	  ] ); ?>
     </script>
     <div class="gh-panel" style="width: 500px; margin: 20px 0;">

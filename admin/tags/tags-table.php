@@ -84,7 +84,7 @@ class Tags_Table extends Table {
 	 * @return string
 	 */
 	protected function column_tag_name( $tag ) {
-		$editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() );
+		$editUrl = esc_url( admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() ) );
 		$html    = "<a class='pill tag' href='$editUrl'>" . esc_html( $tag->get_name() ) . "</a>";
 
 		return $html;
@@ -98,7 +98,7 @@ class Tags_Table extends Table {
 	protected function column_contacts( $tag ) {
 		$count = $tag->get_contact_count();
 
-		return $count ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ) . '">' . _nf( $count ) . '</a>' : '0';
+		return $count ? '<a href="' . esc_url( admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ) ) . '">' . _nf( $count ) . '</a>' : '0';
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Tags_Table extends Table {
 	 * @return string
 	 */
 	protected function column_tag_description( $tag ) {
-		return ! empty( $tag->get_description() ) ? $tag->get_description() : '&#x2014;';
+		return ! empty( $tag->get_description() ) ? esc_html( $tag->get_description() ) : '&#x2014;';
 	}
 
 	/**
@@ -116,10 +116,10 @@ class Tags_Table extends Table {
 	 * @param object $tag         A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
-	 * @return string Text or HTML to be placed inside the column <td>.
+	 * @return void Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $tag, $column_name ) {
-		return do_action( "groundhogg/admin/tags/table/{$column_name}", $tag );
+		do_action( "groundhogg/admin/tags/table/{$column_name}", $tag );
 	}
 
 	/**
@@ -156,12 +156,12 @@ class Tags_Table extends Table {
 			],
 			[
 				'class'   => 'edit',
-				'display' => esc_html__( 'Edit' ),
+				'display' => esc_html__( 'Edit' , 'groundhogg' ),
 				'url'     => $item->admin_link()
 			],
 			[
 				'class'   => 'trash',
-				'display' => esc_html__( 'Delete' ),
+				'display' => esc_html__( 'Delete' , 'groundhogg' ),
 				'url'     => action_url( 'delete', [ 'tag' => $item->get_id() ] )
 			]
 		];

@@ -177,7 +177,7 @@ class Settings_Page extends Admin_Page {
 
 				echo html()->button( [
 					'class' => 'gh-button primary',
-					'text'  => esc_html__( 'Generate new API key' ),
+					'text'  => esc_html__( 'Generate new API key' , 'groundhogg' ),
 					'type'  => 'submit',
 				] )
 
@@ -732,19 +732,19 @@ class Settings_Page extends Admin_Page {
 				'atts'    => [
 					'id'          => 'gh_street_address_2',
 					'name'        => 'gh_street_address_2',
-					'placeholder' => __( 'Unit 42' )
+					'placeholder' => __( 'Unit 42' , 'groundhogg' )
 				],
 			],
 			'gh_city'                                => [
 				'id'      => 'gh_city',
 				'section' => 'business_info',
-				'label'   => __( 'City' ),
+				'label'   => __( 'City' , 'groundhogg' ),
 				'desc'    => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
 					'id'          => 'gh_city',
 					'name'        => 'gh_city',
-					'placeholder' => __( 'Toronto' )
+					'placeholder' => __( 'Toronto' , 'groundhogg' )
 				],
 			],
 			'gh_zip_or_postal'                       => [
@@ -774,7 +774,7 @@ class Settings_Page extends Admin_Page {
 			'gh_country'                             => [
 				'id'      => 'gh_country',
 				'section' => 'business_info',
-				'label'   => __( 'Country' ),
+				'label'   => __( 'Country' , 'groundhogg' ),
 				'desc'    => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
@@ -786,7 +786,7 @@ class Settings_Page extends Admin_Page {
 			'gh_phone'                               => [
 				'id'      => 'gh_phone',
 				'section' => 'business_info',
-				'label'   => __( 'Phone' ),
+				'label'   => __( 'Phone' , 'groundhogg' ),
 				'desc'    => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
@@ -814,7 +814,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Disable the automatic syncing of WordPress users and contacts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'name'  => 'gh_disable_user_sync',
 					'id'    => 'gh_disable_user_sync',
 					'value' => 'on',
@@ -827,7 +827,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'When enabled all user meta will be synced in real time with contact meta if automatic user syncing is enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_sync_user_meta',
 					'id'    => 'gh_sync_user_meta',
 					'value' => 'on',
@@ -840,7 +840,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_uninstall_on_delete[]',
 					'id'    => 'gh_uninstall_on_delete',
@@ -854,7 +854,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_opted_in_stats_collection',
 					'id'    => 'gh_opted_in_stats_collection',
 					'value' => 'on',
@@ -867,7 +867,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will allow anyone with a file access link to view uploads regardless of whether they are logged in.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Allow' ),
+					'label' => __( 'Allow' , 'groundhogg' ),
 					'name'  => 'gh_allow_unrestricted_file_access',
 					'id'    => 'gh_allow_unrestricted_file_access',
 					'value' => 'on',
@@ -880,7 +880,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'This will enabled experimental features in %s and various extensions.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_enable_experimental_features',
 					'id'    => 'gh_enable_experimental_features',
 					'value' => 'on',
@@ -893,7 +893,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will show automatic updates or extensions which may have experimental features.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_get_beta_versions',
 					'id'    => 'gh_get_beta_versions',
 					'value' => 'on',
@@ -930,7 +930,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will let you know if something goes wrong in a flow so you can fix it.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_send_notifications_on_event_failure',
 					'id'    => 'gh_send_notifications_on_event_failure',
 					'value' => 'on',
@@ -963,7 +963,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will attempt to load full JS files instead of minified JS files for debugging.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_script_debug',
 					'id'    => 'gh_script_debug',
 					'value' => 'on',
@@ -976,7 +976,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Use the WordPress core object caching system to improve performance. This may cause strange behaviour on some hosts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_use_object_cache',
 					'id'    => 'gh_use_object_cache',
 					'value' => 'on',
@@ -989,7 +989,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'By default, %s will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'name'  => 'gh_ignore_user_precedence',
 					'id'    => 'gh_ignore_user_precedence',
 					'value' => 'on',
@@ -1002,7 +1002,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => 'The journey of your contacts on the frontend of your site, and form impressions, will no longer be tracked.',
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'value' => 'on',
 				],
 			],
@@ -1074,7 +1074,7 @@ class Settings_Page extends Admin_Page {
 			'gh_privacy_policy'                      => [
 				'id'      => 'gh_privacy_policy',
 				'section' => 'policies',
-				'label'   => __( 'Privacy Policy' ),
+				'label'   => __( 'Privacy Policy' , 'groundhogg' ),
 				'desc'    => _x( 'Link to your privacy policy.', 'settings', 'groundhogg' ),
 				'type'    => 'link_picker',
 				'atts'    => [
@@ -1100,7 +1100,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will stop emails being sent to contacts who do not have confirmed emails outside of the below grace period.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_strict_confirmation[]',
 					'id'    => 'gh_strict_confirmation',
@@ -1127,7 +1127,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_enable_gdpr[]',
 					'id'    => 'gh_enable_gdpr',
@@ -1141,7 +1141,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_strict_gdpr[]',
 					'id'    => 'gh_strict_gdpr',
@@ -1155,7 +1155,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code>, <code>groundhogg-page-visits</code>, and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'name'  => 'gh_disable_unnecessary_cookies',
 					'id'    => 'gh_disable_unnecessary_cookies',
 					'value' => 'on',
@@ -1375,8 +1375,8 @@ class Settings_Page extends Admin_Page {
 					'name'        => 'gh_email_footer_alignment',
 					'id'          => 'gh_email_footer_alignment',
 					'options'     => [
-						'left'   => __( 'Left' ),
-						'center' => __( 'Center' ),
+						'left'   => __( 'Left' , 'groundhogg' ),
+						'center' => __( 'Center' , 'groundhogg' ),
 					],
 					'option_none' => false,
 				],
@@ -1397,7 +1397,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Tag mapping for opt-in status and user roles was originally introduced as a stop-gap measure. There are now much better methods of filtering contacts based on opt-in status and user role.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_enable_tag_mapping',
 					'id'    => 'gh_enable_tag_mapping',
 					'value' => 'on',
@@ -1552,7 +1552,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Disable all email open tracking.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'name'  => 'gh_disable_open_tracking',
 					'id'    => 'gh_disable_open_tracking',
 					'value' => 'on',
@@ -1565,7 +1565,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'Disable all link click tracking in emails.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Disable' ),
+					'label' => __( 'Disable' , 'groundhogg' ),
 					'name'  => 'gh_disable_click_tracking',
 					'id'    => 'gh_disable_click_tracking',
 					'value' => 'on',
@@ -1628,7 +1628,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'This will have %s save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_log_emails',
 					'id'    => 'gh_log_emails',
 					'value' => 'on',
@@ -1656,7 +1656,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed instead of having to confirm. This is not recommended because inbox bots could follow the link and unsubscribe contacts accidentally.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ) . ' <i>(' . __( 'Not recommended', 'groundhogg' ) . ')</i>',
+					'label' => __( 'Enable' , 'groundhogg' ) . ' <i>(' . __( 'Not recommended', 'groundhogg' ) . ')</i>',
 					'name'  => 'gh_enable_one_click_unsubscribe',
 					'id'    => 'gh_enable_one_click_unsubscribe',
 					'value' => 'on',
@@ -1684,7 +1684,7 @@ class Settings_Page extends Admin_Page {
 					: _x( 'Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label'    => __( 'Disable' ),
+					'label'    => __( 'Disable' , 'groundhogg' ),
 					'name'     => 'gh_disable_wp_cron',
 					'id'       => 'gh_disable_wp_cron',
 					'value'    => 'on',
@@ -1699,7 +1699,7 @@ class Settings_Page extends Admin_Page {
 				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label' => __( 'Enable' ),
+					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_purge_page_visits',
 					'id'    => 'gh_purge_page_visits',
 					'value' => 'on',
@@ -1913,7 +1913,7 @@ class Settings_Page extends Admin_Page {
 			<?php header_icon(); ?>
             <h1><?php esc_html_e( 'Settings' ); ?></h1>
 			<?php echo html()->button( [
-				'text'  => __( 'Save Changes' ),
+				'text'  => __( 'Save Changes' , 'groundhogg' ),
 				'class' => 'gh-button primary',
 				'id'    => 'save-from-header'
 			] ) ?>
@@ -1991,7 +1991,7 @@ class Settings_Page extends Admin_Page {
 //					submit_button();
 
 					echo html()->e( 'p', [], html()->button( [
-						'text'  => __( 'Save Changes' ),
+						'text'  => __( 'Save Changes' , 'groundhogg' ),
 						'class' => 'gh-button primary',
 						'type'  => 'submit',
 						'id'    => 'primary-submit'

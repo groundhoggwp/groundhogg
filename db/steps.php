@@ -111,7 +111,7 @@ class Steps extends DB {
 		return array(
 			'ID'             => 0,
 			'funnel_id'      => 0,
-			'step_title'     => esc_html__( 'New Step' ),
+			'step_title'     => esc_html__( 'New Step' , 'groundhogg' ),
 			'step_status'    => 'inactive',
 			'step_type'      => 'send_email',
 			'step_group'     => 'action',

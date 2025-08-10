@@ -305,7 +305,8 @@ class Events_Page extends Tabbed_Admin_Page {
 			return new WP_Error( 'error', 'Something went wrong' );
 		}
 
-		$this->add_notice( 'paused', sprintf( _nx( '%d event paused', '%d events paused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+        /* translators: %s: the number of events paused */
+		$this->add_notice( 'paused', sprintf( _nx( '%s event paused', '%s events paused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		return false;
 	}
@@ -341,7 +342,8 @@ class Events_Page extends Tabbed_Admin_Page {
 			return new WP_Error( 'error', 'Something went wrong' );
 		}
 
-		$this->add_notice( 'paused', sprintf( _nx( '%d event unpaused', '%d events unpaused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+        /* translators: %s: the number of events unpaused */
+		$this->add_notice( 'paused', sprintf( _nx( '%s event unpaused', '%s events unpaused', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		return false;
 	}
@@ -379,7 +381,8 @@ class Events_Page extends Tabbed_Admin_Page {
 		// Move the items over...
 		db()->event_queue->move_events_to_history( [ 'status' => Event::CANCELLED ] );
 
-		$this->add_notice( 'cancelled', sprintf( _nx( '%s event cancelled', '%d events cancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+        /* translators: %s: the number of events cancelled */
+		$this->add_notice( 'cancelled', sprintf( _nx( '%s event cancelled', '%s events cancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		//false return users to the main page
 		return false;
@@ -417,6 +420,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		// Move the events over...
 		get_db( 'events' )->move_events_to_queue( [ 'status' => Event::WAITING ], true );
 
+		/* translators: %s: the number of events uncancelled */
 		$this->add_notice( 'scheduled', sprintf( _nx( '%s event uncancelled', '%s events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
 
 		return false;
@@ -449,7 +453,8 @@ class Events_Page extends Tabbed_Admin_Page {
 		$result = $query->delete();
 
 		if ( $result !== false ) {
-			$this->add_notice( 'events_purged', sprintf( esc_html__( 'Purged %s events!' ), _nf( $result ) ) );
+			/* translators: %s: the number of events purged */
+			$this->add_notice( 'events_purged', sprintf( esc_html__( 'Purged %s events!' , 'groundhogg' ), _nf( $result ) ) );
 		}
 
 		return false;
@@ -506,6 +511,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			'ID'        => wp_parse_id_list( $this->get_items() ),
 		] );
 
+		/* translators: %s: the number of events rescheduled */
 		$this->add_notice( 'scheduled', sprintf( _nx( '%s event rescheduled', '%s events rescheduled', $updated, 'notice', 'groundhogg' ), number_format_i18n( $updated ) ) );
 
 		return false;
@@ -527,6 +533,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			'status' => Event::WAITING
 		] );
 
+		/* translators: %d: the number of events rescheduled */
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
 		return false;
@@ -722,9 +729,11 @@ class Events_Page extends Tabbed_Admin_Page {
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
             <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
-            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search' ); ?>:</label>
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search', 'groundhogg' ); ?>:</label>
 
 			<?php if ( ! get_url_var( 'include_filters' ) ):
+
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 				echo html()->input( [
 					'type' => 'hidden',
 					'name' => 'include_filters'
@@ -736,6 +745,7 @@ class Events_Page extends Tabbed_Admin_Page {
                        value="<?php echo esc_attr( get_request_var( 's' ) ); ?>">
 				<?php
 
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 				echo html()->dropdown( [
 					'options'           => [
 						'subject'    => esc_html__( 'Subject', 'groundhogg' ),
@@ -746,12 +756,12 @@ class Events_Page extends Tabbed_Admin_Page {
 					'option_none'       => esc_html__( 'Everywhere', 'groundhogg' ),
 					'option_none_value' => '',
 					'name'              => 'search_columns',
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- compared against real values
 					'selected'          => get_request_var( 'search_columns' )
 				] );
 
 				?>
-                <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
+                <button type="submit" id="search-submit" class="gh-button primary small"><?php esc_html_e( 'Search', 'groundhogg' ); ?></button>
             </div>
         </form>
         <form method="post" class="search-form wp-clearfix">
@@ -1070,6 +1080,7 @@ ORDER BY ID" );
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
+            /* translators: %d: the number of email logs deleted */
 			sprintf( _nx( 'Deleted %d email log', 'Deleted %d email logs', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
@@ -1094,6 +1105,7 @@ ORDER BY ID" );
 
 		$this->add_notice(
 			esc_attr( 'resent' ),
+			/* translators: %d: the number of email logs resent */
 			sprintf( _nx( 'Resent %d email', 'Resent %d emails', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
@@ -1112,6 +1124,7 @@ ORDER BY ID" );
 
 		$this->add_notice(
 			esc_attr( 'cancelled' ),
+			/* translators: %d: the number of tasks cancelled */
 			sprintf( _nx( 'Cancelled %d task', 'Cancelled %d task', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 		);
 	}
@@ -1163,6 +1176,7 @@ ORDER BY ID" );
 
 		$this->add_notice(
 			esc_attr( 'resume' ),
+			/* translators: %d: the number of tasks resumed */
 			sprintf( _nx( 'Resumed %d task', 'Resumed %d task', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 		);
 	}
@@ -1170,7 +1184,8 @@ ORDER BY ID" );
 	public function page() {
 
 		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::is_enabled() ) {
-			$this->add_notice( 'inactive', sprintf( esc_html__( 'Email logging is currently disabled. You can enable email logging in the %1$semail settings%2$s.', 'groundhogg' ), "<a href=\"" . admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) . "\">", "</a>" ), 'warning' );
+			/* translators: 1: the open <a> tag, 2: the closing </a> tag */
+			$this->add_notice( 'inactive', sprintf( esc_html__( 'Email logging is currently disabled. You can enable email logging in the %1$semail settings%2$s.', 'groundhogg' ), "<a href=\"" . esc_url( admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) ) . "\">", "</a>" ), 'warning' );
 		}
 
 		parent::page();

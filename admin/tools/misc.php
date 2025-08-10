@@ -21,12 +21,12 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="inside">
             <p><?php esc_html_e( 'Sync any existing WordPress users with your contacts. Meta will be synced based on the general settings.', 'groundhogg' ); ?></p>
             <div class="display-flex gap-10">
-				<?php echo html()->e( 'a', [
+				<?php html( 'a', [
 					'class' => 'button',
 					'href'  => action_url( 'sync_users' ),
 				], esc_html__( 'Sync Users', 'groundhogg' ) ) ?></p>
 
-				<?php echo html()->e( 'a', [
+				<?php html( 'a', [
 					'class' => 'button',
 					'href'  => action_url( 're_sync_user_ids' ),
 				], esc_html__( 'Only re-sync user IDs', 'groundhogg' ) ) ?></p>
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="inside">
                 <p><?php esc_html_e( 'In the event the opt-in status tags of your contacts become out of sync, you can re-sync them using this tool.', 'groundhogg' ); ?></p>
-                <p><?php echo html()->e( 'a', [
+                <p><?php html( 'a', [
 						'class' => 'gh-button secondary',
 						'href'  => Plugin::instance()->tag_mapping->get_start_url(),
 					], esc_html__( 'Process', 'groundhogg' ) ) ?></p>

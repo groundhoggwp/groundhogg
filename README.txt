@@ -271,6 +271,26 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 * 🏅 Best Software Innovation 2020 finalist _(Canadian Search Awards)_.
 * 🏅 Canadian Small Business Awards 2021 finalist _(Canadian Search Awards)_.
 
+## External services & APIs
+
+This plugin connects to several 3rd party services to provide crucial functionality. Each is listed below with what services are used and what information is shared, if any.
+
+### Email and flow templates
+Email and flow templates are pulled from a remote repository via API periodically at `https://library.groundhogg.io`. No information about you or your site is shared or logged in this request.
+
+### Dashboard notices and widgets
+Recent blog posts from `https://groundhogg.io` are shown in the dashboard and are fetched periodically. No data or information is logged or shared.
+Important notifications and dashboard notices are pulled from `https://groundho.gg` periodically. No data or information is logged or shared.
+
+### Telemetry and usage
+You can opt-in and opt-out of site telemetry from Groundhogg » Settings » Misc » Danger Zone » Opt-in to anonymous usage tracking. When enabled, the following information will be periodically shared with `https://groundhogg.io`: Your admin email address; Whether your site has a valid and active license from `groundhogg.io`; The license if one exists; Whether Groundhogg is white labelled; System information such as WordPress version, PHP Version, the Groundhogg plugin version, the site time sone, and site language; Usage statistics such as the number of active flows, the number of new contacts, and the number of emails sent; The list of active Groundhogg add-ons on the site;
+No information is shared or collected when telemetry sharing is disabled.
+
+### Google Recaptcha
+If you have the Google Recaptcha integration enabled, scripts will be loaded from `https://www.google.com/recaptcha/api.js` and requests will be made to `https://www.google.com/recaptcha/api/siteverify` sharing only essential information (such as your recaptcha site key) to facilitate the integration.
+
+
+
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==

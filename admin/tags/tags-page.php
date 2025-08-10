@@ -7,6 +7,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Tag;
 use WP_Error;
 use function Groundhogg\action_input;
+use function Groundhogg\db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -103,10 +104,10 @@ class Tags_Page extends Admin_Page {
 
 					action_input( 'add', true, true );
 
-					echo html()->e( 'div', [
+					html( 'div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Name' ) ),
+						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Name' , 'groundhogg' ) ),
 						html()->input( [
 							'id'   => 'tag-name',
 							'name' => 'tag_name'
@@ -114,10 +115,10 @@ class Tags_Page extends Admin_Page {
 						html()->description( esc_html__( 'Name a tag something simple so you do not forget it.', 'groundhogg' ) )
 					] );
 
-					echo html()->e( 'div', [
+					html('div', [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Description' ) ),
+						html()->e( 'label', [ 'for' => 'tag-name' ], esc_html__( 'Description' , 'groundhogg' ) ),
 						html()->textarea( [
 							'id'   => 'tag-description',
 							'name' => 'tag_description',
@@ -128,7 +129,7 @@ class Tags_Page extends Admin_Page {
 
 					do_action( 'groundhogg/admin/tags/add/form' );
 
-					echo html()->e( 'div', [], html()->button( [
+					html('div', [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
 						'text'  => esc_html__( 'Add Tag', 'groundhogg' )
@@ -144,7 +145,7 @@ class Tags_Page extends Admin_Page {
 
 					action_input( 'add', true, true );
 
-					echo html()->e( 'div', [
+					html( 'div', [
 						'class' => 'display-flex column'
 					], [
 						html()->e( 'label', [ 'for' => 'bulk-tags' ], esc_html__( 'Tag names', 'groundhogg' ) ),
@@ -156,16 +157,14 @@ class Tags_Page extends Admin_Page {
 						html()->description( esc_html__( 'Enter 1 tag name per line.', 'groundhogg' ) )
 					] );
 
-					echo html()->e( 'div', [], html()->button( [
+					html( 'div', [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
 						'text'  => esc_html__( 'Add Tags', 'groundhogg' )
 					] ) );
 
 					?>
-
                 </form>
-
             </div>
             <div>
 				<?php
@@ -201,7 +200,7 @@ class Tags_Page extends Admin_Page {
 			$ids = [];
 
 			foreach ( $tag_names as $name ) {
-				$id = get_db( 'tags' )->add( [ 'tag_name' => $name ] );
+				$id = db()->tags->add( [ 'tag_name' => $name ] );
 
 				if ( $id ) {
 					$ids[] = $id;
@@ -214,19 +213,21 @@ class Tags_Page extends Admin_Page {
 				return new WP_Error( 'unable_to_add_tags', "Something went wrong adding the tags." );
 			}
 
+            /* translators: %d: the number of tags created */
 			$this->add_notice( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
 
 		} else {
 
 			$tag_name = trim( sanitize_text_field( get_post_var( 'tag_name' ) ) );
 
-			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-				return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), get_db( 'tags' )->get_max_index_length() ) );
+			if ( $tag_name && strlen( $tag_name ) > db()->tags->get_max_index_length() ) {
+				/* translators: %d: the maximum allowed length of a tag */
+				return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), db()->tags->get_max_index_length() ) );
 			}
 
 			$tag_desc = sanitize_textarea_field( get_post_var( 'tag_description' ) );
 
-			$id = get_db( 'tags' )->add( [
+			$id = db()->tags->add( [
 				'tag_name'        => $tag_name,
 				'tag_description' => $tag_desc
 			] );
@@ -257,8 +258,9 @@ class Tags_Page extends Admin_Page {
 
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
-		if ( strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-			return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), get_db( 'tags' )->get_max_index_length() ) );
+		if ( strlen( $tag_name ) > db()->tags->get_max_index_length() ) {
+			/* translators: %d: the maximum allowed length of a tag */
+			return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), db()->tags->get_max_index_length() ) );
 		}
 		$args = array(
 			'tag_name'        => $tag_name,
@@ -266,7 +268,7 @@ class Tags_Page extends Admin_Page {
 			'tag_description' => $tag_description,
 		);
 
-		Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $_GET['tag'] ), $args );
+		db()->tags->update( $id, $args );
 
 		$this->add_notice( 'updated', _x( 'Tag updated.', 'notice', 'groundhogg' ) );
 
@@ -297,6 +299,7 @@ class Tags_Page extends Admin_Page {
 
 		$this->add_notice(
 			'deleted',
+            /* translators: %d: the number of tags that were deleted */
 			sprintf( _nx( '%d tag deleted', '%d tags deleted', count( $this->get_items() ), 'notice', 'groundhogg' ),
 				count( $this->get_items() )
 			)

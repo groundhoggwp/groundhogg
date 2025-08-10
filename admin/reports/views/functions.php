@@ -98,7 +98,7 @@ function quick_stat_report( $args = [] ) {
                         <span class="groundhogg-quick-stat-arrow up"></span>
                         <span class="groundhogg-quick-stat-prev-percent">0%</span>
                     </div>
-                    <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
+                    <div class="groundhogg-quick-stat-compare"><?php esc_html_e( 'vs. Previous 30 Days', 'groundhogg' ); ?></div>
                 </div>
             </div>
             <div class="wp-clearfix"></div>

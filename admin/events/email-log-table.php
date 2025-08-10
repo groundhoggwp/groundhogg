@@ -65,7 +65,7 @@ class Email_Log_Table extends Table {
 		return [
 			[
 				'view'    => '',
-				'display' => esc_html__( 'All' ),
+				'display' => esc_html__( 'All', 'groundhogg' ),
 				'query'   => [],
 			],
 			[
@@ -145,42 +145,41 @@ class Email_Log_Table extends Table {
         <div class="alignleft gh-actions" style="display: flex;gap: 3px;align-items: center">
 			<?php
 
-			echo html()->dropdown( [
-				'id'          => 'date-filter',
-				'name'        => 'date_filter',
-				'option_none' => esc_html__( 'Filter by date' ),
-				'options'     => [
-					'before'  => esc_html__( 'Before', 'groundhogg' ),
-					'after'   => esc_html__( 'After', 'groundhogg' ),
-					'between' => esc_html__( 'Between', 'groundhogg' ),
-				],
-				'selected'    => get_url_var( 'date_filter' )
-			] );
-
-			echo html()->input( [
-				'type'  => 'date',
-				'id'    => 'after',
-				'name'  => 'after',
-				'value' => get_url_var( 'after' ),
-				'class' => 'input' . ( get_url_var( 'after' ) ? '' : ' hidden' )
-			] );
-
-			echo html()->input( [
-				'type'  => 'date',
-				'id'    => 'before',
-				'name'  => 'before',
-				'value' => get_url_var( 'before' ),
-				'class' => 'input' . ( get_url_var( 'before' ) ? '' : ' hidden' )
-			] );
-
-			echo html()->button( [
-				'text'  => esc_html__( 'Search' ),
-				'id'    => 'search-by-date',
-				'type'  => 'submit',
-				'value' => 'filter_logs',
-				'name'  => 'action',
-				'class' => 'button button-secondary' . ( get_url_var( 'before' ) || get_url_var( 'after' ) ? '' : ' hidden' )
-			] )
+			html()->frag( [
+				html()->dropdown( [
+					'id'          => 'date-filter',
+					'name'        => 'date_filter',
+					'option_none' => esc_html__( 'Filter by date', 'groundhogg' ),
+					'options'     => [
+						'before'  => esc_html__( 'Before', 'groundhogg' ),
+						'after'   => esc_html__( 'After', 'groundhogg' ),
+						'between' => esc_html__( 'Between', 'groundhogg' ),
+					],
+					'selected'    => get_url_var( 'date_filter' )
+				] ),
+				html()->input( [
+					'type'  => 'date',
+					'id'    => 'after',
+					'name'  => 'after',
+					'value' => get_url_var( 'after' ),
+					'class' => 'input' . ( get_url_var( 'after' ) ? '' : ' hidden' )
+				] ),
+				html()->input( [
+					'type'  => 'date',
+					'id'    => 'before',
+					'name'  => 'before',
+					'value' => get_url_var( 'before' ),
+					'class' => 'input' . ( get_url_var( 'before' ) ? '' : ' hidden' )
+				] ),
+				html()->button( [
+					'text'  => esc_html__( 'Search', 'groundhogg' ),
+					'id'    => 'search-by-date',
+					'type'  => 'submit',
+					'value' => 'filter_logs',
+					'name'  => 'action',
+					'class' => 'button button-secondary' . ( get_url_var( 'before' ) || get_url_var( 'after' ) ? '' : ' hidden' )
+				] )
+			], true );
 
 			?></div><?php
 	}
@@ -273,7 +272,7 @@ class Email_Log_Table extends Table {
 			'href'        => '#',
 			'class'       => 'view-email-log',
 			'data-log-id' => $email->get_id()
-		], esc_html__( 'View Details' ) );
+		], esc_html__( 'View Details', 'groundhogg' ) );
 
 		return $this->row_actions( apply_filters( 'groundhogg/log/row_actions', $actions, $email, $column_name ) );
 	}

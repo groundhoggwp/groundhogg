@@ -21,7 +21,7 @@ if ( ! $funnel->exists() ) {
 
 <div class="display-flex gap-20 align-center">
     <h1 class="report-title"><?php echo esc_html( $funnel->get_title() ); ?></h1>
-	<?php echo html()->e( 'a', [
+	<?php html( 'a', [
 		'target' => '_blank',
 		'id'     => 'edit-funnel',
 		'href'   => $funnel->admin_link(),
@@ -109,7 +109,6 @@ if ( ! $funnel->exists() ) {
 		?>
         <script>
           ( $ => {
-
             $('.step .stat-wrap').click(e => {
               let a = e.currentTarget.querySelector('a')
 
@@ -117,13 +116,6 @@ if ( ! $funnel->exists() ) {
                 a.click()
               }
             })
-
-            //$('.step[data-id]').click(e => {
-            //  window.open(Groundhogg.element.adminPageURL('gh_funnels', {
-            //    action: 'edit',
-            //    funnel: <?php //echo $funnel->ID ?>
-            //  }, e.currentTarget.dataset.id), '_self')
-            //})
           } )(jQuery)
         </script>
     </div>

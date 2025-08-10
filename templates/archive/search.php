@@ -20,7 +20,7 @@ use function Groundhogg\html;
 		'class' => 'button',
 		'type'  => 'submit',
 		'id'    => 'search-submit',
-		'text'  => __( 'Search' )
+		'text' => __( 'Search', 'groundhogg' )
 	] );
 
 	?>

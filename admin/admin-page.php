@@ -6,6 +6,7 @@ use Groundhogg\DB\Query\Filters;
 use Groundhogg\Plugin;
 use Groundhogg\Pointers;
 use Groundhogg\Supports_Errors;
+
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\base64_json_encode;
@@ -37,7 +38,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Admin_Page extends Supports_Errors {
-
 	protected $screen_id;
 
 	/**
@@ -62,10 +62,10 @@ abstract class Admin_Page extends Supports_Errors {
 			add_action( 'admin_enqueue_scripts', [ $this, 'register_pointers' ] );
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
 
-			add_filter( "set-screen-option", [ $this, 'set_screen_options' ], 10, 3 );
+			add_filter( 'set-screen-option', [ $this, 'set_screen_options' ], 10, 3 );
 			add_filter( "set_screen_option_{$this->get_slug()}_per_page", [
 				$this,
-				'set_screen_option_per_page'
+				'set_screen_option_per_page',
 			], 10, 3 );
 
 			add_action( 'admin_init', [ $this, 'process_action' ] );
@@ -240,8 +240,8 @@ abstract class Admin_Page extends Supports_Errors {
 
 		$this->screen_id = $page;
 
-		add_action( "load-" . $page, [ $this, 'help' ] );
-		add_action( "load-" . $page, [ $this, 'screen_options' ] );
+		add_action( 'load-' . $page, [ $this, 'help' ] );
+		add_action( 'load-' . $page, [ $this, 'screen_options' ] );
 	}
 
 	/**
@@ -249,11 +249,11 @@ abstract class Admin_Page extends Supports_Errors {
 	 */
 	public function screen_options() {
 
-		$args = array(
+		$args = [
 			'label'   => esc_html__( 'Per page', 'groundhogg' ),
 			'default' => 20,
-			'option'  => $this->get_slug() . '_per_page'
-		);
+			'option' => $this->get_slug() . '_per_page',
+		];
 
 
 		if ( $this->get_current_action() === 'view' ) {
@@ -353,19 +353,21 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @return bool|string
 	 */
 	protected function get_current_action() {
-		if ( isset_not_empty( $_REQUEST, 'filter_action' ) ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- handled upstream
+		if ( ! empty( $_REQUEST['filter_action'] ) ) {
 			return false;
 		}
 
-		if ( isset_not_empty( $_REQUEST, 'action' ) && $_REQUEST['action'] != - 1 ) {
+		if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] != - 1 ) {
 			return sanitize_text_field( get_request_var( 'action' ) );
 		}
 
-		if ( isset_not_empty( $_REQUEST, 'action2' ) && $_REQUEST['action2'] != - 1 ) {
+		if ( isset( $_REQUEST['action2'] ) && $_REQUEST['action2'] != - 1 ) {
 			return sanitize_text_field( get_request_var( 'action2' ) );
 		}
 
 		return 'view';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -410,7 +412,7 @@ abstract class Admin_Page extends Supports_Errors {
 		$checks = [
 			wp_verify_nonce( $nonce ),
 			wp_verify_nonce( $nonce, $this->get_current_action() ),
-			wp_verify_nonce( $nonce, sprintf( 'bulk-%s', $this->get_item_type_plural() ) )
+			wp_verify_nonce( $nonce, sprintf( 'bulk-%s', $this->get_item_type_plural() ) ),
 		];
 
 		return in_array( true, $checks );
@@ -422,10 +424,10 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function wp_die_no_access() {
 
 		if ( wp_doing_ajax() ) {
-			wp_send_json_error( esc_html__( "Invalid permissions.", 'groundhogg' ) );
+			wp_send_json_error( esc_html__( 'Invalid permissions.', 'groundhogg' ) );
 		}
 
-		wp_die( esc_html__( "Invalid permissions.", 'groundhogg' ), 'No Access!' );
+		wp_die( esc_html__( 'Invalid permissions.', 'groundhogg' ), 'No Access!' );
 	}
 
 	/**
@@ -437,7 +439,8 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function search_form( $title = false, $name = 's' ) {
 
 		if ( $title === false ) {
-			$title = sprintf( esc_html__( 'Search %s', 'groundhogg' ), $this->get_name() );
+			/* translators: %s: plural of an object type being searched */
+			$title = sprintf( __( 'Search %s', 'groundhogg' ), $this->get_name() );
 		}
 
 		if ( method_exists( $this, 'get_current_tab' ) ) {
@@ -447,22 +450,22 @@ abstract class Admin_Page extends Supports_Errors {
 
 		?>
         <form method="get" class="search-form">
-			<?php html()->hidden_GET_inputs( true ); ?>
+	        <?php html()->hidden_GET_inputs( true ); ?>
 
-			<?php if ( ! get_url_var( 'include_filters' ) && $this->has_table_filters ):
-				echo html()->input( [
-					'type' => 'hidden',
-					'name' => 'include_filters'
-				] );
+	        <?php if ( ! get_url_var( 'include_filters' ) && $this->has_table_filters ):
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+		        echo html()->input( [
+			        'type' => 'hidden',
+			        'name' => 'include_filters',
+		        ] );
 			endif; ?>
-
-            <label class="screen-reader-text" for="gh-post-search-input"><?php echo $title; ?>:</label>
-
+            <label class="screen-reader-text" for="gh-post-search-input"><?php echo esc_html( $title ); ?>:</label>
             <div style="float: right" class="gh-input-group">
-                <input type="search" id="gh-post-search-input" name="<?php echo $name ?>"
+                <input type="search" id="gh-post-search-input" name="<?php echo esc_attr( $name ) ?>"
                        value="<?php echo esc_attr( get_request_var( $name ) ); ?>">
-                <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php echo esc_attr( 'Search' ); ?></button>
+                <button type="submit" id="search-submit" class="gh-button primary small">
+		            <?php esc_html_e( 'Search', 'groundhogg' ); ?>
+                </button>
             </div>
         </form>
 		<?php
@@ -471,17 +474,18 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function filters_search_form() {
 		?>
         <form method="get" class="search-form">
-			<?php html()->hidden_GET_inputs( true ); ?>
-			<?php if ( ! get_url_var( 'include_filters' ) ):
-				echo html()->input( [
-					'type' => 'hidden',
-					'name' => 'include_filters'
-				] );
+	        <?php html()->hidden_GET_inputs( true ); ?>
+	        <?php if ( ! get_url_var( 'include_filters' ) ):
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+		        echo html()->input( [
+			        'type' => 'hidden',
+			        'name' => 'include_filters',
+		        ] );
 			endif; ?>
             <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
             <div style="float: right" class="gh-input-group">
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php esc_html_e( 'Search', 'groundhogg' ); ?></button>
             </div>
         </form>
 		<?php
@@ -521,7 +525,7 @@ abstract class Admin_Page extends Supports_Errors {
 			'filters' => $filters,
 		];
 
-		wp_add_inline_script( 'groundhogg-admin-filters', "var GroundhoggTableFilters = " . wp_json_encode( array_merge( $configDefaults, $config ) ), 'before' );
+		wp_add_inline_script( 'groundhogg-admin-filters', 'var GroundhoggTableFilters = ' . wp_json_encode( array_merge( $configDefaults, $config ) ), 'before' );
 	}
 
 	/**
@@ -535,7 +539,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		$base_url = remove_query_arg( [ '_wpnonce', 'action', 'process_queue' ], wp_get_referer() );
 
-		$func = sprintf( "process_%s", $this->get_current_action() );
+		$func = sprintf( 'process_%s', $this->get_current_action() );
 
 		$exitCode = null;
 
@@ -557,7 +561,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		if ( is_string( $exitCode ) && esc_url_raw( $exitCode ) ) {
 			wp_redirect( $exitCode );
-			die();
+			exit();
 		}
 
 		// Return to self if true response.
@@ -592,7 +596,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		$primary_object->delete_relationship( $secondary_object );
 
-		$this->add_notice( 'success', esc_html__( 'Relationship removed' ) );
+		$this->add_notice( 'success', esc_html__( 'Relationship removed', 'groundhogg' ) );
 
 		return $primary_object->admin_link();
 	}
@@ -608,7 +612,7 @@ abstract class Admin_Page extends Supports_Errors {
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
 				'action' => esc_html__( 'Add New', 'groundhogg' ),
 				'target' => '_self',
-			]
+			],
 		];
 	}
 
@@ -628,7 +632,7 @@ abstract class Admin_Page extends Supports_Errors {
 				'classes' => '',
 			] );
 
-			echo html()->e( 'a', [
+			html( 'a', [
 				'class'  => 'page-title-action aria-button-if-js gh-button secondary' . $action['classes'],
 				'target' => $action['target'],
 				'href'   => $action['link'],
@@ -657,7 +661,7 @@ abstract class Admin_Page extends Supports_Errors {
 		?>
         <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
 			<?php header_icon(); ?>
-            <h1><?php echo $this->get_title(); ?></h1>
+            <h1><?php echo esc_html( $this->get_title() ); ?></h1>
 			<?php $this->do_title_actions(); ?>
         </div>
         <script>
@@ -765,7 +769,7 @@ abstract class Admin_Page extends Supports_Errors {
 			$data = (array) $data;
 		}
 
-//		ob_start();
+		//		ob_start();
 
 		wp_send_json_success( $data );
 	}

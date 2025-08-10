@@ -31,14 +31,14 @@ class Table_All_Funnels_Performance extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Flow', 'groundhogg' ),
-			__( 'Added', 'groundhogg' ),
-			__( 'Active', 'groundhogg' ),
-			__( 'Conversions', 'groundhogg' ),
-			__( 'Emails Sent', 'groundhogg' ),
-			__( 'Opens', 'groundhogg' ),
-			__( 'Clicks', 'groundhogg' ),
-			__( 'Unsubs', 'groundhogg' ),
+			esc_html__( 'Flow', 'groundhogg' ),
+			esc_html_x( 'Added', 'stats', 'groundhogg' ),
+			esc_html_x( 'Active', 'stats', 'groundhogg' ),
+			esc_html_x( 'Conversions', 'stats', 'groundhogg' ),
+			esc_html_x( 'Emails Sent', 'stats', 'groundhogg' ),
+			esc_html_x( 'Opens', 'stats', 'groundhogg' ),
+			esc_html_x( 'Clicks', 'stats', 'groundhogg' ),
+			esc_html_x( 'Unsubs', 'stats', 'groundhogg' ),
 		];
 	}
 

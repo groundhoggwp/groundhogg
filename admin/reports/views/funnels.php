@@ -26,9 +26,9 @@ if ( ! $has_active_funnels ): ?>
                 <li><?php esc_html_e( 'Embed any forms on your landing pages...', 'groundhogg' ) ?></li>
                 <li><b><?php esc_html_e( 'Activate your flow!', 'groundhogg' ) ?></b></li>
             </ol>
-            <a class="gh-button primary" href="<?php echo admin_page_url( 'gh_funnels', [
+            <a class="gh-button primary" href="<?php echo esc_url( admin_page_url( 'gh_funnels', [
 				'action' => 'add',
-			] ) ?>"><?php esc_html_e( 'Create a flow now!', 'groundhogg' ) ?></a>
+			] ) ); ?>"><?php esc_html_e( 'Create a flow now!', 'groundhogg' ) ?></a>
         </div>
     </div>
 <?php elseif ( get_url_var( 'funnel' ) ):

@@ -8,6 +8,7 @@ use Groundhogg\Properties;
 use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Utils\DateTimeHelper;
+use WP_Error;
 use function Groundhogg\add_redaction;
 use function Groundhogg\array_filter_splice;
 use function Groundhogg\array_find;
@@ -22,6 +23,8 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_field_label;
+use function Groundhogg\get_sanitized_FILE;
+use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
@@ -73,8 +76,9 @@ function basic_field_with_label( $field, $input ) {
 /**
  * Returns a basic input field
  *
- * @param $field
- * @param $contact
+ * @param array  $field
+ * @param Contact  $contact
+ * @param string  $tag
  *
  * @return string
  */
@@ -296,16 +300,16 @@ class Form_v2 extends Step {
 					$last_name  = $posted_data->last_name;
 
 					if ( $first_name && $last_name && $first_name === $last_name ) {
-						return new \WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
+						return new WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
 					}
 
 					if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/u', $first_name ) ) {
 
 						if ( current_user_can( 'edit_funnels' ) ) {
-							return new \WP_Error( 'invalid_first_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+							return new WP_Error( 'invalid_first_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
 						}
 
-						return new \WP_Error( 'invalid_first_name', __( 'Please provide a valid first name.', 'groundhogg' ) );
+						return new WP_Error( 'invalid_first_name', __( 'Please provide a valid first name.', 'groundhogg' ) );
 					}
 
 					return true;
@@ -335,16 +339,16 @@ class Form_v2 extends Step {
 					$last_name  = $posted_data->last_name;
 
 					if ( $first_name && $last_name && $first_name === $last_name ) {
-						return new \WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
+						return new WP_Error( 'invalid_name', __( 'First and last name cannot be the same.', 'groundhogg' ) );
 					}
 
 					if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/u', $last_name ) ) {
 
 						if ( current_user_can( 'edit_funnels' ) ) {
-							return new \WP_Error( 'invalid_last_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+							return new WP_Error( 'invalid_last_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
 						}
 
-						return new \WP_Error( 'invalid_last_name', __( 'Please provide a valid last name.', 'groundhogg' ) );
+						return new WP_Error( 'invalid_last_name', __( 'Please provide a valid last name.', 'groundhogg' ) );
 
 					}
 
@@ -373,7 +377,7 @@ class Form_v2 extends Step {
 				'validate' => function ( $field, $posted_data ) {
 					$email = $posted_data->email;
 
-					return is_email( $email ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
+					return is_email( $email ) ? true : new WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
 				},
 				'before'   => function ( $field, $posted_data, &$args ) {
 					$args['email'] = sanitize_email( $posted_data->email );
@@ -547,7 +551,7 @@ class Form_v2 extends Step {
 					] ) );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return key_exists( $posted_data['country'], utils()->location->get_countries_list() ) ? true : new \WP_Error( 'invalid_country', __( 'Invalid country selected', 'groundhogg' ) );
+					return key_exists( $posted_data['country'], utils()->location->get_countries_list() ) ? true : new WP_Error( 'invalid_country', __( 'Invalid country selected', 'groundhogg' ) );
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta['country'] = sanitize_text_field( $posted_data->country );
@@ -592,14 +596,14 @@ class Form_v2 extends Step {
 				},
 				'validate' => function ( $field, $posted_data ) {
 					if ( $posted_data->data_processing_consent !== 'yes' ) {
-						return new \WP_Error( 'error', __( 'You must consent to storage and processing of your data.', 'groundhogg' ) );
+						return new WP_Error( 'error', __( 'You must consent to storage and processing of your data.', 'groundhogg' ) );
 					}
 
 					return true;
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta, &$tags, &$submission ) {
-					$submission['gdpr_consent']      = __( 'Yes' );
-					$submission['marketing_consent'] = $posted_data->marketing_consent === 'yes' ? __( 'Yes' ) : __( 'No' );
+					$submission['gdpr_consent']      = __( 'Yes', 'groundhogg' );
+					$submission['marketing_consent'] = $posted_data->marketing_consent === 'yes' ? __( 'Yes', 'groundhogg' ) : __( 'No', 'groundhogg' );
 				},
 				'after'    => function ( $field, Posted_Data $posted_data, Contact $contact ) {
 					$contact->set_gdpr_consent();
@@ -643,13 +647,13 @@ class Form_v2 extends Step {
 				},
 				'validate' => function ( $field, $posted_data ) {
 					if ( $posted_data->terms_and_conditions !== 'yes' ) {
-						return new \WP_Error( 'error', __( 'You must agree to the terms and conditions.', 'groundhogg' ) );
+						return new WP_Error( 'error', __( 'You must agree to the terms and conditions.', 'groundhogg' ) );
 					}
 
 					return true;
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta, &$tags, &$submission ) {
-					$submission['terms'] = __( 'Yes' );
+					$submission['terms'] = __( 'Yes', 'groundhogg' );
 				},
 				'after'    => function ( $field, Posted_Data $posted_data, Contact $contact ) {
 					$contact->set_terms_agreement();
@@ -697,7 +701,7 @@ class Form_v2 extends Step {
 				'validate' => function ( $field, $posted_data ) {
 					$email = $posted_data[ $field['name'] ];
 
-					return is_email( $email ) ? true : new \WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
+					return is_email( $email ) ? true : new WP_Error( 'invalid_email', __( 'Invalid email address', 'groundhogg' ) );
 				},
 				'before'   => function ( $field, $posted_data, &$args, &$meta ) {
 					$meta[ $field['name'] ] = sanitize_email( $posted_data[ $field['name'] ] );
@@ -734,7 +738,7 @@ class Form_v2 extends Step {
 					] ), $contact );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return filter_var( $posted_data[ $field['name'] ], FILTER_VALIDATE_URL ) ? true : new \WP_Error( 'invalid_url', __( 'Invalid URL', 'groundhogg' ) );
+					return filter_var( $posted_data[ $field['name'] ], FILTER_VALIDATE_URL ) ? true : new WP_Error( 'invalid_url', __( 'Invalid URL', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -754,7 +758,7 @@ class Form_v2 extends Step {
 					] ), $contact );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new \WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
+					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -773,7 +777,7 @@ class Form_v2 extends Step {
 					] ), $contact );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new \WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
+					return strtotime( $posted_data[ $field['name'] ] ) > 0 ? true : new WP_Error( 'invalid_date', __( 'Invalid Date', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -794,7 +798,7 @@ class Form_v2 extends Step {
 				'validate' => function ( $field, $posted_data ) {
 					$d = \DateTime::createFromFormat( "Y-m-d H:i:s", "2017-12-01 {$posted_data[ $field['name'] ]}" );
 
-					return $d && $d->format( 'H:i:s' ) == $posted_data[ $field['name'] ] ? true : new \WP_Error( 'invalid_time', __( 'Invalid Time', 'groundhogg' ) );
+					return $d && $d->format( 'H:i:s' ) == $posted_data[ $field['name'] ] ? true : new WP_Error( 'invalid_time', __( 'Invalid Time', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_meta_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -813,7 +817,7 @@ class Form_v2 extends Step {
 					] ), $contact );
 				},
 				'validate' => function ( $field, $posted_data ) {
-					return is_numeric( $posted_data[ $field['name'] ] ) ? true : new \WP_Error( 'invalid_number', __( 'Invalid number.', 'groundhogg' ) );
+					return is_numeric( $posted_data[ $field['name'] ] ) ? true : new WP_Error( 'invalid_number', __( 'Invalid number.', 'groundhogg' ) );
 				},
 				'before'   => function ( $field, $posted_data, &$data, &$meta ) {
 					$num                    = $posted_data[ $field['name'] ];
@@ -895,14 +899,14 @@ class Form_v2 extends Step {
 					// multiple options
 					if ( isset_not_empty( $field, 'multiple' ) ) {
 						if ( ! is_array( $value ) ) {
-							return new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+							return new WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 						}
 
 						// All given values are in the options
-						return count( $value ) === count( array_intersect( $options, $value ) ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+						return count( $value ) === count( array_intersect( $options, $value ) ) ? true : new WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 					}
 
-					return in_array( $value, $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+					return in_array( $value, $options ) ? true : new WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -970,7 +974,7 @@ class Form_v2 extends Step {
 						return true;
 					}
 
-					return empty( $posted_data[ $field['name'] ] ) || in_array( $posted_data[ $field['name'] ], $options ) ? true : new \WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
+					return empty( $posted_data[ $field['name'] ] ) || in_array( $posted_data[ $field['name'] ], $options ) ? true : new WP_Error( 'invalid_selection', __( 'Invalid selection', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_dropdown_callback',
 				'retrieve' => __NAMESPACE__ . '\standard_meta_retrieve',
@@ -1039,7 +1043,7 @@ class Form_v2 extends Step {
 
 					$selections = $posted_data[ $field['name'] ];
 
-					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new \WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
+					return count( array_intersect( $selections, $options ) ) === count( $selections ) ? true : new WP_Error( 'invalid_selections', __( 'Invalid selections', 'groundhogg' ) );
 				},
 				'before'   => __NAMESPACE__ . '\standard_multiselect_callback',
 				'retrieve' => function ( Submission $submission, $field ) {
@@ -1137,10 +1141,22 @@ class Form_v2 extends Step {
 				'validate' => function ( $field, $posted_data ) {
 					$file_types = $field['file_types'];
 
-					$validate = wp_check_filetype( $_FILES[ $field['name'] ]['name'] );
+					$file = get_sanitized_FILE( $field['name'] );
+
+					if ( ! $file ) {
+						return new WP_Error( 'no_file_given', "No file was uploaded." );
+					}
+
+					$error = get_upload_wp_error( $file );
+
+					if ( is_wp_error( $error ) ) {
+						return $error;
+					}
+
+					$validate = wp_check_filetype( $file['name'] );
 
 					if ( ! empty( $file_types ) && ! in_array( $validate['ext'], $file_types ) ) {
-						return new \WP_Error( 'invalid_file_type', "Invalid file type given." );
+						return new WP_Error( 'invalid_file_type', "Invalid file type given." );
 					}
 
 					return true;
@@ -1148,12 +1164,13 @@ class Form_v2 extends Step {
 				},
 				'after'    => function ( $field, $posted_data, Contact $contact, &$submission ) {
 
-					// file was not uploaded
-					if ( ! isset( $_FILES[ $field['name'] ] ) ) {
+					$file = get_sanitized_FILE( $field['name'] );
+
+					if ( empty( $file ) ) {
 						return;
 					}
 
-					$file = $contact->upload_file( $_FILES[ $field['name'] ] );
+					$file = $contact->upload_file( $file );
 
 					// Something went wrong
 					if ( is_wp_error( $file ) ) {
@@ -1163,7 +1180,9 @@ class Form_v2 extends Step {
 					$submission[ $field['name'] ] = $file['file']; // store the filename
 				},
 				'required' => function ( $field, $posted_data ) {
-					return isset_not_empty( $_FILES, $field['name'] );
+					$file = get_sanitized_FILE( $field['name'] );
+
+					return ! empty( $file );
 				},
 				'retrieve' => function ( Submission $submission, $field ) {
 					$filename = basename( $submission->get_meta( $field['name'] ) );
@@ -1313,7 +1332,7 @@ class Form_v2 extends Step {
 					[ 'month' => $month, 'day' => $day, 'year' => $year ] = (array) $input;
 
 					if ( ! checkdate( $month, $day, $year ) ) {
-						return new \WP_Error( 'invalid_date', 'Please provide a valid date!' );
+						return new WP_Error( 'invalid_date', 'Please provide a valid date!' );
 					}
 
 					return true;
@@ -1369,7 +1388,7 @@ class Form_v2 extends Step {
 					$property = $field['property'];
 					$property = Properties::instance()->get_field( $property );
 					if ( ! $property ) {
-						return new \WP_Error( 'invalid_property', 'something went wrong' );
+						return new WP_Error( 'invalid_property', 'something went wrong' );
 					}
 
 					return Form_v2::validate_input( array_merge( $property, [
@@ -1501,7 +1520,7 @@ class Form_v2 extends Step {
 					$verifyResponse = wp_remote_get( $file_name );
 					$responseData   = json_decode( wp_remote_retrieve_body( $verifyResponse ) );
 
-					$bot_error = new \WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
+					$bot_error = new WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
 
 					if ( $responseData->success == false ) {
 						return $bot_error;
@@ -1686,7 +1705,7 @@ class Form_v2 extends Step {
 	public function get_iframe_embed_code() {
 		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', $this->get_uuid() ) );
 
-		return sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
+		return '<script id="groundhogg_form_' . esc_attr( $this->get_id() ) . '" type="text/javascript" src="' . esc_url( $form_iframe_url ) . '"></script>';
 	}
 
 	/**
@@ -1710,7 +1729,7 @@ class Form_v2 extends Step {
 	public function get_html_embed_code() {
 
 		if ( ! $this->exists() ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
+			return sprintf( "<p>%s</p>", __( "This form has been deleted.", 'groundhogg' ) );
 		}
 
 		$form = html()->e( 'link', [
@@ -1730,7 +1749,7 @@ class Form_v2 extends Step {
 			'data-id' => $this->get_id(),
 		];
 
-		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		$form .= "<form " . array_to_atts( $atts ) . ">";
 
 		$form .= $this->get_field_html();
 
@@ -1893,7 +1912,7 @@ class Form_v2 extends Step {
 		$form = '<div class="gh-form-wrapper">';
 
 		if ( ! $this->exists() ) {
-			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
+			return sprintf( "<p>%s</p>", __( "This form has been deleted.", 'groundhogg' ) );
 		}
 
 		wp_enqueue_script( 'groundhogg-form-v2' );
@@ -1924,7 +1943,7 @@ class Form_v2 extends Step {
 			$attrs['action'] = $this->get_submission_url();
 		}
 
-		$form .= sprintf( "<form %s>", array_to_atts( $attrs ) );
+		$form .= "<form " . array_to_atts( $attrs ) . ">";
 
 		$form .= '<div class="gh-form-fields">';
 
@@ -1983,7 +2002,7 @@ class Form_v2 extends Step {
 	 * @param $field
 	 * @param $posted_data
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public static function validate_field( $field, $posted_data ) {
 		$type = $field['type'];
@@ -2003,7 +2022,7 @@ class Form_v2 extends Step {
 	 * @param $field
 	 * @param $posted_data
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public static function check_field_isset( $field, $posted_data ) {
 		$type = $field['type'];
@@ -2165,7 +2184,7 @@ class Form_v2 extends Step {
 				$isset = self::check_field_isset( $field, $posted_data );
 
 				if ( ! $isset ) {
-					$this->add_error( new \WP_Error( 'field-required', __( 'This field is required' ), $field['label'] ) );
+					$this->add_error( new WP_Error( 'field-required', __( 'This field is required', 'groundhogg' ), $field['label'] ) );
 					continue;
 				}
 			}
@@ -2418,6 +2437,7 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 	public function __construct( $posted = [] ) {
 
 		if ( empty( $posted ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- handled elsewhere
 			$posted = wp_unslash( $_POST );
 		}
 

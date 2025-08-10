@@ -15,9 +15,9 @@ class Table_Funnel_Stats extends Base_Report {
 
 	public function get_label() {
 		return [
-			__( 'Steps', 'groundhogg' ),
-			__( 'Completed', 'groundhogg' ),
-			__( 'Waiting', 'groundhogg' ),
+			esc_html__( 'Steps', 'groundhogg' ),
+			esc_html__( 'Completed', 'groundhogg' ),
+			esc_html__( 'Waiting', 'groundhogg' ),
 		];
 	}
 

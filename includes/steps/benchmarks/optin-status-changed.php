@@ -90,7 +90,7 @@ class Optin_Status_Changed extends Benchmark {
 			'placeholder' => __( 'Any status', 'groundhogg' )
 		] );
 
-		echo html()->e( 'p', [], __( 'To any of these statuses...' ) );
+		echo html()->e( 'p', [], __( 'To any of these statuses...', 'groundhogg' ) );
 
 		echo html()->select2( [
 			'id'          => $this->setting_id_prefix( 'status' ),

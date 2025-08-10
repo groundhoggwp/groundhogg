@@ -64,7 +64,7 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		return [
 			'datasets' => [
 				array_merge( $this->get_line_style(), [
-					'label'                => __( 'New contacts' ),
+					'label' => __( 'New contacts', 'groundhogg' ),
 					'data'                 => $new,
 					"pointBackgroundColor" => 'rgb(0, 117, 255)',
 					"borderColor"          => 'rgb(0, 117, 255)',
@@ -72,7 +72,7 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 					'spanGaps'             => false,
 				] ),
 				array_merge( $this->get_line_style(), [
-					'label'                => __( 'Confirmed' ),
+					'label' => __( 'Confirmed', 'groundhogg' ),
 					'data'                 => $confirmed,
 					"pointBackgroundColor" => 'rgb(158, 206, 56)',
 					"borderColor"          => 'rgb(158, 206, 56)',
@@ -80,7 +80,7 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 					'spanGaps'             => false,
 				] ),
 				array_merge( $this->get_line_style(), [
-					'label'                => __( 'Unsubscribed' ),
+					'label' => __( 'Unsubscribed', 'groundhogg' ),
 					'data'                 => $unsubscribes,
 					"pointBackgroundColor" => 'rgb(233, 31, 79)',
 					"borderColor"          => 'rgb(233, 31, 79)',

@@ -48,7 +48,7 @@ class Admin_User {
                     <td>
 						<?php
 
-						echo html()->e( 'div', [
+						html( 'div', [
 							'class' => 'display-flex column gap-10'
 						], [
 							html()->checkbox( [
@@ -71,10 +71,14 @@ class Admin_User {
             <tr>
                 <th><?php esc_html_e( 'Default Contact Tab', 'groundhogg' ); ?></th>
                 <td>
-					<?php echo html()->dropdown( [
+					<?php
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    echo html()->dropdown( [
 						'name'        => 'gh_default_contact_tab',
+	                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 						'options'     => get_valid_contact_tabs(),
 						'option_none' => false,
+	                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 						'selected'    => $profile_user->gh_default_contact_tab
 					] ); ?>
                     <p class="description"><?php echo esc_html_x( 'Which tab should be selected by default when opening a contact record.', 'settings', 'groundhogg' ); ?></p>

@@ -397,11 +397,9 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function e( $tag = 'div', $atts = [], $content = '', $self_closing = false, $echo = false ) {
+	public function e( $tag = 'div', $atts = [], $content = '', $unused = false, $echo = false ) {
 
-		if ( in_array( $tag, [ 'img', 'input', 'br', 'hr', 'embed' ] ) ) {
-			$self_closing = true;
-		}
+		$self_closing = in_array( $tag, [ 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr' ] );
 
 		if ( ! $self_closing ) {
 			$html = $this->wrap( $content, $tag, $atts );
@@ -410,6 +408,7 @@ class HTML {
 		}
 
 		if ( $echo === true ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $html;
 		}
 
@@ -663,7 +662,7 @@ class HTML {
 		return $this->modal_link( [
 			'title'              => 'Help',
 			'text'               => '',
-			'footer_button_text' => __( 'Close' ),
+			'footer_button_text' => __( 'Close', 'groundhogg' ),
 			'id'                 => '',
 			'source'             => $link,
 			'height'             => 800,
@@ -710,7 +709,7 @@ class HTML {
 		$atts = wp_parse_args( $args, array(
 			'title'              => 'Modal',
 			'text'               => __( 'Open Modal', 'groundhogg' ),
-			'footer_button_text' => __( 'Save Changes' ),
+			'footer_button_text' => __( 'Save Changes', 'groundhogg' ),
 			'id'                 => '',
 			'class'              => 'button button-secondary',
 			'source'             => '',
@@ -1420,7 +1419,7 @@ class HTML {
 			'id'    => $a['id'],
 			'name'  => $a['id'],
 			'type'  => 'button',
-			'value' => __( 'Upload Image' ),
+			'value' => __( 'Upload Image', 'groundhogg' ),
 			'class' => 'button gh-image-picker',
 		) );
 
@@ -1429,21 +1428,21 @@ class HTML {
 		$html .= $this->input( array(
 			'id'          => $a['id'] . '-src',
 			'name'        => $a['id'] . '-src',
-			'placeholder' => __( 'Src' ),
+			'placeholder' => __( 'Src', 'groundhogg' ),
 			'class'       => $a['class']
 		) );
 
 		$html .= $this->input( array(
 			'id'          => $a['id'] . '-alt',
 			'name'        => $a['id'] . '-alt',
-			'placeholder' => __( 'Alt Tag' ),
+			'placeholder' => __( 'Alt Tag', 'groundhogg' ),
 			'class'       => $a['class']
 		) );
 
 		$html .= $this->input( array(
 			'id'          => $a['id'] . '-title',
 			'name'        => $a['id'] . '-title',
-			'placeholder' => __( 'Title' ),
+			'placeholder' => __( 'Title', 'groundhogg' ),
 			'class'       => $a['class']
 		) );
 
@@ -1602,8 +1601,8 @@ class HTML {
 	public function toggle( $args = [] ) {
 
 		$args = wp_parse_args( $args, [
-			'onLabel'  => __( 'On' ),
-			'offLabel' => __( 'Off' ),
+			'onLabel'  => __( 'On', 'groundhogg' ),
+			'offLabel' => __( 'Off', 'groundhogg' ),
 			'checked'  => false,
 			'name'     => '',
 			'id'       => '',
@@ -1638,8 +1637,8 @@ class HTML {
 	}
 
 	public function toggleYesNo( $args = [] ) {
-		$args['onLabel']  = __( 'Yes' );
-		$args['offLabel'] = __( 'No' );
+		$args['onLabel']  = __( 'Yes', 'groundhogg' );
+		$args['offLabel'] = __( 'No', 'groundhogg' );
 
 		return $this->toggle( $args );
 	}
@@ -1874,14 +1873,32 @@ class HTML {
 	}
 
 	/**
-     * Kinda like a JS doc fragumeent
+     * Kinda like a JS doc fragment
      *
 	 * @param $stuff
 	 *
 	 * @return string
 	 */
-	public function frag( $stuff ) {
-        return is_array( $stuff ) ? implode( '', $stuff ) : "$stuff";
+	public function frag( $stuff, $echo = false ) {
+        $stuff = is_array( $stuff ) ? implode( '', $stuff ) : "$stuff";
+
+        if ( $echo ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo $stuff;
+        }
+
+        return $stuff;
+	}
+
+	/**
+	 * @param  array  $attrs
+	 * @param $content
+	 * @param  bool  $echo
+	 *
+	 * @return string
+	 */
+	public function div( array $attrs, $content, bool $echo = false ) {
+		return $this->e( 'div', $attrs, $content, false, $echo );
 	}
 
 }

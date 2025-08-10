@@ -28,23 +28,21 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 
 			html()->hidden_GET_inputs();
 
-			?>
-            <div class="gh-input-group">
-				<?php
-				echo html()->input( [
+			html( 'div', [
+				'class' => 'gh-input-group'
+			], [
+				html()->input( [
 					'name'        => 's',
 					'placeholder' => esc_html__( 'Name or Email', 'groundhogg' ),
 					'class'       => 'input',
 					'value'       => maybe_change_space_to_plus_in_email( sanitize_text_field( get_url_var( 's' ) ) )
-				] );
-
-				echo html()->submit( [
-					'text'  => esc_html__( 'Search' ),
+				] ),
+				html()->submit( [
+					'text'  => esc_html__( 'Search', 'groundhogg' ),
 					'class' => 'gh-button primary small'
-				] );
-
-				?>
-            </div>
+				] )
+			] );
+			?>
         </form>
     </div>
 </div>

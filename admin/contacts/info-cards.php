@@ -215,15 +215,15 @@ class Info_Cards {
             <div id="<?php echo esc_attr( $id ); ?>"
                  class="gh-panel info-card <?php echo esc_attr( $id ); ?> <?php echo  ! $open ? 'closed' : ''; ?> <?php echo $hidden ? 'hidden' : ''; ?>">
                 <div class="gh-panel-header">
-                    <h2><?php echo $title; ?></h2>
+                    <h2><?php echo esc_html( $title ); ?></h2>
                     <div class="actions hide-if-no-js">
                         <button type="button" class="panel-handle-order-higher" aria-disabled="false"
                                 aria-describedby="<?php echo esc_attr( $id ); ?>-handle-order-higher-description">
-                            <span class="screen-reader-text"><?php esc_html_e( 'Move up' ); ?></span>
+                            <span class="screen-reader-text"><?php esc_html_e( 'Move up', 'groundhogg' ); ?></span>
                         </button>
                         <button type="button" class="panel-handle-order-lower" aria-disabled="false"
                                 aria-describedby="<?php echo esc_attr( $id ); ?>-handle-order-lower-description">
-                            <span class="screen-reader-text"><?php esc_html_e( 'Move down' ); ?></span>
+                            <span class="screen-reader-text"><?php esc_html_e( 'Move down', 'groundhogg' ); ?></span>
                         </button>
                         <button type="button" class="toggle-indicator" aria-expanded="true">
                                 <span class="screen-reader-text">
@@ -264,24 +264,17 @@ class Info_Cards {
                 <div class="inside">
                     <p><?php esc_html_e( 'Select which cards you want visible.', 'groundhogg' ); ?></p>
                     <ul>
-						<?php
+						<?php foreach ( Info_Cards::get_user_info_cards() as $id => $card ):
 
-						foreach ( Info_Cards::get_user_info_cards() as $id => $card ):
+                            html( 'li', [], html()->checkbox( [
+	                            'label'   => $card['title'],
+	                            'name'    => sprintf( 'cards_display[%s]', $id ),
+	                            'class'   => 'hide-card',
+	                            'value'   => $id,
+	                            'checked' => ! isset_not_empty( $card, 'hidden' )
+                            ] ) );
 
-							?>
-                            <li><?php
-							echo html()->checkbox( [
-								'label'   => $card['title'],
-								'name'    => sprintf( 'cards_display[%s]', $id ),
-								'class'   => 'hide-card',
-								'value'   => $id,
-								'checked' => ! isset_not_empty( $card, 'hidden' )
-							] );
-							?></li><?php
-
-						endforeach;
-
-						?>
+						endforeach; ?>
                     </ul>
                     <p>
                         <a class="view-cards" href="javascript:void(0)"><?php esc_html_e( 'Close', 'groundhogg' ); ?></a>

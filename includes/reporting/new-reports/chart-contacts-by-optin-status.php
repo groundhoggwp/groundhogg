@@ -47,25 +47,7 @@ class Chart_Contacts_By_Optin_Status extends Base_Doughnut_Chart_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-		switch ( $item_key ) {
-			default:
-			case Preferences::UNCONFIRMED:
-				$label = __( 'Unconfirmed', 'groundhogg' );
-				break;
-			case Preferences::CONFIRMED:
-				$label = __( 'Confirmed', 'groundhogg' );
-				break;
-			case Preferences::HARD_BOUNCE:
-				$label = __( 'Bounced', 'groundhogg' );
-				break;
-			case Preferences::SPAM:
-				$label = __( 'Spam', 'groundhogg' );
-				break;
-			case Preferences::UNSUBSCRIBED:
-				$label = __( 'Unsubscribed', 'groundhogg' );
-				break;
-		}
-
+		$label = esc_html( Preferences::get_preference_pretty_name( $item_key ) );
 		return [
 			'label' => $label,
 			'data'  => $item_data,

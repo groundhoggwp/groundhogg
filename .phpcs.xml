@@ -2,5 +2,15 @@
 <ruleset name="Groundhogg Project Ruleset (IDE visible)">
     <!-- This file exists to help IDEs (like PhpStorm) automatically detect the project's PHPCS rules. -->
     <!-- It inherits from the canonical ruleset kept in .phpcs.xml.dist to avoid duplication. -->
+
+    <!-- Fallback: make standards discoverable even if a global phpcs is used by the IDE. -->
+    <config name="installed_paths" value=
+        "vendor/phpcompatibility/php-compatibility,
+        vendor/phpcompatibility/phpcompatibility-paragonie,
+        vendor/phpcompatibility/phpcompatibility-wp,
+        vendor/phpcsstandards/phpcsextra,
+        vendor/phpcsstandards/phpcsutils,
+        vendor/wp-coding-standards/wpcs"/>
+
     <rule ref=".phpcs.xml.dist"/>
 </ruleset>

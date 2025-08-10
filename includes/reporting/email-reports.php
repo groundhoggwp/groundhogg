@@ -250,13 +250,13 @@ class Email_Reports extends Notification_Builder {
 					$addedByName = get_userdata( $task->user_id )->display_name;
 					break;
 				case 'funnel':
-					$addedByName = __( 'System' );
+					$addedByName = __( 'System', 'groundhogg' );
 					break;
 				case 'system':
 					$addedByName = html()->a( admin_page_url( 'gh_funnels', [
 						'action' => 'edit',
 						'funnel' => $task->funnel_id
-					], $task->step_id ), __( 'Flow' ) );
+					], $task->step_id ), __( 'Flow', 'groundhogg' ) );
 					break;
 			}
 
@@ -547,9 +547,9 @@ class Email_Reports extends Notification_Builder {
 		}
 
 		$table = Notification_Builder::generate_list_table_html( [
-			__( 'Error Code' ),
-			__( 'Error Message' ),
-			__( 'Events' ),
+			__( 'Error Code', 'groundhogg' ),
+			__( 'Error Message', 'groundhogg' ),
+			__( 'Events', 'groundhogg' ),
 		], $errors );
 
 		$replacer = new Replacer( [

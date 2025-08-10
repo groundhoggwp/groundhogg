@@ -108,7 +108,7 @@ class Campaigns_Table extends Table {
 	 * @return string
 	 */
 	protected function column_visibility( $campaign ) {
-		return $campaign->is_public() ? esc_html__( 'Public' ) : esc_html__( 'Hidden' );
+		return $campaign->is_public() ? esc_html__( 'Public' , 'groundhogg' ) : esc_html__( 'Hidden' , 'groundhogg' );
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Campaigns_Table extends Table {
 		$broadcasts = $campaign->count_parents( 'broadcast' );
 		$emails     = $campaign->count_parents( 'email' );
 
-		return html()->e( 'div', [
+		return html()->div( [
 			'class' => 'display-flex column'
 		], [
 			html()->e( 'a', [
@@ -191,17 +191,17 @@ class Campaigns_Table extends Table {
 			],
 			[
 				'class'   => 'edit',
-				'display' => esc_html__( 'Edit' ),
+				'display' => esc_html__( 'Edit' , 'groundhogg' ),
 				'url'     => $item->admin_link()
 			],
 			[
 				'class'   => 'view',
-				'display' => esc_html__( 'View Archive' ),
+				'display' => esc_html__( 'View Archive' , 'groundhogg' ),
 				'url'     => managed_page_url( sprintf( '/campaigns/%s', $item->get_slug() ) )
 			],
 			[
 				'class'   => 'trash',
-				'display' => esc_html__( 'Delete' ),
+				'display' => esc_html__( 'Delete' , 'groundhogg' ),
 				'url'     => action_url( 'delete', [ 'campaign' => $item->get_id() ] )
 			]
 		];

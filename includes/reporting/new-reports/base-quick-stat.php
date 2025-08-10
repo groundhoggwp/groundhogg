@@ -76,7 +76,8 @@ abstract class Base_Quick_Stat extends Base_Report {
 					'color'     => $arrow['color'],
 				],
 				'percent' => _nf( absint( $percentage ) ) . '%',
-				'text'    => sprintf( __( '.vs prev %s', 'groundhogg' ), $this->get_human_time_diff() )
+				/* translators: %s: the previous time range, like "30 days" */
+				'text'    => sprintf( esc_html__( '.vs prev %s', 'groundhogg' ), $this->get_human_time_diff() )
 			],
 			'data'    => [
 				'current' => $current_data,

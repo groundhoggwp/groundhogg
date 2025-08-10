@@ -19,6 +19,7 @@ $response = License_Manager::get_store_products( [
 ] );
 
 if ( is_wp_error( $response ) ) {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WP_Error in use
 	wp_die( $response );
 }
 
@@ -50,7 +51,7 @@ usort( $downloads, function ( $a, $b ) {
         <div class="gh-panel">
             <div class="gh-panel-header">
                 <h2>
-					<?php esc_html_e( $download->info->title ); ?>
+					<?php echo esc_html( $download->info->title ); ?>
                 </h2>
             </div>
             <div class="inside">
@@ -60,7 +61,7 @@ usort( $downloads, function ( $a, $b ) {
                              alt="<?php echo esc_attr( $extension->info->title ); ?>">
                     </div>
                     <div style="width: 100%">
-						<?php echo wpautop( $extension->info->excerpt ); ?>
+						<?php echo wp_kses_post( wpautop( $extension->info->excerpt ) ); ?>
                     </div>
                 </div>
                 <p></p>
@@ -76,7 +77,9 @@ usort( $downloads, function ( $a, $b ) {
 
 							?>
                             <a class="gh-button secondary" target="_blank"
-                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+                               href="<?php echo esc_url( $extension->info->link ); ?>"> <?php
+                                /* translators: 1: min price, 2: max price */
+                                echo esc_html( sprintf( _x( 'Buy Now ($%1$s - $%2$s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
 							<?php
 						} else {
 
@@ -85,22 +88,24 @@ usort( $downloads, function ( $a, $b ) {
 							if ( $price > 0.00 ) {
 								?>
                                 <a class="gh-button secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+                                   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php
+                                   /* translators: %s: the price of the extension */
+                                    echo esc_html( sprintf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
 								<?php
 							} else {
 								?>
                                 <a class="gh-button secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php echo esc_html_x( 'Download', 'action', 'groundhogg' ); ?></a>
+                                   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html_x( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
-					endif; ?>
+					endif;
 
-					<?php echo html()->e( 'a', [
+                    html('a', [
 						'href'   => $extension->info->link,
 						'target' => '_blank',
 						'class'  => 'more-details',
-					], esc_html__( 'More details' ) ); ?>
+					], esc_html__( 'More details' , 'groundhogg' ) ); ?>
                 </div>
             </div>
         </div>

@@ -182,11 +182,13 @@ class Import_Contacts extends Task {
 
 			$contacts_link = contact_filters_link( _nf( $query->count() ), $filters );
 
-			$message = sprintf( __( '%s contacts have been imported from %s!', 'groundhogg' ), bold_it( $contacts_link ), code_it( $this->fileName ) );
+			/* translators: 1: number of contacts (as a link), 2: file name */
+			$message = sprintf( __( '%1$s contacts have been imported from %2$s!', 'groundhogg' ), bold_it( $contacts_link ), code_it( $this->fileName ) );
 
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
-			$subject = sprintf( __( '[%s] Contacts imported!' ), white_labeled_name() );
+			/* translators: 1: plugin/brand name */
+			$subject = sprintf( __( '[%s] Contacts imported!', 'groundhogg' ), white_labeled_name() );
 
 			wp_mail( get_userdata( $this->user_id )->user_email, $subject, wpautop( $message ), [
 				'Content-Type: text/html'

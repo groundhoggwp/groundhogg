@@ -94,16 +94,17 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 			?>
         <div class="select-step visible" data-id="<?php echo esc_attr( $step->get_type() ); ?>" data-keywords="<?php echo esc_attr( implode( ',', $keywords ) ); ?>">
             <div class="gh-tooltip top"><?php echo esc_html( $step->get_description() ); ?></div>
-            <div id='<?php echo $step->get_type(); ?>'
+            <div id='<?php echo esc_attr( $step->get_type() ); ?>'
                  data-type="<?php echo esc_attr( $step->get_type() ); ?>"
                  data-name="<?php echo esc_attr( $step->get_name() ); ?>"
                  data-group="<?php echo esc_attr( $step->get_group() ); ?>"
                  class="<?php echo esc_attr( implode( ' ', $classes ) ) ?>">
                 <div class="step-icon">
-					<?php if ( $step->icon_is_svg() ): ?>
-						<?php echo $step->get_icon_svg(); ?>
-					<?php else: ?>
-                        <img src="<?php echo esc_url( $step->get_icon() ); ?>">
+	                <?php if ( $step->icon_is_svg() ):
+		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this is an SVG
+		                echo $step->get_icon_svg();
+	                else: ?>
+                        <img src="<?php echo esc_url( $step->get_icon() ); ?>" alt="<?php echo esc_attr( $step->get_name() ); ?>">
 					<?php endif; ?>
                 </div>
                 <p><?php echo esc_html( $step->get_name() ) ?></p></div>
@@ -118,38 +119,32 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 
 ?>
 <form method="post" id="funnel-form" class="gh-fixed-ui" data-status="<?php echo esc_attr( $funnel->get_status() ) ?>">
-	<?php wp_nonce_field(); ?>
-	<?php $args = array(
-		'type'  => 'hidden',
-		'name'  => 'funnel',
-		'id'    => 'funnel',
-		'value' => $funnel_id
-	);
-	echo html()->input( $args ); ?>
+	<?php wp_nonce_field();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo html()->input( [ 'type' => 'hidden', 'name' => 'funnel', 'id' => 'funnel', 'value' => $funnel_id ] ); ?>
     <div class="gh-header funnel-editor-header">
-
 		<?php header_icon(); ?>
-
         <div class="title-section">
-            <div class="title-view">
-				<?php printf( esc_html__( 'Now editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $funnel->get_title() ) ); ?>
-            </div>
+            <div class="title-view"><?php
+	            /* translators: %s: the funnel title */
+	            esc_html_e( 'Now editing %s', 'groundhogg' );
+                ?><span class="title"><?php echo esc_html( $funnel->get_title() ) ?></span></div>
             <div class="title-edit hidden">
-                <input class="title" placeholder="<?php esc_html_e( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
+                <input class="title" placeholder="<?php esc_attr_e( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
                        type="text"
                        name="funnel_title" size="30" value="<?php echo esc_attr( $funnel->get_title() ); ?>" id="title"
                        spellcheck="true" autocomplete="off">
             </div>
         </div>
         <div class="last-saved">
-            <span class="is-saving loading-dots">Saving</span>
+            <span class="is-saving loading-dots"><?php esc_html_e( 'Saving', 'groundhogg' ); ?></span>
             <span id="last-saved-text"></span>
         </div>
         <div class="actions">
             <div id="undo-and-redo"></div>
 			<?php
 
-			echo html()->e( 'button', [
+			html( 'button', [
 				'class' => 'gh-button secondary text icon',
 				'id'    => 'funnel-simulate',
 				'type'  => 'button',
@@ -157,10 +152,10 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				dashicon( 'controls-play' ),
 				html()->e( 'div', [
 					'class' => 'gh-tooltip bottom'
-				], 'Simulate' )
+				], esc_html__( 'Simulate', 'groundhogg' ) )
 			] );
 
-			echo html()->e( 'button', [
+			html( 'button', [
 				'class' => 'gh-button secondary text icon',
 				'id'    => 'funnel-settings',
 				'type'  => 'button',
@@ -168,35 +163,32 @@ function render_draggable_step_grid( $steps, $groups = true ) {
 				dashicon( 'admin-generic' ),
 				html()->e( 'div', [
 					'class' => 'gh-tooltip bottom'
-				], 'Settings' )
+				], esc_html__( 'Settings', 'groundhogg' ) )
 			] );
 
-			echo html()->button( [
-				'type'  => 'button',
-				'class' => 'gh-button danger text',
-				'id'    => 'funnel-deactivate',
-				'text'  => 'Deactivate',
-			] );
+            html( 'button', [
+	            'type'  => 'button',
+	            'class' => 'gh-button danger text',
+	            'id'    => 'funnel-deactivate',
+            ], esc_html__( 'Deactivate', 'groundhogg' ) );
 
-			echo html()->button( [
+			html( 'button', [
 				'type'     => 'button',
 				'class'    => 'gh-button primary',
 				'disabled' => ! $funnel->has_changes(),
 				'id'       => 'funnel-update',
-				'text'     => html()->frag( [
-					html()->e( 'span', [ 'class' => 'button-text' ], 'Publish Changes' ),
-					html()->e( 'span', [ 'class' => 'gh-spinner' ] )
-				] ),
-			] );
+			], [
+				html()->e( 'span', [ 'class' => 'button-text' ], esc_html__( 'Publish Changes', 'groundhogg' ) ),
+				html()->e( 'span', [ 'class' => 'gh-spinner' ] )
+            ] );
 
-			echo html()->button( [
+			html( 'button', [
 				'type'  => 'button',
 				'class' => 'gh-button action',
 				'id'    => 'funnel-activate',
-				'text'  => html()->frag( [
-					html()->e( 'span', [ 'class' => 'button-text' ], 'Activate' ),
-					html()->e( 'span', [ 'class' => 'gh-spinner' ] )
-				] ),
+			], [
+				html()->e( 'span', [ 'class' => 'button-text' ], 'Activate' ),
+				html()->e( 'span', [ 'class' => 'gh-spinner' ] )
 			] );
 
 			?>
@@ -204,7 +196,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
         <div id="close">
 			<?php
 
-			echo html()->e( 'a', [
+			html( 'a', [
 				'href'  => admin_page_url( 'gh_funnels' ),
 				'id'    => 'close-button',
 				'class' => 'gh-button secondary icon text medium'
@@ -232,13 +224,13 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                     <div class="steps-select">
                         <div class="display-flex gap-10 stretch space-below-10">
                             <div class="gh-input-group full-width" style="background-color: #fff;">
-                                <button class="gh-button step-filter full-width" data-group="benchmark">Triggers</button>
-                                <button class="gh-button step-filter full-width" data-group="action">Actions</button>
-                                <button class="gh-button step-filter full-width" data-group="logic">Logic</button>
-                                <button class="gh-button step-filter full-width current" data-group="all">All</button>
+                                <button class="gh-button step-filter full-width" data-group="benchmark"><?php esc_html_e( 'Triggers', 'groundhogg' ); ?></button>
+                                <button class="gh-button step-filter full-width" data-group="action"><?php esc_html_e( 'Actions', 'groundhogg' ); ?></button>
+                                <button class="gh-button step-filter full-width" data-group="logic"><?php esc_html_e( 'Logic', 'groundhogg' ); ?></button>
+                                <button class="gh-button step-filter full-width current" data-group="all"><?php esc_html_e( 'All', 'groundhogg' ); ?></button>
                             </div>
                             <div class="step-search-wrap">
-                                <input id="step-search" name="step-search" type="search" placeholder="Search for a step..."/>
+                                <input id="step-search" name="step-search" type="search" placeholder="<?php esc_attr_e( 'Search for a step...', 'groundhogg' ); ?>"/>
                             </div>
                         </div>
                         <div class="steps-grid">

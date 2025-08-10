@@ -2,17 +2,9 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\DB\DB;
-use Groundhogg\Event;
-use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Preferences;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
 
 class Chart_Contacts_By_Region extends Base_Doughnut_Chart_Report {
 
@@ -69,7 +61,7 @@ class Chart_Contacts_By_Region extends Base_Doughnut_Chart_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-		$label = ! empty( $item_key ) ? $item_key : __( 'Unknown' );
+		$label = ! empty( $item_key ) ? $item_key : __( 'Unknown', 'groundhogg' );
 		$data  = $item_data;
 		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=region&meta_value=%s', $item_key ) ) : '#';
 

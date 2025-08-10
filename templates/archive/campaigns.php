@@ -94,11 +94,15 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 
 		if ( $search ):
 			?>
-            <p><?php printf( _n( 'We found %s campaign matching %s.', 'We found %s campaigns matching %s.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) ) ); ?></p>
+            <p><?php
+                /* translators: 1: number of campaigns found, 2: search term */
+				printf( _n( 'We found %s campaign matching %s.', 'We found %s campaigns matching %s.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) ) ); ?></p>
 		    <?php
 		else:
 			?>
-            <p><?php printf( _n( 'There is %s campaign archive available.', 'There are %s campaign archives available.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ) ); ?></p>
+            <p><?php
+                /* translators: 1: number of campaign archives available */
+				printf( _n( 'There is %s campaign archive available.', 'There are %s campaign archives available.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ) ); ?></p>
 		    <?php
 		endif;
 

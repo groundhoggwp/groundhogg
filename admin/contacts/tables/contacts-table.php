@@ -234,7 +234,7 @@ class Contacts_Table extends WP_List_Table {
 		}
 
 		?>
-        <tr id="contact-<?php echo $contact->get_id(); ?>">
+        <tr id="contact-<?php echo esc_attr( $contact->get_id() ); ?>">
 			<?php $this->single_row_columns( $contact ); ?>
         </tr>
 		<?php
@@ -321,6 +321,7 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	protected function get_view() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return ( isset( $_GET['optin_status'] ) ) ? absint( $_GET['optin_status'] ) : 0;
 	}
 
@@ -409,10 +410,10 @@ class Contacts_Table extends WP_List_Table {
 
 			$actions['inline hide-if-no-js'] = sprintf(
 				'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
-				/* translators: %s: title */
 				esc_attr( $contact->get_id() ),
-				esc_attr( sprintf( __( 'Quick edit "%s" inline' ), $title ) ),
-				esc_html__( 'Quick Edit' )
+				/* translators: %s: title */
+				esc_attr( sprintf( __( 'Quick edit "%s" inline' , 'groundhogg' ), $title ) ),
+				esc_html__( 'Quick Edit' , 'groundhogg' )
 			);
 		}
 
@@ -423,8 +424,8 @@ class Contacts_Table extends WP_List_Table {
 				'<a href="%s" class="edit" aria-label="%s">%s</a>',
 				/* translators: %s: title */
 				$editUrl,
-				esc_attr( __( 'Edit' ) ),
-				esc_html__( 'Edit' )
+				esc_attr( __( 'Edit' , 'groundhogg' ) ),
+				esc_html__( 'Edit' , 'groundhogg' )
 			);
 		}
 
@@ -464,7 +465,7 @@ class Contacts_Table extends WP_List_Table {
 				'data-id' => $contact->get_id(),
 				'class'   => 'delete-contact',
 				'href'    => action_url( 'delete', [ 'contact' => $contact->get_id() ] )
-			], esc_html__( 'Delete' ) );
+			], esc_html__( 'Delete' , 'groundhogg' ) );
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );
@@ -495,20 +496,14 @@ class Contacts_Table extends WP_List_Table {
 		?>
         <div class="table-wrap">
             <div class="table-scroll">
-                <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
+                <table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>">
                     <thead>
                     <tr>
 						<?php $this->print_column_headers(); ?>
                     </tr>
                     </thead>
 
-                    <tbody id="the-list"
-						<?php
-						if ( $singular ) {
-							echo " data-wp-lists='list:$singular'";
-						}
-						?>
-                    >
+                    <tbody id="the-list" <?php if ( $singular ) printf( " data-wp-lists='list:%s'", esc_attr( $singular ) ); ?>>
 					<?php $this->display_rows_or_placeholder(); ?>
                     </tbody>
 

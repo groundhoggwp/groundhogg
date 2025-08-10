@@ -91,6 +91,7 @@ class Update_Contacts extends Task {
 
 		if ( $this->batch === 0 ) {
 
+			/* translators: %s: the number of contacts that have been updated */
 			$message = sprintf( __( '%s contacts have been updated!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 

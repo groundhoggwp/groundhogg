@@ -44,7 +44,7 @@ class Table_Email_Stats extends Base_Table_Report {
 				] )
 			],
 			[
-				'label' => __( 'Sent', 'groundhogg' ),
+				'label' => esc_html_x( 'Sent', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( _nf( $sent ), [
 					[
 						[
@@ -62,7 +62,7 @@ class Table_Email_Stats extends Base_Table_Report {
 				], $sent )
 			],
 			[
-				'label' => __( 'Opens', 'groundhogg' ),
+				'label' => esc_html_x( 'Opens', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
 					[
 						[
@@ -80,7 +80,7 @@ class Table_Email_Stats extends Base_Table_Report {
 				], $opened )
 			],
 			[
-				'label' => __( 'Clicks', 'groundhogg' ),
+				'label' => esc_html_x( 'Clicks', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $clicked, $opened ), [
 					[
 						[
@@ -98,7 +98,7 @@ class Table_Email_Stats extends Base_Table_Report {
 				], $clicked )
 			],
 			[
-				'label' => __( 'Unsubscribed', 'groundhogg' ),
+				'label' => esc_html_x( 'Unsubscribed', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
 					[
 						[

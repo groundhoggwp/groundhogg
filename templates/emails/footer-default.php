@@ -58,7 +58,7 @@ do_action( 'groundhogg/templates/email/footer/before' );
 
 $footer_info = [
     html()->e( 'span', [], [
-        apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' )),
+	    apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' ) ),
         " ",
         html()->e( 'a', [
             'href' => apply_filters( 'groundhogg/email_template/unsubscribe_link', home_url() ),

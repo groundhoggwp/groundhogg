@@ -23,12 +23,12 @@ abstract class Base_Funnel_Email_Performance_Table_Report extends Base_Table_Rep
 
 	public function get_label() {
 		return [
-			__( 'Emails', 'groundhogg' ),
-//			__( 'Ored', 'groundhogg' ),
-			__( 'Sent', 'groundhogg' ),
-			__( 'Opens', 'groundhogg' ),
-			__( 'Clicks', 'groundhogg' ),
-			__( 'Unsubs', 'groundhogg' ),
+			esc_html__( 'Emails', 'groundhogg' ),
+//			esc_html__( 'Ored', 'groundhogg' ),
+			esc_html_x( 'Sent', 'stats', 'groundhogg' ),
+			esc_html_x( 'Opens', 'stats', 'groundhogg' ),
+			esc_html_x( 'Clicks', 'stats', 'groundhogg' ),
+			esc_html_x( 'Unsubs', 'stats', 'groundhogg' ),
 		];
 	}
 

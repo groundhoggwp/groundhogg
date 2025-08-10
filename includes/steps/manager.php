@@ -67,21 +67,21 @@ class Manager {
 	 */
 	public function init_steps() {
 
-		$this->register_sub_group( 'delay', __( 'Delay' ) );
-		$this->register_sub_group( 'comms', __( 'Communications' ) );
-		$this->register_sub_group( 'notifications', __( 'Notifications' ) );
-		$this->register_sub_group( 'forms', __( 'Forms' ) );
-		$this->register_sub_group( 'activity', __( 'Activity' ) );
-		$this->register_sub_group( 'crm', __( 'CRM' ) );
-		$this->register_sub_group( 'wordpress', __( 'WordPress' ) );
-		$this->register_sub_group( 'sms', __( 'SMS' ) );
-		$this->register_sub_group( 'user', __( 'User' ) );
-		$this->register_sub_group( 'lms', __( 'LMS' ) );
-		$this->register_sub_group( 'other', __( 'Other' ) );
-		$this->register_sub_group( 'developer', __( 'Developer' ) );
-		$this->register_sub_group( 'branching', __( 'Branching' ) );
-		$this->register_sub_group( 'logic', __( 'Logic' ) );
-		$this->register_sub_group( 'special', __( 'Special' ) );
+		$this->register_sub_group( 'delay', __( 'Delay', 'groundhogg' ) );
+		$this->register_sub_group( 'comms', __( 'Communications', 'groundhogg' ) );
+		$this->register_sub_group( 'notifications', __( 'Notifications', 'groundhogg' ) );
+		$this->register_sub_group( 'forms', __( 'Forms', 'groundhogg' ) );
+		$this->register_sub_group( 'activity', __( 'Activity', 'groundhogg' ) );
+		$this->register_sub_group( 'crm', __( 'CRM', 'groundhogg' ) );
+		$this->register_sub_group( 'wordpress', __( 'WordPress', 'groundhogg' ) );
+		$this->register_sub_group( 'sms', __( 'SMS', 'groundhogg' ) );
+		$this->register_sub_group( 'user', __( 'User', 'groundhogg' ) );
+		$this->register_sub_group( 'lms', __( 'LMS', 'groundhogg' ) );
+		$this->register_sub_group( 'other', __( 'Other', 'groundhogg' ) );
+		$this->register_sub_group( 'developer', __( 'Developer', 'groundhogg' ) );
+		$this->register_sub_group( 'branching', __( 'Branching', 'groundhogg' ) );
+		$this->register_sub_group( 'logic', __( 'Logic', 'groundhogg' ) );
+		$this->register_sub_group( 'special', __( 'Special', 'groundhogg' ) );
 
 		/* actions */
 		$this->add_step( new Send_Email() );

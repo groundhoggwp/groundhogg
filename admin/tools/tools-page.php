@@ -10,9 +10,7 @@ use Groundhogg\background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Export_Contacts;
-use Groundhogg\Extension_Upgrader;
 use Groundhogg\Files;
-use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
 use Groundhogg\Queue\Event_Queue;
@@ -29,7 +27,9 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_request_uri;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_sanitized_FILE;
 use function Groundhogg\get_url_var;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
@@ -37,6 +37,7 @@ use function Groundhogg\install_gh_cron_file;
 use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\kses;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
 use function Groundhogg\safe_user_id_sync;
@@ -189,7 +190,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	public function get_name() {
-		return esc_html__( 'Tools' );
+		return esc_html__( 'Tools' , 'groundhogg' );
 	}
 
 	public function get_cap() {
@@ -245,17 +246,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'manage_options'
 			],
 			[
-				'name' => esc_html__( 'System Info & Debug' ),
+				'name' => esc_html__( 'System Info & Debug' , 'groundhogg' ),
 				'slug' => 'system',
 				'cap'  => 'manage_options'
 			],
 			[
-				'name' => esc_html__( 'Import' ),
+				'name' => esc_html__( 'Import' , 'groundhogg' ),
 				'slug' => 'import',
 				'cap'  => 'import_contacts'
 			],
 			[
-				'name' => esc_html__( 'Export' ),
+				'name' => esc_html__( 'Export' , 'groundhogg' ),
 				'slug' => 'export',
 				'cap'  => 'export_contacts'
 			],
@@ -308,7 +309,7 @@ class Tools_Page extends Tabbed_Admin_Page {
         <p></p>
 		<?php if ( get_url_var( 'show_sys_info' ) ): ?>
             <pre class="code" style="width: 100%;height:max-content;"
-                 id="system-info-textarea"><?php echo groundhogg_tools_sysinfo_get(); ?></pre>
+                 id="system-info-textarea"><?php echo esc_html( groundhogg_tools_sysinfo_get() ); ?></pre>
 			<?php
 			return;
 		endif; ?>
@@ -317,20 +318,22 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 			return;
 		endif; ?>
-		<?php if ( get_url_var( 'action' ) === 'view_updates' && get_request_var( 'confirm' ) === 'yes' ):
-
-			?>
+		<?php if ( get_url_var( 'action' ) === 'view_updates' && get_request_var( 'confirm' ) === 'yes' ): ?>
             <p><?php esc_html_e( '⚠️ Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
 			<?php
 
-			echo html()->e( 'a', [
+			html( 'a', [
 				'class' => 'big-button button-primary',
 				'href'  => add_query_arg( [
 					'updater'             => sanitize_text_field( get_request_var( 'updater' ) ),
 					'manual_update'       => sanitize_text_field( get_request_var( 'manual_update' ) ),
 					'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
-				], $_SERVER['REQUEST_URI'] )
-			], sprintf( esc_html__( 'Yes, perform update %s', 'groundhogg' ), sanitize_text_field( get_request_var( 'manual_update' ) ) ) );
+				], get_request_uri() )
+			], sprintf(
+				/* translators: 1: version number to update to */
+				esc_html__( 'Yes, perform update %s', 'groundhogg' ),
+				sanitize_text_field( get_request_var( 'manual_update' ) )
+			) );
 
 			return;
 		endif; ?>
@@ -343,12 +346,12 @@ class Tools_Page extends Tabbed_Admin_Page {
                 <div class="inside">
                     <p><?php esc_html_e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
                     <a class="gh-button primary"
-                       href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php esc_html_e( 'Download System Info', 'groundhogg' ); ?></a>
+                       href="<?php echo esc_url( admin_url( '?gh_download_sys_info=1' ) ) ?>"><?php esc_html_e( 'Download System Info', 'groundhogg' ); ?></a>
                     <a class="gh-button secondary"
-                       href="<?php echo admin_page_url( 'gh_tools', [
+                       href="<?php echo esc_url( admin_page_url( 'gh_tools', [
 						   'tab'           => 'system',
 						   'show_sys_info' => 1
-					   ] ) ?>"><?php esc_html_e( 'View System Info', 'groundhogg' ); ?></a>
+					   ] ) ) ?>"><?php esc_html_e( 'View System Info', 'groundhogg' ); ?></a>
                 </div>
             </div>
             <div class="gh-panel">
@@ -356,21 +359,24 @@ class Tools_Page extends Tabbed_Admin_Page {
                     <h2 class="hndle"><?php esc_html_e( 'Safe Mode', 'groundhogg' ); ?></h2>
                 </div>
                 <div class="inside">
-                    <p><?php printf( esc_html__( 'Safe mode will temporarily disable any non %s related plugins for debugging purposes for your account only. Other users will not be impacted.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <p><?php
+                        /* translators: 1: plugin/brand name */
+                        echo esc_html( sprintf( __( 'Safe mode will temporarily disable any non %s related plugins for debugging purposes for your account only. Other users will not be impacted.', 'groundhogg' ), white_labeled_name() ) );
+                        ?></p>
 					<?php
 
 					maybe_install_safe_mode_plugin();
 
 					if ( ! groundhogg_is_safe_mode_enabled() ):
 
-						echo html()->e( 'a', [
+						html( 'a', [
 							'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'enable_safe_mode' ] ), 'enable_safe_mode' ),
 							'class' => 'gh-button danger text danger-confirm',
 						], esc_html__( 'Enable Safe Mode', 'groundhogg' ) );
 
 					else:
 
-						echo html()->e( 'a', [
+						html( 'a', [
 							'href'  => nonce_url_no_amp( $this->admin_url( [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' ),
 							'class' => [ 'gh-button primary' ]
 						], esc_html__( 'Disable Safe Mode', 'groundhogg' ) );
@@ -390,13 +396,18 @@ class Tools_Page extends Tabbed_Admin_Page {
 						<?php html()->hidden_GET_inputs() ?>
 						<?php wp_nonce_field( 'gh_manual_install', 'manual_install_nonce' ) ?>
                         <div class="gh-input-group">
-							<?php echo html()->dropdown( [
+							<?php
+
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                            echo html()->dropdown( [
 								'name'        => 'manual_install',
+	                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 								'options'     => apply_filters( 'groundhogg/admin/tools/install', [] ),
 								'required'    => true,
 								'option_none' => esc_html__( 'Select plugin to run install', 'groundhogg' )
 							] );
 
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 							echo html()->submit( [
 								'class' => 'gh-button primary',
 								'text'  => esc_html__( 'Run installation', 'groundhogg' )
@@ -416,16 +427,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 						<?php html()->hidden_GET_inputs() ?>
 						<?php action_input( 'view_updates' ) ?>
                         <div class="gh-input-group">
-							<?php echo html()->dropdown( [
+							<?php
+
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                            echo html()->dropdown( [
 								'name'        => 'updater',
 								'required'    => true,
+	                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 								'options'     => apply_filters( 'groundhogg/admin/tools/updaters', [] ),
 								'option_none' => esc_html__( 'Select plugin to view updates', 'groundhogg' )
 							] );
 
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 							echo html()->submit( [
 								'class' => 'gh-button primary',
-								'text'  => esc_html__( 'View Updates' )
+								'text'  => esc_html__( 'View Updates' , 'groundhogg' )
 							] )
 
 							?>
@@ -440,7 +456,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                         <h2 class="hndle"><?php esc_html_e( 'Network Upgrades', 'groundhogg' ); ?></h2>
                     </div>
                     <div class="inside">
-                        <p><?php esc_html_e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
+                        <p><?php esc_html_e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.', 'groundhogg' ); ?></p>
 						<?php
 
 						do_action( 'groundhogg/admin/tools/network_updates' );
@@ -455,20 +471,30 @@ class Tools_Page extends Tabbed_Admin_Page {
                         <h2 class="hndle"><span>⚠️ <?php esc_html_e( 'Reset', 'groundhogg' ); ?></span></h2>
                     </div>
                     <div class="inside">
-                        <p><?php printf( esc_html__( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                        <p><?php printf( esc_html__('To confirm you want to reset, type %s into the text box below.', 'groundhogg' ), code_it( 'reset' ) ); ?></p>
+                  						<p><?php
+                                            /* translators: %s: plugin/brand name */
+                                            echo esc_html( sprintf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ) ); ?></p>
+                  						<p><?php
+                                            /* translators: %s: the literal confirmation word */
+                                            printf( esc_html__('To confirm you want to reset, type %s into the text box below.', 'groundhogg' ),
+	                                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safe HTML
+                                                code_it( 'reset' ) );
+                                            ?></p>
                         <form method="post" class="danger-permanent">
 							<?php wp_nonce_field( 'reset' ) ?>
 							<?php action_input( 'reset' ) ?>
                             <div class="gh-input-group">
 
-								<?php echo html()->input( [
+								<?php
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                                echo html()->input( [
 									'class'       => 'input',
 									'name'        => 'reset_confirmation',
 									'placeholder' => 'Type "reset" to confirm.',
 									'required'    => true,
 								] );
 
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 								echo html()->submit( [
 									'class' => 'gh-button danger',
 									'text'  => esc_html__( '⚠️ Reset', 'groundhogg' )
@@ -493,7 +519,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		maybe_install_safe_mode_plugin();
 
 		if ( groundhogg_enable_safe_mode() ) {
-			$this->add_notice( 'safe_mode_enabled', esc_html__( 'Safe mode has been enabled.' ) );
+			$this->add_notice( 'safe_mode_enabled', esc_html__( 'Safe mode has been enabled.' , 'groundhogg' ) );
 		} else {
 			$this->add_notice( new WP_Error( 'error', 'Could not enable safe mode due to a possible fatal error.' ) );
 		}
@@ -504,7 +530,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		maybe_install_safe_mode_plugin();
 
 		if ( groundhogg_disable_safe_mode() ) {
-			$this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' ) );
+			$this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' , 'groundhogg' ) );
 		}
 	}
 
@@ -565,7 +591,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$file = $_FILES['import_file'];
+		$file = get_sanitized_FILE( 'import_file' );
 
 		$result = files()->safe_file_upload( $file, [
 			'csv' => 'text/csv',
@@ -575,7 +601,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			return $result;
 		}
 
-		return wp_redirect( $this->admin_url( [
+		return wp_safe_redirect( $this->admin_url( [
 			'action' => 'map',
 			'tab'    => 'import',
 			'import' => urlencode( basename( $result['file'] ) ),
@@ -599,8 +625,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$file_name = sanitize_file_name( get_post_var( 'import' ) );
 
-		$tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
+		$tags = [ sprintf( '%1$s - %2$s', __( 'Import' , 'groundhogg' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is handled upstream
 		if ( isset_not_empty( $_POST, 'tags' ) ) {
 			$tags = array_merge( $tags, get_post_var( 'tags' ) );
 		}
@@ -627,7 +654,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$time = human_time_diff( time(), time() + ( ceil( $rows / 1000 ) * MINUTE_IN_SECONDS ) );
 
-		$this->add_notice( 'success', sprintf( __( 'Your contacts are being imported in the background! <i>We\'re estimating it will take ~%s.</i> We\'ll let you know when it\'s done!', 'groundhogg' ), $time ) );
+			/* translators: 1: estimated time until import completes */
+			$this->add_notice( 'success', sprintf( __( 'Your contacts are being imported in the background! <i>We\'re estimating it will take ~%s.</i> We\'ll let you know when it\'s done!', 'groundhogg' ), $time ) );
 
 		return admin_page_url( 'gh_tools', [ 'tab' => 'import' ] );
 	}
@@ -712,10 +740,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 
             <h3><?php esc_html_e( 'Name your export', 'groundhogg' ); ?></h3>
 
-			<?php echo html()->input( [
+			<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+            echo html()->input( [
 				'name'        => 'file_name',
 				'placeholder' => 'My export...',
 				'required'    => true,
+	            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 				'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
 			] ); ?>
 
@@ -728,12 +759,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 			foreach ( $tabs as $tab ):
 
-				?><h2><?php esc_html_e( $tab['name'] ); ?></h2><?php
+				?><h2><?php echo esc_html( $tab['name'] ); ?></h2><?php
 
 				$groups = Properties::instance()->get_groups( $tab['id'] );
 
 				foreach ( $groups as $group ):
-					?><h4><?php esc_html_e( $group['name'] ); ?></h4><?php
+					?><h4><?php echo esc_html( $group['name'] ); ?></h4><?php
 
 					$columns = [];
 					$fields  = Properties::instance()->get_fields( $group['id'] );
@@ -767,23 +798,30 @@ class Tools_Page extends Tabbed_Admin_Page {
                     <td>
 						<?php
 
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 						echo html()->dropdown( [
 							'name'        => 'header_type',
 							'options'     => [
-								'basic'  => __( 'Field IDs' ),
-								'pretty' => __( 'Pretty Names' ),
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+								'basic'  => __( 'Field IDs' , 'groundhogg' ),
+								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+								'pretty' => __( 'Pretty Names' , 'groundhogg' ),
 							],
 							'option_none' => false
 						] );
 
-						echo html()->description( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ) )
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses used
+						echo html()->description( kses( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ), 'simple' ) )
 
 						?>
                     </td>
                 </tr>
                 </tbody>
             </table>
-			<?php submit_button( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) ); ?>
+			<?php
+			/* translators: 1: number of contacts to export */
+			submit_button( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) );
+			?>
         </form>
         <script>
           ( function ($) {
@@ -986,6 +1024,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		header( 'Content-Type: text/plain' );
 		header( 'Content-Disposition: attachment; filename="gh-cron.txt"' );
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- file download
 		echo $gh_cron_php;
 		die();
 	}

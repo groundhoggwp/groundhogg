@@ -89,7 +89,7 @@ class Task_Completed extends Benchmark {
 	}
 
 	public function get_name() {
-		return __( 'Task Completed' );
+		return __( 'Task Completed', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -101,7 +101,7 @@ class Task_Completed extends Benchmark {
 	}
 
 	public function get_description() {
-		return __( 'Runs when a task is completed.' );
+		return __( 'Runs when a task is completed.', 'groundhogg' );
 	}
 
 	public function get_icon() {
@@ -148,8 +148,8 @@ class Task_Completed extends Benchmark {
 				'style'       => [ 'vertical-align' => 'middle' ],
 				'options'     =>
 					[
-						'any' => __( 'Any' ),
-						'all' => __( 'All' ),
+						'any' => __( 'Any', 'groundhogg' ),
+						'all' => __( 'All', 'groundhogg' ),
 					]
 			] ),
 			html()->select2( [

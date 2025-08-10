@@ -9,6 +9,7 @@ use Groundhogg\Submission;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\blacklist_check;
+use function Groundhogg\bold_it;
 use function Groundhogg\contact_and_user_match;
 use function Groundhogg\decrypt;
 use function Groundhogg\do_replacements;
@@ -19,6 +20,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_current_contact;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_sanitized_FILE;
 use function Groundhogg\process_events;
 use function Groundhogg\split_name;
 use function Groundhogg\Ymd;
@@ -136,8 +138,8 @@ class Submission_Handler extends Supports_Errors {
 		}
 
 		// Setup the POST data
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- handled upstream
 		$this->posted_data  = wp_unslash( $_POST );
-		$this->posted_files = $_FILES;
 
 		do_action( 'groundhogg/submission_handler/setup', $this );
 
@@ -169,7 +171,8 @@ class Submission_Handler extends Supports_Errors {
 			// Check for FILE type special...
 			if ( $this->field_is( $field, 'file' ) ) {
 				if ( $this->field_is_required( $field ) && ! $this->get_posted_file( $field ) ) {
-					$this->add_error( 'missing_required_field', sprintf( __( '<b>Missing a required field:</b> %s', 'groundhogg' ), $this->get_field_label( $field ) ) );
+					/* translators: %s: */
+					$this->add_error( 'missing_required_field', bold_it( esc_html__( 'Missing a required field:', 'groundhogg' ) ) . ' ' . $this->get_field_label( $field ) );
 					continue;
 				}
 
@@ -179,7 +182,7 @@ class Submission_Handler extends Supports_Errors {
 				// Check for required fields...
 			} else {
 				if ( $this->field_is_required( $field ) && ! $this->get_posted_data( $field ) ) {
-					$this->add_error( 'missing_required_field', sprintf( __( '<b>Missing a required field:</b> %s', 'groundhogg' ), $this->get_field_label( $field ) ) );
+					$this->add_error( 'missing_required_field', bold_it( esc_html__( 'Missing a required field:', 'groundhogg' ) ) . ' ' . $this->get_field_label( $field ) );
 					continue;
 				}
 			}
@@ -463,10 +466,10 @@ class Submission_Handler extends Supports_Errors {
 
 	public function get_posted_file( $key = false, $default = false ) {
 		if ( ! $key ) {
-			return $this->posted_files;
+			return null;
 		}
 
-		return get_array_var( $this->posted_files, $key, $default );
+		return get_sanitized_FILE( $key );
 	}
 
 	public function get_form_id() {

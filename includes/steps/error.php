@@ -7,7 +7,7 @@ use Groundhogg\Step;
 class Error extends Funnel_Step {
 
 	public function get_name() {
-		return __( 'Error' );
+		return __( 'Error', 'groundhogg' );
 	}
 
 	public function get_type() {

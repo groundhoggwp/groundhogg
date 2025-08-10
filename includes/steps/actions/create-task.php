@@ -113,9 +113,9 @@ class Create_Task extends Action {
 			] ),
 			html()->dropdown( [
 				'options'     => [
-					'days'   => __( 'Days' ),
-					'weeks'  => __( 'Weeks' ),
-					'months' => __( 'Months' ),
+					'days'   => __( 'Days', 'groundhogg' ),
+					'weeks'  => __( 'Weeks', 'groundhogg' ),
+					'months' => __( 'Months', 'groundhogg' ),
 				],
 				'selected'    => $this->get_setting( 'delay_unit', 'days' ),
 				'name'        => $this->setting_name_prefix( 'delay_unit' ),

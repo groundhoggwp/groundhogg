@@ -53,19 +53,21 @@ $campaign = new Campaign( $id );
         <tr class="form-field term-description-wrap">
             <th scope="row"><label for="description"><?php echo esc_html( _x( 'Description', 'campaign description', 'groundhogg' ) ); ?></label></th>
             <td><textarea name="description" id="description" rows="5" cols="50"
-                          class="large-text"><?php echo $campaign->get_description(); ?></textarea>
+                          class="large-text"><?php echo esc_html( $campaign->get_description() ); ?></textarea>
                 <p class="description"><?php esc_html_e( 'The description is not prominent by default; However it may be shown if the campaign archive is public.', 'groundhogg' ); ?></p>
             </td>
         </tr>
         <tr class="form-field term-description-wrap">
             <th scope="row"><label for="description"><?php echo esc_html( _x( 'Visibility', 'campaign visibility', 'groundhogg' ) ); ?></label></th>
-            <td><label class="display-flex align-center gap-10"><span><?php esc_html_e( 'Make the archive for this campaign publicly accessible?', 'groundhogg' )); ?></span>
+            <td><label class="display-flex align-center gap-10"><span><?php esc_html_e( 'Make the archive for this campaign publicly accessible?', 'groundhogg' ); ?></span>
 					<?php
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo html()->toggle( [
 						'id'       => 'is-public',
 						'name'     => 'public',
-						'onLabel'  => esc_html__( 'Yes' ),
-						'offLabel' => esc_html__( 'No' ),
+						'onLabel'  => esc_html__( 'Yes', 'groundhogg' ),
+						'offLabel' => esc_html__( 'No', 'groundhogg' ),
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'checked'  => $campaign->is_public(),
 					] );
 					?>
@@ -75,10 +77,10 @@ $campaign = new Campaign( $id );
         </tbody>
     </table>
     <div class="edit-tag-actions">
-		<?php submit_button( esc_html__( 'Update' ), 'primary', 'update', false ); ?>
+	    <?php submit_button( esc_html__( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
         <span id="delete-link">
-            <a class="delete" href="<?php echo action_url( 'delete', [ 'campaign' => $campaign->ID ] ) ?>">
-                <?php esc_html_e( 'Delete' )); ?>
+            <a class="delete" href="<?php echo esc_url( action_url( 'delete', [ 'campaign' => $campaign->ID ] ) ) ?>">
+                <?php esc_html_e( 'Delete', 'groundhogg' ); ?>
             </a>
         </span>
     </div>

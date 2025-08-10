@@ -5,7 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Email;
-use function Groundhogg\get_default_email_width;
 use function Groundhogg\the_email;
 
 include_once __DIR__ . '/template-functions.php';
@@ -19,7 +18,7 @@ $email = the_email();
 $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), esc_html( $email->get_merged_subject_line() ), esc_html( $email_title ) );
+$email_title = sprintf( '%1$s &lsaquo; %2$s', esc_html( $email->get_merged_subject_line() ), esc_html( $email_title ) );
 
 $bgColor    = $email->get_meta( 'backgroundColor' ) ?: '';
 $bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';

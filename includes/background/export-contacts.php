@@ -10,7 +10,6 @@ use function Groundhogg\file_access_url;
 use function Groundhogg\files;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
-use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 use function Groundhogg\percentage;
 use function Groundhogg\white_labeled_name;
@@ -110,14 +109,16 @@ class Export_Contacts extends Task {
 
 		if ( empty( $contacts ) ) {
 
+			/* translators: %s: the name of the export file */
 			$message = sprintf( __( 'Your contacts export %s is ready for download!', 'groundhogg' ), html()->e( 'a', [
 //				'class' => 'gh-button primary',
 				'href' => file_access_url( '/exports/' . basename( $this->filePath ), true )
-			], __( bold_it( basename( $this->filePath ) ), 'groundhogg' ) ) );
+			], esc_html( bold_it( basename( $this->filePath ) ) ) ) );
 
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
-			$subject = sprintf( __( "[%s] Export ready!" ), white_labeled_name() );
+			/* translators: %s: site/brand name */
+			$subject = sprintf( __( "[%s] Export ready!", 'groundhogg' ), white_labeled_name() );
 
 			wp_mail( get_userdata( $this->user_id )->user_email, $subject, wpautop( $message ), [
 				'Content-Type: text/html'

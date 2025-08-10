@@ -141,7 +141,7 @@ class API_Keys_Table extends WP_List_Table {
 	 * Renders the column for the user field
 	 *
 	 * @since 2.0
-	 * @return void
+	 * @return string
 	 */
 	public function column_user( $item ) {
 
@@ -187,6 +187,7 @@ class API_Keys_Table extends WP_List_Table {
 	 * @return int Current page number
 	 */
 	public function get_paged() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
 	}
 

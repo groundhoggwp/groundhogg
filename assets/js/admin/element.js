@@ -318,8 +318,9 @@
     if (array.length === 1) {
       return array[0]
     }
+    // translators: 1: all items in a list except the last, 2: the last item; used when joining with "and"
     return sprintf(
-      _x('%s and %s', 'and preceding the last item in a list', 'groundhogg'),
+      _x('%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg'),
       array.slice(0, -1).join(', '), array[array.length - 1])
   }
 
@@ -331,7 +332,7 @@
       return array[0]
     }
     return sprintf(
-      _x('%s or %s', 'or preceding the last item in a list', 'groundhogg'),
+      _x('%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg'),
       array.slice(0, -1).join(', '),
       array[array.length - 1])
   }

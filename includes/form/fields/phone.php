@@ -121,7 +121,7 @@ class Phone extends Input {
 						html()->e( 'label', [
 							'class' => 'gh-input-label',
 							'for'   => $this->get_id(),
-						], __( 'Ext.' ) ),
+						], __( 'Ext.', 'groundhogg' ) ),
 						$ext_input
 					] )
 				] ),

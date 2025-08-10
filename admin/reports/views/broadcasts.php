@@ -25,10 +25,10 @@ if ( ! $has_sent_broadcasts ):
                 <li><?php esc_html_e( 'Select which contacts should receive it.', 'groundhogg' ); ?></li>
                 <li><b><?php esc_html_e( 'Click send!', 'groundhogg' ); ?></b></li>
             </ol>
-            <a class="gh-button primary" href="<?php echo admin_page_url( 'gh_broadcasts', [
+            <a class="gh-button primary" href="<?php echo esc_url( admin_page_url( 'gh_broadcasts', [
 				'action' => 'add',
 				'type'   => 'email'
-			] ) ?>"><?php esc_html_e( 'Schedule a broadcast now!', 'groundhogg' ) ?></a>
+			] ) ) ?>"><?php esc_html_e( 'Schedule a broadcast now!', 'groundhogg' ) ?></a>
         </div>
     </div>
 <?php elseif ( get_url_var( 'broadcast' ) ) : ?>

@@ -94,7 +94,7 @@ function managed_page_head( $title = '', $action = '' ) {
 	$mp_title = get_bloginfo( 'name', 'display' );
 
 	/* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-	$mp_title = sprintf( __( '%1$s &lsaquo; %2$s' ), esc_html( $title ), esc_html( $mp_title ) );
+	$mp_title = sprintf( '%1$s &lsaquo; %2$s', esc_html( $title ), esc_html( $mp_title ) );
 	$mp_title = apply_filters( 'managed_page_title', $mp_title, $title );
 
 	$classes = [ $action ];
@@ -106,6 +106,7 @@ function managed_page_head( $title = '', $action = '' ) {
 		$header_title = get_network()->site_name;
 	} else {
 		$header_url   = home_url();
+		/* translators: 1: plugin/brand name */
 		$header_title = sprintf( __( 'Powered by %s', 'groundhogg' ), white_labeled_name() );
 	}
 
@@ -156,6 +157,7 @@ function managed_page_footer() {
 	$privacy_policy_url = function_exists( 'get_privacy_policy_url' ) && get_privacy_policy_url() ? get_privacy_policy_url() : get_option( 'gh_privacy_policy' );
 
 	$footer_links = [
+		/* translators: 1: the site title/name */
 		html()->e( 'a', [ 'href' => home_url( '/' ) ], '&larr; ' . sprintf( esc_html__( 'Back to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ) ),
 		html()->e( 'a', [ 'href' => $privacy_policy_url ], esc_html__( 'Privacy Policy', 'groundhogg' ) ),
 	];
@@ -179,7 +181,8 @@ function managed_page_footer() {
     <p id="extralinks"><?php echo $html; ?></p>
 	<?php if ( is_option_enabled( 'gh_affiliate_link_in_email' ) ): ?>
         <p id="credit">
-			<?php printf( esc_html__( "Powered by %s", 'groundhogg' ), html()->e( 'a', [
+	        <?php /* translators: 1: plugin/brand name as a link */
+	        printf( esc_html__( "Powered by %s", 'groundhogg' ), html()->e( 'a', [
 				'target' => '_blank',
 				'href'   => add_query_arg( [
 					'utm_source'   => 'email',

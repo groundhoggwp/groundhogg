@@ -2,8 +2,8 @@
 
 namespace Groundhogg\Form\Fields;
 
-use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Plugin;
+use WP_Error;
 use function Groundhogg\get_array_var;
 use function Groundhogg\is_recaptcha_enabled;
 
@@ -91,7 +91,7 @@ class Recaptcha extends Input {
 	 * @param $input
 	 * @param $config
 	 *
-	 * @return \WP_Error|true
+	 * @return WP_Error|true
 	 */
 	public static function validate( $input, $config ) {
 
@@ -114,7 +114,7 @@ class Recaptcha extends Input {
 		$verifyResponse = wp_remote_get( $file_name );
 		$responseData   = json_decode( wp_remote_retrieve_body( $verifyResponse ) );
 
-		$bot_error = new \WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
+		$bot_error = new WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed reCAPTCHA verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
 
 		if ( $responseData->success == false ) {
 			return $bot_error;

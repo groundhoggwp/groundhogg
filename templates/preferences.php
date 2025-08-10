@@ -70,14 +70,14 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 				'border-spacing' => '10px'
 			]
 		], [], [
-			[ __( 'Name' ), $contact->get_full_name() ],
-			[ __( 'Email' ), $contact->get_email() ],
-			[ __( 'Phone' ), $contact->get_phone_number() ],
-			[ __( 'Mobile' ), $contact->get_mobile_number() ],
-			[ __( 'Address' ), implode( ', ', $contact->get_address() ) ],
-			[ __( 'IP Address' ), $contact->get_ip_address() ],
-			[ __( 'Subscribed' ), date_i18n( get_date_time_format(), date_as_int( $contact->get_date_created() ) ) ],
-			[ __( 'Tags' ), implode( ', ', $contact->get_tags( true ) ) ],
+			[ esc_html__( 'Name', 'groundhogg' ), $contact->get_full_name() ],
+			[ esc_html__( 'Email', 'groundhogg' ), $contact->get_email() ],
+			[ esc_html__( 'Phone', 'groundhogg' ), $contact->get_phone_number() ],
+			[ esc_html__( 'Mobile', 'groundhogg' ), $contact->get_mobile_number() ],
+			[ esc_html__( 'Address', 'groundhogg' ), implode( ', ', $contact->get_address() ) ],
+			[ esc_html__( 'IP Address', 'groundhogg' ), $contact->get_ip_address() ],
+			[ esc_html__( 'Subscribed', 'groundhogg' ), date_i18n( get_date_time_format(), date_as_int( $contact->get_date_created() ) ) ],
+			[ esc_html__( 'Tags', 'groundhogg' ), implode( ', ', $contact->get_tags( true ) ) ],
 		] );
 
 		do_action( 'groundhogg/preferences/gdpr_audit_message/after_basic', $contact );
@@ -133,7 +133,7 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
         <p><?php esc_html_e( 'See an archive of emails you\'ve received from us in the past.', 'groundhogg' );; ?></p>
         <p><?php echo html()->e( 'a', [
 				'href' => add_failsafe_tracking_params( permissions_key_url( managed_page_url( 'archive' ), $contact, 'view_archive' ), $contact )
-			], __( 'View email archive' ) ); ?></p>
+	        ], esc_html__( 'View email archive', 'groundhogg' ) ); ?></p>
 		<?php
 
 		$contact_methods = [
@@ -162,6 +162,7 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 		// Filters the message
 		$message = apply_filters( 'groundhogg/preferences/gdpr_audit_message', $message );
 
+		/* translators: 1: site or business name */
 		$subject_line = sprintf( __( '[%s] Your personal profile audit', 'groundhogg' ), get_option( 'gh_business_name' ) );
 
 		// Filters the GDPR audit subject line
@@ -211,7 +212,8 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		ob_start();
 
 		?>
-        <p><?php printf( __( 'Someone has requested to manage your email preferences on %s.', 'groundhogg' ), get_bloginfo() ) ?></p>
+        <p><?php /* translators: 1: site name */
+			printf( __( 'Someone has requested to manage your email preferences on %s.', 'groundhogg' ), get_bloginfo() ) ?></p>
         <p><?php esc_html_e( 'If you did not initiate this request, just ignore this email and nothing will happen.', 'groundhogg' ); ?></p>
         <p><?php esc_html_e( 'Use any of the following links to manage your preferences.', 'groundhogg' ); ?></p>
         <p><?php echo implode( ' | ', $links ) ?></p>
@@ -219,6 +221,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 
 		$message = ob_get_clean();
 
+		/* translators: 1: site name */
 		$subject = sprintf( _x( '[%s] Manage your preferences', 'subject line', 'groundhogg' ), get_bloginfo( 'name' ) );
 
 		/**
@@ -276,6 +279,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_archive_link' ) ) {
 
 		$message = ob_get_clean();
 
+		/* translators: 1: site name */
 		$subject = sprintf( _x( '[%s] View your email archive', 'subject line', 'groundhogg' ), get_bloginfo( 'name' ) );
 
 		/**
@@ -473,7 +477,8 @@ switch ( $action ):
 		?>
         <form class="box" action="" id="preferences" method="post">
             <h2 class="no-margin-top">
-				<?php printf( __( 'Update information for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), $contact->get_email() ) ?>
+	            <?php /* translators: 1: contact full name, 2: contact email address */
+	            printf( __( 'Update information for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), $contact->get_email() ) ?>
             </h2>
             <p><?php esc_html_e( 'Use the form below to update your information to the most current.', 'groundhogg' ); ?></p>
 			<?php wp_nonce_field( 'update_contact_profile' ); ?>
@@ -674,7 +679,8 @@ switch ( $action ):
                 <h2 class="no-margin-top">
 					<?php esc_html_e( 'Subscribe', 'groundhogg' ); ?>
                 </h2>
-                <p><?php printf( __( 'You are currently <b>unsubscribed</b>. Would you like to receive occasional content, marketing, and promotions from %s?', 'groundhogg' ), get_bloginfo() ) ?></p>
+                <p><?php /* translators: 1: site name */
+		            printf( __( 'You are currently <b>unsubscribed</b>. Would you like to receive occasional content, marketing, and promotions from %s?', 'groundhogg' ), get_bloginfo() ) ?></p>
                 <p>
                     <a id="gotoprofile" class="button"
                        href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'preference', 'confirm', managed_page_url( 'preferences/manage' ) ), 'manage_email_preferences' ) ); ?>"><?php esc_html_e( 'Yes! Subscribe!', 'groundhogg' ); ?></a>
@@ -690,7 +696,8 @@ switch ( $action ):
                 <h2 class="no-margin-top">
 					<?php esc_html_e( 'Unsubscribe', 'groundhogg' ); ?>
                 </h2>
-                <p><?php printf( __( 'Complete this form if you no longer want to receive <b>marketing</b> from %s. You may still receive transactional information related to your account.', 'groundhogg' ), get_bloginfo() ) ?></p>
+                <p><?php /* translators: 1: site name */
+		            printf( __( 'Complete this form if you no longer want to receive <b>marketing</b> from %s. You may still receive transactional information related to your account.', 'groundhogg' ), get_bloginfo() ) ?></p>
                 <label for="reason"><?php esc_html_e( "Can you tell us why you're unsubscribing?", 'groundhogg' ); ?> <span class="optional"><?php esc_html_e( '(optional)', 'groundhogg' ) ?></span></label>
 				<?php echo html()->dropdown( [
 					'id'      => 'reason',
@@ -741,7 +748,8 @@ switch ( $action ):
 		?>
         <div class="box">
             <p>
-                <b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), $contact->get_email() ) ?></b>
+                <b><?php /* translators: 1: the contact's email address */
+		            printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), $contact->get_email() ) ?></b>
             </p>
             <p><?php esc_html_e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.', 'groundhogg' ); ?></p>
             <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=confirm', 'manage_email_preferences' ); ?>"
@@ -798,7 +806,8 @@ switch ( $action ):
 		?>
         <div class="box">
             <p>
-                <b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), $contact->get_email() ) ?></b>
+                <b><?php /* translators: 1: the contact's email address */
+		            printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), $contact->get_email() ) ?></b>
             </p>
             <p><?php esc_html_e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.', 'groundhogg' ); ?></p>
 
@@ -845,12 +854,16 @@ switch ( $action ):
 		?>
         <div class="box">
             <p>
-                <b><?php printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), $contact->get_email() ) ?></b>
+                <b><?php /* translators: 1: the contact's email address */
+		            printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), $contact->get_email() ) ?></b>
             </p>
-            <p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></p>
+            <p><?php /* translators: 1: site title/name */
+		        printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></p>
             <p>
                 <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+                   href="<?php echo esc_url( home_url() ); ?>"><?php
+                    /* translators: 1: site title/name */
+	                printf( esc_html__( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
             </p>
         </div>
 		<?php
@@ -916,7 +929,10 @@ switch ( $action ):
             <p><?php esc_html_e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
             <p>
                 <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+                   href="<?php echo esc_url( home_url() ); ?>"><?php
+                    /* translators: 1: site title/name */
+	                printf( esc_html__( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) );
+                    ?></a>
             </p>
         </div>
 		<?php

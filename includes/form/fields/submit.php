@@ -11,7 +11,7 @@ class Submit extends Field {
 		return [
 			'id'    => 'gh-submit',
 			'class' => 'gh-submit',
-			'text'  => __( 'Submit' ),
+			'text' => __( 'Submit', 'groundhogg' ),
 		];
 	}
 

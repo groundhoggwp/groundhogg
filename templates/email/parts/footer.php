@@ -59,8 +59,8 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 
 	$links = array_filter( [
 		$tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
-		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy' ) ) : false,
-		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
+		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy', 'groundhogg' ) ) : false,
+		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
 	] );
 
 	$_p( $business_name );
@@ -68,6 +68,7 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 	$_p( implode( ' | ', $links ) );
 
 	if ( ! $email->is_transactional() ) {
+		/* translators: 1: unsubscribe link HTML */
 		$_p( sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 			'href' => $email->get_unsubscribe_link()
 		], __( 'Unsubscribe', 'groundhogg' ) ) ) );

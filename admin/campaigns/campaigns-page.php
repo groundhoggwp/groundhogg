@@ -58,27 +58,27 @@ class Campaigns_Page extends Admin_Page {
 
 					action_input( 'add', true, true );
 
-					echo html()->e( 'div', [
+					html()->div( [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html__( 'Name' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html_x( 'Name', 'campaign name', 'groundhogg' ) ),
 						html()->input( [
 							'id'   => 'campaign-name',
 							'name' => 'name'
 						] ),
 						html()->description( esc_html__( 'A recognizable name for the campaign.', 'groundhogg' ) )
-					] );
+					], true );
 
-					echo html()->e( 'div', [
+					html()->div( [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-slug' ], esc_html__( 'Slug' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-slug' ], esc_html_x( 'Slug', 'campaign slug', 'groundhogg' ) ),
 						html()->input( [
 							'id'   => 'campaign-slug',
 							'name' => 'slug'
 						] ),
-						html()->description( esc_html__( 'The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens' ) )
-					] );
+						html()->description( esc_html__( 'The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.', 'groundhogg' ) )
+					],true );
 
 					?>
                     <script>
@@ -90,19 +90,19 @@ class Campaigns_Page extends Admin_Page {
                     </script>
 					<?php
 
-					echo html()->e( 'div', [
+					html()->div( [
 						'class' => 'display-flex column'
 					], [
-						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html__( 'Description' ) ),
+						html()->e( 'label', [ 'for' => 'campaign-name' ], esc_html_x( 'Description', 'campaign description', 'groundhogg' ) ),
 						html()->textarea( [
 							'id'   => 'campaign-description',
 							'name' => 'description',
 							'rows' => 3
 						] ),
 						html()->description( esc_html__( 'A description of the assets that will be assigned to this campaign.', 'groundhogg' ) )
-					] );
+					], true );
 
-					echo html()->e( 'div', [
+					html()->div( [
 						'class' => 'space-between'
 					], [
 						html()->e( 'label', [
@@ -111,16 +111,16 @@ class Campaigns_Page extends Admin_Page {
 						html()->toggle( [
 							'id'       => 'is-public',
 							'name'     => 'public',
-							'onLabel'  => __( 'Yes' ),
-							'offLabel' => __( 'No' ),
+							'onLabel'  => __( 'Yes', 'groundhogg' ),
+							'offLabel' => __( 'No', 'groundhogg' ),
 						] )
-					] );
+					], true );
 
-					echo html()->e( 'div', [], html()->button( [
+					html()->div( [], html()->button( [
 						'type'  => 'submit',
 						'class' => 'gh-button primary',
 						'text'  => esc_html__( 'Add Campaign', 'groundhogg' )
-					] ) );
+					] ), true );
 
 					?>
 
@@ -171,7 +171,7 @@ class Campaigns_Page extends Admin_Page {
 		] );
 
 		if ( ! $campaign->exists() ) {
-			return new WP_Error( 'oops', esc_html__( 'Something went wrong.' ) );
+			return new WP_Error( 'oops', esc_html__( 'Something went wrong.', 'groundhogg' ) );
 		}
 
 		$this->add_notice( 'new-campaign', esc_html__( 'Campaign created!', 'groundhogg' ) );
@@ -210,6 +210,7 @@ class Campaigns_Page extends Admin_Page {
 
 			// Make sure it's not too long
 			if ( strlen( $slug ) > get_db( 'campaigns' )->get_max_index_length() ) {
+                /* translators: %d: the maximum index length */
 				return new WP_Error( 'too_long', sprintf( esc_html__( "Maximum length for a campaign name is %d characters.", 'groundhogg' ), get_db( 'campaigns' )->get_max_index_length() ) );
 			}
 
@@ -255,6 +256,7 @@ class Campaigns_Page extends Admin_Page {
 
 		$this->add_notice(
 			'deleted',
+			/* translators: %d: the number of campaigns deleted */
 			sprintf( _nx( '%d campaign deleted', '%d campaigns deleted', count( $this->get_items() ), 'notice', 'groundhogg' ),
 				count( $this->get_items() )
 			)

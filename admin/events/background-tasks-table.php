@@ -12,6 +12,7 @@ use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\kses_e;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -212,7 +213,7 @@ class Background_Tasks_Table extends Table {
 	protected function column_task( $task ) {
 
 		if ( method_exists( $task->theTask, 'get_title' ) ) {
-			echo $task->theTask->get_title();
+			kses_e( $task->theTask->get_title() );
 
 			return;
 		}
@@ -280,13 +281,13 @@ class Background_Tasks_Table extends Table {
 			case 'done':
 				break;
 			case 'cancelled':
-				$actions[] = [ 'class' => 'edit', 'display' => esc_html__( 'Resume' ), 'url' => action_url( 'resume_task', [ 'task' => $item->ID ] ) ];
+				$actions[] = [ 'class' => 'edit', 'display' => esc_html_x( 'Resume', 'as in resume a task', 'groundhogg' ), 'url' => action_url( 'resume_task', [ 'task' => $item->ID ] ) ];
 				break;
 			default:
-				$actions[] = [ 'class' => 'trash', 'display' => esc_html__( 'Cancel' ), 'url' => action_url( 'cancel_task', [ 'task' => $item->ID ] ) ];
+				$actions[] = [ 'class' => 'trash', 'display' => esc_html_x( 'Cancel', 'as in cancel a task', 'groundhogg' ), 'url' => action_url( 'cancel_task', [ 'task' => $item->ID ] ) ];
 				$actions[] = [
 					'class'     => 'edit',
-					'display'   => esc_html__( 'Run now' ),
+					'display'   => esc_html_x( 'Run now', 'as in immediately execute a task', 'groundhogg' ),
 					'linkProps' => [
 						'class' => 'do-task',
 					],

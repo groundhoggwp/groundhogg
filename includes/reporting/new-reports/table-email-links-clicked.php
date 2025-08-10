@@ -19,9 +19,9 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 	 */
 	public function get_label() {
 		return [
-			__( 'Link', 'groundhogg' ),
-			__( 'Uniques', 'groundhogg' ),
-			__( 'Clicks', 'groundhogg' ),
+			esc_html__( 'Link', 'groundhogg' ),
+			esc_html_x( 'Uniques','stats', 'groundhogg' ),
+			esc_html_x( 'Clicks','stats', 'groundhogg' ),
 		];
 	}
 

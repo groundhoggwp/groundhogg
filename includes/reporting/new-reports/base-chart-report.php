@@ -45,7 +45,7 @@ abstract class Base_Chart_Report extends Base_Report {
 	 */
 	protected function no_data_notice() {
 		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'No information available.', 'groundhogg' ) )
+			html()->e( 'p', [], esc_html__( 'No information available.', 'groundhogg' ) )
 		] );
 	}
 

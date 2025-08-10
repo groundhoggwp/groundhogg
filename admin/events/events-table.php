@@ -16,6 +16,7 @@ use function Groundhogg\find_object;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_request_uri;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -40,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
 if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 class Events_Table extends WP_List_Table {
@@ -55,11 +56,13 @@ class Events_Table extends WP_List_Table {
 	 */
 	public function __construct() {
 		// Set parent defaults.
-		parent::__construct( array(
-			'singular' => 'event',     // Singular name of the listed records.
-			'plural'   => 'events',    // Plural name of the listed records.
-			'ajax'     => false,       // Does this table support ajax?
-		) );
+		parent::__construct(
+			array(
+				'singular' => 'event',     // Singular name of the listed records.
+				'plural'   => 'events',    // Plural name of the listed records.
+				'ajax'     => false,       // Does this table support ajax?
+			)
+		);
 	}
 
 	/**
@@ -67,7 +70,7 @@ class Events_Table extends WP_List_Table {
 	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
-		$columns = [
+		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'contact'        => _x( 'Contact', 'Column label', 'groundhogg' ),
 			'funnel'         => _x( 'Flow', 'Column label', 'groundhogg' ),
@@ -76,9 +79,9 @@ class Events_Table extends WP_List_Table {
 			'time_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 			'error_code'     => _x( 'Error Code', 'Column label', 'groundhogg' ),
 			'error_message'  => _x( 'Error Message', 'Column label', 'groundhogg' ),
-		];
+		);
 
-		if ( ! in_array( $this->get_view(), [ 'skipped', 'failed' ] ) ) {
+		if ( ! in_array( $this->get_view(), array( 'skipped', 'failed' ) ) ) {
 			unset( $columns['error_code'] );
 			unset( $columns['error_message'] );
 		}
@@ -118,16 +121,17 @@ class Events_Table extends WP_List_Table {
 	 * 'internal-name' => array( 'orderby', true )
 	 *
 	 * The second format will make the initial sorting order be descending
+	 *
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
-		$sortable_columns = [
-			'contact'        => [ 'contact_id', false ],
-			'funnel'         => [ 'funnel_id', false ],
-			'step'           => [ 'step_id', false ],
-			'time'           => [ 'time', false ],
-			'time_scheduled' => [ 'time_scheduled', false ],
-		];
+		$sortable_columns = array(
+			'contact'        => array( 'contact_id', false ),
+			'funnel'         => array( 'funnel_id', false ),
+			'step'           => array( 'step_id', false ),
+			'time'           => array( 'time', false ),
+			'time_scheduled' => array( 'time_scheduled', false ),
+		);
 
 		return apply_filters( 'groundhogg_event_sortable_columns', $sortable_columns );
 	}
@@ -145,10 +149,11 @@ class Events_Table extends WP_List_Table {
 	 */
 	protected function column_contact( $event ) {
 		if ( ! $event->get_contact() || ! $event->get_contact()->exists() ) {
-			return sprintf( "<strong>(%s)</strong>", _x( 'contact deleted', 'status', 'groundhogg' ) );
+			return sprintf( '<strong>(%s)</strong>', _x( 'contact deleted', 'status', 'groundhogg' ) );
 		}
 
-		$html = sprintf( "<a class='row-title' href='%s'>%s</a>",
+		$html = sprintf(
+			"<a class='row-title' href='%s'>%s</a>",
 			sprintf( admin_url( 'admin.php?page=gh_events&contact_id=%s&&status=%s' ), $event->get_contact_id(), $this->get_view() ),
 			$event->get_contact()->get_email()
 		);
@@ -165,12 +170,14 @@ class Events_Table extends WP_List_Table {
 		$funnel_title = $event->get_funnel_title();
 
 		if ( ! $funnel_title ) {
-			return sprintf( "<strong>(%s)</strong>", _x( 'flow deleted', 'status', 'groundhogg' ) );
+			return sprintf( '<strong>(%s)</strong>', _x( 'flow deleted', 'status', 'groundhogg' ) );
 		}
 
-		return sprintf( "<a href='%s'>%s</a>",
+		return sprintf(
+			"<a href='%s'>%s</a>",
 			sprintf( admin_url( 'admin.php?page=gh_events&funnel_id=%s&event_type=%s&status=%s' ), $event->get_funnel_id(), $event->get_event_type(), $this->get_view() ),
-			$funnel_title );
+			$funnel_title
+		);
 	}
 
 	/**
@@ -182,13 +189,14 @@ class Events_Table extends WP_List_Table {
 		$step_title = $event->get_step_title();
 
 		if ( ! $step_title ) {
-			return sprintf( "<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
+			return sprintf( '<strong>(%s)</strong>', _x( 'step deleted', 'status', 'groundhogg' ) );
 		}
 
-		return sprintf( "<a href='%s'>%s</a>",
+		return sprintf(
+			"<a href='%s'>%s</a>",
 			admin_url( sprintf( 'admin.php?page=gh_events&step_id=%d&event_type=%s&status=%s', $event->get_step_id(), $event->get_event_type(), $this->get_view() ) ),
-			$step_title );
-
+			$step_title
+		);
 	}
 
 	/**
@@ -202,11 +210,15 @@ class Events_Table extends WP_List_Table {
 
 		$class = '';
 
-		$abbr = html()->e( 'abbr', [
-			'title' => $date->ymdhis(),
-		], [ $date->wpDateTimeFormat() ] );
+		$abbr = html()->e(
+			'abbr',
+			array(
+				'title' => $date->ymdhis(),
+			),
+			array( $date->wpDateTimeFormat() )
+		);
 
-		if ( ! in_array( $this->get_view(), [ Event::WAITING, Event::PAUSED ] ) ) {
+		if ( ! in_array( $this->get_view(), array( Event::WAITING, Event::PAUSED ) ) ) {
 			return $abbr;
 		}
 
@@ -222,9 +234,13 @@ class Events_Table extends WP_List_Table {
 			}
 		}
 
-		return html()->e( 'span', [
-			'class' => $class,
-		], [ $abbr, $tooltip ? "<div class='gh-tooltip top'>$tooltip</div>" : '' ] );
+		return html()->e(
+			'span',
+			array(
+				'class' => $class,
+			),
+			array( $abbr, $tooltip ? "<div class='gh-tooltip top'>$tooltip</div>" : '' )
+		);
 	}
 
 	/**
@@ -235,9 +251,13 @@ class Events_Table extends WP_List_Table {
 	protected function column_time_scheduled( $event ) {
 		$date = new DateTimeHelper( $event->get_time_scheduled() );
 
-		return html()->e( 'abbr', [
-			'title' => $date->ymdhis()
-		], $date->wpDateTimeFormat() );
+		return html()->e(
+			'abbr',
+			array(
+				'title' => $date->ymdhis(),
+			),
+			$date->wpDateTimeFormat()
+		);
 	}
 
 	/**
@@ -292,11 +312,12 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk steps available on this table.
+	 *
 	 * @return array An associative array containing all the bulk steps.
 	 */
 	protected function get_bulk_actions() {
 
-		$actions = [];
+		$actions = array();
 
 		switch ( $this->get_view() ) {
 			case 'paused':
@@ -333,63 +354,83 @@ class Events_Table extends WP_List_Table {
 		$view = $this->get_view();
 
 		$eventQuery = new Table_Query( 'event_queue' );
-		$eventQuery->setSelect( 'status', [ 'COUNT(ID)', 'total' ] )
+		$eventQuery->setSelect( 'status', array( 'COUNT(ID)', 'total' ) )
 		           ->setGroupby( 'status' );
 		$results = $eventQuery->get_results();
 
-		$views = [
+		$views = array(
 			Event::WAITING     => esc_html__( 'Waiting', 'groundhogg' ),
 			Event::PAUSED      => esc_html__( 'Paused', 'groundhogg' ),
 			Event::IN_PROGRESS => esc_html__( 'In Progress', 'groundhogg' ),
-		];
+		);
 
-		$views = array_map_with_keys( $views, function ( $text, $status ) use ( $view, $results ) {
-			$count = get_array_var( find_object( $results, [ 'status' => $status ] ), 'total', 0 );
+		$views = array_map_with_keys(
+			$views,
+			function ( $text, $status ) use ( $view, $results ) {
+				$count = get_array_var( find_object( $results, array( 'status' => $status ) ), 'total', 0 );
 
-			if ( $count === 0 ) {
-				return '';
+				if ( $count === 0 ) {
+					return '';
+				}
+
+				return html()->e(
+					'a',
+					array(
+						'class' => array( $status, $view == $status ? 'current' : '' ),
+						'href'  => admin_page_url(
+							'gh_events',
+							array(
+								'status' => $status,
+							)
+						),
+					),
+					array(
+						$text . ' ',
+						html()->e( 'span', array( 'class' => 'count' ), '(' . _nf( $count ) . ')' ),
+					)
+				);
 			}
+		);
 
-			return html()->e( 'a', [
-				'class' => [ $status, $view == $status ? 'current' : '' ],
-				'href'  => admin_page_url( 'gh_events', [
-					'status' => $status
-				] )
-			], [
-				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . _nf( $count ) . ')' )
-			] );
-		} );
-
-		$more_views = [
+		$more_views = array(
 			Event::COMPLETE  => esc_html__( 'Complete', 'groundhogg' ),
 			Event::SKIPPED   => esc_html__( 'Skipped', 'groundhogg' ),
 			Event::CANCELLED => esc_html__( 'Cancelled', 'groundhogg' ),
 			Event::FAILED    => esc_html__( 'Failed', 'groundhogg' ),
-		];
+		);
 
 		$eventQuery = new Table_Query( 'events' );
-		$eventQuery->setSelect( 'status', [ 'COUNT(ID)', 'total' ] )
+		$eventQuery->setSelect( 'status', array( 'COUNT(ID)', 'total' ) )
 		           ->setGroupby( 'status' );
 		$results = $eventQuery->get_results();
 
-		$more_views = array_map_with_keys( $more_views, function ( $text, $status ) use ( $view, $results ) {
-			$count = get_array_var( find_object( $results, [ 'status' => $status ] ), 'total', 0 );
+		$more_views = array_map_with_keys(
+			$more_views,
+			function ( $text, $status ) use ( $view, $results ) {
+				$count = get_array_var( find_object( $results, array( 'status' => $status ) ), 'total', 0 );
 
-			if ( $count === 0 ) {
-				return '';
+				if ( $count === 0 ) {
+					return '';
+				}
+
+				return html()->e(
+					'a',
+					array(
+						'class' => array( $status, $view == $status ? 'current' : '' ),
+						'href'  => admin_page_url(
+							'gh_events',
+							array(
+								'status' => $status,
+							)
+						),
+					),
+					array(
+						$text . ' ',
+						html()->e( 'span', array( 'class' => 'count' ), '(' . _nf( $count ) . ')' ),
+					)
+				);
 			}
-
-			return html()->e( 'a', [
-				'class' => [ $status, $view == $status ? 'current' : '' ],
-				'href'  => admin_page_url( 'gh_events', [
-					'status' => $status
-				] )
-			], [
-				$text . ' ',
-				html()->e( 'span', [ 'class' => 'count' ], '(' . _nf( $count ) . ')' )
-			] );
-		} );
+		);
 
 		return apply_filters( 'gh_event_views', array_filter( array_merge( $views, $more_views ) ) );
 	}
@@ -405,7 +446,7 @@ class Events_Table extends WP_List_Table {
 	 */
 	protected function handle_row_actions( $event, $column_name, $primary ) {
 
-		$actions = [];
+		$actions = array();
 
 		if ( $primary === $column_name ) {
 
@@ -414,66 +455,107 @@ class Events_Table extends WP_List_Table {
 			switch ( $this->get_view() ) {
 				default:
 				case 'waiting':
-					$actions['execute_now'] = html()->e( 'a', [
-						'href' => action_url( 'execute_now', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Run Now', 'groundhogg' ) );
-					$actions['pause']       = html()->e( 'a', [
-						'href' => action_url( 'pause', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Pause', 'groundhogg' ) );
-					$actions['trash']       = html()->e( 'a', [
-						'href' => action_url( 'cancel', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Cancel', 'groundhogg' ) );
+				$actions['execute_now'] = html()->e(
+					'a',
+					array(
+						'href' => action_url( 'execute_now', array( 'event' => $event->get_id() ) ),
+					),
+					esc_html__( 'Run Now', 'groundhogg' )
+				);
+				$actions['pause']       = html()->e(
+					'a',
+					array(
+						'href' => action_url( 'pause', array( 'event' => $event->get_id() ) ),
+					),
+					esc_html__( 'Pause', 'groundhogg' )
+				);
+				$actions['trash']       = html()->e(
+					'a',
+					array(
+						'href' => action_url( 'cancel', array( 'event' => $event->get_id() ) ),
+					),
+					esc_html__( 'Cancel', 'groundhogg' )
+				);
 					break;
 				case 'paused':
-					$actions['unpause'] = html()->e( 'a', [
-						'href' => action_url( 'unpause', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Unpause', 'groundhogg' ) );
-					$actions['trash']   = html()->e( 'a', [
-						'href' => action_url( 'cancel', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Cancel', 'groundhogg' ) );
+					$actions['unpause'] = html()->e(
+						'a',
+						array(
+							'href' => action_url( 'unpause', array( 'event' => $event->get_id() ) ),
+						),
+						esc_html__( 'Unpause', 'groundhogg' )
+					);
+					$actions['trash']   = html()->e(
+						'a',
+						array(
+							'href' => action_url( 'cancel', array( 'event' => $event->get_id() ) ),
+						),
+						esc_html__( 'Cancel', 'groundhogg' )
+					);
 					break;
 				case 'cancelled':
-					$actions['uncancel'] = html()->e( 'a', [
-						'href' => action_url( 'uncancel', [ 'event' => $event->get_id() ] ),
-					], esc_html__( 'Uncancel', 'groundhogg' ) );
+					$actions['uncancel'] = html()->e(
+						'a',
+						array(
+							'href' => action_url( 'uncancel', array( 'event' => $event->get_id() ) ),
+						),
+						esc_html__( 'Uncancel', 'groundhogg' )
+					);
 					break;
 				case 'complete':
 				case 'skipped':
 				case 'failed':
-					$actions['execute_again'] = html()->e( 'a', [
-						'href' => action_url( 'execute_again', [
-							'event'  => $event->get_id(),
-							'status' => $this->get_view()
-						] ),
-					], esc_html__( 'Run Again', 'groundhogg' ) );
+				$actions['execute_again'] = html()->e(
+					'a',
+					array(
+						'href' => action_url(
+							'execute_again',
+							array(
+								'event'  => $event->get_id(),
+								'status' => $this->get_view(),
+							)
+						),
+					),
+					esc_html__( 'Run Again', 'groundhogg' )
+				);
 					break;
 			}
 
-
 			if ( $event->get_contact() && $event->get_contact()->exists() ) {
-				$actions['view'] = html()->a( $event->get_contact()->admin_link(), esc_html__( 'Contact', 'groundhogg' ), [
-					'aria-label' => _x( 'View Contact', 'action', 'groundhogg' ),
-					'title'      => _x( 'View Contact', 'action', 'groundhogg' ),
-				] );
+				$actions['view'] = html()->a(
+					$event->get_contact()->admin_link(),
+					esc_html__( 'Contact', 'groundhogg' ),
+					array(
+						'aria-label' => _x( 'View Contact', 'action', 'groundhogg' ),
+						'title'      => _x( 'View Contact', 'action', 'groundhogg' ),
+					)
+				);
 			}
-		} else if ( $column_name === 'funnel' ) {
+		} elseif ( $column_name === 'funnel' ) {
 
 			if ( $event->is_funnel_event() ) {
 
-				$actions['edit'] = html()->a( admin_page_url( 'gh_funnels', [
-					'action' => 'edit',
-					'funnel' => $event->get_funnel_id()
-				] ), _x( 'Edit Flow', 'action', 'groundhogg' ), [
-					'aria-label' => _x( 'Edit Flow', 'action', 'groundhogg' ),
-//					'title'      => _x( 'Edit Funnel', 'action', 'groundhogg' ),
-				] );
+				$actions['edit'] = html()->a(
+					admin_page_url(
+						'gh_funnels',
+						array(
+							'action' => 'edit',
+							'funnel' => $event->get_funnel_id(),
+						)
+					),
+					_x( 'Edit Flow', 'action', 'groundhogg' ),
+					array(
+						'aria-label' => _x( 'Edit Flow', 'action', 'groundhogg' ),
+						// 'title'      => _x( 'Edit Funnel', 'action', 'groundhogg' ),
+					)
+				);
 
 			}
-
-		} else if ( $column_name === 'step' ) {
+		} elseif ( $column_name === 'step' ) {
 
 			if ( $event->is_funnel_event() ) {
-				$actions['edit'] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",
+				$actions['edit'] = sprintf(
+					"<a class='edit' href='%s' aria-label='%s'>%s</a>",
 					admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step_id() ) ),
 					esc_attr( _x( 'Edit Step', 'action', 'groundhogg' ) ),
 					_x( 'Edit Step', 'action', 'groundhogg' )
@@ -495,43 +577,49 @@ class Events_Table extends WP_List_Table {
 
 		?>
         <div class="alignleft gh-actions">
-			<?php if ( $this->get_view() === Event::WAITING ): ?>
-                <a class="gh-button primary small"
-                   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php echo esc_html_x( 'Process Events', 'action', 'groundhogg' ); ?></a>
-                <a class="gh-button secondary small"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'pause' ], $_SERVER['REQUEST_URI'] ), 'pause' ) ); ?>"><?php printf( _x( 'Pause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-                <a class="gh-button danger small danger-confirm"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
-					   'action' => 'cancel',
-					   'status' => Event::WAITING
-				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ) ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-			<?php endif; ?>
-			<?php if ( $this->get_view() === Event::PAUSED ): ?>
-                <a class="gh-button secondary small"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'unpause' ], $_SERVER['REQUEST_URI'] ), 'unpause' ) ); ?>"><?php printf( _x( 'Unpause %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-                <a class="gh-button danger small danger-confirm"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
-					   'action' => 'cancel',
-					   'status' => Event::PAUSED
-				   ], $_SERVER['REQUEST_URI'] ), 'cancel' ) ); ?>"><?php printf( _x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-			<?php endif; ?>
-			<?php if ( $this->get_view() === Event::CANCELLED ): ?>
-                <a class="gh-button secondary small"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], $_SERVER['REQUEST_URI'] ), 'uncancel' ) ); ?>"><?php printf( _x( 'Uncancel %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-			<?php endif; ?>
-			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
-                <a class="gh-button danger danger-permanent small"
-                   href="<?php echo esc_url( wp_nonce_url( add_query_arg( [
-					   'action' => 'purge',
-					   'status' => $this->get_view()
-				   ], $_SERVER['REQUEST_URI'] ), 'purge' ) ); ?>"><?php printf( _x( 'Purge %s events', 'action', 'groundhogg' ), _nf( $items ) ); ?></a>
-			<?php endif; ?>
+	        <?php if ( $this->get_view() === Event::WAITING ) :
+
+                html()->frag( [
+                    html()->a( Plugin::instance()->bulk_jobs->process_events->get_start_url(), esc_html_x( 'Process Events', 'action', 'groundhogg' ), [ 'class' => 'gh-button primary small' ] ),
+                    /* translators: %s: the number of events to pause */
+                    html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'pause' ], get_request_uri() ), 'pause' ), sprintf( esc_html_x( 'Pause %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button secondary small' ] ),
+	                /* translators: %s: the number of events to cancel */
+                    html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'cancel' ], get_request_uri(), 'cancel' ) ), sprintf( esc_html_x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button danger danger-confirm small' ] ),
+                ], true );
+
+            elseif ( $this->get_view() === Event::PAUSED ) :
+
+	            html()->frag( [
+		            /* translators: %s: the number of events to pause */
+		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'unpause' ], get_request_uri() ), 'unpause' ), sprintf( esc_html_x( 'Unpause %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button secondary small' ] ),
+		            /* translators: %s: the number of events to cancel */
+		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'cancel', 'status' => Event::PAUSED ], get_request_uri() ), 'cancel' ), sprintf( esc_html_x( 'Cancel %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button danger danger-confirm small' ] ),
+	            ], true );
+
+            elseif ( $this->get_view() === Event::CANCELLED ) :
+
+	            html()->frag( [
+		            /* translators: %s: the number of events to uncancel */
+		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], get_request_uri() ), 'uncancel' ), sprintf( esc_html_x( 'Uncancel %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button secondary small' ] ),
+		        ], true );
+
+            endif;
+
+            if ( in_array( $this->get_view(), array( 'failed', 'skipped', 'cancelled' ) ) ) :
+
+	            html()->frag( [
+		            /* translators: %s: the number of events to purge */
+		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'purge', 'status' => $this->get_view() ], get_request_uri() ), 'purge' ), sprintf( esc_html_x( 'Purge %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button danger danger-permanent small' ] ),
+	            ], true );
+
+            endif; ?>
         </div>
 		<?php
 	}
 
 	/**
 	 * Prepares the list of items for displaying.
+	 *
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()
@@ -557,37 +645,55 @@ class Events_Table extends WP_List_Table {
 
 		// Special handling of the unprocessed status
 		if ( $view === 'unprocessed' ) {
-			$where = [
-				'relationship' => "AND",
-				[ 'col' => 'status', 'val' => [ Event::WAITING, Event::IN_PROGRESS ], 'compare' => 'IN' ],
-				[ 'col' => 'time', 'val' => time() - MINUTE_IN_SECONDS, 'compare' => '<' ],
-			];
+			$where = array(
+				'relationship' => 'AND',
+				array(
+					'col'     => 'status',
+					'val'     => array( Event::WAITING, Event::IN_PROGRESS ),
+					'compare' => 'IN',
+				),
+				array(
+					'col'     => 'time',
+					'val'     => time() - MINUTE_IN_SECONDS,
+					'compare' => '<',
+				),
+			);
 		} else {
-			$where = [
-				'relationship' => "AND",
-				[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-			];
+			$where = array(
+				'relationship' => 'AND',
+				array(
+					'col'     => 'status',
+					'val'     => $this->get_view(),
+					'compare' => '=',
+				),
+			);
 		}
 
-		$request_query = get_request_query( [], [], array_merge( array_keys( get_db( 'events' )->get_columns() ), [ 'include_filters' ] ) );
+		$request_query = get_request_query( array(), array(), array_merge( array_keys( get_db( 'events' )->get_columns() ), array( 'include_filters' ) ) );
 
 		unset( $request_query['status'] );
 
-		$args = array_merge( [
-			'where'      => $where,
-			'limit'      => $per_page,
-			'offset'     => $offset,
-			'order'      => $order,
-			'orderby'    => $orderby,
-			'found_rows' => true
-		], $request_query );
+		$args = array_merge(
+			array(
+				'where'      => $where,
+				'limit'      => $per_page,
+				'offset'     => $offset,
+				'order'      => $order,
+				'orderby'    => $orderby,
+				'found_rows' => true,
+			),
+			$request_query
+		);
 
-		$this->table = in_array( $this->get_view(), [
-			Event::PAUSED,
-			Event::WAITING,
-			Event::IN_PROGRESS,
-			'unprocessed',
-		] ) ? 'event_queue' : 'events';
+		$this->table = in_array(
+			$this->get_view(),
+			array(
+				Event::PAUSED,
+				Event::WAITING,
+				Event::IN_PROGRESS,
+				'unprocessed',
+			)
+		) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
 		$total  = get_db( $this->table )->found_rows();
@@ -598,12 +704,12 @@ class Events_Table extends WP_List_Table {
 		// If $this->per_page is 0, then set total pages to 1.
 		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
 
-		$this->set_pagination_args( array(
-			'total_items' => $total,
-			'per_page'    => $per_page,
-			'total_pages' => $total_pages,
-		) );
+		$this->set_pagination_args(
+			array(
+				'total_items' => $total,
+				'per_page'    => $per_page,
+				'total_pages' => $total_pages,
+			)
+		);
 	}
-
-
 }

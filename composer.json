@@ -15,5 +15,24 @@
     "ext-imap": "*",
     "ext-openssl": "*",
     "webklex/php-imap": "2.7.2"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.9",
+    "wp-coding-standards/wpcs": "^3.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "friendsofphp/php-cs-fixer": "^3.64"
+  },
+  "scripts": {
+    "lint:php": "phpcs",
+    "lint:php:fix": "phpcbf",
+    "wpcs:doctor": "phpcs -i && phpcs --config-show",
+    "cs:check": "php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php",
+    "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

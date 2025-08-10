@@ -6,7 +6,6 @@ use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Contact;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
-use Groundhogg\Email;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_db;
 use function Groundhogg\html;

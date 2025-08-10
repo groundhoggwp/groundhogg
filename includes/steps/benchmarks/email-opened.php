@@ -100,7 +100,7 @@ class Email_Opened extends Benchmark {
 
 		html()->start_row();
 
-		html()->th( __( 'Select email steps:' ) );
+		html()->th( esc_html__( 'Select email steps:', 'groundhogg' ) );
 
 		$td_content = [];
 

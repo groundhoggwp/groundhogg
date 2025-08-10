@@ -10,7 +10,8 @@ use function Groundhogg\notices;
 class Add_Contacts_To_Funnel_Last_Id extends Complete_Benchmark_Last_Id {
 
 	public function get_title() {
-		return sprintf( 'Adding %s contacts to %s in %s', bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
+		/* translators: 1: number of contacts, 2: step title, 3: funnel title */
+		return sprintf( esc_html__( 'Adding %1$s contacts to %2$s in %3$s!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_title() ), bold_it( $this->step->get_funnel_title() ) );
 	}
 
 	public function process(): bool {
@@ -26,7 +27,8 @@ class Add_Contacts_To_Funnel_Last_Id extends Complete_Benchmark_Last_Id {
 		// No more contacts to add to the funnel
 		if ( empty( $contacts ) ) {
 
-			$message = sprintf( __( '%s contacts have been added to %s!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_funnel()->get_title() ) );
+			/* translators: 1: number of contacts, 2: funnel title */
+			$message = sprintf( esc_html__( '%1$s contacts have been added to %2$s!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ), bold_it( $this->step->get_funnel()->get_title() ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
 			return true;

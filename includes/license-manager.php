@@ -3,6 +3,8 @@
 namespace Groundhogg;
 
 
+use WP_Error;
+
 /**
  * Module Manager
  *
@@ -362,7 +364,7 @@ class License_Manager {
 	 * @param $license
 	 * @param $item_id
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public static function activate_license_quietly( $license, $item_id ) {
 
@@ -405,7 +407,7 @@ class License_Manager {
 
 		// Check if anything passed on a message constituting a failure
 		if ( ! empty( $message ) ) {
-			return new \WP_Error( 'license_failed', __( $message ), $license_data );
+			return new WP_Error( 'license_failed', esc_html( $message ), $license_data );
 		}
 
 		$status = 'valid';
@@ -541,7 +543,7 @@ class License_Manager {
 			$code    = $license_data->license;
 			$message = self::get_license_error_message( $code, $license_data->expires );
 
-			notices()->add( new \WP_Error( $code, $message, [
+			notices()->add( new WP_Error( $code, $message, [
 				'response' => $license_data
 			] ) );
 

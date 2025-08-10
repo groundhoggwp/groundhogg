@@ -7,6 +7,7 @@ use WP_List_Table;
 use wpdb;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\file_access_url;
+use function Groundhogg\get_request_var;
 
 /**
  * Contacts Table Class
@@ -233,9 +234,9 @@ class Imports_Table extends WP_List_Table {
 		$a = (array) $a;
 		$b = (array) $b;
 		// If no sort, default to title.
-		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'file'; // WPCS: Input var ok.
+		$orderby = get_request_var( 'orderby', 'file' ); // WPCS: Input var ok.
 		// If no order, default to asc.
-		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
+		$order = get_request_var( 'order', 'asc' ); // WPCS: Input var ok.
 		// Determine sort order.
 		$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
 
@@ -264,7 +265,7 @@ class Imports_Table extends WP_List_Table {
 				/* translators: %s: title */
 				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
 				esc_attr( 'Import' ),
-				__( 'Import' )
+				esc_html__( 'Import', 'groundhogg' )
 			);
 		}
 
@@ -274,7 +275,7 @@ class Imports_Table extends WP_List_Table {
 				/* translators: %s: title */
 				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
 				esc_attr( 'Import' ),
-				__( 'Import' )
+				esc_html__( 'Import', 'groundhogg' )
 			);
 		}
 
@@ -284,7 +285,7 @@ class Imports_Table extends WP_List_Table {
 				wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import['file'] ) ),
 				/* translators: %s: title */
 				esc_attr( 'Delete Permanently' ),
-				__( 'Delete Import' )
+				esc_html__( 'Delete Import' , 'groundhogg' )
 			);
 		}
 

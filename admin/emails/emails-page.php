@@ -54,7 +54,7 @@ class Emails_Page extends Admin_Page {
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
 			case 'add':
-				$admin_title = sprintf( "%s &lsaquo; %s", esc_html__( 'Add' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s", esc_html__( 'Add' , 'groundhogg' ), $admin_title );
 				break;
 			case 'edit':
 				$email_id = Groundhogg\get_request_var( 'email' );
@@ -64,7 +64,7 @@ class Emails_Page extends Admin_Page {
 				}
 
 				$email       = new Email( absint( $email_id ) );
-				$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $email->get_title() ), esc_html__( 'Edit' ), $admin_title );
+				$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $email->get_title() ), esc_html__( 'Edit' , 'groundhogg' ), $admin_title );
 				break;
 		}
 
@@ -154,14 +154,11 @@ class Emails_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			case 'add':
 				return _x( 'Add Email', 'page_title', 'groundhogg' );
-				break;
 			case 'edit':
 				return _x( 'Edit Email', 'page_title', 'groundhogg' );
-				break;
 			case 'view':
 			default:
 				return _x( 'Emails', 'page_title', 'groundhogg' );
-				break;
 		}
 	}
 
@@ -212,7 +209,7 @@ class Emails_Page extends Admin_Page {
 		$this->add_notice(
 			esc_attr( 'restored' ),
 			sprintf( "%s %d %s",
-				__( 'Restored' ),
+				__( 'Restored' , 'groundhogg' ),
 				count( $this->get_items() ),
 				__( 'Emails', 'groundhogg' ) ),
 			'success'
@@ -271,7 +268,7 @@ class Emails_Page extends Admin_Page {
 		$this->add_notice(
 			esc_attr( 'deleted' ),
 			sprintf( "%s %d %s",
-				__( 'Deleted' ),
+				__( 'Deleted' , 'groundhogg' ),
 				count( $emails ),
 				__( 'Emails', 'groundhogg' ) ),
 			'success'
@@ -299,6 +296,7 @@ class Emails_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
+            /* translators: %d: the number of emails that were deleted */
 			sprintf( _nx( 'Deleted %d email', 'Deleted %d emails', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
@@ -326,7 +324,7 @@ class Emails_Page extends Admin_Page {
 		$this->add_notice(
 			esc_attr( 'trashed' ),
 			sprintf( "%s %d %s",
-				__( 'Trashed' ),
+				__( 'Trashed' , 'groundhogg' ),
 				count( $this->get_items() ),
 				__( 'Emails', 'groundhogg' ) ),
 			'success'
@@ -360,19 +358,21 @@ class Emails_Page extends Admin_Page {
 			<?php html()->hidden_GET_inputs( true ); ?>
 
 			<?php if ( ! get_url_var( 'include_filters' ) ):
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 				echo html()->input( [
 					'type' => 'hidden',
 					'name' => 'include_filters'
 				] );
 			endif; ?>
 
-            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search' ); ?>:</label>
+            <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search', 'groundhogg' ); ?>:</label>
 
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"
                        value="<?php echo esc_attr( get_request_var( 's' ) ); ?>">
 				<?php
 
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 				echo html()->dropdown( [
 					'options'           => [
 						'title'   => esc_html__( 'Title', 'groundhogg' ),
@@ -382,12 +382,13 @@ class Emails_Page extends Admin_Page {
 					'option_none'       => esc_html__( 'Everywhere', 'groundhogg' ),
 					'option_none_value' => '',
 					'name'              => 'search_columns',
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 					'selected'          => get_request_var( 'search_columns' )
 				] );
 
 				?>
                 <button type="submit" id="search-submit"
-                        class="gh-button primary small"><?php esc_html_e( 'Search' ); ?></button>
+                        class="gh-button primary small"><?php esc_html_e( 'Search', 'groundhogg' ); ?></button>
             </div>
         </form>
 		<?php

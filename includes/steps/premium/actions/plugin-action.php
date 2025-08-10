@@ -37,7 +37,7 @@ class Plugin_Action extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Call a custom PHP script from within a funnel.' );
+		return __( 'Call a custom PHP script from within a funnel.', 'groundhogg' );
 	}
 
 	/**

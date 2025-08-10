@@ -55,7 +55,7 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	$GLOBALS['email'] = $email;
 
 	if ( ! $email->exists() ) {
-		wp_die( __( 'Could not load email...' ) );
+		wp_die( __( 'Could not load email...', 'groundhogg' ) );
 	}
 
 	$email->set_contact( $contact );

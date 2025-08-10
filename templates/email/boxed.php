@@ -18,7 +18,7 @@ $email = the_email();
 $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $email->get_merged_subject_line(), $email_title );
+$email_title = sprintf( '%1$s &lsaquo; %2$s', $email->get_merged_subject_line(), $email_title );
 
 $bgColor    = $email->get_meta( 'backgroundColor' ) ?: '';
 $bgImage    = $email->get_meta( 'backgroundImage' ) ?: '';

@@ -14,7 +14,7 @@ class Pro_Page extends Admin_Page {
 	/**
 	 * Add Ajax actions...
 	 *
-	 * @return mixed
+	 * @return void
 	 */
 	protected function add_ajax_actions() {
 		// TODO: Implement add_ajax_actions() method.
@@ -23,7 +23,7 @@ class Pro_Page extends Admin_Page {
 	/**
 	 * Adds additional actions.
 	 *
-	 * @return mixed
+	 * @return void
 	 */
 	protected function add_additional_actions() {
 		$pricing_url = add_query_arg( [
@@ -39,8 +39,9 @@ class Pro_Page extends Admin_Page {
 			$pricing_url = add_query_arg( [ 'discount' => $discount ], $pricing_url );
 		}
 
+		// phpcs:ignore WordPress.Security.SafeRedirect -- goes to https://groundhogg.io
 		wp_redirect( $pricing_url );
-		die();
+		exit;
 	}
 
 	public function get_priority() {

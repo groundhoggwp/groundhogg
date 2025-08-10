@@ -27,7 +27,7 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
     </div>
     <div class="gh-panel span-6">
         <div class="gh-panel-header">
-            <h2 class="title"><?php esc_html_e( 'Results', 'groundhogg' )); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Results', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_broadcast_stats"></div>
     </div>
@@ -36,7 +36,7 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
 
     <div class="gh-panel span-12">
         <div class="gh-panel-header">
-            <h2 class="title"><?php esc_html_e( 'Broadcast Link Clicked', 'groundhogg' )); ?></h2>
+            <h2 class="title"><?php esc_html_e( 'Broadcast Link Clicked', 'groundhogg' ); ?></h2>
         </div>
         <div id="table_broadcast_link_clicked"></div>
     </div

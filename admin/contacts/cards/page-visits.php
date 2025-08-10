@@ -51,7 +51,7 @@ $cur_date = $page_visit->get_date();
 <div class="ic-section <?php echo $is_first ? 'open' : '' ?> ">
     <div class="ic-section-header">
         <div class="ic-section-header-content">
-			<?php echo $cur_date->format( get_option( 'date_format' ) ); ?>
+	        <?php echo esc_html( $cur_date->format( get_option( 'date_format' ) ) ); ?>
         </div>
     </div>
     <div class="ic-section-content">
@@ -60,11 +60,16 @@ $cur_date = $page_visit->get_date();
 			}
 
 			?>
-            <li><?php echo html()->e( 'a', [
+            <li><?php
+
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo html()->e( 'a', [
+		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'href'   => $page_visit->get_url(),
 						'target' => '_blank',
+		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'title'  => $page_visit->get_path(),
-					], collapse_string( $page_visit->get_path() ), false ) . ' (' . $page_visit->get_date()->format( get_option( 'time_format' ) ) . ')' ?></li>
+					], esc_html( collapse_string( $page_visit->get_path() ) ), false ) . ' (' . esc_html( $page_visit->get_date()->format( get_option( 'time_format' ) ) ) . ')' ?></li>
 			<?php
 
 			}

@@ -67,6 +67,7 @@ class Delete_Contacts extends Task {
 
 		// No more contacts to delete
 		if ( empty( $contacts ) ) {
+			/* translators: %s: number of contacts that were deleted */
 			$message = sprintf( __( '%s contacts have been deleted!', 'groundhogg' ), bold_it( _nf( $this->contacts ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 			return true;

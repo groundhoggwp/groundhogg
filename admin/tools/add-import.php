@@ -36,7 +36,7 @@ do_action( 'groundhogg/import/form/before' );
 
 		<?php if ( current_user_can( 'view_previous_imports' ) ): ?>
             <p class="description" style="text-align: center"><a
-                        href="<?php echo admin_url( 'admin.php?page=gh_tools&tab=import' ); ?>">&larr;&nbsp;<?php esc_html_e( 'Import from existing file.', 'groundhogg' ); ?></a>
+                        href="<?php echo esc_url( admin_url( 'admin.php?page=gh_tools&tab=import' ) ); ?>">&larr;&nbsp;<?php esc_html_e( 'Import from existing file.', 'groundhogg' ); ?></a>
             </p>
 		<?php endif; ?>
     </div>

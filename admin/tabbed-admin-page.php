@@ -186,7 +186,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 				<?php if ( ! current_user_can( $tab['cap'] ) ) {
 					continue;
 				} ?>
-                <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
+                <a href="?<?php echo esc_url( http_build_query( [ 'page' => $this->get_slug(), 'tab' => $tab['slug'] ] ) ); ?>"
                    class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $tab['name'] ); ?></a>
 			<?php endforeach; ?>
         </h2>
@@ -204,7 +204,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		?>
         <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header tabbed-admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
 			<?php header_icon(); ?>
-            <h1><?php echo $this->get_title(); ?></h1>
+            <h1><?php echo esc_html( $this->get_title() ); ?></h1>
 			<?php $this->do_title_actions(); ?>
         </div>
 		<?php $this->do_page_tabs(); ?>

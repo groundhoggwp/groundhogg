@@ -116,7 +116,7 @@ trait Broadcast_Stats {
 	 */
 	protected function no_data_notice() {
 		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'Send a broadcast first.', 'groundhogg' ) )
+			html()->e( 'p', [], esc_html__( 'Send a broadcast first.', 'groundhogg' ) )
 		] );
 	}
 }

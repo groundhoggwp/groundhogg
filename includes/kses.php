@@ -96,6 +96,9 @@ function kses( $string, $allowed_html, $allowed_protocols = array() ) {
 			'strong' => [],
 			'u' => [],
 			'i' => [],
+			'em'   => [],
+			'code' => [],
+			'pre' => []
 		];
 	}
 

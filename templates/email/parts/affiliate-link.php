@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( is_option_enabled( 'gh_affiliate_link_in_email' ) ) {
 	/** @var callable $_p */
+	/* translators: 1: plugin/brand name as link */
 	$_p( sprintf( __( "This email was sent with %s", 'groundhogg' ), html()->e( 'a', [
 		'href' => add_query_arg( [
 			'utm_source'   => 'email',

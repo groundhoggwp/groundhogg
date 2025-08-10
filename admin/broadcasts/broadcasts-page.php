@@ -72,8 +72,8 @@ class Broadcasts_Page extends Admin_Page {
 
 			notices()->add( 'dne', esc_html__( 'You must create an email before you can schedule a broadcast.', 'groundhogg' ), 'notice' );
 
-			wp_redirect( admin_page_url( 'gh_emails', [ 'action' => 'add' ] ) );
-			die();
+			wp_safe_redirect( admin_page_url( 'gh_emails', [ 'action' => 'add' ] ) );
+			exit();
 		}
 	}
 
@@ -146,6 +146,7 @@ class Broadcasts_Page extends Admin_Page {
 			$broadcast->cancel();
 		}
 
+        /* translators: %d: the number of broadcasts getting cancelled */
 		$this->add_notice( 'cancelled', sprintf( _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
 		return false;
@@ -169,6 +170,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
+			/* translators: %d: the number of broadcasts getting deleted */
 			sprintf( _nx( 'Deleted %d broadcast', 'Deleted %d broadcasts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);

@@ -173,14 +173,14 @@ class Mailhawk {
 			if ( function_exists( '\MailHawk\mailhawk_is_suspended' ) && ! \MailHawk\mailhawk_is_suspended() ) {
 				$ret[] = sprintf(
 				// Translators: %1$s = Opening anchor tag; %2$s = Closing anchor tag.
-					__( '%1$sManage your account%2$s.', 'groundhogg' ),
+					esc_html__( '%1$sManage your account%2$s.', 'groundhogg' ),
 					'<a href="https://mailhawk.io/account/" target="_blank" rel="noopener noreferrer">',
 					'</a>'
 				);
 			} else {
 				$ret[] = sprintf(
 				// Translators: %1$s = Opening anchor tag; %2$s = Closing anchor tag.
-					'<em>' . __( 'Email sending is currently disabled. %1$sVisit the MailHawk Settings%2$s to enable sending..', 'groundhogg' ) . '</em>',
+					'<em>' . esc_html__( 'Email sending is currently disabled. %1$sVisit the MailHawk Settings%2$s to enable sending..', 'groundhogg' ) . '</em>',
 					'<a href="' . admin_url( '/tools.php?page=mailhawk' ) . '">',
 					'</a>'
 				);
@@ -192,7 +192,7 @@ class Mailhawk {
 
 		}
 
-		echo sprintf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), __( 'Connect MailHawk' ) );
+		echo sprintf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), esc_html__( 'Connect MailHawk', 'groundhogg' ) );
 	}
 
 	/**

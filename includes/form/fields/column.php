@@ -3,7 +3,6 @@
 namespace Groundhogg\Form\Fields;
 
 use function Groundhogg\html;
-use function Groundhogg\words_to_key;
 
 class Column extends Field {
 

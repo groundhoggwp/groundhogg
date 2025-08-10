@@ -269,7 +269,7 @@ function modal_link_url( $args ) {
 
 	$atts = wp_parse_args( $args, array(
 		'title'              => 'Modal',
-		'footer_button_text' => esc_html__( 'Save Changes' ),
+		'footer_button_text' => esc_html__( 'Save Changes', 'groundhogg' ),
 		'source'             => '',
 		'height'             => 500,
 		'width'              => 500,
@@ -386,11 +386,20 @@ function is_option_enabled( $option = '' ) {
 
 /**
  * Shorthand;
+ * When using as the wrapper for HTML::e() echo defaults to true
  *
- * @return HTML
+ * @return HTML|string|void
  */
-function html() {
-	return Plugin::instance()->utils->html;
+function html( $tag = null, $atts = [], $content = '', $echo = true ) {
+
+    if ( is_null( $tag ) ){
+	    return Plugin::instance()->utils->html;
+    }
+
+    // will echo automatically
+    if ( is_string( $tag ) ){
+	    return html()->e( $tag, $atts, $content, null, $echo );
+    }
 }
 
 /**
@@ -875,6 +884,27 @@ function get_array_var( $array, $key = '', $default = false ) {
 	}
 
 	return $default;
+}
+
+function get_sanitized_FILE( string $file_key ) {
+
+    // phpcs:ignore WordPress.Security
+    if ( ! isset( $_FILES[ $file_key ] ) ) {
+        return false;
+    }
+
+	return [
+		// phpcs:ignore WordPress.Security
+		'name'     => sanitize_file_name( wp_unslash( $_FILES[$file_key]['name'] ?? '' ) ),
+		// phpcs:ignore WordPress.Security
+		'type'     => sanitize_mime_type( wp_unslash( $_FILES[$file_key]['type'] ?? '' ) ), // WP doesn’t have a core function for this, so you might validate manually
+		// phpcs:ignore WordPress.Security
+		'tmp_name' => $_FILES[$file_key]['tmp_name'] ?? '', // path — validate instead of sanitize
+		// phpcs:ignore WordPress.Security
+		'error'    => (int) $_FILES[$file_key]['error'] ?? 0,
+		// phpcs:ignore WordPress.Security
+		'size'     => (int) $_FILES[$file_key]['size'] ?? 0,
+	];
 }
 
 /**
@@ -2320,7 +2350,7 @@ function get_mappable_fields( $extra = [] ) {
 			'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
 			'contact_id'                => __( 'Contact ID', 'groundhogg' ),
 		],
-		__( 'User' )                        => [
+		__( 'User', 'groundhogg' ) => [
 			'user_id'    => __( 'User Id/Login', 'groundhogg' ),
 			'user_email' => __( 'User Email', 'groundhogg' ),
 		],
@@ -3296,7 +3326,7 @@ add_shortcode( 'preferences-center', __NAMESPACE__ . '\preferences_center_shortc
 
 function preferences_center_shortcode() {
 	if ( ! current_user_can( 'view_contacts' ) ) {
-		return sprintf( '<p>%s</p>', __( 'Oops! Something went wrong finding your email preferences. Please try again shortly or contact us.' ) );
+		return sprintf( '<p>%s</p>', __( 'Oops! Something went wrong finding your email preferences. Please try again shortly or contact us.', 'groundhogg' ) );
 	}
 
 	ob_start();
@@ -3890,12 +3920,22 @@ function action_input( $action = '', $echo = true, $nonce = false ) {
 	}
 
 	if ( $echo ) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 		echo $input;
 
 		return true;
 	}
 
 	return $input;
+}
+
+/**
+ * WPCS leave me alone
+ *
+ * @return string
+ */
+function get_request_uri() {
+    return esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) );
 }
 
 /**
@@ -6624,8 +6664,8 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
 	$links          = [
 		'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
-		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy' ) ) : false,
-		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms' ) ) : false,
+		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
+		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
 	];
 	$unsubscribe    = sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 		'href' => '#unsubscribe_link#'
@@ -7620,7 +7660,9 @@ function andList( $array ) {
 		return $array[0];
 	}
 
-	return sprintf( _x( '%s and %s', 'and preceding the last item in a list', 'groundhogg' ),
+	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "and" */
+
+	return sprintf( _x( '%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }
 
@@ -7632,7 +7674,9 @@ function orList( $array ) {
 		return $array[0];
 	}
 
-	return sprintf( _x( '%s or %s', 'or preceding the last item in a list', 'groundhogg' ),
+	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "or" */
+
+	return sprintf( _x( '%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }
 

@@ -77,7 +77,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				'data'  => date_i18n( get_date_time_format(), convert_to_local_time( $broadcast->get_send_time() ) ),
 			],
 			[
-				'label' => __( 'Sent', 'groundhogg' ),
+				'label' => esc_html_x( 'Sent', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( _nf( $sent ), [
 					[
 						[
@@ -88,7 +88,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				], $sent )
 			],
 			$broadcast->is_sms() ? false : [
-				'label' => __( 'Opens', 'groundhogg' ),
+				'label' => esc_html_x( 'Opens', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $opened, $sent ), [
 					[
 						[
@@ -101,7 +101,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				], $opened )
 			],
 			[
-				'label' => __( 'Clicks', 'groundhogg' ),
+				'label' => esc_html_x( 'Clicks', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $clicked, $broadcast->is_email() ? $opened : $sent ), [
 					[
 						[
@@ -114,11 +114,11 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				], $clicked )
 			],
 			$broadcast->is_sms() ? false : [
-				'label' => __( 'Unopened', 'groundhogg' ),
+				'label' => esc_html_x( 'Unopened', 'stats', 'groundhogg' ),
 				'data'  => _nf( $sent - $opened ) . ' (' . percentage( $sent, $sent - $opened ) . '%)'
 			],
 			[
-				'label' => __( 'Unsubscribed', 'groundhogg' ),
+				'label' => esc_html_x( 'Unsubscribed', 'stats', 'groundhogg' ),
 				'data'  => contact_filters_link( format_number_with_percentage( $unsubscribed, $sent ), [
 					[
 						[

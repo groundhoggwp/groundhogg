@@ -449,7 +449,7 @@ class Form_Filled extends Benchmark {
 		echo html()->button( [
 			'type'  => 'button',
 			'id'    => $this->setting_id_prefix( 'upgrade_form' ),
-			'text'  => __( 'Upgrade Form' ),
+			'text' => __( 'Upgrade Form', 'groundhogg' ),
 			'class' => 'gh-button secondary full-width'
 		] );
 
@@ -466,28 +466,28 @@ class Form_Filled extends Benchmark {
             </div>
             <div class="inside">
                 <div class="display-flex column gap-10">
-                    <label><?php printf( '%s:', __( 'Shortcode' ) ); ?></label>
+                    <label><?php printf( '%s:', __( 'Shortcode', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="code"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Iframe' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Iframe', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="code"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'HTML' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'HTML', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="code"
                             value="<?php echo esc_attr( $form_embed_code ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Hosted' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Hosted', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
@@ -497,9 +497,9 @@ class Form_Filled extends Benchmark {
                 </div>
                 <p>
 					<?php echo Plugin::$instance->utils->html->modal_link( array(
-						'title'              => __( 'Preview' ),
-						'text'               => __( 'Preview' ),
-						'footer_button_text' => __( 'Close' ),
+						'title'              => esc_html__( 'Preview' ),
+						'text'               => esc_html__( 'Preview' ),
+						'footer_button_text' => esc_html__( 'Close' ),
 						'id'                 => '',
 						'class'              => 'gh-button secondary',
 						'source'             => $form_url,
@@ -677,13 +677,13 @@ class Form_Filled extends Benchmark {
 					$ajax_is_enabled = (bool) $this->get_setting( 'enable_ajax' );
 
 					echo Plugin::$instance->utils->html->checkbox( [
-						'label'   => __( 'Enable' ),
+						'label' => esc_html__( 'Enable' ),
 						'name'    => $this->setting_name_prefix( 'enable_ajax' ),
 						'id'      => $this->setting_id_prefix( 'enable_ajax' ),
 						'class'   => 'enable-ajax auto-save',
 						'value'   => '1',
 						'checked' => $ajax_is_enabled,
-						'title'   => __( 'Enable Ajax' ),
+						'title' => __( 'Enable Ajax', 'groundhogg' ),
 					] ); ?>
                 </td>
             </tr>
@@ -697,8 +697,8 @@ class Form_Filled extends Benchmark {
 					$args = array(
 						'id'    => $this->setting_id_prefix( 'success_message' ),
 						'name'  => $this->setting_name_prefix( 'success_message' ),
-						'title' => __( 'Thank You Message' ),
-						'value' => $this->get_setting( 'success_message', __( 'Your submission has been received.' ) ),
+						'title' => __( 'Thank You Message', 'groundhogg' ),
+						'value' => $this->get_setting( 'success_message', __( 'Your submission has been received.', 'groundhogg' ) ),
 						'cols'  => '',
 						'rows'  => 3,
 						'style' => [
@@ -720,7 +720,7 @@ class Form_Filled extends Benchmark {
 						'type'  => 'text',
 						'id'    => $this->setting_id_prefix( 'success_page' ),
 						'name'  => $this->setting_name_prefix( 'success_page' ),
-						'title' => __( 'Thank You Page' ),
+						'title' => __( 'Thank You Page', 'groundhogg' ),
 						'value' => $this->get_setting( 'success_page', home_url( 'thank-you/' ) )
 					);
 
@@ -803,7 +803,7 @@ class Form_Filled extends Benchmark {
 							echo Plugin::$instance->utils->html->checkbox( array(
 								'id'    => 'field-required',
 								'name'  => 'required',
-								'label' => __( 'Yes' ),
+								'label' => __( 'Yes', 'groundhogg' ),
 								'value' => 'true'
 							) );
 							?></td>
@@ -951,7 +951,7 @@ class Form_Filled extends Benchmark {
 							echo Plugin::$instance->utils->html->checkbox( array(
 								'id'    => 'field-multiple',
 								'name'  => 'multiple',
-								'label' => __( 'Yes' )
+								'label' => __( 'Yes', 'groundhogg' )
 							) );
 							?></td>
                     </tr>
@@ -1074,7 +1074,7 @@ class Form_Filled extends Benchmark {
 							echo html()->checkbox( [
 								'id'    => 'field-show_ext',
 								'name'  => 'show_ext',
-								'label' => __( 'Yes' ),
+								'label' => __( 'Yes', 'groundhogg' ),
 								'value' => 'true'
 							] );
 							?>

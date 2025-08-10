@@ -118,7 +118,7 @@ class Bulk_Job_Page extends Admin_Page {
 
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+            <h1 class="wp-heading-inline"><?php echo esc_html( $this->get_title() ); ?></h1>
 			<?php $this->do_title_actions(); ?>
             <div id="notices">
 				<?php Plugin::instance()->notices->notices(); ?>
@@ -146,10 +146,12 @@ class Bulk_Job_Page extends Admin_Page {
 		$items     = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/query", [] );
 		$max_items = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/max_items", 25, $items );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo Plugin::$instance->utils->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
 
 		$bp_args = [
 			'num_retries'   => 3,
+            /* translators: %s: white labeled CRM name */
 			'error_message' => sprintf( esc_html__( 'Something went wrong. Please contact %s support.', 'groundhogg' ), white_labeled_name() ),
 		];
 
@@ -167,7 +169,9 @@ class Bulk_Job_Page extends Admin_Page {
 			<?php esc_html_e( 'Total Remaining: ', 'groundhogg' ); ?><b><span id="total-remaining">0</span></b>
         </p>
         <p>
-			<?php echo html()->textarea( [
+			<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo html()->textarea( [
 				'name'        => '',
 				'id'          => 'bulk-log',
 				'class'       => '',
@@ -182,8 +186,7 @@ class Bulk_Job_Page extends Admin_Page {
         <div id="job-complete" class="hidden">
             <p><?php esc_html_e( "The process is now complete.", 'groundhogg' ); ?></p>
             <p class="submit">
-                <a class="button button-primary"
-                   href="<?php echo admin_url( 'index.php' ); ?>">&larr;&nbsp;<?php esc_html_e( 'Return to dashboard.', 'groundhogg' ) ?></a>
+                <a class="button button-primary" href="<?php echo esc_url( admin_url( 'index.php' ) ); ?>">&larr;&nbsp;<?php esc_html_e( 'Return to dashboard.', 'groundhogg' ) ?></a>
             </p>
         </div>
 
@@ -197,9 +200,9 @@ class Bulk_Job_Page extends Admin_Page {
               items            : 0,
               complete         : 0,
               all              : 0,
-              size             : <?php echo $max_items; ?>,
-              bulk_action_nonce: '<?php echo wp_create_nonce( $this->get_current_action() ); ?>',
-              bulk_action      : '<?php echo $this->get_current_action(); ?>',
+              size             : <?php echo absint( $max_items ); ?>,
+              bulk_action_nonce: <?php echo wp_json_encode( wp_create_nonce( $this->get_current_action() ) ); ?>,
+              bulk_action      : <?php echo wp_json_encode( $this->get_current_action() ); ?>,
               bar              : null,
               total            : null,
               title            : '',

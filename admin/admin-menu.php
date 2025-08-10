@@ -104,7 +104,7 @@ class Admin_Menu {
 			return $class;
 		}
 
-		if ( preg_match( '/^gh_/', $current_page ) || $current_page === 'groundhogg' ) {
+		if ( str_starts_with( $current_page, 'gh_' ) || $current_page === 'groundhogg' ) {
 			$class .= " groundhogg-admin-page $current_page";
 		}
 

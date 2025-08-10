@@ -92,7 +92,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     <p></p>
     <div class="display-flex gap-10" id="template-filters">
         <div style="width: 200px">
-			<?php echo html()->select2( [
+			<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html is used downstream
+            echo html()->select2( [
+	            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html is used downstream
 				'options'        => $campaigns,
 				'name'           => 'filter_campaigns',
 				'id'             => 'filter-campaigns',
@@ -153,7 +156,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <div class="gh-panel funnel-template <?php echo $template->is_premium ? 'premium' : ''; ?> display-flex column" data-campaigns="<?php echo esc_attr( implode( ',', $campaigns ) ); ?>"
                      data-title="<?php echo esc_attr( $template->title ); ?>">
                     <div class="gh-panel-header">
-                        <h2><?php echo $template->get_title(); ?></h2>
+                        <h2><?php echo esc_html( $template->get_title() ); ?></h2>
 						<?php if ( $template->is_premium ): ?>
                             <div style="padding: 5px">
                                 <span class="pill dark">PRO
@@ -169,12 +172,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php endforeach; ?>
                         </div>
 						<?php $template->flow_preview() ?>
-                        <p><?php echo $template->get_meta( 'description' ); ?></p>
+                        <p><?php echo wp_kses_post( $template->get_meta( 'description' ) ); ?></p>
 						<?php if ( $template->is_premium ): ?>
                             <a style="margin-top: auto" class="gh-button primary text" href="https://groundhogg.io/pricing/" target="_blank"><?php echo esc_html_x( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>
 						<?php else: ?>
                             <button style="margin-top: auto" class="gh-button primary" name="funnel_template"
-                                    value="<?php echo $template->ID ?>"><?php echo esc_html_x( 'Use Template', 'action', 'groundhogg' ); ?></button>
+                                    value="<?php echo esc_attr( $template->ID ) ?>"><?php echo esc_html_x( 'Use Template', 'action', 'groundhogg' ); ?></button>
 						<?php endif; ?>
                     </div>
                 </div>

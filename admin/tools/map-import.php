@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\count_csv_rows;
+use function Groundhogg\files;
 use function Groundhogg\get_items_from_csv;
 use function Groundhogg\get_key_from_column_label;
 use function Groundhogg\get_mappable_fields;
@@ -31,13 +32,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$file_name = sanitize_file_name( urldecode( $_GET['import'] ) );
-$file_path = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- not needed
+$file_name = urldecode( sanitize_text_field( wp_unslash( $_GET['import'] ?? '' ) ) );
+$file_path = files()->get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ) {
 	wp_die( 'The given file does not exist.' );
 }
-
 
 $selected = absint( get_url_var( 'preview_item' ) );
 
@@ -75,11 +76,9 @@ function guess_column_map_to( $column ) {
 ?>
 <form method="post">
 	<?php wp_nonce_field(); ?>
-	<?php echo html()->input( [
-		'type'  => 'hidden',
-		'name'  => 'import',
-		'value' => $file_name
-	] ); ?>
+	<?php
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+    echo html()->input( [ 'type'  => 'hidden', 'name'  => 'import', 'value' => $file_name ] ); ?>
     <h2><?php esc_html_e( 'Map Contact Fields', 'groundhogg' ); ?></h2>
     <p class="description"><?php esc_html_e( 'Map your CSV columns to the contact records fields below.', 'groundhogg' ); ?></p>
     <style>
@@ -99,24 +98,24 @@ function guess_column_map_to( $column ) {
 			], admin_url( 'admin.php' ) );
 
 			if ( $selected > 0 ) {
-				echo html()->e( 'a', [
+				html( 'a', [
 					'href'  => add_query_arg( 'preview_item', $selected - 1, $base_admin_url ),
 					'class' => 'button'
-				], '&larr; ' . esc_html__( 'Prev' ) );
+				], '&larr; ' . esc_html__( 'Prev' , 'groundhogg' ) );
 				echo '&nbsp;';
 			}
 
 			if ( $selected < $total_items - 1 ) {
-				echo html()->e( 'a', [
+				html( 'a', [
 					'href'  => add_query_arg( 'preview_item', $selected + 1, $base_admin_url ),
 					'class' => 'button'
-				], esc_html__( 'Next' ) . ' &rarr;' );
-			}
-
-			?>
+				], esc_html__( 'Next' , 'groundhogg' ) . ' &rarr;' );
+			} ?>
         </div>
         <div class="tablenav-pages one-page">
-            <span class="displaying-num"><?php printf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), number_format_i18n( $total_items ) ); ?></span>
+            <span class="displaying-num"><?php
+                /* translators: %s: the number of rows in the CSV */
+                echo esc_html( sprintf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), number_format_i18n( $total_items ) ) ); ?></span>
         </div>
     </div>
 	<?php
@@ -130,7 +129,7 @@ function guess_column_map_to( $column ) {
 		__( 'Map To Contact Field', 'groundhogg' )
 	], array_map( function ( $key ) use ( $sample_item ) {
 		return [
-			"<b>" . $key . "</b>",
+			"<b>" . esc_html( $key ) . "</b>",
 			html()->input( [
 				'name'     => 'no_submit',
 				'value'    => $sample_item[ $key ],
@@ -152,21 +151,28 @@ function guess_column_map_to( $column ) {
         <tr>
             <th><?php esc_html_e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
             <td>
-                <div style="max-width: 500px"><?php echo html()->tag_picker( [] ); ?></div>
+                <div style="max-width: 500px"><?php
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    echo html()->tag_picker( [] );
+                    ?></div>
             </td>
         </tr>
         <tr>
             <th><?php esc_html_e( 'These contacts have previously confirmed their email address.', 'groundhogg' ) ?></th>
-            <td><?php echo html()->checkbox( [
+            <td><?php
+	            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                echo html()->checkbox( [
 					'label'   => esc_html__( 'Yes, these contacts have confirmed their email address.', 'groundhogg' ),
 					'name'    => 'email_is_confirmed',
 					'id'      => 'email_is_confirmed',
 					'class'   => '',
+	                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- constant
 					'value'   => Preferences::CONFIRMED,
 					'checked' => false,
 					'title'   => 'I have confirmed.',
 				] );
 
+	            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses is used
 				echo html()->description( kses( __( "If you are importing the <b>opt-in status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 				?></td>
@@ -174,7 +180,9 @@ function guess_column_map_to( $column ) {
 		<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
             <tr>
                 <th><?php esc_html_e( 'These contacts have previously given data processing consent.', 'groundhogg' ) ?></th>
-                <td><?php echo html()->checkbox( [
+                <td><?php
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    echo html()->checkbox( [
 						'label'   => esc_html__( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'data_processing_consent_given',
 						'id'      => 'data_processing_consent_given',
@@ -184,13 +192,16 @@ function guess_column_map_to( $column ) {
 						'title'   => 'Consent Given.',
 					] );
 
+	                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses is used
 					echo html()->description( kses( __( "If you are importing <b>data processing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 					?></td>
             </tr>
             <tr>
                 <th><?php esc_html_e( 'These contacts have previously given marketing consent.', 'groundhogg' ) ?></th>
-                <td><?php echo html()->checkbox( [
+                <td><?php
+	                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    echo html()->checkbox( [
 						'label'   => esc_html__( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'marketing_consent_given',
 						'id'      => 'marketing_consent_given',
@@ -200,6 +211,7 @@ function guess_column_map_to( $column ) {
 						'title'   => 'Consent Given.',
 					] );
 
+	                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses is used
 					echo html()->description( kses( __( "If you are importing <b>marketing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ), 'simple' ) )
 
 					?></td>

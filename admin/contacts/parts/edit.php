@@ -31,12 +31,12 @@ $id = absint( get_request_var( 'contact' ) );
 $contact = get_contactdata( $id );
 
 if ( ! $contact || ! $contact->exists() ) {
-	wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
+	wp_die( esc_html_x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
 }
 
 // The current user cannot edit this contact because they are not the owner
 if ( ! current_user_can( 'view_contact', $contact ) ) {
-	wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
+	wp_die( esc_html_x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 }
 
 ?>

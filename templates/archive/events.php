@@ -146,13 +146,19 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 		if ( $search ):
 
 			?>
-            <p><?php printf( __( 'You\'ve received %s emails matching %s.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ), bold_it( esc_html( $search ) ) ); ?></p>
+            <p><?php
+                /* translators: 1: number of emails received, 2: search term */
+				printf( __( 'You\'ve received %s emails matching %s.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ), bold_it( esc_html( $search ) ) );
+                ?></p>
 		<?php
 
 		else:
 
 			?>
-            <p><?php printf( __( 'You\'ve received %s emails from us.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ) ); ?></p>
+            <p><?php
+                /* translators: 1: number of emails received */
+				printf( __( 'You\'ve received %s emails from us.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ) );
+                ?></p>
 		<?php
 
 		endif;

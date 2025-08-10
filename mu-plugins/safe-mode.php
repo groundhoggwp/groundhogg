@@ -235,7 +235,10 @@ function groundhogg_safe_mode_enabled_notice() {
 	?>
     <div class="notice notice-warning">
         <p>
-	        <?php printf( __( '%s safe mode is <b>ON</b>. %s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => $disable_safe_mode_url ], __( 'Disable Safe Mode', 'groundhogg' ) ) ) ?>
+   	   		<?php
+            /* translators: 1: plugin/brand name, 2: disable safe mode link */
+            \Groundhogg\kses_e( sprintf( __( '%1$s safe mode is <b>ON</b>. %2$s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => $disable_safe_mode_url ], __( 'Disable Safe Mode', 'groundhogg' ) ) ) )
+            ?>
         </p>
     </div>
 	<?php
